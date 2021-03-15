@@ -8,7 +8,7 @@ require (
 	github.com/lithammer/shortuuid/v3 v3.0.6
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
+	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b // indirect
 	gopkg.in/square/go-jose.v2 v2.5.1
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
