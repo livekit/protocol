@@ -16,13 +16,13 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
+github.com/jxskiss/base62 v0.0.0-20191017122030-4f11678b909b h1:XUr8tvMEILhphQPp3TFcIudb5KTOzFeD0pJyDn5+5QI=
+github.com/jxskiss/base62 v0.0.0-20191017122030-4f11678b909b/go.mod h1:a5Mn24iYVJRUQSkFupGByqykzD+k+wFI8J91zGHuPf8=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0 h1:45sCR5RtlFHMR4UwH9sdQ5TC8v0qDQCHnXt+kaKSTVE=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/lithammer/shortuuid/v3 v3.0.6 h1:pr15YQyvhiSX/qPxncFtqk+v4xLEpOZObbsY/mKrcvA=
 github.com/lithammer/shortuuid/v3 v3.0.6/go.mod h1:vMk8ke37EmiewwolSO1NLW8vP4ZaKlRuDIi8tWWmAts=
-github.com/lytics/base62 v0.0.0-20180808010106-0ee4de5a5d6d h1:HONlVR8gkr5QibYNVFtj8ajfqRAKt21DmdzeZXZl6VQ=
-github.com/lytics/base62 v0.0.0-20180808010106-0ee4de5a5d6d/go.mod h1:nFZ1y9JiUDciefRL0X6OTobqQGgFCR+lbnn1lWsoQk0=
 github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0 h1:8E6DrFvII6QR4eJ3PkFvV+lc03P+2qwqTPLm1ax7694=
 github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0/go.mod h1:fcEyUyXZXoV4Abw8DX0t7wyL8mCDxXyU4iAFZfT3IHw=
 github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e h1:fD57ERR4JtEqsWbfPhv4DMiApHyliiK5xCTNVSPiaAs=

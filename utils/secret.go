@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"io"
 
-	"github.com/lytics/base62"
+	"github.com/jxskiss/base62"
 )
 
 func RandomSecret() string {
@@ -15,5 +15,5 @@ func RandomSecret() string {
 	if err != nil {
 		panic("could not read random")
 	}
-	return base62.StdEncoding.EncodeToString(buf)
+	return base62.EncodeToString(buf)
 }
