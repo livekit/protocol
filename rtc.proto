@@ -13,7 +13,7 @@ message SignalRequest {
     SessionDescription answer = 2;
     TrickleRequest trickle = 3;
     AddTrackRequest add_track = 4;
-    // mute the participant's own tracks
+    // mute the participant's published tracks
     MuteTrackRequest mute = 5;
     // Subscribe or unsubscribe from tracks
     UpdateSubscription subscription = 6;
@@ -110,7 +110,6 @@ enum VideoQuality {
 message UpdateSubscription {
   repeated string track_sids = 1;
   bool subscribe = 2;
-  bool mute = 3;
   VideoQuality quality = 4;
 }
 

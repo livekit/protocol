@@ -9,6 +9,11 @@ type VideoGrant struct {
 	RoomAdmin bool   `json:"roomAdmin,omitempty"`
 	RoomJoin  bool   `json:"roomJoin,omitempty"`
 	Room      string `json:"room,omitempty"`
+
+	// permissions within a room, if none of the permissions are set
+	// it's interpreted as both are permissible
+	CanPublish   bool `json:"canPublish,omitempty"`
+	CanSubscribe bool `json:"canSubscribe,omitempty"`
 }
 
 type ClaimGrants struct {
