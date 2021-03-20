@@ -4,8 +4,8 @@ package livekit;
 option go_package = "github.com/livekit/livekit-server/proto/livekit";
 
 // internal protos, not exposed to clients
-import "rtc.proto";
-import "room.proto";
+import "livekit_rtc.proto";
+import "livekit_room.proto";
 
 message Node {
   string id = 1;
