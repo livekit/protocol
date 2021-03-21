@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"gopkg.in/square/go-jose.v2/json"
 
 	"github.com/livekit/protocol/auth"
 )
@@ -27,6 +29,7 @@ func TestVerifier(t *testing.T) {
 
 	t.Run("key has expired", func(t *testing.T) {
 		v, err := auth.ParseAPIToken(accessToken)
+		require.NoError(t, err)
 
 		_, err = v.Verify(secret)
 		assert.Error(t, err)
@@ -56,12 +59,13 @@ func TestVerifier(t *testing.T) {
 			"user":   "value",
 			"number": float64(3),
 		}
+		md, _ := json.Marshal(metadata)
 		at := auth.NewAccessToken(apiKey, secret).
 			AddGrant(&auth.VideoGrant{
 				RoomAdmin: true,
 				Room:      "myroom",
 			}).
-			SetMetadata(metadata)
+			SetMetadata(string(md))
 
 		authToken, err := at.ToJWT()
 		assert.NoError(t, err)
@@ -72,6 +76,6 @@ func TestVerifier(t *testing.T) {
 		decoded, err := v.Verify(secret)
 		assert.NoError(t, err)
 
-		assert.EqualValues(t, metadata, decoded.Metadata)
+		assert.EqualValues(t, string(md), decoded.Metadata)
 	})
 }

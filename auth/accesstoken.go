@@ -17,7 +17,7 @@ type AccessToken struct {
 	secret     string
 	identity   string
 	videoGrant *VideoGrant
-	metadata   map[string]interface{}
+	metadata   string
 	validFor   time.Duration
 }
 
@@ -43,7 +43,7 @@ func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
 	return t
 }
 
-func (t *AccessToken) SetMetadata(md map[string]interface{}) *AccessToken {
+func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.metadata = md
 	return t
 }
@@ -74,7 +74,7 @@ func (t *AccessToken) ToJWT() (string, error) {
 	if t.videoGrant != nil {
 		grants.Video = t.videoGrant
 	}
-	if t.metadata != nil {
+	if t.metadata != "" {
 		grants.Metadata = t.metadata
 	}
 	return jwt.Signed(sig).Claims(cl).Claims(grants).CompactSerialize()

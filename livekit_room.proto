@@ -27,7 +27,7 @@ service RoomService {
   rpc MutePublishedTrack(MuteRoomTrackRequest) returns (MuteRoomTrackResponse);
 
   // update participant metadata
-  rpc UpdateParticipantMetadata(UpdateParticipantMetadataRequest) returns (ParticipantInfo);
+  rpc UpdateParticipant(UpdateParticipantRequest) returns (ParticipantInfo);
 }
 
 message CreateRoomRequest {
@@ -80,7 +80,15 @@ message MuteRoomTrackResponse {
   TrackInfo track = 1;
 }
 
-message UpdateParticipantMetadataRequest {
-  RoomParticipantIdentity target = 1;
-  string metadata = 2;
+message ParticipantPermission {
+  bool can_publish = 1;
+  bool can_subscribe = 2;
 }
+
+message UpdateParticipantRequest {
+  string room = 1;
+  string identity = 2;
+  optional string metadata = 3;
+  optional ParticipantPermission permission = 4;
+}
+
