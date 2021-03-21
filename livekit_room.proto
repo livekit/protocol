@@ -81,14 +81,14 @@ message MuteRoomTrackResponse {
 }
 
 message ParticipantPermission {
-  bool can_publish = 1;
-  bool can_subscribe = 2;
+  bool can_subscribe = 1;
+  bool can_publish = 2;
 }
 
 message UpdateParticipantRequest {
   string room = 1;
   string identity = 2;
-  optional string metadata = 3;
-  optional ParticipantPermission permission = 4;
+  string metadata = 3;
+  ParticipantPermission permission = 4;
 }
 

@@ -34,7 +34,7 @@ message RTCNodeMessage {
     // internal messages
     RoomParticipantIdentity remove_participant = 4;
     MuteRoomTrackRequest mute_track = 5;
-    UpdateParticipantMetadataRequest update_metadata = 6;
+    UpdateParticipantRequest update_participant = 6;
   }
 }
 
@@ -56,11 +56,6 @@ message StartSession {
   // metadata to pass to participant
   string metadata = 5;
   ParticipantPermission permission = 6;
-}
-
-message ParticipantPermission {
-  bool can_subscribe = 1;
-  bool can_publish = 2;
 }
 
 message EndSession {
