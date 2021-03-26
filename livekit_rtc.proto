@@ -115,7 +115,7 @@ message UpdateSubscription {
 
 message UpdateTrackSettings {
   repeated string track_sids = 1;
-  bool mute = 3;
+  bool disabled = 3;
   VideoQuality quality = 4;
 }
 
