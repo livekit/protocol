@@ -28,6 +28,8 @@ message ParticipantInfo {
   State state = 3;
   repeated TrackInfo tracks = 4;
   string metadata = 5;
+  // timestamp when participant joined room
+  int64 joined_at = 6;
 }
 
 enum TrackType {
