@@ -35,6 +35,7 @@ message RTCNodeMessage {
     RoomParticipantIdentity remove_participant = 4;
     MuteRoomTrackRequest mute_track = 5;
     UpdateParticipantRequest update_participant = 6;
+    LeaveRequest leave = 7;
   }
 }
 

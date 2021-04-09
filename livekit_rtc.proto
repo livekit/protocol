@@ -19,6 +19,8 @@ message SignalRequest {
     UpdateSubscription subscription = 6;
     // Update settings of subscribed tracks
     UpdateTrackSettings track_setting = 7;
+    // Immediately terminate session
+    LeaveRequest leave = 8;
   }
 }
 
@@ -117,6 +119,10 @@ message UpdateTrackSettings {
   repeated string track_sids = 1;
   bool disabled = 3;
   VideoQuality quality = 4;
+}
+
+message LeaveRequest {
+  // empty
 }
 
 message ICEServer {
