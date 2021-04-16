@@ -12,6 +12,7 @@ type APIKeyTokenVerifier struct {
 	apiKey   string
 }
 
+// ParseAPIToken parses an encoded JWT token and
 func ParseAPIToken(raw string) (*APIKeyTokenVerifier, error) {
 	tok, err := jwt.ParseSigned(raw)
 	if err != nil {

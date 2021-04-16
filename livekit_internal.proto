@@ -56,6 +56,8 @@ message StartSession {
   // metadata to pass to participant
   string metadata = 5;
   ParticipantPermission permission = 6;
+  int32 protocol_version = 7;
+  bool use_plan_b = 8;
 }
 
 message EndSession {
