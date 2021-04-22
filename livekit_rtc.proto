@@ -40,6 +40,8 @@ message SignalResponse {
     TrackPublishedResponse track_published = 6;
     // list of active speakers
     ActiveSpeakerUpdate speaker = 7;
+    // Immediately terminate session
+    LeaveRequest leave = 8;
   }
 }
 
