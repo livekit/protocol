@@ -132,3 +132,23 @@ message ICEServer {
   string username = 2;
   string credential = 3;
 }
+
+// new DataPacket API
+message DataPacket {
+  enum Kind {
+    RELIABLE = 0;
+    LOSSY = 1;
+  }
+  Kind kind = 1;
+  oneof value {
+    UserPacket user = 2;
+    ActiveSpeakerUpdate speaker = 3;
+  }
+}
+
+message UserPacket {
+  // participant ID of user that sent the message
+  string participant_sid = 1;
+  // user defined payload
+  bytes payload = 2;
+}

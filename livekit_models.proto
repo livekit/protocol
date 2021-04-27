@@ -45,6 +45,7 @@ message TrackInfo {
   bool muted = 4;
 }
 
+// old DataTrack message
 message DataMessage {
   oneof value {
     string text = 1;
