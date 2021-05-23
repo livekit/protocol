@@ -59,6 +59,7 @@ message StartSession {
   ParticipantPermission permission = 6;
   int32 protocol_version = 7;
   bool use_plan_b = 8;
+  bool auto_subscribe = 9;
 }
 
 message EndSession {
