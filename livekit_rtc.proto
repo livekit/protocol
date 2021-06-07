@@ -151,4 +151,6 @@ message UserPacket {
   string participant_sid = 1;
   // user defined payload
   bytes payload = 2;
+  // the ID of the participants who will receive the message (the message will be sent to all the people in the room if this variable is empty)
+  repeated string destination_sids = 3;
 }
