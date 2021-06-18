@@ -43,6 +43,13 @@ message TrackInfo {
   TrackType type = 2;
   string name = 3;
   bool muted = 4;
+  // original width of video (unset for audio)
+  // clients may receive a lower resolution version with simulcast
+  uint32 width = 5;
+  // original height of video (unset for audio)
+  uint32 height = 6;
+  // true if track is simulcasted
+  bool simulcast = 7;
 }
 
 // old DataTrack message

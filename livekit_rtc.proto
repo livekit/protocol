@@ -55,6 +55,8 @@ message AddTrackRequest {
   string cid = 1;
   string name = 2;
   TrackType type = 3;
+  uint32 width = 4;
+  uint32 height = 5;
 }
 
 message TrickleRequest {
