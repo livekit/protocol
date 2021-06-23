@@ -28,6 +28,9 @@ service RoomService {
 
   // update participant metadata
   rpc UpdateParticipant(UpdateParticipantRequest) returns (ParticipantInfo);
+
+  // selective subscriptions
+  rpc UpdateSubscriptions(UpdateSubscriptionsRequest) returns (UpdateSubscriptionsResponse);
 }
 
 message CreateRoomRequest {
@@ -92,3 +95,13 @@ message UpdateParticipantRequest {
   ParticipantPermission permission = 4;
 }
 
+message UpdateSubscriptionsRequest {
+  string room = 1;
+  string identity = 2;
+  repeated string track_sids = 3;
+  bool subscribe = 4;
+}
+
+message UpdateSubscriptionsResponse {
+  // empty for now
+}
