@@ -9,34 +9,42 @@ import "livekit_models.proto";
 // they are Twirp-based HTTP req/responses
 service RoomService {
 
-  // should be accessible to only internal servers, not external
+  // Creates a room with settings. Requires `roomCreate` permission.
+  // This method is optional; rooms are automatically created when clients connect to them for the first time.
   rpc CreateRoom(CreateRoomRequest) returns (Room);
+
+  // List rooms that are active on the server. Requires `roomList` permission.
   rpc ListRooms(ListRoomsRequest) returns (ListRoomsResponse);
+
+  // Deletes an existing room by name or id. Requires `roomCreate` permission.
+  // DeleteRoom will disconnect all participants that are currently in the room.
   rpc DeleteRoom(DeleteRoomRequest) returns (DeleteRoomResponse);
 
-  // lists participants in a room, requires RoomAdmin
+  // Lists participants in a room, Requires `roomAdmin`
   rpc ListParticipants(ListParticipantsRequest) returns (ListParticipantsResponse);
 
-  // get information on a specific participant, requires RoomAdmin
+  // Get information on a specific participant, Requires `roomAdmin`
   rpc GetParticipant(RoomParticipantIdentity) returns (ParticipantInfo);
 
-  // removes a participant from room, requires RoomAdmin
+  // Removes a participant from room. Requires `roomAdmin`
   rpc RemoveParticipant(RoomParticipantIdentity) returns (RemoveParticipantResponse);
 
-  // mute/unmute a participant, requires RoomAdmin
+  // Mute/unmute a participant's track, Requires `roomAdmin`
   rpc MutePublishedTrack(MuteRoomTrackRequest) returns (MuteRoomTrackResponse);
 
-  // update participant metadata
+  // Update participant metadata, will cause updates to be broadcasted to everyone in the room. Requires `roomAdmin`
   rpc UpdateParticipant(UpdateParticipantRequest) returns (ParticipantInfo);
 
-  // selective subscriptions
+  // Subscribes or unsubscribe a participant from tracks. Requires `roomAdmin`
   rpc UpdateSubscriptions(UpdateSubscriptionsRequest) returns (UpdateSubscriptionsResponse);
 }
 
 message CreateRoomRequest {
+  // name of the room
   string name = 1;
-  // number of seconds the room should cleanup after being empty
+  // number of seconds to keep the room open if no one joins
   uint32 empty_timeout = 2;
+  // limit number of participants that can be in a room
   uint32 max_participants = 3;
   // override the node room is allocated to, for debugging
   string node_id = 4;
@@ -50,6 +58,7 @@ message ListRoomsResponse {
 }
 
 message DeleteRoomRequest {
+  // name of the room
   string room = 1;
 }
 
@@ -57,6 +66,7 @@ message DeleteRoomResponse {
 }
 
 message ListParticipantsRequest {
+  // name of the room
   string room = 1;
 }
 
@@ -65,7 +75,9 @@ message ListParticipantsResponse {
 }
 
 message RoomParticipantIdentity {
+  // name of the room
   string room = 1;
+  // identity of the participant
   string identity = 2;
 }
 
@@ -73,9 +85,12 @@ message RemoveParticipantResponse {
 }
 
 message MuteRoomTrackRequest {
+  // name of the room
   string room = 1;
   string identity = 2;
+  // sid of the track to mute
   string track_sid = 3;
+  // set to true to mute, false to unmute
   bool muted = 4;
 }
 
@@ -84,21 +99,27 @@ message MuteRoomTrackResponse {
 }
 
 message ParticipantPermission {
+  // allow participant to subscribe to other tracks in the room
   bool can_subscribe = 1;
+  // allow participant to publish new tracks to room
   bool can_publish = 2;
 }
 
 message UpdateParticipantRequest {
   string room = 1;
   string identity = 2;
+  // metadata to update. skipping updates if left empty
   string metadata = 3;
+  // set to update the participant's permissions
   ParticipantPermission permission = 4;
 }
 
 message UpdateSubscriptionsRequest {
   string room = 1;
   string identity = 2;
+  // list of sids of tracks
   repeated string track_sids = 3;
+  // set to true to subscribe, false to unsubscribe from tracks
   bool subscribe = 4;
 }
 
