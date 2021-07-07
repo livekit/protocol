@@ -73,7 +73,7 @@ message MuteTrackRequest {
 
 message SetSimulcastLayers {
   string track_sid = 1;
-  repeated uint32 layers = 2;
+  repeated VideoQuality layers = 2;
 }
 
 message JoinResponse {
