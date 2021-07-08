@@ -21,6 +21,8 @@ message SignalRequest {
     UpdateTrackSettings track_setting = 7;
     // Immediately terminate session
     LeaveRequest leave = 8;
+    // Set active published layers
+    SetSimulcastLayers simulcast = 9;
   }
 }
 
@@ -69,8 +71,9 @@ message MuteTrackRequest {
   bool muted = 2;
 }
 
-message NegotiationRequest {
-  // empty
+message SetSimulcastLayers {
+  string track_sid = 1;
+  repeated VideoQuality layers = 2;
 }
 
 message JoinResponse {
