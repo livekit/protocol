@@ -124,7 +124,7 @@ message UpdateTrackSettings {
 }
 
 message LeaveRequest {
-  // empty
+  bool can_reconnect = 1;
 }
 
 message ICEServer {
