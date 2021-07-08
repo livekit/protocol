@@ -124,6 +124,8 @@ message UpdateTrackSettings {
 }
 
 message LeaveRequest {
+  // sent when server initiates the disconnect due to server-restart
+  // indicates clients should attempt full-reconnect sequence
   bool can_reconnect = 1;
 }
 
