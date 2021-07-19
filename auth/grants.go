@@ -14,6 +14,9 @@ type VideoGrant struct {
 	// it's interpreted as both are permissible
 	CanPublish   bool `json:"canPublish,omitempty"`
 	CanSubscribe bool `json:"canSubscribe,omitempty"`
+
+	// used for recording
+	Hidden bool `json:"hidden,omitempty"`
 }
 
 type ClaimGrants struct {
