@@ -37,6 +37,12 @@ service RoomService {
 
   // Subscribes or unsubscribe a participant from tracks. Requires `roomAdmin`
   rpc UpdateSubscriptions(UpdateSubscriptionsRequest) returns (UpdateSubscriptionsResponse);
+
+  // Begins recording a room
+  rpc RecordRoom(RecordRoomRequest) returns (RecordingResponse);
+
+  // Ends a room recording
+  rpc EndRoomRecording(EndRecordingRequest) returns (RecordingResponse);
 }
 
 message CreateRoomRequest {
@@ -48,6 +54,8 @@ message CreateRoomRequest {
   uint32 max_participants = 3;
   // override the node room is allocated to, for debugging
   string node_id = 4;
+  // record room
+  RecordRoomRequest recording = 5;
 }
 
 message ListRoomsRequest {
@@ -125,4 +133,17 @@ message UpdateSubscriptionsRequest {
 
 message UpdateSubscriptionsResponse {
   // empty for now
+}
+
+message RecordRoomRequest {
+  RecordingInput input = 1;
+  RecordingOutput output = 2;
+}
+
+message EndRecordingRequest {
+  string recording_id = 1;
+}
+
+message RecordingResponse {
+  string recording_id = 1;
 }
