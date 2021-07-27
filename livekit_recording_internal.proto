@@ -3,10 +3,11 @@ syntax = "proto3";
 package livekit;
 option go_package = "github.com/livekit/livekit-server/proto/livekit";
 
-message RecordingTemplate {
-  string type = 1;
-  string ws_url = 2;
-  string token = 3;
+message RecordingReservation {
+  string id = 1;
+  int64 submitted_at = 2;
+  RecordingInput input = 3;
+  RecordingOutput output = 4;
 }
 
 message RecordingInput {
@@ -18,28 +19,27 @@ message RecordingInput {
   int32 framerate = 6;
 }
 
+message RecordingTemplate {
+  string type = 1;
+  string ws_url = 2;
+  string token = 3;
+}
+
+message RecordingOutput {
+    string file = 1;
+    string rtmp = 2;
+    RecordingS3Output s3 = 3;
+    int32 width = 4;
+    int32 height = 5;
+    string audioBitrate = 6;
+    string audioFrequency = 7;
+    string videoBitrate = 8;
+    string videoBuffer = 9;
+}
+
 message RecordingS3Output {
   string bucket = 1;
   string key = 2;
   string access_key = 3;
   string secret = 4;
-}
-
-message RecordingOutput {
-  string file = 1;
-  string rtmp = 2;
-  RecordingS3Output s3 = 3;
-  int32 width = 4;
-  int32 height = 5;
-  string audioBitrate = 6;
-  string audioFrequency = 7;
-  string videoBitrate = 8;
-  string videoBuffer = 9;
-}
-
-message RecordingReservation {
-  string id = 1;
-  int64 submitted_at = 2;
-  RecordingInput input = 3;
-  RecordingOutput output = 4;
 }
