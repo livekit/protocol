@@ -69,6 +69,7 @@ message DataMessage {
 }
 
 message RecordingInput {
+  // either url or template required
   string url = 1;
   RecordingTemplate template = 2;
   int32 width = 3;
@@ -80,11 +81,13 @@ message RecordingInput {
 message RecordingTemplate {
   string type = 1;
   string ws_url = 2;
+  // either token or room name required
   string token = 3;
   string roomName = 4;
 }
 
 message RecordingOutput {
+  // either file, rtmp, or s3 required
   string file = 1;
   string rtmp = 2;
   RecordingS3Output s3 = 3;
@@ -99,6 +102,7 @@ message RecordingOutput {
 message RecordingS3Output {
   string bucket = 1;
   string key = 2;
+  // optional
   string access_key = 3;
   string secret = 4;
 }
