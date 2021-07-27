@@ -43,7 +43,3 @@ message RecordingReservation {
   RecordingInput input = 3;
   RecordingOutput output = 4;
 }
-
-message EndRoomRecording {
-  string id = 1;
-}
