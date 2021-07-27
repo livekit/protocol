@@ -37,10 +37,11 @@ message RecordingOutput {
   string videoBuffer = 9;
 }
 
-message StartRoomRecording {
+message RecordingReservation {
   string id = 1;
-  RecordingInput input = 2;
-  RecordingOutput output = 3;
+  int64 submitted_at = 2;
+  RecordingInput input = 3;
+  RecordingOutput output = 4;
 }
 
 message EndRoomRecording {
