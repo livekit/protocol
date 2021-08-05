@@ -4,6 +4,7 @@ type VideoGrant struct {
 	// actions on rooms
 	RoomCreate bool `json:"roomCreate,omitempty"`
 	RoomList   bool `json:"roomList,omitempty"`
+	RoomRecord bool `json:"roomRecord,omitempty"`
 
 	// actions on a particular room
 	RoomAdmin bool   `json:"roomAdmin,omitempty"`
