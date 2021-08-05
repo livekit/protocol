@@ -79,7 +79,7 @@ message RecordingInput {
 }
 
 message RecordingTemplate {
-  string type = 1;
+  string layout = 1;
   string ws_url = 2;
   // either token or room name required
   string token = 3;
