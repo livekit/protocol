@@ -17,8 +17,16 @@ service RecordingService {
 }
 
 message StartRecordingRequest {
-  RecordingInput input = 1;
-  RecordingOutput output = 2;
+  oneof input {
+    string url = 1;
+    RecordingTemplate template = 2;
+  }
+  oneof output {
+    string file = 3;
+    RecordingS3Output s3 = 4;
+    string rtmp = 5;
+  }
+  RecordingOptions options = 6;
 }
 
 message EndRecordingRequest {

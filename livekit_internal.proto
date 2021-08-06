@@ -75,6 +75,14 @@ message RemoveParticipant {
 message RecordingReservation {
   string id = 1;
   int64 submitted_at = 2;
-  RecordingInput input = 3;
-  RecordingOutput output = 4;
+  oneof input {
+    string url = 3;
+    RecordingTemplate template = 4;
+  }
+  oneof output {
+    string file = 5;
+    RecordingS3Output s3 = 6;
+    string rtmp = 7;
+  }
+  RecordingOptions options = 8;
 }

@@ -68,16 +68,6 @@ message DataMessage {
   }
 }
 
-message RecordingInput {
-  // either url or template required
-  string url = 1;
-  RecordingTemplate template = 2;
-  int32 width = 3;
-  int32 height = 4;
-  int32 depth = 5;
-  int32 framerate = 6;
-}
-
 message RecordingTemplate {
   string layout = 1;
   string ws_url = 2;
@@ -86,23 +76,24 @@ message RecordingTemplate {
   string room_name = 4;
 }
 
-message RecordingOutput {
-  // either file, rtmp, or s3 required
-  string file = 1;
-  string rtmp = 2;
-  RecordingS3Output s3 = 3;
-  int32 width = 4;
-  int32 height = 5;
-  string audio_bitrate = 6;
-  string audio_frequency = 7;
-  string video_bitrate = 8;
-  string video_buffer = 9;
-}
-
 message RecordingS3Output {
   string bucket = 1;
   string key = 2;
   // optional
   string access_key = 3;
   string secret = 4;
+}
+
+message RecordingOptions {
+  // 720p30, 720p60, 1080p30, or 1080p60
+  string preset = 1;
+  int32 input_width = 2;
+  int32 input_height = 3;
+  int32 output_width = 4;
+  int32 output_height = 5;
+  int32 depth = 6;
+  int32 framerate = 7;
+  int32 audio_bitrate = 8;
+  int32 audio_frequency = 9;
+  int32 video_bitrate = 10;
 }
