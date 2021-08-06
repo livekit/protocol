@@ -7,7 +7,6 @@ option go_package = "github.com/livekit/livekit-server/proto/livekit";
 import "livekit_recording.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
-import "livekit_models.proto";
 
 message Node {
   string id = 1;
