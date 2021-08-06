@@ -4,9 +4,9 @@ package livekit;
 option go_package = "github.com/livekit/livekit-server/proto/livekit";
 
 // internal protos, not exposed to clients
+import "livekit_recording.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
-import "livekit_models.proto";
 
 message Node {
   string id = 1;
@@ -75,6 +75,5 @@ message RemoveParticipant {
 message RecordingReservation {
   string id = 1;
   int64 submitted_at = 2;
-  RecordingInput input = 3;
-  RecordingOutput output = 4;
+  StartRecordingRequest request = 3;
 }
