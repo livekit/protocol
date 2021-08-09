@@ -24,14 +24,18 @@ func ParseAPIToken(raw string) (*APIKeyTokenVerifier, error) {
 		return nil, err
 	}
 
-	return &APIKeyTokenVerifier{
+	v := &APIKeyTokenVerifier{
 		token:    tok,
 		apiKey:   out.Issuer,
-		identity: out.ID,
-	}, nil
+		identity: out.Subject,
+	}
+	if v.identity == "" {
+		v.identity = out.ID
+	}
+	return v, nil
 }
 
-// Returns the API key this token was signed with
+// APIKey returns the API key this token was signed with
 func (v *APIKeyTokenVerifier) APIKey() string {
 	return v.apiKey
 }
@@ -57,6 +61,6 @@ func (v *APIKeyTokenVerifier) Verify(key interface{}) (*ClaimGrants, error) {
 	}
 
 	// copy over identity
-	claims.Identity = out.ID
+	claims.Identity = v.identity
 	return &claims, nil
 }

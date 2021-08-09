@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/livekit-server/proto/livekit";
+
+import "livekit_models.proto";
+
+message WebhookEvent {
+  // one of room_started, room_finished, participant_joined, participant_left
+  string type = 1;
+
+  Room room = 2;
+
+  // set when event is participant_*
+  ParticipantInfo participant = 3;
+}

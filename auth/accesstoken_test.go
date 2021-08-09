@@ -1,14 +1,13 @@
-package auth_test
+package auth
 
 import (
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2/jwt"
 
-	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/utils"
 )
 
@@ -16,51 +15,70 @@ func TestAccessToken(t *testing.T) {
 	t.Parallel()
 
 	t.Run("keys must be set", func(t *testing.T) {
-		token := auth.NewAccessToken("", "")
+		token := NewAccessToken("", "")
 		_, err := token.ToJWT()
-		assert.Equal(t, auth.ErrKeysMissing, err)
+		require.Equal(t, ErrKeysMissing, err)
 	})
 
-	t.Run("generates a decodeable key", func(t *testing.T) {
+	t.Run("generates a decode-able key", func(t *testing.T) {
 		apiKey, secret := apiKeypair()
-		videoGrant := &auth.VideoGrant{RoomJoin: true, Room: "myroom"}
-		at := auth.NewAccessToken(apiKey, secret).
+		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
+		at := NewAccessToken(apiKey, secret).
 			AddGrant(videoGrant).
 			SetValidFor(time.Minute * 5).
 			SetIdentity("user")
 		value, err := at.ToJWT()
 		//fmt.Println(raw)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.Len(t, strings.Split(value, "."), 3)
+		require.Len(t, strings.Split(value, "."), 3)
 
 		// ensure it's a valid JWT
 		token, err := jwt.ParseSigned(value)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		decodedGrant := auth.ClaimGrants{}
+		decodedGrant := ClaimGrants{}
 		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.EqualValues(t, videoGrant, decodedGrant.Video)
+		require.EqualValues(t, videoGrant, decodedGrant.Video)
 	})
 
 	t.Run("default validity should be more than a minute", func(t *testing.T) {
 		apiKey, secret := apiKeypair()
-		videoGrant := &auth.VideoGrant{RoomJoin: true, Room: "myroom"}
-		at := auth.NewAccessToken(apiKey, secret).
+		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
+		at := NewAccessToken(apiKey, secret).
 			AddGrant(videoGrant)
 		value, err := at.ToJWT()
 		token, err := jwt.ParseSigned(value)
 
 		claim := jwt.Claims{}
-		decodedGrant := auth.ClaimGrants{}
+		decodedGrant := ClaimGrants{}
 		err = token.UnsafeClaimsWithoutVerification(&claim, &decodedGrant)
-		assert.NoError(t, err)
-		assert.EqualValues(t, videoGrant, decodedGrant.Video)
+		require.NoError(t, err)
+		require.EqualValues(t, videoGrant, decodedGrant.Video)
 
 		// default validity
-		assert.True(t, claim.Expiry.Time().Sub(claim.IssuedAt.Time()) > time.Minute)
+		require.True(t, claim.Expiry.Time().Sub(claim.IssuedAt.Time()) > time.Minute)
+	})
+
+	t.Run("backwards compatible with jti identity tokens", func(t *testing.T) {
+		apiKey, secret := apiKeypair()
+		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
+		at := NewAccessToken(apiKey, secret).
+			AddGrant(videoGrant).
+			SetValidFor(time.Minute * 5).
+			SetIdentity("user")
+		value, err := at.toJWTOld()
+		//fmt.Println(raw)
+		require.NoError(t, err)
+
+		verifier, err := ParseAPIToken(value)
+		require.NoError(t, err)
+
+		grants, err := verifier.Verify(secret)
+		require.NoError(t, err)
+		require.Equal(t, "user", grants.Identity)
 	})
 }
 

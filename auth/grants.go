@@ -23,5 +23,7 @@ type VideoGrant struct {
 type ClaimGrants struct {
 	Identity string      `json:"-"`
 	Video    *VideoGrant `json:"video,omitempty"`
-	Metadata string      `json:"metadata,omitempty"`
+	// for verifying integrity of the message body
+	Sha256   string `json:"sha256,omitempty"`
+	Metadata string `json:"metadata,omitempty"`
 }
