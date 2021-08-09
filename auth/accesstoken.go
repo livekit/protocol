@@ -13,12 +13,10 @@ const (
 
 // Signer that produces token signed with API key and secret
 type AccessToken struct {
-	apiKey     string
-	secret     string
-	identity   string
-	videoGrant *VideoGrant
-	metadata   string
-	validFor   time.Duration
+	apiKey   string
+	secret   string
+	grant    ClaimGrants
+	validFor time.Duration
 }
 
 func NewAccessToken(key string, secret string) *AccessToken {
@@ -29,7 +27,7 @@ func NewAccessToken(key string, secret string) *AccessToken {
 }
 
 func (t *AccessToken) SetIdentity(identity string) *AccessToken {
-	t.identity = identity
+	t.grant.Identity = identity
 	return t
 }
 
@@ -39,12 +37,17 @@ func (t *AccessToken) SetValidFor(duration time.Duration) *AccessToken {
 }
 
 func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
-	t.videoGrant = grant
+	t.grant.Video = grant
 	return t
 }
 
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
-	t.metadata = md
+	t.grant.Metadata = md
+	return t
+}
+
+func (t *AccessToken) SetSha256(sha string) *AccessToken {
+	t.grant.Sha256 = sha
 	return t
 }
 
@@ -68,14 +71,34 @@ func (t *AccessToken) ToJWT() (string, error) {
 		Issuer:    t.apiKey,
 		NotBefore: jwt.NewNumericDate(time.Now()),
 		Expiry:    jwt.NewNumericDate(time.Now().Add(validFor)),
-		ID:        t.identity,
+		Subject:   t.grant.Identity,
+		// eventually deprecate using ID as identity
+		ID: t.grant.Identity,
 	}
-	grants := &ClaimGrants{}
-	if t.videoGrant != nil {
-		grants.Video = t.videoGrant
+	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).CompactSerialize()
+}
+
+func (t *AccessToken) toJWTOld() (string, error) {
+	if t.apiKey == "" || t.secret == "" {
+		return "", ErrKeysMissing
 	}
-	if t.metadata != "" {
-		grants.Metadata = t.metadata
+
+	sig, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.HS256, Key: []byte(t.secret)},
+		(&jose.SignerOptions{}).WithType("JWT"))
+	if err != nil {
+		return "", err
 	}
-	return jwt.Signed(sig).Claims(cl).Claims(grants).CompactSerialize()
+
+	validFor := defaultValidDuration
+	if t.validFor > 0 {
+		validFor = t.validFor
+	}
+
+	cl := jwt.Claims{
+		Issuer:    t.apiKey,
+		NotBefore: jwt.NewNumericDate(time.Now()),
+		Expiry:    jwt.NewNumericDate(time.Now().Add(validFor)),
+		ID:        t.grant.Identity,
+	}
+	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).CompactSerialize()
 }

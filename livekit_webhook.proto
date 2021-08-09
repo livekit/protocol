@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/livekit-server/proto/livekit";
+
+import "livekit_models.proto";
+
+message WebhookEvent {
+  // one of room_started, room_ended, participant_joined, participant_left, recording_started, recording_finished
+  string type = 1;
+
+  // JWT token signed with the first API key pair
+  string token = 2;
+
+  Room room = 3;
+
+  // set when event is participant_*
+  ParticipantInfo participant = 4;
+
+  // set when event is recording_*
+  string recording_id = 5;
+//  oneof recording_output {
+//    string file = 7;
+//    RecordingS3Output s3 = 8;
+//    string rtmp = 9;
+//  }
+}

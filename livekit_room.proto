@@ -8,7 +8,6 @@ import "livekit_models.proto";
 // Room service that can be performed on any node
 // they are Twirp-based HTTP req/responses
 service RoomService {
-
   // Creates a room with settings. Requires `roomCreate` permission.
   // This method is optional; rooms are automatically created when clients connect to them for the first time.
   rpc CreateRoom(CreateRoomRequest) returns (Room);

@@ -8,7 +8,6 @@ import "livekit_models.proto";
 // Recording service that can be performed on any node
 // they are Twirp-based HTTP req/responses
 service RecordingService {
-
     // Starts a room
     rpc StartRecording(StartRecordingRequest) returns (RecordingResponse);
 
