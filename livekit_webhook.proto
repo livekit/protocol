@@ -9,11 +9,8 @@ message WebhookEvent {
   // one of room_started, room_finished, participant_joined, participant_left
   string type = 1;
 
-  // JWT token signed with the first API key pair
-  string token = 2;
-
-  Room room = 3;
+  Room room = 2;
 
   // set when event is participant_*
-  ParticipantInfo participant = 4;
+  ParticipantInfo participant = 3;
 }
