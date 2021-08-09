@@ -14,8 +14,6 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const authHeader = "Authorization"
-
 type Notifier struct {
 	apiKey    string
 	apiSecret string

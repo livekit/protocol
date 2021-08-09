@@ -3,17 +3,10 @@ package webhook
 import (
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"io"
 	"net/http"
 
 	"github.com/livekit/protocol/auth"
-)
-
-var (
-	ErrNoAuthHeader    = errors.New("authorization header could not be found")
-	ErrSecretNotFound  = errors.New("API secret could not be found")
-	ErrInvalidChecksum = errors.New("could not verify authenticity of message")
 )
 
 // Receive reads and verifies incoming webhook is signed with key/secret pair
