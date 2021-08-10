@@ -7,7 +7,7 @@ import "livekit_models.proto";
 
 message WebhookEvent {
   // one of room_started, room_finished, participant_joined, participant_left
-  string type = 1;
+  string event = 1;
 
   Room room = 2;
 
