@@ -36,6 +36,9 @@ service RoomService {
 
   // Subscribes or unsubscribe a participant from tracks. Requires `roomAdmin`
   rpc UpdateSubscriptions(UpdateSubscriptionsRequest) returns (UpdateSubscriptionsResponse);
+
+  // Send data over data channel to participants in a room, Requires `roomAdmin`
+  rpc SendData(SendDataRequest) returns (SendDataResponse);
 }
 
 message CreateRoomRequest {
@@ -124,4 +127,15 @@ message UpdateSubscriptionsRequest {
 
 message UpdateSubscriptionsResponse {
   // empty for now
+}
+
+message SendDataRequest {
+  string room = 1;
+  repeated string destination_sids = 2;
+  string kind = 3;
+  bytes data = 4;
+}
+
+message SendDataResponse {
+  //
 }
