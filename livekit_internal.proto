@@ -38,6 +38,7 @@ message RTCNodeMessage {
     UpdateParticipantRequest update_participant = 6;
     DeleteRoomRequest delete_room = 7;
     UpdateSubscriptionsRequest update_subscriptions = 8;
+    SendDataRequest send_data = 9;
   }
 }
 
