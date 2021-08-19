@@ -28,3 +28,15 @@ type ClaimGrants struct {
 	Sha256   string `json:"sha256,omitempty"`
 	Metadata string `json:"metadata,omitempty"`
 }
+
+func (v *VideoGrant) SetCanPublish(val bool) {
+	v.CanPublish = &val
+}
+
+func (v *VideoGrant) SetCanPublishData(val bool) {
+	v.CanPublishData = &val
+}
+
+func (v *VideoGrant) SetCanSubscribe(val bool) {
+	v.CanSubscribe = &val
+}

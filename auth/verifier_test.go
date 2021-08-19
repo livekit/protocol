@@ -79,13 +79,13 @@ func TestVerifier(t *testing.T) {
 	})
 
 	t.Run("nil permissions are handled", func(t *testing.T) {
-		fVal := false
+		grant := &auth.VideoGrant{
+			Room:     "myroom",
+			RoomJoin: true,
+		}
+		grant.SetCanPublishData(false)
 		at := auth.NewAccessToken(apiKey, secret).
-			AddGrant(&auth.VideoGrant{
-				Room:           "myroom",
-				RoomJoin:       true,
-				CanPublishData: &fVal,
-			})
+			AddGrant(grant)
 		token, err := at.ToJWT()
 		require.NoError(t, err)
 
