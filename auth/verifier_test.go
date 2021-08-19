@@ -4,7 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/square/go-jose.v2/json"
 
@@ -17,14 +16,14 @@ func TestVerifier(t *testing.T) {
 	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDg5MzAzMDgsImlzcyI6IkFQSUQzQjY3dXhrNE5qMkdLaVJQaWJBWjkiLCJuYmYiOjE2MDg5MjY3MDgsInJvb21fam9pbiI6dHJ1ZSwicm9vbV9zaWQiOiJteWlkIiwic3ViIjoiQVBJRDNCNjd1eGs0TmoyR0tpUlBpYkFaOSJ9.cmHEBq0MLyRqphmVLM2cLXg5ao5Sro7am8yXhcYKcwE"
 	t.Run("cannot decode with incorrect key", func(t *testing.T) {
 		v, err := auth.ParseAPIToken(accessToken)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.Equal(t, apiKey, v.APIKey())
+		require.Equal(t, apiKey, v.APIKey())
 		_, err = v.Verify("")
-		assert.Error(t, err)
+		require.Error(t, err)
 
 		_, err = v.Verify("anothersecret")
-		assert.Error(t, err)
+		require.Error(t, err)
 	})
 
 	t.Run("key has expired", func(t *testing.T) {
@@ -32,7 +31,7 @@ func TestVerifier(t *testing.T) {
 		require.NoError(t, err)
 
 		_, err = v.Verify(secret)
-		assert.Error(t, err)
+		require.Error(t, err)
 	})
 
 	t.Run("unexpired token is verified", func(t *testing.T) {
@@ -42,16 +41,16 @@ func TestVerifier(t *testing.T) {
 			SetValidFor(time.Minute).
 			SetIdentity("me")
 		authToken, err := at.ToJWT()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		v, err := auth.ParseAPIToken(authToken)
-		assert.NoError(t, err)
-		assert.Equal(t, apiKey, v.APIKey())
-		assert.Equal(t, "me", v.Identity())
+		require.NoError(t, err)
+		require.Equal(t, apiKey, v.APIKey())
+		require.Equal(t, "me", v.Identity())
 
 		decoded, err := v.Verify(secret)
-		assert.NoError(t, err)
-		assert.Equal(t, &claim, decoded.Video)
+		require.NoError(t, err)
+		require.Equal(t, &claim, decoded.Video)
 	})
 
 	t.Run("ensure metadata can be passed through", func(t *testing.T) {
@@ -68,14 +67,34 @@ func TestVerifier(t *testing.T) {
 			SetMetadata(string(md))
 
 		authToken, err := at.ToJWT()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		v, err := auth.ParseAPIToken(authToken)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		decoded, err := v.Verify(secret)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
-		assert.EqualValues(t, string(md), decoded.Metadata)
+		require.EqualValues(t, string(md), decoded.Metadata)
+	})
+
+	t.Run("nil permissions are handled", func(t *testing.T) {
+		fVal := false
+		at := auth.NewAccessToken(apiKey, secret).
+			AddGrant(&auth.VideoGrant{
+				Room:           "myroom",
+				RoomJoin:       true,
+				CanPublishData: &fVal,
+			})
+		token, err := at.ToJWT()
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(token)
+		decoded, err := v.Verify(secret)
+		require.NoError(t, err)
+
+		require.Nil(t, decoded.Video.CanSubscribe)
+		require.Nil(t, decoded.Video.CanPublish)
+		require.False(t, *decoded.Video.CanPublishData)
 	})
 }
