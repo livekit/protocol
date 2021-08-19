@@ -13,8 +13,9 @@ type VideoGrant struct {
 
 	// permissions within a room, if none of the permissions are set
 	// it's interpreted as both are permissible
-	CanPublish   bool `json:"canPublish,omitempty"`
-	CanSubscribe bool `json:"canSubscribe,omitempty"`
+	CanPublish     *bool `json:"canPublish,omitempty"`
+	CanSubscribe   *bool `json:"canSubscribe,omitempty"`
+	CanPublishData *bool `json:"canPublishData,omitempty"`
 
 	// used for recording
 	Hidden bool `json:"hidden,omitempty"`
