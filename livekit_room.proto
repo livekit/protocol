@@ -105,6 +105,8 @@ message ParticipantPermission {
   bool can_subscribe = 1;
   // allow participant to publish new tracks to room
   bool can_publish = 2;
+  // allow participant to publish data
+  bool can_publish_data = 3;
 }
 
 message UpdateParticipantRequest {
