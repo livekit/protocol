@@ -20,8 +20,6 @@ message NodeStats {
   int64 started_at = 1;
   // when server last reported its status
   int64 updated_at = 2;
-  // when server previously reported its status
-  int64 updated_at_previous = 7;
 
   // room
   int32 num_rooms = 3;
@@ -30,13 +28,22 @@ message NodeStats {
   int32 num_tracks_out = 6;
 
   // packet
-  uint64 nack_total = 8;
-  float nack_per_sec = 9;
+  uint64 bytes_in = 7;
+  uint64 bytes_out = 8;
+  uint64 packets_in = 9;
+  uint64 packets_out = 10;
+  uint64 nack_total = 11;
+  float bytes_in_per_sec = 12;
+  float bytes_out_per_sec = 13;
+  float packets_in_per_sec = 14;
+  float packets_out_per_sec = 15;
+  float nack_per_sec = 16;
 
   // system
-  float load_avg_last1min = 10;
-  float load_avg_last5min = 11;
-  float load_avg_last15min = 12;
+  uint32 num_cpus = 17;
+  float load_avg_last1min = 18;
+  float load_avg_last5min = 19;
+  float load_avg_last15min = 20;
 }
 
 // message to RTC nodes
