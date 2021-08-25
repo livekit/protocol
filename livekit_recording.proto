@@ -57,10 +57,10 @@ message RecordingS3Output {
 }
 
 enum RecordingPreset {
-  SD_30 = 0; // 720p, 30fps
-  SD_60 = 1; // 720p, 60fps
-  HD_30 = 2; // 1080p, 30fps
-  HD_60 = 3; // 1080p, 60fps
+  HD_30 = 0; // 720p, 30fps
+  HD_60 = 1; // 720p, 60fps
+  FULL_HD_30 = 2; // 1080p, 30fps
+  FULL_HD_60 = 3; // 1080p, 60fps
 }
 
 message RecordingOptions {
