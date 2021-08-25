@@ -16,16 +16,9 @@ service RecordingService {
 }
 
 message StartRecordingRequest {
-  oneof input {
-    string url = 1;
-    RecordingTemplate template = 2;
-  }
-  oneof output {
-    string file = 3;
-    RecordingS3Output s3 = 4;
-    string rtmp = 5;
-  }
-  RecordingOptions options = 6;
+  RecordingInput input = 1;
+  RecordingOutput output = 2;
+  RecordingOptions options = 3;
 }
 
 message EndRecordingRequest {
@@ -34,4 +27,51 @@ message EndRecordingRequest {
 
 message RecordingResponse {
   string recording_id = 1;
+}
+
+message RecordingInput {
+  string url = 1;
+  RecordingTemplate template = 2;
+}
+
+message RecordingTemplate {
+  string layout = 1;
+  string ws_url = 2;
+  // either token or room name required
+  string token = 3;
+  string room_name = 4;
+}
+
+message RecordingOutput {
+  string file = 1;
+  RecordingS3Output s3 = 2;
+  string rtmp = 3;
+}
+
+message RecordingS3Output {
+  string bucket = 1;
+  string key = 2;
+  // optional
+  string access_key = 3;
+  string secret = 4;
+}
+
+enum RecordingPreset {
+  SD_30 = 0; // 720p, 30fps
+  SD_60 = 1; // 720p, 60fps
+  HD_30 = 2; // 1080p, 30fps
+  HD_60 = 3; // 1080p, 60fps
+}
+
+message RecordingOptions {
+  RecordingPreset preset = 1;
+  int32 input_width = 2;
+  int32 input_height = 3;
+  int32 output_width = 4;
+  int32 output_height = 5;
+  int32 depth = 6;
+  int32 framerate = 7;
+  int32 audio_bitrate = 8;
+  int32 audio_frequency = 9;
+  int32 video_bitrate = 10;
 }
