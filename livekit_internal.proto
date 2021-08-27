@@ -9,9 +9,10 @@ import "livekit_rtc.proto";
 import "livekit_room.proto";
 
 enum NodeType {
-  CONTROLLER = 0;
-  ORIGIN = 1;
-  RELAY = 2;
+  SERVER = 0;
+  CONTROLLER = 1;
+  ORIGIN = 2;
+  RELAY = 3;
 }
 
 message Node {
