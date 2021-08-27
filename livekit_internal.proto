@@ -8,11 +8,19 @@ import "livekit_recording.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
 
+enum NodeType {
+  SERVER = 0;
+  CONTROLLER = 1;
+  ORIGIN = 2;
+  RELAY = 3;
+}
+
 message Node {
   string id = 1;
   string ip = 2;
   uint32 num_cpus = 3;
   NodeStats stats = 4;
+  NodeType type = 5;
 }
 
 message NodeStats {
