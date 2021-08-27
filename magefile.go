@@ -3,47 +3,27 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"go/build"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"time"
 
 	"github.com/magefile/mage/target"
 )
-
-type modInfo struct {
-	Path      string
-	Version   string
-	Time      time.Time
-	Dir       string
-	GoMod     string
-	GoVersion string
-}
 
 var Default = Proto
 
 // regenerate protobuf
 func Proto() error {
-	cmd := exec.Command("go", "list", "-m", "-json", "github.com/livekit/protocol")
-	out, err := cmd.Output()
-	if err != nil {
-		return err
-	}
-	info := modInfo{}
-	if err = json.Unmarshal(out, &info); err != nil {
-		return err
-	}
-	protoDir := info.Dir
 	updated, err := target.Path("proto/livekit_models.pb.go",
-		protoDir+"/livekit_internal.proto",
-		protoDir+"/livekit_models.proto",
-		protoDir+"/livekit_recording.proto",
-		protoDir+"/livekit_room.proto",
-		protoDir+"/livekit_rtc.proto",
-		protoDir+"/livekit_webhook.proto",
+		"livekit_internal.proto",
+		"livekit_internals.proto",
+		"livekit_models.proto",
+		"livekit_recording.proto",
+		"livekit_room.proto",
+		"livekit_rtc.proto",
+		"livekit_webhook.proto",
 	)
 	if err != nil {
 		return err
@@ -72,16 +52,16 @@ func Proto() error {
 	}
 
 	// generate twirp-related protos
-	cmd = exec.Command(protoc,
+	cmd := exec.Command(protoc,
 		"--go_out", target,
 		"--twirp_out", target,
 		"--go_opt=paths=source_relative",
 		"--twirp_opt=paths=source_relative",
 		"--plugin=go="+protocGoPath,
 		"--plugin=twirp="+twirpPath,
-		"-I="+protoDir,
-		protoDir+"/livekit_recording.proto",
-		protoDir+"/livekit_room.proto",
+		"-I=.",
+		"livekit_recording.proto",
+		"livekit_room.proto",
 	)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
@@ -93,12 +73,11 @@ func Proto() error {
 		"--go_out", target,
 		"--go_opt=paths=source_relative",
 		"--plugin=go="+protocGoPath,
-		"-I="+protoDir,
-		protoDir+"/livekit_recording.proto",
-		protoDir+"/livekit_rtc.proto",
-		protoDir+"/livekit_internal.proto",
-		protoDir+"/livekit_models.proto",
-		protoDir+"/livekit_webhook.proto",
+		"-I=.",
+		"livekit_internal.proto",
+		"livekit_models.proto",
+		"livekit_rtc.proto",
+		"livekit_webhook.proto",
 	)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
