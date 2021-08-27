@@ -93,33 +93,3 @@ message UserPacket {
   // the ID of the participants who will receive the message (the message will be sent to all the people in the room if this variable is empty)
   repeated string destination_sids = 3;
 }
-
-message RecordingTemplate {
-  string layout = 1;
-  string ws_url = 2;
-  // either token or room name required
-  string token = 3;
-  string room_name = 4;
-}
-
-message RecordingS3Output {
-  string bucket = 1;
-  string key = 2;
-  // optional
-  string access_key = 3;
-  string secret = 4;
-}
-
-message RecordingOptions {
-  // 720p30, 720p60, 1080p30, or 1080p60
-  string preset = 1;
-  int32 input_width = 2;
-  int32 input_height = 3;
-  int32 output_width = 4;
-  int32 output_height = 5;
-  int32 depth = 6;
-  int32 framerate = 7;
-  int32 audio_bitrate = 8;
-  int32 audio_frequency = 9;
-  int32 video_bitrate = 10;
-}
