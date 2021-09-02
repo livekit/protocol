@@ -25,7 +25,7 @@ type RedisMessageBus struct {
 	rc *redis.Client
 }
 
-func NewRedisMessageBus(rc *redis.Client) *RedisMessageBus {
+func NewRedisMessageBus(rc *redis.Client) MessageBus {
 	return &RedisMessageBus{rc: rc}
 }
 
