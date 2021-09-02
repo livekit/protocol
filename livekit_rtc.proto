@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/livekit-server/proto/livekit";
+option go_package = "github.com/livekit/protocol/proto/livekit";
 
 import "livekit_models.proto";
 
@@ -44,6 +44,8 @@ message SignalResponse {
     ActiveSpeakerUpdate speaker = 7;
     // Immediately terminate session
     LeaveRequest leave = 8;
+    // server initiated mute
+    MuteTrackRequest mute = 9;
   }
 }
 

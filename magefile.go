@@ -18,7 +18,6 @@ var Default = Proto
 func Proto() error {
 	updated, err := target.Path("proto/livekit_models.pb.go",
 		"livekit_internal.proto",
-		"livekit_internals.proto",
 		"livekit_models.proto",
 		"livekit_recording.proto",
 		"livekit_room.proto",

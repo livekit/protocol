@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/livekit-server/proto/livekit";
+option go_package = "github.com/livekit/protocol/proto/livekit";
 
 message Room {
   string sid = 1;
@@ -34,7 +34,7 @@ message ParticipantInfo {
   State state = 3;
   repeated TrackInfo tracks = 4;
   string metadata = 5;
-  // timestamp when participant joined room
+  // timestamp when participant joined room, in seconds
   int64 joined_at = 6;
   // hidden participant (used for recording)
   bool hidden = 7;
