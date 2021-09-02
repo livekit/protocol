@@ -34,24 +34,15 @@ message RecordingInput {
 
 message RecordingTemplate {
   string layout = 1;
-  string ws_url = 2;
   // either token or room name required
   string token = 3;
   string room_name = 4;
 }
 
 message RecordingOutput {
-  string file = 1;
-  RecordingS3Output s3 = 2;
   string rtmp = 3;
-}
-
-message RecordingS3Output {
-  string bucket = 1;
-  string key = 2;
-  // optional
-  string access_key = 3;
-  string secret = 4;
+  // bucket/key
+  string s3_path = 4;
 }
 
 enum RecordingPreset {
