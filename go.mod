@@ -3,7 +3,10 @@ module github.com/livekit/protocol
 go 1.16
 
 require (
+	github.com/eapache/channels v1.1.0
+	github.com/eapache/queue v1.1.0 // indirect
 	github.com/go-logr/logr v1.0.0
+	github.com/go-redis/redis/v8 v8.11.3
 	github.com/jxskiss/base62 v0.0.0-20191017122030-4f11678b909b
 	github.com/lithammer/shortuuid/v3 v3.0.6
 	github.com/magefile/mage v1.11.0
