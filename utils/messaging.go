@@ -10,7 +10,7 @@ import (
 )
 
 type MessageBus interface {
-	Lock(ctx context.Context, key string) (acquired bool, err error)
+	Lock(ctx context.Context, key string, expiration time.Duration) (acquired bool, err error)
 	Subscribe(ctx context.Context, channel string) (PubSub, error)
 	Publish(ctx context.Context, channel string, msg interface{}) error
 }
