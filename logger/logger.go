@@ -45,21 +45,21 @@ func initLogger(config zap.Config, name, level string) {
 	SetLogger(zapr.NewLogger(logger), name)
 }
 
-func Debug(msg string, keysAndValues ...interface{}) {
+func Debugw(msg string, keysAndValues ...interface{}) {
 	defaultLogger.V(2).Info(msg, keysAndValues...)
 }
 
-func Info(msg string, keysAndValues ...interface{}) {
+func Infow(msg string, keysAndValues ...interface{}) {
 	defaultLogger.V(1).Info(msg, keysAndValues...)
 }
 
-func Warn(msg string, err error, keysAndValues ...interface{}) {
+func Warnw(msg string, err error, keysAndValues ...interface{}) {
 	if err != nil {
 		keysAndValues = append([]interface{}{"error", err}, keysAndValues...)
 	}
 	defaultLogger.V(1).Error(err, msg, keysAndValues...)
 }
 
-func Error(msg string, err error, keysAndValues ...interface{}) {
+func Errorw(msg string, err error, keysAndValues ...interface{}) {
 	defaultLogger.Error(err, msg, keysAndValues...)
 }
