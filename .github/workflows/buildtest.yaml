@@ -32,4 +32,4 @@ jobs:
       uses: magefile/mage-action@v1
       with:
         version: latest
-        args: testall
+        args: test
