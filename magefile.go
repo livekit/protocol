@@ -86,6 +86,13 @@ func Proto() error {
 	return nil
 }
 
+// run tests
+func Test() error {
+	cmd := exec.Command("go", "test", "./...")
+	connectStd(cmd)
+	return cmd.Run()
+}
+
 // helpers
 
 func getToolPath(name string) (string, error) {
