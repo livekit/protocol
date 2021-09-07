@@ -28,12 +28,6 @@ jobs:
     - name: Download Go modules
       run: go mod download
 
-    - name: Mage Build
-      uses: magefile/mage-action@v1
-      with:
-        version: latest
-        args: build
-
     - name: Mage Test
       uses: magefile/mage-action@v1
       with:
