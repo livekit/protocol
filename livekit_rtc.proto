@@ -87,7 +87,7 @@ message JoinResponse {
   string server_version = 4;
   repeated ICEServer ice_servers = 5;
   // use subscriber as the primary PeerConnection
-  bool subscriberPrimary = 6;
+  bool subscriber_primary = 6;
 }
 
 message TrackPublishedResponse {
