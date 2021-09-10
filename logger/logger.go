@@ -11,11 +11,8 @@ var (
 	defaultLogger = logr.Discard()
 )
 
-// Note: already with extra depth 1
+// Note: SetLogger already adds extra depth 1
 func GetLogger() logr.Logger {
-	if defaultLogger == logr.Discard() {
-		InitDevelopment("default", "")
-	}
 	return defaultLogger
 }
 
@@ -46,18 +43,18 @@ func initLogger(config zap.Config, name, level string) {
 }
 
 func Debugw(msg string, keysAndValues ...interface{}) {
-	defaultLogger.V(2).Info(msg, keysAndValues...)
+	defaultLogger.V(1).Info(msg, keysAndValues...)
 }
 
 func Infow(msg string, keysAndValues ...interface{}) {
-	defaultLogger.V(1).Info(msg, keysAndValues...)
+	defaultLogger.Info(msg, keysAndValues...)
 }
 
 func Warnw(msg string, err error, keysAndValues ...interface{}) {
 	if err != nil {
-		keysAndValues = append([]interface{}{"error", err}, keysAndValues...)
+		keysAndValues = append(keysAndValues, "error", err)
 	}
-	defaultLogger.V(1).Error(err, msg, keysAndValues...)
+	defaultLogger.Info(msg, keysAndValues...)
 }
 
 func Errorw(msg string, err error, keysAndValues ...interface{}) {
