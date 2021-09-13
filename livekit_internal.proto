@@ -15,12 +15,19 @@ enum NodeType {
   RELAY = 3;
 }
 
+enum NodeState {
+  STARTING_UP = 0;
+  SERVING = 1;
+  SHUTTING_DOWN = 2;
+}
+
 message Node {
   string id = 1;
   string ip = 2;
   uint32 num_cpus = 3;
   NodeStats stats = 4;
   NodeType type = 5;
+  NodeState state = 6;
 }
 
 message NodeStats {
