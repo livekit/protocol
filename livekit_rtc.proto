@@ -40,12 +40,12 @@ message SignalResponse {
     ParticipantUpdate update = 5;
     // sent to the participant when their track has been published
     TrackPublishedResponse track_published = 6;
-    // list of active speakers
-    ActiveSpeakerUpdate speaker = 7;
     // Immediately terminate session
     LeaveRequest leave = 8;
     // server initiated mute
     MuteTrackRequest mute = 9;
+    // indicates changes to speaker status, including when they've gone to not speaking
+    SpeakersChanged speakers_changed = 10;
   }
 }
 
@@ -131,4 +131,8 @@ message ICEServer {
   repeated string urls = 1;
   string username = 2;
   string credential = 3;
+}
+
+message SpeakersChanged {
+  repeated SpeakerInfo speakers = 1;
 }

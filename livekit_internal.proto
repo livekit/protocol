@@ -95,9 +95,11 @@ message StartSession {
   // metadata to pass to participant
   string metadata = 5;
   ParticipantPermission permission = 6;
+  // TODO: deprecate in the future
   int32 protocol_version = 7;
   bool auto_subscribe = 9;
   bool hidden = 10;
+  ClientInfo client = 11;
 }
 
 message EndSession {
@@ -111,4 +113,19 @@ message RecordingReservation {
   string id = 1;
   int64 submitted_at = 2;
   StartRecordingRequest request = 3;
+}
+
+// details about the client
+message ClientInfo {
+  enum SDK {
+     UNKNOWN = 0;
+     JS = 1;
+     IOS = 2;
+     ANDROID = 3;
+     FLUTTER = 4;
+  }
+
+  SDK sdk = 1;
+  string version = 2;
+  int32 protocol = 3;
 }
