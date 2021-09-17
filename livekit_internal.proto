@@ -123,6 +123,7 @@ message ClientInfo {
      IOS = 2;
      ANDROID = 3;
      FLUTTER = 4;
+     GO = 5;
   }
 
   SDK sdk = 1;
