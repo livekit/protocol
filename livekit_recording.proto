@@ -35,14 +35,14 @@ message RecordingInput {
 message RecordingTemplate {
   string layout = 1;
   // either token or room name required
-  string token = 3;
-  string room_name = 4;
+  string token = 2;
+  string room_name = 3;
 }
 
 message RecordingOutput {
-  string rtmp = 3;
+  string rtmp = 1;
   // bucket/key
-  string s3_path = 4;
+  string s3_path = 2;
 }
 
 enum RecordingPreset {
