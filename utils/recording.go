@@ -3,9 +3,10 @@ package utils
 import "time"
 
 const (
-	ReservationChannel = "RESERVE_RECORDER"
-	RecorderTimeout    = time.Second * 3
-	ReservationTimeout = time.Second * 2
+	ReservationChannel     = "RESERVE_RECORDER"
+	RecordingResultChannel = "RECORDING_RESULT"
+	RecorderTimeout        = time.Second * 3
+	ReservationTimeout     = time.Second * 2
 )
 
 func ReservationResponseChannel(id string) string {

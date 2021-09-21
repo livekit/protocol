@@ -93,3 +93,10 @@ message UserPacket {
   // the ID of the participants who will receive the message (the message will be sent to all the people in the room if this variable is empty)
   repeated string destination_sids = 3;
 }
+
+message RecordingResult {
+  string id = 1;
+  string error = 2;
+  int64 duration = 3;
+  string location = 4;
+}

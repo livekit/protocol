@@ -113,6 +113,7 @@ message RecordingReservation {
   string id = 1;
   int64 submitted_at = 2;
   StartRecordingRequest request = 3;
+  string ws_url = 4;
 }
 
 // details about the client
