@@ -2,7 +2,6 @@ package webhook
 
 import (
 	"bytes"
-	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -17,7 +16,7 @@ import (
 )
 
 type Notifier interface {
-	Notify(ctx context.Context, payload interface{}) error
+	Notify(payload interface{}) error
 }
 
 type notifier struct {
@@ -36,7 +35,7 @@ func NewNotifier(apiKey, apiSecret string, urls []string) Notifier {
 	}
 }
 
-func (n *notifier) Notify(ctx context.Context, payload interface{}) error {
+func (n *notifier) Notify(payload interface{}) error {
 	var encoded []byte
 	var err error
 	if message, ok := payload.(proto.Message); ok {
@@ -63,7 +62,7 @@ func (n *notifier) Notify(ctx context.Context, payload interface{}) error {
 	}
 
 	for _, url := range n.urls {
-		r, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(encoded))
+		r, err := http.NewRequest("POST", url, bytes.NewReader(encoded))
 		if err != nil {
 			// ignore and continue
 			n.logger.Error(err, "could not create request", "url", url)
