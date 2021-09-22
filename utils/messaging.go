@@ -2,6 +2,8 @@ package utils
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/base64"
 	"math/rand"
 	"time"
 
@@ -9,9 +11,12 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+const lockExpiration = time.Second * 5
+
 type MessageBus interface {
 	Lock(ctx context.Context, key string, expiration time.Duration) (acquired bool, err error)
 	Subscribe(ctx context.Context, channel string) (PubSub, error)
+	Queue(ctx context.Context, channel string) (PubSub, error)
 	Publish(ctx context.Context, channel string, msg interface{}) error
 }
 
@@ -36,9 +41,38 @@ func (r *RedisMessageBus) Lock(ctx context.Context, key string, expiration time.
 func (r *RedisMessageBus) Subscribe(ctx context.Context, channel string) (PubSub, error) {
 	ps := r.rc.Subscribe(ctx, channel)
 	return &RedisPubSub{
-		ps: ps,
-		c:  channels.Wrap(ps.Channel()).Out(),
+		ps:   ps,
+		c:    channels.Wrap(ps.Channel()).Out(),
+		done: make(chan struct{}, 1),
 	}, nil
+}
+
+func (r *RedisMessageBus) Queue(ctx context.Context, channel string) (PubSub, error) {
+	sub := r.rc.Subscribe(ctx, channel)
+	c := make(chan *redis.Message, 100) // same chan size as redis pubsub
+	ps := &RedisPubSub{
+		ps:   sub,
+		c:    channels.Wrap(c).Out(),
+		done: make(chan struct{}, 1),
+	}
+
+	go func() {
+		for {
+			select {
+			case <-ps.done:
+				return
+			case msg := <-sub.Channel():
+				sha := sha256.Sum256([]byte(msg.Payload))
+				hash := base64.StdEncoding.EncodeToString(sha[:])
+				acquired, _ := r.Lock(ctx, hash, lockExpiration)
+				if acquired {
+					c <- msg
+				}
+			}
+		}
+	}()
+
+	return ps, nil
 }
 
 func (r *RedisMessageBus) Publish(ctx context.Context, channel string, message interface{}) error {
@@ -46,8 +80,9 @@ func (r *RedisMessageBus) Publish(ctx context.Context, channel string, message i
 }
 
 type RedisPubSub struct {
-	ps *redis.PubSub
-	c  <-chan interface{}
+	ps   *redis.PubSub
+	c    <-chan interface{}
+	done chan struct{}
 }
 
 func (r *RedisPubSub) Channel() <-chan interface{} {
@@ -59,5 +94,6 @@ func (r *RedisPubSub) Payload(msg interface{}) []byte {
 }
 
 func (r *RedisPubSub) Close() error {
+	r.done <- struct{}{}
 	return r.ps.Close()
 }

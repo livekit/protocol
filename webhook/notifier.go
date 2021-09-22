@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -9,28 +10,33 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/livekit/protocol/auth"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/livekit/protocol/auth"
 )
 
-type Notifier struct {
+type Notifier interface {
+	Notify(ctx context.Context, payload interface{}) error
+}
+
+type notifier struct {
 	apiKey    string
 	apiSecret string
 	urls      []string
-	Logger    logr.Logger
+	logger    logr.Logger
 }
 
-func NewNotifier(apiKey, apiSecret string, urls []string) *Notifier {
-	return &Notifier{
+func NewNotifier(apiKey, apiSecret string, urls []string) Notifier {
+	return &notifier{
 		apiKey:    apiKey,
 		apiSecret: apiSecret,
 		urls:      urls,
-		Logger:    logr.Discard(),
+		logger:    logr.Discard(),
 	}
 }
 
-func (n *Notifier) Notify(payload interface{}) error {
+func (n *notifier) Notify(ctx context.Context, payload interface{}) error {
 	var encoded []byte
 	var err error
 	if message, ok := payload.(proto.Message); ok {
@@ -57,16 +63,16 @@ func (n *Notifier) Notify(payload interface{}) error {
 	}
 
 	for _, url := range n.urls {
-		r, err := http.NewRequest("POST", url, bytes.NewReader(encoded))
+		r, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(encoded))
 		if err != nil {
 			// ignore and continue
-			n.Logger.Error(err, "could not create request", "url", url)
+			n.logger.Error(err, "could not create request", "url", url)
 			continue
 		}
 		r.Header.Set(authHeader, token)
 		_, err = http.DefaultClient.Do(r)
 		if err != nil {
-			n.Logger.Error(err, "could not post to webhook", "url", url)
+			n.logger.Error(err, "could not post to webhook", "url", url)
 		}
 	}
 
