@@ -16,7 +16,8 @@ const lockExpiration = time.Second * 5
 type MessageBus interface {
 	Lock(ctx context.Context, key string, expiration time.Duration) (acquired bool, err error)
 	Subscribe(ctx context.Context, channel string) (PubSub, error)
-	Queue(ctx context.Context, channel string) (PubSub, error)
+	// like subscribe, but ensuring only a single instance gets to process the message
+	SubscribeQueue(ctx context.Context, channel string) (PubSub, error)
 	Publish(ctx context.Context, channel string, msg interface{}) error
 }
 
@@ -47,7 +48,7 @@ func (r *RedisMessageBus) Subscribe(ctx context.Context, channel string) (PubSub
 	}, nil
 }
 
-func (r *RedisMessageBus) Queue(ctx context.Context, channel string) (PubSub, error) {
+func (r *RedisMessageBus) SubscribeQueue(ctx context.Context, channel string) (PubSub, error) {
 	sub := r.rc.Subscribe(ctx, channel)
 	c := make(chan *redis.Message, 100) // same chan size as redis pubsub
 	ps := &RedisPubSub{
