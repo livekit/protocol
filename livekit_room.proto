@@ -41,7 +41,7 @@ service RoomService {
   rpc SendData(SendDataRequest) returns (SendDataResponse);
 
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
-  rpc UpdateRoomMetadata (UpdateRoomRequest) returns (Room);
+  rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
 }
 
 message CreateRoomRequest {
