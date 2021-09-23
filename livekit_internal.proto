@@ -74,6 +74,7 @@ message RTCNodeMessage {
     DeleteRoomRequest delete_room = 7;
     UpdateSubscriptionsRequest update_subscriptions = 8;
     SendDataRequest send_data = 9;
+    UpdateRoomRequest update_room = 10;
   }
 }
 
