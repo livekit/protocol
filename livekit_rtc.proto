@@ -140,5 +140,5 @@ message SpeakersChanged {
 }
 
 message RoomUpdate {
-  repeated Room room = 1;
+  Room room = 1;
 }
