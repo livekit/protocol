@@ -46,6 +46,8 @@ message SignalResponse {
     MuteTrackRequest mute = 9;
     // indicates changes to speaker status, including when they've gone to not speaking
     SpeakersChanged speakers_changed = 10;
+    // sent when metadata of the room has changed
+    RoomUpdate room_update = 11;
   }
 }
 
@@ -135,4 +137,8 @@ message ICEServer {
 
 message SpeakersChanged {
   repeated SpeakerInfo speakers = 1;
+}
+
+message RoomUpdate {
+  repeated Room room = 1;
 }
