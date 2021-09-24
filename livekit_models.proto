@@ -11,6 +11,7 @@ message Room {
   int64 creation_time = 5;
   string turn_password = 6;
   repeated Codec enabled_codecs = 7;
+  string metadata = 8;
 }
 
 message Codec {

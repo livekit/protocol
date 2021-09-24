@@ -39,6 +39,9 @@ service RoomService {
 
   // Send data over data channel to participants in a room, Requires `roomAdmin`
   rpc SendData(SendDataRequest) returns (SendDataResponse);
+
+  // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
+  rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
 }
 
 message CreateRoomRequest {
@@ -140,4 +143,10 @@ message SendDataRequest {
 
 message SendDataResponse {
   //
+}
+
+message UpdateRoomRequest {
+  string room = 1;
+  // metadata to update. skipping updates if left empty
+  string metadata = 2;
 }
