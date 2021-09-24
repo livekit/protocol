@@ -148,5 +148,5 @@ message SendDataResponse {
 message UpdateRoomRequest {
   string room = 1;
   // metadata to update. skipping updates if left empty
-  string metadata = 3;
+  string metadata = 2;
 }
