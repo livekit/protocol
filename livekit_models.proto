@@ -12,6 +12,7 @@ message Room {
   string turn_password = 6;
   repeated Codec enabled_codecs = 7;
   string metadata = 8;
+  uint32 num_participants = 9;
 }
 
 message Codec {
