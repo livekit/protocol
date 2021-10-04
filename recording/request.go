@@ -58,6 +58,7 @@ func RPC(ctx context.Context, bus utils.MessageBus, recordingId string, req *liv
 	if err != nil {
 		return err
 	}
+	defer sub.Close()
 
 	b, err := proto.Marshal(req)
 	if err != nil {
