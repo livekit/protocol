@@ -36,9 +36,10 @@ message StartRecordingRequest {
 
 message RecordingTemplate {
   string layout = 1;
-  // one of room name or token
-  string room_name = 2;
-  string token = 3;
+  oneof room {
+    string room_name = 2;
+    string token = 3;
+  }
 }
 
 message RtmpOutput {
