@@ -124,6 +124,11 @@ message RecordingRequest {
   }
 }
 
+message RecordingResponse {
+  bool success = 1;
+  string error = 2;
+}
+
 // details about the client
 message ClientInfo {
   enum SDK {
