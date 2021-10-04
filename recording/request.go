@@ -26,8 +26,35 @@ func ResponseChannel(id string) string {
 	return "RECORDING_RESPONSE_" + id
 }
 
-func RecordingRPC(ctx context.Context, mb utils.MessageBus, recordingId string, req *livekit.RecordingRequest) error {
-	sub, err := mb.Subscribe(ctx, ResponseChannel(recordingId))
+func ReserveRecorder(recordingId string, bus utils.MessageBus) error {
+	req := &livekit.RecordingReservation{
+		Id:          recordingId,
+		SubmittedAt: time.Now().UnixNano() / 1e6,
+	}
+
+	b, err := proto.Marshal(req)
+	if err != nil {
+		return err
+	}
+
+	sub, _ := bus.Subscribe(context.Background(), ResponseChannel(recordingId))
+	defer sub.Close()
+
+	err = bus.Publish(context.Background(), ReservationChannel, string(b))
+	if err != nil {
+		return err
+	}
+
+	select {
+	case <-sub.Channel():
+		return nil
+	case <-time.After(RequestTimeout):
+		return errors.New("no recorders available")
+	}
+}
+
+func RPC(ctx context.Context, bus utils.MessageBus, recordingId string, req *livekit.RecordingRequest) error {
+	sub, err := bus.Subscribe(ctx, ResponseChannel(recordingId))
 	if err != nil {
 		return err
 	}
@@ -37,7 +64,7 @@ func RecordingRPC(ctx context.Context, mb utils.MessageBus, recordingId string, 
 		return err
 	}
 
-	err = mb.Publish(ctx, RequestChannel(recordingId), b)
+	err = bus.Publish(ctx, RequestChannel(recordingId), b)
 	if err != nil {
 		return err
 	}
