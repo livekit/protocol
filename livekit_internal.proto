@@ -116,17 +116,19 @@ message RecordingReservation {
 }
 
 message RecordingRequest {
+  string request_id = 1;
   oneof request {
-    StartRecordingRequest start = 1;
-    AddOutputRequest add_output = 2;
-    RemoveOutputRequest remove_output = 3;
-    EndRecordingRequest end = 4;
+    StartRecordingRequest start = 2;
+    AddOutputRequest add_output = 3;
+    RemoveOutputRequest remove_output = 4;
+    EndRecordingRequest end = 5;
   }
 }
 
 message RecordingResponse {
-  bool success = 1;
-  string error = 2;
+  string request_id = 1;
+  bool success = 2;
+  string error = 3;
 }
 
 // details about the client
