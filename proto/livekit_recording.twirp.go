@@ -16,6 +16,8 @@ import proto "google.golang.org/protobuf/proto"
 import twirp "github.com/twitchtv/twirp"
 import ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 
+import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
+
 import bytes "bytes"
 import errors "errors"
 import io "io"
@@ -36,10 +38,16 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 // they are Twirp-based HTTP req/responses
 type RecordingService interface {
 	// Starts a room
-	StartRecording(context.Context, *StartRecordingRequest) (*RecordingResponse, error)
+	StartRecording(context.Context, *StartRecordingRequest) (*StartRecordingResponse, error)
+
+	// Adds an rtmp output to a live recording
+	AddOutput(context.Context, *AddOutputRequest) (*google_protobuf.Empty, error)
+
+	// Removes an rtmp output from a live recording
+	RemoveOutput(context.Context, *RemoveOutputRequest) (*google_protobuf.Empty, error)
 
 	// Ends a recording
-	EndRecording(context.Context, *EndRecordingRequest) (*RecordingResponse, error)
+	EndRecording(context.Context, *EndRecordingRequest) (*RecordingResult, error)
 }
 
 // ================================
@@ -48,7 +56,7 @@ type RecordingService interface {
 
 type recordingServiceProtobufClient struct {
 	client      HTTPClient
-	urls        [2]string
+	urls        [4]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -76,8 +84,10 @@ func NewRecordingServiceProtobufClient(baseURL string, client HTTPClient, opts .
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "RecordingService")
-	urls := [2]string{
+	urls := [4]string{
 		serviceURL + "StartRecording",
+		serviceURL + "AddOutput",
+		serviceURL + "RemoveOutput",
 		serviceURL + "EndRecording",
 	}
 
@@ -89,13 +99,13 @@ func NewRecordingServiceProtobufClient(baseURL string, client HTTPClient, opts .
 	}
 }
 
-func (c *recordingServiceProtobufClient) StartRecording(ctx context.Context, in *StartRecordingRequest) (*RecordingResponse, error) {
+func (c *recordingServiceProtobufClient) StartRecording(ctx context.Context, in *StartRecordingRequest) (*StartRecordingResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
 	ctx = ctxsetters.WithMethodName(ctx, "StartRecording")
 	caller := c.callStartRecording
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *StartRecordingRequest) (*RecordingResponse, error) {
+		caller = func(ctx context.Context, req *StartRecordingRequest) (*StartRecordingResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*StartRecordingRequest)
@@ -106,9 +116,9 @@ func (c *recordingServiceProtobufClient) StartRecording(ctx context.Context, in 
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*StartRecordingResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*StartRecordingResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -118,8 +128,8 @@ func (c *recordingServiceProtobufClient) StartRecording(ctx context.Context, in 
 	return caller(ctx, in)
 }
 
-func (c *recordingServiceProtobufClient) callStartRecording(ctx context.Context, in *StartRecordingRequest) (*RecordingResponse, error) {
-	out := new(RecordingResponse)
+func (c *recordingServiceProtobufClient) callStartRecording(ctx context.Context, in *StartRecordingRequest) (*StartRecordingResponse, error) {
+	out := new(StartRecordingResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -135,13 +145,105 @@ func (c *recordingServiceProtobufClient) callStartRecording(ctx context.Context,
 	return out, nil
 }
 
-func (c *recordingServiceProtobufClient) EndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResponse, error) {
+func (c *recordingServiceProtobufClient) AddOutput(ctx context.Context, in *AddOutputRequest) (*google_protobuf.Empty, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
+	ctx = ctxsetters.WithMethodName(ctx, "AddOutput")
+	caller := c.callAddOutput
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *AddOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddOutputRequest) when calling interceptor")
+					}
+					return c.callAddOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *recordingServiceProtobufClient) callAddOutput(ctx context.Context, in *AddOutputRequest) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *recordingServiceProtobufClient) RemoveOutput(ctx context.Context, in *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveOutput")
+	caller := c.callRemoveOutput
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveOutputRequest) when calling interceptor")
+					}
+					return c.callRemoveOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *recordingServiceProtobufClient) callRemoveOutput(ctx context.Context, in *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *recordingServiceProtobufClient) EndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResult, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
 	ctx = ctxsetters.WithMethodName(ctx, "EndRecording")
 	caller := c.callEndRecording
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResponse, error) {
+		caller = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResult, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*EndRecordingRequest)
@@ -152,9 +254,9 @@ func (c *recordingServiceProtobufClient) EndRecording(ctx context.Context, in *E
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*RecordingResult)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResult) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -164,9 +266,9 @@ func (c *recordingServiceProtobufClient) EndRecording(ctx context.Context, in *E
 	return caller(ctx, in)
 }
 
-func (c *recordingServiceProtobufClient) callEndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResponse, error) {
-	out := new(RecordingResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+func (c *recordingServiceProtobufClient) callEndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResult, error) {
+	out := new(RecordingResult)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -187,7 +289,7 @@ func (c *recordingServiceProtobufClient) callEndRecording(ctx context.Context, i
 
 type recordingServiceJSONClient struct {
 	client      HTTPClient
-	urls        [2]string
+	urls        [4]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -215,8 +317,10 @@ func NewRecordingServiceJSONClient(baseURL string, client HTTPClient, opts ...tw
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "RecordingService")
-	urls := [2]string{
+	urls := [4]string{
 		serviceURL + "StartRecording",
+		serviceURL + "AddOutput",
+		serviceURL + "RemoveOutput",
 		serviceURL + "EndRecording",
 	}
 
@@ -228,13 +332,13 @@ func NewRecordingServiceJSONClient(baseURL string, client HTTPClient, opts ...tw
 	}
 }
 
-func (c *recordingServiceJSONClient) StartRecording(ctx context.Context, in *StartRecordingRequest) (*RecordingResponse, error) {
+func (c *recordingServiceJSONClient) StartRecording(ctx context.Context, in *StartRecordingRequest) (*StartRecordingResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
 	ctx = ctxsetters.WithMethodName(ctx, "StartRecording")
 	caller := c.callStartRecording
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *StartRecordingRequest) (*RecordingResponse, error) {
+		caller = func(ctx context.Context, req *StartRecordingRequest) (*StartRecordingResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*StartRecordingRequest)
@@ -245,9 +349,9 @@ func (c *recordingServiceJSONClient) StartRecording(ctx context.Context, in *Sta
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*StartRecordingResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*StartRecordingResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -257,8 +361,8 @@ func (c *recordingServiceJSONClient) StartRecording(ctx context.Context, in *Sta
 	return caller(ctx, in)
 }
 
-func (c *recordingServiceJSONClient) callStartRecording(ctx context.Context, in *StartRecordingRequest) (*RecordingResponse, error) {
-	out := new(RecordingResponse)
+func (c *recordingServiceJSONClient) callStartRecording(ctx context.Context, in *StartRecordingRequest) (*StartRecordingResponse, error) {
+	out := new(StartRecordingResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -274,13 +378,105 @@ func (c *recordingServiceJSONClient) callStartRecording(ctx context.Context, in 
 	return out, nil
 }
 
-func (c *recordingServiceJSONClient) EndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResponse, error) {
+func (c *recordingServiceJSONClient) AddOutput(ctx context.Context, in *AddOutputRequest) (*google_protobuf.Empty, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
+	ctx = ctxsetters.WithMethodName(ctx, "AddOutput")
+	caller := c.callAddOutput
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *AddOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddOutputRequest) when calling interceptor")
+					}
+					return c.callAddOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *recordingServiceJSONClient) callAddOutput(ctx context.Context, in *AddOutputRequest) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *recordingServiceJSONClient) RemoveOutput(ctx context.Context, in *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveOutput")
+	caller := c.callRemoveOutput
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveOutputRequest) when calling interceptor")
+					}
+					return c.callRemoveOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *recordingServiceJSONClient) callRemoveOutput(ctx context.Context, in *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *recordingServiceJSONClient) EndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResult, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "RecordingService")
 	ctx = ctxsetters.WithMethodName(ctx, "EndRecording")
 	caller := c.callEndRecording
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResponse, error) {
+		caller = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResult, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*EndRecordingRequest)
@@ -291,9 +487,9 @@ func (c *recordingServiceJSONClient) EndRecording(ctx context.Context, in *EndRe
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*RecordingResult)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResult) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -303,9 +499,9 @@ func (c *recordingServiceJSONClient) EndRecording(ctx context.Context, in *EndRe
 	return caller(ctx, in)
 }
 
-func (c *recordingServiceJSONClient) callEndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResponse, error) {
-	out := new(RecordingResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+func (c *recordingServiceJSONClient) callEndRecording(ctx context.Context, in *EndRecordingRequest) (*RecordingResult, error) {
+	out := new(RecordingResult)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -420,6 +616,12 @@ func (s *recordingServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.R
 	case "StartRecording":
 		s.serveStartRecording(ctx, resp, req)
 		return
+	case "AddOutput":
+		s.serveAddOutput(ctx, resp, req)
+		return
+	case "RemoveOutput":
+		s.serveRemoveOutput(ctx, resp, req)
+		return
 	case "EndRecording":
 		s.serveEndRecording(ctx, resp, req)
 		return
@@ -472,7 +674,7 @@ func (s *recordingServiceServer) serveStartRecordingJSON(ctx context.Context, re
 
 	handler := s.RecordingService.StartRecording
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *StartRecordingRequest) (*RecordingResponse, error) {
+		handler = func(ctx context.Context, req *StartRecordingRequest) (*StartRecordingResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*StartRecordingRequest)
@@ -483,9 +685,9 @@ func (s *recordingServiceServer) serveStartRecordingJSON(ctx context.Context, re
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*StartRecordingResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*StartRecordingResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -494,7 +696,7 @@ func (s *recordingServiceServer) serveStartRecordingJSON(ctx context.Context, re
 	}
 
 	// Call service method
-	var respContent *RecordingResponse
+	var respContent *StartRecordingResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -505,7 +707,7 @@ func (s *recordingServiceServer) serveStartRecordingJSON(ctx context.Context, re
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RecordingResponse and nil error while calling StartRecording. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *StartRecordingResponse and nil error while calling StartRecording. nil responses are not supported"))
 		return
 	}
 
@@ -553,7 +755,7 @@ func (s *recordingServiceServer) serveStartRecordingProtobuf(ctx context.Context
 
 	handler := s.RecordingService.StartRecording
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *StartRecordingRequest) (*RecordingResponse, error) {
+		handler = func(ctx context.Context, req *StartRecordingRequest) (*StartRecordingResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*StartRecordingRequest)
@@ -564,9 +766,9 @@ func (s *recordingServiceServer) serveStartRecordingProtobuf(ctx context.Context
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*StartRecordingResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*StartRecordingResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -575,7 +777,7 @@ func (s *recordingServiceServer) serveStartRecordingProtobuf(ctx context.Context
 	}
 
 	// Call service method
-	var respContent *RecordingResponse
+	var respContent *StartRecordingResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -586,7 +788,367 @@ func (s *recordingServiceServer) serveStartRecordingProtobuf(ctx context.Context
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RecordingResponse and nil error while calling StartRecording. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *StartRecordingResponse and nil error while calling StartRecording. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *recordingServiceServer) serveAddOutput(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveAddOutputJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveAddOutputProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *recordingServiceServer) serveAddOutputJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "AddOutput")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(AddOutputRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.RecordingService.AddOutput
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *AddOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddOutputRequest) when calling interceptor")
+					}
+					return s.RecordingService.AddOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *google_protobuf.Empty
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling AddOutput. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *recordingServiceServer) serveAddOutputProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "AddOutput")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(AddOutputRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.RecordingService.AddOutput
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *AddOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddOutputRequest) when calling interceptor")
+					}
+					return s.RecordingService.AddOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *google_protobuf.Empty
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling AddOutput. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *recordingServiceServer) serveRemoveOutput(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveRemoveOutputJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveRemoveOutputProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *recordingServiceServer) serveRemoveOutputJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveOutput")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(RemoveOutputRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.RecordingService.RemoveOutput
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveOutputRequest) when calling interceptor")
+					}
+					return s.RecordingService.RemoveOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *google_protobuf.Empty
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling RemoveOutput. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *recordingServiceServer) serveRemoveOutputProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveOutput")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(RemoveOutputRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.RecordingService.RemoveOutput
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RemoveOutputRequest) (*google_protobuf.Empty, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveOutputRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveOutputRequest) when calling interceptor")
+					}
+					return s.RecordingService.RemoveOutput(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *google_protobuf.Empty
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling RemoveOutput. nil responses are not supported"))
 		return
 	}
 
@@ -652,7 +1214,7 @@ func (s *recordingServiceServer) serveEndRecordingJSON(ctx context.Context, resp
 
 	handler := s.RecordingService.EndRecording
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResponse, error) {
+		handler = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResult, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*EndRecordingRequest)
@@ -663,9 +1225,9 @@ func (s *recordingServiceServer) serveEndRecordingJSON(ctx context.Context, resp
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*RecordingResult)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResult) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -674,7 +1236,7 @@ func (s *recordingServiceServer) serveEndRecordingJSON(ctx context.Context, resp
 	}
 
 	// Call service method
-	var respContent *RecordingResponse
+	var respContent *RecordingResult
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -685,7 +1247,7 @@ func (s *recordingServiceServer) serveEndRecordingJSON(ctx context.Context, resp
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RecordingResponse and nil error while calling EndRecording. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RecordingResult and nil error while calling EndRecording. nil responses are not supported"))
 		return
 	}
 
@@ -733,7 +1295,7 @@ func (s *recordingServiceServer) serveEndRecordingProtobuf(ctx context.Context, 
 
 	handler := s.RecordingService.EndRecording
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResponse, error) {
+		handler = func(ctx context.Context, req *EndRecordingRequest) (*RecordingResult, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*EndRecordingRequest)
@@ -744,9 +1306,9 @@ func (s *recordingServiceServer) serveEndRecordingProtobuf(ctx context.Context, 
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*RecordingResponse)
+				typedResp, ok := resp.(*RecordingResult)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*RecordingResult) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -755,7 +1317,7 @@ func (s *recordingServiceServer) serveEndRecordingProtobuf(ctx context.Context, 
 	}
 
 	// Call service method
-	var respContent *RecordingResponse
+	var respContent *RecordingResult
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -766,7 +1328,7 @@ func (s *recordingServiceServer) serveEndRecordingProtobuf(ctx context.Context, 
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *RecordingResponse and nil error while calling EndRecording. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RecordingResult and nil error while calling EndRecording. nil responses are not supported"))
 		return
 	}
 
@@ -1374,42 +1936,50 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 587 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0xdb, 0x6f, 0xd3, 0x3e,
-	0x14, 0xc7, 0x7f, 0xbd, 0xa4, 0x6d, 0x4e, 0xf7, 0xeb, 0x82, 0x19, 0xb4, 0x8c, 0x89, 0x4b, 0x78,
-	0xe0, 0x26, 0xba, 0x6a, 0x95, 0x2a, 0x9e, 0x78, 0x98, 0xd8, 0xd4, 0x49, 0x55, 0x37, 0x3c, 0x10,
-	0xd2, 0x1e, 0x88, 0xd2, 0xc6, 0x6b, 0xac, 0x35, 0x71, 0x70, 0x9c, 0xa2, 0xfd, 0x4b, 0x48, 0xfc,
-	0x7d, 0xbc, 0x22, 0x5f, 0x9a, 0x65, 0x6b, 0x84, 0x78, 0xf3, 0xf9, 0x9e, 0xcf, 0xf9, 0xc6, 0xc7,
-	0xc7, 0x0e, 0x74, 0x97, 0x74, 0x45, 0xae, 0xa8, 0xf0, 0x38, 0x99, 0x33, 0x1e, 0xd0, 0x78, 0xd1,
-	0x4f, 0x38, 0x13, 0x0c, 0x35, 0x4d, 0xc2, 0xfd, 0x55, 0x81, 0x07, 0xe7, 0xc2, 0xe7, 0x02, 0xaf,
-	0x09, 0x4c, 0xbe, 0x67, 0x24, 0x15, 0xe8, 0x1d, 0x58, 0x34, 0x4e, 0x32, 0xd1, 0xab, 0x3c, 0xab,
-	0xbc, 0x6a, 0x1f, 0x74, 0xfb, 0xa6, 0xa4, 0x9f, 0x93, 0x27, 0x32, 0x8d, 0x35, 0x85, 0x06, 0xd0,
-	0x60, 0x99, 0x90, 0x7c, 0x55, 0xf1, 0xbd, 0x4d, 0xfe, 0x54, 0xe5, 0xb1, 0xe1, 0xd0, 0x10, 0x9a,
-	0x2c, 0x11, 0x94, 0xc5, 0x69, 0xaf, 0xa6, 0x4a, 0x1e, 0x95, 0x94, 0x68, 0x00, 0xaf, 0x49, 0xf7,
-	0x3d, 0xdc, 0x3f, 0x8a, 0x83, 0x8d, 0xcd, 0x3e, 0x87, 0xad, 0xbc, 0x45, 0x8f, 0x06, 0x6a, 0xcf,
-	0x36, 0x6e, 0xe7, 0xda, 0x49, 0xe0, 0x8e, 0xe0, 0x5e, 0xa1, 0x2c, 0x4d, 0x58, 0x9c, 0x92, 0x7f,
-	0xa9, 0xbb, 0x80, 0xce, 0xed, 0x8e, 0x91, 0x03, 0xb5, 0x8c, 0x2f, 0x0d, 0x2b, 0x97, 0x68, 0x04,
-	0x2d, 0x41, 0xa2, 0x64, 0xe9, 0x0b, 0x62, 0xda, 0xdf, 0xdd, 0xec, 0xe5, 0xb3, 0x21, 0x70, 0xce,
-	0xba, 0xdf, 0x0a, 0x7b, 0x5a, 0xa7, 0xd1, 0x43, 0x68, 0x2c, 0xfd, 0x6b, 0x66, 0x4e, 0xde, 0xc6,
-	0x26, 0x42, 0x3b, 0x60, 0x09, 0x76, 0x45, 0x62, 0xf5, 0x05, 0x1b, 0xeb, 0x00, 0x3d, 0x06, 0x9b,
-	0x33, 0x16, 0x79, 0xb1, 0x1f, 0x11, 0x75, 0x8e, 0x36, 0x6e, 0x49, 0x61, 0xea, 0x47, 0xc4, 0xfd,
-	0x00, 0xdb, 0x77, 0x4e, 0x1f, 0x21, 0xa8, 0x73, 0x11, 0x25, 0xc6, 0x5b, 0xad, 0x51, 0x17, 0x9a,
-	0xe9, 0xd0, 0x4b, 0x7c, 0x11, 0x1a, 0xef, 0x46, 0x3a, 0x3c, 0xf3, 0x45, 0xe8, 0xfe, 0xae, 0x82,
-	0x73, 0x77, 0x16, 0x72, 0xd2, 0x09, 0x27, 0x29, 0xd1, 0xfb, 0xeb, 0x94, 0x4d, 0xfa, 0x4c, 0xe5,
-	0xb1, 0xe1, 0xd0, 0x53, 0x68, 0xab, 0x4b, 0xe2, 0xfd, 0xa0, 0x81, 0xf9, 0x86, 0x85, 0x41, 0x49,
-	0x5f, 0xa5, 0x22, 0xc7, 0xa0, 0x81, 0x90, 0xd0, 0x45, 0x28, 0x54, 0x1f, 0x16, 0xd6, 0x45, 0x63,
-	0x25, 0x49, 0x44, 0xdf, 0x1b, 0x63, 0x52, 0xd7, 0x88, 0xd6, 0xb4, 0xcb, 0x0b, 0xf8, 0xdf, 0x20,
-	0xc6, 0xc6, 0x52, 0x8c, 0xa9, 0x33, 0x3e, 0x3b, 0x60, 0x05, 0x24, 0x11, 0x61, 0xaf, 0xa1, 0x92,
-	0x3a, 0x40, 0x7b, 0x60, 0x5f, 0x72, 0x3f, 0x22, 0x5c, 0x4e, 0xb0, 0xa9, 0x32, 0x37, 0x82, 0x34,
-	0xf6, 0xb3, 0x80, 0x32, 0x6f, 0x46, 0x85, 0x22, 0x5a, 0xda, 0x58, 0x89, 0x87, 0x5a, 0x43, 0x2f,
-	0x61, 0x5b, 0x43, 0x97, 0x5c, 0x5e, 0xca, 0x78, 0x7e, 0xdd, 0xb3, 0x15, 0xd6, 0x51, 0xf2, 0xf1,
-	0x5a, 0x95, 0x6e, 0x2b, 0x1a, 0x90, 0x1b, 0x37, 0xd0, 0x6e, 0x4a, 0x34, 0x6e, 0x6f, 0x3e, 0x15,
-	0x26, 0xa7, 0x4f, 0x13, 0xb5, 0xa0, 0x3e, 0x3d, 0x9d, 0x1e, 0x39, 0xff, 0x21, 0x1b, 0xac, 0xf1,
-	0x47, 0x6f, 0x38, 0x70, 0x2a, 0x66, 0x39, 0x1a, 0x38, 0x55, 0xd4, 0x01, 0x38, 0xfe, 0x32, 0x99,
-	0x78, 0x3a, 0x55, 0x2b, 0xc6, 0xa3, 0x81, 0x53, 0x3f, 0xf8, 0x59, 0x29, 0x0c, 0xf3, 0x9c, 0xf0,
-	0x15, 0x9d, 0x13, 0x34, 0x81, 0xce, 0xed, 0xe7, 0x8f, 0x9e, 0xe4, 0xe3, 0x2c, 0xfd, 0x2f, 0xec,
-	0x96, 0xdc, 0xec, 0xfc, 0x39, 0x8d, 0x61, 0xab, 0xf8, 0x3a, 0xd1, 0x5e, 0xce, 0x96, 0x3c, 0xda,
-	0xbf, 0x39, 0x1d, 0xbe, 0xbd, 0x78, 0xbd, 0xa0, 0x22, 0xcc, 0x66, 0xfd, 0x39, 0x8b, 0xf6, 0x0d,
-	0xb7, 0xaf, 0x7e, 0x5e, 0x73, 0xb6, 0xd4, 0x8b, 0xb5, 0x3c, 0x6b, 0xa8, 0x70, 0xf8, 0x27, 0x00,
-	0x00, 0xff, 0xff, 0x19, 0xce, 0x49, 0xf6, 0xef, 0x04, 0x00, 0x00,
+	// 707 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcf, 0x4f, 0xdb, 0x30,
+	0x14, 0xc7, 0x09, 0x34, 0x6d, 0xf2, 0x60, 0xa5, 0x33, 0x0c, 0x42, 0x61, 0xa3, 0xcb, 0x0e, 0x83,
+	0x4d, 0x0a, 0x15, 0x95, 0x10, 0xd2, 0xa4, 0x49, 0xab, 0x00, 0x75, 0x12, 0xe2, 0x87, 0x19, 0x9a,
+	0xb4, 0xc3, 0xa2, 0xb4, 0x31, 0x6d, 0x44, 0x12, 0x67, 0x8e, 0xd3, 0x89, 0xbf, 0x6b, 0x7f, 0xdc,
+	0x2e, 0x3b, 0x4c, 0xb1, 0x9d, 0xb6, 0x6b, 0x8b, 0xb8, 0xec, 0x16, 0x7f, 0xdf, 0xd7, 0x9f, 0x3c,
+	0xfb, 0x3d, 0x3f, 0xd8, 0x0c, 0x83, 0x21, 0xb9, 0x0f, 0xb8, 0xcb, 0x48, 0x8f, 0x32, 0x3f, 0x88,
+	0xfb, 0x4e, 0xc2, 0x28, 0xa7, 0xa8, 0xa2, 0x02, 0xf5, 0xed, 0x3e, 0xa5, 0xfd, 0x90, 0x1c, 0x08,
+	0xb9, 0x9b, 0xdd, 0x1d, 0x90, 0x28, 0xe1, 0x0f, 0xd2, 0x55, 0x5f, 0x2f, 0xb6, 0x47, 0xd4, 0x27,
+	0x61, 0x2a, 0x55, 0xfb, 0x8f, 0x06, 0x2f, 0x6e, 0xb8, 0xc7, 0x38, 0x2e, 0xa0, 0x98, 0xfc, 0xc8,
+	0x48, 0xca, 0xd1, 0x4b, 0x30, 0x83, 0x38, 0xc9, 0xb8, 0x9b, 0xb1, 0xd0, 0xd2, 0x1a, 0xda, 0x9e,
+	0xd9, 0x59, 0xc0, 0x86, 0x90, 0x6e, 0x59, 0x88, 0x8e, 0xc1, 0xe0, 0x24, 0x4a, 0x42, 0x8f, 0x13,
+	0x6b, 0xb1, 0xa1, 0xed, 0x2d, 0x1f, 0xd6, 0x1d, 0xf5, 0x07, 0x67, 0xc4, 0xfa, 0xa2, 0x1c, 0xf9,
+	0xce, 0xc2, 0x8d, 0x36, 0xa1, 0x9c, 0xb6, 0x04, 0x75, 0x49, 0x50, 0x35, 0xac, 0xa7, 0xad, 0x1c,
+	0xb9, 0x0f, 0x25, 0xc6, 0xa3, 0xc4, 0x2a, 0x09, 0xdc, 0xda, 0x18, 0xc7, 0xa3, 0xe4, 0x32, 0xe3,
+	0x49, 0xc6, 0x3b, 0x1a, 0x16, 0x16, 0xd4, 0x82, 0x0a, 0x4d, 0x78, 0x40, 0xe3, 0xd4, 0xd2, 0x85,
+	0x7b, 0x6b, 0xf6, 0xe7, 0x97, 0xd2, 0x80, 0x0b, 0x67, 0xbb, 0x02, 0xba, 0x48, 0xbf, 0x6d, 0x40,
+	0x99, 0x0a, 0x9e, 0xfd, 0x1d, 0x9e, 0xcf, 0x24, 0x8b, 0x36, 0xa0, 0x1c, 0x7a, 0x0f, 0x34, 0xe3,
+	0xf2, 0xd8, 0x58, 0xad, 0xd0, 0x36, 0x98, 0x8c, 0xd2, 0xc8, 0x8d, 0xbd, 0x48, 0x9e, 0xd9, 0xc4,
+	0x46, 0x2e, 0x5c, 0x78, 0x11, 0x41, 0xeb, 0xa0, 0x73, 0x7a, 0x4f, 0x62, 0x79, 0x28, 0x2c, 0x17,
+	0x76, 0x03, 0x60, 0x9c, 0x3d, 0x42, 0x50, 0xca, 0x58, 0x98, 0x5a, 0x5a, 0x63, 0x69, 0xcf, 0xc4,
+	0xe2, 0xdb, 0xfe, 0xbd, 0x08, 0xb5, 0xe9, 0x94, 0x51, 0x13, 0xca, 0x09, 0x23, 0x29, 0x91, 0x19,
+	0x54, 0x0f, 0xad, 0xd9, 0xd3, 0x5d, 0x89, 0x38, 0x56, 0x3e, 0xb4, 0x0b, 0xcb, 0xb2, 0x5a, 0x3f,
+	0x03, 0x9f, 0x0f, 0x44, 0x76, 0x3a, 0x06, 0x21, 0x7d, 0xcd, 0x15, 0xf4, 0x1a, 0x56, 0xa4, 0x61,
+	0x40, 0x82, 0xfe, 0x80, 0x8b, 0x34, 0x75, 0x2c, 0x37, 0x75, 0x84, 0x94, 0x5b, 0xe4, 0xb5, 0x28,
+	0x48, 0x49, 0x5a, 0xa4, 0x26, 0x29, 0x6f, 0xe0, 0x99, 0xb2, 0x28, 0x8c, 0x2e, 0x3c, 0x6a, 0x9f,
+	0xe2, 0xac, 0x83, 0xee, 0x93, 0x84, 0x0f, 0xac, 0xb2, 0x08, 0xca, 0x05, 0xda, 0x01, 0xf3, 0x8e,
+	0x79, 0x11, 0x61, 0x79, 0xc7, 0x54, 0x44, 0x64, 0x2c, 0xe4, 0x60, 0x2f, 0xf3, 0x03, 0xea, 0x76,
+	0x03, 0x2e, 0x1c, 0x86, 0x04, 0x0b, 0xb1, 0x2d, 0x35, 0xf4, 0x16, 0x56, 0xa5, 0xe9, 0x8e, 0xe5,
+	0x4d, 0x1a, 0xf7, 0x1e, 0x2c, 0x53, 0xd8, 0xaa, 0x42, 0x3e, 0x2b, 0xd4, 0x9c, 0x36, 0x0c, 0x7c,
+	0x32, 0xa6, 0x81, 0xa4, 0x09, 0x51, 0xd1, 0xec, 0x0f, 0xb0, 0x31, 0xdd, 0xf9, 0x69, 0x42, 0xe3,
+	0x94, 0xe4, 0x17, 0x31, 0x7a, 0x63, 0x6e, 0xe0, 0xab, 0x36, 0x58, 0x1e, 0x69, 0x9f, 0x7d, 0xfb,
+	0x0a, 0x6a, 0x9f, 0x7c, 0x5f, 0xd6, 0xb5, 0x78, 0x31, 0x4f, 0x6f, 0x43, 0x5b, 0x60, 0xe4, 0xfd,
+	0x2b, 0xba, 0x5f, 0x76, 0x50, 0x25, 0x5f, 0xdf, 0xb2, 0xd0, 0xbe, 0x81, 0x35, 0x4c, 0x22, 0x3a,
+	0x24, 0xff, 0x13, 0x7a, 0x0c, 0x6b, 0xa7, 0xb1, 0x3f, 0xf3, 0xb6, 0x9f, 0x86, 0xbe, 0xbb, 0x86,
+	0xd5, 0xa9, 0x5e, 0x43, 0x06, 0x94, 0x2e, 0x2e, 0x2f, 0x4e, 0x6b, 0x0b, 0xc8, 0x04, 0xbd, 0x73,
+	0xe2, 0xb6, 0x9a, 0x35, 0x4d, 0x7d, 0x1e, 0x35, 0x6b, 0x8b, 0xa8, 0x0a, 0x70, 0x76, 0x7b, 0x7e,
+	0xee, 0xca, 0xd0, 0xd2, 0xe4, 0xfa, 0xa8, 0x59, 0x2b, 0x1d, 0xfe, 0x9a, 0x6c, 0xf5, 0x1b, 0xc2,
+	0x86, 0x41, 0x8f, 0xa0, 0x6b, 0xa8, 0xfe, 0x5b, 0x05, 0xf4, 0x6a, 0xd4, 0xec, 0x73, 0x07, 0x53,
+	0x7d, 0xf7, 0xd1, 0xb8, 0x2a, 0xdf, 0x47, 0x30, 0x47, 0xb5, 0x41, 0xe3, 0xc1, 0x30, 0x5d, 0xaf,
+	0xfa, 0x86, 0x23, 0xe7, 0xa5, 0x53, 0xcc, 0x4b, 0xe7, 0x34, 0x9f, 0x97, 0xe8, 0x04, 0x56, 0x26,
+	0x2b, 0x81, 0x76, 0x26, 0x5e, 0xdf, 0x4c, 0x81, 0x1e, 0xa5, 0x9c, 0xc1, 0xca, 0xe4, 0xd5, 0x4f,
+	0x50, 0xe6, 0x54, 0xa4, 0x3e, 0xe7, 0x85, 0x63, 0x92, 0x66, 0x21, 0x6f, 0xbf, 0xff, 0xb6, 0xdf,
+	0x0f, 0xf8, 0x20, 0xeb, 0x3a, 0x3d, 0x1a, 0x1d, 0x28, 0x97, 0x1c, 0xf1, 0x3d, 0x1a, 0xca, 0x8f,
+	0x42, 0xee, 0x96, 0xc5, 0xb2, 0xf5, 0x37, 0x00, 0x00, 0xff, 0xff, 0x60, 0x3a, 0x22, 0xd2, 0x2c,
+	0x06, 0x00, 0x00,
 }

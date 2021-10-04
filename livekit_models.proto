@@ -100,5 +100,5 @@ message RecordingResult {
   string id = 1;
   string error = 2;
   int64 duration = 3;
-  string location = 4;
+  string download_url = 4;
 }
