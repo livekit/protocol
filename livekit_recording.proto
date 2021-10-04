@@ -24,7 +24,7 @@ service RecordingService {
 
 message StartRecordingRequest {
   oneof input {
-    string input_url = 1;
+    string url = 1;
     RecordingTemplate template = 2;
   }
   oneof output {
