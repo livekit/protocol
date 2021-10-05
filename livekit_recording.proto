@@ -30,8 +30,9 @@ message StartRecordingRequest {
   oneof output {
     string s3_url = 3;
     RtmpOutput rtmp = 4;
+    string file = 5;
   }
-  RecordingOptions options = 5;
+  RecordingOptions options = 6;
 }
 
 message RecordingTemplate {
