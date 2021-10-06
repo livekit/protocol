@@ -58,15 +58,13 @@ enum RecordingPreset {
 
 message RecordingOptions {
   RecordingPreset preset = 1;
-  int32 input_width = 2; // default 1920
-  int32 input_height = 3; // default 1080
-  int32 output_width = 4; // default 0 (no scaling)
-  int32 output_height = 5; // default 0 (no scaling)
-  int32 depth = 6; // default 24
-  int32 framerate = 7; // default 30
-  int32 audio_bitrate = 8; // default 128
-  int32 audio_frequency = 9; // default 44100
-  int32 video_bitrate = 10; // default 4500
+  int32 width = 2; // default 1920
+  int32 height = 3; // default 1080
+  int32 depth = 4; // default 24
+  int32 framerate = 5; // default 30
+  int32 audio_bitrate = 6; // default 128
+  int32 audio_frequency = 7; // default 44100
+  int32 video_bitrate = 8; // default 4500
 }
 
 message StartRecordingResponse {
