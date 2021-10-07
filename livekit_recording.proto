@@ -3,65 +3,84 @@ syntax = "proto3";
 package livekit;
 option go_package = "github.com/livekit/protocol/proto/livekit";
 
+import "google/protobuf/empty.proto";
+import "livekit_models.proto";
+
 // Recording service that can be performed on any node
 // they are Twirp-based HTTP req/responses
 service RecordingService {
     // Starts a room
-    rpc StartRecording(StartRecordingRequest) returns (RecordingResponse);
+    rpc StartRecording(StartRecordingRequest) returns (StartRecordingResponse);
+
+    // Adds an rtmp output to a live recording
+    rpc AddOutput(AddOutputRequest) returns (google.protobuf.Empty);
+
+    // Removes an rtmp output from a live recording
+    rpc RemoveOutput(RemoveOutputRequest) returns (google.protobuf.Empty);
 
     // Ends a recording
-    rpc EndRecording(EndRecordingRequest) returns (RecordingResponse);
+    rpc EndRecording(EndRecordingRequest) returns (RecordingResult);
 }
 
 message StartRecordingRequest {
-  RecordingInput input = 1;
-  RecordingOutput output = 2;
-  RecordingOptions options = 3;
-}
-
-message EndRecordingRequest {
-  string recording_id = 1;
-}
-
-message RecordingResponse {
-  string recording_id = 1;
-}
-
-message RecordingInput {
-  string url = 1;
-  RecordingTemplate template = 2;
+  oneof input {
+    string url = 1;
+    RecordingTemplate template = 2;
+  }
+  oneof output {
+    string s3_url = 3;
+    RtmpOutput rtmp = 4;
+    string file = 5;
+  }
+  RecordingOptions options = 6;
 }
 
 message RecordingTemplate {
   string layout = 1;
-  // either token or room name required
-  string token = 2;
-  string room_name = 3;
+  oneof room {
+    string room_name = 2;
+    string token = 3;
+  }
 }
 
-message RecordingOutput {
-  string rtmp = 1;
-  // bucket/key
-  string s3_path = 2;
+message RtmpOutput {
+  repeated string urls = 1;
 }
 
 enum RecordingPreset {
+  // All presets use 44100 Hz, 128k bitrate for audio and a color depth of 24
   NONE = 0;
-  HD_30 = 1; // 720p, 30fps
-  HD_60 = 2; // 720p, 60fps
-  FULL_HD_30 = 3; // 1080p, 30fps
-  FULL_HD_60 = 4; // 1080p, 60fps
+  HD_30 = 1; // 720p, 30fps, 3000 kpbs
+  HD_60 = 2; // 720p, 60fps, 4500 kbps
+  FULL_HD_30 = 3; // 1080p, 30fps, 4500 kbps
+  FULL_HD_60 = 4; // 1080p, 60fps, 6000 kbps
 }
 
 message RecordingOptions {
   RecordingPreset preset = 1;
-  int32 input_width = 2;
-  int32 input_height = 3;
-  int32 output_width = 4;
-  int32 output_height = 5;
-  int32 depth = 6;
-  int32 framerate = 7;
-  int32 audio_bitrate = 8;
-  int32 audio_frequency = 9;
-  int32 video_bitrate = 10;
+  int32 width = 2; // default 1920
+  int32 height = 3; // default 1080
+  int32 depth = 4; // default 24
+  int32 framerate = 5; // default 30
+  int32 audio_bitrate = 6; // default 128
+  int32 audio_frequency = 7; // default 44100
+  int32 video_bitrate = 8; // default 4500
+}
+
+message StartRecordingResponse {
+  string recording_id = 1;
+}
+
+message AddOutputRequest {
+  string recording_id = 1;
+  string rtmp_url = 2;
+}
+
+message RemoveOutputRequest {
+  string recording_id = 1;
+  string rtmp_url = 2;
+}
+
+message EndRecordingRequest {
+  string recording_id = 1;
 }
