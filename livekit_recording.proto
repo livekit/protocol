@@ -4,7 +4,6 @@ package livekit;
 option go_package = "github.com/livekit/protocol/proto/livekit";
 
 import "google/protobuf/empty.proto";
-import "livekit_models.proto";
 
 // Recording service that can be performed on any node
 // they are Twirp-based HTTP req/responses
@@ -19,7 +18,7 @@ service RecordingService {
     rpc RemoveOutput(RemoveOutputRequest) returns (google.protobuf.Empty);
 
     // Ends a recording
-    rpc EndRecording(EndRecordingRequest) returns (RecordingResult);
+    rpc EndRecording(EndRecordingRequest) returns (google.protobuf.Empty);
 }
 
 message StartRecordingRequest {
