@@ -84,7 +84,7 @@ func RPC(ctx context.Context, bus utils.MessageBus, recordingId string, req *liv
 			if resp.RequestId != req.RequestId {
 				continue
 			}
-			if !resp.Success {
+			if resp.Error != "" {
 				return errors.New(resp.Error)
 			}
 			return nil
