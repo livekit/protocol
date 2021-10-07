@@ -28,6 +28,7 @@ message Node {
   NodeStats stats = 4;
   NodeType type = 5;
   NodeState state = 6;
+  string region = 7;
 }
 
 message NodeStats {
