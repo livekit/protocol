@@ -26,7 +26,8 @@ func ResponseChannel(id string) string {
 	return "RECORDING_RESPONSE_" + id
 }
 
-func ReserveRecorder(recordingId string, bus utils.MessageBus) error {
+func ReserveRecorder(bus utils.MessageBus) (string, error) {
+	recordingId := utils.NewGuid(utils.RecordingPrefix)
 	req := &livekit.RecordingReservation{
 		Id:          recordingId,
 		SubmittedAt: time.Now().UnixNano() / 1e6,
@@ -34,7 +35,7 @@ func ReserveRecorder(recordingId string, bus utils.MessageBus) error {
 
 	b, err := proto.Marshal(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	sub, _ := bus.Subscribe(context.Background(), ResponseChannel(recordingId))
@@ -42,14 +43,14 @@ func ReserveRecorder(recordingId string, bus utils.MessageBus) error {
 
 	err = bus.Publish(context.Background(), ReservationChannel, string(b))
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	select {
 	case <-sub.Channel():
-		return nil
+		return recordingId, nil
 	case <-time.After(RequestTimeout):
-		return errors.New("no recorders available")
+		return "", errors.New("no recorders available")
 	}
 }
 
@@ -59,6 +60,10 @@ func RPC(ctx context.Context, bus utils.MessageBus, recordingId string, req *liv
 		return err
 	}
 	defer sub.Close()
+
+	if req.RequestId == "" {
+		req.RequestId = utils.NewGuid(utils.RPCPrefix)
+	}
 
 	b, err := proto.Marshal(req)
 	if err != nil {
