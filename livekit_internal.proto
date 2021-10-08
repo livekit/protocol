@@ -128,8 +128,7 @@ message RecordingRequest {
 
 message RecordingResponse {
   string request_id = 1;
-  bool success = 2;
-  string error = 3;
+  string error = 2;
 }
 
 // details about the client
