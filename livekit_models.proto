@@ -60,6 +60,8 @@ message TrackInfo {
   uint32 height = 6;
   // true if track is simulcasted
   bool simulcast = 7;
+  // true if DTX (Discontinuous Transmission) is disabled for audio
+  bool disable_dtx = 8;
 }
 
 // new DataPacket API
