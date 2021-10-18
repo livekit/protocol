@@ -13,6 +13,7 @@ enum NodeType {
   CONTROLLER = 1;
   ORIGIN = 2;
   RELAY = 3;
+  TURN = 4;
 }
 
 enum NodeState {
