@@ -21,8 +21,8 @@ message SignalRequest {
     UpdateTrackSettings track_setting = 7;
     // Immediately terminate session
     LeaveRequest leave = 8;
-    // Set active published layers
-    SetSimulcastLayers simulcast = 9;
+    // Set active published layers, deprecated in favor of automatic tracking
+//    SetSimulcastLayers simulcast = 9;
   }
 }
 
@@ -80,11 +80,6 @@ message MuteTrackRequest {
   bool muted = 2;
 }
 
-message SetSimulcastLayers {
-  string track_sid = 1;
-  repeated VideoQuality layers = 2;
-}
-
 message JoinResponse {
   Room room = 1;
   ParticipantInfo participant = 2;
@@ -93,6 +88,9 @@ message JoinResponse {
   repeated ICEServer ice_servers = 5;
   // use subscriber as the primary PeerConnection
   bool subscriber_primary = 6;
+  // when the current server isn't available, return alternate url to retry connection
+  // when this is set, the other fields will be largely empty
+  string alternative_url = 7;
 }
 
 message TrackPublishedResponse {
@@ -122,8 +120,14 @@ message UpdateSubscription {
 
 message UpdateTrackSettings {
   repeated string track_sids = 1;
+  // when true, the track is placed in a paused state, with no new data returned
   bool disabled = 3;
+  // deprecated in favor of width & height
   VideoQuality quality = 4;
+  // for video, width to receive
+  uint32 width = 5;
+  // for video, height to receive
+  uint32 height = 6;
 }
 
 message LeaveRequest {
