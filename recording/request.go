@@ -28,20 +28,16 @@ func ResponseChannel(id string) string {
 
 func ReserveRecorder(bus utils.MessageBus) (string, error) {
 	recordingId := utils.NewGuid(utils.RecordingPrefix)
+
+	sub, _ := bus.Subscribe(context.Background(), ResponseChannel(recordingId))
+	defer sub.Close()
+
 	req := &livekit.RecordingReservation{
 		Id:          recordingId,
 		SubmittedAt: time.Now().UnixNano() / 1e6,
 	}
 
-	b, err := proto.Marshal(req)
-	if err != nil {
-		return "", err
-	}
-
-	sub, _ := bus.Subscribe(context.Background(), ResponseChannel(recordingId))
-	defer sub.Close()
-
-	err = bus.Publish(context.Background(), ReservationChannel, string(b))
+	err := bus.Publish(context.Background(), ReservationChannel, req)
 	if err != nil {
 		return "", err
 	}
@@ -65,12 +61,7 @@ func RPC(ctx context.Context, bus utils.MessageBus, recordingId string, req *liv
 		req.RequestId = utils.NewGuid(utils.RPCPrefix)
 	}
 
-	b, err := proto.Marshal(req)
-	if err != nil {
-		return err
-	}
-
-	err = bus.Publish(ctx, RequestChannel(recordingId), b)
+	err = bus.Publish(ctx, RequestChannel(recordingId), req)
 	if err != nil {
 		return err
 	}
@@ -80,7 +71,7 @@ func RPC(ctx context.Context, bus utils.MessageBus, recordingId string, req *liv
 		case <-time.After(RequestTimeout):
 			return errors.New("request timeout")
 		case msg := <-sub.Channel():
-			b = sub.Payload(msg)
+			b := sub.Payload(msg)
 			resp := &livekit.RecordingResponse{}
 			err = proto.Unmarshal(b, resp)
 			if err != nil {

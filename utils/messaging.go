@@ -9,6 +9,7 @@ import (
 
 	"github.com/eapache/channels"
 	"github.com/go-redis/redis/v8"
+	"google.golang.org/protobuf/proto"
 )
 
 const lockExpiration = time.Second * 5
@@ -18,7 +19,7 @@ type MessageBus interface {
 	Subscribe(ctx context.Context, channel string) (PubSub, error)
 	// like subscribe, but ensuring only a single instance gets to process the message
 	SubscribeQueue(ctx context.Context, channel string) (PubSub, error)
-	Publish(ctx context.Context, channel string, msg interface{}) error
+	Publish(ctx context.Context, channel string, msg proto.Message) error
 }
 
 type PubSub interface {
@@ -76,8 +77,13 @@ func (r *RedisMessageBus) SubscribeQueue(ctx context.Context, channel string) (P
 	return ps, nil
 }
 
-func (r *RedisMessageBus) Publish(ctx context.Context, channel string, message interface{}) error {
-	return r.rc.Publish(ctx, channel, message).Err()
+func (r *RedisMessageBus) Publish(ctx context.Context, channel string, msg proto.Message) error {
+	b, err := proto.Marshal(msg)
+	if err != nil {
+		return err
+	}
+
+	return r.rc.Publish(ctx, channel, b).Err()
 }
 
 type RedisPubSub struct {
