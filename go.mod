@@ -11,7 +11,7 @@ require (
 	github.com/lithammer/shortuuid/v3 v3.0.6
 	github.com/magefile/mage v1.11.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/prometheus/client_golang v1.11.0
 	github.com/stretchr/testify v1.7.0
 	github.com/twitchtv/twirp v8.1.0+incompatible
 	golang.org/x/crypto v0.0.0-20210314154223-e6e6c4f2bb5b // indirect
