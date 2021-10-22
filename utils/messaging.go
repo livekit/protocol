@@ -9,10 +9,26 @@ import (
 
 	"github.com/eapache/channels"
 	"github.com/go-redis/redis/v8"
+	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/protobuf/proto"
 )
 
 const lockExpiration = time.Second * 5
+
+var (
+	PromMessageBusCounter = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Namespace: "livekit",
+			Subsystem: "messagebus",
+			Name:      "messages",
+		},
+		[]string{"type", "status"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(PromMessageBusCounter)
+}
 
 type MessageBus interface {
 	Lock(ctx context.Context, key string, expiration time.Duration) (acquired bool, err error)
@@ -68,6 +84,7 @@ func (r *RedisMessageBus) SubscribeQueue(ctx context.Context, channel string) (P
 				hash := base64.StdEncoding.EncodeToString(sha[:])
 				acquired, _ := r.Lock(ctx, hash, lockExpiration)
 				if acquired {
+					PromMessageBusCounter.WithLabelValues("in", "success").Add(1)
 					c <- msg
 				}
 			}
@@ -80,10 +97,18 @@ func (r *RedisMessageBus) SubscribeQueue(ctx context.Context, channel string) (P
 func (r *RedisMessageBus) Publish(ctx context.Context, channel string, msg proto.Message) error {
 	b, err := proto.Marshal(msg)
 	if err != nil {
+		PromMessageBusCounter.WithLabelValues("out", "failure").Add(1)
 		return err
 	}
 
-	return r.rc.Publish(ctx, channel, b).Err()
+	err = r.rc.Publish(ctx, channel, b).Err()
+	if err == nil {
+		PromMessageBusCounter.WithLabelValues("out", "success").Add(1)
+	} else {
+		PromMessageBusCounter.WithLabelValues("out", "failure").Add(1)
+	}
+
+	return err
 }
 
 type RedisPubSub struct {
