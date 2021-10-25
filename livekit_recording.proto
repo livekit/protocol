@@ -27,11 +27,10 @@ message StartRecordingRequest {
     RecordingTemplate template = 2;
   }
   oneof output {
-    string s3_url = 3;
-    RtmpOutput rtmp = 4;
-    string file = 5;
+    RtmpOutput rtmp = 3;
+    string filepath = 4;
   }
-  RecordingOptions options = 6;
+  RecordingOptions options = 5;
 }
 
 message RecordingTemplate {
