@@ -3,7 +3,7 @@ package webhook
 import (
 	"crypto/sha256"
 	"encoding/base64"
-	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/livekit/protocol/auth"
@@ -13,7 +13,7 @@ import (
 // closes body after reading
 func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
 	defer r.Body.Close()
-	data, err := io.ReadAll(r.Body)
+	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
 	}
