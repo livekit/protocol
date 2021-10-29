@@ -48,6 +48,8 @@ message SignalResponse {
     SpeakersChanged speakers_changed = 10;
     // sent when metadata of the room has changed
     RoomUpdate room_update = 11;
+    // when connection quality changed
+    ConnectionQualityUpdate quality = 12;
   }
 }
 
@@ -148,4 +150,9 @@ message SpeakersChanged {
 
 message RoomUpdate {
   Room room = 1;
+}
+
+message ConnectionQualityUpdate {
+  string participant_sid = 1;
+  ConnectionQuality quality = 2;
 }
