@@ -34,29 +34,48 @@ func Errorw(msg string, err error, keysAndValues ...interface{}) {
 	WithLogger(defaultLogger).Errorw(msg, err, keysAndValues...)
 }
 
-type withLogger struct {
-	logger logr.Logger
+type Logger logr.Logger
+
+func WithLogger(logger logr.Logger) *Logger {
+	l := Logger(logger)
+	return &l
 }
 
-func WithLogger(logger logr.Logger) *withLogger {
-	return &withLogger{logger: logger}
+func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
+	logger := defaultLogger
+	if l != nil {
+		logger = logr.Logger(*l)
+	}
+
+	logger.V(1).Info(msg, keysAndValues...)
 }
 
-func (l *withLogger) Debugw(msg string, keysAndValues ...interface{}) {
-	l.logger.V(1).Info(msg, keysAndValues...)
+func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
+	logger := defaultLogger
+	if l != nil {
+		logger = logr.Logger(*l)
+	}
+
+	logger.Info(msg, keysAndValues...)
 }
 
-func (l *withLogger) Infow(msg string, keysAndValues ...interface{}) {
-	l.logger.Info(msg, keysAndValues...)
-}
-
-func (l *withLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
+func (l *Logger) Warnw(msg string, err error, keysAndValues ...interface{}) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
-	l.logger.Info(msg, keysAndValues...)
+	logger := defaultLogger
+	if l != nil {
+		logger = logr.Logger(*l)
+	}
+
+	logger.Info(msg, keysAndValues...)
 }
 
-func (l *withLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {
-	l.logger.Error(err, msg, keysAndValues...)
+func (l *Logger) Errorw(msg string, err error, keysAndValues ...interface{}) {
+	logger := defaultLogger
+	if l != nil {
+		logger = logr.Logger(*l)
+	}
+
+	logger.Error(err, msg, keysAndValues...)
 }
