@@ -19,63 +19,38 @@ func SetLogger(l logr.Logger, name string) {
 }
 
 func Debugw(msg string, keysAndValues ...interface{}) {
-	WithLogger(defaultLogger).Debugw(msg, keysAndValues...)
+	Logger(defaultLogger).Debugw(msg, keysAndValues...)
 }
 
 func Infow(msg string, keysAndValues ...interface{}) {
-	WithLogger(defaultLogger).Infow(msg, keysAndValues...)
+	Logger(defaultLogger).Infow(msg, keysAndValues...)
 }
 
 func Warnw(msg string, err error, keysAndValues ...interface{}) {
-	WithLogger(defaultLogger).Warnw(msg, err, keysAndValues...)
+	Logger(defaultLogger).Warnw(msg, err, keysAndValues...)
 }
 
 func Errorw(msg string, err error, keysAndValues ...interface{}) {
-	WithLogger(defaultLogger).Errorw(msg, err, keysAndValues...)
+	Logger(defaultLogger).Errorw(msg, err, keysAndValues...)
 }
 
 type Logger logr.Logger
 
-func WithLogger(logger logr.Logger) *Logger {
-	l := Logger(logger)
-	return &l
+func (l Logger) Debugw(msg string, keysAndValues ...interface{}) {
+	logr.Logger(l).V(1).Info(msg, keysAndValues...)
 }
 
-func (l *Logger) Debugw(msg string, keysAndValues ...interface{}) {
-	logger := defaultLogger
-	if l != nil {
-		logger = logr.Logger(*l)
-	}
-
-	logger.V(1).Info(msg, keysAndValues...)
+func (l Logger) Infow(msg string, keysAndValues ...interface{}) {
+	logr.Logger(l).Info(msg, keysAndValues...)
 }
 
-func (l *Logger) Infow(msg string, keysAndValues ...interface{}) {
-	logger := defaultLogger
-	if l != nil {
-		logger = logr.Logger(*l)
-	}
-
-	logger.Info(msg, keysAndValues...)
-}
-
-func (l *Logger) Warnw(msg string, err error, keysAndValues ...interface{}) {
+func (l Logger) Warnw(msg string, err error, keysAndValues ...interface{}) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
-	logger := defaultLogger
-	if l != nil {
-		logger = logr.Logger(*l)
-	}
-
-	logger.Info(msg, keysAndValues...)
+	logr.Logger(l).Info(msg, keysAndValues...)
 }
 
-func (l *Logger) Errorw(msg string, err error, keysAndValues ...interface{}) {
-	logger := defaultLogger
-	if l != nil {
-		logger = logr.Logger(*l)
-	}
-
-	logger.Error(err, msg, keysAndValues...)
+func (l Logger) Errorw(msg string, err error, keysAndValues ...interface{}) {
+	logr.Logger(l).Error(err, msg, keysAndValues...)
 }
