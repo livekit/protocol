@@ -36,21 +36,28 @@ func Errorw(msg string, err error, keysAndValues ...interface{}) {
 
 type Logger logr.Logger
 
+func (l Logger) toLogr() logr.Logger {
+	if logr.Logger(l).GetSink() == nil {
+		return logr.Logger(defaultLogger)
+	}
+	return logr.Logger(l)
+}
+
 func (l Logger) Debugw(msg string, keysAndValues ...interface{}) {
-	logr.Logger(l).V(1).Info(msg, keysAndValues...)
+	l.toLogr().V(1).Info(msg, keysAndValues...)
 }
 
 func (l Logger) Infow(msg string, keysAndValues ...interface{}) {
-	logr.Logger(l).Info(msg, keysAndValues...)
+	l.toLogr().Info(msg, keysAndValues...)
 }
 
 func (l Logger) Warnw(msg string, err error, keysAndValues ...interface{}) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
-	logr.Logger(l).Info(msg, keysAndValues...)
+	l.toLogr().Info(msg, keysAndValues...)
 }
 
 func (l Logger) Errorw(msg string, err error, keysAndValues ...interface{}) {
-	logr.Logger(l).Error(err, msg, keysAndValues...)
+	l.toLogr().Error(err, msg, keysAndValues...)
 }
