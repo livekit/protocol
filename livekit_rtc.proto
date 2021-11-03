@@ -49,7 +49,7 @@ message SignalResponse {
     // sent when metadata of the room has changed
     RoomUpdate room_update = 11;
     // when connection quality changed
-    ConnectionQualityUpdate quality = 12;
+    ConnectionQualityUpdate connection_quality = 12;
   }
 }
 
@@ -152,7 +152,11 @@ message RoomUpdate {
   Room room = 1;
 }
 
-message ConnectionQualityUpdate {
+message ConnectionQualityInfo {
   string participant_sid = 1;
   ConnectionQuality quality = 2;
+}
+
+message ConnectionQualityUpdate {
+  repeated ConnectionQualityInfo updates = 1;
 }
