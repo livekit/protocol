@@ -19,20 +19,45 @@ func SetLogger(l logr.Logger, name string) {
 }
 
 func Debugw(msg string, keysAndValues ...interface{}) {
-	defaultLogger.V(1).Info(msg, keysAndValues...)
+	Logger(defaultLogger).Debugw(msg, keysAndValues...)
 }
 
 func Infow(msg string, keysAndValues ...interface{}) {
-	defaultLogger.Info(msg, keysAndValues...)
+	Logger(defaultLogger).Infow(msg, keysAndValues...)
 }
 
 func Warnw(msg string, err error, keysAndValues ...interface{}) {
-	if err != nil {
-		keysAndValues = append(keysAndValues, "error", err)
-	}
-	defaultLogger.Info(msg, keysAndValues...)
+	Logger(defaultLogger).Warnw(msg, err, keysAndValues...)
 }
 
 func Errorw(msg string, err error, keysAndValues ...interface{}) {
-	defaultLogger.Error(err, msg, keysAndValues...)
+	Logger(defaultLogger).Errorw(msg, err, keysAndValues...)
+}
+
+type Logger logr.Logger
+
+func (l Logger) toLogr() logr.Logger {
+	if logr.Logger(l).GetSink() == nil {
+		return logr.Logger(defaultLogger)
+	}
+	return logr.Logger(l)
+}
+
+func (l Logger) Debugw(msg string, keysAndValues ...interface{}) {
+	l.toLogr().V(1).Info(msg, keysAndValues...)
+}
+
+func (l Logger) Infow(msg string, keysAndValues ...interface{}) {
+	l.toLogr().Info(msg, keysAndValues...)
+}
+
+func (l Logger) Warnw(msg string, err error, keysAndValues ...interface{}) {
+	if err != nil {
+		keysAndValues = append(keysAndValues, "error", err)
+	}
+	l.toLogr().Info(msg, keysAndValues...)
+}
+
+func (l Logger) Errorw(msg string, err error, keysAndValues ...interface{}) {
+	l.toLogr().Error(err, msg, keysAndValues...)
 }
