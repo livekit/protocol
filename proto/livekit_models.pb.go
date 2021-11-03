@@ -121,6 +121,55 @@ func (TrackSource) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{1}
 }
 
+type ConnectionQuality int32
+
+const (
+	ConnectionQuality_POOR      ConnectionQuality = 0
+	ConnectionQuality_GOOD      ConnectionQuality = 1
+	ConnectionQuality_EXCELLENT ConnectionQuality = 2
+)
+
+// Enum value maps for ConnectionQuality.
+var (
+	ConnectionQuality_name = map[int32]string{
+		0: "POOR",
+		1: "GOOD",
+		2: "EXCELLENT",
+	}
+	ConnectionQuality_value = map[string]int32{
+		"POOR":      0,
+		"GOOD":      1,
+		"EXCELLENT": 2,
+	}
+)
+
+func (x ConnectionQuality) Enum() *ConnectionQuality {
+	p := new(ConnectionQuality)
+	*p = x
+	return p
+}
+
+func (x ConnectionQuality) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ConnectionQuality) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_models_proto_enumTypes[2].Descriptor()
+}
+
+func (ConnectionQuality) Type() protoreflect.EnumType {
+	return &file_livekit_models_proto_enumTypes[2]
+}
+
+func (x ConnectionQuality) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ConnectionQuality.Descriptor instead.
+func (ConnectionQuality) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{2}
+}
+
 type ParticipantInfo_State int32
 
 const (
@@ -161,11 +210,11 @@ func (x ParticipantInfo_State) String() string {
 }
 
 func (ParticipantInfo_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[2].Descriptor()
+	return file_livekit_models_proto_enumTypes[3].Descriptor()
 }
 
 func (ParticipantInfo_State) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[2]
+	return &file_livekit_models_proto_enumTypes[3]
 }
 
 func (x ParticipantInfo_State) Number() protoreflect.EnumNumber {
@@ -207,11 +256,11 @@ func (x DataPacket_Kind) String() string {
 }
 
 func (DataPacket_Kind) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[3].Descriptor()
+	return file_livekit_models_proto_enumTypes[4].Descriptor()
 }
 
 func (DataPacket_Kind) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[3]
+	return &file_livekit_models_proto_enumTypes[4]
 }
 
 func (x DataPacket_Kind) Number() protoreflect.EnumNumber {
@@ -972,10 +1021,14 @@ var file_livekit_models_proto_rawDesc = []byte{
 	0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x43,
 	0x41, 0x4d, 0x45, 0x52, 0x41, 0x10, 0x01, 0x12, 0x0e, 0x0a, 0x0a, 0x4d, 0x49, 0x43, 0x52, 0x4f,
 	0x50, 0x48, 0x4f, 0x4e, 0x45, 0x10, 0x02, 0x12, 0x10, 0x0a, 0x0c, 0x53, 0x43, 0x52, 0x45, 0x45,
-	0x4e, 0x5f, 0x53, 0x48, 0x41, 0x52, 0x45, 0x10, 0x03, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6c,
-	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x4e, 0x5f, 0x53, 0x48, 0x41, 0x52, 0x45, 0x10, 0x03, 0x2a, 0x36, 0x0a, 0x11, 0x43, 0x6f, 0x6e,
+	0x6e, 0x65, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x08,
+	0x0a, 0x04, 0x50, 0x4f, 0x4f, 0x52, 0x10, 0x00, 0x12, 0x08, 0x0a, 0x04, 0x47, 0x4f, 0x4f, 0x44,
+	0x10, 0x01, 0x12, 0x0d, 0x0a, 0x09, 0x45, 0x58, 0x43, 0x45, 0x4c, 0x4c, 0x45, 0x4e, 0x54, 0x10,
+	0x02, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -990,32 +1043,33 @@ func file_livekit_models_proto_rawDescGZIP() []byte {
 	return file_livekit_models_proto_rawDescData
 }
 
-var file_livekit_models_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_livekit_models_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_livekit_models_proto_goTypes = []interface{}{
 	(TrackType)(0),              // 0: livekit.TrackType
 	(TrackSource)(0),            // 1: livekit.TrackSource
-	(ParticipantInfo_State)(0),  // 2: livekit.ParticipantInfo.State
-	(DataPacket_Kind)(0),        // 3: livekit.DataPacket.Kind
-	(*Room)(nil),                // 4: livekit.Room
-	(*Codec)(nil),               // 5: livekit.Codec
-	(*ParticipantInfo)(nil),     // 6: livekit.ParticipantInfo
-	(*TrackInfo)(nil),           // 7: livekit.TrackInfo
-	(*DataPacket)(nil),          // 8: livekit.DataPacket
-	(*ActiveSpeakerUpdate)(nil), // 9: livekit.ActiveSpeakerUpdate
-	(*SpeakerInfo)(nil),         // 10: livekit.SpeakerInfo
-	(*UserPacket)(nil),          // 11: livekit.UserPacket
+	(ConnectionQuality)(0),      // 2: livekit.ConnectionQuality
+	(ParticipantInfo_State)(0),  // 3: livekit.ParticipantInfo.State
+	(DataPacket_Kind)(0),        // 4: livekit.DataPacket.Kind
+	(*Room)(nil),                // 5: livekit.Room
+	(*Codec)(nil),               // 6: livekit.Codec
+	(*ParticipantInfo)(nil),     // 7: livekit.ParticipantInfo
+	(*TrackInfo)(nil),           // 8: livekit.TrackInfo
+	(*DataPacket)(nil),          // 9: livekit.DataPacket
+	(*ActiveSpeakerUpdate)(nil), // 10: livekit.ActiveSpeakerUpdate
+	(*SpeakerInfo)(nil),         // 11: livekit.SpeakerInfo
+	(*UserPacket)(nil),          // 12: livekit.UserPacket
 }
 var file_livekit_models_proto_depIdxs = []int32{
-	5,  // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
-	2,  // 1: livekit.ParticipantInfo.state:type_name -> livekit.ParticipantInfo.State
-	7,  // 2: livekit.ParticipantInfo.tracks:type_name -> livekit.TrackInfo
+	6,  // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
+	3,  // 1: livekit.ParticipantInfo.state:type_name -> livekit.ParticipantInfo.State
+	8,  // 2: livekit.ParticipantInfo.tracks:type_name -> livekit.TrackInfo
 	0,  // 3: livekit.TrackInfo.type:type_name -> livekit.TrackType
 	1,  // 4: livekit.TrackInfo.source:type_name -> livekit.TrackSource
-	3,  // 5: livekit.DataPacket.kind:type_name -> livekit.DataPacket.Kind
-	11, // 6: livekit.DataPacket.user:type_name -> livekit.UserPacket
-	9,  // 7: livekit.DataPacket.speaker:type_name -> livekit.ActiveSpeakerUpdate
-	10, // 8: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
+	4,  // 5: livekit.DataPacket.kind:type_name -> livekit.DataPacket.Kind
+	12, // 6: livekit.DataPacket.user:type_name -> livekit.UserPacket
+	10, // 7: livekit.DataPacket.speaker:type_name -> livekit.ActiveSpeakerUpdate
+	11, // 8: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
 	9,  // [9:9] is the sub-list for method output_type
 	9,  // [9:9] is the sub-list for method input_type
 	9,  // [9:9] is the sub-list for extension type_name
@@ -1135,7 +1189,7 @@ func file_livekit_models_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_models_proto_rawDesc,
-			NumEnums:      4,
+			NumEnums:      5,
 			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
