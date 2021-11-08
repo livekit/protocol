@@ -4,9 +4,10 @@ package livekit;
 option go_package = "github.com/livekit/protocol/proto/livekit";
 
 import "livekit_models.proto";
+import "livekit_recording.proto";
 
 message WebhookEvent {
-  // one of room_started, room_finished, participant_joined, participant_left, recording_finished
+  // one of room_started, room_finished, participant_joined, participant_left, recording_started, recording_finished
   string event = 1;
 
   Room room = 2;
@@ -14,8 +15,16 @@ message WebhookEvent {
   // set when event is participant_*
   ParticipantInfo participant = 3;
 
+  // set when event is recording_started
+  RecordingInfo recording_info = 5;
+
   // set when event is recording_finished
   RecordingResult recording_result = 4;
+}
+
+message RecordingInfo {
+  string id = 1;
+  StartRecordingRequest request = 2;
 }
 
 message RecordingResult {

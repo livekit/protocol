@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
@@ -16,7 +17,7 @@ import (
 )
 
 type Notifier interface {
-	Notify(payload interface{}) error
+	Notify(ctx context.Context, payload interface{}) error
 }
 
 type notifier struct {
@@ -35,7 +36,7 @@ func NewNotifier(apiKey, apiSecret string, urls []string) Notifier {
 	}
 }
 
-func (n *notifier) Notify(payload interface{}) error {
+func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 	var encoded []byte
 	var err error
 	if message, ok := payload.(proto.Message); ok {
