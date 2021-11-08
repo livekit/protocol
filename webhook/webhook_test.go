@@ -7,9 +7,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/webhook"
-	"github.com/stretchr/testify/require"
 )
 
 func TestWebHook(t *testing.T) {
@@ -42,7 +43,7 @@ func TestWebHook(t *testing.T) {
 	notifier := webhook.NewNotifier("mykey", "mysecret", []string{
 		"http://localhost:8765",
 	})
-	require.NoError(t, notifier.Notify(payload))
+	require.NoError(t, notifier.Notify(context.Background(), payload))
 }
 
 type testServer struct {
