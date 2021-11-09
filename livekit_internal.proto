@@ -66,6 +66,7 @@ message NodeStats {
 // message to RTC nodes
 message RTCNodeMessage {
   string participant_key = 1;
+  int64 sender_time = 11;
   oneof message {
     StartSession start_session = 2;
     SignalRequest request = 3;
@@ -77,6 +78,7 @@ message RTCNodeMessage {
     UpdateSubscriptionsRequest update_subscriptions = 8;
     SendDataRequest send_data = 9;
     UpdateRoomMetadataRequest update_room_metadata = 10;
+    KeepAlive keep_alive = 12;
   }
 }
 
@@ -146,4 +148,7 @@ message ClientInfo {
   SDK sdk = 1;
   string version = 2;
   int32 protocol = 3;
+}
+
+message KeepAlive {
 }
