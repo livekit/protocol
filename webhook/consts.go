@@ -15,5 +15,6 @@ const (
 	EventRoomFinished      = "room_finished"
 	EventParticipantJoined = "participant_joined"
 	EventParticipantLeft   = "participant_left"
+	EventRecordingStarted  = "recording_started"
 	EventRecordingFinished = "recording_finished"
 )
