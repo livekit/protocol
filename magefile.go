@@ -1,3 +1,4 @@
+//go:build mage
 // +build mage
 
 package main
@@ -23,6 +24,7 @@ func Proto() error {
 		"livekit_room.proto",
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
+		"analytics.proto",
 	)
 	if err != nil {
 		return err
@@ -50,6 +52,10 @@ func Proto() error {
 		return err
 	}
 
+	protocGrpcGoPath, err := getToolPath("protoc-gen-go-grpc")
+	if err != nil {
+		return err
+	}
 	// generate twirp-related protos
 	cmd := exec.Command(protoc,
 		"--go_out", target,
@@ -70,13 +76,17 @@ func Proto() error {
 	// generate basic protobuf
 	cmd = exec.Command(protoc,
 		"--go_out", target,
+		"--go-grpc_out", target,
 		"--go_opt=paths=source_relative",
+		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go="+protocGoPath,
+		"--plugin=go-grpc="+protocGrpcGoPath,
 		"-I=.",
 		"livekit_internal.proto",
 		"livekit_models.proto",
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
+		"analytics.proto",
 	)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
