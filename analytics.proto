@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/proto/livekit";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "livekit_models.proto";
+
+
+
+service AnalyticsRecorderService {
+  rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
+  rpc IngestEvents(stream AnalyticsEvents) returns (google.protobuf.Empty){};
+}
+
+enum StreamType {
+  UPSTREAM = 0;
+  DOWNSTREAM = 1;
+}
+
+message AnalyticsStat {
+  StreamType kind = 1;
+  google.protobuf.Timestamp time_stamp = 2;
+  string node = 3;
+  optional string sid = 4;
+  optional string project_id = 5;
+  optional string participant_id = 6;
+  optional string room_name = 7;
+  optional double jitter = 8;
+  optional uint64 packet_lost = 9;
+  optional uint64 rr_time = 10;
+  optional uint64 bytes_sent = 11;
+  optional uint64 bytes_received = 12;
+  optional string auth_token = 13;
+}
+
+message AnalyticsStats {
+  repeated AnalyticsStat stats = 1;
+}
+
+enum AnalyticsEventType {
+  ROOM_CREATED = 0;
+  PARTICIPANT_JOINED = 1;
+}
+message AnalyticsEvent {
+  AnalyticsEventType type = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  string room_sid = 3;
+  Room room = 4;
+  ParticipantInfo participant = 5;
+  TrackInfo track = 6;
+}
+
+message AnalyticsEvents {
+  repeated AnalyticsEvent events = 1;
+}
