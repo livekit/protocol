@@ -11,8 +11,7 @@ import "livekit_room.proto";
 enum NodeType {
   SERVER = 0;
   CONTROLLER = 1;
-  ORIGIN = 2;
-  RELAY = 3;
+  MEDIA = 2;
   TURN = 4;
 }
 
