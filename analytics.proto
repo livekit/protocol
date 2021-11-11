@@ -46,7 +46,10 @@ enum AnalyticsEventType {
   TRACK_UNPUBLISHED = 5;
   TRACK_SUBSCRIBED = 6;
   TRACK_UNSUBSCRIBED = 7;
+  RECORDING_STARTED = 8;
+  RECORDING_ENDED = 9;
 }
+
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
@@ -56,6 +59,7 @@ message AnalyticsEvent {
   ParticipantInfo participant = 6;
   string track_id = 7;
   TrackInfo track = 8;
+  string recording_id = 9;
 }
 
 message AnalyticsEvents {
