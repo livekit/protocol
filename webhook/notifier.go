@@ -70,6 +70,7 @@ func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 			continue
 		}
 		r.Header.Set(authHeader, token)
+		r.Header.Set("content-type", "application/json")
 		_, err = http.DefaultClient.Do(r)
 		if err != nil {
 			n.logger.Error(err, "could not post to webhook", "url", url)
