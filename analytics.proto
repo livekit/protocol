@@ -54,7 +54,8 @@ message AnalyticsEvent {
   Room room = 4;
   string participant_id = 5;
   ParticipantInfo participant = 6;
-  TrackInfo track = 7;
+  string track_id = 7;
+  TrackInfo track = 8;
 }
 
 message AnalyticsEvents {
