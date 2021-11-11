@@ -7,8 +7,6 @@ import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 
-
-
 service AnalyticsRecorderService {
   rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
   rpc IngestEvents(stream AnalyticsEvents) returns (google.protobuf.Empty){};
@@ -41,15 +39,22 @@ message AnalyticsStats {
 
 enum AnalyticsEventType {
   ROOM_CREATED = 0;
-  PARTICIPANT_JOINED = 1;
+  ROOM_ENDED = 1;
+  PARTICIPANT_JOINED = 2;
+  PARTICIPANT_LEFT = 3;
+  TRACK_PUBLISHED = 4;
+  TRACK_UNPUBLISHED = 5;
+  TRACK_SUBSCRIBED = 6;
+  TRACK_UNSUBSCRIBED = 7;
 }
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
   string room_sid = 3;
   Room room = 4;
-  ParticipantInfo participant = 5;
-  TrackInfo track = 6;
+  string participant_id = 5;
+  ParticipantInfo participant = 6;
+  TrackInfo track = 7;
 }
 
 message AnalyticsEvents {
