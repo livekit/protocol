@@ -18,7 +18,7 @@ enum StreamType {
 }
 
 message AnalyticsStat {
-  string auth_token = 1;
+  string access_key = 1;
   StreamType kind = 2;
   google.protobuf.Timestamp time_stamp = 3;
   string node = 4;
@@ -51,6 +51,15 @@ enum AnalyticsEventType {
   RECORDING_ENDED = 9;
 }
 
+enum SdkType {
+  T_UNKNOWN = 0;
+  JS = 1;
+  IOS = 2;
+  ANDROID = 3;
+  FLUTTER = 4;
+  GO = 5;
+}
+
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
@@ -61,6 +70,9 @@ message AnalyticsEvent {
   string track_id = 7;
   TrackInfo track = 8;
   string recording_id = 9;
+  string access_key = 10;
+  SdkType sdk_type = 11;
+  string region = 12;
 }
 
 message AnalyticsEvents {
