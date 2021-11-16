@@ -6,6 +6,7 @@ option go_package = "github.com/livekit/protocol/proto/livekit";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
+import "livekit_internal.proto";
 
 service AnalyticsRecorderService {
   rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
@@ -18,7 +19,7 @@ enum StreamType {
 }
 
 message AnalyticsStat {
-  string access_key = 1;
+  string analytics_key = 1;
   StreamType kind = 2;
   google.protobuf.Timestamp time_stamp = 3;
   string node = 4;
@@ -51,14 +52,6 @@ enum AnalyticsEventType {
   RECORDING_ENDED = 9;
 }
 
-enum SdkType {
-  T_UNKNOWN = 0;
-  JS = 1;
-  IOS = 2;
-  ANDROID = 3;
-  FLUTTER = 4;
-  GO = 5;
-}
 
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
@@ -70,8 +63,8 @@ message AnalyticsEvent {
   string track_id = 7;
   TrackInfo track = 8;
   string recording_id = 9;
-  string access_key = 10;
-  SdkType sdk_type = 11;
+  string analytics_key = 10;
+  ClientInfo.SDK sdk_type = 11;
   string region = 12;
 }
 
