@@ -33,6 +33,7 @@ message AnalyticsStat {
   int32 nack_count = 12;
   int32 pli_count = 13;
   int32 fir_count = 14;
+  string room_name = 15;
 }
 
 message AnalyticsStats {
