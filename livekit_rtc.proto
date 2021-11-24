@@ -50,6 +50,8 @@ message SignalResponse {
     RoomUpdate room_update = 11;
     // when connection quality changed
     ConnectionQualityUpdate connection_quality = 12;
+    // when streamed tracks changed
+    StreamedTracksUpdate streamed_tracks_update = 13;
   }
 }
 
@@ -159,4 +161,14 @@ message ConnectionQualityInfo {
 
 message ConnectionQualityUpdate {
   repeated ConnectionQualityInfo updates = 1;
+}
+
+message StreamedTrack {
+  string participant_sid = 1;
+  string track_sid = 2;
+}
+
+message StreamedTracksUpdate {
+  repeated StreamedTrack paused = 1;
+  repeated StreamedTrack resumed = 2;
 }
