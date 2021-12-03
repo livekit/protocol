@@ -158,77 +158,6 @@ func (x *RecordingInfo) GetRequest() *StartRecordingRequest {
 	return nil
 }
 
-type RecordingResult struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Id          string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Error       string `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	Duration    int64  `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
-	DownloadUrl string `protobuf:"bytes,4,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"`
-}
-
-func (x *RecordingResult) Reset() {
-	*x = RecordingResult{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_webhook_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *RecordingResult) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RecordingResult) ProtoMessage() {}
-
-func (x *RecordingResult) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_webhook_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RecordingResult.ProtoReflect.Descriptor instead.
-func (*RecordingResult) Descriptor() ([]byte, []int) {
-	return file_livekit_webhook_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *RecordingResult) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *RecordingResult) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-func (x *RecordingResult) GetDuration() int64 {
-	if x != nil {
-		return x.Duration
-	}
-	return 0
-}
-
-func (x *RecordingResult) GetDownloadUrl() string {
-	if x != nil {
-		return x.DownloadUrl
-	}
-	return ""
-}
-
 var File_livekit_webhook_proto protoreflect.FileDescriptor
 
 var file_livekit_webhook_proto_rawDesc = []byte{
@@ -259,18 +188,10 @@ var file_livekit_webhook_proto_rawDesc = []byte{
 	0x71, 0x75, 0x65, 0x73, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x6c, 0x69,
 	0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53, 0x74, 0x61, 0x72, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72,
 	0x64, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x07, 0x72, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x22, 0x76, 0x0a, 0x0f, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x69, 0x6e,
-	0x67, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x1a, 0x0a,
-	0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52,
-	0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x64, 0x6f, 0x77,
-	0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0b, 0x64, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x55, 0x72, 0x6c, 0x42, 0x2b, 0x5a, 0x29,
-	0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b,
-	0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x75, 0x65, 0x73, 0x74, 0x42, 0x2b, 0x5a, 0x29, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63,
+	0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x63, 0x6f, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
+	0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -285,20 +206,20 @@ func file_livekit_webhook_proto_rawDescGZIP() []byte {
 	return file_livekit_webhook_proto_rawDescData
 }
 
-var file_livekit_webhook_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_livekit_webhook_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_livekit_webhook_proto_goTypes = []interface{}{
 	(*WebhookEvent)(nil),          // 0: livekit.WebhookEvent
 	(*RecordingInfo)(nil),         // 1: livekit.RecordingInfo
-	(*RecordingResult)(nil),       // 2: livekit.RecordingResult
-	(*Room)(nil),                  // 3: livekit.Room
-	(*ParticipantInfo)(nil),       // 4: livekit.ParticipantInfo
+	(*Room)(nil),                  // 2: livekit.Room
+	(*ParticipantInfo)(nil),       // 3: livekit.ParticipantInfo
+	(*RecordingResult)(nil),       // 4: livekit.RecordingResult
 	(*StartRecordingRequest)(nil), // 5: livekit.StartRecordingRequest
 }
 var file_livekit_webhook_proto_depIdxs = []int32{
-	3, // 0: livekit.WebhookEvent.room:type_name -> livekit.Room
-	4, // 1: livekit.WebhookEvent.participant:type_name -> livekit.ParticipantInfo
+	2, // 0: livekit.WebhookEvent.room:type_name -> livekit.Room
+	3, // 1: livekit.WebhookEvent.participant:type_name -> livekit.ParticipantInfo
 	1, // 2: livekit.WebhookEvent.recording_info:type_name -> livekit.RecordingInfo
-	2, // 3: livekit.WebhookEvent.recording_result:type_name -> livekit.RecordingResult
+	4, // 3: livekit.WebhookEvent.recording_result:type_name -> livekit.RecordingResult
 	5, // 4: livekit.RecordingInfo.request:type_name -> livekit.StartRecordingRequest
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type
@@ -339,18 +260,6 @@ func file_livekit_webhook_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_webhook_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RecordingResult); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -358,7 +267,7 @@ func file_livekit_webhook_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_webhook_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
