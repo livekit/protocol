@@ -81,12 +81,13 @@ message EndRecordingRequest {
   string recording_id = 1;
 }
 
-message RecordingResult {
+message RecordingInfo {
   string id = 1;
   string room_name = 2;
-  string error = 3;
-  FileResult file = 4;
-  repeated RtmpResult rtmp = 5;
+  bool active = 3;
+  string error = 4;
+  FileResult file = 5;
+  repeated RtmpResult rtmp = 6;
 }
 
 message FileResult {
