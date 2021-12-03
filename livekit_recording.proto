@@ -85,10 +85,8 @@ message RecordingResult {
   string id = 1;
   string room_name = 2;
   string error = 3;
-  oneof output {
-    FileResult file = 4;
-    RtmpResult rtmp = 5;
-  }
+  FileResult file = 4;
+  repeated RtmpResult rtmp = 5;
 }
 
 message FileResult {
