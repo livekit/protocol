@@ -39,8 +39,8 @@ message ParticipantInfo {
   string metadata = 5;
   // timestamp when participant joined room, in seconds
   int64 joined_at = 6;
-  // hidden participant (used for recording)
   bool hidden = 7;
+  bool recorder = 8;
 }
 
 enum TrackType {
