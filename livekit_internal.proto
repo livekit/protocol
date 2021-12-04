@@ -103,6 +103,7 @@ message StartSession {
   int32 protocol_version = 7;
   bool auto_subscribe = 9;
   bool hidden = 10;
+  bool recorder = 12;
   ClientInfo client = 11;
 }
 
