@@ -17,8 +17,9 @@ type VideoGrant struct {
 	CanSubscribe   *bool `json:"canSubscribe,omitempty"`
 	CanPublishData *bool `json:"canPublishData,omitempty"`
 
-	// used for recording
-	Hidden bool `json:"hidden,omitempty"`
+	// participant is not visible to other participants
+	Hidden   bool `json:"hidden,omitempty"`
+	Recorder bool `json:"recorder,omitempty"`
 }
 
 type ClaimGrants struct {

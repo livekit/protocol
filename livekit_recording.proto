@@ -35,10 +35,8 @@ message StartRecordingRequest {
 
 message RecordingTemplate {
   string layout = 1;
-  oneof room {
-    string room_name = 2;
-    string token = 3;
-  }
+  string room_name = 2;
+  string base_url = 3; // defaults to https://recorder.livekit.io
 }
 
 message RtmpOutput {
@@ -81,4 +79,23 @@ message RemoveOutputRequest {
 
 message EndRecordingRequest {
   string recording_id = 1;
+}
+
+message RecordingInfo {
+  string id = 1;
+  string room_name = 2;
+  bool active = 3;
+  string error = 4;
+  FileResult file = 5;
+  repeated RtmpResult rtmp = 6;
+}
+
+message FileResult {
+  string download_url = 1;
+  int64 duration = 2;
+}
+
+message RtmpResult {
+  string stream_url = 1;
+  int64 duration = 2;
 }

@@ -15,21 +15,6 @@ message WebhookEvent {
   // set when event is participant_*
   ParticipantInfo participant = 3;
 
-  // set when event is recording_started
+  // set when event is recording_*
   RecordingInfo recording_info = 5;
-
-  // set when event is recording_finished
-  RecordingResult recording_result = 4;
-}
-
-message RecordingInfo {
-  string id = 1;
-  StartRecordingRequest request = 2;
-}
-
-message RecordingResult {
-  string id = 1;
-  string error = 2;
-  int64 duration = 3;
-  string download_url = 4;
 }
