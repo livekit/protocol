@@ -73,6 +73,23 @@ message TrackInfo {
   bool disable_dtx = 8;
   // source of media
   TrackSource source = 9;
+  repeated VideoLayer layers = 10;
+}
+
+enum VideoQuality {
+  LOW = 0;
+  MEDIUM = 1;
+  HIGH = 2;
+}
+
+// provide information about available spatial layers
+message VideoLayer {
+  // for non-simulcast or SVC, this should be HIGH
+  VideoQuality quality = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  // target bitrate, server will measure actual
+  uint32 bitrate = 4;
 }
 
 // new DataPacket API

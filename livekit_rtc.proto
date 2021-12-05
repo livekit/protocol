@@ -23,6 +23,7 @@ message SignalRequest {
     LeaveRequest leave = 8;
     // Set active published layers, deprecated in favor of automatic tracking
 //    SetSimulcastLayers simulcast = 9;
+    UpdateVideoLayers update_layers = 10;
   }
 }
 
@@ -65,6 +66,7 @@ message AddTrackRequest {
   string cid = 1;
   string name = 2;
   TrackType type = 3;
+  // to be deprecated in favor of layers
   uint32 width = 4;
   uint32 height = 5;
   // true to add track and initialize to muted
@@ -72,6 +74,7 @@ message AddTrackRequest {
   // true if DTX (Discontinuous Transmission) is disabled for audio
   bool disable_dtx = 7;
   TrackSource source = 8;
+  repeated VideoLayer layers = 9;
 }
 
 message TrickleRequest {
@@ -111,12 +114,6 @@ message ParticipantUpdate {
   repeated ParticipantInfo participants = 1;
 }
 
-enum VideoQuality {
-  LOW = 0;
-  MEDIUM = 1;
-  HIGH = 2;
-}
-
 message UpdateSubscription {
   repeated string track_sids = 1;
   bool subscribe = 2;
@@ -138,6 +135,12 @@ message LeaveRequest {
   // sent when server initiates the disconnect due to server-restart
   // indicates clients should attempt full-reconnect sequence
   bool can_reconnect = 1;
+}
+
+// message to indicate published video track dimensions are changing
+message UpdateVideoLayers {
+  string track_sid = 1;
+  repeated VideoLayer layers = 2;
 }
 
 message ICEServer {
