@@ -84,7 +84,7 @@ enum VideoQuality {
 
 // provide information about available spatial layers
 message VideoLayer {
-  // for non-simulcast or SVC, this should be HIGH
+  // for tracks with a single layer, this should be HIGH
   VideoQuality quality = 1;
   uint32 width = 2;
   uint32 height = 3;
