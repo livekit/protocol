@@ -733,7 +733,7 @@ type VideoLayer struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// for non-simulcast or SVC, this should be HIGH
+	// for tracks with a single layer, this should be HIGH
 	Quality VideoQuality `protobuf:"varint,1,opt,name=quality,proto3,enum=livekit.VideoQuality" json:"quality,omitempty"`
 	Width   uint32       `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`
 	Height  uint32       `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`
