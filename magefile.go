@@ -19,7 +19,7 @@ func Proto() error {
 		"proto/livekit_recording.proto",
 		"proto/livekit_room.proto",
 	}
-	allProtoFiles := []string{
+	grpcProtoFiles := []string{
 		"proto/livekit_analytics.proto",
 		"proto/livekit_internal.proto",
 		"proto/livekit_models.proto",
@@ -53,12 +53,11 @@ func Proto() error {
 		"-I=.",
 	}, twirpProtoFiles...)
 	cmd := exec.Command(protoc, args...)
-	fmt.Println("CMD", cmd)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-	fmt.Println("generating basic protobuf")
+	fmt.Println("generating grpc protobuf")
 	args = append([]string{
 		"--go_out", ".",
 		"--go-grpc_out", ".",
@@ -67,9 +66,8 @@ func Proto() error {
 		"--plugin=go=" + protocGoPath,
 		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=.",
-	}, allProtoFiles...)
+	}, grpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
-	fmt.Println("CMD", cmd)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
 		return err
