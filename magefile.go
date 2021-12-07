@@ -19,11 +19,13 @@ func Proto() error {
 		"proto/livekit_recording.proto",
 		"proto/livekit_room.proto",
 	}
-	allProtoFiles, err := filepath.Glob("proto/*.proto")
-	if err != nil {
-		return err
+	allProtoFiles := []string{
+		"proto/livekit_analytics.proto",
+		"proto/livekit_internal.proto",
+		"proto/livekit_models.proto",
+		"proto/livekit_rtc.proto",
+		"proto/livekit_webhook.proto",
 	}
-	// TODO target := "proto"
 	protoc, err := getToolPath("protoc")
 	if err != nil {
 		return err
@@ -56,15 +58,12 @@ func Proto() error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-	if true {
-		return nil // TODO
-	}
 	fmt.Println("generating basic protobuf")
 	args = append([]string{
 		"--go_out", ".",
 		"--go-grpc_out", ".",
-		//"--go_opt=paths=import",
-		//"--go-grpc_opt=paths=import",
+		"--go_opt=paths=source_relative",
+		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
 		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=.",
