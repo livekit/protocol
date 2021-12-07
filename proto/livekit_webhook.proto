@@ -1,10 +1,10 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/proto/livekit";
+option go_package = "github.com/livekit/protocol/proto";
 
-import "livekit_models.proto";
-import "livekit_recording.proto";
+import "proto/livekit_models.proto";
+import "proto/livekit_recording.proto";
 
 message WebhookEvent {
   // one of room_started, room_finished, participant_joined, participant_left, recording_started, recording_finished

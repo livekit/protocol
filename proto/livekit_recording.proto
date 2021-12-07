@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/proto/livekit";
+option go_package = "github.com/livekit/protocol/proto";
 
 import "google/protobuf/empty.proto";
 

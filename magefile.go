@@ -16,14 +16,14 @@ var Default = Proto
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
-		"proto/livekit/livekit_recording.proto",
-		"proto/livekit/livekit_room.proto",
+		"proto/livekit_recording.proto",
+		"proto/livekit_room.proto",
 	}
-	allProtoFiles, err := filepath.Glob("proto/livekit/*.proto")
+	allProtoFiles, err := filepath.Glob("proto/*.proto")
 	if err != nil {
 		return err
 	}
-	target := "proto"
+	// TODO target := "proto"
 	protoc, err := getToolPath("protoc")
 	if err != nil {
 		return err
@@ -57,14 +57,14 @@ func Proto() error {
 		return err
 	}
 	if true {
-		return nil
+		return nil // TODO
 	}
 	fmt.Println("generating basic protobuf")
 	args = append([]string{
 		"--go_out", ".",
 		"--go-grpc_out", ".",
-		"--go_opt=paths=import",
-		"--go-grpc_opt=paths=import",
+		//"--go_opt=paths=import",
+		//"--go-grpc_opt=paths=import",
 		"--plugin=go=" + protocGoPath,
 		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=.",

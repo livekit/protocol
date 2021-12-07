@@ -1,12 +1,12 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/proto/livekit";
+option go_package = "github.com/livekit/protocol/proto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
-import "proto/livekit/livekit_models.proto";
-import "proto/livekit/livekit_internal.proto";
+import "proto/livekit_models.proto";
+import "proto/livekit_internal.proto";
 
 service AnalyticsRecorderService {
   rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
