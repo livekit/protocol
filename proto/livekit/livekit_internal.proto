@@ -4,9 +4,9 @@ package livekit;
 option go_package = "github.com/livekit/protocol/proto/livekit";
 
 // internal protos, not exposed to clients
-import "livekit_recording.proto";
-import "livekit_rtc.proto";
-import "livekit_room.proto";
+import "proto/livekit/livekit_recording.proto";
+import "proto/livekit/livekit_rtc.proto";
+import "proto/livekit/livekit_room.proto";
 
 enum NodeType {
   SERVER = 0;

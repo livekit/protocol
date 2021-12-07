@@ -9,36 +9,21 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-
-	"github.com/magefile/mage/target"
 )
 
 var Default = Proto
 
 // regenerate protobuf
 func Proto() error {
-	updated, err := target.Path("proto/livekit_models.pb.go",
-		"livekit_internal.proto",
-		"livekit_models.proto",
-		"livekit_recording.proto",
-		"livekit_room.proto",
-		"livekit_rtc.proto",
-		"livekit_webhook.proto",
-		"livekit_analytics.proto",
-	)
+	twirpProtoFiles := []string{
+		"proto/livekit/livekit_recording.proto",
+		"proto/livekit/livekit_room.proto",
+	}
+	allProtoFiles, err := filepath.Glob("proto/livekit/*.proto")
 	if err != nil {
 		return err
 	}
-	if !updated {
-		return nil
-	}
-
-	fmt.Println("generating protobuf")
 	target := "proto"
-	if err := os.MkdirAll(target, 0755); err != nil {
-		return err
-	}
-
 	protoc, err := getToolPath("protoc")
 	if err != nil {
 		return err
@@ -51,48 +36,45 @@ func Proto() error {
 	if err != nil {
 		return err
 	}
-
 	protocGrpcGoPath, err := getToolPath("protoc-gen-go-grpc")
 	if err != nil {
 		return err
 	}
-	// generate twirp-related protos
-	cmd := exec.Command(protoc,
-		"--go_out", target,
-		"--twirp_out", target,
+	fmt.Println("generating twirp protobuf")
+	args := append([]string{
+		"--go_out", ".",
+		"--twirp_out", ".",
 		"--go_opt=paths=source_relative",
 		"--twirp_opt=paths=source_relative",
-		"--plugin=go="+protocGoPath,
-		"--plugin=twirp="+twirpPath,
+		"--plugin=go=" + protocGoPath,
+		"--plugin=twirp=" + twirpPath,
 		"-I=.",
-		"livekit_recording.proto",
-		"livekit_room.proto",
-	)
+	}, twirpProtoFiles...)
+	cmd := exec.Command(protoc, args...)
+	fmt.Println("CMD", cmd)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-
-	// generate basic protobuf
-	cmd = exec.Command(protoc,
-		"--go_out", target,
-		"--go-grpc_out", target,
-		"--go_opt=paths=source_relative",
-		"--go-grpc_opt=paths=source_relative",
-		"--plugin=go="+protocGoPath,
-		"--plugin=go-grpc="+protocGrpcGoPath,
+	if true {
+		return nil
+	}
+	fmt.Println("generating basic protobuf")
+	args = append([]string{
+		"--go_out", ".",
+		"--go-grpc_out", ".",
+		"--go_opt=paths=import",
+		"--go-grpc_opt=paths=import",
+		"--plugin=go=" + protocGoPath,
+		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=.",
-		"livekit_internal.proto",
-		"livekit_models.proto",
-		"livekit_rtc.proto",
-		"livekit_webhook.proto",
-		"livekit_analytics.proto",
-	)
+	}, allProtoFiles...)
+	cmd = exec.Command(protoc, args...)
+	fmt.Println("CMD", cmd)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
-
 	return nil
 }
 
