@@ -24,7 +24,7 @@ func Proto() error {
 		"livekit_room.proto",
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
-		"analytics.proto",
+		"livekit_analytics.proto",
 	)
 	if err != nil {
 		return err
@@ -86,7 +86,7 @@ func Proto() error {
 		"livekit_models.proto",
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
-		"analytics.proto",
+		"livekit_analytics.proto",
 	)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
