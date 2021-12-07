@@ -16,15 +16,15 @@ var Default = Proto
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
-		"proto/livekit_recording.proto",
-		"proto/livekit_room.proto",
+		"livekit/livekit_recording.proto",
+		"livekit/livekit_room.proto",
 	}
 	grpcProtoFiles := []string{
-		"proto/livekit_analytics.proto",
-		"proto/livekit_internal.proto",
-		"proto/livekit_models.proto",
-		"proto/livekit_rtc.proto",
-		"proto/livekit_webhook.proto",
+		"livekit/livekit_analytics.proto",
+		"livekit/livekit_internal.proto",
+		"livekit/livekit_models.proto",
+		"livekit/livekit_rtc.proto",
+		"livekit/livekit_webhook.proto",
 	}
 	protoc, err := getToolPath("protoc")
 	if err != nil {

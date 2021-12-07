@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/proto";
+option go_package = "github.com/livekit/protocol/livekit";
 
-import "proto/livekit_models.proto";
+import "livekit/livekit_models.proto";
 
 message SignalRequest {
   oneof message {

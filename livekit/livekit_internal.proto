@@ -1,12 +1,12 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/proto";
+option go_package = "github.com/livekit/protocol/livekit";
 
 // internal protos, not exposed to clients
-import "proto/livekit_recording.proto";
-import "proto/livekit_rtc.proto";
-import "proto/livekit_room.proto";
+import "livekit/livekit_recording.proto";
+import "livekit/livekit_rtc.proto";
+import "livekit/livekit_room.proto";
 
 enum NodeType {
   SERVER = 0;
