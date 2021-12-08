@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.27.1
 // 	protoc        v3.17.3
-// source: livekit/livekit_room.proto
+// source: livekit_room.proto
 
 package livekit
 
@@ -38,7 +38,7 @@ type CreateRoomRequest struct {
 func (x *CreateRoomRequest) Reset() {
 	*x = CreateRoomRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[0]
+		mi := &file_livekit_room_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -51,7 +51,7 @@ func (x *CreateRoomRequest) String() string {
 func (*CreateRoomRequest) ProtoMessage() {}
 
 func (x *CreateRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[0]
+	mi := &file_livekit_room_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +64,7 @@ func (x *CreateRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRoomRequest.ProtoReflect.Descriptor instead.
 func (*CreateRoomRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{0}
+	return file_livekit_room_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CreateRoomRequest) GetName() string {
@@ -104,7 +104,7 @@ type ListRoomsRequest struct {
 func (x *ListRoomsRequest) Reset() {
 	*x = ListRoomsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[1]
+		mi := &file_livekit_room_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -117,7 +117,7 @@ func (x *ListRoomsRequest) String() string {
 func (*ListRoomsRequest) ProtoMessage() {}
 
 func (x *ListRoomsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[1]
+	mi := &file_livekit_room_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -130,7 +130,7 @@ func (x *ListRoomsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRoomsRequest.ProtoReflect.Descriptor instead.
 func (*ListRoomsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{1}
+	return file_livekit_room_proto_rawDescGZIP(), []int{1}
 }
 
 type ListRoomsResponse struct {
@@ -144,7 +144,7 @@ type ListRoomsResponse struct {
 func (x *ListRoomsResponse) Reset() {
 	*x = ListRoomsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[2]
+		mi := &file_livekit_room_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -157,7 +157,7 @@ func (x *ListRoomsResponse) String() string {
 func (*ListRoomsResponse) ProtoMessage() {}
 
 func (x *ListRoomsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[2]
+	mi := &file_livekit_room_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -170,7 +170,7 @@ func (x *ListRoomsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRoomsResponse.ProtoReflect.Descriptor instead.
 func (*ListRoomsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{2}
+	return file_livekit_room_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListRoomsResponse) GetRooms() []*Room {
@@ -192,7 +192,7 @@ type DeleteRoomRequest struct {
 func (x *DeleteRoomRequest) Reset() {
 	*x = DeleteRoomRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[3]
+		mi := &file_livekit_room_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -205,7 +205,7 @@ func (x *DeleteRoomRequest) String() string {
 func (*DeleteRoomRequest) ProtoMessage() {}
 
 func (x *DeleteRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[3]
+	mi := &file_livekit_room_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -218,7 +218,7 @@ func (x *DeleteRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRoomRequest.ProtoReflect.Descriptor instead.
 func (*DeleteRoomRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{3}
+	return file_livekit_room_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DeleteRoomRequest) GetRoom() string {
@@ -237,7 +237,7 @@ type DeleteRoomResponse struct {
 func (x *DeleteRoomResponse) Reset() {
 	*x = DeleteRoomResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[4]
+		mi := &file_livekit_room_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -250,7 +250,7 @@ func (x *DeleteRoomResponse) String() string {
 func (*DeleteRoomResponse) ProtoMessage() {}
 
 func (x *DeleteRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[4]
+	mi := &file_livekit_room_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -263,7 +263,7 @@ func (x *DeleteRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRoomResponse.ProtoReflect.Descriptor instead.
 func (*DeleteRoomResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{4}
+	return file_livekit_room_proto_rawDescGZIP(), []int{4}
 }
 
 type ListParticipantsRequest struct {
@@ -278,7 +278,7 @@ type ListParticipantsRequest struct {
 func (x *ListParticipantsRequest) Reset() {
 	*x = ListParticipantsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[5]
+		mi := &file_livekit_room_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -291,7 +291,7 @@ func (x *ListParticipantsRequest) String() string {
 func (*ListParticipantsRequest) ProtoMessage() {}
 
 func (x *ListParticipantsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[5]
+	mi := &file_livekit_room_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -304,7 +304,7 @@ func (x *ListParticipantsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListParticipantsRequest.ProtoReflect.Descriptor instead.
 func (*ListParticipantsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{5}
+	return file_livekit_room_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListParticipantsRequest) GetRoom() string {
@@ -325,7 +325,7 @@ type ListParticipantsResponse struct {
 func (x *ListParticipantsResponse) Reset() {
 	*x = ListParticipantsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[6]
+		mi := &file_livekit_room_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -338,7 +338,7 @@ func (x *ListParticipantsResponse) String() string {
 func (*ListParticipantsResponse) ProtoMessage() {}
 
 func (x *ListParticipantsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[6]
+	mi := &file_livekit_room_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -351,7 +351,7 @@ func (x *ListParticipantsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListParticipantsResponse.ProtoReflect.Descriptor instead.
 func (*ListParticipantsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{6}
+	return file_livekit_room_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListParticipantsResponse) GetParticipants() []*ParticipantInfo {
@@ -375,7 +375,7 @@ type RoomParticipantIdentity struct {
 func (x *RoomParticipantIdentity) Reset() {
 	*x = RoomParticipantIdentity{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[7]
+		mi := &file_livekit_room_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -388,7 +388,7 @@ func (x *RoomParticipantIdentity) String() string {
 func (*RoomParticipantIdentity) ProtoMessage() {}
 
 func (x *RoomParticipantIdentity) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[7]
+	mi := &file_livekit_room_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,7 +401,7 @@ func (x *RoomParticipantIdentity) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomParticipantIdentity.ProtoReflect.Descriptor instead.
 func (*RoomParticipantIdentity) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{7}
+	return file_livekit_room_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RoomParticipantIdentity) GetRoom() string {
@@ -427,7 +427,7 @@ type RemoveParticipantResponse struct {
 func (x *RemoveParticipantResponse) Reset() {
 	*x = RemoveParticipantResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[8]
+		mi := &file_livekit_room_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -440,7 +440,7 @@ func (x *RemoveParticipantResponse) String() string {
 func (*RemoveParticipantResponse) ProtoMessage() {}
 
 func (x *RemoveParticipantResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[8]
+	mi := &file_livekit_room_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -453,7 +453,7 @@ func (x *RemoveParticipantResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveParticipantResponse.ProtoReflect.Descriptor instead.
 func (*RemoveParticipantResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{8}
+	return file_livekit_room_proto_rawDescGZIP(), []int{8}
 }
 
 type MuteRoomTrackRequest struct {
@@ -473,7 +473,7 @@ type MuteRoomTrackRequest struct {
 func (x *MuteRoomTrackRequest) Reset() {
 	*x = MuteRoomTrackRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[9]
+		mi := &file_livekit_room_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -486,7 +486,7 @@ func (x *MuteRoomTrackRequest) String() string {
 func (*MuteRoomTrackRequest) ProtoMessage() {}
 
 func (x *MuteRoomTrackRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[9]
+	mi := &file_livekit_room_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +499,7 @@ func (x *MuteRoomTrackRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MuteRoomTrackRequest.ProtoReflect.Descriptor instead.
 func (*MuteRoomTrackRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{9}
+	return file_livekit_room_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *MuteRoomTrackRequest) GetRoom() string {
@@ -541,7 +541,7 @@ type MuteRoomTrackResponse struct {
 func (x *MuteRoomTrackResponse) Reset() {
 	*x = MuteRoomTrackResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[10]
+		mi := &file_livekit_room_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -554,7 +554,7 @@ func (x *MuteRoomTrackResponse) String() string {
 func (*MuteRoomTrackResponse) ProtoMessage() {}
 
 func (x *MuteRoomTrackResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[10]
+	mi := &file_livekit_room_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -567,7 +567,7 @@ func (x *MuteRoomTrackResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MuteRoomTrackResponse.ProtoReflect.Descriptor instead.
 func (*MuteRoomTrackResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{10}
+	return file_livekit_room_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MuteRoomTrackResponse) GetTrack() *TrackInfo {
@@ -593,7 +593,7 @@ type ParticipantPermission struct {
 func (x *ParticipantPermission) Reset() {
 	*x = ParticipantPermission{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[11]
+		mi := &file_livekit_room_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -606,7 +606,7 @@ func (x *ParticipantPermission) String() string {
 func (*ParticipantPermission) ProtoMessage() {}
 
 func (x *ParticipantPermission) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[11]
+	mi := &file_livekit_room_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -619,7 +619,7 @@ func (x *ParticipantPermission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantPermission.ProtoReflect.Descriptor instead.
 func (*ParticipantPermission) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{11}
+	return file_livekit_room_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ParticipantPermission) GetCanSubscribe() bool {
@@ -659,7 +659,7 @@ type UpdateParticipantRequest struct {
 func (x *UpdateParticipantRequest) Reset() {
 	*x = UpdateParticipantRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[12]
+		mi := &file_livekit_room_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -672,7 +672,7 @@ func (x *UpdateParticipantRequest) String() string {
 func (*UpdateParticipantRequest) ProtoMessage() {}
 
 func (x *UpdateParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[12]
+	mi := &file_livekit_room_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -685,7 +685,7 @@ func (x *UpdateParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateParticipantRequest.ProtoReflect.Descriptor instead.
 func (*UpdateParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{12}
+	return file_livekit_room_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UpdateParticipantRequest) GetRoom() string {
@@ -732,7 +732,7 @@ type UpdateSubscriptionsRequest struct {
 func (x *UpdateSubscriptionsRequest) Reset() {
 	*x = UpdateSubscriptionsRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[13]
+		mi := &file_livekit_room_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -745,7 +745,7 @@ func (x *UpdateSubscriptionsRequest) String() string {
 func (*UpdateSubscriptionsRequest) ProtoMessage() {}
 
 func (x *UpdateSubscriptionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[13]
+	mi := &file_livekit_room_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -758,7 +758,7 @@ func (x *UpdateSubscriptionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSubscriptionsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSubscriptionsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{13}
+	return file_livekit_room_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UpdateSubscriptionsRequest) GetRoom() string {
@@ -798,7 +798,7 @@ type UpdateSubscriptionsResponse struct {
 func (x *UpdateSubscriptionsResponse) Reset() {
 	*x = UpdateSubscriptionsResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[14]
+		mi := &file_livekit_room_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -811,7 +811,7 @@ func (x *UpdateSubscriptionsResponse) String() string {
 func (*UpdateSubscriptionsResponse) ProtoMessage() {}
 
 func (x *UpdateSubscriptionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[14]
+	mi := &file_livekit_room_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -824,7 +824,7 @@ func (x *UpdateSubscriptionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSubscriptionsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateSubscriptionsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{14}
+	return file_livekit_room_proto_rawDescGZIP(), []int{14}
 }
 
 type SendDataRequest struct {
@@ -841,7 +841,7 @@ type SendDataRequest struct {
 func (x *SendDataRequest) Reset() {
 	*x = SendDataRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[15]
+		mi := &file_livekit_room_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -854,7 +854,7 @@ func (x *SendDataRequest) String() string {
 func (*SendDataRequest) ProtoMessage() {}
 
 func (x *SendDataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[15]
+	mi := &file_livekit_room_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -867,7 +867,7 @@ func (x *SendDataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendDataRequest.ProtoReflect.Descriptor instead.
 func (*SendDataRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{15}
+	return file_livekit_room_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SendDataRequest) GetRoom() string {
@@ -907,7 +907,7 @@ type SendDataResponse struct {
 func (x *SendDataResponse) Reset() {
 	*x = SendDataResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[16]
+		mi := &file_livekit_room_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -920,7 +920,7 @@ func (x *SendDataResponse) String() string {
 func (*SendDataResponse) ProtoMessage() {}
 
 func (x *SendDataResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[16]
+	mi := &file_livekit_room_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -933,7 +933,7 @@ func (x *SendDataResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendDataResponse.ProtoReflect.Descriptor instead.
 func (*SendDataResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{16}
+	return file_livekit_room_proto_rawDescGZIP(), []int{16}
 }
 
 type UpdateRoomMetadataRequest struct {
@@ -949,7 +949,7 @@ type UpdateRoomMetadataRequest struct {
 func (x *UpdateRoomMetadataRequest) Reset() {
 	*x = UpdateRoomMetadataRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_room_proto_msgTypes[17]
+		mi := &file_livekit_room_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -962,7 +962,7 @@ func (x *UpdateRoomMetadataRequest) String() string {
 func (*UpdateRoomMetadataRequest) ProtoMessage() {}
 
 func (x *UpdateRoomMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_room_proto_msgTypes[17]
+	mi := &file_livekit_room_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -975,7 +975,7 @@ func (x *UpdateRoomMetadataRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRoomMetadataRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRoomMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_room_proto_rawDescGZIP(), []int{17}
+	return file_livekit_room_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *UpdateRoomMetadataRequest) GetRoom() string {
@@ -992,12 +992,11 @@ func (x *UpdateRoomMetadataRequest) GetMetadata() string {
 	return ""
 }
 
-var File_livekit_livekit_room_proto protoreflect.FileDescriptor
+var File_livekit_room_proto protoreflect.FileDescriptor
 
-var file_livekit_livekit_room_proto_rawDesc = []byte{
-	0x0a, 0x1a, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
-	0x74, 0x5f, 0x72, 0x6f, 0x6f, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x6c, 0x69,
-	0x76, 0x65, 0x6b, 0x69, 0x74, 0x1a, 0x1c, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x6c,
+var file_livekit_room_proto_rawDesc = []byte{
+	0x0a, 0x12, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x72, 0x6f, 0x6f, 0x6d, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x1a, 0x14, 0x6c,
 	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x6d, 0x6f, 0x64, 0x65, 0x6c, 0x73, 0x2e, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x22, 0x90, 0x01, 0x0a, 0x11, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x6f,
 	0x6f, 0x6d, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d,
@@ -1150,19 +1149,19 @@ var file_livekit_livekit_room_proto_rawDesc = []byte{
 }
 
 var (
-	file_livekit_livekit_room_proto_rawDescOnce sync.Once
-	file_livekit_livekit_room_proto_rawDescData = file_livekit_livekit_room_proto_rawDesc
+	file_livekit_room_proto_rawDescOnce sync.Once
+	file_livekit_room_proto_rawDescData = file_livekit_room_proto_rawDesc
 )
 
-func file_livekit_livekit_room_proto_rawDescGZIP() []byte {
-	file_livekit_livekit_room_proto_rawDescOnce.Do(func() {
-		file_livekit_livekit_room_proto_rawDescData = protoimpl.X.CompressGZIP(file_livekit_livekit_room_proto_rawDescData)
+func file_livekit_room_proto_rawDescGZIP() []byte {
+	file_livekit_room_proto_rawDescOnce.Do(func() {
+		file_livekit_room_proto_rawDescData = protoimpl.X.CompressGZIP(file_livekit_room_proto_rawDescData)
 	})
-	return file_livekit_livekit_room_proto_rawDescData
+	return file_livekit_room_proto_rawDescData
 }
 
-var file_livekit_livekit_room_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
-var file_livekit_livekit_room_proto_goTypes = []interface{}{
+var file_livekit_room_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_livekit_room_proto_goTypes = []interface{}{
 	(*CreateRoomRequest)(nil),           // 0: livekit.CreateRoomRequest
 	(*ListRoomsRequest)(nil),            // 1: livekit.ListRoomsRequest
 	(*ListRoomsResponse)(nil),           // 2: livekit.ListRoomsResponse
@@ -1186,7 +1185,7 @@ var file_livekit_livekit_room_proto_goTypes = []interface{}{
 	(*TrackInfo)(nil),                   // 20: livekit.TrackInfo
 	(DataPacket_Kind)(0),                // 21: livekit.DataPacket.Kind
 }
-var file_livekit_livekit_room_proto_depIdxs = []int32{
+var file_livekit_room_proto_depIdxs = []int32{
 	18, // 0: livekit.ListRoomsResponse.rooms:type_name -> livekit.Room
 	19, // 1: livekit.ListParticipantsResponse.participants:type_name -> livekit.ParticipantInfo
 	20, // 2: livekit.MuteRoomTrackResponse.track:type_name -> livekit.TrackInfo
@@ -1221,14 +1220,14 @@ var file_livekit_livekit_room_proto_depIdxs = []int32{
 	0,  // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_livekit_livekit_room_proto_init() }
-func file_livekit_livekit_room_proto_init() {
-	if File_livekit_livekit_room_proto != nil {
+func init() { file_livekit_room_proto_init() }
+func file_livekit_room_proto_init() {
+	if File_livekit_room_proto != nil {
 		return
 	}
-	file_livekit_livekit_models_proto_init()
+	file_livekit_models_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_livekit_livekit_room_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateRoomRequest); i {
 			case 0:
 				return &v.state
@@ -1240,7 +1239,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListRoomsRequest); i {
 			case 0:
 				return &v.state
@@ -1252,7 +1251,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListRoomsResponse); i {
 			case 0:
 				return &v.state
@@ -1264,7 +1263,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteRoomRequest); i {
 			case 0:
 				return &v.state
@@ -1276,7 +1275,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteRoomResponse); i {
 			case 0:
 				return &v.state
@@ -1288,7 +1287,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListParticipantsRequest); i {
 			case 0:
 				return &v.state
@@ -1300,7 +1299,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListParticipantsResponse); i {
 			case 0:
 				return &v.state
@@ -1312,7 +1311,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RoomParticipantIdentity); i {
 			case 0:
 				return &v.state
@@ -1324,7 +1323,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RemoveParticipantResponse); i {
 			case 0:
 				return &v.state
@@ -1336,7 +1335,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MuteRoomTrackRequest); i {
 			case 0:
 				return &v.state
@@ -1348,7 +1347,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MuteRoomTrackResponse); i {
 			case 0:
 				return &v.state
@@ -1360,7 +1359,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ParticipantPermission); i {
 			case 0:
 				return &v.state
@@ -1372,7 +1371,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateParticipantRequest); i {
 			case 0:
 				return &v.state
@@ -1384,7 +1383,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateSubscriptionsRequest); i {
 			case 0:
 				return &v.state
@@ -1396,7 +1395,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateSubscriptionsResponse); i {
 			case 0:
 				return &v.state
@@ -1408,7 +1407,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SendDataRequest); i {
 			case 0:
 				return &v.state
@@ -1420,7 +1419,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SendDataResponse); i {
 			case 0:
 				return &v.state
@@ -1432,7 +1431,7 @@ func file_livekit_livekit_room_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_room_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_room_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateRoomMetadataRequest); i {
 			case 0:
 				return &v.state
@@ -1449,18 +1448,18 @@ func file_livekit_livekit_room_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_livekit_livekit_room_proto_rawDesc,
+			RawDescriptor: file_livekit_room_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_livekit_livekit_room_proto_goTypes,
-		DependencyIndexes: file_livekit_livekit_room_proto_depIdxs,
-		MessageInfos:      file_livekit_livekit_room_proto_msgTypes,
+		GoTypes:           file_livekit_room_proto_goTypes,
+		DependencyIndexes: file_livekit_room_proto_depIdxs,
+		MessageInfos:      file_livekit_room_proto_msgTypes,
 	}.Build()
-	File_livekit_livekit_room_proto = out.File
-	file_livekit_livekit_room_proto_rawDesc = nil
-	file_livekit_livekit_room_proto_goTypes = nil
-	file_livekit_livekit_room_proto_depIdxs = nil
+	File_livekit_room_proto = out.File
+	file_livekit_room_proto_rawDesc = nil
+	file_livekit_room_proto_goTypes = nil
+	file_livekit_room_proto_depIdxs = nil
 }

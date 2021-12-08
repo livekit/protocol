@@ -16,16 +16,23 @@ var Default = Proto
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
-		"livekit/livekit_recording.proto",
-		"livekit/livekit_room.proto",
+		"livekit_recording.proto",
+		"livekit_room.proto",
 	}
 	grpcProtoFiles := []string{
-		"livekit/livekit_analytics.proto",
-		"livekit/livekit_internal.proto",
-		"livekit/livekit_models.proto",
-		"livekit/livekit_rtc.proto",
-		"livekit/livekit_webhook.proto",
+		"livekit_analytics.proto",
+		"livekit_internal.proto",
+		"livekit_models.proto",
+		"livekit_rtc.proto",
+		"livekit_webhook.proto",
 	}
+
+	fmt.Println("generating protobuf")
+	target := "livekit"
+	if err := os.MkdirAll(target, 0755); err != nil {
+		return err
+	}
+
 	protoc, err := getToolPath("protoc")
 	if err != nil {
 		return err
@@ -44,8 +51,8 @@ func Proto() error {
 	}
 	fmt.Println("generating twirp protobuf")
 	args := append([]string{
-		"--go_out", ".",
-		"--twirp_out", ".",
+		"--go_out", target,
+		"--twirp_out", target,
 		"--go_opt=paths=source_relative",
 		"--twirp_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
@@ -59,8 +66,8 @@ func Proto() error {
 	}
 	fmt.Println("generating grpc protobuf")
 	args = append([]string{
-		"--go_out", ".",
-		"--go-grpc_out", ".",
+		"--go_out", target,
+		"--go-grpc_out", target,
 		"--go_opt=paths=source_relative",
 		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.27.1
 // 	protoc        v3.17.3
-// source: livekit/livekit_internal.proto
+// source: livekit_internal.proto
 
 package livekit
 
@@ -56,11 +56,11 @@ func (x NodeType) String() string {
 }
 
 func (NodeType) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_livekit_internal_proto_enumTypes[0].Descriptor()
+	return file_livekit_internal_proto_enumTypes[0].Descriptor()
 }
 
 func (NodeType) Type() protoreflect.EnumType {
-	return &file_livekit_livekit_internal_proto_enumTypes[0]
+	return &file_livekit_internal_proto_enumTypes[0]
 }
 
 func (x NodeType) Number() protoreflect.EnumNumber {
@@ -69,7 +69,7 @@ func (x NodeType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use NodeType.Descriptor instead.
 func (NodeType) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{0}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{0}
 }
 
 type NodeState int32
@@ -105,11 +105,11 @@ func (x NodeState) String() string {
 }
 
 func (NodeState) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_livekit_internal_proto_enumTypes[1].Descriptor()
+	return file_livekit_internal_proto_enumTypes[1].Descriptor()
 }
 
 func (NodeState) Type() protoreflect.EnumType {
-	return &file_livekit_livekit_internal_proto_enumTypes[1]
+	return &file_livekit_internal_proto_enumTypes[1]
 }
 
 func (x NodeState) Number() protoreflect.EnumNumber {
@@ -118,7 +118,7 @@ func (x NodeState) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use NodeState.Descriptor instead.
 func (NodeState) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{1}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{1}
 }
 
 type ClientInfo_SDK int32
@@ -163,11 +163,11 @@ func (x ClientInfo_SDK) String() string {
 }
 
 func (ClientInfo_SDK) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_livekit_internal_proto_enumTypes[2].Descriptor()
+	return file_livekit_internal_proto_enumTypes[2].Descriptor()
 }
 
 func (ClientInfo_SDK) Type() protoreflect.EnumType {
-	return &file_livekit_livekit_internal_proto_enumTypes[2]
+	return &file_livekit_internal_proto_enumTypes[2]
 }
 
 func (x ClientInfo_SDK) Number() protoreflect.EnumNumber {
@@ -176,7 +176,7 @@ func (x ClientInfo_SDK) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ClientInfo_SDK.Descriptor instead.
 func (ClientInfo_SDK) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{10, 0}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{10, 0}
 }
 
 type Node struct {
@@ -196,7 +196,7 @@ type Node struct {
 func (x *Node) Reset() {
 	*x = Node{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[0]
+		mi := &file_livekit_internal_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -209,7 +209,7 @@ func (x *Node) String() string {
 func (*Node) ProtoMessage() {}
 
 func (x *Node) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[0]
+	mi := &file_livekit_internal_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -222,7 +222,7 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Node.ProtoReflect.Descriptor instead.
 func (*Node) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{0}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Node) GetId() string {
@@ -309,7 +309,7 @@ type NodeStats struct {
 func (x *NodeStats) Reset() {
 	*x = NodeStats{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[1]
+		mi := &file_livekit_internal_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -322,7 +322,7 @@ func (x *NodeStats) String() string {
 func (*NodeStats) ProtoMessage() {}
 
 func (x *NodeStats) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[1]
+	mi := &file_livekit_internal_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -335,7 +335,7 @@ func (x *NodeStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeStats.ProtoReflect.Descriptor instead.
 func (*NodeStats) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{1}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *NodeStats) GetStartedAt() int64 {
@@ -503,7 +503,7 @@ type RTCNodeMessage struct {
 func (x *RTCNodeMessage) Reset() {
 	*x = RTCNodeMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[2]
+		mi := &file_livekit_internal_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -516,7 +516,7 @@ func (x *RTCNodeMessage) String() string {
 func (*RTCNodeMessage) ProtoMessage() {}
 
 func (x *RTCNodeMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[2]
+	mi := &file_livekit_internal_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -529,7 +529,7 @@ func (x *RTCNodeMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTCNodeMessage.ProtoReflect.Descriptor instead.
 func (*RTCNodeMessage) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{2}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RTCNodeMessage) GetParticipantKey() string {
@@ -704,7 +704,7 @@ type SignalNodeMessage struct {
 func (x *SignalNodeMessage) Reset() {
 	*x = SignalNodeMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[3]
+		mi := &file_livekit_internal_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -717,7 +717,7 @@ func (x *SignalNodeMessage) String() string {
 func (*SignalNodeMessage) ProtoMessage() {}
 
 func (x *SignalNodeMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[3]
+	mi := &file_livekit_internal_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -730,7 +730,7 @@ func (x *SignalNodeMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignalNodeMessage.ProtoReflect.Descriptor instead.
 func (*SignalNodeMessage) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{3}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SignalNodeMessage) GetConnectionId() string {
@@ -801,7 +801,7 @@ type StartSession struct {
 func (x *StartSession) Reset() {
 	*x = StartSession{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[4]
+		mi := &file_livekit_internal_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -814,7 +814,7 @@ func (x *StartSession) String() string {
 func (*StartSession) ProtoMessage() {}
 
 func (x *StartSession) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[4]
+	mi := &file_livekit_internal_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -827,7 +827,7 @@ func (x *StartSession) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartSession.ProtoReflect.Descriptor instead.
 func (*StartSession) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{4}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *StartSession) GetRoomName() string {
@@ -916,7 +916,7 @@ type EndSession struct {
 func (x *EndSession) Reset() {
 	*x = EndSession{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[5]
+		mi := &file_livekit_internal_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -929,7 +929,7 @@ func (x *EndSession) String() string {
 func (*EndSession) ProtoMessage() {}
 
 func (x *EndSession) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[5]
+	mi := &file_livekit_internal_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -942,7 +942,7 @@ func (x *EndSession) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EndSession.ProtoReflect.Descriptor instead.
 func (*EndSession) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{5}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{5}
 }
 
 type RemoveParticipant struct {
@@ -956,7 +956,7 @@ type RemoveParticipant struct {
 func (x *RemoveParticipant) Reset() {
 	*x = RemoveParticipant{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[6]
+		mi := &file_livekit_internal_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -969,7 +969,7 @@ func (x *RemoveParticipant) String() string {
 func (*RemoveParticipant) ProtoMessage() {}
 
 func (x *RemoveParticipant) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[6]
+	mi := &file_livekit_internal_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -982,7 +982,7 @@ func (x *RemoveParticipant) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveParticipant.ProtoReflect.Descriptor instead.
 func (*RemoveParticipant) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{6}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *RemoveParticipant) GetParticipantId() string {
@@ -1004,7 +1004,7 @@ type RecordingReservation struct {
 func (x *RecordingReservation) Reset() {
 	*x = RecordingReservation{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[7]
+		mi := &file_livekit_internal_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1017,7 +1017,7 @@ func (x *RecordingReservation) String() string {
 func (*RecordingReservation) ProtoMessage() {}
 
 func (x *RecordingReservation) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[7]
+	mi := &file_livekit_internal_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1030,7 +1030,7 @@ func (x *RecordingReservation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordingReservation.ProtoReflect.Descriptor instead.
 func (*RecordingReservation) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{7}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RecordingReservation) GetId() string {
@@ -1064,7 +1064,7 @@ type RecordingRequest struct {
 func (x *RecordingRequest) Reset() {
 	*x = RecordingRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[8]
+		mi := &file_livekit_internal_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1077,7 +1077,7 @@ func (x *RecordingRequest) String() string {
 func (*RecordingRequest) ProtoMessage() {}
 
 func (x *RecordingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[8]
+	mi := &file_livekit_internal_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1090,7 +1090,7 @@ func (x *RecordingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordingRequest.ProtoReflect.Descriptor instead.
 func (*RecordingRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{8}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *RecordingRequest) GetRequestId() string {
@@ -1175,7 +1175,7 @@ type RecordingResponse struct {
 func (x *RecordingResponse) Reset() {
 	*x = RecordingResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[9]
+		mi := &file_livekit_internal_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1188,7 +1188,7 @@ func (x *RecordingResponse) String() string {
 func (*RecordingResponse) ProtoMessage() {}
 
 func (x *RecordingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[9]
+	mi := &file_livekit_internal_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1201,7 +1201,7 @@ func (x *RecordingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordingResponse.ProtoReflect.Descriptor instead.
 func (*RecordingResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{9}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *RecordingResponse) GetRequestId() string {
@@ -1232,7 +1232,7 @@ type ClientInfo struct {
 func (x *ClientInfo) Reset() {
 	*x = ClientInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[10]
+		mi := &file_livekit_internal_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1245,7 +1245,7 @@ func (x *ClientInfo) String() string {
 func (*ClientInfo) ProtoMessage() {}
 
 func (x *ClientInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[10]
+	mi := &file_livekit_internal_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1258,7 +1258,7 @@ func (x *ClientInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientInfo.ProtoReflect.Descriptor instead.
 func (*ClientInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{10}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ClientInfo) GetSdk() ClientInfo_SDK {
@@ -1291,7 +1291,7 @@ type KeepAlive struct {
 func (x *KeepAlive) Reset() {
 	*x = KeepAlive{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_livekit_internal_proto_msgTypes[11]
+		mi := &file_livekit_internal_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1304,7 +1304,7 @@ func (x *KeepAlive) String() string {
 func (*KeepAlive) ProtoMessage() {}
 
 func (x *KeepAlive) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_livekit_internal_proto_msgTypes[11]
+	mi := &file_livekit_internal_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1317,19 +1317,17 @@ func (x *KeepAlive) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KeepAlive.ProtoReflect.Descriptor instead.
 func (*KeepAlive) Descriptor() ([]byte, []int) {
-	return file_livekit_livekit_internal_proto_rawDescGZIP(), []int{11}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{11}
 }
 
-var File_livekit_livekit_internal_proto protoreflect.FileDescriptor
+var File_livekit_internal_proto protoreflect.FileDescriptor
 
-var file_livekit_livekit_internal_proto_rawDesc = []byte{
-	0x0a, 0x1e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
-	0x74, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x12, 0x07, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x1a, 0x1f, 0x6c, 0x69, 0x76, 0x65, 0x6b,
-	0x69, 0x74, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72,
-	0x64, 0x69, 0x6e, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x19, 0x6c, 0x69, 0x76, 0x65,
-	0x6b, 0x69, 0x74, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x72, 0x74, 0x63, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1a, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x6c,
+var file_livekit_internal_proto_rawDesc = []byte{
+	0x0a, 0x16, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e,
+	0x61, 0x6c, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
+	0x74, 0x1a, 0x17, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72,
+	0x64, 0x69, 0x6e, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x11, 0x6c, 0x69, 0x76, 0x65,
+	0x6b, 0x69, 0x74, 0x5f, 0x72, 0x74, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x12, 0x6c,
 	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x72, 0x6f, 0x6f, 0x6d, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x22, 0xd4, 0x01, 0x0a, 0x04, 0x4e, 0x6f, 0x64, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x70,
@@ -1536,20 +1534,20 @@ var file_livekit_livekit_internal_proto_rawDesc = []byte{
 }
 
 var (
-	file_livekit_livekit_internal_proto_rawDescOnce sync.Once
-	file_livekit_livekit_internal_proto_rawDescData = file_livekit_livekit_internal_proto_rawDesc
+	file_livekit_internal_proto_rawDescOnce sync.Once
+	file_livekit_internal_proto_rawDescData = file_livekit_internal_proto_rawDesc
 )
 
-func file_livekit_livekit_internal_proto_rawDescGZIP() []byte {
-	file_livekit_livekit_internal_proto_rawDescOnce.Do(func() {
-		file_livekit_livekit_internal_proto_rawDescData = protoimpl.X.CompressGZIP(file_livekit_livekit_internal_proto_rawDescData)
+func file_livekit_internal_proto_rawDescGZIP() []byte {
+	file_livekit_internal_proto_rawDescOnce.Do(func() {
+		file_livekit_internal_proto_rawDescData = protoimpl.X.CompressGZIP(file_livekit_internal_proto_rawDescData)
 	})
-	return file_livekit_livekit_internal_proto_rawDescData
+	return file_livekit_internal_proto_rawDescData
 }
 
-var file_livekit_livekit_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_livekit_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
-var file_livekit_livekit_internal_proto_goTypes = []interface{}{
+var file_livekit_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_livekit_internal_proto_goTypes = []interface{}{
 	(NodeType)(0),                      // 0: livekit.NodeType
 	(NodeState)(0),                     // 1: livekit.NodeState
 	(ClientInfo_SDK)(0),                // 2: livekit.ClientInfo.SDK
@@ -1580,7 +1578,7 @@ var file_livekit_livekit_internal_proto_goTypes = []interface{}{
 	(*RemoveOutputRequest)(nil),        // 27: livekit.RemoveOutputRequest
 	(*EndRecordingRequest)(nil),        // 28: livekit.EndRecordingRequest
 }
-var file_livekit_livekit_internal_proto_depIdxs = []int32{
+var file_livekit_internal_proto_depIdxs = []int32{
 	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
 	0,  // 1: livekit.Node.type:type_name -> livekit.NodeType
 	1,  // 2: livekit.Node.state:type_name -> livekit.NodeState
@@ -1610,16 +1608,16 @@ var file_livekit_livekit_internal_proto_depIdxs = []int32{
 	0,  // [0:22] is the sub-list for field type_name
 }
 
-func init() { file_livekit_livekit_internal_proto_init() }
-func file_livekit_livekit_internal_proto_init() {
-	if File_livekit_livekit_internal_proto != nil {
+func init() { file_livekit_internal_proto_init() }
+func file_livekit_internal_proto_init() {
+	if File_livekit_internal_proto != nil {
 		return
 	}
-	file_livekit_livekit_recording_proto_init()
-	file_livekit_livekit_rtc_proto_init()
-	file_livekit_livekit_room_proto_init()
+	file_livekit_recording_proto_init()
+	file_livekit_rtc_proto_init()
+	file_livekit_room_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_livekit_livekit_internal_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Node); i {
 			case 0:
 				return &v.state
@@ -1631,7 +1629,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NodeStats); i {
 			case 0:
 				return &v.state
@@ -1643,7 +1641,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RTCNodeMessage); i {
 			case 0:
 				return &v.state
@@ -1655,7 +1653,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SignalNodeMessage); i {
 			case 0:
 				return &v.state
@@ -1667,7 +1665,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StartSession); i {
 			case 0:
 				return &v.state
@@ -1679,7 +1677,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*EndSession); i {
 			case 0:
 				return &v.state
@@ -1691,7 +1689,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RemoveParticipant); i {
 			case 0:
 				return &v.state
@@ -1703,7 +1701,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RecordingReservation); i {
 			case 0:
 				return &v.state
@@ -1715,7 +1713,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RecordingRequest); i {
 			case 0:
 				return &v.state
@@ -1727,7 +1725,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RecordingResponse); i {
 			case 0:
 				return &v.state
@@ -1739,7 +1737,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ClientInfo); i {
 			case 0:
 				return &v.state
@@ -1751,7 +1749,7 @@ func file_livekit_livekit_internal_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_livekit_internal_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_internal_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*KeepAlive); i {
 			case 0:
 				return &v.state
@@ -1764,7 +1762,7 @@ func file_livekit_livekit_internal_proto_init() {
 			}
 		}
 	}
-	file_livekit_livekit_internal_proto_msgTypes[2].OneofWrappers = []interface{}{
+	file_livekit_internal_proto_msgTypes[2].OneofWrappers = []interface{}{
 		(*RTCNodeMessage_StartSession)(nil),
 		(*RTCNodeMessage_Request)(nil),
 		(*RTCNodeMessage_RemoveParticipant)(nil),
@@ -1776,11 +1774,11 @@ func file_livekit_livekit_internal_proto_init() {
 		(*RTCNodeMessage_UpdateRoomMetadata)(nil),
 		(*RTCNodeMessage_KeepAlive)(nil),
 	}
-	file_livekit_livekit_internal_proto_msgTypes[3].OneofWrappers = []interface{}{
+	file_livekit_internal_proto_msgTypes[3].OneofWrappers = []interface{}{
 		(*SignalNodeMessage_Response)(nil),
 		(*SignalNodeMessage_EndSession)(nil),
 	}
-	file_livekit_livekit_internal_proto_msgTypes[8].OneofWrappers = []interface{}{
+	file_livekit_internal_proto_msgTypes[8].OneofWrappers = []interface{}{
 		(*RecordingRequest_Start)(nil),
 		(*RecordingRequest_AddOutput)(nil),
 		(*RecordingRequest_RemoveOutput)(nil),
@@ -1790,19 +1788,19 @@ func file_livekit_livekit_internal_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_livekit_livekit_internal_proto_rawDesc,
+			RawDescriptor: file_livekit_internal_proto_rawDesc,
 			NumEnums:      3,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_livekit_livekit_internal_proto_goTypes,
-		DependencyIndexes: file_livekit_livekit_internal_proto_depIdxs,
-		EnumInfos:         file_livekit_livekit_internal_proto_enumTypes,
-		MessageInfos:      file_livekit_livekit_internal_proto_msgTypes,
+		GoTypes:           file_livekit_internal_proto_goTypes,
+		DependencyIndexes: file_livekit_internal_proto_depIdxs,
+		EnumInfos:         file_livekit_internal_proto_enumTypes,
+		MessageInfos:      file_livekit_internal_proto_msgTypes,
 	}.Build()
-	File_livekit_livekit_internal_proto = out.File
-	file_livekit_livekit_internal_proto_rawDesc = nil
-	file_livekit_livekit_internal_proto_goTypes = nil
-	file_livekit_livekit_internal_proto_depIdxs = nil
+	File_livekit_internal_proto = out.File
+	file_livekit_internal_proto_rawDesc = nil
+	file_livekit_internal_proto_goTypes = nil
+	file_livekit_internal_proto_depIdxs = nil
 }

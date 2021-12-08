@@ -203,5 +203,5 @@ var AnalyticsRecorderService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "livekit/livekit_analytics.proto",
+	Metadata: "livekit_analytics.proto",
 }
