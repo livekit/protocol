@@ -52,6 +52,12 @@ enum RecordingPreset {
   FULL_HD_60 = 4; // 1080p, 60fps, 6000 kbps
 }
 
+enum EncodingProfile {
+  PROFILE_BASELINE = 0;
+  PROFILE_MAIN = 1;
+  PROFILE_HIGH = 2;
+}
+
 message RecordingOptions {
   RecordingPreset preset = 1;
   int32 width = 2; // default 1920
@@ -61,6 +67,7 @@ message RecordingOptions {
   int32 audio_bitrate = 6; // default 128
   int32 audio_frequency = 7; // default 44100
   int32 video_bitrate = 8; // default 4500
+  EncodingProfile profile = 9; // default MAIN
 }
 
 message StartRecordingResponse {
