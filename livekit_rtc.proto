@@ -160,6 +160,7 @@ message RoomUpdate {
 message ConnectionQualityInfo {
   string participant_sid = 1;
   ConnectionQuality quality = 2;
+  float score = 3;
 }
 
 message ConnectionQualityUpdate {
