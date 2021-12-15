@@ -61,6 +61,7 @@ message RecordingOptions {
   int32 audio_bitrate = 6; // default 128
   int32 audio_frequency = 7; // default 44100
   int32 video_bitrate = 8; // default 4500
+  string profile = 9; // baseline, main, or high. default main
 }
 
 message StartRecordingResponse {
