@@ -53,6 +53,8 @@ message SignalResponse {
     ConnectionQualityUpdate connection_quality = 12;
     // when streamed tracks state changed
     StreamStateUpdate stream_state_update = 13;
+    // when max subscribe quality changed
+    SubscribedQualityUpdate subscribed_quality_udpate = 14;
   }
 }
 
@@ -180,4 +182,13 @@ message StreamStateInfo {
 
 message StreamStateUpdate {
   repeated StreamStateInfo stream_states = 1;
+}
+
+message SubscribedQuality {
+  VideoQuality quality = 1;
+  bool enabled = 2;
+}
+
+message SubscribedQualityUpdate {
+  repeated SubscribedQuality subscribed_qualities = 1;
 }

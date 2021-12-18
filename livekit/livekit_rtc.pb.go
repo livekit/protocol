@@ -316,6 +316,7 @@ type SignalResponse struct {
 	//	*SignalResponse_RoomUpdate
 	//	*SignalResponse_ConnectionQuality
 	//	*SignalResponse_StreamStateUpdate
+	//	*SignalResponse_SubscribedQualityUdpate
 	Message isSignalResponse_Message `protobuf_oneof:"message"`
 }
 
@@ -442,6 +443,13 @@ func (x *SignalResponse) GetStreamStateUpdate() *StreamStateUpdate {
 	return nil
 }
 
+func (x *SignalResponse) GetSubscribedQualityUdpate() *SubscribedQualityUpdate {
+	if x, ok := x.GetMessage().(*SignalResponse_SubscribedQualityUdpate); ok {
+		return x.SubscribedQualityUdpate
+	}
+	return nil
+}
+
 type isSignalResponse_Message interface {
 	isSignalResponse_Message()
 }
@@ -506,6 +514,11 @@ type SignalResponse_StreamStateUpdate struct {
 	StreamStateUpdate *StreamStateUpdate `protobuf:"bytes,13,opt,name=stream_state_update,json=streamStateUpdate,proto3,oneof"`
 }
 
+type SignalResponse_SubscribedQualityUdpate struct {
+	// when max subscribe quality changed
+	SubscribedQualityUdpate *SubscribedQualityUpdate `protobuf:"bytes,14,opt,name=subscribed_quality_udpate,json=subscribedQualityUdpate,proto3,oneof"`
+}
+
 func (*SignalResponse_Join) isSignalResponse_Message() {}
 
 func (*SignalResponse_Answer) isSignalResponse_Message() {}
@@ -529,6 +542,8 @@ func (*SignalResponse_RoomUpdate) isSignalResponse_Message() {}
 func (*SignalResponse_ConnectionQuality) isSignalResponse_Message() {}
 
 func (*SignalResponse_StreamStateUpdate) isSignalResponse_Message() {}
+
+func (*SignalResponse_SubscribedQualityUdpate) isSignalResponse_Message() {}
 
 type AddTrackRequest struct {
 	state         protoimpl.MessageState
@@ -1630,6 +1645,108 @@ func (x *StreamStateUpdate) GetStreamStates() []*StreamStateInfo {
 	return nil
 }
 
+type SubscribedQuality struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Quality VideoQuality `protobuf:"varint,1,opt,name=quality,proto3,enum=livekit.VideoQuality" json:"quality,omitempty"`
+	Enabled bool         `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
+}
+
+func (x *SubscribedQuality) Reset() {
+	*x = SubscribedQuality{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_rtc_proto_msgTypes[20]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SubscribedQuality) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubscribedQuality) ProtoMessage() {}
+
+func (x *SubscribedQuality) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[20]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubscribedQuality.ProtoReflect.Descriptor instead.
+func (*SubscribedQuality) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *SubscribedQuality) GetQuality() VideoQuality {
+	if x != nil {
+		return x.Quality
+	}
+	return VideoQuality_LOW
+}
+
+func (x *SubscribedQuality) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type SubscribedQualityUpdate struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SubscribedQualities []*SubscribedQuality `protobuf:"bytes,1,rep,name=subscribed_qualities,json=subscribedQualities,proto3" json:"subscribed_qualities,omitempty"`
+}
+
+func (x *SubscribedQualityUpdate) Reset() {
+	*x = SubscribedQualityUpdate{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_rtc_proto_msgTypes[21]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SubscribedQualityUpdate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubscribedQualityUpdate) ProtoMessage() {}
+
+func (x *SubscribedQualityUpdate) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[21]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubscribedQualityUpdate.ProtoReflect.Descriptor instead.
+func (*SubscribedQualityUpdate) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *SubscribedQualityUpdate) GetSubscribedQualities() []*SubscribedQuality {
+	if x != nil {
+		return x.SubscribedQualities
+	}
+	return nil
+}
+
 var File_livekit_rtc_proto protoreflect.FileDescriptor
 
 var file_livekit_rtc_proto_rawDesc = []byte{
@@ -1670,7 +1787,7 @@ var file_livekit_rtc_proto_rawDesc = []byte{
 	0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x56, 0x69,
 	0x64, 0x65, 0x6f, 0x4c, 0x61, 0x79, 0x65, 0x72, 0x73, 0x48, 0x00, 0x52, 0x0c, 0x75, 0x70, 0x64,
 	0x61, 0x74, 0x65, 0x4c, 0x61, 0x79, 0x65, 0x72, 0x73, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x22, 0xeb, 0x05, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x52,
+	0x73, 0x61, 0x67, 0x65, 0x22, 0xcb, 0x06, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x52,
 	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x04, 0x6a, 0x6f, 0x69, 0x6e, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e,
 	0x4a, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x00, 0x52, 0x04,
@@ -1716,7 +1833,13 @@ var file_livekit_rtc_proto_rawDesc = []byte{
 	0x18, 0x0d, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74,
 	0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74, 0x65, 0x55, 0x70, 0x64, 0x61,
 	0x74, 0x65, 0x48, 0x00, 0x52, 0x11, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74,
-	0x65, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
+	0x65, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x5e, 0x0a, 0x19, 0x73, 0x75, 0x62, 0x73, 0x63,
+	0x72, 0x69, 0x62, 0x65, 0x64, 0x5f, 0x71, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x5f, 0x75, 0x64,
+	0x70, 0x61, 0x74, 0x65, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x6c, 0x69, 0x76,
+	0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x51,
+	0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x48, 0x00, 0x52, 0x17,
+	0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74,
+	0x79, 0x55, 0x64, 0x70, 0x61, 0x74, 0x65, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61,
 	0x67, 0x65, 0x22, 0x9f, 0x02, 0x0a, 0x0f, 0x41, 0x64, 0x64, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x63, 0x69, 0x64, 0x18, 0x01, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x03, 0x63, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
@@ -1849,15 +1972,28 @@ var file_livekit_rtc_proto_rawDesc = []byte{
 	0x74, 0x61, 0x74, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6c, 0x69,
 	0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74,
 	0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x0c, 0x73, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61,
-	0x74, 0x65, 0x73, 0x2a, 0x2d, 0x0a, 0x0c, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x54, 0x61, 0x72,
-	0x67, 0x65, 0x74, 0x12, 0x0d, 0x0a, 0x09, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x53, 0x48, 0x45, 0x52,
-	0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a, 0x53, 0x55, 0x42, 0x53, 0x43, 0x52, 0x49, 0x42, 0x45, 0x52,
-	0x10, 0x01, 0x2a, 0x25, 0x0a, 0x0b, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74,
-	0x65, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a,
-	0x06, 0x50, 0x41, 0x55, 0x53, 0x45, 0x44, 0x10, 0x01, 0x42, 0x25, 0x5a, 0x23, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x65, 0x73, 0x22, 0x5e, 0x0a, 0x11, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
+	0x64, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x2f, 0x0a, 0x07, 0x71, 0x75, 0x61, 0x6c,
+	0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x15, 0x2e, 0x6c, 0x69, 0x76, 0x65,
+	0x6b, 0x69, 0x74, 0x2e, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79,
+	0x52, 0x07, 0x71, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x12, 0x18, 0x0a, 0x07, 0x65, 0x6e, 0x61,
+	0x62, 0x6c, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x65, 0x6e, 0x61, 0x62,
+	0x6c, 0x65, 0x64, 0x22, 0x68, 0x0a, 0x17, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
+	0x64, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x4d,
+	0x0a, 0x14, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x64, 0x5f, 0x71, 0x75, 0x61,
+	0x6c, 0x69, 0x74, 0x69, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x6c,
+	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
+	0x64, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x79, 0x52, 0x13, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72,
+	0x69, 0x62, 0x65, 0x64, 0x51, 0x75, 0x61, 0x6c, 0x69, 0x74, 0x69, 0x65, 0x73, 0x2a, 0x2d, 0x0a,
+	0x0c, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x54, 0x61, 0x72, 0x67, 0x65, 0x74, 0x12, 0x0d, 0x0a,
+	0x09, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x53, 0x48, 0x45, 0x52, 0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a,
+	0x53, 0x55, 0x42, 0x53, 0x43, 0x52, 0x49, 0x42, 0x45, 0x52, 0x10, 0x01, 0x2a, 0x25, 0x0a, 0x0b,
+	0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0a, 0x0a, 0x06, 0x41,
+	0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x50, 0x41, 0x55, 0x53, 0x45,
+	0x44, 0x10, 0x01, 0x42, 0x25, 0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63,
+	0x6f, 0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1873,7 +2009,7 @@ func file_livekit_rtc_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_rtc_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_livekit_rtc_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_livekit_rtc_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_livekit_rtc_proto_goTypes = []interface{}{
 	(SignalTarget)(0),               // 0: livekit.SignalTarget
 	(StreamState)(0),                // 1: livekit.StreamState
@@ -1897,15 +2033,17 @@ var file_livekit_rtc_proto_goTypes = []interface{}{
 	(*ConnectionQualityUpdate)(nil), // 19: livekit.ConnectionQualityUpdate
 	(*StreamStateInfo)(nil),         // 20: livekit.StreamStateInfo
 	(*StreamStateUpdate)(nil),       // 21: livekit.StreamStateUpdate
-	(TrackType)(0),                  // 22: livekit.TrackType
-	(TrackSource)(0),                // 23: livekit.TrackSource
-	(*VideoLayer)(nil),              // 24: livekit.VideoLayer
-	(*Room)(nil),                    // 25: livekit.Room
-	(*ParticipantInfo)(nil),         // 26: livekit.ParticipantInfo
-	(*TrackInfo)(nil),               // 27: livekit.TrackInfo
-	(VideoQuality)(0),               // 28: livekit.VideoQuality
-	(*SpeakerInfo)(nil),             // 29: livekit.SpeakerInfo
-	(ConnectionQuality)(0),          // 30: livekit.ConnectionQuality
+	(*SubscribedQuality)(nil),       // 22: livekit.SubscribedQuality
+	(*SubscribedQualityUpdate)(nil), // 23: livekit.SubscribedQualityUpdate
+	(TrackType)(0),                  // 24: livekit.TrackType
+	(TrackSource)(0),                // 25: livekit.TrackSource
+	(*VideoLayer)(nil),              // 26: livekit.VideoLayer
+	(*Room)(nil),                    // 27: livekit.Room
+	(*ParticipantInfo)(nil),         // 28: livekit.ParticipantInfo
+	(*TrackInfo)(nil),               // 29: livekit.TrackInfo
+	(VideoQuality)(0),               // 30: livekit.VideoQuality
+	(*SpeakerInfo)(nil),             // 31: livekit.SpeakerInfo
+	(ConnectionQuality)(0),          // 32: livekit.ConnectionQuality
 }
 var file_livekit_rtc_proto_depIdxs = []int32{
 	9,  // 0: livekit.SignalRequest.offer:type_name -> livekit.SessionDescription
@@ -1929,29 +2067,32 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	17, // 18: livekit.SignalResponse.room_update:type_name -> livekit.RoomUpdate
 	19, // 19: livekit.SignalResponse.connection_quality:type_name -> livekit.ConnectionQualityUpdate
 	21, // 20: livekit.SignalResponse.stream_state_update:type_name -> livekit.StreamStateUpdate
-	22, // 21: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
-	23, // 22: livekit.AddTrackRequest.source:type_name -> livekit.TrackSource
-	24, // 23: livekit.AddTrackRequest.layers:type_name -> livekit.VideoLayer
-	0,  // 24: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
-	25, // 25: livekit.JoinResponse.room:type_name -> livekit.Room
-	26, // 26: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
-	26, // 27: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
-	15, // 28: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
-	27, // 29: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
-	26, // 30: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
-	28, // 31: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
-	24, // 32: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
-	29, // 33: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
-	25, // 34: livekit.RoomUpdate.room:type_name -> livekit.Room
-	30, // 35: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
-	18, // 36: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
-	1,  // 37: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
-	20, // 38: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
-	39, // [39:39] is the sub-list for method output_type
-	39, // [39:39] is the sub-list for method input_type
-	39, // [39:39] is the sub-list for extension type_name
-	39, // [39:39] is the sub-list for extension extendee
-	0,  // [0:39] is the sub-list for field type_name
+	23, // 21: livekit.SignalResponse.subscribed_quality_udpate:type_name -> livekit.SubscribedQualityUpdate
+	24, // 22: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
+	25, // 23: livekit.AddTrackRequest.source:type_name -> livekit.TrackSource
+	26, // 24: livekit.AddTrackRequest.layers:type_name -> livekit.VideoLayer
+	0,  // 25: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
+	27, // 26: livekit.JoinResponse.room:type_name -> livekit.Room
+	28, // 27: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
+	28, // 28: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
+	15, // 29: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
+	29, // 30: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
+	28, // 31: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
+	30, // 32: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
+	26, // 33: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
+	31, // 34: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
+	27, // 35: livekit.RoomUpdate.room:type_name -> livekit.Room
+	32, // 36: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
+	18, // 37: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
+	1,  // 38: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
+	20, // 39: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
+	30, // 40: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
+	22, // 41: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
+	42, // [42:42] is the sub-list for method output_type
+	42, // [42:42] is the sub-list for method input_type
+	42, // [42:42] is the sub-list for extension type_name
+	42, // [42:42] is the sub-list for extension extendee
+	0,  // [0:42] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
@@ -2201,6 +2342,30 @@ func file_livekit_rtc_proto_init() {
 				return nil
 			}
 		}
+		file_livekit_rtc_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SubscribedQuality); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_livekit_rtc_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SubscribedQualityUpdate); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_livekit_rtc_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*SignalRequest_Offer)(nil),
@@ -2226,6 +2391,7 @@ func file_livekit_rtc_proto_init() {
 		(*SignalResponse_RoomUpdate)(nil),
 		(*SignalResponse_ConnectionQuality)(nil),
 		(*SignalResponse_StreamStateUpdate)(nil),
+		(*SignalResponse_SubscribedQualityUdpate)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -2233,7 +2399,7 @@ func file_livekit_rtc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_rtc_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   20,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
