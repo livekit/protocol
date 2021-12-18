@@ -190,5 +190,6 @@ message SubscribedQuality {
 }
 
 message SubscribedQualityUpdate {
-  repeated SubscribedQuality subscribed_qualities = 1;
+  string track_sids = 1;
+  repeated SubscribedQuality subscribed_qualities = 2;
 }
