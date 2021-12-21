@@ -34,6 +34,8 @@ message AnalyticsStat {
   int32 pli_count = 13;
   int32 fir_count = 14;
   string room_name = 15;
+  float connection_score = 16;
+  string track_id = 17;
 }
 
 message AnalyticsStats {
