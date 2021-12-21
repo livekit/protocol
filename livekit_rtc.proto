@@ -206,11 +206,11 @@ message TrackPermission {
 }
 
 message UpdateSubscriptionPermissions {
-	bool all_participants = 1;
-	repeated TrackPermission track_permissions = 2;
+  bool all_participants = 1;
+  repeated TrackPermission track_permissions = 2;
 }
 
 message SubscriptionPermissionUpdate {
-    string track_sid = 1;
-    bool allowed = 2;
+  string track_sid = 1;
+  bool allowed = 2;
 }
