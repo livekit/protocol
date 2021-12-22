@@ -23,7 +23,10 @@ message SignalRequest {
     LeaveRequest leave = 8;
     // Set active published layers, deprecated in favor of automatic tracking
 //    SetSimulcastLayers simulcast = 9;
+    // Update published video layers
     UpdateVideoLayers update_layers = 10;
+    // Update subscriber permissions
+    UpdateSubscriptionPermissions subscription_permissions = 11;
   }
 }
 
@@ -55,6 +58,8 @@ message SignalResponse {
     StreamStateUpdate stream_state_update = 13;
     // when max subscribe quality changed
     SubscribedQualityUpdate subscribed_quality_update = 14;
+    // when subscription permission changed
+    SubscriptionPermissionUpdate subscription_permission_update = 15;
   }
 }
 
@@ -192,4 +197,21 @@ message SubscribedQuality {
 message SubscribedQualityUpdate {
   string track_sid = 1;
   repeated SubscribedQuality subscribed_qualities = 2;
+}
+
+message TrackPermission {
+  string participant_sid = 1;
+  bool all_tracks = 2;
+  repeated string track_sids = 3;
+}
+
+message UpdateSubscriptionPermissions {
+  bool all_participants = 1;
+  repeated TrackPermission track_permissions = 2;
+}
+
+message SubscriptionPermissionUpdate {
+  string participant_sid = 1;
+  string track_sid = 2;
+  bool allowed = 3;
 }
