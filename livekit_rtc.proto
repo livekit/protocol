@@ -211,6 +211,7 @@ message UpdateSubscriptionPermissions {
 }
 
 message SubscriptionPermissionUpdate {
-  string track_sid = 1;
-  bool allowed = 2;
+  string participant_sid = 1;
+  string track_sid = 2;
+  bool allowed = 3;
 }
