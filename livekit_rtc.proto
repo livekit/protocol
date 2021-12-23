@@ -124,6 +124,7 @@ message ParticipantUpdate {
 message UpdateSubscription {
   repeated string track_sids = 1;
   bool subscribe = 2;
+  repeated ParticipantTracks participant_tracks = 3;
 }
 
 message UpdateTrackSettings {

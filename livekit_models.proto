@@ -131,3 +131,9 @@ enum ConnectionQuality {
   GOOD = 1;
   EXCELLENT = 2;
 }
+
+message ParticipantTracks {
+  // participant ID of participant to whom the tracks belong
+  string participant_sid = 1;
+  repeated string track_sids = 2;
+}
