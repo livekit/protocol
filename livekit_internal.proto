@@ -105,6 +105,7 @@ message StartSession {
   bool hidden = 10;
   bool recorder = 12;
   ClientInfo client = 11;
+  string name = 13;
 }
 
 message EndSession {
