@@ -1,9 +1,10 @@
 package livekit
 
-type TrackSid = string
+type TrackID = string
 
-type ParticipantSid = string
+type ParticipantID = string
 type ParticipantIdentity = string
+type ParticipantName = string
 
-type RoomSid = string
+type RoomID = string
 type RoomName = string
