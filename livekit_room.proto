@@ -53,9 +53,13 @@ message CreateRoomRequest {
   uint32 max_participants = 3;
   // override the node room is allocated to, for debugging
   string node_id = 4;
+  // metadata of room
+  string metadata = 5;
 }
 
 message ListRoomsRequest {
+  // when set, will only return rooms with name match
+  repeated string names = 1;
 }
 
 message ListRoomsResponse {

@@ -17,4 +17,10 @@ message WebhookEvent {
 
   // set when event is recording_*
   RecordingInfo recording_info = 5;
+
+  // unique event uuid
+  string id = 6;
+
+  // timestamp in seconds
+  int64 created_at = 7;
 }
