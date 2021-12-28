@@ -75,8 +75,8 @@ message TrackInfo {
   // source of media
   TrackSource source = 9;
   repeated VideoLayer layers = 10;
-  // mime representing codec of the Track
-  string mime = 11;
+  // mime type of codec
+  string mime_type = 11;
 }
 
 enum VideoQuality {
