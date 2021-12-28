@@ -41,6 +41,7 @@ message ParticipantInfo {
   int64 joined_at = 6;
   bool hidden = 7;
   bool recorder = 8;
+  string name = 9;
 }
 
 enum TrackType {
