@@ -36,6 +36,7 @@ message AnalyticsStat {
   string room_name = 15;
   float connection_score = 16;
   string track_id = 17;
+  uint32 rtt = 18;
 }
 
 message AnalyticsStats {
