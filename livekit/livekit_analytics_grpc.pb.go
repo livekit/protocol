@@ -4,10 +4,10 @@ package livekit
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -42,7 +42,7 @@ func (c *analyticsRecorderServiceClient) IngestStats(ctx context.Context, opts .
 
 type AnalyticsRecorderService_IngestStatsClient interface {
 	Send(*AnalyticsStats) error
-	CloseAndRecv() (*emptypb.Empty, error)
+	CloseAndRecv() (*empty.Empty, error)
 	grpc.ClientStream
 }
 
@@ -54,11 +54,11 @@ func (x *analyticsRecorderServiceIngestStatsClient) Send(m *AnalyticsStats) erro
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *analyticsRecorderServiceIngestStatsClient) CloseAndRecv() (*emptypb.Empty, error) {
+func (x *analyticsRecorderServiceIngestStatsClient) CloseAndRecv() (*empty.Empty, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
-	m := new(emptypb.Empty)
+	m := new(empty.Empty)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (c *analyticsRecorderServiceClient) IngestEvents(ctx context.Context, opts 
 
 type AnalyticsRecorderService_IngestEventsClient interface {
 	Send(*AnalyticsEvents) error
-	CloseAndRecv() (*emptypb.Empty, error)
+	CloseAndRecv() (*empty.Empty, error)
 	grpc.ClientStream
 }
 
@@ -88,11 +88,11 @@ func (x *analyticsRecorderServiceIngestEventsClient) Send(m *AnalyticsEvents) er
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *analyticsRecorderServiceIngestEventsClient) CloseAndRecv() (*emptypb.Empty, error) {
+func (x *analyticsRecorderServiceIngestEventsClient) CloseAndRecv() (*empty.Empty, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
-	m := new(emptypb.Empty)
+	m := new(empty.Empty)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func _AnalyticsRecorderService_IngestStats_Handler(srv interface{}, stream grpc.
 }
 
 type AnalyticsRecorderService_IngestStatsServer interface {
-	SendAndClose(*emptypb.Empty) error
+	SendAndClose(*empty.Empty) error
 	Recv() (*AnalyticsStats, error)
 	grpc.ServerStream
 }
@@ -146,7 +146,7 @@ type analyticsRecorderServiceIngestStatsServer struct {
 	grpc.ServerStream
 }
 
-func (x *analyticsRecorderServiceIngestStatsServer) SendAndClose(m *emptypb.Empty) error {
+func (x *analyticsRecorderServiceIngestStatsServer) SendAndClose(m *empty.Empty) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -163,7 +163,7 @@ func _AnalyticsRecorderService_IngestEvents_Handler(srv interface{}, stream grpc
 }
 
 type AnalyticsRecorderService_IngestEventsServer interface {
-	SendAndClose(*emptypb.Empty) error
+	SendAndClose(*empty.Empty) error
 	Recv() (*AnalyticsEvents, error)
 	grpc.ServerStream
 }
@@ -172,7 +172,7 @@ type analyticsRecorderServiceIngestEventsServer struct {
 	grpc.ServerStream
 }
 
-func (x *analyticsRecorderServiceIngestEventsServer) SendAndClose(m *emptypb.Empty) error {
+func (x *analyticsRecorderServiceIngestEventsServer) SendAndClose(m *empty.Empty) error {
 	return x.ServerStream.SendMsg(m)
 }
 
