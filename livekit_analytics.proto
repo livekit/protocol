@@ -60,7 +60,7 @@ enum AnalyticsEventType {
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
-  string room_sid = 3;
+  string room_id = 3;
   Room room = 4;
   string participant_id = 5;
   ParticipantInfo participant = 6;
