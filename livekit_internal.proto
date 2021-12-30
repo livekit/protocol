@@ -145,6 +145,7 @@ message ClientInfo {
      ANDROID = 3;
      FLUTTER = 4;
      GO = 5;
+     UNITY = 6;
   }
 
   SDK sdk = 1;
