@@ -1,12 +1,25 @@
 package livekit
 
-type TrackID = string
+//----------------------------------------------------------------
 
-type ParticipantID = string
-type ParticipantIdentity = string
-type ParticipantName = string
+type TrackID string
 
-type RoomID = string
+func StringsAsTrackIDs(trackIDs []string) []TrackID {
+	var asTrackID []TrackID
+	for _, trackID := range trackIDs {
+		asTrackID = append(asTrackID, TrackID(trackID))
+	}
+
+	return asTrackID
+}
+
+//----------------------------------------------------------------
+
+type ParticipantID string
+type ParticipantIdentity string
+type ParticipantName string
+
+type RoomID string
 
 //----------------------------------------------------------------
 
