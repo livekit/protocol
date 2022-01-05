@@ -28,7 +28,7 @@ message SignalRequest {
     // Update subscriber permissions
     UpdateSubscriptionPermissions subscription_permissions = 11;
     // sync client's subscribe state to server during reconnect
-    SyncSubscriptionState sync_subscription = 12;
+    SyncState sync_state = 12;
   }
 }
 
@@ -62,8 +62,6 @@ message SignalResponse {
     SubscribedQualityUpdate subscribed_quality_update = 14;
     // when subscription permission changed
     SubscriptionPermissionUpdate subscription_permission_update = 15;
-    // answer to subscriber's SyncSubscriptionState
-    SessionDescription subscription_answer = 16;
   }
 }
 
@@ -221,7 +219,8 @@ message SubscriptionPermissionUpdate {
   bool allowed = 3;
 }
 
-message SyncSubscriptionState {
+message SyncState {
   SessionDescription offer = 1;
   UpdateSubscription subscription = 2;
+  repeated TrackPublishedResponse publish_tracks = 3;
 }
