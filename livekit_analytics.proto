@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
@@ -36,6 +37,7 @@ message AnalyticsStat {
   string room_name = 15;
   float connection_score = 16;
   string track_id = 17;
+  uint32 rtt = 18;
 }
 
 message AnalyticsStats {
@@ -59,7 +61,7 @@ enum AnalyticsEventType {
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
-  string room_sid = 3;
+  string room_id = 3;
   Room room = 4;
   string participant_id = 5;
   ParticipantInfo participant = 6;

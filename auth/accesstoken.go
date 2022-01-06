@@ -36,6 +36,11 @@ func (t *AccessToken) SetValidFor(duration time.Duration) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) SetName(name string) *AccessToken {
+	t.grant.Name = name
+	return t
+}
+
 func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
 	t.grant.Video = grant
 	return t

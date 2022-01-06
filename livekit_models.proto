@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
 
 message Room {
   string sid = 1;
@@ -41,6 +42,7 @@ message ParticipantInfo {
   int64 joined_at = 6;
   bool hidden = 7;
   bool recorder = 8;
+  string name = 9;
 }
 
 enum TrackType {
@@ -74,13 +76,16 @@ message TrackInfo {
   // source of media
   TrackSource source = 9;
   repeated VideoLayer layers = 10;
-  string mid = 11;
+  // mime type of codec
+  string mime_type = 11;
+  string mid = 12;
 }
 
 enum VideoQuality {
   LOW = 0;
   MEDIUM = 1;
   HIGH = 2;
+  OFF = 3;
 }
 
 // provide information about available spatial layers
