@@ -5,7 +5,7 @@ package livekit
 type TrackID string
 
 func StringsAsTrackIDs(trackIDs []string) []TrackID {
-	var asTrackID []TrackID
+	asTrackID := make([]TrackID, 0, len(trackIDs))
 	for _, trackID := range trackIDs {
 		asTrackID = append(asTrackID, TrackID(trackID))
 	}
