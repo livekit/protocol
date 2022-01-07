@@ -221,7 +221,7 @@ message SubscriptionPermissionUpdate {
 }
 
 message SyncState {
-  SessionDescription offer = 1;
+  SessionDescription anwser = 1;
   UpdateSubscription subscription = 2;
   repeated TrackPublishedResponse publish_tracks = 3;
 }
