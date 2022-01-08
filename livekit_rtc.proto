@@ -28,6 +28,8 @@ message SignalRequest {
     UpdateVideoLayers update_layers = 10;
     // Update subscriber permissions
     UpdateSubscriptionPermissions subscription_permissions = 11;
+    // sync client's subscribe state to server during reconnect
+    SyncState sync_state = 12;
   }
 }
 
@@ -216,4 +218,10 @@ message SubscriptionPermissionUpdate {
   string participant_sid = 1;
   string track_sid = 2;
   bool allowed = 3;
+}
+
+message SyncState {
+  SessionDescription answer = 1;
+  UpdateSubscription subscription = 2;
+  repeated TrackPublishedResponse publish_tracks = 3;
 }

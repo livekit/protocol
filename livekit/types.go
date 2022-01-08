@@ -5,7 +5,7 @@ package livekit
 type TrackID string
 
 func StringsAsTrackIDs(trackIDs []string) []TrackID {
-	var asTrackID []TrackID
+	asTrackID := make([]TrackID, 0, len(trackIDs))
 	for _, trackID := range trackIDs {
 		asTrackID = append(asTrackID, TrackID(trackID))
 	}
@@ -26,7 +26,7 @@ type RoomID string
 type RoomName string
 
 func RoomNamesAsStrings(roomNames []RoomName) []string {
-	var asString []string
+	asString := make([]string, 0, len(roomNames))
 	for _, roomName := range roomNames {
 		asString = append(asString, string(roomName))
 	}
@@ -35,7 +35,7 @@ func RoomNamesAsStrings(roomNames []RoomName) []string {
 }
 
 func StringsAsRoomNames(roomNames []string) []RoomName {
-	var asRoomName []RoomName
+	asRoomName := make([]RoomName, 0, len(roomNames))
 	for _, roomName := range roomNames {
 		asRoomName = append(asRoomName, RoomName(roomName))
 	}

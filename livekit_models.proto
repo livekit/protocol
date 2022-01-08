@@ -78,6 +78,7 @@ message TrackInfo {
   repeated VideoLayer layers = 10;
   // mime type of codec
   string mime_type = 11;
+  string mid = 12;
 }
 
 enum VideoQuality {
@@ -95,6 +96,7 @@ message VideoLayer {
   uint32 height = 3;
   // target bitrate, server will measure actual
   uint32 bitrate = 4;
+  uint32 ssrc = 5;
 }
 
 // new DataPacket API
