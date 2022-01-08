@@ -107,7 +107,6 @@ message StartSession {
   bool recorder = 12;
   ClientInfo client = 11;
   string name = 13;
-  bool migrate = 14;
 }
 
 message EndSession {
