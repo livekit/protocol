@@ -3,7 +3,7 @@ syntax = "proto3";
 package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit";
+option ruby_package = "LiveKit::Proto";
 
 message Room {
   string sid = 1;
