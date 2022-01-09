@@ -3,6 +3,7 @@ syntax = "proto3";
 package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
