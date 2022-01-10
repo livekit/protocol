@@ -31,6 +31,8 @@ message SignalRequest {
     UpdateSubscriptionPermissions subscription_permissions = 11;
     // sync client's subscribe state to server during reconnect
     SyncState sync_state = 12;
+    // Simulate conditions, for client validations
+    SimulateScenario simulate = 13;
   }
 }
 
@@ -225,4 +227,15 @@ message SyncState {
   SessionDescription answer = 1;
   UpdateSubscription subscription = 2;
   repeated TrackPublishedResponse publish_tracks = 3;
+}
+
+message SimulateScenario {
+  oneof scenario {
+    // simulate N seconds of speaker activity
+    int32 speaker_update = 1;
+    // simulate local node failure
+    bool node_failure = 2;
+    // simulate migration
+    bool migration = 3;
+  }
 }
