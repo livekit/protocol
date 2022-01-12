@@ -237,5 +237,7 @@ message SimulateScenario {
     bool node_failure = 2;
     // simulate migration
     bool migration = 3;
+    // server to send leave
+    bool server_leave = 4;
   }
 }
