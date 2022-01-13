@@ -145,3 +145,25 @@ message ParticipantTracks {
   string participant_sid = 1;
   repeated string track_sids = 2;
 }
+
+// details about the client
+message ClientInfo {
+  enum SDK {
+     UNKNOWN = 0;
+     JS = 1;
+     SWIFT = 2;
+     ANDROID = 3;
+     FLUTTER = 4;
+     GO = 5;
+     UNITY = 6;
+  }
+
+  SDK sdk = 1;
+  string version = 2;
+  int32 protocol = 3;
+  string os = 4;
+  string os_version = 5;
+  string device_model = 6;
+  string browser = 7;
+  string browser_version = 8;
+}

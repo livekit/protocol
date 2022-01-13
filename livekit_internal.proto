@@ -6,6 +6,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 // internal protos, not exposed to clients
+import "livekit_models.proto";
 import "livekit_recording.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
@@ -101,12 +102,10 @@ message StartSession {
   // metadata to pass to participant
   string metadata = 5;
   ParticipantPermission permission = 6;
-  // TODO: deprecate in the future
-  int32 protocol_version = 7;
   bool auto_subscribe = 9;
   bool hidden = 10;
-  bool recorder = 12;
   ClientInfo client = 11;
+  bool recorder = 12;
   string name = 13;
 }
 
@@ -135,23 +134,6 @@ message RecordingRequest {
 message RecordingResponse {
   string request_id = 1;
   string error = 2;
-}
-
-// details about the client
-message ClientInfo {
-  enum SDK {
-     UNKNOWN = 0;
-     JS = 1;
-     IOS = 2;
-     ANDROID = 3;
-     FLUTTER = 4;
-     GO = 5;
-     UNITY = 6;
-  }
-
-  SDK sdk = 1;
-  string version = 2;
-  int32 protocol = 3;
 }
 
 message KeepAlive {
