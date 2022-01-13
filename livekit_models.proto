@@ -151,7 +151,7 @@ message ClientInfo {
   enum SDK {
      UNKNOWN = 0;
      JS = 1;
-     IOS = 2;
+     SWIFT = 2;
      ANDROID = 3;
      FLUTTER = 4;
      GO = 5;
