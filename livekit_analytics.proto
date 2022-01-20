@@ -69,14 +69,7 @@ message AnalyticsEvent {
   TrackInfo track = 8;
   string recording_id = 9;
   string analytics_key = 10;
-  ClientInfo.SDK sdk_type = 11;
-  string region = 12;
-  string client_version = 13;
-  string client_os = 14;
-  string client_os_version = 15;
-  string client_device_model = 16;
-  string client_browser = 17;
-  string client_browser_version = 18;
+  ClientInfo  client_info = 11;
 }
 
 message AnalyticsEvents {
