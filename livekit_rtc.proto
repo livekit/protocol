@@ -28,7 +28,7 @@ message SignalRequest {
     // Update published video layers
     UpdateVideoLayers update_layers = 10;
     // Update subscriber permissions
-    UpdateSubscriptionPermissions subscription_permissions = 11;
+    SubscriptionPermission subscription_permission = 11;
     // sync client's subscribe state to server during reconnect
     SyncState sync_state = 12;
     // Simulate conditions, for client validations
@@ -212,7 +212,7 @@ message TrackPermission {
   repeated string track_sids = 3;
 }
 
-message UpdateSubscriptionPermissions {
+message SubscriptionPermission {
   bool all_participants = 1;
   repeated TrackPermission track_permissions = 2;
 }
