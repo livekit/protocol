@@ -588,7 +588,7 @@ type SignalResponse_SubscriptionPermissionUpdate struct {
 }
 
 type SignalResponse_RefreshToken struct {
-	// update the token the client was using, to ensure that it could reconnect with it
+	// update the token the client was using, to prevent an active client from using an expired token
 	RefreshToken string `protobuf:"bytes,16,opt,name=refresh_token,json=refreshToken,proto3,oneof"`
 }
 

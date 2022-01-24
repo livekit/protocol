@@ -67,7 +67,7 @@ message SignalResponse {
     SubscribedQualityUpdate subscribed_quality_update = 14;
     // when subscription permission changed
     SubscriptionPermissionUpdate subscription_permission_update = 15;
-    // update the token the client was using, to ensure that it could reconnect with it
+    // update the token the client was using, to prevent an active client from using an expired token
     string refresh_token = 16;
   }
 }
