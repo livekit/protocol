@@ -107,6 +107,8 @@ message StartSession {
   ClientInfo client = 11;
   bool recorder = 12;
   string name = 13;
+  // A user's ClaimGrants serialized in JSON
+  string grants_json = 14;
 }
 
 message EndSession {

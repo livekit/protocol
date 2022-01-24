@@ -60,12 +60,15 @@ message SignalResponse {
     RoomUpdate room_update = 11;
     // when connection quality changed
     ConnectionQualityUpdate connection_quality = 12;
-    // when streamed tracks state changed
+    // when streamed tracks state changed, used to notify when any of the streams were paused due to
+    // congestion
     StreamStateUpdate stream_state_update = 13;
-    // when max subscribe quality changed
+    // when max subscribe quality changed, used by dynamic broadcasting to disable unused layers
     SubscribedQualityUpdate subscribed_quality_update = 14;
     // when subscription permission changed
     SubscriptionPermissionUpdate subscription_permission_update = 15;
+    // update the token the client was using, to prevent an active client from using an expired token
+    string refresh_token = 16;
   }
 }
 
