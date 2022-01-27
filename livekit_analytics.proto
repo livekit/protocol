@@ -57,7 +57,12 @@ enum AnalyticsEventType {
   RECORDING_ENDED = 9;
   TRACK_PUBLISHED_UPDATE = 10;
 }
-
+message AnalyticsClientMeta {
+  string region = 1;
+  string node = 2;
+  string client_addr = 3;
+  uint32 client_connect_time = 4;
+}
 
 message AnalyticsEvent {
   AnalyticsEventType type = 1;
@@ -71,6 +76,7 @@ message AnalyticsEvent {
   string recording_id = 9;
   string analytics_key = 10;
   ClientInfo  client_info = 11;
+  AnalyticsClientMeta client_meta = 12;
 }
 
 message AnalyticsEvents {
