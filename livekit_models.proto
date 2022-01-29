@@ -166,4 +166,5 @@ message ClientInfo {
   string device_model = 6;
   string browser = 7;
   string browser_version = 8;
+  string address = 9;
 }
