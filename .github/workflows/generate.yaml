@@ -2,11 +2,11 @@ name: Generate
 
 on:
   workflow_dispatch:
-  pull_request:
-    branches: [ main ]
+  push:
+    branches-ignore: [ main ]
 
 jobs:
-  test:
+  generate:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
