@@ -44,6 +44,7 @@ message ParticipantInfo {
   bool hidden = 7;
   bool recorder = 8;
   string name = 9;
+  uint32 version = 10;
 }
 
 enum TrackType {
