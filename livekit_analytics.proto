@@ -29,15 +29,17 @@ message AnalyticsVideoLayer {
 message AnalyticsStream {
   uint32 ssrc = 1;
   uint32 total_packets = 2;
-  uint64 total_bytes = 3;
-  uint64 total_packets_lost = 4;
-  uint64 total_frames = 5;
-  uint32 rtt = 6;
-  double jitter = 7;
-  int32 nack_count = 8;
-  int32 pli_count = 9;
-  int32 fir_count = 10;
-  repeated AnalyticsVideoLayer video_layers = 11;
+  uint32 total_retransmit_packets = 3;
+  uint64 total_bytes = 4;
+  uint64 total_retransmit_bytes = 5;
+  uint64 total_packets_lost = 6;
+  uint64 total_frames = 7;
+  uint32 rtt = 8;
+  double jitter = 9;
+  int32 nack_count = 10;
+  int32 pli_count = 11;
+  int32 fir_count = 12;
+  repeated AnalyticsVideoLayer video_layers = 13;
 }
 
 message AnalyticsStat {
