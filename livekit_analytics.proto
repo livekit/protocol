@@ -19,6 +19,19 @@ enum StreamType {
   DOWNSTREAM = 1;
 }
 
+message AnalyticsStream {
+  int32 layer = 1;
+  uint64 total_packets = 2;
+  uint64 total_bytes = 3;
+  uint64 packet_lost = 4;
+  uint64 total_frames = 5;
+  uint64 delay = 6;
+  double jitter = 7;
+  int32 nack_count = 8;
+  int32 pli_count = 9;
+  int32 fir_count = 10;
+}
+
 message AnalyticsStat {
   string analytics_key = 1;
   StreamType kind = 2;
@@ -38,6 +51,8 @@ message AnalyticsStat {
   float connection_score = 16;
   string track_id = 17;
   uint32 rtt = 18;
+  uint64 total_frames = 19;
+  repeated AnalyticsStream streams = 20;
 }
 
 message AnalyticsStats {
