@@ -28,18 +28,20 @@ message AnalyticsVideoLayer {
 
 message AnalyticsStream {
   uint32 ssrc = 1;
-  uint32 total_packets = 2;
-  uint32 total_retransmit_packets = 3;
-  uint64 total_bytes = 4;
+  uint32 total_primary_packets = 2;
+  uint64 total_primary_bytes = 3;
+  uint32 total_retransmit_packets = 4;
   uint64 total_retransmit_bytes = 5;
-  uint64 total_packets_lost = 6;
-  uint64 total_frames = 7;
-  uint32 rtt = 8;
-  double jitter = 9;
-  int32 nack_count = 10;
-  int32 pli_count = 11;
-  int32 fir_count = 12;
-  repeated AnalyticsVideoLayer video_layers = 13;
+  uint32 total_padding_packets = 6;
+  uint64 total_padding_bytes = 7;
+  uint64 total_packets_lost = 8;
+  uint64 total_frames = 9;
+  uint32 rtt = 10;
+  double jitter = 11;
+  int32 nack_count = 12;
+  int32 pli_count = 13;
+  int32 fir_count = 14;
+  repeated AnalyticsVideoLayer video_layers = 15;
 }
 
 message AnalyticsStat {
