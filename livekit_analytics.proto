@@ -34,13 +34,13 @@ message AnalyticsStream {
   uint64 total_retransmit_bytes = 5;
   uint32 total_padding_packets = 6;
   uint64 total_padding_bytes = 7;
-  uint64 total_packets_lost = 8;
-  uint64 total_frames = 9;
+  uint32 total_packets_lost = 8;
+  uint32 total_frames = 9;
   uint32 rtt = 10;
   double jitter = 11;
-  int32 nack_count = 12;
-  int32 pli_count = 13;
-  int32 fir_count = 14;
+  uint32 total_nacks = 12;
+  uint32 total_plis = 13;
+  uint32 total_firs = 14;
   repeated AnalyticsVideoLayer video_layers = 15;
 }
 
