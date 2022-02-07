@@ -37,7 +37,7 @@ message AnalyticsStream {
   uint32 total_packets_lost = 8;
   uint32 total_frames = 9;
   uint32 rtt = 10;
-  double jitter = 11;
+  uint32 jitter = 11;
   uint32 total_nacks = 12;
   uint32 total_plis = 13;
   uint32 total_firs = 14;
