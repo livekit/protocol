@@ -92,15 +92,16 @@ message RecordingInfo {
   string error = 4;
   FileResult file = 5;
   repeated RtmpResult rtmp = 6;
-  int64 started_at = 8;
 }
 
 message FileResult {
   string download_url = 1;
-  int64 duration = 2;
+  int64 started_at = 2;
+  int64 ended_at = 3;
 }
 
 message RtmpResult {
   string stream_url = 1;
-  int64 duration = 2;
+  int64 started_at = 3;
+  int64 ended_at = 4;
 }
