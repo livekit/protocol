@@ -86,11 +86,13 @@ message EndRecordingRequest {
 
 message RecordingInfo {
   string id = 1;
+  string room_id = 7;
   string room_name = 2;
   bool active = 3;
   string error = 4;
   FileResult file = 5;
   repeated RtmpResult rtmp = 6;
+  int64 started_at = 8;
 }
 
 message FileResult {
