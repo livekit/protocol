@@ -73,7 +73,9 @@ enum AnalyticsEventType {
   RECORDING_STARTED = 8;
   RECORDING_ENDED = 9;
   TRACK_PUBLISHED_UPDATE = 10;
+  PARTICIPANT_ACTIVE = 11;
 }
+
 message AnalyticsClientMeta {
   string region = 1;
   string node = 2;
