@@ -19,25 +19,42 @@ enum StreamType {
   DOWNSTREAM = 1;
 }
 
+message AnalyticsVideoLayer {
+  int32 layer = 1;
+  uint32 total_packets = 2;
+  uint64 total_bytes = 3;
+  uint32 total_frames = 4;
+}
+
+message AnalyticsStream {
+  uint32 ssrc = 1;
+  uint32 total_primary_packets = 2;
+  uint64 total_primary_bytes = 3;
+  uint32 total_retransmit_packets = 4;
+  uint64 total_retransmit_bytes = 5;
+  uint32 total_padding_packets = 6;
+  uint64 total_padding_bytes = 7;
+  uint32 total_packets_lost = 8;
+  uint32 total_frames = 9;
+  uint32 rtt = 10;
+  uint32 jitter = 11;
+  uint32 total_nacks = 12;
+  uint32 total_plis = 13;
+  uint32 total_firs = 14;
+  repeated AnalyticsVideoLayer video_layers = 15;
+}
+
 message AnalyticsStat {
   string analytics_key = 1;
   StreamType kind = 2;
   google.protobuf.Timestamp time_stamp = 3;
   string node = 4;
   string room_id = 5;
-  string participant_id = 6;
-  double jitter = 7;
-  uint64 total_packets = 8;
-  uint64 packet_lost = 9;
-  uint64 delay = 10;
-  uint64 total_bytes = 11;
-  int32 nack_count = 12;
-  int32 pli_count = 13;
-  int32 fir_count = 14;
-  string room_name = 15;
-  float connection_score = 16;
-  string track_id = 17;
-  uint32 rtt = 18;
+  string room_name = 6;
+  string participant_id = 7;
+  string track_id = 8;
+  float score = 9;
+  repeated AnalyticsStream streams = 10;
 }
 
 message AnalyticsStats {
