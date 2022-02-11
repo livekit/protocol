@@ -102,16 +102,18 @@ message AdvancedOptions {
 }
 
 enum OptionPreset {
-  HD_30 = 0;      // 720p,  30fps, 3000kpbs
-  HD_60 = 1;      // 720p,  60fps, 4500kbps
-  FULL_HD_30 = 2; // 1080p, 30fps, 4500kbps
-  FULL_HD_60 = 3; // 1080p, 60fps, 6000kbps
+  NONE = 0;
+  HD_30 = 1;      // 720p,  30fps, 3000kpbs
+  HD_60 = 2;      // 720p,  60fps, 4500kbps
+  FULL_HD_30 = 3; // 1080p, 30fps, 4500kbps
+  FULL_HD_60 = 4; // 1080p, 60fps, 6000kbps
 }
 
 enum EncodingProfile {
-  PROFILE_BASELINE = 0; // maximum compatibility
-  PROFILE_MAIN = 1;     // modern devices and web playback
-  PROFILE_HIGH = 2;     // best quality and compression
+  PROFILE_DEFAULT = 0;
+  PROFILE_BASELINE = 1; // maximum compatibility
+  PROFILE_MAIN = 2;     // modern devices and web playback
+  PROFILE_HIGH = 3;     // best quality and compression
 }
 
 message UpdateStreamRequest {
