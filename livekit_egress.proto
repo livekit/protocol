@@ -5,8 +5,6 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-import "livekit_ingress.proto";
-
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomEgress(RoomEgressRequest) returns (EgressInfo);
@@ -74,9 +72,22 @@ message FileOutput {
   FileType file_type = 1; // required
 }
 
+enum FileType {
+  OGG = 0;
+  OPUS = 1;
+  H264 = 2;
+  MP3 = 3;
+  MP4 = 4;
+}
+
 message StreamOutput {
   StreamProtocol stream_protocol = 1; // required
   repeated string urls = 2;           // required
+}
+
+enum StreamProtocol {
+  RTMP = 0;
+  RTSP = 1;
 }
 
 message AdvancedOptions {

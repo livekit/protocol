@@ -16,7 +16,6 @@ var Default = Proto
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
-		"livekit_ingress.proto",
 		"livekit_egress.proto",
 		"livekit_room.proto",
 	}
