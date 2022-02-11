@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "livekit_egress.proto";
+
+message StartEgressRequest {
+  string egress_id = 1;
+  string request_id = 2;
+  oneof request {
+    RoomEgressRequest room = 3;
+    ParticipantEgressRequest participant = 4;
+    TrackEgressRequest track = 5;
+  }
+}
+
+message EgressRequest {
+  string egress_id = 1;
+  string request_id = 2;
+  oneof request {
+    UpdateStreamRequest update_stream = 3;
+    UpdateTrackEgressRequest update_track = 4;
+    StopEgressRequest stop = 5;
+  }
+}
+
+message EgressResponse {
+  EgressInfo info = 1;
+  string error = 2;
+}

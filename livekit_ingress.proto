@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+service Ingress {
+  rpc GetIngestionEndpoint(GetIngestionEndpointRequest) returns (GetIngestionEndpointResponse);
+}
+
+message GetIngestionEndpointRequest {
+  string room_name = 1;
+  string participant_identity = 2;
+  string participant_name = 3;
+  oneof input {
+    FileType file_type = 4;
+    StreamProtocol stream_protocol = 5;
+  }
+  bool enable_simulcast = 6;
+}
+
+enum FileType {
+  OGG = 0;
+  OPUS = 1;
+  H264 = 2;
+  MP3 = 3;
+  MP4 = 4;
+}
+
+enum StreamProtocol {
+  RTMP = 0;
+  RTSP = 1;
+}
+
+message GetIngestionEndpointResponse {
+  string url = 1;
+}
