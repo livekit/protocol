@@ -13,20 +13,13 @@ import (
 )
 
 const (
-	startChannel          = "EG_START"
-	resultsChannel        = "EG_RESULTS"
+	StartChannel          = "EG_START"
+	ResultsChannel        = "EG_RESULTS"
 	requestChannelPrefix  = "REQ_"
 	responseChannelPrefix = "RES_"
+	LockDuration          = time.Second * 3
 	requestTimeout        = time.Second * 3
 )
-
-func SubscribeToStartRequests(ctx context.Context, bus utils.MessageBus) (utils.PubSub, error) {
-	return bus.Subscribe(ctx, startChannel)
-}
-
-func SubscribeToEgressRequests(ctx context.Context, bus utils.MessageBus, egressID string) (utils.PubSub, error) {
-	return bus.Subscribe(ctx, requestChannel(egressID))
-}
 
 func SendRequest(ctx context.Context, bus utils.MessageBus, req proto.Message) (*livekit.EgressInfo, error) {
 	requestID := utils.NewGuid(utils.RPCPrefix)
@@ -36,15 +29,15 @@ func SendRequest(ctx context.Context, bus utils.MessageBus, req proto.Message) (
 	case *livekit.StartEgressRequest:
 		r.EgressId = utils.NewGuid(utils.EgressPrefix)
 		r.RequestId = requestID
-		channel = startChannel
+		channel = StartChannel
 	case *livekit.EgressRequest:
 		r.RequestId = requestID
-		channel = requestChannel(r.EgressId)
+		channel = RequestChannel(r.EgressId)
 	default:
 		return nil, errors.New("invalid request type")
 	}
 
-	sub, err := bus.Subscribe(ctx, responseChannel(requestID))
+	sub, err := bus.Subscribe(ctx, ResponseChannel(requestID))
 	if err != nil {
 		return nil, err
 	}
@@ -68,19 +61,11 @@ func SendRequest(ctx context.Context, bus utils.MessageBus, req proto.Message) (
 	}
 }
 
-func SendResponse(ctx context.Context, bus utils.MessageBus, requestID string, res *livekit.EgressResponse) error {
-	return bus.Publish(ctx, responseChannel(requestID), res)
-}
-
-func SubscribeToResults(ctx context.Context, bus utils.MessageBus) (utils.PubSub, error) {
-	return bus.Subscribe(ctx, resultsChannel)
-}
-
-func requestChannel(egressID string) string {
+func RequestChannel(egressID string) string {
 	return requestChannelPrefix + egressID
 }
 
-func responseChannel(requestID string) string {
+func ResponseChannel(requestID string) string {
 	return responseChannelPrefix + requestID
 }
 
