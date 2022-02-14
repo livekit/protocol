@@ -11,9 +11,9 @@ message StartEgressRequest {
   string egress_id = 1;
   string request_id = 2;
   oneof request {
-    RoomEgressRequest room = 3;
-    ParticipantEgressRequest participant = 4;
-    TrackEgressRequest track = 5;
+    WebCompositeEgressRequest web_composite = 7;
+    TrackCompositeEgressRequest track_composite = 8;
+    TrackEgressRequest track = 9;
   }
 }
 
@@ -22,7 +22,7 @@ message EgressRequest {
   string request_id = 2;
   oneof request {
     UpdateStreamRequest update_stream = 3;
-    UpdateTrackEgressRequest update_track = 4;
+    ListEgressRequest list = 4;
     StopEgressRequest stop = 5;
   }
 }

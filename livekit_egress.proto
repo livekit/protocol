@@ -7,60 +7,59 @@ option ruby_package = "LiveKit::Proto";
 
 service Egress {
   // start recording or streaming a room, participant, or tracks
-  rpc StartRoomEgress(RoomEgressRequest) returns (EgressInfo);
-  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
+  rpc StartWebCompositeEgress(WebCompositeEgressRequest) returns (EgressInfo);
+  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
   // add or remove stream endpoints
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
-  // add or remove tracks
-  rpc UpdateTrackEgress(UpdateTrackEgressRequest) returns (EgressInfo);
+  // list available egress
+  rpc ListEgress(ListEgressRequest) returns (ListEgressResponse);
 
   // stop a recording or stream
   rpc StopEgress(StopEgressRequest) returns (EgressInfo);
 }
 
-// composite all tracks from room
-message RoomEgressRequest {
+// composite using a web browser
+message WebCompositeEgressRequest {
   string room_name = 1;         // required
-  string layout = 2;            // required
+  string layout = 2;            // (optional)
   bool audio_only = 3;          // (default false)
   bool video_only = 4;          // (default false)
   string custom_base_url = 5;   // (default https://recorder.livekit.io)
   oneof output {                // required
-    FileOutput file = 6;
+    EncodedFileOutput file = 6;
     StreamOutput stream = 7;
   }
   oneof options {
-    OptionPreset preset = 8;
-    AdvancedOptions advanced = 9;
+    EncodingOptionsPreset preset = 8;
+    EncodingOptions advanced = 9;
   }
 }
 
 // composite a single audio and video track
-message ParticipantEgressRequest {
+message TrackCompositeEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // required
   string video_track_id = 3; // required
   oneof output {             // required
-    FileOutput file = 4;
+    EncodedFileOutput file = 4;
     StreamOutput stream = 5;
   }
   oneof options {
-    OptionPreset preset = 6;
-    AdvancedOptions advanced = 7;
+    EncodingOptionsPreset preset = 6;
+    EncodingOptions advanced = 7;
   }
 }
 
-// record tracks individually
+// record tracks individually, without transcoding
 message TrackEgressRequest {
   string room_name = 1;  // required
-  oneof tracks {         // required
-    bool all_tracks = 2;
-    bool all_audio_tracks = 3;
-    bool all_video_tracks = 4;
-    TrackList track_list = 5;
+  string track_id = 2;   // required
+  oneof output {         // required
+    string http_url = 3;
+    string websocket_url = 4;
   }
 }
 
@@ -68,52 +67,59 @@ message TrackList {
   repeated string track_ids = 1;
 }
 
-message FileOutput {
-  FileType file_type = 1; // required
+message EncodedFileOutput {
+  EncodedFileType file_type = 1; // required, must be compatible with codec selection
+  string http_url = 2;
 }
 
-enum FileType {
-  OGG = 0;
-  OPUS = 1;
-  H264 = 2;
-  MP3 = 3;
-  MP4 = 4;
+enum EncodedFileType {
+  MP4  = 0;
+  WEBM = 1;
+  OGG = 2;
 }
 
 message StreamOutput {
-  StreamProtocol stream_protocol = 1; // required
-  repeated string urls = 2;           // required
+  StreamProtocol protocol = 1; // required
+  repeated string urls = 2;    // required
 }
 
 enum StreamProtocol {
   RTMP = 0;
-  RTSP = 1;
+  SRT  = 1;
 }
 
-message AdvancedOptions {
+enum AudioCodec {
+  OPUS = 0;
+  AAC = 1;
+}
+
+enum VideoCodec {
+  H264_BASELINE = 0; // maximum compatibility
+  H264_MAIN = 1;     // modern devices and web playback
+  H264_HIGH = 2;     // best quality and compression
+  VP8 = 3;
+  VP9 = 4;
+  HEVC_MAIN = 5;
+  HEVC_HIGH = 6;
+}
+
+message EncodingOptions {
   int32 width = 1;             // (default 1920)
   int32 height = 2;            // (default 1080)
   int32 depth = 3;             // (default 24)
   int32 framerate = 4;         // (default 30)
-  int32 audio_bitrate = 5;     // (default 128)
-  int32 audio_frequency = 6;   // (default 44100)
-  int32 video_bitrate = 7;     // (default 4500)
-  EncodingProfile profile = 8; // (default PROFILE_MAIN)
+  AudioCodec audio_codec = 5;  // (default AAC)
+  int32 audio_bitrate = 6;     // (default 128)
+  int32 audio_frequency = 7;   // (default 44100)
+  VideoCodec video_codec = 8;  // (default H264_MAIN)
+  int32 video_bitrate = 9;     // (default 4500)
 }
 
-enum OptionPreset {
-  NONE = 0;
-  HD_30 = 1;      // 720p,  30fps, 3000kpbs
-  HD_60 = 2;      // 720p,  60fps, 4500kbps
-  FULL_HD_30 = 3; // 1080p, 30fps, 4500kbps
-  FULL_HD_60 = 4; // 1080p, 60fps, 6000kbps
-}
-
-enum EncodingProfile {
-  PROFILE_DEFAULT = 0;
-  PROFILE_BASELINE = 1; // maximum compatibility
-  PROFILE_MAIN = 2;     // modern devices and web playback
-  PROFILE_HIGH = 3;     // best quality and compression
+enum EncodingOptionsPreset {
+  H264_720P_30 = 0;      // 720p,  30fps, 3000kpbs, H.264_MAIN / AAC
+  H264_720P_60 = 1;      // 720p,  60fps, 4500kbps, H.264_MAIN / AAC
+  H264_1080P_30 = 2;     // 1080p, 30fps, 4500kbps, H.264_MAIN / AAC
+  H264_1080P_60 = 3;     // 1080p, 60fps, 6000kbps, H.264_MAIN / AAC
 }
 
 message UpdateStreamRequest {
@@ -122,51 +128,35 @@ message UpdateStreamRequest {
   repeated string remove_output_urls = 3;
 }
 
-message UpdateTrackEgressRequest {
-  string egress_id = 1;
-  repeated string start_track_ids = 2;
-  repeated string stop_track_ids = 3;
+message ListEgressRequest {
+  string room_name = 1; // optional, when empty lists all egresses
+}
+
+message ListEgressResponse {
+  repeated EgressInfo items = 1;
 }
 
 message StopEgressRequest {
   string egress_id = 1;
 }
 
+// enums are annoying that values have to be unique within a package. so we are appending _EGRESS
+enum EgressType {
+  WEB_COMPOSITE_EGRESS = 0;
+  TRACK_COMPOSITE_EGRESS = 1;
+  TRACK_EGRESS = 2;
+}
+
 message EgressInfo {
   string egress_id = 1;
-  string room_id = 2;
-  string room_name = 3;
-  bool active = 4;
-  oneof info {
-    RoomEgressInfo room = 5;
-    ParticipantEgressInfo participant = 6;
-    TrackEgressInfoList track = 7;
+  EgressType egress_type = 2;
+  string room_id = 3;
+  int64 started_at = 4;
+  int64 ended_at = 5;
+  string error = 6;
+  oneof request {
+    WebCompositeEgressRequest web_composite = 7;
+    TrackCompositeEgressRequest track_composite = 8;
+    TrackEgressRequest track = 9;
   }
-}
-
-message RoomEgressInfo {
-  RoomEgressRequest request = 1;
-  int64 started_at = 2;
-  int64 ended_at = 3;
-  string error = 4;
-}
-
-message ParticipantEgressInfo {
-  ParticipantEgressRequest request = 1;
-  int64 started_at = 2;
-  int64 ended_at = 3;
-  string error = 4;
-}
-
-message TrackEgressInfoList {
-  TrackEgressRequest request = 1;
-  repeated TrackEgressInfo track_info = 2;
-}
-
-message TrackEgressInfo {
-  string track_id = 1;
-  FileType file_type = 2;
-  int64 started_at = 3;
-  int64 ended_at = 4;
-  string error = 5;
 }
