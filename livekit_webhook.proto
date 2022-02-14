@@ -9,16 +9,20 @@ import "livekit_models.proto";
 import "livekit_recording.proto";
 
 message WebhookEvent {
-  // one of room_started, room_finished, participant_joined, participant_left, recording_started, recording_finished
+  // one of room_started, room_finished, participant_joined, participant_left, recording_started, recording_finished,
+  // track_published, track_unpublished
   string event = 1;
 
   Room room = 2;
 
-  // set when event is participant_*
+  // set when event is participant_* or track_*
   ParticipantInfo participant = 3;
 
   // set when event is recording_*
   RecordingInfo recording_info = 5;
+
+  // set when event is track_*
+  TrackInfo track = 8;
 
   // unique event uuid
   string id = 6;
