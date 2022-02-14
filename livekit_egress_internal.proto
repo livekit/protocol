@@ -10,10 +10,11 @@ import "livekit_egress.proto";
 message StartEgressRequest {
   string egress_id = 1;
   string request_id = 2;
+  int64 sent_at = 3;
   oneof request {
-    WebCompositeEgressRequest web_composite = 7;
-    TrackCompositeEgressRequest track_composite = 8;
-    TrackEgressRequest track = 9;
+    WebCompositeEgressRequest web_composite = 4;
+    TrackCompositeEgressRequest track_composite = 5;
+    TrackEgressRequest track = 6;
   }
 }
 
