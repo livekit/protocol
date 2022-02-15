@@ -33,8 +33,8 @@ message WebCompositeEgressRequest {
     StreamOutput stream = 7;
   }
   oneof options {
-    EncodingOptionsPreset preset = 8;
-    EncodingOptions advanced = 9;
+    EncodingOptionsPreset preset = 8; // (default none)
+    EncodingOptions advanced = 9;     // (default none)
   }
 }
 
@@ -48,8 +48,8 @@ message TrackCompositeEgressRequest {
     StreamOutput stream = 5;
   }
   oneof options {
-    EncodingOptionsPreset preset = 6;
-    EncodingOptions advanced = 7;
+    EncodingOptionsPreset preset = 6; // (optional)
+    EncodingOptions advanced = 7;     // (optional)
   }
 }
 
@@ -89,18 +89,20 @@ enum StreamProtocol {
 }
 
 enum AudioCodec {
-  OPUS = 0;
-  AAC = 1;
+  DEFAULT_AC = 0;
+  OPUS = 1;
+  AAC = 2;
 }
 
 enum VideoCodec {
-  H264_BASELINE = 0; // maximum compatibility
-  H264_MAIN = 1;     // modern devices and web playback
-  H264_HIGH = 2;     // best quality and compression
-  VP8 = 3;
-  VP9 = 4;
-  HEVC_MAIN = 5;
-  HEVC_HIGH = 6;
+  DEFAULT_VC = 0;
+  H264_BASELINE = 1;
+  H264_MAIN = 2;
+  H264_HIGH = 3;
+  VP8 = 4;
+  VP9 = 5;
+  HEVC_MAIN = 6;
+  HEVC_HIGH = 7;
 }
 
 message EncodingOptions {
@@ -108,7 +110,7 @@ message EncodingOptions {
   int32 height = 2;            // (default 1080)
   int32 depth = 3;             // (default 24)
   int32 framerate = 4;         // (default 30)
-  AudioCodec audio_codec = 5;  // (default AAC)
+  AudioCodec audio_codec = 5;  // (default OPUS)
   int32 audio_bitrate = 6;     // (default 128)
   int32 audio_frequency = 7;   // (default 44100)
   VideoCodec video_codec = 8;  // (default H264_MAIN)
