@@ -74,8 +74,8 @@ message EncodedFileOutput {
 
 enum EncodedFileType {
   MP4  = 0;
-  WEBM = 1;
-  OGG = 2;
+  OGG = 1;
+//  WEBM = 2; coming soon
 }
 
 message StreamOutput {
@@ -85,7 +85,7 @@ message StreamOutput {
 
 enum StreamProtocol {
   RTMP = 0;
-  SRT  = 1;
+//  SRT  = 1; coming soon
 }
 
 enum AudioCodec {
@@ -99,10 +99,9 @@ enum VideoCodec {
   H264_BASELINE = 1;
   H264_MAIN = 2;
   H264_HIGH = 3;
-  VP8 = 4;
-  VP9 = 5;
-  HEVC_MAIN = 6;
-  HEVC_HIGH = 7;
+//  HEVC = 4; coming soon
+//  VP8 = 5;  coming soon
+//  VP9 = 6;  coming soon
 }
 
 message EncodingOptions {
@@ -118,10 +117,10 @@ message EncodingOptions {
 }
 
 enum EncodingOptionsPreset {
-  H264_720P_30 = 0;      // 720p,  30fps, 3000kpbs, H.264_MAIN / AAC
-  H264_720P_60 = 1;      // 720p,  60fps, 4500kbps, H.264_MAIN / AAC
-  H264_1080P_30 = 2;     // 1080p, 30fps, 4500kbps, H.264_MAIN / AAC
-  H264_1080P_60 = 3;     // 1080p, 60fps, 6000kbps, H.264_MAIN / AAC
+  H264_720P_30 = 0;      // 720p,  30fps, 3000kpbs, H.264_MAIN / OPUS
+  H264_720P_60 = 1;      // 720p,  60fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_30 = 2;     // 1080p, 30fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_60 = 3;     // 1080p, 60fps, 6000kbps, H.264_MAIN / OPUS
 }
 
 message UpdateStreamRequest {
