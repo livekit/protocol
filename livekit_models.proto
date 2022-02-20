@@ -172,8 +172,9 @@ message ClientInfo {
 
 // server provided client configuration
 message RTCClientConfiguration {
-	AudioConfiguration audio = 1;
+  AudioConfiguration audio = 1;
   VideoConfiguration video = 2;
+  VideoConfiguration screen = 3;
   SignalConfiguration signal = 4;
 }
 
@@ -200,8 +201,8 @@ message AudioConfiguration {
 
 message VideoConfiguration {
   message VideoProcessing {
-    bool hardware_decoder = 1;
-    bool hardware_encoder = 2;
+    bool software_decoder = 1;
+    bool software_encoder = 2;
   }
   message VideoPreferences {
     string facing_mode = 1;
