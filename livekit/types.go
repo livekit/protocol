@@ -44,3 +44,7 @@ func StringsAsRoomNames(roomNames []string) []RoomName {
 }
 
 //----------------------------------------------------------------
+
+type ConnectionID string
+type NodeID string
+type ParticipantKey string
