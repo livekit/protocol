@@ -171,7 +171,7 @@ message ClientInfo {
 }
 
 // server provided client configuration
-message RTCClientConfiguration {
+message ClientConfiguration {
   AudioConfiguration audio = 1;
   VideoConfiguration video = 2;
   VideoConfiguration screen = 3;

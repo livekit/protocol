@@ -114,7 +114,7 @@ message JoinResponse {
   // when the current server isn't available, return alternate url to retry connection
   // when this is set, the other fields will be largely empty
   string alternative_url = 7;
-  RTCClientConfiguration client_configuration = 8;
+  ClientConfiguration client_configuration = 8;
 }
 
 message TrackPublishedResponse {
