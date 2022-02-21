@@ -10,15 +10,16 @@ import "livekit_egress.proto";
 message StartEgressRequest {
   string egress_id = 1;
   string request_id = 2;
-  int64 sent_at = 3;
+  string room_id = 3;
+  int64 sent_at = 4;
   oneof request {
-    WebCompositeEgressRequest web_composite = 4;
-    TrackCompositeEgressRequest track_composite = 5;
-    TrackEgressRequest track = 6;
+    WebCompositeEgressRequest web_composite = 5;
+    TrackCompositeEgressRequest track_composite = 6;
+    TrackEgressRequest track = 7;
   }
-  string api_key = 7;
-  string api_secret = 8;
-  string ws_url = 9;
+  string api_key = 8;
+  string api_secret = 9;
+  string ws_url = 10;
 }
 
 message EgressRequest {
