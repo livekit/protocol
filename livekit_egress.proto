@@ -141,19 +141,27 @@ message StopEgressRequest {
   string egress_id = 1;
 }
 
+enum EgressStatus {
+  EGRESS_STARTING = 0;
+  EGRESS_ACTIVE = 1;
+  EGRESS_ENDING = 2;
+  EGRESS_COMPLETE = 3;
+}
+
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
+  EgressStatus status = 3;
   oneof request {
-    WebCompositeEgressRequest web_composite = 3;
-    TrackCompositeEgressRequest track_composite = 4;
-    TrackEgressRequest track = 5;
+    WebCompositeEgressRequest web_composite = 4;
+    TrackCompositeEgressRequest track_composite = 5;
+    TrackEgressRequest track = 6;
   }
   oneof result {
-    StreamInfoList stream = 6;
-    FileInfo file = 7;
+    StreamInfoList stream = 7;
+    FileInfo file = 8;
   }
-  string error = 8;
+  string error = 9;
 }
 
 message StreamInfoList {

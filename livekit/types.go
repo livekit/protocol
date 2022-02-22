@@ -1,6 +1,6 @@
 package livekit
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 
 type TrackID string
 
@@ -13,7 +13,7 @@ func StringsAsTrackIDs(trackIDs []string) []TrackID {
 	return asTrackID
 }
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 
 type ParticipantID string
 type ParticipantIdentity string
@@ -21,7 +21,7 @@ type ParticipantName string
 
 type RoomID string
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 
 type RoomName string
 
@@ -43,7 +43,7 @@ func StringsAsRoomNames(roomNames []string) []RoomName {
 	return asRoomName
 }
 
-//----------------------------------------------------------------
+// ----------------------------------------------------------------
 
 type ConnectionID string
 type NodeID string
