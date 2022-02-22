@@ -17,9 +17,8 @@ message StartEgressRequest {
     TrackCompositeEgressRequest track_composite = 6;
     TrackEgressRequest track = 7;
   }
-  string api_key = 8;
-  string api_secret = 9;
-  string ws_url = 10;
+  string token = 8;
+  string ws_url = 9;
 }
 
 message EgressRequest {
