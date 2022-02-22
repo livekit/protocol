@@ -8,8 +8,8 @@ option ruby_package = "LiveKit::Proto";
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartWebCompositeEgress(WebCompositeEgressRequest) returns (EgressInfo);
-  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
-  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
+//  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo); coming soon
+//  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);                   coming soon
 
   // add or remove stream endpoints
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
