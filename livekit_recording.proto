@@ -10,17 +10,25 @@ import "google/protobuf/empty.proto";
 // Recording service that can be performed on any node
 // they are Twirp-based HTTP req/responses
 service RecordingService {
-    // Starts a room
-    rpc StartRecording(StartRecordingRequest) returns (StartRecordingResponse);
+  // Starts a room
+  rpc StartRecording(StartRecordingRequest) returns (StartRecordingResponse) {
+    option deprecated = true;
+  };
 
-    // Adds an rtmp output to a live recording
-    rpc AddOutput(AddOutputRequest) returns (google.protobuf.Empty);
+  // Adds an rtmp output to a live recording
+  rpc AddOutput(AddOutputRequest) returns (google.protobuf.Empty) {
+    option deprecated = true;
+  };
 
-    // Removes an rtmp output from a live recording
-    rpc RemoveOutput(RemoveOutputRequest) returns (google.protobuf.Empty);
+  // Removes an rtmp output from a live recording
+  rpc RemoveOutput(RemoveOutputRequest) returns (google.protobuf.Empty) {
+    option deprecated = true;
+  };
 
-    // Ends a recording
-    rpc EndRecording(EndRecordingRequest) returns (google.protobuf.Empty);
+  // Ends a recording
+  rpc EndRecording(EndRecordingRequest) returns (google.protobuf.Empty) {
+    option deprecated = true;
+  };
 }
 
 message StartRecordingRequest {

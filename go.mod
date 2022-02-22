@@ -9,7 +9,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.3
 	github.com/jxskiss/base62 v0.0.0-20191017122030-4f11678b909b
 	github.com/lithammer/shortuuid/v3 v3.0.6
-	github.com/magefile/mage v1.11.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/stretchr/testify v1.7.0
