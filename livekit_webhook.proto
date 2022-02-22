@@ -10,12 +10,13 @@ import "livekit_egress.proto";
 import "livekit_recording.proto";
 
 message WebhookEvent {
-  // one of room_started, room_finished, participant_joined, participant_left, recording_started, recording_ended, egress_started, egress_ended
+  // one of room_started, room_finished, participant_joined, participant_left, recording_started, recording_finished,
+  // track_published, track_unpublished, egress_started, egress_ended
   string event = 1;
 
   Room room = 2;
 
-  // set when event is participant_*
+  // set when event is participant_* or track_*
   ParticipantInfo participant = 3;
 
   // set when event is recording_*
@@ -23,6 +24,9 @@ message WebhookEvent {
 
   // set when event is egress_*
   EgressInfo egress_info = 9;
+
+  // set when event is track_*
+  TrackInfo track = 8;
 
   // unique event uuid
   string id = 6;
