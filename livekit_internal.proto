@@ -118,9 +118,6 @@ message RemoveParticipant {
   string participant_id = 1;
 }
 
-message KeepAlive {
-}
-
 message RecordingReservation {
   string id = 1;
   int64 submitted_at = 2;
@@ -139,4 +136,7 @@ message RecordingRequest {
 message RecordingResponse {
   string request_id = 1;
   string error = 2;
+}
+
+message KeepAlive {
 }
