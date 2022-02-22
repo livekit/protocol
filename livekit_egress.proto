@@ -67,25 +67,25 @@ message TrackList {
   repeated string track_ids = 1;
 }
 
-message EncodedFileOutput {
-  EncodedFileType file_type = 1; // required, must be compatible with codec selection
-  string http_url = 2;
-}
-
 enum EncodedFileType {
   MP4  = 0;
   OGG = 1;
 //  WEBM = 2; coming soon
 }
 
-message StreamOutput {
-  StreamProtocol protocol = 1; // required
-  repeated string urls = 2;    // required
+message EncodedFileOutput {
+  EncodedFileType file_type = 1; // required, must be compatible with codec selection
+  string http_url = 2;
 }
 
 enum StreamProtocol {
   RTMP = 0;
 //  SRT  = 1; coming soon
+}
+
+message StreamOutput {
+  StreamProtocol protocol = 1; // required
+  repeated string urls = 2;    // required
 }
 
 enum AudioCodec {
@@ -117,10 +117,10 @@ message EncodingOptions {
 }
 
 enum EncodingOptionsPreset {
-  H264_720P_30 = 0;      // 720p,  30fps, 3000kpbs, H.264_MAIN / OPUS
-  H264_720P_60 = 1;      // 720p,  60fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_30 = 2;     // 1080p, 30fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_60 = 3;     // 1080p, 60fps, 6000kbps, H.264_MAIN / OPUS
+  H264_720P_30 = 0;  //  720p, 30fps, 3000kpbs, H.264_MAIN / OPUS
+  H264_720P_60 = 1;  //  720p, 60fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_30 = 2; // 1080p, 30fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_60 = 3; // 1080p, 60fps, 6000kbps, H.264_MAIN / OPUS
 }
 
 message UpdateStreamRequest {
@@ -141,23 +141,35 @@ message StopEgressRequest {
   string egress_id = 1;
 }
 
-// enums are annoying that values have to be unique within a package. so we are appending _EGRESS
-enum EgressType {
-  WEB_COMPOSITE_EGRESS = 0;
-  TRACK_COMPOSITE_EGRESS = 1;
-  TRACK_EGRESS = 2;
-}
-
 message EgressInfo {
   string egress_id = 1;
-  EgressType egress_type = 2;
-  string room_id = 3;
-  int64 started_at = 4;
-  int64 ended_at = 5;
-  string error = 6;
+  string room_id = 2;
   oneof request {
-    WebCompositeEgressRequest web_composite = 7;
-    TrackCompositeEgressRequest track_composite = 8;
-    TrackEgressRequest track = 9;
+    WebCompositeEgressRequest web_composite = 3;
+    TrackCompositeEgressRequest track_composite = 4;
+    TrackEgressRequest track = 5;
   }
+  oneof result {
+    StreamInfoList stream = 6;
+    FileInfo file = 7;
+  }
+  string error = 8;
+}
+
+message StreamInfoList {
+  repeated StreamInfo info = 1;
+}
+
+message StreamInfo {
+  string url = 1;
+  int64 started_at = 2;
+  int64 ended_at = 3;
+}
+
+message FileInfo {
+  string filename = 1;
+  int64 started_at = 2;
+  int64 ended_at = 3;
+  int64 size = 4;
+  string location = 5;
 }
