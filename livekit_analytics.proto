@@ -74,6 +74,8 @@ enum AnalyticsEventType {
   RECORDING_ENDED = 9;
   TRACK_PUBLISHED_UPDATE = 10;
   PARTICIPANT_ACTIVE = 11;
+  EGRESS_STARTED = 12;
+  EGRESS_ENDED = 13;
 }
 
 message AnalyticsClientMeta {
@@ -96,6 +98,7 @@ message AnalyticsEvent {
   string analytics_key = 10;
   ClientInfo  client_info = 11;
   AnalyticsClientMeta client_meta = 12;
+  string egress_id = 13;
 }
 
 message AnalyticsEvents {
