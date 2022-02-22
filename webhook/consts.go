@@ -17,4 +17,6 @@ const (
 	EventParticipantLeft   = "participant_left"
 	EventRecordingStarted  = "recording_started"
 	EventRecordingFinished = "recording_finished"
+	EventEgressStarted     = "egress_started"
+	EventEgressEnded       = "egress_ended"
 )
