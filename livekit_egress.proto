@@ -179,18 +179,17 @@ enum EgressStatus {
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
-  string egress_identity = 3;
-  EgressStatus status = 4;
+  EgressStatus status = 3;
   oneof request {
-    WebCompositeEgressRequest web_composite = 5;
-    TrackCompositeEgressRequest track_composite = 6;
-    TrackEgressRequest track = 7;
+    WebCompositeEgressRequest web_composite = 4;
+    TrackCompositeEgressRequest track_composite = 5;
+    TrackEgressRequest track = 6;
   }
   oneof result {
-    StreamInfoList stream = 8;
-    FileInfo file = 9;
+    StreamInfoList stream = 7;
+    FileInfo file = 8;
   }
-  string error = 10;
+  string error = 9;
 }
 
 message StreamInfoList {
