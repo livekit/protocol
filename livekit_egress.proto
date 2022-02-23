@@ -78,8 +78,8 @@ message EncodedFileOutput {
   string filepath = 2;
   oneof output {
     S3Upload s3 = 3;
-    AzBlobUpload az = 4;
-    GCPUpload gcp = 5;
+    GCPUpload gcp = 4;
+    AzureBlobUpload azure = 5;
   }
 }
 
@@ -91,15 +91,15 @@ message S3Upload {
   string bucket = 5;
 }
 
-message AzBlobUpload {
-  string account_name = 1;
-  string account_key = 2;
-  string container_name = 3;
-}
-
 message GCPUpload {
   bytes credentials = 1;
   string bucket = 2;
+}
+
+message AzureBlobUpload {
+  string account_name = 1;
+  string account_key = 2;
+  string container_name = 3;
 }
 
 enum StreamProtocol {
