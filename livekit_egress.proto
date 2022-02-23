@@ -75,7 +75,7 @@ enum EncodedFileType {
 
 message EncodedFileOutput {
   EncodedFileType file_type = 1; // required, must be compatible with codec selection
-  string filename = 2;
+  string filepath = 2;
   oneof output {
     S3Upload s3 = 3;
     AzBlobUpload az = 4;
