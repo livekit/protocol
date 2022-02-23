@@ -172,46 +172,15 @@ message ClientInfo {
 
 // server provided client configuration
 message ClientConfiguration {
-  AudioConfiguration audio = 1;
-  VideoConfiguration video = 2;
-  VideoConfiguration screen = 3;
-  SignalConfiguration signal = 4;
-}
-
-message AudioConfiguration {
-  message AudioProcessing {
-    // echo cancellation
-    bool aec = 1;
-    // noise suppression
-    bool ns = 2;
-    // automatic gain control
-    bool agc = 3;
-  }
-  message AudioPreferences {
-    bool dtx = 1;
-    int32 sample_rate = 2;
-    int32 channel_count = 3;
-  }
-  Codec codec = 1;
-  AudioProcessing processing = 2;
-  AudioPreferences preferences = 3;
-
-  // TODO sample/playout config(micphone, speaker, earphone ...)
+  VideoConfiguration video = 1;
+  VideoConfiguration screen = 2;
+  SignalConfiguration signal = 3;
 }
 
 message VideoConfiguration {
-  message VideoProcessing {
-    bool software_decoder = 1;
-    bool software_encoder = 2;
-  }
-  message VideoPreferences {
-    string facing_mode = 1;
-  }
-  Codec preferred_codec = 1;
-  VideoProcessing processing = 2;
-  VideoPreferences preferences = 3;
+  bool disable_hardware_encoder = 1;
 }
 
 message SignalConfiguration {
-	bool migration = 1;
+	bool disable_resume = 1;
 }
