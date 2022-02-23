@@ -179,7 +179,7 @@ enum EgressStatus {
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
-  string participant_id = 3;
+  string egress_identity = 3;
   EgressStatus status = 4;
   oneof request {
     WebCompositeEgressRequest web_composite = 5;
