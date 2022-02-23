@@ -11,6 +11,9 @@ service Egress {
 //  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo); coming soon
 //  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);                   coming soon
 
+  // update web composite layout
+  rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
+
   // add or remove stream endpoints
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
@@ -61,10 +64,6 @@ message TrackEgressRequest {
     string http_url = 3;
     string websocket_url = 4;
   }
-}
-
-message TrackList {
-  repeated string track_ids = 1;
 }
 
 enum EncodedFileType {
@@ -147,6 +146,11 @@ enum EncodingOptionsPreset {
   H264_1080P_60 = 3; // 1080p, 60fps, 6000kbps, H.264_MAIN / OPUS
 }
 
+message UpdateLayoutRequest {
+  string egress_id = 1;
+  string layout = 2;
+}
+
 message UpdateStreamRequest {
   string egress_id = 1;
   repeated string add_output_urls = 2;
@@ -175,17 +179,18 @@ enum EgressStatus {
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
-  EgressStatus status = 3;
+  string participant_id = 3;
+  EgressStatus status = 4;
   oneof request {
-    WebCompositeEgressRequest web_composite = 4;
-    TrackCompositeEgressRequest track_composite = 5;
-    TrackEgressRequest track = 6;
+    WebCompositeEgressRequest web_composite = 5;
+    TrackCompositeEgressRequest track_composite = 6;
+    TrackEgressRequest track = 7;
   }
   oneof result {
-    StreamInfoList stream = 7;
-    FileInfo file = 8;
+    StreamInfoList stream = 8;
+    FileInfo file = 9;
   }
-  string error = 9;
+  string error = 10;
 }
 
 message StreamInfoList {
