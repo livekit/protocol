@@ -26,8 +26,7 @@ message EgressRequest {
   string request_id = 2;
   oneof request {
     UpdateStreamRequest update_stream = 3;
-    ListEgressRequest list = 4;
-    StopEgressRequest stop = 5;
+    StopEgressRequest stop = 4;
   }
 }
 
