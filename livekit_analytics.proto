@@ -76,6 +76,7 @@ enum AnalyticsEventType {
   PARTICIPANT_ACTIVE = 11;
   EGRESS_STARTED = 12;
   EGRESS_ENDED = 13;
+  TRACK_MAX_SUBSCRIBED_VIDEO_QUALITY = 14;
 }
 
 message AnalyticsClientMeta {
@@ -99,6 +100,7 @@ message AnalyticsEvent {
   ClientInfo  client_info = 11;
   AnalyticsClientMeta client_meta = 12;
   string egress_id = 13;
+  VideoQuality max_subscribed_video_quality = 14;
 }
 
 message AnalyticsEvents {
