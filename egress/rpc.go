@@ -71,7 +71,7 @@ func ResponseChannel(requestID string) string {
 	return responseChannelPrefix + requestID
 }
 
-func BuildEgressToken(apiKey, secret, roomName string) (string, error) {
+func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error) {
 	f := false
 	t := true
 	grant := &auth.VideoGrant{
@@ -86,7 +86,7 @@ func BuildEgressToken(apiKey, secret, roomName string) (string, error) {
 
 	at := auth.NewAccessToken(apiKey, secret).
 		AddGrant(grant).
-		SetIdentity(utils.NewGuid(utils.EgressPrefix)).
+		SetIdentity(egressID).
 		SetValidFor(24 * time.Hour)
 
 	return at.ToJWT()
