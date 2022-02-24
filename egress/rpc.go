@@ -28,7 +28,9 @@ func SendRequest(ctx context.Context, bus utils.MessageBus, req proto.Message) (
 
 	switch r := req.(type) {
 	case *livekit.StartEgressRequest:
-		r.EgressId = utils.NewGuid(utils.EgressPrefix)
+		if r.EgressId == "" {
+			r.EgressId = utils.NewGuid(utils.EgressPrefix)
+		}
 		r.RequestId = requestID
 		r.SentAt = time.Now().UnixNano()
 		channel = StartChannel
