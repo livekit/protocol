@@ -169,3 +169,21 @@ message ClientInfo {
   string browser_version = 8;
   string address = 9;
 }
+
+// server provided client configuration
+message ClientConfiguration {
+  VideoConfiguration video = 1;
+  VideoConfiguration screen = 2;
+
+  ClientConfigSetting resume_connection = 3;
+}
+
+enum ClientConfigSetting {
+  UNSET = 0;
+  DISABLED = 1;
+  ENABLED = 2;
+}
+
+message VideoConfiguration {
+  ClientConfigSetting hardware_encoder = 1;
+}
