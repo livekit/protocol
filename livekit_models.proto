@@ -174,13 +174,16 @@ message ClientInfo {
 message ClientConfiguration {
   VideoConfiguration video = 1;
   VideoConfiguration screen = 2;
-  SignalConfiguration signal = 3;
+
+  ClientConfigSetting resume_connection = 3;
+}
+
+enum ClientConfigSetting {
+  UNSET = 0;
+  DISABLED = 1;
+  ENABLED = 2;
 }
 
 message VideoConfiguration {
-  bool disable_hardware_encoder = 1;
-}
-
-message SignalConfiguration {
-	bool disable_resume = 1;
+  ClientConfigSetting hardware_encoder = 1;
 }
