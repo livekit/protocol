@@ -90,6 +90,7 @@ func TestVerifier(t *testing.T) {
 		require.NoError(t, err)
 
 		v, err := auth.ParseAPIToken(token)
+		require.NoError(t, err)
 		decoded, err := v.Verify(secret)
 		require.NoError(t, err)
 
