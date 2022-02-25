@@ -50,7 +50,9 @@ func TestAccessToken(t *testing.T) {
 		at := NewAccessToken(apiKey, secret).
 			AddGrant(videoGrant)
 		value, err := at.ToJWT()
+		require.NoError(t, err)
 		token, err := jwt.ParseSigned(value)
+		require.NoError(t, err)
 
 		claim := jwt.Claims{}
 		decodedGrant := ClaimGrants{}

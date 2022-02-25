@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/auth"
 )
@@ -30,6 +31,7 @@ func TestFileBasedKeyProvider(t *testing.T) {
 	f.Close()
 
 	r, err := os.Open(f.Name())
+	require.NoError(t, err)
 	defer r.Close()
 	p, err := auth.NewFileBasedKeyProviderFromReader(r)
 	assert.NoError(t, err)
