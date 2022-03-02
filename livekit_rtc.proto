@@ -115,6 +115,7 @@ message JoinResponse {
   // when this is set, the other fields will be largely empty
   string alternative_url = 7;
   ClientConfiguration client_configuration = 8;
+  string server_region = 9;
 }
 
 message TrackPublishedResponse {
