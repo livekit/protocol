@@ -16,6 +16,17 @@ func StringsAsTrackIDs(trackIDs []string) []TrackID {
 // ----------------------------------------------------------------
 
 type ParticipantID string
+
+func ParticipantIDsAsStrings(ids []ParticipantID) []string {
+	strs := make([]string, 0, len(ids))
+	for _, id := range ids {
+		strs = append(strs, string(id))
+	}
+	return strs
+}
+
+// ----------------------------------------------------------------
+
 type ParticipantIdentity string
 type ParticipantName string
 
@@ -46,5 +57,18 @@ func StringsAsRoomNames(roomNames []string) []RoomName {
 // ----------------------------------------------------------------
 
 type ConnectionID string
+
+// ----------------------------------------------------------------
+
 type NodeID string
+
+func NodeIDsAsStrings(ids []NodeID) []string {
+	strs := make([]string, 0, len(ids))
+	for _, id := range ids {
+		strs = append(strs, string(id))
+	}
+	return strs
+}
+
+// ----------------------------------------------------------------
 type ParticipantKey string
