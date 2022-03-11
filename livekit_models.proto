@@ -5,6 +5,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/timestamp.proto";
+
 message Room {
   string sid = 1;
   string name = 2;
@@ -186,4 +188,51 @@ enum ClientConfigSetting {
 
 message VideoConfiguration {
   ClientConfigSetting hardware_encoder = 1;
+}
+
+message RTPStats {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  double duration = 3;
+
+  uint32 packets = 4;
+  double packet_rate = 5;
+
+  uint64 bytes = 6;
+  double bitrate = 7;
+
+  uint32 packets_lost = 8;
+  double packet_loss_rate = 9;
+  float packet_loss_percentage = 10;
+
+  uint32 packets_duplicate = 11;
+  double packet_duplicate_rate = 12;
+
+  uint64 bytes_duplicate = 13;
+  double bitrate_duplicate = 14;
+
+  uint32 packets_padding = 15;
+  double packet_padding_rate = 16;
+
+  uint64 bytes_padding = 17;
+  double bitrate_padding = 18;
+
+  uint32 packets_out_of_order = 19;
+
+  uint32 frames = 20;
+  double frame_rate = 21;
+
+  double jitter_current = 22;
+  double jitter_max = 23;
+
+  map<int32, uint32> gap_histogram = 24;
+
+  uint32 nacks = 25;
+  uint32 nack_misses = 26;
+
+  uint32 plis = 27;
+  google.protobuf.Timestamp last_pli = 28;
+
+  uint32 firs = 29;
+  google.protobuf.Timestamp last_fir = 30;
 }
