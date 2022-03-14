@@ -235,4 +235,7 @@ message RTPStats {
 
   uint32 firs = 29;
   google.protobuf.Timestamp last_fir = 30;
+
+  uint32 rtt_current = 31;
+  uint32 rtt_max = 32;
 }
