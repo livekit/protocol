@@ -63,6 +63,7 @@ message NodeStats {
   float load_avg_last1min = 18;
   float load_avg_last5min = 19;
   float load_avg_last15min = 20;
+  float cpu_load = 21;
 }
 
 // message to RTC nodes
