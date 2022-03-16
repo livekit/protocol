@@ -238,4 +238,10 @@ message RTPStats {
 
   uint32 rtt_current = 31;
   uint32 rtt_max = 32;
+
+  uint32 key_frames = 33;
+  google.protobuf.Timestamp last_key_frame = 34;
+
+  uint32 layer_lock_plis = 35;
+  google.protobuf.Timestamp last_layer_lock_pli = 36;
 }
