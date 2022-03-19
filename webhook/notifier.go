@@ -16,6 +16,8 @@ import (
 	"github.com/livekit/protocol/auth"
 )
 
+const defaultWebhookTimeout = 10 * time.Second
+
 type Notifier interface {
 	Notify(ctx context.Context, payload interface{}) error
 }
@@ -24,6 +26,7 @@ type notifier struct {
 	apiKey    string
 	apiSecret string
 	urls      []string
+	client    *http.Client
 	logger    logr.Logger
 }
 
@@ -33,6 +36,9 @@ func NewNotifier(apiKey, apiSecret string, urls []string) Notifier {
 		apiSecret: apiSecret,
 		urls:      urls,
 		logger:    logr.Discard(),
+		client: &http.Client{
+			Timeout: defaultWebhookTimeout,
+		},
 	}
 }
 
@@ -71,7 +77,7 @@ func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 		}
 		r.Header.Set(authHeader, token)
 		r.Header.Set("content-type", "application/json")
-		_, err = http.DefaultClient.Do(r)
+		_, err = n.client.Do(r)
 		if err != nil {
 			n.logger.Error(err, "could not post to webhook", "url", url)
 		}
