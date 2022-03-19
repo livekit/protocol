@@ -15,6 +15,8 @@ const (
 	EventRoomFinished      = "room_finished"
 	EventParticipantJoined = "participant_joined"
 	EventParticipantLeft   = "participant_left"
+	EventTrackPublished    = "track_published"
+	EventTrackUnpublished  = "track_unpublished"
 	EventRecordingStarted  = "recording_started"
 	EventRecordingFinished = "recording_finished"
 	EventEgressStarted     = "egress_started"
