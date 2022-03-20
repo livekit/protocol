@@ -25,6 +25,19 @@ message Codec {
   string fmtp_line = 2;
 }
 
+message ParticipantPermission {
+  // allow participant to subscribe to other tracks in the room
+  bool can_subscribe = 1;
+  // allow participant to publish new tracks to room
+  bool can_publish = 2;
+  // allow participant to publish data
+  bool can_publish_data = 3;
+  // indicates that it's hidden to others
+  bool hidden = 7;
+  // indicates it's a recorder instance
+  bool recorder = 8;
+}
+
 message ParticipantInfo {
   enum State {
     // websocket' connected, but not offered yet
@@ -43,10 +56,9 @@ message ParticipantInfo {
   string metadata = 5;
   // timestamp when participant joined room, in seconds
   int64 joined_at = 6;
-  bool hidden = 7;
-  bool recorder = 8;
   string name = 9;
   uint32 version = 10;
+  ParticipantPermission permission = 11;
 }
 
 enum TrackType {

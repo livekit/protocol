@@ -69,6 +69,8 @@ message SignalResponse {
     SubscriptionPermissionUpdate subscription_permission_update = 15;
     // update the token the client was using, to prevent an active client from using an expired token
     string refresh_token = 16;
+    // server initiated track unpublish
+    TrackUnpublishedResponse track_unpublished = 17;
   }
 }
 
@@ -121,6 +123,10 @@ message JoinResponse {
 message TrackPublishedResponse {
   string cid = 1;
   TrackInfo track = 2;
+}
+
+message TrackUnpublishedResponse {
+  string track_sid = 1;
 }
 
 message SessionDescription {
