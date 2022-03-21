@@ -100,9 +100,6 @@ message StartSession {
   string connection_id = 3;
   // if a client is reconnecting (i.e. resume instead of restart)
   bool reconnect = 4;
-  // metadata to pass to participant
-  string metadata = 5;
-  ParticipantPermission permission = 6;
   bool auto_subscribe = 9;
   bool hidden = 10;
   ClientInfo client = 11;

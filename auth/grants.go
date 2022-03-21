@@ -1,5 +1,9 @@
 package auth
 
+import (
+	"github.com/livekit/protocol/livekit"
+)
+
 type VideoGrant struct {
 	// actions on rooms
 	RoomCreate bool `json:"roomCreate,omitempty"`
@@ -18,7 +22,8 @@ type VideoGrant struct {
 	CanPublishData *bool `json:"canPublishData,omitempty"`
 
 	// participant is not visible to other participants
-	Hidden   bool `json:"hidden,omitempty"`
+	Hidden bool `json:"hidden,omitempty"`
+	// indicates to the room that current participant is a recorder
 	Recorder bool `json:"recorder,omitempty"`
 }
 
@@ -41,4 +46,35 @@ func (v *VideoGrant) SetCanPublishData(val bool) {
 
 func (v *VideoGrant) SetCanSubscribe(val bool) {
 	v.CanSubscribe = &val
+}
+
+func (v *VideoGrant) GetCanPublish() bool {
+	if v.CanPublish == nil {
+		return true
+	}
+	return *v.CanPublish
+}
+
+func (v *VideoGrant) GetCanPublishData() bool {
+	if v.CanPublishData == nil {
+		return v.GetCanPublish()
+	}
+	return *v.CanPublishData
+}
+
+func (v *VideoGrant) GetCanSubscribe() bool {
+	if v.CanSubscribe == nil {
+		return true
+	}
+	return *v.CanSubscribe
+}
+
+func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
+	return &livekit.ParticipantPermission{
+		CanPublish:     v.GetCanPublish(),
+		CanPublishData: v.GetCanPublishData(),
+		CanSubscribe:   v.GetCanSubscribe(),
+		Hidden:         v.Hidden,
+		Recorder:       v.Recorder,
+	}
 }
