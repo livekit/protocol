@@ -6,7 +6,10 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"google.golang.org/protobuf/encoding/protojson"
+
 	"github.com/livekit/protocol/auth"
+	"github.com/livekit/protocol/livekit"
 )
 
 // Receive reads and verifies incoming webhook is signed with key/secret pair
@@ -47,4 +50,21 @@ func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+// ReceiveWebhookEvent reads and verifies incoming webhook, and returns a parsed WebhookEvent
+func ReceiveWebhookEvent(r *http.Request, provider auth.KeyProvider) (*livekit.WebhookEvent, error) {
+	data, err := Receive(r, provider)
+	if err != nil {
+		return nil, err
+	}
+	unmarshalOpts := protojson.UnmarshalOptions{
+		DiscardUnknown: true,
+		AllowPartial:   true,
+	}
+	event := livekit.WebhookEvent{}
+	if err = unmarshalOpts.Unmarshal(data, &event); err != nil {
+		return nil, err
+	}
+	return &event, nil
 }
