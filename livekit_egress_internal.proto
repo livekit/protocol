@@ -13,7 +13,7 @@ message StartEgressRequest {
   string room_id = 3;
   int64 sent_at = 4;
   oneof request {
-    WebCompositeEgressRequest web_composite = 5;
+    RoomCompositeEgressRequest room_composite = 5;
     TrackCompositeEgressRequest track_composite = 6;
     TrackEgressRequest track = 7;
   }
