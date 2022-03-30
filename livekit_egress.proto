@@ -7,7 +7,7 @@ option ruby_package = "LiveKit::Proto";
 
 service Egress {
   // start recording or streaming a room, participant, or tracks
-  rpc StartWebCompositeEgress(WebCompositeEgressRequest) returns (EgressInfo);
+  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
 //  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo); coming soon
 //  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);                   coming soon
 
@@ -25,7 +25,7 @@ service Egress {
 }
 
 // composite using a web browser
-message WebCompositeEgressRequest {
+message RoomCompositeEgressRequest {
   string room_name = 1;         // required
   string layout = 2;            // (optional)
   bool audio_only = 3;          // (default false)
@@ -181,7 +181,7 @@ message EgressInfo {
   string room_id = 2;
   EgressStatus status = 3;
   oneof request {
-    WebCompositeEgressRequest web_composite = 4;
+    RoomCompositeEgressRequest room_composite = 4;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
   }
