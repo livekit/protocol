@@ -59,6 +59,7 @@ message ParticipantInfo {
   string name = 9;
   uint32 version = 10;
   ParticipantPermission permission = 11;
+  string region = 12;
 }
 
 enum TrackType {
