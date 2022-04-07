@@ -96,6 +96,7 @@ message TrackInfo {
   // mime type of codec
   string mime_type = 11;
   string mid = 12;
+  string alternative_mime_type = 13;
 }
 
 enum VideoQuality {
