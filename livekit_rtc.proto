@@ -244,6 +244,7 @@ message SyncState {
 message DataChannelInfo {
   string label = 1;
   uint32 id = 2;
+  SignalTarget target = 3;
 }
 
 message SimulateScenario {
