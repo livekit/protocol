@@ -1,0 +1,85 @@
+syntax = "proto3";
+
+package livekit;
+
+import "google/protobuf/empty.proto";
+import "livekit_models.proto";
+
+option go_package = "github.com/livekit/protocol/livekit";
+
+service Ingress {
+    rpc CreateIngress(CreateIngressRequest) returns (IngressInfo);
+    rpc ListIngress(ListIngressRequest) returns (ListIngressResponse);
+    rpc DeleteIngress(DeleteIngressRequest) returns (google.protobuf.Empty);
+}
+
+enum IngressInput {
+    RTMP_INPUT = 0;
+//    FILE_INPUT = 1;
+//    SRT_INPUT = 2;
+//    URL_INPUT = 3;
+}
+
+message IngressInfo {
+    enum State {
+        ENDPOINT_WAITING = 0;
+        ENDPOINT_ACTIVE = 1;
+        ENDPOINT_ENDED = 2;
+    }
+    string id = 1;
+    IngressInput input_type = 2;
+    State state = 3;
+    string room = 4;
+    string participant_identity = 5;
+    string participant_name = 6;
+    bool transcode = 7;
+    // for RTMP input, it'll be a rtmp:// URL
+    // for FILE input, it'll be a http:// URL
+    // for SRT input, it'll be a srt:// URL
+    string url = 8;
+    repeated TrackInfo tracks = 9;
+}
+
+message CreateIngressRequest {
+    IngressInput input_type = 1;
+    string room_name = 2;
+    string participant_identity = 3;
+    string participant_name = 4;
+    IngressAudioOptions audio = 5;
+    IngressVideoOptions video = 6;
+    // true to disable transcoding and publish input codecs
+    bool disable_transcode = 7;
+}
+
+message IngressAudioOptions {
+    string name = 1;
+    TrackSource source = 2;
+    // desired mime_type to publish to room
+    string mime_type = 3;
+    uint32 bitrate = 4;
+    bool dtx = 5;
+    uint32 channels = 6;
+}
+
+message IngressVideoOptions {
+    string name = 1;
+    TrackSource source = 2;
+    // desired mime_type to publish to room
+    string mime_type = 3;
+    // simulcast layers to publish, when empty, it'll default to a single
+    // video layer at the same resolution as input video
+    repeated VideoLayer layers = 4;
+}
+
+message ListIngressRequest {
+    // when blank, lists all ingress endpoints
+    string room = 1;
+}
+
+message ListIngressResponse {
+    repeated IngressInfo items = 1;
+}
+
+message DeleteIngressRequest {
+    string id = 1;
+}
