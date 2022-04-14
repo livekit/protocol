@@ -42,12 +42,17 @@ message IngressInfo {
 
 message CreateIngressRequest {
     IngressInput input_type = 1;
+    // room to publish to
     string room_name = 2;
+    // publish as participant
     string participant_identity = 3;
+    // name of publishing participant (used for display only)
     string participant_name = 4;
     IngressAudioOptions audio = 5;
     IngressVideoOptions video = 6;
     // true to disable transcoding and publish input codecs
+    // when this is enabled, and input codecs aren't compatible with WebRTC, we'll
+    // throw an error.
     bool disable_transcode = 7;
 }
 
@@ -66,8 +71,8 @@ message IngressVideoOptions {
     TrackSource source = 2;
     // desired mime_type to publish to room
     string mime_type = 3;
-    // simulcast layers to publish, when empty, it'll default to a single
-    // video layer at the same resolution as input video
+    // simulcast layers to publish, when empty, it'll pick default simulcast
+    // layers at 1/2 and 1/4 of the dimensions
     repeated VideoLayer layers = 4;
 }
 
