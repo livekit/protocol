@@ -63,25 +63,6 @@ func TestAccessToken(t *testing.T) {
 		// default validity
 		require.True(t, claim.Expiry.Time().Sub(claim.IssuedAt.Time()) > time.Minute)
 	})
-
-	t.Run("backwards compatible with jti identity tokens", func(t *testing.T) {
-		apiKey, secret := apiKeypair()
-		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
-		at := NewAccessToken(apiKey, secret).
-			AddGrant(videoGrant).
-			SetValidFor(time.Minute * 5).
-			SetIdentity("user")
-		value, err := at.toJWTOld()
-		//fmt.Println(raw)
-		require.NoError(t, err)
-
-		verifier, err := ParseAPIToken(value)
-		require.NoError(t, err)
-
-		grants, err := verifier.Verify(secret)
-		require.NoError(t, err)
-		require.Equal(t, "user", grants.Identity)
-	})
 }
 
 func apiKeypair() (string, string) {

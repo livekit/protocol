@@ -11,7 +11,7 @@ const (
 	defaultValidDuration = 6 * time.Hour
 )
 
-// Signer that produces token signed with API key and secret
+// AccessToken produces token signed with API key and secret
 type AccessToken struct {
 	apiKey   string
 	secret   string
@@ -77,33 +77,6 @@ func (t *AccessToken) ToJWT() (string, error) {
 		NotBefore: jwt.NewNumericDate(time.Now()),
 		Expiry:    jwt.NewNumericDate(time.Now().Add(validFor)),
 		Subject:   t.grant.Identity,
-		// eventually deprecate using ID as identity
-		ID: t.grant.Identity,
-	}
-	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).CompactSerialize()
-}
-
-func (t *AccessToken) toJWTOld() (string, error) {
-	if t.apiKey == "" || t.secret == "" {
-		return "", ErrKeysMissing
-	}
-
-	sig, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.HS256, Key: []byte(t.secret)},
-		(&jose.SignerOptions{}).WithType("JWT"))
-	if err != nil {
-		return "", err
-	}
-
-	validFor := defaultValidDuration
-	if t.validFor > 0 {
-		validFor = t.validFor
-	}
-
-	cl := jwt.Claims{
-		Issuer:    t.apiKey,
-		NotBefore: jwt.NewNumericDate(time.Now()),
-		Expiry:    jwt.NewNumericDate(time.Now().Add(validFor)),
-		ID:        t.grant.Identity,
 	}
 	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).CompactSerialize()
 }
