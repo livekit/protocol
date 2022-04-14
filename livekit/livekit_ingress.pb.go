@@ -232,13 +232,18 @@ type CreateIngressRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	InputType           IngressInput         `protobuf:"varint,1,opt,name=input_type,json=inputType,proto3,enum=livekit.IngressInput" json:"input_type,omitempty"`
-	RoomName            string               `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	ParticipantIdentity string               `protobuf:"bytes,3,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
-	ParticipantName     string               `protobuf:"bytes,4,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
-	Audio               *IngressAudioOptions `protobuf:"bytes,5,opt,name=audio,proto3" json:"audio,omitempty"`
-	Video               *IngressVideoOptions `protobuf:"bytes,6,opt,name=video,proto3" json:"video,omitempty"`
+	InputType IngressInput `protobuf:"varint,1,opt,name=input_type,json=inputType,proto3,enum=livekit.IngressInput" json:"input_type,omitempty"`
+	// room to publish to
+	RoomName string `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	// publish as participant
+	ParticipantIdentity string `protobuf:"bytes,3,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	// name of publishing participant (used for display only)
+	ParticipantName string               `protobuf:"bytes,4,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
+	Audio           *IngressAudioOptions `protobuf:"bytes,5,opt,name=audio,proto3" json:"audio,omitempty"`
+	Video           *IngressVideoOptions `protobuf:"bytes,6,opt,name=video,proto3" json:"video,omitempty"`
 	// true to disable transcoding and publish input codecs
+	// when this is enabled, and input codecs aren't compatible with WebRTC, we'll
+	// throw an error.
 	DisableTranscode bool `protobuf:"varint,7,opt,name=disable_transcode,json=disableTranscode,proto3" json:"disable_transcode,omitempty"`
 }
 
@@ -420,8 +425,8 @@ type IngressVideoOptions struct {
 	Source TrackSource `protobuf:"varint,2,opt,name=source,proto3,enum=livekit.TrackSource" json:"source,omitempty"`
 	// desired mime_type to publish to room
 	MimeType string `protobuf:"bytes,3,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
-	// simulcast layers to publish, when empty, it'll default to a single
-	// video layer at the same resolution as input video
+	// simulcast layers to publish, when empty, it'll pick default simulcast
+	// layers at 1/2 and 1/4 of the dimensions
 	Layers []*VideoLayer `protobuf:"bytes,4,rep,name=layers,proto3" json:"layers,omitempty"`
 }
 
