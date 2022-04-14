@@ -60,16 +60,20 @@ message TrackCompositeEgressRequest {
 message TrackEgressRequest {
   string room_name = 1;  // required
   string track_id = 2;   // required
+  bool containerize = 3; // does not work with websocket output
   oneof output {         // required
-    string http_url = 3;
-    string websocket_url = 4;
+    S3Upload s3 = 4;
+    GCPUpload gcp = 5;
+    AzureBlobUpload azure = 6;
+    string websocket_url = 7;
   }
 }
 
 enum EncodedFileType {
-  MP4  = 0;
-  OGG = 1;
-//  WEBM = 2; coming soon
+  DEFAULT = 0;
+  MP4  = 1;
+  OGG = 2;
+//  WEBM = 3; coming soon
 }
 
 message EncodedFileOutput {
