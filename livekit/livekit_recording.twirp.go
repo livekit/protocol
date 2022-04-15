@@ -1347,7 +1347,7 @@ func (s *recordingServiceServer) serveEndRecordingProtobuf(ctx context.Context, 
 }
 
 func (s *recordingServiceServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor1, 0
+	return twirpFileDescriptor2, 0
 }
 
 func (s *recordingServiceServer) ProtocGenTwirpVersion() string {
@@ -1361,7 +1361,7 @@ func (s *recordingServiceServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "RecordingService")
 }
 
-var twirpFileDescriptor1 = []byte{
+var twirpFileDescriptor2 = []byte{
 	// 828 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0x41, 0x73, 0xe3, 0x34,
 	0x14, 0xae, 0xed, 0x38, 0xb1, 0x5f, 0xdb, 0x6c, 0x50, 0xa1, 0x78, 0xb3, 0x05, 0x82, 0xf7, 0xb0,
