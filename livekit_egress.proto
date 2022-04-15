@@ -41,11 +41,11 @@ message RoomCompositeEgressRequest {
   }
 }
 
-// composite a single audio and video track
+// containerize up to one audio and one video track
 message TrackCompositeEgressRequest {
   string room_name = 1;      // required
-  string audio_track_id = 2; // required
-  string video_track_id = 3; // required
+  string audio_track_id = 2; // optional
+  string video_track_id = 3; // optional
   oneof output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
@@ -61,21 +61,24 @@ message TrackEgressRequest {
   string room_name = 1;  // required
   string track_id = 2;   // required
   oneof output {         // required
-    string http_url = 3;
-    string websocket_url = 4;
+    S3Upload s3 = 3;
+    GCPUpload gcp = 4;
+    AzureBlobUpload azure = 5;
+    string websocket_url = 6;
   }
 }
 
 enum EncodedFileType {
-  MP4  = 0;
-  OGG = 1;
-//  WEBM = 2; coming soon
+  DEFAULT = 0; // file type will be chosen based on codecs
+  MP4  = 1;
+  OGG = 2;
+//  WEBM = 3; coming soon
 }
 
 message EncodedFileOutput {
-  EncodedFileType file_type = 1; // required, must be compatible with codec selection
-  string filepath = 2;
-  oneof output {
+  EncodedFileType file_type = 1; // optional
+  string filepath = 2;           // optional
+  oneof output {                 // required
     S3Upload s3 = 3;
     GCPUpload gcp = 4;
     AzureBlobUpload azure = 5;
