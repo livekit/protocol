@@ -23,7 +23,7 @@ const (
 type EncodedFileType int32
 
 const (
-	EncodedFileType_DEFAULT EncodedFileType = 0
+	EncodedFileType_DEFAULT EncodedFileType = 0 // file type will be chosen based on codecs
 	EncodedFileType_MP4     EncodedFileType = 1
 	EncodedFileType_OGG     EncodedFileType = 2 //  WEBM = 3; coming soon
 )
@@ -479,7 +479,7 @@ func (*RoomCompositeEgressRequest_Preset) isRoomCompositeEgressRequest_Options()
 
 func (*RoomCompositeEgressRequest_Advanced) isRoomCompositeEgressRequest_Options() {}
 
-// composite a single audio and/or video track
+// containerize up to one audio and one video track
 type TrackCompositeEgressRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -755,8 +755,8 @@ type EncodedFileOutput struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	FileType EncodedFileType `protobuf:"varint,1,opt,name=file_type,json=fileType,proto3,enum=livekit.EncodedFileType" json:"file_type,omitempty"` // required, must be compatible with codec selection
-	Filepath string          `protobuf:"bytes,2,opt,name=filepath,proto3" json:"filepath,omitempty"`
+	FileType EncodedFileType `protobuf:"varint,1,opt,name=file_type,json=fileType,proto3,enum=livekit.EncodedFileType" json:"file_type,omitempty"` // optional
+	Filepath string          `protobuf:"bytes,2,opt,name=filepath,proto3" json:"filepath,omitempty"`                                               // optional
 	// Types that are assignable to Output:
 	//	*EncodedFileOutput_S3
 	//	*EncodedFileOutput_Gcp
