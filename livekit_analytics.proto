@@ -55,6 +55,7 @@ message AnalyticsStat {
   string track_id = 8;
   float score = 9;
   repeated AnalyticsStream streams = 10;
+  string mime = 11;
 }
 
 message AnalyticsStats {
@@ -102,6 +103,7 @@ message AnalyticsEvent {
   string egress_id = 13;
   VideoQuality max_subscribed_video_quality = 14;
   ParticipantInfo publisher = 15;
+  string mime = 16;
 }
 
 message AnalyticsEvents {

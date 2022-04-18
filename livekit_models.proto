@@ -76,6 +76,12 @@ enum TrackSource {
   SCREEN_SHARE_AUDIO = 4;
 }
 
+message SimulcastCodecInfo {
+  string mime_type = 1;
+  string mid = 2;
+  string cid = 3;
+}
+
 message TrackInfo {
   string sid = 1;
   TrackType type = 2;
@@ -96,7 +102,7 @@ message TrackInfo {
   // mime type of codec
   string mime_type = 11;
   string mid = 12;
-  string alternative_mime_type = 13;
+  repeated SimulcastCodecInfo codecs = 13;
 }
 
 enum VideoQuality {

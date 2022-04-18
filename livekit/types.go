@@ -1,5 +1,7 @@
 package livekit
 
+import strings "strings"
+
 // ----------------------------------------------------------------
 
 type TrackID string
@@ -72,3 +74,20 @@ func NodeIDsAsStrings(ids []NodeID) []string {
 
 // ----------------------------------------------------------------
 type ParticipantKey string
+
+type CodecMime string
+
+func CodecMimeFromClientCodec(codec string, codecType TrackType) CodecMime {
+	if codecType == TrackType_VIDEO && !strings.HasPrefix(codec, "video/") {
+		codec = "video/" + codec
+	} else if codecType == TrackType_AUDIO && !strings.HasPrefix(codec, "audio/") {
+		codec = "audio/" + codec
+	}
+	return CodecMime(codec)
+}
+
+func (c CodecMime) ToClientCodec() string {
+	codec := strings.TrimPrefix(string(c), "video/")
+	codec = strings.TrimPrefix(codec, "audio/")
+	return codec
+}
