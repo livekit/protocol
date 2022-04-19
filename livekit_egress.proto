@@ -8,8 +8,8 @@ option ruby_package = "LiveKit::Proto";
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
-//  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo); coming soon
-//  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);                   coming soon
+  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
+  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
   // update web composite layout
   rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
@@ -69,10 +69,9 @@ message TrackEgressRequest {
 }
 
 enum EncodedFileType {
-  DEFAULT = 0; // file type will be chosen based on codecs
+  DEFAULT_FILETYPE = 0; // file type will be chosen based on codecs
   MP4  = 1;
   OGG = 2;
-//  WEBM = 3; coming soon
 }
 
 message EncodedFileOutput {
@@ -105,8 +104,8 @@ message AzureBlobUpload {
 }
 
 enum StreamProtocol {
-  RTMP = 0;
-//  SRT  = 1; coming soon
+  DEFAULT_PROTOCOL = 0; // protocol will be chosen based on urls
+  RTMP = 1;
 }
 
 message StreamOutput {
@@ -125,9 +124,6 @@ enum VideoCodec {
   H264_BASELINE = 1;
   H264_MAIN = 2;
   H264_HIGH = 3;
-//  HEVC = 4; coming soon
-//  VP8 = 5;  coming soon
-//  VP9 = 6;  coming soon
 }
 
 message EncodingOptions {
