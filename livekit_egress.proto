@@ -8,8 +8,8 @@ option ruby_package = "LiveKit::Proto";
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
-//  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo); coming soon
-//  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);                   coming soon
+  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
+  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
   // update web composite layout
   rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
@@ -36,22 +36,22 @@ message RoomCompositeEgressRequest {
     StreamOutput stream = 7;
   }
   oneof options {
-    EncodingOptionsPreset preset = 8; // (default none)
-    EncodingOptions advanced = 9;     // (default none)
+    EncodingOptionsPreset preset = 8; // (default H264_720P_30)
+    EncodingOptions advanced = 9;     // (optional)
   }
 }
 
 // containerize up to one audio and one video track
 message TrackCompositeEgressRequest {
   string room_name = 1;      // required
-  string audio_track_id = 2; // optional
-  string video_track_id = 3; // optional
+  string audio_track_id = 2; // (optional)
+  string video_track_id = 3; // (optional)
   oneof output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
   }
   oneof options {
-    EncodingOptionsPreset preset = 6; // (optional)
+    EncodingOptionsPreset preset = 6; // (default H264_720P_30)
     EncodingOptions advanced = 7;     // (optional)
   }
 }
@@ -61,27 +61,33 @@ message TrackEgressRequest {
   string room_name = 1;  // required
   string track_id = 2;   // required
   oneof output {         // required
-    S3Upload s3 = 3;
-    GCPUpload gcp = 4;
-    AzureBlobUpload azure = 5;
-    string websocket_url = 6;
+    DirectFileOutput file = 3;
+    string websocket_url = 4;
   }
 }
 
 enum EncodedFileType {
-  DEFAULT = 0; // file type will be chosen based on codecs
+  DEFAULT_FILETYPE = 0; // file type chosen based on codecs
   MP4  = 1;
   OGG = 2;
-//  WEBM = 3; coming soon
 }
 
 message EncodedFileOutput {
-  EncodedFileType file_type = 1; // optional
-  string filepath = 2;           // optional
+  EncodedFileType file_type = 1; // (optional)
+  string filepath = 2;           // (optional)
   oneof output {                 // required
     S3Upload s3 = 3;
     GCPUpload gcp = 4;
     AzureBlobUpload azure = 5;
+  }
+}
+
+message DirectFileOutput {
+  string filepath = 1; // (optional)
+  oneof output {       // required
+    S3Upload s3 = 2;
+    GCPUpload gcp = 3;
+    AzureBlobUpload azure = 4;
   }
 }
 
@@ -105,8 +111,8 @@ message AzureBlobUpload {
 }
 
 enum StreamProtocol {
-  RTMP = 0;
-//  SRT  = 1; coming soon
+  DEFAULT_PROTOCOL = 0; // protocol chosen based on urls
+  RTMP = 1;
 }
 
 message StreamOutput {
@@ -125,9 +131,6 @@ enum VideoCodec {
   H264_BASELINE = 1;
   H264_MAIN = 2;
   H264_HIGH = 3;
-//  HEVC = 4; coming soon
-//  VP8 = 5;  coming soon
-//  VP9 = 6;  coming soon
 }
 
 message EncodingOptions {
@@ -161,7 +164,7 @@ message UpdateStreamRequest {
 }
 
 message ListEgressRequest {
-  string room_name = 1; // optional, when empty lists all egresses
+  string room_name = 1; // (optional, used to filter results)
 }
 
 message ListEgressResponse {
