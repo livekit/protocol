@@ -85,9 +85,9 @@ message EncodedFileOutput {
 message DirectFileOutput {
   string filepath = 1; // (optional)
   oneof output {       // required
-    S3Upload s3 = 3;
-    GCPUpload gcp = 4;
-    AzureBlobUpload azure = 5;
+    S3Upload s3 = 2;
+    GCPUpload gcp = 3;
+    AzureBlobUpload azure = 4;
   }
 }
 
