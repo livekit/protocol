@@ -60,6 +60,9 @@ message ParticipantInfo {
   uint32 version = 10;
   ParticipantPermission permission = 11;
   string region = 12;
+  // indicates the participant has an active publisher connection
+  // and can publish to the server
+  bool is_publisher = 13;
 }
 
 enum TrackType {
