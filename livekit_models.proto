@@ -117,6 +117,8 @@ message VideoLayer {
   // target bitrate, server will measure actual
   uint32 bitrate = 4;
   uint32 ssrc = 5;
+  // publishing FPS for this layer, used with simulcasted streams
+  float fps = 6;
 }
 
 // new DataPacket API
