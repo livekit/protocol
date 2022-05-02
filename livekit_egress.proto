@@ -186,16 +186,18 @@ message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
   EgressStatus status = 3;
+  int64 started_at = 4;
+  int64 ended_at = 5;
+  string error = 6;
   oneof request {
-    RoomCompositeEgressRequest room_composite = 4;
-    TrackCompositeEgressRequest track_composite = 5;
-    TrackEgressRequest track = 6;
+    RoomCompositeEgressRequest room_composite = 7;
+    TrackCompositeEgressRequest track_composite = 8;
+    TrackEgressRequest track = 9;
   }
   oneof result {
-    StreamInfoList stream = 7;
-    FileInfo file = 8;
+    StreamInfoList stream = 10;
+    FileInfo file = 11;
   }
-  string error = 9;
 }
 
 message StreamInfoList {
@@ -204,14 +206,12 @@ message StreamInfoList {
 
 message StreamInfo {
   string url = 1;
-  int64 started_at = 2;
-  int64 ended_at = 3;
+  int64 duration = 2;
 }
 
 message FileInfo {
   string filename = 1;
-  int64 started_at = 2;
-  int64 ended_at = 3;
-  int64 size = 4;
-  string location = 5;
+  int64 size = 2;
+  int64 duration = 3;
+  string location = 4;
 }
