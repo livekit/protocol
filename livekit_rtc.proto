@@ -218,9 +218,11 @@ message SubscribedQualityUpdate {
 }
 
 message TrackPermission {
+  // permission could be granted either by participant sid or identity
   string participant_sid = 1;
   bool all_tracks = 2;
   repeated string track_sids = 3;
+  string participant_identity = 4;
 }
 
 message SubscriptionPermission {
