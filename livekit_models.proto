@@ -244,7 +244,9 @@ message RTPStats {
   map<int32, uint32> gap_histogram = 24;
 
   uint32 nacks = 25;
+  uint32 nack_acks = 37;
   uint32 nack_misses = 26;
+  uint32 nack_repeated = 38;
 
   uint32 plis = 27;
   google.protobuf.Timestamp last_pli = 28;
