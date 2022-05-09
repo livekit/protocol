@@ -60,6 +60,9 @@ message ParticipantInfo {
   uint32 version = 10;
   ParticipantPermission permission = 11;
   string region = 12;
+  // indicates the participant has an active publisher connection
+  // and can publish to the server
+  bool is_publisher = 13;
 }
 
 enum TrackType {
@@ -248,7 +251,9 @@ message RTPStats {
   map<int32, uint32> gap_histogram = 24;
 
   uint32 nacks = 25;
+  uint32 nack_acks = 37;
   uint32 nack_misses = 26;
+  uint32 nack_repeated = 38;
 
   uint32 plis = 27;
   google.protobuf.Timestamp last_pli = 28;

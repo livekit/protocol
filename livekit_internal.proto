@@ -107,6 +107,7 @@ message StartSession {
   string name = 13;
   // A user's ClaimGrants serialized in JSON
   string grants_json = 14;
+  bool adaptive_stream = 15;
 }
 
 message EndSession {

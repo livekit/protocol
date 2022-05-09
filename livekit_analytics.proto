@@ -21,26 +21,26 @@ enum StreamType {
 
 message AnalyticsVideoLayer {
   int32 layer = 1;
-  uint32 total_packets = 2;
-  uint64 total_bytes = 3;
-  uint32 total_frames = 4;
+  uint32 packets = 2;
+  uint64 bytes = 3;
+  uint32 frames = 4;
 }
 
 message AnalyticsStream {
   uint32 ssrc = 1;
-  uint32 total_primary_packets = 2;
-  uint64 total_primary_bytes = 3;
-  uint32 total_retransmit_packets = 4;
-  uint64 total_retransmit_bytes = 5;
-  uint32 total_padding_packets = 6;
-  uint64 total_padding_bytes = 7;
-  uint32 total_packets_lost = 8;
-  uint32 total_frames = 9;
+  uint32 primary_packets = 2;
+  uint64 primary_bytes = 3;
+  uint32 retransmit_packets = 4;
+  uint64 retransmit_bytes = 5;
+  uint32 padding_packets = 6;
+  uint64 padding_bytes = 7;
+  uint32 packets_lost = 8;
+  uint32 frames = 9;
   uint32 rtt = 10;
   uint32 jitter = 11;
-  uint32 total_nacks = 12;
-  uint32 total_plis = 13;
-  uint32 total_firs = 14;
+  uint32 nacks = 12;
+  uint32 plis = 13;
+  uint32 firs = 14;
   repeated AnalyticsVideoLayer video_layers = 15;
 }
 
