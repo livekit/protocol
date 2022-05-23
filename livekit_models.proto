@@ -83,6 +83,7 @@ message SimulcastCodecInfo {
   string mime_type = 1;
   string mid = 2;
   string cid = 3;
+  repeated VideoLayer layers = 4;
 }
 
 message TrackInfo {
