@@ -36,6 +36,13 @@ type ClaimGrants struct {
 	Metadata string `json:"metadata,omitempty"`
 }
 
+func (c *ClaimGrants) Clone() *ClaimGrants {
+	clone := *c
+	clone.Video = c.Video.Clone()
+
+	return &clone
+}
+
 func (v *VideoGrant) SetCanPublish(val bool) {
 	v.CanPublish = &val
 }
@@ -77,4 +84,23 @@ func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 		Hidden:         v.Hidden,
 		Recorder:       v.Recorder,
 	}
+}
+
+func (v *VideoGrant) Clone() *VideoGrant {
+	if v == nil {
+		return nil
+	}
+
+	clone := *v
+
+	canPublish := *v.CanPublish
+	clone.CanPublish = &canPublish
+
+	canSubscribe := *v.CanSubscribe
+	clone.CanSubscribe = &canSubscribe
+
+	canPublishData := *v.CanPublishData
+	clone.CanPublishData = &canPublishData
+
+	return &clone
 }
