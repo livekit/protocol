@@ -37,6 +37,10 @@ type ClaimGrants struct {
 }
 
 func (c *ClaimGrants) Clone() *ClaimGrants {
+	if c == nil {
+		return nil
+	}
+
 	clone := *c
 	clone.Video = c.Video.Clone()
 
