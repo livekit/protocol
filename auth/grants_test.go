@@ -45,7 +45,7 @@ func TestGrants(t *testing.T) {
 			Room:           "room",
 			CanPublish:     &tr,
 			CanSubscribe:   &fa,
-			CanPublishData: &tr,
+			CanPublishData: nil,
 			Hidden:         true,
 			Recorder:       false,
 		}
@@ -61,7 +61,7 @@ func TestGrants(t *testing.T) {
 		require.NotSame(t, grants.Video, clone.Video)
 		require.NotSame(t, grants.Video.CanPublish, clone.Video.CanPublish)
 		require.NotSame(t, grants.Video.CanSubscribe, clone.Video.CanSubscribe)
-		require.NotSame(t, grants.Video.CanPublishData, clone.Video.CanPublishData)
+		require.Same(t, grants.Video.CanPublishData, clone.Video.CanPublishData)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
 	})
