@@ -64,6 +64,12 @@ message NodeStats {
   float load_avg_last5min = 19;
   float load_avg_last15min = 20;
   float cpu_load = 21;
+
+  // retransmissions
+  uint64 retransmit_bytes_out = 22;
+  uint64 retransmit_packets_out = 23;
+  float retransmit_bytes_out_per_sec = 24;
+  float retransmit_packets_out_per_sec = 25;
 }
 
 // message to RTC nodes
