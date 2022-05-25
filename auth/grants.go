@@ -97,14 +97,20 @@ func (v *VideoGrant) Clone() *VideoGrant {
 
 	clone := *v
 
-	canPublish := *v.CanPublish
-	clone.CanPublish = &canPublish
+	if v.CanPublish != nil {
+		canPublish := *v.CanPublish
+		clone.CanPublish = &canPublish
+	}
 
-	canSubscribe := *v.CanSubscribe
-	clone.CanSubscribe = &canSubscribe
+	if v.CanSubscribe != nil {
+		canSubscribe := *v.CanSubscribe
+		clone.CanSubscribe = &canSubscribe
+	}
 
-	canPublishData := *v.CanPublishData
-	clone.CanPublishData = &canPublishData
+	if v.CanPublishData != nil {
+		canPublishData := *v.CanPublishData
+		clone.CanPublishData = &canPublishData
+	}
 
 	return &clone
 }
