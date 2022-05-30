@@ -79,6 +79,12 @@ enum SignalTarget {
   SUBSCRIBER = 1;
 }
 
+message SimulcastCodec {
+  string codec = 1;
+  string cid = 2;
+  bool enable_simulcast_layers = 3;
+}
+
 message AddTrackRequest {
   // client ID of track, to match it when RTC track is received
   string cid = 1;
@@ -93,6 +99,8 @@ message AddTrackRequest {
   bool disable_dtx = 7;
   TrackSource source = 8;
   repeated VideoLayer layers = 9;
+
+  repeated SimulcastCodec simulcast_codecs = 10;
 }
 
 message TrickleRequest {
@@ -212,9 +220,15 @@ message SubscribedQuality {
   bool enabled = 2;
 }
 
+message SubscribedCodec {
+  string codec = 1;
+  repeated SubscribedQuality qualities = 2;
+}
+
 message SubscribedQualityUpdate {
   string track_sid = 1;
   repeated SubscribedQuality subscribed_qualities = 2;
+  repeated SubscribedCodec subscribed_codecs = 3;
 }
 
 message TrackPermission {
