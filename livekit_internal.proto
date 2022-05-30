@@ -72,8 +72,8 @@ message NodeStats {
   float retransmit_packets_out_per_sec = 25;
 
   // participant joins
-  uint64 participant_joins = 26;
-  float participant_joins_per_sec = 27;
+  uint64 participant_join = 26;
+  float participant_join_per_sec = 27;
 }
 
 // message to RTC nodes
