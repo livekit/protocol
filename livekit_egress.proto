@@ -85,11 +85,12 @@ message EncodedFileOutput {
 
 message SegmentedStreamOutput {
   SegmentedStreamType stream_type = 1; // (optional)
-  string fileprefix = 2;           // (optional)
+  string segment_filename_prefix = 2;  // (optional)
+  string playlist_filename = 3;        // (optional)
   oneof output {                 // required
-    S3Upload s3 = 3;
-    GCPUpload gcp = 4;
-    AzureBlobUpload azure = 5;
+    S3Upload s3 = 4;
+    GCPUpload gcp = 5;
+    AzureBlobUpload azure = 6;
   }
 }
 
