@@ -87,10 +87,11 @@ message SegmentedStreamOutput {
   SegmentedStreamType stream_type = 1; // (optional)
   string segment_filename_prefix = 2;  // (optional)
   string playlist_filename = 3;        // (optional)
+  uint32 segment_duration = 4;         // (optional)
   oneof output {                 // required
-    S3Upload s3 = 4;
-    GCPUpload gcp = 5;
-    AzureBlobUpload azure = 6;
+    S3Upload s3 = 5;
+    GCPUpload gcp = 6;
+    AzureBlobUpload azure = 7;
   }
 }
 
