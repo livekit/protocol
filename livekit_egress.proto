@@ -34,6 +34,7 @@ message RoomCompositeEgressRequest {
   oneof output {                // required
     EncodedFileOutput file = 6;
     StreamOutput stream = 7;
+    SegmentedFileOutput segments = 10;
   }
   oneof options {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
@@ -216,6 +217,7 @@ message EgressInfo {
   oneof result {
     StreamInfoList stream = 7;
     FileInfo file = 8;
+    SegmentsInfo segments = 12;
   }
 }
 
@@ -233,4 +235,12 @@ message FileInfo {
   int64 duration = 6;
   int64 size = 4;
   string location = 5;
+}
+
+message SegmentsInfo {
+  string playlist_name = 1;
+  int64 duration = 2;
+  int64 size = 3;
+  string playlist_location = 4;
+  int64 segment_count = 5;
 }
