@@ -238,8 +238,9 @@ message FileInfo {
 }
 
 message SegmentsInfo {
-  string playlist_filename = 1;
+  string playlist_name = 1;
   int64 duration = 2;
   int64 size = 3;
   string playlist_location = 4;
+  int64 segment_count = 5;
 }
