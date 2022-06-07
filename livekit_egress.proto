@@ -49,6 +49,7 @@ message TrackCompositeEgressRequest {
   oneof output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
+    SegmentedFileOutput segments = 8;
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
@@ -79,6 +80,19 @@ message EncodedFileOutput {
     S3Upload s3 = 3;
     GCPUpload gcp = 4;
     AzureBlobUpload azure = 5;
+  }
+}
+
+// Used to generate HLS segments or other kind of segmented output
+message SegmentedFileOutput {
+  SegmentedFileProtocol protocol = 1; // (optional)
+  string filename_prefix = 2;      // (optional)
+  string playlist_name = 3;        // (optional)
+  uint32 segment_duration = 4;     // (optional)
+  oneof output {                   // required
+    S3Upload s3 = 5;
+    GCPUpload gcp = 6;
+    AzureBlobUpload azure = 7;
   }
 }
 
@@ -113,6 +127,11 @@ message AzureBlobUpload {
 enum StreamProtocol {
   DEFAULT_PROTOCOL = 0; // protocol chosen based on urls
   RTMP = 1;
+}
+
+enum SegmentedFileProtocol {
+  DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
+  HLS_PROTOCOL = 1;
 }
 
 message StreamOutput {
