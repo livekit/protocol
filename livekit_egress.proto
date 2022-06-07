@@ -34,6 +34,7 @@ message RoomCompositeEgressRequest {
   oneof output {                // required
     EncodedFileOutput file = 6;
     StreamOutput stream = 7;
+    SegmentedFileOutput segments = 10;
   }
   oneof options {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
