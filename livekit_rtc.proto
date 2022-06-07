@@ -263,6 +263,11 @@ message DataChannelInfo {
   SignalTarget target = 3;
 }
 
+enum CandidateProtocol {
+  UDP = 0;
+  TCP = 1;
+}
+
 message SimulateScenario {
   oneof scenario {
     // simulate N seconds of speaker activity
@@ -273,5 +278,7 @@ message SimulateScenario {
     bool migration = 3;
     // server to send leave
     bool server_leave = 4;
+    // switch candidate protocol to tcp
+    CandidateProtocol switch_candidate_protocol = 5;
   }
 }
