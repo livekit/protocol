@@ -49,7 +49,7 @@ message TrackCompositeEgressRequest {
   oneof output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
-    SegmentedStreamOutput segments = 8;
+    SegmentedFileOutput segments = 8;
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
@@ -83,8 +83,9 @@ message EncodedFileOutput {
   }
 }
 
-message SegmentedStreamOutput {
-  SegmentedStreamType stream_type = 1; // (optional)
+// Used to generate HLS segments or other kind of segmented output
+message SegmentedFileOutput {
+  SegmentedFileType file_type = 1; // (optional)
   string segment_filename_prefix = 2;  // (optional)
   string playlist_filename = 3;        // (optional)
   uint32 segment_duration = 4;         // (optional)
@@ -128,9 +129,9 @@ enum StreamProtocol {
   RTMP = 1;
 }
 
-enum SegmentedStreamType {
-  DEFAULT_STREAMTYPE = 0;
-  HLS_STREAMTYPE = 1;
+enum SegmentedFileType {
+  DEFAULT_SEGMENTEDFILETYPE = 0;
+  HLS_SEGMENTEDFILETYPE = 1;
 }
 
 message StreamOutput {
