@@ -216,6 +216,7 @@ message EgressInfo {
   oneof result {
     StreamInfoList stream = 7;
     FileInfo file = 8;
+    SegmentsInfo segments = 12;
   }
 }
 
@@ -233,4 +234,11 @@ message FileInfo {
   int64 duration = 6;
   int64 size = 4;
   string location = 5;
+}
+
+message SegmentsInfo {
+  string playlist_filename = 1;
+  int64 duration = 2;
+  int64 size = 3;
+  string playlist_location = 4;
 }
