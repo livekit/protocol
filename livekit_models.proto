@@ -202,6 +202,7 @@ message ClientConfiguration {
   VideoConfiguration screen = 2;
 
   ClientConfigSetting resume_connection = 3;
+  DisabledCodecs disabled_codecs = 4;
 }
 
 enum ClientConfigSetting {
@@ -212,6 +213,10 @@ enum ClientConfigSetting {
 
 message VideoConfiguration {
   ClientConfigSetting hardware_encoder = 1;
+}
+
+message DisabledCodecs {
+  repeated Codec codecs = 1;
 }
 
 message RTPStats {
