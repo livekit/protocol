@@ -31,7 +31,6 @@ func init() {
 }
 
 type MessageBus interface {
-	Lock(ctx context.Context, key string, expiration time.Duration) (acquired bool, err error)
 	Subscribe(ctx context.Context, channel string) (PubSub, error)
 	// like subscribe, but ensuring only a single instance gets to process the message
 	SubscribeQueue(ctx context.Context, channel string) (PubSub, error)
