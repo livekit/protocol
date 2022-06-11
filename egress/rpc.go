@@ -5,43 +5,86 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 )
 
 const (
-	StartChannel          = "EG_START"
-	ResultsChannel        = "EG_RESULTS"
+	newEgressChannel      = "EG_START"
+	updateChannel         = "EG_RESULTS"
 	requestChannelPrefix  = "REQ_"
 	responseChannelPrefix = "RES_"
-	LockDuration          = time.Second * 3
-	requestTimeout        = time.Second * 3
+
+	RequestExpiration = time.Second * 2
+	requestTimeout    = time.Second * 3
+	lockDuration      = time.Second * 3
 )
 
-func SendRequest(ctx context.Context, bus utils.MessageBus, req proto.Message) (*livekit.EgressInfo, error) {
+// RPCClient is used by LiveKit Server
+type RPCClient interface {
+	// UpdateSubscription returns a subscription for egress info updates
+	UpdateSubscription(ctx context.Context) (utils.PubSub, error)
+	// SendRequest sends a request to all available instances
+	SendRequest(ctx context.Context, req proto.Message) (*livekit.EgressInfo, error)
+}
+
+// RPCServer is used by Egress
+type RPCServer interface {
+	// RequestSubscription returns a subscription for egress requests
+	RequestSubscription(ctx context.Context) (utils.PubSub, error)
+	// ClaimRequest is used to take ownership of a request
+	ClaimRequest(ctx context.Context, egressID string) (bool, error)
+	// EgressSubscription subscribes to requests for a specific egress ID
+	EgressSubscription(ctx context.Context, egressID string) (utils.PubSub, error)
+	// SendResponse returns an RPC response
+	SendResponse(ctx context.Context, res *livekit.EgressResponse) error
+	// SendUpdate sends an egress info update
+	SendUpdate(ctx context.Context, info *livekit.EgressInfo) error
+}
+
+type RedisRPC struct {
+	nodeID livekit.NodeID
+	bus    *utils.RedisMessageBus
+}
+
+func NewRedisRPCClient(nodeID livekit.NodeID, rc *redis.Client) RPCClient {
+	bus := utils.NewRedisMessageBus(rc)
+	return &RedisRPC{
+		nodeID: nodeID,
+		bus:    bus.(*utils.RedisMessageBus),
+	}
+}
+
+func (r *RedisRPC) UpdateSubscription(ctx context.Context) (utils.PubSub, error) {
+	return r.bus.SubscribeQueue(context.Background(), updateChannel)
+}
+
+func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*livekit.EgressInfo, error) {
 	requestID := utils.NewGuid(utils.RPCPrefix)
 	var channel string
 
-	switch r := req.(type) {
+	switch req := request.(type) {
 	case *livekit.StartEgressRequest:
-		if r.EgressId == "" {
-			r.EgressId = utils.NewGuid(utils.EgressPrefix)
-		}
-		r.RequestId = requestID
-		r.SentAt = time.Now().UnixNano()
-		channel = StartChannel
+		req.EgressId = utils.NewGuid(utils.EgressPrefix)
+		req.RequestId = requestID
+		req.SentAt = time.Now().UnixNano()
+		req.SenderId = string(r.nodeID)
+		channel = newEgressChannel
+
 	case *livekit.EgressRequest:
-		r.RequestId = requestID
-		channel = RequestChannel(r.EgressId)
+		req.RequestId = requestID
+		req.SenderId = string(r.nodeID)
+		channel = requestChannel(req.EgressId)
+
 	default:
 		return nil, errors.New("invalid request type")
 	}
 
-	sub, err := bus.Subscribe(ctx, ResponseChannel(requestID))
+	sub, err := r.bus.Subscribe(ctx, responseChannel(requestID))
 	if err != nil {
 		return nil, err
 	}
@@ -52,56 +95,63 @@ func SendRequest(ctx context.Context, bus utils.MessageBus, req proto.Message) (
 		}
 	}()
 
-	err = bus.Publish(ctx, channel, req)
+	err = r.bus.Publish(ctx, channel, request)
 	if err != nil {
 		return nil, err
 	}
 
 	select {
 	case raw := <-sub.Channel():
-		return unmarshalResponse(sub.Payload(raw))
+		res := &livekit.EgressResponse{}
+		err := proto.Unmarshal(sub.Payload(raw), res)
+		if err != nil {
+			return nil, err
+		} else if res.Error != "" {
+			return nil, errors.New(res.Error)
+		} else {
+			return res.Info, nil
+		}
+
 	case <-time.After(requestTimeout):
 		return nil, errors.New("no response from egress service")
 	}
 }
 
-func RequestChannel(egressID string) string {
+func NewRedisRPCServer(rc *redis.Client) RPCServer {
+	bus := utils.NewRedisMessageBus(rc)
+	return &RedisRPC{
+		bus: bus.(*utils.RedisMessageBus),
+	}
+}
+
+func (r *RedisRPC) RequestSubscription(ctx context.Context) (utils.PubSub, error) {
+	return r.bus.Subscribe(ctx, newEgressChannel)
+}
+
+func (r *RedisRPC) ClaimRequest(ctx context.Context, egressID string) (bool, error) {
+	claimed, err := r.bus.Lock(ctx, requestChannel(egressID), lockDuration)
+	if err != nil || !claimed {
+		return false, err
+	}
+	return true, nil
+}
+
+func (r *RedisRPC) EgressSubscription(ctx context.Context, egressID string) (utils.PubSub, error) {
+	return r.bus.Subscribe(ctx, requestChannel(egressID))
+}
+
+func (r *RedisRPC) SendResponse(ctx context.Context, res *livekit.EgressResponse) error {
+	return r.bus.Publish(ctx, responseChannel(res.RequestId), res)
+}
+
+func (r *RedisRPC) SendUpdate(ctx context.Context, info *livekit.EgressInfo) error {
+	return r.bus.Publish(ctx, updateChannel, info)
+}
+
+func requestChannel(egressID string) string {
 	return requestChannelPrefix + egressID
 }
 
-func ResponseChannel(requestID string) string {
-	return responseChannelPrefix + requestID
-}
-
-func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error) {
-	f := false
-	t := true
-	grant := &auth.VideoGrant{
-		RoomJoin:       true,
-		Room:           roomName,
-		CanSubscribe:   &t,
-		CanPublish:     &f,
-		CanPublishData: &f,
-		Hidden:         true,
-		Recorder:       true,
-	}
-
-	at := auth.NewAccessToken(apiKey, secret).
-		AddGrant(grant).
-		SetIdentity(egressID).
-		SetValidFor(24 * time.Hour)
-
-	return at.ToJWT()
-}
-
-func unmarshalResponse(data []byte) (*livekit.EgressInfo, error) {
-	res := &livekit.EgressResponse{}
-	err := proto.Unmarshal(data, res)
-	if err != nil {
-		return nil, err
-	}
-	if res.Error != "" {
-		return nil, errors.New(res.Error)
-	}
-	return res.Info, nil
+func responseChannel(nodeID string) string {
+	return responseChannelPrefix + nodeID
 }

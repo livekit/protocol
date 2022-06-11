@@ -35,7 +35,6 @@ type MessageBus interface {
 	// like subscribe, but ensuring only a single instance gets to process the message
 	SubscribeQueue(ctx context.Context, channel string) (PubSub, error)
 	Publish(ctx context.Context, channel string, msg proto.Message) error
-	Close() error
 }
 
 type PubSub interface {
@@ -109,10 +108,6 @@ func (r *RedisMessageBus) Publish(ctx context.Context, channel string, msg proto
 	}
 
 	return err
-}
-
-func (r *RedisMessageBus) Close() error {
-	return r.rc.Close()
 }
 
 type RedisPubSub struct {
