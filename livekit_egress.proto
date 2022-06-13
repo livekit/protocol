@@ -200,6 +200,8 @@ enum EgressStatus {
   EGRESS_ACTIVE = 1;
   EGRESS_ENDING = 2;
   EGRESS_COMPLETE = 3;
+  EGRESS_FAILED = 4;
+  EGRESS_ABORTED = 5;
 }
 
 message EgressInfo {
