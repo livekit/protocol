@@ -41,7 +41,7 @@ type RPCServer interface {
 	// EgressSubscription subscribes to requests for a specific egress ID
 	EgressSubscription(ctx context.Context, egressID string) (utils.PubSub, error)
 	// SendResponse returns an RPC response
-	SendResponse(ctx context.Context, res *livekit.EgressResponse) error
+	SendResponse(ctx context.Context, request proto.Message, info *livekit.EgressInfo, err error) error
 	// SendUpdate sends an egress info update
 	SendUpdate(ctx context.Context, info *livekit.EgressInfo) error
 }
@@ -140,7 +140,22 @@ func (r *RedisRPC) EgressSubscription(ctx context.Context, egressID string) (uti
 	return r.bus.Subscribe(ctx, requestChannel(egressID))
 }
 
-func (r *RedisRPC) SendResponse(ctx context.Context, res *livekit.EgressResponse) error {
+func (r *RedisRPC) SendResponse(ctx context.Context, request proto.Message, info *livekit.EgressInfo, err error) error {
+	res := &livekit.EgressResponse{
+		Info: info,
+	}
+
+	switch req := request.(type) {
+	case *livekit.StartEgressRequest:
+		res.RequestId = req.RequestId
+	case *livekit.EgressRequest:
+		res.RequestId = req.RequestId
+	}
+
+	if err != nil {
+		res.Error = err.Error()
+	}
+
 	return r.bus.Publish(ctx, responseChannel(res.RequestId), res)
 }
 
