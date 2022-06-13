@@ -37,7 +37,7 @@ type RPCServer interface {
 	// GetRequestChannel returns a subscription for egress requests
 	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
 	// ClaimRequest is used to take ownership of a request
-	ClaimRequest(ctx context.Context, egressID string) (bool, error)
+	ClaimRequest(ctx context.Context, request *livekit.StartEgressRequest) (bool, error)
 	// EgressSubscription subscribes to requests for a specific egress ID
 	EgressSubscription(ctx context.Context, egressID string) (utils.PubSub, error)
 	// SendResponse returns an RPC response
@@ -128,8 +128,8 @@ func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) 
 	return r.bus.Subscribe(ctx, newEgressChannel)
 }
 
-func (r *RedisRPC) ClaimRequest(ctx context.Context, egressID string) (bool, error) {
-	claimed, err := r.bus.Lock(ctx, requestChannel(egressID), lockDuration)
+func (r *RedisRPC) ClaimRequest(ctx context.Context, req *livekit.StartEgressRequest) (bool, error) {
+	claimed, err := r.bus.Lock(ctx, requestChannel(req.EgressId), lockDuration)
 	if err != nil || !claimed {
 		return false, err
 	}
