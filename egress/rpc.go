@@ -26,16 +26,16 @@ const (
 
 // RPCClient is used by LiveKit Server
 type RPCClient interface {
-	// UpdateSubscription returns a subscription for egress info updates
-	UpdateSubscription(ctx context.Context) (utils.PubSub, error)
+	// GetUpdateChannel returns a subscription for egress info updates
+	GetUpdateChannel(ctx context.Context) (utils.PubSub, error)
 	// SendRequest sends a request to all available instances
 	SendRequest(ctx context.Context, req proto.Message) (*livekit.EgressInfo, error)
 }
 
 // RPCServer is used by Egress
 type RPCServer interface {
-	// RequestSubscription returns a subscription for egress requests
-	RequestSubscription(ctx context.Context) (utils.PubSub, error)
+	// GetRequestChannel returns a subscription for egress requests
+	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
 	// ClaimRequest is used to take ownership of a request
 	ClaimRequest(ctx context.Context, egressID string) (bool, error)
 	// EgressSubscription subscribes to requests for a specific egress ID
@@ -59,7 +59,7 @@ func NewRedisRPCClient(nodeID livekit.NodeID, rc *redis.Client) RPCClient {
 	}
 }
 
-func (r *RedisRPC) UpdateSubscription(ctx context.Context) (utils.PubSub, error) {
+func (r *RedisRPC) GetUpdateChannel(ctx context.Context) (utils.PubSub, error) {
 	return r.bus.SubscribeQueue(context.Background(), updateChannel)
 }
 
@@ -124,7 +124,7 @@ func NewRedisRPCServer(rc *redis.Client) RPCServer {
 	}
 }
 
-func (r *RedisRPC) RequestSubscription(ctx context.Context) (utils.PubSub, error) {
+func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) {
 	return r.bus.Subscribe(ctx, newEgressChannel)
 }
 
