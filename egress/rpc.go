@@ -52,6 +52,10 @@ type RedisRPC struct {
 }
 
 func NewRedisRPCClient(nodeID livekit.NodeID, rc *redis.Client) RPCClient {
+	if rc == nil {
+		return nil
+	}
+
 	bus := utils.NewRedisMessageBus(rc)
 	return &RedisRPC{
 		nodeID: nodeID,
