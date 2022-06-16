@@ -101,6 +101,9 @@ message AddTrackRequest {
   repeated VideoLayer layers = 9;
 
   repeated SimulcastCodec simulcast_codecs = 10;
+
+  // server ID of track, publish new codec to exist track
+  string sid = 11;
 }
 
 message TrickleRequest {
