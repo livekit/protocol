@@ -7,6 +7,7 @@ type Tracer interface {
 }
 
 type Span interface {
+	RecordError()
 	End()
 }
 
@@ -28,5 +29,7 @@ func (t *NoOpTracer) Start(ctx context.Context, _ string, _ ...interface{}) (con
 }
 
 type NoOpSpan struct{}
+
+func (s *NoOpSpan) RecordError() {}
 
 func (s *NoOpSpan) End() {}
