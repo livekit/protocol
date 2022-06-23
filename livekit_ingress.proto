@@ -24,24 +24,53 @@ message IngressInfo {
     enum State {
         ENDPOINT_WAITING = 0;
         ENDPOINT_ACTIVE = 1;
-        ENDPOINT_ENDED = 2;
+        ENDPOINT_PUBLISHING = 2;
+		ENDPOINT_ERROR = 3; // Received Stream is invalid
     }
     string id = 1;
-    IngressInput input_type = 2;
-    State state = 3;
-    string room = 4;
-    string participant_identity = 5;
-    string participant_name = 6;
-    bool transcode = 7;
+	string name = 2;
+    IngressInput input_type = 3;
+    State state = 4;
+	InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
+    string room = 6;
+    string participant_identity = 7;
+    string participant_name = 8;
     // for RTMP input, it'll be a rtmp:// URL
     // for FILE input, it'll be a http:// URL
     // for SRT input, it'll be a srt:// URL
-    string url = 8;
-    repeated TrackInfo tracks = 9;
+    string url = 9;
+    repeated TrackInfo tracks = 10;
+}
+
+message InputStatus {
+	string status_description = 1; // Error/non compliance description if any
+	InputVideoStatus video = 2;
+	InputAudioStatus audio = 3;	
+}
+
+message InputVideoStatus {
+	uint32 mime_type = 1;
+	uint32 bitrate = 2;
+	uint32 width = 3;
+	uint32 height = 4;
+	uint32 framerate = 5;
+}
+
+message InputAudioStatus {
+	uint32 mime_type = 1;
+	uint32 bitrate = 2;
+	uint32 channels = 3;
+	uint32 samplerate = 4;
 }
 
 message CreateIngressRequest {
     IngressInput input_type = 1;
+	// User provided indentifier for the ingress
+	string name = 2;
+}
+
+message PublishIngressRequest
+	string id = 1;
     // room to publish to
     string room_name = 2;
     // publish as participant
@@ -50,10 +79,6 @@ message CreateIngressRequest {
     string participant_name = 4;
     IngressAudioOptions audio = 5;
     IngressVideoOptions video = 6;
-    // true to disable transcoding and publish input codecs
-    // when this is enabled, and input codecs aren't compatible with WebRTC, we'll
-    // throw an error.
-    bool disable_transcode = 7;
 }
 
 message IngressAudioOptions {
@@ -74,6 +99,10 @@ message IngressVideoOptions {
     // simulcast layers to publish, when empty, it'll pick default simulcast
     // layers at 1/2 and 1/4 of the dimensions
     repeated VideoLayer layers = 4;
+}
+
+message UnpublishRequest {
+	string id = 1;
 }
 
 message ListIngressRequest {
