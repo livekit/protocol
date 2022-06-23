@@ -25,13 +25,13 @@ message IngressInfo {
         ENDPOINT_WAITING = 0;
         ENDPOINT_ACTIVE = 1;
         ENDPOINT_PUBLISHING = 2;
-		ENDPOINT_ERROR = 3; // Received Stream is invalid
+        ENDPOINT_ERROR = 3; // Received Stream is invalid
     }
     string id = 1;
-	string name = 2;
+    string name = 2;
     IngressInput input_type = 3;
     State state = 4;
-	InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
+    InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
     string room = 6;
     string participant_identity = 7;
     string participant_name = 8;
@@ -43,34 +43,34 @@ message IngressInfo {
 }
 
 message InputStatus {
-	string status_description = 1; // Error/non compliance description if any
-	InputVideoStatus video = 2;
-	InputAudioStatus audio = 3;	
+    string status_description = 1; // Error/non compliance description if any
+    InputVideoStatus video = 2;
+    InputAudioStatus audio = 3;    
 }
 
 message InputVideoStatus {
-	uint32 mime_type = 1;
-	uint32 bitrate = 2;
-	uint32 width = 3;
-	uint32 height = 4;
-	uint32 framerate = 5;
+    uint32 mime_type = 1;
+    uint32 bitrate = 2;
+    uint32 width = 3;
+    uint32 height = 4;
+    uint32 framerate = 5;
 }
 
 message InputAudioStatus {
-	uint32 mime_type = 1;
-	uint32 bitrate = 2;
-	uint32 channels = 3;
-	uint32 samplerate = 4;
+    uint32 mime_type = 1;
+    uint32 bitrate = 2;
+    uint32 channels = 3;
+    uint32 samplerate = 4;
 }
 
 message CreateIngressRequest {
     IngressInput input_type = 1;
-	// User provided indentifier for the ingress
-	string name = 2;
+    // User provided indentifier for the ingress
+    string name = 2;
 }
 
-message PublishIngressRequest
-	string id = 1;
+message PublishIngressRequest {
+    string id = 1;
     // room to publish to
     string room_name = 2;
     // publish as participant
@@ -102,7 +102,7 @@ message IngressVideoOptions {
 }
 
 message UnpublishRequest {
-	string id = 1;
+    string id = 1;
 }
 
 message ListIngressRequest {
