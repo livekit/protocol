@@ -37,6 +37,7 @@ message EgressRequest {
   oneof request {
     UpdateStreamRequest update_stream = 3;
     StopEgressRequest stop = 4;
+    UpdateLayoutRequest update_layout = 6;
   }
 }
 
