@@ -168,9 +168,19 @@ message UpdateTrackSettings {
 }
 
 message LeaveRequest {
+  enum LeaveReason {
+    UNKNOWN_REASON = 0;
+    CLIENT_INITIATED = 1;
+    DUPLICATE_IDENTITY = 2;
+    SERVER_SHUTDOWN = 3;
+    PARTICIPANT_REMOVED = 4;
+    ROOM_DELETED = 5;
+    STATE_MISMATCH = 6;
+  }
   // sent when server initiates the disconnect due to server-restart
   // indicates clients should attempt full-reconnect sequence
   bool can_reconnect = 1;
+  LeaveReason reason = 2;
 }
 
 // message to indicate published video track dimensions are changing
