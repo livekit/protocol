@@ -219,6 +219,16 @@ message DisabledCodecs {
   repeated Codec codecs = 1;
 }
 
+enum DisconnectReason {
+  UNKNOWN_REASON = 0;
+  CLIENT_INITIATED = 1;
+  DUPLICATE_IDENTITY = 2;
+  SERVER_SHUTDOWN = 3;
+  PARTICIPANT_REMOVED = 4;
+  ROOM_DELETED = 5;
+  STATE_MISMATCH = 6;
+}
+
 message RTPStats {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
