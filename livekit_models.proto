@@ -227,6 +227,7 @@ enum DisconnectReason {
   PARTICIPANT_REMOVED = 4;
   ROOM_DELETED = 5;
   STATE_MISMATCH = 6;
+  JOIN_FAILURE = 7;
 }
 
 message RTPStats {
