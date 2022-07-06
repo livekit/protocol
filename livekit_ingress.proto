@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package livekit;
 
-import "google/protobuf/empty.proto";
 import "livekit_models.proto";
 
 option go_package = "github.com/livekit/protocol/livekit";
@@ -10,75 +9,28 @@ option go_package = "github.com/livekit/protocol/livekit";
 service Ingress {
     rpc CreateIngress(CreateIngressRequest) returns (IngressInfo);
     rpc ListIngress(ListIngressRequest) returns (ListIngressResponse);
-    rpc DeleteIngress(DeleteIngressRequest) returns (google.protobuf.Empty);
-}
-
-enum IngressInput {
-    RTMP_INPUT = 0;
-//    FILE_INPUT = 1;
-//    SRT_INPUT = 2;
-//    URL_INPUT = 3;
-}
-
-message IngressInfo {
-    enum State {
-        ENDPOINT_WAITING = 0;
-        ENDPOINT_ACTIVE = 1;
-        ENDPOINT_PUBLISHING = 2;
-        ENDPOINT_ERROR = 3; // Received Stream is invalid
-    }
-    string id = 1;
-    string name = 2;
-    IngressInput input_type = 3;
-    State state = 4;
-    InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
-    string room = 6;
-    string participant_identity = 7;
-    string participant_name = 8;
-    // for RTMP input, it'll be a rtmp:// URL
-    // for FILE input, it'll be a http:// URL
-    // for SRT input, it'll be a srt:// URL
-    string url = 9;
-    repeated TrackInfo tracks = 10;
-}
-
-message InputStatus {
-    string status_description = 1; // Error/non compliance description if any
-    InputVideoStatus video = 2;
-    InputAudioStatus audio = 3;    
-}
-
-message InputVideoStatus {
-    uint32 mime_type = 1;
-    uint32 bitrate = 2;
-    uint32 width = 3;
-    uint32 height = 4;
-    uint32 framerate = 5;
-}
-
-message InputAudioStatus {
-    uint32 mime_type = 1;
-    uint32 bitrate = 2;
-    uint32 channels = 3;
-    uint32 samplerate = 4;
+    rpc StopIngress(StopIngressRequest) returns (IngressInfo);
 }
 
 message CreateIngressRequest {
     IngressInput input_type = 1;
-    // User provided indentifier for the ingress
+    // User provided identifier for the ingress
     string name = 2;
+    // room to publish to
+    string room_name = 3;
+    // publish as participant
+    string participant_identity = 4;
+    // name of publishing participant (used for display only)
+    string participant_name = 5;
+    IngressAudioOptions audio = 6;
+    IngressVideoOptions video = 7;
 }
 
-message PublishIngressRequest {
-    string id = 1;
-    // room to publish to
-    string room_name = 2;
-    // publish as participant
-    string participant_identity = 3;
-    // name of publishing participant (used for display only)
-    string participant_name = 4;
-    IngressAudioOptions audio = 5;
-    IngressVideoOptions video = 6;
+enum IngressInput {
+    RTMP_INPUT = 0;
+    //    FILE_INPUT = 1;
+    //    SRT_INPUT = 2;
+    //    URL_INPUT = 3;
 }
 
 message IngressAudioOptions {
@@ -101,8 +53,47 @@ message IngressVideoOptions {
     repeated VideoLayer layers = 4;
 }
 
-message UnpublishRequest {
-    string id = 1;
+message IngressInfo {
+    enum State {
+        ENDPOINT_WAITING = 0;
+        ENDPOINT_ACTIVE = 1;
+        ENDPOINT_PUBLISHING = 2;
+        ENDPOINT_ERROR = 3; // Received Stream is invalid
+    }
+    string ingress_id = 1;
+    string name = 2;
+    IngressInput input_type = 3;
+    State state = 4;
+    InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
+    string room = 6;
+    string participant_identity = 7;
+    string participant_name = 8;
+    // for RTMP input, it'll be a rtmp:// URL
+    // for FILE input, it'll be a http:// URL
+    // for SRT input, it'll be a srt:// URL
+    string url = 9;
+    repeated TrackInfo tracks = 10;
+}
+
+message InputStatus {
+    string status_description = 1; // Error/non compliance description if any
+    InputVideoStatus video = 2;
+    InputAudioStatus audio = 3;
+}
+
+message InputVideoStatus {
+    uint32 mime_type = 1;
+    uint32 bitrate = 2;
+    uint32 width = 3;
+    uint32 height = 4;
+    uint32 framerate = 5;
+}
+
+message InputAudioStatus {
+    uint32 mime_type = 1;
+    uint32 bitrate = 2;
+    uint32 channels = 3;
+    uint32 sample_rate = 4;
 }
 
 message ListIngressRequest {
@@ -114,6 +105,6 @@ message ListIngressResponse {
     repeated IngressInfo items = 1;
 }
 
-message DeleteIngressRequest {
-    string id = 1;
+message StopIngressRequest {
+    string ingress_id = 1;
 }
