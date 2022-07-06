@@ -71,8 +71,6 @@ enum AnalyticsEventType {
   TRACK_UNPUBLISHED = 5;
   TRACK_SUBSCRIBED = 6;
   TRACK_UNSUBSCRIBED = 7;
-  RECORDING_STARTED = 8;
-  RECORDING_ENDED = 9;
   TRACK_PUBLISHED_UPDATE = 10;
   PARTICIPANT_ACTIVE = 11;
   EGRESS_STARTED = 12;
@@ -96,7 +94,6 @@ message AnalyticsEvent {
   ParticipantInfo participant = 6;
   string track_id = 7;
   TrackInfo track = 8;
-  string recording_id = 9;
   string analytics_key = 10;
   ClientInfo  client_info = 11;
   AnalyticsClientMeta client_meta = 12;

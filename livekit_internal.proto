@@ -7,7 +7,6 @@ option ruby_package = "LiveKit::Proto";
 
 // internal protos, not exposed to clients
 import "livekit_models.proto";
-import "livekit_recording.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
 
@@ -125,26 +124,6 @@ message EndSession {
 
 message RemoveParticipant {
   string participant_id = 1;
-}
-
-message RecordingReservation {
-  string id = 1;
-  int64 submitted_at = 2;
-}
-
-message RecordingRequest {
-  string request_id = 1;
-  oneof request {
-    StartRecordingRequest start = 2;
-    AddOutputRequest add_output = 3;
-    RemoveOutputRequest remove_output = 4;
-    EndRecordingRequest end = 5;
-  }
-}
-
-message RecordingResponse {
-  string request_id = 1;
-  string error = 2;
 }
 
 message KeepAlive {
