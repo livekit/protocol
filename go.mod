@@ -7,10 +7,11 @@ require (
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/go-logr/logr v1.2.2
 	github.com/go-logr/zapr v1.2.3
-	github.com/go-redis/redis/v8 v8.11.3
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/jxskiss/base62 v0.0.0-20191017122030-4f11678b909b
 	github.com/lithammer/shortuuid/v3 v3.0.6
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0
+	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/stretchr/testify v1.7.0
 	github.com/twitchtv/twirp v8.1.0+incompatible
