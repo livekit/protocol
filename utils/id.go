@@ -16,6 +16,7 @@ const (
 	TrackPrefix       = "TR_"
 	APIKeyPrefix      = "API"
 	EgressPrefix      = "EG_"
+	IngressPrefix     = "IN_"
 	RPCPrefix         = "RPC_"
 )
 

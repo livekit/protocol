@@ -6,6 +6,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_egress.proto";
+import "livekit_ingress.proto";
 
 message StartEgressRequest {
   // request metadata
@@ -42,6 +43,32 @@ message EgressRequest {
 
 message EgressResponse {
   EgressInfo info = 1;
+  string error = 2;
+  string request_id = 3;
+}
+
+message StartIngressRequest {
+  // request metadata
+  string ingress_id = 1;
+  string request_id = 2;
+  string sender_id = 3;
+  int64 sent_at = 4;
+
+  // request
+  CreateIngressRequest request = 5;
+}
+
+message IngressRequest {
+  // request metadata
+  string ingress_id = 1;
+  string request_id = 2;
+  string sender_id = 3;
+
+  StopIngressRequest stop = 4;
+}
+
+message IngressResponse {
+  IngressInfo info = 1;
   string error = 2;
   string request_id = 3;
 }

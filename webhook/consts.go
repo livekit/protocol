@@ -19,4 +19,6 @@ const (
 	EventTrackUnpublished  = "track_unpublished"
 	EventEgressStarted     = "egress_started"
 	EventEgressEnded       = "egress_ended"
+	EventIngressStarted    = "ingress_started"
+	EventIngressEnded      = "ingress_ended"
 )
