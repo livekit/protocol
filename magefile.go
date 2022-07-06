@@ -18,7 +18,6 @@ func Proto() error {
 	twirpProtoFiles := []string{
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
-		"livekit_recording.proto",
 		"livekit_room.proto",
 	}
 	grpcProtoFiles := []string{
