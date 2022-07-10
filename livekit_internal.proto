@@ -79,6 +79,7 @@ message NodeStats {
 message RTCNodeMessage {
   string participant_key = 1;
   int64 sender_time = 11;
+  string connection_id = 13;
   oneof message {
     StartSession start_session = 2;
     SignalRequest request = 3;
