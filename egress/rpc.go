@@ -73,7 +73,9 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 
 	switch req := request.(type) {
 	case *livekit.StartEgressRequest:
-		req.EgressId = utils.NewGuid(utils.EgressPrefix)
+		if req.EgressId == "" {
+			req.EgressId = utils.NewGuid(utils.EgressPrefix)
+		}
 		req.RequestId = requestID
 		req.SentAt = time.Now().UnixNano()
 		req.SenderId = string(r.nodeID)
