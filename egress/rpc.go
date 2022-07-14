@@ -119,7 +119,7 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 		}
 
 	case <-time.After(requestTimeout):
-		return nil, errors.New("no response from egress service")
+		return nil, ErrNoResponse
 	}
 }
 
