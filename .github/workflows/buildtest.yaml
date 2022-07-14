@@ -34,7 +34,7 @@ jobs:
         version: "2021.1.1"
 
     - name: Mage Test
-      uses: magefile/mage-action@v1
+      uses: magefile/mage-action@v2
       with:
         version: latest
         args: test
