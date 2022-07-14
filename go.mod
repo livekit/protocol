@@ -8,7 +8,7 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/go-logr/zapr v1.2.3
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/jxskiss/base62 v0.0.0-20191017122030-4f11678b909b
+	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v3 v3.0.6
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0
 	github.com/pkg/errors v0.9.1
