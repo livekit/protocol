@@ -9,7 +9,7 @@ require (
 	github.com/go-logr/zapr v1.2.3
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/jxskiss/base62 v1.1.0
-	github.com/lithammer/shortuuid/v3 v3.0.6
+	github.com/lithammer/shortuuid/v3 v3.0.7
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.3.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
