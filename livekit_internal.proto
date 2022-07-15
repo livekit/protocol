@@ -63,6 +63,11 @@ message NodeStats {
   float load_avg_last5min = 19;
   float load_avg_last15min = 20;
   float cpu_load = 21;
+  uint32 sys_packets_out = 28;
+  uint32 sys_packets_dropped = 29;
+  float sys_packets_out_per_sec = 30;
+  float sys_packets_dropped_per_sec = 31;
+  float sys_packets_dropped_pct_per_sec = 32;
 
   // retransmissions
   uint64 retransmit_bytes_out = 22;
