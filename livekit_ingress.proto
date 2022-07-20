@@ -62,6 +62,7 @@ message IngressInfo {
     }
     string ingress_id = 1;
     string name = 2;
+    string stream_key = 11;
     IngressInput input_type = 3;
     Status status = 4;
     InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
