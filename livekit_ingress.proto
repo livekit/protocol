@@ -5,9 +5,14 @@ package livekit;
 import "livekit_models.proto";
 
 option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
 
 service Ingress {
+    // Create a new Ingress
     rpc CreateIngress(CreateIngressRequest) returns (IngressInfo);
+    // Update an existing Ingress. Ingress can only be updated when it's in ENDPOINT_WAITING state.
+    rpc UpdateIngress(UpdateIngressRequest) returns (IngressInfo);
     rpc ListIngress(ListIngressRequest) returns (ListIngressResponse);
     rpc StopIngress(StopIngressRequest) returns (IngressInfo);
 }
@@ -24,6 +29,10 @@ message CreateIngressRequest {
     string participant_name = 5;
     IngressAudioOptions audio = 6;
     IngressVideoOptions video = 7;
+    // when true, ingress will be re-used after completion.
+    // it'll will return to ENDPOINT_WAITING after the stream has finished (or failed)
+    // this is useful to keep the same Ingress URL for future ingestion
+    bool reusable = 8;
 }
 
 enum IngressInput {
@@ -74,6 +83,9 @@ message IngressInfo {
     // for SRT input, it'll be a srt:// URL
     string url = 9;
     repeated TrackInfo tracks = 10;
+    bool reusable = 12;
+
+    // NEXT_ID: 13
 }
 
 message InputStatus {
@@ -95,6 +107,16 @@ message InputAudioStatus {
     uint32 bitrate = 2;
     uint32 channels = 3;
     uint32 sample_rate = 4;
+}
+
+message UpdateIngressRequest {
+    string ingress_id = 1;
+    string name = 2;
+    string room_name = 3;
+    string participant_identity = 4;
+    string participant_name = 5;
+    IngressAudioOptions audio = 6;
+    IngressVideoOptions video = 7;
 }
 
 message ListIngressRequest {
