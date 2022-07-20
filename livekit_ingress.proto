@@ -32,7 +32,7 @@ message CreateIngressRequest {
     // when true, ingress will be re-used after completion.
     // it'll will return to ENDPOINT_WAITING after the stream has finished (or failed)
     // this is useful to keep the same Ingress URL for future ingestion
-    bool reuse = 8;
+    bool reusable = 8;
 }
 
 enum IngressInput {
@@ -83,6 +83,9 @@ message IngressInfo {
     // for SRT input, it'll be a srt:// URL
     string url = 9;
     repeated TrackInfo tracks = 10;
+    bool reusable = 12;
+
+    // NEXT_ID: 13
 }
 
 message InputStatus {
