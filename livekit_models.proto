@@ -287,3 +287,8 @@ message RTPStats {
   uint32 layer_lock_plis = 35;
   google.protobuf.Timestamp last_layer_lock_pli = 36;
 }
+
+message TimedVersion {
+  int64 unix_micro = 1;
+  int32 ticks = 2;
+}
