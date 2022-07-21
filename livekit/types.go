@@ -30,7 +30,18 @@ func ParticipantIDsAsStrings(ids []ParticipantID) []string {
 type ParticipantIdentity string
 type ParticipantName string
 
+// ----------------------------------------------------------------
+
 type RoomID string
+
+func StringsAsRoomIDs(roomIDs []string) []RoomID {
+	asRoomID := make([]RoomID, 0, len(roomIDs))
+	for _, roomID := range roomIDs {
+		asRoomID = append(asRoomID, RoomID(roomID))
+	}
+
+	return asRoomID
+}
 
 // ----------------------------------------------------------------
 

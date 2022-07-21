@@ -62,6 +62,8 @@ message CreateRoomRequest {
 message ListRoomsRequest {
   // when set, will only return rooms with name match
   repeated string names = 1;
+  // when set, will only return rooms with room_sids match
+  repeated string room_sids = 2;
 }
 
 message ListRoomsResponse {
@@ -71,6 +73,7 @@ message ListRoomsResponse {
 message DeleteRoomRequest {
   // name of the room
   string room = 1;
+  string room_sid = 2;
 }
 
 message DeleteRoomResponse {
@@ -79,6 +82,7 @@ message DeleteRoomResponse {
 message ListParticipantsRequest {
   // name of the room
   string room = 1;
+  string room_sid = 2;
 }
 
 message ListParticipantsResponse {
@@ -90,6 +94,8 @@ message RoomParticipantIdentity {
   string room = 1;
   // identity of the participant
   string identity = 2;
+  string room_sid = 3;
+  string participant_sid = 4;
 }
 
 message RemoveParticipantResponse {
@@ -103,6 +109,8 @@ message MuteRoomTrackRequest {
   string track_sid = 3;
   // set to true to mute, false to unmute
   bool muted = 4;
+  string room_sid = 5;
+  string participant_sid = 6;
 }
 
 message MuteRoomTrackResponse {
@@ -116,6 +124,8 @@ message UpdateParticipantRequest {
   string metadata = 3;
   // set to update the participant's permissions
   ParticipantPermission permission = 4;
+  string room_sid = 5;
+  string participant_sid = 6;
 }
 
 message UpdateSubscriptionsRequest {
@@ -127,6 +137,8 @@ message UpdateSubscriptionsRequest {
   bool subscribe = 4;
   // list of participants and their tracks
   repeated ParticipantTracks participant_tracks = 5;
+  string room_sid = 6;
+  string participant_sid = 7;
 }
 
 message UpdateSubscriptionsResponse {
@@ -138,6 +150,7 @@ message SendDataRequest {
   bytes data = 2;
   DataPacket.Kind kind = 3;
   repeated string destination_sids = 4;
+  string room_sid = 5;
 }
 
 message SendDataResponse {
@@ -148,4 +161,5 @@ message UpdateRoomMetadataRequest {
   string room = 1;
   // metadata to update. skipping updates if left empty
   string metadata = 2;
+  string room_sid = 3;
 }
