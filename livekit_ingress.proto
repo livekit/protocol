@@ -14,7 +14,7 @@ service Ingress {
     // Update an existing Ingress. Ingress can only be updated when it's in ENDPOINT_WAITING state.
     rpc UpdateIngress(UpdateIngressRequest) returns (IngressInfo);
     rpc ListIngress(ListIngressRequest) returns (ListIngressResponse);
-    rpc StopIngress(StopIngressRequest) returns (IngressInfo);
+    rpc DeleteIngress(DeleteIngressRequest) returns (IngressInfo);
 }
 
 message CreateIngressRequest {
@@ -29,10 +29,6 @@ message CreateIngressRequest {
     string participant_name = 5;
     IngressAudioOptions audio = 6;
     IngressVideoOptions video = 7;
-    // when true, ingress will be re-used after completion.
-    // it'll will return to ENDPOINT_WAITING after the stream has finished (or failed)
-    // this is useful to keep the same Ingress URL for future ingestion
-    bool reusable = 8;
 }
 
 enum IngressInput {
@@ -63,48 +59,52 @@ message IngressVideoOptions {
 }
 
 message IngressInfo {
-    enum Status {
-        ENDPOINT_WAITING = 0;
-        ENDPOINT_ACTIVE = 1;
-        ENDPOINT_PUBLISHING = 2;
-        ENDPOINT_ERROR = 3; // Received Stream is invalid
-    }
     string ingress_id = 1;
     string name = 2;
-    string stream_key = 11;
-    IngressInput input_type = 3;
-    Status status = 4;
-    InputStatus input_status = 5; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
-    string room = 6;
-    string participant_identity = 7;
-    string participant_name = 8;
+    string stream_key = 3;
+    string url = 4;
     // for RTMP input, it'll be a rtmp:// URL
     // for FILE input, it'll be a http:// URL
     // for SRT input, it'll be a srt:// URL
-    string url = 9;
-    repeated TrackInfo tracks = 10;
-    bool reusable = 12;
+    IngressInput input_type = 5;
+    IngressAudioOptions audio = 6;
+    IngressVideoOptions video = 7;
+    string room_name = 8;
+    string participant_identity = 9;
+    string participant_name = 10;
+    bool reusable = 11;
+    IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
 
     // NEXT_ID: 13
 }
 
-message InputStatus {
-    string status_description = 1; // Error/non compliance description if any
-    InputVideoStatus video = 2;
-    InputAudioStatus audio = 3;
+message IngressState {
+    enum Status {
+        ENDPOINT_INACTIVE = 0;
+        ENDPOINT_BUFFERING = 1;
+        ENDPOINT_PUBLISHING = 2;
+        ENDPOINT_ERROR = 3;
+    }
+
+    Status status = 1;
+    string error = 2; // Error/non compliance description if any
+    InputVideoState video = 3;
+    InputAudioState audio = 4;
+    string room_id = 5; // ID of the current/previous room published to
+    repeated TrackInfo tracks = 6;
 }
 
-message InputVideoStatus {
+message InputVideoState {
     uint32 mime_type = 1;
-    uint32 bitrate = 2;
+//  uint32 bitrate = 2;
     uint32 width = 3;
     uint32 height = 4;
     uint32 framerate = 5;
 }
 
-message InputAudioStatus {
+message InputAudioState {
     uint32 mime_type = 1;
-    uint32 bitrate = 2;
+//  uint32 bitrate = 2;
     uint32 channels = 3;
     uint32 sample_rate = 4;
 }
@@ -121,13 +121,13 @@ message UpdateIngressRequest {
 
 message ListIngressRequest {
     // when blank, lists all ingress endpoints
-    string room = 1;
+    string room_name = 1;
 }
 
 message ListIngressResponse {
     repeated IngressInfo items = 1;
 }
 
-message StopIngressRequest {
+message DeleteIngressRequest {
     string ingress_id = 1;
 }
