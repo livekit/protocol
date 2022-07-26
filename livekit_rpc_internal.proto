@@ -64,7 +64,10 @@ message IngressRequest {
   string request_id = 2;
   string sender_id = 3;
 
-  StopIngressRequest stop = 4;
+  oneof request {
+    UpdateIngressRequest update = 4;
+    DeleteIngressRequest delete = 5;
+  }
 }
 
 message IngressResponse {
