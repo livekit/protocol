@@ -70,8 +70,17 @@ message IngressRequest {
   }
 }
 
+message GetIngressInfoRequest {
+  string ingress_id = 1;
+  string request_id = 2;
+  string sender_id = 3;
+  int64 sent_at = 4;
+}
+
 message IngressResponse {
   IngressInfo info = 1;
   string error = 2;
   string request_id = 3;
 }
+
+
