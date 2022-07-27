@@ -16,6 +16,7 @@ import (
 const (
 	newIngressChannel     = "IN_START"
 	updateChannel         = "IN_RESULTS"
+	entityChannel         = "IN_ENTITY"
 	requestChannelPrefix  = "REQ_"
 	responseChannelPrefix = "RES_"
 
@@ -44,6 +45,13 @@ type RPCServer interface {
 	SendResponse(ctx context.Context, request proto.Message, info *livekit.IngressInfo, err error) error
 	// SendUpdate sends an ingress info update
 	SendUpdate(ctx context.Context, info *livekit.IngressInfo) error
+	// GetEntityChannel returns a subscription for entity requests
+	GetEntityChannel(ctx context.Context) (utils.PubSub, error)
+}
+
+type RPC interface {
+	RPCClient
+	RPCServer
 }
 
 type RedisRPC struct {
@@ -51,7 +59,7 @@ type RedisRPC struct {
 	bus    *utils.RedisMessageBus
 }
 
-func NewRedisRPCClient(nodeID livekit.NodeID, rc *redis.Client) RPCClient {
+func NewRedisRPC(nodeID livekit.NodeID, rc *redis.Client) RPC {
 	if rc == nil {
 		return nil
 	}
@@ -83,6 +91,12 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 		req.RequestId = requestID
 		req.SenderId = string(r.nodeID)
 		channel = requestChannel(req.IngressId)
+
+	case *livekit.GetIngressInfoRequest:
+		req.RequestId = requestID
+		req.SenderId = string(r.nodeID)
+		req.SentAt = time.Now().UnixNano()
+		channel = entityChannel
 
 	default:
 		return nil, errors.New("invalid request type")
@@ -121,13 +135,6 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	}
 }
 
-func NewRedisRPCServer(rc *redis.Client) RPCServer {
-	bus := utils.NewRedisMessageBus(rc)
-	return &RedisRPC{
-		bus: bus.(*utils.RedisMessageBus),
-	}
-}
-
 func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) {
 	return r.bus.Subscribe(ctx, newIngressChannel)
 }
@@ -154,6 +161,8 @@ func (r *RedisRPC) SendResponse(ctx context.Context, request proto.Message, info
 		res.RequestId = req.RequestId
 	case *livekit.IngressRequest:
 		res.RequestId = req.RequestId
+	case *livekit.GetIngressInfoRequest:
+		res.RequestId = req.RequestId
 	}
 
 	if err != nil {
@@ -165,6 +174,10 @@ func (r *RedisRPC) SendResponse(ctx context.Context, request proto.Message, info
 
 func (r *RedisRPC) SendUpdate(ctx context.Context, info *livekit.IngressInfo) error {
 	return r.bus.Publish(ctx, updateChannel, info)
+}
+
+func (r *RedisRPC) GetEntityChannel(ctx context.Context) (utils.PubSub, error) {
+	return r.bus.Subscribe(ctx, entityChannel)
 }
 
 func requestChannel(ingressID string) string {
