@@ -135,13 +135,6 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	}
 }
 
-func NewRedisRPCServer(rc *redis.Client) RPCServer {
-	bus := utils.NewRedisMessageBus(rc)
-	return &RedisRPC{
-		bus: bus.(*utils.RedisMessageBus),
-	}
-}
-
 func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) {
 	return r.bus.Subscribe(ctx, newIngressChannel)
 }
