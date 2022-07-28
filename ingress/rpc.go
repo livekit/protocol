@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	newIngressChannel     = "IN_START"
 	updateChannel         = "IN_RESULTS"
 	entityChannel         = "IN_ENTITY"
 	requestChannelPrefix  = "REQ_"
@@ -22,7 +21,6 @@ const (
 
 	RequestExpiration = time.Second * 2
 	requestTimeout    = time.Second * 3
-	lockDuration      = time.Second * 3
 )
 
 // RPCClient is used by LiveKit Server
@@ -35,10 +33,6 @@ type RPCClient interface {
 
 // RPCServer is used by Ingress
 type RPCServer interface {
-	// GetRequestChannel returns a subscription for ingress requests
-	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
-	// ClaimRequest is used to take ownership of a request
-	ClaimRequest(ctx context.Context, request *livekit.StartIngressRequest) (bool, error)
 	// IngressSubscription subscribes to requests for a specific ingress ID
 	IngressSubscription(ctx context.Context, ingressID string) (utils.PubSub, error)
 	// SendResponse returns an RPC response
@@ -80,13 +74,6 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	var channel string
 
 	switch req := request.(type) {
-	case *livekit.StartIngressRequest:
-		req.IngressId = utils.NewGuid(utils.IngressPrefix)
-		req.RequestId = requestID
-		req.SentAt = time.Now().UnixNano()
-		req.SenderId = string(r.nodeID)
-		channel = newIngressChannel
-
 	case *livekit.IngressRequest:
 		req.RequestId = requestID
 		req.SenderId = string(r.nodeID)
@@ -135,18 +122,6 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	}
 }
 
-func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) {
-	return r.bus.Subscribe(ctx, newIngressChannel)
-}
-
-func (r *RedisRPC) ClaimRequest(ctx context.Context, req *livekit.StartIngressRequest) (bool, error) {
-	claimed, err := r.bus.Lock(ctx, requestChannel(req.IngressId), lockDuration)
-	if err != nil || !claimed {
-		return false, err
-	}
-	return true, nil
-}
-
 func (r *RedisRPC) IngressSubscription(ctx context.Context, ingressID string) (utils.PubSub, error) {
 	return r.bus.Subscribe(ctx, requestChannel(ingressID))
 }
@@ -157,8 +132,6 @@ func (r *RedisRPC) SendResponse(ctx context.Context, request proto.Message, info
 	}
 
 	switch req := request.(type) {
-	case *livekit.StartIngressRequest:
-		res.RequestId = req.RequestId
 	case *livekit.IngressRequest:
 		res.RequestId = req.RequestId
 	case *livekit.GetIngressInfoRequest:
@@ -177,7 +150,7 @@ func (r *RedisRPC) SendUpdate(ctx context.Context, info *livekit.IngressInfo) er
 }
 
 func (r *RedisRPC) GetEntityChannel(ctx context.Context) (utils.PubSub, error) {
-	return r.bus.Subscribe(ctx, entityChannel)
+	return r.bus.SubscribeQueue(ctx, entityChannel)
 }
 
 func requestChannel(ingressID string) string {

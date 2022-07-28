@@ -47,17 +47,6 @@ message EgressResponse {
   string request_id = 3;
 }
 
-message StartIngressRequest {
-  // request metadata
-  string ingress_id = 1;
-  string request_id = 2;
-  string sender_id = 3;
-  int64 sent_at = 4;
-
-  // request
-  CreateIngressRequest request = 5;
-}
-
 message IngressRequest {
   // request metadata
   string ingress_id = 1;
