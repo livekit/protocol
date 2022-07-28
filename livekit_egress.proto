@@ -207,6 +207,7 @@ enum EgressStatus {
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
+  string room_name = 13;
   EgressStatus status = 3;
   int64 started_at = 10;
   int64 ended_at = 11;
