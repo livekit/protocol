@@ -85,12 +85,6 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 		req.SentAt = time.Now().UnixNano()
 		channel = entityChannel
 
-	case *livekit.GetIngressInfoRequest:
-		req.RequestId = requestID
-		req.SenderId = string(r.nodeID)
-		req.SentAt = time.Now().UnixNano()
-		channel = entityChannel
-
 	default:
 		return nil, errors.New("invalid request type")
 	}
