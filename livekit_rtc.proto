@@ -34,7 +34,7 @@ message SignalRequest {
     // Simulate conditions, for client validations
     SimulateScenario simulate = 13;
     // client triggered ping to server
-    bool ping = 14;
+    Ping ping = 14;
   }
 }
 
@@ -291,4 +291,9 @@ message SimulateScenario {
     // switch candidate protocol to tcp
     CandidateProtocol switch_candidate_protocol = 5;
   }
+}
+
+// declare Ping as message in order for it to stay "optional" in generated ts-proto files
+message Ping {
+  bool ping = 1;
 }
