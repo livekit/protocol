@@ -34,7 +34,7 @@ message SignalRequest {
     // Simulate conditions, for client validations
     SimulateScenario simulate = 13;
     // client triggered ping to server
-    Ping ping = 14;
+    int64 ping = 14;
   }
 }
 
@@ -74,7 +74,7 @@ message SignalResponse {
     // server initiated track unpublish
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
-    bool pong = 18;
+    int64 pong = 18;
   }
 }
 
@@ -291,9 +291,4 @@ message SimulateScenario {
     // switch candidate protocol to tcp
     CandidateProtocol switch_candidate_protocol = 5;
   }
-}
-
-// declare Ping as message in order for it to stay "optional" in generated ts-proto files
-message Ping {
-  bool ping = 1;
 }
