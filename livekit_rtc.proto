@@ -33,6 +33,8 @@ message SignalRequest {
     SyncState sync_state = 12;
     // Simulate conditions, for client validations
     SimulateScenario simulate = 13;
+    // client triggered ping to server
+    int64 ping = 14;
   }
 }
 
@@ -71,6 +73,8 @@ message SignalResponse {
     string refresh_token = 16;
     // server initiated track unpublish
     TrackUnpublishedResponse track_unpublished = 17;
+    // respond to ping
+    int64 pong = 18;
   }
 }
 
@@ -129,6 +133,8 @@ message JoinResponse {
   string alternative_url = 7;
   ClientConfiguration client_configuration = 8;
   string server_region = 9;
+  int32 ping_timeout = 10;
+  int32 ping_interval = 11;
 }
 
 message TrackPublishedResponse {
