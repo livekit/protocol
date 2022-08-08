@@ -91,6 +91,7 @@ message IngressState {
     InputVideoState video = 3;
     InputAudioState audio = 4;
     string room_id = 5; // ID of the current/previous room published to
+    int64 started_at = 7;
     repeated TrackInfo tracks = 6;
 }
 
