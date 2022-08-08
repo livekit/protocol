@@ -607,7 +607,7 @@ type InputVideoState struct {
 	unknownFields protoimpl.UnknownFields
 
 	MimeType uint32 `protobuf:"varint,1,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
-	//  uint32 bitrate = 2;
+	// uint32 bitrate = 2;
 	Width     uint32 `protobuf:"varint,3,opt,name=width,proto3" json:"width,omitempty"`
 	Height    uint32 `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
 	Framerate uint32 `protobuf:"varint,5,opt,name=framerate,proto3" json:"framerate,omitempty"`
@@ -679,7 +679,7 @@ type InputAudioState struct {
 	unknownFields protoimpl.UnknownFields
 
 	MimeType uint32 `protobuf:"varint,1,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
-	//  uint32 bitrate = 2;
+	// uint32 bitrate = 2;
 	Channels   uint32 `protobuf:"varint,3,opt,name=channels,proto3" json:"channels,omitempty"`
 	SampleRate uint32 `protobuf:"varint,4,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
 }
