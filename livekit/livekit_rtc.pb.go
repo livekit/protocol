@@ -164,6 +164,7 @@ type SignalRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Message:
+	//
 	//	*SignalRequest_Offer
 	//	*SignalRequest_Answer
 	//	*SignalRequest_Trickle
@@ -354,7 +355,9 @@ type SignalRequest_Leave struct {
 
 type SignalRequest_UpdateLayers struct {
 	// Set active published layers, deprecated in favor of automatic tracking
-	//    SetSimulcastLayers simulcast = 9;
+	//
+	//	SetSimulcastLayers simulcast = 9;
+	//
 	// Update published video layers
 	UpdateLayers *UpdateVideoLayers `protobuf:"bytes,10,opt,name=update_layers,json=updateLayers,proto3,oneof"`
 }
@@ -411,6 +414,7 @@ type SignalResponse struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Message:
+	//
 	//	*SignalResponse_Join
 	//	*SignalResponse_Answer
 	//	*SignalResponse_Offer
@@ -2491,6 +2495,7 @@ type SimulateScenario struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Scenario:
+	//
 	//	*SimulateScenario_SpeakerUpdate
 	//	*SimulateScenario_NodeFailure
 	//	*SimulateScenario_Migration

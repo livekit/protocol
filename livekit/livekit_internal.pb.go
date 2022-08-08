@@ -528,6 +528,7 @@ type RTCNodeMessage struct {
 	SenderTime     int64  `protobuf:"varint,11,opt,name=sender_time,json=senderTime,proto3" json:"sender_time,omitempty"`
 	ConnectionId   string `protobuf:"bytes,13,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
 	// Types that are assignable to Message:
+	//
 	//	*RTCNodeMessage_StartSession
 	//	*RTCNodeMessage_Request
 	//	*RTCNodeMessage_RemoveParticipant
@@ -744,6 +745,7 @@ type SignalNodeMessage struct {
 
 	ConnectionId string `protobuf:"bytes,1,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
 	// Types that are assignable to Message:
+	//
 	//	*SignalNodeMessage_Response
 	//	*SignalNodeMessage_EndSession
 	Message isSignalNodeMessage_Message `protobuf_oneof:"message"`

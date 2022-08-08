@@ -1201,6 +1201,7 @@ type DataPacket struct {
 
 	Kind DataPacket_Kind `protobuf:"varint,1,opt,name=kind,proto3,enum=livekit.DataPacket_Kind" json:"kind,omitempty"`
 	// Types that are assignable to Value:
+	//
 	//	*DataPacket_User
 	//	*DataPacket_Speaker
 	Value isDataPacket_Value `protobuf_oneof:"value"`
