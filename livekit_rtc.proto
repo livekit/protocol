@@ -124,6 +124,7 @@ message JoinResponse {
   Room room = 1;
   ParticipantInfo participant = 2;
   repeated ParticipantInfo other_participants = 3;
+  // deprecated. use server_info.version instead.
   string server_version = 4;
   repeated ICEServer ice_servers = 5;
   // use subscriber as the primary PeerConnection
@@ -132,9 +133,11 @@ message JoinResponse {
   // when this is set, the other fields will be largely empty
   string alternative_url = 7;
   ClientConfiguration client_configuration = 8;
+  // deprecated. use server_info.region instead.
   string server_region = 9;
   int32 ping_timeout = 10;
   int32 ping_interval = 11;
+  ServerInfo server_info = 12;
 }
 
 message TrackPublishedResponse {
