@@ -173,6 +173,21 @@ message ParticipantTracks {
   repeated string track_sids = 2;
 }
 
+// details about the server
+message ServerInfo {
+  enum Edition {
+    Standard = 0;
+    Cloud = 1;
+  }
+  Edition edition = 1;
+  string version = 2;
+  int32 protocol = 3;
+  string region = 4;
+  string node_id = 5;
+  // additional debugging information. sent only if server is in development mode
+  string debug_info = 6;
+}
+
 // details about the client
 message ClientInfo {
   enum SDK {
