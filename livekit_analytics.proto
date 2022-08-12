@@ -83,6 +83,10 @@ message AnalyticsClientMeta {
   string node = 2;
   string client_addr = 3;
   uint32 client_connect_time = 4;
+  // udp, tcp, turn
+  string connection_type = 5;
+  // wifi, cell, empty if not known
+  string client_network = 6;
 }
 
 message AnalyticsEvent {
