@@ -76,6 +76,7 @@ enum AnalyticsEventType {
   EGRESS_STARTED = 12;
   EGRESS_ENDED = 13;
   TRACK_MAX_SUBSCRIBED_VIDEO_QUALITY = 14;
+  RECONNECTED = 15;
 }
 
 message AnalyticsClientMeta {
