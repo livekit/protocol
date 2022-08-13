@@ -254,6 +254,7 @@ message RTPStats {
   double packet_rate = 5;
 
   uint64 bytes = 6;
+  uint64 header_bytes = 39;
   double bitrate = 7;
 
   uint32 packets_lost = 8;
@@ -264,12 +265,14 @@ message RTPStats {
   double packet_duplicate_rate = 12;
 
   uint64 bytes_duplicate = 13;
+  uint64 header_bytes_duplicate = 40;
   double bitrate_duplicate = 14;
 
   uint32 packets_padding = 15;
   double packet_padding_rate = 16;
 
   uint64 bytes_padding = 17;
+  uint64 header_bytes_padding = 41;
   double bitrate_padding = 18;
 
   uint32 packets_out_of_order = 19;
