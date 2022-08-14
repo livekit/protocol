@@ -209,6 +209,8 @@ message ClientInfo {
   string browser = 7;
   string browser_version = 8;
   string address = 9;
+  // wifi, wired, cellular, vpn, empty if not known
+  string network = 10;
 }
 
 // server provided client configuration
