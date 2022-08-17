@@ -3,7 +3,7 @@ package sdp
 import (
 	"strings"
 
-	"github.com/pion/sdp"
+	"github.com/pion/sdp/v3"
 	"github.com/pion/webrtc/v3"
 )
 
