@@ -10,7 +10,7 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v3 v3.0.7
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.5.0
-	github.com/pion/sdp/v3 v3.0.5
+	github.com/pion/sdp/v3 v3.0.6
 	github.com/pion/webrtc/v3 v3.1.43
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
