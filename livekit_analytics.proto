@@ -8,6 +8,8 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
+import "livekit_egress.proto";
+import "livekit_ingress.proto";
 
 service AnalyticsRecorderService {
   rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
@@ -77,6 +79,8 @@ enum AnalyticsEventType {
   EGRESS_ENDED = 13;
   TRACK_MAX_SUBSCRIBED_VIDEO_QUALITY = 14;
   RECONNECTED = 15;
+  INGRESS_STARTED = 16;
+  INGRESS_ENDED = 17;
 }
 
 message AnalyticsClientMeta {
@@ -104,6 +108,9 @@ message AnalyticsEvent {
   VideoQuality max_subscribed_video_quality = 14;
   ParticipantInfo publisher = 15;
   string mime = 16;
+  EgressInfo egress = 17;
+  IngressInfo ingress = 18;
+
 }
 
 message AnalyticsEvents {
