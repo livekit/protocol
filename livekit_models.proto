@@ -220,6 +220,7 @@ message ClientConfiguration {
 
   ClientConfigSetting resume_connection = 3;
   DisabledCodecs disabled_codecs = 4;
+  ClientConfigSetting force_relay = 5;
 }
 
 enum ClientConfigSetting {

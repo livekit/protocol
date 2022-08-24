@@ -279,6 +279,7 @@ message DataChannelInfo {
 enum CandidateProtocol {
   UDP = 0;
   TCP = 1;
+  TLS = 2;
 }
 
 message SimulateScenario {
