@@ -202,6 +202,7 @@ enum EgressStatus {
   EGRESS_COMPLETE = 3;
   EGRESS_FAILED = 4;
   EGRESS_ABORTED = 5;
+  EGRESS_LIMIT_REACHED = 6;
 }
 
 message EgressInfo {
