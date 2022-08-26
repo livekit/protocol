@@ -26,7 +26,7 @@ type WebhookEvent struct {
 	unknownFields protoimpl.UnknownFields
 
 	// one of room_started, room_finished, participant_joined, participant_left,
-	// track_published, track_unpublished, egress_started, egress_ended, ingress_started, ingress_ended
+	// track_published, track_unpublished, egress_started, egress_updated, egress_ended, ingress_started, ingress_ended
 	Event string `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 	Room  *Room  `protobuf:"bytes,2,opt,name=room,proto3" json:"room,omitempty"`
 	// set when event is participant_* or track_*
