@@ -595,6 +595,85 @@ func (x *IngressResponse) GetRequestId() string {
 	return ""
 }
 
+type GetIngressInfoResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Info      *IngressInfo `protobuf:"bytes,1,opt,name=info,proto3" json:"info,omitempty"`
+	Token     string       `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	WsUrl     string       `protobuf:"bytes,3,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
+	Error     string       `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	RequestId string       `protobuf:"bytes,5,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+}
+
+func (x *GetIngressInfoResponse) Reset() {
+	*x = GetIngressInfoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_rpc_internal_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetIngressInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetIngressInfoResponse) ProtoMessage() {}
+
+func (x *GetIngressInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rpc_internal_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetIngressInfoResponse.ProtoReflect.Descriptor instead.
+func (*GetIngressInfoResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_rpc_internal_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetIngressInfoResponse) GetInfo() *IngressInfo {
+	if x != nil {
+		return x.Info
+	}
+	return nil
+}
+
+func (x *GetIngressInfoResponse) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+func (x *GetIngressInfoResponse) GetWsUrl() string {
+	if x != nil {
+		return x.WsUrl
+	}
+	return ""
+}
+
+func (x *GetIngressInfoResponse) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *GetIngressInfoResponse) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
 var File_livekit_rpc_internal_proto protoreflect.FileDescriptor
 
 var file_livekit_rpc_internal_proto_rawDesc = []byte{
@@ -684,12 +763,22 @@ var file_livekit_rpc_internal_proto_rawDesc = []byte{
 	0x66, 0x6f, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x1d, 0x0a, 0x0a, 0x72, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x72, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x49, 0x64, 0x42, 0x46, 0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75,
-	0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02,
-	0x0d, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02,
-	0x0e, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x49, 0x64, 0x22, 0xa4, 0x01, 0x0a, 0x16, 0x47, 0x65, 0x74, 0x49,
+	0x6e, 0x67, 0x72, 0x65, 0x73, 0x73, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x28, 0x0a, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x14, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x49, 0x6e, 0x67, 0x72, 0x65,
+	0x73, 0x73, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x12, 0x14, 0x0a, 0x05,
+	0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f, 0x6b,
+	0x65, 0x6e, 0x12, 0x15, 0x0a, 0x06, 0x77, 0x73, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x03, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x05, 0x77, 0x73, 0x55, 0x72, 0x6c, 0x12, 0x14, 0x0a, 0x05, 0x65, 0x72, 0x72,
+	0x6f, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x12,
+	0x1d, 0x0a, 0x0a, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x09, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x49, 0x64, 0x42, 0x46,
+	0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76,
+	0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x6c, 0x69,
+	0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02, 0x0d, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x2e,
+	0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02, 0x0e, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x3a,
+	0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -704,7 +793,7 @@ func file_livekit_rpc_internal_proto_rawDescGZIP() []byte {
 	return file_livekit_rpc_internal_proto_rawDescData
 }
 
-var file_livekit_rpc_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_livekit_rpc_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_livekit_rpc_internal_proto_goTypes = []interface{}{
 	(*StartEgressRequest)(nil),          // 0: livekit.StartEgressRequest
 	(*EgressRequest)(nil),               // 1: livekit.EgressRequest
@@ -712,31 +801,33 @@ var file_livekit_rpc_internal_proto_goTypes = []interface{}{
 	(*IngressRequest)(nil),              // 3: livekit.IngressRequest
 	(*GetIngressInfoRequest)(nil),       // 4: livekit.GetIngressInfoRequest
 	(*IngressResponse)(nil),             // 5: livekit.IngressResponse
-	(*RoomCompositeEgressRequest)(nil),  // 6: livekit.RoomCompositeEgressRequest
-	(*TrackCompositeEgressRequest)(nil), // 7: livekit.TrackCompositeEgressRequest
-	(*TrackEgressRequest)(nil),          // 8: livekit.TrackEgressRequest
-	(*UpdateStreamRequest)(nil),         // 9: livekit.UpdateStreamRequest
-	(*StopEgressRequest)(nil),           // 10: livekit.StopEgressRequest
-	(*EgressInfo)(nil),                  // 11: livekit.EgressInfo
-	(*UpdateIngressRequest)(nil),        // 12: livekit.UpdateIngressRequest
-	(*DeleteIngressRequest)(nil),        // 13: livekit.DeleteIngressRequest
-	(*IngressInfo)(nil),                 // 14: livekit.IngressInfo
+	(*GetIngressInfoResponse)(nil),      // 6: livekit.GetIngressInfoResponse
+	(*RoomCompositeEgressRequest)(nil),  // 7: livekit.RoomCompositeEgressRequest
+	(*TrackCompositeEgressRequest)(nil), // 8: livekit.TrackCompositeEgressRequest
+	(*TrackEgressRequest)(nil),          // 9: livekit.TrackEgressRequest
+	(*UpdateStreamRequest)(nil),         // 10: livekit.UpdateStreamRequest
+	(*StopEgressRequest)(nil),           // 11: livekit.StopEgressRequest
+	(*EgressInfo)(nil),                  // 12: livekit.EgressInfo
+	(*UpdateIngressRequest)(nil),        // 13: livekit.UpdateIngressRequest
+	(*DeleteIngressRequest)(nil),        // 14: livekit.DeleteIngressRequest
+	(*IngressInfo)(nil),                 // 15: livekit.IngressInfo
 }
 var file_livekit_rpc_internal_proto_depIdxs = []int32{
-	6,  // 0: livekit.StartEgressRequest.room_composite:type_name -> livekit.RoomCompositeEgressRequest
-	7,  // 1: livekit.StartEgressRequest.track_composite:type_name -> livekit.TrackCompositeEgressRequest
-	8,  // 2: livekit.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
-	9,  // 3: livekit.EgressRequest.update_stream:type_name -> livekit.UpdateStreamRequest
-	10, // 4: livekit.EgressRequest.stop:type_name -> livekit.StopEgressRequest
-	11, // 5: livekit.EgressResponse.info:type_name -> livekit.EgressInfo
-	12, // 6: livekit.IngressRequest.update:type_name -> livekit.UpdateIngressRequest
-	13, // 7: livekit.IngressRequest.delete:type_name -> livekit.DeleteIngressRequest
-	14, // 8: livekit.IngressResponse.info:type_name -> livekit.IngressInfo
-	9,  // [9:9] is the sub-list for method output_type
-	9,  // [9:9] is the sub-list for method input_type
-	9,  // [9:9] is the sub-list for extension type_name
-	9,  // [9:9] is the sub-list for extension extendee
-	0,  // [0:9] is the sub-list for field type_name
+	7,  // 0: livekit.StartEgressRequest.room_composite:type_name -> livekit.RoomCompositeEgressRequest
+	8,  // 1: livekit.StartEgressRequest.track_composite:type_name -> livekit.TrackCompositeEgressRequest
+	9,  // 2: livekit.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
+	10, // 3: livekit.EgressRequest.update_stream:type_name -> livekit.UpdateStreamRequest
+	11, // 4: livekit.EgressRequest.stop:type_name -> livekit.StopEgressRequest
+	12, // 5: livekit.EgressResponse.info:type_name -> livekit.EgressInfo
+	13, // 6: livekit.IngressRequest.update:type_name -> livekit.UpdateIngressRequest
+	14, // 7: livekit.IngressRequest.delete:type_name -> livekit.DeleteIngressRequest
+	15, // 8: livekit.IngressResponse.info:type_name -> livekit.IngressInfo
+	15, // 9: livekit.GetIngressInfoResponse.info:type_name -> livekit.IngressInfo
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rpc_internal_proto_init() }
@@ -819,6 +910,18 @@ func file_livekit_rpc_internal_proto_init() {
 				return nil
 			}
 		}
+		file_livekit_rpc_internal_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GetIngressInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_livekit_rpc_internal_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*StartEgressRequest_RoomComposite)(nil),
@@ -839,7 +942,7 @@ func file_livekit_rpc_internal_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_rpc_internal_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
