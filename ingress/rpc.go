@@ -27,6 +27,8 @@ const (
 type RPCClient interface {
 	// GetUpdateChannel returns a subscription for ingress info updates
 	GetUpdateChannel(ctx context.Context) (utils.PubSub, error)
+	// GetEntityChannel returns a subscription for entity requests
+	GetEntityChannel(ctx context.Context) (utils.PubSub, error)
 	// SendRequest sends a request to all available instances
 	SendRequest(ctx context.Context, req *livekit.IngressRequest) (*livekit.IngressInfo, error)
 	// SendResponse returns a GetIngressInfo response
@@ -41,8 +43,6 @@ type RPCServer interface {
 	SendResponse(ctx context.Context, request *livekit.IngressRequest, info *livekit.IngressInfo, err error) error
 	// SendUpdate sends an ingress info update
 	SendUpdate(ctx context.Context, info *livekit.IngressInfo) error
-	// GetEntityChannel returns a subscription for entity requests
-	GetEntityChannel(ctx context.Context) (utils.PubSub, error)
 	// SendGetIngressInfoRequest sends a request to all available instances
 	SendGetIngressInfoRequest(ctx context.Context, req *livekit.GetIngressInfoRequest) (*livekit.GetIngressInfoResponse, error)
 }
