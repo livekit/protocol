@@ -845,7 +845,8 @@ type StartSession struct {
 	// A user's ClaimGrants serialized in JSON
 	GrantsJson     string `protobuf:"bytes,14,opt,name=grants_json,json=grantsJson,proto3" json:"grants_json,omitempty"`
 	AdaptiveStream bool   `protobuf:"varint,15,opt,name=adaptive_stream,json=adaptiveStream,proto3" json:"adaptive_stream,omitempty"`
-	ParticipantId  string `protobuf:"bytes,16,opt,name=participant_id,json=participantId,proto3" json:"participant_id,omitempty"` //if reconnect, client will set current sid
+	// if reconnect, client will set current sid
+	ParticipantId string `protobuf:"bytes,16,opt,name=participant_id,json=participantId,proto3" json:"participant_id,omitempty"`
 }
 
 func (x *StartSession) Reset() {
