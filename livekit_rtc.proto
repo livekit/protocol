@@ -264,10 +264,13 @@ message SubscriptionPermissionUpdate {
 }
 
 message SyncState {
+  // last subscribe answer before reconnecting
   SessionDescription answer = 1;
   UpdateSubscription subscription = 2;
   repeated TrackPublishedResponse publish_tracks = 3;
   repeated DataChannelInfo data_channels = 4;
+  // last received server side offer before reconnecting
+  SessionDescription offer = 5;
 }
 
 message DataChannelInfo {
