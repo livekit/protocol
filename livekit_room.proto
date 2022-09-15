@@ -6,6 +6,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
+import "livekit_egress.proto";
 
 // Room service that can be performed on any node
 // they are Twirp-based HTTP req/responses
@@ -57,6 +58,22 @@ message CreateRoomRequest {
   string node_id = 4;
   // metadata of room
   string metadata = 5;
+  // egress
+  RoomEgress egress = 6;
+}
+
+message RoomEgress {
+  RoomCompositeEgressRequest room = 1;
+  AllTrackEgress tracks = 2;
+}
+
+message AllTrackEgress {
+  string file_prefix = 1;
+  oneof output {
+    S3Upload s3 = 2;
+    GCPUpload gcp = 3;
+    AzureBlobUpload azure = 4;
+  }
 }
 
 message ListRoomsRequest {
