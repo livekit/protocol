@@ -6,6 +6,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
+import "livekit_egress.proto";
 
 message Room {
   string sid = 1;
@@ -18,6 +19,20 @@ message Room {
   string metadata = 8;
   uint32 num_participants = 9;
   bool active_recording = 10;
+  AutoEgress egress = 11;
+}
+
+message AutoEgress {
+  AutoTrackEgress tracks = 1;
+}
+
+message AutoTrackEgress {
+  string file_prefix = 1;
+  oneof output {
+    S3Upload s3 = 2;
+    GCPUpload gcp = 3;
+    AzureBlobUpload azure = 4;
+  }
 }
 
 message Codec {
