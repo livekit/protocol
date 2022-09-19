@@ -667,6 +667,7 @@ func (x *Room) GetActiveRecording() bool {
 	return false
 }
 
+// room info that should not be returned to clients
 type RoomInternal struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
