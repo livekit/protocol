@@ -46,7 +46,7 @@ message RoomCompositeEgressRequest {
 // composite a single participant's video and audio
 message ParticipantCompositeEgressRequest {
   string room_name = 1;
-  string participant_id = 2;
+  string participant_identity = 2;
   bool audio_only = 3;
   bool video_only = 4;
   string custom_template_url = 5;
