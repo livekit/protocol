@@ -240,6 +240,7 @@ message EgressInfo {
     RoomCompositeEgressRequest room_composite = 4;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
+    ParticipantCompositeEgressRequest participant_composite = 14;
   }
   oneof result {
     StreamInfoList stream = 7;

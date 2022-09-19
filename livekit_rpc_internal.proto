@@ -20,6 +20,7 @@ message StartEgressRequest {
     RoomCompositeEgressRequest room_composite = 5;
     TrackCompositeEgressRequest track_composite = 6;
     TrackEgressRequest track = 7;
+    ParticipantCompositeEgressRequest participant_composite = 11;
   }
 
   // connection info
@@ -81,4 +82,3 @@ message GetIngressInfoResponse {
   string error = 4;
   string request_id = 5;
 }
-
