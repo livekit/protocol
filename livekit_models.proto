@@ -40,15 +40,14 @@ message AutoParticipantEgress {
   string file_prefix = 1;
   bool audio_only = 2;
   bool video_only = 3;
-  string custom_template_url = 4;
   oneof output {
-    S3Upload s3 = 5;
-    GCPUpload gcp = 6;
-    AzureBlobUpload azure = 7;
+    S3Upload s3 = 4;
+    GCPUpload gcp = 5;
+    AzureBlobUpload azure = 6;
   }
   oneof options {
-    EncodingOptionsPreset preset = 8; // (default H264_720P_30)
-    EncodingOptions advanced = 9;     // (optional)
+    EncodingOptionsPreset preset = 7; // (default H264_720P_30)
+    EncodingOptions advanced = 8;     // (optional)
   }
 }
 
