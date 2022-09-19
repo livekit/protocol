@@ -392,7 +392,7 @@ func (x ParticipantInfo_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ParticipantInfo_State.Descriptor instead.
 func (ParticipantInfo_State) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{3, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{6, 0}
 }
 
 type DataPacket_Kind int32
@@ -438,7 +438,7 @@ func (x DataPacket_Kind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DataPacket_Kind.Descriptor instead.
 func (DataPacket_Kind) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{7, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{10, 0}
 }
 
 type ServerInfo_Edition int32
@@ -484,7 +484,7 @@ func (x ServerInfo_Edition) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ServerInfo_Edition.Descriptor instead.
 func (ServerInfo_Edition) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{12, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{15, 0}
 }
 
 type ClientInfo_SDK int32
@@ -545,7 +545,7 @@ func (x ClientInfo_SDK) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ClientInfo_SDK.Descriptor instead.
 func (ClientInfo_SDK) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{13, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{16, 0}
 }
 
 type Room struct {
@@ -667,6 +667,334 @@ func (x *Room) GetActiveRecording() bool {
 	return false
 }
 
+// room info that should not be returned to clients
+type RoomInternal struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	TrackEgress       *AutoTrackEgress       `protobuf:"bytes,1,opt,name=track_egress,json=trackEgress,proto3" json:"track_egress,omitempty"`
+	ParticipantEgress *AutoParticipantEgress `protobuf:"bytes,2,opt,name=participant_egress,json=participantEgress,proto3" json:"participant_egress,omitempty"`
+}
+
+func (x *RoomInternal) Reset() {
+	*x = RoomInternal{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_models_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RoomInternal) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RoomInternal) ProtoMessage() {}
+
+func (x *RoomInternal) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_models_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RoomInternal.ProtoReflect.Descriptor instead.
+func (*RoomInternal) Descriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RoomInternal) GetTrackEgress() *AutoTrackEgress {
+	if x != nil {
+		return x.TrackEgress
+	}
+	return nil
+}
+
+func (x *RoomInternal) GetParticipantEgress() *AutoParticipantEgress {
+	if x != nil {
+		return x.ParticipantEgress
+	}
+	return nil
+}
+
+type AutoTrackEgress struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FilePrefix string `protobuf:"bytes,1,opt,name=file_prefix,json=filePrefix,proto3" json:"file_prefix,omitempty"`
+	// Types that are assignable to Output:
+	//
+	//	*AutoTrackEgress_S3
+	//	*AutoTrackEgress_Gcp
+	//	*AutoTrackEgress_Azure
+	Output isAutoTrackEgress_Output `protobuf_oneof:"output"`
+}
+
+func (x *AutoTrackEgress) Reset() {
+	*x = AutoTrackEgress{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_models_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AutoTrackEgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutoTrackEgress) ProtoMessage() {}
+
+func (x *AutoTrackEgress) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_models_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutoTrackEgress.ProtoReflect.Descriptor instead.
+func (*AutoTrackEgress) Descriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *AutoTrackEgress) GetFilePrefix() string {
+	if x != nil {
+		return x.FilePrefix
+	}
+	return ""
+}
+
+func (m *AutoTrackEgress) GetOutput() isAutoTrackEgress_Output {
+	if m != nil {
+		return m.Output
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetS3() *S3Upload {
+	if x, ok := x.GetOutput().(*AutoTrackEgress_S3); ok {
+		return x.S3
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetGcp() *GCPUpload {
+	if x, ok := x.GetOutput().(*AutoTrackEgress_Gcp); ok {
+		return x.Gcp
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetAzure() *AzureBlobUpload {
+	if x, ok := x.GetOutput().(*AutoTrackEgress_Azure); ok {
+		return x.Azure
+	}
+	return nil
+}
+
+type isAutoTrackEgress_Output interface {
+	isAutoTrackEgress_Output()
+}
+
+type AutoTrackEgress_S3 struct {
+	S3 *S3Upload `protobuf:"bytes,2,opt,name=s3,proto3,oneof"`
+}
+
+type AutoTrackEgress_Gcp struct {
+	Gcp *GCPUpload `protobuf:"bytes,3,opt,name=gcp,proto3,oneof"`
+}
+
+type AutoTrackEgress_Azure struct {
+	Azure *AzureBlobUpload `protobuf:"bytes,4,opt,name=azure,proto3,oneof"`
+}
+
+func (*AutoTrackEgress_S3) isAutoTrackEgress_Output() {}
+
+func (*AutoTrackEgress_Gcp) isAutoTrackEgress_Output() {}
+
+func (*AutoTrackEgress_Azure) isAutoTrackEgress_Output() {}
+
+type AutoParticipantEgress struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	FilePrefix        string `protobuf:"bytes,1,opt,name=file_prefix,json=filePrefix,proto3" json:"file_prefix,omitempty"`
+	AudioOnly         bool   `protobuf:"varint,2,opt,name=audio_only,json=audioOnly,proto3" json:"audio_only,omitempty"`
+	VideoOnly         bool   `protobuf:"varint,3,opt,name=video_only,json=videoOnly,proto3" json:"video_only,omitempty"`
+	CustomTemplateUrl string `protobuf:"bytes,4,opt,name=custom_template_url,json=customTemplateUrl,proto3" json:"custom_template_url,omitempty"`
+	// Types that are assignable to Output:
+	//
+	//	*AutoParticipantEgress_S3
+	//	*AutoParticipantEgress_Gcp
+	//	*AutoParticipantEgress_Azure
+	Output isAutoParticipantEgress_Output `protobuf_oneof:"output"`
+	// Types that are assignable to Options:
+	//
+	//	*AutoParticipantEgress_Preset
+	//	*AutoParticipantEgress_Advanced
+	Options isAutoParticipantEgress_Options `protobuf_oneof:"options"`
+}
+
+func (x *AutoParticipantEgress) Reset() {
+	*x = AutoParticipantEgress{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_models_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *AutoParticipantEgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutoParticipantEgress) ProtoMessage() {}
+
+func (x *AutoParticipantEgress) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_models_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutoParticipantEgress.ProtoReflect.Descriptor instead.
+func (*AutoParticipantEgress) Descriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *AutoParticipantEgress) GetFilePrefix() string {
+	if x != nil {
+		return x.FilePrefix
+	}
+	return ""
+}
+
+func (x *AutoParticipantEgress) GetAudioOnly() bool {
+	if x != nil {
+		return x.AudioOnly
+	}
+	return false
+}
+
+func (x *AutoParticipantEgress) GetVideoOnly() bool {
+	if x != nil {
+		return x.VideoOnly
+	}
+	return false
+}
+
+func (x *AutoParticipantEgress) GetCustomTemplateUrl() string {
+	if x != nil {
+		return x.CustomTemplateUrl
+	}
+	return ""
+}
+
+func (m *AutoParticipantEgress) GetOutput() isAutoParticipantEgress_Output {
+	if m != nil {
+		return m.Output
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetS3() *S3Upload {
+	if x, ok := x.GetOutput().(*AutoParticipantEgress_S3); ok {
+		return x.S3
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetGcp() *GCPUpload {
+	if x, ok := x.GetOutput().(*AutoParticipantEgress_Gcp); ok {
+		return x.Gcp
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetAzure() *AzureBlobUpload {
+	if x, ok := x.GetOutput().(*AutoParticipantEgress_Azure); ok {
+		return x.Azure
+	}
+	return nil
+}
+
+func (m *AutoParticipantEgress) GetOptions() isAutoParticipantEgress_Options {
+	if m != nil {
+		return m.Options
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetPreset() EncodingOptionsPreset {
+	if x, ok := x.GetOptions().(*AutoParticipantEgress_Preset); ok {
+		return x.Preset
+	}
+	return EncodingOptionsPreset_H264_720P_30
+}
+
+func (x *AutoParticipantEgress) GetAdvanced() *EncodingOptions {
+	if x, ok := x.GetOptions().(*AutoParticipantEgress_Advanced); ok {
+		return x.Advanced
+	}
+	return nil
+}
+
+type isAutoParticipantEgress_Output interface {
+	isAutoParticipantEgress_Output()
+}
+
+type AutoParticipantEgress_S3 struct {
+	S3 *S3Upload `protobuf:"bytes,5,opt,name=s3,proto3,oneof"`
+}
+
+type AutoParticipantEgress_Gcp struct {
+	Gcp *GCPUpload `protobuf:"bytes,6,opt,name=gcp,proto3,oneof"`
+}
+
+type AutoParticipantEgress_Azure struct {
+	Azure *AzureBlobUpload `protobuf:"bytes,7,opt,name=azure,proto3,oneof"`
+}
+
+func (*AutoParticipantEgress_S3) isAutoParticipantEgress_Output() {}
+
+func (*AutoParticipantEgress_Gcp) isAutoParticipantEgress_Output() {}
+
+func (*AutoParticipantEgress_Azure) isAutoParticipantEgress_Output() {}
+
+type isAutoParticipantEgress_Options interface {
+	isAutoParticipantEgress_Options()
+}
+
+type AutoParticipantEgress_Preset struct {
+	Preset EncodingOptionsPreset `protobuf:"varint,8,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
+}
+
+type AutoParticipantEgress_Advanced struct {
+	Advanced *EncodingOptions `protobuf:"bytes,9,opt,name=advanced,proto3,oneof"` // (optional)
+}
+
+func (*AutoParticipantEgress_Preset) isAutoParticipantEgress_Options() {}
+
+func (*AutoParticipantEgress_Advanced) isAutoParticipantEgress_Options() {}
+
 type Codec struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -679,7 +1007,7 @@ type Codec struct {
 func (x *Codec) Reset() {
 	*x = Codec{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[1]
+		mi := &file_livekit_models_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -692,7 +1020,7 @@ func (x *Codec) String() string {
 func (*Codec) ProtoMessage() {}
 
 func (x *Codec) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[1]
+	mi := &file_livekit_models_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -705,7 +1033,7 @@ func (x *Codec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Codec.ProtoReflect.Descriptor instead.
 func (*Codec) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{1}
+	return file_livekit_models_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *Codec) GetMime() string {
@@ -742,7 +1070,7 @@ type ParticipantPermission struct {
 func (x *ParticipantPermission) Reset() {
 	*x = ParticipantPermission{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[2]
+		mi := &file_livekit_models_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -755,7 +1083,7 @@ func (x *ParticipantPermission) String() string {
 func (*ParticipantPermission) ProtoMessage() {}
 
 func (x *ParticipantPermission) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[2]
+	mi := &file_livekit_models_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -768,7 +1096,7 @@ func (x *ParticipantPermission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantPermission.ProtoReflect.Descriptor instead.
 func (*ParticipantPermission) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{2}
+	return file_livekit_models_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ParticipantPermission) GetCanSubscribe() bool {
@@ -830,7 +1158,7 @@ type ParticipantInfo struct {
 func (x *ParticipantInfo) Reset() {
 	*x = ParticipantInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[3]
+		mi := &file_livekit_models_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -843,7 +1171,7 @@ func (x *ParticipantInfo) String() string {
 func (*ParticipantInfo) ProtoMessage() {}
 
 func (x *ParticipantInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[3]
+	mi := &file_livekit_models_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -856,7 +1184,7 @@ func (x *ParticipantInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantInfo.ProtoReflect.Descriptor instead.
 func (*ParticipantInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{3}
+	return file_livekit_models_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ParticipantInfo) GetSid() string {
@@ -950,7 +1278,7 @@ type SimulcastCodecInfo struct {
 func (x *SimulcastCodecInfo) Reset() {
 	*x = SimulcastCodecInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[4]
+		mi := &file_livekit_models_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -963,7 +1291,7 @@ func (x *SimulcastCodecInfo) String() string {
 func (*SimulcastCodecInfo) ProtoMessage() {}
 
 func (x *SimulcastCodecInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[4]
+	mi := &file_livekit_models_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -976,7 +1304,7 @@ func (x *SimulcastCodecInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SimulcastCodecInfo.ProtoReflect.Descriptor instead.
 func (*SimulcastCodecInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{4}
+	return file_livekit_models_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SimulcastCodecInfo) GetMimeType() string {
@@ -1037,7 +1365,7 @@ type TrackInfo struct {
 func (x *TrackInfo) Reset() {
 	*x = TrackInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[5]
+		mi := &file_livekit_models_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1050,7 +1378,7 @@ func (x *TrackInfo) String() string {
 func (*TrackInfo) ProtoMessage() {}
 
 func (x *TrackInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[5]
+	mi := &file_livekit_models_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1063,7 +1391,7 @@ func (x *TrackInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrackInfo.ProtoReflect.Descriptor instead.
 func (*TrackInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{5}
+	return file_livekit_models_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *TrackInfo) GetSid() string {
@@ -1175,7 +1503,7 @@ type VideoLayer struct {
 func (x *VideoLayer) Reset() {
 	*x = VideoLayer{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[6]
+		mi := &file_livekit_models_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1188,7 +1516,7 @@ func (x *VideoLayer) String() string {
 func (*VideoLayer) ProtoMessage() {}
 
 func (x *VideoLayer) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[6]
+	mi := &file_livekit_models_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1201,7 +1529,7 @@ func (x *VideoLayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VideoLayer.ProtoReflect.Descriptor instead.
 func (*VideoLayer) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{6}
+	return file_livekit_models_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *VideoLayer) GetQuality() VideoQuality {
@@ -1256,7 +1584,7 @@ type DataPacket struct {
 func (x *DataPacket) Reset() {
 	*x = DataPacket{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[7]
+		mi := &file_livekit_models_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1269,7 +1597,7 @@ func (x *DataPacket) String() string {
 func (*DataPacket) ProtoMessage() {}
 
 func (x *DataPacket) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[7]
+	mi := &file_livekit_models_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1282,7 +1610,7 @@ func (x *DataPacket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataPacket.ProtoReflect.Descriptor instead.
 func (*DataPacket) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{7}
+	return file_livekit_models_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DataPacket) GetKind() DataPacket_Kind {
@@ -1340,7 +1668,7 @@ type ActiveSpeakerUpdate struct {
 func (x *ActiveSpeakerUpdate) Reset() {
 	*x = ActiveSpeakerUpdate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[8]
+		mi := &file_livekit_models_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1353,7 +1681,7 @@ func (x *ActiveSpeakerUpdate) String() string {
 func (*ActiveSpeakerUpdate) ProtoMessage() {}
 
 func (x *ActiveSpeakerUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[8]
+	mi := &file_livekit_models_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1366,7 +1694,7 @@ func (x *ActiveSpeakerUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActiveSpeakerUpdate.ProtoReflect.Descriptor instead.
 func (*ActiveSpeakerUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{8}
+	return file_livekit_models_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ActiveSpeakerUpdate) GetSpeakers() []*SpeakerInfo {
@@ -1391,7 +1719,7 @@ type SpeakerInfo struct {
 func (x *SpeakerInfo) Reset() {
 	*x = SpeakerInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[9]
+		mi := &file_livekit_models_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1404,7 +1732,7 @@ func (x *SpeakerInfo) String() string {
 func (*SpeakerInfo) ProtoMessage() {}
 
 func (x *SpeakerInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[9]
+	mi := &file_livekit_models_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1417,7 +1745,7 @@ func (x *SpeakerInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpeakerInfo.ProtoReflect.Descriptor instead.
 func (*SpeakerInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{9}
+	return file_livekit_models_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SpeakerInfo) GetSid() string {
@@ -1457,7 +1785,7 @@ type UserPacket struct {
 func (x *UserPacket) Reset() {
 	*x = UserPacket{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[10]
+		mi := &file_livekit_models_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1470,7 +1798,7 @@ func (x *UserPacket) String() string {
 func (*UserPacket) ProtoMessage() {}
 
 func (x *UserPacket) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[10]
+	mi := &file_livekit_models_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1483,7 +1811,7 @@ func (x *UserPacket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPacket.ProtoReflect.Descriptor instead.
 func (*UserPacket) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{10}
+	return file_livekit_models_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UserPacket) GetParticipantSid() string {
@@ -1520,7 +1848,7 @@ type ParticipantTracks struct {
 func (x *ParticipantTracks) Reset() {
 	*x = ParticipantTracks{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[11]
+		mi := &file_livekit_models_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1533,7 +1861,7 @@ func (x *ParticipantTracks) String() string {
 func (*ParticipantTracks) ProtoMessage() {}
 
 func (x *ParticipantTracks) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[11]
+	mi := &file_livekit_models_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1546,7 +1874,7 @@ func (x *ParticipantTracks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantTracks.ProtoReflect.Descriptor instead.
 func (*ParticipantTracks) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{11}
+	return file_livekit_models_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ParticipantTracks) GetParticipantSid() string {
@@ -1581,7 +1909,7 @@ type ServerInfo struct {
 func (x *ServerInfo) Reset() {
 	*x = ServerInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[12]
+		mi := &file_livekit_models_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1594,7 +1922,7 @@ func (x *ServerInfo) String() string {
 func (*ServerInfo) ProtoMessage() {}
 
 func (x *ServerInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[12]
+	mi := &file_livekit_models_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1607,7 +1935,7 @@ func (x *ServerInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerInfo.ProtoReflect.Descriptor instead.
 func (*ServerInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{12}
+	return file_livekit_models_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ServerInfo) GetEdition() ServerInfo_Edition {
@@ -1674,7 +2002,7 @@ type ClientInfo struct {
 func (x *ClientInfo) Reset() {
 	*x = ClientInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[13]
+		mi := &file_livekit_models_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1687,7 +2015,7 @@ func (x *ClientInfo) String() string {
 func (*ClientInfo) ProtoMessage() {}
 
 func (x *ClientInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[13]
+	mi := &file_livekit_models_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1700,7 +2028,7 @@ func (x *ClientInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientInfo.ProtoReflect.Descriptor instead.
 func (*ClientInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{13}
+	return file_livekit_models_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ClientInfo) GetSdk() ClientInfo_SDK {
@@ -1789,7 +2117,7 @@ type ClientConfiguration struct {
 func (x *ClientConfiguration) Reset() {
 	*x = ClientConfiguration{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[14]
+		mi := &file_livekit_models_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1802,7 +2130,7 @@ func (x *ClientConfiguration) String() string {
 func (*ClientConfiguration) ProtoMessage() {}
 
 func (x *ClientConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[14]
+	mi := &file_livekit_models_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1815,7 +2143,7 @@ func (x *ClientConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientConfiguration.ProtoReflect.Descriptor instead.
 func (*ClientConfiguration) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{14}
+	return file_livekit_models_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *ClientConfiguration) GetVideo() *VideoConfiguration {
@@ -1864,7 +2192,7 @@ type VideoConfiguration struct {
 func (x *VideoConfiguration) Reset() {
 	*x = VideoConfiguration{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[15]
+		mi := &file_livekit_models_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1877,7 +2205,7 @@ func (x *VideoConfiguration) String() string {
 func (*VideoConfiguration) ProtoMessage() {}
 
 func (x *VideoConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[15]
+	mi := &file_livekit_models_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1890,7 +2218,7 @@ func (x *VideoConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VideoConfiguration.ProtoReflect.Descriptor instead.
 func (*VideoConfiguration) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{15}
+	return file_livekit_models_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *VideoConfiguration) GetHardwareEncoder() ClientConfigSetting {
@@ -1911,7 +2239,7 @@ type DisabledCodecs struct {
 func (x *DisabledCodecs) Reset() {
 	*x = DisabledCodecs{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[16]
+		mi := &file_livekit_models_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1924,7 +2252,7 @@ func (x *DisabledCodecs) String() string {
 func (*DisabledCodecs) ProtoMessage() {}
 
 func (x *DisabledCodecs) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[16]
+	mi := &file_livekit_models_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1937,7 +2265,7 @@ func (x *DisabledCodecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DisabledCodecs.ProtoReflect.Descriptor instead.
 func (*DisabledCodecs) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{16}
+	return file_livekit_models_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DisabledCodecs) GetCodecs() []*Codec {
@@ -1998,7 +2326,7 @@ type RTPStats struct {
 func (x *RTPStats) Reset() {
 	*x = RTPStats{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[17]
+		mi := &file_livekit_models_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2011,7 +2339,7 @@ func (x *RTPStats) String() string {
 func (*RTPStats) ProtoMessage() {}
 
 func (x *RTPStats) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[17]
+	mi := &file_livekit_models_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2024,7 +2352,7 @@ func (x *RTPStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTPStats.ProtoReflect.Descriptor instead.
 func (*RTPStats) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{17}
+	return file_livekit_models_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RTPStats) GetStartTime() *timestamppb.Timestamp {
@@ -2326,7 +2654,7 @@ type TimedVersion struct {
 func (x *TimedVersion) Reset() {
 	*x = TimedVersion{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[18]
+		mi := &file_livekit_models_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2339,7 +2667,7 @@ func (x *TimedVersion) String() string {
 func (*TimedVersion) ProtoMessage() {}
 
 func (x *TimedVersion) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[18]
+	mi := &file_livekit_models_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2352,7 +2680,7 @@ func (x *TimedVersion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TimedVersion.ProtoReflect.Descriptor instead.
 func (*TimedVersion) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{18}
+	return file_livekit_models_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *TimedVersion) GetUnixMicro() int64 {
@@ -2376,30 +2704,80 @@ var file_livekit_models_proto_rawDesc = []byte{
 	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x07, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x1a,
 	0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66,
 	0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0xef, 0x02, 0x0a, 0x04, 0x52, 0x6f, 0x6f, 0x6d, 0x12, 0x10, 0x0a, 0x03, 0x73, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x73, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12,
-	0x23, 0x0a, 0x0d, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0c, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x54, 0x69, 0x6d,
-	0x65, 0x6f, 0x75, 0x74, 0x12, 0x29, 0x0a, 0x10, 0x6d, 0x61, 0x78, 0x5f, 0x70, 0x61, 0x72, 0x74,
-	0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0f,
-	0x6d, 0x61, 0x78, 0x50, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x12,
-	0x23, 0x0a, 0x0d, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x54, 0x69, 0x6d, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x74, 0x75, 0x72, 0x6e, 0x5f, 0x70, 0x61, 0x73,
-	0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x74, 0x75, 0x72,
-	0x6e, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x35, 0x0a, 0x0e, 0x65, 0x6e, 0x61,
-	0x62, 0x6c, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x63, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28,
-	0x0b, 0x32, 0x0e, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x43, 0x6f, 0x64, 0x65,
-	0x63, 0x52, 0x0d, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x43, 0x6f, 0x64, 0x65, 0x63, 0x73,
-	0x12, 0x1a, 0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18, 0x08, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x12, 0x29, 0x0a, 0x10,
-	0x6e, 0x75, 0x6d, 0x5f, 0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73,
-	0x18, 0x09, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0f, 0x6e, 0x75, 0x6d, 0x50, 0x61, 0x72, 0x74, 0x69,
-	0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x12, 0x29, 0x0a, 0x10, 0x61, 0x63, 0x74, 0x69, 0x76,
-	0x65, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x69, 0x6e, 0x67, 0x18, 0x0a, 0x20, 0x01, 0x28,
-	0x08, 0x52, 0x0f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x69,
-	0x6e, 0x67, 0x22, 0x38, 0x0a, 0x05, 0x43, 0x6f, 0x64, 0x65, 0x63, 0x12, 0x12, 0x0a, 0x04, 0x6d,
+	0x1a, 0x14, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x5f, 0x65, 0x67, 0x72, 0x65, 0x73, 0x73,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xef, 0x02, 0x0a, 0x04, 0x52, 0x6f, 0x6f, 0x6d, 0x12,
+	0x10, 0x0a, 0x03, 0x73, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x73, 0x69,
+	0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x5f, 0x74,
+	0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0c, 0x65, 0x6d,
+	0x70, 0x74, 0x79, 0x54, 0x69, 0x6d, 0x65, 0x6f, 0x75, 0x74, 0x12, 0x29, 0x0a, 0x10, 0x6d, 0x61,
+	0x78, 0x5f, 0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x0d, 0x52, 0x0f, 0x6d, 0x61, 0x78, 0x50, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69,
+	0x70, 0x61, 0x6e, 0x74, 0x73, 0x12, 0x23, 0x0a, 0x0d, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c, 0x63, 0x72,
+	0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x23, 0x0a, 0x0d, 0x74, 0x75,
+	0x72, 0x6e, 0x5f, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0c, 0x74, 0x75, 0x72, 0x6e, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12,
+	0x35, 0x0a, 0x0e, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x63,
+	0x73, 0x18, 0x07, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
+	0x74, 0x2e, 0x43, 0x6f, 0x64, 0x65, 0x63, 0x52, 0x0d, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64,
+	0x43, 0x6f, 0x64, 0x65, 0x63, 0x73, 0x12, 0x1a, 0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0x12, 0x29, 0x0a, 0x10, 0x6e, 0x75, 0x6d, 0x5f, 0x70, 0x61, 0x72, 0x74, 0x69, 0x63,
+	0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0f, 0x6e, 0x75,
+	0x6d, 0x50, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x73, 0x12, 0x29, 0x0a,
+	0x10, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x5f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x69, 0x6e,
+	0x67, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x52,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x69, 0x6e, 0x67, 0x22, 0x9a, 0x01, 0x0a, 0x0c, 0x52, 0x6f, 0x6f,
+	0x6d, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x12, 0x3b, 0x0a, 0x0c, 0x74, 0x72, 0x61,
+	0x63, 0x6b, 0x5f, 0x65, 0x67, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x18, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x54, 0x72,
+	0x61, 0x63, 0x6b, 0x45, 0x67, 0x72, 0x65, 0x73, 0x73, 0x52, 0x0b, 0x74, 0x72, 0x61, 0x63, 0x6b,
+	0x45, 0x67, 0x72, 0x65, 0x73, 0x73, 0x12, 0x4d, 0x0a, 0x12, 0x70, 0x61, 0x72, 0x74, 0x69, 0x63,
+	0x69, 0x70, 0x61, 0x6e, 0x74, 0x5f, 0x65, 0x67, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x41, 0x75, 0x74,
+	0x6f, 0x50, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x45, 0x67, 0x72, 0x65,
+	0x73, 0x73, 0x52, 0x11, 0x70, 0x61, 0x72, 0x74, 0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x45,
+	0x67, 0x72, 0x65, 0x73, 0x73, 0x22, 0xbb, 0x01, 0x0a, 0x0f, 0x41, 0x75, 0x74, 0x6f, 0x54, 0x72,
+	0x61, 0x63, 0x6b, 0x45, 0x67, 0x72, 0x65, 0x73, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x66, 0x69, 0x6c,
+	0x65, 0x5f, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x66, 0x69, 0x6c, 0x65, 0x50, 0x72, 0x65, 0x66, 0x69, 0x78, 0x12, 0x23, 0x0a, 0x02, 0x73, 0x33,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74,
+	0x2e, 0x53, 0x33, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x48, 0x00, 0x52, 0x02, 0x73, 0x33, 0x12,
+	0x26, 0x0a, 0x03, 0x67, 0x63, 0x70, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12, 0x2e, 0x6c,
+	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x47, 0x43, 0x50, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x48, 0x00, 0x52, 0x03, 0x67, 0x63, 0x70, 0x12, 0x30, 0x0a, 0x05, 0x61, 0x7a, 0x75, 0x72, 0x65,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74,
+	0x2e, 0x41, 0x7a, 0x75, 0x72, 0x65, 0x42, 0x6c, 0x6f, 0x62, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
+	0x48, 0x00, 0x52, 0x05, 0x61, 0x7a, 0x75, 0x72, 0x65, 0x42, 0x08, 0x0a, 0x06, 0x6f, 0x75, 0x74,
+	0x70, 0x75, 0x74, 0x22, 0xac, 0x03, 0x0a, 0x15, 0x41, 0x75, 0x74, 0x6f, 0x50, 0x61, 0x72, 0x74,
+	0x69, 0x63, 0x69, 0x70, 0x61, 0x6e, 0x74, 0x45, 0x67, 0x72, 0x65, 0x73, 0x73, 0x12, 0x1f, 0x0a,
+	0x0b, 0x66, 0x69, 0x6c, 0x65, 0x5f, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x0a, 0x66, 0x69, 0x6c, 0x65, 0x50, 0x72, 0x65, 0x66, 0x69, 0x78, 0x12, 0x1d,
+	0x0a, 0x0a, 0x61, 0x75, 0x64, 0x69, 0x6f, 0x5f, 0x6f, 0x6e, 0x6c, 0x79, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x09, 0x61, 0x75, 0x64, 0x69, 0x6f, 0x4f, 0x6e, 0x6c, 0x79, 0x12, 0x1d, 0x0a,
+	0x0a, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x5f, 0x6f, 0x6e, 0x6c, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x09, 0x76, 0x69, 0x64, 0x65, 0x6f, 0x4f, 0x6e, 0x6c, 0x79, 0x12, 0x2e, 0x0a, 0x13,
+	0x63, 0x75, 0x73, 0x74, 0x6f, 0x6d, 0x5f, 0x74, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x5f,
+	0x75, 0x72, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x11, 0x63, 0x75, 0x73, 0x74, 0x6f,
+	0x6d, 0x54, 0x65, 0x6d, 0x70, 0x6c, 0x61, 0x74, 0x65, 0x55, 0x72, 0x6c, 0x12, 0x23, 0x0a, 0x02,
+	0x73, 0x33, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b,
+	0x69, 0x74, 0x2e, 0x53, 0x33, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64, 0x48, 0x00, 0x52, 0x02, 0x73,
+	0x33, 0x12, 0x26, 0x0a, 0x03, 0x67, 0x63, 0x70, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x12,
+	0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x47, 0x43, 0x50, 0x55, 0x70, 0x6c, 0x6f,
+	0x61, 0x64, 0x48, 0x00, 0x52, 0x03, 0x67, 0x63, 0x70, 0x12, 0x30, 0x0a, 0x05, 0x61, 0x7a, 0x75,
+	0x72, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b,
+	0x69, 0x74, 0x2e, 0x41, 0x7a, 0x75, 0x72, 0x65, 0x42, 0x6c, 0x6f, 0x62, 0x55, 0x70, 0x6c, 0x6f,
+	0x61, 0x64, 0x48, 0x00, 0x52, 0x05, 0x61, 0x7a, 0x75, 0x72, 0x65, 0x12, 0x38, 0x0a, 0x06, 0x70,
+	0x72, 0x65, 0x73, 0x65, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x1e, 0x2e, 0x6c, 0x69,
+	0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x45, 0x6e, 0x63, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x4f, 0x70,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x50, 0x72, 0x65, 0x73, 0x65, 0x74, 0x48, 0x01, 0x52, 0x06, 0x70,
+	0x72, 0x65, 0x73, 0x65, 0x74, 0x12, 0x36, 0x0a, 0x08, 0x61, 0x64, 0x76, 0x61, 0x6e, 0x63, 0x65,
+	0x64, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
+	0x74, 0x2e, 0x45, 0x6e, 0x63, 0x6f, 0x64, 0x69, 0x6e, 0x67, 0x4f, 0x70, 0x74, 0x69, 0x6f, 0x6e,
+	0x73, 0x48, 0x01, 0x52, 0x08, 0x61, 0x64, 0x76, 0x61, 0x6e, 0x63, 0x65, 0x64, 0x42, 0x08, 0x0a,
+	0x06, 0x6f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x42, 0x09, 0x0a, 0x07, 0x6f, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x22, 0x38, 0x0a, 0x05, 0x43, 0x6f, 0x64, 0x65, 0x63, 0x12, 0x12, 0x0a, 0x04, 0x6d,
 	0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6d, 0x69, 0x6d, 0x65, 0x12,
 	0x1b, 0x0a, 0x09, 0x66, 0x6d, 0x74, 0x70, 0x5f, 0x6c, 0x69, 0x6e, 0x65, 0x18, 0x02, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x08, 0x66, 0x6d, 0x74, 0x70, 0x4c, 0x69, 0x6e, 0x65, 0x22, 0xbb, 0x01, 0x0a,
@@ -2758,7 +3136,7 @@ func file_livekit_models_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_models_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
-var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_livekit_models_proto_goTypes = []interface{}{
 	(TrackType)(0),                // 0: livekit.TrackType
 	(TrackSource)(0),              // 1: livekit.TrackSource
@@ -2771,63 +3149,81 @@ var file_livekit_models_proto_goTypes = []interface{}{
 	(ServerInfo_Edition)(0),       // 8: livekit.ServerInfo.Edition
 	(ClientInfo_SDK)(0),           // 9: livekit.ClientInfo.SDK
 	(*Room)(nil),                  // 10: livekit.Room
-	(*Codec)(nil),                 // 11: livekit.Codec
-	(*ParticipantPermission)(nil), // 12: livekit.ParticipantPermission
-	(*ParticipantInfo)(nil),       // 13: livekit.ParticipantInfo
-	(*SimulcastCodecInfo)(nil),    // 14: livekit.SimulcastCodecInfo
-	(*TrackInfo)(nil),             // 15: livekit.TrackInfo
-	(*VideoLayer)(nil),            // 16: livekit.VideoLayer
-	(*DataPacket)(nil),            // 17: livekit.DataPacket
-	(*ActiveSpeakerUpdate)(nil),   // 18: livekit.ActiveSpeakerUpdate
-	(*SpeakerInfo)(nil),           // 19: livekit.SpeakerInfo
-	(*UserPacket)(nil),            // 20: livekit.UserPacket
-	(*ParticipantTracks)(nil),     // 21: livekit.ParticipantTracks
-	(*ServerInfo)(nil),            // 22: livekit.ServerInfo
-	(*ClientInfo)(nil),            // 23: livekit.ClientInfo
-	(*ClientConfiguration)(nil),   // 24: livekit.ClientConfiguration
-	(*VideoConfiguration)(nil),    // 25: livekit.VideoConfiguration
-	(*DisabledCodecs)(nil),        // 26: livekit.DisabledCodecs
-	(*RTPStats)(nil),              // 27: livekit.RTPStats
-	(*TimedVersion)(nil),          // 28: livekit.TimedVersion
-	nil,                           // 29: livekit.RTPStats.GapHistogramEntry
-	(*timestamppb.Timestamp)(nil), // 30: google.protobuf.Timestamp
+	(*RoomInternal)(nil),          // 11: livekit.RoomInternal
+	(*AutoTrackEgress)(nil),       // 12: livekit.AutoTrackEgress
+	(*AutoParticipantEgress)(nil), // 13: livekit.AutoParticipantEgress
+	(*Codec)(nil),                 // 14: livekit.Codec
+	(*ParticipantPermission)(nil), // 15: livekit.ParticipantPermission
+	(*ParticipantInfo)(nil),       // 16: livekit.ParticipantInfo
+	(*SimulcastCodecInfo)(nil),    // 17: livekit.SimulcastCodecInfo
+	(*TrackInfo)(nil),             // 18: livekit.TrackInfo
+	(*VideoLayer)(nil),            // 19: livekit.VideoLayer
+	(*DataPacket)(nil),            // 20: livekit.DataPacket
+	(*ActiveSpeakerUpdate)(nil),   // 21: livekit.ActiveSpeakerUpdate
+	(*SpeakerInfo)(nil),           // 22: livekit.SpeakerInfo
+	(*UserPacket)(nil),            // 23: livekit.UserPacket
+	(*ParticipantTracks)(nil),     // 24: livekit.ParticipantTracks
+	(*ServerInfo)(nil),            // 25: livekit.ServerInfo
+	(*ClientInfo)(nil),            // 26: livekit.ClientInfo
+	(*ClientConfiguration)(nil),   // 27: livekit.ClientConfiguration
+	(*VideoConfiguration)(nil),    // 28: livekit.VideoConfiguration
+	(*DisabledCodecs)(nil),        // 29: livekit.DisabledCodecs
+	(*RTPStats)(nil),              // 30: livekit.RTPStats
+	(*TimedVersion)(nil),          // 31: livekit.TimedVersion
+	nil,                           // 32: livekit.RTPStats.GapHistogramEntry
+	(*S3Upload)(nil),              // 33: livekit.S3Upload
+	(*GCPUpload)(nil),             // 34: livekit.GCPUpload
+	(*AzureBlobUpload)(nil),       // 35: livekit.AzureBlobUpload
+	(EncodingOptionsPreset)(0),    // 36: livekit.EncodingOptionsPreset
+	(*EncodingOptions)(nil),       // 37: livekit.EncodingOptions
+	(*timestamppb.Timestamp)(nil), // 38: google.protobuf.Timestamp
 }
 var file_livekit_models_proto_depIdxs = []int32{
-	11, // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
-	6,  // 1: livekit.ParticipantInfo.state:type_name -> livekit.ParticipantInfo.State
-	15, // 2: livekit.ParticipantInfo.tracks:type_name -> livekit.TrackInfo
-	12, // 3: livekit.ParticipantInfo.permission:type_name -> livekit.ParticipantPermission
-	16, // 4: livekit.SimulcastCodecInfo.layers:type_name -> livekit.VideoLayer
-	0,  // 5: livekit.TrackInfo.type:type_name -> livekit.TrackType
-	1,  // 6: livekit.TrackInfo.source:type_name -> livekit.TrackSource
-	16, // 7: livekit.TrackInfo.layers:type_name -> livekit.VideoLayer
-	14, // 8: livekit.TrackInfo.codecs:type_name -> livekit.SimulcastCodecInfo
-	2,  // 9: livekit.VideoLayer.quality:type_name -> livekit.VideoQuality
-	7,  // 10: livekit.DataPacket.kind:type_name -> livekit.DataPacket.Kind
-	20, // 11: livekit.DataPacket.user:type_name -> livekit.UserPacket
-	18, // 12: livekit.DataPacket.speaker:type_name -> livekit.ActiveSpeakerUpdate
-	19, // 13: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
-	8,  // 14: livekit.ServerInfo.edition:type_name -> livekit.ServerInfo.Edition
-	9,  // 15: livekit.ClientInfo.sdk:type_name -> livekit.ClientInfo.SDK
-	25, // 16: livekit.ClientConfiguration.video:type_name -> livekit.VideoConfiguration
-	25, // 17: livekit.ClientConfiguration.screen:type_name -> livekit.VideoConfiguration
-	4,  // 18: livekit.ClientConfiguration.resume_connection:type_name -> livekit.ClientConfigSetting
-	26, // 19: livekit.ClientConfiguration.disabled_codecs:type_name -> livekit.DisabledCodecs
-	4,  // 20: livekit.ClientConfiguration.force_relay:type_name -> livekit.ClientConfigSetting
-	4,  // 21: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
-	11, // 22: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
-	30, // 23: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
-	30, // 24: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
-	29, // 25: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
-	30, // 26: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
-	30, // 27: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
-	30, // 28: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
-	30, // 29: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
-	30, // [30:30] is the sub-list for method output_type
-	30, // [30:30] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	14, // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
+	12, // 1: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
+	13, // 2: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
+	33, // 3: livekit.AutoTrackEgress.s3:type_name -> livekit.S3Upload
+	34, // 4: livekit.AutoTrackEgress.gcp:type_name -> livekit.GCPUpload
+	35, // 5: livekit.AutoTrackEgress.azure:type_name -> livekit.AzureBlobUpload
+	33, // 6: livekit.AutoParticipantEgress.s3:type_name -> livekit.S3Upload
+	34, // 7: livekit.AutoParticipantEgress.gcp:type_name -> livekit.GCPUpload
+	35, // 8: livekit.AutoParticipantEgress.azure:type_name -> livekit.AzureBlobUpload
+	36, // 9: livekit.AutoParticipantEgress.preset:type_name -> livekit.EncodingOptionsPreset
+	37, // 10: livekit.AutoParticipantEgress.advanced:type_name -> livekit.EncodingOptions
+	6,  // 11: livekit.ParticipantInfo.state:type_name -> livekit.ParticipantInfo.State
+	18, // 12: livekit.ParticipantInfo.tracks:type_name -> livekit.TrackInfo
+	15, // 13: livekit.ParticipantInfo.permission:type_name -> livekit.ParticipantPermission
+	19, // 14: livekit.SimulcastCodecInfo.layers:type_name -> livekit.VideoLayer
+	0,  // 15: livekit.TrackInfo.type:type_name -> livekit.TrackType
+	1,  // 16: livekit.TrackInfo.source:type_name -> livekit.TrackSource
+	19, // 17: livekit.TrackInfo.layers:type_name -> livekit.VideoLayer
+	17, // 18: livekit.TrackInfo.codecs:type_name -> livekit.SimulcastCodecInfo
+	2,  // 19: livekit.VideoLayer.quality:type_name -> livekit.VideoQuality
+	7,  // 20: livekit.DataPacket.kind:type_name -> livekit.DataPacket.Kind
+	23, // 21: livekit.DataPacket.user:type_name -> livekit.UserPacket
+	21, // 22: livekit.DataPacket.speaker:type_name -> livekit.ActiveSpeakerUpdate
+	22, // 23: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
+	8,  // 24: livekit.ServerInfo.edition:type_name -> livekit.ServerInfo.Edition
+	9,  // 25: livekit.ClientInfo.sdk:type_name -> livekit.ClientInfo.SDK
+	28, // 26: livekit.ClientConfiguration.video:type_name -> livekit.VideoConfiguration
+	28, // 27: livekit.ClientConfiguration.screen:type_name -> livekit.VideoConfiguration
+	4,  // 28: livekit.ClientConfiguration.resume_connection:type_name -> livekit.ClientConfigSetting
+	29, // 29: livekit.ClientConfiguration.disabled_codecs:type_name -> livekit.DisabledCodecs
+	4,  // 30: livekit.ClientConfiguration.force_relay:type_name -> livekit.ClientConfigSetting
+	4,  // 31: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
+	14, // 32: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
+	38, // 33: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
+	38, // 34: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
+	32, // 35: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
+	38, // 36: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
+	38, // 37: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
+	38, // 38: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
+	38, // 39: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
+	40, // [40:40] is the sub-list for method output_type
+	40, // [40:40] is the sub-list for method input_type
+	40, // [40:40] is the sub-list for extension type_name
+	40, // [40:40] is the sub-list for extension extendee
+	0,  // [0:40] is the sub-list for field type_name
 }
 
 func init() { file_livekit_models_proto_init() }
@@ -2835,6 +3231,7 @@ func file_livekit_models_proto_init() {
 	if File_livekit_models_proto != nil {
 		return
 	}
+	file_livekit_egress_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_livekit_models_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Room); i {
@@ -2849,7 +3246,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Codec); i {
+			switch v := v.(*RoomInternal); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2861,7 +3258,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ParticipantPermission); i {
+			switch v := v.(*AutoTrackEgress); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2873,7 +3270,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ParticipantInfo); i {
+			switch v := v.(*AutoParticipantEgress); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2885,7 +3282,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SimulcastCodecInfo); i {
+			switch v := v.(*Codec); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2897,7 +3294,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*TrackInfo); i {
+			switch v := v.(*ParticipantPermission); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2909,7 +3306,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*VideoLayer); i {
+			switch v := v.(*ParticipantInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2921,7 +3318,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DataPacket); i {
+			switch v := v.(*SimulcastCodecInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2933,7 +3330,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ActiveSpeakerUpdate); i {
+			switch v := v.(*TrackInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2945,7 +3342,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SpeakerInfo); i {
+			switch v := v.(*VideoLayer); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2957,7 +3354,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*UserPacket); i {
+			switch v := v.(*DataPacket); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2969,7 +3366,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ParticipantTracks); i {
+			switch v := v.(*ActiveSpeakerUpdate); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2981,7 +3378,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ServerInfo); i {
+			switch v := v.(*SpeakerInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -2993,7 +3390,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientInfo); i {
+			switch v := v.(*UserPacket); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3005,7 +3402,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ClientConfiguration); i {
+			switch v := v.(*ParticipantTracks); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3017,7 +3414,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*VideoConfiguration); i {
+			switch v := v.(*ServerInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3029,7 +3426,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*DisabledCodecs); i {
+			switch v := v.(*ClientInfo); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3041,7 +3438,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RTPStats); i {
+			switch v := v.(*ClientConfiguration); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3053,6 +3450,42 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*VideoConfiguration); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_livekit_models_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DisabledCodecs); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_livekit_models_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RTPStats); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_livekit_models_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TimedVersion); i {
 			case 0:
 				return &v.state
@@ -3065,7 +3498,19 @@ func file_livekit_models_proto_init() {
 			}
 		}
 	}
-	file_livekit_models_proto_msgTypes[7].OneofWrappers = []interface{}{
+	file_livekit_models_proto_msgTypes[2].OneofWrappers = []interface{}{
+		(*AutoTrackEgress_S3)(nil),
+		(*AutoTrackEgress_Gcp)(nil),
+		(*AutoTrackEgress_Azure)(nil),
+	}
+	file_livekit_models_proto_msgTypes[3].OneofWrappers = []interface{}{
+		(*AutoParticipantEgress_S3)(nil),
+		(*AutoParticipantEgress_Gcp)(nil),
+		(*AutoParticipantEgress_Azure)(nil),
+		(*AutoParticipantEgress_Preset)(nil),
+		(*AutoParticipantEgress_Advanced)(nil),
+	}
+	file_livekit_models_proto_msgTypes[10].OneofWrappers = []interface{}{
 		(*DataPacket_User)(nil),
 		(*DataPacket_Speaker)(nil),
 	}
@@ -3075,7 +3520,7 @@ func file_livekit_models_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_models_proto_rawDesc,
 			NumEnums:      10,
-			NumMessages:   20,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

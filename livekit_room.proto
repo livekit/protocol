@@ -68,31 +68,6 @@ message RoomEgress {
   AutoParticipantEgress participants = 3;
 }
 
-message AutoTrackEgress {
-  string file_prefix = 1;
-  oneof output {
-    S3Upload s3 = 2;
-    GCPUpload gcp = 3;
-    AzureBlobUpload azure = 4;
-  }
-}
-
-message AutoParticipantEgress {
-  string file_prefix = 1;
-  bool audio_only = 2;
-  bool video_only = 3;
-  string custom_template_url = 4;
-  oneof output {
-    S3Upload s3 = 5;
-    GCPUpload gcp = 6;
-    AzureBlobUpload azure = 7;
-  }
-  oneof options {
-    EncodingOptionsPreset preset = 8; // (default H264_720P_30)
-    EncodingOptions advanced = 9;     // (optional)
-  }
-}
-
 message ListRoomsRequest {
   // when set, will only return rooms with name match
   repeated string names = 1;
