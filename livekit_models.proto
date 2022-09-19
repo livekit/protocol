@@ -40,7 +40,6 @@ message AutoParticipantEgress {
   string file_prefix = 1;
   bool audio_only = 2;
   bool video_only = 3;
-  string custom_template_url = 4;
   oneof output {
     S3Upload s3 = 5;
     GCPUpload gcp = 6;

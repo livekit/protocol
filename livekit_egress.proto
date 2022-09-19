@@ -49,7 +49,6 @@ message ParticipantCompositeEgressRequest {
   string participant_identity = 2;
   bool audio_only = 3;
   bool video_only = 4;
-  string custom_template_url = 5;
   oneof output {
     EncodedFileOutput file = 6;
     StreamOutput stream = 7;
