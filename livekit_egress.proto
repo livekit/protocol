@@ -8,6 +8,7 @@ option ruby_package = "LiveKit::Proto";
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
+  rpc StartParticipantCompositeEgress(ParticipantCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
@@ -39,6 +40,24 @@ message RoomCompositeEgressRequest {
   oneof options {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
     EncodingOptions advanced = 9;     // (optional)
+  }
+}
+
+// composite a single participant's video and audio
+message ParticipantCompositeEgressRequest {
+  string room_name = 1;
+  string participant_identity = 2;
+  bool audio_only = 3;
+  bool video_only = 4;
+  string custom_template_url = 5;
+  oneof output {
+    EncodedFileOutput file = 6;
+    StreamOutput stream = 7;
+    SegmentedFileOutput segments = 8;
+  }
+  oneof options {
+    EncodingOptionsPreset preset = 9; // (default H264_720P_30)
+    EncodingOptions advanced = 10;     // (optional)
   }
 }
 
@@ -166,10 +185,14 @@ message EncodingOptions {
 }
 
 enum EncodingOptionsPreset {
-  H264_720P_30 = 0;  //  720p, 30fps, 3000kpbs, H.264_MAIN / OPUS
-  H264_720P_60 = 1;  //  720p, 60fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_30 = 2; // 1080p, 30fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_60 = 3; // 1080p, 60fps, 6000kbps, H.264_MAIN / OPUS
+  H264_720P_30 = 0;           //  1280x720, 30fps, 3000kpbs, H.264_MAIN / OPUS
+  H264_720P_60 = 1;           //  1280x720, 60fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_30 = 2;          // 1920x1080, 30fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_60 = 3;          // 1920x1080, 60fps, 6000kbps, H.264_MAIN / OPUS
+  PORTRAIT_H264_720P_30 = 4;  //  720x1280, 30fps, 3000kpbs, H.264_MAIN / OPUS
+  PORTRAIT_H264_720P_60 = 5;  //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
+  PORTRAIT_H264_1080P_30 = 6; // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
+  PORTRAIT_H264_1080P_60 = 7; // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
 }
 
 message UpdateLayoutRequest {
