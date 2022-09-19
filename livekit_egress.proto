@@ -50,13 +50,13 @@ message ParticipantCompositeEgressRequest {
   bool audio_only = 3;
   bool video_only = 4;
   oneof output {
-    EncodedFileOutput file = 6;
-    StreamOutput stream = 7;
-    SegmentedFileOutput segments = 8;
+    EncodedFileOutput file = 5;
+    StreamOutput stream = 6;
+    SegmentedFileOutput segments = 7;
   }
   oneof options {
-    EncodingOptionsPreset preset = 9; // (default H264_720P_30)
-    EncodingOptions advanced = 10;     // (optional)
+    EncodingOptionsPreset preset = 8; // (default H264_720P_30)
+    EncodingOptions advanced = 9;     // (optional)
   }
 }
 
