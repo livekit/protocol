@@ -8,7 +8,6 @@ option ruby_package = "LiveKit::Proto";
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
-  rpc StartParticipantCompositeEgress(ParticipantCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
@@ -36,23 +35,6 @@ message RoomCompositeEgressRequest {
     EncodedFileOutput file = 6;
     StreamOutput stream = 7;
     SegmentedFileOutput segments = 10;
-  }
-  oneof options {
-    EncodingOptionsPreset preset = 8; // (default H264_720P_30)
-    EncodingOptions advanced = 9;     // (optional)
-  }
-}
-
-// composite a single participant's video and audio
-message ParticipantCompositeEgressRequest {
-  string room_name = 1;
-  string participant_identity = 2;
-  bool audio_only = 3;
-  bool video_only = 4;
-  oneof output {
-    EncodedFileOutput file = 5;
-    StreamOutput stream = 6;
-    SegmentedFileOutput segments = 7;
   }
   oneof options {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
@@ -239,7 +221,6 @@ message EgressInfo {
     RoomCompositeEgressRequest room_composite = 4;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
-    ParticipantCompositeEgressRequest participant_composite = 14;
   }
   oneof result {
     StreamInfoList stream = 7;
