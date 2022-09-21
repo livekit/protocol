@@ -105,6 +105,7 @@ message AnalyticsEvent {
   ClientInfo  client_info = 11;
   AnalyticsClientMeta client_meta = 12;
   string egress_id = 13;
+  string ingress_id = 19;
   VideoQuality max_subscribed_video_quality = 14;
   ParticipantInfo publisher = 15;
   string mime = 16;
