@@ -105,7 +105,7 @@ func (r *RedisRPC) sendRequest(
 		}
 
 	case <-time.After(requestTimeout):
-		return nil, errors.New("no response from ingress service")
+		return nil, ErrNoResponse
 	}
 }
 
