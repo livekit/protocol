@@ -261,3 +261,12 @@ message SegmentsInfo {
   string playlist_location = 4;
   int64 segment_count = 5;
 }
+
+message AutoTrackEgress {
+  string file_prefix = 1;
+  oneof output {
+    S3Upload s3 = 2;
+    GCPUpload gcp = 3;
+    AzureBlobUpload azure = 4;
+  }
+}

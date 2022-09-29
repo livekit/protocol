@@ -9,6 +9,7 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_models.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
+import "livekit_egress.proto";
 
 enum NodeType {
   SERVER = 0;
@@ -124,7 +125,7 @@ message StartSession {
   string grants_json = 14;
   bool adaptive_stream = 15;
   //if reconnect, client will set current sid
-  string participant_id = 16; 
+  string participant_id = 16;
 }
 
 message EndSession {
@@ -135,4 +136,9 @@ message RemoveParticipant {
 }
 
 message KeepAlive {
+}
+
+// room info that should not be returned to clients
+message RoomInternal {
+  AutoTrackEgress track_egress = 1;
 }
