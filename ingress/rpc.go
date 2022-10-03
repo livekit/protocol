@@ -30,7 +30,7 @@ type RPCClient interface {
 	// GetEntityChannel returns a subscription for entity requests
 	GetEntityChannel(ctx context.Context) (utils.PubSub, error)
 	// SendRequest sends a request to all available instances
-	SendRequest(ctx context.Context, req *livekit.IngressRequest) (*livekit.IngressInfo, error)
+	SendRequest(ctx context.Context, req *livekit.IngressRequest) (*livekit.IngressState, error)
 	// SendResponse returns a GetIngressInfo response
 	SendGetIngressInfoResponse(ctx context.Context, req *livekit.GetIngressInfoRequest, resp *livekit.GetIngressInfoResponse, err error) error
 }
@@ -40,9 +40,9 @@ type RPCServer interface {
 	// IngressSubscription subscribes to requests for a specific ingress ID
 	IngressSubscription(ctx context.Context, ingressID string) (utils.PubSub, error)
 	// SendResponse returns an RPC response
-	SendResponse(ctx context.Context, request *livekit.IngressRequest, info *livekit.IngressInfo, err error) error
+	SendResponse(ctx context.Context, request *livekit.IngressRequest, state *livekit.IngressState, err error) error
 	// SendUpdate sends an ingress info update
-	SendUpdate(ctx context.Context, info *livekit.IngressInfo) error
+	SendUpdate(ctx context.Context, ingressId string, state *livekit.IngressState) error
 	// SendGetIngressInfoRequest sends a request to all available instances
 	SendGetIngressInfoRequest(ctx context.Context, req *livekit.GetIngressInfoRequest) (*livekit.GetIngressInfoResponse, error)
 }
@@ -109,7 +109,7 @@ func (r *RedisRPC) sendRequest(
 	}
 }
 
-func (r *RedisRPC) SendRequest(ctx context.Context, req *livekit.IngressRequest) (*livekit.IngressInfo, error) {
+func (r *RedisRPC) SendRequest(ctx context.Context, req *livekit.IngressRequest) (*livekit.IngressState, error) {
 	requestID := utils.NewGuid(utils.RPCPrefix)
 	var channel string
 	var err error
@@ -125,7 +125,7 @@ func (r *RedisRPC) SendRequest(ctx context.Context, req *livekit.IngressRequest)
 	} else if resp.Error != "" {
 		return nil, errors.New(resp.Error)
 	} else {
-		return resp.Info, nil
+		return resp.State, nil
 	}
 }
 
@@ -153,9 +153,9 @@ func (r *RedisRPC) IngressSubscription(ctx context.Context, ingressID string) (u
 	return r.bus.Subscribe(ctx, requestChannel(ingressID))
 }
 
-func (r *RedisRPC) SendResponse(ctx context.Context, req *livekit.IngressRequest, info *livekit.IngressInfo, err error) error {
+func (r *RedisRPC) SendResponse(ctx context.Context, req *livekit.IngressRequest, state *livekit.IngressState, err error) error {
 	res := &livekit.IngressResponse{
-		Info:      info,
+		State:     state,
 		RequestId: req.RequestId,
 	}
 
@@ -176,8 +176,11 @@ func (r *RedisRPC) SendGetIngressInfoResponse(ctx context.Context, req *livekit.
 	return r.bus.Publish(ctx, responseChannel(req.RequestId), resp)
 }
 
-func (r *RedisRPC) SendUpdate(ctx context.Context, info *livekit.IngressInfo) error {
-	return r.bus.Publish(ctx, updateChannel, info)
+func (r *RedisRPC) SendUpdate(ctx context.Context, ingressId string, state *livekit.IngressState) error {
+	return r.bus.Publish(ctx, updateChannel, &livekit.UpdateIngressStateRequest{
+		IngressId: ingressId,
+		State:     state,
+	})
 }
 
 func (r *RedisRPC) GetEntityChannel(ctx context.Context) (utils.PubSub, error) {
