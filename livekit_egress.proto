@@ -30,7 +30,8 @@ message RoomCompositeEgressRequest {
   string layout = 2;            // (optional)
   bool audio_only = 3;          // (default false)
   bool video_only = 4;          // (default false)
-  string custom_base_url = 5;   // (default https://recorder.livekit.io)
+  string custom_base_url = 5;   // template base url (default https://recorder.livekit.io)
+  bool disable_manifest = 11;   // disable upload of json manifest file (default false)
   oneof output {                // required
     EncodedFileOutput file = 6;
     StreamOutput stream = 7;
@@ -47,6 +48,7 @@ message TrackCompositeEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
+  bool disable_manifest = 9; // disable upload of json manifest file (default false)
   oneof output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
@@ -60,9 +62,10 @@ message TrackCompositeEgressRequest {
 
 // record tracks individually, without transcoding
 message TrackEgressRequest {
-  string room_name = 1;  // required
-  string track_id = 2;   // required
-  oneof output {         // required
+  string room_name = 1;      // required
+  string track_id = 2;       // required
+  bool disable_manifest = 5; // disable upload of json manifest file (default false)
+  oneof output {             // required
     DirectFileOutput file = 3;
     string websocket_url = 4;
   }
@@ -263,7 +266,8 @@ message SegmentsInfo {
 }
 
 message AutoTrackEgress {
-  string file_prefix = 1;
+  string filepath = 1;
+  bool disable_manifest = 5; // disables upload of json manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;
