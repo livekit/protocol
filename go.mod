@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/twitchtv/twirp v8.1.2+incompatible
 	go.uber.org/zap v1.23.0
-	google.golang.org/grpc v1.49.0
+	google.golang.org/grpc v1.50.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1
