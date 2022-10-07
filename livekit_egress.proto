@@ -31,7 +31,6 @@ message RoomCompositeEgressRequest {
   bool audio_only = 3;          // (default false)
   bool video_only = 4;          // (default false)
   string custom_base_url = 5;   // template base url (default https://recorder.livekit.io)
-  bool disable_manifest = 11;   // disable upload of json manifest file (default false)
   oneof output {                // required
     EncodedFileOutput file = 6;
     StreamOutput stream = 7;
@@ -48,7 +47,6 @@ message TrackCompositeEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
-  bool disable_manifest = 9; // disable upload of json manifest file (default false)
   oneof output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
@@ -64,7 +62,6 @@ message TrackCompositeEgressRequest {
 message TrackEgressRequest {
   string room_name = 1;      // required
   string track_id = 2;       // required
-  bool disable_manifest = 5; // disable upload of json manifest file (default false)
   oneof output {             // required
     DirectFileOutput file = 3;
     string websocket_url = 4;
@@ -79,8 +76,9 @@ enum EncodedFileType {
 
 message EncodedFileOutput {
   EncodedFileType file_type = 1; // (optional)
-  string filepath = 2;           // (optional)
-  oneof output {                 // required
+  string filepath = 2;           // see egress docs for templating (default {room_name}-{time})
+  bool disable_manifest = 6;     // disable upload of manifest file (default false)
+  oneof output {
     S3Upload s3 = 3;
     GCPUpload gcp = 4;
     AzureBlobUpload azure = 5;
@@ -90,10 +88,11 @@ message EncodedFileOutput {
 // Used to generate HLS segments or other kind of segmented output
 message SegmentedFileOutput {
   SegmentedFileProtocol protocol = 1; // (optional)
-  string filename_prefix = 2;      // (optional)
-  string playlist_name = 3;        // (optional)
-  uint32 segment_duration = 4;     // (optional)
-  oneof output {                   // required
+  string filename_prefix = 2;         // (optional)
+  string playlist_name = 3;           // (optional)
+  uint32 segment_duration = 4;        // (optional)
+  bool disable_manifest = 8;          // disable upload of manifest file (default false)
+  oneof output {                      // required
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
     AzureBlobUpload azure = 7;
@@ -101,8 +100,9 @@ message SegmentedFileOutput {
 }
 
 message DirectFileOutput {
-  string filepath = 1; // (optional)
-  oneof output {       // required
+  string filepath = 1;       // see egress docs for templating (default {room_name}-{time})
+  bool disable_manifest = 5; // disable upload of manifest file (default false)
+  oneof output {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;
     AzureBlobUpload azure = 4;
@@ -266,7 +266,7 @@ message SegmentsInfo {
 }
 
 message AutoTrackEgress {
-  string filepath = 1;
+  string filepath = 1;       // see docs for templating (default {room_name}-{time})
   bool disable_manifest = 5; // disables upload of json manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
