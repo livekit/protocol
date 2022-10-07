@@ -124,6 +124,8 @@ message UpdateParticipantRequest {
   string metadata = 3;
   // set to update the participant's permissions
   ParticipantPermission permission = 4;
+  // display name to update
+  string name = 5;
 }
 
 message UpdateSubscriptionsRequest {
