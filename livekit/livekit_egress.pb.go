@@ -1245,11 +1245,12 @@ type S3Upload struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AccessKey string `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	Secret    string `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	Region    string `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Endpoint  string `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Bucket    string `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	AccessKey      string `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	Secret         string `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	Region         string `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Endpoint       string `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Bucket         string `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	ForcePathStyle bool   `protobuf:"bytes,6,opt,name=force_path_style,proto3" json:"force_path_style,omitempty"`
 }
 
 func (x *S3Upload) Reset() {

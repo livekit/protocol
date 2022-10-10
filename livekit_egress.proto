@@ -115,6 +115,7 @@ message S3Upload {
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
+  bool force_path_style = 6;
 }
 
 message GCPUpload {
