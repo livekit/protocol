@@ -108,6 +108,10 @@ message AddTrackRequest {
 
   // server ID of track, publish new codec to exist track
   string sid = 11;
+
+  bool stereo = 12;
+  // true if RED (Redundant Encoding) is disabled for audio
+  bool disable_red = 13;
 }
 
 message TrickleRequest {

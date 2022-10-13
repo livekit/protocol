@@ -107,6 +107,9 @@ message TrackInfo {
   string mime_type = 11;
   string mid = 12;
   repeated SimulcastCodecInfo codecs = 13;
+  bool stereo = 14;
+  // true if RED (Redundant Encoding) is disabled for audio
+  bool disable_red = 15;
 }
 
 enum VideoQuality {
