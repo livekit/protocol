@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"regexp"
+	"runtime"
 	"strconv"
 	"time"
 )
@@ -30,7 +31,7 @@ func newPlatformCPUMonitor() (*platformCPUMonitor, error) {
 	}
 
 	return &platformCPUMonitor{
-		lastSampleTime:   time.Now().UnixNano(),
+		lastSampleTime:   time.Now().UnixNano() / 1000,
 		lastTotalCPUTime: cpu,
 	}, nil
 }
@@ -45,7 +46,15 @@ func (p *platformCPUMonitor) getCPUIdle() (float64, error) {
 	durationUSec := t - p.lastSampleTime
 	cpuTime := next - p.lastTotalCPUTime
 
-	idleRatio := float64(cpuTime) / float64(durationUSec)
+	busyRatio := float64(cpuTime) / float64(durationUSec)
+	idleRatio := float64(runtime.NumCPU()) - busyRatio
+
+	// Clamp the value as we do not get all the timestamps at the same time
+	if idleRatio > float64(runtime.NumCPU()) {
+		idleRatio = float64(runtime.NumCPU())
+	} else if idleRatio < 0 {
+		idleRatio = 0
+	}
 
 	p.lastSampleTime = t
 	p.lastTotalCPUTime = next

@@ -31,6 +31,8 @@ func NewCPUStats() (*CPUStats, error) {
 		closeChan:       make(chan struct{}),
 	}
 
+	go c.monitorCPULoad()
+
 	return c, nil
 }
 
