@@ -13,13 +13,15 @@ import (
 // it falls back to full system stats
 
 type CPUStats struct {
-	idleCPUs        atomic.Float64
-	platform        *platformCPUMonitor
+	idleCPUs atomic.Float64
+	platform *platformCPUMonitor
+
+	updateCallback  func(idle float64)
 	warningThrottle func(func())
 	closeChan       chan struct{}
 }
 
-func NewCPUStats() (*CPUStats, error) {
+func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
 	p, err := newPlatformCPUMonitor()
 	if err != nil {
 		return nil, err
@@ -64,6 +66,10 @@ func (c *CPUStats) monitorCPULoad() {
 
 			if idleRatio < 0.1 {
 				c.warningThrottle(func() { logger.Infow("high cpu load", "load", 1-idleRatio) })
+			}
+
+			if c.updateCallback != nil {
+				c.updateCallback(idle)
 			}
 		}
 	}
