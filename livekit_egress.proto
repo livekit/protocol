@@ -100,7 +100,7 @@ message SegmentedFileOutput {
 }
 
 message DirectFileOutput {
-  string filepath = 1;       // see egress docs for templating (default {room_name}-{time})
+  string filepath = 1;       // see egress docs for templating (default {track_id}-{time})
   bool disable_manifest = 5; // disable upload of manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
@@ -271,7 +271,7 @@ message SegmentsInfo {
 }
 
 message AutoTrackEgress {
-  string filepath = 1;       // see docs for templating (default {room_name}-{time})
+  string filepath = 1;       // see docs for templating (default {track_id}-{time})
   bool disable_manifest = 5; // disables upload of json manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
