@@ -30,6 +30,7 @@ func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
 	c := &CPUStats{
 		platform:        p,
 		warningThrottle: throttle.New(time.Minute),
+		updateCallback:  updateCallback,
 		closeChan:       make(chan struct{}),
 	}
 
