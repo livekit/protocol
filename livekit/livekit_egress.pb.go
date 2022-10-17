@@ -1134,7 +1134,7 @@ type DirectFileOutput struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Filepath        string `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see egress docs for templating (default {room_name}-{time})
+	Filepath        string `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see egress docs for templating (default {track_id}-{time})
 	DisableManifest bool   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"` // disable upload of manifest file (default false)
 	// Types that are assignable to Output:
 	//
@@ -2390,7 +2390,7 @@ type AutoTrackEgress struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Filepath        string `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see docs for templating (default {room_name}-{time})
+	Filepath        string `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see docs for templating (default {track_id}-{time})
 	DisableManifest bool   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"` // disables upload of json manifest file (default false)
 	// Types that are assignable to Output:
 	//
