@@ -100,7 +100,7 @@ message SegmentedFileOutput {
 }
 
 message DirectFileOutput {
-  string filepath = 1;       // see egress docs for templating (default {room_name}-{time})
+  string filepath = 1;       // see egress docs for templating (default {track_id}-{time})
   bool disable_manifest = 5; // disable upload of manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
@@ -115,6 +115,7 @@ message S3Upload {
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
+  bool force_path_style = 6;
 }
 
 message GCPUpload {
@@ -252,6 +253,8 @@ message StreamInfo {
 
 message FileInfo {
   string filename = 1;
+  int64 started_at = 2;
+  int64 ended_at = 3;
   int64 duration = 6;
   int64 size = 4;
   string location = 5;
@@ -263,10 +266,12 @@ message SegmentsInfo {
   int64 size = 3;
   string playlist_location = 4;
   int64 segment_count = 5;
+  int64 started_at = 6;
+  int64 ended_at = 7;
 }
 
 message AutoTrackEgress {
-  string filepath = 1;       // see docs for templating (default {room_name}-{time})
+  string filepath = 1;       // see docs for templating (default {track_id}-{time})
   bool disable_manifest = 5; // disables upload of json manifest file (default false)
   oneof output {
     S3Upload s3 = 2;

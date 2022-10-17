@@ -120,3 +120,19 @@ func ExtractICECredential(desc *sdp.SessionDescription) (string, string, error) 
 
 	return remoteUfrags[0], remotePwds[0], nil
 }
+
+func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
+	// last video is pending for publish, set codec preference
+	var streamID string
+	msid, ok := media.Attribute(sdp.AttrKeyMsid)
+	if !ok {
+		return "", false
+	}
+	ids := strings.Split(msid, " ")
+	if len(ids) < 2 {
+		streamID = msid
+	} else {
+		streamID = ids[1]
+	}
+	return streamID, true
+}
