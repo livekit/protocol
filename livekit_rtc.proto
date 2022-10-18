@@ -178,6 +178,7 @@ message UpdateTrackSettings {
   uint32 width = 5;
   // for video, height to receive
   uint32 height = 6;
+  uint32 fps = 7;
 }
 
 message LeaveRequest {
