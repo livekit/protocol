@@ -116,6 +116,8 @@ message S3Upload {
   string endpoint = 4;
   string bucket = 5;
   bool force_path_style = 6;
+  map<string, string> metadata = 7;
+  string tagging = 8;
 }
 
 message GCPUpload {
