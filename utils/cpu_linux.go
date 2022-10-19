@@ -91,7 +91,7 @@ func getTotalCPUTimeV1() (int64, error) {
 		return 0, err
 	}
 
-	// Skip the trailing like return
+	// Skip the trailing EOL
 	i, err := strconv.ParseInt(string(b[:len(b)-1]), 10, 64)
 	if err != nil {
 		return 0, err
