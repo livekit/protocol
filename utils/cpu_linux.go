@@ -40,8 +40,8 @@ func newPlatformCPUMonitor() (*platformCPUMonitor, error) {
 		}
 		if e {
 			cpuTimeFunc = v
+			break
 		}
-		break
 	}
 	if cpuTimeFunc == nil {
 		return nil, errors.New("failed reading cpu stats file")
@@ -53,7 +53,7 @@ func newPlatformCPUMonitor() (*platformCPUMonitor, error) {
 	}
 
 	return &platformCPUMonitor{
-		lastSampleTime:   time.Now().UnixNano() / 1000,
+		lastSampleTime:   time.Now().UnixNano(),
 		lastTotalCPUTime: cpu,
 		cpuTimeFunc:      cpuTimeFunc,
 	}, nil
@@ -91,6 +91,21 @@ func getTotalCPUTimeV1() (int64, error) {
 		return 0, err
 	}
 
+	// Skip the trailing like return
+	i, err := strconv.ParseInt(string(b[:len(b)-1]), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return i, nil
+}
+
+func getTotalCPUTimeV2() (int64, error) {
+	b, err := os.ReadFile(cpuStatsPathV2)
+	if err != nil {
+		return 0, err
+	}
+
 	m := usageRegex.FindSubmatch(b)
 	if len(m) <= 1 {
 		return 0, errors.New("could not parse cpu stats")
@@ -105,26 +120,12 @@ func getTotalCPUTimeV1() (int64, error) {
 	return i * 1000, nil
 }
 
-func getTotalCPUTimeV2() (int64, error) {
-	b, err := os.ReadFile(cpuStatsPathV2)
-	if err != nil {
-		return 0, err
-	}
-
-	i, err := strconv.ParseInt(string(b), 10, 64)
-	if err != nil {
-		return 0, err
-	}
-
-	return i, nil
-}
-
 func fileExists(path string) (bool, error) {
 	_, err := os.Lstat(path)
-	switch err {
-	case nil:
+	switch {
+	case err == nil:
 		return true, nil
-	case os.ErrNotExist:
+	case errors.Is(err, os.ErrNotExist):
 		return false, nil
 	default:
 		return false, err
