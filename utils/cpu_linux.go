@@ -16,16 +16,38 @@ var (
 )
 
 const (
-	cpuStatPath = "/sys/fs/cgroup/cpu.stat"
+	cpuStatsPathV1 = "/sys/fs/cgroup/cpu,cpuacct/cpuacct.usage"
+	cpuStatsPathV2 = "/sys/fs/cgroup/cpu.stat"
 )
 
 type platformCPUMonitor struct {
 	lastSampleTime   int64
 	lastTotalCPUTime int64
+
+	cpuTimeFunc func() (int64, error)
 }
 
 func newPlatformCPUMonitor() (*platformCPUMonitor, error) {
-	cpu, err := getTotalCPUTime()
+	// probe for the cgroup version
+	var cpuTimeFunc func() (int64, error)
+	for k, v := range map[string]func() (int64, error){
+		cpuStatsPathV1: getTotalCPUTimeV1,
+		cpuStatsPathV2: getTotalCPUTimeV2,
+	} {
+		e, err := fileExists(k)
+		if err != nil {
+			return nil, err
+		}
+		if e {
+			cpuTimeFunc = v
+		}
+		break
+	}
+	if cpuTimeFunc == nil {
+		return nil, errors.New("failed reading cpu stats file")
+	}
+
+	cpu, err := cpuTimeFunc()
 	if err != nil {
 		return nil, err
 	}
@@ -33,20 +55,21 @@ func newPlatformCPUMonitor() (*platformCPUMonitor, error) {
 	return &platformCPUMonitor{
 		lastSampleTime:   time.Now().UnixNano() / 1000,
 		lastTotalCPUTime: cpu,
+		cpuTimeFunc:      cpuTimeFunc,
 	}, nil
 }
 
 func (p *platformCPUMonitor) getCPUIdle() (float64, error) {
-	next, err := getTotalCPUTime()
+	next, err := p.cpuTimeFunc()
 	if err != nil {
 		return 0, err
 	}
-	t := time.Now().UnixNano() / 1000
+	t := time.Now().UnixNano()
 
-	durationUSec := t - p.lastSampleTime
+	duration := t - p.lastSampleTime
 	cpuTime := next - p.lastTotalCPUTime
 
-	busyRatio := float64(cpuTime) / float64(durationUSec)
+	busyRatio := float64(cpuTime) / float64(duration)
 	idleRatio := float64(runtime.NumCPU()) - busyRatio
 
 	// Clamp the value as we do not get all the timestamps at the same time
@@ -62,8 +85,8 @@ func (p *platformCPUMonitor) getCPUIdle() (float64, error) {
 	return idleRatio, nil
 }
 
-func getTotalCPUTime() (int64, error) {
-	b, err := os.ReadFile(cpuStatPath)
+func getTotalCPUTimeV1() (int64, error) {
+	b, err := os.ReadFile(cpuStatsPathV1)
 	if err != nil {
 		return 0, err
 	}
@@ -78,5 +101,32 @@ func getTotalCPUTime() (int64, error) {
 		return 0, err
 	}
 
+	// Caller expexts time in ns
+	return i * 1000, nil
+}
+
+func getTotalCPUTimeV2() (int64, error) {
+	b, err := os.ReadFile(cpuStatsPathV2)
+	if err != nil {
+		return 0, err
+	}
+
+	i, err := strconv.ParseInt(string(b), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
 	return i, nil
+}
+
+func fileExists(path string) (bool, error) {
+	_, err := os.Lstat(path)
+	switch err {
+	case nil:
+		return true, nil
+	case os.ErrNotExist:
+		return false, nil
+	default:
+		return false, err
+	}
 }
