@@ -81,6 +81,7 @@ message EncodedFileOutput {
     S3Upload s3 = 3;
     GCPUpload gcp = 4;
     AzureBlobUpload azure = 5;
+    AliOSSUpload aliOSS = 6;
   }
 }
 
@@ -94,6 +95,7 @@ message SegmentedFileOutput {
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
     AzureBlobUpload azure = 7;
+    AliOSSUpload aliOSS = 8;
   }
 }
 
@@ -103,6 +105,7 @@ message DirectFileOutput {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;
     AzureBlobUpload azure = 4;
+    AliOSSUpload aliOSS = 5;
   }
 }
 
@@ -123,6 +126,14 @@ message AzureBlobUpload {
   string account_name = 1;
   string account_key = 2;
   string container_name = 3;
+}
+
+message AliOSSUpload {
+  string access_key = 1;
+  string secret = 2;
+  string region = 3;
+  string endpoint = 4;
+  string bucket = 5;
 }
 
 enum StreamProtocol {
