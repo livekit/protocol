@@ -11,6 +11,9 @@ service Egress {
   rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
+  //start recording and streaming tracks
+  rpc StartFileAndStreamEgress(FileAndStreamEgressRequest) returns (EgressInfo);
+
   // update web composite layout
   rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
 
@@ -44,6 +47,22 @@ message RoomCompositeEgressRequest {
 
 // containerize up to one audio and one video track
 message TrackCompositeEgressRequest {
+  string room_name = 1;      // required
+  string audio_track_id = 2; // (optional)
+  string video_track_id = 3; // (optional)
+  oneof output {             // required
+    EncodedFileOutput file = 4;
+    StreamOutput stream = 5;
+    SegmentedFileOutput segments = 8;
+  }
+  oneof options {
+    EncodingOptionsPreset preset = 6; // (default H264_720P_30)
+    EncodingOptions advanced = 7;     // (optional)
+  }
+}
+
+// containerize up to one audio and one video track for file + stream
+message FileAndStreamEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
@@ -216,20 +235,22 @@ enum EgressStatus {
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
-  string room_name = 13;
+  string room_name = 14;
   EgressStatus status = 3;
-  int64 started_at = 10;
-  int64 ended_at = 11;
-  string error = 9;
+  int64 started_at = 11;
+  int64 ended_at = 12;
+  string error = 10;
   oneof request {
     RoomCompositeEgressRequest room_composite = 4;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
+    //adding our new type
+    FileAndStreamEgressRequest file_and_stream = 7;
   }
   oneof result {
-    StreamInfoList stream = 7;
-    FileInfo file = 8;
-    SegmentsInfo segments = 12;
+    StreamInfoList stream = 8;
+    FileInfo file = 9;
+    SegmentsInfo segments = 13;
   }
 }
 
