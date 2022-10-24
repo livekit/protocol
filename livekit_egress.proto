@@ -6,6 +6,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 //can u see me
+//can you see me too
 
 service Egress {
   // start recording or streaming a room, participant, or tracks
