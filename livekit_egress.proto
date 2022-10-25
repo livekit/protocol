@@ -69,10 +69,11 @@ message FileAndStreamEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
-  oneof output {             // required
-    EncodedFileOutput file = 4;
-    StreamOutput stream = 5;
-    SegmentedFileOutput segments = 8;
+
+  //we remove the oneof statement to include both the outputs
+  message Output {
+  EncodedFileOutput file = 4;
+  StreamOutput stream = 5;
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
