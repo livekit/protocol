@@ -75,7 +75,6 @@ message FileAndStreamEgressRequest {
   message output {             // required
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
-    SegmentedFileOutput segments = 8;
   }
 
   oneof options {
