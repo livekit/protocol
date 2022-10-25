@@ -9,24 +9,17 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/go/pkg/mod
-          ~/go/bin
-          ~/.cache
-        key: livekit-protocol
+    - uses: actions/checkout@v3
 
     - name: Install Protoc
       uses: arduino/setup-protoc@v1
       with:
-        version: '3.19.4'
+        version: '3.x'
 
     - name: Set up Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v3
       with:
-        go-version: 1.17
+        go-version: '>=1.17'
 
     - name: Go mod tidy
       run: go mod tidy
@@ -34,23 +27,23 @@ jobs:
     - name: Install generators
       run: |
         go install github.com/twitchtv/twirp/protoc-gen-twirp@v8.1.0
-        go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
-        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+        go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
+        go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 
     - name: Mage Test
-      uses: magefile/mage-action@v1
+      uses: magefile/mage-action@v2
       with:
         version: latest
         args: test
 
     - name: Generate Protobuf
-      uses: magefile/mage-action@v1
+      uses: magefile/mage-action@v2
       with:
         version: latest
         args: proto
 
     - name: Add changes
-      uses: EndBug/add-and-commit@v8
+      uses: EndBug/add-and-commit@v9
       with:
         add: livekit
         default_author: github_actions

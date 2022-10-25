@@ -7,9 +7,9 @@ option ruby_package = "LiveKit::Proto";
 
 // internal protos, not exposed to clients
 import "livekit_models.proto";
-import "livekit_recording.proto";
 import "livekit_rtc.proto";
 import "livekit_room.proto";
+import "livekit_egress.proto";
 
 enum NodeType {
   SERVER = 0;
@@ -64,6 +64,11 @@ message NodeStats {
   float load_avg_last5min = 19;
   float load_avg_last15min = 20;
   float cpu_load = 21;
+  uint32 sys_packets_out = 28;
+  uint32 sys_packets_dropped = 29;
+  float sys_packets_out_per_sec = 30;
+  float sys_packets_dropped_per_sec = 31;
+  float sys_packets_dropped_pct_per_sec = 32;
 
   // retransmissions
   uint64 retransmit_bytes_out = 22;
@@ -80,6 +85,7 @@ message NodeStats {
 message RTCNodeMessage {
   string participant_key = 1;
   int64 sender_time = 11;
+  string connection_id = 13;
   oneof message {
     StartSession start_session = 2;
     SignalRequest request = 3;
@@ -118,6 +124,8 @@ message StartSession {
   // A user's ClaimGrants serialized in JSON
   string grants_json = 14;
   bool adaptive_stream = 15;
+  //if reconnect, client will set current sid
+  string participant_id = 16;
 }
 
 message EndSession {
@@ -127,25 +135,10 @@ message RemoveParticipant {
   string participant_id = 1;
 }
 
-message RecordingReservation {
-  string id = 1;
-  int64 submitted_at = 2;
-}
-
-message RecordingRequest {
-  string request_id = 1;
-  oneof request {
-    StartRecordingRequest start = 2;
-    AddOutputRequest add_output = 3;
-    RemoveOutputRequest remove_output = 4;
-    EndRecordingRequest end = 5;
-  }
-}
-
-message RecordingResponse {
-  string request_id = 1;
-  string error = 2;
-}
-
 message KeepAlive {
+}
+
+// room info that should not be returned to clients
+message RoomInternal {
+  AutoTrackEgress track_egress = 1;
 }

@@ -15,8 +15,8 @@ const (
 	ParticipantPrefix = "PA_"
 	TrackPrefix       = "TR_"
 	APIKeyPrefix      = "API"
-	RecordingPrefix   = "RR_"
 	EgressPrefix      = "EG_"
+	IngressPrefix     = "IN_"
 	RPCPrefix         = "RPC_"
 )
 

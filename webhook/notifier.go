@@ -76,7 +76,8 @@ func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 			continue
 		}
 		r.Header.Set(authHeader, token)
-		r.Header.Set("content-type", "application/json")
+		// use a custom mime type to ensure signature is checked prior to parsing
+		r.Header.Set("content-type", "application/webhook+json")
 		_, err = n.client.Do(r)
 		if err != nil {
 			n.logger.Error(err, "could not post to webhook", "url", url)

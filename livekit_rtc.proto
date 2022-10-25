@@ -33,6 +33,8 @@ message SignalRequest {
     SyncState sync_state = 12;
     // Simulate conditions, for client validations
     SimulateScenario simulate = 13;
+    // client triggered ping to server
+    int64 ping = 14;
   }
 }
 
@@ -71,6 +73,8 @@ message SignalResponse {
     string refresh_token = 16;
     // server initiated track unpublish
     TrackUnpublishedResponse track_unpublished = 17;
+    // respond to ping
+    int64 pong = 18;
   }
 }
 
@@ -104,6 +108,10 @@ message AddTrackRequest {
 
   // server ID of track, publish new codec to exist track
   string sid = 11;
+
+  bool stereo = 12;
+  // true if RED (Redundant Encoding) is disabled for audio
+  bool disable_red = 13;
 }
 
 message TrickleRequest {
@@ -120,6 +128,7 @@ message JoinResponse {
   Room room = 1;
   ParticipantInfo participant = 2;
   repeated ParticipantInfo other_participants = 3;
+  // deprecated. use server_info.version instead.
   string server_version = 4;
   repeated ICEServer ice_servers = 5;
   // use subscriber as the primary PeerConnection
@@ -128,7 +137,11 @@ message JoinResponse {
   // when this is set, the other fields will be largely empty
   string alternative_url = 7;
   ClientConfiguration client_configuration = 8;
+  // deprecated. use server_info.region instead.
   string server_region = 9;
+  int32 ping_timeout = 10;
+  int32 ping_interval = 11;
+  ServerInfo server_info = 12;
 }
 
 message TrackPublishedResponse {
@@ -165,6 +178,7 @@ message UpdateTrackSettings {
   uint32 width = 5;
   // for video, height to receive
   uint32 height = 6;
+  uint32 fps = 7;
 }
 
 message LeaveRequest {
@@ -255,10 +269,13 @@ message SubscriptionPermissionUpdate {
 }
 
 message SyncState {
+  // last subscribe answer before reconnecting
   SessionDescription answer = 1;
   UpdateSubscription subscription = 2;
   repeated TrackPublishedResponse publish_tracks = 3;
   repeated DataChannelInfo data_channels = 4;
+  // last received server side offer before reconnecting
+  SessionDescription offer = 5;
 }
 
 message DataChannelInfo {
@@ -270,6 +287,7 @@ message DataChannelInfo {
 enum CandidateProtocol {
   UDP = 0;
   TCP = 1;
+  TLS = 2;
 }
 
 message SimulateScenario {

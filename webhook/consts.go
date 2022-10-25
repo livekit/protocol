@@ -17,8 +17,9 @@ const (
 	EventParticipantLeft   = "participant_left"
 	EventTrackPublished    = "track_published"
 	EventTrackUnpublished  = "track_unpublished"
-	EventRecordingStarted  = "recording_started"
-	EventRecordingFinished = "recording_finished"
 	EventEgressStarted     = "egress_started"
+	EventEgressUpdated     = "egress_updated"
 	EventEgressEnded       = "egress_ended"
+	EventIngressStarted    = "ingress_started"
+	EventIngressEnded      = "ingress_ended"
 )
