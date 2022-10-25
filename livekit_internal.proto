@@ -79,6 +79,10 @@ message NodeStats {
   // participant joins
   uint64 participant_join = 26;
   float participant_join_per_sec = 27;
+
+  float memory_load = 33;
+
+  // NEXT ID: 34
 }
 
 // message to RTC nodes
