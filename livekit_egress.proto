@@ -73,8 +73,10 @@ message FileAndStreamEgressRequest {
   //we remove the oneof statement to include both the outputs
 
   // required
+  message output {
   EncodedFileOutput file = 4;
   StreamOutput stream = 5;
+  }
 
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
