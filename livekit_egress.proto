@@ -71,10 +71,13 @@ message FileAndStreamEgressRequest {
   string video_track_id = 3; // (optional)
 
   //we remove the oneof statement to include both the outputs
-  message Output {
-  EncodedFileOutput file = 4;
-  StreamOutput stream = 5;
+
+  message output {             // required
+    EncodedFileOutput file = 4;
+    StreamOutput stream = 5;
+    SegmentedFileOutput segments = 8;
   }
+
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
     EncodingOptions advanced = 7;     // (optional)
