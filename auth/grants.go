@@ -21,6 +21,9 @@ type VideoGrant struct {
 	CanSubscribe   *bool `json:"canSubscribe,omitempty"`
 	CanPublishData *bool `json:"canPublishData,omitempty"`
 
+	// actions on ingresses
+	IngressAdmin bool `json:"ingressAdmin,omitempty"` // applies to all ingress
+
 	// participant is not visible to other participants
 	Hidden bool `json:"hidden,omitempty"`
 	// indicates to the room that current participant is a recorder
