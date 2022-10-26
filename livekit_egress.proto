@@ -255,6 +255,7 @@ message EgressInfo {
     RoomCompositeEgressRequest room_composite = 4;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
+    WebEgressRequest web = 14;
   }
   oneof result {
     StreamInfoList stream = 7;
