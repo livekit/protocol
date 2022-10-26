@@ -51,7 +51,7 @@ type RedisRPC struct {
 	bus    *utils.RedisMessageBus
 }
 
-func NewRedisRPCClient(nodeID livekit.NodeID, rc *redis.Client) RPCClient {
+func NewRedisRPCClient(nodeID livekit.NodeID, rc redis.UniversalClient) RPCClient {
 	if rc == nil {
 		return nil
 	}
@@ -123,7 +123,7 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	}
 }
 
-func NewRedisRPCServer(rc *redis.Client) RPCServer {
+func NewRedisRPCServer(rc redis.UniversalClient) RPCServer {
 	bus := utils.NewRedisMessageBus(rc)
 	return &RedisRPC{
 		bus: bus.(*utils.RedisMessageBus),
