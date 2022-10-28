@@ -57,6 +57,7 @@ message TrackCompositeEgressRequest {
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
     SegmentedFileOutput segments = 8;
+    //add file and stream output here
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
