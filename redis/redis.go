@@ -20,14 +20,16 @@ type RedisConfig struct {
 	SentinelUsername  string   `yaml:"sentinel_username"`
 	SentinelPassword  string   `yaml:"sentinel_password"`
 	SentinelAddresses []string `yaml:"sentinel_addresses"`
+	ClusterAddresses  []string `yaml:"cluster_addresses"`
 }
 
-func GetRedisClient(conf *RedisConfig) (*redis.Client, error) {
+func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	if conf == nil {
 		return nil, nil
 	}
 
-	var rc *redis.Client
+	var rcOptions *redis.UniversalOptions
+	var rc redis.UniversalClient
 	var tlsConfig *tls.Config
 
 	if conf.UseTLS {
@@ -38,8 +40,8 @@ func GetRedisClient(conf *RedisConfig) (*redis.Client, error) {
 
 	if len(conf.SentinelAddresses) > 0 {
 		logger.Infow("connecting to redis", "sentinel", true, "addr", conf.SentinelAddresses, "masterName", conf.MasterName)
-		rcOptions := &redis.FailoverOptions{
-			SentinelAddrs:    conf.SentinelAddresses,
+		rcOptions = &redis.UniversalOptions{
+			Addrs:            conf.SentinelAddresses,
 			SentinelUsername: conf.SentinelUsername,
 			SentinelPassword: conf.SentinelPassword,
 			MasterName:       conf.MasterName,
@@ -48,18 +50,26 @@ func GetRedisClient(conf *RedisConfig) (*redis.Client, error) {
 			DB:               conf.DB,
 			TLSConfig:        tlsConfig,
 		}
-		rc = redis.NewFailoverClient(rcOptions)
-	} else {
-		logger.Infow("connecting to redis", "sentinel", false, "addr", conf.Address)
-		rcOptions := &redis.Options{
-			Addr:      conf.Address,
+	} else if len(conf.ClusterAddresses) > 0 {
+		logger.Infow("connecting to redis", "cluster", true, "addr", conf.ClusterAddresses)
+		rcOptions = &redis.UniversalOptions{
+			Addrs:     conf.ClusterAddresses,
 			Username:  conf.Username,
 			Password:  conf.Password,
 			DB:        conf.DB,
 			TLSConfig: tlsConfig,
 		}
-		rc = redis.NewClient(rcOptions)
+	} else {
+		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)
+		rcOptions = &redis.UniversalOptions{
+			Addrs:     []string{conf.Address},
+			Username:  conf.Username,
+			Password:  conf.Password,
+			DB:        conf.DB,
+			TLSConfig: tlsConfig,
+		}
 	}
+	rc = redis.NewUniversalClient(rcOptions)
 
 	if err := rc.Ping(context.Background()).Err(); err != nil {
 		err = errors.Wrap(err, "unable to connect to redis")
