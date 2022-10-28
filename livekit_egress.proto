@@ -52,6 +52,7 @@ message TrackCompositeEgressRequest {
     EncodedFileOutput file = 4;
     StreamOutput stream = 5;
     SegmentedFileOutput segments = 8;
+    //add fourth output type here which will be mp4 and rtmp
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
