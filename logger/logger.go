@@ -25,8 +25,15 @@ func InitFromConfig(conf Config, name string) {
 	}
 	if conf.Sample {
 		zapConfig.Sampling = &zap.SamplingConfig{
-			Initial:    100,
-			Thereafter: 100,
+			Initial:    conf.SampleInitial,
+			Thereafter: conf.SampleInterval,
+		}
+		// sane defaults
+		if zapConfig.Sampling.Initial == 0 {
+			zapConfig.Sampling.Initial = 10
+		}
+		if zapConfig.Sampling.Thereafter == 0 {
+			zapConfig.Sampling.Thereafter = 100
 		}
 	}
 	if conf.JSON {

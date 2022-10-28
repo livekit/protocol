@@ -44,10 +44,10 @@ type PubSub interface {
 }
 
 type RedisMessageBus struct {
-	rc *redis.Client
+	rc redis.UniversalClient
 }
 
-func NewRedisMessageBus(rc *redis.Client) MessageBus {
+func NewRedisMessageBus(rc redis.UniversalClient) MessageBus {
 	return &RedisMessageBus{rc: rc}
 }
 

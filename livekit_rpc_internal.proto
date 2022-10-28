@@ -20,6 +20,7 @@ message StartEgressRequest {
     RoomCompositeEgressRequest room_composite = 5;
     TrackCompositeEgressRequest track_composite = 6;
     TrackEgressRequest track = 7;
+    WebEgressRequest web = 11;
     FileAndStreamEgressRequest file_and_stream = 8; //adding our new egress request
   }
 
