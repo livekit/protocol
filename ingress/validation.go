@@ -1,7 +1,7 @@
 package ingress
 
 import (
-	"github.com/livekit/protocol/livekit"
+	"github.com/abdulhaseeb08/protocol/livekit"
 )
 
 func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {

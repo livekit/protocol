@@ -4,8 +4,8 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/abdulhaseeb08/protocol/logger"
 	"github.com/frostbyte73/go-throttle"
-	"github.com/livekit/protocol/logger"
 	"go.uber.org/atomic"
 )
 

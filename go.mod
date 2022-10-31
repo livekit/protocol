@@ -1,4 +1,4 @@
-module github.com/livekit/protocol
+module github.com/abdulhaseeb08/protocol
 
 go 1.17
 

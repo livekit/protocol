@@ -3,7 +3,7 @@ package egress
 import (
 	"time"
 
-	"github.com/livekit/protocol/auth"
+	"github.com/abdulhaseeb08/protocol/auth"
 )
 
 func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error) {

@@ -3,7 +3,7 @@ package ingress
 import (
 	"time"
 
-	"github.com/livekit/protocol/auth"
+	"github.com/abdulhaseeb08/protocol/auth"
 )
 
 func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participantName string) (string, error) {
