@@ -140,7 +140,15 @@ message DataPacket {
   oneof value {
     UserPacket user = 2;
     ActiveSpeakerUpdate speaker = 3;
+    StreamPacket stream = 4;
   }
+}
+
+message StreamPacket {
+  string name = 1;
+  bool persistent = 2;
+  string key = 3;
+  bytes value = 4;
 }
 
 message ActiveSpeakerUpdate {

@@ -78,6 +78,14 @@ message SignalResponse {
   }
 }
 
+message GetStreamDataRequest {
+  string name = 1;
+}
+
+message GetStreamDataResponse {
+
+}
+
 enum SignalTarget {
   PUBLISHER = 0;
   SUBSCRIBER = 1;
