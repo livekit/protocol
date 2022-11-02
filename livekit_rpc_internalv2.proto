@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package livekit;
 option go_package = "github.com/abdulhaseeb08/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
+//option csharp_namespace = "LiveKit.Proto";
+//option ruby_package = "LiveKit::Proto";
 
 import "livekit_egressv2.proto";
 import "livekit_ingressv2.proto";

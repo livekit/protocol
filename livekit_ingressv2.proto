@@ -5,8 +5,8 @@ package livekit;
 import "livekit_modelsv2.proto";
 
 option go_package = "github.com/abdulhaseeb08/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
+//option csharp_namespace = "LiveKit.Proto";
+//option ruby_package = "LiveKit::Proto";
 
 service Ingress {
     // Create a new Ingress
