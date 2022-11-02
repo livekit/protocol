@@ -35,6 +35,8 @@ message SignalRequest {
     SimulateScenario simulate = 13;
     // client triggered ping to server
     int64 ping = 14;
+    // client data stream request
+    GetDataStreamRequest data_stream_request = 15;
   }
 }
 
@@ -75,14 +77,16 @@ message SignalResponse {
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
     int64 pong = 18;
+    // client data stream response
+    GetDataStreamResponse data_stream_response = 19;
   }
 }
 
-message GetStreamDataRequest {
+message GetDataStreamRequest {
   string name = 1;
 }
 
-message GetStreamDataResponse {
+message GetDataStreamResponse {
  repeated StreamPacket packets = 1;
 }
 enum SignalTarget {
