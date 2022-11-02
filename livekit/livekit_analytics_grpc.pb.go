@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: livekit_analyticsv2.proto
+// source: livekit_analytics.proto
 
 package livekit
 
@@ -208,5 +208,5 @@ var AnalyticsRecorderService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "livekit_analyticsv2.proto",
+	Metadata: "livekit_analytics.proto",
 }

@@ -6,10 +6,10 @@ option go_package = "github.com/abdulhaseeb08/protocol/livekit";
 //option ruby_package = "LiveKit::Proto";
 
 // internal protos, not exposed to clients
-import "livekit_modelsv2.proto";
-import "livekit_rtcv2.proto";
-import "livekit_roomv2.proto";
-import "livekit_egressv2.proto";
+import "livekit_models.proto";
+import "livekit_rtc.proto";
+import "livekit_room.proto";
+import "livekit_egress.proto";
 
 enum NodeType {
   SERVER = 0;

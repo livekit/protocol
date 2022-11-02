@@ -5,8 +5,8 @@ option go_package = "github.com/abdulhaseeb08/protocol/livekit";
 //option csharp_namespace = "LiveKit.Proto";
 //option ruby_package = "LiveKit::Proto";
 
-import "livekit_egressv2.proto";
-import "livekit_ingressv2.proto";
+import "livekit_egress.proto";
+import "livekit_ingress.proto";
 
 message StartEgressRequest {
   // request metadata

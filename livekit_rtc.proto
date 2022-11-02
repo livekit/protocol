@@ -5,7 +5,7 @@ option go_package = "github.com/abdulhaseeb08/protocol/livekit";
 //option csharp_namespace = "LiveKit.Proto";
 //option ruby_package = "LiveKit::Proto";
 
-import "livekit_modelsv2.proto";
+import "livekit_models.proto";
 
 message SignalRequest {
   oneof message {
