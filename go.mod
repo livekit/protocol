@@ -15,7 +15,7 @@ require (
 	github.com/pion/sdp/v3 v3.0.6
 	github.com/pion/webrtc/v3 v3.1.44
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.13.1
 	github.com/stretchr/testify v1.8.1
 	github.com/twitchtv/twirp v8.1.2+incompatible
 	go.uber.org/atomic v1.10.0
