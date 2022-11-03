@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
@@ -60,18 +61,41 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			TLSConfig: tlsConfig,
 		}
 	} else {
-		logger.Infow("connecting to redis", "simple", true, "addr", "localhost:6379")
+		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)
 		rcOptions = &redis.UniversalOptions{
-			Addrs:     []string{"localhost:6379"},
+			Addrs:     []string{conf.Address},
 			Username:  conf.Username,
 			Password:  conf.Password,
 			DB:        conf.DB,
 			TLSConfig: tlsConfig,
 		}
 	}
+	fmt.Println("Address: ", conf.Address)
 	rc = redis.NewUniversalClient(rcOptions)
 
 	if err := rc.Ping(context.Background()).Err(); err != nil {
+		err = errors.Wrap(err, "unable to connect to redis")
+		return nil, err
+	}
+
+	return rc, nil
+}
+
+func GetRedisClientTest(conf *RedisConfig) (redis.UniversalClient, error) {
+	if conf == nil {
+		return nil, nil
+	}
+
+	var rcOptions *redis.UniversalOptions
+	var rc redis.UniversalClient
+
+	rcOptions = &redis.UniversalOptions{
+		Addrs: []string{"localhost:6379"},
+	}
+	rc = redis.NewUniversalClient(rcOptions)
+
+	if err := rc.Ping(context.Background()).Err(); err != nil {
+		fmt.Println(rcOptions.Addrs)
 		err = errors.Wrap(err, "unable to connect to redis")
 		return nil, err
 	}
