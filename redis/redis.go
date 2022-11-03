@@ -60,9 +60,9 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			TLSConfig: tlsConfig,
 		}
 	} else {
-		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)
+		logger.Infow("connecting to redis", "simple", true, "addr", "localhost:6379")
 		rcOptions = &redis.UniversalOptions{
-			Addrs:     []string{conf.Address},
+			Addrs:     []string{"localhost:6379"},
 			Username:  conf.Username,
 			Password:  conf.Password,
 			DB:        conf.DB,
