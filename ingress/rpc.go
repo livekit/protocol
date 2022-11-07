@@ -57,7 +57,7 @@ type RedisRPC struct {
 	bus    *utils.RedisMessageBus
 }
 
-func NewRedisRPC(nodeID livekit.NodeID, rc *redis.Client) RPC {
+func NewRedisRPC(nodeID livekit.NodeID, rc redis.UniversalClient) RPC {
 	if rc == nil {
 		return nil
 	}
