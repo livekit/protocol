@@ -7,5 +7,5 @@ type Config struct {
 	// when sampling, the first N logs will be logged
 	SampleInitial int `yaml:"sampleInitial,omitempty"`
 	// when sampling, every Mth log will be logged
-	SampleInterval int `yaml:"sampleInitial,omitempty"`
+	SampleInterval int `yaml:"sampleInterval,omitempty"`
 }
