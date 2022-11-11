@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -57,9 +58,19 @@ func (r *RedisMessageBus) Lock(ctx context.Context, key string, expiration time.
 
 func (r *RedisMessageBus) Subscribe(ctx context.Context, channel string) (PubSub, error) {
 	ps := r.rc.Subscribe(ctx, channel)
+	msgChan := make(chan *redis.Message)
+	go func() {
+		for {
+			select {
+			case msg := <-ps.Channel():
+				fmt.Println(msg)
+				msgChan <- msg
+			}
+		}
+	}()
 	return &RedisPubSub{
 		ps:   ps,
-		c:    channels.Wrap(ps.Channel()).Out(),
+		c:    channels.Wrap(msgChan).Out(),
 		done: make(chan struct{}, 1),
 	}, nil
 }
