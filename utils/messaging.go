@@ -63,6 +63,7 @@ func (r *RedisMessageBus) Subscribe(ctx context.Context, channel string) (PubSub
 		for {
 			select {
 			case msg := <-ps.Channel():
+				fmt.Println("Redis subscribe message is : ")
 				fmt.Println(msg)
 				msgChan <- msg
 			}
