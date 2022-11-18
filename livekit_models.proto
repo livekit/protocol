@@ -125,7 +125,7 @@ message VideoLayer {
   VideoQuality quality = 1;
   uint32 width = 2;
   uint32 height = 3;
-  // target bitrate, server will measure actual
+  // target bitrate in bit per second (bps), server will measure actual
   uint32 bitrate = 4;
   uint32 ssrc = 5;
 }
