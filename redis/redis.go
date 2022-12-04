@@ -10,6 +10,8 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
+var ErrNotConfigured = errors.New("Redis is not configured")
+
 type RedisConfig struct {
 	Address           string   `yaml:"address"`
 	Username          string   `yaml:"username"`
@@ -23,9 +25,26 @@ type RedisConfig struct {
 	ClusterAddresses  []string `yaml:"cluster_addresses"`
 }
 
+func (r *RedisConfig) IsConfigured() bool {
+	if r.Address != "" {
+		return true
+	}
+	if len(r.SentinelAddresses) > 0 {
+		return true
+	}
+	if len(r.ClusterAddresses) > 0 {
+		return true
+	}
+	return false
+}
+
 func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	if conf == nil {
 		return nil, nil
+	}
+
+	if !conf.IsConfigured() {
+		return nil, ErrNotConfigured
 	}
 
 	var rcOptions *redis.UniversalOptions
