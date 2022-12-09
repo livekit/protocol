@@ -120,7 +120,7 @@ func (l *ZapLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
-	l.zap.Errorw(msg, keysAndValues...)
+	l.zap.Warnw(msg, keysAndValues...)
 }
 
 func (l *ZapLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {
