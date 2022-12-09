@@ -118,6 +118,10 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 	return zl, nil
 }
 
+func (l *ZapLogger) ToZap() *zap.SugaredLogger {
+	return l.zap
+}
+
 func (l *ZapLogger) Debugw(msg string, keysAndValues ...interface{}) {
 	l.zap.Debugw(msg, keysAndValues...)
 }
