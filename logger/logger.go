@@ -16,40 +16,10 @@ var (
 
 // InitFromConfig initializes a Zap-based logger
 func InitFromConfig(conf Config, name string) {
-	lvl := ParseZapLevel(conf.Level)
-	zapConfig := zap.Config{
-		Level:            zap.NewAtomicLevelAt(lvl),
-		Development:      false,
-		Encoding:         "console",
-		EncoderConfig:    zap.NewDevelopmentEncoderConfig(),
-		OutputPaths:      []string{"stderr"},
-		ErrorOutputPaths: []string{"stderr"},
+	l, err := NewZapLogger(&conf)
+	if err == nil {
+		SetLogger(l, name)
 	}
-	if conf.Sample {
-		zapConfig.Sampling = &zap.SamplingConfig{
-			Initial:    conf.SampleInitial,
-			Thereafter: conf.SampleInterval,
-		}
-		// sane defaults
-		if zapConfig.Sampling.Initial == 0 {
-			zapConfig.Sampling.Initial = 10
-		}
-		if zapConfig.Sampling.Thereafter == 0 {
-			zapConfig.Sampling.Thereafter = 100
-		}
-	}
-	if conf.JSON {
-		zapConfig.Encoding = "json"
-		zapConfig.EncoderConfig = zap.NewProductionEncoderConfig()
-	}
-	l, _ := zapConfig.Build()
-	zl := &ZapLogger{
-		zap:            l.Sugar(),
-		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
-		SampleInitial:  conf.ItemSampleInitial,
-		SampleInterval: conf.ItemSampleInterval,
-	}
-	SetLogger(zl, name)
 }
 
 // GetLogger returns the logger that was set with SetLogger with an extra depth of 1
@@ -106,6 +76,46 @@ type ZapLogger struct {
 	SampleDuration time.Duration
 	SampleInitial  int
 	SampleInterval int
+}
+
+func NewZapLogger(conf *Config) (*ZapLogger, error) {
+	lvl := ParseZapLevel(conf.Level)
+	zapConfig := zap.Config{
+		Level:            zap.NewAtomicLevelAt(lvl),
+		Development:      false,
+		Encoding:         "console",
+		EncoderConfig:    zap.NewDevelopmentEncoderConfig(),
+		OutputPaths:      []string{"stderr"},
+		ErrorOutputPaths: []string{"stderr"},
+	}
+	if conf.Sample {
+		zapConfig.Sampling = &zap.SamplingConfig{
+			Initial:    conf.SampleInitial,
+			Thereafter: conf.SampleInterval,
+		}
+		// sane defaults
+		if zapConfig.Sampling.Initial == 0 {
+			zapConfig.Sampling.Initial = 10
+		}
+		if zapConfig.Sampling.Thereafter == 0 {
+			zapConfig.Sampling.Thereafter = 100
+		}
+	}
+	if conf.JSON {
+		zapConfig.Encoding = "json"
+		zapConfig.EncoderConfig = zap.NewProductionEncoderConfig()
+	}
+	l, err := zapConfig.Build()
+	if err != nil {
+		return nil, err
+	}
+	zl := &ZapLogger{
+		zap:            l.Sugar(),
+		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
+		SampleInitial:  conf.ItemSampleInitial,
+		SampleInterval: conf.ItemSampleInterval,
+	}
+	return zl, nil
 }
 
 func (l *ZapLogger) Debugw(msg string, keysAndValues ...interface{}) {
