@@ -45,7 +45,7 @@ func InitFromConfig(conf Config, name string) {
 	l, _ := zapConfig.Build()
 	zl := &ZapLogger{
 		zap:            l.Sugar(),
-		SampleDuration: time.Duration(conf.SampleInterval) * time.Second,
+		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
 		SampleInitial:  conf.ItemSampleInitial,
 		SampleInterval: conf.ItemSampleInterval,
 	}
