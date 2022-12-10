@@ -89,6 +89,7 @@ message RTCNodeMessage {
   string participant_key = 1;
   int64 sender_time = 11;
   string connection_id = 13;
+  string participant_key_b62 = 14;
   oneof message {
     StartSession start_session = 2;
     SignalRequest request = 3;
@@ -102,6 +103,8 @@ message RTCNodeMessage {
     UpdateRoomMetadataRequest update_room_metadata = 10;
     KeepAlive keep_alive = 12;
   }
+
+  // NEXT ID: 15
 }
 
 // message to Signal nodes
