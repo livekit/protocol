@@ -121,6 +121,55 @@ func (NodeState) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_internal_proto_rawDescGZIP(), []int{1}
 }
 
+type ICECandidateType int32
+
+const (
+	ICECandidateType_ICT_NONE ICECandidateType = 0
+	ICECandidateType_ICT_TCP  ICECandidateType = 1
+	ICECandidateType_ICT_TLS  ICECandidateType = 2
+)
+
+// Enum value maps for ICECandidateType.
+var (
+	ICECandidateType_name = map[int32]string{
+		0: "ICT_NONE",
+		1: "ICT_TCP",
+		2: "ICT_TLS",
+	}
+	ICECandidateType_value = map[string]int32{
+		"ICT_NONE": 0,
+		"ICT_TCP":  1,
+		"ICT_TLS":  2,
+	}
+)
+
+func (x ICECandidateType) Enum() *ICECandidateType {
+	p := new(ICECandidateType)
+	*p = x
+	return p
+}
+
+func (x ICECandidateType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ICECandidateType) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_internal_proto_enumTypes[2].Descriptor()
+}
+
+func (ICECandidateType) Type() protoreflect.EnumType {
+	return &file_livekit_internal_proto_enumTypes[2]
+}
+
+func (x ICECandidateType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ICECandidateType.Descriptor instead.
+func (ICECandidateType) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_internal_proto_rawDescGZIP(), []int{2}
+}
+
 type Node struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -1152,6 +1201,61 @@ func (x *RoomInternal) GetTrackEgress() *AutoTrackEgress {
 	return nil
 }
 
+type ICEConfig struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	PreferenceSubscriber ICECandidateType `protobuf:"varint,1,opt,name=preference_subscriber,json=preferenceSubscriber,proto3,enum=livekit.ICECandidateType" json:"preference_subscriber,omitempty"`
+	PreferencePublisher  ICECandidateType `protobuf:"varint,2,opt,name=preference_publisher,json=preferencePublisher,proto3,enum=livekit.ICECandidateType" json:"preference_publisher,omitempty"`
+}
+
+func (x *ICEConfig) Reset() {
+	*x = ICEConfig{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_internal_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ICEConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ICEConfig) ProtoMessage() {}
+
+func (x *ICEConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_internal_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ICEConfig.ProtoReflect.Descriptor instead.
+func (*ICEConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_internal_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ICEConfig) GetPreferenceSubscriber() ICECandidateType {
+	if x != nil {
+		return x.PreferenceSubscriber
+	}
+	return ICECandidateType_ICT_NONE
+}
+
+func (x *ICEConfig) GetPreferencePublisher() ICECandidateType {
+	if x != nil {
+		return x.PreferencePublisher
+	}
+	return ICECandidateType_ICT_NONE
+}
+
 var File_livekit_internal_proto protoreflect.FileDescriptor
 
 var file_livekit_internal_proto_rawDesc = []byte{
@@ -1365,20 +1469,35 @@ var file_livekit_internal_proto_rawDesc = []byte{
 	0x6c, 0x12, 0x3b, 0x0a, 0x0c, 0x74, 0x72, 0x61, 0x63, 0x6b, 0x5f, 0x65, 0x67, 0x72, 0x65, 0x73,
 	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69,
 	0x74, 0x2e, 0x41, 0x75, 0x74, 0x6f, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x45, 0x67, 0x72, 0x65, 0x73,
-	0x73, 0x52, 0x0b, 0x74, 0x72, 0x61, 0x63, 0x6b, 0x45, 0x67, 0x72, 0x65, 0x73, 0x73, 0x2a, 0x3b,
-	0x0a, 0x08, 0x4e, 0x6f, 0x64, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0a, 0x0a, 0x06, 0x53, 0x45,
-	0x52, 0x56, 0x45, 0x52, 0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a, 0x43, 0x4f, 0x4e, 0x54, 0x52, 0x4f,
-	0x4c, 0x4c, 0x45, 0x52, 0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x4d, 0x45, 0x44, 0x49, 0x41, 0x10,
-	0x02, 0x12, 0x08, 0x0a, 0x04, 0x54, 0x55, 0x52, 0x4e, 0x10, 0x04, 0x2a, 0x3c, 0x0a, 0x09, 0x4e,
-	0x6f, 0x64, 0x65, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0f, 0x0a, 0x0b, 0x53, 0x54, 0x41, 0x52,
-	0x54, 0x49, 0x4e, 0x47, 0x5f, 0x55, 0x50, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x45, 0x52,
-	0x56, 0x49, 0x4e, 0x47, 0x10, 0x01, 0x12, 0x11, 0x0a, 0x0d, 0x53, 0x48, 0x55, 0x54, 0x54, 0x49,
-	0x4e, 0x47, 0x5f, 0x44, 0x4f, 0x57, 0x4e, 0x10, 0x02, 0x42, 0x46, 0x5a, 0x23, 0x67, 0x69, 0x74,
-	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74,
-	0xaa, 0x02, 0x0d, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0xea, 0x02, 0x0e, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x52, 0x0b, 0x74, 0x72, 0x61, 0x63, 0x6b, 0x45, 0x67, 0x72, 0x65, 0x73, 0x73, 0x22, 0xa9,
+	0x01, 0x0a, 0x09, 0x49, 0x43, 0x45, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x4e, 0x0a, 0x15,
+	0x70, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x5f, 0x73, 0x75, 0x62, 0x73, 0x63,
+	0x72, 0x69, 0x62, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x19, 0x2e, 0x6c, 0x69,
+	0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x49, 0x43, 0x45, 0x43, 0x61, 0x6e, 0x64, 0x69, 0x64, 0x61,
+	0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x14, 0x70, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e,
+	0x63, 0x65, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x12, 0x4c, 0x0a, 0x14,
+	0x70, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63, 0x65, 0x5f, 0x70, 0x75, 0x62, 0x6c, 0x69,
+	0x73, 0x68, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x19, 0x2e, 0x6c, 0x69, 0x76,
+	0x65, 0x6b, 0x69, 0x74, 0x2e, 0x49, 0x43, 0x45, 0x43, 0x61, 0x6e, 0x64, 0x69, 0x64, 0x61, 0x74,
+	0x65, 0x54, 0x79, 0x70, 0x65, 0x52, 0x13, 0x70, 0x72, 0x65, 0x66, 0x65, 0x72, 0x65, 0x6e, 0x63,
+	0x65, 0x50, 0x75, 0x62, 0x6c, 0x69, 0x73, 0x68, 0x65, 0x72, 0x2a, 0x3b, 0x0a, 0x08, 0x4e, 0x6f,
+	0x64, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0a, 0x0a, 0x06, 0x53, 0x45, 0x52, 0x56, 0x45, 0x52,
+	0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a, 0x43, 0x4f, 0x4e, 0x54, 0x52, 0x4f, 0x4c, 0x4c, 0x45, 0x52,
+	0x10, 0x01, 0x12, 0x09, 0x0a, 0x05, 0x4d, 0x45, 0x44, 0x49, 0x41, 0x10, 0x02, 0x12, 0x08, 0x0a,
+	0x04, 0x54, 0x55, 0x52, 0x4e, 0x10, 0x04, 0x2a, 0x3c, 0x0a, 0x09, 0x4e, 0x6f, 0x64, 0x65, 0x53,
+	0x74, 0x61, 0x74, 0x65, 0x12, 0x0f, 0x0a, 0x0b, 0x53, 0x54, 0x41, 0x52, 0x54, 0x49, 0x4e, 0x47,
+	0x5f, 0x55, 0x50, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x53, 0x45, 0x52, 0x56, 0x49, 0x4e, 0x47,
+	0x10, 0x01, 0x12, 0x11, 0x0a, 0x0d, 0x53, 0x48, 0x55, 0x54, 0x54, 0x49, 0x4e, 0x47, 0x5f, 0x44,
+	0x4f, 0x57, 0x4e, 0x10, 0x02, 0x2a, 0x3a, 0x0a, 0x10, 0x49, 0x43, 0x45, 0x43, 0x61, 0x6e, 0x64,
+	0x69, 0x64, 0x61, 0x74, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x0c, 0x0a, 0x08, 0x49, 0x43, 0x54,
+	0x5f, 0x4e, 0x4f, 0x4e, 0x45, 0x10, 0x00, 0x12, 0x0b, 0x0a, 0x07, 0x49, 0x43, 0x54, 0x5f, 0x54,
+	0x43, 0x50, 0x10, 0x01, 0x12, 0x0b, 0x0a, 0x07, 0x49, 0x43, 0x54, 0x5f, 0x54, 0x4c, 0x53, 0x10,
+	0x02, 0x42, 0x46, 0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c,
+	0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02, 0x0d, 0x4c, 0x69, 0x76, 0x65, 0x4b,
+	0x69, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02, 0x0e, 0x4c, 0x69, 0x76, 0x65, 0x4b,
+	0x69, 0x74, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -1393,55 +1512,59 @@ func file_livekit_internal_proto_rawDescGZIP() []byte {
 	return file_livekit_internal_proto_rawDescData
 }
 
-var file_livekit_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_livekit_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_livekit_internal_proto_goTypes = []interface{}{
 	(NodeType)(0),                      // 0: livekit.NodeType
 	(NodeState)(0),                     // 1: livekit.NodeState
-	(*Node)(nil),                       // 2: livekit.Node
-	(*NodeStats)(nil),                  // 3: livekit.NodeStats
-	(*RTCNodeMessage)(nil),             // 4: livekit.RTCNodeMessage
-	(*SignalNodeMessage)(nil),          // 5: livekit.SignalNodeMessage
-	(*StartSession)(nil),               // 6: livekit.StartSession
-	(*EndSession)(nil),                 // 7: livekit.EndSession
-	(*RemoveParticipant)(nil),          // 8: livekit.RemoveParticipant
-	(*KeepAlive)(nil),                  // 9: livekit.KeepAlive
-	(*RoomInternal)(nil),               // 10: livekit.RoomInternal
-	(*SignalRequest)(nil),              // 11: livekit.SignalRequest
-	(*RoomParticipantIdentity)(nil),    // 12: livekit.RoomParticipantIdentity
-	(*MuteRoomTrackRequest)(nil),       // 13: livekit.MuteRoomTrackRequest
-	(*UpdateParticipantRequest)(nil),   // 14: livekit.UpdateParticipantRequest
-	(*DeleteRoomRequest)(nil),          // 15: livekit.DeleteRoomRequest
-	(*UpdateSubscriptionsRequest)(nil), // 16: livekit.UpdateSubscriptionsRequest
-	(*SendDataRequest)(nil),            // 17: livekit.SendDataRequest
-	(*UpdateRoomMetadataRequest)(nil),  // 18: livekit.UpdateRoomMetadataRequest
-	(*SignalResponse)(nil),             // 19: livekit.SignalResponse
-	(*ClientInfo)(nil),                 // 20: livekit.ClientInfo
-	(*AutoTrackEgress)(nil),            // 21: livekit.AutoTrackEgress
+	(ICECandidateType)(0),              // 2: livekit.ICECandidateType
+	(*Node)(nil),                       // 3: livekit.Node
+	(*NodeStats)(nil),                  // 4: livekit.NodeStats
+	(*RTCNodeMessage)(nil),             // 5: livekit.RTCNodeMessage
+	(*SignalNodeMessage)(nil),          // 6: livekit.SignalNodeMessage
+	(*StartSession)(nil),               // 7: livekit.StartSession
+	(*EndSession)(nil),                 // 8: livekit.EndSession
+	(*RemoveParticipant)(nil),          // 9: livekit.RemoveParticipant
+	(*KeepAlive)(nil),                  // 10: livekit.KeepAlive
+	(*RoomInternal)(nil),               // 11: livekit.RoomInternal
+	(*ICEConfig)(nil),                  // 12: livekit.ICEConfig
+	(*SignalRequest)(nil),              // 13: livekit.SignalRequest
+	(*RoomParticipantIdentity)(nil),    // 14: livekit.RoomParticipantIdentity
+	(*MuteRoomTrackRequest)(nil),       // 15: livekit.MuteRoomTrackRequest
+	(*UpdateParticipantRequest)(nil),   // 16: livekit.UpdateParticipantRequest
+	(*DeleteRoomRequest)(nil),          // 17: livekit.DeleteRoomRequest
+	(*UpdateSubscriptionsRequest)(nil), // 18: livekit.UpdateSubscriptionsRequest
+	(*SendDataRequest)(nil),            // 19: livekit.SendDataRequest
+	(*UpdateRoomMetadataRequest)(nil),  // 20: livekit.UpdateRoomMetadataRequest
+	(*SignalResponse)(nil),             // 21: livekit.SignalResponse
+	(*ClientInfo)(nil),                 // 22: livekit.ClientInfo
+	(*AutoTrackEgress)(nil),            // 23: livekit.AutoTrackEgress
 }
 var file_livekit_internal_proto_depIdxs = []int32{
-	3,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
+	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
 	0,  // 1: livekit.Node.type:type_name -> livekit.NodeType
 	1,  // 2: livekit.Node.state:type_name -> livekit.NodeState
-	6,  // 3: livekit.RTCNodeMessage.start_session:type_name -> livekit.StartSession
-	11, // 4: livekit.RTCNodeMessage.request:type_name -> livekit.SignalRequest
-	12, // 5: livekit.RTCNodeMessage.remove_participant:type_name -> livekit.RoomParticipantIdentity
-	13, // 6: livekit.RTCNodeMessage.mute_track:type_name -> livekit.MuteRoomTrackRequest
-	14, // 7: livekit.RTCNodeMessage.update_participant:type_name -> livekit.UpdateParticipantRequest
-	15, // 8: livekit.RTCNodeMessage.delete_room:type_name -> livekit.DeleteRoomRequest
-	16, // 9: livekit.RTCNodeMessage.update_subscriptions:type_name -> livekit.UpdateSubscriptionsRequest
-	17, // 10: livekit.RTCNodeMessage.send_data:type_name -> livekit.SendDataRequest
-	18, // 11: livekit.RTCNodeMessage.update_room_metadata:type_name -> livekit.UpdateRoomMetadataRequest
-	9,  // 12: livekit.RTCNodeMessage.keep_alive:type_name -> livekit.KeepAlive
-	19, // 13: livekit.SignalNodeMessage.response:type_name -> livekit.SignalResponse
-	7,  // 14: livekit.SignalNodeMessage.end_session:type_name -> livekit.EndSession
-	20, // 15: livekit.StartSession.client:type_name -> livekit.ClientInfo
-	21, // 16: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	7,  // 3: livekit.RTCNodeMessage.start_session:type_name -> livekit.StartSession
+	13, // 4: livekit.RTCNodeMessage.request:type_name -> livekit.SignalRequest
+	14, // 5: livekit.RTCNodeMessage.remove_participant:type_name -> livekit.RoomParticipantIdentity
+	15, // 6: livekit.RTCNodeMessage.mute_track:type_name -> livekit.MuteRoomTrackRequest
+	16, // 7: livekit.RTCNodeMessage.update_participant:type_name -> livekit.UpdateParticipantRequest
+	17, // 8: livekit.RTCNodeMessage.delete_room:type_name -> livekit.DeleteRoomRequest
+	18, // 9: livekit.RTCNodeMessage.update_subscriptions:type_name -> livekit.UpdateSubscriptionsRequest
+	19, // 10: livekit.RTCNodeMessage.send_data:type_name -> livekit.SendDataRequest
+	20, // 11: livekit.RTCNodeMessage.update_room_metadata:type_name -> livekit.UpdateRoomMetadataRequest
+	10, // 12: livekit.RTCNodeMessage.keep_alive:type_name -> livekit.KeepAlive
+	21, // 13: livekit.SignalNodeMessage.response:type_name -> livekit.SignalResponse
+	8,  // 14: livekit.SignalNodeMessage.end_session:type_name -> livekit.EndSession
+	22, // 15: livekit.StartSession.client:type_name -> livekit.ClientInfo
+	23, // 16: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
+	2,  // 17: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
+	2,  // 18: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
+	19, // [19:19] is the sub-list for method output_type
+	19, // [19:19] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_livekit_internal_proto_init() }
@@ -1562,6 +1685,18 @@ func file_livekit_internal_proto_init() {
 				return nil
 			}
 		}
+		file_livekit_internal_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ICEConfig); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_livekit_internal_proto_msgTypes[2].OneofWrappers = []interface{}{
 		(*RTCNodeMessage_StartSession)(nil),
@@ -1584,8 +1719,8 @@ func file_livekit_internal_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_internal_proto_rawDesc,
-			NumEnums:      2,
-			NumMessages:   9,
+			NumEnums:      3,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

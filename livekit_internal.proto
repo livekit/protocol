@@ -148,3 +148,14 @@ message KeepAlive {
 message RoomInternal {
   AutoTrackEgress track_egress = 1;
 }
+
+enum ICECandidateType {
+  ICT_NONE = 0;
+  ICT_TCP = 1;
+  ICT_TLS = 2;
+}
+
+message ICEConfig {
+  ICECandidateType preference_subscriber = 1;
+  ICECandidateType preference_publisher = 2;
+}
