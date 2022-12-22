@@ -80,8 +80,31 @@ message NodeStats {
   // participant joins
   uint64 participant_join = 26;
   float participant_join_per_sec = 27;
+  uint64 participant_join_failures = 34;
+  float participant_join_failure_per_sec = 35;
 
-  // NEXT ID: 34
+  // connections
+  uint64 connection_success = 36;
+  uint64 connection_failures = 37;
+  float connection_success_per_sec = 38;
+  float connection_failures_per_sec = 39;
+
+  // signaling
+  uint64 signal_success = 40;
+  uint64 signal_failures = 41;
+  float signal_success_per_sec = 42;
+  float signal_failures_per_sec = 43;
+
+  // tracks
+  uint64 track_published_failures = 44;
+  uint64 track_subscribed_failures = 45;
+  uint64 participant_joined_failures = 46;
+  float track_published_per_sec = 47;
+  float track_subscribed_per_sec = 48;
+  float track_published_failure_per_sec = 49;
+  float track_subscribed_failure_per_sec = 50;
+
+  // NEXT ID: 51
 }
 
 // message to RTC nodes
