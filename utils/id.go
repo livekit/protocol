@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/jxskiss/base62"
-	"github.com/lithammer/shortuuid/v3"
+	"github.com/lithammer/shortuuid/v4"
 )
 
 const (
