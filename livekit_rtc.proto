@@ -113,7 +113,7 @@ message AddTrackRequest {
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 13;
   
-  E2EEType e2ee = 14;
+  EncryptionType encryption = 14;
 }
 
 message TrickleRequest {

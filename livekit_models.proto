@@ -79,7 +79,7 @@ enum TrackSource {
   SCREEN_SHARE_AUDIO = 4;
 }
 
-enum E2EEType {
+enum EncryptionType {
   NONE = 0;
   GCM = 1;
   CUSTOM = 2;
@@ -116,7 +116,7 @@ message TrackInfo {
   bool stereo = 14;
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
-  E2EEType e2ee = 16;
+  EncryptionType encryption = 16;
 }
 
 enum VideoQuality {
