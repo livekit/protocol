@@ -85,7 +85,7 @@ message Encryption {
       GCM=1;
       CUSTOM=2;    
   }
- }
+}
 
 message SimulcastCodecInfo {
   string mime_type = 1;
