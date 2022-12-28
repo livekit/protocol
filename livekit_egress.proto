@@ -108,7 +108,7 @@ message SegmentedFileOutput {
   SegmentedFileProtocol protocol = 1; // (optional)
   string filename_prefix = 2;         // (optional)
   string playlist_name = 3;           // (optional)
-  uint32 segment_duration = 4;        // (optional)
+  uint32 segment_duration = 4;        // in seconds (optional)
   bool disable_manifest = 8;          // disable upload of manifest file (default false)
   oneof output {                      // required
     S3Upload s3 = 5;
@@ -188,15 +188,16 @@ enum VideoCodec {
 }
 
 message EncodingOptions {
-  int32 width = 1;             // (default 1920)
-  int32 height = 2;            // (default 1080)
-  int32 depth = 3;             // (default 24)
-  int32 framerate = 4;         // (default 30)
-  AudioCodec audio_codec = 5;  // (default OPUS)
-  int32 audio_bitrate = 6;     // (default 128)
-  int32 audio_frequency = 7;   // (default 44100)
-  VideoCodec video_codec = 8;  // (default H264_MAIN)
-  int32 video_bitrate = 9;     // (default 4500)
+  int32 width = 1;                      // (default 1920)
+  int32 height = 2;                     // (default 1080)
+  int32 depth = 3;                      // (default 24)
+  int32 framerate = 4;                  // (default 30)
+  AudioCodec audio_codec = 5;           // (default OPUS)
+  int32 audio_bitrate = 6;              // (default 128)
+  int32 audio_frequency = 7;            // (default 44100)
+  VideoCodec video_codec = 8;           // (default H264_MAIN)
+  int32 video_bitrate = 9;              // (default 4500)
+  double video_key_frame_interval = 10; // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files) 
 }
 
 enum EncodingOptionsPreset {
