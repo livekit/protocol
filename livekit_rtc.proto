@@ -112,6 +112,8 @@ message AddTrackRequest {
   bool stereo = 12;
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 13;
+  
+  Encryption.Type encryption = 14;
 }
 
 message TrickleRequest {

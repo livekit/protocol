@@ -79,6 +79,14 @@ enum TrackSource {
   SCREEN_SHARE_AUDIO = 4;
 }
 
+message Encryption {
+  enum Type {
+      NONE=0;
+      GCM=1;
+      CUSTOM=2;    
+  }
+}
+
 message SimulcastCodecInfo {
   string mime_type = 1;
   string mid = 2;
@@ -110,6 +118,7 @@ message TrackInfo {
   bool stereo = 14;
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
+  Encryption.Type encryption = 16;
 }
 
 enum VideoQuality {
