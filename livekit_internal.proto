@@ -45,6 +45,14 @@ message NodeStats {
   int32 num_clients = 4;
   int32 num_tracks_in = 5;
   int32 num_tracks_out = 6;
+  int32 num_track_publish_attempts = 34;
+  float track_publish_attempts_per_sec = 35;
+  int32 num_track_publish_success = 36;
+  float track_publish_success_per_sec = 37;
+  int32 num_track_subscribe_attempts = 38;
+  float track_subscribe_attempts_per_sec = 39;
+  int32 num_track_subscribe_success = 40;
+  float track_subscribe_success_per_sec = 41;
 
   // packet
   uint64 bytes_in = 7;
@@ -82,8 +90,14 @@ message NodeStats {
   // participant joins
   uint64 participant_join = 26;
   float participant_join_per_sec = 27;
+  uint64 participant_rtc = 42;
+  float participant_rtc_per_sec = 43;
 
+<<<<<<< HEAD
   // NEXT ID: 36
+=======
+  // NEXT ID: 44
+>>>>>>> 2f1078d (adding more node stats)
 }
 
 // message to RTC nodes
