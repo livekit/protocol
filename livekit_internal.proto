@@ -64,7 +64,9 @@ message NodeStats {
   float load_avg_last5min = 19;
   float load_avg_last15min = 20;
   float cpu_load = 21;
-  float memory_load = 33;
+  float memory_load = 33; // deprecated
+  uint64 memory_total = 34;
+  uint64 memory_used = 35;
   uint32 sys_packets_out = 28;
   uint32 sys_packets_dropped = 29;
   float sys_packets_out_per_sec = 30;
@@ -81,7 +83,7 @@ message NodeStats {
   uint64 participant_join = 26;
   float participant_join_per_sec = 27;
 
-  // NEXT ID: 34
+  // NEXT ID: 36
 }
 
 // message to RTC nodes
