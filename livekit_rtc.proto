@@ -75,6 +75,8 @@ message SignalResponse {
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
     int64 pong = 18;
+    // sent when client reconnects
+    ReconnectResponse reconnect = 19;
   }
 }
 
@@ -144,6 +146,11 @@ message JoinResponse {
   int32 ping_timeout = 10;
   int32 ping_interval = 11;
   ServerInfo server_info = 12;
+}
+
+message ReconnectResponse {
+  repeated ICEServer ice_servers = 1;
+  ClientConfiguration client_configuration = 2;
 }
 
 message TrackPublishedResponse {
