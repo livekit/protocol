@@ -58,6 +58,7 @@ message AnalyticsStat {
   float score = 9;
   repeated AnalyticsStream streams = 10;
   string mime = 11;
+  TrackSource source = 12;
 }
 
 message AnalyticsStats {
