@@ -92,8 +92,10 @@ message NodeStats {
   float participant_join_per_sec = 27;
   uint64 participant_rtc = 44;
   float participant_rtc_per_sec = 45;
+  uint64 participant_rtc_init = 46;
+  float participant_rtc_init_per_sec = 47;
 
-  // NEXT ID: 46
+  // NEXT ID: 48
 }
 
 // message to RTC nodes
