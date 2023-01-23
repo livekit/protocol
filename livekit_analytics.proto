@@ -74,6 +74,7 @@ enum AnalyticsEventType {
   TRACK_UNPUBLISHED = 5;
   TRACK_SUBSCRIBED = 6;
   TRACK_SUBSCRIBE_REQUESTED = 21;
+  TRACK_SUBSCRIBE_FAILED = 25;
   TRACK_UNSUBSCRIBED = 7;
   TRACK_PUBLISHED_UPDATE = 10;
   TRACK_MUTED = 23;
@@ -89,7 +90,7 @@ enum AnalyticsEventType {
   INGRESS_STARTED = 16;
   INGRESS_ENDED = 17;
 
-  // NEXT_ID: 25
+  // NEXT_ID: 26
 }
 
 message AnalyticsClientMeta {
@@ -120,7 +121,9 @@ message AnalyticsEvent {
   string mime = 16;
   EgressInfo egress = 17;
   IngressInfo ingress = 18;
+  string error = 20;
 
+  // NEXT_ID: 21
 }
 
 message AnalyticsEvents {
