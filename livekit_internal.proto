@@ -88,12 +88,14 @@ message NodeStats {
   float retransmit_packets_out_per_sec = 25;
 
   // participant joins
-  uint64 participant_join = 26;
-  float participant_join_per_sec = 27;
-  uint64 participant_rtc = 44;
-  float participant_rtc_per_sec = 45;
+  uint64 participant_signal_connected = 26;
+  float participant_signal_connected_per_sec = 27;
+  uint64 participant_rtc_connected = 44;
+  float participant_rtc_connected_per_sec = 45;
+  uint64 participant_rtc_init = 46;
+  float participant_rtc_init_per_sec = 47;
 
-  // NEXT ID: 46
+  // NEXT ID: 48
 }
 
 // message to RTC nodes
