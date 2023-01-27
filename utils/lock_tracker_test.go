@@ -213,24 +213,5 @@ func BenchmarkGetBlocked(b *testing.B) {
 				utils.ScanTrackedLocks(time.Minute)
 			}
 		})
-
-		b.Run(fmt.Sprintf("parallel/%d", n), func(b *testing.B) {
-			cleanupTest()
-
-			ms := make([]*utils.Mutex, n)
-			for i := range ms {
-				m := &utils.Mutex{}
-				m.Lock()
-				noop()
-				m.Unlock()
-				ms[i] = m
-			}
-
-			b.ResetTimer()
-
-			for i := 0; i < b.N; i++ {
-				utils.ScanTrackedLocksP(time.Minute)
-			}
-		})
 	}
 }
