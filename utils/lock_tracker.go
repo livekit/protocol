@@ -88,10 +88,10 @@ var nextScanMin int
 
 // ScanTrackedLocksI check lock trackers incrementally n at a time
 func ScanTrackedLocksI(threshold time.Duration, n int) bool {
+	minTS := uint32(time.Now().Add(-threshold).Unix())
 	if n <= 0 {
 		n = 10000
 	}
-	minTS := uint32(time.Now().Add(-threshold).Unix())
 
 	weakRefLock.Lock()
 	defer weakRefLock.Unlock()
