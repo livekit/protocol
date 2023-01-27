@@ -17,6 +17,8 @@ func cleanupTest() {
 	utils.SyncLowResTime()
 }
 
+func noop() {}
+
 func TestScanTrackedLocks(t *testing.T) {
 	t.Cleanup(cleanupTest)
 	assert.False(t, utils.ScanTrackedLocks(time.Millisecond))
@@ -25,6 +27,7 @@ func TestScanTrackedLocks(t *testing.T) {
 	for i := range ms {
 		m := &utils.Mutex{}
 		m.Lock()
+		noop()
 		m.Unlock()
 		ms[i] = m
 	}
@@ -64,10 +67,12 @@ func TestEmbeddedMutex(t *testing.T) {
 
 	foo := struct{ m utils.Mutex }{}
 	foo.m.Lock()
+	noop()
 	foo.m.Unlock()
 
 	bar := struct{ utils.Mutex }{}
 	bar.Lock()
+	noop()
 	bar.Unlock()
 }
 
@@ -78,6 +83,7 @@ func TestContestedGlobalLock(t *testing.T) {
 	for i := range ms {
 		m := &utils.Mutex{}
 		m.Lock()
+		noop()
 		m.Unlock()
 		ms[i] = m
 	}
@@ -103,6 +109,7 @@ func TestContestedGlobalLock(t *testing.T) {
 			for i := 0; i < 3; i++ {
 				go func() {
 					m.Lock()
+					noop()
 					m.Unlock()
 					wg.Done()
 				}()
@@ -119,6 +126,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		var m utils.Mutex
 		for i := 0; i < b.N; i++ {
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -126,6 +134,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		var m sync.Mutex
 		for i := 0; i < b.N; i++ {
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -133,6 +142,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		var m utils.RWMutex
 		for i := 0; i < b.N; i++ {
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -140,6 +150,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		var m sync.RWMutex
 		for i := 0; i < b.N; i++ {
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -148,6 +159,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var m utils.Mutex
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -155,6 +167,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var m sync.Mutex
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -162,6 +175,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var m utils.RWMutex
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -169,6 +183,7 @@ func BenchmarkLockTracker(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var m sync.RWMutex
 			m.Lock()
+			noop()
 			m.Unlock()
 		}
 	})
@@ -184,6 +199,7 @@ func BenchmarkGetBlocked(b *testing.B) {
 			for i := range ms {
 				m := &utils.Mutex{}
 				m.Lock()
+				noop()
 				m.Unlock()
 				ms[i] = m
 			}
@@ -202,6 +218,7 @@ func BenchmarkGetBlocked(b *testing.B) {
 			for i := range ms {
 				m := &utils.Mutex{}
 				m.Lock()
+				noop()
 				m.Unlock()
 				ms[i] = m
 			}
