@@ -11,10 +11,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func init() {
+	utils.EnableLockTracker()
+}
+
 func cleanupTest() {
 	runtime.GC()
 	time.Sleep(time.Millisecond)
-	utils.SyncLowResTime()
 }
 
 func noop() {}
