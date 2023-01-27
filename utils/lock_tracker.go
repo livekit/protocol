@@ -9,15 +9,15 @@ import (
 	"unsafe"
 )
 
+var lockTrackerEnabled = false
+var enableLockTrackerOnce sync.Once
 var lowResTime uint32 = uint32(time.Now().Unix())
-var weakRefs []uintptr
-var weakRefFree []int
-var weakRefLock sync.Mutex
 
-var startLockTrackerWorkerOnce sync.Once
-
-func StartLockTrackerWorker() {
-	startLockTrackerWorkerOnce.Do(func() {
+// EnableLockTracker enable lock tracking background worker. This should be
+// called during init
+func EnableLockTracker() {
+	enableLockTrackerOnce.Do(func() {
+		lockTrackerEnabled = true
 		go updateLowResTime()
 	})
 }
@@ -29,9 +29,9 @@ func updateLowResTime() {
 	}
 }
 
-func SyncLowResTime() {
-	atomic.StoreUint32(&lowResTime, uint32(time.Now().Unix()))
-}
+var weakRefs []uintptr
+var weakRefFree []int
+var weakRefLock sync.Mutex
 
 func NumMutexes() int {
 	weakRefLock.Lock()
@@ -48,7 +48,7 @@ func ScanTrackedLocks(threshold time.Duration) bool {
 	return scanTrackedLocks(weakRefs, minTS)
 }
 
-// ScanTrackedLocksP check all locker trackers in parallel
+// ScanTrackedLocksP check all lock trackers in parallel
 func ScanTrackedLocksP(threshold time.Duration) bool {
 	minTS := uint32(time.Now().Add(-threshold).Unix())
 
@@ -127,11 +127,15 @@ type lockTracker struct {
 }
 
 func (t *lockTracker) trackWait() {
-	atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
+	if t != nil {
+		atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
+	}
 }
 
 func (t *lockTracker) trackLock() {
-	atomic.StoreUint32(&t.ts, math.MaxUint32)
+	if t != nil {
+		atomic.StoreUint32(&t.ts, math.MaxUint32)
+	}
 }
 
 func newLockTracker() *lockTracker {
@@ -142,7 +146,7 @@ func newLockTracker() *lockTracker {
 	weakRefLock.Lock()
 	defer weakRefLock.Unlock()
 
-	if fi := len(weakRefFree) - 1; fi > 0 {
+	if fi := len(weakRefFree) - 1; fi >= 0 {
 		t.ref = weakRefFree[fi]
 		weakRefs[t.ref] = uintptr((unsafe.Pointer)(t))
 		weakRefFree = weakRefFree[:fi]
@@ -171,6 +175,9 @@ func sync_runtime_canSpin(int) bool
 func sync_runtime_doSpin()
 
 func lazyInitLockTracker(p **lockTracker) {
+	if !lockTrackerEnabled {
+		return
+	}
 	up := (*unsafe.Pointer)(unsafe.Pointer(p))
 	iter := 0
 	for {
