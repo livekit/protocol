@@ -48,42 +48,6 @@ func ScanTrackedLocks(threshold time.Duration) bool {
 	return scanTrackedLocks(weakRefs, minTS)
 }
 
-// ScanTrackedLocksP check all lock trackers in parallel
-func ScanTrackedLocksP(threshold time.Duration) bool {
-	minTS := uint32(time.Now().Add(-threshold).Unix())
-
-	weakRefLock.Lock()
-	defer weakRefLock.Unlock()
-
-	var found uint32
-
-	k := runtime.NumCPU()
-	n := (len(weakRefs) + (k - 1)) / k
-
-	var wg sync.WaitGroup
-	wg.Add(k)
-	for i := 0; i < k; i++ {
-		min := n * i
-		max := n * (i + 1)
-		go func() {
-			for _, ref := range weakRefs[min:max] {
-				if ref != 0 {
-					t := (*lockTracker)(unsafe.Pointer(ref))
-					ts := atomic.LoadUint32(&t.ts)
-					if ts <= minTS {
-						atomic.StoreUint32(&found, 1)
-						return
-					}
-				}
-			}
-			wg.Done()
-		}()
-	}
-	wg.Wait()
-
-	return found == 1
-}
-
 var nextScanMin int
 
 // ScanTrackedLocksI check lock trackers incrementally n at a time
@@ -108,6 +72,8 @@ func ScanTrackedLocksI(threshold time.Duration, n int) bool {
 	return scanTrackedLocks(weakRefs[min:max], minTS)
 }
 
+//go:norace
+//go:nosplit
 func scanTrackedLocks(refs []uintptr, minTS uint32) bool {
 	for _, ref := range weakRefs {
 		if ref != 0 {
