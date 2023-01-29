@@ -114,7 +114,7 @@ message AddTrackRequest {
   bool stereo = 12;
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 13;
-  
+
   Encryption.Type encryption = 14;
 }
 
@@ -188,6 +188,14 @@ message UpdateTrackSettings {
   // for video, height to receive
   uint32 height = 6;
   uint32 fps = 7;
+  // subscription priority. 1 being the highest (0 is unset)
+  // when unset, server sill assign priority based on the order of subscription
+  // server will use priority in the following ways:
+  // 1. when subscribed tracks exceed per-participant subscription limit, server will
+  //    pause the lowest priority tracks
+  // 2. when the network is congested, server will assign available bandwidth to
+  //    higher priority tracks first. lowest priority tracks can be paused
+  uint32 priority = 8;
 }
 
 message LeaveRequest {
