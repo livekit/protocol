@@ -14,6 +14,7 @@ message StartEgressRequest {
   string request_id = 2;
   string sender_id = 10;
   int64 sent_at = 4;
+  string pool = 12;
 
   // request
   oneof request {
