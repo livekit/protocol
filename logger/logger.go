@@ -71,8 +71,8 @@ type Logger interface {
 
 type ZapLogger struct {
 	zap *zap.SugaredLogger
-	// avoid multiple item samplers
-	hasItemSampler bool
+	// store original logger without sampling to avoid multiple samplers
+	unsampled      *zap.SugaredLogger
 	SampleDuration time.Duration
 	SampleInitial  int
 	SampleInterval int
@@ -88,19 +88,6 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
-	if conf.Sample {
-		zapConfig.Sampling = &zap.SamplingConfig{
-			Initial:    conf.SampleInitial,
-			Thereafter: conf.SampleInterval,
-		}
-		// sane defaults
-		if zapConfig.Sampling.Initial == 0 {
-			zapConfig.Sampling.Initial = 10
-		}
-		if zapConfig.Sampling.Thereafter == 0 {
-			zapConfig.Sampling.Thereafter = 100
-		}
-	}
 	if conf.JSON {
 		zapConfig.Encoding = "json"
 		zapConfig.EncoderConfig = zap.NewProductionEncoderConfig()
@@ -110,10 +97,35 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 		return nil, err
 	}
 	zl := &ZapLogger{
-		zap:            l.Sugar(),
+		unsampled:      l.Sugar(),
 		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
 		SampleInitial:  conf.ItemSampleInitial,
 		SampleInterval: conf.ItemSampleInterval,
+	}
+
+	if conf.Sample {
+		// use a sampling logger for the main logger
+		samplingConf := &zap.SamplingConfig{
+			Initial:    conf.SampleInitial,
+			Thereafter: conf.SampleInterval,
+		}
+		// sane defaults
+		if samplingConf.Initial == 0 {
+			samplingConf.Initial = 20
+		}
+		if samplingConf.Thereafter == 0 {
+			samplingConf.Thereafter = 100
+		}
+		zl.zap = l.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+			return zapcore.NewSamplerWithOptions(
+				core,
+				time.Second,
+				samplingConf.Initial,
+				samplingConf.Thereafter,
+			)
+		})).Sugar()
+	} else {
+		zl.zap = zl.unsampled
 	}
 	return zl, nil
 }
@@ -163,11 +175,11 @@ func (l *ZapLogger) WithCallDepth(depth int) Logger {
 }
 
 func (l *ZapLogger) WithItemSampler() Logger {
-	if l.hasItemSampler || l.SampleDuration == 0 {
+	if l.SampleDuration == 0 {
 		return l
 	}
 	dup := *l
-	dup.zap = l.zap.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+	dup.zap = l.unsampled.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
 		return zapcore.NewSamplerWithOptions(
 			core,
 			l.SampleDuration,
@@ -175,7 +187,6 @@ func (l *ZapLogger) WithItemSampler() Logger {
 			l.SampleInterval,
 		)
 	}))
-	dup.hasItemSampler = true
 	return &dup
 }
 
