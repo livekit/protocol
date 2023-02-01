@@ -32,7 +32,7 @@ message RoomCompositeEgressRequest {
   bool audio_only = 3;          // (default false)
   bool video_only = 4;          // (default false)
   string custom_base_url = 5;   // template base url (default https://recorder.livekit.io)
-  oneof output {                // deprecated
+  oneof output {                // deprecated (use _output fields)
     EncodedFileOutput file = 6 [deprecated = true];
     StreamOutput stream = 7 [deprecated = true];
     SegmentedFileOutput segments = 10 [deprecated = true];
@@ -51,7 +51,7 @@ message WebEgressRequest {
   string url = 1;
   bool audio_only = 2;
   bool video_only = 3;
-  oneof output {
+  oneof output { // deprecated (use _output fields)
     EncodedFileOutput file = 4 [deprecated = true];
     StreamOutput stream = 5 [deprecated = true];
     SegmentedFileOutput segments = 6 [deprecated = true];
@@ -70,7 +70,7 @@ message TrackCompositeEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
-  oneof output {             // deprecated
+  oneof output {             // deprecated (use _output fields)
     EncodedFileOutput file = 4 [deprecated = true];
     StreamOutput stream = 5 [deprecated = true];
     SegmentedFileOutput segments = 8 [deprecated = true];
@@ -267,7 +267,7 @@ message EgressInfo {
     TrackEgressRequest track = 6;
     WebEgressRequest web = 14;
   }
-  oneof result {
+  oneof result { // deprecated (use _result fields)
     StreamInfoList stream = 7 [deprecated = true];
     FileInfo file = 8 [deprecated = true];
     SegmentsInfo segments = 12 [deprecated = true];
