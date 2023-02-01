@@ -32,15 +32,37 @@ message RoomCompositeEgressRequest {
   bool audio_only = 3;          // (default false)
   bool video_only = 4;          // (default false)
   string custom_base_url = 5;   // template base url (default https://recorder.livekit.io)
-  oneof output {                // required
-    EncodedFileOutput file = 6;
-    StreamOutput stream = 7;
-    SegmentedFileOutput segments = 10;
+  oneof output {                // deprecated
+    EncodedFileOutput file = 6 [deprecated = true];
+    StreamOutput stream = 7 [deprecated = true];
+    SegmentedFileOutput segments = 10 [deprecated = true];
   }
   oneof options {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
     EncodingOptions advanced = 9;     // (optional)
   }
+  EncodedFileOutput file_output = 11;
+  StreamOutput stream_output = 12;
+  SegmentedFileOutput segment_output = 13;
+}
+
+// record any website
+message WebEgressRequest {
+  string url = 1;
+  bool audio_only = 2;
+  bool video_only = 3;
+  oneof output {
+    EncodedFileOutput file = 4 [deprecated = true];
+    StreamOutput stream = 5 [deprecated = true];
+    SegmentedFileOutput segments = 6 [deprecated = true];
+  }
+  oneof options {
+    EncodingOptionsPreset preset = 7;
+    EncodingOptions advanced = 8;
+  }
+  EncodedFileOutput file_output = 9;
+  StreamOutput stream_output = 10;
+  SegmentedFileOutput segment_output = 11;
 }
 
 // containerize up to one audio and one video track
@@ -48,15 +70,18 @@ message TrackCompositeEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
-  oneof output {             // required
-    EncodedFileOutput file = 4;
-    StreamOutput stream = 5;
-    SegmentedFileOutput segments = 8;
+  oneof output {             // deprecated
+    EncodedFileOutput file = 4 [deprecated = true];
+    StreamOutput stream = 5 [deprecated = true];
+    SegmentedFileOutput segments = 8 [deprecated = true];
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
     EncodingOptions advanced = 7;     // (optional)
   }
+  EncodedFileOutput file_output = 11;
+  StreamOutput stream_output = 12;
+  SegmentedFileOutput segment_output = 13;
 }
 
 // record tracks individually, without transcoding
@@ -66,22 +91,6 @@ message TrackEgressRequest {
   oneof output {             // required
     DirectFileOutput file = 3;
     string websocket_url = 4;
-  }
-}
-
-// record any website
-message WebEgressRequest {
-  string url = 1;
-  bool audio_only = 2;
-  bool video_only = 3;
-  oneof output {
-    EncodedFileOutput file = 4;
-    StreamOutput stream = 5;
-    SegmentedFileOutput segments = 6;
-  }
-  oneof options {
-    EncodingOptionsPreset preset = 7;
-    EncodingOptions advanced = 8;
   }
 }
 
@@ -259,13 +268,17 @@ message EgressInfo {
     WebEgressRequest web = 14;
   }
   oneof result {
-    StreamInfoList stream = 7;
-    FileInfo file = 8;
-    SegmentsInfo segments = 12;
+    StreamInfoList stream = 7 [deprecated = true];
+    FileInfo file = 8 [deprecated = true];
+    SegmentsInfo segments = 12 [deprecated = true];
   }
+  repeated StreamInfo stream_results = 15;
+  FileInfo file_result = 16;
+  SegmentsInfo segment_result = 17;
 }
 
 message StreamInfoList {
+  option deprecated = true;
   repeated StreamInfo info = 1;
 }
 
