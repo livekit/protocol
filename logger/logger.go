@@ -159,18 +159,34 @@ func (l *ZapLogger) Errorw(msg string, err error, keysAndValues ...interface{}) 
 func (l *ZapLogger) WithValues(keysAndValues ...interface{}) Logger {
 	dup := *l
 	dup.zap = l.zap.With(keysAndValues...)
+	// mirror unsampled logger too
+	if l.unsampled == l.zap {
+		dup.unsampled = dup.zap
+	} else {
+		dup.unsampled = l.unsampled.With(keysAndValues...)
+	}
 	return &dup
 }
 
 func (l *ZapLogger) WithName(name string) Logger {
 	dup := *l
 	dup.zap = l.zap.Named(name)
+	if l.unsampled == l.zap {
+		dup.unsampled = dup.zap
+	} else {
+		dup.unsampled = l.unsampled.Named(name)
+	}
 	return &dup
 }
 
 func (l *ZapLogger) WithCallDepth(depth int) Logger {
 	dup := *l
 	dup.zap = l.zap.WithOptions(zap.AddCallerSkip(depth))
+	if l.unsampled == l.zap {
+		dup.unsampled = dup.zap
+	} else {
+		dup.unsampled = l.unsampled.WithOptions(zap.AddCallerSkip(depth))
+	}
 	return &dup
 }
 
