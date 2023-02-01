@@ -6,7 +6,7 @@ require (
 	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/go-throttle v0.0.0-20210621200530-8018c891361d
 	github.com/go-logr/logr v1.2.3
-	github.com/go-redis/redis/v8 v8.11.5
+	github.com/go-redis/redis/v9 v9.0.2
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/mackerelio/go-osstat v0.2.3
