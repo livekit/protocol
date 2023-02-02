@@ -104,6 +104,8 @@ message RTCNodeMessage {
   int64 sender_time = 11;
   string connection_id = 13;
   string participant_key_b62 = 14;
+  string room_name = 15;
+  string identity = 16;
   oneof message {
     StartSession start_session = 2;
     SignalRequest request = 3;
@@ -118,7 +120,7 @@ message RTCNodeMessage {
     KeepAlive keep_alive = 12;
   }
 
-  // NEXT ID: 15
+  // NEXT ID: 17
 }
 
 // message to Signal nodes
