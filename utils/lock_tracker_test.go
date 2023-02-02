@@ -124,6 +124,30 @@ func TestContestedGlobalLock(t *testing.T) {
 	wg.Wait()
 }
 
+func TestInitRace(t *testing.T) {
+	t.Cleanup(cleanupTest)
+
+	var wg sync.WaitGroup
+	for i := 0; i < 100; i++ {
+		var m utils.Mutex
+		wg.Add(3)
+		done := make(chan struct{})
+		for i := 0; i < 3; i++ {
+			go func() {
+				<-done
+				m.Lock()
+				noop()
+				m.Unlock()
+				wg.Done()
+			}()
+		}
+		close(done)
+		runtime.Gosched()
+	}
+
+	wg.Wait()
+}
+
 func BenchmarkLockTracker(b *testing.B) {
 	b.Run("wrapped mutex", func(b *testing.B) {
 		var m utils.Mutex

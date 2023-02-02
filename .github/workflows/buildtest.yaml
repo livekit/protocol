@@ -25,6 +25,9 @@ jobs:
       with:
         go-version: 1.17
 
+    - name: Set up gotestfmt
+      run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.4.1
+
     - name: Download Go modules
       run: go mod download
 
@@ -33,8 +36,7 @@ jobs:
       with:
         version: "2021.1.1"
 
-    - name: Mage Test
-      uses: magefile/mage-action@v2
-      with:
-        version: latest
-        args: test
+    - name: Test
+      run: |
+        set -euo pipefail
+        MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
