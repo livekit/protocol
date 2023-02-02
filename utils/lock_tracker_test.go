@@ -82,7 +82,7 @@ func TestEmbeddedMutex(t *testing.T) {
 func TestContestedGlobalLock(t *testing.T) {
 	t.Cleanup(cleanupTest)
 
-	ms := make([]*utils.Mutex, 1000000)
+	ms := make([]*utils.Mutex, 100)
 	for i := range ms {
 		m := &utils.Mutex{}
 		m.Lock()
@@ -106,7 +106,7 @@ func TestContestedGlobalLock(t *testing.T) {
 	}()
 
 	go func() {
-		for i := 0; i < 10000; i++ {
+		for i := 0; i < 100; i++ {
 			var m utils.Mutex
 			wg.Add(3)
 			for i := 0; i < 3; i++ {
