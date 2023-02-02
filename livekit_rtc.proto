@@ -35,6 +35,8 @@ message SignalRequest {
     SimulateScenario simulate = 13;
     // client triggered ping to server
     int64 ping = 14;
+    // update a participant's own metadata
+    UpdateParticipantMetadata update_metadata = 15;
   }
 }
 
@@ -209,6 +211,10 @@ message LeaveRequest {
 message UpdateVideoLayers {
   string track_sid = 1;
   repeated VideoLayer layers = 2;
+}
+
+message UpdateParticipantMetadata {
+  string metadata = 1;
 }
 
 message ICEServer {

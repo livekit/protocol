@@ -32,10 +32,14 @@ message ParticipantPermission {
   bool can_publish = 2;
   // allow participant to publish data
   bool can_publish_data = 3;
+  // sources that are allowed to be published
+  repeated TrackSource can_publish_sources = 9;
   // indicates that it's hidden to others
   bool hidden = 7;
   // indicates it's a recorder instance
   bool recorder = 8;
+
+  // NEXT_ID: 10
 }
 
 message ParticipantInfo {
@@ -83,7 +87,7 @@ message Encryption {
   enum Type {
       NONE=0;
       GCM=1;
-      CUSTOM=2;    
+      CUSTOM=2;
   }
 }
 
