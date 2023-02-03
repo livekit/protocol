@@ -100,6 +100,7 @@ message AnalyticsClientMeta {
   uint32 client_connect_time = 4;
   // udp, tcp, turn
   string connection_type = 5;
+  ReconnectReason reconnect_reason = 6; 
 }
 
 message AnalyticsEvent {

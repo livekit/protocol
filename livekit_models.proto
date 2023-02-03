@@ -329,3 +329,11 @@ message TimedVersion {
   int64 unix_micro = 1;
   int32 ticks = 2;
 }
+
+enum ReconnectReason {
+  REASON_UNKOWN = 0;
+  REASON_SIGNAL_DISCONNECTED = 1;
+  REASON_PUBLISHER_FAILED = 2;
+  REASON_SUBSCRIBER_FAILED = 3;
+  REASON_SWITCH_CANDIDATE = 4;
+}
