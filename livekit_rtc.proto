@@ -153,6 +153,9 @@ message JoinResponse {
 message ReconnectResponse {
   repeated ICEServer ice_servers = 1;
   ClientConfiguration client_configuration = 2;
+  Room room = 3;
+  ParticipantInfo participant = 4;
+  repeated ParticipantInfo other_participants = 5;
 }
 
 message TrackPublishedResponse {
