@@ -112,6 +112,11 @@ message EncodedFileOutput {
   }
 }
 
+enum SegmentedFileProtocol {
+  DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
+  HLS_PROTOCOL = 1;
+}
+
 // Used to generate HLS segments or other kind of segmented output
 message SegmentedFileOutput {
   SegmentedFileProtocol protocol = 1; // (optional)
@@ -171,11 +176,6 @@ message AliOSSUpload {
 enum StreamProtocol {
   DEFAULT_PROTOCOL = 0; // protocol chosen based on urls
   RTMP = 1;
-}
-
-enum SegmentedFileProtocol {
-  DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
-  HLS_PROTOCOL = 1;
 }
 
 message StreamOutput {
@@ -294,6 +294,7 @@ message StreamInfo {
   int64 ended_at = 3;
   int64 duration = 4;
   Status status = 5;
+  string error = 6;
 }
 
 message FileInfo {
