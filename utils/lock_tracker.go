@@ -140,9 +140,9 @@ func sync_runtime_canSpin(int) bool
 //go:linkname sync_runtime_doSpin sync.runtime_doSpin
 func sync_runtime_doSpin()
 
-func lazyInitLockTracker(p **lockTracker) {
+func lazyInitLockTracker(p **lockTracker) *lockTracker {
 	if !lockTrackerEnabled {
-		return
+		return nil
 	}
 	up := (*unsafe.Pointer)(unsafe.Pointer(p))
 	iter := 0
@@ -150,7 +150,6 @@ func lazyInitLockTracker(p **lockTracker) {
 		if t := atomic.LoadPointer(up); t == nil {
 			if atomic.CompareAndSwapPointer(up, nil, (unsafe.Pointer)(&waiting)) {
 				atomic.StorePointer(up, (unsafe.Pointer)(newLockTracker()))
-				return
 			}
 		} else if t == (unsafe.Pointer)(&waiting) {
 			if sync_runtime_canSpin(iter) {
@@ -160,7 +159,7 @@ func lazyInitLockTracker(p **lockTracker) {
 				runtime.Gosched()
 			}
 		} else {
-			return
+			return (*lockTracker)(t)
 		}
 	}
 }
@@ -171,10 +170,10 @@ type Mutex struct {
 }
 
 func (m *Mutex) Lock() {
-	lazyInitLockTracker(&m.t)
-	m.t.trackWait()
+	t := lazyInitLockTracker(&m.t)
+	t.trackWait()
 	m.Mutex.Lock()
-	m.t.trackLock()
+	t.trackLock()
 }
 
 type RWMutex struct {
@@ -183,15 +182,15 @@ type RWMutex struct {
 }
 
 func (m *RWMutex) Lock() {
-	lazyInitLockTracker(&m.t)
-	m.t.trackWait()
+	t := lazyInitLockTracker(&m.t)
+	t.trackWait()
 	m.RWMutex.Lock()
-	m.t.trackLock()
+	t.trackLock()
 }
 
 func (m *RWMutex) RLock() {
-	lazyInitLockTracker(&m.t)
-	m.t.trackWait()
+	t := lazyInitLockTracker(&m.t)
+	t.trackWait()
 	m.RWMutex.RLock()
-	m.t.trackLock()
+	t.trackLock()
 }
