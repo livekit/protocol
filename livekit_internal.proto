@@ -148,6 +148,7 @@ message StartSession {
   bool adaptive_stream = 15;
   //if reconnect, client will set current sid
   string participant_id = 16;
+  ReconnectReason reconnect_reason = 17;
 }
 
 message EndSession {
