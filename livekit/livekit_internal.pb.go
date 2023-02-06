@@ -1163,7 +1163,7 @@ func (x *StartSession) GetReconnectReason() ReconnectReason {
 	if x != nil {
 		return x.ReconnectReason
 	}
-	return ReconnectReason_REASON_UNKOWN
+	return ReconnectReason_RR_UNKOWN
 }
 
 type EndSession struct {
