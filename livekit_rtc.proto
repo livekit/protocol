@@ -34,7 +34,10 @@ message SignalRequest {
     // Simulate conditions, for client validations
     SimulateScenario simulate = 13;
     // client triggered ping to server
-    int64 ping = 14;
+    int64 ping = 14; // deprecated by ping_req (message Ping)
+    // update a participant's own metadata
+    UpdateParticipantMetadata update_metadata = 15;
+    Ping ping_req = 16;
   }
 }
 
@@ -74,9 +77,11 @@ message SignalResponse {
     // server initiated track unpublish
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
-    int64 pong = 18;
+    int64 pong = 18; // deprecated by pong_resp (message Pong)
     // sent when client reconnects
     ReconnectResponse reconnect = 19;
+    // respond to Ping
+    Pong pong_resp = 20;
   }
 }
 
@@ -211,6 +216,10 @@ message UpdateVideoLayers {
   repeated VideoLayer layers = 2;
 }
 
+message UpdateParticipantMetadata {
+  string metadata = 1;
+}
+
 message ICEServer {
   repeated string urls = 1;
   string username = 2;
@@ -320,4 +329,16 @@ message SimulateScenario {
     // switch candidate protocol to tcp
     CandidateProtocol switch_candidate_protocol = 5;
   }
+}
+
+message Ping {
+  int64 timestamp = 1;
+  // rtt in milliseconds calculated by client
+  int64 rtt = 2;
+}
+
+message Pong {
+  // timestamp field of last received ping request
+  int64 last_ping_timestamp = 1;
+  int64 timestamp = 2;
 }
