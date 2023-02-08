@@ -41,9 +41,9 @@ message RoomCompositeEgressRequest {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
     EncodingOptions advanced = 9;     // (optional)
   }
-  EncodedFileOutput file_output = 11;
-  StreamOutput stream_output = 12;
-  SegmentedFileOutput segment_output = 13;
+  repeated EncodedFileOutput file_outputs = 11;
+  repeated StreamOutput stream_outputs = 12;
+  repeated SegmentedFileOutput segment_outputs = 13;
 }
 
 // record any website
@@ -60,9 +60,9 @@ message WebEgressRequest {
     EncodingOptionsPreset preset = 7;
     EncodingOptions advanced = 8;
   }
-  EncodedFileOutput file_output = 9;
-  StreamOutput stream_output = 10;
-  SegmentedFileOutput segment_output = 11;
+  repeated EncodedFileOutput file_outputs = 9;
+  repeated StreamOutput stream_outputs = 10;
+  repeated SegmentedFileOutput segment_outputs = 11;
 }
 
 // containerize up to one audio and one video track
@@ -79,9 +79,9 @@ message TrackCompositeEgressRequest {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
     EncodingOptions advanced = 7;     // (optional)
   }
-  EncodedFileOutput file_output = 11;
-  StreamOutput stream_output = 12;
-  SegmentedFileOutput segment_output = 13;
+  repeated EncodedFileOutput file_outputs = 11;
+  repeated StreamOutput stream_outputs = 12;
+  repeated SegmentedFileOutput segment_outputs = 13;
 }
 
 // record tracks individually, without transcoding
@@ -273,8 +273,8 @@ message EgressInfo {
     SegmentsInfo segments = 12 [deprecated = true];
   }
   repeated StreamInfo stream_results = 15;
-  FileInfo file_result = 16;
-  SegmentsInfo segment_result = 17;
+  repeated FileInfo file_results = 16;
+  repeated SegmentsInfo segment_results = 17;
 }
 
 message StreamInfoList {
