@@ -32,15 +32,37 @@ message RoomCompositeEgressRequest {
   bool audio_only = 3;          // (default false)
   bool video_only = 4;          // (default false)
   string custom_base_url = 5;   // template base url (default https://recorder.livekit.io)
-  oneof output {                // required
-    EncodedFileOutput file = 6;
-    StreamOutput stream = 7;
-    SegmentedFileOutput segments = 10;
+  oneof output {                // deprecated (use _output fields)
+    EncodedFileOutput file = 6 [deprecated = true];
+    StreamOutput stream = 7 [deprecated = true];
+    SegmentedFileOutput segments = 10 [deprecated = true];
   }
   oneof options {
     EncodingOptionsPreset preset = 8; // (default H264_720P_30)
     EncodingOptions advanced = 9;     // (optional)
   }
+  repeated EncodedFileOutput file_outputs = 11;
+  repeated StreamOutput stream_outputs = 12;
+  repeated SegmentedFileOutput segment_outputs = 13;
+}
+
+// record any website
+message WebEgressRequest {
+  string url = 1;
+  bool audio_only = 2;
+  bool video_only = 3;
+  oneof output { // deprecated (use _output fields)
+    EncodedFileOutput file = 4 [deprecated = true];
+    StreamOutput stream = 5 [deprecated = true];
+    SegmentedFileOutput segments = 6 [deprecated = true];
+  }
+  oneof options {
+    EncodingOptionsPreset preset = 7;
+    EncodingOptions advanced = 8;
+  }
+  repeated EncodedFileOutput file_outputs = 9;
+  repeated StreamOutput stream_outputs = 10;
+  repeated SegmentedFileOutput segment_outputs = 11;
 }
 
 // containerize up to one audio and one video track
@@ -48,15 +70,18 @@ message TrackCompositeEgressRequest {
   string room_name = 1;      // required
   string audio_track_id = 2; // (optional)
   string video_track_id = 3; // (optional)
-  oneof output {             // required
-    EncodedFileOutput file = 4;
-    StreamOutput stream = 5;
-    SegmentedFileOutput segments = 8;
+  oneof output {             // deprecated (use _output fields)
+    EncodedFileOutput file = 4 [deprecated = true];
+    StreamOutput stream = 5 [deprecated = true];
+    SegmentedFileOutput segments = 8 [deprecated = true];
   }
   oneof options {
     EncodingOptionsPreset preset = 6; // (default H264_720P_30)
     EncodingOptions advanced = 7;     // (optional)
   }
+  repeated EncodedFileOutput file_outputs = 11;
+  repeated StreamOutput stream_outputs = 12;
+  repeated SegmentedFileOutput segment_outputs = 13;
 }
 
 // record tracks individually, without transcoding
@@ -66,22 +91,6 @@ message TrackEgressRequest {
   oneof output {             // required
     DirectFileOutput file = 3;
     string websocket_url = 4;
-  }
-}
-
-// record any website
-message WebEgressRequest {
-  string url = 1;
-  bool audio_only = 2;
-  bool video_only = 3;
-  oneof output {
-    EncodedFileOutput file = 4;
-    StreamOutput stream = 5;
-    SegmentedFileOutput segments = 6;
-  }
-  oneof options {
-    EncodingOptionsPreset preset = 7;
-    EncodingOptions advanced = 8;
   }
 }
 
@@ -101,6 +110,11 @@ message EncodedFileOutput {
     AzureBlobUpload azure = 5;
     AliOSSUpload aliOSS = 7;
   }
+}
+
+enum SegmentedFileProtocol {
+  DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
+  HLS_PROTOCOL = 1;
 }
 
 // Used to generate HLS segments or other kind of segmented output
@@ -162,11 +176,6 @@ message AliOSSUpload {
 enum StreamProtocol {
   DEFAULT_PROTOCOL = 0; // protocol chosen based on urls
   RTMP = 1;
-}
-
-enum SegmentedFileProtocol {
-  DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
-  HLS_PROTOCOL = 1;
 }
 
 message StreamOutput {
@@ -259,14 +268,18 @@ message EgressInfo {
     TrackEgressRequest track = 6;
     WebEgressRequest web = 14;
   }
-  oneof result {
-    StreamInfoList stream = 7;
-    FileInfo file = 8;
-    SegmentsInfo segments = 12;
+  oneof result { // deprecated (use _result fields)
+    StreamInfoList stream = 7 [deprecated = true];
+    FileInfo file = 8 [deprecated = true];
+    SegmentsInfo segments = 12 [deprecated = true];
   }
+  repeated StreamInfo stream_results = 15;
+  repeated FileInfo file_results = 16;
+  repeated SegmentsInfo segment_results = 17;
 }
 
 message StreamInfoList {
+  option deprecated = true;
   repeated StreamInfo info = 1;
 }
 
@@ -282,6 +295,7 @@ message StreamInfo {
   int64 ended_at = 3;
   int64 duration = 4;
   Status status = 5;
+  string error = 6;
 }
 
 message FileInfo {
