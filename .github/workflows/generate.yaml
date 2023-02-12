@@ -20,14 +20,14 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: '>=1.17'
+        go-version: '>=1.18'
 
     - name: Go mod tidy
       run: go mod tidy
 
     - name: Install generators
       run: |
-        go install github.com/twitchtv/twirp/protoc-gen-twirp@v8.1.0
+        go install github.com/twitchtv/twirp/protoc-gen-twirp@v8.1.3
         go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
 

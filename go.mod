@@ -1,6 +1,6 @@
 module github.com/livekit/protocol
 
-go 1.17
+go 1.18
 
 require (
 	github.com/eapache/channels v1.1.0
