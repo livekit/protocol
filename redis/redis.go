@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/livekit/protocol/logger"
 )
@@ -23,6 +23,8 @@ type RedisConfig struct {
 	SentinelPassword  string   `yaml:"sentinel_password"`
 	SentinelAddresses []string `yaml:"sentinel_addresses"`
 	ClusterAddresses  []string `yaml:"cluster_addresses"`
+	// for clustererd mode only, number of redirects to follow, defaults to 2
+	MaxRedirects *int `yaml:"max_redirects"`
 }
 
 func (r *RedisConfig) IsConfigured() bool {
@@ -36,6 +38,13 @@ func (r *RedisConfig) IsConfigured() bool {
 		return true
 	}
 	return false
+}
+
+func (r *RedisConfig) GetMaxRedirects() int {
+	if r.MaxRedirects != nil {
+		return *r.MaxRedirects
+	}
+	return 2
 }
 
 func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
@@ -72,11 +81,12 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	} else if len(conf.ClusterAddresses) > 0 {
 		logger.Infow("connecting to redis", "cluster", true, "addr", conf.ClusterAddresses)
 		rcOptions = &redis.UniversalOptions{
-			Addrs:     conf.ClusterAddresses,
-			Username:  conf.Username,
-			Password:  conf.Password,
-			DB:        conf.DB,
-			TLSConfig: tlsConfig,
+			Addrs:        conf.ClusterAddresses,
+			Username:     conf.Username,
+			Password:     conf.Password,
+			DB:           conf.DB,
+			TLSConfig:    tlsConfig,
+			MaxRedirects: conf.GetMaxRedirects(),
 		}
 	} else {
 		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)

@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -17,7 +16,7 @@ func TestFileBasedKeyProvider(t *testing.T) {
 		"key2": "secret2",
 		"key3": "secret3",
 	}
-	f, err := ioutil.TempFile("", "keyfile")
+	f, err := os.CreateTemp("", "keyfile")
 	assert.NoError(t, err)
 	defer func() {
 		os.Remove(f.Name())

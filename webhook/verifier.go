@@ -3,7 +3,7 @@ package webhook
 import (
 	"crypto/sha256"
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"google.golang.org/protobuf/encoding/protojson"
@@ -16,7 +16,7 @@ import (
 // closes body after reading
 func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
 	defer r.Body.Close()
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		return nil, err
 	}

@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/eapache/channels"
-	"github.com/go-redis/redis/v8"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/redis/go-redis/v9"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -32,7 +32,7 @@ func init() {
 
 type MessageBus interface {
 	Subscribe(ctx context.Context, channel string) (PubSub, error)
-	// like subscribe, but ensuring only a single instance gets to process the message
+	// SubscribeQueue is like subscribe, but ensuring only a single instance gets to process the message
 	SubscribeQueue(ctx context.Context, channel string) (PubSub, error)
 	Publish(ctx context.Context, channel string, msg proto.Message) error
 }
