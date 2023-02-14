@@ -117,14 +117,20 @@ enum SegmentedFileProtocol {
   HLS_PROTOCOL = 1;
 }
 
+enum SegmentedFileSuffix {
+  INDEX = 0;
+  TIMESTAMP = 1;
+}
+
 // Used to generate HLS segments or other kind of segmented output
 message SegmentedFileOutput {
-  SegmentedFileProtocol protocol = 1; // (optional)
-  string filename_prefix = 2;         // (optional)
-  string playlist_name = 3;           // (optional)
-  uint32 segment_duration = 4;        // in seconds (optional)
-  bool disable_manifest = 8;          // disable upload of manifest file (default false)
-  oneof output {                      // required
+  SegmentedFileProtocol protocol = 1;       // (optional)
+  string filename_prefix = 2;               // (optional)
+  string playlist_name = 3;                 // (optional)
+  uint32 segment_duration = 4;              // in seconds (optional)
+  SegmentedFileSuffix filename_suffix = 10; // (optional, default INDEX)
+  bool disable_manifest = 8;                // disable upload of manifest file (default false)
+  oneof output {                            // required
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
     AzureBlobUpload azure = 7;
