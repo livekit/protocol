@@ -118,9 +118,8 @@ enum SegmentedFileProtocol {
 }
 
 enum SegmentedFileSuffix {
-  DEFAULT_SEGMENTED_FILE_SUFFIX = 0;
-  INDEX = 1;
-  TIMESTAMP = 2;
+  INDEX = 0;
+  TIMESTAMP = 1;
 }
 
 // Used to generate HLS segments or other kind of segmented output
