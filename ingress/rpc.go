@@ -24,6 +24,7 @@ const (
 )
 
 // RPCClient is used by LiveKit Server
+// Deprecated
 type RPCClient interface {
 	// GetUpdateChannel returns a subscription for ingress info updates
 	GetUpdateChannel(ctx context.Context) (utils.PubSub, error)
@@ -36,6 +37,7 @@ type RPCClient interface {
 }
 
 // RPCServer is used by Ingress
+// Deprecated
 type RPCServer interface {
 	// IngressSubscription subscribes to requests for a specific ingress ID
 	IngressSubscription(ctx context.Context, ingressID string) (utils.PubSub, error)
@@ -47,6 +49,7 @@ type RPCServer interface {
 	SendGetIngressInfoRequest(ctx context.Context, req *livekit.GetIngressInfoRequest) (*livekit.GetIngressInfoResponse, error)
 }
 
+// Deprecated
 type RPC interface {
 	RPCClient
 	RPCServer
@@ -57,6 +60,7 @@ type RedisRPC struct {
 	bus    *utils.RedisMessageBus
 }
 
+// Deprecated
 func NewRedisRPC(nodeID livekit.NodeID, rc redis.UniversalClient) RPC {
 	if rc == nil {
 		return nil

@@ -25,6 +25,7 @@ const (
 )
 
 // RPCClient is used by LiveKit Server
+// Deprecated
 type RPCClient interface {
 	// GetUpdateChannel returns a subscription for egress info updates
 	GetUpdateChannel(ctx context.Context) (utils.PubSub, error)
@@ -33,6 +34,7 @@ type RPCClient interface {
 }
 
 // RPCServer is used by Egress
+// Deprecated
 type RPCServer interface {
 	// GetRequestChannel returns a subscription for egress requests
 	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
@@ -51,6 +53,7 @@ type RedisRPC struct {
 	bus    *utils.RedisMessageBus
 }
 
+// Deprecated
 func NewRedisRPCClient(nodeID livekit.NodeID, rc redis.UniversalClient) RPCClient {
 	if rc == nil {
 		return nil
@@ -123,6 +126,7 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	}
 }
 
+// Deprecated
 func NewRedisRPCServer(rc redis.UniversalClient) RPCServer {
 	bus := utils.NewRedisMessageBus(rc)
 	return &RedisRPC{
