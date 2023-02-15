@@ -8,6 +8,7 @@ require (
 	github.com/go-logr/logr v1.2.3
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
+	github.com/livekit/psrpc v0.2.6
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
 	github.com/pion/sdp/v3 v3.0.6
@@ -33,8 +34,16 @@ require (
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.3.0 // indirect
+	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/kr/pretty v0.2.1 // indirect
+	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
+	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
+	github.com/minio/highwayhash v1.0.2 // indirect
+	github.com/nats-io/jwt/v2 v2.3.0 // indirect
+	github.com/nats-io/nats.go v1.21.0 // indirect
+	github.com/nats-io/nkeys v0.3.0 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pion/datachannel v1.5.5 // indirect
 	github.com/pion/dtls/v2 v2.2.4 // indirect
 	github.com/pion/ice/v2 v2.3.0 // indirect
@@ -58,6 +67,7 @@ require (
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.6.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	golang.org/x/tools v0.5.0 // indirect

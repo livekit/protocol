@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/livekit/pkg/service/rpc";
+
+import "options.proto";
+import "livekit_egress.proto";
+
+service EgressInternal {
+  rpc StartEgress(StartEgressRequest) returns (livekit.EgressInfo) {
+    option (psrpc.options).affinity_func = true;
+    option (psrpc.options).topics = true;
+  };
+  rpc ListActiveEgress(ListActiveEgressRequest) returns (ListActiveEgressResponse) {
+    option (psrpc.options).multi = true;
+  }
+}
+
+service EgressHandler {
+  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
+    option (psrpc.options).topics = true;
+  }
+  rpc StopEgress(livekit.StopEgressRequest) returns (livekit.EgressInfo) {
+    option (psrpc.options).topics = true;
+  }
+}
+
+message StartEgressRequest {
+  // request metadata
+  string egress_id = 1;
+  string request_id = 2 [deprecated = true];
+  string sender_id = 10 [deprecated = true];
+  int64 sent_at = 4 [deprecated = true];
+
+  // request
+  oneof request {
+    livekit.RoomCompositeEgressRequest room_composite = 5;
+    livekit.TrackCompositeEgressRequest track_composite = 6;
+    livekit.TrackEgressRequest track = 7;
+    livekit.WebEgressRequest web = 11;
+  }
+
+  // connection info
+  string room_id = 3;
+  string token = 8;
+  string ws_url = 9;
+}
+
+message ListActiveEgressRequest {}
+
+message ListActiveEgressResponse {
+  repeated string egress_ids = 1;
+}

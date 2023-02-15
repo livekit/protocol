@@ -9,6 +9,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/livekit/mageutil"
 )
 
 var Default = Proto
@@ -78,6 +80,53 @@ func Proto() error {
 	}, grpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// regenerate psrpc service definitions
+func Psrpc() error {
+	psrpcProtoFiles := []string{
+		"rpc/egress.proto",
+		"rpc/ingress.proto",
+		"rpc/io.proto",
+	}
+
+	fmt.Println("generating psrpc")
+
+	psrpcDir, err := mageutil.GetPkgDir("github.com/livekit/psrpc")
+	if err != nil {
+		return err
+	}
+
+	protoc, err := mageutil.GetToolPath("protoc")
+	if err != nil {
+		return err
+	}
+	protocGoPath, err := mageutil.GetToolPath("protoc-gen-go")
+	if err != nil {
+		return err
+	}
+	psrpcPath, err := mageutil.GetToolPath("protoc-gen-psrpc")
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("generating psrpc protobuf")
+	args := append([]string{
+		"--go_out", ".",
+		"--psrpc_out", ".",
+		"--go_opt=paths=source_relative",
+		"--psrpc_opt=paths=source_relative",
+		"--plugin=go=" + protocGoPath,
+		"--plugin=psrpc=" + psrpcPath,
+		"-I" + psrpcDir + "/protoc-gen-psrpc/options",
+		"-I=.",
+	}, psrpcProtoFiles...)
+	cmd := exec.Command(protoc, args...)
+	mageutil.ConnectStd(cmd)
 	if err := cmd.Run(); err != nil {
 		return err
 	}
