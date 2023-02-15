@@ -29,9 +29,6 @@ service EgressHandler {
 message StartEgressRequest {
   // request metadata
   string egress_id = 1;
-  string request_id = 2 [deprecated = true];
-  string sender_id = 10 [deprecated = true];
-  int64 sent_at = 4 [deprecated = true];
 
   // request
   oneof request {
