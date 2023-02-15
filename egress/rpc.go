@@ -26,6 +26,7 @@ const (
 )
 
 // RPCClient is used by LiveKit Server
+// Deprecated
 type RPCClient interface {
 	// GetUpdateChannel returns a subscription for egress info updates
 	GetUpdateChannel(ctx context.Context) (utils.PubSub, error)
@@ -34,11 +35,12 @@ type RPCClient interface {
 }
 
 // RPCServer is used by Egress
+// Deprecated
 type RPCServer interface {
 	// GetRequestChannel returns a subscription for egress requests
 	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
 	// ClaimRequest is used to take ownership of a request
-	ClaimRequest(ctx context.Context, request *rpc.StartEgressRequest) (bool, error)
+	ClaimRequest(ctx context.Context, request *livekit.StartEgressRequest) (bool, error)
 	// EgressSubscription subscribes to requests for a specific egress ID
 	EgressSubscription(ctx context.Context, egressID string) (utils.PubSub, error)
 	// SendResponse returns an RPC response
@@ -52,6 +54,7 @@ type RedisRPC struct {
 	bus    *utils.RedisMessageBus
 }
 
+// Deprecated
 func NewRedisRPCClient(nodeID livekit.NodeID, rc redis.UniversalClient) RPCClient {
 	if rc == nil {
 		return nil
@@ -74,6 +77,32 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 
 	switch req := request.(type) {
 	case *rpc.StartEgressRequest:
+		dep := &livekit.StartEgressRequest{
+			EgressId:  req.EgressId,
+			RequestId: requestID,
+			SentAt:    time.Now().UnixNano(),
+			SenderId:  string(r.nodeID),
+			RoomId:    req.RoomId,
+			Token:     req.Token,
+			WsUrl:     req.WsUrl,
+		}
+		if dep.EgressId == "" {
+			dep.EgressId = utils.NewGuid(utils.EgressPrefix)
+		}
+		switch r := req.Request.(type) {
+		case *rpc.StartEgressRequest_RoomComposite:
+			dep.Request = &livekit.StartEgressRequest_RoomComposite{RoomComposite: r.RoomComposite}
+		case *rpc.StartEgressRequest_Web:
+			dep.Request = &livekit.StartEgressRequest_Web{Web: r.Web}
+		case *rpc.StartEgressRequest_TrackComposite:
+			dep.Request = &livekit.StartEgressRequest_TrackComposite{TrackComposite: r.TrackComposite}
+		case *rpc.StartEgressRequest_Track:
+			dep.Request = &livekit.StartEgressRequest_Track{Track: r.Track}
+		}
+		request = dep
+		channel = newEgressChannel
+
+	case *livekit.StartEgressRequest:
 		if req.EgressId == "" {
 			req.EgressId = utils.NewGuid(utils.EgressPrefix)
 		}
@@ -124,6 +153,7 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	}
 }
 
+// Deprecated
 func NewRedisRPCServer(rc redis.UniversalClient) RPCServer {
 	bus := utils.NewRedisMessageBus(rc)
 	return &RedisRPC{
@@ -135,7 +165,7 @@ func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) 
 	return r.bus.Subscribe(ctx, newEgressChannel)
 }
 
-func (r *RedisRPC) ClaimRequest(ctx context.Context, req *rpc.StartEgressRequest) (bool, error) {
+func (r *RedisRPC) ClaimRequest(ctx context.Context, req *livekit.StartEgressRequest) (bool, error) {
 	claimed, err := r.bus.Lock(ctx, requestChannel(req.EgressId), lockDuration)
 	if err != nil || !claimed {
 		return false, err
@@ -153,7 +183,7 @@ func (r *RedisRPC) SendResponse(ctx context.Context, request proto.Message, info
 	}
 
 	switch req := request.(type) {
-	case *rpc.StartEgressRequest:
+	case *livekit.StartEgressRequest:
 		res.RequestId = req.RequestId
 	case *livekit.EgressRequest:
 		res.RequestId = req.RequestId

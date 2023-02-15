@@ -18,17 +18,12 @@ service IOInfo {
 message GetIngressInfoRequest {
   string ingress_id = 1;
   string stream_key = 2;
-  string request_id = 3 [deprecated = true];
-  string sender_id = 4 [deprecated = true];
-  int64 sent_at = 5 [deprecated = true];
 }
 
 message GetIngressInfoResponse {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
-  string error = 4;
-  string request_id = 5;
 }
 
 // Request to store an update to the ingress state ingress -> service
