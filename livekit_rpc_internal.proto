@@ -8,28 +8,9 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 
-message StartEgressRequest {
-  // request metadata
-  string egress_id = 1;
-  string request_id = 2;
-  string sender_id = 10;
-  int64 sent_at = 4;
-
-  // request
-  oneof request {
-    RoomCompositeEgressRequest room_composite = 5;
-    TrackCompositeEgressRequest track_composite = 6;
-    TrackEgressRequest track = 7;
-    WebEgressRequest web = 11;
-  }
-
-  // connection info
-  string room_id = 3;
-  string token = 8;
-  string ws_url = 9;
-}
-
 message EgressRequest {
+  option deprecated = true;
+
   // request metadata
   string egress_id = 1;
   string request_id = 2;
@@ -43,6 +24,8 @@ message EgressRequest {
 }
 
 message EgressResponse {
+  option deprecated = true;
+
   EgressInfo info = 1;
   string error = 2;
   string request_id = 3;
@@ -50,6 +33,8 @@ message EgressResponse {
 
 // service -> ingress notification of a change in the ingress configuration
 message IngressRequest {
+  option deprecated = true;
+
   // request metadata
   string ingress_id = 1;
   string request_id = 2;
@@ -61,31 +46,10 @@ message IngressRequest {
   }
 }
 
-// Query an ingress info from an ingress ID or stream key
-message GetIngressInfoRequest {
-  string ingress_id = 1;
-  string stream_key = 2;
-  string request_id = 3;
-  string sender_id = 4;
-  int64 sent_at = 5;
-}
-
-// Request to store an update to the ingress state ingress -> service
-message UpdateIngressStateRequest {
-  string ingress_id = 1;
-  IngressState state = 2;
-}
-
 message IngressResponse {
+  option deprecated = true;
+
   IngressState state = 1;
   string error = 2;
   string request_id = 3;
-}
-
-message GetIngressInfoResponse {
-  IngressInfo info = 1;
-  string token = 2;
-  string ws_url = 3;
-  string error = 4;
-  string request_id = 5;
 }

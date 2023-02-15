@@ -10,6 +10,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 )
 
@@ -37,7 +38,7 @@ type RPCServer interface {
 	// GetRequestChannel returns a subscription for egress requests
 	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
 	// ClaimRequest is used to take ownership of a request
-	ClaimRequest(ctx context.Context, request *livekit.StartEgressRequest) (bool, error)
+	ClaimRequest(ctx context.Context, request *rpc.StartEgressRequest) (bool, error)
 	// EgressSubscription subscribes to requests for a specific egress ID
 	EgressSubscription(ctx context.Context, egressID string) (utils.PubSub, error)
 	// SendResponse returns an RPC response
@@ -72,7 +73,7 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	var channel string
 
 	switch req := request.(type) {
-	case *livekit.StartEgressRequest:
+	case *rpc.StartEgressRequest:
 		if req.EgressId == "" {
 			req.EgressId = utils.NewGuid(utils.EgressPrefix)
 		}
@@ -134,7 +135,7 @@ func (r *RedisRPC) GetRequestChannel(ctx context.Context) (utils.PubSub, error) 
 	return r.bus.Subscribe(ctx, newEgressChannel)
 }
 
-func (r *RedisRPC) ClaimRequest(ctx context.Context, req *livekit.StartEgressRequest) (bool, error) {
+func (r *RedisRPC) ClaimRequest(ctx context.Context, req *rpc.StartEgressRequest) (bool, error) {
 	claimed, err := r.bus.Lock(ctx, requestChannel(req.EgressId), lockDuration)
 	if err != nil || !claimed {
 		return false, err
@@ -152,7 +153,7 @@ func (r *RedisRPC) SendResponse(ctx context.Context, request proto.Message, info
 	}
 
 	switch req := request.(type) {
-	case *livekit.StartEgressRequest:
+	case *rpc.StartEgressRequest:
 		res.RequestId = req.RequestId
 	case *livekit.EgressRequest:
 		res.RequestId = req.RequestId

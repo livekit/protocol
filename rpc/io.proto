@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/livekit/pkg/service/rpc";
+
+import "livekit_egress.proto";
+import "livekit_ingress.proto";
+import "google/protobuf/empty.proto";
+
+service IOInfo {
+  rpc UpdateEgressInfo(livekit.EgressInfo) returns (google.protobuf.Empty);
+  rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
+  rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
+}
+
+// Query an ingress info from an ingress ID or stream key
+message GetIngressInfoRequest {
+  string ingress_id = 1;
+  string stream_key = 2;
+  string request_id = 3 [deprecated = true];
+  string sender_id = 4 [deprecated = true];
+  int64 sent_at = 5 [deprecated = true];
+}
+
+message GetIngressInfoResponse {
+  livekit.IngressInfo info = 1;
+  string token = 2;
+  string ws_url = 3;
+  string error = 4;
+  string request_id = 5;
+}
+
+// Request to store an update to the ingress state ingress -> service
+message UpdateIngressStateRequest {
+  string ingress_id = 1;
+  livekit.IngressState state = 2;
+}
