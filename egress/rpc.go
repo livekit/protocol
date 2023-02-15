@@ -10,6 +10,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 )
 
@@ -75,6 +76,32 @@ func (r *RedisRPC) SendRequest(ctx context.Context, request proto.Message) (*liv
 	var channel string
 
 	switch req := request.(type) {
+	case *rpc.StartEgressRequest:
+		dep := &livekit.StartEgressRequest{
+			EgressId:  req.EgressId,
+			RequestId: requestID,
+			SentAt:    time.Now().UnixNano(),
+			SenderId:  string(r.nodeID),
+			RoomId:    req.RoomId,
+			Token:     req.Token,
+			WsUrl:     req.WsUrl,
+		}
+		if dep.EgressId == "" {
+			dep.EgressId = utils.NewGuid(utils.EgressPrefix)
+		}
+		switch r := req.Request.(type) {
+		case *rpc.StartEgressRequest_RoomComposite:
+			dep.Request = &livekit.StartEgressRequest_RoomComposite{RoomComposite: r.RoomComposite}
+		case *rpc.StartEgressRequest_Web:
+			dep.Request = &livekit.StartEgressRequest_Web{Web: r.Web}
+		case *rpc.StartEgressRequest_TrackComposite:
+			dep.Request = &livekit.StartEgressRequest_TrackComposite{TrackComposite: r.TrackComposite}
+		case *rpc.StartEgressRequest_Track:
+			dep.Request = &livekit.StartEgressRequest_Track{Track: r.Track}
+		}
+		request = dep
+		channel = newEgressChannel
+
 	case *livekit.StartEgressRequest:
 		if req.EgressId == "" {
 			req.EgressId = utils.NewGuid(utils.EgressPrefix)
