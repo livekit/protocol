@@ -116,8 +116,7 @@ func (t *TimedVersion) Load() TimedVersion {
 }
 
 func (t *TimedVersion) After(other *TimedVersion) bool {
-	ov := other.v.Load()
-	return t.v.Load() > ov
+	return t.v.Load() > other.v.Load()
 }
 
 func (t *TimedVersion) Compare(other *TimedVersion) int {
