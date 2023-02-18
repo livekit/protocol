@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync/atomic"
 	"time"
-	_ "unsafe"
+	_ "unsafe" // required for linkname
 
 	"github.com/livekit/protocol/livekit"
 )
