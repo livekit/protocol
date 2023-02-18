@@ -21,7 +21,8 @@ const tickMask uint64 = 0xffff
 const timeMask = ^tickMask
 const timeGranularity = 1000
 
-var epoch = (time.Now().UnixNano() - nanotime1()) / timeGranularity
+var epochNanos = nanotime1()
+var epoch = time.Now().UnixNano() / timeGranularity
 
 type TimedVersionGenerator interface {
 	New() *TimedVersion
@@ -53,7 +54,7 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 	var next uint64
 	for {
 		prev := g.v.Load()
-		next = uint64(nanotime1()) / timeGranularity << tickBits
+		next = uint64(nanotime1()-epochNanos) / timeGranularity << tickBits
 
 		// if the version timestamp and next timestamp match increment the ticks
 		if prev&timeMask == next {
