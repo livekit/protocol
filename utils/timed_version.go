@@ -16,8 +16,8 @@ func nanotime1() int64
 func usleep(usec uint32)
 
 const tickBits uint64 = 16
-const timeMask uint64 = 0xffffffffffff0000
-const tickMask = ^timeMask
+const tickMask uint64 = 0xffff
+const timeMask = ^tickMask
 const timeGranularity = 1000
 
 var epoch = time.Now().UnixNano() - nanotime1()
