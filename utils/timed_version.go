@@ -21,7 +21,7 @@ const tickMask uint64 = 0xffff
 const timeMask = ^tickMask
 const timeGranularity = 1000
 
-var epoch = time.Now().UnixNano() - nanotime1()
+var epoch = (time.Now().UnixNano() - nanotime1()) / timeGranularity
 
 type TimedVersionGenerator interface {
 	New() *TimedVersion
@@ -29,11 +29,11 @@ type TimedVersionGenerator interface {
 }
 
 func timedVersionComponents(v uint64) (ts int64, ticks int32) {
-	return int64(v>>tickBits) + epoch/timeGranularity, int32(v & tickMask)
+	return int64(v>>tickBits) + epoch, int32(v & tickMask)
 }
 
 func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
-	return TimedVersion{v: *atomic.NewUint64(uint64(ts-epoch/timeGranularity)<<tickBits | uint64(ticks))}
+	return TimedVersion{v: *atomic.NewUint64(uint64(ts-epoch)<<tickBits | uint64(ticks))}
 }
 
 type timedVersionGenerator struct {
