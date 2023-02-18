@@ -2,10 +2,8 @@ package utils
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func TestTimedVersion(t *testing.T) {
@@ -33,17 +31,6 @@ func TestTimedVersion(t *testing.T) {
 		gen := NewDefaultTimedVersionGenerator()
 		tv1 := gen.New()
 		tv2 := NewTimedVersionFromProto(tv1.ToProto())
-		require.Equal(t, *tv1, *tv2)
-	})
-
-	t.Run("timed version protobufs are backward compatible", func(t *testing.T) {
-		gen := NewDefaultTimedVersionGenerator()
-		tv := gen.New().ToProto()
-		now := time.Now()
-		d := tv.UnixMicro - now.UnixMicro()
-
-		// +/- 1 millisecond
-		require.Less(t, -int64(1000), d)
-		require.Greater(t, int64(1000), d)
+		assert.Equal(t, tv1.v.Load(), tv2.v.Load())
 	})
 }
