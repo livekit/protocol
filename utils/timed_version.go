@@ -102,9 +102,13 @@ func (t *TimedVersion) Update(other *TimedVersion) {
 	}
 }
 
-func (t *TimedVersion) Set(other *TimedVersion) {
+func (t *TimedVersion) Store(other *TimedVersion) {
 	ov := atomic.LoadUint64((*uint64)(other))
 	atomic.StoreUint64((*uint64)(t), ov)
+}
+
+func (t *TimedVersion) Load() TimedVersion {
+	return TimedVersion(atomic.LoadUint64((*uint64)(t)))
 }
 
 func (t *TimedVersion) After(other *TimedVersion) bool {
