@@ -103,7 +103,7 @@ func (t *TimedVersion) Update(other *TimedVersion) {
 	ov := atomic.LoadUint64(&other.v)
 	for {
 		prev := atomic.LoadUint64(&t.v)
-		if ov < prev {
+		if ov <= prev {
 			return
 		}
 		if atomic.CompareAndSwapUint64(&t.v, prev, ov) {
