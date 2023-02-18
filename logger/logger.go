@@ -67,6 +67,8 @@ type Logger interface {
 	WithName(name string) Logger
 	WithCallDepth(depth int) Logger
 	WithItemSampler() Logger
+	// WithoutSampler returns the original logger without sampling
+	WithoutSampler() Logger
 }
 
 type ZapLogger struct {
@@ -206,6 +208,15 @@ func (l *ZapLogger) WithItemSampler() Logger {
 	return &dup
 }
 
+func (l *ZapLogger) WithoutSampler() Logger {
+	if l.SampleDuration == 0 {
+		return l
+	}
+	dup := *l
+	dup.zap = l.unsampled
+	return &dup
+}
+
 type LogRLogger logr.Logger
 
 func (l LogRLogger) toLogr() logr.Logger {
@@ -248,5 +259,9 @@ func (l LogRLogger) WithCallDepth(depth int) Logger {
 
 func (l LogRLogger) WithItemSampler() Logger {
 	// logr does not support sampling
+	return l
+}
+
+func (l LogRLogger) WithoutSampler() Logger {
 	return l
 }
