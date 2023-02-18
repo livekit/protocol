@@ -2,9 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"sync/atomic"
 	"time"
 	_ "unsafe" // required for linkname
+
+	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/livekit"
 )
@@ -14,8 +15,6 @@ func nanotime1() int64
 
 //go:linkname usleep runtime.usleep
 func usleep(usec uint32)
-
-type nocmp [0]func()
 
 const tickBits uint64 = 16
 const tickMask uint64 = 0xffff
@@ -29,18 +28,16 @@ type TimedVersionGenerator interface {
 	Next() TimedVersion
 }
 
-func timedVersionComponents(t TimedVersion) (ts int64, ticks int32) {
-	return int64(uint64(t.v)>>tickBits) + epoch/timeGranularity, int32(uint64(t.v) & tickMask)
+func timedVersionComponents(v uint64) (ts int64, ticks int32) {
+	return int64(v>>tickBits) + epoch/timeGranularity, int32(v & tickMask)
 }
 
 func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
-	return TimedVersion{v: uint64(ts-epoch/timeGranularity)<<tickBits | uint64(ticks)}
+	return TimedVersion{v: *atomic.NewUint64(uint64(ts-epoch/timeGranularity)<<tickBits | uint64(ticks))}
 }
 
 type timedVersionGenerator struct {
-	_ nocmp // prevent comparison
-
-	v uint64
+	v atomic.Uint64
 }
 
 func NewDefaultTimedVersionGenerator() TimedVersionGenerator {
@@ -55,7 +52,7 @@ func (g *timedVersionGenerator) New() *TimedVersion {
 func (g *timedVersionGenerator) Next() TimedVersion {
 	var next uint64
 	for {
-		prev := atomic.LoadUint64(&g.v)
+		prev := g.v.Load()
 		next = uint64(nanotime1()) / timeGranularity << tickBits
 
 		// if the version timestamp and next timestamp match increment the ticks
@@ -68,17 +65,15 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 			}
 			next = prev + 1
 		}
-		if atomic.CompareAndSwapUint64(&g.v, prev, next) {
+		if g.v.CompareAndSwap(prev, next) {
 			break
 		}
 	}
-	return TimedVersion{v: next}
+	return TimedVersion{v: *atomic.NewUint64(next)}
 }
 
 type TimedVersion struct {
-	_ nocmp // prevent comparison
-
-	v uint64
+	v atomic.Uint64
 }
 
 func NewTimedVersionFromProto(proto *livekit.TimedVersion) *TimedVersion {
@@ -100,35 +95,34 @@ func TimedVersionFromTime(t time.Time) TimedVersion {
 }
 
 func (t *TimedVersion) Update(other *TimedVersion) {
-	ov := atomic.LoadUint64(&other.v)
+	ov := other.v.Load()
 	for {
-		prev := atomic.LoadUint64(&t.v)
+		prev := t.v.Load()
 		if ov <= prev {
 			return
 		}
-		if atomic.CompareAndSwapUint64(&t.v, prev, ov) {
+		if t.v.CompareAndSwap(prev, ov) {
 			break
 		}
 	}
 }
 
 func (t *TimedVersion) Store(other *TimedVersion) {
-	ov := atomic.LoadUint64(&other.v)
-	atomic.StoreUint64(&t.v, ov)
+	t.v.Store(other.v.Load())
 }
 
 func (t *TimedVersion) Load() TimedVersion {
-	return TimedVersion{v: atomic.LoadUint64(&t.v)}
+	return TimedVersion{v: *atomic.NewUint64(t.v.Load())}
 }
 
 func (t *TimedVersion) After(other *TimedVersion) bool {
-	ov := atomic.LoadUint64(&other.v)
-	return atomic.LoadUint64(&t.v) > ov
+	ov := other.v.Load()
+	return t.v.Load() > ov
 }
 
 func (t *TimedVersion) Compare(other *TimedVersion) int {
-	ov := atomic.LoadUint64(&other.v)
-	v := atomic.LoadUint64(&t.v)
+	ov := other.v.Load()
+	v := t.v.Load()
 	if v < ov {
 		return -1
 	}
@@ -139,7 +133,7 @@ func (t *TimedVersion) Compare(other *TimedVersion) int {
 }
 
 func (t *TimedVersion) ToProto() *livekit.TimedVersion {
-	ts, ticks := timedVersionComponents(TimedVersion{v: atomic.LoadUint64(&t.v)})
+	ts, ticks := timedVersionComponents(t.v.Load())
 	return &livekit.TimedVersion{
 		UnixMicro: ts,
 		Ticks:     ticks,
@@ -147,6 +141,6 @@ func (t *TimedVersion) ToProto() *livekit.TimedVersion {
 }
 
 func (t *TimedVersion) String() string {
-	ts, ticks := timedVersionComponents(TimedVersion{v: atomic.LoadUint64(&t.v)})
+	ts, ticks := timedVersionComponents(t.v.Load())
 	return fmt.Sprintf("%d.%d", ts, ticks)
 }
