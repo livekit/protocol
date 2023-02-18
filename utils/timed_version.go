@@ -4,20 +4,13 @@ import (
 	"fmt"
 	"sync"
 	"time"
-	_ "unsafe" // required for linkname
 
 	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/livekit"
 )
 
-//go:linkname nanotime1 runtime.nanotime1
-func nanotime1() int64
-
-//go:linkname usleep runtime.usleep
-func usleep(usec uint32)
-
-const tickBits uint64 = 12
+const tickBits uint64 = 13
 const tickMask uint64 = (1 << tickBits) - 1
 
 var epoch = time.Date(2000, 0, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
@@ -64,7 +57,7 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 			// if incrementing the ticks would overflow the version sleep for a
 			// microsecond then try again.
 			if g.ticks == tickMask {
-				usleep(1)
+				time.Sleep(time.Microsecond)
 				now = time.Now().UnixMicro() - epoch
 				continue
 			}
