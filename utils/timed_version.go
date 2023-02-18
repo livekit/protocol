@@ -20,7 +20,7 @@ func usleep(usec uint32)
 const tickBits uint64 = 12
 const tickMask uint64 = (1 << tickBits) - 1
 
-var epoch = uint64(time.Date(2000, 0, 0, 0, 0, 0, 0, time.UTC).UnixMicro())
+var epoch = time.Date(2000, 0, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
 
 type TimedVersionGenerator interface {
 	New() *TimedVersion
@@ -28,16 +28,16 @@ type TimedVersionGenerator interface {
 }
 
 func timedVersionComponents(v uint64) (ts int64, ticks int32) {
-	return int64(v>>tickBits) + int64(epoch), int32(v & tickMask)
+	return int64(v>>tickBits) + epoch, int32(v & tickMask)
 }
 
 func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
-	return TimedVersion{v: *atomic.NewUint64((uint64(ts-int64(epoch)) << tickBits) | uint64(ticks))}
+	return TimedVersion{v: *atomic.NewUint64((uint64(ts-epoch) << tickBits) | uint64(ticks))}
 }
 
 type timedVersionGenerator struct {
 	mu    sync.Mutex
-	ts    uint64
+	ts    int64
 	ticks uint64
 }
 
@@ -51,7 +51,7 @@ func (g *timedVersionGenerator) New() *TimedVersion {
 }
 
 func (g *timedVersionGenerator) Next() TimedVersion {
-	now := uint64(time.Now().UnixMicro()) - epoch
+	now := time.Now().UnixMicro() - epoch
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -65,7 +65,7 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 			// microsecond then try again.
 			if g.ticks == tickMask {
 				usleep(1)
-				now = uint64(time.Now().UnixMicro()) - epoch
+				now = time.Now().UnixMicro() - epoch
 				continue
 			}
 			g.ticks++
@@ -73,7 +73,7 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 			g.ts = now
 			g.ticks = 0
 		}
-		return TimedVersion{v: *atomic.NewUint64(now<<tickBits | g.ticks)}
+		return TimedVersion{v: *atomic.NewUint64(uint64(now)<<tickBits | g.ticks)}
 	}
 }
 
