@@ -15,6 +15,8 @@ func nanotime1() int64
 //go:linkname usleep runtime.usleep
 func usleep(usec uint32)
 
+type nocmp [0]func()
+
 const tickBits uint64 = 16
 const tickMask uint64 = 0xffff
 const timeMask = ^tickMask
@@ -36,6 +38,8 @@ func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
 }
 
 type timedVersionGenerator struct {
+	_ nocmp // prevent comparison
+
 	v uint64
 }
 
@@ -72,7 +76,8 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 }
 
 type TimedVersion struct {
-	_ [0]func() // prevent comparison
+	_ nocmp // prevent comparison
+
 	v uint64
 }
 
