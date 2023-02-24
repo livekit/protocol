@@ -92,15 +92,15 @@ func TimedVersionFromTime(t time.Time) TimedVersion {
 	return timedVersionFromComponents(t.UnixMicro(), 0)
 }
 
-func (t *TimedVersion) Update(other *TimedVersion) {
+func (t *TimedVersion) Update(other *TimedVersion) bool {
 	ov := other.v.Load()
 	for {
 		prev := t.v.Load()
 		if ov <= prev {
-			return
+			return false
 		}
 		if t.v.CompareAndSwap(prev, ov) {
-			break
+			return true
 		}
 	}
 }
