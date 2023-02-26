@@ -141,6 +141,7 @@ message VideoLayer {
   // target bitrate in bit per second (bps), server will measure actual
   uint32 bitrate = 4;
   uint32 ssrc = 5;
+  uint32 framerate = 6;
 }
 
 // new DataPacket API

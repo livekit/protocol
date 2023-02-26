@@ -3,16 +3,11 @@
 
 package rpc
 
-import (
-	context "context"
-
-	psrpc "github.com/livekit/psrpc"
-	version "github.com/livekit/psrpc/version"
-
-	google_protobuf2 "google.golang.org/protobuf/types/known/emptypb"
-
-	livekit "github.com/livekit/protocol/livekit"
-)
+import context "context"
+import psrpc "github.com/livekit/psrpc"
+import version "github.com/livekit/psrpc/version"
+import google_protobuf2 "google.golang.org/protobuf/types/known/emptypb"
+import livekit "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_2_5
 
