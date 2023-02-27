@@ -25,6 +25,9 @@ func timedVersionComponents(v uint64) (ts int64, ticks int32) {
 }
 
 func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
+	if ts < epoch {
+		ts = epoch
+	}
 	return TimedVersion{v: *atomic.NewUint64((uint64(ts-epoch) << tickBits) | uint64(ticks))}
 }
 
@@ -44,29 +47,29 @@ func (g *timedVersionGenerator) New() *TimedVersion {
 }
 
 func (g *timedVersionGenerator) Next() TimedVersion {
-	now := time.Now().UnixMicro() - epoch
+	ts := time.Now().UnixMicro()
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
 
 	for {
-		if now < g.ts {
-			now = g.ts
+		if ts < g.ts {
+			ts = g.ts
 		}
-		if g.ts == now {
+		if g.ts == ts {
 			// if incrementing the ticks would overflow the version sleep for a
 			// microsecond then try again.
 			if g.ticks == tickMask {
 				time.Sleep(time.Microsecond)
-				now = time.Now().UnixMicro() - epoch
+				ts = time.Now().UnixMicro()
 				continue
 			}
 			g.ticks++
 		} else {
-			g.ts = now
+			g.ts = ts
 			g.ticks = 0
 		}
-		return TimedVersion{v: *atomic.NewUint64(uint64(now)<<tickBits | g.ticks)}
+		return timedVersionFromComponents(g.ts, int32(g.ticks))
 	}
 }
 
