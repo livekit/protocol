@@ -2,6 +2,7 @@ package utils
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -32,5 +33,12 @@ func TestTimedVersion(t *testing.T) {
 		tv1 := gen.New()
 		tv2 := NewTimedVersionFromProto(tv1.ToProto())
 		require.Equal(t, tv1.v.Load(), tv2.v.Load())
+	})
+
+	t.Run("from zero time yields epoch version", func(t *testing.T) {
+		gen := NewDefaultTimedVersionGenerator()
+		tv1 := NewTimedVersionFromTime(time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC))
+		tv2 := gen.New()
+		require.True(t, tv2.After(tv1))
 	})
 }
