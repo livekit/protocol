@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/eapache/channels v1.1.0
-	github.com/frostbyte73/go-throttle v0.0.0-20210621200530-8018c891361d
+	github.com/frostbyte73/go-throttle v0.0.4
 	github.com/go-logr/logr v1.2.3
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
@@ -13,11 +13,11 @@ require (
 	github.com/mackerelio/go-osstat v0.2.3
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
 	github.com/pion/sdp/v3 v3.0.6
-	github.com/pion/webrtc/v3 v3.1.55
+	github.com/pion/webrtc/v3 v3.1.56
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/redis/go-redis/v9 v9.0.2
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/twitchtv/twirp v8.1.3+incompatible
 	go.uber.org/atomic v1.10.0
 	go.uber.org/zap v1.24.0
