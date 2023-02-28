@@ -140,6 +140,11 @@ func (t *TimedVersion) ToProto() *livekit.TimedVersion {
 	}
 }
 
+func (t *TimedVersion) Time() time.Time {
+	ts, _ := timedVersionComponents(t.v.Load())
+	return time.UnixMicro(ts)
+}
+
 func (t *TimedVersion) String() string {
 	ts, ticks := timedVersionComponents(t.v.Load())
 	return fmt.Sprintf("%d.%d", ts, ticks)
