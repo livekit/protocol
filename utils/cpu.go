@@ -3,9 +3,10 @@ package utils
 import (
 	"time"
 
-	"github.com/frostbyte73/go-throttle"
-	"github.com/livekit/protocol/logger"
+	"github.com/frostbyte73/core"
 	"go.uber.org/atomic"
+
+	"github.com/livekit/protocol/logger"
 )
 
 // This object returns cgroup quota aware cpu stats. On other systems than Linux,
@@ -21,7 +22,7 @@ type CPUStats struct {
 	platform platformCPUMonitor
 
 	updateCallback  func(idle float64)
-	warningThrottle func(func())
+	warningThrottle core.Throttle
 	closeChan       chan struct{}
 }
 
@@ -33,7 +34,7 @@ func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
 
 	c := &CPUStats{
 		platform:        p,
-		warningThrottle: throttle.New(time.Minute),
+		warningThrottle: core.NewThrottle(time.Minute),
 		updateCallback:  updateCallback,
 		closeChan:       make(chan struct{}),
 	}
