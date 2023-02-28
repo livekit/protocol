@@ -41,4 +41,13 @@ func TestTimedVersion(t *testing.T) {
 		tv2 := gen.New()
 		require.True(t, tv2.After(tv1))
 	})
+
+	t.Run("time.Time roundtrip", func(t *testing.T) {
+		ts1 := time.Now().Round(time.Microsecond)
+		tv1 := NewTimedVersionFromTime(ts1)
+		ts2 := tv1.Time()
+		tv2 := NewTimedVersionFromTime(ts2)
+		require.Equal(t, ts1, ts2)
+		require.Equal(t, tv1.v.Load(), tv2.v.Load())
+	})
 }
