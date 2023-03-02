@@ -78,7 +78,7 @@ type TimedVersion struct {
 }
 
 func NewTimedVersionFromProto(proto *livekit.TimedVersion) *TimedVersion {
-	v := timedVersionFromComponents(proto.UnixMicro, proto.Ticks)
+	v := timedVersionFromComponents(proto.GetUnixMicro(), proto.GetTicks())
 	return &v
 }
 
