@@ -44,6 +44,7 @@ func Proto() error {
 		"rpc/egress.proto",
 		"rpc/ingress.proto",
 		"rpc/io.proto",
+		"rpc/signal.proto",
 	}
 
 	fmt.Println("generating protobuf")

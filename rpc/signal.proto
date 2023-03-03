@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/livekit/pkg/service/rpc";
+
+import "options.proto";
+import "livekit_internal.proto";
+import "livekit_rtc.proto";
+
+service Signal {
+  rpc RelaySignal(rpc.RelaySignalRequest) returns (rpc.RelaySignalResponse) {
+    option (psrpc.options) = {
+      stream: true
+      topics: true
+      topic_params: {
+        names: ["node_id"]
+        typed: true
+        single_server: true
+      };
+    };
+  };
+}
+
+message RelaySignalRequest {
+  livekit.StartSession start_session = 1;
+  livekit.SignalRequest request = 2;
+}
+
+message RelaySignalResponse {
+  livekit.SignalResponse response = 1;
+}
