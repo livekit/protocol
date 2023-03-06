@@ -175,6 +175,8 @@ message UserPacket {
   bytes payload = 2;
   // the ID of the participants who will receive the message (the message will be sent to all the people in the room if this variable is empty)
   repeated string destination_sids = 3;
+  // topic under which the message was published
+  optional string topic = 4;
 }
 
 enum ConnectionQuality {
