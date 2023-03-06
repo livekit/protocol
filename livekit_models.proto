@@ -40,6 +40,8 @@ message ParticipantPermission {
   bool recorder = 8;
   // indicates that participant can update own metadata
   bool can_update_metadata = 10;
+  
+  // NEXT_ID: 11
 }
 
 message ParticipantInfo {
