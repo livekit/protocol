@@ -38,8 +38,10 @@ message ParticipantPermission {
   bool hidden = 7;
   // indicates it's a recorder instance
   bool recorder = 8;
-
-  // NEXT_ID: 10
+  // indicates that participant can update own metadata
+  bool can_update_metadata = 10;
+  
+  // NEXT_ID: 11
 }
 
 message ParticipantInfo {

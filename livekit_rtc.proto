@@ -35,7 +35,7 @@ message SignalRequest {
     SimulateScenario simulate = 13;
     // client triggered ping to server
     int64 ping = 14; // deprecated by ping_req (message Ping)
-    // update a participant's own metadata
+    // update a participant's own metadata and/or name
     UpdateParticipantMetadata update_metadata = 15;
     Ping ping_req = 16;
   }
@@ -218,6 +218,7 @@ message UpdateVideoLayers {
 
 message UpdateParticipantMetadata {
   string metadata = 1;
+  string name = 2;
 }
 
 message ICEServer {
