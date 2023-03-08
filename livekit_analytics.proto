@@ -125,7 +125,7 @@ message AnalyticsEvent {
   EgressInfo egress = 17;
   IngressInfo ingress = 18;
   string error = 20;
-  RTPStats stats = 21;
+  RTPStats rtp_stats = 21;
 
   // NEXT_ID: 22
 }
