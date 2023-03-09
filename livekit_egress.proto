@@ -164,7 +164,7 @@ message S3Upload {
 }
 
 message GCPUpload {
-  bytes credentials = 1;
+  string credentials = 1;
   string bucket = 2;
 }
 
