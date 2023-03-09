@@ -25,6 +25,19 @@ message Codec {
   string fmtp_line = 2;
 }
 
+enum AudioCodec {
+  DEFAULT_AC = 0;
+  OPUS = 1;
+  AAC = 2;
+}
+
+enum VideoCodec {
+  DEFAULT_VC = 0;
+  H264_BASELINE = 1;
+  H264_MAIN = 2;
+  H264_HIGH = 3;
+}
+
 message ParticipantPermission {
   // allow participant to subscribe to other tracks in the room
   bool can_subscribe = 1;

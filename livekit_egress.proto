@@ -1,6 +1,9 @@
 syntax = "proto3";
 
 package livekit;
+
+import "livekit_models.proto";
+
 option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
@@ -187,19 +190,6 @@ enum StreamProtocol {
 message StreamOutput {
   StreamProtocol protocol = 1; // required
   repeated string urls = 2;    // required
-}
-
-enum AudioCodec {
-  DEFAULT_AC = 0;
-  OPUS = 1;
-  AAC = 2;
-}
-
-enum VideoCodec {
-  DEFAULT_VC = 0;
-  H264_BASELINE = 1;
-  H264_MAIN = 2;
-  H264_HIGH = 3;
 }
 
 message EncodingOptions {
