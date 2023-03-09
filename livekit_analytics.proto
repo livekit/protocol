@@ -115,7 +115,7 @@ message AnalyticsEvent {
   string track_id = 7;
   TrackInfo track = 8;
   string analytics_key = 10;
-  ClientInfo  client_info = 11;
+  ClientInfo client_info = 11;
   AnalyticsClientMeta client_meta = 12;
   string egress_id = 13;
   string ingress_id = 19;
@@ -126,8 +126,9 @@ message AnalyticsEvent {
   IngressInfo ingress = 18;
   string error = 20;
   RTPStats rtp_stats = 21;
+  int32 video_layer = 22;
 
-  // NEXT_ID: 22
+  // NEXT_ID: 23
 }
 
 message AnalyticsEvents {
