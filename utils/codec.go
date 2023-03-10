@@ -1,9 +1,6 @@
 package utils
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/pion/webrtc/v3"
@@ -18,7 +15,7 @@ func GetMimeTypeForVideoCodec(codec livekit.VideoCodec) string {
 	case livekit.VideoCodec_VP8:
 		return webrtc.MimeTypeVP8
 	default:
-		logger.Errorw(fmt.Sprintf("GetMimeTypeForVideoCodec unimplemented for %s", codec.String()), errors.New("unimplemented"))
+		logger.Errorw("GetMimeTypeForVideoCodec unimplemented", nil, "codec", codec.String())
 		return ""
 	}
 }
@@ -30,7 +27,7 @@ func GetMimeTypeForAudioCodec(codec livekit.AudioCodec) string {
 	case livekit.AudioCodec_OPUS:
 		return webrtc.MimeTypeOpus
 	default:
-		logger.Errorw(fmt.Sprintf("GetMimeTypeForAudioCodec unimplemented for %s", codec.String()), errors.New("unimplemented"))
+		logger.Errorw("GetMimeTypeForAudioCodec unimplemented", nil, "codec", codec.String())
 		return ""
 	}
 }
