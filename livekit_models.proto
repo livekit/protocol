@@ -36,6 +36,7 @@ enum VideoCodec {
   H264_BASELINE = 1;
   H264_MAIN = 2;
   H264_HIGH = 3;
+  VP8 = 4;
 }
 
 message ParticipantPermission {
