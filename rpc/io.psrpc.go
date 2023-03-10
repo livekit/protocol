@@ -7,7 +7,7 @@ import context "context"
 import psrpc "github.com/livekit/psrpc"
 import version "github.com/livekit/psrpc/version"
 import google_protobuf2 "google.golang.org/protobuf/types/known/emptypb"
-import livekit "github.com/livekit/protocol/livekit"
+import livekit1 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_2_9
 
@@ -16,7 +16,7 @@ var _ = version.PsrpcVersion_0_2_9
 // =======================
 
 type IOInfoClient interface {
-	UpdateEgressInfo(ctx context.Context, req *livekit.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf2.Empty, error)
+	UpdateEgressInfo(ctx context.Context, req *livekit1.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf2.Empty, error)
 
 	GetIngressInfo(ctx context.Context, req *GetIngressInfoRequest, opts ...psrpc.RequestOption) (*GetIngressInfoResponse, error)
 
@@ -28,7 +28,7 @@ type IOInfoClient interface {
 // ===========================
 
 type IOInfoServerImpl interface {
-	UpdateEgressInfo(context.Context, *livekit.EgressInfo) (*google_protobuf2.Empty, error)
+	UpdateEgressInfo(context.Context, *livekit1.EgressInfo) (*google_protobuf2.Empty, error)
 
 	GetIngressInfo(context.Context, *GetIngressInfoRequest) (*GetIngressInfoResponse, error)
 
@@ -68,7 +68,7 @@ func NewIOInfoClient(clientID string, bus psrpc.MessageBus, opts ...psrpc.Client
 	}, nil
 }
 
-func (c *iOInfoClient) UpdateEgressInfo(ctx context.Context, req *livekit.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf2.Empty, error) {
+func (c *iOInfoClient) UpdateEgressInfo(ctx context.Context, req *livekit1.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf2.Empty, error) {
 	return psrpc.RequestSingle[*google_protobuf2.Empty](ctx, c.client, "UpdateEgressInfo", nil, true, req, opts...)
 }
 

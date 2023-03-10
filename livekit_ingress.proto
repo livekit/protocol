@@ -41,8 +41,8 @@ enum IngressInput {
 message IngressAudioOptions {
     string name = 1;
     TrackSource source = 2;
-    // desired mime_type to publish to room
-    string mime_type = 3;
+    // desired audio codec to publish to room
+    AudioCodec audio_codec = 7;
     uint32 bitrate = 4;
     bool disable_dtx = 5;
     uint32 channels = 6;
@@ -51,8 +51,8 @@ message IngressAudioOptions {
 message IngressVideoOptions {
     string name = 1;
     TrackSource source = 2;
-    // desired mime_type to publish to room
-    string mime_type = 3;
+    // desired codec to publish to room
+    VideoCodec video_codec = 5;
     // simulcast layers to publish, when empty, it'll pick default simulcast
     // layers at 1/2 and 1/4 of the dimensions
     repeated VideoLayer layers = 4;
@@ -97,7 +97,7 @@ message IngressState {
 }
 
 message InputVideoState {
-    uint32 mime_type = 1;
+    string mime_type = 1;
 //  uint32 bitrate = 2;
     uint32 width = 3;
     uint32 height = 4;
@@ -105,7 +105,7 @@ message InputVideoState {
 }
 
 message InputAudioState {
-    uint32 mime_type = 1;
+    string mime_type = 1;
 //  uint32 bitrate = 2;
     uint32 channels = 3;
     uint32 sample_rate = 4;
