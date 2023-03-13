@@ -148,7 +148,7 @@ message SendDataRequest {
   bytes data = 2;
   DataPacket.Kind kind = 3;
   repeated string destination_sids = 4;
-  optional string topic = 5;
+  string topic = 5;
 }
 
 message SendDataResponse {
