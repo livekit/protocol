@@ -1,5 +1,10 @@
 package livekit
 
+import (
+	context "context"
+	fmt "fmt"
+)
+
 // ----------------------------------------------------------------
 
 type TrackID string
@@ -72,3 +77,35 @@ func NodeIDsAsStrings(ids []NodeID) []string {
 
 // ----------------------------------------------------------------
 type ParticipantKey string
+
+// ----------------------------------------------------------------
+
+type ParticipantTopic string
+type RoomTopic string
+
+func FormatParticipantTopic(roomName RoomName, identity ParticipantIdentity) ParticipantTopic {
+	return ParticipantTopic(fmt.Sprintf("%s_%s", roomName, identity))
+}
+
+func FormatRoomTopic(roomName RoomName) RoomTopic {
+	return RoomTopic(roomName)
+}
+
+type TopicFormatter interface {
+	ParticipantTopic(ctx context.Context, roomName RoomName, identity ParticipantIdentity) ParticipantTopic
+	RoomTopic(ctx context.Context, roomName RoomName) RoomTopic
+}
+
+type topicFormatter struct{}
+
+func NewTopicFormatter() TopicFormatter {
+	return topicFormatter{}
+}
+
+func (f topicFormatter) ParticipantTopic(ctx context.Context, roomName RoomName, identity ParticipantIdentity) ParticipantTopic {
+	return FormatParticipantTopic(roomName, identity)
+}
+
+func (f topicFormatter) RoomTopic(ctx context.Context, roomName RoomName) RoomTopic {
+	return FormatRoomTopic(roomName)
+}
