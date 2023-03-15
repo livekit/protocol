@@ -41,6 +41,35 @@ enum IngressInput {
 message IngressAudioOptions {
     string name = 1;
     TrackSource source = 2;
+	oneof encoding_options {
+        IngressAudioEncodingOptionsPreset preset = 3;
+        IngressAudioEncodingOptions advanced = 4;
+    }
+}
+
+message IngressVideoOptions {
+    string name = 1;
+    TrackSource source = 2;
+	oneof encoding_options {
+        IngressVideoEncodingOptionsPreset preset = 3;
+        IngressVideoEncodingOptions advanced = 4;
+    }
+}
+
+enum IngressAudioEncodingOptionsPreset {
+    OPUS_STEREO_96KBPS = 0;      // OPUS, 2 channels, 96kbps
+//    OPUS_MONO_64KBS = 1;         // OPUS, 1 channel, 64kbps
+}
+
+enum IngressVideoEncodingOptionsPreset {
+    H264_720P_30FPS_3_LAYERS = 0;       // 1280x720,  30fps, 3000kbps main layer, 3 layers total
+//    H264_1080P_30FPS_3_LAYERS = 1;      // 1980x1080, 30fps, 4500kpbps main layer, 3 layers total
+//    H264_540P_30FPS_2_LAYERS = 2;       //  960x540,  30fps, 1200kbps main layer, 2 layers total
+//    H264_720P_30FPS_1_LAYER = 3;        // 1281x720,  30fps, 3000kbps, no simulcast
+//    H264_1080P_30FPS_1_LAYER = 4;       // 1980x1080, 30fps, 4500kbps, no simulcast
+}
+
+message IngressAudioEncodingOptions {
     // desired audio codec to publish to room
     AudioCodec audio_codec = 7;
     uint32 bitrate = 4;
@@ -48,13 +77,10 @@ message IngressAudioOptions {
     uint32 channels = 6;
 }
 
-message IngressVideoOptions {
-    string name = 1;
-    TrackSource source = 2;
+message IngressVideoEncodingOptions {
     // desired codec to publish to room
     VideoCodec video_codec = 5;
-    // simulcast layers to publish, when empty, it'll pick default simulcast
-    // layers at 1/2 and 1/4 of the dimensions
+    // simulcast layers to publish, when empty, should usually be set to layers at 1/2 and 1/4 of the dimensions
     repeated VideoLayer layers = 4;
 }
 

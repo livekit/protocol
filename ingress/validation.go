@@ -4,7 +4,11 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {
+func ValidateVideoOptionsConsistency(options *livekit.IngressVideoEncodingOptions) error {
+	if options == nil {
+		return NewInvalidVideoParamsError("empty options")
+	}
+
 	layersByQuality := make(map[livekit.VideoQuality]*livekit.VideoLayer)
 
 	for _, layer := range options.Layers {
