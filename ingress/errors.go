@@ -1,20 +1,22 @@
 package ingress
 
-import "errors"
+import (
+	"fmt"
+
+	"github.com/livekit/psrpc"
+)
 
 var (
-	ErrIngressOutOfDate        = errors.New("trying to ovewrite an ingress with an older version")
-	ErrIngressTimedOut         = errors.New("ingress timed out")
-	ErrNoResponse              = errors.New("no response from ingress service")
+	ErrIngressOutOfDate        = psrpc.NewErrorf(psrpc.FailedPrecondition, "trying to ovewrite an ingress with an older version")
+	ErrIngressTimedOut         = psrpc.NewErrorf(psrpc.DeadlineExceeded, "ingress timed out")
+	ErrNoResponse              = psrpc.NewErrorf(psrpc.Unavailable, "no response from ingress service")
 	ErrInvalidOutputDimensions = NewInvalidVideoParamsError("invalid output media dimensions")
 )
 
-type InvalidVideoParamsError string
-
-func NewInvalidVideoParamsError(s string) InvalidVideoParamsError {
-	return InvalidVideoParamsError(s)
+func NewInvalidVideoParamsError(s string) error {
+	return psrpc.NewError(psrpc.InvalidArgument, fmt.Errorf("invalid video parameters: %s", s))
 }
 
-func (s InvalidVideoParamsError) Error() string {
-	return "invalid video parameters: " + string(s)
+func NewInvalidAudioParamsError(s string) error {
+	return psrpc.NewError(psrpc.InvalidArgument, fmt.Errorf("invalid audio parameters: %s", s))
 }
