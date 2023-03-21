@@ -54,7 +54,7 @@ message ParticipantPermission {
   bool recorder = 8;
   // indicates that participant can update own metadata
   bool can_update_metadata = 10;
-  
+
   // NEXT_ID: 11
 }
 
@@ -232,6 +232,8 @@ message ClientInfo {
      FLUTTER = 4;
      GO = 5;
      UNITY = 6;
+     REACT_NATIVE = 7;
+     RUST = 8;
   }
 
   SDK sdk = 1;
