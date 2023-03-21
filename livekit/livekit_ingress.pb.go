@@ -115,7 +115,7 @@ const (
 	IngressVideoEncodingPreset_H264_720P_30FPS_3_LAYERS  IngressVideoEncodingPreset = 0 // 1280x720,  30fps, 1700kbps main layer, 3 layers total
 	IngressVideoEncodingPreset_H264_1080P_30FPS_3_LAYERS IngressVideoEncodingPreset = 1 // 1980x1080, 30fps, 3000kbps main layer, 3 layers total
 	IngressVideoEncodingPreset_H264_540P_25FPS_2_LAYERS  IngressVideoEncodingPreset = 2 //  960x540,  25fps, 600kbps  main layer, 2 layers total
-	IngressVideoEncodingPreset_H264_720P_30FPS_1_LAYER   IngressVideoEncodingPreset = 3 // 1281x720,  30fps, 1700kbps, no simulcast
+	IngressVideoEncodingPreset_H264_720P_30FPS_1_LAYER   IngressVideoEncodingPreset = 3 // 1280x720,  30fps, 1700kbps, no simulcast
 	IngressVideoEncodingPreset_H264_1080P_30FPS_1_LAYER  IngressVideoEncodingPreset = 4 // 1980x1080, 30fps, 3000kbps, no simulcast
 )
 
