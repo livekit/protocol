@@ -58,15 +58,15 @@ message IngressVideoOptions {
 
 enum IngressAudioEncodingPreset {
   OPUS_STEREO_96KBPS = 0;    // OPUS, 2 channels, 96kbps
-//  OPUS_MONO_64KBS = 1;     // OPUS, 1 channel, 64kbps
+  OPUS_MONO_64KBS = 1;       // OPUS, 1 channel, 64kbps
 }
 
 enum IngressVideoEncodingPreset {
   H264_720P_30FPS_3_LAYERS = 0;     // 1280x720,  30fps, 1700kbps main layer, 3 layers total
-//  H264_1080P_30FPS_3_LAYERS = 1;    // 1980x1080, 30fps, 3000kpbps main layer, 3 layers total
-//  H264_540P_25FPS_2_LAYERS = 2;     //  960x540,  25fps, 600kbps   main layer, 2 layers total
-//  H264_720P_30FPS_1_LAYER = 3;      // 1281x720,  30fps, 1700kbps, no simulcast
-//  H264_1080P_30FPS_1_LAYER = 4;     // 1980x1080, 30fps, 3000kbps, no simulcast
+  H264_1080P_30FPS_3_LAYERS = 1;    // 1980x1080, 30fps, 3000kbps main layer, 3 layers total
+  H264_540P_25FPS_2_LAYERS = 2;     //  960x540,  25fps, 600kbps  main layer, 2 layers total
+  H264_720P_30FPS_1_LAYER = 3;      // 1281x720,  30fps, 1700kbps, no simulcast
+  H264_1080P_30FPS_1_LAYER = 4;     // 1980x1080, 30fps, 3000kbps, no simulcast
 }
 
 message IngressAudioEncodingOptions {
