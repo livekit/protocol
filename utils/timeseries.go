@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"container/list"
 	"fmt"
 	"sync"
 	"time"
@@ -46,14 +47,15 @@ type TimeSeries[T number] struct {
 	params TimeSeriesParams
 
 	lock           sync.RWMutex
-	samples        []TimeSeriesSample[T]
+	samples        *list.List
 	activeSample   T
 	isActiveSample bool
 }
 
 func NewTimeSeries[T number](params TimeSeriesParams) *TimeSeries[T] {
 	t := &TimeSeries[T]{
-		params: params,
+		params:  params,
+		samples: list.New(),
 	}
 
 	t.initSamples()
@@ -111,8 +113,10 @@ func (t *TimeSeries[T]) GetSamples() []TimeSeriesSample[T] {
 	t.lock.RLock()
 	defer t.lock.RUnlock()
 
-	samples := make([]TimeSeriesSample[T], len(t.samples))
-	copy(samples, t.samples)
+	samples := make([]TimeSeriesSample[T], 0, t.samples.Len())
+	for e := t.samples.Front(); e != nil; e = e.Next() {
+		samples = append(samples, e.Value.(TimeSeriesSample[T]))
+	}
 	return samples
 }
 
@@ -130,7 +134,8 @@ func (t *TimeSeries[T]) Sum() T {
 	t.prune()
 
 	sum := T(0)
-	for _, s := range t.samples {
+	for e := t.samples.Front(); e != nil; e = e.Next() {
+		s := e.Value.(TimeSeriesSample[T])
 		sum += s.Value
 	}
 
@@ -144,7 +149,8 @@ func (t *TimeSeries[T]) Min() T {
 	t.prune()
 
 	min := T(0)
-	for _, s := range t.samples {
+	for e := t.samples.Front(); e != nil; e = e.Next() {
+		s := e.Value.(TimeSeriesSample[T])
 		if min == T(0) || min > s.Value {
 			min = s.Value
 		}
@@ -160,7 +166,8 @@ func (t *TimeSeries[T]) Max() T {
 	t.prune()
 
 	max := T(0)
-	for _, s := range t.samples {
+	for e := t.samples.Front(); e != nil; e = e.Next() {
+		s := e.Value.(TimeSeriesSample[T])
 		if max < s.Value {
 			max = s.Value
 		}
@@ -170,39 +177,32 @@ func (t *TimeSeries[T]) Max() T {
 }
 
 func (t *TimeSeries[T]) initSamples() {
-	// set initial capacity assuming 1 second granularity
-	numSamples := (t.params.Window + time.Second - 1) / time.Second
-	t.samples = make([]TimeSeriesSample[T], 0, numSamples)
+	t.samples = t.samples.Init()
 }
 
 func (t *TimeSeries[T]) addSampleAt(val T, at time.Time) {
 	// insert in time order
-	switch {
-	case len(t.samples) == 0 || at.After(t.samples[len(t.samples)-1].At): // empty or at end
-		t.samples = append(t.samples, TimeSeriesSample[T]{
-			Value: val,
-			At:    at,
-		})
-
-	case at.Before(t.samples[0].At): // at start
-		t.samples = append([]TimeSeriesSample[T]{
-			{
-				Value: val,
-				At:    at,
-			},
-		}, t.samples...)
-
-	default: // in between
-		for idx := len(t.samples) - 1; idx >= 0; idx-- {
-			if at.After(t.samples[idx].At) {
-				t.samples = append(t.samples[:idx+1], t.samples[idx:]...)
-				t.samples[idx+1] = TimeSeriesSample[T]{
-					Value: val,
-					At:    at,
-				}
-				break
-			}
+	var e *list.Element
+	for e = t.samples.Back(); e != nil; e = e.Prev() {
+		s := e.Value.(TimeSeriesSample[T])
+		if at.After(s.At) {
+			break
 		}
+	}
+
+	sample := TimeSeriesSample[T]{
+		Value: val,
+		At:    at,
+	}
+	switch {
+	case e != nil: // in the middle
+		t.samples.InsertAfter(sample, e)
+
+	case t.samples.Front() != nil: // at the end
+		t.samples.PushFront(sample)
+
+	default: // in the front
+		t.samples.PushBack(sample)
 	}
 
 	t.prune()
@@ -210,11 +210,19 @@ func (t *TimeSeries[T]) addSampleAt(val T, at time.Time) {
 
 func (t *TimeSeries[T]) prune() {
 	thresh := time.Now().Add(-t.params.Window)
-	for idx, s := range t.samples {
+
+	toRemove := make([]*list.Element, 0, t.samples.Len())
+	for e := t.samples.Front(); e != nil; e = e.Next() {
+		s := e.Value.(TimeSeriesSample[T])
 		if s.At.After(thresh) {
-			t.samples = t.samples[idx:]
 			break
 		}
+
+		toRemove = append(toRemove, e)
+	}
+
+	for _, e := range toRemove {
+		t.samples.Remove(e)
 	}
 }
 
