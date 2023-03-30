@@ -16,6 +16,7 @@ enum NodeType {
   CONTROLLER = 1;
   MEDIA = 2;
   TURN = 4;
+  SWEEPER = 5;
 }
 
 enum NodeState {
