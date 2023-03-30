@@ -198,10 +198,10 @@ func (t *TimeSeries[T]) addSampleAt(val T, at time.Time) {
 	case e != nil: // in the middle
 		t.samples.InsertAfter(sample, e)
 
-	case t.samples.Front() != nil: // at the end
+	case t.samples.Front() != nil: // in the front
 		t.samples.PushFront(sample)
 
-	default: // in the front
+	default: // at the end
 		t.samples.PushBack(sample)
 	}
 
