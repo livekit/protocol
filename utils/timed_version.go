@@ -20,6 +20,7 @@ var epoch = time.Date(2000, 0, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
 type TimedVersionGenerator interface {
 	New() *TimedVersion
 	Next() TimedVersion
+	SetClockOffset(time.Duration)
 }
 
 func timedVersionComponents(v uint64) (ts int64, ticks int32) {
