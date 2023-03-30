@@ -88,8 +88,6 @@ func (t *TimeSeries[T]) CommitActiveSampleAt(at time.Time) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	t.prune()
-
 	if !t.isActiveSample {
 		return
 	}
@@ -107,7 +105,6 @@ func (t *TimeSeries[T]) AddSampleAt(val T, at time.Time) {
 	defer t.lock.Unlock()
 
 	t.addSampleAt(val, at)
-	t.prune()
 }
 
 func (t *TimeSeries[T]) GetSamples() []TimeSeriesSample[T] {
