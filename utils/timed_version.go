@@ -10,8 +10,10 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-const tickBits uint64 = 13
-const tickMask uint64 = (1 << tickBits) - 1
+const (
+	tickBits uint64 = 13
+	tickMask uint64 = (1 << tickBits) - 1
+)
 
 var epoch = time.Date(2000, 0, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
 
@@ -32,9 +34,10 @@ func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
 }
 
 type timedVersionGenerator struct {
-	mu    sync.Mutex
-	ts    int64
-	ticks uint64
+	mu          sync.Mutex
+	ts          int64
+	ticks       uint64
+	clockOffset time.Duration
 }
 
 func NewDefaultTimedVersionGenerator() TimedVersionGenerator {
@@ -47,7 +50,7 @@ func (g *timedVersionGenerator) New() *TimedVersion {
 }
 
 func (g *timedVersionGenerator) Next() TimedVersion {
-	ts := time.Now().UnixMicro()
+	ts := time.Now().Add(g.clockOffset).UnixMicro()
 
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -61,7 +64,7 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 			// microsecond then try again.
 			if g.ticks == tickMask {
 				time.Sleep(time.Microsecond)
-				ts = time.Now().UnixMicro()
+				ts = time.Now().Add(g.clockOffset).UnixMicro()
 				continue
 			}
 			g.ticks++
@@ -71,6 +74,10 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 		}
 		return timedVersionFromComponents(g.ts, int32(g.ticks))
 	}
+}
+
+func (g *timedVersionGenerator) SetClockOffset(clockOffset time.Duration) {
+	g.clockOffset = clockOffset
 }
 
 type TimedVersion struct {
