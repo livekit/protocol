@@ -23,8 +23,6 @@ message SignalRequest {
     UpdateTrackSettings track_setting = 7;
     // Immediately terminate session
     LeaveRequest leave = 8;
-    // Set active published layers, deprecated in favor of automatic tracking
-//    SetSimulcastLayers simulcast = 9;
     // Update published video layers
     UpdateVideoLayers update_layers = 10;
     // Update subscriber permissions
@@ -329,6 +327,9 @@ message SimulateScenario {
     bool server_leave = 4;
     // switch candidate protocol to tcp
     CandidateProtocol switch_candidate_protocol = 5;
+    // maximum bandwidth for subscribers, in bps
+    // when zero, clears artificial bandwidth limit
+    int64 subscriber_bandwidth = 6;
   }
 }
 
