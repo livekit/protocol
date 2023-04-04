@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/core v0.0.5
+	github.com/go-jose/go-jose/v3 v3.0.0
 	github.com/go-logr/logr v1.2.4
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
@@ -23,7 +24,6 @@ require (
 	go.uber.org/zap v1.24.0
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
-	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
