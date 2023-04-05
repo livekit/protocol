@@ -2981,6 +2981,116 @@ func (x *Pong) GetTimestamp() int64 {
 	return 0
 }
 
+type RegionSettings struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Regions []*RegionInfo `protobuf:"bytes,1,rep,name=regions,proto3" json:"regions,omitempty"`
+}
+
+func (x *RegionSettings) Reset() {
+	*x = RegionSettings{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_rtc_proto_msgTypes[35]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegionSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegionSettings) ProtoMessage() {}
+
+func (x *RegionSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[35]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegionSettings.ProtoReflect.Descriptor instead.
+func (*RegionSettings) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *RegionSettings) GetRegions() []*RegionInfo {
+	if x != nil {
+		return x.Regions
+	}
+	return nil
+}
+
+type RegionInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Region   string `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
+	Url      string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	Distance int64  `protobuf:"varint,3,opt,name=distance,proto3" json:"distance,omitempty"`
+}
+
+func (x *RegionInfo) Reset() {
+	*x = RegionInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_rtc_proto_msgTypes[36]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RegionInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RegionInfo) ProtoMessage() {}
+
+func (x *RegionInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[36]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RegionInfo.ProtoReflect.Descriptor instead.
+func (*RegionInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *RegionInfo) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *RegionInfo) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *RegionInfo) GetDistance() int64 {
+	if x != nil {
+		return x.Distance
+	}
+	return 0
+}
+
 var File_livekit_rtc_proto protoreflect.FileDescriptor
 
 var file_livekit_rtc_proto_rawDesc = []byte{
@@ -3422,20 +3532,30 @@ var file_livekit_rtc_proto_rawDesc = []byte{
 	0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x11, 0x6c, 0x61, 0x73, 0x74, 0x50, 0x69, 0x6e,
 	0x67, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69,
 	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74,
-	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2a, 0x2d, 0x0a, 0x0c, 0x53, 0x69, 0x67, 0x6e,
-	0x61, 0x6c, 0x54, 0x61, 0x72, 0x67, 0x65, 0x74, 0x12, 0x0d, 0x0a, 0x09, 0x50, 0x55, 0x42, 0x4c,
-	0x49, 0x53, 0x48, 0x45, 0x52, 0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a, 0x53, 0x55, 0x42, 0x53, 0x43,
-	0x52, 0x49, 0x42, 0x45, 0x52, 0x10, 0x01, 0x2a, 0x25, 0x0a, 0x0b, 0x53, 0x74, 0x72, 0x65, 0x61,
-	0x6d, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0a, 0x0a, 0x06, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45,
-	0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x50, 0x41, 0x55, 0x53, 0x45, 0x44, 0x10, 0x01, 0x2a, 0x2e,
-	0x0a, 0x11, 0x43, 0x61, 0x6e, 0x64, 0x69, 0x64, 0x61, 0x74, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x63, 0x6f, 0x6c, 0x12, 0x07, 0x0a, 0x03, 0x55, 0x44, 0x50, 0x10, 0x00, 0x12, 0x07, 0x0a, 0x03,
-	0x54, 0x43, 0x50, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x54, 0x4c, 0x53, 0x10, 0x02, 0x42, 0x46,
-	0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76,
-	0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x6c, 0x69,
-	0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02, 0x0d, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x2e,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02, 0x0e, 0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x3a,
-	0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0x3f, 0x0a, 0x0e, 0x52, 0x65, 0x67, 0x69,
+	0x6f, 0x6e, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x2d, 0x0a, 0x07, 0x72, 0x65,
+	0x67, 0x69, 0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x6c, 0x69,
+	0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f,
+	0x52, 0x07, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x52, 0x0a, 0x0a, 0x52, 0x65, 0x67,
+	0x69, 0x6f, 0x6e, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f,
+	0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x12,
+	0x10, 0x0a, 0x03, 0x75, 0x72, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72,
+	0x6c, 0x12, 0x1a, 0x0a, 0x08, 0x64, 0x69, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x08, 0x64, 0x69, 0x73, 0x74, 0x61, 0x6e, 0x63, 0x65, 0x2a, 0x2d, 0x0a,
+	0x0c, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x54, 0x61, 0x72, 0x67, 0x65, 0x74, 0x12, 0x0d, 0x0a,
+	0x09, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x53, 0x48, 0x45, 0x52, 0x10, 0x00, 0x12, 0x0e, 0x0a, 0x0a,
+	0x53, 0x55, 0x42, 0x53, 0x43, 0x52, 0x49, 0x42, 0x45, 0x52, 0x10, 0x01, 0x2a, 0x25, 0x0a, 0x0b,
+	0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x0a, 0x0a, 0x06, 0x41,
+	0x43, 0x54, 0x49, 0x56, 0x45, 0x10, 0x00, 0x12, 0x0a, 0x0a, 0x06, 0x50, 0x41, 0x55, 0x53, 0x45,
+	0x44, 0x10, 0x01, 0x2a, 0x2e, 0x0a, 0x11, 0x43, 0x61, 0x6e, 0x64, 0x69, 0x64, 0x61, 0x74, 0x65,
+	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x12, 0x07, 0x0a, 0x03, 0x55, 0x44, 0x50, 0x10,
+	0x00, 0x12, 0x07, 0x0a, 0x03, 0x54, 0x43, 0x50, 0x10, 0x01, 0x12, 0x07, 0x0a, 0x03, 0x54, 0x4c,
+	0x53, 0x10, 0x02, 0x42, 0x46, 0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63,
+	0x6f, 0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02, 0x0d, 0x4c, 0x69, 0x76,
+	0x65, 0x4b, 0x69, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02, 0x0e, 0x4c, 0x69, 0x76,
+	0x65, 0x4b, 0x69, 0x74, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3451,7 +3571,7 @@ func file_livekit_rtc_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_rtc_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_livekit_rtc_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_livekit_rtc_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
 var file_livekit_rtc_proto_goTypes = []interface{}{
 	(SignalTarget)(0),                    // 0: livekit.SignalTarget
 	(StreamState)(0),                     // 1: livekit.StreamState
@@ -3491,20 +3611,22 @@ var file_livekit_rtc_proto_goTypes = []interface{}{
 	(*SimulateScenario)(nil),             // 35: livekit.SimulateScenario
 	(*Ping)(nil),                         // 36: livekit.Ping
 	(*Pong)(nil),                         // 37: livekit.Pong
-	(TrackType)(0),                       // 38: livekit.TrackType
-	(TrackSource)(0),                     // 39: livekit.TrackSource
-	(*VideoLayer)(nil),                   // 40: livekit.VideoLayer
-	(Encryption_Type)(0),                 // 41: livekit.Encryption.Type
-	(*Room)(nil),                         // 42: livekit.Room
-	(*ParticipantInfo)(nil),              // 43: livekit.ParticipantInfo
-	(*ClientConfiguration)(nil),          // 44: livekit.ClientConfiguration
-	(*ServerInfo)(nil),                   // 45: livekit.ServerInfo
-	(*TrackInfo)(nil),                    // 46: livekit.TrackInfo
-	(*ParticipantTracks)(nil),            // 47: livekit.ParticipantTracks
-	(VideoQuality)(0),                    // 48: livekit.VideoQuality
-	(DisconnectReason)(0),                // 49: livekit.DisconnectReason
-	(*SpeakerInfo)(nil),                  // 50: livekit.SpeakerInfo
-	(ConnectionQuality)(0),               // 51: livekit.ConnectionQuality
+	(*RegionSettings)(nil),               // 38: livekit.RegionSettings
+	(*RegionInfo)(nil),                   // 39: livekit.RegionInfo
+	(TrackType)(0),                       // 40: livekit.TrackType
+	(TrackSource)(0),                     // 41: livekit.TrackSource
+	(*VideoLayer)(nil),                   // 42: livekit.VideoLayer
+	(Encryption_Type)(0),                 // 43: livekit.Encryption.Type
+	(*Room)(nil),                         // 44: livekit.Room
+	(*ParticipantInfo)(nil),              // 45: livekit.ParticipantInfo
+	(*ClientConfiguration)(nil),          // 46: livekit.ClientConfiguration
+	(*ServerInfo)(nil),                   // 47: livekit.ServerInfo
+	(*TrackInfo)(nil),                    // 48: livekit.TrackInfo
+	(*ParticipantTracks)(nil),            // 49: livekit.ParticipantTracks
+	(VideoQuality)(0),                    // 50: livekit.VideoQuality
+	(DisconnectReason)(0),                // 51: livekit.DisconnectReason
+	(*SpeakerInfo)(nil),                  // 52: livekit.SpeakerInfo
+	(ConnectionQuality)(0),               // 53: livekit.ConnectionQuality
 }
 var file_livekit_rtc_proto_depIdxs = []int32{
 	13, // 0: livekit.SignalRequest.offer:type_name -> livekit.SessionDescription
@@ -3538,33 +3660,33 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	12, // 28: livekit.SignalResponse.track_unpublished:type_name -> livekit.TrackUnpublishedResponse
 	10, // 29: livekit.SignalResponse.reconnect:type_name -> livekit.ReconnectResponse
 	37, // 30: livekit.SignalResponse.pong_resp:type_name -> livekit.Pong
-	38, // 31: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
-	39, // 32: livekit.AddTrackRequest.source:type_name -> livekit.TrackSource
-	40, // 33: livekit.AddTrackRequest.layers:type_name -> livekit.VideoLayer
+	40, // 31: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
+	41, // 32: livekit.AddTrackRequest.source:type_name -> livekit.TrackSource
+	42, // 33: livekit.AddTrackRequest.layers:type_name -> livekit.VideoLayer
 	5,  // 34: livekit.AddTrackRequest.simulcast_codecs:type_name -> livekit.SimulcastCodec
-	41, // 35: livekit.AddTrackRequest.encryption:type_name -> livekit.Encryption.Type
+	43, // 35: livekit.AddTrackRequest.encryption:type_name -> livekit.Encryption.Type
 	0,  // 36: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
-	42, // 37: livekit.JoinResponse.room:type_name -> livekit.Room
-	43, // 38: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
-	43, // 39: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
+	44, // 37: livekit.JoinResponse.room:type_name -> livekit.Room
+	45, // 38: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
+	45, // 39: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
 	20, // 40: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
-	44, // 41: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	45, // 42: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
+	46, // 41: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	47, // 42: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
 	20, // 43: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
-	44, // 44: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	46, // 45: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
-	43, // 46: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
-	47, // 47: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
-	48, // 48: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
-	49, // 49: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
-	40, // 50: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
-	50, // 51: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
-	42, // 52: livekit.RoomUpdate.room:type_name -> livekit.Room
-	51, // 53: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
+	46, // 44: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	48, // 45: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
+	45, // 46: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
+	49, // 47: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
+	50, // 48: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
+	51, // 49: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
+	42, // 50: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
+	52, // 51: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
+	44, // 52: livekit.RoomUpdate.room:type_name -> livekit.Room
+	53, // 53: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
 	23, // 54: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
 	1,  // 55: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
 	25, // 56: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
-	48, // 57: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
+	50, // 57: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
 	27, // 58: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
 	27, // 59: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
 	28, // 60: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
@@ -3576,11 +3698,12 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	13, // 66: livekit.SyncState.offer:type_name -> livekit.SessionDescription
 	0,  // 67: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
 	2,  // 68: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
-	69, // [69:69] is the sub-list for method output_type
-	69, // [69:69] is the sub-list for method input_type
-	69, // [69:69] is the sub-list for extension type_name
-	69, // [69:69] is the sub-list for extension extendee
-	0,  // [0:69] is the sub-list for field type_name
+	39, // 69: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
+	70, // [70:70] is the sub-list for method output_type
+	70, // [70:70] is the sub-list for method input_type
+	70, // [70:70] is the sub-list for extension type_name
+	70, // [70:70] is the sub-list for extension extendee
+	0,  // [0:70] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
@@ -4010,6 +4133,30 @@ func file_livekit_rtc_proto_init() {
 				return nil
 			}
 		}
+		file_livekit_rtc_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegionSettings); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_livekit_rtc_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RegionInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_livekit_rtc_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*SignalRequest_Offer)(nil),
@@ -4063,7 +4210,7 @@ func file_livekit_rtc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_rtc_proto_rawDesc,
 			NumEnums:      3,
-			NumMessages:   35,
+			NumMessages:   37,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
