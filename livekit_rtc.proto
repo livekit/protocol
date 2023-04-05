@@ -344,3 +344,13 @@ message Pong {
   int64 last_ping_timestamp = 1;
   int64 timestamp = 2;
 }
+
+message RegionSettings {
+  repeated RegionInfo regions = 1;
+}
+
+message RegionInfo {
+  string region = 1;
+  string url = 2;
+  int64 distance = 3;
+}
