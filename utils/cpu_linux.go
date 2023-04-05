@@ -4,7 +4,6 @@ package utils
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"regexp"
 	"runtime"
@@ -148,9 +147,14 @@ func (cg *cpuInfoGetterV1) numCPU() (int, error) {
 		return 0, errors.New("could not parse cpu stats")
 	}
 
-	fmt.Println("CPU", m)
+	cpuCount := 0
+	for _, v := range m {
+		if v != "0" {
+			cpuCount++
+		}
+	}
 
-	return len(m), nil
+	return cpuCount, nil
 }
 
 type cpuInfoGetterV2 struct {
