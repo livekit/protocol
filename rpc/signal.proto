@@ -29,4 +29,5 @@ message RelaySignalRequest {
 
 message RelaySignalResponse {
   livekit.SignalResponse response = 1;
+  repeated livekit.SignalResponse responses = 2;
 }
