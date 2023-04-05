@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/eapache/channels v1.1.0
-	github.com/facebookincubator/go-qfext v0.0.0-20210831195807-4cd18e79853b
 	github.com/frostbyte73/core v0.0.5
 	github.com/go-jose/go-jose/v3 v3.0.0
 	github.com/go-logr/logr v1.2.4
@@ -14,13 +13,11 @@ require (
 	github.com/livekit/psrpc v0.2.10
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.1
-	github.com/panmari/cuckoofilter v1.0.3
 	github.com/pion/sdp/v3 v3.0.6
 	github.com/pion/webrtc/v3 v3.1.59
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
 	github.com/redis/go-redis/v9 v9.0.3
-	github.com/seiflotfy/cuckoofilter v0.0.0-20220411075957-e3b120b3f5fb
 	github.com/stretchr/testify v1.8.2
 	github.com/twitchtv/twirp v8.1.3+incompatible
 	go.uber.org/atomic v1.10.0
@@ -34,7 +31,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/dgryski/go-metro v0.0.0-20200812162917-85c65e2d0165 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
