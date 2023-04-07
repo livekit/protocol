@@ -4,9 +4,41 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-// This validates that advanced encoding options have no consistency issues and provide enough parameters
+// This validates that ingress options have no consistency issues and provide enough parameters
 // to be usable. Options that pass this test may still need some fields to be poulated with default values
 // before being used in a media pipeline.
+
+func Validate(info *livekit.IngressInfo) error {
+	if info.InputType != livekit.IngressInput_RTMP_INPUT {
+		return ErrInvalidIngress("unsupported input type")
+	}
+
+	if info.StreamKey == "" {
+		return ErrInvalidIngress("no stream key")
+	}
+
+	// For now, require a room to be set. We should eventually allow changing the room on an active ingress
+	if info.RoomName == "" {
+		return ErrInvalidIngress("no room name")
+	}
+
+	if info.ParticipantIdentity == "" {
+		return ErrInvalidIngress("no participant identity")
+	}
+
+	err := ValidateVideoOptionsConsistency(info.Video)
+	if err != nil {
+		return err
+	}
+
+	err = ValidateAudioOptionsConsistency(info.Audio)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {
 	if options == nil {
 		return nil

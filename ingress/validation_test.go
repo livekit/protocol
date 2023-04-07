@@ -7,6 +7,49 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestValidate(t *testing.T) {
+	info := &livekit.IngressInfo{}
+
+	err := Validate(info)
+	require.Error(t, err)
+
+	info.StreamKey = "stream_key"
+	err = Validate(info)
+	require.Error(t, err)
+
+	info.RoomName = "room_name"
+	err = Validate(info)
+	require.Error(t, err)
+
+	info.ParticipantIdentity = "participant_identity"
+	err = Validate(info)
+	require.NoError(t, err)
+
+	// make sure video parameters are validated. Full validation logic tested in the next test
+	info.Video = &livekit.IngressVideoOptions{}
+	err = Validate(info)
+	require.NoError(t, err)
+
+	info.Video.Source = livekit.TrackSource_MICROPHONE
+	err = Validate(info)
+	require.Error(t, err)
+
+	info.Video.Source = livekit.TrackSource_CAMERA
+
+	// make sure audio parameters are validated. Full validation logic tested in the next test
+	info.Audio = &livekit.IngressAudioOptions{}
+	err = Validate(info)
+	require.NoError(t, err)
+
+	info.Audio.Source = livekit.TrackSource_CAMERA
+	err = Validate(info)
+	require.Error(t, err)
+
+	info.Audio.Source = livekit.TrackSource_SCREEN_SHARE_AUDIO
+	err = Validate(info)
+	require.NoError(t, err)
+}
+
 func TestValidateVideoOptionsConsistency(t *testing.T) {
 	video := &livekit.IngressVideoOptions{}
 	err := ValidateVideoOptionsConsistency(video)
