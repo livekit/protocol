@@ -77,10 +77,6 @@ func ValidateVideoEncodingOptionsConsistency(options *livekit.IngressVideoEncodi
 		return NewInvalidVideoParamsError("empty options")
 	}
 
-	if (len(options.Layers)) == 0 {
-		return NewInvalidVideoParamsError("no video layer")
-	}
-
 	if options.FrameRate < 0 {
 		return NewInvalidVideoParamsError("invalid framerate")
 	}
