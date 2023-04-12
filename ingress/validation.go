@@ -5,21 +5,34 @@ import (
 )
 
 // This validates that ingress options have no consistency issues and provide enough parameters
-// to be usable. Options that pass this test may still need some fields to be poulated with default values
+// to be usable by the ingress service. Options that pass this test may still need some fields to be poulated with default values
 // before being used in a media pipeline.
 
 func Validate(info *livekit.IngressInfo) error {
+	if info == nil {
+		return ErrInvalidIngress("missing IngressInfo")
+	}
+
+	// For now, require a room to be set. We should eventually allow changing the room on an active ingress
+	if info.RoomName == "" {
+		return ErrInvalidIngress("no room name")
+	}
+
+	return ValidateForSerialization(info)
+}
+
+// Sparse info with not all required fields populated are acceptable for serialization, provided values are consistent
+func ValidateForSerialization(info *livekit.IngressInfo) error {
+	if info == nil {
+		return ErrInvalidIngress("missing IngressInfo")
+	}
+
 	if info.InputType != livekit.IngressInput_RTMP_INPUT {
 		return ErrInvalidIngress("unsupported input type")
 	}
 
 	if info.StreamKey == "" {
 		return ErrInvalidIngress("no stream key")
-	}
-
-	// For now, require a room to be set. We should eventually allow changing the room on an active ingress
-	if info.RoomName == "" {
-		return ErrInvalidIngress("no room name")
 	}
 
 	if info.ParticipantIdentity == "" {
@@ -37,6 +50,7 @@ func Validate(info *livekit.IngressInfo) error {
 	}
 
 	return nil
+
 }
 
 func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {
@@ -95,6 +109,14 @@ func ValidateVideoEncodingOptionsConsistency(options *livekit.IngressVideoEncodi
 	for _, layer := range options.Layers {
 		if layer.Height == 0 || layer.Width == 0 {
 			return ErrInvalidOutputDimensions
+		}
+
+		if layer.Width%2 == 1 {
+			return ErrInvalidIngress("layer width must be even")
+		}
+
+		if layer.Height%2 == 1 {
+			return ErrInvalidIngress("layer height must be even")
 		}
 
 		if _, ok := layersByQuality[layer.Quality]; ok {

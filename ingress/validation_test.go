@@ -105,6 +105,15 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
 		&livekit.VideoLayer{
+			Width:  641,
+			Height: 480,
+		},
+	}
+	err = ValidateVideoOptionsConsistency(video)
+	require.Error(t, err)
+
+	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
+		&livekit.VideoLayer{
 			Width:   640,
 			Height:  480,
 			Quality: livekit.VideoQuality_HIGH,
