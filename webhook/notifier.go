@@ -6,10 +6,10 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"net/http"
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/hashicorp/go-retryablehttp"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 
@@ -26,7 +26,7 @@ type notifier struct {
 	apiKey    string
 	apiSecret string
 	urls      []string
-	client    *http.Client
+	client    *retryablehttp.Client
 	logger    logr.Logger
 }
 
@@ -36,9 +36,7 @@ func NewNotifier(apiKey, apiSecret string, urls []string) Notifier {
 		apiSecret: apiSecret,
 		urls:      urls,
 		logger:    logr.Discard(),
-		client: &http.Client{
-			Timeout: defaultWebhookTimeout,
-		},
+		client:    retryablehttp.NewClient(),
 	}
 }
 
@@ -46,7 +44,7 @@ func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 	var encoded []byte
 	var err error
 	if message, ok := payload.(proto.Message); ok {
-		// use proto marshaler to ensure lowerCaseCamel
+		// use proto marshaller to ensure lowerCaseCamel
 		encoded, err = protojson.Marshal(message)
 	} else {
 		// encode as JSON
@@ -69,7 +67,7 @@ func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 	}
 
 	for _, url := range n.urls {
-		r, err := http.NewRequest("POST", url, bytes.NewReader(encoded))
+		r, err := retryablehttp.NewRequest("POST", url, bytes.NewReader(encoded))
 		if err != nil {
 			// ignore and continue
 			n.logger.Error(err, "could not create request", "url", url)
@@ -78,10 +76,12 @@ func (n *notifier) Notify(_ context.Context, payload interface{}) error {
 		r.Header.Set(authHeader, token)
 		// use a custom mime type to ensure signature is checked prior to parsing
 		r.Header.Set("content-type", "application/webhook+json")
-		_, err = n.client.Do(r)
+		res, err := n.client.Do(r)
 		if err != nil {
 			n.logger.Error(err, "could not post to webhook", "url", url)
+			continue
 		}
+		_ = res.Body.Close()
 	}
 
 	return nil
