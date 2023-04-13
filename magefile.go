@@ -21,7 +21,7 @@ func Bootstrap() error {
 		"go install github.com/twitchtv/twirp/protoc-gen-twirp@v8.1.3",
 		"go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1",
 		"go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0",
-		"go install github.com/livekit/psrpc/protoc-gen-psrpc@v0.2.6",
+		"go install github.com/livekit/psrpc/protoc-gen-psrpc@v0.2.10",
 	)
 }
 

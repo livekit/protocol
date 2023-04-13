@@ -150,6 +150,7 @@ message StartSession {
   //if reconnect, client will set current sid
   string participant_id = 16;
   ReconnectReason reconnect_reason = 17;
+  bool subscriber_allow_pause = 18;
 }
 
 message EndSession {
