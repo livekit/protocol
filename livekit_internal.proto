@@ -150,9 +150,7 @@ message StartSession {
   //if reconnect, client will set current sid
   string participant_id = 16;
   ReconnectReason reconnect_reason = 17;
-  // explicit valid flag to indicate if `false` is explicitly set
-  bool is_subscriber_allow_pause_valid = 18;
-  bool subscriber_allow_pause = 19;
+  optional bool subscriber_allow_pause = 18;
 }
 
 message EndSession {
