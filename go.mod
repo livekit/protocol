@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/core v0.0.5
+	github.com/gammazero/deque v0.2.1
 	github.com/go-jose/go-jose/v3 v3.0.0
 	github.com/go-logr/logr v1.2.4
 	github.com/hashicorp/go-retryablehttp v0.7.2

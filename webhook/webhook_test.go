@@ -1,18 +1,18 @@
-package webhook_test
+package webhook
 
 import (
 	"context"
-	"encoding/json"
 	"net"
 	"net/http"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/webhook"
 )
 
 const (
@@ -20,47 +20,22 @@ const (
 	apiSecret = "mysecret"
 )
 
+var authProvider = auth.NewSimpleKeyProvider(
+	apiKey, apiSecret,
+)
+
 func TestWebHook(t *testing.T) {
 	s := newServer(":8765")
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
-	authProvider := auth.NewSimpleKeyProvider(
-		apiKey, apiSecret,
-	)
-	notifier := webhook.NewNotifier(apiKey, apiSecret, []string{
+	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{
 		"http://localhost:8765",
-	})
-
-	t.Run("test json payload", func(t *testing.T) {
-		payload := map[string]interface{}{
-			"test": "payload",
-			"nested": map[string]interface{}{
-				"structure": true,
-			},
-		}
-
-		wg := sync.WaitGroup{}
-		wg.Add(1)
-		s.handler = func(r *http.Request) {
-			defer wg.Done()
-			// receive logic
-			data, err := webhook.Receive(r, authProvider)
-			require.NoError(t, err)
-
-			var decoded map[string]interface{}
-			require.NoError(t, json.Unmarshal(data, &decoded))
-
-			require.EqualValues(t, decoded, payload)
-		}
-
-		require.NoError(t, notifier.Notify(context.Background(), payload))
-		wg.Wait()
 	})
 
 	t.Run("test event payload", func(t *testing.T) {
 		event := &livekit.WebhookEvent{
-			Event: webhook.EventTrackPublished,
+			Event: EventTrackPublished,
 			Participant: &livekit.ParticipantInfo{
 				Identity: "test",
 			},
@@ -73,15 +48,48 @@ func TestWebHook(t *testing.T) {
 		wg.Add(1)
 		s.handler = func(r *http.Request) {
 			defer wg.Done()
-			decodedEvent, err := webhook.ReceiveWebhookEvent(r, authProvider)
+			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
 
 			require.EqualValues(t, event, decodedEvent)
 		}
-		require.NoError(t, notifier.Notify(context.Background(), event))
+		notifier.QueueNotify(context.Background(), event)
 		wg.Wait()
 	})
 
+}
+
+func TestURLNotifierDropped(t *testing.T) {
+	s := newServer(":8765")
+	require.NoError(t, s.Start())
+	defer s.Stop()
+
+	urlNotifier := NewURLNotifier(URLNotifierParams{
+		QueueSize: 1,
+		URL:       "http://localhost:8765",
+		APIKey:    apiKey,
+		APISecret: apiSecret,
+	})
+	urlNotifier.Start()
+	defer urlNotifier.Stop(true)
+	totalDropped := atomic.Int32{}
+	totalReceived := atomic.Int32{}
+	s.handler = func(r *http.Request) {
+		decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
+		require.NoError(t, err)
+		totalReceived.Inc()
+		totalDropped.Add(decodedEvent.NumDropped)
+	}
+	// send multiple notifications
+	_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+	_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventParticipantJoined})
+	_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+
+	time.Sleep(200 * time.Millisecond)
+
+	require.Equal(t, int32(3), totalDropped.Load()+totalReceived.Load())
+	// at least one request dropped
+	require.Greater(t, totalDropped.Load(), int32(0))
 }
 
 type testServer struct {
