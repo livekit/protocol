@@ -11,7 +11,8 @@ import "livekit_ingress.proto";
 
 message WebhookEvent {
   // one of room_started, room_finished, participant_joined, participant_left,
-  // track_published, track_unpublished, egress_started, egress_updated, egress_ended, ingress_started, ingress_ended
+  // track_published, track_unpublished, egress_started, egress_updated, egress_ended,
+  // ingress_started, ingress_ended
   string event = 1;
 
   Room room = 2;
@@ -33,4 +34,8 @@ message WebhookEvent {
 
   // timestamp in seconds
   int64 created_at = 7;
+
+  int32 num_dropped = 11;
+
+  // NEXT_ID: 12
 }

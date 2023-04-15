@@ -1,88 +1,53 @@
 package webhook
 
 import (
-	"bytes"
 	"context"
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/json"
-	"time"
+	"sync"
 
-	"github.com/go-logr/logr"
-	"github.com/hashicorp/go-retryablehttp"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
-
-	"github.com/livekit/protocol/auth"
+	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/logger"
 )
 
-const defaultWebhookTimeout = 10 * time.Second
-
-type Notifier interface {
-	Notify(ctx context.Context, payload interface{}) error
+type QueuedNotifier interface {
+	QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error
 }
 
-type notifier struct {
-	apiKey    string
-	apiSecret string
-	urls      []string
-	client    *retryablehttp.Client
-	logger    logr.Logger
+type DefaultNotifier struct {
+	urlNotifiers []*URLNotifier
 }
 
-func NewNotifier(apiKey, apiSecret string, urls []string) Notifier {
-	return &notifier{
-		apiKey:    apiKey,
-		apiSecret: apiSecret,
-		urls:      urls,
-		logger:    logr.Discard(),
-		client:    retryablehttp.NewClient(),
+func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier {
+	n := &DefaultNotifier{}
+	for _, url := range urls {
+		u := NewURLNotifier(URLNotifierParams{
+			URL:       url,
+			Logger:    logger.GetLogger(),
+			APIKey:    apiKey,
+			APISecret: apiSecret,
+		})
+		u.Start()
+		n.urlNotifiers = append(n.urlNotifiers, u)
 	}
+	return n
 }
 
-func (n *notifier) Notify(_ context.Context, payload interface{}) error {
-	var encoded []byte
-	var err error
-	if message, ok := payload.(proto.Message); ok {
-		// use proto marshaller to ensure lowerCaseCamel
-		encoded, err = protojson.Marshal(message)
-	} else {
-		// encode as JSON
-		encoded, err = json.Marshal(payload)
+func (n *DefaultNotifier) Stop(force bool) {
+	wg := sync.WaitGroup{}
+	for _, u := range n.urlNotifiers {
+		wg.Add(1)
+		go func(u *URLNotifier) {
+			defer wg.Done()
+			u.Stop(force)
+		}(u)
 	}
-	if err != nil {
-		return err
-	}
+	wg.Wait()
+}
 
-	// sign payload
-	sum := sha256.Sum256(encoded)
-	b64 := base64.StdEncoding.EncodeToString(sum[:])
-
-	at := auth.NewAccessToken(n.apiKey, n.apiSecret).
-		SetValidFor(5 * time.Minute).
-		SetSha256(b64)
-	token, err := at.ToJWT()
-	if err != nil {
-		return err
-	}
-
-	for _, url := range n.urls {
-		r, err := retryablehttp.NewRequest("POST", url, bytes.NewReader(encoded))
-		if err != nil {
-			// ignore and continue
-			n.logger.Error(err, "could not create request", "url", url)
-			continue
+func (n *DefaultNotifier) QueueNotify(_ context.Context, event *livekit.WebhookEvent) error {
+	for _, u := range n.urlNotifiers {
+		if err := u.QueueNotify(event); err != nil {
+			return err
 		}
-		r.Header.Set(authHeader, token)
-		// use a custom mime type to ensure signature is checked prior to parsing
-		r.Header.Set("content-type", "application/webhook+json")
-		res, err := n.client.Do(r)
-		if err != nil {
-			n.logger.Error(err, "could not post to webhook", "url", url)
-			continue
-		}
-		_ = res.Body.Close()
 	}
-
 	return nil
 }
