@@ -120,9 +120,11 @@ func (n *URLNotifier) worker() {
 			return
 		case <-n.jobSignal:
 			n.processQueue()
-			if n.draining.Load() {
-				return
-			}
+		}
+		// when draining, ensure all events are processed and exit
+		if n.draining.Load() {
+			n.processQueue()
+			return
 		}
 	}
 }
