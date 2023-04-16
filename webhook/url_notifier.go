@@ -133,7 +133,7 @@ func (n *URLNotifier) processQueue() {
 	for event := n.nextItem(); event != nil && !n.fuse.IsBroken(); event = n.nextItem() {
 		if err := n.send(event); err != nil {
 			n.params.Logger.Warnw("failed to send webhook", err, "url", n.params.URL, "event", event.Event)
-			n.dropped.Store(event.NumDropped + 1)
+			n.dropped.Add(event.NumDropped + 1)
 		}
 	}
 }
