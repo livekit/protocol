@@ -67,7 +67,7 @@ func (t TimeSeriesCompareOp) String() string {
 // ------------------------------------------------
 
 type number interface {
-	uint32 | float64
+	uint32 | uint64 | int | int32 | int64 | float32 | float64
 }
 
 type TimeSeriesSample[T number] struct {
@@ -362,6 +362,47 @@ func (t *TimeSeries[T]) LinearFit() (float64, float64) {
 	}
 	intercept := (sy - slope*sx) / N
 	return slope, intercept
+}
+
+func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) float64 {
+	t.lock.Lock()
+	t.prune()
+
+	if t.samples.Len() < numSamplesToUse {
+		t.lock.Unlock()
+		return 0.0
+	}
+
+	values := make([]T, numSamplesToUse)
+	idx := numSamplesToUse - 1
+	for e := t.samples.Back(); e != nil; e = e.Prev() {
+		if idx < 0 {
+			break
+		}
+
+		s := e.Value.(TimeSeriesSample[T])
+		values[idx] = s.Value
+		idx--
+	}
+	t.lock.Unlock()
+
+	concordantPairs := 0
+	discordantPairs := 0
+	for i := 0; i < len(values)-1; i++ {
+		for j := i + 1; j < len(values); j++ {
+			if values[i] < values[j] {
+				concordantPairs++
+			} else if values[i] > values[j] {
+				discordantPairs++
+			}
+		}
+	}
+
+	if (concordantPairs + discordantPairs) == 0 {
+		return 0.0
+	}
+
+	return (float64(concordantPairs) - float64(discordantPairs)) / (float64(concordantPairs) + float64(discordantPairs))
 }
 
 func (t *TimeSeries[T]) initSamples() {

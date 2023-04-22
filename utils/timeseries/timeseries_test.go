@@ -321,4 +321,63 @@ func TestTimeSeries(t *testing.T) {
 		require.Equal(t, uint32(43), samples[5].Value)
 		require.Equal(t, uint32(42), samples[6].Value)
 	})
+
+	t.Run("kendall's tau", func(t *testing.T) {
+		ts := NewTimeSeries[int64](TimeSeriesParams{
+			UpdateOp: TimeSeriesUpdateOpMax,
+			Window:   time.Minute,
+		})
+
+		// increasing values
+		now := time.Now()
+		for val := int64(1); val <= 10; val++ {
+			ts.AddSampleAt(val, now.Add(time.Duration(val)*time.Second))
+		}
+
+		// asking to use more samples than available should return 0.0
+		require.Equal(t, float64(0.0), ts.KendallsTau(11))
+
+		// ever increasing should return 1.0
+		require.Equal(t, float64(1.0), ts.KendallsTau(8))
+
+		ts.ClearSamples()
+
+		// decreasing values
+		now = time.Now()
+		for val := int64(1); val <= 10; val++ {
+			ts.AddSampleAt(11-val, now.Add(time.Duration(val)*time.Second))
+		}
+
+		// ever decreasing should return -1.0
+		require.Equal(t, float64(-1.0), ts.KendallsTau(8))
+
+		ts.ClearSamples()
+
+		// overall increasing
+		now = time.Now()
+		for val := int64(1); val <= 10; val++ {
+			if val&0x1 == 0 {
+				ts.AddSampleAt(2*val, now.Add(time.Duration(val)*time.Second))
+			} else {
+				ts.AddSampleAt(val, now.Add(time.Duration(val)*time.Second))
+			}
+		}
+
+		// increasing envelope should trend positive
+		require.Less(t, float64(0.0), ts.KendallsTau(8))
+
+		// overall decreasing
+		now = time.Now()
+		for val := int64(1); val <= 10; val++ {
+			if val&0x1 == 0 {
+				ts.AddSampleAt(2*(11-val), now.Add(time.Duration(val)*time.Second))
+			} else {
+				ts.AddSampleAt(11-val, now.Add(time.Duration(val)*time.Second))
+			}
+		}
+
+		// decreasing envelope should trend negative
+		require.Greater(t, float64(0.0), ts.KendallsTau(8))
+	})
+
 }
