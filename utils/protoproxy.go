@@ -63,7 +63,7 @@ func (p *ProtoProxy[T]) MarkDirty(immediate bool) {
 	shouldUpdate := immediate || time.Since(p.refreshedAt) > p.refreshInterval
 	p.lock.Unlock()
 	if shouldUpdate {
-		p.performUpdate(false)
+		go p.performUpdate(false)
 	}
 }
 
