@@ -106,17 +106,18 @@ func TestTimeSeries(t *testing.T) {
 
 	t.Run("min", func(t *testing.T) {
 		ts := NewTimeSeries[uint32](TimeSeriesParams{
-			UpdateOp: TimeSeriesUpdateOpMax,
+			UpdateOp: TimeSeriesUpdateOpLatest,
 			Window:   2 * time.Minute,
 		})
 
 		ts.UpdateSample(10)
 		ts.UpdateSample(20)
+		ts.UpdateSample(15)
 		ts.CommitActiveSampleAt(time.Now())
-		require.Equal(t, uint32(20), ts.Min())
+		require.Equal(t, uint32(15), ts.Min())
 
 		ts.AddSample(30)
-		require.Equal(t, uint32(20), ts.Min())
+		require.Equal(t, uint32(15), ts.Min())
 	})
 
 	t.Run("max", func(t *testing.T) {
@@ -286,4 +287,98 @@ func TestTimeSeries(t *testing.T) {
 		onlineStdDev := ts.OnlineStdDev()
 		require.Condition(t, func() bool { return onlineStdDev > 3.02 && onlineStdDev < 3.03 }, "online std dev out of range")
 	})
+
+	t.Run("collapse", func(t *testing.T) {
+		ts := NewTimeSeries[uint32](TimeSeriesParams{
+			UpdateOp:         TimeSeriesUpdateOpMax,
+			Window:           time.Minute,
+			CollapseDuration: 2 * time.Second,
+		})
+
+		// add same value spaced apart by half the collapse duration, should add only five to the list
+		now := time.Now()
+		for i := 0; i < 10; i++ {
+			ts.AddSampleAt(42, now.Add(time.Duration(i)*time.Second))
+		}
+		samples := ts.GetSamples()
+		require.Equal(t, 5, len(samples))
+		require.Equal(t, uint32(42), samples[0].Value) // spot check
+		require.Equal(t, uint32(42), samples[3].Value) // spot check
+
+		// add a sample of different value within the collapse window, it should get added
+		ts.AddSampleAt(43, now.Add(time.Duration(9)*time.Second)) // same time offset as last sample to keep within collapse window
+		samples = ts.GetSamples()
+		require.Equal(t, 6, len(samples))
+		require.Equal(t, uint32(42), samples[0].Value) // spot check
+		require.Equal(t, uint32(42), samples[3].Value) // spot check
+		require.Equal(t, uint32(43), samples[5].Value)
+
+		// add a sample with same value as initial burst within the collapse window, it should get added
+		ts.AddSampleAt(42, now.Add(time.Duration(10)*time.Second))
+		samples = ts.GetSamples()
+		require.Equal(t, 7, len(samples))
+		require.Equal(t, uint32(42), samples[0].Value) // spot check
+		require.Equal(t, uint32(42), samples[3].Value) // spot check
+		require.Equal(t, uint32(43), samples[5].Value)
+		require.Equal(t, uint32(42), samples[6].Value)
+	})
+
+	t.Run("kendall's tau", func(t *testing.T) {
+		ts := NewTimeSeries[int64](TimeSeriesParams{
+			UpdateOp: TimeSeriesUpdateOpMax,
+			Window:   time.Minute,
+		})
+
+		// increasing values
+		now := time.Now()
+		for val := int64(1); val <= 10; val++ {
+			ts.AddSampleAt(val, now.Add(time.Duration(val)*time.Second))
+		}
+
+		// asking to use more samples than available should return 0.0
+		require.Equal(t, float64(0.0), ts.KendallsTau(11))
+
+		// ever increasing should return 1.0
+		require.Equal(t, float64(1.0), ts.KendallsTau(8))
+
+		ts.ClearSamples()
+
+		// decreasing values
+		now = time.Now()
+		for val := int64(1); val <= 10; val++ {
+			ts.AddSampleAt(11-val, now.Add(time.Duration(val)*time.Second))
+		}
+
+		// ever decreasing should return -1.0
+		require.Equal(t, float64(-1.0), ts.KendallsTau(8))
+
+		ts.ClearSamples()
+
+		// overall increasing
+		now = time.Now()
+		for val := int64(1); val <= 10; val++ {
+			if val&0x1 == 0 {
+				ts.AddSampleAt(2*val, now.Add(time.Duration(val)*time.Second))
+			} else {
+				ts.AddSampleAt(val, now.Add(time.Duration(val)*time.Second))
+			}
+		}
+
+		// increasing envelope should trend positive
+		require.Less(t, float64(0.0), ts.KendallsTau(8))
+
+		// overall decreasing
+		now = time.Now()
+		for val := int64(1); val <= 10; val++ {
+			if val&0x1 == 0 {
+				ts.AddSampleAt(2*(11-val), now.Add(time.Duration(val)*time.Second))
+			} else {
+				ts.AddSampleAt(11-val, now.Add(time.Duration(val)*time.Second))
+			}
+		}
+
+		// decreasing envelope should trend negative
+		require.Greater(t, float64(0.0), ts.KendallsTau(8))
+	})
+
 }

@@ -19,6 +19,7 @@ type TimeSeriesUpdateOp int
 const (
 	TimeSeriesUpdateOpAdd TimeSeriesUpdateOp = iota
 	TimeSeriesUpdateOpMax
+	TimeSeriesUpdateOpLatest
 )
 
 func (t TimeSeriesUpdateOp) String() string {
@@ -27,6 +28,8 @@ func (t TimeSeriesUpdateOp) String() string {
 		return "ADD"
 	case TimeSeriesUpdateOpMax:
 		return "MAX"
+	case TimeSeriesUpdateOpLatest:
+		return "LATEST"
 	default:
 		return fmt.Sprintf("%d", int(t))
 	}
@@ -67,7 +70,7 @@ func (t TimeSeriesCompareOp) String() string {
 // ------------------------------------------------
 
 type number interface {
-	uint32 | float64
+	uint32 | uint64 | int | int32 | int64 | float32 | float64
 }
 
 type TimeSeriesSample[T number] struct {
@@ -76,8 +79,9 @@ type TimeSeriesSample[T number] struct {
 }
 
 type TimeSeriesParams struct {
-	UpdateOp TimeSeriesUpdateOp
-	Window   time.Duration
+	UpdateOp         TimeSeriesUpdateOp
+	Window           time.Duration
+	CollapseDuration time.Duration
 }
 
 type TimeSeries[T number] struct {
@@ -122,6 +126,8 @@ func (t *TimeSeries[T]) UpdateSample(val T) {
 		if val > t.activeSample {
 			t.activeSample = val
 		}
+	case TimeSeriesUpdateOpLatest:
+		t.activeSample = val
 	}
 }
 
@@ -363,13 +369,62 @@ func (t *TimeSeries[T]) LinearFit() (float64, float64) {
 	return slope, intercept
 }
 
+func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) float64 {
+	t.lock.Lock()
+	t.prune()
+
+	if t.samples.Len() < numSamplesToUse {
+		t.lock.Unlock()
+		return 0.0
+	}
+
+	values := make([]T, numSamplesToUse)
+	idx := numSamplesToUse - 1
+	for e := t.samples.Back(); e != nil; e = e.Prev() {
+		if idx < 0 {
+			break
+		}
+
+		s := e.Value.(TimeSeriesSample[T])
+		values[idx] = s.Value
+		idx--
+	}
+	t.lock.Unlock()
+
+	concordantPairs := 0
+	discordantPairs := 0
+	for i := 0; i < len(values)-1; i++ {
+		for j := i + 1; j < len(values); j++ {
+			if values[i] < values[j] {
+				concordantPairs++
+			} else if values[i] > values[j] {
+				discordantPairs++
+			}
+		}
+	}
+
+	if (concordantPairs + discordantPairs) == 0 {
+		return 0.0
+	}
+
+	return (float64(concordantPairs) - float64(discordantPairs)) / (float64(concordantPairs) + float64(discordantPairs))
+}
+
 func (t *TimeSeries[T]) initSamples() {
 	t.samples = t.samples.Init()
 }
 
 func (t *TimeSeries[T]) addSampleAt(val T, at time.Time) {
 	// insert in time order
-	var e *list.Element
+	e := t.samples.Back()
+	if e != nil {
+		lastSample := e.Value.(TimeSeriesSample[T])
+		if val == lastSample.Value && at.Sub(lastSample.At) < t.params.CollapseDuration {
+			// repeated value within collapse duration
+			t.prune()
+			return
+		}
+	}
 	for e = t.samples.Back(); e != nil; e = e.Prev() {
 		s := e.Value.(TimeSeriesSample[T])
 		if at.After(s.At) {
