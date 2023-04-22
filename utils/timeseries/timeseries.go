@@ -359,7 +359,6 @@ func (t *TimeSeries[T]) LinearFit() (float64, float64) {
 	if denom != 0.0 {
 		slope = (N*sxy - sx*sy) / denom
 	}
-	fmt.Printf("N: %f, sxy: %f, sx: %f, sy: %f, denom: %f, slope: %f\n", N, sxy, sx, sy, denom, slope) // REMOVE
 	intercept := (sy - slope*sx) / N
 	return slope, intercept
 }

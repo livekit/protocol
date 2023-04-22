@@ -1,7 +1,6 @@
 package timeseries
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -286,48 +285,5 @@ func TestTimeSeries(t *testing.T) {
 		require.Condition(t, func() bool { return onlineVariance > 9.16 && onlineVariance < 9.17 }, "online variance out of range")
 		onlineStdDev := ts.OnlineStdDev()
 		require.Condition(t, func() bool { return onlineStdDev > 3.02 && onlineStdDev < 3.03 }, "online std dev out of range")
-	})
-
-	/* RAJA-REMOVE
-	t.Run("z-score", func(t *testing.T) {
-		ts := NewTimeSeries[float64](TimeSeriesParams{
-			UpdateOp: TimeSeriesUpdateOpMax,
-			Window:   time.Minute,
-		})
-
-		now := time.Now()
-		for idx := uint32(1); idx <= 10; idx++ {
-			ts.AddSampleAt(0.1, now.Add(time.Duration(idx)*time.Second))
-			fmt.Printf("m: %f, s: %f, z: %f\n", ts.OnlineAverage(), ts.OnlineStdDev(), ts.ZScore(0.1)) // REMOVE
-		}
-		for idx := uint32(11); idx <= 20; idx++ {
-			ts.AddSampleAt(0.5, now.Add(time.Duration(idx)*time.Second))
-			fmt.Printf("m: %f, s: %f, z: %f\n", ts.OnlineAverage(), ts.OnlineStdDev(), ts.ZScore(0.5)) // REMOVE
-		}
-	})
-	*/
-
-	t.Run("linear fit", func(t *testing.T) {
-		ts := NewTimeSeries[float64](TimeSeriesParams{
-			UpdateOp: TimeSeriesUpdateOpMax,
-			Window:   20 * time.Second,
-		})
-
-		now := time.Now()
-		for idx := uint32(1); idx <= 10; idx++ {
-			ts.AddSampleAt(0.1, now.Add(time.Duration(idx)*time.Second))
-			slope, intercept := ts.LinearFit()
-			fmt.Printf("m: %f, s: %f, z: %f, s: %f, i: %f\n", ts.OnlineAverage(), ts.OnlineStdDev(), ts.ZScore(0.1), slope, intercept) // REMOVE
-		}
-		for idx := uint32(11); idx <= 20; idx++ {
-			ts.AddSampleAt(0.5, now.Add(time.Duration(idx)*time.Second))
-			slope, intercept := ts.LinearFit()
-			fmt.Printf("m: %f, s: %f, z: %f, s: %f, i: %f\n", ts.OnlineAverage(), ts.OnlineStdDev(), ts.ZScore(0.5), slope, intercept) // REMOVE
-		}
-		for idx := uint32(21); idx <= 30; idx++ {
-			ts.AddSampleAt(0.1, now.Add(time.Duration(idx)*time.Second))
-			slope, intercept := ts.LinearFit()
-			fmt.Printf("m: %f, s: %f, z: %f, s: %f, i: %f\n", ts.OnlineAverage(), ts.OnlineStdDev(), ts.ZScore(0.1), slope, intercept) // REMOVE
-		}
 	})
 }
