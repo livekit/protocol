@@ -88,7 +88,7 @@ func NewTimedVersionFromTime(t time.Time) *TimedVersion {
 }
 
 func TimedVersionFromProto(proto *livekit.TimedVersion) TimedVersion {
-	return timedVersionFromComponents(proto.UnixMicro, proto.Ticks)
+	return timedVersionFromComponents(proto.GetUnixMicro(), proto.GetTicks())
 }
 
 func TimedVersionFromTime(t time.Time) TimedVersion {
@@ -130,6 +130,10 @@ func (t *TimedVersion) Compare(other *TimedVersion) int {
 		return 0
 	}
 	return 1
+}
+
+func (t *TimedVersion) IsZero() bool {
+	return t.v.Load() == 0
 }
 
 func (t *TimedVersion) ToProto() *livekit.TimedVersion {
