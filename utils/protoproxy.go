@@ -1,0 +1,121 @@
+/*
+ * Copyright 2023 LiveKit, Inc
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package utils
+
+import (
+	"sync"
+	"time"
+
+	"github.com/frostbyte73/core"
+	"google.golang.org/protobuf/proto"
+)
+
+// ProtoProxy is a caching proxy for protobuf messages that may be expensive
+// to compute. It is used to avoid unnecessary re-generation of Protobufs
+type ProtoProxy[T proto.Message] struct {
+	message         T
+	updateFn        func() T
+	fuse            core.Fuse
+	updateChan      chan struct{}
+	done            chan struct{}
+	dirty           bool
+	refreshedAt     time.Time
+	refreshInterval time.Duration
+	lock            sync.RWMutex
+}
+
+// NewProtoProxy creates a new ProtoProxy that regenerates underlying values at a cadence of refreshInterval
+// this should be used for updates that should be sent periodically, but does not have the urgency of immediate delivery
+// updateFn should provide computations required to generate the protobuf
+// if refreshInterval is 0, then proxy will only update on MarkDirty(true)
+func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func() T) *ProtoProxy[T] {
+	p := &ProtoProxy[T]{
+		updateChan:      make(chan struct{}, 1),
+		updateFn:        updateFn,
+		done:            make(chan struct{}),
+		fuse:            core.NewFuse(),
+		refreshInterval: refreshInterval,
+	}
+	p.performUpdate()
+	if refreshInterval > 0 {
+		go p.worker()
+	}
+	return p
+}
+
+func (p *ProtoProxy[T]) MarkDirty(immediate bool) {
+	p.lock.Lock()
+	p.dirty = true
+	shouldUpdate := immediate || time.Since(p.refreshedAt) > p.refreshInterval
+	p.lock.Unlock()
+	if shouldUpdate {
+		p.performUpdate()
+	}
+}
+
+func (p *ProtoProxy[T]) Updated() <-chan struct{} {
+	return p.updateChan
+}
+
+func (p *ProtoProxy[T]) Get() T {
+	p.lock.RLock()
+	defer p.lock.RUnlock()
+	return p.message
+}
+
+func (p *ProtoProxy[T]) Stop() {
+	p.fuse.Break()
+
+	// goroutine is not started when refreshInterval == 0
+	if p.refreshInterval > 0 {
+		<-p.done
+	}
+}
+
+func (p *ProtoProxy[T]) performUpdate() {
+	msg := p.updateFn()
+	p.lock.Lock()
+	p.message = msg
+	p.refreshedAt = time.Now()
+	p.dirty = false
+	p.lock.Unlock()
+
+	select {
+	case p.updateChan <- struct{}{}:
+	default:
+	}
+}
+
+func (p *ProtoProxy[T]) worker() {
+	ticker := time.NewTicker(p.refreshInterval)
+	defer ticker.Stop()
+	defer close(p.done)
+
+	for {
+		select {
+		case <-p.fuse.Watch():
+			return
+		case <-ticker.C:
+			p.lock.RLock()
+			shouldUpdate := p.dirty && time.Since(p.refreshedAt) > p.refreshInterval
+			p.lock.RUnlock()
+			if shouldUpdate {
+				p.performUpdate()
+			}
+		}
+	}
+}
