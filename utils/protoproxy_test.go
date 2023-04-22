@@ -15,6 +15,12 @@ func TestProtoProxy(t *testing.T) {
 	numGoRoutines := runtime.NumGoroutine()
 	proxy, numParticipants := createTestProxy()
 
+	select {
+	case <-proxy.Updated():
+		t.Fatal("should not have received an update")
+	default:
+	}
+
 	// should not have changed, initial value should persist
 	require.EqualValues(t, 0, proxy.Get().NumParticipants)
 	require.EqualValues(t, 0, proxy.Get().NumParticipants)

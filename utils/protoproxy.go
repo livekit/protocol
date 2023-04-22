@@ -50,7 +50,7 @@ func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func
 		fuse:            core.NewFuse(),
 		refreshInterval: refreshInterval,
 	}
-	p.performUpdate()
+	p.performUpdate(true)
 	if refreshInterval > 0 {
 		go p.worker()
 	}
@@ -63,7 +63,7 @@ func (p *ProtoProxy[T]) MarkDirty(immediate bool) {
 	shouldUpdate := immediate || time.Since(p.refreshedAt) > p.refreshInterval
 	p.lock.Unlock()
 	if shouldUpdate {
-		p.performUpdate()
+		p.performUpdate(false)
 	}
 }
 
@@ -86,7 +86,7 @@ func (p *ProtoProxy[T]) Stop() {
 	}
 }
 
-func (p *ProtoProxy[T]) performUpdate() {
+func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	msg := p.updateFn()
 	p.lock.Lock()
 	p.message = msg
@@ -94,9 +94,11 @@ func (p *ProtoProxy[T]) performUpdate() {
 	p.dirty = false
 	p.lock.Unlock()
 
-	select {
-	case p.updateChan <- struct{}{}:
-	default:
+	if !skipNotify {
+		select {
+		case p.updateChan <- struct{}{}:
+		default:
+		}
 	}
 }
 
@@ -114,7 +116,7 @@ func (p *ProtoProxy[T]) worker() {
 			shouldUpdate := p.dirty && time.Since(p.refreshedAt) > p.refreshInterval
 			p.lock.RUnlock()
 			if shouldUpdate {
-				p.performUpdate()
+				p.performUpdate(false)
 			}
 		}
 	}
