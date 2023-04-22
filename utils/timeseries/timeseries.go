@@ -76,8 +76,9 @@ type TimeSeriesSample[T number] struct {
 }
 
 type TimeSeriesParams struct {
-	UpdateOp TimeSeriesUpdateOp
-	Window   time.Duration
+	UpdateOp         TimeSeriesUpdateOp
+	Window           time.Duration
+	CollapseDuration time.Duration
 }
 
 type TimeSeries[T number] struct {
@@ -369,7 +370,15 @@ func (t *TimeSeries[T]) initSamples() {
 
 func (t *TimeSeries[T]) addSampleAt(val T, at time.Time) {
 	// insert in time order
-	var e *list.Element
+	e := t.samples.Back()
+	if e != nil {
+		lastSample := e.Value.(TimeSeriesSample[T])
+		if val == lastSample.Value && at.Sub(lastSample.At) < t.params.CollapseDuration {
+			// repeated value within collapse duration
+			t.prune()
+			return
+		}
+	}
 	for e = t.samples.Back(); e != nil; e = e.Prev() {
 		s := e.Value.(TimeSeriesSample[T])
 		if at.After(s.At) {
