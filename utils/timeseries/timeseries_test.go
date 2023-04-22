@@ -106,17 +106,18 @@ func TestTimeSeries(t *testing.T) {
 
 	t.Run("min", func(t *testing.T) {
 		ts := NewTimeSeries[uint32](TimeSeriesParams{
-			UpdateOp: TimeSeriesUpdateOpMax,
+			UpdateOp: TimeSeriesUpdateOpLatest,
 			Window:   2 * time.Minute,
 		})
 
 		ts.UpdateSample(10)
 		ts.UpdateSample(20)
+		ts.UpdateSample(15)
 		ts.CommitActiveSampleAt(time.Now())
-		require.Equal(t, uint32(20), ts.Min())
+		require.Equal(t, uint32(15), ts.Min())
 
 		ts.AddSample(30)
-		require.Equal(t, uint32(20), ts.Min())
+		require.Equal(t, uint32(15), ts.Min())
 	})
 
 	t.Run("max", func(t *testing.T) {

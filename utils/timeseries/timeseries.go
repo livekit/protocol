@@ -19,6 +19,7 @@ type TimeSeriesUpdateOp int
 const (
 	TimeSeriesUpdateOpAdd TimeSeriesUpdateOp = iota
 	TimeSeriesUpdateOpMax
+	TimeSeriesUpdateOpLatest
 )
 
 func (t TimeSeriesUpdateOp) String() string {
@@ -27,6 +28,8 @@ func (t TimeSeriesUpdateOp) String() string {
 		return "ADD"
 	case TimeSeriesUpdateOpMax:
 		return "MAX"
+	case TimeSeriesUpdateOpLatest:
+		return "LATEST"
 	default:
 		return fmt.Sprintf("%d", int(t))
 	}
@@ -123,6 +126,8 @@ func (t *TimeSeries[T]) UpdateSample(val T) {
 		if val > t.activeSample {
 			t.activeSample = val
 		}
+	case TimeSeriesUpdateOpLatest:
+		t.activeSample = val
 	}
 }
 
