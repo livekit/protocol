@@ -32,6 +32,7 @@ type ProtoProxy[T proto.Message] struct {
 	fuse            core.Fuse
 	updateChan      chan struct{}
 	done            chan struct{}
+	queueUpdate     chan struct{}
 	dirty           bool
 	refreshedAt     time.Time
 	refreshInterval time.Duration
@@ -63,7 +64,10 @@ func (p *ProtoProxy[T]) MarkDirty(immediate bool) {
 	shouldUpdate := immediate || time.Since(p.refreshedAt) > p.refreshInterval
 	p.lock.Unlock()
 	if shouldUpdate {
-		go p.performUpdate(false)
+		select {
+		case p.queueUpdate <- struct{}{}:
+		default:
+		}
 	}
 }
 
@@ -118,6 +122,8 @@ func (p *ProtoProxy[T]) worker() {
 			if shouldUpdate {
 				p.performUpdate(false)
 			}
+		case <-p.queueUpdate:
+			p.performUpdate(false)
 		}
 	}
 }
