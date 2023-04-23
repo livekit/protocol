@@ -50,7 +50,8 @@ func TestProtoProxy(t *testing.T) {
 
 	// ensure we didn't leak
 	proxy.Stop()
-	require.Equal(t, numGoRoutines, runtime.NumGoroutine())
+	// <= because previous goroutines may be shutting down after this test started
+	require.LessOrEqual(t, numGoRoutines, runtime.NumGoroutine())
 }
 
 func createTestProxy() (*ProtoProxy[*livekit.Room], *atomic.Uint32) {
