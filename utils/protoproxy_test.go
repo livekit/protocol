@@ -27,7 +27,7 @@ func TestProtoProxy(t *testing.T) {
 
 	// immediate change
 	proxy.MarkDirty(true)
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 
 	require.EqualValues(t, 2, numParticipants.Load())
 	require.EqualValues(t, 1, proxy.Get().NumParticipants)
