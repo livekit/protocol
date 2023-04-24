@@ -2,14 +2,17 @@ package timeseries
 
 import (
 	"container/list"
+	"errors"
 	"fmt"
 	"math"
 	"sync"
 	"time"
 )
 
-const (
-	minLinearFitSamples = 5
+// ------------------------------------------------
+
+var (
+	errNotEnoughSamples = errors.New("not enough samples")
 )
 
 // ------------------------------------------------
@@ -159,12 +162,30 @@ func (t *TimeSeries[T]) AddSampleAt(val T, at time.Time) {
 }
 
 func (t *TimeSeries[T]) GetSamples() []TimeSeriesSample[T] {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	t.prune()
 
 	samples := make([]TimeSeriesSample[T], 0, t.samples.Len())
 	for e := t.samples.Front(); e != nil; e = e.Next() {
 		samples = append(samples, e.Value.(TimeSeriesSample[T]))
+	}
+	return samples
+}
+
+func (t *TimeSeries[T]) GetSamplesAfter(at time.Time) []TimeSeriesSample[T] {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	t.prune()
+
+	samples := make([]TimeSeriesSample[T], 0, t.samples.Len())
+	for e := t.samples.Front(); e != nil; e = e.Next() {
+		s := e.Value.(TimeSeriesSample[T])
+		if s.At.After(at) {
+			samples = append(samples, s)
+		}
 	}
 	return samples
 }
@@ -196,12 +217,13 @@ func (t *TimeSeries[T]) Min() T {
 	defer t.lock.Unlock()
 
 	t.prune()
-	return t.minLocked()
+
+	return t.minLocked(t.samples.Len())
 }
 
-func (t *TimeSeries[T]) minLocked() T {
+func (t *TimeSeries[T]) minLocked(numSamples int) T {
 	min := T(0)
-	for e := t.samples.Front(); e != nil; e = e.Next() {
+	for e, samplesSeen := t.samples.Back(), 0; e != nil && samplesSeen < numSamples; e, samplesSeen = e.Prev(), samplesSeen+1 {
 		s := e.Value.(TimeSeriesSample[T])
 		if min == T(0) || min > s.Value {
 			min = s.Value
@@ -217,12 +239,12 @@ func (t *TimeSeries[T]) Max() T {
 
 	t.prune()
 
-	return t.maxLocked()
+	return t.maxLocked(t.samples.Len())
 }
 
-func (t *TimeSeries[T]) maxLocked() T {
+func (t *TimeSeries[T]) maxLocked(numSamples int) T {
 	max := T(0)
-	for e := t.samples.Front(); e != nil; e = e.Next() {
+	for e, samplesSeen := t.samples.Back(), 0; e != nil && samplesSeen < numSamples; e, samplesSeen = e.Prev(), samplesSeen+1 {
 		s := e.Value.(TimeSeriesSample[T])
 		if max < s.Value {
 			max = s.Value
@@ -319,21 +341,30 @@ func (t *TimeSeries[T]) ZScore(val T) float64 {
 	return 0.0
 }
 
-func (t *TimeSeries[T]) LinearFit() (float64, float64) {
+func (t *TimeSeries[T]) Slope() float64 {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	t.prune()
 
-	if t.samples.Len() < minLinearFitSamples {
-		return 0.0, 0.0
+	numSamples := t.samples.Len()
+	slope, _, _, _ := t.linearFitLocked(numSamples)
+
+	// convert to angle to normalize between -90deg to +90deg
+	return math.Atan(slope) * 180 / math.Pi
+}
+
+func (t *TimeSeries[T]) linearFitLocked(numSamples int) (slope float64, intercept float64, startedAt time.Time, endedAt time.Time) {
+	// go back numSamples first
+	e := t.samples.Back()
+	for i := 1; i < numSamples && e != nil; i++ {
+		e = e.Prev()
 	}
 
-	min := t.minLocked()
-	max := t.maxLocked()
-	diff := float64(max - min)
-
-	start := time.Time{}
+	if e == nil {
+		// not enough samples
+		return
+	}
 
 	sx := float64(0.0)
 	sxsq := float64(0.0)
@@ -341,41 +372,60 @@ func (t *TimeSeries[T]) LinearFit() (float64, float64) {
 	sysq := float64(0.0)
 	sxy := float64(0.0)
 
-	for e := t.samples.Front(); e != nil; e = e.Next() {
+	for ; e != nil; e = e.Next() {
 		s := e.Value.(TimeSeriesSample[T])
-		if start.IsZero() {
-			start = s.At
+		if startedAt.IsZero() {
+			startedAt = s.At
 		}
-		since := s.At.Sub(start).Seconds()
-		normy := 0.0
-		if diff != 0.0 {
-			normy = float64(s.Value-min) / diff
+		if endedAt.IsZero() || s.At.After(endedAt) {
+			endedAt = s.At
 		}
-		sx += since
-		sxsq += since * since
-		sy += normy
-		sysq += normy * normy
-		sxy += since * normy
+
+		x := s.At.Sub(startedAt).Seconds()
+		y := float64(s.Value)
+
+		sx += x
+		sxsq += x * x
+
+		sy += y
+		sysq += y * y
+
+		sxy += x * y
 	}
 
-	N := float64(t.samples.Len())
+	N := float64(numSamples)
 	sxwsq := sx * sx
 	denom := N*sxsq - sxwsq
-	slope := float64(0.0)
 	if denom != 0.0 {
 		slope = (N*sxy - sx*sy) / denom
 	}
-	intercept := (sy - slope*sx) / N
-	return slope, intercept
+	intercept = (sy - slope*sx) / N
+	return
 }
 
-func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) float64 {
+func (t *TimeSeries[T]) LinearExtrapolateTo(numSamplesToUse int, after time.Duration) (float64, error) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	t.prune()
+
+	slope, intercept, startedAt, endedAt := t.linearFitLocked(numSamplesToUse)
+	if startedAt.IsZero() {
+		return 0, errNotEnoughSamples
+	}
+
+	x := endedAt.Add(after).Sub(startedAt).Seconds()
+	y := slope*x + intercept
+	return y, nil
+}
+
+func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) (float64, error) {
 	t.lock.Lock()
 	t.prune()
 
 	if t.samples.Len() < numSamplesToUse {
 		t.lock.Unlock()
-		return 0.0
+		return 0.0, errNotEnoughSamples
 	}
 
 	values := make([]T, numSamplesToUse)
@@ -404,10 +454,10 @@ func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) float64 {
 	}
 
 	if (concordantPairs + discordantPairs) == 0 {
-		return 0.0
+		return 0.0, nil
 	}
 
-	return (float64(concordantPairs) - float64(discordantPairs)) / (float64(concordantPairs) + float64(discordantPairs))
+	return (float64(concordantPairs) - float64(discordantPairs)) / (float64(concordantPairs) + float64(discordantPairs)), nil
 }
 
 func (t *TimeSeries[T]) initSamples() {

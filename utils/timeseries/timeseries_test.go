@@ -89,6 +89,28 @@ func TestTimeSeries(t *testing.T) {
 		}
 	})
 
+	t.Run("get samples after", func(t *testing.T) {
+		ts := NewTimeSeries[uint32](TimeSeriesParams{
+			UpdateOp: TimeSeriesUpdateOpMax,
+			Window:   2 * time.Minute,
+		})
+
+		expectedSamples := make([]TimeSeriesSample[uint32], 0, 4)
+
+		now := time.Now()
+		for val := uint32(0); val < 10; val++ {
+			at := now.Add(time.Duration(val) * time.Second)
+			ts.AddSampleAt(val, at)
+			if val > 5 {
+				expectedSamples = append(expectedSamples, TimeSeriesSample[uint32]{
+					Value: val,
+					At:    at,
+				})
+			}
+		}
+		require.Equal(t, expectedSamples, ts.GetSamplesAfter(now.Add(5*time.Second)))
+	})
+
 	t.Run("sum", func(t *testing.T) {
 		ts := NewTimeSeries[uint32](TimeSeriesParams{
 			UpdateOp: TimeSeriesUpdateOpMax,
@@ -323,6 +345,80 @@ func TestTimeSeries(t *testing.T) {
 		require.Equal(t, uint32(42), samples[6].Value)
 	})
 
+	t.Run("slope", func(t *testing.T) {
+		ts := NewTimeSeries[float64](TimeSeriesParams{
+			UpdateOp: TimeSeriesUpdateOpMax,
+			Window:   time.Minute,
+		})
+
+		// increasing values
+		now := time.Now()
+		for val := 1; val <= 10; val++ {
+			ts.AddSampleAt(float64(val)/10.0, now.Add(time.Duration(val)*time.Second))
+		}
+		slope := ts.Slope()
+		require.Condition(t, func() bool { return slope > 5.71 && slope < 5.72 }, "slope out of range")
+
+		ts.ClearSamples()
+
+		// decreasing values
+		now = time.Now()
+		for val := 1; val <= 10; val++ {
+			ts.AddSampleAt(float64(11-val)/10.0, now.Add(time.Duration(val)*time.Second))
+		}
+		slope = ts.Slope()
+		require.Condition(t, func() bool { return slope > -5.72 && slope < -5.71 }, "slope out of range")
+
+		ts.ClearSamples()
+
+		// see-saw values, slope should be 0.0
+		now = time.Now()
+		for val := 1; val <= 11; val++ {
+			if val&0x1 == 1 {
+				ts.AddSampleAt(1.0, now.Add(time.Duration(val)*time.Second))
+			} else {
+				ts.AddSampleAt(10.0, now.Add(time.Duration(val)*time.Second))
+			}
+		}
+		require.Equal(t, float64(0.0), ts.Slope())
+	})
+
+	t.Run("linear extrapolate to", func(t *testing.T) {
+		ts := NewTimeSeries[float64](TimeSeriesParams{
+			UpdateOp: TimeSeriesUpdateOpMax,
+			Window:   time.Minute,
+		})
+
+		// increasing values
+		now := time.Now()
+		for val := 1; val <= 10; val++ {
+			ts.AddSampleAt(float64(val)/10.0, now.Add(time.Duration(val)*time.Second))
+		}
+
+		// try to extrapolate using more than available samples
+		y, err := ts.LinearExtrapolateTo(11, 1*time.Second)
+		require.Error(t, err)
+		require.Equal(t, float64(0.0), y)
+
+		y, err = ts.LinearExtrapolateTo(10, 1*time.Second)
+		require.NoError(t, err)
+		require.Equal(t, float64(1.1), y)
+
+		ts.ClearSamples()
+
+		// decreasing values
+		now = time.Now()
+		for val := 1; val <= 10; val++ {
+			ts.AddSampleAt(float64(11-val)/10.0, now.Add(time.Duration(val)*time.Second))
+		}
+
+		y, err = ts.LinearExtrapolateTo(10, 1*time.Second)
+		require.NoError(t, err)
+		// this picks up a value of -5.55 * 10^-17, probably due to float64 implementation, so check for smaller than some value very close to 0.0
+		// NOTE: printing the value still shows 0.000000, only require.Equal checking for 0.0 failed with that small value
+		require.Greater(t, float64(0.0000000000001), y)
+	})
+
 	t.Run("kendall's tau", func(t *testing.T) {
 		ts := NewTimeSeries[int64](TimeSeriesParams{
 			UpdateOp: TimeSeriesUpdateOpMax,
@@ -336,10 +432,14 @@ func TestTimeSeries(t *testing.T) {
 		}
 
 		// asking to use more samples than available should return 0.0
-		require.Equal(t, float64(0.0), ts.KendallsTau(11))
+		tau, err := ts.KendallsTau(11)
+		require.Error(t, err)
+		require.Equal(t, float64(0.0), tau)
 
 		// ever increasing should return 1.0
-		require.Equal(t, float64(1.0), ts.KendallsTau(8))
+		tau, err = ts.KendallsTau(8)
+		require.NoError(t, err)
+		require.Equal(t, float64(1.0), tau)
 
 		ts.ClearSamples()
 
@@ -350,7 +450,9 @@ func TestTimeSeries(t *testing.T) {
 		}
 
 		// ever decreasing should return -1.0
-		require.Equal(t, float64(-1.0), ts.KendallsTau(8))
+		tau, err = ts.KendallsTau(8)
+		require.NoError(t, err)
+		require.Equal(t, float64(-1.0), tau)
 
 		ts.ClearSamples()
 
@@ -365,7 +467,9 @@ func TestTimeSeries(t *testing.T) {
 		}
 
 		// increasing envelope should trend positive
-		require.Less(t, float64(0.0), ts.KendallsTau(8))
+		tau, err = ts.KendallsTau(8)
+		require.NoError(t, err)
+		require.Less(t, float64(0.0), tau)
 
 		// overall decreasing
 		now = time.Now()
@@ -378,7 +482,8 @@ func TestTimeSeries(t *testing.T) {
 		}
 
 		// decreasing envelope should trend negative
-		require.Greater(t, float64(0.0), ts.KendallsTau(8))
+		tau, err = ts.KendallsTau(8)
+		require.NoError(t, err)
+		require.Greater(t, float64(0.0), tau)
 	})
-
 }
