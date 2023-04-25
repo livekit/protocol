@@ -301,6 +301,8 @@ message SyncState {
   repeated DataChannelInfo data_channels = 4;
   // last received server side offer before reconnecting
   SessionDescription offer = 5;
+  // the participants the client knew about before reconnecting
+  repeated string participant_sids = 6;
 }
 
 message DataChannelInfo {
