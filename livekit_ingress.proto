@@ -33,9 +33,10 @@ message CreateIngressRequest {
 
 enum IngressInput {
   RTMP_INPUT = 0;
-  //  FILE_INPUT = 1;
-  //  SRT_INPUT = 2;
-  //  URL_INPUT = 3;
+  WHIP_INPUT = 1;
+  //  FILE_INPUT = 2;
+  //  SRT_INPUT = 3;
+  //  URL_INPUT = 4;
 }
 
 message IngressAudioOptions {
