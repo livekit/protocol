@@ -1,4 +1,4 @@
-package pion
+package pionlogger
 
 import (
 	"github.com/pion/logging"
