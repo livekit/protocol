@@ -24,13 +24,13 @@ service Signal {
 
 message RelaySignalRequest {
   livekit.StartSession start_session = 1;
-  livekit.SignalRequest request = 2;
   repeated livekit.SignalRequest requests = 3;
   uint64 seq = 4;
+  bool close = 5;
 }
 
 message RelaySignalResponse {
-  livekit.SignalResponse response = 1;
   repeated livekit.SignalResponse responses = 2;
   uint64 seq = 3;
+  bool close = 4;
 }
