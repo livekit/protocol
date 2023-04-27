@@ -6,6 +6,7 @@ option go_package = "github.com/livekit/livekit/pkg/service/rpc";
 
 import "options.proto";
 import "livekit_ingress.proto";
+import "google/protobuf/empty.proto";
 
 service IngressInternal {
   rpc ListActiveIngress(ListActiveIngressRequest) returns (ListActiveIngressResponse) {
@@ -22,8 +23,19 @@ service IngressHandler {
   };
 }
 
+service IngressWHIPHandler {
+  rpc DeleteWHIPResource(DeleteWHIPResourceRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options).topics = true;
+  }; 
+}
+
 message ListActiveIngressRequest {}
 
 message ListActiveIngressResponse {
   repeated string ingress_ids = 1;
+}
+
+message DeleteWHIPResourceRequest {
+  string resource_id = 1;
+  string ingress_id = 2;
 }
