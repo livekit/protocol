@@ -27,7 +27,7 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return ErrInvalidIngress("missing IngressInfo")
 	}
 
-	if info.InputType != livekit.IngressInput_RTMP_INPUT {
+	if info.InputType != livekit.IngressInput_RTMP_INPUT && info.InputType != livekit.IngressInput_WHIP_INPUT {
 		return ErrInvalidIngress("unsupported input type")
 	}
 

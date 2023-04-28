@@ -10,14 +10,15 @@ import (
 )
 
 const (
-	RoomPrefix        = "RM_"
-	NodePrefix        = "ND_"
-	ParticipantPrefix = "PA_"
-	TrackPrefix       = "TR_"
-	APIKeyPrefix      = "API"
-	EgressPrefix      = "EG_"
-	IngressPrefix     = "IN_"
-	RPCPrefix         = "RPC_"
+	RoomPrefix         = "RM_"
+	NodePrefix         = "ND_"
+	ParticipantPrefix  = "PA_"
+	TrackPrefix        = "TR_"
+	APIKeyPrefix       = "API"
+	EgressPrefix       = "EG_"
+	IngressPrefix      = "IN_"
+	RPCPrefix          = "RPC_"
+	WHIPResourcePrefix = "WH_"
 )
 
 func NewGuid(prefix string) string {
