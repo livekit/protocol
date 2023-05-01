@@ -11,6 +11,7 @@ var (
 	ErrIngressTimedOut         = psrpc.NewErrorf(psrpc.DeadlineExceeded, "ingress timed out")
 	ErrNoResponse              = psrpc.NewErrorf(psrpc.Unavailable, "no response from ingress service")
 	ErrInvalidOutputDimensions = NewInvalidVideoParamsError("invalid output media dimensions")
+	ErrInvalidIngressType      = psrpc.NewErrorf(psrpc.InvalidArgument, "invalid ingress type")
 )
 
 func ErrInvalidIngress(s string) psrpc.Error {
