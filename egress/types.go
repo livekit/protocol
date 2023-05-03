@@ -8,11 +8,10 @@ const (
 	EgressTypeTrackComposite = "track_composite"
 	EgressTypeTrack          = "track"
 
-	OutputTypeFile      = "file"
-	OutputTypeStream    = "stream"
-	OutputTypeWebsocket = "websocket"
-	OutputTypeSegments  = "segments"
-	OutputTypeMultiple  = "multiple"
+	OutputTypeFile     = "file"
+	OutputTypeStream   = "stream"
+	OutputTypeSegments = "segments"
+	OutputTypeMultiple = "multiple"
 
 	Unknown = "unknown"
 )
@@ -33,7 +32,7 @@ func GetTypes(info *livekit.EgressInfo) (string, string) {
 		case *livekit.TrackEgressRequest_File:
 			return EgressTypeTrack, OutputTypeFile
 		case *livekit.TrackEgressRequest_WebsocketUrl:
-			return EgressTypeTrack, OutputTypeWebsocket
+			return EgressTypeTrack, OutputTypeStream
 		}
 	}
 
