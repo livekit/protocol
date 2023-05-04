@@ -23,7 +23,7 @@ require (
 	github.com/redis/go-redis/v9 v9.0.4
 	github.com/stretchr/testify v1.8.2
 	github.com/twitchtv/twirp v8.1.3+incompatible
-	go.uber.org/atomic v1.10.0
+	go.uber.org/atomic v1.11.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53
 	google.golang.org/grpc v1.54.0
