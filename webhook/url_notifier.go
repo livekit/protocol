@@ -112,12 +112,14 @@ func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
 func (n *URLNotifier) worker() {
 	defer close(n.done)
 
-	waitTicker := time.NewTicker(100 * time.Millisecond)
+	waitTicker := time.NewTicker(time.Second)
 	for !n.fuse.IsBroken() {
 		select {
-		case <-waitTicker.C:
 		case <-n.fuse.Watch():
 			return
+		case <-waitTicker.C:
+			// periodically process queue in case timing causes jobSignal to be missed
+			n.processQueue()
 		case <-n.jobSignal:
 			n.processQueue()
 		}
@@ -134,6 +136,8 @@ func (n *URLNotifier) processQueue() {
 		if err := n.send(event); err != nil {
 			n.params.Logger.Warnw("failed to send webhook", err, "url", n.params.URL, "event", event.Event)
 			n.dropped.Add(event.NumDropped + 1)
+		} else {
+			n.params.Logger.Infow("sent webhook", "url", n.params.URL, "event", event.Event)
 		}
 	}
 }
