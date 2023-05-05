@@ -132,7 +132,7 @@ func Proto() error {
 
 // run tests
 func Test() error {
-	cmd := exec.Command("go", "test", "./...")
+	cmd := exec.Command("go", "test", "-race", "./...")
 	connectStd(cmd)
 	return cmd.Run()
 }
