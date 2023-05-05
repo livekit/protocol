@@ -136,6 +136,8 @@ func (n *URLNotifier) processQueue() {
 		if err := n.send(event); err != nil {
 			n.params.Logger.Warnw("failed to send webhook", err, "url", n.params.URL, "event", event.Event)
 			n.dropped.Add(event.NumDropped + 1)
+		} else {
+			n.params.Logger.Infow("sent webhook", "url", n.params.URL, "event", event.Event)
 		}
 	}
 }
