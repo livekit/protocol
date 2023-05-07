@@ -83,7 +83,7 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 			waiting := atomic.LoadInt32(&t.waiting)
 			if ts <= minTS && waiting > 0 {
 				stuck = append(stuck, &StuckLock{
-					stack:   t.stack,
+					stack:   append([]byte{}, t.stack...),
 					ts:      ts,
 					waiting: waiting,
 					held:    atomic.LoadInt32(&t.held),
