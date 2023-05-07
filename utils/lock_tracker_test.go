@@ -7,8 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/livekit/protocol/utils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/livekit/protocol/utils"
 )
 
 func init() {
@@ -24,7 +25,7 @@ func noop() {}
 
 func TestScanTrackedLocks(t *testing.T) {
 	t.Cleanup(cleanupTest)
-	assert.False(t, utils.ScanTrackedLocks(time.Millisecond))
+	assert.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
 
 	ms := make([]*utils.Mutex, 100)
 	for i := range ms {
@@ -41,7 +42,7 @@ func TestScanTrackedLocks(t *testing.T) {
 	}()
 
 	time.Sleep(5 * time.Millisecond)
-	assert.True(t, utils.ScanTrackedLocks(time.Millisecond))
+	assert.NotNil(t, utils.ScanTrackedLocks(time.Millisecond))
 
 	ms[50].Unlock()
 }

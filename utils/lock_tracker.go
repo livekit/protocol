@@ -40,7 +40,7 @@ func NumMutexes() int {
 }
 
 // ScanTrackedLocks check all lock trackers
-func ScanTrackedLocks(threshold time.Duration) bool {
+func ScanTrackedLocks(threshold time.Duration) []*StuckLock {
 	minTS := uint32(time.Now().Add(-threshold).Unix())
 
 	weakRefLock.Lock()
@@ -51,7 +51,7 @@ func ScanTrackedLocks(threshold time.Duration) bool {
 var nextScanMin int
 
 // ScanTrackedLocksI check lock trackers incrementally n at a time
-func ScanTrackedLocksI(threshold time.Duration, n int) bool {
+func ScanTrackedLocksI(threshold time.Duration, n int) []*StuckLock {
 	minTS := uint32(time.Now().Add(-threshold).Unix())
 	if n <= 0 {
 		n = 10000
@@ -74,38 +74,93 @@ func ScanTrackedLocksI(threshold time.Duration, n int) bool {
 
 //go:norace
 //go:nosplit
-func scanTrackedLocks(refs []uintptr, minTS uint32) bool {
+func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
+	var stuck []*StuckLock
 	for _, ref := range weakRefs {
 		if ref != 0 {
 			t := (*lockTracker)(unsafe.Pointer(ref))
 			ts := atomic.LoadUint32(&t.ts)
-			if ts <= minTS {
-				return true
+			waiting := atomic.LoadInt32(&t.waiting)
+			if ts <= minTS && waiting > 0 {
+				stuck = append(stuck, &StuckLock{
+					stack:   append([]byte{}, t.stack...),
+					ts:      ts,
+					waiting: waiting,
+					held:    atomic.LoadInt32(&t.held),
+				})
 			}
 		}
 	}
-	return false
+	return stuck
+}
+
+type StuckLock struct {
+	stack   []byte
+	ts      uint32
+	waiting int32
+	held    int32
+}
+
+func (d *StuckLock) FirstLockedAtStack() string {
+	return string(d.stack)
+}
+
+func (d *StuckLock) HeldSince() time.Time {
+	return time.Unix(int64(d.ts), 0)
+}
+
+func (d *StuckLock) NumGoroutineHeld() int {
+	return int(d.held)
+}
+
+func (d *StuckLock) NumGoroutineWaiting() int {
+	return int(d.waiting)
 }
 
 type lockTracker struct {
-	ts  uint32
-	ref int
+	stack   []byte
+	ts      uint32
+	waiting int32
+	held    int32
+	ref     int
 }
 
 func (t *lockTracker) trackWait() {
 	if t != nil {
-		atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
+		atomic.AddInt32(&t.waiting, 1)
 	}
 }
 
 func (t *lockTracker) trackLock() {
 	if t != nil {
-		atomic.StoreUint32(&t.ts, math.MaxUint32)
+		atomic.AddInt32(&t.waiting, -1)
+		if atomic.AddInt32(&t.held, 1) == 1 {
+			atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
+
+			for {
+				n := runtime.Stack(t.stack[:cap(t.stack)], false)
+				if n < cap(t.stack) {
+					t.stack = t.stack[:n]
+					break
+				}
+				t.stack = make([]byte, len(t.stack)*2)
+			}
+		}
+	}
+}
+
+func (t *lockTracker) trackUnlock() {
+	if t != nil {
+		if atomic.AddInt32(&t.held, -1) == 0 {
+			atomic.StoreUint32(&t.ts, math.MaxUint32)
+		}
 	}
 }
 
 func newLockTracker() *lockTracker {
-	t := &lockTracker{}
+	t := &lockTracker{
+		stack: make([]byte, 1024),
+	}
 
 	runtime.SetFinalizer(t, finalizeLockTracker)
 
@@ -176,6 +231,12 @@ func (m *Mutex) Lock() {
 	t.trackLock()
 }
 
+func (m *Mutex) Unlock() {
+	t := lazyInitLockTracker(&m.t)
+	t.trackUnlock()
+	m.Mutex.Unlock()
+}
+
 type RWMutex struct {
 	sync.RWMutex
 	t *lockTracker
@@ -188,9 +249,21 @@ func (m *RWMutex) Lock() {
 	t.trackLock()
 }
 
+func (m *RWMutex) Unlock() {
+	t := lazyInitLockTracker(&m.t)
+	t.trackUnlock()
+	m.RWMutex.Unlock()
+}
+
 func (m *RWMutex) RLock() {
 	t := lazyInitLockTracker(&m.t)
 	t.trackWait()
 	m.RWMutex.RLock()
 	t.trackLock()
+}
+
+func (m *RWMutex) RUnlock() {
+	t := lazyInitLockTracker(&m.t)
+	t.trackUnlock()
+	m.RWMutex.RUnlock()
 }
