@@ -4,8 +4,7 @@ go 1.18
 
 require (
 	github.com/eapache/channels v1.1.0
-	github.com/frostbyte73/core v0.0.5
-	github.com/gammazero/deque v0.2.1
+	github.com/frostbyte73/core v0.0.8
 	github.com/go-jose/go-jose/v3 v3.0.0
 	github.com/go-logr/logr v1.2.4
 	github.com/hashicorp/go-retryablehttp v0.7.2
@@ -37,6 +36,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eapache/queue v1.1.0 // indirect
+	github.com/gammazero/deque v0.2.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
