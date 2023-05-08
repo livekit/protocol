@@ -117,17 +117,12 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		s.handler = func(r *http.Request) {
 			numCalled.Inc()
 		}
-		go func() {
-			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{
-				Event: EventRoomStarted,
-			})
-			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{
-				Event: EventRoomStarted,
-			})
-		}()
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventParticipantJoined})
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
 		urlNotifier.Stop(true)
 		time.Sleep(webhookCheckInterval)
-		require.Less(t, numCalled.Load(), int32(2))
+		require.Less(t, numCalled.Load(), int32(3))
 	})
 }
 
