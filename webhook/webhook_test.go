@@ -20,7 +20,7 @@ const (
 	apiSecret            = "mysecret"
 	testAddr             = ":8765"
 	testUrl              = "http://localhost:8765"
-	webhookCheckInterval = 500 * time.Millisecond
+	webhookCheckInterval = 100 * time.Millisecond
 )
 
 var authProvider = auth.NewSimpleKeyProvider(
