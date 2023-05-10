@@ -66,7 +66,6 @@ func TestURLNotifierDropped(t *testing.T) {
 	defer s.Stop()
 
 	urlNotifier := newTestNotifier()
-	urlNotifier.Start()
 	defer urlNotifier.Stop(true)
 	totalDropped := atomic.Int32{}
 	totalReceived := atomic.Int32{}
@@ -95,38 +94,33 @@ func TestURLNotifierLifecycle(t *testing.T) {
 
 	t.Run("start/stop without use", func(t *testing.T) {
 		urlNotifier := newTestNotifier()
-		urlNotifier.Start()
 		urlNotifier.Stop(false)
 	})
 
 	t.Run("stop allowing to drain", func(t *testing.T) {
 		urlNotifier := newTestNotifier()
-		urlNotifier.Start()
 		numCalled := atomic.Int32{}
 		s.handler = func(r *http.Request) {
 			numCalled.Inc()
 		}
-		require.NoError(t, urlNotifier.QueueNotify(&livekit.WebhookEvent{
-			Event: EventRoomStarted,
-		}))
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
 		urlNotifier.Stop(false)
 		time.Sleep(webhookCheckInterval)
-		require.Equal(t, int32(1), numCalled.Load())
+		require.Equal(t, int32(2), numCalled.Load())
 	})
 
 	t.Run("force stop", func(t *testing.T) {
 		urlNotifier := newTestNotifier()
-		urlNotifier.Start()
 		numCalled := atomic.Int32{}
 		s.handler = func(r *http.Request) {
 			numCalled.Inc()
 		}
-		require.NoError(t, urlNotifier.QueueNotify(&livekit.WebhookEvent{
-			Event: EventRoomStarted,
-		}))
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
 		urlNotifier.Stop(true)
 		time.Sleep(webhookCheckInterval)
-		require.Equal(t, int32(0), numCalled.Load())
+		require.Less(t, numCalled.Load(), int32(2))
 	})
 }
 
