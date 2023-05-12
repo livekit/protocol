@@ -80,9 +80,9 @@ func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 	idb := []byte(id)[len(prefix):]
 	for i := 0; i < 12; i += 4 {
 		j := (i * 6) >> 3
-		b[j] |= b62Index[idb[i]]<<2 | b62Index[idb[i+1]]>>4
-		b[j+1] |= b62Index[idb[i+1]]<<4 | b62Index[idb[i+2]]>>2
-		b[j+2] |= b62Index[idb[i+2]]<<6 | b62Index[idb[i+3]]
+		b[j] = b62Index[idb[i]]<<2 | b62Index[idb[i+1]]>>4
+		b[j+1] = b62Index[idb[i+1]]<<4 | b62Index[idb[i+2]]>>2
+		b[j+2] = b62Index[idb[i+2]]<<6 | b62Index[idb[i+3]]
 	}
 	return b
 }
