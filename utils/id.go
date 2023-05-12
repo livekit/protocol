@@ -2,7 +2,6 @@ package utils
 
 import (
 	"crypto/sha1"
-	"errors"
 	"fmt"
 	"os"
 
@@ -45,8 +44,6 @@ func LocalNodeID() (string, error) {
 	return fmt.Sprintf("%s%s", NodePrefix, HashedID(hostname)[:8]), nil
 }
 
-var ErrInvalidGuid = errors.New("invalid guid")
-
 var b62Index = newB62Index()
 var b62Chars = []byte(shortuuid.DefaultAlphabet)
 
@@ -67,8 +64,6 @@ func guidPrefix[T livekit.Guid]() string {
 		return ParticipantPrefix
 	case livekit.RoomID:
 		return RoomPrefix
-	case livekit.NodeID:
-		return NodePrefix
 	default:
 		panic("unreachable")
 	}

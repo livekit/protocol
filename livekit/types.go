@@ -76,7 +76,7 @@ type ParticipantKey string
 // ----------------------------------------------------------------
 
 type Guid interface {
-	TrackID | ParticipantID | RoomID | NodeID
+	TrackID | ParticipantID | RoomID
 }
 
 type GuidBlock [9]byte
