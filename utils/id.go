@@ -76,8 +76,7 @@ func guidPrefix[T livekit.Guid]() string {
 
 func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 	var b livekit.GuidBlock
-	prefix := guidPrefix[T]()
-	idb := []byte(id)[len(prefix):]
+	idb := []byte(id)[len(guidPrefix[T]()):]
 	for i := 0; i < 12; i += 4 {
 		j := (i * 6) >> 3
 		b[j] = b62Index[idb[i]]<<2 | b62Index[idb[i+1]]>>4
