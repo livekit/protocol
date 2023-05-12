@@ -87,7 +87,7 @@ func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 	return b
 }
 
-func UnmarshalGuid[T livekit.Guid](b livekit.GuidBlock) string {
+func UnmarshalGuid[T livekit.Guid](b livekit.GuidBlock) T {
 	prefix := guidPrefix[T]()
 	id := make([]byte, len(prefix)+12)
 	copy(id, []byte(prefix))
@@ -100,5 +100,5 @@ func UnmarshalGuid[T livekit.Guid](b livekit.GuidBlock) string {
 		idb[k+2] = b62Chars[(b[j+1]&15)<<2|b[j+2]>>6]
 		idb[k+3] = b62Chars[b[j+2]&63]
 	}
-	return string(id)
+	return T(id)
 }
