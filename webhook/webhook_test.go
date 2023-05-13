@@ -76,15 +76,17 @@ func TestURLNotifierDropped(t *testing.T) {
 		totalDropped.Add(decodedEvent.NumDropped)
 	}
 	// send multiple notifications
-	_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
-	_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventParticipantJoined})
-	_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+	for i := 0; i < 10; i++ {
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventParticipantJoined})
+		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+	}
 
 	time.Sleep(webhookCheckInterval)
 
-	require.Equal(t, int32(3), totalDropped.Load()+totalReceived.Load())
+	require.Equal(t, int32(30), totalDropped.Load()+totalReceived.Load())
 	// at least one request dropped
-	require.Greater(t, totalDropped.Load(), int32(0))
+	require.Less(t, int32(0), totalDropped.Load())
 }
 
 func TestURLNotifierLifecycle(t *testing.T) {
@@ -103,11 +105,12 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		s.handler = func(r *http.Request) {
 			numCalled.Inc()
 		}
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+		for i := 0; i < 10; i++ {
+			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+		}
 		urlNotifier.Stop(false)
-		time.Sleep(webhookCheckInterval)
-		require.Equal(t, int32(2), numCalled.Load())
+		require.Eventually(t, func() bool { return numCalled.Load() == 20 }, 5*time.Second, webhookCheckInterval)
 	})
 
 	t.Run("force stop", func(t *testing.T) {
@@ -116,17 +119,19 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		s.handler = func(r *http.Request) {
 			numCalled.Inc()
 		}
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+		for i := 0; i < 10; i++ {
+			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
+			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+		}
 		urlNotifier.Stop(true)
-		time.Sleep(webhookCheckInterval)
-		require.Less(t, numCalled.Load(), int32(2))
+		time.Sleep(time.Second)
+		require.Greater(t, int32(20), numCalled.Load())
 	})
 }
 
 func newTestNotifier() *URLNotifier {
 	return NewURLNotifier(URLNotifierParams{
-		QueueSize: 1,
+		QueueSize: 20,
 		URL:       testUrl,
 		APIKey:    apiKey,
 		APISecret: apiSecret,
