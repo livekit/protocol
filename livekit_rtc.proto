@@ -149,6 +149,8 @@ message JoinResponse {
   int32 ping_timeout = 10;
   int32 ping_interval = 11;
   ServerInfo server_info = 12;
+  // Server-Injected-Frame byte trailer, used to identify unencrypted frames when e2ee is enabled
+  bytes sif_trailer = 13;
 }
 
 message ReconnectResponse {
