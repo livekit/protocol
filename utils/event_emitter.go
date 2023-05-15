@@ -5,14 +5,15 @@ import (
 	"sync"
 
 	"golang.org/x/exp/maps"
+
+	"github.com/livekit/protocol/logger"
 )
 
-var DefaultEventEmitterParams = EventEmitterParams{
-	QeueSize: 16,
-}
+const defaultQueueSize = 16
 
 type EventEmitterParams struct {
-	QeueSize int
+	QueueSize int
+	Logger    logger.Logger
 }
 
 type EventEmitter[K comparable, V any] struct {
@@ -29,7 +30,10 @@ func NewEventEmitter[K comparable, V any](params EventEmitterParams) *EventEmitt
 }
 
 func NewDefaultEventEmitter[K comparable, V any]() *EventEmitter[K, V] {
-	return NewEventEmitter[K, V](DefaultEventEmitterParams)
+	return NewEventEmitter[K, V](EventEmitterParams{
+		QueueSize: defaultQueueSize,
+		Logger:    logger.GetLogger(),
+	})
 }
 
 func (e *EventEmitter[K, V]) Emit(k K, v V) {
@@ -47,7 +51,10 @@ func (e *EventEmitter[K, V]) Emit(k K, v V) {
 }
 
 func (e *EventEmitter[K, V]) Observe(k K) EventObserver[V] {
-	o := EventObserver[V]{ch: make(chan V, e.params.QeueSize)}
+	o := EventObserver[V]{
+		logger: e.params.Logger,
+		ch:     make(chan V, e.params.QueueSize),
+	}
 
 	e.mu.Lock()
 	l, ok := e.observers[k]
@@ -73,7 +80,11 @@ func (e *EventEmitter[K, V]) stopObserving(k K, le *list.Element) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
-	l := e.observers[k]
+	l, ok := e.observers[k]
+	if !ok {
+		return
+	}
+
 	l.Remove(le)
 	if l.Len() == 0 {
 		delete(e.observers, k)
@@ -81,14 +92,16 @@ func (e *EventEmitter[K, V]) stopObserving(k K, le *list.Element) {
 }
 
 type EventObserver[V any] struct {
-	stop func()
-	ch   chan V
+	logger logger.Logger
+	stop   func()
+	ch     chan V
 }
 
 func NewEventObserver[V any](stopFunc func()) (EventObserver[V], func(v V)) {
 	o := EventObserver[V]{
-		stop: stopFunc,
-		ch:   make(chan V, DefaultEventEmitterParams.QeueSize),
+		logger: logger.GetLogger(),
+		stop:   stopFunc,
+		ch:     make(chan V, defaultQueueSize),
 	}
 	return o, o.emit
 }
@@ -97,6 +110,7 @@ func (o EventObserver[V]) emit(v V) {
 	select {
 	case o.ch <- v:
 	default:
+		o.logger.Warnw("could not add event to observer queue", nil)
 	}
 }
 
