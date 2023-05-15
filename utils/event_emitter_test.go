@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/d5/tengo/v2/require"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEventEmitter(t *testing.T) {
