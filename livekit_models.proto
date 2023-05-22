@@ -400,7 +400,7 @@ message ClientReport {
 
   message SubscriptionReport {
     string sid = 1;
-    repeated RTCReceiverStats  rtcStats = 2;
+    repeated RTCReceiverStats rtcStats = 2;
     int32 readyState = 3;
     SubscriptionStatus subscriptionStatus = 4;
     bool allowed = 5;
