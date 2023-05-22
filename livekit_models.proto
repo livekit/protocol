@@ -415,6 +415,7 @@ message ClientReport {
   message ApiError {
     int32 code = 1;
     int64 timestamp = 2;
+    string description = 3;
   }
 
   message DeviceInfo {
