@@ -364,3 +364,69 @@ enum ReconnectReason {
   RR_SUBSCRIBER_FAILED = 3;
   RR_SWITCH_CANDIDATE = 4;
 }
+
+enum SubscriptionStatus {
+  Unsubscribed = 0;
+  Desired = 1;
+  Subscribed = 2;
+}
+
+message ClientReport {
+
+  message RTCSenderStats {
+    // none, cpu, bandwidth, or other
+    string qualityLimitationReason = 1;
+    // maps qualitLimitationReason to duration the limitation has been experienced
+    map<string, uint32> qualityLimitationDurations = 2;
+    uint32 width = 3;
+    uint32 height = 4;
+  }
+
+  message RTCReceiverStats {
+    int32 jitter = 1;
+    int32 freezeCount = 2;
+    int32 totalFreezeDuration = 3;
+  }
+
+  message PublicationReport {
+    string sid = 1;
+    repeated RTCSenderStats rtcStats = 2;
+    int32 readyState = 3;
+    string label = 4;
+    bool muted = 5;
+    int32 width = 6;
+    int32 height = 7;
+  }
+
+  message SubscriptionReport {
+    string sid = 1;
+    repeated RTCReceiverStats  rtcStats = 2;
+    int32 readyState = 3;
+    SubscriptionStatus subscriptionStatus = 4;
+    bool allowed = 5;
+  }
+
+  message EventReport {
+    string eventName = 1;
+    string reason = 2;
+    int64 timestamp = 3;
+  }
+
+  message ApiError {
+    int32 code = 1;
+    int64 timestamp = 2;
+  }
+
+  message DeviceInfo {
+    string ua = 1;
+    int32 concurrency = 2;
+  }
+
+  message Report {
+    repeated PublicationReport publications = 1;
+    repeated SubscriptionReport subscriptions = 2;
+    repeated EventReport events = 3;
+    repeated ApiError errors = 4;
+    DeviceInfo deviceInfo = 5;
+  }
+}
