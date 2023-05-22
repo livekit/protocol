@@ -423,11 +423,9 @@ message ClientReport {
     int32 concurrency = 2;
   }
 
-  message Report {
-    repeated PublicationReport publications = 1;
-    repeated SubscriptionReport subscriptions = 2;
-    repeated EventReport events = 3;
-    repeated ApiError errors = 4;
-    DeviceInfo deviceInfo = 5;
-  }
+  repeated PublicationReport publications = 1;
+  repeated SubscriptionReport subscriptions = 2;
+  repeated EventReport events = 3;
+  repeated ApiError errors = 4;
+  DeviceInfo deviceInfo = 5;
 }
