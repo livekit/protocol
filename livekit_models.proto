@@ -273,7 +273,10 @@ message VideoConfiguration {
 }
 
 message DisabledCodecs {
+  // disabled for both publish and subscribe
   repeated Codec codecs = 1;
+  // only disable for publish
+  repeated Codec publish = 2;
 }
 
 enum DisconnectReason {
