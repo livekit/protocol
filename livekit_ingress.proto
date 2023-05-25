@@ -27,6 +27,8 @@ message CreateIngressRequest {
   string participant_identity = 4;
   // name of publishing participant (used for display only)
   string participant_name = 5;
+  // whether to pass through the incoming media without transcoding, only compatible with some input types
+  bool bypass_transcoding = 8; 
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 }
@@ -95,6 +97,7 @@ message IngressInfo {
   // for FILE input, it'll be a http:// URL
   // for SRT input, it'll be a srt:// URL
   IngressInput input_type = 5;
+  bool bypass_transcoding = 13; 
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
   string room_name = 8;
@@ -145,6 +148,7 @@ message UpdateIngressRequest {
   string room_name = 3;
   string participant_identity = 4;
   string participant_name = 5;
+  optional bool bypass_transcoding = 8; 
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 }

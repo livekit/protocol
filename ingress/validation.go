@@ -39,7 +39,12 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return ErrInvalidIngress("no participant identity")
 	}
 
-	err := ValidateVideoOptionsConsistency(info.Video)
+	err := ValidateBypassTranscoding(info)
+	if err != nil {
+		return err
+	}
+
+	err = ValidateVideoOptionsConsistency(info.Video)
 	if err != nil {
 		return err
 	}
@@ -51,6 +56,28 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 
 	return nil
 
+}
+
+func ValidateBypassTranscoding(info *livekit.IngressInfo) error {
+	if !info.BypassTranscoding {
+		return nil
+	}
+
+	if info.InputType != livekit.IngressInput_WHIP_INPUT {
+		return NewInvalidTranscodingBypassError("bypassing transcoding impossible with selected input type")
+	}
+
+	videoOptions := info.Video
+	if videoOptions != nil && videoOptions.EncodingOptions != nil {
+		return NewInvalidTranscodingBypassError("video encoding options must be empty if transcoding bypass is selected")
+	}
+
+	audioOptions := info.Audio
+	if audioOptions != nil && audioOptions.EncodingOptions != nil {
+		return NewInvalidTranscodingBypassError("audio encoding options must be empty if transcoding bypass is selected")
+	}
+
+	return nil
 }
 
 func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {

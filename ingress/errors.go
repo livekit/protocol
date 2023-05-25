@@ -25,3 +25,7 @@ func NewInvalidVideoParamsError(s string) error {
 func NewInvalidAudioParamsError(s string) error {
 	return psrpc.NewError(psrpc.InvalidArgument, fmt.Errorf("invalid audio parameters: %s", s))
 }
+
+func NewInvalidTranscodingBypassError(s string) error {
+	return psrpc.NewError(psrpc.InvalidArgument, fmt.Errorf("invalid transcoding bypass configuration: %s", s))
+}
