@@ -39,7 +39,12 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return ErrInvalidIngress("no participant identity")
 	}
 
-	err := ValidateVideoOptionsConsistency(info.Video)
+	err := ValidatePassthrough(info)
+	if err != nil {
+		return err
+	}
+
+	err = ValidateVideoOptionsConsistency(info.Video)
 	if err != nil {
 		return err
 	}
@@ -51,6 +56,34 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 
 	return nil
 
+}
+
+func ValidatePassthrough(info *livekit.IngressInfo) error {
+	var isAudioPassthrough, isVideoPassthrough bool
+
+	audioOptions := info.Audio
+	if audioOptions != nil {
+		if _, ok := audioOptions.EncodingOptions.(*livekit.IngressAudioOptions_Passthrough); ok {
+			isAudioPassthrough = true
+		}
+	}
+
+	videoOptions := info.Video
+	if videoOptions != nil {
+		if _, ok := videoOptions.EncodingOptions.(*livekit.IngressVideoOptions_Passthrough); ok {
+			isVideoPassthrough = true
+		}
+	}
+
+	if isAudioPassthrough != isVideoPassthrough {
+		return NewInconsistentPassthroughError("passthrough must be enabled for both audio and video")
+	}
+
+	if (isAudioPassthrough || isVideoPassthrough) && info.InputType != livekit.IngressInput_WHIP_INPUT {
+		return NewInconsistentPassthroughError("passthrough not compatible with ingress type")
+	}
+
+	return nil
 }
 
 func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {

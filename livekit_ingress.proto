@@ -45,6 +45,7 @@ message IngressAudioOptions {
   oneof encoding_options {
     IngressAudioEncodingPreset preset = 3;
     IngressAudioEncodingOptions options = 4;
+    IngressEncodingPassthrough passthrough = 5;
   }
 }
 
@@ -54,6 +55,7 @@ message IngressVideoOptions {
   oneof encoding_options {
     IngressVideoEncodingPreset preset = 3;
     IngressVideoEncodingOptions options = 4;
+    IngressEncodingPassthrough passthrough = 5;
   }
 }
 
@@ -68,6 +70,10 @@ enum IngressVideoEncodingPreset {
   H264_540P_25FPS_2_LAYERS = 2;     //  960x540,  25fps, 600kbps  main layer, 2 layers total
   H264_720P_30FPS_1_LAYER = 3;      // 1280x720,  30fps, 1700kbps, no simulcast
   H264_1080P_30FPS_1_LAYER = 4;     // 1980x1080, 30fps, 3000kbps, no simulcast
+}
+
+enum IngressEncodingPassthrough {
+	PASSTHROUGH_ENABLED = 0;
 }
 
 message IngressAudioEncodingOptions {
