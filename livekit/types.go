@@ -72,3 +72,11 @@ func NodeIDsAsStrings(ids []NodeID) []string {
 
 // ----------------------------------------------------------------
 type ParticipantKey string
+
+// ----------------------------------------------------------------
+
+type Guid interface {
+	TrackID | ParticipantID | RoomID
+}
+
+type GuidBlock [9]byte

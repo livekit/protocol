@@ -17,6 +17,7 @@ enum NodeType {
   MEDIA = 2;
   TURN = 4;
   SWEEPER = 5;
+  DIRECTOR = 6;
 }
 
 enum NodeState {

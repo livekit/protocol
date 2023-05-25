@@ -55,9 +55,11 @@ message AnalyticsStat {
   string room_name = 6;
   string participant_id = 7;
   string track_id = 8;
-  float score = 9;
+  float score = 9; // average score
   repeated AnalyticsStream streams = 10;
   string mime = 11;
+  float min_score = 12;
+  float median_score = 13;
 }
 
 message AnalyticsStats {

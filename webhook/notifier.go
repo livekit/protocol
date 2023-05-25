@@ -25,7 +25,6 @@ func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier 
 			APIKey:    apiKey,
 			APISecret: apiSecret,
 		})
-		u.Start()
 		n.urlNotifiers = append(n.urlNotifiers, u)
 	}
 	return n

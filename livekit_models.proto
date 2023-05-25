@@ -273,7 +273,10 @@ message VideoConfiguration {
 }
 
 message DisabledCodecs {
+  // disabled for both publish and subscribe
   repeated Codec codecs = 1;
+  // only disable for publish
+  repeated Codec publish = 2;
 }
 
 enum DisconnectReason {
@@ -346,6 +349,10 @@ message RTPStats {
 
   uint32 layer_lock_plis = 35;
   google.protobuf.Timestamp last_layer_lock_pli = 36;
+
+  double sample_rate = 42;
+  double drift_ms = 43;
+  // NEXT_ID: 44
 }
 
 message TimedVersion {

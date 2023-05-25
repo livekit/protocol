@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/base64"
-	"errors"
 	"sync"
 	"time"
 
 	"github.com/frostbyte73/core"
-	"github.com/gammazero/deque"
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -29,20 +27,14 @@ type URLNotifierParams struct {
 
 const defaultQueueSize = 100
 
-var ErrNotifierStopped = errors.New("notifier has already been stopped")
-
 // URLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
 // It will retry on failure, and will drop events if notification fall too far behind
 type URLNotifier struct {
-	params    URLNotifierParams
-	queue     *deque.Deque[*livekit.WebhookEvent]
-	client    *retryablehttp.Client
-	draining  atomic.Bool
-	dropped   atomic.Int32
-	fuse      core.Fuse
-	mu        sync.RWMutex
-	done      chan struct{}
-	jobSignal chan struct{}
+	mu      sync.RWMutex
+	params  URLNotifierParams
+	client  *retryablehttp.Client
+	dropped atomic.Int32
+	worker  core.QueueWorker
 }
 
 func NewURLNotifier(params URLNotifierParams) *URLNotifier {
@@ -52,36 +44,17 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	if params.Logger == nil {
 		params.Logger = logger.GetLogger()
 	}
-	return &URLNotifier{
-		params:    params,
-		client:    retryablehttp.NewClient(),
-		queue:     deque.New[*livekit.WebhookEvent](),
-		fuse:      core.NewFuse(),
-		jobSignal: make(chan struct{}, 1),
-	}
-}
 
-func (n *URLNotifier) Start() {
-	if n.done != nil {
-		return
+	n := &URLNotifier{
+		params: params,
+		client: retryablehttp.NewClient(),
 	}
-	n.done = make(chan struct{})
-	go n.worker()
-}
-
-func (n *URLNotifier) Stop(force bool) {
-	if force {
-		// triggers immediate closure
-		n.fuse.Break()
-	} else {
-		// closes after current queue is processed
-		n.draining.Store(true)
-	}
-
-	if !force {
-		// wait for current queue to be processed
-		<-n.done
-	}
+	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
+		QueueSize:    params.QueueSize,
+		DropWhenFull: true,
+		OnDropped:    func() { n.dropped.Inc() },
+	})
+	return n
 }
 
 func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
@@ -92,59 +65,23 @@ func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
 }
 
 func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
-	if n.draining.Load() || n.fuse.IsBroken() {
-		return ErrNotifierStopped
-	}
-	n.mu.Lock()
-	n.queue.PushBack(event)
-	if n.queue.Len() > n.params.QueueSize {
-		n.dropped.Inc()
-		n.queue.PopFront()
-	}
-	n.mu.Unlock()
-	select {
-	case n.jobSignal <- struct{}{}:
-	default:
-	}
-	return nil
-}
-
-func (n *URLNotifier) worker() {
-	defer close(n.done)
-
-	waitTicker := time.NewTicker(100 * time.Millisecond)
-	for !n.fuse.IsBroken() {
-		select {
-		case <-waitTicker.C:
-		case <-n.fuse.Watch():
-			return
-		case <-n.jobSignal:
-			n.processQueue()
-		}
-		// when draining, ensure all events are processed and exit
-		if n.draining.Load() {
-			n.processQueue()
-			return
-		}
-	}
-}
-
-func (n *URLNotifier) processQueue() {
-	for event := n.nextItem(); event != nil && !n.fuse.IsBroken(); event = n.nextItem() {
+	n.worker.Submit(func() {
 		if err := n.send(event); err != nil {
 			n.params.Logger.Warnw("failed to send webhook", err, "url", n.params.URL, "event", event.Event)
 			n.dropped.Add(event.NumDropped + 1)
+		} else {
+			n.params.Logger.Infow("sent webhook", "url", n.params.URL, "event", event.Event)
 		}
-	}
+	})
+	return nil
 }
 
-func (n *URLNotifier) nextItem() *livekit.WebhookEvent {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	if n.queue.Len() == 0 {
-		return nil
+func (n *URLNotifier) Stop(force bool) {
+	if force {
+		n.worker.Kill()
+	} else {
+		n.worker.Drain()
 	}
-	return n.queue.PopFront()
 }
 
 func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
