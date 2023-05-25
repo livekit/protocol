@@ -50,6 +50,42 @@ func TestValidate(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestValidateBypassTranscoding(t *testing.T) {
+	info := &livekit.IngressInfo{}
+
+	err := ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.BypassTranscoding = true
+	err = ValidateBypassTranscoding(info)
+	require.Error(t, err)
+
+	info.InputType = livekit.IngressInput_WHIP_INPUT
+	err = ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.Video = &livekit.IngressVideoOptions{}
+	err = ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.Video.EncodingOptions = &livekit.IngressVideoOptions_Preset{}
+	err = ValidateBypassTranscoding(info)
+	require.Error(t, err)
+
+	info.Video = nil
+
+	info.Audio = &livekit.IngressAudioOptions{}
+	err = ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.Audio.EncodingOptions = &livekit.IngressAudioOptions_Options{
+		Options: &livekit.IngressAudioEncodingOptions{},
+	}
+	err = ValidateBypassTranscoding(info)
+	require.Error(t, err)
+
+}
+
 func TestValidateVideoOptionsConsistency(t *testing.T) {
 	video := &livekit.IngressVideoOptions{}
 	err := ValidateVideoOptionsConsistency(video)
