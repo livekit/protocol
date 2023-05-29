@@ -49,7 +49,7 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 		params: params,
 		client: retryablehttp.NewClient(),
 	}
-	n.client.Logger = &logAdapter{logger: params.Logger}
+	n.client.Logger = &logAdapter{logger: params.Logger.WithCallDepth(1)}
 	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
 		DropWhenFull: true,
