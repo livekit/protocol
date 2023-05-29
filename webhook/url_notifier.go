@@ -49,6 +49,7 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 		params: params,
 		client: retryablehttp.NewClient(),
 	}
+	n.client.Logger = &logAdapter{logger: params.Logger}
 	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
 		DropWhenFull: true,
@@ -121,4 +122,24 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
 	}
 	_ = res.Body.Close()
 	return nil
+}
+
+type logAdapter struct {
+	logger logger.Logger
+}
+
+func (l *logAdapter) Error(msg string, keysAndValues ...interface{}) {
+	l.logger.Errorw(msg, nil, keysAndValues...)
+}
+
+func (l *logAdapter) Info(msg string, keysAndValues ...interface{}) {
+	l.logger.Infow(msg, keysAndValues...)
+}
+
+func (l *logAdapter) Debug(msg string, keysAndValues ...interface{}) {
+	l.logger.Debugw(msg, keysAndValues...)
+}
+
+func (l *logAdapter) Warn(msg string, keysAndValues ...interface{}) {
+	l.logger.Warnw(msg, nil, keysAndValues...)
 }
