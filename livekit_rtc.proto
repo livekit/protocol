@@ -81,7 +81,7 @@ message SignalResponse {
     // respond to Ping
     Pong pong_resp = 20;
     // Subscription response, client should not expect any media from this subscription if it fails
-    SubscriptionResponse subscribption_response = 21;
+    SubscriptionResponse subscription_response = 21;
   }
 }
 
