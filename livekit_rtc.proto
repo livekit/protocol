@@ -80,6 +80,8 @@ message SignalResponse {
     ReconnectResponse reconnect = 19;
     // respond to Ping
     Pong pong_resp = 20;
+    // Subscription response, client should not expect any media from this subscription if it fails
+    SubscriptionResponse subscribption_response = 21;
   }
 }
 
@@ -355,4 +357,9 @@ message RegionInfo {
   string region = 1;
   string url = 2;
   int64 distance = 3;
+}
+
+message SubscriptionResponse {
+  string track_sid = 1;
+  SubscriptionError err = 2;
 }
