@@ -367,3 +367,8 @@ enum ReconnectReason {
   RR_SUBSCRIBER_FAILED = 3;
   RR_SWITCH_CANDIDATE = 4;
 }
+
+enum SubscriptionError {
+  SE_UNKOWN = 0;
+  SE_CODEC_UNSUPPORTED = 1;
+}
