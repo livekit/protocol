@@ -371,4 +371,5 @@ enum ReconnectReason {
 enum SubscriptionError {
   SE_UNKOWN = 0;
   SE_CODEC_UNSUPPORTED = 1;
+  SE_TRACK_NOTFOUND = 2;
 }
