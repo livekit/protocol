@@ -187,6 +187,10 @@ func (cg *cpuInfoGetterV2) getTotalCPUTime() (int64, error) {
 func (cg *cpuInfoGetterV2) numCPU() (int, error) {
 	b, err := os.ReadFile(numCPUPathV2)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			//File may not exist in case of no quota
+			return runtime.NumCPU(), nil
+		}
 		return 0, err
 	}
 
