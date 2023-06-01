@@ -26,7 +26,7 @@ const (
 )
 
 // RPCClient is used by LiveKit Server
-// Deprecated
+// Deprecated. Use rpc.EgressClient instead.
 type RPCClient interface {
 	// GetUpdateChannel returns a subscription for egress info updates
 	GetUpdateChannel(ctx context.Context) (utils.PubSub, error)
@@ -35,7 +35,7 @@ type RPCClient interface {
 }
 
 // RPCServer is used by Egress
-// Deprecated
+// Deprecated. Use rpc.EgressInternalServer instead.
 type RPCServer interface {
 	// GetRequestChannel returns a subscription for egress requests
 	GetRequestChannel(ctx context.Context) (utils.PubSub, error)
