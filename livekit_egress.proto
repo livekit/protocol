@@ -54,6 +54,7 @@ message WebEgressRequest {
   string url = 1;
   bool audio_only = 2;
   bool video_only = 3;
+  bool await_start_signal = 12;
   oneof output { // deprecated (use _output fields)
     EncodedFileOutput file = 4 [deprecated = true];
     StreamOutput stream = 5 [deprecated = true];
