@@ -45,13 +45,10 @@ func TestGraph(t *testing.T) {
 		require.Equal(t, []string{"b"}, maps.Keys(g.OutEdges("a")))
 		require.Equal(t, []string{"c"}, maps.Keys(g.InEdges("a")))
 
-		e, ok := g.Edge("a", "b")
-		require.EqualValues(t, 1, e)
-		require.True(t, ok)
+		require.EqualValues(t, 1, g.Edge("a", "b"))
 
 		g.DeleteEdge("a", "b")
-		_, ok = g.Edge("a", "b")
-		require.False(t, ok)
+		require.False(t, g.HasEdge("a", "b"))
 	})
 
 	t.Run("topological sort", func(t *testing.T) {
