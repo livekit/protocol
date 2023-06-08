@@ -65,19 +65,40 @@ func (g *Graph[K, N, E]) DeleteEdge(src, dst K) {
 	g.edges[s.i][d.i] = nil
 }
 
-func (g *Graph[K, N, E]) Node(id K) N {
-	return g.nodesByID[id].props
+func (g *Graph[K, N, E]) HasNode(id K) bool {
+	return g.nodesByID[id] != nil
 }
 
-func (g *Graph[K, N, E]) Edge(src, dst K) (p E, ok bool) {
+func (g *Graph[K, N, E]) Node(id K) (props N) {
+	n := g.nodesByID[id]
+	if n == nil {
+		return
+	}
+	return n.props
+}
+
+func (g *Graph[K, N, E]) HasEdge(src, dst K) bool {
 	s := g.nodesByID[src]
 	d := g.nodesByID[dst]
+	if s == nil || d == nil {
+		return false
+	}
+
+	return g.edges[s.i][d.i] != nil
+}
+
+func (g *Graph[K, N, E]) Edge(src, dst K) (p E) {
+	s := g.nodesByID[src]
+	d := g.nodesByID[dst]
+	if s == nil || d == nil {
+		return
+	}
 
 	e := g.edges[s.i][d.i]
 	if e == nil {
 		return
 	}
-	return e.props, true
+	return e.props
 }
 
 func (g *Graph[K, N, E]) OutEdges(src K) map[K]E {
@@ -110,6 +131,9 @@ func (g *Graph[K, N, E]) ShortestPath(src, dst K) ([]N, int64) {
 
 	s := g.nodesByID[src]
 	d := g.nodesByID[dst]
+	if s == nil || d == nil {
+		return nil, 0
+	}
 
 	path := &graphPath[N]{node: s}
 	heap.Push(paths, path)
