@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"crypto/tls"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
@@ -23,6 +24,9 @@ type RedisConfig struct {
 	SentinelPassword  string   `yaml:"sentinel_password"`
 	SentinelAddresses []string `yaml:"sentinel_addresses"`
 	ClusterAddresses  []string `yaml:"cluster_addresses"`
+	DialTimeout       int      `yaml:"dial_timeout"`
+	ReadTimeout       int      `yaml:"read_timeout"`
+	WriteTimeout      int      `yaml:"write_timeout"`
 	// for clustererd mode only, number of redirects to follow, defaults to 2
 	MaxRedirects *int `yaml:"max_redirects"`
 }
@@ -68,6 +72,20 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 
 	if len(conf.SentinelAddresses) > 0 {
 		logger.Infow("connecting to redis", "sentinel", true, "addr", conf.SentinelAddresses, "masterName", conf.MasterName)
+
+		// By default DialTimeout set to 2s
+		if conf.DialTimeout == 0 {
+			conf.DialTimeout = 2000
+		}
+		// By default ReadTimeout set to 0.2s
+		if conf.ReadTimeout == 0 {
+			conf.ReadTimeout = 200
+		}
+		// By default WriteTimeout set to 0.2s
+		if conf.WriteTimeout == 0 {
+			conf.WriteTimeout = 200
+		}
+
 		rcOptions = &redis.UniversalOptions{
 			Addrs:            conf.SentinelAddresses,
 			SentinelUsername: conf.SentinelUsername,
@@ -77,6 +95,9 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			Password:         conf.Password,
 			DB:               conf.DB,
 			TLSConfig:        tlsConfig,
+			DialTimeout:      time.Duration(conf.DialTimeout) * time.Millisecond,
+			ReadTimeout:      time.Duration(conf.ReadTimeout) * time.Millisecond,
+			WriteTimeout:     time.Duration(conf.WriteTimeout) * time.Millisecond,
 		}
 	} else if len(conf.ClusterAddresses) > 0 {
 		logger.Infow("connecting to redis", "cluster", true, "addr", conf.ClusterAddresses)
