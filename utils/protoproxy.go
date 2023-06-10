@@ -50,6 +50,7 @@ func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func
 		done:            make(chan struct{}),
 		fuse:            core.NewFuse(),
 		refreshInterval: refreshInterval,
+		queueUpdate:     make(chan struct{}, 1),
 	}
 	p.performUpdate(true)
 	if refreshInterval > 0 {
