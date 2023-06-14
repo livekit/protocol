@@ -361,7 +361,7 @@ message TimedVersion {
 }
 
 enum ReconnectReason {
-  RR_UNKOWN = 0;
+  RR_UNKNOWN = 0;
   RR_SIGNAL_DISCONNECTED = 1;
   RR_PUBLISHER_FAILED = 2;
   RR_SUBSCRIBER_FAILED = 3;
@@ -369,7 +369,7 @@ enum ReconnectReason {
 }
 
 enum SubscriptionError {
-  SE_UNKOWN = 0;
+  SE_UNKNOWN = 0;
   SE_CODEC_UNSUPPORTED = 1;
   SE_TRACK_NOTFOUND = 2;
 }

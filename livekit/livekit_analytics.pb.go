@@ -697,7 +697,7 @@ func (x *AnalyticsClientMeta) GetReconnectReason() ReconnectReason {
 	if x != nil {
 		return x.ReconnectReason
 	}
-	return ReconnectReason_RR_UNKOWN
+	return ReconnectReason_RR_UNKNOWN
 }
 
 type AnalyticsEvent struct {

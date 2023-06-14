@@ -3167,7 +3167,7 @@ func (x *SubscriptionResponse) GetErr() SubscriptionError {
 	if x != nil {
 		return x.Err
 	}
-	return SubscriptionError_SE_UNKOWN
+	return SubscriptionError_SE_UNKNOWN
 }
 
 var File_livekit_rtc_proto protoreflect.FileDescriptor

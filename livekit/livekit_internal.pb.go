@@ -1170,7 +1170,7 @@ func (x *StartSession) GetReconnectReason() ReconnectReason {
 	if x != nil {
 		return x.ReconnectReason
 	}
-	return ReconnectReason_RR_UNKOWN
+	return ReconnectReason_RR_UNKNOWN
 }
 
 func (x *StartSession) GetSubscriberAllowPause() bool {
