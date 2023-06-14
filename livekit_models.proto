@@ -361,7 +361,7 @@ message TimedVersion {
 }
 
 enum ReconnectReason {
-  RR_UNKOWN = 0;
+  RR_UNKNOWN = 0;
   RR_SIGNAL_DISCONNECTED = 1;
   RR_PUBLISHER_FAILED = 2;
   RR_SUBSCRIBER_FAILED = 3;
