@@ -1,0 +1,117 @@
+package logger
+
+import (
+	"fmt"
+	"math"
+	"reflect"
+	"sync/atomic"
+
+	"github.com/zeebo/xxh3"
+	"go.uber.org/zap/zapcore"
+)
+
+const RoomKey = "room"
+
+type FieldSampleRate interface {
+	Threshold() uint64
+}
+
+func rateToThreshold(rate float64) uint64 {
+	return math.MaxUint64 / 10000 * uint64(math.Max(math.Min(rate, 1), 0)*10000)
+}
+
+type AtomicFieldSampleRate uint64
+
+func NewAtomicFieldSampleRate(rate float64) *AtomicFieldSampleRate {
+	var r AtomicFieldSampleRate
+	r.SetRate(rate)
+	return &r
+}
+
+func (r *AtomicFieldSampleRate) SetRate(rate float64) {
+	atomic.StoreUint64((*uint64)(r), rateToThreshold(rate))
+}
+
+func (r *AtomicFieldSampleRate) Threshold() uint64 {
+	return uint64(atomic.LoadUint64((*uint64)(r)))
+}
+
+type FieldSamplerConfig struct {
+	FieldName string
+	Rate      FieldSampleRate
+}
+
+func NewFieldSampler(core zapcore.Core, config FieldSamplerConfig) zapcore.Core {
+	return &fieldSampler{
+		Core:   core,
+		config: config,
+	}
+}
+
+type fieldSampler struct {
+	zapcore.Core
+	config FieldSamplerConfig
+	hash   uint64
+}
+
+var _ zapcore.Core = (*fieldSampler)(nil)
+
+func (s *fieldSampler) With(fields []zapcore.Field) zapcore.Core {
+	hash := s.hash
+	if h, ok := s.hashSampleField(fields); ok {
+		hash = h
+	}
+
+	return &fieldSampler{
+		Core:   s.Core.With(fields),
+		config: s.config,
+		hash:   hash,
+	}
+}
+
+func (s *fieldSampler) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	if s.Enabled(ent.Level) {
+		return ce.AddCore(ent, s)
+	}
+	return ce
+}
+
+func (s *fieldSampler) hashSampleField(fields []zapcore.Field) (uint64, bool) {
+	v, ok := s.findSampleField(fields)
+	if !ok {
+		return 0, false
+	}
+	return xxh3.HashString(v), true
+}
+
+func (s *fieldSampler) findSampleField(fields []zapcore.Field) (string, bool) {
+	for _, f := range fields {
+		if f.Key == s.config.FieldName {
+			switch f.Type {
+			case zapcore.StringType:
+				return f.String, true
+			case zapcore.ReflectType:
+				rv := reflect.ValueOf(f.Interface)
+				if rv.Kind() == reflect.String {
+					return rv.String(), true
+				}
+			case zapcore.StringerType:
+				if str, ok := f.Interface.(fmt.Stringer); ok {
+					return str.String(), true
+				}
+			}
+			return "", false
+		}
+	}
+	return "", false
+}
+
+func (s *fieldSampler) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	if s.hash != 0 && s.hash > s.config.Rate.Threshold() {
+		return nil
+	}
+	if h, ok := s.hashSampleField(fields); ok && h > s.config.Rate.Threshold() {
+		return nil
+	}
+	return s.Core.Write(entry, fields)
+}

@@ -20,7 +20,4 @@ type Config struct {
 	ItemSampleSeconds  int `yaml:"item_sample_seconds,omitempty"`
 	ItemSampleInitial  int `yaml:"item_sample_initial,omitempty"`
 	ItemSampleInterval int `yaml:"item_sample_interval,omitempty"`
-
-	SampleByRoom   bool    `yaml:"sample_by_room,omitempty"`
-	RoomSampleRate float64 `yaml:"room_sample_rate,omitempty"`
 }

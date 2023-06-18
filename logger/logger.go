@@ -105,11 +105,7 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 		SampleInterval: conf.ItemSampleInterval,
 	}
 
-	if conf.SampleByRoom {
-		zl.zap = l.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-			return NewRoomSampler(core, conf.RoomSampleRate)
-		})).Sugar()
-	} else if conf.Sample {
+	if conf.Sample {
 		// use a sampling logger for the main logger
 		samplingConf := &zap.SamplingConfig{
 			Initial:    conf.SampleInitial,
@@ -134,6 +130,14 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 		zl.zap = zl.unsampled
 	}
 	return zl, nil
+}
+
+func (l *ZapLogger) WithFieldSampler(config FieldSamplerConfig) *ZapLogger {
+	dup := *l
+	dup.zap = l.zap.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		return NewFieldSampler(core, config)
+	}))
+	return &dup
 }
 
 func (l *ZapLogger) ToZap() *zap.SugaredLogger {
