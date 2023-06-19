@@ -132,6 +132,14 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 	return zl, nil
 }
 
+func (l *ZapLogger) WithFieldSampler(config FieldSamplerConfig) *ZapLogger {
+	dup := *l
+	dup.zap = l.zap.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		return NewFieldSampler(core, config)
+	}))
+	return &dup
+}
+
 func (l *ZapLogger) ToZap() *zap.SugaredLogger {
 	return l.zap
 }
@@ -209,7 +217,7 @@ func (l *ZapLogger) WithItemSampler() Logger {
 }
 
 func (l *ZapLogger) WithoutSampler() Logger {
-	if l.SampleDuration == 0 {
+	if l.unsampled == l.zap {
 		return l
 	}
 	dup := *l
