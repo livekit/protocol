@@ -10,8 +10,6 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-const RoomKey = "room"
-
 type FieldSampleRate interface {
 	Threshold() uint64
 }
