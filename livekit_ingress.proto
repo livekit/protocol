@@ -122,6 +122,7 @@ message IngressState {
   InputVideoState video = 3;
   InputAudioState audio = 4;
   string room_id = 5; // ID of the current/previous room published to
+  string resource_id = 9; // Unique ID for the current ingress session
   int64 started_at = 7;
   int64 ended_at = 8;
   repeated TrackInfo tracks = 6;
@@ -132,7 +133,7 @@ message InputVideoState {
 //  uint32 bitrate = 2;
   uint32 width = 3;
   uint32 height = 4;
-  uint32 framerate = 5;
+  double framerate = 5;
 }
 
 message InputAudioState {
