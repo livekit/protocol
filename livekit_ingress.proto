@@ -132,7 +132,7 @@ message InputVideoState {
 //  uint32 bitrate = 2;
   uint32 width = 3;
   uint32 height = 4;
-  uint32 framerate = 5;
+  double framerate = 5;
 }
 
 message InputAudioState {
