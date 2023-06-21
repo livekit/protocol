@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 
 	"github.com/zeebo/xxh3"
+	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -34,9 +35,18 @@ func (r *AtomicFieldSampleRate) Threshold() uint64 {
 	return uint64(atomic.LoadUint64((*uint64)(r)))
 }
 
+type FieldSamplerAction int
+
+const (
+	OmitSampledLog FieldSamplerAction = iota
+	AnnotateSampledLog
+)
+
 type FieldSamplerConfig struct {
-	FieldName string
-	Rate      FieldSampleRate
+	FieldName           string
+	Rate                FieldSampleRate
+	Action              FieldSamplerAction
+	AnnotationFieldName string
 }
 
 func NewFieldSampler(core zapcore.Core, config FieldSamplerConfig) zapcore.Core {
@@ -104,12 +114,24 @@ func (s *fieldSampler) findSampleField(fields []zapcore.Field) (string, bool) {
 	return "", false
 }
 
-func (s *fieldSampler) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	if s.hash != 0 && s.hash > s.config.Rate.Threshold() {
-		return nil
+func (s *fieldSampler) test(fields []zapcore.Field) bool {
+	if s.hash != 0 {
+		return s.hash > s.config.Rate.Threshold()
 	}
-	if h, ok := s.hashSampleField(fields); ok && h > s.config.Rate.Threshold() {
-		return nil
+	if h, ok := s.hashSampleField(fields); ok {
+		return h > s.config.Rate.Threshold()
+	}
+	return false
+}
+
+func (s *fieldSampler) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	if s.test(fields) {
+		switch s.config.Action {
+		case OmitSampledLog:
+			return nil
+		case AnnotateSampledLog:
+			fields = append(fields, zap.Bool(s.config.AnnotationFieldName, true))
+		}
 	}
 	return s.Core.Write(entry, fields)
 }
