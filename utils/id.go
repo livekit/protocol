@@ -73,7 +73,7 @@ func guidPrefix[T livekit.Guid]() string {
 
 func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 	var b livekit.GuidBlock
-	idb := []byte(id)[len(guidPrefix[T]()):]
+	idb := []byte(id)[len(id)-guidSize:]
 	for i := 0; i < 3; i++ {
 		j := i * 3
 		k := i * 4
