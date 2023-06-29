@@ -23,6 +23,7 @@ const (
 	IngressPrefix      = "IN_"
 	RPCPrefix          = "RPC_"
 	WHIPResourcePrefix = "WH_"
+	RTMPResourcePrefix = "RT_"
 )
 
 func NewGuid(prefix string) string {
