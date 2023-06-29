@@ -22,8 +22,9 @@ const (
 	cpuStatsPathV1 = "/sys/fs/cgroup/cpu,cpuacct/cpuacct.usage"
 	cpuStatsPathV2 = "/sys/fs/cgroup/cpu.stat"
 
-	numCPUPathV1 = "/sys/fs/cgroup/cpu,cpuacct/cpuacct.usage_percpu"
-	numCPUPathV2 = "/sys/fs/cgroup/cpu.max"
+	numCPUPathV1Period = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
+	numCPUPathV1Quota  = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+	numCPUPathV2       = "/sys/fs/cgroup/cpu.max"
 )
 
 type cpuInfoGetter interface {
@@ -131,27 +132,35 @@ func (cg *cpuInfoGetterV1) getTotalCPUTime() (int64, error) {
 }
 
 func (cg *cpuInfoGetterV1) numCPU() (int, error) {
-	b, err := os.ReadFile(numCPUPathV1)
+	quota, err := readIntFromFile(numCPUPathV1Quota)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			//File may not exist in case of no quota
+			return runtime.NumCPU(), nil
+		}
+
+		return 0, err
+	}
+
+	if quota < 0 {
+		// default
+		return runtime.NumCPU(), nil
+	}
+
+	period, err := readIntFromFile(numCPUPathV1Period)
 	if err != nil {
 		return 0, err
 	}
 
-	// Remove trailing new line if any
-	s := strings.TrimSuffix(string(b), "\n")
-
-	// Remove trailing space if any
-	s = strings.TrimSuffix(s, " ")
-
-	m := strings.Split(s, " ")
-	if len(m) == 0 {
-		return 0, errors.New("could not parse cpu stats")
+	if period <= 0 {
+		// default
+		return runtime.NumCPU(), nil
 	}
 
-	cpuCount := 0
-	for _, v := range m {
-		if v != "0" {
-			cpuCount++
-		}
+	cpuCount := quota / period
+	if cpuCount == 0 {
+		// Round up in this case. TODO: move to float cpu count
+		cpuCount = 1
 	}
 
 	return cpuCount, nil
@@ -215,7 +224,13 @@ func (cg *cpuInfoGetterV2) numCPU() (int, error) {
 			return 0, err
 		}
 
-		return int(n / d), nil
+		cpuCount := int(n / d)
+		if cpuCount == 0 {
+			// Round up in this case. TODO: move to float cpu count
+			cpuCount = 1
+		}
+
+		return cpuCount, nil
 	}
 }
 
@@ -229,4 +244,24 @@ func fileExists(path string) (bool, error) {
 	default:
 		return false, err
 	}
+}
+
+func readIntFromFile(filename string) (int, error) {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return 0, err
+	}
+
+	// Remove trailing new line if any
+	s := strings.TrimSuffix(string(b), "\n")
+
+	// Remove trailing space if any
+	s = strings.TrimSuffix(s, " ")
+
+	n, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return int(n), nil
 }
