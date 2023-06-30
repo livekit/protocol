@@ -34,4 +34,5 @@ message ListActiveIngressResponse {
 
 message DeleteWHIPResourceRequest {
   string resource_id = 1;
+  string stream_key = 2;
 }
