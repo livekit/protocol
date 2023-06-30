@@ -29,13 +29,13 @@ const (
 
 type cpuInfoGetter interface {
 	getTotalCPUTime() (int64, error)
-	numCPU() (int, error)
+	numCPU() (float64, error)
 }
 
 type cgroupCPUMonitor struct {
 	lastSampleTime   int64
 	lastTotalCPUTime int64
-	nCPU             int
+	nCPU             float64
 
 	cg cpuInfoGetter
 }
@@ -58,7 +58,7 @@ func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 	}
 	if cg == nil {
 		logger.Infow("failed reading cgroup specific cpu stats, falling back to system wide implementation")
-		return newOsstatCPUMonitor()
+		return newOSStatCPUMonitor()
 	}
 
 	cpu, err := cg.getTotalCPUTime()
@@ -90,11 +90,11 @@ func (p *cgroupCPUMonitor) getCPUIdle() (float64, error) {
 	cpuTime := next - p.lastTotalCPUTime
 
 	busyRatio := float64(cpuTime) / float64(duration)
-	idleRatio := float64(p.nCPU) - busyRatio
+	idleRatio := p.nCPU - busyRatio
 
 	// Clamp the value as we do not get all the timestamps at the same time
-	if idleRatio > float64(p.nCPU) {
-		idleRatio = float64(p.nCPU)
+	if idleRatio > p.nCPU {
+		idleRatio = p.nCPU
 	} else if idleRatio < 0 {
 		idleRatio = 0
 	}
@@ -105,12 +105,11 @@ func (p *cgroupCPUMonitor) getCPUIdle() (float64, error) {
 	return idleRatio, nil
 }
 
-func (p *cgroupCPUMonitor) numCPU() int {
+func (p *cgroupCPUMonitor) numCPU() float64 {
 	return p.nCPU
 }
 
-type cpuInfoGetterV1 struct {
-}
+type cpuInfoGetterV1 struct{}
 
 func newCpuInfoGetterV1() cpuInfoGetter {
 	return &cpuInfoGetterV1{}
@@ -131,12 +130,12 @@ func (cg *cpuInfoGetterV1) getTotalCPUTime() (int64, error) {
 	return i, nil
 }
 
-func (cg *cpuInfoGetterV1) numCPU() (int, error) {
+func (cg *cpuInfoGetterV1) numCPU() (float64, error) {
 	quota, err := readIntFromFile(numCPUPathV1Quota)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			//File may not exist in case of no quota
-			return runtime.NumCPU(), nil
+			// File may not exist in case of no quota
+			return float64(runtime.NumCPU()), nil
 		}
 
 		return 0, err
@@ -144,7 +143,7 @@ func (cg *cpuInfoGetterV1) numCPU() (int, error) {
 
 	if quota < 0 {
 		// default
-		return runtime.NumCPU(), nil
+		return float64(runtime.NumCPU()), nil
 	}
 
 	period, err := readIntFromFile(numCPUPathV1Period)
@@ -154,20 +153,13 @@ func (cg *cpuInfoGetterV1) numCPU() (int, error) {
 
 	if period <= 0 {
 		// default
-		return runtime.NumCPU(), nil
+		return float64(runtime.NumCPU()), nil
 	}
 
-	cpuCount := quota / period
-	if cpuCount == 0 {
-		// Round up in this case. TODO: move to float cpu count
-		cpuCount = 1
-	}
-
-	return cpuCount, nil
+	return float64(quota) / float64(period), nil
 }
 
-type cpuInfoGetterV2 struct {
-}
+type cpuInfoGetterV2 struct{}
 
 func newCpuInfoGetterV2() cpuInfoGetter {
 	return &cpuInfoGetterV2{}
@@ -189,15 +181,15 @@ func (cg *cpuInfoGetterV2) getTotalCPUTime() (int64, error) {
 		return 0, err
 	}
 
-	// Caller expexts time in ns
+	// Caller expects time in ns
 	return i * 1000, nil
 }
 
-func (cg *cpuInfoGetterV2) numCPU() (int, error) {
+func (cg *cpuInfoGetterV2) numCPU() (float64, error) {
 	b, err := os.ReadFile(numCPUPathV2)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			//File may not exist in case of no quota
+			// File may not exist in case of no quota
 			return runtime.NumCPU(), nil
 		}
 		return 0, err
@@ -212,26 +204,20 @@ func (cg *cpuInfoGetterV2) numCPU() (int, error) {
 
 	if m[0] == "max" {
 		// No quota
-		return runtime.NumCPU(), nil
-	} else {
-		n, err := strconv.ParseInt(string(m[0]), 10, 64)
-		if err != nil {
-			return 0, err
-		}
-
-		d, err := strconv.ParseInt(string(m[1]), 10, 64)
-		if err != nil {
-			return 0, err
-		}
-
-		cpuCount := int(n / d)
-		if cpuCount == 0 {
-			// Round up in this case. TODO: move to float cpu count
-			cpuCount = 1
-		}
-
-		return cpuCount, nil
+		return float64(runtime.NumCPU()), nil
 	}
+
+	quota, err := strconv.ParseInt(string(m[0]), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	period, err := strconv.ParseInt(string(m[1]), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return float64(quota) / float64(period), nil
 }
 
 func fileExists(path string) (bool, error) {
@@ -258,10 +244,5 @@ func readIntFromFile(filename string) (int, error) {
 	// Remove trailing space if any
 	s = strings.TrimSuffix(s, " ")
 
-	n, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, err
-	}
-
-	return int(n), nil
+	return strconv.Atoi(s)
 }

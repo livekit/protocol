@@ -3,5 +3,5 @@
 package utils
 
 func newPlatformCPUMonitor() (platformCPUMonitor, error) {
-	return newOsstatCPUMonitor()
+	return newOSStatCPUMonitor()
 }
