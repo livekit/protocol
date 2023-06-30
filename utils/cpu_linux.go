@@ -190,7 +190,7 @@ func (cg *cpuInfoGetterV2) numCPU() (float64, error) {
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			// File may not exist in case of no quota
-			return runtime.NumCPU(), nil
+			return float64(runtime.NumCPU()), nil
 		}
 		return 0, err
 	}
