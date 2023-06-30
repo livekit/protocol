@@ -142,6 +142,7 @@ message TrackInfo {
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
   Encryption.Type encryption = 16;
+  string stream = 17;
 }
 
 enum VideoQuality {
