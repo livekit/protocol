@@ -32,45 +32,62 @@ func TestTimedAggregator(t *testing.T) {
 		require.Equal(t, 1.0, ta.GetAverage())
 
 		// cannot add anachronous sample
-		require.Error(t, errAnachronousSample, ta.AddSampleAt(10.0, now.Add(200*time.Millisecond)))
+		require.Error(t, ErrAnachronousSample, ta.AddSampleAt(10.0, now.Add(200*time.Millisecond)))
+
+		// cannot get aggregate or average at an older time
+		_, _, err := ta.GetAggregateAt(now.Add(200 * time.Millisecond))
+		require.Error(t, ErrAnachronousSample, err)
 
 		// check a bit later, last value should continue
 		// 1.0 (0.5s) +  2.0 (1.0s)
-		aggregate, aggregateDuration = ta.GetAggregateAt(now.Add(1500 * time.Millisecond))
+		aggregate, aggregateDuration, err = ta.GetAggregateAt(now.Add(1500 * time.Millisecond))
 		require.Equal(t, 2.5, aggregate)
 		require.Equal(t, 1500*time.Millisecond, aggregateDuration)
+		require.NoError(t, err)
+
 		require.Equal(t, 2.5/1.5, ta.GetAverage())
 
 		// another second out and restart
 		// 1.0 (0.5s) +  2.0 (2.0s)
-		aggregate, aggregateDuration = ta.GetAggregateAndRestartAt(now.Add(2500 * time.Millisecond))
+		aggregate, aggregateDuration, err = ta.GetAggregateAndRestartAt(now.Add(2500 * time.Millisecond))
 		require.Equal(t, 4.5, aggregate)
 		require.Equal(t, 2500*time.Millisecond, aggregateDuration)
+		require.NoError(t, err)
 
 		// restart should have reset the aggregates
 		aggregate, aggregateDuration = ta.GetAggregate()
 		require.Equal(t, 0.0, aggregate)
 		require.Equal(t, time.Duration(0), aggregateDuration)
+
 		require.Equal(t, 0.0, ta.GetAverage())
 
 		// add a sample a bit later and check aggregates
 		require.NoError(t, ta.AddSampleAt(20.0, now.Add(2800*time.Millisecond)))
+
 		// 2.0 (0.3s) + 20.0 (0.2s)
-		aggregate, aggregateDuration = ta.GetAggregateAt(now.Add(3000 * time.Millisecond))
+		aggregate, aggregateDuration, err = ta.GetAggregateAt(now.Add(3000 * time.Millisecond))
 		require.Equal(t, 4.6, aggregate)
 		require.Equal(t, 500*time.Millisecond, aggregateDuration)
+		require.NoError(t, err)
+
 		require.Equal(t, 4.6/0.5, ta.GetAverage())
 
 		// get average a bit later
 		// 2.0 (0.3s) +  20.0 (0.5s)
-		require.Equal(t, float64(10.6)/float64(0.8), ta.GetAverageAt(now.Add(3300*time.Millisecond)))
+		average, err := ta.GetAverageAt(now.Add(3300 * time.Millisecond))
+		require.Equal(t, float64(10.6)/float64(0.8), average)
+		require.NoError(t, err)
+
 		aggregate, aggregateDuration = ta.GetAggregate()
 		require.Equal(t, 10.6, aggregate)
 		require.Equal(t, 800*time.Millisecond, aggregateDuration)
 
 		// get average and restart a bit later
 		// 2.0 (0.3s) +  20.0 (1.0s)
-		require.Equal(t, float64(20.6)/float64(1.3), ta.GetAverageAndRestartAt(now.Add(3800*time.Millisecond)))
+		average, err = ta.GetAverageAndRestartAt(now.Add(3800 * time.Millisecond))
+		require.Equal(t, float64(20.6)/float64(1.3), average)
+		require.NoError(t, err)
+
 		// restart should have reset the aggregates
 		aggregate, aggregateDuration = ta.GetAggregate()
 		require.Equal(t, 0.0, aggregate)
@@ -81,7 +98,10 @@ func TestTimedAggregator(t *testing.T) {
 
 		// get average a bit later
 		// 20.0 (0.2s) +  -2.0 (0.5s)
-		require.Equal(t, float64(3.0)/float64(0.7), ta.GetAverageAt(now.Add(4500*time.Millisecond)))
+		average, err = ta.GetAverageAt(now.Add(4500 * time.Millisecond))
+		require.Equal(t, float64(3.0)/float64(0.7), average)
+		require.NoError(t, err)
+
 		aggregate, aggregateDuration = ta.GetAggregate()
 		require.Equal(t, 3.0, aggregate)
 		require.Equal(t, 700*time.Millisecond, aggregateDuration)
@@ -98,9 +118,11 @@ func TestTimedAggregator(t *testing.T) {
 		require.NoError(t, ta.AddSampleAt(1, now.Add(2*time.Second)))
 
 		// 1 (1.0s) + 0 (capped value) (1.0s) + 1 (1.0s)
-		aggregate, aggregateDuration := ta.GetAggregateAt(now.Add(3 * time.Second))
+		aggregate, aggregateDuration, err := ta.GetAggregateAt(now.Add(3 * time.Second))
 		require.Equal(t, int64(2), aggregate)
 		require.Equal(t, 3*time.Second, aggregateDuration)
+		require.NoError(t, err)
+
 		require.Equal(t, float64(2.0)/float64(3.0), ta.GetAverage())
 	})
 }

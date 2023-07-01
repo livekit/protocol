@@ -9,7 +9,7 @@ import (
 // ------------------------------------------------
 
 var (
-	errAnachronousSample = errors.New("anachronous sample")
+	ErrAnachronousSample = errors.New("anachronous sample")
 )
 
 // ------------------------------------------------
@@ -57,7 +57,7 @@ func (t *TimedAggregator[T]) addSampleAtLocked(val T, at time.Time) error {
 	var sinceLast time.Duration
 	if !t.lastSampleAt.IsZero() {
 		if t.lastSampleAt.After(at) {
-			return errAnachronousSample
+			return ErrAnachronousSample
 		}
 
 		sinceLast = at.Sub(t.lastSampleAt)
@@ -79,29 +79,31 @@ func (t *TimedAggregator[T]) GetAggregate() (T, time.Duration) {
 	return t.aggregate, t.aggregateDuration
 }
 
-func (t *TimedAggregator[T]) GetAggregateAt(at time.Time) (T, time.Duration) {
+func (t *TimedAggregator[T]) GetAggregateAt(at time.Time) (T, time.Duration, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	return t.getAggregateAtLocked(at)
 }
 
-func (t *TimedAggregator[T]) GetAggregateAndRestartAt(at time.Time) (T, time.Duration) {
+func (t *TimedAggregator[T]) GetAggregateAndRestartAt(at time.Time) (T, time.Duration, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	aggregate, aggregateDuration := t.getAggregateAtLocked(at)
+	aggregate, aggregateDuration, err := t.getAggregateAtLocked(at)
 	t.restartAtLocked(at)
-	return aggregate, aggregateDuration
+	return aggregate, aggregateDuration, err
 }
 
-func (t *TimedAggregator[T]) getAggregateAtLocked(at time.Time) (T, time.Duration) {
+func (t *TimedAggregator[T]) getAggregateAtLocked(at time.Time) (T, time.Duration, error) {
 	if !t.lastSampleAt.IsZero() {
 		// re-add last sample at given time
-		t.addSampleAtLocked(t.lastSample, at)
+		if err := t.addSampleAtLocked(t.lastSample, at); err != nil {
+			return 0, 0, ErrAnachronousSample
+		}
 	}
 
-	return t.aggregate, t.aggregateDuration
+	return t.aggregate, t.aggregateDuration, nil
 }
 
 func (t *TimedAggregator[T]) GetAverage() float64 {
@@ -111,20 +113,20 @@ func (t *TimedAggregator[T]) GetAverage() float64 {
 	return t.getAverageLocked()
 }
 
-func (t *TimedAggregator[T]) GetAverageAt(at time.Time) float64 {
+func (t *TimedAggregator[T]) GetAverageAt(at time.Time) (float64, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
 	return t.getAverageAtLocked(at)
 }
 
-func (t *TimedAggregator[T]) GetAverageAndRestartAt(at time.Time) float64 {
+func (t *TimedAggregator[T]) GetAverageAndRestartAt(at time.Time) (float64, error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	average := t.getAverageAtLocked(at)
+	average, err := t.getAverageAtLocked(at)
 	t.restartAtLocked(at)
-	return average
+	return average, err
 }
 
 func (t *TimedAggregator[T]) getAverageLocked() float64 {
@@ -136,13 +138,15 @@ func (t *TimedAggregator[T]) getAverageLocked() float64 {
 	return float64(t.aggregate) / seconds
 }
 
-func (t *TimedAggregator[T]) getAverageAtLocked(at time.Time) float64 {
+func (t *TimedAggregator[T]) getAverageAtLocked(at time.Time) (float64, error) {
 	if !t.lastSampleAt.IsZero() {
 		// re-add last sample at given time
-		t.addSampleAtLocked(t.lastSample, at)
+		if err := t.addSampleAtLocked(t.lastSample, at); err != nil {
+			return 0.0, err
+		}
 	}
 
-	return t.getAverageLocked()
+	return t.getAverageLocked(), nil
 }
 
 func (t *TimedAggregator[T]) Reset() {
@@ -167,6 +171,11 @@ func (t *TimedAggregator[T]) Restart() {
 }
 
 func (t *TimedAggregator[T]) restartAtLocked(at time.Time) {
+	if t.lastSampleAt.IsZero() {
+		// no samples yet, nothing to restart
+		return
+	}
+
 	t.lastSampleAt = at
 	t.aggregate = 0
 	t.aggregateDuration = 0
