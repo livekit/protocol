@@ -121,6 +121,9 @@ message AddTrackRequest {
   bool disable_red = 13;
 
   Encryption.Type encryption = 14;
+  // which stream the track belongs to, used to group tracks together.
+  // if not specified, server will infer it from track source to bundle camera/microphone, screenshare/audio together
+  string stream = 15;
 }
 
 message TrickleRequest {
