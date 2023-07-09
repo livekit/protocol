@@ -46,7 +46,8 @@ func TestProtoProxy(t *testing.T) {
 	case <-time.After(100 * time.Millisecond):
 		t.Fatal("should have received an update")
 	}
-	require.EqualValues(t, 2, proxy.Get().NumParticipants)
+	// possible that ticker was updated while markDirty queued another update
+	require.GreaterOrEqual(t, int(proxy.Get().NumParticipants), 2)
 
 	// ensure we didn't leak
 	proxy.Stop()
@@ -64,6 +65,7 @@ func createTestProxy() (*ProtoProxy[*livekit.Room], *atomic.Uint32) {
 	// uses an update func that increments numParticipants each time
 	var numParticipants atomic.Uint32
 	return NewProtoProxy[*livekit.Room](10*time.Millisecond, func() *livekit.Room {
+		// during each update, the number of participants increments by 1
 		defer numParticipants.Add(1)
 		return &livekit.Room{
 			NumParticipants: numParticipants.Load(),
