@@ -17,7 +17,7 @@ require (
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.6.2
 	github.com/pion/logging v0.2.2
 	github.com/pion/sdp/v3 v3.0.6
-	github.com/pion/webrtc/v3 v3.2.10
+	github.com/pion/webrtc/v3 v3.2.11
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
 	github.com/redis/go-redis/v9 v9.0.5
@@ -27,7 +27,7 @@ require (
 	go.uber.org/atomic v1.11.0
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230626212559-97b1e661b5df
-	google.golang.org/grpc v1.56.1
+	google.golang.org/grpc v1.56.2
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -52,7 +52,7 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pion/datachannel v1.5.5 // indirect
 	github.com/pion/dtls/v2 v2.2.7 // indirect
-	github.com/pion/ice/v2 v2.3.7 // indirect
+	github.com/pion/ice/v2 v2.3.8 // indirect
 	github.com/pion/interceptor v0.1.17 // indirect
 	github.com/pion/mdns v0.0.7 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
