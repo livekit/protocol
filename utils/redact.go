@@ -15,16 +15,16 @@ func RedactStreamKey(url string) (string, bool) {
 		return url, false
 	}
 
-	match[4] = redactStreamKey(match[4])
+	match[4] = RedactIdentifier(match[4])
 	return strings.Join(match[1:], ""), true
 }
 
-func redactStreamKey(key string) string {
+func RedactIdentifier(identifier string) string {
 	var prefix, suffix string
 	for i := 3; i > 0; i-- {
-		if len(key) >= i*3 {
-			prefix = key[:i]
-			suffix = key[len(key)-i:]
+		if len(identifier) >= i*3 {
+			prefix = identifier[:i]
+			suffix = identifier[len(identifier)-i:]
 			break
 		}
 	}
