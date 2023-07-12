@@ -8,7 +8,7 @@ import (
 	"github.com/livekit/psrpc/pkg/middleware"
 )
 
-const resourceExhaustedRetries = 3
+const retries = 3
 
 type EgressClient interface {
 	EgressInternalClient
@@ -27,7 +27,7 @@ func NewEgressClient(nodeID livekit.NodeID, bus psrpc.MessageBus) (EgressClient,
 
 	clientID := string(nodeID)
 	internalClient, err := NewEgressInternalClient(clientID, bus, middleware.WithRPCRetries(middleware.RetryOptions{
-		MaxAttempts: 3,
+		MaxAttempts: retries,
 		Timeout:     psrpc.DefaultClientTimeout,
 		IsRecoverable: func(err error) bool {
 			var e psrpc.Error
