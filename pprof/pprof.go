@@ -6,7 +6,6 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/livekit/egress/pkg/errors"
 	"github.com/livekit/psrpc"
 )
 
@@ -56,7 +55,7 @@ func GetCpuProfileData(ctx context.Context, timeout int) (b []byte, err error) {
 func GetGenericProfileData(profileName string, debug int) (b []byte, err error) {
 	pp := pprof.Lookup(profileName)
 	if pp == nil {
-		return nil, errors.ErrProfileNotFound
+		return nil, ErrProfileNotFound
 	}
 
 	buf := &bytes.Buffer{}
