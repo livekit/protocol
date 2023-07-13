@@ -12,7 +12,7 @@ import (
 	"github.com/livekit/psrpc/pkg/server"
 	"github.com/livekit/psrpc/version"
 )
-import google_protobuf2 "google.golang.org/protobuf/types/known/emptypb"
+import google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
 import livekit2 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_3_2
@@ -127,7 +127,7 @@ type IngressHandlerClient interface {
 
 	DeleteIngress(ctx context.Context, topic string, req *livekit2.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressState, error)
 
-	DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf2.Empty, error)
+	DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error)
 }
 
 // ===================================
@@ -139,7 +139,7 @@ type IngressHandlerServerImpl interface {
 
 	DeleteIngress(context.Context, *livekit2.DeleteIngressRequest) (*livekit2.IngressState, error)
 
-	DeleteWHIPResource(context.Context, *DeleteWHIPResourceRequest) (*google_protobuf2.Empty, error)
+	DeleteWHIPResource(context.Context, *DeleteWHIPResourceRequest) (*google_protobuf3.Empty, error)
 }
 
 // ===============================
@@ -198,8 +198,8 @@ func (c *ingressHandlerClient) DeleteIngress(ctx context.Context, topic string, 
 	return client.RequestSingle[*livekit2.IngressState](ctx, c.client, "DeleteIngress", []string{topic}, req, opts...)
 }
 
-func (c *ingressHandlerClient) DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf2.Empty, error) {
-	return client.RequestSingle[*google_protobuf2.Empty](ctx, c.client, "DeleteWHIPResource", []string{topic}, req, opts...)
+func (c *ingressHandlerClient) DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error) {
+	return client.RequestSingle[*google_protobuf3.Empty](ctx, c.client, "DeleteWHIPResource", []string{topic}, req, opts...)
 }
 
 // =====================
