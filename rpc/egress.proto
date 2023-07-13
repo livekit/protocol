@@ -4,6 +4,7 @@ package rpc;
 
 option go_package = "github.com/livekit/livekit/pkg/service/rpc";
 
+import "google/protobuf/any.proto";
 import "options.proto";
 import "livekit_egress.proto";
 
@@ -43,9 +44,8 @@ message StartEgressRequest {
   string token = 8;
   string ws_url = 9;
 
-  // location (used for affinity)
-  double lat = 12;
-  double lon = 13;
+  // metadata
+  map<string, google.protobuf.Any> metadata = 12;
 }
 
 message ListActiveEgressRequest {}
