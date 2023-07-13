@@ -42,6 +42,10 @@ message StartEgressRequest {
   string room_id = 3;
   string token = 8;
   string ws_url = 9;
+
+  // location (used for affinity)
+  double lat = 12;
+  double lon = 13;
 }
 
 message ListActiveEgressRequest {}
