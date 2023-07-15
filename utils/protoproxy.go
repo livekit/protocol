@@ -94,6 +94,13 @@ func (p *ProtoProxy[T]) Stop() {
 func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	msg := p.updateFn()
 	p.lock.Lock()
+	if proto.Equal(p.message, msg) {
+		// no change, skip the notification
+		p.refreshedAt = time.Now()
+		p.dirty = false
+		p.lock.Unlock()
+		return
+	}
 	p.message = msg
 	p.refreshedAt = time.Now()
 	p.dirty = false

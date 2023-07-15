@@ -335,7 +335,7 @@ func (t *TimeSeries[T]) ZScore(val T) float64 {
 
 	onlineStdDev := t.onlineStdDevLocked()
 	if onlineStdDev != 0.0 {
-		return (float64(val) - t.welfordM) / t.onlineStdDevLocked()
+		return (float64(val) - t.welfordM) / onlineStdDev
 	}
 
 	return 0.0
