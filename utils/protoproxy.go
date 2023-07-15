@@ -29,6 +29,7 @@ import (
 type ProtoProxy[T proto.Message] struct {
 	message         T
 	updateFn        func() T
+	equalityFn      func(T, T) bool
 	fuse            core.Fuse
 	updateChan      chan struct{}
 	done            chan struct{}
@@ -43,10 +44,11 @@ type ProtoProxy[T proto.Message] struct {
 // this should be used for updates that should be sent periodically, but does not have the urgency of immediate delivery
 // updateFn should provide computations required to generate the protobuf
 // if refreshInterval is 0, then proxy will only update on MarkDirty(true)
-func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func() T) *ProtoProxy[T] {
+func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func() T, equalityFn func(T, T) bool) *ProtoProxy[T] {
 	p := &ProtoProxy[T]{
 		updateChan:      make(chan struct{}, 1),
 		updateFn:        updateFn,
+		equalityFn:      equalityFn,
 		done:            make(chan struct{}),
 		fuse:            core.NewFuse(),
 		refreshInterval: refreshInterval,
@@ -94,6 +96,13 @@ func (p *ProtoProxy[T]) Stop() {
 func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	msg := p.updateFn()
 	p.lock.Lock()
+	if p.equalityFn != nil && p.equalityFn(p.message, msg) {
+		// no change, skip the notification
+		p.refreshedAt = time.Now()
+		p.dirty = false
+		p.lock.Unlock()
+		return
+	}
 	p.message = msg
 	p.refreshedAt = time.Now()
 	p.dirty = false
