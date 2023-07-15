@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/livekit"
 )
@@ -86,9 +85,6 @@ func createTestProxy() (*ProtoProxy[*livekit.Room], *atomic.Uint32, *atomic.Bool
 			return &livekit.Room{
 				NumParticipants: numParticipants.Load(),
 			}
-		},
-		func(lhs *livekit.Room, rhs *livekit.Room) bool {
-			return proto.Equal(lhs, rhs)
 		},
 	), &numParticipants, &freeze
 }
