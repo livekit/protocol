@@ -156,7 +156,8 @@ message UpdateIngressRequest {
 
 message ListIngressRequest {
   // when blank, lists all ingress endpoints
-  string room_name = 1;
+  string room_name = 1;  // (optional, filter by room name)
+  string ingress_id = 2; // (optional, filter by ingress ID)
 }
 
 message ListIngressResponse {

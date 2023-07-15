@@ -48,7 +48,8 @@ func TestProtoProxy(t *testing.T) {
 	case <-time.After(100 * time.Millisecond):
 		t.Fatal("should have received an update")
 	}
-	require.EqualValues(t, 2, proxy.Get().NumParticipants)
+	// possible that ticker was updated while markDirty queued another update
+	require.GreaterOrEqual(t, int(proxy.Get().NumParticipants), 2)
 
 	// trigger another update, but should not get notification as freeze is in place and the model should not have changed
 	proxy.MarkDirty(false)
