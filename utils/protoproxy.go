@@ -92,18 +92,24 @@ func (p *ProtoProxy[T]) Stop() {
 }
 
 func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
+	// set dirty back *before* calling updateFn because otherwise it could
+	// wipe out another thread setting dirty to true while updateFn is executing
+	p.lock.Lock()
+	p.dirty = false
+	p.lock.Unlock()
+
 	msg := p.updateFn()
+
 	p.lock.Lock()
 	if proto.Equal(p.message, msg) {
 		// no change, skip the notification
-		p.refreshedAt = time.Now()
-		p.dirty = false
 		p.lock.Unlock()
 		return
 	}
 	p.message = msg
+	// only updating refreshedAt if we have notified, so it shouldn't push
+	// out the next notification out by another interval
 	p.refreshedAt = time.Now()
-	p.dirty = false
 	p.lock.Unlock()
 
 	if !skipNotify {
