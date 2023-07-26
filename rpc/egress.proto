@@ -34,9 +34,10 @@ message StartEgressRequest {
   // request
   oneof request {
     livekit.RoomCompositeEgressRequest room_composite = 5;
+    livekit.WebEgressRequest web = 11;
+    livekit.ParticipantCompositeEgressRequest participant = 13;
     livekit.TrackCompositeEgressRequest track_composite = 6;
     livekit.TrackEgressRequest track = 7;
-    livekit.WebEgressRequest web = 11;
   }
 
   // connection info

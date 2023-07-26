@@ -64,6 +64,7 @@ message CreateRoomRequest {
 
 message RoomEgress {
   RoomCompositeEgressRequest room = 1;
+  AutoParticipantEgress participant = 3;
   AutoTrackEgress tracks = 2;
 }
 

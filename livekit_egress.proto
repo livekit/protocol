@@ -11,9 +11,10 @@ option ruby_package = "LiveKit::Proto";
 service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
+  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
+  rpc StartParticipantCompositeEgress(ParticipantCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
-  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
 
   // update web composite layout
   rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
@@ -67,6 +68,19 @@ message WebEgressRequest {
   repeated EncodedFileOutput file_outputs = 9;
   repeated StreamOutput stream_outputs = 10;
   repeated SegmentedFileOutput segment_outputs = 11;
+}
+
+// record audio and video from a single participant
+message ParticipantCompositeEgressRequest {
+  string room_name = 1; // required
+  string identity = 2;  // required
+  oneof options {
+    EncodingOptionsPreset preset = 3; // (default H264_720P_30)
+    EncodingOptions advanced = 4;     // (optional)
+  }
+  repeated EncodedFileOutput file_outputs = 5;
+  repeated StreamOutput stream_outputs = 6;
+  repeated SegmentedFileOutput segment_outputs = 7;
 }
 
 // containerize up to one audio and one video track
@@ -263,9 +277,10 @@ message EgressInfo {
   string error = 9;
   oneof request {
     RoomCompositeEgressRequest room_composite = 4;
+    WebEgressRequest web = 14;
+    ParticipantCompositeEgressRequest participant = 19;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
-    WebEgressRequest web = 14;
   }
   oneof result { // deprecated (use _result fields)
     StreamInfoList stream = 7 [deprecated = true];
@@ -314,6 +329,15 @@ message SegmentsInfo {
   int64 segment_count = 5;
   int64 started_at = 6;
   int64 ended_at = 7;
+}
+
+message AutoParticipantEgress {
+  oneof options {
+    EncodingOptionsPreset preset = 1; // (default H264_720P_30)
+    EncodingOptions advanced = 2;     // (optional)
+  }
+  repeated EncodedFileOutput file_outputs = 3;
+  repeated SegmentedFileOutput segment_outputs = 4;
 }
 
 message AutoTrackEgress {
