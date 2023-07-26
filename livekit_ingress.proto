@@ -130,7 +130,7 @@ message IngressState {
 
 message InputVideoState {
   string mime_type = 1;
-//  uint32 bitrate = 2;
+  uint32 average_bitrate = 2;
   uint32 width = 3;
   uint32 height = 4;
   double framerate = 5;
@@ -138,7 +138,7 @@ message InputVideoState {
 
 message InputAudioState {
   string mime_type = 1;
-//  uint32 bitrate = 2;
+  uint32 average_bitrate = 2;
   uint32 channels = 3;
   uint32 sample_rate = 4;
 }
