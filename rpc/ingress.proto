@@ -9,6 +9,9 @@ import "livekit_ingress.proto";
 import "google/protobuf/empty.proto";
 
 service IngressInternal {
+  rpc StartIngress(StartIngressRequest) returns (livekit.IngressInfo) {
+  };
+
   rpc ListActiveIngress(ListActiveIngressRequest) returns (ListActiveIngressResponse) {
     option (psrpc.options).multi = true;
   };
@@ -35,4 +38,10 @@ message ListActiveIngressResponse {
 message DeleteWHIPResourceRequest {
   string resource_id = 1;
   string stream_key = 2;
+}
+
+message StartIngressRequest {
+  livekit.IngressInfo info = 1;
+  string token = 2;
+  string ws_url = 3;
 }
