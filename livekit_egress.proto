@@ -12,7 +12,7 @@ service Egress {
   // start recording or streaming a room, participant, or tracks
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
   rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
-  rpc StartParticipantCompositeEgress(ParticipantCompositeEgressRequest) returns (EgressInfo);
+  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
   rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
   rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
@@ -71,7 +71,7 @@ message WebEgressRequest {
 }
 
 // record audio and video from a single participant
-message ParticipantCompositeEgressRequest {
+message ParticipantEgressRequest {
   string room_name = 1; // required
   string identity = 2;  // required
   oneof options {
@@ -278,7 +278,7 @@ message EgressInfo {
   oneof request {
     RoomCompositeEgressRequest room_composite = 4;
     WebEgressRequest web = 14;
-    ParticipantCompositeEgressRequest participant = 19;
+    ParticipantEgressRequest participant = 19;
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
   }
