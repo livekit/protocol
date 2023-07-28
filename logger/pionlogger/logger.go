@@ -44,11 +44,12 @@ var (
 		},
 		"turn": {
 			"error when handling datagram",
+			"Failed to send ChannelData from allocation",
 		},
 	}
 )
 
-// implements webrtc.LoggerFactory
+// LoggerFactory implements webrtc.LoggerFactory interface
 type LoggerFactory struct {
 	logger logger.Logger
 }
