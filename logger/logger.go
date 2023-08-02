@@ -15,6 +15,7 @@
 package logger
 
 import (
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -29,8 +30,8 @@ var (
 )
 
 // InitFromConfig initializes a Zap-based logger
-func InitFromConfig(conf Config, name string) {
-	l, err := NewZapLogger(&conf)
+func InitFromConfig(conf *Config, name string) {
+	l, err := NewZapLogger(conf)
 	if err == nil {
 		SetLogger(l, name)
 	}
@@ -79,25 +80,76 @@ type Logger interface {
 	Errorw(msg string, err error, keysAndValues ...interface{})
 	WithValues(keysAndValues ...interface{}) Logger
 	WithName(name string) Logger
+	// WithComponent creates a new logger with name as "<name>.<component>", and uses a log level as specified
+	WithComponent(component string) Logger
 	WithCallDepth(depth int) Logger
 	WithItemSampler() Logger
 	// WithoutSampler returns the original logger without sampling
 	WithoutSampler() Logger
 }
 
+type sharedConfig struct {
+	level           zap.AtomicLevel
+	componentLevels sync.Map // map[string]zapcore.Level
+	config          *Config
+}
+
+func newSharedConfig(conf *Config) *sharedConfig {
+	sc := &sharedConfig{
+		level:  zap.NewAtomicLevelAt(ParseZapLevel(conf.Level)),
+		config: conf,
+	}
+	conf.AddUpdateObserver(sc.onConfigUpdate)
+	_ = sc.onConfigUpdate(conf)
+	return sc
+}
+
+func (c *sharedConfig) onConfigUpdate(conf *Config) error {
+	c.config = conf
+	// update log levels
+	c.level.SetLevel(ParseZapLevel(conf.Level))
+	for component, level := range conf.ComponentLevels {
+		c.componentLevels.Store(component, ParseZapLevel(level))
+	}
+	return nil
+}
+
+func (c *sharedConfig) isEnabled(component string, level zapcore.Level) bool {
+	filterLevel := c.level.Level()
+	if component != "" {
+		if compLevel, ok := c.componentLevels.Load(component); ok {
+			filterLevel = compLevel.(zapcore.Level)
+		}
+	}
+	if level < filterLevel {
+		return false
+	}
+	return true
+}
+
 type ZapLogger struct {
 	zap *zap.SugaredLogger
 	// store original logger without sampling to avoid multiple samplers
-	unsampled      *zap.SugaredLogger
+	unsampled *zap.SugaredLogger
+	component string
+	// use a nested field as pointer so that all loggers share the same sharedConfig
+	sharedConfig   *sharedConfig
 	SampleDuration time.Duration
 	SampleInitial  int
 	SampleInterval int
 }
 
 func NewZapLogger(conf *Config) (*ZapLogger, error) {
-	lvl := ParseZapLevel(conf.Level)
+	sc := newSharedConfig(conf)
+	zl := &ZapLogger{
+		sharedConfig:   sc,
+		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
+		SampleInitial:  conf.ItemSampleInitial,
+		SampleInterval: conf.ItemSampleInterval,
+	}
 	zapConfig := zap.Config{
-		Level:            zap.NewAtomicLevelAt(lvl),
+		// set to the lowest level since we are doing our own filtering in `isEnabled`
+		Level:            zap.NewAtomicLevelAt(zapcore.DebugLevel),
 		Development:      false,
 		Encoding:         "console",
 		EncoderConfig:    zap.NewDevelopmentEncoderConfig(),
@@ -112,12 +164,7 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 	if err != nil {
 		return nil, err
 	}
-	zl := &ZapLogger{
-		unsampled:      l.Sugar(),
-		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
-		SampleInitial:  conf.ItemSampleInitial,
-		SampleInterval: conf.ItemSampleInterval,
-	}
+	zl.unsampled = l.Sugar()
 
 	if conf.Sample {
 		// use a sampling logger for the main logger
@@ -159,14 +206,23 @@ func (l *ZapLogger) ToZap() *zap.SugaredLogger {
 }
 
 func (l *ZapLogger) Debugw(msg string, keysAndValues ...interface{}) {
+	if !l.isEnabled(zapcore.DebugLevel) {
+		return
+	}
 	l.zap.Debugw(msg, keysAndValues...)
 }
 
 func (l *ZapLogger) Infow(msg string, keysAndValues ...interface{}) {
+	if !l.isEnabled(zapcore.InfoLevel) {
+		return
+	}
 	l.zap.Infow(msg, keysAndValues...)
 }
 
 func (l *ZapLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
+	if !l.isEnabled(zapcore.WarnLevel) {
+		return
+	}
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
@@ -174,6 +230,9 @@ func (l *ZapLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
 }
 
 func (l *ZapLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {
+	if !l.isEnabled(zapcore.ErrorLevel) {
+		return
+	}
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
@@ -201,6 +260,17 @@ func (l *ZapLogger) WithName(name string) Logger {
 		dup.unsampled = l.unsampled.Named(name)
 	}
 	return &dup
+}
+
+func (l *ZapLogger) WithComponent(component string) Logger {
+	// zap automatically appends .<name> to the logger name
+	dup := l.WithName(component).(*ZapLogger)
+	if dup.component == "" {
+		dup.component = component
+	} else {
+		dup.component = dup.component + "." + component
+	}
+	return dup
 }
 
 func (l *ZapLogger) WithCallDepth(depth int) Logger {
@@ -239,6 +309,10 @@ func (l *ZapLogger) WithoutSampler() Logger {
 	return &dup
 }
 
+func (l *ZapLogger) isEnabled(level zapcore.Level) bool {
+	return l.sharedConfig.isEnabled(l.component, level)
+}
+
 type LogRLogger logr.Logger
 
 func (l LogRLogger) toLogr() logr.Logger {
@@ -273,6 +347,10 @@ func (l LogRLogger) WithValues(keysAndValues ...interface{}) Logger {
 
 func (l LogRLogger) WithName(name string) Logger {
 	return LogRLogger(l.toLogr().WithName(name))
+}
+
+func (l LogRLogger) WithComponent(component string) Logger {
+	return LogRLogger(l.toLogr().WithName(component))
 }
 
 func (l LogRLogger) WithCallDepth(depth int) Logger {
