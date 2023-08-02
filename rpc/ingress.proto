@@ -10,6 +10,7 @@ import "google/protobuf/empty.proto";
 
 service IngressInternal {
   rpc StartIngress(StartIngressRequest) returns (livekit.IngressInfo) {
+     option (psrpc.options).affinity_func = true;
   };
 
   rpc ListActiveIngress(ListActiveIngressRequest) returns (ListActiveIngressResponse) {

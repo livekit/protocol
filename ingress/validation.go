@@ -27,12 +27,21 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return ErrInvalidIngress("missing IngressInfo")
 	}
 
-	if info.InputType != livekit.IngressInput_RTMP_INPUT && info.InputType != livekit.IngressInput_WHIP_INPUT {
+	if info.InputType != livekit.IngressInput_RTMP_INPUT && info.InputType != livekit.IngressInput_WHIP_INPUT && info.InputType != livekit.IngressInput_URL_INPUT {
 		return ErrInvalidIngress("unsupported input type")
 	}
 
-	if info.StreamKey == "" {
-		return ErrInvalidIngress("no stream key")
+	// Validate source
+	switch info.InputType {
+	case livekit.IngressInput_RTMP_INPUT,
+		livekit.IngressInput_WHIP_INPUT:
+		if info.StreamKey == "" {
+			return ErrInvalidIngress("no stream key")
+		}
+	case livekit.IngressInput_URL_INPUT:
+		if info.Url == "" {
+			return ErrInvalidIngress("no source URL")
+		}
 	}
 
 	if info.ParticipantIdentity == "" {
