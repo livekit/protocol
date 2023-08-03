@@ -74,6 +74,8 @@ message CreateRoomRequest {
   string metadata = 5;
   // egress
   RoomEgress egress = 6;
+  // minimum playout delay of subscriber
+  uint32 min_playout_delay = 7;
 }
 
 message RoomEgress {
