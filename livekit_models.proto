@@ -374,58 +374,76 @@ enum SubscriptionStatus {
 message ClientReport {
 
   message RTCSenderStats {
-    // none, cpu, bandwidth, or other
-    string qualityLimitationReason = 1;
-    // maps qualitLimitationReason to duration the limitation has been experienced
-    map<string, uint32> qualityLimitationDurations = 2;
-    uint32 width = 3;
-    uint32 height = 4;
+    // candidate-pair
+    uint32 available_outgoing_bitrate = 1;
+    uint32 current_round_trip_time = 2;
+    // local-candidate
+    string networkType = 3;
+    // outbound-rtp
+    uint64 packetsSent = 4;
+    uint32 packetsLost = 5;
+    uint32 nack_count = 6;    
+    uint32 retransmitted_packets_sent = 7;
+    uint64 timestamp = 8;
+    string stream_id = 9;
+  }
+
+  message RTCAudioSenderStats {
+   RTCSenderStats common_stats = 1;
+   // media-source
+   float total_audio_energy = 2;
+   float total_samples_duration = 3;
+  }
+
+  message RTCVideoSenderStats {
+   RTCSenderStats common_stats = 1;
+    // outbound-rtp
+    map<string, uint32> quality_limitation_durations = 2;
+    string quality_limitation_reason = 3;
+    uint32 quality_limitation_resolution_changes = 4;
+    string scalability_mode = 5;
+    uint32 frame_height = 6;
+    uint32 frame_width = 7;
+    uint32 frames_per_second = 8;
+    uint64 frames_sent = 9;
+    uint32 huge_frames_sent = 10;
+    string encoder_implementation = 11;
+    bool power_efficient_encoder = 12;
   }
 
   message RTCReceiverStats {
     int32 jitter = 1;
-    int32 freezeCount = 2;
-    int32 totalFreezeDuration = 3;
+    int32 freeze_count = 2;
+    int32 total_freeze_duration = 3;
   }
 
-  message PublicationReport {
+  message AudioPublicationReport {
     string sid = 1;
-    repeated RTCSenderStats rtcStats = 2;
-    int32 readyState = 3;
+    RTCAudioSenderStats rtc_stats = 2;
+    int32 ready_state = 3;
+    string label = 4;
+    bool muted = 5;
+  }
+
+  message VideoPublicationReport {
+    string sid = 1;
+    RTCVideoSenderStats rtc_stats = 2;
+    int32 ready_state = 3;
     string label = 4;
     bool muted = 5;
   }
 
   message SubscriptionReport {
     string sid = 1;
-    repeated RTCReceiverStats rtcStats = 2;
-    int32 readyState = 3;
-    SubscriptionStatus subscriptionStatus = 4;
+    repeated RTCReceiverStats rtc_stats = 2;
+    int32 ready_state = 3;
+    SubscriptionStatus subscription_status = 4;
     bool allowed = 5;
     int32 width = 6;
     int32 height = 7;
   }
 
-  message EventReport {
-    string eventName = 1;
-    string reason = 2;
-    int64 timestamp = 3;
-  }
-
-  message ApiError {
-    int32 code = 1;
-    int64 timestamp = 2;
-    string description = 3;
-  }
-
-  message DeviceInfo {
-    string ua = 1;
-    int32 concurrency = 2;
-  }
-
-  repeated PublicationReport publications = 1;
-  repeated SubscriptionReport subscriptions = 2;
-  repeated EventReport events = 3;
-  repeated ApiError errors = 4;
-  DeviceInfo deviceInfo = 5;
+  repeated AudioPublicationReport audioPublications = 1;
+  repeated VideoPublicationReport videoPublications = 2;
+  repeated SubscriptionReport subscriptions = 3;
 }
