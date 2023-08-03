@@ -35,7 +35,7 @@ func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier 
 	for _, url := range urls {
 		u := NewURLNotifier(URLNotifierParams{
 			URL:       url,
-			Logger:    logger.GetLogger(),
+			Logger:    logger.GetLogger().WithComponent("webhook"),
 			APIKey:    apiKey,
 			APISecret: apiSecret,
 		})
