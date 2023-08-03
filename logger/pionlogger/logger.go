@@ -16,13 +16,11 @@ package pionlogger
 
 import (
 	"github.com/pion/logging"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/livekit/protocol/logger"
 )
 
 var (
-	pionLevel           zapcore.Level
 	pionIgnoredPrefixes = map[string][]string{
 		"ice": {
 			"pingAllCandidates called with no candidate pairs",
@@ -63,12 +61,7 @@ func NewLoggerFactory(logger logger.Logger) *LoggerFactory {
 
 func (f *LoggerFactory) NewLogger(scope string) logging.LeveledLogger {
 	return &logAdapter{
-		logger:          f.logger.WithName(scope),
-		level:           pionLevel,
+		logger:          f.logger.WithComponent("pion." + scope),
 		ignoredPrefixes: pionIgnoredPrefixes[scope],
 	}
-}
-
-func SetLogLevel(level string) {
-	pionLevel = logger.ParseZapLevel(level)
 }

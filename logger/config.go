@@ -14,6 +14,8 @@
 
 package logger
 
+import "sync"
+
 type Config struct {
 	JSON  bool   `yaml:"json"`
 	Level string `yaml:"level"`
@@ -23,6 +25,8 @@ type Config struct {
 	// 2. per participant/track sampling - to be used with Logger.WithItemSampler(). This would be used to throttle
 	//    the logs for a particular participant/track.
 	Sample bool `yaml:"sample,omitempty"`
+
+	ComponentLevels map[string]string `yaml:"component_levels,omitempty"`
 
 	// global sampling per server
 	// when sampling, the first N logs will be logged
@@ -34,4 +38,37 @@ type Config struct {
 	ItemSampleSeconds  int `yaml:"item_sample_seconds,omitempty"`
 	ItemSampleInitial  int `yaml:"item_sample_initial,omitempty"`
 	ItemSampleInterval int `yaml:"item_sample_interval,omitempty"`
+
+	lock               sync.Mutex       `yaml:"-"`
+	onUpdatedCallbacks []ConfigObserver `yaml:"-"`
+}
+
+type ConfigObserver func(*Config) error
+
+func (c *Config) Update(o *Config) error {
+	c.lock.Lock()
+	c.JSON = o.JSON
+	c.Level = o.Level
+	c.Sample = o.Sample
+	c.SampleInitial = o.SampleInitial
+	c.SampleInterval = o.SampleInterval
+	c.ItemSampleSeconds = o.ItemSampleSeconds
+	c.ItemSampleInitial = o.ItemSampleInitial
+	c.ItemSampleInterval = o.ItemSampleInterval
+	c.ComponentLevels = o.ComponentLevels
+	callbacks := c.onUpdatedCallbacks
+	c.lock.Unlock()
+
+	for _, cb := range callbacks {
+		if err := cb(c); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *Config) AddUpdateObserver(cb ConfigObserver) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	c.onUpdatedCallbacks = append(c.onUpdatedCallbacks, cb)
 }
