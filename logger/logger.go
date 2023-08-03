@@ -15,6 +15,7 @@
 package logger
 
 import (
+	"strings"
 	"sync"
 	"time"
 
@@ -90,14 +91,16 @@ type Logger interface {
 
 type sharedConfig struct {
 	level           zap.AtomicLevel
-	componentLevels sync.Map // map[string]zapcore.Level
+	mu              sync.Mutex
+	componentLevels map[string]zap.AtomicLevel
 	config          *Config
 }
 
 func newSharedConfig(conf *Config) *sharedConfig {
 	sc := &sharedConfig{
-		level:  zap.NewAtomicLevelAt(ParseZapLevel(conf.Level)),
-		config: conf,
+		level:           zap.NewAtomicLevelAt(ParseZapLevel(conf.Level)),
+		config:          conf,
+		componentLevels: make(map[string]zap.AtomicLevel),
 	}
 	conf.AddUpdateObserver(sc.onConfigUpdate)
 	_ = sc.onConfigUpdate(conf)
@@ -105,26 +108,52 @@ func newSharedConfig(conf *Config) *sharedConfig {
 }
 
 func (c *sharedConfig) onConfigUpdate(conf *Config) error {
-	c.config = conf
 	// update log levels
 	c.level.SetLevel(ParseZapLevel(conf.Level))
-	for component, level := range conf.ComponentLevels {
-		c.componentLevels.Store(component, ParseZapLevel(level))
+
+	// we have to update alla existing component levels
+	c.mu.Lock()
+	c.config = conf
+	for component, atomicLevel := range c.componentLevels {
+		effectiveLevel := c.level.Level()
+		parts := strings.Split(component, ".")
+	confSearch:
+		for len(parts) > 0 {
+			search := strings.Join(parts, ".")
+			if compLevel, ok := conf.ComponentLevels[search]; ok {
+				effectiveLevel = ParseZapLevel(compLevel)
+				break confSearch
+			}
+			parts = parts[:len(parts)-1]
+		}
+		atomicLevel.SetLevel(effectiveLevel)
 	}
+	c.mu.Unlock()
 	return nil
 }
 
-func (c *sharedConfig) isEnabled(component string, level zapcore.Level) bool {
-	filterLevel := c.level.Level()
-	if component != "" {
-		if compLevel, ok := c.componentLevels.Load(component); ok {
-			filterLevel = compLevel.(zapcore.Level)
+// ensure we have an atomic level in the map representing the full component path
+// this makes it possible to update the log level after the fact
+func (c *sharedConfig) setEffectiveLevel(component string) zap.AtomicLevel {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if compLevel, ok := c.componentLevels[component]; ok {
+		return compLevel
+	}
+
+	// search up the hierarchy to find the first level that is set
+	atomicLevel := zap.NewAtomicLevelAt(c.level.Level())
+	c.componentLevels[component] = atomicLevel
+	parts := strings.Split(component, ".")
+	for len(parts) > 0 {
+		search := strings.Join(parts, ".")
+		if compLevel, ok := c.config.ComponentLevels[search]; ok {
+			atomicLevel.SetLevel(ParseZapLevel(compLevel))
+			return atomicLevel
 		}
+		parts = parts[:len(parts)-1]
 	}
-	if level < filterLevel {
-		return false
-	}
-	return true
+	return atomicLevel
 }
 
 type ZapLogger struct {
@@ -134,6 +163,7 @@ type ZapLogger struct {
 	component string
 	// use a nested field as pointer so that all loggers share the same sharedConfig
 	sharedConfig   *sharedConfig
+	level          zap.AtomicLevel
 	SampleDuration time.Duration
 	SampleInitial  int
 	SampleInterval int
@@ -143,6 +173,7 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 	sc := newSharedConfig(conf)
 	zl := &ZapLogger{
 		sharedConfig:   sc,
+		level:          sc.level,
 		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
 		SampleInitial:  conf.ItemSampleInitial,
 		SampleInterval: conf.ItemSampleInterval,
@@ -270,6 +301,7 @@ func (l *ZapLogger) WithComponent(component string) Logger {
 	} else {
 		dup.component = dup.component + "." + component
 	}
+	dup.level = dup.sharedConfig.setEffectiveLevel(dup.component)
 	return dup
 }
 
@@ -310,7 +342,7 @@ func (l *ZapLogger) WithoutSampler() Logger {
 }
 
 func (l *ZapLogger) isEnabled(level zapcore.Level) bool {
-	return l.sharedConfig.isEnabled(l.component, level)
+	return level >= l.level.Level()
 }
 
 type LogRLogger logr.Logger
