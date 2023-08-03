@@ -33,6 +33,8 @@ service Ingress {
 
 message CreateIngressRequest {
   IngressInput input_type = 1;
+  // Where to pull media from, only for URL input type
+  string url = 9;
   // User provided identifier for the ingress
   string name = 2;
   // room to publish to
@@ -50,9 +52,9 @@ message CreateIngressRequest {
 enum IngressInput {
   RTMP_INPUT = 0;
   WHIP_INPUT = 1;
-  //  FILE_INPUT = 2;
-  //  SRT_INPUT = 3;
-  //  URL_INPUT = 4;
+  URL_INPUT = 2; // Pull from the provided URL. Only HTTP url are supported, serving either a single media file or a HLS stream
+  //  FILE_INPUT = 3;
+  //  SRT_INPUT = 4;
 }
 
 message IngressAudioOptions {
@@ -106,7 +108,7 @@ message IngressInfo {
   string ingress_id = 1;
   string name = 2;
   string stream_key = 3;
-  string url = 4;
+  string url = 4; // URL to point the encoder to for push (RTMP, WHIP), or location to pull media from for pull (URL)
   // for RTMP input, it'll be a rtmp:// URL
   // for FILE input, it'll be a http:// URL
   // for SRT input, it'll be a srt:// URL

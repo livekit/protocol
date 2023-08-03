@@ -38,6 +38,7 @@ const (
 	RPCPrefix          = "RPC_"
 	WHIPResourcePrefix = "WH_"
 	RTMPResourcePrefix = "RT_"
+	URLResourcePrefix  = "UR_"
 )
 
 func NewGuid(prefix string) string {
