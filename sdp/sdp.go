@@ -136,7 +136,6 @@ func ExtractICECredential(desc *sdp.SessionDescription) (string, string, error) 
 }
 
 func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
-	// last video is pending for publish, set codec preference
 	var streamID string
 	msid, ok := media.Attribute(sdp.AttrKeyMsid)
 	if !ok {
