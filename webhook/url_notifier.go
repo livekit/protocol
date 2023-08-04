@@ -1,3 +1,17 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package webhook
 
 import (
@@ -49,6 +63,7 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 		params: params,
 		client: retryablehttp.NewClient(),
 	}
+	n.client.Logger = &logAdapter{logger: params.Logger.WithCallDepth(1)}
 	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
 		DropWhenFull: true,
@@ -121,4 +136,24 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
 	}
 	_ = res.Body.Close()
 	return nil
+}
+
+type logAdapter struct {
+	logger logger.Logger
+}
+
+func (l *logAdapter) Error(msg string, keysAndValues ...interface{}) {
+	l.logger.Errorw(msg, nil, keysAndValues...)
+}
+
+func (l *logAdapter) Info(msg string, keysAndValues ...interface{}) {
+	l.logger.Infow(msg, keysAndValues...)
+}
+
+func (l *logAdapter) Debug(msg string, keysAndValues ...interface{}) {
+	l.logger.Debugw(msg, keysAndValues...)
+}
+
+func (l *logAdapter) Warn(msg string, keysAndValues ...interface{}) {
+	l.logger.Warnw(msg, nil, keysAndValues...)
 }

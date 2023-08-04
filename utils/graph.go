@@ -1,9 +1,25 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package utils
 
 import (
 	"container/heap"
 	"log"
 	"math"
+
+	"github.com/gammazero/deque"
 )
 
 type GraphNodeProps[K comparable] interface {
@@ -15,14 +31,16 @@ type GraphEdgeProps interface {
 }
 
 type Graph[K comparable, N GraphNodeProps[K], E GraphEdgeProps] struct {
-	nodesByID map[K]*GraphNode[N]
-	nodes     []*GraphNode[N]
-	edges     [][]*GraphEdge[N, E]
+	nodesByID   map[K]*GraphNode[N]
+	freeIndices *deque.Deque[int]
+	nodes       []*GraphNode[N]
+	edges       [][]*GraphEdge[N, E]
 }
 
 func NewGraph[K comparable, N GraphNodeProps[K], E GraphEdgeProps]() *Graph[K, N, E] {
 	return &Graph[K, N, E]{
-		nodesByID: map[K]*GraphNode[N]{},
+		nodesByID:   map[K]*GraphNode[N]{},
+		freeIndices: deque.New[int](0),
 	}
 }
 
@@ -36,19 +54,44 @@ func (g *Graph[K, N, E]) InsertNode(props N) {
 		return
 	}
 
-	i := len(g.nodes)
+	var i int
+	if g.freeIndices.Len() != 0 {
+		i = g.freeIndices.PopBack()
+	} else {
+		i = len(g.nodes)
+		g.nodes = append(g.nodes, nil)
+		for j := range g.edges {
+			g.edges[j] = append(g.edges[j], nil)
+		}
+		g.edges = append(g.edges, make([]*GraphEdge[N, E], len(g.nodes)))
+	}
+
 	n := &GraphNode[N]{
 		i:     i,
 		props: props,
 	}
 
-	g.nodes = append(g.nodes, n)
+	g.nodes[i] = n
 	g.nodesByID[props.ID()] = n
+}
 
-	for i := range g.edges {
-		g.edges[i] = append(g.edges[i], nil)
+func (g *Graph[K, N, E]) DeleteNode(id K) {
+	n, ok := g.nodesByID[id]
+	if !ok {
+		return
 	}
-	g.edges = append(g.edges, make([]*GraphEdge[N, E], len(g.nodes)))
+
+	delete(g.nodesByID, id)
+	g.nodes[n.i] = nil
+
+	for _, es := range g.edges {
+		es[n.i] = nil
+	}
+	for j := range g.edges[n.i] {
+		g.edges[n.i][j] = nil
+	}
+
+	g.freeIndices.PushBack(n.i)
 }
 
 func (g *Graph[K, N, E]) InsertEdge(src, dst K, props E) {
@@ -65,23 +108,47 @@ func (g *Graph[K, N, E]) DeleteEdge(src, dst K) {
 	g.edges[s.i][d.i] = nil
 }
 
-func (g *Graph[K, N, E]) Node(id K) N {
-	return g.nodesByID[id].props
+func (g *Graph[K, N, E]) HasNode(id K) bool {
+	return g.nodesByID[id] != nil
 }
 
-func (g *Graph[K, N, E]) Edge(src, dst K) (p E, ok bool) {
+func (g *Graph[K, N, E]) Node(id K) (props N) {
+	n := g.nodesByID[id]
+	if n == nil {
+		return
+	}
+	return n.props
+}
+
+func (g *Graph[K, N, E]) HasEdge(src, dst K) bool {
 	s := g.nodesByID[src]
 	d := g.nodesByID[dst]
+	if s == nil || d == nil {
+		return false
+	}
+
+	return g.edges[s.i][d.i] != nil
+}
+
+func (g *Graph[K, N, E]) Edge(src, dst K) (p E) {
+	s := g.nodesByID[src]
+	d := g.nodesByID[dst]
+	if s == nil || d == nil {
+		return
+	}
 
 	e := g.edges[s.i][d.i]
 	if e == nil {
 		return
 	}
-	return e.props, true
+	return e.props
 }
 
 func (g *Graph[K, N, E]) OutEdges(src K) map[K]E {
 	s := g.nodesByID[src]
+	if s == nil {
+		return nil
+	}
 
 	edges := make(map[K]E, len(g.nodes))
 	for i, e := range g.edges[s.i] {
@@ -94,6 +161,9 @@ func (g *Graph[K, N, E]) OutEdges(src K) map[K]E {
 
 func (g *Graph[K, N, E]) InEdges(dst K) map[K]E {
 	d := g.nodesByID[dst]
+	if d == nil {
+		return nil
+	}
 
 	edges := make(map[K]E, len(g.nodes))
 	for i, es := range g.edges {
@@ -110,6 +180,9 @@ func (g *Graph[K, N, E]) ShortestPath(src, dst K) ([]N, int64) {
 
 	s := g.nodesByID[src]
 	d := g.nodesByID[dst]
+	if s == nil || d == nil {
+		return nil, 0
+	}
 
 	path := &graphPath[N]{node: s}
 	heap.Push(paths, path)

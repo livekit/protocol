@@ -1,3 +1,17 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package utils
 
 import (
@@ -6,22 +20,22 @@ import (
 	"github.com/mackerelio/go-osstat/cpu"
 )
 
-type osstatCPUMonitor struct {
+type osStatCPUMonitor struct {
 	prev *cpu.Stats
 }
 
-func newOsstatCPUMonitor() (*osstatCPUMonitor, error) {
+func newOSStatCPUMonitor() (*osStatCPUMonitor, error) {
 	stats, err := cpu.Get()
 	if err != nil {
 		return nil, err
 	}
 
-	return &osstatCPUMonitor{
+	return &osStatCPUMonitor{
 		prev: stats,
 	}, nil
 }
 
-func (p *osstatCPUMonitor) getCPUIdle() (float64, error) {
+func (p *osStatCPUMonitor) getCPUIdle() (float64, error) {
 	next, err := cpu.Get()
 	if err != nil {
 		return 0, err
@@ -29,9 +43,9 @@ func (p *osstatCPUMonitor) getCPUIdle() (float64, error) {
 	idleRatio := float64(next.Idle-p.prev.Idle) / float64(next.Total-p.prev.Total)
 	p.prev = next
 
-	return float64(p.numCPU()) * idleRatio, nil
+	return p.numCPU() * idleRatio, nil
 }
 
-func (p *osstatCPUMonitor) numCPU() int {
-	return runtime.NumCPU()
+func (p *osStatCPUMonitor) numCPU() float64 {
+	return float64(runtime.NumCPU())
 }

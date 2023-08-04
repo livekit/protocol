@@ -1,3 +1,17 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 syntax = "proto3";
 
 package livekit;
@@ -19,8 +33,9 @@ message Room {
   uint32 num_participants = 9;
   uint32 num_publishers = 11;
   bool active_recording = 10;
+  PlayoutDelay playout_delay = 12;
 
-  // NEXT-ID: 12
+  // NEXT-ID: 13
 }
 
 message Codec {
@@ -40,6 +55,11 @@ enum VideoCodec {
   H264_MAIN = 2;
   H264_HIGH = 3;
   VP8 = 4;
+}
+
+message PlayoutDelay {
+  bool enabled = 1;
+  uint32 min = 2;
 }
 
 message ParticipantPermission {
@@ -142,6 +162,7 @@ message TrackInfo {
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
   Encryption.Type encryption = 16;
+  string stream = 17;
 }
 
 enum VideoQuality {
@@ -237,6 +258,8 @@ message ClientInfo {
      UNITY = 6;
      REACT_NATIVE = 7;
      RUST = 8;
+     PYTHON = 9;
+     CPP = 10;
   }
 
   SDK sdk = 1;
@@ -274,7 +297,10 @@ message VideoConfiguration {
 }
 
 message DisabledCodecs {
+  // disabled for both publish and subscribe
   repeated Codec codecs = 1;
+  // only disable for publish
+  repeated Codec publish = 2;
 }
 
 enum DisconnectReason {
@@ -359,7 +385,7 @@ message TimedVersion {
 }
 
 enum ReconnectReason {
-  RR_UNKOWN = 0;
+  RR_UNKNOWN = 0;
   RR_SIGNAL_DISCONNECTED = 1;
   RR_PUBLISHER_FAILED = 2;
   RR_SUBSCRIBER_FAILED = 3;
@@ -370,6 +396,12 @@ enum SubscriptionStatus {
   Unsubscribed = 0;
   Desired = 1;
   Subscribed = 2;
+}
+
+enum SubscriptionError {
+  SE_UNKNOWN = 0;
+  SE_CODEC_UNSUPPORTED = 1;
+  SE_TRACK_NOTFOUND = 2;
 }
 
 message ClientReport {

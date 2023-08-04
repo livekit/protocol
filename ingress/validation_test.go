@@ -1,3 +1,17 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package ingress
 
 import (
@@ -48,6 +62,42 @@ func TestValidate(t *testing.T) {
 	info.Audio.Source = livekit.TrackSource_SCREEN_SHARE_AUDIO
 	err = Validate(info)
 	require.NoError(t, err)
+}
+
+func TestValidateBypassTranscoding(t *testing.T) {
+	info := &livekit.IngressInfo{}
+
+	err := ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.BypassTranscoding = true
+	err = ValidateBypassTranscoding(info)
+	require.Error(t, err)
+
+	info.InputType = livekit.IngressInput_WHIP_INPUT
+	err = ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.Video = &livekit.IngressVideoOptions{}
+	err = ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.Video.EncodingOptions = &livekit.IngressVideoOptions_Preset{}
+	err = ValidateBypassTranscoding(info)
+	require.Error(t, err)
+
+	info.Video = nil
+
+	info.Audio = &livekit.IngressAudioOptions{}
+	err = ValidateBypassTranscoding(info)
+	require.NoError(t, err)
+
+	info.Audio.EncodingOptions = &livekit.IngressAudioOptions_Options{
+		Options: &livekit.IngressAudioEncodingOptions{},
+	}
+	err = ValidateBypassTranscoding(info)
+	require.Error(t, err)
+
 }
 
 func TestValidateVideoOptionsConsistency(t *testing.T) {

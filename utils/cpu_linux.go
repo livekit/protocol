@@ -1,3 +1,17 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 //go:build linux
 
 package utils
@@ -22,19 +36,20 @@ const (
 	cpuStatsPathV1 = "/sys/fs/cgroup/cpu,cpuacct/cpuacct.usage"
 	cpuStatsPathV2 = "/sys/fs/cgroup/cpu.stat"
 
-	numCPUPathV1 = "/sys/fs/cgroup/cpu,cpuacct/cpuacct.usage_percpu"
-	numCPUPathV2 = "/sys/fs/cgroup/cpu.max"
+	numCPUPathV1Period = "/sys/fs/cgroup/cpu/cpu.cfs_period_us"
+	numCPUPathV1Quota  = "/sys/fs/cgroup/cpu/cpu.cfs_quota_us"
+	numCPUPathV2       = "/sys/fs/cgroup/cpu.max"
 )
 
 type cpuInfoGetter interface {
 	getTotalCPUTime() (int64, error)
-	numCPU() (int, error)
+	numCPU() (float64, error)
 }
 
 type cgroupCPUMonitor struct {
 	lastSampleTime   int64
 	lastTotalCPUTime int64
-	nCPU             int
+	nCPU             float64
 
 	cg cpuInfoGetter
 }
@@ -57,7 +72,7 @@ func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 	}
 	if cg == nil {
 		logger.Infow("failed reading cgroup specific cpu stats, falling back to system wide implementation")
-		return newOsstatCPUMonitor()
+		return newOSStatCPUMonitor()
 	}
 
 	cpu, err := cg.getTotalCPUTime()
@@ -89,11 +104,11 @@ func (p *cgroupCPUMonitor) getCPUIdle() (float64, error) {
 	cpuTime := next - p.lastTotalCPUTime
 
 	busyRatio := float64(cpuTime) / float64(duration)
-	idleRatio := float64(p.nCPU) - busyRatio
+	idleRatio := p.nCPU - busyRatio
 
 	// Clamp the value as we do not get all the timestamps at the same time
-	if idleRatio > float64(p.nCPU) {
-		idleRatio = float64(p.nCPU)
+	if idleRatio > p.nCPU {
+		idleRatio = p.nCPU
 	} else if idleRatio < 0 {
 		idleRatio = 0
 	}
@@ -104,12 +119,11 @@ func (p *cgroupCPUMonitor) getCPUIdle() (float64, error) {
 	return idleRatio, nil
 }
 
-func (p *cgroupCPUMonitor) numCPU() int {
+func (p *cgroupCPUMonitor) numCPU() float64 {
 	return p.nCPU
 }
 
-type cpuInfoGetterV1 struct {
-}
+type cpuInfoGetterV1 struct{}
 
 func newCpuInfoGetterV1() cpuInfoGetter {
 	return &cpuInfoGetterV1{}
@@ -130,35 +144,36 @@ func (cg *cpuInfoGetterV1) getTotalCPUTime() (int64, error) {
 	return i, nil
 }
 
-func (cg *cpuInfoGetterV1) numCPU() (int, error) {
-	b, err := os.ReadFile(numCPUPathV1)
+func (cg *cpuInfoGetterV1) numCPU() (float64, error) {
+	quota, err := readIntFromFile(numCPUPathV1Quota)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// File may not exist in case of no quota
+			return float64(runtime.NumCPU()), nil
+		}
+
+		return 0, err
+	}
+
+	if quota < 0 {
+		// default
+		return float64(runtime.NumCPU()), nil
+	}
+
+	period, err := readIntFromFile(numCPUPathV1Period)
 	if err != nil {
 		return 0, err
 	}
 
-	// Remove trailing new line if any
-	s := strings.TrimSuffix(string(b), "\n")
-
-	// Remove trailing space if any
-	s = strings.TrimSuffix(s, " ")
-
-	m := strings.Split(s, " ")
-	if len(m) == 0 {
-		return 0, errors.New("could not parse cpu stats")
+	if period <= 0 {
+		// default
+		return float64(runtime.NumCPU()), nil
 	}
 
-	cpuCount := 0
-	for _, v := range m {
-		if v != "0" {
-			cpuCount++
-		}
-	}
-
-	return cpuCount, nil
+	return float64(quota) / float64(period), nil
 }
 
-type cpuInfoGetterV2 struct {
-}
+type cpuInfoGetterV2 struct{}
 
 func newCpuInfoGetterV2() cpuInfoGetter {
 	return &cpuInfoGetterV2{}
@@ -180,13 +195,17 @@ func (cg *cpuInfoGetterV2) getTotalCPUTime() (int64, error) {
 		return 0, err
 	}
 
-	// Caller expexts time in ns
+	// Caller expects time in ns
 	return i * 1000, nil
 }
 
-func (cg *cpuInfoGetterV2) numCPU() (int, error) {
+func (cg *cpuInfoGetterV2) numCPU() (float64, error) {
 	b, err := os.ReadFile(numCPUPathV2)
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			// File may not exist in case of no quota
+			return float64(runtime.NumCPU()), nil
+		}
 		return 0, err
 	}
 
@@ -199,20 +218,20 @@ func (cg *cpuInfoGetterV2) numCPU() (int, error) {
 
 	if m[0] == "max" {
 		// No quota
-		return runtime.NumCPU(), nil
-	} else {
-		n, err := strconv.ParseInt(string(m[0]), 10, 64)
-		if err != nil {
-			return 0, err
-		}
-
-		d, err := strconv.ParseInt(string(m[1]), 10, 64)
-		if err != nil {
-			return 0, err
-		}
-
-		return int(n / d), nil
+		return float64(runtime.NumCPU()), nil
 	}
+
+	quota, err := strconv.ParseInt(string(m[0]), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	period, err := strconv.ParseInt(string(m[1]), 10, 64)
+	if err != nil {
+		return 0, err
+	}
+
+	return float64(quota) / float64(period), nil
 }
 
 func fileExists(path string) (bool, error) {
@@ -225,4 +244,19 @@ func fileExists(path string) (bool, error) {
 	default:
 		return false, err
 	}
+}
+
+func readIntFromFile(filename string) (int, error) {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return 0, err
+	}
+
+	// Remove trailing new line if any
+	s := strings.TrimSuffix(string(b), "\n")
+
+	// Remove trailing space if any
+	s = strings.TrimSuffix(s, " ")
+
+	return strconv.Atoi(s)
 }

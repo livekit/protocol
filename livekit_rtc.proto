@@ -1,3 +1,17 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 syntax = "proto3";
 
 package livekit;
@@ -80,6 +94,8 @@ message SignalResponse {
     ReconnectResponse reconnect = 19;
     // respond to Ping
     Pong pong_resp = 20;
+    // Subscription response, client should not expect any media from this subscription if it fails
+    SubscriptionResponse subscription_response = 21;
   }
 }
 
@@ -119,6 +135,9 @@ message AddTrackRequest {
   bool disable_red = 13;
 
   Encryption.Type encryption = 14;
+  // which stream the track belongs to, used to group tracks together.
+  // if not specified, server will infer it from track source to bundle camera/microphone, screenshare/audio together
+  string stream = 15;
 }
 
 message TrickleRequest {
@@ -355,4 +374,9 @@ message RegionInfo {
   string region = 1;
   string url = 2;
   int64 distance = 3;
+}
+
+message SubscriptionResponse {
+  string track_sid = 1;
+  SubscriptionError err = 2;
 }
