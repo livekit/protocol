@@ -478,6 +478,6 @@ message ClientReport {
   repeated AudioPublicationReport audioPublications = 1;
   repeated VideoPublicationReport videoPublications = 2;
   repeated AudioSubscriptionReport audioSubscriptions = 3;
-  repeated VideoSubscriptionReport videoSubscriptions = 3;
+  repeated VideoSubscriptionReport videoSubscriptions = 4;
 
 }
