@@ -412,8 +412,9 @@ message ClientReport {
 
   message RTCReceiverStats {
     // inbound-rtp
-    uint32 nack_count = 1;
-    double last_packet_received_timestamp = 2;
+    double last_packet_received_timestamp = 1;
+    double jitter = 2;
+    int64 packets_lost = 3;
   }
 
   message RTCVideoReceiverStats {
