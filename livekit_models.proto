@@ -250,6 +250,7 @@ message ClientInfo {
   string address = 9;
   // wifi, wired, cellular, vpn, empty if not known
   string network = 10;
+  int32 concurrency = 11;
 }
 
 // server provided client configuration
