@@ -374,9 +374,8 @@ enum SubscriptionStatus {
 message ClientReport {
 
   message RTCSenderStats {
-    // candidate-pair
+    // ice-candidate-pair
     uint32 available_outgoing_bitrate = 1;
-    uint32 current_round_trip_time = 2;
     // local-candidate
     string networkType = 3;
     // outbound-rtp
@@ -391,8 +390,8 @@ message ClientReport {
   message RTCAudioSenderStats {
    RTCSenderStats common_stats = 1;
    // media-source
-   float total_audio_energy = 2;
-   float total_samples_duration = 3;
+   double total_audio_energy = 2;
+   double total_samples_duration = 3;
   }
 
   message RTCVideoSenderStats {
@@ -412,9 +411,32 @@ message ClientReport {
   }
 
   message RTCReceiverStats {
-    int32 jitter = 1;
-    int32 freeze_count = 2;
-    int32 total_freeze_duration = 3;
+    // inbound-rtp
+    uint32 nack_count = 1;
+    double last_packet_received_timestamp = 2;
+  }
+
+  message RTCVideoReceiverStats {
+    RTCReceiverStats common_stats = 1;
+
+    // inbound-rtp
+    uint32 pli_count = 2;
+    uint32 sli_count = 3;
+    uint32 frames_decoded = 4;
+    uint32 frames_dropped = 5;
+    double total_decode_time = 6;
+    uint32 pause_count = 7;
+    double total_pauses_duration = 8;
+    uint32 freeze_count = 9;
+    double total_freezes_duration = 10;
+    uint32 fir_count = 11;
+    string decoder_implementation = 12;
+    bool power_efficient_decoder = 13;
+  }
+
+  message RTCAudioReceiverStats {
+    RTCReceiverStats common_stats = 1;
+    uint32 concealed_samples = 2;
   }
 
   message AudioPublicationReport {
@@ -433,17 +455,27 @@ message ClientReport {
     bool muted = 5;
   }
 
-  message SubscriptionReport {
+  message AudioSubscriptionReport {
     string sid = 1;
-    repeated RTCReceiverStats rtc_stats = 2;
+    RTCAudioReceiverStats rtc_stats = 2;
     int32 ready_state = 3;
     SubscriptionStatus subscription_status = 4;
     bool allowed = 5;
-    int32 width = 6;
-    int32 height = 7;
+  }
+
+  message VideoSubscriptionReport {
+    string sid = 1;
+    RTCVideoReceiverStats rtc_stats = 2;
+    int32 ready_state = 3;
+    SubscriptionStatus subscription_status = 4;
+    bool allowed = 5;
+    uint32 width = 6;
+    uint32 height = 7;
   }
 
   repeated AudioPublicationReport audioPublications = 1;
   repeated VideoPublicationReport videoPublications = 2;
-  repeated SubscriptionReport subscriptions = 3;
+  repeated AudioSubscriptionReport audioSubscriptions = 3;
+  repeated VideoSubscriptionReport videoSubscriptions = 3;
+
 }
