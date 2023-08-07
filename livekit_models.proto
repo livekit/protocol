@@ -410,14 +410,11 @@ message ClientReport {
     // ice-candidate-pair
     uint32 available_outgoing_bitrate = 1;
     // local-candidate
-    string networkType = 3;
+    string network_type = 2;
     // outbound-rtp
-    uint64 packetsSent = 4;
-    uint32 packetsLost = 5;
-    uint32 nack_count = 6;    
-    uint32 retransmitted_packets_sent = 7;
-    uint64 timestamp = 8;
-    string stream_id = 9;
+    uint32 nack_count = 3;    
+    uint64 timestamp = 4;
+    string stream_id = 5;
   }
 
   message RTCAudioSenderStats {
@@ -434,13 +431,11 @@ message ClientReport {
     string quality_limitation_reason = 3;
     uint32 quality_limitation_resolution_changes = 4;
     string scalability_mode = 5;
-    uint32 frame_height = 6;
-    uint32 frame_width = 7;
-    uint32 frames_per_second = 8;
-    uint64 frames_sent = 9;
-    uint32 huge_frames_sent = 10;
-    string encoder_implementation = 11;
-    bool power_efficient_encoder = 12;
+    uint32 frames_per_second = 6;
+    uint64 frames_sent = 7;
+    uint32 huge_frames_sent = 8;
+    string encoder_implementation = 9;
+    bool power_efficient_encoder = 10;
   }
 
   message RTCReceiverStats {
@@ -448,6 +443,8 @@ message ClientReport {
     double last_packet_received_timestamp = 1;
     double jitter = 2;
     int64 packets_lost = 3;
+    uint64 timestamp = 4;
+    string stream_id = 5;
   }
 
   message RTCVideoReceiverStats {
@@ -470,23 +467,22 @@ message ClientReport {
 
   message RTCAudioReceiverStats {
     RTCReceiverStats common_stats = 1;
-    uint32 concealed_samples = 2;
+    uint64 total_samples_received = 2;
+    uint64 concealed_samples = 3;
   }
 
   message AudioPublicationReport {
     string sid = 1;
     RTCAudioSenderStats rtc_stats = 2;
     int32 ready_state = 3;
-    string label = 4;
-    bool muted = 5;
+    bool muted = 4;
   }
 
   message VideoPublicationReport {
     string sid = 1;
     RTCVideoSenderStats rtc_stats = 2;
     int32 ready_state = 3;
-    string label = 4;
-    bool muted = 5;
+    bool muted = 4;
   }
 
   message AudioSubscriptionReport {
@@ -503,8 +499,6 @@ message ClientReport {
     int32 ready_state = 3;
     SubscriptionStatus subscription_status = 4;
     bool allowed = 5;
-    uint32 width = 6;
-    uint32 height = 7;
   }
 
   repeated AudioPublicationReport audioPublications = 1;
