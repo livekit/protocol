@@ -30,16 +30,28 @@ const (
 	Unknown = "unknown"
 )
 
-func GetTypes(info *livekit.EgressInfo) (string, string) {
-	switch req := info.Request.(type) {
+type EncodedOutput interface {
+	GetFileOutputs() []*livekit.EncodedFileOutput
+	GetStreamOutputs() []*livekit.StreamOutput
+	GetSegmentOutputs() []*livekit.SegmentedFileOutput
+}
+
+type EncodedOutputDeprecated interface {
+	GetFile() *livekit.EncodedFileOutput
+	GetStream() *livekit.StreamOutput
+	GetSegments() *livekit.SegmentedFileOutput
+}
+
+func GetTypes(request interface{}) (string, string) {
+	switch req := request.(type) {
 	case *livekit.EgressInfo_RoomComposite:
-		return EgressTypeRoomComposite, getOutputType(req.RoomComposite)
+		return EgressTypeRoomComposite, GetOutputType(req.RoomComposite)
 
 	case *livekit.EgressInfo_Web:
-		return EgressTypeWeb, getOutputType(req.Web)
+		return EgressTypeWeb, GetOutputType(req.Web)
 
 	case *livekit.EgressInfo_TrackComposite:
-		return EgressTypeTrackComposite, getOutputType(req.TrackComposite)
+		return EgressTypeTrackComposite, GetOutputType(req.TrackComposite)
 
 	case *livekit.EgressInfo_Track:
 		switch req.Track.Output.(type) {
@@ -53,14 +65,7 @@ func GetTypes(info *livekit.EgressInfo) (string, string) {
 	return Unknown, Unknown
 }
 
-func getOutputType(req interface {
-	GetFile() *livekit.EncodedFileOutput
-	GetStream() *livekit.StreamOutput
-	GetSegments() *livekit.SegmentedFileOutput
-	GetFileOutputs() []*livekit.EncodedFileOutput
-	GetStreamOutputs() []*livekit.StreamOutput
-	GetSegmentOutputs() []*livekit.SegmentedFileOutput
-}) string {
+func GetOutputType(req EncodedOutput) string {
 	hasFile := len(req.GetFileOutputs()) > 0
 	hasStream := len(req.GetStreamOutputs()) > 0
 	hasSegments := len(req.GetSegmentOutputs()) > 0
@@ -68,12 +73,24 @@ func getOutputType(req interface {
 	switch {
 	case (hasFile && (hasStream || hasSegments)) || (hasStream && hasSegments):
 		return OutputTypeMultiple
-	case hasFile || req.GetFile() != nil:
+	case hasFile:
 		return OutputTypeFile
-	case hasStream || req.GetStream() != nil:
+	case hasStream:
 		return OutputTypeStream
-	case hasSegments || req.GetSegments() != nil:
+	case hasSegments:
 		return OutputTypeSegments
+	default:
+		if r, ok := req.(EncodedOutputDeprecated); ok {
+			if r.GetFile() != nil {
+				return OutputTypeFile
+			}
+			if r.GetStream() != nil {
+				return OutputTypeStream
+			}
+			if r.GetSegments() != nil {
+				return OutputTypeSegments
+			}
+		}
 	}
 
 	return Unknown
