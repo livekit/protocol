@@ -97,24 +97,5 @@ func GetOutputType(req EncodedOutput) string {
 		}
 	}
 
-	if r, ok := req.(interface {
-		GetFile() *livekit.EncodedFileOutput
-		GetStream() *livekit.StreamOutput
-		GetSegments() *livekit.SegmentedFileOutput
-		GetFileOutputs() []*livekit.EncodedFileOutput
-		GetStreamOutputs() []*livekit.StreamOutput
-		GetSegmentOutputs() []*livekit.SegmentedFileOutput
-	}); ok {
-		if r.GetFile() != nil {
-			return OutputTypeFile
-		}
-		if r.GetStream() != nil {
-			return OutputTypeStream
-		}
-		if r.GetSegments() != nil {
-			return OutputTypeSegments
-		}
-	}
-
 	return Unknown
 }
