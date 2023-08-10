@@ -143,7 +143,7 @@ type logAdapter struct {
 }
 
 func (l *logAdapter) Error(msg string, keysAndValues ...interface{}) {
-	l.logger.Errorw(msg, nil, keysAndValues...)
+	l.logger.Warnw(msg, nil, keysAndValues...)
 }
 
 func (l *logAdapter) Info(msg string, keysAndValues ...interface{}) {
