@@ -74,8 +74,15 @@ message CreateRoomRequest {
   string metadata = 5;
   // egress
   RoomEgress egress = 6;
-  // minimum playout delay of subscriber
+  // minimum playout delay when receiving remote media
+  // this is used to smooth out network jitters, and reduces freezes/stutters when a user's network experiences blips
   uint32 min_playout_delay = 7;
+
+  optional AppMode app_mode = 8;
+
+  repeated Codec enabled_codecs = 9;
+
+  // NEXT_ID: 10
 }
 
 message RoomEgress {
