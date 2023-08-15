@@ -273,6 +273,7 @@ message ClientInfo {
   string address = 9;
   // wifi, wired, cellular, vpn, empty if not known
   string network = 10;
+  int32 concurrency = 11;
 }
 
 // server provided client configuration
@@ -391,8 +392,118 @@ enum ReconnectReason {
   RR_SWITCH_CANDIDATE = 4;
 }
 
+enum SubscriptionStatus {
+  Unsubscribed = 0;
+  Desired = 1;
+  Subscribed = 2;
+}
+
 enum SubscriptionError {
   SE_UNKNOWN = 0;
   SE_CODEC_UNSUPPORTED = 1;
   SE_TRACK_NOTFOUND = 2;
+}
+
+message ClientReport {
+
+  message RTCSenderStats {
+    // ice-candidate-pair
+    uint32 available_outgoing_bitrate = 1;
+    // local-candidate
+    string network_type = 2;
+    // outbound-rtp
+    uint32 nack_count = 3;    
+    uint64 timestamp = 4;
+    string stream_id = 5;
+  }
+
+  message RTCAudioSenderStats {
+   RTCSenderStats common_stats = 1;
+   // media-source
+   double total_audio_energy = 2;
+   double total_samples_duration = 3;
+  }
+
+  message RTCVideoSenderStats {
+   RTCSenderStats common_stats = 1;
+    // outbound-rtp
+    map<string, uint32> quality_limitation_durations = 2;
+    string quality_limitation_reason = 3;
+    uint32 quality_limitation_resolution_changes = 4;
+    string scalability_mode = 5;
+    uint32 frames_per_second = 6;
+    uint64 frames_sent = 7;
+    uint32 huge_frames_sent = 8;
+    string encoder_implementation = 9;
+    bool power_efficient_encoder = 10;
+  }
+
+  message RTCReceiverStats {
+    // inbound-rtp
+    double last_packet_received_timestamp = 1;
+    double jitter = 2;
+    int64 packets_lost = 3;
+    uint64 timestamp = 4;
+    string stream_id = 5;
+  }
+
+  message RTCVideoReceiverStats {
+    RTCReceiverStats common_stats = 1;
+
+    // inbound-rtp
+    uint32 pli_count = 2;
+    uint32 sli_count = 3;
+    uint32 frames_decoded = 4;
+    uint32 frames_dropped = 5;
+    double total_decode_time = 6;
+    uint32 pause_count = 7;
+    double total_pauses_duration = 8;
+    uint32 freeze_count = 9;
+    double total_freezes_duration = 10;
+    uint32 fir_count = 11;
+    string decoder_implementation = 12;
+    bool power_efficient_decoder = 13;
+  }
+
+  message RTCAudioReceiverStats {
+    RTCReceiverStats common_stats = 1;
+    uint64 total_samples_received = 2;
+    uint64 concealed_samples = 3;
+  }
+
+  message AudioPublicationReport {
+    string sid = 1;
+    RTCAudioSenderStats rtc_stats = 2;
+    int32 ready_state = 3;
+    bool muted = 4;
+  }
+
+  message VideoPublicationReport {
+    string sid = 1;
+    RTCVideoSenderStats rtc_stats = 2;
+    int32 ready_state = 3;
+    bool muted = 4;
+  }
+
+  message AudioSubscriptionReport {
+    string sid = 1;
+    RTCAudioReceiverStats rtc_stats = 2;
+    int32 ready_state = 3;
+    SubscriptionStatus subscription_status = 4;
+    bool allowed = 5;
+  }
+
+  message VideoSubscriptionReport {
+    string sid = 1;
+    RTCVideoReceiverStats rtc_stats = 2;
+    int32 ready_state = 3;
+    SubscriptionStatus subscription_status = 4;
+    bool allowed = 5;
+  }
+
+  repeated AudioPublicationReport audioPublications = 1;
+  repeated VideoPublicationReport videoPublications = 2;
+  repeated AudioSubscriptionReport audioSubscriptions = 3;
+  repeated VideoSubscriptionReport videoSubscriptions = 4;
+
 }
