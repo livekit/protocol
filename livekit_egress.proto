@@ -86,15 +86,16 @@ message WebEgressRequest {
 
 // record audio and video from a single participant
 message ParticipantEgressRequest {
-  string room_name = 1; // required
-  string identity = 2;  // required
+  string room_name = 1;  // required
+  string identity = 2;   // required
+  bool screen_share = 3; // (default false)
   oneof options {
-    EncodingOptionsPreset preset = 3; // (default H264_720P_30)
-    EncodingOptions advanced = 4;     // (optional)
+    EncodingOptionsPreset preset = 4; // (default H264_720P_30)
+    EncodingOptions advanced = 5;     // (optional)
   }
-  repeated EncodedFileOutput file_outputs = 5;
-  repeated StreamOutput stream_outputs = 6;
-  repeated SegmentedFileOutput segment_outputs = 7;
+  repeated EncodedFileOutput file_outputs = 6;
+  repeated StreamOutput stream_outputs = 7;
+  repeated SegmentedFileOutput segment_outputs = 8;
 }
 
 // containerize up to one audio and one video track
@@ -304,6 +305,8 @@ message EgressInfo {
   repeated StreamInfo stream_results = 15;
   repeated FileInfo file_results = 16;
   repeated SegmentsInfo segment_results = 17;
+
+  // next ID: 20
 }
 
 message StreamInfoList {
