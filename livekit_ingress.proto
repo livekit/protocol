@@ -131,6 +131,7 @@ message IngressState {
     ENDPOINT_BUFFERING = 1;
     ENDPOINT_PUBLISHING = 2;
     ENDPOINT_ERROR = 3;
+    ENDPOINT_COMPLETE = 4;
   }
 
   Status status = 1;
