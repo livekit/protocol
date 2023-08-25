@@ -19,6 +19,7 @@ import "github.com/livekit/protocol/livekit"
 const (
 	EgressTypeRoomComposite  = "room_composite"
 	EgressTypeWeb            = "web"
+	EgressTypeParticipant    = "participant"
 	EgressTypeTrackComposite = "track_composite"
 	EgressTypeTrack          = "track"
 
@@ -49,6 +50,9 @@ func GetTypes(request interface{}) (string, string) {
 
 	case *livekit.EgressInfo_Web:
 		return EgressTypeWeb, GetOutputType(req.Web)
+
+	case *livekit.EgressInfo_Participant:
+		return EgressTypeParticipant, GetOutputType(req.Participant)
 
 	case *livekit.EgressInfo_TrackComposite:
 		return EgressTypeTrackComposite, GetOutputType(req.TrackComposite)
