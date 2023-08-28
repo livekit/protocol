@@ -318,6 +318,19 @@ enum DisconnectReason {
   JOIN_FAILURE = 7;
 }
 
+message RTPDrift {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  double duration = 3;
+
+  uint64 start_timestamp = 4;
+  uint64 end_timestamp = 5;
+  uint64 rtp_clock_ticks = 6;
+  int64 drift_samples = 7;
+  double drift_ms = 8;
+  double clock_rate = 9;
+}
+
 message RTPStats {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
@@ -378,9 +391,12 @@ message RTPStats {
   uint32 layer_lock_plis = 35;
   google.protobuf.Timestamp last_layer_lock_pli = 36;
 
-  double sample_rate = 42;
-  double drift_ms = 43;
-  // NEXT_ID: 44
+  // DEPRECATED double sample_rate = 42;
+  // DEPRECATED double drift_ms = 43;
+
+  RTPDrift packet_drift = 44;
+  RTPDrift report_drift = 45;
+  // NEXT_ID: 46
 }
 
 message TimedVersion {
