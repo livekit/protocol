@@ -2426,6 +2426,117 @@ func (x *DisabledCodecs) GetPublish() []*Codec {
 	return nil
 }
 
+type RTPDrift struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	StartTime      *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	EndTime        *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	Duration       float64                `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	StartTimestamp uint64                 `protobuf:"varint,4,opt,name=start_timestamp,json=startTimestamp,proto3" json:"start_timestamp,omitempty"`
+	EndTimestamp   uint64                 `protobuf:"varint,5,opt,name=end_timestamp,json=endTimestamp,proto3" json:"end_timestamp,omitempty"`
+	RtpClockTicks  uint64                 `protobuf:"varint,6,opt,name=rtp_clock_ticks,json=rtpClockTicks,proto3" json:"rtp_clock_ticks,omitempty"`
+	DriftSamples   int64                  `protobuf:"varint,7,opt,name=drift_samples,json=driftSamples,proto3" json:"drift_samples,omitempty"`
+	DriftMs        float64                `protobuf:"fixed64,8,opt,name=drift_ms,json=driftMs,proto3" json:"drift_ms,omitempty"`
+	ClockRate      float64                `protobuf:"fixed64,9,opt,name=clock_rate,json=clockRate,proto3" json:"clock_rate,omitempty"`
+}
+
+func (x *RTPDrift) Reset() {
+	*x = RTPDrift{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_livekit_models_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RTPDrift) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RTPDrift) ProtoMessage() {}
+
+func (x *RTPDrift) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_models_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RTPDrift.ProtoReflect.Descriptor instead.
+func (*RTPDrift) Descriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *RTPDrift) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
+func (x *RTPDrift) GetEndTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndTime
+	}
+	return nil
+}
+
+func (x *RTPDrift) GetDuration() float64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *RTPDrift) GetStartTimestamp() uint64 {
+	if x != nil {
+		return x.StartTimestamp
+	}
+	return 0
+}
+
+func (x *RTPDrift) GetEndTimestamp() uint64 {
+	if x != nil {
+		return x.EndTimestamp
+	}
+	return 0
+}
+
+func (x *RTPDrift) GetRtpClockTicks() uint64 {
+	if x != nil {
+		return x.RtpClockTicks
+	}
+	return 0
+}
+
+func (x *RTPDrift) GetDriftSamples() int64 {
+	if x != nil {
+		return x.DriftSamples
+	}
+	return 0
+}
+
+func (x *RTPDrift) GetDriftMs() float64 {
+	if x != nil {
+		return x.DriftMs
+	}
+	return 0
+}
+
+func (x *RTPDrift) GetClockRate() float64 {
+	if x != nil {
+		return x.ClockRate
+	}
+	return 0
+}
+
 type RTPStats struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -2472,14 +2583,14 @@ type RTPStats struct {
 	LastKeyFrame         *timestamppb.Timestamp `protobuf:"bytes,34,opt,name=last_key_frame,json=lastKeyFrame,proto3" json:"last_key_frame,omitempty"`
 	LayerLockPlis        uint32                 `protobuf:"varint,35,opt,name=layer_lock_plis,json=layerLockPlis,proto3" json:"layer_lock_plis,omitempty"`
 	LastLayerLockPli     *timestamppb.Timestamp `protobuf:"bytes,36,opt,name=last_layer_lock_pli,json=lastLayerLockPli,proto3" json:"last_layer_lock_pli,omitempty"`
-	SampleRate           float64                `protobuf:"fixed64,42,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
-	DriftMs              float64                `protobuf:"fixed64,43,opt,name=drift_ms,json=driftMs,proto3" json:"drift_ms,omitempty"` // NEXT_ID: 44
+	PacketDrift          *RTPDrift              `protobuf:"bytes,44,opt,name=packet_drift,json=packetDrift,proto3" json:"packet_drift,omitempty"`
+	ReportDrift          *RTPDrift              `protobuf:"bytes,45,opt,name=report_drift,json=reportDrift,proto3" json:"report_drift,omitempty"` // NEXT_ID: 46
 }
 
 func (x *RTPStats) Reset() {
 	*x = RTPStats{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[19]
+		mi := &file_livekit_models_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2492,7 +2603,7 @@ func (x *RTPStats) String() string {
 func (*RTPStats) ProtoMessage() {}
 
 func (x *RTPStats) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[19]
+	mi := &file_livekit_models_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2505,7 +2616,7 @@ func (x *RTPStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTPStats.ProtoReflect.Descriptor instead.
 func (*RTPStats) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{19}
+	return file_livekit_models_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RTPStats) GetStartTime() *timestamppb.Timestamp {
@@ -2795,18 +2906,18 @@ func (x *RTPStats) GetLastLayerLockPli() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *RTPStats) GetSampleRate() float64 {
+func (x *RTPStats) GetPacketDrift() *RTPDrift {
 	if x != nil {
-		return x.SampleRate
+		return x.PacketDrift
 	}
-	return 0
+	return nil
 }
 
-func (x *RTPStats) GetDriftMs() float64 {
+func (x *RTPStats) GetReportDrift() *RTPDrift {
 	if x != nil {
-		return x.DriftMs
+		return x.ReportDrift
 	}
-	return 0
+	return nil
 }
 
 type TimedVersion struct {
@@ -2821,7 +2932,7 @@ type TimedVersion struct {
 func (x *TimedVersion) Reset() {
 	*x = TimedVersion{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_models_proto_msgTypes[20]
+		mi := &file_livekit_models_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2834,7 +2945,7 @@ func (x *TimedVersion) String() string {
 func (*TimedVersion) ProtoMessage() {}
 
 func (x *TimedVersion) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[20]
+	mi := &file_livekit_models_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2847,7 +2958,7 @@ func (x *TimedVersion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TimedVersion.ProtoReflect.Descriptor instead.
 func (*TimedVersion) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{20}
+	return file_livekit_models_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *TimedVersion) GetUnixMicro() int64 {
@@ -3132,7 +3243,30 @@ var file_livekit_models_proto_rawDesc = []byte{
 	0x6f, 0x64, 0x65, 0x63, 0x73, 0x12, 0x28, 0x0a, 0x07, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x73, 0x68,
 	0x18, 0x02, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74,
 	0x2e, 0x43, 0x6f, 0x64, 0x65, 0x63, 0x52, 0x07, 0x70, 0x75, 0x62, 0x6c, 0x69, 0x73, 0x68, 0x22,
-	0x81, 0x0e, 0x0a, 0x08, 0x52, 0x54, 0x50, 0x53, 0x74, 0x61, 0x74, 0x73, 0x12, 0x39, 0x0a, 0x0a,
+	0xed, 0x02, 0x0a, 0x08, 0x52, 0x54, 0x50, 0x44, 0x72, 0x69, 0x66, 0x74, 0x12, 0x39, 0x0a, 0x0a,
+	0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x73, 0x74,
+	0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x35, 0x0a, 0x08, 0x65, 0x6e, 0x64, 0x5f, 0x74,
+	0x69, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67,
+	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x07, 0x65, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1a,
+	0x0a, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01,
+	0x52, 0x08, 0x64, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x27, 0x0a, 0x0f, 0x73, 0x74,
+	0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x0e, 0x73, 0x74, 0x61, 0x72, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x12, 0x23, 0x0a, 0x0d, 0x65, 0x6e, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x18, 0x05, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0c, 0x65, 0x6e, 0x64, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x26, 0x0a, 0x0f, 0x72, 0x74, 0x70, 0x5f,
+	0x63, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74, 0x69, 0x63, 0x6b, 0x73, 0x18, 0x06, 0x20, 0x01, 0x28,
+	0x04, 0x52, 0x0d, 0x72, 0x74, 0x70, 0x43, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69, 0x63, 0x6b, 0x73,
+	0x12, 0x23, 0x0a, 0x0d, 0x64, 0x72, 0x69, 0x66, 0x74, 0x5f, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65,
+	0x73, 0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0c, 0x64, 0x72, 0x69, 0x66, 0x74, 0x53, 0x61,
+	0x6d, 0x70, 0x6c, 0x65, 0x73, 0x12, 0x19, 0x0a, 0x08, 0x64, 0x72, 0x69, 0x66, 0x74, 0x5f, 0x6d,
+	0x73, 0x18, 0x08, 0x20, 0x01, 0x28, 0x01, 0x52, 0x07, 0x64, 0x72, 0x69, 0x66, 0x74, 0x4d, 0x73,
+	0x12, 0x1d, 0x0a, 0x0a, 0x63, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x72, 0x61, 0x74, 0x65, 0x18, 0x09,
+	0x20, 0x01, 0x28, 0x01, 0x52, 0x09, 0x63, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x61, 0x74, 0x65, 0x22,
+	0xb1, 0x0e, 0x0a, 0x08, 0x52, 0x54, 0x50, 0x53, 0x74, 0x61, 0x74, 0x73, 0x12, 0x39, 0x0a, 0x0a,
 	0x73, 0x74, 0x61, 0x72, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
 	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x09, 0x73, 0x74,
@@ -3236,11 +3370,14 @@ var file_livekit_models_proto_rawDesc = []byte{
 	0x6c, 0x69, 0x18, 0x24, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73,
 	0x74, 0x61, 0x6d, 0x70, 0x52, 0x10, 0x6c, 0x61, 0x73, 0x74, 0x4c, 0x61, 0x79, 0x65, 0x72, 0x4c,
-	0x6f, 0x63, 0x6b, 0x50, 0x6c, 0x69, 0x12, 0x1f, 0x0a, 0x0b, 0x73, 0x61, 0x6d, 0x70, 0x6c, 0x65,
-	0x5f, 0x72, 0x61, 0x74, 0x65, 0x18, 0x2a, 0x20, 0x01, 0x28, 0x01, 0x52, 0x0a, 0x73, 0x61, 0x6d,
-	0x70, 0x6c, 0x65, 0x52, 0x61, 0x74, 0x65, 0x12, 0x19, 0x0a, 0x08, 0x64, 0x72, 0x69, 0x66, 0x74,
-	0x5f, 0x6d, 0x73, 0x18, 0x2b, 0x20, 0x01, 0x28, 0x01, 0x52, 0x07, 0x64, 0x72, 0x69, 0x66, 0x74,
-	0x4d, 0x73, 0x1a, 0x3f, 0x0a, 0x11, 0x47, 0x61, 0x70, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x67, 0x72,
+	0x6f, 0x63, 0x6b, 0x50, 0x6c, 0x69, 0x12, 0x34, 0x0a, 0x0c, 0x70, 0x61, 0x63, 0x6b, 0x65, 0x74,
+	0x5f, 0x64, 0x72, 0x69, 0x66, 0x74, 0x18, 0x2c, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6c,
+	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x52, 0x54, 0x50, 0x44, 0x72, 0x69, 0x66, 0x74, 0x52,
+	0x0b, 0x70, 0x61, 0x63, 0x6b, 0x65, 0x74, 0x44, 0x72, 0x69, 0x66, 0x74, 0x12, 0x34, 0x0a, 0x0c,
+	0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x64, 0x72, 0x69, 0x66, 0x74, 0x18, 0x2d, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x11, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x52, 0x54, 0x50,
+	0x44, 0x72, 0x69, 0x66, 0x74, 0x52, 0x0b, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x44, 0x72, 0x69,
+	0x66, 0x74, 0x1a, 0x3f, 0x0a, 0x11, 0x47, 0x61, 0x70, 0x48, 0x69, 0x73, 0x74, 0x6f, 0x67, 0x72,
 	0x61, 0x6d, 0x45, 0x6e, 0x74, 0x72, 0x79, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c,
 	0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x3a,
@@ -3323,7 +3460,7 @@ func file_livekit_models_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_models_proto_enumTypes = make([]protoimpl.EnumInfo, 15)
-var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_livekit_models_proto_goTypes = []interface{}{
 	(AudioCodec)(0),               // 0: livekit.AudioCodec
 	(VideoCodec)(0),               // 1: livekit.VideoCodec
@@ -3359,10 +3496,11 @@ var file_livekit_models_proto_goTypes = []interface{}{
 	(*ClientConfiguration)(nil),   // 31: livekit.ClientConfiguration
 	(*VideoConfiguration)(nil),    // 32: livekit.VideoConfiguration
 	(*DisabledCodecs)(nil),        // 33: livekit.DisabledCodecs
-	(*RTPStats)(nil),              // 34: livekit.RTPStats
-	(*TimedVersion)(nil),          // 35: livekit.TimedVersion
-	nil,                           // 36: livekit.RTPStats.GapHistogramEntry
-	(*timestamppb.Timestamp)(nil), // 37: google.protobuf.Timestamp
+	(*RTPDrift)(nil),              // 34: livekit.RTPDrift
+	(*RTPStats)(nil),              // 35: livekit.RTPStats
+	(*TimedVersion)(nil),          // 36: livekit.TimedVersion
+	nil,                           // 37: livekit.RTPStats.GapHistogramEntry
+	(*timestamppb.Timestamp)(nil), // 38: google.protobuf.Timestamp
 }
 var file_livekit_models_proto_depIdxs = []int32{
 	16, // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
@@ -3392,18 +3530,22 @@ var file_livekit_models_proto_depIdxs = []int32{
 	6,  // 24: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
 	16, // 25: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
 	16, // 26: livekit.DisabledCodecs.publish:type_name -> livekit.Codec
-	37, // 27: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
-	37, // 28: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
-	36, // 29: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
-	37, // 30: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
-	37, // 31: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
-	37, // 32: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
-	37, // 33: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	38, // 27: livekit.RTPDrift.start_time:type_name -> google.protobuf.Timestamp
+	38, // 28: livekit.RTPDrift.end_time:type_name -> google.protobuf.Timestamp
+	38, // 29: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
+	38, // 30: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
+	37, // 31: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
+	38, // 32: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
+	38, // 33: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
+	38, // 34: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
+	38, // 35: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
+	34, // 36: livekit.RTPStats.packet_drift:type_name -> livekit.RTPDrift
+	34, // 37: livekit.RTPStats.report_drift:type_name -> livekit.RTPDrift
+	38, // [38:38] is the sub-list for method output_type
+	38, // [38:38] is the sub-list for method input_type
+	38, // [38:38] is the sub-list for extension type_name
+	38, // [38:38] is the sub-list for extension extendee
+	0,  // [0:38] is the sub-list for field type_name
 }
 
 func init() { file_livekit_models_proto_init() }
@@ -3641,7 +3783,7 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RTPStats); i {
+			switch v := v.(*RTPDrift); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3653,6 +3795,18 @@ func file_livekit_models_proto_init() {
 			}
 		}
 		file_livekit_models_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*RTPStats); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_livekit_models_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*TimedVersion); i {
 			case 0:
 				return &v.state
@@ -3676,7 +3830,7 @@ func file_livekit_models_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_models_proto_rawDesc,
 			NumEnums:      15,
-			NumMessages:   22,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
