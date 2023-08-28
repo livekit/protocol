@@ -391,9 +391,6 @@ message RTPStats {
   uint32 layer_lock_plis = 35;
   google.protobuf.Timestamp last_layer_lock_pli = 36;
 
-  // DEPRECATED double sample_rate = 42;
-  // DEPRECATED double drift_ms = 43;
-
   RTPDrift packet_drift = 44;
   RTPDrift report_drift = 45;
   // NEXT_ID: 46
