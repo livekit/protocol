@@ -36,6 +36,9 @@ service Egress {
   // add or remove stream endpoints
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
+  // add or remove outputs
+  rpc UpdateOutputs(UpdateOutputsRequest) returns (EgressInfo);
+
   // list available egress
   rpc ListEgress(ListEgressRequest) returns (ListEgressResponse);
 
@@ -62,6 +65,7 @@ message RoomCompositeEgressRequest {
   repeated EncodedFileOutput file_outputs = 11;
   repeated StreamOutput stream_outputs = 12;
   repeated SegmentedFileOutput segment_outputs = 13;
+  repeated ImageOutput image_outputs = 14;
 }
 
 // record any website
@@ -82,6 +86,7 @@ message WebEgressRequest {
   repeated EncodedFileOutput file_outputs = 9;
   repeated StreamOutput stream_outputs = 10;
   repeated SegmentedFileOutput segment_outputs = 11;
+  repeated ImageOutput image_outputs = 13;
 }
 
 // record audio and video from a single participant
@@ -96,6 +101,7 @@ message ParticipantEgressRequest {
   repeated EncodedFileOutput file_outputs = 6;
   repeated StreamOutput stream_outputs = 7;
   repeated SegmentedFileOutput segment_outputs = 8;
+  repeated ImageOutput image_outputs = 9;
 }
 
 // containerize up to one audio and one video track
@@ -115,6 +121,7 @@ message TrackCompositeEgressRequest {
   repeated EncodedFileOutput file_outputs = 11;
   repeated StreamOutput stream_outputs = 12;
   repeated SegmentedFileOutput segment_outputs = 13;
+  repeated ImageOutput image_outputs = 14;
 }
 
 // record tracks individually, without transcoding
@@ -179,6 +186,27 @@ message DirectFileOutput {
     GCPUpload gcp = 3;
     AzureBlobUpload azure = 4;
     AliOSSUpload aliOSS = 6;
+  }
+}
+
+enum ImageFileSuffix {
+  IMAGE_SUFFIX_INDEX = 0;
+  IMAGE_SUFFIX_TIMESTAMP = 1;
+}
+
+message ImageOutput {
+  uint32 capture_interval = 1;              // in seconds (required)
+  int32 width = 2;      		            // (required)
+  int32 height = 3;                         // (required)
+  string filename_prefix = 4;               // (optional)
+  ImageFileSuffix filename_suffix = 5;      // (optional, default INDEX)
+  ImageCodec image_codec = 6;               // (optional)
+  bool disable_manifest = 7;                // disable upload of manifest file (default false)  
+  oneof output {                            // required
+    S3Upload s3 = 8;
+    GCPUpload gcp = 9;
+    AzureBlobUpload azure = 10;
+    AliOSSUpload aliOSS = 11;
   }
 }
 
@@ -255,6 +283,12 @@ message UpdateStreamRequest {
   string egress_id = 1;
   repeated string add_output_urls = 2;
   repeated string remove_output_urls = 3;
+}
+
+message UpdateOutputsRequest {
+	string egress_id = 1;
+	repeated ImageOutput add_image_outputs = 2;
+    repeated ImageOutput remove_image_outputs = 3;
 }
 
 message ListEgressRequest {

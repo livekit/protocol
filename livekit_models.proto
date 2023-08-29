@@ -57,6 +57,11 @@ enum VideoCodec {
   VP8 = 4;
 }
 
+enum ImageCodec {
+  DEFAULT_IC = 0;
+  JPEG = 1;
+}
+
 message PlayoutDelay {
   bool enabled = 1;
   uint32 min = 2;
