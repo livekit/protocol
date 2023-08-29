@@ -196,7 +196,7 @@ enum ImageFileSuffix {
 
 message ImageOutput {
   uint32 capture_interval = 1;              // in seconds (required)
-  int32 width = 2;      		            // (required)
+  int32 width = 2;                          // (required)
   int32 height = 3;                         // (required)
   string filename_prefix = 4;               // (optional)
   ImageFileSuffix filename_suffix = 5;      // (optional, default INDEX)
@@ -286,9 +286,9 @@ message UpdateStreamRequest {
 }
 
 message UpdateOutputsRequest {
-	string egress_id = 1;
-	repeated ImageOutput add_image_outputs = 2;
-    repeated ImageOutput remove_image_outputs = 3;
+  string egress_id = 1;
+  repeated ImageOutput add_image_outputs = 2;
+  repeated ImageOutput remove_image_outputs = 3;
 }
 
 message ListEgressRequest {
