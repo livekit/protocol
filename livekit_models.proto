@@ -58,7 +58,7 @@ enum VideoCodec {
 }
 
 enum ImageCodec {
-  IC_DEFAULT_IC = 0;
+  IC_DEFAULT = 0;
   IC_JPEG = 1;
 }
 
