@@ -167,6 +167,7 @@ message SegmentedFileOutput {
   SegmentedFileProtocol protocol = 1;       // (optional)
   string filename_prefix = 2;               // (optional)
   string playlist_name = 3;                 // (optional)
+  string live_playlist_name = 11;           // (optional, disabled if not provided). Path of a live playlist
   uint32 segment_duration = 4;              // in seconds (optional)
   SegmentedFileSuffix filename_suffix = 10; // (optional, default INDEX)
   bool disable_manifest = 8;                // disable upload of manifest file (default false)
@@ -196,8 +197,8 @@ enum ImageFileSuffix {
 
 message ImageOutput {
   uint32 capture_interval = 1;              // in seconds (required)
-  int32 width = 2;                          // (required)
-  int32 height = 3;                         // (required)
+  int32 width = 2;                          // (optional, defaults to track width)
+  int32 height = 3;                         // (optional, defaults to track height)
   string filename_prefix = 4;               // (optional)
   ImageFileSuffix filename_suffix = 5;      // (optional, default INDEX)
   ImageCodec image_codec = 6;               // (optional)
@@ -374,9 +375,11 @@ message FileInfo {
 
 message SegmentsInfo {
   string playlist_name = 1;
+  string live_playlist_name = 8;
   int64 duration = 2;
   int64 size = 3;
   string playlist_location = 4;
+  string live_playlist_location = 9;
   int64 segment_count = 5;
   int64 started_at = 6;
   int64 ended_at = 7;
