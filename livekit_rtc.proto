@@ -107,6 +107,7 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
+  bool enable_simulcast_layers = 3;
   
   // NEXT-ID: 4
 }
