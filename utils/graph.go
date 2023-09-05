@@ -30,6 +30,10 @@ type GraphEdgeProps interface {
 	Length() int64
 }
 
+type SimpleGraphEdge struct{}
+
+func (e SimpleGraphEdge) Length() int64 { return 1 }
+
 type Graph[K comparable, N GraphNodeProps[K], E GraphEdgeProps] struct {
 	nodesByID   map[K]*GraphNode[N]
 	freeIndices *deque.Deque[int]
@@ -46,6 +50,16 @@ func NewGraph[K comparable, N GraphNodeProps[K], E GraphEdgeProps]() *Graph[K, N
 
 func (g *Graph[K, N, E]) Size() int {
 	return len(g.nodes)
+}
+
+func (g *Graph[K, N, E]) NodeIDs() []K {
+	ids := make([]K, 0, len(g.nodes)-g.freeIndices.Len())
+	for _, n := range g.nodes {
+		if n != nil {
+			ids = append(ids, n.props.ID())
+		}
+	}
+	return ids
 }
 
 func (g *Graph[K, N, E]) InsertNode(props N) {
