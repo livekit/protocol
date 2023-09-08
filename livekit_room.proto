@@ -164,8 +164,13 @@ message SendDataRequest {
   string room = 1;
   bytes data = 2;
   DataPacket.Kind kind = 3;
-  repeated string destination_sids = 4;
+  // mark deprecated
+  repeated string destination_sids = 4 [deprecated=true];
+  // when set, only forward to these identities
+  repeated string destination_identities = 6;
   optional string topic = 5;
+
+  // NEXT_ID: 7
 }
 
 message SendDataResponse {
