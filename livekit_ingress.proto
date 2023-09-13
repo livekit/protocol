@@ -81,11 +81,18 @@ enum IngressAudioEncodingPreset {
 }
 
 enum IngressVideoEncodingPreset {
-  H264_720P_30FPS_3_LAYERS = 0;     // 1280x720,  30fps, 1700kbps main layer, 3 layers total
-  H264_1080P_30FPS_3_LAYERS = 1;    // 1980x1080, 30fps, 3000kbps main layer, 3 layers total
-  H264_540P_25FPS_2_LAYERS = 2;     //  960x540,  25fps, 600kbps  main layer, 2 layers total
-  H264_720P_30FPS_1_LAYER = 3;      // 1280x720,  30fps, 1700kbps, no simulcast
-  H264_1080P_30FPS_1_LAYER = 4;     // 1980x1080, 30fps, 3000kbps, no simulcast
+  H264_720P_30FPS_3_LAYERS = 0;                 // 1280x720,  30fps, 1700kbps main layer, 3 layers total
+  H264_1080P_30FPS_3_LAYERS = 1;                // 1980x1080, 30fps, 3000kbps main layer, 3 layers total
+  H264_540P_25FPS_2_LAYERS = 2;                 //  960x540,  25fps, 600kbps  main layer, 2 layers total
+  H264_720P_30FPS_1_LAYER = 3;                  // 1280x720,  30fps, 1700kbps, no simulcast
+  H264_1080P_30FPS_1_LAYER = 4;                 // 1980x1080, 30fps, 3000kbps, no simulcast
+  H264_720P_30FPS_3_LAYERS_HIGH_MOTION = 5;     // 1280x720,  30fps, 2200kbps main layer, 3 layers total, higher bitrate for high motion, harder to encode content
+  H264_1080P_30FPS_3_LAYERS_HIGH_MOTION = 6;    // 1980x1080, 30fps, 3900kbps main layer, 3 layers total, higher bitrate for high motion, harder to encode content
+  H264_540P_25FPS_2_LAYERS_HIGH_MOTION = 7;     //  960x540,  25fps, 780kbps  main layer, 2 layers total, higher bitrate for high motion, harder to encode content
+  H264_720P_30FPS_1_LAYER_HIGH_MOTION = 8;      // 1280x720,  30fps, 2200kbps, no simulcast, higher bitrate for high motion, harder to encode content
+  H264_1080P_30FPS_1_LAYER_HIGH_MOTION = 9;     // 1980x1080, 30fps, 3900kbps, no simulcast, higher bitrate for high motion, harder to encode content
+
+
 }
 
 message IngressAudioEncodingOptions {
