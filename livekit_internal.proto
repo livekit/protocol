@@ -181,6 +181,7 @@ message KeepAlive {
 // room info that should not be returned to clients
 message RoomInternal {
   AutoTrackEgress track_egress = 1;
+  AutoParticipantEgress participant_egress = 2;
 }
 
 enum ICECandidateType {
