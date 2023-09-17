@@ -45,7 +45,3 @@ message SimulateLinkStateRequest {
 }
 
 message SimulateLinkStateResponse {}
-
-message LinkState {
-
-}
