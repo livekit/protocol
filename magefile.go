@@ -53,6 +53,9 @@ func Proto() error {
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
 	}
+	infraProtoFiles := []string{
+		"infra/link.proto",
+	}
 	psrpcProtoFiles := []string{
 		"rpc/egress.proto",
 		"rpc/ingress.proto",
@@ -107,6 +110,21 @@ func Proto() error {
 		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=.",
 	}, grpcProtoFiles...)
+	cmd = exec.Command(protoc, args...)
+	connectStd(cmd)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	fmt.Println("generating infra protobuf")
+	args = append([]string{
+		"--go_out", ".",
+		"--go-grpc_out", ".",
+		"--go_opt=paths=source_relative",
+		"--go-grpc_opt=paths=source_relative",
+		"--plugin=go=" + protocGoPath,
+		"--plugin=go-grpc=" + protocGrpcGoPath,
+		"-I=.",
+	}, infraProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
