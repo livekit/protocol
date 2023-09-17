@@ -22,7 +22,6 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/logger"
-
 	"github.com/livekit/psrpc"
 )
 
