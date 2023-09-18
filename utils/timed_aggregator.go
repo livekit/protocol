@@ -28,7 +28,7 @@ var (
 
 // ------------------------------------------------
 
-type number interface {
+type timedAggregatorNumber interface {
 	int64 | float64
 }
 
@@ -36,7 +36,7 @@ type TimedAggregatorParams struct {
 	CapNegativeValues bool
 }
 
-type TimedAggregator[T number] struct {
+type TimedAggregator[T timedAggregatorNumber] struct {
 	params TimedAggregatorParams
 
 	lock              sync.RWMutex
@@ -46,7 +46,7 @@ type TimedAggregator[T number] struct {
 	aggregateDuration time.Duration
 }
 
-func NewTimedAggregator[T number](params TimedAggregatorParams) *TimedAggregator[T] {
+func NewTimedAggregator[T timedAggregatorNumber](params TimedAggregatorParams) *TimedAggregator[T] {
 	return &TimedAggregator[T]{
 		params: params,
 	}

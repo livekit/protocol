@@ -24,6 +24,9 @@ import (
 )
 
 func Proto(val proto.Message) zapcore.ObjectMarshaler {
+	if val == nil {
+		return nil
+	}
 	return protoMarshaller{val.ProtoReflect()}
 }
 

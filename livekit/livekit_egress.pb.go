@@ -1731,8 +1731,8 @@ type ImageOutput struct {
 	unknownFields protoimpl.UnknownFields
 
 	CaptureInterval uint32          `protobuf:"varint,1,opt,name=capture_interval,json=captureInterval,proto3" json:"capture_interval,omitempty"`                           // in seconds (required)
-	Width           int32           `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`                                                                      // (required)
-	Height          int32           `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`                                                                    // (required)
+	Width           int32           `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`                                                                      // (optional, defaults to track width)
+	Height          int32           `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`                                                                    // (optional, defaults to track height)
 	FilenamePrefix  string          `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                               // (optional)
 	FilenameSuffix  ImageFileSuffix `protobuf:"varint,5,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.ImageFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
 	ImageCodec      ImageCodec      `protobuf:"varint,6,opt,name=image_codec,json=imageCodec,proto3,enum=livekit.ImageCodec" json:"image_codec,omitempty"`                  // (optional)
@@ -1817,7 +1817,7 @@ func (x *ImageOutput) GetImageCodec() ImageCodec {
 	if x != nil {
 		return x.ImageCodec
 	}
-	return ImageCodec_IC_DEFAULT_IC
+	return ImageCodec_IC_DEFAULT
 }
 
 func (x *ImageOutput) GetDisableManifest() bool {
