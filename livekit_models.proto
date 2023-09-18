@@ -60,6 +60,7 @@ enum VideoCodec {
 message PlayoutDelay {
   bool enabled = 1;
   uint32 min = 2;
+  uint32 max = 3;
 }
 
 message ParticipantPermission {
