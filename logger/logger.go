@@ -102,6 +102,7 @@ func newSharedConfig(conf *Config) *sharedConfig {
 		config:          conf,
 		componentLevels: make(map[string]zap.AtomicLevel),
 	}
+	uConfig.Config = conf
 	conf.AddUpdateObserver(sc.onConfigUpdate)
 	_ = sc.onConfigUpdate(conf)
 	return sc

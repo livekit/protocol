@@ -38,29 +38,36 @@ type Config struct {
 	ItemSampleSeconds  int `yaml:"item_sample_seconds,omitempty"`
 	ItemSampleInitial  int `yaml:"item_sample_initial,omitempty"`
 	ItemSampleInterval int `yaml:"item_sample_interval,omitempty"`
-
-	lock               sync.Mutex       `yaml:"-"`
-	onUpdatedCallbacks []ConfigObserver `yaml:"-"`
 }
 
 type ConfigObserver func(*Config) error
 
+type updatableConfig struct {
+	*Config
+
+	lock               sync.Mutex
+	onUpdatedCallbacks []ConfigObserver
+}
+
+var uConfig updatableConfig
+
 func (c *Config) Update(o *Config) error {
-	c.lock.Lock()
-	c.JSON = o.JSON
-	c.Level = o.Level
-	c.Sample = o.Sample
-	c.SampleInitial = o.SampleInitial
-	c.SampleInterval = o.SampleInterval
-	c.ItemSampleSeconds = o.ItemSampleSeconds
-	c.ItemSampleInitial = o.ItemSampleInitial
-	c.ItemSampleInterval = o.ItemSampleInterval
-	c.ComponentLevels = o.ComponentLevels
-	callbacks := c.onUpdatedCallbacks
-	c.lock.Unlock()
+	u := &uConfig
+	u.lock.Lock()
+	u.JSON = o.JSON
+	u.Level = o.Level
+	u.Sample = o.Sample
+	u.SampleInitial = o.SampleInitial
+	u.SampleInterval = o.SampleInterval
+	u.ItemSampleSeconds = o.ItemSampleSeconds
+	u.ItemSampleInitial = o.ItemSampleInitial
+	u.ItemSampleInterval = o.ItemSampleInterval
+	u.ComponentLevels = o.ComponentLevels
+	callbacks := u.onUpdatedCallbacks
+	u.lock.Unlock()
 
 	for _, cb := range callbacks {
-		if err := cb(c); err != nil {
+		if err := cb(u.Config); err != nil {
 			return err
 		}
 	}
@@ -68,7 +75,8 @@ func (c *Config) Update(o *Config) error {
 }
 
 func (c *Config) AddUpdateObserver(cb ConfigObserver) {
-	c.lock.Lock()
-	defer c.lock.Unlock()
-	c.onUpdatedCallbacks = append(c.onUpdatedCallbacks, cb)
+	u := &uConfig
+	u.lock.Lock()
+	defer u.lock.Unlock()
+	u.onUpdatedCallbacks = append(u.onUpdatedCallbacks, cb)
 }
