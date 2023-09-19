@@ -17,8 +17,8 @@ package logger
 import "sync"
 
 type Config struct {
-	JSON  bool   `yaml:"json"`
-	Level string `yaml:"level"`
+	JSON  bool   `yaml:"json,omitempty"`
+	Level string `yaml:"level,omitempty"`
 	// true to enable log sampling, where the same log message and level will be throttled.
 	// we have two layers of sampling
 	// 1. global sampling - within a second, it will log the first SampleInitial, then every SampleInterval messages.
