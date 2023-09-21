@@ -221,8 +221,10 @@ message UserPacket {
   repeated string destination_identities = 6;
   // topic under which the message was published
   optional string topic = 4;
+  // ID of server nodes which will receive the message, used by server internally, no affect on client
+  repeated string destination_node_ids = 7;
 
-  // NEXT_ID: 7
+  // NEXT_ID: 8
 }
 
 enum ConnectionQuality {
