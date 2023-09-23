@@ -26,6 +26,7 @@ import (
 var lockTrackerEnabled = false
 var enableLockTrackerOnce sync.Once
 var lowResTime uint32 = uint32(time.Now().Unix())
+var enableLockTrackerStackTrace uint32
 
 // EnableLockTracker enable lock tracking background worker. This should be
 // called during init
@@ -34,6 +35,14 @@ func EnableLockTracker() {
 		lockTrackerEnabled = true
 		go updateLowResTime()
 	})
+}
+
+func ToggleLockTrackerStackTraces(enable bool) {
+	var v uint32
+	if enable {
+		v = 1
+	}
+	atomic.StoreUint32(&enableLockTrackerStackTrace, v)
 }
 
 func updateLowResTime() {
@@ -151,13 +160,15 @@ func (t *lockTracker) trackLock() {
 		if atomic.AddInt32(&t.held, 1) == 1 {
 			atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
 
-			for {
-				n := runtime.Stack(t.stack[:cap(t.stack)], false)
-				if n < cap(t.stack) {
-					t.stack = t.stack[:n]
-					break
+			if atomic.LoadUint32(&enableLockTrackerStackTrace) == 1 {
+				for {
+					n := runtime.Stack(t.stack[:cap(t.stack)], false)
+					if n < cap(t.stack) {
+						t.stack = t.stack[:n]
+						break
+					}
+					t.stack = make([]byte, len(t.stack)*2)
 				}
-				t.stack = make([]byte, len(t.stack)*2)
 			}
 		}
 	}
