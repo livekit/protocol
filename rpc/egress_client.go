@@ -50,7 +50,9 @@ func NewEgressClient(nodeID livekit.NodeID, bus psrpc.MessageBus) (EgressClient,
 			if !errors.As(err, &e) {
 				return true
 			}
-			return e.Code() == psrpc.DeadlineExceeded || e.Code() == psrpc.ResourceExhausted
+			return e.Code() == psrpc.DeadlineExceeded ||
+				e.Code() == psrpc.ResourceExhausted ||
+				e.Code() == psrpc.Unavailable
 		},
 	}))
 	if err != nil {
