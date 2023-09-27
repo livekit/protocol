@@ -28,21 +28,21 @@ import (
 var ErrNotConfigured = errors.New("Redis is not configured")
 
 type RedisConfig struct {
-	Address           string   `yaml:"address"`
-	Username          string   `yaml:"username"`
-	Password          string   `yaml:"password"`
-	DB                int      `yaml:"db"`
-	UseTLS            bool     `yaml:"use_tls"`
-	MasterName        string   `yaml:"sentinel_master_name"`
-	SentinelUsername  string   `yaml:"sentinel_username"`
-	SentinelPassword  string   `yaml:"sentinel_password"`
-	SentinelAddresses []string `yaml:"sentinel_addresses"`
-	ClusterAddresses  []string `yaml:"cluster_addresses"`
-	DialTimeout       int      `yaml:"dial_timeout"`
-	ReadTimeout       int      `yaml:"read_timeout"`
-	WriteTimeout      int      `yaml:"write_timeout"`
+	Address           string   `yaml:"address,omitempty"`
+	Username          string   `yaml:"username,omitempty"`
+	Password          string   `yaml:"password,omitempty"`
+	DB                int      `yaml:"db,omitempty"`
+	UseTLS            bool     `yaml:"use_tls,omitempty"`
+	MasterName        string   `yaml:"sentinel_master_name,omitempty"`
+	SentinelUsername  string   `yaml:"sentinel_username,omitempty"`
+	SentinelPassword  string   `yaml:"sentinel_password,omitempty"`
+	SentinelAddresses []string `yaml:"sentinel_addresses,omitempty"`
+	ClusterAddresses  []string `yaml:"cluster_addresses,omitempty"`
+	DialTimeout       int      `yaml:"dial_timeout,omitempty"`
+	ReadTimeout       int      `yaml:"read_timeout,omitempty"`
+	WriteTimeout      int      `yaml:"write_timeout,omitempty"`
 	// for clustererd mode only, number of redirects to follow, defaults to 2
-	MaxRedirects *int `yaml:"max_redirects"`
+	MaxRedirects *int `yaml:"max_redirects,omitempty"`
 }
 
 func (r *RedisConfig) IsConfigured() bool {
