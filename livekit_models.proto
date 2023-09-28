@@ -33,7 +33,6 @@ message Room {
   uint32 num_participants = 9;
   uint32 num_publishers = 11;
   bool active_recording = 10;
-  PlayoutDelay playout_delay = 12;
 
   // NEXT-ID: 13
 }

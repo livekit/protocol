@@ -77,6 +77,9 @@ message CreateRoomRequest {
   // playout delay of subscriber
   uint32 min_playout_delay = 7;
   uint32 max_playout_delay = 8;
+  // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use 
+  // so not recommended for rooms with frequent subscription changes
+  bool sync_streams = 9;
 }
 
 message RoomEgress {
