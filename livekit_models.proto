@@ -34,8 +34,9 @@ message Room {
   uint32 num_publishers = 11;
   bool active_recording = 10;
   PlayoutDelay playout_delay = 12;
+  bool sync_streams = 13;
 
-  // NEXT-ID: 13
+  // NEXT-ID: 14
 }
 
 message Codec {
