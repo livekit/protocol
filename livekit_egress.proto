@@ -340,7 +340,7 @@ message EgressInfo {
   repeated StreamInfo stream_results = 15;
   repeated FileInfo file_results = 16;
   repeated SegmentsInfo segment_results = 17;
-  repeated ImagesInfo images_results = 20;
+  repeated ImagesInfo image_results = 20;
 
   // next ID: 21
 }
@@ -387,7 +387,7 @@ message SegmentsInfo {
 }
 
 message ImagesInfo {
-  int64 images_count = 1;
+  int64 image_count = 1;
   int64 started_at = 2;
   int64 ended_at = 3;
 }
