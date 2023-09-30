@@ -14,32 +14,22 @@
 
 package utils
 
-import (
-	"unsafe"
-)
+import "math/bits"
 
 type bitmapNumber interface {
 	uint16 | uint32 | uint64
 }
 
 type Bitmap[T bitmapNumber] struct {
-	halfRange T
-	bits      []uint64
+	bits []uint64
+	cap  int
 }
 
 func NewBitmap[T bitmapNumber](size int) *Bitmap[T] {
-	pof2 := 1
-	for {
-		if pof2 >= 64 && pof2 > size {
-			break
-		}
-		pof2 <<= 1
-	}
-
-	var t T
+	c := 1 << bits.Len64(uint64(size+63)/64)
 	return &Bitmap[T]{
-		halfRange: 1 << (unsafe.Sizeof(t)*8 - 1),
-		bits:      make([]uint64, pof2/64),
+		bits: make([]uint64, c),
+		cap:  c,
 	}
 }
 
@@ -48,8 +38,7 @@ func (b *Bitmap[T]) Set(val T) {
 }
 
 func (b *Bitmap[T]) SetRange(min, max T) {
-	if (max - min) > b.halfRange {
-		// out-of-order
+	if max < min {
 		return
 	}
 
@@ -70,8 +59,7 @@ func (b *Bitmap[T]) Clear(val T) {
 }
 
 func (b *Bitmap[T]) ClearRange(min, max T) {
-	if (max - min) > b.halfRange {
-		// out-of-order
+	if max < min {
 		return
 	}
 
@@ -97,8 +85,14 @@ func (b *Bitmap[T]) IsSet(val T) bool {
 func (b *Bitmap[T]) getSlotsAndOffsets(min, max T) (sm int, ls int, rs int, lo int, ro int) {
 	sm = len(b.bits) - 1 // slot mask
 
-	ls = int(min >> 6)   // left slot
-	rs = int(max >> 6)   // right slot
+	ls = int(min >> 6) // left slot
+	rs = int(max >> 6) // right slot
+
+	if rs-ls > b.cap {
+		rs = ls + b.cap
+		return
+	}
+
 	lo = int(min & 0x3f) // left offset
 	ro = int(max & 0x3f) // right offset
 	return
