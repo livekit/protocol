@@ -22,14 +22,11 @@ type bitmapNumber interface {
 
 type Bitmap[T bitmapNumber] struct {
 	bits []uint64
-	cap  int
 }
 
 func NewBitmap[T bitmapNumber](size int) *Bitmap[T] {
-	c := 1 << bits.Len64(uint64(size+63)/64)
 	return &Bitmap[T]{
-		bits: make([]uint64, c),
-		cap:  c,
+		bits: make([]uint64, 1<<bits.Len64(uint64(size+63)/64)),
 	}
 }
 
@@ -88,8 +85,8 @@ func (b *Bitmap[T]) getSlotsAndOffsets(min, max T) (sm int, ls int, rs int, lo i
 	ls = int(min >> 6) // left slot
 	rs = int(max >> 6) // right slot
 
-	if rs-ls > b.cap {
-		rs = ls + b.cap
+	if rs-ls > len(b.bits) {
+		rs = ls + len(b.bits)
 		return
 	}
 
