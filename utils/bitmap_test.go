@@ -15,6 +15,7 @@
 package utils
 
 import (
+	"math"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -75,4 +76,24 @@ func TestBitmap(t *testing.T) {
 	require.False(t, b.IsSet(95))
 	require.False(t, b.IsSet(234))
 	require.True(t, b.IsSet(235))
+
+	// set large range
+	b.SetRange(0, 1000)
+	e[0] = 0xFFFF_FFFF_FFFF_FFFF
+	e[1] = 0xFFFF_FFFF_FFFF_FFFF
+	e[2] = 0xFFFF_FFFF_FFFF_FFFF
+	e[3] = 0xFFFF_FFFF_FFFF_FFFF
+	require.Equal(t, e, b.bits)
+
+	// clear large range
+	b.ClearRange(0, 1000)
+	e[0] = 0x0000_0000_0000_0000
+	e[1] = 0x0000_0000_0000_0000
+	e[2] = 0x0000_0000_0000_0000
+	e[3] = 0x0000_0000_0000_0000
+	require.Equal(t, e, b.bits)
+
+	// large range changes touch each word once
+	sm, ls, rs, lo, ro := b.getSlotsAndOffsets(0, math.MaxUint32)
+	require.Equal(t, []int{3, 0, 4, 0, 0}, []int{sm, ls, rs, lo, ro})
 }
