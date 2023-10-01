@@ -156,12 +156,12 @@ func (r *multiRPCLoggerInterceptor) Send(ctx context.Context, req proto.Message,
 }
 
 func (r *multiRPCLoggerInterceptor) Recv(msg proto.Message, err error) {
-	if err == nil {
+	if err != nil {
 		r.logger.Warnw("received error", err)
-		r.responseCount++
+		r.errorCount++
 	} else {
 		r.logger.Debugw("received response", "response", logger.Proto(msg))
-		r.errorCount++
+		r.responseCount++
 	}
 	r.ClientMultiRPCHandler.Recv(msg, err)
 }
