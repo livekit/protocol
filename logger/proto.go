@@ -155,9 +155,9 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 func marshalProtoBytes(b []byte) string {
 	n := len(b)
 	if n > 64 {
-		n = 64
+		b = b[:64]
 	}
-	s := base64.RawStdEncoding.EncodeToString(b[:n])
+	s := base64.RawStdEncoding.EncodeToString(b)
 	switch {
 	case n <= 64:
 		return s
