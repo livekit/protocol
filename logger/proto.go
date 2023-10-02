@@ -16,6 +16,7 @@ package logger
 
 import (
 	"encoding/base64"
+	"fmt"
 	"strconv"
 
 	"go.uber.org/zap/zapcore"
@@ -106,7 +107,7 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 		case protoreflect.StringKind:
 			e.AppendString(v.String())
 		case protoreflect.BytesKind:
-			e.AppendString(base64.RawStdEncoding.EncodeToString(v.Bytes()))
+			e.AppendString(marshalProtoBytes(v.Bytes()))
 		case protoreflect.MessageKind:
 			e.AppendObject(protoMarshaller{v.Message()})
 		}
@@ -142,11 +143,31 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 		}
 	case protoreflect.BytesKind:
 		if b := v.Bytes(); len(b) != 0 {
-			e.AddString(k, base64.RawStdEncoding.EncodeToString(b))
+			e.AddString(k, marshalProtoBytes(b))
 		}
 	case protoreflect.MessageKind:
 		if m := v.Message(); m.IsValid() {
 			e.AddObject(k, protoMarshaller{m})
 		}
+	}
+}
+
+func marshalProtoBytes(b []byte) string {
+	n := len(b)
+	if n > 64 {
+		b = b[:64]
+	}
+	s := base64.RawStdEncoding.EncodeToString(b)
+	switch {
+	case n <= 64:
+		return s
+	case n < 1<<10:
+		return fmt.Sprintf("%s... (%dbytes)", s, n)
+	case n < 1<<20:
+		return fmt.Sprintf("%s... (%.2fkB)", s, float64(n)/float64(1<<10))
+	case n < 1<<30:
+		return fmt.Sprintf("%s... (%.2fMB)", s, float64(n)/float64(1<<20))
+	default:
+		return fmt.Sprintf("%s... (%.2fGB)", s, float64(n)/float64(1<<30))
 	}
 }
