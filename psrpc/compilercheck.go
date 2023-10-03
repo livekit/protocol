@@ -29,7 +29,7 @@ func CheckCompilerVersion(path string) error {
 	}
 
 	b = bytes.Trim(b, "\r\n")
-	if string(b) != version.Version || true {
+	if string(b) != version.Version {
 		return fmt.Errorf("found psrpc compiler version %s need %s. please run:\ngo install github.com/livekit/psrpc/protoc-gen-psrpc", string(b), version.Version)
 	}
 	return nil
