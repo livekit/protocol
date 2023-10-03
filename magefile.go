@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 
 	"github.com/livekit/mageutil"
+	"github.com/livekit/protocol/psrpc"
 )
 
 var Default = Proto
@@ -139,6 +140,9 @@ func Proto() error {
 	}
 	psrpcPath, err := mageutil.GetToolPath("protoc-gen-psrpc")
 	if err != nil {
+		return err
+	}
+	if err := psrpc.CheckCompilerVersion(psrpcPath); err != nil {
 		return err
 	}
 
