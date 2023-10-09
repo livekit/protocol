@@ -198,6 +198,7 @@ message DataPacket {
   oneof value {
     UserPacket user = 2;
     ActiveSpeakerUpdate speaker = 3;
+    PersistableUserPacket persistable_user = 4;
   }
 }
 
@@ -227,6 +228,25 @@ message UserPacket {
   optional string topic = 4;
 
   // NEXT_ID: 7
+}
+
+message PersistableUserPacket {
+  // participant ID of user that sent the message
+  string participant_sid = 1;
+  string participant_identity = 5;
+  string participant_name = 8;
+  // user defined payload
+  bytes payload = 2;
+  // the ID of the participants who will receive the message (sent to all by default)
+  repeated string destination_sids = 3;
+  // identities of participants who will receive the message (sent to all by default)
+  repeated string destination_identities = 6;
+  // topic under which the message was published
+  optional string topic = 4;
+
+  int64 timestamp = 7;
+
+  // NEXT_ID: 9
 }
 
 enum ConnectionQuality {
