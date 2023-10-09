@@ -384,6 +384,7 @@ message SegmentsInfo {
   int64 segment_count = 5;
   int64 started_at = 6;
   int64 ended_at = 7;
+  string data_event_location = 10;
 }
 
 message ImagesInfo {
@@ -410,3 +411,5 @@ message AutoTrackEgress {
     AzureBlobUpload azure = 4;
   }
 }
+
+message Data
