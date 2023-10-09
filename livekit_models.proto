@@ -249,6 +249,10 @@ message PersistableUserPacket {
   // NEXT_ID: 9
 }
 
+message PersistableUserData {
+  repeated PersistableUserPacket packets = 1;
+}
+
 enum ConnectionQuality {
   POOR = 0;
   GOOD = 1;
