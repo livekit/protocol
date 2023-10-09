@@ -411,5 +411,3 @@ message AutoTrackEgress {
     AzureBlobUpload azure = 4;
   }
 }
-
-message Data
