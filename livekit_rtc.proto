@@ -90,7 +90,7 @@ message SignalResponse {
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
     int64 pong = 18; // deprecated by pong_resp (message Pong)
-    // sent when client reconnects
+    // sent when client resumes an existing connection
     ReconnectResponse reconnect = 19;
     // respond to Ping
     Pong pong_resp = 20;
@@ -107,7 +107,7 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
-  
+
   // NEXT-ID: 4
 }
 
