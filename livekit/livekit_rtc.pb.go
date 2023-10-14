@@ -750,7 +750,7 @@ type SignalResponse_Pong struct {
 }
 
 type SignalResponse_Reconnect struct {
-	// sent when client reconnects
+	// sent when client resumes an existing connection
 	Reconnect *ReconnectResponse `protobuf:"bytes,19,opt,name=reconnect,proto3,oneof"`
 }
 
