@@ -175,18 +175,21 @@ func ValidateVideoEncodingOptionsConsistency(options *livekit.IngressVideoEncodi
 		layersByQuality[layer.Quality] = layer
 	}
 
-	var oldLayerArea uint32
+	var oldW, oldH uint32
 	for q := livekit.VideoQuality_LOW; q <= livekit.VideoQuality_HIGH; q++ {
 		layer, ok := layersByQuality[q]
 		if !ok {
 			continue
 		}
-		layerArea := layer.Width * layer.Height
 
-		if layerArea <= oldLayerArea {
-			return NewInvalidVideoParamsError("video layers do not have increasing pixel count with increasing quality")
+		if layer.Height < oldH {
+			return NewInvalidVideoParamsError("video layers do not have increasing height with increasing quality")
 		}
-		oldLayerArea = layerArea
+		if layer.Width < oldW {
+			return NewInvalidVideoParamsError("video layers do not have increasing width with increasing quality")
+		}
+		oldW = layer.Width
+		oldH = layer.Height
 	}
 
 	return nil

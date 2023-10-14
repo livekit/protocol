@@ -28,11 +28,11 @@ type logAdapter struct {
 }
 
 func (l *logAdapter) Trace(msg string) {
-	// ignore trace
+	l.logger.Debugw(msg)
 }
 
 func (l *logAdapter) Tracef(format string, args ...interface{}) {
-	// ignore trace
+	l.logger.Debugw(fmt.Sprintf(format, args...))
 }
 
 func (l *logAdapter) Debug(msg string) {

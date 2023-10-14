@@ -74,19 +74,21 @@ message CreateRoomRequest {
   string metadata = 5;
   // egress
   RoomEgress egress = 6;
-  // minimum playout delay when receiving remote media
-  // this is used to smooth out network jitters, and reduces freezes/stutters when a user's network experiences blips
+  // playout delay of subscriber
   uint32 min_playout_delay = 7;
+  uint32 max_playout_delay = 8;
+  // improves A/V sync when min_playout_delay set to a value larger than 200ms. It will disables transceiver re-use
+  // so not recommended for rooms with frequent subscription changes
+  bool sync_streams = 9;
+  optional AppMode mode = 10;
+  repeated Codec enabled_codecs = 11;
 
-  optional AppMode app_mode = 8;
-
-  repeated Codec enabled_codecs = 9;
-
-  // NEXT_ID: 10
+  // NEXT_ID: 12
 }
 
 message RoomEgress {
   RoomCompositeEgressRequest room = 1;
+  AutoParticipantEgress participant = 3;
   AutoTrackEgress tracks = 2;
 }
 
@@ -170,8 +172,13 @@ message SendDataRequest {
   string room = 1;
   bytes data = 2;
   DataPacket.Kind kind = 3;
-  repeated string destination_sids = 4;
+  // mark deprecated
+  repeated string destination_sids = 4 [deprecated=true];
+  // when set, only forward to these identities
+  repeated string destination_identities = 6;
   optional string topic = 5;
+
+  // NEXT_ID: 7
 }
 
 message SendDataResponse {

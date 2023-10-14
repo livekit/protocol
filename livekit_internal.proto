@@ -181,6 +181,9 @@ message KeepAlive {
 // room info that should not be returned to clients
 message RoomInternal {
   AutoTrackEgress track_egress = 1;
+  AutoParticipantEgress participant_egress = 2;
+  PlayoutDelay playout_delay = 3;
+  bool sync_streams = 4;
 }
 
 enum ICECandidateType {

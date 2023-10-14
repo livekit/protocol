@@ -33,8 +33,7 @@ message Room {
   uint32 num_participants = 9;
   uint32 num_publishers = 11;
   bool active_recording = 10;
-  PlayoutDelay playout_delay = 12;
-  AppMode app_mode = 13;
+  AppMode mode = 13;
 
   // NEXT-ID: 14
 }
@@ -44,7 +43,7 @@ enum AppMode {
   // default mode, up to 3k users per room, everyone can be a publisher
   // most applications should use this mode
   AM_DEFAULT = 0;
-  // Interactive livestreams with support for large audiences
+  // Interactive livestreams with support for large audiences - Cloud-only
   // limited to 25 publishers (with canPublish permissions) and unlimited viewers (with Cloud)
   // some behavioral differences in livestream mode:
   // - only admins will receive participant information from subscribers
@@ -73,9 +72,15 @@ enum VideoCodec {
   VP8 = 4;
 }
 
+enum ImageCodec {
+  IC_DEFAULT = 0;
+  IC_JPEG = 1;
+}
+
 message PlayoutDelay {
   bool enabled = 1;
   uint32 min = 2;
+  uint32 max = 3;
 }
 
 message ParticipantPermission {
@@ -227,12 +232,17 @@ message SpeakerInfo {
 message UserPacket {
   // participant ID of user that sent the message
   string participant_sid = 1;
+  string participant_identity = 5;
   // user defined payload
   bytes payload = 2;
-  // the ID of the participants who will receive the message (the message will be sent to all the people in the room if this variable is empty)
+  // the ID of the participants who will receive the message (sent to all by default)
   repeated string destination_sids = 3;
+  // identities of participants who will receive the message (sent to all by default)
+  repeated string destination_identities = 6;
   // topic under which the message was published
   optional string topic = 4;
+
+  // NEXT_ID: 7
 }
 
 enum ConnectionQuality {
@@ -329,6 +339,19 @@ enum DisconnectReason {
   JOIN_FAILURE = 7;
 }
 
+message RTPDrift {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  double duration = 3;
+
+  uint64 start_timestamp = 4;
+  uint64 end_timestamp = 5;
+  uint64 rtp_clock_ticks = 6;
+  int64 drift_samples = 7;
+  double drift_ms = 8;
+  double clock_rate = 9;
+}
+
 message RTPStats {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
@@ -389,9 +412,9 @@ message RTPStats {
   uint32 layer_lock_plis = 35;
   google.protobuf.Timestamp last_layer_lock_pli = 36;
 
-  double sample_rate = 42;
-  double drift_ms = 43;
-  // NEXT_ID: 44
+  RTPDrift packet_drift = 44;
+  RTPDrift report_drift = 45;
+  // NEXT_ID: 46
 }
 
 message TimedVersion {

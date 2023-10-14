@@ -175,7 +175,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 		},
 	}
 	err = ValidateVideoOptionsConsistency(video)
-	require.Error(t, err)
+	require.NoError(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
 		&livekit.VideoLayer{

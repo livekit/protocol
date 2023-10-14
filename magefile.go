@@ -26,6 +26,7 @@ import (
 	"path/filepath"
 
 	"github.com/livekit/mageutil"
+	"github.com/livekit/protocol/psrpc"
 )
 
 var Default = Proto
@@ -52,6 +53,9 @@ func Proto() error {
 		"livekit_models.proto",
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
+	}
+	infraProtoFiles := []string{
+		"infra/link.proto",
 	}
 	psrpcProtoFiles := []string{
 		"rpc/egress.proto",
@@ -112,6 +116,21 @@ func Proto() error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
+	fmt.Println("generating infra protobuf")
+	args = append([]string{
+		"--go_out", ".",
+		"--go-grpc_out", ".",
+		"--go_opt=paths=source_relative",
+		"--go-grpc_opt=paths=source_relative",
+		"--plugin=go=" + protocGoPath,
+		"--plugin=go-grpc=" + protocGrpcGoPath,
+		"-I=.",
+	}, infraProtoFiles...)
+	cmd = exec.Command(protoc, args...)
+	connectStd(cmd)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
 
 	fmt.Println("generating psrpc protobuf")
 
@@ -121,6 +140,9 @@ func Proto() error {
 	}
 	psrpcPath, err := mageutil.GetToolPath("protoc-gen-psrpc")
 	if err != nil {
+		return err
+	}
+	if err := psrpc.CheckCompilerVersion(psrpcPath); err != nil {
 		return err
 	}
 
