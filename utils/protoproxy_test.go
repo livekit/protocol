@@ -79,7 +79,7 @@ func TestProtoProxy(t *testing.T) {
 	proxy.Stop()
 
 	for i := 0; i < 10; i++ {
-		if numGoRoutines <= runtime.NumGoroutine() {
+		if runtime.NumGoroutine() <= numGoRoutines {
 			break
 		}
 		time.Sleep(100 * time.Millisecond)
