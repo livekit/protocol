@@ -23,9 +23,22 @@ import "livekit_ingress.proto";
 import "google/protobuf/empty.proto";
 
 service IOInfo {
-  rpc UpdateEgressInfo(livekit.EgressInfo) returns (google.protobuf.Empty);
+  // egress
+  rpc CreateEgress(livekit.EgressInfo) returns (google.protobuf.Empty);
+  rpc UpdateEgress(livekit.EgressInfo) returns (google.protobuf.Empty);
+  rpc GetEgress(GetEgressRequest) returns (livekit.EgressInfo);
+  rpc ListEgress(livekit.ListEgressRequest) returns (livekit.ListEgressResponse);
+
+  // ingress
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
+
+  // deprecated
+  rpc UpdateEgressInfo(livekit.EgressInfo) returns (google.protobuf.Empty);
+}
+
+message GetEgressRequest {
+  string egress_id = 1;
 }
 
 // Query an ingress info from an ingress ID or stream key
