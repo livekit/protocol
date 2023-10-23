@@ -12,7 +12,7 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
-	github.com/livekit/psrpc v0.3.3
+	github.com/livekit/psrpc v0.3.4
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
 	github.com/pion/logging v0.2.2
