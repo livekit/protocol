@@ -2256,11 +2256,11 @@ type EncodingOptions struct {
 	Framerate        int32      `protobuf:"varint,4,opt,name=framerate,proto3" json:"framerate,omitempty"`                                             // (default 30)
 	AudioCodec       AudioCodec `protobuf:"varint,5,opt,name=audio_codec,json=audioCodec,proto3,enum=livekit.AudioCodec" json:"audio_codec,omitempty"` // (default OPUS)
 	AudioBitrate     int32      `protobuf:"varint,6,opt,name=audio_bitrate,json=audioBitrate,proto3" json:"audio_bitrate,omitempty"`                   // (default 128)
-	AudioQuality     int32      `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"`                  // quality setting on audio encoder, overrides audio_bitrate
+	AudioQuality     int32      `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"`                  // quality setting on audio encoder
 	AudioFrequency   int32      `protobuf:"varint,7,opt,name=audio_frequency,json=audioFrequency,proto3" json:"audio_frequency,omitempty"`             // (default 44100)
 	VideoCodec       VideoCodec `protobuf:"varint,8,opt,name=video_codec,json=videoCodec,proto3,enum=livekit.VideoCodec" json:"video_codec,omitempty"` // (default H264_MAIN)
 	VideoBitrate     int32      `protobuf:"varint,9,opt,name=video_bitrate,json=videoBitrate,proto3" json:"video_bitrate,omitempty"`                   // (default 4500)
-	VideoQuality     int32      `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"`                  // quality setting on video encoder, overrides video_bitrate
+	VideoQuality     int32      `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"`                  // quality setting on video encoder
 	KeyFrameInterval float64    `protobuf:"fixed64,10,opt,name=key_frame_interval,json=keyFrameInterval,proto3" json:"key_frame_interval,omitempty"`   // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
 }
 
