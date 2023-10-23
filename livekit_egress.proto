@@ -36,9 +36,6 @@ service Egress {
   // add or remove stream endpoints
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
-  // add or remove outputs
-  rpc UpdateOutputs(UpdateOutputsRequest) returns (EgressInfo);
-
   // list available egress
   rpc ListEgress(ListEgressRequest) returns (ListEgressResponse);
 
@@ -202,7 +199,7 @@ message ImageOutput {
   string filename_prefix = 4;               // (optional)
   ImageFileSuffix filename_suffix = 5;      // (optional, default INDEX)
   ImageCodec image_codec = 6;               // (optional)
-  bool disable_manifest = 7;                // disable upload of manifest file (default false)  
+  bool disable_manifest = 7;                // disable upload of manifest file (default false)
   oneof output {                            // required
     S3Upload s3 = 8;
     GCPUpload gcp = 9;
@@ -262,6 +259,7 @@ message EncodingOptions {
   VideoCodec video_codec = 8;     // (default H264_MAIN)
   int32 video_bitrate = 9;        // (default 4500)
   double key_frame_interval = 10; // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
+  int32 quality = 11;             // quality setting on encoder
 }
 
 enum EncodingOptionsPreset {
@@ -284,12 +282,6 @@ message UpdateStreamRequest {
   string egress_id = 1;
   repeated string add_output_urls = 2;
   repeated string remove_output_urls = 3;
-}
-
-message UpdateOutputsRequest {
-  string egress_id = 1;
-  repeated ImageOutput add_image_outputs = 2;
-  repeated ImageOutput remove_image_outputs = 3;
 }
 
 message ListEgressRequest {
