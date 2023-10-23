@@ -255,11 +255,12 @@ message EncodingOptions {
   int32 framerate = 4;            // (default 30)
   AudioCodec audio_codec = 5;     // (default OPUS)
   int32 audio_bitrate = 6;        // (default 128)
+  int32 audio_quality = 11;       // quality setting on audio encoder, overrides audio_bitrate
   int32 audio_frequency = 7;      // (default 44100)
   VideoCodec video_codec = 8;     // (default H264_MAIN)
   int32 video_bitrate = 9;        // (default 4500)
+  int32 video_quality = 12;       // quality setting on video encoder, overrides video_bitrate
   double key_frame_interval = 10; // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
-  int32 quality = 11;             // quality setting on encoder
 }
 
 enum EncodingOptionsPreset {
