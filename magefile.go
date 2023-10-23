@@ -61,6 +61,7 @@ func Proto() error {
 		"rpc/egress.proto",
 		"rpc/ingress.proto",
 		"rpc/io.proto",
+		"rpc/room.proto",
 		"rpc/signal.proto",
 	}
 

@@ -15,9 +15,14 @@
 package rpc
 
 import (
+	"context"
+	"fmt"
+
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/psrpc"
 )
+
+//go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 type TypedSignalClient = SignalClient[livekit.NodeID]
 type TypedSignalServer = SignalServer[livekit.NodeID]
@@ -28,4 +33,32 @@ func NewTypedSignalClient(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...p
 
 func NewTypedSignalServer(nodeID livekit.NodeID, svc SignalServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedSignalServer, error) {
 	return NewSignalServer[livekit.NodeID](string(nodeID), svc, bus, opts...)
+}
+
+type ParticipantTopic string
+type RoomTopic string
+
+func FormatParticipantTopic(roomName livekit.RoomName, identity livekit.ParticipantIdentity) ParticipantTopic {
+	return ParticipantTopic(fmt.Sprintf("%s_%s", roomName, identity))
+}
+
+func FormatRoomTopic(roomName livekit.RoomName) RoomTopic {
+	return RoomTopic(roomName)
+}
+
+type TopicFormatter interface {
+	ParticipantTopic(ctx context.Context, roomName livekit.RoomName, identity livekit.ParticipantIdentity) ParticipantTopic
+	RoomTopic(ctx context.Context, roomName livekit.RoomName) RoomTopic
+}
+
+//counterfeiter:generate . TypedRoomClient
+type TypedRoomClient = RoomClient[ParticipantTopic, RoomTopic]
+type TypedRoomServer = RoomServer[ParticipantTopic, RoomTopic]
+
+func NewTypedRoomClient(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomClient, error) {
+	return NewRoomClient[ParticipantTopic, RoomTopic](string(nodeID), bus, opts...)
+}
+
+func NewTypedRoomServer(nodeID livekit.NodeID, svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomServer, error) {
+	return NewRoomServer[ParticipantTopic, RoomTopic](string(nodeID), svc, bus, opts...)
 }
