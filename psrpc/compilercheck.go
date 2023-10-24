@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os/exec"
 
+	"golang.org/x/mod/semver"
+
 	"github.com/livekit/psrpc/version"
 )
 
@@ -29,8 +31,10 @@ func CheckCompilerVersion(path string) error {
 	}
 
 	b = bytes.Trim(b, "\r\n")
-	if string(b) != version.Version {
-		return fmt.Errorf("found psrpc compiler version %s need %s. please run:\ngo install github.com/livekit/psrpc/protoc-gen-psrpc", string(b), version.Version)
+	current := semver.MajorMinor(string(b))
+	required := semver.MajorMinor(version.Version)
+	if current != required {
+		return fmt.Errorf("found psrpc compiler %s need %s.x. please run:\ngo install github.com/livekit/psrpc/protoc-gen-psrpc", string(b), required)
 	}
 	return nil
 }
