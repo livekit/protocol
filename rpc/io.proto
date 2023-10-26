@@ -32,9 +32,6 @@ service IOInfo {
   // ingress
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
-
-  // deprecated
-  rpc UpdateEgressInfo(livekit.EgressInfo) returns (google.protobuf.Empty);
 }
 
 message GetEgressRequest {
