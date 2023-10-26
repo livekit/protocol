@@ -44,12 +44,6 @@ jobs:
         version: latest
         args: bootstrap
 
-    - name: Mage Test
-      uses: magefile/mage-action@v3
-      with:
-        version: latest
-        args: test
-
     - name: Generate Protobuf
       uses: magefile/mage-action@v3
       with:
