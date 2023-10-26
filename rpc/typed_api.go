@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/utils"
 	"github.com/livekit/psrpc"
 )
 
@@ -51,14 +52,26 @@ type TopicFormatter interface {
 	RoomTopic(ctx context.Context, roomName livekit.RoomName) RoomTopic
 }
 
-//counterfeiter:generate . TypedRoomClient
-type TypedRoomClient = RoomClient[ParticipantTopic, RoomTopic]
-type TypedRoomServer = RoomServer[ParticipantTopic, RoomTopic]
+//counterfeiter:generate . TypedParticipantClient
+type TypedParticipantClient = ParticipantClient[ParticipantTopic]
+type TypedParticipantServer = ParticipantServer[ParticipantTopic]
 
-func NewTypedRoomClient(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomClient, error) {
-	return NewRoomClient[ParticipantTopic, RoomTopic](string(nodeID), bus, opts...)
+func NewTypedParticipantClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedParticipantClient, error) {
+	return NewParticipantClient[ParticipantTopic](utils.NewGuid("CLI_"), bus, opts...)
 }
 
-func NewTypedRoomServer(nodeID livekit.NodeID, svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomServer, error) {
-	return NewRoomServer[ParticipantTopic, RoomTopic](string(nodeID), svc, bus, opts...)
+func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) TypedParticipantServer {
+	return utils.Must(NewParticipantServer[ParticipantTopic](utils.NewGuid("SRV_"), svc, bus, opts...))
+}
+
+//counterfeiter:generate . TypedRoomClient
+type TypedRoomClient = RoomClient[RoomTopic]
+type TypedRoomServer = RoomServer[RoomTopic]
+
+func NewTypedRoomClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomClient, error) {
+	return NewRoomClient[RoomTopic](utils.NewGuid("CLI_"), bus, opts...)
+}
+
+func NewTypedRoomServer(svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) TypedRoomServer {
+	return utils.Must(NewRoomServer[RoomTopic](utils.NewGuid("SRV_"), svc, bus, opts...))
 }
