@@ -33,11 +33,7 @@ type IngressInternalClient interface {
 // ====================================
 
 type IngressInternalServerImpl interface {
-<<<<<<< Updated upstream
-	StartIngress(context.Context, *StartIngressRequest) (*livekit2.IngressInfo, error)
-=======
 	StartIngress(context.Context, *StartIngressRequest) (*livekit3.IngressInfo, error)
->>>>>>> Stashed changes
 	StartIngressAffinity(context.Context, *StartIngressRequest) float32
 
 	ListActiveIngress(context.Context, *ListActiveIngressRequest) (*ListActiveIngressResponse, error)

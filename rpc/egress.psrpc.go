@@ -32,11 +32,7 @@ type EgressInternalClient interface {
 // ===================================
 
 type EgressInternalServerImpl interface {
-<<<<<<< Updated upstream
-	StartEgress(context.Context, *StartEgressRequest) (*livekit1.EgressInfo, error)
-=======
 	StartEgress(context.Context, *StartEgressRequest) (*livekit2.EgressInfo, error)
->>>>>>> Stashed changes
 	StartEgressAffinity(context.Context, *StartEgressRequest) float32
 
 	ListActiveEgress(context.Context, *ListActiveEgressRequest) (*ListActiveEgressResponse, error)
