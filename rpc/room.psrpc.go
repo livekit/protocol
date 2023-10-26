@@ -14,7 +14,11 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import livekit "github.com/livekit/protocol/livekit"
+<<<<<<< Updated upstream
 import livekit3 "github.com/livekit/protocol/livekit"
+=======
+import livekit4 "github.com/livekit/protocol/livekit"
+>>>>>>> Stashed changes
 
 var _ = version.PsrpcVersion_0_5
 
@@ -23,6 +27,7 @@ var _ = version.PsrpcVersion_0_5
 // =====================
 
 type RoomClient[ParticipantTopicType, RoomTopicType ~string] interface {
+<<<<<<< Updated upstream
 	RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit3.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit3.RemoveParticipantResponse, error)
 
 	MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit3.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit3.MuteRoomTrackResponse, error)
@@ -36,6 +41,21 @@ type RoomClient[ParticipantTopicType, RoomTopicType ~string] interface {
 	SendData(ctx context.Context, room RoomTopicType, req *livekit3.SendDataRequest, opts ...psrpc.RequestOption) (*livekit3.SendDataResponse, error)
 
 	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit3.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error)
+=======
+	RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit4.RemoveParticipantResponse, error)
+
+	MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit4.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit4.MuteRoomTrackResponse, error)
+
+	UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error)
+
+	UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit4.UpdateSubscriptionsResponse, error)
+
+	DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error)
+
+	SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error)
+
+	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit4.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error)
+>>>>>>> Stashed changes
 }
 
 // =========================
@@ -43,6 +63,7 @@ type RoomClient[ParticipantTopicType, RoomTopicType ~string] interface {
 // =========================
 
 type RoomServerImpl interface {
+<<<<<<< Updated upstream
 	RemoveParticipant(context.Context, *livekit3.RoomParticipantIdentity) (*livekit3.RemoveParticipantResponse, error)
 
 	MutePublishedTrack(context.Context, *livekit3.MuteRoomTrackRequest) (*livekit3.MuteRoomTrackResponse, error)
@@ -56,6 +77,21 @@ type RoomServerImpl interface {
 	SendData(context.Context, *livekit3.SendDataRequest) (*livekit3.SendDataResponse, error)
 
 	UpdateRoomMetadata(context.Context, *livekit3.UpdateRoomMetadataRequest) (*livekit.Room, error)
+=======
+	RemoveParticipant(context.Context, *livekit4.RoomParticipantIdentity) (*livekit4.RemoveParticipantResponse, error)
+
+	MutePublishedTrack(context.Context, *livekit4.MuteRoomTrackRequest) (*livekit4.MuteRoomTrackResponse, error)
+
+	UpdateParticipant(context.Context, *livekit4.UpdateParticipantRequest) (*livekit.ParticipantInfo, error)
+
+	UpdateSubscriptions(context.Context, *livekit4.UpdateSubscriptionsRequest) (*livekit4.UpdateSubscriptionsResponse, error)
+
+	DeleteRoom(context.Context, *livekit4.DeleteRoomRequest) (*livekit4.DeleteRoomResponse, error)
+
+	SendData(context.Context, *livekit4.SendDataRequest) (*livekit4.SendDataResponse, error)
+
+	UpdateRoomMetadata(context.Context, *livekit4.UpdateRoomMetadataRequest) (*livekit.Room, error)
+>>>>>>> Stashed changes
 }
 
 // =====================
@@ -122,6 +158,7 @@ func NewRoomClient[ParticipantTopicType, RoomTopicType ~string](bus psrpc.Messag
 	}, nil
 }
 
+<<<<<<< Updated upstream
 func (c *roomClient[ParticipantTopicType, RoomTopicType]) RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit3.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit3.RemoveParticipantResponse, error) {
 	return client.RequestSingle[*livekit3.RemoveParticipantResponse](ctx, c.client, "RemoveParticipant", []string{string(participant)}, req, opts...)
 }
@@ -147,6 +184,33 @@ func (c *roomClient[ParticipantTopicType, RoomTopicType]) SendData(ctx context.C
 }
 
 func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit3.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
+=======
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit4.RemoveParticipantResponse, error) {
+	return client.RequestSingle[*livekit4.RemoveParticipantResponse](ctx, c.client, "RemoveParticipant", []string{string(participant)}, req, opts...)
+}
+
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit4.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit4.MuteRoomTrackResponse, error) {
+	return client.RequestSingle[*livekit4.MuteRoomTrackResponse](ctx, c.client, "MutePublishedTrack", []string{string(participant)}, req, opts...)
+}
+
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error) {
+	return client.RequestSingle[*livekit.ParticipantInfo](ctx, c.client, "UpdateParticipant", []string{string(participant)}, req, opts...)
+}
+
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit4.UpdateSubscriptionsResponse, error) {
+	return client.RequestSingle[*livekit4.UpdateSubscriptionsResponse](ctx, c.client, "UpdateSubscriptions", []string{string(participant)}, req, opts...)
+}
+
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error) {
+	return client.RequestSingle[*livekit4.DeleteRoomResponse](ctx, c.client, "DeleteRoom", []string{string(room)}, req, opts...)
+}
+
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error) {
+	return client.RequestSingle[*livekit4.SendDataResponse](ctx, c.client, "SendData", []string{string(room)}, req, opts...)
+}
+
+func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit4.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
+>>>>>>> Stashed changes
 	return client.RequestSingle[*livekit.Room](ctx, c.client, "UpdateRoomMetadata", []string{string(room)}, req, opts...)
 }
 
@@ -279,7 +343,11 @@ func (s *roomServer[ParticipantTopicType, RoomTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+<<<<<<< Updated upstream
 var psrpcFileDescriptor3 = []byte{
+=======
+var psrpcFileDescriptor4 = []byte{
+>>>>>>> Stashed changes
 	// 384 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xdf, 0x6a, 0xf2, 0x30,
 	0x18, 0xc6, 0x29, 0x9f, 0xc8, 0x47, 0x3e, 0x14, 0xcd, 0x37, 0x86, 0xeb, 0xfe, 0xe0, 0x9c, 0x47,

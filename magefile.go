@@ -48,6 +48,7 @@ func Proto() error {
 		"livekit_room.proto",
 	}
 	grpcProtoFiles := []string{
+		"livekit_agent.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",
@@ -58,6 +59,7 @@ func Proto() error {
 		"infra/link.proto",
 	}
 	psrpcProtoFiles := []string{
+		"rpc/agent.proto",
 		"rpc/egress.proto",
 		"rpc/ingress.proto",
 		"rpc/io.proto",
