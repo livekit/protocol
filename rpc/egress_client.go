@@ -36,13 +36,12 @@ type egressClient struct {
 	EgressHandlerClient
 }
 
-func NewEgressClient(nodeID livekit.NodeID, bus psrpc.MessageBus) (EgressClient, error) {
+func NewEgressClient(bus psrpc.MessageBus) (EgressClient, error) {
 	if bus == nil {
 		return nil, nil
 	}
 
-	clientID := string(nodeID)
-	internalClient, err := NewEgressInternalClient(clientID, bus, middleware.WithRPCRetries(middleware.RetryOptions{
+	internalClient, err := NewEgressInternalClient(bus, middleware.WithRPCRetries(middleware.RetryOptions{
 		MaxAttempts: retries,
 		Timeout:     time.Second * 10,
 		IsRecoverable: func(err error) bool {
@@ -59,7 +58,7 @@ func NewEgressClient(nodeID livekit.NodeID, bus psrpc.MessageBus) (EgressClient,
 		return nil, err
 	}
 
-	handlerClient, err := NewEgressHandlerClient(clientID, bus)
+	handlerClient, err := NewEgressHandlerClient(bus)
 	if err != nil {
 		return nil, err
 	}

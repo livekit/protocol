@@ -28,11 +28,11 @@ type TypedSignalClient = SignalClient[livekit.NodeID]
 type TypedSignalServer = SignalServer[livekit.NodeID]
 
 func NewTypedSignalClient(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedSignalClient, error) {
-	return NewSignalClient[livekit.NodeID](string(nodeID), bus, opts...)
+	return NewSignalClient[livekit.NodeID](bus, append(opts[:len(opts):len(opts)], psrpc.WithClientID(string(nodeID)))...)
 }
 
 func NewTypedSignalServer(nodeID livekit.NodeID, svc SignalServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedSignalServer, error) {
-	return NewSignalServer[livekit.NodeID](string(nodeID), svc, bus, opts...)
+	return NewSignalServer[livekit.NodeID](svc, bus, append(opts[:len(opts):len(opts)], psrpc.WithServerID(string(nodeID)))...)
 }
 
 type ParticipantTopic string
@@ -55,10 +55,10 @@ type TopicFormatter interface {
 type TypedRoomClient = RoomClient[ParticipantTopic, RoomTopic]
 type TypedRoomServer = RoomServer[ParticipantTopic, RoomTopic]
 
-func NewTypedRoomClient(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomClient, error) {
-	return NewRoomClient[ParticipantTopic, RoomTopic](string(nodeID), bus, opts...)
+func NewTypedRoomClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomClient, error) {
+	return NewRoomClient[ParticipantTopic, RoomTopic](bus, opts...)
 }
 
-func NewTypedRoomServer(nodeID livekit.NodeID, svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomServer, error) {
-	return NewRoomServer[ParticipantTopic, RoomTopic](string(nodeID), svc, bus, opts...)
+func NewTypedRoomServer(svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomServer, error) {
+	return NewRoomServer[ParticipantTopic, RoomTopic](svc, bus, opts...)
 }
