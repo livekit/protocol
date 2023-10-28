@@ -46,6 +46,7 @@ func Proto() error {
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
 		"livekit_room.proto",
+		"livekit_sip.proto",
 	}
 	grpcProtoFiles := []string{
 		"livekit_analytics.proto",

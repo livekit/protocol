@@ -1,0 +1,195 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+/*
+   LiveKit's SIP API is built with 3 high level primitives
+   - SIP Trunk
+   - SIP Dispatch Rule
+   - SIP Participant
+
+
+   The `SIP Trunk` is used to accept and make calls. A `SIP Trunk` is configured with
+   the IPs/Ports and Authentication details of your SIP Provider. When a call is accepted from
+   the `SIP Trunk` it is then handled by the `SIP Dispatch Rules`. When a `SIP Participant` is created
+   for a outbound call a `SIP Trunk` is chosen to make the call with.
+
+
+   The `SIP Dispatch Rule` is a list of rules that dictate how a incoming SIP call should be handled.
+   LiveKit currently supports 3 types, but may support more in the future.
+
+   - `Direct Dispatch` puts a caller into a existing room
+   - `Pin Dispatch` allows a caller to choose between multiple rooms with a pin
+   - `Individual Dispatch` puts a caller into a new room created for the call
+
+
+   The `SIP Participant` represents an active SIP Session. These SIP Sessions are created by an
+   inbound call or can be created by a developer making an outbound call. DTMF can be emitted for
+   these participants via an API.
+*/
+
+
+service SIP {
+  rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo);
+  rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse);
+  rpc DeleteSIPTrunk(DeleteSIPTrunkRequest) returns (SIPTrunkInfo);
+
+  rpc CreateSIPDispatchRule(CreateSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
+  rpc ListSIPDispatchRule(ListSIPDispatchRuleRequest) returns (ListSIPDispatchRuleResponse);
+  rpc DeleteSIPDispatchRule(DeleteSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
+
+  rpc CreateSIPParticipant(CreateSIPParticipantRequest) returns (SIPParticipantInfo);
+  rpc SendSIPParticipantDTMF(SendSIPParticipantDTMFRequest) returns (SIPParticipantDTMFInfo);
+  rpc ListSIPParticipant(ListSIPParticipantRequest) returns (ListSIPParticipantResponse);
+  rpc DeleteSIPParticipant(DeleteSIPParticipantRequest) returns (SIPParticipantInfo);
+}
+
+
+message CreateSIPTrunkRequest {
+  // CIDR or IPs that traffic is accepted from
+  // An empty list means all inbound traffic is accepted.
+  repeated string addresses = 1;
+
+  // `To` value that will be used when making a call
+  string to = 2;
+
+  // Accepted `To` values. This Trunk will only accept a call made to
+  // these numbers. This allows you to have distinct Trunks for different phone
+  // numbers at the same provider.
+  // An empty list means all dialed numbers are accepted.
+  repeated string allowed_destinations_regex = 3;
+}
+
+message SIPTrunkInfo {
+  string sip_trunk_id = 1;
+}
+
+message ListSIPTrunkRequest {
+}
+
+message ListSIPTrunkResponse {
+  repeated SIPTrunkInfo items = 1;
+}
+
+message DeleteSIPTrunkRequest {
+  string sip_trunk_id = 1;
+}
+
+message SIPDispatchRuleDirect {
+  // What room should call be directed into
+  string room_name = 1;
+
+  // Optional pin required to enter room
+  string pin = 2;
+}
+
+message SIPDispatchRulePin {
+  // What room should call be directed into
+  string room_name = 1;
+
+  // Pin required to enter room
+  string pin = 2;
+}
+
+message SIPDispatchRuleIndividual {
+  // Prefix used on new room name
+  string room_prefix = 1;
+
+  // Optional pin required to enter room
+  string pin = 2;
+}
+
+message CreateSIPDispatchRuleRequest {
+  oneof instrument {
+    // SIPDispatchRuleDirect is a `SIP Dispatch Rule` that puts a user directly into a room
+    // This places users into an existing room. Optionally you can require a pin before a user can
+    // enter the room
+    SIPDispatchRuleDirect dispatch_rule_direct = 1;
+
+    // SIPDispatchRulePin is a `SIP Dispatch Rule` that allows a user to choose between multiple rooms.
+    // The user is prompted for a pin and then can enter a individual room.
+    SIPDispatchRulePin dispatch_rule_pin = 2;
+
+    // SIPDispatchRuleIndividual is a `SIP Dispatch Rule` that creates a new room for each caller.
+    SIPDispatchRuleIndividual dispatch_rule_individual = 3;
+  }
+
+  // What trunks are accepted for this dispatch rule
+  // If empty all trunks will match this dispatch rule
+  repeated string trunk_ids = 4;
+
+  // By default the From value (Phone number) is used as the participant identity
+  // If true a random value will be used instead
+  bool hide_phone_number = 6;
+}
+
+message SIPDispatchRuleInfo {
+  string sip_dispatch_rule_id = 1;
+}
+
+message ListSIPDispatchRuleRequest {
+}
+
+message ListSIPDispatchRuleResponse {
+  repeated SIPDispatchRuleInfo items = 1;
+}
+
+message DeleteSIPDispatchRuleRequest {
+  string sip_dispatch_rule_id = 1;
+}
+
+// A SIP Participant is a singular SIP session connected to a LiveKit room via
+// a SIP Trunk into a SIP DispatchRule
+message CreateSIPParticipantRequest {
+  // What LiveKit room should this participant be connected too
+  string room_name = 1;
+
+  // What SIP Trunk should be used to dial the user
+  string sip_trunk_id = 2;
+}
+
+message SIPParticipantInfo {
+  string sip_participant_id = 1;
+}
+
+// DTMF Request lets you send a DTMF message for a SIP Participant
+message SendSIPParticipantDTMFRequest {
+  // What SIP Participant to send this DTMF for
+  string sip_participant_id = 1;
+
+  // Digits that will be sent via DTMF
+  string digits = 2;
+}
+
+message SIPParticipantDTMFInfo {
+  string sip_participant_id = 1;
+}
+
+message ListSIPParticipantRequest {
+}
+
+message ListSIPParticipantResponse {
+  repeated SIPParticipantInfo items = 1;
+}
+
+message DeleteSIPParticipantRequest {
+  string sip_participant_id = 1;
+}
