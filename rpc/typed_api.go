@@ -36,8 +36,8 @@ type PSRPCConfig struct {
 
 var DefaultPSRPCConfig = PSRPCConfig{
 	MaxAttempts: 3,
-	Timeout:     500 * time.Millisecond,
-	Backoff:     500 * time.Millisecond,
+	Timeout:     3 * time.Second,
+	Backoff:     2 * time.Second,
 	BufferSize:  1000,
 }
 
