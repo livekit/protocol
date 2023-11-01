@@ -22,7 +22,6 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	protopsrpc "github.com/livekit/protocol/psrpc"
-	"github.com/livekit/protocol/utils"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
 )
@@ -44,10 +43,9 @@ var DefaultPSRPCConfig = PSRPCConfig{
 
 type ClientParams struct {
 	PSRPCConfig
-	Bus              psrpc.MessageBus
-	Logger           logger.Logger
-	Observer         middleware.MetricsObserver
-	VersionGenerator utils.TimedVersionGenerator
+	Bus      psrpc.MessageBus
+	Logger   logger.Logger
+	Observer middleware.MetricsObserver
 }
 
 func NewClientParams(
