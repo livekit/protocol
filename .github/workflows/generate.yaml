@@ -26,14 +26,14 @@ jobs:
     - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
 
     - name: Install Protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v2
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '>=1.18'
+        go-version: '>=1.20'
 
     - name: Go mod tidy
       run: go mod tidy

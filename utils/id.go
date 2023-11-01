@@ -25,7 +25,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-const guidSize = 12
+const GuidSize = 12
 
 const (
 	RoomPrefix         = "RM_"
@@ -42,7 +42,7 @@ const (
 )
 
 func NewGuid(prefix string) string {
-	return prefix + shortuuid.New()[:guidSize]
+	return prefix + shortuuid.New()[:GuidSize]
 }
 
 // Creates a hashed ID from a unique string
@@ -63,12 +63,12 @@ func LocalNodeID() (string, error) {
 }
 
 var b62Index = newB62Index()
-var b62Chars = []byte(shortuuid.DefaultAlphabet)
+var b62Chars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
 func newB62Index() [256]byte {
 	var index [256]byte
-	for i := 0; i < len(shortuuid.DefaultAlphabet); i++ {
-		index[shortuuid.DefaultAlphabet[i]] = byte(i)
+	for i := 0; i < len(b62Chars); i++ {
+		index[b62Chars[i]] = byte(i)
 	}
 	return index
 }
@@ -89,7 +89,7 @@ func guidPrefix[T livekit.Guid]() string {
 
 func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 	var b livekit.GuidBlock
-	idb := []byte(id)[len(id)-guidSize:]
+	idb := []byte(id)[len(id)-GuidSize:]
 	for i := 0; i < 3; i++ {
 		j := i * 3
 		k := i * 4
@@ -102,7 +102,7 @@ func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 
 func UnmarshalGuid[T livekit.Guid](b livekit.GuidBlock) T {
 	prefix := guidPrefix[T]()
-	id := make([]byte, len(prefix)+guidSize)
+	id := make([]byte, len(prefix)+GuidSize)
 	copy(id, []byte(prefix))
 	idb := id[len(prefix):]
 	for i := 0; i < 3; i++ {

@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/livekit/pkg/service/rpc";
+
+import "options.proto";
+import "livekit_models.proto";
+import "livekit_room.proto";
+
+service Participant {
+  rpc RemoveParticipant(livekit.RoomParticipantIdentity) returns (livekit.RemoveParticipantResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
+  rpc MutePublishedTrack(livekit.MuteRoomTrackRequest) returns (livekit.MuteRoomTrackResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
+  rpc UpdateParticipant(livekit.UpdateParticipantRequest) returns (livekit.ParticipantInfo) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
+  rpc UpdateSubscriptions(livekit.UpdateSubscriptionsRequest) returns (livekit.UpdateSubscriptionsResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
+}

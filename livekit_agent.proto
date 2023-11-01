@@ -60,7 +60,7 @@ message ServerMessage {
 
 enum JobType {
     JT_ROOM = 0;
-    JT_PARTICIPANT = 1;
+    JT_PUBLISHER = 1;
 }
 
 enum WorkerStatus {

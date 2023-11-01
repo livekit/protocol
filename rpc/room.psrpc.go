@@ -22,15 +22,7 @@ var _ = version.PsrpcVersion_0_5
 // Room Client Interface
 // =====================
 
-type RoomClient[ParticipantTopicType, RoomTopicType ~string] interface {
-	RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit4.RemoveParticipantResponse, error)
-
-	MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit4.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit4.MuteRoomTrackResponse, error)
-
-	UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error)
-
-	UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit4.UpdateSubscriptionsResponse, error)
-
+type RoomClient[RoomTopicType ~string] interface {
 	DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error)
 
 	SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error)
@@ -43,14 +35,6 @@ type RoomClient[ParticipantTopicType, RoomTopicType ~string] interface {
 // =========================
 
 type RoomServerImpl interface {
-	RemoveParticipant(context.Context, *livekit4.RoomParticipantIdentity) (*livekit4.RemoveParticipantResponse, error)
-
-	MutePublishedTrack(context.Context, *livekit4.MuteRoomTrackRequest) (*livekit4.MuteRoomTrackResponse, error)
-
-	UpdateParticipant(context.Context, *livekit4.UpdateParticipantRequest) (*livekit.ParticipantInfo, error)
-
-	UpdateSubscriptions(context.Context, *livekit4.UpdateSubscriptionsRequest) (*livekit4.UpdateSubscriptionsResponse, error)
-
 	DeleteRoom(context.Context, *livekit4.DeleteRoomRequest) (*livekit4.DeleteRoomResponse, error)
 
 	SendData(context.Context, *livekit4.SendDataRequest) (*livekit4.SendDataResponse, error)
@@ -62,23 +46,13 @@ type RoomServerImpl interface {
 // Room Server Interface
 // =====================
 
-type RoomServer[ParticipantTopicType, RoomTopicType ~string] interface {
-	RegisterRemoveParticipantTopic(participant ParticipantTopicType) error
-	DeregisterRemoveParticipantTopic(participant ParticipantTopicType)
-	RegisterMutePublishedTrackTopic(participant ParticipantTopicType) error
-	DeregisterMutePublishedTrackTopic(participant ParticipantTopicType)
-	RegisterUpdateParticipantTopic(participant ParticipantTopicType) error
-	DeregisterUpdateParticipantTopic(participant ParticipantTopicType)
-	RegisterUpdateSubscriptionsTopic(participant ParticipantTopicType) error
-	DeregisterUpdateSubscriptionsTopic(participant ParticipantTopicType)
+type RoomServer[RoomTopicType ~string] interface {
 	RegisterDeleteRoomTopic(room RoomTopicType) error
 	DeregisterDeleteRoomTopic(room RoomTopicType)
 	RegisterSendDataTopic(room RoomTopicType) error
 	DeregisterSendDataTopic(room RoomTopicType)
 	RegisterUpdateRoomMetadataTopic(room RoomTopicType) error
 	DeregisterUpdateRoomMetadataTopic(room RoomTopicType)
-	RegisterAllParticipantTopics(participant ParticipantTopicType) error
-	DeregisterAllParticipantTopics(participant ParticipantTopicType)
 	RegisterAllRoomTopics(room RoomTopicType) error
 	DeregisterAllRoomTopics(room RoomTopicType)
 
@@ -93,21 +67,17 @@ type RoomServer[ParticipantTopicType, RoomTopicType ~string] interface {
 // Room Client
 // ===========
 
-type roomClient[ParticipantTopicType, RoomTopicType ~string] struct {
+type roomClient[RoomTopicType ~string] struct {
 	client *client.RPCClient
 }
 
 // NewRoomClient creates a psrpc client that implements the RoomClient interface.
-func NewRoomClient[ParticipantTopicType, RoomTopicType ~string](bus psrpc.MessageBus, opts ...psrpc.ClientOption) (RoomClient[ParticipantTopicType, RoomTopicType], error) {
+func NewRoomClient[RoomTopicType ~string](bus psrpc.MessageBus, opts ...psrpc.ClientOption) (RoomClient[RoomTopicType], error) {
 	sd := &info.ServiceDefinition{
 		Name: "Room",
 		ID:   rand.NewClientID(),
 	}
 
-	sd.RegisterMethod("RemoveParticipant", false, false, true, true)
-	sd.RegisterMethod("MutePublishedTrack", false, false, true, true)
-	sd.RegisterMethod("UpdateParticipant", false, false, true, true)
-	sd.RegisterMethod("UpdateSubscriptions", false, false, true, true)
 	sd.RegisterMethod("DeleteRoom", false, false, true, true)
 	sd.RegisterMethod("SendData", false, false, true, true)
 	sd.RegisterMethod("UpdateRoomMetadata", false, false, true, true)
@@ -117,36 +87,20 @@ func NewRoomClient[ParticipantTopicType, RoomTopicType ~string](bus psrpc.Messag
 		return nil, err
 	}
 
-	return &roomClient[ParticipantTopicType, RoomTopicType]{
+	return &roomClient[RoomTopicType]{
 		client: rpcClient,
 	}, nil
 }
 
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit4.RemoveParticipantResponse, error) {
-	return client.RequestSingle[*livekit4.RemoveParticipantResponse](ctx, c.client, "RemoveParticipant", []string{string(participant)}, req, opts...)
-}
-
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit4.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit4.MuteRoomTrackResponse, error) {
-	return client.RequestSingle[*livekit4.MuteRoomTrackResponse](ctx, c.client, "MutePublishedTrack", []string{string(participant)}, req, opts...)
-}
-
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error) {
-	return client.RequestSingle[*livekit.ParticipantInfo](ctx, c.client, "UpdateParticipant", []string{string(participant)}, req, opts...)
-}
-
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit4.UpdateSubscriptionsResponse, error) {
-	return client.RequestSingle[*livekit4.UpdateSubscriptionsResponse](ctx, c.client, "UpdateSubscriptions", []string{string(participant)}, req, opts...)
-}
-
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error) {
+func (c *roomClient[RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error) {
 	return client.RequestSingle[*livekit4.DeleteRoomResponse](ctx, c.client, "DeleteRoom", []string{string(room)}, req, opts...)
 }
 
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error) {
+func (c *roomClient[RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error) {
 	return client.RequestSingle[*livekit4.SendDataResponse](ctx, c.client, "SendData", []string{string(room)}, req, opts...)
 }
 
-func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit4.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
+func (c *roomClient[RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit4.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
 	return client.RequestSingle[*livekit.Room](ctx, c.client, "UpdateRoomMetadata", []string{string(room)}, req, opts...)
 }
 
@@ -154,14 +108,14 @@ func (c *roomClient[ParticipantTopicType, RoomTopicType]) UpdateRoomMetadata(ctx
 // Room Server
 // ===========
 
-type roomServer[ParticipantTopicType, RoomTopicType ~string] struct {
+type roomServer[RoomTopicType ~string] struct {
 	svc RoomServerImpl
 	rpc *server.RPCServer
 }
 
 // NewRoomServer builds a RPCServer that will route requests
 // to the corresponding method in the provided svc implementation.
-func NewRoomServer[ParticipantTopicType, RoomTopicType ~string](svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (RoomServer[ParticipantTopicType, RoomTopicType], error) {
+func NewRoomServer[RoomTopicType ~string](svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (RoomServer[RoomTopicType], error) {
 	sd := &info.ServiceDefinition{
 		Name: "Room",
 		ID:   rand.NewServerID(),
@@ -169,93 +123,40 @@ func NewRoomServer[ParticipantTopicType, RoomTopicType ~string](svc RoomServerIm
 
 	s := server.NewRPCServer(sd, bus, opts...)
 
-	sd.RegisterMethod("RemoveParticipant", false, false, true, true)
-	sd.RegisterMethod("MutePublishedTrack", false, false, true, true)
-	sd.RegisterMethod("UpdateParticipant", false, false, true, true)
-	sd.RegisterMethod("UpdateSubscriptions", false, false, true, true)
 	sd.RegisterMethod("DeleteRoom", false, false, true, true)
 	sd.RegisterMethod("SendData", false, false, true, true)
 	sd.RegisterMethod("UpdateRoomMetadata", false, false, true, true)
-	return &roomServer[ParticipantTopicType, RoomTopicType]{
+	return &roomServer[RoomTopicType]{
 		svc: svc,
 		rpc: s,
 	}, nil
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterRemoveParticipantTopic(participant ParticipantTopicType) error {
-	return server.RegisterHandler(s.rpc, "RemoveParticipant", []string{string(participant)}, s.svc.RemoveParticipant, nil)
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterRemoveParticipantTopic(participant ParticipantTopicType) {
-	s.rpc.DeregisterHandler("RemoveParticipant", []string{string(participant)})
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterMutePublishedTrackTopic(participant ParticipantTopicType) error {
-	return server.RegisterHandler(s.rpc, "MutePublishedTrack", []string{string(participant)}, s.svc.MutePublishedTrack, nil)
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterMutePublishedTrackTopic(participant ParticipantTopicType) {
-	s.rpc.DeregisterHandler("MutePublishedTrack", []string{string(participant)})
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterUpdateParticipantTopic(participant ParticipantTopicType) error {
-	return server.RegisterHandler(s.rpc, "UpdateParticipant", []string{string(participant)}, s.svc.UpdateParticipant, nil)
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterUpdateParticipantTopic(participant ParticipantTopicType) {
-	s.rpc.DeregisterHandler("UpdateParticipant", []string{string(participant)})
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterUpdateSubscriptionsTopic(participant ParticipantTopicType) error {
-	return server.RegisterHandler(s.rpc, "UpdateSubscriptions", []string{string(participant)}, s.svc.UpdateSubscriptions, nil)
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterUpdateSubscriptionsTopic(participant ParticipantTopicType) {
-	s.rpc.DeregisterHandler("UpdateSubscriptions", []string{string(participant)})
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterDeleteRoomTopic(room RoomTopicType) error {
+func (s *roomServer[RoomTopicType]) RegisterDeleteRoomTopic(room RoomTopicType) error {
 	return server.RegisterHandler(s.rpc, "DeleteRoom", []string{string(room)}, s.svc.DeleteRoom, nil)
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterDeleteRoomTopic(room RoomTopicType) {
+func (s *roomServer[RoomTopicType]) DeregisterDeleteRoomTopic(room RoomTopicType) {
 	s.rpc.DeregisterHandler("DeleteRoom", []string{string(room)})
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterSendDataTopic(room RoomTopicType) error {
+func (s *roomServer[RoomTopicType]) RegisterSendDataTopic(room RoomTopicType) error {
 	return server.RegisterHandler(s.rpc, "SendData", []string{string(room)}, s.svc.SendData, nil)
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterSendDataTopic(room RoomTopicType) {
+func (s *roomServer[RoomTopicType]) DeregisterSendDataTopic(room RoomTopicType) {
 	s.rpc.DeregisterHandler("SendData", []string{string(room)})
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterUpdateRoomMetadataTopic(room RoomTopicType) error {
+func (s *roomServer[RoomTopicType]) RegisterUpdateRoomMetadataTopic(room RoomTopicType) error {
 	return server.RegisterHandler(s.rpc, "UpdateRoomMetadata", []string{string(room)}, s.svc.UpdateRoomMetadata, nil)
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterUpdateRoomMetadataTopic(room RoomTopicType) {
+func (s *roomServer[RoomTopicType]) DeregisterUpdateRoomMetadataTopic(room RoomTopicType) {
 	s.rpc.DeregisterHandler("UpdateRoomMetadata", []string{string(room)})
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) allParticipantTopicRegisterers() server.RegistererSlice {
-	return server.RegistererSlice{
-		server.NewRegisterer(s.RegisterRemoveParticipantTopic, s.DeregisterRemoveParticipantTopic),
-		server.NewRegisterer(s.RegisterMutePublishedTrackTopic, s.DeregisterMutePublishedTrackTopic),
-		server.NewRegisterer(s.RegisterUpdateParticipantTopic, s.DeregisterUpdateParticipantTopic),
-		server.NewRegisterer(s.RegisterUpdateSubscriptionsTopic, s.DeregisterUpdateSubscriptionsTopic),
-	}
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterAllParticipantTopics(participant ParticipantTopicType) error {
-	return s.allParticipantTopicRegisterers().Register(participant)
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterAllParticipantTopics(participant ParticipantTopicType) {
-	s.allParticipantTopicRegisterers().Deregister(participant)
-}
-
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) allRoomTopicRegisterers() server.RegistererSlice {
+func (s *roomServer[RoomTopicType]) allRoomTopicRegisterers() server.RegistererSlice {
 	return server.RegistererSlice{
 		server.NewRegisterer(s.RegisterDeleteRoomTopic, s.DeregisterDeleteRoomTopic),
 		server.NewRegisterer(s.RegisterSendDataTopic, s.DeregisterSendDataTopic),
@@ -263,46 +164,37 @@ func (s *roomServer[ParticipantTopicType, RoomTopicType]) allRoomTopicRegisterer
 	}
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) RegisterAllRoomTopics(room RoomTopicType) error {
+func (s *roomServer[RoomTopicType]) RegisterAllRoomTopics(room RoomTopicType) error {
 	return s.allRoomTopicRegisterers().Register(room)
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) DeregisterAllRoomTopics(room RoomTopicType) {
+func (s *roomServer[RoomTopicType]) DeregisterAllRoomTopics(room RoomTopicType) {
 	s.allRoomTopicRegisterers().Deregister(room)
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) Shutdown() {
+func (s *roomServer[RoomTopicType]) Shutdown() {
 	s.rpc.Close(false)
 }
 
-func (s *roomServer[ParticipantTopicType, RoomTopicType]) Kill() {
+func (s *roomServer[RoomTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
 var psrpcFileDescriptor4 = []byte{
-	// 384 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0xdf, 0x6a, 0xf2, 0x30,
-	0x18, 0xc6, 0x29, 0x9f, 0xc8, 0x47, 0x3e, 0x14, 0xcd, 0x37, 0x86, 0xeb, 0xfe, 0xe0, 0x9c, 0x47,
-	0x63, 0xb4, 0xb0, 0xdd, 0xc1, 0xf0, 0x64, 0x07, 0x82, 0xd4, 0x8d, 0xc1, 0x60, 0x48, 0x9b, 0xbe,
-	0xd3, 0x60, 0xdb, 0x64, 0x49, 0x5a, 0xf0, 0x68, 0x67, 0x03, 0xef, 0x61, 0x57, 0xe1, 0x15, 0x8e,
-	0x5a, 0xd3, 0x56, 0xa7, 0xdb, 0x3c, 0x69, 0xe9, 0xf3, 0xbc, 0xef, 0xf3, 0x4b, 0xde, 0x26, 0xa8,
-	0x2e, 0x38, 0xb1, 0x05, 0x63, 0xa1, 0xc5, 0x05, 0x53, 0x0c, 0xff, 0x11, 0x9c, 0x98, 0x35, 0xc6,
-	0x15, 0x65, 0x91, 0xcc, 0x34, 0xf3, 0x20, 0xa0, 0x09, 0x4c, 0xa9, 0x1a, 0x85, 0xcc, 0x87, 0x40,
-	0xab, 0x58, 0xab, 0x45, 0xf7, 0xf5, 0x47, 0x15, 0x55, 0x1c, 0xc6, 0x42, 0xfc, 0x86, 0x9a, 0x0e,
-	0x84, 0x2c, 0x81, 0x81, 0x2b, 0x14, 0x25, 0x94, 0xbb, 0x91, 0xc2, 0x6d, 0x6b, 0xd5, 0x62, 0xa5,
-	0x35, 0x25, 0xe7, 0xce, 0x87, 0x48, 0x51, 0x35, 0x33, 0x3b, 0x45, 0xc5, 0x66, 0xb7, 0x03, 0x92,
-	0xb3, 0x48, 0x42, 0xa7, 0xbb, 0x98, 0x1b, 0xed, 0x86, 0x61, 0x9e, 0xa0, 0x7f, 0xbc, 0x14, 0x5e,
-	0xfe, 0x68, 0x19, 0x78, 0x86, 0x70, 0x3f, 0x56, 0x30, 0x88, 0xbd, 0x80, 0xca, 0x09, 0xf8, 0xf7,
-	0xc2, 0x25, 0x53, 0x7c, 0x9a, 0xe7, 0xa7, 0x66, 0xba, 0x8a, 0xa5, 0xee, 0xc0, 0x6b, 0x0c, 0x52,
-	0x99, 0x67, 0xbb, 0xec, 0xbd, 0xd0, 0x09, 0x6a, 0x3e, 0x70, 0xdf, 0x55, 0x6b, 0x7b, 0x3f, 0xcf,
-	0xa3, 0xbf, 0x78, 0x9a, 0xde, 0xca, 0x4b, 0xca, 0xa3, 0x89, 0x5e, 0xd8, 0x2f, 0xb9, 0xef, 0x06,
-	0xfa, 0x9f, 0x85, 0x0f, 0x63, 0x4f, 0x12, 0x41, 0xb3, 0x9f, 0x88, 0x2f, 0x36, 0xd0, 0x6b, 0xae,
-	0x86, 0x77, 0xbf, 0x2f, 0xda, 0x6b, 0x00, 0xcf, 0x08, 0xf5, 0x20, 0x80, 0x6c, 0x82, 0xd8, 0xcc,
-	0x93, 0x0b, 0x51, 0x53, 0x8f, 0xb7, 0x7a, 0x2b, 0xd8, 0xe1, 0x62, 0x6e, 0xe0, 0x86, 0x61, 0xd6,
-	0x51, 0x25, 0x3d, 0x62, 0x78, 0xf9, 0x6c, 0x19, 0xf8, 0x11, 0xfd, 0x1d, 0x42, 0xe4, 0xf7, 0x5c,
-	0xe5, 0xe2, 0x62, 0x66, 0x5a, 0xd2, 0xd1, 0x47, 0x5b, 0x9c, 0x1f, 0x82, 0x47, 0x08, 0x67, 0x9b,
-	0x4f, 0x97, 0xd1, 0x07, 0xe5, 0xfa, 0x29, 0xa2, 0xb3, 0x31, 0x99, 0xb2, 0xa9, 0x61, 0xb5, 0xb5,
-	0x93, 0xbd, 0x0b, 0x70, 0x7b, 0xf5, 0x74, 0x39, 0xa6, 0x6a, 0x12, 0x7b, 0x16, 0x61, 0xa1, 0xbd,
-	0x6a, 0xc9, 0xdf, 0x7c, 0x3a, 0xb6, 0x25, 0x88, 0x84, 0x12, 0xb0, 0x05, 0x27, 0x5e, 0x75, 0x79,
-	0xa7, 0x6e, 0x3e, 0x03, 0x00, 0x00, 0xff, 0xff, 0xd8, 0xc1, 0x20, 0xb0, 0xa3, 0x03, 0x00, 0x00,
+	// 237 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x2a, 0x48, 0xd6,
+	0x2f, 0xca, 0xcf, 0xcf, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x2e, 0x2a, 0x48, 0x96,
+	0xe2, 0xcd, 0x2f, 0x28, 0xc9, 0xcc, 0xcf, 0x2b, 0x86, 0x88, 0x49, 0x89, 0xe4, 0x64, 0x96, 0xa5,
+	0x66, 0x67, 0x96, 0xc4, 0xe7, 0xe6, 0xa7, 0xa4, 0xe6, 0xc0, 0x44, 0x85, 0x60, 0xa2, 0x08, 0xdd,
+	0x46, 0xf3, 0x99, 0xb8, 0x58, 0x82, 0xf2, 0xf3, 0x73, 0x85, 0x62, 0xb9, 0xb8, 0x5c, 0x52, 0x73,
+	0x52, 0x4b, 0x52, 0xc1, 0x3c, 0x29, 0x3d, 0xa8, 0x5a, 0x3d, 0x84, 0x60, 0x50, 0x6a, 0x61, 0x69,
+	0x6a, 0x71, 0x89, 0x94, 0x34, 0x56, 0xb9, 0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0x25, 0xb1, 0x4d,
+	0x9d, 0x8c, 0x42, 0x02, 0x8c, 0x52, 0x7c, 0x5c, 0x2c, 0x20, 0x5b, 0x84, 0xc0, 0xa4, 0x04, 0xa3,
+	0x50, 0x38, 0x17, 0x47, 0x70, 0x6a, 0x5e, 0x8a, 0x4b, 0x62, 0x49, 0xa2, 0x90, 0x04, 0xdc, 0x00,
+	0x98, 0x10, 0xcc, 0x68, 0x49, 0x2c, 0x32, 0x04, 0x0c, 0x8e, 0xe7, 0x12, 0x0a, 0x2d, 0x48, 0x49,
+	0x84, 0x38, 0xc3, 0x37, 0xb5, 0x24, 0x31, 0x05, 0x64, 0x85, 0x12, 0xdc, 0x20, 0x4c, 0x49, 0x98,
+	0x65, 0xbc, 0x70, 0x35, 0x20, 0x59, 0x5c, 0x16, 0x38, 0xe9, 0x44, 0x69, 0xa5, 0x67, 0x96, 0x64,
+	0x94, 0x26, 0xe9, 0x25, 0xe7, 0xe7, 0xea, 0x43, 0xb5, 0xc0, 0xe9, 0x82, 0xec, 0x74, 0xfd, 0xe2,
+	0xd4, 0xa2, 0xb2, 0xcc, 0xe4, 0x54, 0xfd, 0xa2, 0x82, 0xe4, 0x24, 0x36, 0x70, 0xb0, 0x1a, 0x03,
+	0x02, 0x00, 0x00, 0xff, 0xff, 0x53, 0xa6, 0x88, 0x04, 0xa6, 0x01, 0x00, 0x00,
 }
