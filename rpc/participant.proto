@@ -16,7 +16,6 @@ service Participant {
         group: "participant"
         names: ["participant"]
         typed: true
-        single_server: true
       };
     };
   };
@@ -27,7 +26,6 @@ service Participant {
         group: "participant"
         names: ["participant"]
         typed: true
-        single_server: true
       };
     };
   };
@@ -38,7 +36,6 @@ service Participant {
         group: "participant"
         names: ["participant"]
         typed: true
-        single_server: true
       };
     };
   };
@@ -49,7 +46,6 @@ service Participant {
         group: "participant"
         names: ["participant"]
         typed: true
-        single_server: true
       };
     };
   };
