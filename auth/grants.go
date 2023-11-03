@@ -23,15 +23,29 @@ import (
 )
 
 type VideoGrant struct {
-	// actions on rooms
-	RoomCreate bool `json:"roomCreate,omitempty"`
-	RoomList   bool `json:"roomList,omitempty"`
-	RoomRecord bool `json:"roomRecord,omitempty"`
+	// ---- actions on rooms
 
-	// actions on a particular room
-	RoomAdmin bool   `json:"roomAdmin,omitempty"`
-	RoomJoin  bool   `json:"roomJoin,omitempty"`
-	Room      string `json:"room,omitempty"`
+	// ability to create rooms, typically used only for CreateRoom API
+	RoomCreate bool `json:"roomCreate,omitempty"`
+	// ability to retrieve read-only information about rooms
+	RoomList bool `json:"roomList,omitempty"`
+	// ability to record any room
+	// this permission is too broad, and will be replaced by roomEgress, which is applied to a specific room
+	RoomRecord bool `json:"roomRecord,omitempty"`
+	// actions on ingresses
+	IngressAdmin bool `json:"ingressAdmin,omitempty"` // applies to all ingress
+
+	// ---- actions on a single room
+
+	Room string `json:"room,omitempty"`
+	// can token holder perform admin operations on the room
+	RoomAdmin bool `json:"roomAdmin,omitempty"`
+	// can token holder join the room as a participant
+	RoomJoin bool `json:"roomJoin,omitempty"`
+	// can start egress sessions from the room
+	RoomEgress bool `json:"roomEgress,omitempty"`
+
+	// ---- activity allowed by a participant with roomJoin
 
 	// permissions within a room, if none of the permissions are set explicitly
 	// it will be granted with all publish and subscribe permissions
@@ -44,8 +58,7 @@ type VideoGrant struct {
 	// by default, a participant is not allowed to update its own metadata
 	CanUpdateOwnMetadata *bool `json:"canUpdateOwnMetadata,omitempty"`
 
-	// actions on ingresses
-	IngressAdmin bool `json:"ingressAdmin,omitempty"` // applies to all ingress
+	// ---- attributes on a participant
 
 	// participant is not visible to other participants
 	Hidden bool `json:"hidden,omitempty"`

@@ -33,14 +33,30 @@ message Room {
   uint32 num_participants = 9;
   uint32 num_publishers = 11;
   bool active_recording = 10;
+  AppMode mode = 13;
 
-  // NEXT-ID: 13
+  // NEXT-ID: 14
+}
+
+// AppMode configures the behavior and limits of the room
+enum AppMode {
+  // default mode, up to 3k users per room, everyone can be a publisher
+  // most applications should use this mode
+  AM_DEFAULT = 0;
+  // Interactive livestreams with support for large audiences - Cloud-only
+  // limited to 25 publishers (with canPublish permissions) and unlimited viewers (with Cloud)
+  // some behavioral differences in livestream mode:
+  // - only admins will receive participant information from subscribers
+  // - default playout_delay is set to 150ms, you can override this by setting playout_delay in CreateRoom
+  AM_LIVESTREAM = 1;
 }
 
 message Codec {
   string mime = 1;
   string fmtp_line = 2;
 }
+
+// AudioCodec and VideoCodec are used by Ingress / Egress
 
 enum AudioCodec {
   DEFAULT_AC = 0;

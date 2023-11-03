@@ -162,7 +162,7 @@ message StartSession {
   // A user's ClaimGrants serialized in JSON
   string grants_json = 14;
   bool adaptive_stream = 15;
-  //if reconnect, client will set current sid
+  // if reconnect, client will set current sid
   string participant_id = 16;
   ReconnectReason reconnect_reason = 17;
   optional bool subscriber_allow_pause = 18;
