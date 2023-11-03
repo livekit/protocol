@@ -1,0 +1,111 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "livekit_models.proto";
+
+message AgentInfo {
+    string id = 1;
+    string name = 2;
+    string version = 3;
+}
+
+message Job {
+    string id = 1;
+    JobType type = 2;
+    Room room = 3;
+    optional ParticipantInfo participant = 4;
+}
+
+// from Worker to Server
+message WorkerMessage {
+    oneof message {
+        // agent workers need to register themselves with the server first
+        RegisterWorkerRequest register = 1;
+        // worker confirms to server that it's available for a job, or declines it
+        AvailabilityResponse availability = 2;
+        // worker can update its status to the server, including taking itself out of the pool
+        UpdateWorkerStatus status = 3;
+        JobStatusUpdate job_update = 4;
+    };
+}
+
+// from Server to Worker
+message ServerMessage {
+    oneof message {
+        // server confirms the registration, from this moment on, the worker is considered active
+        RegisterWorkerResponse register = 1;
+        // server asks worker to confirm availability for a job
+        AvailabilityRequest availability = 2;
+        JobAssignment assignment = 3;
+    }
+}
+
+enum JobType {
+    JT_ROOM = 0;
+    JT_PUBLISHER = 1;
+}
+
+enum WorkerStatus {
+    WS_AVAILABLE = 0;
+    WS_FULL = 1;
+}
+
+enum JobStatus {
+    JS_UNKNOWN = 0;
+    JS_SUCCESS = 1;
+    JS_FAILED = 2;
+}
+
+message RegisterWorkerRequest {
+    JobType type = 1;
+    string worker_id = 2;
+    string version = 3;
+    string name = 4;
+}
+
+message RegisterWorkerResponse {
+    string worker_id = 1;
+    string server_version = 2;
+}
+
+message AvailabilityRequest {
+    Job job = 1;
+}
+
+message AvailabilityResponse {
+    string job_id = 1;
+    bool available = 2;
+}
+
+message JobStatusUpdate {
+    string job_id = 1;
+    JobStatus status = 2;
+    string error = 3;
+    string user_data = 4;
+}
+
+message JobAssignment {
+    Job job = 1;
+}
+
+message UpdateWorkerStatus {
+    WorkerStatus status = 1;
+}

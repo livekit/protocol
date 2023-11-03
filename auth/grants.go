@@ -51,6 +51,9 @@ type VideoGrant struct {
 	Hidden bool `json:"hidden,omitempty"`
 	// indicates to the room that current participant is a recorder
 	Recorder bool `json:"recorder,omitempty"`
+	// indicates that the holder can register as an Agent framework worker
+	// it is also set on all participants that are joining as Agent
+	Agent bool `json:"agent,omitempty"`
 }
 
 type ClaimGrants struct {

@@ -14,7 +14,7 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import livekit "github.com/livekit/protocol/livekit"
-import livekit3 "github.com/livekit/protocol/livekit"
+import livekit4 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -23,13 +23,13 @@ var _ = version.PsrpcVersion_0_5
 // ============================
 
 type ParticipantClient[ParticipantTopicType ~string] interface {
-	RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit3.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit3.RemoveParticipantResponse, error)
+	RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit4.RemoveParticipantResponse, error)
 
-	MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit3.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit3.MuteRoomTrackResponse, error)
+	MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit4.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit4.MuteRoomTrackResponse, error)
 
-	UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit3.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error)
+	UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error)
 
-	UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit3.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit3.UpdateSubscriptionsResponse, error)
+	UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit4.UpdateSubscriptionsResponse, error)
 }
 
 // ================================
@@ -37,13 +37,13 @@ type ParticipantClient[ParticipantTopicType ~string] interface {
 // ================================
 
 type ParticipantServerImpl interface {
-	RemoveParticipant(context.Context, *livekit3.RoomParticipantIdentity) (*livekit3.RemoveParticipantResponse, error)
+	RemoveParticipant(context.Context, *livekit4.RoomParticipantIdentity) (*livekit4.RemoveParticipantResponse, error)
 
-	MutePublishedTrack(context.Context, *livekit3.MuteRoomTrackRequest) (*livekit3.MuteRoomTrackResponse, error)
+	MutePublishedTrack(context.Context, *livekit4.MuteRoomTrackRequest) (*livekit4.MuteRoomTrackResponse, error)
 
-	UpdateParticipant(context.Context, *livekit3.UpdateParticipantRequest) (*livekit.ParticipantInfo, error)
+	UpdateParticipant(context.Context, *livekit4.UpdateParticipantRequest) (*livekit.ParticipantInfo, error)
 
-	UpdateSubscriptions(context.Context, *livekit3.UpdateSubscriptionsRequest) (*livekit3.UpdateSubscriptionsResponse, error)
+	UpdateSubscriptions(context.Context, *livekit4.UpdateSubscriptionsRequest) (*livekit4.UpdateSubscriptionsResponse, error)
 }
 
 // ============================
@@ -99,20 +99,20 @@ func NewParticipantClient[ParticipantTopicType ~string](bus psrpc.MessageBus, op
 	}, nil
 }
 
-func (c *participantClient[ParticipantTopicType]) RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit3.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit3.RemoveParticipantResponse, error) {
-	return client.RequestSingle[*livekit3.RemoveParticipantResponse](ctx, c.client, "RemoveParticipant", []string{string(participant)}, req, opts...)
+func (c *participantClient[ParticipantTopicType]) RemoveParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit4.RemoveParticipantResponse, error) {
+	return client.RequestSingle[*livekit4.RemoveParticipantResponse](ctx, c.client, "RemoveParticipant", []string{string(participant)}, req, opts...)
 }
 
-func (c *participantClient[ParticipantTopicType]) MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit3.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit3.MuteRoomTrackResponse, error) {
-	return client.RequestSingle[*livekit3.MuteRoomTrackResponse](ctx, c.client, "MutePublishedTrack", []string{string(participant)}, req, opts...)
+func (c *participantClient[ParticipantTopicType]) MutePublishedTrack(ctx context.Context, participant ParticipantTopicType, req *livekit4.MuteRoomTrackRequest, opts ...psrpc.RequestOption) (*livekit4.MuteRoomTrackResponse, error) {
+	return client.RequestSingle[*livekit4.MuteRoomTrackResponse](ctx, c.client, "MutePublishedTrack", []string{string(participant)}, req, opts...)
 }
 
-func (c *participantClient[ParticipantTopicType]) UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit3.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error) {
+func (c *participantClient[ParticipantTopicType]) UpdateParticipant(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateParticipantRequest, opts ...psrpc.RequestOption) (*livekit.ParticipantInfo, error) {
 	return client.RequestSingle[*livekit.ParticipantInfo](ctx, c.client, "UpdateParticipant", []string{string(participant)}, req, opts...)
 }
 
-func (c *participantClient[ParticipantTopicType]) UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit3.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit3.UpdateSubscriptionsResponse, error) {
-	return client.RequestSingle[*livekit3.UpdateSubscriptionsResponse](ctx, c.client, "UpdateSubscriptions", []string{string(participant)}, req, opts...)
+func (c *participantClient[ParticipantTopicType]) UpdateSubscriptions(ctx context.Context, participant ParticipantTopicType, req *livekit4.UpdateSubscriptionsRequest, opts ...psrpc.RequestOption) (*livekit4.UpdateSubscriptionsResponse, error) {
+	return client.RequestSingle[*livekit4.UpdateSubscriptionsResponse](ctx, c.client, "UpdateSubscriptions", []string{string(participant)}, req, opts...)
 }
 
 // ==================
@@ -201,7 +201,7 @@ func (s *participantServer[ParticipantTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
-var psrpcFileDescriptor4 = []byte{
+var psrpcFileDescriptor5 = []byte{
 	// 299 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0xcf, 0x4a, 0xc3, 0x40,
 	0x10, 0xc6, 0x09, 0x8a, 0x87, 0x2d, 0x82, 0x5d, 0x15, 0x4a, 0x50, 0xa9, 0xb5, 0x27, 0x91, 0x04,

@@ -13,8 +13,8 @@ import (
 	"github.com/livekit/psrpc/pkg/server"
 	"github.com/livekit/psrpc/version"
 )
-import google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
-import livekit1 "github.com/livekit/protocol/livekit"
+import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
+import livekit2 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -24,18 +24,18 @@ var _ = version.PsrpcVersion_0_5
 
 type IOInfoClient interface {
 	// egress
-	CreateEgress(ctx context.Context, req *livekit1.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error)
+	CreateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
-	UpdateEgress(ctx context.Context, req *livekit1.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error)
+	UpdateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
-	GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit1.EgressInfo, error)
+	GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit2.EgressInfo, error)
 
-	ListEgress(ctx context.Context, req *livekit1.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit1.ListEgressResponse, error)
+	ListEgress(ctx context.Context, req *livekit2.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit2.ListEgressResponse, error)
 
 	// ingress
 	GetIngressInfo(ctx context.Context, req *GetIngressInfoRequest, opts ...psrpc.RequestOption) (*GetIngressInfoResponse, error)
 
-	UpdateIngressState(ctx context.Context, req *UpdateIngressStateRequest, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error)
+	UpdateIngressState(ctx context.Context, req *UpdateIngressStateRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 }
 
 // ===========================
@@ -44,18 +44,18 @@ type IOInfoClient interface {
 
 type IOInfoServerImpl interface {
 	// egress
-	CreateEgress(context.Context, *livekit1.EgressInfo) (*google_protobuf3.Empty, error)
+	CreateEgress(context.Context, *livekit2.EgressInfo) (*google_protobuf.Empty, error)
 
-	UpdateEgress(context.Context, *livekit1.EgressInfo) (*google_protobuf3.Empty, error)
+	UpdateEgress(context.Context, *livekit2.EgressInfo) (*google_protobuf.Empty, error)
 
-	GetEgress(context.Context, *GetEgressRequest) (*livekit1.EgressInfo, error)
+	GetEgress(context.Context, *GetEgressRequest) (*livekit2.EgressInfo, error)
 
-	ListEgress(context.Context, *livekit1.ListEgressRequest) (*livekit1.ListEgressResponse, error)
+	ListEgress(context.Context, *livekit2.ListEgressRequest) (*livekit2.ListEgressResponse, error)
 
 	// ingress
 	GetIngressInfo(context.Context, *GetIngressInfoRequest) (*GetIngressInfoResponse, error)
 
-	UpdateIngressState(context.Context, *UpdateIngressStateRequest) (*google_protobuf3.Empty, error)
+	UpdateIngressState(context.Context, *UpdateIngressStateRequest) (*google_protobuf.Empty, error)
 }
 
 // =======================
@@ -103,28 +103,28 @@ func NewIOInfoClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (IOInfoCl
 	}, nil
 }
 
-func (c *iOInfoClient) CreateEgress(ctx context.Context, req *livekit1.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error) {
-	return client.RequestSingle[*google_protobuf3.Empty](ctx, c.client, "CreateEgress", nil, req, opts...)
+func (c *iOInfoClient) CreateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "CreateEgress", nil, req, opts...)
 }
 
-func (c *iOInfoClient) UpdateEgress(ctx context.Context, req *livekit1.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error) {
-	return client.RequestSingle[*google_protobuf3.Empty](ctx, c.client, "UpdateEgress", nil, req, opts...)
+func (c *iOInfoClient) UpdateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "UpdateEgress", nil, req, opts...)
 }
 
-func (c *iOInfoClient) GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit1.EgressInfo, error) {
-	return client.RequestSingle[*livekit1.EgressInfo](ctx, c.client, "GetEgress", nil, req, opts...)
+func (c *iOInfoClient) GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit2.EgressInfo, error) {
+	return client.RequestSingle[*livekit2.EgressInfo](ctx, c.client, "GetEgress", nil, req, opts...)
 }
 
-func (c *iOInfoClient) ListEgress(ctx context.Context, req *livekit1.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit1.ListEgressResponse, error) {
-	return client.RequestSingle[*livekit1.ListEgressResponse](ctx, c.client, "ListEgress", nil, req, opts...)
+func (c *iOInfoClient) ListEgress(ctx context.Context, req *livekit2.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit2.ListEgressResponse, error) {
+	return client.RequestSingle[*livekit2.ListEgressResponse](ctx, c.client, "ListEgress", nil, req, opts...)
 }
 
 func (c *iOInfoClient) GetIngressInfo(ctx context.Context, req *GetIngressInfoRequest, opts ...psrpc.RequestOption) (*GetIngressInfoResponse, error) {
 	return client.RequestSingle[*GetIngressInfoResponse](ctx, c.client, "GetIngressInfo", nil, req, opts...)
 }
 
-func (c *iOInfoClient) UpdateIngressState(ctx context.Context, req *UpdateIngressStateRequest, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error) {
-	return client.RequestSingle[*google_protobuf3.Empty](ctx, c.client, "UpdateIngressState", nil, req, opts...)
+func (c *iOInfoClient) UpdateIngressState(ctx context.Context, req *UpdateIngressStateRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "UpdateIngressState", nil, req, opts...)
 }
 
 // =============
@@ -203,7 +203,7 @@ func (s *iOInfoServer) Kill() {
 	s.rpc.Close(true)
 }
 
-var psrpcFileDescriptor2 = []byte{
+var psrpcFileDescriptor3 = []byte{
 	// 410 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x52, 0x4f, 0x8b, 0xd3, 0x40,
 	0x14, 0x67, 0xad, 0x5b, 0xcc, 0xdb, 0x45, 0x64, 0x6c, 0x96, 0x9a, 0xa0, 0x48, 0x4e, 0x8b, 0xca,

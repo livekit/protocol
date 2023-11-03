@@ -13,8 +13,8 @@ import (
 	"github.com/livekit/psrpc/pkg/server"
 	"github.com/livekit/psrpc/version"
 )
-import google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
-import livekit2 "github.com/livekit/protocol/livekit"
+import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
+import livekit3 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -23,7 +23,7 @@ var _ = version.PsrpcVersion_0_5
 // ================================
 
 type IngressInternalClient interface {
-	StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressInfo, error)
+	StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressInfo, error)
 
 	ListActiveIngress(ctx context.Context, req *ListActiveIngressRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*ListActiveIngressResponse], error)
 }
@@ -33,7 +33,7 @@ type IngressInternalClient interface {
 // ====================================
 
 type IngressInternalServerImpl interface {
-	StartIngress(context.Context, *StartIngressRequest) (*livekit2.IngressInfo, error)
+	StartIngress(context.Context, *StartIngressRequest) (*livekit3.IngressInfo, error)
 	StartIngressAffinity(context.Context, *StartIngressRequest) float32
 
 	ListActiveIngress(context.Context, *ListActiveIngressRequest) (*ListActiveIngressResponse, error)
@@ -80,8 +80,8 @@ func NewIngressInternalClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) 
 	}, nil
 }
 
-func (c *ingressInternalClient) StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressInfo, error) {
-	return client.RequestSingle[*livekit2.IngressInfo](ctx, c.client, "StartIngress", nil, req, opts...)
+func (c *ingressInternalClient) StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressInfo, error) {
+	return client.RequestSingle[*livekit3.IngressInfo](ctx, c.client, "StartIngress", nil, req, opts...)
 }
 
 func (c *ingressInternalClient) ListActiveIngress(ctx context.Context, req *ListActiveIngressRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*ListActiveIngressResponse], error) {
@@ -141,11 +141,11 @@ func (s *ingressInternalServer) Kill() {
 // ===============================
 
 type IngressHandlerClient interface {
-	UpdateIngress(ctx context.Context, topic string, req *livekit2.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressState, error)
+	UpdateIngress(ctx context.Context, topic string, req *livekit3.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error)
 
-	DeleteIngress(ctx context.Context, topic string, req *livekit2.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressState, error)
+	DeleteIngress(ctx context.Context, topic string, req *livekit3.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error)
 
-	DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error)
+	DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 }
 
 // ===================================
@@ -153,11 +153,11 @@ type IngressHandlerClient interface {
 // ===================================
 
 type IngressHandlerServerImpl interface {
-	UpdateIngress(context.Context, *livekit2.UpdateIngressRequest) (*livekit2.IngressState, error)
+	UpdateIngress(context.Context, *livekit3.UpdateIngressRequest) (*livekit3.IngressState, error)
 
-	DeleteIngress(context.Context, *livekit2.DeleteIngressRequest) (*livekit2.IngressState, error)
+	DeleteIngress(context.Context, *livekit3.DeleteIngressRequest) (*livekit3.IngressState, error)
 
-	DeleteWHIPResource(context.Context, *DeleteWHIPResourceRequest) (*google_protobuf3.Empty, error)
+	DeleteWHIPResource(context.Context, *DeleteWHIPResourceRequest) (*google_protobuf.Empty, error)
 }
 
 // ===============================
@@ -208,16 +208,16 @@ func NewIngressHandlerClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (
 	}, nil
 }
 
-func (c *ingressHandlerClient) UpdateIngress(ctx context.Context, topic string, req *livekit2.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressState, error) {
-	return client.RequestSingle[*livekit2.IngressState](ctx, c.client, "UpdateIngress", []string{topic}, req, opts...)
+func (c *ingressHandlerClient) UpdateIngress(ctx context.Context, topic string, req *livekit3.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error) {
+	return client.RequestSingle[*livekit3.IngressState](ctx, c.client, "UpdateIngress", []string{topic}, req, opts...)
 }
 
-func (c *ingressHandlerClient) DeleteIngress(ctx context.Context, topic string, req *livekit2.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit2.IngressState, error) {
-	return client.RequestSingle[*livekit2.IngressState](ctx, c.client, "DeleteIngress", []string{topic}, req, opts...)
+func (c *ingressHandlerClient) DeleteIngress(ctx context.Context, topic string, req *livekit3.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error) {
+	return client.RequestSingle[*livekit3.IngressState](ctx, c.client, "DeleteIngress", []string{topic}, req, opts...)
 }
 
-func (c *ingressHandlerClient) DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf3.Empty, error) {
-	return client.RequestSingle[*google_protobuf3.Empty](ctx, c.client, "DeleteWHIPResource", []string{topic}, req, opts...)
+func (c *ingressHandlerClient) DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "DeleteWHIPResource", []string{topic}, req, opts...)
 }
 
 // =====================
@@ -280,7 +280,7 @@ func (s *ingressHandlerServer) Kill() {
 	s.rpc.Close(true)
 }
 
-var psrpcFileDescriptor1 = []byte{
+var psrpcFileDescriptor2 = []byte{
 	// 449 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x51, 0x6f, 0xd3, 0x30,
 	0x10, 0xc7, 0xe5, 0x76, 0x54, 0xec, 0xc6, 0x80, 0x99, 0x15, 0x65, 0x41, 0x83, 0x29, 0x4f, 0x15,

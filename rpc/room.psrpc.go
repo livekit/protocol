@@ -14,7 +14,7 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import livekit "github.com/livekit/protocol/livekit"
-import livekit3 "github.com/livekit/protocol/livekit"
+import livekit4 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -23,11 +23,11 @@ var _ = version.PsrpcVersion_0_5
 // =====================
 
 type RoomClient[RoomTopicType ~string] interface {
-	DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit3.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit3.DeleteRoomResponse, error)
+	DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error)
 
-	SendData(ctx context.Context, room RoomTopicType, req *livekit3.SendDataRequest, opts ...psrpc.RequestOption) (*livekit3.SendDataResponse, error)
+	SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error)
 
-	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit3.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error)
+	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit4.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error)
 }
 
 // =========================
@@ -35,11 +35,11 @@ type RoomClient[RoomTopicType ~string] interface {
 // =========================
 
 type RoomServerImpl interface {
-	DeleteRoom(context.Context, *livekit3.DeleteRoomRequest) (*livekit3.DeleteRoomResponse, error)
+	DeleteRoom(context.Context, *livekit4.DeleteRoomRequest) (*livekit4.DeleteRoomResponse, error)
 
-	SendData(context.Context, *livekit3.SendDataRequest) (*livekit3.SendDataResponse, error)
+	SendData(context.Context, *livekit4.SendDataRequest) (*livekit4.SendDataResponse, error)
 
-	UpdateRoomMetadata(context.Context, *livekit3.UpdateRoomMetadataRequest) (*livekit.Room, error)
+	UpdateRoomMetadata(context.Context, *livekit4.UpdateRoomMetadataRequest) (*livekit.Room, error)
 }
 
 // =====================
@@ -92,15 +92,15 @@ func NewRoomClient[RoomTopicType ~string](bus psrpc.MessageBus, opts ...psrpc.Cl
 	}, nil
 }
 
-func (c *roomClient[RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit3.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit3.DeleteRoomResponse, error) {
-	return client.RequestSingle[*livekit3.DeleteRoomResponse](ctx, c.client, "DeleteRoom", []string{string(room)}, req, opts...)
+func (c *roomClient[RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit4.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit4.DeleteRoomResponse, error) {
+	return client.RequestSingle[*livekit4.DeleteRoomResponse](ctx, c.client, "DeleteRoom", []string{string(room)}, req, opts...)
 }
 
-func (c *roomClient[RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit3.SendDataRequest, opts ...psrpc.RequestOption) (*livekit3.SendDataResponse, error) {
-	return client.RequestSingle[*livekit3.SendDataResponse](ctx, c.client, "SendData", []string{string(room)}, req, opts...)
+func (c *roomClient[RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit4.SendDataRequest, opts ...psrpc.RequestOption) (*livekit4.SendDataResponse, error) {
+	return client.RequestSingle[*livekit4.SendDataResponse](ctx, c.client, "SendData", []string{string(room)}, req, opts...)
 }
 
-func (c *roomClient[RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit3.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
+func (c *roomClient[RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit4.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
 	return client.RequestSingle[*livekit.Room](ctx, c.client, "UpdateRoomMetadata", []string{string(room)}, req, opts...)
 }
 
@@ -180,7 +180,7 @@ func (s *roomServer[RoomTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
-var psrpcFileDescriptor3 = []byte{
+var psrpcFileDescriptor4 = []byte{
 	// 237 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x2a, 0x48, 0xd6,
 	0x2f, 0xca, 0xcf, 0xcf, 0xd5, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x62, 0x2e, 0x2a, 0x48, 0x96,
