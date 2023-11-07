@@ -179,6 +179,9 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if v.Recorder != permission.Recorder {
 		return false
 	}
+	if v.Agent != permission.Agent {
+		return false
+	}
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
 		return false
 	}
@@ -198,6 +201,7 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.SetCanUpdateOwnMetadata(permission.CanUpdateMetadata)
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
+	v.Agent = permission.Agent
 }
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
@@ -209,6 +213,7 @@ func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 		CanUpdateMetadata: v.GetCanUpdateOwnMetadata(),
 		Hidden:            v.Hidden,
 		Recorder:          v.Recorder,
+		Agent:             v.Agent,
 	}
 	return pp
 }

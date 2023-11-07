@@ -82,8 +82,10 @@ message ParticipantPermission {
   bool recorder = 8;
   // indicates that participant can update own metadata
   bool can_update_metadata = 10;
+  // indicates that participant is an agent
+  bool agent = 11;
 
-  // NEXT_ID: 11
+  // NEXT_ID: 12
 }
 
 message ParticipantInfo {
