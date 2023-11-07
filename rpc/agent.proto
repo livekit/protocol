@@ -23,8 +23,18 @@ import "options.proto";
 import "livekit_agent.proto";
 
 service AgentInternal {
+  rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse) {
+    option (psrpc.options).multi = true;
+  };
   rpc JobRequest(livekit.Job) returns (google.protobuf.Empty) {
     option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   };
+}
+
+message CheckEnabledRequest{}
+
+message CheckEnabledResponse {
+  bool room_enabled = 1;
+  bool publisher_enabled = 2;
 }
