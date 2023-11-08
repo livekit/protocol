@@ -28,17 +28,20 @@ import (
 const GuidSize = 12
 
 const (
-	RoomPrefix         = "RM_"
-	NodePrefix         = "ND_"
-	ParticipantPrefix  = "PA_"
-	TrackPrefix        = "TR_"
-	APIKeyPrefix       = "API"
-	EgressPrefix       = "EG_"
-	IngressPrefix      = "IN_"
-	RPCPrefix          = "RPC_"
-	WHIPResourcePrefix = "WH_"
-	RTMPResourcePrefix = "RT_"
-	URLResourcePrefix  = "UR_"
+	RoomPrefix            = "RM_"
+	NodePrefix            = "ND_"
+	ParticipantPrefix     = "PA_"
+	TrackPrefix           = "TR_"
+	APIKeyPrefix          = "API"
+	EgressPrefix          = "EG_"
+	IngressPrefix         = "IN_"
+	SIPTrunkPrefix        = "ST_"
+	SIPDispatchRulePrefix = "SDR_"
+	SIPParticipantPrefix  = "SP_"
+	RPCPrefix             = "RPC_"
+	WHIPResourcePrefix    = "WH_"
+	RTMPResourcePrefix    = "RT_"
+	URLResourcePrefix     = "UR_"
 )
 
 func NewGuid(prefix string) string {
