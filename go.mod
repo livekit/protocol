@@ -6,9 +6,9 @@ require (
 	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/core v0.0.9
 	github.com/gammazero/deque v0.2.1
-	github.com/go-jose/go-jose/v3 v3.0.0
-	github.com/go-logr/logr v1.2.4
-	github.com/hashicorp/go-retryablehttp v0.7.4
+	github.com/go-jose/go-jose/v3 v3.0.1
+	github.com/go-logr/logr v1.3.0
+	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
@@ -20,14 +20,14 @@ require (
 	github.com/pion/webrtc/v3 v3.2.21
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.17.0
-	github.com/redis/go-redis/v9 v9.2.1
+	github.com/redis/go-redis/v9 v9.3.0
 	github.com/stretchr/testify v1.8.4
 	github.com/twitchtv/twirp v8.1.3+incompatible
 	github.com/zeebo/xxh3 v1.0.2
 	go.uber.org/atomic v1.11.0
 	go.uber.org/zap v1.26.0
-	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
-	golang.org/x/mod v0.13.0
+	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678
+	golang.org/x/mod v0.14.0
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -67,11 +67,11 @@ require (
 	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
-	golang.org/x/tools v0.14.0 // indirect
+	golang.org/x/crypto v0.15.0 // indirect
+	golang.org/x/net v0.18.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/tools v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231016165738-49dd2c1f3d0b // indirect
 )
