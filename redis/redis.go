@@ -42,7 +42,9 @@ type RedisConfig struct {
 	ReadTimeout       int      `yaml:"read_timeout,omitempty"`
 	WriteTimeout      int      `yaml:"write_timeout,omitempty"`
 	// for clustererd mode only, number of redirects to follow, defaults to 2
-	MaxRedirects *int `yaml:"max_redirects,omitempty"`
+	MaxRedirects *int          `yaml:"max_redirects,omitempty"`
+	PoolTimeout  time.Duration `yaml:"pool_timeout,omitempty"`
+	PoolSize     int           `yaml:"pool_size,omitempty"`
 }
 
 func (r *RedisConfig) IsConfigured() bool {
@@ -112,6 +114,8 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			DialTimeout:      time.Duration(conf.DialTimeout) * time.Millisecond,
 			ReadTimeout:      time.Duration(conf.ReadTimeout) * time.Millisecond,
 			WriteTimeout:     time.Duration(conf.WriteTimeout) * time.Millisecond,
+			PoolTimeout:      conf.PoolTimeout,
+			PoolSize:         conf.PoolSize,
 		}
 	} else if len(conf.ClusterAddresses) > 0 {
 		logger.Infow("connecting to redis", "cluster", true, "addr", conf.ClusterAddresses)
@@ -122,15 +126,19 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			DB:           conf.DB,
 			TLSConfig:    tlsConfig,
 			MaxRedirects: conf.GetMaxRedirects(),
+			PoolTimeout:  conf.PoolTimeout,
+			PoolSize:     conf.PoolSize,
 		}
 	} else {
 		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)
 		rcOptions = &redis.UniversalOptions{
-			Addrs:     []string{conf.Address},
-			Username:  conf.Username,
-			Password:  conf.Password,
-			DB:        conf.DB,
-			TLSConfig: tlsConfig,
+			Addrs:       []string{conf.Address},
+			Username:    conf.Username,
+			Password:    conf.Password,
+			DB:          conf.DB,
+			TLSConfig:   tlsConfig,
+			PoolTimeout: conf.PoolTimeout,
+			PoolSize:    conf.PoolSize,
 		}
 	}
 	rc = redis.NewUniversalClient(rcOptions)
