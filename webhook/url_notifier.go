@@ -85,7 +85,7 @@ func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
 			n.params.Logger.Warnw("failed to send webhook", err, "url", n.params.URL, "event", event.Event)
 			n.dropped.Add(event.NumDropped + 1)
 		} else {
-			n.params.Logger.Infow("sent webhook", "url", n.params.URL, "event", event.Event)
+			n.params.Logger.Infow("sent webhook", "url", n.params.URL, "event", event.Event, "eventDetails", logger.Proto(event))
 		}
 	})
 	return nil
