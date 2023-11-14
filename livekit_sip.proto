@@ -66,20 +66,47 @@ service SIP {
 message CreateSIPTrunkRequest {
   // CIDR or IPs that traffic is accepted from
   // An empty list means all inbound traffic is accepted.
-  repeated string addresses = 1;
+  repeated string inbound_addresses = 1;
 
-  // `To` value that will be used when making a call
-  string to = 2;
+  // IP that SIP INVITE is sent too
+  string outbound_address = 2;
+
+  // Number used to make outbound calls
+  string outbound_number = 3;
 
   // Accepted `To` values. This Trunk will only accept a call made to
   // these numbers. This allows you to have distinct Trunks for different phone
   // numbers at the same provider.
-  // An empty list means all dialed numbers are accepted.
-  repeated string allowed_destinations_regex = 3;
+  repeated string inbound_numbers_regex = 4;
+
+  // Username and password used to authenticate inbound and outbound SIP invites
+  // May be empty to have no Authentication
+  string username = 5;
+  string password = 6;
 }
 
 message SIPTrunkInfo {
   string sip_trunk_id = 1;
+
+  // CIDR or IPs that traffic is accepted from
+  // An empty list means all inbound traffic is accepted.
+  repeated string inbound_addresses = 2;
+
+  // IP that SIP INVITE is sent too
+  string outbound_address = 3;
+
+  // Number used to make outbound calls
+  string outbound_number = 4;
+
+  // Accepted `To` values. This Trunk will only accept a call made to
+  // these numbers. This allows you to have distinct Trunks for different phone
+  // numbers at the same provider.
+  repeated string inbound_numbers_regex = 5;
+
+  // Username and password used to authenticate inbound and outbound SIP invites
+  // May be empty to have no Authentication
+  string username = 6;
+  string password = 7;
 }
 
 message ListSIPTrunkRequest {
@@ -117,8 +144,8 @@ message SIPDispatchRuleIndividual {
   string pin = 2;
 }
 
-message CreateSIPDispatchRuleRequest {
-  oneof instrument {
+message SIPDispatchRule {
+  oneof rule {
     // SIPDispatchRuleDirect is a `SIP Dispatch Rule` that puts a user directly into a room
     // This places users into an existing room. Optionally you can require a pin before a user can
     // enter the room
@@ -131,18 +158,25 @@ message CreateSIPDispatchRuleRequest {
     // SIPDispatchRuleIndividual is a `SIP Dispatch Rule` that creates a new room for each caller.
     SIPDispatchRuleIndividual dispatch_rule_individual = 3;
   }
+}
+
+message CreateSIPDispatchRuleRequest {
+  SIPDispatchRule rule = 1;
 
   // What trunks are accepted for this dispatch rule
   // If empty all trunks will match this dispatch rule
-  repeated string trunk_ids = 4;
+  repeated string trunk_ids = 2;
 
   // By default the From value (Phone number) is used as the participant identity
   // If true a random value will be used instead
-  bool hide_phone_number = 6;
+  bool hide_phone_number = 3;
 }
 
 message SIPDispatchRuleInfo {
   string sip_dispatch_rule_id = 1;
+  SIPDispatchRule rule = 2;
+  repeated string trunk_ids = 3;
+  bool hide_phone_number = 4;
 }
 
 message ListSIPDispatchRuleRequest {
