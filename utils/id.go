@@ -66,7 +66,7 @@ func LocalNodeID() (string, error) {
 }
 
 var b62Index = newB62Index()
-var b62Chars = []byte("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+var b62Chars = []byte(shortuuid.DefaultAlphabet)
 
 func newB62Index() [256]byte {
 	var index [256]byte
