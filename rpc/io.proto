@@ -91,6 +91,9 @@ message EvaluateSIPDispatchRulesRequest {
 
   // What pin has been entered if any
   string pin = 5;
+
+  // Caller rejected pin prompt, only try public rooms
+  bool no_pin = 6;
 }
 
 message EvaluateSIPDispatchRulesResponse {
