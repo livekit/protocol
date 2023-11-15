@@ -34,10 +34,9 @@ option ruby_package = "LiveKit::Proto";
 
 
    The `SIP Dispatch Rule` is a list of rules that dictate how a incoming SIP call should be handled.
-   LiveKit currently supports 3 types, but may support more in the future.
+   LiveKit currently supports 2 types, but may support more in the future.
 
-   - `Direct Dispatch` puts a caller into a existing room
-   - `Pin Dispatch` allows a caller to choose between multiple rooms with a pin
+   - `Direct Dispatch` puts a caller into a existing room, possibly choosing between multiple rooms with a pin
    - `Individual Dispatch` puts a caller into a new room created for the call
 
 
@@ -128,14 +127,6 @@ message SIPDispatchRuleDirect {
   string pin = 2;
 }
 
-message SIPDispatchRulePin {
-  // What room should call be directed into
-  string room_name = 1;
-
-  // Pin required to enter room
-  string pin = 2;
-}
-
 message SIPDispatchRuleIndividual {
   // Prefix used on new room name
   string room_prefix = 1;
@@ -151,12 +142,8 @@ message SIPDispatchRule {
     // enter the room
     SIPDispatchRuleDirect dispatch_rule_direct = 1;
 
-    // SIPDispatchRulePin is a `SIP Dispatch Rule` that allows a user to choose between multiple rooms.
-    // The user is prompted for a pin and then can enter a individual room.
-    SIPDispatchRulePin dispatch_rule_pin = 2;
-
     // SIPDispatchRuleIndividual is a `SIP Dispatch Rule` that creates a new room for each caller.
-    SIPDispatchRuleIndividual dispatch_rule_individual = 3;
+    SIPDispatchRuleIndividual dispatch_rule_individual = 2;
   }
 }
 
