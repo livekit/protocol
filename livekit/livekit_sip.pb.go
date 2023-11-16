@@ -423,63 +423,6 @@ func (x *SIPDispatchRuleDirect) GetPin() string {
 	return ""
 }
 
-type SIPDispatchRulePin struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// What room should call be directed into
-	RoomName string `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	// Pin required to enter room
-	Pin string `protobuf:"bytes,2,opt,name=pin,proto3" json:"pin,omitempty"`
-}
-
-func (x *SIPDispatchRulePin) Reset() {
-	*x = SIPDispatchRulePin{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SIPDispatchRulePin) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SIPDispatchRulePin) ProtoMessage() {}
-
-func (x *SIPDispatchRulePin) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SIPDispatchRulePin.ProtoReflect.Descriptor instead.
-func (*SIPDispatchRulePin) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *SIPDispatchRulePin) GetRoomName() string {
-	if x != nil {
-		return x.RoomName
-	}
-	return ""
-}
-
-func (x *SIPDispatchRulePin) GetPin() string {
-	if x != nil {
-		return x.Pin
-	}
-	return ""
-}
-
 type SIPDispatchRuleIndividual struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -494,7 +437,7 @@ type SIPDispatchRuleIndividual struct {
 func (x *SIPDispatchRuleIndividual) Reset() {
 	*x = SIPDispatchRuleIndividual{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[7]
+		mi := &file_livekit_sip_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -507,7 +450,7 @@ func (x *SIPDispatchRuleIndividual) String() string {
 func (*SIPDispatchRuleIndividual) ProtoMessage() {}
 
 func (x *SIPDispatchRuleIndividual) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[7]
+	mi := &file_livekit_sip_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -520,7 +463,7 @@ func (x *SIPDispatchRuleIndividual) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleIndividual.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleIndividual) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{7}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SIPDispatchRuleIndividual) GetRoomPrefix() string {
@@ -545,7 +488,6 @@ type SIPDispatchRule struct {
 	// Types that are assignable to Rule:
 	//
 	//	*SIPDispatchRule_DispatchRuleDirect
-	//	*SIPDispatchRule_DispatchRulePin
 	//	*SIPDispatchRule_DispatchRuleIndividual
 	Rule isSIPDispatchRule_Rule `protobuf_oneof:"rule"`
 }
@@ -553,7 +495,7 @@ type SIPDispatchRule struct {
 func (x *SIPDispatchRule) Reset() {
 	*x = SIPDispatchRule{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[8]
+		mi := &file_livekit_sip_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -566,7 +508,7 @@ func (x *SIPDispatchRule) String() string {
 func (*SIPDispatchRule) ProtoMessage() {}
 
 func (x *SIPDispatchRule) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[8]
+	mi := &file_livekit_sip_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -579,7 +521,7 @@ func (x *SIPDispatchRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRule.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRule) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{8}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{7}
 }
 
 func (m *SIPDispatchRule) GetRule() isSIPDispatchRule_Rule {
@@ -592,13 +534,6 @@ func (m *SIPDispatchRule) GetRule() isSIPDispatchRule_Rule {
 func (x *SIPDispatchRule) GetDispatchRuleDirect() *SIPDispatchRuleDirect {
 	if x, ok := x.GetRule().(*SIPDispatchRule_DispatchRuleDirect); ok {
 		return x.DispatchRuleDirect
-	}
-	return nil
-}
-
-func (x *SIPDispatchRule) GetDispatchRulePin() *SIPDispatchRulePin {
-	if x, ok := x.GetRule().(*SIPDispatchRule_DispatchRulePin); ok {
-		return x.DispatchRulePin
 	}
 	return nil
 }
@@ -621,20 +556,12 @@ type SIPDispatchRule_DispatchRuleDirect struct {
 	DispatchRuleDirect *SIPDispatchRuleDirect `protobuf:"bytes,1,opt,name=dispatch_rule_direct,json=dispatchRuleDirect,proto3,oneof"`
 }
 
-type SIPDispatchRule_DispatchRulePin struct {
-	// SIPDispatchRulePin is a `SIP Dispatch Rule` that allows a user to choose between multiple rooms.
-	// The user is prompted for a pin and then can enter a individual room.
-	DispatchRulePin *SIPDispatchRulePin `protobuf:"bytes,2,opt,name=dispatch_rule_pin,json=dispatchRulePin,proto3,oneof"`
-}
-
 type SIPDispatchRule_DispatchRuleIndividual struct {
 	// SIPDispatchRuleIndividual is a `SIP Dispatch Rule` that creates a new room for each caller.
-	DispatchRuleIndividual *SIPDispatchRuleIndividual `protobuf:"bytes,3,opt,name=dispatch_rule_individual,json=dispatchRuleIndividual,proto3,oneof"`
+	DispatchRuleIndividual *SIPDispatchRuleIndividual `protobuf:"bytes,2,opt,name=dispatch_rule_individual,json=dispatchRuleIndividual,proto3,oneof"`
 }
 
 func (*SIPDispatchRule_DispatchRuleDirect) isSIPDispatchRule_Rule() {}
-
-func (*SIPDispatchRule_DispatchRulePin) isSIPDispatchRule_Rule() {}
 
 func (*SIPDispatchRule_DispatchRuleIndividual) isSIPDispatchRule_Rule() {}
 
@@ -655,7 +582,7 @@ type CreateSIPDispatchRuleRequest struct {
 func (x *CreateSIPDispatchRuleRequest) Reset() {
 	*x = CreateSIPDispatchRuleRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[9]
+		mi := &file_livekit_sip_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -668,7 +595,7 @@ func (x *CreateSIPDispatchRuleRequest) String() string {
 func (*CreateSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *CreateSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[9]
+	mi := &file_livekit_sip_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -681,7 +608,7 @@ func (x *CreateSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*CreateSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{9}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CreateSIPDispatchRuleRequest) GetRule() *SIPDispatchRule {
@@ -719,7 +646,7 @@ type SIPDispatchRuleInfo struct {
 func (x *SIPDispatchRuleInfo) Reset() {
 	*x = SIPDispatchRuleInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[10]
+		mi := &file_livekit_sip_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -732,7 +659,7 @@ func (x *SIPDispatchRuleInfo) String() string {
 func (*SIPDispatchRuleInfo) ProtoMessage() {}
 
 func (x *SIPDispatchRuleInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[10]
+	mi := &file_livekit_sip_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -745,7 +672,7 @@ func (x *SIPDispatchRuleInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleInfo.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{10}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SIPDispatchRuleInfo) GetSipDispatchRuleId() string {
@@ -785,7 +712,7 @@ type ListSIPDispatchRuleRequest struct {
 func (x *ListSIPDispatchRuleRequest) Reset() {
 	*x = ListSIPDispatchRuleRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[11]
+		mi := &file_livekit_sip_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -798,7 +725,7 @@ func (x *ListSIPDispatchRuleRequest) String() string {
 func (*ListSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *ListSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[11]
+	mi := &file_livekit_sip_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -811,7 +738,7 @@ func (x *ListSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*ListSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{11}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{10}
 }
 
 type ListSIPDispatchRuleResponse struct {
@@ -825,7 +752,7 @@ type ListSIPDispatchRuleResponse struct {
 func (x *ListSIPDispatchRuleResponse) Reset() {
 	*x = ListSIPDispatchRuleResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[12]
+		mi := &file_livekit_sip_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -838,7 +765,7 @@ func (x *ListSIPDispatchRuleResponse) String() string {
 func (*ListSIPDispatchRuleResponse) ProtoMessage() {}
 
 func (x *ListSIPDispatchRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[12]
+	mi := &file_livekit_sip_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -851,7 +778,7 @@ func (x *ListSIPDispatchRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPDispatchRuleResponse.ProtoReflect.Descriptor instead.
 func (*ListSIPDispatchRuleResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{12}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ListSIPDispatchRuleResponse) GetItems() []*SIPDispatchRuleInfo {
@@ -872,7 +799,7 @@ type DeleteSIPDispatchRuleRequest struct {
 func (x *DeleteSIPDispatchRuleRequest) Reset() {
 	*x = DeleteSIPDispatchRuleRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[13]
+		mi := &file_livekit_sip_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -885,7 +812,7 @@ func (x *DeleteSIPDispatchRuleRequest) String() string {
 func (*DeleteSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *DeleteSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[13]
+	mi := &file_livekit_sip_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -898,7 +825,7 @@ func (x *DeleteSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{13}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DeleteSIPDispatchRuleRequest) GetSipDispatchRuleId() string {
@@ -924,7 +851,7 @@ type CreateSIPParticipantRequest struct {
 func (x *CreateSIPParticipantRequest) Reset() {
 	*x = CreateSIPParticipantRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[14]
+		mi := &file_livekit_sip_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -937,7 +864,7 @@ func (x *CreateSIPParticipantRequest) String() string {
 func (*CreateSIPParticipantRequest) ProtoMessage() {}
 
 func (x *CreateSIPParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[14]
+	mi := &file_livekit_sip_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -950,7 +877,7 @@ func (x *CreateSIPParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSIPParticipantRequest.ProtoReflect.Descriptor instead.
 func (*CreateSIPParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{14}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CreateSIPParticipantRequest) GetRoomName() string {
@@ -978,7 +905,7 @@ type SIPParticipantInfo struct {
 func (x *SIPParticipantInfo) Reset() {
 	*x = SIPParticipantInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[15]
+		mi := &file_livekit_sip_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -991,7 +918,7 @@ func (x *SIPParticipantInfo) String() string {
 func (*SIPParticipantInfo) ProtoMessage() {}
 
 func (x *SIPParticipantInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[15]
+	mi := &file_livekit_sip_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1004,7 +931,7 @@ func (x *SIPParticipantInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPParticipantInfo.ProtoReflect.Descriptor instead.
 func (*SIPParticipantInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{15}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *SIPParticipantInfo) GetSipParticipantId() string {
@@ -1029,7 +956,7 @@ type SendSIPParticipantDTMFRequest struct {
 func (x *SendSIPParticipantDTMFRequest) Reset() {
 	*x = SendSIPParticipantDTMFRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[16]
+		mi := &file_livekit_sip_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1042,7 +969,7 @@ func (x *SendSIPParticipantDTMFRequest) String() string {
 func (*SendSIPParticipantDTMFRequest) ProtoMessage() {}
 
 func (x *SendSIPParticipantDTMFRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[16]
+	mi := &file_livekit_sip_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1055,7 +982,7 @@ func (x *SendSIPParticipantDTMFRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendSIPParticipantDTMFRequest.ProtoReflect.Descriptor instead.
 func (*SendSIPParticipantDTMFRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{16}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SendSIPParticipantDTMFRequest) GetSipParticipantId() string {
@@ -1083,7 +1010,7 @@ type SIPParticipantDTMFInfo struct {
 func (x *SIPParticipantDTMFInfo) Reset() {
 	*x = SIPParticipantDTMFInfo{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[17]
+		mi := &file_livekit_sip_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1096,7 +1023,7 @@ func (x *SIPParticipantDTMFInfo) String() string {
 func (*SIPParticipantDTMFInfo) ProtoMessage() {}
 
 func (x *SIPParticipantDTMFInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[17]
+	mi := &file_livekit_sip_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1109,7 +1036,7 @@ func (x *SIPParticipantDTMFInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPParticipantDTMFInfo.ProtoReflect.Descriptor instead.
 func (*SIPParticipantDTMFInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{17}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *SIPParticipantDTMFInfo) GetSipParticipantId() string {
@@ -1128,7 +1055,7 @@ type ListSIPParticipantRequest struct {
 func (x *ListSIPParticipantRequest) Reset() {
 	*x = ListSIPParticipantRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[18]
+		mi := &file_livekit_sip_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1141,7 +1068,7 @@ func (x *ListSIPParticipantRequest) String() string {
 func (*ListSIPParticipantRequest) ProtoMessage() {}
 
 func (x *ListSIPParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[18]
+	mi := &file_livekit_sip_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1154,7 +1081,7 @@ func (x *ListSIPParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPParticipantRequest.ProtoReflect.Descriptor instead.
 func (*ListSIPParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{18}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{17}
 }
 
 type ListSIPParticipantResponse struct {
@@ -1168,7 +1095,7 @@ type ListSIPParticipantResponse struct {
 func (x *ListSIPParticipantResponse) Reset() {
 	*x = ListSIPParticipantResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[19]
+		mi := &file_livekit_sip_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1181,7 +1108,7 @@ func (x *ListSIPParticipantResponse) String() string {
 func (*ListSIPParticipantResponse) ProtoMessage() {}
 
 func (x *ListSIPParticipantResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[19]
+	mi := &file_livekit_sip_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1194,7 +1121,7 @@ func (x *ListSIPParticipantResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPParticipantResponse.ProtoReflect.Descriptor instead.
 func (*ListSIPParticipantResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{19}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListSIPParticipantResponse) GetItems() []*SIPParticipantInfo {
@@ -1215,7 +1142,7 @@ type DeleteSIPParticipantRequest struct {
 func (x *DeleteSIPParticipantRequest) Reset() {
 	*x = DeleteSIPParticipantRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_sip_proto_msgTypes[20]
+		mi := &file_livekit_sip_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -1228,7 +1155,7 @@ func (x *DeleteSIPParticipantRequest) String() string {
 func (*DeleteSIPParticipantRequest) ProtoMessage() {}
 
 func (x *DeleteSIPParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[20]
+	mi := &file_livekit_sip_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1241,7 +1168,7 @@ func (x *DeleteSIPParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSIPParticipantRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSIPParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{20}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DeleteSIPParticipantRequest) GetSipParticipantId() string {
@@ -1304,29 +1231,20 @@ var file_livekit_sip_proto_rawDesc = []byte{
 	0x65, 0x63, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x72, 0x6f, 0x6f, 0x6d, 0x5f, 0x6e, 0x61, 0x6d, 0x65,
 	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x72, 0x6f, 0x6f, 0x6d, 0x4e, 0x61, 0x6d, 0x65,
 	0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x70,
-	0x69, 0x6e, 0x22, 0x43, 0x0a, 0x12, 0x53, 0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63,
-	0x68, 0x52, 0x75, 0x6c, 0x65, 0x50, 0x69, 0x6e, 0x12, 0x1b, 0x0a, 0x09, 0x72, 0x6f, 0x6f, 0x6d,
-	0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x72, 0x6f, 0x6f,
-	0x6d, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x6e, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x03, 0x70, 0x69, 0x6e, 0x22, 0x4e, 0x0a, 0x19, 0x53, 0x49, 0x50, 0x44, 0x69,
-	0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x49, 0x6e, 0x64, 0x69, 0x76, 0x69,
-	0x64, 0x75, 0x61, 0x6c, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x6f, 0x6f, 0x6d, 0x5f, 0x70, 0x72, 0x65,
-	0x66, 0x69, 0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x6f, 0x6f, 0x6d, 0x50,
-	0x72, 0x65, 0x66, 0x69, 0x78, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x6e, 0x18, 0x02, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x03, 0x70, 0x69, 0x6e, 0x22, 0x98, 0x02, 0x0a, 0x0f, 0x53, 0x49, 0x50, 0x44,
-	0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x12, 0x52, 0x0a, 0x14, 0x64,
-	0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x5f, 0x72, 0x75, 0x6c, 0x65, 0x5f, 0x64, 0x69, 0x72,
-	0x65, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x6c, 0x69, 0x76, 0x65,
-	0x6b, 0x69, 0x74, 0x2e, 0x53, 0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x52,
-	0x75, 0x6c, 0x65, 0x44, 0x69, 0x72, 0x65, 0x63, 0x74, 0x48, 0x00, 0x52, 0x12, 0x64, 0x69, 0x73,
-	0x70, 0x61, 0x74, 0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x44, 0x69, 0x72, 0x65, 0x63, 0x74, 0x12,
-	0x49, 0x0a, 0x11, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x5f, 0x72, 0x75, 0x6c, 0x65,
-	0x5f, 0x70, 0x69, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x6c, 0x69, 0x76,
-	0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53, 0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68,
-	0x52, 0x75, 0x6c, 0x65, 0x50, 0x69, 0x6e, 0x48, 0x00, 0x52, 0x0f, 0x64, 0x69, 0x73, 0x70, 0x61,
-	0x74, 0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x50, 0x69, 0x6e, 0x12, 0x5e, 0x0a, 0x18, 0x64, 0x69,
+	0x69, 0x6e, 0x22, 0x4e, 0x0a, 0x19, 0x53, 0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63,
+	0x68, 0x52, 0x75, 0x6c, 0x65, 0x49, 0x6e, 0x64, 0x69, 0x76, 0x69, 0x64, 0x75, 0x61, 0x6c, 0x12,
+	0x1f, 0x0a, 0x0b, 0x72, 0x6f, 0x6f, 0x6d, 0x5f, 0x70, 0x72, 0x65, 0x66, 0x69, 0x78, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x6f, 0x6f, 0x6d, 0x50, 0x72, 0x65, 0x66, 0x69, 0x78,
+	0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x70,
+	0x69, 0x6e, 0x22, 0xcd, 0x01, 0x0a, 0x0f, 0x53, 0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74,
+	0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x12, 0x52, 0x0a, 0x14, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74,
+	0x63, 0x68, 0x5f, 0x72, 0x75, 0x6c, 0x65, 0x5f, 0x64, 0x69, 0x72, 0x65, 0x63, 0x74, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53,
+	0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x44, 0x69,
+	0x72, 0x65, 0x63, 0x74, 0x48, 0x00, 0x52, 0x12, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68,
+	0x52, 0x75, 0x6c, 0x65, 0x44, 0x69, 0x72, 0x65, 0x63, 0x74, 0x12, 0x5e, 0x0a, 0x18, 0x64, 0x69,
 	0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x5f, 0x72, 0x75, 0x6c, 0x65, 0x5f, 0x69, 0x6e, 0x64, 0x69,
-	0x76, 0x69, 0x64, 0x75, 0x61, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x6c,
+	0x76, 0x69, 0x64, 0x75, 0x61, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x22, 0x2e, 0x6c,
 	0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x53, 0x49, 0x50, 0x44, 0x69, 0x73, 0x70, 0x61, 0x74,
 	0x63, 0x68, 0x52, 0x75, 0x6c, 0x65, 0x49, 0x6e, 0x64, 0x69, 0x76, 0x69, 0x64, 0x75, 0x61, 0x6c,
 	0x48, 0x00, 0x52, 0x16, 0x64, 0x69, 0x73, 0x70, 0x61, 0x74, 0x63, 0x68, 0x52, 0x75, 0x6c, 0x65,
@@ -1473,7 +1391,7 @@ func file_livekit_sip_proto_rawDescGZIP() []byte {
 	return file_livekit_sip_proto_rawDescData
 }
 
-var file_livekit_sip_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_livekit_sip_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_livekit_sip_proto_goTypes = []interface{}{
 	(*CreateSIPTrunkRequest)(nil),         // 0: livekit.CreateSIPTrunkRequest
 	(*SIPTrunkInfo)(nil),                  // 1: livekit.SIPTrunkInfo
@@ -1481,56 +1399,54 @@ var file_livekit_sip_proto_goTypes = []interface{}{
 	(*ListSIPTrunkResponse)(nil),          // 3: livekit.ListSIPTrunkResponse
 	(*DeleteSIPTrunkRequest)(nil),         // 4: livekit.DeleteSIPTrunkRequest
 	(*SIPDispatchRuleDirect)(nil),         // 5: livekit.SIPDispatchRuleDirect
-	(*SIPDispatchRulePin)(nil),            // 6: livekit.SIPDispatchRulePin
-	(*SIPDispatchRuleIndividual)(nil),     // 7: livekit.SIPDispatchRuleIndividual
-	(*SIPDispatchRule)(nil),               // 8: livekit.SIPDispatchRule
-	(*CreateSIPDispatchRuleRequest)(nil),  // 9: livekit.CreateSIPDispatchRuleRequest
-	(*SIPDispatchRuleInfo)(nil),           // 10: livekit.SIPDispatchRuleInfo
-	(*ListSIPDispatchRuleRequest)(nil),    // 11: livekit.ListSIPDispatchRuleRequest
-	(*ListSIPDispatchRuleResponse)(nil),   // 12: livekit.ListSIPDispatchRuleResponse
-	(*DeleteSIPDispatchRuleRequest)(nil),  // 13: livekit.DeleteSIPDispatchRuleRequest
-	(*CreateSIPParticipantRequest)(nil),   // 14: livekit.CreateSIPParticipantRequest
-	(*SIPParticipantInfo)(nil),            // 15: livekit.SIPParticipantInfo
-	(*SendSIPParticipantDTMFRequest)(nil), // 16: livekit.SendSIPParticipantDTMFRequest
-	(*SIPParticipantDTMFInfo)(nil),        // 17: livekit.SIPParticipantDTMFInfo
-	(*ListSIPParticipantRequest)(nil),     // 18: livekit.ListSIPParticipantRequest
-	(*ListSIPParticipantResponse)(nil),    // 19: livekit.ListSIPParticipantResponse
-	(*DeleteSIPParticipantRequest)(nil),   // 20: livekit.DeleteSIPParticipantRequest
+	(*SIPDispatchRuleIndividual)(nil),     // 6: livekit.SIPDispatchRuleIndividual
+	(*SIPDispatchRule)(nil),               // 7: livekit.SIPDispatchRule
+	(*CreateSIPDispatchRuleRequest)(nil),  // 8: livekit.CreateSIPDispatchRuleRequest
+	(*SIPDispatchRuleInfo)(nil),           // 9: livekit.SIPDispatchRuleInfo
+	(*ListSIPDispatchRuleRequest)(nil),    // 10: livekit.ListSIPDispatchRuleRequest
+	(*ListSIPDispatchRuleResponse)(nil),   // 11: livekit.ListSIPDispatchRuleResponse
+	(*DeleteSIPDispatchRuleRequest)(nil),  // 12: livekit.DeleteSIPDispatchRuleRequest
+	(*CreateSIPParticipantRequest)(nil),   // 13: livekit.CreateSIPParticipantRequest
+	(*SIPParticipantInfo)(nil),            // 14: livekit.SIPParticipantInfo
+	(*SendSIPParticipantDTMFRequest)(nil), // 15: livekit.SendSIPParticipantDTMFRequest
+	(*SIPParticipantDTMFInfo)(nil),        // 16: livekit.SIPParticipantDTMFInfo
+	(*ListSIPParticipantRequest)(nil),     // 17: livekit.ListSIPParticipantRequest
+	(*ListSIPParticipantResponse)(nil),    // 18: livekit.ListSIPParticipantResponse
+	(*DeleteSIPParticipantRequest)(nil),   // 19: livekit.DeleteSIPParticipantRequest
 }
 var file_livekit_sip_proto_depIdxs = []int32{
 	1,  // 0: livekit.ListSIPTrunkResponse.items:type_name -> livekit.SIPTrunkInfo
 	5,  // 1: livekit.SIPDispatchRule.dispatch_rule_direct:type_name -> livekit.SIPDispatchRuleDirect
-	6,  // 2: livekit.SIPDispatchRule.dispatch_rule_pin:type_name -> livekit.SIPDispatchRulePin
-	7,  // 3: livekit.SIPDispatchRule.dispatch_rule_individual:type_name -> livekit.SIPDispatchRuleIndividual
-	8,  // 4: livekit.CreateSIPDispatchRuleRequest.rule:type_name -> livekit.SIPDispatchRule
-	8,  // 5: livekit.SIPDispatchRuleInfo.rule:type_name -> livekit.SIPDispatchRule
-	10, // 6: livekit.ListSIPDispatchRuleResponse.items:type_name -> livekit.SIPDispatchRuleInfo
-	15, // 7: livekit.ListSIPParticipantResponse.items:type_name -> livekit.SIPParticipantInfo
-	0,  // 8: livekit.SIP.CreateSIPTrunk:input_type -> livekit.CreateSIPTrunkRequest
-	2,  // 9: livekit.SIP.ListSIPTrunk:input_type -> livekit.ListSIPTrunkRequest
-	4,  // 10: livekit.SIP.DeleteSIPTrunk:input_type -> livekit.DeleteSIPTrunkRequest
-	9,  // 11: livekit.SIP.CreateSIPDispatchRule:input_type -> livekit.CreateSIPDispatchRuleRequest
-	11, // 12: livekit.SIP.ListSIPDispatchRule:input_type -> livekit.ListSIPDispatchRuleRequest
-	13, // 13: livekit.SIP.DeleteSIPDispatchRule:input_type -> livekit.DeleteSIPDispatchRuleRequest
-	14, // 14: livekit.SIP.CreateSIPParticipant:input_type -> livekit.CreateSIPParticipantRequest
-	16, // 15: livekit.SIP.SendSIPParticipantDTMF:input_type -> livekit.SendSIPParticipantDTMFRequest
-	18, // 16: livekit.SIP.ListSIPParticipant:input_type -> livekit.ListSIPParticipantRequest
-	20, // 17: livekit.SIP.DeleteSIPParticipant:input_type -> livekit.DeleteSIPParticipantRequest
-	1,  // 18: livekit.SIP.CreateSIPTrunk:output_type -> livekit.SIPTrunkInfo
-	3,  // 19: livekit.SIP.ListSIPTrunk:output_type -> livekit.ListSIPTrunkResponse
-	1,  // 20: livekit.SIP.DeleteSIPTrunk:output_type -> livekit.SIPTrunkInfo
-	10, // 21: livekit.SIP.CreateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	12, // 22: livekit.SIP.ListSIPDispatchRule:output_type -> livekit.ListSIPDispatchRuleResponse
-	10, // 23: livekit.SIP.DeleteSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	15, // 24: livekit.SIP.CreateSIPParticipant:output_type -> livekit.SIPParticipantInfo
-	17, // 25: livekit.SIP.SendSIPParticipantDTMF:output_type -> livekit.SIPParticipantDTMFInfo
-	19, // 26: livekit.SIP.ListSIPParticipant:output_type -> livekit.ListSIPParticipantResponse
-	15, // 27: livekit.SIP.DeleteSIPParticipant:output_type -> livekit.SIPParticipantInfo
-	18, // [18:28] is the sub-list for method output_type
-	8,  // [8:18] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	6,  // 2: livekit.SIPDispatchRule.dispatch_rule_individual:type_name -> livekit.SIPDispatchRuleIndividual
+	7,  // 3: livekit.CreateSIPDispatchRuleRequest.rule:type_name -> livekit.SIPDispatchRule
+	7,  // 4: livekit.SIPDispatchRuleInfo.rule:type_name -> livekit.SIPDispatchRule
+	9,  // 5: livekit.ListSIPDispatchRuleResponse.items:type_name -> livekit.SIPDispatchRuleInfo
+	14, // 6: livekit.ListSIPParticipantResponse.items:type_name -> livekit.SIPParticipantInfo
+	0,  // 7: livekit.SIP.CreateSIPTrunk:input_type -> livekit.CreateSIPTrunkRequest
+	2,  // 8: livekit.SIP.ListSIPTrunk:input_type -> livekit.ListSIPTrunkRequest
+	4,  // 9: livekit.SIP.DeleteSIPTrunk:input_type -> livekit.DeleteSIPTrunkRequest
+	8,  // 10: livekit.SIP.CreateSIPDispatchRule:input_type -> livekit.CreateSIPDispatchRuleRequest
+	10, // 11: livekit.SIP.ListSIPDispatchRule:input_type -> livekit.ListSIPDispatchRuleRequest
+	12, // 12: livekit.SIP.DeleteSIPDispatchRule:input_type -> livekit.DeleteSIPDispatchRuleRequest
+	13, // 13: livekit.SIP.CreateSIPParticipant:input_type -> livekit.CreateSIPParticipantRequest
+	15, // 14: livekit.SIP.SendSIPParticipantDTMF:input_type -> livekit.SendSIPParticipantDTMFRequest
+	17, // 15: livekit.SIP.ListSIPParticipant:input_type -> livekit.ListSIPParticipantRequest
+	19, // 16: livekit.SIP.DeleteSIPParticipant:input_type -> livekit.DeleteSIPParticipantRequest
+	1,  // 17: livekit.SIP.CreateSIPTrunk:output_type -> livekit.SIPTrunkInfo
+	3,  // 18: livekit.SIP.ListSIPTrunk:output_type -> livekit.ListSIPTrunkResponse
+	1,  // 19: livekit.SIP.DeleteSIPTrunk:output_type -> livekit.SIPTrunkInfo
+	9,  // 20: livekit.SIP.CreateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	11, // 21: livekit.SIP.ListSIPDispatchRule:output_type -> livekit.ListSIPDispatchRuleResponse
+	9,  // 22: livekit.SIP.DeleteSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	14, // 23: livekit.SIP.CreateSIPParticipant:output_type -> livekit.SIPParticipantInfo
+	16, // 24: livekit.SIP.SendSIPParticipantDTMF:output_type -> livekit.SIPParticipantDTMFInfo
+	18, // 25: livekit.SIP.ListSIPParticipant:output_type -> livekit.ListSIPParticipantResponse
+	14, // 26: livekit.SIP.DeleteSIPParticipant:output_type -> livekit.SIPParticipantInfo
+	17, // [17:27] is the sub-list for method output_type
+	7,  // [7:17] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_livekit_sip_proto_init() }
@@ -1612,18 +1528,6 @@ func file_livekit_sip_proto_init() {
 			}
 		}
 		file_livekit_sip_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SIPDispatchRulePin); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_livekit_sip_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SIPDispatchRuleIndividual); i {
 			case 0:
 				return &v.state
@@ -1635,7 +1539,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SIPDispatchRule); i {
 			case 0:
 				return &v.state
@@ -1647,7 +1551,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateSIPDispatchRuleRequest); i {
 			case 0:
 				return &v.state
@@ -1659,7 +1563,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SIPDispatchRuleInfo); i {
 			case 0:
 				return &v.state
@@ -1671,7 +1575,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListSIPDispatchRuleRequest); i {
 			case 0:
 				return &v.state
@@ -1683,7 +1587,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListSIPDispatchRuleResponse); i {
 			case 0:
 				return &v.state
@@ -1695,7 +1599,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteSIPDispatchRuleRequest); i {
 			case 0:
 				return &v.state
@@ -1707,7 +1611,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateSIPParticipantRequest); i {
 			case 0:
 				return &v.state
@@ -1719,7 +1623,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SIPParticipantInfo); i {
 			case 0:
 				return &v.state
@@ -1731,7 +1635,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SendSIPParticipantDTMFRequest); i {
 			case 0:
 				return &v.state
@@ -1743,7 +1647,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SIPParticipantDTMFInfo); i {
 			case 0:
 				return &v.state
@@ -1755,7 +1659,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListSIPParticipantRequest); i {
 			case 0:
 				return &v.state
@@ -1767,7 +1671,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListSIPParticipantResponse); i {
 			case 0:
 				return &v.state
@@ -1779,7 +1683,7 @@ func file_livekit_sip_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_sip_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
+		file_livekit_sip_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteSIPParticipantRequest); i {
 			case 0:
 				return &v.state
@@ -1792,9 +1696,8 @@ func file_livekit_sip_proto_init() {
 			}
 		}
 	}
-	file_livekit_sip_proto_msgTypes[8].OneofWrappers = []interface{}{
+	file_livekit_sip_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*SIPDispatchRule_DispatchRuleDirect)(nil),
-		(*SIPDispatchRule_DispatchRulePin)(nil),
 		(*SIPDispatchRule_DispatchRuleIndividual)(nil),
 	}
 	type x struct{}
@@ -1803,7 +1706,7 @@ func file_livekit_sip_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_sip_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   21,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
