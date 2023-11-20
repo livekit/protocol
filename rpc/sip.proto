@@ -24,8 +24,36 @@ service SIPInternal {
   rpc UpdateSIPParticipant(InternalUpdateSIPParticipantRequest) returns (InternalUpdateSIPParticipantResponse) {
     option (psrpc.options).affinity_func = true;
   }
+  rpc SendSIPParticipantDTMF(InternalSendSIPParticipantDTMFRequest) returns (InternalSendSIPParticipantDTMFResponse) {
+    option (psrpc.options).affinity_func = true;
+  }
 }
 
-message InternalUpdateSIPParticipantRequest {}
+message InternalUpdateSIPParticipantRequest {
+  string participant_id = 1;
+
+  // IP that SIP INVITE is sent too
+  string address = 2;
+
+  // Number used to make the call
+  string number = 3;
+
+  // Number to call to
+  string call_to = 4;
+
+  string username = 5;
+  string password = 6;
+
+  string room_name = 7;
+  string participant_identity = 8;
+}
 
 message InternalUpdateSIPParticipantResponse {}
+
+message InternalSendSIPParticipantDTMFRequest {
+  string participant_id = 1;
+
+  string digits = 2;
+}
+
+message InternalSendSIPParticipantDTMFResponse {}

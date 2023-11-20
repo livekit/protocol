@@ -80,8 +80,10 @@ message CreateSIPTrunkRequest {
 
   // Username and password used to authenticate inbound and outbound SIP invites
   // May be empty to have no Authentication
-  string username = 5;
-  string password = 6;
+  string inbound_username = 5;
+  string inbound_password = 6;
+  string outbound_username = 7;
+  string outbound_password = 8;
 }
 
 message SIPTrunkInfo {
@@ -104,8 +106,10 @@ message SIPTrunkInfo {
 
   // Username and password used to authenticate inbound and outbound SIP invites
   // May be empty to have no Authentication
-  string username = 6;
-  string password = 7;
+  string inbound_username = 6;
+  string inbound_password = 7;
+  string outbound_username = 8;
+  string outbound_password = 9;
 }
 
 message ListSIPTrunkRequest {
@@ -180,15 +184,25 @@ message DeleteSIPDispatchRuleRequest {
 // A SIP Participant is a singular SIP session connected to a LiveKit room via
 // a SIP Trunk into a SIP DispatchRule
 message CreateSIPParticipantRequest {
-  // What LiveKit room should this participant be connected too
-  string room_name = 1;
-
   // What SIP Trunk should be used to dial the user
-  string sip_trunk_id = 2;
+  string sip_trunk_id = 1;
+
+  // What number should be dialed via SIP
+  string sip_call_to = 2;
+
+  // What LiveKit room should this participant be connected too
+  string room_name = 3;
+
+  // Optional identity of the participant in LiveKit room
+  string participant_identity = 4;
 }
 
 message SIPParticipantInfo {
   string sip_participant_id = 1;
+  string sip_trunk_id = 2;
+  string sip_call_to = 3;
+  string room_name = 4;
+  string participant_identity = 5;
 }
 
 // DTMF Request lets you send a DTMF message for a SIP Participant
