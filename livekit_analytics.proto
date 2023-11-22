@@ -152,3 +152,20 @@ message AnalyticsEvent {
 message AnalyticsEvents {
   repeated AnalyticsEvent events = 1;
 }
+
+message TrafficStats {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  uint32 packets = 3;
+  uint64 bytes = 4;
+}
+
+message TrafficTypeStats {
+  TrackType track_type = 1;
+  StreamType stream_type = 2;
+  TrafficStats traffic_stats = 3;
+}
+
+message TrafficLoad {
+  repeated TrafficTypeStats traffic_type_stats = 1;
+}
