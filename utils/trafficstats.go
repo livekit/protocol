@@ -82,3 +82,29 @@ func AggregateTrafficStats(statsList []*livekit.TrafficStats) *livekit.TrafficSt
 		Bytes:     bytes,
 	}
 }
+
+func TrafficLoadToTrafficRate(trafficLoad *livekit.TrafficLoad) (
+	packetRateIn float64,
+	byteRateIn float64,
+	packetRateOut float64,
+	byteRateOut float64,
+) {
+	if trafficLoad == nil {
+		return
+	}
+
+	for _, trafficTypeStat := range trafficLoad.TrafficTypeStats {
+		elapsed := trafficTypeStat.TrafficStats.EndTime.AsTime().Sub(trafficTypeStat.TrafficStats.StartTime.AsTime()).Seconds()
+		packetRate := float64(trafficTypeStat.TrafficStats.Packets) / elapsed
+		byteRate := float64(trafficTypeStat.TrafficStats.Bytes) / elapsed
+		switch trafficTypeStat.StreamType {
+		case livekit.StreamType_UPSTREAM:
+			packetRateIn += packetRate
+			byteRateIn += byteRate
+		case livekit.StreamType_DOWNSTREAM:
+			packetRateOut += packetRate
+			byteRateOut += byteRate
+		}
+	}
+	return
+}
