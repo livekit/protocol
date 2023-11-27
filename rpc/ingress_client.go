@@ -14,10 +14,6 @@
 
 package rpc
 
-import (
-	"github.com/livekit/psrpc"
-)
-
 type IngressClient interface {
 	IngressInternalClient
 	IngressHandlerClient
@@ -28,16 +24,17 @@ type ingressClient struct {
 	IngressHandlerClient
 }
 
-func NewIngressClient(bus psrpc.MessageBus) (IngressClient, error) {
-	if bus == nil {
+func NewIngressClient(params ClientParams) (IngressClient, error) {
+	if params.Bus == nil {
 		return nil, nil
 	}
+	opts := clientOptions(params)
 
-	internalClient, err := NewIngressInternalClient(bus)
+	internalClient, err := NewIngressInternalClient(params.Bus, opts...)
 	if err != nil {
 		return nil, err
 	}
-	handlerClient, err := NewIngressHandlerClient(bus)
+	handlerClient, err := NewIngressHandlerClient(params.Bus, opts...)
 	if err != nil {
 		return nil, err
 	}
