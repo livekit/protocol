@@ -235,6 +235,7 @@ enum ConnectionQuality {
   POOR = 0;
   GOOD = 1;
   EXCELLENT = 2;
+  DISCONNECTED = 3;
 }
 
 message ParticipantTracks {
