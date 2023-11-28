@@ -36,14 +36,19 @@ type egressClient struct {
 	EgressHandlerClient
 }
 
-func NewEgressClient(bus psrpc.MessageBus) (EgressClient, error) {
-	if bus == nil {
+func NewEgressClient(params ClientParams) (EgressClient, error) {
+	if params.Bus == nil {
 		return nil, nil
 	}
-
-	internalClient, err := NewEgressInternalClient(bus, middleware.WithRPCRetries(middleware.RetryOptions{
-		MaxAttempts: retries,
-		Timeout:     time.Second * 10,
+	opts := clientOptions(params)
+	timeout := params.Timeout
+	if timeout < 10*time.Second {
+		timeout = 10 * time.Second
+	}
+	internalOpts := append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
+		MaxAttempts: params.MaxAttempts,
+		// use longer retry timeout
+		Timeout: timeout,
 		IsRecoverable: func(err error) bool {
 			var e psrpc.Error
 			if !errors.As(err, &e) {
@@ -54,11 +59,12 @@ func NewEgressClient(bus psrpc.MessageBus) (EgressClient, error) {
 				e.Code() == psrpc.Unavailable
 		},
 	}))
+	internalClient, err := NewEgressInternalClient(params.Bus, internalOpts...)
 	if err != nil {
 		return nil, err
 	}
 
-	handlerClient, err := NewEgressHandlerClient(bus)
+	handlerClient, err := NewEgressHandlerClient(params.Bus, opts...)
 	if err != nil {
 		return nil, err
 	}
