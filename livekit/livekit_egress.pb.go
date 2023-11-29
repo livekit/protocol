@@ -1895,15 +1895,16 @@ type S3Upload struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	AccessKey          string            `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	Secret             string            `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	Region             string            `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Endpoint           string            `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Bucket             string            `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	ForcePathStyle     bool              `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
-	Metadata           map[string]string `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Tagging            string            `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
-	ContentDisposition string            `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"`
+	AccessKey      string            `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	Secret         string            `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	Region         string            `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Endpoint       string            `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Bucket         string            `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	ForcePathStyle bool              `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
+	Metadata       map[string]string `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Tagging        string            `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
+	// Content-Disposition header
+	ContentDisposition string `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"`
 }
 
 func (x *S3Upload) Reset() {
@@ -2006,6 +2007,7 @@ type GCPUpload struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// service account credentials serialized in JSON "credentials.json"
 	Credentials string `protobuf:"bytes,1,opt,name=credentials,proto3" json:"credentials,omitempty"`
 	Bucket      string `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
 }
