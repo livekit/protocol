@@ -45,9 +45,8 @@ message GetEgressRequest {
 
 message UpdateMetricsRequest {
   livekit.EgressInfo info = 1;
-  float min_cpu_usage = 2;
-  float max_cpu_usage = 3;
-  float avg_cpu_usage = 4;
+  float avg_cpu_usage = 3;
+  float max_cpu_usage = 4;
 }
 
 // Query an ingress info from an ingress ID or stream key
