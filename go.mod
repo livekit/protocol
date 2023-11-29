@@ -15,11 +15,13 @@ require (
 	github.com/livekit/psrpc v0.5.2
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
+	github.com/mitchellh/go-ps v1.0.0
 	github.com/pion/logging v0.2.2
 	github.com/pion/sdp/v3 v3.0.6
 	github.com/pion/webrtc/v3 v3.2.23
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.17.0
+	github.com/prometheus/procfs v0.11.1
 	github.com/redis/go-redis/v9 v9.3.0
 	github.com/stretchr/testify v1.8.4
 	github.com/twitchtv/twirp v8.1.3+incompatible
@@ -64,7 +66,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16 // indirect
 	github.com/prometheus/common v0.44.0 // indirect
-	github.com/prometheus/procfs v0.11.1 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.15.0 // indirect
