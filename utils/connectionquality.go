@@ -19,11 +19,11 @@ import (
 )
 
 func IsConnectionQualityLower(prev livekit.ConnectionQuality, curr livekit.ConnectionQuality) bool {
-	if prev != livekit.ConnectionQuality_DISCONNECTED && curr == livekit.ConnectionQuality_DISCONNECTED {
+	if prev != livekit.ConnectionQuality_LOST && curr == livekit.ConnectionQuality_LOST {
 		return true
 	}
 
-	if prev == livekit.ConnectionQuality_DISCONNECTED && curr != livekit.ConnectionQuality_DISCONNECTED {
+	if prev == livekit.ConnectionQuality_LOST && curr != livekit.ConnectionQuality_LOST {
 		return false
 	}
 
