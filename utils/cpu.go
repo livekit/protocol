@@ -43,7 +43,7 @@ type CPUStats struct {
 	closeChan       chan struct{}
 }
 
-func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
+func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
 	p, err := newPlatformCPUMonitor()
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
 	c := &CPUStats{
 		platform:        p,
 		warningThrottle: core.NewThrottle(time.Minute),
-		idleCallback:    updateCallback,
+		idleCallback:    idleUpdateCallback,
 		closeChan:       make(chan struct{}),
 	}
 
@@ -61,7 +61,7 @@ func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
 	return c, nil
 }
 
-func NewProcCPUStats(updateCallback func(idle float64, usage map[int]float64)) (*CPUStats, error) {
+func NewProcCPUStats(procUpdateCallback func(idle float64, usage map[int]float64)) (*CPUStats, error) {
 	p, err := newPlatformCPUMonitor()
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func NewProcCPUStats(updateCallback func(idle float64, usage map[int]float64)) (
 	c := &CPUStats{
 		platform:        p,
 		warningThrottle: core.NewThrottle(time.Minute),
-		procCallback:    updateCallback,
+		procCallback:    procUpdateCallback,
 		closeChan:       make(chan struct{}),
 	}
 
@@ -122,9 +122,15 @@ func (c *CPUStats) monitorCPULoad() {
 
 func (c *CPUStats) monitorProcCPULoad() {
 	numCPU := c.platform.numCPU()
+
 	fs, err := procfs.NewFS(procfs.DefaultMountPoint)
 	if err != nil {
 		logger.Errorw("failed read proc fs", err)
+		return
+	}
+	totalCPU, err := getPodCPUCount(fs)
+	if err != nil {
+		logger.Errorw("failed to read pod cpu count", err)
 		return
 	}
 
@@ -188,7 +194,7 @@ func (c *CPUStats) monitorProcCPULoad() {
 					pid = ppids[pid]
 				}
 
-				s := numCPU * t / 100 / (nextTotalTime - prevTotalTime)
+				s := totalCPU * t / 100 / (nextTotalTime - prevTotalTime)
 				usage[pid] += s
 				totalUsage += s
 			}

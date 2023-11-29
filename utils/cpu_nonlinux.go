@@ -16,6 +16,16 @@
 
 package utils
 
+import (
+	"runtime"
+
+	"github.com/prometheus/procfs"
+)
+
 func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 	return newOSStatCPUMonitor()
+}
+
+func getPodCPUCount(fs procfs.FS) (float64, error) {
+	return float64(runtime.NumCPU()), nil
 }
