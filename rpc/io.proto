@@ -111,4 +111,10 @@ message EvaluateSIPDispatchRulesResponse {
 
   // Pin should be requested from SIPParticipant
   bool request_pin = 3;
+
+  // optional token that should be used when creating LiveKit participant
+  string token = 4;
+
+  // optional websocket url that should be used when creating LiveKit participant
+  string ws_url = 5;
 }
