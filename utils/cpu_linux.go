@@ -25,6 +25,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/procfs"
+
 	"github.com/livekit/protocol/logger"
 )
 
@@ -259,4 +261,12 @@ func readIntFromFile(filename string) (int, error) {
 	s = strings.TrimSuffix(s, " ")
 
 	return strconv.Atoi(s)
+}
+
+func getHostCPUCount(fs procfs.FS) (float64, error) {
+	cpuInfo, err := fs.CPUInfo()
+	if err != nil {
+		return 0, err
+	}
+	return float64(len(cpuInfo)), nil
 }

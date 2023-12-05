@@ -18,6 +18,8 @@ import (
 	"time"
 
 	"github.com/frostbyte73/core"
+	"github.com/mitchellh/go-ps"
+	"github.com/prometheus/procfs"
 	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/logger"
@@ -35,12 +37,13 @@ type CPUStats struct {
 	idleCPUs atomic.Float64
 	platform platformCPUMonitor
 
-	updateCallback  func(idle float64)
+	idleCallback    func(idle float64)
+	procCallback    func(idle float64, usage map[int]float64)
 	warningThrottle core.Throttle
 	closeChan       chan struct{}
 }
 
-func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
+func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
 	p, err := newPlatformCPUMonitor()
 	if err != nil {
 		return nil, err
@@ -49,11 +52,29 @@ func NewCPUStats(updateCallback func(idle float64)) (*CPUStats, error) {
 	c := &CPUStats{
 		platform:        p,
 		warningThrottle: core.NewThrottle(time.Minute),
-		updateCallback:  updateCallback,
+		idleCallback:    idleUpdateCallback,
 		closeChan:       make(chan struct{}),
 	}
 
 	go c.monitorCPULoad()
+
+	return c, nil
+}
+
+func NewProcCPUStats(procUpdateCallback func(idle float64, usage map[int]float64)) (*CPUStats, error) {
+	p, err := newPlatformCPUMonitor()
+	if err != nil {
+		return nil, err
+	}
+
+	c := &CPUStats{
+		platform:        p,
+		warningThrottle: core.NewThrottle(time.Minute),
+		procCallback:    procUpdateCallback,
+		closeChan:       make(chan struct{}),
+	}
+
+	go c.monitorProcCPULoad()
 
 	return c, nil
 }
@@ -92,9 +113,112 @@ func (c *CPUStats) monitorCPULoad() {
 				c.warningThrottle(func() { logger.Infow("high cpu load", "load", 1-idleRatio) })
 			}
 
-			if c.updateCallback != nil {
-				c.updateCallback(idle)
+			if c.idleCallback != nil {
+				c.idleCallback(idle)
 			}
 		}
 	}
+}
+
+func (c *CPUStats) monitorProcCPULoad() {
+	numCPU := c.platform.numCPU()
+
+	fs, err := procfs.NewFS(procfs.DefaultMountPoint)
+	if err != nil {
+		logger.Errorw("failed read proc fs", err)
+		return
+	}
+	hostCPU, err := getHostCPUCount(fs)
+	if err != nil {
+		logger.Errorw("failed to read pod cpu count", err)
+		return
+	}
+
+	self, err := fs.Self()
+	if err != nil {
+		logger.Errorw("failed to read self", err)
+		return
+	}
+
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+
+	var prevTotalTime float64
+	var prevStats map[int]procfs.ProcStat
+	for {
+		select {
+		case <-c.closeChan:
+			return
+		case <-ticker.C:
+			procStats := make(map[int]procfs.ProcStat)
+			procs, err := procfs.AllProcs()
+			if err != nil {
+				logger.Errorw("failed to read processes", err)
+				continue
+			}
+
+			total, err := fs.Stat()
+			if err != nil {
+				logger.Errorw("failed to read stats", err)
+				continue
+			}
+
+			ppids := make(map[int]int)
+			for _, proc := range procs {
+				procStats[proc.PID], err = proc.Stat()
+				if err != nil {
+					logger.Errorw("failed to read proc stats", err)
+					continue
+				}
+				if proc.PID != self.PID {
+					ppids[proc.PID], err = getPPID(proc.PID)
+					if err != nil {
+						logger.Errorw("failed to get PPID", err)
+						continue
+					}
+				}
+			}
+
+			totalHostTime := total.CPUTotal.Idle + total.CPUTotal.Iowait +
+				total.CPUTotal.User + total.CPUTotal.Nice + total.CPUTotal.System +
+				total.CPUTotal.IRQ + total.CPUTotal.SoftIRQ + total.CPUTotal.Steal
+
+			usage := make(map[int]float64)
+			podUsage := 0.0
+			for pid, stat := range procStats {
+				// process usage as percent of total host cpu
+				procPercentUsage := float64(stat.UTime + stat.STime - prevStats[pid].UTime - prevStats[pid].STime)
+				if procPercentUsage == 0 {
+					continue
+				}
+
+				for ppids[pid] != self.PID && ppids[pid] != 0 {
+					// bundle usage up to first child of main go process
+					pid = ppids[pid]
+				}
+
+				procUsage := hostCPU * procPercentUsage / 100 / (totalHostTime - prevTotalTime)
+				usage[pid] += procUsage
+				podUsage += procUsage
+			}
+
+			idle := numCPU - podUsage
+			c.idleCPUs.Store(idle)
+
+			if c.procCallback != nil {
+				c.procCallback(idle, usage)
+			}
+
+			prevTotalTime = totalHostTime
+			prevStats = procStats
+		}
+	}
+}
+
+func getPPID(pid int) (int, error) {
+	p, err := ps.FindProcess(pid)
+	if err != nil {
+		return 0, err
+	}
+	return p.PPid(), nil
 }
