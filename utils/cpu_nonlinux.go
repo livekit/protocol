@@ -26,6 +26,6 @@ func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 	return newOSStatCPUMonitor()
 }
 
-func getPodCPUCount(fs procfs.FS) (float64, error) {
+func getHostCPUCount(fs procfs.FS) (float64, error) {
 	return float64(runtime.NumCPU()), nil
 }

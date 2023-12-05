@@ -128,7 +128,7 @@ func (c *CPUStats) monitorProcCPULoad() {
 		logger.Errorw("failed read proc fs", err)
 		return
 	}
-	totalCPU, err := getPodCPUCount(fs)
+	hostCPU, err := getHostCPUCount(fs)
 	if err != nil {
 		logger.Errorw("failed to read pod cpu count", err)
 		return
@@ -150,7 +150,7 @@ func (c *CPUStats) monitorProcCPULoad() {
 		case <-c.closeChan:
 			return
 		case <-ticker.C:
-			nextStats := make(map[int]procfs.ProcStat)
+			procStats := make(map[int]procfs.ProcStat)
 			procs, err := procfs.AllProcs()
 			if err != nil {
 				logger.Errorw("failed to read processes", err)
@@ -165,7 +165,7 @@ func (c *CPUStats) monitorProcCPULoad() {
 
 			ppids := make(map[int]int)
 			for _, proc := range procs {
-				nextStats[proc.PID], err = proc.Stat()
+				procStats[proc.PID], err = proc.Stat()
 				if err != nil {
 					logger.Errorw("failed to read proc stats", err)
 					continue
@@ -179,35 +179,38 @@ func (c *CPUStats) monitorProcCPULoad() {
 				}
 			}
 
-			nextTotalTime := total.CPUTotal.User + total.CPUTotal.Nice + total.CPUTotal.System + total.CPUTotal.Idle
+			totalHostTime := total.CPUTotal.Idle + total.CPUTotal.Iowait +
+				total.CPUTotal.User + total.CPUTotal.Nice + total.CPUTotal.System +
+				total.CPUTotal.IRQ + total.CPUTotal.SoftIRQ + total.CPUTotal.Steal
 
 			usage := make(map[int]float64)
-			totalUsage := 0.0
-			for pid, stat := range nextStats {
-				t := float64(stat.UTime + stat.STime - prevStats[pid].UTime - prevStats[pid].STime)
-				if t == 0 {
+			podUsage := 0.0
+			for pid, stat := range procStats {
+				// process usage as percent of total host cpu
+				procPercentUsage := float64(stat.UTime + stat.STime - prevStats[pid].UTime - prevStats[pid].STime)
+				if procPercentUsage == 0 {
 					continue
 				}
 
 				for ppids[pid] != self.PID && ppids[pid] != 0 {
-					// attribute usage to parent process, stopping before service process
+					// bundle usage up to first child of main go process
 					pid = ppids[pid]
 				}
 
-				s := totalCPU * t / 100 / (nextTotalTime - prevTotalTime)
-				usage[pid] += s
-				totalUsage += s
+				procUsage := hostCPU * procPercentUsage / 100 / (totalHostTime - prevTotalTime)
+				usage[pid] += procUsage
+				podUsage += procUsage
 			}
 
-			idle := numCPU - totalUsage
+			idle := numCPU - podUsage
 			c.idleCPUs.Store(idle)
 
 			if c.procCallback != nil {
 				c.procCallback(idle, usage)
 			}
 
-			prevTotalTime = nextTotalTime
-			prevStats = nextStats
+			prevTotalTime = totalHostTime
+			prevStats = procStats
 		}
 	}
 }

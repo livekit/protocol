@@ -263,7 +263,7 @@ func readIntFromFile(filename string) (int, error) {
 	return strconv.Atoi(s)
 }
 
-func getPodCPUCount(fs procfs.FS) (float64, error) {
+func getHostCPUCount(fs procfs.FS) (float64, error) {
 	cpuInfo, err := fs.CPUInfo()
 	if err != nil {
 		return 0, err
