@@ -76,6 +76,9 @@ message GetSIPTrunkAuthenticationRequest {
 
   // What is the IP address of the called number
   string src_address = 4;
+
+  // What Host was called
+  string to_host = 5;
 }
 
 message GetSIPTrunkAuthenticationResponse {
@@ -101,6 +104,9 @@ message EvaluateSIPDispatchRulesRequest {
 
   // Caller rejected pin prompt, only try public rooms
   bool no_pin = 6;
+
+  // What Host was called
+  string called_host = 7;
 }
 
 message EvaluateSIPDispatchRulesResponse {
@@ -112,4 +118,10 @@ message EvaluateSIPDispatchRulesResponse {
 
   // Pin should be requested from SIPParticipant
   bool request_pin = 3;
+
+  // optional token that should be used when creating LiveKit participant
+  string token = 4;
+
+  // optional websocket url that should be used when creating LiveKit participant
+  string ws_url = 5;
 }

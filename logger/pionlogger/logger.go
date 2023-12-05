@@ -61,7 +61,7 @@ func NewLoggerFactory(logger logger.Logger) *LoggerFactory {
 
 func (f *LoggerFactory) NewLogger(scope string) logging.LeveledLogger {
 	return &logAdapter{
-		logger:          f.logger.WithComponent("pion." + scope),
+		logger:          f.logger.WithComponent("pion." + scope).WithCallDepth(1),
 		ignoredPrefixes: pionIgnoredPrefixes[scope],
 	}
 }

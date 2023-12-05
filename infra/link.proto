@@ -16,6 +16,8 @@ syntax = "proto3";
 
 package rpc;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/livekit/protocol/infra";
 
 service Link {
@@ -32,6 +34,7 @@ message WatchLocalLinksResponse {
   int64 jitter = 4;
   double packet_loss = 5;
   bool disabled = 6;
+  google.protobuf.Timestamp last_read = 7;
 }
 
 message SimulateLinkStateRequest {

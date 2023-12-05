@@ -63,16 +63,24 @@ func NewClientParams(
 }
 
 func clientOptions(params ClientParams) []psrpc.ClientOption {
-	return []psrpc.ClientOption{
-		psrpc.WithClientChannelSize(params.BufferSize),
-		middleware.WithClientMetrics(params.Observer),
-		protopsrpc.WithClientLogger(params.Logger),
-		middleware.WithRPCRetries(middleware.RetryOptions{
+	opts := make([]psrpc.ClientOption, 0, 4)
+	if params.BufferSize != 0 {
+		opts = append(opts, psrpc.WithClientChannelSize(params.BufferSize))
+	}
+	if params.Observer != nil {
+		opts = append(opts, middleware.WithClientMetrics(params.Observer))
+	}
+	if params.Logger != nil {
+		opts = append(opts, protopsrpc.WithClientLogger(params.Logger))
+	}
+	if params.MaxAttempts != 0 || params.Timeout != 0 || params.Backoff != 0 {
+		opts = append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
 			MaxAttempts: params.MaxAttempts,
 			Timeout:     params.Timeout,
 			Backoff:     params.Backoff,
-		}),
+		}))
 	}
+	return opts
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate

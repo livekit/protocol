@@ -217,10 +217,12 @@ message S3Upload {
   bool force_path_style = 6;
   map<string, string> metadata = 7;
   string tagging = 8;
+  // Content-Disposition header
   string content_disposition = 9;
 }
 
 message GCPUpload {
+  // service account credentials serialized in JSON "credentials.json"
   string credentials = 1;
   string bucket = 2;
 }
