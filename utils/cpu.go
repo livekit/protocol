@@ -18,7 +18,6 @@ import (
 	"time"
 
 	"github.com/frostbyte73/core"
-	"github.com/mitchellh/go-ps"
 	"github.com/prometheus/procfs"
 	"go.uber.org/atomic"
 
@@ -125,7 +124,7 @@ func (c *CPUStats) monitorProcCPULoad() {
 
 	fs, err := procfs.NewFS(procfs.DefaultMountPoint)
 	if err != nil {
-		logger.Errorw("failed read proc fs", err)
+		logger.Errorw("failed to read proc fs", err)
 		return
 	}
 	hostCPU, err := getHostCPUCount(fs)
@@ -165,17 +164,14 @@ func (c *CPUStats) monitorProcCPULoad() {
 
 			ppids := make(map[int]int)
 			for _, proc := range procs {
-				procStats[proc.PID], err = proc.Stat()
+				stat, err := proc.Stat()
 				if err != nil {
-					logger.Errorw("failed to read proc stats", err)
 					continue
 				}
+
+				procStats[proc.PID] = stat
 				if proc.PID != self.PID {
-					ppids[proc.PID], err = getPPID(proc.PID)
-					if err != nil {
-						logger.Errorw("failed to get PPID", err)
-						continue
-					}
+					ppids[proc.PID] = stat.PPID
 				}
 			}
 
@@ -213,12 +209,4 @@ func (c *CPUStats) monitorProcCPULoad() {
 			prevStats = procStats
 		}
 	}
-}
-
-func getPPID(pid int) (int, error) {
-	p, err := ps.FindProcess(pid)
-	if err != nil {
-		return 0, err
-	}
-	return p.PPid(), nil
 }

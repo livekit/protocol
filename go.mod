@@ -15,7 +15,6 @@ require (
 	github.com/livekit/psrpc v0.5.2
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.7.0
-	github.com/mitchellh/go-ps v1.0.0
 	github.com/pion/logging v0.2.2
 	github.com/pion/sdp/v3 v3.0.6
 	github.com/pion/webrtc/v3 v3.2.23
