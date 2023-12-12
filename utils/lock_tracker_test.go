@@ -21,7 +21,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/utils"
 )
@@ -39,7 +39,7 @@ func noop() {}
 
 func TestScanTrackedLocks(t *testing.T) {
 	t.Cleanup(cleanupTest)
-	assert.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
 
 	ms := make([]*utils.Mutex, 100)
 	for i := range ms {
@@ -56,14 +56,45 @@ func TestScanTrackedLocks(t *testing.T) {
 	}()
 
 	time.Sleep(5 * time.Millisecond)
-	assert.NotNil(t, utils.ScanTrackedLocks(time.Millisecond))
+	require.NotNil(t, utils.ScanTrackedLocks(time.Millisecond))
 
 	ms[50].Unlock()
 }
 
+func TestFirstLockStackTrace(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	utils.ToggleLockTrackerStackTraces(true)
+	defer utils.ToggleLockTrackerStackTraces(false)
+
+	m := &utils.Mutex{}
+
+	var deepLock func(n int)
+	deepLock = func(n int) {
+		if n > 0 {
+			deepLock(n - 1)
+		} else {
+			m.Lock()
+		}
+	}
+
+	go func() {
+		deepLock(5)
+		m.Lock()
+	}()
+
+	time.Sleep(5 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.NotEqual(t, "", locks[0].FirstLockedAtStack())
+
+	m.Unlock()
+}
+
 func TestMutexFinalizer(t *testing.T) {
 	cleanupTest()
-	assert.Equal(t, 0, utils.NumMutexes())
+	require.Equal(t, 0, utils.NumMutexes())
 
 	go func() {
 		m := &utils.Mutex{}
@@ -71,13 +102,13 @@ func TestMutexFinalizer(t *testing.T) {
 		go func() {
 			m.Unlock()
 		}()
-		assert.Equal(t, 1, utils.NumMutexes())
+		require.Equal(t, 1, utils.NumMutexes())
 	}()
 
 	time.Sleep(time.Millisecond)
 	cleanupTest()
 
-	assert.Equal(t, 0, utils.NumMutexes())
+	require.Equal(t, 0, utils.NumMutexes())
 }
 
 func TestEmbeddedMutex(t *testing.T) {
@@ -172,16 +203,68 @@ func BenchmarkLockTracker(b *testing.B) {
 			m.Unlock()
 		}
 	})
-	b.Run("native mutex", func(b *testing.B) {
-		var m sync.Mutex
+	b.Run("wrapped rwmutex", func(b *testing.B) {
+		var m utils.RWMutex
 		for i := 0; i < b.N; i++ {
 			m.Lock()
 			noop()
 			m.Unlock()
 		}
 	})
-	b.Run("wrapped rwmutex", func(b *testing.B) {
+	b.Run("wrapped mutex init", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			var m utils.Mutex
+			m.Lock()
+			noop()
+			m.Unlock()
+		}
+	})
+	b.Run("wrapped rwmutex init", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			var m utils.RWMutex
+			m.Lock()
+			noop()
+			m.Unlock()
+		}
+	})
+
+	utils.ToggleLockTrackerStackTraces(true)
+	b.Run("wrapped mutex + stack trace", func(b *testing.B) {
+		var m utils.Mutex
+		for i := 0; i < b.N; i++ {
+			m.Lock()
+			noop()
+			m.Unlock()
+		}
+	})
+	b.Run("wrapped rwmutex + stack trace", func(b *testing.B) {
 		var m utils.RWMutex
+		for i := 0; i < b.N; i++ {
+			m.Lock()
+			noop()
+			m.Unlock()
+		}
+	})
+	b.Run("wrapped mutex init + stack trace", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			var m utils.Mutex
+			m.Lock()
+			noop()
+			m.Unlock()
+		}
+	})
+	b.Run("wrapped rwmutex init + stack trace", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			var m utils.RWMutex
+			m.Lock()
+			noop()
+			m.Unlock()
+		}
+	})
+	utils.ToggleLockTrackerStackTraces(false)
+
+	b.Run("native mutex", func(b *testing.B) {
+		var m sync.Mutex
 		for i := 0; i < b.N; i++ {
 			m.Lock()
 			noop()
@@ -196,26 +279,9 @@ func BenchmarkLockTracker(b *testing.B) {
 			m.Unlock()
 		}
 	})
-
-	b.Run("wrapped mutex init", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			var m utils.Mutex
-			m.Lock()
-			noop()
-			m.Unlock()
-		}
-	})
 	b.Run("native mutex init", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			var m sync.Mutex
-			m.Lock()
-			noop()
-			m.Unlock()
-		}
-	})
-	b.Run("wrapped rwmutex init", func(b *testing.B) {
-		for i := 0; i < b.N; i++ {
-			var m utils.RWMutex
 			m.Lock()
 			noop()
 			m.Unlock()

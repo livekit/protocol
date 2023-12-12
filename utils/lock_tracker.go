@@ -17,11 +17,16 @@ package utils
 import (
 	"math"
 	"runtime"
+	"slices"
+	"strconv"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 	"unsafe"
 )
+
+const lockTrackerMaxStackDepth = 16
 
 var lockTrackerEnabled = false
 var enableLockTrackerOnce sync.Once
@@ -106,7 +111,7 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 			waiting := atomic.LoadInt32(&t.waiting)
 			if ts <= minTS && waiting > 0 {
 				stuck = append(stuck, &StuckLock{
-					stack:   append([]byte{}, t.stack...),
+					stack:   slices.Clone(t.stack),
 					ts:      ts,
 					waiting: waiting,
 					held:    atomic.LoadInt32(&t.held),
@@ -118,14 +123,33 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 }
 
 type StuckLock struct {
-	stack   []byte
+	stack   []uintptr
 	ts      uint32
 	waiting int32
 	held    int32
 }
 
 func (d *StuckLock) FirstLockedAtStack() string {
-	return string(d.stack)
+	fs := runtime.CallersFrames(d.stack)
+	var b strings.Builder
+	for {
+		f, ok := fs.Next()
+		if !ok {
+			break
+		}
+		if f.Function != "" {
+			b.WriteString(f.Function)
+			b.WriteByte('\n')
+		}
+		if f.File != "" {
+			b.WriteByte('\t')
+			b.WriteString(f.File)
+			b.WriteByte(':')
+			b.WriteString(strconv.Itoa(f.Line))
+			b.WriteByte('\n')
+		}
+	}
+	return b.String()
 }
 
 func (d *StuckLock) HeldSince() time.Time {
@@ -141,7 +165,7 @@ func (d *StuckLock) NumGoroutineWaiting() int {
 }
 
 type lockTracker struct {
-	stack   []byte
+	stack   []uintptr
 	ts      uint32
 	waiting int32
 	held    int32
@@ -161,14 +185,8 @@ func (t *lockTracker) trackLock() {
 			atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
 
 			if atomic.LoadUint32(&enableLockTrackerStackTrace) == 1 {
-				for {
-					n := runtime.Stack(t.stack[:cap(t.stack)], false)
-					if n < cap(t.stack) {
-						t.stack = t.stack[:n]
-						break
-					}
-					t.stack = make([]byte, len(t.stack)*2)
-				}
+				n := runtime.Callers(2, t.stack[:lockTrackerMaxStackDepth])
+				t.stack = t.stack[:n]
 			}
 		}
 	}
@@ -184,7 +202,7 @@ func (t *lockTracker) trackUnlock() {
 
 func newLockTracker() *lockTracker {
 	t := &lockTracker{
-		stack: make([]byte, 1024),
+		stack: make([]uintptr, lockTrackerMaxStackDepth),
 	}
 
 	runtime.SetFinalizer(t, finalizeLockTracker)
