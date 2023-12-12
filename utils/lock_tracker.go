@@ -17,13 +17,14 @@ package utils
 import (
 	"math"
 	"runtime"
-	"slices"
 	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 	"unsafe"
+
+	"golang.org/x/exp/slices"
 )
 
 const lockTrackerMaxStackDepth = 16
