@@ -66,10 +66,8 @@ github.com/lithammer/shortuuid/v4 v4.0.0 h1:QRbbVkfgNippHOS8PXDkti4NaWeyYfcBTHtw
 github.com/lithammer/shortuuid/v4 v4.0.0/go.mod h1:Zs8puNcrvf2rV9rTH51ZLLcj7ZXqQI3lv67aw4KiB1Y=
 github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1 h1:jm09419p0lqTkDaKb5iXdynYrzB84ErPPO4LbRASk58=
 github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1/go.mod h1:Rs3MhFwutWhGwmY1VQsygw28z5bWcnEYmS1OG9OxjOQ=
-github.com/livekit/psrpc v0.5.3-0.20231213034606-72c092a7ae28 h1:vb558KoaxeDQ1ojLmRg+PxmNWbqa3Gy+083ECMq2C6Y=
-github.com/livekit/psrpc v0.5.3-0.20231213034606-72c092a7ae28/go.mod h1:cQjxg1oCxYHhxxv6KJH1gSvdtCHQoRZCHgPdm5N8v2g=
-github.com/livekit/psrpc v0.5.3-0.20231213223846-bc354498735c h1:tfLuE8yp8KrQydTIcyr3DktmMLs6yv+skyGskxaGQgE=
-github.com/livekit/psrpc v0.5.3-0.20231213223846-bc354498735c/go.mod h1:cQjxg1oCxYHhxxv6KJH1gSvdtCHQoRZCHgPdm5N8v2g=
+github.com/livekit/psrpc v0.5.3-0.20231213230638-40783a3497a3 h1:S77f+105Ic4JR/nOzk6jyqiUxWa9FOlyvJ3bYIseU8Q=
+github.com/livekit/psrpc v0.5.3-0.20231213230638-40783a3497a3/go.mod h1:cQjxg1oCxYHhxxv6KJH1gSvdtCHQoRZCHgPdm5N8v2g=
 github.com/mackerelio/go-osstat v0.2.4 h1:qxGbdPkFo65PXOb/F/nhDKpF2nGmGaCFDLXoZjJTtUs=
 github.com/mackerelio/go-osstat v0.2.4/go.mod h1:Zy+qzGdZs3A9cuIqmgbJvwbmLQH9dJvtio5ZjJTbdlQ=
 github.com/matttproud/golang_protobuf_extensions v1.0.4 h1:mmDVorXM7PCGKw94cs5zkfA9PSy5pEvNWRP0ET0TIVo=
