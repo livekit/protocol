@@ -17,6 +17,8 @@ package rpc
 import (
 	"context"
 	"errors"
+	"math"
+	"math/rand"
 	"time"
 
 	"github.com/livekit/protocol/livekit"
@@ -24,7 +26,10 @@ import (
 	"github.com/livekit/psrpc/pkg/middleware"
 )
 
-const retries = 3
+const (
+	retries     = 3
+	backoffBase = 1 * time.Second
+)
 
 type EgressClient interface {
 	EgressInternalClient
@@ -34,6 +39,16 @@ type EgressClient interface {
 type egressClient struct {
 	EgressInternalClient
 	EgressHandlerClient
+}
+
+func isErrRecoverable(err error) bool {
+	var e psrpc.Error
+	if !errors.As(err, &e) {
+		return true
+	}
+	return e.Code() == psrpc.DeadlineExceeded ||
+		e.Code() == psrpc.ResourceExhausted ||
+		e.Code() == psrpc.Unavailable
 }
 
 func NewEgressClient(params ClientParams) (EgressClient, error) {
@@ -46,17 +61,21 @@ func NewEgressClient(params ClientParams) (EgressClient, error) {
 		timeout = 10 * time.Second
 	}
 	internalOpts := append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
-		MaxAttempts: params.MaxAttempts,
-		// use longer retry timeout
 		Timeout: timeout,
-		IsRecoverable: func(err error) bool {
-			var e psrpc.Error
-			if !errors.As(err, &e) {
-				return true
+		GetRetryParameters: func(err error, attempt int) (retry bool, timeout time.Duration, waitTime time.Duration) {
+			if !isErrRecoverable(err) {
+				return false, 0, 0
 			}
-			return e.Code() == psrpc.DeadlineExceeded ||
-				e.Code() == psrpc.ResourceExhausted ||
-				e.Code() == psrpc.Unavailable
+
+			if attempt >= retries {
+				return false, 0, 0
+			}
+
+			// backoff = base * 2 ^ (attempt - 1) * rand[1,2)
+			backoff := time.Duration(float64(backoffBase) * math.Pow(2, float64(attempt-1)) * (rand.Float64() + 1))
+			timeout = time.Duration(float64(timeout) * math.Pow(2, float64(attempt)))
+
+			return true, timeout, backoff
 		},
 	}))
 	internalClient, err := NewEgressInternalClient(params.Bus, internalOpts...)
