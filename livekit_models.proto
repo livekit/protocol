@@ -99,6 +99,18 @@ message ParticipantInfo {
     // WS disconnected
     DISCONNECTED = 3;
   }
+  enum Kind {
+    // standard participants, e.g. web clients
+    STANDARD = 0;
+    // only ingests streams
+    INGRESS = 1;
+    // only consumes streams
+    EGRESS = 2;
+    // SIP participants
+    SIP = 3;
+    // LiveKit agents
+    AGENT = 4;
+  }
   string sid = 1;
   string identity = 2;
   State state = 3;
@@ -113,6 +125,7 @@ message ParticipantInfo {
   // indicates the participant has an active publisher connection
   // and can publish to the server
   bool is_publisher = 13;
+  Kind kind = 14;
 }
 
 enum TrackType {
