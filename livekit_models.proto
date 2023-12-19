@@ -183,6 +183,7 @@ message TrackInfo {
   bool disable_red = 15;
   Encryption.Type encryption = 16;
   string stream = 17;
+  TimedVersion version = 18;
 }
 
 enum VideoQuality {
