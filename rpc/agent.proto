@@ -30,6 +30,17 @@ service AgentInternal {
     option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   };
+  rpc AgentRegistered(google.protobuf.Empty) returns (CheckEnabledResponse) {
+    option (psrpc.options) = {
+      subscription: true
+      multi: true
+      topics: true
+      topic_params: {
+        names: ["project_id"]
+        typed: false
+      }
+    };
+  }
 }
 
 message CheckEnabledRequest{}
