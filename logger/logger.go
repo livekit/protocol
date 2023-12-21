@@ -87,6 +87,7 @@ type Logger interface {
 	WithItemSampler() Logger
 	// WithoutSampler returns the original logger without sampling
 	WithoutSampler() Logger
+	WithDeferredValues() (Logger, DeferredFieldResolver)
 }
 
 type sharedConfig struct {
@@ -341,6 +342,29 @@ func (l *ZapLogger) WithoutSampler() Logger {
 	return &dup
 }
 
+func (l *ZapLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
+	var resolvers []DeferredFieldResolver
+	opt := zap.WrapCore(func(core zapcore.Core) zapcore.Core {
+		core, resolve := newDeferredValueCore(core)
+		resolvers = append(resolvers, resolve)
+		return core
+	})
+	resolve := func(args ...any) {
+		for _, r := range resolvers {
+			r(args...)
+		}
+	}
+
+	dup := *l
+	dup.zap = l.zap.WithOptions(opt)
+	if l.unsampled == l.zap {
+		dup.unsampled = dup.zap
+	} else {
+		dup.unsampled = l.unsampled.WithOptions(opt)
+	}
+	return &dup, resolve
+}
+
 func (l *ZapLogger) isEnabled(level zapcore.Level) bool {
 	return level >= l.level.Level()
 }
@@ -396,4 +420,8 @@ func (l LogRLogger) WithItemSampler() Logger {
 
 func (l LogRLogger) WithoutSampler() Logger {
 	return l
+}
+
+func (l LogRLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
+	return l, func(args ...any) {}
 }
