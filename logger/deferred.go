@@ -71,7 +71,7 @@ func newDeferredValueCore(core zapcore.Core) (zapcore.Core, DeferredFieldResolve
 					i++
 				case string:
 					if i < len(args)-1 {
-						fields = append(fields, zap.Any(arg, arg[i+1]))
+						fields = append(fields, zap.Any(arg, args[i+1]))
 						i += 2
 					}
 				}
