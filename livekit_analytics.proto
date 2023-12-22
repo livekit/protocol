@@ -159,16 +159,14 @@ message AnalyticsRoomParticipant {
   string identity = 2;
   string name = 3;
   ParticipantInfo.State state = 4;
-  ParticipantInfo.Kind kind = 5;
-  google.protobuf.Timestamp joined_at = 6;
+  google.protobuf.Timestamp joined_at = 5;
 }
 
 message AnalyticsRoom {
   string id = 1;
   string name = 2;
   google.protobuf.Timestamp created_at = 3;
-  uint32 num_participants = 4;
-  repeated AnalyticsRoomParticipant participants = 5;
+  repeated AnalyticsRoomParticipant participants = 4;
 }
 
 message AnalyticsNodeRooms {
