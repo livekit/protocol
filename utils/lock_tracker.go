@@ -105,7 +105,7 @@ func ScanTrackedLocksI(threshold time.Duration, n int) []*StuckLock {
 //go:nosplit
 func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 	var stuck []*StuckLock
-	for _, ref := range weakRefs {
+	for _, ref := range refs {
 		if ref != 0 {
 			t := (*lockTracker)(unsafe.Pointer(ref))
 			ts := atomic.LoadUint32(&t.ts)
