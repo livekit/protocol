@@ -28,6 +28,7 @@ import "livekit_ingress.proto";
 service AnalyticsRecorderService {
   rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
   rpc IngestEvents(stream AnalyticsEvents) returns (google.protobuf.Empty){};
+  rpc IngestNodeRoomStates(stream AnalyticsNodeRooms) returns (google.protobuf.Empty){};
 }
 
 enum StreamType {
@@ -151,4 +152,26 @@ message AnalyticsEvent {
 
 message AnalyticsEvents {
   repeated AnalyticsEvent events = 1;
+}
+
+message AnalyticsRoomParticipant {
+  string id = 1;
+  string identity = 2;
+  string name = 3;
+  ParticipantInfo.State state = 4;
+  google.protobuf.Timestamp joined_at = 5;
+}
+
+message AnalyticsRoom {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp created_at = 3;
+  repeated AnalyticsRoomParticipant participants = 4;
+}
+
+message AnalyticsNodeRooms {
+  string node_id = 1;
+  uint64 sequence_number = 2;
+  google.protobuf.Timestamp timestamp = 3;
+  repeated AnalyticsRoom rooms = 4;
 }

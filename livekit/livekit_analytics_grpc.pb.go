@@ -34,8 +34,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AnalyticsRecorderService_IngestStats_FullMethodName  = "/livekit.AnalyticsRecorderService/IngestStats"
-	AnalyticsRecorderService_IngestEvents_FullMethodName = "/livekit.AnalyticsRecorderService/IngestEvents"
+	AnalyticsRecorderService_IngestStats_FullMethodName          = "/livekit.AnalyticsRecorderService/IngestStats"
+	AnalyticsRecorderService_IngestEvents_FullMethodName         = "/livekit.AnalyticsRecorderService/IngestEvents"
+	AnalyticsRecorderService_IngestNodeRoomStates_FullMethodName = "/livekit.AnalyticsRecorderService/IngestNodeRoomStates"
 )
 
 // AnalyticsRecorderServiceClient is the client API for AnalyticsRecorderService service.
@@ -44,6 +45,7 @@ const (
 type AnalyticsRecorderServiceClient interface {
 	IngestStats(ctx context.Context, opts ...grpc.CallOption) (AnalyticsRecorderService_IngestStatsClient, error)
 	IngestEvents(ctx context.Context, opts ...grpc.CallOption) (AnalyticsRecorderService_IngestEventsClient, error)
+	IngestNodeRoomStates(ctx context.Context, opts ...grpc.CallOption) (AnalyticsRecorderService_IngestNodeRoomStatesClient, error)
 }
 
 type analyticsRecorderServiceClient struct {
@@ -122,12 +124,47 @@ func (x *analyticsRecorderServiceIngestEventsClient) CloseAndRecv() (*emptypb.Em
 	return m, nil
 }
 
+func (c *analyticsRecorderServiceClient) IngestNodeRoomStates(ctx context.Context, opts ...grpc.CallOption) (AnalyticsRecorderService_IngestNodeRoomStatesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AnalyticsRecorderService_ServiceDesc.Streams[2], AnalyticsRecorderService_IngestNodeRoomStates_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &analyticsRecorderServiceIngestNodeRoomStatesClient{stream}
+	return x, nil
+}
+
+type AnalyticsRecorderService_IngestNodeRoomStatesClient interface {
+	Send(*AnalyticsNodeRooms) error
+	CloseAndRecv() (*emptypb.Empty, error)
+	grpc.ClientStream
+}
+
+type analyticsRecorderServiceIngestNodeRoomStatesClient struct {
+	grpc.ClientStream
+}
+
+func (x *analyticsRecorderServiceIngestNodeRoomStatesClient) Send(m *AnalyticsNodeRooms) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *analyticsRecorderServiceIngestNodeRoomStatesClient) CloseAndRecv() (*emptypb.Empty, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(emptypb.Empty)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // AnalyticsRecorderServiceServer is the server API for AnalyticsRecorderService service.
 // All implementations must embed UnimplementedAnalyticsRecorderServiceServer
 // for forward compatibility
 type AnalyticsRecorderServiceServer interface {
 	IngestStats(AnalyticsRecorderService_IngestStatsServer) error
 	IngestEvents(AnalyticsRecorderService_IngestEventsServer) error
+	IngestNodeRoomStates(AnalyticsRecorderService_IngestNodeRoomStatesServer) error
 	mustEmbedUnimplementedAnalyticsRecorderServiceServer()
 }
 
@@ -140,6 +177,9 @@ func (UnimplementedAnalyticsRecorderServiceServer) IngestStats(AnalyticsRecorder
 }
 func (UnimplementedAnalyticsRecorderServiceServer) IngestEvents(AnalyticsRecorderService_IngestEventsServer) error {
 	return status.Errorf(codes.Unimplemented, "method IngestEvents not implemented")
+}
+func (UnimplementedAnalyticsRecorderServiceServer) IngestNodeRoomStates(AnalyticsRecorderService_IngestNodeRoomStatesServer) error {
+	return status.Errorf(codes.Unimplemented, "method IngestNodeRoomStates not implemented")
 }
 func (UnimplementedAnalyticsRecorderServiceServer) mustEmbedUnimplementedAnalyticsRecorderServiceServer() {
 }
@@ -207,6 +247,32 @@ func (x *analyticsRecorderServiceIngestEventsServer) Recv() (*AnalyticsEvents, e
 	return m, nil
 }
 
+func _AnalyticsRecorderService_IngestNodeRoomStates_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AnalyticsRecorderServiceServer).IngestNodeRoomStates(&analyticsRecorderServiceIngestNodeRoomStatesServer{stream})
+}
+
+type AnalyticsRecorderService_IngestNodeRoomStatesServer interface {
+	SendAndClose(*emptypb.Empty) error
+	Recv() (*AnalyticsNodeRooms, error)
+	grpc.ServerStream
+}
+
+type analyticsRecorderServiceIngestNodeRoomStatesServer struct {
+	grpc.ServerStream
+}
+
+func (x *analyticsRecorderServiceIngestNodeRoomStatesServer) SendAndClose(m *emptypb.Empty) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *analyticsRecorderServiceIngestNodeRoomStatesServer) Recv() (*AnalyticsNodeRooms, error) {
+	m := new(AnalyticsNodeRooms)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // AnalyticsRecorderService_ServiceDesc is the grpc.ServiceDesc for AnalyticsRecorderService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -223,6 +289,11 @@ var AnalyticsRecorderService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "IngestEvents",
 			Handler:       _AnalyticsRecorderService_IngestEvents_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "IngestNodeRoomStates",
+			Handler:       _AnalyticsRecorderService_IngestNodeRoomStates_Handler,
 			ClientStreams: true,
 		},
 	},
