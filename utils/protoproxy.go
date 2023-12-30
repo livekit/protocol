@@ -31,6 +31,7 @@ type ProtoProxy[T proto.Message] struct {
 	updateFn        func() T
 	fuse            core.Fuse
 	updateChan      chan struct{}
+	awaitChan       chan struct{}
 	done            chan struct{}
 	queueUpdate     chan struct{}
 	dirty           bool
@@ -59,17 +60,25 @@ func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func
 	return p
 }
 
-func (p *ProtoProxy[T]) MarkDirty(immediate bool) {
+func (p *ProtoProxy[T]) MarkDirty(immediate bool) <-chan struct{} {
 	p.lock.Lock()
 	p.dirty = true
 	shouldUpdate := immediate || time.Since(p.refreshedAt) > p.refreshInterval
+
+	awaitChan := p.awaitChan
+	if awaitChan == nil {
+		awaitChan = make(chan struct{})
+		p.awaitChan = awaitChan
+	}
 	p.lock.Unlock()
+
 	if shouldUpdate {
 		select {
 		case p.queueUpdate <- struct{}{}:
 		default:
 		}
 	}
+	return awaitChan
 }
 
 func (p *ProtoProxy[T]) Updated() <-chan struct{} {
@@ -89,6 +98,13 @@ func (p *ProtoProxy[T]) Stop() {
 	if p.refreshInterval > 0 {
 		<-p.done
 	}
+
+	p.lock.Lock()
+	defer p.lock.Unlock()
+	if awaitChan := p.awaitChan; awaitChan != nil {
+		p.awaitChan = nil
+		close(awaitChan)
+	}
 }
 
 func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
@@ -96,6 +112,8 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	// wipe out another thread setting dirty to true while updateFn is executing
 	p.lock.Lock()
 	p.dirty = false
+	awaitChan := p.awaitChan
+	p.awaitChan = nil
 	p.lock.Unlock()
 
 	msg := p.updateFn()
@@ -112,6 +130,9 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	p.refreshedAt = time.Now()
 	p.lock.Unlock()
 
+	if awaitChan != nil {
+		close(awaitChan)
+	}
 	if !skipNotify {
 		select {
 		case p.updateChan <- struct{}{}:
