@@ -64,4 +64,8 @@ func TestTimedVersion(t *testing.T) {
 		require.Equal(t, ts1, ts2)
 		require.Equal(t, tv1.v.Load(), tv2.v.Load())
 	})
+
+	t.Run("timed version from nil is zero", func(t *testing.T) {
+		require.True(t, NewTimedVersionFromProto(nil).IsZero())
+	})
 }
