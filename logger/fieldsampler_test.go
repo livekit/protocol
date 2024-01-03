@@ -90,10 +90,10 @@ func TestRoomSamplerWith(t *testing.T) {
 	}).(*fieldSampler)).Sugar()
 
 	s.Debugw("test", "field", "test")
-	require.Equal(t, 0, c.writeCount)
+	require.Equal(t, 0, c.WriteCount())
 
 	s.With("field", "test").Debugw("test")
-	require.Equal(t, 0, c.writeCount)
+	require.Equal(t, 0, c.WriteCount())
 }
 
 func TestRoomSampleFindSampleField(t *testing.T) {
