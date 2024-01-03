@@ -19,6 +19,7 @@ import (
 	"math"
 	"testing"
 
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -35,11 +36,31 @@ type testStringLike string
 
 type testCore struct {
 	zapcore.Core
-	writeCount int
+	writeCount *atomic.Int32
+}
+
+func (c *testCore) init() {
+	if c.writeCount == nil {
+		c.writeCount = &atomic.Int32{}
+	}
+}
+
+func (c *testCore) WriteCount() int {
+	c.init()
+	return int(c.writeCount.Load())
+}
+
+func (c *testCore) With(fields []zapcore.Field) zapcore.Core {
+	c.init()
+	return &testCore{
+		Core:       c.Core.With(fields),
+		writeCount: c.writeCount,
+	}
 }
 
 func (s *testCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	s.writeCount++
+	s.init()
+	s.writeCount.Inc()
 	return nil
 }
 
@@ -57,7 +78,7 @@ func TestRoomSampleRate(t *testing.T) {
 		s.Debugw("test", "field", fmt.Sprintf("field_%d", i))
 	}
 
-	rate := float64(c.writeCount) / float64(n)
+	rate := float64(c.WriteCount()) / float64(n)
 	require.Greater(t, 0.01, math.Abs(rate-expectedRate))
 }
 
