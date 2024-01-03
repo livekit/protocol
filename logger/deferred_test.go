@@ -13,11 +13,14 @@ func TestDeferredLogger(t *testing.T) {
 	s := zap.New(dc).Sugar()
 
 	s.Infow("test")
-	require.Equal(t, 0, c.writeCount)
+	require.Equal(t, 0, c.WriteCount())
 
-	resolve("foo", "bar")
-	require.Equal(t, 1, c.writeCount)
+	s.With("a", "1").Infow("test")
+	require.Equal(t, 0, c.WriteCount())
 
-	s.Infow("test")
-	require.Equal(t, 2, c.writeCount)
+	resolve("b", "2")
+	require.Equal(t, 2, c.WriteCount())
+
+	s.With("c", "3").Infow("test")
+	require.Equal(t, 3, c.WriteCount())
 }
