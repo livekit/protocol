@@ -88,7 +88,7 @@ func (p *ProtoProxy[T]) Updated() <-chan struct{} {
 func (p *ProtoProxy[T]) Get() T {
 	p.lock.RLock()
 	defer p.lock.RUnlock()
-	return p.message
+	return proto.Clone(p.message).(T)
 }
 
 func (p *ProtoProxy[T]) Stop() {
