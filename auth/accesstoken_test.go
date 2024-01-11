@@ -22,6 +22,7 @@ import (
 	"github.com/go-jose/go-jose/v3/jwt"
 	"github.com/stretchr/testify/require"
 
+	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/utils"
 )
 
@@ -40,6 +41,7 @@ func TestAccessToken(t *testing.T) {
 		at := NewAccessToken(apiKey, secret).
 			AddGrant(videoGrant).
 			SetValidFor(time.Minute * 5).
+			SetKind(livekit.ParticipantInfo_AGENT).
 			SetIdentity("user")
 		value, err := at.ToJWT()
 		//fmt.Println(raw)
@@ -55,7 +57,25 @@ func TestAccessToken(t *testing.T) {
 		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
 		require.NoError(t, err)
 
+		require.EqualValues(t, livekit.ParticipantInfo_AGENT, decodedGrant.GetParticipantKind())
 		require.EqualValues(t, videoGrant, decodedGrant.Video)
+	})
+
+	t.Run("missing kind should be interpreted as standard", func(t *testing.T) {
+		apiKey, secret := apiKeypair()
+		value, err := NewAccessToken(apiKey, secret).
+			AddGrant(&VideoGrant{RoomJoin: true, Room: "myroom"}).
+			ToJWT()
+		require.NoError(t, err)
+		token, err := jwt.ParseSigned(value)
+		require.NoError(t, err)
+
+		decodedGrant := ClaimGrants{}
+		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
+		require.NoError(t, err)
+
+		// default validity
+		require.EqualValues(t, livekit.ParticipantInfo_STANDARD, decodedGrant.GetParticipantKind())
 	})
 
 	t.Run("default validity should be more than a minute", func(t *testing.T) {
