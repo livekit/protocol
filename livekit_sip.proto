@@ -161,6 +161,9 @@ message CreateSIPDispatchRuleRequest {
   // By default the From value (Phone number) is used as the participant identity
   // If true a random value will be used instead
   bool hide_phone_number = 3;
+
+  // When SIP participant joins a room, play an automated audio message.
+  bool play_room_join_message = 4;
 }
 
 message SIPDispatchRuleInfo {
@@ -168,6 +171,7 @@ message SIPDispatchRuleInfo {
   SIPDispatchRule rule = 2;
   repeated string trunk_ids = 3;
   bool hide_phone_number = 4;
+  bool play_room_join_message = 5;
 }
 
 message ListSIPDispatchRuleRequest {
