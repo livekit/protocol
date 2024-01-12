@@ -23,6 +23,7 @@ import "options.proto";
 service SIPInternal {
   rpc UpdateSIPParticipant(InternalUpdateSIPParticipantRequest) returns (InternalUpdateSIPParticipantResponse) {
     option (psrpc.options).affinity_func = true;
+    option (psrpc.options).topics = true;
   }
   rpc SendSIPParticipantDTMF(InternalSendSIPParticipantDTMFRequest) returns (InternalSendSIPParticipantDTMFResponse) {
     option (psrpc.options).affinity_func = true;
