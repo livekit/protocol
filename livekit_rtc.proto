@@ -354,6 +354,8 @@ message SimulateScenario {
     int64 subscriber_bandwidth = 6;
     // disconnect signal on resume
     bool disconnect_signal_on_resume = 7;
+    // disconnect signal on resume before sending any messages from server
+    bool disconnect_signal_on_resume_no_messages = 8;
   }
 }
 
