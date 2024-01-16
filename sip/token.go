@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ingress
+package sip
 
 import (
 	"time"
@@ -21,21 +21,18 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participantName string) (string, error) {
-	f := false
+func BuildSIPToken(apiKey, secret, roomName, participantIdentity, participantName string) (string, error) {
 	t := true
-	grant := &auth.VideoGrant{
-		RoomJoin:     true,
-		Room:         roomName,
-		CanSubscribe: &f,
-		CanPublish:   &t,
-	}
-
 	at := auth.NewAccessToken(apiKey, secret).
-		AddGrant(grant).
+		AddGrant(&auth.VideoGrant{
+			RoomJoin:     true,
+			Room:         roomName,
+			CanSubscribe: &t,
+			CanPublish:   &t,
+		}).
 		SetIdentity(participantIdentity).
 		SetName(participantName).
-		SetKind(livekit.ParticipantInfo_INGRESS).
+		SetKind(livekit.ParticipantInfo_SIP).
 		SetValidFor(24 * time.Hour)
 
 	return at.ToJWT()

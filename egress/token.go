@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/livekit/protocol/auth"
+	"github.com/livekit/protocol/livekit"
 )
 
 func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error) {
@@ -36,6 +37,7 @@ func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error)
 	at := auth.NewAccessToken(apiKey, secret).
 		AddGrant(grant).
 		SetIdentity(egressID).
+		SetKind(livekit.ParticipantInfo_EGRESS).
 		SetValidFor(24 * time.Hour)
 
 	return at.ToJWT()

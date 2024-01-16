@@ -16,9 +16,12 @@ package auth
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/livekit/protocol/livekit"
 )
 
 func TestGrants(t *testing.T) {
@@ -66,6 +69,7 @@ func TestGrants(t *testing.T) {
 		grants := &ClaimGrants{
 			Identity: "identity",
 			Name:     "name",
+			Kind:     "kind",
 			Video:    video,
 			Sha256:   "sha256",
 			Metadata: "metadata",
@@ -79,4 +83,18 @@ func TestGrants(t *testing.T) {
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
 	})
+}
+
+func TestParticipantKind(t *testing.T) {
+	const kindMin, kindMax = livekit.ParticipantInfo_STANDARD, livekit.ParticipantInfo_AGENT
+	for k := kindMin; k <= kindMax; k++ {
+		k := k
+		t.Run(k.String(), func(t *testing.T) {
+			require.Equal(t, k, kindToProto(kindFromProto(k)))
+		})
+	}
+	const kindNext = kindMax + 1
+	if _, err := strconv.Atoi(kindNext.String()); err != nil {
+		t.Errorf("Please update kindMax to match protobuf. Missing value: %s", kindNext)
+	}
 }

@@ -19,6 +19,8 @@ import (
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/jwt"
+
+	"github.com/livekit/protocol/livekit"
 )
 
 const (
@@ -52,6 +54,11 @@ func (t *AccessToken) SetValidFor(duration time.Duration) *AccessToken {
 
 func (t *AccessToken) SetName(name string) *AccessToken {
 	t.grant.Name = name
+	return t
+}
+
+func (t *AccessToken) SetKind(kind livekit.ParticipantInfo_Kind) *AccessToken {
+	t.grant.SetParticipantKind(kind)
 	return t
 }
 

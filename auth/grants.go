@@ -59,10 +59,19 @@ type VideoGrant struct {
 type ClaimGrants struct {
 	Identity string      `json:"-"`
 	Name     string      `json:"name,omitempty"`
+	Kind     string      `json:"kind,omitempty"`
 	Video    *VideoGrant `json:"video,omitempty"`
 	// for verifying integrity of the message body
 	Sha256   string `json:"sha256,omitempty"`
 	Metadata string `json:"metadata,omitempty"`
+}
+
+func (c *ClaimGrants) SetParticipantKind(kind livekit.ParticipantInfo_Kind) {
+	c.Kind = kindFromProto(kind)
+}
+
+func (c *ClaimGrants) GetParticipantKind() livekit.ParticipantInfo_Kind {
+	return kindToProto(c.Kind)
 }
 
 func (c *ClaimGrants) Clone() *ClaimGrants {
@@ -269,5 +278,26 @@ func sourceToProto(sourceStr string) livekit.TrackSource {
 		return livekit.TrackSource_SCREEN_SHARE_AUDIO
 	default:
 		return livekit.TrackSource_UNKNOWN
+	}
+}
+
+func kindFromProto(source livekit.ParticipantInfo_Kind) string {
+	return strings.ToLower(source.String())
+}
+
+func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
+	switch sourceStr {
+	case "", "standard":
+		return livekit.ParticipantInfo_STANDARD
+	case "ingress":
+		return livekit.ParticipantInfo_INGRESS
+	case "egress":
+		return livekit.ParticipantInfo_EGRESS
+	case "sip":
+		return livekit.ParticipantInfo_SIP
+	case "agent":
+		return livekit.ParticipantInfo_AGENT
+	default:
+		return livekit.ParticipantInfo_STANDARD
 	}
 }
