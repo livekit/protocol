@@ -29,6 +29,7 @@ service EgressInternal {
   };
   rpc ListActiveEgress(ListActiveEgressRequest) returns (ListActiveEgressResponse) {
     option (psrpc.options).multi = true;
+    option (psrpc.options).topics = true;
   }
 }
 
