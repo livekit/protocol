@@ -27,7 +27,6 @@ import (
 )
 
 type PSRPCConfig struct {
-	Enabled     bool          `yaml:"enabled,omitempty"`
 	MaxAttempts int           `yaml:"max_attempts,omitempty"`
 	Timeout     time.Duration `yaml:"timeout,omitempty"`
 	Backoff     time.Duration `yaml:"backoff,omitempty"`

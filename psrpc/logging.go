@@ -132,11 +132,9 @@ func (s *streamLoggerInterceptor) Close(cause error) error {
 func newMultiRPCLoggerInterceptor(l logger.Logger) psrpc.ClientMultiRPCInterceptor {
 	var loggers loggerCache
 	return func(rpcInfo psrpc.RPCInfo, next psrpc.ClientMultiRPCHandler) psrpc.ClientMultiRPCHandler {
-		l := loggers.Get(rpcInfo, l).WithValues("topic", rpcInfo.Topic)
-		l.Debugw("multirpc opened")
 		return &multiRPCLoggerInterceptor{
 			ClientMultiRPCHandler: next,
-			logger:                l,
+			logger:                loggers.Get(rpcInfo, l).WithValues("topic", rpcInfo.Topic),
 			start:                 time.Now(),
 		}
 	}
@@ -152,6 +150,7 @@ type multiRPCLoggerInterceptor struct {
 
 func (r *multiRPCLoggerInterceptor) Send(ctx context.Context, req proto.Message, opts ...psrpc.RequestOption) error {
 	r.start = time.Now()
+	r.logger.Debugw("multirpc opened", "request", logger.Proto(req))
 	return r.ClientMultiRPCHandler.Send(ctx, req, opts...)
 }
 
