@@ -166,8 +166,6 @@ message StartSession {
   string participant_id = 16;
   ReconnectReason reconnect_reason = 17;
   optional bool subscriber_allow_pause = 18;
-  string controller_node_id = 19;
-  string selection_reason = 20;
 }
 
 message EndSession {
