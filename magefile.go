@@ -63,11 +63,12 @@ func Proto() error {
 		"rpc/agent.proto",
 		"rpc/egress.proto",
 		"rpc/ingress.proto",
-		"rpc/sip.proto",
 		"rpc/io.proto",
-		"rpc/room.proto",
+		"rpc/keepalive.proto",
 		"rpc/participant.proto",
+		"rpc/room.proto",
 		"rpc/signal.proto",
+		"rpc/sip.proto",
 	}
 
 	fmt.Println("generating protobuf")

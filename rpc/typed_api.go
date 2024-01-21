@@ -22,6 +22,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	protopsrpc "github.com/livekit/protocol/psrpc"
+	"github.com/livekit/protocol/utils"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
 )
@@ -147,4 +148,23 @@ func NewTypedParticipantClient(params ClientParams) (TypedParticipantClient, err
 
 func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedParticipantServer, error) {
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
+}
+
+type KeepalivePubSub interface {
+	KeepaliveClient[livekit.NodeID]
+	KeepaliveServer[livekit.NodeID]
+}
+
+type keepalivePubSub struct {
+	KeepaliveClient[livekit.NodeID]
+	KeepaliveServer[livekit.NodeID]
+}
+
+func NewKeepalivePubSub(params ClientParams) (KeepalivePubSub, error) {
+	client, err := NewKeepaliveClient[livekit.NodeID](params.Bus, clientOptions(params)...)
+	if err != nil {
+		return nil, err
+	}
+	server := utils.Must(NewKeepaliveServer[livekit.NodeID](nil, params.Bus))
+	return &keepalivePubSub{client, server}, nil
 }
