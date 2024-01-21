@@ -19,38 +19,21 @@ package rpc;
 option go_package = "github.com/livekit/livekit/pkg/service/rpc";
 
 import "options.proto";
-import "livekit_models.proto";
-import "livekit_room.proto";
 
-service Room {
-  rpc DeleteRoom(livekit.DeleteRoomRequest) returns (livekit.DeleteRoomResponse) {
+service Keepalive {
+  rpc Ping(KeepalivePing) returns (KeepalivePing) {
     option (psrpc.options) = {
+      subscription: true
+      multi: true
       topics: true
       topic_params: {
-        group: "room"
-        names: ["room"]
+        names: ["nodeID"]
         typed: true
       };
     };
   };
-  rpc SendData(livekit.SendDataRequest) returns (livekit.SendDataResponse) {
-    option (psrpc.options) = {
-      topics: true
-      topic_params: {
-        group: "room"
-        names: ["room"]
-        typed: true
-      };
-    };
-  };
-  rpc UpdateRoomMetadata (livekit.UpdateRoomMetadataRequest) returns (livekit.Room) {
-    option (psrpc.options) = {
-      topics: true
-      topic_params: {
-        group: "room"
-        names: ["room"]
-        typed: true
-      };
-    };
-  };
+}
+
+message KeepalivePing {
+  int64 timestamp = 1;
 }
