@@ -40,12 +40,6 @@ type SIP interface {
 	DeleteSIPDispatchRule(context.Context, *DeleteSIPDispatchRuleRequest) (*SIPDispatchRuleInfo, error)
 
 	CreateSIPParticipant(context.Context, *CreateSIPParticipantRequest) (*SIPParticipantInfo, error)
-
-	SendSIPParticipantDTMF(context.Context, *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error)
-
-	ListSIPParticipant(context.Context, *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error)
-
-	DeleteSIPParticipant(context.Context, *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error)
 }
 
 // ===================
@@ -54,7 +48,7 @@ type SIP interface {
 
 type sIPProtobufClient struct {
 	client      HTTPClient
-	urls        [10]string
+	urls        [7]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -82,7 +76,7 @@ func NewSIPProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Clien
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "SIP")
-	urls := [10]string{
+	urls := [7]string{
 		serviceURL + "CreateSIPTrunk",
 		serviceURL + "ListSIPTrunk",
 		serviceURL + "DeleteSIPTrunk",
@@ -90,9 +84,6 @@ func NewSIPProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Clien
 		serviceURL + "ListSIPDispatchRule",
 		serviceURL + "DeleteSIPDispatchRule",
 		serviceURL + "CreateSIPParticipant",
-		serviceURL + "SendSIPParticipantDTMF",
-		serviceURL + "ListSIPParticipant",
-		serviceURL + "DeleteSIPParticipant",
 	}
 
 	return &sIPProtobufClient{
@@ -425,151 +416,13 @@ func (c *sIPProtobufClient) callCreateSIPParticipant(ctx context.Context, in *Cr
 	return out, nil
 }
 
-func (c *sIPProtobufClient) SendSIPParticipantDTMF(ctx context.Context, in *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "SIP")
-	ctx = ctxsetters.WithMethodName(ctx, "SendSIPParticipantDTMF")
-	caller := c.callSendSIPParticipantDTMF
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*SendSIPParticipantDTMFRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*SendSIPParticipantDTMFRequest) when calling interceptor")
-					}
-					return c.callSendSIPParticipantDTMF(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantDTMFInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantDTMFInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *sIPProtobufClient) callSendSIPParticipantDTMF(ctx context.Context, in *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-	out := new(SIPParticipantDTMFInfo)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *sIPProtobufClient) ListSIPParticipant(ctx context.Context, in *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "SIP")
-	ctx = ctxsetters.WithMethodName(ctx, "ListSIPParticipant")
-	caller := c.callListSIPParticipant
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListSIPParticipantRequest) when calling interceptor")
-					}
-					return c.callListSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListSIPParticipantResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPParticipantResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *sIPProtobufClient) callListSIPParticipant(ctx context.Context, in *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-	out := new(ListSIPParticipantResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *sIPProtobufClient) DeleteSIPParticipant(ctx context.Context, in *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "SIP")
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteSIPParticipant")
-	caller := c.callDeleteSIPParticipant
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteSIPParticipantRequest) when calling interceptor")
-					}
-					return c.callDeleteSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *sIPProtobufClient) callDeleteSIPParticipant(ctx context.Context, in *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-	out := new(SIPParticipantInfo)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
 // ===============
 // SIP JSON Client
 // ===============
 
 type sIPJSONClient struct {
 	client      HTTPClient
-	urls        [10]string
+	urls        [7]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -597,7 +450,7 @@ func NewSIPJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOpt
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "SIP")
-	urls := [10]string{
+	urls := [7]string{
 		serviceURL + "CreateSIPTrunk",
 		serviceURL + "ListSIPTrunk",
 		serviceURL + "DeleteSIPTrunk",
@@ -605,9 +458,6 @@ func NewSIPJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOpt
 		serviceURL + "ListSIPDispatchRule",
 		serviceURL + "DeleteSIPDispatchRule",
 		serviceURL + "CreateSIPParticipant",
-		serviceURL + "SendSIPParticipantDTMF",
-		serviceURL + "ListSIPParticipant",
-		serviceURL + "DeleteSIPParticipant",
 	}
 
 	return &sIPJSONClient{
@@ -940,144 +790,6 @@ func (c *sIPJSONClient) callCreateSIPParticipant(ctx context.Context, in *Create
 	return out, nil
 }
 
-func (c *sIPJSONClient) SendSIPParticipantDTMF(ctx context.Context, in *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "SIP")
-	ctx = ctxsetters.WithMethodName(ctx, "SendSIPParticipantDTMF")
-	caller := c.callSendSIPParticipantDTMF
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*SendSIPParticipantDTMFRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*SendSIPParticipantDTMFRequest) when calling interceptor")
-					}
-					return c.callSendSIPParticipantDTMF(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantDTMFInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantDTMFInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *sIPJSONClient) callSendSIPParticipantDTMF(ctx context.Context, in *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-	out := new(SIPParticipantDTMFInfo)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *sIPJSONClient) ListSIPParticipant(ctx context.Context, in *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "SIP")
-	ctx = ctxsetters.WithMethodName(ctx, "ListSIPParticipant")
-	caller := c.callListSIPParticipant
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListSIPParticipantRequest) when calling interceptor")
-					}
-					return c.callListSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListSIPParticipantResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPParticipantResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *sIPJSONClient) callListSIPParticipant(ctx context.Context, in *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-	out := new(ListSIPParticipantResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
-func (c *sIPJSONClient) DeleteSIPParticipant(ctx context.Context, in *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "SIP")
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteSIPParticipant")
-	caller := c.callDeleteSIPParticipant
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteSIPParticipantRequest) when calling interceptor")
-					}
-					return c.callDeleteSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *sIPJSONClient) callDeleteSIPParticipant(ctx context.Context, in *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-	out := new(SIPParticipantInfo)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
 // ==================
 // SIP Server Handler
 // ==================
@@ -1195,15 +907,6 @@ func (s *sIPServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	case "CreateSIPParticipant":
 		s.serveCreateSIPParticipant(ctx, resp, req)
-		return
-	case "SendSIPParticipantDTMF":
-		s.serveSendSIPParticipantDTMF(ctx, resp, req)
-		return
-	case "ListSIPParticipant":
-		s.serveListSIPParticipant(ctx, resp, req)
-		return
-	case "DeleteSIPParticipant":
-		s.serveDeleteSIPParticipant(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -2472,546 +2175,6 @@ func (s *sIPServer) serveCreateSIPParticipantProtobuf(ctx context.Context, resp 
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *sIPServer) serveSendSIPParticipantDTMF(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveSendSIPParticipantDTMFJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveSendSIPParticipantDTMFProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *sIPServer) serveSendSIPParticipantDTMFJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "SendSIPParticipantDTMF")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(SendSIPParticipantDTMFRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.SIP.SendSIPParticipantDTMF
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*SendSIPParticipantDTMFRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*SendSIPParticipantDTMFRequest) when calling interceptor")
-					}
-					return s.SIP.SendSIPParticipantDTMF(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantDTMFInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantDTMFInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *SIPParticipantDTMFInfo
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPParticipantDTMFInfo and nil error while calling SendSIPParticipantDTMF. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *sIPServer) serveSendSIPParticipantDTMFProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "SendSIPParticipantDTMF")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(SendSIPParticipantDTMFRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.SIP.SendSIPParticipantDTMF
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *SendSIPParticipantDTMFRequest) (*SIPParticipantDTMFInfo, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*SendSIPParticipantDTMFRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*SendSIPParticipantDTMFRequest) when calling interceptor")
-					}
-					return s.SIP.SendSIPParticipantDTMF(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantDTMFInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantDTMFInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *SIPParticipantDTMFInfo
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPParticipantDTMFInfo and nil error while calling SendSIPParticipantDTMF. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *sIPServer) serveListSIPParticipant(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveListSIPParticipantJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveListSIPParticipantProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *sIPServer) serveListSIPParticipantJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListSIPParticipant")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(ListSIPParticipantRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.SIP.ListSIPParticipant
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListSIPParticipantRequest) when calling interceptor")
-					}
-					return s.SIP.ListSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListSIPParticipantResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPParticipantResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *ListSIPParticipantResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPParticipantResponse and nil error while calling ListSIPParticipant. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *sIPServer) serveListSIPParticipantProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListSIPParticipant")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(ListSIPParticipantRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.SIP.ListSIPParticipant
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListSIPParticipantRequest) (*ListSIPParticipantResponse, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListSIPParticipantRequest) when calling interceptor")
-					}
-					return s.SIP.ListSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*ListSIPParticipantResponse)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPParticipantResponse) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *ListSIPParticipantResponse
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPParticipantResponse and nil error while calling ListSIPParticipant. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *sIPServer) serveDeleteSIPParticipant(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveDeleteSIPParticipantJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveDeleteSIPParticipantProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *sIPServer) serveDeleteSIPParticipantJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteSIPParticipant")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(DeleteSIPParticipantRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.SIP.DeleteSIPParticipant
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteSIPParticipantRequest) when calling interceptor")
-					}
-					return s.SIP.DeleteSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *SIPParticipantInfo
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPParticipantInfo and nil error while calling DeleteSIPParticipant. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *sIPServer) serveDeleteSIPParticipantProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteSIPParticipant")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(DeleteSIPParticipantRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.SIP.DeleteSIPParticipant
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *DeleteSIPParticipantRequest) (*SIPParticipantInfo, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteSIPParticipantRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteSIPParticipantRequest) when calling interceptor")
-					}
-					return s.SIP.DeleteSIPParticipant(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*SIPParticipantInfo)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*SIPParticipantInfo) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *SIPParticipantInfo
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPParticipantInfo and nil error while calling DeleteSIPParticipant. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
 func (s *sIPServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor3, 0
 }
@@ -3028,69 +2191,61 @@ func (s *sIPServer) PathPrefix() string {
 }
 
 var twirpFileDescriptor3 = []byte{
-	// 1014 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x57, 0xdd, 0x72, 0xdb, 0x44,
-	0x14, 0xae, 0x2d, 0xc7, 0xb1, 0x8f, 0x43, 0x7e, 0x36, 0x76, 0x46, 0xb5, 0xd3, 0x36, 0xa3, 0x14,
-	0x28, 0xd0, 0x71, 0xa6, 0xe6, 0x8a, 0xde, 0xd1, 0x64, 0xd2, 0x7a, 0x52, 0x52, 0xa3, 0x84, 0x8b,
-	0x32, 0x05, 0xa1, 0x78, 0x37, 0xc9, 0x4e, 0x65, 0x49, 0x68, 0x57, 0xa1, 0x3c, 0x48, 0x5e, 0x82,
-	0x1b, 0x9e, 0x80, 0x47, 0xe0, 0x8e, 0xa7, 0xe0, 0x11, 0x18, 0x2e, 0x3a, 0x92, 0x56, 0xb2, 0x64,
-	0xad, 0x14, 0xeb, 0x2e, 0x3e, 0xe7, 0xdb, 0xa3, 0xef, 0xfc, 0x7c, 0x67, 0x37, 0xb0, 0x65, 0xd1,
-	0x1b, 0xf2, 0x9e, 0x72, 0x83, 0x51, 0x77, 0xe8, 0x7a, 0x0e, 0x77, 0xd0, 0xaa, 0x30, 0x69, 0xff,
-	0xd7, 0xa1, 0x77, 0xe8, 0x11, 0x93, 0x93, 0xb3, 0xf1, 0xe4, 0xdc, 0xf3, 0xed, 0xf7, 0x3a, 0xf9,
-	0xd5, 0x27, 0x8c, 0xa3, 0xaf, 0x60, 0x8b, 0xda, 0x17, 0x8e, 0x6f, 0x63, 0xc3, 0xc4, 0xd8, 0x23,
-	0x8c, 0x11, 0xa6, 0xd6, 0xf6, 0x94, 0x27, 0x6d, 0x7d, 0x53, 0x38, 0xbe, 0x8d, 0xed, 0xe8, 0x0b,
-	0xd8, 0x74, 0x7c, 0x9e, 0x41, 0xab, 0xf5, 0xbd, 0xda, 0x93, 0xb6, 0xbe, 0x11, 0xdb, 0x05, 0x18,
-	0x7d, 0x0e, 0x89, 0xc9, 0xb0, 0xfd, 0xd9, 0x05, 0xf1, 0x54, 0x25, 0x44, 0xae, 0xc7, 0xe6, 0xd3,
-	0xd0, 0x8a, 0x46, 0xd0, 0x8b, 0x09, 0x44, 0x38, 0x66, 0x78, 0xe4, 0x8a, 0x7c, 0x50, 0x1b, 0x21,
-	0x89, 0x6d, 0xe1, 0x8c, 0xd0, 0x4c, 0x0f, 0x5c, 0x01, 0x8f, 0xf8, 0x8c, 0xcf, 0x88, 0x67, 0x9b,
-	0x33, 0xa2, 0xae, 0x44, 0x3c, 0x84, 0xfd, 0x07, 0x61, 0x4e, 0x43, 0x5d, 0x93, 0xb1, 0xdf, 0x1c,
-	0x0f, 0xab, 0xcd, 0x0c, 0x74, 0x22, 0xcc, 0x41, 0x29, 0x12, 0xca, 0x49, 0xd8, 0xd5, 0x10, 0x9b,
-	0xa4, 0x9d, 0xc4, 0x4d, 0x83, 0x93, 0xc0, 0xad, 0x2c, 0x38, 0x8e, 0xac, 0xdd, 0x2a, 0xb0, 0x16,
-	0x17, 0x7e, 0x6c, 0x5f, 0x3a, 0x68, 0x0f, 0xd6, 0x18, 0x75, 0x0d, 0x1e, 0x18, 0x0c, 0x8a, 0xd5,
-	0x5a, 0x78, 0x10, 0x18, 0x75, 0x23, 0x0c, 0x96, 0xf7, 0xa5, 0x5e, 0xa1, 0x2f, 0xca, 0xd2, 0x7d,
-	0x69, 0x54, 0xeb, 0xcb, 0x4a, 0xb5, 0xbe, 0x34, 0x97, 0xef, 0xcb, 0x6a, 0x85, 0xbe, 0xb4, 0xaa,
-	0xf4, 0xa5, 0x5d, 0xd0, 0x97, 0x1e, 0x6c, 0xbf, 0xa6, 0x8c, 0x2f, 0x68, 0x42, 0x3b, 0x84, 0x6e,
-	0xd6, 0xcc, 0x5c, 0xc7, 0x66, 0x41, 0xec, 0x15, 0xca, 0xc9, 0x2c, 0xd2, 0x47, 0x67, 0xd4, 0x1b,
-	0x0a, 0x79, 0x0d, 0xd3, 0xbd, 0xd5, 0x23, 0x8c, 0xf6, 0x0d, 0xf4, 0x8e, 0x88, 0x45, 0xf2, 0x8a,
-	0xbb, 0xb3, 0xf7, 0xda, 0x31, 0xf4, 0xce, 0xc6, 0x93, 0x23, 0xca, 0x5c, 0x93, 0x4f, 0xaf, 0x75,
-	0xdf, 0x22, 0x47, 0xd4, 0x23, 0x53, 0x8e, 0x06, 0xd0, 0xf6, 0x1c, 0x67, 0x66, 0x84, 0x15, 0x88,
-	0xce, 0xb5, 0x02, 0xc3, 0x69, 0x90, 0xf9, 0x26, 0x28, 0x2e, 0xb5, 0x85, 0x1e, 0x83, 0x3f, 0xb5,
-	0x53, 0xb8, 0xbf, 0x10, 0x67, 0x6c, 0x63, 0x7a, 0x43, 0xb1, 0x6f, 0x5a, 0xe8, 0x11, 0x74, 0xc2,
-	0x58, 0xae, 0x47, 0x2e, 0xe9, 0x87, 0x98, 0x45, 0x60, 0x9a, 0x84, 0x16, 0x49, 0xbc, 0xbf, 0x6b,
-	0xb0, 0xb1, 0x10, 0x10, 0xe9, 0xd0, 0xc5, 0xe2, 0xb7, 0xe1, 0xf9, 0x16, 0x31, 0x70, 0x48, 0x35,
-	0x8c, 0xd7, 0x19, 0x3d, 0x4c, 0x97, 0x28, 0x9f, 0xd0, 0xab, 0x7b, 0x3a, 0xc2, 0xf9, 0x34, 0x7f,
-	0x06, 0x35, 0x1b, 0x93, 0x26, 0xb4, 0x43, 0x3a, 0x9d, 0x91, 0x56, 0x14, 0x77, 0x9e, 0xe0, 0xab,
-	0x7b, 0xfa, 0x0e, 0x96, 0x7a, 0x5e, 0x34, 0xa1, 0x11, 0x84, 0xd5, 0x6e, 0x6b, 0xb0, 0x9b, 0x6c,
-	0xc5, 0x74, 0x94, 0xb8, 0x55, 0x4f, 0x23, 0xa0, 0x48, 0x46, 0x2d, 0xfa, 0xa8, 0x1e, 0xa2, 0x82,
-	0xee, 0xc4, 0x4d, 0x8d, 0xa5, 0xda, 0xe2, 0x51, 0x4b, 0x19, 0xfa, 0x12, 0xb6, 0xae, 0x29, 0x26,
-	0x86, 0x7b, 0xed, 0xd8, 0x24, 0xbd, 0x11, 0x5b, 0xfa, 0x46, 0xe0, 0x98, 0x04, 0xf6, 0x48, 0x4c,
-	0xda, 0x5f, 0x35, 0xd8, 0xce, 0xe5, 0x75, 0xe9, 0xa0, 0x03, 0xe8, 0x06, 0x93, 0xb3, 0x50, 0x9b,
-	0x78, 0x82, 0xb6, 0x18, 0x75, 0x33, 0x47, 0x70, 0xc2, 0xbf, 0x5e, 0x9d, 0xbf, 0xb2, 0x0c, 0xff,
-	0x86, 0x9c, 0xff, 0x2e, 0xf4, 0x85, 0x7e, 0x24, 0x45, 0xd5, 0xbe, 0x87, 0x81, 0xd4, 0x2b, 0x44,
-	0x36, 0xca, 0x8a, 0x6c, 0xb7, 0xb8, 0xd3, 0x73, 0xad, 0xbd, 0x81, 0xdd, 0x44, 0x6b, 0xb2, 0x3e,
-	0x56, 0x2d, 0x9c, 0xf6, 0x67, 0x0d, 0x06, 0xc9, 0x64, 0x4c, 0x4c, 0x8f, 0xd3, 0x29, 0x75, 0x4d,
-	0x9b, 0x2f, 0xad, 0x61, 0xf4, 0x10, 0x3a, 0x01, 0x62, 0x6a, 0x5a, 0x96, 0xc1, 0x1d, 0xa1, 0xa2,
-	0x36, 0xa3, 0xee, 0xa1, 0x69, 0x59, 0xe7, 0x4e, 0x56, 0xca, 0xca, 0x82, 0x94, 0x9f, 0x41, 0xd7,
-	0x9d, 0x7f, 0xd4, 0xa0, 0x98, 0xd8, 0x9c, 0xf2, 0xdf, 0xc5, 0xa6, 0xde, 0x4e, 0xf9, 0xc6, 0xc2,
-	0xa5, 0xfd, 0x53, 0x03, 0x94, 0xe5, 0x1a, 0x8e, 0xcc, 0x53, 0x40, 0x01, 0x8d, 0x6c, 0x34, 0x41,
-	0x77, 0x93, 0x51, 0x37, 0x8d, 0xc7, 0xb9, 0xb4, 0xea, 0x77, 0xa5, 0xa5, 0x94, 0xa6, 0xd5, 0x58,
-	0x32, 0xad, 0x95, 0xe2, 0xb4, 0x08, 0x3c, 0x38, 0x23, 0x36, 0xce, 0x66, 0x76, 0x74, 0xfe, 0xdd,
-	0xf1, 0x5c, 0xa2, 0x55, 0x12, 0xdc, 0x81, 0x26, 0xa6, 0x57, 0x94, 0xc7, 0xcf, 0x16, 0xf1, 0x4b,
-	0x3b, 0x86, 0x9d, 0xfc, 0x27, 0xaa, 0x17, 0x50, 0x1b, 0xc0, 0x7d, 0x31, 0xdb, 0xf9, 0xa1, 0xd1,
-	0xde, 0x24, 0xb2, 0xc8, 0x38, 0xc5, 0xdc, 0x3f, 0xcb, 0xce, 0xfd, 0x20, 0x3d, 0xf7, 0x0b, 0x5d,
-	0x8d, 0xc7, 0xfe, 0x04, 0x06, 0xc9, 0xd8, 0x4b, 0x86, 0xb4, 0x12, 0xf5, 0xd1, 0x7f, 0x4d, 0x50,
-	0xce, 0xc6, 0x13, 0xf4, 0x12, 0xd6, 0xb3, 0x2f, 0x45, 0x34, 0x5f, 0xe2, 0xd2, 0x27, 0x64, 0x5f,
-	0x7e, 0x0f, 0xa2, 0x13, 0x58, 0x4b, 0xdf, 0xa2, 0x68, 0xae, 0x64, 0xc9, 0x9d, 0xdb, 0x7f, 0x50,
-	0xe0, 0x15, 0xd5, 0x79, 0x09, 0xeb, 0xd9, 0xdb, 0x34, 0xc5, 0x4a, 0x7a, 0xcd, 0x16, 0xb1, 0x7a,
-	0x97, 0x7a, 0x08, 0x67, 0x2e, 0xb2, 0x4f, 0xf3, 0x59, 0x4a, 0x56, 0x49, 0xbf, 0x74, 0x1f, 0xa1,
-	0x5f, 0x92, 0x07, 0x45, 0x26, 0xf6, 0xfe, 0x62, 0x72, 0xb2, 0xc8, 0x8f, 0xcb, 0x41, 0xa2, 0x10,
-	0xef, 0x52, 0xcf, 0x8a, 0x02, 0xfe, 0x65, 0xab, 0xf0, 0x0e, 0xfe, 0x6f, 0xa1, 0x2b, 0x5b, 0x7b,
-	0xe8, 0x71, 0xbe, 0x38, 0xf9, 0x81, 0xeb, 0x97, 0xcd, 0x2c, 0x32, 0x61, 0x47, 0xae, 0x64, 0xf4,
-	0xd9, 0xfc, 0x58, 0x99, 0xd4, 0xfb, 0x8f, 0x0a, 0xc2, 0x27, 0x5a, 0xfd, 0x09, 0x50, 0x5e, 0x60,
-	0x48, 0x5b, 0xac, 0xab, 0x84, 0xf9, 0x7e, 0x29, 0x46, 0x94, 0xfe, 0x2d, 0x74, 0x65, 0x72, 0x4b,
-	0x15, 0xa7, 0x44, 0x8d, 0xa5, 0xc5, 0x79, 0x71, 0xfc, 0xe3, 0xfe, 0x15, 0xe5, 0xd7, 0xfe, 0xc5,
-	0x70, 0xea, 0xcc, 0x0e, 0x04, 0xf0, 0x20, 0xfc, 0x27, 0x6e, 0xea, 0x58, 0xb1, 0xe1, 0x8f, 0xfa,
-	0x27, 0xaf, 0xe9, 0x0d, 0x39, 0xa1, 0x7c, 0x38, 0x09, 0x5c, 0xff, 0xd6, 0xd7, 0xc5, 0xef, 0xe7,
-	0xcf, 0x43, 0xc3, 0x45, 0x33, 0x3c, 0xf2, 0xf5, 0xc7, 0x00, 0x00, 0x00, 0xff, 0xff, 0x68, 0xe7,
-	0xa3, 0xbd, 0x0c, 0x0e, 0x00, 0x00,
+	// 887 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x56, 0xdd, 0x72, 0xdb, 0x44,
+	0x14, 0xae, 0x2c, 0xc7, 0xb1, 0x8f, 0x53, 0x27, 0x5e, 0xdb, 0x8c, 0xb0, 0x4d, 0xc9, 0xa8, 0xed,
+	0x50, 0x7e, 0xc6, 0x19, 0xcc, 0x15, 0xbd, 0xa3, 0xc9, 0xb4, 0xf5, 0xb4, 0x13, 0x84, 0x52, 0x2e,
+	0x60, 0x3a, 0x08, 0xd9, 0xda, 0xc4, 0x3b, 0x91, 0x25, 0xa1, 0x5d, 0x85, 0xf0, 0x0c, 0x5c, 0xe7,
+	0x25, 0xb8, 0xe1, 0x09, 0x78, 0x04, 0x1e, 0x81, 0x17, 0xe0, 0x19, 0xb8, 0x60, 0x76, 0xb5, 0x92,
+	0x25, 0x5b, 0x72, 0xec, 0x3b, 0xfb, 0x9c, 0xb3, 0x9f, 0xbe, 0xb3, 0xdf, 0xf9, 0x8e, 0x04, 0x6d,
+	0x97, 0xdc, 0xe0, 0x6b, 0xc2, 0x2c, 0x4a, 0x82, 0x51, 0x10, 0xfa, 0xcc, 0x47, 0xfb, 0x32, 0xa4,
+	0xff, 0x57, 0x81, 0xde, 0x69, 0x88, 0x6d, 0x86, 0x2f, 0x26, 0xc6, 0xbb, 0x30, 0xf2, 0xae, 0x4d,
+	0xfc, 0x4b, 0x84, 0x29, 0x43, 0x9f, 0x43, 0x9b, 0x78, 0x53, 0x3f, 0xf2, 0x1c, 0xcb, 0x76, 0x9c,
+	0x10, 0x53, 0x8a, 0xa9, 0xa6, 0x1c, 0xab, 0xcf, 0x1a, 0xe6, 0x91, 0x4c, 0x7c, 0x93, 0xc4, 0xd1,
+	0xa7, 0x70, 0xe4, 0x47, 0x2c, 0x57, 0xad, 0x55, 0x8e, 0x95, 0x67, 0x0d, 0xf3, 0x30, 0x89, 0xcb,
+	0x62, 0xf4, 0x09, 0xa4, 0x21, 0xcb, 0x8b, 0x16, 0x53, 0x1c, 0x6a, 0xaa, 0xa8, 0x6c, 0x25, 0xe1,
+	0x73, 0x11, 0x45, 0x63, 0xe8, 0x25, 0x04, 0xe2, 0x3a, 0x6a, 0x85, 0xf8, 0x0a, 0xdf, 0x6a, 0x55,
+	0x41, 0xa2, 0x23, 0x93, 0x71, 0x35, 0x35, 0x79, 0x8a, 0xf3, 0x48, 0xce, 0x44, 0x14, 0x87, 0x9e,
+	0xbd, 0xc0, 0xda, 0x5e, 0xcc, 0x43, 0xc6, 0xbf, 0x97, 0xe1, 0x6c, 0x69, 0x60, 0x53, 0xfa, 0xab,
+	0x1f, 0x3a, 0x5a, 0x2d, 0x57, 0x6a, 0xc8, 0x30, 0xbf, 0x8a, 0x94, 0x72, 0x0a, 0xbb, 0x2f, 0x6a,
+	0xd3, 0xb6, 0x53, 0xdc, 0x6c, 0x71, 0x0a, 0x5c, 0xcf, 0x17, 0x27, 0xc8, 0xfa, 0x9d, 0x0a, 0x07,
+	0xc9, 0xc5, 0x4f, 0xbc, 0x4b, 0x1f, 0x1d, 0xc3, 0x01, 0x25, 0x81, 0xc5, 0x78, 0xc0, 0x22, 0x8e,
+	0xa6, 0x88, 0x83, 0x40, 0x49, 0x10, 0xd7, 0x38, 0xc5, 0xba, 0x54, 0x76, 0xd0, 0x45, 0xdd, 0x5a,
+	0x97, 0xea, 0x6e, 0xba, 0xec, 0xed, 0xa6, 0x4b, 0x6d, 0x7b, 0x5d, 0xf6, 0x77, 0xd0, 0xa5, 0xbe,
+	0x8b, 0x2e, 0x8d, 0x12, 0x5d, 0x7a, 0xd0, 0x79, 0x4b, 0x28, 0x5b, 0xf1, 0x84, 0x7e, 0x0a, 0xdd,
+	0x7c, 0x98, 0x06, 0xbe, 0x47, 0x39, 0xf6, 0x1e, 0x61, 0x78, 0x11, 0xfb, 0xa3, 0x39, 0xee, 0x8d,
+	0xa4, 0xbd, 0x46, 0x59, 0x6d, 0xcd, 0xb8, 0x46, 0xff, 0x1a, 0x7a, 0x67, 0xd8, 0xc5, 0xeb, 0x8e,
+	0xbb, 0x57, 0x7b, 0xfd, 0x25, 0xf4, 0x2e, 0x26, 0xc6, 0x19, 0xa1, 0x81, 0xcd, 0x66, 0x73, 0x33,
+	0x72, 0xf1, 0x19, 0x09, 0xf1, 0x8c, 0xa1, 0x01, 0x34, 0x42, 0xdf, 0x5f, 0x58, 0xe2, 0x06, 0xe2,
+	0x73, 0x75, 0x1e, 0x38, 0xe7, 0x9d, 0x1f, 0x81, 0x1a, 0x10, 0x4f, 0xfa, 0x91, 0xff, 0xd4, 0xcf,
+	0xe1, 0xc3, 0x15, 0x9c, 0x89, 0xe7, 0x90, 0x1b, 0xe2, 0x44, 0xb6, 0x8b, 0x3e, 0x86, 0xa6, 0xc0,
+	0x0a, 0x42, 0x7c, 0x49, 0x6e, 0x13, 0x16, 0x3c, 0x64, 0x88, 0x48, 0x01, 0xde, 0xdf, 0x0a, 0x1c,
+	0xae, 0x00, 0x22, 0x13, 0xba, 0x8e, 0xfc, 0x6f, 0x85, 0x91, 0x8b, 0x2d, 0x47, 0x50, 0x15, 0x78,
+	0xcd, 0xf1, 0xa3, 0xec, 0x15, 0xad, 0x37, 0xf4, 0xfa, 0x81, 0x89, 0x9c, 0xf5, 0x36, 0x7f, 0x02,
+	0x2d, 0x8f, 0x49, 0x52, 0xda, 0x82, 0x4e, 0x73, 0xac, 0x97, 0xe1, 0x2e, 0x1b, 0x7c, 0xfd, 0xc0,
+	0xfc, 0xc0, 0x29, 0xcc, 0xbc, 0xa8, 0x41, 0x95, 0xc3, 0xea, 0x77, 0x0a, 0x0c, 0xd3, 0xad, 0x98,
+	0x45, 0x49, 0xa4, 0xfa, 0x22, 0x2e, 0x94, 0xcd, 0x68, 0x65, 0x0f, 0x35, 0x45, 0x15, 0x57, 0x27,
+	0x11, 0x35, 0xb1, 0x6a, 0x9d, 0xc5, 0x92, 0x52, 0xf4, 0x19, 0xb4, 0xe7, 0xc4, 0xc1, 0x56, 0x30,
+	0xf7, 0x3d, 0x9c, 0xdd, 0x88, 0x75, 0xf3, 0x90, 0x27, 0x0c, 0x1e, 0x8f, 0xcd, 0xa4, 0xff, 0xa5,
+	0x40, 0x67, 0xad, 0xaf, 0x4b, 0x1f, 0x9d, 0x40, 0x97, 0x4f, 0xce, 0xca, 0xdd, 0x24, 0x13, 0xd4,
+	0xa6, 0x24, 0xc8, 0x1d, 0x71, 0x52, 0xfe, 0x95, 0xdd, 0xf9, 0xab, 0xdb, 0xf0, 0xaf, 0x16, 0xf3,
+	0x1f, 0x42, 0x5f, 0xfa, 0xa7, 0xe0, 0x52, 0xf5, 0xef, 0x60, 0x50, 0x98, 0x95, 0x26, 0x1b, 0xe7,
+	0x4d, 0x36, 0x2c, 0x57, 0x7a, 0xe9, 0xb5, 0x6f, 0x61, 0x98, 0x7a, 0xad, 0x48, 0xc7, 0x5d, 0x2f,
+	0x4e, 0xff, 0x53, 0x81, 0x41, 0x3a, 0x19, 0x86, 0x1d, 0x32, 0x32, 0x23, 0x81, 0xed, 0xb1, 0xad,
+	0x3d, 0x8c, 0x1e, 0x41, 0x93, 0x57, 0xcc, 0x6c, 0xd7, 0xb5, 0x98, 0x2f, 0x5d, 0xd4, 0xa0, 0x24,
+	0x38, 0xb5, 0x5d, 0xf7, 0x9d, 0x9f, 0xb7, 0xb2, 0xba, 0x62, 0xe5, 0x2f, 0xa1, 0x1b, 0x2c, 0x1f,
+	0x6a, 0x11, 0x07, 0x7b, 0x8c, 0xb0, 0xdf, 0xe4, 0xa6, 0xee, 0x64, 0x72, 0x13, 0x99, 0xd2, 0x7f,
+	0x57, 0x00, 0xe5, 0xb9, 0x8a, 0x91, 0x79, 0x0a, 0xad, 0x3c, 0x92, 0xa4, 0xfa, 0x30, 0x87, 0x51,
+	0xfa, 0xc0, 0x4a, 0xe9, 0x03, 0x37, 0x36, 0x30, 0xfe, 0xa7, 0x0a, 0xea, 0xc5, 0xc4, 0x40, 0xaf,
+	0xa0, 0x95, 0xff, 0xec, 0x40, 0xcb, 0x8d, 0x50, 0xf8, 0x3d, 0xd2, 0x2f, 0x5e, 0xaa, 0xe8, 0x0d,
+	0x1c, 0x64, 0x57, 0x32, 0x5a, 0x8e, 0x45, 0xc1, 0x02, 0xef, 0x7f, 0x54, 0x92, 0x95, 0x23, 0xf6,
+	0x0a, 0x5a, 0xf9, 0xd5, 0x9c, 0x61, 0x55, 0xb8, 0xb3, 0xcb, 0x58, 0xbd, 0xcf, 0x7c, 0x55, 0xe5,
+	0xb6, 0xe2, 0xd3, 0xf5, 0x2e, 0x0b, 0xe6, 0xb2, 0xbf, 0x71, 0xb8, 0xd1, 0xcf, 0xe9, 0xdb, 0x29,
+	0x87, 0xfd, 0x78, 0xb5, 0xb9, 0x22, 0xe4, 0x27, 0x9b, 0x8b, 0xe4, 0x45, 0xbc, 0xcf, 0xbc, 0xa3,
+	0x4a, 0xf8, 0x6f, 0xf2, 0xd5, 0x3d, 0xfc, 0x7f, 0x80, 0x6e, 0x91, 0x87, 0xd0, 0x93, 0xf5, 0xcb,
+	0x59, 0xb7, 0x58, 0x7f, 0x90, 0xc5, 0x5e, 0x19, 0xeb, 0x17, 0x2f, 0x7f, 0x7c, 0x7c, 0x45, 0xd8,
+	0x3c, 0x9a, 0x8e, 0x66, 0xfe, 0xe2, 0x44, 0x16, 0x9e, 0x88, 0x8f, 0xde, 0x99, 0xef, 0x26, 0x81,
+	0x3f, 0x2a, 0x0f, 0xdf, 0x92, 0x1b, 0xfc, 0x86, 0xb0, 0x91, 0xc1, 0x53, 0xff, 0x56, 0x5a, 0xf2,
+	0xff, 0xf3, 0xe7, 0x22, 0x30, 0xad, 0x89, 0x23, 0x5f, 0xfd, 0x1f, 0x00, 0x00, 0xff, 0xff, 0x58,
+	0x18, 0xd2, 0x3a, 0x3c, 0x0b, 0x00, 0x00,
 }

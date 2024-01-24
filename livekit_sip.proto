@@ -40,9 +40,9 @@ option ruby_package = "LiveKit::Proto";
    - `Individual Dispatch` puts a caller into a new room created for the call
 
 
-   The `SIP Participant` represents an active SIP Session. These SIP Sessions are created by an
-   inbound call or can be created by a developer making an outbound call. DTMF can be emitted for
-   these participants via an API.
+   The `SIP Participant` represents an active SIP Session. These SIP Sessions are always associated with
+   a Participant on LiveKit side. Inbound calls create Participants directly (with a `SIP` kind), while outbound
+   calls must be initiated with `CreateSIPParticipant`.
 */
 
 
@@ -56,9 +56,6 @@ service SIP {
   rpc DeleteSIPDispatchRule(DeleteSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
 
   rpc CreateSIPParticipant(CreateSIPParticipantRequest) returns (SIPParticipantInfo);
-  rpc SendSIPParticipantDTMF(SendSIPParticipantDTMFRequest) returns (SIPParticipantDTMFInfo);
-  rpc ListSIPParticipant(ListSIPParticipantRequest) returns (ListSIPParticipantResponse);
-  rpc DeleteSIPParticipant(DeleteSIPParticipantRequest) returns (SIPParticipantInfo);
 }
 
 
@@ -198,33 +195,7 @@ message CreateSIPParticipantRequest {
 }
 
 message SIPParticipantInfo {
-  string sip_participant_id = 1;
-  string sip_trunk_id = 2;
-  string sip_call_to = 3;
-  string room_name = 4;
-  string participant_identity = 5;
-}
-
-// DTMF Request lets you send a DTMF message for a SIP Participant
-message SendSIPParticipantDTMFRequest {
-  // What SIP Participant to send this DTMF for
-  string sip_participant_id = 1;
-
-  // Digits that will be sent via DTMF
-  string digits = 2;
-}
-
-message SIPParticipantDTMFInfo {
-  string sip_participant_id = 1;
-}
-
-message ListSIPParticipantRequest {
-}
-
-message ListSIPParticipantResponse {
-  repeated SIPParticipantInfo items = 1;
-}
-
-message DeleteSIPParticipantRequest {
-  string sip_participant_id = 1;
+  string participant_id = 1;
+  string participant_identity = 2;
+  string room_name = 3;
 }
