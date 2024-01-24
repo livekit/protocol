@@ -23,6 +23,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
+	"github.com/livekit/protocol/utils"
 )
 
 // DispatchRulePriority returns sorting priority for dispatch rules. Lower value means higher priority.
@@ -291,8 +292,9 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	}
 	switch rule := rule.GetRule().GetRule().(type) {
 	case *livekit.SIPDispatchRule_DispatchRuleIndividual:
-		// TODO: Decide on the suffix. Do we need to escape specific characters?
-		room = rule.DispatchRuleIndividual.GetRoomPrefix() + from
+		// TODO: Do we need to escape specific characters in the number?
+		// TODO: Include actual SIP call ID in the room name?
+		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, utils.NewGuid(""))
 	}
 	return &rpc.EvaluateSIPDispatchRulesResponse{
 		RoomName:            room,
