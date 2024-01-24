@@ -21,18 +21,13 @@ option go_package = "github.com/livekit/livekit/pkg/service/rpc";
 import "options.proto";
 
 service SIPInternal {
-  rpc UpdateSIPParticipant(InternalUpdateSIPParticipantRequest) returns (InternalUpdateSIPParticipantResponse) {
+  rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
     option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   }
-  rpc SendSIPParticipantDTMF(InternalSendSIPParticipantDTMFRequest) returns (InternalSendSIPParticipantDTMFResponse) {
-    option (psrpc.options).affinity_func = true;
-  }
 }
 
-message InternalUpdateSIPParticipantRequest {
-  string participant_id = 1;
-
+message InternalCreateSIPParticipantRequest {
   // IP that SIP INVITE is sent too
   string address = 2;
 
@@ -49,12 +44,7 @@ message InternalUpdateSIPParticipantRequest {
   string participant_identity = 8;
 }
 
-message InternalUpdateSIPParticipantResponse {}
-
-message InternalSendSIPParticipantDTMFRequest {
+message InternalCreateSIPParticipantResponse {
   string participant_id = 1;
-
-  string digits = 2;
+  string participant_identity = 2;
 }
-
-message InternalSendSIPParticipantDTMFResponse {}
