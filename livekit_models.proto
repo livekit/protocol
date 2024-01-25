@@ -339,6 +339,8 @@ enum DisconnectReason {
   ROOM_DELETED = 5;
   STATE_MISMATCH = 6;
   JOIN_FAILURE = 7;
+  MIGRATION = 8;
+  SIGNAL_CLOSE = 9;
 }
 
 message RTPDrift {
