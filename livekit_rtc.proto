@@ -224,10 +224,20 @@ message UpdateTrackSettings {
 }
 
 message LeaveRequest {
+  // indicates action clients should take on receiving this message
+  enum Action {
+    DISCONNECT = 0;  // should disconnect
+    RESUME = 1;      // should attempt a resume with `reconnect=1` in join URL
+    RECONNECT = 2;   // should attempt a reconnect, i. e. no `reconnect=1`
+  }
+
   // sent when server initiates the disconnect due to server-restart
   // indicates clients should attempt full-reconnect sequence
+  // NOTE: `can_reconnect` obsoleted by `action` starting in protocol version 13
   bool can_reconnect = 1;
   DisconnectReason reason = 2;
+  Action action = 3;
+  RegionSettings regions = 4;
 }
 
 // message to indicate published video track dimensions are changing
