@@ -99,6 +99,7 @@ func (c *egressClient) StartEgress(ctx context.Context, topic string, req *Start
 		psrpc.WithSelectionOpts(psrpc.SelectionOpts{
 			MaximumAffinity:     1,
 			AffinityTimeout:     time.Second,
+			Jitter:              0.1,
 			ShortCircuitTimeout: time.Millisecond * 500,
 		}),
 	}, opts...)
