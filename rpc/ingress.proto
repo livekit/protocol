@@ -59,4 +59,5 @@ message StartIngressRequest {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
+  map<string,string> logging_fields = 4;
 }
