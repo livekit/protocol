@@ -29,19 +29,21 @@ import (
 var ErrNotConfigured = errors.New("Redis is not configured")
 
 type RedisConfig struct {
-	Address           string      `yaml:"address,omitempty"`
-	Username          string      `yaml:"username,omitempty"`
-	Password          string      `yaml:"password,omitempty"`
-	DB                int         `yaml:"db,omitempty"`
-	TLS               xtls.Config `yaml:"tls,omitempty"`
-	MasterName        string      `yaml:"sentinel_master_name,omitempty"`
-	SentinelUsername  string      `yaml:"sentinel_username,omitempty"`
-	SentinelPassword  string      `yaml:"sentinel_password,omitempty"`
-	SentinelAddresses []string    `yaml:"sentinel_addresses,omitempty"`
-	ClusterAddresses  []string    `yaml:"cluster_addresses,omitempty"`
-	DialTimeout       int         `yaml:"dial_timeout,omitempty"`
-	ReadTimeout       int         `yaml:"read_timeout,omitempty"`
-	WriteTimeout      int         `yaml:"write_timeout,omitempty"`
+	Address  string `yaml:"address,omitempty"`
+	Username string `yaml:"username,omitempty"`
+	Password string `yaml:"password,omitempty"`
+	DB       int    `yaml:"db,omitempty"`
+	// Deprecated: use TLS instead of UseTLS
+	UseTLS            bool         `yaml:"use_tls,omitempty"`
+	TLS               *xtls.Config `yaml:"tls,omitempty"`
+	MasterName        string       `yaml:"sentinel_master_name,omitempty"`
+	SentinelUsername  string       `yaml:"sentinel_username,omitempty"`
+	SentinelPassword  string       `yaml:"sentinel_password,omitempty"`
+	SentinelAddresses []string     `yaml:"sentinel_addresses,omitempty"`
+	ClusterAddresses  []string     `yaml:"cluster_addresses,omitempty"`
+	DialTimeout       int          `yaml:"dial_timeout,omitempty"`
+	ReadTimeout       int          `yaml:"read_timeout,omitempty"`
+	WriteTimeout      int          `yaml:"write_timeout,omitempty"`
 	// for clustererd mode only, number of redirects to follow, defaults to 2
 	MaxRedirects *int          `yaml:"max_redirects,omitempty"`
 	PoolTimeout  time.Duration `yaml:"pool_timeout,omitempty"`
@@ -81,12 +83,15 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	var rc redis.UniversalClient
 	var tlsConfig *tls.Config
 
-	if conf.TLS.Enabled {
+	if conf.TLS != nil && conf.TLS.Enabled {
 		var err error
 		tlsConfig, err = conf.TLS.ClientTLSConfig()
-
 		if err != nil {
 			return nil, err
+		}
+	} else if conf.UseTLS {
+		tlsConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
 		}
 	}
 
