@@ -29,6 +29,7 @@ service IngressInternal {
 
   rpc ListActiveIngress(ListActiveIngressRequest) returns (ListActiveIngressResponse) {
     option (psrpc.options).multi = true;
+    option (psrpc.options).topics = true;
   };
 }
 
