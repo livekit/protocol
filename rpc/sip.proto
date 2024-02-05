@@ -42,6 +42,12 @@ message InternalCreateSIPParticipantRequest {
 
   string room_name = 7;
   string participant_identity = 8;
+
+  // optional token that should be used when creating LiveKit participant
+  string token = 9;
+
+  // optional websocket url that should be used when creating LiveKit participant
+  string ws_url = 10;
 }
 
 message InternalCreateSIPParticipantResponse {
