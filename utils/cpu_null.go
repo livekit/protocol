@@ -17,25 +17,27 @@
 package utils
 
 import (
+	"runtime"
+
 	"github.com/livekit/protocol/logger"
 	"github.com/prometheus/procfs"
 )
 
-type nullStatCPUMonitor int
+type nullStatCPUMonitor struct{}
 
 func (p *nullStatCPUMonitor) getCPUIdle() (float64, error) {
-	return 0, nil
+	return float64(runtime.NumCPU()), nil
 }
 
 func (p *nullStatCPUMonitor) numCPU() float64 {
-	return 1
+	return float64(runtime.NumCPU())
 }
 func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 	logger.Errorw("CPU monitoring unsupported on current platform. Server capacity management will be disabled", nil)
 
-	return newNullCPUMonitor()
+	return &nullStatCPUMonitor{}, nil
 }
 
 func getHostCPUCount(fs procfs.FS) (float64, error) {
-	return 1, nil
+	return float64(runtime.NumCPU()), nil
 }
