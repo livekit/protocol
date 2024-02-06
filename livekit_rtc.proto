@@ -333,6 +333,7 @@ message SyncState {
   repeated DataChannelInfo data_channels = 4;
   // last received server side offer before reconnecting
   SessionDescription offer = 5;
+  repeated string track_sids_disabled = 6;
 }
 
 message DataChannelInfo {
