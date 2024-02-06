@@ -43,6 +43,8 @@ message CreateIngressRequest {
   string participant_identity = 4;
   // name of publishing participant (used for display only)
   string participant_name = 5;
+  // metadata associated with the publishing participant
+  string participant_metadata = 10;
   // whether to pass through the incoming media without transcoding, only compatible with some input types
   bool bypass_transcoding = 8; 
   IngressAudioOptions audio = 6;
