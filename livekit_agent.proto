@@ -118,6 +118,9 @@ message AvailabilityResponse {
     string job_id = 1;
     bool available = 2;
     bool should_retry = 3;
+
+    // How much the worker thinks the job will cost in terms of resources
+    double job_cost = 4;
 }
 
 message JobStatusUpdate {
