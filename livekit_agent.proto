@@ -74,6 +74,15 @@ enum JobStatus {
     JS_FAILED = 2;
 }
 
+message SimulateJobRequest {
+    JobType type = 1;
+    string room_id = 2;
+    string participant_id = 3;
+}
+
+// Response is empty, SimulateJob will trigger the AvailabilityRequest
+message SimulateJobResponse {}
+
 message RegisterWorkerRequest {
     JobType type = 1;
     string worker_id = 2;
