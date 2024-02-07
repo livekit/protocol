@@ -95,7 +95,7 @@ message RegisterWorkerRequest {
     string version = 3;
     string name = 4;
     uint32 ping_interval = 5;
-    optional string namespace = 5;
+    optional string namespace = 6;
 }
 
 message RegisterWorkerResponse {
