@@ -44,6 +44,9 @@ message WorkerMessage {
         // worker can update its status to the server, including taking itself out of the pool
         UpdateWorkerStatus status = 3;
         JobStatusUpdate job_update = 4;
+	PingRequest ping = 5;
+	SimulateJobRequest simulate_job = 6;
+	MigrateJobRequest migrate_job = 7;
     };
 }
 
@@ -55,6 +58,7 @@ message ServerMessage {
         // server asks worker to confirm availability for a job
         AvailabilityRequest availability = 2;
         JobAssignment assignment = 3;
+	PingResponse ping = 4;
     }
 }
 
@@ -80,14 +84,18 @@ message SimulateJobRequest {
     string participant_id = 3;
 }
 
-// Response is empty, SimulateJob will trigger the AvailabilityRequest
-message SimulateJobResponse {}
+message PingRequest {
+    double current_load = 1;
+}
+message PingResponse {}
 
 message RegisterWorkerRequest {
     JobType type = 1;
     string worker_id = 2;
     string version = 3;
     string name = 4;
+    uint32 ping_interval = 5;
+    optional string namespace = 5;
 }
 
 message RegisterWorkerResponse {
@@ -95,13 +103,21 @@ message RegisterWorkerResponse {
     string server_version = 2;
 }
 
+message MigrateJobRequest {
+    Job job = 1;
+}
+
 message AvailabilityRequest {
     Job job = 1;
+
+    // True when the job was previously assigned to another worker but has been migrated due to different reasons (e.g. worker failure, job migration)
+    bool resuming = 2;
 }
 
 message AvailabilityResponse {
     string job_id = 1;
     bool available = 2;
+    bool should_retry = 3;
 }
 
 message JobStatusUpdate {
