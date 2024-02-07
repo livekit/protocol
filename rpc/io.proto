@@ -31,8 +31,12 @@ service IOInfo {
   rpc UpdateMetrics(UpdateMetricsRequest) returns (google.protobuf.Empty);
 
   // ingress
+  rpc CreateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);  
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
+  rpc UpdateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
+  rpc ListIngress(livekit.ListIngressRequest) returns (livekit.ListIngressResponse);
+  rpc DeleteIngress(livekit.DeleteIngressRequest) returns (livekit.IngressInfo) {};
 
   // sip
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
