@@ -86,6 +86,7 @@ message GetSIPTrunkAuthenticationResponse {
   // Expected username and password
   string username = 1;
   string password = 2;
+  bool   drop = 3;
 }
 
 message EvaluateSIPDispatchRulesRequest {
@@ -117,12 +118,21 @@ message EvaluateSIPDispatchRulesResponse {
   // What should be used for the LiveKit identity
   string participant_identity = 2;
 
-  // Pin should be requested from SIPParticipant
-  bool request_pin = 3;
+  bool request_pin = 3 [deprecated=true]; // see result
 
   // optional token that should be used when creating LiveKit participant
   string token = 4;
 
   // optional websocket url that should be used when creating LiveKit participant
   string ws_url = 5;
+
+  SIPDispatchResult result = 6;
+}
+
+enum SIPDispatchResult {
+  LEGACY_ACCEPT_OR_PIN = 0; // check request_pin field
+  ACCEPT = 1;
+  REQUEST_PIN = 2;
+  REJECT = 3;
+  DROP = 4;
 }
