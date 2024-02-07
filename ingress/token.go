@@ -21,7 +21,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participantName string) (string, error) {
+func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participantName, participantMetadata string) (string, error) {
 	f := false
 	t := true
 	grant := &auth.VideoGrant{
@@ -36,7 +36,8 @@ func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participan
 		SetIdentity(participantIdentity).
 		SetName(participantName).
 		SetKind(livekit.ParticipantInfo_INGRESS).
-		SetValidFor(24 * time.Hour)
+		SetValidFor(24 * time.Hour).
+		SetMetadata(participantMetadata)
 
 	return at.ToJWT()
 }
