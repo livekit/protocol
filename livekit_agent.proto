@@ -41,9 +41,9 @@ message WorkerMessage {
         RegisterWorkerRequest register = 1;
         // worker confirms to server that it's available for a job, or declines it
         AvailabilityResponse availability = 2;
-        // worker can update its status to the server, including taking itself out of the pool
-        UpdateWorkerStatus status = 3;
+	// job can send status updates to the server, useful for tracking progress
         JobStatusUpdate job_update = 4;
+        // worker can update its status to the server, including taking itself out of the pool
 	WorkerStatusUpdate worker_status = 5;
 
 	WorkerPing ping = 6;
@@ -140,6 +140,7 @@ message JobStatusUpdate {
 }
 
 message WorkerStatusUpdate {
+    WorkerStatus status = 1;
     double load = 1;
     int32 running_jobs = 2;
 }
@@ -148,6 +149,3 @@ message JobAssignment {
     Job job = 1;
 }
 
-message UpdateWorkerStatus {
-    WorkerStatus status = 1;
-}
