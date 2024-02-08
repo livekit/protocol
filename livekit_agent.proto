@@ -46,7 +46,7 @@ message WorkerMessage {
         JobStatusUpdate job_update = 4;
 	WorkerStatusUpdate worker_status = 5;
 
-	Ping ping = 6;
+	WorkerPing ping = 6;
 	SimulateJobRequest simulate_job = 7;
 	MigrateJobRequest migrate_job = 8;
     };
@@ -60,7 +60,7 @@ message ServerMessage {
         // server asks worker to confirm availability for a job
         AvailabilityRequest availability = 2;
         JobAssignment assignment = 3;
-	Pong ping = 4;
+	WorkerPong ping = 4;
     }
 }
 
@@ -86,10 +86,10 @@ message SimulateJobRequest {
     string participant_id = 3;
 }
 
-message Ping {
+message WorkerPing {
     int64 timestamp = 1;
 }
-message Pong {
+message WorkerPong {
     int64 last_timestamp = 1;
     int64 timestamp = 2;
 }
