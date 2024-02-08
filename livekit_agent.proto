@@ -46,7 +46,7 @@ message WorkerMessage {
         JobStatusUpdate job_update = 4;
 	WorkerStatusUpdate worker_status = 5;
 
-	PingRequest ping = 6;
+	Ping ping = 6;
 	SimulateJobRequest simulate_job = 7;
 	MigrateJobRequest migrate_job = 8;
     };
@@ -60,7 +60,7 @@ message ServerMessage {
         // server asks worker to confirm availability for a job
         AvailabilityRequest availability = 2;
         JobAssignment assignment = 3;
-	PingResponse ping = 4;
+	Pong ping = 4;
     }
 }
 
@@ -86,10 +86,10 @@ message SimulateJobRequest {
     string participant_id = 3;
 }
 
-message PingRequest {
+message Ping {
     int64 timestamp = 1;
 }
-message PingResponse {
+message Pong {
     int64 last_timestamp = 1;
     int64 timestamp = 2;
 }
@@ -115,7 +115,8 @@ message MigrateJobRequest {
 message AvailabilityRequest {
     Job job = 1;
 
-    // True when the job was previously assigned to another worker but has been migrated due to different reasons (e.g. worker failure, job migration)
+    // True when the job was previously assigned to another worker but has been 
+    // migrated due to different reasons (e.g. worker failure, job migration)
     bool resuming = 2;
 }
 
@@ -133,10 +134,13 @@ message JobStatusUpdate {
     JobStatus status = 2;
     string error = 3;
     string user_data = 4;
+    
+    // The load that the job currently has on the worker
+    double load = 1;
 }
 
 message WorkerStatusUpdate {
-    double current_load = 1;
+    double load = 1;
     int32 running_jobs = 2;
 }
 
