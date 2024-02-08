@@ -136,7 +136,7 @@ message JobStatusUpdate {
     string user_data = 4;
     
     // The load that the job currently has on the worker
-    double load = 1;
+    double load = 5;
 }
 
 message WorkerStatusUpdate {
