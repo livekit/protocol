@@ -44,9 +44,11 @@ message WorkerMessage {
         // worker can update its status to the server, including taking itself out of the pool
         UpdateWorkerStatus status = 3;
         JobStatusUpdate job_update = 4;
-	PingRequest ping = 5;
-	SimulateJobRequest simulate_job = 6;
-	MigrateJobRequest migrate_job = 7;
+	WorkerStatusUpdate worker_status = 5;
+
+	PingRequest ping = 6;
+	SimulateJobRequest simulate_job = 7;
+	MigrateJobRequest migrate_job = 8;
     };
 }
 
@@ -85,9 +87,12 @@ message SimulateJobRequest {
 }
 
 message PingRequest {
-    double current_load = 1;
+    int64 timestamp = 1;
 }
-message PingResponse {}
+message PingResponse {
+    int64 last_timestamp = 1;
+    int64 timestamp = 2;
+}
 
 message RegisterWorkerRequest {
     JobType type = 1;
@@ -128,6 +133,11 @@ message JobStatusUpdate {
     JobStatus status = 2;
     string error = 3;
     string user_data = 4;
+}
+
+message WorkerStatusUpdate {
+    double current_load = 1;
+    int32 running_jobs = 2;
 }
 
 message JobAssignment {
