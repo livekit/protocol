@@ -60,7 +60,7 @@ message ServerMessage {
         // server asks worker to confirm availability for a job
         AvailabilityRequest availability = 2;
         JobAssignment assignment = 3;
-	WorkerPong ping = 4;
+	WorkerPong pong = 4;
     }
 }
 
