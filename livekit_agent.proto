@@ -141,7 +141,7 @@ message JobStatusUpdate {
 
 message WorkerStatusUpdate {
     WorkerStatus status = 1;
-    double load = 1;
+    double load = 2;
     repeated string jobs = 3;
 }
 
