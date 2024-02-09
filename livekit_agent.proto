@@ -109,7 +109,7 @@ message RegisterWorkerResponse {
 }
 
 message MigrateJobRequest {
-    Job job = 1;
+    string job_id = 1;
 }
 
 message AvailabilityRequest {
@@ -123,7 +123,7 @@ message AvailabilityRequest {
 message AvailabilityResponse {
     string job_id = 1;
     bool available = 2;
-    bool should_retry = 3;
+    bool supports_resume = 3;
 
     // How much the worker thinks the job will cost in terms of resources
     double job_cost = 4;
@@ -142,7 +142,7 @@ message JobStatusUpdate {
 message WorkerStatusUpdate {
     WorkerStatus status = 1;
     double load = 1;
-    int32 running_jobs = 2;
+    repeated string jobs = 3;
 }
 
 message JobAssignment {
