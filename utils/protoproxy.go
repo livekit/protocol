@@ -122,6 +122,9 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	if proto.Equal(p.message, msg) {
 		// no change, skip the notification
 		p.lock.Unlock()
+		if awaitChan != nil {
+			close(awaitChan)
+		}
 		return
 	}
 	p.message = msg
