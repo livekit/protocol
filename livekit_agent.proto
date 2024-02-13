@@ -34,6 +34,17 @@ message Job {
     optional ParticipantInfo participant = 4;
 }
 
+message JobStats {
+    string id = 1;
+    double load = 2;
+}
+
+message WorkerStats {
+    // By default the framework is using CPU load as a metric
+    double load = 1;
+    repeated string jobs = 2;
+}
+
 // from Worker to Server
 message WorkerMessage {
     oneof message {
@@ -42,9 +53,9 @@ message WorkerMessage {
         // worker confirms to server that it's available for a job, or declines it
         AvailabilityResponse availability = 2;
 	// job can send status updates to the server, useful for tracking progress
-        JobStatusUpdate job_update = 4;
+        UpdateJobStatus update_job = 4;
         // worker can update its status to the server, including taking itself out of the pool
-	WorkerStatusUpdate worker_status = 5;
+	UpdateWorkerStatus update_worker = 5;
 
 	WorkerPing ping = 6;
 	SimulateJobRequest simulate_job = 7;
@@ -89,6 +100,7 @@ message SimulateJobRequest {
 message WorkerPing {
     int64 timestamp = 1;
 }
+
 message WorkerPong {
     int64 last_timestamp = 1;
     int64 timestamp = 2;
@@ -101,6 +113,7 @@ message RegisterWorkerRequest {
     string name = 4;
     uint32 ping_interval = 5;
     optional string namespace = 6;
+    ParticipantPermission allowed_permissions = 7;
 }
 
 message RegisterWorkerResponse {
@@ -120,16 +133,14 @@ message AvailabilityRequest {
     bool resuming = 2;
 }
 
+
 message AvailabilityResponse {
     string job_id = 1;
     bool available = 2;
     bool supports_resume = 3;
-
-    // How much the worker thinks the job will cost in terms of resources
-    double job_cost = 4;
 }
 
-message JobStatusUpdate {
+message UpdateJobStatus {
     string job_id = 1;
     JobStatus status = 2;
     string error = 3;
@@ -139,13 +150,13 @@ message JobStatusUpdate {
     double load = 5;
 }
 
-message WorkerStatusUpdate {
+message UpdateWorkerStatus {
     WorkerStatus status = 1;
-    double load = 2;
-    repeated string jobs = 3;
 }
 
 message JobAssignment {
     Job job = 1;
+    string url = 2;
+    string token = 3; 
 }
 
