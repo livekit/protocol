@@ -26,6 +26,22 @@ import (
 	"github.com/livekit/protocol/utils"
 )
 
+type ErrNoDispatchMatched struct {
+	NoRules      bool
+	NoTrunks     bool
+	CalledNumber string
+}
+
+func (e *ErrNoDispatchMatched) Error() string {
+	if e.NoRules {
+		return "No SIP Dispatch Rules defined"
+	}
+	if e.NoTrunks {
+		return fmt.Sprintf("No SIP Trunk or Dispatch Rules matched for %q", e.CalledNumber)
+	}
+	return fmt.Sprintf("No SIP Dispatch Rules matched for %q", e.CalledNumber)
+}
+
 // DispatchRulePriority returns sorting priority for dispatch rules. Lower value means higher priority.
 func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
 	// In all these cases, prefer pin-protected rules.
@@ -188,7 +204,7 @@ func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatch
 	// Trunk can still be nil here in case none matched or were defined.
 	// This is still fine, but only in case we'll match exactly one wildcard dispatch rule.
 	if len(rules) == 0 {
-		return nil, fmt.Errorf("No SIP Dispatch Rules defined")
+		return nil, &ErrNoDispatchMatched{NoRules: true, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
 	}
 	// We split the matched dispatch rules into two sets: specific and default (aka wildcard).
 	// First, attempt to match any of the specific rules, where we did match the Trunk ID.
@@ -255,10 +271,7 @@ func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatch
 	} else if best != nil {
 		return best, nil
 	}
-	if trunk == nil {
-		return nil, fmt.Errorf("No SIP Trunk or Dispatch Rules matched for %q", req.CalledNumber)
-	}
-	return nil, fmt.Errorf("No SIP Dispatch Rules matched for %q", req.CalledNumber)
+	return nil, &ErrNoDispatchMatched{NoRules: false, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
 }
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
@@ -280,6 +293,7 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	if rulePin != "" {
 		if sentPin == "" {
 			return &rpc.EvaluateSIPDispatchRulesResponse{
+				Result:     rpc.SIPDispatchResult_REQUEST_PIN,
 				RequestPin: true,
 			}, nil
 		}
@@ -297,6 +311,7 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, utils.NewGuid(""))
 	}
 	return &rpc.EvaluateSIPDispatchRulesResponse{
+		Result:              rpc.SIPDispatchResult_ACCEPT,
 		RoomName:            room,
 		ParticipantIdentity: fromName,
 	}, nil

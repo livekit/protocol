@@ -55,29 +55,34 @@ func NewEgressClient(params ClientParams) (EgressClient, error) {
 	if params.Bus == nil {
 		return nil, nil
 	}
+
 	opts := clientOptions(params)
 	timeout := params.Timeout
 	if timeout < 10*time.Second {
 		timeout = 10 * time.Second
 	}
-	internalOpts := append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
-		Timeout: timeout,
-		GetRetryParameters: func(err error, attempt int) (retry bool, timeout time.Duration, waitTime time.Duration) {
-			if !isErrRecoverable(err) {
-				return false, 0, 0
-			}
 
-			if attempt >= retries {
-				return false, 0, 0
-			}
+	internalOpts := append(opts,
+		psrpc.WithClientChannelSize(1000),
+		middleware.WithRPCRetries(middleware.RetryOptions{
+			Timeout: timeout,
+			GetRetryParameters: func(err error, attempt int) (retry bool, timeout time.Duration, waitTime time.Duration) {
+				if !isErrRecoverable(err) {
+					return false, 0, 0
+				}
 
-			// backoff = base * 2 ^ (attempt - 1) * rand[1,2)
-			backoff := time.Duration(float64(backoffBase) * math.Pow(2, float64(attempt-1)) * (rand.Float64() + 1))
-			timeout = time.Duration(float64(timeout) * math.Pow(2, float64(attempt)))
+				if attempt >= retries {
+					return false, 0, 0
+				}
 
-			return true, timeout, backoff
-		},
-	}))
+				// backoff = base * 2 ^ (attempt - 1) * rand[1,2)
+				backoff := time.Duration(float64(backoffBase) * math.Pow(2, float64(attempt-1)) * (rand.Float64() + 1))
+				timeout = time.Duration(float64(timeout) * math.Pow(2, float64(attempt)))
+
+				return true, timeout, backoff
+			},
+		}))
+
 	internalClient, err := NewEgressInternalClient(params.Bus, internalOpts...)
 	if err != nil {
 		return nil, err
@@ -99,7 +104,6 @@ func (c *egressClient) StartEgress(ctx context.Context, topic string, req *Start
 		psrpc.WithSelectionOpts(psrpc.SelectionOpts{
 			MaximumAffinity:     1,
 			AffinityTimeout:     time.Second,
-			Jitter:              0.1,
 			ShortCircuitTimeout: time.Millisecond * 500,
 		}),
 	}, opts...)
