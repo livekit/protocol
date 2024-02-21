@@ -204,6 +204,7 @@ func (t *lockTracker) trackUnlock() {
 func newLockTracker() *lockTracker {
 	t := &lockTracker{
 		stack: make([]uintptr, lockTrackerMaxStackDepth),
+		ts:    math.MaxUint32,
 	}
 
 	runtime.SetFinalizer(t, finalizeLockTracker)
