@@ -7,6 +7,10 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+func zapLoggerCore(l Logger) zapcore.Core {
+	return l.(*ZapLogger).ToZap().Desugar().Core()
+}
+
 func TestLoggerComponent(t *testing.T) {
 	t.Run("inheriting parent level", func(t *testing.T) {
 		l, err := NewZapLogger(&Config{
@@ -17,13 +21,13 @@ func TestLoggerComponent(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		sub := l.WithComponent("sub")
-		require.True(t, sub.(*ZapLogger).isEnabled(zapcore.InfoLevel))
-		require.False(t, sub.(*ZapLogger).isEnabled(zapcore.DebugLevel))
+		sub := zapLoggerCore(l.WithComponent("sub"))
+		require.True(t, sub.Enabled(zapcore.InfoLevel))
+		require.False(t, sub.Enabled(zapcore.DebugLevel))
 
-		compLogger := l.WithComponent("mycomponent").WithComponent("level2")
-		require.True(t, compLogger.(*ZapLogger).isEnabled(zapcore.WarnLevel))
-		require.False(t, compLogger.(*ZapLogger).isEnabled(zapcore.InfoLevel))
+		compLogger := zapLoggerCore(l.WithComponent("mycomponent").WithComponent("level2"))
+		require.True(t, compLogger.Enabled(zapcore.WarnLevel))
+		require.False(t, compLogger.Enabled(zapcore.InfoLevel))
 	})
 
 	t.Run("obeys component override", func(t *testing.T) {
@@ -36,10 +40,10 @@ func TestLoggerComponent(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		sub := l.WithComponent("sub")
-		sub2 := l.WithComponent("sub2")
-		require.True(t, sub.(*ZapLogger).isEnabled(zapcore.DebugLevel))
-		require.False(t, sub2.(*ZapLogger).isEnabled(zapcore.InfoLevel))
+		sub := zapLoggerCore(l.WithComponent("sub"))
+		sub2 := zapLoggerCore(l.WithComponent("sub2"))
+		require.True(t, sub.Enabled(zapcore.DebugLevel))
+		require.False(t, sub2.Enabled(zapcore.InfoLevel))
 	})
 
 	t.Run("updates dynamically", func(t *testing.T) {
@@ -53,8 +57,8 @@ func TestLoggerComponent(t *testing.T) {
 		l, err := NewZapLogger(config)
 		require.NoError(t, err)
 
-		sub := l.WithComponent("sub")
-		sub2 := l.WithComponent("sub2.test")
+		sub := zapLoggerCore(l.WithComponent("sub"))
+		sub2 := zapLoggerCore(l.WithComponent("sub2.test"))
 		err = config.Update(&Config{
 			Level: "debug",
 			ComponentLevels: map[string]string{
@@ -64,9 +68,9 @@ func TestLoggerComponent(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		require.True(t, l.isEnabled(zapcore.DebugLevel))
-		require.False(t, sub.(*ZapLogger).isEnabled(zapcore.DebugLevel))
-		require.True(t, sub.(*ZapLogger).isEnabled(zapcore.InfoLevel))
-		require.True(t, sub2.(*ZapLogger).isEnabled(zapcore.InfoLevel))
+		require.True(t, zapLoggerCore(l).Enabled(zapcore.DebugLevel))
+		require.False(t, sub.Enabled(zapcore.DebugLevel))
+		require.True(t, sub.Enabled(zapcore.InfoLevel))
+		require.True(t, sub2.Enabled(zapcore.InfoLevel))
 	})
 }

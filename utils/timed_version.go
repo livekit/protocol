@@ -215,3 +215,7 @@ func (t *TimedVersion) Scan(src interface{}) (err error) {
 	}
 	return nil
 }
+
+func (t TimedVersion) GormDataType() string {
+	return "bytes"
+}
