@@ -110,6 +110,17 @@ func TestProtoProxy(t *testing.T) {
 		<-done1
 		require.EqualValues(t, 1, proxy.Get().NumParticipants)
 	})
+
+	t.Run("await resolve when there is no change", func(t *testing.T) {
+		proxy := NewProtoProxy[*livekit.Room](10*time.Millisecond, func() *livekit.Room { return nil })
+		done := proxy.MarkDirty(true)
+		time.Sleep(100 * time.Millisecond)
+		select {
+		case <-done:
+		default:
+			t.FailNow()
+		}
+	})
 }
 
 func createTestProxy() (*ProtoProxy[*livekit.Room], *atomic.Uint32, *atomic.Bool) {

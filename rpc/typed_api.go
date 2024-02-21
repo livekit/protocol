@@ -22,7 +22,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	protopsrpc "github.com/livekit/protocol/psrpc"
-	"github.com/livekit/protocol/utils"
+	"github.com/livekit/protocol/utils/must"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
 )
@@ -150,6 +150,7 @@ func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, 
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
 }
 
+//counterfeiter:generate . KeepalivePubSub
 type KeepalivePubSub interface {
 	KeepaliveClient[livekit.NodeID]
 	KeepaliveServer[livekit.NodeID]
@@ -165,6 +166,6 @@ func NewKeepalivePubSub(params ClientParams) (KeepalivePubSub, error) {
 	if err != nil {
 		return nil, err
 	}
-	server := utils.Must(NewKeepaliveServer[livekit.NodeID](nil, params.Bus))
+	server := must.Get(NewKeepaliveServer[livekit.NodeID](nil, params.Bus))
 	return &keepalivePubSub{client, server}, nil
 }

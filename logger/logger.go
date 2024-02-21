@@ -15,6 +15,7 @@
 package logger
 
 import (
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -22,6 +23,8 @@ import (
 	"github.com/go-logr/logr"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/livekit/protocol/logger/zaputil"
 )
 
 var (
@@ -74,6 +77,8 @@ func ParseZapLevel(level string) zapcore.Level {
 	return lvl
 }
 
+type DeferredFieldResolver = zaputil.DeferredFieldResolver
+
 type Logger interface {
 	Debugw(msg string, keysAndValues ...interface{})
 	Infow(msg string, keysAndValues ...interface{})
@@ -88,6 +93,7 @@ type Logger interface {
 	// WithoutSampler returns the original logger without sampling
 	WithoutSampler() Logger
 	WithDeferredValues() (Logger, DeferredFieldResolver)
+	WithTap(we *zaputil.WriteEnabler) Logger
 }
 
 type sharedConfig struct {
@@ -135,7 +141,7 @@ func (c *sharedConfig) onConfigUpdate(conf *Config) error {
 
 // ensure we have an atomic level in the map representing the full component path
 // this makes it possible to update the log level after the fact
-func (c *sharedConfig) setEffectiveLevel(component string) zap.AtomicLevel {
+func (c *sharedConfig) ComponentLevel(component string) zap.AtomicLevel {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if compLevel, ok := c.componentLevels[component]; ok {
@@ -158,103 +164,85 @@ func (c *sharedConfig) setEffectiveLevel(component string) zap.AtomicLevel {
 }
 
 type ZapLogger struct {
-	zap *zap.SugaredLogger
-	// store original logger without sampling to avoid multiple samplers
-	unsampled *zap.SugaredLogger
-	component string
-	// use a nested field as pointer so that all loggers share the same sharedConfig
-	sharedConfig   *sharedConfig
-	level          zap.AtomicLevel
-	SampleDuration time.Duration
-	SampleInitial  int
-	SampleInterval int
+	zap           *zap.SugaredLogger
+	conf          *Config
+	sc            *sharedConfig
+	console, json *zaputil.WriteEnabler
+	enc           zaputil.Encoder
+	name          string
+	component     string
+	deferred      []*zaputil.Deferrer
+	sampler       *zaputil.Sampler
+	callerSkip    int
 }
 
 func NewZapLogger(conf *Config) (*ZapLogger, error) {
 	sc := newSharedConfig(conf)
-	zl := &ZapLogger{
-		sharedConfig:   sc,
-		level:          sc.level,
-		SampleDuration: time.Duration(conf.ItemSampleSeconds) * time.Second,
-		SampleInitial:  conf.ItemSampleInitial,
-		SampleInterval: conf.ItemSampleInterval,
-	}
-	zapConfig := zap.Config{
-		// set to the lowest level since we are doing our own filtering in `isEnabled`
-		Level:            zap.NewAtomicLevelAt(zapcore.DebugLevel),
-		Development:      false,
-		Encoding:         "console",
-		EncoderConfig:    zap.NewDevelopmentEncoderConfig(),
-		OutputPaths:      []string{"stderr"},
-		ErrorOutputPaths: []string{"stderr"},
-	}
+
+	var enc zaputil.Encoder
 	if conf.JSON {
-		zapConfig.Encoding = "json"
-		zapConfig.EncoderConfig = zap.NewProductionEncoderConfig()
+		enc = zaputil.NewProductionEncoder()
+	} else {
+		enc = zaputil.NewDevelopmentEncoder()
 	}
-	l, err := zapConfig.Build()
-	if err != nil {
-		return nil, err
+
+	l := &ZapLogger{
+		conf:    conf,
+		sc:      sc,
+		console: zaputil.NewWriteEnabler(os.Stderr, sc.level),
+		json:    zaputil.NewDiscardWriteEnabler(),
+		enc:     enc,
 	}
-	zl.unsampled = l.Sugar()
 
 	if conf.Sample {
-		// use a sampling logger for the main logger
-		samplingConf := &zap.SamplingConfig{
-			Initial:    conf.SampleInitial,
-			Thereafter: conf.SampleInterval,
+		var initial = 20
+		var interval = 100
+		if conf.ItemSampleInitial != 0 {
+			initial = conf.ItemSampleInitial
 		}
-		// sane defaults
-		if samplingConf.Initial == 0 {
-			samplingConf.Initial = 20
+		if conf.ItemSampleInterval != 0 {
+			interval = conf.ItemSampleInterval
 		}
-		if samplingConf.Thereafter == 0 {
-			samplingConf.Thereafter = 100
-		}
-		zl.zap = l.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-			return zapcore.NewSamplerWithOptions(
-				core,
-				time.Second,
-				samplingConf.Initial,
-				samplingConf.Thereafter,
-			)
-		})).Sugar()
-	} else {
-		zl.zap = zl.unsampled
+		l.sampler = zaputil.NewSampler(time.Second, initial, interval)
 	}
-	return zl, nil
-}
 
-func (l *ZapLogger) WithFieldSampler(config FieldSamplerConfig) *ZapLogger {
-	dup := *l
-	dup.zap = l.zap.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-		return NewFieldSampler(core, config)
-	}))
-	return &dup
+	l.zap = l.ToZap()
+	return l, nil
 }
 
 func (l *ZapLogger) ToZap() *zap.SugaredLogger {
-	return l.zap
+	c := l.enc.Core(l.console, l.json)
+	for i := range l.deferred {
+		c = zaputil.NewDeferredValueCore(c, l.deferred[i])
+	}
+	if l.sampler != nil {
+		c = zaputil.NewSamplerCore(c, l.sampler)
+	}
+
+	zl := zap.New(c)
+
+	if l.callerSkip != 0 {
+		zl = zl.WithOptions(zap.AddCallerSkip(l.callerSkip))
+	}
+
+	if l.name == "" || l.component == "" {
+		zl = zl.Named(l.name + l.component)
+	} else {
+		zl = zl.Named(l.name + "." + l.component)
+	}
+
+	return zl.Sugar()
 }
 
 func (l *ZapLogger) Debugw(msg string, keysAndValues ...interface{}) {
-	if !l.isEnabled(zapcore.DebugLevel) {
-		return
-	}
 	l.zap.Debugw(msg, keysAndValues...)
 }
 
 func (l *ZapLogger) Infow(msg string, keysAndValues ...interface{}) {
-	if !l.isEnabled(zapcore.InfoLevel) {
-		return
-	}
 	l.zap.Infow(msg, keysAndValues...)
 }
 
 func (l *ZapLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
-	if !l.isEnabled(zapcore.WarnLevel) {
-		return
-	}
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
@@ -262,9 +250,6 @@ func (l *ZapLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
 }
 
 func (l *ZapLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {
-	if !l.isEnabled(zapcore.ErrorLevel) {
-		return
-	}
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
@@ -273,100 +258,75 @@ func (l *ZapLogger) Errorw(msg string, err error, keysAndValues ...interface{}) 
 
 func (l *ZapLogger) WithValues(keysAndValues ...interface{}) Logger {
 	dup := *l
-	dup.zap = l.zap.With(keysAndValues...)
-	// mirror unsampled logger too
-	if l.unsampled == l.zap {
-		dup.unsampled = dup.zap
-	} else {
-		dup.unsampled = l.unsampled.With(keysAndValues...)
-	}
+	dup.enc = dup.enc.WithValues(keysAndValues...)
+	dup.zap = dup.ToZap()
 	return &dup
 }
 
 func (l *ZapLogger) WithName(name string) Logger {
 	dup := *l
-	dup.zap = l.zap.Named(name)
-	if l.unsampled == l.zap {
-		dup.unsampled = dup.zap
+	if dup.name == "" {
+		dup.name = name
 	} else {
-		dup.unsampled = l.unsampled.Named(name)
+		dup.name = dup.name + "." + name
 	}
+	dup.zap = dup.ToZap()
 	return &dup
 }
 
 func (l *ZapLogger) WithComponent(component string) Logger {
-	// zap automatically appends .<name> to the logger name
-	dup := l.WithName(component).(*ZapLogger)
+	dup := *l
 	if dup.component == "" {
 		dup.component = component
 	} else {
 		dup.component = dup.component + "." + component
 	}
-	dup.level = dup.sharedConfig.setEffectiveLevel(dup.component)
-	return dup
+	dup.console = zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(dup.component))
+	dup.zap = dup.ToZap()
+	return &dup
 }
 
 func (l *ZapLogger) WithCallDepth(depth int) Logger {
 	dup := *l
-	dup.zap = l.zap.WithOptions(zap.AddCallerSkip(depth))
-	if l.unsampled == l.zap {
-		dup.unsampled = dup.zap
-	} else {
-		dup.unsampled = l.unsampled.WithOptions(zap.AddCallerSkip(depth))
-	}
+	dup.callerSkip = depth
+	dup.zap = dup.ToZap()
 	return &dup
 }
 
 func (l *ZapLogger) WithItemSampler() Logger {
-	if l.SampleDuration == 0 {
+	if l.conf.ItemSampleSeconds == 0 {
 		return l
 	}
 	dup := *l
-	dup.zap = l.unsampled.WithOptions(zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-		return zapcore.NewSamplerWithOptions(
-			core,
-			l.SampleDuration,
-			l.SampleInitial,
-			l.SampleInterval,
-		)
-	}))
+	dup.sampler = zaputil.NewSampler(
+		time.Duration(l.conf.ItemSampleSeconds)*time.Second,
+		l.conf.ItemSampleInitial,
+		l.conf.ItemSampleInterval,
+	)
+	dup.zap = dup.ToZap()
 	return &dup
 }
 
 func (l *ZapLogger) WithoutSampler() Logger {
-	if l.unsampled == l.zap {
-		return l
-	}
 	dup := *l
-	dup.zap = l.unsampled
+	dup.sampler = nil
+	dup.zap = dup.ToZap()
 	return &dup
 }
 
 func (l *ZapLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
-	var resolvers []DeferredFieldResolver
-	opt := zap.WrapCore(func(core zapcore.Core) zapcore.Core {
-		core, resolve := newDeferredValueCore(core)
-		resolvers = append(resolvers, resolve)
-		return core
-	})
-	resolve := func(args ...any) {
-		for _, r := range resolvers {
-			r(args...)
-		}
-	}
-
 	dup := *l
-	dup.zap = l.zap.WithOptions(opt)
-	if l.unsampled == l.zap {
-		dup.unsampled = dup.zap
-	} else {
-		dup.unsampled = l.unsampled.WithOptions(opt)
-	}
+	def, resolve := zaputil.NewDeferrer()
+	dup.deferred = append(dup.deferred[0:len(dup.deferred):len(dup.deferred)], def)
+	dup.zap = dup.ToZap()
 	return &dup, resolve
 }
 
-func (l *ZapLogger) isEnabled(level zapcore.Level) bool {
-	return level >= l.level.Level()
+func (l *ZapLogger) WithTap(we *zaputil.WriteEnabler) Logger {
+	dup := *l
+	dup.json = we
+	dup.zap = dup.ToZap()
+	return &dup
 }
 
 type LogRLogger logr.Logger
@@ -424,4 +384,8 @@ func (l LogRLogger) WithoutSampler() Logger {
 
 func (l LogRLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
 	return l, func(args ...any) {}
+}
+
+func (l LogRLogger) WithTap(we *zaputil.WriteEnabler) Logger {
+	return l
 }
