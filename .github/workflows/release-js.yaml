@@ -21,7 +21,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./js
+    working-directory: ./packages/js
 
 jobs:
   generate:
@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
-          cache-dependency-path: "js/pnpm-lock.yaml"
+          cache-dependency-path: "packages/js/pnpm-lock.yaml"
       - name: Install Protoc
         uses: arduino/setup-protoc@v3
       - name: Install dependencies
