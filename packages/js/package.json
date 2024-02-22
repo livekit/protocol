@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "generate:version": "genversion --esm --semi src/gen/version.js",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../ ../livekit_rtc.proto ../livekit_models.proto ../livekit_agent.proto ../livekit_webhook.proto",
+    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../ ../../livekit_rtc.proto ../../livekit_models.proto ../../livekit_agent.proto ../../livekit_webhook.proto ../../livekit_egress.proto ../../livekit_ingress.proto ../../livekit_sip.proto",
     "ci:publish": "pnpm publish --dry-run"
   },
   "keywords": [],
