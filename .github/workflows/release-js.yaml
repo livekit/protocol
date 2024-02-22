@@ -27,6 +27,8 @@ jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
       - name: Checkout Repo
         uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
