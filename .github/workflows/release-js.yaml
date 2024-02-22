@@ -17,7 +17,7 @@ name: Generate and release JS protocol package
 on:
   workflow_dispatch:
   push:
-    branches: ["main"]
+    branches: ["main", "lukas/add-js-as-package"]
 
 defaults:
   run:
