@@ -36,20 +36,13 @@ type EncodedOutput interface {
 	GetFileOutputs() []*livekit.EncodedFileOutput
 	GetStreamOutputs() []*livekit.StreamOutput
 	GetSegmentOutputs() []*livekit.SegmentedFileOutput
-	ImageOutput
+	GetImageOutputs() []*livekit.ImageOutput
 }
 
 type EncodedOutputDeprecated interface {
 	GetFile() *livekit.EncodedFileOutput
 	GetStream() *livekit.StreamOutput
 	GetSegments() *livekit.SegmentedFileOutput
-	GetFileOutputs() []*livekit.EncodedFileOutput
-	GetStreamOutputs() []*livekit.StreamOutput
-	GetSegmentOutputs() []*livekit.SegmentedFileOutput
-}
-
-type ImageOutput interface {
-	GetImageOutputs() []*livekit.ImageOutput
 }
 
 func GetTypes(request interface{}) (string, string) {
