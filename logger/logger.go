@@ -219,7 +219,12 @@ func (l *ZapLogger) ToZap() *zap.SugaredLogger {
 		c = zaputil.NewSamplerCore(c, l.sampler)
 	}
 
-	zl := zap.New(c, zap.AddCaller(), zap.AddCallerSkip(l.callerSkip))
+	zl := zap.New(
+		c,
+		zap.AddCaller(),
+		zap.AddCallerSkip(l.callerSkip),
+		zap.AddStacktrace(zap.ErrorLevel),
+	)
 
 	if l.name == "" || l.component == "" {
 		zl = zl.Named(l.name + l.component)
