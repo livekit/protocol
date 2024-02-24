@@ -21,7 +21,6 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
-	protopsrpc "github.com/livekit/protocol/psrpc"
 	"github.com/livekit/protocol/utils/must"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
@@ -71,7 +70,7 @@ func clientOptions(params ClientParams) []psrpc.ClientOption {
 		opts = append(opts, middleware.WithClientMetrics(params.Observer))
 	}
 	if params.Logger != nil {
-		opts = append(opts, protopsrpc.WithClientLogger(params.Logger))
+		opts = append(opts, WithClientLogger(params.Logger))
 	}
 	if params.MaxAttempts != 0 || params.Timeout != 0 || params.Backoff != 0 {
 		opts = append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
