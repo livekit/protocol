@@ -19,7 +19,6 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
 )
@@ -36,7 +35,7 @@ var (
 	psrpcErrorTotal         *prometheus.CounterVec
 )
 
-func InitPSRPCStats(nodeID string, nodeType livekit.NodeType, env string) {
+func InitPSRPCStats(constLabels prometheus.Labels) {
 	labels := []string{"role", "kind", "service", "method"}
 	streamLabels := []string{"role", "service", "method"}
 
@@ -44,33 +43,33 @@ func InitPSRPCStats(nodeID string, nodeType livekit.NodeType, env string) {
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
 		Name:        "request_time_ms",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String(), "env": env},
+		ConstLabels: constLabels,
 		Buckets:     []float64{10, 50, 100, 300, 500, 1000, 1500, 2000, 5000, 10000},
 	}, labels)
 	psrpcStreamSendTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
 		Name:        "stream_send_time_ms",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String(), "env": env},
+		ConstLabels: constLabels,
 		Buckets:     []float64{10, 50, 100, 300, 500, 1000, 1500, 2000, 5000, 10000},
 	}, streamLabels)
 	psrpcStreamReceiveTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
 		Name:        "stream_receive_total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String(), "env": env},
+		ConstLabels: constLabels,
 	}, streamLabels)
 	psrpcStreamCurrent = prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
 		Name:        "stream_count",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String(), "env": env},
+		ConstLabels: constLabels,
 	}, streamLabels)
 	psrpcErrorTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
 		Name:        "error_total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String(), "env": env},
+		ConstLabels: constLabels,
 	}, labels)
 
 	prometheus.MustRegister(psrpcRequestTime)
