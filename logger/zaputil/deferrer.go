@@ -102,9 +102,6 @@ type deferredValueCore struct {
 func NewDeferredValueCore(core zapcore.Core, def *Deferrer) zapcore.Core {
 	def.mu.Lock()
 	defer def.mu.Unlock()
-	if def.ready {
-		return core.With(def.fields)
-	}
 	return &deferredValueCore{core, def}
 }
 
