@@ -271,7 +271,7 @@ func (l *ZapLogger) WithComponent(component string) Logger {
 
 func (l *ZapLogger) WithCallDepth(depth int) Logger {
 	dup := *l
-	dup.zap.WithOptions(zap.AddCallerSkip(depth))
+	dup.zap = dup.zap.WithOptions(zap.AddCallerSkip(depth))
 	return &dup
 }
 
