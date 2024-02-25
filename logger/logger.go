@@ -169,11 +169,9 @@ type ZapLogger struct {
 	sc            *sharedConfig
 	console, json *zaputil.WriteEnabler
 	enc           zaputil.Encoder
-	name          string
 	component     string
 	deferred      []*zaputil.Deferrer
 	sampler       *zaputil.Sampler
-	callerSkip    int
 }
 
 func NewZapLogger(conf *Config) (*ZapLogger, error) {
@@ -187,6 +185,7 @@ func NewZapLogger(conf *Config) (*ZapLogger, error) {
 	}
 
 	l := &ZapLogger{
+		zap:     zap.New(nil, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar(),
 		conf:    conf,
 		sc:      sc,
 		console: zaputil.NewWriteEnabler(os.Stderr, sc.level),
@@ -219,20 +218,7 @@ func (l *ZapLogger) ToZap() *zap.SugaredLogger {
 		c = zaputil.NewSamplerCore(c, l.sampler)
 	}
 
-	zl := zap.New(
-		c,
-		zap.AddCaller(),
-		zap.AddCallerSkip(l.callerSkip),
-		zap.AddStacktrace(zap.ErrorLevel),
-	)
-
-	if l.name == "" || l.component == "" {
-		zl = zl.Named(l.name + l.component)
-	} else {
-		zl = zl.Named(l.name + "." + l.component)
-	}
-
-	return zl.Sugar()
+	return l.zap.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core { return c }))
 }
 
 func (l *ZapLogger) Debugw(msg string, keysAndValues ...interface{}) {
@@ -266,17 +252,13 @@ func (l *ZapLogger) WithValues(keysAndValues ...interface{}) Logger {
 
 func (l *ZapLogger) WithName(name string) Logger {
 	dup := *l
-	if dup.name == "" {
-		dup.name = name
-	} else {
-		dup.name = dup.name + "." + name
-	}
-	dup.zap = dup.ToZap()
+	dup.zap = dup.zap.Named(name)
 	return &dup
 }
 
 func (l *ZapLogger) WithComponent(component string) Logger {
 	dup := *l
+	dup.zap = dup.zap.Named(component)
 	if dup.component == "" {
 		dup.component = component
 	} else {
@@ -289,8 +271,7 @@ func (l *ZapLogger) WithComponent(component string) Logger {
 
 func (l *ZapLogger) WithCallDepth(depth int) Logger {
 	dup := *l
-	dup.callerSkip += depth
-	dup.zap = dup.ToZap()
+	dup.zap.WithOptions(zap.AddCallerSkip(depth))
 	return &dup
 }
 
