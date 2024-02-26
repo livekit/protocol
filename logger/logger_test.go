@@ -8,7 +8,7 @@ import (
 )
 
 func zapLoggerCore(l Logger) zapcore.Core {
-	return l.(*ZapLogger).ToZap().Desugar().Core()
+	return l.(ZapLogger).ToZap().Desugar().Core()
 }
 
 func TestLoggerComponent(t *testing.T) {

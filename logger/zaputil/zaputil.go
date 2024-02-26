@@ -29,8 +29,8 @@ func encoderWithValues(enc zapcore.Encoder, kvs ...any) zapcore.Encoder {
 	return clone
 }
 
-type Encoder interface {
-	WithValues(kvs ...any) Encoder
+type Encoder[T any] interface {
+	WithValues(kvs ...any) T
 	Core(console, json *WriteEnabler) zapcore.Core
 }
 
@@ -39,21 +39,20 @@ type DevelopmentEncoder struct {
 	json    zapcore.Encoder
 }
 
-func NewDevelopmentEncoder() Encoder {
-	return &DevelopmentEncoder{
+func NewDevelopmentEncoder() DevelopmentEncoder {
+	return DevelopmentEncoder{
 		console: zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
 		json:    zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 	}
 }
 
-func (e *DevelopmentEncoder) WithValues(kvs ...any) Encoder {
-	clone := *e
-	clone.console = encoderWithValues(clone.console, kvs...)
-	clone.json = encoderWithValues(clone.json, kvs...)
-	return &clone
+func (e DevelopmentEncoder) WithValues(kvs ...any) DevelopmentEncoder {
+	e.console = encoderWithValues(e.console, kvs...)
+	e.json = encoderWithValues(e.json, kvs...)
+	return e
 }
 
-func (e *DevelopmentEncoder) Core(console, json *WriteEnabler) zapcore.Core {
+func (e DevelopmentEncoder) Core(console, json *WriteEnabler) zapcore.Core {
 	return zapcore.NewTee(NewEncoderCore(e.console, console), NewEncoderCore(e.json, json))
 }
 
@@ -61,18 +60,17 @@ type ProductionEncoder struct {
 	json zapcore.Encoder
 }
 
-func NewProductionEncoder() Encoder {
-	return &ProductionEncoder{
+func NewProductionEncoder() ProductionEncoder {
+	return ProductionEncoder{
 		json: zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
 	}
 }
 
-func (e *ProductionEncoder) WithValues(kvs ...any) Encoder {
-	clone := *e
-	clone.json = encoderWithValues(clone.json, kvs...)
-	return &clone
+func (e ProductionEncoder) WithValues(kvs ...any) ProductionEncoder {
+	e.json = encoderWithValues(e.json, kvs...)
+	return e
 }
 
-func (e *ProductionEncoder) Core(console, json *WriteEnabler) zapcore.Core {
+func (e ProductionEncoder) Core(console, json *WriteEnabler) zapcore.Core {
 	return NewEncoderCore(e.json, console, json)
 }
