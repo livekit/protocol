@@ -193,7 +193,7 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 }
 
 func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
-	zap := zap.New(nil, zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
+	zap := zap.New(nil).WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
 
 	zc := &zapConfig{
 		conf:          conf,
