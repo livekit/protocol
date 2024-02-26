@@ -1,10 +1,14 @@
 package logger
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/livekit/protocol/logger/zaputil"
 )
 
 func zapLoggerCore(l Logger) zapcore.Core {
@@ -73,4 +77,32 @@ func TestLoggerComponent(t *testing.T) {
 		require.True(t, sub.Enabled(zapcore.InfoLevel))
 		require.True(t, sub2.Enabled(zapcore.InfoLevel))
 	})
+
+	t.Run("log output matches expected values", func(t *testing.T) {
+		ws := &testBufferedWriteSyncer{}
+		l, err := NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel)))
+		require.NoError(t, err)
+		l.Debugw("foo", "bar", "baz")
+
+		var log struct {
+			Level  string
+			TS     float64
+			Caller string
+			Msg    string
+			Bar    string
+		}
+		require.NoError(t, json.Unmarshal(ws.Bytes(), &log))
+
+		require.Equal(t, "debug", log.Level)
+		require.NotEqual(t, 0, log.TS)
+		require.NotEqual(t, "", log.Caller)
+		require.Equal(t, "foo", log.Msg)
+		require.Equal(t, "baz", log.Bar)
+	})
 }
+
+type testBufferedWriteSyncer struct {
+	bytes.Buffer
+}
+
+func (t *testBufferedWriteSyncer) Sync() error { return nil }
