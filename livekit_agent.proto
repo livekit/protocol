@@ -93,7 +93,7 @@ enum JobStatus {
 
 message SimulateJobRequest {
     JobType type = 1;
-    string room_id = 2;
+    string room_name = 2;
     string participant_id = 3;
 }
 
