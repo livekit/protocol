@@ -15,18 +15,18 @@ type Config struct {
 	Insecure bool `json:"insecure" yaml:"insecure"`
 
 	// Server name indication for TLS.
-	ServerName string `json:"serverName" yaml:"serverName"`
+	ServerName string `json:"serverName" yaml:"server_name"`
 
 	// File containing trusted root certificates for verifying the server.
-	CACertFile string `json:"caCertFile" yaml:"caCertFile"`
+	CACertFile string `json:"caCertFile" yaml:"ca_cert_file"`
 
 	// File containing client certificate (public key), to present to the
 	// server. Must also provide @ClientKey option.
-	ClientCertFile string `json:"clientCertFile" yaml:"clientCertFile"`
+	ClientCertFile string `json:"clientCertFile" yaml:"client_cert_file"`
 
 	// File containing client private key, to present to the server.
 	// Must also provide @ClientCert option.
-	ClientKeyFile string `json:"clientKeyFile" yaml:"clientKeyFile"`
+	ClientKeyFile string `json:"clientKeyFile" yaml:"client_key_file"`
 }
 
 var ErrFailedToLoadCACert = errors.New("failed to load CACertificate")

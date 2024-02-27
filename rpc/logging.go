@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package psrpc
+package rpc
 
 import (
 	"context"
-	"sync"
 	"time"
 
+	"github.com/puzpuzpuz/xsync"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/logger"
@@ -26,19 +26,18 @@ import (
 )
 
 type loggerCache struct {
-	m sync.Map
+	m *xsync.MapOf[string, logger.Logger]
 }
 
-func (c *loggerCache) Get(info psrpc.RPCInfo, l logger.Logger) logger.Logger {
-	if cl, ok := c.m.Load(info.Method); ok {
-		return cl.(logger.Logger)
-	}
-	if zl, ok := l.(*logger.ZapLogger); ok {
-		wl := zl.WithComponent("psrpc").WithComponent(info.Service).WithComponent(info.Method)
-		cl, _ := c.m.LoadOrStore(info.Method, wl)
-		return cl.(logger.Logger)
-	}
-	return l
+func newLoggerCache() loggerCache {
+	return loggerCache{m: xsync.NewMapOf[logger.Logger]()}
+}
+
+func (c loggerCache) Get(info psrpc.RPCInfo, l logger.Logger) logger.Logger {
+	wl, _ := c.m.LoadOrCompute(info.Method, func() logger.Logger {
+		return l.WithComponent("psrpc").WithComponent(info.Service).WithComponent(info.Method)
+	})
+	return wl
 }
 
 func WithClientLogger(logger logger.Logger) psrpc.ClientOption {
@@ -57,7 +56,7 @@ func WithServerLogger(logger logger.Logger) psrpc.ServerOption {
 }
 
 func newClientRPCLoggerInterceptor(l logger.Logger) psrpc.ClientRPCInterceptor {
-	var loggers loggerCache
+	loggers := newLoggerCache()
 	return func(rpcInfo psrpc.RPCInfo, next psrpc.ClientRPCHandler) psrpc.ClientRPCHandler {
 		l := loggers.Get(rpcInfo, l)
 		return func(ctx context.Context, req proto.Message, opts ...psrpc.RequestOption) (res proto.Message, err error) {
@@ -75,7 +74,7 @@ func newClientRPCLoggerInterceptor(l logger.Logger) psrpc.ClientRPCInterceptor {
 }
 
 func newServerRPCLoggerInterceptor(l logger.Logger) psrpc.ServerRPCInterceptor {
-	var loggers loggerCache
+	loggers := newLoggerCache()
 	return func(ctx context.Context, req proto.Message, rpcInfo psrpc.RPCInfo, handler psrpc.ServerRPCHandler) (res proto.Message, err error) {
 		l := loggers.Get(rpcInfo, l)
 		start := time.Now()
@@ -91,7 +90,7 @@ func newServerRPCLoggerInterceptor(l logger.Logger) psrpc.ServerRPCInterceptor {
 }
 
 func newStreamLoggerInterceptor(l logger.Logger) psrpc.StreamInterceptor {
-	var loggers loggerCache
+	loggers := newLoggerCache()
 	return func(rpcInfo psrpc.RPCInfo, next psrpc.StreamHandler) psrpc.StreamHandler {
 		l := loggers.Get(rpcInfo, l).WithValues("topic", rpcInfo.Topic)
 		l.Debugw("stream opened")
@@ -130,7 +129,7 @@ func (s *streamLoggerInterceptor) Close(cause error) error {
 }
 
 func newMultiRPCLoggerInterceptor(l logger.Logger) psrpc.ClientMultiRPCInterceptor {
-	var loggers loggerCache
+	loggers := newLoggerCache()
 	return func(rpcInfo psrpc.RPCInfo, next psrpc.ClientMultiRPCHandler) psrpc.ClientMultiRPCHandler {
 		return &multiRPCLoggerInterceptor{
 			ClientMultiRPCHandler: next,

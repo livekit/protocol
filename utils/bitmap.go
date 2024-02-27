@@ -30,8 +30,13 @@ func NewBitmap[T bitmapNumber](size int) *Bitmap[T] {
 	}
 }
 
+func (b *Bitmap[T]) Len() int {
+	return len(b.bits) << 6
+}
+
 func (b *Bitmap[T]) Set(val T) {
-	b.SetRange(val, val)
+	sm, s, o := b.getSlotAndOffset(val)
+	b.bits[s&sm] |= 1 << o
 }
 
 func (b *Bitmap[T]) SetRange(min, max T) {
@@ -52,7 +57,8 @@ func (b *Bitmap[T]) SetRange(min, max T) {
 }
 
 func (b *Bitmap[T]) Clear(val T) {
-	b.ClearRange(val, val)
+	sm, s, o := b.getSlotAndOffset(val)
+	b.bits[s&sm] &= ^(1 << o)
 }
 
 func (b *Bitmap[T]) ClearRange(min, max T) {
@@ -73,13 +79,18 @@ func (b *Bitmap[T]) ClearRange(min, max T) {
 }
 
 func (b *Bitmap[T]) IsSet(val T) bool {
-	sm := len(b.bits) - 1 // slot mask
-	s := int(val >> 6)    // slot
-	o := int(val & 0x3f)  // offset
+	sm, s, o := b.getSlotAndOffset(val)
 	return b.bits[s&sm]&(1<<o) != 0
 }
 
-func (b *Bitmap[T]) getSlotsAndOffsets(min, max T) (sm int, ls int, rs int, lo int, ro int) {
+func (b *Bitmap[T]) getSlotAndOffset(val T) (sm, s, o int) {
+	sm = len(b.bits) - 1 // slot mask
+	s = int(val >> 6)    // slot
+	o = int(val & 0x3f)  // offset
+	return
+}
+
+func (b *Bitmap[T]) getSlotsAndOffsets(min, max T) (sm, ls, rs, lo, ro int) {
 	sm = len(b.bits) - 1 // slot mask
 
 	ls = int(min >> 6) // left slot

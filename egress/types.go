@@ -26,6 +26,7 @@ const (
 	OutputTypeFile     = "file"
 	OutputTypeStream   = "stream"
 	OutputTypeSegments = "segments"
+	OutputTypeImages   = "images"
 	OutputTypeMultiple = "multiple"
 
 	Unknown = "unknown"
@@ -35,6 +36,7 @@ type EncodedOutput interface {
 	GetFileOutputs() []*livekit.EncodedFileOutput
 	GetStreamOutputs() []*livekit.StreamOutput
 	GetSegmentOutputs() []*livekit.SegmentedFileOutput
+	GetImageOutputs() []*livekit.ImageOutput
 }
 
 type EncodedOutputDeprecated interface {
@@ -70,20 +72,26 @@ func GetTypes(request interface{}) (string, string) {
 }
 
 func GetOutputType(req EncodedOutput) string {
-	hasFile := len(req.GetFileOutputs()) > 0
-	hasStream := len(req.GetStreamOutputs()) > 0
-	hasSegments := len(req.GetSegmentOutputs()) > 0
+	outputs := make([]string, 0)
+	if len(req.GetFileOutputs()) > 0 {
+		outputs = append(outputs, OutputTypeFile)
+	}
+	if len(req.GetStreamOutputs()) > 0 {
+		outputs = append(outputs, OutputTypeStream)
+	}
+	if len(req.GetSegmentOutputs()) > 0 {
+		outputs = append(outputs, OutputTypeSegments)
+	}
+	if len(req.GetImageOutputs()) > 0 {
+		outputs = append(outputs, OutputTypeImages)
+	}
 
-	switch {
-	case (hasFile && (hasStream || hasSegments)) || (hasStream && hasSegments):
-		return OutputTypeMultiple
-	case hasFile:
-		return OutputTypeFile
-	case hasStream:
-		return OutputTypeStream
-	case hasSegments:
-		return OutputTypeSegments
+	switch len(outputs) {
 	default:
+		return OutputTypeMultiple
+	case 1:
+		return outputs[0]
+	case 0:
 		if r, ok := req.(EncodedOutputDeprecated); ok {
 			if r.GetFile() != nil {
 				return OutputTypeFile

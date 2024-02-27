@@ -65,11 +65,10 @@ func (p *ProtoProxy[T]) MarkDirty(immediate bool) <-chan struct{} {
 	p.dirty = true
 	shouldUpdate := immediate || time.Since(p.refreshedAt) > p.refreshInterval
 
-	awaitChan := p.awaitChan
-	if awaitChan == nil {
-		awaitChan = make(chan struct{})
-		p.awaitChan = awaitChan
+	if p.awaitChan == nil {
+		p.awaitChan = make(chan struct{})
 	}
+	awaitChan := p.awaitChan
 	p.lock.Unlock()
 
 	if shouldUpdate {
@@ -112,8 +111,11 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	// wipe out another thread setting dirty to true while updateFn is executing
 	p.lock.Lock()
 	p.dirty = false
-	awaitChan := p.awaitChan
-	p.awaitChan = nil
+
+	if awaitChan := p.awaitChan; awaitChan != nil {
+		p.awaitChan = nil
+		defer close(awaitChan)
+	}
 	p.lock.Unlock()
 
 	msg := p.updateFn()
@@ -122,9 +124,6 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	if proto.Equal(p.message, msg) {
 		// no change, skip the notification
 		p.lock.Unlock()
-		if awaitChan != nil {
-			close(awaitChan)
-		}
 		return
 	}
 	p.message = msg
@@ -133,9 +132,6 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	p.refreshedAt = time.Now()
 	p.lock.Unlock()
 
-	if awaitChan != nil {
-		close(awaitChan)
-	}
 	if !skipNotify {
 		select {
 		case p.updateChan <- struct{}{}:

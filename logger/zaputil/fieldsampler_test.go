@@ -12,57 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package logger
+package zaputil
 
 import (
 	"fmt"
 	"math"
 	"testing"
 
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/stretchr/testify/require"
 )
-
-type testStringer string
-
-func (s testStringer) String() string {
-	return string(s)
-}
-
-type testStringLike string
-
-type testCore struct {
-	zapcore.Core
-	writeCount *atomic.Int32
-}
-
-func (c *testCore) init() {
-	if c.writeCount == nil {
-		c.writeCount = &atomic.Int32{}
-	}
-}
-
-func (c *testCore) WriteCount() int {
-	c.init()
-	return int(c.writeCount.Load())
-}
-
-func (c *testCore) With(fields []zapcore.Field) zapcore.Core {
-	c.init()
-	return &testCore{
-		Core:       c.Core.With(fields),
-		writeCount: c.writeCount,
-	}
-}
-
-func (s *testCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	s.init()
-	s.writeCount.Inc()
-	return nil
-}
 
 func TestRoomSampleRate(t *testing.T) {
 	expectedRate := 0.50

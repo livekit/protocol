@@ -1,0 +1,60 @@
+# Copyright 2023 LiveKit, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Generate and release JS protocol package
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["main"]
+
+defaults:
+  run:
+    working-directory: ./packages/js
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: "packages/js/pnpm-lock.yaml"
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+      - name: Install dependencies
+        run: pnpm install
+      - name: Version package
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        run: npm version from-git
+      - name: Generate files
+        run: |
+          pnpm generate:version
+          pnpm generate:proto
+      - name: Add changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: '["packages/js"]'
+          default_author: github_actions
+          message: auto-generated JS files
+      - name: Publish
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        run: pnpm ci:publish

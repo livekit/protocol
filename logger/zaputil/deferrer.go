@@ -1,4 +1,18 @@
-package logger
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package zaputil
 
 import (
 	"sync"
@@ -13,23 +27,24 @@ type deferredWrite struct {
 	fields []zapcore.Field
 }
 
-type deferredWriteBuffer struct {
+type Deferrer struct {
 	mu     sync.Mutex
 	ready  bool
 	fields []zapcore.Field
 	writes []*deferredWrite
 }
 
-func (b *deferredWriteBuffer) append(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) bool {
+func (b *Deferrer) buffer(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) bool {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	if !b.ready {
-		b.writes = append(b.writes, &deferredWrite{core, ent, fields})
+	if b.ready {
+		return false
 	}
-	return b.ready
+	b.writes = append(b.writes, &deferredWrite{core, ent, fields})
+	return true
 }
 
-func (b *deferredWriteBuffer) flush() {
+func (b *Deferrer) flush() {
 	b.mu.Lock()
 	b.ready = true
 	writes := b.writes
@@ -44,8 +59,8 @@ func (b *deferredWriteBuffer) flush() {
 	}
 }
 
-func (b *deferredWriteBuffer) write(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) error {
-	if b.append(core, ent, fields) {
+func (b *Deferrer) write(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) error {
+	if !b.buffer(core, ent, fields) {
 		return core.Write(ent, append(fields[0:len(fields):len(fields)], b.fields...))
 	}
 	return nil
@@ -53,13 +68,8 @@ func (b *deferredWriteBuffer) write(core zapcore.Core, ent zapcore.Entry, fields
 
 type DeferredFieldResolver func(args ...any)
 
-type deferredValueCore struct {
-	zapcore.Core
-	buf *deferredWriteBuffer
-}
-
-func newDeferredValueCore(core zapcore.Core) (zapcore.Core, DeferredFieldResolver) {
-	buf := &deferredWriteBuffer{}
+func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
+	buf := &Deferrer{}
 	var resolveOnce sync.Once
 	resolve := func(args ...any) {
 		resolveOnce.Do(func() {
@@ -81,14 +91,24 @@ func newDeferredValueCore(core zapcore.Core) (zapcore.Core, DeferredFieldResolve
 			buf.flush()
 		})
 	}
+	return buf, resolve
+}
 
-	return &deferredValueCore{core, buf}, resolve
+type deferredValueCore struct {
+	zapcore.Core
+	def *Deferrer
+}
+
+func NewDeferredValueCore(core zapcore.Core, def *Deferrer) zapcore.Core {
+	def.mu.Lock()
+	defer def.mu.Unlock()
+	return &deferredValueCore{core, def}
 }
 
 func (c *deferredValueCore) With(fields []zapcore.Field) zapcore.Core {
 	return &deferredValueCore{
 		Core: c.Core.With(fields),
-		buf:  c.buf,
+		def:  c.def,
 	}
 }
 
@@ -100,5 +120,5 @@ func (c *deferredValueCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *
 }
 
 func (c *deferredValueCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	return c.buf.write(c.Core, ent, fields)
+	return c.def.write(c.Core, ent, fields)
 }
