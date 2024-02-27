@@ -49,7 +49,6 @@ func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func
 		updateChan:      make(chan struct{}, 1),
 		updateFn:        updateFn,
 		done:            make(chan struct{}),
-		fuse:            core.NewFuse(),
 		refreshInterval: refreshInterval,
 		queueUpdate:     make(chan struct{}, 1),
 	}
