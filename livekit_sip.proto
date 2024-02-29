@@ -70,10 +70,12 @@ message CreateSIPTrunkRequest {
   // Number used to make outbound calls
   string outbound_number = 3;
 
+  repeated string inbound_numbers_regex = 4 [deprecated=true];
+
   // Accepted `To` values. This Trunk will only accept a call made to
   // these numbers. This allows you to have distinct Trunks for different phone
   // numbers at the same provider.
-  repeated string inbound_numbers_regex = 4;
+  repeated string inbound_numbers = 9;
 
   // Username and password used to authenticate inbound and outbound SIP invites
   // May be empty to have no Authentication
@@ -96,10 +98,12 @@ message SIPTrunkInfo {
   // Number used to make outbound calls
   string outbound_number = 4;
 
+  repeated string inbound_numbers_regex = 5 [deprecated=true];
+
   // Accepted `To` values. This Trunk will only accept a call made to
   // these numbers. This allows you to have distinct Trunks for different phone
   // numbers at the same provider.
-  repeated string inbound_numbers_regex = 5;
+  repeated string inbound_numbers = 10;
 
   // Username and password used to authenticate inbound and outbound SIP invites
   // May be empty to have no Authentication
