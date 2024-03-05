@@ -272,6 +272,7 @@ message ServerInfo {
   string node_id = 5;
   // additional debugging information. sent only if server is in development mode
   string debug_info = 6;
+  int32 agent_protocol = 7;
 }
 
 // details about the client

@@ -41,6 +41,8 @@ const (
 	WHIPResourcePrefix    = "WH_"
 	RTMPResourcePrefix    = "RT_"
 	URLResourcePrefix     = "UR_"
+	AgentWorkerPrefix     = "AW_"
+	AgentJobPrefix        = "AJ_"
 )
 
 func NewGuid(prefix string) string {

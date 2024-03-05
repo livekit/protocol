@@ -21,6 +21,15 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
+message WorkerInfo {
+    string id = 1;
+    string namespace = 2;
+    string version = 3;
+    string name = 4;
+    JobType type = 5;
+    ParticipantPermission allowed_permissions = 6;
+}
+
 message AgentInfo {
     string id = 1;
     string name = 2;
@@ -32,17 +41,7 @@ message Job {
     JobType type = 2;
     Room room = 3;
     optional ParticipantInfo participant = 4;
-}
-
-message JobStats {
-    string id = 1;
-    double load = 2;
-}
-
-message WorkerStats {
-    // By default the framework is using CPU load as a metric
-    double load = 1;
-    repeated string jobs = 2;
+    string namespace = 5;
 }
 
 // from Worker to Server
@@ -93,8 +92,8 @@ enum JobStatus {
 
 message SimulateJobRequest {
     JobType type = 1;
-    string room_name = 2;
-    string participant_id = 3;
+    Room room = 2;
+    ParticipantInfo participant = 3;
 }
 
 message WorkerPing {
@@ -108,7 +107,7 @@ message WorkerPong {
 
 message RegisterWorkerRequest {
     JobType type = 1;
-    string worker_id = 2;
+    //string worker_id = 2;
     string version = 3;
     string name = 4;
     uint32 ping_interval = 5;
@@ -118,7 +117,7 @@ message RegisterWorkerRequest {
 
 message RegisterWorkerResponse {
     string worker_id = 1;
-    string server_version = 2;
+    ServerInfo server_info = 3;
 }
 
 message MigrateJobRequest {
@@ -138,25 +137,38 @@ message AvailabilityResponse {
     string job_id = 1;
     bool available = 2;
     bool supports_resume = 3;
+
+    string participant_name = 4;
+    string participant_identity = 5;
+    string participant_metadata = 6;
 }
 
 message UpdateJobStatus {
     string job_id = 1;
-    JobStatus status = 2;
+
+    // The worker can indicate the job end by either specifying SUCCESS or FAILED
+    optional JobStatus status = 2;
+
+    // metadata shown on the dashboard, useful for debugging
     string error = 3;
-    string user_data = 4;
+
+    // the user_data can be updated multiple times
+    // None = no update
+    optional string metadata = 4;
     
     // The load that the job currently has on the worker
-    double load = 5;
+    float load = 5;
 }
 
 message UpdateWorkerStatus {
-    WorkerStatus status = 1;
+    optional WorkerStatus status = 1;
+    optional string metadata = 2;
+    float load = 3;
 }
 
 message JobAssignment {
     Job job = 1;
-    string url = 2;
+    optional string url = 2;
     string token = 3; 
 }
 
