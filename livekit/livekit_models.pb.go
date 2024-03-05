@@ -951,11 +951,9 @@ type Room struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Sid  string `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// seconds to wait for the first participant to join a room before closing
-	EmptyTimeout uint32 `protobuf:"varint,3,opt,name=empty_timeout,json=emptyTimeout,proto3" json:"empty_timeout,omitempty"`
-	// seconds to wait after the last participant has left before closing
+	Sid              string        `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
+	Name             string        `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	EmptyTimeout     uint32        `protobuf:"varint,3,opt,name=empty_timeout,json=emptyTimeout,proto3" json:"empty_timeout,omitempty"`
 	DepartureTimeout uint32        `protobuf:"varint,14,opt,name=departure_timeout,json=departureTimeout,proto3" json:"departure_timeout,omitempty"`
 	MaxParticipants  uint32        `protobuf:"varint,4,opt,name=max_participants,json=maxParticipants,proto3" json:"max_participants,omitempty"`
 	CreationTime     int64         `protobuf:"varint,5,opt,name=creation_time,json=creationTime,proto3" json:"creation_time,omitempty"`
