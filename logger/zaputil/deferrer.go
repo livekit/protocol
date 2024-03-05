@@ -74,15 +74,14 @@ func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 	resolve := func(args ...any) {
 		resolveOnce.Do(func() {
 			fields := make([]zapcore.Field, 0, len(args))
-			for i := 0; i < len(args); {
+			for i := 0; i < len(args); i++ {
 				switch arg := args[i].(type) {
 				case zapcore.Field:
 					fields = append(fields, arg)
-					i++
 				case string:
 					if i < len(args)-1 {
 						fields = append(fields, zap.Any(arg, args[i+1]))
-						i += 2
+						i++
 					}
 				}
 			}
