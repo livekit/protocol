@@ -19,6 +19,7 @@ import (
 	"math"
 	"regexp"
 	"sort"
+	"strconv"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -86,6 +87,51 @@ func SortDispatchRules(rules []*livekit.SIPDispatchRuleInfo) {
 	})
 }
 
+func printID(s string) string {
+	if s == "" {
+		return "<new>"
+	}
+	return s
+}
+
+// ValidateDispatchRules checks a set of dispatch rules for conflicts.
+func ValidateDispatchRules(rules []*livekit.SIPDispatchRuleInfo) error {
+	if len(rules) == 0 {
+		return nil
+	}
+	byPinAndTrunk := make(map[string]map[string]*livekit.SIPDispatchRuleInfo)
+	for _, r := range rules {
+		_, pin, err := GetPinAndRoom(r)
+		if err != nil {
+			return err
+		}
+		byTrunk := byPinAndTrunk[pin]
+		if byTrunk == nil {
+			byTrunk = make(map[string]*livekit.SIPDispatchRuleInfo)
+			byPinAndTrunk[pin] = byTrunk
+		}
+		if len(r.TrunkIds) == 0 {
+			// This rule matches all trunks, but collides only with other default ones (specific rules take priority).
+			if r2 := byTrunk[""]; r2 != nil {
+				return fmt.Errorf("Conflicting SIP Dispatch Rules: Same PIN for %q and %q",
+					printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
+			}
+			byTrunk[""] = r
+		} else {
+			// Check all specific rules for the same pin.
+			for _, trunk := range r.TrunkIds {
+				r2 := byTrunk[trunk]
+				if r2 != nil {
+					return fmt.Errorf("Conflicting SIP Dispatch Rules: Same PIN for %q and %q",
+						printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
+				}
+				byTrunk[trunk] = r
+			}
+		}
+	}
+	return nil
+}
+
 // SelectDispatchRule takes a list of dispatch rules, and takes the decision which one should be selected.
 // It returns an error if there are conflicting rules. Returns nil if no rules match.
 func SelectDispatchRule(rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
@@ -149,6 +195,48 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	return room, pin, nil
 }
 
+func printNumber(s string) string {
+	if s == "" {
+		return "<any>"
+	}
+	return strconv.Quote(s)
+}
+
+// ValidateTrunks checks a set of trunks for conflicts.
+func ValidateTrunks(trunks []*livekit.SIPTrunkInfo) error {
+	if len(trunks) == 0 {
+		return nil
+	}
+	byOutboundAndInbound := make(map[string]map[string]*livekit.SIPTrunkInfo)
+	for _, t := range trunks {
+		if len(t.InboundNumbersRegex) != 0 {
+			continue // can't effectively validate these
+		}
+		byInbound := byOutboundAndInbound[t.OutboundNumber]
+		if byInbound == nil {
+			byInbound = make(map[string]*livekit.SIPTrunkInfo)
+			byOutboundAndInbound[t.OutboundNumber] = byInbound
+		}
+		if len(t.InboundNumbers) == 0 {
+			if t2 := byInbound[""]; t2 != nil {
+				return fmt.Errorf("Conflicting SIP Trunks: %q and %q, using the same OutboundNumber %s without InboundNumbers set",
+					printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumber(t.OutboundNumber))
+			}
+			byInbound[""] = t
+		} else {
+			for _, num := range t.InboundNumbers {
+				t2 := byInbound[num]
+				if t2 != nil {
+					return fmt.Errorf("Conflicting SIP Trunks: %q and %q, using the same OutboundNumber %s and InboundNumber %q",
+						printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumber(t.OutboundNumber), num)
+				}
+				byInbound[num] = t
+			}
+		}
+	}
+	return nil
+}
+
 // MatchTrunk finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
 func MatchTrunk(trunks []*livekit.SIPTrunkInfo, calling, called string) (*livekit.SIPTrunkInfo, error) {
@@ -158,8 +246,19 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, calling, called string) (*liveki
 		defaultTrunkCnt int // to error in case there are multiple ones
 	)
 	for _, tr := range trunks {
-		// Do not consider it if regexp doesn't match.
-		matches := len(tr.InboundNumbersRegex) == 0
+		// Do not consider it if number doesn't match.
+		matches := len(tr.InboundNumbers) == 0
+		for _, exp := range tr.InboundNumbers {
+			if calling == exp {
+				matches = true
+				break
+			}
+		}
+		if !matches {
+			continue
+		}
+		// Deprecated, but we still check it for backward compatibility.
+		matchesRe := len(tr.InboundNumbersRegex) == 0
 		for _, reStr := range tr.InboundNumbersRegex {
 			// TODO: we should cache it
 			re, err := regexp.Compile(reStr)
@@ -168,11 +267,11 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, calling, called string) (*liveki
 				continue
 			}
 			if re.MatchString(calling) {
-				matches = true
+				matchesRe = true
 				break
 			}
 		}
-		if !matches {
+		if !matchesRe {
 			continue
 		}
 		if tr.OutboundNumber == "" {
