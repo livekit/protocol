@@ -24,9 +24,7 @@ import "google/protobuf/timestamp.proto";
 message Room {
   string sid = 1;
   string name = 2;
-  // seconds to wait for the first participant to join a room before closing
   uint32 empty_timeout = 3;
-  // seconds to wait after the last participant has left before closing
   uint32 departure_timeout = 14;
   uint32 max_participants = 4;
   int64 creation_time = 5;
