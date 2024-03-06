@@ -37,7 +37,6 @@ jobs:
 
       - name: Go mod tidy
         run: go mod tidy
-        working-directory: ./packages/golang
 
       - name: Install generators
         uses: magefile/mage-action@v3

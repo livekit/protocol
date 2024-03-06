@@ -46,7 +46,6 @@ jobs:
 
       - name: Download Go modules
         run: go mod download
-        working-directory: ./packages/golang
 
       - name: Static Check
         uses: amarpal/staticcheck-action@master
