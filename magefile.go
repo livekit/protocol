@@ -101,7 +101,7 @@ func Proto() error {
 		"--twirp_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
 		"--plugin=twirp=" + twirpPath,
-		"-I=../../protobufs",
+		"-I=./protobufs",
 	}, twirpProtoFiles...)
 	cmd := exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -116,7 +116,7 @@ func Proto() error {
 		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
 		"--plugin=go-grpc=" + protocGrpcGoPath,
-		"-I=../../protobufs",
+		"-I=./protobufs",
 	}, grpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -131,7 +131,7 @@ func Proto() error {
 		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
 		"--plugin=go-grpc=" + protocGrpcGoPath,
-		"-I=../../protobufs",
+		"-I=./protobufs",
 	}, infraProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -161,7 +161,7 @@ func Proto() error {
 		"--plugin=go=" + protocGoPath,
 		"--plugin=psrpc=" + psrpcPath,
 		"-I" + psrpcDir + "/protoc-gen-psrpc/options",
-		"-I=../../protobufs",
+		"-I=./protobufs",
 	}, psrpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	mageutil.ConnectStd(cmd)

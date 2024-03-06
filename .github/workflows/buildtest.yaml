@@ -43,7 +43,6 @@ jobs:
 
       - name: Set up gotestfmt
         run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.4.1
-        working-directory: ./packages/golang
 
       - name: Download Go modules
         run: go mod download
@@ -54,10 +53,8 @@ jobs:
         with:
           checks: '["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022", "-SA1019"]'
           install-go: false
-          working-directory: ./packages/golang
 
       - name: Test
         run: |
           set -euo pipefail
           MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
-        working-directory: ./packages/golang
