@@ -1,6 +1,10 @@
 {
   "private": true,
   "version": "0.0.1",
+  "scripts": {
+    "version": "changeset version",
+    "publish:ci": "pnpm --filter @livekit/protocol run build && changeset publish --dry-run"
+  },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
     "@livekit/changesets-changelog-github": "^0.0.4"
