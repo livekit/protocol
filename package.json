@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.10.1",
   "scripts": {
-    "version": "changeset version",
+    "changeset": "changeset version",
     "publish:ci": "pnpm --filter @livekit/protocol run build && changeset publish --dry-run"
   },
   "devDependencies": {
