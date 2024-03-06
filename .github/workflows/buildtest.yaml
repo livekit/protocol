@@ -17,41 +17,45 @@ name: Test
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
-    - uses: actions/cache@v4
-      with:
-        path: |
-          ~/go/pkg/mod
-          ~/go/bin
-          ~/.cache
-        key: livekit-protocol
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/go/bin
+            ~/.cache
+          key: livekit-protocol
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: 1.21
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.21
 
-    - name: Set up gotestfmt
-      run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.4.1
+      - name: Set up gotestfmt
+        run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.4.1
+        working-directory: ./packages/golang
 
-    - name: Download Go modules
-      run: go mod download
+      - name: Download Go modules
+        run: go mod download
+        working-directory: ./packages/golang
 
-    - name: Static Check
-      uses: amarpal/staticcheck-action@master
-      with:
-        checks: '["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022", "-SA1019"]'
-        install-go: false
+      - name: Static Check
+        uses: amarpal/staticcheck-action@master
+        with:
+          checks: '["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022", "-SA1019"]'
+          install-go: false
+          working-directory: ./packages/golang
 
-    - name: Test
-      run: |
-        set -euo pipefail
-        MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
+      - name: Test
+        run: |
+          set -euo pipefail
+          MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
+        working-directory: ./packages/golang
