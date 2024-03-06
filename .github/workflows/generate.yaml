@@ -37,18 +37,20 @@ jobs:
 
       - name: Go mod tidy
         run: go mod tidy
+        working-directory: ./packages/golang
 
       - name: Install generators
         uses: magefile/mage-action@v3
         with:
           version: latest
-          args: bootstrap
+
+      - name: Bootstrap
+        run: mage bootstrap
+        working-directory: ./packages/golang
 
       - name: Generate Protobuf
-        uses: magefile/mage-action@v3
-        with:
-          version: latest
-          args: proto
+        run: mage proto
+        working-directory: ./packages/golang
 
       - uses: pnpm/action-setup@v2
         with:
@@ -65,10 +67,10 @@ jobs:
         run: pnpm install
       - name: Generate JS files
         run: |
-          pnpm generate:proto
+          pnpm --filter @livekit/protocol run generate:proto
       - name: Add changes
         uses: EndBug/add-and-commit@v9
         with:
-          add: '["livekit", "rpc", "infra", "packages/js"]'
+          add: '["packages"]'
           default_author: github_actions
           message: generated protobuf
