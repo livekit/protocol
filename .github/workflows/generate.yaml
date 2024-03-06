@@ -43,6 +43,7 @@ jobs:
         uses: magefile/mage-action@v3
         with:
           version: latest
+          install-only: true
 
       - name: Bootstrap
         run: mage bootstrap
@@ -61,8 +62,7 @@ jobs:
           node-version: 20
           cache: "pnpm"
           cache-dependency-path: "packages/js/pnpm-lock.yaml"
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v3
+
       - name: Install dependencies
         run: pnpm install
       - name: Generate JS files
