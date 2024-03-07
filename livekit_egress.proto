@@ -219,6 +219,8 @@ message S3Upload {
   string tagging = 8;
   // Content-Disposition header
   string content_disposition = 9;
+  // Support none secure protocol
+  optional bool secure = 10; // (optional default true)
 }
 
 message GCPUpload {
