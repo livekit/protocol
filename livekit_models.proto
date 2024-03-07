@@ -212,10 +212,15 @@ message DataPacket {
     RELIABLE = 0;
     LOSSY = 1;
   }
-  Kind kind = 1;
+  Kind kind = 1 [deprecated=true];
+  // participant identity of user that sent the message
+  string participant_identity = 4;
+  // identities of participants who will receive the message (sent to all by default)
+  repeated string destination_identities = 5;
   oneof value {
     UserPacket user = 2;
-    ActiveSpeakerUpdate speaker = 3;
+    ActiveSpeakerUpdate speaker = 3 [deprecated=true];
+    SipDTMF sip_dtmf = 6;
   }
 }
 
@@ -233,18 +238,23 @@ message SpeakerInfo {
 
 message UserPacket {
   // participant ID of user that sent the message
-  string participant_sid = 1;
-  string participant_identity = 5;
+  string participant_sid = 1 [deprecated=true];
+  string participant_identity = 5 [deprecated=true];
   // user defined payload
   bytes payload = 2;
   // the ID of the participants who will receive the message (sent to all by default)
-  repeated string destination_sids = 3;
+  repeated string destination_sids = 3 [deprecated=true];
   // identities of participants who will receive the message (sent to all by default)
-  repeated string destination_identities = 6;
+  repeated string destination_identities = 6 [deprecated=true];
   // topic under which the message was published
   optional string topic = 4;
 
   // NEXT_ID: 7
+}
+
+message SipDTMF {
+  uint32 code = 3;
+  string digit = 4;
 }
 
 enum ConnectionQuality {
