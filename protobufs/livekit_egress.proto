@@ -225,6 +225,7 @@ message GCPUpload {
   // service account credentials serialized in JSON "credentials.json"
   string credentials = 1;
   string bucket = 2;
+  string endpoint = 3;
 }
 
 message AzureBlobUpload {
