@@ -213,13 +213,12 @@ message S3Upload {
   string secret = 2;
   string region = 3;
   string endpoint = 4;
-  ProxyConfig proxy = 10;
   string bucket = 5;
   bool force_path_style = 6;
   map<string, string> metadata = 7;
   string tagging = 8;
-  // Content-Disposition header
-  string content_disposition = 9;
+  string content_disposition = 9; // Content-Disposition header
+  ProxyConfig proxy = 10;
 }
 
 message GCPUpload {
