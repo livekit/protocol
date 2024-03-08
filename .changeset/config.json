@@ -5,7 +5,7 @@
     { "repo": "livekit/protocol" }
   ],
   "commit": false,
-  "fixed": [["livekit-protocol", "@livekit/protocol"]],
+  "fixed": [["github.com/livekit/protocol", "@livekit/protocol"]],
   "linked": [],
   "access": "public",
   "baseBranch": "main",
