@@ -4,7 +4,7 @@
   "version": "1.10.1",
   "scripts": {
     "changeset": "changeset",
-    "publish:ci": "pnpm --filter @livekit/protocol run build && changeset publish"
+    "ci:publish": "pnpm --filter @livekit/protocol run build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
