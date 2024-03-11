@@ -22,8 +22,9 @@ func (testConfigBuilder) New() (*TestConfig, error) {
 	return &TestConfig{}, nil
 }
 
-func (testConfigBuilder) InitDefaults(c *TestConfig) {
+func (testConfigBuilder) InitDefaults(c *TestConfig) error {
 	c.Bar = "c"
+	return nil
 }
 
 func TestConfigObserver(t *testing.T) {
