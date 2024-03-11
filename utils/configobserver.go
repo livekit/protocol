@@ -16,7 +16,7 @@ type ConfigBuilder[T any] interface {
 }
 
 type ConfigDefaulter[T any] interface {
-	InitDefaults(*T)
+	InitDefaults(*T) error
 }
 
 type ConfigObserver[T any] struct {
