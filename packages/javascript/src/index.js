@@ -1,4 +1,6 @@
+// @ts-check
 export * from "./gen/version.js";
+export * from "./gen/livekit_room_pb.js";
 export * from "./gen/livekit_agent_pb.js";
 export * from "./gen/livekit_models_pb.js";
 export * from "./gen/livekit_rtc_pb.js";
