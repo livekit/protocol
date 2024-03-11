@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.10.4
+
+### Patch Changes
+
+- Fix granular export paths - [#642](https://github.com/livekit/protocol/pull/642) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.10.3
 
 ### Patch Changes
