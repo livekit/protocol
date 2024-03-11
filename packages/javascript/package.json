@@ -13,33 +13,9 @@
       "types": "./src/index.d.ts",
       "default": "./src/index.js"
     },
-    "./models": {
-      "types": "./src/gen/livekit_models.pb.d.ts",
-      "default": "./src/gen/livekit_models.pb.js"
-    },
-    "./room": {
-      "types": "./src/gen/livekit_room.pb.d.ts",
-      "default": "./src/gen/livekit_room.pb.js"
-    },
-    "./sip": {
-      "types": "./src/gen/livekit_sip.pb.d.ts",
-      "default": "./src/gen/livekit_sip.pb.js"
-    },
-    "./egress": {
-      "types": "./src/gen/livekit_egress.pb.d.ts",
-      "default": "./src/gen/livekit_egress.pb.js"
-    },
-    "./ingress": {
-      "types": "./src/gen/livekit_ingress.pb.d.ts",
-      "default": "./src/gen/livekit_ingress.pb.js"
-    },
-    "./agent": {
-      "types": "./src/gen/livekit_agent.pb.d.ts",
-      "default": "./src/gen/livekit_agent.pb.js"
-    },
-    "./webhook": {
-      "types": "./src/gen/livekit_webhook.pb.d.ts",
-      "default": "./src/gen/livekit_webhook.pb.js"
+    "./*": {
+      "types": "./src/gen/livekit_*_pb.d.ts",
+      "default": "./src/gen/livekit_*_pb.js"
     }
   },
   "scripts": {
