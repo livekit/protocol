@@ -29,6 +29,10 @@
       "types": "./src/gen/livekit_egress.pb.d.ts",
       "default": "./src/gen/livekit_egress.pb.js"
     },
+    "./ingress": {
+      "types": "./src/gen/livekit_ingress.pb.d.ts",
+      "default": "./src/gen/livekit_ingress.pb.js"
+    },
     "./agent": {
       "types": "./src/gen/livekit_agent.pb.d.ts",
       "default": "./src/gen/livekit_agent.pb.js"
