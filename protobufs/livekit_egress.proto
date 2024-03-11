@@ -217,15 +217,15 @@ message S3Upload {
   bool force_path_style = 6;
   map<string, string> metadata = 7;
   string tagging = 8;
-  // Content-Disposition header
-  string content_disposition = 9;
+  string content_disposition = 9; // Content-Disposition header
+  ProxyConfig proxy = 10;
 }
 
 message GCPUpload {
   // service account credentials serialized in JSON "credentials.json"
   string credentials = 1;
   string bucket = 2;
-  string endpoint = 3;
+  ProxyConfig proxy = 3;
 }
 
 message AzureBlobUpload {
@@ -240,6 +240,12 @@ message AliOSSUpload {
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
+}
+
+message ProxyConfig {
+  string url = 1;
+  string username = 2;
+  string password = 3;
 }
 
 enum StreamProtocol {
