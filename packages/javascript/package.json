@@ -8,16 +8,45 @@
   "files": [
     "src"
   ],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./models": {
+      "types": "./src/gen/livekit_models.pb.d.ts",
+      "default": "./src/gen/livekit_models.pb.js"
+    },
+    "./room": {
+      "types": "./src/gen/livekit_room.pb.d.ts",
+      "default": "./src/gen/livekit_room.pb.js"
+    },
+    "./sip": {
+      "types": "./src/gen/livekit_sip.pb.d.ts",
+      "default": "./src/gen/livekit_sip.pb.js"
+    },
+    "./egress": {
+      "types": "./src/gen/livekit_egress.pb.d.ts",
+      "default": "./src/gen/livekit_egress.pb.js"
+    },
+    "./agent": {
+      "types": "./src/gen/livekit_agent.pb.d.ts",
+      "default": "./src/gen/livekit_agent.pb.js"
+    },
+    "./webhook": {
+      "types": "./src/gen/livekit_webhook.pb.d.ts",
+      "default": "./src/gen/livekit_webhook.pb.js"
+    }
+  },
   "scripts": {
     "generate:version": "genversion --esm --semi src/gen/version.js",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_rtc.proto ../../protobufs/livekit_models.proto ../../protobufs/livekit_agent.proto ../../protobufs/livekit_webhook.proto ../../protobufs/livekit_egress.proto ../../protobufs/livekit_ingress.proto ../../protobufs/livekit_sip.proto",
+    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_room.proto ../../protobufs/livekit_rtc.proto ../../protobufs/livekit_models.proto ../../protobufs/livekit_agent.proto ../../protobufs/livekit_webhook.proto ../../protobufs/livekit_egress.proto ../../protobufs/livekit_ingress.proto ../../protobufs/livekit_sip.proto",
     "build": "pnpm generate:version && pnpm generate:proto"
   },
   "keywords": [],
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@bufbuild/buf": "^1.29.0",
     "@bufbuild/protoc-gen-es": "^1.7.2",
     "genversion": "^3.2.0"
   },
