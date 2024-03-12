@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/puzpuzpuz/xsync"
+	"github.com/puzpuzpuz/xsync/v3"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -198,7 +198,7 @@ func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
 	zc := &zapConfig{
 		conf:          conf,
 		sc:            newSharedConfig(conf),
-		writeEnablers: xsync.NewMapOf[*zaputil.WriteEnabler](),
+		writeEnablers: xsync.NewMapOf[string, *zaputil.WriteEnabler](),
 		tap:           zaputil.NewDiscardWriteEnabler(),
 	}
 	for _, opt := range opts {
