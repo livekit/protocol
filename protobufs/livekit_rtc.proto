@@ -50,6 +50,10 @@ message SignalRequest {
     // update a participant's own metadata and/or name
     UpdateParticipantMetadata update_metadata = 15;
     Ping ping_req = 16;
+    // Update local audio track settings
+    UpdateLocalAudioTrack local_audio_track = 17;
+    // Update local video track settings
+    UpdateLocalVideoTrack local_video_track = 18;
   }
 }
 
@@ -221,6 +225,20 @@ message UpdateTrackSettings {
   // 2. when the network is congested, server will assign available bandwidth to
   //    higher priority tracks first. lowest priority tracks can be paused
   uint32 priority = 8;
+}
+
+
+
+message UpdateLocalAudioTrack {
+  string track_sid = 1;
+  repeated AudioTrackFeature = 2;
+}
+
+message UpdateLocalVideoTrack {
+  string track_sid = 1;
+  uint32 width = 2;
+  uint32 height = 3;
+  repeated VideoTrackFeature = 4;
 }
 
 message LeaveRequest {
