@@ -429,7 +429,7 @@ message RTPStats {
 
   RTPDrift packet_drift = 44;
   RTPDrift report_drift = 45;
-  RTPDrift receive_report_drift = 46;
+  RTPDrift rebased_report_drift = 46;
   // NEXT_ID: 47
 }
 
