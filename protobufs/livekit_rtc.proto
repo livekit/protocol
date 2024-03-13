@@ -231,14 +231,14 @@ message UpdateTrackSettings {
 
 message UpdateLocalAudioTrack {
   string track_sid = 1;
-  repeated AudioTrackFeature = 2;
+  repeated AudioTrackFeature features = 2;
 }
 
 message UpdateLocalVideoTrack {
   string track_sid = 1;
   uint32 width = 2;
   uint32 height = 3;
-  repeated VideoTrackFeature = 4;
+  repeated VideoTrackFeature features = 4;
 }
 
 message LeaveRequest {
