@@ -221,7 +221,9 @@ message DataPacket {
     UserPacket user = 2;
     ActiveSpeakerUpdate speaker = 3 [deprecated=true];
     SipDTMF sip_dtmf = 6;
+    Transcription transcription = 7;
   }
+  // NEXT_ID: 8
 }
 
 message ActiveSpeakerUpdate {
@@ -255,6 +257,21 @@ message UserPacket {
 message SipDTMF {
   uint32 code = 3;
   string digit = 4;
+}
+
+message Transcription {
+  string id = 1;
+  string participant_identity = 2;
+  string track_id = 3;
+  repeated TranscriptionSegment segments = 4;
+  string language = 5;
+}
+
+message TranscriptionSegment {
+  string text = 1;
+  int64 start_time = 2;
+  int64 end_time = 3;
+  bool final = 4;
 }
 
 enum ConnectionQuality {
