@@ -57,6 +57,14 @@ func (c *ConfigObserver[T]) Close() {
 	}
 }
 
+func (c *ConfigObserver[T]) EmitConfigUpdate(conf *T) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for e := c.cbs.Front(); e != nil; e = e.Next() {
+		go e.Value.(func(*T))(conf)
+	}
+}
+
 func (c *ConfigObserver[T]) Observe(cb func(*T)) func() {
 	if c == nil {
 		return func() {}
@@ -106,11 +114,7 @@ func (c *ConfigObserver[T]) reload(path string) error {
 		return err
 	}
 
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	for e := c.cbs.Front(); e != nil; e = e.Next() {
-		go e.Value.(func(*T))(conf)
-	}
+	c.EmitConfigUpdate(conf)
 	return nil
 }
 
