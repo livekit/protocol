@@ -381,7 +381,11 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	if rule.HidePhoneNumber {
 		// TODO: Decide on the phone masking format.
 		//       Maybe keep regional code, but mask all but 4 last digits?
-		from = from[len(from)-4:]
+		n := 4
+		if len(from) <= 4 {
+			n = 1
+		}
+		from = from[len(from)-n:]
 	}
 	fromName := "Phone " + from
 
