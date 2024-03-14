@@ -48,6 +48,10 @@ message InternalCreateSIPParticipantRequest {
 
   // optional websocket url that should be used when creating LiveKit participant
   string ws_url = 10;
+
+  // Optionally send following DTMF digits (extension codes) when making a call.
+  // Character 'w' can be used to add a 0.5 sec delay.
+  string dtmf = 11;
 }
 
 message InternalCreateSIPParticipantResponse {
