@@ -196,6 +196,10 @@ message CreateSIPParticipantRequest {
 
   // Optional identity of the participant in LiveKit room
   string participant_identity = 4;
+
+  // Optionally send following DTMF digits (extension codes) when making a call.
+  // Character 'w' can be used to add a 0.5 sec delay.
+  string dtmf = 5;
 }
 
 message SIPParticipantInfo {
