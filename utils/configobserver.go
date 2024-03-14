@@ -2,6 +2,7 @@ package utils
 
 import (
 	"container/list"
+	"fmt"
 	"os"
 	"sync"
 
@@ -61,7 +62,7 @@ func (c *ConfigObserver[T]) EmitConfigUpdate(conf *T) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	for e := c.cbs.Front(); e != nil; e = e.Next() {
-		go e.Value.(func(*T))(conf)
+		e.Value.(func(*T))(conf)
 	}
 }
 
@@ -125,14 +126,17 @@ func (c *ConfigObserver[T]) load(path string) (*T, error) {
 	}
 
 	if path != "" {
-		f, err := os.OpenFile(path, os.O_RDONLY, 0644)
+		b, err := os.ReadFile(path)
 		if err != nil {
 			return nil, err
 		}
-		defer f.Close()
 
-		if err := yaml.NewDecoder(f).Decode(conf); err != nil {
-			return nil, err
+		if len(b) == 0 {
+			return nil, fmt.Errorf("cannot parse config: file empty")
+		}
+
+		if err := yaml.Unmarshal(b, conf); err != nil {
+			return nil, fmt.Errorf("cannot parse config: %v", err)
 		}
 	}
 
