@@ -132,11 +132,11 @@ func (c *ConfigObserver[T]) load(path string) (*T, error) {
 		}
 
 		if len(b) == 0 {
-			return nil, fmt.Errorf("cannot parse config file: file empty")
+			return nil, fmt.Errorf("cannot parse config: file empty")
 		}
 
 		if err := yaml.Unmarshal(b, conf); err != nil {
-			return nil, fmt.Errorf("cannot parse config file: %v", err)
+			return nil, fmt.Errorf("cannot parse config: %v", err)
 		}
 	}
 
