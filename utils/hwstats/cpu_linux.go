@@ -14,7 +14,7 @@
 
 //go:build linux
 
-package utils
+package hwstats
 
 import (
 	"errors"

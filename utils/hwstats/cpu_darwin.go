@@ -12,30 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build !(linux || darwin)
+//go:build darwin
 
-package utils
+package hwstats
 
 import (
 	"runtime"
 
-	"github.com/livekit/protocol/logger"
 	"github.com/prometheus/procfs"
 )
 
-type nullStatCPUMonitor struct{}
-
-func (p *nullStatCPUMonitor) getCPUIdle() (float64, error) {
-	return float64(runtime.NumCPU()), nil
-}
-
-func (p *nullStatCPUMonitor) numCPU() float64 {
-	return float64(runtime.NumCPU())
-}
 func newPlatformCPUMonitor() (platformCPUMonitor, error) {
-	logger.Errorw("CPU monitoring unsupported on current platform. Server capacity management will be disabled", nil)
-
-	return &nullStatCPUMonitor{}, nil
+	return newOSStatCPUMonitor()
 }
 
 func getHostCPUCount(fs procfs.FS) (float64, error) {
