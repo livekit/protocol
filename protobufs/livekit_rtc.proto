@@ -51,9 +51,9 @@ message SignalRequest {
     UpdateParticipantMetadata update_metadata = 15;
     Ping ping_req = 16;
     // Update local audio track settings
-    UpdateLocalAudioTrack local_audio_track = 17;
+    UpdateLocalAudioTrack update_audio_track = 17;
     // Update local video track settings
-    UpdateLocalVideoTrack local_video_track = 18;
+    UpdateLocalVideoTrack update_video_track = 18;
   }
 }
 
