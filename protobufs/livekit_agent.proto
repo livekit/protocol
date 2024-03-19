@@ -51,14 +51,15 @@ message WorkerMessage {
         RegisterWorkerRequest register = 1;
         // worker confirms to server that it's available for a job, or declines it
         AvailabilityResponse availability = 2;
+
+        // worker can update its status to the server, including taking itself out of the pool
+	UpdateWorkerStatus update_worker = 3;
 	// job can send status updates to the server, useful for tracking progress
         UpdateJobStatus update_job = 4;
-        // worker can update its status to the server, including taking itself out of the pool
-	UpdateWorkerStatus update_worker = 5;
 
-	WorkerPing ping = 6;
-	SimulateJobRequest simulate_job = 7;
-	MigrateJobRequest migrate_job = 8;
+	WorkerPing ping = 5;
+	SimulateJobRequest simulate_job = 6;
+	MigrateJobRequest migrate_job = 7;
     };
 }
 
@@ -152,8 +153,7 @@ message UpdateJobStatus {
     // metadata shown on the dashboard, useful for debugging
     string error = 3;
 
-    // the user_data can be updated multiple times
-    // None = no update
+    // the metadata can be updated multiple times
     optional string metadata = 4;
     
     // The load that the job currently has on the worker
