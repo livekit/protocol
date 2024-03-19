@@ -38,7 +38,7 @@ message SignalRequest {
     // Immediately terminate session
     LeaveRequest leave = 8;
     // Update published video layers
-    UpdateVideoLayers update_layers = 10;
+    UpdateVideoLayers update_layers = 10; 
     // Update subscriber permissions
     SubscriptionPermission subscription_permission = 11;
     // sync client's subscribe state to server during reconnect
@@ -238,7 +238,6 @@ message UpdateLocalVideoTrack {
   string track_sid = 1;
   uint32 width = 2;
   uint32 height = 3;
-  repeated VideoTrackFeature features = 4;
 }
 
 message LeaveRequest {

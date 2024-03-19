@@ -461,7 +461,3 @@ enum AudioTrackFeature {
   TF_ENHANCED_NOISE_CANCELLATION = 5;
 }
 
-enum VideoTrackFeature {
-  TF_SIMULCAST = 0;
-}
-
