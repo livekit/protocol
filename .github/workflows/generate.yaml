@@ -17,42 +17,59 @@ name: Generate
 on:
   workflow_dispatch:
   push:
-    branches-ignore: [ main ]
+    branches-ignore: [main]
 
 jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
+      - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4
 
-    - name: Install Protoc
-      uses: arduino/setup-protoc@v2
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '>=1.20'
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.20"
 
-    - name: Go mod tidy
-      run: go mod tidy
+      - name: Go mod tidy
+        run: go mod tidy
 
-    - name: Install generators
-      uses: magefile/mage-action@v3
-      with:
-        version: latest
-        args: bootstrap
+      - name: Install generators
+        uses: magefile/mage-action@v3
+        with:
+          version: latest
+          install-only: true
 
-    - name: Generate Protobuf
-      uses: magefile/mage-action@v3
-      with:
-        version: latest
-        args: proto
+      - name: Bootstrap
+        run: mage bootstrap
 
-    - name: Add changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: '["livekit", "rpc", "infra"]'
-        default_author: github_actions
-        message: generated protobuf
+      - name: Generate Protobuf
+        run: mage proto
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install JS dependencies
+        run: pnpm install
+
+      - name: Test generate JS files
+        run: |
+          pnpm --filter @livekit/protocol run generate:proto
+
+      - name: Add changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: '["livekit", "rpc", "infra"]'
+          default_author: github_actions
+          message: generated protobuf

@@ -5,8 +5,9 @@ go 1.21
 require (
 	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/core v0.0.10
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gammazero/deque v0.2.1
-	github.com/go-jose/go-jose/v3 v3.0.2
+	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-logr/logr v1.4.1
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	github.com/jxskiss/base62 v1.1.0
@@ -21,7 +22,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
 	github.com/prometheus/procfs v0.12.0
-	github.com/puzpuzpuz/xsync v1.5.2
+	github.com/puzpuzpuz/xsync/v3 v3.1.0
 	github.com/redis/go-redis/v9 v9.5.1
 	github.com/stretchr/testify v1.9.0
 	github.com/twitchtv/twirp v8.1.3+incompatible
@@ -32,7 +33,7 @@ require (
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225
 	golang.org/x/mod v0.16.0
 	google.golang.org/grpc v1.62.0
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

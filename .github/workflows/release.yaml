@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Create Release Pull Request or Publish packages
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          # This expects you to have a script called ci:publish which does a build for your packages and calls changeset publish
+          publish: pnpm ci:publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create git tag for golang package
+        if: steps.changesets.outputs.published == 'true'
+        uses: rickstaa/action-create-tag@v1
+        id: tag_create
+        with:
+          tag: ${{format('v{0}', steps.changesets.outputs.publishedPackages[0].version)}}
+          tag_exists_error: false
+          message: "github.com/livekit/protocol@${{steps.changesets.outputs.publishedPackages.version}}"

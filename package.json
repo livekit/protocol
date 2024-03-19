@@ -1,0 +1,13 @@
+{
+  "name": "github.com/livekit/protocol",
+  "private": true,
+  "version": "1.11.0",
+  "scripts": {
+    "changeset": "changeset",
+    "ci:publish": "pnpm --filter @livekit/protocol run build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@livekit/changesets-changelog-github": "^0.0.4"
+  }
+}
