@@ -47,6 +47,6 @@ jobs:
         uses: rickstaa/action-create-tag@v1
         id: tag_create
         with:
-          tag: ${{ format('v{0}', steps.changesets.outputs.publishedPackages[0].version) }}
+          tag: ${{ format('v{0}', fromJson(steps.changesets.outputs.publishedPackages)[0].version) }}
           tag_exists_error: false
-          message: ${{ format('github.com/livekit/protocol@{0}', steps.changesets.outputs.publishedPackages[0].version) }}
+          message: ${{ format('github.com/livekit/protocol@{0}', fromJson(steps.changesets.outputs.publishedPackages)[0].version) }}
