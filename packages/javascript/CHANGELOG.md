@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.12.0
+
+### Patch Changes
+
+- Fixed bounds check when masking short SIP numbers. - [#650](https://github.com/livekit/protocol/pull/650) ([@dennwc](https://github.com/dennwc))
+
+- Add signal requests for local track updates - [#651](https://github.com/livekit/protocol/pull/651) ([@lukasIO](https://github.com/lukasIO))
+
+- Allow sending DTMF when creating SIP participant. - [#658](https://github.com/livekit/protocol/pull/658) ([@dennwc](https://github.com/dennwc))
+
 ## 1.11.0
 
 ### Minor Changes
