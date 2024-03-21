@@ -24,9 +24,9 @@ import (
 func TestTimedVersion(t *testing.T) {
 	t.Run("timed versions are monotonic and comparable", func(t *testing.T) {
 		gen := NewDefaultTimedVersionGenerator()
-		tv1 := gen.New()
-		tv2 := gen.New()
-		tv3 := gen.New()
+		tv1 := gen.Next()
+		tv2 := gen.Next()
+		tv3 := gen.Next()
 
 		require.True(t, tv3.After(tv1))
 		require.True(t, tv3.After(tv2))
@@ -44,28 +44,28 @@ func TestTimedVersion(t *testing.T) {
 
 	t.Run("protobuf roundtrip", func(t *testing.T) {
 		gen := NewDefaultTimedVersionGenerator()
-		tv1 := gen.New()
-		tv2 := NewTimedVersionFromProto(tv1.ToProto())
-		require.Equal(t, tv1.v.Load(), tv2.v.Load())
+		tv1 := gen.Next()
+		tv2 := TimedVersionFromProto(tv1.ToProto())
+		require.Equal(t, tv1, tv2)
 	})
 
 	t.Run("from zero time yields epoch version", func(t *testing.T) {
 		gen := NewDefaultTimedVersionGenerator()
-		tv1 := NewTimedVersionFromTime(time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC))
-		tv2 := gen.New()
+		tv1 := TimedVersionFromTime(time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC))
+		tv2 := gen.Next()
 		require.True(t, tv2.After(tv1))
 	})
 
 	t.Run("time.Time roundtrip", func(t *testing.T) {
 		ts1 := time.Now().Round(time.Microsecond)
-		tv1 := NewTimedVersionFromTime(ts1)
+		tv1 := TimedVersionFromTime(ts1)
 		ts2 := tv1.Time()
-		tv2 := NewTimedVersionFromTime(ts2)
+		tv2 := TimedVersionFromTime(ts2)
 		require.Equal(t, ts1, ts2)
-		require.Equal(t, tv1.v.Load(), tv2.v.Load())
+		require.Equal(t, tv1, tv2)
 	})
 
 	t.Run("timed version from nil is zero", func(t *testing.T) {
-		require.True(t, NewTimedVersionFromProto(nil).IsZero())
+		require.True(t, TimedVersionFromProto(nil).IsZero())
 	})
 }
