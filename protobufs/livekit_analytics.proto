@@ -123,6 +123,9 @@ message AnalyticsClientMeta {
   // udp, tcp, turn
   string connection_type = 5;
   ReconnectReason reconnect_reason = 6;
+  optional string geo_hash = 7;
+  optional string country = 8;
+  optional uint32 isp_asn = 9;
 }
 
 message AnalyticsEvent {
