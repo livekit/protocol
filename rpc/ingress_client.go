@@ -28,7 +28,7 @@ func NewIngressClient(params ClientParams) (IngressClient, error) {
 	if params.Bus == nil {
 		return nil, nil
 	}
-	opts := clientOptions(params)
+	opts := params.Options()
 
 	internalClient, err := NewIngressInternalClient(params.Bus, opts...)
 	if err != nil {

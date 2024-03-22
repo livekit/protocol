@@ -61,22 +61,22 @@ func NewClientParams(
 	}
 }
 
-func clientOptions(params ClientParams) []psrpc.ClientOption {
+func (p *ClientParams) Options() []psrpc.ClientOption {
 	opts := make([]psrpc.ClientOption, 0, 4)
-	if params.BufferSize != 0 {
-		opts = append(opts, psrpc.WithClientChannelSize(params.BufferSize))
+	if p.BufferSize != 0 {
+		opts = append(opts, psrpc.WithClientChannelSize(p.BufferSize))
 	}
-	if params.Observer != nil {
-		opts = append(opts, middleware.WithClientMetrics(params.Observer))
+	if p.Observer != nil {
+		opts = append(opts, middleware.WithClientMetrics(p.Observer))
 	}
-	if params.Logger != nil {
-		opts = append(opts, WithClientLogger(params.Logger))
+	if p.Logger != nil {
+		opts = append(opts, WithClientLogger(p.Logger))
 	}
-	if params.MaxAttempts != 0 || params.Timeout != 0 || params.Backoff != 0 {
+	if p.MaxAttempts != 0 || p.Timeout != 0 || p.Backoff != 0 {
 		opts = append(opts, middleware.WithRPCRetries(middleware.RetryOptions{
-			MaxAttempts: params.MaxAttempts,
-			Timeout:     params.Timeout,
-			Backoff:     params.Backoff,
+			MaxAttempts: p.MaxAttempts,
+			Timeout:     p.Timeout,
+			Backoff:     p.Backoff,
 		}))
 	}
 	return opts
@@ -130,7 +130,7 @@ type TypedRoomClient = RoomClient[RoomTopic]
 type TypedRoomServer = RoomServer[RoomTopic]
 
 func NewTypedRoomClient(params ClientParams) (TypedRoomClient, error) {
-	return NewRoomClient[RoomTopic](params.Bus, clientOptions(params)...)
+	return NewRoomClient[RoomTopic](params.Bus, params.Options()...)
 }
 
 func NewTypedRoomServer(svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomServer, error) {
@@ -142,7 +142,7 @@ type TypedParticipantClient = ParticipantClient[ParticipantTopic]
 type TypedParticipantServer = ParticipantServer[ParticipantTopic]
 
 func NewTypedParticipantClient(params ClientParams) (TypedParticipantClient, error) {
-	return NewParticipantClient[ParticipantTopic](params.Bus, clientOptions(params)...)
+	return NewParticipantClient[ParticipantTopic](params.Bus, params.Options()...)
 }
 
 func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedParticipantServer, error) {
@@ -161,7 +161,7 @@ type keepalivePubSub struct {
 }
 
 func NewKeepalivePubSub(params ClientParams) (KeepalivePubSub, error) {
-	client, err := NewKeepaliveClient[livekit.NodeID](params.Bus, clientOptions(params)...)
+	client, err := NewKeepaliveClient[livekit.NodeID](params.Bus, params.Options()...)
 	if err != nil {
 		return nil, err
 	}
