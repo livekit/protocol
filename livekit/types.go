@@ -22,10 +22,17 @@ type RoomID string
 type RoomName string
 type ConnectionID string
 type NodeID string
-type ParticipantKey string
+type RoomKey struct {
+	ProjectID string
+	RoomName  RoomName
+}
+type ParticipantKey struct {
+	RoomKey
+	Identity ParticipantIdentity
+}
 
 type stringTypes interface {
-	ParticipantID | RoomID | TrackID | ParticipantIdentity | ParticipantName | RoomName | ConnectionID | NodeID | ParticipantKey
+	ParticipantID | RoomID | TrackID | ParticipantIdentity | ParticipantName | RoomName | ConnectionID | NodeID
 }
 
 func IDsAsStrings[T stringTypes](ids []T) []string {
