@@ -42,7 +42,7 @@ service AgentInternal {
       multi: true
       topics: true
       topic_params: {
-        names: ["project_id"]
+        names: ["handler_namespace"]
         typed: false
       }
     };
@@ -56,4 +56,3 @@ message CheckEnabledResponse {
   bool publisher_enabled = 2;
   repeated string namespaces = 3;
 }
-
