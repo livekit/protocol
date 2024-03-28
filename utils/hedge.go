@@ -18,10 +18,7 @@ type HedgeParams[T any] struct {
 // race retries if the function takes to long to return
 // |---------------- attempt 1 ----------------|
 // |    delay    |--------- attempt 2 ---------|
-func HedgeCall[T any](
-	ctx context.Context,
-	params HedgeParams[T],
-) (v T, err error) {
+func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err error) {
 	ctx, cancel := context.WithTimeout(ctx, params.Timeout)
 	defer cancel()
 
