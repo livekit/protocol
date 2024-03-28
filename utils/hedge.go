@@ -45,7 +45,7 @@ func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err erro
 				delay.Reset(params.RetryDelay)
 			}
 		case res := <-ch:
-			if res.err == nil || params.IsRecoverable == nil || !params.IsRecoverable(err) {
+			if res.err == nil || params.IsRecoverable == nil || !params.IsRecoverable(res.err) {
 				return res.value, res.err
 			}
 			err = multierr.Append(err, res.err)
