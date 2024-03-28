@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.12.1
+
+### Patch Changes
+
+- Add initial support for slog. - [#668](https://github.com/livekit/protocol/pull/668) ([@dennwc](https://github.com/dennwc))
+
 ## 1.12.0
 
 ### Minor Changes
