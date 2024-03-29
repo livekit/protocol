@@ -200,6 +200,9 @@ message CreateSIPParticipantRequest {
   // Optionally send following DTMF digits (extension codes) when making a call.
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 5;
+
+  // Optionally play ringtone in the room as an audible indicator for existing participants
+  bool play_ringtone = 6;
 }
 
 message SIPParticipantInfo {
