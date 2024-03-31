@@ -75,7 +75,6 @@ message AnalyticsStat {
   string mime = 11;
   float min_score = 12;
   float median_score = 13;
-  string project_id = 14;
 }
 
 message AnalyticsStats {
@@ -150,7 +149,6 @@ message AnalyticsEvent {
   string error = 20;
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
-  string project_id = 23;
 
   // NEXT_ID: 24
 }
