@@ -170,8 +170,11 @@ message AnalyticsRoomParticipant {
 message AnalyticsRoom {
   string id = 1;
   string name = 2;
+  string project_id = 5;
   google.protobuf.Timestamp created_at = 3;
   repeated AnalyticsRoomParticipant participants = 4;
+
+  // NEXT_ID: 6
 }
 
 message AnalyticsNodeRooms {
