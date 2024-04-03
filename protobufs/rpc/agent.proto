@@ -27,16 +27,22 @@ service AgentInternal {
     option (psrpc.options).multi = true;
   };
   rpc JobRequest(livekit.Job) returns (google.protobuf.Empty) {
-    option (psrpc.options).affinity_func = true;
-    option (psrpc.options).topics = true;
+    option (psrpc.options) = {
+      affinity_func: true
+      topics: true
+      topic_params: {
+	names: ["namespace", "job_type"]
+	typed: false
+      }
+    };
   };
-  rpc AgentRegistered(google.protobuf.Empty) returns (CheckEnabledResponse) {
+  rpc WorkerRegistered(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (psrpc.options) = {
       subscription: true
       multi: true
       topics: true
       topic_params: {
-        names: ["project_id"]
+        names: ["handler_namespace"]
         typed: false
       }
     };
@@ -48,4 +54,5 @@ message CheckEnabledRequest{}
 message CheckEnabledResponse {
   bool room_enabled = 1;
   bool publisher_enabled = 2;
+  repeated string namespaces = 3;
 }
