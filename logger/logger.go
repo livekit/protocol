@@ -15,6 +15,7 @@
 package logger
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 	"sync"
@@ -39,6 +40,7 @@ func InitFromConfig(conf *Config, name string) {
 	l, err := NewZapLogger(conf)
 	if err == nil {
 		SetLogger(l, name)
+		slog.SetDefault(slog.New(ToSlogHandler(l)))
 	}
 }
 
