@@ -59,6 +59,8 @@ message AnalyticsStream {
   uint32 plis = 13;
   uint32 firs = 14;
   repeated AnalyticsVideoLayer video_layers = 15;
+  google.protobuf.Timestamp start_time = 17;
+  google.protobuf.Timestamp end_time = 18;
 }
 
 message AnalyticsStat {
