@@ -1,6 +1,10 @@
 package utils
 
-import "time"
+import (
+	"time"
+
+	"github.com/benbjohnson/clock"
+)
 
 type Clock interface {
 	Now() time.Time
@@ -18,3 +22,9 @@ func (clock *SystemClock) Now() time.Time {
 func (clock *SystemClock) Sleep(d time.Duration) {
 	time.Sleep(d)
 }
+
+type SimulatedClock struct{
+  clock.Mock
+}
+
+var _ Clock = &SimulatedClock{}
