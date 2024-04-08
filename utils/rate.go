@@ -23,15 +23,16 @@
 package utils
 
 import (
-	"sync/atomic"
 	"time"
+
+	"go.uber.org/atomic"
 )
 
 type LeakyBucket struct {
 	//lint:ignore U1000 Padding is unused but it is crucial to maintain performance
 	// of this rate limiter in case of collocation with other frequently accessed memory.
-	prepadding [64]byte // cache line size = 64; created to avoid false sharing.
-	state      int64    // unix nanoseconds of the next permissions issue.
+	prepadding [64]byte      // cache line size = 64; created to avoid false sharing.
+	state      *atomic.Int64 // unix nanoseconds of the next permissions issue.
 	//lint:ignore U1000 like prepadding.
 	postpadding [56]byte // cache line size - state size = 64 - 8; created to avoid false sharing.
 
@@ -45,7 +46,7 @@ func NewLeakyBucket(rateLimit int, slack time.Duration, clock Clock) *LeakyBucke
 	lb.SetRateLimit(rateLimit)
 	lb.maxSlack = slack * lb.perRequest
 	lb.clock = clock
-	atomic.StoreInt64(&lb.state, 0)
+	lb.state = atomic.NewInt64(0)
 	return &lb
 }
 
@@ -62,7 +63,7 @@ func (lb *LeakyBucket) Take() time.Time {
 	)
 	for {
 		now = lb.clock.Now().UnixNano()
-		timeOfNextPermissionIssue := atomic.LoadInt64(&lb.state)
+		timeOfNextPermissionIssue := lb.state.Load()
 
 		switch {
 		case timeOfNextPermissionIssue == 0 || (lb.maxSlack == 0 && now-timeOfNextPermissionIssue > int64(lb.perRequest)):
@@ -77,9 +78,9 @@ func (lb *LeakyBucket) Take() time.Time {
 			newTimeOfNextPermissionIssue = timeOfNextPermissionIssue + int64(lb.perRequest)
 		}
 
-		if atomic.CompareAndSwapInt64(&lb.state, timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
-			break
-		}
+    if lb.state.CompareAndSwap(timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
+      break
+    }
 	}
 
 	sleepDuration := time.Duration(newTimeOfNextPermissionIssue - now)

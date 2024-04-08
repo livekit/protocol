@@ -27,8 +27,6 @@ import (
 	"testing"
 	"time"
 
-	gotomic "sync/atomic"
-
 	"go.uber.org/atomic"
 
 	"github.com/benbjohnson/clock"
@@ -171,7 +169,7 @@ func runTest(t *testing.T, fn func(testRunner)) {
 					maxSlack:   time.Duration(config.slack) * perRequest,
 					clock:      config.clock,
 				}
-				gotomic.StoreInt64(&l.state, 0)
+        l.state = atomic.NewInt64(0)
 				return l
 			},
 		},
