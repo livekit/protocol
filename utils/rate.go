@@ -55,36 +55,36 @@ func (lb *LeakyBucket) SetRateLimit(rateLimit int) {
 
 // Take blocks to ensure that the time spent between multiple
 // Take calls is on average time.Second/rate.
-func (t *LeakyBucket) Take() time.Time {
+func (lb *LeakyBucket) Take() time.Time {
 	var (
 		newTimeOfNextPermissionIssue int64
 		now                          int64
 	)
 	for {
-		now = t.clock.Now().UnixNano()
-		timeOfNextPermissionIssue := atomic.LoadInt64(&t.state)
+		now = lb.clock.Now().UnixNano()
+		timeOfNextPermissionIssue := atomic.LoadInt64(&lb.state)
 
 		switch {
-		case timeOfNextPermissionIssue == 0 || (t.maxSlack == 0 && now-timeOfNextPermissionIssue > int64(t.perRequest)):
+		case timeOfNextPermissionIssue == 0 || (lb.maxSlack == 0 && now-timeOfNextPermissionIssue > int64(lb.perRequest)):
 			// if this is our first call or t.maxSlack == 0 we need to shrink issue time to now
 			newTimeOfNextPermissionIssue = now
-		case t.maxSlack > 0 && now-timeOfNextPermissionIssue > int64(t.maxSlack)+int64(t.perRequest):
+		case lb.maxSlack > 0 && now-timeOfNextPermissionIssue > int64(lb.maxSlack)+int64(lb.perRequest):
 			// a lot of nanoseconds passed since the last Take call
 			// we will limit max accumulated time to maxSlack
-			newTimeOfNextPermissionIssue = now - int64(t.maxSlack)
+			newTimeOfNextPermissionIssue = now - int64(lb.maxSlack)
 		default:
 			// calculate the time at which our permission was issued
-			newTimeOfNextPermissionIssue = timeOfNextPermissionIssue + int64(t.perRequest)
+			newTimeOfNextPermissionIssue = timeOfNextPermissionIssue + int64(lb.perRequest)
 		}
 
-		if atomic.CompareAndSwapInt64(&t.state, timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
+		if atomic.CompareAndSwapInt64(&lb.state, timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
 			break
 		}
 	}
 
 	sleepDuration := time.Duration(newTimeOfNextPermissionIssue - now)
 	if sleepDuration > 0 {
-		t.clock.Sleep(sleepDuration)
+		lb.clock.Sleep(sleepDuration)
 		return time.Unix(0, newTimeOfNextPermissionIssue)
 	}
 	// return now if we don't sleep as atomicLimiter does
