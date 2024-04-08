@@ -160,8 +160,13 @@ func runTest(t *testing.T, fn func(testRunner)) {
 			name: "mutex",
 			constructor: func(rate int, opts ...Option) Limiter {
 				config := buildConfig(opts)
-				rateLimit := int(time.Second) * rate / int(config.per)
-				return NewLeakyBucket(rateLimit, time.Duration(config.slack), config.clock)
+				perRequest := config.per / time.Duration(rate)
+				l := &LeakyBucket{
+					maxSlack: -1 * time.Duration(config.slack) * perRequest,
+					clock:    config.clock,
+				}
+				l.perRequest.Store(perRequest)
+				return l
 			},
 		},
 	}
@@ -261,7 +266,6 @@ func (r *runnerImpl) goWait(fn func()) {
 }
 
 func TestRateLimiter(t *testing.T) {
-	t.Skip(UnstableTest)
 	t.Parallel()
 	runTest(t, func(r testRunner) {
 		rl := r.createLimiter(100, WithoutSlack)
@@ -299,7 +303,6 @@ func TestDelayedRateLimiter(t *testing.T) {
 }
 
 func TestPer(t *testing.T) {
-	t.Skip(UnstableTest)
 	t.Parallel()
 	runTest(t, func(r testRunner) {
 		rl := r.createLimiter(7, WithoutSlack, Per(time.Minute))
@@ -315,7 +318,6 @@ func TestPer(t *testing.T) {
 
 // TestInitial verifies that the initial sequence is scheduled as expected.
 func TestInitial(t *testing.T) {
-	t.Skip(UnstableTest)
 	t.Parallel()
 	tests := []struct {
 		msg  string
@@ -376,7 +378,6 @@ func TestInitial(t *testing.T) {
 }
 
 func TestMaxSlack(t *testing.T) {
-	t.Skip(UnstableTest)
 	t.Parallel()
 	runTest(t, func(r testRunner) {
 		rl := r.createLimiter(1, WithSlack(1))
@@ -393,7 +394,6 @@ func TestMaxSlack(t *testing.T) {
 }
 
 func TestSlack(t *testing.T) {
-	t.Skip(UnstableTest)
 	t.Parallel()
 	// To simulate slack, we combine two limiters.
 	// - First, we start a single goroutine with both of them,
@@ -483,4 +483,34 @@ func TestSlack(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestSetRateLimitOnTheFly(t *testing.T) {
+	runTest(t, func(r testRunner) {
+		// Set rate to 1hz
+		limiter, ok := r.createLimiter(1, WithoutSlack).(*LeakyBucket)
+		if !ok {
+			t.Skip("SetRateLimit is not supported")
+		}
+
+		r.startTaking(limiter)
+		r.assertCountAt(time.Second, 2)
+
+		r.getClock().Add(time.Second)
+		r.assertCountAt(time.Second, 3)
+
+		// increase to 2hz
+		limiter.SetRateLimit(2)
+		r.getClock().Add(time.Second)
+		r.assertCountAt(time.Second, 4) // <- delayed due to paying sleepFor debt
+		r.getClock().Add(time.Second)
+		r.assertCountAt(time.Second, 6)
+
+		// reduce to 1hz again
+		limiter.SetRateLimit(1)
+		r.getClock().Add(time.Second)
+		r.assertCountAt(time.Second, 7)
+		r.getClock().Add(time.Second)
+		r.assertCountAt(time.Second, 8)
+	})
 }
