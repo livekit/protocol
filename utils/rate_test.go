@@ -157,20 +157,11 @@ func runTest(t *testing.T, fn func(testRunner)) {
 		constructor func(int, ...Option) Limiter
 	}{
 		{
-			name: "atomic_int64",
+			name: "mutex",
 			constructor: func(rate int, opts ...Option) Limiter {
-				// config := buildConfig(opts)
-				// rateLimit := int(time.Second) * rate / int(config.per)
-				// lb := NewLeakyBucket(rateLimit, time.Duration(config.slack), config.clock)
-				// return lb
 				config := buildConfig(opts)
-				perRequest := config.per / time.Duration(rate)
-				l := &LeakyBucket{
-					perRequest: perRequest,
-					maxSlack:   time.Duration(config.slack) * perRequest,
-					clock:      config.clock,
-				}
-				return l
+				rateLimit := int(time.Second) * rate / int(config.per)
+				return NewLeakyBucket(rateLimit, time.Duration(config.slack), config.clock)
 			},
 		},
 	}
