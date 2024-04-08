@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 //
+// Source: https://github.com/uber-go/ratelimit/blob/main/limiter_atomic_int64.go
 // EDIT: slight modification to allow setting rate limit on the fly
 // SCOPE: LeakyBucket
 package utils
