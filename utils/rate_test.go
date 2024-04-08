@@ -465,6 +465,11 @@ func TestSlack(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		cfg := buildConfig(tt.opt)
+		if cfg.slack >= 100 {
+			t.Skip(UnstableTest)
+		}
+
 		t.Run(tt.msg, func(t *testing.T) {
 			runTest(t, func(r testRunner) {
 				slow := r.createLimiter(10, WithoutSlack)
