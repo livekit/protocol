@@ -170,7 +170,6 @@ func runTest(t *testing.T, fn func(testRunner)) {
 					maxSlack:   time.Duration(config.slack) * perRequest,
 					clock:      config.clock,
 				}
-        l.state = atomic.NewInt64(0)
 				return l
 			},
 		},

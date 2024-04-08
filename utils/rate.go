@@ -31,8 +31,8 @@ import (
 type LeakyBucket struct {
 	//lint:ignore U1000 Padding is unused but it is crucial to maintain performance
 	// of this rate limiter in case of collocation with other frequently accessed memory.
-	prepadding [64]byte      // cache line size = 64; created to avoid false sharing.
-	state      *atomic.Int64 // unix nanoseconds of the next permissions issue.
+	prepadding [64]byte     // cache line size = 64; created to avoid false sharing.
+	state      atomic.Int64 // unix nanoseconds of the next permissions issue.
 	//lint:ignore U1000 like prepadding.
 	postpadding [56]byte // cache line size - state size = 64 - 8; created to avoid false sharing.
 
@@ -46,7 +46,6 @@ func NewLeakyBucket(rateLimit int, slack time.Duration, clock Clock) *LeakyBucke
 	lb.SetRateLimit(rateLimit)
 	lb.maxSlack = slack * lb.perRequest
 	lb.clock = clock
-	lb.state = atomic.NewInt64(0)
 	return &lb
 }
 
@@ -78,9 +77,9 @@ func (lb *LeakyBucket) Take() time.Time {
 			newTimeOfNextPermissionIssue = timeOfNextPermissionIssue + int64(lb.perRequest)
 		}
 
-    if lb.state.CompareAndSwap(timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
-      break
-    }
+		if lb.state.CompareAndSwap(timeOfNextPermissionIssue, newTimeOfNextPermissionIssue) {
+			break
+		}
 	}
 
 	sleepDuration := time.Duration(newTimeOfNextPermissionIssue - now)
