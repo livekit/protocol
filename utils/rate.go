@@ -31,7 +31,7 @@ import (
 )
 
 type LeakyBucket struct {
-	sync.Mutex
+	mutex      sync.Mutex
 	last       time.Time
 	sleepFor   time.Duration
 	perRequest atomic.Duration
@@ -49,6 +49,7 @@ func NewLeakyBucket(rateLimit int, slack time.Duration, clock Clock) *LeakyBucke
 
 // SetRateLimit sets the underlying rate limit.
 // The setting may not be applied immediately.
+//
 // SetRateLimit is THREAD SAFE and NON-BLOCKING.
 func (lb *LeakyBucket) SetRateLimit(rateLimit int) {
 	lb.perRequest.Store(time.Second / time.Duration(rateLimit))
@@ -56,10 +57,11 @@ func (lb *LeakyBucket) SetRateLimit(rateLimit int) {
 
 // Take blocks to ensure that the time spent between multiple Take calls
 // is on average time.Second/rate.
+//
 // Take is THREAD SAFE and BLOCKING.
 func (lb *LeakyBucket) Take() time.Time {
-	lb.Lock()
-	defer lb.Unlock()
+	lb.mutex.Lock()
+	defer lb.mutex.Unlock()
 
 	now := lb.clock.Now()
 
