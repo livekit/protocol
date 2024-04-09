@@ -3,6 +3,7 @@ module github.com/livekit/protocol
 go 1.21
 
 require (
+	github.com/benbjohnson/clock v1.3.5
 	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/core v0.0.10
 	github.com/fsnotify/fsnotify v1.7.0
