@@ -433,6 +433,8 @@ func (t *TimeSeries[T]) LinearExtrapolateTo(numSamplesToUse int, after time.Dura
 }
 
 func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) (float64, error) {
+	t.prune()
+
 	if t.samples.Len() < numSamplesToUse {
 		return 0.0, errNotEnoughSamples
 	}
