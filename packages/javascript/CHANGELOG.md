@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.13.0
+
+### Minor Changes
+
+- Add and option to play ringtone for SIP outbound calls. - [#671](https://github.com/livekit/protocol/pull/671) ([@dennwc](https://github.com/dennwc))
+
 ## 1.12.0
 
 ### Patch Changes
