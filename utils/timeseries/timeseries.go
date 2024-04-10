@@ -526,8 +526,8 @@ func (t *TimeSeries[T]) prune() {
 	thresh := t.welfordLast.Add(-t.params.Window)
 	//thresh := time.Now().Add(-t.params.Window)
 
-	for next, e := t.samples.Front(), (*list.Element)(nil); next != nil; {
-		e = next
+	for next := t.samples.Front(); next != nil; {
+		e := next
 		s := e.Value.(TimeSeriesSample[T])
 		if s.At.After(thresh) {
 			break
