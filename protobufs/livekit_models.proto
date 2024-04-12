@@ -250,8 +250,13 @@ message UserPacket {
   repeated string destination_identities = 6 [deprecated=true];
   // topic under which the message was published
   optional string topic = 4;
+  // Unique ID to indentify the message
+  optional string id = 8;
+  // start and end time allow relating the message to specific media time
+  optional uint64 start_time = 9;
+  optional uint64 end_time = 10;
 
-  // NEXT_ID: 7
+  // NEXT_ID: 11
 }
 
 message SipDTMF {
@@ -260,7 +265,6 @@ message SipDTMF {
 }
 
 message Transcription {
-  string id = 1;
   string participant_identity = 2;
   string track_id = 3;
   repeated TranscriptionSegment segments = 4;
@@ -268,10 +272,11 @@ message Transcription {
 }
 
 message TranscriptionSegment {
-  string text = 1;
-  int64 start_time = 2;
-  int64 end_time = 3;
-  bool final = 4;
+  string id = 1
+  string text = 2;
+  uint64 start_time = 3;
+  uint64 end_time = 4;
+  bool final = 5;
 }
 
 enum ConnectionQuality {
