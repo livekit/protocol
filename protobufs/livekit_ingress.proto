@@ -65,6 +65,7 @@ message IngressAudioOptions {
   oneof encoding_options {
     IngressAudioEncodingPreset preset = 3;
     IngressAudioEncodingOptions options = 4;
+    IngressAudioEncodingPassthrough passthrough = 5;
   }
 }
 
@@ -74,6 +75,7 @@ message IngressVideoOptions {
   oneof encoding_options {
     IngressVideoEncodingPreset preset = 3;
     IngressVideoEncodingOptions options = 4;
+    IngressVideoEncodingPassthrough passthrough = 5;
   }
 }
 
@@ -93,8 +95,6 @@ enum IngressVideoEncodingPreset {
   H264_540P_25FPS_2_LAYERS_HIGH_MOTION = 7;     //  960x540,  25fps, 1300kbps  main layer, 2 layers total, higher bitrate for high motion, harder to encode content
   H264_720P_30FPS_1_LAYER_HIGH_MOTION = 8;      // 1280x720,  30fps, 2500kbps, no simulcast, higher bitrate for high motion, harder to encode content
   H264_1080P_30FPS_1_LAYER_HIGH_MOTION = 9;     // 1980x1080, 30fps, 4500kbps, no simulcast, higher bitrate for high motion, harder to encode content
-
-
 }
 
 message IngressAudioEncodingOptions {
@@ -111,6 +111,12 @@ message IngressVideoEncodingOptions {
   double frame_rate = 2; 
   // simulcast layers to publish, when empty, should usually be set to layers at 1/2 and 1/4 of the dimensions
   repeated VideoLayer layers = 3;
+}
+
+message IngressAudioEncodingPassthrough {
+}
+
+message IngressVideoEncodingPassthrough {
 }
 
 message IngressInfo {
@@ -177,7 +183,7 @@ message UpdateIngressRequest {
   string participant_identity = 4;
   string participant_name = 5;
   string participant_metadata = 9;
-  optional bool bypass_transcoding = 8; 
+  optional bool bypass_transcoding = 8 [deprecated = true]; 
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 
