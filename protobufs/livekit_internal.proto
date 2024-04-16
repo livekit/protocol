@@ -130,6 +130,7 @@ message StartSession {
   string participant_id = 16;
   ReconnectReason reconnect_reason = 17;
   optional bool subscriber_allow_pause = 18;
+  ICEConfig ice_config = 19;
 }
 
 // room info that should not be returned to clients
