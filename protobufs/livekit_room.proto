@@ -20,6 +20,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
+import "livekit_agent.proto";
 import "livekit_egress.proto";
 
 // Room service that can be performed on any node
@@ -58,7 +59,10 @@ service RoomService {
   rpc SendData(SendDataRequest) returns (SendDataResponse);
 
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
-  rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
+  rpc UpdateRoomMetadata(UpdateRoomMetadataRequest) returns (Room);
+
+  // Start a new custom agent job
+  rpc StartAgentJob(StartAgentJobRequest) returns (StartAgentJobResponse);
 }
 
 message CreateRoomRequest {
@@ -190,3 +194,13 @@ message UpdateRoomMetadataRequest {
   // metadata to update. skipping updates if left empty
   string metadata = 2;
 }
+
+message StartAgentJobRequest {
+  string room = 1;
+  repeated string namespaces = 2; // empty = all registered namespaces
+}
+
+message StartAgentJobResponse {
+  Job job = 1;
+}
+
