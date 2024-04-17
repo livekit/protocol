@@ -43,6 +43,13 @@ type leakyBucketConfig struct {
 	maxSlack   time.Duration
 }
 
+// NewLeakyBucket initiates LeakyBucket with rateLimit, slack, and clock.
+//
+// rateLimit is defined as the number of request per second.
+//
+// slack is defined as the number of allowed requests before limiting.
+// e.g. when slack=5, LeakyBucket will allow 5 requests to pass through Take
+// without a sleep as long as these requests are under perRequest duration.
 func NewLeakyBucket(rateLimit int, slack int, clock Clock) *LeakyBucket {
 	var lb LeakyBucket
 	lb.clock = clock
