@@ -43,18 +43,18 @@ type leakyBucketConfig struct {
 	maxSlack   time.Duration
 }
 
-func NewLeakyBucket(rateLimit int, slack time.Duration, clock Clock) *LeakyBucket {
+func NewLeakyBucket(rateLimit int, slack int, clock Clock) *LeakyBucket {
 	var lb LeakyBucket
 	lb.clock = clock
 	lb.Update(rateLimit, slack)
 	return &lb
 }
 
-// Update sets the underlying rate limit.
+// Update sets the underlying rate limit and slack.
 // The setting may not be applied immediately.
 //
 // Update is THREAD SAFE and NON-BLOCKING.
-func (lb *LeakyBucket) Update(rateLimit int, slack time.Duration) {
+func (lb *LeakyBucket) Update(rateLimit int, slack int) {
 	perRequest := time.Second / time.Duration(rateLimit)
 	maxSlack := -1 * time.Duration(slack) * perRequest
 	cfg := leakyBucketConfig{
