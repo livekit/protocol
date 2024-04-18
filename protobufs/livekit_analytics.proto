@@ -24,6 +24,7 @@ import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
+import "livekit_sip.proto";
 
 service AnalyticsRecorderService {
   rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
@@ -112,6 +113,9 @@ enum AnalyticsEventType {
   INGRESS_STARTED = 16;
   INGRESS_ENDED = 17;
   INGRESS_UPDATED = 29;
+  SIP_CALL_CREATED = 30;
+  SIP_CALL_ENDED = 31;
+  SIP_CALL_UPDATED = 32;
 
   // NEXT_ID: 30
 }
@@ -151,8 +155,9 @@ message AnalyticsEvent {
   string error = 20;
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
+  SIPCallInfo sip_call = 24;
 
-  // NEXT_ID: 24
+  // NEXT_ID: 25
 }
 
 message AnalyticsEvents {

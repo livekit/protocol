@@ -20,6 +20,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/timestamp.proto";
+
 /*
    LiveKit's SIP API is built with 3 high level primitives
    - SIP Trunk
@@ -212,4 +214,36 @@ message SIPParticipantInfo {
   string participant_id = 1;
   string participant_identity = 2;
   string room_name = 3;
+}
+
+message SIPUri {
+  string full_uri = 1;
+  string user = 2; // SIP username or phone number
+  string host = 3; // SIP hostname
+}
+
+message SIPCallInfo {
+  enum Direction {
+    DIR_UNKNOWN = 0; // legacy
+    DIR_INBOUND = 1;
+    DIR_OUTBOUND = 2;
+  }
+  enum Status {
+    UNKNOWN = 0; // legacy
+    CREATED = 1; // call created, but not yet dialed
+    HANDSHAKE = 2; // SIP protocol handshake is ongoing
+    AUTOMATION = 3; // SIP call established, running automation (e.g. pin prompt or sending DTMF)
+    ACTIVE = 4; // SIP call active
+    ERROR = 5; // call failed
+    COMPLETE = 6; // call hangup
+  }
+  SIPUri from = 1;
+  SIPUri to = 2;
+  Direction dir = 3;
+  Status status = 4;
+  string error = 5; // error message, if any
+  SIPParticipantInfo participant = 6; // participant (only for active calls)
+  google.protobuf.Timestamp started_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  google.protobuf.Timestamp ended_at = 9;
 }
