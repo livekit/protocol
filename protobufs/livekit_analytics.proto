@@ -59,6 +59,8 @@ message AnalyticsStream {
   uint32 plis = 13;
   uint32 firs = 14;
   repeated AnalyticsVideoLayer video_layers = 15;
+  google.protobuf.Timestamp start_time = 17;
+  google.protobuf.Timestamp end_time = 18;
 }
 
 message AnalyticsStat {
@@ -75,7 +77,6 @@ message AnalyticsStat {
   string mime = 11;
   float min_score = 12;
   float median_score = 13;
-  string project_id = 14;
 }
 
 message AnalyticsStats {
@@ -123,6 +124,9 @@ message AnalyticsClientMeta {
   // udp, tcp, turn
   string connection_type = 5;
   ReconnectReason reconnect_reason = 6;
+  optional string geo_hash = 7;
+  optional string country = 8;
+  optional uint32 isp_asn = 9;
 }
 
 message AnalyticsEvent {
@@ -147,7 +151,6 @@ message AnalyticsEvent {
   string error = 20;
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
-  string project_id = 23;
 
   // NEXT_ID: 24
 }
@@ -167,8 +170,11 @@ message AnalyticsRoomParticipant {
 message AnalyticsRoom {
   string id = 1;
   string name = 2;
+  string project_id = 5;
   google.protobuf.Timestamp created_at = 3;
   repeated AnalyticsRoomParticipant participants = 4;
+
+  // NEXT_ID: 6
 }
 
 message AnalyticsNodeRooms {

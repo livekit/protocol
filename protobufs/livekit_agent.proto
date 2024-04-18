@@ -21,6 +21,15 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
+message WorkerInfo {
+    string id = 1;
+    string namespace = 2;
+    string version = 3;
+    string name = 4;
+    JobType type = 5;
+    ParticipantPermission allowed_permissions = 6;
+}
+
 message AgentInfo {
     string id = 1;
     string name = 2;
@@ -32,6 +41,7 @@ message Job {
     JobType type = 2;
     Room room = 3;
     optional ParticipantInfo participant = 4;
+    string namespace = 5;
 }
 
 // from Worker to Server
@@ -41,9 +51,15 @@ message WorkerMessage {
         RegisterWorkerRequest register = 1;
         // worker confirms to server that it's available for a job, or declines it
         AvailabilityResponse availability = 2;
+
         // worker can update its status to the server, including taking itself out of the pool
-        UpdateWorkerStatus status = 3;
-        JobStatusUpdate job_update = 4;
+	UpdateWorkerStatus update_worker = 3;
+	// job can send status updates to the server, useful for tracking progress
+        UpdateJobStatus update_job = 4;
+
+	WorkerPing ping = 5;
+	SimulateJobRequest simulate_job = 6;
+	MigrateJobRequest migrate_job = 7;
     };
 }
 
@@ -55,6 +71,7 @@ message ServerMessage {
         // server asks worker to confirm availability for a job
         AvailabilityRequest availability = 2;
         JobAssignment assignment = 3;
+	WorkerPong pong = 4;
     }
 }
 
@@ -74,38 +91,84 @@ enum JobStatus {
     JS_FAILED = 2;
 }
 
+message SimulateJobRequest {
+    JobType type = 1;
+    Room room = 2;
+    ParticipantInfo participant = 3;
+}
+
+message WorkerPing {
+    int64 timestamp = 1;
+}
+
+message WorkerPong {
+    int64 last_timestamp = 1;
+    int64 timestamp = 2;
+}
+
 message RegisterWorkerRequest {
     JobType type = 1;
-    string worker_id = 2;
+    //string worker_id = 2;
     string version = 3;
     string name = 4;
+    uint32 ping_interval = 5;
+    optional string namespace = 6;
+    ParticipantPermission allowed_permissions = 7;
 }
 
 message RegisterWorkerResponse {
     string worker_id = 1;
-    string server_version = 2;
+    ServerInfo server_info = 3;
+}
+
+message MigrateJobRequest {
+    string job_id = 1;
 }
 
 message AvailabilityRequest {
     Job job = 1;
+
+    // True when the job was previously assigned to another worker but has been 
+    // migrated due to different reasons (e.g. worker failure, job migration)
+    bool resuming = 2;
 }
+
 
 message AvailabilityResponse {
     string job_id = 1;
     bool available = 2;
+    bool supports_resume = 3;
+
+    string participant_name = 4;
+    string participant_identity = 5;
+    string participant_metadata = 6;
 }
 
-message JobStatusUpdate {
+message UpdateJobStatus {
     string job_id = 1;
-    JobStatus status = 2;
+
+    // The worker can indicate the job end by either specifying SUCCESS or FAILED
+    optional JobStatus status = 2;
+
+    // metadata shown on the dashboard, useful for debugging
     string error = 3;
-    string user_data = 4;
+
+    // the metadata can be updated multiple times
+    optional string metadata = 4;
+    
+    // The load that the job currently has on the worker
+    float load = 5;
+}
+
+message UpdateWorkerStatus {
+    optional WorkerStatus status = 1;
+    optional string metadata = 2;
+    float load = 3;
 }
 
 message JobAssignment {
     Job job = 1;
+    optional string url = 2;
+    string token = 3; 
 }
 
-message UpdateWorkerStatus {
-    WorkerStatus status = 1;
-}

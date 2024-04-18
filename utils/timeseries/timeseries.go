@@ -19,7 +19,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"sync"
 	"time"
 )
 
@@ -86,6 +85,28 @@ func (t TimeSeriesCompareOp) String() string {
 
 // ------------------------------------------------
 
+type ReverseIterator[T number] struct {
+	limit time.Time
+	e     *list.Element
+	s     TimeSeriesSample[T]
+}
+
+func (it *ReverseIterator[T]) Next() bool {
+	if it.e == nil {
+		return false
+	}
+
+	it.s = it.e.Value.(TimeSeriesSample[T])
+	it.e = it.e.Prev()
+	return it.s.At.After(it.limit)
+}
+
+func (it *ReverseIterator[T]) Value() TimeSeriesSample[T] {
+	return it.s
+}
+
+// ------------------------------------------------
+
 type number interface {
 	uint32 | uint64 | int | int32 | int64 | float32 | float64
 }
@@ -104,7 +125,6 @@ type TimeSeriesParams struct {
 type TimeSeries[T number] struct {
 	params TimeSeriesParams
 
-	lock           sync.RWMutex
 	samples        *list.List
 	activeSample   T
 	isActiveSample bool
@@ -127,9 +147,6 @@ func NewTimeSeries[T number](params TimeSeriesParams) *TimeSeries[T] {
 }
 
 func (t *TimeSeries[T]) UpdateSample(val T) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	if !t.isActiveSample {
 		t.isActiveSample = true
 		t.activeSample = val
@@ -153,9 +170,6 @@ func (t *TimeSeries[T]) CommitActiveSample() {
 }
 
 func (t *TimeSeries[T]) CommitActiveSampleAt(at time.Time) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	if !t.isActiveSample {
 		return
 	}
@@ -169,16 +183,10 @@ func (t *TimeSeries[T]) AddSample(val T) {
 }
 
 func (t *TimeSeries[T]) AddSampleAt(val T, at time.Time) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.addSampleAt(val, at)
 }
 
 func (t *TimeSeries[T]) GetSamples() []TimeSeriesSample[T] {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	samples := make([]TimeSeriesSample[T], 0, t.samples.Len())
@@ -189,9 +197,6 @@ func (t *TimeSeries[T]) GetSamples() []TimeSeriesSample[T] {
 }
 
 func (t *TimeSeries[T]) GetSamplesAfter(at time.Time) []TimeSeriesSample[T] {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	samples := make([]TimeSeriesSample[T], 0, t.samples.Len())
@@ -204,17 +209,20 @@ func (t *TimeSeries[T]) GetSamplesAfter(at time.Time) []TimeSeriesSample[T] {
 	return samples
 }
 
-func (t *TimeSeries[T]) ClearSamples() {
-	t.lock.Lock()
-	defer t.lock.Unlock()
+func (t *TimeSeries[T]) ReverseIterateSamplesAfter(at time.Time) ReverseIterator[T] {
+	t.prune()
 
+	return ReverseIterator[T]{
+		limit: at,
+		e:     t.samples.Back(),
+	}
+}
+
+func (t *TimeSeries[T]) ClearSamples() {
 	t.initSamples()
 }
 
 func (t *TimeSeries[T]) Sum() float64 {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	sum := float64(0.0)
@@ -226,10 +234,25 @@ func (t *TimeSeries[T]) Sum() float64 {
 	return sum
 }
 
-func (t *TimeSeries[T]) Min() T {
-	t.lock.Lock()
-	defer t.lock.Unlock()
+func (t *TimeSeries[T]) HasSamplesAfter(at time.Time) bool {
+	t.prune()
 
+	if e := t.samples.Back(); e != nil {
+		return e.Value.(TimeSeriesSample[T]).At.After(at)
+	}
+	return false
+}
+
+func (t *TimeSeries[T]) Back() TimeSeriesSample[T] {
+	t.prune()
+
+	if e := t.samples.Back(); e != nil {
+		return e.Value.(TimeSeriesSample[T])
+	}
+	return TimeSeriesSample[T]{}
+}
+
+func (t *TimeSeries[T]) Min() T {
 	t.prune()
 
 	return t.minLocked(t.samples.Len())
@@ -248,9 +271,6 @@ func (t *TimeSeries[T]) minLocked(numSamples int) T {
 }
 
 func (t *TimeSeries[T]) Max() T {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	return t.maxLocked(t.samples.Len())
@@ -269,9 +289,6 @@ func (t *TimeSeries[T]) maxLocked(numSamples int) T {
 }
 
 func (t *TimeSeries[T]) CurrentRun(threshold T, op TimeSeriesCompareOp) time.Duration {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	start := time.Time{}
@@ -311,16 +328,10 @@ func (t *TimeSeries[T]) CurrentRun(threshold T, op TimeSeriesCompareOp) time.Dur
 }
 
 func (t *TimeSeries[T]) OnlineAverage() float64 {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
-
 	return t.welfordM
 }
 
 func (t *TimeSeries[T]) OnlineVariance() float64 {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
-
 	return t.onlineVarianceLocked()
 }
 
@@ -333,9 +344,6 @@ func (t *TimeSeries[T]) onlineVarianceLocked() float64 {
 }
 
 func (t *TimeSeries[T]) OnlineStdDev() float64 {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
-
 	return t.onlineStdDevLocked()
 }
 
@@ -344,9 +352,6 @@ func (t *TimeSeries[T]) onlineStdDevLocked() float64 {
 }
 
 func (t *TimeSeries[T]) ZScore(val T) float64 {
-	t.lock.RLock()
-	defer t.lock.RUnlock()
-
 	onlineStdDev := t.onlineStdDevLocked()
 	if onlineStdDev != 0.0 {
 		return (float64(val) - t.welfordM) / onlineStdDev
@@ -356,9 +361,6 @@ func (t *TimeSeries[T]) ZScore(val T) float64 {
 }
 
 func (t *TimeSeries[T]) Slope() float64 {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	numSamples := t.samples.Len()
@@ -418,9 +420,6 @@ func (t *TimeSeries[T]) linearFitLocked(numSamples int) (slope float64, intercep
 }
 
 func (t *TimeSeries[T]) LinearExtrapolateTo(numSamplesToUse int, after time.Duration) (float64, error) {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
 	t.prune()
 
 	slope, intercept, startedAt, endedAt := t.linearFitLocked(numSamplesToUse)
@@ -434,11 +433,9 @@ func (t *TimeSeries[T]) LinearExtrapolateTo(numSamplesToUse int, after time.Dura
 }
 
 func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) (float64, error) {
-	t.lock.Lock()
 	t.prune()
 
 	if t.samples.Len() < numSamplesToUse {
-		t.lock.Unlock()
 		return 0.0, errNotEnoughSamples
 	}
 
@@ -453,7 +450,6 @@ func (t *TimeSeries[T]) KendallsTau(numSamplesToUse int) (float64, error) {
 		values[idx] = s.Value
 		idx--
 	}
-	t.lock.Unlock()
 
 	concordantPairs := 0
 	discordantPairs := 0
@@ -532,17 +528,14 @@ func (t *TimeSeries[T]) prune() {
 	thresh := t.welfordLast.Add(-t.params.Window)
 	//thresh := time.Now().Add(-t.params.Window)
 
-	toRemove := make([]*list.Element, 0, t.samples.Len())
-	for e := t.samples.Front(); e != nil; e = e.Next() {
+	for next := t.samples.Front(); next != nil; {
+		e := next
 		s := e.Value.(TimeSeriesSample[T])
 		if s.At.After(thresh) {
 			break
 		}
+		next = e.Next()
 
-		toRemove = append(toRemove, e)
-	}
-
-	for _, e := range toRemove {
 		t.samples.Remove(e)
 	}
 }

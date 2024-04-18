@@ -19,11 +19,11 @@ importers:
     dependencies:
       '@bufbuild/protobuf':
         specifier: ^1.7.2
-        version: 1.7.2
+        version: 1.8.0
     devDependencies:
       '@bufbuild/protoc-gen-es':
         specifier: ^1.7.2
-        version: 1.7.2(@bufbuild/protobuf@1.7.2)
+        version: 1.8.0(@bufbuild/protobuf@1.8.0)
       genversion:
         specifier: ^3.2.0
         version: 3.2.0
@@ -59,29 +59,29 @@ packages:
       regenerator-runtime: 0.14.1
     dev: true
 
-  /@bufbuild/protobuf@1.7.2:
-    resolution: {integrity: sha512-i5GE2Dk5ekdlK1TR7SugY4LWRrKSfb5T1Qn4unpIMbfxoeGKERKQ59HG3iYewacGD10SR7UzevfPnh6my4tNmQ==}
+  /@bufbuild/protobuf@1.8.0:
+    resolution: {integrity: sha512-qR9FwI8QKIveDnUYutvfzbC21UZJJryYrLuZGjeZ/VGz+vXelUkK+xgkOHsvPEdYEdxtgUUq4313N8QtOehJ1Q==}
 
-  /@bufbuild/protoc-gen-es@1.7.2(@bufbuild/protobuf@1.7.2):
-    resolution: {integrity: sha512-yiRk/T+YGmpSVvIkybCjPt+QyM/pLWMO+MAiz6auvCsiAgfXfc5nFFosD4yBYXID55M6eIkgBcity1AoJ6I30A==}
+  /@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0):
+    resolution: {integrity: sha512-jnvBKwHq3o/iOgfKxaxn5Za7ay4oAs8KWgoHiDc9Fsb0g+/d1z+mHlHvmevOiCPcVZsnH6V3LImOJvGStPONpA==}
     engines: {node: '>=14'}
     hasBin: true
     peerDependencies:
-      '@bufbuild/protobuf': 1.7.2
+      '@bufbuild/protobuf': 1.8.0
     peerDependenciesMeta:
       '@bufbuild/protobuf':
         optional: true
     dependencies:
-      '@bufbuild/protobuf': 1.7.2
-      '@bufbuild/protoplugin': 1.7.2
+      '@bufbuild/protobuf': 1.8.0
+      '@bufbuild/protoplugin': 1.8.0
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /@bufbuild/protoplugin@1.7.2:
-    resolution: {integrity: sha512-N3QtO8XWD4F4alMtASWtxBw6BWXp4aLz7rPBXH4KTULdjpUHnq46g15TsrG0/8szZw6pIklTO3lFe14dl6ZYdA==}
+  /@bufbuild/protoplugin@1.8.0:
+    resolution: {integrity: sha512-Pb89cTshW+I577qh27VvxGYvZEvQ3zJ8La1OfzPCKugP9d4A4P65WStkAY+aSCiDHk68m1/+mtBb6elfiLPuFg==}
     dependencies:
-      '@bufbuild/protobuf': 1.7.2
+      '@bufbuild/protobuf': 1.8.0
       '@typescript/vfs': 1.5.0
       typescript: 4.5.2
     transitivePeerDependencies:

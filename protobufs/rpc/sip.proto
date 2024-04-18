@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package rpc;
 
-option go_package = "github.com/livekit/livekit/pkg/service/rpc";
+option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
 
@@ -48,6 +48,13 @@ message InternalCreateSIPParticipantRequest {
 
   // optional websocket url that should be used when creating LiveKit participant
   string ws_url = 10;
+
+  // Optionally send following DTMF digits (extension codes) when making a call.
+  // Character 'w' can be used to add a 0.5 sec delay.
+  string dtmf = 11;
+
+  // Optionally play ringtone in the room as an audible indicator for existing participants
+  bool play_ringtone = 12;
 }
 
 message InternalCreateSIPParticipantResponse {

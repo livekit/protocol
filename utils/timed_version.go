@@ -22,8 +22,6 @@ import (
 	"sync"
 	"time"
 
-	"go.uber.org/atomic"
-
 	"github.com/livekit/protocol/livekit"
 )
 
@@ -33,19 +31,18 @@ const tickMask uint64 = (1 << tickBits) - 1
 var epoch = time.Date(2000, 0, 0, 0, 0, 0, 0, time.UTC).UnixMicro()
 
 type TimedVersionGenerator interface {
-	New() *TimedVersion
 	Next() TimedVersion
 }
 
-func timedVersionComponents(v uint64) (ts int64, ticks int32) {
-	return int64(v>>tickBits) + epoch, int32(v & tickMask)
+func timedVersionComponents(v TimedVersion) (ts int64, ticks int32) {
+	return int64(v>>tickBits) + epoch, int32(uint64(v) & tickMask)
 }
 
 func timedVersionFromComponents(ts int64, ticks int32) TimedVersion {
 	if ts < epoch {
 		ts = epoch
 	}
-	return TimedVersion{v: *atomic.NewUint64((uint64(ts-epoch) << tickBits) | uint64(ticks))}
+	return TimedVersion((uint64(ts-epoch) << tickBits) | uint64(ticks))
 }
 
 type timedVersionGenerator struct {
@@ -90,19 +87,7 @@ func (g *timedVersionGenerator) Next() TimedVersion {
 	}
 }
 
-type TimedVersion struct {
-	v atomic.Uint64
-}
-
-func NewTimedVersionFromProto(proto *livekit.TimedVersion) *TimedVersion {
-	v := timedVersionFromComponents(proto.GetUnixMicro(), proto.GetTicks())
-	return &v
-}
-
-func NewTimedVersionFromTime(t time.Time) *TimedVersion {
-	v := timedVersionFromComponents(t.UnixMicro(), 0)
-	return &v
-}
+type TimedVersion uint64
 
 func TimedVersionFromProto(proto *livekit.TimedVersion) TimedVersion {
 	return timedVersionFromComponents(proto.GetUnixMicro(), proto.GetTicks())
@@ -112,74 +97,67 @@ func TimedVersionFromTime(t time.Time) TimedVersion {
 	return timedVersionFromComponents(t.UnixMicro(), 0)
 }
 
-func (t *TimedVersion) Update(other *TimedVersion) bool {
+func (t *TimedVersion) Update(other TimedVersion) bool {
 	return t.Upgrade(other)
 }
 
-func (t *TimedVersion) Upgrade(other *TimedVersion) bool {
-	return t.update(other, func(ov, prev uint64) bool { return ov > prev })
-}
-
-func (t *TimedVersion) Downgrade(other *TimedVersion) bool {
-	return t.update(other, func(ov, prev uint64) bool { return ov < prev })
-}
-
-func (t *TimedVersion) update(other *TimedVersion, cmp func(ov, prev uint64) bool) bool {
-	ov := other.v.Load()
-	for {
-		prev := t.v.Load()
-		if !cmp(ov, prev) {
-			return false
-		}
-		if t.v.CompareAndSwap(prev, ov) {
-			return true
-		}
+func (t *TimedVersion) Upgrade(other TimedVersion) bool {
+	if *t < other {
+		*t = other
+		return true
 	}
+	return false
 }
 
-func (t *TimedVersion) Store(other *TimedVersion) {
-	t.v.Store(other.v.Load())
+func (t *TimedVersion) Downgrade(other TimedVersion) bool {
+	if *t > other {
+		*t = other
+		return true
+	}
+	return false
 }
 
-func (t *TimedVersion) Load() TimedVersion {
-	return TimedVersion{v: *atomic.NewUint64(t.v.Load())}
+func (t *TimedVersion) Store(other TimedVersion) {
+	*t = other
 }
 
-func (t *TimedVersion) After(other *TimedVersion) bool {
-	return t.v.Load() > other.v.Load()
+func (t TimedVersion) Load() TimedVersion {
+	return t
 }
 
-func (t *TimedVersion) Compare(other *TimedVersion) int {
-	ov := other.v.Load()
-	v := t.v.Load()
-	if v < ov {
+func (t TimedVersion) After(other TimedVersion) bool {
+	return t > other
+}
+
+func (t TimedVersion) Compare(other TimedVersion) int {
+	if t < other {
 		return -1
 	}
-	if v == ov {
+	if t == other {
 		return 0
 	}
 	return 1
 }
 
-func (t *TimedVersion) IsZero() bool {
-	return t.v.Load() == 0
+func (t TimedVersion) IsZero() bool {
+	return t == 0
 }
 
-func (t *TimedVersion) ToProto() *livekit.TimedVersion {
-	ts, ticks := timedVersionComponents(t.v.Load())
+func (t TimedVersion) ToProto() *livekit.TimedVersion {
+	ts, ticks := timedVersionComponents(t)
 	return &livekit.TimedVersion{
 		UnixMicro: ts,
 		Ticks:     ticks,
 	}
 }
 
-func (t *TimedVersion) Time() time.Time {
-	ts, _ := timedVersionComponents(t.v.Load())
+func (t TimedVersion) Time() time.Time {
+	ts, _ := timedVersionComponents(t)
 	return time.UnixMicro(ts)
 }
 
-func (t *TimedVersion) String() string {
-	ts, ticks := timedVersionComponents(t.v.Load())
+func (t TimedVersion) String() string {
+	ts, ticks := timedVersionComponents(t)
 	return fmt.Sprintf("%d.%d", ts, ticks)
 }
 
@@ -188,7 +166,7 @@ func (t TimedVersion) Value() (driver.Value, error) {
 		return nil, nil
 	}
 
-	ts, ticks := timedVersionComponents(t.v.Load())
+	ts, ticks := timedVersionComponents(t)
 	b := make([]byte, 0, 12)
 	b = binary.BigEndian.AppendUint64(b, uint64(ts))
 	b = binary.BigEndian.AppendUint32(b, uint32(ticks))
@@ -200,7 +178,7 @@ func (t *TimedVersion) Scan(src interface{}) (err error) {
 	case []byte:
 		switch len(b) {
 		case 0:
-			t.v.Store(0)
+			*t = 0
 		case 12:
 			ts := int64(binary.BigEndian.Uint64(b))
 			ticks := int32(binary.BigEndian.Uint32(b[8:]))
@@ -209,7 +187,7 @@ func (t *TimedVersion) Scan(src interface{}) (err error) {
 			return errors.New("(*TimedVersion).Scan: unsupported format")
 		}
 	case nil:
-		t.v.Store(0)
+		*t = 0
 	default:
 		return errors.New("(*TimedVersion).Scan: unsupported data type")
 	}

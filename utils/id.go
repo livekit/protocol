@@ -41,13 +41,15 @@ const (
 	WHIPResourcePrefix    = "WH_"
 	RTMPResourcePrefix    = "RT_"
 	URLResourcePrefix     = "UR_"
+	AgentWorkerPrefix     = "AW_"
+	AgentJobPrefix        = "AJ_"
 )
 
 func NewGuid(prefix string) string {
 	return prefix + shortuuid.New()[:GuidSize]
 }
 
-// Creates a hashed ID from a unique string
+// HashedID creates a hashed ID from a unique string
 func HashedID(id string) string {
 	h := sha1.New()
 	h.Write([]byte(id))

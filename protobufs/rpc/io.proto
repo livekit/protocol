@@ -16,7 +16,7 @@ syntax = "proto3";
 
 package rpc;
 
-option go_package = "github.com/livekit/livekit/pkg/service/rpc";
+option go_package = "github.com/livekit/protocol/rpc";
 
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
@@ -31,7 +31,7 @@ service IOInfo {
   rpc UpdateMetrics(UpdateMetricsRequest) returns (google.protobuf.Empty);
 
   // ingress
-  rpc CreateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);  
+  rpc CreateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
 

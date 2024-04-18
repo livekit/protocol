@@ -15,6 +15,7 @@
 package timeseries
 
 import (
+	"slices"
 	"testing"
 	"time"
 
@@ -122,7 +123,17 @@ func TestTimeSeries(t *testing.T) {
 				})
 			}
 		}
-		require.Equal(t, expectedSamples, ts.GetSamplesAfter(now.Add(5*time.Second)))
+
+		threshold := now.Add(5 * time.Second)
+		require.True(t, ts.HasSamplesAfter(threshold))
+		require.Equal(t, expectedSamples, ts.GetSamplesAfter(threshold))
+
+		history := make([]TimeSeriesSample[uint32], 0, 4)
+		for it := ts.ReverseIterateSamplesAfter(threshold); it.Next(); {
+			history = append(history, it.Value())
+		}
+		slices.Reverse(history)
+		require.Equal(t, expectedSamples, ts.GetSamplesAfter(threshold))
 	})
 
 	t.Run("sum", func(t *testing.T) {

@@ -56,7 +56,7 @@ func NewEgressClient(params ClientParams) (EgressClient, error) {
 		return nil, nil
 	}
 
-	opts := clientOptions(params)
+	opts := params.Options()
 	timeout := params.Timeout
 	if timeout < 10*time.Second {
 		timeout = 10 * time.Second

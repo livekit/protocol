@@ -305,6 +305,7 @@ message ServerInfo {
   string node_id = 5;
   // additional debugging information. sent only if server is in development mode
   string debug_info = 6;
+  int32 agent_protocol = 7;
 }
 
 // details about the client
@@ -451,7 +452,8 @@ message RTPStats {
 
   RTPDrift packet_drift = 44;
   RTPDrift report_drift = 45;
-  // NEXT_ID: 46
+  RTPDrift rebased_report_drift = 46;
+  // NEXT_ID: 47
 }
 
 message TimedVersion {
@@ -472,3 +474,13 @@ enum SubscriptionError {
   SE_CODEC_UNSUPPORTED = 1;
   SE_TRACK_NOTFOUND = 2;
 }
+
+enum AudioTrackFeature {
+  TF_STEREO = 0;
+  TF_NO_DTX = 1;
+  TF_AUTO_GAIN_CONTROL = 2;
+  TF_ECHO_CANCELLATION = 3;
+  TF_NOISE_SUPPRESSION = 4;
+  TF_ENHANCED_NOISE_CANCELLATION = 5;
+}
+
