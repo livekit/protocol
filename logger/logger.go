@@ -169,6 +169,7 @@ type zapConfig struct {
 	conf          *Config
 	sc            *sharedConfig
 	writeEnablers *xsync.MapOf[string, *zaputil.WriteEnabler]
+	levelEnablers *xsync.MapOf[string, *zaputil.OrLevelEnabler]
 	tap           *zaputil.WriteEnabler
 }
 
@@ -180,9 +181,14 @@ func WithTap(tap *zaputil.WriteEnabler) ZapLoggerOption {
 	}
 }
 
+type ZapComponentLeveler interface {
+	ComponentLevel(component string) zapcore.LevelEnabler
+}
+
 type ZapLogger interface {
 	Logger
 	ToZap() *zap.SugaredLogger
+	ComponentLeveler() ZapComponentLeveler
 }
 
 type zapLogger[T zaputil.Encoder[T]] struct {
@@ -201,6 +207,7 @@ func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
 		conf:          conf,
 		sc:            newSharedConfig(conf),
 		writeEnablers: xsync.NewMapOf[string, *zaputil.WriteEnabler](),
+		levelEnablers: xsync.NewMapOf[string, *zaputil.OrLevelEnabler](),
 		tap:           zaputil.NewDiscardWriteEnabler(),
 	}
 	for _, opt := range opts {
@@ -252,6 +259,25 @@ func (l *zapLogger[T]) ToZap() *zap.SugaredLogger {
 	}
 
 	return l.zap.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core { return c }))
+}
+
+type zapLoggerComponentLeveler[T zaputil.Encoder[T]] struct {
+	zl *zapLogger[T]
+}
+
+func (l zapLoggerComponentLeveler[T]) ComponentLevel(component string) zapcore.LevelEnabler {
+	if l.zl.component != "" {
+		component = l.zl.component + "." + component
+	}
+
+	enab, _ := l.zl.levelEnablers.LoadOrCompute(component, func() *zaputil.OrLevelEnabler {
+		return &zaputil.OrLevelEnabler{l.zl.sc.ComponentLevel(component), l.zl.tap}
+	})
+	return enab
+}
+
+func (l *zapLogger[T]) ComponentLeveler() ZapComponentLeveler {
+	return zapLoggerComponentLeveler[T]{l}
 }
 
 func (l *zapLogger[T]) Debugw(msg string, keysAndValues ...interface{}) {

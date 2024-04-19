@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/livekit/protocol/logger/zaputil"
@@ -98,6 +99,22 @@ func TestLoggerComponent(t *testing.T) {
 		require.NotEqual(t, "", log.Caller)
 		require.Equal(t, "foo", log.Msg)
 		require.Equal(t, "baz", log.Bar)
+	})
+
+	t.Run("component enabler for tapped logger returns lowest enabled level", func(t *testing.T) {
+		tapLevel := zap.NewAtomicLevel()
+		l, err := NewZapLogger(&Config{Level: "info"}, WithTap(zaputil.NewWriteEnabler(&testBufferedWriteSyncer{}, tapLevel)))
+		require.NoError(t, err)
+
+		lvl := l.ComponentLeveler().ComponentLevel("foo")
+
+		// check config level
+		require.False(t, lvl.Enabled(zapcore.DebugLevel))
+		require.True(t, lvl.Enabled(zapcore.InfoLevel))
+
+		// check tap level
+		tapLevel.SetLevel(zapcore.DebugLevel)
+		require.True(t, lvl.Enabled(zapcore.DebugLevel))
 	})
 }
 
