@@ -12,30 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package zaputil
 
-import (
-	"context"
-	"testing"
-	"time"
+import "go.uber.org/zap/zapcore"
 
-	"github.com/stretchr/testify/require"
-	"go.uber.org/atomic"
-)
+type OrLevelEnabler [2]zapcore.LevelEnabler
 
-func TestHedgeCall(t *testing.T) {
-	var attempts atomic.Uint32
-	res, err := HedgeCall(context.Background(), HedgeParams[uint32]{
-		Timeout:     200 * time.Millisecond,
-		RetryDelay:  50 * time.Millisecond,
-		MaxAttempts: 2,
-		Func: func(context.Context) (uint32, error) {
-			n := attempts.Add(1)
-			time.Sleep(75 * time.Millisecond)
-			return n, nil
-		},
-	})
-	require.NoError(t, err)
-	require.EqualValues(t, 1, res)
-	require.EqualValues(t, 2, attempts.Load())
+func (e OrLevelEnabler) Enabled(lvl zapcore.Level) bool {
+	return e[0].Enabled(lvl) || e[1].Enabled(lvl)
 }
