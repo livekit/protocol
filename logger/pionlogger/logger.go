@@ -15,13 +15,15 @@
 package pionlogger
 
 import (
+	"strings"
+
 	"github.com/pion/logging"
 
 	"github.com/livekit/protocol/logger"
 )
 
 var (
-	pionIgnoredPrefixes = map[string][]string{
+	pionIgnoredPrefixes = map[string]prefixSet{
 		"ice": {
 			"pingAllCandidates called with no candidate pairs",
 			"failed to send packet: io: read/write on closed pipe",
@@ -47,6 +49,17 @@ var (
 		},
 	}
 )
+
+type prefixSet []string
+
+func (s prefixSet) Match(msg string) bool {
+	for _, prefix := range s {
+		if strings.HasPrefix(msg, prefix) {
+			return true
+		}
+	}
+	return false
+}
 
 func NewLoggerFactory(l logger.Logger) logging.LoggerFactory {
 	if zl, ok := l.(logger.ZapLogger); ok {
