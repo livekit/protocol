@@ -135,7 +135,7 @@ func (g *guidGenerator) readIDChars(b []byte) {
 	var n int
 	for {
 		r := g.uint32()
-		for i := 0; i < 10; i++ {
+		for i := 0; i < 5; i++ {
 			if int(r&0x3f) < len(b57Chars) {
 				b[n] = b57Chars[r&0x3f]
 				n++
