@@ -150,7 +150,7 @@ func (g *guidGenerator) readIDChars(b []byte) {
 
 func (g *guidGenerator) NewGuid(prefix string) string {
 	b := g.pool.Get().(*[]byte)
-	g.pool.Put(b)
+	defer g.pool.Put(b)
 
 	*b = append((*b)[:0], make([]byte, len(prefix)+GuidSize)...)
 	copy(*b, prefix)
