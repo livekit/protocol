@@ -117,9 +117,6 @@ func (g *guidGenerator) refillBuf() {
 }
 
 func (g *guidGenerator) uint32() uint32 {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	if g.pos == len(g.buf) {
 		g.refillBuf()
 		g.pos = 0
@@ -132,6 +129,9 @@ func (g *guidGenerator) uint32() uint32 {
 }
 
 func (g *guidGenerator) readIDChars(b []byte) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
 	var n int
 	for {
 		r := g.uint32()
