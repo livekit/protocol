@@ -30,3 +30,13 @@ func TestMarshalUnmarshalGuid(t *testing.T) {
 	require.EqualValues(t, id0, id1)
 	require.EqualValues(t, b0, b1)
 }
+
+func BenchmarkNewGuid(b *testing.B) {
+	b.Run("new", func(b *testing.B) {
+		var guid string
+		for i := 0; i < b.N; i++ {
+			guid = NewGuid(TrackPrefix)
+		}
+		_ = guid
+	})
+}

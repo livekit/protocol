@@ -15,14 +15,19 @@
 package utils
 
 import (
+	"crypto/rand"
 	"crypto/sha1"
+	"encoding/binary"
 	"fmt"
 	"os"
+	"sync"
+	"time"
 
 	"github.com/jxskiss/base62"
 	"github.com/lithammer/shortuuid/v4"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/logger"
 )
 
 const GuidSize = 12
@@ -45,8 +50,10 @@ const (
 	AgentJobPrefix        = "AJ_"
 )
 
+var defaultGuidGenerator = newGuidGenerator(4096, GuidSize+10)
+
 func NewGuid(prefix string) string {
-	return prefix + shortuuid.New()[:GuidSize]
+	return defaultGuidGenerator.NewGuid(prefix)
 }
 
 // HashedID creates a hashed ID from a unique string
@@ -66,15 +73,89 @@ func LocalNodeID() (string, error) {
 	return fmt.Sprintf("%s%s", NodePrefix, HashedID(hostname)[:8]), nil
 }
 
-var b62Index = newB62Index()
-var b62Chars = []byte(shortuuid.DefaultAlphabet)
+var b57Index = newB57Index()
+var b57Chars = []byte(shortuuid.DefaultAlphabet)
 
-func newB62Index() [256]byte {
+func newB57Index() [256]byte {
 	var index [256]byte
-	for i := 0; i < len(b62Chars); i++ {
-		index[b62Chars[i]] = byte(i)
+	for i := 0; i < len(b57Chars); i++ {
+		index[b57Chars[i]] = byte(i)
 	}
 	return index
+}
+
+type guidGenerator struct {
+	pool sync.Pool
+	mu   sync.Mutex
+	buf  []byte
+	pos  int
+}
+
+func newGuidGenerator(bufSize, scratchSize int) *guidGenerator {
+	return &guidGenerator{
+		pool: sync.Pool{
+			New: func() any {
+				b := make([]byte, scratchSize)
+				return &b
+			},
+		},
+		buf: make([]byte, bufSize),
+		pos: bufSize,
+	}
+}
+
+func (g *guidGenerator) refillBuf() {
+	for {
+		_, err := rand.Read(g.buf)
+		if err == nil {
+			return
+		}
+
+		logger.Errorw("unable to refill guid buffer", err)
+		time.Sleep(time.Millisecond)
+	}
+}
+
+func (g *guidGenerator) uint32() uint32 {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+
+	if g.pos == len(g.buf) {
+		g.refillBuf()
+		g.pos = 0
+	}
+
+	n := binary.BigEndian.Uint32(g.buf[g.pos:])
+	g.pos += 4
+
+	return n
+}
+
+func (g *guidGenerator) readIDChars(b []byte) {
+	var n int
+	for {
+		r := g.uint32()
+		for i := 0; i < 10; i++ {
+			if int(r&0x3f) < len(b57Chars) {
+				b[n] = b57Chars[r&0x3f]
+				n++
+				if n == len(b) {
+					return
+				}
+			}
+			r >>= 6
+		}
+	}
+}
+
+func (g *guidGenerator) NewGuid(prefix string) string {
+	b := g.pool.Get().(*[]byte)
+	g.pool.Put(b)
+
+	*b = append((*b)[:0], make([]byte, len(prefix)+GuidSize)...)
+	copy(*b, prefix)
+	g.readIDChars((*b)[len(prefix):])
+	return string(*b)
 }
 
 func guidPrefix[T livekit.Guid]() string {
@@ -97,9 +178,9 @@ func MarshalGuid[T livekit.Guid](id T) livekit.GuidBlock {
 	for i := 0; i < 3; i++ {
 		j := i * 3
 		k := i * 4
-		b[j] = b62Index[idb[k]]<<2 | b62Index[idb[k+1]]>>4
-		b[j+1] = b62Index[idb[k+1]]<<4 | b62Index[idb[k+2]]>>2
-		b[j+2] = b62Index[idb[k+2]]<<6 | b62Index[idb[k+3]]
+		b[j] = b57Index[idb[k]]<<2 | b57Index[idb[k+1]]>>4
+		b[j+1] = b57Index[idb[k+1]]<<4 | b57Index[idb[k+2]]>>2
+		b[j+2] = b57Index[idb[k+2]]<<6 | b57Index[idb[k+3]]
 	}
 	return b
 }
@@ -112,10 +193,10 @@ func UnmarshalGuid[T livekit.Guid](b livekit.GuidBlock) T {
 	for i := 0; i < 3; i++ {
 		j := i * 3
 		k := i * 4
-		idb[k] = b62Chars[b[j]>>2]
-		idb[k+1] = b62Chars[(b[j]&3)<<4|b[j+1]>>4]
-		idb[k+2] = b62Chars[(b[j+1]&15)<<2|b[j+2]>>6]
-		idb[k+3] = b62Chars[b[j+2]&63]
+		idb[k] = b57Chars[b[j]>>2]
+		idb[k+1] = b57Chars[(b[j]&3)<<4|b[j+1]>>4]
+		idb[k+2] = b57Chars[(b[j+1]&15)<<2|b[j+2]>>6]
+		idb[k+3] = b57Chars[b[j+2]&63]
 	}
 	return T(id)
 }
