@@ -15,13 +15,15 @@
 package pionlogger
 
 import (
+	"strings"
+
 	"github.com/pion/logging"
 
 	"github.com/livekit/protocol/logger"
 )
 
 var (
-	pionIgnoredPrefixes = map[string][]string{
+	pionIgnoredPrefixes = map[string]prefixSet{
 		"ice": {
 			"pingAllCandidates called with no candidate pairs",
 			"failed to send packet: io: read/write on closed pipe",
@@ -48,20 +50,50 @@ var (
 	}
 )
 
-// LoggerFactory implements webrtc.LoggerFactory interface
-type LoggerFactory struct {
+type prefixSet []string
+
+func (s prefixSet) Match(msg string) bool {
+	for _, prefix := range s {
+		if strings.HasPrefix(msg, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func NewLoggerFactory(l logger.Logger) logging.LoggerFactory {
+	if zl, ok := l.(logger.ZapLogger); ok {
+		return &zapLoggerFactory{zl}
+	}
+	return &loggerFactory{l}
+}
+
+// zapLoggerFactory implements logging.LoggerFactory interface for zap loggers
+type zapLoggerFactory struct {
+	logger logger.ZapLogger
+}
+
+func (f *zapLoggerFactory) NewLogger(scope string) logging.LeveledLogger {
+	return &zapLogAdapter{
+		logger:          f.logger,
+		level:           f.logger.ComponentLeveler().ComponentLevel(formatComponent(scope)),
+		scope:           scope,
+		ignoredPrefixes: pionIgnoredPrefixes[scope],
+	}
+}
+
+// loggerFactory implements logging.LoggerFactory interface for generic loggers
+type loggerFactory struct {
 	logger logger.Logger
 }
 
-func NewLoggerFactory(logger logger.Logger) *LoggerFactory {
-	return &LoggerFactory{
-		logger: logger,
+func (f *loggerFactory) NewLogger(scope string) logging.LeveledLogger {
+	return &logAdapter{
+		logger:          f.logger.WithComponent(formatComponent(scope)).WithCallDepth(1),
+		ignoredPrefixes: pionIgnoredPrefixes[scope],
 	}
 }
 
-func (f *LoggerFactory) NewLogger(scope string) logging.LeveledLogger {
-	return &logAdapter{
-		logger:          f.logger.WithComponent("pion." + scope).WithCallDepth(1),
-		ignoredPrefixes: pionIgnoredPrefixes[scope],
-	}
+func formatComponent(scope string) string {
+	return "pion." + scope
 }

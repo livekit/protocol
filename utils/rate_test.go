@@ -32,6 +32,7 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 const UnstableTest = "UNSTABLE TEST"
@@ -161,11 +162,14 @@ func runTest(t *testing.T, fn func(testRunner)) {
 			constructor: func(rate int, opts ...Option) Limiter {
 				config := buildConfig(opts)
 				perRequest := config.per / time.Duration(rate)
-				l := &LeakyBucket{
-					maxSlack: -1 * time.Duration(config.slack) * perRequest,
-					clock:    config.clock,
+				cfg := leakyBucketConfig{
+					perRequest: perRequest,
+					maxSlack:   -1 * time.Duration(config.slack) * perRequest,
 				}
-				l.perRequest.Store(perRequest)
+				l := &LeakyBucket{
+					clock: config.clock,
+				}
+				l.cfg.Store(&cfg)
 				return l
 			},
 		},
@@ -495,7 +499,7 @@ func TestSetRateLimitOnTheFly(t *testing.T) {
 		// Set rate to 1hz
 		limiter, ok := r.createLimiter(1, WithoutSlack).(*LeakyBucket)
 		if !ok {
-			t.Skip("SetRateLimit is not supported")
+			t.Skip("Update is not supported")
 		}
 
 		r.startTaking(limiter)
@@ -505,17 +509,23 @@ func TestSetRateLimitOnTheFly(t *testing.T) {
 		r.assertCountAt(time.Second, 3)
 
 		// increase to 2hz
-		limiter.SetRateLimit(2)
+		limiter.Update(2, 0)
 		r.getClock().Add(time.Second)
 		r.assertCountAt(time.Second, 4) // <- delayed due to paying sleepFor debt
 		r.getClock().Add(time.Second)
 		r.assertCountAt(time.Second, 6)
 
 		// reduce to 1hz again
-		limiter.SetRateLimit(1)
+		limiter.Update(1, 0)
 		r.getClock().Add(time.Second)
 		r.assertCountAt(time.Second, 7)
 		r.getClock().Add(time.Second)
 		r.assertCountAt(time.Second, 8)
+
+		slack := 3
+		require.GreaterOrEqual(t, limiter.sleepFor, time.Duration(0))
+		limiter.Update(1, slack)
+		r.getClock().Add(time.Second * time.Duration(slack))
+		r.assertCountAt(time.Second, 8+slack)
 	})
 }

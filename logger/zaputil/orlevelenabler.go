@@ -12,31 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package zaputil
 
-import (
-	"testing"
+import "go.uber.org/zap/zapcore"
 
-	"github.com/stretchr/testify/require"
+type OrLevelEnabler [2]zapcore.LevelEnabler
 
-	"github.com/livekit/protocol/livekit"
-)
-
-func TestMarshalUnmarshalGuid(t *testing.T) {
-	id0 := livekit.TrackID(NewGuid(TrackPrefix))
-	b0 := MarshalGuid(id0)
-	id1 := UnmarshalGuid[livekit.TrackID](b0)
-	b1 := MarshalGuid(id1)
-	require.EqualValues(t, id0, id1)
-	require.EqualValues(t, b0, b1)
-}
-
-func BenchmarkNewGuid(b *testing.B) {
-	b.Run("new", func(b *testing.B) {
-		var guid string
-		for i := 0; i < b.N; i++ {
-			guid = NewGuid(TrackPrefix)
-		}
-		_ = guid
-	})
+func (e OrLevelEnabler) Enabled(lvl zapcore.Level) bool {
+	return e[0].Enabled(lvl) || e[1].Enabled(lvl)
 }

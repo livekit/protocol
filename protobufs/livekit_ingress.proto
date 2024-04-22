@@ -157,8 +157,11 @@ message IngressState {
   string room_id = 5; // ID of the current/previous room published to
   int64 started_at = 7;
   int64 ended_at = 8;
+  int64 updated_at = 10;
   string resource_id = 9;
   repeated TrackInfo tracks = 6;
+
+  // next ID: 11
 }
 
 message InputVideoState {
