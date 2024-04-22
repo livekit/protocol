@@ -32,6 +32,7 @@ service Ingress {
 }
 
 message CreateIngressRequest {
+  uint32 api_version = 11;
   IngressInput input_type = 1;
   // Where to pull media from, only for URL input type
   string url = 9;
@@ -45,10 +46,11 @@ message CreateIngressRequest {
   string participant_name = 5;
   // metadata associated with the publishing participant
   string participant_metadata = 10;
-  // whether to pass through the incoming media without transcoding, only compatible with some input types
-  bool bypass_transcoding = 8; 
+  bool bypass_transcoding = 8  [deprecated = true]; 
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
+
+   // NEXT_ID: 12
 }
 
 enum IngressInput {
@@ -120,6 +122,7 @@ message IngressVideoEncodingPassthrough {
 }
 
 message IngressInfo {
+  uint32 api_version = 15;
   string ingress_id = 1;
   string name = 2;
   string stream_key = 3;
@@ -128,7 +131,7 @@ message IngressInfo {
   // for FILE input, it'll be a http:// URL
   // for SRT input, it'll be a srt:// URL
   IngressInput input_type = 5;
-  bool bypass_transcoding = 13; 
+  bool bypass_transcoding = 13 [deprecated = true]; 
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
   string room_name = 8;
@@ -138,7 +141,7 @@ message IngressInfo {
   bool reusable = 11;
   IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
 
-  // NEXT_ID: 15
+  // NEXT_ID: 16
 }
 
 message IngressState {
@@ -180,6 +183,7 @@ message InputAudioState {
 }
 
 message UpdateIngressRequest {
+  uint32 api_version = 10;
   string ingress_id = 1;
   string name = 2;
   string room_name = 3;
@@ -190,7 +194,7 @@ message UpdateIngressRequest {
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 
-  // NEXT_ID: 10
+  // NEXT_ID: 11
 }
 
 message ListIngressRequest {
