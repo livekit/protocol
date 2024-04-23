@@ -72,12 +72,12 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return err
 	}
 
-	err = ValidateVideoOptionsConsistency(info.InputType, info.Video)
+	err = ValidateVideoOptionsConsistency(info.Video)
 	if err != nil {
 		return err
 	}
 
-	err = ValidateAudioOptionsConsistency(info.InputType, info.Audio)
+	err = ValidateAudioOptionsConsistency(info.Audio)
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func ValidateEnableTranscoding(info *livekit.IngressInfo) error {
 	return nil
 }
 
-func ValidateVideoOptionsConsistency(inputType livekit.IngressInput, options *livekit.IngressVideoOptions) error {
+func ValidateVideoOptionsConsistency(options *livekit.IngressVideoOptions) error {
 	if options == nil {
 		return nil
 	}
@@ -229,7 +229,7 @@ func ValidateVideoEncodingOptionsConsistency(options *livekit.IngressVideoEncodi
 	return nil
 }
 
-func ValidateAudioOptionsConsistency(inputType livekit.IngressInput, options *livekit.IngressAudioOptions) error {
+func ValidateAudioOptionsConsistency(options *livekit.IngressAudioOptions) error {
 	if options == nil {
 		return nil
 	}
