@@ -145,24 +145,24 @@ func TestValidateEnableTranscoding(t *testing.T) {
 
 func TestValidateVideoOptionsConsistency(t *testing.T) {
 	video := &livekit.IngressVideoOptions{}
-	err := ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err := ValidateVideoOptionsConsistency(video)
 	require.NoError(t, err)
 
 	video.Source = livekit.TrackSource_MICROPHONE
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.Source = livekit.TrackSource_CAMERA
 	video.EncodingOptions = &livekit.IngressVideoOptions_Preset{
 		Preset: livekit.IngressVideoEncodingPreset(42),
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.EncodingOptions = &livekit.IngressVideoOptions_Preset{
 		Preset: livekit.IngressVideoEncodingPreset_H264_1080P_30FPS_1_LAYER,
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.NoError(t, err)
 
 	video.EncodingOptions = &livekit.IngressVideoOptions_Options{
@@ -170,7 +170,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			VideoCodec: livekit.VideoCodec_H264_HIGH,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.EncodingOptions = &livekit.IngressVideoOptions_Options{
@@ -178,13 +178,13 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			VideoCodec: livekit.VideoCodec_DEFAULT_VC,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.NoError(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
 		&livekit.VideoLayer{},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
@@ -193,7 +193,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			Height: 480,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.NoError(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
@@ -202,7 +202,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			Height: 480,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
@@ -217,7 +217,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			Quality: livekit.VideoQuality_LOW,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.NoError(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
@@ -232,7 +232,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			Quality: livekit.VideoQuality_HIGH,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
@@ -247,7 +247,7 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			Quality: livekit.VideoQuality_LOW,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+	err = ValidateVideoOptionsConsistency(video)
 	require.Error(t, err)
 
 	video.EncodingOptions.(*livekit.IngressVideoOptions_Options).Options.Layers = []*livekit.VideoLayer{
@@ -262,30 +262,31 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 			Quality: livekit.VideoQuality_HIGH,
 		},
 	}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
+
+	err = ValidateVideoOptionsConsistency(video)
 	require.NoError(t, err)
 }
 
 func TestValidateAudioOptionsConsistency(t *testing.T) {
 	audio := &livekit.IngressAudioOptions{}
-	err := ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err := ValidateAudioOptionsConsistency(audio)
 	require.NoError(t, err)
 
 	audio.Source = livekit.TrackSource_CAMERA
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err = ValidateAudioOptionsConsistency(audio)
 	require.Error(t, err)
 
 	audio.Source = livekit.TrackSource_SCREEN_SHARE_AUDIO
 	audio.EncodingOptions = &livekit.IngressAudioOptions_Preset{
 		Preset: livekit.IngressAudioEncodingPreset(42),
 	}
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err = ValidateAudioOptionsConsistency(audio)
 	require.Error(t, err)
 
 	audio.EncodingOptions = &livekit.IngressAudioOptions_Preset{
 		Preset: livekit.IngressAudioEncodingPreset_OPUS_MONO_64KBS,
 	}
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err = ValidateAudioOptionsConsistency(audio)
 	require.NoError(t, err)
 
 	audio.EncodingOptions = &livekit.IngressAudioOptions_Options{
@@ -293,7 +294,7 @@ func TestValidateAudioOptionsConsistency(t *testing.T) {
 			AudioCodec: livekit.AudioCodec_AAC,
 		},
 	}
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err = ValidateAudioOptionsConsistency(audio)
 	require.Error(t, err)
 
 	audio.EncodingOptions = &livekit.IngressAudioOptions_Options{
@@ -302,10 +303,10 @@ func TestValidateAudioOptionsConsistency(t *testing.T) {
 			Channels:   3,
 		},
 	}
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err = ValidateAudioOptionsConsistency(audio)
 	require.Error(t, err)
 
 	audio.EncodingOptions.(*livekit.IngressAudioOptions_Options).Options.Channels = 2
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
+	err = ValidateAudioOptionsConsistency(audio)
 	require.NoError(t, err)
 }
