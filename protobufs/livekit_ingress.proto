@@ -184,7 +184,7 @@ message UpdateIngressRequest {
   string participant_identity = 4;
   string participant_name = 5;
   string participant_metadata = 9;
-  optional bool bypass_transcoding = 8 [deprecated = true];
+  // optional bool bypass_transcoding = 8 [deprecated = true];
   optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
