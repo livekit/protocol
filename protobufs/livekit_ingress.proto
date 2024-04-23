@@ -32,7 +32,6 @@ service Ingress {
 }
 
 message CreateIngressRequest {
-  uint32 api_version = 11;
   IngressInput input_type = 1;
   // Where to pull media from, only for URL input type
   string url = 9;
@@ -46,7 +45,8 @@ message CreateIngressRequest {
   string participant_name = 5;
   // metadata associated with the publishing participant
   string participant_metadata = 10;
-  bool bypass_transcoding = 8  [deprecated = true]; 
+  // bool bypass_transcoding = 8 [deprecated = true];
+  optional bool enable_transcoding = 11;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 
@@ -67,7 +67,6 @@ message IngressAudioOptions {
   oneof encoding_options {
     IngressAudioEncodingPreset preset = 3;
     IngressAudioEncodingOptions options = 4;
-    IngressAudioEncodingPassthrough passthrough = 5;
   }
 }
 
@@ -77,7 +76,6 @@ message IngressVideoOptions {
   oneof encoding_options {
     IngressVideoEncodingPreset preset = 3;
     IngressVideoEncodingOptions options = 4;
-    IngressVideoEncodingPassthrough passthrough = 5;
   }
 }
 
@@ -115,14 +113,10 @@ message IngressVideoEncodingOptions {
   repeated VideoLayer layers = 3;
 }
 
-message IngressAudioEncodingPassthrough {
-}
-
 message IngressVideoEncodingPassthrough {
 }
 
 message IngressInfo {
-  uint32 api_version = 15;
   string ingress_id = 1;
   string name = 2;
   string stream_key = 3;
@@ -131,7 +125,8 @@ message IngressInfo {
   // for FILE input, it'll be a http:// URL
   // for SRT input, it'll be a srt:// URL
   IngressInput input_type = 5;
-  bool bypass_transcoding = 13 [deprecated = true]; 
+  bool bypass_transcoding = 13 [deprecated = true];
+  optional bool enable_transcoding = 15;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
   string room_name = 8;
@@ -183,14 +178,14 @@ message InputAudioState {
 }
 
 message UpdateIngressRequest {
-  uint32 api_version = 10;
   string ingress_id = 1;
   string name = 2;
   string room_name = 3;
   string participant_identity = 4;
   string participant_name = 5;
   string participant_metadata = 9;
-  optional bool bypass_transcoding = 8 [deprecated = true]; 
+  optional bool bypass_transcoding = 8 [deprecated = true];
+  optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 

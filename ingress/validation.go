@@ -67,6 +67,11 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return err
 	}
 
+	err = ValidateEnableTranscoding(info)
+	if err != nil {
+		return err
+	}
+
 	err = ValidateVideoOptionsConsistency(info.InputType, info.Video)
 	if err != nil {
 		return err
@@ -75,13 +80,6 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 	err = ValidateAudioOptionsConsistency(info.InputType, info.Audio)
 	if err != nil {
 		return err
-	}
-
-	if info.InputType == livekit.IngressInput_WHIP_INPUT {
-		err = ValidatePassthroughConsistency(info.Video, info.Audio)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -105,6 +103,35 @@ func ValidateBypassTranscoding(info *livekit.IngressInfo) error {
 	audioOptions := info.Audio
 	if audioOptions != nil && audioOptions.EncodingOptions != nil {
 		return NewInvalidTranscodingBypassError("audio encoding options must be empty if transcoding bypass is selected")
+	}
+
+	return nil
+}
+
+func ValidateEnableTranscoding(info *livekit.IngressInfo) error {
+	var enableTranscoding bool
+	if info.InputType == livekit.IngressInput_WHIP_INPUT {
+		enableTranscoding = false
+		if info.EnableTranscoding != nil {
+			enableTranscoding = *info.EnableTranscoding
+		}
+	} else {
+		enableTranscoding = true
+		if info.EnableTranscoding != nil && *info.EnableTranscoding == false {
+			return NewInvalidTranscodingBypassError("bypassing transcoding impossible with selected input type")
+		}
+	}
+
+	if !enableTranscoding {
+		videoOptions := info.Video
+		if videoOptions != nil && videoOptions.EncodingOptions != nil {
+			return NewInvalidTranscodingBypassError("video encoding options must be empty if transcoding is disabled")
+		}
+
+		audioOptions := info.Audio
+		if audioOptions != nil && audioOptions.EncodingOptions != nil {
+			return NewInvalidTranscodingBypassError("audio encoding options must be empty if transcoding is disabled")
+		}
 	}
 
 	return nil
@@ -137,10 +164,6 @@ func ValidateVideoOptionsConsistency(inputType livekit.IngressInput, options *li
 		err := ValidateVideoEncodingOptionsConsistency(o.Options)
 		if err != nil {
 			return err
-		}
-	case *livekit.IngressVideoOptions_Passthrough:
-		if inputType != livekit.IngressInput_WHIP_INPUT {
-			return NewInvalidTranscodingBypassError("passthrough impossible with selected input type")
 		}
 	}
 
@@ -234,10 +257,6 @@ func ValidateAudioOptionsConsistency(inputType livekit.IngressInput, options *li
 		if err != nil {
 			return err
 		}
-	case *livekit.IngressAudioOptions_Passthrough:
-		if inputType != livekit.IngressInput_WHIP_INPUT {
-			return NewInvalidTranscodingBypassError("passthrough impossible with selected input type")
-		}
 	}
 
 	return nil
@@ -258,35 +277,6 @@ func ValidateAudioEncodingOptionsConsistency(options *livekit.IngressAudioEncodi
 
 	if options.Channels > 2 {
 		return NewInvalidAudioParamsError("invalid audio channel count")
-	}
-
-	return nil
-}
-
-func ValidatePassthroughConsistency(videoOptions *livekit.IngressVideoOptions, audioOptions *livekit.IngressAudioOptions) error {
-	audioPassthrough := true
-	videoPassthrough := true
-
-	if videoOptions != nil {
-		switch videoOptions.EncodingOptions.(type) {
-		case nil:
-		case *livekit.IngressVideoOptions_Passthrough:
-		default:
-			videoPassthrough = false
-		}
-	}
-
-	if audioOptions != nil {
-		switch audioOptions.EncodingOptions.(type) {
-		case nil:
-		case *livekit.IngressAudioOptions_Passthrough:
-		default:
-			audioPassthrough = false
-		}
-	}
-
-	if videoPassthrough != audioPassthrough {
-		return NewInvalidTranscodingBypassError("passthough can only be enabled for audio and video at the same time")
 	}
 
 	return nil

@@ -100,6 +100,49 @@ func TestValidateBypassTranscoding(t *testing.T) {
 
 }
 
+func TestValidateEnableTranscoding(t *testing.T) {
+	info := &livekit.IngressInfo{}
+	T := true
+	F := false
+
+	err := ValidateEnableTranscoding(info)
+	require.NoError(t, err)
+
+	info.InputType = livekit.IngressInput_WHIP_INPUT
+	err = ValidateEnableTranscoding(info)
+	require.NoError(t, err)
+
+	info.Audio = &livekit.IngressAudioOptions{}
+	info.Audio.EncodingOptions = &livekit.IngressAudioOptions_Options{}
+	err = ValidateEnableTranscoding(info)
+	require.Error(t, err)
+
+	info.Audio.EncodingOptions = nil
+
+	info.EnableTranscoding = &T
+	err = ValidateEnableTranscoding(info)
+	require.NoError(t, err)
+
+	info.EnableTranscoding = &F
+	err = ValidateEnableTranscoding(info)
+	require.NoError(t, err)
+
+	info.Video = &livekit.IngressVideoOptions{}
+	info.Video.EncodingOptions = &livekit.IngressVideoOptions_Preset{}
+	err = ValidateEnableTranscoding(info)
+	require.Error(t, err)
+
+	info.Video.EncodingOptions = nil
+
+	info.InputType = livekit.IngressInput_RTMP_INPUT
+	err = ValidateEnableTranscoding(info)
+	require.Error(t, err)
+
+	info.EnableTranscoding = &T
+	err = ValidateEnableTranscoding(info)
+	require.NoError(t, err)
+}
+
 func TestValidateVideoOptionsConsistency(t *testing.T) {
 	video := &livekit.IngressVideoOptions{}
 	err := ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
@@ -221,13 +264,6 @@ func TestValidateVideoOptionsConsistency(t *testing.T) {
 	}
 	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
 	require.NoError(t, err)
-
-	video.EncodingOptions = &livekit.IngressVideoOptions_Passthrough{}
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_RTMP_INPUT, video)
-	require.Error(t, err)
-
-	err = ValidateVideoOptionsConsistency(livekit.IngressInput_WHIP_INPUT, video)
-	require.NoError(t, err)
 }
 
 func TestValidateAudioOptionsConsistency(t *testing.T) {
@@ -271,50 +307,5 @@ func TestValidateAudioOptionsConsistency(t *testing.T) {
 
 	audio.EncodingOptions.(*livekit.IngressAudioOptions_Options).Options.Channels = 2
 	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
-	require.NoError(t, err)
-
-	audio.EncodingOptions = &livekit.IngressAudioOptions_Passthrough{}
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_RTMP_INPUT, audio)
-	require.Error(t, err)
-
-	err = ValidateAudioOptionsConsistency(livekit.IngressInput_WHIP_INPUT, audio)
-	require.NoError(t, err)
-}
-
-func TestValidatePassthroughConsistency(t *testing.T) {
-	var audio *livekit.IngressAudioOptions
-	var video *livekit.IngressVideoOptions
-
-	err := ValidatePassthroughConsistency(video, audio)
-	require.NoError(t, err)
-
-	audio = &livekit.IngressAudioOptions{}
-	video = &livekit.IngressVideoOptions{}
-
-	err = ValidatePassthroughConsistency(video, audio)
-	require.NoError(t, err)
-
-	audio.EncodingOptions = &livekit.IngressAudioOptions_Passthrough{}
-	err = ValidatePassthroughConsistency(video, audio)
-	require.NoError(t, err)
-
-	video.EncodingOptions = &livekit.IngressVideoOptions_Preset{}
-	err = ValidatePassthroughConsistency(video, audio)
-	require.Error(t, err)
-
-	audio.EncodingOptions = &livekit.IngressAudioOptions_Options{}
-	err = ValidatePassthroughConsistency(video, audio)
-	require.NoError(t, err)
-
-	video.EncodingOptions = &livekit.IngressVideoOptions_Passthrough{}
-	err = ValidatePassthroughConsistency(video, audio)
-	require.Error(t, err)
-
-	audio.EncodingOptions = &livekit.IngressAudioOptions_Passthrough{}
-	err = ValidatePassthroughConsistency(video, audio)
-	require.NoError(t, err)
-
-	video = nil
-	err = ValidatePassthroughConsistency(video, audio)
 	require.NoError(t, err)
 }
