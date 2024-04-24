@@ -27,6 +27,10 @@ import (
 	"github.com/livekit/protocol/utils"
 )
 
+func NewCallID() string {
+	return utils.NewGuid(utils.SIPCallPrefix)
+}
+
 type ErrNoDispatchMatched struct {
 	NoRules      bool
 	NoTrunks     bool
@@ -387,6 +391,7 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 		}
 		from = from[len(from)-n:]
 	}
+	fromID := "sip_" + from
 	fromName := "Phone " + from
 
 	room, rulePin, err := GetPinAndRoom(rule)
@@ -396,8 +401,9 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	if rulePin != "" {
 		if sentPin == "" {
 			return &rpc.EvaluateSIPDispatchRulesResponse{
-				Result:     rpc.SIPDispatchResult_REQUEST_PIN,
-				RequestPin: true,
+				SipDispatchRuleId: rule.SipDispatchRuleId,
+				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
+				RequestPin:        true,
 			}, nil
 		}
 		if rulePin != sentPin {
@@ -414,8 +420,11 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, utils.NewGuid(""))
 	}
 	return &rpc.EvaluateSIPDispatchRulesResponse{
+		SipDispatchRuleId:   rule.SipDispatchRuleId,
 		Result:              rpc.SIPDispatchResult_ACCEPT,
 		RoomName:            room,
-		ParticipantIdentity: fromName,
+		ParticipantIdentity: fromID,
+		ParticipantName:     fromName,
+		ParticipantMetadata: rule.Metadata,
 	}, nil
 }

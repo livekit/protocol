@@ -42,6 +42,7 @@ const (
 	IngressPrefix         = "IN_"
 	SIPTrunkPrefix        = "ST_"
 	SIPDispatchRulePrefix = "SDR_"
+	SIPCallPrefix         = "SCL_"
 	RPCPrefix             = "RPC_"
 	WHIPResourcePrefix    = "WH_"
 	RTMPResourcePrefix    = "RT_"
