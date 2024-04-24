@@ -113,9 +113,6 @@ message IngressVideoEncodingOptions {
   repeated VideoLayer layers = 3;
 }
 
-message IngressVideoEncodingPassthrough {
-}
-
 message IngressInfo {
   string ingress_id = 1;
   string name = 2;
