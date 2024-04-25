@@ -45,10 +45,14 @@ message CreateIngressRequest {
   string participant_name = 5;
   // metadata associated with the publishing participant
   string participant_metadata = 10;
-  // whether to pass through the incoming media without transcoding, only compatible with some input types
-  bool bypass_transcoding = 8; 
+  // [depreacted ] whether to pass through the incoming media without transcoding, only compatible with some input types. Use `enable_transcoding` instead.
+  bool bypass_transcoding = 8 [deprecated = true];
+  // Whether to transcode the ingested media. Only WHIP supports disabling transcoding currently. WHIP will default to transcoding disabled. Replaces `bypass_transcoding. 
+  optional bool enable_transcoding = 11;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
+
+   // NEXT_ID: 12
 }
 
 enum IngressInput {
@@ -93,8 +97,6 @@ enum IngressVideoEncodingPreset {
   H264_540P_25FPS_2_LAYERS_HIGH_MOTION = 7;     //  960x540,  25fps, 1300kbps  main layer, 2 layers total, higher bitrate for high motion, harder to encode content
   H264_720P_30FPS_1_LAYER_HIGH_MOTION = 8;      // 1280x720,  30fps, 2500kbps, no simulcast, higher bitrate for high motion, harder to encode content
   H264_1080P_30FPS_1_LAYER_HIGH_MOTION = 9;     // 1980x1080, 30fps, 4500kbps, no simulcast, higher bitrate for high motion, harder to encode content
-
-
 }
 
 message IngressAudioEncodingOptions {
@@ -122,7 +124,8 @@ message IngressInfo {
   // for FILE input, it'll be a http:// URL
   // for SRT input, it'll be a srt:// URL
   IngressInput input_type = 5;
-  bool bypass_transcoding = 13; 
+  bool bypass_transcoding = 13 [deprecated = true];
+  optional bool enable_transcoding = 15;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
   string room_name = 8;
@@ -132,7 +135,7 @@ message IngressInfo {
   bool reusable = 11;
   IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
 
-  // NEXT_ID: 15
+  // NEXT_ID: 16
 }
 
 message IngressState {
@@ -180,11 +183,12 @@ message UpdateIngressRequest {
   string participant_identity = 4;
   string participant_name = 5;
   string participant_metadata = 9;
-  optional bool bypass_transcoding = 8; 
+  optional bool bypass_transcoding = 8 [deprecated = true];
+  optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 
-  // NEXT_ID: 10
+  // NEXT_ID: 11
 }
 
 message ListIngressRequest {

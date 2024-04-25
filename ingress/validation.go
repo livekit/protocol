@@ -67,6 +67,11 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		return err
 	}
 
+	err = ValidateEnableTranscoding(info)
+	if err != nil {
+		return err
+	}
+
 	err = ValidateVideoOptionsConsistency(info.Video)
 	if err != nil {
 		return err
@@ -98,6 +103,35 @@ func ValidateBypassTranscoding(info *livekit.IngressInfo) error {
 	audioOptions := info.Audio
 	if audioOptions != nil && audioOptions.EncodingOptions != nil {
 		return NewInvalidTranscodingBypassError("audio encoding options must be empty if transcoding bypass is selected")
+	}
+
+	return nil
+}
+
+func ValidateEnableTranscoding(info *livekit.IngressInfo) error {
+	var enableTranscoding bool
+	if info.InputType == livekit.IngressInput_WHIP_INPUT {
+		enableTranscoding = false
+		if info.EnableTranscoding != nil {
+			enableTranscoding = *info.EnableTranscoding
+		}
+	} else {
+		enableTranscoding = true
+		if info.EnableTranscoding != nil && *info.EnableTranscoding == false {
+			return NewInvalidTranscodingBypassError("bypassing transcoding impossible with selected input type")
+		}
+	}
+
+	if !enableTranscoding {
+		videoOptions := info.Video
+		if videoOptions != nil && videoOptions.EncodingOptions != nil {
+			return NewInvalidTranscodingBypassError("video encoding options must be empty if transcoding is disabled")
+		}
+
+		audioOptions := info.Audio
+		if audioOptions != nil && audioOptions.EncodingOptions != nil {
+			return NewInvalidTranscodingBypassError("audio encoding options must be empty if transcoding is disabled")
+		}
 	}
 
 	return nil
