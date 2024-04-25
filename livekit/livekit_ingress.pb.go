@@ -272,8 +272,11 @@ type CreateIngressRequest struct {
 	ParticipantName string `protobuf:"bytes,5,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
 	// metadata associated with the publishing participant
 	ParticipantMetadata string `protobuf:"bytes,10,opt,name=participant_metadata,json=participantMetadata,proto3" json:"participant_metadata,omitempty"`
+	// [depreacted ] whether to pass through the incoming media without transcoding, only compatible with some input types. Use `enable_transcoding` instead.
+	//
 	// Deprecated: Marked as deprecated in livekit_ingress.proto.
-	BypassTranscoding bool                 `protobuf:"varint,8,opt,name=bypass_transcoding,json=bypassTranscoding,proto3" json:"bypass_transcoding,omitempty"`
+	BypassTranscoding bool `protobuf:"varint,8,opt,name=bypass_transcoding,json=bypassTranscoding,proto3" json:"bypass_transcoding,omitempty"`
+	// Whether to transcode the ingested media. Only WHIP supports disabling transcoding currently. WHIP will default to transcoding disabled. Replaces `bypass_transcoding.
 	EnableTranscoding *bool                `protobuf:"varint,11,opt,name=enable_transcoding,json=enableTranscoding,proto3,oneof" json:"enable_transcoding,omitempty"`
 	Audio             *IngressAudioOptions `protobuf:"bytes,6,opt,name=audio,proto3" json:"audio,omitempty"`
 	Video             *IngressVideoOptions `protobuf:"bytes,7,opt,name=video,proto3" json:"video,omitempty"`
