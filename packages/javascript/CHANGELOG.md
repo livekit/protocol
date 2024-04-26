@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.14.0
+
+### Minor Changes
+
+- Added real-time Transcription protocol - [#686](https://github.com/livekit/protocol/pull/686) ([@davidzhao](https://github.com/davidzhao))
+
+- WHIP protocol change - [#680](https://github.com/livekit/protocol/pull/680) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+  Deprecate the bypass_transcoding property in all ingress APIs and introduce the optional enable_transcoding property. This property will default to false for WHIP and to true for all other ingress types.
+
+### Patch Changes
+
+- Add SIP participant name. - [#687](https://github.com/livekit/protocol/pull/687) ([@dennwc](https://github.com/dennwc))
+
 ## 1.13.0
 
 ### Minor Changes
