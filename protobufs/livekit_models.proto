@@ -186,6 +186,7 @@ message TrackInfo {
   Encryption.Type encryption = 16;
   string stream = 17;
   TimedVersion version = 18;
+  repeated AudioTrackFeature audio_features = 19;
 }
 
 enum VideoQuality {
