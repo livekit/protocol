@@ -38,7 +38,7 @@ message SignalRequest {
     // Immediately terminate session
     LeaveRequest leave = 8;
     // Update published video layers
-    UpdateVideoLayers update_layers = 10;
+    UpdateVideoLayers update_layers = 10 [deprecated = true];
     // Update subscriber permissions
     SubscriptionPermission subscription_permission = 11;
     // sync client's subscribe state to server during reconnect
@@ -259,6 +259,7 @@ message LeaveRequest {
 
 // message to indicate published video track dimensions are changing
 message UpdateVideoLayers {
+  option deprecated = true;
   string track_sid = 1;
   repeated VideoLayer layers = 2;
 }
