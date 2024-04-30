@@ -200,8 +200,11 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 	sampler   *zaputil.Sampler
 }
 
-func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
-	zap := zap.New(nil).WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
+func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
+	if log == nil {
+		log = zap.New(nil).WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel))
+	}
+	zap := log.Sugar()
 
 	zc := &zapConfig{
 		conf:          conf,
@@ -232,6 +235,10 @@ func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
 	} else {
 		return newZapLogger(zap, zc, zaputil.NewDevelopmentEncoder(), sampler), nil
 	}
+}
+
+func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
+	return FromZapLogger(nil, conf, opts...)
 }
 
 func newZapLogger[T zaputil.Encoder[T]](zap *zap.SugaredLogger, zc *zapConfig, enc T, sampler *zaputil.Sampler) ZapLogger {
