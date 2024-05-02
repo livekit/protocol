@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.15.0
+
+### Minor Changes
+
+- Expose Logger constructor for Zap. - [#701](https://github.com/livekit/protocol/pull/701) ([@dennwc](https://github.com/dennwc))
+
+- Add metadata to SIP trunks, dispatch rules and participants. Change SIP participant identity prefix to `sip_`. - [#696](https://github.com/livekit/protocol/pull/696) ([@dennwc](https://github.com/dennwc))
+
+- Move language into TranscriptionSegment #703 - [#704](https://github.com/livekit/protocol/pull/704) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.14.0
 
 ### Minor Changes
