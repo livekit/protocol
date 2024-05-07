@@ -29,7 +29,7 @@ type HedgeParams[T any] struct {
 	Func          func(context.Context) (T, error)
 }
 
-// race retries if the function takes to long to return
+// race retries if the function takes too long to return
 // |---------------- attempt 1 ----------------|
 // |    delay    |--------- attempt 2 ---------|
 func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err error) {

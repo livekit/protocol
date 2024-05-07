@@ -17,20 +17,22 @@ package utils
 import (
 	"crypto/rand"
 	"crypto/sha1"
-	"encoding/binary"
 	"fmt"
+	mrand "math/rand/v2"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/jxskiss/base62"
 	"github.com/lithammer/shortuuid/v4"
 
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/utils/must"
 )
 
-const GuidSize = 12
+const (
+	GuidSize        = 12
+	guidScratchSize = GuidSize + 10
+)
 
 const (
 	RoomPrefix            = "RM_"
@@ -51,10 +53,16 @@ const (
 	AgentJobPrefix        = "AJ_"
 )
 
-var defaultGuidGenerator = newGuidGenerator(4096, GuidSize+10)
+var guidGeneratorPool = sync.Pool{
+	New: func() any {
+		return must.Get(newGuidGenerator(guidScratchSize))
+	},
+}
 
 func NewGuid(prefix string) string {
-	return defaultGuidGenerator.NewGuid(prefix)
+	g := guidGeneratorPool.Get().(*guidGenerator)
+	defer guidGeneratorPool.Put(g)
+	return g.NewGuid(prefix)
 }
 
 // HashedID creates a hashed ID from a unique string
@@ -86,57 +94,27 @@ func newB57Index() [256]byte {
 }
 
 type guidGenerator struct {
-	pool sync.Pool
-	mu   sync.Mutex
-	buf  []byte
-	pos  int
+	scratch []byte
+	rng     *mrand.ChaCha8
 }
 
-func newGuidGenerator(bufSize, scratchSize int) *guidGenerator {
+func newGuidGenerator(scratchSize int) (*guidGenerator, error) {
+	var seed [32]byte
+	if _, err := rand.Read(seed[:]); err != nil {
+		return nil, err
+	}
+
 	return &guidGenerator{
-		pool: sync.Pool{
-			New: func() any {
-				b := make([]byte, scratchSize)
-				return &b
-			},
-		},
-		buf: make([]byte, bufSize),
-		pos: bufSize,
-	}
-}
-
-func (g *guidGenerator) refillBuf() {
-	for {
-		_, err := rand.Read(g.buf)
-		if err == nil {
-			return
-		}
-
-		logger.Errorw("unable to refill guid buffer", err)
-		time.Sleep(time.Millisecond)
-	}
-}
-
-func (g *guidGenerator) uint32() uint32 {
-	if g.pos == len(g.buf) {
-		g.refillBuf()
-		g.pos = 0
-	}
-
-	n := binary.BigEndian.Uint32(g.buf[g.pos:])
-	g.pos += 4
-
-	return n
+		scratch: make([]byte, scratchSize),
+		rng:     mrand.NewChaCha8(seed),
+	}, nil
 }
 
 func (g *guidGenerator) readIDChars(b []byte) {
-	g.mu.Lock()
-	defer g.mu.Unlock()
-
 	var n int
 	for {
-		r := g.uint32()
-		for i := 0; i < 5; i++ {
+		r := g.rng.Uint64()
+		for i := 0; i < 10; i++ {
 			if int(r&0x3f) < len(b57Chars) {
 				b[n] = b57Chars[r&0x3f]
 				n++
@@ -150,13 +128,10 @@ func (g *guidGenerator) readIDChars(b []byte) {
 }
 
 func (g *guidGenerator) NewGuid(prefix string) string {
-	b := g.pool.Get().(*[]byte)
-	defer g.pool.Put(b)
-
-	*b = append((*b)[:0], make([]byte, len(prefix)+GuidSize)...)
-	copy(*b, prefix)
-	g.readIDChars((*b)[len(prefix):])
-	return string(*b)
+	s := append(g.scratch[:0], make([]byte, len(prefix)+GuidSize)...)
+	copy(s, prefix)
+	g.readIDChars(s[len(prefix):])
+	return string(s)
 }
 
 func guidPrefix[T livekit.Guid]() string {

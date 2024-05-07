@@ -189,6 +189,7 @@ type ZapLogger interface {
 	Logger
 	ToZap() *zap.SugaredLogger
 	ComponentLeveler() ZapComponentLeveler
+	WithMinLevel(lvl zapcore.LevelEnabler) Logger
 }
 
 type zapLogger[T zaputil.Encoder[T]] struct {
@@ -198,6 +199,7 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 	component string
 	deferred  []*zaputil.Deferrer
 	sampler   *zaputil.Sampler
+	minLevel  zapcore.LevelEnabler
 }
 
 func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
@@ -253,9 +255,15 @@ func newZapLogger[T zaputil.Encoder[T]](zap *zap.SugaredLogger, zc *zapConfig, e
 }
 
 func (l *zapLogger[T]) ToZap() *zap.SugaredLogger {
-	console, _ := l.writeEnablers.LoadOrCompute(l.component, func() *zaputil.WriteEnabler {
-		return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component))
-	})
+	var console *zaputil.WriteEnabler
+	if l.minLevel == nil {
+		console, _ = l.writeEnablers.LoadOrCompute(l.component, func() *zaputil.WriteEnabler {
+			return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component))
+		})
+	} else {
+		enab := zaputil.OrLevelEnabler{l.minLevel, l.sc.ComponentLevel(l.component)}
+		console = zaputil.NewWriteEnabler(os.Stderr, enab)
+	}
 
 	c := l.enc.Core(console, l.tap)
 	for i := range l.deferred {
@@ -289,6 +297,13 @@ func (l *zapLogger[T]) ComponentLeveler() ZapComponentLeveler {
 
 func (l *zapLogger[T]) Debugw(msg string, keysAndValues ...interface{}) {
 	l.zap.Debugw(msg, keysAndValues...)
+}
+
+func (l *zapLogger[T]) WithMinLevel(lvl zapcore.LevelEnabler) Logger {
+	dup := *l
+	dup.minLevel = lvl
+	dup.zap = dup.ToZap()
+	return &dup
 }
 
 func (l *zapLogger[T]) Infow(msg string, keysAndValues ...interface{}) {
