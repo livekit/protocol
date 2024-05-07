@@ -173,10 +173,15 @@ message CreateSIPDispatchRuleRequest {
   // If true a random value will be used instead
   bool hide_phone_number = 3;
 
+  // Dispatch Rule will only accept a call made to these numbers (if set).
+  repeated string inbound_numbers = 6;
+
   // Optional human-readable name for the Dispatch Rule.
   string name = 4;
   // Optional user-defined metadata for the Dispatch Rule.
   string metadata = 5;
+
+  // NEXT ID: 7
 }
 
 message SIPDispatchRuleInfo {
@@ -184,12 +189,16 @@ message SIPDispatchRuleInfo {
   SIPDispatchRule rule = 2;
   repeated string trunk_ids = 3;
   bool hide_phone_number = 4;
+  // Dispatch Rule will only accept a call made to these numbers (if set).
+  repeated string inbound_numbers = 7;
 
   // Human-readable name for the Dispatch Rule.
   string name = 5;
   // User-defined metadata for the Dispatch Rule.
   // Participants created by this rule will inherit this metadata.
   string metadata = 6;
+
+  // NEXT ID: 8
 }
 
 message ListSIPDispatchRuleRequest {
