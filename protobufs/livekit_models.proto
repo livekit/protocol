@@ -271,7 +271,8 @@ message Transcription {
   string participant_identity = 2;
   string track_id = 3;
   repeated TranscriptionSegment segments = 4;
-  string language = 5;
+
+  // NEXT_ID: 6
 }
 
 message TranscriptionSegment {
@@ -280,6 +281,7 @@ message TranscriptionSegment {
   uint64 start_time = 3;
   uint64 end_time = 4;
   bool final = 5;
+  string language = 6;
 }
 
 message TimeSyncRequest {

@@ -23,7 +23,7 @@ import (
 // implements webrtc.LeveledLogger
 type logAdapter struct {
 	logger          logger.Logger
-	ignoredPrefixes prefixSet
+	ignoredPrefixes *prefixSet
 }
 
 func (l *logAdapter) Trace(msg string) {

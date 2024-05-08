@@ -70,6 +70,7 @@ message UpdateIngressStateRequest {
 }
 
 message GetSIPTrunkAuthenticationRequest {
+  string sip_call_id = 6;
   // What Number is calling
   string from = 2;
 
@@ -81,6 +82,8 @@ message GetSIPTrunkAuthenticationRequest {
 
   // What Host was called
   string to_host = 5;
+
+  // NEXT ID: 7
 }
 
 message GetSIPTrunkAuthenticationResponse {
@@ -88,10 +91,13 @@ message GetSIPTrunkAuthenticationResponse {
   string username = 1;
   string password = 2;
   bool   drop = 3;
+  // Trunk used to fulfill this request
+  string sip_trunk_id = 4;
 }
 
 message EvaluateSIPDispatchRulesRequest {
-  string sip_participant_id = 1;
+  string sip_call_id = 8;
+  string sip_participant_id = 1 [deprecated=true];
 
   // What Number is calling
   string calling_number = 2;
@@ -110,14 +116,20 @@ message EvaluateSIPDispatchRulesRequest {
 
   // What Host was called
   string called_host = 7;
+
+  // NEXT ID: 9
 }
 
 message EvaluateSIPDispatchRulesResponse {
   // non-empty string if SIPParticipant should be placed a room
   string room_name = 1;
 
-  // What should be used for the LiveKit identity
+  // What should be used for the LiveKit participant identity
   string participant_identity = 2;
+  // What should be used for the LiveKit participant name
+  string participant_name = 7;
+  // What should be used for the LiveKit participant metadata
+  string participant_metadata = 8;
 
   bool request_pin = 3 [deprecated=true]; // see result
 
@@ -128,6 +140,12 @@ message EvaluateSIPDispatchRulesResponse {
   string ws_url = 5;
 
   SIPDispatchResult result = 6;
+
+  // Trunk used to fulfill this request
+  string sip_trunk_id = 9;
+  // Dispatch Rule used to fulfill this request
+  string sip_dispatch_rule_id = 10;
+  // NEXT ID: 11
 }
 
 enum SIPDispatchResult {

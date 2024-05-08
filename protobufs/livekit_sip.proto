@@ -83,6 +83,11 @@ message CreateSIPTrunkRequest {
   string inbound_password = 6;
   string outbound_username = 7;
   string outbound_password = 8;
+
+  // Optional human-readable name for the Trunk.
+  string name = 10;
+  // Optional user-defined metadata for the Trunk.
+  string metadata = 11;
 }
 
 message SIPTrunkInfo {
@@ -111,6 +116,11 @@ message SIPTrunkInfo {
   string inbound_password = 7;
   string outbound_username = 8;
   string outbound_password = 9;
+
+  // Human-readable name for the Trunk.
+  string name = 11;
+  // User-defined metadata for the Trunk.
+  string metadata = 12;
 }
 
 message ListSIPTrunkRequest {
@@ -162,6 +172,16 @@ message CreateSIPDispatchRuleRequest {
   // By default the From value (Phone number) is used as the participant identity
   // If true a random value will be used instead
   bool hide_phone_number = 3;
+
+  // Dispatch Rule will only accept a call made to these numbers (if set).
+  repeated string inbound_numbers = 6;
+
+  // Optional human-readable name for the Dispatch Rule.
+  string name = 4;
+  // Optional user-defined metadata for the Dispatch Rule.
+  string metadata = 5;
+
+  // NEXT ID: 7
 }
 
 message SIPDispatchRuleInfo {
@@ -169,6 +189,16 @@ message SIPDispatchRuleInfo {
   SIPDispatchRule rule = 2;
   repeated string trunk_ids = 3;
   bool hide_phone_number = 4;
+  // Dispatch Rule will only accept a call made to these numbers (if set).
+  repeated string inbound_numbers = 7;
+
+  // Human-readable name for the Dispatch Rule.
+  string name = 5;
+  // User-defined metadata for the Dispatch Rule.
+  // Participants created by this rule will inherit this metadata.
+  string metadata = 6;
+
+  // NEXT ID: 8
 }
 
 message ListSIPDispatchRuleRequest {
@@ -200,16 +230,22 @@ message CreateSIPParticipantRequest {
   // Optional name of the participant in LiveKit room
   string participant_name = 7;
 
+  // Optional user-defined metadata. Will be attached to a created Participant in the room.
+  string participant_metadata = 8;
+
   // Optionally send following DTMF digits (extension codes) when making a call.
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 5;
 
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 6;
+
+  // NEXT ID: 9
 }
 
 message SIPParticipantInfo {
   string participant_id = 1;
   string participant_identity = 2;
   string room_name = 3;
+  string sip_call_id = 4;
 }

@@ -36,7 +36,7 @@ type zapLogAdapter struct {
 	logger          logger.Logger
 	level           zapcore.LevelEnabler
 	scope           string
-	ignoredPrefixes prefixSet
+	ignoredPrefixes *prefixSet
 }
 
 func (l *zapLogAdapter) init() {

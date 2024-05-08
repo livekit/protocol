@@ -21,11 +21,17 @@ import (
 	"sort"
 	"strconv"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 )
+
+func NewCallID() string {
+	return utils.NewGuid(utils.SIPCallPrefix)
+}
 
 type ErrNoDispatchMatched struct {
 	NoRules      bool
@@ -45,30 +51,38 @@ func (e *ErrNoDispatchMatched) Error() string {
 
 // DispatchRulePriority returns sorting priority for dispatch rules. Lower value means higher priority.
 func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
-	// In all these cases, prefer pin-protected rules.
+	// In all these cases, prefer pin-protected rules and rules for specific calling number.
 	// Thus, the order will be the following:
 	// - 0: Direct or Pin (both pin-protected)
 	// - 1: Individual (pin-protected)
 	// - 100: Direct (open)
 	// - 101: Individual (open)
+	// Also, add 1K penalty for not specifying the calling number.
 	const (
 		last = math.MaxInt32
 	)
 	// TODO: Maybe allow setting specific priorities for dispatch rules?
+	priority := int32(0)
 	switch rule := info.GetRule().GetRule().(type) {
 	default:
 		return last
 	case *livekit.SIPDispatchRule_DispatchRuleDirect:
 		if rule.DispatchRuleDirect.GetPin() != "" {
-			return 0
+			priority = 0
+		} else {
+			priority = 100
 		}
-		return 100
 	case *livekit.SIPDispatchRule_DispatchRuleIndividual:
 		if rule.DispatchRuleIndividual.GetPin() != "" {
-			return 1
+			priority = 1
+		} else {
+			priority = 101
 		}
-		return 101
 	}
+	if len(info.InboundNumbers) == 0 {
+		priority += 1000
+	}
+	return priority
 }
 
 // SortDispatchRules predictably sorts dispatch rules by priority (first one is highest).
@@ -99,33 +113,36 @@ func ValidateDispatchRules(rules []*livekit.SIPDispatchRuleInfo) error {
 	if len(rules) == 0 {
 		return nil
 	}
-	byPinAndTrunk := make(map[string]map[string]*livekit.SIPDispatchRuleInfo)
+	type ruleKey struct {
+		Pin    string
+		Trunk  string
+		Number string
+	}
+	byRuleKey := make(map[ruleKey]*livekit.SIPDispatchRuleInfo)
 	for _, r := range rules {
 		_, pin, err := GetPinAndRoom(r)
 		if err != nil {
 			return err
 		}
-		byTrunk := byPinAndTrunk[pin]
-		if byTrunk == nil {
-			byTrunk = make(map[string]*livekit.SIPDispatchRuleInfo)
-			byPinAndTrunk[pin] = byTrunk
-		}
-		if len(r.TrunkIds) == 0 {
+		trunks := r.TrunkIds
+		if len(trunks) == 0 {
 			// This rule matches all trunks, but collides only with other default ones (specific rules take priority).
-			if r2 := byTrunk[""]; r2 != nil {
-				return fmt.Errorf("Conflicting SIP Dispatch Rules: Same PIN for %q and %q",
-					printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
-			}
-			byTrunk[""] = r
-		} else {
-			// Check all specific rules for the same pin.
-			for _, trunk := range r.TrunkIds {
-				r2 := byTrunk[trunk]
+			trunks = []string{""}
+		}
+		numbers := r.InboundNumbers
+		if len(numbers) == 0 {
+			// This rule matches all numbers, but collides only with other default ones (specific rules take priority).
+			numbers = []string{""}
+		}
+		for _, trunk := range trunks {
+			for _, number := range numbers {
+				key := ruleKey{Pin: pin, Trunk: trunk, Number: number}
+				r2 := byRuleKey[key]
 				if r2 != nil {
-					return fmt.Errorf("Conflicting SIP Dispatch Rules: Same PIN for %q and %q",
+					return fmt.Errorf("Conflicting SIP Dispatch Rules: same Trunk+Number+PIN combination for for %q and %q",
 						printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
 				}
-				byTrunk[trunk] = r
+				byRuleKey[key] = r
 			}
 		}
 	}
@@ -136,47 +153,15 @@ func ValidateDispatchRules(rules []*livekit.SIPDispatchRuleInfo) error {
 // It returns an error if there are conflicting rules. Returns nil if no rules match.
 func SelectDispatchRule(rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
 	if len(rules) == 0 {
+		// Nil is fine here. We will report "no rules matched" later.
 		return nil, nil
 	}
-	// Sorting will do the selection for us. We already filtered out irrelevant ones in matchSIPDispatchRule.
+	if err := ValidateDispatchRules(rules); err != nil {
+		return nil, err
+	}
+	// Sorting will do the selection for us. We already filtered out irrelevant ones in MatchDispatchRule and above.
 	SortDispatchRules(rules)
-	byPin := make(map[string]*livekit.SIPDispatchRuleInfo)
-	var (
-		pinRule  *livekit.SIPDispatchRuleInfo
-		openRule *livekit.SIPDispatchRuleInfo
-	)
-	openCnt := 0
-	for _, r := range rules {
-		_, pin, err := GetPinAndRoom(r)
-		if err != nil {
-			return nil, err
-		}
-		if pin == "" {
-			openRule = r // last one
-			openCnt++
-		} else if r2 := byPin[pin]; r2 != nil {
-			return nil, fmt.Errorf("Conflicting SIP Dispatch Rules: Same PIN for %q and %q",
-				r.SipDispatchRuleId, r2.SipDispatchRuleId)
-		} else {
-			byPin[pin] = r
-			// Pick the first one with a Pin. If Pin was provided in the request, we already filtered the right rules.
-			// If not, this rule will just be used to send RequestPin=true flag.
-			if pinRule == nil {
-				pinRule = r
-			}
-		}
-	}
-	if req.GetPin() != "" {
-		// If it's still nil that's fine. We will report "no rules matched" later.
-		return pinRule, nil
-	}
-	if pinRule != nil {
-		return pinRule, nil
-	}
-	if openCnt > 1 {
-		return nil, fmt.Errorf("Conflicting SIP Dispatch Rules: Matched %d open rules for %q", openCnt, req.CallingNumber)
-	}
-	return openRule, nil
+	return rules[0], nil
 }
 
 // GetPinAndRoom returns a room name/prefix and the pin for a dispatch rule. Just a convenience wrapper.
@@ -247,14 +232,7 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, calling, called string) (*liveki
 	)
 	for _, tr := range trunks {
 		// Do not consider it if number doesn't match.
-		matches := len(tr.InboundNumbers) == 0
-		for _, exp := range tr.InboundNumbers {
-			if calling == exp {
-				matches = true
-				break
-			}
-		}
-		if !matches {
+		if len(tr.InboundNumbers) != 0 && !slices.Contains(tr.InboundNumbers, calling) {
 			continue
 		}
 		// Deprecated, but we still check it for backward compatibility.
@@ -305,7 +283,7 @@ func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatch
 	if len(rules) == 0 {
 		return nil, &ErrNoDispatchMatched{NoRules: true, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
 	}
-	// We split the matched dispatch rules into two sets: specific and default (aka wildcard).
+	// We split the matched dispatch rules into two sets in relation to Trunks: specific and default (aka wildcard).
 	// First, attempt to match any of the specific rules, where we did match the Trunk ID.
 	// If nothing matches there - fallback to default/wildcard rules, where no Trunk IDs were mentioned.
 	var (
@@ -315,6 +293,9 @@ func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatch
 	noPin := req.NoPin
 	sentPin := req.GetPin()
 	for _, info := range rules {
+		if len(info.InboundNumbers) != 0 && !slices.Contains(info.InboundNumbers, req.CallingNumber) {
+			continue
+		}
 		_, rulePin, err := GetPinAndRoom(info)
 		if err != nil {
 			logger.Errorw("Invalid SIP Dispatch Rule", err, "dispatchRuleID", info.SipDispatchRuleId)
@@ -346,14 +327,7 @@ func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatch
 		if trunk == nil {
 			continue
 		}
-		matches := false
-		for _, id := range info.TrunkIds {
-			if id == trunk.SipTrunkId {
-				matches = true
-				break
-			}
-		}
-		if !matches {
+		if !slices.Contains(info.TrunkIds, trunk.SipTrunkId) {
 			continue
 		}
 		specificRules = append(specificRules, info)
@@ -387,6 +361,7 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 		}
 		from = from[len(from)-n:]
 	}
+	fromID := "sip_" + from
 	fromName := "Phone " + from
 
 	room, rulePin, err := GetPinAndRoom(rule)
@@ -396,8 +371,9 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	if rulePin != "" {
 		if sentPin == "" {
 			return &rpc.EvaluateSIPDispatchRulesResponse{
-				Result:     rpc.SIPDispatchResult_REQUEST_PIN,
-				RequestPin: true,
+				SipDispatchRuleId: rule.SipDispatchRuleId,
+				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
+				RequestPin:        true,
 			}, nil
 		}
 		if rulePin != sentPin {
@@ -414,8 +390,11 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, utils.NewGuid(""))
 	}
 	return &rpc.EvaluateSIPDispatchRulesResponse{
+		SipDispatchRuleId:   rule.SipDispatchRuleId,
 		Result:              rpc.SIPDispatchResult_ACCEPT,
 		RoomName:            room,
-		ParticipantIdentity: fromName,
+		ParticipantIdentity: fromID,
+		ParticipantName:     fromName,
+		ParticipantMetadata: rule.Metadata,
 	}, nil
 }
