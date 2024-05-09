@@ -75,7 +75,11 @@ func (e *EventEmitter[K, V]) Observe(k K) *EventObserver[V] {
 	o := l.Observe()
 	e.mu.Unlock()
 
-	o.stop = append(o.stop, func() { e.cleanUpObserverList(k) })
+	stop := o.stop
+	o.stop = func() {
+		stop()
+		e.cleanUpObserverList(k)
+	}
 
 	return o
 }
@@ -129,7 +133,7 @@ func (l *EventObserverList[V]) Observe() *EventObserver[V] {
 	le := l.observers.PushBack(o)
 	l.mu.Unlock()
 
-	o.stop = append(o.stop, func() { l.stopObserving(le) })
+	o.stop = func() { l.stopObserving(le) }
 
 	return o
 }
@@ -150,14 +154,14 @@ func (l *EventObserverList[V]) stopObserving(le *list.Element) {
 
 type EventObserver[V any] struct {
 	logger logger.Logger
-	stop   []func()
+	stop   func()
 	ch     chan V
 }
 
 func NewEventObserver[V any](stopFunc func()) (*EventObserver[V], func(v V)) {
 	o := &EventObserver[V]{
 		logger: logger.GetLogger(),
-		stop:   []func(){stopFunc},
+		stop:   stopFunc,
 		ch:     make(chan V, defaultQueueSize),
 	}
 	return o, o.emit
@@ -172,9 +176,7 @@ func (o *EventObserver[V]) emit(v V) {
 }
 
 func (o *EventObserver[V]) Stop() {
-	for _, stop := range o.stop {
-		stop()
-	}
+	o.stop()
 }
 
 func (o *EventObserver[V]) Events() <-chan V {

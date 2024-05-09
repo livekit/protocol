@@ -100,11 +100,11 @@ func (q *TimeoutQueue[T]) remove(i *TimeoutQueueItem[T]) {
 	i.prev = nil
 }
 
-func (q *TimeoutQueue[T]) IterateAfter(timeout time.Duration) *timeoutQueueIterator[T] {
+func (q *TimeoutQueue[T]) IterateAfter(timeout time.Duration) timeoutQueueIterator[T] {
 	return newTimeoutQueueIterator(q, timeout, false)
 }
 
-func (q *TimeoutQueue[T]) IterateRemoveAfter(timeout time.Duration) *timeoutQueueIterator[T] {
+func (q *TimeoutQueue[T]) IterateRemoveAfter(timeout time.Duration) timeoutQueueIterator[T] {
 	return newTimeoutQueueIterator(q, timeout, true)
 }
 
@@ -115,8 +115,8 @@ type timeoutQueueIterator[T any] struct {
 	item   *TimeoutQueueItem[T]
 }
 
-func newTimeoutQueueIterator[T any](q *TimeoutQueue[T], timeout time.Duration, remove bool) *timeoutQueueIterator[T] {
-	return &timeoutQueueIterator[T]{
+func newTimeoutQueueIterator[T any](q *TimeoutQueue[T], timeout time.Duration, remove bool) timeoutQueueIterator[T] {
+	return timeoutQueueIterator[T]{
 		q:      q,
 		time:   time.Now().Add(-timeout),
 		remove: remove,
