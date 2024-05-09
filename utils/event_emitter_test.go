@@ -43,9 +43,11 @@ func TestEventEmitter(t *testing.T) {
 		default:
 		}
 
+		ao0.Stop()
+
 		keys := emitter.ObservedKeys()
 		sort.Strings(keys)
-		require.Equal(t, []string{"a", "b"}, keys)
+		require.Equal(t, []string{"b"}, keys)
 	})
 
 	t.Run("observer", func(t *testing.T) {
