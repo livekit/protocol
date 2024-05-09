@@ -50,6 +50,13 @@ type DirectOutput interface {
 	GetWebsocketUrl() string
 }
 
+type UploadRequest interface {
+	GetS3() *livekit.S3Upload
+	GetGcp() *livekit.GCPUpload
+	GetAzure() *livekit.AzureBlobUpload
+	GetAliOSS() *livekit.AliOSSUpload
+}
+
 func GetTypes(request interface{}) (string, string) {
 	switch req := request.(type) {
 	case *livekit.EgressInfo_RoomComposite:
