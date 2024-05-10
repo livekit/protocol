@@ -385,6 +385,8 @@ message SimulateScenario {
     bool disconnect_signal_on_resume = 7;
     // disconnect signal on resume before sending any messages from server
     bool disconnect_signal_on_resume_no_messages = 8;
+    // full reconnect leave request
+    bool leave_request_full_reconnect = 9;
   }
 }
 
