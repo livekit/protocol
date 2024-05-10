@@ -32,10 +32,15 @@ const (
 	Unknown = "unknown"
 )
 
-type EncodedOutput interface {
+// Outputs that can be used in egress that are started automatically on room creation
+type AutoEncodedOutput interface {
 	GetFileOutputs() []*livekit.EncodedFileOutput
-	GetStreamOutputs() []*livekit.StreamOutput
 	GetSegmentOutputs() []*livekit.SegmentedFileOutput
+}
+
+type EncodedOutput interface {
+	AutoEncodedOutput
+	GetStreamOutputs() []*livekit.StreamOutput
 	GetImageOutputs() []*livekit.ImageOutput
 }
 
