@@ -412,5 +412,6 @@ message AutoTrackEgress {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;
     AzureBlobUpload azure = 4;
+    AliOSSUpload aliOSS = 6;
   }
 }

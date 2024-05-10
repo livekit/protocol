@@ -30,16 +30,25 @@ func RedactUpload(req UploadRequest) {
 	}
 }
 
-func RedactEncodedOutputs(out EncodedOutput) {
+func RedactAutoEncodedOutput(out AutoEncodedOutput) {
 	if files := out.GetFileOutputs(); len(files) == 1 {
 		RedactUpload(files[0])
-	}
-	if streams := out.GetStreamOutputs(); len(streams) == 1 {
-		RedactStreamKeys(streams[0])
 	}
 	if segments := out.GetSegmentOutputs(); len(segments) == 1 {
 		RedactUpload(segments[0])
 	}
+}
+
+func RedactEncodedOutputs(out EncodedOutput) {
+	RedactAutoEncodedOutput(out)
+
+	if streams := out.GetStreamOutputs(); len(streams) == 1 {
+		RedactStreamKeys(streams[0])
+	}
+	if images := out.GetImageOutputs(); len(images) == 1 {
+		RedactUpload(images[0])
+	}
+
 	if o, ok := out.(EncodedOutputDeprecated); ok {
 		if file := o.GetFile(); file != nil {
 			RedactUpload(file)

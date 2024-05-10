@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	file1 = &livekit.EncodedFileOutput{
+	file = &livekit.EncodedFileOutput{
 		Output: &livekit.EncodedFileOutput_S3{
 			S3: &livekit.S3Upload{
 				AccessKey: "ACCESS_KEY",
@@ -19,8 +19,8 @@ var (
 		},
 	}
 
-	file2 = &livekit.EncodedFileOutput{
-		Output: &livekit.EncodedFileOutput_AliOSS{
+	image = &livekit.ImageOutput{
+		Output: &livekit.ImageOutput_AliOSS{
 			AliOSS: &livekit.AliOSSUpload{
 				AccessKey: "ACCESS_KEY",
 				Secret:    "LONG_SECRET_STRING",
@@ -47,18 +47,17 @@ var (
 )
 
 func TestRedactUpload(t *testing.T) {
-
-	cl := proto.Clone(file1)
+	cl := proto.Clone(file)
 	RedactUpload(cl.(UploadRequest))
 
 	require.Equal(t, "{access_key}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.AccessKey)
 	require.Equal(t, "{secret}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.Secret)
 
-	cl = proto.Clone(file2)
+	cl = proto.Clone(image)
 	RedactUpload(cl.(UploadRequest))
 
-	require.Equal(t, "{access_key}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_AliOSS).AliOSS.AccessKey)
-	require.Equal(t, "{secret}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_AliOSS).AliOSS.Secret)
+	require.Equal(t, "{access_key}", cl.(*livekit.ImageOutput).Output.(*livekit.ImageOutput_AliOSS).AliOSS.AccessKey)
+	require.Equal(t, "{secret}", cl.(*livekit.ImageOutput).Output.(*livekit.ImageOutput_AliOSS).AliOSS.Secret)
 
 	cl = proto.Clone(segments)
 	RedactUpload(cl.(UploadRequest))
@@ -70,7 +69,6 @@ func TestRedactUpload(t *testing.T) {
 
 	require.Equal(t, "{account_name}", cl.(*livekit.DirectFileOutput).Output.(*livekit.DirectFileOutput_Azure).Azure.AccountName)
 	require.Equal(t, "{account_key}", cl.(*livekit.DirectFileOutput).Output.(*livekit.DirectFileOutput_Azure).Azure.AccountKey)
-
 }
 
 func TestRedactStreamOutput(t *testing.T) {
@@ -87,7 +85,7 @@ func TestRedactStreamOutput(t *testing.T) {
 func TestRedactEncodedOutputs(t *testing.T) {
 	trackComposite := &livekit.TrackCompositeEgressRequest{
 		FileOutputs: []*livekit.EncodedFileOutput{
-			file1,
+			file,
 		},
 	}
 
@@ -98,16 +96,16 @@ func TestRedactEncodedOutputs(t *testing.T) {
 	require.Equal(t, "{secret}", cl.(*livekit.TrackCompositeEgressRequest).FileOutputs[0].Output.(*livekit.EncodedFileOutput_S3).S3.Secret)
 
 	roomComposite := &livekit.RoomCompositeEgressRequest{
-		FileOutputs: []*livekit.EncodedFileOutput{
-			file2,
+		ImageOutputs: []*livekit.ImageOutput{
+			image,
 		},
 	}
 
 	cl = proto.Clone(roomComposite)
 	RedactEncodedOutputs(cl.(EncodedOutput))
 
-	require.Equal(t, "{access_key}", cl.(*livekit.RoomCompositeEgressRequest).FileOutputs[0].Output.(*livekit.EncodedFileOutput_AliOSS).AliOSS.AccessKey)
-	require.Equal(t, "{secret}", cl.(*livekit.RoomCompositeEgressRequest).FileOutputs[0].Output.(*livekit.EncodedFileOutput_AliOSS).AliOSS.Secret)
+	require.Equal(t, "{access_key}", cl.(*livekit.RoomCompositeEgressRequest).ImageOutputs[0].Output.(*livekit.ImageOutput_AliOSS).AliOSS.AccessKey)
+	require.Equal(t, "{secret}", cl.(*livekit.RoomCompositeEgressRequest).ImageOutputs[0].Output.(*livekit.ImageOutput_AliOSS).AliOSS.Secret)
 
 	participant := &livekit.ParticipantEgressRequest{
 		SegmentOutputs: []*livekit.SegmentedFileOutput{
