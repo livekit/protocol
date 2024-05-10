@@ -14,9 +14,11 @@
 
 package egress
 
-import "errors"
+import (
+	"github.com/livekit/psrpc"
+)
 
 var (
-	ErrNoResponse     = errors.New("no response from egress service")
-	ErrEgressTimedOut = errors.New("egress timed out")
+	ErrNoResponse     = psrpc.NewErrorf(psrpc.Unavailable, "no response from egress service")
+	ErrEgressTimedOut = psrpc.NewErrorf(psrpc.DeadlineExceeded, "egress timed out")
 )
