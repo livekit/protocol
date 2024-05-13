@@ -329,6 +329,7 @@ message EgressInfo {
   int64 updated_at = 18;
   string details = 21;
   string error = 9;
+  int32 error_code = 22;
   oneof request {
     RoomCompositeEgressRequest room_composite = 4;
     WebEgressRequest web = 14;
@@ -346,7 +347,7 @@ message EgressInfo {
   repeated SegmentsInfo segment_results = 17;
   repeated ImagesInfo image_results = 20;
 
-  // next ID: 22
+  // next ID: 23
 }
 
 message StreamInfoList {
