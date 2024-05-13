@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.16.0
+
+### Minor Changes
+
+- - Add RedactAutoEncodedOutput to support redacting auto egress types - [#712](https://github.com/livekit/protocol/pull/712) ([@biglittlebigben](https://github.com/biglittlebigben))
+  - Redact image outputs
+  - Support AliOSS uploads for auto egress
+
+- Allow inbound number filtering on SIP Dispatch Rules - [#707](https://github.com/livekit/protocol/pull/707) ([@dennwc](https://github.com/dennwc))
+
+- Move egress request redacting routines to protocol - [#711](https://github.com/livekit/protocol/pull/711) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.15.0
 
 ### Minor Changes
