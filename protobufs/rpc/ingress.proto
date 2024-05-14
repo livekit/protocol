@@ -43,6 +43,10 @@ service IngressHandler {
   rpc DeleteWHIPResource(DeleteWHIPResourceRequest) returns (google.protobuf.Empty) {
     option (psrpc.options).topics = true;
   };
+  rpc ICERestartWHIPResource(ICERestartWHIPResourceRequest) returns (ICERestartWHIPResourceResponse) {
+    option (psrpc.options).topics = true;
+  };
+
 }
 
 message ListActiveIngressRequest {}
@@ -54,6 +58,18 @@ message ListActiveIngressResponse {
 message DeleteWHIPResourceRequest {
   string resource_id = 1;
   string stream_key = 2;
+}
+
+message ICERestartWHIPResourceRequest {
+  string resource_id = 1;
+  string stream_key = 2;
+  string user_fragment = 3;
+  string password = 4;
+  repeated string candidates = 5;
+}
+
+message ICERestartWHIPResourceResponse {
+  string trickle_ice_sdpfrag = 1;
 }
 
 message StartIngressRequest {
