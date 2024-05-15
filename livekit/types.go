@@ -66,3 +66,12 @@ func (p *SipDTMF) ToProto() *DataPacket {
 		},
 	}
 }
+
+// ToProto implements DataPacket in Go SDK.
+func (p *TimeSyncResponse) ToProto() *DataPacket {
+	return &DataPacket{
+		Value: &DataPacket_TimeSyncResponse{
+			TimeSyncResponse: p,
+		},
+	}
+}
