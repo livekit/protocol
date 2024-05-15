@@ -223,8 +223,10 @@ message DataPacket {
     ActiveSpeakerUpdate speaker = 3 [deprecated=true];
     SipDTMF sip_dtmf = 6;
     Transcription transcription = 7;
+    TimeSyncRequest time_sync_request = 8;
+    TimeSyncResponse time_sync_response = 9;
   }
-  // NEXT_ID: 8
+  // NEXT_ID: 10
 }
 
 message ActiveSpeakerUpdate {
@@ -280,6 +282,15 @@ message TranscriptionSegment {
   uint64 end_time = 4;
   bool final = 5;
   string language = 6;
+}
+
+message TimeSyncRequest {
+  string id = 1;
+}
+
+message TimeSyncResponse {
+  string id = 1;
+  uint64 ntp_time = 2;
 }
 
 enum ConnectionQuality {
