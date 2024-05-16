@@ -21,6 +21,23 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
+service AgentService {
+  rpc StartAgentJob(StartAgentJobRequest) returns (Job);
+  rpc StopAgentJob(StopAgentJobRequest) returns (Job); 
+}
+
+message StartAgentJobRequest {
+  JobType type = 1;
+  Room room = 2;
+  optional ParticipantInfo participant = 3;
+  string namespace = 4;
+  map<string, string> metadata = 5;
+}
+
+message StopAgentJobRequest {
+  string id = 1;
+}
+
 message WorkerInfo {
   string id = 1;
   string namespace = 2;
@@ -43,6 +60,8 @@ message Job {
   optional ParticipantInfo participant = 4;
   string namespace = 5;
   map<string, string> metadata = 6;
+  JobStatus status = 7;
+  string error = 8;
 }
 
 // from Worker to Server
