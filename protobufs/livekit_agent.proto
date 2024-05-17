@@ -31,7 +31,7 @@ message StartAgentJobRequest {
   string room_name = 2;
   optional string participant_identity = 3;
   string namespace = 4;
-  map<string, string> metadata = 5;
+  string metadata = 5;
 }
 
 message StopAgentJobRequest {
@@ -59,7 +59,7 @@ message Job {
   Room room = 3;
   optional ParticipantInfo participant = 4;
   string namespace = 5;
-  map<string, string> metadata = 6;
+  string metadata = 6;
   JobStatus status = 7;
   string error = 8;
 }
@@ -182,7 +182,7 @@ message UpdateJobStatus {
 
 message UpdateWorkerStatus {
   optional WorkerStatus status = 1;
-  optional string metadata = 2 [deprecated=true];
+  // optional string metadata = 2 [deprecated=true];
   float load = 3;
 }
 
