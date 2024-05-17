@@ -28,8 +28,8 @@ service AgentService {
 
 message StartAgentJobRequest {
   JobType type = 1;
-  Room room = 2;
-  optional ParticipantInfo participant = 3;
+  string room_name = 2;
+  optional string participant_identity = 3;
   string namespace = 4;
   map<string, string> metadata = 5;
 }
