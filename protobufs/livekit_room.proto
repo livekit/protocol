@@ -21,6 +21,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 import "livekit_egress.proto";
+import "livekit_agent.proto";
 
 // Room service that can be performed on any node
 // they are Twirp-based HTTP req/responses
@@ -59,11 +60,22 @@ service RoomService {
 
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
   rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
+
+  // Create a room configuration. 
+  rpc CreateRoomConfiguration(CreateRoomConfigurationRequest) returns (RoomConfiguration);
+
+  // Update a room configuration 
+  rpc UpdateRoomConfiguration(UpdateRoomConfigurationRequest) returns (RoomConfiguration);
+
+  // List configurations
+  rpc ListRoomConfiguration(ListRoomConfigurationRequest) returns (ListRoomConfigurationResponse);
 }
 
 message CreateRoomRequest {
   // name of the room
   string name = 1;
+  // configuration to use for this room parameters. Setting parameters below override the config defaults. 
+  string config_name = 12;
   // number of seconds to keep the room open if no one joins
   uint32 empty_timeout = 2;
   // number of seconds to keep the room open after everyone leaves
@@ -77,7 +89,7 @@ message CreateRoomRequest {
   // egress
   RoomEgress egress = 6;
   // agent
-  repeated RoomAgent agent = 11;
+  RoomAgent agent = 11;
   // playout delay of subscriber
   uint32 min_playout_delay = 7;
   uint32 max_playout_delay = 8;
@@ -85,7 +97,7 @@ message CreateRoomRequest {
   // so not recommended for rooms with frequent subscription changes
   bool sync_streams = 9;
 
-  // NEXT-ID: 12
+  // NEXT-ID: 13
 }
 
 message RoomEgress {
@@ -95,10 +107,9 @@ message RoomEgress {
 }
 
 message RoomAgent {
-  JobType type = 1;
-  string namespace = 2;
-  map<string, string> metadata = 3;
+  repeated StartAgentJobRequest agents = 1;
 }
+
 
 message ListRoomsRequest {
   // when set, will only return rooms with name match
@@ -198,3 +209,56 @@ message UpdateRoomMetadataRequest {
   // metadata to update. skipping updates if left empty
   string metadata = 2;
 }
+
+message CreateRoomConfigurationRequest {
+  RoomConfiguration configuration = 1;
+}
+
+message UpdateRoomConfigurationRequest {
+  string name = 1; // configuration to update
+  // number of seconds to keep the room open if no one joins
+  optional uint32 empty_timeout = 2;
+  // number of seconds to keep the room open after everyone leaves
+  optional uint32 departure_timeout = 3;
+  // limit number of participants that can be in a room
+  optional uint32 max_participants = 4;
+  // egress
+  optional RoomEgress egress = 5;
+  // agent
+  optional RoomAgent agent = 6;
+  // playout delay of subscriber
+  optional uint32 min_playout_delay = 7;
+  optional uint32 max_playout_delay = 8;
+  // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
+  // so not recommended for rooms with frequent subscription changes
+  optional bool sync_streams = 9;
+}
+
+message ListRoomConfigurationRequest {
+  string name = 1; // If non empty, return only the configurartion with this name
+}
+
+message ListRoomConfigurationResponse {
+  repeated RoomConfiguration configurations = 1;
+}
+
+message RoomConfiguration {
+  string name = 1; // Used as ID, must be unique
+  // number of seconds to keep the room open if no one joins
+  uint32 empty_timeout = 2;
+  // number of seconds to keep the room open after everyone leaves
+  uint32 departure_timeout = 3;
+  // limit number of participants that can be in a room
+  uint32 max_participants = 4;
+  // egress
+  RoomEgress egress = 5;
+  // agent
+  RoomAgent agent = 6;
+  // playout delay of subscriber
+  uint32 min_playout_delay = 7;
+  uint32 max_playout_delay = 8;
+  // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
+  // so not recommended for rooms with frequent subscription changes
+  bool sync_streams = 9;
+}
+
