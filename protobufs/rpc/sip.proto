@@ -59,7 +59,10 @@ message InternalCreateSIPParticipantRequest {
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 12;
 
-  // NEXT ID: 16
+  // Maximum duration of the call (in seconds)
+  int64 max_call_dur_sec = 16;
+
+  // NEXT ID: 17
 }
 
 message InternalCreateSIPParticipantResponse {
