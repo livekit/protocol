@@ -266,7 +266,8 @@ message SipDTMF {
 }
 
 message Transcription {
-  string participant_identity = 2;
+  // Participant that got its speech transcribed
+  string transcribed_participant_identity = 2;
   string track_id = 3;
   repeated TranscriptionSegment segments = 4;
 
