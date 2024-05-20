@@ -167,6 +167,16 @@ message UpdateJobStatus {
     
   // The load that the job currently has on the worker
   float load = 5;
+
+  // Time the job was started
+  int64 started_at = 6;
+
+  // Time the job was ended
+  int64 ended_at = 7;
+
+  // Time the job state was last updated
+  int64 updated_at = 8; 
+ 
 }
 
 message UpdateWorkerStatus {
