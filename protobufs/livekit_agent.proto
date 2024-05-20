@@ -48,6 +48,9 @@ message Job {
   JobStatus status = 7;
   string error = 8;
   float load = 9;
+  int64 started_at = 10;
+  int64 ended_at = 11;
+  int64 updated_at = 12; 
 }
 
 // from Worker to Server
