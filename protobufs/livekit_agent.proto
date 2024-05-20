@@ -23,7 +23,7 @@ import "livekit_models.proto";
 
 service AgentService {
   rpc StartAgentJob(StartAgentJobRequest) returns (Job);
-  rpc StopAgentJob(StopAgentJobRequest) returns (Job); 
+  rpc StopAgentJob(StopAgentJobRequest) returns (Job);
 }
 
 message StartAgentJobRequest {
@@ -36,21 +36,6 @@ message StartAgentJobRequest {
 
 message StopAgentJobRequest {
   string id = 1;
-}
-
-message WorkerInfo {
-  string id = 1;
-  string namespace = 2;
-  string version = 3;
-  string name = 4;
-  JobType type = 5 [deprecated=true];
-  ParticipantPermission allowed_permissions = 6;
-}
-
-message AgentInfo {
-  string id = 1;
-  string name = 2;
-  string version = 3;
 }
 
 message Job {
@@ -173,8 +158,11 @@ message UpdateJobStatus {
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
 
-  // The load that the job currently has on the worker
-  float load = 5;
+    // the metadata can be updated multiple times
+    // optional string metadata = 4 [deprecated=true];
+    
+    // The load that the job currently has on the worker
+    float load = 5;
 }
 
 message UpdateWorkerStatus {
@@ -186,6 +174,6 @@ message UpdateWorkerStatus {
 message JobAssignment {
   Job job = 1;
   optional string url = 2;
-  string token = 3; 
+  string token = 3;
 }
 
