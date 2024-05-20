@@ -173,9 +173,6 @@ message UpdateJobStatus {
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
 
-  // the metadata can be updated multiple times
-  optional string metadata = 4 [deprecated=true];
-  
   // The load that the job currently has on the worker
   float load = 5;
 }
