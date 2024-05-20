@@ -95,9 +95,10 @@ enum WorkerStatus {
 }
 
 enum JobStatus {
-  JS_UNKNOWN = 0;
-  JS_SUCCESS = 1;
-  JS_FAILED = 2;
+  JS_PENDING = 0;
+  JS_STARTED = 1;
+  JS_SUCCESS = 2;
+  JS_FAILED = 3;
 }
 
 message SimulateJobRequest {
