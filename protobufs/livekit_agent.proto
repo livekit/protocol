@@ -47,6 +47,7 @@ message Job {
   string metadata = 6;
   JobStatus status = 7;
   string error = 8;
+  float load = 9;
 }
 
 // from Worker to Server
@@ -158,11 +159,11 @@ message UpdateJobStatus {
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
 
-    // the metadata can be updated multiple times
-    // optional string metadata = 4 [deprecated=true];
+  // the metadata can be updated multiple times
+  // optional string metadata = 4 [deprecated=true];
     
-    // The load that the job currently has on the worker
-    float load = 5;
+  // The load that the job currently has on the worker
+  float load = 5;
 }
 
 message UpdateWorkerStatus {
