@@ -19,6 +19,7 @@ package rpc;
 option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
+import "livekit_sip.proto";
 
 service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
@@ -31,6 +32,7 @@ message InternalCreateSIPParticipantRequest {
   string sip_call_id = 13;
   // IP that SIP INVITE is sent too
   string address = 2;
+  livekit.SIPTransport transport = 16;
 
   // Number used to make the call
   string number = 3;
@@ -59,7 +61,7 @@ message InternalCreateSIPParticipantRequest {
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 12;
 
-  // NEXT ID: 16
+  // NEXT ID: 17
 }
 
 message InternalCreateSIPParticipantResponse {
