@@ -41,6 +41,7 @@ message StopAgentJobRequest {
 
 message ListAgentJobsRequest {
   string job_id = 1; // if set, only the job whose id is given will be returned
+  string room = 2;   // name of the room to list agents for. Must be set
 }
 
 message ListAgentJobsResponse {
