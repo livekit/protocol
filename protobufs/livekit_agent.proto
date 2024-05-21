@@ -24,6 +24,7 @@ import "livekit_models.proto";
 service AgentService {
   rpc StartAgentJob(StartAgentJobRequest) returns (Job);
   rpc StopAgentJob(StopAgentJobRequest) returns (Job);
+  rpc ListAgentJobs(ListAgentJobsRequest) returns (ListAgentJobsResponse);
 }
 
 message StartAgentJobRequest {
@@ -35,7 +36,15 @@ message StartAgentJobRequest {
 }
 
 message StopAgentJobRequest {
-  string id = 1;
+  string job_id = 1;
+}
+
+message ListAgentJobsRequest {
+  string job_id = 1; // if set, only the job whose id is given will be returned
+}
+
+message ListAgentJobsResponse {
+  repeated Job jobs = 1;
 }
 
 message Job {
@@ -45,12 +54,15 @@ message Job {
   optional ParticipantInfo participant = 4;
   string namespace = 5;
   string metadata = 6;
-  JobStatus status = 7;
-  string error = 8;
-  float load = 9;
-  int64 started_at = 10;
-  int64 ended_at = 11;
-  int64 updated_at = 12; 
+  JobState state = 7;
+}
+
+message JobState {
+  JobStatus status = 1;
+  string error = 2;
+  int64 started_at = 3;
+  int64 ended_at = 4;
+  int64 updated_at = 5; 
 }
 
 // from Worker to Server
@@ -80,6 +92,7 @@ message ServerMessage {
     // server asks worker to confirm availability for a job
     AvailabilityRequest availability = 2;
     JobAssignment assignment = 3;
+    JobTermination termination = 5;
     WorkerPong pong = 4;
   }
 }
@@ -96,7 +109,7 @@ enum WorkerStatus {
 
 enum JobStatus {
   JS_PENDING = 0;
-  JS_STARTED = 1;
+  JS_RUNNING = 1;
   JS_SUCCESS = 2;
   JS_FAILED = 3;
 }
@@ -158,26 +171,13 @@ message UpdateJobStatus {
   string job_id = 1;
 
   // The worker can indicate the job end by either specifying SUCCESS or FAILED
-  optional JobStatus status = 2;
+  JobStatus status = 2;
 
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
 
   // the metadata can be updated multiple times
   // optional string metadata = 4 [deprecated=true];
-    
-  // The load that the job currently has on the worker
-  float load = 5;
-
-  // Time the job was started
-  int64 started_at = 6;
-
-  // Time the job was ended
-  int64 ended_at = 7;
-
-  // Time the job state was last updated
-  int64 updated_at = 8; 
- 
 }
 
 message UpdateWorkerStatus {
@@ -192,3 +192,6 @@ message JobAssignment {
   string token = 3;
 }
 
+message JobTermination {
+  string job_id = 1;
+}
