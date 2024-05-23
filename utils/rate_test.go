@@ -31,7 +31,6 @@ import (
 	"go.uber.org/atomic"
 
 	"github.com/benbjohnson/clock"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -253,7 +252,7 @@ func (r *runnerImpl) takeOnceAfter(d time.Duration, rl Limiter) {
 func (r *runnerImpl) assertCountAt(d time.Duration, count int) {
 	r.wg.Add(1)
 	r.afterFunc(d, func() {
-		assert.Equal(r.t, int32(count), r.count.Load(), "count not as expected")
+		require.Equal(r.t, int32(count), r.count.Load(), "count not as expected")
 		r.wg.Done()
 	})
 }
@@ -262,11 +261,8 @@ func (r *runnerImpl) assertCountAt(d time.Duration, count int) {
 func (r *runnerImpl) assertCountAtWithNoise(d time.Duration, count int, noise int) {
 	r.wg.Add(1)
 	r.afterFunc(d, func() {
-		actual := int(r.count.Load())
-		boundMin, boundMax := count-noise, count+noise
-		withinRange := boundMin < actual && actual < boundMax
-		assert.True(r.t, withinRange, "expected count to be within [%d, %d], but got %d",
-			boundMin, boundMax, actual)
+		require.InDelta(r.t, count, int(r.count.Load()), float64(noise),
+			"expected count to be within noise tolerance")
 		r.wg.Done()
 	})
 }
@@ -390,7 +386,7 @@ func TestInitial(t *testing.T) {
 					prev = ts
 				}
 
-				assert.Equal(t,
+				require.Equal(t,
 					[]time.Duration{
 						0,
 						perRequest,
