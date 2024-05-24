@@ -22,30 +22,48 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_models.proto";
 
 service AgentService {
-  rpc StartAgentJob(StartAgentJobRequest) returns (Job);
-  rpc StopAgentJob(StopAgentJobRequest) returns (Job);
-  rpc ListAgentJobs(ListAgentJobsRequest) returns (ListAgentJobsResponse);
+  rpc CreateAgentJobDefinition(CreateAgentJobDefinitionRequest) returns (JobDefinition);
+  rpc DeleteAgentJobDefinition(DeleteAgentJobDefinitionRequest) returns (JobDefinition);
+  rpc ListAgentJobDefinitions(ListAgentJobDefinitionsRequesst) returns (ListAgentJobDefinitionsResponse);
 }
 
-message StartAgentJobRequest {
+message CreateAgentJobDefinitionRequest {
   JobType type = 1;
-  string room_name = 2;
-  optional string participant_identity = 3;
+  string room = 2;
+  repeated string participant_identity = 3;
   string namespace = 4;
   string metadata = 5;
 }
 
-message StopAgentJobRequest {
-  string job_id = 1;
+message DeleteAgentJobDefinitionRequest {
+  string job_definition_id = 1;
 }
 
-message ListAgentJobsRequest {
-  string job_id = 1; // if set, only the job whose id is given will be returned
-  string room = 2;   // name of the room to list agents for. Must be set
+message ListAgentJobDefinitionsRequesst {
+  string job_definition_id = 1; // if set, only the job definition whose id is given will be returned
+  string room = 2;              // name of the room to list agents for. Must be set.
 }
 
-message ListAgentJobsResponse {
+message ListAgentJobDefinitionsResponse {
+  repeated JobDefinition job_definitions = 1;
+}
+
+message JobDefinition {
+  string id = 1;
+  JobType type = 2;
+  string room = 3;
+  repeated string participant_identity = 4;
+  string namespace = 5;
+  string metadata = 6;
+  JobDefinitionState state = 7;
+}
+
+message JobDefinitionState {
+  // For job definitions of tyoe JT_ROOM, there will be at most 1 job. 
+  // For job definitions of type JT_PUBLISHER, there will be 1 job per provided participant identity, or per publisher in the room if left empty.
   repeated Job jobs = 1;
+  int64 created_at = 2;
+  int64 deleted_at = 3;
 }
 
 message Job {

@@ -107,7 +107,7 @@ message RoomEgress {
 }
 
 message RoomAgent {
-  repeated StartAgentJobRequest agents = 1;
+  repeated CreateAgentJobDefinitionRequest agents = 1;
 }
 
 
