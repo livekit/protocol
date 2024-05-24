@@ -109,7 +109,11 @@ message NodeStats {
   uint64 participant_rtc_init = 46;
   float participant_rtc_init_per_sec = 47;
 
-  // NEXT ID: 48
+  // forward metrics
+  uint32 forward_latency = 48;
+  uint32 forward_jitter = 49;
+
+  // NEXT ID: 50
 }
 
 message StartSession {
