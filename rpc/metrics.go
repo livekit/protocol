@@ -37,6 +37,7 @@ type psrpcMetrics struct {
 	streamReceiveTotal *prometheus.CounterVec
 	streamCurrent      *prometheus.GaugeVec
 	errorTotal         *prometheus.CounterVec
+	bytesTotal         *prometheus.CounterVec
 }
 
 var (
@@ -82,6 +83,7 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 
 	labels := append(curryLabelNames, "role", "kind", "service", "method")
 	streamLabels := append(curryLabelNames, "role", "service", "method")
+	bytesLabels := append(labels, "direction")
 
 	metricsBase.requestTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   livekitNamespace,
@@ -115,6 +117,12 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 		Name:        "error_total",
 		ConstLabels: constLabels,
 	}, labels)
+	metricsBase.bytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace:   livekitNamespace,
+		Subsystem:   "psrpc",
+		Name:        "bytes_total",
+		ConstLabels: constLabels,
+	}, bytesLabels)
 
 	metricsBase.mu.Unlock()
 
@@ -123,6 +131,7 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 	prometheus.MustRegister(metricsBase.streamReceiveTotal)
 	prometheus.MustRegister(metricsBase.streamCurrent)
 	prometheus.MustRegister(metricsBase.errorTotal)
+	prometheus.MustRegister(metricsBase.bytesTotal)
 
 	CurryMetricLabels(o.curryLabels)
 }
@@ -146,6 +155,7 @@ func CurryMetricLabels(labels prometheus.Labels) {
 		streamReceiveTotal: metricsBase.streamReceiveTotal.MustCurryWith(metricsBase.curryLabels),
 		streamCurrent:      metricsBase.streamCurrent.MustCurryWith(metricsBase.curryLabels),
 		errorTotal:         metricsBase.errorTotal.MustCurryWith(metricsBase.curryLabels),
+		bytesTotal:         metricsBase.bytesTotal.MustCurryWith(metricsBase.curryLabels),
 	})
 }
 
@@ -153,59 +163,73 @@ var _ middleware.MetricsObserver = PSRPCMetricsObserver{}
 
 type PSRPCMetricsObserver struct{}
 
-func (o PSRPCMetricsObserver) OnUnaryRequest(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, err error) {
+func (o PSRPCMetricsObserver) OnUnaryRequest(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, err error, rxBytes, txBytes int) {
+	m := metrics.Load()
+	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "rx").Add(float64(rxBytes))
+	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(txBytes))
+
 	if err != nil {
-		metrics.Load().errorTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Inc()
-	} else if role == middleware.ClientRole {
-		metrics.Load().requestTime.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
+		m.errorTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Inc()
 	} else {
-		metrics.Load().requestTime.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
+		m.requestTime.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
 }
 
-func (o PSRPCMetricsObserver) OnMultiRequest(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, responseCount int, errorCount int) {
+func (o PSRPCMetricsObserver) OnMultiRequest(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, responseCount, errorCount, rxBytes, txBytes int) {
+	m := metrics.Load()
+	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "rx").Add(float64(rxBytes))
+	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(txBytes))
+
 	if responseCount == 0 {
-		metrics.Load().errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Inc()
-	} else if role == middleware.ClientRole {
-		metrics.Load().requestTime.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
+		m.errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Inc()
 	} else {
-		metrics.Load().requestTime.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
+		m.requestTime.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
 }
 
-func (o PSRPCMetricsObserver) OnStreamSend(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, err error) {
+func (o PSRPCMetricsObserver) OnStreamSend(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, err error, bytes int) {
+	m := metrics.Load()
+	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(bytes))
+
 	if err != nil {
-		metrics.Load().errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
 	} else {
-		metrics.Load().streamSendTime.WithLabelValues(role.String(), info.Service, info.Method).Observe(float64(duration.Milliseconds()))
+		m.streamSendTime.WithLabelValues(role.String(), info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
 }
 
-func (o PSRPCMetricsObserver) OnStreamRecv(role middleware.MetricRole, info psrpc.RPCInfo, err error) {
+func (o PSRPCMetricsObserver) OnStreamRecv(role middleware.MetricRole, info psrpc.RPCInfo, err error, bytes int) {
+	m := metrics.Load()
+	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "rx").Add(float64(bytes))
+
 	if err != nil {
-		metrics.Load().errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
 	} else {
-		metrics.Load().streamReceiveTotal.WithLabelValues(role.String(), info.Service, info.Method).Inc()
+		m.streamReceiveTotal.WithLabelValues(role.String(), info.Service, info.Method).Inc()
 	}
 }
 
 func (o PSRPCMetricsObserver) OnStreamOpen(role middleware.MetricRole, info psrpc.RPCInfo) {
-	metrics.Load().streamCurrent.WithLabelValues(role.String(), info.Service, info.Method).Inc()
+	m := metrics.Load()
+	m.streamCurrent.WithLabelValues(role.String(), info.Service, info.Method).Inc()
 }
 
 func (o PSRPCMetricsObserver) OnStreamClose(role middleware.MetricRole, info psrpc.RPCInfo) {
-	metrics.Load().streamCurrent.WithLabelValues(role.String(), info.Service, info.Method).Dec()
+	m := metrics.Load()
+	m.streamCurrent.WithLabelValues(role.String(), info.Service, info.Method).Dec()
 }
+
+var _ middleware.MetricsObserver = UnimplementedMetricsObserver{}
 
 type UnimplementedMetricsObserver struct{}
 
-func (o UnimplementedMetricsObserver) OnUnaryRequest(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, duration time.Duration, err error) {
+func (o UnimplementedMetricsObserver) OnUnaryRequest(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, duration time.Duration, err error, rxBytes, txBytes int) {
 }
-func (o UnimplementedMetricsObserver) OnMultiRequest(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, duration time.Duration, responseCount int, errorCount int) {
+func (o UnimplementedMetricsObserver) OnMultiRequest(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, duration time.Duration, responseCount, errorCount, reqBytes, txBytes int) {
 }
-func (o UnimplementedMetricsObserver) OnStreamSend(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, duration time.Duration, err error) {
+func (o UnimplementedMetricsObserver) OnStreamSend(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, duration time.Duration, err error, bytes int) {
 }
-func (o UnimplementedMetricsObserver) OnStreamRecv(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, err error) {
+func (o UnimplementedMetricsObserver) OnStreamRecv(role middleware.MetricRole, rpcInfo psrpc.RPCInfo, err error, bytes int) {
 }
 func (o UnimplementedMetricsObserver) OnStreamOpen(role middleware.MetricRole, rpcInfo psrpc.RPCInfo) {
 }
