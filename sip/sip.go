@@ -17,9 +17,11 @@ package sip
 import (
 	"fmt"
 	"math"
+	"net/netip"
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 
 	"golang.org/x/exp/slices"
 
@@ -222,9 +224,36 @@ func ValidateTrunks(trunks []*livekit.SIPTrunkInfo) error {
 	return nil
 }
 
+func matchAddrs(addr string, mask string) bool {
+	if !strings.Contains(mask, "/") {
+		return addr == mask
+	}
+	ip, err := netip.ParseAddr(addr)
+	if err != nil {
+		return false
+	}
+	pref, err := netip.ParsePrefix(mask)
+	if err != nil {
+		return false
+	}
+	return pref.Contains(ip)
+}
+
+func matchAddr(addr string, masks []string) bool {
+	if addr == "" {
+		return true
+	}
+	for _, mask := range masks {
+		if !matchAddrs(addr, mask) {
+			return false
+		}
+	}
+	return true
+}
+
 // MatchTrunk finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
-func MatchTrunk(trunks []*livekit.SIPTrunkInfo, calling, called string) (*livekit.SIPTrunkInfo, error) {
+func MatchTrunk(trunks []*livekit.SIPTrunkInfo, srcIP, calling, called string) (*livekit.SIPTrunkInfo, error) {
 	var (
 		selectedTrunk   *livekit.SIPTrunkInfo
 		defaultTrunk    *livekit.SIPTrunkInfo
@@ -233,6 +262,9 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, calling, called string) (*liveki
 	for _, tr := range trunks {
 		// Do not consider it if number doesn't match.
 		if len(tr.InboundNumbers) != 0 && !slices.Contains(tr.InboundNumbers, calling) {
+			continue
+		}
+		if !matchAddr(srcIP, tr.InboundAddresses) {
 			continue
 		}
 		// Deprecated, but we still check it for backward compatibility.
