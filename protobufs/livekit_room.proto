@@ -60,15 +60,6 @@ service RoomService {
 
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
   rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
-
-  // Create a room configuration. 
-  rpc CreateRoomConfiguration(CreateRoomConfigurationRequest) returns (RoomConfiguration);
-
-  // Update a room configuration 
-  rpc UpdateRoomConfiguration(UpdateRoomConfigurationRequest) returns (RoomConfiguration);
-
-  // List configurations
-  rpc ListRoomConfiguration(ListRoomConfigurationRequest) returns (ListRoomConfigurationResponse);
 }
 
 message CreateRoomRequest {
@@ -208,38 +199,6 @@ message UpdateRoomMetadataRequest {
   string room = 1;
   // metadata to update. skipping updates if left empty
   string metadata = 2;
-}
-
-message CreateRoomConfigurationRequest {
-  RoomConfiguration configuration = 1;
-}
-
-message UpdateRoomConfigurationRequest {
-  string name = 1; // configuration to update
-  // number of seconds to keep the room open if no one joins
-  optional uint32 empty_timeout = 2;
-  // number of seconds to keep the room open after everyone leaves
-  optional uint32 departure_timeout = 3;
-  // limit number of participants that can be in a room
-  optional uint32 max_participants = 4;
-  // egress
-  optional RoomEgress egress = 5;
-  // agent
-  optional RoomAgent agent = 6;
-  // playout delay of subscriber
-  optional uint32 min_playout_delay = 7;
-  optional uint32 max_playout_delay = 8;
-  // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
-  // so not recommended for rooms with frequent subscription changes
-  optional bool sync_streams = 9;
-}
-
-message ListRoomConfigurationRequest {
-  string name = 1; // If non empty, return only the configurartion with this name
-}
-
-message ListRoomConfigurationResponse {
-  repeated RoomConfiguration configurations = 1;
 }
 
 message RoomConfiguration {
