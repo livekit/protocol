@@ -157,7 +157,7 @@ func TestSIPMatchTrunk(t *testing.T) {
 	for _, c := range trunkCases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
-			got, err := MatchTrunk(c.trunks, sipNumber1, sipNumber2)
+			got, err := MatchTrunk(c.trunks, "", sipNumber1, sipNumber2)
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
@@ -512,6 +512,26 @@ func TestSIPValidateDispatchRules(t *testing.T) {
 			} else {
 				require.NoError(t, err)
 			}
+		})
+	}
+}
+
+func TestMatchIP(t *testing.T) {
+	cases := []struct {
+		addr string
+		mask string
+		exp  bool
+	}{
+		{addr: "192.168.0.10", mask: "192.168.0.10", exp: true},
+		{addr: "192.168.0.10", mask: "192.168.0.11", exp: false},
+		{addr: "192.168.0.10", mask: "192.168.0.0/24", exp: true},
+		{addr: "192.168.0.10", mask: "192.168.0.10/0", exp: true},
+		{addr: "192.168.0.10", mask: "192.170.0.0/24", exp: false},
+	}
+	for _, c := range cases {
+		t.Run(c.mask, func(t *testing.T) {
+			got := matchAddrs(c.addr, c.mask)
+			require.Equal(t, c.exp, got)
 		})
 	}
 }
