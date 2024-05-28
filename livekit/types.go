@@ -81,3 +81,13 @@ func (r *RoomEgress) UnmarshalYAML(value *yaml.Node) error {
 
 	return protoyaml.Unmarshal(str, r)
 }
+
+func (r *RoomAgent) UnmarshalYAML(value *yaml.Node) error {
+	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
+	str, err := yaml.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return protoyaml.Unmarshal(str, r)
+}
