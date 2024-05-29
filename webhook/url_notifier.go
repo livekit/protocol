@@ -32,11 +32,12 @@ import (
 )
 
 type URLNotifierParams struct {
-	Logger    logger.Logger
-	QueueSize int
-	URL       string
-	APIKey    string
-	APISecret string
+	Logger       logger.Logger
+	QueueSize    int
+	DropWhenFull bool
+	URL          string
+	APIKey       string
+	APISecret    string
 }
 
 const defaultQueueSize = 100
@@ -66,7 +67,7 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	n.client.Logger = &logAdapter{}
 	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
-		DropWhenFull: true,
+		DropWhenFull: params.DropWhenFull,
 		OnDropped:    func() { n.dropped.Inc() },
 	})
 	return n
@@ -102,6 +103,7 @@ func (n *URLNotifier) Stop(force bool) {
 func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
 	// set dropped count
 	event.NumDropped = n.dropped.Swap(0)
+	event.DequeuedAt = time.Now().Unix()
 	encoded, err := protojson.Marshal(event)
 	if err != nil {
 		return err

@@ -16,10 +16,10 @@ package webhook
 
 import (
 	"context"
+	"github.com/livekit/protocol/logger"
 	"sync"
 
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/logger"
 )
 
 type QueuedNotifier interface {
@@ -34,11 +34,25 @@ func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier 
 	n := &DefaultNotifier{}
 	for _, url := range urls {
 		u := NewURLNotifier(URLNotifierParams{
-			URL:       url,
-			Logger:    logger.GetLogger().WithComponent("webhook"),
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			URL:          url,
+			Logger:       logger.GetLogger().WithComponent("webhook"),
+			APIKey:       apiKey,
+			APISecret:    apiSecret,
+			DropWhenFull: true,
 		})
+		n.urlNotifiers = append(n.urlNotifiers, u)
+	}
+	return n
+}
+
+func NewDefaultNotifierByParams(params []URLNotifierParams) QueuedNotifier {
+	n := &DefaultNotifier{}
+	for _, p := range params {
+		if p.Logger == nil {
+			p.Logger = logger.GetLogger().WithComponent("webhook")
+		}
+
+		u := NewURLNotifier(p)
 		n.urlNotifiers = append(n.urlNotifiers, u)
 	}
 	return n
