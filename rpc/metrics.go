@@ -177,8 +177,8 @@ func (o PSRPCMetricsObserver) OnUnaryRequest(role middleware.MetricRole, info ps
 
 func (o PSRPCMetricsObserver) OnMultiRequest(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, responseCount, errorCount, rxBytes, txBytes int) {
 	m := metrics.Load()
-	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "rx").Add(float64(rxBytes))
-	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(txBytes))
+	m.bytesTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method, "rx").Add(float64(rxBytes))
+	m.bytesTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method, "tx").Add(float64(txBytes))
 
 	if responseCount == 0 {
 		m.errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Inc()
@@ -189,7 +189,7 @@ func (o PSRPCMetricsObserver) OnMultiRequest(role middleware.MetricRole, info ps
 
 func (o PSRPCMetricsObserver) OnStreamSend(role middleware.MetricRole, info psrpc.RPCInfo, duration time.Duration, err error, bytes int) {
 	m := metrics.Load()
-	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(bytes))
+	m.bytesTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, "tx").Add(float64(bytes))
 
 	if err != nil {
 		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
@@ -200,7 +200,7 @@ func (o PSRPCMetricsObserver) OnStreamSend(role middleware.MetricRole, info psrp
 
 func (o PSRPCMetricsObserver) OnStreamRecv(role middleware.MetricRole, info psrpc.RPCInfo, err error, bytes int) {
 	m := metrics.Load()
-	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "rx").Add(float64(bytes))
+	m.bytesTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, "rx").Add(float64(bytes))
 
 	if err != nil {
 		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
