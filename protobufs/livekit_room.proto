@@ -74,6 +74,7 @@ message CreateRoomRequest {
   string node_id = 4;
   // metadata of room
   string metadata = 5;
+  Metadata kv_metadata = 11;
   // egress
   RoomEgress egress = 6;
   // playout delay of subscriber
@@ -83,7 +84,7 @@ message CreateRoomRequest {
   // so not recommended for rooms with frequent subscription changes
   bool sync_streams = 9;
 
-  // NEXT-ID: 11
+  // NEXT-ID: 12
 }
 
 message RoomEgress {
@@ -147,6 +148,9 @@ message UpdateParticipantRequest {
   string identity = 2;
   // metadata to update. skipping updates if left empty
   string metadata = 3;
+  // KV metadata to update.
+  // New keys will be added, existing ones will be overwritten, empty value removes a key.
+  Metadata kv_metadata = 6;
   // set to update the participant's permissions
   ParticipantPermission permission = 4;
   // display name to update
@@ -189,4 +193,7 @@ message UpdateRoomMetadataRequest {
   string room = 1;
   // metadata to update. skipping updates if left empty
   string metadata = 2;
+  // KV metadata to update.
+  // New keys will be added, existing ones will be overwritten, empty value removes a key.
+  Metadata kv_metadata = 3;
 }

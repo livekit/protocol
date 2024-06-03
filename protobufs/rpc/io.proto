@@ -18,6 +18,7 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
+import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "google/protobuf/empty.proto";
@@ -130,6 +131,7 @@ message EvaluateSIPDispatchRulesResponse {
   string participant_name = 7;
   // What should be used for the LiveKit participant metadata
   string participant_metadata = 8;
+  livekit.Metadata participant_kv_metadata = 11;
 
   bool request_pin = 3 [deprecated=true]; // see result
 
@@ -145,7 +147,7 @@ message EvaluateSIPDispatchRulesResponse {
   string sip_trunk_id = 9;
   // Dispatch Rule used to fulfill this request
   string sip_dispatch_rule_id = 10;
-  // NEXT ID: 11
+  // NEXT ID: 12
 }
 
 enum SIPDispatchResult {

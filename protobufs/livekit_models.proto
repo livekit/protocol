@@ -21,6 +21,19 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
 
+message Metadata {
+  // Internal LiveKit keys must be in the following format:
+  //  livekit.<system>.<key>[.<subkey>...]
+  // Keys must be in camelCase.
+  //
+  // For example:
+  //  livekit.sip.callID
+  //
+  // Users keys must be in the following format:
+  //  user.<key>[.<subkey>...]
+  map<string,string> kv = 1;
+}
+
 message Room {
   string sid = 1;
   string name = 2;
@@ -31,12 +44,13 @@ message Room {
   string turn_password = 6;
   repeated Codec enabled_codecs = 7;
   string metadata = 8;
+  Metadata kv_metadata = 15;
   uint32 num_participants = 9;
   uint32 num_publishers = 11;
   bool active_recording = 10;
   TimedVersion version = 13;
 
-  // NEXT-ID: 15
+  // NEXT-ID: 16
 }
 
 message Codec {
@@ -118,6 +132,7 @@ message ParticipantInfo {
   State state = 3;
   repeated TrackInfo tracks = 4;
   string metadata = 5;
+  Metadata kv_metadata = 15;
   // timestamp when participant joined room, in seconds
   int64 joined_at = 6;
   string name = 9;
@@ -128,6 +143,8 @@ message ParticipantInfo {
   // and can publish to the server
   bool is_publisher = 13;
   Kind kind = 14;
+
+  // NEXT_ID: 15
 }
 
 enum TrackType {

@@ -266,6 +266,7 @@ message UpdateVideoLayers {
 
 message UpdateParticipantMetadata {
   string metadata = 1;
+  Metadata kv_metadata = 3;
   string name = 2;
 }
 

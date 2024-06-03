@@ -20,6 +20,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "livekit_models.proto";
+
 /*
    LiveKit's SIP API is built with 3 high level primitives
    - SIP Trunk
@@ -88,6 +90,8 @@ message CreateSIPTrunkRequest {
   string name = 10;
   // Optional user-defined metadata for the Trunk.
   string metadata = 11;
+  // Optional KV metadata for the Trunk.
+  Metadata kv_metadata = 12;
 }
 
 enum SIPTransport {
@@ -131,8 +135,10 @@ message SIPTrunkInfo {
   string name = 11;
   // User-defined metadata for the Trunk.
   string metadata = 12;
+  // KV metadata for the Trunk.
+  Metadata kv_metadata = 14;
 
-  // NEXT ID: 14
+  // NEXT ID: 15
 }
 
 message ListSIPTrunkRequest {
@@ -192,6 +198,8 @@ message CreateSIPDispatchRuleRequest {
   string name = 4;
   // Optional user-defined metadata for the Dispatch Rule.
   string metadata = 5;
+  // KV metadata for the Dispatch Rule.
+  Metadata kv_metadata = 7;
 
   // NEXT ID: 7
 }
@@ -209,6 +217,8 @@ message SIPDispatchRuleInfo {
   // User-defined metadata for the Dispatch Rule.
   // Participants created by this rule will inherit this metadata.
   string metadata = 6;
+  // KV metadata for the Dispatch Rule.
+  Metadata kv_metadata = 8;
 
   // NEXT ID: 8
 }
@@ -244,6 +254,8 @@ message CreateSIPParticipantRequest {
 
   // Optional user-defined metadata. Will be attached to a created Participant in the room.
   string participant_metadata = 8;
+  // Optional user-defined KV metadata. Will be attached to a created Participant in the room.
+  Metadata participant_kv_metadata = 9;
 
   // Optionally send following DTMF digits (extension codes) when making a call.
   // Character 'w' can be used to add a 0.5 sec delay.
@@ -252,7 +264,7 @@ message CreateSIPParticipantRequest {
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 6;
 
-  // NEXT ID: 9
+  // NEXT ID: 10
 }
 
 message SIPParticipantInfo {

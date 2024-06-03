@@ -45,6 +45,7 @@ message CreateIngressRequest {
   string participant_name = 5;
   // metadata associated with the publishing participant
   string participant_metadata = 10;
+  Metadata participant_kv_metadata = 12;
   // [depreacted ] whether to pass through the incoming media without transcoding, only compatible with some input types. Use `enable_transcoding` instead.
   bool bypass_transcoding = 8 [deprecated = true];
   // Whether to transcode the ingested media. Only WHIP supports disabling transcoding currently. WHIP will default to transcoding disabled. Replaces `bypass_transcoding. 
@@ -132,10 +133,11 @@ message IngressInfo {
   string participant_identity = 9;
   string participant_name = 10;
   string participant_metadata = 14;
+  Metadata participant_kv_metadata = 16;
   bool reusable = 11;
   IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
 
-  // NEXT_ID: 16
+  // NEXT_ID: 17
 }
 
 message IngressState {
@@ -183,12 +185,13 @@ message UpdateIngressRequest {
   string participant_identity = 4;
   string participant_name = 5;
   string participant_metadata = 9;
+  Metadata participant_kv_metadata = 11;
   optional bool bypass_transcoding = 8 [deprecated = true];
   optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
 
-  // NEXT_ID: 11
+  // NEXT_ID: 12
 }
 
 message ListIngressRequest {

@@ -142,6 +142,7 @@ message AvailabilityResponse {
     string participant_name = 4;
     string participant_identity = 5;
     string participant_metadata = 6;
+    Metadata participant_kv_metadata = 7;
 }
 
 message UpdateJobStatus {
@@ -155,6 +156,7 @@ message UpdateJobStatus {
 
     // the metadata can be updated multiple times
     optional string metadata = 4;
+    Metadata kv_metadata = 6;
     
     // The load that the job currently has on the worker
     float load = 5;
@@ -163,6 +165,7 @@ message UpdateJobStatus {
 message UpdateWorkerStatus {
     optional WorkerStatus status = 1;
     optional string metadata = 2;
+    Metadata kv_metadata = 4;
     float load = 3;
 }
 
