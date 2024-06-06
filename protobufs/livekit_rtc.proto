@@ -47,7 +47,8 @@ message SignalRequest {
     SimulateScenario simulate = 13;
     // client triggered ping to server
     int64 ping = 14; // deprecated by ping_req (message Ping)
-    // update a participant's own metadata and/or name
+    // update a participant's own metadata, name, or attributes
+    // requires canUpdateOwnParticipantMetadata permission
     UpdateParticipantMetadata update_metadata = 15;
     Ping ping_req = 16;
     // Update local audio track settings
@@ -111,7 +112,7 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
-  
+
   // NEXT-ID: 4
 }
 
@@ -267,6 +268,9 @@ message UpdateVideoLayers {
 message UpdateParticipantMetadata {
   string metadata = 1;
   string name = 2;
+  // attributes to update. it only updates attributes that have been set
+  // to delete attributes, set the value to an empty string
+  map<string, string> attributes = 3;
 }
 
 message ICEServer {
