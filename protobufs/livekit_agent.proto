@@ -149,8 +149,7 @@ message WorkerPong {
 }
 
 message RegisterWorkerRequest {
-  JobType type = 1 [deprecated=true]; // use `types` instead. If types is non empty, type will be ignored
-  repeated JobType types = 8;
+  JobType type = 1;
   //string worker_id = 2;
   string version = 3;
   string name = 4;
