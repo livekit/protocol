@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package guid
 
 import (
 	"testing"
@@ -22,20 +22,20 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func TestMarshalUnmarshalGuid(t *testing.T) {
-	id0 := livekit.TrackID(NewGuid(TrackPrefix))
-	b0 := MarshalGuid(id0)
-	id1 := UnmarshalGuid[livekit.TrackID](b0)
-	b1 := MarshalGuid(id1)
+func TestMarshalUnmarshal(t *testing.T) {
+	id0 := livekit.TrackID(New(TrackPrefix))
+	b0 := Marshal(id0)
+	id1 := Unmarshal[livekit.TrackID](b0)
+	b1 := Marshal(id1)
 	require.EqualValues(t, id0, id1)
 	require.EqualValues(t, b0, b1)
 }
 
-func BenchmarkNewGuid(b *testing.B) {
+func BenchmarkNew(b *testing.B) {
 	b.Run("new", func(b *testing.B) {
 		var guid string
 		for i := 0; i < b.N; i++ {
-			guid = NewGuid(TrackPrefix)
+			guid = New(TrackPrefix)
 		}
 		_ = guid
 	})
