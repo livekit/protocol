@@ -16,12 +16,13 @@
 // versions:
 // - protoc-gen-go-grpc v1.4.0
 // - protoc             v4.23.4
-// source: livekit_analytics.proto
+// source: rpc/analytics.proto
 
-package livekit
+package rpc
 
 import (
 	context "context"
+	livekit "github.com/livekit/protocol/livekit"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -67,7 +68,7 @@ func (c *analyticsRecorderServiceClient) IngestStats(ctx context.Context, opts .
 }
 
 type AnalyticsRecorderService_IngestStatsClient interface {
-	Send(*AnalyticsStats) error
+	Send(*livekit.AnalyticsStats) error
 	CloseAndRecv() (*emptypb.Empty, error)
 	grpc.ClientStream
 }
@@ -76,7 +77,7 @@ type analyticsRecorderServiceIngestStatsClient struct {
 	grpc.ClientStream
 }
 
-func (x *analyticsRecorderServiceIngestStatsClient) Send(m *AnalyticsStats) error {
+func (x *analyticsRecorderServiceIngestStatsClient) Send(m *livekit.AnalyticsStats) error {
 	return x.ClientStream.SendMsg(m)
 }
 
@@ -102,7 +103,7 @@ func (c *analyticsRecorderServiceClient) IngestEvents(ctx context.Context, opts 
 }
 
 type AnalyticsRecorderService_IngestEventsClient interface {
-	Send(*AnalyticsEvents) error
+	Send(*livekit.AnalyticsEvents) error
 	CloseAndRecv() (*emptypb.Empty, error)
 	grpc.ClientStream
 }
@@ -111,7 +112,7 @@ type analyticsRecorderServiceIngestEventsClient struct {
 	grpc.ClientStream
 }
 
-func (x *analyticsRecorderServiceIngestEventsClient) Send(m *AnalyticsEvents) error {
+func (x *analyticsRecorderServiceIngestEventsClient) Send(m *livekit.AnalyticsEvents) error {
 	return x.ClientStream.SendMsg(m)
 }
 
@@ -137,7 +138,7 @@ func (c *analyticsRecorderServiceClient) IngestNodeRoomStates(ctx context.Contex
 }
 
 type AnalyticsRecorderService_IngestNodeRoomStatesClient interface {
-	Send(*AnalyticsNodeRooms) error
+	Send(*livekit.AnalyticsNodeRooms) error
 	CloseAndRecv() (*emptypb.Empty, error)
 	grpc.ClientStream
 }
@@ -146,7 +147,7 @@ type analyticsRecorderServiceIngestNodeRoomStatesClient struct {
 	grpc.ClientStream
 }
 
-func (x *analyticsRecorderServiceIngestNodeRoomStatesClient) Send(m *AnalyticsNodeRooms) error {
+func (x *analyticsRecorderServiceIngestNodeRoomStatesClient) Send(m *livekit.AnalyticsNodeRooms) error {
 	return x.ClientStream.SendMsg(m)
 }
 
@@ -204,7 +205,7 @@ func _AnalyticsRecorderService_IngestStats_Handler(srv interface{}, stream grpc.
 
 type AnalyticsRecorderService_IngestStatsServer interface {
 	SendAndClose(*emptypb.Empty) error
-	Recv() (*AnalyticsStats, error)
+	Recv() (*livekit.AnalyticsStats, error)
 	grpc.ServerStream
 }
 
@@ -216,8 +217,8 @@ func (x *analyticsRecorderServiceIngestStatsServer) SendAndClose(m *emptypb.Empt
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *analyticsRecorderServiceIngestStatsServer) Recv() (*AnalyticsStats, error) {
-	m := new(AnalyticsStats)
+func (x *analyticsRecorderServiceIngestStatsServer) Recv() (*livekit.AnalyticsStats, error) {
+	m := new(livekit.AnalyticsStats)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -230,7 +231,7 @@ func _AnalyticsRecorderService_IngestEvents_Handler(srv interface{}, stream grpc
 
 type AnalyticsRecorderService_IngestEventsServer interface {
 	SendAndClose(*emptypb.Empty) error
-	Recv() (*AnalyticsEvents, error)
+	Recv() (*livekit.AnalyticsEvents, error)
 	grpc.ServerStream
 }
 
@@ -242,8 +243,8 @@ func (x *analyticsRecorderServiceIngestEventsServer) SendAndClose(m *emptypb.Emp
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *analyticsRecorderServiceIngestEventsServer) Recv() (*AnalyticsEvents, error) {
-	m := new(AnalyticsEvents)
+func (x *analyticsRecorderServiceIngestEventsServer) Recv() (*livekit.AnalyticsEvents, error) {
+	m := new(livekit.AnalyticsEvents)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -256,7 +257,7 @@ func _AnalyticsRecorderService_IngestNodeRoomStates_Handler(srv interface{}, str
 
 type AnalyticsRecorderService_IngestNodeRoomStatesServer interface {
 	SendAndClose(*emptypb.Empty) error
-	Recv() (*AnalyticsNodeRooms, error)
+	Recv() (*livekit.AnalyticsNodeRooms, error)
 	grpc.ServerStream
 }
 
@@ -268,8 +269,8 @@ func (x *analyticsRecorderServiceIngestNodeRoomStatesServer) SendAndClose(m *emp
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *analyticsRecorderServiceIngestNodeRoomStatesServer) Recv() (*AnalyticsNodeRooms, error) {
-	m := new(AnalyticsNodeRooms)
+func (x *analyticsRecorderServiceIngestNodeRoomStatesServer) Recv() (*livekit.AnalyticsNodeRooms, error) {
+	m := new(livekit.AnalyticsNodeRooms)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -300,5 +301,5 @@ var AnalyticsRecorderService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "livekit_analytics.proto",
+	Metadata: "rpc/analytics.proto",
 }
