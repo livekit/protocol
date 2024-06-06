@@ -29,10 +29,11 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
+	"github.com/livekit/protocol/utils/guid"
 )
 
 func NewCallID() string {
-	return utils.NewGuid(utils.SIPCallPrefix)
+	return guid.New(utils.SIPCallPrefix)
 }
 
 type ErrNoDispatchMatched struct {
@@ -419,7 +420,7 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	case *livekit.SIPDispatchRule_DispatchRuleIndividual:
 		// TODO: Do we need to escape specific characters in the number?
 		// TODO: Include actual SIP call ID in the room name?
-		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, utils.NewGuid(""))
+		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, guid.New(""))
 	}
 	return &rpc.EvaluateSIPDispatchRulesResponse{
 		SipDispatchRuleId:   rule.SipDispatchRuleId,
