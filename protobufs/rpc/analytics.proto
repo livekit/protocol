@@ -15,9 +15,7 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/livekit/rpc";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
+option go_package = "github.com/livekit/protocol/rpc";
 
 import "google/protobuf/empty.proto";
 import "livekit_analytics.proto";
