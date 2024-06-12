@@ -55,3 +55,11 @@ message WebhookEvent {
 
   // NEXT_ID: 13
 }
+
+message BatchedWebhookEvents {
+  repeated WebhookEvent events = 1;
+
+  int32 num_dropped = 2;
+
+  int64 dequeued_at = 3;
+}

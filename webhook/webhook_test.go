@@ -47,6 +47,7 @@ func TestWebHook(t *testing.T) {
 	defer s.Stop()
 
 	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl})
+	defer notifier.Stop(true)
 
 	t.Run("test event payload", func(t *testing.T) {
 		event := &livekit.WebhookEvent{
@@ -68,6 +69,46 @@ func TestWebHook(t *testing.T) {
 
 			require.EqualValues(t, event, decodedEvent)
 		}
+		require.NoError(t, notifier.QueueNotify(context.Background(), event))
+		wg.Wait()
+	})
+
+}
+
+func TestBatchWebHook(t *testing.T) {
+	s := newServer(testAddr)
+	require.NoError(t, s.Start())
+	defer s.Stop()
+
+	notifier := NewBatchedNotifier(context.Background(), apiKey, apiSecret, []string{testUrl})
+	defer notifier.Stop(true)
+
+	t.Run("test events payload", func(t *testing.T) {
+		event := &livekit.WebhookEvent{
+			Event: EventTrackPublished,
+			Participant: &livekit.ParticipantInfo{
+				Identity: "test",
+			},
+			Track: &livekit.TrackInfo{
+				Sid: "TR_abcde",
+			},
+		}
+
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		s.handler = func(r *http.Request) {
+			defer wg.Done()
+			decodedEvent, err := ReceiveWebhookEventBatched(r, authProvider)
+			require.NoError(t, err)
+
+			require.Equal(t, 3, len(decodedEvent))
+			for _, ev := range decodedEvent {
+				require.EqualValues(t, event, ev)
+			}
+		}
+		// send 3 times
+		require.NoError(t, notifier.QueueNotify(context.Background(), event))
+		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		wg.Wait()
 	})
@@ -170,8 +211,8 @@ func TestURLNotifierLifecycle(t *testing.T) {
 	})
 }
 
-func newTestNotifier(dropWhenFull bool) *URLNotifier {
-	return NewURLNotifier(URLNotifierParams{
+func newTestNotifier(dropWhenFull bool) URLNotifier {
+	return NewDefaultURLNotifier(URLNotifierParams{
 		QueueSize:    20,
 		URL:          testUrl,
 		APIKey:       apiKey,

@@ -82,3 +82,21 @@ func ReceiveWebhookEvent(r *http.Request, provider auth.KeyProvider) (*livekit.W
 	}
 	return &event, nil
 }
+
+func ReceiveWebhookEventBatched(r *http.Request, provider auth.KeyProvider) ([]*livekit.WebhookEvent, error) {
+	data, err := Receive(r, provider)
+	if err != nil {
+		return nil, err
+	}
+	unmarshalOpts := protojson.UnmarshalOptions{
+		DiscardUnknown: true,
+		AllowPartial:   true,
+	}
+
+	events := livekit.BatchedWebhookEvents{}
+	if err = unmarshalOpts.Unmarshal(data, &events); err != nil {
+		return nil, err
+	}
+
+	return events.Events, nil
+}
