@@ -15,7 +15,10 @@
 package sip
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"maps"
 	"math"
 	"net/netip"
 	"regexp"
@@ -381,21 +384,37 @@ func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatch
 }
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
-func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
+func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
 	sentPin := req.GetPin()
 
+	attrs := maps.Clone(rule.Attributes)
+	if attrs == nil {
+		attrs = make(map[string]string)
+	}
+	for k, v := range req.ExtraAttributes {
+		attrs[k] = v
+	}
+	attrs[livekit.AttrSIPCallID] = req.SipCallId
+	attrs[livekit.AttrSIPTrunkID] = trunkID
+
 	from := req.CallingNumber
+	fromName := "Phone " + req.CallingNumber
+	fromID := "sip_" + req.CallingNumber
 	if rule.HidePhoneNumber {
-		// TODO: Decide on the phone masking format.
-		//       Maybe keep regional code, but mask all but 4 last digits?
+		// Mask the phone number, hash identity. Omit number in attrs.
+		h := sha256.Sum256([]byte(req.CallingNumber))
+		fromID = "sip_" + hex.EncodeToString(h[:8])
+		// TODO: Maybe keep regional code, but mask all but 4 last digits?
 		n := 4
 		if len(from) <= 4 {
 			n = 1
 		}
 		from = from[len(from)-n:]
+		fromName = "Phone " + from
+	} else {
+		attrs[livekit.AttrSIPFromNumber] = req.CallingNumber
+		attrs[livekit.AttrSIPToNumber] = req.CalledNumber
 	}
-	fromID := "sip_" + from
-	fromName := "Phone " + from
 
 	room, rulePin, err := GetPinAndRoom(rule)
 	if err != nil {
@@ -404,6 +423,7 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 	if rulePin != "" {
 		if sentPin == "" {
 			return &rpc.EvaluateSIPDispatchRulesResponse{
+				SipTrunkId:        trunkID,
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
 				RequestPin:        true,
@@ -422,12 +442,15 @@ func EvaluateDispatchRule(rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSI
 		// TODO: Include actual SIP call ID in the room name?
 		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, guid.New(""))
 	}
+	attrs[livekit.AttrSIPDispatchRuleID] = rule.SipDispatchRuleId
 	return &rpc.EvaluateSIPDispatchRulesResponse{
-		SipDispatchRuleId:   rule.SipDispatchRuleId,
-		Result:              rpc.SIPDispatchResult_ACCEPT,
-		RoomName:            room,
-		ParticipantIdentity: fromID,
-		ParticipantName:     fromName,
-		ParticipantMetadata: rule.Metadata,
+		SipTrunkId:            trunkID,
+		SipDispatchRuleId:     rule.SipDispatchRuleId,
+		Result:                rpc.SIPDispatchResult_ACCEPT,
+		RoomName:              room,
+		ParticipantIdentity:   fromID,
+		ParticipantName:       fromName,
+		ParticipantMetadata:   rule.Metadata,
+		ParticipantAttributes: attrs,
 	}, nil
 }
