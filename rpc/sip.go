@@ -1,6 +1,10 @@
 package rpc
 
-import "github.com/livekit/protocol/livekit"
+import (
+	"strings"
+
+	"github.com/livekit/protocol/livekit"
+)
 
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.
@@ -9,11 +13,23 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPTrunkInfo,
 ) *InternalCreateSIPParticipantRequest {
+	// A sanity check for the number format for well-known providers.
+	outboundNumber := trunk.OutboundNumber
+	switch {
+	case strings.HasSuffix(trunk.OutboundAddress, "telnyx.com"):
+		// Telnyx omits leading '+' by default.
+		outboundNumber = strings.TrimPrefix(outboundNumber, "+")
+	case strings.HasSuffix(trunk.OutboundAddress, "twilio.com"):
+		// Twilio requires leading '+'.
+		if !strings.HasPrefix(outboundNumber, "+") {
+			outboundNumber = "+" + outboundNumber
+		}
+	}
 	return &InternalCreateSIPParticipantRequest{
 		SipCallId:           callID,
 		Address:             trunk.OutboundAddress,
 		Transport:           trunk.Transport,
-		Number:              trunk.OutboundNumber,
+		Number:              outboundNumber,
 		Username:            trunk.OutboundUsername,
 		Password:            trunk.OutboundPassword,
 		CallTo:              req.SipCallTo,
