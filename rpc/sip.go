@@ -24,8 +24,8 @@ func NewCreateSIPParticipantRequest(
 	}
 	attrs[livekit.AttrSIPTrunkID] = trunkID
 	if !req.HidePhoneNumber {
-		attrs[livekit.AttrSIPToNumber] = req.SipCallTo
-		attrs[livekit.AttrSIPFromNumber] = trunk.OutboundNumber
+		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
+		attrs[livekit.AttrSIPTrunkNumber] = trunk.OutboundNumber
 	}
 	return &InternalCreateSIPParticipantRequest{
 		SipCallId:             callID,

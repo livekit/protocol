@@ -412,8 +412,8 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 		from = from[len(from)-n:]
 		fromName = "Phone " + from
 	} else {
-		attrs[livekit.AttrSIPFromNumber] = req.CallingNumber
-		attrs[livekit.AttrSIPToNumber] = req.CalledNumber
+		attrs[livekit.AttrSIPPhoneNumber] = req.CallingNumber
+		attrs[livekit.AttrSIPTrunkNumber] = req.CalledNumber
 	}
 
 	room, rulePin, err := GetPinAndRoom(rule)

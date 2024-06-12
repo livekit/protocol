@@ -43,11 +43,11 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Dtmf:                "1234#",
 		PlayRingtone:        true,
 		ParticipantAttributes: map[string]string{
-			"extra":                   "1",
-			livekit.AttrSIPCallID:     "call-id",
-			livekit.AttrSIPTrunkID:    "trunk",
-			livekit.AttrSIPFromNumber: "+1111",
-			livekit.AttrSIPToNumber:   "+3333",
+			"extra":                    "1",
+			livekit.AttrSIPCallID:      "call-id",
+			livekit.AttrSIPTrunkID:     "trunk",
+			livekit.AttrSIPTrunkNumber: "+1111",
+			livekit.AttrSIPPhoneNumber: "+3333",
 		},
 	}, res)
 

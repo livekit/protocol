@@ -552,8 +552,8 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			livekit.AttrSIPCallID:         "call-id",
 			livekit.AttrSIPTrunkID:        "trunk",
 			livekit.AttrSIPDispatchRuleID: "rule",
-			livekit.AttrSIPFromNumber:     "+11112222",
-			livekit.AttrSIPToNumber:       "+3333",
+			livekit.AttrSIPPhoneNumber:    "+11112222",
+			livekit.AttrSIPTrunkNumber:    "+3333",
 		},
 	}, res)
 
