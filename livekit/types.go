@@ -57,12 +57,3 @@ type Guid interface {
 }
 
 type GuidBlock [9]byte
-
-// ToProto implements DataPacket in Go SDK.
-func (p *SipDTMF) ToProto() *DataPacket {
-	return &DataPacket{
-		Value: &DataPacket_SipDtmf{
-			SipDtmf: p,
-		},
-	}
-}

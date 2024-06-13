@@ -91,13 +91,6 @@ var trunkCases = []struct {
 		exp: -1,
 	},
 	{
-		name: "not matching regexp",
-		trunks: []*livekit.SIPTrunkInfo{
-			{SipTrunkId: "aaa", OutboundNumber: sipNumber2, InboundNumbersRegex: []string{`^\d+$`}},
-		},
-		exp: -1,
-	},
-	{
 		name: "one match",
 		trunks: []*livekit.SIPTrunkInfo{
 			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
@@ -132,15 +125,6 @@ var trunkCases = []struct {
 			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
 			{SipTrunkId: "bbb", OutboundNumber: sipNumber2},
 			{SipTrunkId: "ccc", OutboundNumber: sipNumber2, InboundNumbers: []string{sipNumber1 + "1"}},
-		},
-		exp: 1,
-	},
-	{
-		name: "regexp",
-		trunks: []*livekit.SIPTrunkInfo{
-			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
-			{SipTrunkId: "bbb", OutboundNumber: sipNumber2},
-			{SipTrunkId: "ccc", OutboundNumber: sipNumber2, InboundNumbersRegex: []string{`^\d+$`}},
 		},
 		exp: 1,
 	},
@@ -212,6 +196,14 @@ var trunkCases = []struct {
 	},
 }
 
+func toInboundTrunks(trunks []*livekit.SIPTrunkInfo) []*livekit.SIPInboundTrunkInfo {
+	out := make([]*livekit.SIPInboundTrunkInfo, 0, len(trunks))
+	for _, t := range trunks {
+		out = append(out, t.AsInbound())
+	}
+	return out
+}
+
 func TestSIPMatchTrunk(t *testing.T) {
 	for _, c := range trunkCases {
 		c := c
@@ -226,15 +218,16 @@ func TestSIPMatchTrunk(t *testing.T) {
 			if src == "" {
 				src = "1.1.1.1"
 			}
-			got, err := MatchTrunk(c.trunks, src, from, to)
+			trunks := toInboundTrunks(c.trunks)
+			got, err := MatchTrunk(trunks, src, from, to)
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
 				t.Log(err)
 			} else {
-				var exp *livekit.SIPTrunkInfo
+				var exp *livekit.SIPInboundTrunkInfo
 				if c.exp >= 0 {
-					exp = c.trunks[c.exp]
+					exp = trunks[c.exp]
 				}
 				require.NoError(t, err)
 				require.Equal(t, exp, got)
@@ -252,7 +245,7 @@ func TestSIPValidateTrunks(t *testing.T) {
 					r.SipTrunkId = strconv.Itoa(i)
 				}
 			}
-			err := ValidateTrunks(c.trunks)
+			err := ValidateTrunks(toInboundTrunks(c.trunks))
 			if c.invalid {
 				require.Error(t, err)
 			} else {
@@ -547,7 +540,7 @@ func TestSIPMatchDispatchRule(t *testing.T) {
 					name = "no pin"
 				}
 				t.Run(name, func(t *testing.T) {
-					got, err := MatchDispatchRule(c.trunk, c.rules, newSIPReqDispatch(pin, c.noPin))
+					got, err := MatchDispatchRule(c.trunk.AsInbound(), c.rules, newSIPReqDispatch(pin, c.noPin))
 					if c.expErr {
 						require.Error(t, err)
 						require.Nil(t, got)
