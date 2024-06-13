@@ -39,6 +39,9 @@ var trunkCases = []struct {
 	exp     int
 	expErr  bool
 	invalid bool
+	from    string
+	to      string
+	src     string
 }{
 	{
 		name:   "empty",
@@ -151,13 +154,79 @@ var trunkCases = []struct {
 		expErr:  true,
 		invalid: true,
 	},
+	{
+		name: "inbound with ip exact",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.10",
+				"1.1.1.1",
+			}},
+		},
+		exp: 0,
+	},
+	{
+		name: "inbound with ip exact miss",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.10",
+			}},
+		},
+		exp: -1,
+	},
+	{
+		name: "inbound with ip mask",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.0/24",
+				"1.1.1.0/24",
+			}},
+		},
+		exp: 0,
+	},
+	{
+		name: "inbound with ip mask miss",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.0/24",
+			}},
+		},
+		exp: -1,
+	},
+	{
+		name: "inbound with plus",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "aaa", OutboundNumber: "+" + sipNumber3},
+			{SipTrunkId: "bbb", OutboundNumber: "+" + sipNumber2},
+		},
+		exp: 1,
+	},
+	{
+		name: "inbound without plus",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2},
+		},
+		from: "+" + sipNumber1,
+		to:   "+" + sipNumber2,
+		exp:  1,
+	},
 }
 
 func TestSIPMatchTrunk(t *testing.T) {
 	for _, c := range trunkCases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
-			got, err := MatchTrunk(c.trunks, "", sipNumber1, sipNumber2)
+			from, to, src := c.from, c.to, c.src
+			if from == "" {
+				from = sipNumber1
+			}
+			if to == "" {
+				to = sipNumber2
+			}
+			if src == "" {
+				src = "1.1.1.1"
+			}
+			got, err := MatchTrunk(c.trunks, src, from, to)
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
@@ -530,7 +599,7 @@ func TestMatchIP(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
-			got := matchAddrs(c.addr, c.mask)
+			got := matchAddrMask(c.addr, c.mask)
 			require.Equal(t, c.exp, got)
 		})
 	}

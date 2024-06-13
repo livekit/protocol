@@ -139,7 +139,7 @@ func ValidateDispatchRules(rules []*livekit.SIPDispatchRuleInfo) error {
 		}
 		for _, trunk := range trunks {
 			for _, number := range numbers {
-				key := ruleKey{Pin: pin, Trunk: trunk, Number: number}
+				key := ruleKey{Pin: pin, Trunk: trunk, Number: normalizeNumber(number)}
 				r2 := byRuleKey[key]
 				if r2 != nil {
 					return fmt.Errorf("Conflicting SIP Dispatch Rules: same Trunk+Number+PIN combination for for %q and %q",
@@ -190,6 +190,18 @@ func printNumber(s string) string {
 	return strconv.Quote(s)
 }
 
+func normalizeNumber(num string) string {
+	if num == "" {
+		return ""
+	}
+	// TODO: Always keep "number" as-is if it's not E.164.
+	//       This will only matter for native SIP clients which have '+' in the username.
+	if !strings.HasPrefix(num, `+`) {
+		num = "+" + num
+	}
+	return num
+}
+
 // ValidateTrunks checks a set of trunks for conflicts.
 func ValidateTrunks(trunks []*livekit.SIPTrunkInfo) error {
 	if len(trunks) == 0 {
@@ -200,10 +212,11 @@ func ValidateTrunks(trunks []*livekit.SIPTrunkInfo) error {
 		if len(t.InboundNumbersRegex) != 0 {
 			continue // can't effectively validate these
 		}
-		byInbound := byOutboundAndInbound[t.OutboundNumber]
+		outboundKey := normalizeNumber(t.OutboundNumber)
+		byInbound := byOutboundAndInbound[outboundKey]
 		if byInbound == nil {
 			byInbound = make(map[string]*livekit.SIPTrunkInfo)
-			byOutboundAndInbound[t.OutboundNumber] = byInbound
+			byOutboundAndInbound[outboundKey] = byInbound
 		}
 		if len(t.InboundNumbers) == 0 {
 			if t2 := byInbound[""]; t2 != nil {
@@ -213,19 +226,20 @@ func ValidateTrunks(trunks []*livekit.SIPTrunkInfo) error {
 			byInbound[""] = t
 		} else {
 			for _, num := range t.InboundNumbers {
-				t2 := byInbound[num]
+				inboundKey := normalizeNumber(num)
+				t2 := byInbound[inboundKey]
 				if t2 != nil {
 					return fmt.Errorf("Conflicting SIP Trunks: %q and %q, using the same OutboundNumber %s and InboundNumber %q",
 						printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumber(t.OutboundNumber), num)
 				}
-				byInbound[num] = t
+				byInbound[inboundKey] = t
 			}
 		}
 	}
 	return nil
 }
 
-func matchAddrs(addr string, mask string) bool {
+func matchAddrMask(addr string, mask string) bool {
 	if !strings.Contains(mask, "/") {
 		return addr == mask
 	}
@@ -240,16 +254,29 @@ func matchAddrs(addr string, mask string) bool {
 	return pref.Contains(ip)
 }
 
-func matchAddr(addr string, masks []string) bool {
-	if addr == "" {
+func matchAddrMasks(addr string, masks []string) bool {
+	if addr == "" || len(masks) == 0 {
 		return true
 	}
 	for _, mask := range masks {
-		if !matchAddrs(addr, mask) {
-			return false
+		if matchAddrMask(addr, mask) {
+			return true
 		}
 	}
-	return true
+	return false
+}
+
+func matchNumbers(num string, allowed []string) bool {
+	if len(allowed) == 0 {
+		return true
+	}
+	num = normalizeNumber(num)
+	for _, allow := range allowed {
+		if num == normalizeNumber(allow) {
+			return true
+		}
+	}
+	return false
 }
 
 // MatchTrunk finds a SIP Trunk definition matching the request.
@@ -260,12 +287,13 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, srcIP, calling, called string) (
 		defaultTrunk    *livekit.SIPTrunkInfo
 		defaultTrunkCnt int // to error in case there are multiple ones
 	)
+	calledNorm := normalizeNumber(called)
 	for _, tr := range trunks {
 		// Do not consider it if number doesn't match.
-		if len(tr.InboundNumbers) != 0 && !slices.Contains(tr.InboundNumbers, calling) {
+		if !matchNumbers(calling, tr.InboundNumbers) {
 			continue
 		}
-		if !matchAddr(srcIP, tr.InboundAddresses) {
+		if !matchAddrMasks(srcIP, tr.InboundAddresses) {
 			continue
 		}
 		// Deprecated, but we still check it for backward compatibility.
@@ -289,7 +317,7 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, srcIP, calling, called string) (
 			// Default/wildcard trunk.
 			defaultTrunk = tr
 			defaultTrunkCnt++
-		} else if tr.OutboundNumber == called {
+		} else if normalizeNumber(tr.OutboundNumber) == calledNorm {
 			// Trunk specific to the number.
 			if selectedTrunk != nil {
 				return nil, fmt.Errorf("Multiple SIP Trunks matched for %q", called)
