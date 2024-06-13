@@ -65,7 +65,7 @@ func TestTimeoutQueue(t *testing.T) {
 			q.Reset(it)
 		}
 
-		ts := time.Now()
+		ts := time.Now().UnixNano()
 		q.popBefore(ts, true)
 		require.EqualValues(t, []int{1, 2, 3, 4}, debugTimeoutQueueItems(&q))
 		q.popBefore(ts, true)

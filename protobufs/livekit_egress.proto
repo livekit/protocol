@@ -211,6 +211,7 @@ message ImageOutput {
 message S3Upload {
   string access_key = 1;
   string secret = 2;
+  string session_token = 11;
   string region = 3;
   string endpoint = 4;
   string bucket = 5;

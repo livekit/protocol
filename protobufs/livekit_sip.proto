@@ -90,6 +90,13 @@ message CreateSIPTrunkRequest {
   string metadata = 11;
 }
 
+enum SIPTransport {
+  SIP_TRANSPORT_AUTO = 0;
+  SIP_TRANSPORT_UDP = 1;
+  SIP_TRANSPORT_TCP = 2;
+  SIP_TRANSPORT_TLS = 3;
+}
+
 message SIPTrunkInfo {
   string sip_trunk_id = 1;
 
@@ -102,6 +109,9 @@ message SIPTrunkInfo {
 
   // Number used to make outbound calls
   string outbound_number = 4;
+
+  // Transport used for inbound and outbound calls.
+  SIPTransport transport = 13;
 
   repeated string inbound_numbers_regex = 5 [deprecated=true];
 
@@ -121,6 +131,8 @@ message SIPTrunkInfo {
   string name = 11;
   // User-defined metadata for the Trunk.
   string metadata = 12;
+
+  // NEXT ID: 14
 }
 
 message ListSIPTrunkRequest {

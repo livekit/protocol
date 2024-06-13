@@ -12,31 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+syntax = "proto3";
 
-import (
-	"testing"
+package livekit;
+option go_package = "github.com/livekit/protocol/rpc";
 
-	"github.com/stretchr/testify/require"
+import "google/protobuf/empty.proto";
+import "livekit_analytics.proto";
 
-	"github.com/livekit/protocol/livekit"
-)
-
-func TestMarshalUnmarshalGuid(t *testing.T) {
-	id0 := livekit.TrackID(NewGuid(TrackPrefix))
-	b0 := MarshalGuid(id0)
-	id1 := UnmarshalGuid[livekit.TrackID](b0)
-	b1 := MarshalGuid(id1)
-	require.EqualValues(t, id0, id1)
-	require.EqualValues(t, b0, b1)
-}
-
-func BenchmarkNewGuid(b *testing.B) {
-	b.Run("new", func(b *testing.B) {
-		var guid string
-		for i := 0; i < b.N; i++ {
-			guid = NewGuid(TrackPrefix)
-		}
-		_ = guid
-	})
+service AnalyticsRecorderService {
+  rpc IngestStats(stream livekit.AnalyticsStats) returns (google.protobuf.Empty){};
+  rpc IngestEvents(stream livekit.AnalyticsEvents) returns (google.protobuf.Empty){};
+  rpc IngestNodeRoomStates(stream livekit.AnalyticsNodeRooms) returns (google.protobuf.Empty){};
 }

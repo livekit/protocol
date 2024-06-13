@@ -24,6 +24,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/utils"
+	"github.com/livekit/protocol/utils/guid"
 )
 
 func TestAccessToken(t *testing.T) {
@@ -100,5 +101,5 @@ func TestAccessToken(t *testing.T) {
 }
 
 func apiKeypair() (string, string) {
-	return utils.NewGuid(utils.APIKeyPrefix), utils.RandomSecret()
+	return guid.New(utils.APIKeyPrefix), utils.RandomSecret()
 }

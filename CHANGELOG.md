@@ -1,5 +1,23 @@
 # github.com/livekit/protocol
 
+## 1.17.0
+
+### Minor Changes
+
+- Add support for additional SIP transports. - [#719](https://github.com/livekit/protocol/pull/719) ([@dennwc](https://github.com/dennwc))
+
+- Add ICERestartWHIPResource to RPC - [#716](https://github.com/livekit/protocol/pull/716) ([@Sean-Der](https://github.com/Sean-Der))
+
+### Patch Changes
+
+- Added error code field to EgressInfo - [#714](https://github.com/livekit/protocol/pull/714) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Include node_id with analytics events - [#727](https://github.com/livekit/protocol/pull/727) ([@davidzhao](https://github.com/davidzhao))
+
+- Match SIP Trunks by source IP or mask. - [#724](https://github.com/livekit/protocol/pull/724) ([@dennwc](https://github.com/dennwc))
+
+- Add notice to use participant identity from DataPacket for transcriptions. - [#706](https://github.com/livekit/protocol/pull/706) ([@dennwc](https://github.com/dennwc))
+
 ## 1.16.0
 
 ### Minor Changes

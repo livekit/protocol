@@ -53,12 +53,12 @@ func (q *TimeoutQueue[T]) Remove(i *TimeoutQueueItem[T]) {
 	q.remove(i)
 }
 
-func (q *TimeoutQueue[T]) popBefore(t time.Time, remove bool) *TimeoutQueueItem[T] {
+func (q *TimeoutQueue[T]) popBefore(t int64, remove bool) *TimeoutQueueItem[T] {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	i := q.head
-	if i == nil || i.time > t.UnixNano() {
+	if i == nil || i.time > t {
 		return nil
 	}
 
@@ -100,34 +100,34 @@ func (q *TimeoutQueue[T]) remove(i *TimeoutQueueItem[T]) {
 	i.prev = nil
 }
 
-func (q *TimeoutQueue[T]) IterateAfter(timeout time.Duration) timeoutQueueIterator[T] {
+func (q *TimeoutQueue[T]) IterateAfter(timeout time.Duration) TimeoutQueueIterator[T] {
 	return newTimeoutQueueIterator(q, timeout, false)
 }
 
-func (q *TimeoutQueue[T]) IterateRemoveAfter(timeout time.Duration) timeoutQueueIterator[T] {
+func (q *TimeoutQueue[T]) IterateRemoveAfter(timeout time.Duration) TimeoutQueueIterator[T] {
 	return newTimeoutQueueIterator(q, timeout, true)
 }
 
-type timeoutQueueIterator[T any] struct {
+type TimeoutQueueIterator[T any] struct {
 	q      *TimeoutQueue[T]
-	time   time.Time
+	time   int64
 	remove bool
 	item   *TimeoutQueueItem[T]
 }
 
-func newTimeoutQueueIterator[T any](q *TimeoutQueue[T], timeout time.Duration, remove bool) timeoutQueueIterator[T] {
-	return timeoutQueueIterator[T]{
+func newTimeoutQueueIterator[T any](q *TimeoutQueue[T], timeout time.Duration, remove bool) TimeoutQueueIterator[T] {
+	return TimeoutQueueIterator[T]{
 		q:      q,
-		time:   time.Now().Add(-timeout),
+		time:   time.Now().Add(-timeout).UnixNano(),
 		remove: remove,
 	}
 }
 
-func (i *timeoutQueueIterator[T]) Next() bool {
+func (i *TimeoutQueueIterator[T]) Next() bool {
 	i.item = i.q.popBefore(i.time, i.remove)
 	return i.item != nil
 }
 
-func (i *timeoutQueueIterator[T]) Item() *TimeoutQueueItem[T] {
+func (i *TimeoutQueueIterator[T]) Item() *TimeoutQueueItem[T] {
 	return i.item
 }

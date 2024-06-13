@@ -19,17 +19,10 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
-
-service AnalyticsRecorderService {
-  rpc IngestStats(stream AnalyticsStats) returns (google.protobuf.Empty){};
-  rpc IngestEvents(stream AnalyticsEvents) returns (google.protobuf.Empty){};
-  rpc IngestNodeRoomStates(stream AnalyticsNodeRooms) returns (google.protobuf.Empty){};
-}
 
 enum StreamType {
   UPSTREAM = 0;
@@ -151,8 +144,9 @@ message AnalyticsEvent {
   string error = 20;
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
+  string node_id = 24;
 
-  // NEXT_ID: 24
+  // NEXT_ID: 25
 }
 
 message AnalyticsEvents {
