@@ -12,21 +12,21 @@ type Config struct {
 	Enabled bool `json:"enabled" yaml:"enabled"`
 
 	// Skip server certificate and domain verification.
-	Insecure bool `json:"insecure" yaml:"insecure"`
+	Insecure bool `json:"insecure" yaml:"insecure" config:"allowempty"`
 
 	// Server name indication for TLS.
-	ServerName string `json:"serverName" yaml:"server_name"`
+	ServerName string `json:"serverName" yaml:"server_name" config:"allowempty"`
 
 	// File containing trusted root certificates for verifying the server.
-	CACertFile string `json:"caCertFile" yaml:"ca_cert_file"`
+	CACertFile string `json:"caCertFile" yaml:"ca_cert_file" config:"allowempty"`
 
 	// File containing client certificate (public key), to present to the
 	// server. Must also provide @ClientKey option.
-	ClientCertFile string `json:"clientCertFile" yaml:"client_cert_file"`
+	ClientCertFile string `json:"clientCertFile" yaml:"client_cert_file" config:"allowempty"`
 
 	// File containing client private key, to present to the server.
 	// Must also provide @ClientCert option.
-	ClientKeyFile string `json:"clientKeyFile" yaml:"client_key_file"`
+	ClientKeyFile string `json:"clientKeyFile" yaml:"client_key_file" config:"allowempty"`
 }
 
 var ErrFailedToLoadCACert = errors.New("failed to load CACertificate")
