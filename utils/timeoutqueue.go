@@ -32,13 +32,11 @@ type TimeoutQueue[T any] struct {
 }
 
 func (q *TimeoutQueue[T]) Reset(i *TimeoutQueueItem[T]) bool {
-	t := time.Now().UnixNano()
-
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	if !i.removed {
-		i.time = t
+		i.time = time.Now().UnixNano()
 		q.remove(i)
 		q.push(i)
 	}
