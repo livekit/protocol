@@ -1,7 +1,10 @@
 package rpc
 
 import (
+	"errors"
 	"maps"
+	"math/rand/v2"
+	"strings"
 
 	"github.com/livekit/protocol/livekit"
 )
@@ -11,8 +14,23 @@ import (
 func NewCreateSIPParticipantRequest(
 	callID, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
-	trunk *livekit.SIPTrunkInfo,
-) *InternalCreateSIPParticipantRequest {
+	trunk *livekit.SIPOutboundTrunkInfo,
+) (*InternalCreateSIPParticipantRequest, error) {
+	if len(trunk.Numbers) == 0 {
+		return nil, errors.New("no numbers on outbound trunk")
+	}
+	outboundNumber := trunk.Numbers[rand.IntN(len(trunk.Numbers))]
+	// A sanity check for the number format for well-known providers.
+	switch {
+	case strings.HasSuffix(trunk.Address, "telnyx.com"):
+		// Telnyx omits leading '+' by default.
+		outboundNumber = strings.TrimPrefix(outboundNumber, "+")
+	case strings.HasSuffix(trunk.Address, "twilio.com"):
+		// Twilio requires leading '+'.
+		if !strings.HasPrefix(outboundNumber, "+") {
+			outboundNumber = "+" + outboundNumber
+		}
+	}
 	attrs := maps.Clone(req.ParticipantAttributes)
 	if attrs == nil {
 		attrs = make(map[string]string)
@@ -25,24 +43,24 @@ func NewCreateSIPParticipantRequest(
 	attrs[livekit.AttrSIPTrunkID] = trunkID
 	if !req.HidePhoneNumber {
 		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
-		attrs[livekit.AttrSIPTrunkNumber] = trunk.OutboundNumber
+		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
 	}
 	return &InternalCreateSIPParticipantRequest{
-		SipCallId:             callID,
-		Address:               trunk.OutboundAddress,
-		Transport:             trunk.Transport,
-		Number:                trunk.OutboundNumber,
-		Username:              trunk.OutboundUsername,
-		Password:              trunk.OutboundPassword,
-		CallTo:                req.SipCallTo,
-		WsUrl:                 wsUrl,
-		Token:                 token,
-		RoomName:              req.RoomName,
-		ParticipantIdentity:   req.ParticipantIdentity,
-		ParticipantName:       req.ParticipantName,
-		ParticipantMetadata:   req.ParticipantMetadata,
+		SipCallId:           callID,
+		Address:             trunk.Address,
+		Transport:           trunk.Transport,
+		Number:              outboundNumber,
+		Username:            trunk.AuthUsername,
+		Password:            trunk.AuthPassword,
+		CallTo:              req.SipCallTo,
+		WsUrl:               wsUrl,
+		Token:               token,
+		RoomName:            req.RoomName,
+		ParticipantIdentity: req.ParticipantIdentity,
+		ParticipantName:     req.ParticipantName,
+		ParticipantMetadata: req.ParticipantMetadata,
 		ParticipantAttributes: attrs,
-		Dtmf:                  req.Dtmf,
-		PlayRingtone:          req.PlayRingtone,
-	}
+		Dtmf:                req.Dtmf,
+		PlayRingtone:        req.PlayRingtone,
+	}, nil
 }

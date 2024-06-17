@@ -47,8 +47,13 @@ option ruby_package = "LiveKit::Proto";
 
 
 service SIP {
-  rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo);
-  rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse);
+  rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; };
+  rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
+
+  rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
+  rpc CreateSIPOutboundTrunk(CreateSIPOutboundTrunkRequest) returns (SIPOutboundTrunkInfo);
+  rpc ListSIPInboundTrunk(ListSIPInboundTrunkRequest) returns (ListSIPInboundTrunkResponse);
+  rpc ListSIPOutboundTrunk(ListSIPOutboundTrunkRequest) returns (ListSIPOutboundTrunkResponse);
   rpc DeleteSIPTrunk(DeleteSIPTrunkRequest) returns (SIPTrunkInfo);
 
   rpc CreateSIPDispatchRule(CreateSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
@@ -60,6 +65,7 @@ service SIP {
 
 
 message CreateSIPTrunkRequest {
+  option deprecated = true;
   // CIDR or IPs that traffic is accepted from
   // An empty list means all inbound traffic is accepted.
   repeated string inbound_addresses = 1;
@@ -98,7 +104,16 @@ enum SIPTransport {
 }
 
 message SIPTrunkInfo {
+  option deprecated = true;
+
+  enum TrunkKind {
+    TRUNK_LEGACY = 0;
+    TRUNK_INBOUND = 1;
+    TRUNK_OUTBOUND = 2;
+  }
+
   string sip_trunk_id = 1;
+  TrunkKind kind = 14;
 
   // CIDR or IPs that traffic is accepted from
   // An empty list means all inbound traffic is accepted.
@@ -132,14 +147,88 @@ message SIPTrunkInfo {
   // User-defined metadata for the Trunk.
   string metadata = 12;
 
-  // NEXT ID: 14
+  // NEXT ID: 15
+}
+
+message CreateSIPInboundTrunkRequest {
+  SIPInboundTrunkInfo trunk = 1; // Trunk ID is ignored
+}
+
+message SIPInboundTrunkInfo {
+  string sip_trunk_id = 1;
+
+  // Human-readable name for the Trunk.
+  string name = 2;
+  // User-defined metadata for the Trunk.
+  string metadata = 3;
+
+  // Numbers associated with LiveKit SIP. The Trunk will only accept calls made to these numbers.
+  // Creating multiple Trunks with different phone numbers allows having different rules for a single provider.
+  repeated string numbers = 4;
+
+  // CIDR or IPs that traffic is accepted from.
+  // An empty list means all inbound traffic is accepted.
+  repeated string allowed_addresses = 5;
+
+  // Numbers that are allowed to make calls to this Trunk.
+  // An empty list means calls from any phone number is accepted.
+  repeated string allowed_numbers = 6;
+
+  // Username and password used to authenticate inbound SIP invites.
+  // May be empty to have no authentication.
+  string auth_username = 7;
+  string auth_password = 8;
+}
+
+message CreateSIPOutboundTrunkRequest {
+  SIPOutboundTrunkInfo trunk = 1; // Trunk ID is ignored
+}
+
+message SIPOutboundTrunkInfo {
+  string sip_trunk_id = 1;
+
+  // Human-readable name for the Trunk.
+  string name = 2;
+  // User-defined metadata for the Trunk.
+  string metadata = 3;
+
+  // Hostname or IP that SIP INVITE is sent too.
+  // Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
+  string address = 4;
+
+  // SIP Transport used for outbound call.
+  SIPTransport transport = 5;
+
+  // Numbers used to make the calls. Random one from this list will be selected.
+  repeated string numbers = 6;
+
+  // Username and password used to authenticate with SIP server.
+  // May be empty to have no authentication.
+  string auth_username = 7;
+  string auth_password = 8;
 }
 
 message ListSIPTrunkRequest {
+  option deprecated = true;
 }
 
 message ListSIPTrunkResponse {
+  option deprecated = true;
   repeated SIPTrunkInfo items = 1;
+}
+
+message ListSIPInboundTrunkRequest {
+}
+
+message ListSIPInboundTrunkResponse {
+  repeated SIPInboundTrunkInfo items = 1;
+}
+
+message ListSIPOutboundTrunkRequest {
+}
+
+message ListSIPOutboundTrunkResponse {
+  repeated SIPOutboundTrunkInfo items = 1;
 }
 
 message DeleteSIPTrunkRequest {

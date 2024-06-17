@@ -21,9 +21,7 @@ import (
 	"maps"
 	"math"
 	"net/netip"
-	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -142,7 +140,7 @@ func ValidateDispatchRules(rules []*livekit.SIPDispatchRuleInfo) error {
 		}
 		for _, trunk := range trunks {
 			for _, number := range numbers {
-				key := ruleKey{Pin: pin, Trunk: trunk, Number: number}
+				key := ruleKey{Pin: pin, Trunk: trunk, Number: normalizeNumber(number)}
 				r2 := byRuleKey[key]
 				if r2 != nil {
 					return fmt.Errorf("Conflicting SIP Dispatch Rules: same Trunk+Number+PIN combination for for %q and %q",
@@ -186,49 +184,79 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	return room, pin, nil
 }
 
-func printNumber(s string) string {
-	if s == "" {
+func printNumbers(numbers []string) string {
+	if len(numbers) == 0 {
 		return "<any>"
 	}
-	return strconv.Quote(s)
+	return fmt.Sprintf("%q", numbers)
+}
+
+func normalizeNumber(num string) string {
+	if num == "" {
+		return ""
+	}
+	// TODO: Always keep "number" as-is if it's not E.164.
+	//       This will only matter for native SIP clients which have '+' in the username.
+	if !strings.HasPrefix(num, `+`) {
+		num = "+" + num
+	}
+	return num
+}
+
+func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *livekit.SIPInboundTrunkInfo) error {
+	if len(t.AllowedNumbers) == 0 {
+		if t2 := byInbound[""]; t2 != nil {
+			return fmt.Errorf("Conflicting inbound SIP Trunks: %q and %q, using the same number(s) %s without AllowedNumbers set",
+				printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumbers(t.Numbers))
+		}
+		byInbound[""] = t
+	} else {
+		for _, num := range t.AllowedNumbers {
+			inboundKey := normalizeNumber(num)
+			t2 := byInbound[inboundKey]
+			if t2 != nil {
+				return fmt.Errorf("Conflicting inbound SIP Trunks: %q and %q, using the same number(s) %s and AllowedNumber %q",
+					printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumbers(t.Numbers), num)
+			}
+			byInbound[inboundKey] = t
+		}
+	}
+	return nil
 }
 
 // ValidateTrunks checks a set of trunks for conflicts.
-func ValidateTrunks(trunks []*livekit.SIPTrunkInfo) error {
+func ValidateTrunks(trunks []*livekit.SIPInboundTrunkInfo) error {
 	if len(trunks) == 0 {
 		return nil
 	}
-	byOutboundAndInbound := make(map[string]map[string]*livekit.SIPTrunkInfo)
+	byOutboundAndInbound := make(map[string]map[string]*livekit.SIPInboundTrunkInfo)
 	for _, t := range trunks {
-		if len(t.InboundNumbersRegex) != 0 {
-			continue // can't effectively validate these
-		}
-		byInbound := byOutboundAndInbound[t.OutboundNumber]
-		if byInbound == nil {
-			byInbound = make(map[string]*livekit.SIPTrunkInfo)
-			byOutboundAndInbound[t.OutboundNumber] = byInbound
-		}
-		if len(t.InboundNumbers) == 0 {
-			if t2 := byInbound[""]; t2 != nil {
-				return fmt.Errorf("Conflicting SIP Trunks: %q and %q, using the same OutboundNumber %s without InboundNumbers set",
-					printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumber(t.OutboundNumber))
+		if len(t.Numbers) == 0 {
+			byInbound := byOutboundAndInbound[""]
+			if byInbound == nil {
+				byInbound = make(map[string]*livekit.SIPInboundTrunkInfo)
+				byOutboundAndInbound[""] = byInbound
 			}
-			byInbound[""] = t
+			if err := validateTrunkInbound(byInbound, t); err != nil {
+				return err
+			}
 		} else {
-			for _, num := range t.InboundNumbers {
-				t2 := byInbound[num]
-				if t2 != nil {
-					return fmt.Errorf("Conflicting SIP Trunks: %q and %q, using the same OutboundNumber %s and InboundNumber %q",
-						printID(t.SipTrunkId), printID(t2.SipTrunkId), printNumber(t.OutboundNumber), num)
+			for _, num := range t.Numbers {
+				byInbound := byOutboundAndInbound[num]
+				if byInbound == nil {
+					byInbound = make(map[string]*livekit.SIPInboundTrunkInfo)
+					byOutboundAndInbound[num] = byInbound
 				}
-				byInbound[num] = t
+				if err := validateTrunkInbound(byInbound, t); err != nil {
+					return err
+				}
 			}
 		}
 	}
 	return nil
 }
 
-func matchAddrs(addr string, mask string) bool {
+func matchAddrMask(addr string, mask string) bool {
 	if !strings.Contains(mask, "/") {
 		return addr == mask
 	}
@@ -243,62 +271,63 @@ func matchAddrs(addr string, mask string) bool {
 	return pref.Contains(ip)
 }
 
-func matchAddr(addr string, masks []string) bool {
-	if addr == "" {
+func matchAddrMasks(addr string, masks []string) bool {
+	if addr == "" || len(masks) == 0 {
 		return true
 	}
 	for _, mask := range masks {
-		if !matchAddrs(addr, mask) {
-			return false
+		if matchAddrMask(addr, mask) {
+			return true
 		}
 	}
-	return true
+	return false
+}
+
+func matchNumbers(num string, allowed []string) bool {
+	if len(allowed) == 0 {
+		return true
+	}
+	num = normalizeNumber(num)
+	for _, allow := range allowed {
+		if num == normalizeNumber(allow) {
+			return true
+		}
+	}
+	return false
 }
 
 // MatchTrunk finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
-func MatchTrunk(trunks []*livekit.SIPTrunkInfo, srcIP, calling, called string) (*livekit.SIPTrunkInfo, error) {
+func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, srcIP, calling, called string) (*livekit.SIPInboundTrunkInfo, error) {
 	var (
-		selectedTrunk   *livekit.SIPTrunkInfo
-		defaultTrunk    *livekit.SIPTrunkInfo
+		selectedTrunk   *livekit.SIPInboundTrunkInfo
+		defaultTrunk    *livekit.SIPInboundTrunkInfo
 		defaultTrunkCnt int // to error in case there are multiple ones
 	)
+	calledNorm := normalizeNumber(called)
 	for _, tr := range trunks {
 		// Do not consider it if number doesn't match.
-		if len(tr.InboundNumbers) != 0 && !slices.Contains(tr.InboundNumbers, calling) {
+		if !matchNumbers(calling, tr.AllowedNumbers) {
 			continue
 		}
-		if !matchAddr(srcIP, tr.InboundAddresses) {
+		if !matchAddrMasks(srcIP, tr.AllowedAddresses) {
 			continue
 		}
-		// Deprecated, but we still check it for backward compatibility.
-		matchesRe := len(tr.InboundNumbersRegex) == 0
-		for _, reStr := range tr.InboundNumbersRegex {
-			// TODO: we should cache it
-			re, err := regexp.Compile(reStr)
-			if err != nil {
-				logger.Errorw("cannot parse SIP trunk regexp", err, "trunkID", tr.SipTrunkId)
-				continue
-			}
-			if re.MatchString(calling) {
-				matchesRe = true
-				break
-			}
-		}
-		if !matchesRe {
-			continue
-		}
-		if tr.OutboundNumber == "" {
+		if len(tr.Numbers) == 0 {
 			// Default/wildcard trunk.
 			defaultTrunk = tr
 			defaultTrunkCnt++
-		} else if tr.OutboundNumber == called {
-			// Trunk specific to the number.
-			if selectedTrunk != nil {
-				return nil, fmt.Errorf("Multiple SIP Trunks matched for %q", called)
+		} else {
+			for _, num := range tr.Numbers {
+				if normalizeNumber(num) == calledNorm {
+					// Trunk specific to the number.
+					if selectedTrunk != nil {
+						return nil, fmt.Errorf("Multiple SIP Trunks matched for %q", called)
+					}
+					selectedTrunk = tr
+					// Keep searching! We want to know if there are any conflicting Trunk definitions.
+				}
 			}
-			selectedTrunk = tr
-			// Keep searching! We want to know if there are any conflicting Trunk definitions.
 		}
 	}
 	if selectedTrunk != nil {
@@ -313,7 +342,7 @@ func MatchTrunk(trunks []*livekit.SIPTrunkInfo, srcIP, calling, called string) (
 
 // MatchDispatchRule finds the best dispatch rule matching the request parameters. Returns an error if no rule matched.
 // Trunk parameter can be nil, in which case only wildcard dispatch rules will be effective (ones without Trunk IDs).
-func MatchDispatchRule(trunk *livekit.SIPTrunkInfo, rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
+func MatchDispatchRule(trunk *livekit.SIPInboundTrunkInfo, rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
 	// Trunk can still be nil here in case none matched or were defined.
 	// This is still fine, but only in case we'll match exactly one wildcard dispatch rule.
 	if len(rules) == 0 {

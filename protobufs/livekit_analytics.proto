@@ -57,6 +57,8 @@ message AnalyticsStream {
 }
 
 message AnalyticsStat {
+  // unique id for this stat
+  string id = 14;
   string analytics_key = 1;
   StreamType kind = 2;
   google.protobuf.Timestamp time_stamp = 3;
@@ -70,6 +72,8 @@ message AnalyticsStat {
   string mime = 11;
   float min_score = 12;
   float median_score = 13;
+
+  // NEXT_ID: 15
 }
 
 message AnalyticsStats {
@@ -123,6 +127,8 @@ message AnalyticsClientMeta {
 }
 
 message AnalyticsEvent {
+  // unique id for this event
+  string id = 25;
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
   string room_id = 3;
@@ -146,7 +152,7 @@ message AnalyticsEvent {
   int32 video_layer = 22;
   string node_id = 24;
 
-  // NEXT_ID: 25
+  // NEXT_ID: 26
 }
 
 message AnalyticsEvents {
