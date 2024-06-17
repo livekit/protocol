@@ -21,14 +21,15 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Dtmf:         "1234#",
 		PlayRingtone: true,
 	}
-	tr := &livekit.SIPTrunkInfo{
-		SipTrunkId:       "trunk",
-		OutboundAddress:  "sip.example.com",
-		OutboundNumber:   "+1111",
-		OutboundUsername: "user",
-		OutboundPassword: "pass",
+	tr := &livekit.SIPOutboundTrunkInfo{
+		SipTrunkId:   "trunk",
+		Address:      "sip.example.com",
+		Numbers:      []string{"+1111"},
+		AuthUsername: "user",
+		AuthPassword: "pass",
 	}
-	res := NewCreateSIPParticipantRequest("call-id", "url", "token", r, tr)
+	res, err := NewCreateSIPParticipantRequest("call-id", "url", "token", r, tr)
+	require.NoError(t, err)
 	require.Equal(t, &InternalCreateSIPParticipantRequest{
 		SipCallId:           "call-id",
 		Address:             "sip.example.com",
@@ -52,7 +53,8 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	}, res)
 
 	r.HidePhoneNumber = true
-	res = NewCreateSIPParticipantRequest("call-id", "url", "token", r, tr)
+	res, err = NewCreateSIPParticipantRequest("call-id", "url", "token", r, tr)
+	require.NoError(t, err)
 	require.Equal(t, &InternalCreateSIPParticipantRequest{
 		SipCallId:           "call-id",
 		Address:             "sip.example.com",
