@@ -72,6 +72,19 @@ func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) SetAttributes(attrs map[string]string) *AccessToken {
+	if len(attrs) == 0 {
+		return t
+	}
+	if t.grant.Attributes == nil {
+		t.grant.Attributes = make(map[string]string)
+	}
+	for k, v := range attrs {
+		t.grant.Attributes[k] = v
+	}
+	return t
+}
+
 func (t *AccessToken) SetSha256(sha string) *AccessToken {
 	t.grant.Sha256 = sha
 	return t
