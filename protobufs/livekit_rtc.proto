@@ -267,6 +267,8 @@ message UpdateVideoLayers {
 message UpdateParticipantMetadata {
   string metadata = 1;
   string name = 2;
+
+  uint32 request_id = 4;
 }
 
 message ICEServer {
@@ -415,4 +417,11 @@ message RegionInfo {
 message SubscriptionResponse {
   string track_sid = 1;
   SubscriptionError err = 2;
+}
+
+message ErrorResponse {
+  uint32 request_id = 1;
+  // http error code
+  uint32 code = 2;
+  string message = 3;
 }
