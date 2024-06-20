@@ -21,7 +21,11 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func BuildSIPToken(apiKey, secret, roomName, participantIdentity, participantName, participantMeta string) (string, error) {
+func BuildSIPToken(
+	apiKey, secret, roomName string,
+	participantIdentity, participantName, participantMeta string,
+	participantAttrs map[string]string,
+) (string, error) {
 	t := true
 	at := auth.NewAccessToken(apiKey, secret).
 		AddGrant(&auth.VideoGrant{
@@ -33,6 +37,7 @@ func BuildSIPToken(apiKey, secret, roomName, participantIdentity, participantNam
 		SetIdentity(participantIdentity).
 		SetName(participantName).
 		SetMetadata(participantMeta).
+		SetAttributes(participantAttrs).
 		SetKind(livekit.ParticipantInfo_SIP).
 		SetValidFor(24 * time.Hour)
 

@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"maps"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -64,6 +65,8 @@ type ClaimGrants struct {
 	// for verifying integrity of the message body
 	Sha256   string `json:"sha256,omitempty"`
 	Metadata string `json:"metadata,omitempty"`
+	// Key/value attributes to attach to the participant
+	Attributes map[string]string `json:"attributes,omitempty"`
 }
 
 func (c *ClaimGrants) SetParticipantKind(kind livekit.ParticipantInfo_Kind) {
@@ -81,6 +84,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 
 	clone := *c
 	clone.Video = c.Video.Clone()
+	clone.Attributes = maps.Clone(c.Attributes)
 
 	return &clone
 }

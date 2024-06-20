@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"errors"
+	"maps"
 	"math/rand/v2"
 	"strings"
 
@@ -30,6 +31,20 @@ func NewCreateSIPParticipantRequest(
 			outboundNumber = "+" + outboundNumber
 		}
 	}
+	attrs := maps.Clone(req.ParticipantAttributes)
+	if attrs == nil {
+		attrs = make(map[string]string)
+	}
+	attrs[livekit.AttrSIPCallID] = callID
+	trunkID := req.SipTrunkId
+	if trunkID == "" {
+		trunkID = trunk.SipTrunkId
+	}
+	attrs[livekit.AttrSIPTrunkID] = trunkID
+	if !req.HidePhoneNumber {
+		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
+		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
+	}
 	return &InternalCreateSIPParticipantRequest{
 		SipCallId:           callID,
 		Address:             trunk.Address,
@@ -44,6 +59,7 @@ func NewCreateSIPParticipantRequest(
 		ParticipantIdentity: req.ParticipantIdentity,
 		ParticipantName:     req.ParticipantName,
 		ParticipantMetadata: req.ParticipantMetadata,
+		ParticipantAttributes: attrs,
 		Dtmf:                req.Dtmf,
 		PlayRingtone:        req.PlayRingtone,
 	}, nil
