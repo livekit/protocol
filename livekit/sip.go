@@ -68,8 +68,8 @@ func (p *SIPTrunkInfo) AsOutbound() *SIPOutboundTrunkInfo {
 		Address:      p.OutboundAddress,
 		Transport:    p.Transport,
 		Numbers:      nums,
-		AuthUsername: p.InboundUsername,
-		AuthPassword: p.InboundPassword,
+		AuthUsername: p.OutboundUsername,
+		AuthPassword: p.OutboundPassword,
 	}
 }
 
