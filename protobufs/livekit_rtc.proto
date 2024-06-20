@@ -425,8 +425,14 @@ message SubscriptionResponse {
 }
 
 message ErrorResponse {
+
+  enum Reason {
+    UNKNOWN = 0;
+    NOT_FOUND = 1;
+    NOT_ALLOWED = 2;
+  }
+
   uint32 request_id = 1;
-  // http error code
-  uint32 code = 2;
+  Reason reason = 2;
   string message = 3;
 }
