@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.19.0
+
+### Minor Changes
+
+- Add SIP grants. - [#745](https://github.com/livekit/protocol/pull/745) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Fix typo in SIP Trunk conversion. - [#744](https://github.com/livekit/protocol/pull/744) ([@dennwc](https://github.com/dennwc))
+
 ## 1.18.0
 
 ### Minor Changes
