@@ -57,11 +57,20 @@ type VideoGrant struct {
 	Agent bool `json:"agent,omitempty"`
 }
 
+type SIPGrant struct {
+	// Admin grants access to all SIP features.
+	Admin bool `json:"admin,omitempty"`
+
+	// Call allows making outbound SIP calls.
+	Call bool `json:"call,omitempty"`
+}
+
 type ClaimGrants struct {
 	Identity string      `json:"-"`
 	Name     string      `json:"name,omitempty"`
 	Kind     string      `json:"kind,omitempty"`
 	Video    *VideoGrant `json:"video,omitempty"`
+	SIP      *SIPGrant   `json:"sip,omitempty"`
 	// for verifying integrity of the message body
 	Sha256   string `json:"sha256,omitempty"`
 	Metadata string `json:"metadata,omitempty"`
@@ -84,6 +93,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 
 	clone := *c
 	clone.Video = c.Video.Clone()
+	clone.SIP = c.SIP.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 
 	return &clone
@@ -262,6 +272,16 @@ func (v *VideoGrant) Clone() *VideoGrant {
 		canUpdateOwnMetadata := *v.CanUpdateOwnMetadata
 		clone.CanUpdateOwnMetadata = &canUpdateOwnMetadata
 	}
+
+	return &clone
+}
+
+func (s *SIPGrant) Clone() *SIPGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
 
 	return &clone
 }

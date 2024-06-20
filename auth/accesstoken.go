@@ -67,6 +67,11 @@ func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) AddSIPGrant(grant *SIPGrant) *AccessToken {
+	t.grant.SIP = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t

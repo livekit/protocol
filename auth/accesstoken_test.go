@@ -39,8 +39,10 @@ func TestAccessToken(t *testing.T) {
 	t.Run("generates a decode-able key", func(t *testing.T) {
 		apiKey, secret := apiKeypair()
 		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
+		sipGrant := &SIPGrant{Admin: true}
 		at := NewAccessToken(apiKey, secret).
 			AddGrant(videoGrant).
+			AddSIPGrant(sipGrant).
 			SetValidFor(time.Minute * 5).
 			SetKind(livekit.ParticipantInfo_AGENT).
 			SetIdentity("user")
@@ -60,6 +62,7 @@ func TestAccessToken(t *testing.T) {
 
 		require.EqualValues(t, livekit.ParticipantInfo_AGENT, decodedGrant.GetParticipantKind())
 		require.EqualValues(t, videoGrant, decodedGrant.Video)
+		require.EqualValues(t, sipGrant, decodedGrant.SIP)
 	})
 
 	t.Run("missing kind should be interpreted as standard", func(t *testing.T) {

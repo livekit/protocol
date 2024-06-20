@@ -29,10 +29,12 @@ func BuildSIPToken(
 	t := true
 	at := auth.NewAccessToken(apiKey, secret).
 		AddGrant(&auth.VideoGrant{
-			RoomJoin:     true,
-			Room:         roomName,
-			CanSubscribe: &t,
-			CanPublish:   &t,
+			RoomJoin:             true,
+			Room:                 roomName,
+			CanSubscribe:         &t,
+			CanPublish:           &t,
+			CanPublishData:       &t,
+			CanUpdateOwnMetadata: &t,
 		}).
 		SetIdentity(participantIdentity).
 		SetName(participantName).
