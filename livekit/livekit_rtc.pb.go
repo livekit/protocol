@@ -561,6 +561,7 @@ type SignalResponse struct {
 	//	*SignalResponse_Reconnect
 	//	*SignalResponse_PongResp
 	//	*SignalResponse_SubscriptionResponse
+	//	*SignalResponse_ErrorResponse
 	Message isSignalResponse_Message `protobuf_oneof:"message"`
 }
 
@@ -743,6 +744,13 @@ func (x *SignalResponse) GetSubscriptionResponse() *SubscriptionResponse {
 	return nil
 }
 
+func (x *SignalResponse) GetErrorResponse() *ErrorResponse {
+	if x, ok := x.GetMessage().(*SignalResponse_ErrorResponse); ok {
+		return x.ErrorResponse
+	}
+	return nil
+}
+
 type isSignalResponse_Message interface {
 	isSignalResponse_Message()
 }
@@ -848,6 +856,11 @@ type SignalResponse_SubscriptionResponse struct {
 	SubscriptionResponse *SubscriptionResponse `protobuf:"bytes,21,opt,name=subscription_response,json=subscriptionResponse,proto3,oneof"`
 }
 
+type SignalResponse_ErrorResponse struct {
+	// Errors relating to user inititated requests that carry a `request_id`
+	ErrorResponse *ErrorResponse `protobuf:"bytes,22,opt,name=error_response,json=errorResponse,proto3,oneof"`
+}
+
 func (*SignalResponse_Join) isSignalResponse_Message() {}
 
 func (*SignalResponse_Answer) isSignalResponse_Message() {}
@@ -887,6 +900,8 @@ func (*SignalResponse_Reconnect) isSignalResponse_Message() {}
 func (*SignalResponse_PongResp) isSignalResponse_Message() {}
 
 func (*SignalResponse_SubscriptionResponse) isSignalResponse_Message() {}
+
+func (*SignalResponse_ErrorResponse) isSignalResponse_Message() {}
 
 type SimulcastCodec struct {
 	state         protoimpl.MessageState
@@ -2105,19 +2120,11 @@ func (x *UpdateParticipantMetadata) GetName() string {
 	return ""
 }
 
-<<<<<<< HEAD
 func (x *UpdateParticipantMetadata) GetRequestId() uint32 {
 	if x != nil {
 		return x.RequestId
 	}
 	return 0
-=======
-func (x *UpdateParticipantMetadata) GetAttributes() map[string]string {
-	if x != nil {
-		return x.Attributes
-	}
-	return nil
->>>>>>> main
 }
 
 type ICEServer struct {
@@ -3614,7 +3621,7 @@ var file_livekit_rtc_proto_rawDesc = []byte{
 	0x70, 0x64, 0x61, 0x74, 0x65, 0x4c, 0x6f, 0x63, 0x61, 0x6c, 0x56, 0x69, 0x64, 0x65, 0x6f, 0x54,
 	0x72, 0x61, 0x63, 0x6b, 0x48, 0x00, 0x52, 0x10, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x56, 0x69,
 	0x64, 0x65, 0x6f, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x42, 0x09, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x22, 0x89, 0x0a, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x52, 0x65,
+	0x61, 0x67, 0x65, 0x22, 0xca, 0x0a, 0x0a, 0x0e, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x52, 0x65,
 	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2b, 0x0a, 0x04, 0x6a, 0x6f, 0x69, 0x6e, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x15, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x4a,
 	0x6f, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x48, 0x00, 0x52, 0x04, 0x6a,
@@ -4783,6 +4790,7 @@ func file_livekit_rtc_proto_init() {
 		(*SignalResponse_Reconnect)(nil),
 		(*SignalResponse_PongResp)(nil),
 		(*SignalResponse_SubscriptionResponse)(nil),
+		(*SignalResponse_ErrorResponse)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[34].OneofWrappers = []any{
 		(*SimulateScenario_SpeakerUpdate)(nil),
