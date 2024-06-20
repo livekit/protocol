@@ -270,8 +270,8 @@ message CreateSIPDispatchRuleRequest {
   // If empty all trunks will match this dispatch rule
   repeated string trunk_ids = 2;
 
-  // By default the From value (Phone number) is used as the participant identity
-  // If true a random value will be used instead
+  // By default the From value (Phone number) is used for participant name/identity and added to attributes.
+  // If true, a random value for identity will be used and numbers will be omitted from attributes.
   bool hide_phone_number = 3;
 
   // Dispatch Rule will only accept a call made to these numbers (if set).
@@ -279,10 +279,14 @@ message CreateSIPDispatchRuleRequest {
 
   // Optional human-readable name for the Dispatch Rule.
   string name = 4;
-  // Optional user-defined metadata for the Dispatch Rule.
+  // User-defined metadata for the Dispatch Rule.
+  // Participants created by this rule will inherit this metadata.
   string metadata = 5;
+  // User-defined attributes for the Dispatch Rule.
+  // Participants created by this rule will inherit these attributes.
+  map<string, string> attributes = 7;
 
-  // NEXT ID: 7
+  // NEXT ID: 8
 }
 
 message SIPDispatchRuleInfo {
@@ -298,8 +302,11 @@ message SIPDispatchRuleInfo {
   // User-defined metadata for the Dispatch Rule.
   // Participants created by this rule will inherit this metadata.
   string metadata = 6;
+  // User-defined attributes for the Dispatch Rule.
+  // Participants created by this rule will inherit these attributes.
+  map<string, string> attributes = 8;
 
-  // NEXT ID: 8
+  // NEXT ID: 9
 }
 
 message ListSIPDispatchRuleRequest {
@@ -333,6 +340,8 @@ message CreateSIPParticipantRequest {
 
   // Optional user-defined metadata. Will be attached to a created Participant in the room.
   string participant_metadata = 8;
+  // Optional user-defined attributes. Will be attached to a created Participant in the room.
+  map<string, string> participant_attributes = 9;
 
   // Optionally send following DTMF digits (extension codes) when making a call.
   // Character 'w' can be used to add a 0.5 sec delay.
@@ -341,7 +350,11 @@ message CreateSIPParticipantRequest {
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 6;
 
-  // NEXT ID: 9
+  // By default the From value (Phone number) is used for participant name/identity (if not set) and added to attributes.
+  // If true, a random value for identity will be used and numbers will be omitted from attributes.
+  bool hide_phone_number = 10;
+
+  // NEXT ID: 11
 }
 
 message SIPParticipantInfo {

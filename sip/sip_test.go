@@ -578,6 +578,68 @@ func TestSIPValidateDispatchRules(t *testing.T) {
 	}
 }
 
+func TestEvaluateDispatchRule(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+		HidePhoneNumber:   false,
+		InboundNumbers:    nil,
+		Name:              "",
+		Metadata:          "rule-meta",
+		Attributes: map[string]string{
+			"rule-attr": "1",
+		},
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CalledNumber:  "+3333",
+		ExtraAttributes: map[string]string{
+			"prov-attr": "1",
+		},
+	}
+	res, err := EvaluateDispatchRule("trunk", d, r)
+	require.NoError(t, err)
+	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		Result:              rpc.SIPDispatchResult_ACCEPT,
+		SipTrunkId:          "trunk",
+		SipDispatchRuleId:   "rule",
+		RoomName:            "room",
+		ParticipantIdentity: "sip_+11112222",
+		ParticipantName:     "Phone +11112222",
+		ParticipantMetadata: "rule-meta",
+		ParticipantAttributes: map[string]string{
+			"rule-attr":                   "1",
+			"prov-attr":                   "1",
+			livekit.AttrSIPCallID:         "call-id",
+			livekit.AttrSIPTrunkID:        "trunk",
+			livekit.AttrSIPDispatchRuleID: "rule",
+			livekit.AttrSIPPhoneNumber:    "+11112222",
+			livekit.AttrSIPTrunkNumber:    "+3333",
+		},
+	}, res)
+
+	d.HidePhoneNumber = true
+	res, err = EvaluateDispatchRule("trunk", d, r)
+	require.NoError(t, err)
+	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		Result:              rpc.SIPDispatchResult_ACCEPT,
+		SipTrunkId:          "trunk",
+		SipDispatchRuleId:   "rule",
+		RoomName:            "room",
+		ParticipantIdentity: "sip_c15a31c71649a522",
+		ParticipantName:     "Phone 2222",
+		ParticipantMetadata: "rule-meta",
+		ParticipantAttributes: map[string]string{
+			"rule-attr":                   "1",
+			"prov-attr":                   "1",
+			livekit.AttrSIPCallID:         "call-id",
+			livekit.AttrSIPTrunkID:        "trunk",
+			livekit.AttrSIPDispatchRuleID: "rule",
+		},
+	}, res)
+}
+
 func TestMatchIP(t *testing.T) {
 	cases := []struct {
 		addr string

@@ -151,6 +151,9 @@ message UpdateParticipantRequest {
   ParticipantPermission permission = 4;
   // display name to update
   string name = 5;
+  // attributes to update. it only updates attributes that have been set
+  // to delete attributes, set the value to an empty string
+  map<string, string> attributes = 6;
 }
 
 message UpdateSubscriptionsRequest {

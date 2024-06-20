@@ -117,7 +117,11 @@ message EvaluateSIPDispatchRulesRequest {
   // What Host was called
   string called_host = 7;
 
-  // NEXT ID: 9
+  // Extra participant attributes added for this call.
+  // Usually include provider-specific metadata.
+  map<string, string> extra_attributes = 9;
+
+  // NEXT ID: 10
 }
 
 message EvaluateSIPDispatchRulesResponse {
@@ -130,6 +134,8 @@ message EvaluateSIPDispatchRulesResponse {
   string participant_name = 7;
   // What should be used for the LiveKit participant metadata
   string participant_metadata = 8;
+  // What should be used for the LiveKit participant attributes
+  map<string, string> participant_attributes = 11;
 
   bool request_pin = 3 [deprecated=true]; // see result
 
@@ -145,7 +151,7 @@ message EvaluateSIPDispatchRulesResponse {
   string sip_trunk_id = 9;
   // Dispatch Rule used to fulfill this request
   string sip_dispatch_rule_id = 10;
-  // NEXT ID: 11
+  // NEXT ID: 12
 }
 
 enum SIPDispatchResult {

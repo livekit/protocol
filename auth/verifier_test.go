@@ -73,12 +73,14 @@ func TestVerifier(t *testing.T) {
 			"number": float64(3),
 		}
 		md, _ := json.Marshal(metadata)
+		attrs := map[string]string{"mykey": "myval", "secondkey": "secondval"}
 		at := auth.NewAccessToken(apiKey, secret).
 			AddGrant(&auth.VideoGrant{
 				RoomAdmin: true,
 				Room:      "myroom",
 			}).
-			SetMetadata(string(md))
+			SetMetadata(string(md)).
+			SetAttributes(attrs)
 
 		authToken, err := at.ToJWT()
 		require.NoError(t, err)
@@ -90,6 +92,7 @@ func TestVerifier(t *testing.T) {
 		require.NoError(t, err)
 
 		require.EqualValues(t, string(md), decoded.Metadata)
+		require.EqualValues(t, attrs, decoded.Attributes)
 	})
 
 	t.Run("nil permissions are handled", func(t *testing.T) {
