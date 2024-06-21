@@ -101,6 +101,8 @@ message SignalResponse {
     Pong pong_resp = 20;
     // Subscription response, client should not expect any media from this subscription if it fails
     SubscriptionResponse subscription_response = 21;
+    // Errors relating to user inititated requests that carry a `request_id`
+    ErrorResponse error_response = 22;
   }
 }
 
@@ -271,6 +273,7 @@ message UpdateParticipantMetadata {
   // attributes to update. it only updates attributes that have been set
   // to delete attributes, set the value to an empty string
   map<string, string> attributes = 3;
+  uint32 request_id = 4;
 }
 
 message ICEServer {
@@ -419,4 +422,18 @@ message RegionInfo {
 message SubscriptionResponse {
   string track_sid = 1;
   SubscriptionError err = 2;
+}
+
+message ErrorResponse {
+
+  enum Reason {
+    UNKNOWN = 0;
+    NOT_FOUND = 1;
+    NOT_ALLOWED = 2;
+    INVALID_ARGUMENT = 3;
+  }
+
+  uint32 request_id = 1;
+  Reason reason = 2;
+  string message = 3;
 }
