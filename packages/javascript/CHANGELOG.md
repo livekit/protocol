@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.19.0
+
+### Minor Changes
+
+- Add SIP grants. - [#745](https://github.com/livekit/protocol/pull/745) ([@dennwc](https://github.com/dennwc))
+
+## 1.18.0
+
+### Minor Changes
+
+- Split SIP Trunk configuration to inbound and outbound parts. - [#738](https://github.com/livekit/protocol/pull/738) ([@dennwc](https://github.com/dennwc))
+
+- add Participant attributes key/val storage - [#733](https://github.com/livekit/protocol/pull/733) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.17.0
 
 ### Minor Changes

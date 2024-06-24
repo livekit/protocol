@@ -1,5 +1,31 @@
 # github.com/livekit/protocol
 
+## 1.19.0
+
+### Minor Changes
+
+- Add SIP grants. - [#745](https://github.com/livekit/protocol/pull/745) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Fix typo in SIP Trunk conversion. - [#744](https://github.com/livekit/protocol/pull/744) ([@dennwc](https://github.com/dennwc))
+
+## 1.18.0
+
+### Minor Changes
+
+- Split SIP Trunk configuration to inbound and outbound parts. - [#738](https://github.com/livekit/protocol/pull/738) ([@dennwc](https://github.com/dennwc))
+
+- add Participant attributes key/val storage - [#733](https://github.com/livekit/protocol/pull/733) ([@davidzhao](https://github.com/davidzhao))
+
+### Patch Changes
+
+- Simplify number matching rules for SIP. - [#737](https://github.com/livekit/protocol/pull/737) ([@dennwc](https://github.com/dennwc))
+
+- Added session token option for s3 uploads - [#734](https://github.com/livekit/protocol/pull/734) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Include analytics event ids - [#739](https://github.com/livekit/protocol/pull/739) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.17.0
 
 ### Minor Changes

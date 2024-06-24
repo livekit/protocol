@@ -67,8 +67,26 @@ func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) AddSIPGrant(grant *SIPGrant) *AccessToken {
+	t.grant.SIP = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
+	return t
+}
+
+func (t *AccessToken) SetAttributes(attrs map[string]string) *AccessToken {
+	if len(attrs) == 0 {
+		return t
+	}
+	if t.grant.Attributes == nil {
+		t.grant.Attributes = make(map[string]string)
+	}
+	for k, v := range attrs {
+		t.grant.Attributes[k] = v
+	}
 	return t
 }
 

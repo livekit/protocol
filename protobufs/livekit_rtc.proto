@@ -47,7 +47,8 @@ message SignalRequest {
     SimulateScenario simulate = 13;
     // client triggered ping to server
     int64 ping = 14; // deprecated by ping_req (message Ping)
-    // update a participant's own metadata and/or name
+    // update a participant's own metadata, name, or attributes
+    // requires canUpdateOwnParticipantMetadata permission
     UpdateParticipantMetadata update_metadata = 15;
     Ping ping_req = 16;
     // Update local audio track settings
@@ -100,6 +101,8 @@ message SignalResponse {
     Pong pong_resp = 20;
     // Subscription response, client should not expect any media from this subscription if it fails
     SubscriptionResponse subscription_response = 21;
+    // Errors relating to user inititated requests that carry a `request_id`
+    ErrorResponse error_response = 22;
   }
 }
 
@@ -111,7 +114,7 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
-  
+
   // NEXT-ID: 4
 }
 
@@ -267,6 +270,10 @@ message UpdateVideoLayers {
 message UpdateParticipantMetadata {
   string metadata = 1;
   string name = 2;
+  // attributes to update. it only updates attributes that have been set
+  // to delete attributes, set the value to an empty string
+  map<string, string> attributes = 3;
+  uint32 request_id = 4;
 }
 
 message ICEServer {
@@ -415,4 +422,18 @@ message RegionInfo {
 message SubscriptionResponse {
   string track_sid = 1;
   SubscriptionError err = 2;
+}
+
+message ErrorResponse {
+
+  enum Reason {
+    UNKNOWN = 0;
+    NOT_FOUND = 1;
+    NOT_ALLOWED = 2;
+    INVALID_ARGUMENT = 3;
+  }
+
+  uint32 request_id = 1;
+  Reason reason = 2;
+  string message = 3;
 }

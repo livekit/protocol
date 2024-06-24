@@ -81,11 +81,13 @@ message ParticipantPermission {
   // indicates that it's hidden to others
   bool hidden = 7;
   // indicates it's a recorder instance
-  bool recorder = 8;
-  // indicates that participant can update own metadata
+  // deprecated: use ParticipantInfo.kind instead
+  bool recorder = 8 [deprecated=true];
+  // indicates that participant can update own metadata and attributes
   bool can_update_metadata = 10;
   // indicates that participant is an agent
-  bool agent = 11;
+  // deprecated: use ParticipantInfo.kind instead
+  bool agent = 11 [deprecated=true];
 
   // NEXT_ID: 12
 }
@@ -128,6 +130,7 @@ message ParticipantInfo {
   // and can publish to the server
   bool is_publisher = 13;
   Kind kind = 14;
+  map<string, string> attributes = 15;
 }
 
 enum TrackType {

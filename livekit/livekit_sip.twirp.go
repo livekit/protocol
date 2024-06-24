@@ -31,6 +31,14 @@ type SIP interface {
 
 	ListSIPTrunk(context.Context, *ListSIPTrunkRequest) (*ListSIPTrunkResponse, error)
 
+	CreateSIPInboundTrunk(context.Context, *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error)
+
+	CreateSIPOutboundTrunk(context.Context, *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error)
+
+	ListSIPInboundTrunk(context.Context, *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error)
+
+	ListSIPOutboundTrunk(context.Context, *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error)
+
 	DeleteSIPTrunk(context.Context, *DeleteSIPTrunkRequest) (*SIPTrunkInfo, error)
 
 	CreateSIPDispatchRule(context.Context, *CreateSIPDispatchRuleRequest) (*SIPDispatchRuleInfo, error)
@@ -48,7 +56,7 @@ type SIP interface {
 
 type sIPProtobufClient struct {
 	client      HTTPClient
-	urls        [7]string
+	urls        [11]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -76,9 +84,13 @@ func NewSIPProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Clien
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "SIP")
-	urls := [7]string{
+	urls := [11]string{
 		serviceURL + "CreateSIPTrunk",
 		serviceURL + "ListSIPTrunk",
+		serviceURL + "CreateSIPInboundTrunk",
+		serviceURL + "CreateSIPOutboundTrunk",
+		serviceURL + "ListSIPInboundTrunk",
+		serviceURL + "ListSIPOutboundTrunk",
 		serviceURL + "DeleteSIPTrunk",
 		serviceURL + "CreateSIPDispatchRule",
 		serviceURL + "ListSIPDispatchRule",
@@ -186,6 +198,190 @@ func (c *sIPProtobufClient) callListSIPTrunk(ctx context.Context, in *ListSIPTru
 	return out, nil
 }
 
+func (c *sIPProtobufClient) CreateSIPInboundTrunk(ctx context.Context, in *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPInboundTrunk")
+	caller := c.callCreateSIPInboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return c.callCreateSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPInboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPInboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPProtobufClient) callCreateSIPInboundTrunk(ctx context.Context, in *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+	out := new(SIPInboundTrunkInfo)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *sIPProtobufClient) CreateSIPOutboundTrunk(ctx context.Context, in *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPOutboundTrunk")
+	caller := c.callCreateSIPOutboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return c.callCreateSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPOutboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPOutboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPProtobufClient) callCreateSIPOutboundTrunk(ctx context.Context, in *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+	out := new(SIPOutboundTrunkInfo)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *sIPProtobufClient) ListSIPInboundTrunk(ctx context.Context, in *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPInboundTrunk")
+	caller := c.callListSIPInboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return c.callListSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPInboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPInboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPProtobufClient) callListSIPInboundTrunk(ctx context.Context, in *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+	out := new(ListSIPInboundTrunkResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *sIPProtobufClient) ListSIPOutboundTrunk(ctx context.Context, in *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPOutboundTrunk")
+	caller := c.callListSIPOutboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return c.callListSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPOutboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPOutboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPProtobufClient) callListSIPOutboundTrunk(ctx context.Context, in *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+	out := new(ListSIPOutboundTrunkResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 func (c *sIPProtobufClient) DeleteSIPTrunk(ctx context.Context, in *DeleteSIPTrunkRequest) (*SIPTrunkInfo, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "SIP")
@@ -217,7 +413,7 @@ func (c *sIPProtobufClient) DeleteSIPTrunk(ctx context.Context, in *DeleteSIPTru
 
 func (c *sIPProtobufClient) callDeleteSIPTrunk(ctx context.Context, in *DeleteSIPTrunkRequest) (*SIPTrunkInfo, error) {
 	out := new(SIPTrunkInfo)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -263,7 +459,7 @@ func (c *sIPProtobufClient) CreateSIPDispatchRule(ctx context.Context, in *Creat
 
 func (c *sIPProtobufClient) callCreateSIPDispatchRule(ctx context.Context, in *CreateSIPDispatchRuleRequest) (*SIPDispatchRuleInfo, error) {
 	out := new(SIPDispatchRuleInfo)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -309,7 +505,7 @@ func (c *sIPProtobufClient) ListSIPDispatchRule(ctx context.Context, in *ListSIP
 
 func (c *sIPProtobufClient) callListSIPDispatchRule(ctx context.Context, in *ListSIPDispatchRuleRequest) (*ListSIPDispatchRuleResponse, error) {
 	out := new(ListSIPDispatchRuleResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -355,7 +551,7 @@ func (c *sIPProtobufClient) DeleteSIPDispatchRule(ctx context.Context, in *Delet
 
 func (c *sIPProtobufClient) callDeleteSIPDispatchRule(ctx context.Context, in *DeleteSIPDispatchRuleRequest) (*SIPDispatchRuleInfo, error) {
 	out := new(SIPDispatchRuleInfo)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -401,7 +597,7 @@ func (c *sIPProtobufClient) CreateSIPParticipant(ctx context.Context, in *Create
 
 func (c *sIPProtobufClient) callCreateSIPParticipant(ctx context.Context, in *CreateSIPParticipantRequest) (*SIPParticipantInfo, error) {
 	out := new(SIPParticipantInfo)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -422,7 +618,7 @@ func (c *sIPProtobufClient) callCreateSIPParticipant(ctx context.Context, in *Cr
 
 type sIPJSONClient struct {
 	client      HTTPClient
-	urls        [7]string
+	urls        [11]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -450,9 +646,13 @@ func NewSIPJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOpt
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "SIP")
-	urls := [7]string{
+	urls := [11]string{
 		serviceURL + "CreateSIPTrunk",
 		serviceURL + "ListSIPTrunk",
+		serviceURL + "CreateSIPInboundTrunk",
+		serviceURL + "CreateSIPOutboundTrunk",
+		serviceURL + "ListSIPInboundTrunk",
+		serviceURL + "ListSIPOutboundTrunk",
 		serviceURL + "DeleteSIPTrunk",
 		serviceURL + "CreateSIPDispatchRule",
 		serviceURL + "ListSIPDispatchRule",
@@ -560,6 +760,190 @@ func (c *sIPJSONClient) callListSIPTrunk(ctx context.Context, in *ListSIPTrunkRe
 	return out, nil
 }
 
+func (c *sIPJSONClient) CreateSIPInboundTrunk(ctx context.Context, in *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPInboundTrunk")
+	caller := c.callCreateSIPInboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return c.callCreateSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPInboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPInboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPJSONClient) callCreateSIPInboundTrunk(ctx context.Context, in *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+	out := new(SIPInboundTrunkInfo)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *sIPJSONClient) CreateSIPOutboundTrunk(ctx context.Context, in *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPOutboundTrunk")
+	caller := c.callCreateSIPOutboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return c.callCreateSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPOutboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPOutboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPJSONClient) callCreateSIPOutboundTrunk(ctx context.Context, in *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+	out := new(SIPOutboundTrunkInfo)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *sIPJSONClient) ListSIPInboundTrunk(ctx context.Context, in *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPInboundTrunk")
+	caller := c.callListSIPInboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return c.callListSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPInboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPInboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPJSONClient) callListSIPInboundTrunk(ctx context.Context, in *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+	out := new(ListSIPInboundTrunkResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *sIPJSONClient) ListSIPOutboundTrunk(ctx context.Context, in *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "SIP")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPOutboundTrunk")
+	caller := c.callListSIPOutboundTrunk
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return c.callListSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPOutboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPOutboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *sIPJSONClient) callListSIPOutboundTrunk(ctx context.Context, in *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+	out := new(ListSIPOutboundTrunkResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 func (c *sIPJSONClient) DeleteSIPTrunk(ctx context.Context, in *DeleteSIPTrunkRequest) (*SIPTrunkInfo, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "SIP")
@@ -591,7 +975,7 @@ func (c *sIPJSONClient) DeleteSIPTrunk(ctx context.Context, in *DeleteSIPTrunkRe
 
 func (c *sIPJSONClient) callDeleteSIPTrunk(ctx context.Context, in *DeleteSIPTrunkRequest) (*SIPTrunkInfo, error) {
 	out := new(SIPTrunkInfo)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -637,7 +1021,7 @@ func (c *sIPJSONClient) CreateSIPDispatchRule(ctx context.Context, in *CreateSIP
 
 func (c *sIPJSONClient) callCreateSIPDispatchRule(ctx context.Context, in *CreateSIPDispatchRuleRequest) (*SIPDispatchRuleInfo, error) {
 	out := new(SIPDispatchRuleInfo)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -683,7 +1067,7 @@ func (c *sIPJSONClient) ListSIPDispatchRule(ctx context.Context, in *ListSIPDisp
 
 func (c *sIPJSONClient) callListSIPDispatchRule(ctx context.Context, in *ListSIPDispatchRuleRequest) (*ListSIPDispatchRuleResponse, error) {
 	out := new(ListSIPDispatchRuleResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -729,7 +1113,7 @@ func (c *sIPJSONClient) DeleteSIPDispatchRule(ctx context.Context, in *DeleteSIP
 
 func (c *sIPJSONClient) callDeleteSIPDispatchRule(ctx context.Context, in *DeleteSIPDispatchRuleRequest) (*SIPDispatchRuleInfo, error) {
 	out := new(SIPDispatchRuleInfo)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -775,7 +1159,7 @@ func (c *sIPJSONClient) CreateSIPParticipant(ctx context.Context, in *CreateSIPP
 
 func (c *sIPJSONClient) callCreateSIPParticipant(ctx context.Context, in *CreateSIPParticipantRequest) (*SIPParticipantInfo, error) {
 	out := new(SIPParticipantInfo)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -892,6 +1276,18 @@ func (s *sIPServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	case "ListSIPTrunk":
 		s.serveListSIPTrunk(ctx, resp, req)
+		return
+	case "CreateSIPInboundTrunk":
+		s.serveCreateSIPInboundTrunk(ctx, resp, req)
+		return
+	case "CreateSIPOutboundTrunk":
+		s.serveCreateSIPOutboundTrunk(ctx, resp, req)
+		return
+	case "ListSIPInboundTrunk":
+		s.serveListSIPInboundTrunk(ctx, resp, req)
+		return
+	case "ListSIPOutboundTrunk":
+		s.serveListSIPOutboundTrunk(ctx, resp, req)
 		return
 	case "DeleteSIPTrunk":
 		s.serveDeleteSIPTrunk(ctx, resp, req)
@@ -1252,6 +1648,726 @@ func (s *sIPServer) serveListSIPTrunkProtobuf(ctx context.Context, resp http.Res
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPTrunkResponse and nil error while calling ListSIPTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveCreateSIPInboundTrunk(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveCreateSIPInboundTrunkJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveCreateSIPInboundTrunkProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *sIPServer) serveCreateSIPInboundTrunkJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPInboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(CreateSIPInboundTrunkRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.SIP.CreateSIPInboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.CreateSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPInboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPInboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *SIPInboundTrunkInfo
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPInboundTrunkInfo and nil error while calling CreateSIPInboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveCreateSIPInboundTrunkProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPInboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(CreateSIPInboundTrunkRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.SIP.CreateSIPInboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateSIPInboundTrunkRequest) (*SIPInboundTrunkInfo, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.CreateSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPInboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPInboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *SIPInboundTrunkInfo
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPInboundTrunkInfo and nil error while calling CreateSIPInboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveCreateSIPOutboundTrunk(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveCreateSIPOutboundTrunkJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveCreateSIPOutboundTrunkProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *sIPServer) serveCreateSIPOutboundTrunkJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPOutboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(CreateSIPOutboundTrunkRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.SIP.CreateSIPOutboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.CreateSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPOutboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPOutboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *SIPOutboundTrunkInfo
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPOutboundTrunkInfo and nil error while calling CreateSIPOutboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveCreateSIPOutboundTrunkProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateSIPOutboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(CreateSIPOutboundTrunkRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.SIP.CreateSIPOutboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateSIPOutboundTrunkRequest) (*SIPOutboundTrunkInfo, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.CreateSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*SIPOutboundTrunkInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*SIPOutboundTrunkInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *SIPOutboundTrunkInfo
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SIPOutboundTrunkInfo and nil error while calling CreateSIPOutboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveListSIPInboundTrunk(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListSIPInboundTrunkJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListSIPInboundTrunkProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *sIPServer) serveListSIPInboundTrunkJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPInboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListSIPInboundTrunkRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.SIP.ListSIPInboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.ListSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPInboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPInboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSIPInboundTrunkResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPInboundTrunkResponse and nil error while calling ListSIPInboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveListSIPInboundTrunkProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPInboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListSIPInboundTrunkRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.SIP.ListSIPInboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSIPInboundTrunkRequest) (*ListSIPInboundTrunkResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPInboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPInboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.ListSIPInboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPInboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPInboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSIPInboundTrunkResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPInboundTrunkResponse and nil error while calling ListSIPInboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveListSIPOutboundTrunk(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListSIPOutboundTrunkJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListSIPOutboundTrunkProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *sIPServer) serveListSIPOutboundTrunkJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPOutboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListSIPOutboundTrunkRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.SIP.ListSIPOutboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.ListSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPOutboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPOutboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSIPOutboundTrunkResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPOutboundTrunkResponse and nil error while calling ListSIPOutboundTrunk. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *sIPServer) serveListSIPOutboundTrunkProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSIPOutboundTrunk")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListSIPOutboundTrunkRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.SIP.ListSIPOutboundTrunk
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSIPOutboundTrunkRequest) (*ListSIPOutboundTrunkResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSIPOutboundTrunkRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSIPOutboundTrunkRequest) when calling interceptor")
+					}
+					return s.SIP.ListSIPOutboundTrunk(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSIPOutboundTrunkResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSIPOutboundTrunkResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSIPOutboundTrunkResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSIPOutboundTrunkResponse and nil error while calling ListSIPOutboundTrunk. nil responses are not supported"))
 		return
 	}
 
@@ -2191,74 +3307,102 @@ func (s *sIPServer) PathPrefix() string {
 }
 
 var twirpFileDescriptor3 = []byte{
-	// 1098 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x57, 0xdf, 0x4e, 0xe3, 0xc6,
-	0x17, 0x26, 0x4e, 0x08, 0xc9, 0x09, 0x84, 0x30, 0x90, 0x95, 0x7f, 0x81, 0xdf, 0x16, 0x99, 0x5d,
-	0x95, 0x6e, 0x2b, 0x50, 0x59, 0xa9, 0x52, 0xf7, 0x8e, 0x3f, 0xda, 0xdd, 0x68, 0x29, 0xb8, 0x4e,
-	0xb8, 0x68, 0xb5, 0xaa, 0x6b, 0xe2, 0x01, 0x46, 0x38, 0xb6, 0xeb, 0x19, 0xd3, 0xdd, 0x17, 0xe9,
-	0x2b, 0x54, 0x6a, 0xdf, 0xa3, 0x77, 0x7d, 0x80, 0x5e, 0xf4, 0x05, 0x7a, 0xd1, 0x67, 0xa8, 0x66,
-	0x3c, 0x76, 0x6c, 0xc7, 0x0e, 0xc9, 0x9d, 0xfd, 0x9d, 0x33, 0xc7, 0xe7, 0x7c, 0xe7, 0x9b, 0x33,
-	0x63, 0xd8, 0x70, 0xc8, 0x03, 0xbe, 0x27, 0xcc, 0xa4, 0xc4, 0x3f, 0xf0, 0x03, 0x8f, 0x79, 0x68,
-	0x45, 0x42, 0xda, 0x5f, 0x55, 0xe8, 0x9e, 0x06, 0xd8, 0x62, 0x78, 0xd0, 0xd7, 0x87, 0x41, 0xe8,
-	0xde, 0x1b, 0xf8, 0xa7, 0x10, 0x53, 0x86, 0x3e, 0x87, 0x0d, 0xe2, 0x5e, 0x7b, 0xa1, 0x6b, 0x9b,
-	0x96, 0x6d, 0x07, 0x98, 0x52, 0x4c, 0xd5, 0xca, 0x6e, 0x75, 0xbf, 0x69, 0x74, 0xa4, 0xe1, 0x38,
-	0xc6, 0xd1, 0x67, 0xd0, 0xf1, 0x42, 0x96, 0xf1, 0x56, 0x95, 0xdd, 0xca, 0x7e, 0xd3, 0x58, 0x8f,
-	0x71, 0xe9, 0x8c, 0x3e, 0x85, 0x04, 0x32, 0xdd, 0x70, 0x7c, 0x8d, 0x03, 0xb5, 0x2a, 0x3c, 0xdb,
-	0x31, 0x7c, 0x21, 0x50, 0xf4, 0x15, 0x74, 0xe3, 0x04, 0x22, 0x3f, 0x6a, 0x06, 0xf8, 0x16, 0x7f,
-	0x50, 0x6b, 0x3c, 0x89, 0x13, 0x45, 0xad, 0x18, 0x9b, 0xd2, 0x21, 0x5a, 0x41, 0x0d, 0x6e, 0xe6,
-	0x1f, 0xc8, 0xad, 0x53, 0x9b, 0x22, 0xed, 0x76, 0xd6, 0x9b, 0x27, 0x1d, 0x3b, 0x86, 0x14, 0x07,
-	0xae, 0x35, 0xc6, 0xea, 0x72, 0x94, 0xb4, 0xc4, 0xaf, 0x24, 0x9c, 0x76, 0xf5, 0x2d, 0x4a, 0x7f,
-	0xf6, 0x02, 0x5b, 0xad, 0x67, 0x5c, 0x75, 0x09, 0x73, 0xde, 0x92, 0xfa, 0x92, 0xb0, 0x2b, 0xc2,
-	0x37, 0xe1, 0x28, 0x89, 0x9b, 0x76, 0x4e, 0x02, 0x37, 0xb2, 0xce, 0x49, 0x64, 0x04, 0x35, 0x11,
-	0x0c, 0x84, 0x5d, 0x3c, 0xa3, 0x1e, 0x34, 0xc6, 0x98, 0x59, 0xb6, 0xc5, 0x2c, 0xb5, 0x25, 0xf0,
-	0xe4, 0x5d, 0xfb, 0xb5, 0x06, 0xab, 0x71, 0x57, 0xfb, 0xee, 0x8d, 0x87, 0x76, 0x61, 0x95, 0x12,
-	0xdf, 0x64, 0x1c, 0x30, 0x89, 0xad, 0x56, 0xc4, 0x02, 0xa0, 0xc4, 0x8f, 0x7c, 0xec, 0xe2, 0xa6,
-	0x2b, 0x0b, 0x34, 0xbd, 0x3a, 0x77, 0xd3, 0x6b, 0x85, 0x4d, 0x7f, 0x09, 0x4d, 0x16, 0x58, 0x2e,
-	0xf5, 0xbd, 0x80, 0xa9, 0x6b, 0xbb, 0x95, 0xfd, 0xf6, 0x51, 0xf7, 0x40, 0x8a, 0xf5, 0x40, 0x14,
-	0x23, 0x8d, 0xc6, 0xc4, 0xaf, 0x5c, 0x29, 0xcb, 0x0b, 0x2b, 0x05, 0xe6, 0x56, 0x4a, 0x7d, 0x7e,
-	0xa5, 0xac, 0x2c, 0xa0, 0x94, 0xc6, 0x22, 0x4a, 0x69, 0x3e, 0xa2, 0x94, 0x56, 0x89, 0x52, 0x56,
-	0x73, 0x4a, 0xe9, 0xc2, 0xe6, 0x39, 0xa1, 0x2c, 0x37, 0x02, 0xb4, 0x53, 0xd8, 0xca, 0xc2, 0xd4,
-	0xf7, 0x5c, 0xca, 0x73, 0x59, 0x26, 0x0c, 0x8f, 0xa3, 0x71, 0xd0, 0xca, 0x37, 0x48, 0xaa, 0xcd,
-	0x88, 0x7c, 0xb4, 0xaf, 0xa1, 0x7b, 0x86, 0x1d, 0x3c, 0x3d, 0x60, 0x1e, 0x55, 0xa3, 0xf6, 0x1a,
-	0xba, 0x83, 0xbe, 0x7e, 0x46, 0xa8, 0x6f, 0xb1, 0xd1, 0x9d, 0x11, 0x3a, 0xf8, 0x8c, 0x04, 0x78,
-	0xc4, 0xd0, 0x36, 0x34, 0x03, 0xcf, 0x1b, 0x9b, 0xa2, 0xc8, 0x68, 0x5d, 0x83, 0x03, 0x17, 0xbc,
-	0xd0, 0x0e, 0x54, 0x7d, 0xe2, 0xca, 0xf1, 0xc3, 0x1f, 0xb5, 0x0b, 0xf8, 0x5f, 0x2e, 0x4e, 0xdf,
-	0xb5, 0xc9, 0x03, 0xb1, 0x43, 0xcb, 0x41, 0x9f, 0x40, 0x4b, 0xc4, 0xf2, 0x03, 0x7c, 0x43, 0x3e,
-	0xc4, 0x59, 0x70, 0x48, 0x17, 0x48, 0x41, 0xbc, 0x3f, 0x2b, 0xb0, 0x9e, 0x0b, 0x88, 0x0c, 0xd8,
-	0xb2, 0xe5, 0xbb, 0x19, 0x84, 0x0e, 0x36, 0x6d, 0x91, 0xaa, 0x88, 0xd7, 0x3a, 0x7a, 0x9a, 0xa6,
-	0x68, 0xba, 0xa0, 0xb7, 0x4b, 0x06, 0xb2, 0xa7, 0xcb, 0xfc, 0x01, 0xd4, 0x6c, 0x4c, 0x92, 0xa4,
-	0x2d, 0xd2, 0x69, 0x1d, 0x69, 0x65, 0x71, 0x27, 0x05, 0xbe, 0x5d, 0x32, 0x9e, 0xd8, 0x85, 0x96,
-	0x93, 0x3a, 0xd4, 0x78, 0x58, 0xed, 0xdf, 0x0a, 0xec, 0x24, 0x87, 0x40, 0x3a, 0x4a, 0xdc, 0xaa,
-	0x2f, 0x22, 0x47, 0x59, 0x8c, 0x5a, 0xf6, 0x51, 0x43, 0x78, 0xf1, 0xee, 0xc4, 0x4d, 0x8d, 0x87,
-	0x47, 0x83, 0x45, 0x2d, 0xa5, 0xe8, 0x05, 0x6c, 0xdc, 0x11, 0x1b, 0x9b, 0xfe, 0x9d, 0xe7, 0xe2,
-	0xf4, 0x01, 0xd0, 0x30, 0xd6, 0xb9, 0x41, 0xe7, 0xb8, 0x1c, 0x06, 0x05, 0xfb, 0xb3, 0x5e, 0xb8,
-	0x3f, 0x63, 0xbd, 0xd7, 0x4a, 0xf4, 0xbe, 0x9c, 0xd3, 0xfb, 0x2f, 0x0a, 0x6c, 0x4e, 0x11, 0x76,
-	0xe3, 0xa1, 0x43, 0xd8, 0xe2, 0x92, 0xcc, 0x91, 0x1e, 0x4b, 0x73, 0x83, 0x12, 0x3f, 0xb3, 0xc4,
-	0x4e, 0x88, 0x51, 0x16, 0x27, 0xa6, 0x3a, 0x0f, 0x31, 0xb5, 0xb9, 0x89, 0x59, 0x99, 0x49, 0xcc,
-	0x72, 0x09, 0x31, 0xf5, 0x1c, 0x31, 0x3b, 0xd0, 0x93, 0x3b, 0xbe, 0x40, 0x06, 0xda, 0xb7, 0xb0,
-	0x5d, 0x68, 0x95, 0x63, 0xe1, 0x28, 0x3b, 0x16, 0x76, 0xca, 0xb5, 0x39, 0x99, 0x0e, 0x97, 0xb0,
-	0x93, 0x4c, 0x87, 0x22, 0xe5, 0x2d, 0xda, 0x11, 0xed, 0x0f, 0x05, 0xb6, 0x13, 0x2d, 0xeb, 0x56,
-	0xc0, 0xc8, 0x88, 0xf8, 0x96, 0xcb, 0xe6, 0x9e, 0x3a, 0xe8, 0x29, 0xb4, 0xb8, 0xc7, 0xc8, 0x72,
-	0x1c, 0x93, 0x79, 0x72, 0xdf, 0x37, 0x29, 0xf1, 0x4f, 0x2d, 0xc7, 0x19, 0x7a, 0xd9, 0xe1, 0x53,
-	0xcd, 0x0d, 0x9f, 0x2f, 0x61, 0xcb, 0x9f, 0x7c, 0xd4, 0x24, 0x36, 0x76, 0x19, 0x61, 0x1f, 0xa5,
-	0x32, 0x37, 0x53, 0xb6, 0xbe, 0x34, 0xf1, 0x13, 0x23, 0xbd, 0x24, 0x75, 0x5f, 0x58, 0x4f, 0xe1,
-	0x45, 0xd1, 0x93, 0x36, 0x36, 0xa6, 0xa2, 0x7f, 0x23, 0x4d, 0x5c, 0x01, 0x36, 0x1b, 0xdf, 0xc4,
-	0x0a, 0xe0, 0xcf, 0x68, 0x0f, 0xd6, 0x7c, 0xc7, 0xfa, 0x68, 0x06, 0xc4, 0xbd, 0x65, 0x9e, 0x1b,
-	0x9d, 0x65, 0x0d, 0x63, 0x95, 0x83, 0x86, 0xc4, 0xb4, 0xdf, 0x2b, 0x80, 0xb2, 0x14, 0x8a, 0x2d,
-	0xf2, 0x1c, 0xda, 0xd9, 0x02, 0x25, 0x83, 0x6b, 0x99, 0xd2, 0x4a, 0x79, 0x50, 0xca, 0x79, 0x98,
-	0xc9, 0x6b, 0xba, 0x29, 0xc4, 0x96, 0x74, 0xc6, 0x4d, 0xe9, 0xdb, 0x2f, 0xee, 0xe5, 0x55, 0x27,
-	0xbe, 0x12, 0x3c, 0x11, 0xc9, 0x9b, 0x43, 0xe3, 0xf8, 0x62, 0xa0, 0x5f, 0x1a, 0x43, 0xf3, 0xf8,
-	0x6a, 0x78, 0xd9, 0x59, 0x42, 0x5d, 0xd8, 0xc8, 0xe2, 0x57, 0x67, 0x7a, 0xa7, 0x32, 0x0d, 0x0f,
-	0x4f, 0xf5, 0x8e, 0x52, 0x00, 0x9f, 0x0f, 0x3a, 0xd5, 0xa3, 0xbf, 0x6b, 0x50, 0x1d, 0xf4, 0x75,
-	0xf4, 0x06, 0xda, 0xd9, 0xbb, 0x33, 0x9a, 0xcc, 0xf9, 0xc2, 0x4b, 0x75, 0xaf, 0xf8, 0xa8, 0x44,
-	0xef, 0x60, 0x35, 0x7d, 0xd0, 0xa2, 0xc9, 0xd6, 0x29, 0x38, 0x96, 0x7b, 0xff, 0x2f, 0xb1, 0xca,
-	0x6d, 0xf8, 0x06, 0xda, 0xd9, 0x03, 0x37, 0x95, 0x55, 0xe1, 0x49, 0x5c, 0x96, 0xd5, 0xfb, 0xd4,
-	0xaf, 0x41, 0xe6, 0xac, 0x7b, 0x3e, 0x5d, 0x65, 0xc1, 0xde, 0xed, 0xcd, 0x1c, 0x00, 0xe8, 0xc7,
-	0xe4, 0xce, 0x91, 0x89, 0xbd, 0x97, 0x2f, 0xae, 0x28, 0xf2, 0xb3, 0xd9, 0x4e, 0x92, 0x88, 0xf7,
-	0xa9, 0x9b, 0x47, 0x49, 0xfe, 0xb3, 0x66, 0xcf, 0x23, 0xf9, 0x7f, 0x07, 0x5b, 0x45, 0x73, 0x06,
-	0x3d, 0x9b, 0x26, 0x67, 0x7a, 0x0c, 0xf5, 0xb6, 0xd3, 0xb1, 0x73, 0x7b, 0xec, 0xe4, 0xf5, 0xf7,
-	0x7b, 0xb7, 0x84, 0xdd, 0x85, 0xd7, 0x07, 0x23, 0x6f, 0x7c, 0x28, 0x1d, 0x0f, 0xc5, 0x9f, 0xdb,
-	0xc8, 0x73, 0x62, 0xe0, 0x37, 0x65, 0xed, 0x9c, 0x3c, 0xe0, 0x77, 0x84, 0x1d, 0xe8, 0xdc, 0xf4,
-	0x8f, 0xd2, 0x96, 0xef, 0xaf, 0x5e, 0x09, 0xe0, 0xba, 0x2e, 0x96, 0xbc, 0xfc, 0x2f, 0x00, 0x00,
-	0xff, 0xff, 0x9b, 0x32, 0x67, 0x4e, 0x01, 0x0e, 0x00, 0x00,
+	// 1547 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0xdb, 0x6e, 0xdb, 0x46,
+	0x13, 0xb6, 0xa8, 0x83, 0xa5, 0xb1, 0x2d, 0xcb, 0xeb, 0x03, 0x18, 0xd9, 0x4e, 0x0c, 0x26, 0xfe,
+	0x93, 0x3f, 0x0d, 0x14, 0xd4, 0x46, 0x8b, 0xd6, 0x40, 0x51, 0xf8, 0x90, 0x83, 0x10, 0xd7, 0x56,
+	0x69, 0xf9, 0x22, 0x45, 0x50, 0x96, 0x36, 0xe9, 0x78, 0x61, 0x99, 0x64, 0xc9, 0x95, 0x13, 0xdf,
+	0xf7, 0xa2, 0xef, 0xd0, 0xab, 0xa2, 0x40, 0x2f, 0xda, 0xdb, 0xbe, 0x46, 0x1f, 0xa1, 0x2f, 0x50,
+	0xa0, 0xef, 0x50, 0x70, 0xb9, 0x4b, 0xef, 0x52, 0x4b, 0x59, 0x02, 0x9a, 0x3b, 0x72, 0x66, 0x76,
+	0x76, 0x76, 0xe6, 0x9b, 0x6f, 0x87, 0x84, 0xb9, 0x1e, 0xbe, 0x72, 0x2f, 0x30, 0xb1, 0x22, 0x1c,
+	0xb4, 0x82, 0xd0, 0x27, 0x3e, 0x9a, 0x64, 0x22, 0xe3, 0xaf, 0x22, 0x2c, 0xee, 0x86, 0xae, 0x4d,
+	0xdc, 0xa3, 0x76, 0xa7, 0x1b, 0xf6, 0xbd, 0x0b, 0xd3, 0xfd, 0xbe, 0xef, 0x46, 0x04, 0x7d, 0x04,
+	0x73, 0xd8, 0x3b, 0xf1, 0xfb, 0x9e, 0x63, 0xd9, 0x8e, 0x13, 0xba, 0x51, 0xe4, 0x46, 0x7a, 0x61,
+	0xad, 0xf8, 0xa8, 0x66, 0x36, 0x98, 0x62, 0x9b, 0xcb, 0xd1, 0xff, 0xa1, 0xe1, 0xf7, 0x89, 0x64,
+	0xad, 0x6b, 0x6b, 0x85, 0x47, 0x35, 0x73, 0x96, 0xcb, 0x99, 0x31, 0x7a, 0x08, 0xa9, 0xc8, 0xf2,
+	0xfa, 0x97, 0x27, 0x6e, 0xa8, 0x17, 0xa9, 0x65, 0x9d, 0x8b, 0x0f, 0xa8, 0x14, 0x7d, 0x0a, 0x8b,
+	0x3c, 0x80, 0xc4, 0x2e, 0xb2, 0x42, 0xf7, 0xad, 0xfb, 0x5e, 0x2f, 0xc5, 0x41, 0xec, 0x68, 0x7a,
+	0xc1, 0x9c, 0x67, 0x06, 0xc9, 0x8a, 0xc8, 0x8c, 0xd5, 0xf1, 0x06, 0x99, 0x75, 0x7a, 0x8d, 0x86,
+	0x5d, 0x97, 0xad, 0xe3, 0xa0, 0xb9, 0x61, 0x3f, 0x72, 0x43, 0xcf, 0xbe, 0x74, 0xf5, 0x72, 0x12,
+	0x34, 0x93, 0x1f, 0x33, 0xb1, 0x68, 0x1a, 0xd8, 0x51, 0xf4, 0xce, 0x0f, 0x1d, 0xbd, 0x22, 0x99,
+	0x76, 0x98, 0x38, 0xce, 0x5b, 0x7a, 0xbe, 0xd4, 0xed, 0x24, 0xb5, 0x4d, 0x73, 0x94, 0xfa, 0x15,
+	0x8d, 0x53, 0xc7, 0x55, 0xd9, 0x38, 0xf5, 0x8c, 0xa0, 0x44, 0x9d, 0x01, 0xd5, 0xd3, 0x67, 0xd4,
+	0x84, 0xea, 0xa5, 0x4b, 0x6c, 0xc7, 0x26, 0xb6, 0x3e, 0x45, 0xe5, 0xe9, 0xfb, 0x96, 0xa6, 0x17,
+	0x8c, 0x5f, 0xcb, 0x30, 0xcd, 0x2b, 0xdb, 0xf6, 0xce, 0x7c, 0xb4, 0x06, 0xd3, 0x11, 0x0e, 0x2c,
+	0x12, 0x0b, 0x2c, 0xec, 0xe8, 0x05, 0xba, 0x08, 0x22, 0x1c, 0x24, 0x36, 0x0e, 0xda, 0x84, 0xd2,
+	0x05, 0xf6, 0x1c, 0xbd, 0xbe, 0x56, 0x78, 0x54, 0xdf, 0xb8, 0xd7, 0x62, 0x50, 0x69, 0x89, 0x6e,
+	0x5a, 0xf4, 0xe9, 0x15, 0xf6, 0x1c, 0x93, 0x1a, 0xab, 0xd1, 0xa2, 0x8d, 0x81, 0x96, 0xe2, 0xc8,
+	0x68, 0x29, 0x29, 0xd1, 0xb2, 0x09, 0x35, 0x12, 0xda, 0x5e, 0x14, 0xf8, 0x21, 0xd1, 0x67, 0x68,
+	0xe8, 0x8b, 0x72, 0xe8, 0x4c, 0x69, 0xde, 0xd8, 0xe5, 0x43, 0xac, 0x3c, 0x36, 0xc4, 0x60, 0x64,
+	0x88, 0x55, 0x46, 0x87, 0xd8, 0xe4, 0x18, 0x10, 0xab, 0x8e, 0x03, 0xb1, 0xda, 0x2d, 0x10, 0x9b,
+	0xca, 0x81, 0xd8, 0xb4, 0x0c, 0x31, 0x63, 0x0f, 0x6a, 0x29, 0x12, 0x50, 0x03, 0xa6, 0xbb, 0xe6,
+	0xf1, 0xc1, 0x2b, 0x6b, 0xff, 0xd9, 0x8b, 0xed, 0xdd, 0xd7, 0x8d, 0x09, 0x34, 0x07, 0x33, 0x89,
+	0xa4, 0x7d, 0xb0, 0x73, 0x78, 0x7c, 0xb0, 0xd7, 0x28, 0x20, 0x04, 0xf5, 0x44, 0x74, 0x78, 0xdc,
+	0x4d, 0x64, 0x1a, 0x05, 0xaa, 0x09, 0x2b, 0x29, 0x0f, 0xb5, 0x93, 0xf3, 0x4a, 0x74, 0xb4, 0x01,
+	0x65, 0x8a, 0x59, 0x0a, 0xd8, 0xa9, 0x8d, 0x15, 0xb1, 0xb6, 0xa2, 0x7d, 0x8c, 0x4e, 0x33, 0x31,
+	0x35, 0x7e, 0xd6, 0x60, 0x5e, 0xa1, 0x1e, 0xa1, 0x07, 0x78, 0x1e, 0xb4, 0x9c, 0x3c, 0x14, 0xe5,
+	0x3c, 0x20, 0x1d, 0x26, 0x39, 0x10, 0x28, 0x3b, 0x99, 0xfc, 0x35, 0x4e, 0xbf, 0xdd, 0xeb, 0xf9,
+	0xef, 0x5c, 0xb1, 0x31, 0xca, 0x49, 0x63, 0x30, 0xc5, 0x4d, 0x63, 0x3c, 0x84, 0x59, 0x6e, 0xcc,
+	0xdd, 0x55, 0x12, 0x5c, 0x31, 0x31, 0xc7, 0xd5, 0x7d, 0x98, 0xb1, 0xfb, 0xe4, 0x3c, 0x4b, 0x30,
+	0xd3, 0xb1, 0x30, 0xad, 0x3c, 0x37, 0xca, 0x10, 0x0b, 0x35, 0xe2, 0x15, 0x37, 0xba, 0xb0, 0x9a,
+	0xe6, 0xfd, 0x90, 0xc1, 0x41, 0x4a, 0xfc, 0xa6, 0x9c, 0xf8, 0x55, 0x31, 0xf1, 0xd2, 0x02, 0x31,
+	0xf3, 0x3f, 0x69, 0xb0, 0xa0, 0xd2, 0x7f, 0x98, 0xd4, 0x73, 0x0e, 0x49, 0x98, 0x81, 0xbf, 0xca,
+	0x94, 0x50, 0x1e, 0x91, 0x12, 0x84, 0x4a, 0x56, 0xe4, 0x4a, 0xfe, 0x77, 0x39, 0xbf, 0x03, 0xf3,
+	0xfb, 0x38, 0x22, 0x99, 0x1b, 0x97, 0xb6, 0xc1, 0x0b, 0x58, 0x90, 0x55, 0x51, 0xe0, 0x7b, 0x51,
+	0xdc, 0xc5, 0x65, 0x4c, 0xdc, 0xcb, 0xe4, 0x06, 0x9e, 0xca, 0x9e, 0x23, 0xcd, 0x3e, 0xb5, 0xa1,
+	0x8e, 0x56, 0xa0, 0xc9, 0x1c, 0x29, 0xba, 0xc9, 0xf8, 0x1a, 0x96, 0x95, 0x5a, 0xb6, 0xdb, 0x86,
+	0xbc, 0xdb, 0x2d, 0xcd, 0x46, 0x4d, 0x8d, 0xd5, 0xd4, 0xa5, 0x0a, 0x46, 0xc6, 0x11, 0xac, 0xa8,
+	0xd5, 0x6c, 0xcb, 0x4d, 0x79, 0xcb, 0xdb, 0x60, 0x96, 0xec, 0xf9, 0x39, 0x2c, 0xee, 0xb9, 0x3d,
+	0x77, 0x70, 0x78, 0xb9, 0x15, 0x66, 0xc6, 0x73, 0x58, 0x3c, 0x6a, 0x77, 0xf6, 0x70, 0x14, 0xd8,
+	0xe4, 0xf4, 0xdc, 0xec, 0xf7, 0xdc, 0x3d, 0x1c, 0xba, 0xa7, 0x04, 0x2d, 0x43, 0x2d, 0xf4, 0xfd,
+	0x4b, 0x8b, 0x96, 0x38, 0x59, 0x57, 0x8d, 0x05, 0x07, 0x71, 0x79, 0x1b, 0x50, 0x0c, 0xb0, 0xc7,
+	0xb0, 0x19, 0x3f, 0x1a, 0x07, 0x70, 0x27, 0xe3, 0xa7, 0xed, 0x39, 0xf8, 0x0a, 0x3b, 0x7d, 0xbb,
+	0x87, 0xee, 0xc1, 0x14, 0xf5, 0x15, 0x84, 0xee, 0x19, 0x7e, 0xcf, 0xa3, 0x88, 0x45, 0x1d, 0x2a,
+	0x51, 0xf8, 0xfb, 0xb3, 0x00, 0xb3, 0x19, 0x87, 0xc8, 0x84, 0x05, 0x87, 0xbd, 0x5b, 0x61, 0xbf,
+	0xe7, 0x5a, 0x0e, 0x0d, 0x95, 0x75, 0xe4, 0x5d, 0x31, 0x55, 0x83, 0x07, 0x7a, 0x39, 0x61, 0x22,
+	0x67, 0xf0, 0x98, 0xdf, 0x82, 0x2e, 0xfb, 0xc4, 0x69, 0xd8, 0x34, 0x9c, 0xa9, 0x0d, 0x23, 0xcf,
+	0xef, 0xcd, 0x01, 0x5f, 0x4e, 0x98, 0x4b, 0x8e, 0x52, 0xb3, 0x53, 0x81, 0x52, 0xec, 0xd6, 0xf8,
+	0xa1, 0x28, 0x10, 0xbb, 0xe8, 0x85, 0x97, 0xea, 0x49, 0x62, 0xc8, 0x0e, 0xa3, 0xe7, 0x6d, 0x6a,
+	0x52, 0xab, 0xb8, 0x3a, 0xbc, 0xa8, 0x7c, 0xbe, 0xa8, 0x92, 0xa4, 0xa4, 0x11, 0x7a, 0x0c, 0x73,
+	0xe7, 0xd8, 0x71, 0xad, 0xe0, 0xdc, 0xf7, 0x5c, 0x71, 0xb8, 0xac, 0x9a, 0xb3, 0xb1, 0xa2, 0x13,
+	0xcb, 0xd9, 0xbc, 0xa0, 0xb8, 0xc2, 0x2b, 0xca, 0x2b, 0x9c, 0xf3, 0x51, 0x29, 0x87, 0x8f, 0xca,
+	0x19, 0x3e, 0x3a, 0x06, 0xb0, 0x09, 0x09, 0xf1, 0x49, 0x9f, 0xb8, 0x91, 0x3e, 0x49, 0xd1, 0xfc,
+	0x49, 0x7a, 0xaa, 0x61, 0xa9, 0x68, 0x6d, 0xa7, 0xeb, 0x9e, 0x79, 0x24, 0xbc, 0x36, 0x05, 0x47,
+	0xcd, 0x2f, 0x60, 0x36, 0xa3, 0x8e, 0xc1, 0x73, 0xe1, 0x5e, 0x33, 0x54, 0xc5, 0x8f, 0x68, 0x01,
+	0xca, 0x57, 0x76, 0xaf, 0xcf, 0xc9, 0x33, 0x79, 0xd9, 0xd2, 0x3e, 0x2b, 0x18, 0xbf, 0x14, 0xe9,
+	0x55, 0x28, 0x97, 0xf1, 0xcc, 0x47, 0x4f, 0x61, 0x21, 0x6e, 0x94, 0x0c, 0x14, 0x78, 0xc3, 0xcc,
+	0x45, 0x38, 0x90, 0x96, 0x38, 0x69, 0xb9, 0xb4, 0xf1, 0xcb, 0x55, 0x1c, 0xa5, 0x5c, 0xa5, 0x91,
+	0xcb, 0x35, 0x39, 0xb4, 0x5c, 0xe5, 0x9c, 0x72, 0x55, 0x32, 0xe5, 0xda, 0x97, 0xca, 0x55, 0xa5,
+	0xe5, 0x7a, 0x92, 0x8f, 0xfc, 0x33, 0xff, 0x43, 0x56, 0xe9, 0x86, 0xb4, 0x15, 0xf0, 0x10, 0x48,
+	0x5b, 0xd6, 0x8e, 0x40, 0xda, 0xd9, 0x43, 0x70, 0x02, 0x3d, 0x84, 0x95, 0x94, 0x40, 0x55, 0xcd,
+	0x39, 0x2e, 0x3c, 0x8c, 0x3f, 0x4a, 0xb0, 0x9c, 0x62, 0xbc, 0x63, 0x87, 0x04, 0x9f, 0xe2, 0xc0,
+	0xf6, 0xc8, 0xc8, 0xc4, 0x8c, 0xee, 0xc2, 0x54, 0x6c, 0x71, 0x6a, 0xf7, 0x7a, 0x16, 0xf1, 0x59,
+	0x8e, 0x6a, 0x11, 0x0e, 0x76, 0xed, 0x5e, 0xaf, 0xeb, 0xcb, 0xfc, 0x5c, 0xcc, 0xf0, 0xf3, 0xc7,
+	0xb0, 0x10, 0xdc, 0x6c, 0x6a, 0x61, 0xc7, 0xf5, 0x08, 0x26, 0xd7, 0xac, 0x79, 0xe7, 0x05, 0x5d,
+	0x9b, 0xa9, 0xe2, 0xb9, 0x5b, 0x5c, 0x22, 0xdc, 0xec, 0xb3, 0x82, 0x5c, 0xe5, 0x3d, 0xc5, 0x54,
+	0x75, 0xc0, 0xfb, 0x57, 0x1c, 0x5e, 0x57, 0xb0, 0x24, 0x2e, 0x11, 0xa0, 0x56, 0xa3, 0x55, 0xfa,
+	0x72, 0x90, 0x19, 0x06, 0xb3, 0xd6, 0x12, 0x44, 0x59, 0xf4, 0x2d, 0x06, 0x2a, 0x5d, 0xdc, 0x06,
+	0x0e, 0xb9, 0x3c, 0xe3, 0x6d, 0x10, 0x3f, 0xc7, 0xb3, 0x49, 0xd0, 0xb3, 0xaf, 0xad, 0x10, 0x7b,
+	0x6f, 0x89, 0xef, 0x25, 0x5f, 0x22, 0x55, 0x73, 0x3a, 0x16, 0x9a, 0x4c, 0xa6, 0x6e, 0x4a, 0x50,
+	0x36, 0x65, 0xf3, 0x25, 0x34, 0xf3, 0x23, 0x1b, 0x0b, 0xf8, 0xbf, 0x17, 0x00, 0xc9, 0x47, 0xa7,
+	0xec, 0xb4, 0x0e, 0x75, 0xb9, 0x9c, 0xcc, 0xdb, 0x8c, 0x54, 0xc8, 0xdc, 0xaa, 0x6b, 0xf9, 0x55,
+	0x1f, 0x8a, 0x22, 0x11, 0x82, 0xd8, 0x61, 0xe0, 0xe1, 0x10, 0x6c, 0x3b, 0x8f, 0x2f, 0xd8, 0x37,
+	0x35, 0x9f, 0x19, 0x97, 0x68, 0xf0, 0x56, 0xd7, 0xdc, 0x3e, 0x38, 0xea, 0x1c, 0x9a, 0x5d, 0x6b,
+	0xfb, 0xb8, 0x7b, 0xd8, 0x98, 0x40, 0x8b, 0x30, 0x27, 0xcb, 0x8f, 0xf7, 0x3a, 0x8d, 0xc2, 0xa0,
+	0xb8, 0xbb, 0xdb, 0x69, 0x68, 0x0a, 0xf1, 0xfe, 0x51, 0xa3, 0xb8, 0xf1, 0xcf, 0x24, 0x14, 0x8f,
+	0xda, 0x1d, 0xb4, 0x0f, 0x75, 0xf9, 0x47, 0x0d, 0xba, 0x3b, 0x88, 0x1d, 0x71, 0x08, 0x6a, 0xaa,
+	0x87, 0x44, 0xa3, 0xf8, 0xa3, 0x56, 0x40, 0x1d, 0x98, 0x16, 0xe7, 0x4c, 0x74, 0xc3, 0x16, 0x8a,
+	0xc9, 0xb4, 0xb9, 0x9a, 0xa3, 0x4d, 0x98, 0x27, 0xf1, 0xf8, 0x46, 0xf8, 0x91, 0x24, 0xce, 0x88,
+	0x68, 0x7d, 0x30, 0x4c, 0xc5, 0x48, 0xda, 0x1c, 0x3a, 0x64, 0x22, 0x0b, 0x96, 0xd4, 0x9f, 0x29,
+	0xe8, 0x7f, 0x83, 0xee, 0x55, 0x03, 0x68, 0x73, 0xf8, 0x44, 0x89, 0xbe, 0x4b, 0x67, 0x72, 0x29,
+	0xf8, 0xfb, 0xd9, 0x93, 0xab, 0x42, 0x7f, 0x30, 0xdc, 0x88, 0xf1, 0xf3, 0x69, 0x3a, 0xda, 0xcb,
+	0x07, 0x18, 0x58, 0xad, 0x0c, 0x7f, 0xfd, 0x16, 0x2b, 0xb6, 0xc9, 0x0b, 0xa8, 0xcb, 0x13, 0xb1,
+	0x80, 0x12, 0xe5, 0xa8, 0x9c, 0x83, 0x12, 0xa9, 0x9c, 0xd2, 0x30, 0xba, 0x3e, 0xd2, 0x2c, 0xd3,
+	0x1c, 0x7a, 0xfd, 0x08, 0xd9, 0x96, 0x7c, 0x0f, 0x64, 0x5b, 0xe5, 0xf9, 0xc1, 0x70, 0x23, 0x96,
+	0x88, 0x37, 0xc2, 0xa7, 0x41, 0x4e, 0xfc, 0xc3, 0x6e, 0xbe, 0x5b, 0xe2, 0x7f, 0x0d, 0x0b, 0x2a,
+	0xbe, 0x16, 0x6a, 0x39, 0x84, 0xce, 0x9b, 0xcb, 0xa2, 0xef, 0x0c, 0xe7, 0xed, 0x3c, 0xff, 0xe6,
+	0xfe, 0x5b, 0x4c, 0xce, 0xfb, 0x27, 0xad, 0x53, 0xff, 0xf2, 0x29, 0x33, 0x7c, 0x4a, 0x7f, 0xdb,
+	0x9e, 0xfa, 0x3d, 0x2e, 0xf8, 0x4d, 0x9b, 0xd9, 0xc7, 0x57, 0xee, 0x2b, 0x4c, 0x5a, 0x9d, 0x58,
+	0xf5, 0xb7, 0x56, 0x67, 0xef, 0x5b, 0x5b, 0x54, 0x70, 0x52, 0xa1, 0x4b, 0x36, 0xff, 0x0d, 0x00,
+	0x00, 0xff, 0xff, 0x9b, 0x11, 0x3f, 0x94, 0xfe, 0x15, 0x00, 0x00,
 }

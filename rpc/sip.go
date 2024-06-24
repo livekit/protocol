@@ -1,21 +1,57 @@
 package rpc
 
-import "github.com/livekit/protocol/livekit"
+import (
+	"errors"
+	"maps"
+	"math/rand/v2"
+	"strings"
+
+	"github.com/livekit/protocol/livekit"
+)
 
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.
 func NewCreateSIPParticipantRequest(
 	callID, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
-	trunk *livekit.SIPTrunkInfo,
-) *InternalCreateSIPParticipantRequest {
+	trunk *livekit.SIPOutboundTrunkInfo,
+) (*InternalCreateSIPParticipantRequest, error) {
+	if len(trunk.Numbers) == 0 {
+		return nil, errors.New("no numbers on outbound trunk")
+	}
+	outboundNumber := trunk.Numbers[rand.IntN(len(trunk.Numbers))]
+	// A sanity check for the number format for well-known providers.
+	switch {
+	case strings.HasSuffix(trunk.Address, "telnyx.com"):
+		// Telnyx omits leading '+' by default.
+		outboundNumber = strings.TrimPrefix(outboundNumber, "+")
+	case strings.HasSuffix(trunk.Address, "twilio.com"):
+		// Twilio requires leading '+'.
+		if !strings.HasPrefix(outboundNumber, "+") {
+			outboundNumber = "+" + outboundNumber
+		}
+	}
+	attrs := maps.Clone(req.ParticipantAttributes)
+	if attrs == nil {
+		attrs = make(map[string]string)
+	}
+	attrs[livekit.AttrSIPCallID] = callID
+	trunkID := req.SipTrunkId
+	if trunkID == "" {
+		trunkID = trunk.SipTrunkId
+	}
+	attrs[livekit.AttrSIPTrunkID] = trunkID
+	if !req.HidePhoneNumber {
+		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
+		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
+	}
 	return &InternalCreateSIPParticipantRequest{
 		SipCallId:           callID,
-		Address:             trunk.OutboundAddress,
+		Address:             trunk.Address,
 		Transport:           trunk.Transport,
-		Number:              trunk.OutboundNumber,
-		Username:            trunk.OutboundUsername,
-		Password:            trunk.OutboundPassword,
+		Number:              outboundNumber,
+		Username:            trunk.AuthUsername,
+		Password:            trunk.AuthPassword,
 		CallTo:              req.SipCallTo,
 		WsUrl:               wsUrl,
 		Token:               token,
@@ -23,7 +59,8 @@ func NewCreateSIPParticipantRequest(
 		ParticipantIdentity: req.ParticipantIdentity,
 		ParticipantName:     req.ParticipantName,
 		ParticipantMetadata: req.ParticipantMetadata,
+		ParticipantAttributes: attrs,
 		Dtmf:                req.Dtmf,
 		PlayRingtone:        req.PlayRingtone,
-	}
+	}, nil
 }

@@ -39,6 +39,9 @@ var trunkCases = []struct {
 	exp     int
 	expErr  bool
 	invalid bool
+	from    string
+	to      string
+	src     string
 }{
 	{
 		name:   "empty",
@@ -88,13 +91,6 @@ var trunkCases = []struct {
 		exp: -1,
 	},
 	{
-		name: "not matching regexp",
-		trunks: []*livekit.SIPTrunkInfo{
-			{SipTrunkId: "aaa", OutboundNumber: sipNumber2, InboundNumbersRegex: []string{`^\d+$`}},
-		},
-		exp: -1,
-	},
-	{
 		name: "one match",
 		trunks: []*livekit.SIPTrunkInfo{
 			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
@@ -133,15 +129,6 @@ var trunkCases = []struct {
 		exp: 1,
 	},
 	{
-		name: "regexp",
-		trunks: []*livekit.SIPTrunkInfo{
-			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
-			{SipTrunkId: "bbb", OutboundNumber: sipNumber2},
-			{SipTrunkId: "ccc", OutboundNumber: sipNumber2, InboundNumbersRegex: []string{`^\d+$`}},
-		},
-		exp: 1,
-	},
-	{
 		name: "multiple defaults",
 		trunks: []*livekit.SIPTrunkInfo{
 			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
@@ -151,21 +138,96 @@ var trunkCases = []struct {
 		expErr:  true,
 		invalid: true,
 	},
+	{
+		name: "inbound with ip exact",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.10",
+				"1.1.1.1",
+			}},
+		},
+		exp: 0,
+	},
+	{
+		name: "inbound with ip exact miss",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.10",
+			}},
+		},
+		exp: -1,
+	},
+	{
+		name: "inbound with ip mask",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.0/24",
+				"1.1.1.0/24",
+			}},
+		},
+		exp: 0,
+	},
+	{
+		name: "inbound with ip mask miss",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.0/24",
+			}},
+		},
+		exp: -1,
+	},
+	{
+		name: "inbound with plus",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "aaa", OutboundNumber: "+" + sipNumber3},
+			{SipTrunkId: "bbb", OutboundNumber: "+" + sipNumber2},
+		},
+		exp: 1,
+	},
+	{
+		name: "inbound without plus",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "aaa", OutboundNumber: sipNumber3},
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2},
+		},
+		from: "+" + sipNumber1,
+		to:   "+" + sipNumber2,
+		exp:  1,
+	},
+}
+
+func toInboundTrunks(trunks []*livekit.SIPTrunkInfo) []*livekit.SIPInboundTrunkInfo {
+	out := make([]*livekit.SIPInboundTrunkInfo, 0, len(trunks))
+	for _, t := range trunks {
+		out = append(out, t.AsInbound())
+	}
+	return out
 }
 
 func TestSIPMatchTrunk(t *testing.T) {
 	for _, c := range trunkCases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
-			got, err := MatchTrunk(c.trunks, "", sipNumber1, sipNumber2)
+			from, to, src := c.from, c.to, c.src
+			if from == "" {
+				from = sipNumber1
+			}
+			if to == "" {
+				to = sipNumber2
+			}
+			if src == "" {
+				src = "1.1.1.1"
+			}
+			trunks := toInboundTrunks(c.trunks)
+			got, err := MatchTrunk(trunks, src, from, to)
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
 				t.Log(err)
 			} else {
-				var exp *livekit.SIPTrunkInfo
+				var exp *livekit.SIPInboundTrunkInfo
 				if c.exp >= 0 {
-					exp = c.trunks[c.exp]
+					exp = trunks[c.exp]
 				}
 				require.NoError(t, err)
 				require.Equal(t, exp, got)
@@ -183,7 +245,7 @@ func TestSIPValidateTrunks(t *testing.T) {
 					r.SipTrunkId = strconv.Itoa(i)
 				}
 			}
-			err := ValidateTrunks(c.trunks)
+			err := ValidateTrunks(toInboundTrunks(c.trunks))
 			if c.invalid {
 				require.Error(t, err)
 			} else {
@@ -478,7 +540,7 @@ func TestSIPMatchDispatchRule(t *testing.T) {
 					name = "no pin"
 				}
 				t.Run(name, func(t *testing.T) {
-					got, err := MatchDispatchRule(c.trunk, c.rules, newSIPReqDispatch(pin, c.noPin))
+					got, err := MatchDispatchRule(c.trunk.AsInbound(), c.rules, newSIPReqDispatch(pin, c.noPin))
 					if c.expErr {
 						require.Error(t, err)
 						require.Nil(t, got)
@@ -516,6 +578,68 @@ func TestSIPValidateDispatchRules(t *testing.T) {
 	}
 }
 
+func TestEvaluateDispatchRule(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+		HidePhoneNumber:   false,
+		InboundNumbers:    nil,
+		Name:              "",
+		Metadata:          "rule-meta",
+		Attributes: map[string]string{
+			"rule-attr": "1",
+		},
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CalledNumber:  "+3333",
+		ExtraAttributes: map[string]string{
+			"prov-attr": "1",
+		},
+	}
+	res, err := EvaluateDispatchRule("trunk", d, r)
+	require.NoError(t, err)
+	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		Result:              rpc.SIPDispatchResult_ACCEPT,
+		SipTrunkId:          "trunk",
+		SipDispatchRuleId:   "rule",
+		RoomName:            "room",
+		ParticipantIdentity: "sip_+11112222",
+		ParticipantName:     "Phone +11112222",
+		ParticipantMetadata: "rule-meta",
+		ParticipantAttributes: map[string]string{
+			"rule-attr":                   "1",
+			"prov-attr":                   "1",
+			livekit.AttrSIPCallID:         "call-id",
+			livekit.AttrSIPTrunkID:        "trunk",
+			livekit.AttrSIPDispatchRuleID: "rule",
+			livekit.AttrSIPPhoneNumber:    "+11112222",
+			livekit.AttrSIPTrunkNumber:    "+3333",
+		},
+	}, res)
+
+	d.HidePhoneNumber = true
+	res, err = EvaluateDispatchRule("trunk", d, r)
+	require.NoError(t, err)
+	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		Result:              rpc.SIPDispatchResult_ACCEPT,
+		SipTrunkId:          "trunk",
+		SipDispatchRuleId:   "rule",
+		RoomName:            "room",
+		ParticipantIdentity: "sip_c15a31c71649a522",
+		ParticipantName:     "Phone 2222",
+		ParticipantMetadata: "rule-meta",
+		ParticipantAttributes: map[string]string{
+			"rule-attr":                   "1",
+			"prov-attr":                   "1",
+			livekit.AttrSIPCallID:         "call-id",
+			livekit.AttrSIPTrunkID:        "trunk",
+			livekit.AttrSIPDispatchRuleID: "rule",
+		},
+	}, res)
+}
+
 func TestMatchIP(t *testing.T) {
 	cases := []struct {
 		addr string
@@ -530,7 +654,7 @@ func TestMatchIP(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
-			got := matchAddrs(c.addr, c.mask)
+			got := matchAddrMask(c.addr, c.mask)
 			require.Equal(t, c.exp, got)
 		})
 	}
