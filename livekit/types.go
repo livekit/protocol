@@ -63,15 +63,6 @@ type Guid interface {
 
 type GuidBlock [9]byte
 
-// ToProto implements DataPacket in Go SDK.
-func (p *SipDTMF) ToProto() *DataPacket {
-	return &DataPacket{
-		Value: &DataPacket_SipDtmf{
-			SipDtmf: p,
-		},
-	}
-}
-
 func (r *RoomEgress) UnmarshalYAML(value *yaml.Node) error {
 	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
 	str, err := yaml.Marshal(value)
