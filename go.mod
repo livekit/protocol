@@ -10,7 +10,7 @@ require (
 	github.com/gammazero/deque v0.2.1
 	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-logr/logr v1.4.1
-	github.com/hashicorp/go-retryablehttp v0.7.5
+	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
@@ -73,7 +73,7 @@ require (
 	golang.org/x/crypto v0.21.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.18.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240221002015-b0ce06bbee7c // indirect
