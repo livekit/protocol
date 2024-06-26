@@ -164,7 +164,8 @@ message RegisterWorkerResponse {
 }
 
 message MigrateJobRequest {
-  string job_id = 1;
+  // string job_id = 1 [deprecated = true];
+  repeated string job_ids = 2;
 }
 
 message AvailabilityRequest {
@@ -203,6 +204,7 @@ message UpdateWorkerStatus {
   optional WorkerStatus status = 1;
   // optional string metadata = 2 [deprecated=true];
   float load = 3;
+  int32 job_count = 4;
 }
 
 message JobAssignment {
