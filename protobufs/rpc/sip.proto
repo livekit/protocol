@@ -61,8 +61,10 @@ message InternalCreateSIPParticipantRequest {
 
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 12;
+  // This participant will accept DTMF data messages from other LiveKit participants.
+  bool accept_dtmf = 18;
 
-  // NEXT ID: 18
+  // NEXT ID: 19
 }
 
 message InternalCreateSIPParticipantResponse {

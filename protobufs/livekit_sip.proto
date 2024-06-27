@@ -273,6 +273,8 @@ message CreateSIPDispatchRuleRequest {
   // By default the From value (Phone number) is used for participant name/identity and added to attributes.
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
   bool hide_phone_number = 3;
+  // Participants created by this rule will accept DTMF data messages from other LiveKit participants.
+  bool participant_accept_dtmf = 8;
 
   // Dispatch Rule will only accept a call made to these numbers (if set).
   repeated string inbound_numbers = 6;
@@ -286,7 +288,7 @@ message CreateSIPDispatchRuleRequest {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 7;
 
-  // NEXT ID: 8
+  // NEXT ID: 9
 }
 
 message SIPDispatchRuleInfo {
@@ -294,6 +296,8 @@ message SIPDispatchRuleInfo {
   SIPDispatchRule rule = 2;
   repeated string trunk_ids = 3;
   bool hide_phone_number = 4;
+  // Participants created by this rule will accept DTMF data messages from other LiveKit participants.
+  bool participant_accept_dtmf = 9;
   // Dispatch Rule will only accept a call made to these numbers (if set).
   repeated string inbound_numbers = 7;
 
@@ -306,7 +310,7 @@ message SIPDispatchRuleInfo {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 8;
 
-  // NEXT ID: 9
+  // NEXT ID: 10
 }
 
 message ListSIPDispatchRuleRequest {
@@ -354,7 +358,10 @@ message CreateSIPParticipantRequest {
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
   bool hide_phone_number = 10;
 
-  // NEXT ID: 11
+  // This participant will accept DTMF data messages from other LiveKit participants.
+  bool accept_dtmf = 11;
+
+  // NEXT ID: 12
 }
 
 message SIPParticipantInfo {

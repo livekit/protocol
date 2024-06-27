@@ -136,6 +136,8 @@ message EvaluateSIPDispatchRulesResponse {
   string participant_metadata = 8;
   // What should be used for the LiveKit participant attributes
   map<string, string> participant_attributes = 11;
+  // This participant will accept DTMF data messages from other LiveKit participants.
+  bool participant_accept_dtmf = 12;
 
   bool request_pin = 3 [deprecated=true]; // see result
 
@@ -151,7 +153,7 @@ message EvaluateSIPDispatchRulesResponse {
   string sip_trunk_id = 9;
   // Dispatch Rule used to fulfill this request
   string sip_dispatch_rule_id = 10;
-  // NEXT ID: 12
+  // NEXT ID: 13
 }
 
 enum SIPDispatchResult {

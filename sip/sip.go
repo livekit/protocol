@@ -481,5 +481,6 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 		ParticipantName:       fromName,
 		ParticipantMetadata:   rule.Metadata,
 		ParticipantAttributes: attrs,
+		ParticipantAcceptDtmf: rule.ParticipantAcceptDtmf,
 	}, nil
 }
