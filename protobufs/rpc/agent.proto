@@ -31,8 +31,8 @@ service AgentInternal {
       affinity_func: true
       topics: true
       topic_params: {
-	names: ["namespace", "job_type"]
-	typed: false
+        names: ["namespace", "job_type"]
+        typed: false
       }
     };
   };
@@ -52,7 +52,8 @@ service AgentInternal {
 message CheckEnabledRequest{}
 
 message CheckEnabledResponse {
-  bool room_enabled = 1;
-  bool publisher_enabled = 2;
-  repeated string namespaces = 3;
+  bool room_enabled = 1 [deprecated = true];
+  bool publisher_enabled = 2 [deprecated = true];
+  repeated string namespaces = 3 [deprecated = true];
+
 }

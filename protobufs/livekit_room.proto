@@ -21,6 +21,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 import "livekit_egress.proto";
+import "livekit_agent.proto";
 
 // Room service that can be performed on any node
 // they are Twirp-based HTTP req/responses
@@ -64,6 +65,8 @@ service RoomService {
 message CreateRoomRequest {
   // name of the room
   string name = 1;
+  // configuration to use for this room parameters. Setting parameters below override the config defaults. 
+  string config_name = 12;
   // number of seconds to keep the room open if no one joins
   uint32 empty_timeout = 2;
   // number of seconds to keep the room open after everyone leaves
@@ -76,6 +79,8 @@ message CreateRoomRequest {
   string metadata = 5;
   // egress
   RoomEgress egress = 6;
+  // agent
+  RoomAgent agent = 11;
   // playout delay of subscriber
   uint32 min_playout_delay = 7;
   uint32 max_playout_delay = 8;
@@ -83,7 +88,7 @@ message CreateRoomRequest {
   // so not recommended for rooms with frequent subscription changes
   bool sync_streams = 9;
 
-  // NEXT-ID: 11
+  // NEXT-ID: 13
 }
 
 message RoomEgress {
@@ -91,6 +96,11 @@ message RoomEgress {
   AutoParticipantEgress participant = 3;
   AutoTrackEgress tracks = 2;
 }
+
+message RoomAgent {
+  repeated CreateAgentJobDefinitionRequest agents = 1;
+}
+
 
 message ListRoomsRequest {
   // when set, will only return rooms with name match
@@ -193,3 +203,24 @@ message UpdateRoomMetadataRequest {
   // metadata to update. skipping updates if left empty
   string metadata = 2;
 }
+
+message RoomConfiguration {
+  string name = 1; // Used as ID, must be unique
+  // number of seconds to keep the room open if no one joins
+  uint32 empty_timeout = 2;
+  // number of seconds to keep the room open after everyone leaves
+  uint32 departure_timeout = 3;
+  // limit number of participants that can be in a room
+  uint32 max_participants = 4;
+  // egress
+  RoomEgress egress = 5;
+  // agent
+  RoomAgent agent = 6;
+  // playout delay of subscriber
+  uint32 min_playout_delay = 7;
+  uint32 max_playout_delay = 8;
+  // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
+  // so not recommended for rooms with frequent subscription changes
+  bool sync_streams = 9;
+}
+

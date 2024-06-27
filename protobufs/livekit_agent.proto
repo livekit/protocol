@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,154 +21,198 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
-message WorkerInfo {
-    string id = 1;
-    string namespace = 2;
-    string version = 3;
-    string name = 4;
-    JobType type = 5;
-    ParticipantPermission allowed_permissions = 6;
+service AgentService {
+  rpc CreateAgentJobDefinition(CreateAgentJobDefinitionRequest) returns (JobDefinition);
+  rpc DeleteAgentJobDefinition(DeleteAgentJobDefinitionRequest) returns (JobDefinition);
+  rpc ListAgentJobDefinitions(ListAgentJobDefinitionsRequesst) returns (ListAgentJobDefinitionsResponse);
 }
 
-message AgentInfo {
-    string id = 1;
-    string name = 2;
-    string version = 3;
+message CreateAgentJobDefinitionRequest {
+  JobType type = 1;
+  string room = 2;
+  repeated string participant_identity = 3;
+  string namespace = 4;
+  string metadata = 5;
+}
+
+message DeleteAgentJobDefinitionRequest {
+  string job_definition_id = 1;
+}
+
+message ListAgentJobDefinitionsRequesst {
+  string job_definition_id = 1; // if set, only the job definition whose id is given will be returned
+  string room = 2;              // name of the room to list agents for. Must be set.
+}
+
+message ListAgentJobDefinitionsResponse {
+  repeated JobDefinition job_definitions = 1;
+}
+
+message JobDefinition {
+  string id = 1;
+  JobType type = 2;
+  string room = 3;
+  repeated string participant_identity = 4;
+  string namespace = 5;
+  string metadata = 6;
+  JobDefinitionState state = 7;
+}
+
+message JobDefinitionState {
+  // For job definitions of tyoe JT_ROOM, there will be at most 1 job. 
+  // For job definitions of type JT_PUBLISHER, there will be 1 job per provided participant identity, or per publisher in the room if left empty.
+  repeated Job jobs = 1;
+  int64 created_at = 2;
+  int64 deleted_at = 3;
 }
 
 message Job {
-    string id = 1;
-    JobType type = 2;
-    Room room = 3;
-    optional ParticipantInfo participant = 4;
-    string namespace = 5;
+  string id = 1;
+  JobType type = 2;
+  Room room = 3;
+  optional ParticipantInfo participant = 4;
+  string namespace = 5;
+  string metadata = 6;
+  JobState state = 7;
+}
+
+message JobState {
+  JobStatus status = 1;
+  string error = 2;
+  int64 started_at = 3;
+  int64 ended_at = 4;
+  int64 updated_at = 5; 
 }
 
 // from Worker to Server
 message WorkerMessage {
-    oneof message {
-        // agent workers need to register themselves with the server first
-        RegisterWorkerRequest register = 1;
-        // worker confirms to server that it's available for a job, or declines it
-        AvailabilityResponse availability = 2;
+  oneof message {
+    // agent workers need to register themselves with the server first
+    RegisterWorkerRequest register = 1;
+    // worker confirms to server that it's available for a job, or declines it
+    AvailabilityResponse availability = 2;
 
-        // worker can update its status to the server, including taking itself out of the pool
-	UpdateWorkerStatus update_worker = 3;
-	// job can send status updates to the server, useful for tracking progress
-        UpdateJobStatus update_job = 4;
+    // worker can update its status to the server, including taking itself out of the pool
+    UpdateWorkerStatus update_worker = 3;
+    // job can send status updates to the server, useful for tracking progress
+    UpdateJobStatus update_job = 4;
 
-	WorkerPing ping = 5;
-	SimulateJobRequest simulate_job = 6;
-	MigrateJobRequest migrate_job = 7;
-    };
+    WorkerPing ping = 5;
+    SimulateJobRequest simulate_job = 6;
+    MigrateJobRequest migrate_job = 7;
+  };
 }
 
 // from Server to Worker
 message ServerMessage {
-    oneof message {
-        // server confirms the registration, from this moment on, the worker is considered active
-        RegisterWorkerResponse register = 1;
-        // server asks worker to confirm availability for a job
-        AvailabilityRequest availability = 2;
-        JobAssignment assignment = 3;
-	WorkerPong pong = 4;
-    }
+  oneof message {
+    // server confirms the registration, from this moment on, the worker is considered active
+    RegisterWorkerResponse register = 1;
+    // server asks worker to confirm availability for a job
+    AvailabilityRequest availability = 2;
+    JobAssignment assignment = 3;
+    JobTermination termination = 5;
+    WorkerPong pong = 4;
+  }
 }
 
 enum JobType {
-    JT_ROOM = 0;
-    JT_PUBLISHER = 1;
+  JT_ROOM = 0;
+  JT_PUBLISHER = 1;
 }
 
 enum WorkerStatus {
-    WS_AVAILABLE = 0;
-    WS_FULL = 1;
+  WS_AVAILABLE = 0;
+  WS_FULL = 1;
 }
 
 enum JobStatus {
-    JS_UNKNOWN = 0;
-    JS_SUCCESS = 1;
-    JS_FAILED = 2;
+  JS_PENDING = 0;
+  JS_RUNNING = 1;
+  JS_SUCCESS = 2;
+  JS_FAILED = 3;
 }
 
 message SimulateJobRequest {
-    JobType type = 1;
-    Room room = 2;
-    ParticipantInfo participant = 3;
+  JobType type = 1;
+  Room room = 2;
+  ParticipantInfo participant = 3;
 }
 
 message WorkerPing {
-    int64 timestamp = 1;
+  int64 timestamp = 1;
 }
 
 message WorkerPong {
-    int64 last_timestamp = 1;
-    int64 timestamp = 2;
+  int64 last_timestamp = 1;
+  int64 timestamp = 2;
 }
 
 message RegisterWorkerRequest {
-    JobType type = 1;
-    //string worker_id = 2;
-    string version = 3;
-    string name = 4;
-    uint32 ping_interval = 5;
-    optional string namespace = 6;
-    ParticipantPermission allowed_permissions = 7;
+  JobType type = 1;
+  //string worker_id = 2;
+  string version = 3;
+  string name = 4;
+  uint32 ping_interval = 5;
+  optional string namespace = 6;
+  ParticipantPermission allowed_permissions = 7;
 }
 
 message RegisterWorkerResponse {
-    string worker_id = 1;
-    ServerInfo server_info = 3;
+  string worker_id = 1;
+  ServerInfo server_info = 3;
 }
 
 message MigrateJobRequest {
-    string job_id = 1;
+  // string job_id = 1 [deprecated = true];
+  repeated string job_ids = 2;
 }
 
 message AvailabilityRequest {
-    Job job = 1;
+  Job job = 1;
 
-    // True when the job was previously assigned to another worker but has been 
-    // migrated due to different reasons (e.g. worker failure, job migration)
-    bool resuming = 2;
+  // True when the job was previously assigned to another worker but has been 
+  // migrated due to different reasons (e.g. worker failure, job migration)
+  bool resuming = 2;
 }
 
 
 message AvailabilityResponse {
-    string job_id = 1;
-    bool available = 2;
-    bool supports_resume = 3;
+  string job_id = 1;
+  bool available = 2;
+  bool supports_resume = 3;
 
-    string participant_name = 4;
-    string participant_identity = 5;
-    string participant_metadata = 6;
+  string participant_name = 4;
+  string participant_identity = 5;
+  string participant_metadata = 6;
 }
 
 message UpdateJobStatus {
-    string job_id = 1;
+  string job_id = 1;
 
-    // The worker can indicate the job end by either specifying SUCCESS or FAILED
-    optional JobStatus status = 2;
+  // The worker can indicate the job end by either specifying SUCCESS or FAILED
+  JobStatus status = 2;
 
-    // metadata shown on the dashboard, useful for debugging
-    string error = 3;
+  // metadata shown on the dashboard, useful for debugging
+  string error = 3;
 
-    // the metadata can be updated multiple times
-    optional string metadata = 4;
-    
-    // The load that the job currently has on the worker
-    float load = 5;
+  // the metadata can be updated multiple times
+  // optional string metadata = 4 [deprecated=true];
 }
 
 message UpdateWorkerStatus {
-    optional WorkerStatus status = 1;
-    optional string metadata = 2;
-    float load = 3;
+  optional WorkerStatus status = 1;
+  // optional string metadata = 2 [deprecated=true];
+  float load = 3;
+  int32 job_count = 4;
 }
 
 message JobAssignment {
-    Job job = 1;
-    optional string url = 2;
-    string token = 3; 
+  Job job = 1;
+  optional string url = 2;
+  string token = 3;
 }
 
+message JobTermination {
+  string job_id = 1;
+}

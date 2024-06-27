@@ -14,6 +14,11 @@
 
 package livekit
 
+import (
+	"github.com/bufbuild/protoyaml-go"
+	"gopkg.in/yaml.v3"
+)
+
 type TrackID string
 type ParticipantID string
 type ParticipantIdentity string
@@ -57,3 +62,23 @@ type Guid interface {
 }
 
 type GuidBlock [9]byte
+
+func (r *RoomEgress) UnmarshalYAML(value *yaml.Node) error {
+	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
+	str, err := yaml.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return protoyaml.Unmarshal(str, r)
+}
+
+func (r *RoomAgent) UnmarshalYAML(value *yaml.Node) error {
+	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
+	str, err := yaml.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	return protoyaml.Unmarshal(str, r)
+}
