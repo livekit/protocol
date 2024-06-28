@@ -10,6 +10,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gammazero/deque v0.2.1
 	github.com/go-jose/go-jose/v3 v3.0.3
+	github.com/go-jose/go-jose/v4 v4.0.2
 	github.com/go-logr/logr v1.4.1
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jxskiss/base62 v1.1.0
