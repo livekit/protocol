@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.19.1
+
+### Patch Changes
+
+- Add ErrorResponse - [#743](https://github.com/livekit/protocol/pull/743) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.19.0
 
 ### Minor Changes
