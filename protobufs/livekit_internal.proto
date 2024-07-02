@@ -142,7 +142,7 @@ message RoomInternal {
   AutoTrackEgress track_egress = 1;
   AutoParticipantEgress participant_egress = 2;
   PlayoutDelay playout_delay = 3;
-  repeated CreateAgentJobDefinitionRequest agents = 5; 
+  repeated RoomAgentJobDefinition agents = 5; 
   bool sync_streams = 4;
 }
 

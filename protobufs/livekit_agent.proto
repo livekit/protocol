@@ -28,11 +28,16 @@ service AgentService {
 }
 
 message CreateAgentJobDefinitionRequest {
-  JobType type = 1;
-  string room = 2;
-  repeated string participant_identity = 3;
-  string namespace = 4;
-  string metadata = 5;
+  string room = 1;
+  repeated string participant_identity = 2;
+  string namespace = 3;
+  string metadata = 4;
+}
+
+message RoomAgentJobDefinition {
+  repeated string participant_identity = 1;
+  string namespace = 2;
+  string metadata = 3;
 }
 
 message DeleteAgentJobDefinitionRequest {
@@ -50,7 +55,6 @@ message ListAgentJobDefinitionsResponse {
 
 message JobDefinition {
   string id = 1;
-  JobType type = 2;
   string room = 3;
   repeated string participant_identity = 4;
   string namespace = 5;
