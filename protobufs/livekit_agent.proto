@@ -22,49 +22,46 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_models.proto";
 
 service AgentService {
-  rpc CreateAgentJobDefinition(CreateAgentJobDefinitionRequest) returns (JobDefinition);
-  rpc DeleteAgentJobDefinition(DeleteAgentJobDefinitionRequest) returns (JobDefinition);
-  rpc ListAgentJobDefinitions(ListAgentJobDefinitionsRequesst) returns (ListAgentJobDefinitionsResponse);
+  rpc CreateAgentDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);
+  rpc DeleteAgentDispatch(DeleteAgentDispatchRequest) returns (AgentDispatch);
+  rpc ListAgentDispatch(ListAgentDispatchRequesst) returns (ListAgentDispatchResponse);
 }
 
-message CreateAgentJobDefinitionRequest {
+message CreateAgentDispatchRequest {
   string room = 1;
-  repeated string participant_identity = 2;
   string namespace = 3;
   string metadata = 4;
 }
 
-message RoomAgentJobDefinition {
-  repeated string participant_identity = 1;
+message RoomAgentDispatch {
   string namespace = 2;
   string metadata = 3;
 }
 
-message DeleteAgentJobDefinitionRequest {
-  string job_definition_id = 1;
+message DeleteAgentDispatchRequest {
+  string dispatch_id = 1;
 }
 
-message ListAgentJobDefinitionsRequesst {
-  string job_definition_id = 1; // if set, only the job definition whose id is given will be returned
-  string room = 2;              // name of the room to list agents for. Must be set.
+message ListAgentDispatchRequesst {
+  string dispatch_id = 1; // if set, only the dispatch whose id is given will be returned
+  string room = 2;        // name of the room to list agents for. Must be set.
 }
 
-message ListAgentJobDefinitionsResponse {
-  repeated JobDefinition job_definitions = 1;
+message ListAgentDispatchResponse {
+  repeated AgentDispatch agent_dispatches = 1;
 }
 
-message JobDefinition {
+message AgentDispatch {
   string id = 1;
   string room = 3;
-  repeated string participant_identity = 4;
   string namespace = 5;
   string metadata = 6;
-  JobDefinitionState state = 7;
+  AgentDispatchState state = 7;
 }
 
-message JobDefinitionState {
-  // For job definitions of tyoe JT_ROOM, there will be at most 1 job. 
-  // For job definitions of type JT_PUBLISHER, there will be 1 job per provided participant identity, or per publisher in the room if left empty.
+message AgentDispatchState {
+  // For dispatches of tyoe JT_ROOM, there will be at most 1 job. 
+  // For dispatches of type JT_PUBLISHER, there will be 1 per publisher.
   repeated Job jobs = 1;
   int64 created_at = 2;
   int64 deleted_at = 3;
