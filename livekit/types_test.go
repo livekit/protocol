@@ -38,13 +38,9 @@ b:
 func TestUnmarshallRoomAgent(t *testing.T) {
 	y := `
 a:
-  agents:
-    - type: 0 
-      room: test room
-    - type: 1
-      participant_identity:
-        - id1
-        - id2
+  dispatches:
+    - {}
+    - name: ag
       namespace: nm
 `
 	obj := make(map[string]*RoomAgent)
@@ -55,12 +51,6 @@ a:
 
 	re := obj["a"]
 	require.NotNil(t, re)
-	require.Equal(t, len(re.Agents), 2)
-	require.Equal(t, JobType_JT_ROOM, re.Agents[0].Type)
-	require.Equal(t, "test room", re.Agents[0].Room)
-	require.Equal(t, JobType_JT_PUBLISHER, re.Agents[1].Type)
-	require.Equal(t, "nm", re.Agents[1].Namespace)
-	require.Equal(t, 2, len(re.Agents[1].ParticipantIdentity))
-	require.Equal(t, "id1", re.Agents[1].ParticipantIdentity[0])
-	require.Equal(t, "id2", re.Agents[1].ParticipantIdentity[1])
+	require.Equal(t, len(re.Dispatches), 2)
+	require.Equal(t, "nm", re.Dispatches[1].Namespace)
 }
