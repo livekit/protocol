@@ -22,9 +22,9 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_models.proto";
 
 service AgentService {
-  rpc CreateAgentDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);
-  rpc DeleteAgentDispatch(DeleteAgentDispatchRequest) returns (AgentDispatch);
-  rpc ListAgentDispatch(ListAgentDispatchRequesst) returns (ListAgentDispatchResponse);
+  rpc CreateDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);
+  rpc DeleteDispatch(DeleteAgentDispatchRequest) returns (AgentDispatch);
+  rpc ListDispatch(ListAgentDispatchRequesst) returns (ListAgentDispatchResponse);
 }
 
 message CreateAgentDispatchRequest {
