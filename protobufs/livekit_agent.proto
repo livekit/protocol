@@ -74,7 +74,7 @@ message Job {
   optional ParticipantInfo participant = 4;
   string namespace = 5 [deprecated = true];
   string metadata = 6;
-  string agent_id = 7;
+  string agent_name = 7;
   JobState state = 8;
 }
 
