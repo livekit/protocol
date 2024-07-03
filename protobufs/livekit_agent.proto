@@ -53,7 +53,7 @@ message ListAgentDispatchResponse {
 
 message AgentDispatch {
   string id = 1;
-  string agemt_name = 2;
+  string agent_name = 2;
   string room = 3;
   string metadata = 4;
   AgentDispatchState state = 5;

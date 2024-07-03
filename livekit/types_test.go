@@ -40,8 +40,8 @@ func TestUnmarshallRoomAgent(t *testing.T) {
 a:
   dispatches:
     - {}
-    - name: ag
-      namespace: nm
+    - agent_name: ag
+      metadata: mm
 `
 	obj := make(map[string]*RoomAgent)
 
@@ -52,5 +52,6 @@ a:
 	re := obj["a"]
 	require.NotNil(t, re)
 	require.Equal(t, len(re.Dispatches), 2)
-	require.Equal(t, "nm", re.Dispatches[1].Namespace)
+	require.Equal(t, "ag", re.Dispatches[1].AgentName)
+	require.Equal(t, "mm", re.Dispatches[1].Metadata)
 }
