@@ -50,7 +50,7 @@ jobs:
       - name: Generate Protobuf
         run: mage proto
 
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: 8
 
