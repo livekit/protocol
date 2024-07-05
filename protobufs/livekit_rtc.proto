@@ -55,6 +55,9 @@ message SignalRequest {
     UpdateLocalAudioTrack update_audio_track = 17;
     // Update local video track settings
     UpdateLocalVideoTrack update_video_track = 18;
+    // Send/Update ParticipantMessge
+    ParticipantMessage participant_message = 19;
+
   }
 }
 
@@ -103,6 +106,8 @@ message SignalResponse {
     SubscriptionResponse subscription_response = 21;
     // Errors relating to user inititated requests that carry a `request_id`
     ErrorResponse error_response = 22;
+    // Receive/Acknowledge ParticipantMessge
+    ParticipantMessage participant_message = 23;
   }
 }
 
@@ -436,4 +441,11 @@ message ErrorResponse {
   uint32 request_id = 1;
   Reason reason = 2;
   string message = 3;
+}
+
+message ParticipantMessage {
+  oneof message {
+    ChatMessage chat = 2;
+    Transcription transcription = 3;
+  }
 }

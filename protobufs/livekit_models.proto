@@ -491,3 +491,18 @@ enum AudioTrackFeature {
   TF_ENHANCED_NOISE_CANCELLATION = 5;
 }
 
+message ChatMessage {
+  string id = 1; // populated by server
+  int64 timestamp = 2; // populated by  server
+  int64 edit_timestamp = 3; // populated by server
+  string message = 4;
+  bool deleted = 5; // true to remove message
+  ParticipantMetaInfo sender_info = 6;
+  repeated string destination_identities = 7;
+}
+
+message ParticipantMetaInfo {
+  string identity = 1;
+  string name = 2;
+}
+
