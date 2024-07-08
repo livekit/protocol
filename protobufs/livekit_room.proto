@@ -65,7 +65,7 @@ service RoomService {
 message CreateRoomRequest {
   // name of the room
   string name = 1;
-  // configuration to use for this room parameters. Setting parameters below override the config defaults. 
+  // configuration to use for this room parameters. Setting parameters below override the config defaults.
   string config_name = 12;
   // number of seconds to keep the room open if no one joins
   uint32 empty_timeout = 2;
@@ -87,8 +87,9 @@ message CreateRoomRequest {
   // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
   // so not recommended for rooms with frequent subscription changes
   bool sync_streams = 9;
-
-  // NEXT-ID: 13
+  // replay
+  bool replay_enabled = 13;
+  // NEXT-ID: 14
 }
 
 message RoomEgress {
@@ -223,4 +224,3 @@ message RoomConfiguration {
   // so not recommended for rooms with frequent subscription changes
   bool sync_streams = 9;
 }
-

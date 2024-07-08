@@ -94,6 +94,7 @@ func Proto() error {
 	if err != nil {
 		return err
 	}
+
 	fmt.Println("generating twirp protobuf")
 	args := append([]string{
 		"--go_out", target,
@@ -109,6 +110,24 @@ func Proto() error {
 	if err := cmd.Run(); err != nil {
 		return err
 	}
+
+	fmt.Println("generating replay twirp protobuf")
+	replayTarget := "replay"
+	args = append([]string{
+		"--go_out", replayTarget,
+		"--twirp_out", replayTarget,
+		"--go_opt=paths=source_relative",
+		"--twirp_opt=paths=source_relative",
+		"--plugin=go=" + protocGoPath,
+		"--plugin=twirp=" + twirpPath,
+		"-I=./protobufs",
+	}, "cloud_replay.proto")
+	cmd = exec.Command(protoc, args...)
+	connectStd(cmd)
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+
 	fmt.Println("generating protobuf")
 	args = append([]string{
 		"--go_out", target,
