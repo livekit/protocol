@@ -106,8 +106,8 @@ message SignalResponse {
     SubscriptionResponse subscription_response = 21;
     // Errors relating to user inititated requests that carry a `request_id`
     ErrorResponse error_response = 22;
-    // Receive/Acknowledge ParticipantMessge
-    ParticipantMessage participant_message = 23;
+    // Receive/Acknowledge ParticipantMessages
+    repeated ParticipantMessage participant_messages = 23;
   }
 }
 
@@ -448,4 +448,8 @@ message ParticipantMessage {
     ChatMessage chat = 2;
     Transcription transcription = 3;
   }
+}
+
+message ParticipantMessageRequest {
+  uint64 timestamp = 1; // Retrieve all messages with local participant as recepient since timestamp
 }
