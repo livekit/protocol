@@ -1,34 +1,50 @@
 syntax = "proto3";
 
-package cloud_protocol;
+package replay;
 
-option go_package = "github.com/livekit/protocol/livekit";
+option go_package = "github.com/livekit/protocol/replay";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
 
 service Replay {
+  rpc ListReplays(ListReplaysRequest) returns (ListReplaysResponse);
   rpc LoadReplay(LoadReplayRequest) returns (LoadReplayResponse);
   rpc SeekForRoom(RoomSeekRequest) returns (google.protobuf.Empty);
   rpc CloseReplay(CloseReplayRequest) returns (google.protobuf.Empty);
+  rpc DeleteReplay(DeleteReplayRequest) returns (google.protobuf.Empty);
+}
+
+message ListReplaysRequest {}
+
+message ListReplaysResponse {
+  repeated ReplayInfo replays = 1;
+}
+
+message ReplayInfo {
+  string replay_id = 1;
 }
 
 message LoadReplayRequest {
-  string src_room_id = 1;
-  string dest_room_name = 2;
+  string replay_id = 1;
+  string room_name = 2;
   int64 starting_pts = 3;
 }
 
 message LoadReplayResponse {
-  string replay_id = 1;
+  string playback_id = 1;
 }
 
 message RoomSeekRequest {
-  string replay_id = 1;
+  string playback_id = 1;
   int64 pts = 2;
 }
 
 message CloseReplayRequest {
+  string playback_id = 1;
+}
+
+message DeleteReplayRequest {
   string replay_id = 1;
 }
