@@ -43,6 +43,7 @@ func Bootstrap() error {
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
+		"cloud_replay.proto",
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
 		"livekit_room.proto",
