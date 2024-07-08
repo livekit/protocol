@@ -8,6 +8,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
 
+// Experimental (not currently available)
 service Replay {
   rpc ListReplays(ListReplaysRequest) returns (ListReplaysResponse);
   rpc LoadReplay(LoadReplayRequest) returns (LoadReplayResponse);

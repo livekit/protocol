@@ -33,6 +33,7 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 // Replay Interface
 // ================
 
+// Experimental (not currently available)
 type Replay interface {
 	ListReplays(context.Context, *ListReplaysRequest) (*ListReplaysResponse, error)
 
