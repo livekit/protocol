@@ -15,10 +15,11 @@
 package auth_test
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v3/json"
+	"github.com/go-jose/go-jose/v4/json"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/auth"
@@ -26,8 +27,8 @@ import (
 
 func TestVerifier(t *testing.T) {
 	apiKey := "APID3B67uxk4Nj2GKiRPibAZ9"
-	secret := "YHC-CUhbQhGeVCaYgn1BNA++"
-	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDg5MzAzMDgsImlzcyI6IkFQSUQzQjY3dXhrNE5qMkdLaVJQaWJBWjkiLCJuYmYiOjE2MDg5MjY3MDgsInJvb21fam9pbiI6dHJ1ZSwicm9vbV9zaWQiOiJteWlkIiwic3ViIjoiQVBJRDNCNjd1eGs0TmoyR0tpUlBpYkFaOSJ9.cmHEBq0MLyRqphmVLM2cLXg5ao5Sro7am8yXhcYKcwE"
+	secret := "YHC-CUhbQhGeVCaYgn1BNA++HC-CUhbQhHC"
+	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjA1OTgyODQsImlzcyI6IkFQSUQzQjY3dXhrNE5qMkdLaVJQaWJBWjkiLCJuYW1lIjoibXluYW1lIiwibmJmIjoxNzIwNTk4MjgzLCJzdWIiOiJteW5hbWUiLCJ2aWRlbyI6eyJyb29tIjoibXlyb29tIiwicm9vbUpvaW4iOnRydWV9fQ.4aNFWIN8OZwG7U3wU-GlAlH_Q3crgvWDktDmB1XzzYY"
 	t.Run("cannot decode with incorrect key", func(t *testing.T) {
 		v, err := auth.ParseAPIToken(accessToken)
 		require.NoError(t, err)
@@ -40,7 +41,7 @@ func TestVerifier(t *testing.T) {
 		require.Error(t, err)
 	})
 
-	t.Run("key has expired", func(t *testing.T) {
+	t.Run("token has expired", func(t *testing.T) {
 		v, err := auth.ParseAPIToken(accessToken)
 		require.NoError(t, err)
 
