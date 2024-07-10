@@ -15,7 +15,6 @@
 package auth_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
