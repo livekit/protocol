@@ -51,6 +51,7 @@ const (
 	URLResourcePrefix     = "UR_"
 	AgentWorkerPrefix     = "AW_"
 	AgentJobPrefix        = "AJ_"
+	AgentDispatchPrefix   = "AD_"
 )
 
 var guidGeneratorPool = sync.Pool{
