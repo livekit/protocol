@@ -40,6 +40,7 @@ const (
 	URLResourcePrefix     = guid.URLResourcePrefix
 	AgentWorkerPrefix     = guid.AgentWorkerPrefix
 	AgentJobPrefix        = guid.AgentJobPrefix
+	AgentDispatchPrefix   = guid.AgentDispatchPrefix
 )
 
 func NewGuid(prefix string) string {
