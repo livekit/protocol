@@ -17,7 +17,7 @@ package auth
 import (
 	"time"
 
-	"github.com/go-jose/go-jose/v3/jwt"
+	"github.com/go-jose/go-jose/v4/jwt"
 )
 
 type APIKeyTokenVerifier struct {
@@ -28,7 +28,7 @@ type APIKeyTokenVerifier struct {
 
 // ParseAPIToken parses an encoded JWT token and
 func ParseAPIToken(raw string) (*APIKeyTokenVerifier, error) {
-	tok, err := jwt.ParseSigned(raw)
+	tok, err := jwt.ParseSigned(raw, defaultAlgorithms)
 	if err != nil {
 		return nil, err
 	}

@@ -432,7 +432,7 @@ message ErrorResponse {
     UNKNOWN = 0;
     NOT_FOUND = 1;
     NOT_ALLOWED = 2;
-    INVALID_ARGUMENT = 3;
+    LIMIT_EXCEEDED = 3;
   }
 
   uint32 request_id = 1;
