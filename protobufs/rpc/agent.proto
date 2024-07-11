@@ -26,7 +26,7 @@ service AgentInternal {
   rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse) {
     option (psrpc.options).multi = true;
   };
-  rpc JobRequest(livekit.Job) returns (google.protobuf.Empty) {
+  rpc JobRequest(livekit.Job) returns (JobRequestResponse) {
     option (psrpc.options) = {
       affinity_func: true
       topics: true
@@ -56,4 +56,8 @@ message CheckEnabledResponse {
   bool publisher_enabled = 2;
   repeated string namespaces = 3 [deprecated = true];
   repeated string agent_names = 4;
+}
+
+message JobRequestResponse {
+  livekit.JobState state = 1;
 }
