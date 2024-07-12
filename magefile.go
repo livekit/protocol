@@ -50,6 +50,7 @@ func Proto() error {
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",
+		"livekit_agent_dispatch.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",

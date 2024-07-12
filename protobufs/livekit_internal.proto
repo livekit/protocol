@@ -22,7 +22,7 @@ option ruby_package = "LiveKit::Proto";
 // internal protos, not exposed to clients
 import "livekit_models.proto";
 import "livekit_egress.proto";
-import "livekit_agent.proto";
+import "livekit_agent_dispatch.proto";
 
 enum NodeType {
   SERVER = 0;

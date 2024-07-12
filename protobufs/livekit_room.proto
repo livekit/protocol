@@ -21,7 +21,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 import "livekit_egress.proto";
-import "livekit_agent.proto";
+import "livekit_agent_dispatch.proto";
 
 // Room service that can be performed on any node
 // they are Twirp-based HTTP req/responses

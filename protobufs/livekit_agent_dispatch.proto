@@ -19,7 +19,7 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-import "livekit_models.proto";
+import "livekit_agent.proto";
 
 service AgentDispatchService {
   rpc CreateDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);

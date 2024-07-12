@@ -23,6 +23,7 @@ import "livekit_models.proto";
 
 message Job {
   string id = 1;
+  string agent_id = 9;
   JobType type = 2;
   Room room = 3;
   optional ParticipantInfo participant = 4;
