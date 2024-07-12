@@ -31,7 +31,7 @@ import (
 
 const (
 	apiKey               = "mykey"
-	apiSecret            = "mysecretmysecretmysecretmysecret"
+	apiSecret            = "mysecret"
 	testAddr             = ":8765"
 	testUrl              = "http://localhost:8765"
 	webhookCheckInterval = 100 * time.Millisecond
