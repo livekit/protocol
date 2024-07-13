@@ -41,12 +41,60 @@ var authProvider = auth.NewSimpleKeyProvider(
 	apiKey, apiSecret,
 )
 
+var sampleEvents = []*livekit.WebhookEvent{
+	{
+		Event: EventTrackPublished,
+		Participant: &livekit.ParticipantInfo{
+			Identity: "test",
+		},
+		Track: &livekit.TrackInfo{
+			Sid: "TR_abcde",
+		},
+	},
+	{
+		Event: EventParticipantJoined,
+		Participant: &livekit.ParticipantInfo{
+			Identity: "test",
+		},
+		Track: &livekit.TrackInfo{
+			Sid: "TR_abcde",
+		},
+	},
+	{
+		Event: EventParticipantJoined,
+		Participant: &livekit.ParticipantInfo{
+			Identity: "test",
+		},
+		Track: &livekit.TrackInfo{
+			Sid: "TR_abcde",
+		},
+	},
+	{
+		Event: EventRoomFinished,
+		Participant: &livekit.ParticipantInfo{
+			Identity: "test",
+		},
+		Track: &livekit.TrackInfo{
+			Sid: "TR_abcde",
+		},
+	},
+	{
+		Event: EventRoomStarted,
+		Participant: &livekit.ParticipantInfo{
+			Identity: "test",
+		},
+		Track: &livekit.TrackInfo{
+			Sid: "TR_abcde",
+		},
+	},
+}
+
 func TestWebHook(t *testing.T) {
 	s := newServer(testAddr)
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
-	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl})
+	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl}, true, nil, nil)
 	defer notifier.Stop(true)
 
 	t.Run("test event payload", func(t *testing.T) {
@@ -80,7 +128,7 @@ func TestBatchWebHook(t *testing.T) {
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
-	notifier := NewBatchedNotifier(context.Background(), apiKey, apiSecret, []string{testUrl})
+	notifier := NewBatchedNotifier(context.Background(), apiKey, apiSecret, []string{testUrl}, nil, nil)
 	defer notifier.Stop(true)
 
 	t.Run("test events payload", func(t *testing.T) {
@@ -110,6 +158,120 @@ func TestBatchWebHook(t *testing.T) {
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
+		wg.Wait()
+	})
+
+}
+
+func TestWebHookWithIncludeFilter(t *testing.T) {
+	s := newServer(testAddr)
+	require.NoError(t, s.Start())
+	defer s.Stop()
+
+	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl}, true, []string{EventParticipantJoined, EventTrackPublished}, nil)
+	defer notifier.Stop(true)
+
+	t.Run("test event payload", func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		wg.Add(3)
+		counter := 0
+		s.handler = func(r *http.Request) {
+			defer wg.Done()
+			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
+			require.NoError(t, err)
+
+			require.EqualValues(t, sampleEvents[counter], decodedEvent)
+			counter++
+		}
+		for _, ev := range sampleEvents {
+			require.NoError(t, notifier.QueueNotify(context.Background(), ev))
+		}
+		wg.Wait()
+		require.Equal(t, 3, counter)
+	})
+}
+
+func TestBatchWebHookWithIncludeFilter(t *testing.T) {
+	s := newServer(testAddr)
+	require.NoError(t, s.Start())
+	defer s.Stop()
+
+	notifier := NewBatchedNotifier(context.Background(), apiKey, apiSecret, []string{testUrl}, []string{EventParticipantJoined, EventTrackPublished}, nil)
+	defer notifier.Stop(true)
+
+	t.Run("test events payload", func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		s.handler = func(r *http.Request) {
+			defer wg.Done()
+			decodedEvent, err := ReceiveWebhookEventBatched(r, authProvider)
+			require.NoError(t, err)
+
+			require.Equal(t, 3, len(decodedEvent))
+			for idx, ev := range decodedEvent {
+				require.EqualValues(t, sampleEvents[idx], ev)
+			}
+		}
+		for _, ev := range sampleEvents {
+			require.NoError(t, notifier.QueueNotify(context.Background(), ev))
+		}
+		wg.Wait()
+	})
+
+}
+
+func TestWebHookWithExcludeFilter(t *testing.T) {
+	s := newServer(testAddr)
+	require.NoError(t, s.Start())
+	defer s.Stop()
+
+	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl}, true, nil, []string{EventParticipantJoined, EventTrackPublished})
+	defer notifier.Stop(true)
+
+	t.Run("test event payload", func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		wg.Add(2)
+		counter := 0
+		s.handler = func(r *http.Request) {
+			defer wg.Done()
+			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
+			require.NoError(t, err)
+
+			require.EqualValues(t, sampleEvents[counter+3], decodedEvent)
+			counter++
+		}
+		for _, ev := range sampleEvents {
+			require.NoError(t, notifier.QueueNotify(context.Background(), ev))
+		}
+		wg.Wait()
+		require.Equal(t, 2, counter)
+	})
+}
+
+func TestBatchWebHookWithExcludeFilter(t *testing.T) {
+	s := newServer(testAddr)
+	require.NoError(t, s.Start())
+	defer s.Stop()
+
+	notifier := NewBatchedNotifier(context.Background(), apiKey, apiSecret, []string{testUrl}, nil, []string{EventParticipantJoined, EventTrackPublished})
+	defer notifier.Stop(true)
+
+	t.Run("test events payload", func(t *testing.T) {
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		s.handler = func(r *http.Request) {
+			defer wg.Done()
+			decodedEvent, err := ReceiveWebhookEventBatched(r, authProvider)
+			require.NoError(t, err)
+
+			require.Equal(t, 2, len(decodedEvent))
+			for idx, ev := range decodedEvent {
+				require.EqualValues(t, sampleEvents[idx+3], ev)
+			}
+		}
+		for _, ev := range sampleEvents {
+			require.NoError(t, notifier.QueueNotify(context.Background(), ev))
+		}
 		wg.Wait()
 	})
 

@@ -27,12 +27,38 @@ type QueuedNotifier interface {
 	Stop(force bool)
 }
 
-type DefaultNotifier struct {
-	urlNotifiers []URLNotifier
+type NotifierParams struct {
+	ApiKey        string
+	ApiSecret     string
+	Urls          []string
+	IncludeEvents []string // when IncludeEvents is not empty ExcludeEvents will be ignored
+	ExcludeEvents []string // needs IncludeEvents to be empty, otherwise it won't take effect
+	Batched       bool     // when Batched is true, DropWhenFull is ignored
+	DropWhenFull  bool     // only works when Batched is disabled
 }
 
-func NewBatchedNotifier(ctx context.Context, apiKey, apiSecret string, urls []string) QueuedNotifier {
-	n := &DefaultNotifier{}
+func NewNotifier(ctx context.Context, params NotifierParams) QueuedNotifier {
+	if len(params.IncludeEvents) > 0 {
+		params.ExcludeEvents = nil
+	}
+	if params.Batched {
+		return NewBatchedNotifier(ctx, params.ApiKey, params.ApiSecret, params.Urls, params.IncludeEvents, params.ExcludeEvents)
+	} else {
+		return NewDefaultNotifier(params.ApiKey, params.ApiSecret, params.Urls, params.DropWhenFull, params.IncludeEvents, params.ExcludeEvents)
+	}
+}
+
+type DefaultNotifier struct {
+	urlNotifiers   []URLNotifier
+	includedEvents []string
+	excludedEvents []string
+}
+
+func NewBatchedNotifier(ctx context.Context, apiKey, apiSecret string, urls []string, includedEvents []string, excludedEvents []string) QueuedNotifier {
+	n := &DefaultNotifier{
+		includedEvents: includedEvents,
+		excludedEvents: excludedEvents,
+	}
 	for _, url := range urls {
 		u := NewBatchURLNotifier(ctx, BatchURLNotifierParams{
 			Logger:    logger.GetLogger().WithComponent("webhook"),
@@ -45,29 +71,19 @@ func NewBatchedNotifier(ctx context.Context, apiKey, apiSecret string, urls []st
 	return n
 }
 
-func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier {
-	n := &DefaultNotifier{}
+func NewDefaultNotifier(apiKey, apiSecret string, urls []string, dropWhenFull bool, includedEvents []string, excludedEvents []string) QueuedNotifier {
+	n := &DefaultNotifier{
+		includedEvents: includedEvents,
+		excludedEvents: excludedEvents,
+	}
 	for _, url := range urls {
 		u := NewDefaultURLNotifier(URLNotifierParams{
 			URL:          url,
 			Logger:       logger.GetLogger().WithComponent("webhook"),
 			APIKey:       apiKey,
 			APISecret:    apiSecret,
-			DropWhenFull: true,
+			DropWhenFull: dropWhenFull,
 		})
-		n.urlNotifiers = append(n.urlNotifiers, u)
-	}
-	return n
-}
-
-func NewDefaultNotifierByParams(params []URLNotifierParams) QueuedNotifier {
-	n := &DefaultNotifier{}
-	for _, p := range params {
-		if p.Logger == nil {
-			p.Logger = logger.GetLogger().WithComponent("webhook")
-		}
-
-		u := NewDefaultURLNotifier(p)
 		n.urlNotifiers = append(n.urlNotifiers, u)
 	}
 	return n
@@ -86,6 +102,24 @@ func (n *DefaultNotifier) Stop(force bool) {
 }
 
 func (n *DefaultNotifier) QueueNotify(_ context.Context, event *livekit.WebhookEvent) error {
+	for _, ev := range n.includedEvents {
+		if event.Event == ev {
+			return n.queueNotify(event)
+		}
+	}
+	if len(n.includedEvents) > 0 {
+		return nil
+	}
+
+	for _, ev := range n.excludedEvents {
+		if event.Event == ev {
+			return nil
+		}
+	}
+	return n.queueNotify(event)
+}
+
+func (n *DefaultNotifier) queueNotify(event *livekit.WebhookEvent) error {
 	for _, u := range n.urlNotifiers {
 		if err := u.QueueNotify(event); err != nil {
 			return err
