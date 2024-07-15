@@ -34,7 +34,7 @@ type VideoGrant struct {
 	RoomJoin  bool   `json:"roomJoin,omitempty"`
 	Room      string `json:"room,omitempty"`
 	// Name of the room configuration to apply to the room if created
-	RoomConfiguration string `json:"room_configuration,omitempty"`
+	RoomConfiguration string `json:"roomConfiguration,omitempty"`
 
 	// permissions within a room, if none of the permissions are set explicitly
 	// it will be granted with all publish and subscribe permissions
