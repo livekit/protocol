@@ -153,9 +153,9 @@ message WorkerPong {
 message RegisterWorkerRequest {
   JobType type = 1;
   string agent_name = 8;
-  //string worker_id = 2;
+  // string worker_id = 2;
   string version = 3;
-  string name = 4;
+  // string name = 4 [deprecated = true];
   uint32 ping_interval = 5;
   optional string namespace = 6;
   ParticipantPermission allowed_permissions = 7;
@@ -178,7 +178,6 @@ message AvailabilityRequest {
   // migrated due to different reasons (e.g. worker failure, job migration)
   bool resuming = 2;
 }
-
 
 message AvailabilityResponse {
   string job_id = 1;
