@@ -153,6 +153,7 @@ message AddTrackRequest {
 message TrickleRequest {
   string candidateInit = 1;
   SignalTarget target = 2;
+  bool final = 3;
 }
 
 message MuteTrackRequest {
