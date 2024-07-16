@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v4/jwt"
+	"github.com/go-jose/go-jose/v3/jwt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/livekit"
@@ -53,7 +53,7 @@ func TestAccessToken(t *testing.T) {
 		require.Len(t, strings.Split(value, "."), 3)
 
 		// ensure it's a valid JWT
-		token, err := jwt.ParseSigned(value, defaultAlgorithms)
+		token, err := jwt.ParseSigned(value)
 		require.NoError(t, err)
 
 		decodedGrant := ClaimGrants{}
@@ -71,7 +71,7 @@ func TestAccessToken(t *testing.T) {
 			AddGrant(&VideoGrant{RoomJoin: true, Room: "myroom"}).
 			ToJWT()
 		require.NoError(t, err)
-		token, err := jwt.ParseSigned(value, defaultAlgorithms)
+		token, err := jwt.ParseSigned(value)
 		require.NoError(t, err)
 
 		decodedGrant := ClaimGrants{}
@@ -89,7 +89,7 @@ func TestAccessToken(t *testing.T) {
 			AddGrant(videoGrant)
 		value, err := at.ToJWT()
 		require.NoError(t, err)
-		token, err := jwt.ParseSigned(value, defaultAlgorithms)
+		token, err := jwt.ParseSigned(value)
 		require.NoError(t, err)
 
 		claim := jwt.Claims{}
