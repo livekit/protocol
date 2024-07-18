@@ -7,6 +7,38 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+func TestUnmarshallRoomConfiguration(t *testing.T) {
+	y := `
+a:
+  name: room_name
+  egress:
+    room:
+      room_name: room_name
+  agent:
+    dispatches:
+      - {}
+      - agent_name: ag
+        metadata: mm
+  min_playout_delay: 42
+`
+
+	obj := make(map[string]*RoomConfiguration)
+
+	err := yaml.Unmarshal([]byte(y), &obj)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(obj))
+
+	re := obj["a"]
+	require.NotNil(t, re)
+	require.Equal(t, re.Name, "room_name")
+	require.Equal(t, re.MinPlayoutDelay, uint32(42))
+	require.Equal(t, re.Egress.Room.RoomName, "room_name")
+	require.Equal(t, len(re.Agent.Dispatches), 2)
+	require.Equal(t, "ag", re.Agent.Dispatches[1].AgentName)
+	require.Equal(t, "mm", re.Agent.Dispatches[1].Metadata)
+
+}
+
 func TestUnmarshallRoomEgress(t *testing.T) {
 	y := `
 a:
