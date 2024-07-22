@@ -252,6 +252,7 @@ message ProxyConfig {
 enum StreamProtocol {
   DEFAULT_PROTOCOL = 0; // protocol chosen based on urls
   RTMP = 1;
+  SRT = 2;
 }
 
 message StreamOutput {
