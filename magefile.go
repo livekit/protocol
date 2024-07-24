@@ -47,10 +47,10 @@ func Proto() error {
 		"livekit_ingress.proto",
 		"livekit_room.proto",
 		"livekit_sip.proto",
+		"livekit_agent_dispatch.proto",
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",
-		"livekit_agent_dispatch.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",
@@ -132,11 +132,8 @@ func Proto() error {
 	fmt.Println("generating protobuf")
 	args = append([]string{
 		"--go_out", target,
-		"--go-grpc_out", target,
 		"--go_opt=paths=source_relative",
-		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
-		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=./protobufs",
 	}, protoFiles...)
 	cmd = exec.Command(protoc, args...)

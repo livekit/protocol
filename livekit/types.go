@@ -92,3 +92,8 @@ func (r *RoomAgent) UnmarshalYAML(value *yaml.Node) error {
 
 	return protoyaml.Unmarshal(str, r)
 }
+
+func IsJobType(t JobType) bool {
+	_, ok := JobType_name[int32(t)]
+	return ok
+}
