@@ -61,3 +61,27 @@ func TestEventEmitter(t *testing.T) {
 		require.True(t, closeCalled)
 	})
 }
+
+func BenchmarkEventEmitter(b *testing.B) {
+	e := NewEventEmitter[int, int](EventEmitterParams{
+		QueueSize: DefaultEventQueueSize,
+	})
+	for i := 0; i < b.N; i++ {
+		o := e.Observe(i)
+		e.Emit(i, i)
+		<-o.Events()
+		o.Stop()
+	}
+}
+
+func BenchmarkEventObserverList(b *testing.B) {
+	l := NewEventObserverList[int](EventEmitterParams{
+		QueueSize: DefaultEventQueueSize,
+	})
+	for i := 0; i < b.N; i++ {
+		o := l.Observe()
+		l.Emit(i)
+		<-o.Events()
+		o.Stop()
+	}
+}
