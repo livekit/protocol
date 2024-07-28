@@ -38,7 +38,7 @@ message JobState {
   string error = 2;
   int64 started_at = 3;
   int64 ended_at = 4;
-  int64 updated_at = 5; 
+  int64 updated_at = 5;
 }
 
 // from Worker to Server
@@ -129,7 +129,7 @@ message MigrateJobRequest {
 message AvailabilityRequest {
   Job job = 1;
 
-  // True when the job was previously assigned to another worker but has been 
+  // True when the job was previously assigned to another worker but has been
   // migrated due to different reasons (e.g. worker failure, job migration)
   bool resuming = 2;
 }
@@ -142,6 +142,7 @@ message AvailabilityResponse {
   string participant_name = 4;
   string participant_identity = 5;
   string participant_metadata = 6;
+  map<string, string> attributes = 7;
 }
 
 message UpdateJobStatus {
