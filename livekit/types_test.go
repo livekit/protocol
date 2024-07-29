@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
 
@@ -39,6 +40,38 @@ a:
 
 }
 
+func TestMarshallRoomConfiguration(t *testing.T) {
+	r := &RoomConfiguration{
+		Name:             "name",
+		MaxParticipants:  42,
+		EmptyTimeout:     12,
+		DepartureTimeout: 13,
+		MinPlayoutDelay:  14,
+		MaxPlayoutDelay:  15,
+		Egress: &RoomEgress{
+			Room: &RoomCompositeEgressRequest{
+				AudioOnly: true,
+				RoomName:  "room name",
+			},
+		},
+		Agent: &RoomAgent{
+			Dispatches: []*RoomAgentDispatch{
+				&RoomAgentDispatch{
+					AgentName: "agent name",
+				},
+			},
+		},
+	}
+
+	b, err := yaml.Marshal(r)
+	require.NoError(t, err)
+
+	var ur RoomConfiguration
+	err = yaml.Unmarshal(b, &ur)
+	require.NoError(t, err)
+	require.True(t, proto.Equal(r, &ur))
+}
+
 func TestUnmarshallRoomEgress(t *testing.T) {
 	y := `
 a:
@@ -67,6 +100,23 @@ b:
 	require.Equal(t, "key", re.Participant.FileOutputs[0].Output.(*EncodedFileOutput_S3).S3.AccessKey)
 }
 
+func TestMarshallRoomEgress(t *testing.T) {
+	e := &RoomEgress{
+		Room: &RoomCompositeEgressRequest{
+			AudioOnly: true,
+			RoomName:  "room name",
+		},
+	}
+
+	b, err := yaml.Marshal(e)
+	require.NoError(t, err)
+
+	var ue RoomEgress
+	err = yaml.Unmarshal(b, &ue)
+	require.NoError(t, err)
+	require.True(t, proto.Equal(e, &ue))
+}
+
 func TestUnmarshallRoomAgent(t *testing.T) {
 	y := `
 a:
@@ -86,4 +136,22 @@ a:
 	require.Equal(t, len(re.Dispatches), 2)
 	require.Equal(t, "ag", re.Dispatches[1].AgentName)
 	require.Equal(t, "mm", re.Dispatches[1].Metadata)
+}
+
+func TestMarshallRoomAgent(t *testing.T) {
+	a := &RoomAgent{
+		Dispatches: []*RoomAgentDispatch{
+			&RoomAgentDispatch{
+				AgentName: "agent name",
+			},
+		},
+	}
+
+	b, err := yaml.Marshal(a)
+	require.NoError(t, err)
+
+	var ua RoomAgent
+	err = yaml.Unmarshal(b, &ua)
+	require.NoError(t, err)
+	require.True(t, proto.Equal(a, &ua))
 }
