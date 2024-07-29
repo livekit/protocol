@@ -40,6 +40,7 @@ message RoomAgentDispatch {
 
 message DeleteAgentDispatchRequest {
   string dispatch_id = 1;
+  string room = 2;
 }
 
 message ListAgentDispatchRequesst {
