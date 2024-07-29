@@ -142,7 +142,7 @@ message AvailabilityResponse {
   string participant_name = 4;
   string participant_identity = 5;
   string participant_metadata = 6;
-  map<string, string> attributes = 7;
+  map<string, string> participant_attributes = 7;
 }
 
 message UpdateJobStatus {
