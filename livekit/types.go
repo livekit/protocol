@@ -107,7 +107,7 @@ func (r *RoomAgent) MarshalYAML() (interface{}, error) {
 }
 
 func marshalProto(o proto.Message) (map[string]interface{}, error) {
-	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
+	// Marshall the Node to yaml using the protobuf specific marshaller to ensure the proper field names are used
 	str, err := protoyaml.MarshalOptions{UseProtoNames: true}.Marshal(o)
 	if err != nil {
 		return nil, err
