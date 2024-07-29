@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/protocol/rpc";
+
+import "options.proto";
+import "rpc/ingress.proto";
+import "google/protobuf/empty.proto";
+
+service WHEPInternal {
+    rpc StartWHEP(StartWHEPRequest) returns (StartWHEPResponse) {
+        option (psrpc.options).affinity_func = true;
+    };
+}
+
+service WHEPHandler {
+    rpc ICETrickle(ICETrickleRequest) returns(google.protobuf.Empty) {
+        option (psrpc.options) = {
+            topics: true
+            topic_params: {
+                group: "Resuource"
+            };
+        };
+    };
+    rpc ICERestart(ICERestartWHIPResourceRequest) returns (ICERestartWHIPResourceResponse){
+        option (psrpc.options) = {
+            topics: true
+            topic_params: {
+                group: "Resuource"
+            };
+        };
+    }
+    rpc DeleteWHEP(DeleteWHEPRequest) returns (google.protobuf.Empty) {
+        option (psrpc.options) = {
+            topics: true
+            topic_params: {
+                group: "Resuource"
+            };
+        };
+    }
+
+}
+
+message StartWHEPRequest {
+    string token = 1;
+    string ws_url = 2;
+    string participant = 3;
+    string offer = 4;
+}
+
+message StartWHEPResponse {
+    string resource_id = 1;
+    string answer = 2;
+}
+
+message ICETrickleRequest {
+    string resource_id = 1;
+    string user_fragment = 2;
+    string password = 3;
+    repeated string candidates = 4;
+}
+
+message DeleteWHEPRequest {
+    string resource_id = 1;
+}

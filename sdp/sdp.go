@@ -149,3 +149,32 @@ func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
 	}
 	return streamID, true
 }
+
+func ReplaceICEDetails(in, ufrag, pwd string) (string, error) {
+	var parsed sdp.SessionDescription
+	replaceAttributes := func(attributes []sdp.Attribute) {
+		for i := range attributes {
+			if attributes[i].Key == "ice-ufrag" {
+				attributes[i].Value = ufrag
+			} else if attributes[i].Key == "ice-pwd" {
+				attributes[i].Value = pwd
+			}
+		}
+	}
+
+	if err := parsed.UnmarshalString(in); err != nil {
+		return "", err
+	}
+
+	replaceAttributes(parsed.Attributes)
+	for _, m := range parsed.MediaDescriptions {
+		replaceAttributes(m.Attributes)
+	}
+
+	newRemoteDescription, err := parsed.Marshal()
+	if err != nil {
+		return "", err
+	}
+
+	return string(newRemoteDescription), nil
+}

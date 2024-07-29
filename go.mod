@@ -19,7 +19,7 @@ require (
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/pion/logging v0.2.2
-	github.com/pion/sdp/v3 v3.0.6
+	github.com/pion/sdp/v3 v3.0.9
 	github.com/pion/webrtc/v3 v3.2.28
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
