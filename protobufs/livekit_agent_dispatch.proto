@@ -20,6 +20,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_agent.proto";
+import "livekit_models.proto";
 
 service AgentDispatchService {
   rpc CreateDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);
@@ -34,8 +35,8 @@ message CreateAgentDispatchRequest {
 }
 
 message RoomAgentDispatch {
-  string agent_name = 1;
-  string metadata = 2;
+  string agent_name = 1 [(description) = "name of the agent to dispatch the job to"];
+  string metadata = 2 [(description) = "metadata passed to the agent worker. Can be used to configure the worker for the job"]; ;
 }
 
 message DeleteAgentDispatchRequest {

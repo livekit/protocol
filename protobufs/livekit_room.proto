@@ -93,13 +93,13 @@ message CreateRoomRequest {
 }
 
 message RoomEgress {
-  RoomCompositeEgressRequest room = 1;
-  AutoParticipantEgress participant = 3;
-  AutoTrackEgress tracks = 2;
+  RoomCompositeEgressRequest room = 1 [(description) = "room composite egress to launch when room starts (https://docs.livekit.io/realtime/egress/room-composite/)"];
+  AutoParticipantEgress participant = 3 [(description) = "participant egress to launch when participant joins"];
+  AutoTrackEgress tracks = 2  [(description) = "track egress to launch for each published track (https://docs.livekit.io/realtime/egress/track/)"];
 }
 
 message RoomAgent {
-  repeated RoomAgentDispatch dispatches = 1;
+  repeated RoomAgentDispatch dispatches = 1 [(description) = "list agents to dispatch when the room is created"];
 }
 
 
@@ -206,21 +206,16 @@ message UpdateRoomMetadataRequest {
 }
 
 message RoomConfiguration {
-  string name = 1; // Used as ID, must be unique
-  // number of seconds to keep the room open if no one joins
-  uint32 empty_timeout = 2;
+  string name = 1 [(description) = "Used as ID, must be unique"];
+  uint32 empty_timeout = 2 [(description) = "number of seconds to keep the room open if no one joins"];
   // number of seconds to keep the room open after everyone leaves
-  uint32 departure_timeout = 3;
-  // limit number of participants that can be in a room
-  uint32 max_participants = 4;
-  // egress
-  RoomEgress egress = 5;
-  // agent
-  RoomAgent agent = 6;
-  // playout delay of subscriber
-  uint32 min_playout_delay = 7;
-  uint32 max_playout_delay = 8;
+  uint32 departure_timeout = 3 [(description) = "number of seconds to keep the room open after everyone leaves"];
+  uint32 max_participants = 4 [(description) = "limit number of participants that can be in a room"];
+  RoomEgress egress = 5 [(description) = "egress configuration"];
+  RoomAgent agent = 6 [(description) = "agent configuration"];
+  uint32 min_playout_delay = 7 [(description) = "minimum playout delay of subscriber"];
+  uint32 max_playout_delay = 8 [(description) = "maximum playout delay of subscriber"];
   // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
   // so not recommended for rooms with frequent subscription changes
-  bool sync_streams = 9;
+  bool sync_streams = 9 [(description) = "improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use so not recommended for rooms with frequent subscription changes"];
 }
