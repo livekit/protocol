@@ -39,6 +39,7 @@ type ConfigObserver[T any] struct {
 	watcher *fsnotify.Watcher
 	mu      sync.Mutex
 	cbs     list.List
+	conf    *T
 }
 
 func NewConfigObserver[T any](path string, builder ConfigBuilder[T]) (*ConfigObserver[T], *T, error) {
@@ -46,7 +47,7 @@ func NewConfigObserver[T any](path string, builder ConfigBuilder[T]) (*ConfigObs
 		builder: builder,
 	}
 
-	config, err := c.load(path)
+	conf, err := c.load(path)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -63,7 +64,7 @@ func NewConfigObserver[T any](path string, builder ConfigBuilder[T]) (*ConfigObs
 		go c.watch()
 	}
 
-	return c, config, nil
+	return c, conf, nil
 }
 
 func (c *ConfigObserver[T]) Close() {
@@ -93,6 +94,12 @@ func (c *ConfigObserver[T]) Observe(cb func(*T)) func() {
 		c.cbs.Remove(e)
 		c.mu.Unlock()
 	}
+}
+
+func (c *ConfigObserver[T]) Load() *T {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.conf
 }
 
 func (c *ConfigObserver[T]) watch() {
@@ -157,6 +164,10 @@ func (c *ConfigObserver[T]) load(path string) (*T, error) {
 	if d, ok := c.builder.(ConfigDefaulter[T]); ok {
 		d.InitDefaults(conf)
 	}
+
+	c.mu.Lock()
+	c.conf = conf
+	c.mu.Unlock()
 
 	return conf, err
 }
