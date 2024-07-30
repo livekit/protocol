@@ -22,7 +22,18 @@ import "options.proto";
 import "livekit_agent_dispatch.proto";
 
 service AgentDispatchInternal {
-  rpc ListDispatch(livekit.ListAgentDispatchRequesst) returns (livekit.ListAgentDispatchResponse) {
+  rpc CreateDispatch(livekit.CreateAgentDispatchRequest) returns (livekit.AgentDispatch) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "room"
+        names: ["room"]
+        typed: true
+      };
+    };
+  };
+
+  rpc ListDispatch(livekit.ListAgentDispatchRequest) returns (livekit.ListAgentDispatchResponse) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
