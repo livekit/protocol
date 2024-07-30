@@ -31,19 +31,26 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
+type URLNotifier interface {
+	SetKeys(apiKey, apiSecret string)
+	QueueNotify(event *livekit.WebhookEvent) error
+	Stop(force bool)
+}
+
 type URLNotifierParams struct {
-	Logger    logger.Logger
-	QueueSize int
-	URL       string
-	APIKey    string
-	APISecret string
+	Logger       logger.Logger
+	QueueSize    int
+	DropWhenFull bool
+	URL          string
+	APIKey       string
+	APISecret    string
 }
 
 const defaultQueueSize = 100
 
-// URLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
+// DefaultURLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
 // It will retry on failure, and will drop events if notification fall too far behind
-type URLNotifier struct {
+type DefaultURLNotifier struct {
 	mu      sync.RWMutex
 	params  URLNotifierParams
 	client  *retryablehttp.Client
@@ -51,7 +58,7 @@ type URLNotifier struct {
 	worker  core.QueueWorker
 }
 
-func NewURLNotifier(params URLNotifierParams) *URLNotifier {
+func NewDefaultURLNotifier(params URLNotifierParams) URLNotifier {
 	if params.QueueSize == 0 {
 		params.QueueSize = defaultQueueSize
 	}
@@ -59,27 +66,27 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 		params.Logger = logger.GetLogger()
 	}
 
-	n := &URLNotifier{
+	n := &DefaultURLNotifier{
 		params: params,
 		client: retryablehttp.NewClient(),
 	}
 	n.client.Logger = &logAdapter{}
 	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
-		DropWhenFull: true,
+		DropWhenFull: params.DropWhenFull,
 		OnDropped:    func() { n.dropped.Inc() },
 	})
 	return n
 }
 
-func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
+func (n *DefaultURLNotifier) SetKeys(apiKey, apiSecret string) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 	n.params.APIKey = apiKey
 	n.params.APISecret = apiSecret
 }
 
-func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
+func (n *DefaultURLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
 	n.worker.Submit(func() {
 		if err := n.send(event); err != nil {
 			n.params.Logger.Warnw("failed to send webhook", err, "url", n.params.URL, "event", event.Event)
@@ -91,7 +98,7 @@ func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
 	return nil
 }
 
-func (n *URLNotifier) Stop(force bool) {
+func (n *DefaultURLNotifier) Stop(force bool) {
 	if force {
 		n.worker.Kill()
 	} else {
@@ -99,9 +106,10 @@ func (n *URLNotifier) Stop(force bool) {
 	}
 }
 
-func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
+func (n *DefaultURLNotifier) send(event *livekit.WebhookEvent) error {
 	// set dropped count
 	event.NumDropped = n.dropped.Swap(0)
+	event.DequeuedAt = time.Now().Unix()
 	encoded, err := protojson.Marshal(event)
 	if err != nil {
 		return err
