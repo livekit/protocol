@@ -20,6 +20,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/livekit/protocol/utils/configutil"
 )
 
 const testConfig0 = `foo: a`
@@ -56,6 +58,12 @@ func TestConfigObserver(t *testing.T) {
 	require.Equal(t, "a", conf.Foo)
 	require.Equal(t, "c", conf.Bar)
 
+	atomicFoo := configutil.NewAtomicValue(obs, func(c *TestConfig) string {
+		return c.Foo
+	})
+
+	require.Equal(t, "a", atomicFoo.Load())
+
 	done := make(chan struct{})
 	obs.Observe(func(c *TestConfig) {
 		require.Equal(t, "b", c.Foo)
@@ -71,4 +79,6 @@ func TestConfigObserver(t *testing.T) {
 	case <-time.After(100 * time.Millisecond):
 		require.FailNow(t, "timed out waiting for config update")
 	}
+
+	require.Equal(t, "b", atomicFoo.Load())
 }
