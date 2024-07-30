@@ -16,6 +16,7 @@ package livekit
 
 import (
 	"github.com/bufbuild/protoyaml-go"
+	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
 
@@ -73,6 +74,10 @@ func (r *RoomConfiguration) UnmarshalYAML(value *yaml.Node) error {
 	return protoyaml.Unmarshal(str, r)
 }
 
+func (r *RoomConfiguration) MarshalYAML() (interface{}, error) {
+	return marshalProto(r)
+}
+
 func (r *RoomEgress) UnmarshalYAML(value *yaml.Node) error {
 	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
 	str, err := yaml.Marshal(value)
@@ -83,6 +88,10 @@ func (r *RoomEgress) UnmarshalYAML(value *yaml.Node) error {
 	return protoyaml.Unmarshal(str, r)
 }
 
+func (r *RoomEgress) MarshalYAML() (interface{}, error) {
+	return marshalProto(r)
+}
+
 func (r *RoomAgent) UnmarshalYAML(value *yaml.Node) error {
 	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
 	str, err := yaml.Marshal(value)
@@ -91,4 +100,25 @@ func (r *RoomAgent) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	return protoyaml.Unmarshal(str, r)
+}
+
+func (r *RoomAgent) MarshalYAML() (interface{}, error) {
+	return marshalProto(r)
+}
+
+func marshalProto(o proto.Message) (map[string]interface{}, error) {
+	// Marshall the Node to yaml using the protobuf specific marshaller to ensure the proper field names are used
+	str, err := protoyaml.MarshalOptions{UseProtoNames: true}.Marshal(o)
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]interface{})
+
+	err = yaml.Unmarshal(str, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
 }
