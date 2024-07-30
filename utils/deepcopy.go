@@ -26,9 +26,7 @@ func deepCopy(v reflect.Value) reflect.Value {
 	switch v.Type().Kind() {
 	case reflect.Array:
 		c := reflect.New(v.Type()).Elem()
-		for i := range v.Len() {
-			c.Index(i).Set(deepCopy(v.Index(i)))
-		}
+		reflect.Copy(c, v)
 		return c
 
 	case reflect.Map:
@@ -54,9 +52,7 @@ func deepCopy(v reflect.Value) reflect.Value {
 			return v
 		}
 		c := reflect.MakeSlice(v.Type(), v.Len(), v.Cap())
-		for i := range v.Len() {
-			c.Index(i).Set(deepCopy(v.Index(i)))
-		}
+		reflect.Copy(c, v)
 		return c
 
 	case reflect.Struct:
