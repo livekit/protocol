@@ -36,6 +36,7 @@ const (
 	SIPCallPrefix         = guid.SIPCallPrefix
 	RPCPrefix             = guid.RPCPrefix
 	WHIPResourcePrefix    = guid.WHIPResourcePrefix
+	WHEPResourcePrefix    = guid.WHEPResourcePrefix
 	RTMPResourcePrefix    = guid.RTMPResourcePrefix
 	URLResourcePrefix     = guid.URLResourcePrefix
 	AgentWorkerPrefix     = guid.AgentWorkerPrefix
