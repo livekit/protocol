@@ -15,7 +15,6 @@
 package utils
 
 import (
-	"container/list"
 	"sync"
 
 	"golang.org/x/exp/maps"
@@ -23,16 +22,17 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
-const defaultQueueSize = 16
+const DefaultEventQueueSize = 16
 
 type EventEmitterParams struct {
 	QueueSize int
+	Blocking  bool
 	Logger    logger.Logger
 }
 
 func DefaultEventEmitterParams() EventEmitterParams {
 	return EventEmitterParams{
-		QueueSize: defaultQueueSize,
+		QueueSize: DefaultEventQueueSize,
 		Logger:    logger.GetLogger(),
 	}
 }
@@ -65,7 +65,18 @@ func (e *EventEmitter[K, V]) Emit(k K, v V) {
 	l.Emit(v)
 }
 
-func (e *EventEmitter[K, V]) Observe(k K) *EventObserver[V] {
+type eventEmitterObserver[K comparable, V any] struct {
+	e *EventEmitter[K, V]
+	k K
+	EventObserver[V]
+}
+
+func (o *eventEmitterObserver[K, V]) Stop() {
+	o.EventObserver.Stop()
+	o.e.cleanUpObserverList(o.k)
+}
+
+func (e *EventEmitter[K, V]) Observe(k K) EventObserver[V] {
 	e.mu.Lock()
 	l, ok := e.observers[k]
 	if !ok {
@@ -75,13 +86,7 @@ func (e *EventEmitter[K, V]) Observe(k K) *EventObserver[V] {
 	o := l.Observe()
 	e.mu.Unlock()
 
-	stop := o.stop
-	o.stop = func() {
-		stop()
-		e.cleanUpObserverList(k)
-	}
-
-	return o
+	return &eventEmitterObserver[K, V]{e, k, o}
 }
 
 func (e *EventEmitter[K, V]) ObservedKeys() []K {
@@ -103,13 +108,12 @@ func (e *EventEmitter[K, V]) cleanUpObserverList(k K) {
 type EventObserverList[V any] struct {
 	params    EventEmitterParams
 	mu        sync.RWMutex
-	observers *list.List
+	observers []*eventObserverListObserver[V]
 }
 
 func NewEventObserverList[V any](params EventEmitterParams) *EventObserverList[V] {
 	return &EventObserverList[V]{
-		params:    params,
-		observers: list.New(),
+		params: params,
 	}
 }
 
@@ -120,20 +124,39 @@ func NewDefaultEventObserverList[V any]() *EventObserverList[V] {
 func (l *EventObserverList[V]) Len() int {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
-	return l.observers.Len()
+	return len(l.observers)
 }
 
-func (l *EventObserverList[V]) Observe() *EventObserver[V] {
-	o := &EventObserver[V]{
-		logger: l.params.Logger,
-		ch:     make(chan V, l.params.QueueSize),
+type eventObserverListObserver[V any] struct {
+	l *EventObserverList[V]
+	EventObserver[V]
+	index int
+}
+
+func (o *eventObserverListObserver[V]) Stop() {
+	o.l.stopObserving(o)
+	o.EventObserver.Stop()
+}
+
+func (l *EventObserverList[V]) Observe() EventObserver[V] {
+	o := &eventObserverListObserver[V]{l: l}
+
+	if l.params.Blocking {
+		o.EventObserver = &blockingEventObserver[V]{
+			done: make(chan struct{}),
+			ch:   make(chan V, l.params.QueueSize),
+		}
+	} else {
+		o.EventObserver = &nonblockingEventObserver[V]{
+			logger: l.params.Logger,
+			ch:     make(chan V, l.params.QueueSize),
+		}
 	}
 
 	l.mu.Lock()
-	le := l.observers.PushBack(o)
+	o.index = len(l.observers)
+	l.observers = append(l.observers, o)
 	l.mu.Unlock()
-
-	o.stop = func() { l.stopObserving(le) }
 
 	return o
 }
@@ -141,33 +164,50 @@ func (l *EventObserverList[V]) Observe() *EventObserver[V] {
 func (l *EventObserverList[V]) Emit(v V) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
-	for le := l.observers.Front(); le != nil; le = le.Next() {
-		le.Value.(*EventObserver[V]).emit(v)
+	for _, o := range l.observers {
+		o.emit(v)
 	}
 }
 
-func (l *EventObserverList[V]) stopObserving(le *list.Element) {
+func (l *EventObserverList[V]) stopObserving(o *eventObserverListObserver[V]) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	l.observers.Remove(le)
+	l.observers[o.index] = l.observers[len(l.observers)-1]
+	l.observers[o.index].index = o.index
+	l.observers[len(l.observers)-1] = nil
+	l.observers = l.observers[:len(l.observers)-1]
 }
 
-type EventObserver[V any] struct {
+type EventObserver[V any] interface {
+	emit(v V)
+	Stop()
+	Events() <-chan V
+}
+
+type eventObserver[V any] struct {
+	stopFunc func()
+	EventObserver[V]
+}
+
+func (o *eventObserver[V]) Stop() {
+	o.stopFunc()
+	o.EventObserver.Stop()
+}
+
+func NewEventObserver[V any](stopFunc func()) (EventObserver[V], func(v V)) {
+	o := &nonblockingEventObserver[V]{
+		logger: logger.GetLogger(),
+		ch:     make(chan V, DefaultEventQueueSize),
+	}
+	return &eventObserver[V]{stopFunc, o}, o.emit
+}
+
+type nonblockingEventObserver[V any] struct {
 	logger logger.Logger
-	stop   func()
 	ch     chan V
 }
 
-func NewEventObserver[V any](stopFunc func()) (*EventObserver[V], func(v V)) {
-	o := &EventObserver[V]{
-		logger: logger.GetLogger(),
-		stop:   stopFunc,
-		ch:     make(chan V, defaultQueueSize),
-	}
-	return o, o.emit
-}
-
-func (o *EventObserver[V]) emit(v V) {
+func (o *nonblockingEventObserver[V]) emit(v V) {
 	select {
 	case o.ch <- v:
 	default:
@@ -175,10 +215,28 @@ func (o *EventObserver[V]) emit(v V) {
 	}
 }
 
-func (o *EventObserver[V]) Stop() {
-	o.stop()
+func (o *nonblockingEventObserver[V]) Stop() {}
+
+func (o *nonblockingEventObserver[V]) Events() <-chan V {
+	return o.ch
 }
 
-func (o *EventObserver[V]) Events() <-chan V {
+type blockingEventObserver[V any] struct {
+	done chan struct{}
+	ch   chan V
+}
+
+func (o *blockingEventObserver[V]) emit(v V) {
+	select {
+	case o.ch <- v:
+	case <-o.done:
+	}
+}
+
+func (o *blockingEventObserver[V]) Stop() {
+	close(o.done)
+}
+
+func (o *blockingEventObserver[V]) Events() <-chan V {
 	return o.ch
 }

@@ -133,11 +133,8 @@ func Proto() error {
 	fmt.Println("generating protobuf")
 	args = append([]string{
 		"--go_out", target,
-		"--go-grpc_out", target,
 		"--go_opt=paths=source_relative",
-		"--go-grpc_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
-		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=./protobufs",
 	}, protoFiles...)
 	cmd = exec.Command(protoc, args...)
