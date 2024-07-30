@@ -27,7 +27,7 @@
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@bufbuild/protoc-gen-es": "^1.7.2",
+    "@bufbuild/protoc-gen-es": "^2.0.0",
     "genversion": "^3.2.0"
   },
   "dependencies": {
