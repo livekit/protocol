@@ -47,10 +47,10 @@ func Proto() error {
 		"livekit_ingress.proto",
 		"livekit_room.proto",
 		"livekit_sip.proto",
+		"livekit_agent_dispatch.proto",
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",
-		"livekit_agent_dispatch.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",

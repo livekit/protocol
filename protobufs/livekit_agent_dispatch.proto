@@ -60,7 +60,7 @@ message AgentDispatch {
 }
 
 message AgentDispatchState {
-  // For dispatches of tyoe JT_ROOM, there will be at most 1 job. 
+  // For dispatches of tyoe JT_ROOM, there will be at most 1 job.
   // For dispatches of type JT_PUBLISHER, there will be 1 per publisher.
   repeated Job jobs = 1;
   int64 created_at = 2;
