@@ -19,7 +19,7 @@ service WHEPHandler {
         option (psrpc.options) = {
             topics: true
             topic_params: {
-                group: "Resuource"
+                group: "Resource"
             };
         };
     };
@@ -27,7 +27,7 @@ service WHEPHandler {
         option (psrpc.options) = {
             topics: true
             topic_params: {
-                group: "Resuource"
+                group: "Resource"
             };
         };
     }
@@ -35,7 +35,7 @@ service WHEPHandler {
         option (psrpc.options) = {
             topics: true
             topic_params: {
-                group: "Resuource"
+                group: "Resource"
             };
         };
     }
