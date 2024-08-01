@@ -32,14 +32,19 @@ import (
 )
 
 type URLNotifierParams struct {
-	Logger       logger.Logger
-	QueueSize    int
-	URL          string
-	APIKey       string
-	APISecret    string
-	RetryWaitMin time.Duration
-	RetryWaitMax time.Duration
-	MaxRetries   int
+	HTTPClientParams
+	Logger    logger.Logger
+	QueueSize int
+	URL       string
+	APIKey    string
+	APISecret string
+}
+
+type HTTPClientParams struct {
+	RetryWaitMin  time.Duration
+	RetryWaitMax  time.Duration
+	MaxRetries    int
+	ClientTimeout time.Duration
 }
 
 const defaultQueueSize = 100
@@ -71,6 +76,9 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	}
 	if params.MaxRetries > 0 {
 		rhc.RetryMax = params.MaxRetries
+	}
+	if params.ClientTimeout > 0 {
+		rhc.HTTPClient.Timeout = params.ClientTimeout
 	}
 	n := &URLNotifier{
 		params: params,
