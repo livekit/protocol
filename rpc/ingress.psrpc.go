@@ -14,7 +14,7 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
-import livekit3 "github.com/livekit/protocol/livekit"
+import livekit4 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -23,7 +23,7 @@ var _ = version.PsrpcVersion_0_5
 // ================================
 
 type IngressInternalClient interface {
-	StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressInfo, error)
+	StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit4.IngressInfo, error)
 
 	ListActiveIngress(ctx context.Context, topic string, req *ListActiveIngressRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*ListActiveIngressResponse], error)
 
@@ -35,7 +35,7 @@ type IngressInternalClient interface {
 // ====================================
 
 type IngressInternalServerImpl interface {
-	StartIngress(context.Context, *StartIngressRequest) (*livekit3.IngressInfo, error)
+	StartIngress(context.Context, *StartIngressRequest) (*livekit4.IngressInfo, error)
 	StartIngressAffinity(context.Context, *StartIngressRequest) float32
 
 	ListActiveIngress(context.Context, *ListActiveIngressRequest) (*ListActiveIngressResponse, error)
@@ -89,8 +89,8 @@ func NewIngressInternalClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) 
 	}, nil
 }
 
-func (c *ingressInternalClient) StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressInfo, error) {
-	return client.RequestSingle[*livekit3.IngressInfo](ctx, c.client, "StartIngress", nil, req, opts...)
+func (c *ingressInternalClient) StartIngress(ctx context.Context, req *StartIngressRequest, opts ...psrpc.RequestOption) (*livekit4.IngressInfo, error) {
+	return client.RequestSingle[*livekit4.IngressInfo](ctx, c.client, "StartIngress", nil, req, opts...)
 }
 
 func (c *ingressInternalClient) ListActiveIngress(ctx context.Context, topic string, req *ListActiveIngressRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*ListActiveIngressResponse], error) {
@@ -165,9 +165,9 @@ func (s *ingressInternalServer) Kill() {
 // ===============================
 
 type IngressHandlerClient interface {
-	UpdateIngress(ctx context.Context, topic string, req *livekit3.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error)
+	UpdateIngress(ctx context.Context, topic string, req *livekit4.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit4.IngressState, error)
 
-	DeleteIngress(ctx context.Context, topic string, req *livekit3.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error)
+	DeleteIngress(ctx context.Context, topic string, req *livekit4.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit4.IngressState, error)
 
 	DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
@@ -179,9 +179,9 @@ type IngressHandlerClient interface {
 // ===================================
 
 type IngressHandlerServerImpl interface {
-	UpdateIngress(context.Context, *livekit3.UpdateIngressRequest) (*livekit3.IngressState, error)
+	UpdateIngress(context.Context, *livekit4.UpdateIngressRequest) (*livekit4.IngressState, error)
 
-	DeleteIngress(context.Context, *livekit3.DeleteIngressRequest) (*livekit3.IngressState, error)
+	DeleteIngress(context.Context, *livekit4.DeleteIngressRequest) (*livekit4.IngressState, error)
 
 	DeleteWHIPResource(context.Context, *DeleteWHIPResourceRequest) (*google_protobuf.Empty, error)
 
@@ -239,12 +239,12 @@ func NewIngressHandlerClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (
 	}, nil
 }
 
-func (c *ingressHandlerClient) UpdateIngress(ctx context.Context, topic string, req *livekit3.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error) {
-	return client.RequestSingle[*livekit3.IngressState](ctx, c.client, "UpdateIngress", []string{topic}, req, opts...)
+func (c *ingressHandlerClient) UpdateIngress(ctx context.Context, topic string, req *livekit4.UpdateIngressRequest, opts ...psrpc.RequestOption) (*livekit4.IngressState, error) {
+	return client.RequestSingle[*livekit4.IngressState](ctx, c.client, "UpdateIngress", []string{topic}, req, opts...)
 }
 
-func (c *ingressHandlerClient) DeleteIngress(ctx context.Context, topic string, req *livekit3.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit3.IngressState, error) {
-	return client.RequestSingle[*livekit3.IngressState](ctx, c.client, "DeleteIngress", []string{topic}, req, opts...)
+func (c *ingressHandlerClient) DeleteIngress(ctx context.Context, topic string, req *livekit4.DeleteIngressRequest, opts ...psrpc.RequestOption) (*livekit4.IngressState, error) {
+	return client.RequestSingle[*livekit4.IngressState](ctx, c.client, "DeleteIngress", []string{topic}, req, opts...)
 }
 
 func (c *ingressHandlerClient) DeleteWHIPResource(ctx context.Context, topic string, req *DeleteWHIPResourceRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {

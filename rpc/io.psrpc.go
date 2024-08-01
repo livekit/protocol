@@ -14,8 +14,8 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
-import livekit2 "github.com/livekit/protocol/livekit"
 import livekit3 "github.com/livekit/protocol/livekit"
+import livekit4 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -25,18 +25,18 @@ var _ = version.PsrpcVersion_0_5
 
 type IOInfoClient interface {
 	// egress
-	CreateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
+	CreateEgress(ctx context.Context, req *livekit3.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
-	UpdateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
+	UpdateEgress(ctx context.Context, req *livekit3.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
-	GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit2.EgressInfo, error)
+	GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error)
 
-	ListEgress(ctx context.Context, req *livekit2.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit2.ListEgressResponse, error)
+	ListEgress(ctx context.Context, req *livekit3.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit3.ListEgressResponse, error)
 
 	UpdateMetrics(ctx context.Context, req *UpdateMetricsRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
 	// ingress
-	CreateIngress(ctx context.Context, req *livekit3.IngressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
+	CreateIngress(ctx context.Context, req *livekit4.IngressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
 	GetIngressInfo(ctx context.Context, req *GetIngressInfoRequest, opts ...psrpc.RequestOption) (*GetIngressInfoResponse, error)
 
@@ -54,18 +54,18 @@ type IOInfoClient interface {
 
 type IOInfoServerImpl interface {
 	// egress
-	CreateEgress(context.Context, *livekit2.EgressInfo) (*google_protobuf.Empty, error)
+	CreateEgress(context.Context, *livekit3.EgressInfo) (*google_protobuf.Empty, error)
 
-	UpdateEgress(context.Context, *livekit2.EgressInfo) (*google_protobuf.Empty, error)
+	UpdateEgress(context.Context, *livekit3.EgressInfo) (*google_protobuf.Empty, error)
 
-	GetEgress(context.Context, *GetEgressRequest) (*livekit2.EgressInfo, error)
+	GetEgress(context.Context, *GetEgressRequest) (*livekit3.EgressInfo, error)
 
-	ListEgress(context.Context, *livekit2.ListEgressRequest) (*livekit2.ListEgressResponse, error)
+	ListEgress(context.Context, *livekit3.ListEgressRequest) (*livekit3.ListEgressResponse, error)
 
 	UpdateMetrics(context.Context, *UpdateMetricsRequest) (*google_protobuf.Empty, error)
 
 	// ingress
-	CreateIngress(context.Context, *livekit3.IngressInfo) (*google_protobuf.Empty, error)
+	CreateIngress(context.Context, *livekit4.IngressInfo) (*google_protobuf.Empty, error)
 
 	GetIngressInfo(context.Context, *GetIngressInfoRequest) (*GetIngressInfoResponse, error)
 
@@ -126,27 +126,27 @@ func NewIOInfoClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (IOInfoCl
 	}, nil
 }
 
-func (c *iOInfoClient) CreateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+func (c *iOInfoClient) CreateEgress(ctx context.Context, req *livekit3.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
 	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "CreateEgress", nil, req, opts...)
 }
 
-func (c *iOInfoClient) UpdateEgress(ctx context.Context, req *livekit2.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+func (c *iOInfoClient) UpdateEgress(ctx context.Context, req *livekit3.EgressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
 	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "UpdateEgress", nil, req, opts...)
 }
 
-func (c *iOInfoClient) GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit2.EgressInfo, error) {
-	return client.RequestSingle[*livekit2.EgressInfo](ctx, c.client, "GetEgress", nil, req, opts...)
+func (c *iOInfoClient) GetEgress(ctx context.Context, req *GetEgressRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error) {
+	return client.RequestSingle[*livekit3.EgressInfo](ctx, c.client, "GetEgress", nil, req, opts...)
 }
 
-func (c *iOInfoClient) ListEgress(ctx context.Context, req *livekit2.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit2.ListEgressResponse, error) {
-	return client.RequestSingle[*livekit2.ListEgressResponse](ctx, c.client, "ListEgress", nil, req, opts...)
+func (c *iOInfoClient) ListEgress(ctx context.Context, req *livekit3.ListEgressRequest, opts ...psrpc.RequestOption) (*livekit3.ListEgressResponse, error) {
+	return client.RequestSingle[*livekit3.ListEgressResponse](ctx, c.client, "ListEgress", nil, req, opts...)
 }
 
 func (c *iOInfoClient) UpdateMetrics(ctx context.Context, req *UpdateMetricsRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
 	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "UpdateMetrics", nil, req, opts...)
 }
 
-func (c *iOInfoClient) CreateIngress(ctx context.Context, req *livekit3.IngressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
+func (c *iOInfoClient) CreateIngress(ctx context.Context, req *livekit4.IngressInfo, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error) {
 	return client.RequestSingle[*google_protobuf.Empty](ctx, c.client, "CreateIngress", nil, req, opts...)
 }
 

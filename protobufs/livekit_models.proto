@@ -21,6 +21,8 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
 
+import "livekit_metrics.proto";
+
 message Room {
   string sid = 1;
   string name = 2;
@@ -226,8 +228,9 @@ message DataPacket {
     ActiveSpeakerUpdate speaker = 3 [deprecated=true];
     SipDTMF sip_dtmf = 6;
     Transcription transcription = 7;
+    MetricsBatch metrics = 8;
   }
-  // NEXT_ID: 8
+  // NEXT_ID: 9
 }
 
 message ActiveSpeakerUpdate {
