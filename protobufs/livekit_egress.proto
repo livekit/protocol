@@ -402,20 +402,20 @@ message ImagesInfo {
 
 message AutoParticipantEgress {
   oneof options {
-    EncodingOptionsPreset preset = 1; // (default H264_720P_30)
-    EncodingOptions advanced = 2;     // (optional)
+    EncodingOptionsPreset preset = 1 [(description) = "encoding preset to use to encode the egress output (default H264_720P_30)"];
+    EncodingOptions advanced = 2 [(description) = "custom encoding parameters to use for the egress output"];
   }
-  repeated EncodedFileOutput file_outputs = 3;
-  repeated SegmentedFileOutput segment_outputs = 4;
+  repeated EncodedFileOutput file_outputs = 3 [(description) = "parameters of single movie file outputs"];
+  repeated SegmentedFileOutput segment_outputs = 4 [(description) = "parameters of segmented outputs (e.g. HLS)"];;
 }
 
 message AutoTrackEgress {
-  string filepath = 1;       // see docs for templating (default {track_id}-{time})
-  bool disable_manifest = 5; // disables upload of json manifest file (default false)
+  string filepath = 1 [(description) = "file to record the track to, see https://docs.livekit.io/realtime/egress/overview/#File-Segment-outputs for templating (default {track_id}-{time})"];
+  bool disable_manifest = 5 [(description) = "disables upload of json manifest file (default false)"];
   oneof output {
-    S3Upload s3 = 2;
-    GCPUpload gcp = 3;
-    AzureBlobUpload azure = 4;
-    AliOSSUpload aliOSS = 6;
+    S3Upload s3 = 2 [(description) = "S3 upload parameters"];
+    GCPUpload gcp = 3 [(description) = "Google Cloud Storage upload parameters"];
+    AzureBlobUpload azure = 4 [(description) = "Azure upload parameters"];
+    AliOSSUpload aliOSS = 6 [(description) = "AliIOSS upload parameters"];
   }
 }
