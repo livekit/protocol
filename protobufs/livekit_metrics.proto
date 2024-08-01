@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+
+message MetricsBatch {
+  repeated TimeSeriesMetric time_series = 1;
+  repeated AnnotationMetric annotations = 2;
+}
+
+message TimeSeriesMetric {
+  // Metric name, e.g., "speech_probability"
+  string label = 1;
+  // optional participant identity
+  string participant_identity = 2;
+  // optional track sid
+  string track_sid = 3;
+  // if track_sid is set, timestamp represents the RTP timestamp
+  int64 start_timestamp = 4;
+
+  oneof encoding {
+    DeltaEncoding delta_encoding = 5;
+    IntervalEncoding interval_encoding = 6;
+  }
+
+  message DeltaEncoding {
+    // protobuf encodes int32 as varint, delta times are usually small
+    repeated int32 delta_times = 1; // Delta time in milliseconds from the previous timestamp
+    repeated float values = 2;
+  }
+
+  message IntervalEncoding {
+    uint32 interval = 1; // Interval in milliseconds between data points
+    repeated float values = 2;
+  }
+}
+
+message AnnotationMetric {
+  // Metric name e.g "assistant_interrupted", "speaking"
+  string label = 1;
+   // optional participant identity
+  string participant_identity = 2;
+  // optional track sid
+  string track_sid = 3;
+  // if track_sid is set, timestamp represents the RTP timestamp
+  int64 timestamp = 4;
+   // optional duration of an event
+  optional float duration = 5;
+  // optional metadata
+  string metadata = 6;
+}
+
