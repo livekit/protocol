@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.19.3
+
+### Patch Changes
+
+- Use glob for generating JS proto definitions - [#779](https://github.com/livekit/protocol/pull/779) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.19.2
 
 ### Patch Changes
