@@ -474,6 +474,37 @@ message RTPStats {
   // NEXT_ID: 47
 }
 
+message RTPForwarderState {
+  bool started = 1;
+  int32 reference_layer_spatial = 2;
+  int64 pre_start_time = 3;
+  uint64 ext_first_timestamp = 4;
+  uint64 dummy_start_timestamp_offset = 5;
+  RTPMungerState rtp_munger = 6;
+  oneof codec_munger {
+    VP8MungerState vp8_munger = 7;
+  }
+}
+
+message RTPMungerState {
+  uint64 ext_last_sequence_number = 1;
+  uint64 ext_second_last_sequence_number = 2;
+  uint64 ext_last_timestamp = 3;
+  uint64 ext_second_last_timestamp = 4;
+  bool last_marker = 5;
+  bool second_last_marker = 6;
+}
+
+message VP8MungerState {
+  int32 ext_last_picture_id = 1;
+  bool picture_id_used = 2;
+  uint32 last_tl0_pic_idx = 3;
+  bool tl0_pic_idx_used = 4;
+  bool tid_used = 5;
+  uint32 last_key_idx = 6;
+  bool key_idx_used = 7;
+}
+
 message TimedVersion {
   int64 unix_micro = 1;
   int32 ticks = 2;
