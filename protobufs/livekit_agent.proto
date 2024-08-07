@@ -38,7 +38,8 @@ message JobState {
   string error = 2;
   int64 started_at = 3;
   int64 ended_at = 4;
-  int64 updated_at = 5; 
+  int64 updated_at = 5;
+  string participant_identity = 6; 
 }
 
 // from Worker to Server
