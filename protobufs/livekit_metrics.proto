@@ -19,23 +19,16 @@ message TimeSeriesMetric {
   // optional track sid
   string track_sid = 3;
   // if track_sid is set, timestamp represents the RTP timestamp
-  int64 start_timestamp = 4;
+  int64 start_timestamp = 4; // samples
+  // if track_sid is set, timestamp represents the RTP timestamp
+  int64 end_timestamp = 5;
+  // list of samples between start_timestamp and end_timestamp
+  repeated MetricSample samples = 6;
+}
 
-  oneof encoding {
-    DeltaEncoding delta_encoding = 5;
-    IntervalEncoding interval_encoding = 6;
-  }
-
-  message DeltaEncoding {
-    // protobuf encodes int32 as varint, delta times are usually small
-    repeated int32 delta_times = 1; // Delta time in milliseconds from the previous timestamp
-    repeated float values = 2;
-  }
-
-  message IntervalEncoding {
-    uint32 interval = 1; // Interval in milliseconds between data points
-    repeated float values = 2;
-  }
+message MetricSample {
+  int64 timestamp = 1;
+  float value = 2;
 }
 
 message AnnotationMetric {
@@ -46,10 +39,9 @@ message AnnotationMetric {
   // optional track sid
   string track_sid = 3;
   // if track_sid is set, timestamp represents the RTP timestamp
-  int64 timestamp = 4;
+  int64 start_timestamp = 4;
    // optional duration of an event
-  optional float duration = 5;
+  int64 end_timestamp = 5;
   // optional metadata
   string metadata = 6;
 }
-
