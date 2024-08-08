@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.19.4
+
+### Patch Changes
+
+- Use multiple webhook workers for each URL to improve parallelism - [#784](https://github.com/livekit/protocol/pull/784) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.19.3
 
 ## 1.19.2
