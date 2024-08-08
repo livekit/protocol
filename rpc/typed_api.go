@@ -149,6 +149,18 @@ func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, 
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
 }
 
+//counterfeiter:generate . TypedAgentDispatchInternalClient
+type TypedAgentDispatchInternalClient = AgentDispatchInternalClient[RoomTopic]
+type TypedAgentDispatchInternalServer = AgentDispatchInternalServer[RoomTopic]
+
+func NewTypedAgentDispatchInternalClient(params ClientParams) (TypedAgentDispatchInternalClient, error) {
+	return NewAgentDispatchInternalClient[RoomTopic](params.Bus, params.Options()...)
+}
+
+func NewTypedAgentDispatchInternalServer(svc AgentDispatchInternalServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedAgentDispatchInternalServer, error) {
+	return NewAgentDispatchInternalServer[RoomTopic](svc, bus, opts...)
+}
+
 //counterfeiter:generate . KeepalivePubSub
 type KeepalivePubSub interface {
 	KeepaliveClient[livekit.NodeID]
