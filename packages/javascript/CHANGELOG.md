@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.19.4
+
+### Patch Changes
+
+- Add AgentDispatchInternal service. Add JobTerminate to AgentService - [#782](https://github.com/livekit/protocol/pull/782) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.19.3
 
 ### Patch Changes
