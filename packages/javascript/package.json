@@ -1,6 +1,6 @@
 {
   "name": "@livekit/protocol",
-  "version": "1.19.1",
+  "version": "1.19.3",
   "description": "",
   "type": "module",
   "main": "src/index.js",
@@ -20,7 +20,7 @@
   },
   "scripts": {
     "generate:version": "genversion --esm --semi src/gen/version.js",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_room.proto ../../protobufs/livekit_rtc.proto ../../protobufs/livekit_models.proto ../../protobufs/livekit_agent.proto ../../protobufs/livekit_webhook.proto ../../protobufs/livekit_egress.proto ../../protobufs/livekit_ingress.proto ../../protobufs/livekit_sip.proto",
+    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_*.proto",
     "build": "pnpm generate:version && pnpm generate:proto"
   },
   "keywords": [],

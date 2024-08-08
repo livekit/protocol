@@ -1,5 +1,42 @@
 # github.com/livekit/protocol
 
+## 1.19.3
+
+## 1.19.2
+
+### Patch Changes
+
+- Add FilenamePrefix to ImagesInfo - [#751](https://github.com/livekit/protocol/pull/751) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Add experimental replay api - [#755](https://github.com/livekit/protocol/pull/755) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Implement a custom YAML unmarshaller for RoomConfiguration - [#765](https://github.com/livekit/protocol/pull/765) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add AgentDispatchPrefix to guid - [#757](https://github.com/livekit/protocol/pull/757) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Ability to set attributes upon job acceptance - [#769](https://github.com/livekit/protocol/pull/769) ([@davidzhao](https://github.com/davidzhao))
+
+- Remove unused fields from RegisterWorkerRequest - [#761](https://github.com/livekit/protocol/pull/761) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Integrate feedback on the agents protocol: - [#750](https://github.com/livekit/protocol/pull/750) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+  - Rename JobDescription to AgentDispatch
+  - Remove participant_identity entry in the dispatch
+  - Deprecate namespace
+  - Add an agent_name field to specify what agent workers a job should be dispatched to
+
+  Also allow setting a room configuration in the token.
+
+- add srt output for egress - [#766](https://github.com/livekit/protocol/pull/766) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Internal agent protocol improvements - [#764](https://github.com/livekit/protocol/pull/764) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Implement MarshalYAML on RoomConfiguration and related types - [#771](https://github.com/livekit/protocol/pull/771) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Use consistent json field name for room configuration grant - [#762](https://github.com/livekit/protocol/pull/762) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Added RoomClosed as a DisconnectReason - [#778](https://github.com/livekit/protocol/pull/778) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.19.1
 
 ## 1.19.0

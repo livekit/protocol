@@ -1,5 +1,23 @@
 # @livekit/protocol
 
+## 1.19.3
+
+### Patch Changes
+
+- Use glob for generating JS proto definitions - [#779](https://github.com/livekit/protocol/pull/779) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.19.2
+
+### Patch Changes
+
+- Ability to set attributes upon job acceptance - [#769](https://github.com/livekit/protocol/pull/769) ([@davidzhao](https://github.com/davidzhao))
+
+- Add track subscribed first time notification - [#752](https://github.com/livekit/protocol/pull/752) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Rename ErrorResponse Reason INVALID_ARGUMENT to LIMIT_EXCEEDED - [#758](https://github.com/livekit/protocol/pull/758) ([@lukasIO](https://github.com/lukasIO))
+
+- Added RoomClosed as a DisconnectReason - [#778](https://github.com/livekit/protocol/pull/778) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.19.1
 
 ### Patch Changes
