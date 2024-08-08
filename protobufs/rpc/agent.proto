@@ -58,6 +58,11 @@ service AgentInternal {
   };
 }
 
+enum JobTerminateReason {
+  TERINATION_REQUESTED = 0;
+  AGENT_LEFT_ROOM = 1;
+}
+
 message CheckEnabledRequest{}
 
 message CheckEnabledResponse {
@@ -73,6 +78,7 @@ message JobRequestResponse {
 
 message JobTerminateRequest {
   string job_id = 1;
+  JobTerminateReason reason = 2;
 }
 
 message JobTerminateResponse {
