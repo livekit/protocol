@@ -226,8 +226,9 @@ message DataPacket {
     ActiveSpeakerUpdate speaker = 3 [deprecated=true];
     SipDTMF sip_dtmf = 6;
     Transcription transcription = 7;
+    ChatMessage chat_message = 8;
   }
-  // NEXT_ID: 8
+  // NEXT_ID: 9
 }
 
 message ActiveSpeakerUpdate {
@@ -284,6 +285,14 @@ message TranscriptionSegment {
   uint64 end_time = 4;
   bool final = 5;
   string language = 6;
+}
+
+message ChatMessage {
+  string id = 1; // populated by server
+  int64 timestamp = 2; // populated by  server
+  int64 edit_timestamp = 3; // populated by server
+  string message = 4;
+  bool deleted = 5; // true to remove message
 }
 
 enum ConnectionQuality {
