@@ -95,6 +95,17 @@ func NewTypedSignalServer(nodeID livekit.NodeID, svc SignalServerImpl, bus psrpc
 	return NewSignalServer[livekit.NodeID](svc, bus, append(opts[:len(opts):len(opts)], psrpc.WithServerID(string(nodeID)))...)
 }
 
+type TypedRoomManagerClient = RoomManagerClient[livekit.NodeID]
+type TypedRoomManagerServer = RoomManagerServer[livekit.NodeID]
+
+func NewTypedRoomManagerClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomManagerClient, error) {
+	return NewRoomManagerClient[livekit.NodeID](bus, opts...)
+}
+
+func NewTypedRoomManagerServer(svc RoomManagerServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomManagerServer, error) {
+	return NewRoomManagerServer[livekit.NodeID](svc, bus, opts...)
+}
+
 type ParticipantTopic string
 type RoomTopic string
 

@@ -28,6 +28,7 @@ service Signal {
       stream: true
       topics: true
       topic_params: {
+        group: "node"
         names: ["node_id"]
         typed: true
         single_server: true

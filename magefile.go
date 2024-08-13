@@ -69,6 +69,7 @@ func Proto() error {
 		"rpc/keepalive.proto",
 		"rpc/participant.proto",
 		"rpc/room.proto",
+		"rpc/roommanager.proto",
 		"rpc/signal.proto",
 		"rpc/sip.proto",
 	}
