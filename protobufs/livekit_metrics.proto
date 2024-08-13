@@ -9,7 +9,7 @@ option ruby_package = "LiveKit::Proto";
 /*
   Protocol used to record metrics for a specific session.
 
-  Clients send their timestamp in their own monotonically increasing time (e.g `performance.now` on JS). which will
+  Clients send their timestamp in their own monotonically increasing time (e.g `performance.now` on JS).
   These timestamps are then converted by the SFU to align with the session's timeline, relative to the session start time.
   (at receive time)
 
