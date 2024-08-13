@@ -3292,7 +3292,7 @@ func (s *sIPServer) serveCreateSIPParticipantProtobuf(ctx context.Context, resp 
 }
 
 func (s *sIPServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor3, 0
+	return twirpFileDescriptor4, 0
 }
 
 func (s *sIPServer) ProtocGenTwirpVersion() string {
@@ -3306,7 +3306,7 @@ func (s *sIPServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "SIP")
 }
 
-var twirpFileDescriptor3 = []byte{
+var twirpFileDescriptor4 = []byte{
 	// 1547 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x58, 0xdb, 0x6e, 0xdb, 0x46,
 	0x13, 0xb6, 0xa8, 0x83, 0xa5, 0xb1, 0x2d, 0xcb, 0xeb, 0x03, 0x18, 0xd9, 0x4e, 0x0c, 0x26, 0xfe,

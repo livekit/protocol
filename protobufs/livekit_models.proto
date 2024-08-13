@@ -131,6 +131,7 @@ message ParticipantInfo {
   bool is_publisher = 13;
   Kind kind = 14;
   map<string, string> attributes = 15;
+  DisconnectReason disconnect_reason = 16;
 }
 
 enum TrackType {

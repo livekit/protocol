@@ -101,8 +101,8 @@ message SignalResponse {
     Pong pong_resp = 20;
     // Subscription response, client should not expect any media from this subscription if it fails
     SubscriptionResponse subscription_response = 21;
-    // Errors relating to user inititated requests that carry a `request_id`
-    ErrorResponse error_response = 22;
+    // Response relating to user inititated requests that carry a `request_id`
+    RequestResponse request_response = 22;
     // notify to the publisher when a published track has been subscribed for the first time
     TrackSubscribed track_subscribed = 23;
   }
@@ -427,10 +427,9 @@ message SubscriptionResponse {
   SubscriptionError err = 2;
 }
 
-message ErrorResponse {
-
+message RequestResponse {
   enum Reason {
-    UNKNOWN = 0;
+    OK = 0;
     NOT_FOUND = 1;
     NOT_ALLOWED = 2;
     LIMIT_EXCEEDED = 3;

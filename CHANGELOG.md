@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.20.0
+
+### Minor Changes
+
+- Send non-error responses also as part of RequestResponse - [#787](https://github.com/livekit/protocol/pull/787) ([@lukasIO](https://github.com/lukasIO))
+
+### Patch Changes
+
+- Add disconnect reason in participant info. - [#788](https://github.com/livekit/protocol/pull/788) ([@boks1971](https://github.com/boks1971))
+
+- Use multiple webhook workers for each URL to improve parallelism - [#784](https://github.com/livekit/protocol/pull/784) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.19.3
 
 ## 1.19.2

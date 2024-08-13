@@ -61,7 +61,7 @@ func TestWebHook(t *testing.T) {
 
 		wg := sync.WaitGroup{}
 		wg.Add(1)
-		s.handler = func(r *http.Request) {
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			defer wg.Done()
 			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestURLNotifierDropped(t *testing.T) {
 	defer urlNotifier.Stop(true)
 	totalDropped := atomic.Int32{}
 	totalReceived := atomic.Int32{}
-	s.handler = func(r *http.Request) {
+	s.handler = func(w http.ResponseWriter, r *http.Request) {
 		decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
 		require.NoError(t, err)
 		totalReceived.Inc()
@@ -116,7 +116,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 	t.Run("stop allowing to drain", func(t *testing.T) {
 		urlNotifier := newTestNotifier()
 		numCalled := atomic.Int32{}
-		s.handler = func(r *http.Request) {
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			numCalled.Inc()
 		}
 		for i := 0; i < 10; i++ {
@@ -130,7 +130,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 	t.Run("force stop", func(t *testing.T) {
 		urlNotifier := newTestNotifier()
 		numCalled := atomic.Int32{}
-		s.handler = func(r *http.Request) {
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			numCalled.Inc()
 		}
 		for i := 0; i < 10; i++ {
@@ -140,6 +140,59 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		urlNotifier.Stop(true)
 		time.Sleep(time.Second)
 		require.Greater(t, int32(20), numCalled.Load())
+	})
+
+	t.Run("times out after accepting connection", func(t *testing.T) {
+		urlNotifier := NewURLNotifier(URLNotifierParams{
+			QueueSize: 20,
+			URL:       testUrl,
+			APIKey:    apiKey,
+			APISecret: apiSecret,
+			HTTPClientParams: HTTPClientParams{
+				RetryWaitMax:  time.Millisecond,
+				MaxRetries:    1,
+				ClientTimeout: 100 * time.Millisecond,
+			},
+		})
+
+		numCalled := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(200)
+			w.Write([]byte("ok"))
+
+			// delay the request to cause it to fail
+			time.Sleep(time.Second)
+			if r.Context().Err() == nil {
+				// inc if not canceled
+				numCalled.Inc()
+			}
+		}
+		defer urlNotifier.Stop(false)
+
+		err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted})
+		require.Error(t, err)
+	})
+
+	t.Run("times out before connection", func(t *testing.T) {
+		ln, err := net.Listen("tcp", ":9987")
+		require.NoError(t, err)
+		defer ln.Close()
+		urlNotifier := NewURLNotifier(URLNotifierParams{
+			URL:       "http://localhost:9987",
+			APIKey:    apiKey,
+			APISecret: apiSecret,
+			HTTPClientParams: HTTPClientParams{
+				RetryWaitMax:  time.Millisecond,
+				MaxRetries:    1,
+				ClientTimeout: 100 * time.Millisecond,
+			},
+		})
+		defer urlNotifier.Stop(false)
+
+		startedAt := time.Now()
+		err = urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted})
+		require.Error(t, err)
+		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
 }
 
@@ -153,7 +206,7 @@ func newTestNotifier() *URLNotifier {
 }
 
 type testServer struct {
-	handler func(r *http.Request)
+	handler func(w http.ResponseWriter, r *http.Request)
 	server  *http.Server
 }
 
@@ -168,7 +221,7 @@ func newServer(addr string) *testServer {
 
 func (s *testServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if s.handler != nil {
-		s.handler(r)
+		s.handler(w, r)
 	}
 }
 
