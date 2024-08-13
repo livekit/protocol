@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.20.0
+
+### Minor Changes
+
+- Send non-error responses also as part of RequestResponse - [#787](https://github.com/livekit/protocol/pull/787) ([@lukasIO](https://github.com/lukasIO))
+
+### Patch Changes
+
+- Add disconnect reason in participant info. - [#788](https://github.com/livekit/protocol/pull/788) ([@boks1971](https://github.com/boks1971))
+
+- Add AgentDispatchInternal service. Add JobTerminate to AgentService - [#782](https://github.com/livekit/protocol/pull/782) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.19.3
 
 ### Patch Changes
