@@ -290,7 +290,7 @@ message TranscriptionSegment {
 message ChatMessage {
   string id = 1; // uuid
   int64 timestamp = 2;
-  int64 edit_timestamp = 3; // populated only if the intent is to edit/update an existing message
+  optional int64 edit_timestamp = 3; // populated only if the intent is to edit/update an existing message
   string message = 4;
   bool deleted = 5; // true to remove message
 }
