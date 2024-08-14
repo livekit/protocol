@@ -2539,9 +2539,9 @@ type ChatMessage struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                             // populated by server
-	Timestamp     int64  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`                              // populated by  server
-	EditTimestamp int64  `protobuf:"varint,3,opt,name=edit_timestamp,json=editTimestamp,proto3" json:"edit_timestamp,omitempty"` // populated by server
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // uuid
+	Timestamp     int64  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	EditTimestamp int64  `protobuf:"varint,3,opt,name=edit_timestamp,json=editTimestamp,proto3" json:"edit_timestamp,omitempty"` // populated only if the intent is to edit/update an existing message
 	Message       string `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
 	Deleted       bool   `protobuf:"varint,5,opt,name=deleted,proto3" json:"deleted,omitempty"` // true to remove message
 }
