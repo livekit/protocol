@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add dedicated chat message definitino
+Add dedicated chat message definition
