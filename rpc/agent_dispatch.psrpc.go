@@ -13,7 +13,7 @@ import (
 	"github.com/livekit/psrpc/pkg/server"
 	"github.com/livekit/psrpc/version"
 )
-import livekit2 "github.com/livekit/protocol/livekit"
+import livekit3 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -22,11 +22,11 @@ var _ = version.PsrpcVersion_0_5
 // ======================================
 
 type AgentDispatchInternalClient[RoomTopicType ~string] interface {
-	CreateDispatch(ctx context.Context, room RoomTopicType, req *livekit2.CreateAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit2.AgentDispatch, error)
+	CreateDispatch(ctx context.Context, room RoomTopicType, req *livekit3.CreateAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit3.AgentDispatch, error)
 
-	DeleteDispatch(ctx context.Context, room RoomTopicType, req *livekit2.DeleteAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit2.AgentDispatch, error)
+	DeleteDispatch(ctx context.Context, room RoomTopicType, req *livekit3.DeleteAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit3.AgentDispatch, error)
 
-	ListDispatch(ctx context.Context, room RoomTopicType, req *livekit2.ListAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit2.ListAgentDispatchResponse, error)
+	ListDispatch(ctx context.Context, room RoomTopicType, req *livekit3.ListAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit3.ListAgentDispatchResponse, error)
 }
 
 // ==========================================
@@ -34,11 +34,11 @@ type AgentDispatchInternalClient[RoomTopicType ~string] interface {
 // ==========================================
 
 type AgentDispatchInternalServerImpl interface {
-	CreateDispatch(context.Context, *livekit2.CreateAgentDispatchRequest) (*livekit2.AgentDispatch, error)
+	CreateDispatch(context.Context, *livekit3.CreateAgentDispatchRequest) (*livekit3.AgentDispatch, error)
 
-	DeleteDispatch(context.Context, *livekit2.DeleteAgentDispatchRequest) (*livekit2.AgentDispatch, error)
+	DeleteDispatch(context.Context, *livekit3.DeleteAgentDispatchRequest) (*livekit3.AgentDispatch, error)
 
-	ListDispatch(context.Context, *livekit2.ListAgentDispatchRequest) (*livekit2.ListAgentDispatchResponse, error)
+	ListDispatch(context.Context, *livekit3.ListAgentDispatchRequest) (*livekit3.ListAgentDispatchResponse, error)
 }
 
 // ======================================
@@ -91,16 +91,16 @@ func NewAgentDispatchInternalClient[RoomTopicType ~string](bus psrpc.MessageBus,
 	}, nil
 }
 
-func (c *agentDispatchInternalClient[RoomTopicType]) CreateDispatch(ctx context.Context, room RoomTopicType, req *livekit2.CreateAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit2.AgentDispatch, error) {
-	return client.RequestSingle[*livekit2.AgentDispatch](ctx, c.client, "CreateDispatch", []string{string(room)}, req, opts...)
+func (c *agentDispatchInternalClient[RoomTopicType]) CreateDispatch(ctx context.Context, room RoomTopicType, req *livekit3.CreateAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit3.AgentDispatch, error) {
+	return client.RequestSingle[*livekit3.AgentDispatch](ctx, c.client, "CreateDispatch", []string{string(room)}, req, opts...)
 }
 
-func (c *agentDispatchInternalClient[RoomTopicType]) DeleteDispatch(ctx context.Context, room RoomTopicType, req *livekit2.DeleteAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit2.AgentDispatch, error) {
-	return client.RequestSingle[*livekit2.AgentDispatch](ctx, c.client, "DeleteDispatch", []string{string(room)}, req, opts...)
+func (c *agentDispatchInternalClient[RoomTopicType]) DeleteDispatch(ctx context.Context, room RoomTopicType, req *livekit3.DeleteAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit3.AgentDispatch, error) {
+	return client.RequestSingle[*livekit3.AgentDispatch](ctx, c.client, "DeleteDispatch", []string{string(room)}, req, opts...)
 }
 
-func (c *agentDispatchInternalClient[RoomTopicType]) ListDispatch(ctx context.Context, room RoomTopicType, req *livekit2.ListAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit2.ListAgentDispatchResponse, error) {
-	return client.RequestSingle[*livekit2.ListAgentDispatchResponse](ctx, c.client, "ListDispatch", []string{string(room)}, req, opts...)
+func (c *agentDispatchInternalClient[RoomTopicType]) ListDispatch(ctx context.Context, room RoomTopicType, req *livekit3.ListAgentDispatchRequest, opts ...psrpc.RequestOption) (*livekit3.ListAgentDispatchResponse, error) {
+	return client.RequestSingle[*livekit3.ListAgentDispatchResponse](ctx, c.client, "ListDispatch", []string{string(room)}, req, opts...)
 }
 
 // ============================

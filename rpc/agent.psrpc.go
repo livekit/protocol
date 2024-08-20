@@ -14,7 +14,7 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
-import livekit1 "github.com/livekit/protocol/livekit"
+import livekit2 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -25,7 +25,7 @@ var _ = version.PsrpcVersion_0_5
 type AgentInternalClient interface {
 	CheckEnabled(ctx context.Context, req *CheckEnabledRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*CheckEnabledResponse], error)
 
-	JobRequest(ctx context.Context, namespace string, jobType string, req *livekit1.Job, opts ...psrpc.RequestOption) (*JobRequestResponse, error)
+	JobRequest(ctx context.Context, namespace string, jobType string, req *livekit2.Job, opts ...psrpc.RequestOption) (*JobRequestResponse, error)
 
 	JobTerminate(ctx context.Context, jobId string, req *JobTerminateRequest, opts ...psrpc.RequestOption) (*JobTerminateResponse, error)
 
@@ -39,8 +39,8 @@ type AgentInternalClient interface {
 type AgentInternalServerImpl interface {
 	CheckEnabled(context.Context, *CheckEnabledRequest) (*CheckEnabledResponse, error)
 
-	JobRequest(context.Context, *livekit1.Job) (*JobRequestResponse, error)
-	JobRequestAffinity(context.Context, *livekit1.Job) float32
+	JobRequest(context.Context, *livekit2.Job) (*JobRequestResponse, error)
+	JobRequestAffinity(context.Context, *livekit2.Job) float32
 
 	JobTerminate(context.Context, *JobTerminateRequest) (*JobTerminateResponse, error)
 }
@@ -97,7 +97,7 @@ func (c *agentInternalClient) CheckEnabled(ctx context.Context, req *CheckEnable
 	return client.RequestMulti[*CheckEnabledResponse](ctx, c.client, "CheckEnabled", nil, req, opts...)
 }
 
-func (c *agentInternalClient) JobRequest(ctx context.Context, namespace string, jobType string, req *livekit1.Job, opts ...psrpc.RequestOption) (*JobRequestResponse, error) {
+func (c *agentInternalClient) JobRequest(ctx context.Context, namespace string, jobType string, req *livekit2.Job, opts ...psrpc.RequestOption) (*JobRequestResponse, error) {
 	return client.RequestSingle[*JobRequestResponse](ctx, c.client, "JobRequest", []string{namespace, jobType}, req, opts...)
 }
 
