@@ -17,19 +17,20 @@ option ruby_package = "LiveKit::Proto";
 */
 
 
-// index starting at 4096 are for predefined labels (`MetricLabel`)
+// index from [0; 512] are for predefined labels (`MetricLabel`)
 enum MetricLabel {
   AGENTS_LLM_TTFT = 0; // time to first token from LLM
   AGENTS_STT_TTFT = 1; // time to final transcription
   AGENTS_TTS_TTFB = 2; // time to first byte
+
+  METRIC_LABEL_MAX_VALUE = 512;
 }
 
 message MetricsBatch {
   // To avoid repeating string values, we store them in a separate list and reference them by index
   // This is useful for storing participant identities, track names, etc.
-  // There is also a predefined list of labels that can be used to reference common metrics starting at 4096.
-  // E.g: for the llm TTFT, the int value would be 4096 + 0 (MetricLabel.AGENTS_LLM_TTFT)
-  // Those predefined labels are not stored in the string list
+  // There is also a predefined list of labels that can be used to reference common metrics.
+  // They have reserved indices from 0 to 512
   repeated string str_data = 1;
   repeated TimeSeriesMetric time_series = 2;
   repeated EventMetric events = 3;
@@ -38,9 +39,9 @@ message MetricsBatch {
 message TimeSeriesMetric {
   // Metric name e.g "speech_probablity". The string value is not directly stored in the message, but referenced by index
   // in the `str_data` field of `MetricsBatch`
-  int32 label = 1;
-  int32 participant_identity = 2;
-  optional int32 track_sid = 3;
+  uint32 label = 1;
+  uint32 participant_identity = 2;
+  uint32 track_sid = 3;
   int64 start_timestamp = 4; // samples
   int64 end_timestamp = 5;
   // list of samples between start_timestamp and end_timestamp
@@ -53,9 +54,9 @@ message MetricSample {
 }
 
 message EventMetric {
-  int32 label = 1;
-  int32 participant_identity = 2;
-  optional int32 track_sid = 3;
+  uint32 label = 1;
+  uint32 participant_identity = 2;
+  uint32 track_sid = 3; // 0 =
   int64 start_timestamp = 4;
   optional int64 end_timestamp = 5;
   string metadata = 6;
