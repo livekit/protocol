@@ -36,6 +36,15 @@ service AgentInternal {
       }
     };
   };
+  rpc JobTerminate(JobTerminateRequest) returns (JobTerminateResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        names: ["job_id"]
+        typed: false
+      }
+    };
+  }
   rpc WorkerRegistered(google.protobuf.Empty) returns (google.protobuf.Empty) {
     option (psrpc.options) = {
       subscription: true
@@ -46,7 +55,12 @@ service AgentInternal {
         typed: false
       }
     };
-  }
+  };
+}
+
+enum JobTerminateReason {
+  TERINATION_REQUESTED = 0;
+  AGENT_LEFT_ROOM = 1;
 }
 
 message CheckEnabledRequest{}
@@ -61,3 +75,13 @@ message CheckEnabledResponse {
 message JobRequestResponse {
   livekit.JobState state = 1;
 }
+
+message JobTerminateRequest {
+  string job_id = 1;
+  JobTerminateReason reason = 2;
+}
+
+message JobTerminateResponse {
+  livekit.JobState state = 1;
+}
+

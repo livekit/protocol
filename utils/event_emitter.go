@@ -134,8 +134,8 @@ type eventObserverListObserver[V any] struct {
 }
 
 func (o *eventObserverListObserver[V]) Stop() {
-	o.l.stopObserving(o)
 	o.EventObserver.Stop()
+	o.l.stopObserving(o)
 }
 
 func (l *EventObserverList[V]) Observe() EventObserver[V] {

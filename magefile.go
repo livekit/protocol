@@ -43,6 +43,7 @@ func Bootstrap() error {
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
+		"livekit_agent_dispatch.proto",
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
 		"livekit_room.proto",
@@ -50,7 +51,6 @@ func Proto() error {
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",
-		"livekit_agent_dispatch.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",
@@ -64,12 +64,14 @@ func Proto() error {
 	}
 	psrpcProtoFiles := []string{
 		"rpc/agent.proto",
+		"rpc/agent_dispatch.proto",
 		"rpc/egress.proto",
 		"rpc/ingress.proto",
 		"rpc/io.proto",
 		"rpc/keepalive.proto",
 		"rpc/participant.proto",
 		"rpc/room.proto",
+		"rpc/roommanager.proto",
 		"rpc/signal.proto",
 		"rpc/sip.proto",
 	}

@@ -31,6 +31,10 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
+const (
+	numWorkers = 10
+)
+
 type URLNotifierParams struct {
 	HTTPClientParams
 	Logger    logger.Logger
@@ -56,7 +60,7 @@ type URLNotifier struct {
 	params  URLNotifierParams
 	client  *retryablehttp.Client
 	dropped atomic.Int32
-	worker  core.QueueWorker
+	pool    core.QueuePool
 }
 
 func NewURLNotifier(params URLNotifierParams) *URLNotifier {
@@ -85,7 +89,8 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 		client: rhc,
 	}
 	n.client.Logger = &logAdapter{}
-	n.worker = core.NewQueueWorker(core.QueueWorkerParams{
+
+	n.pool = core.NewQueuePool(numWorkers, core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
 		DropWhenFull: true,
 		OnDropped:    func() { n.dropped.Inc() },
@@ -102,7 +107,8 @@ func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
 
 func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
 	enqueuedAt := time.Now()
-	n.worker.Submit(func() {
+
+	n.pool.Submit(n.eventKey(event), func() {
 		fields := logFields(event)
 		fields = append(fields,
 			"url", n.params.URL,
@@ -121,11 +127,30 @@ func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
 	return nil
 }
 
+func (c *URLNotifier) eventKey(event *livekit.WebhookEvent) string {
+	if event.EgressInfo != nil {
+		return event.EgressInfo.EgressId
+	}
+	if event.IngressInfo != nil {
+		return event.IngressInfo.IngressId
+	}
+	if event.Room != nil {
+		return event.Room.Name
+	}
+	if event.Participant != nil {
+		return event.Participant.Identity
+	}
+	if event.Track != nil {
+		return event.Track.Sid
+	}
+	return "default"
+}
+
 func (n *URLNotifier) Stop(force bool) {
 	if force {
-		n.worker.Kill()
+		n.pool.Kill()
 	} else {
-		n.worker.Drain()
+		n.pool.Drain()
 	}
 }
 

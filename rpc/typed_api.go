@@ -95,6 +95,17 @@ func NewTypedSignalServer(nodeID livekit.NodeID, svc SignalServerImpl, bus psrpc
 	return NewSignalServer[livekit.NodeID](svc, bus, append(opts[:len(opts):len(opts)], psrpc.WithServerID(string(nodeID)))...)
 }
 
+type TypedRoomManagerClient = RoomManagerClient[livekit.NodeID]
+type TypedRoomManagerServer = RoomManagerServer[livekit.NodeID]
+
+func NewTypedRoomManagerClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedRoomManagerClient, error) {
+	return NewRoomManagerClient[livekit.NodeID](bus, opts...)
+}
+
+func NewTypedRoomManagerServer(svc RoomManagerServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomManagerServer, error) {
+	return NewRoomManagerServer[livekit.NodeID](svc, bus, opts...)
+}
+
 type ParticipantTopic string
 type RoomTopic string
 
@@ -147,6 +158,18 @@ func NewTypedParticipantClient(params ClientParams) (TypedParticipantClient, err
 
 func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedParticipantServer, error) {
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
+}
+
+//counterfeiter:generate . TypedAgentDispatchInternalClient
+type TypedAgentDispatchInternalClient = AgentDispatchInternalClient[RoomTopic]
+type TypedAgentDispatchInternalServer = AgentDispatchInternalServer[RoomTopic]
+
+func NewTypedAgentDispatchInternalClient(params ClientParams) (TypedAgentDispatchInternalClient, error) {
+	return NewAgentDispatchInternalClient[RoomTopic](params.Bus, params.Options()...)
+}
+
+func NewTypedAgentDispatchInternalServer(svc AgentDispatchInternalServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedAgentDispatchInternalServer, error) {
+	return NewAgentDispatchInternalServer[RoomTopic](svc, bus, opts...)
 }
 
 //counterfeiter:generate . KeepalivePubSub

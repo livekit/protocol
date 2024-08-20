@@ -6,7 +6,7 @@ require (
 	github.com/benbjohnson/clock v1.3.5
 	github.com/bufbuild/protoyaml-go v0.1.9
 	github.com/eapache/channels v1.1.0
-	github.com/frostbyte73/core v0.0.10
+	github.com/frostbyte73/core v0.0.12
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gammazero/deque v0.2.1
 	github.com/go-jose/go-jose/v3 v3.0.3

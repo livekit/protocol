@@ -133,6 +133,7 @@ message ParticipantInfo {
   bool is_publisher = 13;
   Kind kind = 14;
   map<string, string> attributes = 15;
+  DisconnectReason disconnect_reason = 16;
 }
 
 enum TrackType {
@@ -376,15 +377,26 @@ message DisabledCodecs {
 
 enum DisconnectReason {
   UNKNOWN_REASON = 0;
+  // the client initiated the disconnect
   CLIENT_INITIATED = 1;
+  // another participant with the same identity has joined the room
   DUPLICATE_IDENTITY = 2;
+  // the server instance is shutting down
   SERVER_SHUTDOWN = 3;
+  // RoomService.RemoveParticipant was called
   PARTICIPANT_REMOVED = 4;
+  // RoomService.DeleteRoom was called
   ROOM_DELETED = 5;
+  // the client is attempting to resume a session, but server is not aware of it
   STATE_MISMATCH = 6;
+  // client was unable to connect fully
   JOIN_FAILURE = 7;
+  // Cloud-only, the server requested Participant to migrate the connection elsewhere
   MIGRATION = 8;
+  // the signal websocket was closed unexpectedly
   SIGNAL_CLOSE = 9;
+  // the room was closed, due to all Standard and Ingress participants having left
+  ROOM_CLOSED = 10;
 }
 
 message RTPDrift {
@@ -464,6 +476,37 @@ message RTPStats {
   RTPDrift report_drift = 45;
   RTPDrift rebased_report_drift = 46;
   // NEXT_ID: 47
+}
+
+message RTPForwarderState {
+  bool started = 1;
+  int32 reference_layer_spatial = 2;
+  int64 pre_start_time = 3;
+  uint64 ext_first_timestamp = 4;
+  uint64 dummy_start_timestamp_offset = 5;
+  RTPMungerState rtp_munger = 6;
+  oneof codec_munger {
+    VP8MungerState vp8_munger = 7;
+  }
+}
+
+message RTPMungerState {
+  uint64 ext_last_sequence_number = 1;
+  uint64 ext_second_last_sequence_number = 2;
+  uint64 ext_last_timestamp = 3;
+  uint64 ext_second_last_timestamp = 4;
+  bool last_marker = 5;
+  bool second_last_marker = 6;
+}
+
+message VP8MungerState {
+  int32 ext_last_picture_id = 1;
+  bool picture_id_used = 2;
+  uint32 last_tl0_pic_idx = 3;
+  bool tl0_pic_idx_used = 4;
+  bool tid_used = 5;
+  uint32 last_key_idx = 6;
+  bool key_idx_used = 7;
 }
 
 message TimedVersion {

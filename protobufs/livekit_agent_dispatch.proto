@@ -24,7 +24,7 @@ import "livekit_agent.proto";
 service AgentDispatchService {
   rpc CreateDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);
   rpc DeleteDispatch(DeleteAgentDispatchRequest) returns (AgentDispatch);
-  rpc ListDispatch(ListAgentDispatchRequesst) returns (ListAgentDispatchResponse);
+  rpc ListDispatch(ListAgentDispatchRequest) returns (ListAgentDispatchResponse);
 }
 
 message CreateAgentDispatchRequest {
@@ -40,9 +40,10 @@ message RoomAgentDispatch {
 
 message DeleteAgentDispatchRequest {
   string dispatch_id = 1;
+  string room = 2;
 }
 
-message ListAgentDispatchRequesst {
+message ListAgentDispatchRequest {
   string dispatch_id = 1; // if set, only the dispatch whose id is given will be returned
   string room = 2;        // name of the room to list agents for. Must be set.
 }
