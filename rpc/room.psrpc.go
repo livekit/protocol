@@ -13,8 +13,8 @@ import (
 	"github.com/livekit/psrpc/pkg/server"
 	"github.com/livekit/psrpc/version"
 )
-import livekit "github.com/livekit/protocol/livekit"
-import livekit5 "github.com/livekit/protocol/livekit"
+import livekit1 "github.com/livekit/protocol/livekit"
+import livekit6 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -23,11 +23,11 @@ var _ = version.PsrpcVersion_0_5
 // =====================
 
 type RoomClient[RoomTopicType ~string] interface {
-	DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit5.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit5.DeleteRoomResponse, error)
+	DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit6.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit6.DeleteRoomResponse, error)
 
-	SendData(ctx context.Context, room RoomTopicType, req *livekit5.SendDataRequest, opts ...psrpc.RequestOption) (*livekit5.SendDataResponse, error)
+	SendData(ctx context.Context, room RoomTopicType, req *livekit6.SendDataRequest, opts ...psrpc.RequestOption) (*livekit6.SendDataResponse, error)
 
-	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit5.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error)
+	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit6.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error)
 }
 
 // =========================
@@ -35,11 +35,11 @@ type RoomClient[RoomTopicType ~string] interface {
 // =========================
 
 type RoomServerImpl interface {
-	DeleteRoom(context.Context, *livekit5.DeleteRoomRequest) (*livekit5.DeleteRoomResponse, error)
+	DeleteRoom(context.Context, *livekit6.DeleteRoomRequest) (*livekit6.DeleteRoomResponse, error)
 
-	SendData(context.Context, *livekit5.SendDataRequest) (*livekit5.SendDataResponse, error)
+	SendData(context.Context, *livekit6.SendDataRequest) (*livekit6.SendDataResponse, error)
 
-	UpdateRoomMetadata(context.Context, *livekit5.UpdateRoomMetadataRequest) (*livekit.Room, error)
+	UpdateRoomMetadata(context.Context, *livekit6.UpdateRoomMetadataRequest) (*livekit1.Room, error)
 }
 
 // =====================
@@ -92,16 +92,16 @@ func NewRoomClient[RoomTopicType ~string](bus psrpc.MessageBus, opts ...psrpc.Cl
 	}, nil
 }
 
-func (c *roomClient[RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit5.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit5.DeleteRoomResponse, error) {
-	return client.RequestSingle[*livekit5.DeleteRoomResponse](ctx, c.client, "DeleteRoom", []string{string(room)}, req, opts...)
+func (c *roomClient[RoomTopicType]) DeleteRoom(ctx context.Context, room RoomTopicType, req *livekit6.DeleteRoomRequest, opts ...psrpc.RequestOption) (*livekit6.DeleteRoomResponse, error) {
+	return client.RequestSingle[*livekit6.DeleteRoomResponse](ctx, c.client, "DeleteRoom", []string{string(room)}, req, opts...)
 }
 
-func (c *roomClient[RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit5.SendDataRequest, opts ...psrpc.RequestOption) (*livekit5.SendDataResponse, error) {
-	return client.RequestSingle[*livekit5.SendDataResponse](ctx, c.client, "SendData", []string{string(room)}, req, opts...)
+func (c *roomClient[RoomTopicType]) SendData(ctx context.Context, room RoomTopicType, req *livekit6.SendDataRequest, opts ...psrpc.RequestOption) (*livekit6.SendDataResponse, error) {
+	return client.RequestSingle[*livekit6.SendDataResponse](ctx, c.client, "SendData", []string{string(room)}, req, opts...)
 }
 
-func (c *roomClient[RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit5.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit.Room, error) {
-	return client.RequestSingle[*livekit.Room](ctx, c.client, "UpdateRoomMetadata", []string{string(room)}, req, opts...)
+func (c *roomClient[RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit6.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error) {
+	return client.RequestSingle[*livekit1.Room](ctx, c.client, "UpdateRoomMetadata", []string{string(room)}, req, opts...)
 }
 
 // ===========

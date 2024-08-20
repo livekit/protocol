@@ -13,7 +13,7 @@ import (
 	"github.com/livekit/psrpc/pkg/server"
 	"github.com/livekit/psrpc/version"
 )
-import livekit3 "github.com/livekit/protocol/livekit"
+import livekit4 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_5
 
@@ -22,7 +22,7 @@ var _ = version.PsrpcVersion_0_5
 // ===============================
 
 type EgressInternalClient interface {
-	StartEgress(ctx context.Context, topic string, req *StartEgressRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error)
+	StartEgress(ctx context.Context, topic string, req *StartEgressRequest, opts ...psrpc.RequestOption) (*livekit4.EgressInfo, error)
 
 	ListActiveEgress(ctx context.Context, topic string, req *ListActiveEgressRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*ListActiveEgressResponse], error)
 }
@@ -32,7 +32,7 @@ type EgressInternalClient interface {
 // ===================================
 
 type EgressInternalServerImpl interface {
-	StartEgress(context.Context, *StartEgressRequest) (*livekit3.EgressInfo, error)
+	StartEgress(context.Context, *StartEgressRequest) (*livekit4.EgressInfo, error)
 	StartEgressAffinity(context.Context, *StartEgressRequest) float32
 
 	ListActiveEgress(context.Context, *ListActiveEgressRequest) (*ListActiveEgressResponse, error)
@@ -83,8 +83,8 @@ func NewEgressInternalClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (
 	}, nil
 }
 
-func (c *egressInternalClient) StartEgress(ctx context.Context, topic string, req *StartEgressRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error) {
-	return client.RequestSingle[*livekit3.EgressInfo](ctx, c.client, "StartEgress", []string{topic}, req, opts...)
+func (c *egressInternalClient) StartEgress(ctx context.Context, topic string, req *StartEgressRequest, opts ...psrpc.RequestOption) (*livekit4.EgressInfo, error) {
+	return client.RequestSingle[*livekit4.EgressInfo](ctx, c.client, "StartEgress", []string{topic}, req, opts...)
 }
 
 func (c *egressInternalClient) ListActiveEgress(ctx context.Context, topic string, req *ListActiveEgressRequest, opts ...psrpc.RequestOption) (<-chan *psrpc.Response[*ListActiveEgressResponse], error) {
@@ -147,9 +147,9 @@ func (s *egressInternalServer) Kill() {
 // ==============================
 
 type EgressHandlerClient interface {
-	UpdateStream(ctx context.Context, topic string, req *livekit3.UpdateStreamRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error)
+	UpdateStream(ctx context.Context, topic string, req *livekit4.UpdateStreamRequest, opts ...psrpc.RequestOption) (*livekit4.EgressInfo, error)
 
-	StopEgress(ctx context.Context, topic string, req *livekit3.StopEgressRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error)
+	StopEgress(ctx context.Context, topic string, req *livekit4.StopEgressRequest, opts ...psrpc.RequestOption) (*livekit4.EgressInfo, error)
 }
 
 // ==================================
@@ -157,9 +157,9 @@ type EgressHandlerClient interface {
 // ==================================
 
 type EgressHandlerServerImpl interface {
-	UpdateStream(context.Context, *livekit3.UpdateStreamRequest) (*livekit3.EgressInfo, error)
+	UpdateStream(context.Context, *livekit4.UpdateStreamRequest) (*livekit4.EgressInfo, error)
 
-	StopEgress(context.Context, *livekit3.StopEgressRequest) (*livekit3.EgressInfo, error)
+	StopEgress(context.Context, *livekit4.StopEgressRequest) (*livekit4.EgressInfo, error)
 }
 
 // ==============================
@@ -207,12 +207,12 @@ func NewEgressHandlerClient(bus psrpc.MessageBus, opts ...psrpc.ClientOption) (E
 	}, nil
 }
 
-func (c *egressHandlerClient) UpdateStream(ctx context.Context, topic string, req *livekit3.UpdateStreamRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error) {
-	return client.RequestSingle[*livekit3.EgressInfo](ctx, c.client, "UpdateStream", []string{topic}, req, opts...)
+func (c *egressHandlerClient) UpdateStream(ctx context.Context, topic string, req *livekit4.UpdateStreamRequest, opts ...psrpc.RequestOption) (*livekit4.EgressInfo, error) {
+	return client.RequestSingle[*livekit4.EgressInfo](ctx, c.client, "UpdateStream", []string{topic}, req, opts...)
 }
 
-func (c *egressHandlerClient) StopEgress(ctx context.Context, topic string, req *livekit3.StopEgressRequest, opts ...psrpc.RequestOption) (*livekit3.EgressInfo, error) {
-	return client.RequestSingle[*livekit3.EgressInfo](ctx, c.client, "StopEgress", []string{topic}, req, opts...)
+func (c *egressHandlerClient) StopEgress(ctx context.Context, topic string, req *livekit4.StopEgressRequest, opts ...psrpc.RequestOption) (*livekit4.EgressInfo, error) {
+	return client.RequestSingle[*livekit4.EgressInfo](ctx, c.client, "StopEgress", []string{topic}, req, opts...)
 }
 
 // ====================
