@@ -13,46 +13,33 @@ option ruby_package = "LiveKit::Proto";
   These timestamps are then converted by the SFU to align with the session's timeline, relative to the session start time.
   (at receive time)
 
-  When track_sid is specified, the client should use the RTP timestamp as the timestamp.
+  A metric can be linked to a specific track by setting `track_sid`.
 */
 
 
+// index starting at 4096 are for predefined labels (`MetricLabel`)
 enum MetricLabel {
-  AGENTS_LLM_TTFT = 0;             // Time to first token from LLM
-  AGENTS_STT_TTFT = 1;             // Time to final transcription
-  AGENTS_TTS_TTFB = 2;             // Time to first byte
-  AGENTS_LLM_INPUT_TOKENS = 3;     // Number of input tokens fed into the LLM
-  AGENTS_LLM_OUTPUT_TOKENS = 4;    // Number of tokens output by the LLM
-  AGENTS_LLM_FUNCTION_CALLED = 5;  // An AI function was called
-  AGENTS_STT_INPUT_DURATION = 6;   // Length of audio input
-  AGENTS_STT_OUTPUT_TOKENS = 7;    // Number of tokens produced by STT
-  AGENTS_TTS_INPUT_TOKENS = 8;     // Input tokens for TTS
-  AGENTS_TTS_OUTPUT_DURATION = 9;  // Output duration for TTS
-  SFU_PUBLISH_LATENCY = 10;        // Publish latency in SFU
-  SFU_MESH_LATENCY = 11;           // Mesh latency in SFU
-  SFU_SUBSCRIBE_LATENCY = 12;      // Subscribe latency in SFU
-  CLIENT_JITTER_BUFFER_DELAY = 13; // Jitter buffer delay on the client
-  CLIENT_PLAYOUT_DELAY = 14;       // Total delay on client-side from receiving a packet to playback
-  CLIENT_RESOLUTION_LIMIT = 15;    // Resolution limit for video publishing
-  CLIENT_FRAME_FROZEN = 16;        // Number of frame frozen events
-};
+  AGENTS_LLM_TTFT = 0; // time to first token from LLM
+  AGENTS_STT_TTFT = 1; // time to final transcription
+  AGENTS_TTS_TTFB = 2; // time to first byte
+}
 
 message MetricsBatch {
-  map<int32, string> label_dict = 1; // reserve the first 4096 labels for predefined labels (`MetricLabel`)
+  // To avoid repeating string values, we store them in a separate list and reference them by index
+  // This is useful for storing participant identities, track names, etc.
+  // There is also a predefined list of labels that can be used to reference common metrics starting at 4096.
+  // E.g: for the llm TTFT, the int value would be 4096 + 0 (MetricLabel.AGENTS_LLM_TTFT)
+  // Those predefined labels are not stored in the string list
+  repeated string str_data = 1;
   repeated TimeSeriesMetric time_series = 2;
-  repeated AnnotationMetric annotations = 3;
+  repeated EventMetric events = 3;
 }
 
 message TimeSeriesMetric {
-  // Metric name, e.g., "speech_probability"
   int32 label = 1;
-  // optional participant identity
-  string participant_identity = 2;
-  // optional track sid
-  string track_sid = 3;
-  // if track_sid is set, timestamp represents the RTP timestamp
+  int32 participant_identity = 2;
+  optional int32 track_sid = 3;
   int64 start_timestamp = 4; // samples
-  // if track_sid is set, timestamp represents the RTP timestamp
   int64 end_timestamp = 5;
   // list of samples between start_timestamp and end_timestamp
   repeated MetricSample samples = 6;
@@ -63,17 +50,12 @@ message MetricSample {
   float value = 2;
 }
 
-message AnnotationMetric {
+message EventMetric {
   // Metric name e.g "assistant_interrupted", "speaking"
   int32 label = 1;
-  // optional participant identity
-  string participant_identity = 2;
-  // optional track sid
-  string track_sid = 3;
-  // if track_sid is set, timestamp represents the RTP timestamp
+  int32 participant_identity = 2;
+  optional int32 track_sid = 3;
   int64 start_timestamp = 4;
-  // optional end timestamp (set to 0 if none)
-  int64 end_timestamp = 5;
-  // optional metadata
+  optional int64 end_timestamp = 5;
   string metadata = 6;
 }
