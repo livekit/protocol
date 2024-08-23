@@ -181,6 +181,7 @@ message JoinResponse {
   ServerInfo server_info = 12;
   // Server-Injected-Frame byte trailer, used to identify unencrypted frames when e2ee is enabled
   bytes sif_trailer = 13;
+  EnabledCodec enabled_publish_codec = 14;
 }
 
 message ReconnectResponse {
@@ -442,4 +443,8 @@ message RequestResponse {
 
 message TrackSubscribed {
   string track_sid = 1;
+}
+
+message EnabledCodec {
+  repeated Codec videos = 1;
 }
