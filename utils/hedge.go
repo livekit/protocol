@@ -67,7 +67,7 @@ func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err erro
 			}
 
 			err = multierr.Append(err, res.err)
-			if params.IsRecoverable != nil && res.err != nil && !params.IsRecoverable(res.err) {
+			if params.IsRecoverable != nil && !params.IsRecoverable(res.err) {
 				return
 			}
 			if done++; done == params.MaxAttempts {
