@@ -1692,7 +1692,8 @@ type TrackInfo struct {
 	Stream        string              `protobuf:"bytes,17,opt,name=stream,proto3" json:"stream,omitempty"`
 	Version       *TimedVersion       `protobuf:"bytes,18,opt,name=version,proto3" json:"version,omitempty"`
 	AudioFeatures []AudioTrackFeature `protobuf:"varint,19,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
-	PublishedAt   int64               `protobuf:"varint,20,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
+	// server time when the track was published, in milliseconds
+	PublishedAt int64 `protobuf:"varint,20,opt,name=published_at,json=publishedAt,proto3" json:"published_at,omitempty"`
 }
 
 func (x *TrackInfo) Reset() {
