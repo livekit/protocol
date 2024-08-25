@@ -193,6 +193,7 @@ message TrackInfo {
   string stream = 17;
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
+  int64 published_at = 20;
 }
 
 enum VideoQuality {
