@@ -78,6 +78,8 @@ type ClaimGrants struct {
 	Metadata string `json:"metadata,omitempty"`
 	// Key/value attributes to attach to the participant
 	Attributes map[string]string `json:"attributes,omitempty"`
+	// if a participant can subscribe to metrics
+	CanSubscribeMetrics *bool `json:"canSubscribeMetrics,omitempty"`
 }
 
 func (c *ClaimGrants) SetParticipantKind(kind livekit.ParticipantInfo_Kind) {
