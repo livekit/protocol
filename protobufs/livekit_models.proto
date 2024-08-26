@@ -90,8 +90,10 @@ message ParticipantPermission {
   // indicates that participant is an agent
   // deprecated: use ParticipantInfo.kind instead
   bool agent = 11 [deprecated=true];
+  // if a participant can subscribe to metrics
+  bool can_subscribe_metrics = 12;
 
-  // NEXT_ID: 12
+  // NEXT_ID: 13
 }
 
 message ParticipantInfo {

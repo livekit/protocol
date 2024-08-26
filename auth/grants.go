@@ -23,50 +23,6 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-type VideoGrant struct {
-	// actions on rooms
-	RoomCreate bool `json:"roomCreate,omitempty"`
-	RoomList   bool `json:"roomList,omitempty"`
-	RoomRecord bool `json:"roomRecord,omitempty"`
-
-	// actions on a particular room
-	RoomAdmin bool   `json:"roomAdmin,omitempty"`
-	RoomJoin  bool   `json:"roomJoin,omitempty"`
-	Room      string `json:"room,omitempty"`
-	// Name of the room configuration to apply to the room if created
-	RoomConfiguration string `json:"roomConfiguration,omitempty"`
-
-	// permissions within a room, if none of the permissions are set explicitly
-	// it will be granted with all publish and subscribe permissions
-	CanPublish     *bool `json:"canPublish,omitempty"`
-	CanSubscribe   *bool `json:"canSubscribe,omitempty"`
-	CanPublishData *bool `json:"canPublishData,omitempty"`
-	// TrackSource types that a participant may publish.
-	// When set, it supersedes CanPublish. Only sources explicitly set here can be published
-	CanPublishSources []string `json:"canPublishSources,omitempty"` // keys keep track of each source
-	// by default, a participant is not allowed to update its own metadata
-	CanUpdateOwnMetadata *bool `json:"canUpdateOwnMetadata,omitempty"`
-
-	// actions on ingresses
-	IngressAdmin bool `json:"ingressAdmin,omitempty"` // applies to all ingress
-
-	// participant is not visible to other participants
-	Hidden bool `json:"hidden,omitempty"`
-	// indicates to the room that current participant is a recorder
-	Recorder bool `json:"recorder,omitempty"`
-	// indicates that the holder can register as an Agent framework worker
-	// it is also set on all participants that are joining as Agent
-	Agent bool `json:"agent,omitempty"`
-}
-
-type SIPGrant struct {
-	// Admin grants access to all SIP features.
-	Admin bool `json:"admin,omitempty"`
-
-	// Call allows making outbound SIP calls.
-	Call bool `json:"call,omitempty"`
-}
-
 type ClaimGrants struct {
 	Identity string      `json:"-"`
 	Name     string      `json:"name,omitempty"`
@@ -101,6 +57,47 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	return &clone
 }
 
+// -------------------------------------------------------------
+
+type VideoGrant struct {
+	// actions on rooms
+	RoomCreate bool `json:"roomCreate,omitempty"`
+	RoomList   bool `json:"roomList,omitempty"`
+	RoomRecord bool `json:"roomRecord,omitempty"`
+
+	// actions on a particular room
+	RoomAdmin bool   `json:"roomAdmin,omitempty"`
+	RoomJoin  bool   `json:"roomJoin,omitempty"`
+	Room      string `json:"room,omitempty"`
+	// Name of the room configuration to apply to the room if created
+	RoomConfiguration string `json:"roomConfiguration,omitempty"`
+
+	// permissions within a room, if none of the permissions are set explicitly
+	// it will be granted with all publish and subscribe permissions
+	CanPublish     *bool `json:"canPublish,omitempty"`
+	CanSubscribe   *bool `json:"canSubscribe,omitempty"`
+	CanPublishData *bool `json:"canPublishData,omitempty"`
+	// TrackSource types that a participant may publish.
+	// When set, it supersedes CanPublish. Only sources explicitly set here can be published
+	CanPublishSources []string `json:"canPublishSources,omitempty"` // keys keep track of each source
+	// by default, a participant is not allowed to update its own metadata
+	CanUpdateOwnMetadata *bool `json:"canUpdateOwnMetadata,omitempty"`
+
+	// actions on ingresses
+	IngressAdmin bool `json:"ingressAdmin,omitempty"` // applies to all ingress
+
+	// participant is not visible to other participants
+	Hidden bool `json:"hidden,omitempty"`
+	// indicates to the room that current participant is a recorder
+	Recorder bool `json:"recorder,omitempty"`
+	// indicates that the holder can register as an Agent framework worker
+	// it is also set on all participants that are joining as Agent
+	Agent bool `json:"agent,omitempty"`
+
+	// if a participant can subscribe to metrics
+	CanSubscribeMetrics *bool `json:"canSubscribeMetrics,omitempty"`
+}
+
 func (v *VideoGrant) SetCanPublish(val bool) {
 	v.CanPublish = &val
 }
@@ -122,6 +119,10 @@ func (v *VideoGrant) SetCanPublishSources(sources []livekit.TrackSource) {
 
 func (v *VideoGrant) SetCanUpdateOwnMetadata(val bool) {
 	v.CanUpdateOwnMetadata = &val
+}
+
+func (v *VideoGrant) SetCanSubscribeMetrics(val bool) {
+	v.CanSubscribeMetrics = &val
 }
 
 func (v *VideoGrant) GetCanPublish() bool {
@@ -181,6 +182,13 @@ func (v *VideoGrant) GetCanUpdateOwnMetadata() bool {
 	return *v.CanUpdateOwnMetadata
 }
 
+func (v *VideoGrant) GetCanSubscribeMetrics() bool {
+	if v.CanSubscribeMetrics == nil {
+		return false
+	}
+	return *v.CanSubscribeMetrics
+}
+
 func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission) bool {
 	if permission == nil {
 		return false
@@ -210,6 +218,9 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
 		return false
 	}
+	if v.GetCanSubscribeMetrics() != permission.CanSubscribeMetrics {
+		return false
+	}
 
 	return true
 }
@@ -227,20 +238,21 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
 	v.Agent = permission.Agent
+	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 }
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
-	pp := &livekit.ParticipantPermission{
-		CanPublish:        v.GetCanPublish(),
-		CanPublishData:    v.GetCanPublishData(),
-		CanSubscribe:      v.GetCanSubscribe(),
-		CanPublishSources: v.GetCanPublishSources(),
-		CanUpdateMetadata: v.GetCanUpdateOwnMetadata(),
-		Hidden:            v.Hidden,
-		Recorder:          v.Recorder,
-		Agent:             v.Agent,
+	return &livekit.ParticipantPermission{
+		CanPublish:          v.GetCanPublish(),
+		CanPublishData:      v.GetCanPublishData(),
+		CanSubscribe:        v.GetCanSubscribe(),
+		CanPublishSources:   v.GetCanPublishSources(),
+		CanUpdateMetadata:   v.GetCanUpdateOwnMetadata(),
+		Hidden:              v.Hidden,
+		Recorder:            v.Recorder,
+		Agent:               v.Agent,
+		CanSubscribeMetrics: v.GetCanSubscribeMetrics(),
 	}
-	return pp
 }
 
 func (v *VideoGrant) Clone() *VideoGrant {
@@ -278,6 +290,16 @@ func (v *VideoGrant) Clone() *VideoGrant {
 	return &clone
 }
 
+// ----------------------------------------------------------------
+
+type SIPGrant struct {
+	// Admin grants access to all SIP features.
+	Admin bool `json:"admin,omitempty"`
+
+	// Call allows making outbound SIP calls.
+	Call bool `json:"call,omitempty"`
+}
+
 func (s *SIPGrant) Clone() *SIPGrant {
 	if s == nil {
 		return nil
@@ -287,6 +309,8 @@ func (s *SIPGrant) Clone() *SIPGrant {
 
 	return &clone
 }
+
+// ------------------------------------------------------------------
 
 func sourceToString(source livekit.TrackSource) string {
 	return strings.ToLower(source.String())
