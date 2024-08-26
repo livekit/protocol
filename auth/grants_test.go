@@ -37,13 +37,11 @@ func TestGrants(t *testing.T) {
 	})
 
 	t.Run("clone nil video", func(t *testing.T) {
-		fa := false
 		grants := &ClaimGrants{
-			Identity:            "identity",
-			Name:                "name",
-			Sha256:              "sha256",
-			Metadata:            "metadata",
-			CanSubscribeMetrics: &fa,
+			Identity: "identity",
+			Name:     "name",
+			Sha256:   "sha256",
+			Metadata: "metadata",
 		}
 		clone := grants.Clone()
 		require.NotSame(t, grants, clone)
@@ -56,26 +54,26 @@ func TestGrants(t *testing.T) {
 		tr := true
 		fa := false
 		video := &VideoGrant{
-			RoomCreate:     true,
-			RoomList:       false,
-			RoomRecord:     true,
-			RoomAdmin:      false,
-			RoomJoin:       true,
-			Room:           "room",
-			CanPublish:     &tr,
-			CanSubscribe:   &fa,
-			CanPublishData: nil,
-			Hidden:         true,
-			Recorder:       false,
+			RoomCreate:          true,
+			RoomList:            false,
+			RoomRecord:          true,
+			RoomAdmin:           false,
+			RoomJoin:            true,
+			Room:                "room",
+			CanPublish:          &tr,
+			CanSubscribe:        &fa,
+			CanPublishData:      nil,
+			Hidden:              true,
+			Recorder:            false,
+			CanSubscribeMetrics: &tr,
 		}
 		grants := &ClaimGrants{
-			Identity:            "identity",
-			Name:                "name",
-			Kind:                "kind",
-			Video:               video,
-			Sha256:              "sha256",
-			Metadata:            "metadata",
-			CanSubscribeMetrics: &tr,
+			Identity: "identity",
+			Name:     "name",
+			Kind:     "kind",
+			Video:    video,
+			Sha256:   "sha256",
+			Metadata: "metadata",
 		}
 		clone := grants.Clone()
 		require.NotSame(t, grants, clone)

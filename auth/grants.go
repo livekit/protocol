@@ -23,6 +23,42 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
+type ClaimGrants struct {
+	Identity string      `json:"-"`
+	Name     string      `json:"name,omitempty"`
+	Kind     string      `json:"kind,omitempty"`
+	Video    *VideoGrant `json:"video,omitempty"`
+	SIP      *SIPGrant   `json:"sip,omitempty"`
+	// for verifying integrity of the message body
+	Sha256   string `json:"sha256,omitempty"`
+	Metadata string `json:"metadata,omitempty"`
+	// Key/value attributes to attach to the participant
+	Attributes map[string]string `json:"attributes,omitempty"`
+}
+
+func (c *ClaimGrants) SetParticipantKind(kind livekit.ParticipantInfo_Kind) {
+	c.Kind = kindFromProto(kind)
+}
+
+func (c *ClaimGrants) GetParticipantKind() livekit.ParticipantInfo_Kind {
+	return kindToProto(c.Kind)
+}
+
+func (c *ClaimGrants) Clone() *ClaimGrants {
+	if c == nil {
+		return nil
+	}
+
+	clone := *c
+	clone.Video = c.Video.Clone()
+	clone.SIP = c.SIP.Clone()
+	clone.Attributes = maps.Clone(c.Attributes)
+
+	return &clone
+}
+
+// -------------------------------------------------------------
+
 type VideoGrant struct {
 	// actions on rooms
 	RoomCreate bool `json:"roomCreate,omitempty"`
@@ -57,50 +93,9 @@ type VideoGrant struct {
 	// indicates that the holder can register as an Agent framework worker
 	// it is also set on all participants that are joining as Agent
 	Agent bool `json:"agent,omitempty"`
-}
 
-type SIPGrant struct {
-	// Admin grants access to all SIP features.
-	Admin bool `json:"admin,omitempty"`
-
-	// Call allows making outbound SIP calls.
-	Call bool `json:"call,omitempty"`
-}
-
-type ClaimGrants struct {
-	Identity string      `json:"-"`
-	Name     string      `json:"name,omitempty"`
-	Kind     string      `json:"kind,omitempty"`
-	Video    *VideoGrant `json:"video,omitempty"`
-	SIP      *SIPGrant   `json:"sip,omitempty"`
-	// for verifying integrity of the message body
-	Sha256   string `json:"sha256,omitempty"`
-	Metadata string `json:"metadata,omitempty"`
-	// Key/value attributes to attach to the participant
-	Attributes map[string]string `json:"attributes,omitempty"`
 	// if a participant can subscribe to metrics
 	CanSubscribeMetrics *bool `json:"canSubscribeMetrics,omitempty"`
-}
-
-func (c *ClaimGrants) SetParticipantKind(kind livekit.ParticipantInfo_Kind) {
-	c.Kind = kindFromProto(kind)
-}
-
-func (c *ClaimGrants) GetParticipantKind() livekit.ParticipantInfo_Kind {
-	return kindToProto(c.Kind)
-}
-
-func (c *ClaimGrants) Clone() *ClaimGrants {
-	if c == nil {
-		return nil
-	}
-
-	clone := *c
-	clone.Video = c.Video.Clone()
-	clone.SIP = c.SIP.Clone()
-	clone.Attributes = maps.Clone(c.Attributes)
-
-	return &clone
 }
 
 func (v *VideoGrant) SetCanPublish(val bool) {
@@ -124,6 +119,10 @@ func (v *VideoGrant) SetCanPublishSources(sources []livekit.TrackSource) {
 
 func (v *VideoGrant) SetCanUpdateOwnMetadata(val bool) {
 	v.CanUpdateOwnMetadata = &val
+}
+
+func (v *VideoGrant) SetCanSubscribeMetrics(val bool) {
+	v.CanSubscribeMetrics = &val
 }
 
 func (v *VideoGrant) GetCanPublish() bool {
@@ -183,6 +182,13 @@ func (v *VideoGrant) GetCanUpdateOwnMetadata() bool {
 	return *v.CanUpdateOwnMetadata
 }
 
+func (v *VideoGrant) GetCanSubscribeMetrics() bool {
+	if v.CanSubscribeMetrics == nil {
+		return false
+	}
+	return *v.CanSubscribeMetrics
+}
+
 func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission) bool {
 	if permission == nil {
 		return false
@@ -212,6 +218,9 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if !slices.Equal(v.GetCanPublishSources(), permission.CanPublishSources) {
 		return false
 	}
+	if v.GetCanSubscribeMetrics() != permission.CanSubscribeMetrics {
+		return false
+	}
 
 	return true
 }
@@ -229,20 +238,21 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.Hidden = permission.Hidden
 	v.Recorder = permission.Recorder
 	v.Agent = permission.Agent
+	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
 }
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
-	pp := &livekit.ParticipantPermission{
-		CanPublish:        v.GetCanPublish(),
-		CanPublishData:    v.GetCanPublishData(),
-		CanSubscribe:      v.GetCanSubscribe(),
-		CanPublishSources: v.GetCanPublishSources(),
-		CanUpdateMetadata: v.GetCanUpdateOwnMetadata(),
-		Hidden:            v.Hidden,
-		Recorder:          v.Recorder,
-		Agent:             v.Agent,
+	return &livekit.ParticipantPermission{
+		CanPublish:          v.GetCanPublish(),
+		CanPublishData:      v.GetCanPublishData(),
+		CanSubscribe:        v.GetCanSubscribe(),
+		CanPublishSources:   v.GetCanPublishSources(),
+		CanUpdateMetadata:   v.GetCanUpdateOwnMetadata(),
+		Hidden:              v.Hidden,
+		Recorder:            v.Recorder,
+		Agent:               v.Agent,
+		CanSubscribeMetrics: v.GetCanSubscribeMetrics(),
 	}
-	return pp
 }
 
 func (v *VideoGrant) Clone() *VideoGrant {
@@ -280,6 +290,16 @@ func (v *VideoGrant) Clone() *VideoGrant {
 	return &clone
 }
 
+// ----------------------------------------------------------------
+
+type SIPGrant struct {
+	// Admin grants access to all SIP features.
+	Admin bool `json:"admin,omitempty"`
+
+	// Call allows making outbound SIP calls.
+	Call bool `json:"call,omitempty"`
+}
+
 func (s *SIPGrant) Clone() *SIPGrant {
 	if s == nil {
 		return nil
@@ -289,6 +309,8 @@ func (s *SIPGrant) Clone() *SIPGrant {
 
 	return &clone
 }
+
+// ------------------------------------------------------------------
 
 func sourceToString(source livekit.TrackSource) string {
 	return strings.ToLower(source.String())
