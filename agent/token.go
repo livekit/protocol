@@ -17,6 +17,7 @@ func BuildAgentToken(apiKey, secret, roomName, participantIdentity, participantN
 		CanPublishData:       &permissions.CanPublishData,
 		Hidden:               permissions.Hidden,
 		CanUpdateOwnMetadata: &permissions.CanUpdateMetadata,
+		CanSubscribeMetrics:  &permissions.CanSubscribeMetrics,
 	}
 
 	at := auth.NewAccessToken(apiKey, secret).
