@@ -182,6 +182,8 @@ message JoinResponse {
   // Server-Injected-Frame byte trailer, used to identify unencrypted frames when e2ee is enabled
   bytes sif_trailer = 13;
   repeated Codec enabled_publish_codecs = 14;
+  // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
+  bool fast_publish = 15;
 }
 
 message ReconnectResponse {
