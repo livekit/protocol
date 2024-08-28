@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.20.1
+
+### Patch Changes
+
+- Add EnabledCodecs to JoinResponse - [#791](https://github.com/livekit/protocol/pull/791) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Add fast_publish option to JoinResponse - [#796](https://github.com/livekit/protocol/pull/796) ([@cnderrauber](https://github.com/cnderrauber))
+
 ## 1.20.0
 
 ### Minor Changes
