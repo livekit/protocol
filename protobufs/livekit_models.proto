@@ -335,6 +335,8 @@ message ClientInfo {
      RUST = 8;
      PYTHON = 9;
      CPP = 10;
+     UNITY_WEB = 11;
+     NODE = 12;
   }
 
   SDK sdk = 1;
