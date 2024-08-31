@@ -58,9 +58,11 @@ func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
 	// In all these cases, prefer pin-protected rules and rules for specific calling number.
 	// Thus, the order will be the following:
 	// - 0: Direct or Pin (both pin-protected)
-	// - 1: Individual (pin-protected)
+	// - 1: Caller, aka Individual (pin-protected)
+	// - 2: Callee (pin-protected)
 	// - 100: Direct (open)
-	// - 101: Individual (open)
+	// - 101: Caller, aka Individual (open)
+	// - 102: Callee (open)
 	// Also, add 1K penalty for not specifying the calling number.
 	const (
 		last = math.MaxInt32
@@ -81,6 +83,12 @@ func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
 			priority = 1
 		} else {
 			priority = 101
+		}
+	case *livekit.SIPDispatchRule_DispatchRuleCallee:
+		if rule.DispatchRuleCallee.GetPin() != "" {
+			priority = 2
+		} else {
+			priority = 102
 		}
 	}
 	if len(info.InboundNumbers) == 0 {
@@ -180,6 +188,9 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	case *livekit.SIPDispatchRule_DispatchRuleIndividual:
 		pin = rule.DispatchRuleIndividual.GetPin()
 		room = rule.DispatchRuleIndividual.GetRoomPrefix()
+	case *livekit.SIPDispatchRule_DispatchRuleCallee:
+		pin = rule.DispatchRuleCallee.GetPin()
+		room = rule.DispatchRuleCallee.GetRoomPrefix()
 	}
 	return room, pin, nil
 }
@@ -426,6 +437,7 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 	attrs[livekit.AttrSIPCallID] = req.SipCallId
 	attrs[livekit.AttrSIPTrunkID] = trunkID
 
+	to := req.CalledNumber
 	from := req.CallingNumber
 	fromName := "Phone " + req.CallingNumber
 	fromID := "sip_" + req.CallingNumber
@@ -467,9 +479,18 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 	}
 	switch rule := rule.GetRule().GetRule().(type) {
 	case *livekit.SIPDispatchRule_DispatchRuleIndividual:
+		// TODO: Remove "_" if the prefix is empty for consistency with Callee dispatch rule.
 		// TODO: Do we need to escape specific characters in the number?
 		// TODO: Include actual SIP call ID in the room name?
 		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, guid.New(""))
+	case *livekit.SIPDispatchRule_DispatchRuleCallee:
+		room = to
+		if pref := rule.DispatchRuleCallee.GetRoomPrefix(); pref != "" {
+			room = pref + "_" + to
+		}
+		if rule.DispatchRuleCallee.Randomize {
+			room += "_" + guid.New("")
+		}
 	}
 	attrs[livekit.AttrSIPDispatchRuleID] = rule.SipDispatchRuleId
 	return &rpc.EvaluateSIPDispatchRulesResponse{

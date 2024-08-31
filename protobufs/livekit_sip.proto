@@ -251,6 +251,17 @@ message SIPDispatchRuleIndividual {
   string pin = 2;
 }
 
+message SIPDispatchRuleCallee {
+  // Prefix used on new room name
+  string room_prefix = 1;
+
+  // Optional pin required to enter room
+  string pin = 2;
+
+  // Optionally append random suffix
+  bool randomize = 3;
+}
+
 message SIPDispatchRule {
   oneof rule {
     // SIPDispatchRuleDirect is a `SIP Dispatch Rule` that puts a user directly into a room
@@ -260,6 +271,9 @@ message SIPDispatchRule {
 
     // SIPDispatchRuleIndividual is a `SIP Dispatch Rule` that creates a new room for each caller.
     SIPDispatchRuleIndividual dispatch_rule_individual = 2;
+
+    // SIPDispatchRuleCallee is a `SIP Dispatch Rule` that creates a new room for each callee.
+    SIPDispatchRuleCallee dispatch_rule_callee = 3;
   }
 }
 
