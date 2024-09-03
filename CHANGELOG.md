@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.21.0
+
+### Minor Changes
+
+- Add Callee dispatch rule type for SIP. - [#798](https://github.com/livekit/protocol/pull/798) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add SDK values for Unity-Web and NodeJS. - [#797](https://github.com/livekit/protocol/pull/797) ([@bcherry](https://github.com/bcherry))
+
 ## 1.20.1
 
 ### Patch Changes
