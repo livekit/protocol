@@ -16,10 +16,13 @@ package utils
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"go.uber.org/multierr"
 )
+
+var ErrMaxAttemptsReached = errors.New("max attempts reached")
 
 type HedgeParams[T any] struct {
 	Timeout       time.Duration
@@ -47,7 +50,7 @@ func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err erro
 		ch <- result{value, err}
 	}
 
-	var attempt int
+	var attempt, done int
 	delay := time.NewTimer(0)
 	defer delay.Stop()
 
@@ -59,10 +62,18 @@ func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err erro
 				delay.Reset(params.RetryDelay)
 			}
 		case res := <-ch:
-			if res.err == nil || params.IsRecoverable == nil || !params.IsRecoverable(res.err) {
-				return res.value, res.err
+			if res.err == nil {
+				return res.value, nil
 			}
+
 			err = multierr.Append(err, res.err)
+			if params.IsRecoverable != nil && !params.IsRecoverable(res.err) {
+				return
+			}
+			if done++; done == params.MaxAttempts {
+				err = multierr.Append(err, ErrMaxAttemptsReached)
+				return
+			}
 		case <-ctx.Done():
 			err = multierr.Append(err, ctx.Err())
 			return

@@ -19,33 +19,18 @@ package rpc;
 option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
-import "livekit_internal.proto";
-import "livekit_rtc.proto";
+import "livekit_models.proto";
+import "livekit_room.proto";
 
-service Signal {
-  rpc RelaySignal(rpc.RelaySignalRequest) returns (rpc.RelaySignalResponse) {
+service RoomManager {
+  rpc CreateRoom(livekit.CreateRoomRequest) returns (livekit.Room) {
     option (psrpc.options) = {
-      stream: true
       topics: true
       topic_params: {
         group: "node"
         names: ["node_id"]
         typed: true
-        single_server: true
       };
     };
   };
-}
-
-message RelaySignalRequest {
-  livekit.StartSession start_session = 1;
-  repeated livekit.SignalRequest requests = 3;
-  uint64 seq = 4;
-  bool close = 5;
-}
-
-message RelaySignalResponse {
-  repeated livekit.SignalResponse responses = 2;
-  uint64 seq = 3;
-  bool close = 4;
 }

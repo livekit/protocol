@@ -17,6 +17,7 @@ package utils
 import (
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -59,6 +60,78 @@ func TestEventEmitter(t *testing.T) {
 
 		o.Stop()
 		require.True(t, closeCalled)
+	})
+
+	t.Run("stop unblocks blocking observers", func(t *testing.T) {
+		observer, emit := NewEventObserver[int](func() {})
+
+		list := NewEventObserverList[int](EventEmitterParams{
+			QueueSize: DefaultEventQueueSize,
+			Blocking:  true,
+		})
+
+		emitter := NewEventEmitter[int, int](EventEmitterParams{
+			QueueSize: DefaultEventQueueSize,
+			Blocking:  true,
+		})
+
+		cases := []struct {
+			label    string
+			emit     func()
+			observer EventObserver[int]
+		}{
+			{
+				label:    "observer",
+				emit:     func() { emit(0) },
+				observer: observer,
+			},
+			{
+				label:    "list",
+				emit:     func() { list.Emit(0) },
+				observer: list.Observe(),
+			},
+			{
+				label:    "emitter",
+				emit:     func() { emitter.Emit(0, 0) },
+				observer: emitter.Observe(0),
+			},
+		}
+
+		for _, c := range cases {
+			t.Run(c.label, func(t *testing.T) {
+				emitDone := make(chan struct{})
+				stopDone := make(chan struct{})
+				ready := make(chan struct{})
+
+				go func() {
+					for i := 0; i < DefaultEventQueueSize; i++ {
+						c.emit()
+					}
+					close(ready)
+					c.emit()
+					close(emitDone)
+				}()
+
+				go func() {
+					<-ready
+					time.Sleep(100 * time.Millisecond)
+					c.observer.Stop()
+					close(stopDone)
+				}()
+
+				select {
+				case <-emitDone:
+				case <-time.After(time.Second):
+					require.FailNow(t, "timeout waiting for emit to unblock")
+				}
+
+				select {
+				case <-stopDone:
+				case <-time.After(time.Second):
+					require.FailNow(t, "timeout waiting for stop to unblock")
+				}
+			})
+		}
 	})
 }
 

@@ -21,6 +21,8 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
 
+import "livekit_metrics.proto";
+
 message Room {
   string sid = 1;
   string name = 2;
@@ -88,8 +90,10 @@ message ParticipantPermission {
   // indicates that participant is an agent
   // deprecated: use ParticipantInfo.kind instead
   bool agent = 11 [deprecated=true];
+  // if a participant can subscribe to metrics
+  bool can_subscribe_metrics = 12;
 
-  // NEXT_ID: 12
+  // NEXT_ID: 13
 }
 
 message ParticipantInfo {
@@ -131,6 +135,7 @@ message ParticipantInfo {
   bool is_publisher = 13;
   Kind kind = 14;
   map<string, string> attributes = 15;
+  DisconnectReason disconnect_reason = 16;
 }
 
 enum TrackType {
@@ -226,7 +231,8 @@ message DataPacket {
     ActiveSpeakerUpdate speaker = 3 [deprecated=true];
     SipDTMF sip_dtmf = 6;
     Transcription transcription = 7;
-    ChatMessage chat_message = 8;
+    MetricsBatch metrics = 8;
+    ChatMessage chat_message = 9;
   }
   // NEXT_ID: 9
 }
@@ -338,6 +344,8 @@ message ClientInfo {
      RUST = 8;
      PYTHON = 9;
      CPP = 10;
+     UNITY_WEB = 11;
+     NODE = 12;
   }
 
   SDK sdk = 1;

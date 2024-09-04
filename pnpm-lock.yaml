@@ -18,11 +18,11 @@ importers:
   packages/javascript:
     dependencies:
       '@bufbuild/protobuf':
-        specifier: ^1.7.2
+        specifier: ^1.10.0
         version: 1.10.0
     devDependencies:
       '@bufbuild/protoc-gen-es':
-        specifier: ^1.7.2
+        specifier: ^1.10.0
         version: 1.10.0(@bufbuild/protobuf@1.10.0)
       genversion:
         specifier: ^3.2.0

@@ -54,17 +54,18 @@ func TestGrants(t *testing.T) {
 		tr := true
 		fa := false
 		video := &VideoGrant{
-			RoomCreate:     true,
-			RoomList:       false,
-			RoomRecord:     true,
-			RoomAdmin:      false,
-			RoomJoin:       true,
-			Room:           "room",
-			CanPublish:     &tr,
-			CanSubscribe:   &fa,
-			CanPublishData: nil,
-			Hidden:         true,
-			Recorder:       false,
+			RoomCreate:          true,
+			RoomList:            false,
+			RoomRecord:          true,
+			RoomAdmin:           false,
+			RoomJoin:            true,
+			Room:                "room",
+			CanPublish:          &tr,
+			CanSubscribe:        &fa,
+			CanPublishData:      nil,
+			Hidden:              true,
+			Recorder:            false,
+			CanSubscribeMetrics: &tr,
 		}
 		grants := &ClaimGrants{
 			Identity: "identity",

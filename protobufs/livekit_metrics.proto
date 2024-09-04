@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+
+/*
+  Protocol used to record metrics for a specific session.
+
+  Clients send their timestamp in their own monotonically increasing time (e.g `performance.now` on JS).
+  These timestamps are then converted by the SFU to align with the session's timeline, relative to the session start time.
+  (at receive time)
+
+  A metric can be linked to a specific track by setting `track_sid`.
+*/
+
+
+// index from [0; 512] are for predefined labels (`MetricLabel`)
+enum MetricLabel {
+  AGENTS_LLM_TTFT = 0; // time to first token from LLM
+  AGENTS_STT_TTFT = 1; // time to final transcription
+  AGENTS_TTS_TTFB = 2; // time to first byte
+
+  METRIC_LABEL_MAX_VALUE = 512;
+}
+
+message MetricsBatch {
+  // To avoid repeating string values, we store them in a separate list and reference them by index
+  // This is useful for storing participant identities, track names, etc.
+  // There is also a predefined list of labels that can be used to reference common metrics.
+  // They have reserved indices from 0 to 512
+  repeated string str_data = 1;
+  repeated TimeSeriesMetric time_series = 2;
+  repeated EventMetric events = 3;
+}
+
+message TimeSeriesMetric {
+  // Metric name e.g "speech_probablity". The string value is not directly stored in the message, but referenced by index
+  // in the `str_data` field of `MetricsBatch`
+  uint32 label = 1;
+  uint32 participant_identity = 2;
+  uint32 track_sid = 3;
+  int64 start_timestamp = 4; // samples
+  int64 end_timestamp = 5;
+  // list of samples between start_timestamp and end_timestamp
+  repeated MetricSample samples = 6;
+}
+
+message MetricSample {
+  int64 timestamp = 1;
+  float value = 2;
+}
+
+message EventMetric {
+  uint32 label = 1;
+  uint32 participant_identity = 2;
+  uint32 track_sid = 3; // 0 =
+  int64 start_timestamp = 4;
+  optional int64 end_timestamp = 5;
+  string metadata = 6;
+}
