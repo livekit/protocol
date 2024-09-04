@@ -232,6 +232,7 @@ message DataPacket {
     SipDTMF sip_dtmf = 6;
     Transcription transcription = 7;
     MetricsBatch metrics = 8;
+    ChatMessage chat_message = 9;
   }
   // NEXT_ID: 9
 }
@@ -290,6 +291,14 @@ message TranscriptionSegment {
   uint64 end_time = 4;
   bool final = 5;
   string language = 6;
+}
+
+message ChatMessage {
+  string id = 1; // uuid
+  int64 timestamp = 2;
+  optional int64 edit_timestamp = 3; // populated only if the intent is to edit/update an existing message
+  string message = 4;
+  bool deleted = 5; // true to remove message
 }
 
 enum ConnectionQuality {
