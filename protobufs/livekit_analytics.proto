@@ -54,6 +54,7 @@ message AnalyticsStream {
   repeated AnalyticsVideoLayer video_layers = 15;
   google.protobuf.Timestamp start_time = 17;
   google.protobuf.Timestamp end_time = 18;
+  uint32 packets_out_of_order = 19;
 }
 
 message AnalyticsStat {
