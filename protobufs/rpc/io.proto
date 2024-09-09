@@ -93,11 +93,15 @@ message GetSIPTrunkAuthenticationResponse {
   bool   drop = 3;
   // Trunk used to fulfill this request
   string sip_trunk_id = 4;
+  // Used in Cloud only
+  string project_id = 5;
 }
 
 message EvaluateSIPDispatchRulesRequest {
   string sip_call_id = 8;
   string sip_participant_id = 1 [deprecated=true];
+  // Trunk from the auth response, if any
+  string sip_trunk_id = 10;
 
   // What Number is calling
   string calling_number = 2;
@@ -121,7 +125,7 @@ message EvaluateSIPDispatchRulesRequest {
   // Usually include provider-specific metadata.
   map<string, string> extra_attributes = 9;
 
-  // NEXT ID: 10
+  // NEXT ID: 11
 }
 
 message EvaluateSIPDispatchRulesResponse {
@@ -151,7 +155,15 @@ message EvaluateSIPDispatchRulesResponse {
   string sip_trunk_id = 9;
   // Dispatch Rule used to fulfill this request
   string sip_dispatch_rule_id = 10;
-  // NEXT ID: 12
+
+  // Used in Cloud only
+  string project_id = 12;
+
+  // Include these SIP X-* headers in 200 OK response.
+  map<string, string> headers = 13;
+  // Map SIP X-* headers from INVITE to SIP participant attributes.
+  map<string, string> headers_to_attributes = 14;
+  // NEXT ID: 15
 }
 
 enum SIPDispatchResult {

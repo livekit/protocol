@@ -52,6 +52,8 @@ service SIP {
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
   rpc CreateSIPOutboundTrunk(CreateSIPOutboundTrunkRequest) returns (SIPOutboundTrunkInfo);
+  rpc GetSIPInboundTrunk(GetSIPInboundTrunkRequest) returns (GetSIPInboundTrunkResponse);
+  rpc GetSIPOutboundTrunk(GetSIPOutboundTrunkRequest) returns (GetSIPOutboundTrunkResponse);
   rpc ListSIPInboundTrunk(ListSIPInboundTrunkRequest) returns (ListSIPInboundTrunkResponse);
   rpc ListSIPOutboundTrunk(ListSIPOutboundTrunkRequest) returns (ListSIPOutboundTrunkResponse);
   rpc DeleteSIPTrunk(DeleteSIPTrunkRequest) returns (SIPTrunkInfo);
@@ -178,6 +180,11 @@ message SIPInboundTrunkInfo {
   // May be empty to have no authentication.
   string auth_username = 7;
   string auth_password = 8;
+
+  // Include these SIP X-* headers in 200 OK responses.
+  map<string, string> headers = 9;
+  // Map SIP X-* headers from INVITE to SIP participant attributes.
+  map<string, string> headers_to_attributes = 10;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -206,6 +213,27 @@ message SIPOutboundTrunkInfo {
   // May be empty to have no authentication.
   string auth_username = 7;
   string auth_password = 8;
+
+  // Include these SIP X-* headers in INVITE request.
+  map<string, string> headers = 9;
+  // Map SIP X-* headers from 200 OK to SIP participant attributes.
+  map<string, string> headers_to_attributes = 10;
+}
+
+message GetSIPInboundTrunkRequest {
+  string sip_trunk_id = 1;
+}
+
+message GetSIPInboundTrunkResponse {
+  SIPInboundTrunkInfo trunk = 1;
+}
+
+message GetSIPOutboundTrunkRequest {
+  string sip_trunk_id = 1;
+}
+
+message GetSIPOutboundTrunkResponse {
+  SIPOutboundTrunkInfo trunk = 1;
 }
 
 message ListSIPTrunkRequest {
