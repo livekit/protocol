@@ -486,9 +486,26 @@ message RTPStats {
   google.protobuf.Timestamp last_layer_lock_pli = 36;
 
   RTPDrift packet_drift = 44;
-  RTPDrift report_drift = 45;
+  RTPDrift ntp_report_drift = 45;
   RTPDrift rebased_report_drift = 46;
-  // NEXT_ID: 47
+  RTPDrift received_report_drift = 47;
+  // NEXT_ID: 48
+}
+
+message RTCPSenderReportState {
+  uint32 rtp_timestamp = 1;
+  uint64 rtp_timestamp_ext = 2;
+  uint64 ntp_timestamp = 3;
+  int64 at = 4; // time at which this happened
+  int64 at_adjusted = 5;
+  uint32 packets = 6;
+  uint64 octets = 7;
+}
+
+message ReferenceRTCPSenderReportState {
+  RTCPSenderReportState sender_report_state = 1;
+  uint64 timestamp_offset = 2;
+  bool timestamp_offset_valid = 3;
 }
 
 message RTPForwarderState {
@@ -501,6 +518,7 @@ message RTPForwarderState {
   oneof codec_munger {
     VP8MungerState vp8_munger = 7;
   }
+  repeated ReferenceRTCPSenderReportState reference_sender_report_state = 8;
 }
 
 message RTPMungerState {
