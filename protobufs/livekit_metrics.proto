@@ -43,7 +43,6 @@ message TimeSeriesMetric {
   uint32 label = 1;
   uint32 participant_identity = 2;
   uint32 track_sid = 3;
-  // list of samples between start_timestamp and end_timestamp
   repeated MetricSample samples = 4;
 }
 
@@ -56,7 +55,7 @@ message EventMetric {
   uint32 label = 1;
   uint32 participant_identity = 2;
   uint32 track_sid = 3; // 0 =
-  int64 start_timestamp = 4; // time of event based on a monotonic clock
-  optional int64 end_timestamp = 5;
+  int64 start_timestamp = 4; // start time of event based on a monotonic clock
+  optional int64 end_timestamp = 5; // end time of event based on a monotonic clock, if needed
   string metadata = 6;
 }
