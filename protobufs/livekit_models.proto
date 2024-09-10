@@ -502,12 +502,6 @@ message RTCPSenderReportState {
   uint64 octets = 7;
 }
 
-message ReferenceRTCPSenderReportState {
-  RTCPSenderReportState sender_report_state = 1;
-  uint64 timestamp_offset = 2;
-  bool timestamp_offset_valid = 3;
-}
-
 message RTPForwarderState {
   bool started = 1;
   int32 reference_layer_spatial = 2;
@@ -518,7 +512,7 @@ message RTPForwarderState {
   oneof codec_munger {
     VP8MungerState vp8_munger = 7;
   }
-  repeated ReferenceRTCPSenderReportState reference_sender_report_state = 8;
+  repeated RTCPSenderReportState sender_report_state = 8;
 }
 
 message RTPMungerState {
