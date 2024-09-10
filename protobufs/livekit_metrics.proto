@@ -27,7 +27,7 @@ enum MetricLabel {
 }
 
 message MetricsBatch {
-  int64 timestamp = 1; // current time based on some monotonic clock
+  int64 timestamp = 1; // time at which this batch is sent based on a monotonic clock
   // To avoid repeating string values, we store them in a separate list and reference them by index
   // This is useful for storing participant identities, track names, etc.
   // There is also a predefined list of labels that can be used to reference common metrics.
