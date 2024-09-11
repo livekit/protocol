@@ -5,6 +5,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/timestamp.proto";
+
 
 /*
   Protocol used to record metrics for a specific session.
@@ -16,45 +18,49 @@ option ruby_package = "LiveKit::Proto";
 */
 
 
-// index from [0; 512] are for predefined labels (`MetricLabel`)
+// index from [0: MAX_LABEL_PREDEFINED_MAX_VALUE) are for predefined labels (`MetricLabel`)
 enum MetricLabel {
   AGENTS_LLM_TTFT = 0; // time to first token from LLM
   AGENTS_STT_TTFT = 1; // time to final transcription
   AGENTS_TTS_TTFB = 2; // time to first byte
 
-  METRIC_LABEL_MAX_VALUE = 512;
+  METRIC_LABEL_PREDEFINED_MAX_VALUE = 4096;
 }
 
 message MetricsBatch {
-  int64 timestamp = 1; // time at which this batch is sent based on a monotonic clock
+  int64 timestamp_ms = 1; // time at which this batch is sent based on a monotonic clock (millisecond resolution)
+  google.protobuf.Timestamp normalized_timestamp = 2;
   // To avoid repeating string values, we store them in a separate list and reference them by index
   // This is useful for storing participant identities, track names, etc.
   // There is also a predefined list of labels that can be used to reference common metrics.
-  // They have reserved indices from 0 to 512
-  repeated string str_data = 2;
-  repeated TimeSeriesMetric time_series = 3;
-  repeated EventMetric events = 4;
+  // They have reserved indices from 0 to (METRIC_LABEL_PREDEFINED_MAX_VALUE - 1)
+  repeated string str_data = 3;
+  repeated TimeSeriesMetric time_series = 4;
+  repeated EventMetric events = 5;
 }
 
 message TimeSeriesMetric {
   // Metric name e.g "speech_probablity". The string value is not directly stored in the message, but referenced by index
   // in the `str_data` field of `MetricsBatch`
   uint32 label = 1;
-  uint32 participant_identity = 2;
-  uint32 track_sid = 3;
+  uint32 participant_identity = 2; // index into `str_data`
+  uint32 track_sid = 3; // index into `str_data`
   repeated MetricSample samples = 4;
 }
 
 message MetricSample {
-  int64 timestamp = 1; // time of metric based on a monotonic clock
-  float value = 2;
+  int64 timestamp_ms = 1; // time of metric based on a monotonic clock (in milliseconds)
+  google.protobuf.Timestamp normalized_timestamp = 2;
+  float value = 3;
 }
 
 message EventMetric {
   uint32 label = 1;
   uint32 participant_identity = 2;
   uint32 track_sid = 3;
-  int64 start_timestamp = 4; // start time of event based on a monotonic clock
-  optional int64 end_timestamp = 5; // end time of event based on a monotonic clock, if needed
-  string metadata = 6;
+  int64 start_timestamp_ms = 4; // start time of event based on a monotonic clock (in milliseconds)
+  optional int64 end_timestamp_ms = 5; // end time of event based on a monotonic clock (in milliseconds), if needed
+  google.protobuf.Timestamp normalized_start_timestamp = 6;
+  optional google.protobuf.Timestamp normalized_end_timestamp = 7;
+  string metadata = 8;
 }
