@@ -12,7 +12,7 @@ import "google/protobuf/timestamp.proto";
   Protocol used to record metrics for a specific session.
 
   Clients send their timestamp in their own monotonically increasing time (e.g `performance.now` on JS).
-  These timestamps are then converted by the SFU to its time base.
+  These timestamps are then augmented by the SFU to its time base.
 
   A metric can be linked to a specific track by setting `track_sid`.
 */
