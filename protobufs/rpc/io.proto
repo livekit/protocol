@@ -159,9 +159,11 @@ message EvaluateSIPDispatchRulesResponse {
   // Used in Cloud only
   string project_id = 12;
 
-  // Include these SIP X-* headers in 200 OK response.
+  // Include these SIP X-* headers in 200 OK response to INVITE.
+  // These headers are included as-is and may help identify triggered LiveKit Dispatch Rule for the other SIP endpoint.
   map<string, string> headers = 13;
   // Map SIP X-* headers from INVITE to SIP participant attributes.
+  // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 14;
   // NEXT ID: 15
 }

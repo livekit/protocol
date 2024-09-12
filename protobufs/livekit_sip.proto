@@ -215,8 +215,10 @@ message SIPOutboundTrunkInfo {
   string auth_password = 8;
 
   // Include these SIP X-* headers in INVITE request.
+  // These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
   map<string, string> headers = 9;
   // Map SIP X-* headers from 200 OK to SIP participant attributes.
+  // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 10;
 }
 
