@@ -707,9 +707,11 @@ type EvaluateSIPDispatchRulesResponse struct {
 	SipDispatchRuleId string `protobuf:"bytes,10,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`
 	// Used in Cloud only
 	ProjectId string `protobuf:"bytes,12,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	// Include these SIP X-* headers in 200 OK response.
+	// Include these SIP X-* headers in 200 OK response to INVITE.
+	// These headers are included as-is and may help identify triggered LiveKit Dispatch Rule for the other SIP endpoint.
 	Headers map[string]string `protobuf:"bytes,13,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Map SIP X-* headers from INVITE to SIP participant attributes.
+	// Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
 	HeadersToAttributes map[string]string `protobuf:"bytes,14,rep,name=headers_to_attributes,json=headersToAttributes,proto3" json:"headers_to_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // NEXT ID: 15
 }
 

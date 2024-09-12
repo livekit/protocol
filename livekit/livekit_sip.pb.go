@@ -689,8 +689,10 @@ type SIPOutboundTrunkInfo struct {
 	AuthUsername string `protobuf:"bytes,7,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	AuthPassword string `protobuf:"bytes,8,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
 	// Include these SIP X-* headers in INVITE request.
+	// These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
 	Headers map[string]string `protobuf:"bytes,9,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	// Map SIP X-* headers from 200 OK to SIP participant attributes.
+	// Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
 	HeadersToAttributes map[string]string `protobuf:"bytes,10,rep,name=headers_to_attributes,json=headersToAttributes,proto3" json:"headers_to_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 }
 
