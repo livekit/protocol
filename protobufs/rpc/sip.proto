@@ -18,6 +18,7 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
+import "google/protobuf/empty.proto";
 import "options.proto";
 import "livekit_sip.proto";
 
@@ -25,7 +26,16 @@ service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
     option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
-  }
+  };
+  rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        names: ["sip_call_id"]
+        typed: false
+      }
+    };
+  };
 }
 
 message InternalCreateSIPParticipantRequest {
@@ -69,4 +79,8 @@ message InternalCreateSIPParticipantResponse {
   string participant_id = 1;
   string participant_identity = 2;
   string sip_call_id = 3;
+}
+
+message InternalTransferSIPParticipantRequest {
+  string sip_call_id = 1;
 }
