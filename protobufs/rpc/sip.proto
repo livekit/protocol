@@ -29,9 +29,15 @@ service SIPInternal {
 }
 
 message InternalCreateSIPParticipantRequest {
+  // Used in Cloud only
+  string project_id = 18;
+
   string sip_call_id = 13;
-  // IP that SIP INVITE is sent too
+  string sip_trunk_id = 19;
+  // IP or hostname that SIP INVITE is sent too
   string address = 2;
+  // Hostname for the 'From' SIP address in INVITE
+  string hostname = 20;
   livekit.SIPTransport transport = 16;
 
   // Number used to make the call
@@ -62,7 +68,10 @@ message InternalCreateSIPParticipantRequest {
   // Optionally play ringtone in the room as an audible indicator for existing participants
   bool play_ringtone = 12;
 
-  // NEXT ID: 18
+  map<string, string> headers = 21;
+  map<string, string> headers_to_attributes = 22;
+
+  // NEXT ID: 23
 }
 
 message InternalCreateSIPParticipantResponse {

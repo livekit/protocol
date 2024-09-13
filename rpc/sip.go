@@ -12,7 +12,7 @@ import (
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.
 func NewCreateSIPParticipantRequest(
-	callID, wsUrl, token string,
+	projectID, callID, host, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
@@ -46,21 +46,26 @@ func NewCreateSIPParticipantRequest(
 		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
 	}
 	return &InternalCreateSIPParticipantRequest{
-		SipCallId:           callID,
-		Address:             trunk.Address,
-		Transport:           trunk.Transport,
-		Number:              outboundNumber,
-		Username:            trunk.AuthUsername,
-		Password:            trunk.AuthPassword,
-		CallTo:              req.SipCallTo,
-		WsUrl:               wsUrl,
-		Token:               token,
-		RoomName:            req.RoomName,
-		ParticipantIdentity: req.ParticipantIdentity,
-		ParticipantName:     req.ParticipantName,
-		ParticipantMetadata: req.ParticipantMetadata,
+		ProjectId:             projectID,
+		SipCallId:             callID,
+		SipTrunkId:            trunkID,
+		Address:               trunk.Address,
+		Hostname:              host,
+		Transport:             trunk.Transport,
+		Number:                outboundNumber,
+		Username:              trunk.AuthUsername,
+		Password:              trunk.AuthPassword,
+		CallTo:                req.SipCallTo,
+		WsUrl:                 wsUrl,
+		Token:                 token,
+		RoomName:              req.RoomName,
+		ParticipantIdentity:   req.ParticipantIdentity,
+		ParticipantName:       req.ParticipantName,
+		ParticipantMetadata:   req.ParticipantMetadata,
 		ParticipantAttributes: attrs,
-		Dtmf:                req.Dtmf,
-		PlayRingtone:        req.PlayRingtone,
+		Dtmf:                  req.Dtmf,
+		PlayRingtone:          req.PlayRingtone,
+		Headers:               trunk.Headers,
+		HeadersToAttributes:   trunk.HeadersToAttributes,
 	}, nil
 }

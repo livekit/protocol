@@ -424,9 +424,13 @@ func MatchDispatchRule(trunk *livekit.SIPInboundTrunkInfo, rules []*livekit.SIPD
 }
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
-func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
+func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
 	sentPin := req.GetPin()
 
+	trunkID := req.SipTrunkId
+	if trunk != nil {
+		trunkID = trunk.SipTrunkId
+	}
 	attrs := maps.Clone(rule.Attributes)
 	if attrs == nil {
 		attrs = make(map[string]string)
@@ -464,6 +468,7 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 	if rulePin != "" {
 		if sentPin == "" {
 			return &rpc.EvaluateSIPDispatchRulesResponse{
+				ProjectId:         projectID,
 				SipTrunkId:        trunkID,
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
@@ -493,7 +498,8 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 		}
 	}
 	attrs[livekit.AttrSIPDispatchRuleID] = rule.SipDispatchRuleId
-	return &rpc.EvaluateSIPDispatchRulesResponse{
+	resp := &rpc.EvaluateSIPDispatchRulesResponse{
+		ProjectId:             projectID,
 		SipTrunkId:            trunkID,
 		SipDispatchRuleId:     rule.SipDispatchRuleId,
 		Result:                rpc.SIPDispatchResult_ACCEPT,
@@ -502,5 +508,10 @@ func EvaluateDispatchRule(trunkID string, rule *livekit.SIPDispatchRuleInfo, req
 		ParticipantName:       fromName,
 		ParticipantMetadata:   rule.Metadata,
 		ParticipantAttributes: attrs,
-	}, nil
+	}
+	if trunk != nil {
+		resp.Headers = trunk.Headers
+		resp.HeadersToAttributes = trunk.HeadersToAttributes
+	}
+	return resp, nil
 }
