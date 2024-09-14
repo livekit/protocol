@@ -384,4 +384,5 @@ message SIPParticipantInfo {
 message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
+  string transfer_to = 3;
 }

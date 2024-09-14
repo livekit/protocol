@@ -83,4 +83,5 @@ message InternalCreateSIPParticipantResponse {
 
 message InternalTransferSIPParticipantRequest {
   string sip_call_id = 1;
+  string transfer_to = 2;
 }
