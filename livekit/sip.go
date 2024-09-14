@@ -1,5 +1,11 @@
 package livekit
 
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
 // ToProto implements DataPacket in Go SDK.
 func (p *SipDTMF) ToProto() *DataPacket {
 	return &DataPacket{
@@ -93,4 +99,92 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 		OutboundUsername: p.AuthUsername,
 		OutboundPassword: p.AuthPassword,
 	}
+}
+
+func validateHeaders(headers map[string]string) error {
+	for k := range headers {
+		k = strings.ToLower(k)
+		if !strings.HasPrefix(k, "x-") {
+			return fmt.Errorf("only X-* headers are allowed: %s", k)
+		}
+	}
+	return nil
+}
+
+func (p *SIPTrunkInfo) Validate() error {
+	if len(p.InboundNumbersRegex) != 0 {
+		return fmt.Errorf("trunks with InboundNumbersRegex are deprecated")
+	}
+	return nil
+}
+
+func (p *CreateSIPOutboundTrunkRequest) Validate() error {
+	if p.Trunk == nil {
+		return errors.New("missing trunk")
+	}
+	if err := p.Trunk.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *CreateSIPInboundTrunkRequest) Validate() error {
+	if p.Trunk == nil {
+		return errors.New("missing trunk")
+	}
+	if err := p.Trunk.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SIPInboundTrunkInfo) Validate() error {
+	if len(p.Numbers) == 0 {
+		return errors.New("no trunk numbers specified")
+	}
+	if err := validateHeaders(p.Headers); err != nil {
+		return err
+	}
+	if err := validateHeaders(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SIPOutboundTrunkInfo) Validate() error {
+	if len(p.Numbers) == 0 {
+		return errors.New("no trunk numbers specified")
+	}
+	if p.Address == "" {
+		return errors.New("no outbound address specified")
+	} else if strings.Contains(p.Address, "@") {
+		return errors.New("trunk address should be a hostname or IP, not SIP URI")
+	}
+	if err := validateHeaders(p.Headers); err != nil {
+		return err
+	}
+	if err := validateHeaders(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *CreateSIPDispatchRuleRequest) Validate() error {
+	if p.Rule == nil {
+		return errors.New("missing rule")
+	}
+	return nil
+}
+
+func (p *CreateSIPParticipantRequest) Validate() error {
+	if p.SipTrunkId == "" {
+		return errors.New("missing sip trunk id")
+	}
+	if p.SipCallTo == "" {
+		return errors.New("missing sip callee number")
+	}
+	if p.RoomName == "" {
+		return errors.New("missing room name")
+	}
+	return nil
 }
