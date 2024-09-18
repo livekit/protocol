@@ -62,6 +62,56 @@ func TestEventEmitter(t *testing.T) {
 		require.True(t, closeCalled)
 	})
 
+	t.Run("notify", func(t *testing.T) {
+		emitter := NewDefaultEventEmitter[string, int]()
+
+		as := make(chan int, 1)
+		stop := emitter.Notify("a", as)
+
+		emitter.Emit("a", 0)
+		select {
+		case v := <-as:
+			require.Equal(t, 0, v)
+		default:
+			require.FailNow(t, "expected event in channel")
+		}
+
+		stop()
+
+		emitter.Emit("a", 0)
+		select {
+		case <-as:
+			require.FailNow(t, "expected no event in channel after stop")
+		default:
+		}
+	})
+
+	t.Run("on", func(t *testing.T) {
+		emitter := NewDefaultEventEmitter[string, int]()
+
+		as := make(chan int, 1)
+		stop := emitter.On("a", func(i int) {
+			as <- i
+		})
+
+		emitter.Emit("a", 0)
+		select {
+		case v := <-as:
+			require.Equal(t, 0, v)
+		case <-time.After(100 * time.Millisecond):
+			require.FailNow(t, "expected event in channel")
+		}
+
+		stop()
+
+		emitter.Emit("a", 0)
+		select {
+		case <-as:
+			require.FailNow(t, "expected no event in channel after stop")
+		case <-time.After(100 * time.Millisecond):
+		}
+	})
+
 	t.Run("stop unblocks blocking observers", func(t *testing.T) {
 		observer, emit := NewEventObserver[int](func() {})
 
