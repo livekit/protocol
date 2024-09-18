@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package options
 
-import "math"
-
-func LogisticFunc(x0, L, k float64) func(x float64) float64 {
-	return func(x float64) float64 {
-		return L / (1 + math.Pow(math.E, -k*(x-x0)))
+func Apply[T any, F ~func(T)](o T, opts []F) T {
+	for _, opt := range opts {
+		opt(o)
 	}
-}
-
-func FastLogisticFunc(x0, L, k float64) func(x float64) float64 {
-	return func(x float64) float64 {
-		return L / 2 * (1 + k*(x-x0)/(1+math.Abs(k*(x-x0))))
-	}
+	return o
 }
