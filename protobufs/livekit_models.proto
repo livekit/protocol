@@ -316,16 +316,24 @@ message RpcMessageAck {
   string recipient_sid = 3;
 }
 
-message RpcMessageResponse {
+message RpcResponse {
   string message_id = 1;
   string sender_sid = 2;
   string recipient_sid = 3;
   string data = 4;
-  int32 error_code = 5; // 0 or null means no error. // 1001+ are reserved for LiveKit internal errors.
+  int32 error_code = 5; // Can be a value from ErrorCode enum or a custom value
   string error_data = 6;
+
+  enum ErrorCode {
+    NO_ERROR = 0;
+
+    // codes 1-999 are available for user-defined errors
+
+    // codes 1001+ are reserved for future use as LiveKit-defined errors
+  }
 }
 
-message RpcMessageResponseAck {
+message RpcResponseAck {
   string message_id = 1;
   string sender_sid = 2;
   string recipient_sid = 3;
