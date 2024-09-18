@@ -301,6 +301,36 @@ message ChatMessage {
   bool deleted = 5; // true to remove message
 }
 
+message RpcMessage {
+  string id = 1;
+  string sender_sid = 2;
+  string recipient_sid = 3;
+  string name = 4;
+  string data = 5;
+  bool expects_response = 6;
+}
+
+message RpcMessageAck {
+  string message_id = 1;
+  string sender_sid = 2;
+  string recipient_sid = 3;
+}
+
+message RpcMessageResponse {
+  string message_id = 1;
+  string sender_sid = 2;
+  string recipient_sid = 3;
+  string data = 4;
+  int32 error_code = 5; // 0 or null means no error. // 1001+ are reserved for LiveKit internal errors.
+  string error_data = 6;
+}
+
+message RpcMessageResponseAck {
+  string message_id = 1;
+  string sender_sid = 2;
+  string recipient_sid = 3;
+}
+
 enum ConnectionQuality {
   POOR = 0;
   GOOD = 1;
