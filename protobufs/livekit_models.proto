@@ -233,6 +233,10 @@ message DataPacket {
     Transcription transcription = 7;
     MetricsBatch metrics = 8;
     ChatMessage chat_message = 9;
+    RpcMessage rpc_message = 10;
+    RpcMessageAck rpc_message_ack = 11;
+    RpcResponse rpc_response = 12;
+    RpcResponseAck rpc_response_ack = 13;
   }
   // NEXT_ID: 9
 }
@@ -303,26 +307,20 @@ message ChatMessage {
 
 message RpcMessage {
   string id = 1;
-  string sender_sid = 2;
-  string recipient_sid = 3;
-  string name = 4;
-  string data = 5;
-  bool expects_response = 6;
+  string name = 2;
+  string data = 3;
+  bool expects_response = 4;
 }
 
 message RpcMessageAck {
   string message_id = 1;
-  string sender_sid = 2;
-  string recipient_sid = 3;
 }
 
 message RpcResponse {
-  string message_id = 1;
-  string sender_sid = 2;
-  string recipient_sid = 3;
-  string data = 4;
-  int32 error_code = 5; // Can be a value from ErrorCode enum or a custom value
-  string error_data = 6;
+  string message_id = 1; // ID of the request message
+  string data = 2;
+  int32 error_code = 3; // Can be a value from ErrorCode enum or a custom value
+  string error_data = 4;
 
   enum ErrorCode {
     NO_ERROR = 0;
@@ -335,8 +333,6 @@ message RpcResponse {
 
 message RpcResponseAck {
   string message_id = 1;
-  string sender_sid = 2;
-  string recipient_sid = 3;
 }
 
 enum ConnectionQuality {
