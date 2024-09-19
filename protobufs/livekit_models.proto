@@ -308,7 +308,6 @@ message RpcMessage {
   string id = 1;
   string name = 2;
   string data = 3;
-  bool expects_response = 4;
 }
 
 message RpcAck {
