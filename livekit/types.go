@@ -36,6 +36,9 @@ type ParticipantKey struct {
 	RoomKey
 	Identity ParticipantIdentity
 }
+type JobID string
+type DispatchID string
+type AgentName string
 
 type stringTypes interface {
 	ParticipantID | RoomID | TrackID | ParticipantIdentity | ParticipantName | RoomName | ConnectionID | NodeID
@@ -121,4 +124,9 @@ func marshalProto(o proto.Message) (map[string]interface{}, error) {
 	}
 
 	return m, nil
+}
+
+func IsJobType(jobType JobType) bool {
+	_, ok := JobType_name[int32(jobType)]
+	return ok
 }
