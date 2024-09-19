@@ -234,9 +234,8 @@ message DataPacket {
     MetricsBatch metrics = 8;
     ChatMessage chat_message = 9;
     RpcMessage rpc_message = 10;
-    RpcMessageAck rpc_message_ack = 11;
+    RpcAck rpc_ack = 11;
     RpcResponse rpc_response = 12;
-    RpcResponseAck rpc_response_ack = 13;
   }
   // NEXT_ID: 9
 }
@@ -312,7 +311,7 @@ message RpcMessage {
   bool expects_response = 4;
 }
 
-message RpcMessageAck {
+message RpcAck {
   string message_id = 1;
 }
 
@@ -329,10 +328,6 @@ message RpcResponse {
 
     // codes 1001+ are reserved for future use as LiveKit-defined errors
   }
-}
-
-message RpcResponseAck {
-  string message_id = 1;
 }
 
 enum ConnectionQuality {
