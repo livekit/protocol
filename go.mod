@@ -5,7 +5,6 @@ go 1.22
 require (
 	github.com/benbjohnson/clock v1.3.5
 	github.com/bufbuild/protoyaml-go v0.1.9
-	github.com/eapache/channels v1.1.0
 	github.com/frostbyte73/core v0.0.12
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gammazero/deque v0.2.1
@@ -15,7 +14,7 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
-	github.com/livekit/psrpc v0.5.3-0.20240616012458-ac39c8549a0a
+	github.com/livekit/psrpc v0.6.0
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/pion/logging v0.2.2
@@ -48,7 +47,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/eapache/queue v1.1.0 // indirect
 	github.com/google/cel-go v0.20.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect

@@ -11,6 +11,10 @@ import (
 )
 
 type FakeTypedRoomClient struct {
+	CloseStub        func()
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct {
+	}
 	DeleteRoomStub        func(context.Context, rpc.RoomTopic, *livekit.DeleteRoomRequest, ...psrpc.RequestOption) (*livekit.DeleteRoomResponse, error)
 	deleteRoomMutex       sync.RWMutex
 	deleteRoomArgsForCall []struct {
@@ -61,6 +65,30 @@ type FakeTypedRoomClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeTypedRoomClient) Close() {
+	fake.closeMutex.Lock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
+	}{})
+	stub := fake.CloseStub
+	fake.recordInvocation("Close", []interface{}{})
+	fake.closeMutex.Unlock()
+	if stub != nil {
+		fake.CloseStub()
+	}
+}
+
+func (fake *FakeTypedRoomClient) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
+}
+
+func (fake *FakeTypedRoomClient) CloseCalls(stub func()) {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.CloseStub = stub
 }
 
 func (fake *FakeTypedRoomClient) DeleteRoom(arg1 context.Context, arg2 rpc.RoomTopic, arg3 *livekit.DeleteRoomRequest, arg4 ...psrpc.RequestOption) (*livekit.DeleteRoomResponse, error) {
@@ -267,6 +295,8 @@ func (fake *FakeTypedRoomClient) UpdateRoomMetadataReturnsOnCall(i int, result1 
 func (fake *FakeTypedRoomClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
 	fake.deleteRoomMutex.RLock()
 	defer fake.deleteRoomMutex.RUnlock()
 	fake.sendDataMutex.RLock()
