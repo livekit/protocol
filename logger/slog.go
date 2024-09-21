@@ -27,11 +27,11 @@ func ToSlogHandler(log Logger) slog.Handler {
 
 type slogDiscard struct{}
 
-func (_ slogDiscard) Enabled(ctx context.Context, level slog.Level) bool {
+func (slogDiscard) Enabled(ctx context.Context, level slog.Level) bool {
 	return false
 }
 
-func (_ slogDiscard) Handle(ctx context.Context, record slog.Record) error {
+func (slogDiscard) Handle(ctx context.Context, record slog.Record) error {
 	return nil
 }
 
