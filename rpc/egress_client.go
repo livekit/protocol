@@ -109,3 +109,8 @@ func (c *egressClient) StartEgress(ctx context.Context, topic string, req *Start
 	}, opts...)
 	return c.EgressInternalClient.StartEgress(ctx, topic, req, o...)
 }
+
+func (c *egressClient) Close() {
+	c.EgressInternalClient.Close()
+	c.EgressHandlerClient.Close()
+}
