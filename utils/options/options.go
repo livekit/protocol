@@ -20,3 +20,13 @@ func Apply[T any, F ~func(T)](o T, opts []F) T {
 	}
 	return o
 }
+
+func Make[T any, F ~func(*T)](opts []F) T {
+	var o T
+	Apply(&o, opts)
+	return o
+}
+
+func New[T any, F ~func(*T)](opts []F) *T {
+	return Apply(new(T), opts)
+}
