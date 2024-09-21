@@ -11,6 +11,10 @@ import (
 )
 
 type FakeKeepalivePubSub struct {
+	CloseStub        func()
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct {
+	}
 	KillStub        func()
 	killMutex       sync.RWMutex
 	killArgsForCall []struct {
@@ -48,6 +52,30 @@ type FakeKeepalivePubSub struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeKeepalivePubSub) Close() {
+	fake.closeMutex.Lock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
+	}{})
+	stub := fake.CloseStub
+	fake.recordInvocation("Close", []interface{}{})
+	fake.closeMutex.Unlock()
+	if stub != nil {
+		fake.CloseStub()
+	}
+}
+
+func (fake *FakeKeepalivePubSub) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
+}
+
+func (fake *FakeKeepalivePubSub) CloseCalls(stub func()) {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.CloseStub = stub
 }
 
 func (fake *FakeKeepalivePubSub) Kill() {
@@ -229,6 +257,8 @@ func (fake *FakeKeepalivePubSub) SubscribePingReturnsOnCall(i int, result1 psrpc
 func (fake *FakeKeepalivePubSub) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
 	fake.killMutex.RLock()
 	defer fake.killMutex.RUnlock()
 	fake.publishPingMutex.RLock()
