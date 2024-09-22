@@ -11,6 +11,10 @@ import (
 )
 
 type FakeTypedParticipantClient struct {
+	CloseStub        func()
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct {
+	}
 	MutePublishedTrackStub        func(context.Context, rpc.ParticipantTopic, *livekit.MuteRoomTrackRequest, ...psrpc.RequestOption) (*livekit.MuteRoomTrackResponse, error)
 	mutePublishedTrackMutex       sync.RWMutex
 	mutePublishedTrackArgsForCall []struct {
@@ -77,6 +81,30 @@ type FakeTypedParticipantClient struct {
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
+}
+
+func (fake *FakeTypedParticipantClient) Close() {
+	fake.closeMutex.Lock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
+	}{})
+	stub := fake.CloseStub
+	fake.recordInvocation("Close", []interface{}{})
+	fake.closeMutex.Unlock()
+	if stub != nil {
+		fake.CloseStub()
+	}
+}
+
+func (fake *FakeTypedParticipantClient) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
+}
+
+func (fake *FakeTypedParticipantClient) CloseCalls(stub func()) {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.CloseStub = stub
 }
 
 func (fake *FakeTypedParticipantClient) MutePublishedTrack(arg1 context.Context, arg2 rpc.ParticipantTopic, arg3 *livekit.MuteRoomTrackRequest, arg4 ...psrpc.RequestOption) (*livekit.MuteRoomTrackResponse, error) {
@@ -350,6 +378,8 @@ func (fake *FakeTypedParticipantClient) UpdateSubscriptionsReturnsOnCall(i int, 
 func (fake *FakeTypedParticipantClient) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
 	fake.mutePublishedTrackMutex.RLock()
 	defer fake.mutePublishedTrackMutex.RUnlock()
 	fake.removeParticipantMutex.RLock()

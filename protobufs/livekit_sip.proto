@@ -20,6 +20,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/empty.proto";
+
 /*
    LiveKit's SIP API is built with 3 high level primitives
    - SIP Trunk
@@ -63,6 +65,7 @@ service SIP {
   rpc DeleteSIPDispatchRule(DeleteSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
 
   rpc CreateSIPParticipant(CreateSIPParticipantRequest) returns (SIPParticipantInfo);
+  rpc TransferSIPParticipant(TransferSIPParticipantRequest) returns (google.protobuf.Empty);
 }
 
 
@@ -406,4 +409,10 @@ message SIPParticipantInfo {
   string participant_identity = 2;
   string room_name = 3;
   string sip_call_id = 4;
+}
+
+message TransferSIPParticipantRequest {
+  string participant_identity = 1;
+  string room_name = 2;
+  string transfer_to = 3;
 }
