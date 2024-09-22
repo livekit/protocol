@@ -311,7 +311,6 @@ message RpcRequest {
   string payload = 3;
   uint32 response_timeout_ms = 4;
   uint32 version = 5;
-
 }
 
 message RpcAck {
