@@ -314,11 +314,11 @@ message RpcRequest {
 }
 
 message RpcAck {
-  string message_id = 1;
+  string request_id = 1;
 }
 
 message RpcResponse {
-  string message_id = 1;
+  string request_id = 1;
   oneof value {
     string payload = 2;
     string error = 3;
