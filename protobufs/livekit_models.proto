@@ -321,8 +321,14 @@ message RpcResponse {
   string request_id = 1;
   oneof value {
     string payload = 2;
-    string error = 3;
+    RpcError error = 3;
   }
+}
+
+message RpcError {
+  string name = 1;
+  string message = 2;
+  string data = 3;
 }
 
 enum ConnectionQuality {
