@@ -23,6 +23,20 @@ enum MetricLabel {
   AGENTS_LLM_TTFT = 0; // time to first token from LLM
   AGENTS_STT_TTFT = 1; // time to final transcription
   AGENTS_TTS_TTFB = 2; // time to first byte
+  CLIENT_VIDEO_SUBSCRIBER_FREEZE_COUNT = 3;                           // Number of video freezes
+  CLIENT_VIDEO_SUBSCRIBER_TOTAL_FREEZE_DURATION = 4;                  // total duration of freezes
+  CLIENT_VIDEO_SUBSCRIBER_PAUSE_COUNT = 5;                            // number of video pauses
+  CLIENT_VIDEO_SUBSCRIBER_TOTAL_PAUSES_DURATION = 6;                  // total duration of pauses
+  CLIENT_AUDIO_SUBSCRIBER_CONCEALED_SAMPLES = 7;                      // number of concealed (synthesized) audio samples
+  CLIENT_AUDIO_SUBSCRIBER_SILENT_CONCEALED_SAMPLES = 8;               // number of silent concealed samples
+  CLIENT_AUDIO_SUBSCRIBER_CONCEALMENT_EVENTS = 9;                     // number of concealment events
+  CLIENT_AUDIO_SUBSCRIBER_INTERRUPTION_COUNT = 10;                    // number of interruptions
+  CLIENT_AUDIO_SUBSCRIBER_TOTAL_INTERRUPTION_DURATION = 11;           // total duration of interruptions
+  CLIENT_SUBSCRIBER_JITTER_BUFFER_DELAY = 12;                         // total time spent in jitter buffer
+  CLIENT_SUBSCRIBER_JITTER_BUFFER_EMITTED_COUNT = 13;                 // total time spent in jitter buffer
+  CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_BANDWIDTH = 14;  // total duration spent in bandwidth quality limitation
+  CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_CPU = 15;        // total duration spent in cpu quality limitation
+  CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_OTHER = 16;      // total duration spent in other quality limitation
 
   METRIC_LABEL_PREDEFINED_MAX_VALUE = 4096;
 }
@@ -33,7 +47,9 @@ message MetricsBatch {
   // To avoid repeating string values, we store them in a separate list and reference them by index
   // This is useful for storing participant identities, track names, etc.
   // There is also a predefined list of labels that can be used to reference common metrics.
-  // They have reserved indices from 0 to (METRIC_LABEL_PREDEFINED_MAX_VALUE - 1)
+  // They have reserved indices from 0 to (METRIC_LABEL_PREDEFINED_MAX_VALUE - 1).
+  // Indexes pointing at str_data should start from METRIC_LABEL_PREDEFINED_MAX_VALUE, 
+  // such that str_data[0] == index of METRIC_LABEL_PREDEFINED_MAX_VALUE.
   repeated string str_data = 3;
   repeated TimeSeriesMetric time_series = 4;
   repeated EventMetric events = 5;
@@ -46,6 +62,7 @@ message TimeSeriesMetric {
   uint32 participant_identity = 2; // index into `str_data`
   uint32 track_sid = 3; // index into `str_data`
   repeated MetricSample samples = 4;
+  uint32 rid = 5; // index into 'str_data'
 }
 
 message MetricSample {
@@ -63,4 +80,5 @@ message EventMetric {
   google.protobuf.Timestamp normalized_start_timestamp = 6;
   optional google.protobuf.Timestamp normalized_end_timestamp = 7;
   string metadata = 8;
+  uint32 rid = 9; // index into 'str_data'
 }
