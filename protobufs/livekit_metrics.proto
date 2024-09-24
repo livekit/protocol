@@ -23,20 +23,20 @@ enum MetricLabel {
   AGENTS_LLM_TTFT = 0; // time to first token from LLM
   AGENTS_STT_TTFT = 1; // time to final transcription
   AGENTS_TTS_TTFB = 2; // time to first byte
-  CLIENT_FREEZE_COUNT = 3;                            // Number of video freezes
-  CLIENT_TOTAL_FREEZE_DURATION = 4;                   // total duration of freezes
-  CLIENT_PAUSE_COUNT = 5;                             // number of video pauses
-  CLIENT_TOTAL_PAUSES_DURATION = 6;                   // total duration of pauses
-  CLIENT_CONCEALED_SAMPLES = 7;                       // number of concealed (synthesized) audio samples
-  CLIENT_SILENT_CONCEALED_SAMPLES = 8;                // number of silent concealed samples
-  CLIENT_CONCEALMENT_EVENTS = 9;                      // number of concealment events
-  CLIENT_INTERRUPTION_COUNT = 10;                     // number of interruptions
-  CLIENT_TOTAL_INTERRUPTION_DURATION = 11;            // total duration of interruptions
-  CLIENT_JITTER_BUFFER_DELAY = 12;                    // total time spent in jitter buffer
-  CLIENT_JITTER_BUFFER_EMITTED_COUNT = 13;            // total time spent in jitter buffer
-  CLIENT_QUALITY_LIMITATION_DURATION_BANDWIDTH = 14;  // total duration spent in bandwidth quality limitation
-  CLIENT_QUALITY_LIMITATION_DURATION_CPU = 15;        // total duration spent in cpu quality limitation
-  CLIENT_QUALITY_LIMITATION_DURATION_OTHER = 16;      // total duration spent in other quality limitation
+  CLIENT_VIDEO_SUBSCRIBER_FREEZE_COUNT = 3;                           // Number of video freezes
+  CLIENT_VIDEO_SUBSCRIBER_TOTAL_FREEZE_DURATION = 4;                  // total duration of freezes
+  CLIENT_VIDEO_SUBSCRIBER_PAUSE_COUNT = 5;                            // number of video pauses
+  CLIENT_VIDEO_SUBSCRIBER_TOTAL_PAUSES_DURATION = 6;                  // total duration of pauses
+  CLIENT_AUDIO_SUBSCRIBER_CONCEALED_SAMPLES = 7;                      // number of concealed (synthesized) audio samples
+  CLIENT_AUDIO_SUBSCRIBER_SILENT_CONCEALED_SAMPLES = 8;               // number of silent concealed samples
+  CLIENT_AUDIO_SUBSCRIBER_CONCEALMENT_EVENTS = 9;                     // number of concealment events
+  CLIENT_AUDIO_SUBSCRIBER_INTERRUPTION_COUNT = 10;                    // number of interruptions
+  CLIENT_AUDIO_SUBSCRIBER_TOTAL_INTERRUPTION_DURATION = 11;           // total duration of interruptions
+  CLIENT_SUBSCRIBER_JITTER_BUFFER_DELAY = 12;                         // total time spent in jitter buffer
+  CLIENT_SUBSCRIBER_JITTER_BUFFER_EMITTED_COUNT = 13;                 // total time spent in jitter buffer
+  CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_BANDWIDTH = 14;  // total duration spent in bandwidth quality limitation
+  CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_CPU = 15;        // total duration spent in cpu quality limitation
+  CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_OTHER = 16;      // total duration spent in other quality limitation
 
   METRIC_LABEL_PREDEFINED_MAX_VALUE = 4096;
 }
