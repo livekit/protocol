@@ -391,7 +391,7 @@ message ClientInfo {
   string network = 10;
   // comma separated list of additional LiveKit SDKs in use of this client, with versions
   // e.g. "components-js:1.2.3,track-processors-js:1.2.3"
-  string other_sdks = 11
+  string other_sdks = 11;
 }
 
 // server provided client configuration
