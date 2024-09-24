@@ -3,4 +3,4 @@
 "github.com/livekit/protocol": patch
 ---
 
-Update @bufbuild/protobuf dependency
+Add protocols for client metrics

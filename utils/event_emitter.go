@@ -76,17 +76,37 @@ func (o *eventEmitterObserver[K, V]) Stop() {
 	o.e.cleanUpObserverList(o.k)
 }
 
-func (e *EventEmitter[K, V]) Observe(k K) EventObserver[V] {
+func (e *EventEmitter[K, V]) On(k K, f func(V)) func() {
 	e.mu.Lock()
+	o := e.getOrCreateEventObserverList(k).on(f)
+	e.mu.Unlock()
+
+	return (&eventEmitterObserver[K, V]{e, k, o}).Stop
+}
+
+func (e *EventEmitter[K, V]) Notify(k K, ch chan V) func() {
+	return e.observe(k, ch).Stop
+}
+
+func (e *EventEmitter[K, V]) Observe(k K) EventObserver[V] {
+	return e.observe(k, make(chan V, e.params.QueueSize))
+}
+
+func (e *EventEmitter[K, V]) observe(k K, ch chan V) *eventEmitterObserver[K, V] {
+	e.mu.Lock()
+	o := e.getOrCreateEventObserverList(k).observe(ch)
+	e.mu.Unlock()
+
+	return &eventEmitterObserver[K, V]{e, k, o}
+}
+
+func (e *EventEmitter[K, V]) getOrCreateEventObserverList(k K) *EventObserverList[V] {
 	l, ok := e.observers[k]
 	if !ok {
 		l = NewEventObserverList[V](e.params)
 		e.observers[k] = l
 	}
-	o := l.Observe()
-	e.mu.Unlock()
-
-	return &eventEmitterObserver[K, V]{e, k, o}
+	return l
 }
 
 func (e *EventEmitter[K, V]) ObservedKeys() []K {
@@ -138,26 +158,47 @@ func (o *eventObserverListObserver[V]) Stop() {
 	o.l.stopObserving(o)
 }
 
+func (l *EventObserverList[V]) On(f func(V)) func() {
+	return l.on(f).Stop
+}
+
+func (l *EventObserverList[V]) on(f func(V)) *eventObserverListObserver[V] {
+	o := &eventObserverListObserver[V]{l: l}
+
+	if l.params.Blocking {
+		o.EventObserver = blockingEventCallback[V](f)
+	} else {
+		o.EventObserver = nonblockingEventCallback[V](f)
+	}
+
+	l.startObserving(o)
+	return o
+}
+
+func (l *EventObserverList[V]) Notify(ch chan V) func() {
+	return l.observe(ch).Stop
+}
+
 func (l *EventObserverList[V]) Observe() EventObserver[V] {
+	return l.observe(make(chan V, l.params.QueueSize))
+}
+
+func (l *EventObserverList[V]) observe(ch chan V) *eventObserverListObserver[V] {
 	o := &eventObserverListObserver[V]{l: l}
 
 	if l.params.Blocking {
 		o.EventObserver = &blockingEventObserver[V]{
 			done: make(chan struct{}),
-			ch:   make(chan V, l.params.QueueSize),
+			ch:   ch,
 		}
 	} else {
 		o.EventObserver = &nonblockingEventObserver[V]{
 			logger: l.params.Logger,
-			ch:     make(chan V, l.params.QueueSize),
+			ch:     ch,
 		}
 	}
 
-	l.mu.Lock()
-	o.index = len(l.observers)
-	l.observers = append(l.observers, o)
-	l.mu.Unlock()
-
+	l.startObserving(o)
 	return o
 }
 
@@ -167,6 +208,13 @@ func (l *EventObserverList[V]) Emit(v V) {
 	for _, o := range l.observers {
 		o.emit(v)
 	}
+}
+
+func (l *EventObserverList[V]) startObserving(o *eventObserverListObserver[V]) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	o.index = len(l.observers)
+	l.observers = append(l.observers, o)
 }
 
 func (l *EventObserverList[V]) stopObserving(o *eventObserverListObserver[V]) {
@@ -240,3 +288,23 @@ func (o *blockingEventObserver[V]) Stop() {
 func (o *blockingEventObserver[V]) Events() <-chan V {
 	return o.ch
 }
+
+type nonblockingEventCallback[V any] func(V)
+
+func (o nonblockingEventCallback[V]) emit(v V) {
+	go o(v)
+}
+
+func (o nonblockingEventCallback[V]) Stop() {}
+
+func (o nonblockingEventCallback[V]) Events() <-chan V { return nil }
+
+type blockingEventCallback[V any] func(V)
+
+func (o blockingEventCallback[V]) emit(v V) {
+	o(v)
+}
+
+func (o blockingEventCallback[V]) Stop() {}
+
+func (o blockingEventCallback[V]) Events() <-chan V { return nil }

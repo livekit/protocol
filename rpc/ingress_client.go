@@ -43,3 +43,8 @@ func NewIngressClient(params ClientParams) (IngressClient, error) {
 		IngressHandlerClient:  handlerClient,
 	}, nil
 }
+
+func (c *ingressClient) Close() {
+	c.IngressInternalClient.Close()
+	c.IngressHandlerClient.Close()
+}

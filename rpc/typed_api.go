@@ -82,6 +82,24 @@ func (p *ClientParams) Options() []psrpc.ClientOption {
 	return opts
 }
 
+func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
+	return p.Bus, psrpc.WithClientOptions(p.Options()...)
+}
+
+func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
+	return psrpc.WithServerOptions(
+		middleware.WithServerMetrics(PSRPCMetricsObserver{}),
+		WithServerLogger(logger),
+	)
+}
+
+func WithDefaultServerOptions(psrpcConfig PSRPCConfig, logger logger.Logger) psrpc.ServerOption {
+	return psrpc.WithServerOptions(
+		psrpc.WithServerChannelSize(psrpcConfig.BufferSize),
+		WithServerObservability(logger),
+	)
+}
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 type TypedSignalClient = SignalClient[livekit.NodeID]
@@ -141,7 +159,7 @@ type TypedRoomClient = RoomClient[RoomTopic]
 type TypedRoomServer = RoomServer[RoomTopic]
 
 func NewTypedRoomClient(params ClientParams) (TypedRoomClient, error) {
-	return NewRoomClient[RoomTopic](params.Bus, params.Options()...)
+	return NewRoomClient[RoomTopic](params.Args())
 }
 
 func NewTypedRoomServer(svc RoomServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRoomServer, error) {
@@ -153,7 +171,7 @@ type TypedParticipantClient = ParticipantClient[ParticipantTopic]
 type TypedParticipantServer = ParticipantServer[ParticipantTopic]
 
 func NewTypedParticipantClient(params ClientParams) (TypedParticipantClient, error) {
-	return NewParticipantClient[ParticipantTopic](params.Bus, params.Options()...)
+	return NewParticipantClient[ParticipantTopic](params.Args())
 }
 
 func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedParticipantServer, error) {
@@ -165,7 +183,7 @@ type TypedAgentDispatchInternalClient = AgentDispatchInternalClient[RoomTopic]
 type TypedAgentDispatchInternalServer = AgentDispatchInternalServer[RoomTopic]
 
 func NewTypedAgentDispatchInternalClient(params ClientParams) (TypedAgentDispatchInternalClient, error) {
-	return NewAgentDispatchInternalClient[RoomTopic](params.Bus, params.Options()...)
+	return NewAgentDispatchInternalClient[RoomTopic](params.Args())
 }
 
 func NewTypedAgentDispatchInternalServer(svc AgentDispatchInternalServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedAgentDispatchInternalServer, error) {
@@ -184,7 +202,7 @@ type keepalivePubSub struct {
 }
 
 func NewKeepalivePubSub(params ClientParams) (KeepalivePubSub, error) {
-	client, err := NewKeepaliveClient[livekit.NodeID](params.Bus, params.Options()...)
+	client, err := NewKeepaliveClient[livekit.NodeID](params.Args())
 	if err != nil {
 		return nil, err
 	}

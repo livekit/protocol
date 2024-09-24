@@ -17,7 +17,7 @@ package utils
 import "math/bits"
 
 type bitmapNumber interface {
-	uint16 | uint32 | uint64
+	uint8 | uint16 | uint32 | uint64
 }
 
 type Bitmap[T bitmapNumber] struct {

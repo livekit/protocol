@@ -598,9 +598,11 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			"prov-attr": "1",
 		},
 	}
-	res, err := EvaluateDispatchRule("trunk", d, r)
+	tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+	res, err := EvaluateDispatchRule("p_123", tr, d, r)
 	require.NoError(t, err)
 	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		ProjectId:           "p_123",
 		Result:              rpc.SIPDispatchResult_ACCEPT,
 		SipTrunkId:          "trunk",
 		SipDispatchRuleId:   "rule",
@@ -620,9 +622,10 @@ func TestEvaluateDispatchRule(t *testing.T) {
 	}, res)
 
 	d.HidePhoneNumber = true
-	res, err = EvaluateDispatchRule("trunk", d, r)
+	res, err = EvaluateDispatchRule("p_123", tr, d, r)
 	require.NoError(t, err)
 	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		ProjectId:           "p_123",
 		Result:              rpc.SIPDispatchResult_ACCEPT,
 		SipTrunkId:          "trunk",
 		SipDispatchRuleId:   "rule",
