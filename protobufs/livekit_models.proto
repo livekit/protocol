@@ -326,7 +326,7 @@ message RpcResponse {
 }
 
 message RpcError {
-  string name = 1;
+  uint32 code = 1;
   string message = 2;
   string data = 3;
 }
