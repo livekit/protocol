@@ -188,3 +188,17 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	}
 	return nil
 }
+
+func (p *TransferSIPParticipantRequest) Validate() error {
+	if p.RoomName == "" {
+		return errors.New("missing room name")
+	}
+	if p.ParticipantIdentity == "" {
+		return errors.New("missing participant identity")
+	}
+	if p.TransferTo == "" {
+		return errors.New("missing transfer to")
+	}
+
+	return nil
+}
