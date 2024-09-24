@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.23.0
+
+### Patch Changes
+
+- Add protocols for client metrics - [#821](https://github.com/livekit/protocol/pull/821) ([@davidliu](https://github.com/davidliu))
+
+- Add other_sdks field to ClientInfo - [#804](https://github.com/livekit/protocol/pull/804) ([@bcherry](https://github.com/bcherry))
+
 ## 1.22.0
 
 ### Minor Changes
