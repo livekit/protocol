@@ -182,6 +182,8 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	}
 	if p.SipCallTo == "" {
 		return errors.New("missing sip callee number")
+	} else if strings.Contains(p.SipCallTo, "@") {
+		return errors.New("SipCallTo should be a phone number or SIP user, not a full SIP URI")
 	}
 	if p.RoomName == "" {
 		return errors.New("missing room name")
