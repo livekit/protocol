@@ -317,7 +317,7 @@ func sourceToString(source livekit.TrackSource) string {
 }
 
 func sourceToProto(sourceStr string) livekit.TrackSource {
-	switch sourceStr {
+	switch strings.ToLower(sourceStr) {
 	case "camera":
 		return livekit.TrackSource_CAMERA
 	case "microphone":
@@ -336,7 +336,7 @@ func kindFromProto(source livekit.ParticipantInfo_Kind) string {
 }
 
 func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
-	switch sourceStr {
+	switch strings.ToLower(sourceStr) {
 	case "", "standard":
 		return livekit.ParticipantInfo_STANDARD
 	case "ingress":
