@@ -166,8 +166,13 @@ message EvaluateSIPDispatchRulesResponse {
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 14;
 
-  repeated string enabled_features = 15;
+  repeated SIPFeature enabled_features = 15;
   // NEXT ID: 16
+}
+
+enum SIPFeature {
+  NONE = 0;
+  KRISP_ENABLED = 1;
 }
 
 enum SIPDispatchResult {
