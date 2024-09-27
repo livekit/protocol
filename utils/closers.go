@@ -15,30 +15,48 @@
 package utils
 
 import (
-	"time"
+	"io"
 
-	"github.com/benbjohnson/clock"
+	"go.uber.org/multierr"
 )
 
-type Clock interface {
-	Now() time.Time
-	Sleep(time.Duration)
+type Closers []io.Closer
+
+func CombineClosers(cs ...io.Closer) Closers {
+	return append([]io.Closer{}, cs...)
 }
 
-type SystemClock struct{}
+func (s *Closers) Close() error {
+	var err error
+	for _, c := range *s {
+		if c != nil {
+			err = multierr.Append(err, c.Close())
+		}
+	}
 
-var _ Clock = &SystemClock{}
+	*s = (*s)[:0]
 
-func (SystemClock) Now() time.Time {
-	return time.Now()
+	return err
 }
 
-func (SystemClock) Sleep(d time.Duration) {
-	time.Sleep(d)
+type CloseFuncType interface {
+	~func() error | ~func()
 }
 
-type SimulatedClock struct {
-	clock.Mock
+func CloseFunc[T CloseFuncType](fn T) io.Closer {
+	return closeFunc[T]{fn}
 }
 
-var _ Clock = &SimulatedClock{}
+type closeFunc[T CloseFuncType] struct {
+	fn T
+}
+
+func (f closeFunc[T]) Close() error {
+	switch fn := any(f.fn).(type) {
+	case func() error:
+		return fn()
+	case func():
+		fn()
+	}
+	return nil
+}
