@@ -443,6 +443,10 @@ enum DisconnectReason {
   SIGNAL_CLOSE = 9;
   // the room was closed, due to all Standard and Ingress participants having left
   ROOM_CLOSED = 10;
+  // SIP callee did not respond in time
+  USER_UNAVAILABLE = 11;
+  // SIP callee rejected the call (busy)
+  USER_REJECTED = 12;
 }
 
 message RTPDrift {
