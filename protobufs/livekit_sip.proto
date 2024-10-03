@@ -21,6 +21,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
+import "livekit_models.proto";
 
 /*
    LiveKit's SIP API is built with 3 high level primitives
@@ -415,4 +416,17 @@ message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
   string transfer_to = 3;
+}
+
+message SIPCallInfo {
+  string call_id = 1;
+  string trunk_id = 2;
+  string room_id = 3; // ID of the current/previous room published to
+  string from_user = 4;
+  string to_user = 5;
+  string to_host = 6;
+  string src_address = 7;
+  int64 started_at = 8;
+  int64 ended_at = 9; 
+  DisconnectReason disconnect_reason = 10;
 }

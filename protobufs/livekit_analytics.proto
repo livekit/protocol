@@ -23,6 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
+import "livekit_sip.proto";
 
 enum StreamType {
   UPSTREAM = 0;
@@ -161,8 +162,15 @@ message AnalyticsEvent {
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
   string node_id = 24;
+  string sip_call_id = 26;
+  SIPCallInfo sip_call = 27;
+  string sip_trunk_id = 28;
+  SIPInboundTrunkInfo sip_inbound_trunk = 29;
+  SIPOutboundTrunkInfo sip_outbound_trunk = 30;
+  string sip_dispatch_rule_id = 31;
+  SIPDispatchRuleInfo sip_dispatch_rule = 32;
 
-  // NEXT_ID: 26
+  // NEXT_ID: 33
 }
 
 message AnalyticsEvents {
