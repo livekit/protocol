@@ -165,7 +165,14 @@ message EvaluateSIPDispatchRulesResponse {
   // Map SIP X-* headers from INVITE to SIP participant attributes.
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 14;
-  // NEXT ID: 15
+
+  repeated SIPFeature enabled_features = 15;
+  // NEXT ID: 16
+}
+
+enum SIPFeature {
+  NONE = 0;
+  KRISP_ENABLED = 1;
 }
 
 enum SIPDispatchResult {
