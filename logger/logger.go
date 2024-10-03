@@ -17,6 +17,7 @@ package logger
 import (
 	"log/slog"
 	"os"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -56,19 +57,19 @@ func SetLogger(l Logger, name string) {
 	pkgLogger = l.WithCallDepth(2).WithName(name)
 }
 
-func Debugw(msg string, keysAndValues ...interface{}) {
+func Debugw(msg string, keysAndValues ...any) {
 	pkgLogger.Debugw(msg, keysAndValues...)
 }
 
-func Infow(msg string, keysAndValues ...interface{}) {
+func Infow(msg string, keysAndValues ...any) {
 	pkgLogger.Infow(msg, keysAndValues...)
 }
 
-func Warnw(msg string, err error, keysAndValues ...interface{}) {
+func Warnw(msg string, err error, keysAndValues ...any) {
 	pkgLogger.Warnw(msg, err, keysAndValues...)
 }
 
-func Errorw(msg string, err error, keysAndValues ...interface{}) {
+func Errorw(msg string, err error, keysAndValues ...any) {
 	pkgLogger.Errorw(msg, err, keysAndValues...)
 }
 
@@ -83,11 +84,12 @@ func ParseZapLevel(level string) zapcore.Level {
 type DeferredFieldResolver = zaputil.DeferredFieldResolver
 
 type Logger interface {
-	Debugw(msg string, keysAndValues ...interface{})
-	Infow(msg string, keysAndValues ...interface{})
-	Warnw(msg string, err error, keysAndValues ...interface{})
-	Errorw(msg string, err error, keysAndValues ...interface{})
-	WithValues(keysAndValues ...interface{}) Logger
+	Debugw(msg string, keysAndValues ...any)
+	Infow(msg string, keysAndValues ...any)
+	Warnw(msg string, err error, keysAndValues ...any)
+	Errorw(msg string, err error, keysAndValues ...any)
+	WithValues(keysAndValues ...any) Logger
+	WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger
 	WithName(name string) Logger
 	// WithComponent creates a new logger with name as "<name>.<component>", and uses a log level as specified
 	WithComponent(component string) Logger
@@ -96,6 +98,35 @@ type Logger interface {
 	// WithoutSampler returns the original logger without sampling
 	WithoutSampler() Logger
 	WithDeferredValues() (Logger, DeferredFieldResolver)
+}
+
+type UnlikelyLogger struct {
+	logger        Logger
+	keysAndValues []any
+}
+
+func makeUnlikelyLogger(logger Logger, keysAndValues ...any) UnlikelyLogger {
+	return UnlikelyLogger{logger, keysAndValues}
+}
+
+func (l UnlikelyLogger) Debugw(msg string, keysAndValues ...any) {
+	l.logger.Debugw(msg, slices.Concat(l.keysAndValues, keysAndValues))
+}
+
+func (l UnlikelyLogger) Infow(msg string, keysAndValues ...any) {
+	l.logger.Infow(msg, slices.Concat(l.keysAndValues, keysAndValues))
+}
+
+func (l UnlikelyLogger) Warnw(msg string, err error, keysAndValues ...any) {
+	l.logger.Warnw(msg, err, slices.Concat(l.keysAndValues, keysAndValues))
+}
+
+func (l UnlikelyLogger) Errorw(msg string, err error, keysAndValues ...any) {
+	l.logger.Errorw(msg, err, slices.Concat(l.keysAndValues, keysAndValues))
+}
+
+func (l UnlikelyLogger) WithValues(keysAndValues ...any) UnlikelyLogger {
+	return makeUnlikelyLogger(l.logger, slices.Concat(l.keysAndValues, keysAndValues))
 }
 
 type sharedConfig struct {
@@ -295,7 +326,7 @@ func (l *zapLogger[T]) ComponentLeveler() ZapComponentLeveler {
 	return zapLoggerComponentLeveler[T]{l}
 }
 
-func (l *zapLogger[T]) Debugw(msg string, keysAndValues ...interface{}) {
+func (l *zapLogger[T]) Debugw(msg string, keysAndValues ...any) {
 	l.zap.Debugw(msg, keysAndValues...)
 }
 
@@ -306,29 +337,33 @@ func (l *zapLogger[T]) WithMinLevel(lvl zapcore.LevelEnabler) Logger {
 	return &dup
 }
 
-func (l *zapLogger[T]) Infow(msg string, keysAndValues ...interface{}) {
+func (l *zapLogger[T]) Infow(msg string, keysAndValues ...any) {
 	l.zap.Infow(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) Warnw(msg string, err error, keysAndValues ...interface{}) {
+func (l *zapLogger[T]) Warnw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
 	l.zap.Warnw(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) Errorw(msg string, err error, keysAndValues ...interface{}) {
+func (l *zapLogger[T]) Errorw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
 	l.zap.Errorw(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) WithValues(keysAndValues ...interface{}) Logger {
+func (l *zapLogger[T]) WithValues(keysAndValues ...any) Logger {
 	dup := *l
 	dup.enc = dup.enc.WithValues(keysAndValues...)
 	dup.zap = dup.ToZap()
 	return &dup
+}
+
+func (l *zapLogger[T]) WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger {
+	return makeUnlikelyLogger(l, keysAndValues)
 }
 
 func (l *zapLogger[T]) WithName(name string) Logger {
@@ -393,27 +428,31 @@ func (l LogRLogger) toLogr() logr.Logger {
 	return logr.Logger(l)
 }
 
-func (l LogRLogger) Debugw(msg string, keysAndValues ...interface{}) {
+func (l LogRLogger) Debugw(msg string, keysAndValues ...any) {
 	l.toLogr().V(1).Info(msg, keysAndValues...)
 }
 
-func (l LogRLogger) Infow(msg string, keysAndValues ...interface{}) {
+func (l LogRLogger) Infow(msg string, keysAndValues ...any) {
 	l.toLogr().Info(msg, keysAndValues...)
 }
 
-func (l LogRLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
+func (l LogRLogger) Warnw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
 	l.toLogr().Info(msg, keysAndValues...)
 }
 
-func (l LogRLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {
+func (l LogRLogger) Errorw(msg string, err error, keysAndValues ...any) {
 	l.toLogr().Error(err, msg, keysAndValues...)
 }
 
-func (l LogRLogger) WithValues(keysAndValues ...interface{}) Logger {
+func (l LogRLogger) WithValues(keysAndValues ...any) Logger {
 	return LogRLogger(l.toLogr().WithValues(keysAndValues...))
+}
+
+func (l LogRLogger) WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger {
+	return makeUnlikelyLogger(l, keysAndValues)
 }
 
 func (l LogRLogger) WithName(name string) Logger {

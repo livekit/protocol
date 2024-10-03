@@ -27,3 +27,7 @@ func Do(err error) {
 		panic(err)
 	}
 }
+
+func DoFunc(f func() error) func() {
+	return func() { Do(f()) }
+}
