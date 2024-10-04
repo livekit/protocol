@@ -252,8 +252,8 @@ func (r *runnerImpl) takeOnceAfter(d time.Duration, rl Limiter) {
 func (r *runnerImpl) assertCountAt(d time.Duration, count int) {
 	r.wg.Add(1)
 	r.afterFunc(d, func() {
+		defer r.wg.Done()
 		require.Equal(r.t, int32(count), r.count.Load(), "count not as expected")
-		r.wg.Done()
 	})
 }
 
@@ -261,9 +261,9 @@ func (r *runnerImpl) assertCountAt(d time.Duration, count int) {
 func (r *runnerImpl) assertCountAtWithNoise(d time.Duration, count int, noise int) {
 	r.wg.Add(1)
 	r.afterFunc(d, func() {
+		defer r.wg.Done()
 		require.InDelta(r.t, count, int(r.count.Load()), float64(noise),
 			"expected count to be within noise tolerance")
-		r.wg.Done()
 	})
 }
 
