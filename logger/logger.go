@@ -105,28 +105,24 @@ type UnlikelyLogger struct {
 	keysAndValues []any
 }
 
-func makeUnlikelyLogger(logger Logger, keysAndValues ...any) UnlikelyLogger {
-	return UnlikelyLogger{logger, keysAndValues}
-}
-
 func (l UnlikelyLogger) Debugw(msg string, keysAndValues ...any) {
-	l.logger.Debugw(msg, slices.Concat(l.keysAndValues, keysAndValues))
+	l.logger.Debugw(msg, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) Infow(msg string, keysAndValues ...any) {
-	l.logger.Infow(msg, slices.Concat(l.keysAndValues, keysAndValues))
+	l.logger.Infow(msg, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) Warnw(msg string, err error, keysAndValues ...any) {
-	l.logger.Warnw(msg, err, slices.Concat(l.keysAndValues, keysAndValues))
+	l.logger.Warnw(msg, err, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) Errorw(msg string, err error, keysAndValues ...any) {
-	l.logger.Errorw(msg, err, slices.Concat(l.keysAndValues, keysAndValues))
+	l.logger.Errorw(msg, err, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) WithValues(keysAndValues ...any) UnlikelyLogger {
-	return makeUnlikelyLogger(l.logger, slices.Concat(l.keysAndValues, keysAndValues))
+	return UnlikelyLogger{l.logger, slices.Concat(l.keysAndValues, keysAndValues)}
 }
 
 type sharedConfig struct {
@@ -363,7 +359,7 @@ func (l *zapLogger[T]) WithValues(keysAndValues ...any) Logger {
 }
 
 func (l *zapLogger[T]) WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger {
-	return makeUnlikelyLogger(l, keysAndValues)
+	return UnlikelyLogger{l, keysAndValues}
 }
 
 func (l *zapLogger[T]) WithName(name string) Logger {
@@ -452,7 +448,7 @@ func (l LogRLogger) WithValues(keysAndValues ...any) Logger {
 }
 
 func (l LogRLogger) WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger {
-	return makeUnlikelyLogger(l, keysAndValues)
+	return UnlikelyLogger{l, keysAndValues}
 }
 
 func (l LogRLogger) WithName(name string) Logger {
