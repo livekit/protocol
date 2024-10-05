@@ -180,5 +180,5 @@ func Unmarshal[T livekit.Guid](b livekit.GuidBlock) T {
 		idb[k+2] = b57Chars[(b[j+1]&15)<<2|b[j+2]>>6]
 		idb[k+3] = b57Chars[b[j+2]&63]
 	}
-	return T(unsafe.String(unsafe.SliceData(idb), len(idb)))
+	return T(unsafe.String(unsafe.SliceData(id), len(id)))
 }
