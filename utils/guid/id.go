@@ -21,6 +21,7 @@ import (
 	mrand "math/rand/v2"
 	"os"
 	"sync"
+	"unsafe"
 
 	"github.com/jxskiss/base62"
 	"github.com/lithammer/shortuuid/v4"
@@ -150,7 +151,11 @@ func guidPrefix[T livekit.Guid]() string {
 }
 
 func Marshal[T livekit.Guid](id T) livekit.GuidBlock {
-	var b livekit.GuidBlock
+	return livekit.GuidBlock(MarshalAppend(nil, id))
+}
+
+func MarshalAppend[T livekit.Guid](b []byte, id T) []byte {
+	b = append(b, make([]byte, 9)...)
 	idb := []byte(id)[len(id)-Size:]
 	for i := 0; i < 3; i++ {
 		j := i * 3
@@ -175,5 +180,5 @@ func Unmarshal[T livekit.Guid](b livekit.GuidBlock) T {
 		idb[k+2] = b57Chars[(b[j+1]&15)<<2|b[j+2]>>6]
 		idb[k+3] = b57Chars[b[j+2]&63]
 	}
-	return T(id)
+	return T(unsafe.String(unsafe.SliceData(id), len(id)))
 }
