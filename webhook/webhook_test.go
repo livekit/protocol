@@ -16,6 +16,7 @@ package webhook
 
 import (
 	"context"
+	"github.com/livekit/protocol/logger"
 	"net"
 	"net/http"
 	"sync"
@@ -196,12 +197,107 @@ func TestURLNotifierLifecycle(t *testing.T) {
 	})
 }
 
+func TestFilteredNotifier(t *testing.T) {
+	var (
+		maxItr = 10
+		events = []string{
+			EventRoomStarted,
+			EventRoomFinished,
+			EventParticipantJoined,
+			EventParticipantLeft,
+			EventTrackPublished,
+			EventTrackUnpublished,
+			EventEgressStarted,
+			EventEgressUpdated,
+			EventEgressEnded,
+			EventIngressStarted,
+			EventIngressEnded,
+		}
+		nm = notifierMock{numCalled: &atomic.Int32{}}
+	)
+
+	t.Run("empty filter should send all events", func(t *testing.T) {
+		filteredNotifier := newTestFilteredNotifier(&nm, nil)
+		defer filteredNotifier.Stop(true)
+
+		for i := 0; i < maxItr; i++ {
+			for _, event := range events {
+				_ = filteredNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: event})
+			}
+		}
+
+		require.Equal(t, int32(maxItr*len(events)), nm.numCalled.Load())
+	})
+
+	t.Run("one filter", func(t *testing.T) {
+		events := events[:1]
+		filteredNotifier := newTestFilteredNotifier(&nm, events)
+		defer filteredNotifier.Stop(true)
+
+		for i := 0; i < maxItr; i++ {
+			for _, event := range events {
+				_ = filteredNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: event})
+			}
+		}
+
+		require.Equal(t, int32(maxItr*len(events)), nm.numCalled.Load())
+	})
+
+	t.Run("some filter", func(t *testing.T) {
+		events := events[2:5]
+		filteredNotifier := newTestFilteredNotifier(&nm, events)
+		defer filteredNotifier.Stop(true)
+
+		for i := 0; i < maxItr; i++ {
+			for _, event := range events {
+				_ = filteredNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: event})
+			}
+		}
+
+		require.Equal(t, int32(maxItr*len(events)), nm.numCalled.Load())
+	})
+
+	t.Run("all filter should send all events", func(t *testing.T) {
+		filteredNotifier := newTestFilteredNotifier(&nm, events)
+		defer filteredNotifier.Stop(true)
+
+		for i := 0; i < maxItr; i++ {
+			for _, event := range events {
+				_ = filteredNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: event})
+			}
+		}
+
+		require.Equal(t, int32(maxItr*len(events)), nm.numCalled.Load())
+	})
+}
+
 func newTestNotifier() *URLNotifier {
 	return NewURLNotifier(URLNotifierParams{
 		QueueSize: 20,
 		URL:       testUrl,
 		APIKey:    apiKey,
 		APISecret: apiSecret,
+	})
+}
+
+type notifierMock struct {
+	numCalled *atomic.Int32
+}
+
+func (n notifierMock) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
+	n.numCalled.Inc()
+	return nil
+}
+
+func (n notifierMock) Stop(force bool) {
+	n.numCalled.Store(0)
+}
+
+func newTestFilteredNotifier(notifier *notifierMock, events []string) *FilteredNotifier {
+
+	return NewFilteredNotifier(notifier, FilteredNotifierParams{
+		Events: events,
+		Logger: logger.GetLogger(),
 	})
 }
 
