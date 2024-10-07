@@ -40,18 +40,18 @@ const (
 type JobTerminateReason int32
 
 const (
-	JobTerminateReason_TERINATION_REQUESTED JobTerminateReason = 0
+	JobTerminateReason_TERMINATION_REQUESTED JobTerminateReason = 0
 	JobTerminateReason_AGENT_LEFT_ROOM      JobTerminateReason = 1
 )
 
 // Enum value maps for JobTerminateReason.
 var (
 	JobTerminateReason_name = map[int32]string{
-		0: "TERINATION_REQUESTED",
+		0: "TERMINATION_REQUESTED",
 		1: "AGENT_LEFT_ROOM",
 	}
 	JobTerminateReason_value = map[string]int32{
-		"TERINATION_REQUESTED": 0,
+		"TERMINATION_REQUESTED": 0,
 		"AGENT_LEFT_ROOM":      1,
 	}
 )
@@ -293,7 +293,7 @@ func (x *JobTerminateRequest) GetReason() JobTerminateReason {
 	if x != nil {
 		return x.Reason
 	}
-	return JobTerminateReason_TERINATION_REQUESTED
+	return JobTerminateReason_TERMINATION_REQUESTED
 }
 
 type JobTerminateResponse struct {
