@@ -422,11 +422,18 @@ message SIPCallInfo {
   string call_id = 1;
   string trunk_id = 2;
   string room_id = 3; // ID of the current/previous room published to
-  string from_user = 4;
-  string to_user = 5;
-  string to_host = 6;
-  string src_address = 7;
-  int64 started_at = 8;
-  int64 ended_at = 9; 
-  DisconnectReason disconnect_reason = 10;
+  string participant_identity = 4;
+  SIPUri from_uri = 5;
+  SIPUri to_uri = 6;
+  int64 started_at = 7;
+  int64 ended_at = 8;
+  DisconnectReason disconnect_reason = 9;
+}
+
+message SIPUri {
+  string user = 1;
+  string host = 2;
+  string ip = 3;
+  string port = 4;
+  SIPTransport transport = 5;
 }
