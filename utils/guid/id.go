@@ -155,7 +155,7 @@ func Marshal[T livekit.Guid](id T) livekit.GuidBlock {
 }
 
 func MarshalAppend[T livekit.Guid](b []byte, id T) []byte {
-	b = append(b, make([]byte, 9)...)
+	b = append(b, make([]byte, Size*3/4)...)
 	idb := []byte(id)[len(id)-Size:]
 	for i := 0; i < 3; i++ {
 		j := i * 3

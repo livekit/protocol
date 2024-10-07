@@ -59,7 +59,7 @@ service AgentInternal {
 }
 
 enum JobTerminateReason {
-  TERINATION_REQUESTED = 0;
+  TERMINATION_REQUESTED = 0;
   AGENT_LEFT_ROOM = 1;
 }
 
