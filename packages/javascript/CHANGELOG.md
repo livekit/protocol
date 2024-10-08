@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.24.0
+
+### Minor Changes
+
+- Add disconnect reasons for SIP. - [#828](https://github.com/livekit/protocol/pull/828) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Expose metrics on javascript package - [#843](https://github.com/livekit/protocol/pull/843) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.23.0
 
 ### Minor Changes
