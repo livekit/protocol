@@ -15,12 +15,12 @@ type FakeTypedAgentDispatchInternalClient struct {
 	closeMutex       sync.RWMutex
 	closeArgsForCall []struct {
 	}
-	CreateDispatchStub        func(context.Context, rpc.RoomTopic, *livekit.CreateAgentDispatchRequest, ...psrpc.RequestOption) (*livekit.AgentDispatch, error)
+	CreateDispatchStub        func(context.Context, rpc.RoomTopic, *livekit.AgentDispatch, ...psrpc.RequestOption) (*livekit.AgentDispatch, error)
 	createDispatchMutex       sync.RWMutex
 	createDispatchArgsForCall []struct {
 		arg1 context.Context
 		arg2 rpc.RoomTopic
-		arg3 *livekit.CreateAgentDispatchRequest
+		arg3 *livekit.AgentDispatch
 		arg4 []psrpc.RequestOption
 	}
 	createDispatchReturns struct {
@@ -91,13 +91,13 @@ func (fake *FakeTypedAgentDispatchInternalClient) CloseCalls(stub func()) {
 	fake.CloseStub = stub
 }
 
-func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatch(arg1 context.Context, arg2 rpc.RoomTopic, arg3 *livekit.CreateAgentDispatchRequest, arg4 ...psrpc.RequestOption) (*livekit.AgentDispatch, error) {
+func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatch(arg1 context.Context, arg2 rpc.RoomTopic, arg3 *livekit.AgentDispatch, arg4 ...psrpc.RequestOption) (*livekit.AgentDispatch, error) {
 	fake.createDispatchMutex.Lock()
 	ret, specificReturn := fake.createDispatchReturnsOnCall[len(fake.createDispatchArgsForCall)]
 	fake.createDispatchArgsForCall = append(fake.createDispatchArgsForCall, struct {
 		arg1 context.Context
 		arg2 rpc.RoomTopic
-		arg3 *livekit.CreateAgentDispatchRequest
+		arg3 *livekit.AgentDispatch
 		arg4 []psrpc.RequestOption
 	}{arg1, arg2, arg3, arg4})
 	stub := fake.CreateDispatchStub
@@ -119,13 +119,13 @@ func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatchCallCount() int 
 	return len(fake.createDispatchArgsForCall)
 }
 
-func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatchCalls(stub func(context.Context, rpc.RoomTopic, *livekit.CreateAgentDispatchRequest, ...psrpc.RequestOption) (*livekit.AgentDispatch, error)) {
+func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatchCalls(stub func(context.Context, rpc.RoomTopic, *livekit.AgentDispatch, ...psrpc.RequestOption) (*livekit.AgentDispatch, error)) {
 	fake.createDispatchMutex.Lock()
 	defer fake.createDispatchMutex.Unlock()
 	fake.CreateDispatchStub = stub
 }
 
-func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatchArgsForCall(i int) (context.Context, rpc.RoomTopic, *livekit.CreateAgentDispatchRequest, []psrpc.RequestOption) {
+func (fake *FakeTypedAgentDispatchInternalClient) CreateDispatchArgsForCall(i int) (context.Context, rpc.RoomTopic, *livekit.AgentDispatch, []psrpc.RequestOption) {
 	fake.createDispatchMutex.RLock()
 	defer fake.createDispatchMutex.RUnlock()
 	argsForCall := fake.createDispatchArgsForCall[i]
