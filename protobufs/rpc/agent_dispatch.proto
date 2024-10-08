@@ -22,7 +22,7 @@ import "options.proto";
 import "livekit_agent_dispatch.proto";
 
 service AgentDispatchInternal {
-  rpc CreateDispatch(livekit.CreateAgentDispatchRequest) returns (livekit.AgentDispatch) {
+  rpc CreateDispatch(livekit.AgentDispatch) returns (livekit.AgentDispatch) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
