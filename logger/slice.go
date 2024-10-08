@@ -15,15 +15,32 @@
 package logger
 
 import (
+	"time"
+
 	"go.uber.org/multierr"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/proto"
 )
+
+type protoSlice[T proto.Message] []T
+
+func ProtoSlice[T proto.Message](s []T) zapcore.ArrayMarshaler {
+	return protoSlice[T](s)
+}
+
+func (s protoSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
+	var err error
+	for _, v := range s {
+		err = multierr.Append(err, e.AppendObject(Proto(v)))
+	}
+	return err
+}
+
+type objectSlice[T zapcore.ObjectMarshaler] []T
 
 func ObjectSlice[T zapcore.ObjectMarshaler](s []T) zapcore.ArrayMarshaler {
 	return objectSlice[T](s)
 }
-
-type objectSlice[T zapcore.ObjectMarshaler] []T
 
 func (s objectSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 	var err error
@@ -31,6 +48,32 @@ func (s objectSlice[T]) MarshalLogArray(e zapcore.ArrayEncoder) error {
 		err = multierr.Append(err, e.AppendObject(v))
 	}
 	return err
+}
+
+type timeSlice []time.Time
+
+func TimeSlice(s []time.Time) zapcore.ArrayMarshaler {
+	return timeSlice(s)
+}
+
+func (s timeSlice) MarshalLogArray(e zapcore.ArrayEncoder) error {
+	for _, v := range s {
+		e.AppendTime(v)
+	}
+	return nil
+}
+
+type durationSlice []time.Duration
+
+func DurationSlice(s []time.Duration) zapcore.ArrayMarshaler {
+	return durationSlice(s)
+}
+
+func (s durationSlice) MarshalLogArray(e zapcore.ArrayEncoder) error {
+	for _, v := range s {
+		e.AppendDuration(v)
+	}
+	return nil
 }
 
 type boolSlice[T ~bool] []T
