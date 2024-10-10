@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.25.0
+
+### Minor Changes
+
+- Add ringing timeout and max call duration setting for SIP. - [#844](https://github.com/livekit/protocol/pull/844) ([@dennwc](https://github.com/dennwc))
+
 ## 1.24.0
 
 ### Minor Changes
