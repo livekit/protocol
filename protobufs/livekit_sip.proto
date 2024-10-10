@@ -21,6 +21,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 
 /*
    LiveKit's SIP API is built with 3 high level primitives
@@ -188,6 +189,11 @@ message SIPInboundTrunkInfo {
   map<string, string> headers = 9;
   // Map SIP X-* headers from INVITE to SIP participant attributes.
   map<string, string> headers_to_attributes = 10;
+
+  // Max time for the caller to wait for track subscription.
+  google.protobuf.Duration ringing_timeout = 11;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 12;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -401,7 +407,12 @@ message CreateSIPParticipantRequest {
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
   bool hide_phone_number = 10;
 
-  // NEXT ID: 11
+  // Max time for the callee to answer the call.
+  google.protobuf.Duration ringing_timeout = 11;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 12;
+
+  // NEXT ID: 13
 }
 
 message SIPParticipantInfo {
