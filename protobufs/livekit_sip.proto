@@ -50,7 +50,7 @@ import "livekit_models.proto";
 
 
 service SIP {
-  rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; };
+  // rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; }; DELETED
   rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
@@ -425,9 +425,10 @@ message SIPCallInfo {
   string participant_identity = 4;
   SIPUri from_uri = 5;
   SIPUri to_uri = 6;
-  int64 started_at = 7;
-  int64 ended_at = 8;
-  DisconnectReason disconnect_reason = 9;
+  SIPCallStatus call_status = 7;
+  int64 started_at = 8;
+  int64 ended_at = 9;
+  DisconnectReason disconnect_reason = 10;
 }
 
 message SIPUri {
@@ -436,4 +437,10 @@ message SIPUri {
   string ip = 3;
   string port = 4;
   SIPTransport transport = 5;
+}
+
+enum SIPCallStatus {
+  SIP_CALL_STARTING = 0;
+  SIP_CALL_ACTIVE = 1;
+  SIP_CALL_DISCONNECTED = 2;
 }
