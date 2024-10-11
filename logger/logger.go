@@ -105,20 +105,24 @@ type UnlikelyLogger struct {
 	keysAndValues []any
 }
 
+func (l UnlikelyLogger) makeLogger() Logger {
+	return l.logger.WithCallDepth(2)
+}
+
 func (l UnlikelyLogger) Debugw(msg string, keysAndValues ...any) {
-	l.logger.Debugw(msg, slices.Concat(l.keysAndValues, keysAndValues)...)
+	l.makeLogger().Debugw(msg, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) Infow(msg string, keysAndValues ...any) {
-	l.logger.Infow(msg, slices.Concat(l.keysAndValues, keysAndValues)...)
+	l.makeLogger().Infow(msg, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) Warnw(msg string, err error, keysAndValues ...any) {
-	l.logger.Warnw(msg, err, slices.Concat(l.keysAndValues, keysAndValues)...)
+	l.makeLogger().Warnw(msg, err, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) Errorw(msg string, err error, keysAndValues ...any) {
-	l.logger.Errorw(msg, err, slices.Concat(l.keysAndValues, keysAndValues)...)
+	l.makeLogger().Errorw(msg, err, slices.Concat(l.keysAndValues, keysAndValues)...)
 }
 
 func (l UnlikelyLogger) WithValues(keysAndValues ...any) UnlikelyLogger {
