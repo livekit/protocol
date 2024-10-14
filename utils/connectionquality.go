@@ -30,3 +30,11 @@ func IsConnectionQualityLower(prev livekit.ConnectionQuality, curr livekit.Conne
 	// WARNING NOTE: comparing protobuf enums directly
 	return curr < prev
 }
+
+func IsConnectionQualityHigher(prev livekit.ConnectionQuality, curr livekit.ConnectionQuality) bool {
+	if IsConnectionQualityLower(prev, curr) {
+		return false
+	}
+
+	return curr != prev
+}

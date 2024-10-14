@@ -22,6 +22,7 @@ import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 
 service IOInfo {
   // egress
@@ -169,7 +170,13 @@ message EvaluateSIPDispatchRulesResponse {
   map<string, string> headers_to_attributes = 14;
 
   repeated SIPFeature enabled_features = 15;
-  // NEXT ID: 16
+
+  // Max time for the caller to wait for track subscription.
+  google.protobuf.Duration ringing_timeout = 16;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 17;
+
+  // NEXT ID: 18
 }
 
 message UpdateSIPCallStateRequest {

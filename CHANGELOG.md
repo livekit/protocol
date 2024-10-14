@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.24.0
+
+### Minor Changes
+
+- Add disconnect reasons for SIP. - [#828](https://github.com/livekit/protocol/pull/828) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add missing SIP status attribute. - [#833](https://github.com/livekit/protocol/pull/833) ([@dennwc](https://github.com/dennwc))
+
+- Validate SipCallTo in CreateSIPParticipantRequest. - [#823](https://github.com/livekit/protocol/pull/823) ([@dennwc](https://github.com/dennwc))
+
 ## 1.23.0
 
 ### Patch Changes

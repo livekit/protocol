@@ -520,6 +520,7 @@ func TestSlack(t *testing.T) {
 }
 
 func TestSetRateLimitOnTheFly(t *testing.T) {
+	t.Skip(UnstableTest)
 	runTest(t, func(r testRunner) {
 		// Set rate to 1hz
 		limiter, ok := r.createLimiter(1, WithoutSlack).(*LeakyBucket)

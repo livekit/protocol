@@ -19,6 +19,7 @@ package rpc;
 option go_package = "github.com/livekit/protocol/rpc";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 import "options.proto";
 import "livekit_sip.proto";
 
@@ -81,7 +82,12 @@ message InternalCreateSIPParticipantRequest {
   map<string, string> headers = 21;
   map<string, string> headers_to_attributes = 22;
 
-  // NEXT ID: 23
+  // Max time for the callee to answer the call.
+  google.protobuf.Duration ringing_timeout = 23;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 24;
+
+  // NEXT ID: 25
 }
 
 message InternalCreateSIPParticipantResponse {

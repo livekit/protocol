@@ -3,4 +3,4 @@
 "github.com/livekit/protocol": minor
 ---
 
-Add disconnect reasons for SIP.
+Add ringing timeout and max call duration setting for SIP.

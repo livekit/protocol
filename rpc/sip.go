@@ -67,5 +67,7 @@ func NewCreateSIPParticipantRequest(
 		PlayRingtone:          req.PlayRingtone,
 		Headers:               trunk.Headers,
 		HeadersToAttributes:   trunk.HeadersToAttributes,
+		RingingTimeout:        req.RingingTimeout,
+		MaxCallDuration:       req.MaxCallDuration,
 	}, nil
 }
