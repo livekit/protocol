@@ -440,9 +440,9 @@ message SIPUri {
   SIPTransport transport = 5;
 }
 
-enum SIPCallStatus {
-  SIP_CALL_STATUS_CALL_INCOMING = 0;
-  SIP_CALL_STATUS_PARTICIPANT_JOINED = 1;
-  SIP_CALL_STATUS_ACTIVE = 2;
-  SIP_CALL_STATUS_DISCONNECTED = 3;
+enum SIPCallStatus { 
+  SCS_CALL_INCOMING = 0; // Incoming call is being handled by the SIP service. The SIP participant hasn't joined a LiveKit room yet
+  SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
+  SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
+  SCS_DISCONNECTED = 3; // Call has ended
 }
