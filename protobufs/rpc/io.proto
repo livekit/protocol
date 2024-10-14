@@ -20,6 +20,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
+import "livekit_sip.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 
@@ -39,6 +40,7 @@ service IOInfo {
   // sip
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
   rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
+  rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
 }
 
 message GetEgressRequest {
@@ -175,6 +177,12 @@ message EvaluateSIPDispatchRulesResponse {
   google.protobuf.Duration max_call_duration = 17;
 
   // NEXT ID: 18
+}
+
+message UpdateSIPCallStateRequest {
+  livekit.SIPCallInfo call_info = 1;
+
+   // NEXT ID: 2
 }
 
 enum SIPFeature {

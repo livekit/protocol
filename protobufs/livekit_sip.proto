@@ -20,8 +20,9 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "livekit_models.proto";
 
 /*
    LiveKit's SIP API is built with 3 high level primitives
@@ -50,7 +51,7 @@ import "google/protobuf/duration.proto";
 
 
 service SIP {
-  rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; };
+  // rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; }; DELETED
   rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
@@ -426,4 +427,33 @@ message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
   string transfer_to = 3;
+}
+
+message SIPCallInfo {
+  string call_id = 1;
+  string trunk_id = 2;
+  string room_name = 3;
+  string room_id = 4; // ID of the current/previous room published to
+  string participant_identity = 5;
+  SIPUri from_uri = 6;
+  SIPUri to_uri = 7;
+  SIPCallStatus call_status = 8;
+  int64 started_at = 9;
+  int64 ended_at = 10;
+  DisconnectReason disconnect_reason = 11;
+}
+
+message SIPUri {
+  string user = 1;
+  string host = 2;
+  string ip = 3;
+  string port = 4;
+  SIPTransport transport = 5;
+}
+
+enum SIPCallStatus { 
+  SCS_CALL_INCOMING = 0; // Incoming call is being handled by the SIP service. The SIP participant hasn't joined a LiveKit room yet
+  SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
+  SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
+  SCS_DISCONNECTED = 3; // Call has ended
 }
