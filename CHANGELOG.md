@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.26.0
+
+### Minor Changes
+
+- allow Agents to pass through initial attributes - [#852](https://github.com/livekit/protocol/pull/852) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.25.0
 
 ### Minor Changes
