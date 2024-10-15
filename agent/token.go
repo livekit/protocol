@@ -7,7 +7,11 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func BuildAgentToken(apiKey, secret, roomName, participantIdentity, participantName, participantMetadata string, permissions *livekit.ParticipantPermission) (string, error) {
+func BuildAgentToken(
+	apiKey, secret, roomName, participantIdentity, participantName, participantMetadata string,
+	participantAttributes map[string]string,
+	permissions *livekit.ParticipantPermission,
+) (string, error) {
 	grant := &auth.VideoGrant{
 		RoomJoin:             true,
 		Agent:                true,
@@ -26,7 +30,8 @@ func BuildAgentToken(apiKey, secret, roomName, participantIdentity, participantN
 		SetName(participantName).
 		SetKind(livekit.ParticipantInfo_AGENT).
 		SetValidFor(1 * time.Hour).
-		SetMetadata(participantMetadata)
+		SetMetadata(participantMetadata).
+		SetAttributes(participantAttributes)
 
 	return at.ToJWT()
 }
