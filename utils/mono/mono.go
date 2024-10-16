@@ -7,8 +7,12 @@ var (
 	epochNano = epoch.UnixNano()
 )
 
+func FromTime(t time.Time) time.Time {
+	return epoch.Add(t.Sub(epoch))
+}
+
 func Now() time.Time {
-	return epoch.Add(time.Since(epoch))
+	return FromTime(time.Now())
 }
 
 func UnixNano() int64 {
