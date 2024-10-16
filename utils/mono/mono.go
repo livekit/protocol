@@ -14,3 +14,7 @@ func Now() time.Time {
 func UnixNano() int64 {
 	return epochNano + int64(time.Since(epoch))
 }
+
+func UnixMicro() int64 {
+	return (epochNano + int64(time.Since(epoch))) / 1000
+}
