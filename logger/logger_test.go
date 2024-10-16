@@ -135,71 +135,52 @@ type testBufferedWriteSyncer struct {
 
 func (t *testBufferedWriteSyncer) Sync() error { return nil }
 
-func testLogCaller(logFunc func(msg string, keysAndValues ...any)) {
-	logFunc("test")
+type logFunc func(string, ...any)
+
+func testLogCaller(f logFunc) {
+	f("test")
 }
 
-func getTestLogCallerCaller() string {
+func TestLoggerCallDepth(t *testing.T) {
+	t.Cleanup(func() {
+		defaultLogger = LogRLogger(discardLogger)
+		pkgLogger = LogRLogger(discardLogger)
+	})
+
 	var caller string
 	testLogCaller(func(string, ...any) {
 		_, file, line, _ := runtime.Caller(1)
 		caller = fmt.Sprintf("%s:%d", file, line)
 	})
-	return caller
-}
 
-func TestLoggerCallDepth(t *testing.T) {
-	caller := getTestLogCallerCaller()
+	cases := map[string]func(l Logger) logFunc{
+		"NewZapLogger": func(l Logger) logFunc {
+			return l.Debugw
+		},
+		"package logger": func(l Logger) logFunc {
+			SetLogger(l, "TEST")
+			return Debugw
+		},
+		"GetLogger": func(l Logger) logFunc {
+			SetLogger(l, "TEST")
+			return GetLogger().Debugw
+		},
+		"ToZap": func(l Logger) logFunc {
+			return l.(ZapLogger).ToZap().Debugw
+		},
+		"WithUnlikelyValues": func(l Logger) logFunc {
+			return l.WithUnlikelyValues().Debugw
+		},
+	}
+	for label, getLogFunc := range cases {
+		t.Run(label, func(t *testing.T) {
+			ws := &testBufferedWriteSyncer{}
+			l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
 
-	t.Run("NewZapLogger", func(t *testing.T) {
-		ws := &testBufferedWriteSyncer{}
-		l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
+			testLogCaller(getLogFunc(l))
 
-		testLogCaller(l.Debugw)
-		log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
-
-		require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
-	})
-
-	t.Run("package logger", func(t *testing.T) {
-		ws := &testBufferedWriteSyncer{}
-		l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
-		SetLogger(l, "TEST")
-
-		testLogCaller(Debugw)
-		log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
-
-		require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
-	})
-
-	t.Run("GetLogger", func(t *testing.T) {
-		ws := &testBufferedWriteSyncer{}
-		l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
-		SetLogger(l, "TEST")
-
-		testLogCaller(GetLogger().Debugw)
-		log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
-
-		require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
-	})
-
-	t.Run("ToZap", func(t *testing.T) {
-		ws := &testBufferedWriteSyncer{}
-		l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
-
-		testLogCaller(l.ToZap().Debugw)
-		log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
-
-		require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
-	})
-
-	t.Run("WithUnlikelyValues", func(t *testing.T) {
-		ws := &testBufferedWriteSyncer{}
-		l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
-
-		testLogCaller(l.WithUnlikelyValues().Debugw)
-		log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
-
-		require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
-	})
+			log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
+			require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
+		})
+	}
 }
