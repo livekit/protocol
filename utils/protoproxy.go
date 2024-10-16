@@ -52,7 +52,7 @@ func NewProtoProxy[T proto.Message](refreshInterval time.Duration, updateFn func
 		refreshInterval: refreshInterval,
 		queueUpdate:     make(chan struct{}, 1),
 	}
-	p.performUpdate(true)
+	p.performUpdate(true, time.Now())
 	if refreshInterval > 0 {
 		go p.worker()
 	}
@@ -105,7 +105,7 @@ func (p *ProtoProxy[T]) Stop() {
 	}
 }
 
-func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
+func (p *ProtoProxy[T]) performUpdate(skipNotify bool, refreshTime time.Time) {
 	// set dirty back *before* calling updateFn because otherwise it could
 	// wipe out another thread setting dirty to true while updateFn is executing
 	p.lock.Lock()
@@ -128,7 +128,7 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool) {
 	p.message = msg
 	// only updating refreshedAt if we have notified, so it shouldn't push
 	// out the next notification out by another interval
-	p.refreshedAt = time.Now()
+	p.refreshedAt = refreshTime
 	p.lock.Unlock()
 
 	if !skipNotify {
@@ -148,15 +148,15 @@ func (p *ProtoProxy[T]) worker() {
 		select {
 		case <-p.fuse.Watch():
 			return
-		case <-ticker.C:
+		case now := <-ticker.C:
 			p.lock.RLock()
-			shouldUpdate := p.dirty && time.Since(p.refreshedAt) > p.refreshInterval
+			shouldUpdate := p.dirty && time.Since(p.refreshedAt) >= p.refreshInterval
 			p.lock.RUnlock()
 			if shouldUpdate {
-				p.performUpdate(false)
+				p.performUpdate(false, now)
 			}
 		case <-p.queueUpdate:
-			p.performUpdate(false)
+			p.performUpdate(false, time.Now())
 		}
 	}
 }
