@@ -105,7 +105,7 @@ func (p *ProtoProxy[T]) Stop() {
 	}
 }
 
-func (p *ProtoProxy[T]) performUpdate(skipNotify bool, refreshTime time.Time) bool {
+func (p *ProtoProxy[T]) performUpdate(skipNotify bool, refreshTime time.Time) {
 	// set dirty back *before* calling updateFn because otherwise it could
 	// wipe out another thread setting dirty to true while updateFn is executing
 	p.lock.Lock()
@@ -123,7 +123,7 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool, refreshTime time.Time) bo
 	if proto.Equal(p.message, msg) {
 		// no change, skip the notification
 		p.lock.Unlock()
-		return false
+		return
 	}
 	p.message = msg
 	// only updating refreshedAt if we have notified, so it shouldn't push
@@ -137,7 +137,6 @@ func (p *ProtoProxy[T]) performUpdate(skipNotify bool, refreshTime time.Time) bo
 		default:
 		}
 	}
-	return true
 }
 
 func (p *ProtoProxy[T]) worker() {
