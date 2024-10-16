@@ -16,6 +16,7 @@ package sip
 
 import (
 	"fmt"
+	"net/netip"
 	"strconv"
 	"testing"
 
@@ -219,7 +220,13 @@ func TestSIPMatchTrunk(t *testing.T) {
 				src = "1.1.1.1"
 			}
 			trunks := toInboundTrunks(c.trunks)
-			got, err := MatchTrunk(trunks, src, from, to)
+			var srcIP netip.Addr
+			if src != "" {
+				var err error
+				srcIP, err = netip.ParseAddr(src)
+				require.NoError(t, err)
+			}
+			got, err := MatchTrunk(trunks, srcIP, from, to)
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
@@ -657,7 +664,9 @@ func TestMatchIP(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
-			got := matchAddrMask(c.addr, c.mask)
+			ip, err := netip.ParseAddr(c.addr)
+			require.NoError(t, err)
+			got := matchAddrMask(ip, c.mask)
 			require.Equal(t, c.exp, got)
 		})
 	}
