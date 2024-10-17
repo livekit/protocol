@@ -348,8 +348,8 @@ message EgressInfo {
   repeated FileInfo file_results = 16;
   repeated SegmentsInfo segment_results = 17;
   repeated ImagesInfo image_results = 20;
-
-  // next ID: 23
+  string manifest_url = 23;
+  // next ID: 24
 }
 
 message StreamInfoList {
