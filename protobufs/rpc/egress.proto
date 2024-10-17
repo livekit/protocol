@@ -58,6 +58,8 @@ message StartEgressRequest {
   string room_id = 3;
   string token = 8;
   string ws_url = 9;
+
+  bool cloud_backup_enabled = 10; // cloud only
 }
 
 message ListActiveEgressRequest {}
