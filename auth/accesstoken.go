@@ -112,19 +112,19 @@ func (t *AccessToken) SetRoomPreset(preset string) *AccessToken {
 
 func (t *AccessToken) SetRoomConfig(config *livekit.RoomConfiguration) *AccessToken {
 	if config == nil {
-		t.grant.Room = nil
+		t.grant.RoomConfig = nil
 	} else {
-		t.grant.Room = (*RoomConfiguration)(config)
+		t.grant.RoomConfig = (*RoomConfiguration)(config)
 	}
 	return t
 }
 
 // SetAgents is a shortcut for setting agents in room configuration
 func (t *AccessToken) SetAgents(agents []*livekit.RoomAgentDispatch) *AccessToken {
-	if t.grant.Room == nil {
-		t.grant.Room = &RoomConfiguration{}
+	if t.grant.RoomConfig == nil {
+		t.grant.RoomConfig = &RoomConfiguration{}
 	}
-	t.grant.Room.Agents = agents
+	t.grant.RoomConfig.Agents = agents
 	return t
 }
 

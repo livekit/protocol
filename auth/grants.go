@@ -53,7 +53,7 @@ type ClaimGrants struct {
 	Video    *VideoGrant `json:"video,omitempty"`
 	SIP      *SIPGrant   `json:"sip,omitempty"`
 	// Room configuration to use if this participant initiates the room
-	Room *RoomConfiguration `json:"roomConfig,omitempty"`
+	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
 	// when both room and roomPreset are set, parameters in room overrides the preset
 	RoomPreset string `json:"roomPreset,omitempty"`
@@ -73,10 +73,10 @@ func (c *ClaimGrants) GetParticipantKind() livekit.ParticipantInfo_Kind {
 }
 
 func (c *ClaimGrants) GetRoomConfiguration() *livekit.RoomConfiguration {
-	if c.Room == nil {
+	if c.RoomConfig == nil {
 		return nil
 	}
-	return (*livekit.RoomConfiguration)(c.Room)
+	return (*livekit.RoomConfiguration)(c.RoomConfig)
 }
 
 func (c *ClaimGrants) Clone() *ClaimGrants {
@@ -88,7 +88,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Video = c.Video.Clone()
 	clone.SIP = c.SIP.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
-	clone.Room = c.Room.Clone()
+	clone.RoomConfig = c.RoomConfig.Clone()
 
 	return &clone
 }

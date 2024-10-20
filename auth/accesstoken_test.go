@@ -137,7 +137,7 @@ func TestAccessToken(t *testing.T) {
 		require.NoError(t, err)
 
 		// Check if the room configuration was correctly serialized and deserialized
-		roomDecoded := (*livekit.RoomConfiguration)(decodedGrant.Room)
+		roomDecoded := (*livekit.RoomConfiguration)(decodedGrant.RoomConfig)
 		require.NotNil(t, roomDecoded)
 		agents := roomDecoded.Agents
 		require.NotNil(t, agents)
@@ -160,7 +160,7 @@ func TestAccessToken(t *testing.T) {
 		require.NoError(t, err)
 
 		// Navigate to the agents array
-		room, ok := jsonPayload["room"].(map[string]interface{})
+		room, ok := jsonPayload["roomConfig"].(map[string]interface{})
 		require.True(t, ok, "room should be a map")
 		agentsJSON, ok := room["agents"].([]interface{})
 		require.True(t, ok, "agents should be an array")
