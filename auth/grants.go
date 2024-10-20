@@ -53,7 +53,7 @@ type ClaimGrants struct {
 	Video    *VideoGrant `json:"video,omitempty"`
 	SIP      *SIPGrant   `json:"sip,omitempty"`
 	// Room configuration to use if this participant initiates the room
-	Room *RoomConfiguration `json:"room,omitempty"`
+	Room *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
 	// when both room and roomPreset are set, parameters in room overrides the preset
 	RoomPreset string `json:"roomPreset,omitempty"`
