@@ -99,4 +99,7 @@ message InternalCreateSIPParticipantResponse {
 message InternalTransferSIPParticipantRequest {
   string sip_call_id = 1;
   string transfer_to = 2;
+ 
+  // Optionally play ringtone to the SIP participant as an audible indicator of being transferred
+  bool play_ringtone = 3;
 }
