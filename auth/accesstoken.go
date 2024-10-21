@@ -120,7 +120,7 @@ func (t *AccessToken) SetRoomConfig(config *livekit.RoomConfiguration) *AccessTo
 }
 
 // SetAgents is a shortcut for setting agents in room configuration
-func (t *AccessToken) SetAgents(agents []*livekit.RoomAgentDispatch) *AccessToken {
+func (t *AccessToken) SetAgents(agents ...*livekit.RoomAgentDispatch) *AccessToken {
 	if t.grant.RoomConfig == nil {
 		t.grant.RoomConfig = &RoomConfiguration{}
 	}
