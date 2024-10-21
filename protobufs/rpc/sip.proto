@@ -76,8 +76,8 @@ message InternalCreateSIPParticipantRequest {
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 11;
 
-  // Optionally play ringtone in the room as an audible indicator for existing participants
-  bool play_ringtone = 12;
+  // Optionally play dialtone in the room as an audible indicator for existing participants
+  bool play_dialtone = 12;
 
   map<string, string> headers = 21;
   map<string, string> headers_to_attributes = 22;
@@ -100,6 +100,6 @@ message InternalTransferSIPParticipantRequest {
   string sip_call_id = 1;
   string transfer_to = 2;
  
-  // Optionally play ringtone to the SIP participant as an audible indicator of being transferred
-  bool play_ringtone = 3;
+  // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
+  bool play_dialtone = 3;
 }
