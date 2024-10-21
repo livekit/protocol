@@ -514,6 +514,9 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		resp.HeadersToAttributes = trunk.HeadersToAttributes
 		resp.RingingTimeout = trunk.RingingTimeout
 		resp.MaxCallDuration = trunk.MaxCallDuration
+		if trunk.KrispEnabled {
+			resp.EnabledFeatures = append(resp.EnabledFeatures, rpc.SIPFeature_KRISP_ENABLED)
+		}
 	}
 	return resp, nil
 }
