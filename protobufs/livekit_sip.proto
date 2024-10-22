@@ -403,8 +403,9 @@ message CreateSIPParticipantRequest {
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 5;
 
-  // Optionally play ringtone in the room as an audible indicator for existing participants
-  bool play_ringtone = 6;
+  // Optionally play dialtone in the room as an audible indicator for existing participants. The `play_ringtone` option is deprectated but has the same effect.
+  bool play_ringtone = 6 [deprecated = true];
+  bool play_dialtone = 13;
 
   // By default the From value (Phone number) is used for participant name/identity (if not set) and added to attributes.
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
@@ -415,7 +416,7 @@ message CreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
 
-  // NEXT ID: 13
+  // NEXT ID: 14
 }
 
 message SIPParticipantInfo {
@@ -429,6 +430,9 @@ message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
   string transfer_to = 3;
+  
+  // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
+  bool play_dialtone = 4;
 }
 
 message SIPCallInfo {

@@ -19,7 +19,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"extra": "1",
 		},
 		Dtmf:         "1234#",
-		PlayRingtone: true,
+		PlayDialtone: true,
 	}
 	tr := &livekit.SIPOutboundTrunkInfo{
 		SipTrunkId:   "trunk",
@@ -45,7 +45,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Token:               "token",
 		WsUrl:               "url",
 		Dtmf:                "1234#",
-		PlayRingtone:        true,
+		PlayDialtone:        true,
 		ParticipantAttributes: map[string]string{
 			"extra":                    "1",
 			livekit.AttrSIPCallID:      "call-id",
@@ -73,7 +73,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Token:               "token",
 		WsUrl:               "url",
 		Dtmf:                "1234#",
-		PlayRingtone:        true,
+		PlayDialtone:        true,
 		ParticipantAttributes: map[string]string{
 			"extra":                "1",
 			livekit.AttrSIPCallID:  "call-id",
