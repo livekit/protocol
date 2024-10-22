@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package events
 
 import (
 	"sort"
@@ -24,7 +24,7 @@ import (
 
 func TestEventEmitter(t *testing.T) {
 	t.Run("emitter", func(t *testing.T) {
-		emitter := NewDefaultEventEmitter[string, int]()
+		emitter := NewEmitter[string, int]()
 		ao0 := emitter.Observe("a")
 		ao1 := emitter.Observe("a")
 		bo := emitter.Observe("b")
@@ -53,7 +53,7 @@ func TestEventEmitter(t *testing.T) {
 
 	t.Run("observer", func(t *testing.T) {
 		var closeCalled bool
-		o, emit := NewEventObserver[int](func() { closeCalled = true })
+		o, emit := NewObserver[int](func() { closeCalled = true })
 
 		emit(1)
 		require.Equal(t, 1, <-o.Events())
@@ -63,7 +63,7 @@ func TestEventEmitter(t *testing.T) {
 	})
 
 	t.Run("notify", func(t *testing.T) {
-		emitter := NewDefaultEventEmitter[string, int]()
+		emitter := NewEmitter[string, int]()
 
 		as := make(chan int, 1)
 		stop := emitter.Notify("a", as)
@@ -87,7 +87,7 @@ func TestEventEmitter(t *testing.T) {
 	})
 
 	t.Run("on", func(t *testing.T) {
-		emitter := NewDefaultEventEmitter[string, int]()
+		emitter := NewEmitter[string, int]()
 
 		as := make(chan int, 1)
 		stop := emitter.On("a", func(i int) {
@@ -113,22 +113,16 @@ func TestEventEmitter(t *testing.T) {
 	})
 
 	t.Run("stop unblocks blocking observers", func(t *testing.T) {
-		observer, emit := NewEventObserver[int](func() {})
+		observer, emit := NewObserver[int](func() {})
 
-		list := NewEventObserverList[int](EventEmitterParams{
-			QueueSize: DefaultEventQueueSize,
-			Blocking:  true,
-		})
+		list := NewObserverList[int](WithBlocking())
 
-		emitter := NewEventEmitter[int, int](EventEmitterParams{
-			QueueSize: DefaultEventQueueSize,
-			Blocking:  true,
-		})
+		emitter := NewEmitter[int, int](WithBlocking())
 
 		cases := []struct {
 			label    string
 			emit     func()
-			observer EventObserver[int]
+			observer Observer[int]
 		}{
 			{
 				label:    "observer",
@@ -154,7 +148,7 @@ func TestEventEmitter(t *testing.T) {
 				ready := make(chan struct{})
 
 				go func() {
-					for i := 0; i < DefaultEventQueueSize; i++ {
+					for i := 0; i < DefaultQueueSize; i++ {
 						c.emit()
 					}
 					close(ready)
@@ -186,9 +180,7 @@ func TestEventEmitter(t *testing.T) {
 }
 
 func BenchmarkEventEmitter(b *testing.B) {
-	e := NewEventEmitter[int, int](EventEmitterParams{
-		QueueSize: DefaultEventQueueSize,
-	})
+	e := NewEmitter[int, int]()
 	for i := 0; i < b.N; i++ {
 		o := e.Observe(i)
 		e.Emit(i, i)
@@ -198,9 +190,7 @@ func BenchmarkEventEmitter(b *testing.B) {
 }
 
 func BenchmarkEventObserverList(b *testing.B) {
-	l := NewEventObserverList[int](EventEmitterParams{
-		QueueSize: DefaultEventQueueSize,
-	})
+	l := NewObserverList[int]()
 	for i := 0; i < b.N; i++ {
 		o := l.Observe()
 		l.Emit(i)
