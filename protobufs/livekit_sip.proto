@@ -195,6 +195,8 @@ message SIPInboundTrunkInfo {
   google.protobuf.Duration ringing_timeout = 11;
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
+
+  bool krisp_enabled = 13;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -455,7 +457,7 @@ message SIPUri {
   SIPTransport transport = 5;
 }
 
-enum SIPCallStatus { 
+enum SIPCallStatus {
   SCS_CALL_INCOMING = 0; // Incoming call is being handled by the SIP service. The SIP participant hasn't joined a LiveKit room yet
   SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
   SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
