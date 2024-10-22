@@ -1,5 +1,19 @@
 # github.com/livekit/protocol
 
+## 1.27.0
+
+### Minor Changes
+
+- Support for room configuration and agent dispatches - [#864](https://github.com/livekit/protocol/pull/864) ([@davidzhao](https://github.com/davidzhao))
+
+### Patch Changes
+
+- added manifest details to egress info - [#862](https://github.com/livekit/protocol/pull/862) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Type safe IP checks for SIP Trunks. - [#857](https://github.com/livekit/protocol/pull/857) ([@dennwc](https://github.com/dennwc))
+
+- enable krisp SIP setting - [#866](https://github.com/livekit/protocol/pull/866) ([@frostbyte73](https://github.com/frostbyte73))
+
 ## 1.26.0
 
 ### Minor Changes
