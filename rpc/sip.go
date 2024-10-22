@@ -64,7 +64,7 @@ func NewCreateSIPParticipantRequest(
 		ParticipantMetadata:   req.ParticipantMetadata,
 		ParticipantAttributes: attrs,
 		Dtmf:                  req.Dtmf,
-		PlayRingtone:          req.PlayRingtone,
+		PlayDialtone:          req.PlayRingtone || req.PlayDialtone,
 		Headers:               trunk.Headers,
 		HeadersToAttributes:   trunk.HeadersToAttributes,
 		RingingTimeout:        req.RingingTimeout,
