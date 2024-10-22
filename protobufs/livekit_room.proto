@@ -66,7 +66,7 @@ message CreateRoomRequest {
   // name of the room
   string name = 1;
   // configuration to use for this room parameters. Setting parameters below override the config defaults.
-  string config_name = 12;
+  string room_preset = 12;
   // number of seconds to keep the room open if no one joins
   uint32 empty_timeout = 2;
   // number of seconds to keep the room open after everyone leaves
@@ -77,10 +77,8 @@ message CreateRoomRequest {
   string node_id = 4;
   // metadata of room
   string metadata = 5;
-  // egress
+  // auto-egress configurations
   RoomEgress egress = 6;
-  // agent
-  RoomAgent agent = 11;
   // playout delay of subscriber
   uint32 min_playout_delay = 7;
   uint32 max_playout_delay = 8;
@@ -89,7 +87,10 @@ message CreateRoomRequest {
   bool sync_streams = 9;
   // replay
   bool replay_enabled = 13;
-  // NEXT-ID: 14
+
+  // Define agents that should be dispatched to this room
+  repeated RoomAgentDispatch agents = 14;
+  // NEXT-ID: 15
 }
 
 message RoomEgress {
@@ -211,16 +212,17 @@ message RoomConfiguration {
   uint32 empty_timeout = 2;
   // number of seconds to keep the room open after everyone leaves
   uint32 departure_timeout = 3;
-  // limit number of participants that can be in a room
+  // limit number of participants that can be in a room, excluding Egress and Ingress participants
   uint32 max_participants = 4;
   // egress
   RoomEgress egress = 5;
-  // agent
-  RoomAgent agent = 6;
   // playout delay of subscriber
   uint32 min_playout_delay = 7;
   uint32 max_playout_delay = 8;
   // improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
   // so not recommended for rooms with frequent subscription changes
   bool sync_streams = 9;
+
+  // Define agents that should be dispatched to this room
+  repeated RoomAgentDispatch agents = 10;
 }

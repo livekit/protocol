@@ -68,7 +68,7 @@ func TestProtoProxy(t *testing.T) {
 
 		// trigger another update, but should not get notification as freeze is in place and the model should not have changed
 		proxy.MarkDirty(false)
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(500 * time.Millisecond)
 		select {
 		case <-proxy.Updated():
 			t.Fatal("should not have received an update")
