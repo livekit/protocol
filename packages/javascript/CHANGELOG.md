@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.27.0
+
+### Minor Changes
+
+- Support for room configuration and agent dispatches - [#864](https://github.com/livekit/protocol/pull/864) ([@davidzhao](https://github.com/davidzhao))
+
+### Patch Changes
+
+- Allow requesting a ringtone during SIP call transfers - [#865](https://github.com/livekit/protocol/pull/865) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.26.0
 
 ## 1.25.0
