@@ -462,4 +462,5 @@ enum SIPCallStatus {
   SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
   SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
   SCS_DISCONNECTED = 3; // Call has ended
+  SCS_ERROR = 4; // Call has ended or never succeeded because of an error
 }
