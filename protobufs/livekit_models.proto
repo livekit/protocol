@@ -599,3 +599,67 @@ enum AudioTrackFeature {
   TF_ENHANCED_NOISE_CANCELLATION = 5;
 }
 
+message DataStream {
+  enum StreamType {
+    FINITE = 0;
+    STREAMING = 1;
+  }
+  
+  // Enum for operation types (specific to TextStreamHeader)
+  enum OperationType {
+    CREATE = 0;
+    UPDATE = 1;
+    DELETE = 2;
+    REACTION = 3;
+  }
+  
+  // Header properties specific to text streams
+  message TextHeader {
+    OperationType operationType = 1;
+    int32 version = 2;  // Optional: Version for updates/edits
+    string replyToMessageId = 3;  // Optional: Reply to specific message
+  }
+  
+  // Header properties specific to file or image streams
+  message FileHeader {
+    string fileName = 1;  // Optional: Name of the file
+  }
+
+   // Header properties specific to file or image streams
+   message CustomHeader {
+    map<string, string> extensions = 1;  // Optional: Name of the file
+  }
+  
+  // Main DataStreamHeader that contains a oneof for specific headers
+  message Header {
+    string messageId = 1;
+    int64 timestamp = 2;  // Using int64 for Unix timestamp
+    string topic = 3;
+    StreamType streamType = 4;
+    string mimeType = 6;
+    int32 totalLength = 7;  // Optional: Only for finite streams
+    int32 totalChunks = 8;  // Optional: Only for finite streams
+    Encryption.Type encryptionType = 9;  // Optional, defaults to NONE
+  
+    // oneof to choose between specific header types
+    oneof content_header {
+      TextHeader textHeader = 10;
+      FileHeader fileHeader = 11;
+      CustomHeader customHeader = 12;
+    }
+  }
+
+  message Packet {
+    string messageId = 1; // messageId as string
+    uint32 chunkId = 2; // chunkId as an unsigned 32-bit integer
+    bytes content = 3; // content as binary (bytes)
+    uint32 contentLength = 4; // content length in bytes
+    bool complete = 5; // optional, if the stream is complete
+    bytes iv = 6; // optional, initialization vector for AES-GCM encryption
+  }
+}
+
+
+
+
+
