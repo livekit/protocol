@@ -232,6 +232,8 @@ message SIPOutboundTrunkInfo {
   // Map SIP X-* headers from 200 OK to SIP participant attributes.
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 10;
+
+  bool krisp_enabled = 11;
 }
 
 message GetSIPInboundTrunkRequest {
@@ -430,7 +432,7 @@ message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
   string transfer_to = 3;
-  
+
   // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
   bool play_dialtone = 4;
 }

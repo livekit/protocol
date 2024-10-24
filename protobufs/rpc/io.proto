@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "rpc/sip.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 
@@ -183,11 +184,6 @@ message UpdateSIPCallStateRequest {
   livekit.SIPCallInfo call_info = 1;
 
    // NEXT ID: 2
-}
-
-enum SIPFeature {
-  NONE = 0;
-  KRISP_ENABLED = 1;
 }
 
 enum SIPDispatchResult {
