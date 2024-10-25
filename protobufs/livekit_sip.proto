@@ -58,6 +58,8 @@ service SIP {
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
   rpc CreateSIPOutboundTrunk(CreateSIPOutboundTrunkRequest) returns (SIPOutboundTrunkInfo);
+  rpc UpdateSIPInboundTrunk(UpdateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
+  rpc UpdateSIPOutboundTrunk(UpdateSIPOutboundTrunkRequest) returns (SIPOutboundTrunkInfo);
   rpc GetSIPInboundTrunk(GetSIPInboundTrunkRequest) returns (GetSIPInboundTrunkResponse);
   rpc GetSIPOutboundTrunk(GetSIPOutboundTrunkRequest) returns (GetSIPOutboundTrunkResponse);
   rpc ListSIPInboundTrunk(ListSIPInboundTrunkRequest) returns (ListSIPInboundTrunkResponse);
@@ -65,6 +67,7 @@ service SIP {
   rpc DeleteSIPTrunk(DeleteSIPTrunkRequest) returns (SIPTrunkInfo);
 
   rpc CreateSIPDispatchRule(CreateSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
+  rpc UpdateSIPDispatchRule(UpdateSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
   rpc ListSIPDispatchRule(ListSIPDispatchRuleRequest) returns (ListSIPDispatchRuleResponse);
   rpc DeleteSIPDispatchRule(DeleteSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
 
@@ -238,6 +241,14 @@ message CreateSIPInboundTrunkRequest {
   SIPInboundTrunkInfo trunk = 1; // Trunk ID is ignored
 }
 
+message UpdateSIPInboundTrunkRequest {
+  string sip_trunk_id = 1;
+  oneof action {
+    SIPInboundTrunkInfo replace = 2;
+    SIPInboundTrunkUpdate update = 3;
+  }
+}
+
 message SIPInboundTrunkInfo {
   string sip_trunk_id = 1;
 
@@ -289,8 +300,26 @@ message SIPInboundTrunkInfo {
   // NEXT ID: 17
 }
 
+message SIPInboundTrunkUpdate {
+  ListUpdate numbers = 1;
+  ListUpdate allowed_addresses = 2;
+  ListUpdate allowed_numbers = 3;
+  optional string auth_username = 4;
+  optional string auth_password = 5;
+  optional string name = 6;
+  optional string metadata = 7;
+}
+
 message CreateSIPOutboundTrunkRequest {
   SIPOutboundTrunkInfo trunk = 1; // Trunk ID is ignored
+}
+
+message UpdateSIPOutboundTrunkRequest {
+  string sip_trunk_id = 1;
+  oneof action {
+    SIPOutboundTrunkInfo replace = 2;
+    SIPOutboundTrunkUpdate update = 3;
+  }
 }
 
 message SIPOutboundTrunkInfo {
@@ -336,6 +365,16 @@ message SIPOutboundTrunkInfo {
   SIPMediaEncryption media_encryption = 13;
 
   // NEXT ID: 14
+}
+
+message SIPOutboundTrunkUpdate {
+  optional string address = 1;
+  optional SIPTransport transport = 2;
+  ListUpdate numbers = 3;
+  optional string auth_username = 4;
+  optional string auth_password = 5;
+  optional string name = 6;
+  optional string metadata = 7;
 }
 
 message GetSIPInboundTrunkRequest {
@@ -439,35 +478,45 @@ message SIPDispatchRule {
 }
 
 message CreateSIPDispatchRuleRequest {
-  SIPDispatchRule rule = 1;
+  SIPDispatchRuleInfo dispatch_rule = 10; // Rule ID is ignored
+
+  SIPDispatchRule rule = 1 [deprecated=true];
 
   // What trunks are accepted for this dispatch rule
   // If empty all trunks will match this dispatch rule
-  repeated string trunk_ids = 2;
+  repeated string trunk_ids = 2 [deprecated=true];
 
   // By default the From value (Phone number) is used for participant name/identity and added to attributes.
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
-  bool hide_phone_number = 3;
+  bool hide_phone_number = 3 [deprecated=true];
 
   // Dispatch Rule will only accept a call made to these numbers (if set).
-  repeated string inbound_numbers = 6;
+  repeated string inbound_numbers = 6 [deprecated=true];
 
   // Optional human-readable name for the Dispatch Rule.
-  string name = 4;
+  string name = 4 [deprecated=true];
   // User-defined metadata for the Dispatch Rule.
   // Participants created by this rule will inherit this metadata.
-  string metadata = 5;
+  string metadata = 5 [deprecated=true];
   // User-defined attributes for the Dispatch Rule.
   // Participants created by this rule will inherit these attributes.
-  map<string, string> attributes = 7;
+  map<string, string> attributes = 7 [deprecated=true];
 
   // Cloud-only, config preset to use
-  string room_preset = 8;
+  string room_preset = 8 [deprecated=true];
 
   // RoomConfiguration to use if the participant initiates the room
-  RoomConfiguration room_config = 9;
+  RoomConfiguration room_config = 9 [deprecated=true];
 
-  // NEXT ID: 10
+  // NEXT ID: 11
+}
+
+message UpdateSIPDispatchRuleRequest {
+  string sip_dispatch_rule_id = 1;
+  oneof action {
+    SIPDispatchRuleInfo replace = 2;
+    SIPDispatchRuleUpdate update = 3;
+  }
 }
 
 message SIPDispatchRuleInfo {
@@ -496,6 +545,14 @@ message SIPDispatchRuleInfo {
   bool krisp_enabled = 11;
   SIPMediaEncryption media_encryption = 12;
   // NEXT ID: 13
+}
+
+message SIPDispatchRuleUpdate {
+  ListUpdate trunk_ids = 1;
+  SIPDispatchRule rule = 2;
+  optional string name = 3;
+  optional string metadata = 4;
+  map<string, string> attributes = 5;
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
