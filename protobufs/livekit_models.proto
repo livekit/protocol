@@ -625,11 +625,6 @@ message DataStream {
     string fileName = 1;  // Optional: Name of the file
   }
 
-   // Header properties specific to file or image streams
-   message CustomHeader {
-    map<string, string> extensions = 1;  // Optional: Name of the file
-  }
-  
   // Main DataStreamHeader that contains a oneof for specific headers
   message Header {
     string messageId = 1;
@@ -637,15 +632,15 @@ message DataStream {
     string topic = 3;
     StreamType streamType = 4;
     string mimeType = 6;
-    int32 totalLength = 7;  // Optional: Only for finite streams
-    int32 totalChunks = 8;  // Optional: Only for finite streams
+    optional int32 totalLength = 7;  // Optional: Only for finite streams
+    optional int32 totalChunks = 8;  // Optional: Only for finite streams
     Encryption.Type encryptionType = 9;  // Optional, defaults to NONE
+    map<string, string> extensions = 10;  // Optional, user defined extensions map that can carry additional info
   
     // oneof to choose between specific header types
     oneof content_header {
-      TextHeader textHeader = 10;
-      FileHeader fileHeader = 11;
-      CustomHeader customHeader = 12;
+      TextHeader textHeader = 11;
+      FileHeader fileHeader = 12;
     }
   }
 
