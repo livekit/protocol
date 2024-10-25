@@ -47,7 +47,7 @@ func NewCreateSIPParticipantRequest(
 	}
 
 	var features []SIPFeature
-	if trunk.KrispEnabled {
+	if req.EnableKrisp {
 		features = append(features, SIPFeature_KRISP_ENABLED)
 	}
 
