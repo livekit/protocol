@@ -418,7 +418,7 @@ message CreateSIPParticipantRequest {
 
   // Enable voice isolation for the callee.
   bool enable_krisp = 14;
-  // NEXT ID: 14
+  // NEXT ID: 15
 }
 
 message SIPParticipantInfo {
