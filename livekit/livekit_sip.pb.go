@@ -1981,7 +1981,7 @@ type CreateSIPParticipantRequest struct {
 	// Max call duration.
 	MaxCallDuration *durationpb.Duration `protobuf:"bytes,12,opt,name=max_call_duration,json=maxCallDuration,proto3" json:"max_call_duration,omitempty"`
 	// Enable voice isolation for the callee.
-	EnableKrisp bool `protobuf:"varint,14,opt,name=enable_krisp,json=enableKrisp,proto3" json:"enable_krisp,omitempty"` // NEXT ID: 14
+	EnableKrisp bool `protobuf:"varint,14,opt,name=enable_krisp,json=enableKrisp,proto3" json:"enable_krisp,omitempty"` // NEXT ID: 15
 }
 
 func (x *CreateSIPParticipantRequest) Reset() {
