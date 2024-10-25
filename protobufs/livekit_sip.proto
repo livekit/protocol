@@ -232,8 +232,6 @@ message SIPOutboundTrunkInfo {
   // Map SIP X-* headers from 200 OK to SIP participant attributes.
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 10;
-
-  bool krisp_enabled = 11;
 }
 
 message GetSIPInboundTrunkRequest {
@@ -418,6 +416,8 @@ message CreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
 
+  // Enable voice isolation for the callee.
+  bool enable_krisp = 14;
   // NEXT ID: 14
 }
 
