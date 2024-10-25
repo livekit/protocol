@@ -19,3 +19,11 @@ import "google.golang.org/protobuf/proto"
 func CloneProto[T proto.Message](m T) T {
 	return proto.Clone(m).(T)
 }
+
+func CloneProtoSlice[T proto.Message](ms []T) []T {
+	cs := make([]T, len(ms))
+	for i := range ms {
+		cs[i] = CloneProto(ms[i])
+	}
+	return cs
+}
