@@ -416,7 +416,9 @@ message CreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
 
-  // NEXT ID: 14
+  // Enable voice isolation for the callee.
+  bool enable_krisp = 14;
+  // NEXT ID: 15
 }
 
 message SIPParticipantInfo {
@@ -430,7 +432,7 @@ message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
   string transfer_to = 3;
-  
+
   // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
   bool play_dialtone = 4;
 }
