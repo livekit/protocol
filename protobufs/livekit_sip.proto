@@ -446,9 +446,11 @@ message SIPCallInfo {
   SIPUri from_uri = 6;
   SIPUri to_uri = 7;
   SIPCallStatus call_status = 8;
-  int64 started_at = 9;
-  int64 ended_at = 10;
-  DisconnectReason disconnect_reason = 11;
+  int64 created_at = 9;
+  int64 started_at = 10;
+  int64 ended_at = 11;
+  DisconnectReason disconnect_reason = 12;
+  string error = 13;
 }
 
 message SIPUri {
@@ -464,4 +466,5 @@ enum SIPCallStatus {
   SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
   SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
   SCS_DISCONNECTED = 3; // Call has ended
+  SCS_ERROR = 4; // Call has ended or never succeeded because of an error
 }
