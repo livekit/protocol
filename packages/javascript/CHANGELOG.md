@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.27.1
+
+### Patch Changes
+
+- Include room agent dispatch protobufs in JS export - [#875](https://github.com/livekit/protocol/pull/875) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.27.0
 
 ### Minor Changes

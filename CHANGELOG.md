@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.27.1
+
+### Patch Changes
+
+- Add extra fields to SIP analytics events - [#872](https://github.com/livekit/protocol/pull/872) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.27.0
 
 ### Minor Changes
