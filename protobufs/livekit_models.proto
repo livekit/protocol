@@ -618,6 +618,7 @@ message DataStream {
     OperationType operationType = 1;
     int32 version = 2;  // Optional: Version for updates/edits
     string replyToMessageId = 3;  // Optional: Reply to specific message
+    repeated string attachedFileIds = 4;
   }
   
   // Header properties specific to file or image streams
