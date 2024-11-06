@@ -643,6 +643,8 @@ message DataStream {
       TextHeader textHeader = 11;
       FileHeader fileHeader = 12;
     }
+
+    string senderIdentity = 13;
   }
 
   message Packet {
