@@ -15,7 +15,7 @@
 package livekit
 
 import (
-	"github.com/bufbuild/protoyaml-go"
+	"github.com/livekit/protocol/livekit/protoyaml"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
@@ -111,7 +111,7 @@ func (r *RoomAgent) MarshalYAML() (interface{}, error) {
 
 func marshalProto(o proto.Message) (map[string]interface{}, error) {
 	// Marshall the Node to yaml using the protobuf specific marshaller to ensure the proper field names are used
-	str, err := protoyaml.MarshalOptions{UseProtoNames: true}.Marshal(o)
+	str, err := protoyaml.Marshal(o)
 	if err != nil {
 		return nil, err
 	}
