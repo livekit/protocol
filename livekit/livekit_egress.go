@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	MsgBackupUsed               = "At least one file went to backup storage"
 	MsgLimitReached             = "Session limit reached"
 	MsgStartNotReceived         = "Start signal not received"
 	MsgLimitReachedWithoutStart = "Session limit reached before start signal"
@@ -30,10 +29,8 @@ func (e *EgressInfo) UpdateStatus(status EgressStatus) {
 }
 
 func (e *EgressInfo) SetBackupUsed() {
-	e.Status = EgressStatus_EGRESS_FAILED
+	e.BackupStorageUsed = true
 	e.UpdatedAt = time.Now().UnixNano()
-	e.Error = MsgBackupUsed
-	e.ErrorCode = int32(http.StatusPermanentRedirect)
 }
 
 func (e *EgressInfo) SetEndReason(reason string) {
