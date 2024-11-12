@@ -457,7 +457,7 @@ message SIPUri {
   string user = 1;
   string host = 2;
   string ip = 3;
-  string port = 4;
+  uint32 port = 4;
   SIPTransport transport = 5;
 }
 
