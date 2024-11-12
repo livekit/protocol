@@ -31,6 +31,16 @@ func TestMarshalUnmarshal(t *testing.T) {
 	require.EqualValues(t, b0, b1)
 }
 
+func TestMarshalAppend(t *testing.T) {
+	id0 := livekit.RoomID(New(RoomPrefix))
+	id1 := livekit.RoomID(New(RoomPrefix))
+	var b []byte
+	b = MarshalAppend(b, id0)
+	b = MarshalAppend(b, id1)
+	require.Equal(t, id0, Unmarshal[livekit.RoomID](livekit.GuidBlock(b[0:])))
+	require.Equal(t, id1, Unmarshal[livekit.RoomID](livekit.GuidBlock(b[9:])))
+}
+
 func BenchmarkNew(b *testing.B) {
 	b.Run("new", func(b *testing.B) {
 		var guid string

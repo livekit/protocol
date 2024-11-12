@@ -19,9 +19,32 @@ import (
 	"strings"
 
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/utils"
 )
+
+type RoomConfiguration livekit.RoomConfiguration
+
+var tokenMarshaler = protojson.MarshalOptions{
+	EmitDefaultValues: false,
+}
+
+func (c *RoomConfiguration) Clone() *RoomConfiguration {
+	if c == nil {
+		return nil
+	}
+	return (*RoomConfiguration)(utils.CloneProto((*livekit.RoomConfiguration)(c)))
+}
+
+func (c *RoomConfiguration) MarshalJSON() ([]byte, error) {
+	return tokenMarshaler.Marshal((*livekit.RoomConfiguration)(c))
+}
+
+func (c *RoomConfiguration) UnmarshalJSON(data []byte) error {
+	return protojson.Unmarshal(data, (*livekit.RoomConfiguration)(c))
+}
 
 type ClaimGrants struct {
 	Identity string      `json:"-"`
@@ -29,6 +52,11 @@ type ClaimGrants struct {
 	Kind     string      `json:"kind,omitempty"`
 	Video    *VideoGrant `json:"video,omitempty"`
 	SIP      *SIPGrant   `json:"sip,omitempty"`
+	// Room configuration to use if this participant initiates the room
+	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
+	// Cloud-only, config preset to use
+	// when both room and roomPreset are set, parameters in room overrides the preset
+	RoomPreset string `json:"roomPreset,omitempty"`
 	// for verifying integrity of the message body
 	Sha256   string `json:"sha256,omitempty"`
 	Metadata string `json:"metadata,omitempty"`
@@ -44,6 +72,13 @@ func (c *ClaimGrants) GetParticipantKind() livekit.ParticipantInfo_Kind {
 	return kindToProto(c.Kind)
 }
 
+func (c *ClaimGrants) GetRoomConfiguration() *livekit.RoomConfiguration {
+	if c.RoomConfig == nil {
+		return nil
+	}
+	return (*livekit.RoomConfiguration)(c.RoomConfig)
+}
+
 func (c *ClaimGrants) Clone() *ClaimGrants {
 	if c == nil {
 		return nil
@@ -53,6 +88,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Video = c.Video.Clone()
 	clone.SIP = c.SIP.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
+	clone.RoomConfig = c.RoomConfig.Clone()
 
 	return &clone
 }
@@ -69,8 +105,6 @@ type VideoGrant struct {
 	RoomAdmin bool   `json:"roomAdmin,omitempty"`
 	RoomJoin  bool   `json:"roomJoin,omitempty"`
 	Room      string `json:"room,omitempty"`
-	// Name of the room configuration to apply to the room if created
-	RoomConfiguration string `json:"roomConfiguration,omitempty"`
 
 	// permissions within a room, if none of the permissions are set explicitly
 	// it will be granted with all publish and subscribe permissions
@@ -91,7 +125,6 @@ type VideoGrant struct {
 	// indicates to the room that current participant is a recorder
 	Recorder bool `json:"recorder,omitempty"`
 	// indicates that the holder can register as an Agent framework worker
-	// it is also set on all participants that are joining as Agent
 	Agent bool `json:"agent,omitempty"`
 
 	// if a participant can subscribe to metrics
@@ -317,7 +350,7 @@ func sourceToString(source livekit.TrackSource) string {
 }
 
 func sourceToProto(sourceStr string) livekit.TrackSource {
-	switch sourceStr {
+	switch strings.ToLower(sourceStr) {
 	case "camera":
 		return livekit.TrackSource_CAMERA
 	case "microphone":
@@ -336,7 +369,7 @@ func kindFromProto(source livekit.ParticipantInfo_Kind) string {
 }
 
 func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
-	switch sourceStr {
+	switch strings.ToLower(sourceStr) {
 	case "", "standard":
 		return livekit.ParticipantInfo_STANDARD
 	case "ingress":

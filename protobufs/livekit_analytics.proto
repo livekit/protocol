@@ -23,6 +23,7 @@ import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
+import "livekit_sip.proto";
 
 enum StreamType {
   UPSTREAM = 0;
@@ -110,8 +111,18 @@ enum AnalyticsEventType {
   INGRESS_STARTED = 16;
   INGRESS_ENDED = 17;
   INGRESS_UPDATED = 29;
+  SIP_INBOUND_TRUNK_CREATED = 30;
+  SIP_INBOUND_TRUNK_DELETED = 31;
+  SIP_OUTBOUND_TRUNK_CREATED = 32;
+  SIP_OUTBOUND_TRUNK_DELETED = 33;
+  SIP_DISPATCH_RULE_CREATED = 34;
+  SIP_DISPATCH_RULE_DELETED = 35;
+  SIP_PARTICIPANT_CREATED = 36;
+  SIP_CALL_INCOMING = 37;
+  SIP_CALL_STARTED = 38;
+  SIP_CALL_ENDED = 39;
 
-  // NEXT_ID: 30
+  // NEXT_ID: 40
 }
 
 message AnalyticsClientMeta {
@@ -152,8 +163,15 @@ message AnalyticsEvent {
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
   string node_id = 24;
+  string sip_call_id = 26;
+  SIPCallInfo sip_call = 27;
+  string sip_trunk_id = 28;
+  SIPInboundTrunkInfo sip_inbound_trunk = 29;
+  SIPOutboundTrunkInfo sip_outbound_trunk = 30;
+  string sip_dispatch_rule_id = 31;
+  SIPDispatchRuleInfo sip_dispatch_rule = 32;
 
-  // NEXT_ID: 26
+  // NEXT_ID: 33
 }
 
 message AnalyticsEvents {

@@ -97,7 +97,7 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 		case protoreflect.BoolKind:
 			e.AppendBool(v.Bool())
 		case protoreflect.EnumKind:
-			e.AppendInt32(int32(v.Enum()))
+			e.AppendString(marshalProtoEnum(p.f, v))
 		case protoreflect.Int32Kind, protoreflect.Int64Kind, protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind:
 			e.AppendInt64(v.Int())
 		case protoreflect.Uint32Kind, protoreflect.Uint64Kind, protoreflect.Fixed32Kind, protoreflect.Fixed64Kind:
@@ -122,9 +122,7 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 			e.AddBool(k, b)
 		}
 	case protoreflect.EnumKind:
-		if n := v.Enum(); n != 0 {
-			e.AddInt32(k, int32(n))
-		}
+		e.AddString(k, marshalProtoEnum(f, v))
 	case protoreflect.Int32Kind, protoreflect.Int64Kind, protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind:
 		if n := v.Int(); n != 0 {
 			e.AddInt64(k, n)
@@ -150,6 +148,13 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 			e.AddObject(k, protoMarshaller{m})
 		}
 	}
+}
+
+func marshalProtoEnum(f protoreflect.FieldDescriptor, v protoreflect.Value) string {
+	if e := f.Enum().Values().ByNumber(v.Enum()); e != nil {
+		return string(e.Name())
+	}
+	return fmt.Sprintf("<UNDEFINED(%d)>", v.Enum())
 }
 
 func marshalProtoBytes(b []byte) string {

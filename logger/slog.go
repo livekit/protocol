@@ -18,7 +18,7 @@ func ToSlogHandler(log Logger) slog.Handler {
 	switch log := log.(type) {
 	case ZapLogger:
 		zlog := log.ToZap().Desugar()
-		return zapslog.NewHandler(zlog.Core(), &zapslog.HandlerOptions{AddSource: true})
+		return zapslog.NewHandler(zlog.Core())
 	case LogRLogger:
 		return logr.ToSlogHandler(log.toLogr())
 	}
@@ -27,11 +27,11 @@ func ToSlogHandler(log Logger) slog.Handler {
 
 type slogDiscard struct{}
 
-func (_ slogDiscard) Enabled(ctx context.Context, level slog.Level) bool {
+func (slogDiscard) Enabled(ctx context.Context, level slog.Level) bool {
 	return false
 }
 
-func (_ slogDiscard) Handle(ctx context.Context, record slog.Record) error {
+func (slogDiscard) Handle(ctx context.Context, record slog.Record) error {
 	return nil
 }
 

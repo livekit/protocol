@@ -22,7 +22,6 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/must"
-	"github.com/livekit/protocol/utils/options"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
 )
@@ -84,26 +83,18 @@ func (p *ClientParams) Options() []psrpc.ClientOption {
 }
 
 func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
-	return p.Bus, WithClientOptions(p.Options()...)
-}
-
-func WithClientOptions(opts ...psrpc.ClientOption) psrpc.ClientOption {
-	return func(o *psrpc.ClientOpts) { options.Apply(o, opts) }
-}
-
-func WithServerOptions(opts ...psrpc.ServerOption) psrpc.ServerOption {
-	return func(o *psrpc.ServerOpts) { options.Apply(o, opts) }
+	return p.Bus, psrpc.WithClientOptions(p.Options()...)
 }
 
 func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
-	return WithServerOptions(
+	return psrpc.WithServerOptions(
 		middleware.WithServerMetrics(PSRPCMetricsObserver{}),
 		WithServerLogger(logger),
 	)
 }
 
 func WithDefaultServerOptions(psrpcConfig PSRPCConfig, logger logger.Logger) psrpc.ServerOption {
-	return WithServerOptions(
+	return psrpc.WithServerOptions(
 		psrpc.WithServerChannelSize(psrpcConfig.BufferSize),
 		WithServerObservability(logger),
 	)
@@ -115,11 +106,11 @@ type TypedSignalClient = SignalClient[livekit.NodeID]
 type TypedSignalServer = SignalServer[livekit.NodeID]
 
 func NewTypedSignalClient(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedSignalClient, error) {
-	return NewSignalClient[livekit.NodeID](bus, append(opts[:len(opts):len(opts)], psrpc.WithClientID(string(nodeID)))...)
+	return NewSignalClient[livekit.NodeID](bus, psrpc.WithClientOptions(opts...), psrpc.WithClientID(string(nodeID)))
 }
 
 func NewTypedSignalServer(nodeID livekit.NodeID, svc SignalServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedSignalServer, error) {
-	return NewSignalServer[livekit.NodeID](svc, bus, append(opts[:len(opts):len(opts)], psrpc.WithServerID(string(nodeID)))...)
+	return NewSignalServer[livekit.NodeID](svc, bus, psrpc.WithServerOptions(opts...), psrpc.WithServerID(string(nodeID)))
 }
 
 type TypedRoomManagerClient = RoomManagerClient[livekit.NodeID]

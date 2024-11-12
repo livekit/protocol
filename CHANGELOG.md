@@ -1,5 +1,57 @@
 # github.com/livekit/protocol
 
+## 1.27.1
+
+### Patch Changes
+
+- Add extra fields to SIP analytics events - [#872](https://github.com/livekit/protocol/pull/872) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+## 1.27.0
+
+### Minor Changes
+
+- Support for room configuration and agent dispatches - [#864](https://github.com/livekit/protocol/pull/864) ([@davidzhao](https://github.com/davidzhao))
+
+### Patch Changes
+
+- added manifest details to egress info - [#862](https://github.com/livekit/protocol/pull/862) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Type safe IP checks for SIP Trunks. - [#857](https://github.com/livekit/protocol/pull/857) ([@dennwc](https://github.com/dennwc))
+
+- enable krisp SIP setting - [#866](https://github.com/livekit/protocol/pull/866) ([@frostbyte73](https://github.com/frostbyte73))
+
+## 1.26.0
+
+### Minor Changes
+
+- allow Agents to pass through initial attributes - [#852](https://github.com/livekit/protocol/pull/852) ([@davidzhao](https://github.com/davidzhao))
+
+## 1.25.0
+
+### Minor Changes
+
+- Add ringing timeout and max call duration setting for SIP. - [#844](https://github.com/livekit/protocol/pull/844) ([@dennwc](https://github.com/dennwc))
+
+## 1.24.0
+
+### Minor Changes
+
+- Add disconnect reasons for SIP. - [#828](https://github.com/livekit/protocol/pull/828) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add missing SIP status attribute. - [#833](https://github.com/livekit/protocol/pull/833) ([@dennwc](https://github.com/dennwc))
+
+- Validate SipCallTo in CreateSIPParticipantRequest. - [#823](https://github.com/livekit/protocol/pull/823) ([@dennwc](https://github.com/dennwc))
+
+## 1.23.0
+
+### Patch Changes
+
+- Add protocols for client metrics - [#821](https://github.com/livekit/protocol/pull/821) ([@davidliu](https://github.com/davidliu))
+
+- Add other_sdks field to ClientInfo - [#804](https://github.com/livekit/protocol/pull/804) ([@bcherry](https://github.com/bcherry))
+
 ## 1.22.0
 
 ### Minor Changes

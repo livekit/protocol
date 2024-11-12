@@ -62,12 +62,22 @@ func (t *AccessToken) SetKind(kind livekit.ParticipantInfo_Kind) *AccessToken {
 	return t
 }
 
+// Deprecated: use SetVideoGrant instead
 func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
+	return t.SetVideoGrant(grant)
+}
+
+func (t *AccessToken) SetVideoGrant(grant *VideoGrant) *AccessToken {
 	t.grant.Video = grant
 	return t
 }
 
+// Deprecated: use SetSIPGrant instead
 func (t *AccessToken) AddSIPGrant(grant *SIPGrant) *AccessToken {
+	return t.SetSIPGrant(grant)
+}
+
+func (t *AccessToken) SetSIPGrant(grant *SIPGrant) *AccessToken {
 	t.grant.SIP = grant
 	return t
 }
@@ -93,6 +103,33 @@ func (t *AccessToken) SetAttributes(attrs map[string]string) *AccessToken {
 func (t *AccessToken) SetSha256(sha string) *AccessToken {
 	t.grant.Sha256 = sha
 	return t
+}
+
+func (t *AccessToken) SetRoomPreset(preset string) *AccessToken {
+	t.grant.RoomPreset = preset
+	return t
+}
+
+func (t *AccessToken) SetRoomConfig(config *livekit.RoomConfiguration) *AccessToken {
+	if config == nil {
+		t.grant.RoomConfig = nil
+	} else {
+		t.grant.RoomConfig = (*RoomConfiguration)(config)
+	}
+	return t
+}
+
+// SetAgents is a shortcut for setting agents in room configuration
+func (t *AccessToken) SetAgents(agents ...*livekit.RoomAgentDispatch) *AccessToken {
+	if t.grant.RoomConfig == nil {
+		t.grant.RoomConfig = &RoomConfiguration{}
+	}
+	t.grant.RoomConfig.Agents = agents
+	return t
+}
+
+func (t *AccessToken) GetGrants() *ClaimGrants {
+	return &t.grant
 }
 
 func (t *AccessToken) ToJWT() (string, error) {

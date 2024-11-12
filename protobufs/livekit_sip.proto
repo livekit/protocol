@@ -20,6 +20,10 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/empty.proto";
+import "livekit_models.proto";
+
 /*
    LiveKit's SIP API is built with 3 high level primitives
    - SIP Trunk
@@ -47,7 +51,7 @@ option ruby_package = "LiveKit::Proto";
 
 
 service SIP {
-  rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; };
+  // rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; }; DELETED
   rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
@@ -63,6 +67,7 @@ service SIP {
   rpc DeleteSIPDispatchRule(DeleteSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
 
   rpc CreateSIPParticipant(CreateSIPParticipantRequest) returns (SIPParticipantInfo);
+  rpc TransferSIPParticipant(TransferSIPParticipantRequest) returns (google.protobuf.Empty);
 }
 
 
@@ -185,6 +190,13 @@ message SIPInboundTrunkInfo {
   map<string, string> headers = 9;
   // Map SIP X-* headers from INVITE to SIP participant attributes.
   map<string, string> headers_to_attributes = 10;
+
+  // Max time for the caller to wait for track subscription.
+  google.protobuf.Duration ringing_timeout = 11;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 12;
+
+  bool krisp_enabled = 13;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -391,14 +403,22 @@ message CreateSIPParticipantRequest {
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 5;
 
-  // Optionally play ringtone in the room as an audible indicator for existing participants
-  bool play_ringtone = 6;
+  // Optionally play dialtone in the room as an audible indicator for existing participants. The `play_ringtone` option is deprectated but has the same effect.
+  bool play_ringtone = 6 [deprecated = true];
+  bool play_dialtone = 13;
 
   // By default the From value (Phone number) is used for participant name/identity (if not set) and added to attributes.
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
   bool hide_phone_number = 10;
 
-  // NEXT ID: 11
+  // Max time for the callee to answer the call.
+  google.protobuf.Duration ringing_timeout = 11;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 12;
+
+  // Enable voice isolation for the callee.
+  bool enable_krisp = 14;
+  // NEXT ID: 15
 }
 
 message SIPParticipantInfo {
@@ -406,4 +426,45 @@ message SIPParticipantInfo {
   string participant_identity = 2;
   string room_name = 3;
   string sip_call_id = 4;
+}
+
+message TransferSIPParticipantRequest {
+  string participant_identity = 1;
+  string room_name = 2;
+  string transfer_to = 3;
+
+  // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
+  bool play_dialtone = 4;
+}
+
+message SIPCallInfo {
+  string call_id = 1;
+  string trunk_id = 2;
+  string room_name = 3;
+  string room_id = 4; // ID of the current/previous room published to
+  string participant_identity = 5;
+  SIPUri from_uri = 6;
+  SIPUri to_uri = 7;
+  SIPCallStatus call_status = 8;
+  int64 created_at = 9;
+  int64 started_at = 10;
+  int64 ended_at = 11;
+  DisconnectReason disconnect_reason = 12;
+  string error = 13;
+}
+
+message SIPUri {
+  string user = 1;
+  string host = 2;
+  string ip = 3;
+  string port = 4;
+  SIPTransport transport = 5;
+}
+
+enum SIPCallStatus {
+  SCS_CALL_INCOMING = 0; // Incoming call is being handled by the SIP service. The SIP participant hasn't joined a LiveKit room yet
+  SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
+  SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
+  SCS_DISCONNECTED = 3; // Call has ended
+  SCS_ERROR = 4; // Call has ended or never succeeded because of an error
 }

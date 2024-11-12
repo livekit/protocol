@@ -3,6 +3,9 @@ package logger
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,6 +13,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"github.com/livekit/protocol/logger/zaputil"
+	"github.com/livekit/protocol/utils/must"
 )
 
 func zapLoggerCore(l Logger) zapcore.Core {
@@ -85,14 +89,8 @@ func TestLoggerComponent(t *testing.T) {
 		require.NoError(t, err)
 		l.Debugw("foo", "bar", "baz")
 
-		var log struct {
-			Level  string
-			TS     float64
-			Caller string
-			Msg    string
-			Bar    string
-		}
-		require.NoError(t, json.Unmarshal(ws.Bytes(), &log))
+		log, err := unmarshalTestLogOutput(ws.Bytes())
+		require.NoError(t, err)
 
 		require.Equal(t, "debug", log.Level)
 		require.NotEqual(t, 0, log.TS)
@@ -118,8 +116,71 @@ func TestLoggerComponent(t *testing.T) {
 	})
 }
 
+type testLogOutput struct {
+	Level  string
+	TS     float64
+	Caller string
+	Msg    string
+	Bar    string
+}
+
+func unmarshalTestLogOutput(b []byte) (*testLogOutput, error) {
+	log := &testLogOutput{}
+	return log, json.Unmarshal(b, &log)
+}
+
 type testBufferedWriteSyncer struct {
 	bytes.Buffer
 }
 
 func (t *testBufferedWriteSyncer) Sync() error { return nil }
+
+type logFunc func(string, ...any)
+
+func testLogCaller(f logFunc) {
+	f("test")
+}
+
+func TestLoggerCallDepth(t *testing.T) {
+	t.Cleanup(func() {
+		defaultLogger = LogRLogger(discardLogger)
+		pkgLogger = LogRLogger(discardLogger)
+	})
+
+	var caller string
+	testLogCaller(func(string, ...any) {
+		_, file, line, _ := runtime.Caller(1)
+		caller = fmt.Sprintf("%s:%d", file, line)
+	})
+
+	cases := map[string]func(l Logger) logFunc{
+		"NewZapLogger": func(l Logger) logFunc {
+			return l.Debugw
+		},
+		"package logger": func(l Logger) logFunc {
+			SetLogger(l, "TEST")
+			return Debugw
+		},
+		"GetLogger": func(l Logger) logFunc {
+			SetLogger(l, "TEST")
+			return GetLogger().Debugw
+		},
+		"ToZap": func(l Logger) logFunc {
+			return l.(ZapLogger).ToZap().Debugw
+		},
+		"WithUnlikelyValues": func(l Logger) logFunc {
+			return l.WithUnlikelyValues().Debugw
+		},
+	}
+	for label, getLogFunc := range cases {
+		t.Run(label, func(t *testing.T) {
+			ws := &testBufferedWriteSyncer{}
+			l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
+
+			testLogCaller(getLogFunc(l))
+
+			log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
+			require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
+		})
+	}
+}

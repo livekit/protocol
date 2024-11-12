@@ -20,7 +20,10 @@ option go_package = "github.com/livekit/protocol/rpc";
 
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
+import "livekit_sip.proto";
+import "rpc/sip.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 
 service IOInfo {
   // egress
@@ -38,6 +41,7 @@ service IOInfo {
   // sip
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
   rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
+  rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
 }
 
 message GetEgressRequest {
@@ -165,7 +169,21 @@ message EvaluateSIPDispatchRulesResponse {
   // Map SIP X-* headers from INVITE to SIP participant attributes.
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 14;
-  // NEXT ID: 15
+
+  repeated SIPFeature enabled_features = 15;
+
+  // Max time for the caller to wait for track subscription.
+  google.protobuf.Duration ringing_timeout = 16;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 17;
+
+  // NEXT ID: 18
+}
+
+message UpdateSIPCallStateRequest {
+  livekit.SIPCallInfo call_info = 1;
+
+   // NEXT ID: 2
 }
 
 enum SIPDispatchResult {

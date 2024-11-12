@@ -15,11 +15,10 @@ a:
   egress:
     room:
       room_name: room_name
-  agent:
-    dispatches:
-      - {}
-      - agent_name: ag
-        metadata: mm
+  agents:
+    - {}
+    - agent_name: ag
+      metadata: mm
   min_playout_delay: 42
 `
 
@@ -34,9 +33,9 @@ a:
 	require.Equal(t, re.Name, "room_name")
 	require.Equal(t, re.MinPlayoutDelay, uint32(42))
 	require.Equal(t, re.Egress.Room.RoomName, "room_name")
-	require.Equal(t, len(re.Agent.Dispatches), 2)
-	require.Equal(t, "ag", re.Agent.Dispatches[1].AgentName)
-	require.Equal(t, "mm", re.Agent.Dispatches[1].Metadata)
+	require.Equal(t, 2, len(re.Agents))
+	require.Equal(t, "ag", re.Agents[1].AgentName)
+	require.Equal(t, "mm", re.Agents[1].Metadata)
 
 }
 
@@ -54,11 +53,9 @@ func TestMarshallRoomConfiguration(t *testing.T) {
 				RoomName:  "room name",
 			},
 		},
-		Agent: &RoomAgent{
-			Dispatches: []*RoomAgentDispatch{
-				&RoomAgentDispatch{
-					AgentName: "agent name",
-				},
+		Agents: []*RoomAgentDispatch{
+			{
+				AgentName: "agent name",
 			},
 		},
 	}
@@ -81,7 +78,7 @@ b:
   participant:
     file_outputs:
         - s3:
-            access_key: key 
+            access_key: key
 `
 
 	obj := make(map[string]*RoomEgress)

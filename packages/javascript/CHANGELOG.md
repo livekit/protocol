@@ -1,5 +1,57 @@
 # @livekit/protocol
 
+## 1.27.1
+
+### Patch Changes
+
+- Include room agent dispatch protobufs in JS export - [#875](https://github.com/livekit/protocol/pull/875) ([@davidzhao](https://github.com/davidzhao))
+
+## 1.27.0
+
+### Minor Changes
+
+- Support for room configuration and agent dispatches - [#864](https://github.com/livekit/protocol/pull/864) ([@davidzhao](https://github.com/davidzhao))
+
+### Patch Changes
+
+- Allow requesting a ringtone during SIP call transfers - [#865](https://github.com/livekit/protocol/pull/865) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+## 1.26.0
+
+## 1.25.0
+
+### Minor Changes
+
+- Add SIP analytics events - [#831](https://github.com/livekit/protocol/pull/831) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add ringing timeout and max call duration setting for SIP. - [#844](https://github.com/livekit/protocol/pull/844) ([@dennwc](https://github.com/dennwc))
+
+## 1.24.0
+
+### Minor Changes
+
+- Add disconnect reasons for SIP. - [#828](https://github.com/livekit/protocol/pull/828) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Expose metrics on javascript package - [#843](https://github.com/livekit/protocol/pull/843) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.23.0
+
+### Minor Changes
+
+- Add RPC types - [#814](https://github.com/livekit/protocol/pull/814) ([@bcherry](https://github.com/bcherry))
+
+- Add TransferParticipant to sip and sip internal services - [#816](https://github.com/livekit/protocol/pull/816) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+### Patch Changes
+
+- Add protocols for client metrics - [#821](https://github.com/livekit/protocol/pull/821) ([@davidliu](https://github.com/davidliu))
+
+- Implement Validate on TransferSIPParticipantRequest - [#818](https://github.com/livekit/protocol/pull/818) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add other_sdks field to ClientInfo - [#804](https://github.com/livekit/protocol/pull/804) ([@bcherry](https://github.com/bcherry))
+
 ## 1.22.0
 
 ### Minor Changes

@@ -18,6 +18,8 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
+import "google/protobuf/empty.proto";
+import "google/protobuf/duration.proto";
 import "options.proto";
 import "livekit_sip.proto";
 
@@ -25,7 +27,16 @@ service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
     option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
-  }
+  };
+  rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        names: ["sip_call_id"]
+        typed: false
+      }
+    };
+  };
 }
 
 message InternalCreateSIPParticipantRequest {
@@ -65,17 +76,37 @@ message InternalCreateSIPParticipantRequest {
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 11;
 
-  // Optionally play ringtone in the room as an audible indicator for existing participants
-  bool play_ringtone = 12;
+  // Optionally play dialtone in the room as an audible indicator for existing participants
+  bool play_dialtone = 12;
 
   map<string, string> headers = 21;
   map<string, string> headers_to_attributes = 22;
 
-  // NEXT ID: 23
+  repeated SIPFeature enabled_features = 25;
+
+  // Max time for the callee to answer the call.
+  google.protobuf.Duration ringing_timeout = 23;
+  // Max call duration.
+  google.protobuf.Duration max_call_duration = 24;
+
+  // NEXT ID: 26
 }
 
 message InternalCreateSIPParticipantResponse {
   string participant_id = 1;
   string participant_identity = 2;
   string sip_call_id = 3;
+}
+
+message InternalTransferSIPParticipantRequest {
+  string sip_call_id = 1;
+  string transfer_to = 2;
+
+  // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
+  bool play_dialtone = 3;
+}
+
+enum SIPFeature {
+  NONE = 0;
+  KRISP_ENABLED = 1;
 }

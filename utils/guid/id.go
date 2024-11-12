@@ -21,6 +21,7 @@ import (
 	mrand "math/rand/v2"
 	"os"
 	"sync"
+	"unsafe"
 
 	"github.com/jxskiss/base62"
 	"github.com/lithammer/shortuuid/v4"
@@ -29,10 +30,7 @@ import (
 	"github.com/livekit/protocol/utils/must"
 )
 
-const (
-	Size            = 12
-	guidScratchSize = Size + 10
-)
+const Size = 12
 
 const (
 	RoomPrefix            = "RM_"
@@ -56,7 +54,7 @@ const (
 
 var guidGeneratorPool = sync.Pool{
 	New: func() any {
-		return must.Get(newGenerator(guidScratchSize))
+		return must.Get(newGenerator())
 	},
 }
 
@@ -95,19 +93,17 @@ func newB57Index() [256]byte {
 }
 
 type guidGenerator struct {
-	scratch []byte
-	rng     *mrand.ChaCha8
+	rng *mrand.ChaCha8
 }
 
-func newGenerator(scratchSize int) (*guidGenerator, error) {
+func newGenerator() (*guidGenerator, error) {
 	var seed [32]byte
 	if _, err := rand.Read(seed[:]); err != nil {
 		return nil, err
 	}
 
 	return &guidGenerator{
-		scratch: make([]byte, scratchSize),
-		rng:     mrand.NewChaCha8(seed),
+		rng: mrand.NewChaCha8(seed),
 	}, nil
 }
 
@@ -129,10 +125,10 @@ func (g *guidGenerator) readIDChars(b []byte) {
 }
 
 func (g *guidGenerator) New(prefix string) string {
-	s := append(g.scratch[:0], make([]byte, len(prefix)+Size)...)
-	copy(s, prefix)
-	g.readIDChars(s[len(prefix):])
-	return string(s)
+	b := make([]byte, len(prefix)+Size)
+	copy(b, prefix)
+	g.readIDChars(b[len(prefix):])
+	return unsafe.String(unsafe.SliceData(b), len(b))
 }
 
 func guidPrefix[T livekit.Guid]() string {
@@ -150,10 +146,15 @@ func guidPrefix[T livekit.Guid]() string {
 }
 
 func Marshal[T livekit.Guid](id T) livekit.GuidBlock {
-	var b livekit.GuidBlock
+	return livekit.GuidBlock(MarshalAppend(nil, id))
+}
+
+func MarshalAppend[T livekit.Guid](b []byte, id T) []byte {
+	off := len(b)
+	b = append(b, make([]byte, Size*3/4)...)
 	idb := []byte(id)[len(id)-Size:]
 	for i := 0; i < 3; i++ {
-		j := i * 3
+		j := i*3 + off
 		k := i * 4
 		b[j] = b57Index[idb[k]]<<2 | b57Index[idb[k+1]]>>4
 		b[j+1] = b57Index[idb[k+1]]<<4 | b57Index[idb[k+2]]>>2
@@ -175,5 +176,5 @@ func Unmarshal[T livekit.Guid](b livekit.GuidBlock) T {
 		idb[k+2] = b57Chars[(b[j+1]&15)<<2|b[j+2]>>6]
 		idb[k+3] = b57Chars[b[j+2]&63]
 	}
-	return T(id)
+	return T(unsafe.String(unsafe.SliceData(id), len(id)))
 }

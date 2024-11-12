@@ -12,11 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package mono
 
-func Must[T any](v T, err error) T {
-	if err != nil {
-		panic(err)
-	}
-	return v
+import "time"
+
+var (
+	epoch     = time.Now()
+	epochNano = epoch.UnixNano()
+)
+
+func FromTime(t time.Time) time.Time {
+	return epoch.Add(t.Sub(epoch))
+}
+
+func Now() time.Time {
+	return epoch.Add(time.Since(epoch))
+}
+
+func UnixNano() int64 {
+	return epochNano + int64(time.Since(epoch))
+}
+
+func UnixMicro() int64 {
+	return UnixNano() / 1000
 }

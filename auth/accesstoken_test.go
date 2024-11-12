@@ -15,6 +15,8 @@
 package auth
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"strings"
 	"testing"
 	"time"
@@ -100,6 +102,77 @@ func TestAccessToken(t *testing.T) {
 
 		// default validity
 		require.True(t, claim.Expiry.Time().Sub(claim.IssuedAt.Time()) > time.Minute)
+	})
+
+	t.Run("room configuration serialization and deserialization", func(t *testing.T) {
+		apiKey, secret := apiKeypair()
+		roomConfig := &livekit.RoomConfiguration{
+			Agents: []*livekit.RoomAgentDispatch{{
+				AgentName: "agent1",
+				Metadata:  "metadata1",
+			}},
+			SyncStreams: true,
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					FileOutputs: []*livekit.EncodedFileOutput{{
+						DisableManifest: true,
+					}},
+				},
+			},
+		}
+		videoGrant := &VideoGrant{RoomJoin: true, Room: "test-room"}
+		at := NewAccessToken(apiKey, secret).
+			SetVideoGrant(videoGrant).
+			SetRoomConfig(roomConfig)
+
+		value, err := at.ToJWT()
+		require.NoError(t, err)
+
+		// Parse and verify the token
+		token, err := jwt.ParseSigned(value)
+		require.NoError(t, err)
+
+		decodedGrant := ClaimGrants{}
+		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
+		require.NoError(t, err)
+
+		// Check if the room configuration was correctly serialized and deserialized
+		roomDecoded := (*livekit.RoomConfiguration)(decodedGrant.RoomConfig)
+		require.NotNil(t, roomDecoded)
+		agents := roomDecoded.Agents
+		require.NotNil(t, agents)
+		require.Len(t, agents, 1)
+		require.Equal(t, "agent1", agents[0].AgentName)
+		require.Equal(t, "metadata1", agents[0].Metadata)
+		egress := roomDecoded.Egress
+		require.NotNil(t, egress)
+		require.Equal(t, true, egress.Room.FileOutputs[0].DisableManifest)
+
+		// Ensure that we are encoding room configuration with camelCase
+		parts := strings.Split(value, ".")
+		require.Equal(t, 3, len(parts), "JWT should have three parts")
+		payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+		require.NoError(t, err)
+
+		// Parse the JSON
+		var jsonPayload map[string]interface{}
+		err = json.Unmarshal(payload, &jsonPayload)
+		require.NoError(t, err)
+
+		// Navigate to the agents array
+		room, ok := jsonPayload["roomConfig"].(map[string]interface{})
+		require.True(t, ok, "room should be a map")
+		agentsJSON, ok := room["agents"].([]interface{})
+		require.True(t, ok, "agents should be an array")
+		require.Len(t, agents, 1, "there should be one agent")
+
+		// Check if agentName is in camelCase
+		agent, ok := agentsJSON[0].(map[string]interface{})
+		require.True(t, ok, "agent should be a map")
+		_, hasAgentName := agent["agentName"]
+		require.True(t, hasAgentName, "agentName should be present in camelCase")
+		_, hasAgentNameSnakeCase := agent["agent_name"]
+		require.False(t, hasAgentNameSnakeCase, "agent_name should not be present in snake_case")
 	})
 }
 

@@ -45,6 +45,12 @@ func NewCreateSIPParticipantRequest(
 		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
 		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
 	}
+
+	var features []SIPFeature
+	if req.EnableKrisp {
+		features = append(features, SIPFeature_KRISP_ENABLED)
+	}
+
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
@@ -64,8 +70,11 @@ func NewCreateSIPParticipantRequest(
 		ParticipantMetadata:   req.ParticipantMetadata,
 		ParticipantAttributes: attrs,
 		Dtmf:                  req.Dtmf,
-		PlayRingtone:          req.PlayRingtone,
+		PlayDialtone:          req.PlayRingtone || req.PlayDialtone,
 		Headers:               trunk.Headers,
 		HeadersToAttributes:   trunk.HeadersToAttributes,
+		EnabledFeatures:       features,
+		RingingTimeout:        req.RingingTimeout,
+		MaxCallDuration:       req.MaxCallDuration,
 	}, nil
 }
