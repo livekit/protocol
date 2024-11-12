@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@changesets/cli':
-        specifier: ^2.27.1
-        version: 2.27.8
+        specifier: ^2.27.9
+        version: 2.27.9
       '@livekit/changesets-changelog-github':
         specifier: ^0.0.4
         version: 0.0.4
@@ -30,8 +30,8 @@ importers:
 
 packages:
 
-  '@babel/runtime@7.25.6':
-    resolution: {integrity: sha512-VBj9MYyDb9tuLq7yzqjgzt6Q+IBQLrGZfdjOekyEirZPHxXWoTSGUTMrpsfi58Up73d13NfYLv8HT9vmznjzhQ==}
+  '@babel/runtime@7.26.0':
+    resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
     engines: {node: '>=6.9.0'}
 
   '@bufbuild/protobuf@1.10.0':
@@ -59,8 +59,8 @@ packages:
   '@changesets/changelog-git@0.2.0':
     resolution: {integrity: sha512-bHOx97iFI4OClIT35Lok3sJAwM31VbUM++gnMBV16fdbtBhgYu4dxsphBF/0AZZsyAHMrnM0yFcj5gZM1py6uQ==}
 
-  '@changesets/cli@2.27.8':
-    resolution: {integrity: sha512-gZNyh+LdSsI82wBSHLQ3QN5J30P4uHKJ4fXgoGwQxfXwYFTJzDdvIJasZn8rYQtmKhyQuiBj4SSnLuKlxKWq4w==}
+  '@changesets/cli@2.27.9':
+    resolution: {integrity: sha512-q42a/ZbDnxPpCb5Wkm6tMVIxgeI9C/bexntzTeCFBrQEdpisQqk8kCHllYZMDjYtEc1ZzumbMJAG8H0Z4rdvjg==}
     hasBin: true
 
   '@changesets/config@3.0.3':
@@ -135,9 +135,6 @@ packages:
   '@types/node@12.20.55':
     resolution: {integrity: sha512-J8xLz7q2OFulZ2cyGTLE1TbbZcjpno7FaN6zdJNrgAdrJ+DZzh/uFR6YrTb4C+nXakvud8Q4+rbhoIWlYQbUFQ==}
 
-  '@types/semver@7.5.8':
-    resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
-
   '@typescript/vfs@1.5.3':
     resolution: {integrity: sha512-OSZ/o3wwD5VPZVdGGsXWk7sRGRtwrGnqA4zwmb33FTs7Wxmad0QTkQCbaNyqWA8hL09TCwAthdp8yjFA5G1lvw==}
     peerDependencies:
@@ -162,8 +159,8 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
 
-  async@3.2.5:
-    resolution: {integrity: sha512-baNZyqaaLhyLVKm/DlvdW051MSgO6b8eVfIezl9E5PqWxFgzLm/wQntEW4zOytVburDEr0JlALEpdOFwvErLsg==}
+  async@3.2.6:
+    resolution: {integrity: sha512-htCUDlxyyCLMgaM3xXg0C0LW2xqfuQ6p05pCEIsXuyQ+a1koYKTuBMzRNwmybfLgvJDMd0r1LTn4+E0Ti6C2AA==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -234,8 +231,8 @@ packages:
     resolution: {integrity: sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==}
     engines: {node: '>=10'}
 
-  ejs@3.1.9:
-    resolution: {integrity: sha512-rC+QVNMJWv+MtPgkt0y+0rVEIdbtxVADApW9JXrUVlzHetgcyczP/E7DJmWJ4fJCZF2cPcBk0laWO9ZHMG3DmQ==}
+  ejs@3.1.10:
+    resolution: {integrity: sha512-UeJmFfOrAQS8OJWPZ4qtgHyWExa088/MtK5UEyoJGFH67cDEXkZSviOiKRCZ4Xij0zxI3JECgYs3oKx+AizQBA==}
     engines: {node: '>=0.10.0'}
     hasBin: true
 
@@ -338,8 +335,8 @@ packages:
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  jake@10.8.7:
-    resolution: {integrity: sha512-ZDi3aP+fG/LchyBzUM804VjddnwfSfsdeYkwt8NcbKRvo4rFkjhs456iLFn3k2ZUWvNe4i48WACDbza8fhq2+w==}
+  jake@10.9.2:
+    resolution: {integrity: sha512-2P4SQ0HrLQ+fw6llpLnOaGAvN2Zu6778SJMrCUwns4fOoG9ayrTiZk3VV8sCPkVZF8ab0zksVpS8FDY5pRCNBA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -418,8 +415,8 @@ packages:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
     engines: {node: '>=6'}
 
-  package-manager-detector@0.2.0:
-    resolution: {integrity: sha512-E385OSk9qDcXhcM9LNSe4sdhx8a9mAPrZ4sMLW+tmxl5ZuGtPUcdFu+MPP2jbgiWAZ6Pfe5soGFMd+0Db5Vrog==}
+  package-manager-detector@0.2.2:
+    resolution: {integrity: sha512-VgXbyrSNsml4eHWIvxxG/nTL4wgybMTXCV2Un/+yEc3aDKKU6nQBZjbeP3Pl3qm9Qg92X/1ng4ffvCeD/zwHgg==}
 
   parents@1.0.1:
     resolution: {integrity: sha512-mXKF3xkoUt5td2DoxpLmtOmZvko9VfFpwRwkKDHSNvgmpLAeBo18YDhcPbBzJq+QLCHMbGOfzia2cX4U+0v9Mg==}
@@ -436,8 +433,8 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  picocolors@1.1.0:
-    resolution: {integrity: sha512-TQ92mBOW0l3LeMeyLV6mzy/kWr8lkd/hp3mTg7wYK7zJhuBStmGMBG0BdeDZS/dZx1IukaX6Bk11zcln25o1Aw==}
+  picocolors@1.1.1:
+    resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -556,7 +553,7 @@ packages:
 
 snapshots:
 
-  '@babel/runtime@7.25.6':
+  '@babel/runtime@7.26.0':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -607,7 +604,7 @@ snapshots:
     dependencies:
       '@changesets/types': 6.0.0
 
-  '@changesets/cli@2.27.8':
+  '@changesets/cli@2.27.9':
     dependencies:
       '@changesets/apply-release-plan': 7.0.5
       '@changesets/assemble-release-plan': 6.0.4
@@ -624,17 +621,15 @@ snapshots:
       '@changesets/types': 6.0.0
       '@changesets/write': 0.3.2
       '@manypkg/get-packages': 1.1.3
-      '@types/semver': 7.5.8
       ansi-colors: 4.1.3
       ci-info: 3.9.0
       enquirer: 2.4.1
       external-editor: 3.1.0
       fs-extra: 7.0.1
       mri: 1.2.0
-      outdent: 0.5.0
       p-limit: 2.3.0
-      package-manager-detector: 0.2.0
-      picocolors: 1.1.0
+      package-manager-detector: 0.2.2
+      picocolors: 1.1.1
       resolve-from: 5.0.0
       semver: 7.6.3
       spawndamnit: 2.0.0
@@ -658,7 +653,7 @@ snapshots:
     dependencies:
       '@changesets/types': 6.0.0
       '@manypkg/get-packages': 1.1.3
-      picocolors: 1.1.0
+      picocolors: 1.1.1
       semver: 7.6.3
 
   '@changesets/get-github-info@0.5.2':
@@ -689,7 +684,7 @@ snapshots:
 
   '@changesets/logger@0.1.1':
     dependencies:
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   '@changesets/parse@0.4.0':
     dependencies:
@@ -711,7 +706,7 @@ snapshots:
       '@changesets/types': 6.0.0
       fs-extra: 7.0.1
       p-filter: 2.1.0
-      picocolors: 1.1.0
+      picocolors: 1.1.1
 
   '@changesets/should-skip-package@0.1.1':
     dependencies:
@@ -741,14 +736,14 @@ snapshots:
 
   '@manypkg/find-root@1.1.0':
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.0
       '@types/node': 12.20.55
       find-up: 4.1.0
       fs-extra: 8.1.0
 
   '@manypkg/get-packages@1.1.3':
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.0
       '@changesets/types': 4.1.0
       '@manypkg/find-root': 1.1.0
       fs-extra: 8.1.0
@@ -768,8 +763,6 @@ snapshots:
       fastq: 1.17.1
 
   '@types/node@12.20.55': {}
-
-  '@types/semver@7.5.8': {}
 
   '@typescript/vfs@1.5.3(typescript@4.5.2)':
     dependencies:
@@ -792,7 +785,7 @@ snapshots:
 
   array-union@2.1.0: {}
 
-  async@3.2.5: {}
+  async@3.2.6: {}
 
   balanced-match@1.0.2: {}
 
@@ -852,9 +845,9 @@ snapshots:
 
   dotenv@8.6.0: {}
 
-  ejs@3.1.9:
+  ejs@3.1.10:
     dependencies:
-      jake: 10.8.7
+      jake: 10.9.2
 
   enquirer@2.4.1:
     dependencies:
@@ -915,7 +908,7 @@ snapshots:
   genversion@3.2.0:
     dependencies:
       commander: 7.2.0
-      ejs: 3.1.9
+      ejs: 3.1.10
       find-package: 1.0.0
 
   glob-parent@5.1.2:
@@ -959,9 +952,9 @@ snapshots:
 
   isexe@2.0.0: {}
 
-  jake@10.8.7:
+  jake@10.9.2:
     dependencies:
-      async: 3.2.5
+      async: 3.2.6
       chalk: 4.1.2
       filelist: 1.0.4
       minimatch: 3.1.2
@@ -1029,7 +1022,7 @@ snapshots:
 
   p-try@2.2.0: {}
 
-  package-manager-detector@0.2.0: {}
+  package-manager-detector@0.2.2: {}
 
   parents@1.0.1:
     dependencies:
@@ -1041,7 +1034,7 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  picocolors@1.1.0: {}
+  picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
 
