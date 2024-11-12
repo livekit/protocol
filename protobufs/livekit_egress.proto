@@ -349,7 +349,8 @@ message EgressInfo {
   repeated SegmentsInfo segment_results = 17;
   repeated ImagesInfo image_results = 20;
   string manifest_location = 23;
-  // next ID: 25
+  bool backup_storage_used = 25;
+  // next ID: 26
 }
 
 message StreamInfoList {
