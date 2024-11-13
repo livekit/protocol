@@ -26,7 +26,7 @@
     "generate:version": "pnpm generate:version:esm && pnpm generate:version:cjs",
     "generate:proto:esm": "protoc --es_out src/gen/esm --es_opt target=js -I=../../protobufs ../../protobufs/livekit_*.proto",
     "generate:proto:cjs": "protoc --es_out src/gen/cjs --es_opt target=js,js_import_style=legacy_commonjs -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "generate:proto:dts": "mkdir -p src/gen/dts && protoc --es_out src/gen/dts --es_opt target=dts -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:proto:dts": "protoc --es_out src/gen/dts --es_opt target=dts -I=../../protobufs ../../protobufs/livekit_*.proto",
     "generate:proto": "pnpm generate:proto:esm && pnpm generate:proto:cjs && pnpm generate:proto:dts",
     "build": "pnpm generate:version && pnpm generate:proto"
   },

@@ -9,3 +9,4 @@ export type * from "./gen/dts/livekit_room_pb.d.ts";
 export type * from "./gen/dts/livekit_rtc_pb.d.ts";
 export type * from "./gen/dts/livekit_sip_pb.d.ts";
 export type * from "./gen/dts/livekit_webhook_pb.d.ts";
+export type * from "./gen/dts/version.d.ts";
