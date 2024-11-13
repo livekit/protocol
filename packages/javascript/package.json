@@ -2,8 +2,8 @@
   "name": "@livekit/protocol",
   "version": "1.27.1",
   "description": "",
-  "type": "module",
   "main": "src/index.js",
+  "module": "src/index.mjs",
   "types": "src/index.d.ts",
   "files": [
     "src"
@@ -11,16 +11,23 @@
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
-      "default": "./src/index.js"
+      "import": "./src/index.mjs",
+      "require": "./src/index.js"
     },
     "./*": {
-      "types": "./src/gen/livekit_*_pb.d.ts",
-      "default": "./src/gen/livekit_*_pb.js"
+      "types": "./src/gen/dts/livekit_*_pb.d.ts",
+      "import": "./src/gen/esm/livekit_*_pb.js",
+      "require": "./src/gen/cjs/livekit_*_pb.js"
     }
   },
   "scripts": {
-    "generate:version": "genversion --esm --semi src/gen/version.js",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:version:esm": "genversion --esm --semi src/gen/esm/version.js",
+    "generate:version:cjs": "genversion --semi src/gen/cjs/version.js",
+    "generate:version": "pnpm generate:version:esm && pnpm generate:version:cjs",
+    "generate:proto:esm": "protoc --es_out src/gen/esm --es_opt target=js -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:proto:cjs": "protoc --es_out src/gen/cjs --es_opt target=js,js_import_style=legacy_commonjs -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:proto:dts": "mkdir -p src/gen/dts && protoc --es_out src/gen/dts --es_opt target=dts -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:proto": "pnpm generate:proto:esm && pnpm generate:proto:cjs && pnpm generate:proto:dts",
     "build": "pnpm generate:version && pnpm generate:proto"
   },
   "keywords": [],
