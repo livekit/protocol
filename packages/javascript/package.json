@@ -26,7 +26,7 @@
     "generate:version:cjs": "genversion --semi src/gen/cjs/version.js",
     "generate:version": "pnpm generate:version:esm && pnpm generate:version:cjs",
     "generate:proto:esm": "mkdir -p src/gen/esm && protoc --es_out src/gen/esm --es_opt target=js -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "generate:proto:cjs": "mkdir -p src/gen/cjs && protoc --es_out src/gen/cjs --es_opt target=js --es_opt js_import_style=legacy_commonjs -I=../../protobufs ../../protobufs/livekit_*.proto && rename \"s/js$/cjs/\" src/gen/cjs/*.js",
+    "generate:proto:cjs": "mkdir -p src/gen/cjs && protoc --es_out src/gen/cjs --es_opt target=js,js_import_style=legacy_commonjs -I=../../protobufs ../../protobufs/livekit_*.proto && rename \"s/js$/cjs/\" src/gen/cjs/*.js && sed -i 's/\\.js\")/.cjs\")/' src/gen/cjs/*.cjs",
     "generate:proto:dts": "protoc --es_out src/gen/dts --es_opt target=dts -I=../../protobufs ../../protobufs/livekit_*.proto",
     "generate:proto": "pnpm generate:proto:esm && pnpm generate:proto:cjs && pnpm generate:proto:dts",
     "build": "pnpm generate:version && pnpm generate:proto"
