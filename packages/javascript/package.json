@@ -2,8 +2,9 @@
   "name": "@livekit/protocol",
   "version": "1.27.1",
   "description": "",
+  "type": "module",
   "main": "src/index.js",
-  "module": "src/index.mjs",
+  "import": "src/index.cjs",
   "types": "src/index.d.ts",
   "files": [
     "src"
@@ -11,8 +12,8 @@
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
-      "import": "./src/index.mjs",
-      "require": "./src/index.js"
+      "import": "./src/index.js",
+      "require": "./src/index.cjs"
     },
     "./*": {
       "types": "./src/gen/dts/livekit_*_pb.d.ts",
