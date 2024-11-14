@@ -18,7 +18,7 @@
     "./*": {
       "types": "./src/gen/dts/livekit_*_pb.d.ts",
       "import": "./src/gen/esm/livekit_*_pb.js",
-      "require": "./src/gen/cjs/livekit_*_pb.js"
+      "require": "./src/gen/cjs/livekit_*_pb.cjs"
     }
   },
   "scripts": {
