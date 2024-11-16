@@ -4,9 +4,9 @@ go 1.22
 
 require (
 	github.com/benbjohnson/clock v1.3.5
-	github.com/bufbuild/protoyaml-go v0.1.9
-	github.com/frostbyte73/core v0.0.12
-	github.com/fsnotify/fsnotify v1.7.0
+	github.com/bufbuild/protoyaml-go v0.2.0
+	github.com/frostbyte73/core v0.0.13
+	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gammazero/deque v0.2.1
 	github.com/go-jose/go-jose/v3 v3.0.3
 	github.com/go-logr/logr v1.4.2
@@ -14,17 +14,17 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.0.0
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
-	github.com/livekit/psrpc v0.6.1-0.20240924010758-9f0a4268a3b9
-	github.com/mackerelio/go-osstat v0.2.4
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
+	github.com/livekit/psrpc 1efff3d113a8
+	github.com/mackerelio/go-osstat v0.2.5
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.10.0
 	github.com/pion/logging v0.2.2
-	github.com/pion/sdp/v3 v3.0.6
-	github.com/pion/webrtc/v3 v3.2.28
+	github.com/pion/sdp/v3 v3.0.9
+	github.com/pion/webrtc/v3 v3.3.4
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.19.0
-	github.com/prometheus/procfs v0.12.0
-	github.com/puzpuzpuz/xsync/v3 v3.1.0
-	github.com/redis/go-redis/v9 v9.6.1
+	github.com/prometheus/client_golang v1.20.5
+	github.com/prometheus/procfs v0.15.1
+	github.com/puzpuzpuz/xsync/v3 v3.4.0
+	github.com/redis/go-redis/v9 v9.7.0
 	github.com/stretchr/testify v1.9.0
 	github.com/twitchtv/twirp v8.1.3+incompatible
 	github.com/zeebo/xxh3 v1.0.2
@@ -32,10 +32,10 @@ require (
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	go.uber.org/zap/exp v0.3.0
-	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	golang.org/x/mod v0.19.0
-	google.golang.org/grpc v1.65.0
-	google.golang.org/protobuf v1.34.2
+	golang.org/x/exp 2d47ceb2692f
+	golang.org/x/mod v0.22.0
+	google.golang.org/grpc v1.68.0
+	google.golang.org/protobuf v1.35.2
 	gopkg.in/yaml.v3 v3.0.1
 )
 
