@@ -7,8 +7,9 @@ require (
 	github.com/bufbuild/protoyaml-go v0.1.9
 	github.com/frostbyte73/core v0.0.12
 	github.com/fsnotify/fsnotify v1.7.0
-	github.com/gammazero/deque v0.2.1
+	github.com/gammazero/deque v1.0.0
 	github.com/go-jose/go-jose/v3 v3.0.3
+	github.com/go-jose/go-jose/v4 v4.0.4
 	github.com/go-logr/logr v1.4.2
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jxskiss/base62 v1.1.0
@@ -18,8 +19,9 @@ require (
 	github.com/mackerelio/go-osstat v0.2.4
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.8.1
 	github.com/pion/logging v0.2.2
-	github.com/pion/sdp/v3 v3.0.6
-	github.com/pion/webrtc/v3 v3.2.28
+	github.com/pion/sdp/v3 v3.0.9
+	github.com/pion/webrtc/v3 v3.3.4
+	github.com/pion/webrtc/v4 v4.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.19.0
 	github.com/prometheus/procfs v0.12.0
@@ -55,29 +57,30 @@ require (
 	github.com/nats-io/nats.go v1.36.0 // indirect
 	github.com/nats-io/nkeys v0.4.7 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/pion/datachannel v1.5.5 // indirect
-	github.com/pion/dtls/v2 v2.2.7 // indirect
-	github.com/pion/ice/v2 v2.3.13 // indirect
-	github.com/pion/interceptor v0.1.25 // indirect
+	github.com/pion/datachannel v1.5.9 // indirect
+	github.com/pion/dtls/v2 v2.2.12 // indirect
+	github.com/pion/ice/v2 v2.3.36 // indirect
+	github.com/pion/interceptor v0.1.37 // indirect
 	github.com/pion/mdns v0.0.12 // indirect
 	github.com/pion/randutil v0.1.0 // indirect
-	github.com/pion/rtcp v1.2.12 // indirect
-	github.com/pion/rtp v1.8.3 // indirect
-	github.com/pion/sctp v1.8.12 // indirect
-	github.com/pion/srtp/v2 v2.0.18 // indirect
+	github.com/pion/rtcp v1.2.14 // indirect
+	github.com/pion/rtp v1.8.9 // indirect
+	github.com/pion/sctp v1.8.33 // indirect
+	github.com/pion/srtp/v2 v2.0.20 // indirect
 	github.com/pion/stun v0.6.1 // indirect
-	github.com/pion/transport/v2 v2.2.3 // indirect
-	github.com/pion/turn/v2 v2.1.3 // indirect
+	github.com/pion/transport/v2 v2.2.10 // indirect
+	github.com/pion/turn/v2 v2.1.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
-	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	github.com/wlynxg/anet v0.0.3 // indirect
+	golang.org/x/crypto v0.28.0 // indirect
+	golang.org/x/net v0.30.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240725223205-93522f1f2a9f // indirect
