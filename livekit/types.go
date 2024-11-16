@@ -15,7 +15,7 @@
 package livekit
 
 import (
-	"github.com/bufbuild/protoyaml-go"
+	"buf.build/go/protoyaml"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
