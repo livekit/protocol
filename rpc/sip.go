@@ -46,9 +46,9 @@ func NewCreateSIPParticipantRequest(
 		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
 	}
 
-	var features []SIPFeature
+	var features []livekit.SIPFeature
 	if req.EnableKrisp {
-		features = append(features, SIPFeature_KRISP_ENABLED)
+		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
 	}
 
 	return &InternalCreateSIPParticipantRequest{
