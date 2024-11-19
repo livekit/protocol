@@ -23,6 +23,7 @@ enum MetricLabel {
   AGENTS_LLM_TTFT = 0; // time to first token from LLM
   AGENTS_STT_TTFT = 1; // time to final transcription
   AGENTS_TTS_TTFB = 2; // time to first byte
+
   CLIENT_VIDEO_SUBSCRIBER_FREEZE_COUNT = 3;                           // Number of video freezes
   CLIENT_VIDEO_SUBSCRIBER_TOTAL_FREEZE_DURATION = 4;                  // total duration of freezes
   CLIENT_VIDEO_SUBSCRIBER_PAUSE_COUNT = 5;                            // number of video pauses
@@ -37,6 +38,10 @@ enum MetricLabel {
   CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_BANDWIDTH = 14;  // total duration spent in bandwidth quality limitation
   CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_CPU = 15;        // total duration spent in cpu quality limitation
   CLIENT_VIDEO_PUBLISHER_QUALITY_LIMITATION_DURATION_OTHER = 16;      // total duration spent in other quality limitation
+
+  PUBLISHER_RTT = 17;   // Publisher RTT (participant -> server)
+  SERVER_MESH_RTT = 18; // RTT between publisher node and subscriber node (could involve intermedia node(s))
+  SUBSCRIBER_RTT = 19;  // Subscribe RTT (server -> participant)
 
   METRIC_LABEL_PREDEFINED_MAX_VALUE = 4096;
 }
