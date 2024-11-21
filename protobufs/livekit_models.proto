@@ -643,13 +643,11 @@ message DataStream {
       TextHeader textHeader = 11;
       FileHeader fileHeader = 12;
     }
-
-    string senderIdentity = 13;
   }
 
   message Packet {
     string messageId = 1; // messageId as string
-    uint32 chunkId = 2; // chunkId as an unsigned 32-bit integer
+    uint32 chunkIndex = 2; // chunkId as an unsigned 32-bit integer
     bytes content = 3; // content as binary (bytes)
     uint32 contentLength = 4; // content length in bytes
     bool complete = 5; // optional, if the stream is complete
