@@ -628,13 +628,13 @@ message DataStream {
 
   // Main DataStreamHeader that contains a oneof for specific headers
   message Header {
-    string messageId = 1;
+    string messageId = 1; // Unique identifier for this data stream
     int64 timestamp = 2;  // Using int64 for Unix timestamp
     string topic = 3;
     StreamType streamType = 4;
     string mimeType = 6;
-    optional int32 totalLength = 7;  // Optional: Only for finite streams
-    optional int32 totalChunks = 8;  // Optional: Only for finite streams
+    optional uint64 totalLength = 7;  // Optional: Only for finite streams
+    optional uint64 totalChunks = 8;  // Optional: Only for finite streams
     Encryption.Type encryptionType = 9;  // Optional, defaults to NONE
     map<string, string> extensions = 10;  // Optional, user defined extensions map that can carry additional info
   
@@ -646,8 +646,8 @@ message DataStream {
   }
 
   message Packet {
-    string messageId = 1; // messageId as string
-    uint32 chunkIndex = 2; // chunkId as an unsigned 32-bit integer
+    string messageId = 1;  // unique identifier for this data stream to map it to the correct header
+    uint64 chunkIndex = 2; // chunkId as an unsigned 32-bit integer
     bytes content = 3; // content as binary (bytes)
     uint32 contentLength = 4; // content length in bytes
     bool complete = 5; // optional, if the stream is complete
