@@ -22,6 +22,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	MetricsBatchBuilderInvalidTimeSeriesMetricId = -1
+)
+
 var (
 	ErrInvalidMetricLabel           = errors.New("invalid metric label")
 	ErrInvalidTimeSeriesMetricIndex = errors.New("invalid time series metric index")
@@ -33,18 +37,20 @@ type MetricsBatchBuilder struct {
 	stringData map[string]uint32
 }
 
-func NewMetricsBatchBuilder(at time.Time, normalizedAt time.Time) *MetricsBatchBuilder {
+func NewMetricsBatchBuilder() *MetricsBatchBuilder {
 	return &MetricsBatchBuilder{
-		MetricsBatch: &livekit.MetricsBatch{
-			TimestampMs:         at.UnixMilli(),
-			NormalizedTimestamp: timestamppb.New(normalizedAt),
-		},
-		stringData: make(map[string]uint32),
+		MetricsBatch: &livekit.MetricsBatch{},
+		stringData:   make(map[string]uint32),
 	}
 }
 
 func (m *MetricsBatchBuilder) ToProto() *livekit.MetricsBatch {
 	return m.MetricsBatch
+}
+
+func (m *MetricsBatchBuilder) SetTime(at time.Time, normalizedAt time.Time) {
+	m.MetricsBatch.TimestampMs = at.UnixMilli()
+	m.MetricsBatch.NormalizedTimestamp = timestamppb.New(normalizedAt)
 }
 
 type MetricSample struct {
@@ -69,7 +75,7 @@ func (m *MetricsBatchBuilder) AddTimeSeriesMetric(tsm TimeSeriesMetric) (int, er
 		ptsm.Label = m.getStrDataIndex(tsm.CustomMetricLabel)
 	} else {
 		if tsm.MetricLabel >= livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE {
-			return 0, ErrInvalidMetricLabel
+			return MetricsBatchBuilderInvalidTimeSeriesMetricId, ErrInvalidMetricLabel
 		}
 		ptsm.Label = uint32(tsm.MetricLabel)
 	}

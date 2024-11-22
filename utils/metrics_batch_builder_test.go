@@ -35,7 +35,8 @@ func TestMetricsBatchBuilder(t *testing.T) {
 			NormalizedTimestamp: timestamppb.New(normalizedAt),
 		}
 
-		mbb := NewMetricsBatchBuilder(
+		mbb := NewMetricsBatchBuilder()
+		mbb.SetTime(
 			time.Unix(0, expected.TimestampMs*int64(time.Millisecond)),
 			expected.NormalizedTimestamp.AsTime(),
 		)
@@ -120,7 +121,8 @@ func TestMetricsBatchBuilder(t *testing.T) {
 			},
 		}
 
-		mbb := NewMetricsBatchBuilder(at, normalizedAt)
+		mbb := NewMetricsBatchBuilder()
+		mbb.SetTime(at, normalizedAt)
 
 		// should not be able to add invalid metric label index
 		_, err := mbb.AddTimeSeriesMetric(TimeSeriesMetric{
@@ -268,7 +270,8 @@ func TestMetricsBatchBuilder(t *testing.T) {
 			},
 		}
 
-		mbb := NewMetricsBatchBuilder(at, normalizedAt)
+		mbb := NewMetricsBatchBuilder()
+		mbb.SetTime(at, normalizedAt)
 
 		// should not be able to add invalid metric label index
 		err := mbb.AddEventMetric(EventMetric{
