@@ -321,6 +321,11 @@ enum EgressStatus {
   EGRESS_LIMIT_REACHED = 6;
 }
 
+enum EgressSourceType {
+  EGRESS_SOURCE_TYPE_WEB = 0;
+  EGRESS_SOURCE_TYPE_SDK = 1;
+}
+
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
