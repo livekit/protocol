@@ -175,6 +175,74 @@ func (m *MetricsBatchBuilder) AddEventMetric(em EventMetric) error {
 	return nil
 }
 
+func (m *MetricsBatchBuilder) Merge(other *livekit.MetricsBatch) {
+	// Timestamp and NormalizedTimestamp are not merged
+
+	// add from other's StrData as needed
+	for _, str := range other.StrData {
+		m.getStrDataIndex(str)
+	}
+
+	for _, optsm := range other.TimeSeries {
+		ptsm := &livekit.TimeSeriesMetric{
+			Samples: optsm.Samples,
+		}
+		if optsm.Label < uint32(int(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE)) {
+			ptsm.Label = optsm.Label
+		} else {
+			if tidx, ok := m.translateStrDataIndex(other.StrData, optsm.Label); ok {
+				ptsm.Label = tidx
+			}
+		}
+
+		if tidx, ok := m.translateStrDataIndex(other.StrData, optsm.ParticipantIdentity); ok {
+			ptsm.ParticipantIdentity = tidx
+		}
+
+		if tidx, ok := m.translateStrDataIndex(other.StrData, optsm.TrackSid); ok {
+			ptsm.TrackSid = tidx
+		}
+
+		if tidx, ok := m.translateStrDataIndex(other.StrData, optsm.Rid); ok {
+			ptsm.Rid = tidx
+		}
+
+		m.MetricsBatch.TimeSeries = append(m.MetricsBatch.TimeSeries, ptsm)
+	}
+
+	for _, opem := range other.Events {
+		pem := &livekit.EventMetric{}
+		if opem.Label < uint32(int(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE)) {
+			pem.Label = opem.Label
+		} else {
+			if tidx, ok := m.translateStrDataIndex(other.StrData, opem.Label); ok {
+				pem.Label = tidx
+			}
+		}
+
+		if tidx, ok := m.translateStrDataIndex(other.StrData, opem.ParticipantIdentity); ok {
+			pem.ParticipantIdentity = tidx
+		}
+
+		if tidx, ok := m.translateStrDataIndex(other.StrData, opem.TrackSid); ok {
+			pem.TrackSid = tidx
+		}
+
+		pem.StartTimestampMs = opem.StartTimestampMs
+		pem.EndTimestampMs = opem.EndTimestampMs
+		pem.NormalizedStartTimestamp = opem.NormalizedStartTimestamp
+		pem.NormalizedEndTimestamp = opem.NormalizedEndTimestamp
+
+		pem.Metadata = opem.Metadata
+
+		if tidx, ok := m.translateStrDataIndex(other.StrData, opem.Rid); ok {
+			pem.Rid = tidx
+		}
+
+		m.MetricsBatch.Events = append(m.MetricsBatch.Events, pem)
+	}
+}
+
 func (m *MetricsBatchBuilder) getStrDataIndex(s string) uint32 {
 	idx, ok := m.stringData[s]
 	if !ok {
@@ -183,4 +251,18 @@ func (m *MetricsBatchBuilder) getStrDataIndex(s string) uint32 {
 		m.stringData[s] = idx
 	}
 	return idx
+}
+
+func (m *MetricsBatchBuilder) translateStrDataIndex(strData []string, index uint32) (uint32, bool) {
+	if index < uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) {
+		return 0, false
+	}
+
+	baseIdx := index - uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE)
+	if len(strData) <= int(baseIdx) {
+		return 0, false
+	}
+
+	translatedIdx, ok := m.stringData[strData[baseIdx]]
+	return translatedIdx, ok
 }

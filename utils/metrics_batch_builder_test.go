@@ -15,6 +15,7 @@
 package utils
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -279,7 +280,7 @@ func TestMetricsBatchBuilder(t *testing.T) {
 		})
 		require.ErrorIs(t, err, ErrInvalidMetricLabel)
 
-		// add an eventmetric
+		// add an event metric
 		err = mbb.AddEventMetric(EventMetric{
 			MetricLabel:         livekit.MetricLabel_PUBLISHER_RTT,
 			ParticipantIdentity: "PA_1",
@@ -320,6 +321,148 @@ func TestMetricsBatchBuilder(t *testing.T) {
 		require.NoError(t, err)
 
 		mb := mbb.ToProto()
+		require.True(t, proto.Equal(expected, mb))
+	})
+
+	t.Run("merge", func(t *testing.T) {
+		at := mono.Now()
+		atMilli := at.UnixMilli()
+		normalizedAt := mono.Now().Add(10 * time.Millisecond)
+
+		expected := &livekit.MetricsBatch{
+			TimestampMs:         at.UnixMilli(),
+			NormalizedTimestamp: timestamppb.New(normalizedAt),
+			StrData: []string{
+				"PA_1",
+				"TR_VC1",
+				"f",
+				"CustomMetric",
+				"TR_VC2",
+				"q",
+				"PA_2",
+			},
+			Events: []*livekit.EventMetric{
+				{
+					Label:                    uint32(livekit.MetricLabel_PUBLISHER_RTT),
+					ParticipantIdentity:      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE),
+					TrackSid:                 uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 1,
+					StartTimestampMs:         at.UnixMilli(),
+					EndTimestampMs:           &atMilli,
+					NormalizedStartTimestamp: timestamppb.New(normalizedAt),
+					NormalizedEndTimestamp:   timestamppb.New(normalizedAt),
+					Metadata:                 "md1",
+					Rid:                      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 2,
+				},
+				{
+					Label:                    uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 3,
+					ParticipantIdentity:      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE),
+					TrackSid:                 uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 4,
+					StartTimestampMs:         at.UnixMilli(),
+					NormalizedStartTimestamp: timestamppb.New(normalizedAt),
+					Metadata:                 "md2",
+					Rid:                      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 5,
+				},
+				{
+					Label:                    uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 3,
+					ParticipantIdentity:      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE),
+					TrackSid:                 uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 4,
+					StartTimestampMs:         at.UnixMilli(),
+					NormalizedStartTimestamp: timestamppb.New(normalizedAt),
+					Metadata:                 "md2",
+					Rid:                      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 5,
+				},
+			},
+			TimeSeries: []*livekit.TimeSeriesMetric{
+				{
+					Label:               uint32(livekit.MetricLabel_SUBSCRIBER_RTT),
+					ParticipantIdentity: uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 6,
+					Samples: []*livekit.MetricSample{
+						{
+							TimestampMs:         at.UnixMilli(),
+							NormalizedTimestamp: timestamppb.New(normalizedAt),
+							Value:               102.4,
+						},
+					},
+				},
+			},
+		}
+
+		mbb := NewMetricsBatchBuilder()
+		mbb.SetTime(at, normalizedAt)
+
+		// should not be able to add invalid metric label index
+		err := mbb.AddEventMetric(EventMetric{
+			MetricLabel: livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE,
+		})
+		require.ErrorIs(t, err, ErrInvalidMetricLabel)
+
+		// add an event metric
+		err = mbb.AddEventMetric(EventMetric{
+			MetricLabel:         livekit.MetricLabel_PUBLISHER_RTT,
+			ParticipantIdentity: "PA_1",
+			TrackID:             "TR_VC1",
+			StartedAt:           at,
+			EndedAt:             at,
+			NormalizedStartedAt: normalizedAt,
+			NormalizedEndedAt:   normalizedAt,
+			Metadata:            "md1",
+			Rid:                 "f",
+		})
+		require.NoError(t, err)
+
+		// add a second one with some optional fields not included
+		// including this here and in the one to merge to test index translation
+		err = mbb.AddEventMetric(EventMetric{
+			CustomMetricLabel:   "CustomMetric",
+			ParticipantIdentity: "PA_1",
+			TrackID:             "TR_VC2",
+			StartedAt:           at,
+			NormalizedStartedAt: normalizedAt,
+			Metadata:            "md2",
+			Rid:                 "q",
+		})
+		require.NoError(t, err)
+
+		toMerge := &livekit.MetricsBatch{
+			TimestampMs:         at.UnixMilli(),
+			NormalizedTimestamp: timestamppb.New(normalizedAt),
+			StrData: []string{
+				"CustomMetric",
+				"PA_1",
+				"TR_VC2",
+				"q",
+				"PA_2",
+			},
+			Events: []*livekit.EventMetric{
+				{
+					Label:                    uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE),
+					ParticipantIdentity:      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 1,
+					TrackSid:                 uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 2,
+					StartTimestampMs:         at.UnixMilli(),
+					NormalizedStartTimestamp: timestamppb.New(normalizedAt),
+					Metadata:                 "md2",
+					Rid:                      uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 3,
+				},
+			},
+			TimeSeries: []*livekit.TimeSeriesMetric{
+				{
+					Label:               uint32(livekit.MetricLabel_SUBSCRIBER_RTT),
+					ParticipantIdentity: uint32(livekit.MetricLabel_METRIC_LABEL_PREDEFINED_MAX_VALUE) + 4,
+					Samples: []*livekit.MetricSample{
+						{
+							TimestampMs:         at.UnixMilli(),
+							NormalizedTimestamp: timestamppb.New(normalizedAt),
+							Value:               102.4,
+						},
+					},
+				},
+			},
+		}
+		mbb.Merge(toMerge)
+
+		mb := mbb.ToProto()
+		fmt.Printf("expected: %s\n", expected) // REMOVE
+		fmt.Printf("actual: %s\n", mb)         // REMOVE
 		require.True(t, proto.Equal(expected, mb))
 	})
 }
