@@ -36,6 +36,7 @@ func TestMetricsBatchBuilder(t *testing.T) {
 		}
 
 		mbb := NewMetricsBatchBuilder()
+		require.True(t, mbb.IsEmpty())
 		mbb.SetTime(
 			time.Unix(0, expected.TimestampMs*int64(time.Millisecond)),
 			expected.NormalizedTimestamp.AsTime(),
@@ -165,6 +166,7 @@ func TestMetricsBatchBuilder(t *testing.T) {
 			Rid: "f",
 		})
 		require.NoError(t, err)
+		require.False(t, mbb.IsEmpty())
 
 		// should not be able to add sample to invalid index
 		err = mbb.AddMetricSamplesToTimeSeriesMetric(-1, nil)

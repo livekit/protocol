@@ -274,6 +274,10 @@ func (m *MetricsBatchBuilder) Merge(other *livekit.MetricsBatch) {
 	}
 }
 
+func (m *MetricsBatchBuilder) IsEmpty() bool {
+	return len(m.MetricsBatch.TimeSeries) == 0 && len(m.MetricsBatch.Events) == 0
+}
+
 func (m *MetricsBatchBuilder) isLabelFiltered(label livekit.MetricLabel, participantIdentity livekit.ParticipantIdentity) bool {
 	if participantIdentity == m.restrictedLabels.ParticipantIdentity {
 		// all labels allowed for restricted participant
