@@ -122,6 +122,9 @@ func (p *CreateSIPOutboundTrunkRequest) Validate() error {
 	if p.Trunk == nil {
 		return errors.New("missing trunk")
 	}
+	if p.Trunk.SipTrunkId != "" {
+		return errors.New("trunk id must not be set")
+	}
 	if err := p.Trunk.Validate(); err != nil {
 		return err
 	}
@@ -132,6 +135,9 @@ func (p *CreateSIPInboundTrunkRequest) Validate() error {
 	if p.Trunk == nil {
 		return errors.New("missing trunk")
 	}
+	if p.Trunk.SipTrunkId != "" {
+		return errors.New("trunk id must not be set")
+	}
 	if err := p.Trunk.Validate(); err != nil {
 		return err
 	}
@@ -139,8 +145,11 @@ func (p *CreateSIPInboundTrunkRequest) Validate() error {
 }
 
 func (p *SIPInboundTrunkInfo) Validate() error {
-	if len(p.Numbers) == 0 {
-		return errors.New("no trunk numbers specified")
+	hasAuth := p.AuthUsername != "" || p.AuthPassword != ""
+	hasCIDR := len(p.AllowedAddresses) != 0
+	hasNumbers := len(p.Numbers) != 0 // TODO: remove this condition, it doesn't really help with security
+	if !hasAuth && !hasCIDR && !hasNumbers {
+		return errors.New("for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
@@ -157,7 +166,9 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	}
 	if p.Address == "" {
 		return errors.New("no outbound address specified")
-	} else if strings.Contains(p.Address, "@") {
+	} else if strings.Contains(p.Address, "transport=") {
+		return errors.New("trunk transport should be set as a field, not a URI parameter")
+	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
 		return errors.New("trunk address should be a hostname or IP, not SIP URI")
 	}
 	if err := validateHeaders(p.Headers); err != nil {
