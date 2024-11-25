@@ -4608,13 +4608,13 @@ type DataStream_Header struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	MessageId      string                `protobuf:"bytes,1,opt,name=messageId,proto3" json:"messageId,omitempty"`
+	MessageId      string                `protobuf:"bytes,1,opt,name=messageId,proto3" json:"messageId,omitempty"`  // Unique identifier for this data stream
 	Timestamp      int64                 `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // Using int64 for Unix timestamp
 	Topic          string                `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
 	StreamType     DataStream_StreamType `protobuf:"varint,4,opt,name=streamType,proto3,enum=livekit.DataStream_StreamType" json:"streamType,omitempty"`
 	MimeType       string                `protobuf:"bytes,6,opt,name=mimeType,proto3" json:"mimeType,omitempty"`
-	TotalLength    *int32                `protobuf:"varint,7,opt,name=totalLength,proto3,oneof" json:"totalLength,omitempty"`                                                                                 // Optional: Only for finite streams
-	TotalChunks    *int32                `protobuf:"varint,8,opt,name=totalChunks,proto3,oneof" json:"totalChunks,omitempty"`                                                                                 // Optional: Only for finite streams
+	TotalLength    *uint64               `protobuf:"varint,7,opt,name=totalLength,proto3,oneof" json:"totalLength,omitempty"`                                                                                 // Optional: Only for finite streams
+	TotalChunks    *uint64               `protobuf:"varint,8,opt,name=totalChunks,proto3,oneof" json:"totalChunks,omitempty"`                                                                                 // Optional: Only for finite streams
 	EncryptionType Encryption_Type       `protobuf:"varint,9,opt,name=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryptionType,omitempty"`                                                    // Optional, defaults to NONE
 	Extensions     map[string]string     `protobuf:"bytes,10,rep,name=extensions,proto3" json:"extensions,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"` // Optional, user defined extensions map that can carry additional info
 	// oneof to choose between specific header types
@@ -4691,14 +4691,14 @@ func (x *DataStream_Header) GetMimeType() string {
 	return ""
 }
 
-func (x *DataStream_Header) GetTotalLength() int32 {
+func (x *DataStream_Header) GetTotalLength() uint64 {
 	if x != nil && x.TotalLength != nil {
 		return *x.TotalLength
 	}
 	return 0
 }
 
-func (x *DataStream_Header) GetTotalChunks() int32 {
+func (x *DataStream_Header) GetTotalChunks() uint64 {
 	if x != nil && x.TotalChunks != nil {
 		return *x.TotalChunks
 	}
@@ -4761,8 +4761,8 @@ type DataStream_Packet struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	MessageId     string `protobuf:"bytes,1,opt,name=messageId,proto3" json:"messageId,omitempty"`          // messageId as string
-	ChunkIndex    uint32 `protobuf:"varint,2,opt,name=chunkIndex,proto3" json:"chunkIndex,omitempty"`       // chunkId as an unsigned 32-bit integer
+	MessageId     string `protobuf:"bytes,1,opt,name=messageId,proto3" json:"messageId,omitempty"`          // unique identifier for this data stream to map it to the correct header
+	ChunkIndex    uint64 `protobuf:"varint,2,opt,name=chunkIndex,proto3" json:"chunkIndex,omitempty"`       // chunkId as an unsigned 32-bit integer
 	Content       []byte `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`              // content as binary (bytes)
 	ContentLength uint32 `protobuf:"varint,4,opt,name=contentLength,proto3" json:"contentLength,omitempty"` // content length in bytes
 	Complete      bool   `protobuf:"varint,5,opt,name=complete,proto3" json:"complete,omitempty"`           // optional, if the stream is complete
@@ -4806,7 +4806,7 @@ func (x *DataStream_Packet) GetMessageId() string {
 	return ""
 }
 
-func (x *DataStream_Packet) GetChunkIndex() uint32 {
+func (x *DataStream_Packet) GetChunkIndex() uint64 {
 	if x != nil {
 		return x.ChunkIndex
 	}
@@ -5518,9 +5518,9 @@ var file_livekit_models_proto_rawDesc = []byte{
 	0x70, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x6d, 0x69, 0x6d, 0x65, 0x54, 0x79, 0x70, 0x65, 0x18, 0x06,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6d, 0x69, 0x6d, 0x65, 0x54, 0x79, 0x70, 0x65, 0x12, 0x25,
 	0x0a, 0x0b, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x4c, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x18, 0x07, 0x20,
-	0x01, 0x28, 0x05, 0x48, 0x01, 0x52, 0x0b, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x4c, 0x65, 0x6e, 0x67,
+	0x01, 0x28, 0x04, 0x48, 0x01, 0x52, 0x0b, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x4c, 0x65, 0x6e, 0x67,
 	0x74, 0x68, 0x88, 0x01, 0x01, 0x12, 0x25, 0x0a, 0x0b, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x43, 0x68,
-	0x75, 0x6e, 0x6b, 0x73, 0x18, 0x08, 0x20, 0x01, 0x28, 0x05, 0x48, 0x02, 0x52, 0x0b, 0x74, 0x6f,
+	0x75, 0x6e, 0x6b, 0x73, 0x18, 0x08, 0x20, 0x01, 0x28, 0x04, 0x48, 0x02, 0x52, 0x0b, 0x74, 0x6f,
 	0x74, 0x61, 0x6c, 0x43, 0x68, 0x75, 0x6e, 0x6b, 0x73, 0x88, 0x01, 0x01, 0x12, 0x40, 0x0a, 0x0e,
 	0x65, 0x6e, 0x63, 0x72, 0x79, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x18, 0x09,
 	0x20, 0x01, 0x28, 0x0e, 0x32, 0x18, 0x2e, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2e, 0x45,
@@ -5549,7 +5549,7 @@ var file_livekit_models_proto_rawDesc = []byte{
 	0xb2, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x63, 0x6b, 0x65, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x6d, 0x65,
 	0x73, 0x73, 0x61, 0x67, 0x65, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d,
 	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x49, 0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x68, 0x75, 0x6e,
-	0x6b, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x0a, 0x63, 0x68,
+	0x6b, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0a, 0x63, 0x68,
 	0x75, 0x6e, 0x6b, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74,
 	0x65, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
 	0x6e, 0x74, 0x12, 0x24, 0x0a, 0x0d, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x4c, 0x65, 0x6e,
