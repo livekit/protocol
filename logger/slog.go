@@ -18,7 +18,7 @@ func ToSlogHandler(log Logger) slog.Handler {
 	switch log := log.(type) {
 	case ZapLogger:
 		zlog := log.ToZap().Desugar()
-		return zapslog.NewHandler(zlog.Core(), &zapslog.HandlerOptions{AddSource: true})
+		return zapslog.NewHandler(zlog.Core())
 	case LogRLogger:
 		return logr.ToSlogHandler(log.toLogr())
 	}

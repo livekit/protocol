@@ -416,7 +416,9 @@ message CreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
 
-  // NEXT ID: 14
+  // Enable voice isolation for the callee.
+  bool enable_krisp = 14;
+  // NEXT ID: 15
 }
 
 message SIPParticipantInfo {
@@ -430,7 +432,7 @@ message TransferSIPParticipantRequest {
   string participant_identity = 1;
   string room_name = 2;
   string transfer_to = 3;
-  
+
   // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
   bool play_dialtone = 4;
 }
@@ -444,16 +446,18 @@ message SIPCallInfo {
   SIPUri from_uri = 6;
   SIPUri to_uri = 7;
   SIPCallStatus call_status = 8;
-  int64 started_at = 9;
-  int64 ended_at = 10;
-  DisconnectReason disconnect_reason = 11;
+  int64 created_at = 9;
+  int64 started_at = 10;
+  int64 ended_at = 11;
+  DisconnectReason disconnect_reason = 12;
+  string error = 13;
 }
 
 message SIPUri {
   string user = 1;
   string host = 2;
   string ip = 3;
-  string port = 4;
+  uint32 port = 4;
   SIPTransport transport = 5;
 }
 
@@ -462,4 +466,5 @@ enum SIPCallStatus {
   SCS_PARTICIPANT_JOINED = 1; // SIP participant for outgoing call has been created. The SIP outgoing call is being established
   SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
   SCS_DISCONNECTED = 3; // Call has ended
+  SCS_ERROR = 4; // Call has ended or never succeeded because of an error
 }

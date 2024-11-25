@@ -30,10 +30,7 @@ import (
 	"github.com/livekit/protocol/utils/must"
 )
 
-const (
-	Size            = 12
-	guidScratchSize = Size + 10
-)
+const Size = 12
 
 const (
 	RoomPrefix            = "RM_"
@@ -57,7 +54,7 @@ const (
 
 var guidGeneratorPool = sync.Pool{
 	New: func() any {
-		return must.Get(newGenerator(guidScratchSize))
+		return must.Get(newGenerator())
 	},
 }
 
@@ -96,19 +93,17 @@ func newB57Index() [256]byte {
 }
 
 type guidGenerator struct {
-	scratch []byte
-	rng     *mrand.ChaCha8
+	rng *mrand.ChaCha8
 }
 
-func newGenerator(scratchSize int) (*guidGenerator, error) {
+func newGenerator() (*guidGenerator, error) {
 	var seed [32]byte
 	if _, err := rand.Read(seed[:]); err != nil {
 		return nil, err
 	}
 
 	return &guidGenerator{
-		scratch: make([]byte, scratchSize),
-		rng:     mrand.NewChaCha8(seed),
+		rng: mrand.NewChaCha8(seed),
 	}, nil
 }
 
@@ -130,10 +125,10 @@ func (g *guidGenerator) readIDChars(b []byte) {
 }
 
 func (g *guidGenerator) New(prefix string) string {
-	s := append(g.scratch[:0], make([]byte, len(prefix)+Size)...)
-	copy(s, prefix)
-	g.readIDChars(s[len(prefix):])
-	return string(s)
+	b := make([]byte, len(prefix)+Size)
+	copy(b, prefix)
+	g.readIDChars(b[len(prefix):])
+	return unsafe.String(unsafe.SliceData(b), len(b))
 }
 
 func guidPrefix[T livekit.Guid]() string {

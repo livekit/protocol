@@ -12,18 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package pointer
 
-import "google.golang.org/protobuf/proto"
-
-func CloneProto[T proto.Message](m T) T {
-	return proto.Clone(m).(T)
-}
-
-func CloneProtoSlice[T proto.Message](ms []T) []T {
-	cs := make([]T, len(ms))
-	for i := range ms {
-		cs[i] = CloneProto(ms[i])
-	}
-	return cs
+func To[T any](v T) *T {
+	return &v
 }
