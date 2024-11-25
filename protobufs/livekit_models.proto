@@ -236,6 +236,8 @@ message DataPacket {
     RpcRequest rpc_request = 10;
     RpcAck rpc_ack = 11;
     RpcResponse rpc_response = 12;
+    DataStream.Header stream_header = 13;
+    DataStream.Chunk stream_chunk = 14;
   }
   // NEXT_ID: 9
 }
@@ -644,11 +646,11 @@ message DataStream {
     }
   }
 
-  message Packet {
+  message Chunk {
     string streamId = 1;  // unique identifier for this data stream to map it to the correct header
     uint64 chunkIndex = 2;
     bytes content = 3; // content as binary (bytes)
-    bool complete = 4; // true only if this is the last packet of this stream - can also be sent with empty content
+    bool complete = 4; // true only if this is the last chunk of this stream - can also be sent with empty content
     optional bytes iv = 5; // optional, initialization vector for AES-GCM encryption
   }
 }
