@@ -648,9 +648,8 @@ message DataStream {
     string streamId = 1;  // unique identifier for this data stream to map it to the correct header
     uint64 chunkIndex = 2;
     bytes content = 3; // content as binary (bytes)
-    uint32 contentLength = 4; // content length in bytes
-    bool complete = 5; // true only if this is the last packet of this stream - can also be sent with empty content
-    optional bytes iv = 6; // optional, initialization vector for AES-GCM encryption
+    bool complete = 4; // true only if this is the last packet of this stream - can also be sent with empty content
+    optional bytes iv = 5; // optional, initialization vector for AES-GCM encryption
   }
 }
 
