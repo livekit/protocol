@@ -603,7 +603,7 @@ enum AudioTrackFeature {
 
 message DataStream {
 
-  // enum for operation types (specific to TextStreamHeader)
+  // enum for operation types (specific to TextHeader)
   enum OperationType {
     CREATE = 0;
     UPDATE = 1;
@@ -623,10 +623,10 @@ message DataStream {
   
   // header properties specific to file or image streams
   message FileHeader {
-    string fileName = 1;  // optional: name of the file
+    string fileName = 1;  // name of the file
   }
 
-  // main DataStreamHeader that contains a oneof for specific headers
+  // main DataStream.Header that contains a oneof for specific headers
   message Header {
     string streamId = 1; // unique identifier for this data stream
     int64 timestamp = 2;  // using int64 for Unix timestamp
@@ -645,16 +645,12 @@ message DataStream {
   }
 
   message Packet {
-    string messageId = 1;  // unique identifier for this data stream to map it to the correct header
-    uint64 chunkIndex = 2; // chunkId as an unsigned 32-bit integer
+    string streamId = 1;  // unique identifier for this data stream to map it to the correct header
+    uint64 chunkIndex = 2;
     bytes content = 3; // content as binary (bytes)
     uint32 contentLength = 4; // content length in bytes
     bool complete = 5; // true only if this is the last packet of this stream - can also be sent with empty content
     optional bytes iv = 6; // optional, initialization vector for AES-GCM encryption
   }
 }
-
-
-
-
 
