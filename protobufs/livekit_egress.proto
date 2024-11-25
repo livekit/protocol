@@ -330,6 +330,7 @@ message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
   string room_name = 13;
+  EgressSourceType source_type = 26;
   EgressStatus status = 3;
   int64 started_at = 10;
   int64 ended_at = 11;
@@ -355,7 +356,7 @@ message EgressInfo {
   repeated ImagesInfo image_results = 20;
   string manifest_location = 23;
   bool backup_storage_used = 25;
-  // next ID: 26
+  // next ID: 27
 }
 
 message StreamInfoList {
