@@ -1,3 +1,2 @@
 node_modules/
-src/gen
-!src/gen/version.d.ts
+dist/

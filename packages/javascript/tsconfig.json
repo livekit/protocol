@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationMap": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "outDir": "dist",
+  },
+  "include": ["src/**/*.ts"],
+}
