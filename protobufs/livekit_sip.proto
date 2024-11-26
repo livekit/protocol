@@ -385,6 +385,9 @@ message CreateSIPParticipantRequest {
   // What number should be dialed via SIP
   string sip_call_to = 2;
 
+  // Optional SIP From number to use. If empty, trunk number is used.
+  string sip_number = 15;
+
   // What LiveKit room should this participant be connected too
   string room_name = 3;
 
@@ -418,7 +421,7 @@ message CreateSIPParticipantRequest {
 
   // Enable voice isolation for the callee.
   bool enable_krisp = 14;
-  // NEXT ID: 15
+  // NEXT ID: 16
 }
 
 message SIPParticipantInfo {

@@ -16,10 +16,13 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
-	if len(trunk.Numbers) == 0 {
-		return nil, errors.New("no numbers on outbound trunk")
+	outboundNumber := req.SipNumber
+	if outboundNumber == "" {
+		if len(trunk.Numbers) == 0 {
+			return nil, errors.New("no numbers on outbound trunk")
+		}
+		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}
-	outboundNumber := trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	// A sanity check for the number format for well-known providers.
 	switch {
 	case strings.HasSuffix(trunk.Address, "telnyx.com"):
