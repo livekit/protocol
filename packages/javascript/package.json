@@ -23,7 +23,7 @@
   },
   "scripts": {
     "generate:version": "genversion --esm --semi src/gen/version.ts",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=ts -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:proto": "mkdir src/gen && protoc --es_out src/gen --es_opt target=ts -I=../../protobufs ../../protobufs/livekit_*.proto",
     "prebuild": "pnpm generate:version && pnpm generate:proto",
     "build": "pnpm prebuild && tsup --onSuccess \"tsc --declaration --emitDeclarationOnly\""
   },
