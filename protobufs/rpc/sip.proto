@@ -82,7 +82,7 @@ message InternalCreateSIPParticipantRequest {
   map<string, string> headers = 21;
   map<string, string> headers_to_attributes = 22;
 
-  repeated SIPFeature enabled_features = 25;
+  repeated livekit.SIPFeature enabled_features = 25;
 
   // Max time for the callee to answer the call.
   google.protobuf.Duration ringing_timeout = 23;
@@ -106,7 +106,3 @@ message InternalTransferSIPParticipantRequest {
   bool play_dialtone = 3;
 }
 
-enum SIPFeature {
-  NONE = 0;
-  KRISP_ENABLED = 1;
-}
