@@ -179,7 +179,9 @@ message EvaluateSIPDispatchRulesResponse {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 17;
 
-  // NEXT ID: 19
+  livekit.SIPMediaEncryption media_encryption = 19;
+
+  // NEXT ID: 20
 }
 
 message UpdateSIPCallStateRequest {
