@@ -2,5 +2,5 @@
 "@livekit/protocol": minor
 ---
 
-add native CommonJS support
+add native CommonJS support (#883)
 
