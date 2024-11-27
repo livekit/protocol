@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/twitchtv/twirp"
-
 	"golang.org/x/exp/slices"
 
 	"github.com/livekit/protocol/livekit"
@@ -513,15 +512,24 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		ParticipantMetadata:   rule.Metadata,
 		ParticipantAttributes: attrs,
 	}
+	krispEnabled := false
 	if trunk != nil {
 		resp.Headers = trunk.Headers
 		resp.HeadersToAttributes = trunk.HeadersToAttributes
 		resp.AttributesToHeaders = trunk.AttributesToHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
 		resp.MaxCallDuration = trunk.MaxCallDuration
-		if trunk.KrispEnabled {
-			resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)
+		resp.MediaEncryption = trunk.MediaEncryption
+		krispEnabled = krispEnabled || trunk.KrispEnabled
+	}
+	if rule != nil {
+		krispEnabled = krispEnabled || rule.KrispEnabled
+		if rule.MediaEncryption != 0 {
+			resp.MediaEncryption = rule.MediaEncryption
 		}
+	}
+	if krispEnabled {
+		resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)
 	}
 	return resp, nil
 }
