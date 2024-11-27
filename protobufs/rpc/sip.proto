@@ -81,6 +81,9 @@ message InternalCreateSIPParticipantRequest {
 
   map<string, string> headers = 21;
   map<string, string> headers_to_attributes = 22;
+  // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
+  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
+  map<string, string> attributes_to_headers = 26;
 
   repeated livekit.SIPFeature enabled_features = 25;
 
@@ -89,7 +92,7 @@ message InternalCreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 24;
 
-  // NEXT ID: 26
+  // NEXT ID: 27
 }
 
 message InternalCreateSIPParticipantResponse {
