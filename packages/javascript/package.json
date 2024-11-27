@@ -1,6 +1,6 @@
 {
   "name": "@livekit/protocol",
-  "version": "1.28.0",
+  "version": "1.28.1",
   "description": "",
   "type": "module",
   "main": "dist/index.js",

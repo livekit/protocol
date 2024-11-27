@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.28.1
+
+### Patch Changes
+
+- fix CJS require importing .js - [#897](https://github.com/livekit/protocol/pull/897) ([@nbsp](https://github.com/nbsp))
+
 ## 1.28.0
 
 ### Minor Changes
