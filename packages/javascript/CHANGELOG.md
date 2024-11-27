@@ -1,5 +1,23 @@
 # @livekit/protocol
 
+## 1.28.0
+
+### Minor Changes
+
+- Add disconnect reason for SIP failures. - [#845](https://github.com/livekit/protocol/pull/845) ([@dennwc](https://github.com/dennwc))
+
+- add native CommonJS support (#883) - [#895](https://github.com/livekit/protocol/pull/895) ([@nbsp](https://github.com/nbsp))
+
+- Map participant attributes to SIP headers. - [#893](https://github.com/livekit/protocol/pull/893) ([@dennwc](https://github.com/dennwc))
+
+- Allow setting number for SIP outbound. - [#891](https://github.com/livekit/protocol/pull/891) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Report call enabled features in SIPCallInfo - [#884](https://github.com/livekit/protocol/pull/884) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Fix port type for SIPUri. - [#882](https://github.com/livekit/protocol/pull/882) ([@dennwc](https://github.com/dennwc))
+
 ## 1.27.1
 
 ### Patch Changes
