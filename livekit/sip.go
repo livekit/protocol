@@ -101,11 +101,27 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 	}
 }
 
-func validateHeaders(headers map[string]string) error {
+func validateHeader(header string) error {
+	v := strings.ToLower(header)
+	if !strings.HasPrefix(v, "x-") {
+		return fmt.Errorf("only X-* headers are allowed: %s", header)
+	}
+	return nil
+}
+
+func validateHeaderKeys(headers map[string]string) error {
 	for k := range headers {
-		k = strings.ToLower(k)
-		if !strings.HasPrefix(k, "x-") {
-			return fmt.Errorf("only X-* headers are allowed: %s", k)
+		if err := validateHeader(k); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateHeaderValues(headers map[string]string) error {
+	for _, v := range headers {
+		if err := validateHeader(v); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -151,10 +167,13 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	if !hasAuth && !hasCIDR && !hasNumbers {
 		return errors.New("for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
-	if err := validateHeaders(p.Headers); err != nil {
+	if err := validateHeaderKeys(p.Headers); err != nil {
 		return err
 	}
-	if err := validateHeaders(p.HeadersToAttributes); err != nil {
+	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
 	return nil
@@ -171,10 +190,13 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
 		return errors.New("trunk address should be a hostname or IP, not SIP URI")
 	}
-	if err := validateHeaders(p.Headers); err != nil {
+	if err := validateHeaderKeys(p.Headers); err != nil {
 		return err
 	}
-	if err := validateHeaders(p.HeadersToAttributes); err != nil {
+	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
 	return nil

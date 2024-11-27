@@ -190,6 +190,9 @@ message SIPInboundTrunkInfo {
   map<string, string> headers = 9;
   // Map SIP X-* headers from INVITE to SIP participant attributes.
   map<string, string> headers_to_attributes = 10;
+  // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
+  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
+  map<string, string> attributes_to_headers = 14;
 
   // Max time for the caller to wait for track subscription.
   google.protobuf.Duration ringing_timeout = 11;
@@ -197,6 +200,8 @@ message SIPInboundTrunkInfo {
   google.protobuf.Duration max_call_duration = 12;
 
   bool krisp_enabled = 13;
+
+  // NEXT ID: 15
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -232,6 +237,11 @@ message SIPOutboundTrunkInfo {
   // Map SIP X-* headers from 200 OK to SIP participant attributes.
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 10;
+  // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
+  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
+  map<string, string> attributes_to_headers = 11;
+
+  // NEXT ID: 12
 }
 
 message GetSIPInboundTrunkRequest {
