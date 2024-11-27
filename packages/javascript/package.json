@@ -3,32 +3,38 @@
   "version": "1.27.1",
   "description": "",
   "type": "module",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "main": "dist/index.js",
+  "import": "dist/index.cjs",
+  "types": "dist/index.d.ts",
   "files": [
-    "src"
+    "dist"
   ],
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./*": {
-      "types": "./src/gen/livekit_*_pb.d.ts",
-      "default": "./src/gen/livekit_*_pb.js"
+      "types": "./dist/gen/livekit_*_pb.d.ts",
+      "import": "./dist/gen/livekit_*_pb.js",
+      "require": "./dist/gen/livekit_*_pb.cjs"
     }
   },
   "scripts": {
-    "generate:version": "genversion --esm --semi src/gen/version.js",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "build": "pnpm generate:version && pnpm generate:proto"
+    "generate:version": "genversion --esm --semi src/gen/version.ts",
+    "generate:proto": "mkdir src/gen && protoc --es_out src/gen --es_opt target=ts -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "prebuild": "pnpm generate:version && pnpm generate:proto",
+    "build": "pnpm prebuild && tsup --onSuccess \"tsc --declaration --emitDeclarationOnly\""
   },
   "keywords": [],
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.10.0",
-    "genversion": "^3.2.0"
+    "genversion": "^3.2.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"
