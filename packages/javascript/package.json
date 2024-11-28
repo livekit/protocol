@@ -34,7 +34,7 @@
     "@bufbuild/protoc-gen-es": "^1.10.0",
     "genversion": "^3.2.0",
     "tsup": "^8.3.5",
-    "typescript": "^5.2"
+    "typescript": "5.2"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"
