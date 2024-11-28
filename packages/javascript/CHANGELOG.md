@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.29.0
+
+### Minor Changes
+
+- Add DataStream support - [#871](https://github.com/livekit/protocol/pull/871) ([@lukasIO](https://github.com/lukasIO))
+
+### Patch Changes
+
+- Downgrade TypeScript to fix incorrect generated typings - [#901](https://github.com/livekit/protocol/pull/901) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.28.1
 
 ### Patch Changes
