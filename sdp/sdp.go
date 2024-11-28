@@ -18,7 +18,7 @@ import (
 	"strings"
 
 	"github.com/pion/sdp/v3"
-	"github.com/pion/webrtc/v3"
+	"github.com/pion/webrtc/v4"
 )
 
 func GetMidValue(media *sdp.MediaDescription) string {
