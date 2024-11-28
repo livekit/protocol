@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.29.1
+
+### Patch Changes
+
+- Actually downgrade TypeScript - [#902](https://github.com/livekit/protocol/pull/902) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.29.0
 
 ### Minor Changes
