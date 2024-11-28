@@ -1,8 +1,7 @@
 module github.com/livekit/protocol
 
-go 1.23
+go 1.22
 
-toolchain go1.23.3
 
 require (
 	buf.build/go/protoyaml v0.2.0
