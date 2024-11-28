@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.29.0
+
+### Minor Changes
+
+- Add DataStream support - [#871](https://github.com/livekit/protocol/pull/871) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.28.1
 
 ## 1.28.0
