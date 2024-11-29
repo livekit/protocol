@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.29.3
+
+### Patch Changes
+
+- Fix treehaking possibility of individual imports - [#907](https://github.com/livekit/protocol/pull/907) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.29.2
 
 ## 1.29.1
