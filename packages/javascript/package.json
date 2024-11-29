@@ -3,38 +3,46 @@
   "version": "1.29.2",
   "description": "",
   "type": "module",
-  "main": "dist/index.js",
-  "import": "dist/index.cjs",
-  "types": "dist/index.d.ts",
+  "main": "src/esm/index.js",
+  "require": "src/cjs/index.cjs",
+  "types": "src/esm/index.d.ts",
   "files": [
-    "dist"
+    "src"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./src/esm/index.d.ts",
+        "default": "./src/esm/index.js"
+      },
+      "require": {
+        "types": "./src/cjs/index.d.ts",
+        "default": "./src/cjs/index.cjs"
+      }
     },
     "./*": {
-      "types": "./dist/gen/livekit_*_pb.d.ts",
-      "import": "./dist/gen/livekit_*_pb.js",
-      "require": "./dist/gen/livekit_*_pb.cjs"
+      "import": {
+        "types": "./src/esm/gen/livekit_*_pb.d.ts",
+        "default": "./src/esm/gen/livekit_*_pb.js"
+      },
+      "require": {
+        "types": "./src/cjs/gen/livekit_*_pb.d.ts",
+        "default": "./src/cjs/gen/livekit_*_pb.js"
+      }
     }
   },
   "scripts": {
-    "generate:version": "genversion --esm --semi src/gen/version.ts",
     "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=ts -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "prebuild": "pnpm generate:version && pnpm generate:proto",
-    "build": "pnpm prebuild && tsup --onSuccess \"tsc --declaration --emitDeclarationOnly\""
+    "build:esm": "genversion --esm --semi src/esm/gen/version.js && protoc --es_out src/esm/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "build:cjs": "genversion --semi --property version,name src/cjs/gen/version.js && protoc --es_out src/cjs/gen --es_opt target=dts+js --es_opt js_import_style=legacy_commonjs --es_opt import_extension=none -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "build": "pnpm build:esm && pnpm build:cjs"
   },
   "keywords": [],
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.10.0",
-    "genversion": "^3.2.0",
-    "tsup": "^8.3.5",
-    "typescript": "5.2"
+    "genversion": "^3.2.0"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"
