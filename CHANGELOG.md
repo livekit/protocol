@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.29.2
+
+### Patch Changes
+
+- Revert back to Go 1.22 - [#905](https://github.com/livekit/protocol/pull/905) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.29.1
 
 ## 1.29.0
