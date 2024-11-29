@@ -1,8 +1,8 @@
 module github.com/livekit/protocol
 
-go 1.23
+go 1.22.7
 
-toolchain go1.23.3
+toolchain go1.22.9
 
 require (
 	buf.build/go/protoyaml v0.2.0
@@ -18,7 +18,7 @@ require (
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
 	github.com/livekit/psrpc v0.6.1-0.20241018124827-1efff3d113a8
 	github.com/mackerelio/go-osstat v0.2.5
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.10.0
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.9.0
 	github.com/pion/logging v0.2.2
 	github.com/pion/sdp/v3 v3.0.9
 	github.com/pion/webrtc/v4 v4.0.3
