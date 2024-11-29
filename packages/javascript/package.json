@@ -3,38 +3,36 @@
   "version": "1.29.2",
   "description": "",
   "type": "module",
-  "main": "dist/index.js",
-  "import": "dist/index.cjs",
-  "types": "dist/index.d.ts",
+  "require": "dist/index.cjs",
   "files": [
+    "src",
     "dist"
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./*": {
-      "types": "./dist/gen/livekit_*_pb.d.ts",
-      "import": "./dist/gen/livekit_*_pb.js",
-      "require": "./dist/gen/livekit_*_pb.cjs"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "scripts": {
-    "generate:version": "genversion --esm --semi src/gen/version.ts",
-    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=ts -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "prebuild": "pnpm generate:version && pnpm generate:proto",
-    "build": "pnpm prebuild && tsup --onSuccess \"tsc --declaration --emitDeclarationOnly\""
+    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:version": "genversion --esm --semi src/gen/version.js",
+    "build": "pnpm generate:version && pnpm generate:proto && unbuild"
   },
   "keywords": [],
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.10.0",
-    "genversion": "^3.2.0",
-    "tsup": "^8.3.5",
-    "typescript": "5.2"
+    "genversion": "^3.2.0"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"
