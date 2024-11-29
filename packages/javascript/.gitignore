@@ -1,6 +1,3 @@
 node_modules/
-src/esm/gen/*
-!src/esm/gen/version.d.ts
-src/cjs/gen/*
-!src/cjs/gen/version.d.ts
+dist
 

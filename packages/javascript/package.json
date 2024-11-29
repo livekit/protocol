@@ -3,39 +3,29 @@
   "version": "1.29.2",
   "description": "",
   "type": "module",
-  "main": "src/esm/index.js",
-  "require": "src/cjs/index.cjs",
-  "types": "src/esm/index.d.ts",
+  "require": "dist/index.cjs",
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "exports": {
     ".": {
       "import": {
-        "types": "./src/esm/index.d.ts",
-        "default": "./src/esm/index.js"
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
       },
       "require": {
-        "types": "./src/cjs/index.d.ts",
-        "default": "./src/cjs/index.cjs"
-      }
-    },
-    "./*": {
-      "import": {
-        "types": "./src/esm/gen/livekit_*_pb.d.ts",
-        "default": "./src/esm/gen/livekit_*_pb.js"
-      },
-      "require": {
-        "types": "./src/cjs/gen/livekit_*_pb.d.ts",
-        "default": "./src/cjs/gen/livekit_*_pb.js"
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
       }
     }
   },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "scripts": {
-    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=ts -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "build:esm": "genversion --esm --semi src/esm/gen/version.js && protoc --es_out src/esm/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "build:cjs": "genversion --semi --property version,name src/cjs/gen/version.js && protoc --es_out src/cjs/gen --es_opt target=dts+js --es_opt js_import_style=legacy_commonjs --es_opt import_extension=none -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "build": "pnpm build:esm && pnpm build:cjs"
+    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:version": "genversion --esm --semi src/gen/version.js",
+    "build": "pnpm generate:version && pnpm generate:proto && unbuild"
   },
   "keywords": [],
   "author": "LiveKit",
