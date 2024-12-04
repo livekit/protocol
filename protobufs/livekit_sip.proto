@@ -424,6 +424,14 @@ message CreateSIPParticipantRequest {
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
   bool hide_phone_number = 10;
 
+  // These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
+  map<string, string> headers = 16;
+  // Key-value mapping of SIP X-* header names to participant attribute names.
+  map<string, string> headers_to_attributes = 17;
+  // Key-value mapping of participant attribute names to SIP X-* header names when sending BYE or REFER requests.
+  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
+  map<string, string> attributes_to_headers = 18;
+
   // Max time for the callee to answer the call.
   google.protobuf.Duration ringing_timeout = 11;
   // Max call duration.
@@ -431,15 +439,7 @@ message CreateSIPParticipantRequest {
 
   // Enable voice isolation for the callee.
   bool enable_krisp = 14;
-
-  // These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
-  map<string, string> headers = 15;
-  // Key-value mapping of SIP X-* header names to participant attribute names.
-  map<string, string> headers_to_attributes = 16;
-  // Key-value mapping of participant attribute names to SIP X-* header names when sending BYE or REFER requests.
-  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
-  map<string, string> attributes_to_headers = 17;
-  // NEXT ID: 18
+  // NEXT ID: 19
 }
 
 message SIPParticipantInfo {
