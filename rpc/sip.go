@@ -50,7 +50,7 @@ func NewCreateSIPParticipantRequest(
 	}
 
 	var features []livekit.SIPFeature
-	if req.EnableKrisp {
+	if req.KrispEnabled {
 		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
 	}
 
@@ -80,5 +80,6 @@ func NewCreateSIPParticipantRequest(
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
+		MediaEncryption:       req.MediaEncryption,
 	}, nil
 }

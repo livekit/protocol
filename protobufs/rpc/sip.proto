@@ -92,7 +92,9 @@ message InternalCreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 24;
 
-  // NEXT ID: 27
+  livekit.SIPMediaEncryption media_encryption = 27;
+
+  // NEXT ID: 28
 }
 
 message InternalCreateSIPParticipantResponse {
