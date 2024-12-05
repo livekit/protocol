@@ -20,6 +20,7 @@ import (
 	"github.com/frostbyte73/core"
 	"github.com/prometheus/procfs"
 	"go.uber.org/atomic"
+	"golang.org/x/sys/unix"
 
 	"github.com/livekit/protocol/logger"
 )
@@ -37,9 +38,16 @@ type CPUStats struct {
 	platform platformCPUMonitor
 
 	idleCallback    func(idle float64)
-	procCallback    func(idle float64, usage map[int]float64)
+	procCallback    func(*ProcStats)
 	warningThrottle core.Throttle
 	closeChan       chan struct{}
+}
+
+type ProcStats struct {
+	CpuIdle     float64
+	Cpu         map[int]float64
+	MemoryTotal int
+	Memory      map[int]int
 }
 
 func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
@@ -60,7 +68,7 @@ func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
 	return c, nil
 }
 
-func NewProcCPUStats(procUpdateCallback func(idle float64, usage map[int]float64)) (*CPUStats, error) {
+func NewProcMonitor(onUpdate func(*ProcStats)) (*CPUStats, error) {
 	p, err := newPlatformCPUMonitor()
 	if err != nil {
 		return nil, err
@@ -69,11 +77,11 @@ func NewProcCPUStats(procUpdateCallback func(idle float64, usage map[int]float64
 	c := &CPUStats{
 		platform:        p,
 		warningThrottle: core.NewThrottle(time.Minute),
-		procCallback:    procUpdateCallback,
+		procCallback:    onUpdate,
 		closeChan:       make(chan struct{}),
 	}
 
-	go c.monitorProcCPULoad()
+	go c.monitorProcesses()
 
 	return c, nil
 }
@@ -119,8 +127,12 @@ func (c *CPUStats) monitorCPULoad() {
 	}
 }
 
-func (c *CPUStats) monitorProcCPULoad() {
+func (c *CPUStats) monitorProcesses() {
 	numCPU := c.platform.numCPU()
+	pageSize := unix.Getpagesize()
+	if pageSize == 0 {
+		pageSize = 4096
+	}
 
 	fs, err := procfs.NewFS(procfs.DefaultMountPoint)
 	if err != nil {
@@ -179,8 +191,13 @@ func (c *CPUStats) monitorProcCPULoad() {
 				total.CPUTotal.User + total.CPUTotal.Nice + total.CPUTotal.System +
 				total.CPUTotal.IRQ + total.CPUTotal.SoftIRQ + total.CPUTotal.Steal
 
-			usage := make(map[int]float64)
-			podUsage := 0.0
+			stats := &ProcStats{
+				CpuIdle:     numCPU,
+				Cpu:         make(map[int]float64),
+				MemoryTotal: 0,
+				Memory:      make(map[int]int),
+			}
+
 			for pid, stat := range procStats {
 				// process usage as percent of total host cpu
 				procPercentUsage := float64(stat.UTime + stat.STime - prevStats[pid].UTime - prevStats[pid].STime)
@@ -193,16 +210,19 @@ func (c *CPUStats) monitorProcCPULoad() {
 					pid = ppids[pid]
 				}
 
-				procUsage := hostCPU * procPercentUsage / 100 / (totalHostTime - prevTotalTime)
-				usage[pid] += procUsage
-				podUsage += procUsage
+				cpu := hostCPU * procPercentUsage / 100 / (totalHostTime - prevTotalTime)
+				stats.Cpu[pid] += cpu
+				stats.CpuIdle -= cpu
+
+				memory := stat.RSS * pageSize
+				stats.Memory[pid] += memory
+				stats.MemoryTotal += memory
 			}
 
-			idle := numCPU - podUsage
-			c.idleCPUs.Store(idle)
+			c.idleCPUs.Store(stats.CpuIdle)
 
 			if c.procCallback != nil {
-				c.procCallback(idle, usage)
+				c.procCallback(stats)
 			}
 
 			prevTotalTime = totalHostTime
