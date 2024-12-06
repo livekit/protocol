@@ -20,6 +20,6 @@ const (
 	//
 	// SIP participant is ready when it reaches "active" status.
 	AttrSIPCallStatus = AttrSIPPrefix + "callStatus"
-  // AttrSIPInviteMessage attribute contains LiveKit SIP Invite Message
-  AttrSIPInviteMessage = AttrSIPPrefix + "inviteMessage"
+	// AttrSIPInviteMessage attribute contains LiveKit SIP Invite Message
+	AttrSIPInviteMessage = AttrSIPPrefix + "inviteMessage"
 )
