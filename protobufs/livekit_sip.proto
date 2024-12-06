@@ -52,6 +52,7 @@ import "livekit_models.proto";
 
 service SIP {
   // rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; }; DELETED
+
   rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
@@ -270,6 +271,8 @@ message ListSIPTrunkResponse {
 }
 
 message ListSIPInboundTrunkRequest {
+  repeated string trunk_ids = 1;
+  repeated string numbers = 2;
 }
 
 message ListSIPInboundTrunkResponse {
@@ -277,6 +280,8 @@ message ListSIPInboundTrunkResponse {
 }
 
 message ListSIPOutboundTrunkRequest {
+  repeated string trunk_ids = 1;
+  repeated string numbers = 2;
 }
 
 message ListSIPOutboundTrunkResponse {
@@ -376,6 +381,8 @@ message SIPDispatchRuleInfo {
 }
 
 message ListSIPDispatchRuleRequest {
+  repeated string dispatch_rule_ids = 1;
+  repeated string trunk_ids = 2;
 }
 
 message ListSIPDispatchRuleResponse {
