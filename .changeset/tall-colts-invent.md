@@ -1,5 +1,6 @@
 ---
-"@fake-scope/fake-pkg": patch
+"@livekit/protocol": minor
+"github.com/livekit/protocol": minor
 ---
 
 Add headers for CreateSipParticipant
