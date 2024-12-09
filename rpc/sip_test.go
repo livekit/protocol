@@ -18,6 +18,10 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		ParticipantAttributes: map[string]string{
 			"extra": "1",
 		},
+		Headers: map[string]string{
+			"X-B": "B2",
+			"X-C": "C",
+		},
 		Dtmf:         "1234#",
 		PlayDialtone: true,
 	}
@@ -27,6 +31,10 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Numbers:      []string{"+1111"},
 		AuthUsername: "user",
 		AuthPassword: "pass",
+		Headers: map[string]string{
+			"X-A": "A",
+			"X-B": "B1",
+		},
 	}
 	res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
 	require.NoError(t, err)
@@ -53,6 +61,11 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			livekit.AttrSIPTrunkNumber: "+1111",
 			livekit.AttrSIPPhoneNumber: "+3333",
 		},
+		Headers: map[string]string{
+			"X-A": "A",
+			"X-B": "B2",
+			"X-C": "C",
+		},
 	}, res)
 
 	r.HidePhoneNumber = true
@@ -78,6 +91,11 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"extra":                "1",
 			livekit.AttrSIPCallID:  "call-id",
 			livekit.AttrSIPTrunkID: "trunk",
+		},
+		Headers: map[string]string{
+			"X-A": "A",
+			"X-B": "B2",
+			"X-C": "C",
 		},
 	}, res)
 }

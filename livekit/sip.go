@@ -221,6 +221,9 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	if p.RoomName == "" {
 		return errors.New("missing room name")
 	}
+	if err := validateHeaderKeys(p.Headers); err != nil {
+		return err
+	}
 	return nil
 }
 
