@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.29.4
+
+### Patch Changes
+
+- Add version declaration file - [#916](https://github.com/livekit/protocol/pull/916) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.29.3
 
 ### Patch Changes
