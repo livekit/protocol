@@ -15,6 +15,8 @@
 package livekit
 
 import (
+	"fmt"
+
 	"buf.build/go/protoyaml"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
@@ -129,4 +131,48 @@ func marshalProto(o proto.Message) (map[string]interface{}, error) {
 func IsJobType(jobType JobType) bool {
 	_, ok := JobType_name[int32(jobType)]
 	return ok
+}
+
+func (p *ListUpdate) Validate() error {
+	if p == nil {
+		return nil
+	}
+	for _, v := range p.Set {
+		if v == "" {
+			return fmt.Errorf("empty element in the list")
+		}
+	}
+	return nil
+}
+
+func applyUpdate[T any](dst *T, set *T) {
+	if set != nil {
+		*dst = *set
+	}
+}
+
+func applyListUpdate[T ~string](dst *[]T, u *ListUpdate) {
+	if u == nil {
+		return
+	}
+	arr := make([]T, 0, len(u.Set))
+	for _, v := range u.Set {
+		arr = append(arr, T(v))
+	}
+	*dst = arr
+}
+
+func applyMapDiff(dst *map[string]string, diff map[string]string) {
+	m := *dst
+	if m == nil {
+		m = make(map[string]string)
+	}
+	for k, v := range diff {
+		if v != "" {
+			m[k] = v
+		} else {
+			delete(m, k)
+		}
+	}
+	*dst = m
 }

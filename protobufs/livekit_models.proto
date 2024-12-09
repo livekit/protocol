@@ -23,6 +23,11 @@ import "google/protobuf/timestamp.proto";
 
 import "livekit_metrics.proto";
 
+// ListUpdate is used for updated APIs where 'repeated string' field is modified.
+message ListUpdate {
+  repeated string set = 1; // set the field to a new list
+}
+
 message Room {
   string sid = 1;
   string name = 2;
