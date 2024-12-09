@@ -54,9 +54,12 @@ func NewCreateSIPParticipantRequest(
 		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
 	}
 
-	headers := req.Headers
+	headers := maps.Clone(trunk.Headers)
 	if headers == nil {
-		headers = trunk.Headers
+		headers = make(map[string]string)
+	}
+	for k, v := range req.Headers {
+		headers[k] = v
 	}
 
 	return &InternalCreateSIPParticipantRequest{
