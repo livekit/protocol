@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.30.0
+
+### Minor Changes
+
+- Add filters to SIP list APIs. - [#913](https://github.com/livekit/protocol/pull/913) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for CreateSipParticipant - [#911](https://github.com/livekit/protocol/pull/911) ([@s-hamdananwar](https://github.com/s-hamdananwar))
+
 ## 1.29.4
 
 ## 1.29.3
