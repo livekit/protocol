@@ -1,5 +1,7 @@
 # github.com/livekit/protocol
 
+## 1.29.4
+
 ## 1.29.3
 
 ## 1.29.2
