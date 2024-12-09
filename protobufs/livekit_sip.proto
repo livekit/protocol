@@ -110,6 +110,12 @@ enum SIPTransport {
   SIP_TRANSPORT_TLS = 3;
 }
 
+enum SIPMediaEncryption {
+  SIP_MEDIA_ENCRYPT_DISABLE = 0; // do not enable encryption
+  SIP_MEDIA_ENCRYPT_ALLOW = 1; // use encryption if available
+  SIP_MEDIA_ENCRYPT_REQUIRE = 2; // require encryption
+}
+
 message SIPTrunkInfo {
   option deprecated = true;
 
@@ -200,8 +206,9 @@ message SIPInboundTrunkInfo {
   google.protobuf.Duration max_call_duration = 12;
 
   bool krisp_enabled = 13;
+  SIPMediaEncryption media_encryption = 15;
 
-  // NEXT ID: 15
+  // NEXT ID: 16
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -241,7 +248,8 @@ message SIPOutboundTrunkInfo {
   // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
   map<string, string> attributes_to_headers = 11;
 
-  // NEXT ID: 12
+  SIPMediaEncryption media_encryption = 12;
+  // NEXT ID: 13
 }
 
 message GetSIPInboundTrunkRequest {
@@ -372,7 +380,10 @@ message SIPDispatchRuleInfo {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 8;
 
-  // NEXT ID: 9
+  bool krisp_enabled = 9;
+  SIPMediaEncryption media_encryption = 10;
+
+  // NEXT ID: 11
 }
 
 message ListSIPDispatchRuleRequest {
@@ -433,8 +444,10 @@ message CreateSIPParticipantRequest {
   google.protobuf.Duration max_call_duration = 12;
 
   // Enable voice isolation for the callee.
-  bool enable_krisp = 14;
-  // NEXT ID: 17
+  bool krisp_enabled = 14;
+  SIPMediaEncryption media_encryption = 17;
+
+  // NEXT ID: 18
 }
 
 message SIPParticipantInfo {
