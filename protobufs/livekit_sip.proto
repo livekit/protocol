@@ -52,6 +52,7 @@ import "livekit_models.proto";
 
 service SIP {
   // rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; }; DELETED
+
   rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
@@ -269,14 +270,26 @@ message ListSIPTrunkResponse {
   repeated SIPTrunkInfo items = 1;
 }
 
+// ListSIPInboundTrunkRequest lists inbound trunks for given filters. If no filters are set, all trunks are listed.
 message ListSIPInboundTrunkRequest {
+  // Trunk IDs to list. If this option is set, the response will contains trunks in the same order.
+  // If any of the trunks is missing, a nil item in that position will be sent in the response.
+  repeated string trunk_ids = 1;
+  // Only list trunks that contain one of the numbers, including wildcard trunks.
+  repeated string numbers = 2;
 }
 
 message ListSIPInboundTrunkResponse {
   repeated SIPInboundTrunkInfo items = 1;
 }
 
+// ListSIPOutboundTrunkRequest lists outbound trunks for given filters. If no filters are set, all trunks are listed.
 message ListSIPOutboundTrunkRequest {
+  // Trunk IDs to list. If this option is set, the response will contains trunks in the same order.
+  // If any of the trunks is missing, a nil item in that position will be sent in the response.
+  repeated string trunk_ids = 1;
+  // Only list trunks that contain one of the numbers, including wildcard trunks.
+  repeated string numbers = 2;
 }
 
 message ListSIPOutboundTrunkResponse {
@@ -375,7 +388,13 @@ message SIPDispatchRuleInfo {
   // NEXT ID: 9
 }
 
+// ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
 message ListSIPDispatchRuleRequest {
+  // Rule IDs to list. If this option is set, the response will contains rules in the same order.
+  // If any of the rules is missing, a nil item in that position will be sent in the response.
+  repeated string dispatch_rule_ids = 1;
+  // Only list rules that contain one of the Trunk IDs, including wildcard rules.
+  repeated string trunk_ids = 2;
 }
 
 message ListSIPDispatchRuleResponse {
