@@ -20,4 +20,6 @@ const (
 	//
 	// SIP participant is ready when it reaches "active" status.
 	AttrSIPCallStatus = AttrSIPPrefix + "callStatus"
+	// AttrSIPHeaderPrefix is a prefix for automatically mapped SIP header attributes.
+	AttrSIPHeaderPrefix = AttrSIPPrefix + "h."
 )
