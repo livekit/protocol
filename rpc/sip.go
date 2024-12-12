@@ -64,6 +64,10 @@ func NewCreateSIPParticipantRequest(
 			headers[k] = v
 		}
 	}
+	includeHeaders := trunk.IncludeHeaders
+	if req.IncludeHeaders != 0 {
+		includeHeaders = req.IncludeHeaders
+	}
 
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
@@ -88,6 +92,7 @@ func NewCreateSIPParticipantRequest(
 		Headers:               headers,
 		HeadersToAttributes:   trunk.HeadersToAttributes,
 		AttributesToHeaders:   trunk.AttributesToHeaders,
+		IncludeHeaders:        includeHeaders,
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,

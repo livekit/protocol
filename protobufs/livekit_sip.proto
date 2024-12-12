@@ -111,6 +111,12 @@ enum SIPTransport {
   SIP_TRANSPORT_TLS = 3;
 }
 
+enum SIPHeaderOptions {
+  SIP_NO_HEADERS = 0;  // do not map any headers, except ones mapped explicitly
+  SIP_X_HEADERS = 1;   // map all X-* headers to sip.h.x-* attributes
+  SIP_ALL_HEADERS = 2; // map all headers to sip.h.* attributes
+}
+
 message SIPTrunkInfo {
   option deprecated = true;
 
@@ -194,6 +200,13 @@ message SIPInboundTrunkInfo {
   // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
   // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
   map<string, string> attributes_to_headers = 14;
+  // Map SIP headers from INVITE to sip.h.* participant attributes automatically.
+  //
+  // When the names of required headers is known, using headers_to_attributes is strongly recommended.
+  //
+  // When mapping INVITE headers to response headers with attributes_to_headers map,
+  // lowercase header names should be used, for example: sip.h.x-custom-header.
+  SIPHeaderOptions include_headers = 15;
 
   // Max time for the caller to wait for track subscription.
   google.protobuf.Duration ringing_timeout = 11;
@@ -202,7 +215,7 @@ message SIPInboundTrunkInfo {
 
   bool krisp_enabled = 13;
 
-  // NEXT ID: 15
+  // NEXT ID: 16
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -241,8 +254,15 @@ message SIPOutboundTrunkInfo {
   // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
   // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
   map<string, string> attributes_to_headers = 11;
+  // Map SIP headers from 200 OK to sip.h.* participant attributes automatically.
+  //
+  // When the names of required headers is known, using headers_to_attributes is strongly recommended.
+  //
+  // When mapping 200 OK headers to follow-up request headers with attributes_to_headers map,
+  // lowercase header names should be used, for example: sip.h.x-custom-header.
+  SIPHeaderOptions include_headers = 12;
 
-  // NEXT ID: 12
+  // NEXT ID: 13
 }
 
 message GetSIPInboundTrunkRequest {
@@ -445,6 +465,13 @@ message CreateSIPParticipantRequest {
 
   // These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
   map<string, string> headers = 16;
+  // Map SIP headers from 200 OK to sip.h.* participant attributes automatically.
+  //
+  // When the names of required headers is known, using headers_to_attributes is strongly recommended.
+  //
+  // When mapping 200 OK headers to follow-up request headers with attributes_to_headers map,
+  // lowercase header names should be used, for example: sip.h.x-custom-header.
+  SIPHeaderOptions include_headers = 17;
 
   // Max time for the callee to answer the call.
   google.protobuf.Duration ringing_timeout = 11;
@@ -453,7 +480,7 @@ message CreateSIPParticipantRequest {
 
   // Enable voice isolation for the callee.
   bool enable_krisp = 14;
-  // NEXT ID: 17
+  // NEXT ID: 18
 }
 
 message SIPParticipantInfo {
