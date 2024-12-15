@@ -14,7 +14,7 @@ import (
 	"github.com/livekit/psrpc/version"
 )
 import livekit1 "github.com/livekit/protocol/livekit"
-import livekit7 "github.com/livekit/protocol/livekit"
+import livekit6 "github.com/livekit/protocol/livekit"
 
 var _ = version.PsrpcVersion_0_6
 
@@ -23,7 +23,7 @@ var _ = version.PsrpcVersion_0_6
 // ============================
 
 type RoomManagerClient[NodeIdTopicType ~string] interface {
-	CreateRoom(ctx context.Context, nodeId NodeIdTopicType, req *livekit7.CreateRoomRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error)
+	CreateRoom(ctx context.Context, nodeId NodeIdTopicType, req *livekit6.CreateRoomRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error)
 
 	// Close immediately, without waiting for pending RPCs
 	Close()
@@ -34,7 +34,7 @@ type RoomManagerClient[NodeIdTopicType ~string] interface {
 // ================================
 
 type RoomManagerServerImpl interface {
-	CreateRoom(context.Context, *livekit7.CreateRoomRequest) (*livekit1.Room, error)
+	CreateRoom(context.Context, *livekit6.CreateRoomRequest) (*livekit1.Room, error)
 }
 
 // ============================
@@ -81,7 +81,7 @@ func NewRoomManagerClient[NodeIdTopicType ~string](bus psrpc.MessageBus, opts ..
 	}, nil
 }
 
-func (c *roomManagerClient[NodeIdTopicType]) CreateRoom(ctx context.Context, nodeId NodeIdTopicType, req *livekit7.CreateRoomRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error) {
+func (c *roomManagerClient[NodeIdTopicType]) CreateRoom(ctx context.Context, nodeId NodeIdTopicType, req *livekit6.CreateRoomRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error) {
 	return client.RequestSingle[*livekit1.Room](ctx, c.client, "CreateRoom", []string{string(nodeId)}, req, opts...)
 }
 

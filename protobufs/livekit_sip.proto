@@ -23,6 +23,7 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "livekit_models.proto";
+import "livekit_room.proto";
 
 /*
    LiveKit's SIP API is built with 3 high level primitives
@@ -385,7 +386,13 @@ message CreateSIPDispatchRuleRequest {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 7;
 
-  // NEXT ID: 8
+  // Cloud-only, config preset to use
+  string room_preset = 8;
+
+  // RoomConfiguration to use if the participant initiates the room
+  RoomConfiguration room_config = 9;
+
+  // NEXT ID: 10
 }
 
 message SIPDispatchRuleInfo {
@@ -405,7 +412,12 @@ message SIPDispatchRuleInfo {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 8;
 
-  // NEXT ID: 9
+  // Cloud-only, config preset to use
+  string room_preset = 9;
+
+  // RoomConfiguration to use if the participant initiates the room
+  RoomConfiguration room_config = 10;
+  // NEXT ID: 11
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
