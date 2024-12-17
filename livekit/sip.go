@@ -240,6 +240,9 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	if p.TransferTo == "" {
 		return errors.New("missing transfer to")
 	}
+	if err := validateHeaderKeys(p.Headers); err != nil {
+		return err
+	}
 
 	return nil
 }

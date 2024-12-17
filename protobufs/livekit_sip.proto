@@ -497,6 +497,9 @@ message TransferSIPParticipantRequest {
 
   // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
   bool play_dialtone = 4;
+
+  // Add the following headers to the REFER SIP request.
+  map<string, string> headers = 5;
 }
 
 message SIPCallInfo {
