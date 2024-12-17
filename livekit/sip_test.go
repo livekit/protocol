@@ -91,6 +91,16 @@ func TestSIPValidate(t *testing.T) {
 					"From": "from",
 				},
 			},
+			exp: true,
+		},
+		{
+			name: "inbound invalid header",
+			req: &SIPInboundTrunkInfo{
+				Numbers: []string{"+1111"},
+				HeadersToAttributes: map[string]string{
+					"From ": "from",
+				},
+			},
 			exp: false,
 		},
 		{
@@ -163,6 +173,17 @@ func TestSIPValidate(t *testing.T) {
 				Numbers: []string{"+2222"},
 				HeadersToAttributes: map[string]string{
 					"From": "from",
+				},
+			},
+			exp: true,
+		},
+		{
+			name: "outbound invalid header",
+			req: &SIPOutboundTrunkInfo{
+				Address: "sip.example.com",
+				Numbers: []string{"+2222"},
+				HeadersToAttributes: map[string]string{
+					"From ": "from",
 				},
 			},
 			exp: false,

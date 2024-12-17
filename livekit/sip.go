@@ -3,6 +3,7 @@ package livekit
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"slices"
 	"strings"
 )
@@ -102,10 +103,11 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 	}
 }
 
+var reHeaders = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9\-]*$`)
+
 func validateHeader(header string) error {
-	v := strings.ToLower(header)
-	if !strings.HasPrefix(v, "x-") {
-		return fmt.Errorf("only X-* headers are allowed: %s", header)
+	if !reHeaders.MatchString(header) {
+		return fmt.Errorf("invalid header name: %q", header)
 	}
 	return nil
 }
