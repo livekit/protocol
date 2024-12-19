@@ -36,14 +36,15 @@ func (e SimpleGraphEdge) Length() int64 { return 1 }
 
 type Graph[K comparable, N GraphNodeProps[K], E GraphEdgeProps] struct {
 	nodesByID   map[K]*GraphNode[N]
-	freeIndices deque.Deque[int]
+	freeIndices *deque.Deque[int]
 	nodes       []*GraphNode[N]
 	edges       [][]*GraphEdge[N, E]
 }
 
 func NewGraph[K comparable, N GraphNodeProps[K], E GraphEdgeProps]() *Graph[K, N, E] {
 	return &Graph[K, N, E]{
-		nodesByID: map[K]*GraphNode[N]{},
+		nodesByID:   map[K]*GraphNode[N]{},
+		freeIndices: &deque.Deque[int]{},
 	}
 }
 
