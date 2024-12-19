@@ -26,6 +26,9 @@ service AgentInternal {
   rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse) {
     option (psrpc.options).multi = true;
   };
+  rpc CheckAvailibility(livekit.CheckAvailibilityRequest) returns (livekit.CheckAvailibilityResponse) {
+    option (psrpc.options).multi = true;
+  };
   rpc JobRequest(livekit.Job) returns (JobRequestResponse) {
     option (psrpc.options) = {
       affinity_func: true
@@ -63,8 +66,10 @@ enum JobTerminateReason {
   AGENT_LEFT_ROOM = 1;
 }
 
+// Deprecated, use livekit.CheckEnabledRequest instead
 message CheckEnabledRequest{}
 
+// Deprecated, use livekit.CheckEnabledResponse instead
 message CheckEnabledResponse {
   bool room_enabled = 1;
   bool publisher_enabled = 2;
