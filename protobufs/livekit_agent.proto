@@ -127,7 +127,7 @@ message RegisterWorkerRequest {
   string agent_name = 8;
   // string worker_id = 2;
   string version = 3;
-  // string name = 4 [deprecated = true];
+  string metadata = 4;
   uint32 ping_interval = 5;
   optional string namespace = 6;
   ParticipantPermission allowed_permissions = 7;
