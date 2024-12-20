@@ -26,6 +26,7 @@ var (
 	ErrNoResponse              = psrpc.NewErrorf(psrpc.Unavailable, "no response from ingress service")
 	ErrInvalidOutputDimensions = NewInvalidVideoParamsError("invalid output media dimensions")
 	ErrInvalidIngressType      = psrpc.NewErrorf(psrpc.InvalidArgument, "invalid ingress type")
+	ErrSessionDisabled         = psrpc.NewErrorf(psrpc.PermissionDenied, "session is disabled")
 )
 
 func ErrInvalidIngress(s string) psrpc.Error {
