@@ -1,34 +1,40 @@
 {
   "name": "@livekit/protocol",
-  "version": "1.27.1",
+  "version": "1.29.4",
   "description": "",
   "type": "module",
-  "main": "src/index.js",
-  "types": "src/index.d.ts",
+  "require": "dist/index.cjs",
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/index.js"
-    },
-    "./*": {
-      "types": "./src/gen/livekit_*_pb.d.ts",
-      "default": "./src/gen/livekit_*_pb.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "scripts": {
+    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
     "generate:version": "genversion --esm --semi src/gen/version.js",
-    "generate:proto": "protoc --es_out src/gen --es_opt target=js+dts -I=../../protobufs ../../protobufs/livekit_*.proto",
-    "build": "pnpm generate:version && pnpm generate:proto"
+    "build": "pnpm generate:version && pnpm generate:proto && unbuild"
   },
   "keywords": [],
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.10.0",
-    "genversion": "^3.2.0"
+    "genversion": "^3.2.0",
+    "typescript": "5.5.4",
+    "unbuild": "^2.0.0"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"

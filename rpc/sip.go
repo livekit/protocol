@@ -16,10 +16,13 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
-	if len(trunk.Numbers) == 0 {
-		return nil, errors.New("no numbers on outbound trunk")
+	outboundNumber := req.SipNumber
+	if outboundNumber == "" {
+		if len(trunk.Numbers) == 0 {
+			return nil, errors.New("no numbers on outbound trunk")
+		}
+		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}
-	outboundNumber := trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	// A sanity check for the number format for well-known providers.
 	switch {
 	case strings.HasSuffix(trunk.Address, "telnyx.com"):
@@ -46,9 +49,24 @@ func NewCreateSIPParticipantRequest(
 		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
 	}
 
-	var features []SIPFeature
+	var features []livekit.SIPFeature
 	if req.EnableKrisp {
-		features = append(features, SIPFeature_KRISP_ENABLED)
+		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
+	}
+
+	headers := trunk.Headers
+	if len(req.Headers) != 0 {
+		headers = maps.Clone(headers)
+		if headers == nil {
+			headers = make(map[string]string)
+		}
+		for k, v := range req.Headers {
+			headers[k] = v
+		}
+	}
+	includeHeaders := trunk.IncludeHeaders
+	if req.IncludeHeaders != 0 {
+		includeHeaders = req.IncludeHeaders
 	}
 
 	return &InternalCreateSIPParticipantRequest{
@@ -71,10 +89,26 @@ func NewCreateSIPParticipantRequest(
 		ParticipantAttributes: attrs,
 		Dtmf:                  req.Dtmf,
 		PlayDialtone:          req.PlayRingtone || req.PlayDialtone,
-		Headers:               trunk.Headers,
+		Headers:               headers,
 		HeadersToAttributes:   trunk.HeadersToAttributes,
+		AttributesToHeaders:   trunk.AttributesToHeaders,
+		IncludeHeaders:        includeHeaders,
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
+	}, nil
+}
+
+// NewTransferSIPParticipantRequest fills InternalTransferSIPParticipantRequest from
+// livekit.TransferSIPParticipantRequest.
+func NewTransferSIPParticipantRequest(
+	callID string,
+	req *livekit.TransferSIPParticipantRequest,
+) (*InternalTransferSIPParticipantRequest, error) {
+	return &InternalTransferSIPParticipantRequest{
+		SipCallId:    callID,
+		TransferTo:   req.TransferTo,
+		PlayDialtone: req.PlayDialtone,
+		Headers:      req.Headers,
 	}, nil
 }

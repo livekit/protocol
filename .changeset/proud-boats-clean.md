@@ -2,4 +2,4 @@
 "github.com/livekit/protocol": patch
 ---
 
-Annotate SIP errors with Twirp codes.
+Relax SIP header validation.

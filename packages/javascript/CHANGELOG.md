@@ -1,5 +1,59 @@
 # @livekit/protocol
 
+## 1.29.4
+
+### Patch Changes
+
+- Add version declaration file - [#916](https://github.com/livekit/protocol/pull/916) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.29.3
+
+### Patch Changes
+
+- Fix treehaking possibility of individual imports - [#907](https://github.com/livekit/protocol/pull/907) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.29.2
+
+## 1.29.1
+
+### Patch Changes
+
+- Actually downgrade TypeScript - [#902](https://github.com/livekit/protocol/pull/902) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.29.0
+
+### Minor Changes
+
+- Add DataStream support - [#871](https://github.com/livekit/protocol/pull/871) ([@lukasIO](https://github.com/lukasIO))
+
+### Patch Changes
+
+- Downgrade TypeScript to fix incorrect generated typings - [#901](https://github.com/livekit/protocol/pull/901) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.28.1
+
+### Patch Changes
+
+- fix CJS require importing .js - [#897](https://github.com/livekit/protocol/pull/897) ([@nbsp](https://github.com/nbsp))
+
+## 1.28.0
+
+### Minor Changes
+
+- Add disconnect reason for SIP failures. - [#845](https://github.com/livekit/protocol/pull/845) ([@dennwc](https://github.com/dennwc))
+
+- add native CommonJS support (#883) - [#895](https://github.com/livekit/protocol/pull/895) ([@nbsp](https://github.com/nbsp))
+
+- Map participant attributes to SIP headers. - [#893](https://github.com/livekit/protocol/pull/893) ([@dennwc](https://github.com/dennwc))
+
+- Allow setting number for SIP outbound. - [#891](https://github.com/livekit/protocol/pull/891) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Report call enabled features in SIPCallInfo - [#884](https://github.com/livekit/protocol/pull/884) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Fix port type for SIPUri. - [#882](https://github.com/livekit/protocol/pull/882) ([@dennwc](https://github.com/dennwc))
+
 ## 1.27.1
 
 ### Patch Changes

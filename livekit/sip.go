@@ -3,6 +3,8 @@ package livekit
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -101,11 +103,28 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 	}
 }
 
-func validateHeaders(headers map[string]string) error {
+var reHeaders = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9\-]*$`)
+
+func validateHeader(header string) error {
+	if !reHeaders.MatchString(header) {
+		return fmt.Errorf("invalid header name: %q", header)
+	}
+	return nil
+}
+
+func validateHeaderKeys(headers map[string]string) error {
 	for k := range headers {
-		k = strings.ToLower(k)
-		if !strings.HasPrefix(k, "x-") {
-			return fmt.Errorf("only X-* headers are allowed: %s", k)
+		if err := validateHeader(k); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func validateHeaderValues(headers map[string]string) error {
+	for _, v := range headers {
+		if err := validateHeader(v); err != nil {
+			return err
 		}
 	}
 	return nil
@@ -122,6 +141,9 @@ func (p *CreateSIPOutboundTrunkRequest) Validate() error {
 	if p.Trunk == nil {
 		return errors.New("missing trunk")
 	}
+	if p.Trunk.SipTrunkId != "" {
+		return errors.New("trunk id must not be set")
+	}
 	if err := p.Trunk.Validate(); err != nil {
 		return err
 	}
@@ -132,6 +154,9 @@ func (p *CreateSIPInboundTrunkRequest) Validate() error {
 	if p.Trunk == nil {
 		return errors.New("missing trunk")
 	}
+	if p.Trunk.SipTrunkId != "" {
+		return errors.New("trunk id must not be set")
+	}
 	if err := p.Trunk.Validate(); err != nil {
 		return err
 	}
@@ -139,13 +164,19 @@ func (p *CreateSIPInboundTrunkRequest) Validate() error {
 }
 
 func (p *SIPInboundTrunkInfo) Validate() error {
-	if len(p.Numbers) == 0 {
-		return errors.New("no trunk numbers specified")
+	hasAuth := p.AuthUsername != "" || p.AuthPassword != ""
+	hasCIDR := len(p.AllowedAddresses) != 0
+	hasNumbers := len(p.Numbers) != 0 // TODO: remove this condition, it doesn't really help with security
+	if !hasAuth && !hasCIDR && !hasNumbers {
+		return errors.New("for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
-	if err := validateHeaders(p.Headers); err != nil {
+	if err := validateHeaderKeys(p.Headers); err != nil {
 		return err
 	}
-	if err := validateHeaders(p.HeadersToAttributes); err != nil {
+	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
 	return nil
@@ -157,13 +188,18 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	}
 	if p.Address == "" {
 		return errors.New("no outbound address specified")
-	} else if strings.Contains(p.Address, "@") {
+	} else if strings.Contains(p.Address, "transport=") {
+		return errors.New("trunk transport should be set as a field, not a URI parameter")
+	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
 		return errors.New("trunk address should be a hostname or IP, not SIP URI")
 	}
-	if err := validateHeaders(p.Headers); err != nil {
+	if err := validateHeaderKeys(p.Headers); err != nil {
 		return err
 	}
-	if err := validateHeaders(p.HeadersToAttributes); err != nil {
+	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
 	return nil
@@ -188,6 +224,9 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	if p.RoomName == "" {
 		return errors.New("missing room name")
 	}
+	if err := validateHeaderKeys(p.Headers); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -201,6 +240,122 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	if p.TransferTo == "" {
 		return errors.New("missing transfer to")
 	}
+	if err := validateHeaderKeys(p.Headers); err != nil {
+		return err
+	}
 
 	return nil
+}
+
+func filterSlice[T any](arr []T, fnc func(v T) bool) []T {
+	var out []T
+	for _, v := range arr {
+		if fnc(v) {
+			out = append(out, v)
+		}
+	}
+	return out
+}
+
+func filterIDs[T any, ID comparable](arr []T, ids []ID, get func(v T) ID) []T {
+	if len(ids) == 0 {
+		return arr
+	}
+	out := make([]T, len(ids))
+	for i, id := range ids {
+		j := slices.IndexFunc(arr, func(v T) bool {
+			return get(v) == id
+		})
+		if j >= 0 {
+			out[i] = arr[j]
+		}
+	}
+	return out
+}
+
+func (p *ListSIPInboundTrunkRequest) Filter(info *SIPInboundTrunkInfo) bool {
+	if info == nil {
+		return true // for FilterSlice to work correctly with missing IDs
+	}
+	if len(p.TrunkIds) != 0 && !slices.Contains(p.TrunkIds, info.SipTrunkId) {
+		return false
+	}
+	if len(p.Numbers) != 0 && len(info.Numbers) != 0 {
+		ok := false
+		for _, num := range info.Numbers {
+			if slices.Contains(p.Numbers, num) {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (p *ListSIPInboundTrunkRequest) FilterSlice(arr []*SIPInboundTrunkInfo) []*SIPInboundTrunkInfo {
+	arr = filterIDs(arr, p.TrunkIds, func(v *SIPInboundTrunkInfo) string {
+		return v.SipTrunkId
+	})
+	return filterSlice(arr, p.Filter)
+}
+
+func (p *ListSIPOutboundTrunkRequest) Filter(info *SIPOutboundTrunkInfo) bool {
+	if info == nil {
+		return true // for FilterSlice to work correctly with missing IDs
+	}
+	if len(p.TrunkIds) != 0 && !slices.Contains(p.TrunkIds, info.SipTrunkId) {
+		return false
+	}
+	if len(p.Numbers) != 0 && len(info.Numbers) != 0 {
+		ok := false
+		for _, num := range info.Numbers {
+			if slices.Contains(p.Numbers, num) {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (p *ListSIPOutboundTrunkRequest) FilterSlice(arr []*SIPOutboundTrunkInfo) []*SIPOutboundTrunkInfo {
+	arr = filterIDs(arr, p.TrunkIds, func(v *SIPOutboundTrunkInfo) string {
+		return v.SipTrunkId
+	})
+	return filterSlice(arr, p.Filter)
+}
+
+func (p *ListSIPDispatchRuleRequest) Filter(info *SIPDispatchRuleInfo) bool {
+	if info == nil {
+		return true // for FilterSlice to work correctly with missing IDs
+	}
+	if len(p.DispatchRuleIds) != 0 && !slices.Contains(p.DispatchRuleIds, info.SipDispatchRuleId) {
+		return false
+	}
+	if len(p.TrunkIds) != 0 && len(info.TrunkIds) != 0 {
+		ok := false
+		for _, id := range info.TrunkIds {
+			if slices.Contains(p.TrunkIds, id) {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return false
+		}
+	}
+	return true
+}
+
+func (p *ListSIPDispatchRuleRequest) FilterSlice(arr []*SIPDispatchRuleInfo) []*SIPDispatchRuleInfo {
+	arr = filterIDs(arr, p.DispatchRuleIds, func(v *SIPDispatchRuleInfo) string {
+		return v.SipDispatchRuleId
+	})
+	return filterSlice(arr, p.Filter)
 }

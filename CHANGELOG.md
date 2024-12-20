@@ -1,5 +1,43 @@
 # github.com/livekit/protocol
 
+## 1.29.4
+
+## 1.29.3
+
+## 1.29.2
+
+### Patch Changes
+
+- Revert back to Go 1.22 - [#905](https://github.com/livekit/protocol/pull/905) ([@davidzhao](https://github.com/davidzhao))
+
+## 1.29.1
+
+## 1.29.0
+
+### Minor Changes
+
+- Add DataStream support - [#871](https://github.com/livekit/protocol/pull/871) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.28.1
+
+## 1.28.0
+
+### Minor Changes
+
+- Add disconnect reason for SIP failures. - [#845](https://github.com/livekit/protocol/pull/845) ([@dennwc](https://github.com/dennwc))
+
+- Map participant attributes to SIP headers. - [#893](https://github.com/livekit/protocol/pull/893) ([@dennwc](https://github.com/dennwc))
+
+- Allow setting number for SIP outbound. - [#891](https://github.com/livekit/protocol/pull/891) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Annotate SIP errors with Twirp codes. - [#879](https://github.com/livekit/protocol/pull/879) ([@dennwc](https://github.com/dennwc))
+
+- Fix port type for SIPUri. - [#882](https://github.com/livekit/protocol/pull/882) ([@dennwc](https://github.com/dennwc))
+
+- Require number, CIDR or auth for SIP inbound. - [#890](https://github.com/livekit/protocol/pull/890) ([@dennwc](https://github.com/dennwc))
+
 ## 1.27.1
 
 ### Patch Changes

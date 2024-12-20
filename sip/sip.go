@@ -18,12 +18,13 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"github.com/twitchtv/twirp"
 	"maps"
 	"math"
 	"net/netip"
 	"sort"
 	"strings"
+
+	"github.com/twitchtv/twirp"
 
 	"golang.org/x/exp/slices"
 
@@ -515,10 +516,12 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	if trunk != nil {
 		resp.Headers = trunk.Headers
 		resp.HeadersToAttributes = trunk.HeadersToAttributes
+		resp.AttributesToHeaders = trunk.AttributesToHeaders
+		resp.IncludeHeaders = trunk.IncludeHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
 		resp.MaxCallDuration = trunk.MaxCallDuration
 		if trunk.KrispEnabled {
-			resp.EnabledFeatures = append(resp.EnabledFeatures, rpc.SIPFeature_KRISP_ENABLED)
+			resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)
 		}
 	}
 	return resp, nil

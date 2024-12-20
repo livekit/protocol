@@ -3,4 +3,4 @@
 "github.com/livekit/protocol": minor
 ---
 
-Add disconnect reason for SIP failures.
+Allow mapping all SIP headers to attributes.
