@@ -187,8 +187,8 @@ message UpdateIngressRequest {
   optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
-
-  // NEXT_ID: 11
+  optional bool session_enabled = 11;
+  // NEXT_ID: 12
 }
 
 message ListIngressRequest {
