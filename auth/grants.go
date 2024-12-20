@@ -18,10 +18,12 @@ import (
 	"maps"
 	"strings"
 
+	"go.uber.org/zap/zapcore"
 	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 )
 
@@ -91,6 +93,20 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.RoomConfig = c.RoomConfig.Clone()
 
 	return &clone
+}
+
+func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if c == nil {
+		return nil
+	}
+
+	e.AddString("Identity", c.Identity)
+	e.AddString("Kind", c.Kind)
+	e.AddObject("Video", c.Video)
+	e.AddObject("SIP", c.SIP)
+	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
+	e.AddString("RoomPreset", c.RoomPreset)
+	return nil
 }
 
 // -------------------------------------------------------------
@@ -323,6 +339,43 @@ func (v *VideoGrant) Clone() *VideoGrant {
 	return &clone
 }
 
+func (v *VideoGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if v == nil {
+		return nil
+	}
+
+	logBoolPtr := func(prop string, val *bool) {
+		if val == nil {
+			e.AddString(prop, "not-set")
+		} else {
+			e.AddBool(prop, *val)
+		}
+	}
+
+	logBoolPtr("RoomCreate", &v.RoomCreate)
+	logBoolPtr("RoomList", &v.RoomList)
+	logBoolPtr("RoomRecord", &v.RoomRecord)
+
+	logBoolPtr("RoomAdmin", &v.RoomAdmin)
+	logBoolPtr("RoomJoin", &v.RoomJoin)
+	e.AddString("Room", v.Room)
+
+	logBoolPtr("CanPublish", v.CanPublish)
+	logBoolPtr("CanSubscribe", v.CanSubscribe)
+	logBoolPtr("CanPublishData", v.CanPublishData)
+	e.AddArray("CanPublishSources", logger.StringSlice(v.CanPublishSources))
+	logBoolPtr("CanUpdateOwnMetadata", v.CanUpdateOwnMetadata)
+
+	logBoolPtr("IngressAdmin", &v.IngressAdmin)
+
+	logBoolPtr("Hidden", &v.Hidden)
+	logBoolPtr("Recorder", &v.Recorder)
+	logBoolPtr("Agent", &v.Agent)
+
+	logBoolPtr("CanSubscribeMetrics", v.CanSubscribeMetrics)
+	return nil
+}
+
 // ----------------------------------------------------------------
 
 type SIPGrant struct {
@@ -341,6 +394,16 @@ func (s *SIPGrant) Clone() *SIPGrant {
 	clone := *s
 
 	return &clone
+}
+
+func (s *SIPGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Admin", s.Admin)
+	e.AddBool("Call", s.Call)
+	return nil
 }
 
 // ------------------------------------------------------------------
