@@ -21,6 +21,11 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
+service AgentService {
+  rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse);
+  rpc CheckAvailibility(CheckAvailibilityRequest) returns (CheckAvailibilityResponse);
+}
+
 message Job {
   string id = 1;
   string dispatch_id = 9;
@@ -40,6 +45,17 @@ message JobState {
   int64 ended_at = 4;
   int64 updated_at = 5;
   string participant_identity = 6;
+}
+
+message WorkerInfo {
+  string id = 1;
+  string agent_name = 2;
+  string version = 3;
+  WorkerStatus status = 4;
+  string metadata = 5;
+  float load = 6;
+  uint32 job_count = 7;
+  ParticipantPermission allowed_permissions = 8;
 }
 
 // from Worker to Server
@@ -174,4 +190,21 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1;
+}
+
+message CheckEnabledRequest{}
+
+message CheckEnabledResponse {
+  bool room_enabled = 1;
+  bool publisher_enabled = 2;
+  repeated string namespaces = 3 [deprecated = true];
+  repeated string agent_names = 4;
+}
+
+message CheckAvailibilityRequest {
+  repeated string agent_names = 1; // if empty, all agents are checked
+}
+
+message CheckAvailibilityResponse {
+  repeated WorkerInfo workers = 1;
 }
