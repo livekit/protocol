@@ -23,7 +23,7 @@ import "options.proto";
 import "livekit_agent.proto";
 
 service AgentInternal {
-  rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse) {
+  rpc CheckEnabled(livekit.CheckEnabledRequest) returns (livekit.CheckEnabledResponse) {
     option (psrpc.options).multi = true;
   };
   rpc CheckAvailibility(livekit.CheckAvailibilityRequest) returns (livekit.CheckAvailibilityResponse) {
@@ -64,17 +64,6 @@ service AgentInternal {
 enum JobTerminateReason {
   TERMINATION_REQUESTED = 0;
   AGENT_LEFT_ROOM = 1;
-}
-
-// Deprecated, use livekit.CheckEnabledRequest instead
-message CheckEnabledRequest{}
-
-// Deprecated, use livekit.CheckEnabledResponse instead
-message CheckEnabledResponse {
-  bool room_enabled = 1;
-  bool publisher_enabled = 2;
-  repeated string namespaces = 3 [deprecated = true];
-  repeated string agent_names = 4;
 }
 
 message JobRequestResponse {
