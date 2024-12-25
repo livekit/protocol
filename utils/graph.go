@@ -44,7 +44,7 @@ type Graph[K comparable, N GraphNodeProps[K], E GraphEdgeProps] struct {
 func NewGraph[K comparable, N GraphNodeProps[K], E GraphEdgeProps]() *Graph[K, N, E] {
 	return &Graph[K, N, E]{
 		nodesByID:   map[K]*GraphNode[N]{},
-		freeIndices: deque.New[int](0),
+		freeIndices: &deque.Deque[int]{},
 	}
 }
 

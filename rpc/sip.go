@@ -98,3 +98,17 @@ func NewCreateSIPParticipantRequest(
 		MaxCallDuration:       req.MaxCallDuration,
 	}, nil
 }
+
+// NewTransferSIPParticipantRequest fills InternalTransferSIPParticipantRequest from
+// livekit.TransferSIPParticipantRequest.
+func NewTransferSIPParticipantRequest(
+	callID string,
+	req *livekit.TransferSIPParticipantRequest,
+) (*InternalTransferSIPParticipantRequest, error) {
+	return &InternalTransferSIPParticipantRequest{
+		SipCallId:    callID,
+		TransferTo:   req.TransferTo,
+		PlayDialtone: req.PlayDialtone,
+		Headers:      req.Headers,
+	}, nil
+}

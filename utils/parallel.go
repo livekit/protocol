@@ -37,6 +37,9 @@ func ParallelExec[T any](vals []T, parallelThreshold, step uint64, fn func(T)) {
 
 	var wg sync.WaitGroup
 	numCPU := runtime.NumCPU()
+	if numCPU > len(vals) {
+		numCPU = len(vals)
+	}
 	wg.Add(numCPU)
 	for p := 0; p < numCPU; p++ {
 		go func() {
