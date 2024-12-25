@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "livekit_room.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 
