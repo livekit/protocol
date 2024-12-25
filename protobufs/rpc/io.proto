@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "livekit_room.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 
@@ -186,7 +187,13 @@ message EvaluateSIPDispatchRulesResponse {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 17;
 
-  // NEXT ID: 20
+  // Room preset and config are used only to generate tokens
+  // once tokens are returned by this response consistently, it will no longer
+  // be needed
+  string room_preset = 20;
+  livekit.RoomConfiguration room_config = 21;
+
+  // NEXT ID: 22
 }
 
 message UpdateSIPCallStateRequest {
