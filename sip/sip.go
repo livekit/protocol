@@ -512,6 +512,8 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		ParticipantName:       fromName,
 		ParticipantMetadata:   rule.Metadata,
 		ParticipantAttributes: attrs,
+		RoomPreset:            rule.RoomPreset,
+		RoomConfig:            rule.RoomConfig,
 	}
 	if trunk != nil {
 		resp.Headers = trunk.Headers
