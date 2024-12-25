@@ -1,5 +1,23 @@
 # @livekit/protocol
 
+## 1.30.0
+
+### Minor Changes
+
+- Add filters to SIP list APIs. - [#913](https://github.com/livekit/protocol/pull/913) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for SIP call transfer. - [#926](https://github.com/livekit/protocol/pull/926) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for CreateSipParticipant - [#911](https://github.com/livekit/protocol/pull/911) ([@s-hamdananwar](https://github.com/s-hamdananwar))
+
+- Allow mapping all SIP headers to attributes. - [#920](https://github.com/livekit/protocol/pull/920) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Allow SIP inbound to specify room configuration - [#923](https://github.com/livekit/protocol/pull/923) ([@davidzhao](https://github.com/davidzhao))
+
+- Add EgressSourceType to EgressInfo - [#894](https://github.com/livekit/protocol/pull/894) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.29.4
 
 ### Patch Changes
