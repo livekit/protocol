@@ -701,11 +701,14 @@ type EvaluateSIPDispatchRulesResponse struct {
 	// Max time for the caller to wait for track subscription.
 	RingingTimeout *durationpb.Duration `protobuf:"bytes,16,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
 	// Max call duration.
-	MaxCallDuration *durationpb.Duration       `protobuf:"bytes,17,opt,name=max_call_duration,json=maxCallDuration,proto3" json:"max_call_duration,omitempty"`
-	RoomPreset      string                     `protobuf:"bytes,20,opt,name=room_preset,json=roomPreset,proto3" json:"room_preset,omitempty"`
-	RoomConfig      *livekit.RoomConfiguration `protobuf:"bytes,21,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	MaxCallDuration *durationpb.Duration `protobuf:"bytes,17,opt,name=max_call_duration,json=maxCallDuration,proto3" json:"max_call_duration,omitempty"`
+	// Room preset and config are used only to generate tokens
+	// once tokens are returned by this response consistently, it will no longer
+	// be needed
+	RoomPreset    string                     `protobuf:"bytes,20,opt,name=room_preset,json=roomPreset,proto3" json:"room_preset,omitempty"`
+	RoomConfig    *livekit.RoomConfiguration `protobuf:"bytes,21,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EvaluateSIPDispatchRulesResponse) Reset() {
