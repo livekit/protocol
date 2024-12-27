@@ -21,25 +21,35 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func BuildSIPToken(
-	apiKey, secret, roomName string,
-	participantIdentity, participantName, participantMeta string,
-	participantAttrs map[string]string,
-) (string, error) {
+type SIPTokenParams struct {
+	APIKey                string
+	APISecret             string
+	RoomName              string
+	ParticipantIdentity   string
+	ParticipantName       string
+	ParticipantMetadata   string
+	ParticipantAttributes map[string]string
+	RoomPreset            string
+	RoomConfig            *livekit.RoomConfiguration
+}
+
+func BuildSIPToken(params SIPTokenParams) (string, error) {
 	t := true
-	at := auth.NewAccessToken(apiKey, secret).
-		AddGrant(&auth.VideoGrant{
+	at := auth.NewAccessToken(params.APIKey, params.APISecret).
+		SetVideoGrant(&auth.VideoGrant{
 			RoomJoin:             true,
-			Room:                 roomName,
+			Room:                 params.RoomName,
 			CanSubscribe:         &t,
 			CanPublish:           &t,
 			CanPublishData:       &t,
 			CanUpdateOwnMetadata: &t,
 		}).
-		SetIdentity(participantIdentity).
-		SetName(participantName).
-		SetMetadata(participantMeta).
-		SetAttributes(participantAttrs).
+		SetIdentity(params.ParticipantIdentity).
+		SetName(params.ParticipantName).
+		SetMetadata(params.ParticipantMetadata).
+		SetAttributes(params.ParticipantAttributes).
+		SetRoomPreset(params.RoomPreset).
+		SetRoomConfig(params.RoomConfig).
 		SetKind(livekit.ParticipantInfo_SIP).
 		SetValidFor(24 * time.Hour)
 
