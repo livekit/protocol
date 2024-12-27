@@ -96,14 +96,14 @@ func TestMutexFinalizer(t *testing.T) {
 	cleanupTest()
 	require.Equal(t, 0, utils.NumMutexes())
 
-	go func() {
+	{
 		m := &utils.Mutex{}
 		m.Lock()
 		go func() {
 			m.Unlock()
 		}()
 		require.Equal(t, 1, utils.NumMutexes())
-	}()
+	}
 
 	for range 100 {
 		cleanupTest()
