@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"github.com/twitchtv/twirp"
-
 	"golang.org/x/exp/slices"
 
 	"github.com/livekit/protocol/livekit"
@@ -435,6 +434,10 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	if trunk != nil {
 		trunkID = trunk.SipTrunkId
 	}
+	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+	if trunk != nil {
+		enc = trunk.MediaEncryption
+	}
 	attrs := maps.Clone(rule.Attributes)
 	if attrs == nil {
 		attrs = make(map[string]string)
@@ -476,6 +479,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 				SipTrunkId:        trunkID,
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
+				MediaEncryption:   enc,
 				RequestPin:        true,
 			}, nil
 		}
@@ -514,7 +518,9 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		ParticipantAttributes: attrs,
 		RoomPreset:            rule.RoomPreset,
 		RoomConfig:            rule.RoomConfig,
+		MediaEncryption:       enc,
 	}
+	krispEnabled := false
 	if trunk != nil {
 		resp.Headers = trunk.Headers
 		resp.HeadersToAttributes = trunk.HeadersToAttributes
@@ -522,9 +528,16 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		resp.IncludeHeaders = trunk.IncludeHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
 		resp.MaxCallDuration = trunk.MaxCallDuration
-		if trunk.KrispEnabled {
-			resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)
+		krispEnabled = krispEnabled || trunk.KrispEnabled
+	}
+	if rule != nil {
+		krispEnabled = krispEnabled || rule.KrispEnabled
+		if rule.MediaEncryption != 0 {
+			resp.MediaEncryption = rule.MediaEncryption
 		}
+	}
+	if krispEnabled {
+		resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)
 	}
 	return resp, nil
 }

@@ -50,8 +50,12 @@ func NewCreateSIPParticipantRequest(
 	}
 
 	var features []livekit.SIPFeature
-	if req.EnableKrisp {
+	if req.KrispEnabled {
 		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
+	}
+	enc := trunk.MediaEncryption
+	if req.MediaEncryption != 0 {
+		enc = req.MediaEncryption
 	}
 
 	headers := trunk.Headers
@@ -96,6 +100,7 @@ func NewCreateSIPParticipantRequest(
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
+		MediaEncryption:       enc,
 	}, nil
 }
 

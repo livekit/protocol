@@ -118,6 +118,12 @@ enum SIPHeaderOptions {
   SIP_ALL_HEADERS = 2; // map all headers to sip.h.* attributes
 }
 
+enum SIPMediaEncryption {
+  SIP_MEDIA_ENCRYPT_DISABLE = 0; // do not enable encryption
+  SIP_MEDIA_ENCRYPT_ALLOW = 1; // use encryption if available
+  SIP_MEDIA_ENCRYPT_REQUIRE = 2; // require encryption
+}
+
 message SIPTrunkInfo {
   option deprecated = true;
 
@@ -215,8 +221,9 @@ message SIPInboundTrunkInfo {
   google.protobuf.Duration max_call_duration = 12;
 
   bool krisp_enabled = 13;
+  SIPMediaEncryption media_encryption = 16;
 
-  // NEXT ID: 16
+  // NEXT ID: 17
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -263,7 +270,9 @@ message SIPOutboundTrunkInfo {
   // lowercase header names should be used, for example: sip.h.x-custom-header.
   SIPHeaderOptions include_headers = 12;
 
-  // NEXT ID: 13
+  SIPMediaEncryption media_encryption = 13;
+
+  // NEXT ID: 14
 }
 
 message GetSIPInboundTrunkRequest {
@@ -417,7 +426,10 @@ message SIPDispatchRuleInfo {
 
   // RoomConfiguration to use if the participant initiates the room
   RoomConfiguration room_config = 10;
-  // NEXT ID: 11
+
+  bool krisp_enabled = 11;
+  SIPMediaEncryption media_encryption = 12;
+  // NEXT ID: 13
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
@@ -491,8 +503,10 @@ message CreateSIPParticipantRequest {
   google.protobuf.Duration max_call_duration = 12;
 
   // Enable voice isolation for the callee.
-  bool enable_krisp = 14;
-  // NEXT ID: 18
+  bool krisp_enabled = 14;
+
+  SIPMediaEncryption media_encryption = 18;
+  // NEXT ID: 19
 }
 
 message SIPParticipantInfo {

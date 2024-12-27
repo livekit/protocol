@@ -193,7 +193,9 @@ message EvaluateSIPDispatchRulesResponse {
   string room_preset = 20;
   livekit.RoomConfiguration room_config = 21;
 
-  // NEXT ID: 22
+  livekit.SIPMediaEncryption media_encryption = 22;
+
+  // NEXT ID: 23
 }
 
 message UpdateSIPCallStateRequest {
