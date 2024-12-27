@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.31.0
+
+### Minor Changes
+
+- Add media encryption options for SIP. - [#892](https://github.com/livekit/protocol/pull/892) ([@dennwc](https://github.com/dennwc))
+
 ## 1.30.0
 
 ### Minor Changes
