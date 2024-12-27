@@ -105,8 +105,12 @@ func TestMutexFinalizer(t *testing.T) {
 		require.Equal(t, 1, utils.NumMutexes())
 	}()
 
-	time.Sleep(time.Millisecond)
-	cleanupTest()
+	for range 100 {
+		cleanupTest()
+		if utils.NumMutexes() == 0 {
+			break
+		}
+	}
 
 	require.Equal(t, 0, utils.NumMutexes())
 }
