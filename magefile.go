@@ -108,6 +108,7 @@ func Proto() error {
 		"--plugin=go=" + protocGoPath,
 		"--plugin=twirp=" + twirpPath,
 		"-I=./protobufs",
+		"-I=/usr/local/include",
 	}, twirpProtoFiles...)
 	cmd := exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -125,6 +126,7 @@ func Proto() error {
 		"--plugin=go=" + protocGoPath,
 		"--plugin=twirp=" + twirpPath,
 		"-I=./protobufs",
+		"-I=/usr/local/include",
 	}, "cloud_replay.proto")
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -138,6 +140,7 @@ func Proto() error {
 		"--go_opt=paths=source_relative",
 		"--plugin=go=" + protocGoPath,
 		"-I=./protobufs",
+		"-I=/usr/local/include",
 	}, protoFiles...)
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -153,6 +156,7 @@ func Proto() error {
 		"--plugin=go=" + protocGoPath,
 		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=./protobufs",
+		"-I=/usr/local/include",
 	}, grpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
@@ -183,6 +187,7 @@ func Proto() error {
 		"--plugin=psrpc=" + psrpcPath,
 		"-I" + psrpcDir + "/protoc-gen-psrpc/options",
 		"-I=./protobufs",
+		"-I=/usr/local/include",
 	}, psrpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
 	mageutil.ConnectStd(cmd)
