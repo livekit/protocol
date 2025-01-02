@@ -51,8 +51,9 @@ message CreateIngressRequest {
   optional bool enable_transcoding = 11;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
+  optional bool enabled = 12; // The default value is true and when set to false, the new connection attempts will be rejected
 
-   // NEXT_ID: 12
+   // NEXT_ID: 13
 }
 
 enum IngressInput {
@@ -134,7 +135,7 @@ message IngressInfo {
   string participant_metadata = 14;
   bool reusable = 11;
   IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
-  optional bool session_enabled = 16;
+  optional bool enabled = 16; // The default value is true and when set to false, the new connection attempts will be rejected
 
   // NEXT_ID: 17
 }
@@ -188,7 +189,7 @@ message UpdateIngressRequest {
   optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;
   IngressVideoOptions video = 7;
-  optional bool session_enabled = 11;
+  optional bool enabled = 11; // The default value is true and when set to false, the new connection attempts will be rejected
   // NEXT_ID: 12
 }
 
