@@ -48,7 +48,7 @@ if [ $(version $GO_VERSION) -ge $(version $GO_TARGET_VERSION) ];
     go install github.com/twitchtv/twirp/protoc-gen-twirp@v8.1.3
     go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.0
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
-    go install github.com/livekit/psrpc/protoc-gen-psrpc@v0.5.1
+    go install github.com/livekit/psrpc/protoc-gen-psrpc@v0.6.0
   else
     go get -u github.com/twitchtv/twirp/protoc-gen-twirp@v8.1.3
     go get -u google.golang.org/protobuf/cmd/protoc-gen-go@v1.30.0
