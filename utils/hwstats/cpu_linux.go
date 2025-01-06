@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"github.com/prometheus/procfs"
+	"golang.org/x/sys/unix"
 
 	"github.com/livekit/protocol/logger"
 )
@@ -269,4 +270,8 @@ func getHostCPUCount(fs procfs.FS) (float64, error) {
 		return 0, err
 	}
 	return float64(len(cpuInfo)), nil
+}
+
+func getPageSize() int {
+	return unix.Getpagesize()
 }
