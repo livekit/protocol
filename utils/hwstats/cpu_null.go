@@ -42,3 +42,7 @@ func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 func getHostCPUCount(fs procfs.FS) (float64, error) {
 	return float64(runtime.NumCPU()), nil
 }
+
+func getPageSize() int {
+	return 4096
+}

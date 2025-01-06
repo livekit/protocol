@@ -20,6 +20,7 @@ import (
 	"runtime"
 
 	"github.com/prometheus/procfs"
+	"golang.org/x/sys/unix"
 )
 
 func newPlatformCPUMonitor() (platformCPUMonitor, error) {
@@ -28,4 +29,8 @@ func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 
 func getHostCPUCount(fs procfs.FS) (float64, error) {
 	return float64(runtime.NumCPU()), nil
+}
+
+func getPageSize() int {
+	return unix.Getpagesize()
 }
