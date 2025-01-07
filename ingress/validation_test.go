@@ -143,6 +143,41 @@ func TestValidateEnableTranscoding(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestValidateEnabled(t *testing.T) {
+	info := &livekit.IngressInfo{
+		StreamKey:           "sk",
+		RoomName:            "room_name",
+		ParticipantIdentity: "id",
+	}
+	T := true
+	F := false
+
+	err := Validate(info)
+	require.NoError(t, err)
+
+	info.Enabled = &T
+	err = Validate(info)
+	require.NoError(t, err)
+
+	info.Enabled = &F
+	err = Validate(info)
+	require.NoError(t, err)
+
+	info.InputType = livekit.IngressInput_URL_INPUT
+	info.Url = "url"
+	info.Enabled = nil
+	err = Validate(info)
+	require.NoError(t, err)
+
+	info.Enabled = &T
+	err = Validate(info)
+	require.NoError(t, err)
+
+	info.Enabled = &F
+	err = Validate(info)
+	require.Error(t, err)
+}
+
 func TestValidateVideoOptionsConsistency(t *testing.T) {
 	video := &livekit.IngressVideoOptions{}
 	err := ValidateVideoOptionsConsistency(video)

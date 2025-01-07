@@ -135,7 +135,7 @@ message IngressInfo {
   string participant_metadata = 14;
   bool reusable = 11;
   IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
-  bool enabled = 16; // The default value is true and when set to false, the new connection attempts will be rejected
+  optional bool enabled = 16; // The default value is true and when set to false, the new connection attempts will be rejected
 
   // NEXT_ID: 17
 }

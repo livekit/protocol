@@ -56,7 +56,7 @@ func ValidateForSerialization(info *livekit.IngressInfo) error {
 		if info.Url == "" {
 			return ErrInvalidIngress("no source URL")
 		}
-		if !info.Enabled {
+		if info.Enabled != nil && !*info.Enabled {
 			return ErrInvalidIngress("disabled non reusable ingress")
 		}
 	}
