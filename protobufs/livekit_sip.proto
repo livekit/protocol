@@ -537,6 +537,7 @@ message SIPCallInfo {
   SIPUri from_uri = 6;
   SIPUri to_uri = 7;
   repeated SIPFeature enabled_features = 14;
+  SIPCallDirection call_direction = 15;
   SIPCallStatus call_status = 8;
   int64 created_at = 9;
   int64 started_at = 10;
@@ -544,7 +545,7 @@ message SIPCallInfo {
   DisconnectReason disconnect_reason = 12;
   string error = 13;
 
-  // NEXT ID: 15
+  // NEXT ID: 16
 }
 
 message SIPUri {
@@ -566,4 +567,10 @@ enum SIPCallStatus {
 enum SIPFeature {
   NONE = 0;
   KRISP_ENABLED = 1;
+}
+
+enum SIPCallDirection {
+  SCD_UNKNOWN = 0;
+  SCD_INBOUND = 1;
+  SCD_OUTBOUND = 2;
 }
