@@ -238,6 +238,7 @@ message DataPacket {
     RpcResponse rpc_response = 12;
     DataStream.Header stream_header = 13;
     DataStream.Chunk stream_chunk = 14;
+    DataStream.Trailer stream_trailer = 15;
   }
   // NEXT_ID: 9
 }
@@ -652,6 +653,12 @@ message DataStream {
     bool complete = 4; // true only if this is the last chunk of this stream - can also be sent with empty content
     int32 version = 5; // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
     optional bytes iv = 6; // optional, initialization vector for AES-GCM encryption
+  }
+
+  message Trailer {
+    string stream_id = 1; // unique identifier for this data stream
+    string reason = 2; // reason why the stream was closed (could contain "error" / "interrupted" / empty for expected end)
+    map<string, string> extensions = 3; // finalizing updates for the stream, can also include additional insights for errors or endTime for transcription
   }
 }
 
