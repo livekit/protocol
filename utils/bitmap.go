@@ -22,14 +22,11 @@ type bitmapNumber interface {
 
 type Bitmap[T bitmapNumber] struct {
 	bits []uint64
-	mask int
 }
 
 func NewBitmap[T bitmapNumber](size int) *Bitmap[T] {
-	numElems := 1 << bits.Len64(uint64(size+63)/64)
 	return &Bitmap[T]{
-		bits: make([]uint64, numElems),
-		mask: numElems - 1,
+		bits: make([]uint64, 1<<bits.Len64(uint64(size+63)/64)),
 	}
 }
 
@@ -38,8 +35,15 @@ func (b *Bitmap[T]) Len() int {
 }
 
 func (b *Bitmap[T]) Set(val T) {
-	s, o := b.getSlotAndOffset(val)
-	b.bits[s&b.mask] |= 1 << o
+	sm, s, o := b.getSlotAndOffset(val)
+	b.bits[s&sm] |= 1 << o
+}
+
+func (b *Bitmap[T]) GetAndSet(val T) bool {
+	sm, s, o := b.getSlotAndOffset(val)
+	prev := b.bits[s&sm]&(1<<o) != 0
+	b.bits[s&sm] |= 1 << o
+	return prev
 }
 
 func (b *Bitmap[T]) SetRange(min, max T) {
@@ -47,21 +51,21 @@ func (b *Bitmap[T]) SetRange(min, max T) {
 		return
 	}
 
-	ls, rs, lo, ro := b.getSlotsAndOffsets(min, max)
+	sm, ls, rs, lo, ro := b.getSlotsAndOffsets(min, max)
 	if ls == rs {
-		b.bits[ls&b.mask] |= (((1 << (ro - lo + 1)) - 1) << lo)
+		b.bits[ls&sm] |= (((1 << (ro - lo + 1)) - 1) << lo)
 	} else {
-		b.bits[ls&b.mask] |= ^((1 << lo) - 1)
+		b.bits[ls&sm] |= ^((1 << lo) - 1)
 		for i := ls + 1; i < rs; i++ {
-			b.bits[i&b.mask] = ^uint64(0)
+			b.bits[i&sm] = ^uint64(0)
 		}
-		b.bits[rs&b.mask] |= (1 << (ro + 1)) - 1
+		b.bits[rs&sm] |= (1 << (ro + 1)) - 1
 	}
 }
 
 func (b *Bitmap[T]) Clear(val T) {
-	s, o := b.getSlotAndOffset(val)
-	b.bits[s&b.mask] &= ^(1 << o)
+	sm, s, o := b.getSlotAndOffset(val)
+	b.bits[s&sm] &= ^(1 << o)
 }
 
 func (b *Bitmap[T]) ClearRange(min, max T) {
@@ -69,30 +73,33 @@ func (b *Bitmap[T]) ClearRange(min, max T) {
 		return
 	}
 
-	ls, rs, lo, ro := b.getSlotsAndOffsets(min, max)
+	sm, ls, rs, lo, ro := b.getSlotsAndOffsets(min, max)
 	if ls == rs {
-		b.bits[ls&b.mask] &= ^(((1 << (ro - lo + 1)) - 1) << lo)
+		b.bits[ls&sm] &= ^(((1 << (ro - lo + 1)) - 1) << lo)
 	} else {
-		b.bits[ls&b.mask] &= ^uint64(0) >> (64 - lo)
+		b.bits[ls&sm] &= ^uint64(0) >> (64 - lo)
 		for i := ls + 1; i < rs; i++ {
-			b.bits[i&b.mask] = 0
+			b.bits[i&sm] = 0
 		}
-		b.bits[rs&b.mask] &= ^uint64(0) << (ro + 1)
+		b.bits[rs&sm] &= ^uint64(0) << (ro + 1)
 	}
 }
 
 func (b *Bitmap[T]) IsSet(val T) bool {
-	s, o := b.getSlotAndOffset(val)
-	return b.bits[s&b.mask]&(1<<o) != 0
+	sm, s, o := b.getSlotAndOffset(val)
+	return b.bits[s&sm]&(1<<o) != 0
 }
 
-func (b *Bitmap[T]) getSlotAndOffset(val T) (s, o int) {
-	s = int(val >> 6)   // slot
-	o = int(val & 0x3f) // offset
+func (b *Bitmap[T]) getSlotAndOffset(val T) (sm, s, o int) {
+	sm = len(b.bits) - 1 // slot mask
+	s = int(val >> 6)    // slot
+	o = int(val & 0x3f)  // offset
 	return
 }
 
-func (b *Bitmap[T]) getSlotsAndOffsets(min, max T) (ls, rs, lo, ro int) {
+func (b *Bitmap[T]) getSlotsAndOffsets(min, max T) (sm, ls, rs, lo, ro int) {
+	sm = len(b.bits) - 1 // slot mask
+
 	ls = int(min >> 6) // left slot
 	rs = int(max >> 6) // right slot
 

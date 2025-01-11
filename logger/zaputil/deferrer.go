@@ -17,6 +17,7 @@ package zaputil
 import (
 	"sync"
 
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -70,25 +71,27 @@ type DeferredFieldResolver func(args ...any)
 
 func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 	buf := &Deferrer{}
-	var resolveOnce sync.Once
+	var resolved atomic.Bool
 	resolve := func(args ...any) {
-		resolveOnce.Do(func() {
-			fields := make([]zapcore.Field, 0, len(args))
-			for i := 0; i < len(args); i++ {
-				switch arg := args[i].(type) {
-				case zapcore.Field:
-					fields = append(fields, arg)
-				case string:
-					if i < len(args)-1 {
-						fields = append(fields, zap.Any(arg, args[i+1]))
-						i++
-					}
+		if resolved.Swap(true) {
+			return
+		}
+
+		fields := make([]zapcore.Field, 0, len(args))
+		for i := 0; i < len(args); i++ {
+			switch arg := args[i].(type) {
+			case zapcore.Field:
+				fields = append(fields, arg)
+			case string:
+				if i < len(args)-1 {
+					fields = append(fields, zap.Any(arg, args[i+1]))
+					i++
 				}
 			}
+		}
 
-			buf.fields = fields
-			buf.flush()
-		})
+		buf.fields = fields
+		buf.flush()
 	}
 	return buf, resolve
 }
@@ -99,8 +102,6 @@ type deferredValueCore struct {
 }
 
 func NewDeferredValueCore(core zapcore.Core, def *Deferrer) zapcore.Core {
-	def.mu.Lock()
-	defer def.mu.Unlock()
 	return &deferredValueCore{core, def}
 }
 
