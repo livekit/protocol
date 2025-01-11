@@ -94,8 +94,8 @@ func TestBitmap(t *testing.T) {
 	require.Equal(t, e, b.bits)
 
 	// large range changes touch each word once
-	ls, rs, lo, ro := b.getSlotsAndOffsets(0, math.MaxUint32)
-	require.Equal(t, []int{0, 4, 0, 0}, []int{ls, rs, lo, ro})
+	sm, ls, rs, lo, ro := b.getSlotsAndOffsets(0, math.MaxUint32)
+	require.Equal(t, []int{3, 0, 4, 0, 0}, []int{sm, ls, rs, lo, ro})
 }
 
 func BenchmarkBitmap(b *testing.B) {
@@ -108,6 +108,17 @@ func BenchmarkBitmap(b *testing.B) {
 	b.Run("Set", func(b *testing.B) {
 		for i := range b.N {
 			m.Set(uint64(i))
+		}
+	})
+	b.Run("IsSet/Set", func(b *testing.B) {
+		for i := range b.N {
+			_ = m.IsSet(uint64(i))
+			m.Set(uint64(i))
+		}
+	})
+	b.Run("GetAndSet", func(b *testing.B) {
+		for i := range b.N {
+			m.GetAndSet(uint64(i))
 		}
 	})
 }
