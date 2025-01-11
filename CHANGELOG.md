@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.31.0
+
+### Minor Changes
+
+- Add media encryption options for SIP. - [#892](https://github.com/livekit/protocol/pull/892) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- include room preset/config in SIP tokens - [#932](https://github.com/livekit/protocol/pull/932) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.30.0
 
 ### Minor Changes
