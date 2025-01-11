@@ -94,6 +94,6 @@ func TestBitmap(t *testing.T) {
 	require.Equal(t, e, b.bits)
 
 	// large range changes touch each word once
-	sm, ls, rs, lo, ro := b.getSlotsAndOffsets(0, math.MaxUint32)
-	require.Equal(t, []int{3, 0, 4, 0, 0}, []int{sm, ls, rs, lo, ro})
+	ls, rs, lo, ro := b.getSlotsAndOffsets(0, math.MaxUint32)
+	require.Equal(t, []int{0, 4, 0, 0}, []int{ls, rs, lo, ro})
 }
