@@ -15,26 +15,26 @@
 package utils
 
 import (
-	"math"
-
-	"golang.org/x/exp/constraints"
+	"testing"
 )
 
-func LogisticFunc(x0, L, k float64) func(x float64) float64 {
-	return func(x float64) float64 {
-		return L / (1 + math.Exp(-k*(x-x0)))
-	}
-}
-
-func FastLogisticFunc(x0, L, k float64) func(x float64) float64 {
-	return func(x float64) float64 {
-		return L / 2 * (1 + k*(x-x0)/(1+math.Abs(k*(x-x0))))
-	}
-}
-
-func Abs[T constraints.Signed | constraints.Float](v T) T {
-	if v < 0 {
-		return -v
-	}
-	return v
+func BenchmarkLogisticFunc(b *testing.B) {
+	b.Run("LogisticFunc", func(b *testing.B) {
+		l := LogisticFunc(0, 1, 1)
+		step := 4.0 / float64(b.N)
+		var i float64
+		for range b.N {
+			_ = l(i)
+			i += step
+		}
+	})
+	b.Run("FastLogisticFunc", func(b *testing.B) {
+		l := FastLogisticFunc(0, 1, 1)
+		step := 4.0 / float64(b.N)
+		var i float64
+		for range b.N {
+			_ = l(i)
+			i += step
+		}
+	})
 }

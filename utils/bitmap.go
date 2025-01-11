@@ -39,6 +39,13 @@ func (b *Bitmap[T]) Set(val T) {
 	b.bits[s&sm] |= 1 << o
 }
 
+func (b *Bitmap[T]) GetAndSet(val T) bool {
+	sm, s, o := b.getSlotAndOffset(val)
+	prev := b.bits[s&sm]&(1<<o) != 0
+	b.bits[s&sm] |= 1 << o
+	return prev
+}
+
 func (b *Bitmap[T]) SetRange(min, max T) {
 	if max < min {
 		return
