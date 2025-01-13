@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.31.0
+
+### Minor Changes
+
+- Add media encryption options for SIP. - [#892](https://github.com/livekit/protocol/pull/892) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add "Enabled" flag to ingresses to allow preventing an ingress to become active without deleting it. - [#937](https://github.com/livekit/protocol/pull/937) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add DataStream.Trailer for finalizing streams - [#940](https://github.com/livekit/protocol/pull/940) ([@lukasIO](https://github.com/lukasIO))
+
+- Add SIPCallDirection to SIPCallInfo - [#938](https://github.com/livekit/protocol/pull/938) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.30.0
 
 ### Minor Changes
