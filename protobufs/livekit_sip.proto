@@ -293,6 +293,7 @@ message GetSIPOutboundTrunkResponse {
 
 message ListSIPTrunkRequest {
   option deprecated = true;
+  Pagination page = 1;
 }
 
 message ListSIPTrunkResponse {
@@ -302,6 +303,7 @@ message ListSIPTrunkResponse {
 
 // ListSIPInboundTrunkRequest lists inbound trunks for given filters. If no filters are set, all trunks are listed.
 message ListSIPInboundTrunkRequest {
+  Pagination page = 3;
   // Trunk IDs to list. If this option is set, the response will contains trunks in the same order.
   // If any of the trunks is missing, a nil item in that position will be sent in the response.
   repeated string trunk_ids = 1;
@@ -315,6 +317,7 @@ message ListSIPInboundTrunkResponse {
 
 // ListSIPOutboundTrunkRequest lists outbound trunks for given filters. If no filters are set, all trunks are listed.
 message ListSIPOutboundTrunkRequest {
+  Pagination page = 3;
   // Trunk IDs to list. If this option is set, the response will contains trunks in the same order.
   // If any of the trunks is missing, a nil item in that position will be sent in the response.
   repeated string trunk_ids = 1;
@@ -434,6 +437,7 @@ message SIPDispatchRuleInfo {
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
 message ListSIPDispatchRuleRequest {
+  Pagination page = 3;
   // Rule IDs to list. If this option is set, the response will contains rules in the same order.
   // If any of the rules is missing, a nil item in that position will be sent in the response.
   repeated string dispatch_rule_ids = 1;

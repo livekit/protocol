@@ -7,6 +7,7 @@ toolchain go1.22.9
 require (
 	buf.build/go/protoyaml v0.2.0
 	github.com/benbjohnson/clock v1.3.5
+	github.com/dennwc/iters v1.0.1
 	github.com/frostbyte73/core v0.1.0
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gammazero/deque v1.0.0

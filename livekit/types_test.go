@@ -1,8 +1,11 @@
 package livekit
 
 import (
+	"context"
+	"fmt"
 	"testing"
 
+	"github.com/dennwc/iters"
 	"github.com/stretchr/testify/require"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
@@ -151,4 +154,72 @@ func TestMarshallRoomAgent(t *testing.T) {
 	err = yaml.Unmarshal(b, &ua)
 	require.NoError(t, err)
 	require.True(t, proto.Equal(a, &ua))
+}
+
+var _ PageItem = testPageItem("")
+
+type testPageItem string
+
+func (t testPageItem) ID() string {
+	return string(t)
+}
+
+type testPageReq struct {
+	Page *Pagination
+}
+
+func (t *testPageReq) GetPage() *Pagination {
+	return t.Page
+}
+
+func (t *testPageReq) Filter(v testPageItem) bool {
+	return true
+}
+
+type testPageResp []testPageItem
+
+func (t testPageResp) GetItems() []testPageItem {
+	return t
+}
+
+func TestListPageIter(t *testing.T) {
+	testList := func(t testing.TB, req *testPageReq) {
+		const page = 3
+		var exp []testPageItem
+		for i := 0; i < 10; i++ {
+			exp = append(exp, testPageItem(fmt.Sprintf("%03d", i)))
+		}
+		it := ListPageIter(func(ctx context.Context, req *testPageReq) (testPageResp, error) {
+			limit := -1
+			if req.Page != nil {
+				limit = int(req.Page.Limit)
+				if limit == 0 {
+					limit = page
+				}
+			}
+			var out testPageResp
+			for _, v := range exp {
+				if req.Filter(v) && req.Page.Filter(v) {
+					out = append(out, v)
+					if limit > 0 && len(out) >= limit {
+						break
+					}
+				}
+			}
+			return out, nil
+		}, req)
+
+		got, err := iters.AllPages(context.Background(), it)
+		require.NoError(t, err)
+		require.Equal(t, exp, got)
+	}
+	t.Run("legacy", func(t *testing.T) {
+		testList(t, &testPageReq{})
+	})
+	t.Run("pagination", func(t *testing.T) {
+		testList(t, &testPageReq{Page: &Pagination{}})
+	})
+	t.Run("limit", func(t *testing.T) {
+		testList(t, &testPageReq{Page: &Pagination{Limit: 5}})
+	})
 }
