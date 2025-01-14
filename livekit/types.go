@@ -15,7 +15,11 @@
 package livekit
 
 import (
+	"context"
+	"io"
+
 	"buf.build/go/protoyaml"
+	"github.com/dennwc/iters"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
 )
@@ -129,4 +133,73 @@ func marshalProto(o proto.Message) (map[string]interface{}, error) {
 func IsJobType(jobType JobType) bool {
 	_, ok := JobType_name[int32(jobType)]
 	return ok
+}
+
+func (p *Pagination) Filter(v PageItem) bool {
+	if p == nil {
+		return true
+	}
+	if p.AfterId != "" {
+		if id := v.ID(); id != "" && id <= p.AfterId {
+			return false
+		}
+	}
+	return true
+}
+
+type pageIterReq[T any] interface {
+	GetPage() *Pagination
+	Filter(v T) bool
+}
+
+type pageIterResp[T any] interface {
+	GetItems() []T
+}
+
+type PageItem interface {
+	ID() string
+}
+
+func ListPageIter[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]](fnc func(ctx context.Context, req Req) (Resp, error), req Req) iters.PageIter[T] {
+	it := &listPageIter[T, Req, Resp]{fnc: fnc, req: req}
+	return iters.FilterPage(it, func(v T) bool {
+		return req.Filter(v)
+	})
+}
+
+type listPageIter[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]] struct {
+	fnc  func(ctx context.Context, opts Req) (Resp, error)
+	req  Req
+	done bool
+}
+
+func (it *listPageIter[T, Req, Resp]) NextPage(ctx context.Context) ([]T, error) {
+	if it.done {
+		return nil, io.EOF
+	}
+	opts := it.req.GetPage()
+	resp, err := it.fnc(ctx, it.req)
+	page := resp.GetItems()
+	if opts == nil {
+		// No pagination set - returns all items.
+		// We have to do this to support legacy implementations.
+		it.done = true
+		return page, nil
+	}
+	// Advance pagination cursor.
+	for i := len(page) - 1; i >= 0; i-- {
+		if id := page[i].ID(); id != "" {
+			opts.AfterId = id
+			break
+		}
+	}
+	if err == nil && len(page) == 0 {
+		err = io.EOF
+		it.done = true
+	}
+	return page, err
+}
+
+func (it *listPageIter[_, _, _]) Close() {
+	it.done = true
 }

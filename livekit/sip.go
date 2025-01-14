@@ -17,6 +17,34 @@ func (p *SipDTMF) ToProto() *DataPacket {
 	}
 }
 
+func (p *SIPTrunkInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipTrunkId
+}
+
+func (p *SIPInboundTrunkInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipTrunkId
+}
+
+func (p *SIPOutboundTrunkInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipTrunkId
+}
+
+func (p *SIPDispatchRuleInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipDispatchRuleId
+}
+
 // AsInbound converts legacy SIPTrunkInfo to SIPInboundTrunkInfo.
 func (p *SIPTrunkInfo) AsInbound() *SIPInboundTrunkInfo {
 	if p == nil || p.Kind == SIPTrunkInfo_TRUNK_OUTBOUND {
@@ -271,6 +299,13 @@ func filterIDs[T any, ID comparable](arr []T, ids []ID, get func(v T) ID) []T {
 		}
 	}
 	return out
+}
+
+func (p *ListSIPTrunkRequest) Filter(info *SIPTrunkInfo) bool {
+	if info == nil {
+		return true // for FilterSlice to work correctly with missing IDs
+	}
+	return true
 }
 
 func (p *ListSIPInboundTrunkRequest) Filter(info *SIPInboundTrunkInfo) bool {

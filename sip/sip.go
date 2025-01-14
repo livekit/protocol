@@ -18,12 +18,14 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"maps"
 	"math"
 	"net/netip"
 	"sort"
 	"strings"
 
+	"github.com/dennwc/iters"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/exp/slices"
 
@@ -98,19 +100,23 @@ func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
 	return priority
 }
 
+func hasHigherPriority(r1, r2 *livekit.SIPDispatchRuleInfo) bool {
+	p1, p2 := DispatchRulePriority(r1), DispatchRulePriority(r2)
+	if p1 < p2 {
+		return true
+	} else if p1 > p2 {
+		return false
+	}
+	// For predictable sorting order.
+	room1, _, _ := GetPinAndRoom(r1)
+	room2, _, _ := GetPinAndRoom(r2)
+	return room1 < room2
+}
+
 // SortDispatchRules predictably sorts dispatch rules by priority (first one is highest).
 func SortDispatchRules(rules []*livekit.SIPDispatchRuleInfo) {
 	sort.Slice(rules, func(i, j int) bool {
-		p1, p2 := DispatchRulePriority(rules[i]), DispatchRulePriority(rules[j])
-		if p1 < p2 {
-			return true
-		} else if p1 > p2 {
-			return false
-		}
-		// For predictable sorting order.
-		room1, _, _ := GetPinAndRoom(rules[i])
-		room2, _, _ := GetPinAndRoom(rules[j])
-		return room1 < room2
+		return hasHigherPriority(rules[i], rules[j])
 	})
 }
 
@@ -122,59 +128,108 @@ func printID(s string) string {
 }
 
 // ValidateDispatchRules checks a set of dispatch rules for conflicts.
+//
+// Deprecated: use ValidateDispatchRulesIter
 func ValidateDispatchRules(rules []*livekit.SIPDispatchRuleInfo) error {
-	if len(rules) == 0 {
-		return nil
+	_, err := ValidateDispatchRulesIter(iters.Slice(rules))
+	return err
+}
+
+// ValidateDispatchRulesIter checks a set of dispatch rules for conflicts.
+func ValidateDispatchRulesIter(it iters.Iter[*livekit.SIPDispatchRuleInfo]) (best *livekit.SIPDispatchRuleInfo, _ error) {
+	it = NewDispatchRuleValidator().ValidateIter(it)
+	defer it.Close()
+	for {
+		r, err := it.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return best, err
+		}
+		if best == nil || hasHigherPriority(r, best) {
+			best = r
+		}
 	}
-	type ruleKey struct {
-		Pin    string
-		Trunk  string
-		Number string
+	return best, nil
+}
+
+func NewDispatchRuleValidator() *DispatchRuleValidator {
+	return &DispatchRuleValidator{
+		byRuleKey: make(map[dispatchRuleKey]*livekit.SIPDispatchRuleInfo),
 	}
-	byRuleKey := make(map[ruleKey]*livekit.SIPDispatchRuleInfo)
-	for _, r := range rules {
-		_, pin, err := GetPinAndRoom(r)
-		if err != nil {
-			return err
-		}
-		trunks := r.TrunkIds
-		if len(trunks) == 0 {
-			// This rule matches all trunks, but collides only with other default ones (specific rules take priority).
-			trunks = []string{""}
-		}
-		numbers := r.InboundNumbers
-		if len(numbers) == 0 {
-			// This rule matches all numbers, but collides only with other default ones (specific rules take priority).
-			numbers = []string{""}
-		}
-		for _, trunk := range trunks {
-			for _, number := range numbers {
-				key := ruleKey{Pin: pin, Trunk: trunk, Number: normalizeNumber(number)}
-				r2 := byRuleKey[key]
-				if r2 != nil {
-					return twirp.NewErrorf(twirp.InvalidArgument, "Conflicting SIP Dispatch Rules: same Trunk+Number+PIN combination for for %q and %q",
-						printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
-				}
-				byRuleKey[key] = r
+}
+
+type dispatchRuleKey struct {
+	Pin    string
+	Trunk  string
+	Number string
+}
+
+type DispatchRuleValidator struct {
+	byRuleKey map[dispatchRuleKey]*livekit.SIPDispatchRuleInfo
+}
+
+func (v *DispatchRuleValidator) ValidateIter(it iters.Iter[*livekit.SIPDispatchRuleInfo]) iters.Iter[*livekit.SIPDispatchRuleInfo] {
+	return &dispatchRuleValidatorIter{v: v, it: it}
+}
+
+func (v *DispatchRuleValidator) Validate(r *livekit.SIPDispatchRuleInfo) error {
+	_, pin, err := GetPinAndRoom(r)
+	if err != nil {
+		return err
+	}
+	trunks := r.TrunkIds
+	if len(trunks) == 0 {
+		// This rule matches all trunks, but collides only with other default ones (specific rules take priority).
+		trunks = []string{""}
+	}
+	numbers := r.InboundNumbers
+	if len(numbers) == 0 {
+		// This rule matches all numbers, but collides only with other default ones (specific rules take priority).
+		numbers = []string{""}
+	}
+	for _, trunk := range trunks {
+		for _, number := range numbers {
+			key := dispatchRuleKey{Pin: pin, Trunk: trunk, Number: normalizeNumber(number)}
+			r2 := v.byRuleKey[key]
+			if r2 != nil {
+				return twirp.NewErrorf(twirp.InvalidArgument, "Conflicting SIP Dispatch Rules: same Trunk+Number+PIN combination for for %q and %q",
+					printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
 			}
+			v.byRuleKey[key] = r
 		}
 	}
 	return nil
 }
 
-// SelectDispatchRule takes a list of dispatch rules, and takes the decision which one should be selected.
-// It returns an error if there are conflicting rules. Returns nil if no rules match.
-func SelectDispatchRule(rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
-	if len(rules) == 0 {
-		// Nil is fine here. We will report "no rules matched" later.
-		return nil, nil
-	}
-	if err := ValidateDispatchRules(rules); err != nil {
+type dispatchRuleValidatorIter struct {
+	v  *DispatchRuleValidator
+	it iters.Iter[*livekit.SIPDispatchRuleInfo]
+}
+
+func (v *dispatchRuleValidatorIter) Next() (*livekit.SIPDispatchRuleInfo, error) {
+	r, err := v.it.Next()
+	if err != nil {
 		return nil, err
 	}
+	if err = v.v.Validate(r); err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+func (v *dispatchRuleValidatorIter) Close() {
+	v.it.Close()
+}
+
+// SelectDispatchRule takes a list of dispatch rules, and takes the decision which one should be selected.
+// It returns an error if there are conflicting rules. Returns nil if no rules match.
+//
+// Deprecated: use MatchDispatchRuleIter
+func SelectDispatchRule(rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
 	// Sorting will do the selection for us. We already filtered out irrelevant ones in MatchDispatchRule and above.
-	SortDispatchRules(rules)
-	return rules[0], nil
+	// Nil is fine here. We will report "no rules matched" later.
+	return ValidateDispatchRulesIter(iters.Slice(rules))
 }
 
 // GetPinAndRoom returns a room name/prefix and the pin for a dispatch rule. Just a convenience wrapper.
@@ -237,12 +292,23 @@ func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *
 }
 
 // ValidateTrunks checks a set of trunks for conflicts.
+//
+// Deprecated: use ValidateTrunksIter
 func ValidateTrunks(trunks []*livekit.SIPInboundTrunkInfo) error {
-	if len(trunks) == 0 {
-		return nil
-	}
+	return ValidateTrunksIter(iters.Slice(trunks))
+}
+
+// ValidateTrunksIter checks a set of trunks for conflicts.
+func ValidateTrunksIter(it iters.Iter[*livekit.SIPInboundTrunkInfo]) error {
+	defer it.Close()
 	byOutboundAndInbound := make(map[string]map[string]*livekit.SIPInboundTrunkInfo)
-	for _, t := range trunks {
+	for {
+		t, err := it.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return err
+		}
 		if len(t.Numbers) == 0 {
 			byInbound := byOutboundAndInbound[""]
 			if byInbound == nil {
@@ -310,14 +376,29 @@ func matchNumbers(num string, allowed []string) bool {
 
 // MatchTrunk finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
+//
+// Deprecated: use MatchTrunkIter
 func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, srcIP netip.Addr, calling, called string) (*livekit.SIPInboundTrunkInfo, error) {
+	return MatchTrunkIter(iters.Slice(trunks), srcIP, calling, called)
+}
+
+// MatchTrunkIter finds a SIP Trunk definition matching the request.
+// Returns nil if no rules matched or an error if there are conflicting definitions.
+func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], srcIP netip.Addr, calling, called string) (*livekit.SIPInboundTrunkInfo, error) {
+	defer it.Close()
 	var (
 		selectedTrunk   *livekit.SIPInboundTrunkInfo
 		defaultTrunk    *livekit.SIPInboundTrunkInfo
 		defaultTrunkCnt int // to error in case there are multiple ones
 	)
 	calledNorm := normalizeNumber(called)
-	for _, tr := range trunks {
+	for {
+		tr, err := it.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
 		// Do not consider it if number doesn't match.
 		if !matchNumbers(calling, tr.AllowedNumbers) {
 			continue
@@ -354,23 +435,38 @@ func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, srcIP netip.Addr, calling
 
 // MatchDispatchRule finds the best dispatch rule matching the request parameters. Returns an error if no rule matched.
 // Trunk parameter can be nil, in which case only wildcard dispatch rules will be effective (ones without Trunk IDs).
+//
+// Deprecated: use MatchDispatchRuleIter
 func MatchDispatchRule(trunk *livekit.SIPInboundTrunkInfo, rules []*livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
+	return MatchDispatchRuleIter(trunk, iters.Slice(rules), req)
+}
+
+// MatchDispatchRuleIter finds the best dispatch rule matching the request parameters. Returns an error if no rule matched.
+// Trunk parameter can be nil, in which case only wildcard dispatch rules will be effective (ones without Trunk IDs).
+func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[*livekit.SIPDispatchRuleInfo], req *rpc.EvaluateSIPDispatchRulesRequest) (*livekit.SIPDispatchRuleInfo, error) {
+	rules = NewDispatchRuleValidator().ValidateIter(rules)
+	defer rules.Close()
 	// Trunk can still be nil here in case none matched or were defined.
 	// This is still fine, but only in case we'll match exactly one wildcard dispatch rule.
-	if len(rules) == 0 {
-		err := &ErrNoDispatchMatched{NoRules: true, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
-		return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, err.Error()), err)
-	}
+
 	// We split the matched dispatch rules into two sets in relation to Trunks: specific and default (aka wildcard).
 	// First, attempt to match any of the specific rules, where we did match the Trunk ID.
 	// If nothing matches there - fallback to default/wildcard rules, where no Trunk IDs were mentioned.
 	var (
-		specificRules []*livekit.SIPDispatchRuleInfo
-		defaultRules  []*livekit.SIPDispatchRuleInfo
+		specificRule    *livekit.SIPDispatchRuleInfo
+		specificRuleCnt int
+		defaultRule     *livekit.SIPDispatchRuleInfo
+		defaultRuleCnt  int
 	)
 	noPin := req.NoPin
 	sentPin := req.GetPin()
-	for _, info := range rules {
+	for {
+		info, err := rules.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
 		if len(info.InboundNumbers) != 0 && !slices.Contains(info.InboundNumbers, req.CallingNumber) {
 			continue
 		}
@@ -398,7 +494,10 @@ func MatchDispatchRule(trunk *livekit.SIPInboundTrunkInfo, rules []*livekit.SIPD
 		}
 		if len(info.TrunkIds) == 0 {
 			// Default/wildcard dispatch rule.
-			defaultRules = append(defaultRules, info)
+			defaultRuleCnt++
+			if defaultRule == nil || hasHigherPriority(info, defaultRule) {
+				defaultRule = info
+			}
 			continue
 		}
 		// Specific dispatch rules. Require a Trunk associated with the number.
@@ -408,21 +507,22 @@ func MatchDispatchRule(trunk *livekit.SIPInboundTrunkInfo, rules []*livekit.SIPD
 		if !slices.Contains(info.TrunkIds, trunk.SipTrunkId) {
 			continue
 		}
-		specificRules = append(specificRules, info)
+		specificRuleCnt++
+		if specificRule == nil || hasHigherPriority(info, specificRule) {
+			specificRule = info
+		}
 	}
-	best, err := SelectDispatchRule(specificRules, req)
-	if err != nil {
-		return nil, err
-	} else if best != nil {
-		return best, nil
+	if specificRuleCnt == 0 && defaultRuleCnt == 0 {
+		err := &ErrNoDispatchMatched{NoRules: true, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
+		return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, err.Error()), err)
 	}
-	best, err = SelectDispatchRule(defaultRules, req)
-	if err != nil {
-		return nil, err
-	} else if best != nil {
-		return best, nil
+	if specificRule != nil {
+		return specificRule, nil
 	}
-	err = &ErrNoDispatchMatched{NoRules: false, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
+	if defaultRule != nil {
+		return defaultRule, nil
+	}
+	err := &ErrNoDispatchMatched{NoRules: false, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
 	return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, err.Error()), err)
 }
 

@@ -23,6 +23,11 @@ import "google/protobuf/timestamp.proto";
 
 import "livekit_metrics.proto";
 
+message Pagination {
+  string after_id = 1; // list entities which IDs are greater
+  int32  limit = 2;
+}
+
 message Room {
   string sid = 1;
   string name = 2;
