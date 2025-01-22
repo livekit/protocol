@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.32.0
+
+### Minor Changes
+
+- Use iterators in SIP. - [#943](https://github.com/livekit/protocol/pull/943) ([@dennwc](https://github.com/dennwc))
+
 ## 1.31.0
 
 ### Minor Changes
