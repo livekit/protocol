@@ -131,6 +131,8 @@ message ParticipantInfo {
   string metadata = 5;
   // timestamp when participant joined room, in seconds
   int64 joined_at = 6;
+  // timestamp when participant joined room, in milliseconds
+  int64 joined_at_ms = 17;
   string name = 9;
   uint32 version = 10;
   ParticipantPermission permission = 11;
@@ -141,6 +143,8 @@ message ParticipantInfo {
   Kind kind = 14;
   map<string, string> attributes = 15;
   DisconnectReason disconnect_reason = 16;
+ 
+  // NEXT_ID: 18
 }
 
 enum TrackType {
