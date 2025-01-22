@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.32.0
+
+### Minor Changes
+
+- Use iterators in SIP. - [#943](https://github.com/livekit/protocol/pull/943) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Rename File* related DataStream messages to Byte* - [#948](https://github.com/livekit/protocol/pull/948) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.31.0
 
 ### Minor Changes
