@@ -35,6 +35,7 @@ message Room {
   uint32 departure_timeout = 14;
   uint32 max_participants = 4;
   int64 creation_time = 5;
+  int64 creation_time_ms = 15;
   string turn_password = 6;
   repeated Codec enabled_codecs = 7;
   string metadata = 8;
@@ -43,7 +44,7 @@ message Room {
   bool active_recording = 10;
   TimedVersion version = 13;
 
-  // NEXT-ID: 15
+  // NEXT-ID: 16
 }
 
 message Codec {
