@@ -22,8 +22,9 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"X-B": "B2",
 			"X-C": "C",
 		},
-		Dtmf:         "1234#",
-		PlayDialtone: true,
+		Dtmf:              "1234#",
+		PlayDialtone:      true,
+		WaitUntilAnswered: true,
 	}
 	tr := &livekit.SIPOutboundTrunkInfo{
 		SipTrunkId:   "trunk",
@@ -66,6 +67,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"X-B": "B2",
 			"X-C": "C",
 		},
+		WaitUntilAnswered: true,
 	}, res)
 
 	r.HidePhoneNumber = true
@@ -97,5 +99,6 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"X-B": "B2",
 			"X-C": "C",
 		},
+		WaitUntilAnswered: true,
 	}, res)
 }

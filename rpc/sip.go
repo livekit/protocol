@@ -101,6 +101,7 @@ func NewCreateSIPParticipantRequest(
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
 		MediaEncryption:       enc,
+		WaitUntilAnswered:     req.WaitUntilAnswered,
 	}, nil
 }
 

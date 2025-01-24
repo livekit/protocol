@@ -510,7 +510,10 @@ message CreateSIPParticipantRequest {
   bool krisp_enabled = 14;
 
   SIPMediaEncryption media_encryption = 18;
-  // NEXT ID: 19
+
+  // Wait for the answer for the call before returning.
+  bool wait_until_answered = 19;
+  // NEXT ID: 20
 }
 
 message SIPParticipantInfo {
