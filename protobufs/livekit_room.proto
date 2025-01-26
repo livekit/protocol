@@ -193,7 +193,7 @@ message SendDataRequest {
   repeated string destination_identities = 6;
   optional string topic = 5;
   // added by SDK to enable de-duping messages
-  int64 nonce = 7;
+  string nonce = 7;
 
   // NEXT_ID: 8
 }

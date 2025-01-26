@@ -283,7 +283,7 @@ message UserPacket {
   optional uint64 start_time = 9;
   optional uint64 end_time = 10;
   // added by SDK to enable de-duping messages
-  int64 nonce = 11;
+  string nonce = 11;
 
   // NEXT_ID: 12
 }
