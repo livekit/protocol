@@ -972,9 +972,10 @@ type SendDataRequest struct {
 	// when set, only forward to these identities
 	DestinationIdentities []string `protobuf:"bytes,6,rep,name=destination_identities,json=destinationIdentities,proto3" json:"destination_identities,omitempty"`
 	Topic                 *string  `protobuf:"bytes,5,opt,name=topic,proto3,oneof" json:"topic,omitempty"`
-	Nonce                 int64    `protobuf:"varint,7,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// added by SDK to enable de-duping messages
+	Nonce         int64 `protobuf:"varint,7,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SendDataRequest) Reset() {
