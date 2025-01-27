@@ -652,21 +652,106 @@ func TestEvaluateDispatchRule(t *testing.T) {
 
 func TestMatchIP(t *testing.T) {
 	cases := []struct {
-		addr string
-		mask string
-		exp  bool
+		addr  string
+		mask  string
+		valid bool
+		exp   bool
 	}{
-		{addr: "192.168.0.10", mask: "192.168.0.10", exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.11", exp: false},
-		{addr: "192.168.0.10", mask: "192.168.0.0/24", exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.10/0", exp: true},
-		{addr: "192.168.0.10", mask: "192.170.0.0/24", exp: false},
+		{addr: "192.168.0.10", mask: "192.168.0.10", valid: true, exp: true},
+		{addr: "192.168.0.10", mask: "192.168.0.11", valid: true, exp: false},
+		{addr: "192.168.0.10", mask: "192.168.0.0/24", valid: true, exp: true},
+		{addr: "192.168.0.10", mask: "192.168.0.10/0", valid: true, exp: true},
+		{addr: "192.168.0.10", mask: "192.170.0.0/24", valid: true, exp: false},
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
 			ip, err := netip.ParseAddr(c.addr)
 			require.NoError(t, err)
-			got := matchAddrMask(ip, c.mask)
+			got := isValidMask(c.mask)
+			require.Equal(t, c.valid, got)
+			got = matchAddrMask(ip, c.mask)
+			require.Equal(t, c.exp, got)
+		})
+	}
+}
+
+func TestMatchMasks(t *testing.T) {
+	cases := []struct {
+		name  string
+		addr  string
+		masks []string
+		exp   bool
+	}{
+		{
+			name:  "no masks",
+			addr:  "192.168.0.10",
+			masks: nil,
+			exp:   true,
+		},
+		{
+			name: "single ip",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.0.10",
+			},
+			exp: true,
+		},
+		{
+			name: "wrong ip",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.0.11",
+			},
+			exp: false,
+		},
+		{
+			name: "ip mask",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.0.0/24",
+			},
+			exp: true,
+		},
+		{
+			name: "wrong mask",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.1.0/24",
+			},
+			exp: false,
+		},
+		{
+			name: "invalid range",
+			addr: "192.168.0.10",
+			masks: []string{
+				"some.domain",
+			},
+			exp: true,
+		},
+		{
+			name: "invalid and valid range",
+			addr: "192.168.0.10",
+			masks: []string{
+				"some.domain",
+				"192.168.0.0/24",
+			},
+			exp: true,
+		},
+		{
+			name: "invalid and wrong range",
+			addr: "192.168.0.10",
+			masks: []string{
+				"some.domain",
+				"192.168.1.0/24",
+			},
+			exp: false,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			ip, err := netip.ParseAddr(c.addr)
+			require.NoError(t, err)
+			got := matchAddrMasks(ip, c.masks)
 			require.Equal(t, c.exp, got)
 		})
 	}

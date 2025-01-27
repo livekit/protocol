@@ -334,6 +334,34 @@ func ValidateTrunksIter(it iters.Iter[*livekit.SIPInboundTrunkInfo]) error {
 	return nil
 }
 
+func isValidMask(mask string) bool {
+	if !strings.Contains(mask, "/") {
+		expIP, err := netip.ParseAddr(mask)
+		if err != nil {
+			return false
+		}
+		return expIP.IsValid()
+	}
+	pref, err := netip.ParsePrefix(mask)
+	if err != nil {
+		return false
+	}
+	return pref.IsValid()
+}
+
+func filterInvalidAddrMasks(masks []string) []string {
+	if len(masks) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(masks))
+	for _, m := range masks {
+		if isValidMask(m) {
+			out = append(out, m)
+		}
+	}
+	return out
+}
+
 func matchAddrMask(ip netip.Addr, mask string) bool {
 	if !strings.Contains(mask, "/") {
 		expIP, err := netip.ParseAddr(mask)
@@ -350,7 +378,11 @@ func matchAddrMask(ip netip.Addr, mask string) bool {
 }
 
 func matchAddrMasks(addr netip.Addr, masks []string) bool {
-	if !addr.IsValid() || len(masks) == 0 {
+	if !addr.IsValid() {
+		return true
+	}
+	masks = filterInvalidAddrMasks(masks)
+	if len(masks) == 0 {
 		return true
 	}
 	for _, mask := range masks {
