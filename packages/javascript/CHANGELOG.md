@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.32.1
+
+### Patch Changes
+
+- Add nonce to SendDataRequest #953 - [#954](https://github.com/livekit/protocol/pull/954) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.32.0
 
 ### Minor Changes
