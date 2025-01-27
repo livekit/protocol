@@ -282,8 +282,8 @@ message UserPacket {
   // start and end time allow relating the message to specific media time
   optional uint64 start_time = 9;
   optional uint64 end_time = 10;
-  // added by SDK to enable de-duping messages
-  string nonce = 11;
+  // added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
+  bytes nonce = 11;
 
   // NEXT_ID: 12
 }

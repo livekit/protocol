@@ -192,8 +192,8 @@ message SendDataRequest {
   // when set, only forward to these identities
   repeated string destination_identities = 6;
   optional string topic = 5;
-  // added by SDK to enable de-duping messages
-  string nonce = 7;
+  // added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
+  bytes nonce = 7;
 
   // NEXT_ID: 8
 }
