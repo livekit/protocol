@@ -5,8 +5,24 @@ import (
 	"fmt"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
+
+	"github.com/livekit/protocol/utils/xtwirp"
 )
+
+var _ xtwirp.ErrorMeta = (*SIPStatus)(nil)
+
+func (p *SIPStatus) TwirpErrorMeta() map[string]string {
+	status := p.Status
+	if status == "" {
+		status = p.Code.String()
+	}
+	return map[string]string{
+		"sip_status_code": strconv.Itoa(int(p.Code)),
+		"sip_status":      status,
+	}
+}
 
 // ToProto implements DataPacket in Go SDK.
 func (p *SipDTMF) ToProto() *DataPacket {
