@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.33.0
+
+### Minor Changes
+
+- Add flag to make CreateSIPParticipant synchronous. - [#952](https://github.com/livekit/protocol/pull/952) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add a workaround for invalid IP masks in SIP. - [#956](https://github.com/livekit/protocol/pull/956) ([@dennwc](https://github.com/dennwc))
+
 ## 1.32.1
 
 ### Patch Changes
