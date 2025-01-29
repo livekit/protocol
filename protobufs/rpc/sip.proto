@@ -111,9 +111,6 @@ message InternalCreateSIPParticipantResponse {
   string participant_id = 1;
   string participant_identity = 2;
   string sip_call_id = 3;
-
-  uint32 sip_failure_code = 4;
-  string sip_failure_reason = 5;
 }
 
 message InternalTransferSIPParticipantRequest {
