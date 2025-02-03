@@ -5,6 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestSIPTrunkAs(t *testing.T) {
@@ -357,4 +360,17 @@ func TestSIPDispatchRuleFilter(t *testing.T) {
 			require.Equal(t, c.exp, got)
 		})
 	}
+}
+
+func TestGRPCStatus(t *testing.T) {
+	e := &SIPStatus{Code: SIPStatusCode_SIP_STATUS_BUSY_HERE}
+	st, ok := status.FromError(e)
+	require.True(t, ok)
+	require.Equal(t, codes.Unavailable, st.Code())
+	require.Equal(t, "sip status 486: BUSY_HERE", st.Message())
+	details := st.Details()
+	require.Len(t, details, 1)
+	e2, ok := details[0].(*SIPStatus)
+	require.True(t, ok)
+	require.True(t, proto.Equal(e, e2))
 }
