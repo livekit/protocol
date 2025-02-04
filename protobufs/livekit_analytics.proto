@@ -211,6 +211,11 @@ message ReportInfo {
   }
 }
 
+message TimeRange {
+  google.protobuf.Timestamp started_at = 1;
+  google.protobuf.Timestamp ended_at = 2;
+}
+
 message FeatureUsageInfo {
   enum Feature {
     KRISP_NOISE_CANCELLATION = 0;
@@ -222,6 +227,5 @@ message FeatureUsageInfo {
   string participant_identity = 5;
   string participant_id = 6;
   string track_id = 7;
-  google.protobuf.Timestamp started_at = 8;
-  google.protobuf.Timestamp ended_at = 9;
+  repeated TimeRange time_ranges = 8;
 }
