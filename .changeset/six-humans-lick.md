@@ -1,5 +1,5 @@
 ---
-"@fake-scope/fake-pkg": patch
+"@livekit/protocol": patch
 ---
 
 Proto to "report" different kinds of data.
