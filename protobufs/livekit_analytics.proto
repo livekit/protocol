@@ -121,8 +121,9 @@ enum AnalyticsEventType {
   SIP_CALL_INCOMING = 37;
   SIP_CALL_STARTED = 38;
   SIP_CALL_ENDED = 39;
+  REPORT = 40;
 
-  // NEXT_ID: 40
+  // NEXT_ID: 41
 }
 
 message AnalyticsClientMeta {
@@ -170,8 +171,9 @@ message AnalyticsEvent {
   SIPOutboundTrunkInfo sip_outbound_trunk = 30;
   string sip_dispatch_rule_id = 31;
   SIPDispatchRuleInfo sip_dispatch_rule = 32;
+  ReportInfo report = 33;
 
-  // NEXT_ID: 33
+  // NEXT_ID: 34
 }
 
 message AnalyticsEvents {
@@ -201,4 +203,25 @@ message AnalyticsNodeRooms {
   uint64 sequence_number = 2;
   google.protobuf.Timestamp timestamp = 3;
   repeated AnalyticsRoom rooms = 4;
+}
+
+message ReportInfo {
+  oneof message {
+    FeatureUsageInfo feature_usage = 1;
+  }
+}
+
+message FeatureUsageInfo {
+  enum Feature {
+    KRISP_NOISE_CANCELLATION = 0;
+  }
+  Feature feature = 1;
+  string project_id = 2;
+  string room_name = 3;
+  string room_id = 4;
+  string participant_identity = 5;
+  string participant_id = 6;
+  string track_id = 7;
+  google.protobuf.Timestamp started_at = 8;
+  google.protobuf.Timestamp ended_at = 9;
 }
