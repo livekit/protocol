@@ -8,10 +8,67 @@ import (
 	"strconv"
 	"strings"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/livekit/protocol/utils/xtwirp"
 )
 
-var _ xtwirp.ErrorMeta = (*SIPStatus)(nil)
+var (
+	_ xtwirp.ErrorMeta = (*SIPStatus)(nil)
+	_ error            = (*SIPStatus)(nil)
+)
+
+func (p SIPStatusCode) ShortName() string {
+	return strings.TrimPrefix(p.String(), "SIP_STATUS_")
+}
+
+func (p *SIPStatus) Error() string {
+	if p.Status != "" {
+		return fmt.Sprintf("sip status: %d: %s", p.Code, p.Status)
+	}
+	return fmt.Sprintf("sip status: %d (%s)", p.Code, p.Code.ShortName())
+}
+
+func (p *SIPStatus) GRPCStatus() *status.Status {
+	msg := p.Status
+	if msg == "" {
+		msg = p.Code.ShortName()
+	}
+	var code = codes.Internal
+	switch p.Code {
+	case SIPStatusCode_SIP_STATUS_OK:
+		return status.New(codes.OK, "OK")
+	case SIPStatusCode_SIP_STATUS_REQUEST_TERMINATED:
+		code = codes.Aborted
+	case SIPStatusCode_SIP_STATUS_BAD_REQUEST,
+		SIPStatusCode_SIP_STATUS_NOTFOUND,
+		SIPStatusCode_SIP_STATUS_ADDRESS_INCOMPLETE,
+		SIPStatusCode_SIP_STATUS_AMBIGUOUS,
+		SIPStatusCode_SIP_STATUS_BAD_EXTENSION,
+		SIPStatusCode_SIP_STATUS_EXTENSION_REQUIRED:
+		code = codes.InvalidArgument
+	case SIPStatusCode_SIP_STATUS_REQUEST_TIMEOUT,
+		SIPStatusCode_SIP_STATUS_GATEWAY_TIMEOUT:
+		code = codes.DeadlineExceeded
+	case SIPStatusCode_SIP_STATUS_SERVICE_UNAVAILABLE,
+		SIPStatusCode_SIP_STATUS_TEMPORARILY_UNAVAILABLE,
+		SIPStatusCode_SIP_STATUS_BUSY_HERE,
+		SIPStatusCode_SIP_STATUS_GLOBAL_BUSY_EVERYWHERE,
+		SIPStatusCode_SIP_STATUS_NOT_IMPLEMENTED,
+		SIPStatusCode_SIP_STATUS_GLOBAL_DECLINE:
+		code = codes.Unavailable
+	case SIPStatusCode_SIP_STATUS_PROXY_AUTH_REQUIRED,
+		SIPStatusCode_SIP_STATUS_UNAUTHORIZED,
+		SIPStatusCode_SIP_STATUS_FORBIDDEN:
+		code = codes.PermissionDenied
+	}
+	st := status.New(code, fmt.Sprintf("sip status %d: %s", p.Code, msg))
+	if st2, err := st.WithDetails(p); err == nil {
+		return st2
+	}
+	return st
+}
 
 func (p *SIPStatus) TwirpErrorMeta() map[string]string {
 	status := p.Status
