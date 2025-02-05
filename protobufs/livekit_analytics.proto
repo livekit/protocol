@@ -219,6 +219,7 @@ message TimeRange {
 message FeatureUsageInfo {
   enum Feature {
     KRISP_NOISE_CANCELLATION = 0;
+    KRISP_BACKGROUND_VOICE_CANCELLATION = 1;
   }
   Feature feature = 1;
   string project_id = 2;
@@ -227,5 +228,8 @@ message FeatureUsageInfo {
   string participant_identity = 5;
   string participant_id = 6;
   string track_id = 7;
+  // time ranges during which the feature was enabled.
+  // for e. g., noise cancellation may not be applied when a media track is paused/muted,
+  // this allows reporting only periods during which a feature is avtive.
   repeated TimeRange time_ranges = 8;
 }
