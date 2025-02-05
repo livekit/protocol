@@ -170,17 +170,3 @@ func ServerPassErrorDetails() twirp.ServerOption {
 		}
 	})
 }
-
-// DefaultClientOptions returns default Twirp client options.
-func DefaultClientOptions() []twirp.ClientOption {
-	return []twirp.ClientOption{
-		ClientPassErrorDetails(),
-	}
-}
-
-// DefaultServerOptions returns default Twirp server options.
-func DefaultServerOptions() []twirp.ServerOption {
-	return []twirp.ServerOption{
-		ServerPassErrorDetails(),
-	}
-}
