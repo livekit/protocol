@@ -250,14 +250,15 @@ message APICallResponse {
 }
 
 message APICallInfo {
-  APICallRequest request = 1;
-  APICallResponse response = 2;
-  string service = 3;
-  string method = 4;
-  string node_id = 5;
-  string status = 6;
-  string error_code = 7;
-  string error_message = 8;
-  google.protobuf.Timestamp started_at = 9;
-  int64 duration_ns = 10;
+  string project_id = 1;
+  APICallRequest request = 2;
+  APICallResponse response = 3;
+  string service = 4;
+  string method = 5;
+  string node_id = 6;
+  string status = 7;
+  string error_code = 8;
+  string error_message = 9;
+  google.protobuf.Timestamp started_at = 10;
+  int64 duration_ns = 11;
 }
