@@ -516,11 +516,32 @@ message DeleteSIPDispatchRuleRequest {
   string sip_dispatch_rule_id = 1;
 }
 
+message SIPOutboundConfig {
+  // SIP server address
+  string hostname = 1;
+
+  // SIP Transport used for outbound call.
+  SIPTransport transport = 2;
+
+  // Username and password used to authenticate with SIP server.
+  // May be empty to have no authentication.
+  string auth_username = 3;
+  string auth_password = 4;
+
+  // Map SIP X-* headers from 200 OK to SIP participant attributes.
+  // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
+  map<string, string> headers_to_attributes = 5;
+  // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
+  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
+  map<string, string> attributes_to_headers = 6;
+}
+
 // A SIP Participant is a singular SIP session connected to a LiveKit room via
 // a SIP Trunk into a SIP DispatchRule
 message CreateSIPParticipantRequest {
   // What SIP Trunk should be used to dial the user
   string sip_trunk_id = 1;
+  SIPOutboundConfig trunk = 20;
 
   // What number should be dialed via SIP
   string sip_call_to = 2;
@@ -576,7 +597,7 @@ message CreateSIPParticipantRequest {
 
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 19;
-  // NEXT ID: 20
+  // NEXT ID: 21
 }
 
 message SIPParticipantInfo {
