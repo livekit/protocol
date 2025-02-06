@@ -25,10 +25,11 @@ func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participan
 	f := false
 	t := true
 	grant := &auth.VideoGrant{
-		RoomJoin:     true,
-		Room:         roomName,
-		CanSubscribe: &f,
-		CanPublish:   &t,
+		RoomJoin:             true,
+		Room:                 roomName,
+		CanSubscribe:         &f,
+		CanPublish:           &t,
+		CanUpdateOwnMetadata: &t,
 	}
 
 	at := auth.NewAccessToken(apiKey, secret).

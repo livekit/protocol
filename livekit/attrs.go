@@ -22,4 +22,11 @@ const (
 	AttrSIPCallStatus = AttrSIPPrefix + "callStatus"
 	// AttrSIPHeaderPrefix is a prefix for automatically mapped SIP header attributes.
 	AttrSIPHeaderPrefix = AttrSIPPrefix + "h."
+
+	// AttrIngressPrefix is shared for all Ingress attributes
+	AttrIngressPrefix = "ingress."
+	// AttrIngressOutOfNetworkPrefix is shared for all ingress out of network (Ads break) related attributes
+	AttrIngressOutOfNetworkPrefix = AttrIngressPrefix + "outOfNetwork."
+	// AttrIngressOutOfNetworkEventID contains the event ID of the current Out of network splice
+	AttrIngressOutOfNetworkEventID = AttrIngressOutOfNetworkPrefix + "eventID"
 )
