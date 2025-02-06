@@ -71,6 +71,14 @@ enum ImageCodec {
   IC_JPEG = 1;
 }
 
+// Policy for publisher to handle subscribers that are unable to support the primary codec of a track
+enum BackupCodecPolicy {
+  // default behavior, regress to backup codec and all subscribers will receive the backup codec
+  REGRESSION = 0;
+  // encoding/send the primary and backup codec simultaneously
+  SIMULCAST = 1;
+}
+
 message PlayoutDelay {
   bool enabled = 1;
   uint32 min = 2;
@@ -205,6 +213,7 @@ message TrackInfo {
   string stream = 17;
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
+  BackupCodecPolicy backup_codec_policy = 20;
 }
 
 enum VideoQuality {
