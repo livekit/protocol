@@ -240,25 +240,32 @@ message FeatureUsageInfo {
 message APICallRequest {
   oneof message {
     CreateRoomRequest create_room_request = 1;
-  }
-}
-
-message APICallResponse {
-  oneof message {
-    Room room = 1;
+    ListRoomsRequest list_rooms_request = 2;
+    DeleteRoomRequest delete_room_request = 3;
+    ListParticipantsRequest list_participants_request = 4;
+    RoomParticipantIdentity room_participant_identity = 5;
+    MuteRoomTrackRequest mute_room_track_request = 6;
+    UpdateParticipantRequest update_participant_request = 7;
+    UpdateSubscriptionsRequest update_subscriptions_request = 8;
+    SendDataRequest send_data_request = 9;
+    UpdateRoomMetadataRequest  update_room_metadata_request = 10;
   }
 }
 
 message APICallInfo {
   string project_id = 1;
   APICallRequest request = 2;
-  APICallResponse response = 3;
-  string service = 4;
-  string method = 5;
-  string node_id = 6;
-  string status = 7;
-  string error_code = 8;
-  string error_message = 9;
-  google.protobuf.Timestamp started_at = 10;
-  int64 duration_ns = 11;
+  string service = 3;
+  string method = 4;
+  string node_id = 5;
+  int32 status = 6;
+  string twirp_error_code = 7;
+  string twirp_error_message = 8;
+  string room_name = 9;
+  string room_id = 10;
+  string participant_identity = 11;
+  string participant_id = 12;
+  string track_id = 13;
+  google.protobuf.Timestamp started_at = 14;
+  int64 duration_ns = 15;
 }
