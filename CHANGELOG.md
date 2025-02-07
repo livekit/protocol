@@ -1,5 +1,21 @@
 # github.com/livekit/protocol
 
+## 1.33.0
+
+### Minor Changes
+
+- Use SIP statuses as Go and gRPC errors. - [#960](https://github.com/livekit/protocol/pull/960) ([@dennwc](https://github.com/dennwc))
+
+- Add flag to make CreateSIPParticipant synchronous. - [#952](https://github.com/livekit/protocol/pull/952) ([@dennwc](https://github.com/dennwc))
+
+- Add Twirp options to preserve error details and client timeouts. - [#963](https://github.com/livekit/protocol/pull/963) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add a workaround for invalid IP masks in SIP. - [#956](https://github.com/livekit/protocol/pull/956) ([@dennwc](https://github.com/dennwc))
+
+- Add backup codec policy to AddTrackRequest - [#947](https://github.com/livekit/protocol/pull/947) ([@cnderrauber](https://github.com/cnderrauber))
+
 ## 1.32.1
 
 ### Patch Changes

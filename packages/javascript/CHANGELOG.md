@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.33.0
+
+### Minor Changes
+
+- Add flag to make CreateSIPParticipant synchronous. - [#952](https://github.com/livekit/protocol/pull/952) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Proto to "report" different kinds of data. - [#962](https://github.com/livekit/protocol/pull/962) ([@boks1971](https://github.com/boks1971))
+
+- Add backup codec policy to AddTrackRequest - [#947](https://github.com/livekit/protocol/pull/947) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Add Ingress OutOfNetwork attribute keys. Add the CanUpdateOwnMetadata claim to the ingress token - [#965](https://github.com/livekit/protocol/pull/965) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.32.1
 
 ### Patch Changes
