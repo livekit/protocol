@@ -12,23 +12,53 @@ import (
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.
 func NewCreateSIPParticipantRequest(
-	projectID, callID, host, wsUrl, token string,
+	projectID, callID, ownHostname, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
+	var (
+		hostname       string
+		enc            livekit.SIPMediaEncryption
+		headers        map[string]string
+		includeHeaders livekit.SIPHeaderOptions
+		transport      livekit.SIPTransport
+		authUser       string
+		authPass       string
+		hdrToAttr      map[string]string
+		attrToHdr      map[string]string
+	)
+	if trunk != nil {
+		hostname = trunk.Address
+		enc = trunk.MediaEncryption
+		headers = trunk.Headers
+		includeHeaders = trunk.IncludeHeaders
+		transport = trunk.Transport
+		authUser = trunk.AuthUsername
+		authPass = trunk.AuthPassword
+		hdrToAttr = trunk.HeadersToAttributes
+		attrToHdr = trunk.AttributesToHeaders
+	} else if t := req.Trunk; t != nil {
+		hostname = t.Hostname
+		transport = t.Transport
+		authUser = t.AuthUsername
+		authPass = t.AuthPassword
+		hdrToAttr = t.HeadersToAttributes
+		attrToHdr = t.AttributesToHeaders
+	}
+
 	outboundNumber := req.SipNumber
 	if outboundNumber == "" {
-		if len(trunk.Numbers) == 0 {
+		if trunk == nil || len(trunk.Numbers) == 0 {
 			return nil, errors.New("no numbers on outbound trunk")
 		}
 		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}
 	// A sanity check for the number format for well-known providers.
 	switch {
-	case strings.HasSuffix(trunk.Address, "telnyx.com"):
+	case strings.HasSuffix(hostname, "telnyx.com"):
 		// Telnyx omits leading '+' by default.
 		outboundNumber = strings.TrimPrefix(outboundNumber, "+")
-	case strings.HasSuffix(trunk.Address, "twilio.com"):
+	case strings.HasSuffix(hostname, "twilio.com"):
 		// Twilio requires leading '+'.
 		if !strings.HasPrefix(outboundNumber, "+") {
 			outboundNumber = "+" + outboundNumber
@@ -40,7 +70,7 @@ func NewCreateSIPParticipantRequest(
 	}
 	attrs[livekit.AttrSIPCallID] = callID
 	trunkID := req.SipTrunkId
-	if trunkID == "" {
+	if trunkID == "" && trunk != nil {
 		trunkID = trunk.SipTrunkId
 	}
 	attrs[livekit.AttrSIPTrunkID] = trunkID
@@ -53,12 +83,10 @@ func NewCreateSIPParticipantRequest(
 	if req.KrispEnabled {
 		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
 	}
-	enc := trunk.MediaEncryption
 	if req.MediaEncryption != 0 {
 		enc = req.MediaEncryption
 	}
 
-	headers := trunk.Headers
 	if len(req.Headers) != 0 {
 		headers = maps.Clone(headers)
 		if headers == nil {
@@ -68,7 +96,6 @@ func NewCreateSIPParticipantRequest(
 			headers[k] = v
 		}
 	}
-	includeHeaders := trunk.IncludeHeaders
 	if req.IncludeHeaders != 0 {
 		includeHeaders = req.IncludeHeaders
 	}
@@ -77,12 +104,12 @@ func NewCreateSIPParticipantRequest(
 		ProjectId:             projectID,
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
-		Address:               trunk.Address,
-		Hostname:              host,
-		Transport:             trunk.Transport,
+		Address:               hostname,
+		Hostname:              ownHostname,
+		Transport:             transport,
 		Number:                outboundNumber,
-		Username:              trunk.AuthUsername,
-		Password:              trunk.AuthPassword,
+		Username:              authUser,
+		Password:              authPass,
 		CallTo:                req.SipCallTo,
 		WsUrl:                 wsUrl,
 		Token:                 token,
@@ -94,8 +121,8 @@ func NewCreateSIPParticipantRequest(
 		Dtmf:                  req.Dtmf,
 		PlayDialtone:          req.PlayRingtone || req.PlayDialtone,
 		Headers:               headers,
-		HeadersToAttributes:   trunk.HeadersToAttributes,
-		AttributesToHeaders:   trunk.AttributesToHeaders,
+		HeadersToAttributes:   hdrToAttr,
+		AttributesToHeaders:   attrToHdr,
 		IncludeHeaders:        includeHeaders,
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,

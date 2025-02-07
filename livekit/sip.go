@@ -306,6 +306,23 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	return nil
 }
 
+func (p *SIPOutboundConfig) Validate() error {
+	if p.Hostname == "" {
+		return errors.New("no outbound hostname specified")
+	} else if strings.Contains(p.Hostname, "transport=") {
+		return errors.New("trunk transport should be set as a field, not a URI parameter")
+	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
+		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
+	}
+	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *CreateSIPDispatchRuleRequest) Validate() error {
 	if p.Rule == nil {
 		return errors.New("missing rule")
@@ -314,8 +331,13 @@ func (p *CreateSIPDispatchRuleRequest) Validate() error {
 }
 
 func (p *CreateSIPParticipantRequest) Validate() error {
-	if p.SipTrunkId == "" {
+	if p.SipTrunkId == "" && p.Trunk == nil {
 		return errors.New("missing sip trunk id")
+	}
+	if p.Trunk != nil {
+		if err := p.Trunk.Validate(); err != nil {
+			return err
+		}
 	}
 	if p.SipCallTo == "" {
 		return errors.New("missing sip callee number")
