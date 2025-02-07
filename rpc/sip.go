@@ -55,9 +55,6 @@ func NewCreateSIPParticipantRequest(
 	}
 	// A sanity check for the number format for well-known providers.
 	switch {
-	case strings.HasSuffix(hostname, "telnyx.com"):
-		// Telnyx omits leading '+' by default.
-		outboundNumber = strings.TrimPrefix(outboundNumber, "+")
 	case strings.HasSuffix(hostname, "twilio.com"):
 		// Twilio requires leading '+'.
 		if !strings.HasPrefix(outboundNumber, "+") {
