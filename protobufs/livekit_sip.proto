@@ -423,6 +423,32 @@ message SIPDispatchRuleCallee {
   bool randomize = 3;
 }
 
+message SIPDispatchRuleDynamic {
+  string url = 1;
+}
+
+// SIPDispatchRuleDynamicResponse is the response from the webhook URL.
+message SIPDispatchRuleDynamicResponse {
+  // Room name to dispatch to
+  string room_name = 1;
+
+  // Optional pin required to enter room
+  string pin = 2;
+
+  // User-defined metadata for the Dispatch Rule.
+  // Participants created by this rule will inherit this metadata.
+  string metadata = 3;
+  // User-defined attributes for the Dispatch Rule.
+  // Participants created by this rule will inherit these attributes.
+  map<string, string> attributes = 4;
+
+  // Cloud-only, config preset to use
+  string room_preset = 5;
+
+  // RoomConfiguration to use if the participant initiates the room
+  RoomConfiguration room_config = 6;
+}
+
 message SIPDispatchRule {
   oneof rule {
     // SIPDispatchRuleDirect is a `SIP Dispatch Rule` that puts a user directly into a room
@@ -435,6 +461,11 @@ message SIPDispatchRule {
 
     // SIPDispatchRuleCallee is a `SIP Dispatch Rule` that creates a new room for each callee.
     SIPDispatchRuleCallee dispatch_rule_callee = 3;
+
+    // SIPDispatchRuleDynamic is a webhook-based dispatch rule. SIP will send a request to
+    // a webhook URL that you must implement. You can return information about how the call
+    // should be dispatched.
+    SIPDispatchRuleDynamic dispatch_rule_dynamic = 4;
   }
 }
 
