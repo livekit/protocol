@@ -311,7 +311,7 @@ func (p *SIPOutboundConfig) Validate() error {
 		return errors.New("no outbound hostname specified")
 	} else if strings.Contains(p.Hostname, "transport=") {
 		return errors.New("trunk transport should be set as a field, not a URI parameter")
-	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
+	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Hostname, "sip:") || strings.HasPrefix(p.Hostname, "sips:") {
 		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
 	}
 	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {

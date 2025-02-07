@@ -104,6 +104,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	}, res)
 
 	r.HidePhoneNumber = false
+	r.SipNumber = tr.Numbers[0]
 	r.Trunk = &livekit.SIPOutboundConfig{
 		Hostname:            tr.Address,
 		Transport:           tr.Transport,
@@ -114,6 +115,11 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	}
 	r.SipTrunkId = ""
 	exp.SipTrunkId = ""
+	for k, v := range tr.Headers {
+		if _, ok := r.Headers[k]; !ok {
+			r.Headers[k] = v
+		}
+	}
 	exp.ParticipantAttributes[livekit.AttrSIPTrunkID] = ""
 	res, err = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, nil)
 	require.NoError(t, err)
