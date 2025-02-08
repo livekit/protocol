@@ -165,7 +165,8 @@ func (t testPageItem) ID() string {
 }
 
 type testPageReq struct {
-	Page *Pagination
+	Page        *Pagination
+	ReturnEmpty bool
 }
 
 func (t *testPageReq) GetPage() *Pagination {
@@ -183,31 +184,38 @@ func (t testPageResp) GetItems() []testPageItem {
 }
 
 func TestListPageIter(t *testing.T) {
-	testList := func(t testing.TB, req *testPageReq) {
-		const page = 3
-		var exp []testPageItem
-		for i := 0; i < 10; i++ {
-			exp = append(exp, testPageItem(fmt.Sprintf("%03d", i)))
+	const page = 3
+	var (
+		all []testPageItem
+	)
+	for i := 0; i < 10; i++ {
+		all = append(all, testPageItem(fmt.Sprintf("%03d", i)))
+	}
+	pageFunc := func(ctx context.Context, req *testPageReq) (testPageResp, error) {
+		limit := -1
+		if req.Page != nil {
+			limit = int(req.Page.Limit)
+			if limit == 0 {
+				limit = page
+			}
 		}
-		it := ListPageIter(func(ctx context.Context, req *testPageReq) (testPageResp, error) {
-			limit := -1
-			if req.Page != nil {
-				limit = int(req.Page.Limit)
-				if limit == 0 {
-					limit = page
+		if req.ReturnEmpty {
+			return make(testPageResp, page), nil
+		}
+		var out testPageResp
+		for _, v := range all {
+			if req.Filter(v) && req.Page.Filter(v) {
+				out = append(out, v)
+				if limit > 0 && len(out) >= limit {
+					break
 				}
 			}
-			var out testPageResp
-			for _, v := range exp {
-				if req.Filter(v) && req.Page.Filter(v) {
-					out = append(out, v)
-					if limit > 0 && len(out) >= limit {
-						break
-					}
-				}
-			}
-			return out, nil
-		}, req)
+		}
+		return out, nil
+	}
+	exp := all
+	testList := func(t testing.TB, req *testPageReq) {
+		it := ListPageIter(pageFunc, req)
 
 		got, err := iters.AllPages(context.Background(), it)
 		require.NoError(t, err)
@@ -221,5 +229,12 @@ func TestListPageIter(t *testing.T) {
 	})
 	t.Run("limit", func(t *testing.T) {
 		testList(t, &testPageReq{Page: &Pagination{Limit: 5}})
+	})
+	t.Run("no ids", func(t *testing.T) {
+		it := ListPageIter(pageFunc, &testPageReq{Page: &Pagination{}, ReturnEmpty: true})
+
+		got, err := iters.AllPages(context.Background(), it)
+		require.NoError(t, err)
+		require.Equal(t, []testPageItem(nil), got)
 	})
 }

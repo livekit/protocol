@@ -184,16 +184,17 @@ func (it *listPageIter[T, Req, Resp]) NextPage(ctx context.Context) ([]T, error)
 		// No pagination set - returns all items.
 		// We have to do this to support legacy implementations.
 		it.done = true
-		return page, nil
+		return page, err
 	}
 	// Advance pagination cursor.
+	hasID := false
 	for i := len(page) - 1; i >= 0; i-- {
-		if id := page[i].ID(); id != "" {
+		if id := page[i].ID(); id > opts.AfterId {
 			opts.AfterId = id
-			break
+			hasID = true
 		}
 	}
-	if err == nil && len(page) == 0 {
+	if err == nil && (len(page) == 0 || !hasID) {
 		err = io.EOF
 		it.done = true
 	}
