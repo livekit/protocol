@@ -284,9 +284,6 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 }
 
 func (p *SIPOutboundTrunkInfo) Validate() error {
-	if len(p.Numbers) == 0 {
-		return errors.New("no trunk numbers specified")
-	}
 	if p.Address == "" {
 		return errors.New("no outbound address specified")
 	} else if strings.Contains(p.Address, "transport=") {
