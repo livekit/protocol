@@ -260,6 +260,13 @@ message StreamOutput {
   repeated string urls = 2;    // required
 }
 
+enum AudioMixing {
+  DEFAULT_MIXING = 0;         // all users are mixed together
+  DUAL_CHANNEL_AGENT = 1;     // agent audio in the left channel, all other audio in the right channel
+  DUAL_CHANNEL_ALTERNATE = 2; // each new audio track alternates between left and right channels
+  MULTI_CHANNEL = 3;          // every audio track is mixed into a new channel, max 255 channels
+}
+
 message EncodingOptions {
   int32 width = 1;                // (default 1920)
   int32 height = 2;               // (default 1080)
@@ -269,6 +276,7 @@ message EncodingOptions {
   int32 audio_bitrate = 6;        // (default 128)
   int32 audio_quality = 11;       // quality setting on audio encoder
   int32 audio_frequency = 7;      // (default 44100)
+  AudioMixing audio_mixing = 13;  // (default DEFAULT_MIXING)
   VideoCodec video_codec = 8;     // (default H264_MAIN)
   int32 video_bitrate = 9;        // (default 4500)
   int32 video_quality = 12;       // quality setting on video encoder
