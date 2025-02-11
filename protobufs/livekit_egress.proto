@@ -264,7 +264,6 @@ enum AudioMixing {
   DEFAULT_MIXING = 0;         // all users are mixed together
   DUAL_CHANNEL_AGENT = 1;     // agent audio in the left channel, all other audio in the right channel
   DUAL_CHANNEL_ALTERNATE = 2; // each new audio track alternates between left and right channels
-  MULTI_CHANNEL = 3;          // every audio track is mixed into a new channel, max 255 channels
 }
 
 message EncodingOptions {
