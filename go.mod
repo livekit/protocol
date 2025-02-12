@@ -86,3 +86,5 @@ require (
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241202173237-19429a94021a // indirect
 )
+
+replace github.com/frostbyte73/core => ../frostbyte73/core/core

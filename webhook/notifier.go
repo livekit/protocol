@@ -23,6 +23,7 @@ import (
 )
 
 type QueuedNotifier interface {
+	RegisterProcessedHook(f func(ctx context.Context, whi *livekit.WebhookInfo))
 	QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error
 }
 
@@ -56,11 +57,17 @@ func (n *DefaultNotifier) Stop(force bool) {
 	wg.Wait()
 }
 
-func (n *DefaultNotifier) QueueNotify(_ context.Context, event *livekit.WebhookEvent) error {
+func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
 	for _, u := range n.urlNotifiers {
-		if err := u.QueueNotify(event); err != nil {
+		if err := u.QueueNotify(ctx, event); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (n *DefaultNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
+	for _, u := range n.urlNotifiers {
+		u.RegisterProcessedHook(hook)
+	}
 }

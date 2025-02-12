@@ -16,6 +16,7 @@ package webhook
 
 import (
 	"bytes"
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"sync"
@@ -25,6 +26,7 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/encoding/protojson"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
@@ -37,11 +39,12 @@ const (
 
 type URLNotifierParams struct {
 	HTTPClientParams
-	Logger    logger.Logger
-	QueueSize int
-	URL       string
-	APIKey    string
-	APISecret string
+	Logger     logger.Logger
+	QueueSize  int
+	URL        string
+	APIKey     string
+	APISecret  string
+	FieldsHook func(whi *livekit.WebhookInfo)
 }
 
 type HTTPClientParams struct {
@@ -56,11 +59,12 @@ const defaultQueueSize = 100
 // URLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
 // It will retry on failure, and will drop events if notification fall too far behind
 type URLNotifier struct {
-	mu      sync.RWMutex
-	params  URLNotifierParams
-	client  *retryablehttp.Client
-	dropped atomic.Int32
-	pool    core.QueuePool
+	mu            sync.RWMutex
+	params        URLNotifierParams
+	client        *retryablehttp.Client
+	dropped       atomic.Int32
+	pool          core.QueuePool
+	processedHook func(ctx context.Context, whi *livekit.WebhookInfo)
 }
 
 func NewURLNotifier(params URLNotifierParams) *URLNotifier {
@@ -105,25 +109,74 @@ func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
 	n.params.APISecret = apiSecret
 }
 
-func (n *URLNotifier) QueueNotify(event *livekit.WebhookEvent) error {
+func (n *URLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.processedHook = hook
+}
+
+func (n *URLNotifier) getProcessedHook() func(ctx context.Context, whi *livekit.WebhookInfo) {
+	n.mu.RLock()
+	defer n.mu.RUnlock()
+	return n.processedHook
+}
+
+func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
 	enqueuedAt := time.Now()
 
-	n.pool.Submit(n.eventKey(event), func() {
-		fields := logFields(event)
-		fields = append(fields,
-			"url", n.params.URL,
-			"queueDuration", time.Since(enqueuedAt),
-		)
-		sentStart := time.Now()
+	if !n.pool.Submit(n.eventKey(event), func() {
+		fields := logFields(event, n.params.URL)
+
+		queueDuration := time.Since(enqueuedAt)
+		fields = append(fields, "queueDuration", queueDuration)
+
+		sendStart := time.Now()
 		err := n.send(event)
-		fields = append(fields, "sendDuration", time.Since(sentStart))
+		sendDuration := time.Since(sendStart)
+		fields = append(fields, "sendDuration", sendDuration)
 		if err != nil {
 			n.params.Logger.Warnw("failed to send webhook", err, fields...)
 			n.dropped.Add(event.NumDropped + 1)
 		} else {
 			n.params.Logger.Infow("sent webhook", fields...)
 		}
-	})
+		if ph := n.getProcessedHook(); ph != nil {
+			whi := webhookInfo(
+				event,
+				enqueuedAt,
+				queueDuration,
+				sendStart,
+				sendDuration,
+				n.params.URL,
+				false,
+				err,
+			)
+			if n.params.FieldsHook != nil {
+				n.params.FieldsHook(whi)
+			}
+			ph(ctx, whi)
+		}
+	}) {
+		fields := logFields(event, n.params.URL)
+		n.params.Logger.Infow("dropped webhook", fields...)
+
+		if ph := n.getProcessedHook(); ph != nil {
+			whi := webhookInfo(
+				event,
+				time.Time{},
+				0,
+				time.Time{},
+				0,
+				n.params.URL,
+				true,
+				nil,
+			)
+			if n.params.FieldsHook != nil {
+				n.params.FieldsHook(whi)
+			}
+			ph(ctx, whi)
+		}
+	}
 	return nil
 }
 
@@ -197,12 +250,13 @@ type logAdapter struct{}
 
 func (l *logAdapter) Printf(string, ...interface{}) {}
 
-func logFields(event *livekit.WebhookEvent) []interface{} {
+func logFields(event *livekit.WebhookEvent, url string) []interface{} {
 	fields := make([]interface{}, 0, 20)
 	fields = append(fields,
 		"event", event.Event,
 		"id", event.Id,
 		"webhookTime", event.CreatedAt,
+		"url", url,
 	)
 
 	if event.Room != nil {
@@ -215,6 +269,11 @@ func logFields(event *livekit.WebhookEvent) []interface{} {
 		fields = append(fields,
 			"participant", event.Participant.Identity,
 			"pID", event.Participant.Sid,
+		)
+	}
+	if event.Track != nil {
+		fields = append(fields,
+			"trackID", event.Track.Sid,
 		)
 	}
 	if event.EgressInfo != nil {
@@ -238,4 +297,66 @@ func logFields(event *livekit.WebhookEvent) []interface{} {
 		}
 	}
 	return fields
+}
+
+func webhookInfo(
+	event *livekit.WebhookEvent,
+	queuedAt time.Time,
+	queueDuration time.Duration,
+	sentAt time.Time,
+	sendDuration time.Duration,
+	url string,
+	isDropped bool,
+	sendError error,
+) *livekit.WebhookInfo {
+	whi := &livekit.WebhookInfo{
+		EventId:         event.Id,
+		Event:           event.Event,
+		CreatedAt:       timestamppb.New(time.Unix(event.CreatedAt, 0)),
+		QueuedAt:        timestamppb.New(queuedAt),
+		QueueDurationNs: queueDuration.Nanoseconds(),
+		SentAt:          timestamppb.New(sentAt),
+		SendDurationNs:  sendDuration.Nanoseconds(),
+		Url:             url,
+		NumDropped:      event.NumDropped,
+		IsDropped:       isDropped,
+	}
+	if !queuedAt.IsZero() {
+		whi.QueuedAt = timestamppb.New(queuedAt)
+	}
+	if !sentAt.IsZero() {
+		whi.SentAt = timestamppb.New(sentAt)
+	}
+	if event.Room != nil {
+		whi.RoomName = event.Room.Name
+		whi.RoomId = event.Room.Sid
+	}
+	if event.Participant != nil {
+		whi.ParticipantIdentity = event.Participant.Identity
+		whi.ParticipantId = event.Participant.Sid
+	}
+	if event.Track != nil {
+		whi.TrackId = event.Track.Sid
+	}
+	if event.EgressInfo != nil {
+		whi.EgressId = event.EgressInfo.EgressId
+		whi.ServiceStatus = event.EgressInfo.Status.String()
+		if event.EgressInfo.Error != "" {
+			whi.ServiceErrorCode = event.EgressInfo.ErrorCode
+			whi.ServiceError = event.EgressInfo.Error
+		}
+	}
+	if event.IngressInfo != nil {
+		whi.IngressId = event.IngressInfo.IngressId
+		if event.IngressInfo.State != nil {
+			whi.ServiceStatus = event.IngressInfo.State.Status.String()
+			if event.IngressInfo.State.Error != "" {
+				whi.ServiceError = event.IngressInfo.State.Error
+			}
+		}
+	}
+	if sendError != nil {
+		whi.SendError = sendError.Error()
+	}
+	return whi
 }
