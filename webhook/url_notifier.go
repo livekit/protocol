@@ -97,7 +97,6 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	n.pool = core.NewQueuePool(numWorkers, core.QueueWorkerParams{
 		QueueSize:    params.QueueSize,
 		DropWhenFull: true,
-		OnDropped:    func() { n.dropped.Inc() },
 	})
 	return n
 }
@@ -157,6 +156,8 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 			ph(ctx, whi)
 		}
 	}) {
+		n.dropped.Inc()
+
 		fields := logFields(event, n.params.URL)
 		n.params.Logger.Infow("dropped webhook", fields...)
 

@@ -6,7 +6,7 @@ require (
 	buf.build/go/protoyaml v0.3.1
 	github.com/benbjohnson/clock v1.3.5
 	github.com/dennwc/iters v1.0.1
-	github.com/frostbyte73/core v0.1.0
+	github.com/frostbyte73/core v0.1.1
 	github.com/fsnotify/fsnotify v1.8.0
 	github.com/gammazero/deque v1.0.0
 	github.com/go-jose/go-jose/v3 v3.0.3
@@ -86,5 +86,3 @@ require (
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241202173237-19429a94021a // indirect
 )
-
-replace github.com/frostbyte73/core => ../frostbyte73/core/core
