@@ -100,6 +100,13 @@ func WithDefaultServerOptions(psrpcConfig PSRPCConfig, logger logger.Logger) psr
 	)
 }
 
+func WithClientObservability(logger logger.Logger) psrpc.ClientOption {
+	return psrpc.WithClientOptions(
+		middleware.WithClientMetrics(PSRPCMetricsObserver{}),
+		WithClientLogger(logger),
+	)
+}
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 type TypedSignalClient = SignalClient[livekit.NodeID]
