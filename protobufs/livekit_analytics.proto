@@ -124,8 +124,9 @@ enum AnalyticsEventType {
   SIP_CALL_ENDED = 39;
   REPORT = 40;
   API_CALL = 41;
+  WEBHOOK = 42;
 
-  // NEXT_ID: 42
+  // NEXT_ID: 43
 }
 
 message AnalyticsClientMeta {
@@ -175,8 +176,9 @@ message AnalyticsEvent {
   SIPDispatchRuleInfo sip_dispatch_rule = 32;
   ReportInfo report = 33;
   APICallInfo api_call = 34;
+  WebhookInfo webhook = 35;
 
-  // NEXT_ID: 35
+  // NEXT_ID: 36
 }
 
 message AnalyticsEvents {
@@ -268,4 +270,29 @@ message APICallInfo {
   string track_id = 13;
   google.protobuf.Timestamp started_at = 14;
   int64 duration_ns = 15;
+}
+
+message WebhookInfo {
+  string event_id = 1;
+  string event = 2;
+  string project_id = 3;
+  string room_name = 4;
+  string room_id = 5;
+  string participant_identity = 6;
+  string participant_id = 7;
+  string track_id = 8;
+  string egress_id = 9;
+  string ingress_id = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp queued_at = 12;
+  int64 queue_duration_ns = 13;
+  google.protobuf.Timestamp sent_at = 14;
+  int64 send_duration_ns = 15;
+  string url = 16;
+  int32 num_dropped = 17;
+  bool is_dropped = 18;
+  string service_status = 19;
+  int32 service_error_code = 20;
+  string service_error = 21;
+  string send_error = 22;
 }
