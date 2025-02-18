@@ -96,6 +96,10 @@ func NewCreateSIPParticipantRequest(
 	if req.IncludeHeaders != 0 {
 		includeHeaders = req.IncludeHeaders
 	}
+	participantIdentity := req.ParticipantIdentity
+	if participantIdentity == "" {
+		participantIdentity = "sip_" + req.SipCallTo
+	}
 
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
@@ -111,7 +115,7 @@ func NewCreateSIPParticipantRequest(
 		WsUrl:                 wsUrl,
 		Token:                 token,
 		RoomName:              req.RoomName,
-		ParticipantIdentity:   req.ParticipantIdentity,
+		ParticipantIdentity:   participantIdentity,
 		ParticipantName:       req.ParticipantName,
 		ParticipantMetadata:   req.ParticipantMetadata,
 		ParticipantAttributes: attrs,
