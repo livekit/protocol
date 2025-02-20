@@ -16,6 +16,7 @@ package sip
 
 import (
 	"fmt"
+	"github.com/dennwc/iters"
 	"net/netip"
 	"strconv"
 	"testing"
@@ -226,7 +227,9 @@ func TestSIPMatchTrunk(t *testing.T) {
 				srcIP, err = netip.ParseAddr(src)
 				require.NoError(t, err)
 			}
-			got, err := MatchTrunk(trunks, srcIP, from, to)
+			got, err := MatchTrunkIter(iters.Slice(trunks), srcIP, from, to, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
+				t.Logf("conflict: %v\n%v\nvs\n%v", reason, t1, t2)
+			}))
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
@@ -547,7 +550,9 @@ func TestSIPMatchDispatchRule(t *testing.T) {
 					name = "no pin"
 				}
 				t.Run(name, func(t *testing.T) {
-					got, err := MatchDispatchRule(c.trunk.AsInbound(), c.rules, newSIPReqDispatch(pin, c.noPin))
+					got, err := MatchDispatchRuleIter(c.trunk.AsInbound(), iters.Slice(c.rules), newSIPReqDispatch(pin, c.noPin), WithDispatchRuleConflict(func(r1, r2 *livekit.SIPDispatchRuleInfo, reason DispatchRuleConflictReason) {
+						t.Logf("conflict: %v\n%v\nvs\n%v", reason, r1, r2)
+					}))
 					if c.expErr {
 						require.Error(t, err)
 						require.Nil(t, got)
@@ -575,7 +580,9 @@ func TestSIPValidateDispatchRules(t *testing.T) {
 					r.SipDispatchRuleId = strconv.Itoa(i)
 				}
 			}
-			err := ValidateDispatchRules(c.rules)
+			_, err := ValidateDispatchRulesIter(iters.Slice(c.rules), WithDispatchRuleConflict(func(r1, r2 *livekit.SIPDispatchRuleInfo, reason DispatchRuleConflictReason) {
+				t.Logf("conflict: %v\n%v\nvs\n%v", reason, r1, r2)
+			}))
 			if c.invalid {
 				require.Error(t, err)
 			} else {
