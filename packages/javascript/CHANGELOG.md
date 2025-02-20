@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.34.0
+
+### Minor Changes
+
+- Allow passing all SIP trunk options in CreateSIPParticipant. - [#961](https://github.com/livekit/protocol/pull/961) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Proto for sending API call details to telemetry. - [#964](https://github.com/livekit/protocol/pull/964) ([@boks1971](https://github.com/boks1971))
+
 ## 1.33.0
 
 ### Minor Changes
