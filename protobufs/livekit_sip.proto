@@ -622,21 +622,27 @@ message TransferSIPParticipantRequest {
 message SIPCallInfo {
   string call_id = 1;
   string trunk_id = 2;
+  string dispatch_rule_id = 16;
+  string region = 17;
   string room_name = 3;
   string room_id = 4; // ID of the current/previous room published to
   string participant_identity = 5;
+  map<string, string> participant_attributes = 18;
   SIPUri from_uri = 6;
   SIPUri to_uri = 7;
   repeated SIPFeature enabled_features = 14;
   SIPCallDirection call_direction = 15;
   SIPCallStatus call_status = 8;
-  int64 created_at = 9;
-  int64 started_at = 10;
-  int64 ended_at = 11;
+  int64 created_at_ns = 9;
+  int64 started_at_ns = 10;
+  int64 ended_at_ns = 11;
   DisconnectReason disconnect_reason = 12;
   string error = 13;
+  SIPStatus call_status_code = 19;
+  string audio_codec = 20;
+  string media_encryption = 21;
 
-  // NEXT ID: 16
+  // NEXT ID: 22
 }
 
 message SIPUri {
