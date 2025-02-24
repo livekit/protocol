@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.35.0
+
+### Minor Changes
+
+- More analytics fields for SIPCallInfo. - [#984](https://github.com/livekit/protocol/pull/984) ([@dennwc](https://github.com/dennwc))
+
 ## 1.34.0
 
 ### Minor Changes
