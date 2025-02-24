@@ -10,6 +10,7 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/utils/xtwirp"
 )
@@ -264,6 +265,62 @@ func (p *CreateSIPInboundTrunkRequest) Validate() error {
 	return nil
 }
 
+func (p *UpdateSIPOutboundTrunkRequest) Validate() error {
+	if p.SipTrunkId == "" {
+		return errors.New("trunk id must be set")
+	}
+	if p.Action == nil {
+		return errors.New("missing or unsupported update action")
+	}
+	switch a := p.Action.(type) {
+	default:
+		return nil
+	case *UpdateSIPOutboundTrunkRequest_Replace:
+		info := a.Replace
+		if info == nil {
+			return errors.New("missing trunk")
+		}
+		if info.SipTrunkId != "" && info.SipTrunkId != p.SipTrunkId {
+			return errors.New("trunk id in the info must be empty or match the id in the update")
+		}
+		return info.Validate()
+	case *UpdateSIPOutboundTrunkRequest_Update:
+		diff := a.Update
+		if diff == nil {
+			return errors.New("missing trunk update")
+		}
+		return diff.Validate()
+	}
+}
+
+func (p *UpdateSIPInboundTrunkRequest) Validate() error {
+	if p.SipTrunkId == "" {
+		return errors.New("trunk id must be set")
+	}
+	if p.Action == nil {
+		return errors.New("missing or unsupported update action")
+	}
+	switch a := p.Action.(type) {
+	default:
+		return nil
+	case *UpdateSIPInboundTrunkRequest_Replace:
+		info := a.Replace
+		if info == nil {
+			return errors.New("missing trunk")
+		}
+		if info.SipTrunkId != "" && info.SipTrunkId != p.SipTrunkId {
+			return errors.New("trunk id in the info must be empty or match the id in the update")
+		}
+		return info.Validate()
+	case *UpdateSIPInboundTrunkRequest_Update:
+		diff := a.Update
+		if diff == nil {
+			return errors.New("missing trunk update")
+		}
+		return diff.Validate()
+	}
+}
+
 func (p *SIPInboundTrunkInfo) Validate() error {
 	hasAuth := p.AuthUsername != "" || p.AuthPassword != ""
 	hasCIDR := len(p.AllowedAddresses) != 0
@@ -281,6 +338,63 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 		return err
 	}
 	return nil
+}
+
+func (p *SIPInboundTrunkUpdate) Validate() error {
+	if err := p.Numbers.Validate(); err != nil {
+		return err
+	}
+	if err := p.AllowedAddresses.Validate(); err != nil {
+		return err
+	}
+	if err := p.AllowedNumbers.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+	applyListUpdate(&info.Numbers, p.Numbers)
+	applyListUpdate(&info.AllowedAddresses, p.AllowedAddresses)
+	applyListUpdate(&info.AllowedNumbers, p.AllowedNumbers)
+	applyUpdate(&info.AuthUsername, p.AuthUsername)
+	applyUpdate(&info.AuthPassword, p.AuthPassword)
+	applyUpdate(&info.Name, p.Name)
+	applyUpdate(&info.Metadata, p.Metadata)
+	return info.Validate()
+}
+
+type UpdateSIPOutboundTrunkRequestAction interface {
+	isUpdateSIPOutboundTrunkRequest_Action
+	Apply(info *SIPOutboundTrunkInfo) error
+}
+
+var (
+	_ UpdateSIPOutboundTrunkRequestAction = (*UpdateSIPOutboundTrunkRequest_Replace)(nil)
+	_ UpdateSIPOutboundTrunkRequestAction = (*UpdateSIPOutboundTrunkRequest_Update)(nil)
+)
+
+func (p *UpdateSIPOutboundTrunkRequest_Replace) Apply(info *SIPOutboundTrunkInfo) error {
+	val := p.Replace
+	if val == nil {
+		return errors.New("missing trunk")
+	}
+	if info.SipTrunkId != "" {
+		val.SipTrunkId = info.SipTrunkId
+	}
+	proto.Merge(info, val)
+	return val.Validate()
+}
+
+func (p *UpdateSIPOutboundTrunkRequest_Update) Apply(info *SIPOutboundTrunkInfo) error {
+	diff := p.Update
+	if diff == nil {
+		return errors.New("missing trunk update")
+	}
+	return diff.Apply(info)
 }
 
 func (p *SIPOutboundTrunkInfo) Validate() error {
@@ -323,11 +437,170 @@ func (p *SIPOutboundConfig) Validate() error {
 	return nil
 }
 
+func (p *SIPOutboundTrunkUpdate) Validate() error {
+	if err := p.Numbers.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+	applyUpdate(&info.Address, p.Address)
+	applyUpdate(&info.Transport, p.Transport)
+	applyListUpdate(&info.Numbers, p.Numbers)
+	applyUpdate(&info.AuthUsername, p.AuthUsername)
+	applyUpdate(&info.AuthPassword, p.AuthPassword)
+	applyUpdate(&info.Name, p.Name)
+	applyUpdate(&info.Metadata, p.Metadata)
+	return info.Validate()
+}
+
+type UpdateSIPInboundTrunkRequestAction interface {
+	isUpdateSIPInboundTrunkRequest_Action
+	Apply(info *SIPInboundTrunkInfo) error
+}
+
+var (
+	_ UpdateSIPInboundTrunkRequestAction = (*UpdateSIPInboundTrunkRequest_Replace)(nil)
+	_ UpdateSIPInboundTrunkRequestAction = (*UpdateSIPInboundTrunkRequest_Update)(nil)
+)
+
+func (p *UpdateSIPInboundTrunkRequest_Replace) Apply(info *SIPInboundTrunkInfo) error {
+	val := p.Replace
+	if val == nil {
+		return errors.New("missing trunk")
+	}
+	if info.SipTrunkId != "" {
+		val.SipTrunkId = info.SipTrunkId
+	}
+	proto.Merge(info, val)
+	return val.Validate()
+}
+
+func (p *UpdateSIPInboundTrunkRequest_Update) Apply(info *SIPInboundTrunkInfo) error {
+	diff := p.Update
+	if diff == nil {
+		return errors.New("missing trunk update")
+	}
+	return diff.Apply(info)
+}
+
+func (p *CreateSIPDispatchRuleRequest) DispatchRuleInfo() *SIPDispatchRuleInfo {
+	if p == nil {
+		return nil
+	}
+	if p.DispatchRule != nil {
+		return p.DispatchRule
+	}
+	return &SIPDispatchRuleInfo{
+		Rule:            p.Rule,
+		TrunkIds:        p.TrunkIds,
+		InboundNumbers:  p.InboundNumbers,
+		HidePhoneNumber: p.HidePhoneNumber,
+		Name:            p.Name,
+		Metadata:        p.Metadata,
+		Attributes:      p.Attributes,
+		RoomPreset:      p.RoomPreset,
+		RoomConfig:      p.RoomConfig,
+	}
+}
+
 func (p *CreateSIPDispatchRuleRequest) Validate() error {
+	if p.DispatchRule == nil {
+		// legacy
+		return p.DispatchRuleInfo().Validate()
+	}
+	if p.DispatchRule.SipDispatchRuleId != "" {
+		return errors.New("rule id must not be set")
+	}
+	return p.DispatchRule.Validate()
+}
+
+func (p *UpdateSIPDispatchRuleRequest) Validate() error {
+	if p.SipDispatchRuleId == "" {
+		return errors.New("rule id must be set")
+	}
+	if p.Action == nil {
+		return errors.New("missing or unsupported update action")
+	}
+	switch a := p.Action.(type) {
+	default:
+		return nil
+	case *UpdateSIPDispatchRuleRequest_Replace:
+		info := a.Replace
+		if info == nil {
+			return errors.New("missing dispatch rule")
+		}
+		if info.SipDispatchRuleId != "" && info.SipDispatchRuleId != p.SipDispatchRuleId {
+			return errors.New("rule id in the info must be empty or match the id in the update")
+		}
+		return info.Validate()
+	case *UpdateSIPDispatchRuleRequest_Update:
+		diff := a.Update
+		if diff == nil {
+			return errors.New("missing dispatch rule update")
+		}
+		return diff.Validate()
+	}
+}
+
+func (p *SIPDispatchRuleInfo) Validate() error {
 	if p.Rule == nil {
 		return errors.New("missing rule")
 	}
 	return nil
+}
+
+func (p *SIPDispatchRuleUpdate) Validate() error {
+	if err := p.TrunkIds.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
+	if err := p.Validate(); err != nil {
+		return err
+	}
+	applyListUpdate(&info.TrunkIds, p.TrunkIds)
+	applyUpdate(&info.Rule, &p.Rule)
+	applyUpdate(&info.Name, p.Name)
+	applyUpdate(&info.Metadata, p.Metadata)
+	applyMapDiff(&info.Attributes, p.Attributes)
+	return info.Validate()
+}
+
+type UpdateSIPDispatchRuleRequestAction interface {
+	isUpdateSIPDispatchRuleRequest_Action
+	Apply(info *SIPDispatchRuleInfo) error
+}
+
+var (
+	_ UpdateSIPDispatchRuleRequestAction = (*UpdateSIPDispatchRuleRequest_Replace)(nil)
+	_ UpdateSIPDispatchRuleRequestAction = (*UpdateSIPDispatchRuleRequest_Update)(nil)
+)
+
+func (p *UpdateSIPDispatchRuleRequest_Replace) Apply(info *SIPDispatchRuleInfo) error {
+	val := p.Replace
+	if val == nil {
+		return errors.New("missing dispatch rule")
+	}
+	if info.SipDispatchRuleId != "" {
+		val.SipDispatchRuleId = info.SipDispatchRuleId
+	}
+	proto.Merge(info, val)
+	return val.Validate()
+}
+
+func (p *UpdateSIPDispatchRuleRequest_Update) Apply(info *SIPDispatchRuleInfo) error {
+	diff := p.Update
+	if diff == nil {
+		return errors.New("missing dispatch rule update")
+	}
+	return diff.Apply(info)
 }
 
 func (p *CreateSIPParticipantRequest) Validate() error {
