@@ -75,19 +75,21 @@ message UpdateIngressStateRequest {
 
 message GetSIPTrunkAuthenticationRequest {
   string sip_call_id = 6;
+
   // What Number is calling
   string from = 2;
+  // What Host is calling
+  string from_host = 7;
 
   // What Number was called
   string to = 3;
+  // What Host was called
+  string to_host = 5;
 
   // What is the IP address of the called number
   string src_address = 4;
 
-  // What Host was called
-  string to_host = 5;
-
-  // NEXT ID: 7
+  // NEXT ID: 8
 }
 
 message GetSIPTrunkAuthenticationResponse {
