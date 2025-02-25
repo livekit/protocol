@@ -16,6 +16,8 @@ const (
 	// AttrSIPPhoneNumber attribute contains number external to LiveKit SIP (caller for inbound and called number for outbound).
 	// This attribute will be omitted if HidePhoneNumber is set.
 	AttrSIPPhoneNumber = AttrSIPPrefix + "phoneNumber"
+	// AttrSIPHostName attribute contains host name external to LiveKit SIP (caller for inbound and called number for outbound).
+	AttrSIPHostName = AttrSIPPrefix + "hostname"
 	// AttrSIPCallStatus attribute contains current call status for a SIP call associated with the participant.
 	//
 	// SIP participant is ready when it reaches "active" status.

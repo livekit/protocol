@@ -110,6 +110,9 @@ message EvaluateSIPDispatchRulesRequest {
   // What Number is calling
   string calling_number = 2;
 
+  // What Host is calling
+  string calling_host = 11;
+
   // What Number was called
   string called_number = 3;
 
@@ -129,7 +132,7 @@ message EvaluateSIPDispatchRulesRequest {
   // Usually include provider-specific metadata.
   map<string, string> extra_attributes = 9;
 
-  // NEXT ID: 11
+  // NEXT ID: 12
 }
 
 message EvaluateSIPDispatchRulesResponse {
