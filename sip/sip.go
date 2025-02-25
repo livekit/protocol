@@ -376,18 +376,19 @@ func ValidateTrunksIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], opts ...Mat
 }
 
 func isValidMask(mask string) bool {
-	if !strings.Contains(mask, "/") {
-		expIP, err := netip.ParseAddr(mask)
-		if err != nil {
-			return false
-		}
-		return expIP.IsValid()
-	}
-	pref, err := netip.ParsePrefix(mask)
-	if err != nil {
+	// Allowed formats:
+	// - 1.2.3.4
+	// - 1.2.3.4/8
+	// - [::]
+	// - [::]/8
+	// - some.host.name
+	if strings.ContainsAny(mask, "()+*;, \t\n\r") {
 		return false
 	}
-	return pref.IsValid()
+	if strings.Contains(mask, "://") {
+		return false
+	}
+	return true
 }
 
 func filterInvalidAddrMasks(masks []string) []string {
@@ -418,7 +419,7 @@ func matchAddrMask(ip netip.Addr, mask string) bool {
 	return pref.Contains(ip)
 }
 
-func matchAddrMasks(addr netip.Addr, masks []string) bool {
+func matchAddrMasks(addr netip.Addr, host string, masks []string) bool {
 	if !addr.IsValid() {
 		return true
 	}
@@ -427,7 +428,7 @@ func matchAddrMasks(addr netip.Addr, masks []string) bool {
 		return true
 	}
 	for _, mask := range masks {
-		if matchAddrMask(addr, mask) {
+		if mask == host || matchAddrMask(addr, mask) {
 			return true
 		}
 	}
@@ -451,8 +452,8 @@ func matchNumbers(num string, allowed []string) bool {
 // Returns nil if no rules matched or an error if there are conflicting definitions.
 //
 // Deprecated: use MatchTrunkIter
-func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, srcIP netip.Addr, calling, called string, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
-	return MatchTrunkIter(iters.Slice(trunks), srcIP, calling, called, opts...)
+func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, srcIP netip.Addr, calling, called string, callingHost string, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
+	return MatchTrunkIter(iters.Slice(trunks), srcIP, calling, called, callingHost, opts...)
 }
 
 type matchTrunkOpts struct {
@@ -518,7 +519,7 @@ func WithTrunkConflict(fnc TrunkConflictFunc) MatchTrunkOpt {
 
 // MatchTrunkIter finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
-func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], srcIP netip.Addr, calling, called string, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
+func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], srcIP netip.Addr, calling, called string, callingHost string, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
 	defer it.Close()
 	var opt matchTrunkOpts
 	for _, fnc := range opts {
@@ -544,7 +545,7 @@ func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], srcIP netip.Add
 			opt.Filtered(tr, TrunkFilteredCallingNumberDisallowed)
 			continue
 		}
-		if !matchAddrMasks(srcIP, tr.AllowedAddresses) {
+		if !matchAddrMasks(srcIP, callingHost, tr.AllowedAddresses) {
 			opt.Filtered(tr, TrunkFilteredSourceAddressDisallowed)
 			continue
 		}
@@ -757,6 +758,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		fromName = "Phone " + from
 	} else {
 		attrs[livekit.AttrSIPPhoneNumber] = req.CallingNumber
+		attrs[livekit.AttrSIPHostName] = req.CallingHost
 		attrs[livekit.AttrSIPTrunkNumber] = req.CalledNumber
 	}
 

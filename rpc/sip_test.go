@@ -60,6 +60,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			livekit.AttrSIPTrunkID:     "trunk",
 			livekit.AttrSIPTrunkNumber: "+1111",
 			livekit.AttrSIPPhoneNumber: "+3333",
+			livekit.AttrSIPHostName:    "sip.example.com",
 		},
 		Headers: map[string]string{
 			"X-A": "A",

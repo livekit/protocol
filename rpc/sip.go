@@ -73,6 +73,7 @@ func NewCreateSIPParticipantRequest(
 	attrs[livekit.AttrSIPTrunkID] = trunkID
 	if !req.HidePhoneNumber {
 		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
+		attrs[livekit.AttrSIPHostName] = hostname
 		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
 	}
 
