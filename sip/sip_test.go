@@ -27,6 +27,25 @@ import (
 	"github.com/livekit/protocol/rpc"
 )
 
+func TestNormalizeNumber(t *testing.T) {
+	cases := []struct {
+		name string
+		num  string
+		exp  string
+	}{
+		{"empty", "", ""},
+		{"number", "123", "+123"},
+		{"plus", "+123", "+123"},
+		{"user", "user", "user"},
+		{"human", "(123) 456 7890", "+1234567890"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			require.Equal(t, c.exp, NormalizeNumber(c.num))
+		})
+	}
+}
+
 const (
 	sipNumber1  = "1111 1111"
 	sipNumber2  = "2222 2222"

@@ -22,6 +22,7 @@ import (
 	"maps"
 	"math"
 	"net/netip"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -201,7 +202,7 @@ func (v *DispatchRuleValidator) Validate(r *livekit.SIPDispatchRuleInfo) error {
 	}
 	for _, trunk := range trunks {
 		for _, number := range numbers {
-			key := dispatchRuleKey{Pin: pin, Trunk: trunk, Number: normalizeNumber(number)}
+			key := dispatchRuleKey{Pin: pin, Trunk: trunk, Number: NormalizeNumber(number)}
 			r2 := v.byRuleKey[key]
 			if r2 != nil {
 				v.opt.Conflict(r, r2, DispatchRuleConflictGeneric)
@@ -273,14 +274,26 @@ func printNumbers(numbers []string) string {
 	return fmt.Sprintf("%q", numbers)
 }
 
-func normalizeNumber(num string) string {
+var (
+	reNumber     = regexp.MustCompile(`^\+?[\d\- ()]+$`)
+	reNumberRepl = strings.NewReplacer(
+		" ", "",
+		"-", "",
+		"(", "",
+		")", "",
+	)
+)
+
+func NormalizeNumber(num string) string {
 	if num == "" {
 		return ""
 	}
-	// TODO: Always keep "number" as-is if it's not E.164.
-	//       This will only matter for native SIP clients which have '+' in the username.
-	if !strings.HasPrefix(num, `+`) {
-		num = "+" + num
+	if !reNumber.MatchString(num) {
+		return num
+	}
+	num = reNumberRepl.Replace(num)
+	if !strings.HasPrefix(num, "+") {
+		return "+" + num
 	}
 	return num
 }
@@ -298,7 +311,7 @@ func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *
 		byInbound[""] = t
 	} else {
 		for _, num := range t.AllowedNumbers {
-			inboundKey := normalizeNumber(num)
+			inboundKey := NormalizeNumber(num)
 			t2 := byInbound[inboundKey]
 			if t2 != nil {
 				opt.Conflict(t, t2, TrunkConflictCallingNumber)
@@ -425,9 +438,9 @@ func matchNumbers(num string, allowed []string) bool {
 	if len(allowed) == 0 {
 		return true
 	}
-	num = normalizeNumber(num)
+	norm := NormalizeNumber(num)
 	for _, allow := range allowed {
-		if num == normalizeNumber(allow) {
+		if num == allow || norm == NormalizeNumber(allow) {
 			return true
 		}
 	}
@@ -518,7 +531,7 @@ func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], srcIP netip.Add
 		defaultTrunkPrev *livekit.SIPInboundTrunkInfo
 		defaultTrunkCnt  int // to error in case there are multiple ones
 	)
-	calledNorm := normalizeNumber(called)
+	calledNorm := NormalizeNumber(called)
 	for {
 		tr, err := it.Next()
 		if err == io.EOF {
@@ -542,7 +555,7 @@ func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], srcIP netip.Add
 			defaultTrunkCnt++
 		} else {
 			for _, num := range tr.Numbers {
-				if normalizeNumber(num) == calledNorm {
+				if num == called || NormalizeNumber(num) == calledNorm {
 					// Trunk specific to the number.
 					if selectedTrunk != nil {
 						opt.Conflict(selectedTrunk, tr, TrunkConflictCalledNumber)
