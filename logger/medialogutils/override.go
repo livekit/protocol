@@ -21,9 +21,13 @@ type OverrideLogger struct {
 	logger.Logger
 }
 
-func NewOverrideLogger() *OverrideLogger {
+func NewOverrideLogger(l logger.Logger) *OverrideLogger {
+	if l == nil {
+		l = logger.GetLogger()
+	}
+
 	return &OverrideLogger{
-		Logger: logger.GetLogger(),
+		Logger: l,
 	}
 }
 
