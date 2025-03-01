@@ -4,10 +4,65 @@ import (
 	"errors"
 	"maps"
 	"math/rand/v2"
+	"net"
 	"strings"
 
 	"github.com/livekit/protocol/livekit"
 )
+
+func (p *GetSIPTrunkAuthenticationRequest) SIPCall() *SIPCall {
+	if p == nil {
+		return nil
+	}
+	if p.Call != nil {
+		return p.Call
+	}
+	ip := p.SrcAddress
+	if addr, _, err := net.SplitHostPort(ip); err == nil {
+		ip = addr
+	}
+	c := &SIPCall{
+		LkCallId: p.SipCallId,
+		SourceIp: ip,
+		From: &livekit.SIPUri{
+			User: p.From,
+			Host: p.FromHost,
+		},
+		To: &livekit.SIPUri{
+			User: p.To,
+			Host: p.ToHost,
+		},
+	}
+	c.Address = c.To
+	return c
+}
+
+func (p *EvaluateSIPDispatchRulesRequest) SIPCall() *SIPCall {
+	if p == nil {
+		return nil
+	}
+	if p.Call != nil {
+		return p.Call
+	}
+	ip := p.SrcAddress
+	if addr, _, err := net.SplitHostPort(ip); err == nil {
+		ip = addr
+	}
+	c := &SIPCall{
+		LkCallId: p.SipCallId,
+		SourceIp: ip,
+		From: &livekit.SIPUri{
+			User: p.CallingNumber,
+			Host: p.CallingHost,
+		},
+		To: &livekit.SIPUri{
+			User: p.CalledNumber,
+			Host: p.CalledHost,
+		},
+	}
+	c.Address = c.To
+	return c
+}
 
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.

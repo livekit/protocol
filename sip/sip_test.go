@@ -16,10 +16,11 @@ package sip
 
 import (
 	"fmt"
-	"github.com/dennwc/iters"
 	"net/netip"
 	"strconv"
 	"testing"
+
+	"github.com/dennwc/iters"
 
 	"github.com/stretchr/testify/require"
 
@@ -254,13 +255,18 @@ func TestSIPMatchTrunk(t *testing.T) {
 				host = "sip.example.com"
 			}
 			trunks := toInboundTrunks(c.trunks)
-			var srcIP netip.Addr
-			if src != "" {
-				var err error
-				srcIP, err = netip.ParseAddr(src)
-				require.NoError(t, err)
+			call := &rpc.SIPCall{
+				SourceIp: src,
+				From: &livekit.SIPUri{
+					User: from,
+					Host: host,
+				},
+				To: &livekit.SIPUri{
+					User: to,
+				},
 			}
-			got, err := MatchTrunkIter(iters.Slice(trunks), srcIP, from, to, host, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
+			call.Address = call.To
+			got, err := MatchTrunkIter(iters.Slice(trunks), call, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
 				t.Logf("conflict: %v\n%v\nvs\n%v", reason, t1, t2)
 			}))
 			if c.expErr {
@@ -813,9 +819,7 @@ func TestMatchMasks(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			ip, err := netip.ParseAddr(c.addr)
-			require.NoError(t, err)
-			got := matchAddrMasks(ip, c.host, c.masks)
+			got := matchAddrMasks(c.addr, c.host, c.masks)
 			require.Equal(t, c.exp, got)
 		})
 	}
