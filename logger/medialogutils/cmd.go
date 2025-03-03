@@ -39,11 +39,13 @@ func (l *CmdLogger) Write(p []byte) (int, error) {
 
 // HandlerLogger catches stray outputs from egress handlers
 type HandlerLogger struct {
+	json   bool
 	logger logger.Logger
 }
 
-func NewHandlerLogger(keyAndValues ...any) *HandlerLogger {
+func NewHandlerLogger(json bool, keyAndValues ...any) *HandlerLogger {
 	return &HandlerLogger{
+		json:   json,
 		logger: logger.GetLogger().WithValues(keyAndValues...),
 	}
 }
@@ -52,8 +54,9 @@ func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 	s := strings.Split(strings.TrimSuffix(string(p), "\n"), "\n")
 	for _, line := range s {
 		switch {
-		case strings.HasPrefix(line, `{"level":"`):
-			// json log
+		case (l.json && strings.HasPrefix(line, `{"level":"`)) ||
+			(!l.json && len(line) > 24 && line[24] == '\t'):
+			// (probably) normal log
 			fmt.Println(s)
 		case strings.HasPrefix(line, "0:00:"):
 			// ignore cuda and template not mapped gstreamer warnings
