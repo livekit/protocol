@@ -49,18 +49,22 @@ func NewHandlerLogger(keyAndValues ...any) *HandlerLogger {
 }
 
 func (l *HandlerLogger) Write(p []byte) (n int, err error) {
-	s := string(p)
-	if strings.HasSuffix(s, "}\n") {
-		// normal handler logs
-		fmt.Print(s)
-	} else if strings.HasPrefix(s, "0:00:") || strings.HasPrefix(s, "te_audio_template_caps") {
-		// ignore cuda and template not mapped gstreamer warnings
-	} else if strings.HasPrefix(s, "turnc") {
-		// warn on turnc error
-		l.logger.Infow(s)
-	} else {
-		// panics and unexpected errors
-		l.logger.Errorw(s, nil)
+	s := strings.Split(strings.TrimSuffix(string(p), "\n"), "\n")
+	for _, line := range s {
+		switch {
+		case strings.HasPrefix(line, `{"level":"`):
+			// json log
+			fmt.Println(s)
+		case strings.HasPrefix(line, "0:00:"):
+			// ignore cuda and template not mapped gstreamer warnings
+			continue
+		case strings.HasPrefix(line, "turnc"):
+			// warn on turnc error
+			l.logger.Infow(line)
+		default:
+			// panics and unexpected errors
+			l.logger.Errorw(line, nil)
+		}
 	}
 
 	return len(p), nil
