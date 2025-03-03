@@ -39,28 +39,35 @@ func (l *CmdLogger) Write(p []byte) (int, error) {
 
 // HandlerLogger catches stray outputs from egress handlers
 type HandlerLogger struct {
+	json   bool
 	logger logger.Logger
 }
 
-func NewHandlerLogger(keyAndValues ...any) *HandlerLogger {
+func NewHandlerLogger(json bool, keyAndValues ...any) *HandlerLogger {
 	return &HandlerLogger{
+		json:   json,
 		logger: logger.GetLogger().WithValues(keyAndValues...),
 	}
 }
 
 func (l *HandlerLogger) Write(p []byte) (n int, err error) {
-	s := string(p)
-	if strings.HasSuffix(s, "}\n") {
-		// normal handler logs
-		fmt.Print(s)
-	} else if strings.HasPrefix(s, "0:00:") || strings.HasPrefix(s, "te_audio_template_caps") {
-		// ignore cuda and template not mapped gstreamer warnings
-	} else if strings.HasPrefix(s, "turnc") {
-		// warn on turnc error
-		l.logger.Infow(s)
-	} else {
-		// panics and unexpected errors
-		l.logger.Errorw(s, nil)
+	s := strings.Split(strings.TrimSuffix(string(p), "\n"), "\n")
+	for _, line := range s {
+		switch {
+		case (l.json && strings.HasPrefix(line, `{"level":"`)) ||
+			(!l.json && len(line) > 24 && line[24] == '\t'):
+			// (probably) normal log
+			fmt.Println(line)
+		case strings.HasPrefix(line, "0:00:"):
+			// ignore cuda and template not mapped gstreamer warnings
+			continue
+		case strings.HasPrefix(line, "turnc"):
+			// warn on turnc error
+			l.logger.Infow(line)
+		default:
+			// panics and unexpected errors
+			l.logger.Errorw(line, nil)
+		}
 	}
 
 	return len(p), nil
