@@ -57,7 +57,7 @@ func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 		case (l.json && strings.HasPrefix(line, `{"level":"`)) ||
 			(!l.json && len(line) > 24 && line[24] == '\t'):
 			// (probably) normal log
-			fmt.Println(s)
+			fmt.Println(line)
 		case strings.HasPrefix(line, "0:00:"):
 			// ignore cuda and template not mapped gstreamer warnings
 			continue
