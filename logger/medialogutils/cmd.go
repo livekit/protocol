@@ -57,7 +57,7 @@ func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 		// ignore cuda and template not mapped gstreamer warnings
 	} else if strings.HasPrefix(s, "turnc") {
 		// warn on turnc error
-		l.logger.Infow(s, nil)
+		l.logger.Infow(s)
 	} else {
 		// panics and unexpected errors
 		l.logger.Errorw(s, nil)
