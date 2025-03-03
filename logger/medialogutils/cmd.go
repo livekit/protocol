@@ -53,11 +53,11 @@ func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 	if strings.HasSuffix(s, "}\n") {
 		// normal handler logs
 		fmt.Print(s)
-	} else if strings.HasPrefix(s, "0:00:") {
+	} else if strings.HasPrefix(s, "0:00:") || strings.HasPrefix(s, "te_audio_template_caps") {
 		// ignore cuda and template not mapped gstreamer warnings
 	} else if strings.HasPrefix(s, "turnc") {
 		// warn on turnc error
-		l.logger.Infow(s, nil)
+		l.logger.Infow(s)
 	} else {
 		// panics and unexpected errors
 		l.logger.Errorw(s, nil)
