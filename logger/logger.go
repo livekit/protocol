@@ -418,7 +418,7 @@ func (l *zapLogger[T]) WithoutSampler() Logger {
 func (l *zapLogger[T]) WithDeferredValues() (Logger, DeferredFieldResolver) {
 	dup := *l
 	def, resolve := zaputil.NewDeferrer()
-	dup.deferred = append(dup.deferred, def)
+	dup.deferred = append(dup.deferred[0:len(dup.deferred):len(dup.deferred)], def)
 	dup.zap = dup.makeZap()
 	return &dup, resolve
 }

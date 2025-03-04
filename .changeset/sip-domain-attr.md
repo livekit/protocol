@@ -3,4 +3,4 @@
 "github.com/livekit/protocol": minor
 ---
 
-Add filters to SIP list APIs.
+Handle SIP hostname in address filters. Expose attribute.

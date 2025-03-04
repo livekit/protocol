@@ -26,7 +26,7 @@ service AgentInternal {
   rpc CheckEnabled(livekit.CheckEnabledRequest) returns (livekit.CheckEnabledResponse) {
     option (psrpc.options).multi = true;
   };
-  rpc CheckAvailibility(livekit.CheckAvailibilityRequest) returns (livekit.CheckAvailibilityResponse) {
+  rpc CheckAvailability(livekit.CheckAvailabilityRequest) returns (livekit.CheckAvailabilityResponse) {
     option (psrpc.options).multi = true;
   };
   rpc JobRequest(livekit.Job) returns (JobRequestResponse) {

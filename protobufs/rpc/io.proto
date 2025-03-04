@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "livekit_room.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 
@@ -73,20 +74,24 @@ message UpdateIngressStateRequest {
 }
 
 message GetSIPTrunkAuthenticationRequest {
-  string sip_call_id = 6;
+  string sip_call_id = 6 [deprecated=true];
+
   // What Number is calling
-  string from = 2;
+  string from = 2 [deprecated=true];
+  // What Host is calling
+  string from_host = 7 [deprecated=true];
 
   // What Number was called
-  string to = 3;
+  string to = 3 [deprecated=true];
+  // What Host was called
+  string to_host = 5 [deprecated=true];
 
   // What is the IP address of the called number
-  string src_address = 4;
+  string src_address = 4 [deprecated=true];
 
-  // What Host was called
-  string to_host = 5;
+  SIPCall call = 8;
 
-  // NEXT ID: 7
+  // NEXT ID: 9
 }
 
 message GetSIPTrunkAuthenticationResponse {
@@ -101,19 +106,22 @@ message GetSIPTrunkAuthenticationResponse {
 }
 
 message EvaluateSIPDispatchRulesRequest {
-  string sip_call_id = 8;
+  string sip_call_id = 8 [deprecated=true];
   string sip_participant_id = 1 [deprecated=true];
   // Trunk from the auth response, if any
   string sip_trunk_id = 10;
 
   // What Number is calling
-  string calling_number = 2;
+  string calling_number = 2 [deprecated=true];
+
+  // What Host is calling
+  string calling_host = 11 [deprecated=true];
 
   // What Number was called
-  string called_number = 3;
+  string called_number = 3 [deprecated=true];
 
   // What is the IP address of the called number
-  string src_address = 4;
+  string src_address = 4 [deprecated=true];
 
   // What pin has been entered if any
   string pin = 5;
@@ -122,13 +130,15 @@ message EvaluateSIPDispatchRulesRequest {
   bool no_pin = 6;
 
   // What Host was called
-  string called_host = 7;
+  string called_host = 7 [deprecated=true];
 
   // Extra participant attributes added for this call.
   // Usually include provider-specific metadata.
   map<string, string> extra_attributes = 9;
 
-  // NEXT ID: 11
+  SIPCall call = 12;
+
+  // NEXT ID: 13
 }
 
 message EvaluateSIPDispatchRulesResponse {
@@ -186,7 +196,15 @@ message EvaluateSIPDispatchRulesResponse {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 17;
 
-  // NEXT ID: 20
+  // Room preset and config are used only to generate tokens
+  // once tokens are returned by this response consistently, it will no longer
+  // be needed
+  string room_preset = 20;
+  livekit.RoomConfiguration room_config = 21;
+
+  livekit.SIPMediaEncryption media_encryption = 22;
+
+  // NEXT ID: 23
 }
 
 message UpdateSIPCallStateRequest {
@@ -201,4 +219,13 @@ enum SIPDispatchResult {
   REQUEST_PIN = 2;
   REJECT = 3;
   DROP = 4;
+}
+
+message SIPCall {
+  string lk_call_id = 1;
+  string source_ip = 2; // source ip (without port)
+  livekit.SIPUri address = 3; // address in the request line (INVITE)
+  livekit.SIPUri from = 4; // From header
+  livekit.SIPUri to = 5; // To header
+  repeated livekit.SIPUri via = 6; // Via headers
 }

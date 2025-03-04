@@ -1,5 +1,77 @@
 # @livekit/protocol
 
+## 1.34.0
+
+### Minor Changes
+
+- Allow passing all SIP trunk options in CreateSIPParticipant. - [#961](https://github.com/livekit/protocol/pull/961) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Proto for sending API call details to telemetry. - [#964](https://github.com/livekit/protocol/pull/964) ([@boks1971](https://github.com/boks1971))
+
+## 1.33.0
+
+### Minor Changes
+
+- Add flag to make CreateSIPParticipant synchronous. - [#952](https://github.com/livekit/protocol/pull/952) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Proto to "report" different kinds of data. - [#962](https://github.com/livekit/protocol/pull/962) ([@boks1971](https://github.com/boks1971))
+
+- Add backup codec policy to AddTrackRequest - [#947](https://github.com/livekit/protocol/pull/947) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Add Ingress OutOfNetwork attribute keys. Add the CanUpdateOwnMetadata claim to the ingress token - [#965](https://github.com/livekit/protocol/pull/965) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+## 1.32.1
+
+### Patch Changes
+
+- Add nonce to SendDataRequest #953 - [#954](https://github.com/livekit/protocol/pull/954) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.32.0
+
+### Minor Changes
+
+- Use iterators in SIP. - [#943](https://github.com/livekit/protocol/pull/943) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Rename File* related DataStream messages to Byte* - [#948](https://github.com/livekit/protocol/pull/948) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.31.0
+
+### Minor Changes
+
+- Add media encryption options for SIP. - [#892](https://github.com/livekit/protocol/pull/892) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add "Enabled" flag to ingresses to allow preventing an ingress to become active without deleting it. - [#937](https://github.com/livekit/protocol/pull/937) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add DataStream.Trailer for finalizing streams - [#940](https://github.com/livekit/protocol/pull/940) ([@lukasIO](https://github.com/lukasIO))
+
+- Add SIPCallDirection to SIPCallInfo - [#938](https://github.com/livekit/protocol/pull/938) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+## 1.30.0
+
+### Minor Changes
+
+- Add filters to SIP list APIs. - [#913](https://github.com/livekit/protocol/pull/913) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for SIP call transfer. - [#926](https://github.com/livekit/protocol/pull/926) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for CreateSipParticipant - [#911](https://github.com/livekit/protocol/pull/911) ([@s-hamdananwar](https://github.com/s-hamdananwar))
+
+- Allow mapping all SIP headers to attributes. - [#920](https://github.com/livekit/protocol/pull/920) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Allow SIP inbound to specify room configuration - [#923](https://github.com/livekit/protocol/pull/923) ([@davidzhao](https://github.com/davidzhao))
+
+- Add EgressSourceType to EgressInfo - [#894](https://github.com/livekit/protocol/pull/894) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.29.4
 
 ### Patch Changes

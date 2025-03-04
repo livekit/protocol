@@ -45,12 +45,13 @@ service Egress {
 
 // composite using a web browser
 message RoomCompositeEgressRequest {
-  string room_name = 1;         // required
-  string layout = 2;            // (optional)
-  bool audio_only = 3;          // (default false)
-  bool video_only = 4;          // (default false)
-  string custom_base_url = 5;   // template base url (default https://recorder.livekit.io)
-  oneof output {                // deprecated (use _output fields)
+  string room_name = 1;          // required
+  string layout = 2;             // (optional)
+  bool audio_only = 3;           // (default false)
+  AudioMixing audio_mixing = 15; // only applies to audio_only egress (default DEFAULT_MIXING)
+  bool video_only = 4;           // (default false)
+  string custom_base_url = 5;    // template base url (default https://recorder.livekit.io)
+  oneof output {                 // deprecated (use _output fields)
     EncodedFileOutput file = 6 [deprecated = true];
     StreamOutput stream = 7 [deprecated = true];
     SegmentedFileOutput segments = 10 [deprecated = true];
@@ -260,6 +261,12 @@ message StreamOutput {
   repeated string urls = 2;    // required
 }
 
+enum AudioMixing {
+  DEFAULT_MIXING = 0;         // all users are mixed together
+  DUAL_CHANNEL_AGENT = 1;     // agent audio in the left channel, all other audio in the right channel
+  DUAL_CHANNEL_ALTERNATE = 2; // each new audio track alternates between left and right channels
+}
+
 message EncodingOptions {
   int32 width = 1;                // (default 1920)
   int32 height = 2;               // (default 1080)
@@ -321,10 +328,16 @@ enum EgressStatus {
   EGRESS_LIMIT_REACHED = 6;
 }
 
+enum EgressSourceType {
+  EGRESS_SOURCE_TYPE_WEB = 0;
+  EGRESS_SOURCE_TYPE_SDK = 1;
+}
+
 message EgressInfo {
   string egress_id = 1;
   string room_id = 2;
   string room_name = 13;
+  EgressSourceType source_type = 26;
   EgressStatus status = 3;
   int64 started_at = 10;
   int64 ended_at = 11;
@@ -350,7 +363,7 @@ message EgressInfo {
   repeated ImagesInfo image_results = 20;
   string manifest_location = 23;
   bool backup_storage_used = 25;
-  // next ID: 26
+  // next ID: 27
 }
 
 message StreamInfoList {

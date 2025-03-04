@@ -5,8 +5,81 @@ import (
 	"fmt"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	"github.com/livekit/protocol/utils/xtwirp"
 )
+
+var (
+	_ xtwirp.ErrorMeta = (*SIPStatus)(nil)
+	_ error            = (*SIPStatus)(nil)
+)
+
+func (p SIPStatusCode) ShortName() string {
+	return strings.TrimPrefix(p.String(), "SIP_STATUS_")
+}
+
+func (p *SIPStatus) Error() string {
+	if p.Status != "" {
+		return fmt.Sprintf("sip status: %d: %s", p.Code, p.Status)
+	}
+	return fmt.Sprintf("sip status: %d (%s)", p.Code, p.Code.ShortName())
+}
+
+func (p *SIPStatus) GRPCStatus() *status.Status {
+	msg := p.Status
+	if msg == "" {
+		msg = p.Code.ShortName()
+	}
+	var code = codes.Internal
+	switch p.Code {
+	case SIPStatusCode_SIP_STATUS_OK:
+		return status.New(codes.OK, "OK")
+	case SIPStatusCode_SIP_STATUS_REQUEST_TERMINATED:
+		code = codes.Aborted
+	case SIPStatusCode_SIP_STATUS_BAD_REQUEST,
+		SIPStatusCode_SIP_STATUS_NOTFOUND,
+		SIPStatusCode_SIP_STATUS_ADDRESS_INCOMPLETE,
+		SIPStatusCode_SIP_STATUS_AMBIGUOUS,
+		SIPStatusCode_SIP_STATUS_BAD_EXTENSION,
+		SIPStatusCode_SIP_STATUS_EXTENSION_REQUIRED:
+		code = codes.InvalidArgument
+	case SIPStatusCode_SIP_STATUS_REQUEST_TIMEOUT,
+		SIPStatusCode_SIP_STATUS_GATEWAY_TIMEOUT:
+		code = codes.DeadlineExceeded
+	case SIPStatusCode_SIP_STATUS_SERVICE_UNAVAILABLE,
+		SIPStatusCode_SIP_STATUS_TEMPORARILY_UNAVAILABLE,
+		SIPStatusCode_SIP_STATUS_BUSY_HERE,
+		SIPStatusCode_SIP_STATUS_GLOBAL_BUSY_EVERYWHERE,
+		SIPStatusCode_SIP_STATUS_NOT_IMPLEMENTED,
+		SIPStatusCode_SIP_STATUS_GLOBAL_DECLINE:
+		code = codes.Unavailable
+	case SIPStatusCode_SIP_STATUS_PROXY_AUTH_REQUIRED,
+		SIPStatusCode_SIP_STATUS_UNAUTHORIZED,
+		SIPStatusCode_SIP_STATUS_FORBIDDEN:
+		code = codes.PermissionDenied
+	}
+	st := status.New(code, fmt.Sprintf("sip status %d: %s", p.Code, msg))
+	if st2, err := st.WithDetails(p); err == nil {
+		return st2
+	}
+	return st
+}
+
+func (p *SIPStatus) TwirpErrorMeta() map[string]string {
+	status := p.Status
+	if status == "" {
+		status = p.Code.String()
+	}
+	return map[string]string{
+		"sip_status_code": strconv.Itoa(int(p.Code)),
+		"sip_status":      status,
+	}
+}
 
 // ToProto implements DataPacket in Go SDK.
 func (p *SipDTMF) ToProto() *DataPacket {
@@ -15,6 +88,34 @@ func (p *SipDTMF) ToProto() *DataPacket {
 			SipDtmf: p,
 		},
 	}
+}
+
+func (p *SIPTrunkInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipTrunkId
+}
+
+func (p *SIPInboundTrunkInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipTrunkId
+}
+
+func (p *SIPOutboundTrunkInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipTrunkId
+}
+
+func (p *SIPDispatchRuleInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.SipDispatchRuleId
 }
 
 // AsInbound converts legacy SIPTrunkInfo to SIPInboundTrunkInfo.
@@ -205,6 +306,23 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	return nil
 }
 
+func (p *SIPOutboundConfig) Validate() error {
+	if p.Hostname == "" {
+		return errors.New("no outbound hostname specified")
+	} else if strings.Contains(p.Hostname, "transport=") {
+		return errors.New("trunk transport should be set as a field, not a URI parameter")
+	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Hostname, "sip:") || strings.HasPrefix(p.Hostname, "sips:") {
+		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
+	}
+	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (p *CreateSIPDispatchRuleRequest) Validate() error {
 	if p.Rule == nil {
 		return errors.New("missing rule")
@@ -213,8 +331,13 @@ func (p *CreateSIPDispatchRuleRequest) Validate() error {
 }
 
 func (p *CreateSIPParticipantRequest) Validate() error {
-	if p.SipTrunkId == "" {
+	if p.SipTrunkId == "" && p.Trunk == nil {
 		return errors.New("missing sip trunk id")
+	}
+	if p.Trunk != nil {
+		if err := p.Trunk.Validate(); err != nil {
+			return err
+		}
 	}
 	if p.SipCallTo == "" {
 		return errors.New("missing sip callee number")
@@ -271,6 +394,13 @@ func filterIDs[T any, ID comparable](arr []T, ids []ID, get func(v T) ID) []T {
 		}
 	}
 	return out
+}
+
+func (p *ListSIPTrunkRequest) Filter(info *SIPTrunkInfo) bool {
+	if info == nil {
+		return true // for FilterSlice to work correctly with missing IDs
+	}
+	return true
 }
 
 func (p *ListSIPInboundTrunkRequest) Filter(info *SIPInboundTrunkInfo) bool {

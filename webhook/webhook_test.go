@@ -91,9 +91,9 @@ func TestURLNotifierDropped(t *testing.T) {
 	}
 	// send multiple notifications
 	for i := 0; i < 10; i++ {
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventParticipantJoined})
-		_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventParticipantJoined})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 	}
 
 	time.Sleep(webhookCheckInterval)
@@ -120,8 +120,8 @@ func TestURLNotifierLifecycle(t *testing.T) {
 			numCalled.Inc()
 		}
 		for i := 0; i < 10; i++ {
-			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
-			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+			_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+			_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		}
 		urlNotifier.Stop(false)
 		require.Eventually(t, func() bool { return numCalled.Load() == 20 }, 5*time.Second, webhookCheckInterval)
@@ -134,8 +134,8 @@ func TestURLNotifierLifecycle(t *testing.T) {
 			numCalled.Inc()
 		}
 		for i := 0; i < 10; i++ {
-			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomStarted})
-			_ = urlNotifier.QueueNotify(&livekit.WebhookEvent{Event: EventRoomFinished})
+			_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+			_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		}
 		urlNotifier.Stop(true)
 		time.Sleep(time.Second)

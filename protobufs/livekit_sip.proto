@@ -23,6 +23,7 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "livekit_models.proto";
+import "livekit_room.proto";
 
 /*
    LiveKit's SIP API is built with 3 high level primitives
@@ -71,6 +72,69 @@ service SIP {
   rpc TransferSIPParticipant(TransferSIPParticipantRequest) returns (google.protobuf.Empty);
 }
 
+enum SIPStatusCode {
+    SIP_STATUS_UNKNOWN = 0;
+
+    SIP_STATUS_TRYING = 100;
+    SIP_STATUS_RINGING = 180;
+    SIP_STATUS_CALL_IS_FORWARDED = 181;
+    SIP_STATUS_QUEUED = 182;
+    SIP_STATUS_SESSION_PROGRESS = 183;
+
+    SIP_STATUS_OK = 200;
+    SIP_STATUS_ACCEPTED = 202;
+
+    SIP_STATUS_MOVED_PERMANENTLY = 301;
+    SIP_STATUS_MOVED_TEMPORARILY = 302;
+    SIP_STATUS_USE_PROXY = 305;
+
+    SIP_STATUS_BAD_REQUEST = 400;
+    SIP_STATUS_UNAUTHORIZED = 401;
+    SIP_STATUS_PAYMENT_REQUIRED = 402;
+    SIP_STATUS_FORBIDDEN = 403;
+    SIP_STATUS_NOTFOUND = 404;
+    SIP_STATUS_METHOD_NOT_ALLOWED = 405;
+    SIP_STATUS_NOT_ACCEPTABLE = 406;
+    SIP_STATUS_PROXY_AUTH_REQUIRED = 407;
+    SIP_STATUS_REQUEST_TIMEOUT = 408;
+    SIP_STATUS_CONFLICT = 409;
+    SIP_STATUS_GONE = 410;
+    SIP_STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
+    SIP_STATUS_REQUEST_URI_TOO_LONG = 414;
+    SIP_STATUS_UNSUPPORTED_MEDIA_TYPE = 415;
+    SIP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+    SIP_STATUS_BAD_EXTENSION = 420;
+    SIP_STATUS_EXTENSION_REQUIRED = 421;
+    SIP_STATUS_INTERVAL_TOO_BRIEF = 423;
+    SIP_STATUS_TEMPORARILY_UNAVAILABLE = 480;
+    SIP_STATUS_CALL_TRANSACTION_DOES_NOT_EXISTS = 481;
+    SIP_STATUS_LOOP_DETECTED = 482;
+    SIP_STATUS_TOO_MANY_HOPS = 483;
+    SIP_STATUS_ADDRESS_INCOMPLETE = 484;
+    SIP_STATUS_AMBIGUOUS = 485;
+    SIP_STATUS_BUSY_HERE = 486;
+    SIP_STATUS_REQUEST_TERMINATED = 487;
+    SIP_STATUS_NOT_ACCEPTABLE_HERE = 488;
+
+    SIP_STATUS_INTERNAL_SERVER_ERROR = 500;
+    SIP_STATUS_NOT_IMPLEMENTED = 501;
+    SIP_STATUS_BAD_GATEWAY = 502;
+    SIP_STATUS_SERVICE_UNAVAILABLE = 503;
+    SIP_STATUS_GATEWAY_TIMEOUT = 504;
+    SIP_STATUS_VERSION_NOT_SUPPORTED = 505;
+    SIP_STATUS_MESSAGE_TOO_LARGE = 513;
+
+    SIP_STATUS_GLOBAL_BUSY_EVERYWHERE = 600;
+    SIP_STATUS_GLOBAL_DECLINE = 603;
+    SIP_STATUS_GLOBAL_DOES_NOT_EXIST_ANYWHERE = 604;
+    SIP_STATUS_GLOBAL_NOT_ACCEPTABLE = 606;
+}
+
+// SIPStatus is returned as an error detail in CreateSIPParticipant.
+message SIPStatus {
+  SIPStatusCode code = 1;
+  string status = 2;
+}
 
 message CreateSIPTrunkRequest {
   option deprecated = true;
@@ -115,6 +179,12 @@ enum SIPHeaderOptions {
   SIP_NO_HEADERS = 0;  // do not map any headers, except ones mapped explicitly
   SIP_X_HEADERS = 1;   // map all X-* headers to sip.h.x-* attributes
   SIP_ALL_HEADERS = 2; // map all headers to sip.h.* attributes
+}
+
+enum SIPMediaEncryption {
+  SIP_MEDIA_ENCRYPT_DISABLE = 0; // do not enable encryption
+  SIP_MEDIA_ENCRYPT_ALLOW = 1; // use encryption if available
+  SIP_MEDIA_ENCRYPT_REQUIRE = 2; // require encryption
 }
 
 message SIPTrunkInfo {
@@ -214,8 +284,9 @@ message SIPInboundTrunkInfo {
   google.protobuf.Duration max_call_duration = 12;
 
   bool krisp_enabled = 13;
+  SIPMediaEncryption media_encryption = 16;
 
-  // NEXT ID: 16
+  // NEXT ID: 17
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -262,7 +333,9 @@ message SIPOutboundTrunkInfo {
   // lowercase header names should be used, for example: sip.h.x-custom-header.
   SIPHeaderOptions include_headers = 12;
 
-  // NEXT ID: 13
+  SIPMediaEncryption media_encryption = 13;
+
+  // NEXT ID: 14
 }
 
 message GetSIPInboundTrunkRequest {
@@ -283,6 +356,7 @@ message GetSIPOutboundTrunkResponse {
 
 message ListSIPTrunkRequest {
   option deprecated = true;
+  Pagination page = 1;
 }
 
 message ListSIPTrunkResponse {
@@ -292,6 +366,7 @@ message ListSIPTrunkResponse {
 
 // ListSIPInboundTrunkRequest lists inbound trunks for given filters. If no filters are set, all trunks are listed.
 message ListSIPInboundTrunkRequest {
+  Pagination page = 3;
   // Trunk IDs to list. If this option is set, the response will contains trunks in the same order.
   // If any of the trunks is missing, a nil item in that position will be sent in the response.
   repeated string trunk_ids = 1;
@@ -305,6 +380,7 @@ message ListSIPInboundTrunkResponse {
 
 // ListSIPOutboundTrunkRequest lists outbound trunks for given filters. If no filters are set, all trunks are listed.
 message ListSIPOutboundTrunkRequest {
+  Pagination page = 3;
   // Trunk IDs to list. If this option is set, the response will contains trunks in the same order.
   // If any of the trunks is missing, a nil item in that position will be sent in the response.
   repeated string trunk_ids = 1;
@@ -385,7 +461,13 @@ message CreateSIPDispatchRuleRequest {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 7;
 
-  // NEXT ID: 8
+  // Cloud-only, config preset to use
+  string room_preset = 8;
+
+  // RoomConfiguration to use if the participant initiates the room
+  RoomConfiguration room_config = 9;
+
+  // NEXT ID: 10
 }
 
 message SIPDispatchRuleInfo {
@@ -405,11 +487,20 @@ message SIPDispatchRuleInfo {
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 8;
 
-  // NEXT ID: 9
+  // Cloud-only, config preset to use
+  string room_preset = 9;
+
+  // RoomConfiguration to use if the participant initiates the room
+  RoomConfiguration room_config = 10;
+
+  bool krisp_enabled = 11;
+  SIPMediaEncryption media_encryption = 12;
+  // NEXT ID: 13
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
 message ListSIPDispatchRuleRequest {
+  Pagination page = 3;
   // Rule IDs to list. If this option is set, the response will contains rules in the same order.
   // If any of the rules is missing, a nil item in that position will be sent in the response.
   repeated string dispatch_rule_ids = 1;
@@ -425,11 +516,32 @@ message DeleteSIPDispatchRuleRequest {
   string sip_dispatch_rule_id = 1;
 }
 
+message SIPOutboundConfig {
+  // SIP server address
+  string hostname = 1;
+
+  // SIP Transport used for outbound call.
+  SIPTransport transport = 2;
+
+  // Username and password used to authenticate with SIP server.
+  // May be empty to have no authentication.
+  string auth_username = 3;
+  string auth_password = 4;
+
+  // Map SIP X-* headers from 200 OK to SIP participant attributes.
+  // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
+  map<string, string> headers_to_attributes = 5;
+  // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
+  // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
+  map<string, string> attributes_to_headers = 6;
+}
+
 // A SIP Participant is a singular SIP session connected to a LiveKit room via
 // a SIP Trunk into a SIP DispatchRule
 message CreateSIPParticipantRequest {
   // What SIP Trunk should be used to dial the user
   string sip_trunk_id = 1;
+  SIPOutboundConfig trunk = 20;
 
   // What number should be dialed via SIP
   string sip_call_to = 2;
@@ -479,8 +591,13 @@ message CreateSIPParticipantRequest {
   google.protobuf.Duration max_call_duration = 12;
 
   // Enable voice isolation for the callee.
-  bool enable_krisp = 14;
-  // NEXT ID: 18
+  bool krisp_enabled = 14;
+
+  SIPMediaEncryption media_encryption = 18;
+
+  // Wait for the answer for the call before returning.
+  bool wait_until_answered = 19;
+  // NEXT ID: 21
 }
 
 message SIPParticipantInfo {
@@ -505,20 +622,30 @@ message TransferSIPParticipantRequest {
 message SIPCallInfo {
   string call_id = 1;
   string trunk_id = 2;
+  string dispatch_rule_id = 16;
+  string region = 17;
   string room_name = 3;
   string room_id = 4; // ID of the current/previous room published to
   string participant_identity = 5;
+  map<string, string> participant_attributes = 18;
   SIPUri from_uri = 6;
   SIPUri to_uri = 7;
+  int64 created_at = 9 [ deprecated = true ];
+  int64 started_at = 10 [ deprecated = true ];
+  int64 ended_at = 11 [ deprecated = true ];
   repeated SIPFeature enabled_features = 14;
+  SIPCallDirection call_direction = 15;
   SIPCallStatus call_status = 8;
-  int64 created_at = 9;
-  int64 started_at = 10;
-  int64 ended_at = 11;
+  int64 created_at_ns = 22;
+  int64 started_at_ns = 23;
+  int64 ended_at_ns = 24;
   DisconnectReason disconnect_reason = 12;
   string error = 13;
+  SIPStatus call_status_code = 19;
+  string audio_codec = 20;
+  string media_encryption = 21;
 
-  // NEXT ID: 15
+  // NEXT ID: 25
 }
 
 message SIPUri {
@@ -540,4 +667,10 @@ enum SIPCallStatus {
 enum SIPFeature {
   NONE = 0;
   KRISP_ENABLED = 1;
+}
+
+enum SIPCallDirection {
+  SCD_UNKNOWN = 0;
+  SCD_INBOUND = 1;
+  SCD_OUTBOUND = 2;
 }

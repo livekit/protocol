@@ -3,4 +3,4 @@
 "github.com/livekit/protocol": minor
 ---
 
-Add headers for SIP call transfer.
+Move SIP call dispatch info into s separate type.

@@ -20,11 +20,32 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/dennwc/iters"
+
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/rpc"
 )
+
+func TestNormalizeNumber(t *testing.T) {
+	cases := []struct {
+		name string
+		num  string
+		exp  string
+	}{
+		{"empty", "", ""},
+		{"number", "123", "+123"},
+		{"plus", "+123", "+123"},
+		{"user", "user", "user"},
+		{"human", "(123) 456 7890", "+1234567890"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			require.Equal(t, c.exp, NormalizeNumber(c.num))
+		})
+	}
+}
 
 const (
 	sipNumber1  = "1111 1111"
@@ -43,6 +64,7 @@ var trunkCases = []struct {
 	from    string
 	to      string
 	src     string
+	host    string
 }{
 	{
 		name:   "empty",
@@ -178,6 +200,16 @@ var trunkCases = []struct {
 		exp: -1,
 	},
 	{
+		name: "inbound with host mask",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.0/24",
+				"sip.example.com",
+			}},
+		},
+		exp: 0,
+	},
+	{
 		name: "inbound with plus",
 		trunks: []*livekit.SIPTrunkInfo{
 			{SipTrunkId: "aaa", OutboundNumber: "+" + sipNumber3},
@@ -209,7 +241,7 @@ func TestSIPMatchTrunk(t *testing.T) {
 	for _, c := range trunkCases {
 		c := c
 		t.Run(c.name, func(t *testing.T) {
-			from, to, src := c.from, c.to, c.src
+			from, to, src, host := c.from, c.to, c.src, c.host
 			if from == "" {
 				from = sipNumber1
 			}
@@ -219,14 +251,24 @@ func TestSIPMatchTrunk(t *testing.T) {
 			if src == "" {
 				src = "1.1.1.1"
 			}
-			trunks := toInboundTrunks(c.trunks)
-			var srcIP netip.Addr
-			if src != "" {
-				var err error
-				srcIP, err = netip.ParseAddr(src)
-				require.NoError(t, err)
+			if host == "" {
+				host = "sip.example.com"
 			}
-			got, err := MatchTrunk(trunks, srcIP, from, to)
+			trunks := toInboundTrunks(c.trunks)
+			call := &rpc.SIPCall{
+				SourceIp: src,
+				From: &livekit.SIPUri{
+					User: from,
+					Host: host,
+				},
+				To: &livekit.SIPUri{
+					User: to,
+				},
+			}
+			call.Address = call.To
+			got, err := MatchTrunkIter(iters.Slice(trunks), call, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
+				t.Logf("conflict: %v\n%v\nvs\n%v", reason, t1, t2)
+			}))
 			if c.expErr {
 				require.Error(t, err)
 				require.Nil(t, got)
@@ -547,7 +589,9 @@ func TestSIPMatchDispatchRule(t *testing.T) {
 					name = "no pin"
 				}
 				t.Run(name, func(t *testing.T) {
-					got, err := MatchDispatchRule(c.trunk.AsInbound(), c.rules, newSIPReqDispatch(pin, c.noPin))
+					got, err := MatchDispatchRuleIter(c.trunk.AsInbound(), iters.Slice(c.rules), newSIPReqDispatch(pin, c.noPin), WithDispatchRuleConflict(func(r1, r2 *livekit.SIPDispatchRuleInfo, reason DispatchRuleConflictReason) {
+						t.Logf("conflict: %v\n%v\nvs\n%v", reason, r1, r2)
+					}))
 					if c.expErr {
 						require.Error(t, err)
 						require.Nil(t, got)
@@ -575,7 +619,9 @@ func TestSIPValidateDispatchRules(t *testing.T) {
 					r.SipDispatchRuleId = strconv.Itoa(i)
 				}
 			}
-			err := ValidateDispatchRules(c.rules)
+			_, err := ValidateDispatchRulesIter(iters.Slice(c.rules), WithDispatchRuleConflict(func(r1, r2 *livekit.SIPDispatchRuleInfo, reason DispatchRuleConflictReason) {
+				t.Logf("conflict: %v\n%v\nvs\n%v", reason, r1, r2)
+			}))
 			if c.invalid {
 				require.Error(t, err)
 			} else {
@@ -600,6 +646,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 	r := &rpc.EvaluateSIPDispatchRulesRequest{
 		SipCallId:     "call-id",
 		CallingNumber: "+11112222",
+		CallingHost:   "sip.example.com",
 		CalledNumber:  "+3333",
 		ExtraAttributes: map[string]string{
 			"prov-attr": "1",
@@ -625,6 +672,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			livekit.AttrSIPDispatchRuleID: "rule",
 			livekit.AttrSIPPhoneNumber:    "+11112222",
 			livekit.AttrSIPTrunkNumber:    "+3333",
+			livekit.AttrSIPHostName:       "sip.example.com",
 		},
 	}, res)
 
@@ -652,21 +700,126 @@ func TestEvaluateDispatchRule(t *testing.T) {
 
 func TestMatchIP(t *testing.T) {
 	cases := []struct {
-		addr string
-		mask string
-		exp  bool
+		addr  string
+		mask  string
+		valid bool
+		exp   bool
 	}{
-		{addr: "192.168.0.10", mask: "192.168.0.10", exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.11", exp: false},
-		{addr: "192.168.0.10", mask: "192.168.0.0/24", exp: true},
-		{addr: "192.168.0.10", mask: "192.168.0.10/0", exp: true},
-		{addr: "192.168.0.10", mask: "192.170.0.0/24", exp: false},
+		{addr: "192.168.0.10", mask: "192.168.0.10", valid: true, exp: true},
+		{addr: "192.168.0.10", mask: "192.168.0.11", valid: true, exp: false},
+		{addr: "192.168.0.10", mask: "192.168.0.0/24", valid: true, exp: true},
+		{addr: "192.168.0.10", mask: "192.168.0.10/0", valid: true, exp: true},
+		{addr: "192.168.0.10", mask: "192.170.0.0/24", valid: true, exp: false},
 	}
 	for _, c := range cases {
 		t.Run(c.mask, func(t *testing.T) {
 			ip, err := netip.ParseAddr(c.addr)
 			require.NoError(t, err)
-			got := matchAddrMask(ip, c.mask)
+			got := isValidMask(c.mask)
+			require.Equal(t, c.valid, got)
+			got = matchAddrMask(ip, c.mask)
+			require.Equal(t, c.exp, got)
+		})
+	}
+}
+
+func TestMatchMasks(t *testing.T) {
+	cases := []struct {
+		name  string
+		addr  string
+		host  string
+		masks []string
+		exp   bool
+	}{
+		{
+			name:  "no masks",
+			addr:  "192.168.0.10",
+			masks: nil,
+			exp:   true,
+		},
+		{
+			name: "single ip",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.0.10",
+			},
+			exp: true,
+		},
+		{
+			name: "wrong ip",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.0.11",
+			},
+			exp: false,
+		},
+		{
+			name: "ip mask",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.0.0/24",
+			},
+			exp: true,
+		},
+		{
+			name: "wrong mask",
+			addr: "192.168.0.10",
+			masks: []string{
+				"192.168.1.0/24",
+			},
+			exp: false,
+		},
+		{
+			name: "hostname",
+			addr: "192.168.0.10",
+			host: "sip.example.com",
+			masks: []string{
+				"sip.example.com",
+			},
+			exp: true,
+		},
+		{
+			name: "invalid hostname",
+			addr: "192.168.0.10",
+			host: "sip.example.com",
+			masks: []string{
+				"some.domain",
+			},
+			exp: false,
+		},
+		{
+			name: "invalid and valid range",
+			addr: "192.168.0.10",
+			masks: []string{
+				"some.domain,192.168.0.10/24",
+				"192.168.0.0/24",
+			},
+			exp: true,
+		},
+		{
+			name: "invalid and wrong range",
+			addr: "192.168.0.10",
+			masks: []string{
+				"some.domain",
+				"192.168.1.0/24",
+			},
+			exp: false,
+		},
+		{
+			name: "domain name",
+			addr: "192.168.0.10",
+			host: "sip.example.com",
+			masks: []string{
+				"some.domain",
+				"192.168.1.0/24",
+				"sip.example.com",
+			},
+			exp: true,
+		},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := matchAddrMasks(c.addr, c.host, c.masks)
 			require.Equal(t, c.exp, got)
 		})
 	}

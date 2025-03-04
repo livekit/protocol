@@ -97,3 +97,28 @@ func TestBitmap(t *testing.T) {
 	sm, ls, rs, lo, ro := b.getSlotsAndOffsets(0, math.MaxUint32)
 	require.Equal(t, []int{3, 0, 4, 0, 0}, []int{sm, ls, rs, lo, ro})
 }
+
+func BenchmarkBitmap(b *testing.B) {
+	m := NewBitmap[uint64](128)
+	b.Run("SetRange", func(b *testing.B) {
+		for range b.N {
+			m.SetRange(100, 1100)
+		}
+	})
+	b.Run("Set", func(b *testing.B) {
+		for i := range b.N {
+			m.Set(uint64(i))
+		}
+	})
+	b.Run("IsSet/Set", func(b *testing.B) {
+		for i := range b.N {
+			_ = m.IsSet(uint64(i))
+			m.Set(uint64(i))
+		}
+	})
+	b.Run("GetAndSet", func(b *testing.B) {
+		for i := range b.N {
+			m.GetAndSet(uint64(i))
+		}
+	})
+}

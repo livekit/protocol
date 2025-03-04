@@ -20,7 +20,6 @@ import (
 	"github.com/frostbyte73/core"
 	"github.com/prometheus/procfs"
 	"go.uber.org/atomic"
-	"golang.org/x/sys/unix"
 
 	"github.com/livekit/protocol/logger"
 )
@@ -129,10 +128,7 @@ func (c *CPUStats) monitorCPULoad() {
 
 func (c *CPUStats) monitorProcesses() {
 	numCPU := c.platform.numCPU()
-	pageSize := unix.Getpagesize()
-	if pageSize == 0 {
-		pageSize = 4096
-	}
+	pageSize := getPageSize()
 
 	fs, err := procfs.NewFS(procfs.DefaultMountPoint)
 	if err != nil {

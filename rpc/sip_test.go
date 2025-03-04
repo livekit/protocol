@@ -22,8 +22,9 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"X-B": "B2",
 			"X-C": "C",
 		},
-		Dtmf:         "1234#",
-		PlayDialtone: true,
+		Dtmf:              "1234#",
+		PlayDialtone:      true,
+		WaitUntilAnswered: true,
 	}
 	tr := &livekit.SIPOutboundTrunkInfo{
 		SipTrunkId:   "trunk",
@@ -36,9 +37,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			"X-B": "B1",
 		},
 	}
-	res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
-	require.NoError(t, err)
-	require.Equal(t, &InternalCreateSIPParticipantRequest{
+	exp := &InternalCreateSIPParticipantRequest{
 		ProjectId:           "p_123",
 		SipCallId:           "call-id",
 		SipTrunkId:          "trunk",
@@ -49,6 +48,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Username:            "user",
 		Password:            "pass",
 		RoomName:            "room",
+		ParticipantIdentity: "sip_+3333",
 		ParticipantMetadata: "meta",
 		Token:               "token",
 		WsUrl:               "url",
@@ -60,13 +60,18 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			livekit.AttrSIPTrunkID:     "trunk",
 			livekit.AttrSIPTrunkNumber: "+1111",
 			livekit.AttrSIPPhoneNumber: "+3333",
+			livekit.AttrSIPHostName:    "sip.example.com",
 		},
 		Headers: map[string]string{
 			"X-A": "A",
 			"X-B": "B2",
 			"X-C": "C",
 		},
-	}, res)
+		WaitUntilAnswered: true,
+	}
+	res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+	require.NoError(t, err)
+	require.Equal(t, exp, res)
 
 	r.HidePhoneNumber = true
 	res, err = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
@@ -82,20 +87,44 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		Username:            "user",
 		Password:            "pass",
 		RoomName:            "room",
-		ParticipantMetadata: "meta",
 		Token:               "token",
 		WsUrl:               "url",
 		Dtmf:                "1234#",
 		PlayDialtone:        true,
+		ParticipantIdentity: "sip_+3333",
 		ParticipantAttributes: map[string]string{
 			"extra":                "1",
 			livekit.AttrSIPCallID:  "call-id",
 			livekit.AttrSIPTrunkID: "trunk",
 		},
+		ParticipantMetadata: "meta",
 		Headers: map[string]string{
 			"X-A": "A",
 			"X-B": "B2",
 			"X-C": "C",
 		},
+		WaitUntilAnswered: true,
 	}, res)
+
+	r.HidePhoneNumber = false
+	r.SipNumber = tr.Numbers[0]
+	r.Trunk = &livekit.SIPOutboundConfig{
+		Hostname:            tr.Address,
+		Transport:           tr.Transport,
+		AuthUsername:        tr.AuthUsername,
+		AuthPassword:        tr.AuthPassword,
+		HeadersToAttributes: tr.HeadersToAttributes,
+		AttributesToHeaders: tr.AttributesToHeaders,
+	}
+	r.SipTrunkId = ""
+	exp.SipTrunkId = ""
+	for k, v := range tr.Headers {
+		if _, ok := r.Headers[k]; !ok {
+			r.Headers[k] = v
+		}
+	}
+	exp.ParticipantAttributes[livekit.AttrSIPTrunkID] = ""
+	res, err = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, nil)
+	require.NoError(t, err)
+	require.Equal(t, exp, res)
 }

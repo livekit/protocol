@@ -24,6 +24,7 @@ import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "livekit_room.proto";
 
 enum StreamType {
   UPSTREAM = 0;
@@ -121,8 +122,11 @@ enum AnalyticsEventType {
   SIP_CALL_INCOMING = 37;
   SIP_CALL_STARTED = 38;
   SIP_CALL_ENDED = 39;
+  REPORT = 40;
+  API_CALL = 41;
+  WEBHOOK = 42;
 
-  // NEXT_ID: 40
+  // NEXT_ID: 43
 }
 
 message AnalyticsClientMeta {
@@ -170,8 +174,11 @@ message AnalyticsEvent {
   SIPOutboundTrunkInfo sip_outbound_trunk = 30;
   string sip_dispatch_rule_id = 31;
   SIPDispatchRuleInfo sip_dispatch_rule = 32;
+  ReportInfo report = 33;
+  APICallInfo api_call = 34;
+  WebhookInfo webhook = 35;
 
-  // NEXT_ID: 33
+  // NEXT_ID: 36
 }
 
 message AnalyticsEvents {
@@ -201,4 +208,91 @@ message AnalyticsNodeRooms {
   uint64 sequence_number = 2;
   google.protobuf.Timestamp timestamp = 3;
   repeated AnalyticsRoom rooms = 4;
+}
+
+message ReportInfo {
+  oneof message {
+    FeatureUsageInfo feature_usage = 1;
+  }
+}
+
+message TimeRange {
+  google.protobuf.Timestamp started_at = 1;
+  google.protobuf.Timestamp ended_at = 2;
+}
+
+message FeatureUsageInfo {
+  enum Feature {
+    KRISP_NOISE_CANCELLATION = 0;
+    KRISP_BACKGROUND_VOICE_CANCELLATION = 1;
+  }
+  Feature feature = 1;
+  string project_id = 2;
+  string room_name = 3;
+  string room_id = 4;
+  string participant_identity = 5;
+  string participant_id = 6;
+  string track_id = 7;
+  // time ranges during which the feature was enabled.
+  // for e. g., noise cancellation may not be applied when a media track is paused/muted,
+  // this allows reporting only periods during which a feature is avtive.
+  repeated TimeRange time_ranges = 8;
+}
+
+message APICallRequest {
+  oneof message {
+    CreateRoomRequest create_room_request = 1;
+    ListRoomsRequest list_rooms_request = 2;
+    DeleteRoomRequest delete_room_request = 3;
+    ListParticipantsRequest list_participants_request = 4;
+    RoomParticipantIdentity room_participant_identity = 5;
+    MuteRoomTrackRequest mute_room_track_request = 6;
+    UpdateParticipantRequest update_participant_request = 7;
+    UpdateSubscriptionsRequest update_subscriptions_request = 8;
+    SendDataRequest send_data_request = 9;
+    UpdateRoomMetadataRequest  update_room_metadata_request = 10;
+  }
+}
+
+message APICallInfo {
+  string project_id = 1;
+  APICallRequest request = 2;
+  string service = 3;
+  string method = 4;
+  string node_id = 5;
+  int32 status = 6;
+  string twirp_error_code = 7;
+  string twirp_error_message = 8;
+  string room_name = 9;
+  string room_id = 10;
+  string participant_identity = 11;
+  string participant_id = 12;
+  string track_id = 13;
+  google.protobuf.Timestamp started_at = 14;
+  int64 duration_ns = 15;
+}
+
+message WebhookInfo {
+  string event_id = 1;
+  string event = 2;
+  string project_id = 3;
+  string room_name = 4;
+  string room_id = 5;
+  string participant_identity = 6;
+  string participant_id = 7;
+  string track_id = 8;
+  string egress_id = 9;
+  string ingress_id = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp queued_at = 12;
+  int64 queue_duration_ns = 13;
+  google.protobuf.Timestamp sent_at = 14;
+  int64 send_duration_ns = 15;
+  string url = 16;
+  int32 num_dropped = 17;
+  bool is_dropped = 18;
+  string service_status = 19;
+  int32 service_error_code = 20;
+  string service_error = 21;
+  string send_error = 22;
 }

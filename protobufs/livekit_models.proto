@@ -23,6 +23,11 @@ import "google/protobuf/timestamp.proto";
 
 import "livekit_metrics.proto";
 
+message Pagination {
+  string after_id = 1; // list entities which IDs are greater
+  int32  limit = 2;
+}
+
 message Room {
   string sid = 1;
   string name = 2;
@@ -30,6 +35,7 @@ message Room {
   uint32 departure_timeout = 14;
   uint32 max_participants = 4;
   int64 creation_time = 5;
+  int64 creation_time_ms = 15;
   string turn_password = 6;
   repeated Codec enabled_codecs = 7;
   string metadata = 8;
@@ -38,7 +44,7 @@ message Room {
   bool active_recording = 10;
   TimedVersion version = 13;
 
-  // NEXT-ID: 15
+  // NEXT-ID: 16
 }
 
 message Codec {
@@ -63,6 +69,14 @@ enum VideoCodec {
 enum ImageCodec {
   IC_DEFAULT = 0;
   IC_JPEG = 1;
+}
+
+// Policy for publisher to handle subscribers that are unable to support the primary codec of a track
+enum BackupCodecPolicy {
+  // default behavior, regress to backup codec and all subscribers will receive the backup codec
+  REGRESSION = 0;
+  // encoding/send the primary and backup codec simultaneously
+  SIMULCAST = 1;
 }
 
 message PlayoutDelay {
@@ -126,6 +140,8 @@ message ParticipantInfo {
   string metadata = 5;
   // timestamp when participant joined room, in seconds
   int64 joined_at = 6;
+  // timestamp when participant joined room, in milliseconds
+  int64 joined_at_ms = 17;
   string name = 9;
   uint32 version = 10;
   ParticipantPermission permission = 11;
@@ -136,6 +152,8 @@ message ParticipantInfo {
   Kind kind = 14;
   map<string, string> attributes = 15;
   DisconnectReason disconnect_reason = 16;
+ 
+  // NEXT_ID: 18
 }
 
 enum TrackType {
@@ -195,6 +213,7 @@ message TrackInfo {
   string stream = 17;
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
+  BackupCodecPolicy backup_codec_policy = 20;
 }
 
 enum VideoQuality {
@@ -238,8 +257,9 @@ message DataPacket {
     RpcResponse rpc_response = 12;
     DataStream.Header stream_header = 13;
     DataStream.Chunk stream_chunk = 14;
+    DataStream.Trailer stream_trailer = 15;
   }
-  // NEXT_ID: 9
+  // NEXT_ID: 16
 }
 
 message ActiveSpeakerUpdate {
@@ -271,8 +291,10 @@ message UserPacket {
   // start and end time allow relating the message to specific media time
   optional uint64 start_time = 9;
   optional uint64 end_time = 10;
+  // added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
+  bytes nonce = 11;
 
-  // NEXT_ID: 11
+  // NEXT_ID: 12
 }
 
 message SipDTMF {
@@ -623,9 +645,9 @@ message DataStream {
 
   }
   
-  // header properties specific to file or image streams
-  message FileHeader {
-    string file_name = 1;  // name of the file
+  // header properties specific to byte or file streams
+  message ByteHeader {
+    string name = 1;
   }
 
   // main DataStream.Header that contains a oneof for specific headers
@@ -635,14 +657,13 @@ message DataStream {
     string topic = 3;
     string mime_type = 4;
     optional uint64 total_length = 5;  // only populated for finite streams, if it's a stream of unknown size this stays empty
-    optional uint64 total_chunks = 6;  // only populated for finite streams, if it's a stream of unknown size this stays empty
     Encryption.Type encryption_type = 7;  // defaults to NONE
-    map<string, string> extensions = 8;  // user defined extensions map that can carry additional info
+    map<string, string> attributes = 8;  // user defined attributes map that can carry additional info
   
     // oneof to choose between specific header types
     oneof content_header {
       TextHeader text_header = 9;
-      FileHeader file_header = 10;
+      ByteHeader byte_header = 10;
     }
   }
 
@@ -650,9 +671,14 @@ message DataStream {
     string stream_id = 1;  // unique identifier for this data stream to map it to the correct header
     uint64 chunk_index = 2;
     bytes content = 3; // content as binary (bytes)
-    bool complete = 4; // true only if this is the last chunk of this stream - can also be sent with empty content
-    int32 version = 5; // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
-    optional bytes iv = 6; // optional, initialization vector for AES-GCM encryption
+    int32 version = 4; // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
+    optional bytes iv = 5; // optional, initialization vector for AES-GCM encryption
+  }
+
+  message Trailer {
+    string stream_id = 1; // unique identifier for this data stream
+    string reason = 2; // reason why the stream was closed (could contain "error" / "interrupted" / empty for expected end)
+    map<string, string> attributes = 3; // finalizing updates for the stream, can also include additional insights for errors or endTime for transcription
   }
 }
 

@@ -1,5 +1,79 @@
 # github.com/livekit/protocol
 
+## 1.34.0
+
+### Minor Changes
+
+- Allow passing all SIP trunk options in CreateSIPParticipant. - [#961](https://github.com/livekit/protocol/pull/961) ([@dennwc](https://github.com/dennwc))
+
+- Add egress audio mixing options - [#978](https://github.com/livekit/protocol/pull/978) ([@frostbyte73](https://github.com/frostbyte73))
+
+- Expose hooks for SIP trunk and rule matching. - [#983](https://github.com/livekit/protocol/pull/983) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Fix iteration over empty and unsorted records. - [#971](https://github.com/livekit/protocol/pull/971) ([@dennwc](https://github.com/dennwc))
+
+- Remove SIP outbound number normalization for Telnyx. - [#969](https://github.com/livekit/protocol/pull/969) ([@dennwc](https://github.com/dennwc))
+
+- Remove SIP outbound number normalization for Telnyx. - [#982](https://github.com/livekit/protocol/pull/982) ([@dennwc](https://github.com/dennwc))
+
+## 1.33.0
+
+### Minor Changes
+
+- Use SIP statuses as Go and gRPC errors. - [#960](https://github.com/livekit/protocol/pull/960) ([@dennwc](https://github.com/dennwc))
+
+- Add flag to make CreateSIPParticipant synchronous. - [#952](https://github.com/livekit/protocol/pull/952) ([@dennwc](https://github.com/dennwc))
+
+- Add Twirp options to preserve error details and client timeouts. - [#963](https://github.com/livekit/protocol/pull/963) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add a workaround for invalid IP masks in SIP. - [#956](https://github.com/livekit/protocol/pull/956) ([@dennwc](https://github.com/dennwc))
+
+- Add backup codec policy to AddTrackRequest - [#947](https://github.com/livekit/protocol/pull/947) ([@cnderrauber](https://github.com/cnderrauber))
+
+## 1.32.1
+
+### Patch Changes
+
+- Add nonce to SendDataRequest #953 - [#954](https://github.com/livekit/protocol/pull/954) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.32.0
+
+### Minor Changes
+
+- Use iterators in SIP. - [#943](https://github.com/livekit/protocol/pull/943) ([@dennwc](https://github.com/dennwc))
+
+## 1.31.0
+
+### Minor Changes
+
+- Add media encryption options for SIP. - [#892](https://github.com/livekit/protocol/pull/892) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- include room preset/config in SIP tokens - [#932](https://github.com/livekit/protocol/pull/932) ([@davidzhao](https://github.com/davidzhao))
+
+## 1.30.0
+
+### Minor Changes
+
+- Add filters to SIP list APIs. - [#913](https://github.com/livekit/protocol/pull/913) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for SIP call transfer. - [#926](https://github.com/livekit/protocol/pull/926) ([@dennwc](https://github.com/dennwc))
+
+- Add headers for CreateSipParticipant - [#911](https://github.com/livekit/protocol/pull/911) ([@s-hamdananwar](https://github.com/s-hamdananwar))
+
+- Allow mapping all SIP headers to attributes. - [#920](https://github.com/livekit/protocol/pull/920) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Allow SIP inbound to specify room configuration - [#923](https://github.com/livekit/protocol/pull/923) ([@davidzhao](https://github.com/davidzhao))
+
+- Relax SIP header validation. - [#925](https://github.com/livekit/protocol/pull/925) ([@dennwc](https://github.com/dennwc))
+
 ## 1.29.4
 
 ## 1.29.3
