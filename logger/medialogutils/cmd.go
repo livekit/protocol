@@ -39,13 +39,11 @@ func (l *CmdLogger) Write(p []byte) (int, error) {
 
 // HandlerLogger catches stray outputs from egress handlers
 type HandlerLogger struct {
-	json   bool
 	logger logger.Logger
 }
 
-func NewHandlerLogger(json bool, keyAndValues ...any) *HandlerLogger {
+func NewHandlerLogger(keyAndValues ...any) *HandlerLogger {
 	return &HandlerLogger{
-		json:   json,
 		logger: logger.GetLogger().WithValues(keyAndValues...),
 	}
 }
@@ -54,8 +52,7 @@ func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 	s := strings.Split(strings.TrimSuffix(string(p), "\n"), "\n")
 	for _, line := range s {
 		switch {
-		case (l.json && strings.HasPrefix(line, `{"level":"`)) ||
-			(!l.json && len(line) > 24 && line[24] == '\t'):
+		case strings.HasSuffix(line, "}"):
 			// (probably) normal log
 			fmt.Println(line)
 		case strings.HasPrefix(line, "0:00:"):
