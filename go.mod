@@ -17,15 +17,15 @@ require (
 	github.com/livekit/mageutil v0.0.0-20230125210925-54e8a70427c1
 	github.com/livekit/psrpc v0.6.1-0.20250205181828-a0beed2e4126
 	github.com/mackerelio/go-osstat v0.2.5
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.1
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.11.2
 	github.com/pion/logging v0.2.3
 	github.com/pion/sdp/v3 v3.0.10
-	github.com/pion/webrtc/v4 v4.0.8
+	github.com/pion/webrtc/v4 v4.0.13
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus/client_golang v1.20.5
+	github.com/prometheus/client_golang v1.21.1
 	github.com/prometheus/procfs v0.15.1
-	github.com/puzpuzpuz/xsync/v3 v3.5.0
-	github.com/redis/go-redis/v9 v9.7.0
+	github.com/puzpuzpuz/xsync/v3 v3.5.1
+	github.com/redis/go-redis/v9 v9.7.1
 	github.com/stretchr/testify v1.10.0
 	github.com/twitchtv/twirp v8.1.3+incompatible
 	github.com/zeebo/xxh3 v1.0.2
@@ -33,11 +33,11 @@ require (
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	go.uber.org/zap/exp v0.3.0
-	golang.org/x/exp v0.0.0-20250128182459-e0ece0dbea4c
-	golang.org/x/mod v0.23.0
-	golang.org/x/sys v0.30.0
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250204164813-702378808489
-	google.golang.org/grpc v1.70.0
+	golang.org/x/exp 054e65f0b394
+	golang.org/x/mod v0.24.0
+	golang.org/x/sys v0.31.0
+	google.golang.org/genproto/googleapis/rpc a0af3efb3deb
+	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.5
 	gopkg.in/yaml.v3 v3.0.1
 )
