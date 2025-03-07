@@ -26,7 +26,6 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
@@ -34,7 +33,8 @@ import (
 )
 
 const (
-	numWorkers = 10
+	numWorkers       = 10
+	defaultQueueSize = 100
 )
 
 type URLNotifierParams struct {
@@ -46,15 +46,6 @@ type URLNotifierParams struct {
 	APISecret  string
 	FieldsHook func(whi *livekit.WebhookInfo)
 }
-
-type HTTPClientParams struct {
-	RetryWaitMin  time.Duration
-	RetryWaitMax  time.Duration
-	MaxRetries    int
-	ClientTimeout time.Duration
-}
-
-const defaultQueueSize = 100
 
 // URLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
 // It will retry on failure, and will drop events if notification fall too far behind
@@ -123,7 +114,8 @@ func (n *URLNotifier) getProcessedHook() func(ctx context.Context, whi *livekit.
 func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
 	enqueuedAt := time.Now()
 
-	if !n.pool.Submit(n.eventKey(event), func() {
+	key := eventKey(event)
+	if !n.pool.Submit(key, func() {
 		fields := logFields(event, n.params.URL)
 
 		queueDuration := time.Since(enqueuedAt)
@@ -181,25 +173,6 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 	return nil
 }
 
-func (c *URLNotifier) eventKey(event *livekit.WebhookEvent) string {
-	if event.EgressInfo != nil {
-		return event.EgressInfo.EgressId
-	}
-	if event.IngressInfo != nil {
-		return event.IngressInfo.IngressId
-	}
-	if event.Room != nil {
-		return event.Room.Name
-	}
-	if event.Participant != nil {
-		return event.Participant.Identity
-	}
-	if event.Track != nil {
-		return event.Track.Sid
-	}
-	return "default"
-}
-
 func (n *URLNotifier) Stop(force bool) {
 	if force {
 		n.pool.Kill()
@@ -245,119 +218,4 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
 	}
 	_ = res.Body.Close()
 	return nil
-}
-
-type logAdapter struct{}
-
-func (l *logAdapter) Printf(string, ...interface{}) {}
-
-func logFields(event *livekit.WebhookEvent, url string) []interface{} {
-	fields := make([]interface{}, 0, 20)
-	fields = append(fields,
-		"event", event.Event,
-		"id", event.Id,
-		"webhookTime", event.CreatedAt,
-		"url", url,
-	)
-
-	if event.Room != nil {
-		fields = append(fields,
-			"room", event.Room.Name,
-			"roomID", event.Room.Sid,
-		)
-	}
-	if event.Participant != nil {
-		fields = append(fields,
-			"participant", event.Participant.Identity,
-			"pID", event.Participant.Sid,
-		)
-	}
-	if event.Track != nil {
-		fields = append(fields,
-			"trackID", event.Track.Sid,
-		)
-	}
-	if event.EgressInfo != nil {
-		fields = append(fields,
-			"egressID", event.EgressInfo.EgressId,
-			"status", event.EgressInfo.Status,
-		)
-		if event.EgressInfo.Error != "" {
-			fields = append(fields, "error", event.EgressInfo.Error)
-		}
-	}
-	if event.IngressInfo != nil {
-		fields = append(fields,
-			"ingressID", event.IngressInfo.IngressId,
-		)
-		if event.IngressInfo.State != nil {
-			fields = append(fields, "status", event.IngressInfo.State.Status)
-			if event.IngressInfo.State.Error != "" {
-				fields = append(fields, "error", event.IngressInfo.State.Error)
-			}
-		}
-	}
-	return fields
-}
-
-func webhookInfo(
-	event *livekit.WebhookEvent,
-	queuedAt time.Time,
-	queueDuration time.Duration,
-	sentAt time.Time,
-	sendDuration time.Duration,
-	url string,
-	isDropped bool,
-	sendError error,
-) *livekit.WebhookInfo {
-	whi := &livekit.WebhookInfo{
-		EventId:         event.Id,
-		Event:           event.Event,
-		CreatedAt:       timestamppb.New(time.Unix(event.CreatedAt, 0)),
-		QueuedAt:        timestamppb.New(queuedAt),
-		QueueDurationNs: queueDuration.Nanoseconds(),
-		SentAt:          timestamppb.New(sentAt),
-		SendDurationNs:  sendDuration.Nanoseconds(),
-		Url:             url,
-		NumDropped:      event.NumDropped,
-		IsDropped:       isDropped,
-	}
-	if !queuedAt.IsZero() {
-		whi.QueuedAt = timestamppb.New(queuedAt)
-	}
-	if !sentAt.IsZero() {
-		whi.SentAt = timestamppb.New(sentAt)
-	}
-	if event.Room != nil {
-		whi.RoomName = event.Room.Name
-		whi.RoomId = event.Room.Sid
-	}
-	if event.Participant != nil {
-		whi.ParticipantIdentity = event.Participant.Identity
-		whi.ParticipantId = event.Participant.Sid
-	}
-	if event.Track != nil {
-		whi.TrackId = event.Track.Sid
-	}
-	if event.EgressInfo != nil {
-		whi.EgressId = event.EgressInfo.EgressId
-		whi.ServiceStatus = event.EgressInfo.Status.String()
-		if event.EgressInfo.Error != "" {
-			whi.ServiceErrorCode = event.EgressInfo.ErrorCode
-			whi.ServiceError = event.EgressInfo.Error
-		}
-	}
-	if event.IngressInfo != nil {
-		whi.IngressId = event.IngressInfo.IngressId
-		if event.IngressInfo.State != nil {
-			whi.ServiceStatus = event.IngressInfo.State.Status.String()
-			if event.IngressInfo.State.Error != "" {
-				whi.ServiceError = event.IngressInfo.State.Error
-			}
-		}
-	}
-	if sendError != nil {
-		whi.SendError = sendError.Error()
-	}
-	return whi
 }

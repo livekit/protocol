@@ -49,7 +49,7 @@ message WebhookEvent {
   // timestamp in seconds
   int64 created_at = 7;
 
-  int32 num_dropped = 11;
+  int32 num_dropped = 11 [deprecated=true];
 
   // NEXT_ID: 12
 }
