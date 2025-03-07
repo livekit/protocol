@@ -373,10 +373,18 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 				},
 			)
 		}
+
+		resourceURLNotifier.mu.RLock()
 		require.Equal(t, 10, len(resourceURLNotifier.resourceQueues))
+		resourceURLNotifier.mu.RUnlock()
+
 		time.Sleep(time.Second)
+
 		// should have reaped after some time
+		resourceURLNotifier.mu.RLock()
 		require.Equal(t, 0, len(resourceURLNotifier.resourceQueues))
+		resourceURLNotifier.mu.RUnlock()
+
 		require.Equal(t, int32(20), numCalled.Load())
 	})
 
