@@ -216,6 +216,7 @@ func TestResourceWebHook(t *testing.T) {
 
 	t.Run("test event payload", func(t *testing.T) {
 		resourceURLNotifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl})
+		defer resourceURLNotifier.Stop(false)
 
 		event := &livekit.WebhookEvent{
 			Event: EventTrackPublished,
