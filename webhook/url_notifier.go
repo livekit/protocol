@@ -45,6 +45,7 @@ type URLNotifierParams struct {
 	APIKey     string
 	APISecret  string
 	FieldsHook func(whi *livekit.WebhookInfo)
+	FilterParams
 }
 
 // URLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
@@ -56,6 +57,7 @@ type URLNotifier struct {
 	dropped       atomic.Int32
 	pool          core.QueuePool
 	processedHook func(ctx context.Context, whi *livekit.WebhookInfo)
+	filter        *filter
 }
 
 func NewURLNotifier(params URLNotifierParams) *URLNotifier {
@@ -82,6 +84,7 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	n := &URLNotifier{
 		params: params,
 		client: rhc,
+		filter: newFilter(params.FilterParams),
 	}
 	n.client.Logger = &logAdapter{}
 
@@ -99,6 +102,12 @@ func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
 	n.params.APISecret = apiSecret
 }
 
+func (n *URLNotifier) SetFilter(params FilterParams) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.filter.SetFilter(params)
+}
+
 func (n *URLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
@@ -112,6 +121,10 @@ func (n *URLNotifier) getProcessedHook() func(ctx context.Context, whi *livekit.
 }
 
 func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
+	if !n.filter.IsAllowed(event.Event) {
+		return nil
+	}
+
 	enqueuedAt := time.Now()
 
 	key := eventKey(event)

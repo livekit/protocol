@@ -26,6 +26,8 @@ import (
 
 type QueuedNotifier interface {
 	RegisterProcessedHook(f func(ctx context.Context, whi *livekit.WebhookInfo))
+	SetKeys(apiKey, apiSecret string)
+	SetFilter(params FilterParams)
 	QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error
 	Stop(force bool)
 }
@@ -75,6 +77,18 @@ func (n *DefaultNotifier) RegisterProcessedHook(hook func(ctx context.Context, w
 	}
 }
 
+func (n *DefaultNotifier) SetKeys(apiKey, apiSecret string) {
+	for _, u := range n.notifiers {
+		u.SetKeys(apiKey, apiSecret)
+	}
+}
+
+func (n *DefaultNotifier) SetFilter(params FilterParams) {
+	for _, u := range n.notifiers {
+		u.SetFilter(params)
+	}
+}
+
 // ---------------------------------
 
 type HTTPClientParams struct {
@@ -82,6 +96,11 @@ type HTTPClientParams struct {
 	RetryWaitMax  time.Duration
 	MaxRetries    int
 	ClientTimeout time.Duration
+}
+
+type FilterParams struct {
+	IncludeEvents []string
+	ExcludeEvents []string
 }
 
 // ---------------------------------
