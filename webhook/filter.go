@@ -16,29 +16,28 @@ package webhook
 
 import "slices"
 
-type filterParams struct {
-	Includes []string
-	Excludes []string
-}
-
 type filter struct {
-	params filterParams
+	params FilterParams
 }
 
-func newFilter(params filterParams) *filter {
+func newFilter(params FilterParams) *filter {
 	return &filter{
 		params: params,
 	}
 }
 
+func (f *filter) SetFilter(params FilterParams) {
+	f.params = params
+}
+
 func (f *filter) IsAllowed(event string) bool {
 	// includes get higher precendence than excludes
-	if len(f.params.Includes) != 0 {
-		return slices.Contains(f.params.Includes, event)
+	if len(f.params.IncludeEvents) != 0 {
+		return slices.Contains(f.params.IncludeEvents, event)
 	}
 
-	if len(f.params.Excludes) != 0 {
-		return !slices.Contains(f.params.Excludes, event)
+	if len(f.params.ExcludeEvents) != 0 {
+		return !slices.Contains(f.params.ExcludeEvents, event)
 	}
 
 	// default allow

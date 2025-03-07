@@ -84,10 +84,7 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	n := &URLNotifier{
 		params: params,
 		client: rhc,
-		filter: newFilter(filterParams{
-			Includes: params.IncludeEvents,
-			Excludes: params.ExcludeEvents,
-		}),
+		filter: newFilter(params.FilterParams),
 	}
 	n.client.Logger = &logAdapter{}
 
@@ -103,6 +100,12 @@ func (n *URLNotifier) SetKeys(apiKey, apiSecret string) {
 	defer n.mu.Unlock()
 	n.params.APIKey = apiKey
 	n.params.APISecret = apiSecret
+}
+
+func (n *URLNotifier) SetFilter(params FilterParams) {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+	n.filter.SetFilter(params)
 }
 
 func (n *URLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {

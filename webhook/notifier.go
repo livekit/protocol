@@ -26,6 +26,8 @@ import (
 
 type QueuedNotifier interface {
 	RegisterProcessedHook(f func(ctx context.Context, whi *livekit.WebhookInfo))
+	SetKeys(apiKey, apiSecret string)
+	SetFilter(params FilterParams)
 	QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error
 	Stop(force bool)
 }
@@ -72,6 +74,18 @@ func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.Webhoo
 func (n *DefaultNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
 	for _, u := range n.notifiers {
 		u.RegisterProcessedHook(hook)
+	}
+}
+
+func (n *DefaultNotifier) SetKeys(apiKey, apiSecret string) {
+	for _, u := range n.notifiers {
+		u.SetKeys(apiKey, apiSecret)
+	}
+}
+
+func (n *DefaultNotifier) SetFilter(params FilterParams) {
+	for _, u := range n.notifiers {
+		u.SetFilter(params)
 	}
 }
 

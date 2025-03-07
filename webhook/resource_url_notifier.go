@@ -118,10 +118,7 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 		params:         params,
 		client:         rhc,
 		resourceQueues: make(map[string]*resourceQueueInfo),
-		filter: newFilter(filterParams{
-			Includes: params.IncludeEvents,
-			Excludes: params.ExcludeEvents,
-		}),
+		filter:         newFilter(params.FilterParams),
 	}
 
 	go r.sweeper()
@@ -134,6 +131,13 @@ func (r *ResourceURLNotifier) SetKeys(apiKey, apiSecret string) {
 
 	r.params.APIKey = apiKey
 	r.params.APISecret = apiSecret
+}
+
+func (r *ResourceURLNotifier) SetFilter(params FilterParams) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.filter.SetFilter(params)
 }
 
 func (r *ResourceURLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
