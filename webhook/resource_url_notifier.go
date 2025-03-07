@@ -163,7 +163,11 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 	r.mu.Unlock()
 
 	err := rqi.resourceQueue.Enqueue(ctx, event)
-	if err == errQueueClosed {
+	for {
+		if err == nil || err != errQueueClosed {
+			break
+		}
+
 		// the resource could have been closed due to idle timeout
 		rq := newResourceQueue(resourceQueueParams{
 			MaxDepth: r.params.MaxDepth,

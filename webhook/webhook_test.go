@@ -344,7 +344,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			resourceURLNotifier.mu.RUnlock()
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
-			require.NotEqual(t, rqi.resourceQueue, rq)
+			require.NotEqualValues(t, rqi.resourceQueue, rq)
 			rq = rqi.resourceQueue
 			time.Sleep(10 * time.Millisecond)
 
@@ -362,7 +362,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			resourceURLNotifier.mu.RUnlock()
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
-			require.NotEqual(t, rqi.resourceQueue, rq)
+			require.NotEqualValues(t, rqi.resourceQueue, rq)
 			rq = rqi.resourceQueue
 			time.Sleep(10 * time.Millisecond)
 
@@ -380,7 +380,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			resourceURLNotifier.mu.RUnlock()
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
-			require.NotEqual(t, rqi.resourceQueue, rq)
+			require.NotEqualValues(t, rqi.resourceQueue, rq)
 			rq = rqi.resourceQueue
 			time.Sleep(10 * time.Millisecond)
 		}
