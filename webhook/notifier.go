@@ -76,6 +76,21 @@ func (n *DefaultNotifier) RegisterProcessedHook(hook func(ctx context.Context, w
 
 // ---------------------------------
 
+type HTTPClientParams struct {
+	RetryWaitMin  time.Duration
+	RetryWaitMax  time.Duration
+	MaxRetries    int
+	ClientTimeout time.Duration
+}
+
+// ---------------------------------
+
+type logAdapter struct{}
+
+func (l *logAdapter) Printf(string, ...interface{}) {}
+
+// ---------------------------------
+
 func eventKey(event *livekit.WebhookEvent) (string, bool) {
 	if event.EgressInfo != nil {
 		return event.EgressInfo.EgressId, event.Event == "egress_ended"
@@ -95,14 +110,6 @@ func eventKey(event *livekit.WebhookEvent) (string, bool) {
 	logger.Warnw("webhook using default event", nil, "event", logger.Proto(event))
 	return "default", false
 }
-
-// --------------------------------------
-
-type logAdapter struct{}
-
-func (l *logAdapter) Printf(string, ...interface{}) {}
-
-// --------------------------------------
 
 func logFields(event *livekit.WebhookEvent, url string) []interface{} {
 	fields := make([]interface{}, 0, 20)
