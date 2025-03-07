@@ -344,7 +344,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			resourceURLNotifier.mu.RUnlock()
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
-			require.NotEqualValues(t, rqi.resourceQueue, rq)
+			require.NotSame(t, rqi.resourceQueue, rq)
 			rq = rqi.resourceQueue
 			time.Sleep(10 * time.Millisecond)
 
@@ -362,7 +362,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			resourceURLNotifier.mu.RUnlock()
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
-			require.NotEqualValues(t, rqi.resourceQueue, rq)
+			require.NotSame(t, rqi.resourceQueue, rq)
 			rq = rqi.resourceQueue
 			time.Sleep(10 * time.Millisecond)
 
@@ -380,7 +380,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			resourceURLNotifier.mu.RUnlock()
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
-			require.NotEqualValues(t, rqi.resourceQueue, rq)
+			require.NotSame(t, rqi.resourceQueue, rq)
 			rq = rqi.resourceQueue
 			time.Sleep(10 * time.Millisecond)
 		}
@@ -402,7 +402,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 	})
 
 	t.Run("sweeper", func(t *testing.T) {
-		resourceURLNotifier := newTestResourceNotifier(500*time.Millisecond, 200*time.Millisecond, 50)
+		resourceURLNotifier := newTestResourceNotifier(200*time.Millisecond, 200*time.Millisecond, 50)
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			numCalled.Inc()
