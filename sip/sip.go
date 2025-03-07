@@ -228,6 +228,7 @@ func (v *dispatchRuleValidatorIter) Next() (*livekit.SIPDispatchRuleInfo, error)
 	if err != nil {
 		return nil, err
 	}
+	r = v.v.opt.Replace(r)
 	if err = v.v.Validate(r); err != nil {
 		return nil, err
 	}
@@ -350,6 +351,7 @@ func ValidateTrunksIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], opts ...Mat
 		} else if err != nil {
 			return err
 		}
+		t = opt.Replace(t)
 		if len(t.Numbers) == 0 {
 			byInbound := byOutboundAndInbound[""]
 			if byInbound == nil {
@@ -461,6 +463,7 @@ type matchTrunkOpts struct {
 	AllowConflicts bool
 	Filtered       TrunkFilteredFunc
 	Conflict       TrunkConflictFunc
+	Replace        TrunkReplaceFunc
 }
 
 func (opt *matchTrunkOpts) defaults() {
@@ -471,6 +474,11 @@ func (opt *matchTrunkOpts) defaults() {
 	}
 	if opt.Conflict == nil {
 		opt.Conflict = func(_, _ *livekit.SIPInboundTrunkInfo, _ TrunkConflictReason) {}
+	}
+	if opt.Replace == nil {
+		opt.Replace = func(t *livekit.SIPInboundTrunkInfo) *livekit.SIPInboundTrunkInfo {
+			return t
+		}
 	}
 }
 
@@ -521,6 +529,15 @@ func WithTrunkConflict(fnc TrunkConflictFunc) MatchTrunkOpt {
 	}
 }
 
+type TrunkReplaceFunc func(t *livekit.SIPInboundTrunkInfo) *livekit.SIPInboundTrunkInfo
+
+// WithTrunkReplace sets a callback that is called to potentially replace trunks before matching runs.
+func WithTrunkReplace(fnc TrunkReplaceFunc) MatchTrunkOpt {
+	return func(opt *matchTrunkOpts) {
+		opt.Replace = fnc
+	}
+}
+
 // MatchTrunkIter finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
 func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
@@ -544,6 +561,7 @@ func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCa
 		} else if err != nil {
 			return nil, err
 		}
+		tr = opt.Replace(tr)
 		// Do not consider it if number doesn't match.
 		if !matchNumbers(call.From.User, tr.AllowedNumbers) {
 			if !opt.Filtered(tr, TrunkFilteredCallingNumberDisallowed) {
@@ -608,11 +626,17 @@ func MatchDispatchRule(trunk *livekit.SIPInboundTrunkInfo, rules []*livekit.SIPD
 type matchDispatchRuleOpts struct {
 	AllowConflicts bool
 	Conflict       DispatchRuleConflictFunc
+	Replace        DispatchRuleReplaceFunc
 }
 
 func (opt *matchDispatchRuleOpts) defaults() {
 	if opt.Conflict == nil {
 		opt.Conflict = func(_, _ *livekit.SIPDispatchRuleInfo, _ DispatchRuleConflictReason) {}
+	}
+	if opt.Replace == nil {
+		opt.Replace = func(r *livekit.SIPDispatchRuleInfo) *livekit.SIPDispatchRuleInfo {
+			return r
+		}
 	}
 }
 
@@ -637,6 +661,15 @@ func WithAllowDispatchRuleConflicts() MatchDispatchRuleOpt {
 func WithDispatchRuleConflict(fnc DispatchRuleConflictFunc) MatchDispatchRuleOpt {
 	return func(opt *matchDispatchRuleOpts) {
 		opt.Conflict = fnc
+	}
+}
+
+type DispatchRuleReplaceFunc func(r *livekit.SIPDispatchRuleInfo) *livekit.SIPDispatchRuleInfo
+
+// WithDispatchRuleReplace sets a callback that is called to potentially replace dispatch rules before matching runs.
+func WithDispatchRuleReplace(fnc DispatchRuleReplaceFunc) MatchDispatchRuleOpt {
+	return func(opt *matchDispatchRuleOpts) {
+		opt.Replace = fnc
 	}
 }
 
