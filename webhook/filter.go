@@ -33,9 +33,14 @@ func newFilter(params filterParams) *filter {
 
 func (f *filter) IsAllowed(event string) bool {
 	// includes get higher precendence than excludes
-	if slices.Contains(f.params.Includes, event) {
-		return true
+	if len(f.params.Includes) != 0 {
+		return slices.Contains(f.params.Includes, event)
 	}
 
-	return !slices.Contains(f.params.Excludes, event)
+	if len(f.params.Excludes) != 0 {
+		return !slices.Contains(f.params.Excludes, event)
+	}
+
+	// default allow
+	return true
 }

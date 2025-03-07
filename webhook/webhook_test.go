@@ -203,6 +203,32 @@ func TestURLNotifierFilter(t *testing.T) {
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
+	t.Run("none", func(t *testing.T) {
+		urlNotifier := NewURLNotifier(URLNotifierParams{
+			QueueSize: 20,
+			URL:       testUrl,
+			APIKey:    apiKey,
+			APISecret: apiSecret,
+		})
+		defer urlNotifier.Stop(false)
+
+		numCalled := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			numCalled.Inc()
+		}
+
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
+		require.Eventually(
+			t,
+			func() bool {
+				return numCalled.Load() == 2
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
+
 	t.Run("includes", func(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			QueueSize: 20,
@@ -220,13 +246,12 @@ func TestURLNotifierFilter(t *testing.T) {
 			numCalled.Inc()
 		}
 
-		// as there is no explicit ExcludeEvents, EventRoomFinished should be allowed
 		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		require.Eventually(
 			t,
 			func() bool {
-				return numCalled.Load() == 2
+				return numCalled.Load() == 1
 			},
 			5*time.Second,
 			webhookCheckInterval,
@@ -633,6 +658,34 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
+	t.Run("none", func(t *testing.T) {
+		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+			URL:          testUrl,
+			APIKey:       apiKey,
+			APISecret:    apiSecret,
+			MaxAge:       200 * time.Millisecond,
+			MaxDepth:     50,
+			FilterParams: FilterParams{},
+		})
+		defer resourceURLNotifier.Stop(false)
+
+		numCalled := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			numCalled.Inc()
+		}
+
+		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
+		require.Eventually(
+			t,
+			func() bool {
+				return numCalled.Load() == 2
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
+
 	t.Run("includes", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       testUrl,
@@ -651,13 +704,12 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 			numCalled.Inc()
 		}
 
-		// as there is no explicit ExcludeEvents, EventRoomFinished should be allowed
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		require.Eventually(
 			t,
 			func() bool {
-				return numCalled.Load() == 2
+				return numCalled.Load() == 1
 			},
 			5*time.Second,
 			webhookCheckInterval,
