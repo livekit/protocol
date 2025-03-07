@@ -148,41 +148,20 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 	key := eventKey(event)
 
 	r.mu.Lock()
-	var tqi *utils.TimeoutQueueItem[*resourceQueueInfo]
 	rqi := r.resourceQueues[key]
-	if rqi == nil {
+	if rqi == nil || !r.resourceQueueTimeoutQueue.Reset(rqi.tqi) {
 		rq := newResourceQueue(resourceQueueParams{
 			MaxDepth: r.params.MaxDepth,
 			Poster:   r,
 		})
 		rqi = &resourceQueueInfo{resourceQueue: rq, key: key}
-		tqi = &utils.TimeoutQueueItem[*resourceQueueInfo]{Value: rqi}
-		rqi.tqi = tqi
+		rqi.tqi = &utils.TimeoutQueueItem[*resourceQueueInfo]{Value: rqi}
+		r.resourceQueueTimeoutQueue.Reset(rqi.tqi)
 		r.resourceQueues[key] = rqi
 	}
 	r.mu.Unlock()
 
 	err := rqi.resourceQueue.Enqueue(ctx, event)
-	for {
-		if err == nil || err != errQueueClosed {
-			break
-		}
-
-		// the resource could have been closed due to idle timeout
-		rq := newResourceQueue(resourceQueueParams{
-			MaxDepth: r.params.MaxDepth,
-			Poster:   r,
-		})
-		rqi = &resourceQueueInfo{resourceQueue: rq, key: key}
-		tqi = &utils.TimeoutQueueItem[*resourceQueueInfo]{Value: rqi}
-		rqi.tqi = tqi
-
-		r.mu.Lock()
-		r.resourceQueues[key] = rqi
-		r.mu.Unlock()
-
-		err = rqi.resourceQueue.Enqueue(ctx, event)
-	}
 	if err != nil {
 		fields := logFields(event, r.params.URL)
 		fields = append(fields, "reason", err)
@@ -205,11 +184,6 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 			ph(ctx, whi)
 		}
 	}
-
-	if tqi != nil {
-		r.resourceQueueTimeoutQueue.Reset(tqi)
-	}
-
 	return err
 }
 
@@ -330,18 +304,16 @@ func (r *ResourceURLNotifier) sweeper() {
 			return
 
 		case <-ticker.C:
-			for it := r.resourceQueueTimeoutQueue.IterateAfter(r.params.Timeout); it.Next(); {
+			for it := r.resourceQueueTimeoutQueue.IterateRemoveAfter(r.params.Timeout); it.Next(); {
 				rqi := it.Item().Value
-				if !rqi.resourceQueue.StopIfIdle(r.params.Timeout) && rqi.tqi != nil {
-					r.resourceQueueTimeoutQueue.Reset(rqi.tqi)
-					continue
-				}
 
 				r.mu.Lock()
 				if r.resourceQueues[rqi.key] == rqi {
 					delete(r.resourceQueues, rqi.key)
 				}
 				r.mu.Unlock()
+
+				rqi.Stop(false)
 			}
 		}
 	}

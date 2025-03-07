@@ -44,10 +44,9 @@ type resourceQueueParams struct {
 type resourceQueue struct {
 	params resourceQueueParams
 
-	mu           sync.Mutex
-	items        deque.Deque[*item]
-	lastQueuedAt time.Time
-	cond         *sync.Cond
+	mu    sync.Mutex
+	items deque.Deque[*item]
+	cond  *sync.Cond
 
 	closed bool
 	drain  bool
@@ -64,32 +63,16 @@ func newResourceQueue(params resourceQueueParams) *resourceQueue {
 	return r
 }
 
-func (r *resourceQueue) stopLocked(force bool) {
+func (r *resourceQueue) Stop(force bool) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
 	if !r.closed {
 		r.closed = true
 		r.drain = !force
 
 		r.cond.Broadcast()
 	}
-}
-
-func (r *resourceQueue) Stop(force bool) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	r.stopLocked(force)
-}
-
-func (r *resourceQueue) StopIfIdle(timeout time.Duration) bool {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-
-	if r.items.Len() == 0 && time.Since(r.lastQueuedAt) > timeout {
-		r.stopLocked(false)
-		return true
-	}
-
-	return false
 }
 
 func (r *resourceQueue) Enqueue(ctx context.Context, whEvent *livekit.WebhookEvent) error {
@@ -109,7 +92,6 @@ func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *li
 	}
 
 	r.items.PushBack(&item{ctx, at, whEvent})
-	r.lastQueuedAt = at
 	r.cond.Broadcast()
 	return nil
 }
@@ -120,9 +102,7 @@ func (r *resourceQueue) flush() {
 		item := r.items.PopFront()
 		r.mu.Unlock()
 
-		if r.params.Poster != nil && item != nil {
-			r.params.Poster.Process(item.ctx, item.queuedAt, item.event)
-		}
+		r.params.Poster.Process(item.ctx, item.queuedAt, item.event)
 
 		r.mu.Lock()
 	}
@@ -150,8 +130,6 @@ func (r *resourceQueue) worker() {
 		item := r.items.PopFront()
 		r.mu.Unlock()
 
-		if r.params.Poster != nil && item != nil {
-			r.params.Poster.Process(item.ctx, item.queuedAt, item.event)
-		}
+		r.params.Poster.Process(item.ctx, item.queuedAt, item.event)
 	}
 }
