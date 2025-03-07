@@ -141,29 +141,47 @@ func (r *ResourceURLNotifier) getProcessedHook() func(ctx context.Context, whi *
 }
 
 func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
-	key, isEnd := eventKey(event)
-
 	if r.closed.IsBroken() {
 		return errClosed
 	}
 
+	key := eventKey(event)
+
 	r.mu.Lock()
+	var tqi *utils.TimeoutQueueItem[*resourceQueueInfo]
 	rqi := r.resourceQueues[key]
 	if rqi == nil {
 		rq := newResourceQueue(resourceQueueParams{
-			MaxAge:   r.params.MaxAge,
 			MaxDepth: r.params.MaxDepth,
 			Poster:   r,
 		})
 		rqi = &resourceQueueInfo{resourceQueue: rq, key: key}
-		rqi.tqi = &utils.TimeoutQueueItem[*resourceQueueInfo]{Value: rqi}
+		tqi = &utils.TimeoutQueueItem[*resourceQueueInfo]{Value: rqi}
+		rqi.tqi = tqi
 		r.resourceQueues[key] = rqi
 	}
 	r.mu.Unlock()
 
 	err := rqi.resourceQueue.Enqueue(ctx, event)
+	if err == errQueueClosed {
+		// the resource could have been closed due to idle timeout
+		rq := newResourceQueue(resourceQueueParams{
+			MaxDepth: r.params.MaxDepth,
+			Poster:   r,
+		})
+		rqi = &resourceQueueInfo{resourceQueue: rq, key: key}
+		tqi = &utils.TimeoutQueueItem[*resourceQueueInfo]{Value: rqi}
+		rqi.tqi = tqi
+
+		r.mu.Lock()
+		r.resourceQueues[key] = rqi
+		r.mu.Unlock()
+
+		err = rqi.resourceQueue.Enqueue(ctx, event)
+	}
 	if err != nil {
 		fields := logFields(event, r.params.URL)
+		fields = append(fields, "reason", err)
 		r.params.Logger.Infow("dropped webhook", fields...)
 
 		if ph := r.getProcessedHook(); ph != nil {
@@ -184,9 +202,8 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 		}
 	}
 
-	if isEnd && rqi.tqi != nil {
-		// add to prune checker to reap resources that have ended
-		r.resourceQueueTimeoutQueue.Reset(rqi.tqi)
+	if tqi != nil {
+		r.resourceQueueTimeoutQueue.Reset(tqi)
 	}
 
 	return err
@@ -211,6 +228,29 @@ func (r *ResourceURLNotifier) Process(ctx context.Context, queuedAt time.Time, e
 
 	queueDuration := time.Since(queuedAt)
 	fields = append(fields, "queueDuration", queueDuration)
+
+	if queueDuration > r.params.MaxAge {
+		fields = append(fields, "reason", "age")
+		r.params.Logger.Infow("dropped webhook", fields...)
+
+		if ph := r.getProcessedHook(); ph != nil {
+			whi := webhookInfo(
+				event,
+				queuedAt,
+				queueDuration,
+				time.Time{},
+				0,
+				r.params.URL,
+				true,
+				nil,
+			)
+			if r.params.FieldsHook != nil {
+				r.params.FieldsHook(whi)
+			}
+			ph(ctx, whi)
+		}
+		return
+	}
 
 	sendStart := time.Now()
 	err := r.send(event)
@@ -286,11 +326,17 @@ func (r *ResourceURLNotifier) sweeper() {
 			return
 
 		case <-ticker.C:
-			for it := r.resourceQueueTimeoutQueue.IterateRemoveAfter(r.params.Timeout); it.Next(); {
+			for it := r.resourceQueueTimeoutQueue.IterateAfter(r.params.Timeout); it.Next(); {
 				rqi := it.Item().Value
+				if !rqi.resourceQueue.StopIfIdle(r.params.Timeout) && rqi.tqi != nil {
+					r.resourceQueueTimeoutQueue.Reset(rqi.tqi)
+					continue
+				}
 
 				r.mu.Lock()
-				delete(r.resourceQueues, rqi.key)
+				if r.resourceQueues[rqi.key] == rqi {
+					delete(r.resourceQueues, rqi.key)
+				}
 				r.mu.Unlock()
 			}
 		}

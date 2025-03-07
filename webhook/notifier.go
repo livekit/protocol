@@ -91,24 +91,24 @@ func (l *logAdapter) Printf(string, ...interface{}) {}
 
 // ---------------------------------
 
-func eventKey(event *livekit.WebhookEvent) (string, bool) {
+func eventKey(event *livekit.WebhookEvent) string {
 	if event.EgressInfo != nil {
-		return event.EgressInfo.EgressId, event.Event == "egress_ended"
+		return event.EgressInfo.EgressId
 	}
 	if event.IngressInfo != nil {
-		return event.IngressInfo.IngressId, event.Event == "ingress_ended"
+		return event.IngressInfo.IngressId
 	}
 	if event.Room != nil {
-		return event.Room.Name, event.Event == "room_finished"
+		return event.Room.Name
 	}
 	if event.Participant != nil {
-		return event.Participant.Identity, event.Event == "participant_left"
+		return event.Participant.Identity
 	}
 	if event.Track != nil {
-		return event.Track.Sid, event.Event == "track_unpublished"
+		return event.Track.Sid
 	}
 	logger.Warnw("webhook using default event", nil, "event", logger.Proto(event))
-	return "default", false
+	return "default"
 }
 
 func logFields(event *livekit.WebhookEvent, url string) []interface{} {

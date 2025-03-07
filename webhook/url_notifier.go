@@ -114,7 +114,7 @@ func (n *URLNotifier) getProcessedHook() func(ctx context.Context, whi *livekit.
 func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
 	enqueuedAt := time.Now()
 
-	key, _ := eventKey(event)
+	key := eventKey(event)
 	if !n.pool.Submit(key, func() {
 		fields := logFields(event, n.params.URL)
 

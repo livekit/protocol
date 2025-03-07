@@ -252,10 +252,9 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 		totalDropped := atomic.Int32{}
 		totalReceived := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
+			_, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
 			totalReceived.Inc()
-			totalDropped.Add(decodedEvent.NumDropped)
 		}
 		// send multiple notifications
 		for i := 0; i < 10; i++ {
@@ -291,47 +290,104 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 	t.Run("age drop", func(t *testing.T) {
 		resourceURLNotifier := newTestResourceNotifier(time.Minute, 10*time.Millisecond, 500)
 		defer resourceURLNotifier.Stop(true)
-		totalDropped := atomic.Int32{}
 		totalReceived := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(5 * time.Millisecond)
-			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
+			_, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
 			totalReceived.Inc()
-			totalDropped.Add(decodedEvent.NumDropped)
 		}
 		// send multiple notifications
 		for i := 0; i < 10; i++ {
-			err := resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
-			if err == errQueueBackedUp {
-				totalDropped.Inc()
-			}
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 			time.Sleep(time.Millisecond)
-			err = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventParticipantJoined})
-			if err == errQueueBackedUp {
-				totalDropped.Inc()
-			}
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventParticipantJoined})
 			time.Sleep(time.Millisecond)
-			err = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
-			if err == errQueueBackedUp {
-				totalDropped.Inc()
-			}
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 			time.Sleep(time.Millisecond)
+		}
+
+		time.Sleep(2 * webhookCheckInterval)
+
+		// at least one request dropped
+		require.Greater(t, int32(30), totalReceived.Load())
+		require.Less(t, int32(0), totalReceived.Load())
+	})
+
+	t.Run("resource queue timeout", func(t *testing.T) {
+		resourceURLNotifier := newTestResourceNotifier(5*time.Millisecond, time.Minute, 500)
+		defer resourceURLNotifier.Stop(true)
+		totalReceived := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			_, err := ReceiveWebhookEvent(r, authProvider)
+			require.NoError(t, err)
+			totalReceived.Inc()
+		}
+
+		// check that resource queues change for the same event key
+		for i := 0; i < 3; i++ {
+			var rq *resourceQueue
+
+			roomName := fmt.Sprintf("room%d", i)
+
+			_ = resourceURLNotifier.QueueNotify(
+				context.Background(),
+				&livekit.WebhookEvent{
+					Event: EventRoomStarted,
+					Room: &livekit.Room{
+						Name: roomName,
+					},
+				},
+			)
+			resourceURLNotifier.mu.RLock()
+			rqi := resourceURLNotifier.resourceQueues[roomName]
+			resourceURLNotifier.mu.RUnlock()
+			require.NotNil(t, rqi)
+			require.NotNil(t, rqi.resourceQueue)
+			require.NotEqual(t, rqi.resourceQueue, rq)
+			rq = rqi.resourceQueue
+			time.Sleep(10 * time.Millisecond)
+
+			_ = resourceURLNotifier.QueueNotify(
+				context.Background(),
+				&livekit.WebhookEvent{
+					Event: EventParticipantJoined,
+					Room: &livekit.Room{
+						Name: roomName,
+					},
+				},
+			)
+			resourceURLNotifier.mu.RLock()
+			rqi = resourceURLNotifier.resourceQueues[roomName]
+			resourceURLNotifier.mu.RUnlock()
+			require.NotNil(t, rqi)
+			require.NotNil(t, rqi.resourceQueue)
+			require.NotEqual(t, rqi.resourceQueue, rq)
+			rq = rqi.resourceQueue
+			time.Sleep(10 * time.Millisecond)
+
+			_ = resourceURLNotifier.QueueNotify(
+				context.Background(),
+				&livekit.WebhookEvent{
+					Event: EventParticipantLeft,
+					Room: &livekit.Room{
+						Name: roomName,
+					},
+				},
+			)
+			resourceURLNotifier.mu.RLock()
+			rqi = resourceURLNotifier.resourceQueues[roomName]
+			resourceURLNotifier.mu.RUnlock()
+			require.NotNil(t, rqi)
+			require.NotNil(t, rqi.resourceQueue)
+			require.NotEqual(t, rqi.resourceQueue, rq)
+			rq = rqi.resourceQueue
+			time.Sleep(10 * time.Millisecond)
 		}
 
 		time.Sleep(webhookCheckInterval)
 
-		require.Eventually(
-			t,
-			func() bool {
-				return totalDropped.Load()+totalReceived.Load() == 30
-			},
-			5*time.Second,
-			webhookCheckInterval,
-		)
-		// at least one request dropped, but not all dropped
-		require.Less(t, int32(0), totalDropped.Load())
-		require.Less(t, int32(0), totalReceived.Load())
+		require.Equal(t, int32(9), totalReceived.Load())
 	})
 }
 
