@@ -47,9 +47,10 @@ func TestWebHook(t *testing.T) {
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
-	notifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl})
-
 	t.Run("test event payload", func(t *testing.T) {
+		notifier := newTestNotifier()
+		defer notifier.Stop(false)
+
 		event := &livekit.WebhookEvent{
 			Event: EventTrackPublished,
 			Participant: &livekit.ParticipantInfo{
@@ -213,9 +214,9 @@ func TestResourceWebHook(t *testing.T) {
 	require.NoError(t, s.Start())
 	defer s.Stop()
 
-	resourceURLNotifier := newTestResourceNotifier(time.Minute, 200*time.Millisecond, 10)
-
 	t.Run("test event payload", func(t *testing.T) {
+		resourceURLNotifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl})
+
 		event := &livekit.WebhookEvent{
 			Event: EventTrackPublished,
 			Participant: &livekit.ParticipantInfo{

@@ -27,31 +27,32 @@ import (
 type QueuedNotifier interface {
 	RegisterProcessedHook(f func(ctx context.Context, whi *livekit.WebhookInfo))
 	QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error
+	Stop(force bool)
 }
 
 type DefaultNotifier struct {
-	urlNotifiers []*URLNotifier
+	notifiers []QueuedNotifier
 }
 
 func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier {
 	n := &DefaultNotifier{}
 	for _, url := range urls {
-		u := NewURLNotifier(URLNotifierParams{
+		u := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       url,
 			Logger:    logger.GetLogger().WithComponent("webhook"),
 			APIKey:    apiKey,
 			APISecret: apiSecret,
 		})
-		n.urlNotifiers = append(n.urlNotifiers, u)
+		n.notifiers = append(n.notifiers, u)
 	}
 	return n
 }
 
 func (n *DefaultNotifier) Stop(force bool) {
 	wg := sync.WaitGroup{}
-	for _, u := range n.urlNotifiers {
+	for _, u := range n.notifiers {
 		wg.Add(1)
-		go func(u *URLNotifier) {
+		go func(u QueuedNotifier) {
 			defer wg.Done()
 			u.Stop(force)
 		}(u)
@@ -60,7 +61,7 @@ func (n *DefaultNotifier) Stop(force bool) {
 }
 
 func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
-	for _, u := range n.urlNotifiers {
+	for _, u := range n.notifiers {
 		if err := u.QueueNotify(ctx, event); err != nil {
 			return err
 		}
@@ -69,7 +70,7 @@ func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.Webhoo
 }
 
 func (n *DefaultNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
-	for _, u := range n.urlNotifiers {
+	for _, u := range n.notifiers {
 		u.RegisterProcessedHook(hook)
 	}
 }
