@@ -84,6 +84,11 @@ type HTTPClientParams struct {
 	ClientTimeout time.Duration
 }
 
+type FilterParams struct {
+	IncludeEvents []string
+	ExcludeEvents []string
+}
+
 // ---------------------------------
 
 type logAdapter struct{}

@@ -63,6 +63,7 @@ type ResourceURLNotifierParams struct {
 	APIKey     string
 	APISecret  string
 	FieldsHook func(whi *livekit.WebhookInfo)
+	FilterParams
 }
 
 // ResourceURLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
@@ -78,7 +79,10 @@ type ResourceURLNotifier struct {
 
 	resourceQueues            map[string]*resourceQueueInfo
 	resourceQueueTimeoutQueue utils.TimeoutQueue[*resourceQueueInfo]
-	closed                    core.Fuse
+
+	filter *filter
+
+	closed core.Fuse
 }
 
 func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifier {
@@ -114,6 +118,10 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 		params:         params,
 		client:         rhc,
 		resourceQueues: make(map[string]*resourceQueueInfo),
+		filter: newFilter(filterParams{
+			Includes: params.IncludeEvents,
+			Excludes: params.ExcludeEvents,
+		}),
 	}
 
 	go r.sweeper()
@@ -141,6 +149,10 @@ func (r *ResourceURLNotifier) getProcessedHook() func(ctx context.Context, whi *
 }
 
 func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
+	if !r.filter.IsAllowed(event.Event) {
+		return nil
+	}
+
 	if r.closed.IsBroken() {
 		return errClosed
 	}
