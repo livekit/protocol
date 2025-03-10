@@ -63,4 +63,14 @@ service Participant {
       };
     };
   };
+  rpc ForwardParticipant(livekit.ForwardParticipantRequest) returns (livekit.ForwardParticipantResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
 }

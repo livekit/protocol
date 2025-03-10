@@ -60,6 +60,11 @@ service RoomService {
 
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
   rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
+
+  // Forward a participant's track to another room. Requires `roomAdmin`. The forwarding will stop when the participant leaves the room
+  // or call this method again with `stop` set to true. A participant can be forwarded to multiple rooms. The destination room will be
+  // created if it does not exist.
+  rpc ForwardParticipant(ForwardParticipantRequest) returns (ForwardParticipantResponse);
 }
 
 message CreateRoomRequest {
@@ -227,4 +232,18 @@ message RoomConfiguration {
 
   // Define agents that should be dispatched to this room
   repeated RoomAgentDispatch agents = 10;
+}
+
+message ForwardParticipantRequest {
+  // room to forward participant from
+  string room = 1;
+  // identity of the participant to forward
+  string identity = 2;
+  // room to forward participant to
+  string destination_room = 3;
+  // set to true to stop forwarding
+  bool stop = 4;
+}
+
+message ForwardParticipantResponse {
 }
