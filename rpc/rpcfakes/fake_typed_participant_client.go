@@ -15,6 +15,22 @@ type FakeTypedParticipantClient struct {
 	closeMutex       sync.RWMutex
 	closeArgsForCall []struct {
 	}
+	ForwardParticipantStub        func(context.Context, rpc.ParticipantTopic, *livekit.ForwardParticipantRequest, ...psrpc.RequestOption) (*livekit.ForwardParticipantResponse, error)
+	forwardParticipantMutex       sync.RWMutex
+	forwardParticipantArgsForCall []struct {
+		arg1 context.Context
+		arg2 rpc.ParticipantTopic
+		arg3 *livekit.ForwardParticipantRequest
+		arg4 []psrpc.RequestOption
+	}
+	forwardParticipantReturns struct {
+		result1 *livekit.ForwardParticipantResponse
+		result2 error
+	}
+	forwardParticipantReturnsOnCall map[int]struct {
+		result1 *livekit.ForwardParticipantResponse
+		result2 error
+	}
 	MutePublishedTrackStub        func(context.Context, rpc.ParticipantTopic, *livekit.MuteRoomTrackRequest, ...psrpc.RequestOption) (*livekit.MuteRoomTrackResponse, error)
 	mutePublishedTrackMutex       sync.RWMutex
 	mutePublishedTrackArgsForCall []struct {
@@ -105,6 +121,73 @@ func (fake *FakeTypedParticipantClient) CloseCalls(stub func()) {
 	fake.closeMutex.Lock()
 	defer fake.closeMutex.Unlock()
 	fake.CloseStub = stub
+}
+
+func (fake *FakeTypedParticipantClient) ForwardParticipant(arg1 context.Context, arg2 rpc.ParticipantTopic, arg3 *livekit.ForwardParticipantRequest, arg4 ...psrpc.RequestOption) (*livekit.ForwardParticipantResponse, error) {
+	fake.forwardParticipantMutex.Lock()
+	ret, specificReturn := fake.forwardParticipantReturnsOnCall[len(fake.forwardParticipantArgsForCall)]
+	fake.forwardParticipantArgsForCall = append(fake.forwardParticipantArgsForCall, struct {
+		arg1 context.Context
+		arg2 rpc.ParticipantTopic
+		arg3 *livekit.ForwardParticipantRequest
+		arg4 []psrpc.RequestOption
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.ForwardParticipantStub
+	fakeReturns := fake.forwardParticipantReturns
+	fake.recordInvocation("ForwardParticipant", []interface{}{arg1, arg2, arg3, arg4})
+	fake.forwardParticipantMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeTypedParticipantClient) ForwardParticipantCallCount() int {
+	fake.forwardParticipantMutex.RLock()
+	defer fake.forwardParticipantMutex.RUnlock()
+	return len(fake.forwardParticipantArgsForCall)
+}
+
+func (fake *FakeTypedParticipantClient) ForwardParticipantCalls(stub func(context.Context, rpc.ParticipantTopic, *livekit.ForwardParticipantRequest, ...psrpc.RequestOption) (*livekit.ForwardParticipantResponse, error)) {
+	fake.forwardParticipantMutex.Lock()
+	defer fake.forwardParticipantMutex.Unlock()
+	fake.ForwardParticipantStub = stub
+}
+
+func (fake *FakeTypedParticipantClient) ForwardParticipantArgsForCall(i int) (context.Context, rpc.ParticipantTopic, *livekit.ForwardParticipantRequest, []psrpc.RequestOption) {
+	fake.forwardParticipantMutex.RLock()
+	defer fake.forwardParticipantMutex.RUnlock()
+	argsForCall := fake.forwardParticipantArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeTypedParticipantClient) ForwardParticipantReturns(result1 *livekit.ForwardParticipantResponse, result2 error) {
+	fake.forwardParticipantMutex.Lock()
+	defer fake.forwardParticipantMutex.Unlock()
+	fake.ForwardParticipantStub = nil
+	fake.forwardParticipantReturns = struct {
+		result1 *livekit.ForwardParticipantResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeTypedParticipantClient) ForwardParticipantReturnsOnCall(i int, result1 *livekit.ForwardParticipantResponse, result2 error) {
+	fake.forwardParticipantMutex.Lock()
+	defer fake.forwardParticipantMutex.Unlock()
+	fake.ForwardParticipantStub = nil
+	if fake.forwardParticipantReturnsOnCall == nil {
+		fake.forwardParticipantReturnsOnCall = make(map[int]struct {
+			result1 *livekit.ForwardParticipantResponse
+			result2 error
+		})
+	}
+	fake.forwardParticipantReturnsOnCall[i] = struct {
+		result1 *livekit.ForwardParticipantResponse
+		result2 error
+	}{result1, result2}
 }
 
 func (fake *FakeTypedParticipantClient) MutePublishedTrack(arg1 context.Context, arg2 rpc.ParticipantTopic, arg3 *livekit.MuteRoomTrackRequest, arg4 ...psrpc.RequestOption) (*livekit.MuteRoomTrackResponse, error) {
@@ -380,6 +463,8 @@ func (fake *FakeTypedParticipantClient) Invocations() map[string][][]interface{}
 	defer fake.invocationsMutex.RUnlock()
 	fake.closeMutex.RLock()
 	defer fake.closeMutex.RUnlock()
+	fake.forwardParticipantMutex.RLock()
+	defer fake.forwardParticipantMutex.RUnlock()
 	fake.mutePublishedTrackMutex.RLock()
 	defer fake.mutePublishedTrackMutex.RUnlock()
 	fake.removeParticipantMutex.RLock()
