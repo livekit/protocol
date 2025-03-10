@@ -48,6 +48,12 @@ func NewHandlerLogger(keyAndValues ...any) *HandlerLogger {
 	}
 }
 
+var downgrade = map[string]bool{
+	"turnc ": true,
+	"ice ER": true,
+	"SDK 20": true,
+}
+
 func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 	s := strings.Split(strings.TrimSuffix(string(p), "\n"), "\n")
 	for _, line := range s {
@@ -58,8 +64,8 @@ func (l *HandlerLogger) Write(p []byte) (n int, err error) {
 		case strings.HasPrefix(line, "0:00:"):
 			// ignore cuda and template not mapped gstreamer warnings
 			continue
-		case strings.HasPrefix(line, "turnc"):
-			// warn on turnc error
+		case len(line) > 6 && downgrade[line[:6]]:
+			// downgrade turn, ice, and sdk errors
 			l.logger.Infow(line)
 		default:
 			// panics and unexpected errors
