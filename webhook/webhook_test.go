@@ -31,15 +31,15 @@ import (
 )
 
 const (
-	apiKey               = "mykey"
-	apiSecret            = "mysecret"
+	testAPIKey           = "mykey"
+	testAPISecret        = "mysecret"
 	testAddr             = ":8765"
 	testUrl              = "http://localhost:8765"
 	webhookCheckInterval = 100 * time.Millisecond
 )
 
 var authProvider = auth.NewSimpleKeyProvider(
-	apiKey, apiSecret,
+	testAPIKey, testAPISecret,
 )
 
 func TestWebHook(t *testing.T) {
@@ -148,8 +148,8 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			QueueSize: 20,
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			HTTPClientParams: HTTPClientParams{
 				RetryWaitMax:  time.Millisecond,
 				MaxRetries:    1,
@@ -181,8 +181,8 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		defer ln.Close()
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			URL:       "http://localhost:9987",
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			HTTPClientParams: HTTPClientParams{
 				RetryWaitMax:  time.Millisecond,
 				MaxRetries:    1,
@@ -207,8 +207,8 @@ func TestURLNotifierFilter(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			QueueSize: 20,
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 		})
 		defer urlNotifier.Stop(false)
 
@@ -233,8 +233,8 @@ func TestURLNotifierFilter(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			QueueSize: 20,
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			FilterParams: FilterParams{
 				IncludeEvents: []string{EventRoomStarted},
 			},
@@ -262,8 +262,8 @@ func TestURLNotifierFilter(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			QueueSize: 20,
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			FilterParams: FilterParams{
 				ExcludeEvents: []string{EventRoomStarted},
 			},
@@ -291,8 +291,8 @@ func TestURLNotifierFilter(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
 			QueueSize: 20,
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			FilterParams: FilterParams{
 				IncludeEvents: []string{EventRoomStarted},
 				ExcludeEvents: []string{EventRoomStarted, EventRoomFinished},
@@ -323,8 +323,8 @@ func newTestNotifier() *URLNotifier {
 	return NewURLNotifier(URLNotifierParams{
 		QueueSize: 20,
 		URL:       testUrl,
-		APIKey:    apiKey,
-		APISecret: apiSecret,
+		APIKey:    testAPIKey,
+		APISecret: testAPISecret,
 	})
 }
 
@@ -336,7 +336,13 @@ func TestResourceWebHook(t *testing.T) {
 	defer s.Stop()
 
 	t.Run("test event payload", func(t *testing.T) {
-		resourceURLNotifier := NewDefaultNotifier(apiKey, apiSecret, []string{testUrl})
+		resourceURLNotifier := NewDefaultNotifier(
+			WebHookConfig{
+				URLs:   []string{testUrl},
+				APIKey: testAPIKey,
+			},
+			testAPISecret,
+		)
 		defer resourceURLNotifier.Stop(false)
 
 		event := &livekit.WebhookEvent{
@@ -599,8 +605,8 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 	t.Run("times out after accepting connection", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			Config: ResourceURLNotifierConfig{
 				MaxAge:   200 * time.Millisecond,
 				MaxDepth: 50,
@@ -636,8 +642,8 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		defer ln.Close()
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       "http://localhost:9987",
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			Config: ResourceURLNotifierConfig{
 				MaxAge:   200 * time.Millisecond,
 				MaxDepth: 50,
@@ -665,8 +671,8 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 	t.Run("none", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			Config: ResourceURLNotifierConfig{
 				MaxAge:   200 * time.Millisecond,
 				MaxDepth: 50,
@@ -695,8 +701,8 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 	t.Run("includes", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			Config: ResourceURLNotifierConfig{
 				MaxAge:   200 * time.Millisecond,
 				MaxDepth: 50,
@@ -727,8 +733,8 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 	t.Run("excludes", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			Config: ResourceURLNotifierConfig{
 				MaxAge:   200 * time.Millisecond,
 				MaxDepth: 50,
@@ -759,8 +765,8 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 	t.Run("includes + excludes", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       testUrl,
-			APIKey:    apiKey,
-			APISecret: apiSecret,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
 			Config: ResourceURLNotifierConfig{
 				MaxAge:   200 * time.Millisecond,
 				MaxDepth: 50,
@@ -794,8 +800,8 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 func newTestResourceNotifier(timeout time.Duration, maxAge time.Duration, maxDepth int) *ResourceURLNotifier {
 	return NewResourceURLNotifier(ResourceURLNotifierParams{
 		URL:       testUrl,
-		APIKey:    apiKey,
-		APISecret: apiSecret,
+		APIKey:    testAPIKey,
+		APISecret: testAPISecret,
 		Timeout:   timeout,
 		Config: ResourceURLNotifierConfig{
 			MaxAge:   maxAge,

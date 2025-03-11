@@ -24,6 +24,16 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type WebHookConfig struct {
+	URLs                []string                  `yaml:"urls,omitempty"`
+	APIKey              string                    `yaml:"api_key,omitempty"`
+	ResourceURLNotifier ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
+}
+
+var DefaultWebHookConfig = WebHookConfig{
+	ResourceURLNotifier: DefaultResourceURLNotifierConfig,
+}
+
 type QueuedNotifier interface {
 	RegisterProcessedHook(f func(ctx context.Context, whi *livekit.WebhookInfo))
 	SetKeys(apiKey, apiSecret string)
@@ -36,14 +46,15 @@ type DefaultNotifier struct {
 	notifiers []QueuedNotifier
 }
 
-func NewDefaultNotifier(apiKey, apiSecret string, urls []string) QueuedNotifier {
+func NewDefaultNotifier(config WebHookConfig, apiSecret string) QueuedNotifier {
 	n := &DefaultNotifier{}
-	for _, url := range urls {
+	for _, url := range config.URLs {
 		u := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       url,
 			Logger:    logger.GetLogger().WithComponent("webhook"),
-			APIKey:    apiKey,
+			APIKey:    config.APIKey,
 			APISecret: apiSecret,
+			Config:    config.ResourceURLNotifier,
 		})
 		n.notifiers = append(n.notifiers, u)
 	}
