@@ -37,10 +37,20 @@ const (
 	defaultQueueSize = 100
 )
 
+type URLNotifierConfig struct {
+	NumWorkers int
+	QueueSize  int
+}
+
+var DefaultURLNotifierConfig = URLNotifierConfig{
+	NumWorkers: 10,
+	QueueSize:  100,
+}
+
 type URLNotifierParams struct {
 	HTTPClientParams
 	Logger     logger.Logger
-	QueueSize  int
+	Config     URLNotifierConfig
 	URL        string
 	APIKey     string
 	APISecret  string
@@ -61,8 +71,11 @@ type URLNotifier struct {
 }
 
 func NewURLNotifier(params URLNotifierParams) *URLNotifier {
-	if params.QueueSize == 0 {
-		params.QueueSize = defaultQueueSize
+	if params.Config.NumWorkers == 0 {
+		params.Config.NumWorkers = DefaultURLNotifierConfig.NumWorkers
+	}
+	if params.Config.QueueSize == 0 {
+		params.Config.QueueSize = DefaultURLNotifierConfig.QueueSize
 	}
 	if params.Logger == nil {
 		params.Logger = logger.GetLogger()
@@ -88,8 +101,8 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	}
 	n.client.Logger = &logAdapter{}
 
-	n.pool = core.NewQueuePool(numWorkers, core.QueueWorkerParams{
-		QueueSize:    params.QueueSize,
+	n.pool = core.NewQueuePool(params.Config.NumWorkers, core.QueueWorkerParams{
+		QueueSize:    params.Config.QueueSize,
 		DropWhenFull: true,
 	})
 	return n
