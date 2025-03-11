@@ -38,8 +38,8 @@ const (
 )
 
 type URLNotifierConfig struct {
-	NumWorkers int
-	QueueSize  int
+	NumWorkers int `yaml:"num_workers,omitempty"`
+	QueueSize  int `yaml:"queue_size,omitempty"`
 }
 
 var DefaultURLNotifierConfig = URLNotifierConfig{
