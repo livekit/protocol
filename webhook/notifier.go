@@ -27,10 +27,12 @@ import (
 type WebHookConfig struct {
 	URLs                []string                  `yaml:"urls,omitempty"`
 	APIKey              string                    `yaml:"api_key,omitempty"`
+	URLNotifier         URLNotifierConfig         `yaml:"url_notifier,omitempty"`
 	ResourceURLNotifier ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
 }
 
 var DefaultWebHookConfig = WebHookConfig{
+	URLNotifier:         DefaultURLNotifierConfig,
 	ResourceURLNotifier: DefaultResourceURLNotifierConfig,
 }
 

@@ -146,7 +146,6 @@ func TestURLNotifierLifecycle(t *testing.T) {
 
 	t.Run("times out after accepting connection", func(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
-			QueueSize: 20,
 			URL:       testUrl,
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
@@ -154,6 +153,9 @@ func TestURLNotifierLifecycle(t *testing.T) {
 				RetryWaitMax:  time.Millisecond,
 				MaxRetries:    1,
 				ClientTimeout: 100 * time.Millisecond,
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
 			},
 		})
 
@@ -205,10 +207,12 @@ func TestURLNotifierFilter(t *testing.T) {
 
 	t.Run("none", func(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
-			QueueSize: 20,
 			URL:       testUrl,
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
+			Config: URLNotifierConfig{
+				QueueSize: 20,
+			},
 		})
 		defer urlNotifier.Stop(false)
 
@@ -231,12 +235,14 @@ func TestURLNotifierFilter(t *testing.T) {
 
 	t.Run("includes", func(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
-			QueueSize: 20,
 			URL:       testUrl,
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
 			FilterParams: FilterParams{
 				IncludeEvents: []string{EventRoomStarted},
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
 			},
 		})
 		defer urlNotifier.Stop(false)
@@ -260,12 +266,14 @@ func TestURLNotifierFilter(t *testing.T) {
 
 	t.Run("excludes", func(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
-			QueueSize: 20,
 			URL:       testUrl,
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
 			FilterParams: FilterParams{
 				ExcludeEvents: []string{EventRoomStarted},
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
 			},
 		})
 		defer urlNotifier.Stop(false)
@@ -289,13 +297,15 @@ func TestURLNotifierFilter(t *testing.T) {
 
 	t.Run("includes + excludes", func(t *testing.T) {
 		urlNotifier := NewURLNotifier(URLNotifierParams{
-			QueueSize: 20,
 			URL:       testUrl,
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
 			FilterParams: FilterParams{
 				IncludeEvents: []string{EventRoomStarted},
 				ExcludeEvents: []string{EventRoomStarted, EventRoomFinished},
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
 			},
 		})
 		defer urlNotifier.Stop(false)
@@ -321,10 +331,12 @@ func TestURLNotifierFilter(t *testing.T) {
 
 func newTestNotifier() *URLNotifier {
 	return NewURLNotifier(URLNotifierParams{
-		QueueSize: 20,
 		URL:       testUrl,
 		APIKey:    testAPIKey,
 		APISecret: testAPISecret,
+		Config: URLNotifierConfig{
+			QueueSize: 20,
+		},
 	})
 }
 
