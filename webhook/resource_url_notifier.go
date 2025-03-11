@@ -35,13 +35,18 @@ import (
 
 const (
 	defaultTimeout  = 5 * time.Minute
-	defaultMaxAge   = 5 * time.Second
+	defaultMaxAge   = 10 * time.Second
 	defaultMaxDepth = 200
 )
 
 var (
 	errClosed = errors.New("notifier is closed")
 )
+
+type ResourceURLNotifierConfig struct {
+	MaxAge   time.Duration
+	MaxDepth int
+}
 
 type poster interface {
 	Process(ctx context.Context, queuedAt time.Time, event *livekit.WebhookEvent)
@@ -57,8 +62,7 @@ type ResourceURLNotifierParams struct {
 	HTTPClientParams
 	Logger     logger.Logger
 	Timeout    time.Duration
-	MaxAge     time.Duration
-	MaxDepth   int
+	Config     ResourceURLNotifierConfig
 	URL        string
 	APIKey     string
 	APISecret  string
@@ -93,11 +97,11 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 	if params.Timeout == 0 {
 		params.Timeout = defaultTimeout
 	}
-	if params.MaxAge == 0 {
-		params.MaxAge = defaultMaxAge
+	if params.Config.MaxAge == 0 {
+		params.Config.MaxAge = defaultMaxAge
 	}
-	if params.MaxDepth == 0 {
-		params.MaxDepth = defaultMaxDepth
+	if params.Config.MaxDepth == 0 {
+		params.Config.MaxDepth = defaultMaxDepth
 	}
 
 	rhc := retryablehttp.NewClient()
@@ -167,7 +171,7 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 	rqi := r.resourceQueues[key]
 	if rqi == nil || !r.resourceQueueTimeoutQueue.Reset(rqi.tqi) {
 		rq := newResourceQueue(resourceQueueParams{
-			MaxDepth: r.params.MaxDepth,
+			MaxDepth: r.params.Config.MaxDepth,
 			Poster:   r,
 		})
 		rqi = &resourceQueueInfo{resourceQueue: rq, key: key}
@@ -223,7 +227,7 @@ func (r *ResourceURLNotifier) Process(ctx context.Context, queuedAt time.Time, e
 	queueDuration := time.Since(queuedAt)
 	fields = append(fields, "queueDuration", queueDuration)
 
-	if queueDuration > r.params.MaxAge {
+	if queueDuration > r.params.Config.MaxAge {
 		fields = append(fields, "reason", "age")
 		r.params.Logger.Infow("dropped webhook", fields...)
 

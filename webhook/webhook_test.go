@@ -601,8 +601,10 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 			URL:       testUrl,
 			APIKey:    apiKey,
 			APISecret: apiSecret,
-			MaxAge:    200 * time.Millisecond,
-			MaxDepth:  50,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
 			HTTPClientParams: HTTPClientParams{
 				RetryWaitMax:  time.Millisecond,
 				MaxRetries:    1,
@@ -636,8 +638,10 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 			URL:       "http://localhost:9987",
 			APIKey:    apiKey,
 			APISecret: apiSecret,
-			MaxAge:    200 * time.Millisecond,
-			MaxDepth:  50,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
 			HTTPClientParams: HTTPClientParams{
 				RetryWaitMax:  time.Millisecond,
 				MaxRetries:    1,
@@ -660,11 +664,13 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 
 	t.Run("none", func(t *testing.T) {
 		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
-			URL:          testUrl,
-			APIKey:       apiKey,
-			APISecret:    apiSecret,
-			MaxAge:       200 * time.Millisecond,
-			MaxDepth:     50,
+			URL:       testUrl,
+			APIKey:    apiKey,
+			APISecret: apiSecret,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
 			FilterParams: FilterParams{},
 		})
 		defer resourceURLNotifier.Stop(false)
@@ -691,8 +697,10 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 			URL:       testUrl,
 			APIKey:    apiKey,
 			APISecret: apiSecret,
-			MaxAge:    200 * time.Millisecond,
-			MaxDepth:  50,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
 			FilterParams: FilterParams{
 				IncludeEvents: []string{EventRoomStarted},
 			},
@@ -721,8 +729,10 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 			URL:       testUrl,
 			APIKey:    apiKey,
 			APISecret: apiSecret,
-			MaxAge:    200 * time.Millisecond,
-			MaxDepth:  50,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
 			FilterParams: FilterParams{
 				ExcludeEvents: []string{EventRoomStarted},
 			},
@@ -751,8 +761,10 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 			URL:       testUrl,
 			APIKey:    apiKey,
 			APISecret: apiSecret,
-			MaxAge:    200 * time.Millisecond,
-			MaxDepth:  50,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
 			FilterParams: FilterParams{
 				IncludeEvents: []string{EventRoomStarted},
 				ExcludeEvents: []string{EventRoomStarted, EventRoomFinished},
@@ -785,8 +797,10 @@ func newTestResourceNotifier(timeout time.Duration, maxAge time.Duration, maxDep
 		APIKey:    apiKey,
 		APISecret: apiSecret,
 		Timeout:   timeout,
-		MaxAge:    maxAge,
-		MaxDepth:  maxDepth,
+		Config: ResourceURLNotifierConfig{
+			MaxAge:   maxAge,
+			MaxDepth: maxDepth,
+		},
 	})
 }
 
