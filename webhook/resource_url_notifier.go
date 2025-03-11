@@ -48,6 +48,11 @@ type ResourceURLNotifierConfig struct {
 	MaxDepth int
 }
 
+var DefaultResourceURLNotifierConfig = ResourceURLNotifierConfig{
+	MaxAge:   defaultMaxAge,
+	MaxDepth: defaultMaxDepth,
+}
+
 type poster interface {
 	Process(ctx context.Context, queuedAt time.Time, event *livekit.WebhookEvent)
 }
