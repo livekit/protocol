@@ -34,9 +34,7 @@ import (
 )
 
 const (
-	defaultTimeout  = 5 * time.Minute
-	defaultMaxAge   = 10 * time.Second
-	defaultMaxDepth = 200
+	defaultTimeout = 5 * time.Minute
 )
 
 var (
@@ -49,8 +47,8 @@ type ResourceURLNotifierConfig struct {
 }
 
 var DefaultResourceURLNotifierConfig = ResourceURLNotifierConfig{
-	MaxAge:   defaultMaxAge,
-	MaxDepth: defaultMaxDepth,
+	MaxAge:   10 * time.Second,
+	MaxDepth: 200,
 }
 
 type poster interface {
@@ -103,10 +101,10 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 		params.Timeout = defaultTimeout
 	}
 	if params.Config.MaxAge == 0 {
-		params.Config.MaxAge = defaultMaxAge
+		params.Config.MaxAge = DefaultResourceURLNotifierConfig.MaxAge
 	}
 	if params.Config.MaxDepth == 0 {
-		params.Config.MaxDepth = defaultMaxDepth
+		params.Config.MaxDepth = DefaultResourceURLNotifierConfig.MaxDepth
 	}
 
 	rhc := retryablehttp.NewClient()
