@@ -42,8 +42,8 @@ var (
 )
 
 type ResourceURLNotifierConfig struct {
-	MaxAge   time.Duration
-	MaxDepth int
+	MaxAge   time.Duration `yaml:"max_age,omitempty"`
+	MaxDepth int           `yaml:"max_depth,omitempty"`
 }
 
 var DefaultResourceURLNotifierConfig = ResourceURLNotifierConfig{
