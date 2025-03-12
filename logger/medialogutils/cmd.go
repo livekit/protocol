@@ -52,6 +52,7 @@ var downgrade = map[string]bool{
 	"turnc ": true,
 	"ice ER": true,
 	"SDK 20": true,
+	"(egres": true,
 }
 
 func (l *HandlerLogger) Write(p []byte) (n int, err error) {
