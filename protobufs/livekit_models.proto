@@ -132,6 +132,8 @@ message ParticipantInfo {
     SIP = 3;
     // LiveKit agents
     AGENT = 4;
+    // forwarded participant from another room
+    FORWARDED = 5;
   }
   string sid = 1;
   string identity = 2;

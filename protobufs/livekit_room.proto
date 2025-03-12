@@ -241,8 +241,6 @@ message ForwardParticipantRequest {
   string identity = 2;
   // room to forward participant to
   string destination_room = 3;
-  // set to true to stop forwarding
-  bool stop = 4;
 }
 
 message ForwardParticipantResponse {
