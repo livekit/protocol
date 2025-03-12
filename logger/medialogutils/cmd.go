@@ -14,64 +14,18 @@
 
 package medialogutils
 
-import (
-	"fmt"
-	"strings"
-
-	"github.com/livekit/protocol/logger"
-)
-
 // CmdLogger logs cmd outputs
 type CmdLogger struct {
-	name string
+	handler func(string)
 }
 
-func NewCmdLogger(name string) *CmdLogger {
+func NewCmdLogger(handler func(string)) *CmdLogger {
 	return &CmdLogger{
-		name: name,
+		handler: handler,
 	}
 }
 
 func (l *CmdLogger) Write(p []byte) (int, error) {
-	logger.Infow(fmt.Sprintf("%s: %s", l.name, string(p)))
-	return len(p), nil
-}
-
-// HandlerLogger catches stray outputs from egress handlers
-type HandlerLogger struct {
-	logger logger.Logger
-}
-
-func NewHandlerLogger(keyAndValues ...any) *HandlerLogger {
-	return &HandlerLogger{
-		logger: logger.GetLogger().WithValues(keyAndValues...),
-	}
-}
-
-var downgrade = map[string]bool{
-	"turnc ": true,
-	"ice ER": true,
-	"SDK 20": true,
-}
-
-func (l *HandlerLogger) Write(p []byte) (n int, err error) {
-	s := strings.Split(strings.TrimSuffix(string(p), "\n"), "\n")
-	for _, line := range s {
-		switch {
-		case strings.HasSuffix(line, "}"):
-			// (probably) normal log
-			fmt.Println(line)
-		case strings.HasPrefix(line, "0:00:"):
-			// ignore cuda and template not mapped gstreamer warnings
-			continue
-		case len(line) > 6 && downgrade[line[:6]]:
-			// downgrade turn, ice, and sdk errors
-			l.logger.Infow(line)
-		default:
-			// panics and unexpected errors
-			l.logger.Errorw(line, nil)
-		}
-	}
-
+	l.handler(string(p))
 	return len(p), nil
 }
