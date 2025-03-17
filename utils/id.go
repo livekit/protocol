@@ -24,23 +24,27 @@ const (
 )
 
 const (
-	RoomPrefix            = guid.RoomPrefix
-	NodePrefix            = guid.NodePrefix
-	ParticipantPrefix     = guid.ParticipantPrefix
-	TrackPrefix           = guid.TrackPrefix
-	APIKeyPrefix          = guid.APIKeyPrefix
-	EgressPrefix          = guid.EgressPrefix
-	IngressPrefix         = guid.IngressPrefix
-	SIPTrunkPrefix        = guid.SIPTrunkPrefix
-	SIPDispatchRulePrefix = guid.SIPDispatchRulePrefix
-	SIPCallPrefix         = guid.SIPCallPrefix
-	RPCPrefix             = guid.RPCPrefix
-	WHIPResourcePrefix    = guid.WHIPResourcePrefix
-	RTMPResourcePrefix    = guid.RTMPResourcePrefix
-	URLResourcePrefix     = guid.URLResourcePrefix
-	AgentWorkerPrefix     = guid.AgentWorkerPrefix
-	AgentJobPrefix        = guid.AgentJobPrefix
-	AgentDispatchPrefix   = guid.AgentDispatchPrefix
+	RoomPrefix               = guid.RoomPrefix
+	NodePrefix               = guid.NodePrefix
+	ParticipantPrefix        = guid.ParticipantPrefix
+	TrackPrefix              = guid.TrackPrefix
+	APIKeyPrefix             = guid.APIKeyPrefix
+	EgressPrefix             = guid.EgressPrefix
+	IngressPrefix            = guid.IngressPrefix
+	SIPTrunkPrefix           = guid.SIPTrunkPrefix
+	SIPDispatchRulePrefix    = guid.SIPDispatchRulePrefix
+	SIPCallPrefix            = guid.SIPCallPrefix
+	RPCPrefix                = guid.RPCPrefix
+	WHIPResourcePrefix       = guid.WHIPResourcePrefix
+	RTMPResourcePrefix       = guid.RTMPResourcePrefix
+	URLResourcePrefix        = guid.URLResourcePrefix
+	AgentWorkerPrefix        = guid.AgentWorkerPrefix
+	AgentJobPrefix           = guid.AgentJobPrefix
+	AgentDispatchPrefix      = guid.AgentDispatchPrefix
+	HostedAgentPrefix        = guid.HostedAgentPrefix
+	HostedAgentRegionPrefix  = guid.HostedAgentRegionPrefix
+	HostedAgentVersionPrefix = guid.HostedAgentVersionPrefix
+	HostedAgentSecretPrefix  = guid.HostedAgentSecretPrefix
 )
 
 func NewGuid(prefix string) string {
