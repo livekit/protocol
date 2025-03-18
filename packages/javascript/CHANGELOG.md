@@ -1,5 +1,23 @@
 # @livekit/protocol
 
+## 1.35.0
+
+### Minor Changes
+
+- Add ForwardParticipant to room service - [#1011](https://github.com/livekit/protocol/pull/1011) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Move SIP call dispatch info into s separate type. - [#989](https://github.com/livekit/protocol/pull/989) ([@dennwc](https://github.com/dennwc))
+
+- Handle SIP hostname in address filters. Expose attribute. - [#987](https://github.com/livekit/protocol/pull/987) ([@dennwc](https://github.com/dennwc))
+
+- More analytics fields for SIPCallInfo. - [#984](https://github.com/livekit/protocol/pull/984) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Move media related logging utilities from egress to protocol - [#990](https://github.com/livekit/protocol/pull/990) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Allow selecting the base logger used by the OverrideLogger - [#991](https://github.com/livekit/protocol/pull/991) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.34.0
 
 ### Minor Changes

@@ -1,5 +1,19 @@
 # github.com/livekit/protocol
 
+## 1.35.0
+
+### Minor Changes
+
+- Add ForwardParticipant to room service - [#1011](https://github.com/livekit/protocol/pull/1011) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Move SIP call dispatch info into s separate type. - [#989](https://github.com/livekit/protocol/pull/989) ([@dennwc](https://github.com/dennwc))
+
+- Handle SIP hostname in address filters. Expose attribute. - [#987](https://github.com/livekit/protocol/pull/987) ([@dennwc](https://github.com/dennwc))
+
+- Expose and improve SIP number normalization. - [#986](https://github.com/livekit/protocol/pull/986) ([@dennwc](https://github.com/dennwc))
+
+- More analytics fields for SIPCallInfo. - [#984](https://github.com/livekit/protocol/pull/984) ([@dennwc](https://github.com/dennwc))
+
 ## 1.34.0
 
 ### Minor Changes
