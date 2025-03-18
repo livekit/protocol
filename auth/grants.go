@@ -443,6 +443,8 @@ func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
 		return livekit.ParticipantInfo_SIP
 	case "agent":
 		return livekit.ParticipantInfo_AGENT
+	case "forwarded":
+		return livekit.ParticipantInfo_FORWARDED
 	default:
 		return livekit.ParticipantInfo_STANDARD
 	}
