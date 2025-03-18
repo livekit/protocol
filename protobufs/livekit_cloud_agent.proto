@@ -62,7 +62,7 @@ message AgentInfo {
     string agent_id = 1;
     string agent_name = 2;
     string version = 3;
-    repeated AgentDeployment regional_agents = 4;
+    repeated AgentDeployment agent_deployments = 4;
     repeated AgentSecret secrets = 5;
     google.protobuf.Timestamp deployed_at = 6;
 }
