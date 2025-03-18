@@ -166,7 +166,7 @@ message ListAgentSecretsResponse {
 
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
-    rpc ListAgent(ListAgentsRequest) returns (ListAgentsResponse) {}
+    rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}
     rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse) {}
