@@ -71,7 +71,7 @@ message AgentInfo {
     google.protobuf.Timestamp deployed_at = 6;
 }
 
-message ListAgentRequest {
+message ListAgentsRequest {
     string agent_name = 1;
     string agent_id = 2;
 }
