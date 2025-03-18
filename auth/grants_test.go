@@ -87,7 +87,7 @@ func TestGrants(t *testing.T) {
 }
 
 func TestParticipantKind(t *testing.T) {
-	const kindMin, kindMax = livekit.ParticipantInfo_STANDARD, livekit.ParticipantInfo_AGENT
+	const kindMin, kindMax = livekit.ParticipantInfo_STANDARD, livekit.ParticipantInfo_FORWARDED
 	for k := kindMin; k <= kindMax; k++ {
 		k := k
 		t.Run(k.String(), func(t *testing.T) {
