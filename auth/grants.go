@@ -412,7 +412,7 @@ func (s *SIPGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // ------------------------------------------------------------------
 
 type AgentGrant struct {
-	// Admin grants access to all Agents features.
+	// Admin grants to create/update/delete Cloud Agents.
 	Admin bool `json:"admin,omitempty"`
 }
 
