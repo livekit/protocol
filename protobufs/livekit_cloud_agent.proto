@@ -164,6 +164,18 @@ message ListAgentSecretsResponse {
     repeated AgentSecret secrets = 1;
 }
 
+message SettingsParam {
+    string name = 1;
+    string value = 2;
+}
+
+message ClientSettingsResponse {
+    repeated SettingsParam params = 1;
+}
+
+message ClientSettingsRequest {
+}
+
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
@@ -174,4 +186,5 @@ service CloudAgent {
     rpc UpdateAgentSecrets(UpdateAgentSecretsRequest) returns (UpdateAgentSecretsResponse) {}
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}
     rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse) {}
+    rpc GetClientSettings(ClientSettingsRequest) returns (ClientSettingsResponse) {}
 }
