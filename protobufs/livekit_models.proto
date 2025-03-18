@@ -134,6 +134,8 @@ message ParticipantInfo {
     AGENT = 4;
     // forwarded participant from another room
     FORWARDED = 5;
+    // Cloud agents
+    CLOUD_AGENT = 6;
   }
   string sid = 1;
   string identity = 2;

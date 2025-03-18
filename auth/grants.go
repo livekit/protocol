@@ -474,6 +474,8 @@ func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
 		return livekit.ParticipantInfo_AGENT
 	case "forwarded":
 		return livekit.ParticipantInfo_FORWARDED
+	case "cloud_agent":
+		return livekit.ParticipantInfo_CLOUD_AGENT
 	default:
 		return livekit.ParticipantInfo_STANDARD
 	}
