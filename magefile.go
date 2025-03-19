@@ -48,6 +48,7 @@ func Proto() error {
 		"livekit_ingress.proto",
 		"livekit_room.proto",
 		"livekit_sip.proto",
+		"livekit_cloud_agent.proto",
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",

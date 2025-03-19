@@ -54,6 +54,7 @@ type ClaimGrants struct {
 	Kind     string      `json:"kind,omitempty"`
 	Video    *VideoGrant `json:"video,omitempty"`
 	SIP      *SIPGrant   `json:"sip,omitempty"`
+	Agent    *AgentGrant `json:"agent,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -408,6 +409,34 @@ func (s *SIPGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 // ------------------------------------------------------------------
 
+// ------------------------------------------------------------------
+
+type AgentGrant struct {
+	// Admin grants to create/update/delete Cloud Agents.
+	Admin bool `json:"admin,omitempty"`
+}
+
+func (s *AgentGrant) Clone() *AgentGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+
+	return &clone
+}
+
+func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Admin", s.Admin)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
 func sourceToString(source livekit.TrackSource) string {
 	return strings.ToLower(source.String())
 }
@@ -445,6 +474,8 @@ func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
 		return livekit.ParticipantInfo_AGENT
 	case "forwarded":
 		return livekit.ParticipantInfo_FORWARDED
+	case "cloud_agent":
+		return livekit.ParticipantInfo_CLOUD_AGENT
 	default:
 		return livekit.ParticipantInfo_STANDARD
 	}

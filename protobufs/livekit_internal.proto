@@ -32,6 +32,7 @@ enum NodeType {
   TURN = 4;
   SWEEPER = 5;
   DIRECTOR = 6;
+  HOSTED_AGENT = 7;
 }
 
 enum NodeState {

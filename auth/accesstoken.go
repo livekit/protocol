@@ -82,6 +82,11 @@ func (t *AccessToken) SetSIPGrant(grant *SIPGrant) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) SetAgentGrant(grant *AgentGrant) *AccessToken {
+	t.grant.Agent = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t
