@@ -374,3 +374,37 @@ func TestGRPCStatus(t *testing.T) {
 	require.True(t, ok)
 	require.True(t, proto.Equal(e, e2))
 }
+
+func TestDispatchRuleUpdate(t *testing.T) {
+	r := &SIPDispatchRuleInfo{
+		Name:     "Test",
+		TrunkIds: []string{"T1", "T2"},
+		Rule: &SIPDispatchRule{
+			Rule: &SIPDispatchRule_DispatchRuleDirect{
+				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
+			},
+		},
+	}
+	name2 := "Test2"
+	upd := &UpdateSIPDispatchRuleRequest{
+		Action: &UpdateSIPDispatchRuleRequest_Update{
+			Update: &SIPDispatchRuleUpdate{
+				Name: &name2,
+				TrunkIds: &ListUpdate{
+					Set: []string{"T3"},
+				},
+			},
+		},
+	}
+	err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
+	require.NoError(t, err)
+	require.Equal(t, &SIPDispatchRuleInfo{
+		Name:     "Test2",
+		TrunkIds: []string{"T3"},
+		Rule: &SIPDispatchRule{
+			Rule: &SIPDispatchRule_DispatchRuleDirect{
+				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
+			},
+		},
+	}, r)
+}
