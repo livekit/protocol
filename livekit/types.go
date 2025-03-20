@@ -16,8 +16,8 @@ package livekit
 
 import (
 	"context"
-	"io"
 	"fmt"
+	"io"
 
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
@@ -206,7 +206,6 @@ func (it *listPageIter[_, _, _]) Close() {
 	it.done = true
 }
 
-
 func (p *ListUpdate) Validate() error {
 	if p == nil {
 		return nil
@@ -225,6 +224,12 @@ func applyUpdate[T any](dst *T, set *T) {
 	}
 }
 
+func applyUpdatePtr[T any](dst **T, set *T) {
+	if set != nil {
+		*dst = set
+	}
+}
+
 func applyListUpdate[T ~string](dst *[]T, u *ListUpdate) {
 	if u == nil {
 		return
@@ -238,11 +243,11 @@ func applyListUpdate[T ~string](dst *[]T, u *ListUpdate) {
 
 func applyMapDiff(dst *map[string]string, diff map[string]string) {
 	m := *dst
-	if m == nil {
-		m = make(map[string]string)
-	}
 	for k, v := range diff {
 		if v != "" {
+			if m == nil {
+				m = make(map[string]string)
+			}
 			m[k] = v
 		} else {
 			delete(m, k)

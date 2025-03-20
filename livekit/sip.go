@@ -566,7 +566,7 @@ func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
 		return err
 	}
 	applyListUpdate(&info.TrunkIds, p.TrunkIds)
-	applyUpdate(&info.Rule, &p.Rule)
+	applyUpdatePtr(&info.Rule, p.Rule)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyMapDiff(&info.Attributes, p.Attributes)
