@@ -21,6 +21,26 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
+service AgentService {
+  rpc ListAgentWorker(ListAgentWorkerRequest) returns (ListAgentWorkerResponse);
+}
+
+message ListAgentWorkerRequest {
+  string agent_name = 1; // (optional, filter by agent name)
+  JobType job_type = 2; // (optional, filter by job type)
+}
+
+message ListAgentWorkerResponse {
+  repeated AgentWorker agent_workers = 1;
+}
+
+message AgentWorker {
+  string id = 1;
+  string agent_name = 2;
+  JobType job_type = 3;
+  float load = 4;
+}
+
 message Job {
   string id = 1;
   string dispatch_id = 9;
