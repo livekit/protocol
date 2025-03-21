@@ -40,7 +40,7 @@ func newClientRPCErrorInterceptor(errs ...error) psrpc.ClientRPCInterceptor {
 	return func(rpcInfo psrpc.RPCInfo, next psrpc.ClientRPCHandler) psrpc.ClientRPCHandler {
 		return func(ctx context.Context, req proto.Message, opts ...psrpc.RequestOption) (res proto.Message, err error) {
 			res, err = next(ctx, req, opts...)
-			return res, utils.SuppressErrors(err, errs...)
+			return res, utils.ScreenError(err, errs...)
 		}
 	}
 }
@@ -48,7 +48,7 @@ func newClientRPCErrorInterceptor(errs ...error) psrpc.ClientRPCInterceptor {
 func newServerRPCErorrInterceptor(errs ...error) psrpc.ServerRPCInterceptor {
 	return func(ctx context.Context, req proto.Message, rpcInfo psrpc.RPCInfo, handler psrpc.ServerRPCHandler) (res proto.Message, err error) {
 		res, err = handler(ctx, req)
-		return res, utils.SuppressErrors(err, errs...)
+		return res, utils.ScreenError(err, errs...)
 	}
 }
 
@@ -67,5 +67,5 @@ type multiRPCErorrInterceptor struct {
 }
 
 func (r *multiRPCErorrInterceptor) Recv(msg proto.Message, err error) {
-	r.ClientMultiRPCHandler.Recv(msg, utils.SuppressErrors(err, r.errors...))
+	r.ClientMultiRPCHandler.Recv(msg, utils.ScreenError(err, r.errors...))
 }

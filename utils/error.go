@@ -11,7 +11,7 @@ func ErrorIsOneOf(err error, targets ...error) bool {
 	return false
 }
 
-func SuppressErrors(err error, ignored ...error) error {
+func ScreenError(err error, ignored ...error) error {
 	if ErrorIsOneOf(err, ignored...) {
 		return nil
 	}
