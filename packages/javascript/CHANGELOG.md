@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.36.0
+
+### Minor Changes
+
+- add cloud agents - [#1010](https://github.com/livekit/protocol/pull/1010) ([@real-danm](https://github.com/real-danm))
+
+- Update API for SIP. - [#869](https://github.com/livekit/protocol/pull/869) ([@dennwc](https://github.com/dennwc))
+
 ## 1.35.0
 
 ### Minor Changes
