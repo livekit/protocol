@@ -10,3 +10,10 @@ func ErrorIsOneOf(err error, targets ...error) bool {
 	}
 	return false
 }
+
+func ScreenError(err error, ignored ...error) error {
+	if ErrorIsOneOf(err, ignored...) {
+		return nil
+	}
+	return err
+}
