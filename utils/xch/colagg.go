@@ -48,7 +48,7 @@ func MakeColAggFuncUniqStrVar(n int) ColAggFuncUniqStrVar {
 	}
 }
 
-// Append string to column.
+// Append aggregate to column.
 func (c *ColAggFunc[T]) Append(v T) {
 	c.Values = append(c.Values, v)
 }
