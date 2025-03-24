@@ -137,10 +137,10 @@ message ParticipantInfo {
     SIP = 3;
     // LiveKit agents
     AGENT = 4;
-    // forwarded participant from another room
-    FORWARDED = 5;
-    // Cloud agents
-    CLOUD_AGENT = 6;
+  }
+  enum CloudFeature {
+    CLOUD_AGENT = 0;
+    FORWARDED = 1;
   }
   string sid = 1;
   string identity = 2;
@@ -161,8 +161,9 @@ message ParticipantInfo {
   Kind kind = 14;
   map<string, string> attributes = 15;
   DisconnectReason disconnect_reason = 16;
+  repeated CloudFeature cloud_features = 18;
 
-  // NEXT_ID: 18
+  // NEXT_ID: 19
 }
 
 enum TrackType {
