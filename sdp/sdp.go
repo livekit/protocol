@@ -149,3 +149,19 @@ func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
 	}
 	return streamID, true
 }
+
+func GetTrackIDFromMediaDescription(m *sdp.MediaDescription) string {
+	trackId := ""
+	msid, ok := m.Attribute(sdp.AttrKeyMsid)
+	if ok {
+		if split := strings.Split(msid, " "); len(split) >= 2 {
+			trackId = split[1]
+		}
+	}
+	return trackId
+}
+
+func IsMediaDescriptionSimulcast(m *sdp.MediaDescription) bool {
+	_, ok := m.Attribute("simulcast")
+	return ok
+}
