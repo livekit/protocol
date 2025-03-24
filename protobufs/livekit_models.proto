@@ -137,6 +137,8 @@ message ParticipantInfo {
     SIP = 3;
     // LiveKit agents
     AGENT = 4;
+
+    // NEXT_ID: 7
   }
   enum CloudFeature {
     CLOUD_AGENT = 0;
