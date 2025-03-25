@@ -1,5 +1,19 @@
 # github.com/livekit/protocol
 
+## 1.36.0
+
+### Minor Changes
+
+- add cloud agents - [#1010](https://github.com/livekit/protocol/pull/1010) ([@real-danm](https://github.com/real-danm))
+
+- sdp.go: add helper functions for simulcast and trackId - [#1018](https://github.com/livekit/protocol/pull/1018) ([@anunaym14](https://github.com/anunaym14))
+
+- Update API for SIP. - [#869](https://github.com/livekit/protocol/pull/869) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Fix incremental SIP dispatch rule update. - [#1014](https://github.com/livekit/protocol/pull/1014) ([@dennwc](https://github.com/dennwc))
+
 ## 1.35.0
 
 ### Minor Changes
