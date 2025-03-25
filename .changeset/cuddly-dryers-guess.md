@@ -2,4 +2,4 @@
 "@livekit/protocol": patch
 ---
 
-Add cloud features enum
+Add KindDetails enum on ParticipantInfo
