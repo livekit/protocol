@@ -78,10 +78,13 @@ enum ImageCodec {
 
 // Policy for publisher to handle subscribers that are unable to support the primary codec of a track
 enum BackupCodecPolicy {
-  // default behavior, regress to backup codec and all subscribers will receive the backup codec
-  REGRESSION = 0;
+  // default behavior, the track prefer to regress to backup codec and all subscribers will receive the backup codec,
+  // the sfu will try to regress codec if possible but not assured.
+  PREFER_REGRESSION = 0;
   // encoding/send the primary and backup codec simultaneously
   SIMULCAST = 1;
+  // force the track to regress to backup codec, this option can be used in video conference or the publisher has limited bandwidth/encoding power
+  REGRESSION = 2;
 }
 
 message PlayoutDelay {
