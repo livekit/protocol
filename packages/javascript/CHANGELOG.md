@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.36.1
+
+### Patch Changes
+
+- Refine backup codec policy - [#1022](https://github.com/livekit/protocol/pull/1022) ([@cnderrauber](https://github.com/cnderrauber))
+
 ## 1.36.0
 
 ### Minor Changes
