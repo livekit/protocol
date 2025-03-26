@@ -293,58 +293,77 @@ type NodeStats struct {
 	// when server last reported its status
 	UpdatedAt int64 `protobuf:"varint,2,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	// room
-	NumRooms                     int32   `protobuf:"varint,3,opt,name=num_rooms,json=numRooms,proto3" json:"num_rooms,omitempty"`
-	NumClients                   int32   `protobuf:"varint,4,opt,name=num_clients,json=numClients,proto3" json:"num_clients,omitempty"`
-	NumTracksIn                  int32   `protobuf:"varint,5,opt,name=num_tracks_in,json=numTracksIn,proto3" json:"num_tracks_in,omitempty"`
-	NumTracksOut                 int32   `protobuf:"varint,6,opt,name=num_tracks_out,json=numTracksOut,proto3" json:"num_tracks_out,omitempty"`
-	NumTrackPublishAttempts      int32   `protobuf:"varint,36,opt,name=num_track_publish_attempts,json=numTrackPublishAttempts,proto3" json:"num_track_publish_attempts,omitempty"`
-	TrackPublishAttemptsPerSec   float32 `protobuf:"fixed32,37,opt,name=track_publish_attempts_per_sec,json=trackPublishAttemptsPerSec,proto3" json:"track_publish_attempts_per_sec,omitempty"`
-	NumTrackPublishSuccess       int32   `protobuf:"varint,38,opt,name=num_track_publish_success,json=numTrackPublishSuccess,proto3" json:"num_track_publish_success,omitempty"`
-	TrackPublishSuccessPerSec    float32 `protobuf:"fixed32,39,opt,name=track_publish_success_per_sec,json=trackPublishSuccessPerSec,proto3" json:"track_publish_success_per_sec,omitempty"`
-	NumTrackSubscribeAttempts    int32   `protobuf:"varint,40,opt,name=num_track_subscribe_attempts,json=numTrackSubscribeAttempts,proto3" json:"num_track_subscribe_attempts,omitempty"`
+	NumRooms                int32 `protobuf:"varint,3,opt,name=num_rooms,json=numRooms,proto3" json:"num_rooms,omitempty"`
+	NumClients              int32 `protobuf:"varint,4,opt,name=num_clients,json=numClients,proto3" json:"num_clients,omitempty"`
+	NumTracksIn             int32 `protobuf:"varint,5,opt,name=num_tracks_in,json=numTracksIn,proto3" json:"num_tracks_in,omitempty"`
+	NumTracksOut            int32 `protobuf:"varint,6,opt,name=num_tracks_out,json=numTracksOut,proto3" json:"num_tracks_out,omitempty"`
+	NumTrackPublishAttempts int32 `protobuf:"varint,36,opt,name=num_track_publish_attempts,json=numTrackPublishAttempts,proto3" json:"num_track_publish_attempts,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	TrackPublishAttemptsPerSec float32 `protobuf:"fixed32,37,opt,name=track_publish_attempts_per_sec,json=trackPublishAttemptsPerSec,proto3" json:"track_publish_attempts_per_sec,omitempty"`
+	NumTrackPublishSuccess     int32   `protobuf:"varint,38,opt,name=num_track_publish_success,json=numTrackPublishSuccess,proto3" json:"num_track_publish_success,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	TrackPublishSuccessPerSec float32 `protobuf:"fixed32,39,opt,name=track_publish_success_per_sec,json=trackPublishSuccessPerSec,proto3" json:"track_publish_success_per_sec,omitempty"`
+	NumTrackSubscribeAttempts int32   `protobuf:"varint,40,opt,name=num_track_subscribe_attempts,json=numTrackSubscribeAttempts,proto3" json:"num_track_subscribe_attempts,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	TrackSubscribeAttemptsPerSec float32 `protobuf:"fixed32,41,opt,name=track_subscribe_attempts_per_sec,json=trackSubscribeAttemptsPerSec,proto3" json:"track_subscribe_attempts_per_sec,omitempty"`
 	NumTrackSubscribeSuccess     int32   `protobuf:"varint,42,opt,name=num_track_subscribe_success,json=numTrackSubscribeSuccess,proto3" json:"num_track_subscribe_success,omitempty"`
-	TrackSubscribeSuccessPerSec  float32 `protobuf:"fixed32,43,opt,name=track_subscribe_success_per_sec,json=trackSubscribeSuccessPerSec,proto3" json:"track_subscribe_success_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	TrackSubscribeSuccessPerSec float32 `protobuf:"fixed32,43,opt,name=track_subscribe_success_per_sec,json=trackSubscribeSuccessPerSec,proto3" json:"track_subscribe_success_per_sec,omitempty"`
 	// packet
-	BytesIn          uint64  `protobuf:"varint,7,opt,name=bytes_in,json=bytesIn,proto3" json:"bytes_in,omitempty"`
-	BytesOut         uint64  `protobuf:"varint,8,opt,name=bytes_out,json=bytesOut,proto3" json:"bytes_out,omitempty"`
-	PacketsIn        uint64  `protobuf:"varint,9,opt,name=packets_in,json=packetsIn,proto3" json:"packets_in,omitempty"`
-	PacketsOut       uint64  `protobuf:"varint,10,opt,name=packets_out,json=packetsOut,proto3" json:"packets_out,omitempty"`
-	NackTotal        uint64  `protobuf:"varint,11,opt,name=nack_total,json=nackTotal,proto3" json:"nack_total,omitempty"`
-	BytesInPerSec    float32 `protobuf:"fixed32,12,opt,name=bytes_in_per_sec,json=bytesInPerSec,proto3" json:"bytes_in_per_sec,omitempty"`
-	BytesOutPerSec   float32 `protobuf:"fixed32,13,opt,name=bytes_out_per_sec,json=bytesOutPerSec,proto3" json:"bytes_out_per_sec,omitempty"`
-	PacketsInPerSec  float32 `protobuf:"fixed32,14,opt,name=packets_in_per_sec,json=packetsInPerSec,proto3" json:"packets_in_per_sec,omitempty"`
+	BytesIn    uint64 `protobuf:"varint,7,opt,name=bytes_in,json=bytesIn,proto3" json:"bytes_in,omitempty"`
+	BytesOut   uint64 `protobuf:"varint,8,opt,name=bytes_out,json=bytesOut,proto3" json:"bytes_out,omitempty"`
+	PacketsIn  uint64 `protobuf:"varint,9,opt,name=packets_in,json=packetsIn,proto3" json:"packets_in,omitempty"`
+	PacketsOut uint64 `protobuf:"varint,10,opt,name=packets_out,json=packetsOut,proto3" json:"packets_out,omitempty"`
+	NackTotal  uint64 `protobuf:"varint,11,opt,name=nack_total,json=nackTotal,proto3" json:"nack_total,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	BytesInPerSec float32 `protobuf:"fixed32,12,opt,name=bytes_in_per_sec,json=bytesInPerSec,proto3" json:"bytes_in_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	BytesOutPerSec float32 `protobuf:"fixed32,13,opt,name=bytes_out_per_sec,json=bytesOutPerSec,proto3" json:"bytes_out_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	PacketsInPerSec float32 `protobuf:"fixed32,14,opt,name=packets_in_per_sec,json=packetsInPerSec,proto3" json:"packets_in_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	PacketsOutPerSec float32 `protobuf:"fixed32,15,opt,name=packets_out_per_sec,json=packetsOutPerSec,proto3" json:"packets_out_per_sec,omitempty"`
-	NackPerSec       float32 `protobuf:"fixed32,16,opt,name=nack_per_sec,json=nackPerSec,proto3" json:"nack_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	NackPerSec float32 `protobuf:"fixed32,16,opt,name=nack_per_sec,json=nackPerSec,proto3" json:"nack_per_sec,omitempty"`
 	// system
-	NumCpus                    uint32  `protobuf:"varint,17,opt,name=num_cpus,json=numCpus,proto3" json:"num_cpus,omitempty"`
-	LoadAvgLast1Min            float32 `protobuf:"fixed32,18,opt,name=load_avg_last1min,json=loadAvgLast1min,proto3" json:"load_avg_last1min,omitempty"`
-	LoadAvgLast5Min            float32 `protobuf:"fixed32,19,opt,name=load_avg_last5min,json=loadAvgLast5min,proto3" json:"load_avg_last5min,omitempty"`
-	LoadAvgLast15Min           float32 `protobuf:"fixed32,20,opt,name=load_avg_last15min,json=loadAvgLast15min,proto3" json:"load_avg_last15min,omitempty"`
-	CpuLoad                    float32 `protobuf:"fixed32,21,opt,name=cpu_load,json=cpuLoad,proto3" json:"cpu_load,omitempty"`
-	MemoryLoad                 float32 `protobuf:"fixed32,33,opt,name=memory_load,json=memoryLoad,proto3" json:"memory_load,omitempty"` // deprecated
-	MemoryTotal                uint64  `protobuf:"varint,34,opt,name=memory_total,json=memoryTotal,proto3" json:"memory_total,omitempty"`
-	MemoryUsed                 uint64  `protobuf:"varint,35,opt,name=memory_used,json=memoryUsed,proto3" json:"memory_used,omitempty"`
-	SysPacketsOut              uint32  `protobuf:"varint,28,opt,name=sys_packets_out,json=sysPacketsOut,proto3" json:"sys_packets_out,omitempty"`
-	SysPacketsDropped          uint32  `protobuf:"varint,29,opt,name=sys_packets_dropped,json=sysPacketsDropped,proto3" json:"sys_packets_dropped,omitempty"`
-	SysPacketsOutPerSec        float32 `protobuf:"fixed32,30,opt,name=sys_packets_out_per_sec,json=sysPacketsOutPerSec,proto3" json:"sys_packets_out_per_sec,omitempty"`
-	SysPacketsDroppedPerSec    float32 `protobuf:"fixed32,31,opt,name=sys_packets_dropped_per_sec,json=sysPacketsDroppedPerSec,proto3" json:"sys_packets_dropped_per_sec,omitempty"`
+	NumCpus          uint32  `protobuf:"varint,17,opt,name=num_cpus,json=numCpus,proto3" json:"num_cpus,omitempty"`
+	LoadAvgLast1Min  float32 `protobuf:"fixed32,18,opt,name=load_avg_last1min,json=loadAvgLast1min,proto3" json:"load_avg_last1min,omitempty"`
+	LoadAvgLast5Min  float32 `protobuf:"fixed32,19,opt,name=load_avg_last5min,json=loadAvgLast5min,proto3" json:"load_avg_last5min,omitempty"`
+	LoadAvgLast15Min float32 `protobuf:"fixed32,20,opt,name=load_avg_last15min,json=loadAvgLast15min,proto3" json:"load_avg_last15min,omitempty"`
+	CpuLoad          float32 `protobuf:"fixed32,21,opt,name=cpu_load,json=cpuLoad,proto3" json:"cpu_load,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	MemoryLoad        float32 `protobuf:"fixed32,33,opt,name=memory_load,json=memoryLoad,proto3" json:"memory_load,omitempty"`
+	MemoryTotal       uint64  `protobuf:"varint,34,opt,name=memory_total,json=memoryTotal,proto3" json:"memory_total,omitempty"`
+	MemoryUsed        uint64  `protobuf:"varint,35,opt,name=memory_used,json=memoryUsed,proto3" json:"memory_used,omitempty"`
+	SysPacketsOut     uint32  `protobuf:"varint,28,opt,name=sys_packets_out,json=sysPacketsOut,proto3" json:"sys_packets_out,omitempty"`
+	SysPacketsDropped uint32  `protobuf:"varint,29,opt,name=sys_packets_dropped,json=sysPacketsDropped,proto3" json:"sys_packets_dropped,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	SysPacketsOutPerSec float32 `protobuf:"fixed32,30,opt,name=sys_packets_out_per_sec,json=sysPacketsOutPerSec,proto3" json:"sys_packets_out_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	SysPacketsDroppedPerSec float32 `protobuf:"fixed32,31,opt,name=sys_packets_dropped_per_sec,json=sysPacketsDroppedPerSec,proto3" json:"sys_packets_dropped_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	SysPacketsDroppedPctPerSec float32 `protobuf:"fixed32,32,opt,name=sys_packets_dropped_pct_per_sec,json=sysPacketsDroppedPctPerSec,proto3" json:"sys_packets_dropped_pct_per_sec,omitempty"`
 	// retransmissions
-	RetransmitBytesOut         uint64  `protobuf:"varint,22,opt,name=retransmit_bytes_out,json=retransmitBytesOut,proto3" json:"retransmit_bytes_out,omitempty"`
-	RetransmitPacketsOut       uint64  `protobuf:"varint,23,opt,name=retransmit_packets_out,json=retransmitPacketsOut,proto3" json:"retransmit_packets_out,omitempty"`
-	RetransmitBytesOutPerSec   float32 `protobuf:"fixed32,24,opt,name=retransmit_bytes_out_per_sec,json=retransmitBytesOutPerSec,proto3" json:"retransmit_bytes_out_per_sec,omitempty"`
+	RetransmitBytesOut   uint64 `protobuf:"varint,22,opt,name=retransmit_bytes_out,json=retransmitBytesOut,proto3" json:"retransmit_bytes_out,omitempty"`
+	RetransmitPacketsOut uint64 `protobuf:"varint,23,opt,name=retransmit_packets_out,json=retransmitPacketsOut,proto3" json:"retransmit_packets_out,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	RetransmitBytesOutPerSec float32 `protobuf:"fixed32,24,opt,name=retransmit_bytes_out_per_sec,json=retransmitBytesOutPerSec,proto3" json:"retransmit_bytes_out_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	RetransmitPacketsOutPerSec float32 `protobuf:"fixed32,25,opt,name=retransmit_packets_out_per_sec,json=retransmitPacketsOutPerSec,proto3" json:"retransmit_packets_out_per_sec,omitempty"`
 	// participant joins
-	ParticipantSignalConnected       uint64  `protobuf:"varint,26,opt,name=participant_signal_connected,json=participantSignalConnected,proto3" json:"participant_signal_connected,omitempty"`
+	ParticipantSignalConnected uint64 `protobuf:"varint,26,opt,name=participant_signal_connected,json=participantSignalConnected,proto3" json:"participant_signal_connected,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	ParticipantSignalConnectedPerSec float32 `protobuf:"fixed32,27,opt,name=participant_signal_connected_per_sec,json=participantSignalConnectedPerSec,proto3" json:"participant_signal_connected_per_sec,omitempty"`
 	ParticipantRtcConnected          uint64  `protobuf:"varint,44,opt,name=participant_rtc_connected,json=participantRtcConnected,proto3" json:"participant_rtc_connected,omitempty"`
-	ParticipantRtcConnectedPerSec    float32 `protobuf:"fixed32,45,opt,name=participant_rtc_connected_per_sec,json=participantRtcConnectedPerSec,proto3" json:"participant_rtc_connected_per_sec,omitempty"`
-	ParticipantRtcInit               uint64  `protobuf:"varint,46,opt,name=participant_rtc_init,json=participantRtcInit,proto3" json:"participant_rtc_init,omitempty"`
-	ParticipantRtcInitPerSec         float32 `protobuf:"fixed32,47,opt,name=participant_rtc_init_per_sec,json=participantRtcInitPerSec,proto3" json:"participant_rtc_init_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	ParticipantRtcConnectedPerSec float32 `protobuf:"fixed32,45,opt,name=participant_rtc_connected_per_sec,json=participantRtcConnectedPerSec,proto3" json:"participant_rtc_connected_per_sec,omitempty"`
+	ParticipantRtcInit            uint64  `protobuf:"varint,46,opt,name=participant_rtc_init,json=participantRtcInit,proto3" json:"participant_rtc_init,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	ParticipantRtcInitPerSec float32 `protobuf:"fixed32,47,opt,name=participant_rtc_init_per_sec,json=participantRtcInitPerSec,proto3" json:"participant_rtc_init_per_sec,omitempty"`
 	// forward metrics
-	ForwardLatency uint32 `protobuf:"varint,48,opt,name=forward_latency,json=forwardLatency,proto3" json:"forward_latency,omitempty"`
-	ForwardJitter  uint32 `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
+	ForwardLatency uint32           `protobuf:"varint,48,opt,name=forward_latency,json=forwardLatency,proto3" json:"forward_latency,omitempty"`
+	ForwardJitter  uint32           `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
+	Rates          []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -428,6 +447,7 @@ func (x *NodeStats) GetNumTrackPublishAttempts() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetTrackPublishAttemptsPerSec() float32 {
 	if x != nil {
 		return x.TrackPublishAttemptsPerSec
@@ -442,6 +462,7 @@ func (x *NodeStats) GetNumTrackPublishSuccess() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetTrackPublishSuccessPerSec() float32 {
 	if x != nil {
 		return x.TrackPublishSuccessPerSec
@@ -456,6 +477,7 @@ func (x *NodeStats) GetNumTrackSubscribeAttempts() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetTrackSubscribeAttemptsPerSec() float32 {
 	if x != nil {
 		return x.TrackSubscribeAttemptsPerSec
@@ -470,6 +492,7 @@ func (x *NodeStats) GetNumTrackSubscribeSuccess() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetTrackSubscribeSuccessPerSec() float32 {
 	if x != nil {
 		return x.TrackSubscribeSuccessPerSec
@@ -512,6 +535,7 @@ func (x *NodeStats) GetNackTotal() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetBytesInPerSec() float32 {
 	if x != nil {
 		return x.BytesInPerSec
@@ -519,6 +543,7 @@ func (x *NodeStats) GetBytesInPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetBytesOutPerSec() float32 {
 	if x != nil {
 		return x.BytesOutPerSec
@@ -526,6 +551,7 @@ func (x *NodeStats) GetBytesOutPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetPacketsInPerSec() float32 {
 	if x != nil {
 		return x.PacketsInPerSec
@@ -533,6 +559,7 @@ func (x *NodeStats) GetPacketsInPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetPacketsOutPerSec() float32 {
 	if x != nil {
 		return x.PacketsOutPerSec
@@ -540,6 +567,7 @@ func (x *NodeStats) GetPacketsOutPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetNackPerSec() float32 {
 	if x != nil {
 		return x.NackPerSec
@@ -582,6 +610,7 @@ func (x *NodeStats) GetCpuLoad() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetMemoryLoad() float32 {
 	if x != nil {
 		return x.MemoryLoad
@@ -617,6 +646,7 @@ func (x *NodeStats) GetSysPacketsDropped() uint32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetSysPacketsOutPerSec() float32 {
 	if x != nil {
 		return x.SysPacketsOutPerSec
@@ -624,6 +654,7 @@ func (x *NodeStats) GetSysPacketsOutPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetSysPacketsDroppedPerSec() float32 {
 	if x != nil {
 		return x.SysPacketsDroppedPerSec
@@ -631,6 +662,7 @@ func (x *NodeStats) GetSysPacketsDroppedPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetSysPacketsDroppedPctPerSec() float32 {
 	if x != nil {
 		return x.SysPacketsDroppedPctPerSec
@@ -652,6 +684,7 @@ func (x *NodeStats) GetRetransmitPacketsOut() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetRetransmitBytesOutPerSec() float32 {
 	if x != nil {
 		return x.RetransmitBytesOutPerSec
@@ -659,6 +692,7 @@ func (x *NodeStats) GetRetransmitBytesOutPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetRetransmitPacketsOutPerSec() float32 {
 	if x != nil {
 		return x.RetransmitPacketsOutPerSec
@@ -673,6 +707,7 @@ func (x *NodeStats) GetParticipantSignalConnected() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetParticipantSignalConnectedPerSec() float32 {
 	if x != nil {
 		return x.ParticipantSignalConnectedPerSec
@@ -687,6 +722,7 @@ func (x *NodeStats) GetParticipantRtcConnected() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetParticipantRtcConnectedPerSec() float32 {
 	if x != nil {
 		return x.ParticipantRtcConnectedPerSec
@@ -701,6 +737,7 @@ func (x *NodeStats) GetParticipantRtcInit() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetParticipantRtcInitPerSec() float32 {
 	if x != nil {
 		return x.ParticipantRtcInitPerSec
@@ -718,6 +755,219 @@ func (x *NodeStats) GetForwardLatency() uint32 {
 func (x *NodeStats) GetForwardJitter() uint32 {
 	if x != nil {
 		return x.ForwardJitter
+	}
+	return 0
+}
+
+func (x *NodeStats) GetRates() []*NodeStatsRate {
+	if x != nil {
+		return x.Rates
+	}
+	return nil
+}
+
+// rates of different node stats (per second)
+type NodeStatsRate struct {
+	state                      protoimpl.MessageState `protogen:"open.v1"`
+	StartedAt                  int64                  `protobuf:"varint,1,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt                    int64                  `protobuf:"varint,2,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	Duration                   int64                  `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"`
+	TrackPublishAttempts       float32                `protobuf:"fixed32,4,opt,name=track_publish_attempts,json=trackPublishAttempts,proto3" json:"track_publish_attempts,omitempty"`
+	TrackPublishSuccess        float32                `protobuf:"fixed32,5,opt,name=track_publish_success,json=trackPublishSuccess,proto3" json:"track_publish_success,omitempty"`
+	TrackSubscribeAttempts     float32                `protobuf:"fixed32,6,opt,name=track_subscribe_attempts,json=trackSubscribeAttempts,proto3" json:"track_subscribe_attempts,omitempty"`
+	TrackSubscribeSuccess      float32                `protobuf:"fixed32,7,opt,name=track_subscribe_success,json=trackSubscribeSuccess,proto3" json:"track_subscribe_success,omitempty"`
+	BytesIn                    float32                `protobuf:"fixed32,8,opt,name=bytes_in,json=bytesIn,proto3" json:"bytes_in,omitempty"`
+	BytesOut                   float32                `protobuf:"fixed32,9,opt,name=bytes_out,json=bytesOut,proto3" json:"bytes_out,omitempty"`
+	PacketsIn                  float32                `protobuf:"fixed32,10,opt,name=packets_in,json=packetsIn,proto3" json:"packets_in,omitempty"`
+	PacketsOut                 float32                `protobuf:"fixed32,11,opt,name=packets_out,json=packetsOut,proto3" json:"packets_out,omitempty"`
+	NackTotal                  float32                `protobuf:"fixed32,12,opt,name=nack_total,json=nackTotal,proto3" json:"nack_total,omitempty"`
+	SysPacketsOut              float32                `protobuf:"fixed32,13,opt,name=sys_packets_out,json=sysPacketsOut,proto3" json:"sys_packets_out,omitempty"`
+	SysPacketsDropped          float32                `protobuf:"fixed32,14,opt,name=sys_packets_dropped,json=sysPacketsDropped,proto3" json:"sys_packets_dropped,omitempty"`
+	RetransmitBytesOut         float32                `protobuf:"fixed32,15,opt,name=retransmit_bytes_out,json=retransmitBytesOut,proto3" json:"retransmit_bytes_out,omitempty"`
+	RetransmitPacketsOut       float32                `protobuf:"fixed32,16,opt,name=retransmit_packets_out,json=retransmitPacketsOut,proto3" json:"retransmit_packets_out,omitempty"`
+	ParticipantSignalConnected float32                `protobuf:"fixed32,17,opt,name=participant_signal_connected,json=participantSignalConnected,proto3" json:"participant_signal_connected,omitempty"`
+	ParticipantRtcConnected    float32                `protobuf:"fixed32,18,opt,name=participant_rtc_connected,json=participantRtcConnected,proto3" json:"participant_rtc_connected,omitempty"`
+	ParticipantRtcInit         float32                `protobuf:"fixed32,19,opt,name=participant_rtc_init,json=participantRtcInit,proto3" json:"participant_rtc_init,omitempty"`
+	// time weighted averages across stats windows forming part of a rate measurement interval
+	CpuLoad       float32 `protobuf:"fixed32,20,opt,name=cpu_load,json=cpuLoad,proto3" json:"cpu_load,omitempty"`
+	MemoryLoad    float32 `protobuf:"fixed32,21,opt,name=memory_load,json=memoryLoad,proto3" json:"memory_load,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodeStatsRate) Reset() {
+	*x = NodeStatsRate{}
+	mi := &file_livekit_internal_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeStatsRate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeStatsRate) ProtoMessage() {}
+
+func (x *NodeStatsRate) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_internal_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeStatsRate.ProtoReflect.Descriptor instead.
+func (*NodeStatsRate) Descriptor() ([]byte, []int) {
+	return file_livekit_internal_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *NodeStatsRate) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetDuration() int64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetTrackPublishAttempts() float32 {
+	if x != nil {
+		return x.TrackPublishAttempts
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetTrackPublishSuccess() float32 {
+	if x != nil {
+		return x.TrackPublishSuccess
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetTrackSubscribeAttempts() float32 {
+	if x != nil {
+		return x.TrackSubscribeAttempts
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetTrackSubscribeSuccess() float32 {
+	if x != nil {
+		return x.TrackSubscribeSuccess
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetBytesIn() float32 {
+	if x != nil {
+		return x.BytesIn
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetBytesOut() float32 {
+	if x != nil {
+		return x.BytesOut
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetPacketsIn() float32 {
+	if x != nil {
+		return x.PacketsIn
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetPacketsOut() float32 {
+	if x != nil {
+		return x.PacketsOut
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetNackTotal() float32 {
+	if x != nil {
+		return x.NackTotal
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetSysPacketsOut() float32 {
+	if x != nil {
+		return x.SysPacketsOut
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetSysPacketsDropped() float32 {
+	if x != nil {
+		return x.SysPacketsDropped
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetRetransmitBytesOut() float32 {
+	if x != nil {
+		return x.RetransmitBytesOut
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetRetransmitPacketsOut() float32 {
+	if x != nil {
+		return x.RetransmitPacketsOut
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetParticipantSignalConnected() float32 {
+	if x != nil {
+		return x.ParticipantSignalConnected
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetParticipantRtcConnected() float32 {
+	if x != nil {
+		return x.ParticipantRtcConnected
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetParticipantRtcInit() float32 {
+	if x != nil {
+		return x.ParticipantRtcInit
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetCpuLoad() float32 {
+	if x != nil {
+		return x.CpuLoad
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetMemoryLoad() float32 {
+	if x != nil {
+		return x.MemoryLoad
 	}
 	return 0
 }
@@ -749,7 +999,7 @@ type StartSession struct {
 
 func (x *StartSession) Reset() {
 	*x = StartSession{}
-	mi := &file_livekit_internal_proto_msgTypes[2]
+	mi := &file_livekit_internal_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -761,7 +1011,7 @@ func (x *StartSession) String() string {
 func (*StartSession) ProtoMessage() {}
 
 func (x *StartSession) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_internal_proto_msgTypes[2]
+	mi := &file_livekit_internal_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -774,7 +1024,7 @@ func (x *StartSession) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartSession.ProtoReflect.Descriptor instead.
 func (*StartSession) Descriptor() ([]byte, []int) {
-	return file_livekit_internal_proto_rawDescGZIP(), []int{2}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *StartSession) GetRoomName() string {
@@ -904,7 +1154,7 @@ type RoomInternal struct {
 
 func (x *RoomInternal) Reset() {
 	*x = RoomInternal{}
-	mi := &file_livekit_internal_proto_msgTypes[3]
+	mi := &file_livekit_internal_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -916,7 +1166,7 @@ func (x *RoomInternal) String() string {
 func (*RoomInternal) ProtoMessage() {}
 
 func (x *RoomInternal) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_internal_proto_msgTypes[3]
+	mi := &file_livekit_internal_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -929,7 +1179,7 @@ func (x *RoomInternal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomInternal.ProtoReflect.Descriptor instead.
 func (*RoomInternal) Descriptor() ([]byte, []int) {
-	return file_livekit_internal_proto_rawDescGZIP(), []int{3}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RoomInternal) GetTrackEgress() *AutoTrackEgress {
@@ -984,7 +1234,7 @@ type ICEConfig struct {
 
 func (x *ICEConfig) Reset() {
 	*x = ICEConfig{}
-	mi := &file_livekit_internal_proto_msgTypes[4]
+	mi := &file_livekit_internal_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -996,7 +1246,7 @@ func (x *ICEConfig) String() string {
 func (*ICEConfig) ProtoMessage() {}
 
 func (x *ICEConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_internal_proto_msgTypes[4]
+	mi := &file_livekit_internal_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1009,7 +1259,7 @@ func (x *ICEConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ICEConfig.ProtoReflect.Descriptor instead.
 func (*ICEConfig) Descriptor() ([]byte, []int) {
-	return file_livekit_internal_proto_rawDescGZIP(), []int{4}
+	return file_livekit_internal_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ICEConfig) GetPreferenceSubscriber() ICECandidateType {
@@ -1038,7 +1288,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xbe\x12\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\xb4\x13\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1049,14 +1299,14 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"numClients\x12\"\n" +
 	"\rnum_tracks_in\x18\x05 \x01(\x05R\vnumTracksIn\x12$\n" +
 	"\x0enum_tracks_out\x18\x06 \x01(\x05R\fnumTracksOut\x12;\n" +
-	"\x1anum_track_publish_attempts\x18$ \x01(\x05R\x17numTrackPublishAttempts\x12B\n" +
-	"\x1etrack_publish_attempts_per_sec\x18% \x01(\x02R\x1atrackPublishAttemptsPerSec\x129\n" +
-	"\x19num_track_publish_success\x18& \x01(\x05R\x16numTrackPublishSuccess\x12@\n" +
-	"\x1dtrack_publish_success_per_sec\x18' \x01(\x02R\x19trackPublishSuccessPerSec\x12?\n" +
-	"\x1cnum_track_subscribe_attempts\x18( \x01(\x05R\x19numTrackSubscribeAttempts\x12F\n" +
-	" track_subscribe_attempts_per_sec\x18) \x01(\x02R\x1ctrackSubscribeAttemptsPerSec\x12=\n" +
-	"\x1bnum_track_subscribe_success\x18* \x01(\x05R\x18numTrackSubscribeSuccess\x12D\n" +
-	"\x1ftrack_subscribe_success_per_sec\x18+ \x01(\x02R\x1btrackSubscribeSuccessPerSec\x12\x19\n" +
+	"\x1anum_track_publish_attempts\x18$ \x01(\x05R\x17numTrackPublishAttempts\x12F\n" +
+	"\x1etrack_publish_attempts_per_sec\x18% \x01(\x02B\x02\x18\x01R\x1atrackPublishAttemptsPerSec\x129\n" +
+	"\x19num_track_publish_success\x18& \x01(\x05R\x16numTrackPublishSuccess\x12D\n" +
+	"\x1dtrack_publish_success_per_sec\x18' \x01(\x02B\x02\x18\x01R\x19trackPublishSuccessPerSec\x12?\n" +
+	"\x1cnum_track_subscribe_attempts\x18( \x01(\x05R\x19numTrackSubscribeAttempts\x12J\n" +
+	" track_subscribe_attempts_per_sec\x18) \x01(\x02B\x02\x18\x01R\x1ctrackSubscribeAttemptsPerSec\x12=\n" +
+	"\x1bnum_track_subscribe_success\x18* \x01(\x05R\x18numTrackSubscribeSuccess\x12H\n" +
+	"\x1ftrack_subscribe_success_per_sec\x18+ \x01(\x02B\x02\x18\x01R\x1btrackSubscribeSuccessPerSec\x12\x19\n" +
 	"\bbytes_in\x18\a \x01(\x04R\abytesIn\x12\x1b\n" +
 	"\tbytes_out\x18\b \x01(\x04R\bbytesOut\x12\x1d\n" +
 	"\n" +
@@ -1065,40 +1315,69 @@ const file_livekit_internal_proto_rawDesc = "" +
 	" \x01(\x04R\n" +
 	"packetsOut\x12\x1d\n" +
 	"\n" +
-	"nack_total\x18\v \x01(\x04R\tnackTotal\x12'\n" +
-	"\x10bytes_in_per_sec\x18\f \x01(\x02R\rbytesInPerSec\x12)\n" +
-	"\x11bytes_out_per_sec\x18\r \x01(\x02R\x0ebytesOutPerSec\x12+\n" +
-	"\x12packets_in_per_sec\x18\x0e \x01(\x02R\x0fpacketsInPerSec\x12-\n" +
-	"\x13packets_out_per_sec\x18\x0f \x01(\x02R\x10packetsOutPerSec\x12 \n" +
-	"\fnack_per_sec\x18\x10 \x01(\x02R\n" +
+	"nack_total\x18\v \x01(\x04R\tnackTotal\x12+\n" +
+	"\x10bytes_in_per_sec\x18\f \x01(\x02B\x02\x18\x01R\rbytesInPerSec\x12-\n" +
+	"\x11bytes_out_per_sec\x18\r \x01(\x02B\x02\x18\x01R\x0ebytesOutPerSec\x12/\n" +
+	"\x12packets_in_per_sec\x18\x0e \x01(\x02B\x02\x18\x01R\x0fpacketsInPerSec\x121\n" +
+	"\x13packets_out_per_sec\x18\x0f \x01(\x02B\x02\x18\x01R\x10packetsOutPerSec\x12$\n" +
+	"\fnack_per_sec\x18\x10 \x01(\x02B\x02\x18\x01R\n" +
 	"nackPerSec\x12\x19\n" +
 	"\bnum_cpus\x18\x11 \x01(\rR\anumCpus\x12*\n" +
 	"\x11load_avg_last1min\x18\x12 \x01(\x02R\x0floadAvgLast1min\x12*\n" +
 	"\x11load_avg_last5min\x18\x13 \x01(\x02R\x0floadAvgLast5min\x12,\n" +
 	"\x12load_avg_last15min\x18\x14 \x01(\x02R\x10loadAvgLast15min\x12\x19\n" +
-	"\bcpu_load\x18\x15 \x01(\x02R\acpuLoad\x12\x1f\n" +
-	"\vmemory_load\x18! \x01(\x02R\n" +
+	"\bcpu_load\x18\x15 \x01(\x02R\acpuLoad\x12#\n" +
+	"\vmemory_load\x18! \x01(\x02B\x02\x18\x01R\n" +
 	"memoryLoad\x12!\n" +
 	"\fmemory_total\x18\" \x01(\x04R\vmemoryTotal\x12\x1f\n" +
 	"\vmemory_used\x18# \x01(\x04R\n" +
 	"memoryUsed\x12&\n" +
 	"\x0fsys_packets_out\x18\x1c \x01(\rR\rsysPacketsOut\x12.\n" +
-	"\x13sys_packets_dropped\x18\x1d \x01(\rR\x11sysPacketsDropped\x124\n" +
-	"\x17sys_packets_out_per_sec\x18\x1e \x01(\x02R\x13sysPacketsOutPerSec\x12<\n" +
-	"\x1bsys_packets_dropped_per_sec\x18\x1f \x01(\x02R\x17sysPacketsDroppedPerSec\x12C\n" +
-	"\x1fsys_packets_dropped_pct_per_sec\x18  \x01(\x02R\x1asysPacketsDroppedPctPerSec\x120\n" +
+	"\x13sys_packets_dropped\x18\x1d \x01(\rR\x11sysPacketsDropped\x128\n" +
+	"\x17sys_packets_out_per_sec\x18\x1e \x01(\x02B\x02\x18\x01R\x13sysPacketsOutPerSec\x12@\n" +
+	"\x1bsys_packets_dropped_per_sec\x18\x1f \x01(\x02B\x02\x18\x01R\x17sysPacketsDroppedPerSec\x12G\n" +
+	"\x1fsys_packets_dropped_pct_per_sec\x18  \x01(\x02B\x02\x18\x01R\x1asysPacketsDroppedPctPerSec\x120\n" +
 	"\x14retransmit_bytes_out\x18\x16 \x01(\x04R\x12retransmitBytesOut\x124\n" +
-	"\x16retransmit_packets_out\x18\x17 \x01(\x04R\x14retransmitPacketsOut\x12>\n" +
-	"\x1cretransmit_bytes_out_per_sec\x18\x18 \x01(\x02R\x18retransmitBytesOutPerSec\x12B\n" +
-	"\x1eretransmit_packets_out_per_sec\x18\x19 \x01(\x02R\x1aretransmitPacketsOutPerSec\x12@\n" +
-	"\x1cparticipant_signal_connected\x18\x1a \x01(\x04R\x1aparticipantSignalConnected\x12N\n" +
-	"$participant_signal_connected_per_sec\x18\x1b \x01(\x02R participantSignalConnectedPerSec\x12:\n" +
-	"\x19participant_rtc_connected\x18, \x01(\x04R\x17participantRtcConnected\x12H\n" +
-	"!participant_rtc_connected_per_sec\x18- \x01(\x02R\x1dparticipantRtcConnectedPerSec\x120\n" +
-	"\x14participant_rtc_init\x18. \x01(\x04R\x12participantRtcInit\x12>\n" +
-	"\x1cparticipant_rtc_init_per_sec\x18/ \x01(\x02R\x18participantRtcInitPerSec\x12'\n" +
+	"\x16retransmit_packets_out\x18\x17 \x01(\x04R\x14retransmitPacketsOut\x12B\n" +
+	"\x1cretransmit_bytes_out_per_sec\x18\x18 \x01(\x02B\x02\x18\x01R\x18retransmitBytesOutPerSec\x12F\n" +
+	"\x1eretransmit_packets_out_per_sec\x18\x19 \x01(\x02B\x02\x18\x01R\x1aretransmitPacketsOutPerSec\x12@\n" +
+	"\x1cparticipant_signal_connected\x18\x1a \x01(\x04R\x1aparticipantSignalConnected\x12R\n" +
+	"$participant_signal_connected_per_sec\x18\x1b \x01(\x02B\x02\x18\x01R participantSignalConnectedPerSec\x12:\n" +
+	"\x19participant_rtc_connected\x18, \x01(\x04R\x17participantRtcConnected\x12L\n" +
+	"!participant_rtc_connected_per_sec\x18- \x01(\x02B\x02\x18\x01R\x1dparticipantRtcConnectedPerSec\x120\n" +
+	"\x14participant_rtc_init\x18. \x01(\x04R\x12participantRtcInit\x12B\n" +
+	"\x1cparticipant_rtc_init_per_sec\x18/ \x01(\x02B\x02\x18\x01R\x18participantRtcInitPerSec\x12'\n" +
 	"\x0fforward_latency\x180 \x01(\rR\x0eforwardLatency\x12%\n" +
-	"\x0eforward_jitter\x181 \x01(\rR\rforwardJitter\"\x99\x05\n" +
+	"\x0eforward_jitter\x181 \x01(\rR\rforwardJitter\x12,\n" +
+	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\x84\a\n" +
+	"\rNodeStatsRate\x12\x1d\n" +
+	"\n" +
+	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x19\n" +
+	"\bended_at\x18\x02 \x01(\x03R\aendedAt\x12\x1a\n" +
+	"\bduration\x18\x03 \x01(\x03R\bduration\x124\n" +
+	"\x16track_publish_attempts\x18\x04 \x01(\x02R\x14trackPublishAttempts\x122\n" +
+	"\x15track_publish_success\x18\x05 \x01(\x02R\x13trackPublishSuccess\x128\n" +
+	"\x18track_subscribe_attempts\x18\x06 \x01(\x02R\x16trackSubscribeAttempts\x126\n" +
+	"\x17track_subscribe_success\x18\a \x01(\x02R\x15trackSubscribeSuccess\x12\x19\n" +
+	"\bbytes_in\x18\b \x01(\x02R\abytesIn\x12\x1b\n" +
+	"\tbytes_out\x18\t \x01(\x02R\bbytesOut\x12\x1d\n" +
+	"\n" +
+	"packets_in\x18\n" +
+	" \x01(\x02R\tpacketsIn\x12\x1f\n" +
+	"\vpackets_out\x18\v \x01(\x02R\n" +
+	"packetsOut\x12\x1d\n" +
+	"\n" +
+	"nack_total\x18\f \x01(\x02R\tnackTotal\x12&\n" +
+	"\x0fsys_packets_out\x18\r \x01(\x02R\rsysPacketsOut\x12.\n" +
+	"\x13sys_packets_dropped\x18\x0e \x01(\x02R\x11sysPacketsDropped\x120\n" +
+	"\x14retransmit_bytes_out\x18\x0f \x01(\x02R\x12retransmitBytesOut\x124\n" +
+	"\x16retransmit_packets_out\x18\x10 \x01(\x02R\x14retransmitPacketsOut\x12@\n" +
+	"\x1cparticipant_signal_connected\x18\x11 \x01(\x02R\x1aparticipantSignalConnected\x12:\n" +
+	"\x19participant_rtc_connected\x18\x12 \x01(\x02R\x17participantRtcConnected\x120\n" +
+	"\x14participant_rtc_init\x18\x13 \x01(\x02R\x12participantRtcInit\x12\x19\n" +
+	"\bcpu_load\x18\x14 \x01(\x02R\acpuLoad\x12\x1f\n" +
+	"\vmemory_load\x18\x15 \x01(\x02R\n" +
+	"memoryLoad\"\x99\x05\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12#\n" +
@@ -1162,42 +1441,44 @@ func file_livekit_internal_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_internal_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_livekit_internal_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_livekit_internal_proto_goTypes = []any{
 	(NodeType)(0),                 // 0: livekit.NodeType
 	(NodeState)(0),                // 1: livekit.NodeState
 	(ICECandidateType)(0),         // 2: livekit.ICECandidateType
 	(*Node)(nil),                  // 3: livekit.Node
 	(*NodeStats)(nil),             // 4: livekit.NodeStats
-	(*StartSession)(nil),          // 5: livekit.StartSession
-	(*RoomInternal)(nil),          // 6: livekit.RoomInternal
-	(*ICEConfig)(nil),             // 7: livekit.ICEConfig
-	(*ClientInfo)(nil),            // 8: livekit.ClientInfo
-	(ReconnectReason)(0),          // 9: livekit.ReconnectReason
-	(*CreateRoomRequest)(nil),     // 10: livekit.CreateRoomRequest
-	(*AutoTrackEgress)(nil),       // 11: livekit.AutoTrackEgress
-	(*AutoParticipantEgress)(nil), // 12: livekit.AutoParticipantEgress
-	(*PlayoutDelay)(nil),          // 13: livekit.PlayoutDelay
-	(*RoomAgentDispatch)(nil),     // 14: livekit.RoomAgentDispatch
+	(*NodeStatsRate)(nil),         // 5: livekit.NodeStatsRate
+	(*StartSession)(nil),          // 6: livekit.StartSession
+	(*RoomInternal)(nil),          // 7: livekit.RoomInternal
+	(*ICEConfig)(nil),             // 8: livekit.ICEConfig
+	(*ClientInfo)(nil),            // 9: livekit.ClientInfo
+	(ReconnectReason)(0),          // 10: livekit.ReconnectReason
+	(*CreateRoomRequest)(nil),     // 11: livekit.CreateRoomRequest
+	(*AutoTrackEgress)(nil),       // 12: livekit.AutoTrackEgress
+	(*AutoParticipantEgress)(nil), // 13: livekit.AutoParticipantEgress
+	(*PlayoutDelay)(nil),          // 14: livekit.PlayoutDelay
+	(*RoomAgentDispatch)(nil),     // 15: livekit.RoomAgentDispatch
 }
 var file_livekit_internal_proto_depIdxs = []int32{
 	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
 	0,  // 1: livekit.Node.type:type_name -> livekit.NodeType
 	1,  // 2: livekit.Node.state:type_name -> livekit.NodeState
-	8,  // 3: livekit.StartSession.client:type_name -> livekit.ClientInfo
-	9,  // 4: livekit.StartSession.reconnect_reason:type_name -> livekit.ReconnectReason
-	10, // 5: livekit.StartSession.create_room:type_name -> livekit.CreateRoomRequest
-	11, // 6: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
-	12, // 7: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
-	13, // 8: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
-	14, // 9: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
-	2,  // 10: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
-	2,  // 11: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
-	12, // [12:12] is the sub-list for method output_type
-	12, // [12:12] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	5,  // 3: livekit.NodeStats.rates:type_name -> livekit.NodeStatsRate
+	9,  // 4: livekit.StartSession.client:type_name -> livekit.ClientInfo
+	10, // 5: livekit.StartSession.reconnect_reason:type_name -> livekit.ReconnectReason
+	11, // 6: livekit.StartSession.create_room:type_name -> livekit.CreateRoomRequest
+	12, // 7: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
+	13, // 8: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
+	14, // 9: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
+	15, // 10: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
+	2,  // 11: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
+	2,  // 12: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_livekit_internal_proto_init() }
@@ -1209,14 +1490,14 @@ func file_livekit_internal_proto_init() {
 	file_livekit_egress_proto_init()
 	file_livekit_agent_dispatch_proto_init()
 	file_livekit_room_proto_init()
-	file_livekit_internal_proto_msgTypes[2].OneofWrappers = []any{}
+	file_livekit_internal_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_internal_proto_rawDesc), len(file_livekit_internal_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   5,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
