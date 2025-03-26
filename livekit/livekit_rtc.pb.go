@@ -1264,7 +1264,7 @@ func (x *AddTrackRequest) GetBackupCodecPolicy() BackupCodecPolicy {
 	if x != nil {
 		return x.BackupCodecPolicy
 	}
-	return BackupCodecPolicy_REGRESSION
+	return BackupCodecPolicy_PREFER_REGRESSION
 }
 
 type TrickleRequest struct {

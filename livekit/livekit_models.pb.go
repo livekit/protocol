@@ -190,21 +190,26 @@ func (ImageCodec) EnumDescriptor() ([]byte, []int) {
 type BackupCodecPolicy int32
 
 const (
-	// default behavior, regress to backup codec and all subscribers will receive the backup codec
-	BackupCodecPolicy_REGRESSION BackupCodecPolicy = 0
+	// default behavior, the track prefer to regress to backup codec and all subscribers will receive the backup codec,
+	// the sfu will try to regress codec if possible but not assured.
+	BackupCodecPolicy_PREFER_REGRESSION BackupCodecPolicy = 0
 	// encoding/send the primary and backup codec simultaneously
 	BackupCodecPolicy_SIMULCAST BackupCodecPolicy = 1
+	// force the track to regress to backup codec, this option can be used in video conference or the publisher has limited bandwidth/encoding power
+	BackupCodecPolicy_REGRESSION BackupCodecPolicy = 2
 )
 
 // Enum value maps for BackupCodecPolicy.
 var (
 	BackupCodecPolicy_name = map[int32]string{
-		0: "REGRESSION",
+		0: "PREFER_REGRESSION",
 		1: "SIMULCAST",
+		2: "REGRESSION",
 	}
 	BackupCodecPolicy_value = map[string]int32{
-		"REGRESSION": 0,
-		"SIMULCAST":  1,
+		"PREFER_REGRESSION": 0,
+		"SIMULCAST":         1,
+		"REGRESSION":        2,
 	}
 )
 
@@ -2139,7 +2144,7 @@ func (x *TrackInfo) GetBackupCodecPolicy() BackupCodecPolicy {
 	if x != nil {
 		return x.BackupCodecPolicy
 	}
-	return BackupCodecPolicy_REGRESSION
+	return BackupCodecPolicy_PREFER_REGRESSION
 }
 
 // provide information about available spatial layers
@@ -5591,11 +5596,12 @@ const file_livekit_models_proto_rawDesc = "" +
 	"ImageCodec\x12\x0e\n" +
 	"\n" +
 	"IC_DEFAULT\x10\x00\x12\v\n" +
-	"\aIC_JPEG\x10\x01*2\n" +
-	"\x11BackupCodecPolicy\x12\x0e\n" +
+	"\aIC_JPEG\x10\x01*I\n" +
+	"\x11BackupCodecPolicy\x12\x15\n" +
+	"\x11PREFER_REGRESSION\x10\x00\x12\r\n" +
+	"\tSIMULCAST\x10\x01\x12\x0e\n" +
 	"\n" +
-	"REGRESSION\x10\x00\x12\r\n" +
-	"\tSIMULCAST\x10\x01*+\n" +
+	"REGRESSION\x10\x02*+\n" +
 	"\tTrackType\x12\t\n" +
 	"\x05AUDIO\x10\x00\x12\t\n" +
 	"\x05VIDEO\x10\x01\x12\b\n" +
