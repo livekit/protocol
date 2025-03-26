@@ -80,11 +80,11 @@ enum ImageCodec {
 enum BackupCodecPolicy {
   // default behavior, the track prefer to regress to backup codec and all subscribers will receive the backup codec,
   // the sfu will try to regress codec if possible but not assured.
-  REGRESSION = 0;
+  PREFER_REGRESSION = 0;
   // encoding/send the primary and backup codec simultaneously
   SIMULCAST = 1;
   // force the track to regress to backup codec, this option can be used in video conference or the publisher has limited bandwidth/encoding power
-  FORCE_REGRESSION = 2;
+  REGRESSION = 2;
 }
 
 message PlayoutDelay {
