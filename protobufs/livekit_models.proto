@@ -196,8 +196,10 @@ message Encryption {
 message SimulcastCodecInfo {
   string mime_type = 1;
   string mid = 2;
-  string cid = 3;
+  string signal_cid = 3;
   repeated VideoLayer layers = 4;
+  string sdp_cid = 5;
+  bool is_simulcast = 6;
 }
 
 message TrackInfo {
