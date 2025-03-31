@@ -20,6 +20,20 @@ var (
 	_ error            = (*SIPStatus)(nil)
 )
 
+// SIPStatusFrom unwraps an error and returns associated SIP call status, if any.
+func SIPStatusFrom(err error) *SIPStatus {
+	st, ok := status.FromError(err)
+	if !ok {
+		return nil
+	}
+	for _, d := range st.Details() {
+		if e, ok := d.(*SIPStatus); ok {
+			return e
+		}
+	}
+	return nil
+}
+
 func (p SIPStatusCode) ShortName() string {
 	return strings.TrimPrefix(p.String(), "SIP_STATUS_")
 }
