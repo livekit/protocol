@@ -1879,10 +1879,8 @@ type SimulcastCodecInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	MimeType      string                 `protobuf:"bytes,1,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
 	Mid           string                 `protobuf:"bytes,2,opt,name=mid,proto3" json:"mid,omitempty"`
-	SignalCid     string                 `protobuf:"bytes,3,opt,name=signal_cid,json=signalCid,proto3" json:"signal_cid,omitempty"`
+	Cid           string                 `protobuf:"bytes,3,opt,name=cid,proto3" json:"cid,omitempty"`
 	Layers        []*VideoLayer          `protobuf:"bytes,4,rep,name=layers,proto3" json:"layers,omitempty"`
-	SdpCid        string                 `protobuf:"bytes,5,opt,name=sdp_cid,json=sdpCid,proto3" json:"sdp_cid,omitempty"`
-	IsSimulcast   bool                   `protobuf:"varint,6,opt,name=is_simulcast,json=isSimulcast,proto3" json:"is_simulcast,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1931,9 +1929,9 @@ func (x *SimulcastCodecInfo) GetMid() string {
 	return ""
 }
 
-func (x *SimulcastCodecInfo) GetSignalCid() string {
+func (x *SimulcastCodecInfo) GetCid() string {
 	if x != nil {
-		return x.SignalCid
+		return x.Cid
 	}
 	return ""
 }
@@ -1943,20 +1941,6 @@ func (x *SimulcastCodecInfo) GetLayers() []*VideoLayer {
 		return x.Layers
 	}
 	return nil
-}
-
-func (x *SimulcastCodecInfo) GetSdpCid() string {
-	if x != nil {
-		return x.SdpCid
-	}
-	return ""
-}
-
-func (x *SimulcastCodecInfo) GetIsSimulcast() bool {
-	if x != nil {
-		return x.IsSimulcast
-	}
-	return false
 }
 
 type TrackInfo struct {
@@ -5235,15 +5219,12 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x04NONE\x10\x00\x12\a\n" +
 	"\x03GCM\x10\x01\x12\n" +
 	"\n" +
-	"\x06CUSTOM\x10\x02\"\xcb\x01\n" +
+	"\x06CUSTOM\x10\x02\"\x82\x01\n" +
 	"\x12SimulcastCodecInfo\x12\x1b\n" +
 	"\tmime_type\x18\x01 \x01(\tR\bmimeType\x12\x10\n" +
-	"\x03mid\x18\x02 \x01(\tR\x03mid\x12\x1d\n" +
-	"\n" +
-	"signal_cid\x18\x03 \x01(\tR\tsignalCid\x12+\n" +
-	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12\x17\n" +
-	"\asdp_cid\x18\x05 \x01(\tR\x06sdpCid\x12!\n" +
-	"\fis_simulcast\x18\x06 \x01(\bR\visSimulcast\"\xe6\x05\n" +
+	"\x03mid\x18\x02 \x01(\tR\x03mid\x12\x10\n" +
+	"\x03cid\x18\x03 \x01(\tR\x03cid\x12+\n" +
+	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xe6\x05\n" +
 	"\tTrackInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12&\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x12.livekit.TrackTypeR\x04type\x12\x12\n" +
