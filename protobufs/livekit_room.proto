@@ -64,7 +64,7 @@ service RoomService {
   // Forward a participant's track to another room. Requires `roomAdmin` on the room whose name 
   // consists of the source room and destination room as `source|dest`. The forwarding will stop 
   // when the participant leaves the room or call `RemoveParticipant` on the destination room.
-  //A participant can be forwarded to multiple rooms. The destination room will be created if it does not exist.
+  // A participant can be forwarded to multiple rooms. The destination room will be created if it does not exist.
   rpc ForwardParticipant(ForwardParticipantRequest) returns (ForwardParticipantResponse);
 }
 
