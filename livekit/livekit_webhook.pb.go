@@ -156,61 +156,6 @@ func (x *WebhookEvent) GetNumDropped() int32 {
 	return 0
 }
 
-type WebhookConfig struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Url    string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	ApiKey string `protobuf:"bytes,2,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
-}
-
-func (x *WebhookConfig) Reset() {
-	*x = WebhookConfig{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_livekit_webhook_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *WebhookConfig) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WebhookConfig) ProtoMessage() {}
-
-func (x *WebhookConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_webhook_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WebhookConfig.ProtoReflect.Descriptor instead.
-func (*WebhookConfig) Descriptor() ([]byte, []int) {
-	return file_livekit_webhook_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *WebhookConfig) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
-func (x *WebhookConfig) GetApiKey() string {
-	if x != nil {
-		return x.ApiKey
-	}
-	return ""
-}
-
 var File_livekit_webhook_proto protoreflect.FileDescriptor
 
 var file_livekit_webhook_proto_rawDesc = []byte{
@@ -243,16 +188,12 @@ var file_livekit_webhook_proto_rawDesc = []byte{
 	0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41,
 	0x74, 0x12, 0x23, 0x0a, 0x0b, 0x6e, 0x75, 0x6d, 0x5f, 0x64, 0x72, 0x6f, 0x70, 0x70, 0x65, 0x64,
 	0x18, 0x0b, 0x20, 0x01, 0x28, 0x05, 0x42, 0x02, 0x18, 0x01, 0x52, 0x0a, 0x6e, 0x75, 0x6d, 0x44,
-	0x72, 0x6f, 0x70, 0x70, 0x65, 0x64, 0x22, 0x3a, 0x0a, 0x0d, 0x57, 0x65, 0x62, 0x68, 0x6f, 0x6f,
-	0x6b, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x10, 0x0a, 0x03, 0x75, 0x72, 0x6c, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x12, 0x17, 0x0a, 0x07, 0x61, 0x70, 0x69,
-	0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x70, 0x69, 0x4b,
-	0x65, 0x79, 0x42, 0x46, 0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d,
-	0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
-	0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02, 0x0d, 0x4c, 0x69, 0x76, 0x65,
-	0x4b, 0x69, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02, 0x0e, 0x4c, 0x69, 0x76, 0x65,
-	0x4b, 0x69, 0x74, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x72, 0x6f, 0x70, 0x70, 0x65, 0x64, 0x42, 0x46, 0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62,
+	0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0x2f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x2f, 0x6c, 0x69, 0x76, 0x65, 0x6b, 0x69, 0x74, 0xaa, 0x02, 0x0d,
+	0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0xea, 0x02, 0x0e,
+	0x4c, 0x69, 0x76, 0x65, 0x4b, 0x69, 0x74, 0x3a, 0x3a, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -267,22 +208,21 @@ func file_livekit_webhook_proto_rawDescGZIP() []byte {
 	return file_livekit_webhook_proto_rawDescData
 }
 
-var file_livekit_webhook_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_livekit_webhook_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_livekit_webhook_proto_goTypes = []any{
 	(*WebhookEvent)(nil),    // 0: livekit.WebhookEvent
-	(*WebhookConfig)(nil),   // 1: livekit.WebhookConfig
-	(*Room)(nil),            // 2: livekit.Room
-	(*ParticipantInfo)(nil), // 3: livekit.ParticipantInfo
-	(*EgressInfo)(nil),      // 4: livekit.EgressInfo
-	(*IngressInfo)(nil),     // 5: livekit.IngressInfo
-	(*TrackInfo)(nil),       // 6: livekit.TrackInfo
+	(*Room)(nil),            // 1: livekit.Room
+	(*ParticipantInfo)(nil), // 2: livekit.ParticipantInfo
+	(*EgressInfo)(nil),      // 3: livekit.EgressInfo
+	(*IngressInfo)(nil),     // 4: livekit.IngressInfo
+	(*TrackInfo)(nil),       // 5: livekit.TrackInfo
 }
 var file_livekit_webhook_proto_depIdxs = []int32{
-	2, // 0: livekit.WebhookEvent.room:type_name -> livekit.Room
-	3, // 1: livekit.WebhookEvent.participant:type_name -> livekit.ParticipantInfo
-	4, // 2: livekit.WebhookEvent.egress_info:type_name -> livekit.EgressInfo
-	5, // 3: livekit.WebhookEvent.ingress_info:type_name -> livekit.IngressInfo
-	6, // 4: livekit.WebhookEvent.track:type_name -> livekit.TrackInfo
+	1, // 0: livekit.WebhookEvent.room:type_name -> livekit.Room
+	2, // 1: livekit.WebhookEvent.participant:type_name -> livekit.ParticipantInfo
+	3, // 2: livekit.WebhookEvent.egress_info:type_name -> livekit.EgressInfo
+	4, // 3: livekit.WebhookEvent.ingress_info:type_name -> livekit.IngressInfo
+	5, // 4: livekit.WebhookEvent.track:type_name -> livekit.TrackInfo
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
@@ -311,18 +251,6 @@ func file_livekit_webhook_proto_init() {
 				return nil
 			}
 		}
-		file_livekit_webhook_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*WebhookConfig); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -330,7 +258,7 @@ func file_livekit_webhook_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_livekit_webhook_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
