@@ -791,6 +791,8 @@ type NodeStatsRate struct {
 	// time weighted averages across stats windows forming part of a rate measurement interval
 	CpuLoad       float32 `protobuf:"fixed32,20,opt,name=cpu_load,json=cpuLoad,proto3" json:"cpu_load,omitempty"`
 	MemoryLoad    float32 `protobuf:"fixed32,21,opt,name=memory_load,json=memoryLoad,proto3" json:"memory_load,omitempty"`
+	MemoryUsed    float32 `protobuf:"fixed32,22,opt,name=memory_used,json=memoryUsed,proto3" json:"memory_used,omitempty"`
+	MemoryTotal   float32 `protobuf:"fixed32,23,opt,name=memory_total,json=memoryTotal,proto3" json:"memory_total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -968,6 +970,20 @@ func (x *NodeStatsRate) GetCpuLoad() float32 {
 func (x *NodeStatsRate) GetMemoryLoad() float32 {
 	if x != nil {
 		return x.MemoryLoad
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetMemoryUsed() float32 {
+	if x != nil {
+		return x.MemoryUsed
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetMemoryTotal() float32 {
+	if x != nil {
+		return x.MemoryTotal
 	}
 	return 0
 }
@@ -1349,7 +1365,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x1cparticipant_rtc_init_per_sec\x18/ \x01(\x02B\x02\x18\x01R\x18participantRtcInitPerSec\x12'\n" +
 	"\x0fforward_latency\x180 \x01(\rR\x0eforwardLatency\x12%\n" +
 	"\x0eforward_jitter\x181 \x01(\rR\rforwardJitter\x12,\n" +
-	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\x84\a\n" +
+	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\xc8\a\n" +
 	"\rNodeStatsRate\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x19\n" +
@@ -1377,7 +1393,10 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x14participant_rtc_init\x18\x13 \x01(\x02R\x12participantRtcInit\x12\x19\n" +
 	"\bcpu_load\x18\x14 \x01(\x02R\acpuLoad\x12\x1f\n" +
 	"\vmemory_load\x18\x15 \x01(\x02R\n" +
-	"memoryLoad\"\x99\x05\n" +
+	"memoryLoad\x12\x1f\n" +
+	"\vmemory_used\x18\x16 \x01(\x02R\n" +
+	"memoryUsed\x12!\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\x99\x05\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12#\n" +
