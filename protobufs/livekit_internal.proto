@@ -151,6 +151,8 @@ message NodeStatsRate {
   // time weighted averages across stats windows forming part of a rate measurement interval
   float cpu_load = 20;
   float memory_load = 21;
+  float memory_used = 22;
+  float memory_total = 23;
 
   // NEXT ID: 22
 }
