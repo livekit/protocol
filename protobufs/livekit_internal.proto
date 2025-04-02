@@ -154,7 +154,7 @@ message NodeStatsRate {
   float memory_used = 22;
   float memory_total = 23;
 
-  // NEXT ID: 22
+  // NEXT ID: 24
 }
 
 message StartSession {
