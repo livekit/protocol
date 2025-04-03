@@ -19,7 +19,6 @@ package hwstats
 import (
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/livekit/protocol/logger"
 )
@@ -140,14 +139,10 @@ func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
 
 	total, err := readValueFromFile(memMaxPathV2)
 	if err != nil {
-		if maxVal, err := readStringFromFile(memMaxPathV2); err != nil {
+		// when memory limit not set, it has the string "max"
+		usage, total, err = cg.osStat.getMemory()
+		if err != nil {
 			return 0, 0, err
-		} else if maxVal == "max" {
-			// memory limit not set
-			usage, total, err = cg.osStat.getMemory()
-			if err != nil {
-				return 0, 0, err
-			}
 		}
 	}
 
@@ -164,17 +159,4 @@ func readValueFromFile(file string) (uint64, error) {
 
 	// Skip the trailing EOL
 	return strconv.ParseUint(string(b[:len(b)-1]), 10, 64)
-}
-
-func readStringFromFile(file string) (string, error) {
-	b, err := os.ReadFile(file)
-	if err != nil {
-		return "", err
-	}
-
-	// Remove trailing new line if any
-	s := strings.TrimSuffix(string(b), "\n")
-
-	// Remove trailing space if any
-	return strings.TrimSuffix(s, " "), nil
 }
