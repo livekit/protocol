@@ -33,6 +33,7 @@ func (p *nullStatCPUMonitor) getCPUIdle() (float64, error) {
 func (p *nullStatCPUMonitor) numCPU() float64 {
 	return float64(runtime.NumCPU())
 }
+
 func newPlatformCPUMonitor() (platformCPUMonitor, error) {
 	logger.Errorw("CPU monitoring unsupported on current platform. Server capacity management will be disabled", nil)
 
