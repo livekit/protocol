@@ -17,7 +17,6 @@
 package hwstats
 
 import (
-	"errors"
 	"os"
 	"strconv"
 	"strings"
@@ -48,14 +47,14 @@ type cgroupMemoryGetter struct {
 func newPlatformMemoryGetter() (platformMemoryGetter, error) {
 	// backup getter when max is not available,
 	// will get from /proc/meminfo which will be node level max though
-	osStat, err := newOSStatMemoryMonitor()
+	osStat, err := newOSStatMemoryGetter()
 	if err != nil {
 		return nil, err
 	}
 
 	// probe for the cgroup version
 	var cg memInfoGetter
-	for k, v := range map[string]func() memInfoGetter{
+	for k, v := range map[string]func(osStat *osStatMemoryGetter) memInfoGetter{
 		memStatsPathV1: newMemInfoGetterV1,
 		memStatsPathV2: newMemInfoGetterV2,
 	} {
@@ -73,14 +72,14 @@ func newPlatformMemoryGetter() (platformMemoryGetter, error) {
 		return osStat, nil
 	}
 
-	return &cgroupMemoryMonitor{
+	return &cgroupMemoryGetter{
 		cg:     cg,
 		osStat: osStat,
 	}, nil
 }
 
 func (c *cgroupMemoryGetter) getMemory() (uint64, uint64, error) {
-	return p.cg.getMemory()
+	return c.cg.getMemory()
 }
 
 // -----------------------------------------
@@ -89,10 +88,14 @@ const (
 	cSaneMemoryLimit = 32 * 1024 * 1024 * 1024 // 32 GB
 )
 
-type memInfoGetterV1 struct{}
+type memInfoGetterV1 struct {
+	osStat *osStatMemoryGetter
+}
 
-func newMemInfoGetterV1() memInfoGetter {
-	return &memInfoGetterV1{}
+func newMemInfoGetterV1(osStat *osStatMemoryGetter) memInfoGetter {
+	return &memInfoGetterV1{
+		osStat: osStat,
+	}
 }
 
 func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
@@ -107,6 +110,7 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 	}
 
 	if total > cSaneMemoryLimit {
+		// when limit is not explicitly, it could be very high
 		usage, total, err = cg.osStat.getMemory()
 		if err != nil {
 			return 0, 0, err
@@ -151,18 +155,6 @@ func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
 }
 
 // ---------------------------------
-
-func fileExists(path string) (bool, error) {
-	_, err := os.Lstat(path)
-	switch {
-	case err == nil:
-		return true, nil
-	case errors.Is(err, os.ErrNotExist):
-		return false, nil
-	default:
-		return false, err
-	}
-}
 
 func readValueFromFile(file string) (uint64, error) {
 	b, err := os.ReadFile(file)
