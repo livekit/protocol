@@ -699,5 +699,5 @@ message DataStream {
 
 message WebhookConfig {
   string url = 1;
-  string api_key = 2;
+  string signing_key = 2;
 }

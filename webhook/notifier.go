@@ -16,6 +16,7 @@ package webhook
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -36,20 +37,49 @@ var DefaultWebHookConfig = WebHookConfig{
 	ResourceURLNotifier: DefaultResourceURLNotifierConfig,
 }
 
+type NotifyParams struct {
+	ExtraWebhooks []*livekit.WebhookConfig
+	Secret        string
+}
+
+type NotifyOption func(*NotifyParams)
+
+func WithExtraWebhooks(wh []*livekit.WebhookConfig) NotifyOption {
+	return func(p *NotifyParams) {
+		p.ExtraWebhooks = wh
+	}
+}
+
+func WithSecret(secret string) NotifyOption {
+	return func(p *NotifyParams) {
+		p.Secret = secret
+	}
+}
+
 type QueuedNotifier interface {
 	RegisterProcessedHook(f func(ctx context.Context, whi *livekit.WebhookInfo))
 	SetKeys(apiKey, apiSecret string)
 	SetFilter(params FilterParams)
-	QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error
+	QueueNotify(ctx context.Context, event *livekit.WebhookEvent, opts ...NotifyOption) error
 	Stop(force bool)
 }
 
 type DefaultNotifier struct {
-	notifiers []QueuedNotifier
+	apiKeys map[string]string
+
+	notifiers            []QueuedNotifier
+	extraWebhookNotifier QueuedNotifier
 }
 
-func NewDefaultNotifier(config WebHookConfig, apiSecret string) QueuedNotifier {
-	n := &DefaultNotifier{}
+func NewDefaultNotifier(config WebHookConfig, apiKeys map[string]string) (QueuedNotifier, error) {
+	apiSecret, ok := apiKeys[config.APIKey]
+	if !ok {
+		return nil, fmt.Errorf("unknown api key in webhook config")
+	}
+
+	n := &DefaultNotifier{
+		apiKeys: apiKeys,
+	}
 	for _, url := range config.URLs {
 		u := NewResourceURLNotifier(ResourceURLNotifierParams{
 			URL:       url,
@@ -60,7 +90,15 @@ func NewDefaultNotifier(config WebHookConfig, apiSecret string) QueuedNotifier {
 		})
 		n.notifiers = append(n.notifiers, u)
 	}
-	return n
+
+	n.extraWebhookNotifier = NewResourceURLNotifier(ResourceURLNotifierParams{
+		Logger:    logger.GetLogger().WithComponent("webhook"),
+		APIKey:    config.APIKey,
+		APISecret: apiSecret,
+		Config:    config.ResourceURLNotifier,
+	})
+
+	return n, nil
 }
 
 func (n *DefaultNotifier) Stop(force bool) {
@@ -75,12 +113,39 @@ func (n *DefaultNotifier) Stop(force bool) {
 	wg.Wait()
 }
 
-func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
+func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent, opts ...NotifyOption) error {
 	for _, u := range n.notifiers {
+		// No override for static notifiers
 		if err := u.QueueNotify(ctx, event); err != nil {
 			return err
 		}
 	}
+
+	p := &NotifyParams{}
+	for _, o := range opts {
+		o(p)
+	}
+
+	for _, wh := range p.ExtraWebhooks {
+		lopts := []NotifyOption{
+			WithExtraWebhooks([]*livekit.WebhookConfig{wh}),
+		}
+
+		if wh.SigningKey != "" {
+			// empty signing key means default
+			k, ok := n.apiKeys[wh.SigningKey]
+			if !ok {
+				return fmt.Errorf("no secret for provided signing key")
+			}
+
+			lopts = append(lopts, WithSecret(k))
+		}
+
+		if err := n.extraWebhookNotifier.QueueNotify(ctx, event, lopts...); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
