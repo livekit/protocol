@@ -40,8 +40,8 @@ type memInfoGetter interface {
 }
 
 type cgroupMemoryGetter struct {
-	cg memInfoGetter
-	os *osStatMemoryGetter
+	cg     memInfoGetter
+	osStat *osStatMemoryGetter
 }
 
 func newPlatformMemoryGetter() (platformMemoryGetter, error) {
@@ -123,7 +123,7 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 // --------------------------------------------
 
 type memInfoGetterV2 struct {
-	osStat *osStatsMemoryGetter
+	osStat *osStatMemoryGetter
 }
 
 func newMemInfoGetterV2(osStat *osStatMemoryGetter) memInfoGetter {
@@ -159,7 +159,7 @@ func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
 func readValueFromFile(file string) (uint64, error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return 0, 0, err
+		return 0, err
 	}
 
 	// Skip the trailing EOL
@@ -169,12 +169,12 @@ func readValueFromFile(file string) (uint64, error) {
 func readStringFromFile(file string) (string, error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return 0, 0, err
+		return 0, err
 	}
 
 	// Remove trailing new line if any
 	s := strings.TrimSuffix(string(b), "\n")
 
 	// Remove trailing space if any
-	return strings.TrimSuffix(s, " ")
+	return strings.TrimSuffix(s, " "), nil
 }
