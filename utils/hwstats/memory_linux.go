@@ -169,7 +169,7 @@ func readValueFromFile(file string) (uint64, error) {
 func readStringFromFile(file string) (string, error) {
 	b, err := os.ReadFile(file)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	// Remove trailing new line if any
