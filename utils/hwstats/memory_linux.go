@@ -109,7 +109,7 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 	}
 
 	if total > cSaneMemoryLimit {
-		// when limit is not explicitly, it could be very high
+		// when limit is not set explicitly, it could be very high
 		usage, total, err = cg.osStat.getMemory()
 		if err != nil {
 			return 0, 0, err
