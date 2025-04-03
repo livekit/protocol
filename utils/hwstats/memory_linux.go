@@ -138,9 +138,7 @@ func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
 	if err != nil {
 		if maxVal, err := readStringFromFile(memMaxPathV2); err != nil {
 			return 0, 0, err
-		}
-
-		if maxVal == "max" {
+		} else if maxVal == "max" {
 			// memory limit not set
 			usage, total, err = cg.osStat.getMemory()
 			if err != nil {
