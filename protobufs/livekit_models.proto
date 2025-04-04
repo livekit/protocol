@@ -415,6 +415,7 @@ message ClientInfo {
      CPP = 10;
      UNITY_WEB = 11;
      NODE = 12;
+     UNREAL = 13;
   }
 
   SDK sdk = 1;
