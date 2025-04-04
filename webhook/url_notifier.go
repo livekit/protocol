@@ -19,6 +19,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"sync"
 	"time"
 
@@ -133,7 +134,7 @@ func (n *URLNotifier) getProcessedHook() func(ctx context.Context, whi *livekit.
 	return n.processedHook
 }
 
-func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent) error {
+func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEvent, opts ...NotifyOption) error {
 	if !n.filter.IsAllowed(event.Event) {
 		return nil
 	}
@@ -141,21 +142,43 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 	enqueuedAt := time.Now()
 
 	key := eventKey(event)
+
+	p := &NotifyParams{}
+	for _, o := range opts {
+		o(p)
+	}
+
+	n.mu.RLock()
+	params := n.params
+	n.mu.RUnlock()
+
+	if len(p.ExtraWebhooks) > 1 {
+		return fmt.Errorf("more than 1 extra webhook url unexpected")
+	}
+	if len(p.ExtraWebhooks) == 1 {
+		params.URL = p.ExtraWebhooks[0].Url
+		params.APIKey = p.ExtraWebhooks[0].SigningKey
+	}
+
+	if p.Secret != "" {
+		params.APISecret = p.Secret
+	}
+
 	if !n.pool.Submit(key, func() {
-		fields := logFields(event, n.params.URL)
+		fields := logFields(event, params.URL)
 
 		queueDuration := time.Since(enqueuedAt)
 		fields = append(fields, "queueDuration", queueDuration)
 
 		sendStart := time.Now()
-		err := n.send(event)
+		err := n.send(event, &params)
 		sendDuration := time.Since(sendStart)
 		fields = append(fields, "sendDuration", sendDuration)
 		if err != nil {
-			n.params.Logger.Warnw("failed to send webhook", err, fields...)
+			params.Logger.Warnw("failed to send webhook", err, fields...)
 			n.dropped.Add(event.NumDropped + 1)
 		} else {
-			n.params.Logger.Infow("sent webhook", fields...)
+			params.Logger.Infow("sent webhook", fields...)
 		}
 		if ph := n.getProcessedHook(); ph != nil {
 			whi := webhookInfo(
@@ -164,20 +187,20 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 				queueDuration,
 				sendStart,
 				sendDuration,
-				n.params.URL,
+				params.URL,
 				false,
 				err,
 			)
-			if n.params.FieldsHook != nil {
-				n.params.FieldsHook(whi)
+			if params.FieldsHook != nil {
+				params.FieldsHook(whi)
 			}
 			ph(ctx, whi)
 		}
 	}) {
 		n.dropped.Inc()
 
-		fields := logFields(event, n.params.URL)
-		n.params.Logger.Infow("dropped webhook", fields...)
+		fields := logFields(event, params.URL)
+		params.Logger.Infow("dropped webhook", fields...)
 
 		if ph := n.getProcessedHook(); ph != nil {
 			whi := webhookInfo(
@@ -186,12 +209,12 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 				0,
 				time.Time{},
 				0,
-				n.params.URL,
+				params.URL,
 				true,
 				nil,
 			)
-			if n.params.FieldsHook != nil {
-				n.params.FieldsHook(whi)
+			if params.FieldsHook != nil {
+				params.FieldsHook(whi)
 			}
 			ph(ctx, whi)
 		}
@@ -207,7 +230,7 @@ func (n *URLNotifier) Stop(force bool) {
 	}
 }
 
-func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
+func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParams) error {
 	// set dropped count
 	event.NumDropped = n.dropped.Swap(0)
 	encoded, err := protojson.Marshal(event)
@@ -218,19 +241,14 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent) error {
 	sum := sha256.Sum256(encoded)
 	b64 := base64.StdEncoding.EncodeToString(sum[:])
 
-	n.mu.RLock()
-	apiKey := n.params.APIKey
-	apiSecret := n.params.APISecret
-	n.mu.RUnlock()
-
-	at := auth.NewAccessToken(apiKey, apiSecret).
+	at := auth.NewAccessToken(params.APIKey, params.APISecret).
 		SetValidFor(5 * time.Minute).
 		SetSha256(b64)
 	token, err := at.ToJWT()
 	if err != nil {
 		return err
 	}
-	r, err := retryablehttp.NewRequest("POST", n.params.URL, bytes.NewReader(encoded))
+	r, err := retryablehttp.NewRequest("POST", params.URL, bytes.NewReader(encoded))
 	if err != nil {
 		// ignore and continue
 		return err
