@@ -15,6 +15,7 @@
 package sdp
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/pion/sdp/v3"
@@ -164,4 +165,29 @@ func GetTrackIDFromMediaDescription(m *sdp.MediaDescription) string {
 func IsMediaDescriptionSimulcast(m *sdp.MediaDescription) bool {
 	_, ok := m.Attribute("simulcast")
 	return ok
+}
+
+func CodecsFromMediaDescription(m *sdp.MediaDescription) (out []sdp.Codec, err error) {
+	s := &sdp.SessionDescription{
+		MediaDescriptions: []*sdp.MediaDescription{m},
+	}
+
+	for _, payloadStr := range m.MediaName.Formats {
+		payloadType, err := strconv.ParseUint(payloadStr, 10, 8)
+		if err != nil {
+			return nil, err
+		}
+
+		codec, err := s.GetCodecForPayloadType(uint8(payloadType))
+		if err != nil {
+			if payloadType == 0 {
+				continue
+			}
+			return nil, err
+		}
+
+		out = append(out, codec)
+	}
+
+	return out, nil
 }
