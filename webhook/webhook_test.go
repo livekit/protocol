@@ -76,6 +76,7 @@ func TestWebHook(t *testing.T) {
 		wg.Wait()
 
 		wg.Add(1)
+		expectedUrl = "/wh"
 		require.NoError(t, notifier.QueueNotify(context.Background(), event, WithExtraWebhooks([]*livekit.WebhookConfig{&livekit.WebhookConfig{Url: "http://localhost:8765/wh"}})))
 		wg.Wait()
 

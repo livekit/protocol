@@ -187,7 +187,9 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 	}
 	if len(p.ExtraWebhooks) == 1 {
 		params.URL = p.ExtraWebhooks[0].Url
-		params.APIKey = p.ExtraWebhooks[0].SigningKey
+		if p.ExtraWebhooks[0].SigningKey != "" {
+			params.APIKey = p.ExtraWebhooks[0].SigningKey
+		}
 	}
 
 	if p.Secret != "" {
