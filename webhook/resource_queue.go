@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/gammazero/deque"
+
 	"github.com/livekit/protocol/livekit"
 )
 
@@ -96,28 +97,12 @@ func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *li
 	return nil
 }
 
-func (r *resourceQueue) flush() {
-	r.mu.Lock()
-	for r.items.Len() > 0 {
-		item := r.items.PopFront()
-		r.mu.Unlock()
-
-		r.params.Poster.Process(item.ctx, item.queuedAt, item.event)
-
-		r.mu.Lock()
-	}
-	r.mu.Unlock()
-}
-
 func (r *resourceQueue) worker() {
 	for {
 		r.mu.Lock()
 		for {
-			if r.closed {
+			if r.closed && (!r.drain || r.items.Len() == 0) {
 				r.mu.Unlock()
-				if r.drain {
-					r.flush()
-				}
 				return
 			}
 
