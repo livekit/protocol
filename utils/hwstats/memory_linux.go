@@ -83,10 +83,6 @@ func (c *cgroupMemoryGetter) getMemory() (uint64, uint64, error) {
 
 // -----------------------------------------
 
-const (
-	cSaneMemoryLimit = 32 * 1024 * 1024 * 1024 // 32 GB
-)
-
 type memInfoGetterV1 struct {
 	osStat *osStatMemoryGetter
 }
@@ -108,12 +104,14 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 		return 0, 0, err
 	}
 
-	if total > cSaneMemoryLimit {
-		// when limit is not set explicitly, it could be very high
-		usage, total, err = cg.osStat.getMemory()
-		if err != nil {
-			return 0, 0, err
-		}
+	// fallback if limit from cgroup is more than physical available memory
+	// when limit is not set explicitly, it could be very high
+	usage1, total1, err = cg.osStat.getMemory()
+	if err != nil {
+		return 0, 0, err
+	}
+	if total > tota1 {
+		return usage1, total1, nil
 	}
 
 	return usage, total, nil
