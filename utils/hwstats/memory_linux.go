@@ -106,7 +106,7 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 
 	// fallback if limit from cgroup is more than physical available memory
 	// when limit is not set explicitly, it could be very high
-	usage1, total1, err = cg.osStat.getMemory()
+	usage1, total1, err := cg.osStat.getMemory()
 	if err != nil {
 		return 0, 0, err
 	}
