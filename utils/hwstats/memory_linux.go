@@ -110,7 +110,7 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 	if err != nil {
 		return 0, 0, err
 	}
-	if total > tota1 {
+	if total > total1 {
 		return usage1, total1, nil
 	}
 
