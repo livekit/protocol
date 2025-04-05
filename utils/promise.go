@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"context"
+	"sync"
+)
+
 var closedPromiseChan = make(chan struct{})
 
 func init() {
@@ -7,9 +12,10 @@ func init() {
 }
 
 type Promise[T any] struct {
+	mu     sync.Mutex
+	done   chan struct{}
 	Result T
 	Err    error
-	done   chan struct{}
 }
 
 func NewPromise[T any]() *Promise[T] {
@@ -33,20 +39,43 @@ func NewResolvedPromise[T any](result T, err error) *Promise[T] {
 }
 
 func (p *Promise[T]) Resolve(result T, err error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.done == closedPromiseChan {
+		return
+	}
+
 	p.Result = result
 	p.Err = err
-	close(p.done)
+
+	if p.done != nil {
+		close(p.done)
+	}
+	p.done = closedPromiseChan
 }
 
 func (p *Promise[T]) Done() <-chan struct{} {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.done == nil {
+		p.done = make(chan struct{})
+	}
 	return p.done
 }
 
 func (p *Promise[T]) Resolved() bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.done == closedPromiseChan
+}
+
+func AwaitPromise[T any](ctx context.Context, p *Promise[T]) (T, error) {
 	select {
-	case <-p.done:
-		return true
-	default:
-		return false
+	case <-ctx.Done():
+		var v T
+		return v, ctx.Err()
+	case <-p.Done():
+		return p.Result, p.Err
 	}
 }
