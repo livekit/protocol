@@ -30,8 +30,8 @@ const (
 	memUsagePathV1 = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
 	memLimitPathV1 = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
 
-	memCurrentPathV2 = "sys/fs/cgroup/memory/memory.current"
-	memMaxPathV2     = "sys/fs/cgroup/memory/memory.max"
+	memCurrentPathV2 = "/sys/fs/cgroup/memory/memory.current"
+	memMaxPathV2     = "/sys/fs/cgroup/memory/memory.max"
 )
 
 type memInfoGetter interface {
