@@ -1,5 +1,25 @@
 # github.com/livekit/protocol
 
+## 1.37.0
+
+### Minor Changes
+
+- Add helper to get SIP call status from an error. - [#1028](https://github.com/livekit/protocol/pull/1028) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add rate for memory use and total. - [#1030](https://github.com/livekit/protocol/pull/1030) ([@boks1971](https://github.com/boks1971))
+
+- Revert cid changes. - [#1029](https://github.com/livekit/protocol/pull/1029) ([@boks1971](https://github.com/boks1971))
+
+- Use cgroup for memory stats. - [#1031](https://github.com/livekit/protocol/pull/1031) ([@boks1971](https://github.com/boks1971))
+
+- Add more fields to CodecInfo. - [#1024](https://github.com/livekit/protocol/pull/1024) ([@boks1971](https://github.com/boks1971))
+
+- Add client info enum value for unreal - [#1032](https://github.com/livekit/protocol/pull/1032) ([@bcherry](https://github.com/bcherry))
+
+- Rework node stats to split out rate metrics into its own shape. - [#1023](https://github.com/livekit/protocol/pull/1023) ([@boks1971](https://github.com/boks1971))
+
 ## 1.36.1
 
 ### Patch Changes
