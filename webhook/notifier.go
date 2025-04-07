@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -65,20 +66,20 @@ type QueuedNotifier interface {
 }
 
 type DefaultNotifier struct {
-	apiKeys map[string]string
+	kp auth.KeyProvider
 
 	notifiers            []QueuedNotifier
 	extraWebhookNotifier QueuedNotifier
 }
 
-func NewDefaultNotifier(config WebHookConfig, apiKeys map[string]string) (QueuedNotifier, error) {
-	apiSecret, ok := apiKeys[config.APIKey]
-	if !ok {
+func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifier, error) {
+	apiSecret := kp.GetSecret(config.APIKey)
+	if apiSecret == "" {
 		return nil, fmt.Errorf("unknown api key in webhook config")
 	}
 
 	n := &DefaultNotifier{
-		apiKeys: apiKeys,
+		kp: kp,
 	}
 	for _, url := range config.URLs {
 		u := NewResourceURLNotifier(ResourceURLNotifierParams{
@@ -110,6 +111,13 @@ func (n *DefaultNotifier) Stop(force bool) {
 			u.Stop(force)
 		}(u)
 	}
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		n.extraWebhookNotifier.Stop(force)
+	}()
+
 	wg.Wait()
 }
 
@@ -133,8 +141,8 @@ func (n *DefaultNotifier) QueueNotify(ctx context.Context, event *livekit.Webhoo
 
 		if wh.SigningKey != "" {
 			// empty signing key means default
-			k, ok := n.apiKeys[wh.SigningKey]
-			if !ok {
+			k := n.kp.GetSecret(wh.SigningKey)
+			if k == "" {
 				return fmt.Errorf("no secret for provided signing key")
 			}
 
