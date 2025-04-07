@@ -3530,9 +3530,11 @@ type TransferSIPParticipantRequest struct {
 	// Optionally play dialtone to the SIP participant as an audible indicator of being transferred
 	PlayDialtone bool `protobuf:"varint,4,opt,name=play_dialtone,json=playDialtone,proto3" json:"play_dialtone,omitempty"`
 	// Add the following headers to the REFER SIP request.
-	Headers       map[string]string `protobuf:"bytes,5,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Headers map[string]string `protobuf:"bytes,5,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Max time for the transfer destination to answer the call.
+	RingingTimeout *durationpb.Duration `protobuf:"bytes,6,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *TransferSIPParticipantRequest) Reset() {
@@ -3596,6 +3598,13 @@ func (x *TransferSIPParticipantRequest) GetPlayDialtone() bool {
 func (x *TransferSIPParticipantRequest) GetHeaders() map[string]string {
 	if x != nil {
 		return x.Headers
+	}
+	return nil
+}
+
+func (x *TransferSIPParticipantRequest) GetRingingTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.RingingTimeout
 	}
 	return nil
 }
@@ -4208,14 +4217,15 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x12\x1e\n" +
-	"\vsip_call_id\x18\x04 \x01(\tR\tsipCallId\"\xc0\x02\n" +
+	"\vsip_call_id\x18\x04 \x01(\tR\tsipCallId\"\x84\x03\n" +
 	"\x1dTransferSIPParticipantRequest\x121\n" +
 	"\x14participant_identity\x18\x01 \x01(\tR\x13participantIdentity\x12\x1b\n" +
 	"\troom_name\x18\x02 \x01(\tR\broomName\x12\x1f\n" +
 	"\vtransfer_to\x18\x03 \x01(\tR\n" +
 	"transferTo\x12#\n" +
 	"\rplay_dialtone\x18\x04 \x01(\bR\fplayDialtone\x12M\n" +
-	"\aheaders\x18\x05 \x03(\v23.livekit.TransferSIPParticipantRequest.HeadersEntryR\aheaders\x1a:\n" +
+	"\aheaders\x18\x05 \x03(\v23.livekit.TransferSIPParticipantRequest.HeadersEntryR\aheaders\x12B\n" +
+	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe2\b\n" +
@@ -4503,52 +4513,53 @@ var file_livekit_sip_proto_depIdxs = []int32{
 	62, // 61: livekit.CreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
 	3,  // 62: livekit.CreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
 	60, // 63: livekit.TransferSIPParticipantRequest.headers:type_name -> livekit.TransferSIPParticipantRequest.HeadersEntry
-	61, // 64: livekit.SIPCallInfo.participant_attributes:type_name -> livekit.SIPCallInfo.ParticipantAttributesEntry
-	46, // 65: livekit.SIPCallInfo.from_uri:type_name -> livekit.SIPUri
-	46, // 66: livekit.SIPCallInfo.to_uri:type_name -> livekit.SIPUri
-	5,  // 67: livekit.SIPCallInfo.enabled_features:type_name -> livekit.SIPFeature
-	6,  // 68: livekit.SIPCallInfo.call_direction:type_name -> livekit.SIPCallDirection
-	4,  // 69: livekit.SIPCallInfo.call_status:type_name -> livekit.SIPCallStatus
-	66, // 70: livekit.SIPCallInfo.disconnect_reason:type_name -> livekit.DisconnectReason
-	8,  // 71: livekit.SIPCallInfo.call_status_code:type_name -> livekit.SIPStatus
-	1,  // 72: livekit.SIPUri.transport:type_name -> livekit.SIPTransport
-	23, // 73: livekit.SIP.ListSIPTrunk:input_type -> livekit.ListSIPTrunkRequest
-	11, // 74: livekit.SIP.CreateSIPInboundTrunk:input_type -> livekit.CreateSIPInboundTrunkRequest
-	15, // 75: livekit.SIP.CreateSIPOutboundTrunk:input_type -> livekit.CreateSIPOutboundTrunkRequest
-	12, // 76: livekit.SIP.UpdateSIPInboundTrunk:input_type -> livekit.UpdateSIPInboundTrunkRequest
-	16, // 77: livekit.SIP.UpdateSIPOutboundTrunk:input_type -> livekit.UpdateSIPOutboundTrunkRequest
-	19, // 78: livekit.SIP.GetSIPInboundTrunk:input_type -> livekit.GetSIPInboundTrunkRequest
-	21, // 79: livekit.SIP.GetSIPOutboundTrunk:input_type -> livekit.GetSIPOutboundTrunkRequest
-	25, // 80: livekit.SIP.ListSIPInboundTrunk:input_type -> livekit.ListSIPInboundTrunkRequest
-	27, // 81: livekit.SIP.ListSIPOutboundTrunk:input_type -> livekit.ListSIPOutboundTrunkRequest
-	29, // 82: livekit.SIP.DeleteSIPTrunk:input_type -> livekit.DeleteSIPTrunkRequest
-	34, // 83: livekit.SIP.CreateSIPDispatchRule:input_type -> livekit.CreateSIPDispatchRuleRequest
-	35, // 84: livekit.SIP.UpdateSIPDispatchRule:input_type -> livekit.UpdateSIPDispatchRuleRequest
-	38, // 85: livekit.SIP.ListSIPDispatchRule:input_type -> livekit.ListSIPDispatchRuleRequest
-	40, // 86: livekit.SIP.DeleteSIPDispatchRule:input_type -> livekit.DeleteSIPDispatchRuleRequest
-	42, // 87: livekit.SIP.CreateSIPParticipant:input_type -> livekit.CreateSIPParticipantRequest
-	44, // 88: livekit.SIP.TransferSIPParticipant:input_type -> livekit.TransferSIPParticipantRequest
-	24, // 89: livekit.SIP.ListSIPTrunk:output_type -> livekit.ListSIPTrunkResponse
-	13, // 90: livekit.SIP.CreateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
-	17, // 91: livekit.SIP.CreateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
-	13, // 92: livekit.SIP.UpdateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
-	17, // 93: livekit.SIP.UpdateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
-	20, // 94: livekit.SIP.GetSIPInboundTrunk:output_type -> livekit.GetSIPInboundTrunkResponse
-	22, // 95: livekit.SIP.GetSIPOutboundTrunk:output_type -> livekit.GetSIPOutboundTrunkResponse
-	26, // 96: livekit.SIP.ListSIPInboundTrunk:output_type -> livekit.ListSIPInboundTrunkResponse
-	28, // 97: livekit.SIP.ListSIPOutboundTrunk:output_type -> livekit.ListSIPOutboundTrunkResponse
-	10, // 98: livekit.SIP.DeleteSIPTrunk:output_type -> livekit.SIPTrunkInfo
-	36, // 99: livekit.SIP.CreateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	36, // 100: livekit.SIP.UpdateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	39, // 101: livekit.SIP.ListSIPDispatchRule:output_type -> livekit.ListSIPDispatchRuleResponse
-	36, // 102: livekit.SIP.DeleteSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	43, // 103: livekit.SIP.CreateSIPParticipant:output_type -> livekit.SIPParticipantInfo
-	67, // 104: livekit.SIP.TransferSIPParticipant:output_type -> google.protobuf.Empty
-	89, // [89:105] is the sub-list for method output_type
-	73, // [73:89] is the sub-list for method input_type
-	73, // [73:73] is the sub-list for extension type_name
-	73, // [73:73] is the sub-list for extension extendee
-	0,  // [0:73] is the sub-list for field type_name
+	62, // 64: livekit.TransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	61, // 65: livekit.SIPCallInfo.participant_attributes:type_name -> livekit.SIPCallInfo.ParticipantAttributesEntry
+	46, // 66: livekit.SIPCallInfo.from_uri:type_name -> livekit.SIPUri
+	46, // 67: livekit.SIPCallInfo.to_uri:type_name -> livekit.SIPUri
+	5,  // 68: livekit.SIPCallInfo.enabled_features:type_name -> livekit.SIPFeature
+	6,  // 69: livekit.SIPCallInfo.call_direction:type_name -> livekit.SIPCallDirection
+	4,  // 70: livekit.SIPCallInfo.call_status:type_name -> livekit.SIPCallStatus
+	66, // 71: livekit.SIPCallInfo.disconnect_reason:type_name -> livekit.DisconnectReason
+	8,  // 72: livekit.SIPCallInfo.call_status_code:type_name -> livekit.SIPStatus
+	1,  // 73: livekit.SIPUri.transport:type_name -> livekit.SIPTransport
+	23, // 74: livekit.SIP.ListSIPTrunk:input_type -> livekit.ListSIPTrunkRequest
+	11, // 75: livekit.SIP.CreateSIPInboundTrunk:input_type -> livekit.CreateSIPInboundTrunkRequest
+	15, // 76: livekit.SIP.CreateSIPOutboundTrunk:input_type -> livekit.CreateSIPOutboundTrunkRequest
+	12, // 77: livekit.SIP.UpdateSIPInboundTrunk:input_type -> livekit.UpdateSIPInboundTrunkRequest
+	16, // 78: livekit.SIP.UpdateSIPOutboundTrunk:input_type -> livekit.UpdateSIPOutboundTrunkRequest
+	19, // 79: livekit.SIP.GetSIPInboundTrunk:input_type -> livekit.GetSIPInboundTrunkRequest
+	21, // 80: livekit.SIP.GetSIPOutboundTrunk:input_type -> livekit.GetSIPOutboundTrunkRequest
+	25, // 81: livekit.SIP.ListSIPInboundTrunk:input_type -> livekit.ListSIPInboundTrunkRequest
+	27, // 82: livekit.SIP.ListSIPOutboundTrunk:input_type -> livekit.ListSIPOutboundTrunkRequest
+	29, // 83: livekit.SIP.DeleteSIPTrunk:input_type -> livekit.DeleteSIPTrunkRequest
+	34, // 84: livekit.SIP.CreateSIPDispatchRule:input_type -> livekit.CreateSIPDispatchRuleRequest
+	35, // 85: livekit.SIP.UpdateSIPDispatchRule:input_type -> livekit.UpdateSIPDispatchRuleRequest
+	38, // 86: livekit.SIP.ListSIPDispatchRule:input_type -> livekit.ListSIPDispatchRuleRequest
+	40, // 87: livekit.SIP.DeleteSIPDispatchRule:input_type -> livekit.DeleteSIPDispatchRuleRequest
+	42, // 88: livekit.SIP.CreateSIPParticipant:input_type -> livekit.CreateSIPParticipantRequest
+	44, // 89: livekit.SIP.TransferSIPParticipant:input_type -> livekit.TransferSIPParticipantRequest
+	24, // 90: livekit.SIP.ListSIPTrunk:output_type -> livekit.ListSIPTrunkResponse
+	13, // 91: livekit.SIP.CreateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
+	17, // 92: livekit.SIP.CreateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
+	13, // 93: livekit.SIP.UpdateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
+	17, // 94: livekit.SIP.UpdateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
+	20, // 95: livekit.SIP.GetSIPInboundTrunk:output_type -> livekit.GetSIPInboundTrunkResponse
+	22, // 96: livekit.SIP.GetSIPOutboundTrunk:output_type -> livekit.GetSIPOutboundTrunkResponse
+	26, // 97: livekit.SIP.ListSIPInboundTrunk:output_type -> livekit.ListSIPInboundTrunkResponse
+	28, // 98: livekit.SIP.ListSIPOutboundTrunk:output_type -> livekit.ListSIPOutboundTrunkResponse
+	10, // 99: livekit.SIP.DeleteSIPTrunk:output_type -> livekit.SIPTrunkInfo
+	36, // 100: livekit.SIP.CreateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	36, // 101: livekit.SIP.UpdateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	39, // 102: livekit.SIP.ListSIPDispatchRule:output_type -> livekit.ListSIPDispatchRuleResponse
+	36, // 103: livekit.SIP.DeleteSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	43, // 104: livekit.SIP.CreateSIPParticipant:output_type -> livekit.SIPParticipantInfo
+	67, // 105: livekit.SIP.TransferSIPParticipant:output_type -> google.protobuf.Empty
+	90, // [90:106] is the sub-list for method output_type
+	74, // [74:90] is the sub-list for method input_type
+	74, // [74:74] is the sub-list for extension type_name
+	74, // [74:74] is the sub-list for extension extendee
+	0,  // [0:74] is the sub-list for field type_name
 }
 
 func init() { file_livekit_sip_proto_init() }
