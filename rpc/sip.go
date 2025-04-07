@@ -196,9 +196,10 @@ func NewTransferSIPParticipantRequest(
 	req *livekit.TransferSIPParticipantRequest,
 ) (*InternalTransferSIPParticipantRequest, error) {
 	return &InternalTransferSIPParticipantRequest{
-		SipCallId:    callID,
-		TransferTo:   req.TransferTo,
-		PlayDialtone: req.PlayDialtone,
-		Headers:      req.Headers,
+		SipCallId:      callID,
+		TransferTo:     req.TransferTo,
+		PlayDialtone:   req.PlayDialtone,
+		Headers:        req.Headers,
+		RingingTimeout: req.RingingTimeout,
 	}, nil
 }

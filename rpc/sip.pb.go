@@ -387,9 +387,11 @@ type InternalTransferSIPParticipantRequest struct {
 	// Optionally play dialtone to the SIP participant as an audible indicator of being transferred
 	PlayDialtone bool `protobuf:"varint,3,opt,name=play_dialtone,json=playDialtone,proto3" json:"play_dialtone,omitempty"`
 	// Add the following headers to the REFER SIP request.
-	Headers       map[string]string `protobuf:"bytes,4,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Headers map[string]string `protobuf:"bytes,4,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Max time for the transfer destination to answer the call.
+	RingingTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *InternalTransferSIPParticipantRequest) Reset() {
@@ -450,6 +452,13 @@ func (x *InternalTransferSIPParticipantRequest) GetHeaders() map[string]string {
 	return nil
 }
 
+func (x *InternalTransferSIPParticipantRequest) GetRingingTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.RingingTimeout
+	}
+	return nil
+}
+
 var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
@@ -502,13 +511,14 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"$InternalCreateSIPParticipantResponse\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1e\n" +
-	"\vsip_call_id\x18\x03 \x01(\tR\tsipCallId\"\x9c\x02\n" +
+	"\vsip_call_id\x18\x03 \x01(\tR\tsipCallId\"\xe0\x02\n" +
 	"%InternalTransferSIPParticipantRequest\x12\x1e\n" +
 	"\vsip_call_id\x18\x01 \x01(\tR\tsipCallId\x12\x1f\n" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
 	"transferTo\x12#\n" +
 	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12Q\n" +
-	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryR\aheaders\x1a:\n" +
+	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryR\aheaders\x12B\n" +
+	"\x0fringing_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xf9\x01\n" +
@@ -557,15 +567,16 @@ var file_rpc_sip_proto_depIdxs = []int32{
 	11, // 8: rpc.InternalCreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
 	12, // 9: rpc.InternalCreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
 	7,  // 10: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
-	0,  // 11: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
-	2,  // 12: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
-	1,  // 13: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
-	13, // 14: rpc.SIPInternal.TransferSIPParticipant:output_type -> google.protobuf.Empty
-	13, // [13:15] is the sub-list for method output_type
-	11, // [11:13] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 11: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	0,  // 12: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
+	2,  // 13: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
+	1,  // 14: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
+	13, // 15: rpc.SIPInternal.TransferSIPParticipant:output_type -> google.protobuf.Empty
+	14, // [14:16] is the sub-list for method output_type
+	12, // [12:14] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_rpc_sip_proto_init() }
