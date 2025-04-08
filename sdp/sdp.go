@@ -153,17 +153,6 @@ func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
 	return streamID, true
 }
 
-func GetTrackIDFromMediaDescription(m *sdp.MediaDescription) string {
-	trackId := ""
-	msid, ok := m.Attribute(sdp.AttrKeyMsid)
-	if ok {
-		if split := strings.Split(msid, " "); len(split) >= 2 {
-			trackId = split[1]
-		}
-	}
-	return trackId
-}
-
 func IsMediaDescriptionSimulcast(m *sdp.MediaDescription) bool {
 	_, ok := m.Attribute("simulcast")
 	return ok
@@ -300,6 +289,7 @@ func (m *sdpFragmentMedia) Unmarshal(md *sdp.MediaDescription) error {
 		info = append(info, '/')
 		info = strconv.AppendInt(info, int64(*md.MediaName.Port.Range), 10)
 	}
+	info = append(info, ' ')
 
 	appendList(md.MediaName.Protos, '/')
 	info = append(info, ' ')
@@ -579,7 +569,7 @@ func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) 
 				if s.ice.lite == nil || !*s.ice.lite {
 					return errors.New("ice lite mismatch")
 				}
-			case "ice-pwd":
+			case "ice-options":
 				if s.ice.options != "" && s.ice.options != a.Value {
 					return errors.New("ice options mismatch")
 				}
@@ -609,12 +599,19 @@ func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) 
 	}
 
 	if s.ice != nil && s.ice.ufrag != "" && s.ice.pwd != "" {
-		for _, a := range parsed.Attributes {
+		fmt.Printf("patching ufrag/pwd\n") // REMOVE
+		for idx, a := range parsed.Attributes {
 			switch a.Key {
 			case "ice-ufrag":
-				a.Value = s.ice.ufrag
+				parsed.Attributes[idx] = sdp.Attribute{
+					Key:   "ice-ufrag",
+					Value: s.ice.ufrag,
+				}
 			case "ice-pwd":
-				a.Value = s.ice.pwd
+				parsed.Attributes[idx] = sdp.Attribute{
+					Key:   "ice-pwd",
+					Value: s.ice.pwd,
+				}
 			}
 		}
 	}
@@ -626,15 +623,21 @@ func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) 
 				continue
 			}
 
-			for _, a := range md.Attributes {
+			for idx, a := range md.Attributes {
 				switch a.Key {
 				case "ice-ufrag":
 					if s.media.ice.ufrag != "" {
-						a.Value = s.media.ice.ufrag
+						md.Attributes[idx] = sdp.Attribute{
+							Key:   "ice-ufrag",
+							Value: s.media.ice.ufrag,
+						}
 					}
 				case "ice-pwd":
 					if s.media.ice.pwd != "" {
-						a.Value = s.media.ice.pwd
+						md.Attributes[idx] = sdp.Attribute{
+							Key:   "ice-pwd",
+							Value: s.media.ice.pwd,
+						}
 					}
 				}
 			}
@@ -675,6 +678,10 @@ func ExtractSDPFragment(parsed *sdp.SessionDescription) (*SDPFragment, error) {
 	}
 
 	s := &SDPFragment{}
+	if group, found := parsed.Attribute(sdp.AttrKeyGroup); found {
+		s.group = group
+	}
+
 	s.ice = &sdpFragmentICE{}
 	if err := s.ice.Unmarshal(parsed.Attributes); err != nil {
 		return nil, err
