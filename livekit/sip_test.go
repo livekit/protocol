@@ -375,6 +375,92 @@ func TestGRPCStatus(t *testing.T) {
 	require.True(t, proto.Equal(e, e2))
 }
 
+func TestInboundTrunkUpdate(t *testing.T) {
+	r := &SIPInboundTrunkInfo{
+		Name:     "Test",
+		Numbers:  []string{"T1", "T2"},
+		Metadata: "test",
+	}
+	name2 := "Test2"
+	upd := &UpdateSIPInboundTrunkRequest{
+		Action: &UpdateSIPInboundTrunkRequest_Update{
+			Update: &SIPInboundTrunkUpdate{
+				Name: &name2,
+				Numbers: &ListUpdate{
+					Set: []string{"T3"},
+				},
+			},
+		},
+	}
+	out, err := upd.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
+	require.NoError(t, err)
+	require.True(t, r != out)
+	require.True(t, proto.Equal(&SIPInboundTrunkInfo{
+		Name:     "Test2",
+		Numbers:  []string{"T3"},
+		Metadata: "test",
+	}, out))
+
+	r2 := cloneProto(r)
+	r2.Numbers = []string{"T4"}
+	upd2 := &UpdateSIPInboundTrunkRequest{
+		Action: &UpdateSIPInboundTrunkRequest_Replace{
+			Replace: r2,
+		},
+	}
+
+	out, err = upd2.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
+	require.NoError(t, err)
+	require.True(t, r != out)
+	require.True(t, r2 != out)
+	require.True(t, proto.Equal(r2, out))
+}
+
+func TestOutboundTrunkUpdate(t *testing.T) {
+	r := &SIPOutboundTrunkInfo{
+		Name:     "Test",
+		Address:  "sip.example.com",
+		Numbers:  []string{"T1", "T2"},
+		Metadata: "test",
+	}
+	name2 := "Test2"
+	addr2 := "sip2.example.com"
+	upd := &UpdateSIPOutboundTrunkRequest{
+		Action: &UpdateSIPOutboundTrunkRequest_Update{
+			Update: &SIPOutboundTrunkUpdate{
+				Name:    &name2,
+				Address: &addr2,
+				Numbers: &ListUpdate{
+					Set: []string{"T3"},
+				},
+			},
+		},
+	}
+	out, err := upd.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
+	require.NoError(t, err)
+	require.True(t, r != out)
+	require.True(t, proto.Equal(&SIPOutboundTrunkInfo{
+		Name:     "Test2",
+		Address:  "sip2.example.com",
+		Numbers:  []string{"T3"},
+		Metadata: "test",
+	}, out))
+
+	r2 := cloneProto(r)
+	r2.Numbers = []string{"T4"}
+	upd2 := &UpdateSIPOutboundTrunkRequest{
+		Action: &UpdateSIPOutboundTrunkRequest_Replace{
+			Replace: r2,
+		},
+	}
+
+	out, err = upd2.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
+	require.NoError(t, err)
+	require.True(t, r != out)
+	require.True(t, r2 != out)
+	require.True(t, proto.Equal(r2, out))
+}
+
 func TestDispatchRuleUpdate(t *testing.T) {
 	r := &SIPDispatchRuleInfo{
 		Name:     "Test",
@@ -396,9 +482,10 @@ func TestDispatchRuleUpdate(t *testing.T) {
 			},
 		},
 	}
-	err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
+	out, err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
 	require.NoError(t, err)
-	require.Equal(t, &SIPDispatchRuleInfo{
+	require.True(t, r != out)
+	require.True(t, proto.Equal(&SIPDispatchRuleInfo{
 		Name:     "Test2",
 		TrunkIds: []string{"T3"},
 		Rule: &SIPDispatchRule{
@@ -406,5 +493,19 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
-	}, r)
+	}, out))
+
+	r2 := cloneProto(r)
+	r2.TrunkIds = []string{"T4"}
+	upd2 := &UpdateSIPDispatchRuleRequest{
+		Action: &UpdateSIPDispatchRuleRequest_Replace{
+			Replace: r2,
+		},
+	}
+
+	out, err = upd2.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
+	require.NoError(t, err)
+	require.True(t, r != out)
+	require.True(t, r2 != out)
+	require.True(t, proto.Equal(r2, out))
 }
