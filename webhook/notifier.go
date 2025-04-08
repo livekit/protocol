@@ -74,7 +74,7 @@ type DefaultNotifier struct {
 
 func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifier, error) {
 	apiSecret := kp.GetSecret(config.APIKey)
-	if apiSecret == "" {
+	if apiSecret == "" && len(config.URLs) > 0 {
 		return nil, fmt.Errorf("unknown api key in webhook config")
 	}
 
