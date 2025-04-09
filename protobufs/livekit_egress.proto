@@ -64,6 +64,10 @@ message RoomCompositeEgressRequest {
   repeated StreamOutput stream_outputs = 12;
   repeated SegmentedFileOutput segment_outputs = 13;
   repeated ImageOutput image_outputs = 14;
+
+  repeated WebhookConfig webhooks = 16; // extra webhooks to call for this request
+
+  // NEXT_ID: 17
 }
 
 // record any website
@@ -85,6 +89,11 @@ message WebEgressRequest {
   repeated StreamOutput stream_outputs = 10;
   repeated SegmentedFileOutput segment_outputs = 11;
   repeated ImageOutput image_outputs = 13;
+
+  repeated WebhookConfig webhooks = 14; // extra webhooks to call for this request
+
+  // NEXT_ID: 15
+
 }
 
 // record audio and video from a single participant
@@ -100,6 +109,10 @@ message ParticipantEgressRequest {
   repeated StreamOutput stream_outputs = 7;
   repeated SegmentedFileOutput segment_outputs = 8;
   repeated ImageOutput image_outputs = 9;
+
+  repeated WebhookConfig webhooks = 10; // extra webhooks to call for this request
+
+  // NEXT_ID: 11
 }
 
 // containerize up to one audio and one video track
@@ -120,6 +133,10 @@ message TrackCompositeEgressRequest {
   repeated StreamOutput stream_outputs = 12;
   repeated SegmentedFileOutput segment_outputs = 13;
   repeated ImageOutput image_outputs = 14;
+
+  repeated WebhookConfig webhooks = 15; // extra webhooks to call for this request
+
+  // NEXT_ID: 16
 }
 
 // record tracks individually, without transcoding
@@ -130,6 +147,10 @@ message TrackEgressRequest {
     DirectFileOutput file = 3;
     string websocket_url = 4;
   }
+
+  repeated WebhookConfig webhooks = 5; // extra webhooks to call for this request
+
+  // NEXT_ID: 6
 }
 
 enum EncodedFileType {

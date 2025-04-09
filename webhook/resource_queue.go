@@ -34,6 +34,7 @@ type item struct {
 	ctx      context.Context
 	queuedAt time.Time
 	event    *livekit.WebhookEvent
+	params   *ResourceURLNotifierParams
 }
 
 type resourceQueueParams struct {
@@ -76,11 +77,11 @@ func (r *resourceQueue) Stop(force bool) {
 	}
 }
 
-func (r *resourceQueue) Enqueue(ctx context.Context, whEvent *livekit.WebhookEvent) error {
-	return r.EnqueueAt(ctx, time.Now(), whEvent)
+func (r *resourceQueue) Enqueue(ctx context.Context, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) error {
+	return r.EnqueueAt(ctx, time.Now(), whEvent, params)
 }
 
-func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *livekit.WebhookEvent) error {
+func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -92,7 +93,7 @@ func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *li
 		return errQueueFull
 	}
 
-	r.items.PushBack(&item{ctx, at, whEvent})
+	r.items.PushBack(&item{ctx, at, whEvent, params})
 	r.cond.Broadcast()
 	return nil
 }
@@ -115,6 +116,6 @@ func (r *resourceQueue) worker() {
 		item := r.items.PopFront()
 		r.mu.Unlock()
 
-		r.params.Poster.Process(item.ctx, item.queuedAt, item.event)
+		r.params.Poster.Process(item.ctx, item.queuedAt, item.event, item.params)
 	}
 }

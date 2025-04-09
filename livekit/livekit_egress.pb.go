@@ -564,6 +564,7 @@ type RoomCompositeEgressRequest struct {
 	StreamOutputs  []*StreamOutput                      `protobuf:"bytes,12,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput               `protobuf:"bytes,13,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput                       `protobuf:"bytes,14,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
+	Webhooks       []*WebhookConfig                     `protobuf:"bytes,16,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -730,6 +731,13 @@ func (x *RoomCompositeEgressRequest) GetImageOutputs() []*ImageOutput {
 	return nil
 }
 
+func (x *RoomCompositeEgressRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
+}
+
 type isRoomCompositeEgressRequest_Output interface {
 	isRoomCompositeEgressRequest_Output()
 }
@@ -793,6 +801,7 @@ type WebEgressRequest struct {
 	StreamOutputs  []*StreamOutput            `protobuf:"bytes,10,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput     `protobuf:"bytes,11,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput             `protobuf:"bytes,13,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
+	Webhooks       []*WebhookConfig           `protobuf:"bytes,14,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -945,6 +954,13 @@ func (x *WebEgressRequest) GetImageOutputs() []*ImageOutput {
 	return nil
 }
 
+func (x *WebEgressRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
+}
+
 type isWebEgressRequest_Output interface {
 	isWebEgressRequest_Output()
 }
@@ -1001,6 +1017,7 @@ type ParticipantEgressRequest struct {
 	StreamOutputs  []*StreamOutput                    `protobuf:"bytes,7,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput             `protobuf:"bytes,8,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput                     `protobuf:"bytes,9,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
+	Webhooks       []*WebhookConfig                   `protobuf:"bytes,10,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1109,6 +1126,13 @@ func (x *ParticipantEgressRequest) GetImageOutputs() []*ImageOutput {
 	return nil
 }
 
+func (x *ParticipantEgressRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
+}
+
 type isParticipantEgressRequest_Options interface {
 	isParticipantEgressRequest_Options()
 }
@@ -1146,6 +1170,7 @@ type TrackCompositeEgressRequest struct {
 	StreamOutputs  []*StreamOutput                       `protobuf:"bytes,12,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput                `protobuf:"bytes,13,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput                        `protobuf:"bytes,14,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
+	Webhooks       []*WebhookConfig                      `protobuf:"bytes,15,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -1291,6 +1316,13 @@ func (x *TrackCompositeEgressRequest) GetImageOutputs() []*ImageOutput {
 	return nil
 }
 
+func (x *TrackCompositeEgressRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
+}
+
 type isTrackCompositeEgressRequest_Output interface {
 	isTrackCompositeEgressRequest_Output()
 }
@@ -1342,6 +1374,7 @@ type TrackEgressRequest struct {
 	//	*TrackEgressRequest_File
 	//	*TrackEgressRequest_WebsocketUrl
 	Output        isTrackEgressRequest_Output `protobuf_oneof:"output"`
+	Webhooks      []*WebhookConfig            `protobuf:"bytes,5,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1413,6 +1446,13 @@ func (x *TrackEgressRequest) GetWebsocketUrl() string {
 		}
 	}
 	return ""
+}
+
+func (x *TrackEgressRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
 }
 
 type isTrackEgressRequest_Output interface {
@@ -3820,7 +3860,7 @@ var File_livekit_egress_proto protoreflect.FileDescriptor
 
 const file_livekit_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\"\xa1\x06\n" +
+	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\"\xd5\x06\n" +
 	"\x1aRoomCompositeEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x16\n" +
 	"\x06layout\x18\x02 \x01(\tR\x06layout\x12\x1d\n" +
@@ -3839,9 +3879,10 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\ffile_outputs\x18\v \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
 	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputsB\b\n" +
+	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\x10 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xc1\x05\n" +
+	"\aoptions\"\xf5\x05\n" +
 	"\x10WebEgressRequest\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
@@ -3858,9 +3899,10 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0estream_outputs\x18\n" +
 	" \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\v \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\r \x03(\v2\x14.livekit.ImageOutputR\fimageOutputsB\b\n" +
+	"\rimage_outputs\x18\r \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\x0e \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xf2\x03\n" +
+	"\aoptions\"\xa6\x04\n" +
 	"\x18ParticipantEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12!\n" +
@@ -3870,8 +3912,10 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\ffile_outputs\x18\x06 \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
 	"\x0estream_outputs\x18\a \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\b \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\t \x03(\v2\x14.livekit.ImageOutputR\fimageOutputsB\t\n" +
-	"\aoptions\"\xb7\x05\n" +
+	"\rimage_outputs\x18\t \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\n" +
+	" \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\t\n" +
+	"\aoptions\"\xeb\x05\n" +
 	"\x1bTrackCompositeEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12$\n" +
 	"\x0eaudio_track_id\x18\x02 \x01(\tR\faudioTrackId\x12$\n" +
@@ -3884,14 +3928,16 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\ffile_outputs\x18\v \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
 	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputsB\b\n" +
+	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\x0f \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xae\x01\n" +
+	"\aoptions\"\xe2\x01\n" +
 	"\x12TrackEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x19\n" +
 	"\btrack_id\x18\x02 \x01(\tR\atrackId\x12/\n" +
 	"\x04file\x18\x03 \x01(\v2\x19.livekit.DirectFileOutputH\x00R\x04file\x12%\n" +
-	"\rwebsocket_url\x18\x04 \x01(\tH\x00R\fwebsocketUrlB\b\n" +
+	"\rwebsocket_url\x18\x04 \x01(\tH\x00R\fwebsocketUrl\x122\n" +
+	"\bwebhooks\x18\x05 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06output\"\xcb\x02\n" +
 	"\x11EncodedFileOutput\x125\n" +
 	"\tfile_type\x18\x01 \x01(\x0e2\x18.livekit.EncodedFileTypeR\bfileType\x12\x1a\n" +
@@ -4211,121 +4257,127 @@ var file_livekit_egress_proto_goTypes = []any{
 	(*AutoParticipantEgress)(nil),       // 37: livekit.AutoParticipantEgress
 	(*AutoTrackEgress)(nil),             // 38: livekit.AutoTrackEgress
 	nil,                                 // 39: livekit.S3Upload.MetadataEntry
-	(ImageCodec)(0),                     // 40: livekit.ImageCodec
-	(AudioCodec)(0),                     // 41: livekit.AudioCodec
-	(VideoCodec)(0),                     // 42: livekit.VideoCodec
+	(*WebhookConfig)(nil),               // 40: livekit.WebhookConfig
+	(ImageCodec)(0),                     // 41: livekit.ImageCodec
+	(AudioCodec)(0),                     // 42: livekit.AudioCodec
+	(VideoCodec)(0),                     // 43: livekit.VideoCodec
 }
 var file_livekit_egress_proto_depIdxs = []int32{
-	5,  // 0: livekit.RoomCompositeEgressRequest.audio_mixing:type_name -> livekit.AudioMixing
-	15, // 1: livekit.RoomCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
-	24, // 2: livekit.RoomCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
-	16, // 3: livekit.RoomCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
-	6,  // 4: livekit.RoomCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25, // 5: livekit.RoomCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15, // 6: livekit.RoomCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24, // 7: livekit.RoomCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16, // 8: livekit.RoomCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18, // 9: livekit.RoomCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	15, // 10: livekit.WebEgressRequest.file:type_name -> livekit.EncodedFileOutput
-	24, // 11: livekit.WebEgressRequest.stream:type_name -> livekit.StreamOutput
-	16, // 12: livekit.WebEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
-	6,  // 13: livekit.WebEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25, // 14: livekit.WebEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15, // 15: livekit.WebEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24, // 16: livekit.WebEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16, // 17: livekit.WebEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18, // 18: livekit.WebEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	6,  // 19: livekit.ParticipantEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25, // 20: livekit.ParticipantEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15, // 21: livekit.ParticipantEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24, // 22: livekit.ParticipantEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16, // 23: livekit.ParticipantEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18, // 24: livekit.ParticipantEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	15, // 25: livekit.TrackCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
-	24, // 26: livekit.TrackCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
-	16, // 27: livekit.TrackCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
-	6,  // 28: livekit.TrackCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25, // 29: livekit.TrackCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15, // 30: livekit.TrackCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24, // 31: livekit.TrackCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16, // 32: livekit.TrackCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18, // 33: livekit.TrackCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	17, // 34: livekit.TrackEgressRequest.file:type_name -> livekit.DirectFileOutput
-	0,  // 35: livekit.EncodedFileOutput.file_type:type_name -> livekit.EncodedFileType
-	19, // 36: livekit.EncodedFileOutput.s3:type_name -> livekit.S3Upload
-	20, // 37: livekit.EncodedFileOutput.gcp:type_name -> livekit.GCPUpload
-	21, // 38: livekit.EncodedFileOutput.azure:type_name -> livekit.AzureBlobUpload
-	22, // 39: livekit.EncodedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	1,  // 40: livekit.SegmentedFileOutput.protocol:type_name -> livekit.SegmentedFileProtocol
-	2,  // 41: livekit.SegmentedFileOutput.filename_suffix:type_name -> livekit.SegmentedFileSuffix
-	19, // 42: livekit.SegmentedFileOutput.s3:type_name -> livekit.S3Upload
-	20, // 43: livekit.SegmentedFileOutput.gcp:type_name -> livekit.GCPUpload
-	21, // 44: livekit.SegmentedFileOutput.azure:type_name -> livekit.AzureBlobUpload
-	22, // 45: livekit.SegmentedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	19, // 46: livekit.DirectFileOutput.s3:type_name -> livekit.S3Upload
-	20, // 47: livekit.DirectFileOutput.gcp:type_name -> livekit.GCPUpload
-	21, // 48: livekit.DirectFileOutput.azure:type_name -> livekit.AzureBlobUpload
-	22, // 49: livekit.DirectFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	3,  // 50: livekit.ImageOutput.filename_suffix:type_name -> livekit.ImageFileSuffix
-	40, // 51: livekit.ImageOutput.image_codec:type_name -> livekit.ImageCodec
-	19, // 52: livekit.ImageOutput.s3:type_name -> livekit.S3Upload
-	20, // 53: livekit.ImageOutput.gcp:type_name -> livekit.GCPUpload
-	21, // 54: livekit.ImageOutput.azure:type_name -> livekit.AzureBlobUpload
-	22, // 55: livekit.ImageOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	39, // 56: livekit.S3Upload.metadata:type_name -> livekit.S3Upload.MetadataEntry
-	23, // 57: livekit.S3Upload.proxy:type_name -> livekit.ProxyConfig
-	23, // 58: livekit.GCPUpload.proxy:type_name -> livekit.ProxyConfig
-	4,  // 59: livekit.StreamOutput.protocol:type_name -> livekit.StreamProtocol
-	41, // 60: livekit.EncodingOptions.audio_codec:type_name -> livekit.AudioCodec
-	42, // 61: livekit.EncodingOptions.video_codec:type_name -> livekit.VideoCodec
-	31, // 62: livekit.ListEgressResponse.items:type_name -> livekit.EgressInfo
-	8,  // 63: livekit.EgressInfo.source_type:type_name -> livekit.EgressSourceType
-	7,  // 64: livekit.EgressInfo.status:type_name -> livekit.EgressStatus
-	10, // 65: livekit.EgressInfo.room_composite:type_name -> livekit.RoomCompositeEgressRequest
-	11, // 66: livekit.EgressInfo.web:type_name -> livekit.WebEgressRequest
-	12, // 67: livekit.EgressInfo.participant:type_name -> livekit.ParticipantEgressRequest
-	13, // 68: livekit.EgressInfo.track_composite:type_name -> livekit.TrackCompositeEgressRequest
-	14, // 69: livekit.EgressInfo.track:type_name -> livekit.TrackEgressRequest
-	32, // 70: livekit.EgressInfo.stream:type_name -> livekit.StreamInfoList
-	34, // 71: livekit.EgressInfo.file:type_name -> livekit.FileInfo
-	35, // 72: livekit.EgressInfo.segments:type_name -> livekit.SegmentsInfo
-	33, // 73: livekit.EgressInfo.stream_results:type_name -> livekit.StreamInfo
-	34, // 74: livekit.EgressInfo.file_results:type_name -> livekit.FileInfo
-	35, // 75: livekit.EgressInfo.segment_results:type_name -> livekit.SegmentsInfo
-	36, // 76: livekit.EgressInfo.image_results:type_name -> livekit.ImagesInfo
-	33, // 77: livekit.StreamInfoList.info:type_name -> livekit.StreamInfo
-	9,  // 78: livekit.StreamInfo.status:type_name -> livekit.StreamInfo.Status
-	6,  // 79: livekit.AutoParticipantEgress.preset:type_name -> livekit.EncodingOptionsPreset
-	25, // 80: livekit.AutoParticipantEgress.advanced:type_name -> livekit.EncodingOptions
-	15, // 81: livekit.AutoParticipantEgress.file_outputs:type_name -> livekit.EncodedFileOutput
-	16, // 82: livekit.AutoParticipantEgress.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	19, // 83: livekit.AutoTrackEgress.s3:type_name -> livekit.S3Upload
-	20, // 84: livekit.AutoTrackEgress.gcp:type_name -> livekit.GCPUpload
-	21, // 85: livekit.AutoTrackEgress.azure:type_name -> livekit.AzureBlobUpload
-	22, // 86: livekit.AutoTrackEgress.aliOSS:type_name -> livekit.AliOSSUpload
-	10, // 87: livekit.Egress.StartRoomCompositeEgress:input_type -> livekit.RoomCompositeEgressRequest
-	11, // 88: livekit.Egress.StartWebEgress:input_type -> livekit.WebEgressRequest
-	12, // 89: livekit.Egress.StartParticipantEgress:input_type -> livekit.ParticipantEgressRequest
-	13, // 90: livekit.Egress.StartTrackCompositeEgress:input_type -> livekit.TrackCompositeEgressRequest
-	14, // 91: livekit.Egress.StartTrackEgress:input_type -> livekit.TrackEgressRequest
-	26, // 92: livekit.Egress.UpdateLayout:input_type -> livekit.UpdateLayoutRequest
-	27, // 93: livekit.Egress.UpdateStream:input_type -> livekit.UpdateStreamRequest
-	28, // 94: livekit.Egress.ListEgress:input_type -> livekit.ListEgressRequest
-	30, // 95: livekit.Egress.StopEgress:input_type -> livekit.StopEgressRequest
-	31, // 96: livekit.Egress.StartRoomCompositeEgress:output_type -> livekit.EgressInfo
-	31, // 97: livekit.Egress.StartWebEgress:output_type -> livekit.EgressInfo
-	31, // 98: livekit.Egress.StartParticipantEgress:output_type -> livekit.EgressInfo
-	31, // 99: livekit.Egress.StartTrackCompositeEgress:output_type -> livekit.EgressInfo
-	31, // 100: livekit.Egress.StartTrackEgress:output_type -> livekit.EgressInfo
-	31, // 101: livekit.Egress.UpdateLayout:output_type -> livekit.EgressInfo
-	31, // 102: livekit.Egress.UpdateStream:output_type -> livekit.EgressInfo
-	29, // 103: livekit.Egress.ListEgress:output_type -> livekit.ListEgressResponse
-	31, // 104: livekit.Egress.StopEgress:output_type -> livekit.EgressInfo
-	96, // [96:105] is the sub-list for method output_type
-	87, // [87:96] is the sub-list for method input_type
-	87, // [87:87] is the sub-list for extension type_name
-	87, // [87:87] is the sub-list for extension extendee
-	0,  // [0:87] is the sub-list for field type_name
+	5,   // 0: livekit.RoomCompositeEgressRequest.audio_mixing:type_name -> livekit.AudioMixing
+	15,  // 1: livekit.RoomCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
+	24,  // 2: livekit.RoomCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
+	16,  // 3: livekit.RoomCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
+	6,   // 4: livekit.RoomCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	25,  // 5: livekit.RoomCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	15,  // 6: livekit.RoomCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	24,  // 7: livekit.RoomCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	16,  // 8: livekit.RoomCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	18,  // 9: livekit.RoomCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	40,  // 10: livekit.RoomCompositeEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	15,  // 11: livekit.WebEgressRequest.file:type_name -> livekit.EncodedFileOutput
+	24,  // 12: livekit.WebEgressRequest.stream:type_name -> livekit.StreamOutput
+	16,  // 13: livekit.WebEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
+	6,   // 14: livekit.WebEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	25,  // 15: livekit.WebEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	15,  // 16: livekit.WebEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	24,  // 17: livekit.WebEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	16,  // 18: livekit.WebEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	18,  // 19: livekit.WebEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	40,  // 20: livekit.WebEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	6,   // 21: livekit.ParticipantEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	25,  // 22: livekit.ParticipantEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	15,  // 23: livekit.ParticipantEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	24,  // 24: livekit.ParticipantEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	16,  // 25: livekit.ParticipantEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	18,  // 26: livekit.ParticipantEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	40,  // 27: livekit.ParticipantEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	15,  // 28: livekit.TrackCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
+	24,  // 29: livekit.TrackCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
+	16,  // 30: livekit.TrackCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
+	6,   // 31: livekit.TrackCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	25,  // 32: livekit.TrackCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	15,  // 33: livekit.TrackCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	24,  // 34: livekit.TrackCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	16,  // 35: livekit.TrackCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	18,  // 36: livekit.TrackCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	40,  // 37: livekit.TrackCompositeEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	17,  // 38: livekit.TrackEgressRequest.file:type_name -> livekit.DirectFileOutput
+	40,  // 39: livekit.TrackEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	0,   // 40: livekit.EncodedFileOutput.file_type:type_name -> livekit.EncodedFileType
+	19,  // 41: livekit.EncodedFileOutput.s3:type_name -> livekit.S3Upload
+	20,  // 42: livekit.EncodedFileOutput.gcp:type_name -> livekit.GCPUpload
+	21,  // 43: livekit.EncodedFileOutput.azure:type_name -> livekit.AzureBlobUpload
+	22,  // 44: livekit.EncodedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	1,   // 45: livekit.SegmentedFileOutput.protocol:type_name -> livekit.SegmentedFileProtocol
+	2,   // 46: livekit.SegmentedFileOutput.filename_suffix:type_name -> livekit.SegmentedFileSuffix
+	19,  // 47: livekit.SegmentedFileOutput.s3:type_name -> livekit.S3Upload
+	20,  // 48: livekit.SegmentedFileOutput.gcp:type_name -> livekit.GCPUpload
+	21,  // 49: livekit.SegmentedFileOutput.azure:type_name -> livekit.AzureBlobUpload
+	22,  // 50: livekit.SegmentedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	19,  // 51: livekit.DirectFileOutput.s3:type_name -> livekit.S3Upload
+	20,  // 52: livekit.DirectFileOutput.gcp:type_name -> livekit.GCPUpload
+	21,  // 53: livekit.DirectFileOutput.azure:type_name -> livekit.AzureBlobUpload
+	22,  // 54: livekit.DirectFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	3,   // 55: livekit.ImageOutput.filename_suffix:type_name -> livekit.ImageFileSuffix
+	41,  // 56: livekit.ImageOutput.image_codec:type_name -> livekit.ImageCodec
+	19,  // 57: livekit.ImageOutput.s3:type_name -> livekit.S3Upload
+	20,  // 58: livekit.ImageOutput.gcp:type_name -> livekit.GCPUpload
+	21,  // 59: livekit.ImageOutput.azure:type_name -> livekit.AzureBlobUpload
+	22,  // 60: livekit.ImageOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	39,  // 61: livekit.S3Upload.metadata:type_name -> livekit.S3Upload.MetadataEntry
+	23,  // 62: livekit.S3Upload.proxy:type_name -> livekit.ProxyConfig
+	23,  // 63: livekit.GCPUpload.proxy:type_name -> livekit.ProxyConfig
+	4,   // 64: livekit.StreamOutput.protocol:type_name -> livekit.StreamProtocol
+	42,  // 65: livekit.EncodingOptions.audio_codec:type_name -> livekit.AudioCodec
+	43,  // 66: livekit.EncodingOptions.video_codec:type_name -> livekit.VideoCodec
+	31,  // 67: livekit.ListEgressResponse.items:type_name -> livekit.EgressInfo
+	8,   // 68: livekit.EgressInfo.source_type:type_name -> livekit.EgressSourceType
+	7,   // 69: livekit.EgressInfo.status:type_name -> livekit.EgressStatus
+	10,  // 70: livekit.EgressInfo.room_composite:type_name -> livekit.RoomCompositeEgressRequest
+	11,  // 71: livekit.EgressInfo.web:type_name -> livekit.WebEgressRequest
+	12,  // 72: livekit.EgressInfo.participant:type_name -> livekit.ParticipantEgressRequest
+	13,  // 73: livekit.EgressInfo.track_composite:type_name -> livekit.TrackCompositeEgressRequest
+	14,  // 74: livekit.EgressInfo.track:type_name -> livekit.TrackEgressRequest
+	32,  // 75: livekit.EgressInfo.stream:type_name -> livekit.StreamInfoList
+	34,  // 76: livekit.EgressInfo.file:type_name -> livekit.FileInfo
+	35,  // 77: livekit.EgressInfo.segments:type_name -> livekit.SegmentsInfo
+	33,  // 78: livekit.EgressInfo.stream_results:type_name -> livekit.StreamInfo
+	34,  // 79: livekit.EgressInfo.file_results:type_name -> livekit.FileInfo
+	35,  // 80: livekit.EgressInfo.segment_results:type_name -> livekit.SegmentsInfo
+	36,  // 81: livekit.EgressInfo.image_results:type_name -> livekit.ImagesInfo
+	33,  // 82: livekit.StreamInfoList.info:type_name -> livekit.StreamInfo
+	9,   // 83: livekit.StreamInfo.status:type_name -> livekit.StreamInfo.Status
+	6,   // 84: livekit.AutoParticipantEgress.preset:type_name -> livekit.EncodingOptionsPreset
+	25,  // 85: livekit.AutoParticipantEgress.advanced:type_name -> livekit.EncodingOptions
+	15,  // 86: livekit.AutoParticipantEgress.file_outputs:type_name -> livekit.EncodedFileOutput
+	16,  // 87: livekit.AutoParticipantEgress.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	19,  // 88: livekit.AutoTrackEgress.s3:type_name -> livekit.S3Upload
+	20,  // 89: livekit.AutoTrackEgress.gcp:type_name -> livekit.GCPUpload
+	21,  // 90: livekit.AutoTrackEgress.azure:type_name -> livekit.AzureBlobUpload
+	22,  // 91: livekit.AutoTrackEgress.aliOSS:type_name -> livekit.AliOSSUpload
+	10,  // 92: livekit.Egress.StartRoomCompositeEgress:input_type -> livekit.RoomCompositeEgressRequest
+	11,  // 93: livekit.Egress.StartWebEgress:input_type -> livekit.WebEgressRequest
+	12,  // 94: livekit.Egress.StartParticipantEgress:input_type -> livekit.ParticipantEgressRequest
+	13,  // 95: livekit.Egress.StartTrackCompositeEgress:input_type -> livekit.TrackCompositeEgressRequest
+	14,  // 96: livekit.Egress.StartTrackEgress:input_type -> livekit.TrackEgressRequest
+	26,  // 97: livekit.Egress.UpdateLayout:input_type -> livekit.UpdateLayoutRequest
+	27,  // 98: livekit.Egress.UpdateStream:input_type -> livekit.UpdateStreamRequest
+	28,  // 99: livekit.Egress.ListEgress:input_type -> livekit.ListEgressRequest
+	30,  // 100: livekit.Egress.StopEgress:input_type -> livekit.StopEgressRequest
+	31,  // 101: livekit.Egress.StartRoomCompositeEgress:output_type -> livekit.EgressInfo
+	31,  // 102: livekit.Egress.StartWebEgress:output_type -> livekit.EgressInfo
+	31,  // 103: livekit.Egress.StartParticipantEgress:output_type -> livekit.EgressInfo
+	31,  // 104: livekit.Egress.StartTrackCompositeEgress:output_type -> livekit.EgressInfo
+	31,  // 105: livekit.Egress.StartTrackEgress:output_type -> livekit.EgressInfo
+	31,  // 106: livekit.Egress.UpdateLayout:output_type -> livekit.EgressInfo
+	31,  // 107: livekit.Egress.UpdateStream:output_type -> livekit.EgressInfo
+	29,  // 108: livekit.Egress.ListEgress:output_type -> livekit.ListEgressResponse
+	31,  // 109: livekit.Egress.StopEgress:output_type -> livekit.EgressInfo
+	101, // [101:110] is the sub-list for method output_type
+	92,  // [92:101] is the sub-list for method input_type
+	92,  // [92:92] is the sub-list for extension type_name
+	92,  // [92:92] is the sub-list for extension extendee
+	0,   // [0:92] is the sub-list for field type_name
 }
 
 func init() { file_livekit_egress_proto_init() }

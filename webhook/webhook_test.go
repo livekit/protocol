@@ -63,15 +63,23 @@ func TestWebHook(t *testing.T) {
 
 		wg := sync.WaitGroup{}
 		wg.Add(1)
+		expectedUrl := "/"
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			defer wg.Done()
 			decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
 
 			require.EqualValues(t, event, decodedEvent)
+			require.Equal(t, expectedUrl, r.URL.String())
 		}
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		wg.Wait()
+
+		wg.Add(1)
+		expectedUrl = "/wh"
+		require.NoError(t, notifier.QueueNotify(context.Background(), event, WithExtraWebhooks([]*livekit.WebhookConfig{&livekit.WebhookConfig{Url: "http://localhost:8765/wh"}})))
+		wg.Wait()
+
 	})
 
 }
@@ -173,7 +181,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		}
 		defer urlNotifier.Stop(false)
 
-		err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted})
+		err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
 		require.Error(t, err)
 	})
 
@@ -194,7 +202,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		defer urlNotifier.Stop(false)
 
 		startedAt := time.Now()
-		err = urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted})
+		err = urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
 		require.Error(t, err)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
@@ -348,13 +356,14 @@ func TestResourceWebHook(t *testing.T) {
 	defer s.Stop()
 
 	t.Run("test event payload", func(t *testing.T) {
-		resourceURLNotifier := NewDefaultNotifier(
+		resourceURLNotifier, err := NewDefaultNotifier(
 			WebHookConfig{
 				URLs:   []string{testUrl},
 				APIKey: testAPIKey,
 			},
-			testAPISecret,
+			authProvider,
 		)
+		require.NoError(t, err)
 		defer resourceURLNotifier.Stop(false)
 
 		event := &livekit.WebhookEvent{
@@ -615,7 +624,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 	})
 
 	t.Run("times out after accepting connection", func(t *testing.T) {
-		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+		params := ResourceURLNotifierParams{
 			URL:       testUrl,
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
@@ -628,7 +637,9 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 				MaxRetries:    1,
 				ClientTimeout: 100 * time.Millisecond,
 			},
-		})
+		}
+
+		resourceURLNotifier := NewResourceURLNotifier(params)
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
@@ -644,7 +655,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		}
 		defer resourceURLNotifier.Stop(false)
 
-		err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted})
+		err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
 		require.Error(t, err)
 	})
 
@@ -652,7 +663,8 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		ln, err := net.Listen("tcp", ":9987")
 		require.NoError(t, err)
 		defer ln.Close()
-		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+
+		params := ResourceURLNotifierParams{
 			URL:       "http://localhost:9987",
 			APIKey:    testAPIKey,
 			APISecret: testAPISecret,
@@ -665,11 +677,13 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 				MaxRetries:    1,
 				ClientTimeout: 100 * time.Millisecond,
 			},
-		})
+		}
+
+		resourceURLNotifier := NewResourceURLNotifier(params)
 		defer resourceURLNotifier.Stop(false)
 
 		startedAt := time.Now()
-		err = resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted})
+		err = resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
 		require.Error(t, err)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
