@@ -166,6 +166,10 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 		params.APISecret = p.Secret
 	}
 
+	if params.APIKey == "" || params.APISecret == "" {
+		return errNoKey
+	}
+
 	if !n.pool.Submit(key, func() {
 		fields := logFields(event, params.URL)
 

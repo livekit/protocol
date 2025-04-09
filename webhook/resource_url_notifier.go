@@ -40,6 +40,7 @@ const (
 
 var (
 	errClosed = errors.New("notifier is closed")
+	errNoKey  = errors.New("no singing key or secret was provided")
 )
 
 type ResourceURLNotifierConfig struct {
@@ -196,6 +197,10 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 		params.APISecret = p.Secret
 	}
 
+	if params.APIKey == "" || params.APISecret == "" {
+		return errNoKey
+	}
+
 	rqi := r.resourceQueues[key]
 	if rqi == nil || !r.resourceQueueTimeoutQueue.Reset(rqi.tqi) {
 		rq := newResourceQueue(resourceQueueParams{
@@ -314,10 +319,8 @@ func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *Resource
 	sum := sha256.Sum256(encoded)
 	b64 := base64.StdEncoding.EncodeToString(sum[:])
 
-	r.mu.RLock()
 	apiKey := params.APIKey
 	apiSecret := params.APISecret
-	r.mu.RUnlock()
 
 	at := auth.NewAccessToken(apiKey, apiSecret).
 		SetValidFor(5 * time.Minute).

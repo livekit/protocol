@@ -361,9 +361,7 @@ func TestResourceWebHook(t *testing.T) {
 				URLs:   []string{testUrl},
 				APIKey: testAPIKey,
 			},
-			map[string]string{
-				testAPIKey: testAPISecret,
-			},
+			authProvider,
 		)
 		require.NoError(t, err)
 		defer resourceURLNotifier.Stop(false)
