@@ -77,12 +77,9 @@ type ResourceURLNotifierParams struct {
 
 // ResourceURLNotifier is a QueuedNotifier that sends a POST request to a Webhook URL.
 // It queues up events per resource (could be egress, ingress, room, participant, track, etc.)
-//
-//	to avoid blocking events of one resource blocking another resource's event(s).
-//
+// to avoid blocking events of one resource blocking another resource's event(s).
 // It will retry on failure, and will drop events if notification fall too far behind,
-//
-//	either in age or queue depth.
+// either in age or queue depth.
 type ResourceURLNotifier struct {
 	mu            sync.RWMutex
 	params        ResourceURLNotifierParams
