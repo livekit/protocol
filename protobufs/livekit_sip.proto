@@ -674,6 +674,9 @@ message TransferSIPParticipantRequest {
 
   // Add the following headers to the REFER SIP request.
   map<string, string> headers = 5;
+
+  // Max time for the transfer destination to answer the call.
+  google.protobuf.Duration ringing_timeout = 6;
 }
 
 message SIPCallInfo {

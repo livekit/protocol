@@ -93,6 +93,16 @@ func (c *CPUStats) NumCPU() float64 {
 	return c.platform.numCPU()
 }
 
+func (c *CPUStats) GetCPULoad() float64 {
+	var cpuLoad float64
+	cpuIdle := c.GetCPUIdle()
+	nCPU := c.NumCPU()
+	if nCPU > 0 && cpuIdle > 0 {
+		cpuLoad = 1 - (cpuIdle / c.NumCPU())
+	}
+	return cpuLoad
+}
+
 func (c *CPUStats) Stop() {
 	close(c.closeChan)
 }

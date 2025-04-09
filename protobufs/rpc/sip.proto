@@ -122,5 +122,8 @@ message InternalTransferSIPParticipantRequest {
 
   // Add the following headers to the REFER SIP request.
   map<string, string> headers = 4;
+
+  // Max time for the transfer destination to answer the call.
+  google.protobuf.Duration ringing_timeout = 5;
 }
 
