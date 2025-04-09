@@ -64,9 +64,8 @@ type RoomService interface {
 	// Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
 	UpdateRoomMetadata(context.Context, *UpdateRoomMetadataRequest) (*Room, error)
 
-	// Forward a participant's track to another room. Requires `roomAdmin` on the room whose name
-	// consists of the source room and destination room as `source|dest`. The forwarding will stop
-	// when the participant leaves the room or call `RemoveParticipant` on the destination room.
+	// Forward a participant's track(s) to another room. Requires `roomAdmin` and `destinationRoom`. The forwarding will
+	// stop when the participant leaves the room or `RemoveParticipant` has been called in the destination room.
 	// A participant can be forwarded to multiple rooms. The destination room will be created if it does not exist.
 	ForwardParticipant(context.Context, *ForwardParticipantRequest) (*ForwardParticipantResponse, error)
 }

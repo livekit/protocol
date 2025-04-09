@@ -146,6 +146,9 @@ type VideoGrant struct {
 
 	// if a participant can subscribe to metrics
 	CanSubscribeMetrics *bool `json:"canSubscribeMetrics,omitempty"`
+
+	// destination room which this participant can forward to
+	DestinationRoom string `json:"destinationRoom,omitempty"`
 }
 
 func (v *VideoGrant) SetCanPublish(val bool) {
@@ -374,6 +377,7 @@ func (v *VideoGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	logBoolPtr("Agent", &v.Agent)
 
 	logBoolPtr("CanSubscribeMetrics", v.CanSubscribeMetrics)
+	e.AddString("DestinationRoom", v.DestinationRoom)
 	return nil
 }
 
