@@ -26,6 +26,9 @@ service AgentInternal {
   rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse) {
     option (psrpc.options).multi = true;
   };
+  rpc ListWorker(livekit.ListAgentWorkerRequest) returns (livekit.ListAgentWorkerResponse) {
+    option (psrpc.options).multi = true;
+  };
   rpc JobRequest(livekit.Job) returns (JobRequestResponse) {
     option (psrpc.options) = {
       affinity_func: true
