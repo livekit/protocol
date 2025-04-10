@@ -27,6 +27,10 @@ const (
 
 	// AttrIngressPrefix is shared for all Ingress attributes
 	AttrIngressPrefix = "ingress."
+	// AttrIngressID contains the ingressID associated with the participant
+	AttrIngressID = AttrIngressPrefix + "ingressID"
+	// AttrIngressResourceID coutains the resourceID of ths ingress session associated with the participant
+	AttrIngressResourceID = AttrIngressPrefix + "resourceID"
 	// AttrIngressOutOfNetworkPrefix is shared for all ingress out of network (Ads break) related attributes
 	AttrIngressOutOfNetworkPrefix = AttrIngressPrefix + "outOfNetwork."
 	// AttrIngressOutOfNetworkEventID contains the event ID of the current Out of network splice
