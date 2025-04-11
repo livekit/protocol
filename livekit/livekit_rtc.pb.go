@@ -2780,10 +2780,15 @@ func (x *SubscribedQualityUpdate) GetSubscribedCodecs() []*SubscribedCodec {
 type TrackPermission struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// permission could be granted either by participant sid or identity
-	ParticipantSid      string   `protobuf:"bytes,1,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
-	AllTracks           bool     `protobuf:"varint,2,opt,name=all_tracks,json=allTracks,proto3" json:"all_tracks,omitempty"`
-	TrackSids           []string `protobuf:"bytes,3,rep,name=track_sids,json=trackSids,proto3" json:"track_sids,omitempty"`
-	ParticipantIdentity string   `protobuf:"bytes,4,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	//
+	// Deprecated: Marked as deprecated in livekit_rtc.proto.
+	ParticipantSid string `protobuf:"bytes,1,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
+	AllTracks      bool   `protobuf:"varint,2,opt,name=all_tracks,json=allTracks,proto3" json:"all_tracks,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_rtc.proto.
+	TrackSids           []string      `protobuf:"bytes,3,rep,name=track_sids,json=trackSids,proto3" json:"track_sids,omitempty"`
+	ParticipantIdentity string        `protobuf:"bytes,4,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	TrackSources        []TrackSource `protobuf:"varint,5,rep,packed,name=track_sources,json=trackSources,proto3,enum=livekit.TrackSource" json:"track_sources,omitempty"`
+	TrackNames          []string      `protobuf:"bytes,6,rep,name=track_names,json=trackNames,proto3" json:"track_names,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -2818,6 +2823,7 @@ func (*TrackPermission) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{29}
 }
 
+// Deprecated: Marked as deprecated in livekit_rtc.proto.
 func (x *TrackPermission) GetParticipantSid() string {
 	if x != nil {
 		return x.ParticipantSid
@@ -2832,6 +2838,7 @@ func (x *TrackPermission) GetAllTracks() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in livekit_rtc.proto.
 func (x *TrackPermission) GetTrackSids() []string {
 	if x != nil {
 		return x.TrackSids
@@ -2844,6 +2851,20 @@ func (x *TrackPermission) GetParticipantIdentity() string {
 		return x.ParticipantIdentity
 	}
 	return ""
+}
+
+func (x *TrackPermission) GetTrackSources() []TrackSource {
+	if x != nil {
+		return x.TrackSources
+	}
+	return nil
+}
+
+func (x *TrackPermission) GetTrackNames() []string {
+	if x != nil {
+		return x.TrackNames
+	}
+	return nil
 }
 
 type SubscriptionPermission struct {
@@ -3888,14 +3909,17 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x17SubscribedQualityUpdate\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12M\n" +
 	"\x14subscribed_qualities\x18\x02 \x03(\v2\x1a.livekit.SubscribedQualityR\x13subscribedQualities\x12E\n" +
-	"\x11subscribed_codecs\x18\x03 \x03(\v2\x18.livekit.SubscribedCodecR\x10subscribedCodecs\"\xab\x01\n" +
-	"\x0fTrackPermission\x12'\n" +
-	"\x0fparticipant_sid\x18\x01 \x01(\tR\x0eparticipantSid\x12\x1d\n" +
+	"\x11subscribed_codecs\x18\x03 \x03(\v2\x18.livekit.SubscribedCodecR\x10subscribedCodecs\"\x8f\x02\n" +
+	"\x0fTrackPermission\x12+\n" +
+	"\x0fparticipant_sid\x18\x01 \x01(\tB\x02\x18\x01R\x0eparticipantSid\x12\x1d\n" +
 	"\n" +
-	"all_tracks\x18\x02 \x01(\bR\tallTracks\x12\x1d\n" +
+	"all_tracks\x18\x02 \x01(\bR\tallTracks\x12!\n" +
 	"\n" +
-	"track_sids\x18\x03 \x03(\tR\ttrackSids\x121\n" +
-	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\"\x8a\x01\n" +
+	"track_sids\x18\x03 \x03(\tB\x02\x18\x01R\ttrackSids\x121\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x129\n" +
+	"\rtrack_sources\x18\x05 \x03(\x0e2\x14.livekit.TrackSourceR\ftrackSources\x12\x1f\n" +
+	"\vtrack_names\x18\x06 \x03(\tR\n" +
+	"trackNames\"\x8a\x01\n" +
 	"\x16SubscriptionPermission\x12)\n" +
 	"\x10all_participants\x18\x01 \x01(\bR\x0fallParticipants\x12E\n" +
 	"\x11track_permissions\x18\x02 \x03(\v2\x18.livekit.TrackPermissionR\x10trackPermissions\"\x84\x02\n" +
@@ -4128,23 +4152,24 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	31, // 69: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
 	31, // 70: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
 	32, // 71: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
-	34, // 72: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
-	49, // 73: livekit.SubscriptionPermissionUpdate.track_source:type_name -> livekit.TrackSource
-	15, // 74: livekit.SyncState.answer:type_name -> livekit.SessionDescription
-	17, // 75: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
-	13, // 76: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
-	38, // 77: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
-	15, // 78: livekit.SyncState.offer:type_name -> livekit.SessionDescription
-	0,  // 79: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
-	2,  // 80: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
-	43, // 81: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
-	65, // 82: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
-	4,  // 83: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
-	84, // [84:84] is the sub-list for method output_type
-	84, // [84:84] is the sub-list for method input_type
-	84, // [84:84] is the sub-list for extension type_name
-	84, // [84:84] is the sub-list for extension extendee
-	0,  // [0:84] is the sub-list for field type_name
+	49, // 72: livekit.TrackPermission.track_sources:type_name -> livekit.TrackSource
+	34, // 73: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
+	49, // 74: livekit.SubscriptionPermissionUpdate.track_source:type_name -> livekit.TrackSource
+	15, // 75: livekit.SyncState.answer:type_name -> livekit.SessionDescription
+	17, // 76: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
+	13, // 77: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
+	38, // 78: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
+	15, // 79: livekit.SyncState.offer:type_name -> livekit.SessionDescription
+	0,  // 80: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
+	2,  // 81: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
+	43, // 82: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
+	65, // 83: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
+	4,  // 84: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
+	85, // [85:85] is the sub-list for method output_type
+	85, // [85:85] is the sub-list for method input_type
+	85, // [85:85] is the sub-list for extension type_name
+	85, // [85:85] is the sub-list for extension extendee
+	0,  // [0:85] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
