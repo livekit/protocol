@@ -353,8 +353,10 @@ message SubscriptionPermission {
 
 message SubscriptionPermissionUpdate {
   string participant_sid = 1;
-  string track_sid = 2;
+  string track_sid = 2 [deprecated = true];
   bool allowed = 3;
+  optional TrackSource track_source = 4;
+  optional string track_name = 5;
 }
 
 message SyncState {
