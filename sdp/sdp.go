@@ -364,6 +364,8 @@ type SDPFragment struct {
 
 // primarily for use with WHIP Trickle ICE - https://www.rfc-editor.org/rfc/rfc9725.html#name-trickle-ice
 func (s *SDPFragment) Unmarshal(frag string) error {
+	s.ice = &sdpFragmentICE{}
+
 	lines := strings.Split(frag, "\n")
 	for _, line := range lines {
 		line = strings.TrimRight(line, " \r")
@@ -390,56 +392,54 @@ func (s *SDPFragment) Unmarshal(frag string) error {
 			return errors.New("invalid attribute")
 		}
 
-		attrParts := strings.Split(line[2:], ":")
-		if len(attrParts) != 2 {
-			return errors.New("invalid attribute")
+		line = line[2:]
+		delimIndex := strings.Index(line, ":")
+		if delimIndex < 0 {
+			if line == sdp.AttrKeyICELite {
+				lite := true
+				if s.media != nil {
+					s.media.ice.lite = &lite
+				} else {
+					s.ice.lite = &lite
+				}
+			}
+			continue
 		}
 
-		if s.ice == nil {
-			s.ice = &sdpFragmentICE{}
-		}
-
-		switch attrParts[0] {
+		value := line[delimIndex+1:]
+		switch line[:delimIndex] {
 		case sdp.AttrKeyGroup:
-			s.group = attrParts[1]
+			s.group = value
 
 		case "ice-ufrag":
 			if s.media != nil {
-				s.media.ice.ufrag = attrParts[1]
+				s.media.ice.ufrag = value
 			} else {
-				s.ice.ufrag = attrParts[1]
+				s.ice.ufrag = value
 			}
 
 		case "ice-pwd":
 			if s.media != nil {
-				s.media.ice.pwd = attrParts[1]
+				s.media.ice.pwd = value
 			} else {
-				s.ice.pwd = attrParts[1]
-			}
-
-		case sdp.AttrKeyICELite:
-			lite := true
-			if s.media != nil {
-				s.media.ice.lite = &lite
-			} else {
-				s.ice.lite = &lite
+				s.ice.pwd = value
 			}
 
 		case "ice-options":
 			if s.media != nil {
-				s.media.ice.options = attrParts[1]
+				s.media.ice.options = value
 			} else {
-				s.ice.options = attrParts[1]
+				s.ice.options = value
 			}
 
 		case sdp.AttrKeyMID:
 			if s.media != nil {
-				s.media.mid = attrParts[1]
+				s.media.mid = value
 			}
 
 		case sdp.AttrKeyCandidate:
 			if s.media != nil {
-				s.media.candidates = append(s.media.candidates, attrParts[1])
+				s.media.candidates = append(s.media.candidates, value)
 			}
 
 		case sdp.AttrKeyEndOfCandidates:
