@@ -2901,10 +2901,13 @@ func (x *SubscriptionPermission) GetTrackPermissions() []*TrackPermission {
 type SubscriptionPermissionUpdate struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	ParticipantSid string                 `protobuf:"bytes,1,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
-	TrackSid       string                 `protobuf:"bytes,2,opt,name=track_sid,json=trackSid,proto3" json:"track_sid,omitempty"`
-	Allowed        bool                   `protobuf:"varint,3,opt,name=allowed,proto3" json:"allowed,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Deprecated: Marked as deprecated in livekit_rtc.proto.
+	TrackSid      string       `protobuf:"bytes,2,opt,name=track_sid,json=trackSid,proto3" json:"track_sid,omitempty"`
+	Allowed       bool         `protobuf:"varint,3,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	TrackSource   *TrackSource `protobuf:"varint,4,opt,name=track_source,json=trackSource,proto3,enum=livekit.TrackSource,oneof" json:"track_source,omitempty"`
+	TrackName     *string      `protobuf:"bytes,5,opt,name=track_name,json=trackName,proto3,oneof" json:"track_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SubscriptionPermissionUpdate) Reset() {
@@ -2944,6 +2947,7 @@ func (x *SubscriptionPermissionUpdate) GetParticipantSid() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_rtc.proto.
 func (x *SubscriptionPermissionUpdate) GetTrackSid() string {
 	if x != nil {
 		return x.TrackSid
@@ -2956,6 +2960,20 @@ func (x *SubscriptionPermissionUpdate) GetAllowed() bool {
 		return x.Allowed
 	}
 	return false
+}
+
+func (x *SubscriptionPermissionUpdate) GetTrackSource() TrackSource {
+	if x != nil && x.TrackSource != nil {
+		return *x.TrackSource
+	}
+	return TrackSource_UNKNOWN
+}
+
+func (x *SubscriptionPermissionUpdate) GetTrackName() string {
+	if x != nil && x.TrackName != nil {
+		return *x.TrackName
+	}
+	return ""
 }
 
 type SyncState struct {
@@ -3880,11 +3898,16 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\"\x8a\x01\n" +
 	"\x16SubscriptionPermission\x12)\n" +
 	"\x10all_participants\x18\x01 \x01(\bR\x0fallParticipants\x12E\n" +
-	"\x11track_permissions\x18\x02 \x03(\v2\x18.livekit.TrackPermissionR\x10trackPermissions\"~\n" +
+	"\x11track_permissions\x18\x02 \x03(\v2\x18.livekit.TrackPermissionR\x10trackPermissions\"\x84\x02\n" +
 	"\x1cSubscriptionPermissionUpdate\x12'\n" +
-	"\x0fparticipant_sid\x18\x01 \x01(\tR\x0eparticipantSid\x12\x1b\n" +
-	"\ttrack_sid\x18\x02 \x01(\tR\btrackSid\x12\x18\n" +
-	"\aallowed\x18\x03 \x01(\bR\aallowed\"\xeb\x02\n" +
+	"\x0fparticipant_sid\x18\x01 \x01(\tR\x0eparticipantSid\x12\x1f\n" +
+	"\ttrack_sid\x18\x02 \x01(\tB\x02\x18\x01R\btrackSid\x12\x18\n" +
+	"\aallowed\x18\x03 \x01(\bR\aallowed\x12<\n" +
+	"\ftrack_source\x18\x04 \x01(\x0e2\x14.livekit.TrackSourceH\x00R\vtrackSource\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"track_name\x18\x05 \x01(\tH\x01R\ttrackName\x88\x01\x01B\x0f\n" +
+	"\r_track_sourceB\r\n" +
+	"\v_track_name\"\xeb\x02\n" +
 	"\tSyncState\x123\n" +
 	"\x06answer\x18\x01 \x01(\v2\x1b.livekit.SessionDescriptionR\x06answer\x12?\n" +
 	"\fsubscription\x18\x02 \x01(\v2\x1b.livekit.UpdateSubscriptionR\fsubscription\x12F\n" +
@@ -4106,21 +4129,22 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	31, // 70: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
 	32, // 71: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
 	34, // 72: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
-	15, // 73: livekit.SyncState.answer:type_name -> livekit.SessionDescription
-	17, // 74: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
-	13, // 75: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
-	38, // 76: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
-	15, // 77: livekit.SyncState.offer:type_name -> livekit.SessionDescription
-	0,  // 78: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
-	2,  // 79: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
-	43, // 80: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
-	65, // 81: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
-	4,  // 82: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
-	83, // [83:83] is the sub-list for method output_type
-	83, // [83:83] is the sub-list for method input_type
-	83, // [83:83] is the sub-list for extension type_name
-	83, // [83:83] is the sub-list for extension extendee
-	0,  // [0:83] is the sub-list for field type_name
+	49, // 73: livekit.SubscriptionPermissionUpdate.track_source:type_name -> livekit.TrackSource
+	15, // 74: livekit.SyncState.answer:type_name -> livekit.SessionDescription
+	17, // 75: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
+	13, // 76: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
+	38, // 77: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
+	15, // 78: livekit.SyncState.offer:type_name -> livekit.SessionDescription
+	0,  // 79: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
+	2,  // 80: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
+	43, // 81: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
+	65, // 82: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
+	4,  // 83: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
+	84, // [84:84] is the sub-list for method output_type
+	84, // [84:84] is the sub-list for method input_type
+	84, // [84:84] is the sub-list for extension type_name
+	84, // [84:84] is the sub-list for extension extendee
+	0,  // [0:84] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
@@ -4172,6 +4196,7 @@ func file_livekit_rtc_proto_init() {
 		(*SignalResponse_RequestResponse)(nil),
 		(*SignalResponse_TrackSubscribed)(nil),
 	}
+	file_livekit_rtc_proto_msgTypes[31].OneofWrappers = []any{}
 	file_livekit_rtc_proto_msgTypes[34].OneofWrappers = []any{
 		(*SimulateScenario_SpeakerUpdate)(nil),
 		(*SimulateScenario_NodeFailure)(nil),
