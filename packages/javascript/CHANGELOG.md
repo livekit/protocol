@@ -1,5 +1,29 @@
 # @livekit/protocol
 
+## 1.37.0
+
+### Minor Changes
+
+- Allow specifying extra webhooks in egress start requests - [#1040](https://github.com/livekit/protocol/pull/1040) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add timeout parameter to SIP transfer API. - [#1036](https://github.com/livekit/protocol/pull/1036) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- allow calling promise.Resolve more than once - [#1035](https://github.com/livekit/protocol/pull/1035) ([@paulwe](https://github.com/paulwe))
+
+- Add CONNECTION_TIMEOUT disconnect reason - [#1037](https://github.com/livekit/protocol/pull/1037) ([@boks1971](https://github.com/boks1971))
+
+- Add rate for memory use and total. - [#1030](https://github.com/livekit/protocol/pull/1030) ([@boks1971](https://github.com/boks1971))
+
+- Add IngressID and ResourceID attributes for the ingress participants - [#1042](https://github.com/livekit/protocol/pull/1042) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Revert cid changes. - [#1029](https://github.com/livekit/protocol/pull/1029) ([@boks1971](https://github.com/boks1971))
+
+- Add more fields to CodecInfo. - [#1024](https://github.com/livekit/protocol/pull/1024) ([@boks1971](https://github.com/boks1971))
+
+- Add client info enum value for unreal - [#1032](https://github.com/livekit/protocol/pull/1032) ([@bcherry](https://github.com/bcherry))
+
 ## 1.36.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "@livekit/protocol",
-  "version": "1.36.1",
+  "version": "1.37.0",
   "description": "",
   "type": "module",
   "require": "dist/index.cjs",
