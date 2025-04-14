@@ -308,6 +308,7 @@ message SIPInboundTrunkUpdate {
   optional string auth_password = 5;
   optional string name = 6;
   optional string metadata = 7;
+  optional SIPMediaEncryption media_encryption = 8;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -375,6 +376,7 @@ message SIPOutboundTrunkUpdate {
   optional string auth_password = 5;
   optional string name = 6;
   optional string metadata = 7;
+  optional SIPMediaEncryption media_encryption = 8;
 }
 
 message GetSIPInboundTrunkRequest {
@@ -553,6 +555,7 @@ message SIPDispatchRuleUpdate {
   optional string name = 3;
   optional string metadata = 4;
   map<string, string> attributes = 5;
+  optional SIPMediaEncryption media_encryption = 6;
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
