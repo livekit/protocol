@@ -377,6 +377,7 @@ func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
+	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	return info.Validate()
 }
 
@@ -474,6 +475,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
+	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	return info.Validate()
 }
 
@@ -594,6 +596,7 @@ func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
 	applyUpdatePtr(&info.Rule, p.Rule)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
+	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	applyMapDiff(&info.Attributes, p.Attributes)
 	return info.Validate()
 }
