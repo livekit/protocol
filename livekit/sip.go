@@ -218,7 +218,7 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 	}
 }
 
-var reHeaders = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9\-]*$`)
+var reHeaders = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9\-_]*$`)
 
 func validateHeader(header string) error {
 	if !reHeaders.MatchString(header) {
