@@ -1362,6 +1362,105 @@ func (*ForwardParticipantResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_room_proto_rawDescGZIP(), []int{21}
 }
 
+type MoveParticipantRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// room to move participant from
+	Room string `protobuf:"bytes,1,opt,name=room,proto3" json:"room,omitempty"`
+	// identity of the participant to move to
+	Identity string `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	// room to move participant to
+	DestinationRoom string `protobuf:"bytes,3,opt,name=destination_room,json=destinationRoom,proto3" json:"destination_room,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *MoveParticipantRequest) Reset() {
+	*x = MoveParticipantRequest{}
+	mi := &file_livekit_room_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MoveParticipantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MoveParticipantRequest) ProtoMessage() {}
+
+func (x *MoveParticipantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_room_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MoveParticipantRequest.ProtoReflect.Descriptor instead.
+func (*MoveParticipantRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_room_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *MoveParticipantRequest) GetRoom() string {
+	if x != nil {
+		return x.Room
+	}
+	return ""
+}
+
+func (x *MoveParticipantRequest) GetIdentity() string {
+	if x != nil {
+		return x.Identity
+	}
+	return ""
+}
+
+func (x *MoveParticipantRequest) GetDestinationRoom() string {
+	if x != nil {
+		return x.DestinationRoom
+	}
+	return ""
+}
+
+type MoveParticipantResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MoveParticipantResponse) Reset() {
+	*x = MoveParticipantResponse{}
+	mi := &file_livekit_room_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MoveParticipantResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MoveParticipantResponse) ProtoMessage() {}
+
+func (x *MoveParticipantResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_room_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MoveParticipantResponse.ProtoReflect.Descriptor instead.
+func (*MoveParticipantResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_room_proto_rawDescGZIP(), []int{23}
+}
+
 var File_livekit_room_proto protoreflect.FileDescriptor
 
 const file_livekit_room_proto_rawDesc = "" +
@@ -1464,7 +1563,12 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12)\n" +
 	"\x10destination_room\x18\x03 \x01(\tR\x0fdestinationRoom\"\x1c\n" +
-	"\x1aForwardParticipantResponse2\xc5\a\n" +
+	"\x1aForwardParticipantResponse\"s\n" +
+	"\x16MoveParticipantRequest\x12\x12\n" +
+	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
+	"\bidentity\x18\x02 \x01(\tR\bidentity\x12)\n" +
+	"\x10destination_room\x18\x03 \x01(\tR\x0fdestinationRoom\"\x19\n" +
+	"\x17MoveParticipantResponse2\x9b\b\n" +
 	"\vRoomService\x127\n" +
 	"\n" +
 	"CreateRoom\x12\x1a.livekit.CreateRoomRequest\x1a\r.livekit.Room\x12B\n" +
@@ -1479,7 +1583,8 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x13UpdateSubscriptions\x12#.livekit.UpdateSubscriptionsRequest\x1a$.livekit.UpdateSubscriptionsResponse\x12?\n" +
 	"\bSendData\x12\x18.livekit.SendDataRequest\x1a\x19.livekit.SendDataResponse\x12G\n" +
 	"\x12UpdateRoomMetadata\x12\".livekit.UpdateRoomMetadataRequest\x1a\r.livekit.Room\x12]\n" +
-	"\x12ForwardParticipant\x12\".livekit.ForwardParticipantRequest\x1a#.livekit.ForwardParticipantResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x12ForwardParticipant\x12\".livekit.ForwardParticipantRequest\x1a#.livekit.ForwardParticipantResponse\x12T\n" +
+	"\x0fMoveParticipant\x12\x1f.livekit.MoveParticipantRequest\x1a .livekit.MoveParticipantResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_room_proto_rawDescOnce sync.Once
@@ -1493,7 +1598,7 @@ func file_livekit_room_proto_rawDescGZIP() []byte {
 	return file_livekit_room_proto_rawDescData
 }
 
-var file_livekit_room_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_livekit_room_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_livekit_room_proto_goTypes = []any{
 	(*CreateRoomRequest)(nil),           // 0: livekit.CreateRoomRequest
 	(*RoomEgress)(nil),                  // 1: livekit.RoomEgress
@@ -1517,34 +1622,36 @@ var file_livekit_room_proto_goTypes = []any{
 	(*RoomConfiguration)(nil),           // 19: livekit.RoomConfiguration
 	(*ForwardParticipantRequest)(nil),   // 20: livekit.ForwardParticipantRequest
 	(*ForwardParticipantResponse)(nil),  // 21: livekit.ForwardParticipantResponse
-	nil,                                 // 22: livekit.UpdateParticipantRequest.AttributesEntry
-	(*RoomAgentDispatch)(nil),           // 23: livekit.RoomAgentDispatch
-	(*RoomCompositeEgressRequest)(nil),  // 24: livekit.RoomCompositeEgressRequest
-	(*AutoParticipantEgress)(nil),       // 25: livekit.AutoParticipantEgress
-	(*AutoTrackEgress)(nil),             // 26: livekit.AutoTrackEgress
-	(*Room)(nil),                        // 27: livekit.Room
-	(*ParticipantInfo)(nil),             // 28: livekit.ParticipantInfo
-	(*TrackInfo)(nil),                   // 29: livekit.TrackInfo
-	(*ParticipantPermission)(nil),       // 30: livekit.ParticipantPermission
-	(*ParticipantTracks)(nil),           // 31: livekit.ParticipantTracks
-	(DataPacket_Kind)(0),                // 32: livekit.DataPacket.Kind
+	(*MoveParticipantRequest)(nil),      // 22: livekit.MoveParticipantRequest
+	(*MoveParticipantResponse)(nil),     // 23: livekit.MoveParticipantResponse
+	nil,                                 // 24: livekit.UpdateParticipantRequest.AttributesEntry
+	(*RoomAgentDispatch)(nil),           // 25: livekit.RoomAgentDispatch
+	(*RoomCompositeEgressRequest)(nil),  // 26: livekit.RoomCompositeEgressRequest
+	(*AutoParticipantEgress)(nil),       // 27: livekit.AutoParticipantEgress
+	(*AutoTrackEgress)(nil),             // 28: livekit.AutoTrackEgress
+	(*Room)(nil),                        // 29: livekit.Room
+	(*ParticipantInfo)(nil),             // 30: livekit.ParticipantInfo
+	(*TrackInfo)(nil),                   // 31: livekit.TrackInfo
+	(*ParticipantPermission)(nil),       // 32: livekit.ParticipantPermission
+	(*ParticipantTracks)(nil),           // 33: livekit.ParticipantTracks
+	(DataPacket_Kind)(0),                // 34: livekit.DataPacket.Kind
 }
 var file_livekit_room_proto_depIdxs = []int32{
 	1,  // 0: livekit.CreateRoomRequest.egress:type_name -> livekit.RoomEgress
-	23, // 1: livekit.CreateRoomRequest.agents:type_name -> livekit.RoomAgentDispatch
-	24, // 2: livekit.RoomEgress.room:type_name -> livekit.RoomCompositeEgressRequest
-	25, // 3: livekit.RoomEgress.participant:type_name -> livekit.AutoParticipantEgress
-	26, // 4: livekit.RoomEgress.tracks:type_name -> livekit.AutoTrackEgress
-	23, // 5: livekit.RoomAgent.dispatches:type_name -> livekit.RoomAgentDispatch
-	27, // 6: livekit.ListRoomsResponse.rooms:type_name -> livekit.Room
-	28, // 7: livekit.ListParticipantsResponse.participants:type_name -> livekit.ParticipantInfo
-	29, // 8: livekit.MuteRoomTrackResponse.track:type_name -> livekit.TrackInfo
-	30, // 9: livekit.UpdateParticipantRequest.permission:type_name -> livekit.ParticipantPermission
-	22, // 10: livekit.UpdateParticipantRequest.attributes:type_name -> livekit.UpdateParticipantRequest.AttributesEntry
-	31, // 11: livekit.UpdateSubscriptionsRequest.participant_tracks:type_name -> livekit.ParticipantTracks
-	32, // 12: livekit.SendDataRequest.kind:type_name -> livekit.DataPacket.Kind
+	25, // 1: livekit.CreateRoomRequest.agents:type_name -> livekit.RoomAgentDispatch
+	26, // 2: livekit.RoomEgress.room:type_name -> livekit.RoomCompositeEgressRequest
+	27, // 3: livekit.RoomEgress.participant:type_name -> livekit.AutoParticipantEgress
+	28, // 4: livekit.RoomEgress.tracks:type_name -> livekit.AutoTrackEgress
+	25, // 5: livekit.RoomAgent.dispatches:type_name -> livekit.RoomAgentDispatch
+	29, // 6: livekit.ListRoomsResponse.rooms:type_name -> livekit.Room
+	30, // 7: livekit.ListParticipantsResponse.participants:type_name -> livekit.ParticipantInfo
+	31, // 8: livekit.MuteRoomTrackResponse.track:type_name -> livekit.TrackInfo
+	32, // 9: livekit.UpdateParticipantRequest.permission:type_name -> livekit.ParticipantPermission
+	24, // 10: livekit.UpdateParticipantRequest.attributes:type_name -> livekit.UpdateParticipantRequest.AttributesEntry
+	33, // 11: livekit.UpdateSubscriptionsRequest.participant_tracks:type_name -> livekit.ParticipantTracks
+	34, // 12: livekit.SendDataRequest.kind:type_name -> livekit.DataPacket.Kind
 	1,  // 13: livekit.RoomConfiguration.egress:type_name -> livekit.RoomEgress
-	23, // 14: livekit.RoomConfiguration.agents:type_name -> livekit.RoomAgentDispatch
+	25, // 14: livekit.RoomConfiguration.agents:type_name -> livekit.RoomAgentDispatch
 	0,  // 15: livekit.RoomService.CreateRoom:input_type -> livekit.CreateRoomRequest
 	3,  // 16: livekit.RoomService.ListRooms:input_type -> livekit.ListRoomsRequest
 	5,  // 17: livekit.RoomService.DeleteRoom:input_type -> livekit.DeleteRoomRequest
@@ -1557,20 +1664,22 @@ var file_livekit_room_proto_depIdxs = []int32{
 	16, // 24: livekit.RoomService.SendData:input_type -> livekit.SendDataRequest
 	18, // 25: livekit.RoomService.UpdateRoomMetadata:input_type -> livekit.UpdateRoomMetadataRequest
 	20, // 26: livekit.RoomService.ForwardParticipant:input_type -> livekit.ForwardParticipantRequest
-	27, // 27: livekit.RoomService.CreateRoom:output_type -> livekit.Room
-	4,  // 28: livekit.RoomService.ListRooms:output_type -> livekit.ListRoomsResponse
-	6,  // 29: livekit.RoomService.DeleteRoom:output_type -> livekit.DeleteRoomResponse
-	8,  // 30: livekit.RoomService.ListParticipants:output_type -> livekit.ListParticipantsResponse
-	28, // 31: livekit.RoomService.GetParticipant:output_type -> livekit.ParticipantInfo
-	10, // 32: livekit.RoomService.RemoveParticipant:output_type -> livekit.RemoveParticipantResponse
-	12, // 33: livekit.RoomService.MutePublishedTrack:output_type -> livekit.MuteRoomTrackResponse
-	28, // 34: livekit.RoomService.UpdateParticipant:output_type -> livekit.ParticipantInfo
-	15, // 35: livekit.RoomService.UpdateSubscriptions:output_type -> livekit.UpdateSubscriptionsResponse
-	17, // 36: livekit.RoomService.SendData:output_type -> livekit.SendDataResponse
-	27, // 37: livekit.RoomService.UpdateRoomMetadata:output_type -> livekit.Room
-	21, // 38: livekit.RoomService.ForwardParticipant:output_type -> livekit.ForwardParticipantResponse
-	27, // [27:39] is the sub-list for method output_type
-	15, // [15:27] is the sub-list for method input_type
+	22, // 27: livekit.RoomService.MoveParticipant:input_type -> livekit.MoveParticipantRequest
+	29, // 28: livekit.RoomService.CreateRoom:output_type -> livekit.Room
+	4,  // 29: livekit.RoomService.ListRooms:output_type -> livekit.ListRoomsResponse
+	6,  // 30: livekit.RoomService.DeleteRoom:output_type -> livekit.DeleteRoomResponse
+	8,  // 31: livekit.RoomService.ListParticipants:output_type -> livekit.ListParticipantsResponse
+	30, // 32: livekit.RoomService.GetParticipant:output_type -> livekit.ParticipantInfo
+	10, // 33: livekit.RoomService.RemoveParticipant:output_type -> livekit.RemoveParticipantResponse
+	12, // 34: livekit.RoomService.MutePublishedTrack:output_type -> livekit.MuteRoomTrackResponse
+	30, // 35: livekit.RoomService.UpdateParticipant:output_type -> livekit.ParticipantInfo
+	15, // 36: livekit.RoomService.UpdateSubscriptions:output_type -> livekit.UpdateSubscriptionsResponse
+	17, // 37: livekit.RoomService.SendData:output_type -> livekit.SendDataResponse
+	29, // 38: livekit.RoomService.UpdateRoomMetadata:output_type -> livekit.Room
+	21, // 39: livekit.RoomService.ForwardParticipant:output_type -> livekit.ForwardParticipantResponse
+	23, // 40: livekit.RoomService.MoveParticipant:output_type -> livekit.MoveParticipantResponse
+	28, // [28:41] is the sub-list for method output_type
+	15, // [15:28] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
 	15, // [15:15] is the sub-list for extension extendee
 	0,  // [0:15] is the sub-list for field type_name
@@ -1591,7 +1700,7 @@ func file_livekit_room_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_room_proto_rawDesc), len(file_livekit_room_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   23,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
