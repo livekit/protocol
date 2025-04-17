@@ -136,7 +136,7 @@ func TestSDPFragment(t *testing.T) {
 		SDP:  sdp,
 	}
 	parsed, _ := sd.Unmarshal()
-	err = sdpFragment1.PatchICECredentialIntoSDP(parsed)
+	err = sdpFragment1.PatchICECredentialAndCandidatesIntoSDP(parsed)
 	require.NoError(t, err)
 
 	ufrag, pwd, err = ExtractICECredential(parsed)
