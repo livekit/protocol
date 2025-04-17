@@ -576,13 +576,23 @@ func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) 
 			}
 		}
 	}
-	if s.media != nil && s.media.mid != "" && s.media.ice != nil && (s.media.ice.lite != nil || s.media.ice.options != "") {
+
+	foundMediaMid := false
+	if s.media != nil && s.media.mid != "" {
 		for _, md := range parsed.MediaDescriptions {
 			mid, found := md.Attribute(sdp.AttrKeyMID)
-			if !found || mid != s.media.mid {
-				continue
+			if found && mid == s.media.mid {
+				foundMediaMid = true
+				break
 			}
+		}
+	}
+	if !foundMediaMid {
+		return errors.New("could not find media mid")
+	}
 
+	if s.media != nil && s.media.ice != nil && (s.media.ice.lite != nil || s.media.ice.options != "") {
+		for _, md := range parsed.MediaDescriptions {
 			for _, a := range md.Attributes {
 				switch a.Key {
 				case "ice-lite":
@@ -599,7 +609,6 @@ func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) 
 	}
 
 	if s.ice != nil && s.ice.ufrag != "" && s.ice.pwd != "" {
-		fmt.Printf("patching ufrag/pwd\n") // REMOVE
 		for idx, a := range parsed.Attributes {
 			switch a.Key {
 			case "ice-ufrag":
@@ -616,13 +625,8 @@ func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) 
 		}
 	}
 
-	if s.media != nil && s.media.mid != "" {
+	if s.media != nil {
 		for _, md := range parsed.MediaDescriptions {
-			mid, found := md.Attribute(sdp.AttrKeyMID)
-			if !found || mid != s.media.mid {
-				continue
-			}
-
 			for idx, a := range md.Attributes {
 				switch a.Key {
 				case "ice-ufrag":
