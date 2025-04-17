@@ -560,7 +560,7 @@ func (s *SDPFragment) ExtractICECredential() (string, string, error) {
 }
 
 // primarily for use with WHIP ICE Restart - https://www.rfc-editor.org/rfc/rfc9725.html#name-ice-restarts
-func (s *SDPFragment) PatchICECredentialIntoSDP(parsed *sdp.SessionDescription) error {
+func (s *SDPFragment) PatchICECredentialAndCandidatesIntoSDP(parsed *sdp.SessionDescription) error {
 	// ice-options and ice-lite should match
 	if s.ice != nil && (s.ice.lite != nil || s.ice.options != "") {
 		for _, a := range parsed.Attributes {
