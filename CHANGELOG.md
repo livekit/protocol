@@ -1,5 +1,35 @@
 # github.com/livekit/protocol
 
+## 1.37.0
+
+### Minor Changes
+
+- Allow updating SIP media encryption. - [#1047](https://github.com/livekit/protocol/pull/1047) ([@dennwc](https://github.com/dennwc))
+
+- Add helper to get SIP call status from an error. - [#1028](https://github.com/livekit/protocol/pull/1028) ([@dennwc](https://github.com/dennwc))
+
+- Add timeout parameter to SIP transfer API. - [#1036](https://github.com/livekit/protocol/pull/1036) ([@dennwc](https://github.com/dennwc))
+
+- Fix SIP update when replacing array fields. - [#1038](https://github.com/livekit/protocol/pull/1038) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add CONNECTION_TIMEOUT disconnect reason - [#1037](https://github.com/livekit/protocol/pull/1037) ([@boks1971](https://github.com/boks1971))
+
+- Add rate for memory use and total. - [#1030](https://github.com/livekit/protocol/pull/1030) ([@boks1971](https://github.com/boks1971))
+
+- Revert cid changes. - [#1029](https://github.com/livekit/protocol/pull/1029) ([@boks1971](https://github.com/boks1971))
+
+- Use cgroup for memory stats. - [#1031](https://github.com/livekit/protocol/pull/1031) ([@boks1971](https://github.com/boks1971))
+
+- Allow '\_' in SIP headers. - [#1048](https://github.com/livekit/protocol/pull/1048) ([@dennwc](https://github.com/dennwc))
+
+- Add more fields to CodecInfo. - [#1024](https://github.com/livekit/protocol/pull/1024) ([@boks1971](https://github.com/boks1971))
+
+- Add client info enum value for unreal - [#1032](https://github.com/livekit/protocol/pull/1032) ([@bcherry](https://github.com/bcherry))
+
+- Rework node stats to split out rate metrics into its own shape. - [#1023](https://github.com/livekit/protocol/pull/1023) ([@boks1971](https://github.com/boks1971))
+
 ## 1.36.1
 
 ### Patch Changes
