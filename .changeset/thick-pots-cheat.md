@@ -1,5 +1,5 @@
 ---
-"@github/livekit/protocol": patch
+"@livekit/protocol": patch
 ---
 
 Export GetEgressNotifyOptions
