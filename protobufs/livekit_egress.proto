@@ -212,6 +212,7 @@ message DirectFileOutput {
 enum ImageFileSuffix {
   IMAGE_SUFFIX_INDEX = 0;
   IMAGE_SUFFIX_TIMESTAMP = 1;
+  IMAGE_SUFFIX_NONE_OVERWRITE = 2; // Do not append any suffix and overwrite the existing image with the latest
 }
 
 message ImageOutput {

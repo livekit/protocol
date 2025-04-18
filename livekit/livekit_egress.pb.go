@@ -179,8 +179,9 @@ func (SegmentedFileSuffix) EnumDescriptor() ([]byte, []int) {
 type ImageFileSuffix int32
 
 const (
-	ImageFileSuffix_IMAGE_SUFFIX_INDEX     ImageFileSuffix = 0
-	ImageFileSuffix_IMAGE_SUFFIX_TIMESTAMP ImageFileSuffix = 1
+	ImageFileSuffix_IMAGE_SUFFIX_INDEX          ImageFileSuffix = 0
+	ImageFileSuffix_IMAGE_SUFFIX_TIMESTAMP      ImageFileSuffix = 1
+	ImageFileSuffix_IMAGE_SUFFIX_NONE_OVERWRITE ImageFileSuffix = 2 // Do not append any suffix and overwrite the existing image with the latest
 )
 
 // Enum value maps for ImageFileSuffix.
@@ -188,10 +189,12 @@ var (
 	ImageFileSuffix_name = map[int32]string{
 		0: "IMAGE_SUFFIX_INDEX",
 		1: "IMAGE_SUFFIX_TIMESTAMP",
+		2: "IMAGE_SUFFIX_NONE_OVERWRITE",
 	}
 	ImageFileSuffix_value = map[string]int32{
-		"IMAGE_SUFFIX_INDEX":     0,
-		"IMAGE_SUFFIX_TIMESTAMP": 1,
+		"IMAGE_SUFFIX_INDEX":          0,
+		"IMAGE_SUFFIX_TIMESTAMP":      1,
+		"IMAGE_SUFFIX_NONE_OVERWRITE": 2,
 	}
 )
 
@@ -4157,10 +4160,11 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\fHLS_PROTOCOL\x10\x01*/\n" +
 	"\x13SegmentedFileSuffix\x12\t\n" +
 	"\x05INDEX\x10\x00\x12\r\n" +
-	"\tTIMESTAMP\x10\x01*E\n" +
+	"\tTIMESTAMP\x10\x01*f\n" +
 	"\x0fImageFileSuffix\x12\x16\n" +
 	"\x12IMAGE_SUFFIX_INDEX\x10\x00\x12\x1a\n" +
-	"\x16IMAGE_SUFFIX_TIMESTAMP\x10\x01*9\n" +
+	"\x16IMAGE_SUFFIX_TIMESTAMP\x10\x01\x12\x1f\n" +
+	"\x1bIMAGE_SUFFIX_NONE_OVERWRITE\x10\x02*9\n" +
 	"\x0eStreamProtocol\x12\x14\n" +
 	"\x10DEFAULT_PROTOCOL\x10\x00\x12\b\n" +
 	"\x04RTMP\x10\x01\x12\a\n" +
