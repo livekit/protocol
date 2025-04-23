@@ -364,8 +364,8 @@ message RoomMovedResponse {
   Room room = 1;
   // new reconnect token that can be used to reconnect to the new room
   string token = 2;
-  ParticipantInfo participant = 2;
-  repeated ParticipantInfo other_participants = 3;
+  ParticipantInfo participant = 3;
+  repeated ParticipantInfo other_participants = 4;
 }
 
 message SyncState {
