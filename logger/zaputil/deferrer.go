@@ -75,7 +75,6 @@ type DeferredFieldResolver func(args ...any)
 
 func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 	buf := &Deferrer{}
-
 	resolve := func(args ...any) {
 		fields := make([]zapcore.Field, 0, len(args))
 		for i := 0; i < len(args); i++ {
