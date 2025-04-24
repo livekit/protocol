@@ -15,6 +15,7 @@
 package zaputil
 
 import (
+	"slices"
 	"sync"
 
 	"go.uber.org/atomic"
@@ -30,15 +31,14 @@ type deferredWrite struct {
 
 type Deferrer struct {
 	mu     sync.Mutex
-	ready  bool
-	fields []zapcore.Field
+	fields atomic.Pointer[[]zapcore.Field]
 	writes []*deferredWrite
 }
 
 func (b *Deferrer) buffer(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) bool {
 	b.mu.Lock()
 	defer b.mu.Unlock()
-	if b.ready {
+	if b.fields.Load() != nil {
 		return false
 	}
 	b.writes = append(b.writes, &deferredWrite{core, ent, fields})
@@ -47,36 +47,35 @@ func (b *Deferrer) buffer(core zapcore.Core, ent zapcore.Entry, fields []zapcore
 
 func (b *Deferrer) flush() {
 	b.mu.Lock()
-	b.ready = true
 	writes := b.writes
 	b.writes = nil
 	b.mu.Unlock()
 
-	var fields []zapcore.Field
+	fields := slices.Clone(*b.fields.Load())
+	n := len(fields)
+
 	for _, w := range writes {
-		fields = append(fields[:0], b.fields...)
-		fields = append(fields, w.fields...)
+		fields = append(fields[:n], w.fields...)
 		w.core.Write(w.ent, fields)
 	}
 }
 
 func (b *Deferrer) write(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) error {
-	if !b.buffer(core, ent, fields) {
-		return core.Write(ent, append(fields[0:len(fields):len(fields)], b.fields...))
+	for {
+		if dfs := b.fields.Load(); dfs != nil {
+			return core.Write(ent, slices.Concat(fields, *dfs))
+		}
+		if b.buffer(core, ent, fields) {
+			return nil
+		}
 	}
-	return nil
 }
 
 type DeferredFieldResolver func(args ...any)
 
 func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 	buf := &Deferrer{}
-	var resolved atomic.Bool
 	resolve := func(args ...any) {
-		if resolved.Swap(true) {
-			return
-		}
-
 		fields := make([]zapcore.Field, 0, len(args))
 		for i := 0; i < len(args); i++ {
 			switch arg := args[i].(type) {
@@ -90,8 +89,9 @@ func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 			}
 		}
 
-		buf.fields = fields
-		buf.flush()
+		if buf.fields.Swap(&fields) == nil {
+			buf.flush()
+		}
 	}
 	return buf, resolve
 }
