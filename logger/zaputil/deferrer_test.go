@@ -46,10 +46,9 @@ func TestDeferredLogger(t *testing.T) {
 
 	t.Run("resolved values can be overwritten", func(t *testing.T) {
 		ws := &testutil.BufferedWriteSyncer{}
-		c := NewEncoderCore(
-			zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-			NewWriteEnabler(ws, zapcore.DebugLevel),
-		)
+		we := NewWriteEnabler(ws, zapcore.DebugLevel)
+		enc := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
+		c := NewEncoderCore(enc, we)
 		d, resolve := NewDeferrer()
 		dc := NewDeferredValueCore(c, d)
 		s := zap.New(dc).Sugar()
