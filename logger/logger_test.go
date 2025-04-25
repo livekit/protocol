@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"runtime"
 	"strings"
@@ -12,6 +10,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
+	"github.com/livekit/protocol/logger/testutil"
 	"github.com/livekit/protocol/logger/zaputil"
 	"github.com/livekit/protocol/utils/must"
 )
@@ -84,13 +83,13 @@ func TestLoggerComponent(t *testing.T) {
 	})
 
 	t.Run("log output matches expected values", func(t *testing.T) {
-		ws := &testBufferedWriteSyncer{}
+		ws := &testutil.BufferedWriteSyncer{}
 		l, err := NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel)))
 		require.NoError(t, err)
 		l.Debugw("foo", "bar", "baz")
 
-		log, err := unmarshalTestLogOutput(ws.Bytes())
-		require.NoError(t, err)
+		var log TestLogOutput
+		require.NoError(t, ws.Unmarshal(&log))
 
 		require.Equal(t, "debug", log.Level)
 		require.NotEqual(t, 0, log.TS)
@@ -101,7 +100,7 @@ func TestLoggerComponent(t *testing.T) {
 
 	t.Run("component enabler for tapped logger returns lowest enabled level", func(t *testing.T) {
 		tapLevel := zap.NewAtomicLevel()
-		l, err := NewZapLogger(&Config{Level: "info"}, WithTap(zaputil.NewWriteEnabler(&testBufferedWriteSyncer{}, tapLevel)))
+		l, err := NewZapLogger(&Config{Level: "info"}, WithTap(zaputil.NewWriteEnabler(&testutil.BufferedWriteSyncer{}, tapLevel)))
 		require.NoError(t, err)
 
 		lvl := l.ComponentLeveler().ComponentLevel("foo")
@@ -116,24 +115,10 @@ func TestLoggerComponent(t *testing.T) {
 	})
 }
 
-type testLogOutput struct {
-	Level  string
-	TS     float64
-	Caller string
-	Msg    string
-	Bar    string
+type TestLogOutput struct {
+	testutil.TestLogOutput
+	Bar string
 }
-
-func unmarshalTestLogOutput(b []byte) (*testLogOutput, error) {
-	log := &testLogOutput{}
-	return log, json.Unmarshal(b, &log)
-}
-
-type testBufferedWriteSyncer struct {
-	bytes.Buffer
-}
-
-func (t *testBufferedWriteSyncer) Sync() error { return nil }
 
 type logFunc func(string, ...any)
 
@@ -174,12 +159,13 @@ func TestLoggerCallDepth(t *testing.T) {
 	}
 	for label, getLogFunc := range cases {
 		t.Run(label, func(t *testing.T) {
-			ws := &testBufferedWriteSyncer{}
+			ws := &testutil.BufferedWriteSyncer{}
 			l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
 
 			testLogCaller(getLogFunc(l))
 
-			log := must.Get(unmarshalTestLogOutput(ws.Bytes()))
+			var log TestLogOutput
+			require.NoError(t, ws.Unmarshal(&log))
 			require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
 		})
 	}
