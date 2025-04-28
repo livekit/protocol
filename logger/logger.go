@@ -20,9 +20,11 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"testing"
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/go-logr/logr/funcr"
 	"github.com/puzpuzpuz/xsync/v3"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -482,4 +484,14 @@ func (l LogRLogger) WithoutSampler() Logger {
 
 func (l LogRLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
 	return l, func(args ...any) {}
+}
+
+func NewTestLogger(t *testing.T) Logger {
+	return LogRLogger(funcr.New(func(prefix, args string) {
+		if prefix != "" {
+			t.Logf("%s: %s\n", prefix, args)
+		} else {
+			t.Log(args)
+		}
+	}, funcr.Options{}))
 }
