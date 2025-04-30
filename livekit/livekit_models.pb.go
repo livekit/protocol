@@ -709,6 +709,7 @@ const (
 	AudioTrackFeature_TF_ECHO_CANCELLATION           AudioTrackFeature = 3
 	AudioTrackFeature_TF_NOISE_SUPPRESSION           AudioTrackFeature = 4
 	AudioTrackFeature_TF_ENHANCED_NOISE_CANCELLATION AudioTrackFeature = 5
+	AudioTrackFeature_TF_PRECONNECT_BUFFER           AudioTrackFeature = 6 // client will buffer audio once available and send it to the server via bytes stream once connected
 )
 
 // Enum value maps for AudioTrackFeature.
@@ -720,6 +721,7 @@ var (
 		3: "TF_ECHO_CANCELLATION",
 		4: "TF_NOISE_SUPPRESSION",
 		5: "TF_ENHANCED_NOISE_CANCELLATION",
+		6: "TF_PRECONNECT_BUFFER",
 	}
 	AudioTrackFeature_value = map[string]int32{
 		"TF_STEREO":                      0,
@@ -728,6 +730,7 @@ var (
 		"TF_ECHO_CANCELLATION":           3,
 		"TF_NOISE_SUPPRESSION":           4,
 		"TF_ENHANCED_NOISE_CANCELLATION": 5,
+		"TF_PRECONNECT_BUFFER":           6,
 	}
 )
 
@@ -5722,14 +5725,15 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"SE_UNKNOWN\x10\x00\x12\x18\n" +
 	"\x14SE_CODEC_UNSUPPORTED\x10\x01\x12\x15\n" +
-	"\x11SE_TRACK_NOTFOUND\x10\x02*\xa3\x01\n" +
+	"\x11SE_TRACK_NOTFOUND\x10\x02*\xbd\x01\n" +
 	"\x11AudioTrackFeature\x12\r\n" +
 	"\tTF_STEREO\x10\x00\x12\r\n" +
 	"\tTF_NO_DTX\x10\x01\x12\x18\n" +
 	"\x14TF_AUTO_GAIN_CONTROL\x10\x02\x12\x18\n" +
 	"\x14TF_ECHO_CANCELLATION\x10\x03\x12\x18\n" +
 	"\x14TF_NOISE_SUPPRESSION\x10\x04\x12\"\n" +
-	"\x1eTF_ENHANCED_NOISE_CANCELLATION\x10\x05BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x1eTF_ENHANCED_NOISE_CANCELLATION\x10\x05\x12\x18\n" +
+	"\x14TF_PRECONNECT_BUFFER\x10\x06BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_models_proto_rawDescOnce sync.Once

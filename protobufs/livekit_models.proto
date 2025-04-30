@@ -641,6 +641,7 @@ enum AudioTrackFeature {
   TF_ECHO_CANCELLATION = 3;
   TF_NOISE_SUPPRESSION = 4;
   TF_ENHANCED_NOISE_CANCELLATION = 5;
+  TF_PRECONNECT_BUFFER = 6; // client will buffer audio once available and send it to the server via bytes stream once connected
 }
 
 message DataStream {

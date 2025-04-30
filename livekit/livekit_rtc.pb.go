@@ -1119,8 +1119,9 @@ type AddTrackRequest struct {
 	Encryption Encryption_Type `protobuf:"varint,14,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	// which stream the track belongs to, used to group tracks together.
 	// if not specified, server will infer it from track source to bundle camera/microphone, screenshare/audio together
-	Stream            string            `protobuf:"bytes,15,opt,name=stream,proto3" json:"stream,omitempty"`
-	BackupCodecPolicy BackupCodecPolicy `protobuf:"varint,16,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
+	Stream            string              `protobuf:"bytes,15,opt,name=stream,proto3" json:"stream,omitempty"`
+	BackupCodecPolicy BackupCodecPolicy   `protobuf:"varint,16,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
+	AudioFeatures     []AudioTrackFeature `protobuf:"varint,17,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1265,6 +1266,13 @@ func (x *AddTrackRequest) GetBackupCodecPolicy() BackupCodecPolicy {
 		return x.BackupCodecPolicy
 	}
 	return BackupCodecPolicy_PREFER_REGRESSION
+}
+
+func (x *AddTrackRequest) GetAudioFeatures() []AudioTrackFeature {
+	if x != nil {
+		return x.AudioFeatures
+	}
+	return nil
 }
 
 type TrickleRequest struct {
@@ -3728,7 +3736,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\amessage\"8\n" +
 	"\x0eSimulcastCodec\x12\x14\n" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
-	"\x03cid\x18\x02 \x01(\tR\x03cid\"\xcc\x04\n" +
+	"\x03cid\x18\x02 \x01(\tR\x03cid\"\x8f\x05\n" +
 	"\x0fAddTrackRequest\x12\x10\n" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12&\n" +
@@ -3750,7 +3758,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x18\x0e \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\x12\x16\n" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
-	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"{\n" +
+	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
+	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"{\n" +
 	"\x0eTrickleRequest\x12$\n" +
 	"\rcandidateInit\x18\x01 \x01(\tR\rcandidateInit\x12-\n" +
 	"\x06target\x18\x02 \x01(\x0e2\x15.livekit.SignalTargetR\x06target\x12\x14\n" +
@@ -4018,15 +4027,15 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(*VideoLayer)(nil),                   // 50: livekit.VideoLayer
 	(Encryption_Type)(0),                 // 51: livekit.Encryption.Type
 	(BackupCodecPolicy)(0),               // 52: livekit.BackupCodecPolicy
-	(*Room)(nil),                         // 53: livekit.Room
-	(*ParticipantInfo)(nil),              // 54: livekit.ParticipantInfo
-	(*ClientConfiguration)(nil),          // 55: livekit.ClientConfiguration
-	(*ServerInfo)(nil),                   // 56: livekit.ServerInfo
-	(*Codec)(nil),                        // 57: livekit.Codec
-	(*TrackInfo)(nil),                    // 58: livekit.TrackInfo
-	(*ParticipantTracks)(nil),            // 59: livekit.ParticipantTracks
-	(VideoQuality)(0),                    // 60: livekit.VideoQuality
-	(AudioTrackFeature)(0),               // 61: livekit.AudioTrackFeature
+	(AudioTrackFeature)(0),               // 53: livekit.AudioTrackFeature
+	(*Room)(nil),                         // 54: livekit.Room
+	(*ParticipantInfo)(nil),              // 55: livekit.ParticipantInfo
+	(*ClientConfiguration)(nil),          // 56: livekit.ClientConfiguration
+	(*ServerInfo)(nil),                   // 57: livekit.ServerInfo
+	(*Codec)(nil),                        // 58: livekit.Codec
+	(*TrackInfo)(nil),                    // 59: livekit.TrackInfo
+	(*ParticipantTracks)(nil),            // 60: livekit.ParticipantTracks
+	(VideoQuality)(0),                    // 61: livekit.VideoQuality
 	(DisconnectReason)(0),                // 62: livekit.DisconnectReason
 	(*SpeakerInfo)(nil),                  // 63: livekit.SpeakerInfo
 	(ConnectionQuality)(0),               // 64: livekit.ConnectionQuality
@@ -4075,52 +4084,53 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	7,  // 39: livekit.AddTrackRequest.simulcast_codecs:type_name -> livekit.SimulcastCodec
 	51, // 40: livekit.AddTrackRequest.encryption:type_name -> livekit.Encryption.Type
 	52, // 41: livekit.AddTrackRequest.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
-	0,  // 42: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
-	53, // 43: livekit.JoinResponse.room:type_name -> livekit.Room
-	54, // 44: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
-	54, // 45: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
-	24, // 46: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
-	55, // 47: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	56, // 48: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
-	57, // 49: livekit.JoinResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	24, // 50: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
-	55, // 51: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	58, // 52: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
-	54, // 53: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
-	59, // 54: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
-	60, // 55: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
-	61, // 56: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
-	62, // 57: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
-	3,  // 58: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
-	42, // 59: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
-	50, // 60: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
-	47, // 61: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
-	63, // 62: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
-	53, // 63: livekit.RoomUpdate.room:type_name -> livekit.Room
-	64, // 64: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
-	27, // 65: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
-	1,  // 66: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
-	29, // 67: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
-	60, // 68: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
-	31, // 69: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
-	31, // 70: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
-	32, // 71: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
-	34, // 72: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
-	15, // 73: livekit.SyncState.answer:type_name -> livekit.SessionDescription
-	17, // 74: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
-	13, // 75: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
-	38, // 76: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
-	15, // 77: livekit.SyncState.offer:type_name -> livekit.SessionDescription
-	0,  // 78: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
-	2,  // 79: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
-	43, // 80: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
-	65, // 81: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
-	4,  // 82: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
-	83, // [83:83] is the sub-list for method output_type
-	83, // [83:83] is the sub-list for method input_type
-	83, // [83:83] is the sub-list for extension type_name
-	83, // [83:83] is the sub-list for extension extendee
-	0,  // [0:83] is the sub-list for field type_name
+	53, // 42: livekit.AddTrackRequest.audio_features:type_name -> livekit.AudioTrackFeature
+	0,  // 43: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
+	54, // 44: livekit.JoinResponse.room:type_name -> livekit.Room
+	55, // 45: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
+	55, // 46: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
+	24, // 47: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
+	56, // 48: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	57, // 49: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
+	58, // 50: livekit.JoinResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	24, // 51: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
+	56, // 52: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	59, // 53: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
+	55, // 54: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
+	60, // 55: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
+	61, // 56: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
+	53, // 57: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
+	62, // 58: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
+	3,  // 59: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
+	42, // 60: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
+	50, // 61: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
+	47, // 62: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
+	63, // 63: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
+	54, // 64: livekit.RoomUpdate.room:type_name -> livekit.Room
+	64, // 65: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
+	27, // 66: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
+	1,  // 67: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
+	29, // 68: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
+	61, // 69: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
+	31, // 70: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
+	31, // 71: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
+	32, // 72: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
+	34, // 73: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
+	15, // 74: livekit.SyncState.answer:type_name -> livekit.SessionDescription
+	17, // 75: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
+	13, // 76: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
+	38, // 77: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
+	15, // 78: livekit.SyncState.offer:type_name -> livekit.SessionDescription
+	0,  // 79: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
+	2,  // 80: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
+	43, // 81: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
+	65, // 82: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
+	4,  // 83: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
+	84, // [84:84] is the sub-list for method output_type
+	84, // [84:84] is the sub-list for method input_type
+	84, // [84:84] is the sub-list for extension type_name
+	84, // [84:84] is the sub-list for extension extendee
+	0,  // [0:84] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }

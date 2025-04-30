@@ -149,6 +149,8 @@ message AddTrackRequest {
   // if not specified, server will infer it from track source to bundle camera/microphone, screenshare/audio together
   string stream = 15;
   BackupCodecPolicy backup_codec_policy = 16;
+
+  repeated AudioTrackFeature audio_features = 17;
 }
 
 message TrickleRequest {
