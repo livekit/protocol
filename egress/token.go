@@ -35,7 +35,7 @@ func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error)
 	}
 
 	at := auth.NewAccessToken(apiKey, secret).
-		AddGrant(grant).
+		SetVideoGrant(grant).
 		SetIdentity(egressID).
 		SetKind(livekit.ParticipantInfo_EGRESS).
 		SetValidFor(24 * time.Hour)

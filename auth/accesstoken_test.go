@@ -43,8 +43,8 @@ func TestAccessToken(t *testing.T) {
 		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
 		sipGrant := &SIPGrant{Admin: true}
 		at := NewAccessToken(apiKey, secret).
-			AddGrant(videoGrant).
-			AddSIPGrant(sipGrant).
+			SetVideoGrant(videoGrant).
+			SetSIPGrant(sipGrant).
 			SetValidFor(time.Minute * 5).
 			SetKind(livekit.ParticipantInfo_AGENT).
 			SetIdentity("user")
@@ -70,7 +70,7 @@ func TestAccessToken(t *testing.T) {
 	t.Run("missing kind should be interpreted as standard", func(t *testing.T) {
 		apiKey, secret := apiKeypair()
 		value, err := NewAccessToken(apiKey, secret).
-			AddGrant(&VideoGrant{RoomJoin: true, Room: "myroom"}).
+			SetVideoGrant(&VideoGrant{RoomJoin: true, Room: "myroom"}).
 			ToJWT()
 		require.NoError(t, err)
 		token, err := jwt.ParseSigned(value)
@@ -88,7 +88,7 @@ func TestAccessToken(t *testing.T) {
 		apiKey, secret := apiKeypair()
 		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
 		at := NewAccessToken(apiKey, secret).
-			AddGrant(videoGrant)
+			SetVideoGrant(videoGrant)
 		value, err := at.ToJWT()
 		require.NoError(t, err)
 		token, err := jwt.ParseSigned(value)

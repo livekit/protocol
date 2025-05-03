@@ -33,7 +33,7 @@ func BuildIngressToken(apiKey, secret, roomName, participantIdentity, participan
 	}
 
 	at := auth.NewAccessToken(apiKey, secret).
-		AddGrant(grant).
+		SetVideoGrant(grant).
 		SetIdentity(participantIdentity).
 		SetName(participantName).
 		SetKind(livekit.ParticipantInfo_INGRESS).
