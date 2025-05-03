@@ -1107,13 +1107,16 @@ type AddTrackRequest struct {
 	// true to add track and initialize to muted
 	Muted bool `protobuf:"varint,6,opt,name=muted,proto3" json:"muted,omitempty"`
 	// true if DTX (Discontinuous Transmission) is disabled for audio
-	DisableDtx      bool              `protobuf:"varint,7,opt,name=disable_dtx,json=disableDtx,proto3" json:"disable_dtx,omitempty"`
+	//
+	// Deprecated: Marked as deprecated in livekit_rtc.proto.
+	DisableDtx      bool              `protobuf:"varint,7,opt,name=disable_dtx,json=disableDtx,proto3" json:"disable_dtx,omitempty"` // deprecated in favor of audio_features
 	Source          TrackSource       `protobuf:"varint,8,opt,name=source,proto3,enum=livekit.TrackSource" json:"source,omitempty"`
 	Layers          []*VideoLayer     `protobuf:"bytes,9,rep,name=layers,proto3" json:"layers,omitempty"`
 	SimulcastCodecs []*SimulcastCodec `protobuf:"bytes,10,rep,name=simulcast_codecs,json=simulcastCodecs,proto3" json:"simulcast_codecs,omitempty"`
 	// server ID of track, publish new codec to exist track
-	Sid    string `protobuf:"bytes,11,opt,name=sid,proto3" json:"sid,omitempty"`
-	Stereo bool   `protobuf:"varint,12,opt,name=stereo,proto3" json:"stereo,omitempty"`
+	Sid string `protobuf:"bytes,11,opt,name=sid,proto3" json:"sid,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_rtc.proto.
+	Stereo bool `protobuf:"varint,12,opt,name=stereo,proto3" json:"stereo,omitempty"` // deprecated in favor of audio_features
 	// true if RED (Redundant Encoding) is disabled for audio
 	DisableRed bool            `protobuf:"varint,13,opt,name=disable_red,json=disableRed,proto3" json:"disable_red,omitempty"`
 	Encryption Encryption_Type `protobuf:"varint,14,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
@@ -1198,6 +1201,7 @@ func (x *AddTrackRequest) GetMuted() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in livekit_rtc.proto.
 func (x *AddTrackRequest) GetDisableDtx() bool {
 	if x != nil {
 		return x.DisableDtx
@@ -1233,6 +1237,7 @@ func (x *AddTrackRequest) GetSid() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_rtc.proto.
 func (x *AddTrackRequest) GetStereo() bool {
 	if x != nil {
 		return x.Stereo
@@ -3736,22 +3741,22 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\amessage\"8\n" +
 	"\x0eSimulcastCodec\x12\x14\n" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
-	"\x03cid\x18\x02 \x01(\tR\x03cid\"\x8f\x05\n" +
+	"\x03cid\x18\x02 \x01(\tR\x03cid\"\x97\x05\n" +
 	"\x0fAddTrackRequest\x12\x10\n" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12&\n" +
 	"\x04type\x18\x03 \x01(\x0e2\x12.livekit.TrackTypeR\x04type\x12\x14\n" +
 	"\x05width\x18\x04 \x01(\rR\x05width\x12\x16\n" +
 	"\x06height\x18\x05 \x01(\rR\x06height\x12\x14\n" +
-	"\x05muted\x18\x06 \x01(\bR\x05muted\x12\x1f\n" +
-	"\vdisable_dtx\x18\a \x01(\bR\n" +
+	"\x05muted\x18\x06 \x01(\bR\x05muted\x12#\n" +
+	"\vdisable_dtx\x18\a \x01(\bB\x02\x18\x01R\n" +
 	"disableDtx\x12,\n" +
 	"\x06source\x18\b \x01(\x0e2\x14.livekit.TrackSourceR\x06source\x12+\n" +
 	"\x06layers\x18\t \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
 	"\x10simulcast_codecs\x18\n" +
 	" \x03(\v2\x17.livekit.SimulcastCodecR\x0fsimulcastCodecs\x12\x10\n" +
-	"\x03sid\x18\v \x01(\tR\x03sid\x12\x16\n" +
-	"\x06stereo\x18\f \x01(\bR\x06stereo\x12\x1f\n" +
+	"\x03sid\x18\v \x01(\tR\x03sid\x12\x1a\n" +
+	"\x06stereo\x18\f \x01(\bB\x02\x18\x01R\x06stereo\x12\x1f\n" +
 	"\vdisable_red\x18\r \x01(\bR\n" +
 	"disableRed\x128\n" +
 	"\n" +
