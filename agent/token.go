@@ -25,7 +25,7 @@ func BuildAgentToken(
 	}
 
 	at := auth.NewAccessToken(apiKey, secret).
-		AddGrant(grant).
+		SetVideoGrant(grant).
 		SetIdentity(participantIdentity).
 		SetName(participantName).
 		SetKind(livekit.ParticipantInfo_AGENT).
