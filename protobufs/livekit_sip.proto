@@ -711,6 +711,17 @@ message SIPCallInfo {
   // NEXT ID: 25
 }
 
+message SIPTransferInfo {
+  string call_id = 1;
+  uint32 refer_seq_num = 2;
+  int64 transfer_initiated_at_ns = 3;
+  int64 transfer_completed_at_ns = 4;
+  string error = 5;
+  SIPStatus transfer_status_code = 6;
+
+  // NEXT ID: 7
+}
+
 message SIPUri {
   string user = 1;
   string host = 2;

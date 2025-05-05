@@ -122,11 +122,13 @@ enum AnalyticsEventType {
   SIP_CALL_INCOMING = 37;
   SIP_CALL_STARTED = 38;
   SIP_CALL_ENDED = 39;
+  SIP_TRANSFER_REQUESTED = 43;
+  SIP_TRANSFER_COMPLETE = 44;
   REPORT = 40;
   API_CALL = 41;
   WEBHOOK = 42;
 
-  // NEXT_ID: 43
+  // NEXT_ID: 45
 }
 
 message AnalyticsClientMeta {
@@ -174,11 +176,12 @@ message AnalyticsEvent {
   SIPOutboundTrunkInfo sip_outbound_trunk = 30;
   string sip_dispatch_rule_id = 31;
   SIPDispatchRuleInfo sip_dispatch_rule = 32;
+  SIPTransferInfo sip_transfer = 36;
   ReportInfo report = 33;
   APICallInfo api_call = 34;
   WebhookInfo webhook = 35;
 
-  // NEXT_ID: 36
+  // NEXT_ID: 37
 }
 
 message AnalyticsEvents {
