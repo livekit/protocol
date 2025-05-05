@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.37.1
+
+### Patch Changes
+
+- Deprecate explicit AddTrackRequest fields that can be read from AudioTrackFeatures - [#1058](https://github.com/livekit/protocol/pull/1058) ([@lukasIO](https://github.com/lukasIO))
+
+- Add PreconnectBuffer to AudioTrackFeatures, add AudioTrackFeatures to AddTrackRequest - [#1057](https://github.com/livekit/protocol/pull/1057) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.37.0
 
 ### Minor Changes
