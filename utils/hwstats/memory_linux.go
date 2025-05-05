@@ -127,9 +127,9 @@ func newMemInfoGetterV2(osStat *osStatMemoryGetter) memInfoGetter {
 }
 
 func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
-	usage, err1 := readValueFromFile(memCurrentPathV2)
-	if err1 != nil {
-		return 0, 0, err1
+	usage, err := readValueFromFile(memCurrentPathV2)
+	if err != nil {
+		return 0, 0, err
 	}
 
 	total, err := readValueFromFile(memMaxPathV2)
