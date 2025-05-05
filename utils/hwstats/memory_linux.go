@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	memStatsPathV1 = "/sys/fs/memory/memory.usage_in_bytes"
+	memStatsPathV1 = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
 	memStatsPathV2 = "/sys/fs/memory/memory.current"
 
 	memUsagePathV1 = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
@@ -62,6 +62,7 @@ func newPlatformMemoryGetter() (platformMemoryGetter, error) {
 			return nil, err
 		}
 		if e {
+			logger.Infow("using getter", "key", k) // REMOVE
 			cg = v(osStat)
 			break
 		}
@@ -130,12 +131,13 @@ func newMemInfoGetterV2(osStat *osStatMemoryGetter) memInfoGetter {
 }
 
 func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
-	usage, err := readValueFromFile(memCurrentPathV2)
-	if err != nil {
-		return 0, 0, err
+	usage, err1 := readValueFromFile(memCurrentPathV2)
+	if err1 != nil {
+		return 0, 0, err1
 	}
 
 	total, err := readValueFromFile(memMaxPathV2)
+	logger.Infow("memory v2 usage", "usage", usage, "err1", err1, "total", total, "err", err) // REMOVE
 	if err != nil {
 		// when memory limit not set, it has the string "max"
 		usage, total, err = cg.osStat.getMemory()
@@ -155,6 +157,7 @@ func readValueFromFile(file string) (uint64, error) {
 		return 0, err
 	}
 
+	logger.Infow("read file", "file", file, "value", string(b), "truncated", string(b[:len(b)-1])) // REMOVE
 	// Skip the trailing EOL
 	return strconv.ParseUint(string(b[:len(b)-1]), 10, 64)
 }
