@@ -62,7 +62,7 @@ func newPlatformMemoryGetter() (platformMemoryGetter, error) {
 			return nil, err
 		}
 		if e {
-			logger.Infow("using getter", "key", k) // REMOVE
+			logger.Infow("DEBUG using getter", "key", k) // REMOVE
 			cg = v(osStat)
 			break
 		}
@@ -108,6 +108,7 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 	// fallback if limit from cgroup is more than physical available memory
 	// when limit is not set explicitly, it could be very high
 	usage1, total1, err := cg.osStat.getMemory()
+	logger.Infow("DEBUG memory v1 usage", "usage", usage, "total", total, "err", err, "usage1", usage1, "total1", total1) // REMOVE
 	if err != nil {
 		return 0, 0, err
 	}
@@ -137,7 +138,7 @@ func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
 	}
 
 	total, err := readValueFromFile(memMaxPathV2)
-	logger.Infow("memory v2 usage", "usage", usage, "err1", err1, "total", total, "err", err) // REMOVE
+	logger.Infow("DEBUG memory v2 usage", "usage", usage, "err1", err1, "total", total, "err", err) // REMOVE
 	if err != nil {
 		// when memory limit not set, it has the string "max"
 		usage, total, err = cg.osStat.getMemory()
@@ -157,7 +158,7 @@ func readValueFromFile(file string) (uint64, error) {
 		return 0, err
 	}
 
-	logger.Infow("read file", "file", file, "value", string(b), "truncated", string(b[:len(b)-1])) // REMOVE
+	logger.Infow("DEBUG read file", "file", file, "value", string(b), "truncated", string(b[:len(b)-1])) // REMOVE
 	// Skip the trailing EOL
 	return strconv.ParseUint(string(b[:len(b)-1]), 10, 64)
 }
