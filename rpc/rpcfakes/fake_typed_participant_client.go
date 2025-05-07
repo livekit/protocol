@@ -31,6 +31,22 @@ type FakeTypedParticipantClient struct {
 		result1 *livekit.ForwardParticipantResponse
 		result2 error
 	}
+	MoveParticipantStub        func(context.Context, rpc.ParticipantTopic, *livekit.MoveParticipantRequest, ...psrpc.RequestOption) (*livekit.MoveParticipantResponse, error)
+	moveParticipantMutex       sync.RWMutex
+	moveParticipantArgsForCall []struct {
+		arg1 context.Context
+		arg2 rpc.ParticipantTopic
+		arg3 *livekit.MoveParticipantRequest
+		arg4 []psrpc.RequestOption
+	}
+	moveParticipantReturns struct {
+		result1 *livekit.MoveParticipantResponse
+		result2 error
+	}
+	moveParticipantReturnsOnCall map[int]struct {
+		result1 *livekit.MoveParticipantResponse
+		result2 error
+	}
 	MutePublishedTrackStub        func(context.Context, rpc.ParticipantTopic, *livekit.MuteRoomTrackRequest, ...psrpc.RequestOption) (*livekit.MuteRoomTrackResponse, error)
 	mutePublishedTrackMutex       sync.RWMutex
 	mutePublishedTrackArgsForCall []struct {
@@ -186,6 +202,73 @@ func (fake *FakeTypedParticipantClient) ForwardParticipantReturnsOnCall(i int, r
 	}
 	fake.forwardParticipantReturnsOnCall[i] = struct {
 		result1 *livekit.ForwardParticipantResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeTypedParticipantClient) MoveParticipant(arg1 context.Context, arg2 rpc.ParticipantTopic, arg3 *livekit.MoveParticipantRequest, arg4 ...psrpc.RequestOption) (*livekit.MoveParticipantResponse, error) {
+	fake.moveParticipantMutex.Lock()
+	ret, specificReturn := fake.moveParticipantReturnsOnCall[len(fake.moveParticipantArgsForCall)]
+	fake.moveParticipantArgsForCall = append(fake.moveParticipantArgsForCall, struct {
+		arg1 context.Context
+		arg2 rpc.ParticipantTopic
+		arg3 *livekit.MoveParticipantRequest
+		arg4 []psrpc.RequestOption
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.MoveParticipantStub
+	fakeReturns := fake.moveParticipantReturns
+	fake.recordInvocation("MoveParticipant", []interface{}{arg1, arg2, arg3, arg4})
+	fake.moveParticipantMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeTypedParticipantClient) MoveParticipantCallCount() int {
+	fake.moveParticipantMutex.RLock()
+	defer fake.moveParticipantMutex.RUnlock()
+	return len(fake.moveParticipantArgsForCall)
+}
+
+func (fake *FakeTypedParticipantClient) MoveParticipantCalls(stub func(context.Context, rpc.ParticipantTopic, *livekit.MoveParticipantRequest, ...psrpc.RequestOption) (*livekit.MoveParticipantResponse, error)) {
+	fake.moveParticipantMutex.Lock()
+	defer fake.moveParticipantMutex.Unlock()
+	fake.MoveParticipantStub = stub
+}
+
+func (fake *FakeTypedParticipantClient) MoveParticipantArgsForCall(i int) (context.Context, rpc.ParticipantTopic, *livekit.MoveParticipantRequest, []psrpc.RequestOption) {
+	fake.moveParticipantMutex.RLock()
+	defer fake.moveParticipantMutex.RUnlock()
+	argsForCall := fake.moveParticipantArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeTypedParticipantClient) MoveParticipantReturns(result1 *livekit.MoveParticipantResponse, result2 error) {
+	fake.moveParticipantMutex.Lock()
+	defer fake.moveParticipantMutex.Unlock()
+	fake.MoveParticipantStub = nil
+	fake.moveParticipantReturns = struct {
+		result1 *livekit.MoveParticipantResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeTypedParticipantClient) MoveParticipantReturnsOnCall(i int, result1 *livekit.MoveParticipantResponse, result2 error) {
+	fake.moveParticipantMutex.Lock()
+	defer fake.moveParticipantMutex.Unlock()
+	fake.MoveParticipantStub = nil
+	if fake.moveParticipantReturnsOnCall == nil {
+		fake.moveParticipantReturnsOnCall = make(map[int]struct {
+			result1 *livekit.MoveParticipantResponse
+			result2 error
+		})
+	}
+	fake.moveParticipantReturnsOnCall[i] = struct {
+		result1 *livekit.MoveParticipantResponse
 		result2 error
 	}{result1, result2}
 }
@@ -465,6 +548,8 @@ func (fake *FakeTypedParticipantClient) Invocations() map[string][][]interface{}
 	defer fake.closeMutex.RUnlock()
 	fake.forwardParticipantMutex.RLock()
 	defer fake.forwardParticipantMutex.RUnlock()
+	fake.moveParticipantMutex.RLock()
+	defer fake.moveParticipantMutex.RUnlock()
 	fake.mutePublishedTrackMutex.RLock()
 	defer fake.mutePublishedTrackMutex.RUnlock()
 	fake.removeParticipantMutex.RLock()

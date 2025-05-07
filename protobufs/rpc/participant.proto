@@ -73,4 +73,14 @@ service Participant {
       };
     };
   };
+  rpc MoveParticipant(livekit.MoveParticipantRequest) returns (livekit.MoveParticipantResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
 }
