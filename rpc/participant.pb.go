@@ -40,7 +40,7 @@ var File_rpc_participant_proto protoreflect.FileDescriptor
 
 const file_rpc_participant_proto_rawDesc = "" +
 	"\n" +
-	"\x15rpc/participant.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto2\x90\x05\n" +
+	"\x15rpc/participant.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto2\x8c\x06\n" +
 	"\vParticipant\x12\x7f\n" +
 	"\x11RemoveParticipant\x12 .livekit.RoomParticipantIdentity\x1a\".livekit.RemoveParticipantResponse\"$\xb2\x89\x01 \x10\x01\x1a\x1c\n" +
 	"\vparticipant\x12\vparticipant\x18\x01\x12y\n" +
@@ -51,6 +51,8 @@ const file_rpc_participant_proto_rawDesc = "" +
 	"\x13UpdateSubscriptions\x12#.livekit.UpdateSubscriptionsRequest\x1a$.livekit.UpdateSubscriptionsResponse\"$\xb2\x89\x01 \x10\x01\x1a\x1c\n" +
 	"\vparticipant\x12\vparticipant\x18\x01\x12\x83\x01\n" +
 	"\x12ForwardParticipant\x12\".livekit.ForwardParticipantRequest\x1a#.livekit.ForwardParticipantResponse\"$\xb2\x89\x01 \x10\x01\x1a\x1c\n" +
+	"\vparticipant\x12\vparticipant\x18\x01\x12z\n" +
+	"\x0fMoveParticipant\x12\x1f.livekit.MoveParticipantRequest\x1a .livekit.MoveParticipantResponse\"$\xb2\x89\x01 \x10\x01\x1a\x1c\n" +
 	"\vparticipant\x12\vparticipant\x18\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var file_rpc_participant_proto_goTypes = []any{
@@ -59,28 +61,32 @@ var file_rpc_participant_proto_goTypes = []any{
 	(*livekit.UpdateParticipantRequest)(nil),    // 2: livekit.UpdateParticipantRequest
 	(*livekit.UpdateSubscriptionsRequest)(nil),  // 3: livekit.UpdateSubscriptionsRequest
 	(*livekit.ForwardParticipantRequest)(nil),   // 4: livekit.ForwardParticipantRequest
-	(*livekit.RemoveParticipantResponse)(nil),   // 5: livekit.RemoveParticipantResponse
-	(*livekit.MuteRoomTrackResponse)(nil),       // 6: livekit.MuteRoomTrackResponse
-	(*livekit.ParticipantInfo)(nil),             // 7: livekit.ParticipantInfo
-	(*livekit.UpdateSubscriptionsResponse)(nil), // 8: livekit.UpdateSubscriptionsResponse
-	(*livekit.ForwardParticipantResponse)(nil),  // 9: livekit.ForwardParticipantResponse
+	(*livekit.MoveParticipantRequest)(nil),      // 5: livekit.MoveParticipantRequest
+	(*livekit.RemoveParticipantResponse)(nil),   // 6: livekit.RemoveParticipantResponse
+	(*livekit.MuteRoomTrackResponse)(nil),       // 7: livekit.MuteRoomTrackResponse
+	(*livekit.ParticipantInfo)(nil),             // 8: livekit.ParticipantInfo
+	(*livekit.UpdateSubscriptionsResponse)(nil), // 9: livekit.UpdateSubscriptionsResponse
+	(*livekit.ForwardParticipantResponse)(nil),  // 10: livekit.ForwardParticipantResponse
+	(*livekit.MoveParticipantResponse)(nil),     // 11: livekit.MoveParticipantResponse
 }
 var file_rpc_participant_proto_depIdxs = []int32{
-	0, // 0: rpc.Participant.RemoveParticipant:input_type -> livekit.RoomParticipantIdentity
-	1, // 1: rpc.Participant.MutePublishedTrack:input_type -> livekit.MuteRoomTrackRequest
-	2, // 2: rpc.Participant.UpdateParticipant:input_type -> livekit.UpdateParticipantRequest
-	3, // 3: rpc.Participant.UpdateSubscriptions:input_type -> livekit.UpdateSubscriptionsRequest
-	4, // 4: rpc.Participant.ForwardParticipant:input_type -> livekit.ForwardParticipantRequest
-	5, // 5: rpc.Participant.RemoveParticipant:output_type -> livekit.RemoveParticipantResponse
-	6, // 6: rpc.Participant.MutePublishedTrack:output_type -> livekit.MuteRoomTrackResponse
-	7, // 7: rpc.Participant.UpdateParticipant:output_type -> livekit.ParticipantInfo
-	8, // 8: rpc.Participant.UpdateSubscriptions:output_type -> livekit.UpdateSubscriptionsResponse
-	9, // 9: rpc.Participant.ForwardParticipant:output_type -> livekit.ForwardParticipantResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: rpc.Participant.RemoveParticipant:input_type -> livekit.RoomParticipantIdentity
+	1,  // 1: rpc.Participant.MutePublishedTrack:input_type -> livekit.MuteRoomTrackRequest
+	2,  // 2: rpc.Participant.UpdateParticipant:input_type -> livekit.UpdateParticipantRequest
+	3,  // 3: rpc.Participant.UpdateSubscriptions:input_type -> livekit.UpdateSubscriptionsRequest
+	4,  // 4: rpc.Participant.ForwardParticipant:input_type -> livekit.ForwardParticipantRequest
+	5,  // 5: rpc.Participant.MoveParticipant:input_type -> livekit.MoveParticipantRequest
+	6,  // 6: rpc.Participant.RemoveParticipant:output_type -> livekit.RemoveParticipantResponse
+	7,  // 7: rpc.Participant.MutePublishedTrack:output_type -> livekit.MuteRoomTrackResponse
+	8,  // 8: rpc.Participant.UpdateParticipant:output_type -> livekit.ParticipantInfo
+	9,  // 9: rpc.Participant.UpdateSubscriptions:output_type -> livekit.UpdateSubscriptionsResponse
+	10, // 10: rpc.Participant.ForwardParticipant:output_type -> livekit.ForwardParticipantResponse
+	11, // 11: rpc.Participant.MoveParticipant:output_type -> livekit.MoveParticipantResponse
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_rpc_participant_proto_init() }
