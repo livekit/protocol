@@ -53,29 +53,25 @@ func TestDeferredLogger(t *testing.T) {
 		dc := NewDeferredValueCore(c, d)
 		s := zap.New(dc).Sugar()
 
-		type testLogOutput struct {
-			testutil.TestLogOutput
-			A string
-			B string
+		type testLog struct {
+			A, B string
 		}
 
-		cases := []struct {
-			a, b string
-		}{
+		cases := []testLog{
 			{"foo", "bar"},
 			{"baz", "qux"},
 		}
 		for _, c := range cases {
-			resolve("a", c.a, "b", c.b)
+			resolve("a", c.A, "b", c.B)
 			s.Infow("test")
 			s.Sync()
 
-			var log testLogOutput
+			var log testLog
 			require.NoError(t, ws.Unmarshal(&log))
 			ws.Reset()
 
-			require.Equal(t, c.a, log.A)
-			require.Equal(t, c.b, log.B)
+			require.Equal(t, c.A, log.A)
+			require.Equal(t, c.B, log.B)
 		}
 	})
 }

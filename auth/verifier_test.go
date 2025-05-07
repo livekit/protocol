@@ -51,7 +51,7 @@ func TestVerifier(t *testing.T) {
 	t.Run("unexpired token is verified", func(t *testing.T) {
 		claim := auth.VideoGrant{RoomCreate: true}
 		at := auth.NewAccessToken(apiKey, secret).
-			AddGrant(&claim).
+			SetVideoGrant(&claim).
 			SetValidFor(time.Minute).
 			SetIdentity("me")
 		authToken, err := at.ToJWT()
@@ -75,7 +75,7 @@ func TestVerifier(t *testing.T) {
 		md, _ := json.Marshal(metadata)
 		attrs := map[string]string{"mykey": "myval", "secondkey": "secondval"}
 		at := auth.NewAccessToken(apiKey, secret).
-			AddGrant(&auth.VideoGrant{
+			SetVideoGrant(&auth.VideoGrant{
 				RoomAdmin: true,
 				Room:      "myroom",
 			}).
@@ -102,7 +102,7 @@ func TestVerifier(t *testing.T) {
 		}
 		grant.SetCanPublishData(false)
 		at := auth.NewAccessToken(apiKey, secret).
-			AddGrant(grant)
+			SetVideoGrant(grant)
 		token, err := at.ToJWT()
 		require.NoError(t, err)
 

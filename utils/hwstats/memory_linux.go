@@ -24,14 +24,11 @@ import (
 )
 
 const (
-	memStatsPathV1 = "/sys/fs/memory/memory.usage_in_bytes"
-	memStatsPathV2 = "/sys/fs/memory/memory.current"
-
 	memUsagePathV1 = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
 	memLimitPathV1 = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
 
-	memCurrentPathV2 = "/sys/fs/cgroup/memory/memory.current"
-	memMaxPathV2     = "/sys/fs/cgroup/memory/memory.max"
+	memCurrentPathV2 = "/sys/fs/cgroup/memory.current"
+	memMaxPathV2     = "/sys/fs/cgroup/memory.max"
 )
 
 type memInfoGetter interface {
@@ -54,8 +51,8 @@ func newPlatformMemoryGetter() (platformMemoryGetter, error) {
 	// probe for the cgroup version
 	var cg memInfoGetter
 	for k, v := range map[string]func(osStat *osStatMemoryGetter) memInfoGetter{
-		memStatsPathV1: newMemInfoGetterV1,
-		memStatsPathV2: newMemInfoGetterV2,
+		memUsagePathV1:   newMemInfoGetterV1,
+		memCurrentPathV2: newMemInfoGetterV2,
 	} {
 		e, err := fileExists(k)
 		if err != nil {

@@ -133,7 +133,7 @@ message AddTrackRequest {
   // true to add track and initialize to muted
   bool muted = 6;
   // true if DTX (Discontinuous Transmission) is disabled for audio
-  bool disable_dtx = 7;
+  bool disable_dtx = 7 [deprecated = true]; // deprecated in favor of audio_features
   TrackSource source = 8;
   repeated VideoLayer layers = 9;
 
@@ -142,7 +142,7 @@ message AddTrackRequest {
   // server ID of track, publish new codec to exist track
   string sid = 11;
 
-  bool stereo = 12;
+  bool stereo = 12 [deprecated = true]; // deprecated in favor of audio_features
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 13;
 
@@ -151,6 +151,8 @@ message AddTrackRequest {
   // if not specified, server will infer it from track source to bundle camera/microphone, screenshare/audio together
   string stream = 15;
   BackupCodecPolicy backup_codec_policy = 16;
+
+  repeated AudioTrackFeature audio_features = 17;
 }
 
 message TrickleRequest {

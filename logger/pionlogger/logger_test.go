@@ -12,33 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package egress
+package pionlogger
 
 import (
-	"time"
+	"testing"
 
-	"github.com/livekit/protocol/auth"
-	"github.com/livekit/protocol/livekit"
+	"github.com/stretchr/testify/require"
 )
 
-func BuildEgressToken(egressID, apiKey, secret, roomName string) (string, error) {
-	f := false
-	t := true
-	grant := &auth.VideoGrant{
-		RoomJoin:       true,
-		Room:           roomName,
-		CanSubscribe:   &t,
-		CanPublish:     &f,
-		CanPublishData: &f,
-		Hidden:         true,
-		Recorder:       true,
-	}
+func TestPrefixFilter(t *testing.T) {
+	f := NewPrefixFilter(map[string][]string{
+		"tcp_mux": {
+			"test",
+		},
+	})
 
-	at := auth.NewAccessToken(apiKey, secret).
-		SetVideoGrant(grant).
-		SetIdentity(egressID).
-		SetKind(livekit.ParticipantInfo_EGRESS).
-		SetValidFor(24 * time.Hour)
-
-	return at.ToJWT()
+	require.True(t, f["tcp_mux"].Match("error closing connection"))
+	require.True(t, f["tcp_mux"].Match("test"))
 }

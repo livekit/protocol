@@ -15,11 +15,15 @@
 package pionlogger
 
 import (
+	"maps"
+	"slices"
 	"strings"
 
 	"github.com/pion/logging"
 
 	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/utils/options"
+	"github.com/livekit/protocol/utils/pointer"
 )
 
 var (
@@ -65,16 +69,50 @@ func (s *prefixSet) Match(msg string) bool {
 	return false
 }
 
-func NewLoggerFactory(l logger.Logger) logging.LoggerFactory {
-	if zl, ok := l.(logger.ZapLogger); ok {
-		return &zapLoggerFactory{zl}
+type PrefixFilter map[string]*prefixSet
+
+func NewPrefixFilter(prefixes map[string][]string) PrefixFilter {
+	p := maps.Clone(pionIgnoredPrefixes)
+	for scope, set := range prefixes {
+		if prev, ok := p[scope]; ok {
+			p[scope] = pointer.To(slices.Concat(*prev, prefixSet(set)))
+		} else {
+			p[scope] = pointer.To(prefixSet(set))
+		}
 	}
-	return &loggerFactory{l}
+	return p
+}
+
+type FilterFunc func(msg string) bool
+
+type Options struct {
+	PrefixFilter PrefixFilter
+}
+
+type Option func(o *Options)
+
+func WithPrefixFilter(f PrefixFilter) Option {
+	return func(o *Options) {
+		o.PrefixFilter = f
+	}
+}
+
+func NewLoggerFactory(l logger.Logger, opts ...Option) logging.LoggerFactory {
+	o := Options{
+		PrefixFilter: pionIgnoredPrefixes,
+	}
+	options.Apply(&o, opts)
+
+	if zl, ok := l.(logger.ZapLogger); ok {
+		return &zapLoggerFactory{zl, o}
+	}
+	return &loggerFactory{l, o}
 }
 
 // zapLoggerFactory implements logging.LoggerFactory interface for zap loggers
 type zapLoggerFactory struct {
-	logger logger.ZapLogger
+	logger  logger.ZapLogger
+	options Options
 }
 
 func (f *zapLoggerFactory) NewLogger(scope string) logging.LeveledLogger {
@@ -82,19 +120,20 @@ func (f *zapLoggerFactory) NewLogger(scope string) logging.LeveledLogger {
 		logger:          f.logger,
 		level:           f.logger.ComponentLeveler().ComponentLevel(formatComponent(scope)),
 		scope:           scope,
-		ignoredPrefixes: pionIgnoredPrefixes[scope],
+		ignoredPrefixes: f.options.PrefixFilter[scope],
 	}
 }
 
 // loggerFactory implements logging.LoggerFactory interface for generic loggers
 type loggerFactory struct {
-	logger logger.Logger
+	logger  logger.Logger
+	options Options
 }
 
 func (f *loggerFactory) NewLogger(scope string) logging.LeveledLogger {
 	return &logAdapter{
 		logger:          f.logger.WithComponent(formatComponent(scope)).WithCallDepth(1),
-		ignoredPrefixes: pionIgnoredPrefixes[scope],
+		ignoredPrefixes: f.options.PrefixFilter[scope],
 	}
 }
 
