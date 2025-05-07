@@ -61,10 +61,17 @@ service RoomService {
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
   rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
 
-  // Forward a participant's track(s) to another room. Requires `roomAdmin` and `destinationRoom`. The forwarding will 
+  // Cloud-only
+  // a connected participant's track(s) to another room. Requires `roomAdmin` and `destinationRoom`. The forwarding will 
   // stop when the participant leaves the room or `RemoveParticipant` has been called in the destination room. 
   // A participant can be forwarded to multiple rooms. The destination room will be created if it does not exist.
   rpc ForwardParticipant(ForwardParticipantRequest) returns (ForwardParticipantResponse);
+
+  // Cloud-only
+  // Move a connected participant to a different room. Requires `roomAdmin` and `destinationRoom`.
+  // The participant will be removed from the current room and added to the destination room.
+  // From the other observers' perspective, the participant would've disconnected from the previous room and joined the new one.
+  rpc MoveParticipant(MoveParticipantRequest) returns (MoveParticipantResponse);
 }
 
 message CreateRoomRequest {
@@ -244,4 +251,16 @@ message ForwardParticipantRequest {
 }
 
 message ForwardParticipantResponse {
+}
+
+message MoveParticipantRequest {
+  // room to move participant from
+  string room = 1;
+  // identity of the participant to move to
+  string identity = 2;
+  // room to move participant to
+  string destination_room = 3;
+}
+
+message MoveParticipantResponse {
 }

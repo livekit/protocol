@@ -105,6 +105,8 @@ message SignalResponse {
     RequestResponse request_response = 22;
     // notify to the publisher when a published track has been subscribed for the first time
     TrackSubscribed track_subscribed = 23;
+    // notify to the participant when they have been moved to a new room
+    RoomMovedResponse room_moved = 24;
   }
 }
 
@@ -357,6 +359,15 @@ message SubscriptionPermissionUpdate {
   string participant_sid = 1;
   string track_sid = 2;
   bool allowed = 3;
+}
+
+message RoomMovedResponse {
+  // information about the new room
+  Room room = 1;
+  // new reconnect token that can be used to reconnect to the new room
+  string token = 2;
+  ParticipantInfo participant = 3;
+  repeated ParticipantInfo other_participants = 4;
 }
 
 message SyncState {
