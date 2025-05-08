@@ -15,6 +15,7 @@
 package auth_test
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -22,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/auth"
+	"github.com/livekit/protocol/livekit"
 )
 
 func TestVerifier(t *testing.T) {
@@ -114,5 +116,33 @@ func TestVerifier(t *testing.T) {
 		require.Nil(t, decoded.Video.CanSubscribe)
 		require.Nil(t, decoded.Video.CanPublish)
 		require.False(t, *decoded.Video.CanPublishData)
+	})
+
+	t.Run("kind test", func(t *testing.T) {
+		at := auth.NewAccessToken(apiKey, secret).
+			SetKind(livekit.ParticipantInfo_AGENT)
+		token, err := at.ToJWT()
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(token)
+		require.NoError(t, err)
+		decoded, err := v.Verify(secret)
+		require.NoError(t, err)
+		require.Equal(t, strings.ToUpper(livekit.ParticipantInfo_Kind_name[int32(livekit.ParticipantInfo_AGENT)]), strings.ToUpper(decoded.Kind))
+	})
+
+	t.Run("kind detail test", func(t *testing.T) {
+		at := auth.NewAccessToken(apiKey, secret).
+			SetKind(livekit.ParticipantInfo_AGENT).
+			SetKindDetail(livekit.ParticipantInfo_CLOUD_AGENT)
+		token, err := at.ToJWT()
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(token)
+		require.NoError(t, err)
+		decoded, err := v.Verify(secret)
+		require.NoError(t, err)
+		require.Equal(t, strings.ToLower(livekit.ParticipantInfo_KindDetail_name[int32(livekit.ParticipantInfo_CLOUD_AGENT)]), strings.ToLower(decoded.KindDetail))
+		require.Equal(t, strings.ToLower(livekit.ParticipantInfo_Kind_name[int32(livekit.ParticipantInfo_AGENT)]), strings.ToLower(decoded.Kind))
 	})
 }
