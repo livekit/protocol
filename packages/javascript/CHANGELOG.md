@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.38.0
+
+### Minor Changes
+
+- feat: MoveParticipant API - [#1065](https://github.com/livekit/protocol/pull/1065) ([@cnderrauber](https://github.com/cnderrauber))
+
+### Patch Changes
+
+- fix memory path for cgroups v2 - [#1060](https://github.com/livekit/protocol/pull/1060) ([@boks1971](https://github.com/boks1971))
+
+- Fix paths and simplify. - [#1062](https://github.com/livekit/protocol/pull/1062) ([@boks1971](https://github.com/boks1971))
+
 ## 1.37.1
 
 ### Patch Changes

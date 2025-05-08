@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.38.0
+
+### Minor Changes
+
+- feat: MoveParticipant API - [#1065](https://github.com/livekit/protocol/pull/1065) ([@cnderrauber](https://github.com/cnderrauber))
+
 ## 1.37.1
 
 ### Patch Changes
