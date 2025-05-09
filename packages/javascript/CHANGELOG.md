@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.38.1
+
+### Patch Changes
+
+- Add SIPTransferInfo to analytics - [#1063](https://github.com/livekit/protocol/pull/1063) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.38.0
 
 ### Minor Changes
