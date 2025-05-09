@@ -49,12 +49,13 @@ func (c *RoomConfiguration) UnmarshalJSON(data []byte) error {
 }
 
 type ClaimGrants struct {
-	Identity string      `json:"-"`
-	Name     string      `json:"name,omitempty"`
-	Kind     string      `json:"kind,omitempty"`
-	Video    *VideoGrant `json:"video,omitempty"`
-	SIP      *SIPGrant   `json:"sip,omitempty"`
-	Agent    *AgentGrant `json:"agent,omitempty"`
+	Identity   string      `json:"-"`
+	Name       string      `json:"name,omitempty"`
+	Kind       string      `json:"kind,omitempty"`
+	KindDetail string      `json:"kindDetail,omitempty"`
+	Video      *VideoGrant `json:"video,omitempty"`
+	SIP        *SIPGrant   `json:"sip,omitempty"`
+	Agent      *AgentGrant `json:"agent,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -71,8 +72,16 @@ func (c *ClaimGrants) SetParticipantKind(kind livekit.ParticipantInfo_Kind) {
 	c.Kind = kindFromProto(kind)
 }
 
+func (c *ClaimGrants) SetParticipantKindDetail(kindDetail livekit.ParticipantInfo_KindDetail) {
+	c.KindDetail = kindDetailFromProto(kindDetail)
+}
+
 func (c *ClaimGrants) GetParticipantKind() livekit.ParticipantInfo_Kind {
 	return kindToProto(c.Kind)
+}
+
+func (c *ClaimGrants) GetParticipantKindDetail() livekit.ParticipantInfo_KindDetail {
+	return kindDetailToProto(c.KindDetail)
 }
 
 func (c *ClaimGrants) GetRoomConfiguration() *livekit.RoomConfiguration {
@@ -464,6 +473,10 @@ func kindFromProto(source livekit.ParticipantInfo_Kind) string {
 	return strings.ToLower(source.String())
 }
 
+func kindDetailFromProto(source livekit.ParticipantInfo_KindDetail) string {
+	return strings.ToLower(source.String())
+}
+
 func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
 	switch strings.ToLower(sourceStr) {
 	case "", "standard":
@@ -478,5 +491,16 @@ func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
 		return livekit.ParticipantInfo_AGENT
 	default:
 		return livekit.ParticipantInfo_STANDARD
+	}
+}
+
+func kindDetailToProto(sourceStr string) livekit.ParticipantInfo_KindDetail {
+	switch strings.ToLower(sourceStr) {
+	case "cloud_agent":
+		return livekit.ParticipantInfo_CLOUD_AGENT
+	case "forwarded":
+		return livekit.ParticipantInfo_FORWARDED
+	default:
+		return livekit.ParticipantInfo_CLOUD_AGENT
 	}
 }
