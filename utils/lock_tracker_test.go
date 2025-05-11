@@ -84,7 +84,7 @@ func TestFirstLockStackTrace(t *testing.T) {
 		m.Lock()
 	}()
 
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	locks := utils.ScanTrackedLocks(time.Millisecond)
 	require.NotNil(t, locks)
 	require.NotEqual(t, "", locks[0].FirstLockedAtStack())
