@@ -55,7 +55,7 @@ func TestScanTrackedLocks(t *testing.T) {
 		ms[50].Lock()
 	}()
 
-	time.Sleep(5 * time.Millisecond)
+	time.Sleep(100 * time.Millisecond)
 	require.NotNil(t, utils.ScanTrackedLocks(time.Millisecond))
 
 	ms[50].Unlock()
