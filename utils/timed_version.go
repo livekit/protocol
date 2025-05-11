@@ -125,6 +125,17 @@ func (t TimedVersion) Load() TimedVersion {
 	return t
 }
 
+func (t TimedVersion) Next() TimedVersion {
+	return t + 1
+}
+
+func (t TimedVersion) Prev() TimedVersion {
+	if t == 0 {
+		return t
+	}
+	return t - 1
+}
+
 func (t TimedVersion) After(other TimedVersion) bool {
 	return t > other
 }
