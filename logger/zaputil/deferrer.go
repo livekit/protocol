@@ -76,21 +76,39 @@ type DeferredFieldResolver func(args ...any)
 func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 	buf := &Deferrer{}
 	resolve := func(args ...any) {
-		fields := make([]zapcore.Field, 0, len(args))
-		for i := 0; i < len(args); i++ {
-			switch arg := args[i].(type) {
-			case zapcore.Field:
-				fields = append(fields, arg)
-			case string:
-				if i < len(args)-1 {
-					fields = append(fields, zap.Any(arg, args[i+1]))
-					i++
+		fields := make([]zapcore.Field, len(args))
+		for {
+			fields = fields[:0]
+			for i := 0; i < len(args); i++ {
+				switch arg := args[i].(type) {
+				case zapcore.Field:
+					fields = append(fields, arg)
+				case string:
+					if i < len(args)-1 {
+						fields = append(fields, zap.Any(arg, args[i+1]))
+						i++
+					}
 				}
 			}
-		}
 
-		if buf.fields.Swap(&fields) == nil {
-			buf.flush()
+			prev := buf.fields.Load()
+			if prev != nil {
+				for _, pf := range *prev {
+					overwritten := slices.ContainsFunc(fields, func(f zapcore.Field) bool {
+						return f.Key == pf.Key
+					})
+					if !overwritten {
+						fields = append(fields, pf)
+					}
+				}
+			}
+
+			if buf.fields.CompareAndSwap(prev, &fields) {
+				if prev == nil {
+					buf.flush()
+				}
+				return
+			}
 		}
 	}
 	return buf, resolve

@@ -44,6 +44,10 @@ func TestDeferredLogger(t *testing.T) {
 		require.Equal(t, 3, c.WriteCount())
 	})
 
+	type testLog struct {
+		A, B string
+	}
+
 	t.Run("resolved values can be overwritten", func(t *testing.T) {
 		ws := &testutil.BufferedWriteSyncer{}
 		we := NewWriteEnabler(ws, zapcore.DebugLevel)
@@ -52,10 +56,6 @@ func TestDeferredLogger(t *testing.T) {
 		d, resolve := NewDeferrer()
 		dc := NewDeferredValueCore(c, d)
 		s := zap.New(dc).Sugar()
-
-		type testLog struct {
-			A, B string
-		}
 
 		cases := []testLog{
 			{"foo", "bar"},
@@ -73,5 +73,27 @@ func TestDeferredLogger(t *testing.T) {
 			require.Equal(t, c.A, log.A)
 			require.Equal(t, c.B, log.B)
 		}
+	})
+
+	t.Run("resolved values merge with previous resolutions", func(t *testing.T) {
+		ws := &testutil.BufferedWriteSyncer{}
+		we := NewWriteEnabler(ws, zapcore.DebugLevel)
+		enc := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
+		c := NewEncoderCore(enc, we)
+		d, resolve := NewDeferrer()
+		dc := NewDeferredValueCore(c, d)
+		s := zap.New(dc).Sugar()
+
+		resolve("a", "foo")
+		resolve("b", "bar")
+		s.Infow("test")
+		s.Sync()
+
+		var log testLog
+		require.NoError(t, ws.Unmarshal(&log))
+		ws.Reset()
+
+		require.Equal(t, "foo", log.A)
+		require.Equal(t, "bar", log.B)
 	})
 }
