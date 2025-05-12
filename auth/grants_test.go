@@ -99,3 +99,17 @@ func TestParticipantKind(t *testing.T) {
 		t.Errorf("Please update kindMax to match protobuf. Missing value: %s", kindNext)
 	}
 }
+
+func TestParticipantKindDetail(t *testing.T) {
+	const kindDetailMin, kindDetailMax = livekit.ParticipantInfo_CLOUD_AGENT, livekit.ParticipantInfo_FORWARDED
+	for k := kindDetailMin; k <= kindDetailMax; k++ {
+		k := k
+		t.Run(k.String(), func(t *testing.T) {
+			require.Equal(t, k, kindDetailToProto(kindDetailFromProto(k)))
+		})
+	}
+	const kindDetailNext = kindDetailMax + 1
+	if _, err := strconv.Atoi(kindDetailNext.String()); err != nil {
+		t.Errorf("Please update kindDetailMax to match protobuf. Missing value: %s", kindDetailNext)
+	}
+}
