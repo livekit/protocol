@@ -71,12 +71,10 @@ func (b *Deferrer) write(core zapcore.Core, ent zapcore.Entry, fields []zapcore.
 	}
 }
 
-type DeferredFieldResolver func(args ...any)
-
-func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
-	buf := &Deferrer{}
-	resolve := func(args ...any) {
-		fields := make([]zapcore.Field, 0, len(args))
+func (b *Deferrer) Resolve(args ...any) {
+	fields := make([]zapcore.Field, len(args))
+	for {
+		fields = fields[:0]
 		for i := 0; i < len(args); i++ {
 			switch arg := args[i].(type) {
 			case zapcore.Field:
@@ -89,12 +87,28 @@ func NewDeferrer() (*Deferrer, DeferredFieldResolver) {
 			}
 		}
 
-		if buf.fields.Swap(&fields) == nil {
-			buf.flush()
+		prev := b.fields.Load()
+		if prev != nil {
+			for _, pf := range *prev {
+				overwritten := slices.ContainsFunc(fields, func(f zapcore.Field) bool {
+					return f.Key == pf.Key
+				})
+				if !overwritten {
+					fields = append(fields, pf)
+				}
+			}
+		}
+
+		if b.fields.CompareAndSwap(prev, &fields) {
+			if prev == nil {
+				b.flush()
+			}
+			return
 		}
 	}
-	return buf, resolve
 }
+
+type DeferredFieldResolver func(args ...any)
 
 type deferredValueCore struct {
 	zapcore.Core
