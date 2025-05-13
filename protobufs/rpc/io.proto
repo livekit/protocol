@@ -209,8 +209,9 @@ message EvaluateSIPDispatchRulesResponse {
 
 message UpdateSIPCallStateRequest {
   livekit.SIPCallInfo call_info = 1;
+  livekit.SIPTransferInfo transfer_info = 2;
 
-   // NEXT ID: 2
+   // NEXT ID: 3
 }
 
 enum SIPDispatchResult {
