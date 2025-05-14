@@ -96,4 +96,38 @@ func TestDeferredLogger(t *testing.T) {
 		require.Equal(t, "foo", log.A)
 		require.Equal(t, "bar", log.B)
 	})
+
+	t.Run("re-resolve", func(t *testing.T) {
+		ws := &testutil.BufferedWriteSyncer{}
+		we := NewWriteEnabler(ws, zapcore.DebugLevel)
+		enc := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
+		c := NewEncoderCore(enc, we)
+		d := &Deferrer{}
+		dc := NewDeferredValueCore(c, d)
+		s := zap.New(dc).Sugar()
+
+		d.Resolve("a", "foo")
+		d.Resolve("b", "bar")
+		s.Infow("test")
+		s.Sync()
+
+		var log testLog
+		require.NoError(t, ws.Unmarshal(&log))
+		ws.Reset()
+
+		require.Equal(t, "foo", log.A)
+		require.Equal(t, "bar", log.B)
+
+		d.Reset()
+		d.Resolve("a", "car")
+		d.Resolve("b", "dog")
+		s.Infow("test")
+		s.Sync()
+
+		require.NoError(t, ws.Unmarshal(&log))
+		ws.Reset()
+
+		require.Equal(t, "car", log.A)
+		require.Equal(t, "dog", log.B)
+	})
 }

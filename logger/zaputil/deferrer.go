@@ -29,6 +29,8 @@ type deferredWrite struct {
 	fields []zapcore.Field
 }
 
+// ---------------------------------
+
 type Deferrer struct {
 	mu     sync.Mutex
 	fields atomic.Pointer[[]zapcore.Field]
@@ -108,7 +110,24 @@ func (b *Deferrer) Resolve(args ...any) {
 	}
 }
 
-type DeferredFieldResolver func(args ...any)
+func (b *Deferrer) Reset() {
+	b.fields.Store(nil)
+}
+
+// ---------------------------------
+
+type NoOpDeferrer struct{}
+
+func (n NoOpDeferrer) Resolve(args ...any) {}
+
+func (n NoOpDeferrer) Reset() {}
+
+// ---------------------------------
+
+type DeferredFieldResolver interface {
+	Resolve(args ...any)
+	Reset()
+}
 
 type deferredValueCore struct {
 	zapcore.Core
