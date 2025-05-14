@@ -422,7 +422,7 @@ func (l *zapLogger[T]) WithDeferredValues() (Logger, DeferredFieldResolver) {
 	def := &zaputil.Deferrer{}
 	dup.deferred = append(dup.deferred[0:len(dup.deferred):len(dup.deferred)], def)
 	dup.zap = dup.makeZap()
-	return &dup, def.Resolve
+	return &dup, def
 }
 
 type LogRLogger logr.Logger
@@ -483,7 +483,7 @@ func (l LogRLogger) WithoutSampler() Logger {
 }
 
 func (l LogRLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
-	return l, func(args ...any) {}
+	return l, nil
 }
 
 func NewTestLogger(t *testing.T) Logger {
