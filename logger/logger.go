@@ -483,7 +483,7 @@ func (l LogRLogger) WithoutSampler() Logger {
 }
 
 func (l LogRLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
-	return l, nil
+	return l, zaputil.NoOpDeferrer{}
 }
 
 func NewTestLogger(t *testing.T) Logger {
