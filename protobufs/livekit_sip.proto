@@ -712,12 +712,14 @@ message SIPCallInfo {
 }
 
 message SIPTransferInfo {
-  string call_id = 1;
-  uint32 refer_seq_num = 2;
-  int64 transfer_initiated_at_ns = 3;
-  int64 transfer_completed_at_ns = 4;
-  string error = 5;
-  SIPStatus transfer_status_code = 6;
+  string transfer_id = 1;
+  string call_id = 2;
+  string transfer_to = 3;
+  int64 transfer_initiated_at_ns = 4;
+  int64 transfer_completed_at_ns = 5;
+  SIPTransferStatus transfer_status = 6;
+  string error = 7;
+  SIPStatus transfer_status_code = 8;
 
   // NEXT ID: 7
 }
@@ -736,6 +738,12 @@ enum SIPCallStatus {
   SCS_ACTIVE = 2; // Call is ongoing. SIP participant is active in the LiveKit room
   SCS_DISCONNECTED = 3; // Call has ended
   SCS_ERROR = 4; // Call has ended or never succeeded because of an error
+}
+
+enum SIPTransferStatus {
+  STS_TRANSFER_ONGOING = 0;
+  STS_TRANSFER_FAILED = 1;
+  STS_TRANSFER_SUCCESSFUL = 2;
 }
 
 enum SIPFeature {

@@ -34,6 +34,7 @@ const (
 	SIPTrunkPrefix           = guid.SIPTrunkPrefix
 	SIPDispatchRulePrefix    = guid.SIPDispatchRulePrefix
 	SIPCallPrefix            = guid.SIPCallPrefix
+	SIPTransferPrefix        = guid.SIPTransferPrefix
 	RPCPrefix                = guid.RPCPrefix
 	WHIPResourcePrefix       = guid.WHIPResourcePrefix
 	RTMPResourcePrefix       = guid.RTMPResourcePrefix
