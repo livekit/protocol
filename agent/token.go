@@ -2,12 +2,13 @@ package agent
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/base64"
 	"fmt"
 	"time"
 
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/jwt"
-	"go.uber.org/multierr"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
@@ -57,28 +58,40 @@ type WorkerClaims struct {
 
 type WorkerTokenProvider struct {
 	nodeID  livekit.NodeID
-	keys    [][]byte
+	keySet  jose.JSONWebKeySet
 	timeout time.Duration
 }
 
 func NewWorkerTokenProvider(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerTokenProvider {
+	var keySet jose.JSONWebKeySet
 	keys := bytes.Split([]byte(config.Keys), []byte(","))
 	for i := range keys {
-		keys[i] = bytes.TrimSpace(keys[i])
+		key := bytes.TrimSpace(keys[i])
+		id := sha256.Sum256(key)
+		keySet.Keys = append(keySet.Keys, jose.JSONWebKey{
+			Key:       key,
+			KeyID:     base64.RawStdEncoding.EncodeToString(id[:8]),
+			Algorithm: string(jose.HS256),
+			Use:       "sig",
+		})
 	}
 
 	return &WorkerTokenProvider{
 		nodeID:  nodeID,
-		keys:    keys,
+		keySet:  keySet,
 		timeout: config.Timeout,
 	}
 }
 
 func (t *WorkerTokenProvider) Encode(claims WorkerClaims) (string, error) {
+	opts := &jose.SignerOptions{}
+	opts.WithType("JWT")
+	opts.WithHeader("kid", t.keySet.Keys[0].KeyID)
+
 	signer, err := jose.NewSigner(jose.SigningKey{
 		Algorithm: jose.HS256,
-		Key:       t.keys[0],
-	}, nil)
+		Key:       t.keySet.Keys[0],
+	}, opts)
 	if err != nil {
 		return "", fmt.Errorf("failed to create signer: %w", err)
 	}
@@ -104,16 +117,11 @@ func (t *WorkerTokenProvider) Decode(token string) (*WorkerClaims, error) {
 	}
 
 	claims := &WorkerClaims{}
-	for _, k := range t.keys {
-		if erri := tok.Claims(k, &claims); erri != nil {
-			err = multierr.Append(err, erri)
-			continue
-		}
-		if erri := claims.Validate(jwt.Expected{Time: time.Now()}); erri != nil {
-			err = multierr.Append(err, erri)
-			continue
-		}
-		return claims, nil
+	if err := tok.Claims(t.keySet, &claims); err != nil {
+		return nil, err
 	}
-	return nil, err
+	if err := claims.Validate(jwt.Expected{Time: time.Now()}); err != nil {
+		return nil, err
+	}
+	return claims, nil
 }
