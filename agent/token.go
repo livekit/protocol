@@ -52,17 +52,18 @@ var DefaultWorkerTokenConfig = WorkerTokenConfig{
 	Timeout: 60 * time.Minute,
 }
 
-type WorkerClaims struct {
+type WorkerClaimsT[T any] struct {
 	jwt.Claims
+	Metadata T `json:"metadata,inline"`
 }
 
-type WorkerTokenProvider struct {
+type WorkerTokenProviderT[T any] struct {
 	nodeID  livekit.NodeID
 	keySet  jose.JSONWebKeySet
 	timeout time.Duration
 }
 
-func NewWorkerTokenProvider(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerTokenProvider {
+func NewWorkerTokenProviderT[T any](nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerTokenProviderT[T] {
 	var keySet jose.JSONWebKeySet
 	keys := bytes.Split([]byte(config.Keys), []byte(","))
 	for i := range keys {
@@ -76,14 +77,14 @@ func NewWorkerTokenProvider(nodeID livekit.NodeID, config WorkerTokenConfig) *Wo
 		})
 	}
 
-	return &WorkerTokenProvider{
+	return &WorkerTokenProviderT[T]{
 		nodeID:  nodeID,
 		keySet:  keySet,
 		timeout: config.Timeout,
 	}
 }
 
-func (t *WorkerTokenProvider) Encode(claims WorkerClaims) (string, error) {
+func (t *WorkerTokenProviderT[T]) Encode(claims WorkerClaimsT[T]) (string, error) {
 	opts := &jose.SignerOptions{}
 	opts.WithType("JWT")
 	opts.WithHeader("kid", t.keySet.Keys[0].KeyID)
@@ -110,13 +111,13 @@ func (t *WorkerTokenProvider) Encode(claims WorkerClaims) (string, error) {
 	return token, nil
 }
 
-func (t *WorkerTokenProvider) Decode(token string) (*WorkerClaims, error) {
+func (t *WorkerTokenProviderT[T]) Decode(token string) (*WorkerClaimsT[T], error) {
 	tok, err := jwt.ParseSigned(token)
 	if err != nil {
 		return nil, err
 	}
 
-	claims := &WorkerClaims{}
+	claims := &WorkerClaimsT[T]{}
 	if err := tok.Claims(t.keySet, &claims); err != nil {
 		return nil, err
 	}
@@ -124,4 +125,14 @@ func (t *WorkerTokenProvider) Decode(token string) (*WorkerClaims, error) {
 		return nil, err
 	}
 	return claims, nil
+}
+
+type (
+	empty               struct{}
+	WorkerClaims        = WorkerClaimsT[empty]
+	WorkerTokenProvider = WorkerTokenProviderT[empty]
+)
+
+func NewWorkerTokenProvider(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerTokenProvider {
+	return NewWorkerTokenProviderT[empty](nodeID, config)
 }
