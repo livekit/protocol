@@ -55,26 +55,26 @@ type WorkerClaims struct {
 	jwt.Claims
 }
 
-type WorkerJWT struct {
+type WorkerTokenProvider struct {
 	nodeID  livekit.NodeID
 	keys    [][]byte
 	timeout time.Duration
 }
 
-func NewWorkerJWT(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerJWT {
+func NewWorkerTokenProvider(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerTokenProvider {
 	keys := bytes.Split([]byte(config.Secret), []byte(","))
 	for i := range keys {
 		keys[i] = bytes.TrimSpace(keys[i])
 	}
 
-	return &WorkerJWT{
+	return &WorkerTokenProvider{
 		nodeID:  nodeID,
 		keys:    keys,
 		timeout: config.Timeout,
 	}
 }
 
-func (t *WorkerJWT) Encode(claims WorkerClaims) (string, error) {
+func (t *WorkerTokenProvider) Encode(claims WorkerClaims) (string, error) {
 	signer, err := jose.NewSigner(jose.SigningKey{
 		Algorithm: jose.HS256,
 		Key:       t.keys[0],
@@ -97,7 +97,7 @@ func (t *WorkerJWT) Encode(claims WorkerClaims) (string, error) {
 	return token, nil
 }
 
-func (t *WorkerJWT) Decode(token string) (*WorkerClaims, error) {
+func (t *WorkerTokenProvider) Decode(token string) (*WorkerClaims, error) {
 	tok, err := jwt.ParseSigned(token)
 	if err != nil {
 		return nil, err
