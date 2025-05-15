@@ -56,12 +56,12 @@ type WorkerClaims struct {
 }
 
 type WorkerJWT struct {
-	nodeID  string
+	nodeID  livekit.NodeID
 	keys    [][]byte
 	timeout time.Duration
 }
 
-func NewWorkerJWT(nodeID string, config WorkerTokenConfig) *WorkerJWT {
+func NewWorkerJWT(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerJWT {
 	keys := bytes.Split([]byte(config.Secret), []byte(","))
 	for i := range keys {
 		keys[i] = bytes.TrimSpace(keys[i])
@@ -85,7 +85,7 @@ func (t *WorkerJWT) Encode(claims WorkerClaims) (string, error) {
 
 	now := time.Now()
 
-	claims.Issuer = t.nodeID
+	claims.Issuer = string(t.nodeID)
 	claims.Expiry = jwt.NewNumericDate(now.Add(t.timeout))
 	claims.NotBefore = jwt.NewNumericDate(now)
 	claims.IssuedAt = jwt.NewNumericDate(now)
