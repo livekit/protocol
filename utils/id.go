@@ -46,6 +46,7 @@ const (
 	HostedAgentRegionPrefix  = guid.HostedAgentRegionPrefix
 	HostedAgentVersionPrefix = guid.HostedAgentVersionPrefix
 	HostedAgentSecretPrefix  = guid.HostedAgentSecretPrefix
+	HostedAgentWorkerPrefix  = guid.HostedAgentWorkerPrefix
 )
 
 func NewGuid(prefix string) string {

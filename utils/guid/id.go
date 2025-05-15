@@ -55,6 +55,7 @@ const (
 	HostedAgentRegionPrefix  = "HAR_"
 	HostedAgentVersionPrefix = "HAV_"
 	HostedAgentSecretPrefix  = "HAS_"
+	HostedAgentWorkerPrefix  = "HAW_"
 )
 
 var guidGeneratorPool = sync.Pool{
