@@ -43,8 +43,8 @@ func BuildAgentToken(
 }
 
 type WorkerTokenConfig struct {
-	Secret  string        `yaml:"jwt_secret,omitempty"`
-	Timeout time.Duration `yaml:"jwt_timeout,omitempty"`
+	Secret  string        `yaml:"secret,omitempty"`
+	Timeout time.Duration `yaml:"timeout,omitempty"`
 }
 
 var DefaultWorkerTokenConfig = WorkerTokenConfig{
