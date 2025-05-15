@@ -7,6 +7,7 @@ import (
 	"github.com/go-jose/go-jose/v3/jwt"
 	"github.com/stretchr/testify/require"
 
+	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/utils/guid"
 )
 
@@ -23,8 +24,8 @@ func TestToken(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.label, func(t *testing.T) {
-			wt0 := NewWorkerJWT(
-				guid.New(guid.NodePrefix),
+			wt0 := NewWorkerTokenProvider(
+				livekit.NodeID(guid.New(guid.NodePrefix)),
 				WorkerTokenConfig{
 					Secret:  c.keys0,
 					Timeout: time.Hour,
@@ -39,8 +40,8 @@ func TestToken(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			wt1 := NewWorkerJWT(
-				guid.New(guid.NodePrefix),
+			wt1 := NewWorkerTokenProvider(
+				livekit.NodeID(guid.New(guid.NodePrefix)),
 				WorkerTokenConfig{
 					Secret:  c.keys1,
 					Timeout: time.Hour,
