@@ -43,7 +43,7 @@ func BuildAgentToken(
 }
 
 type WorkerTokenConfig struct {
-	Secret  string        `yaml:"secret,omitempty"`
+	Keys    string        `yaml:"secret,omitempty"`
 	Timeout time.Duration `yaml:"timeout,omitempty"`
 }
 
@@ -62,7 +62,7 @@ type WorkerTokenProvider struct {
 }
 
 func NewWorkerTokenProvider(nodeID livekit.NodeID, config WorkerTokenConfig) *WorkerTokenProvider {
-	keys := bytes.Split([]byte(config.Secret), []byte(","))
+	keys := bytes.Split([]byte(config.Keys), []byte(","))
 	for i := range keys {
 		keys[i] = bytes.TrimSpace(keys[i])
 	}

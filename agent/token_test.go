@@ -27,7 +27,7 @@ func TestToken(t *testing.T) {
 			wt0 := NewWorkerTokenProvider(
 				livekit.NodeID(guid.New(guid.NodePrefix)),
 				WorkerTokenConfig{
-					Secret:  c.keys0,
+					Keys:    c.keys0,
 					Timeout: time.Hour,
 				},
 			)
@@ -43,7 +43,7 @@ func TestToken(t *testing.T) {
 			wt1 := NewWorkerTokenProvider(
 				livekit.NodeID(guid.New(guid.NodePrefix)),
 				WorkerTokenConfig{
-					Secret:  c.keys1,
+					Keys:    c.keys1,
 					Timeout: time.Hour,
 				},
 			)
