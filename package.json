@@ -7,7 +7,7 @@
     "ci:publish": "pnpm --filter @livekit/protocol run build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.9",
+    "@changesets/cli": "^2.29.4",
     "@livekit/changesets-changelog-github": "^0.0.4"
   }
 }
