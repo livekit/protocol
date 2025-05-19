@@ -194,6 +194,7 @@ message JoinResponse {
 message ReconnectResponse {
   repeated ICEServer ice_servers = 1;
   ClientConfiguration client_configuration = 2;
+  ServerInfo server_info = 3;
 }
 
 message TrackPublishedResponse {
@@ -338,7 +339,7 @@ message SubscribedCodec {
 
 message SubscribedQualityUpdate {
   string track_sid = 1;
-  repeated SubscribedQuality subscribed_qualities = 2;
+  repeated SubscribedQuality subscribed_qualities = 2 [deprecated = true];
   repeated SubscribedCodec subscribed_codecs = 3;
 }
 
