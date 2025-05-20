@@ -7,7 +7,9 @@
     "ci:publish": "pnpm --filter @livekit/protocol run build && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.9",
-    "@livekit/changesets-changelog-github": "^0.0.4"
+    "@babel/core": "^7.27.1",
+    "@changesets/cli": "^2.29.4",
+    "@livekit/changesets-changelog-github": "^0.0.4",
+    "esbuild": "^0.25.4"
   }
 }
