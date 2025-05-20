@@ -1540,7 +1540,7 @@ type SIPOutboundTrunkInfo struct {
 	// Hostname or IP that SIP INVITE is sent too.
 	// Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
 	Address string `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
-	// country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livei
+	// country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
 	DestinationCountry string `protobuf:"bytes,14,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
 	// SIP Transport used for outbound call.
 	Transport SIPTransport `protobuf:"varint,5,opt,name=transport,proto3,enum=livekit.SIPTransport" json:"transport,omitempty"`
@@ -3223,7 +3223,7 @@ type SIPOutboundConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// SIP server address
 	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	// country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livei
+	// country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
 	DestinationCountry string `protobuf:"bytes,7,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
 	// SIP Transport used for outbound call.
 	Transport SIPTransport `protobuf:"varint,2,opt,name=transport,proto3,enum=livekit.SIPTransport" json:"transport,omitempty"`
