@@ -335,6 +335,9 @@ message SIPOutboundTrunkInfo {
   // Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
   string address = 4;
 
+  // country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livei
+  string destination_country = 14;
+
   // SIP Transport used for outbound call.
   SIPTransport transport = 5;
 
@@ -365,7 +368,7 @@ message SIPOutboundTrunkInfo {
 
   SIPMediaEncryption media_encryption = 13;
 
-  // NEXT ID: 14
+  // NEXT ID: 15
 }
 
 message SIPOutboundTrunkUpdate {
@@ -580,6 +583,9 @@ message SIPOutboundConfig {
   // SIP server address
   string hostname = 1;
 
+  // country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livei
+  string destination_country = 7;
+
   // SIP Transport used for outbound call.
   SIPTransport transport = 2;
 
@@ -594,6 +600,8 @@ message SIPOutboundConfig {
   // Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
   // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
   map<string, string> attributes_to_headers = 6;
+
+  // NEXT ID: 7
 }
 
 // A SIP Participant is a singular SIP session connected to a LiveKit room via

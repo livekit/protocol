@@ -27,11 +27,12 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		WaitUntilAnswered: true,
 	}
 	tr := &livekit.SIPOutboundTrunkInfo{
-		SipTrunkId:   "trunk",
-		Address:      "sip.example.com",
-		Numbers:      []string{"+1111"},
-		AuthUsername: "user",
-		AuthPassword: "pass",
+		SipTrunkId:         "trunk",
+		Address:            "sip.example.com",
+		Numbers:            []string{"+1111"},
+		DestinationCountry: "us",
+		AuthUsername:       "user",
+		AuthPassword:       "pass",
 		Headers: map[string]string{
 			"X-A": "A",
 			"X-B": "B1",
@@ -43,6 +44,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		SipTrunkId:          "trunk",
 		Address:             "sip.example.com",
 		Hostname:            "xyz.sip.livekit.cloud",
+		DestinationCountry:  "us",
 		Number:              "+1111",
 		CallTo:              "+3333",
 		Username:            "user",
@@ -82,6 +84,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		SipTrunkId:          "trunk",
 		Address:             "sip.example.com",
 		Hostname:            "xyz.sip.livekit.cloud",
+		DestinationCountry:  "us",
 		Number:              "+1111",
 		CallTo:              "+3333",
 		Username:            "user",
@@ -111,6 +114,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	r.Trunk = &livekit.SIPOutboundConfig{
 		Hostname:            tr.Address,
 		Transport:           tr.Transport,
+		DestinationCountry:  "us",
 		AuthUsername:        tr.AuthUsername,
 		AuthPassword:        tr.AuthPassword,
 		HeadersToAttributes: tr.HeadersToAttributes,
