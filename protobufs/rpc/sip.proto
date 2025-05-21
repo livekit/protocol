@@ -49,6 +49,7 @@ message InternalCreateSIPParticipantRequest {
   string address = 2;
   // Hostname for the 'From' SIP address in INVITE
   string hostname = 20;
+  string destination_country = 30;
   livekit.SIPTransport transport = 16;
 
   // Number used to make the call
@@ -104,7 +105,7 @@ message InternalCreateSIPParticipantRequest {
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 29;
 
-  // NEXT ID: 30
+  // NEXT ID: 31
 }
 
 message InternalCreateSIPParticipantResponse {

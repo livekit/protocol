@@ -72,15 +72,16 @@ func NewCreateSIPParticipantRequest(
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
 	var (
-		hostname       string
-		enc            livekit.SIPMediaEncryption
-		headers        map[string]string
-		includeHeaders livekit.SIPHeaderOptions
-		transport      livekit.SIPTransport
-		authUser       string
-		authPass       string
-		hdrToAttr      map[string]string
-		attrToHdr      map[string]string
+		hostname           string
+		enc                livekit.SIPMediaEncryption
+		headers            map[string]string
+		includeHeaders     livekit.SIPHeaderOptions
+		transport          livekit.SIPTransport
+		destinationCountry string
+		authUser           string
+		authPass           string
+		hdrToAttr          map[string]string
+		attrToHdr          map[string]string
 	)
 	if trunk != nil {
 		hostname = trunk.Address
@@ -88,6 +89,7 @@ func NewCreateSIPParticipantRequest(
 		headers = trunk.Headers
 		includeHeaders = trunk.IncludeHeaders
 		transport = trunk.Transport
+		destinationCountry = trunk.DestinationCountry
 		authUser = trunk.AuthUsername
 		authPass = trunk.AuthPassword
 		hdrToAttr = trunk.HeadersToAttributes
@@ -95,6 +97,7 @@ func NewCreateSIPParticipantRequest(
 	} else if t := req.Trunk; t != nil {
 		hostname = t.Hostname
 		transport = t.Transport
+		destinationCountry = t.DestinationCountry
 		authUser = t.AuthUsername
 		authPass = t.AuthPassword
 		hdrToAttr = t.HeadersToAttributes
@@ -161,6 +164,7 @@ func NewCreateSIPParticipantRequest(
 		ProjectId:             projectID,
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
+		DestinationCountry:    destinationCountry,
 		Address:               hostname,
 		Hostname:              ownHostname,
 		Transport:             transport,

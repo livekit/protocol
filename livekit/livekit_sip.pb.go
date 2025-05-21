@@ -1540,6 +1540,8 @@ type SIPOutboundTrunkInfo struct {
 	// Hostname or IP that SIP INVITE is sent too.
 	// Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
 	Address string `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
+	// country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
+	DestinationCountry string `protobuf:"bytes,14,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
 	// SIP Transport used for outbound call.
 	Transport SIPTransport `protobuf:"varint,5,opt,name=transport,proto3,enum=livekit.SIPTransport" json:"transport,omitempty"`
 	// Numbers used to make the calls. Random one from this list will be selected.
@@ -1623,6 +1625,13 @@ func (x *SIPOutboundTrunkInfo) GetMetadata() string {
 func (x *SIPOutboundTrunkInfo) GetAddress() string {
 	if x != nil {
 		return x.Address
+	}
+	return ""
+}
+
+func (x *SIPOutboundTrunkInfo) GetDestinationCountry() string {
+	if x != nil {
+		return x.DestinationCountry
 	}
 	return ""
 }
@@ -3214,6 +3223,8 @@ type SIPOutboundConfig struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// SIP server address
 	Hostname string `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	// country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
+	DestinationCountry string `protobuf:"bytes,7,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
 	// SIP Transport used for outbound call.
 	Transport SIPTransport `protobuf:"varint,2,opt,name=transport,proto3,enum=livekit.SIPTransport" json:"transport,omitempty"`
 	// Username and password used to authenticate with SIP server.
@@ -3263,6 +3274,13 @@ func (*SIPOutboundConfig) Descriptor() ([]byte, []int) {
 func (x *SIPOutboundConfig) GetHostname() string {
 	if x != nil {
 		return x.Hostname
+	}
+	return ""
+}
+
+func (x *SIPOutboundConfig) GetDestinationCountry() string {
+	if x != nil {
+		return x.DestinationCountry
 	}
 	return ""
 }
@@ -4191,13 +4209,14 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x129\n" +
 	"\areplace\x18\x02 \x01(\v2\x1d.livekit.SIPOutboundTrunkInfoH\x00R\areplace\x129\n" +
 	"\x06update\x18\x03 \x01(\v2\x1f.livekit.SIPOutboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\x91\a\n" +
+	"\x06action\"\xc2\a\n" +
 	"\x14SIPOutboundTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
 	"\bmetadata\x18\x03 \x01(\tR\bmetadata\x12\x18\n" +
-	"\aaddress\x18\x04 \x01(\tR\aaddress\x123\n" +
+	"\aaddress\x18\x04 \x01(\tR\aaddress\x12/\n" +
+	"\x13destination_country\x18\x0e \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x05 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x18\n" +
 	"\anumbers\x18\x06 \x03(\tR\anumbers\x12#\n" +
 	"\rauth_username\x18\a \x01(\tR\fauthUsername\x12#\n" +
@@ -4348,9 +4367,10 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x1bListSIPDispatchRuleResponse\x122\n" +
 	"\x05items\x18\x01 \x03(\v2\x1c.livekit.SIPDispatchRuleInfoR\x05items\"O\n" +
 	"\x1cDeleteSIPDispatchRuleRequest\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\x90\x04\n" +
+	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\xc1\x04\n" +
 	"\x11SIPOutboundConfig\x12\x1a\n" +
-	"\bhostname\x18\x01 \x01(\tR\bhostname\x123\n" +
+	"\bhostname\x18\x01 \x01(\tR\bhostname\x12/\n" +
+	"\x13destination_country\x18\a \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12#\n" +
 	"\rauth_username\x18\x03 \x01(\tR\fauthUsername\x12#\n" +
 	"\rauth_password\x18\x04 \x01(\tR\fauthPassword\x12g\n" +
