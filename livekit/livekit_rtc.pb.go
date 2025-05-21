@@ -3517,6 +3517,7 @@ func (x *Pong) GetTimestamp() int64 {
 type RegionSettings struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Regions       []*RegionInfo          `protobuf:"bytes,1,rep,name=regions,proto3" json:"regions,omitempty"`
+	ClientIp      string                 `protobuf:"bytes,2,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3556,6 +3557,13 @@ func (x *RegionSettings) GetRegions() []*RegionInfo {
 		return x.Regions
 	}
 	return nil
+}
+
+func (x *RegionSettings) GetClientIp() string {
+	if x != nil {
+		return x.ClientIp
+	}
+	return ""
 }
 
 type RegionInfo struct {
@@ -4021,9 +4029,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x03rtt\x18\x02 \x01(\x03R\x03rtt\"T\n" +
 	"\x04Pong\x12.\n" +
 	"\x13last_ping_timestamp\x18\x01 \x01(\x03R\x11lastPingTimestamp\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"?\n" +
+	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\"\\\n" +
 	"\x0eRegionSettings\x12-\n" +
-	"\aregions\x18\x01 \x03(\v2\x13.livekit.RegionInfoR\aregions\"R\n" +
+	"\aregions\x18\x01 \x03(\v2\x13.livekit.RegionInfoR\aregions\x12\x1b\n" +
+	"\tclient_ip\x18\x02 \x01(\tR\bclientIp\"R\n" +
 	"\n" +
 	"RegionInfo\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x10\n" +
