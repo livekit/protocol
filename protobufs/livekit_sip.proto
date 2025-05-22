@@ -374,12 +374,15 @@ message SIPOutboundTrunkInfo {
 message SIPOutboundTrunkUpdate {
   optional string address = 1;
   optional SIPTransport transport = 2;
+  optional string destination_country = 9;
   ListUpdate numbers = 3;
   optional string auth_username = 4;
   optional string auth_password = 5;
   optional string name = 6;
   optional string metadata = 7;
   optional SIPMediaEncryption media_encryption = 8;
+
+  // NEXT ID: 10
 }
 
 message GetSIPInboundTrunkRequest {

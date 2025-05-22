@@ -470,6 +470,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	}
 	applyUpdate(&info.Address, p.Address)
 	applyUpdate(&info.Transport, p.Transport)
+	applyUpdate(&info.DestinationCountry, p.DestinationCountry)
 	applyListUpdate(&info.Numbers, p.Numbers)
 	applyUpdate(&info.AuthUsername, p.AuthUsername)
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
