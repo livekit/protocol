@@ -432,6 +432,7 @@ message Pong {
 
 message RegionSettings {
   repeated RegionInfo regions = 1;
+  string client_ip = 2;
 }
 
 message RegionInfo {
