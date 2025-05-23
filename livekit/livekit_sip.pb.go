@@ -1700,17 +1700,18 @@ func (x *SIPOutboundTrunkInfo) GetMediaEncryption() SIPMediaEncryption {
 }
 
 type SIPOutboundTrunkUpdate struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Address         *string                `protobuf:"bytes,1,opt,name=address,proto3,oneof" json:"address,omitempty"`
-	Transport       *SIPTransport          `protobuf:"varint,2,opt,name=transport,proto3,enum=livekit.SIPTransport,oneof" json:"transport,omitempty"`
-	Numbers         *ListUpdate            `protobuf:"bytes,3,opt,name=numbers,proto3" json:"numbers,omitempty"`
-	AuthUsername    *string                `protobuf:"bytes,4,opt,name=auth_username,json=authUsername,proto3,oneof" json:"auth_username,omitempty"`
-	AuthPassword    *string                `protobuf:"bytes,5,opt,name=auth_password,json=authPassword,proto3,oneof" json:"auth_password,omitempty"`
-	Name            *string                `protobuf:"bytes,6,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	Metadata        *string                `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
-	MediaEncryption *SIPMediaEncryption    `protobuf:"varint,8,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Address            *string                `protobuf:"bytes,1,opt,name=address,proto3,oneof" json:"address,omitempty"`
+	Transport          *SIPTransport          `protobuf:"varint,2,opt,name=transport,proto3,enum=livekit.SIPTransport,oneof" json:"transport,omitempty"`
+	DestinationCountry *string                `protobuf:"bytes,9,opt,name=destination_country,json=destinationCountry,proto3,oneof" json:"destination_country,omitempty"`
+	Numbers            *ListUpdate            `protobuf:"bytes,3,opt,name=numbers,proto3" json:"numbers,omitempty"`
+	AuthUsername       *string                `protobuf:"bytes,4,opt,name=auth_username,json=authUsername,proto3,oneof" json:"auth_username,omitempty"`
+	AuthPassword       *string                `protobuf:"bytes,5,opt,name=auth_password,json=authPassword,proto3,oneof" json:"auth_password,omitempty"`
+	Name               *string                `protobuf:"bytes,6,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	Metadata           *string                `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
+	MediaEncryption    *SIPMediaEncryption    `protobuf:"varint,8,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *SIPOutboundTrunkUpdate) Reset() {
@@ -1755,6 +1756,13 @@ func (x *SIPOutboundTrunkUpdate) GetTransport() SIPTransport {
 		return *x.Transport
 	}
 	return SIPTransport_SIP_TRANSPORT_AUTO
+}
+
+func (x *SIPOutboundTrunkUpdate) GetDestinationCountry() string {
+	if x != nil && x.DestinationCountry != nil {
+		return *x.DestinationCountry
+	}
+	return ""
 }
 
 func (x *SIPOutboundTrunkUpdate) GetNumbers() *ListUpdate {
@@ -4235,20 +4243,22 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe4\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb2\x04\n" +
 	"\x16SIPOutboundTrunkUpdate\x12\x1d\n" +
 	"\aaddress\x18\x01 \x01(\tH\x00R\aaddress\x88\x01\x01\x128\n" +
-	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportH\x01R\ttransport\x88\x01\x01\x12-\n" +
+	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportH\x01R\ttransport\x88\x01\x01\x124\n" +
+	"\x13destination_country\x18\t \x01(\tH\x02R\x12destinationCountry\x88\x01\x01\x12-\n" +
 	"\anumbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12(\n" +
-	"\rauth_username\x18\x04 \x01(\tH\x02R\fauthUsername\x88\x01\x01\x12(\n" +
-	"\rauth_password\x18\x05 \x01(\tH\x03R\fauthPassword\x88\x01\x01\x12\x17\n" +
-	"\x04name\x18\x06 \x01(\tH\x04R\x04name\x88\x01\x01\x12\x1f\n" +
-	"\bmetadata\x18\a \x01(\tH\x05R\bmetadata\x88\x01\x01\x12K\n" +
-	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x06R\x0fmediaEncryption\x88\x01\x01B\n" +
+	"\rauth_username\x18\x04 \x01(\tH\x03R\fauthUsername\x88\x01\x01\x12(\n" +
+	"\rauth_password\x18\x05 \x01(\tH\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
+	"\x04name\x18\x06 \x01(\tH\x05R\x04name\x88\x01\x01\x12\x1f\n" +
+	"\bmetadata\x18\a \x01(\tH\x06R\bmetadata\x88\x01\x01\x12K\n" +
+	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\aR\x0fmediaEncryption\x88\x01\x01B\n" +
 	"\n" +
 	"\b_addressB\f\n" +
 	"\n" +
-	"_transportB\x10\n" +
+	"_transportB\x16\n" +
+	"\x14_destination_countryB\x10\n" +
 	"\x0e_auth_usernameB\x10\n" +
 	"\x0e_auth_passwordB\a\n" +
 	"\x05_nameB\v\n" +
