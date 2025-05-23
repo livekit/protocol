@@ -229,6 +229,8 @@ message TrackInfo {
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
   BackupCodecPolicy backup_codec_policy = 20;
+  // metadata for stereoscopic and spherical video features
+  SpatialVideoFeatures spatial_video_features = 21;
 }
 
 enum VideoQuality {
@@ -247,6 +249,43 @@ message VideoLayer {
   // target bitrate in bit per second (bps), server will measure actual
   uint32 bitrate = 4;
   uint32 ssrc = 5;
+}
+
+// Metadata for stereoscopic and spherical video features. Includes
+// a subset of the fields defined by the Google Spherical Video V2 RFC.
+message SpatialVideoFeatures {
+  enum StereoMode {
+    MONOSCOPIC = 0;
+    TOP_BOTTOM = 1;
+    LEFT_RIGHT = 2;
+    CUSTOM = 3; // not supported yet
+    RIGHT_LEFT = 4;
+  }
+  message ProjectionHeader {
+    int32 pose_yaw_degrees = 1;
+    int32 pose_pitch_degrees = 2;
+    int32 pose_roll_degrees = 3;
+  }
+  message CubemapProjection {
+    int32 layout = 1;
+    int32 padding = 2;
+  }
+  message EquirectangularProjection {
+    int32 bounds_top = 1;
+    int32 bounds_bottom = 2;
+    int32 bounds_left = 3;
+    int32 bounds_right = 4;
+  }
+  // frame layout for stereoscopic video
+  StereoMode stereo_mode = 1;
+  // initial orientation of the camera for spherical video
+  ProjectionHeader projection_header = 2;
+  // projection format for spherical video
+  oneof projection {
+    CubemapProjection cubemap = 3;
+    EquirectangularProjection equirectangular = 4;
+  }
+  // NEXT_ID: 5
 }
 
 // new DataPacket API
