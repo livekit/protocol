@@ -140,11 +140,13 @@ message AvailabilityResponse {
   string job_id = 1;
   bool available = 2;
   bool supports_resume = 3;
+  bool terminate = 8;
 
   string participant_name = 4;
   string participant_identity = 5;
   string participant_metadata = 6;
   map<string, string> participant_attributes = 7;
+  // NEXT_ID: 9
 }
 
 message UpdateJobStatus {
