@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.39.0
+
+### Patch Changes
+
+- Add a MEDIA_FAILURE disconnect reason. - [#1085](https://github.com/livekit/protocol/pull/1085) ([@dennwc](https://github.com/dennwc))
+
 ## 1.38.0
 
 ### Minor Changes

@@ -1,5 +1,31 @@
 # @livekit/protocol
 
+## 1.39.0
+
+### Minor Changes
+
+- Add destination_country field to CreateSIPParticipant - [#1084](https://github.com/livekit/protocol/pull/1084) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+### Patch Changes
+
+- merge deferred log fields - [#1070](https://github.com/livekit/protocol/pull/1070) ([@paulwe](https://github.com/paulwe))
+
+- add agent jwt helper - [#1075](https://github.com/livekit/protocol/pull/1075) ([@paulwe](https://github.com/paulwe))
+
+- add terminate to agent AvailabilityResponse - [#1088](https://github.com/livekit/protocol/pull/1088) ([@paulwe](https://github.com/paulwe))
+
+- remove agent token - [#1077](https://github.com/livekit/protocol/pull/1077) ([@paulwe](https://github.com/paulwe))
+
+- Add a MEDIA_FAILURE disconnect reason. - [#1085](https://github.com/livekit/protocol/pull/1085) ([@dennwc](https://github.com/dennwc))
+
+- Allow updating trunk destination country - [#1087](https://github.com/livekit/protocol/pull/1087) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- update mageutil for license - [#1068](https://github.com/livekit/protocol/pull/1068) ([@paulwe](https://github.com/paulwe))
+
+- Add SIPTransferInfo to analytics - [#1063](https://github.com/livekit/protocol/pull/1063) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- This adds a transfer_id as an easier to implement way to deduplicate transfer requests. It also adds a transfer_status to indicate if the event is for the start of end of a transfer, and if it's been successful. - [#1072](https://github.com/livekit/protocol/pull/1072) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.38.0
 
 ### Minor Changes
