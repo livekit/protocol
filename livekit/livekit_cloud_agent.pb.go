@@ -105,13 +105,17 @@ func (x *AgentSecret) GetUpdatedAt() *timestamppb.Timestamp {
 }
 
 type CreateAgentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Secrets       []*AgentSecret         `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
-	Replicas      int32                  `protobuf:"varint,3,opt,name=replicas,proto3" json:"replicas,omitempty"`
-	MaxReplicas   int32                  `protobuf:"varint,4,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
-	CpuReq        string                 `protobuf:"bytes,5,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
-	Regions       []string               `protobuf:"bytes,6,rep,name=regions,proto3" json:"regions,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	AgentName string         `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Secrets   []*AgentSecret `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Replicas int32 `protobuf:"varint,3,opt,name=replicas,proto3" json:"replicas,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	MaxReplicas int32 `protobuf:"varint,4,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	CpuReq        string   `protobuf:"bytes,5,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
+	Regions       []string `protobuf:"bytes,6,rep,name=regions,proto3" json:"regions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -146,6 +150,7 @@ func (*CreateAgentRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{1}
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreateAgentRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
@@ -160,6 +165,7 @@ func (x *CreateAgentRequest) GetSecrets() []*AgentSecret {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreateAgentRequest) GetReplicas() int32 {
 	if x != nil {
 		return x.Replicas
@@ -167,6 +173,7 @@ func (x *CreateAgentRequest) GetReplicas() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreateAgentRequest) GetMaxReplicas() int32 {
 	if x != nil {
 		return x.MaxReplicas
@@ -174,6 +181,7 @@ func (x *CreateAgentRequest) GetMaxReplicas() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreateAgentRequest) GetCpuReq() string {
 	if x != nil {
 		return x.CpuReq
@@ -717,14 +725,18 @@ func (x *ListAgentVersionsResponse) GetVersions() []*AgentVersion {
 }
 
 type UpdateAgentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Replicas      int32                  `protobuf:"varint,3,opt,name=replicas,proto3" json:"replicas,omitempty"`
-	MaxReplicas   int32                  `protobuf:"varint,4,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
-	CpuReq        string                 `protobuf:"bytes,5,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
-	Regions       []string               `protobuf:"bytes,6,rep,name=regions,proto3" json:"regions,omitempty"`
-	Secrets       []*AgentSecret         `protobuf:"bytes,7,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	AgentId string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	AgentName string `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Replicas int32 `protobuf:"varint,3,opt,name=replicas,proto3" json:"replicas,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	MaxReplicas int32 `protobuf:"varint,4,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	CpuReq        string         `protobuf:"bytes,5,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
+	Regions       []string       `protobuf:"bytes,6,rep,name=regions,proto3" json:"regions,omitempty"`
+	Secrets       []*AgentSecret `protobuf:"bytes,7,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -766,6 +778,7 @@ func (x *UpdateAgentRequest) GetAgentId() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *UpdateAgentRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
@@ -773,6 +786,7 @@ func (x *UpdateAgentRequest) GetAgentName() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *UpdateAgentRequest) GetReplicas() int32 {
 	if x != nil {
 		return x.Replicas
@@ -780,6 +794,7 @@ func (x *UpdateAgentRequest) GetReplicas() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *UpdateAgentRequest) GetMaxReplicas() int32 {
 	if x != nil {
 		return x.MaxReplicas
@@ -787,6 +802,7 @@ func (x *UpdateAgentRequest) GetMaxReplicas() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *UpdateAgentRequest) GetCpuReq() string {
 	if x != nil {
 		return x.CpuReq
@@ -861,13 +877,17 @@ func (x *UpdateAgentResponse) GetMessage() string {
 }
 
 type DeployAgentRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Secrets       []*AgentSecret         `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
-	Replicas      int32                  `protobuf:"varint,4,opt,name=replicas,proto3" json:"replicas,omitempty"`
-	MaxReplicas   int32                  `protobuf:"varint,5,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
-	CpuReq        string                 `protobuf:"bytes,6,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	AgentId string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	AgentName string         `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Secrets   []*AgentSecret `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Replicas int32 `protobuf:"varint,4,opt,name=replicas,proto3" json:"replicas,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	MaxReplicas int32 `protobuf:"varint,5,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	CpuReq        string `protobuf:"bytes,6,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -909,6 +929,7 @@ func (x *DeployAgentRequest) GetAgentId() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *DeployAgentRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
@@ -923,6 +944,7 @@ func (x *DeployAgentRequest) GetSecrets() []*AgentSecret {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *DeployAgentRequest) GetReplicas() int32 {
 	if x != nil {
 		return x.Replicas
@@ -930,6 +952,7 @@ func (x *DeployAgentRequest) GetReplicas() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *DeployAgentRequest) GetMaxReplicas() int32 {
 	if x != nil {
 		return x.MaxReplicas
@@ -937,6 +960,7 @@ func (x *DeployAgentRequest) GetMaxReplicas() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *DeployAgentRequest) GetCpuReq() string {
 	if x != nil {
 		return x.CpuReq
@@ -1587,14 +1611,14 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xd5\x01\n" +
-	"\x12CreateAgentRequest\x12\x1d\n" +
+	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xe5\x01\n" +
+	"\x12CreateAgentRequest\x12!\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12.\n" +
-	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1a\n" +
-	"\breplicas\x18\x03 \x01(\x05R\breplicas\x12!\n" +
-	"\fmax_replicas\x18\x04 \x01(\x05R\vmaxReplicas\x12\x17\n" +
-	"\acpu_req\x18\x05 \x01(\tR\x06cpuReq\x12\x18\n" +
+	"agent_name\x18\x01 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
+	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
+	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
+	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
+	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
 	"\aregions\x18\x06 \x03(\tR\aregions\"\xa6\x01\n" +
 	"\x13CreateAgentResponse\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
@@ -1640,27 +1664,27 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"N\n" +
 	"\x19ListAgentVersionsResponse\x121\n" +
-	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\xf0\x01\n" +
+	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x80\x02\n" +
 	"\x12UpdateAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12!\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1a\n" +
-	"\breplicas\x18\x03 \x01(\x05R\breplicas\x12!\n" +
-	"\fmax_replicas\x18\x04 \x01(\x05R\vmaxReplicas\x12\x17\n" +
-	"\acpu_req\x18\x05 \x01(\tR\x06cpuReq\x12\x18\n" +
+	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12\x1e\n" +
+	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
+	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
+	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
 	"\aregions\x18\x06 \x03(\tR\aregions\x12.\n" +
 	"\asecrets\x18\a \x03(\v2\x14.livekit.AgentSecretR\asecrets\"I\n" +
 	"\x13UpdateAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xd6\x01\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xe6\x01\n" +
 	"\x12DeployAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12!\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12.\n" +
-	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1a\n" +
-	"\breplicas\x18\x04 \x01(\x05R\breplicas\x12!\n" +
-	"\fmax_replicas\x18\x05 \x01(\x05R\vmaxReplicas\x12\x17\n" +
-	"\acpu_req\x18\x06 \x01(\tR\x06cpuReq\"\x89\x01\n" +
+	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
+	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
+	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
+	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
+	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\x89\x01\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
