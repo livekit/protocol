@@ -29,12 +29,12 @@ message AgentSecret {
 }
 
 message CreateAgentRequest {
-    string agent_name = 1;
+    string agent_name            = 1 [deprecated=true];
     repeated AgentSecret secrets = 2;
-    int32 replicas = 3;
-    int32 max_replicas = 4;
-    string cpu_req = 5;
-    repeated string regions = 6;
+    int32 replicas               = 3 [deprecated=true];
+    int32 max_replicas           = 4 [deprecated=true];
+    string cpu_req               = 5 [deprecated=true];
+    repeated string regions      = 6;
 }
 
 message CreateAgentResponse {
@@ -92,12 +92,12 @@ message ListAgentVersionsResponse {
 }
 
 message UpdateAgentRequest {
-    string agent_id = 1;
-    string agent_name = 2;
-    int32 replicas = 3;
-    int32 max_replicas = 4;
-    string cpu_req = 5;
-    repeated string regions = 6;
+    string agent_id              = 1;
+    string agent_name            = 2 [deprecated=true];
+    int32 replicas               = 3 [deprecated=true];
+    int32 max_replicas           = 4 [deprecated=true];
+    string cpu_req               = 5 [deprecated=true];
+    repeated string regions      = 6;
     repeated AgentSecret secrets = 7;
 }
 
@@ -107,12 +107,12 @@ message UpdateAgentResponse {
 }
 
 message DeployAgentRequest {
-    string agent_id = 1;
-    string agent_name = 2;
+    string agent_id              = 1;
+    string agent_name            = 2 [deprecated=true];
     repeated AgentSecret secrets = 3;
-    int32 replicas = 4;
-    int32 max_replicas = 5;
-    string cpu_req = 6;
+    int32 replicas               = 4 [deprecated=true];
+    int32 max_replicas           = 5 [deprecated=true];
+    string cpu_req               = 6 [deprecated=true];
 }
 
 message DeployAgentResponse {
