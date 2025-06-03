@@ -1,0 +1,104 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/protocol/rpc";
+
+import "google/protobuf/empty.proto";
+import "options.proto";
+import "livekit_internal.proto";
+import "livekit_rtc.proto";
+
+service RTCRest {
+  rpc Create(RTCRestCreateRequest) returns (RTCRestCreateResponse) {
+    option (psrpc.options) = {
+      topics: true
+      queue: true
+      topic_params: {
+        group: "common"
+        names: ["topic"]
+        typed: true
+      };
+    };
+  }
+}
+
+message RTCRestCreateRequest {
+  message TrackList {
+    repeated string track_names = 1;
+  }
+
+  livekit.StartSession start_session = 1;
+  string offer_sdp = 2;
+  map<string, TrackList> subscribed_participant_tracks = 3;
+}
+
+message RTCRestCreateResponse {
+  string answer_sdp = 1;
+  string participant_id = 2;
+  repeated livekit.ICEServer ice_servers = 3;
+  string ice_session_id = 4;
+}
+
+// ----------------------------------
+
+service RTCRestParticipant {
+  rpc ICETrickle(RTCRestParticipantICETrickleRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "common"
+        names: ["topic"]
+        typed: true
+      };
+    };
+  }
+
+  rpc ICERestart(RTCRestParticipantICERestartRequest) returns (RTCRestParticipantICERestartResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "common"
+        names: ["topic"]
+        typed: true
+      };
+    };
+  }
+
+  rpc DeleteSession(RTCRestParticipantDeleteSessionRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "common"
+        names: ["topic"]
+        typed: true
+      };
+    };
+  }
+}
+
+message RTCRestParticipantICETrickleRequest {
+  string room = 1;
+  string participant_identity = 2;
+  string participant_id = 3;
+  string ice_session_id = 4;
+  string sdp_fragment = 5;
+}
+
+message RTCRestParticipantICERestartRequest {
+  string room = 1;
+  string participant_identity = 2;
+  string participant_id = 3;
+  string sdp_fragment = 4;
+}
+
+message RTCRestParticipantICERestartResponse {
+  string ice_session_id = 1;
+  string sdp_fragment = 2;
+}
+
+message RTCRestParticipantDeleteSessionRequest {
+  string room = 1;
+  string participant_identity = 2;
+  string participant_id = 3;
+}

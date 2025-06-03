@@ -185,6 +185,18 @@ func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, 
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
 }
 
+//counterfeiter:generate . TypedRTCRestParticipantClient
+type TypedRTCRestParticipantClient = RTCRestParticipantClient[ParticipantTopic]
+type TypedRTCRestParticipantServer = RTCRestParticipantServer[ParticipantTopic]
+
+func NewTypedRTCRestParticipantClient(params ClientParams) (TypedRTCRestParticipantClient, error) {
+	return NewRTCRestParticipantClient[ParticipantTopic](params.Args())
+}
+
+func NewTypedRTCRestParticipantServer(svc RTCRestParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRTCRestParticipantServer, error) {
+	return NewRTCRestParticipantServer[ParticipantTopic](svc, bus, opts...)
+}
+
 //counterfeiter:generate . TypedAgentDispatchInternalClient
 type TypedAgentDispatchInternalClient = AgentDispatchInternalClient[RoomTopic]
 type TypedAgentDispatchInternalServer = AgentDispatchInternalServer[RoomTopic]
