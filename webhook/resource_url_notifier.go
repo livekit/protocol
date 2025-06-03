@@ -49,7 +49,7 @@ type ResourceURLNotifierConfig struct {
 }
 
 var DefaultResourceURLNotifierConfig = ResourceURLNotifierConfig{
-	MaxAge:   10 * time.Second,
+	MaxAge:   30 * time.Second,
 	MaxDepth: 200,
 }
 
