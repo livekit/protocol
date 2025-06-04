@@ -18,6 +18,7 @@ import (
 	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
@@ -32,22 +33,20 @@ func InitWebhookStats(constLabels prometheus.Labels) {
 }
 
 func initWebhookStats(constLabels prometheus.Labels) {
-	promWebhookDispatchTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promWebhookDispatchTotal = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace:   "livekit",
 		Subsystem:   "webhook",
 		Name:        "dispatch_total",
 		ConstLabels: constLabels,
 	}, []string{"status", "reason"})
-	prometheus.MustRegister(promWebhookDispatchTotal)
 
-	promWebhookQueueLengthHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
+	promWebhookQueueLengthHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Namespace:   "livekit",
 		Subsystem:   "webhook",
 		Name:        "queue_length",
 		ConstLabels: constLabels,
 		Buckets:     prometheus.ExponentialBucketsRange(1, 100, 4),
 	})
-	prometheus.MustRegister(promWebhookQueueLengthHistogram)
 }
 
 func IncDispatchSuccess() {
