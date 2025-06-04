@@ -211,11 +211,12 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 	}
 	r.mu.Unlock()
 
-	err := rqi.resourceQueue.Enqueue(ctx, event, &params)
+	qLen, err := rqi.resourceQueue.Enqueue(ctx, event, &params)
 	if err != nil {
 		fields := logFields(event, params.URL)
 		fields = append(fields, "reason", err)
 		params.Logger.Infow("dropped webhook", fields...)
+		IncDispatchDrop(err.Error())
 
 		if ph := r.getProcessedHook(); ph != nil {
 			whi := webhookInfo(
@@ -233,6 +234,8 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 			}
 			ph(ctx, whi)
 		}
+	} else {
+		RecordQueueLength(qLen)
 	}
 	return err
 }
@@ -260,6 +263,7 @@ func (r *ResourceURLNotifier) Process(ctx context.Context, queuedAt time.Time, e
 	if queueDuration > params.Config.MaxAge {
 		fields = append(fields, "reason", "age")
 		params.Logger.Infow("dropped webhook", fields...)
+		IncDispatchDrop("age")
 
 		if ph := r.getProcessedHook(); ph != nil {
 			whi := webhookInfo(
@@ -286,8 +290,10 @@ func (r *ResourceURLNotifier) Process(ctx context.Context, queuedAt time.Time, e
 	fields = append(fields, "sendDuration", sendDuration)
 	if err != nil {
 		params.Logger.Warnw("failed to send webhook", err, fields...)
+		IncDispatchFailure()
 	} else {
 		params.Logger.Infow("sent webhook", fields...)
+		IncDispatchSuccess()
 	}
 	if ph := r.getProcessedHook(); ph != nil {
 		whi := webhookInfo(
