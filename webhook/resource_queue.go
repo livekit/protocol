@@ -77,25 +77,25 @@ func (r *resourceQueue) Stop(force bool) {
 	}
 }
 
-func (r *resourceQueue) Enqueue(ctx context.Context, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) error {
+func (r *resourceQueue) Enqueue(ctx context.Context, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) (int, error) {
 	return r.EnqueueAt(ctx, time.Now(), whEvent, params)
 }
 
-func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) error {
+func (r *resourceQueue) EnqueueAt(ctx context.Context, at time.Time, whEvent *livekit.WebhookEvent, params *ResourceURLNotifierParams) (int, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
 	if r.closed {
-		return errQueueClosed
+		return r.items.Len(), errQueueClosed
 	}
 
 	if r.items.Len() >= r.params.MaxDepth {
-		return errQueueFull
+		return r.items.Len(), errQueueFull
 	}
 
 	r.items.PushBack(&item{ctx, at, whEvent, params})
 	r.cond.Broadcast()
-	return nil
+	return r.items.Len(), nil
 }
 
 func (r *resourceQueue) worker() {

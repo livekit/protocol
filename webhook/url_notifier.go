@@ -183,8 +183,10 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 		if err != nil {
 			params.Logger.Warnw("failed to send webhook", err, fields...)
 			n.dropped.Add(event.NumDropped + 1)
+			IncDispatchFailure()
 		} else {
 			params.Logger.Infow("sent webhook", fields...)
+			IncDispatchSuccess()
 		}
 		if ph := n.getProcessedHook(); ph != nil {
 			whi := webhookInfo(
@@ -207,6 +209,7 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 
 		fields := logFields(event, params.URL)
 		params.Logger.Infow("dropped webhook", fields...)
+		IncDispatchDrop("overflow")
 
 		if ph := n.getProcessedHook(); ph != nil {
 			whi := webhookInfo(

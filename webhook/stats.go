@@ -1,0 +1,67 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package webhook
+
+import (
+	"sync"
+
+	"github.com/prometheus/client_golang/prometheus"
+)
+
+var (
+	promWebhookDispatchTotal        *prometheus.CounterVec
+	promWebhookQueueLengthHistogram prometheus.Histogram
+
+	promWebhookInitOnce sync.Once
+)
+
+func InitWebhookStats(constLabels prometheus.Labels) {
+	promWebhookInitOnce.Do(func() { initWebhookStats(constLabels) })
+}
+
+func initWebhookStats(constLabels prometheus.Labels) {
+	promWebhookDispatchTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace:   "livekit",
+		Subsystem:   "webhook",
+		Name:        "dispatch_total",
+		ConstLabels: constLabels,
+	}, []string{"status", "reason"})
+	prometheus.MustRegister(promWebhookDispatchTotal)
+
+	promWebhookQueueLengthHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
+		Namespace:   "livekit",
+		Subsystem:   "webhook",
+		Name:        "queue_length",
+		ConstLabels: constLabels,
+		Buckets:     prometheus.ExponentialBucketsRange(1, 100, 4),
+	})
+	prometheus.MustRegister(promWebhookQueueLengthHistogram)
+}
+
+func IncDispatchSuccess() {
+	promWebhookDispatchTotal.WithLabelValues("success", "").Inc()
+}
+
+func IncDispatchFailure() {
+	promWebhookDispatchTotal.WithLabelValues("failure", "").Inc()
+}
+
+func IncDispatchDrop(reason string) {
+	promWebhookDispatchTotal.WithLabelValues("drop", reason).Inc()
+}
+
+func RecordQueueLength(queueLength int) {
+	promWebhookQueueLengthHistogram.Observe(float64(queueLength))
+}

@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 
@@ -43,6 +44,8 @@ var authProvider = auth.NewSimpleKeyProvider(
 )
 
 func TestWebHook(t *testing.T) {
+	InitWebhookStats(prometheus.Labels{})
+
 	s := newServer(testAddr)
 	require.NoError(t, s.Start())
 	defer s.Stop()
@@ -81,10 +84,11 @@ func TestWebHook(t *testing.T) {
 		wg.Wait()
 
 	})
-
 }
 
 func TestURLNotifierDropped(t *testing.T) {
+	InitWebhookStats(prometheus.Labels{})
+
 	s := newServer(testAddr)
 	require.NoError(t, s.Start())
 	defer s.Stop()
@@ -114,6 +118,8 @@ func TestURLNotifierDropped(t *testing.T) {
 }
 
 func TestURLNotifierLifecycle(t *testing.T) {
+	InitWebhookStats(prometheus.Labels{})
+
 	s := newServer(testAddr)
 	require.NoError(t, s.Start())
 	defer s.Stop()
@@ -209,6 +215,8 @@ func TestURLNotifierLifecycle(t *testing.T) {
 }
 
 func TestURLNotifierFilter(t *testing.T) {
+	InitWebhookStats(prometheus.Labels{})
+
 	s := newServer(testAddr)
 	require.NoError(t, s.Start())
 	defer s.Stop()
