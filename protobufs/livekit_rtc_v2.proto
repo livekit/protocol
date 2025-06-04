@@ -47,6 +47,7 @@ message Signalv2ClientMessage {
     Ping ping = 17;
     UpdateLocalAudioTrack update_local_audio_track = 18;
     UpdateLocalVideoTrack update_local_video_track = 19;
+    bool replay_request = 20;
   }
 }
 
