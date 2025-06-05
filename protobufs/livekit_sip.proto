@@ -474,26 +474,91 @@ message SIPDispatchRuleDynamic {
   string url = 1;
 }
 
-// SIPDispatchRuleDynamicResponse is the response from the webhook URL.
-message SIPDispatchRuleDynamicResponse {
+// Audio quality configuration for SIP calls
+enum AudioQuality {
+  // Let the system decide based on capabilities
+  AUDIO_QUALITY_AUTO = 0;
+
+  // Standard definition audio (narrowband, e.g. G.711)
+  AUDIO_QUALITY_SD = 1;
+
+  // High definition audio (wideband, e.g. Opus)
+  AUDIO_QUALITY_HD = 2;
+}
+
+// Defines the type of dispatch for a SIP call
+enum SIPDispatchType {
+  // Connect the call to a LiveKit room
+  DISPATCH_CONNECT_ROOM = 0;
+
+  // Reject the call
+  DISPATCH_REJECT = 1;
+
+  // Transfer the call to another destination
+  DISPATCH_TRANSFER = 2;
+}
+
+// Configuration for connecting to a LiveKit room
+message SIPRoomConnection {
   // Room name to dispatch to
   string room_name = 1;
 
   // Optional pin required to enter room
   string pin = 2;
 
-  // User-defined metadata for the Dispatch Rule.
-  // Participants created by this rule will inherit this metadata.
-  string metadata = 3;
-  // User-defined attributes for the Dispatch Rule.
-  // Participants created by this rule will inherit these attributes.
-  map<string, string> attributes = 4;
-
   // Cloud-only, config preset to use
-  string room_preset = 5;
+  string room_preset = 3;
 
   // RoomConfiguration to use if the participant initiates the room
-  RoomConfiguration room_config = 6;
+  RoomConfiguration room_config = 4;
+}
+
+// Configuration for rejecting a call
+message SIPRejection {
+  // Status code to reject with
+  SIPStatusCode status_code = 1;
+
+  // Optional reason message
+  string reason = 2;
+}
+
+// Configuration for transferring a call
+message SIPTransfer {
+  // Destination to transfer to (e.g. phone number)
+  string transfer_to = 1;
+
+  // Optional human-readable name or department
+  string destination_name = 2;
+
+  // Max time to wait for transfer to be answered
+  google.protobuf.Duration ringing_timeout = 3;
+
+  // Whether to play dialtone during transfer
+  bool play_dialtone = 4;
+}
+
+// SIPDispatchRuleDynamicResponse is the response from the webhook URL.
+message SIPDispatchRuleDynamicResponse {
+  // Type of dispatch
+  SIPDispatchType dispatch_type = 1;
+
+  // Dispatch-specific configuration
+  oneof dispatch {
+    SIPRoomConnection room = 2;
+    SIPRejection reject = 3;
+    SIPTransfer transfer = 4;
+  }
+
+  // User-defined metadata that applies to any dispatch type.
+  // Participants created by this rule will inherit this metadata.
+  string metadata = 5;
+
+  // User-defined attributes that apply to any dispatch type.
+  // Participants created by this rule will inherit these attributes.
+  map<string, string> attributes = 6;
+
+  // Audio quality settings for the call
+  AudioQuality audio_quality = 7;
 }
 
 message SIPDispatchRule {
