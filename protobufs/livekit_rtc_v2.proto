@@ -23,7 +23,7 @@ import "livekit_rtc.proto";
 import "livekit_models.proto";
 
 message Signalv2ClientMessage {
-  // monotonically increasing number starting at some non-zero number (should not rollover)
+  // monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
   uint32 message_id = 1;
 
   // last remote message processed
@@ -47,7 +47,7 @@ message Signalv2ClientMessage {
     Ping ping = 17;
     UpdateLocalAudioTrack update_local_audio_track = 18;
     UpdateLocalVideoTrack update_local_video_track = 19;
-    bool replay_request = 20;
+    bool acknowledgement = 20;
   }
 }
 
@@ -57,7 +57,7 @@ message Signalv2ClientEnvelope {
 }
 
 message Signalv2ServerMessage {
-  // monotonically increasing number starting at some non-zero number (should not rollover)
+  // monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
   uint32 message_id = 1;
 
   // last remote message processed
@@ -85,6 +85,7 @@ message Signalv2ServerMessage {
     RequestResponse request_response = 20;
     TrackSubscribed track_subscribed = 21;
     RoomMovedResponse room_moved_response = 22;
+    bool acknowledgement = 23;
   }
 }
 
