@@ -95,11 +95,10 @@ message Signalv2ServerEnvelope {
 }
 
 message ConnectionSettings {
-  uint32 protocol = 1;
-  bool auto_subscribe = 2;
-  bool adaptive_stream = 3;
-  bool subscriber_allow_pause = 4;
-  bool disable_ice_lite = 5;;
+  bool auto_subscribe = 1;
+  bool adaptive_stream = 2;
+  bool subscriber_allow_pause = 3;
+  bool disable_ice_lite = 4;;
 }
 
 message TrackSettings {
