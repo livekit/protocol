@@ -54,7 +54,13 @@ var DefaultResourceURLNotifierConfig = ResourceURLNotifierConfig{
 }
 
 type poster interface {
-	Process(ctx context.Context, queuedAt time.Time, event *livekit.WebhookEvent, params *ResourceURLNotifierParams)
+	Process(
+		ctx context.Context,
+		queuedAt time.Time,
+		event *livekit.WebhookEvent,
+		params *ResourceURLNotifierParams,
+		qLen int,
+	)
 }
 
 type resourceQueueInfo struct {
@@ -254,11 +260,17 @@ func (r *ResourceURLNotifier) Stop(force bool) {
 }
 
 // poster interface
-func (r *ResourceURLNotifier) Process(ctx context.Context, queuedAt time.Time, event *livekit.WebhookEvent, params *ResourceURLNotifierParams) {
+func (r *ResourceURLNotifier) Process(
+	ctx context.Context,
+	queuedAt time.Time,
+	event *livekit.WebhookEvent,
+	params *ResourceURLNotifierParams,
+	qLen int,
+) {
 	fields := logFields(event, params.URL)
 
 	queueDuration := time.Since(queuedAt)
-	fields = append(fields, "queueDuration", queueDuration)
+	fields = append(fields, "queueDuration", queueDuration, "qLen", qLen)
 
 	if queueDuration > params.Config.MaxAge {
 		fields = append(fields, "reason", "age")
