@@ -114,8 +114,9 @@ func (r *resourceQueue) worker() {
 		}
 
 		item := r.items.PopFront()
+		qLen := r.items.Len()
 		r.mu.Unlock()
 
-		r.params.Poster.Process(item.ctx, item.queuedAt, item.event, item.params)
+		r.params.Poster.Process(item.ctx, item.queuedAt, item.event, item.params, qLen)
 	}
 }
