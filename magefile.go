@@ -56,6 +56,7 @@ func Proto() error {
 		"livekit_internal.proto",
 		"livekit_models.proto",
 		"livekit_rtc.proto",
+		"livekit_rtc_v2.proto",
 		"livekit_webhook.proto",
 		"livekit_metrics.proto",
 	}
@@ -74,6 +75,7 @@ func Proto() error {
 		"rpc/room.proto",
 		"rpc/roommanager.proto",
 		"rpc/signal.proto",
+		"rpc/signal_v2.proto",
 		"rpc/rest_signal.proto",
 		"rpc/sip.proto",
 	}
