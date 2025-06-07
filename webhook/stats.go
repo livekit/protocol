@@ -45,7 +45,7 @@ func initWebhookStats(constLabels prometheus.Labels) {
 		Subsystem:   "webhook",
 		Name:        "queue_length",
 		ConstLabels: constLabels,
-		Buckets:     prometheus.ExponentialBucketsRange(1, 100, 4),
+		Buckets:     []float64{1, 2, 3, 4, 5, 10, 20, 40, 80},
 	})
 }
 
