@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.39.1
+
+### Patch Changes
+
+- WHIP internal signalling to be able to support WHIP in OSS. - [#1091](https://github.com/livekit/protocol/pull/1091) ([@boks1971](https://github.com/boks1971))
+
 ## 1.39.0
 
 ### Minor Changes
