@@ -142,6 +142,12 @@ func (t *AccessToken) ToJWT() (string, error) {
 		return "", ErrKeysMissing
 	}
 
+	if t.grant.RoomConfig != nil {
+		if err := t.grant.RoomConfig.CheckCredentials(); err != nil {
+			return "", err
+		}
+	}
+
 	sig, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.HS256, Key: []byte(t.secret)},
 		(&jose.SignerOptions{}).WithType("JWT"))
 	if err != nil {

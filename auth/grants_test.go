@@ -99,3 +99,295 @@ func TestParticipantKind(t *testing.T) {
 		t.Errorf("Please update kindMax to match protobuf. Missing value: %s", kindNext)
 	}
 }
+
+func TestRoomConfiguration_CheckCredentials(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil egress returns nil", func(t *testing.T) {
+		config := &RoomConfiguration{}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("empty egress returns nil", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("participant file output with S3 secret fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Participant: &livekit.AutoParticipantEgress{
+					FileOutputs: []*livekit.EncodedFileOutput{
+						{
+							Output: &livekit.EncodedFileOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "secret", // This should trigger error
+									Bucket:    "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("participant file output with S3 but no secret passes", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Participant: &livekit.AutoParticipantEgress{
+					FileOutputs: []*livekit.EncodedFileOutput{
+						{
+							Output: &livekit.EncodedFileOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "", // No secret
+									Bucket:    "bucket",
+									Region:    "us-west-2",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("participant segment output with GCP credentials fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Participant: &livekit.AutoParticipantEgress{
+					SegmentOutputs: []*livekit.SegmentedFileOutput{
+						{
+							Output: &livekit.SegmentedFileOutput_Gcp{
+								Gcp: &livekit.GCPUpload{
+									Credentials: "credentials", // This should trigger error
+									Bucket:      "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("participant segment output with GCP but no credentials passes", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Participant: &livekit.AutoParticipantEgress{
+					SegmentOutputs: []*livekit.SegmentedFileOutput{
+						{
+							Output: &livekit.SegmentedFileOutput_Gcp{
+								Gcp: &livekit.GCPUpload{
+									Credentials: "", // No credentials
+									Bucket:      "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("room file output with Azure account key fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					FileOutputs: []*livekit.EncodedFileOutput{
+						{
+							Output: &livekit.EncodedFileOutput_Azure{
+								Azure: &livekit.AzureBlobUpload{
+									AccountName:   "account",
+									AccountKey:    "key", // This should trigger error
+									ContainerName: "container",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("room segment output with AliOSS secret fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					SegmentOutputs: []*livekit.SegmentedFileOutput{
+						{
+							Output: &livekit.SegmentedFileOutput_AliOSS{
+								AliOSS: &livekit.AliOSSUpload{
+									AccessKey: "access",
+									Secret:    "secret", // This should trigger error
+									Bucket:    "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("room image output with valid config passes", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					ImageOutputs: []*livekit.ImageOutput{
+						{
+							CaptureInterval: 5,
+							Width:           1920,
+							Height:          1080,
+							Output: &livekit.ImageOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "", // No secret
+									Bucket:    "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("room stream outputs always fail", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					StreamOutputs: []*livekit.StreamOutput{
+						{
+							Protocol: livekit.StreamProtocol_RTMP,
+							Urls:     []string{"rtmp://example.com/live"},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("tracks output with S3 secret fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Tracks: &livekit.AutoTrackEgress{
+					Filepath: "output.mp4",
+					Output: &livekit.AutoTrackEgress_S3{
+						S3: &livekit.S3Upload{
+							AccessKey: "access",
+							Secret:    "secret", // This should trigger error
+							Bucket:    "bucket",
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("tracks output without credentials passes", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Tracks: &livekit.AutoTrackEgress{
+					Filepath: "output.mp4",
+					Output: &livekit.AutoTrackEgress_Gcp{
+						Gcp: &livekit.GCPUpload{
+							Credentials: "", // No credentials
+							Bucket:      "bucket",
+						},
+					},
+				},
+			},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+
+	t.Run("multiple outputs with mixed credentials", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Participant: &livekit.AutoParticipantEgress{
+					FileOutputs: []*livekit.EncodedFileOutput{
+						{
+							Output: &livekit.EncodedFileOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "", // No secret - OK
+									Bucket:    "bucket1",
+								},
+							},
+						},
+						{
+							Output: &livekit.EncodedFileOutput_Gcp{
+								Gcp: &livekit.GCPUpload{
+									Credentials: "credentials", // Has credentials - should fail
+									Bucket:      "bucket2",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("all cloud providers without credentials pass", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					FileOutputs: []*livekit.EncodedFileOutput{
+						{
+							Output: &livekit.EncodedFileOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "", // No secret
+									Bucket:    "s3bucket",
+								},
+							},
+						},
+						{
+							Output: &livekit.EncodedFileOutput_Gcp{
+								Gcp: &livekit.GCPUpload{
+									Credentials: "", // No credentials
+									Bucket:      "gcpbucket",
+								},
+							},
+						},
+						{
+							Output: &livekit.EncodedFileOutput_Azure{
+								Azure: &livekit.AzureBlobUpload{
+									AccountName:   "account",
+									AccountKey:    "", // No key
+									ContainerName: "container",
+								},
+							},
+						},
+						{
+							Output: &livekit.EncodedFileOutput_AliOSS{
+								AliOSS: &livekit.AliOSSUpload{
+									AccessKey: "access",
+									Secret:    "", // No secret
+									Bucket:    "alibucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.NoError(t, config.CheckCredentials())
+	})
+}
