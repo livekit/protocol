@@ -17,6 +17,7 @@ package auth
 import (
 	"errors"
 	"maps"
+	"reflect"
 	"strings"
 
 	"go.uber.org/zap/zapcore"
@@ -62,44 +63,94 @@ func (c *RoomConfiguration) CheckCredentials() error {
 		return nil
 	}
 
-	if c.Egress.Participant != nil {
-		for _, output := range c.Egress.Participant.FileOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
-				return err
+	var credentialsError error
+	checkOutputs := func(outputs ...any) bool {
+		checkOutput := func(output any) bool {
+			if err := checkOutputForCredentials(output); err != nil {
+				credentialsError = err
+				return true
+			}
+			return false
+		}
+
+		checkReflectOutput := func(output reflect.Value) bool {
+			if output.Kind() == reflect.Ptr && !output.IsNil() {
+				if outputField := output.Elem().FieldByName("Output"); outputField.IsValid() {
+					return checkOutput(outputField.Interface())
+				}
+			}
+			return false
+		}
+
+		for _, output := range outputs {
+			v := reflect.ValueOf(output)
+
+			switch v.Kind() {
+			case reflect.Ptr:
+				if checkReflectOutput(v) {
+					return true
+				}
+			case reflect.Slice:
+				for i := 0; i < v.Len(); i++ {
+					if checkReflectOutput(v.Index(i)) {
+						return true
+					}
+				}
 			}
 		}
-		for _, output := range c.Egress.Participant.SegmentOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
-				return err
-			}
+
+		// If using reflection is not an option, we can use type assertions
+		// for _, output := range outputs {
+		// 	switch v := output.(type) {
+		// 	case []*livekit.EncodedFileOutput:
+		// 		if slices.ContainsFunc(v, func(o *livekit.EncodedFileOutput) bool {
+		// 			return checkOutput(o.Output)
+		// 		}) {
+		// 			return true
+		// 		}
+		// 	case []*livekit.SegmentedFileOutput:
+		// 		if slices.ContainsFunc(v, func(o *livekit.SegmentedFileOutput) bool {
+		// 			return checkOutput(o.Output)
+		// 		}) {
+		// 			return true
+		// 		}
+		// 	case []*livekit.ImageOutput:
+		// 		if slices.ContainsFunc(v, func(o *livekit.ImageOutput) bool {
+		// 			return checkOutput(o.Output)
+		// 		}) {
+		// 			return true
+		// 		}
+		// 	case *livekit.AutoTrackEgress:
+		// 		if checkOutput(v.Output) {
+		// 			return true
+		// 		}
+		// 	}
+		// }
+		return false
+	}
+
+	if c.Egress.Participant != nil {
+		if checkOutputs(c.Egress.Participant.FileOutputs, c.Egress.Participant.SegmentOutputs) {
+			return credentialsError
 		}
 	}
+
 	if c.Egress.Room != nil {
-		for _, output := range c.Egress.Room.FileOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
-				return err
-			}
-		}
-		for _, output := range c.Egress.Room.SegmentOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
-				return err
-			}
-		}
-		for _, output := range c.Egress.Room.ImageOutputs {
-			if err := checkOutputForCredentials(output.Output); err != nil {
-				return err
-			}
+		if checkOutputs(c.Egress.Room.FileOutputs, c.Egress.Room.SegmentOutputs, c.Egress.Room.ImageOutputs) {
+			return credentialsError
 		}
 		if len(c.Egress.Room.StreamOutputs) > 0 {
 			// do not leak stream key
 			return ErrSensitiveCredentials
 		}
 	}
+
 	if c.Egress.Tracks != nil {
-		if err := checkOutputForCredentials(c.Egress.Tracks.Output); err != nil {
-			return err
+		if checkOutputs(c.Egress.Tracks) {
+			return credentialsError
 		}
 	}
+
 	return nil
 }
 
@@ -108,56 +159,29 @@ func checkOutputForCredentials(output any) error {
 		return nil
 	}
 
-	switch msg := output.(type) {
-	case *livekit.EncodedFileOutput_S3:
-		if msg.S3.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_S3:
-		if msg.S3.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_S3:
-		if msg.S3.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.EncodedFileOutput_Gcp:
-		if msg.Gcp.Credentials != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_Gcp:
-		if msg.Gcp.Credentials != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_Gcp:
-		if msg.Gcp.Credentials != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.EncodedFileOutput_Azure:
-		if msg.Azure.AccountKey != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_Azure:
-		if msg.Azure.AccountKey != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_Azure:
-		if msg.Azure.AccountKey != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.EncodedFileOutput_AliOSS:
-		if msg.AliOSS.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.SegmentedFileOutput_AliOSS:
-		if msg.AliOSS.Secret != "" {
-			return ErrSensitiveCredentials
-		}
-	case *livekit.AutoTrackEgress_AliOSS:
-		if msg.AliOSS.Secret != "" {
-			return ErrSensitiveCredentials
+	credentialFields := map[string]string{
+		"S3":     "Secret",
+		"Gcp":    "Credentials",
+		"Azure":  "AccountKey",
+		"AliOSS": "Secret",
+	}
+
+	outputValue := reflect.ValueOf(output)
+	if outputValue.Kind() != reflect.Ptr || outputValue.IsNil() {
+		return nil
+	}
+
+	structValue := outputValue.Elem()
+	for providerField, credentialField := range credentialFields {
+		if field := structValue.FieldByName(providerField); field.IsValid() && !field.IsNil() {
+			if credField := field.Elem().FieldByName(credentialField); credField.IsValid() {
+				if credValue := credField.String(); credValue != "" {
+					return ErrSensitiveCredentials
+				}
+			}
 		}
 	}
+
 	return nil
 }
 
