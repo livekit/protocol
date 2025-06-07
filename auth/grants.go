@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"errors"
 	"maps"
 	"strings"
 
@@ -33,6 +34,8 @@ var tokenMarshaler = protojson.MarshalOptions{
 	EmitDefaultValues: false,
 }
 
+var ErrSensitiveCredentials = errors.New("room configuration should not contain sensitive credentials")
+
 func (c *RoomConfiguration) Clone() *RoomConfiguration {
 	if c == nil {
 		return nil
@@ -46,6 +49,116 @@ func (c *RoomConfiguration) MarshalJSON() ([]byte, error) {
 
 func (c *RoomConfiguration) UnmarshalJSON(data []byte) error {
 	return protojson.Unmarshal(data, (*livekit.RoomConfiguration)(c))
+}
+
+// CheckCredentials checks if the room configuration contains sensitive credentials
+// and returns an error if it does.
+//
+// This is used to prevent sensitive credentials from being leaked to the client.
+// It is not used to validate the credentials themselves, as that is done by the
+// egress service.
+func (c *RoomConfiguration) CheckCredentials() error {
+	if c.Egress == nil {
+		return nil
+	}
+
+	if c.Egress.Participant != nil {
+		for _, output := range c.Egress.Participant.FileOutputs {
+			if err := checkOutputForCredentials(output.Output); err != nil {
+				return err
+			}
+		}
+		for _, output := range c.Egress.Participant.SegmentOutputs {
+			if err := checkOutputForCredentials(output.Output); err != nil {
+				return err
+			}
+		}
+	}
+	if c.Egress.Room != nil {
+		for _, output := range c.Egress.Room.FileOutputs {
+			if err := checkOutputForCredentials(output.Output); err != nil {
+				return err
+			}
+		}
+		for _, output := range c.Egress.Room.SegmentOutputs {
+			if err := checkOutputForCredentials(output.Output); err != nil {
+				return err
+			}
+		}
+		for _, output := range c.Egress.Room.ImageOutputs {
+			if err := checkOutputForCredentials(output.Output); err != nil {
+				return err
+			}
+		}
+		if len(c.Egress.Room.StreamOutputs) > 0 {
+			// do not leak stream key
+			return ErrSensitiveCredentials
+		}
+	}
+	if c.Egress.Tracks != nil {
+		if err := checkOutputForCredentials(c.Egress.Tracks.Output); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func checkOutputForCredentials(output any) error {
+	if output == nil {
+		return nil
+	}
+
+	switch msg := output.(type) {
+	case *livekit.EncodedFileOutput_S3:
+		if msg.S3.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.SegmentedFileOutput_S3:
+		if msg.S3.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.AutoTrackEgress_S3:
+		if msg.S3.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.EncodedFileOutput_Gcp:
+		if msg.Gcp.Credentials != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.SegmentedFileOutput_Gcp:
+		if msg.Gcp.Credentials != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.AutoTrackEgress_Gcp:
+		if msg.Gcp.Credentials != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.EncodedFileOutput_Azure:
+		if msg.Azure.AccountKey != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.SegmentedFileOutput_Azure:
+		if msg.Azure.AccountKey != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.AutoTrackEgress_Azure:
+		if msg.Azure.AccountKey != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.EncodedFileOutput_AliOSS:
+		if msg.AliOSS.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.SegmentedFileOutput_AliOSS:
+		if msg.AliOSS.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	case *livekit.AutoTrackEgress_AliOSS:
+		if msg.AliOSS.Secret != "" {
+			return ErrSensitiveCredentials
+		}
+	}
+	return nil
 }
 
 type ClaimGrants struct {
