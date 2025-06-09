@@ -195,6 +195,9 @@ message ReconnectResponse {
   repeated ICEServer ice_servers = 1;
   ClientConfiguration client_configuration = 2;
   ServerInfo server_info = 3;
+
+  // last sequence number of reliable message received before resuming
+	uint32 last_message_seq = 4;
 }
 
 message TrackPublishedResponse {
@@ -380,6 +383,12 @@ message SyncState {
   // last received server side offer before reconnecting
   SessionDescription offer = 5;
   repeated string track_sids_disabled = 6;
+  repeated DataChannelReceiveState datachannel_receive_states = 7;
+}
+
+message DataChannelReceiveState {
+  string publisher_sid = 1;
+  uint32 last_seq = 2;
 }
 
 message DataChannelInfo {
