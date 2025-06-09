@@ -197,7 +197,7 @@ message ReconnectResponse {
   ServerInfo server_info = 3;
 
   // last sequence number of reliable message received before resuming
-	uint32 last_message_seq = 4;
+  uint32 last_message_seq = 4;
 }
 
 message TrackPublishedResponse {
