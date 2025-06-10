@@ -451,12 +451,129 @@ func matchNumbers(num string, allowed []string) bool {
 	return false
 }
 
+// TrunkMatchType indicates how a trunk was matched
+type TrunkMatchType int
+
+const (
+	// TrunkMatchEmpty indicates no trunks were defined
+	TrunkMatchEmpty TrunkMatchType = iota
+	// TrunkMatchNone indicates trunks exist but none matched
+	TrunkMatchNone
+	// TrunkMatchDefault indicates only a default trunk (with no specific numbers) matched
+	TrunkMatchDefault
+	// TrunkMatchSpecific indicates a trunk with specific numbers matched
+	TrunkMatchSpecific
+)
+
+// TrunkMatchResult provides detailed information about the trunk matching process
+type TrunkMatchResult struct {
+	// The matched trunk, if any
+	Trunk *livekit.SIPInboundTrunkInfo
+	// How the trunk was matched
+	MatchType TrunkMatchType
+	// Number of default trunks found
+	DefaultTrunkCount int
+}
+
 // MatchTrunk finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
 //
 // Deprecated: use MatchTrunkIter
 func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, call *rpc.SIPCall, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
 	return MatchTrunkIter(iters.Slice(trunks), call, opts...)
+}
+
+// MatchTrunkDetailed is like MatchTrunkIter but returns detailed match information
+func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*TrunkMatchResult, error) {
+	defer it.Close()
+	var opt matchTrunkOpts
+	for _, fnc := range opts {
+		fnc(&opt)
+	}
+	opt.defaults()
+
+	result := &TrunkMatchResult{
+		MatchType: TrunkMatchEmpty, // Start with assumption it's empty
+	}
+
+	var (
+		selectedTrunk    *livekit.SIPInboundTrunkInfo
+		defaultTrunk     *livekit.SIPInboundTrunkInfo
+		defaultTrunkPrev *livekit.SIPInboundTrunkInfo
+		sawAnyTrunk      bool
+	)
+	calledNorm := NormalizeNumber(call.To.User)
+	for {
+		tr, err := it.Next()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+		if !sawAnyTrunk {
+			sawAnyTrunk = true
+			result.MatchType = TrunkMatchNone // We have trunks but haven't matched any yet
+		}
+		tr = opt.Replace(tr)
+		// Do not consider it if number doesn't match.
+		if !matchNumbers(call.From.User, tr.AllowedNumbers) {
+			if !opt.Filtered(tr, TrunkFilteredCallingNumberDisallowed) {
+				continue
+			}
+		}
+		if !matchAddrMasks(call.SourceIp, call.From.Host, tr.AllowedAddresses) {
+			if !opt.Filtered(tr, TrunkFilteredSourceAddressDisallowed) {
+				continue
+			}
+		}
+		if len(tr.Numbers) == 0 {
+			// Default/wildcard trunk.
+			defaultTrunkPrev = defaultTrunk
+			defaultTrunk = tr
+			result.DefaultTrunkCount++
+		} else {
+			for _, num := range tr.Numbers {
+				if num == call.To.User || NormalizeNumber(num) == calledNorm {
+					// Trunk specific to the number.
+					if selectedTrunk != nil {
+						opt.Conflict(selectedTrunk, tr, TrunkConflictCalledNumber)
+						if opt.AllowConflicts {
+							// This path is unreachable, since we pick the first trunk. Kept for completeness.
+							continue
+						}
+						return nil, twirp.NewErrorf(twirp.FailedPrecondition, "Multiple SIP Trunks matched for %q", call.To.User)
+					}
+					selectedTrunk = tr
+					if opt.AllowConflicts {
+						// Pick the first match as soon as it's found. We don't care about conflicts.
+						result.Trunk = selectedTrunk
+						result.MatchType = TrunkMatchSpecific
+						return result, nil
+					}
+					// Keep searching! We want to know if there are any conflicting Trunk definitions.
+				} else {
+					opt.Filtered(tr, TrunkFilteredCalledNumberDisallowed)
+				}
+			}
+		}
+	}
+
+	if selectedTrunk != nil {
+		result.Trunk = selectedTrunk
+		result.MatchType = TrunkMatchSpecific
+		return result, nil
+	}
+	if result.DefaultTrunkCount > 1 {
+		opt.Conflict(defaultTrunk, defaultTrunkPrev, TrunkConflictDefault)
+		if !opt.AllowConflicts {
+			return nil, twirp.NewErrorf(twirp.FailedPrecondition, "Multiple default SIP Trunks matched for %q", call.To.User)
+		}
+	}
+	if defaultTrunk != nil {
+		result.Trunk = defaultTrunk
+		result.MatchType = TrunkMatchDefault
+	}
+	return result, nil
 }
 
 type matchTrunkOpts struct {
@@ -541,78 +658,11 @@ func WithTrunkReplace(fnc TrunkReplaceFunc) MatchTrunkOpt {
 // MatchTrunkIter finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
 func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
-	defer it.Close()
-	var opt matchTrunkOpts
-	for _, fnc := range opts {
-		fnc(&opt)
+	result, err := MatchTrunkDetailed(it, call, opts...)
+	if err != nil {
+		return nil, err
 	}
-	opt.defaults()
-	var (
-		selectedTrunk    *livekit.SIPInboundTrunkInfo
-		defaultTrunk     *livekit.SIPInboundTrunkInfo
-		defaultTrunkPrev *livekit.SIPInboundTrunkInfo
-		defaultTrunkCnt  int // to error in case there are multiple ones
-	)
-	calledNorm := NormalizeNumber(call.To.User)
-	for {
-		tr, err := it.Next()
-		if err == io.EOF {
-			break
-		} else if err != nil {
-			return nil, err
-		}
-		tr = opt.Replace(tr)
-		// Do not consider it if number doesn't match.
-		if !matchNumbers(call.From.User, tr.AllowedNumbers) {
-			if !opt.Filtered(tr, TrunkFilteredCallingNumberDisallowed) {
-				continue
-			}
-		}
-		if !matchAddrMasks(call.SourceIp, call.From.Host, tr.AllowedAddresses) {
-			if !opt.Filtered(tr, TrunkFilteredSourceAddressDisallowed) {
-				continue
-			}
-		}
-		if len(tr.Numbers) == 0 {
-			// Default/wildcard trunk.
-			defaultTrunkPrev = defaultTrunk
-			defaultTrunk = tr
-			defaultTrunkCnt++
-		} else {
-			for _, num := range tr.Numbers {
-				if num == call.To.User || NormalizeNumber(num) == calledNorm {
-					// Trunk specific to the number.
-					if selectedTrunk != nil {
-						opt.Conflict(selectedTrunk, tr, TrunkConflictCalledNumber)
-						if opt.AllowConflicts {
-							// This path is unreachable, since we pick the first trunk. Kept for completeness.
-							continue
-						}
-						return nil, twirp.NewErrorf(twirp.FailedPrecondition, "Multiple SIP Trunks matched for %q", call.To.User)
-					}
-					selectedTrunk = tr
-					if opt.AllowConflicts {
-						// Pick the first match as soon as it's found. We don't care about conflicts.
-						return selectedTrunk, nil
-					}
-					// Keep searching! We want to know if there are any conflicting Trunk definitions.
-				} else {
-					opt.Filtered(tr, TrunkFilteredCalledNumberDisallowed)
-				}
-			}
-		}
-	}
-	if selectedTrunk != nil {
-		return selectedTrunk, nil
-	}
-	if defaultTrunkCnt > 1 {
-		opt.Conflict(defaultTrunk, defaultTrunkPrev, TrunkConflictDefault)
-		if !opt.AllowConflicts {
-			return nil, twirp.NewErrorf(twirp.FailedPrecondition, "Multiple default SIP Trunks matched for %q", call.To.User)
-		}
-	}
-	// Could still be nil here.
-	return defaultTrunk, nil
+	return result.Trunk, nil
 }
 
 // MatchDispatchRule finds the best dispatch rule matching the request parameters. Returns an error if no rule matched.
