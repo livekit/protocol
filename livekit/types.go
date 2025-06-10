@@ -45,6 +45,18 @@ type JobID string
 type DispatchID string
 type AgentName string
 
+func (s TrackID) String() string             { return string(s) }
+func (s ParticipantID) String() string       { return string(s) }
+func (s ParticipantIdentity) String() string { return string(s) }
+func (s ParticipantName) String() string     { return string(s) }
+func (s RoomID) String() string              { return string(s) }
+func (s RoomName) String() string            { return string(s) }
+func (s ConnectionID) String() string        { return string(s) }
+func (s NodeID) String() string              { return string(s) }
+func (s JobID) String() string               { return string(s) }
+func (s DispatchID) String() string          { return string(s) }
+func (s AgentName) String() string           { return string(s) }
+
 type stringTypes interface {
 	ParticipantID | RoomID | TrackID | ParticipantIdentity | ParticipantName | RoomName | ConnectionID | NodeID
 }
