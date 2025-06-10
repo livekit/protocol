@@ -1,0 +1,108 @@
+// Code generated; DO NOT EDIT.
+
+package agentsobs
+
+import (
+	"time"
+)
+
+var (
+	_ Reporter        = (*noopReporter)(nil)
+	_ ProjectReporter = (*noopProjectReporter)(nil)
+	_ AgentReporter   = (*noopAgentReporter)(nil)
+	_ WorkerReporter  = (*noopWorkerReporter)(nil)
+	_ JobReporter     = (*noopJobReporter)(nil)
+)
+
+type noopKeyResolver struct{}
+
+func (noopKeyResolver) Resolve(string) {}
+func (noopKeyResolver) Reset()         {}
+
+type noopReporter struct{}
+
+func NewNoopReporter() Reporter {
+	return &noopReporter{}
+}
+
+func (r *noopReporter) WithProject(id string) ProjectReporter {
+	return &noopProjectReporter{}
+}
+
+func (r *noopReporter) WithDeferredProject() (ProjectReporter, KeyResolver) {
+	return &noopProjectReporter{}, noopKeyResolver{}
+}
+
+type noopProjectReporter struct{}
+
+func NewNoopProjectReporter() ProjectReporter {
+	return &noopProjectReporter{}
+}
+
+func (r *noopProjectReporter) RegisterFunc(f func(ts time.Time, tx ProjectTx) bool) {}
+func (r *noopProjectReporter) Tx(f func(ProjectTx))                                 {}
+func (r *noopProjectReporter) TxAt(ts time.Time, f func(ProjectTx))                 {}
+func (r *noopProjectReporter) WithAgent(name string) AgentReporter {
+	return &noopAgentReporter{}
+}
+func (r *noopProjectReporter) WithDeferredAgent() (AgentReporter, KeyResolver) {
+	return &noopAgentReporter{}, noopKeyResolver{}
+}
+
+type noopAgentReporter struct{}
+
+func NewNoopAgentReporter() AgentReporter {
+	return &noopAgentReporter{}
+}
+
+func (r *noopAgentReporter) RegisterFunc(f func(ts time.Time, tx AgentTx) bool) {}
+func (r *noopAgentReporter) Tx(f func(AgentTx))                                 {}
+func (r *noopAgentReporter) TxAt(ts time.Time, f func(AgentTx))                 {}
+func (r *noopAgentReporter) WithWorker(id string) WorkerReporter {
+	return &noopWorkerReporter{}
+}
+func (r *noopAgentReporter) WithDeferredWorker() (WorkerReporter, KeyResolver) {
+	return &noopWorkerReporter{}, noopKeyResolver{}
+}
+
+type noopWorkerReporter struct{}
+
+func NewNoopWorkerReporter() WorkerReporter {
+	return &noopWorkerReporter{}
+}
+
+func (r *noopWorkerReporter) RegisterFunc(f func(ts time.Time, tx WorkerTx) bool) {}
+func (r *noopWorkerReporter) Tx(f func(WorkerTx))                                 {}
+func (r *noopWorkerReporter) TxAt(ts time.Time, f func(WorkerTx))                 {}
+func (r *noopWorkerReporter) ReportMem(v float32)                                 {}
+func (r *noopWorkerReporter) ReportCPU(v float32)                                 {}
+func (r *noopWorkerReporter) ReportLoad(v float32)                                {}
+func (r *noopWorkerReporter) ReportStatus(v WorkerStatus)                         {}
+func (r *noopWorkerReporter) ReportRegion(v string)                               {}
+func (r *noopWorkerReporter) ReportVersion(v string)                              {}
+func (r *noopWorkerReporter) ReportStartedAt(v time.Time)                         {}
+func (r *noopWorkerReporter) ReportJobsCurrent(v uint16)                          {}
+func (r *noopWorkerReporter) ReportKind(v AgentKind)                              {}
+func (r *noopWorkerReporter) WithJob(id string) JobReporter {
+	return &noopJobReporter{}
+}
+func (r *noopWorkerReporter) WithDeferredJob() (JobReporter, KeyResolver) {
+	return &noopJobReporter{}, noopKeyResolver{}
+}
+
+type noopJobReporter struct{}
+
+func NewNoopJobReporter() JobReporter {
+	return &noopJobReporter{}
+}
+
+func (r *noopJobReporter) RegisterFunc(f func(ts time.Time, tx JobTx) bool) {}
+func (r *noopJobReporter) Tx(f func(JobTx))                                 {}
+func (r *noopJobReporter) TxAt(ts time.Time, f func(JobTx))                 {}
+func (r *noopJobReporter) ReportRoomSessionID(v string)                     {}
+func (r *noopJobReporter) ReportKind(v JobKind)                             {}
+func (r *noopJobReporter) ReportStatus(v JobStatus)                         {}
+func (r *noopJobReporter) ReportDuration(v uint32)                          {}
+func (r *noopJobReporter) ReportDispatchedAt(v time.Time)                   {}
+func (r *noopJobReporter) ReportJoinedAt(v time.Time)                       {}
+func (r *noopJobReporter) ReportCompletedAt(v time.Time)                    {}
