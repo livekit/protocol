@@ -825,7 +825,7 @@ func TestMatchMasks(t *testing.T) {
 	}
 }
 
-func TestMatchTrunkIterDetailed(t *testing.T) {
+func TestMatchTrunkDetailed(t *testing.T) {
 	for _, c := range []struct {
 		name            string
 		trunks          []*livekit.SIPInboundTrunkInfo
@@ -937,7 +937,7 @@ func TestMatchTrunkIterDetailed(t *testing.T) {
 			call.Address = call.To
 
 			var conflicts []string
-			result, err := MatchTrunkIterDetailed(iters.Slice(c.trunks), call, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
+			result, err := MatchTrunkDetailed(iters.Slice(c.trunks), call, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
 				conflicts = append(conflicts, fmt.Sprintf("%v: %v vs %v", reason, t1.SipTrunkId, t2.SipTrunkId))
 			}))
 

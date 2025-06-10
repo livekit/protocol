@@ -483,8 +483,8 @@ func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, call *rpc.SIPCall, opts .
 	return MatchTrunkIter(iters.Slice(trunks), call, opts...)
 }
 
-// MatchTrunkIterDetailed is like MatchTrunkIter but returns detailed match information
-func MatchTrunkIterDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*TrunkMatchResult, error) {
+// MatchTrunkDetailed is like MatchTrunkIter but returns detailed match information
+func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*TrunkMatchResult, error) {
 	defer it.Close()
 	var opt matchTrunkOpts
 	for _, fnc := range opts {
@@ -658,7 +658,7 @@ func WithTrunkReplace(fnc TrunkReplaceFunc) MatchTrunkOpt {
 // MatchTrunkIter finds a SIP Trunk definition matching the request.
 // Returns nil if no rules matched or an error if there are conflicting definitions.
 func MatchTrunkIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*livekit.SIPInboundTrunkInfo, error) {
-	result, err := MatchTrunkIterDetailed(it, call, opts...)
+	result, err := MatchTrunkDetailed(it, call, opts...)
 	if err != nil {
 		return nil, err
 	}
