@@ -824,3 +824,140 @@ func TestMatchMasks(t *testing.T) {
 		})
 	}
 }
+
+func TestMatchTrunkIterDetailed(t *testing.T) {
+	for _, c := range []struct {
+		name            string
+		trunks          []*livekit.SIPInboundTrunkInfo
+		expMatchType    TrunkMatchType
+		expTrunkID      string
+		expDefaultCount int
+		expErr          bool
+		from            string
+		to              string
+		src             string
+		host            string
+	}{
+		{
+			name:         "empty",
+			trunks:       nil,
+			expMatchType: TrunkMatchEmpty,
+			expTrunkID:   "",
+			expErr:       false,
+		},
+		{
+			name: "one wildcard",
+			trunks: []*livekit.SIPInboundTrunkInfo{
+				{SipTrunkId: "aaa"},
+			},
+			expMatchType:    TrunkMatchDefault,
+			expTrunkID:      "aaa",
+			expDefaultCount: 1,
+			expErr:          false,
+		},
+		{
+			name: "specific match",
+			trunks: []*livekit.SIPInboundTrunkInfo{
+				{SipTrunkId: "aaa", Numbers: []string{sipNumber2}},
+			},
+			expMatchType:    TrunkMatchSpecific,
+			expTrunkID:      "aaa",
+			expDefaultCount: 0,
+			expErr:          false,
+		},
+		{
+			name: "no match with trunks",
+			trunks: []*livekit.SIPInboundTrunkInfo{
+				{SipTrunkId: "aaa", Numbers: []string{sipNumber3}},
+			},
+			expMatchType:    TrunkMatchNone,
+			expTrunkID:      "",
+			expDefaultCount: 0,
+			expErr:          false,
+		},
+		{
+			name: "multiple defaults",
+			trunks: []*livekit.SIPInboundTrunkInfo{
+				{SipTrunkId: "aaa"},
+				{SipTrunkId: "bbb"},
+			},
+			expMatchType:    TrunkMatchDefault,
+			expTrunkID:      "aaa",
+			expDefaultCount: 2,
+			expErr:          true,
+		},
+		{
+			name: "specific over default",
+			trunks: []*livekit.SIPInboundTrunkInfo{
+				{SipTrunkId: "aaa"},
+				{SipTrunkId: "bbb", Numbers: []string{sipNumber2}},
+			},
+			expMatchType:    TrunkMatchSpecific,
+			expTrunkID:      "bbb",
+			expDefaultCount: 1,
+			expErr:          false,
+		},
+		{
+			name: "multiple specific",
+			trunks: []*livekit.SIPInboundTrunkInfo{
+				{SipTrunkId: "aaa", Numbers: []string{sipNumber2}},
+				{SipTrunkId: "bbb", Numbers: []string{sipNumber2}},
+			},
+			expMatchType:    TrunkMatchSpecific,
+			expTrunkID:      "aaa",
+			expDefaultCount: 0,
+			expErr:          true,
+		},
+	} {
+		c := c
+		t.Run(c.name, func(t *testing.T) {
+			from, to, src, host := c.from, c.to, c.src, c.host
+			if from == "" {
+				from = sipNumber1
+			}
+			if to == "" {
+				to = sipNumber2
+			}
+			if src == "" {
+				src = "1.1.1.1"
+			}
+			if host == "" {
+				host = "sip.example.com"
+			}
+			call := &rpc.SIPCall{
+				SourceIp: src,
+				From: &livekit.SIPUri{
+					User: from,
+					Host: host,
+				},
+				To: &livekit.SIPUri{
+					User: to,
+				},
+			}
+			call.Address = call.To
+
+			var conflicts []string
+			result, err := MatchTrunkIterDetailed(iters.Slice(c.trunks), call, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
+				conflicts = append(conflicts, fmt.Sprintf("%v: %v vs %v", reason, t1.SipTrunkId, t2.SipTrunkId))
+			}))
+
+			if c.expErr {
+				require.Error(t, err)
+				require.NotEmpty(t, conflicts, "expected conflicts but got none")
+			} else {
+				require.NoError(t, err)
+				require.Empty(t, conflicts, "unexpected conflicts: %v", conflicts)
+
+				if c.expTrunkID == "" {
+					require.Nil(t, result.Trunk)
+				} else {
+					require.NotNil(t, result.Trunk)
+					require.Equal(t, c.expTrunkID, result.Trunk.SipTrunkId)
+				}
+
+				require.Equal(t, c.expMatchType, result.MatchType)
+				require.Equal(t, c.expDefaultCount, result.DefaultTrunkCount)
+			}
+		})
+	}
+}
