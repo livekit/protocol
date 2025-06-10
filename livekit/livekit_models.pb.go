@@ -2263,9 +2263,13 @@ type DataPacket struct {
 	//	*DataPacket_StreamHeader
 	//	*DataPacket_StreamChunk
 	//	*DataPacket_StreamTrailer
-	Value         isDataPacket_Value `protobuf_oneof:"value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Value isDataPacket_Value `protobuf_oneof:"value"`
+	// sequence number of reliable packet
+	Sequence uint32 `protobuf:"varint,16,opt,name=sequence,proto3" json:"sequence,omitempty"`
+	// sid of the user that sent the message
+	ParticipantSid string `protobuf:"bytes,17,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *DataPacket) Reset() {
@@ -2434,6 +2438,20 @@ func (x *DataPacket) GetStreamTrailer() *DataStream_Trailer {
 		}
 	}
 	return nil
+}
+
+func (x *DataPacket) GetSequence() uint32 {
+	if x != nil {
+		return x.Sequence
+	}
+	return 0
+}
+
+func (x *DataPacket) GetParticipantSid() string {
+	if x != nil {
+		return x.ParticipantSid
+	}
+	return ""
 }
 
 type isDataPacket_Value interface {
@@ -5323,7 +5341,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x05width\x18\x02 \x01(\rR\x05width\x12\x16\n" +
 	"\x06height\x18\x03 \x01(\rR\x06height\x12\x18\n" +
 	"\abitrate\x18\x04 \x01(\rR\abitrate\x12\x12\n" +
-	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\"\x80\a\n" +
+	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\"\xc5\a\n" +
 	"\n" +
 	"DataPacket\x120\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.livekit.DataPacket.KindB\x02\x18\x01R\x04kind\x121\n" +
@@ -5342,7 +5360,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\frpc_response\x18\f \x01(\v2\x14.livekit.RpcResponseH\x00R\vrpcResponse\x12A\n" +
 	"\rstream_header\x18\r \x01(\v2\x1a.livekit.DataStream.HeaderH\x00R\fstreamHeader\x12>\n" +
 	"\fstream_chunk\x18\x0e \x01(\v2\x19.livekit.DataStream.ChunkH\x00R\vstreamChunk\x12D\n" +
-	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\"\x1f\n" +
+	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\x12\x1a\n" +
+	"\bsequence\x18\x10 \x01(\rR\bsequence\x12'\n" +
+	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\"\x1f\n" +
 	"\x04Kind\x12\f\n" +
 	"\bRELIABLE\x10\x00\x12\t\n" +
 	"\x05LOSSY\x10\x01B\a\n" +
