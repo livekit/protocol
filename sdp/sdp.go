@@ -153,9 +153,39 @@ func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
 	return streamID, true
 }
 
-func IsMediaDescriptionSimulcast(m *sdp.MediaDescription) bool {
-	_, ok := m.Attribute("simulcast")
-	return ok
+func GetMediaStreamTrack(m *sdp.MediaDescription) string {
+	mst := ""
+	msid, ok := m.Attribute(sdp.AttrKeyMsid)
+	if ok {
+		if parts := strings.Split(msid, " "); len(parts) == 2 {
+			mst = parts[1]
+		}
+	}
+
+	if mst == "" {
+		attr, ok := m.Attribute(sdp.AttrKeySSRC)
+		if ok {
+			parts := strings.Split(attr, " ")
+			if len(parts) == 3 && strings.HasPrefix(strings.ToLower(parts[1]), "msid:") {
+				mst = parts[2]
+			}
+		}
+	}
+	return mst
+}
+
+func GetSimulcastRids(m *sdp.MediaDescription) ([]string, bool) {
+	val, ok := m.Attribute("simulcast")
+	if !ok {
+		return nil, false
+	}
+
+	parts := strings.Split(val, " ")
+	if len(parts) != 2 || parts[0] != "send" {
+		return nil, false
+	}
+
+	return strings.Split(parts[1], ";"), true
 }
 
 func CodecsFromMediaDescription(m *sdp.MediaDescription) (out []sdp.Codec, err error) {
