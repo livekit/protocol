@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.39.1
+
+### Patch Changes
+
+- adding detailed responses to the trunk match logic which can help with decisions on blocking - [#1101](https://github.com/livekit/protocol/pull/1101) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- E2E reliability for data channel - [#1099](https://github.com/livekit/protocol/pull/1099) ([@cnderrauber](https://github.com/cnderrauber))
+
+- ensure access token do not contain sensitive credentials - [#1097](https://github.com/livekit/protocol/pull/1097) ([@davidzhao](https://github.com/davidzhao))
+
+- WHIP internal signalling to be able to support WHIP in OSS. - [#1091](https://github.com/livekit/protocol/pull/1091) ([@boks1971](https://github.com/boks1971))
+
 ## 1.39.0
 
 ### Patch Changes
