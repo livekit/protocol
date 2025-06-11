@@ -74,8 +74,8 @@ func NewNoopWorkerReporter() WorkerReporter {
 func (r *noopWorkerReporter) RegisterFunc(f func(ts time.Time, tx WorkerTx) bool) {}
 func (r *noopWorkerReporter) Tx(f func(WorkerTx))                                 {}
 func (r *noopWorkerReporter) TxAt(ts time.Time, f func(WorkerTx))                 {}
-func (r *noopWorkerReporter) ReportMem(v float32)                                 {}
-func (r *noopWorkerReporter) ReportCPU(v float32)                                 {}
+func (r *noopWorkerReporter) ReportMem(v int64)                                   {}
+func (r *noopWorkerReporter) ReportCPU(v int64)                                   {}
 func (r *noopWorkerReporter) ReportLoad(v float32)                                {}
 func (r *noopWorkerReporter) ReportStatus(v WorkerStatus)                         {}
 func (r *noopWorkerReporter) ReportRegion(v string)                               {}
