@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_JDTUL28 = true
+const Version_1MM59JG = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -44,8 +44,8 @@ type WorkerReporter interface {
 	TxAt(time.Time, func(tx WorkerTx))
 	WithJob(id string) JobReporter
 	WithDeferredJob() (JobReporter, KeyResolver)
-	ReportMem(v float32)
-	ReportCPU(v float32)
+	ReportMem(v int64)
+	ReportCPU(v int64)
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportRegion(v string)
@@ -56,8 +56,8 @@ type WorkerReporter interface {
 }
 
 type WorkerTx interface {
-	ReportMem(v float32)
-	ReportCPU(v float32)
+	ReportMem(v int64)
+	ReportCPU(v int64)
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportRegion(v string)
