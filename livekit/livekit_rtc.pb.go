@@ -1741,6 +1741,7 @@ type SessionDescription struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"` // "answer" | "offer" | "pranswer" | "rollback"
 	Sdp           string                 `protobuf:"bytes,2,opt,name=sdp,proto3" json:"sdp,omitempty"`
+	Id            uint32                 `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1787,6 +1788,13 @@ func (x *SessionDescription) GetSdp() string {
 		return x.Sdp
 	}
 	return ""
+}
+
+func (x *SessionDescription) GetId() uint32 {
+	if x != nil {
+		return x.Id
+	}
+	return 0
 }
 
 type ParticipantUpdate struct {
@@ -3971,10 +3979,11 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12(\n" +
 	"\x05track\x18\x02 \x01(\v2\x12.livekit.TrackInfoR\x05track\"7\n" +
 	"\x18TrackUnpublishedResponse\x12\x1b\n" +
-	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\":\n" +
+	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"J\n" +
 	"\x12SessionDescription\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x10\n" +
-	"\x03sdp\x18\x02 \x01(\tR\x03sdp\"Q\n" +
+	"\x03sdp\x18\x02 \x01(\tR\x03sdp\x12\x0e\n" +
+	"\x02id\x18\x03 \x01(\rR\x02id\"Q\n" +
 	"\x11ParticipantUpdate\x12<\n" +
 	"\fparticipants\x18\x01 \x03(\v2\x18.livekit.ParticipantInfoR\fparticipants\"\x9c\x01\n" +
 	"\x12UpdateSubscription\x12\x1d\n" +
