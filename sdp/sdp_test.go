@@ -51,7 +51,8 @@ func TestSDPUtilFunctions(t *testing.T) {
 	require.False(t, found)
 	require.Empty(t, streamID)
 
-	require.False(t, IsMediaDescriptionSimulcast(parsed.MediaDescriptions[1]))
+	_, ok := GetSimulcastRids(parsed.MediaDescriptions[1])
+	require.False(t, ok)
 
 	codecs, err := CodecsFromMediaDescription(parsed.MediaDescriptions[0])
 	require.NoError(t, err)
