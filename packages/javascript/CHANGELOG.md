@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.39.2
+
+### Patch Changes
+
+- Add id field to SessionDescription message - [#1105](https://github.com/livekit/protocol/pull/1105) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.39.1
 
 ### Patch Changes
