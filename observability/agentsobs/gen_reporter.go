@@ -44,8 +44,10 @@ type WorkerReporter interface {
 	TxAt(time.Time, func(tx WorkerTx))
 	WithJob(id string) JobReporter
 	WithDeferredJob() (JobReporter, KeyResolver)
-	ReportMem(v int64)
 	ReportCPU(v int64)
+	ReportCPULimit(v int64)
+	ReportMem(v int64)
+	ReportMemLimit(v int64)
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportRegion(v string)
@@ -56,8 +58,10 @@ type WorkerReporter interface {
 }
 
 type WorkerTx interface {
-	ReportMem(v int64)
 	ReportCPU(v int64)
+	ReportCPULimit(v int64)
+	ReportMem(v int64)
+	ReportMemLimit(v int64)
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportRegion(v string)
