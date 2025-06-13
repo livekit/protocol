@@ -2171,6 +2171,8 @@ type VideoLayer struct {
 	// target bitrate in bit per second (bps), server will measure actual
 	Bitrate       uint32 `protobuf:"varint,4,opt,name=bitrate,proto3" json:"bitrate,omitempty"`
 	Ssrc          uint32 `protobuf:"varint,5,opt,name=ssrc,proto3" json:"ssrc,omitempty"`
+	SpatialLayer  int32  `protobuf:"varint,6,opt,name=spatial_layer,json=spatialLayer,proto3" json:"spatial_layer,omitempty"`
+	Rid           string `protobuf:"bytes,7,opt,name=rid,proto3" json:"rid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2238,6 +2240,20 @@ func (x *VideoLayer) GetSsrc() uint32 {
 		return x.Ssrc
 	}
 	return 0
+}
+
+func (x *VideoLayer) GetSpatialLayer() int32 {
+	if x != nil {
+		return x.SpatialLayer
+	}
+	return 0
+}
+
+func (x *VideoLayer) GetRid() string {
+	if x != nil {
+		return x.Rid
+	}
+	return ""
 }
 
 // new DataPacket API
@@ -5334,14 +5350,16 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06stream\x18\x11 \x01(\tR\x06stream\x12/\n" +
 	"\aversion\x18\x12 \x01(\v2\x15.livekit.TimedVersionR\aversion\x12A\n" +
 	"\x0eaudio_features\x18\x13 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12J\n" +
-	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\x99\x01\n" +
+	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\xd0\x01\n" +
 	"\n" +
 	"VideoLayer\x12/\n" +
 	"\aquality\x18\x01 \x01(\x0e2\x15.livekit.VideoQualityR\aquality\x12\x14\n" +
 	"\x05width\x18\x02 \x01(\rR\x05width\x12\x16\n" +
 	"\x06height\x18\x03 \x01(\rR\x06height\x12\x18\n" +
 	"\abitrate\x18\x04 \x01(\rR\abitrate\x12\x12\n" +
-	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\"\xc5\a\n" +
+	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\x12#\n" +
+	"\rspatial_layer\x18\x06 \x01(\x05R\fspatialLayer\x12\x10\n" +
+	"\x03rid\x18\a \x01(\tR\x03rid\"\xc5\a\n" +
 	"\n" +
 	"DataPacket\x120\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.livekit.DataPacket.KindB\x02\x18\x01R\x04kind\x121\n" +
