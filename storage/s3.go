@@ -31,9 +31,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/livekit/psrpc"
-
 	"github.com/livekit/protocol/logger"
+	"github.com/livekit/psrpc"
 )
 
 const (
