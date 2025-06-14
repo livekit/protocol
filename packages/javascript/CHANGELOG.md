@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.39.3
+
+### Patch Changes
+
+- Move uploader code from Egress - [#1108](https://github.com/livekit/protocol/pull/1108) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.39.2
 
 ### Patch Changes
