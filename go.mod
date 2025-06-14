@@ -2,8 +2,6 @@ module github.com/livekit/protocol
 
 go 1.23.1
 
-toolchain go1.24.1
-
 require (
 	buf.build/go/protoyaml v0.6.0
 	cloud.google.com/go/storage v1.49.0
