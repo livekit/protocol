@@ -40,6 +40,7 @@ message JobState {
   int64 ended_at = 4;
   int64 updated_at = 5;
   string participant_identity = 6;
+  string worker_id = 7;
 }
 
 // from Worker to Server
