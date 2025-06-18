@@ -25,6 +25,10 @@ type terminalError struct {
 	error
 }
 
+func (e terminalError) Unwrap() error {
+	return e.error
+}
+
 func TerminalError(err error) error {
 	return terminalError{err}
 }
