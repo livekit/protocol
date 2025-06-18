@@ -9,6 +9,14 @@ const (
 	WorkerStatusFull      WorkerStatus = "full"
 )
 
+type WorkerState string
+
+const (
+	WorkerStateUndefined WorkerState = ""
+	WorkerStateOnline    WorkerState = "online"
+	WorkerStateOffline   WorkerState = "offline"
+)
+
 type AgentKind string
 
 const (
