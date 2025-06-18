@@ -1085,6 +1085,7 @@ const (
 	ClientInfo_UNITY_WEB    ClientInfo_SDK = 11
 	ClientInfo_NODE         ClientInfo_SDK = 12
 	ClientInfo_UNREAL       ClientInfo_SDK = 13
+	ClientInfo_ESP32        ClientInfo_SDK = 14
 )
 
 // Enum value maps for ClientInfo_SDK.
@@ -1104,6 +1105,7 @@ var (
 		11: "UNITY_WEB",
 		12: "NODE",
 		13: "UNREAL",
+		14: "ESP32",
 	}
 	ClientInfo_SDK_value = map[string]int32{
 		"UNKNOWN":      0,
@@ -1120,6 +1122,7 @@ var (
 		"UNITY_WEB":    11,
 		"NODE":         12,
 		"UNREAL":       13,
+		"ESP32":        14,
 	}
 )
 
@@ -5468,7 +5471,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
 	"\aEdition\x12\f\n" +
 	"\bStandard\x10\x00\x12\t\n" +
-	"\x05Cloud\x10\x01\"\x80\x04\n" +
+	"\x05Cloud\x10\x01\"\x8b\x04\n" +
 	"\n" +
 	"ClientInfo\x12)\n" +
 	"\x03sdk\x18\x01 \x01(\x0e2\x17.livekit.ClientInfo.SDKR\x03sdk\x12\x18\n" +
@@ -5484,7 +5487,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\anetwork\x18\n" +
 	" \x01(\tR\anetwork\x12\x1d\n" +
 	"\n" +
-	"other_sdks\x18\v \x01(\tR\totherSdks\"\xa8\x01\n" +
+	"other_sdks\x18\v \x01(\tR\totherSdks\"\xb3\x01\n" +
 	"\x03SDK\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x06\n" +
 	"\x02JS\x10\x01\x12\t\n" +
@@ -5502,7 +5505,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\tUNITY_WEB\x10\v\x12\b\n" +
 	"\x04NODE\x10\f\x12\n" +
 	"\n" +
-	"\x06UNREAL\x10\r\"\xc9\x02\n" +
+	"\x06UNREAL\x10\r\x12\t\n" +
+	"\x05ESP32\x10\x0e\"\xc9\x02\n" +
 	"\x13ClientConfiguration\x121\n" +
 	"\x05video\x18\x01 \x01(\v2\x1b.livekit.VideoConfigurationR\x05video\x123\n" +
 	"\x06screen\x18\x02 \x01(\v2\x1b.livekit.VideoConfigurationR\x06screen\x12I\n" +

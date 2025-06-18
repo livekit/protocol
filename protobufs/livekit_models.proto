@@ -423,6 +423,7 @@ message ClientInfo {
      UNITY_WEB = 11;
      NODE = 12;
      UNREAL = 13;
+     ESP32 = 14;
   }
 
   SDK sdk = 1;
