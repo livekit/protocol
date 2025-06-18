@@ -83,6 +83,7 @@ func (r *noopWorkerReporter) ReportStatus(v WorkerStatus)                       
 func (r *noopWorkerReporter) ReportRegion(v string)                               {}
 func (r *noopWorkerReporter) ReportVersion(v string)                              {}
 func (r *noopWorkerReporter) ReportSdkVersion(v string)                           {}
+func (r *noopWorkerReporter) ReportState(v WorkerState)                           {}
 func (r *noopWorkerReporter) ReportStartedAt(v time.Time)                         {}
 func (r *noopWorkerReporter) ReportJobsCurrent(v uint16)                          {}
 func (r *noopWorkerReporter) ReportKind(v AgentKind)                              {}
