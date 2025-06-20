@@ -284,6 +284,8 @@ type AgentDeployment struct {
 	CurCpu        string                 `protobuf:"bytes,8,opt,name=cur_cpu,json=curCpu,proto3" json:"cur_cpu,omitempty"`
 	CurMem        string                 `protobuf:"bytes,9,opt,name=cur_mem,json=curMem,proto3" json:"cur_mem,omitempty"`
 	MemReq        string                 `protobuf:"bytes,10,opt,name=mem_req,json=memReq,proto3" json:"mem_req,omitempty"`
+	MemLimit      string                 `protobuf:"bytes,11,opt,name=mem_limit,json=memLimit,proto3" json:"mem_limit,omitempty"`
+	CpuLimit      string                 `protobuf:"bytes,12,opt,name=cpu_limit,json=cpuLimit,proto3" json:"cpu_limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -384,6 +386,20 @@ func (x *AgentDeployment) GetCurMem() string {
 func (x *AgentDeployment) GetMemReq() string {
 	if x != nil {
 		return x.MemReq
+	}
+	return ""
+}
+
+func (x *AgentDeployment) GetMemLimit() string {
+	if x != nil {
+		return x.MemLimit
+	}
+	return ""
+}
+
+func (x *AgentDeployment) GetCpuLimit() string {
+	if x != nil {
+		return x.CpuLimit
 	}
 	return ""
 }
@@ -1626,7 +1642,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x18\n" +
 	"\aversion\x18\x04 \x01(\tR\aversion\x12#\n" +
-	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\"\xa2\x02\n" +
+	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\"\xdc\x02\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\x12\x16\n" +
@@ -1638,7 +1654,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\acur_cpu\x18\b \x01(\tR\x06curCpu\x12\x17\n" +
 	"\acur_mem\x18\t \x01(\tR\x06curMem\x12\x17\n" +
 	"\amem_req\x18\n" +
-	" \x01(\tR\x06memReq\"\x93\x02\n" +
+	" \x01(\tR\x06memReq\x12\x1b\n" +
+	"\tmem_limit\x18\v \x01(\tR\bmemLimit\x12\x1b\n" +
+	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\"\x93\x02\n" +
 	"\tAgentInfo\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +

@@ -56,6 +56,8 @@ message AgentDeployment {
     string cur_cpu = 8;
     string cur_mem = 9;
     string mem_req = 10;
+    string mem_limit = 11;
+    string cpu_limit = 12;
 }
 
 message AgentInfo {
