@@ -6,6 +6,7 @@ const Project = "livekit"
 
 type Reporter interface {
 	Room() roomobs.Reporter
+	Close()
 }
 
 func NewReporter() Reporter {
@@ -17,3 +18,5 @@ type reporter struct{}
 func (reporter) Room() roomobs.Reporter {
 	return roomobs.NewNoopReporter()
 }
+
+func (reporter) Close() {}
