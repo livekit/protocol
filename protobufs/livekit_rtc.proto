@@ -212,6 +212,7 @@ message TrackUnpublishedResponse {
 message SessionDescription {
   string type = 1; // "answer" | "offer" | "pranswer" | "rollback"
   string sdp = 2;
+  uint32 id = 3;
 }
 
 message ParticipantUpdate {

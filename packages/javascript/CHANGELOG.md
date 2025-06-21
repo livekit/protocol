@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.39.2
+
+### Patch Changes
+
+- Add id field to SessionDescription message - [#1105](https://github.com/livekit/protocol/pull/1105) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.39.1
+
+### Patch Changes
+
+- E2E reliability for data channel - [#1099](https://github.com/livekit/protocol/pull/1099) ([@cnderrauber](https://github.com/cnderrauber))
+
+- WHIP internal signalling to be able to support WHIP in OSS. - [#1091](https://github.com/livekit/protocol/pull/1091) ([@boks1971](https://github.com/boks1971))
+
 ## 1.39.0
 
 ### Minor Changes

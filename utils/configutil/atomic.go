@@ -73,10 +73,8 @@ type AtomicValue[T any] struct {
 	v atomic.Value
 }
 
-func newAtomicValue[T any](v T) *AtomicValue[T] {
-	a := &AtomicValue[T]{}
-	a.Store(v)
-	return a
+func newAtomicValue[T any](_ T) *AtomicValue[T] {
+	return &AtomicValue[T]{}
 }
 
 func (a *AtomicValue[T]) Store(v T) {
