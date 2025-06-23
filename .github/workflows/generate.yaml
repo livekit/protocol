@@ -51,8 +51,6 @@ jobs:
         run: mage proto
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 8
 
       - name: Use Node.js 20
         uses: actions/setup-node@v4
