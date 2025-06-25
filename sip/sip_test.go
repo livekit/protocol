@@ -256,7 +256,8 @@ func TestSIPMatchTrunk(t *testing.T) {
 			}
 			trunks := toInboundTrunks(c.trunks)
 			call := &rpc.SIPCall{
-				SourceIp: src,
+				SipCallId: "test-call-id",
+				SourceIp:  src,
 				From: &livekit.SIPUri{
 					User: from,
 					Host: host,
@@ -925,7 +926,8 @@ func TestMatchTrunkDetailed(t *testing.T) {
 				host = "sip.example.com"
 			}
 			call := &rpc.SIPCall{
-				SourceIp: src,
+				SipCallId: "test-call-id",
+				SourceIp:  src,
 				From: &livekit.SIPUri{
 					User: from,
 					Host: host,
