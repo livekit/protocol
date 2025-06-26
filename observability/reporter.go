@@ -9,7 +9,7 @@ const Project = "livekit"
 
 type Reporter interface {
 	Room() roomobs.Reporter
-	Agents() agentsobs.Reporter
+	Agent() agentsobs.Reporter
 	Close()
 }
 
@@ -23,7 +23,7 @@ func (reporter) Room() roomobs.Reporter {
 	return roomobs.NewNoopReporter()
 }
 
-func (reporter) Agents() agentsobs.Reporter {
+func (reporter) Agent() agentsobs.Reporter {
 	return agentsobs.NewNoopReporter()
 }
 
