@@ -579,6 +579,17 @@ func (p *SIPDispatchRuleInfo) Validate() error {
 	if p.Rule == nil {
 		return errors.New("missing rule")
 	}
+
+	// Validate dynamic dispatch rule URL must be HTTPS
+	if dynamicRule := p.Rule.GetDispatchRuleDynamic(); dynamicRule != nil {
+		if dynamicRule.Url == "" {
+			return errors.New("dynamic dispatch rule URL cannot be empty")
+		}
+		if !strings.HasPrefix(dynamicRule.Url, "https://") {
+			return errors.New("dynamic dispatch rule URL must use HTTPS protocol")
+		}
+	}
+
 	return nil
 }
 

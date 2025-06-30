@@ -15,7 +15,10 @@
 package sip
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"net/netip"
 	"strconv"
 	"testing"
@@ -697,6 +700,380 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			livekit.AttrSIPDispatchRuleID: "rule",
 		},
 	}, res)
+}
+
+func TestEvaluateDispatchRuleDynamic(t *testing.T) {
+	// Test dynamic dispatch rule with accept action
+	t.Run("dynamic_accept", func(t *testing.T) {
+		// Create a test server to mock the webhook
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, "POST", r.Method)
+			require.Equal(t, "application/json", r.Header.Get("Content-Type"))
+
+			// Verify request body
+			var reqBody map[string]interface{}
+			err := json.NewDecoder(r.Body).Decode(&reqBody)
+			require.NoError(t, err)
+
+			require.Equal(t, "p_123", reqBody["project_id"])
+			require.Equal(t, "trunk", reqBody["trunk_id"])
+			require.Equal(t, "call-id", reqBody["call_id"])
+			require.Equal(t, "+11112222", reqBody["from_user"])
+			require.Equal(t, "sip.example.com", reqBody["from_host"])
+			require.Equal(t, "+3333", reqBody["to_user"])
+			require.Equal(t, "sip.example.com", reqBody["to_host"])
+
+			// Return accept response
+			response := map[string]interface{}{
+				"dispatch_action": "accept",
+				"room_name":       "dynamic-room",
+				"pin":             "1234",
+				"metadata":        "dynamic-meta",
+				"attributes": map[string]string{
+					"dynamic-attr": "value",
+				},
+				"media_encryption": "SRTP",
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+			Attributes: map[string]string{
+				"rule-attr": "1",
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+			Pin:           "1234",
+			ExtraAttributes: map[string]string{
+				"prov-attr": "1",
+			},
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+			ProjectId:           "p_123",
+			Result:              rpc.SIPDispatchResult_ACCEPT,
+			SipTrunkId:          "trunk",
+			SipDispatchRuleId:   "dynamic-rule",
+			RoomName:            "dynamic-room",
+			ParticipantIdentity: "sip_+11112222",
+			ParticipantName:     "Phone +11112222",
+			ParticipantMetadata: "dynamic-meta",
+			ParticipantAttributes: map[string]string{
+				"rule-attr":                   "1",
+				"prov-attr":                   "1",
+				"dynamic-attr":                "value",
+				livekit.AttrSIPCallID:         "call-id",
+				livekit.AttrSIPTrunkID:        "trunk",
+				livekit.AttrSIPDispatchRuleID: "dynamic-rule",
+				livekit.AttrSIPPhoneNumber:    "+11112222",
+				livekit.AttrSIPTrunkNumber:    "+3333",
+				livekit.AttrSIPHostName:       "sip.example.com",
+			},
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+		}, res)
+	})
+
+	// Test dynamic dispatch rule with reject action
+	t.Run("dynamic_reject", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			response := map[string]interface{}{
+				"dispatch_action": "reject",
+				"reject_reason":   "Call not allowed",
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+			ProjectId:           "p_123",
+			SipTrunkId:          "trunk",
+			SipDispatchRuleId:   "dynamic-rule",
+			Result:              rpc.SIPDispatchResult_REJECT,
+			ParticipantMetadata: "Call not allowed",
+		}, res)
+	})
+
+	// Test dynamic dispatch rule with transfer action
+	t.Run("dynamic_transfer", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			response := map[string]interface{}{
+				"dispatch_action":          "transfer",
+				"transfer_to":              "+55556666",
+				"destination_name":         "Support Desk",
+				"transfer_ringing_timeout": 30,
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+			ProjectId:           "p_123",
+			SipTrunkId:          "trunk",
+			SipDispatchRuleId:   "dynamic-rule",
+			Result:              rpc.SIPDispatchResult_DROP,
+			ParticipantMetadata: "+55556666",
+		}, res)
+	})
+
+	// Test webhook HTTP error
+	t.Run("webhook_http_error", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusInternalServerError)
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		_, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "Webhook returned non-200 status: 500")
+	})
+
+	// Test webhook network error
+	t.Run("webhook_network_error", func(t *testing.T) {
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: "http://invalid-url-that-does-not-exist.com/webhook",
+					},
+				},
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		_, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "Failed to make HTTP request")
+	})
+
+	// Test invalid JSON response
+	t.Run("invalid_json_response", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("invalid json"))
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		_, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "Failed to decode response")
+	})
+
+	// Test unknown dispatch action
+	t.Run("unknown_dispatch_action", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			response := map[string]interface{}{
+				"dispatch_action": "unknown_action",
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+		}
+
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		// Should continue with normal dispatch rule evaluation
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, rpc.SIPDispatchResult_ACCEPT, res.Result)
+	})
+
+	// Test dynamic dispatch with PIN validation
+	t.Run("dynamic_with_pin_validation", func(t *testing.T) {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			response := map[string]interface{}{
+				"dispatch_action": "accept",
+				"room_name":       "pin-room",
+				"pin":             "5678",
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(response)
+		}))
+		defer server.Close()
+
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "dynamic-rule",
+			Rule: &livekit.SIPDispatchRule{
+				Rule: &livekit.SIPDispatchRule_DispatchRuleDynamic{
+					DispatchRuleDynamic: &livekit.SIPDispatchRuleDynamic{
+						Url: server.URL,
+					},
+				},
+			},
+		}
+
+		// Test without PIN - should request PIN
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			CalledHost:    "sip.example.com",
+		}
+
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, rpc.SIPDispatchResult_REQUEST_PIN, res.Result)
+		require.True(t, res.RequestPin)
+
+		// Test with correct PIN
+		r.Pin = "5678"
+		res, err = EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, rpc.SIPDispatchResult_ACCEPT, res.Result)
+		require.Equal(t, "pin-room", res.RoomName)
+
+		// Test with incorrect PIN - should return permission denied error
+		r.Pin = "9999"
+		_, err = EvaluateDispatchRule("p_123", tr, d, r)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "Incorrect PIN for SIP room")
+	})
 }
 
 func TestMatchIP(t *testing.T) {
