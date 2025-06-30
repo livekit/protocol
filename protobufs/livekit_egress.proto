@@ -235,6 +235,8 @@ message S3Upload {
   string access_key = 1;
   string secret = 2;
   string session_token = 11;
+  string assumed_role_arn = 12;         // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role
+  string assumed_role_external_id = 13; // ExternalID to use when assuming role for upload
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
@@ -243,6 +245,8 @@ message S3Upload {
   string tagging = 8;
   string content_disposition = 9; // Content-Disposition header
   ProxyConfig proxy = 10;
+
+  // NEXT_ID: 14 
 }
 
 message GCPUpload {
