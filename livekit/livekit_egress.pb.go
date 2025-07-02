@@ -2084,22 +2084,22 @@ func (*ImageOutput_Azure) isImageOutput_Output() {}
 func (*ImageOutput_AliOSS) isImageOutput_Output() {}
 
 type S3Upload struct {
-	state                 protoimpl.MessageState `protogen:"open.v1"`
-	AccessKey             string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	Secret                string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	SessionToken          string                 `protobuf:"bytes,11,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
-	AssumedRoleArn        string                 `protobuf:"bytes,12,opt,name=assumed_role_arn,json=assumedRoleArn,proto3" json:"assumed_role_arn,omitempty"`                        // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role
-	AssumedRoleExternalId string                 `protobuf:"bytes,13,opt,name=assumed_role_external_id,json=assumedRoleExternalId,proto3" json:"assumed_role_external_id,omitempty"` // ExternalID to use when assuming role for upload
-	Region                string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Endpoint              string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Bucket                string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	ForcePathStyle        bool                   `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
-	Metadata              map[string]string      `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	Tagging               string                 `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
-	ContentDisposition    string                 `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"` // Content-Disposition header
-	Proxy                 *ProxyConfig           `protobuf:"bytes,10,opt,name=proxy,proto3" json:"proxy,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	AccessKey            string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	Secret               string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	SessionToken         string                 `protobuf:"bytes,11,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+	AssumeRoleArn        string                 `protobuf:"bytes,12,opt,name=assume_role_arn,json=assumeRoleArn,proto3" json:"assume_role_arn,omitempty"`                        // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
+	AssumeRoleExternalId string                 `protobuf:"bytes,13,opt,name=assume_role_external_id,json=assumeRoleExternalId,proto3" json:"assume_role_external_id,omitempty"` // ExternalID to use when assuming role for upload
+	Region               string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Endpoint             string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Bucket               string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	ForcePathStyle       bool                   `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
+	Metadata             map[string]string      `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Tagging              string                 `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
+	ContentDisposition   string                 `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"` // Content-Disposition header
+	Proxy                *ProxyConfig           `protobuf:"bytes,10,opt,name=proxy,proto3" json:"proxy,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *S3Upload) Reset() {
@@ -2153,16 +2153,16 @@ func (x *S3Upload) GetSessionToken() string {
 	return ""
 }
 
-func (x *S3Upload) GetAssumedRoleArn() string {
+func (x *S3Upload) GetAssumeRoleArn() string {
 	if x != nil {
-		return x.AssumedRoleArn
+		return x.AssumeRoleArn
 	}
 	return ""
 }
 
-func (x *S3Upload) GetAssumedRoleExternalId() string {
+func (x *S3Upload) GetAssumeRoleExternalId() string {
 	if x != nil {
-		return x.AssumedRoleExternalId
+		return x.AssumeRoleExternalId
 	}
 	return ""
 }
@@ -4003,14 +4003,14 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x05azure\x18\n" +
 	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xb0\x04\n" +
+	"\x06output\"\xac\x04\n" +
 	"\bS3Upload\x12\x1d\n" +
 	"\n" +
 	"access_key\x18\x01 \x01(\tR\taccessKey\x12\x16\n" +
 	"\x06secret\x18\x02 \x01(\tR\x06secret\x12#\n" +
-	"\rsession_token\x18\v \x01(\tR\fsessionToken\x12(\n" +
-	"\x10assumed_role_arn\x18\f \x01(\tR\x0eassumedRoleArn\x127\n" +
-	"\x18assumed_role_external_id\x18\r \x01(\tR\x15assumedRoleExternalId\x12\x16\n" +
+	"\rsession_token\x18\v \x01(\tR\fsessionToken\x12&\n" +
+	"\x0fassume_role_arn\x18\f \x01(\tR\rassumeRoleArn\x125\n" +
+	"\x17assume_role_external_id\x18\r \x01(\tR\x14assumeRoleExternalId\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x16\n" +
 	"\x06bucket\x18\x05 \x01(\tR\x06bucket\x12(\n" +
