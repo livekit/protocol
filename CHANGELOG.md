@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.40.0
+
+### Minor Changes
+
+- Adding SIP Protocol generated call id to SipCall - [#1119](https://github.com/livekit/protocol/pull/1119) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
 ## 1.39.3
 
 ## 1.39.2

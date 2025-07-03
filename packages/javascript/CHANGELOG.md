@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.40.0
+
+### Patch Changes
+
+- Add fields to support AssumeRole in egress S3 uploads - [#1124](https://github.com/livekit/protocol/pull/1124) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.39.3
 
 ### Patch Changes
