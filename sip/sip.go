@@ -34,6 +34,7 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
+	siputils "github.com/livekit/protocol/utils/sip"
 )
 
 //go:generate stringer -type TrunkFilteredReason -trimprefix TrunkFiltered
@@ -275,9 +276,9 @@ func printNumbers(numbers []string) string {
 }
 
 // NormalizeNumber normalizes a phone number by removing formatting characters and ensuring it starts with a "+".
-// This function delegates to utils.NormalizeNumber for the actual implementation.
+// This function delegates to siputils.NormalizeNumber for the actual implementation.
 func NormalizeNumber(num string) string {
-	return utils.NormalizeNumber(num)
+	return siputils.NormalizeNumber(num)
 }
 
 func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *livekit.SIPInboundTrunkInfo, opt *matchTrunkOpts) error {

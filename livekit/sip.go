@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/livekit/protocol/utils"
+	siputils "github.com/livekit/protocol/utils/sip"
 	"github.com/livekit/protocol/utils/xtwirp"
 )
 
@@ -722,9 +722,9 @@ func (p *ListSIPInboundTrunkRequest) Filter(info *SIPInboundTrunkInfo) bool {
 	if len(p.Numbers) != 0 && len(info.Numbers) != 0 {
 		ok := false
 		for _, num := range info.Numbers {
-			normalizedNum := utils.NormalizeNumber(num)
+			normalizedNum := siputils.NormalizeNumber(num)
 			for _, reqNum := range p.Numbers {
-				if utils.NormalizeNumber(reqNum) == normalizedNum {
+				if siputils.NormalizeNumber(reqNum) == normalizedNum {
 					ok = true
 					break
 				}
