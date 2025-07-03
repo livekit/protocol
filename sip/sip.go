@@ -15,12 +15,15 @@
 package sip
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"maps"
 	"math"
+	"net/http"
 	"net/netip"
 	"regexp"
 	"sort"
@@ -29,6 +32,7 @@ import (
 	"github.com/dennwc/iters"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/exp/slices"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -98,6 +102,9 @@ func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
 		} else {
 			priority = 102
 		}
+	case *livekit.SIPDispatchRule_DispatchRuleDynamic:
+		// Dynamic rules have highest priority (lowest number) since they can make runtime decisions
+		priority = -1
 	}
 	if len(info.InboundNumbers) == 0 {
 		priority += 1000
@@ -264,6 +271,10 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	case *livekit.SIPDispatchRule_DispatchRuleCallee:
 		pin = rule.DispatchRuleCallee.GetPin()
 		room = rule.DispatchRuleCallee.GetRoomPrefix()
+	case *livekit.SIPDispatchRule_DispatchRuleDynamic:
+		// For dynamic rules, we can't determine pin/room statically
+		// These are resolved at runtime via webhook
+		return "", "", nil
 	}
 	return room, pin, nil
 }
@@ -744,6 +755,7 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 	sentPin := req.GetPin()
 	for {
 		info, err := rules.Next()
+
 		if err == io.EOF {
 			break
 		} else if err != nil {
@@ -810,6 +822,8 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
+	log := logger.GetLogger()
+	log.Debugw("Evaluating dispatch rule dailamooooo", "rule", rule)
 	call := req.SIPCall()
 	sentPin := req.GetPin()
 
@@ -830,6 +844,125 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	}
 	attrs[livekit.AttrSIPCallID] = call.LkCallId
 	attrs[livekit.AttrSIPTrunkID] = trunkID
+
+	var (
+		room    string
+		rulePin string
+		err     error
+	)
+
+	switch dynamicRule := rule.GetRule().GetRule().(type) {
+	default:
+		room, rulePin, err = GetPinAndRoom(rule)
+		if err != nil {
+			return nil, twirp.WrapError(twirp.NewError(twirp.Internal, "Failed to get room and pin"), err)
+		}
+	case *livekit.SIPDispatchRule_DispatchRuleDynamic:
+		type dynamicDispatchRequest struct {
+			ProjectID string `json:"project_id"`
+			TrunkID   string `json:"trunk_id"`
+			CallID    string `json:"call_id"`
+			FromUser  string `json:"from_user"`
+			FromHost  string `json:"from_host"`
+			ToUser    string `json:"to_user"`
+			ToHost    string `json:"to_host"`
+		}
+
+		type dynamicDispatchResponse struct {
+			DispatchAction         string            `json:"dispatch_action"` // "accept", "reject", "transfer"
+			RoomName               string            `json:"room_name"`
+			Pin                    string            `json:"pin"`
+			Metadata               string            `json:"metadata"`
+			Attributes             map[string]string `json:"attributes"`
+			MediaEncryption        string            `json:"media_encryption"`
+			RejectReason           string            `json:"reject_reason"`
+			TransferTo             string            `json:"transfer_to"`
+			DestinationName        string            `json:"destination_name"`
+			TransferRingingTimeout int64             `json:"transfer_ringing_timeout"`
+		}
+
+		reqBody := dynamicDispatchRequest{
+			ProjectID: projectID,
+			TrunkID:   trunkID,
+			CallID:    call.LkCallId,
+			FromUser:  call.From.User,
+			FromHost:  call.From.Host,
+			ToUser:    call.To.User,
+			ToHost:    call.To.Host,
+		}
+
+		reqBytes, err := json.Marshal(reqBody)
+		if err != nil {
+			return nil, twirp.WrapError(twirp.NewError(twirp.Internal, "Failed to marshal request"), err)
+		}
+
+		resp, err := http.Post(dynamicRule.DispatchRuleDynamic.GetUrl(), "application/json", bytes.NewReader(reqBytes))
+		if err != nil {
+			return nil, twirp.WrapError(twirp.NewError(twirp.Internal, "Failed to make HTTP request"), err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			return nil, twirp.NewError(twirp.Internal, fmt.Sprintf("Webhook returned non-200 status: %d", resp.StatusCode))
+		}
+
+		var dynamicResp dynamicDispatchResponse
+		if err := json.NewDecoder(resp.Body).Decode(&dynamicResp); err != nil {
+			return nil, twirp.WrapError(twirp.NewError(twirp.Internal, "Failed to decode response"), err)
+		}
+
+		// Set values in the rule based on the response
+		switch strings.ToLower(dynamicResp.DispatchAction) {
+		case "accept":
+			room = dynamicResp.RoomName
+			rulePin = dynamicResp.Pin
+			if dynamicResp.Metadata != "" {
+				rule.Metadata = dynamicResp.Metadata
+			}
+			if len(dynamicResp.Attributes) > 0 {
+				for k, v := range dynamicResp.Attributes {
+					attrs[k] = v
+				}
+			}
+			if dynamicResp.MediaEncryption != "" {
+				switch strings.ToUpper(dynamicResp.MediaEncryption) {
+				case "SRTP":
+					rule.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+				case "DISABLE":
+					rule.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+				}
+			}
+			// Continue with normal dispatch rule evaluation to handle PIN validation
+
+		case "reject":
+			rule.Action = livekit.DispatchAction_ACTION_REJECT
+			rule.RejectReason = dynamicResp.RejectReason
+			return &rpc.EvaluateSIPDispatchRulesResponse{
+				ProjectId:           projectID,
+				SipTrunkId:          trunkID,
+				SipDispatchRuleId:   rule.SipDispatchRuleId,
+				Result:              rpc.SIPDispatchResult_REJECT,
+				ParticipantMetadata: dynamicResp.RejectReason,
+			}, nil
+
+		case "transfer":
+			rule.Action = livekit.DispatchAction_ACTION_TRANSFER
+			rule.TransferTo = dynamicResp.TransferTo
+			rule.DestinationName = dynamicResp.DestinationName
+			if dynamicResp.TransferRingingTimeout > 0 {
+				rule.TransferRingingTimeout = &durationpb.Duration{
+					Seconds: dynamicResp.TransferRingingTimeout,
+				}
+			}
+			return &rpc.EvaluateSIPDispatchRulesResponse{
+				ProjectId:           projectID,
+				SipTrunkId:          trunkID,
+				SipDispatchRuleId:   rule.SipDispatchRuleId,
+				Result:              rpc.SIPDispatchResult_DROP,
+				ParticipantMetadata: dynamicResp.TransferTo,
+			}, nil
+		}
+	}
 
 	to := call.To.User
 	from := call.From.User
@@ -852,10 +985,6 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		attrs[livekit.AttrSIPTrunkNumber] = call.To.User
 	}
 
-	room, rulePin, err := GetPinAndRoom(rule)
-	if err != nil {
-		return nil, err
-	}
 	if rulePin != "" {
 		if sentPin == "" {
 			return &rpc.EvaluateSIPDispatchRulesResponse{
