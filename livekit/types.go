@@ -177,17 +177,74 @@ type PageItem interface {
 	ID() string
 }
 
+// FilterStats tracks statistics about the filtering process
+type FilterStats struct {
+	TotalItemsBeforeFilter int
+	TotalItemsAfterFilter  int
+	ItemsInCurrentPage     int
+	FilteredInCurrentPage  int
+}
+
+type StatsCallback func(stats FilterStats)
+
+// ListPageIterWithStats creates a paginated iterator that tracks and emits filtering statistics
+func ListPageIterWithStats[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]](
+	fnc func(ctx context.Context, req Req) (Resp, error),
+	req Req,
+	statsCallback StatsCallback,
+	applyFilter bool,
+) iters.PageIter[T] {
+	it := &listPageIterWithStats[T, Req, Resp]{
+		fnc:           fnc,
+		req:           req,
+		statsCallback: statsCallback,
+		stats:         FilterStats{},
+		applyFilter:   applyFilter,
+	}
+	if applyFilter {
+		return iters.FilterPage(it, func(v T) bool {
+			return req.Filter(v)
+		})
+	}
+	return it
+}
+
 func ListPageIter[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]](fnc func(ctx context.Context, req Req) (Resp, error), req Req) iters.PageIter[T] {
-	it := &listPageIter[T, Req, Resp]{fnc: fnc, req: req}
+	// Create a callback that applies the same filtering logic as iters.FilterPage
+	statsCallback := func(stats FilterStats) {
+		// Optional: You can add logging here if needed
+		// fmt.Printf("Filter Stats: Total Before: %d, Total After: %d, Current Page: %d, Filtered This Page: %d\n",
+		// 	stats.TotalItemsBeforeFilter,
+		// 	stats.TotalItemsAfterFilter,
+		// 	stats.ItemsInCurrentPage,
+		// 	stats.FilteredInCurrentPage)
+	}
+
+	// Use ListPageIterWithStats with applyFilter=false to get unfiltered items, then apply filtering
+	it := ListPageIterWithStats(fnc, req, statsCallback, false)
 	return iters.FilterPage(it, func(v T) bool {
 		return req.Filter(v)
 	})
+}
+
+// ListPageIterSilent creates a paginated iterator without statistics logging
+func ListPageIterSilent[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]](fnc func(ctx context.Context, req Req) (Resp, error), req Req) iters.PageIter[T] {
+	return ListPageIterWithStats(fnc, req, nil, true)
 }
 
 type listPageIter[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]] struct {
 	fnc  func(ctx context.Context, opts Req) (Resp, error)
 	req  Req
 	done bool
+}
+
+type listPageIterWithStats[T PageItem, Req pageIterReq[T], Resp pageIterResp[T]] struct {
+	fnc           func(ctx context.Context, opts Req) (Resp, error)
+	req           Req
+	done          bool
+	stats         FilterStats
+	statsCallback StatsCallback
+	applyFilter   bool
 }
 
 func (it *listPageIter[T, Req, Resp]) NextPage(ctx context.Context) ([]T, error) {
@@ -219,6 +276,94 @@ func (it *listPageIter[T, Req, Resp]) NextPage(ctx context.Context) ([]T, error)
 }
 
 func (it *listPageIter[_, _, _]) Close() {
+	it.done = true
+}
+
+func (it *listPageIterWithStats[T, Req, Resp]) NextPage(ctx context.Context) ([]T, error) {
+	if it.done {
+		return nil, io.EOF
+	}
+
+	opts := it.req.GetPage()
+	resp, err := it.fnc(ctx, it.req)
+	page := resp.GetItems()
+
+	// Track total items before filtering
+	it.stats.TotalItemsBeforeFilter += len(page)
+	it.stats.ItemsInCurrentPage = len(page)
+
+	if it.applyFilter {
+		// Apply filtering and track statistics
+		filteredItems := make([]T, 0, len(page))
+		for _, item := range page {
+			if it.req.Filter(item) {
+				filteredItems = append(filteredItems, item)
+			}
+		}
+
+		// Update statistics
+		it.stats.TotalItemsAfterFilter += len(filteredItems)
+		it.stats.FilteredInCurrentPage = len(page) - len(filteredItems)
+
+		// Emit statistics via callback
+		if it.statsCallback != nil {
+			it.statsCallback(it.stats)
+		}
+
+		if opts == nil {
+			it.done = true
+			return filteredItems, err
+		}
+
+		// Advance pagination cursor based on filtered items
+		hasID := false
+		for i := len(filteredItems) - 1; i >= 0; i-- {
+			if id := filteredItems[i].ID(); id > opts.AfterId {
+				opts.AfterId = id
+				hasID = true
+			}
+		}
+
+		if err == nil && (len(filteredItems) == 0 || !hasID) {
+			err = io.EOF
+			it.done = true
+		}
+
+		return filteredItems, err
+	} else {
+		// Don't apply filtering, just track statistics
+		it.stats.TotalItemsAfterFilter += len(page) // All items pass through
+		it.stats.FilteredInCurrentPage = 0
+
+		// Emit statistics via callback
+		if it.statsCallback != nil {
+			it.statsCallback(it.stats)
+		}
+
+		if opts == nil {
+			it.done = true
+			return page, err
+		}
+
+		// Advance pagination cursor based on all items
+		hasID := false
+		for i := len(page) - 1; i >= 0; i-- {
+			if id := page[i].ID(); id > opts.AfterId {
+				opts.AfterId = id
+				hasID = true
+			}
+		}
+
+		if err == nil && (len(page) == 0 || !hasID) {
+			err = io.EOF
+			it.done = true
+		}
+
+		return page, err
+	}
+}
+
+func (it *listPageIterWithStats[_, _, _]) Close() {
 	it.done = true
 }
 
