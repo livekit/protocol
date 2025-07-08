@@ -29,6 +29,8 @@ func UnpackCountryCode(code uint16) (isoAlpha2 string) {
 }
 
 func ToClientOS(os string) ClientOS {
+	os = strings.ToLower(os)
+
 	switch os {
 	case "":
 		return ClientOSUndefined
@@ -38,9 +40,9 @@ func ToClientOS(os string) ClientOS {
 		return ClientOSAndroid
 	case "windows":
 		return ClientOSWindows
-	case "mac":
+	case "mac", "mac os x", "darwin", "macos":
 		return ClientOSMac
-	case "linux":
+	case "linux", "chrome os":
 		return ClientOSLinux
 	default:
 		return ClientOSUndefined

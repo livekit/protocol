@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.39.3
+
+### Patch Changes
+
+- normalize common os names - [#1118](https://github.com/livekit/protocol/pull/1118) ([@paulwe](https://github.com/paulwe))
+
+- Add client info case for ESP32 - [#1113](https://github.com/livekit/protocol/pull/1113) ([@ladvoc](https://github.com/ladvoc))
+
 ## 1.39.2
 
 ### Patch Changes
