@@ -315,8 +315,9 @@ message UserPacket {
   optional uint64 end_time = 10;
   // added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
   bytes nonce = 11;
-
-  // NEXT_ID: 12
+  Encryption.Type encryption_type = 12;  // defaults to NONE
+  bytes iv = 13;
+  // NEXT_ID: 14
 }
 
 message SipDTMF {
@@ -357,6 +358,8 @@ message RpcRequest {
   string payload = 3;
   uint32 response_timeout_ms = 4;
   uint32 version = 5;
+  Encryption.Type encryption_type = 6;  // defaults to NONE
+  bytes iv = 7;
 }
 
 message RpcAck {
@@ -369,6 +372,8 @@ message RpcResponse {
     string payload = 2;
     RpcError error = 3;
   }
+  Encryption.Type encryption_type = 4;  // defaults to NONE
+  bytes iv = 5;
 }
 
 message RpcError {
