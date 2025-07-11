@@ -2684,7 +2684,8 @@ type UserPacket struct {
 	// added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
 	Nonce          []byte          `protobuf:"bytes,11,opt,name=nonce,proto3" json:"nonce,omitempty"`
 	EncryptionType Encryption_Type `protobuf:"varint,12,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // defaults to NONE
-	Iv             []byte          `protobuf:"bytes,13,opt,name=iv,proto3" json:"iv,omitempty"`                                                                             // NEXT_ID: 14
+	Iv             []byte          `protobuf:"bytes,13,opt,name=iv,proto3" json:"iv,omitempty"`
+	KeyIndex       uint32          `protobuf:"varint,14,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"` // NEXT_ID: 15
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -2805,6 +2806,13 @@ func (x *UserPacket) GetIv() []byte {
 		return x.Iv
 	}
 	return nil
+}
+
+func (x *UserPacket) GetKeyIndex() uint32 {
+	if x != nil {
+		return x.KeyIndex
+	}
+	return 0
 }
 
 type SipDTMF struct {
@@ -3097,6 +3105,7 @@ type RpcRequest struct {
 	Version           uint32                 `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
 	EncryptionType    Encryption_Type        `protobuf:"varint,6,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // defaults to NONE
 	Iv                []byte                 `protobuf:"bytes,7,opt,name=iv,proto3" json:"iv,omitempty"`
+	KeyIndex          uint32                 `protobuf:"varint,8,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3180,6 +3189,13 @@ func (x *RpcRequest) GetIv() []byte {
 	return nil
 }
 
+func (x *RpcRequest) GetKeyIndex() uint32 {
+	if x != nil {
+		return x.KeyIndex
+	}
+	return 0
+}
+
 type RpcAck struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -3234,6 +3250,7 @@ type RpcResponse struct {
 	Value          isRpcResponse_Value `protobuf_oneof:"value"`
 	EncryptionType Encryption_Type     `protobuf:"varint,4,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // defaults to NONE
 	Iv             []byte              `protobuf:"bytes,5,opt,name=iv,proto3" json:"iv,omitempty"`
+	KeyIndex       uint32              `protobuf:"varint,6,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -3312,6 +3329,13 @@ func (x *RpcResponse) GetIv() []byte {
 		return x.Iv
 	}
 	return nil
+}
+
+func (x *RpcResponse) GetKeyIndex() uint32 {
+	if x != nil {
+		return x.KeyIndex
+	}
+	return 0
 }
 
 type isRpcResponse_Value interface {
@@ -5141,9 +5165,10 @@ type DataStream_Chunk struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StreamId      string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream to map it to the correct header
 	ChunkIndex    uint64                 `protobuf:"varint,2,opt,name=chunk_index,json=chunkIndex,proto3" json:"chunk_index,omitempty"`
-	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`  // content as binary (bytes)
-	Version       int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"` // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
-	Iv            []byte                 `protobuf:"bytes,5,opt,name=iv,proto3,oneof" json:"iv,omitempty"`      // optional, initialization vector for AES-GCM encryption
+	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                    // content as binary (bytes)
+	Version       int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"`                   // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
+	Iv            []byte                 `protobuf:"bytes,5,opt,name=iv,proto3,oneof" json:"iv,omitempty"`                        // optional, initialization vector for AES-GCM encryption
+	KeyIndex      uint32                 `protobuf:"varint,6,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"` // key index for AES-GCM encryption
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5211,6 +5236,13 @@ func (x *DataStream_Chunk) GetIv() []byte {
 		return x.Iv
 	}
 	return nil
+}
+
+func (x *DataStream_Chunk) GetKeyIndex() uint32 {
+	if x != nil {
+		return x.KeyIndex
+	}
+	return 0
 }
 
 type DataStream_Trailer struct {
@@ -5441,7 +5473,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\vSpeakerInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x02R\x05level\x12\x16\n" +
-	"\x06active\x18\x03 \x01(\bR\x06active\"\xfe\x03\n" +
+	"\x06active\x18\x03 \x01(\bR\x06active\"\x9b\x04\n" +
 	"\n" +
 	"UserPacket\x12+\n" +
 	"\x0fparticipant_sid\x18\x01 \x01(\tB\x02\x18\x01R\x0eparticipantSid\x125\n" +
@@ -5457,7 +5489,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	" \x01(\x04H\x03R\aendTime\x88\x01\x01\x12\x14\n" +
 	"\x05nonce\x18\v \x01(\fR\x05nonce\x12A\n" +
 	"\x0fencryption_type\x18\f \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
-	"\x02iv\x18\r \x01(\fR\x02ivB\b\n" +
+	"\x02iv\x18\r \x01(\fR\x02iv\x12\x1b\n" +
+	"\tkey_index\x18\x0e \x01(\rR\bkeyIndexB\b\n" +
 	"\x06_topicB\x05\n" +
 	"\x03_idB\r\n" +
 	"\v_start_timeB\v\n" +
@@ -5484,7 +5517,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12\x18\n" +
 	"\adeleted\x18\x05 \x01(\bR\adeleted\x12\x1c\n" +
 	"\tgenerated\x18\x06 \x01(\bR\tgeneratedB\x11\n" +
-	"\x0f_edit_timestamp\"\xeb\x01\n" +
+	"\x0f_edit_timestamp\"\x88\x02\n" +
 	"\n" +
 	"RpcRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
@@ -5493,17 +5526,19 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13response_timeout_ms\x18\x04 \x01(\rR\x11responseTimeoutMs\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\rR\aversion\x12A\n" +
 	"\x0fencryption_type\x18\x06 \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
-	"\x02iv\x18\a \x01(\fR\x02iv\"'\n" +
+	"\x02iv\x18\a \x01(\fR\x02iv\x12\x1b\n" +
+	"\tkey_index\x18\b \x01(\rR\bkeyIndex\"'\n" +
 	"\x06RpcAck\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\"\xcf\x01\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\"\xec\x01\n" +
 	"\vRpcResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
 	"\apayload\x18\x02 \x01(\tH\x00R\apayload\x12)\n" +
 	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05error\x12A\n" +
 	"\x0fencryption_type\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
-	"\x02iv\x18\x05 \x01(\fR\x02ivB\a\n" +
+	"\x02iv\x18\x05 \x01(\fR\x02iv\x12\x1b\n" +
+	"\tkey_index\x18\x06 \x01(\rR\bkeyIndexB\a\n" +
 	"\x05value\"L\n" +
 	"\bRpcError\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\rR\x04code\x12\x18\n" +
@@ -5684,7 +5719,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fTimedVersion\x12\x1d\n" +
 	"\n" +
 	"unix_micro\x18\x01 \x01(\x03R\tunixMicro\x12\x14\n" +
-	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xdc\t\n" +
+	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xf9\t\n" +
 	"\n" +
 	"DataStream\x1a\xeb\x01\n" +
 	"\n" +
@@ -5716,14 +5751,15 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x10\n" +
 	"\x0econtent_headerB\x0f\n" +
-	"\r_total_length\x1a\x95\x01\n" +
+	"\r_total_length\x1a\xb2\x01\n" +
 	"\x05Chunk\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1f\n" +
 	"\vchunk_index\x18\x02 \x01(\x04R\n" +
 	"chunkIndex\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\fR\acontent\x12\x18\n" +
 	"\aversion\x18\x04 \x01(\x05R\aversion\x12\x13\n" +
-	"\x02iv\x18\x05 \x01(\fH\x00R\x02iv\x88\x01\x01B\x05\n" +
+	"\x02iv\x18\x05 \x01(\fH\x00R\x02iv\x88\x01\x01\x12\x1b\n" +
+	"\tkey_index\x18\x06 \x01(\rR\bkeyIndexB\x05\n" +
 	"\x03_iv\x1a\xca\x01\n" +
 	"\aTrailer\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x16\n" +
