@@ -281,7 +281,12 @@ message DataPacket {
   // sid of the user that sent the message
   string participant_sid = 17;
 
-  // NEXT_ID: 18
+  Encryption.Type encryption_type = 18; // if encryption is set to other than NONE iv, key_index and encrypted_packet are expected to be set, too
+  bytes iv = 19;
+  uint32 key_index = 20;
+  bytes encrypted_packet = 21;
+
+  // NEXT_ID: 22
 }
 
 message ActiveSpeakerUpdate {
@@ -315,9 +320,7 @@ message UserPacket {
   optional uint64 end_time = 10;
   // added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
   bytes nonce = 11;
-  Encryption.Type encryption_type = 12;  // defaults to NONE
-  bytes iv = 13;
-  uint32 key_index = 14;
+
   // NEXT_ID: 15
 }
 
@@ -358,10 +361,7 @@ message RpcRequest {
   string method = 2;
   string payload = 3;
   uint32 response_timeout_ms = 4;
-  uint32 version = 5;
-  Encryption.Type encryption_type = 6;  // defaults to NONE
-  bytes iv = 7;
-  uint32 key_index = 8;
+  uint32 version = 5;  
 }
 
 message RpcAck {
@@ -374,9 +374,6 @@ message RpcResponse {
     string payload = 2;
     RpcError error = 3;
   }
-  Encryption.Type encryption_type = 4;  // defaults to NONE
-  bytes iv = 5;
-  uint32 key_index = 6;
 }
 
 message RpcError {
@@ -694,7 +691,7 @@ message DataStream {
     string topic = 3;
     string mime_type = 4;
     optional uint64 total_length = 5;  // only populated for finite streams, if it's a stream of unknown size this stays empty
-    Encryption.Type encryption_type = 7;  // defaults to NONE
+    Encryption.Type encryption_type = 7 [deprecated=true];  //  this is set on the DataPacket
     map<string, string> attributes = 8;  // user defined attributes map that can carry additional info
 
     // oneof to choose between specific header types
@@ -709,8 +706,7 @@ message DataStream {
     uint64 chunk_index = 2;
     bytes content = 3; // content as binary (bytes)
     int32 version = 4; // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
-    optional bytes iv = 5; // optional, initialization vector for AES-GCM encryption
-    uint32 key_index = 6; // key index for AES-GCM encryption
+    optional bytes iv = 5 [deprecated=true]; // this is set on the DataPacket
   }
 
   message Trailer {
