@@ -317,7 +317,8 @@ message UserPacket {
   bytes nonce = 11;
   Encryption.Type encryption_type = 12;  // defaults to NONE
   bytes iv = 13;
-  // NEXT_ID: 14
+  uint32 key_index = 14;
+  // NEXT_ID: 15
 }
 
 message SipDTMF {
@@ -360,6 +361,7 @@ message RpcRequest {
   uint32 version = 5;
   Encryption.Type encryption_type = 6;  // defaults to NONE
   bytes iv = 7;
+  uint32 key_index = 8;
 }
 
 message RpcAck {
@@ -374,6 +376,7 @@ message RpcResponse {
   }
   Encryption.Type encryption_type = 4;  // defaults to NONE
   bytes iv = 5;
+  uint32 key_index = 6;
 }
 
 message RpcError {
@@ -707,6 +710,7 @@ message DataStream {
     bytes content = 3; // content as binary (bytes)
     int32 version = 4; // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
     optional bytes iv = 5; // optional, initialization vector for AES-GCM encryption
+    uint32 key_index = 6; // key index for AES-GCM encryption
   }
 
   message Trailer {
