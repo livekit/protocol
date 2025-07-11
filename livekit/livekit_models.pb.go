@@ -2286,9 +2286,13 @@ type DataPacket struct {
 	// sequence number of reliable packet
 	Sequence uint32 `protobuf:"varint,16,opt,name=sequence,proto3" json:"sequence,omitempty"`
 	// sid of the user that sent the message
-	ParticipantSid string `protobuf:"bytes,17,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	ParticipantSid  string          `protobuf:"bytes,17,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
+	EncryptionType  Encryption_Type `protobuf:"varint,18,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // if encryption is set to other than NONE iv, key_index and encrypted_packet are expected to be set, too
+	Iv              []byte          `protobuf:"bytes,19,opt,name=iv,proto3" json:"iv,omitempty"`
+	KeyIndex        uint32          `protobuf:"varint,20,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"`
+	EncryptedPacket []byte          `protobuf:"bytes,21,opt,name=encrypted_packet,json=encryptedPacket,proto3" json:"encrypted_packet,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *DataPacket) Reset() {
@@ -2471,6 +2475,34 @@ func (x *DataPacket) GetParticipantSid() string {
 		return x.ParticipantSid
 	}
 	return ""
+}
+
+func (x *DataPacket) GetEncryptionType() Encryption_Type {
+	if x != nil {
+		return x.EncryptionType
+	}
+	return Encryption_NONE
+}
+
+func (x *DataPacket) GetIv() []byte {
+	if x != nil {
+		return x.Iv
+	}
+	return nil
+}
+
+func (x *DataPacket) GetKeyIndex() uint32 {
+	if x != nil {
+		return x.KeyIndex
+	}
+	return 0
+}
+
+func (x *DataPacket) GetEncryptedPacket() []byte {
+	if x != nil {
+		return x.EncryptedPacket
+	}
+	return nil
 }
 
 type isDataPacket_Value interface {
@@ -2682,12 +2714,9 @@ type UserPacket struct {
 	StartTime *uint64 `protobuf:"varint,9,opt,name=start_time,json=startTime,proto3,oneof" json:"start_time,omitempty"`
 	EndTime   *uint64 `protobuf:"varint,10,opt,name=end_time,json=endTime,proto3,oneof" json:"end_time,omitempty"`
 	// added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
-	Nonce          []byte          `protobuf:"bytes,11,opt,name=nonce,proto3" json:"nonce,omitempty"`
-	EncryptionType Encryption_Type `protobuf:"varint,12,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // defaults to NONE
-	Iv             []byte          `protobuf:"bytes,13,opt,name=iv,proto3" json:"iv,omitempty"`
-	KeyIndex       uint32          `protobuf:"varint,14,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"` // NEXT_ID: 15
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	Nonce         []byte `protobuf:"bytes,11,opt,name=nonce,proto3" json:"nonce,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UserPacket) Reset() {
@@ -2792,27 +2821,6 @@ func (x *UserPacket) GetNonce() []byte {
 		return x.Nonce
 	}
 	return nil
-}
-
-func (x *UserPacket) GetEncryptionType() Encryption_Type {
-	if x != nil {
-		return x.EncryptionType
-	}
-	return Encryption_NONE
-}
-
-func (x *UserPacket) GetIv() []byte {
-	if x != nil {
-		return x.Iv
-	}
-	return nil
-}
-
-func (x *UserPacket) GetKeyIndex() uint32 {
-	if x != nil {
-		return x.KeyIndex
-	}
-	return 0
 }
 
 type SipDTMF struct {
@@ -3103,9 +3111,6 @@ type RpcRequest struct {
 	Payload           string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
 	ResponseTimeoutMs uint32                 `protobuf:"varint,4,opt,name=response_timeout_ms,json=responseTimeoutMs,proto3" json:"response_timeout_ms,omitempty"`
 	Version           uint32                 `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
-	EncryptionType    Encryption_Type        `protobuf:"varint,6,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // defaults to NONE
-	Iv                []byte                 `protobuf:"bytes,7,opt,name=iv,proto3" json:"iv,omitempty"`
-	KeyIndex          uint32                 `protobuf:"varint,8,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3175,27 +3180,6 @@ func (x *RpcRequest) GetVersion() uint32 {
 	return 0
 }
 
-func (x *RpcRequest) GetEncryptionType() Encryption_Type {
-	if x != nil {
-		return x.EncryptionType
-	}
-	return Encryption_NONE
-}
-
-func (x *RpcRequest) GetIv() []byte {
-	if x != nil {
-		return x.Iv
-	}
-	return nil
-}
-
-func (x *RpcRequest) GetKeyIndex() uint32 {
-	if x != nil {
-		return x.KeyIndex
-	}
-	return 0
-}
-
 type RpcAck struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -3247,12 +3231,9 @@ type RpcResponse struct {
 	//
 	//	*RpcResponse_Payload
 	//	*RpcResponse_Error
-	Value          isRpcResponse_Value `protobuf_oneof:"value"`
-	EncryptionType Encryption_Type     `protobuf:"varint,4,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"` // defaults to NONE
-	Iv             []byte              `protobuf:"bytes,5,opt,name=iv,proto3" json:"iv,omitempty"`
-	KeyIndex       uint32              `protobuf:"varint,6,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	Value         isRpcResponse_Value `protobuf_oneof:"value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RpcResponse) Reset() {
@@ -3315,27 +3296,6 @@ func (x *RpcResponse) GetError() *RpcError {
 		}
 	}
 	return nil
-}
-
-func (x *RpcResponse) GetEncryptionType() Encryption_Type {
-	if x != nil {
-		return x.EncryptionType
-	}
-	return Encryption_NONE
-}
-
-func (x *RpcResponse) GetIv() []byte {
-	if x != nil {
-		return x.Iv
-	}
-	return nil
-}
-
-func (x *RpcResponse) GetKeyIndex() uint32 {
-	if x != nil {
-		return x.KeyIndex
-	}
-	return 0
 }
 
 type isRpcResponse_Value interface {
@@ -5022,14 +4982,15 @@ func (x *DataStream_ByteHeader) GetName() string {
 
 // main DataStream.Header that contains a oneof for specific headers
 type DataStream_Header struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	StreamId       string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream
-	Timestamp      int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // using int64 for Unix timestamp
-	Topic          string                 `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
-	MimeType       string                 `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
-	TotalLength    *uint64                `protobuf:"varint,5,opt,name=total_length,json=totalLength,proto3,oneof" json:"total_length,omitempty"`                                               // only populated for finite streams, if it's a stream of unknown size this stays empty
-	EncryptionType Encryption_Type        `protobuf:"varint,7,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"`               // defaults to NONE
-	Attributes     map[string]string      `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // user defined attributes map that can carry additional info
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	StreamId    string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream
+	Timestamp   int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // using int64 for Unix timestamp
+	Topic       string                 `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
+	MimeType    string                 `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
+	TotalLength *uint64                `protobuf:"varint,5,opt,name=total_length,json=totalLength,proto3,oneof" json:"total_length,omitempty"` // only populated for finite streams, if it's a stream of unknown size this stays empty
+	// Deprecated: Marked as deprecated in livekit_models.proto.
+	EncryptionType Encryption_Type   `protobuf:"varint,7,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"`               //  this is set on the DataPacket
+	Attributes     map[string]string `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // user defined attributes map that can carry additional info
 	// oneof to choose between specific header types
 	//
 	// Types that are valid to be assigned to ContentHeader:
@@ -5106,6 +5067,7 @@ func (x *DataStream_Header) GetTotalLength() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_models.proto.
 func (x *DataStream_Header) GetEncryptionType() Encryption_Type {
 	if x != nil {
 		return x.EncryptionType
@@ -5162,13 +5124,13 @@ func (*DataStream_Header_TextHeader) isDataStream_Header_ContentHeader() {}
 func (*DataStream_Header_ByteHeader) isDataStream_Header_ContentHeader() {}
 
 type DataStream_Chunk struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	StreamId      string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream to map it to the correct header
-	ChunkIndex    uint64                 `protobuf:"varint,2,opt,name=chunk_index,json=chunkIndex,proto3" json:"chunk_index,omitempty"`
-	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                    // content as binary (bytes)
-	Version       int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"`                   // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
-	Iv            []byte                 `protobuf:"bytes,5,opt,name=iv,proto3,oneof" json:"iv,omitempty"`                        // optional, initialization vector for AES-GCM encryption
-	KeyIndex      uint32                 `protobuf:"varint,6,opt,name=key_index,json=keyIndex,proto3" json:"key_index,omitempty"` // key index for AES-GCM encryption
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	StreamId   string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream to map it to the correct header
+	ChunkIndex uint64                 `protobuf:"varint,2,opt,name=chunk_index,json=chunkIndex,proto3" json:"chunk_index,omitempty"`
+	Content    []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`  // content as binary (bytes)
+	Version    int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"` // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
+	// Deprecated: Marked as deprecated in livekit_models.proto.
+	Iv            []byte `protobuf:"bytes,5,opt,name=iv,proto3,oneof" json:"iv,omitempty"` // this is set on the DataPacket
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -5231,18 +5193,12 @@ func (x *DataStream_Chunk) GetVersion() int32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_models.proto.
 func (x *DataStream_Chunk) GetIv() []byte {
 	if x != nil {
 		return x.Iv
 	}
 	return nil
-}
-
-func (x *DataStream_Chunk) GetKeyIndex() uint32 {
-	if x != nil {
-		return x.KeyIndex
-	}
-	return 0
 }
 
 type DataStream_Trailer struct {
@@ -5442,7 +5398,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\abitrate\x18\x04 \x01(\rR\abitrate\x12\x12\n" +
 	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\x12#\n" +
 	"\rspatial_layer\x18\x06 \x01(\x05R\fspatialLayer\x12\x10\n" +
-	"\x03rid\x18\a \x01(\tR\x03rid\"\xc5\a\n" +
+	"\x03rid\x18\a \x01(\tR\x03rid\"\xe0\b\n" +
 	"\n" +
 	"DataPacket\x120\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.livekit.DataPacket.KindB\x02\x18\x01R\x04kind\x121\n" +
@@ -5463,7 +5419,11 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fstream_chunk\x18\x0e \x01(\v2\x19.livekit.DataStream.ChunkH\x00R\vstreamChunk\x12D\n" +
 	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\x12\x1a\n" +
 	"\bsequence\x18\x10 \x01(\rR\bsequence\x12'\n" +
-	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\"\x1f\n" +
+	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\x12A\n" +
+	"\x0fencryption_type\x18\x12 \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
+	"\x02iv\x18\x13 \x01(\fR\x02iv\x12\x1b\n" +
+	"\tkey_index\x18\x14 \x01(\rR\bkeyIndex\x12)\n" +
+	"\x10encrypted_packet\x18\x15 \x01(\fR\x0fencryptedPacket\"\x1f\n" +
 	"\x04Kind\x12\f\n" +
 	"\bRELIABLE\x10\x00\x12\t\n" +
 	"\x05LOSSY\x10\x01B\a\n" +
@@ -5473,7 +5433,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\vSpeakerInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x02R\x05level\x12\x16\n" +
-	"\x06active\x18\x03 \x01(\bR\x06active\"\x9b\x04\n" +
+	"\x06active\x18\x03 \x01(\bR\x06active\"\xab\x03\n" +
 	"\n" +
 	"UserPacket\x12+\n" +
 	"\x0fparticipant_sid\x18\x01 \x01(\tB\x02\x18\x01R\x0eparticipantSid\x125\n" +
@@ -5487,10 +5447,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"start_time\x18\t \x01(\x04H\x02R\tstartTime\x88\x01\x01\x12\x1e\n" +
 	"\bend_time\x18\n" +
 	" \x01(\x04H\x03R\aendTime\x88\x01\x01\x12\x14\n" +
-	"\x05nonce\x18\v \x01(\fR\x05nonce\x12A\n" +
-	"\x0fencryption_type\x18\f \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
-	"\x02iv\x18\r \x01(\fR\x02iv\x12\x1b\n" +
-	"\tkey_index\x18\x0e \x01(\rR\bkeyIndexB\b\n" +
+	"\x05nonce\x18\v \x01(\fR\x05nonceB\b\n" +
 	"\x06_topicB\x05\n" +
 	"\x03_idB\r\n" +
 	"\v_start_timeB\v\n" +
@@ -5517,28 +5474,22 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12\x18\n" +
 	"\adeleted\x18\x05 \x01(\bR\adeleted\x12\x1c\n" +
 	"\tgenerated\x18\x06 \x01(\bR\tgeneratedB\x11\n" +
-	"\x0f_edit_timestamp\"\x88\x02\n" +
+	"\x0f_edit_timestamp\"\x98\x01\n" +
 	"\n" +
 	"RpcRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06method\x18\x02 \x01(\tR\x06method\x12\x18\n" +
 	"\apayload\x18\x03 \x01(\tR\apayload\x12.\n" +
 	"\x13response_timeout_ms\x18\x04 \x01(\rR\x11responseTimeoutMs\x12\x18\n" +
-	"\aversion\x18\x05 \x01(\rR\aversion\x12A\n" +
-	"\x0fencryption_type\x18\x06 \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
-	"\x02iv\x18\a \x01(\fR\x02iv\x12\x1b\n" +
-	"\tkey_index\x18\b \x01(\rR\bkeyIndex\"'\n" +
+	"\aversion\x18\x05 \x01(\rR\aversion\"'\n" +
 	"\x06RpcAck\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\"\xec\x01\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\"|\n" +
 	"\vRpcResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
 	"\apayload\x18\x02 \x01(\tH\x00R\apayload\x12)\n" +
-	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05error\x12A\n" +
-	"\x0fencryption_type\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12\x0e\n" +
-	"\x02iv\x18\x05 \x01(\fR\x02iv\x12\x1b\n" +
-	"\tkey_index\x18\x06 \x01(\rR\bkeyIndexB\a\n" +
+	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05errorB\a\n" +
 	"\x05value\"L\n" +
 	"\bRpcError\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\rR\x04code\x12\x18\n" +
@@ -5719,7 +5670,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fTimedVersion\x12\x1d\n" +
 	"\n" +
 	"unix_micro\x18\x01 \x01(\x03R\tunixMicro\x12\x14\n" +
-	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xf9\t\n" +
+	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xe4\t\n" +
 	"\n" +
 	"DataStream\x1a\xeb\x01\n" +
 	"\n" +
@@ -5731,14 +5682,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\tgenerated\x18\x05 \x01(\bR\tgenerated\x1a \n" +
 	"\n" +
 	"ByteHeader\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x1a\x95\x04\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x1a\x99\x04\n" +
 	"\x06Header\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x14\n" +
 	"\x05topic\x18\x03 \x01(\tR\x05topic\x12\x1b\n" +
 	"\tmime_type\x18\x04 \x01(\tR\bmimeType\x12&\n" +
-	"\ftotal_length\x18\x05 \x01(\x04H\x01R\vtotalLength\x88\x01\x01\x12A\n" +
-	"\x0fencryption_type\x18\a \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12J\n" +
+	"\ftotal_length\x18\x05 \x01(\x04H\x01R\vtotalLength\x88\x01\x01\x12E\n" +
+	"\x0fencryption_type\x18\a \x01(\x0e2\x18.livekit.Encryption.TypeB\x02\x18\x01R\x0eencryptionType\x12J\n" +
 	"\n" +
 	"attributes\x18\b \x03(\v2*.livekit.DataStream.Header.AttributesEntryR\n" +
 	"attributes\x12A\n" +
@@ -5751,15 +5702,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x10\n" +
 	"\x0econtent_headerB\x0f\n" +
-	"\r_total_length\x1a\xb2\x01\n" +
+	"\r_total_length\x1a\x99\x01\n" +
 	"\x05Chunk\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1f\n" +
 	"\vchunk_index\x18\x02 \x01(\x04R\n" +
 	"chunkIndex\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\fR\acontent\x12\x18\n" +
-	"\aversion\x18\x04 \x01(\x05R\aversion\x12\x13\n" +
-	"\x02iv\x18\x05 \x01(\fH\x00R\x02iv\x88\x01\x01\x12\x1b\n" +
-	"\tkey_index\x18\x06 \x01(\rR\bkeyIndexB\x05\n" +
+	"\aversion\x18\x04 \x01(\x05R\aversion\x12\x17\n" +
+	"\x02iv\x18\x05 \x01(\fB\x02\x18\x01H\x00R\x02iv\x88\x01\x01B\x05\n" +
 	"\x03_iv\x1a\xca\x01\n" +
 	"\aTrailer\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x16\n" +
@@ -5992,49 +5942,47 @@ var file_livekit_models_proto_depIdxs = []int32{
 	63, // 30: livekit.DataPacket.stream_header:type_name -> livekit.DataStream.Header
 	64, // 31: livekit.DataPacket.stream_chunk:type_name -> livekit.DataStream.Chunk
 	65, // 32: livekit.DataPacket.stream_trailer:type_name -> livekit.DataStream.Trailer
-	34, // 33: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
-	16, // 34: livekit.UserPacket.encryption_type:type_name -> livekit.Encryption.Type
+	16, // 33: livekit.DataPacket.encryption_type:type_name -> livekit.Encryption.Type
+	34, // 34: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
 	38, // 35: livekit.Transcription.segments:type_name -> livekit.TranscriptionSegment
-	16, // 36: livekit.RpcRequest.encryption_type:type_name -> livekit.Encryption.Type
-	43, // 37: livekit.RpcResponse.error:type_name -> livekit.RpcError
-	16, // 38: livekit.RpcResponse.encryption_type:type_name -> livekit.Encryption.Type
-	18, // 39: livekit.ServerInfo.edition:type_name -> livekit.ServerInfo.Edition
-	19, // 40: livekit.ClientInfo.sdk:type_name -> livekit.ClientInfo.SDK
-	48, // 41: livekit.ClientConfiguration.video:type_name -> livekit.VideoConfiguration
-	48, // 42: livekit.ClientConfiguration.screen:type_name -> livekit.VideoConfiguration
-	8,  // 43: livekit.ClientConfiguration.resume_connection:type_name -> livekit.ClientConfigSetting
-	49, // 44: livekit.ClientConfiguration.disabled_codecs:type_name -> livekit.DisabledCodecs
-	8,  // 45: livekit.ClientConfiguration.force_relay:type_name -> livekit.ClientConfigSetting
-	8,  // 46: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
-	24, // 47: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
-	24, // 48: livekit.DisabledCodecs.publish:type_name -> livekit.Codec
-	69, // 49: livekit.RTPDrift.start_time:type_name -> google.protobuf.Timestamp
-	69, // 50: livekit.RTPDrift.end_time:type_name -> google.protobuf.Timestamp
-	69, // 51: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
-	69, // 52: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
-	60, // 53: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
-	69, // 54: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
-	69, // 55: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
-	69, // 56: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
-	69, // 57: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
-	50, // 58: livekit.RTPStats.packet_drift:type_name -> livekit.RTPDrift
-	50, // 59: livekit.RTPStats.ntp_report_drift:type_name -> livekit.RTPDrift
-	50, // 60: livekit.RTPStats.rebased_report_drift:type_name -> livekit.RTPDrift
-	50, // 61: livekit.RTPStats.received_report_drift:type_name -> livekit.RTPDrift
-	54, // 62: livekit.RTPForwarderState.rtp_munger:type_name -> livekit.RTPMungerState
-	55, // 63: livekit.RTPForwarderState.vp8_munger:type_name -> livekit.VP8MungerState
-	52, // 64: livekit.RTPForwarderState.sender_report_state:type_name -> livekit.RTCPSenderReportState
-	20, // 65: livekit.DataStream.TextHeader.operation_type:type_name -> livekit.DataStream.OperationType
-	16, // 66: livekit.DataStream.Header.encryption_type:type_name -> livekit.Encryption.Type
-	66, // 67: livekit.DataStream.Header.attributes:type_name -> livekit.DataStream.Header.AttributesEntry
-	61, // 68: livekit.DataStream.Header.text_header:type_name -> livekit.DataStream.TextHeader
-	62, // 69: livekit.DataStream.Header.byte_header:type_name -> livekit.DataStream.ByteHeader
-	67, // 70: livekit.DataStream.Trailer.attributes:type_name -> livekit.DataStream.Trailer.AttributesEntry
-	71, // [71:71] is the sub-list for method output_type
-	71, // [71:71] is the sub-list for method input_type
-	71, // [71:71] is the sub-list for extension type_name
-	71, // [71:71] is the sub-list for extension extendee
-	0,  // [0:71] is the sub-list for field type_name
+	43, // 36: livekit.RpcResponse.error:type_name -> livekit.RpcError
+	18, // 37: livekit.ServerInfo.edition:type_name -> livekit.ServerInfo.Edition
+	19, // 38: livekit.ClientInfo.sdk:type_name -> livekit.ClientInfo.SDK
+	48, // 39: livekit.ClientConfiguration.video:type_name -> livekit.VideoConfiguration
+	48, // 40: livekit.ClientConfiguration.screen:type_name -> livekit.VideoConfiguration
+	8,  // 41: livekit.ClientConfiguration.resume_connection:type_name -> livekit.ClientConfigSetting
+	49, // 42: livekit.ClientConfiguration.disabled_codecs:type_name -> livekit.DisabledCodecs
+	8,  // 43: livekit.ClientConfiguration.force_relay:type_name -> livekit.ClientConfigSetting
+	8,  // 44: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
+	24, // 45: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
+	24, // 46: livekit.DisabledCodecs.publish:type_name -> livekit.Codec
+	69, // 47: livekit.RTPDrift.start_time:type_name -> google.protobuf.Timestamp
+	69, // 48: livekit.RTPDrift.end_time:type_name -> google.protobuf.Timestamp
+	69, // 49: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
+	69, // 50: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
+	60, // 51: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
+	69, // 52: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
+	69, // 53: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
+	69, // 54: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
+	69, // 55: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
+	50, // 56: livekit.RTPStats.packet_drift:type_name -> livekit.RTPDrift
+	50, // 57: livekit.RTPStats.ntp_report_drift:type_name -> livekit.RTPDrift
+	50, // 58: livekit.RTPStats.rebased_report_drift:type_name -> livekit.RTPDrift
+	50, // 59: livekit.RTPStats.received_report_drift:type_name -> livekit.RTPDrift
+	54, // 60: livekit.RTPForwarderState.rtp_munger:type_name -> livekit.RTPMungerState
+	55, // 61: livekit.RTPForwarderState.vp8_munger:type_name -> livekit.VP8MungerState
+	52, // 62: livekit.RTPForwarderState.sender_report_state:type_name -> livekit.RTCPSenderReportState
+	20, // 63: livekit.DataStream.TextHeader.operation_type:type_name -> livekit.DataStream.OperationType
+	16, // 64: livekit.DataStream.Header.encryption_type:type_name -> livekit.Encryption.Type
+	66, // 65: livekit.DataStream.Header.attributes:type_name -> livekit.DataStream.Header.AttributesEntry
+	61, // 66: livekit.DataStream.Header.text_header:type_name -> livekit.DataStream.TextHeader
+	62, // 67: livekit.DataStream.Header.byte_header:type_name -> livekit.DataStream.ByteHeader
+	67, // 68: livekit.DataStream.Trailer.attributes:type_name -> livekit.DataStream.Trailer.AttributesEntry
+	69, // [69:69] is the sub-list for method output_type
+	69, // [69:69] is the sub-list for method input_type
+	69, // [69:69] is the sub-list for extension type_name
+	69, // [69:69] is the sub-list for extension extendee
+	0,  // [0:69] is the sub-list for field type_name
 }
 
 func init() { file_livekit_models_proto_init() }
