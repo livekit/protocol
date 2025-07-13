@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	siputils "github.com/livekit/protocol/utils/sip"
 	"github.com/livekit/protocol/utils/xtwirp"
 )
 
@@ -722,9 +721,13 @@ func (p *ListSIPInboundTrunkRequest) Filter(info *SIPInboundTrunkInfo) bool {
 	if len(p.Numbers) != 0 && len(info.Numbers) != 0 {
 		ok := false
 		for _, num := range info.Numbers {
-			normalizedNum := siputils.NormalizeNumber(num)
+			if slices.Contains(p.Numbers, num) {
+				ok = true
+				break
+			}
+			normalizedNum := NormalizeNumber(num)
 			for _, reqNum := range p.Numbers {
-				if siputils.NormalizeNumber(reqNum) == normalizedNum {
+				if NormalizeNumber(reqNum) == normalizedNum {
 					ok = true
 					break
 				}
@@ -804,3 +807,30 @@ func (p *ListSIPDispatchRuleRequest) FilterSlice(arr []*SIPDispatchRuleInfo) []*
 	})
 	return filterSlice(arr, p.Filter)
 }
+
+// NormalizeNumber normalizes a phone number by removing formatting characters and ensuring it starts with a "+".
+// If the input is empty, it returns an empty string.
+// If the input doesn't match the expected number pattern, it returns the original input unchanged.
+func NormalizeNumber(num string) string {
+	if num == "" {
+		return ""
+	}
+	if !reNumber.MatchString(num) {
+		return num
+	}
+	num = reNumberRepl.Replace(num)
+	if !strings.HasPrefix(num, "+") {
+		return "+" + num
+	}
+	return num
+}
+
+var (
+	reNumber     = regexp.MustCompile(`^\+?[\d\- ()]+$`)
+	reNumberRepl = strings.NewReplacer(
+		" ", "",
+		"-", "",
+		"(", "",
+		")", "",
+	)
+)
