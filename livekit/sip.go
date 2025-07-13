@@ -725,6 +725,16 @@ func (p *ListSIPInboundTrunkRequest) Filter(info *SIPInboundTrunkInfo) bool {
 				ok = true
 				break
 			}
+			normalizedNum := NormalizeNumber(num)
+			for _, reqNum := range p.Numbers {
+				if NormalizeNumber(reqNum) == normalizedNum {
+					ok = true
+					break
+				}
+			}
+			if ok {
+				break
+			}
 		}
 		if !ok {
 			return false
@@ -797,3 +807,30 @@ func (p *ListSIPDispatchRuleRequest) FilterSlice(arr []*SIPDispatchRuleInfo) []*
 	})
 	return filterSlice(arr, p.Filter)
 }
+
+// NormalizeNumber normalizes a phone number by removing formatting characters and ensuring it starts with a "+".
+// If the input is empty, it returns an empty string.
+// If the input doesn't match the expected number pattern, it returns the original input unchanged.
+func NormalizeNumber(num string) string {
+	if num == "" {
+		return ""
+	}
+	if !reNumber.MatchString(num) {
+		return num
+	}
+	num = reNumberRepl.Replace(num)
+	if !strings.HasPrefix(num, "+") {
+		return "+" + num
+	}
+	return num
+}
+
+var (
+	reNumber     = regexp.MustCompile(`^\+?[\d\- ()]+$`)
+	reNumberRepl = strings.NewReplacer(
+		" ", "",
+		"-", "",
+		"(", "",
+		")", "",
+	)
+)

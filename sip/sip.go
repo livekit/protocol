@@ -22,7 +22,6 @@ import (
 	"maps"
 	"math"
 	"net/netip"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -275,28 +274,10 @@ func printNumbers(numbers []string) string {
 	return fmt.Sprintf("%q", numbers)
 }
 
-var (
-	reNumber     = regexp.MustCompile(`^\+?[\d\- ()]+$`)
-	reNumberRepl = strings.NewReplacer(
-		" ", "",
-		"-", "",
-		"(", "",
-		")", "",
-	)
-)
-
+// NormalizeNumber normalizes a phone number by removing formatting characters and ensuring it starts with a "+".
+// This function delegates to livekit.NormalizeNumber for the actual implementation.
 func NormalizeNumber(num string) string {
-	if num == "" {
-		return ""
-	}
-	if !reNumber.MatchString(num) {
-		return num
-	}
-	num = reNumberRepl.Replace(num)
-	if !strings.HasPrefix(num, "+") {
-		return "+" + num
-	}
-	return num
+	return livekit.NormalizeNumber(num)
 }
 
 func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *livekit.SIPInboundTrunkInfo, opt *matchTrunkOpts) error {
