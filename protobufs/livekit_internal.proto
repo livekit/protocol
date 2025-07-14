@@ -24,7 +24,6 @@ import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_agent_dispatch.proto";
 import "livekit_room.proto";
-import "livekit_rtc_v2.proto";
 
 enum NodeType {
   SERVER = 0;
@@ -178,13 +177,6 @@ message StartSession {
   optional bool subscriber_allow_pause = 18;
   bool disable_ice_lite = 19;
   livekit.CreateRoomRequest create_room = 20;
-}
-
-message CreateParticipantSession {
-  // A user's ClaimGrants serialized in JSON
-  string grants_json = 3;
-  livekit.CreateRoomRequest create_room = 4;
-  livekit.ConnectRequest connect = 5;
 }
 
 // room info that should not be returned to clients
