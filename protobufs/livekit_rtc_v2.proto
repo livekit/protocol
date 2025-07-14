@@ -128,6 +128,7 @@ message ConnectRequest {
   ConnectionSettings connection_settings = 3;
   repeated AudioTrack audio_tracks = 4;
   repeated VideoTrack video_tracks = 5;
+  map<string, string> participant_attributes = 6;
 }
 
 message ReconnectRequest {
