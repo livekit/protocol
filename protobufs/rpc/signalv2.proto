@@ -38,11 +38,11 @@ service Signalv2 {
 
 message RelaySignalv2ConnectRequest {
   // A user's ClaimGrants serialized in JSON
-  string grants_json = 3;
-  livekit.CreateRoomRequest create_room = 4;
-  livekit.ConnectRequest connect = 5;
+  string grants_json = 1;
+  livekit.CreateRoomRequest create_room = 2;
+  livekit.ConnectRequest connect_request = 3;
 }
 
 message RelaySignalv2ConnectResponse {
-  livekit.Signalv2ServerEnvelope server_envelope = 1;
+  livekit.ConnectResponse connect_response = 1;
 }

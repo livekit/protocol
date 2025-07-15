@@ -107,7 +107,7 @@ message TrackSettings {
   TrackSource source = 3;
   bool muted = 4;
   Encryption.Type encryption = 5;
-  optional string sid = 6;
+  string stream = 6;
 }
 
 message AudioTrack {
@@ -118,17 +118,19 @@ message AudioTrack {
 
 message VideoTrack {
   TrackSettings track_settings = 1;
-  repeated SimulcastCodec simulcast_codecs = 2;
-  BackupCodecPolicy backup_codec_policy = 3;
+  VideoLayer.Mode layer_mode = 2;
+  repeated SimulcastCodec simulcast_codecs = 3;
+  BackupCodecPolicy backup_codec_policy = 4;
+  string sid = 5;  // used when publishing a new codec to an existing track
 }
 
 message ConnectRequest {
   ClientInfo client_info = 1;
-  SessionDescription publisher_sdp = 2;
-  ConnectionSettings connection_settings = 3;
+  ConnectionSettings connection_settings = 2;
+  map<string, string> participant_attributes = 3;
   repeated AudioTrack audio_tracks = 4;
   repeated VideoTrack video_tracks = 5;
-  map<string, string> participant_attributes = 6;
+  SessionDescription publisher_sdp = 6;
 }
 
 message ReconnectRequest {
@@ -143,14 +145,13 @@ message ConnectResponse {
   repeated ParticipantInfo other_participants = 3;
   repeated ICEServer ice_servers = 4;
   ClientConfiguration client_configuration = 5;
-  int32 ping_timeout = 6;
-  int32 ping_interval = 7;
-  ServerInfo server_info = 8;
+  ServerInfo server_info = 6;
   // Server-Injected-Frame byte trailer, used to identify unencrypted frames when e2ee is enabled
-  bytes sif_trailer = 9;
-  repeated Codec enabled_publish_codecs = 10;
-  SessionDescription publisher_sdp = 11;
-  SessionDescription subscriber_sdp = 12;
+  bytes sif_trailer = 7;
+  repeated Codec enabled_publish_codecs = 8;
+  bool fast_publish = 9;
+  SessionDescription publisher_sdp = 10;
+  SessionDescription subscriber_sdp = 11;
 }
 
 message ErrorResponse {
