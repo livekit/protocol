@@ -48,6 +48,7 @@ message Signalv2ClientMessage {
     UpdateLocalAudioTrack update_local_audio_track = 18;
     UpdateLocalVideoTrack update_local_video_track = 19;
     bool acknowledgement = 20;
+    Signalv2ClientEnvelope envelope = 21;
   }
 }
 
@@ -86,6 +87,7 @@ message Signalv2ServerMessage {
     TrackSubscribed track_subscribed = 21;
     RoomMovedResponse room_moved_response = 22;
     bool acknowledgement = 23;
+    Signalv2ServerEnvelope envelope = 24;
   }
 }
 
