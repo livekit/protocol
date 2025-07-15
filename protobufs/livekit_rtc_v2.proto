@@ -97,7 +97,7 @@ message Signalv2ServerEnvelope {
 message ConnectionSettings {
   bool auto_subscribe = 1;
   bool adaptive_stream = 2;
-  bool subscriber_allow_pause = 3;
+  optional bool subscriber_allow_pause = 3;
   bool disable_ice_lite = 4;;
 }
 
