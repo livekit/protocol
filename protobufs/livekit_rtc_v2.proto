@@ -30,25 +30,8 @@ message Signalv2ClientMessage {
   uint32 last_processed_remote_message_id = 2;
 
   oneof message {
-    ConnectRequest connect_request = 3;
-    ReconnectRequest reconnect_request = 4;
-    AudioTrack audio_track = 5;
-    VideoTrack video_track = 6;
-    SessionDescription publisher_sdp = 7;
-    SessionDescription subscriber_sdp = 8;
-    TrickleRequest ice_candidate = 9;
-    MuteTrackRequest mute_track_request = 10;
-    UpdateSubscription update_subscription = 11;
-    UpdateTrackSettings update_track_settings = 12;
-    LeaveRequest leave_request = 13;
-    SubscriptionPermission update_subscription_permission = 14;
-    SimulateScenario simulate_scenario = 15;
-    UpdateParticipantMetadata update_participant_metadata = 16;
-    Ping ping = 17;
-    UpdateLocalAudioTrack update_local_audio_track = 18;
-    UpdateLocalVideoTrack update_local_video_track = 19;
-    bool acknowledgement = 20;
-    Signalv2ClientEnvelope envelope = 21;
+    Signalv2ClientEnvelope envelope = 3;
+    ConnectRequest connect_request = 4;
   }
 }
 
@@ -67,27 +50,8 @@ message Signalv2ServerMessage {
   repeated ErrorResponse errors = 3;
 
   oneof message {
-    ConnectResponse connect_response = 4;
-    ReconnectResponse reconnect_response = 5;
-    Room room_update = 6;
-    ParticipantUpdate participant_update = 7;
-    SessionDescription publisher_sdp = 8;
-    SessionDescription subscriber_sdp = 9;
-    LeaveRequest leave_request = 10;
-    MuteTrackRequest mute_track_request = 11;
-    SpeakersChanged speakers_changed = 12;
-    ConnectionQualityUpdate connection_quality_update = 13;
-    StreamStateUpdate stream_state_update = 14;
-    SubscribedQualityUpdate subscribed_quality_update = 15;
-    string refresh_token = 16;
-    TrackUnpublishedResponse track_unpublished = 17;
-    Pong pong = 18;
-    SubscriptionResponse subscription_response = 19;
-    RequestResponse request_response = 20;
-    TrackSubscribed track_subscribed = 21;
-    RoomMovedResponse room_moved_response = 22;
-    bool acknowledgement = 23;
-    Signalv2ServerEnvelope envelope = 24;
+    Signalv2ServerEnvelope envelope = 4;
+    ConnectResponse connect_response = 5;
   }
 }
 
@@ -103,42 +67,10 @@ message ConnectionSettings {
   bool disable_ice_lite = 4;;
 }
 
-message TrackSettings {
-  string cid = 1;
-  string name = 2;
-  TrackSource source = 3;
-  bool muted = 4;
-  Encryption.Type encryption = 5;
-  string stream = 6;
-}
-
-message AudioTrack {
-  TrackSettings track_settings = 1;
-  repeated AudioTrackFeature audio_features = 5;
-  bool disable_red = 6;
-}
-
-message VideoTrack {
-  TrackSettings track_settings = 1;
-  VideoLayer.Mode layer_mode = 2;
-  repeated SimulcastCodec simulcast_codecs = 3;
-  BackupCodecPolicy backup_codec_policy = 4;
-  string sid = 5;  // used when publishing a new codec to an existing track
-}
-
 message ConnectRequest {
   ClientInfo client_info = 1;
   ConnectionSettings connection_settings = 2;
   map<string, string> participant_attributes = 3;
-  repeated AudioTrack audio_tracks = 4;
-  repeated VideoTrack video_tracks = 5;
-  SessionDescription publisher_sdp = 6;
-}
-
-message ReconnectRequest {
-  string participant_sid = 1;
-  ReconnectReason reconnect_reason = 2;
-  SyncState sync_state = 3;
 }
 
 message ConnectResponse {
@@ -152,8 +84,7 @@ message ConnectResponse {
   bytes sif_trailer = 7;
   repeated Codec enabled_publish_codecs = 8;
   bool fast_publish = 9;
-  SessionDescription publisher_sdp = 10;
-  SessionDescription subscriber_sdp = 11;
+  SessionDescription subscriber_sdp = 10;
 }
 
 message ErrorResponse {
