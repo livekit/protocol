@@ -30,8 +30,9 @@ message Signalv2ClientMessage {
   uint32 last_processed_remote_message_id = 2;
 
   oneof message {
-    Signalv2ClientEnvelope envelope = 3;
-    ConnectRequest connect_request = 4;
+    Fragment fragment = 3;
+    Signalv2ClientEnvelope envelope = 4;
+    ConnectRequest connect_request = 5;
   }
 }
 
@@ -50,8 +51,9 @@ message Signalv2ServerMessage {
   repeated ErrorResponse errors = 3;
 
   oneof message {
-    Signalv2ServerEnvelope envelope = 4;
-    ConnectResponse connect_response = 5;
+    Fragment fragment = 4;
+    Signalv2ServerEnvelope envelope = 5;
+    ConnectResponse connect_response = 6;
   }
 }
 

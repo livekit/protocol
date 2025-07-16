@@ -723,3 +723,13 @@ message WebhookConfig {
   string url = 1;
   string signing_key = 2;
 }
+
+message Fragment {
+  uint32 packet_id = 1;  // all fragments of a packet will have the same id
+  uint32 fragment_number = 2; // should start at 1
+  uint32 num_fragments = 3;
+  uint32 fragment_size = 4;
+  uint32 total_size = 5;
+  bytes data = 6;
+}
+
