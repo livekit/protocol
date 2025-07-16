@@ -29,9 +29,7 @@ func UnpackCountryCode(code uint16) (isoAlpha2 string) {
 }
 
 func ToClientOS(os string) ClientOS {
-	os = strings.ToLower(os)
-
-	switch os {
+	switch strings.ToLower(os) {
 	case "":
 		return ClientOSUndefined
 	case "ios":
