@@ -70,9 +70,10 @@ message ConnectionSettings {
 message ConnectRequest {
   ClientInfo client_info = 1;
   ConnectionSettings connection_settings = 2;
-  string metadata = 3; // will be used only if token does not have metadata
+  string metadata = 3; // if not empty, will overwrite `metadata` in token
 
-  // will set keys which are not in token, but provided via this
+  // will set keys provided via this
+  // will overwrite if the same key is in the token
   // will not delete keys from token if there is a key collision and this sets that key to empty value
   map<string, string> participant_attributes = 4;
 }
