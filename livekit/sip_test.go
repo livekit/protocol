@@ -509,3 +509,89 @@ func TestDispatchRuleUpdate(t *testing.T) {
 	require.True(t, r2 != out)
 	require.True(t, proto.Equal(r2, out))
 }
+
+func TestSIPDispatchRuleInfo_Validate_DynamicURL(t *testing.T) {
+	tests := []struct {
+		name    string
+		rule    *SIPDispatchRuleInfo
+		wantErr bool
+		errMsg  string
+	}{
+		{
+			name: "valid HTTPS URL",
+			rule: &SIPDispatchRuleInfo{
+				Rule: &SIPDispatchRule{
+					Rule: &SIPDispatchRule_DispatchRuleDynamic{
+						DispatchRuleDynamic: &SIPDispatchRuleDynamic{
+							Url: "https://example.com/webhook",
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "HTTP URL should fail",
+			rule: &SIPDispatchRuleInfo{
+				Rule: &SIPDispatchRule{
+					Rule: &SIPDispatchRule_DispatchRuleDynamic{
+						DispatchRuleDynamic: &SIPDispatchRuleDynamic{
+							Url: "http://example.com/webhook",
+						},
+					},
+				},
+			},
+			wantErr: true,
+			errMsg:  "dynamic dispatch rule URL must use HTTPS protocol",
+		},
+		{
+			name: "empty URL should fail",
+			rule: &SIPDispatchRuleInfo{
+				Rule: &SIPDispatchRule{
+					Rule: &SIPDispatchRule_DispatchRuleDynamic{
+						DispatchRuleDynamic: &SIPDispatchRuleDynamic{
+							Url: "",
+						},
+					},
+				},
+			},
+			wantErr: true,
+			errMsg:  "dynamic dispatch rule URL cannot be empty",
+		},
+		{
+			name: "non-dynamic rule should pass",
+			rule: &SIPDispatchRuleInfo{
+				Rule: &SIPDispatchRule{
+					Rule: &SIPDispatchRule_DispatchRuleDirect{
+						DispatchRuleDirect: &SIPDispatchRuleDirect{
+							RoomName: "test-room",
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "nil rule should fail",
+			rule: &SIPDispatchRuleInfo{
+				Rule: nil,
+			},
+			wantErr: true,
+			errMsg:  "missing rule",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.rule.Validate()
+			if tt.wantErr {
+				require.Error(t, err)
+				if tt.errMsg != "" {
+					require.Contains(t, err.Error(), tt.errMsg)
+				}
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}
