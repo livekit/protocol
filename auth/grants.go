@@ -162,7 +162,7 @@ func checkOutputForCredentials(output any) error {
 }
 
 type ClaimGrants struct {
-	Identity string      `json:"-"`
+	Identity string      `json:"identity,omitempty"`
 	Name     string      `json:"name,omitempty"`
 	Kind     string      `json:"kind,omitempty"`
 	Video    *VideoGrant `json:"video,omitempty"`

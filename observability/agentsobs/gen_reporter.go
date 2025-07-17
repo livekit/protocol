@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_9IAJBGO = true
+const Version_6JD79I0 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -22,11 +22,21 @@ type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
 	Tx(func(tx ProjectTx))
 	TxAt(time.Time, func(tx ProjectTx))
+	WithCloudAgent(id string) CloudAgentReporter
+	WithDeferredCloudAgent() (CloudAgentReporter, KeyResolver)
+}
+
+type ProjectTx interface{}
+
+type CloudAgentReporter interface {
+	RegisterFunc(func(ts time.Time, tx CloudAgentTx) bool)
+	Tx(func(tx CloudAgentTx))
+	TxAt(time.Time, func(tx CloudAgentTx))
 	WithAgent(name string) AgentReporter
 	WithDeferredAgent() (AgentReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type CloudAgentTx interface{}
 
 type AgentReporter interface {
 	RegisterFunc(func(ts time.Time, tx AgentTx) bool)
@@ -44,35 +54,35 @@ type WorkerReporter interface {
 	TxAt(time.Time, func(tx WorkerTx))
 	WithJob(id string) JobReporter
 	WithDeferredJob() (JobReporter, KeyResolver)
+	ReportLoad(v float32)
+	ReportStatus(v WorkerStatus)
+	ReportStartTime(v time.Time)
+	ReportJobsCurrent(v uint32)
+	ReportKind(v AgentKind)
 	ReportCPU(v int64)
 	ReportCPULimit(v int64)
 	ReportMem(v int64)
 	ReportMemLimit(v int64)
-	ReportLoad(v float32)
-	ReportStatus(v WorkerStatus)
 	ReportRegion(v string)
 	ReportVersion(v string)
 	ReportSdkVersion(v string)
 	ReportState(v WorkerState)
-	ReportStartedAt(v time.Time)
-	ReportJobsCurrent(v uint16)
-	ReportKind(v AgentKind)
 }
 
 type WorkerTx interface {
+	ReportLoad(v float32)
+	ReportStatus(v WorkerStatus)
+	ReportStartTime(v time.Time)
+	ReportJobsCurrent(v uint32)
+	ReportKind(v AgentKind)
 	ReportCPU(v int64)
 	ReportCPULimit(v int64)
 	ReportMem(v int64)
 	ReportMemLimit(v int64)
-	ReportLoad(v float32)
-	ReportStatus(v WorkerStatus)
 	ReportRegion(v string)
 	ReportVersion(v string)
 	ReportSdkVersion(v string)
 	ReportState(v WorkerState)
-	ReportStartedAt(v time.Time)
-	ReportJobsCurrent(v uint16)
-	ReportKind(v AgentKind)
 }
 
 type JobReporter interface {
@@ -83,9 +93,10 @@ type JobReporter interface {
 	ReportKind(v JobKind)
 	ReportStatus(v JobStatus)
 	ReportDuration(v uint32)
-	ReportDispatchedAt(v time.Time)
-	ReportJoinedAt(v time.Time)
-	ReportCompletedAt(v time.Time)
+	ReportDurationMinutes(v uint8)
+	ReportStartTime(v time.Time)
+	ReportEndTime(v time.Time)
+	ReportJoinLatency(v uint32)
 }
 
 type JobTx interface {
@@ -93,7 +104,8 @@ type JobTx interface {
 	ReportKind(v JobKind)
 	ReportStatus(v JobStatus)
 	ReportDuration(v uint32)
-	ReportDispatchedAt(v time.Time)
-	ReportJoinedAt(v time.Time)
-	ReportCompletedAt(v time.Time)
+	ReportDurationMinutes(v uint8)
+	ReportStartTime(v time.Time)
+	ReportEndTime(v time.Time)
+	ReportJoinLatency(v uint32)
 }

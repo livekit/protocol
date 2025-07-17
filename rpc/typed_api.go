@@ -120,6 +120,17 @@ func NewTypedSignalServer(nodeID livekit.NodeID, svc SignalServerImpl, bus psrpc
 	return NewSignalServer[livekit.NodeID](svc, bus, psrpc.WithServerOptions(opts...), psrpc.WithServerID(string(nodeID)))
 }
 
+type TypedSignalv2Client = Signalv2Client[livekit.NodeID]
+type TypedSignalv2Server = Signalv2Server[livekit.NodeID]
+
+func NewTypedSignalv2Client(nodeID livekit.NodeID, bus psrpc.MessageBus, opts ...psrpc.ClientOption) (TypedSignalv2Client, error) {
+	return NewSignalv2Client[livekit.NodeID](bus, psrpc.WithClientOptions(opts...), psrpc.WithClientID(string(nodeID)))
+}
+
+func NewTypedSignalv2Server(nodeID livekit.NodeID, svc Signalv2ServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedSignalv2Server, error) {
+	return NewSignalv2Server[livekit.NodeID](svc, bus, psrpc.WithServerOptions(opts...), psrpc.WithServerID(string(nodeID)))
+}
+
 type TypedRoomManagerClient = RoomManagerClient[livekit.NodeID]
 type TypedRoomManagerServer = RoomManagerServer[livekit.NodeID]
 

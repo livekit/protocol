@@ -164,9 +164,9 @@ message StartSession {
   // if a client is reconnecting (i.e. resume instead of restart)
   bool reconnect = 4;
   bool auto_subscribe = 9;
-  bool hidden = 10;
+  bool hidden = 10 [deprecated=true];
   ClientInfo client = 11;
-  bool recorder = 12;
+  bool recorder = 12 [deprecated=true];
   string name = 13;
   // A user's ClaimGrants serialized in JSON
   string grants_json = 14;
