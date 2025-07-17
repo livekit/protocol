@@ -1156,8 +1156,6 @@ type RoomConfiguration struct {
 	DepartureTimeout uint32 `protobuf:"varint,3,opt,name=departure_timeout,json=departureTimeout,proto3" json:"departure_timeout,omitempty"`
 	// limit number of participants that can be in a room, excluding Egress and Ingress participants
 	MaxParticipants uint32 `protobuf:"varint,4,opt,name=max_participants,json=maxParticipants,proto3" json:"max_participants,omitempty"`
-	// metadata of room
-	Metadata string `protobuf:"bytes,11,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	// egress
 	Egress *RoomEgress `protobuf:"bytes,5,opt,name=egress,proto3" json:"egress,omitempty"`
 	// playout delay of subscriber
@@ -1165,7 +1163,7 @@ type RoomConfiguration struct {
 	MaxPlayoutDelay uint32 `protobuf:"varint,8,opt,name=max_playout_delay,json=maxPlayoutDelay,proto3" json:"max_playout_delay,omitempty"`
 	// improves A/V sync when playout_delay set to a value larger than 200ms. It will disables transceiver re-use
 	// so not recommended for rooms with frequent subscription changes
-	SyncStreams bool `protobuf:"varint,12,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
+	SyncStreams bool `protobuf:"varint,9,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
 	// Define agents that should be dispatched to this room
 	Agents        []*RoomAgentDispatch `protobuf:"bytes,10,rep,name=agents,proto3" json:"agents,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1228,13 +1226,6 @@ func (x *RoomConfiguration) GetMaxParticipants() uint32 {
 		return x.MaxParticipants
 	}
 	return 0
-}
-
-func (x *RoomConfiguration) GetMetadata() string {
-	if x != nil {
-		return x.Metadata
-	}
-	return ""
 }
 
 func (x *RoomConfiguration) GetEgress() *RoomEgress {
@@ -1556,17 +1547,16 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x10SendDataResponse\"K\n" +
 	"\x19UpdateRoomMetadataRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
-	"\bmetadata\x18\x02 \x01(\tR\bmetadata\"\x9c\x03\n" +
+	"\bmetadata\x18\x02 \x01(\tR\bmetadata\"\x80\x03\n" +
 	"\x11RoomConfiguration\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
 	"\rempty_timeout\x18\x02 \x01(\rR\femptyTimeout\x12+\n" +
 	"\x11departure_timeout\x18\x03 \x01(\rR\x10departureTimeout\x12)\n" +
-	"\x10max_participants\x18\x04 \x01(\rR\x0fmaxParticipants\x12\x1a\n" +
-	"\bmetadata\x18\v \x01(\tR\bmetadata\x12+\n" +
+	"\x10max_participants\x18\x04 \x01(\rR\x0fmaxParticipants\x12+\n" +
 	"\x06egress\x18\x05 \x01(\v2\x13.livekit.RoomEgressR\x06egress\x12*\n" +
 	"\x11min_playout_delay\x18\a \x01(\rR\x0fminPlayoutDelay\x12*\n" +
 	"\x11max_playout_delay\x18\b \x01(\rR\x0fmaxPlayoutDelay\x12!\n" +
-	"\fsync_streams\x18\f \x01(\bR\vsyncStreams\x122\n" +
+	"\fsync_streams\x18\t \x01(\bR\vsyncStreams\x122\n" +
 	"\x06agents\x18\n" +
 	" \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\"v\n" +
 	"\x19ForwardParticipantRequest\x12\x12\n" +

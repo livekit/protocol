@@ -301,6 +301,7 @@ type JobState struct {
 	UpdatedAt           int64                  `protobuf:"varint,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	ParticipantIdentity string                 `protobuf:"bytes,6,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	WorkerId            string                 `protobuf:"bytes,7,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
+	AgentId             string                 `protobuf:"bytes,8,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -380,6 +381,13 @@ func (x *JobState) GetParticipantIdentity() string {
 func (x *JobState) GetWorkerId() string {
 	if x != nil {
 		return x.WorkerId
+	}
+	return ""
+}
+
+func (x *JobState) GetAgentId() string {
+	if x != nil {
+		return x.AgentId
 	}
 	return ""
 }
@@ -1421,7 +1429,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
 	"agent_name\x18\a \x01(\tR\tagentName\x12'\n" +
 	"\x05state\x18\b \x01(\v2\x11.livekit.JobStateR\x05stateB\x0e\n" +
-	"\f_participant\"\xf5\x01\n" +
+	"\f_participant\"\x90\x02\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -1431,7 +1439,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x05 \x01(\x03R\tupdatedAt\x121\n" +
 	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x12\x1b\n" +
-	"\tworker_id\x18\a \x01(\tR\bworkerId\"\xc8\x03\n" +
+	"\tworker_id\x18\a \x01(\tR\bworkerId\x12\x19\n" +
+	"\bagent_id\x18\b \x01(\tR\aagentId\"\xc8\x03\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
