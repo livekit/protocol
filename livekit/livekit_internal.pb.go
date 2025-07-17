@@ -994,14 +994,12 @@ type StartSession struct {
 	Identity     string                 `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
 	ConnectionId string                 `protobuf:"bytes,3,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
 	// if a client is reconnecting (i.e. resume instead of restart)
-	Reconnect     bool `protobuf:"varint,4,opt,name=reconnect,proto3" json:"reconnect,omitempty"`
-	AutoSubscribe bool `protobuf:"varint,9,opt,name=auto_subscribe,json=autoSubscribe,proto3" json:"auto_subscribe,omitempty"`
-	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	Hidden bool        `protobuf:"varint,10,opt,name=hidden,proto3" json:"hidden,omitempty"`
-	Client *ClientInfo `protobuf:"bytes,11,opt,name=client,proto3" json:"client,omitempty"`
-	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	Recorder bool   `protobuf:"varint,12,opt,name=recorder,proto3" json:"recorder,omitempty"`
-	Name     string `protobuf:"bytes,13,opt,name=name,proto3" json:"name,omitempty"`
+	Reconnect     bool        `protobuf:"varint,4,opt,name=reconnect,proto3" json:"reconnect,omitempty"`
+	AutoSubscribe bool        `protobuf:"varint,9,opt,name=auto_subscribe,json=autoSubscribe,proto3" json:"auto_subscribe,omitempty"`
+	Hidden        bool        `protobuf:"varint,10,opt,name=hidden,proto3" json:"hidden,omitempty"`
+	Client        *ClientInfo `protobuf:"bytes,11,opt,name=client,proto3" json:"client,omitempty"`
+	Recorder      bool        `protobuf:"varint,12,opt,name=recorder,proto3" json:"recorder,omitempty"`
+	Name          string      `protobuf:"bytes,13,opt,name=name,proto3" json:"name,omitempty"`
 	// A user's ClaimGrants serialized in JSON
 	GrantsJson     string `protobuf:"bytes,14,opt,name=grants_json,json=grantsJson,proto3" json:"grants_json,omitempty"`
 	AdaptiveStream bool   `protobuf:"varint,15,opt,name=adaptive_stream,json=adaptiveStream,proto3" json:"adaptive_stream,omitempty"`
@@ -1080,7 +1078,6 @@ func (x *StartSession) GetAutoSubscribe() bool {
 	return false
 }
 
-// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *StartSession) GetHidden() bool {
 	if x != nil {
 		return x.Hidden
@@ -1095,7 +1092,6 @@ func (x *StartSession) GetClient() *ClientInfo {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *StartSession) GetRecorder() bool {
 	if x != nil {
 		return x.Recorder
@@ -1400,17 +1396,17 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xa1\x05\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\x99\x05\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12#\n" +
 	"\rconnection_id\x18\x03 \x01(\tR\fconnectionId\x12\x1c\n" +
 	"\treconnect\x18\x04 \x01(\bR\treconnect\x12%\n" +
-	"\x0eauto_subscribe\x18\t \x01(\bR\rautoSubscribe\x12\x1a\n" +
+	"\x0eauto_subscribe\x18\t \x01(\bR\rautoSubscribe\x12\x16\n" +
 	"\x06hidden\x18\n" +
-	" \x01(\bB\x02\x18\x01R\x06hidden\x12+\n" +
-	"\x06client\x18\v \x01(\v2\x13.livekit.ClientInfoR\x06client\x12\x1e\n" +
-	"\brecorder\x18\f \x01(\bB\x02\x18\x01R\brecorder\x12\x12\n" +
+	" \x01(\bR\x06hidden\x12+\n" +
+	"\x06client\x18\v \x01(\v2\x13.livekit.ClientInfoR\x06client\x12\x1a\n" +
+	"\brecorder\x18\f \x01(\bR\brecorder\x12\x12\n" +
 	"\x04name\x18\r \x01(\tR\x04name\x12\x1f\n" +
 	"\vgrants_json\x18\x0e \x01(\tR\n" +
 	"grantsJson\x12'\n" +
