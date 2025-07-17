@@ -41,6 +41,7 @@ message JobState {
   int64 updated_at = 5;
   string participant_identity = 6;
   string worker_id = 7;
+  string agent_id = 8;
 }
 
 // from Worker to Server
