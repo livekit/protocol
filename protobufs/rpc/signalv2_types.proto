@@ -18,19 +18,16 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
-import "options.proto";
-import "rpc/signalv2_types.proto";
+import "livekit_room.proto";
+import "livekit_rtc_v2.proto";
 
-service Signalv2 {
-  rpc RelaySignalv2Connect(RelaySignalv2ConnectRequest) returns (RelaySignalv2ConnectResponse) {
-    option (psrpc.options) = {
-      topics: true
-      topic_params: {
-        group: "node"
-        names: ["node_id"]
-        typed: true
-        single_server: true
-      };
-    };
-  };
+message RelaySignalv2ConnectRequest {
+  // A user's ClaimGrants serialized in JSON
+  string grants_json = 1;
+  livekit.CreateRoomRequest create_room = 2;
+  livekit.ConnectRequest connect_request = 3;
+}
+
+message RelaySignalv2ConnectResponse {
+  livekit.ConnectResponse connect_response = 1;
 }
