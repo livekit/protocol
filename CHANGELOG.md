@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.40.0
+
+### Minor Changes
+
+- Adding SIP Protocol generated call id to SipCall - [#1119](https://github.com/livekit/protocol/pull/1119) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+### Patch Changes
+
+- Updating how ListSIPInboundTrunkRequest filtering occurs by normalising phone number that are being compared - [#1126](https://github.com/livekit/protocol/pull/1126) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
 ## 1.39.3
 
 ## 1.39.2
