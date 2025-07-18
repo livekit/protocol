@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.40.0
+
+### Patch Changes
+
+- Add fields to support AssumeRole in egress S3 uploads - [#1124](https://github.com/livekit/protocol/pull/1124) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add latest CreateRoomRequest fields to RoomConfiguration - [#1132](https://github.com/livekit/protocol/pull/1132) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- update agent reporter for cloud agents - [#1128](https://github.com/livekit/protocol/pull/1128) ([@paulwe](https://github.com/paulwe))
+
 ## 1.39.3
 
 ### Patch Changes
