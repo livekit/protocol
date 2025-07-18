@@ -244,7 +244,7 @@ type VideoGrant struct {
 	// TrackSource types that a participant may publish.
 	// When set, it supersedes CanPublish. Only sources explicitly set here can be published
 	CanPublishSources []string `json:"canPublishSources,omitempty"` // keys keep track of each source
-	// by default, a participant is not allowed to update its own metadata
+	// by default, a participant is allowed to update its own metadata
 	CanUpdateOwnMetadata *bool `json:"canUpdateOwnMetadata,omitempty"`
 
 	// actions on ingresses
@@ -343,7 +343,7 @@ func (v *VideoGrant) GetCanSubscribe() bool {
 
 func (v *VideoGrant) GetCanUpdateOwnMetadata() bool {
 	if v.CanUpdateOwnMetadata == nil {
-		return false
+		return true
 	}
 	return *v.CanUpdateOwnMetadata
 }
