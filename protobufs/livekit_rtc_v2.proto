@@ -50,8 +50,8 @@ message Signalv2ClientMessage {
 
   oneof message {
     ConnectRequest connect_request = 2;
-    AudioTrack audio_track = 3;
-    VideoTrack video_track = 4;
+    RPC_AddAudioTrackRequest rpc_add_audio_track_request = 3;
+    RPC_AddVideoTrackRequest rpc_add_video_track_request = 4;
   }
 }
 
@@ -60,6 +60,8 @@ message Signalv2ServerMessage {
 
   oneof message {
     ConnectResponse connect_response = 2;
+    RPC_AddAudioTrackResponse rpc_add_audio_track_response = 3;
+    RPC_AddVideoTrackResponse rpc_add_video_track_response = 4;
   }
 }
 
@@ -108,6 +110,16 @@ message ConnectRequest {
   SessionDescription publisher_sdp = 7;
 }
 
+message RPC_AddAudioTrackRequest {
+  uint32 request_id = 1;
+  AudioTrack audio_track = 2;
+}
+
+message RPC_AddVideoTrackRequest {
+  uint32 request_id = 1;
+  VideoTrack video_track = 2;
+}
+
 message ConnectResponse {
   Room room = 1;
   ParticipantInfo participant = 2;
@@ -120,9 +132,23 @@ message ConnectResponse {
   repeated Codec enabled_publish_codecs = 8;
   bool fast_publish = 9;
   SessionDescription subscriber_sdp = 10;
+  SessionDescription publisher_sdp = 11;
 }
 
-message ErrorResponse {
-  uint32 message_id = 1;
-  string error = 2;
+enum AddTrackState {
+  UNUSED = 0;
+  ADDED = 1;
+  QUEUED = 2;
+}
+
+message RPC_AddAudioTrackResponse {
+  RPC_AddAudioTrackRequest rpc_add_audio_track_request = 1; // request reflected back
+  AddTrackState add_track_state = 2;
+  TrackInfo track_info = 3;
+}
+
+message RPC_AddVideoTrackResponse {
+  RPC_AddVideoTrackRequest rpc_add_video_track_request = 1; // request reflected back
+  AddTrackState add_track_state = 2;
+  TrackInfo track_info = 3;
 }
