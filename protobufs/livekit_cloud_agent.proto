@@ -108,6 +108,15 @@ message UpdateAgentResponse {
     string message = 2;
 }
 
+message RestartAgentRequest {
+    string agent_id = 1;
+}
+
+message RestartAgentResponse {
+    bool success = 1;
+    string message = 2;
+}
+
 message DeployAgentRequest {
     string agent_id              = 1;
     string agent_name            = 2 [deprecated=true];
@@ -184,6 +193,7 @@ service CloudAgent {
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}
     rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse) {}
+    rpc RestartAgent(RestartAgentRequest) returns (RestartAgentResponse) {}
     rpc DeployAgent(DeployAgentRequest) returns (DeployAgentResponse) {}
     rpc UpdateAgentSecrets(UpdateAgentSecretsRequest) returns (UpdateAgentSecretsResponse) {}
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}
