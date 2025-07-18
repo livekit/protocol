@@ -35,16 +35,201 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Signalv2ClientMessage struct {
+type Signalv2WireMessage struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Message:
+	//
+	//	*Signalv2WireMessage_Envelope
+	//	*Signalv2WireMessage_Fragment
+	Message       isSignalv2WireMessage_Message `protobuf_oneof:"message"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Signalv2WireMessage) Reset() {
+	*x = Signalv2WireMessage{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Signalv2WireMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Signalv2WireMessage) ProtoMessage() {}
+
+func (x *Signalv2WireMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Signalv2WireMessage.ProtoReflect.Descriptor instead.
+func (*Signalv2WireMessage) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Signalv2WireMessage) GetMessage() isSignalv2WireMessage_Message {
+	if x != nil {
+		return x.Message
+	}
+	return nil
+}
+
+func (x *Signalv2WireMessage) GetEnvelope() *Envelope {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2WireMessage_Envelope); ok {
+			return x.Envelope
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2WireMessage) GetFragment() *Fragment {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2WireMessage_Fragment); ok {
+			return x.Fragment
+		}
+	}
+	return nil
+}
+
+type isSignalv2WireMessage_Message interface {
+	isSignalv2WireMessage_Message()
+}
+
+type Signalv2WireMessage_Envelope struct {
+	Envelope *Envelope `protobuf:"bytes,1,opt,name=envelope,proto3,oneof"`
+}
+
+type Signalv2WireMessage_Fragment struct {
+	Fragment *Fragment `protobuf:"bytes,2,opt,name=fragment,proto3,oneof"`
+}
+
+func (*Signalv2WireMessage_Envelope) isSignalv2WireMessage_Message() {}
+
+func (*Signalv2WireMessage_Fragment) isSignalv2WireMessage_Message() {}
+
+type Envelope struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// collection of client -> server messages
+	ClientMessages []*Signalv2ClientMessage `protobuf:"bytes,1,rep,name=client_messages,json=clientMessages,proto3" json:"client_messages,omitempty"`
+	// collection of server -> client messages
+	ServerMessages []*Signalv2ServerMessage `protobuf:"bytes,2,rep,name=server_messages,json=serverMessages,proto3" json:"server_messages,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Envelope) Reset() {
+	*x = Envelope{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Envelope) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Envelope) ProtoMessage() {}
+
+func (x *Envelope) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Envelope.ProtoReflect.Descriptor instead.
+func (*Envelope) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Envelope) GetClientMessages() []*Signalv2ClientMessage {
+	if x != nil {
+		return x.ClientMessages
+	}
+	return nil
+}
+
+func (x *Envelope) GetServerMessages() []*Signalv2ServerMessage {
+	if x != nil {
+		return x.ServerMessages
+	}
+	return nil
+}
+
+type Sequencer struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
 	MessageId uint32 `protobuf:"varint,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
 	// last remote message processed
 	LastProcessedRemoteMessageId uint32 `protobuf:"varint,2,opt,name=last_processed_remote_message_id,json=lastProcessedRemoteMessageId,proto3" json:"last_processed_remote_message_id,omitempty"`
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
+}
+
+func (x *Sequencer) Reset() {
+	*x = Sequencer{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Sequencer) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Sequencer) ProtoMessage() {}
+
+func (x *Sequencer) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Sequencer.ProtoReflect.Descriptor instead.
+func (*Sequencer) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Sequencer) GetMessageId() uint32 {
+	if x != nil {
+		return x.MessageId
+	}
+	return 0
+}
+
+func (x *Sequencer) GetLastProcessedRemoteMessageId() uint32 {
+	if x != nil {
+		return x.LastProcessedRemoteMessageId
+	}
+	return 0
+}
+
+type Signalv2ClientMessage struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Sequencer *Sequencer             `protobuf:"bytes,1,opt,name=sequencer,proto3" json:"sequencer,omitempty"`
 	// Types that are valid to be assigned to Message:
 	//
-	//	*Signalv2ClientMessage_Fragment
-	//	*Signalv2ClientMessage_Envelope
 	//	*Signalv2ClientMessage_ConnectRequest
 	Message       isSignalv2ClientMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
@@ -53,7 +238,7 @@ type Signalv2ClientMessage struct {
 
 func (x *Signalv2ClientMessage) Reset() {
 	*x = Signalv2ClientMessage{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[0]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -65,7 +250,7 @@ func (x *Signalv2ClientMessage) String() string {
 func (*Signalv2ClientMessage) ProtoMessage() {}
 
 func (x *Signalv2ClientMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[0]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -78,44 +263,19 @@ func (x *Signalv2ClientMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Signalv2ClientMessage.ProtoReflect.Descriptor instead.
 func (*Signalv2ClientMessage) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{0}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *Signalv2ClientMessage) GetMessageId() uint32 {
+func (x *Signalv2ClientMessage) GetSequencer() *Sequencer {
 	if x != nil {
-		return x.MessageId
+		return x.Sequencer
 	}
-	return 0
-}
-
-func (x *Signalv2ClientMessage) GetLastProcessedRemoteMessageId() uint32 {
-	if x != nil {
-		return x.LastProcessedRemoteMessageId
-	}
-	return 0
+	return nil
 }
 
 func (x *Signalv2ClientMessage) GetMessage() isSignalv2ClientMessage_Message {
 	if x != nil {
 		return x.Message
-	}
-	return nil
-}
-
-func (x *Signalv2ClientMessage) GetFragment() *Fragment {
-	if x != nil {
-		if x, ok := x.Message.(*Signalv2ClientMessage_Fragment); ok {
-			return x.Fragment
-		}
-	}
-	return nil
-}
-
-func (x *Signalv2ClientMessage) GetEnvelope() *Signalv2ClientEnvelope {
-	if x != nil {
-		if x, ok := x.Message.(*Signalv2ClientMessage_Envelope); ok {
-			return x.Envelope
-		}
 	}
 	return nil
 }
@@ -133,79 +293,17 @@ type isSignalv2ClientMessage_Message interface {
 	isSignalv2ClientMessage_Message()
 }
 
-type Signalv2ClientMessage_Fragment struct {
-	Fragment *Fragment `protobuf:"bytes,3,opt,name=fragment,proto3,oneof"`
-}
-
-type Signalv2ClientMessage_Envelope struct {
-	Envelope *Signalv2ClientEnvelope `protobuf:"bytes,4,opt,name=envelope,proto3,oneof"`
-}
-
 type Signalv2ClientMessage_ConnectRequest struct {
-	ConnectRequest *ConnectRequest `protobuf:"bytes,5,opt,name=connect_request,json=connectRequest,proto3,oneof"`
+	ConnectRequest *ConnectRequest `protobuf:"bytes,2,opt,name=connect_request,json=connectRequest,proto3,oneof"`
 }
-
-func (*Signalv2ClientMessage_Fragment) isSignalv2ClientMessage_Message() {}
-
-func (*Signalv2ClientMessage_Envelope) isSignalv2ClientMessage_Message() {}
 
 func (*Signalv2ClientMessage_ConnectRequest) isSignalv2ClientMessage_Message() {}
 
-type Signalv2ClientEnvelope struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// collection of client -> server messages
-	ClientMessages []*Signalv2ClientMessage `protobuf:"bytes,1,rep,name=client_messages,json=clientMessages,proto3" json:"client_messages,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *Signalv2ClientEnvelope) Reset() {
-	*x = Signalv2ClientEnvelope{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Signalv2ClientEnvelope) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Signalv2ClientEnvelope) ProtoMessage() {}
-
-func (x *Signalv2ClientEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Signalv2ClientEnvelope.ProtoReflect.Descriptor instead.
-func (*Signalv2ClientEnvelope) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Signalv2ClientEnvelope) GetClientMessages() []*Signalv2ClientMessage {
-	if x != nil {
-		return x.ClientMessages
-	}
-	return nil
-}
-
 type Signalv2ServerMessage struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
-	MessageId uint32 `protobuf:"varint,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	// last remote message processed
-	LastProcessedRemoteMessageId uint32 `protobuf:"varint,2,opt,name=last_processed_remote_message_id,json=lastProcessedRemoteMessageId,proto3" json:"last_processed_remote_message_id,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Sequencer *Sequencer             `protobuf:"bytes,1,opt,name=sequencer,proto3" json:"sequencer,omitempty"`
 	// Types that are valid to be assigned to Message:
 	//
-	//	*Signalv2ServerMessage_Fragment
-	//	*Signalv2ServerMessage_Envelope
 	//	*Signalv2ServerMessage_ConnectResponse
 	Message       isSignalv2ServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
@@ -214,7 +312,7 @@ type Signalv2ServerMessage struct {
 
 func (x *Signalv2ServerMessage) Reset() {
 	*x = Signalv2ServerMessage{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[2]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -226,7 +324,7 @@ func (x *Signalv2ServerMessage) String() string {
 func (*Signalv2ServerMessage) ProtoMessage() {}
 
 func (x *Signalv2ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[2]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -239,44 +337,19 @@ func (x *Signalv2ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Signalv2ServerMessage.ProtoReflect.Descriptor instead.
 func (*Signalv2ServerMessage) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{2}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *Signalv2ServerMessage) GetMessageId() uint32 {
+func (x *Signalv2ServerMessage) GetSequencer() *Sequencer {
 	if x != nil {
-		return x.MessageId
+		return x.Sequencer
 	}
-	return 0
-}
-
-func (x *Signalv2ServerMessage) GetLastProcessedRemoteMessageId() uint32 {
-	if x != nil {
-		return x.LastProcessedRemoteMessageId
-	}
-	return 0
+	return nil
 }
 
 func (x *Signalv2ServerMessage) GetMessage() isSignalv2ServerMessage_Message {
 	if x != nil {
 		return x.Message
-	}
-	return nil
-}
-
-func (x *Signalv2ServerMessage) GetFragment() *Fragment {
-	if x != nil {
-		if x, ok := x.Message.(*Signalv2ServerMessage_Fragment); ok {
-			return x.Fragment
-		}
-	}
-	return nil
-}
-
-func (x *Signalv2ServerMessage) GetEnvelope() *Signalv2ServerEnvelope {
-	if x != nil {
-		if x, ok := x.Message.(*Signalv2ServerMessage_Envelope); ok {
-			return x.Envelope
-		}
 	}
 	return nil
 }
@@ -294,68 +367,11 @@ type isSignalv2ServerMessage_Message interface {
 	isSignalv2ServerMessage_Message()
 }
 
-type Signalv2ServerMessage_Fragment struct {
-	Fragment *Fragment `protobuf:"bytes,3,opt,name=fragment,proto3,oneof"`
-}
-
-type Signalv2ServerMessage_Envelope struct {
-	Envelope *Signalv2ServerEnvelope `protobuf:"bytes,4,opt,name=envelope,proto3,oneof"`
-}
-
 type Signalv2ServerMessage_ConnectResponse struct {
-	ConnectResponse *ConnectResponse `protobuf:"bytes,5,opt,name=connect_response,json=connectResponse,proto3,oneof"`
+	ConnectResponse *ConnectResponse `protobuf:"bytes,2,opt,name=connect_response,json=connectResponse,proto3,oneof"`
 }
-
-func (*Signalv2ServerMessage_Fragment) isSignalv2ServerMessage_Message() {}
-
-func (*Signalv2ServerMessage_Envelope) isSignalv2ServerMessage_Message() {}
 
 func (*Signalv2ServerMessage_ConnectResponse) isSignalv2ServerMessage_Message() {}
-
-type Signalv2ServerEnvelope struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// collection of server -> client messages
-	ServerMessages []*Signalv2ServerMessage `protobuf:"bytes,1,rep,name=server_messages,json=serverMessages,proto3" json:"server_messages,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *Signalv2ServerEnvelope) Reset() {
-	*x = Signalv2ServerEnvelope{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Signalv2ServerEnvelope) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Signalv2ServerEnvelope) ProtoMessage() {}
-
-func (x *Signalv2ServerEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Signalv2ServerEnvelope.ProtoReflect.Descriptor instead.
-func (*Signalv2ServerEnvelope) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *Signalv2ServerEnvelope) GetServerMessages() []*Signalv2ServerMessage {
-	if x != nil {
-		return x.ServerMessages
-	}
-	return nil
-}
 
 type ConnectionSettings struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
@@ -369,7 +385,7 @@ type ConnectionSettings struct {
 
 func (x *ConnectionSettings) Reset() {
 	*x = ConnectionSettings{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[4]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -381,7 +397,7 @@ func (x *ConnectionSettings) String() string {
 func (*ConnectionSettings) ProtoMessage() {}
 
 func (x *ConnectionSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[4]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -394,7 +410,7 @@ func (x *ConnectionSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionSettings.ProtoReflect.Descriptor instead.
 func (*ConnectionSettings) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{4}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ConnectionSettings) GetAutoSubscribe() bool {
@@ -440,7 +456,7 @@ type ConnectRequest struct {
 
 func (x *ConnectRequest) Reset() {
 	*x = ConnectRequest{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[5]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -452,7 +468,7 @@ func (x *ConnectRequest) String() string {
 func (*ConnectRequest) ProtoMessage() {}
 
 func (x *ConnectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[5]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -465,7 +481,7 @@ func (x *ConnectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectRequest.ProtoReflect.Descriptor instead.
 func (*ConnectRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{5}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ConnectRequest) GetClientInfo() *ClientInfo {
@@ -515,7 +531,7 @@ type ConnectResponse struct {
 
 func (x *ConnectResponse) Reset() {
 	*x = ConnectResponse{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -527,7 +543,7 @@ func (x *ConnectResponse) String() string {
 func (*ConnectResponse) ProtoMessage() {}
 
 func (x *ConnectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -540,7 +556,7 @@ func (x *ConnectResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectResponse.ProtoReflect.Descriptor instead.
 func (*ConnectResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{6}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ConnectResponse) GetRoom() *Room {
@@ -623,7 +639,7 @@ type ErrorResponse struct {
 
 func (x *ErrorResponse) Reset() {
 	*x = ErrorResponse{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -635,7 +651,7 @@ func (x *ErrorResponse) String() string {
 func (*ErrorResponse) ProtoMessage() {}
 
 func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -648,7 +664,7 @@ func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ErrorResponse.ProtoReflect.Descriptor instead.
 func (*ErrorResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{7}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ErrorResponse) GetMessageId() uint32 {
@@ -669,27 +685,26 @@ var File_livekit_rtc_v2_proto protoreflect.FileDescriptor
 
 const file_livekit_rtc_v2_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_rtc_v2.proto\x12\alivekit\x1a\x11livekit_rtc.proto\x1a\x14livekit_models.proto\"\xbd\x02\n" +
-	"\x15Signalv2ClientMessage\x12\x1d\n" +
+	"\x14livekit_rtc_v2.proto\x12\alivekit\x1a\x11livekit_rtc.proto\x1a\x14livekit_models.proto\"\x82\x01\n" +
+	"\x13Signalv2WireMessage\x12/\n" +
+	"\benvelope\x18\x01 \x01(\v2\x11.livekit.EnvelopeH\x00R\benvelope\x12/\n" +
+	"\bfragment\x18\x02 \x01(\v2\x11.livekit.FragmentH\x00R\bfragmentB\t\n" +
+	"\amessage\"\x9c\x01\n" +
+	"\bEnvelope\x12G\n" +
+	"\x0fclient_messages\x18\x01 \x03(\v2\x1e.livekit.Signalv2ClientMessageR\x0eclientMessages\x12G\n" +
+	"\x0fserver_messages\x18\x02 \x03(\v2\x1e.livekit.Signalv2ServerMessageR\x0eserverMessages\"r\n" +
+	"\tSequencer\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\rR\tmessageId\x12F\n" +
-	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\x12/\n" +
-	"\bfragment\x18\x03 \x01(\v2\x11.livekit.FragmentH\x00R\bfragment\x12=\n" +
-	"\benvelope\x18\x04 \x01(\v2\x1f.livekit.Signalv2ClientEnvelopeH\x00R\benvelope\x12B\n" +
-	"\x0fconnect_request\x18\x05 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequestB\t\n" +
-	"\amessage\"a\n" +
-	"\x16Signalv2ClientEnvelope\x12G\n" +
-	"\x0fclient_messages\x18\x01 \x03(\v2\x1e.livekit.Signalv2ClientMessageR\x0eclientMessages\"\xc0\x02\n" +
-	"\x15Signalv2ServerMessage\x12\x1d\n" +
-	"\n" +
-	"message_id\x18\x01 \x01(\rR\tmessageId\x12F\n" +
-	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\x12/\n" +
-	"\bfragment\x18\x03 \x01(\v2\x11.livekit.FragmentH\x00R\bfragment\x12=\n" +
-	"\benvelope\x18\x04 \x01(\v2\x1f.livekit.Signalv2ServerEnvelopeH\x00R\benvelope\x12E\n" +
-	"\x10connect_response\x18\x05 \x01(\v2\x18.livekit.ConnectResponseH\x00R\x0fconnectResponseB\t\n" +
-	"\amessage\"a\n" +
-	"\x16Signalv2ServerEnvelope\x12G\n" +
-	"\x0fserver_messages\x18\x01 \x03(\v2\x1e.livekit.Signalv2ServerMessageR\x0eserverMessages\"\xe4\x01\n" +
+	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\x98\x01\n" +
+	"\x15Signalv2ClientMessage\x120\n" +
+	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12B\n" +
+	"\x0fconnect_request\x18\x02 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequestB\t\n" +
+	"\amessage\"\x9b\x01\n" +
+	"\x15Signalv2ServerMessage\x120\n" +
+	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12E\n" +
+	"\x10connect_response\x18\x02 \x01(\v2\x18.livekit.ConnectResponseH\x00R\x0fconnectResponseB\t\n" +
+	"\amessage\"\xe4\x01\n" +
 	"\x12ConnectionSettings\x12%\n" +
 	"\x0eauto_subscribe\x18\x01 \x01(\bR\rautoSubscribe\x12'\n" +
 	"\x0fadaptive_stream\x18\x02 \x01(\bR\x0eadaptiveStream\x129\n" +
@@ -737,47 +752,48 @@ func file_livekit_rtc_v2_proto_rawDescGZIP() []byte {
 	return file_livekit_rtc_v2_proto_rawDescData
 }
 
-var file_livekit_rtc_v2_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_livekit_rtc_v2_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_livekit_rtc_v2_proto_goTypes = []any{
-	(*Signalv2ClientMessage)(nil),  // 0: livekit.Signalv2ClientMessage
-	(*Signalv2ClientEnvelope)(nil), // 1: livekit.Signalv2ClientEnvelope
-	(*Signalv2ServerMessage)(nil),  // 2: livekit.Signalv2ServerMessage
-	(*Signalv2ServerEnvelope)(nil), // 3: livekit.Signalv2ServerEnvelope
-	(*ConnectionSettings)(nil),     // 4: livekit.ConnectionSettings
-	(*ConnectRequest)(nil),         // 5: livekit.ConnectRequest
-	(*ConnectResponse)(nil),        // 6: livekit.ConnectResponse
-	(*ErrorResponse)(nil),          // 7: livekit.ErrorResponse
-	nil,                            // 8: livekit.ConnectRequest.ParticipantAttributesEntry
-	(*Fragment)(nil),               // 9: livekit.Fragment
-	(*ClientInfo)(nil),             // 10: livekit.ClientInfo
-	(*Room)(nil),                   // 11: livekit.Room
-	(*ParticipantInfo)(nil),        // 12: livekit.ParticipantInfo
-	(*ICEServer)(nil),              // 13: livekit.ICEServer
-	(*ClientConfiguration)(nil),    // 14: livekit.ClientConfiguration
-	(*ServerInfo)(nil),             // 15: livekit.ServerInfo
-	(*Codec)(nil),                  // 16: livekit.Codec
-	(*SessionDescription)(nil),     // 17: livekit.SessionDescription
+	(*Signalv2WireMessage)(nil),   // 0: livekit.Signalv2WireMessage
+	(*Envelope)(nil),              // 1: livekit.Envelope
+	(*Sequencer)(nil),             // 2: livekit.Sequencer
+	(*Signalv2ClientMessage)(nil), // 3: livekit.Signalv2ClientMessage
+	(*Signalv2ServerMessage)(nil), // 4: livekit.Signalv2ServerMessage
+	(*ConnectionSettings)(nil),    // 5: livekit.ConnectionSettings
+	(*ConnectRequest)(nil),        // 6: livekit.ConnectRequest
+	(*ConnectResponse)(nil),       // 7: livekit.ConnectResponse
+	(*ErrorResponse)(nil),         // 8: livekit.ErrorResponse
+	nil,                           // 9: livekit.ConnectRequest.ParticipantAttributesEntry
+	(*Fragment)(nil),              // 10: livekit.Fragment
+	(*ClientInfo)(nil),            // 11: livekit.ClientInfo
+	(*Room)(nil),                  // 12: livekit.Room
+	(*ParticipantInfo)(nil),       // 13: livekit.ParticipantInfo
+	(*ICEServer)(nil),             // 14: livekit.ICEServer
+	(*ClientConfiguration)(nil),   // 15: livekit.ClientConfiguration
+	(*ServerInfo)(nil),            // 16: livekit.ServerInfo
+	(*Codec)(nil),                 // 17: livekit.Codec
+	(*SessionDescription)(nil),    // 18: livekit.SessionDescription
 }
 var file_livekit_rtc_v2_proto_depIdxs = []int32{
-	9,  // 0: livekit.Signalv2ClientMessage.fragment:type_name -> livekit.Fragment
-	1,  // 1: livekit.Signalv2ClientMessage.envelope:type_name -> livekit.Signalv2ClientEnvelope
-	5,  // 2: livekit.Signalv2ClientMessage.connect_request:type_name -> livekit.ConnectRequest
-	0,  // 3: livekit.Signalv2ClientEnvelope.client_messages:type_name -> livekit.Signalv2ClientMessage
-	9,  // 4: livekit.Signalv2ServerMessage.fragment:type_name -> livekit.Fragment
-	3,  // 5: livekit.Signalv2ServerMessage.envelope:type_name -> livekit.Signalv2ServerEnvelope
-	6,  // 6: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
-	2,  // 7: livekit.Signalv2ServerEnvelope.server_messages:type_name -> livekit.Signalv2ServerMessage
-	10, // 8: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
-	4,  // 9: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	8,  // 10: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
-	11, // 11: livekit.ConnectResponse.room:type_name -> livekit.Room
-	12, // 12: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
-	12, // 13: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
-	13, // 14: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
-	14, // 15: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	15, // 16: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
-	16, // 17: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	17, // 18: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
+	1,  // 0: livekit.Signalv2WireMessage.envelope:type_name -> livekit.Envelope
+	10, // 1: livekit.Signalv2WireMessage.fragment:type_name -> livekit.Fragment
+	3,  // 2: livekit.Envelope.client_messages:type_name -> livekit.Signalv2ClientMessage
+	4,  // 3: livekit.Envelope.server_messages:type_name -> livekit.Signalv2ServerMessage
+	2,  // 4: livekit.Signalv2ClientMessage.sequencer:type_name -> livekit.Sequencer
+	6,  // 5: livekit.Signalv2ClientMessage.connect_request:type_name -> livekit.ConnectRequest
+	2,  // 6: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
+	7,  // 7: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
+	11, // 8: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
+	5,  // 9: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	9,  // 10: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
+	12, // 11: livekit.ConnectResponse.room:type_name -> livekit.Room
+	13, // 12: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
+	13, // 13: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
+	14, // 14: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
+	15, // 15: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	16, // 16: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
+	17, // 17: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	18, // 18: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
 	19, // [19:19] is the sub-list for method output_type
 	19, // [19:19] is the sub-list for method input_type
 	19, // [19:19] is the sub-list for extension type_name
@@ -793,23 +809,23 @@ func file_livekit_rtc_v2_proto_init() {
 	file_livekit_rtc_proto_init()
 	file_livekit_models_proto_init()
 	file_livekit_rtc_v2_proto_msgTypes[0].OneofWrappers = []any{
-		(*Signalv2ClientMessage_Fragment)(nil),
-		(*Signalv2ClientMessage_Envelope)(nil),
+		(*Signalv2WireMessage_Envelope)(nil),
+		(*Signalv2WireMessage_Fragment)(nil),
+	}
+	file_livekit_rtc_v2_proto_msgTypes[3].OneofWrappers = []any{
 		(*Signalv2ClientMessage_ConnectRequest)(nil),
 	}
-	file_livekit_rtc_v2_proto_msgTypes[2].OneofWrappers = []any{
-		(*Signalv2ServerMessage_Fragment)(nil),
-		(*Signalv2ServerMessage_Envelope)(nil),
+	file_livekit_rtc_v2_proto_msgTypes[4].OneofWrappers = []any{
 		(*Signalv2ServerMessage_ConnectResponse)(nil),
 	}
-	file_livekit_rtc_v2_proto_msgTypes[4].OneofWrappers = []any{}
+	file_livekit_rtc_v2_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_rtc_v2_proto_rawDesc), len(file_livekit_rtc_v2_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
