@@ -22,42 +22,43 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_rtc.proto";
 import "livekit_models.proto";
 
-message Signalv2ClientMessage {
+message Signalv2WireMessage {
+  oneof message {
+    Envelope envelope = 1;
+    Fragment fragment = 2;
+  }
+}
+
+message Envelope {
+  // collection of client -> server messages
+  repeated Signalv2ClientMessage client_messages = 1;
+ 
+  // collection of server -> client messages
+  repeated Signalv2ServerMessage server_messages = 2;
+}
+
+message Sequencer {
   // monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
   uint32 message_id = 1;
 
   // last remote message processed
   uint32 last_processed_remote_message_id = 2;
-
-  oneof message {
-    Fragment fragment = 3;
-    Signalv2ClientEnvelope envelope = 4;
-    ConnectRequest connect_request = 5;
-  }
 }
 
-message Signalv2ClientEnvelope {
-  // collection of client -> server messages
-  repeated Signalv2ClientMessage client_messages = 1;
+message Signalv2ClientMessage {
+  Sequencer sequencer = 1;
+
+  oneof message {
+    ConnectRequest connect_request = 2;
+  }
 }
 
 message Signalv2ServerMessage {
-  // monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
-  uint32 message_id = 1;
-
-  // last remote message processed
-  uint32 last_processed_remote_message_id = 2;
+  Sequencer sequencer = 1;
 
   oneof message {
-    Fragment fragment = 3;
-    Signalv2ServerEnvelope envelope = 4;
-    ConnectResponse connect_response = 5;
+    ConnectResponse connect_response = 2;
   }
-}
-
-message Signalv2ServerEnvelope {
-  // collection of server -> client messages
-  repeated Signalv2ServerMessage server_messages = 1;
 }
 
 message ConnectionSettings {
