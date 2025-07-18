@@ -50,6 +50,8 @@ message Signalv2ClientMessage {
 
   oneof message {
     ConnectRequest connect_request = 2;
+    AudioTrack audio_track = 3;
+    VideoTrack video_track = 4;
   }
 }
 
@@ -68,6 +70,29 @@ message ConnectionSettings {
   bool disable_ice_lite = 4;;
 }
 
+message TrackSettings {
+  string cid = 1;
+  string name = 2;
+  TrackSource source = 3;
+  bool muted = 4;
+  Encryption.Type encryption = 5;
+  string stream = 6;
+}
+
+message AudioTrack {
+  TrackSettings track_settings = 1;
+  repeated AudioTrackFeature audio_features = 5;
+  bool disable_red = 6;
+}
+
+message VideoTrack {
+  TrackSettings track_settings = 1;
+  VideoLayer.Mode layer_mode = 2;
+  repeated SimulcastCodec simulcast_codecs = 3;
+  BackupCodecPolicy backup_codec_policy = 4;
+  string sid = 5;  // used when publishing a new codec to an existing track
+}
+
 message ConnectRequest {
   ClientInfo client_info = 1;
   ConnectionSettings connection_settings = 2;
@@ -77,6 +102,10 @@ message ConnectRequest {
   // will overwrite if the same key is in the token
   // will not delete keys from token if there is a key collision and this sets that key to empty value
   map<string, string> participant_attributes = 4;
+
+  repeated AudioTrack audio_tracks = 5;
+  repeated VideoTrack video_tracks = 6;
+  SessionDescription publisher_sdp = 7;
 }
 
 message ConnectResponse {
