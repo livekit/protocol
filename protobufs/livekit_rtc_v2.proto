@@ -50,6 +50,8 @@ message Signalv2ClientMessage {
 
   oneof message {
     ConnectRequest connect_request = 2;
+    RPC_AddAudioTrackRequest rpc_add_audio_track_request = 3;
+    RPC_AddVideoTrackRequest rpc_add_video_track_request = 4;
   }
 }
 
@@ -58,6 +60,8 @@ message Signalv2ServerMessage {
 
   oneof message {
     ConnectResponse connect_response = 2;
+    RPC_AddAudioTrackResponse rpc_add_audio_track_response = 3;
+    RPC_AddVideoTrackResponse rpc_add_video_track_response = 4;
   }
 }
 
@@ -66,6 +70,29 @@ message ConnectionSettings {
   bool adaptive_stream = 2;
   optional bool subscriber_allow_pause = 3;
   bool disable_ice_lite = 4;;
+}
+
+message TrackSettings {
+  string cid = 1;
+  string name = 2;
+  TrackSource source = 3;
+  bool muted = 4;
+  Encryption.Type encryption = 5;
+  string stream = 6;
+}
+
+message AudioTrack {
+  TrackSettings track_settings = 1;
+  repeated AudioTrackFeature audio_features = 5;
+  bool disable_red = 6;
+}
+
+message VideoTrack {
+  TrackSettings track_settings = 1;
+  VideoLayer.Mode layer_mode = 2;
+  repeated SimulcastCodec simulcast_codecs = 3;
+  BackupCodecPolicy backup_codec_policy = 4;
+  string sid = 5;  // used when publishing a new codec to an existing track
 }
 
 message ConnectRequest {
@@ -77,6 +104,20 @@ message ConnectRequest {
   // will overwrite if the same key is in the token
   // will not delete keys from token if there is a key collision and this sets that key to empty value
   map<string, string> participant_attributes = 4;
+
+  repeated AudioTrack audio_tracks = 5;
+  repeated VideoTrack video_tracks = 6;
+  SessionDescription publisher_sdp = 7;
+}
+
+message RPC_AddAudioTrackRequest {
+  uint32 request_id = 1;
+  AudioTrack audio_track = 2;
+}
+
+message RPC_AddVideoTrackRequest {
+  uint32 request_id = 1;
+  VideoTrack video_track = 2;
 }
 
 message ConnectResponse {
@@ -91,9 +132,23 @@ message ConnectResponse {
   repeated Codec enabled_publish_codecs = 8;
   bool fast_publish = 9;
   SessionDescription subscriber_sdp = 10;
+  SessionDescription publisher_sdp = 11;
 }
 
-message ErrorResponse {
-  uint32 message_id = 1;
-  string error = 2;
+enum AddTrackState {
+  UNUSED = 0;
+  ADDED = 1;
+  QUEUED = 2;
+}
+
+message RPC_AddAudioTrackResponse {
+  RPC_AddAudioTrackRequest rpc_add_audio_track_request = 1; // request reflected back
+  AddTrackState add_track_state = 2;
+  TrackInfo track_info = 3;
+}
+
+message RPC_AddVideoTrackResponse {
+  RPC_AddVideoTrackRequest rpc_add_video_track_request = 1; // request reflected back
+  AddTrackState add_track_state = 2;
+  TrackInfo track_info = 3;
 }

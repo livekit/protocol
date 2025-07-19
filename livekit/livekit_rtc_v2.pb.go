@@ -35,6 +35,55 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type AddTrackState int32
+
+const (
+	AddTrackState_UNUSED AddTrackState = 0
+	AddTrackState_ADDED  AddTrackState = 1
+	AddTrackState_QUEUED AddTrackState = 2
+)
+
+// Enum value maps for AddTrackState.
+var (
+	AddTrackState_name = map[int32]string{
+		0: "UNUSED",
+		1: "ADDED",
+		2: "QUEUED",
+	}
+	AddTrackState_value = map[string]int32{
+		"UNUSED": 0,
+		"ADDED":  1,
+		"QUEUED": 2,
+	}
+)
+
+func (x AddTrackState) Enum() *AddTrackState {
+	p := new(AddTrackState)
+	*p = x
+	return p
+}
+
+func (x AddTrackState) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AddTrackState) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_rtc_v2_proto_enumTypes[0].Descriptor()
+}
+
+func (AddTrackState) Type() protoreflect.EnumType {
+	return &file_livekit_rtc_v2_proto_enumTypes[0]
+}
+
+func (x AddTrackState) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AddTrackState.Descriptor instead.
+func (AddTrackState) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{0}
+}
+
 type Signalv2WireMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Message:
@@ -231,6 +280,8 @@ type Signalv2ClientMessage struct {
 	// Types that are valid to be assigned to Message:
 	//
 	//	*Signalv2ClientMessage_ConnectRequest
+	//	*Signalv2ClientMessage_RpcAddAudioTrackRequest
+	//	*Signalv2ClientMessage_RpcAddVideoTrackRequest
 	Message       isSignalv2ClientMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -289,6 +340,24 @@ func (x *Signalv2ClientMessage) GetConnectRequest() *ConnectRequest {
 	return nil
 }
 
+func (x *Signalv2ClientMessage) GetRpcAddAudioTrackRequest() *RPC_AddAudioTrackRequest {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ClientMessage_RpcAddAudioTrackRequest); ok {
+			return x.RpcAddAudioTrackRequest
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2ClientMessage) GetRpcAddVideoTrackRequest() *RPC_AddVideoTrackRequest {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ClientMessage_RpcAddVideoTrackRequest); ok {
+			return x.RpcAddVideoTrackRequest
+		}
+	}
+	return nil
+}
+
 type isSignalv2ClientMessage_Message interface {
 	isSignalv2ClientMessage_Message()
 }
@@ -297,7 +366,19 @@ type Signalv2ClientMessage_ConnectRequest struct {
 	ConnectRequest *ConnectRequest `protobuf:"bytes,2,opt,name=connect_request,json=connectRequest,proto3,oneof"`
 }
 
+type Signalv2ClientMessage_RpcAddAudioTrackRequest struct {
+	RpcAddAudioTrackRequest *RPC_AddAudioTrackRequest `protobuf:"bytes,3,opt,name=rpc_add_audio_track_request,json=rpcAddAudioTrackRequest,proto3,oneof"`
+}
+
+type Signalv2ClientMessage_RpcAddVideoTrackRequest struct {
+	RpcAddVideoTrackRequest *RPC_AddVideoTrackRequest `protobuf:"bytes,4,opt,name=rpc_add_video_track_request,json=rpcAddVideoTrackRequest,proto3,oneof"`
+}
+
 func (*Signalv2ClientMessage_ConnectRequest) isSignalv2ClientMessage_Message() {}
+
+func (*Signalv2ClientMessage_RpcAddAudioTrackRequest) isSignalv2ClientMessage_Message() {}
+
+func (*Signalv2ClientMessage_RpcAddVideoTrackRequest) isSignalv2ClientMessage_Message() {}
 
 type Signalv2ServerMessage struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
@@ -305,6 +386,8 @@ type Signalv2ServerMessage struct {
 	// Types that are valid to be assigned to Message:
 	//
 	//	*Signalv2ServerMessage_ConnectResponse
+	//	*Signalv2ServerMessage_RpcAddAudioTrackResponse
+	//	*Signalv2ServerMessage_RpcAddVideoTrackResponse
 	Message       isSignalv2ServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -363,6 +446,24 @@ func (x *Signalv2ServerMessage) GetConnectResponse() *ConnectResponse {
 	return nil
 }
 
+func (x *Signalv2ServerMessage) GetRpcAddAudioTrackResponse() *RPC_AddAudioTrackResponse {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ServerMessage_RpcAddAudioTrackResponse); ok {
+			return x.RpcAddAudioTrackResponse
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2ServerMessage) GetRpcAddVideoTrackResponse() *RPC_AddVideoTrackResponse {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ServerMessage_RpcAddVideoTrackResponse); ok {
+			return x.RpcAddVideoTrackResponse
+		}
+	}
+	return nil
+}
+
 type isSignalv2ServerMessage_Message interface {
 	isSignalv2ServerMessage_Message()
 }
@@ -371,7 +472,19 @@ type Signalv2ServerMessage_ConnectResponse struct {
 	ConnectResponse *ConnectResponse `protobuf:"bytes,2,opt,name=connect_response,json=connectResponse,proto3,oneof"`
 }
 
+type Signalv2ServerMessage_RpcAddAudioTrackResponse struct {
+	RpcAddAudioTrackResponse *RPC_AddAudioTrackResponse `protobuf:"bytes,3,opt,name=rpc_add_audio_track_response,json=rpcAddAudioTrackResponse,proto3,oneof"`
+}
+
+type Signalv2ServerMessage_RpcAddVideoTrackResponse struct {
+	RpcAddVideoTrackResponse *RPC_AddVideoTrackResponse `protobuf:"bytes,4,opt,name=rpc_add_video_track_response,json=rpcAddVideoTrackResponse,proto3,oneof"`
+}
+
 func (*Signalv2ServerMessage_ConnectResponse) isSignalv2ServerMessage_Message() {}
+
+func (*Signalv2ServerMessage_RpcAddAudioTrackResponse) isSignalv2ServerMessage_Message() {}
+
+func (*Signalv2ServerMessage_RpcAddVideoTrackResponse) isSignalv2ServerMessage_Message() {}
 
 type ConnectionSettings struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
@@ -441,6 +554,226 @@ func (x *ConnectionSettings) GetDisableIceLite() bool {
 	return false
 }
 
+type TrackSettings struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Cid           string                 `protobuf:"bytes,1,opt,name=cid,proto3" json:"cid,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Source        TrackSource            `protobuf:"varint,3,opt,name=source,proto3,enum=livekit.TrackSource" json:"source,omitempty"`
+	Muted         bool                   `protobuf:"varint,4,opt,name=muted,proto3" json:"muted,omitempty"`
+	Encryption    Encryption_Type        `protobuf:"varint,5,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
+	Stream        string                 `protobuf:"bytes,6,opt,name=stream,proto3" json:"stream,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TrackSettings) Reset() {
+	*x = TrackSettings{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrackSettings) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrackSettings) ProtoMessage() {}
+
+func (x *TrackSettings) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrackSettings.ProtoReflect.Descriptor instead.
+func (*TrackSettings) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *TrackSettings) GetCid() string {
+	if x != nil {
+		return x.Cid
+	}
+	return ""
+}
+
+func (x *TrackSettings) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TrackSettings) GetSource() TrackSource {
+	if x != nil {
+		return x.Source
+	}
+	return TrackSource_UNKNOWN
+}
+
+func (x *TrackSettings) GetMuted() bool {
+	if x != nil {
+		return x.Muted
+	}
+	return false
+}
+
+func (x *TrackSettings) GetEncryption() Encryption_Type {
+	if x != nil {
+		return x.Encryption
+	}
+	return Encryption_NONE
+}
+
+func (x *TrackSettings) GetStream() string {
+	if x != nil {
+		return x.Stream
+	}
+	return ""
+}
+
+type AudioTrack struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TrackSettings *TrackSettings         `protobuf:"bytes,1,opt,name=track_settings,json=trackSettings,proto3" json:"track_settings,omitempty"`
+	AudioFeatures []AudioTrackFeature    `protobuf:"varint,5,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
+	DisableRed    bool                   `protobuf:"varint,6,opt,name=disable_red,json=disableRed,proto3" json:"disable_red,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioTrack) Reset() {
+	*x = AudioTrack{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioTrack) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioTrack) ProtoMessage() {}
+
+func (x *AudioTrack) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioTrack.ProtoReflect.Descriptor instead.
+func (*AudioTrack) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AudioTrack) GetTrackSettings() *TrackSettings {
+	if x != nil {
+		return x.TrackSettings
+	}
+	return nil
+}
+
+func (x *AudioTrack) GetAudioFeatures() []AudioTrackFeature {
+	if x != nil {
+		return x.AudioFeatures
+	}
+	return nil
+}
+
+func (x *AudioTrack) GetDisableRed() bool {
+	if x != nil {
+		return x.DisableRed
+	}
+	return false
+}
+
+type VideoTrack struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	TrackSettings     *TrackSettings         `protobuf:"bytes,1,opt,name=track_settings,json=trackSettings,proto3" json:"track_settings,omitempty"`
+	LayerMode         VideoLayer_Mode        `protobuf:"varint,2,opt,name=layer_mode,json=layerMode,proto3,enum=livekit.VideoLayer_Mode" json:"layer_mode,omitempty"`
+	SimulcastCodecs   []*SimulcastCodec      `protobuf:"bytes,3,rep,name=simulcast_codecs,json=simulcastCodecs,proto3" json:"simulcast_codecs,omitempty"`
+	BackupCodecPolicy BackupCodecPolicy      `protobuf:"varint,4,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
+	Sid               string                 `protobuf:"bytes,5,opt,name=sid,proto3" json:"sid,omitempty"` // used when publishing a new codec to an existing track
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *VideoTrack) Reset() {
+	*x = VideoTrack{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *VideoTrack) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*VideoTrack) ProtoMessage() {}
+
+func (x *VideoTrack) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use VideoTrack.ProtoReflect.Descriptor instead.
+func (*VideoTrack) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *VideoTrack) GetTrackSettings() *TrackSettings {
+	if x != nil {
+		return x.TrackSettings
+	}
+	return nil
+}
+
+func (x *VideoTrack) GetLayerMode() VideoLayer_Mode {
+	if x != nil {
+		return x.LayerMode
+	}
+	return VideoLayer_UNUSED
+}
+
+func (x *VideoTrack) GetSimulcastCodecs() []*SimulcastCodec {
+	if x != nil {
+		return x.SimulcastCodecs
+	}
+	return nil
+}
+
+func (x *VideoTrack) GetBackupCodecPolicy() BackupCodecPolicy {
+	if x != nil {
+		return x.BackupCodecPolicy
+	}
+	return BackupCodecPolicy_PREFER_REGRESSION
+}
+
+func (x *VideoTrack) GetSid() string {
+	if x != nil {
+		return x.Sid
+	}
+	return ""
+}
+
 type ConnectRequest struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	ClientInfo         *ClientInfo            `protobuf:"bytes,1,opt,name=client_info,json=clientInfo,proto3" json:"client_info,omitempty"`
@@ -449,14 +782,17 @@ type ConnectRequest struct {
 	// will set keys provided via this
 	// will overwrite if the same key is in the token
 	// will not delete keys from token if there is a key collision and this sets that key to empty value
-	ParticipantAttributes map[string]string `protobuf:"bytes,4,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	ParticipantAttributes map[string]string   `protobuf:"bytes,4,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	AudioTracks           []*AudioTrack       `protobuf:"bytes,5,rep,name=audio_tracks,json=audioTracks,proto3" json:"audio_tracks,omitempty"`
+	VideoTracks           []*VideoTrack       `protobuf:"bytes,6,rep,name=video_tracks,json=videoTracks,proto3" json:"video_tracks,omitempty"`
+	PublisherSdp          *SessionDescription `protobuf:"bytes,7,opt,name=publisher_sdp,json=publisherSdp,proto3" json:"publisher_sdp,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
 
 func (x *ConnectRequest) Reset() {
 	*x = ConnectRequest{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -468,7 +804,7 @@ func (x *ConnectRequest) String() string {
 func (*ConnectRequest) ProtoMessage() {}
 
 func (x *ConnectRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[6]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,7 +817,7 @@ func (x *ConnectRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectRequest.ProtoReflect.Descriptor instead.
 func (*ConnectRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{6}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ConnectRequest) GetClientInfo() *ClientInfo {
@@ -512,6 +848,131 @@ func (x *ConnectRequest) GetParticipantAttributes() map[string]string {
 	return nil
 }
 
+func (x *ConnectRequest) GetAudioTracks() []*AudioTrack {
+	if x != nil {
+		return x.AudioTracks
+	}
+	return nil
+}
+
+func (x *ConnectRequest) GetVideoTracks() []*VideoTrack {
+	if x != nil {
+		return x.VideoTracks
+	}
+	return nil
+}
+
+func (x *ConnectRequest) GetPublisherSdp() *SessionDescription {
+	if x != nil {
+		return x.PublisherSdp
+	}
+	return nil
+}
+
+type RPC_AddAudioTrackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestId     uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	AudioTrack    *AudioTrack            `protobuf:"bytes,2,opt,name=audio_track,json=audioTrack,proto3" json:"audio_track,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RPC_AddAudioTrackRequest) Reset() {
+	*x = RPC_AddAudioTrackRequest{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPC_AddAudioTrackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPC_AddAudioTrackRequest) ProtoMessage() {}
+
+func (x *RPC_AddAudioTrackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPC_AddAudioTrackRequest.ProtoReflect.Descriptor instead.
+func (*RPC_AddAudioTrackRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *RPC_AddAudioTrackRequest) GetRequestId() uint32 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
+}
+
+func (x *RPC_AddAudioTrackRequest) GetAudioTrack() *AudioTrack {
+	if x != nil {
+		return x.AudioTrack
+	}
+	return nil
+}
+
+type RPC_AddVideoTrackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestId     uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	VideoTrack    *VideoTrack            `protobuf:"bytes,2,opt,name=video_track,json=videoTrack,proto3" json:"video_track,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RPC_AddVideoTrackRequest) Reset() {
+	*x = RPC_AddVideoTrackRequest{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPC_AddVideoTrackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPC_AddVideoTrackRequest) ProtoMessage() {}
+
+func (x *RPC_AddVideoTrackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPC_AddVideoTrackRequest.ProtoReflect.Descriptor instead.
+func (*RPC_AddVideoTrackRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *RPC_AddVideoTrackRequest) GetRequestId() uint32 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
+}
+
+func (x *RPC_AddVideoTrackRequest) GetVideoTrack() *VideoTrack {
+	if x != nil {
+		return x.VideoTrack
+	}
+	return nil
+}
+
 type ConnectResponse struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	Room                *Room                  `protobuf:"bytes,1,opt,name=room,proto3" json:"room,omitempty"`
@@ -525,13 +986,14 @@ type ConnectResponse struct {
 	EnabledPublishCodecs []*Codec            `protobuf:"bytes,8,rep,name=enabled_publish_codecs,json=enabledPublishCodecs,proto3" json:"enabled_publish_codecs,omitempty"`
 	FastPublish          bool                `protobuf:"varint,9,opt,name=fast_publish,json=fastPublish,proto3" json:"fast_publish,omitempty"`
 	SubscriberSdp        *SessionDescription `protobuf:"bytes,10,opt,name=subscriber_sdp,json=subscriberSdp,proto3" json:"subscriber_sdp,omitempty"`
+	PublisherSdp         *SessionDescription `protobuf:"bytes,11,opt,name=publisher_sdp,json=publisherSdp,proto3" json:"publisher_sdp,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ConnectResponse) Reset() {
 	*x = ConnectResponse{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -543,7 +1005,7 @@ func (x *ConnectResponse) String() string {
 func (*ConnectResponse) ProtoMessage() {}
 
 func (x *ConnectResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[7]
+	mi := &file_livekit_rtc_v2_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -556,7 +1018,7 @@ func (x *ConnectResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectResponse.ProtoReflect.Descriptor instead.
 func (*ConnectResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{7}
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ConnectResponse) GetRoom() *Room {
@@ -629,29 +1091,37 @@ func (x *ConnectResponse) GetSubscriberSdp() *SessionDescription {
 	return nil
 }
 
-type ErrorResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	MessageId     uint32                 `protobuf:"varint,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	Error         string                 `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+func (x *ConnectResponse) GetPublisherSdp() *SessionDescription {
+	if x != nil {
+		return x.PublisherSdp
+	}
+	return nil
 }
 
-func (x *ErrorResponse) Reset() {
-	*x = ErrorResponse{}
-	mi := &file_livekit_rtc_v2_proto_msgTypes[8]
+type RPC_AddAudioTrackResponse struct {
+	state                   protoimpl.MessageState    `protogen:"open.v1"`
+	RpcAddAudioTrackRequest *RPC_AddAudioTrackRequest `protobuf:"bytes,1,opt,name=rpc_add_audio_track_request,json=rpcAddAudioTrackRequest,proto3" json:"rpc_add_audio_track_request,omitempty"` // request reflected back
+	AddTrackState           AddTrackState             `protobuf:"varint,2,opt,name=add_track_state,json=addTrackState,proto3,enum=livekit.AddTrackState" json:"add_track_state,omitempty"`
+	TrackInfo               *TrackInfo                `protobuf:"bytes,3,opt,name=track_info,json=trackInfo,proto3" json:"track_info,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
+}
+
+func (x *RPC_AddAudioTrackResponse) Reset() {
+	*x = RPC_AddAudioTrackResponse{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ErrorResponse) String() string {
+func (x *RPC_AddAudioTrackResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ErrorResponse) ProtoMessage() {}
+func (*RPC_AddAudioTrackResponse) ProtoMessage() {}
 
-func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_v2_proto_msgTypes[8]
+func (x *RPC_AddAudioTrackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -662,23 +1132,90 @@ func (x *ErrorResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ErrorResponse.ProtoReflect.Descriptor instead.
-func (*ErrorResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{8}
+// Deprecated: Use RPC_AddAudioTrackResponse.ProtoReflect.Descriptor instead.
+func (*RPC_AddAudioTrackResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *ErrorResponse) GetMessageId() uint32 {
+func (x *RPC_AddAudioTrackResponse) GetRpcAddAudioTrackRequest() *RPC_AddAudioTrackRequest {
 	if x != nil {
-		return x.MessageId
+		return x.RpcAddAudioTrackRequest
 	}
-	return 0
+	return nil
 }
 
-func (x *ErrorResponse) GetError() string {
+func (x *RPC_AddAudioTrackResponse) GetAddTrackState() AddTrackState {
 	if x != nil {
-		return x.Error
+		return x.AddTrackState
 	}
-	return ""
+	return AddTrackState_UNUSED
+}
+
+func (x *RPC_AddAudioTrackResponse) GetTrackInfo() *TrackInfo {
+	if x != nil {
+		return x.TrackInfo
+	}
+	return nil
+}
+
+type RPC_AddVideoTrackResponse struct {
+	state                   protoimpl.MessageState    `protogen:"open.v1"`
+	RpcAddVideoTrackRequest *RPC_AddVideoTrackRequest `protobuf:"bytes,1,opt,name=rpc_add_video_track_request,json=rpcAddVideoTrackRequest,proto3" json:"rpc_add_video_track_request,omitempty"` // request reflected back
+	AddTrackState           AddTrackState             `protobuf:"varint,2,opt,name=add_track_state,json=addTrackState,proto3,enum=livekit.AddTrackState" json:"add_track_state,omitempty"`
+	TrackInfo               *TrackInfo                `protobuf:"bytes,3,opt,name=track_info,json=trackInfo,proto3" json:"track_info,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
+}
+
+func (x *RPC_AddVideoTrackResponse) Reset() {
+	*x = RPC_AddVideoTrackResponse{}
+	mi := &file_livekit_rtc_v2_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RPC_AddVideoTrackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RPC_AddVideoTrackResponse) ProtoMessage() {}
+
+func (x *RPC_AddVideoTrackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_v2_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RPC_AddVideoTrackResponse.ProtoReflect.Descriptor instead.
+func (*RPC_AddVideoTrackResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_v2_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *RPC_AddVideoTrackResponse) GetRpcAddVideoTrackRequest() *RPC_AddVideoTrackRequest {
+	if x != nil {
+		return x.RpcAddVideoTrackRequest
+	}
+	return nil
+}
+
+func (x *RPC_AddVideoTrackResponse) GetAddTrackState() AddTrackState {
+	if x != nil {
+		return x.AddTrackState
+	}
+	return AddTrackState_UNUSED
+}
+
+func (x *RPC_AddVideoTrackResponse) GetTrackInfo() *TrackInfo {
+	if x != nil {
+		return x.TrackInfo
+	}
+	return nil
 }
 
 var File_livekit_rtc_v2_proto protoreflect.FileDescriptor
@@ -696,30 +1233,70 @@ const file_livekit_rtc_v2_proto_rawDesc = "" +
 	"\tSequencer\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\rR\tmessageId\x12F\n" +
-	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\x98\x01\n" +
+	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\xde\x02\n" +
 	"\x15Signalv2ClientMessage\x120\n" +
 	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12B\n" +
-	"\x0fconnect_request\x18\x02 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequestB\t\n" +
-	"\amessage\"\x9b\x01\n" +
+	"\x0fconnect_request\x18\x02 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequest\x12a\n" +
+	"\x1brpc_add_audio_track_request\x18\x03 \x01(\v2!.livekit.RPC_AddAudioTrackRequestH\x00R\x17rpcAddAudioTrackRequest\x12a\n" +
+	"\x1brpc_add_video_track_request\x18\x04 \x01(\v2!.livekit.RPC_AddVideoTrackRequestH\x00R\x17rpcAddVideoTrackRequestB\t\n" +
+	"\amessage\"\xe7\x02\n" +
 	"\x15Signalv2ServerMessage\x120\n" +
 	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12E\n" +
-	"\x10connect_response\x18\x02 \x01(\v2\x18.livekit.ConnectResponseH\x00R\x0fconnectResponseB\t\n" +
+	"\x10connect_response\x18\x02 \x01(\v2\x18.livekit.ConnectResponseH\x00R\x0fconnectResponse\x12d\n" +
+	"\x1crpc_add_audio_track_response\x18\x03 \x01(\v2\".livekit.RPC_AddAudioTrackResponseH\x00R\x18rpcAddAudioTrackResponse\x12d\n" +
+	"\x1crpc_add_video_track_response\x18\x04 \x01(\v2\".livekit.RPC_AddVideoTrackResponseH\x00R\x18rpcAddVideoTrackResponseB\t\n" +
 	"\amessage\"\xe4\x01\n" +
 	"\x12ConnectionSettings\x12%\n" +
 	"\x0eauto_subscribe\x18\x01 \x01(\bR\rautoSubscribe\x12'\n" +
 	"\x0fadaptive_stream\x18\x02 \x01(\bR\x0eadaptiveStream\x129\n" +
 	"\x16subscriber_allow_pause\x18\x03 \x01(\bH\x00R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
 	"\x10disable_ice_lite\x18\x04 \x01(\bR\x0edisableIceLiteB\x19\n" +
-	"\x17_subscriber_allow_pause\"\xe5\x02\n" +
+	"\x17_subscriber_allow_pause\"\xcb\x01\n" +
+	"\rTrackSettings\x12\x10\n" +
+	"\x03cid\x18\x01 \x01(\tR\x03cid\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12,\n" +
+	"\x06source\x18\x03 \x01(\x0e2\x14.livekit.TrackSourceR\x06source\x12\x14\n" +
+	"\x05muted\x18\x04 \x01(\bR\x05muted\x128\n" +
+	"\n" +
+	"encryption\x18\x05 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
+	"encryption\x12\x16\n" +
+	"\x06stream\x18\x06 \x01(\tR\x06stream\"\xaf\x01\n" +
+	"\n" +
+	"AudioTrack\x12=\n" +
+	"\x0etrack_settings\x18\x01 \x01(\v2\x16.livekit.TrackSettingsR\rtrackSettings\x12A\n" +
+	"\x0eaudio_features\x18\x05 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12\x1f\n" +
+	"\vdisable_red\x18\x06 \x01(\bR\n" +
+	"disableRed\"\xa6\x02\n" +
+	"\n" +
+	"VideoTrack\x12=\n" +
+	"\x0etrack_settings\x18\x01 \x01(\v2\x16.livekit.TrackSettingsR\rtrackSettings\x127\n" +
+	"\n" +
+	"layer_mode\x18\x02 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\tlayerMode\x12B\n" +
+	"\x10simulcast_codecs\x18\x03 \x03(\v2\x17.livekit.SimulcastCodecR\x0fsimulcastCodecs\x12J\n" +
+	"\x13backup_codec_policy\x18\x04 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12\x10\n" +
+	"\x03sid\x18\x05 \x01(\tR\x03sid\"\x97\x04\n" +
 	"\x0eConnectRequest\x124\n" +
 	"\vclient_info\x18\x01 \x01(\v2\x13.livekit.ClientInfoR\n" +
 	"clientInfo\x12L\n" +
 	"\x13connection_settings\x18\x02 \x01(\v2\x1b.livekit.ConnectionSettingsR\x12connectionSettings\x12\x1a\n" +
 	"\bmetadata\x18\x03 \x01(\tR\bmetadata\x12i\n" +
-	"\x16participant_attributes\x18\x04 \x03(\v22.livekit.ConnectRequest.ParticipantAttributesEntryR\x15participantAttributes\x1aH\n" +
+	"\x16participant_attributes\x18\x04 \x03(\v22.livekit.ConnectRequest.ParticipantAttributesEntryR\x15participantAttributes\x126\n" +
+	"\faudio_tracks\x18\x05 \x03(\v2\x13.livekit.AudioTrackR\vaudioTracks\x126\n" +
+	"\fvideo_tracks\x18\x06 \x03(\v2\x13.livekit.VideoTrackR\vvideoTracks\x12@\n" +
+	"\rpublisher_sdp\x18\a \x01(\v2\x1b.livekit.SessionDescriptionR\fpublisherSdp\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc3\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"o\n" +
+	"\x18RPC_AddAudioTrackRequest\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\rR\trequestId\x124\n" +
+	"\vaudio_track\x18\x02 \x01(\v2\x13.livekit.AudioTrackR\n" +
+	"audioTrack\"o\n" +
+	"\x18RPC_AddVideoTrackRequest\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\rR\trequestId\x124\n" +
+	"\vvideo_track\x18\x02 \x01(\v2\x13.livekit.VideoTrackR\n" +
+	"videoTrack\"\x85\x05\n" +
 	"\x0fConnectResponse\x12!\n" +
 	"\x04room\x18\x01 \x01(\v2\r.livekit.RoomR\x04room\x12:\n" +
 	"\vparticipant\x18\x02 \x01(\v2\x18.livekit.ParticipantInfoR\vparticipant\x12G\n" +
@@ -734,11 +1311,24 @@ const file_livekit_rtc_v2_proto_rawDesc = "" +
 	"\x16enabled_publish_codecs\x18\b \x03(\v2\x0e.livekit.CodecR\x14enabledPublishCodecs\x12!\n" +
 	"\ffast_publish\x18\t \x01(\bR\vfastPublish\x12B\n" +
 	"\x0esubscriber_sdp\x18\n" +
-	" \x01(\v2\x1b.livekit.SessionDescriptionR\rsubscriberSdp\"D\n" +
-	"\rErrorResponse\x12\x1d\n" +
+	" \x01(\v2\x1b.livekit.SessionDescriptionR\rsubscriberSdp\x12@\n" +
+	"\rpublisher_sdp\x18\v \x01(\v2\x1b.livekit.SessionDescriptionR\fpublisherSdp\"\xef\x01\n" +
+	"\x19RPC_AddAudioTrackResponse\x12_\n" +
+	"\x1brpc_add_audio_track_request\x18\x01 \x01(\v2!.livekit.RPC_AddAudioTrackRequestR\x17rpcAddAudioTrackRequest\x12>\n" +
+	"\x0fadd_track_state\x18\x02 \x01(\x0e2\x16.livekit.AddTrackStateR\raddTrackState\x121\n" +
 	"\n" +
-	"message_id\x18\x01 \x01(\rR\tmessageId\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05errorBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"track_info\x18\x03 \x01(\v2\x12.livekit.TrackInfoR\ttrackInfo\"\xef\x01\n" +
+	"\x19RPC_AddVideoTrackResponse\x12_\n" +
+	"\x1brpc_add_video_track_request\x18\x01 \x01(\v2!.livekit.RPC_AddVideoTrackRequestR\x17rpcAddVideoTrackRequest\x12>\n" +
+	"\x0fadd_track_state\x18\x02 \x01(\x0e2\x16.livekit.AddTrackStateR\raddTrackState\x121\n" +
+	"\n" +
+	"track_info\x18\x03 \x01(\v2\x12.livekit.TrackInfoR\ttrackInfo*2\n" +
+	"\rAddTrackState\x12\n" +
+	"\n" +
+	"\x06UNUSED\x10\x00\x12\t\n" +
+	"\x05ADDED\x10\x01\x12\n" +
+	"\n" +
+	"\x06QUEUED\x10\x02BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_rtc_v2_proto_rawDescOnce sync.Once
@@ -752,53 +1342,92 @@ func file_livekit_rtc_v2_proto_rawDescGZIP() []byte {
 	return file_livekit_rtc_v2_proto_rawDescData
 }
 
-var file_livekit_rtc_v2_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_livekit_rtc_v2_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_rtc_v2_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_livekit_rtc_v2_proto_goTypes = []any{
-	(*Signalv2WireMessage)(nil),   // 0: livekit.Signalv2WireMessage
-	(*Envelope)(nil),              // 1: livekit.Envelope
-	(*Sequencer)(nil),             // 2: livekit.Sequencer
-	(*Signalv2ClientMessage)(nil), // 3: livekit.Signalv2ClientMessage
-	(*Signalv2ServerMessage)(nil), // 4: livekit.Signalv2ServerMessage
-	(*ConnectionSettings)(nil),    // 5: livekit.ConnectionSettings
-	(*ConnectRequest)(nil),        // 6: livekit.ConnectRequest
-	(*ConnectResponse)(nil),       // 7: livekit.ConnectResponse
-	(*ErrorResponse)(nil),         // 8: livekit.ErrorResponse
-	nil,                           // 9: livekit.ConnectRequest.ParticipantAttributesEntry
-	(*Fragment)(nil),              // 10: livekit.Fragment
-	(*ClientInfo)(nil),            // 11: livekit.ClientInfo
-	(*Room)(nil),                  // 12: livekit.Room
-	(*ParticipantInfo)(nil),       // 13: livekit.ParticipantInfo
-	(*ICEServer)(nil),             // 14: livekit.ICEServer
-	(*ClientConfiguration)(nil),   // 15: livekit.ClientConfiguration
-	(*ServerInfo)(nil),            // 16: livekit.ServerInfo
-	(*Codec)(nil),                 // 17: livekit.Codec
-	(*SessionDescription)(nil),    // 18: livekit.SessionDescription
+	(AddTrackState)(0),                // 0: livekit.AddTrackState
+	(*Signalv2WireMessage)(nil),       // 1: livekit.Signalv2WireMessage
+	(*Envelope)(nil),                  // 2: livekit.Envelope
+	(*Sequencer)(nil),                 // 3: livekit.Sequencer
+	(*Signalv2ClientMessage)(nil),     // 4: livekit.Signalv2ClientMessage
+	(*Signalv2ServerMessage)(nil),     // 5: livekit.Signalv2ServerMessage
+	(*ConnectionSettings)(nil),        // 6: livekit.ConnectionSettings
+	(*TrackSettings)(nil),             // 7: livekit.TrackSettings
+	(*AudioTrack)(nil),                // 8: livekit.AudioTrack
+	(*VideoTrack)(nil),                // 9: livekit.VideoTrack
+	(*ConnectRequest)(nil),            // 10: livekit.ConnectRequest
+	(*RPC_AddAudioTrackRequest)(nil),  // 11: livekit.RPC_AddAudioTrackRequest
+	(*RPC_AddVideoTrackRequest)(nil),  // 12: livekit.RPC_AddVideoTrackRequest
+	(*ConnectResponse)(nil),           // 13: livekit.ConnectResponse
+	(*RPC_AddAudioTrackResponse)(nil), // 14: livekit.RPC_AddAudioTrackResponse
+	(*RPC_AddVideoTrackResponse)(nil), // 15: livekit.RPC_AddVideoTrackResponse
+	nil,                               // 16: livekit.ConnectRequest.ParticipantAttributesEntry
+	(*Fragment)(nil),                  // 17: livekit.Fragment
+	(TrackSource)(0),                  // 18: livekit.TrackSource
+	(Encryption_Type)(0),              // 19: livekit.Encryption.Type
+	(AudioTrackFeature)(0),            // 20: livekit.AudioTrackFeature
+	(VideoLayer_Mode)(0),              // 21: livekit.VideoLayer.Mode
+	(*SimulcastCodec)(nil),            // 22: livekit.SimulcastCodec
+	(BackupCodecPolicy)(0),            // 23: livekit.BackupCodecPolicy
+	(*ClientInfo)(nil),                // 24: livekit.ClientInfo
+	(*SessionDescription)(nil),        // 25: livekit.SessionDescription
+	(*Room)(nil),                      // 26: livekit.Room
+	(*ParticipantInfo)(nil),           // 27: livekit.ParticipantInfo
+	(*ICEServer)(nil),                 // 28: livekit.ICEServer
+	(*ClientConfiguration)(nil),       // 29: livekit.ClientConfiguration
+	(*ServerInfo)(nil),                // 30: livekit.ServerInfo
+	(*Codec)(nil),                     // 31: livekit.Codec
+	(*TrackInfo)(nil),                 // 32: livekit.TrackInfo
 }
 var file_livekit_rtc_v2_proto_depIdxs = []int32{
-	1,  // 0: livekit.Signalv2WireMessage.envelope:type_name -> livekit.Envelope
-	10, // 1: livekit.Signalv2WireMessage.fragment:type_name -> livekit.Fragment
-	3,  // 2: livekit.Envelope.client_messages:type_name -> livekit.Signalv2ClientMessage
-	4,  // 3: livekit.Envelope.server_messages:type_name -> livekit.Signalv2ServerMessage
-	2,  // 4: livekit.Signalv2ClientMessage.sequencer:type_name -> livekit.Sequencer
-	6,  // 5: livekit.Signalv2ClientMessage.connect_request:type_name -> livekit.ConnectRequest
-	2,  // 6: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
-	7,  // 7: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
-	11, // 8: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
-	5,  // 9: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	9,  // 10: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
-	12, // 11: livekit.ConnectResponse.room:type_name -> livekit.Room
-	13, // 12: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
-	13, // 13: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
-	14, // 14: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
-	15, // 15: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	16, // 16: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
-	17, // 17: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	18, // 18: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	2,  // 0: livekit.Signalv2WireMessage.envelope:type_name -> livekit.Envelope
+	17, // 1: livekit.Signalv2WireMessage.fragment:type_name -> livekit.Fragment
+	4,  // 2: livekit.Envelope.client_messages:type_name -> livekit.Signalv2ClientMessage
+	5,  // 3: livekit.Envelope.server_messages:type_name -> livekit.Signalv2ServerMessage
+	3,  // 4: livekit.Signalv2ClientMessage.sequencer:type_name -> livekit.Sequencer
+	10, // 5: livekit.Signalv2ClientMessage.connect_request:type_name -> livekit.ConnectRequest
+	11, // 6: livekit.Signalv2ClientMessage.rpc_add_audio_track_request:type_name -> livekit.RPC_AddAudioTrackRequest
+	12, // 7: livekit.Signalv2ClientMessage.rpc_add_video_track_request:type_name -> livekit.RPC_AddVideoTrackRequest
+	3,  // 8: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
+	13, // 9: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
+	14, // 10: livekit.Signalv2ServerMessage.rpc_add_audio_track_response:type_name -> livekit.RPC_AddAudioTrackResponse
+	15, // 11: livekit.Signalv2ServerMessage.rpc_add_video_track_response:type_name -> livekit.RPC_AddVideoTrackResponse
+	18, // 12: livekit.TrackSettings.source:type_name -> livekit.TrackSource
+	19, // 13: livekit.TrackSettings.encryption:type_name -> livekit.Encryption.Type
+	7,  // 14: livekit.AudioTrack.track_settings:type_name -> livekit.TrackSettings
+	20, // 15: livekit.AudioTrack.audio_features:type_name -> livekit.AudioTrackFeature
+	7,  // 16: livekit.VideoTrack.track_settings:type_name -> livekit.TrackSettings
+	21, // 17: livekit.VideoTrack.layer_mode:type_name -> livekit.VideoLayer.Mode
+	22, // 18: livekit.VideoTrack.simulcast_codecs:type_name -> livekit.SimulcastCodec
+	23, // 19: livekit.VideoTrack.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
+	24, // 20: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
+	6,  // 21: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	16, // 22: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
+	8,  // 23: livekit.ConnectRequest.audio_tracks:type_name -> livekit.AudioTrack
+	9,  // 24: livekit.ConnectRequest.video_tracks:type_name -> livekit.VideoTrack
+	25, // 25: livekit.ConnectRequest.publisher_sdp:type_name -> livekit.SessionDescription
+	8,  // 26: livekit.RPC_AddAudioTrackRequest.audio_track:type_name -> livekit.AudioTrack
+	9,  // 27: livekit.RPC_AddVideoTrackRequest.video_track:type_name -> livekit.VideoTrack
+	26, // 28: livekit.ConnectResponse.room:type_name -> livekit.Room
+	27, // 29: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
+	27, // 30: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
+	28, // 31: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
+	29, // 32: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	30, // 33: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
+	31, // 34: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	25, // 35: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
+	25, // 36: livekit.ConnectResponse.publisher_sdp:type_name -> livekit.SessionDescription
+	11, // 37: livekit.RPC_AddAudioTrackResponse.rpc_add_audio_track_request:type_name -> livekit.RPC_AddAudioTrackRequest
+	0,  // 38: livekit.RPC_AddAudioTrackResponse.add_track_state:type_name -> livekit.AddTrackState
+	32, // 39: livekit.RPC_AddAudioTrackResponse.track_info:type_name -> livekit.TrackInfo
+	12, // 40: livekit.RPC_AddVideoTrackResponse.rpc_add_video_track_request:type_name -> livekit.RPC_AddVideoTrackRequest
+	0,  // 41: livekit.RPC_AddVideoTrackResponse.add_track_state:type_name -> livekit.AddTrackState
+	32, // 42: livekit.RPC_AddVideoTrackResponse.track_info:type_name -> livekit.TrackInfo
+	43, // [43:43] is the sub-list for method output_type
+	43, // [43:43] is the sub-list for method input_type
+	43, // [43:43] is the sub-list for extension type_name
+	43, // [43:43] is the sub-list for extension extendee
+	0,  // [0:43] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_v2_proto_init() }
@@ -814,9 +1443,13 @@ func file_livekit_rtc_v2_proto_init() {
 	}
 	file_livekit_rtc_v2_proto_msgTypes[3].OneofWrappers = []any{
 		(*Signalv2ClientMessage_ConnectRequest)(nil),
+		(*Signalv2ClientMessage_RpcAddAudioTrackRequest)(nil),
+		(*Signalv2ClientMessage_RpcAddVideoTrackRequest)(nil),
 	}
 	file_livekit_rtc_v2_proto_msgTypes[4].OneofWrappers = []any{
 		(*Signalv2ServerMessage_ConnectResponse)(nil),
+		(*Signalv2ServerMessage_RpcAddAudioTrackResponse)(nil),
+		(*Signalv2ServerMessage_RpcAddVideoTrackResponse)(nil),
 	}
 	file_livekit_rtc_v2_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
@@ -824,13 +1457,14 @@ func file_livekit_rtc_v2_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_rtc_v2_proto_rawDesc), len(file_livekit_rtc_v2_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   10,
+			NumEnums:      1,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_livekit_rtc_v2_proto_goTypes,
 		DependencyIndexes: file_livekit_rtc_v2_proto_depIdxs,
+		EnumInfos:         file_livekit_rtc_v2_proto_enumTypes,
 		MessageInfos:      file_livekit_rtc_v2_proto_msgTypes,
 	}.Build()
 	File_livekit_rtc_v2_proto = out.File
