@@ -34,3 +34,18 @@ service Signalv2 {
     };
   };
 }
+
+// ----------------------------
+
+service Signalv2Participant {
+  rpc RelaySignalv2Participant(RelaySignalv2ParticipantRequest) returns (RelaySignalv2ParticipantResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "common"
+        names: ["topic"]
+        typed: true
+      };
+    };
+  }
+}
