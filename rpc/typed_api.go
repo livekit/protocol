@@ -196,6 +196,18 @@ func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, 
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
 }
 
+//counterfeiter:generate . TypedSignalv2ParticipantClient
+type TypedSignalv2ParticipantClient = Signalv2ParticipantClient[ParticipantTopic]
+type TypedSignalv2ParticipantServer = Signalv2ParticipantServer[ParticipantTopic]
+
+func NewTypedSignalv2ParticipantClient(params ClientParams) (TypedSignalv2ParticipantClient, error) {
+	return NewSignalv2ParticipantClient[ParticipantTopic](params.Args())
+}
+
+func NewTypedSignalv2ParticipantServer(svc Signalv2ParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedSignalv2ParticipantServer, error) {
+	return NewSignalv2ParticipantServer[ParticipantTopic](svc, bus, opts...)
+}
+
 //counterfeiter:generate . TypedRTCRestParticipantClient
 type TypedRTCRestParticipantClient = RTCRestParticipantClient[ParticipantTopic]
 type TypedRTCRestParticipantServer = RTCRestParticipantServer[ParticipantTopic]
