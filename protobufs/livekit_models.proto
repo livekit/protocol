@@ -293,6 +293,7 @@ message DataPacket {
 }
 
 message ActiveSpeakerUpdate {
+  option deprecated = true;
   repeated SpeakerInfo speakers = 1;
 }
 

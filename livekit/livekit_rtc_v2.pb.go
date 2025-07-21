@@ -231,6 +231,8 @@ type Signalv2ClientMessage struct {
 	// Types that are valid to be assigned to Message:
 	//
 	//	*Signalv2ClientMessage_ConnectRequest
+	//	*Signalv2ClientMessage_PublisherSdp
+	//	*Signalv2ClientMessage_SubscriberSdp
 	Message       isSignalv2ClientMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -289,6 +291,24 @@ func (x *Signalv2ClientMessage) GetConnectRequest() *ConnectRequest {
 	return nil
 }
 
+func (x *Signalv2ClientMessage) GetPublisherSdp() *SessionDescription {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ClientMessage_PublisherSdp); ok {
+			return x.PublisherSdp
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2ClientMessage) GetSubscriberSdp() *SessionDescription {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ClientMessage_SubscriberSdp); ok {
+			return x.SubscriberSdp
+		}
+	}
+	return nil
+}
+
 type isSignalv2ClientMessage_Message interface {
 	isSignalv2ClientMessage_Message()
 }
@@ -297,7 +317,19 @@ type Signalv2ClientMessage_ConnectRequest struct {
 	ConnectRequest *ConnectRequest `protobuf:"bytes,2,opt,name=connect_request,json=connectRequest,proto3,oneof"`
 }
 
+type Signalv2ClientMessage_PublisherSdp struct {
+	PublisherSdp *SessionDescription `protobuf:"bytes,3,opt,name=publisher_sdp,json=publisherSdp,proto3,oneof"` // SDP offer for publisher peer connection
+}
+
+type Signalv2ClientMessage_SubscriberSdp struct {
+	SubscriberSdp *SessionDescription `protobuf:"bytes,4,opt,name=subscriber_sdp,json=subscriberSdp,proto3,oneof"` // SDP answer for subscriber peer connection
+}
+
 func (*Signalv2ClientMessage_ConnectRequest) isSignalv2ClientMessage_Message() {}
+
+func (*Signalv2ClientMessage_PublisherSdp) isSignalv2ClientMessage_Message() {}
+
+func (*Signalv2ClientMessage_SubscriberSdp) isSignalv2ClientMessage_Message() {}
 
 type Signalv2ServerMessage struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
@@ -305,6 +337,10 @@ type Signalv2ServerMessage struct {
 	// Types that are valid to be assigned to Message:
 	//
 	//	*Signalv2ServerMessage_ConnectResponse
+	//	*Signalv2ServerMessage_PublisherSdp
+	//	*Signalv2ServerMessage_SubscriberSdp
+	//	*Signalv2ServerMessage_RoomUpdate
+	//	*Signalv2ServerMessage_ParticipantUpdate
 	Message       isSignalv2ServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -363,6 +399,42 @@ func (x *Signalv2ServerMessage) GetConnectResponse() *ConnectResponse {
 	return nil
 }
 
+func (x *Signalv2ServerMessage) GetPublisherSdp() *SessionDescription {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ServerMessage_PublisherSdp); ok {
+			return x.PublisherSdp
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2ServerMessage) GetSubscriberSdp() *SessionDescription {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ServerMessage_SubscriberSdp); ok {
+			return x.SubscriberSdp
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2ServerMessage) GetRoomUpdate() *RoomUpdate {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ServerMessage_RoomUpdate); ok {
+			return x.RoomUpdate
+		}
+	}
+	return nil
+}
+
+func (x *Signalv2ServerMessage) GetParticipantUpdate() *ParticipantUpdate {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ServerMessage_ParticipantUpdate); ok {
+			return x.ParticipantUpdate
+		}
+	}
+	return nil
+}
+
 type isSignalv2ServerMessage_Message interface {
 	isSignalv2ServerMessage_Message()
 }
@@ -371,7 +443,31 @@ type Signalv2ServerMessage_ConnectResponse struct {
 	ConnectResponse *ConnectResponse `protobuf:"bytes,2,opt,name=connect_response,json=connectResponse,proto3,oneof"`
 }
 
+type Signalv2ServerMessage_PublisherSdp struct {
+	PublisherSdp *SessionDescription `protobuf:"bytes,3,opt,name=publisher_sdp,json=publisherSdp,proto3,oneof"` // SDP answer for publisher peer connection
+}
+
+type Signalv2ServerMessage_SubscriberSdp struct {
+	SubscriberSdp *SessionDescription `protobuf:"bytes,4,opt,name=subscriber_sdp,json=subscriberSdp,proto3,oneof"` // SDP offer for subscriber peer connection
+}
+
+type Signalv2ServerMessage_RoomUpdate struct {
+	RoomUpdate *RoomUpdate `protobuf:"bytes,5,opt,name=room_update,json=roomUpdate,proto3,oneof"`
+}
+
+type Signalv2ServerMessage_ParticipantUpdate struct {
+	ParticipantUpdate *ParticipantUpdate `protobuf:"bytes,6,opt,name=participant_update,json=participantUpdate,proto3,oneof"`
+}
+
 func (*Signalv2ServerMessage_ConnectResponse) isSignalv2ServerMessage_Message() {}
+
+func (*Signalv2ServerMessage_PublisherSdp) isSignalv2ServerMessage_Message() {}
+
+func (*Signalv2ServerMessage_SubscriberSdp) isSignalv2ServerMessage_Message() {}
+
+func (*Signalv2ServerMessage_RoomUpdate) isSignalv2ServerMessage_Message() {}
+
+func (*Signalv2ServerMessage_ParticipantUpdate) isSignalv2ServerMessage_Message() {}
 
 type ConnectionSettings struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
@@ -696,14 +792,21 @@ const file_livekit_rtc_v2_proto_rawDesc = "" +
 	"\tSequencer\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\rR\tmessageId\x12F\n" +
-	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\x98\x01\n" +
+	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\xa2\x02\n" +
 	"\x15Signalv2ClientMessage\x120\n" +
 	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12B\n" +
-	"\x0fconnect_request\x18\x02 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequestB\t\n" +
-	"\amessage\"\x9b\x01\n" +
+	"\x0fconnect_request\x18\x02 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequest\x12B\n" +
+	"\rpublisher_sdp\x18\x03 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\fpublisherSdp\x12D\n" +
+	"\x0esubscriber_sdp\x18\x04 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\rsubscriberSdpB\t\n" +
+	"\amessage\"\xaa\x03\n" +
 	"\x15Signalv2ServerMessage\x120\n" +
 	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12E\n" +
-	"\x10connect_response\x18\x02 \x01(\v2\x18.livekit.ConnectResponseH\x00R\x0fconnectResponseB\t\n" +
+	"\x10connect_response\x18\x02 \x01(\v2\x18.livekit.ConnectResponseH\x00R\x0fconnectResponse\x12B\n" +
+	"\rpublisher_sdp\x18\x03 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\fpublisherSdp\x12D\n" +
+	"\x0esubscriber_sdp\x18\x04 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\rsubscriberSdp\x126\n" +
+	"\vroom_update\x18\x05 \x01(\v2\x13.livekit.RoomUpdateH\x00R\n" +
+	"roomUpdate\x12K\n" +
+	"\x12participant_update\x18\x06 \x01(\v2\x1a.livekit.ParticipantUpdateH\x00R\x11participantUpdateB\t\n" +
 	"\amessage\"\xe4\x01\n" +
 	"\x12ConnectionSettings\x12%\n" +
 	"\x0eauto_subscribe\x18\x01 \x01(\bR\rautoSubscribe\x12'\n" +
@@ -765,14 +868,16 @@ var file_livekit_rtc_v2_proto_goTypes = []any{
 	(*ErrorResponse)(nil),         // 8: livekit.ErrorResponse
 	nil,                           // 9: livekit.ConnectRequest.ParticipantAttributesEntry
 	(*Fragment)(nil),              // 10: livekit.Fragment
-	(*ClientInfo)(nil),            // 11: livekit.ClientInfo
-	(*Room)(nil),                  // 12: livekit.Room
-	(*ParticipantInfo)(nil),       // 13: livekit.ParticipantInfo
-	(*ICEServer)(nil),             // 14: livekit.ICEServer
-	(*ClientConfiguration)(nil),   // 15: livekit.ClientConfiguration
-	(*ServerInfo)(nil),            // 16: livekit.ServerInfo
-	(*Codec)(nil),                 // 17: livekit.Codec
-	(*SessionDescription)(nil),    // 18: livekit.SessionDescription
+	(*SessionDescription)(nil),    // 11: livekit.SessionDescription
+	(*RoomUpdate)(nil),            // 12: livekit.RoomUpdate
+	(*ParticipantUpdate)(nil),     // 13: livekit.ParticipantUpdate
+	(*ClientInfo)(nil),            // 14: livekit.ClientInfo
+	(*Room)(nil),                  // 15: livekit.Room
+	(*ParticipantInfo)(nil),       // 16: livekit.ParticipantInfo
+	(*ICEServer)(nil),             // 17: livekit.ICEServer
+	(*ClientConfiguration)(nil),   // 18: livekit.ClientConfiguration
+	(*ServerInfo)(nil),            // 19: livekit.ServerInfo
+	(*Codec)(nil),                 // 20: livekit.Codec
 }
 var file_livekit_rtc_v2_proto_depIdxs = []int32{
 	1,  // 0: livekit.Signalv2WireMessage.envelope:type_name -> livekit.Envelope
@@ -781,24 +886,30 @@ var file_livekit_rtc_v2_proto_depIdxs = []int32{
 	4,  // 3: livekit.Envelope.server_messages:type_name -> livekit.Signalv2ServerMessage
 	2,  // 4: livekit.Signalv2ClientMessage.sequencer:type_name -> livekit.Sequencer
 	6,  // 5: livekit.Signalv2ClientMessage.connect_request:type_name -> livekit.ConnectRequest
-	2,  // 6: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
-	7,  // 7: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
-	11, // 8: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
-	5,  // 9: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	9,  // 10: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
-	12, // 11: livekit.ConnectResponse.room:type_name -> livekit.Room
-	13, // 12: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
-	13, // 13: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
-	14, // 14: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
-	15, // 15: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	16, // 16: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
-	17, // 17: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	18, // 18: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	11, // 6: livekit.Signalv2ClientMessage.publisher_sdp:type_name -> livekit.SessionDescription
+	11, // 7: livekit.Signalv2ClientMessage.subscriber_sdp:type_name -> livekit.SessionDescription
+	2,  // 8: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
+	7,  // 9: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
+	11, // 10: livekit.Signalv2ServerMessage.publisher_sdp:type_name -> livekit.SessionDescription
+	11, // 11: livekit.Signalv2ServerMessage.subscriber_sdp:type_name -> livekit.SessionDescription
+	12, // 12: livekit.Signalv2ServerMessage.room_update:type_name -> livekit.RoomUpdate
+	13, // 13: livekit.Signalv2ServerMessage.participant_update:type_name -> livekit.ParticipantUpdate
+	14, // 14: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
+	5,  // 15: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	9,  // 16: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
+	15, // 17: livekit.ConnectResponse.room:type_name -> livekit.Room
+	16, // 18: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
+	16, // 19: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
+	17, // 20: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
+	18, // 21: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	19, // 22: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
+	20, // 23: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	11, // 24: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
+	25, // [25:25] is the sub-list for method output_type
+	25, // [25:25] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_v2_proto_init() }
@@ -814,9 +925,15 @@ func file_livekit_rtc_v2_proto_init() {
 	}
 	file_livekit_rtc_v2_proto_msgTypes[3].OneofWrappers = []any{
 		(*Signalv2ClientMessage_ConnectRequest)(nil),
+		(*Signalv2ClientMessage_PublisherSdp)(nil),
+		(*Signalv2ClientMessage_SubscriberSdp)(nil),
 	}
 	file_livekit_rtc_v2_proto_msgTypes[4].OneofWrappers = []any{
 		(*Signalv2ServerMessage_ConnectResponse)(nil),
+		(*Signalv2ServerMessage_PublisherSdp)(nil),
+		(*Signalv2ServerMessage_SubscriberSdp)(nil),
+		(*Signalv2ServerMessage_RoomUpdate)(nil),
+		(*Signalv2ServerMessage_ParticipantUpdate)(nil),
 	}
 	file_livekit_rtc_v2_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}

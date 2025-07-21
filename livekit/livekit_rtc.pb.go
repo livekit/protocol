@@ -500,12 +500,12 @@ type isSignalRequest_Message interface {
 }
 
 type SignalRequest_Offer struct {
-	// initial join exchange, for publisher
+	// participant offer for publisher
 	Offer *SessionDescription `protobuf:"bytes,1,opt,name=offer,proto3,oneof"`
 }
 
 type SignalRequest_Answer struct {
-	// participant answering publisher offer
+	// participant answering subscriber offer
 	Answer *SessionDescription `protobuf:"bytes,2,opt,name=answer,proto3,oneof"`
 }
 

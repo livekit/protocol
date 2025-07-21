@@ -2626,6 +2626,7 @@ func (*DataPacket_StreamChunk) isDataPacket_Value() {}
 
 func (*DataPacket_StreamTrailer) isDataPacket_Value() {}
 
+// Deprecated: Marked as deprecated in livekit_models.proto.
 type ActiveSpeakerUpdate struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Speakers      []*SpeakerInfo         `protobuf:"bytes,1,rep,name=speakers,proto3" json:"speakers,omitempty"`
@@ -5555,9 +5556,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x04Kind\x12\f\n" +
 	"\bRELIABLE\x10\x00\x12\t\n" +
 	"\x05LOSSY\x10\x01B\a\n" +
-	"\x05value\"G\n" +
+	"\x05value\"K\n" +
 	"\x13ActiveSpeakerUpdate\x120\n" +
-	"\bspeakers\x18\x01 \x03(\v2\x14.livekit.SpeakerInfoR\bspeakers\"M\n" +
+	"\bspeakers\x18\x01 \x03(\v2\x14.livekit.SpeakerInfoR\bspeakers:\x02\x18\x01\"M\n" +
 	"\vSpeakerInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x14\n" +
 	"\x05level\x18\x02 \x01(\x02R\x05level\x12\x16\n" +
