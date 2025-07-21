@@ -23,7 +23,7 @@ import "livekit_models.proto";
 
 message SignalRequest {
   oneof message {
-    // initial join exchange, for publisher
+    // participant offer for publisher
     SessionDescription offer = 1;
     // participant answering subscriber offer
     SessionDescription answer = 2;
