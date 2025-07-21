@@ -25,7 +25,7 @@ message SignalRequest {
   oneof message {
     // initial join exchange, for publisher
     SessionDescription offer = 1;
-    // participant answering publisher offer
+    // participant answering subscriber offer
     SessionDescription answer = 2;
     TrickleRequest trickle = 3;
     AddTrackRequest add_track = 4;

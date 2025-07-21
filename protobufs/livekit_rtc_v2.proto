@@ -50,6 +50,8 @@ message Signalv2ClientMessage {
 
   oneof message {
     ConnectRequest connect_request = 2;
+    SessionDescription publisher_sdp = 3; // SDP offer for publisher peer connection
+    SessionDescription subscriber_sdp = 4; // SDP answer for subscriber peer connection
   }
 }
 
@@ -58,6 +60,10 @@ message Signalv2ServerMessage {
 
   oneof message {
     ConnectResponse connect_response = 2;
+    SessionDescription publisher_sdp = 3; // SDP answer for publisher peer connection
+    SessionDescription subscriber_sdp = 4; // SDP offer for subscriber peer connection
+    RoomUpdate room_update = 5;
+    ParticipantUpdate participant_update = 6;
   }
 }
 
