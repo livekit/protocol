@@ -561,7 +561,7 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 type InferenceGrant struct {
 	// Admin grants to all inference features (LLM, STT, TTS)
-	Admin bool `json:"admin,omitempty"`
+	Perform bool `json:"perform,omitempty"`
 }
 
 func (s *InferenceGrant) Clone() *InferenceGrant {
@@ -579,7 +579,7 @@ func (s *InferenceGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		return nil
 	}
 
-	e.AddBool("Admin", s.Admin)
+	e.AddBool("Perform", s.Perform)
 	return nil
 }
 

@@ -43,7 +43,7 @@ func TestAccessToken(t *testing.T) {
 		videoGrant := &VideoGrant{RoomJoin: true, Room: "myroom"}
 		sipGrant := &SIPGrant{Admin: true}
 		agentGrant := &AgentGrant{Admin: true}
-		inferenceGrant := &InferenceGrant{Admin: true}
+		inferenceGrant := &InferenceGrant{Perform: true}
 		at := NewAccessToken(apiKey, secret).
 			SetVideoGrant(videoGrant).
 			SetSIPGrant(sipGrant).

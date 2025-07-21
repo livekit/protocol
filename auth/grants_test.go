@@ -140,7 +140,7 @@ func TestGrants(t *testing.T) {
 
 	t.Run("clone with Inference", func(t *testing.T) {
 		inference := &InferenceGrant{
-			Admin: true,
+			Perform: true,
 		}
 		grants := &ClaimGrants{
 			Identity:  "identity",
@@ -153,7 +153,7 @@ func TestGrants(t *testing.T) {
 		clone := grants.Clone()
 		require.NotSame(t, grants, clone)
 		require.NotSame(t, grants.Inference, clone.Inference)
-		require.Equal(t, grants.Inference.Admin, clone.Inference.Admin)
+		require.Equal(t, grants.Inference.Perform, clone.Inference.Perform)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Inference, clone.Inference))
 	})
