@@ -47,7 +47,6 @@ const (
 	CloudAgentVersionPrefix = guid.CloudAgentVersionPrefix
 	CloudAgentSecretPrefix  = guid.CloudAgentSecretPrefix
 	CloudAgentWorkerPrefix  = guid.CloudAgentWorkerPrefix
-	CloudAgentGatewayPrefix = guid.CloudAgentGatewayPrefix
 )
 
 func NewGuid(prefix string) string {
