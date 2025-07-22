@@ -162,12 +162,13 @@ func checkOutputForCredentials(output any) error {
 }
 
 type ClaimGrants struct {
-	Identity string      `json:"identity,omitempty"`
-	Name     string      `json:"name,omitempty"`
-	Kind     string      `json:"kind,omitempty"`
-	Video    *VideoGrant `json:"video,omitempty"`
-	SIP      *SIPGrant   `json:"sip,omitempty"`
-	Agent    *AgentGrant `json:"agent,omitempty"`
+	Identity  string          `json:"identity,omitempty"`
+	Name      string          `json:"name,omitempty"`
+	Kind      string          `json:"kind,omitempty"`
+	Video     *VideoGrant     `json:"video,omitempty"`
+	SIP       *SIPGrant       `json:"sip,omitempty"`
+	Agent     *AgentGrant     `json:"agent,omitempty"`
+	Inference *InferenceGrant `json:"inference,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -203,6 +204,8 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone := *c
 	clone.Video = c.Video.Clone()
 	clone.SIP = c.SIP.Clone()
+	clone.Agent = c.Agent.Clone()
+	clone.Inference = c.Inference.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 
@@ -218,6 +221,8 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddString("Kind", c.Kind)
 	e.AddObject("Video", c.Video)
 	e.AddObject("SIP", c.SIP)
+	e.AddObject("Agent", c.Agent)
+	e.AddObject("Inference", c.Inference)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -549,6 +554,32 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddBool("Admin", s.Admin)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+type InferenceGrant struct {
+	// Admin grants to all inference features (LLM, STT, TTS)
+	Perform bool `json:"perform,omitempty"`
+}
+
+func (s *InferenceGrant) Clone() *InferenceGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+
+	return &clone
+}
+
+func (s *InferenceGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Perform", s.Perform)
 	return nil
 }
 
