@@ -9,14 +9,6 @@ const (
 	WorkerStatusFull      WorkerStatus = "full"
 )
 
-type AgentKind string
-
-const (
-	AgentKindUndefined AgentKind = ""
-	AgentKindCloud     AgentKind = "cloud"
-	AgentKindSelfhost  AgentKind = "selfhost"
-)
-
 type WorkerState string
 
 const (
@@ -32,6 +24,14 @@ const (
 	JobKindRoom        JobKind = "room"
 	JobKindPublisher   JobKind = "publisher"
 	JobKindParticipant JobKind = "participant"
+)
+
+type WorkerKind string
+
+const (
+	WorkerKindUndefined WorkerKind = ""
+	WorkerKindCloud     WorkerKind = "cloud"
+	WorkerKindSelfhost  WorkerKind = "selfhost"
 )
 
 type JobStatus string
