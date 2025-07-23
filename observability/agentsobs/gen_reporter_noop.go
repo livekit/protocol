@@ -95,7 +95,6 @@ func (r *noopWorkerReporter) ReportLoad(v float32)                              
 func (r *noopWorkerReporter) ReportStatus(v WorkerStatus)                         {}
 func (r *noopWorkerReporter) ReportStartTime(v time.Time)                         {}
 func (r *noopWorkerReporter) ReportJobsCurrent(v uint32)                          {}
-func (r *noopWorkerReporter) ReportKind(v AgentKind)                              {}
 func (r *noopWorkerReporter) ReportCPU(v int64)                                   {}
 func (r *noopWorkerReporter) ReportCPULimit(v int64)                              {}
 func (r *noopWorkerReporter) ReportMem(v int64)                                   {}
@@ -122,6 +121,7 @@ func (r *noopJobReporter) Tx(f func(JobTx))                                 {}
 func (r *noopJobReporter) TxAt(ts time.Time, f func(JobTx))                 {}
 func (r *noopJobReporter) ReportRoomSessionID(v string)                     {}
 func (r *noopJobReporter) ReportKind(v JobKind)                             {}
+func (r *noopJobReporter) ReportWorkerKind(v WorkerKind)                    {}
 func (r *noopJobReporter) ReportStatus(v JobStatus)                         {}
 func (r *noopJobReporter) ReportDuration(v uint32)                          {}
 func (r *noopJobReporter) ReportDurationMinutes(v uint8)                    {}
