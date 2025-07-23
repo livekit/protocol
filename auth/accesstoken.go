@@ -87,6 +87,11 @@ func (t *AccessToken) SetAgentGrant(grant *AgentGrant) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) SetInferenceGrant(grant *InferenceGrant) *AccessToken {
+	t.grant.Inference = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t

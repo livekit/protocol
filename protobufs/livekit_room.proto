@@ -228,6 +228,8 @@ message RoomConfiguration {
   uint32 departure_timeout = 3;
   // limit number of participants that can be in a room, excluding Egress and Ingress participants
   uint32 max_participants = 4;
+  // metadata of room
+  string metadata = 11;
   // egress
   RoomEgress egress = 5;
   // playout delay of subscriber
@@ -239,6 +241,8 @@ message RoomConfiguration {
 
   // Define agents that should be dispatched to this room
   repeated RoomAgentDispatch agents = 10;
+
+  // NEXT_ID: 12
 }
 
 message ForwardParticipantRequest {

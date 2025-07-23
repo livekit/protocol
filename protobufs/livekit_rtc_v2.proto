@@ -1,0 +1,105 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "livekit_rtc.proto";
+import "livekit_models.proto";
+
+message Signalv2WireMessage {
+  oneof message {
+    Envelope envelope = 1;
+    Fragment fragment = 2;
+  }
+}
+
+message Envelope {
+  // collection of client -> server messages
+  repeated Signalv2ClientMessage client_messages = 1;
+ 
+  // collection of server -> client messages
+  repeated Signalv2ServerMessage server_messages = 2;
+}
+
+message Sequencer {
+  // monotonically increasing number (by 1) starting at some non-zero number (should not rollover)
+  uint32 message_id = 1;
+
+  // last remote message processed
+  uint32 last_processed_remote_message_id = 2;
+}
+
+message Signalv2ClientMessage {
+  Sequencer sequencer = 1;
+
+  oneof message {
+    ConnectRequest connect_request = 2;
+    SessionDescription publisher_sdp = 3; // SDP offer for publisher peer connection
+    SessionDescription subscriber_sdp = 4; // SDP answer for subscriber peer connection
+  }
+}
+
+message Signalv2ServerMessage {
+  Sequencer sequencer = 1;
+
+  oneof message {
+    ConnectResponse connect_response = 2;
+    SessionDescription publisher_sdp = 3; // SDP answer for publisher peer connection
+    SessionDescription subscriber_sdp = 4; // SDP offer for subscriber peer connection
+    RoomUpdate room_update = 5;
+    ParticipantUpdate participant_update = 6;
+  }
+}
+
+message ConnectionSettings {
+  bool auto_subscribe = 1;
+  bool adaptive_stream = 2;
+  optional bool subscriber_allow_pause = 3;
+  bool disable_ice_lite = 4;;
+}
+
+message ConnectRequest {
+  ClientInfo client_info = 1;
+  ConnectionSettings connection_settings = 2;
+  string metadata = 3; // if not empty, will overwrite `metadata` in token
+
+  // will set keys provided via this
+  // will overwrite if the same key is in the token
+  // will not delete keys from token if there is a key collision and this sets that key to empty value
+  map<string, string> participant_attributes = 4;
+}
+
+message ConnectResponse {
+  Room room = 1;
+  ParticipantInfo participant = 2;
+  repeated ParticipantInfo other_participants = 3;
+  repeated ICEServer ice_servers = 4;
+  ClientConfiguration client_configuration = 5;
+  ServerInfo server_info = 6;
+  // Server-Injected-Frame byte trailer, used to identify unencrypted frames when e2ee is enabled
+  bytes sif_trailer = 7;
+  repeated Codec enabled_publish_codecs = 8;
+  bool fast_publish = 9;
+  SessionDescription subscriber_sdp = 10;
+}
+
+message ErrorResponse {
+  uint32 message_id = 1;
+  string error = 2;
+}

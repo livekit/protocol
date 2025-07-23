@@ -207,21 +207,21 @@ message TrackInfo {
   bool muted = 4;
   // original width of video (unset for audio)
   // clients may receive a lower resolution version with simulcast
-  uint32 width = 5;
+  uint32 width = 5 [deprecated=true];
   // original height of video (unset for audio)
-  uint32 height = 6;
+  uint32 height = 6 [deprecated=true];
   // true if track is simulcasted
-  bool simulcast = 7;
+  bool simulcast = 7 [deprecated = true]; // see layer_mode
   // true if DTX (Discontinuous Transmission) is disabled for audio
-  bool disable_dtx = 8;
+  bool disable_dtx = 8 [deprecated=true];   // deprecated in favor of audio_features
   // source of media
   TrackSource source = 9;
-  repeated VideoLayer layers = 10;
+  repeated VideoLayer layers = 10 [deprecated=true]; // see `codecs` for layers of individual codec
   // mime type of codec
   string mime_type = 11;
   string mid = 12;
   repeated SimulcastCodecInfo codecs = 13;
-  bool stereo = 14;
+  bool stereo = 14 [deprecated=true];   // deprecated in favor of audio_features
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
   Encryption.Type encryption = 16;
@@ -229,6 +229,7 @@ message TrackInfo {
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
   BackupCodecPolicy backup_codec_policy = 20;
+  VideoLayer.Mode video_mode = 21;
 }
 
 enum VideoQuality {
@@ -240,6 +241,13 @@ enum VideoQuality {
 
 // provide information about available spatial layers
 message VideoLayer {
+  enum Mode {
+    UNUSED = 0;
+    STANDARD = 1;
+    SIMULCAST = 2;
+    SVC = 3;
+  }
+
   // for tracks with a single layer, this should be HIGH
   VideoQuality quality = 1;
   uint32 width = 2;
@@ -285,6 +293,7 @@ message DataPacket {
 }
 
 message ActiveSpeakerUpdate {
+  option deprecated = true;
   repeated SpeakerInfo speakers = 1;
 }
 
@@ -715,3 +724,13 @@ message WebhookConfig {
   string url = 1;
   string signing_key = 2;
 }
+
+message Fragment {
+  uint32 packet_id = 1;  // all fragments of a packet will have the same id
+  uint32 fragment_number = 2; // should start at 1
+  uint32 num_fragments = 3;
+  uint32 fragment_size = 4;
+  uint32 total_size = 5;
+  bytes data = 6;
+}
+
