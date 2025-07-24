@@ -1313,7 +1313,10 @@ func (x *Pagination) GetLimit() int32 {
 // ListUpdate is used for updated APIs where 'repeated string' field is modified.
 type ListUpdate struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Set           []string               `protobuf:"bytes,1,rep,name=set,proto3" json:"set,omitempty"` // set the field to a new list
+	Set           []string               `protobuf:"bytes,1,rep,name=set,proto3" json:"set,omitempty"`      // set the field to a new list
+	Add           []string               `protobuf:"bytes,2,rep,name=add,proto3" json:"add,omitempty"`      // append items to a list, avoiding duplicates
+	Del           []string               `protobuf:"bytes,3,rep,name=del,proto3" json:"del,omitempty"`      // delete items from a list
+	Clear         bool                   `protobuf:"varint,4,opt,name=clear,proto3" json:"clear,omitempty"` // sets the list to an empty list
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1353,6 +1356,27 @@ func (x *ListUpdate) GetSet() []string {
 		return x.Set
 	}
 	return nil
+}
+
+func (x *ListUpdate) GetAdd() []string {
+	if x != nil {
+		return x.Add
+	}
+	return nil
+}
+
+func (x *ListUpdate) GetDel() []string {
+	if x != nil {
+		return x.Del
+	}
+	return nil
+}
+
+func (x *ListUpdate) GetClear() bool {
+	if x != nil {
+		return x.Clear
+	}
+	return false
 }
 
 type Room struct {
@@ -5394,10 +5418,13 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"Pagination\x12\x19\n" +
 	"\bafter_id\x18\x01 \x01(\tR\aafterId\x12\x14\n" +
-	"\x05limit\x18\x02 \x01(\x05R\x05limit\"\x1e\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\"X\n" +
 	"\n" +
 	"ListUpdate\x12\x10\n" +
-	"\x03set\x18\x01 \x03(\tR\x03set\"\x9e\x04\n" +
+	"\x03set\x18\x01 \x03(\tR\x03set\x12\x10\n" +
+	"\x03add\x18\x02 \x03(\tR\x03add\x12\x10\n" +
+	"\x03del\x18\x03 \x03(\tR\x03del\x12\x14\n" +
+	"\x05clear\x18\x04 \x01(\bR\x05clear\"\x9e\x04\n" +
 	"\x04Room\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12#\n" +

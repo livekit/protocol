@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"slices"
 
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
@@ -226,12 +227,40 @@ func (p *ListUpdate) Validate() error {
 	if p == nil {
 		return nil
 	}
+	change := len(p.Set)+len(p.Add)+len(p.Del) > 0
+	if !p.Clear && !change {
+		return fmt.Errorf("unsupported list update operation")
+	}
+	if p.Clear && change {
+		return fmt.Errorf("cannot clear and change the list at the same time")
+	}
+	if len(p.Set) > 0 && len(p.Add)+len(p.Del) > 0 {
+		return fmt.Errorf("cannot set and change the list at the same time")
+	}
 	for _, v := range p.Set {
 		if v == "" {
 			return fmt.Errorf("empty element in the list")
 		}
 	}
+	for _, v := range p.Add {
+		if v == "" {
+			return fmt.Errorf("empty element in the list")
+		}
+	}
+	for _, v := range p.Del {
+		if v == "" {
+			return fmt.Errorf("empty element in the list")
+		}
+	}
 	return nil
+}
+
+func (p *ListUpdate) Apply(arr []string) ([]string, error) {
+	if err := p.Validate(); err != nil {
+		return arr, err
+	}
+	applyListUpdate(&arr, p)
+	return arr, nil
 }
 
 func applyUpdate[T any](dst *T, set *T) {
@@ -250,9 +279,28 @@ func applyListUpdate[T ~string](dst *[]T, u *ListUpdate) {
 	if u == nil {
 		return
 	}
-	arr := make([]T, 0, len(u.Set))
-	for _, v := range u.Set {
-		arr = append(arr, T(v))
+	if u.Clear {
+		*dst = nil
+		return
+	}
+	if len(u.Set) != 0 {
+		arr := make([]T, 0, len(u.Set))
+		for _, v := range u.Set {
+			arr = append(arr, T(v))
+		}
+		*dst = arr
+		return
+	}
+	arr := slices.Clone(*dst)
+	for _, v := range u.Del {
+		if i := slices.Index(arr, T(v)); i >= 0 {
+			arr = slices.Delete(arr, i, i+1)
+		}
+	}
+	for _, v := range u.Add {
+		if i := slices.Index(arr, T(v)); i < 0 {
+			arr = append(arr, T(v))
+		}
 	}
 	*dst = arr
 }

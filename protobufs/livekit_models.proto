@@ -31,6 +31,9 @@ message Pagination {
 // ListUpdate is used for updated APIs where 'repeated string' field is modified.
 message ListUpdate {
   repeated string set = 1; // set the field to a new list
+  repeated string add = 2; // append items to a list, avoiding duplicates
+  repeated string del = 3; // delete items from a list
+  bool clear = 4; // sets the list to an empty list
 }
 
 message Room {
