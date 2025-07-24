@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package livekit;
+
+option go_package = "github.com/livekit/protocol/livekit";
+
+import "google/protobuf/empty.proto";
+
+// Public Phone Number Service - External API for phone number management
+service PhoneNumberService {
+  // List available phone numbers in inventory
+  rpc ListPhoneNumberInventory(ListPhoneNumberInventoryRequest)
+      returns (ListPhoneNumberInventoryResponse) {}
+  
+  // Purchase a phone number from inventory
+  rpc PurchasePhoneNumber(PurchasePhoneNumberRequest)
+      returns (PurchasePhoneNumberResponse) {}
+  
+  // List purchased phone numbers for a project
+  rpc ListPurchasedPhoneNumbers(ListPurchasedPhoneNumbersRequest)
+      returns (ListPurchasedPhoneNumbersResponse) {}
+  
+  // Release a purchased phone number
+  rpc ReleasePhoneNumber(ReleasePhoneNumberRequest)
+      returns (google.protobuf.Empty) {}
+}
+
+// ListPhoneNumberInventoryRequest - Request to list available phone numbers
+message ListPhoneNumberInventoryRequest {
+  string project_id = 1;          // Required: Project ID
+  string country_code = 2;        // Optional: Filter by country code (e.g., "US", "CA")
+  string area_code = 3;           // Optional: Filter by area code (e.g., "415")
+  string pattern = 4;             // Optional: Filter by pattern (e.g., "***-***-1234")
+  int32 limit = 5;                // Optional: Maximum number of results (default: 50)
+  int32 offset = 6;               // Optional: Number of results to skip (default: 0)
+}
+
+// ListPhoneNumberInventoryResponse - Response containing available phone numbers
+message ListPhoneNumberInventoryResponse {
+  repeated PhoneNumberInventoryItem items = 1;  // List of available phone numbers
+  int32 total_count = 2;                        // Total number of available numbers
+  int32 limit = 3;                              // Limit used in the request
+  int32 offset = 4;                             // Offset used in the request
+}
+
+// PurchasePhoneNumberRequest - Request to purchase a phone number
+message PurchasePhoneNumberRequest {
+  string project_id = 1;          // Required: Project ID
+  string phone_number = 2;        // Required: Phone number in E.164 format (e.g., "+14155552671")
+}
+
+// PurchasePhoneNumberResponse - Response containing the purchased phone number
+message PurchasePhoneNumberResponse {
+  PurchasedPhoneNumber phone_number = 1;  // Details of the purchased phone number
+}
+
+// ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
+message ListPurchasedPhoneNumbersRequest {
+  string project_id = 1;          // Required: Project ID
+  string status = 2;              // Optional: Filter by status ("active", "released", "pending")
+  int32 limit = 3;                // Optional: Maximum number of results (default: 50)
+  int32 offset = 4;               // Optional: Number of results to skip (default: 0)
+}
+
+// ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
+message ListPurchasedPhoneNumbersResponse {
+  repeated PurchasedPhoneNumber items = 1;  // List of purchased phone numbers
+  int32 total_count = 2;                   // Total number of purchased numbers
+  int32 limit = 3;                         // Limit used in the request
+  int32 offset = 4;                        // Offset used in the request
+}
+
+// ReleasePhoneNumberRequest - Request to release a phone number
+message ReleasePhoneNumberRequest {
+  string project_id = 1;          // Required: Project ID
+  string phone_number = 2;        // Required: Phone number in E.164 format (e.g., "+14155552671")
+}
+
+// PhoneNumberInventoryItem - Represents an available phone number for purchase
+message PhoneNumberInventoryItem {
+  string phone_number = 1;        // Phone number in E.164 format (e.g., "+14155552671")
+  string country_code = 2;        // Country code (e.g., "US")
+  string area_code = 3;           // Area code (e.g., "415")
+  string locality = 4;            // City/locality (e.g., "San Francisco")
+  string region = 5;              // State/region (e.g., "CA")
+  string capabilities = 6;        // Comma-separated capabilities (e.g., "voice,sms")
+  int64 monthly_cost_cents = 7;   // Monthly cost in cents
+  bool available = 8;             // Whether the number is currently available
+  string carrier_name = 9;        // Name of the carrier providing this number
+}
+
+// PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
+message PurchasedPhoneNumber {
+  string id = 1;                  // Unique identifier for the phone number
+  string phone_number = 2;        // Phone number in E.164 format (e.g., "+14155552671")
+  string country_code = 3;        // Country code (e.g., "US")
+  string area_code = 4;           // Area code (e.g., "415")
+  string national_number = 5;     // National number without country code (e.g., "4155552671")
+  bool is_mobile = 6;             // Whether this is a mobile number
+  string status = 7;              // Current status ("active", "pending", "released")
+  int64 assigned_at = 8;          // Timestamp when the number was assigned
+  int64 released_at = 9;          // Timestamp when the number was released (if applicable)
+} 
