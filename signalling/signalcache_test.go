@@ -23,10 +23,10 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-func TestSignalv2Cache(t *testing.T) {
+func TestSignalCache(t *testing.T) {
 	firstMessageId := uint32(10)
 	lastProcessedRemoteMessageId := uint32(2345)
-	cache := NewSignalv2Cache(Signalv2CacheParams{
+	cache := NewSignalCache(SignalCacheParams{
 		FirstMessageId: firstMessageId,
 	})
 
@@ -78,41 +78,87 @@ func TestSignalv2Cache(t *testing.T) {
 
 	cache.SetLastProcessedRemoteMessageId(lastProcessedRemoteMessageId)
 
-	// Add() - add one message at a time
+	// add messages to cache
 	for _, inputMessage := range inputMessages {
-		cache.Add(inputMessage)
+		messageId := cache.NextMessageId()
+		inputMessage.Sequencer = &livekit.Sequencer{
+			MessageId: messageId,
+		}
+		cache.Add(inputMessage, messageId)
 	}
 
 	// get all messages in cache
-	outputMessages := cache.GetFromFront()
+	protoMessages, lprmi := cache.GetFromFront()
+	outputMessages := make([]*livekit.Signalv2ServerMessage, 0, len(protoMessages))
+	for _, protoMessage := range protoMessages {
+		if sm, ok := protoMessage.(*livekit.Signalv2ServerMessage); ok {
+			sm.Sequencer.LastProcessedRemoteMessageId = lprmi
+			outputMessages = append(outputMessages, sm)
+		}
+	}
 	require.True(t, compareProtoSlices(expectedOutputMessages, outputMessages))
+	require.Equal(t, lastProcessedRemoteMessageId, lprmi)
 
 	// clear one and get again
 	cache.Clear(firstMessageId)
 
-	outputMessages = cache.GetFromFront()
+	protoMessages, lprmi = cache.GetFromFront()
+	outputMessages = make([]*livekit.Signalv2ServerMessage, 0, len(protoMessages))
+	for _, protoMessage := range protoMessages {
+		if sm, ok := protoMessage.(*livekit.Signalv2ServerMessage); ok {
+			sm.Sequencer.LastProcessedRemoteMessageId = lprmi
+			outputMessages = append(outputMessages, sm)
+		}
+	}
 	require.True(t, compareProtoSlices(expectedOutputMessages[1:], outputMessages))
+	require.Equal(t, lastProcessedRemoteMessageId, lprmi)
 
 	// clearing some evicted messages should not clear anything
 	cache.Clear(firstMessageId) // firstMessageId has been cleared already at this point
 
-	outputMessages = cache.GetFromFront()
+	protoMessages, lprmi = cache.GetFromFront()
+	outputMessages = make([]*livekit.Signalv2ServerMessage, 0, len(protoMessages))
+	for _, protoMessage := range protoMessages {
+		if sm, ok := protoMessage.(*livekit.Signalv2ServerMessage); ok {
+			sm.Sequencer.LastProcessedRemoteMessageId = lprmi
+			outputMessages = append(outputMessages, sm)
+		}
+	}
 	require.True(t, compareProtoSlices(expectedOutputMessages[1:], outputMessages))
+	require.Equal(t, lastProcessedRemoteMessageId, lprmi)
 
 	// clear some and get rest in one go
-	outputMessages = cache.ClearAndGetFrom(firstMessageId + 3)
+	protoMessages, lprmi = cache.ClearAndGetFrom(firstMessageId + 3)
+	outputMessages = make([]*livekit.Signalv2ServerMessage, 0, len(protoMessages))
+	for _, protoMessage := range protoMessages {
+		if sm, ok := protoMessage.(*livekit.Signalv2ServerMessage); ok {
+			sm.Sequencer.LastProcessedRemoteMessageId = lprmi
+			outputMessages = append(outputMessages, sm)
+		}
+	}
 	require.Equal(t, 1, len(outputMessages))
 	require.True(t, compareProtoSlices(expectedOutputMessages[3:], outputMessages))
+	require.Equal(t, lastProcessedRemoteMessageId, lprmi)
 
 	// getting again should get the same messages again as they sill should in cache
-	outputMessages = cache.GetFromFront()
+	protoMessages, lprmi = cache.GetFromFront()
+	outputMessages = make([]*livekit.Signalv2ServerMessage, 0, len(protoMessages))
+	for _, protoMessage := range protoMessages {
+		if sm, ok := protoMessage.(*livekit.Signalv2ServerMessage); ok {
+			sm.Sequencer.LastProcessedRemoteMessageId = lprmi
+			outputMessages = append(outputMessages, sm)
+		}
+	}
 	require.True(t, compareProtoSlices(expectedOutputMessages[3:], outputMessages))
+	require.Equal(t, lastProcessedRemoteMessageId, lprmi)
 
 	// clearing all and getting should return nil
-	require.Nil(t, cache.ClearAndGetFrom(firstMessageId+uint32(len(inputMessages))))
+	protoMessages, lprmi = cache.ClearAndGetFrom(firstMessageId + uint32(len(inputMessages)))
+	require.Nil(t, protoMessages)
 
 	// getting again should return nil as the cache is fully cleared above
-	require.Nil(t, cache.GetFromFront())
+	protoMessages, lprmi = cache.GetFromFront()
+	require.Nil(t, protoMessages)
 
 	lastProcessedRemoteMessageId = 4567
 	cache.SetLastProcessedRemoteMessageId(lastProcessedRemoteMessageId)
@@ -148,11 +194,26 @@ func TestSignalv2Cache(t *testing.T) {
 		},
 	}
 
-	// AddBatch() - add all messages at once
-	cache.AddBatch(inputMessages)
+	// add more messages which should increment the message id and add them in scrambled message id order
+	for _, inputMessage := range inputMessages {
+		messageId := cache.NextMessageId()
+		inputMessage.Sequencer = &livekit.Sequencer{
+			MessageId: messageId,
+		}
+	}
+	for _, idx := range []int{1, 3, 2, 0} {
+		cache.Add(inputMessages[idx], firstMessageId+4+uint32(idx))
+	}
 
 	// get all messages in cache
-	outputMessages = cache.GetFromFront()
+	protoMessages, lprmi = cache.GetFromFront()
+	outputMessages = make([]*livekit.Signalv2ServerMessage, 0, len(protoMessages))
+	for _, protoMessage := range protoMessages {
+		if sm, ok := protoMessage.(*livekit.Signalv2ServerMessage); ok {
+			sm.Sequencer.LastProcessedRemoteMessageId = lprmi
+			outputMessages = append(outputMessages, sm)
+		}
+	}
 	require.True(t, compareProtoSlices(expectedOutputMessages, outputMessages))
 }
 
