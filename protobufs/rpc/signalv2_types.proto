@@ -25,11 +25,11 @@ message RelaySignalv2ConnectRequest {
   // A user's ClaimGrants serialized in JSON
   string grants_json = 1;
   livekit.CreateRoomRequest create_room = 2;
-  livekit.ConnectRequest connect_request = 3;
+  livekit.Signalv2WireMessage wire_message = 3; // livekit.ConnectRequest is the first message in the envelope
 }
 
 message RelaySignalv2ConnectResponse {
-  livekit.ConnectResponse connect_response = 1;
+  livekit.Signalv2WireMessage wire_message = 1; // livekit.ConnectResponse is the first message in the envelope
 }
 
 message RelaySignalv2ParticipantRequest {

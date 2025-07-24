@@ -233,6 +233,7 @@ type Signalv2ClientMessage struct {
 	//	*Signalv2ClientMessage_ConnectRequest
 	//	*Signalv2ClientMessage_PublisherSdp
 	//	*Signalv2ClientMessage_SubscriberSdp
+	//	*Signalv2ClientMessage_Trickle
 	Message       isSignalv2ClientMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -309,6 +310,15 @@ func (x *Signalv2ClientMessage) GetSubscriberSdp() *SessionDescription {
 	return nil
 }
 
+func (x *Signalv2ClientMessage) GetTrickle() *TrickleRequest {
+	if x != nil {
+		if x, ok := x.Message.(*Signalv2ClientMessage_Trickle); ok {
+			return x.Trickle
+		}
+	}
+	return nil
+}
+
 type isSignalv2ClientMessage_Message interface {
 	isSignalv2ClientMessage_Message()
 }
@@ -325,11 +335,17 @@ type Signalv2ClientMessage_SubscriberSdp struct {
 	SubscriberSdp *SessionDescription `protobuf:"bytes,4,opt,name=subscriber_sdp,json=subscriberSdp,proto3,oneof"` // SDP answer for subscriber peer connection
 }
 
+type Signalv2ClientMessage_Trickle struct {
+	Trickle *TrickleRequest `protobuf:"bytes,5,opt,name=trickle,proto3,oneof"`
+}
+
 func (*Signalv2ClientMessage_ConnectRequest) isSignalv2ClientMessage_Message() {}
 
 func (*Signalv2ClientMessage_PublisherSdp) isSignalv2ClientMessage_Message() {}
 
 func (*Signalv2ClientMessage_SubscriberSdp) isSignalv2ClientMessage_Message() {}
+
+func (*Signalv2ClientMessage_Trickle) isSignalv2ClientMessage_Message() {}
 
 type Signalv2ServerMessage struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
@@ -792,12 +808,13 @@ const file_livekit_rtc_v2_proto_rawDesc = "" +
 	"\tSequencer\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\rR\tmessageId\x12F\n" +
-	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\xa2\x02\n" +
+	" last_processed_remote_message_id\x18\x02 \x01(\rR\x1clastProcessedRemoteMessageId\"\xd7\x02\n" +
 	"\x15Signalv2ClientMessage\x120\n" +
 	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12B\n" +
 	"\x0fconnect_request\x18\x02 \x01(\v2\x17.livekit.ConnectRequestH\x00R\x0econnectRequest\x12B\n" +
 	"\rpublisher_sdp\x18\x03 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\fpublisherSdp\x12D\n" +
-	"\x0esubscriber_sdp\x18\x04 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\rsubscriberSdpB\t\n" +
+	"\x0esubscriber_sdp\x18\x04 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\rsubscriberSdp\x123\n" +
+	"\atrickle\x18\x05 \x01(\v2\x17.livekit.TrickleRequestH\x00R\atrickleB\t\n" +
 	"\amessage\"\xaa\x03\n" +
 	"\x15Signalv2ServerMessage\x120\n" +
 	"\tsequencer\x18\x01 \x01(\v2\x12.livekit.SequencerR\tsequencer\x12E\n" +
@@ -869,15 +886,16 @@ var file_livekit_rtc_v2_proto_goTypes = []any{
 	nil,                           // 9: livekit.ConnectRequest.ParticipantAttributesEntry
 	(*Fragment)(nil),              // 10: livekit.Fragment
 	(*SessionDescription)(nil),    // 11: livekit.SessionDescription
-	(*RoomUpdate)(nil),            // 12: livekit.RoomUpdate
-	(*ParticipantUpdate)(nil),     // 13: livekit.ParticipantUpdate
-	(*ClientInfo)(nil),            // 14: livekit.ClientInfo
-	(*Room)(nil),                  // 15: livekit.Room
-	(*ParticipantInfo)(nil),       // 16: livekit.ParticipantInfo
-	(*ICEServer)(nil),             // 17: livekit.ICEServer
-	(*ClientConfiguration)(nil),   // 18: livekit.ClientConfiguration
-	(*ServerInfo)(nil),            // 19: livekit.ServerInfo
-	(*Codec)(nil),                 // 20: livekit.Codec
+	(*TrickleRequest)(nil),        // 12: livekit.TrickleRequest
+	(*RoomUpdate)(nil),            // 13: livekit.RoomUpdate
+	(*ParticipantUpdate)(nil),     // 14: livekit.ParticipantUpdate
+	(*ClientInfo)(nil),            // 15: livekit.ClientInfo
+	(*Room)(nil),                  // 16: livekit.Room
+	(*ParticipantInfo)(nil),       // 17: livekit.ParticipantInfo
+	(*ICEServer)(nil),             // 18: livekit.ICEServer
+	(*ClientConfiguration)(nil),   // 19: livekit.ClientConfiguration
+	(*ServerInfo)(nil),            // 20: livekit.ServerInfo
+	(*Codec)(nil),                 // 21: livekit.Codec
 }
 var file_livekit_rtc_v2_proto_depIdxs = []int32{
 	1,  // 0: livekit.Signalv2WireMessage.envelope:type_name -> livekit.Envelope
@@ -888,28 +906,29 @@ var file_livekit_rtc_v2_proto_depIdxs = []int32{
 	6,  // 5: livekit.Signalv2ClientMessage.connect_request:type_name -> livekit.ConnectRequest
 	11, // 6: livekit.Signalv2ClientMessage.publisher_sdp:type_name -> livekit.SessionDescription
 	11, // 7: livekit.Signalv2ClientMessage.subscriber_sdp:type_name -> livekit.SessionDescription
-	2,  // 8: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
-	7,  // 9: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
-	11, // 10: livekit.Signalv2ServerMessage.publisher_sdp:type_name -> livekit.SessionDescription
-	11, // 11: livekit.Signalv2ServerMessage.subscriber_sdp:type_name -> livekit.SessionDescription
-	12, // 12: livekit.Signalv2ServerMessage.room_update:type_name -> livekit.RoomUpdate
-	13, // 13: livekit.Signalv2ServerMessage.participant_update:type_name -> livekit.ParticipantUpdate
-	14, // 14: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
-	5,  // 15: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	9,  // 16: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
-	15, // 17: livekit.ConnectResponse.room:type_name -> livekit.Room
-	16, // 18: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
-	16, // 19: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
-	17, // 20: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
-	18, // 21: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	19, // 22: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
-	20, // 23: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	11, // 24: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
-	25, // [25:25] is the sub-list for method output_type
-	25, // [25:25] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	12, // 8: livekit.Signalv2ClientMessage.trickle:type_name -> livekit.TrickleRequest
+	2,  // 9: livekit.Signalv2ServerMessage.sequencer:type_name -> livekit.Sequencer
+	7,  // 10: livekit.Signalv2ServerMessage.connect_response:type_name -> livekit.ConnectResponse
+	11, // 11: livekit.Signalv2ServerMessage.publisher_sdp:type_name -> livekit.SessionDescription
+	11, // 12: livekit.Signalv2ServerMessage.subscriber_sdp:type_name -> livekit.SessionDescription
+	13, // 13: livekit.Signalv2ServerMessage.room_update:type_name -> livekit.RoomUpdate
+	14, // 14: livekit.Signalv2ServerMessage.participant_update:type_name -> livekit.ParticipantUpdate
+	15, // 15: livekit.ConnectRequest.client_info:type_name -> livekit.ClientInfo
+	5,  // 16: livekit.ConnectRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	9,  // 17: livekit.ConnectRequest.participant_attributes:type_name -> livekit.ConnectRequest.ParticipantAttributesEntry
+	16, // 18: livekit.ConnectResponse.room:type_name -> livekit.Room
+	17, // 19: livekit.ConnectResponse.participant:type_name -> livekit.ParticipantInfo
+	17, // 20: livekit.ConnectResponse.other_participants:type_name -> livekit.ParticipantInfo
+	18, // 21: livekit.ConnectResponse.ice_servers:type_name -> livekit.ICEServer
+	19, // 22: livekit.ConnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	20, // 23: livekit.ConnectResponse.server_info:type_name -> livekit.ServerInfo
+	21, // 24: livekit.ConnectResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	11, // 25: livekit.ConnectResponse.subscriber_sdp:type_name -> livekit.SessionDescription
+	26, // [26:26] is the sub-list for method output_type
+	26, // [26:26] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_v2_proto_init() }
@@ -927,6 +946,7 @@ func file_livekit_rtc_v2_proto_init() {
 		(*Signalv2ClientMessage_ConnectRequest)(nil),
 		(*Signalv2ClientMessage_PublisherSdp)(nil),
 		(*Signalv2ClientMessage_SubscriberSdp)(nil),
+		(*Signalv2ClientMessage_Trickle)(nil),
 	}
 	file_livekit_rtc_v2_proto_msgTypes[4].OneofWrappers = []any{
 		(*Signalv2ServerMessage_ConnectResponse)(nil),

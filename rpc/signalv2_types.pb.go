@@ -39,11 +39,11 @@ const (
 type RelaySignalv2ConnectRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// A user's ClaimGrants serialized in JSON
-	GrantsJson     string                     `protobuf:"bytes,1,opt,name=grants_json,json=grantsJson,proto3" json:"grants_json,omitempty"`
-	CreateRoom     *livekit.CreateRoomRequest `protobuf:"bytes,2,opt,name=create_room,json=createRoom,proto3" json:"create_room,omitempty"`
-	ConnectRequest *livekit.ConnectRequest    `protobuf:"bytes,3,opt,name=connect_request,json=connectRequest,proto3" json:"connect_request,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	GrantsJson    string                       `protobuf:"bytes,1,opt,name=grants_json,json=grantsJson,proto3" json:"grants_json,omitempty"`
+	CreateRoom    *livekit.CreateRoomRequest   `protobuf:"bytes,2,opt,name=create_room,json=createRoom,proto3" json:"create_room,omitempty"`
+	WireMessage   *livekit.Signalv2WireMessage `protobuf:"bytes,3,opt,name=wire_message,json=wireMessage,proto3" json:"wire_message,omitempty"` // livekit.ConnectRequest is the first message in the envelope
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RelaySignalv2ConnectRequest) Reset() {
@@ -90,18 +90,18 @@ func (x *RelaySignalv2ConnectRequest) GetCreateRoom() *livekit.CreateRoomRequest
 	return nil
 }
 
-func (x *RelaySignalv2ConnectRequest) GetConnectRequest() *livekit.ConnectRequest {
+func (x *RelaySignalv2ConnectRequest) GetWireMessage() *livekit.Signalv2WireMessage {
 	if x != nil {
-		return x.ConnectRequest
+		return x.WireMessage
 	}
 	return nil
 }
 
 type RelaySignalv2ConnectResponse struct {
-	state           protoimpl.MessageState   `protogen:"open.v1"`
-	ConnectResponse *livekit.ConnectResponse `protobuf:"bytes,1,opt,name=connect_response,json=connectResponse,proto3" json:"connect_response,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	WireMessage   *livekit.Signalv2WireMessage `protobuf:"bytes,1,opt,name=wire_message,json=wireMessage,proto3" json:"wire_message,omitempty"` // livekit.ConnectResponse is the first message in the envelope
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *RelaySignalv2ConnectResponse) Reset() {
@@ -134,9 +134,9 @@ func (*RelaySignalv2ConnectResponse) Descriptor() ([]byte, []int) {
 	return file_rpc_signalv2_types_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RelaySignalv2ConnectResponse) GetConnectResponse() *livekit.ConnectResponse {
+func (x *RelaySignalv2ConnectResponse) GetWireMessage() *livekit.Signalv2WireMessage {
 	if x != nil {
-		return x.ConnectResponse
+		return x.WireMessage
 	}
 	return nil
 }
@@ -257,15 +257,15 @@ var File_rpc_signalv2_types_proto protoreflect.FileDescriptor
 
 const file_rpc_signalv2_types_proto_rawDesc = "" +
 	"\n" +
-	"\x18rpc/signalv2_types.proto\x12\x03rpc\x1a\x12livekit_room.proto\x1a\x14livekit_rtc_v2.proto\"\xbd\x01\n" +
+	"\x18rpc/signalv2_types.proto\x12\x03rpc\x1a\x12livekit_room.proto\x1a\x14livekit_rtc_v2.proto\"\xbc\x01\n" +
 	"\x1bRelaySignalv2ConnectRequest\x12\x1f\n" +
 	"\vgrants_json\x18\x01 \x01(\tR\n" +
 	"grantsJson\x12;\n" +
 	"\vcreate_room\x18\x02 \x01(\v2\x1a.livekit.CreateRoomRequestR\n" +
-	"createRoom\x12@\n" +
-	"\x0fconnect_request\x18\x03 \x01(\v2\x17.livekit.ConnectRequestR\x0econnectRequest\"c\n" +
-	"\x1cRelaySignalv2ConnectResponse\x12C\n" +
-	"\x10connect_response\x18\x01 \x01(\v2\x18.livekit.ConnectResponseR\x0fconnectResponse\"\xd0\x01\n" +
+	"createRoom\x12?\n" +
+	"\fwire_message\x18\x03 \x01(\v2\x1c.livekit.Signalv2WireMessageR\vwireMessage\"_\n" +
+	"\x1cRelaySignalv2ConnectResponse\x12?\n" +
+	"\fwire_message\x18\x01 \x01(\v2\x1c.livekit.Signalv2WireMessageR\vwireMessage\"\xd0\x01\n" +
 	"\x1fRelaySignalv2ParticipantRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12%\n" +
@@ -293,16 +293,14 @@ var file_rpc_signalv2_types_proto_goTypes = []any{
 	(*RelaySignalv2ParticipantRequest)(nil),  // 2: rpc.RelaySignalv2ParticipantRequest
 	(*RelaySignalv2ParticipantResponse)(nil), // 3: rpc.RelaySignalv2ParticipantResponse
 	(*livekit.CreateRoomRequest)(nil),        // 4: livekit.CreateRoomRequest
-	(*livekit.ConnectRequest)(nil),           // 5: livekit.ConnectRequest
-	(*livekit.ConnectResponse)(nil),          // 6: livekit.ConnectResponse
-	(*livekit.Signalv2WireMessage)(nil),      // 7: livekit.Signalv2WireMessage
+	(*livekit.Signalv2WireMessage)(nil),      // 5: livekit.Signalv2WireMessage
 }
 var file_rpc_signalv2_types_proto_depIdxs = []int32{
 	4, // 0: rpc.RelaySignalv2ConnectRequest.create_room:type_name -> livekit.CreateRoomRequest
-	5, // 1: rpc.RelaySignalv2ConnectRequest.connect_request:type_name -> livekit.ConnectRequest
-	6, // 2: rpc.RelaySignalv2ConnectResponse.connect_response:type_name -> livekit.ConnectResponse
-	7, // 3: rpc.RelaySignalv2ParticipantRequest.wire_message:type_name -> livekit.Signalv2WireMessage
-	7, // 4: rpc.RelaySignalv2ParticipantResponse.wire_message:type_name -> livekit.Signalv2WireMessage
+	5, // 1: rpc.RelaySignalv2ConnectRequest.wire_message:type_name -> livekit.Signalv2WireMessage
+	5, // 2: rpc.RelaySignalv2ConnectResponse.wire_message:type_name -> livekit.Signalv2WireMessage
+	5, // 3: rpc.RelaySignalv2ParticipantRequest.wire_message:type_name -> livekit.Signalv2WireMessage
+	5, // 4: rpc.RelaySignalv2ParticipantResponse.wire_message:type_name -> livekit.Signalv2WireMessage
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
