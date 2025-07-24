@@ -52,6 +52,7 @@ message Signalv2ClientMessage {
     ConnectRequest connect_request = 2;
     SessionDescription publisher_sdp = 3; // SDP offer for publisher peer connection
     SessionDescription subscriber_sdp = 4; // SDP answer for subscriber peer connection
+    TrickleRequest trickle = 5;
   }
 }
 
