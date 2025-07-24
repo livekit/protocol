@@ -55,6 +55,7 @@ func Proto() error {
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",
+		"livekit_phone_number.proto",
 		"livekit_rtc.proto",
 		"livekit_rtc_v2.proto",
 		"livekit_webhook.proto",
