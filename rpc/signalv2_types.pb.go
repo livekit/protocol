@@ -253,6 +253,66 @@ func (x *RelaySignalv2ParticipantResponse) GetWireMessage() *livekit.Signalv2Wir
 	return nil
 }
 
+type RelaySignalv2ParticipantDeleteSessionRequest struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Room                string                 `protobuf:"bytes,1,opt,name=room,proto3" json:"room,omitempty"`
+	ParticipantIdentity string                 `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	ParticipantId       string                 `protobuf:"bytes,3,opt,name=participant_id,json=participantId,proto3" json:"participant_id,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *RelaySignalv2ParticipantDeleteSessionRequest) Reset() {
+	*x = RelaySignalv2ParticipantDeleteSessionRequest{}
+	mi := &file_rpc_signalv2_types_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RelaySignalv2ParticipantDeleteSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RelaySignalv2ParticipantDeleteSessionRequest) ProtoMessage() {}
+
+func (x *RelaySignalv2ParticipantDeleteSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_signalv2_types_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RelaySignalv2ParticipantDeleteSessionRequest.ProtoReflect.Descriptor instead.
+func (*RelaySignalv2ParticipantDeleteSessionRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_signalv2_types_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *RelaySignalv2ParticipantDeleteSessionRequest) GetRoom() string {
+	if x != nil {
+		return x.Room
+	}
+	return ""
+}
+
+func (x *RelaySignalv2ParticipantDeleteSessionRequest) GetParticipantIdentity() string {
+	if x != nil {
+		return x.ParticipantIdentity
+	}
+	return ""
+}
+
+func (x *RelaySignalv2ParticipantDeleteSessionRequest) GetParticipantId() string {
+	if x != nil {
+		return x.ParticipantId
+	}
+	return ""
+}
+
 var File_rpc_signalv2_types_proto protoreflect.FileDescriptor
 
 const file_rpc_signalv2_types_proto_rawDesc = "" +
@@ -272,7 +332,11 @@ const file_rpc_signalv2_types_proto_rawDesc = "" +
 	"\x0eparticipant_id\x18\x03 \x01(\tR\rparticipantId\x12?\n" +
 	"\fwire_message\x18\x04 \x01(\v2\x1c.livekit.Signalv2WireMessageR\vwireMessage\"c\n" +
 	" RelaySignalv2ParticipantResponse\x12?\n" +
-	"\fwire_message\x18\x01 \x01(\v2\x1c.livekit.Signalv2WireMessageR\vwireMessageB!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
+	"\fwire_message\x18\x01 \x01(\v2\x1c.livekit.Signalv2WireMessageR\vwireMessage\"\x9c\x01\n" +
+	",RelaySignalv2ParticipantDeleteSessionRequest\x12\x12\n" +
+	"\x04room\x18\x01 \x01(\tR\x04room\x121\n" +
+	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12%\n" +
+	"\x0eparticipant_id\x18\x03 \x01(\tR\rparticipantIdB!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var (
 	file_rpc_signalv2_types_proto_rawDescOnce sync.Once
@@ -286,21 +350,22 @@ func file_rpc_signalv2_types_proto_rawDescGZIP() []byte {
 	return file_rpc_signalv2_types_proto_rawDescData
 }
 
-var file_rpc_signalv2_types_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_rpc_signalv2_types_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_rpc_signalv2_types_proto_goTypes = []any{
-	(*RelaySignalv2ConnectRequest)(nil),      // 0: rpc.RelaySignalv2ConnectRequest
-	(*RelaySignalv2ConnectResponse)(nil),     // 1: rpc.RelaySignalv2ConnectResponse
-	(*RelaySignalv2ParticipantRequest)(nil),  // 2: rpc.RelaySignalv2ParticipantRequest
-	(*RelaySignalv2ParticipantResponse)(nil), // 3: rpc.RelaySignalv2ParticipantResponse
-	(*livekit.CreateRoomRequest)(nil),        // 4: livekit.CreateRoomRequest
-	(*livekit.Signalv2WireMessage)(nil),      // 5: livekit.Signalv2WireMessage
+	(*RelaySignalv2ConnectRequest)(nil),                  // 0: rpc.RelaySignalv2ConnectRequest
+	(*RelaySignalv2ConnectResponse)(nil),                 // 1: rpc.RelaySignalv2ConnectResponse
+	(*RelaySignalv2ParticipantRequest)(nil),              // 2: rpc.RelaySignalv2ParticipantRequest
+	(*RelaySignalv2ParticipantResponse)(nil),             // 3: rpc.RelaySignalv2ParticipantResponse
+	(*RelaySignalv2ParticipantDeleteSessionRequest)(nil), // 4: rpc.RelaySignalv2ParticipantDeleteSessionRequest
+	(*livekit.CreateRoomRequest)(nil),                    // 5: livekit.CreateRoomRequest
+	(*livekit.Signalv2WireMessage)(nil),                  // 6: livekit.Signalv2WireMessage
 }
 var file_rpc_signalv2_types_proto_depIdxs = []int32{
-	4, // 0: rpc.RelaySignalv2ConnectRequest.create_room:type_name -> livekit.CreateRoomRequest
-	5, // 1: rpc.RelaySignalv2ConnectRequest.wire_message:type_name -> livekit.Signalv2WireMessage
-	5, // 2: rpc.RelaySignalv2ConnectResponse.wire_message:type_name -> livekit.Signalv2WireMessage
-	5, // 3: rpc.RelaySignalv2ParticipantRequest.wire_message:type_name -> livekit.Signalv2WireMessage
-	5, // 4: rpc.RelaySignalv2ParticipantResponse.wire_message:type_name -> livekit.Signalv2WireMessage
+	5, // 0: rpc.RelaySignalv2ConnectRequest.create_room:type_name -> livekit.CreateRoomRequest
+	6, // 1: rpc.RelaySignalv2ConnectRequest.wire_message:type_name -> livekit.Signalv2WireMessage
+	6, // 2: rpc.RelaySignalv2ConnectResponse.wire_message:type_name -> livekit.Signalv2WireMessage
+	6, // 3: rpc.RelaySignalv2ParticipantRequest.wire_message:type_name -> livekit.Signalv2WireMessage
+	6, // 4: rpc.RelaySignalv2ParticipantResponse.wire_message:type_name -> livekit.Signalv2WireMessage
 	5, // [5:5] is the sub-list for method output_type
 	5, // [5:5] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
@@ -319,7 +384,7 @@ func file_rpc_signalv2_types_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_signalv2_types_proto_rawDesc), len(file_rpc_signalv2_types_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

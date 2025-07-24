@@ -42,3 +42,9 @@ message RelaySignalv2ParticipantRequest {
 message RelaySignalv2ParticipantResponse {
   livekit.Signalv2WireMessage wire_message = 1;
 }
+
+message RelaySignalv2ParticipantDeleteSessionRequest {
+  string room = 1;
+  string participant_identity = 2;
+  string participant_id = 3;
+}

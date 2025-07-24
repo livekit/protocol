@@ -24,6 +24,7 @@ import (
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	unsafe "unsafe"
 )
@@ -39,27 +40,33 @@ var File_rpc_signalv2_proto protoreflect.FileDescriptor
 
 const file_rpc_signalv2_proto_rawDesc = "" +
 	"\n" +
-	"\x12rpc/signalv2.proto\x12\x03rpc\x1a\roptions.proto\x1a\x18rpc/signalv2_types.proto2\x84\x01\n" +
+	"\x12rpc/signalv2.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\roptions.proto\x1a\x18rpc/signalv2_types.proto2\x84\x01\n" +
 	"\bSignalv2\x12x\n" +
 	"\x14RelaySignalv2Connect\x12 .rpc.RelaySignalv2ConnectRequest\x1a!.rpc.RelaySignalv2ConnectResponse\"\x1b\xb2\x89\x01\x17\x10\x01\x1a\x13\n" +
-	"\x04node\x12\anode_id\x18\x01 \x012\x9a\x01\n" +
+	"\x04node\x12\anode_id\x18\x01 \x012\xaa\x02\n" +
 	"\x13Signalv2Participant\x12\x82\x01\n" +
 	"\x18RelaySignalv2Participant\x12$.rpc.RelaySignalv2ParticipantRequest\x1a%.rpc.RelaySignalv2ParticipantResponse\"\x19\xb2\x89\x01\x15\x10\x01\x1a\x11\n" +
+	"\x06common\x12\x05topic\x18\x01\x12\x8d\x01\n" +
+	"%RelaySignalv2ParticipantDeleteSession\x121.rpc.RelaySignalv2ParticipantDeleteSessionRequest\x1a\x16.google.protobuf.Empty\"\x19\xb2\x89\x01\x15\x10\x01\x1a\x11\n" +
 	"\x06common\x12\x05topic\x18\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var file_rpc_signalv2_proto_goTypes = []any{
-	(*RelaySignalv2ConnectRequest)(nil),      // 0: rpc.RelaySignalv2ConnectRequest
-	(*RelaySignalv2ParticipantRequest)(nil),  // 1: rpc.RelaySignalv2ParticipantRequest
-	(*RelaySignalv2ConnectResponse)(nil),     // 2: rpc.RelaySignalv2ConnectResponse
-	(*RelaySignalv2ParticipantResponse)(nil), // 3: rpc.RelaySignalv2ParticipantResponse
+	(*RelaySignalv2ConnectRequest)(nil),                  // 0: rpc.RelaySignalv2ConnectRequest
+	(*RelaySignalv2ParticipantRequest)(nil),              // 1: rpc.RelaySignalv2ParticipantRequest
+	(*RelaySignalv2ParticipantDeleteSessionRequest)(nil), // 2: rpc.RelaySignalv2ParticipantDeleteSessionRequest
+	(*RelaySignalv2ConnectResponse)(nil),                 // 3: rpc.RelaySignalv2ConnectResponse
+	(*RelaySignalv2ParticipantResponse)(nil),             // 4: rpc.RelaySignalv2ParticipantResponse
+	(*emptypb.Empty)(nil),                                // 5: google.protobuf.Empty
 }
 var file_rpc_signalv2_proto_depIdxs = []int32{
 	0, // 0: rpc.Signalv2.RelaySignalv2Connect:input_type -> rpc.RelaySignalv2ConnectRequest
 	1, // 1: rpc.Signalv2Participant.RelaySignalv2Participant:input_type -> rpc.RelaySignalv2ParticipantRequest
-	2, // 2: rpc.Signalv2.RelaySignalv2Connect:output_type -> rpc.RelaySignalv2ConnectResponse
-	3, // 3: rpc.Signalv2Participant.RelaySignalv2Participant:output_type -> rpc.RelaySignalv2ParticipantResponse
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	2, // 2: rpc.Signalv2Participant.RelaySignalv2ParticipantDeleteSession:input_type -> rpc.RelaySignalv2ParticipantDeleteSessionRequest
+	3, // 3: rpc.Signalv2.RelaySignalv2Connect:output_type -> rpc.RelaySignalv2ConnectResponse
+	4, // 4: rpc.Signalv2Participant.RelaySignalv2Participant:output_type -> rpc.RelaySignalv2ParticipantResponse
+	5, // 5: rpc.Signalv2Participant.RelaySignalv2ParticipantDeleteSession:output_type -> google.protobuf.Empty
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

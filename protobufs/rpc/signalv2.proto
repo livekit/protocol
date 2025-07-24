@@ -18,6 +18,7 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
+import "google/protobuf/empty.proto";
 import "options.proto";
 import "rpc/signalv2_types.proto";
 
@@ -39,6 +40,17 @@ service Signalv2 {
 
 service Signalv2Participant {
   rpc RelaySignalv2Participant(RelaySignalv2ParticipantRequest) returns (RelaySignalv2ParticipantResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "common"
+        names: ["topic"]
+        typed: true
+      };
+    };
+  }
+
+  rpc RelaySignalv2ParticipantDeleteSession(RelaySignalv2ParticipantDeleteSessionRequest) returns (google.protobuf.Empty) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
