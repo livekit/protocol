@@ -72,7 +72,7 @@ func (s *SignalCache) SetLastProcessedRemoteMessageId(lastProcessedRemoteMessage
 	s.lastProcessedRemoteMessageId = lastProcessedRemoteMessageId
 }
 
-func (s *SignalCache) Add(msg proto.Message, messageId uint32) {
+func (s *SignalCache) Add(msg proto.Message, messageId uint32) uint32 {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
@@ -85,6 +85,8 @@ func (s *SignalCache) Add(msg proto.Message, messageId uint32) {
 		})
 	}
 	s.messages.Insert(rindex+1, elem)
+
+	return s.lastProcessedRemoteMessageId
 }
 
 func (s *SignalCache) Clear(till uint32) {
