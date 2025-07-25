@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package rpc;
+
+option go_package = "github.com/livekit/protocol/rpc";
+
+// Import the public phone number types for reuse
+import "livekit_phone_number.proto";
+
+// Internal request/response for listing phone number inventory
+message InternalListPhoneNumberInventoryRequest {
+  string project_id = 1;
+  string country_code = 2;
+  string area_code = 3;
+  string pattern = 4;
+  int32 limit = 5;
+  int32 offset = 6;
+}
+
+message InternalListPhoneNumberInventoryResponse {
+  repeated livekit.PhoneNumberInventoryItem items = 1;
+  int32 total_count = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+// Internal request/response for purchasing phone number
+message InternalPurchasePhoneNumberRequest {
+  string project_id = 1;
+  string phone_number = 2;
+}
+
+message InternalPurchasePhoneNumberResponse {
+  livekit.PhoneNumber phone_number = 1;
+}
+
+// Internal request/response for listing purchased phone numbers
+message InternalListPurchasedPhoneNumbersRequest {
+  string project_id = 1;
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message InternalListPurchasedPhoneNumbersResponse {
+  repeated livekit.PhoneNumber phone_numbers = 1;
+  int32 total_count = 2;
+  int32 limit = 3;
+  int32 offset = 4;
+}
+
+// Internal request/response for releasing phone number
+message InternalReleasePhoneNumberRequest {
+  string project_id = 1;
+  string phone_number = 2;
+}
+
+message InternalReleasePhoneNumberResponse {
+  // Empty response
+}
+
+// Internal phone number service
+service InternalPhoneNumberService {
+  rpc ListPhoneNumberInventory(InternalListPhoneNumberInventoryRequest) returns (InternalListPhoneNumberInventoryResponse);
+  rpc PurchasePhoneNumber(InternalPurchasePhoneNumberRequest) returns (InternalPurchasePhoneNumberResponse);
+  rpc ListPurchasedPhoneNumbers(InternalListPurchasedPhoneNumbersRequest) returns (InternalListPurchasedPhoneNumbersResponse);
+  rpc ReleasePhoneNumber(InternalReleasePhoneNumberRequest) returns (InternalReleasePhoneNumberResponse);
+} 
