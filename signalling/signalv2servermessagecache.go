@@ -35,7 +35,8 @@ func (s *Signalv2ServerMessageCache) Add(msg *livekit.Signalv2ServerMessage) *li
 	msg.Sequencer = &livekit.Sequencer{
 		MessageId: messageId,
 	}
-	s.SignalCache.Add(msg, messageId)
+	lprmi := s.SignalCache.Add(msg, messageId)
+	msg.Sequencer.LastProcessedRemoteMessageId = lprmi
 	return msg
 }
 
