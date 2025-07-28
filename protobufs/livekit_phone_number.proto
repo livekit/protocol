@@ -27,12 +27,11 @@ service PhoneNumberService {
 
 // ListPhoneNumberInventoryRequest - Request to list available phone numbers
 message ListPhoneNumberInventoryRequest {
-  string project_id = 1;          // Required: Project ID
-  string country_code = 2;        // Optional: Filter by country code (e.g., "US", "CA")
-  string area_code = 3;           // Optional: Filter by area code (e.g., "415")
-  string pattern = 4;             // Optional: Filter by pattern (e.g., "***-***-1234")
-  int32 limit = 5;                // Optional: Maximum number of results (default: 50)
-  int32 offset = 6;               // Optional: Number of results to skip (default: 0)
+  string country_code = 1;        // Optional: Filter by country code (e.g., "US", "CA")
+  string area_code = 2;           // Optional: Filter by area code (e.g., "415")
+  string pattern = 3;             // Optional: Filter by pattern (e.g., "***-***-1234")
+  int32 limit = 4;                // Optional: Maximum number of results (default: 50)
+  int32 offset = 5;               // Optional: Number of results to skip (default: 0)
 }
 
 // ListPhoneNumberInventoryResponse - Response containing available phone numbers
@@ -45,8 +44,7 @@ message ListPhoneNumberInventoryResponse {
 
 // PurchasePhoneNumberRequest - Request to purchase a phone number
 message PurchasePhoneNumberRequest {
-  string project_id = 1;          // Required: Project ID
-  string phone_number = 2;        // Required: Phone number in E.164 format (e.g., "+14155552671")
+  string phone_number = 1;        // Phone number to purchase (e.g., "+1234567890")
 }
 
 // PurchasePhoneNumberResponse - Response containing the purchased phone number
@@ -56,10 +54,8 @@ message PurchasePhoneNumberResponse {
 
 // ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
 message ListPurchasedPhoneNumbersRequest {
-  string project_id = 1;          // Required: Project ID
-  string status = 2;              // Optional: Filter by status ("active", "released", "pending")
-  int32 limit = 3;                // Optional: Maximum number of results (default: 50)
-  int32 offset = 4;               // Optional: Number of results to skip (default: 0)
+  int32 limit = 1;                // Optional: Maximum number of results (default: 50)
+  int32 offset = 2;               // Optional: Number of results to skip (default: 0)
 }
 
 // ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
@@ -70,10 +66,9 @@ message ListPurchasedPhoneNumbersResponse {
   int32 offset = 4;                        // Offset used in the request
 }
 
-// ReleasePhoneNumberRequest - Request to release a phone number
+// ReleasePhoneNumberRequest - Request to release a purchased phone number
 message ReleasePhoneNumberRequest {
-  string project_id = 1;          // Required: Project ID
-  string phone_number = 2;        // Required: Phone number in E.164 format (e.g., "+14155552671")
+  string phone_number = 1;        // Phone number to release (e.g., "+1234567890")
 }
 
 // PhoneNumberInventoryItem - Represents an available phone number for purchase
