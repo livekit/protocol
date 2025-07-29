@@ -328,3 +328,30 @@ func (p *ChatMessage) ToProto() *DataPacket {
 		},
 	}
 }
+
+// ToProto implements DataPacket in Go SDK.
+func (p *DataStream_Header) ToProto() *DataPacket {
+	return &DataPacket{
+		Value: &DataPacket_StreamHeader{
+			StreamHeader: p,
+		},
+	}
+}
+
+// ToProto implements DataPacket in Go SDK.
+func (p *DataStream_Chunk) ToProto() *DataPacket {
+	return &DataPacket{
+		Value: &DataPacket_StreamChunk{
+			StreamChunk: p,
+		},
+	}
+}
+
+// ToProto implements DataPacket in Go SDK.
+func (p *DataStream_Trailer) ToProto() *DataPacket {
+	return &DataPacket{
+		Value: &DataPacket_StreamTrailer{
+			StreamTrailer: p,
+		},
+	}
+}
