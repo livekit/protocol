@@ -319,3 +319,12 @@ func applyMapDiff(dst *map[string]string, diff map[string]string) {
 	}
 	*dst = m
 }
+
+// ToProto implements DataPacket in Go SDK.
+func (p *ChatMessage) ToProto() *DataPacket {
+	return &DataPacket{
+		Value: &DataPacket_ChatMessage{
+			ChatMessage: p,
+		},
+	}
+}
