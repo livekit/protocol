@@ -730,7 +730,7 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 		} else if err != nil {
 			return nil, err
 		}
-		if len(info.InboundNumbers) != 0 && !slices.Contains(info.InboundNumbers, req.CallingNumber) {
+		if len(info.InboundNumbers) != 0 && !slices.Contains(info.InboundNumbers, req.CalledNumber) {
 			continue
 		}
 		_, rulePin, err := GetPinAndRoom(info)
