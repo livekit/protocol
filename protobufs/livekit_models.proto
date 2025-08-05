@@ -232,7 +232,6 @@ message TrackInfo {
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
   BackupCodecPolicy backup_codec_policy = 20;
-  VideoLayer.Mode video_mode = 21;
 }
 
 enum VideoQuality {
@@ -244,13 +243,6 @@ enum VideoQuality {
 
 // provide information about available spatial layers
 message VideoLayer {
-  enum Mode {
-    UNUSED = 0;
-    STANDARD = 1;
-    SIMULCAST = 2;
-    SVC = 3;
-  }
-
   // for tracks with a single layer, this should be HIGH
   VideoQuality quality = 1;
   uint32 width = 2;
@@ -727,13 +719,3 @@ message WebhookConfig {
   string url = 1;
   string signing_key = 2;
 }
-
-message Fragment {
-  uint32 packet_id = 1;  // all fragments of a packet will have the same id
-  uint32 fragment_number = 2; // should start at 1
-  uint32 num_fragments = 3;
-  uint32 fragment_size = 4;
-  uint32 total_size = 5;
-  bytes data = 6;
-}
-
