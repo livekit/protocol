@@ -22,6 +22,10 @@ import (
 )
 
 func ToProtoSessionDescription(sd webrtc.SessionDescription, id uint32) *livekit.SessionDescription {
+	if sd.SDP == "" {
+		return nil
+	}
+
 	return &livekit.SessionDescription{
 		Type: sd.Type.String(),
 		Sdp:  sd.SDP,

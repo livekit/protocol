@@ -471,3 +471,30 @@ message RequestResponse {
 message TrackSubscribed {
   string track_sid = 1;
 }
+
+message ConnectionSettings {
+  bool auto_subscribe = 1;
+  bool adaptive_stream = 2;
+  optional bool subscriber_allow_pause = 3;
+  bool disable_ice_lite = 4;
+}
+
+message JoinRequest {
+  ClientInfo client_info = 1;
+  ConnectionSettings connection_settings = 2;
+
+  string metadata = 3; // if not empty, will overwrite `metadata` in token
+
+  // will set keys provided via this
+  // will overwrite if the same key is in the token
+  // will not delete keys from token if there is a key collision and this sets that key to empty value
+  map<string, string> participant_attributes = 4;
+
+  repeated AddTrackRequest add_track_requests = 5;
+  SessionDescription publisher_offer = 6;
+
+  bool reconnect = 7;
+  ReconnectReason reconnect_reason = 8;
+  string participant_sid = 9;
+}
+
