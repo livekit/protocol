@@ -189,6 +189,9 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
+  // server sets this if client sent a publish peer connection offer in the
+  // initial join request, clients should use this to set local description
+  // with the offer client sent in join request and kick off ICE candidate gathering
   bool join_publish = 16;
 }
 
