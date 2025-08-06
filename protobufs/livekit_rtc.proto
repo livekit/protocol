@@ -189,6 +189,7 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
+  bool join_publish = 16;
 }
 
 message ReconnectResponse {
