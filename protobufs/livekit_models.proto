@@ -214,7 +214,7 @@ message TrackInfo {
   // original height of video (unset for audio)
   uint32 height = 6 [deprecated=true];
   // true if track is simulcasted
-  bool simulcast = 7 [deprecated = true]; // see layer_mode
+  bool simulcast = 7;
   // true if DTX (Discontinuous Transmission) is disabled for audio
   bool disable_dtx = 8 [deprecated=true];   // deprecated in favor of audio_features
   // source of media
