@@ -498,3 +498,12 @@ message JoinRequest {
   string participant_sid = 9;
 }
 
+message WrappedJoinRequest {
+  enum Compression {
+    NONE = 0;
+    GZIP = 1;
+  }
+
+  Compression compression = 1;
+  bytes join_request = 2;   // marshalled JoinRequest + potentially compressed
+}
