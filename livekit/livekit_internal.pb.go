@@ -1013,6 +1013,7 @@ type StartSession struct {
 	CreateRoom           *CreateRoomRequest  `protobuf:"bytes,20,opt,name=create_room,json=createRoom,proto3" json:"create_room,omitempty"`
 	AddTrackRequests     []*AddTrackRequest  `protobuf:"bytes,21,rep,name=add_track_requests,json=addTrackRequests,proto3" json:"add_track_requests,omitempty"`
 	PublisherOffer       *SessionDescription `protobuf:"bytes,22,opt,name=publisher_offer,json=publisherOffer,proto3" json:"publisher_offer,omitempty"`
+	SyncState            *SyncState          `protobuf:"bytes,23,opt,name=sync_state,json=syncState,proto3" json:"sync_state,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1171,6 +1172,13 @@ func (x *StartSession) GetAddTrackRequests() []*AddTrackRequest {
 func (x *StartSession) GetPublisherOffer() *SessionDescription {
 	if x != nil {
 		return x.PublisherOffer
+	}
+	return nil
+}
+
+func (x *StartSession) GetSyncState() *SyncState {
+	if x != nil {
+		return x.SyncState
 	}
 	return nil
 }
@@ -1416,7 +1424,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xaf\x06\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xe2\x06\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12#\n" +
@@ -1438,7 +1446,9 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\vcreate_room\x18\x14 \x01(\v2\x1a.livekit.CreateRoomRequestR\n" +
 	"createRoom\x12F\n" +
 	"\x12add_track_requests\x18\x15 \x03(\v2\x18.livekit.AddTrackRequestR\x10addTrackRequests\x12D\n" +
-	"\x0fpublisher_offer\x18\x16 \x01(\v2\x1b.livekit.SessionDescriptionR\x0epublisherOfferB\x19\n" +
+	"\x0fpublisher_offer\x18\x16 \x01(\v2\x1b.livekit.SessionDescriptionR\x0epublisherOffer\x121\n" +
+	"\n" +
+	"sync_state\x18\x17 \x01(\v2\x12.livekit.SyncStateR\tsyncStateB\x19\n" +
 	"\x17_subscriber_allow_pause\"\xe7\x02\n" +
 	"\fRoomInternal\x12;\n" +
 	"\ftrack_egress\x18\x01 \x01(\v2\x18.livekit.AutoTrackEgressR\vtrackEgress\x12M\n" +
@@ -1498,10 +1508,11 @@ var file_livekit_internal_proto_goTypes = []any{
 	(*CreateRoomRequest)(nil),     // 11: livekit.CreateRoomRequest
 	(*AddTrackRequest)(nil),       // 12: livekit.AddTrackRequest
 	(*SessionDescription)(nil),    // 13: livekit.SessionDescription
-	(*AutoTrackEgress)(nil),       // 14: livekit.AutoTrackEgress
-	(*AutoParticipantEgress)(nil), // 15: livekit.AutoParticipantEgress
-	(*PlayoutDelay)(nil),          // 16: livekit.PlayoutDelay
-	(*RoomAgentDispatch)(nil),     // 17: livekit.RoomAgentDispatch
+	(*SyncState)(nil),             // 14: livekit.SyncState
+	(*AutoTrackEgress)(nil),       // 15: livekit.AutoTrackEgress
+	(*AutoParticipantEgress)(nil), // 16: livekit.AutoParticipantEgress
+	(*PlayoutDelay)(nil),          // 17: livekit.PlayoutDelay
+	(*RoomAgentDispatch)(nil),     // 18: livekit.RoomAgentDispatch
 }
 var file_livekit_internal_proto_depIdxs = []int32{
 	4,  // 0: livekit.Node.stats:type_name -> livekit.NodeStats
@@ -1513,17 +1524,18 @@ var file_livekit_internal_proto_depIdxs = []int32{
 	11, // 6: livekit.StartSession.create_room:type_name -> livekit.CreateRoomRequest
 	12, // 7: livekit.StartSession.add_track_requests:type_name -> livekit.AddTrackRequest
 	13, // 8: livekit.StartSession.publisher_offer:type_name -> livekit.SessionDescription
-	14, // 9: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
-	15, // 10: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
-	16, // 11: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
-	17, // 12: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
-	2,  // 13: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
-	2,  // 14: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
-	15, // [15:15] is the sub-list for method output_type
-	15, // [15:15] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	14, // 9: livekit.StartSession.sync_state:type_name -> livekit.SyncState
+	15, // 10: livekit.RoomInternal.track_egress:type_name -> livekit.AutoTrackEgress
+	16, // 11: livekit.RoomInternal.participant_egress:type_name -> livekit.AutoParticipantEgress
+	17, // 12: livekit.RoomInternal.playout_delay:type_name -> livekit.PlayoutDelay
+	18, // 13: livekit.RoomInternal.agent_dispatches:type_name -> livekit.RoomAgentDispatch
+	2,  // 14: livekit.ICEConfig.preference_subscriber:type_name -> livekit.ICECandidateType
+	2,  // 15: livekit.ICEConfig.preference_publisher:type_name -> livekit.ICECandidateType
+	16, // [16:16] is the sub-list for method output_type
+	16, // [16:16] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_livekit_internal_proto_init() }

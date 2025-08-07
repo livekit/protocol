@@ -3989,6 +3989,7 @@ type JoinRequest struct {
 	Reconnect             bool                `protobuf:"varint,7,opt,name=reconnect,proto3" json:"reconnect,omitempty"`
 	ReconnectReason       ReconnectReason     `protobuf:"varint,8,opt,name=reconnect_reason,json=reconnectReason,proto3,enum=livekit.ReconnectReason" json:"reconnect_reason,omitempty"`
 	ParticipantSid        string              `protobuf:"bytes,9,opt,name=participant_sid,json=participantSid,proto3" json:"participant_sid,omitempty"`
+	SyncState             *SyncState          `protobuf:"bytes,10,opt,name=sync_state,json=syncState,proto3" json:"sync_state,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
@@ -4084,6 +4085,13 @@ func (x *JoinRequest) GetParticipantSid() string {
 		return x.ParticipantSid
 	}
 	return ""
+}
+
+func (x *JoinRequest) GetSyncState() *SyncState {
+	if x != nil {
+		return x.SyncState
+	}
+	return nil
 }
 
 type WrappedJoinRequest struct {
@@ -4421,7 +4429,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x0fadaptive_stream\x18\x02 \x01(\bR\x0eadaptiveStream\x129\n" +
 	"\x16subscriber_allow_pause\x18\x03 \x01(\bH\x00R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
 	"\x10disable_ice_lite\x18\x04 \x01(\bR\x0edisableIceLiteB\x19\n" +
-	"\x17_subscriber_allow_pause\"\xf9\x04\n" +
+	"\x17_subscriber_allow_pause\"\xac\x05\n" +
 	"\vJoinRequest\x124\n" +
 	"\vclient_info\x18\x01 \x01(\v2\x13.livekit.ClientInfoR\n" +
 	"clientInfo\x12L\n" +
@@ -4432,7 +4440,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x0fpublisher_offer\x18\x06 \x01(\v2\x1b.livekit.SessionDescriptionR\x0epublisherOffer\x12\x1c\n" +
 	"\treconnect\x18\a \x01(\bR\treconnect\x12C\n" +
 	"\x10reconnect_reason\x18\b \x01(\x0e2\x18.livekit.ReconnectReasonR\x0freconnectReason\x12'\n" +
-	"\x0fparticipant_sid\x18\t \x01(\tR\x0eparticipantSid\x1aH\n" +
+	"\x0fparticipant_sid\x18\t \x01(\tR\x0eparticipantSid\x121\n" +
+	"\n" +
+	"sync_state\x18\n" +
+	" \x01(\v2\x12.livekit.SyncStateR\tsyncState\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa5\x01\n" +
@@ -4644,12 +4655,13 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	9,  // 93: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
 	16, // 94: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
 	74, // 95: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
-	5,  // 96: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
-	97, // [97:97] is the sub-list for method output_type
-	97, // [97:97] is the sub-list for method input_type
-	97, // [97:97] is the sub-list for extension type_name
-	97, // [97:97] is the sub-list for extension extendee
-	0,  // [0:97] is the sub-list for field type_name
+	39, // 96: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
+	5,  // 97: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
+	98, // [98:98] is the sub-list for method output_type
+	98, // [98:98] is the sub-list for method input_type
+	98, // [98:98] is the sub-list for extension type_name
+	98, // [98:98] is the sub-list for extension extendee
+	0,  // [0:98] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }

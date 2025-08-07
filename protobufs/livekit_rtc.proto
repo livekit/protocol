@@ -496,6 +496,7 @@ message JoinRequest {
   bool reconnect = 7;
   ReconnectReason reconnect_reason = 8;
   string participant_sid = 9;
+  SyncState sync_state = 10;
 }
 
 message WrappedJoinRequest {
