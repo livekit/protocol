@@ -32,6 +32,9 @@ func TestGrants(t *testing.T) {
 		clone := grants.Clone()
 		require.NotSame(t, grants, clone)
 		require.Same(t, grants.Video, clone.Video)
+		require.Same(t, grants.Agent, clone.Agent)
+		require.Same(t, grants.Inference, clone.Inference)
+		require.Same(t, grants.SIP, clone.SIP)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
 	})
@@ -48,6 +51,16 @@ func TestGrants(t *testing.T) {
 		require.Same(t, grants.Video, clone.Video)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
+
+		// require SIP
+		require.Same(t, grants.SIP, clone.SIP)
+		require.True(t, reflect.DeepEqual(grants.SIP, clone.SIP))
+		// require Agent
+		require.Same(t, grants.Agent, clone.Agent)
+		require.True(t, reflect.DeepEqual(grants.Agent, clone.Agent))
+		// require Inference
+		require.Same(t, grants.Inference, clone.Inference)
+		require.True(t, reflect.DeepEqual(grants.Inference, clone.Inference))
 	})
 
 	t.Run("clone with video", func(t *testing.T) {
@@ -83,6 +96,66 @@ func TestGrants(t *testing.T) {
 		require.Same(t, grants.Video.CanPublishData, clone.Video.CanPublishData)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
+	})
+
+	t.Run("clone with SIP", func(t *testing.T) {
+		sip := &SIPGrant{
+			Admin: true,
+		}
+		grants := &ClaimGrants{
+			Identity: "identity",
+			Name:     "name",
+			Kind:     "kind",
+			SIP:      sip,
+			Sha256:   "sha256",
+			Metadata: "metadata",
+		}
+		clone := grants.Clone()
+		require.NotSame(t, grants, clone)
+		require.NotSame(t, grants.SIP, clone.SIP)
+		require.Equal(t, grants.SIP.Admin, clone.SIP.Admin)
+		require.True(t, reflect.DeepEqual(grants, clone))
+		require.True(t, reflect.DeepEqual(grants.SIP, clone.SIP))
+	})
+
+	t.Run("clone with Agent", func(t *testing.T) {
+		agent := &AgentGrant{
+			Admin: true,
+		}
+		grants := &ClaimGrants{
+			Identity: "identity",
+			Name:     "name",
+			Kind:     "kind",
+			Agent:    agent,
+			Sha256:   "sha256",
+			Metadata: "metadata",
+		}
+		clone := grants.Clone()
+		require.NotSame(t, grants, clone)
+		require.NotSame(t, grants.Agent, clone.Agent)
+		require.Equal(t, grants.Agent.Admin, clone.Agent.Admin)
+		require.True(t, reflect.DeepEqual(grants, clone))
+		require.True(t, reflect.DeepEqual(grants.Agent, clone.Agent))
+	})
+
+	t.Run("clone with Inference", func(t *testing.T) {
+		inference := &InferenceGrant{
+			Perform: true,
+		}
+		grants := &ClaimGrants{
+			Identity:  "identity",
+			Name:      "name",
+			Kind:      "kind",
+			Inference: inference,
+			Sha256:    "sha256",
+			Metadata:  "metadata",
+		}
+		clone := grants.Clone()
+		require.NotSame(t, grants, clone)
+		require.NotSame(t, grants.Inference, clone.Inference)
+		require.Equal(t, grants.Inference.Perform, clone.Inference.Perform)
+		require.True(t, reflect.DeepEqual(grants, clone))
+		require.True(t, reflect.DeepEqual(grants.Inference, clone.Inference))
 	})
 }
 

@@ -31,6 +31,9 @@ message Pagination {
 // ListUpdate is used for updated APIs where 'repeated string' field is modified.
 message ListUpdate {
   repeated string set = 1; // set the field to a new list
+  repeated string add = 2; // append items to a list, avoiding duplicates
+  repeated string del = 3; // delete items from a list
+  bool clear = 4; // sets the list to an empty list
 }
 
 message Room {
@@ -211,7 +214,7 @@ message TrackInfo {
   // original height of video (unset for audio)
   uint32 height = 6 [deprecated=true];
   // true if track is simulcasted
-  bool simulcast = 7 [deprecated = true]; // see layer_mode
+  bool simulcast = 7;
   // true if DTX (Discontinuous Transmission) is disabled for audio
   bool disable_dtx = 8 [deprecated=true];   // deprecated in favor of audio_features
   // source of media
@@ -229,7 +232,6 @@ message TrackInfo {
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
   BackupCodecPolicy backup_codec_policy = 20;
-  VideoLayer.Mode video_mode = 21;
 }
 
 enum VideoQuality {
@@ -241,13 +243,6 @@ enum VideoQuality {
 
 // provide information about available spatial layers
 message VideoLayer {
-  enum Mode {
-    UNUSED = 0;
-    STANDARD = 1;
-    SIMULCAST = 2;
-    SVC = 3;
-  }
-
   // for tracks with a single layer, this should be HIGH
   VideoQuality quality = 1;
   uint32 width = 2;
@@ -724,13 +719,3 @@ message WebhookConfig {
   string url = 1;
   string signing_key = 2;
 }
-
-message Fragment {
-  uint32 packet_id = 1;  // all fragments of a packet will have the same id
-  uint32 fragment_number = 2; // should start at 1
-  uint32 num_fragments = 3;
-  uint32 fragment_size = 4;
-  uint32 total_size = 5;
-  bytes data = 6;
-}
-

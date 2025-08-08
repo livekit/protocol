@@ -3,6 +3,7 @@ package livekit
 import (
 	"context"
 	"fmt"
+	"slices"
 	"testing"
 
 	"github.com/dennwc/iters"
@@ -237,4 +238,84 @@ func TestListPageIter(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, []testPageItem(nil), got)
 	})
+}
+
+func TestListUpdate(t *testing.T) {
+	var cases = []struct {
+		Name   string
+		Arr    []string
+		Update *ListUpdate
+		Exp    []string
+		Err    bool
+	}{
+		{
+			Name:   "empty update",
+			Update: &ListUpdate{},
+			Err:    true,
+		},
+		{
+			Name:   "clear and set",
+			Update: &ListUpdate{Clear: true, Set: []string{"a"}},
+			Err:    true,
+		},
+		{
+			Name:   "clear and add",
+			Update: &ListUpdate{Clear: true, Add: []string{"a"}},
+			Err:    true,
+		},
+		{
+			Name:   "set and add",
+			Update: &ListUpdate{Set: []string{"a"}, Add: []string{"b"}},
+			Err:    true,
+		},
+		{
+			Name:   "set and del",
+			Update: &ListUpdate{Set: []string{"a"}, Del: []string{"b"}},
+			Err:    true,
+		},
+		{
+			Name:   "clear",
+			Arr:    []string{"a", "b"},
+			Update: &ListUpdate{Clear: true},
+			Exp:    nil,
+		},
+		{
+			Name:   "set",
+			Arr:    []string{"a"},
+			Update: &ListUpdate{Set: []string{"b"}},
+			Exp:    []string{"b"},
+		},
+		{
+			Name:   "add",
+			Arr:    []string{"a", "b"},
+			Update: &ListUpdate{Add: []string{"b", "c"}},
+			Exp:    []string{"a", "b", "c"},
+		},
+		{
+			Name:   "del",
+			Arr:    []string{"a", "b"},
+			Update: &ListUpdate{Del: []string{"b", "c"}},
+			Exp:    []string{"a"},
+		},
+		{
+			Name:   "add and del",
+			Arr:    []string{"a", "b", "c"},
+			Update: &ListUpdate{Add: []string{"b", "d"}, Del: []string{"c", "e"}},
+			Exp:    []string{"a", "b", "d"},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.Name, func(t *testing.T) {
+			prev := slices.Clone(c.Arr)
+			out, err := c.Update.Apply(c.Arr)
+			if c.Err {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			require.Equal(t, c.Exp, out)
+			require.Equal(t, prev, c.Arr)
+		})
+	}
 }
