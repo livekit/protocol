@@ -118,8 +118,9 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
+  repeated VideoLayer layers = 4;
 
-  // NEXT-ID: 4
+  // NEXT-ID: 5
 }
 
 message AddTrackRequest {
