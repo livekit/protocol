@@ -129,7 +129,6 @@ message AddTrackRequest {
   string cid = 1;
   string name = 2;
   TrackType type = 3;
-  // to be deprecated in favor of layers
   uint32 width = 4;
   uint32 height = 5;
   // true to add track and initialize to muted
