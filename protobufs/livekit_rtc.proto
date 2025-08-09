@@ -119,8 +119,9 @@ message SimulcastCodec {
   string codec = 1;
   string cid = 2;
   repeated VideoLayer layers = 4;
+  VideoLayer.Mode video_layer_mode = 5;
 
-  // NEXT-ID: 5
+  // NEXT-ID: 6
 }
 
 message AddTrackRequest {
