@@ -119,8 +119,9 @@ message SimulcastCodec {
   string codec = 1;
   string cid = 2;
   repeated VideoLayer layers = 4;
+  VideoLayer.Mode video_layer_mode = 5;
 
-  // NEXT-ID: 5
+  // NEXT-ID: 6
 }
 
 message AddTrackRequest {
@@ -128,7 +129,6 @@ message AddTrackRequest {
   string cid = 1;
   string name = 2;
   TrackType type = 3;
-  // to be deprecated in favor of layers
   uint32 width = 4;
   uint32 height = 5;
   // true to add track and initialize to muted

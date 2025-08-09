@@ -201,6 +201,7 @@ message SimulcastCodecInfo {
   string mid = 2;
   string cid = 3;
   repeated VideoLayer layers = 4;
+  VideoLayer.Mode video_layer_mode = 5;
 }
 
 message TrackInfo {
@@ -214,9 +215,9 @@ message TrackInfo {
   // original height of video (unset for audio)
   uint32 height = 6 [deprecated=true];
   // true if track is simulcasted
-  bool simulcast = 7;
+  bool simulcast = 7 [deprecated = true]; // see `video_layer_mode` in `codecs`
   // true if DTX (Discontinuous Transmission) is disabled for audio
-  bool disable_dtx = 8 [deprecated=true];   // deprecated in favor of audio_features
+  bool disable_dtx = 8 [deprecated=true];   // deprecated in favor of `audio_features`
   // source of media
   TrackSource source = 9;
   repeated VideoLayer layers = 10 [deprecated=true]; // see `codecs` for layers of individual codec
@@ -224,7 +225,7 @@ message TrackInfo {
   string mime_type = 11;
   string mid = 12;
   repeated SimulcastCodecInfo codecs = 13;
-  bool stereo = 14 [deprecated=true];   // deprecated in favor of audio_features
+  bool stereo = 14 [deprecated=true];   // deprecated in favor of `audio_features`
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
   Encryption.Type encryption = 16;
@@ -243,6 +244,12 @@ enum VideoQuality {
 
 // provide information about available spatial layers
 message VideoLayer {
+  enum Mode {
+    MODE_UNUSED = 0;
+    ONE_SPATIAL_LAYER_PER_STREAM = 1;
+    MULTIPLE_SPATIAL_LAYERS_PER_STREAM = 2;
+  }
+
   // for tracks with a single layer, this should be HIGH
   VideoQuality quality = 1;
   uint32 width = 2;
