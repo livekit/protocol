@@ -39,6 +39,7 @@ const (
 	WHIPResourcePrefix      = guid.WHIPResourcePrefix
 	RTMPResourcePrefix      = guid.RTMPResourcePrefix
 	URLResourcePrefix       = guid.URLResourcePrefix
+	SIPHostnamePrefix       = guid.SIPHostnamePrefix
 	AgentWorkerPrefix       = guid.AgentWorkerPrefix
 	AgentJobPrefix          = guid.AgentJobPrefix
 	AgentDispatchPrefix     = guid.AgentDispatchPrefix
