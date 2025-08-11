@@ -41,6 +41,11 @@ func TestMarshalAppend(t *testing.T) {
 	require.Equal(t, id1, Unmarshal[livekit.RoomID](livekit.GuidBlock(b[9:])))
 }
 
+func TestHash(t *testing.T) {
+	id := Hash(AgentPrefix, []byte("test"))
+	require.Equal(t, "A_SFo4igEG5Dg5", id)
+}
+
 func BenchmarkNew(b *testing.B) {
 	b.Run("new", func(b *testing.B) {
 		var guid string
