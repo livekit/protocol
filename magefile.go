@@ -63,7 +63,6 @@ func Proto() error {
 	grpcProtoFiles := []string{
 		"infra/link.proto",
 		"rpc/analytics.proto",
-		"livekit_phone_number.proto",
 	}
 	psrpcProtoFiles := []string{
 		"rpc/agent.proto",
@@ -158,22 +157,6 @@ func Proto() error {
 		"--plugin=go-grpc=" + protocGrpcGoPath,
 		"-I=./protobufs",
 	}, grpcProtoFiles...)
-	cmd = exec.Command(protoc, args...)
-	connectStd(cmd)
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	fmt.Println("generating livekit grpc protobuf")
-	args = append([]string{
-		"--go_out", target,
-		"--go-grpc_out", target,
-		"--go_opt=paths=source_relative",
-		"--go-grpc_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
-		"--plugin=go-grpc=" + protocGrpcGoPath,
-		"-I=./protobufs",
-	}, "livekit_phone_number.proto")
 	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
