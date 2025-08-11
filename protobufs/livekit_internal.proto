@@ -24,6 +24,7 @@ import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_agent_dispatch.proto";
 import "livekit_room.proto";
+import "livekit_rtc.proto";
 
 enum NodeType {
   SERVER = 0;
@@ -176,7 +177,10 @@ message StartSession {
   ReconnectReason reconnect_reason = 17;
   optional bool subscriber_allow_pause = 18;
   bool disable_ice_lite = 19;
-  livekit.CreateRoomRequest create_room = 20;
+  CreateRoomRequest create_room = 20;
+  repeated livekit.AddTrackRequest add_track_requests = 21;
+  SessionDescription publisher_offer = 22;
+  SyncState sync_state = 23;
 }
 
 // room info that should not be returned to clients

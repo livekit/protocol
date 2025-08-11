@@ -7,7 +7,6 @@ export * from "./gen/livekit_metrics_pb.js";
 export * from "./gen/livekit_models_pb.js";
 export * from "./gen/livekit_room_pb.js";
 export * from "./gen/livekit_rtc_pb.js";
-export * from "./gen/livekit_rtc_v2_pb.js";
 export * from "./gen/livekit_sip_pb.js";
 export * from "./gen/livekit_webhook_pb.js";
 export * from "./gen/version.js";

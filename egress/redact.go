@@ -9,6 +9,7 @@ func RedactUpload(req UploadRequest) {
 	if s3 := req.GetS3(); s3 != nil {
 		s3.AccessKey = utils.Redact(s3.AccessKey, "{access_key}")
 		s3.Secret = utils.Redact(s3.Secret, "{secret}")
+		s3.AssumeRoleExternalId = utils.Redact(s3.AssumeRoleExternalId, "{external_id}")
 		return
 	}
 
