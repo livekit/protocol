@@ -590,7 +590,7 @@ type AgentVersion struct {
 	Current       bool                   `protobuf:"varint,2,opt,name=current,proto3" json:"current,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	DeployedAt    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=deployed_at,json=deployedAt,proto3" json:"deployed_at,omitempty"`
-	Labels        map[string]string      `protobuf:"bytes,5,rep,name=labels,proto3" json:"labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -653,9 +653,9 @@ func (x *AgentVersion) GetDeployedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *AgentVersion) GetLabels() map[string]string {
+func (x *AgentVersion) GetAttributes() map[string]string {
 	if x != nil {
-		return x.Labels
+		return x.Attributes
 	}
 	return nil
 }
@@ -1783,16 +1783,18 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
-	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xb0\x02\n" +
+	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xc0\x02\n" +
 	"\fAgentVersion\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x18\n" +
 	"\acurrent\x18\x02 \x01(\bR\acurrent\x129\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12;\n" +
 	"\vdeployed_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"deployedAt\x129\n" +
-	"\x06labels\x18\x05 \x03(\v2!.livekit.AgentVersion.LabelsEntryR\x06labels\x1a9\n" +
-	"\vLabelsEntry\x12\x10\n" +
+	"deployedAt\x12E\n" +
+	"\n" +
+	"attributes\x18\x05 \x03(\v2%.livekit.AgentVersion.AttributesEntryR\n" +
+	"attributes\x1a=\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
 	"\x18ListAgentVersionsRequest\x12\x19\n" +
@@ -1923,7 +1925,7 @@ var file_livekit_cloud_agent_proto_goTypes = []any{
 	(*SettingsParam)(nil),              // 24: livekit.SettingsParam
 	(*ClientSettingsResponse)(nil),     // 25: livekit.ClientSettingsResponse
 	(*ClientSettingsRequest)(nil),      // 26: livekit.ClientSettingsRequest
-	nil,                                // 27: livekit.AgentVersion.LabelsEntry
+	nil,                                // 27: livekit.AgentVersion.AttributesEntry
 	(*timestamppb.Timestamp)(nil),      // 28: google.protobuf.Timestamp
 }
 var file_livekit_cloud_agent_proto_depIdxs = []int32{
@@ -1936,7 +1938,7 @@ var file_livekit_cloud_agent_proto_depIdxs = []int32{
 	4,  // 6: livekit.ListAgentsResponse.agents:type_name -> livekit.AgentInfo
 	28, // 7: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
 	28, // 8: livekit.AgentVersion.deployed_at:type_name -> google.protobuf.Timestamp
-	27, // 9: livekit.AgentVersion.labels:type_name -> livekit.AgentVersion.LabelsEntry
+	27, // 9: livekit.AgentVersion.attributes:type_name -> livekit.AgentVersion.AttributesEntry
 	7,  // 10: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
 	0,  // 11: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
 	0,  // 12: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
