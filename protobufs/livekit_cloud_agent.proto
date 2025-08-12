@@ -82,6 +82,7 @@ message AgentVersion {
     string version = 1;
     bool current = 2;
     google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp deployed_at = 4;
 }
 
 message ListAgentVersionsRequest {
