@@ -67,6 +67,7 @@ message AgentInfo {
     repeated AgentDeployment agent_deployments = 4;
     repeated AgentSecret secrets = 5;
     google.protobuf.Timestamp deployed_at = 6;
+
 }
 
 message ListAgentsRequest {
@@ -83,6 +84,7 @@ message AgentVersion {
     bool current = 2;
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp deployed_at = 4;
+    map<string, string> labels = 5;
 }
 
 message ListAgentVersionsRequest {
