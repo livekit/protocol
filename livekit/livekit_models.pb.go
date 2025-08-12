@@ -1974,7 +1974,7 @@ type SimulcastCodecInfo struct {
 	VideoLayerMode VideoLayer_Mode        `protobuf:"varint,5,opt,name=video_layer_mode,json=videoLayerMode,proto3,enum=livekit.VideoLayer_Mode" json:"video_layer_mode,omitempty"`
 	// cid (client side id for track) could be different between
 	// signalling (AddTrackRequest) and SDP offer. This field
-	// will be populated only if it is diffeerent to avoid
+	// will be populated only if it is different to avoid
 	// duplication and keep the representation concise.
 	SdpCid        string `protobuf:"bytes,6,opt,name=sdp_cid,json=sdpCid,proto3" json:"sdp_cid,omitempty"`
 	unknownFields protoimpl.UnknownFields
