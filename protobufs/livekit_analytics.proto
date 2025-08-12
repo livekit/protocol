@@ -88,6 +88,7 @@ enum AnalyticsEventType {
   ROOM_ENDED = 1;
   PARTICIPANT_JOINED = 2;
   PARTICIPANT_LEFT = 3;
+  PARTICIPANT_CONNECTION_ABORTED = 45;
   TRACK_PUBLISHED = 4;
   TRACK_PUBLISH_REQUESTED = 20;
   TRACK_UNPUBLISHED = 5;
@@ -128,7 +129,7 @@ enum AnalyticsEventType {
   API_CALL = 41;
   WEBHOOK = 42;
 
-  // NEXT_ID: 45
+  // NEXT_ID: 46
 }
 
 message AnalyticsClientMeta {
