@@ -204,7 +204,7 @@ message SimulcastCodecInfo {
   VideoLayer.Mode video_layer_mode = 5;
   // cid (client side id for track) could be different between
   // signalling (AddTrackRequest) and SDP offer. This field
-  // will be populated only if it is diffeerent to avoid
+  // will be populated only if it is different to avoid
   // duplication and keep the representation concise.
   string sdp_cid = 6;
 }
