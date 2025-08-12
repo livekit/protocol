@@ -67,7 +67,6 @@ message AgentInfo {
     repeated AgentDeployment agent_deployments = 4;
     repeated AgentSecret secrets = 5;
     google.protobuf.Timestamp deployed_at = 6;
-
 }
 
 message ListAgentsRequest {
