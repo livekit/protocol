@@ -1972,8 +1972,13 @@ type SimulcastCodecInfo struct {
 	Cid            string                 `protobuf:"bytes,3,opt,name=cid,proto3" json:"cid,omitempty"`
 	Layers         []*VideoLayer          `protobuf:"bytes,4,rep,name=layers,proto3" json:"layers,omitempty"`
 	VideoLayerMode VideoLayer_Mode        `protobuf:"varint,5,opt,name=video_layer_mode,json=videoLayerMode,proto3,enum=livekit.VideoLayer_Mode" json:"video_layer_mode,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// cid (client side id for track) could be different between
+	// signalling (AddTrackRequest) and SDP offer. This field
+	// will be populated only if it is different to avoid
+	// duplication and keep the representation concise.
+	SdpCid        string `protobuf:"bytes,6,opt,name=sdp_cid,json=sdpCid,proto3" json:"sdp_cid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulcastCodecInfo) Reset() {
@@ -2039,6 +2044,13 @@ func (x *SimulcastCodecInfo) GetVideoLayerMode() VideoLayer_Mode {
 		return x.VideoLayerMode
 	}
 	return VideoLayer_MODE_UNUSED
+}
+
+func (x *SimulcastCodecInfo) GetSdpCid() string {
+	if x != nil {
+		return x.SdpCid
+	}
+	return ""
 }
 
 type TrackInfo struct {
@@ -5423,13 +5435,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x04NONE\x10\x00\x12\a\n" +
 	"\x03GCM\x10\x01\x12\n" +
 	"\n" +
-	"\x06CUSTOM\x10\x02\"\xc6\x01\n" +
+	"\x06CUSTOM\x10\x02\"\xdf\x01\n" +
 	"\x12SimulcastCodecInfo\x12\x1b\n" +
 	"\tmime_type\x18\x01 \x01(\tR\bmimeType\x12\x10\n" +
 	"\x03mid\x18\x02 \x01(\tR\x03mid\x12\x10\n" +
 	"\x03cid\x18\x03 \x01(\tR\x03cid\x12+\n" +
 	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
-	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\xfe\x05\n" +
+	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\x12\x17\n" +
+	"\asdp_cid\x18\x06 \x01(\tR\x06sdpCid\"\xfe\x05\n" +
 	"\tTrackInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12&\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x12.livekit.TrackTypeR\x04type\x12\x12\n" +
