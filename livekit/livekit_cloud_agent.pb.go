@@ -589,6 +589,8 @@ type AgentVersion struct {
 	Version       string                 `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
 	Current       bool                   `protobuf:"varint,2,opt,name=current,proto3" json:"current,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	DeployedAt    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=deployed_at,json=deployedAt,proto3" json:"deployed_at,omitempty"`
+	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -640,6 +642,20 @@ func (x *AgentVersion) GetCurrent() bool {
 func (x *AgentVersion) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *AgentVersion) GetDeployedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DeployedAt
+	}
+	return nil
+}
+
+func (x *AgentVersion) GetAttributes() map[string]string {
+	if x != nil {
+		return x.Attributes
 	}
 	return nil
 }
@@ -1767,12 +1783,20 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
-	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"}\n" +
+	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xc0\x02\n" +
 	"\fAgentVersion\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x18\n" +
 	"\acurrent\x18\x02 \x01(\bR\acurrent\x129\n" +
 	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"T\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12;\n" +
+	"\vdeployed_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"deployedAt\x12E\n" +
+	"\n" +
+	"attributes\x18\x05 \x03(\v2%.livekit.AgentVersion.AttributesEntryR\n" +
+	"attributes\x1a=\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
 	"\x18ListAgentVersionsRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
@@ -1872,7 +1896,7 @@ func file_livekit_cloud_agent_proto_rawDescGZIP() []byte {
 	return file_livekit_cloud_agent_proto_rawDescData
 }
 
-var file_livekit_cloud_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_livekit_cloud_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_livekit_cloud_agent_proto_goTypes = []any{
 	(*AgentSecret)(nil),                // 0: livekit.AgentSecret
 	(*CreateAgentRequest)(nil),         // 1: livekit.CreateAgentRequest
@@ -1901,50 +1925,53 @@ var file_livekit_cloud_agent_proto_goTypes = []any{
 	(*SettingsParam)(nil),              // 24: livekit.SettingsParam
 	(*ClientSettingsResponse)(nil),     // 25: livekit.ClientSettingsResponse
 	(*ClientSettingsRequest)(nil),      // 26: livekit.ClientSettingsRequest
-	(*timestamppb.Timestamp)(nil),      // 27: google.protobuf.Timestamp
+	nil,                                // 27: livekit.AgentVersion.AttributesEntry
+	(*timestamppb.Timestamp)(nil),      // 28: google.protobuf.Timestamp
 }
 var file_livekit_cloud_agent_proto_depIdxs = []int32{
-	27, // 0: livekit.AgentSecret.created_at:type_name -> google.protobuf.Timestamp
-	27, // 1: livekit.AgentSecret.updated_at:type_name -> google.protobuf.Timestamp
+	28, // 0: livekit.AgentSecret.created_at:type_name -> google.protobuf.Timestamp
+	28, // 1: livekit.AgentSecret.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: livekit.CreateAgentRequest.secrets:type_name -> livekit.AgentSecret
 	3,  // 3: livekit.AgentInfo.agent_deployments:type_name -> livekit.AgentDeployment
 	0,  // 4: livekit.AgentInfo.secrets:type_name -> livekit.AgentSecret
-	27, // 5: livekit.AgentInfo.deployed_at:type_name -> google.protobuf.Timestamp
+	28, // 5: livekit.AgentInfo.deployed_at:type_name -> google.protobuf.Timestamp
 	4,  // 6: livekit.ListAgentsResponse.agents:type_name -> livekit.AgentInfo
-	27, // 7: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
-	7,  // 8: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
-	0,  // 9: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
-	0,  // 10: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
-	0,  // 11: livekit.UpdateAgentSecretsRequest.secrets:type_name -> livekit.AgentSecret
-	0,  // 12: livekit.ListAgentSecretsResponse.secrets:type_name -> livekit.AgentSecret
-	24, // 13: livekit.ClientSettingsResponse.params:type_name -> livekit.SettingsParam
-	1,  // 14: livekit.CloudAgent.CreateAgent:input_type -> livekit.CreateAgentRequest
-	5,  // 15: livekit.CloudAgent.ListAgents:input_type -> livekit.ListAgentsRequest
-	8,  // 16: livekit.CloudAgent.ListAgentVersions:input_type -> livekit.ListAgentVersionsRequest
-	22, // 17: livekit.CloudAgent.ListAgentSecrets:input_type -> livekit.ListAgentSecretsRequest
-	10, // 18: livekit.CloudAgent.UpdateAgent:input_type -> livekit.UpdateAgentRequest
-	12, // 19: livekit.CloudAgent.RestartAgent:input_type -> livekit.RestartAgentRequest
-	14, // 20: livekit.CloudAgent.DeployAgent:input_type -> livekit.DeployAgentRequest
-	16, // 21: livekit.CloudAgent.UpdateAgentSecrets:input_type -> livekit.UpdateAgentSecretsRequest
-	18, // 22: livekit.CloudAgent.RollbackAgent:input_type -> livekit.RollbackAgentRequest
-	20, // 23: livekit.CloudAgent.DeleteAgent:input_type -> livekit.DeleteAgentRequest
-	26, // 24: livekit.CloudAgent.GetClientSettings:input_type -> livekit.ClientSettingsRequest
-	2,  // 25: livekit.CloudAgent.CreateAgent:output_type -> livekit.CreateAgentResponse
-	6,  // 26: livekit.CloudAgent.ListAgents:output_type -> livekit.ListAgentsResponse
-	9,  // 27: livekit.CloudAgent.ListAgentVersions:output_type -> livekit.ListAgentVersionsResponse
-	23, // 28: livekit.CloudAgent.ListAgentSecrets:output_type -> livekit.ListAgentSecretsResponse
-	11, // 29: livekit.CloudAgent.UpdateAgent:output_type -> livekit.UpdateAgentResponse
-	13, // 30: livekit.CloudAgent.RestartAgent:output_type -> livekit.RestartAgentResponse
-	15, // 31: livekit.CloudAgent.DeployAgent:output_type -> livekit.DeployAgentResponse
-	17, // 32: livekit.CloudAgent.UpdateAgentSecrets:output_type -> livekit.UpdateAgentSecretsResponse
-	19, // 33: livekit.CloudAgent.RollbackAgent:output_type -> livekit.RollbackAgentResponse
-	21, // 34: livekit.CloudAgent.DeleteAgent:output_type -> livekit.DeleteAgentResponse
-	25, // 35: livekit.CloudAgent.GetClientSettings:output_type -> livekit.ClientSettingsResponse
-	25, // [25:36] is the sub-list for method output_type
-	14, // [14:25] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	28, // 7: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
+	28, // 8: livekit.AgentVersion.deployed_at:type_name -> google.protobuf.Timestamp
+	27, // 9: livekit.AgentVersion.attributes:type_name -> livekit.AgentVersion.AttributesEntry
+	7,  // 10: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
+	0,  // 11: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
+	0,  // 12: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
+	0,  // 13: livekit.UpdateAgentSecretsRequest.secrets:type_name -> livekit.AgentSecret
+	0,  // 14: livekit.ListAgentSecretsResponse.secrets:type_name -> livekit.AgentSecret
+	24, // 15: livekit.ClientSettingsResponse.params:type_name -> livekit.SettingsParam
+	1,  // 16: livekit.CloudAgent.CreateAgent:input_type -> livekit.CreateAgentRequest
+	5,  // 17: livekit.CloudAgent.ListAgents:input_type -> livekit.ListAgentsRequest
+	8,  // 18: livekit.CloudAgent.ListAgentVersions:input_type -> livekit.ListAgentVersionsRequest
+	22, // 19: livekit.CloudAgent.ListAgentSecrets:input_type -> livekit.ListAgentSecretsRequest
+	10, // 20: livekit.CloudAgent.UpdateAgent:input_type -> livekit.UpdateAgentRequest
+	12, // 21: livekit.CloudAgent.RestartAgent:input_type -> livekit.RestartAgentRequest
+	14, // 22: livekit.CloudAgent.DeployAgent:input_type -> livekit.DeployAgentRequest
+	16, // 23: livekit.CloudAgent.UpdateAgentSecrets:input_type -> livekit.UpdateAgentSecretsRequest
+	18, // 24: livekit.CloudAgent.RollbackAgent:input_type -> livekit.RollbackAgentRequest
+	20, // 25: livekit.CloudAgent.DeleteAgent:input_type -> livekit.DeleteAgentRequest
+	26, // 26: livekit.CloudAgent.GetClientSettings:input_type -> livekit.ClientSettingsRequest
+	2,  // 27: livekit.CloudAgent.CreateAgent:output_type -> livekit.CreateAgentResponse
+	6,  // 28: livekit.CloudAgent.ListAgents:output_type -> livekit.ListAgentsResponse
+	9,  // 29: livekit.CloudAgent.ListAgentVersions:output_type -> livekit.ListAgentVersionsResponse
+	23, // 30: livekit.CloudAgent.ListAgentSecrets:output_type -> livekit.ListAgentSecretsResponse
+	11, // 31: livekit.CloudAgent.UpdateAgent:output_type -> livekit.UpdateAgentResponse
+	13, // 32: livekit.CloudAgent.RestartAgent:output_type -> livekit.RestartAgentResponse
+	15, // 33: livekit.CloudAgent.DeployAgent:output_type -> livekit.DeployAgentResponse
+	17, // 34: livekit.CloudAgent.UpdateAgentSecrets:output_type -> livekit.UpdateAgentSecretsResponse
+	19, // 35: livekit.CloudAgent.RollbackAgent:output_type -> livekit.RollbackAgentResponse
+	21, // 36: livekit.CloudAgent.DeleteAgent:output_type -> livekit.DeleteAgentResponse
+	25, // 37: livekit.CloudAgent.GetClientSettings:output_type -> livekit.ClientSettingsResponse
+	27, // [27:38] is the sub-list for method output_type
+	16, // [16:27] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_livekit_cloud_agent_proto_init() }
@@ -1958,7 +1985,7 @@ func file_livekit_cloud_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_cloud_agent_proto_rawDesc), len(file_livekit_cloud_agent_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
