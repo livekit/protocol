@@ -37,7 +37,7 @@ const (
 
 type WebhookEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// one of room_started, room_finished, participant_joined, participant_left,
+	// one of room_started, room_finished, participant_joined, participant_left, participant_connection_aborted,
 	// track_published, track_unpublished, egress_started, egress_updated, egress_ended,
 	// ingress_started, ingress_ended
 	Event string `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
