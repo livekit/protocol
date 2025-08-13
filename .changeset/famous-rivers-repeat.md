@@ -1,5 +1,6 @@
 ---
-"@fake-scope/fake-pkg": patch
+"@livekit/protocol": patch
+"github.com/livekit/protocol": patch
 ---
 
 Add webhook for aborted participant connection.
