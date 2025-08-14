@@ -95,6 +95,7 @@ func (r *noopWorkerReporter) ReportLoad(v float32)                              
 func (r *noopWorkerReporter) ReportStatus(v WorkerStatus)                         {}
 func (r *noopWorkerReporter) ReportStartTime(v time.Time)                         {}
 func (r *noopWorkerReporter) ReportJobsCurrent(v uint32)                          {}
+func (r *noopWorkerReporter) ReportLive(v uint8)                                  {}
 func (r *noopWorkerReporter) ReportCPU(v int64)                                   {}
 func (r *noopWorkerReporter) ReportCPULimit(v int64)                              {}
 func (r *noopWorkerReporter) ReportMem(v int64)                                   {}
