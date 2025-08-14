@@ -1,5 +1,31 @@
 # github.com/livekit/protocol
 
+## 1.40.0
+
+### Minor Changes
+
+- Adding SIP Protocol generated call id to SipCall - [#1119](https://github.com/livekit/protocol/pull/1119) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+### Patch Changes
+
+- Store SDP cid in TrackInfo. - [#1164](https://github.com/livekit/protocol/pull/1164) ([@boks1971](https://github.com/boks1971))
+
+- Support per simulcast codec layers. - [#1157](https://github.com/livekit/protocol/pull/1157) ([@boks1971](https://github.com/boks1971))
+
+- Add webhook for aborted participant connection. - [#1166](https://github.com/livekit/protocol/pull/1166) ([@boks1971](https://github.com/boks1971))
+
+- Go SDK support for chat messages. - [#1147](https://github.com/livekit/protocol/pull/1147) ([@dennwc](https://github.com/dennwc))
+
+- Go SDK support for stream data messages. - [#1148](https://github.com/livekit/protocol/pull/1148) ([@dennwc](https://github.com/dennwc))
+
+- Updating how ListSIPInboundTrunkRequest filtering occurs by normalising phone number that are being compared - [#1126](https://github.com/livekit/protocol/pull/1126) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- add hash function to generate common guid - [#1163](https://github.com/livekit/protocol/pull/1163) ([@paulwe](https://github.com/paulwe))
+
+- Allow adding, removing items and clearing list fields. - [#1142](https://github.com/livekit/protocol/pull/1142) ([@dennwc](https://github.com/dennwc))
+
+- Allow clients to specify video layers mode. - [#1158](https://github.com/livekit/protocol/pull/1158) ([@boks1971](https://github.com/boks1971))
+
 ## 1.39.3
 
 ## 1.39.2
