@@ -1,5 +1,29 @@
 # @livekit/protocol
 
+## 1.40.0
+
+### Patch Changes
+
+- Add fields to support AssumeRole in egress S3 uploads - [#1124](https://github.com/livekit/protocol/pull/1124) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Store SDP cid in TrackInfo. - [#1164](https://github.com/livekit/protocol/pull/1164) ([@boks1971](https://github.com/boks1971))
+
+- Support per simulcast codec layers. - [#1157](https://github.com/livekit/protocol/pull/1157) ([@boks1971](https://github.com/boks1971))
+
+- Add webhook for aborted participant connection. - [#1166](https://github.com/livekit/protocol/pull/1166) ([@boks1971](https://github.com/boks1971))
+
+- add hash function to generate common guid - [#1163](https://github.com/livekit/protocol/pull/1163) ([@paulwe](https://github.com/paulwe))
+
+- Redact external_id field - [#1152](https://github.com/livekit/protocol/pull/1152) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Allow adding, removing items and clearing list fields. - [#1142](https://github.com/livekit/protocol/pull/1142) ([@dennwc](https://github.com/dennwc))
+
+- Add latest CreateRoomRequest fields to RoomConfiguration - [#1132](https://github.com/livekit/protocol/pull/1132) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- update agent reporter for cloud agents - [#1128](https://github.com/livekit/protocol/pull/1128) ([@paulwe](https://github.com/paulwe))
+
+- Allow clients to specify video layers mode. - [#1158](https://github.com/livekit/protocol/pull/1158) ([@boks1971](https://github.com/boks1971))
+
 ## 1.39.3
 
 ### Patch Changes
