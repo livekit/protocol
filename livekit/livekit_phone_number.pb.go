@@ -22,14 +22,66 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Phone number status enumeration
+type PhoneNumberStatus int32
+
+const (
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_UNSPECIFIED PhoneNumberStatus = 0 // Default value
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_ACTIVE      PhoneNumberStatus = 1 // Number is active and ready for use
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_PENDING     PhoneNumberStatus = 2 // Number is being provisioned
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_RELEASED    PhoneNumberStatus = 3 // Number has been released
+)
+
+// Enum value maps for PhoneNumberStatus.
+var (
+	PhoneNumberStatus_name = map[int32]string{
+		0: "PHONE_NUMBER_STATUS_UNSPECIFIED",
+		1: "PHONE_NUMBER_STATUS_ACTIVE",
+		2: "PHONE_NUMBER_STATUS_PENDING",
+		3: "PHONE_NUMBER_STATUS_RELEASED",
+	}
+	PhoneNumberStatus_value = map[string]int32{
+		"PHONE_NUMBER_STATUS_UNSPECIFIED": 0,
+		"PHONE_NUMBER_STATUS_ACTIVE":      1,
+		"PHONE_NUMBER_STATUS_PENDING":     2,
+		"PHONE_NUMBER_STATUS_RELEASED":    3,
+	}
+)
+
+func (x PhoneNumberStatus) Enum() *PhoneNumberStatus {
+	p := new(PhoneNumberStatus)
+	*p = x
+	return p
+}
+
+func (x PhoneNumberStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PhoneNumberStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_phone_number_proto_enumTypes[0].Descriptor()
+}
+
+func (PhoneNumberStatus) Type() protoreflect.EnumType {
+	return &file_livekit_phone_number_proto_enumTypes[0]
+}
+
+func (x PhoneNumberStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PhoneNumberStatus.Descriptor instead.
+func (PhoneNumberStatus) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{0}
+}
+
 // ListPhoneNumberInventoryRequest - Request to list available phone numbers
 type ListPhoneNumberInventoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CountryCode   string                 `protobuf:"bytes,1,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"` // Optional: Filter by country code (e.g., "US", "CA")
 	AreaCode      string                 `protobuf:"bytes,2,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`          // Optional: Filter by area code (e.g., "415")
-	Pattern       string                 `protobuf:"bytes,3,opt,name=pattern,proto3" json:"pattern,omitempty"`                            // Optional: Filter by pattern (e.g., "***-***-1234")
-	Limit         int32                  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`                               // Optional: Maximum number of results (default: 50)
-	Offset        int32                  `protobuf:"varint,5,opt,name=offset,proto3" json:"offset,omitempty"`                             // Optional: Number of results to skip (default: 0)
+	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`                               // Optional: Maximum number of results (default: 50)
+	PageToken     string                 `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`       // Optional: Token for pagination (empty for first page)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -78,13 +130,6 @@ func (x *ListPhoneNumberInventoryRequest) GetAreaCode() string {
 	return ""
 }
 
-func (x *ListPhoneNumberInventoryRequest) GetPattern() string {
-	if x != nil {
-		return x.Pattern
-	}
-	return ""
-}
-
 func (x *ListPhoneNumberInventoryRequest) GetLimit() int32 {
 	if x != nil {
 		return x.Limit
@@ -92,20 +137,18 @@ func (x *ListPhoneNumberInventoryRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *ListPhoneNumberInventoryRequest) GetOffset() int32 {
+func (x *ListPhoneNumberInventoryRequest) GetPageToken() string {
 	if x != nil {
-		return x.Offset
+		return x.PageToken
 	}
-	return 0
+	return ""
 }
 
 // ListPhoneNumberInventoryResponse - Response containing available phone numbers
 type ListPhoneNumberInventoryResponse struct {
 	state         protoimpl.MessageState      `protogen:"open.v1"`
-	Items         []*PhoneNumberInventoryItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`                              // List of available phone numbers
-	TotalCount    int32                       `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"` // Total number of available numbers
-	Limit         int32                       `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`                             // Limit used in the request
-	Offset        int32                       `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`                           // Offset used in the request
+	Items         []*PhoneNumberInventoryItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`                                        // List of available phone numbers
+	NextPageToken string                      `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // Token for next page (empty if no more pages)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -147,31 +190,17 @@ func (x *ListPhoneNumberInventoryResponse) GetItems() []*PhoneNumberInventoryIte
 	return nil
 }
 
-func (x *ListPhoneNumberInventoryResponse) GetTotalCount() int32 {
+func (x *ListPhoneNumberInventoryResponse) GetNextPageToken() string {
 	if x != nil {
-		return x.TotalCount
+		return x.NextPageToken
 	}
-	return 0
+	return ""
 }
 
-func (x *ListPhoneNumberInventoryResponse) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-func (x *ListPhoneNumberInventoryResponse) GetOffset() int32 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
-// PurchasePhoneNumberRequest - Request to purchase a phone number
+// PurchasePhoneNumberRequest - Request to purchase phone numbers
 type PurchasePhoneNumberRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumber   string                 `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // Phone number to purchase (e.g., "+1234567890")
+	PhoneNumbers  []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -206,17 +235,17 @@ func (*PurchasePhoneNumberRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_phone_number_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *PurchasePhoneNumberRequest) GetPhoneNumber() string {
+func (x *PurchasePhoneNumberRequest) GetPhoneNumbers() []string {
 	if x != nil {
-		return x.PhoneNumber
+		return x.PhoneNumbers
 	}
-	return ""
+	return nil
 }
 
-// PurchasePhoneNumberResponse - Response containing the purchased phone number
+// PurchasePhoneNumberResponse - Response containing the purchased phone numbers
 type PurchasePhoneNumberResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumber   *PurchasedPhoneNumber  `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // Details of the purchased phone number
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	PhoneNumbers  []*PurchasedPhoneNumber `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Details of the purchased phone numbers
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -251,9 +280,9 @@ func (*PurchasePhoneNumberResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_phone_number_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *PurchasePhoneNumberResponse) GetPhoneNumber() *PurchasedPhoneNumber {
+func (x *PurchasePhoneNumberResponse) GetPhoneNumbers() []*PurchasedPhoneNumber {
 	if x != nil {
-		return x.PhoneNumber
+		return x.PhoneNumbers
 	}
 	return nil
 }
@@ -261,8 +290,8 @@ func (x *PurchasePhoneNumberResponse) GetPhoneNumber() *PurchasedPhoneNumber {
 // ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
 type ListPurchasedPhoneNumbersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`   // Optional: Maximum number of results (default: 50)
-	Offset        int32                  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"` // Optional: Number of results to skip (default: 0)
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`                         // Optional: Maximum number of results (default: 50)
+	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"` // Optional: Token for pagination (empty for first page)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -304,20 +333,19 @@ func (x *ListPurchasedPhoneNumbersRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *ListPurchasedPhoneNumbersRequest) GetOffset() int32 {
+func (x *ListPurchasedPhoneNumbersRequest) GetPageToken() string {
 	if x != nil {
-		return x.Offset
+		return x.PageToken
 	}
-	return 0
+	return ""
 }
 
 // ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
 type ListPurchasedPhoneNumbersResponse struct {
 	state         protoimpl.MessageState  `protogen:"open.v1"`
-	Items         []*PurchasedPhoneNumber `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`                              // List of purchased phone numbers
-	TotalCount    int32                   `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"` // Total number of purchased numbers
-	Limit         int32                   `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`                             // Limit used in the request
-	Offset        int32                   `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`                           // Offset used in the request
+	Items         []*PurchasedPhoneNumber `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`                                        // List of purchased phone numbers
+	NextPageToken string                  `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // Token for next page (empty if no more pages)
+	TotalCount    int32                   `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`           // Total number of purchased phone numbers
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -359,23 +387,16 @@ func (x *ListPurchasedPhoneNumbersResponse) GetItems() []*PurchasedPhoneNumber {
 	return nil
 }
 
+func (x *ListPurchasedPhoneNumbersResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
 func (x *ListPurchasedPhoneNumbersResponse) GetTotalCount() int32 {
 	if x != nil {
 		return x.TotalCount
-	}
-	return 0
-}
-
-func (x *ListPurchasedPhoneNumbersResponse) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
-	}
-	return 0
-}
-
-func (x *ListPurchasedPhoneNumbersResponse) GetOffset() int32 {
-	if x != nil {
-		return x.Offset
 	}
 	return 0
 }
@@ -425,25 +446,224 @@ func (x *ReleasePhoneNumberRequest) GetPhoneNumber() string {
 	return ""
 }
 
+// GlobalPhoneNumber represents a phone number with standardized format
+type GlobalPhoneNumber struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                      // unique identifier
+	E164Format    string                 `protobuf:"bytes,2,opt,name=e164_format,json=e164Format,proto3" json:"e164_format,omitempty"`    // e.g., "+14155552671"
+	CountryCode   string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"` // e.g., "US"
+	AreaCode      string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`          // e.g., "415"
+	NumberType    string                 `protobuf:"bytes,5,opt,name=number_type,json=numberType,proto3" json:"number_type,omitempty"`    // e.g., local, toll-free, national, mobile
+	Locality      string                 `protobuf:"bytes,6,opt,name=locality,proto3" json:"locality,omitempty"`                          // City/locality (e.g., "San Francisco")
+	Region        string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`                              // State/region (e.g., "CA")
+	SpamScore     int64                  `protobuf:"varint,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`      // can be used later for fraud detection
+	CreatedAt     int64                  `protobuf:"varint,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`      // timestamp when created
+	UpdatedAt     int64                  `protobuf:"varint,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`     // timestamp when updated
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GlobalPhoneNumber) Reset() {
+	*x = GlobalPhoneNumber{}
+	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GlobalPhoneNumber) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GlobalPhoneNumber) ProtoMessage() {}
+
+func (x *GlobalPhoneNumber) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GlobalPhoneNumber.ProtoReflect.Descriptor instead.
+func (*GlobalPhoneNumber) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GlobalPhoneNumber) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetE164Format() string {
+	if x != nil {
+		return x.E164Format
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetCountryCode() string {
+	if x != nil {
+		return x.CountryCode
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetAreaCode() string {
+	if x != nil {
+		return x.AreaCode
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetNumberType() string {
+	if x != nil {
+		return x.NumberType
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetLocality() string {
+	if x != nil {
+		return x.Locality
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *GlobalPhoneNumber) GetSpamScore() int64 {
+	if x != nil {
+		return x.SpamScore
+	}
+	return 0
+}
+
+func (x *GlobalPhoneNumber) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *GlobalPhoneNumber) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+// PhoneNumberCost represents the pricing structure for a phone number
+type PhoneNumberCost struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Currency string                 `protobuf:"bytes,1,opt,name=currency,proto3" json:"currency,omitempty"` // Currency code (e.g., "USD", "EUR")
+	// Monthly rental cost
+	MonthlyRental float64 `protobuf:"fixed64,2,opt,name=monthly_rental,json=monthlyRental,proto3" json:"monthly_rental,omitempty"` // Monthly rental cost (e.g., 10.00)
+	// Voice calling costs
+	VoiceCost        float64 `protobuf:"fixed64,3,opt,name=voice_cost,json=voiceCost,proto3" json:"voice_cost,omitempty"`                      // Voice cost per unit (e.g., 2.00)
+	VoiceBillingUnit string  `protobuf:"bytes,4,opt,name=voice_billing_unit,json=voiceBillingUnit,proto3" json:"voice_billing_unit,omitempty"` // Voice billing unit (e.g., "minute", "second", "call")
+	// SMS costs
+	SmsCost        float64 `protobuf:"fixed64,5,opt,name=sms_cost,json=smsCost,proto3" json:"sms_cost,omitempty"`                      // SMS cost per unit (e.g., 0.50)
+	SmsBillingUnit string  `protobuf:"bytes,6,opt,name=sms_billing_unit,json=smsBillingUnit,proto3" json:"sms_billing_unit,omitempty"` // SMS billing unit (e.g., "message", "character")
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *PhoneNumberCost) Reset() {
+	*x = PhoneNumberCost{}
+	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PhoneNumberCost) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PhoneNumberCost) ProtoMessage() {}
+
+func (x *PhoneNumberCost) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PhoneNumberCost.ProtoReflect.Descriptor instead.
+func (*PhoneNumberCost) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *PhoneNumberCost) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+func (x *PhoneNumberCost) GetMonthlyRental() float64 {
+	if x != nil {
+		return x.MonthlyRental
+	}
+	return 0
+}
+
+func (x *PhoneNumberCost) GetVoiceCost() float64 {
+	if x != nil {
+		return x.VoiceCost
+	}
+	return 0
+}
+
+func (x *PhoneNumberCost) GetVoiceBillingUnit() string {
+	if x != nil {
+		return x.VoiceBillingUnit
+	}
+	return ""
+}
+
+func (x *PhoneNumberCost) GetSmsCost() float64 {
+	if x != nil {
+		return x.SmsCost
+	}
+	return 0
+}
+
+func (x *PhoneNumberCost) GetSmsBillingUnit() string {
+	if x != nil {
+		return x.SmsBillingUnit
+	}
+	return ""
+}
+
 // PhoneNumberInventoryItem - Represents an available phone number for purchase
 type PhoneNumberInventoryItem struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumber      string                 `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`                   // Phone number in E.164 format (e.g., "+14155552671")
-	CountryCode      string                 `protobuf:"bytes,2,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`                   // Country code (e.g., "US")
-	AreaCode         string                 `protobuf:"bytes,3,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                            // Area code (e.g., "415")
-	Locality         string                 `protobuf:"bytes,4,opt,name=locality,proto3" json:"locality,omitempty"`                                            // City/locality (e.g., "San Francisco")
-	Region           string                 `protobuf:"bytes,5,opt,name=region,proto3" json:"region,omitempty"`                                                // State/region (e.g., "CA")
-	Capabilities     string                 `protobuf:"bytes,6,opt,name=capabilities,proto3" json:"capabilities,omitempty"`                                    // Comma-separated capabilities (e.g., "voice,sms")
-	MonthlyCostCents int64                  `protobuf:"varint,7,opt,name=monthly_cost_cents,json=monthlyCostCents,proto3" json:"monthly_cost_cents,omitempty"` // Monthly cost in cents
-	Available        bool                   `protobuf:"varint,8,opt,name=available,proto3" json:"available,omitempty"`                                         // Whether the number is currently available
-	CarrierName      string                 `protobuf:"bytes,9,opt,name=carrier_name,json=carrierName,proto3" json:"carrier_name,omitempty"`                   // Name of the carrier providing this number
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PhoneNumber   *GlobalPhoneNumber     `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // Common phone number fields
+	Capabilities  []string               `protobuf:"bytes,2,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                  // Comma-separated capabilities (e.g., "voice,sms")
+	Cost          *PhoneNumberCost       `protobuf:"bytes,3,opt,name=cost,proto3" json:"cost,omitempty"`                                  // Cost structure for this phone number
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PhoneNumberInventoryItem) Reset() {
 	*x = PhoneNumberInventoryItem{}
-	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	mi := &file_livekit_phone_number_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -455,7 +675,7 @@ func (x *PhoneNumberInventoryItem) String() string {
 func (*PhoneNumberInventoryItem) ProtoMessage() {}
 
 func (x *PhoneNumberInventoryItem) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	mi := &file_livekit_phone_number_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -468,91 +688,44 @@ func (x *PhoneNumberInventoryItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PhoneNumberInventoryItem.ProtoReflect.Descriptor instead.
 func (*PhoneNumberInventoryItem) Descriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{7}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *PhoneNumberInventoryItem) GetPhoneNumber() string {
+func (x *PhoneNumberInventoryItem) GetPhoneNumber() *GlobalPhoneNumber {
 	if x != nil {
 		return x.PhoneNumber
 	}
-	return ""
+	return nil
 }
 
-func (x *PhoneNumberInventoryItem) GetCountryCode() string {
-	if x != nil {
-		return x.CountryCode
-	}
-	return ""
-}
-
-func (x *PhoneNumberInventoryItem) GetAreaCode() string {
-	if x != nil {
-		return x.AreaCode
-	}
-	return ""
-}
-
-func (x *PhoneNumberInventoryItem) GetLocality() string {
-	if x != nil {
-		return x.Locality
-	}
-	return ""
-}
-
-func (x *PhoneNumberInventoryItem) GetRegion() string {
-	if x != nil {
-		return x.Region
-	}
-	return ""
-}
-
-func (x *PhoneNumberInventoryItem) GetCapabilities() string {
+func (x *PhoneNumberInventoryItem) GetCapabilities() []string {
 	if x != nil {
 		return x.Capabilities
 	}
-	return ""
+	return nil
 }
 
-func (x *PhoneNumberInventoryItem) GetMonthlyCostCents() int64 {
+func (x *PhoneNumberInventoryItem) GetCost() *PhoneNumberCost {
 	if x != nil {
-		return x.MonthlyCostCents
+		return x.Cost
 	}
-	return 0
-}
-
-func (x *PhoneNumberInventoryItem) GetAvailable() bool {
-	if x != nil {
-		return x.Available
-	}
-	return false
-}
-
-func (x *PhoneNumberInventoryItem) GetCarrierName() string {
-	if x != nil {
-		return x.CarrierName
-	}
-	return ""
+	return nil
 }
 
 // PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
 type PurchasedPhoneNumber struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                               // Unique identifier for the phone number
-	PhoneNumber    string                 `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`          // Phone number in E.164 format (e.g., "+14155552671")
-	CountryCode    string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`          // Country code (e.g., "US")
-	AreaCode       string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                   // Area code (e.g., "415")
-	NationalNumber string                 `protobuf:"bytes,5,opt,name=national_number,json=nationalNumber,proto3" json:"national_number,omitempty"` // National number without country code (e.g., "4155552671")
-	IsMobile       bool                   `protobuf:"varint,6,opt,name=is_mobile,json=isMobile,proto3" json:"is_mobile,omitempty"`                  // Whether this is a mobile number
-	Status         string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`                                       // Current status ("active", "pending", "released")
-	AssignedAt     int64                  `protobuf:"varint,8,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`            // Timestamp when the number was assigned
-	ReleasedAt     int64                  `protobuf:"varint,9,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`            // Timestamp when the number was released (if applicable)
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PhoneNumber   *GlobalPhoneNumber     `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`    // Common phone number fields
+	Status        PhoneNumberStatus      `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"` // Current status of the phone number
+	AssignedAt    int64                  `protobuf:"varint,3,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`      // Timestamp when the number was assigned
+	ReleasedAt    int64                  `protobuf:"varint,4,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`      // Timestamp when the number was released (if applicable)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PurchasedPhoneNumber) Reset() {
 	*x = PurchasedPhoneNumber{}
-	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	mi := &file_livekit_phone_number_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -564,7 +737,7 @@ func (x *PurchasedPhoneNumber) String() string {
 func (*PurchasedPhoneNumber) ProtoMessage() {}
 
 func (x *PurchasedPhoneNumber) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	mi := &file_livekit_phone_number_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -577,56 +750,21 @@ func (x *PurchasedPhoneNumber) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchasedPhoneNumber.ProtoReflect.Descriptor instead.
 func (*PurchasedPhoneNumber) Descriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{8}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *PurchasedPhoneNumber) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *PurchasedPhoneNumber) GetPhoneNumber() string {
+func (x *PurchasedPhoneNumber) GetPhoneNumber() *GlobalPhoneNumber {
 	if x != nil {
 		return x.PhoneNumber
 	}
-	return ""
+	return nil
 }
 
-func (x *PurchasedPhoneNumber) GetCountryCode() string {
-	if x != nil {
-		return x.CountryCode
-	}
-	return ""
-}
-
-func (x *PurchasedPhoneNumber) GetAreaCode() string {
-	if x != nil {
-		return x.AreaCode
-	}
-	return ""
-}
-
-func (x *PurchasedPhoneNumber) GetNationalNumber() string {
-	if x != nil {
-		return x.NationalNumber
-	}
-	return ""
-}
-
-func (x *PurchasedPhoneNumber) GetIsMobile() bool {
-	if x != nil {
-		return x.IsMobile
-	}
-	return false
-}
-
-func (x *PurchasedPhoneNumber) GetStatus() string {
+func (x *PurchasedPhoneNumber) GetStatus() PhoneNumberStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return PhoneNumberStatus_PHONE_NUMBER_STATUS_UNSPECIFIED
 }
 
 func (x *PurchasedPhoneNumber) GetAssignedAt() int64 {
@@ -647,56 +785,72 @@ var File_livekit_phone_number_proto protoreflect.FileDescriptor
 
 const file_livekit_phone_number_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1bgoogle/protobuf/empty.proto\"\xa9\x01\n" +
+	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1bgoogle/protobuf/empty.proto\"\x96\x01\n" +
 	"\x1fListPhoneNumberInventoryRequest\x12!\n" +
 	"\fcountry_code\x18\x01 \x01(\tR\vcountryCode\x12\x1b\n" +
-	"\tarea_code\x18\x02 \x01(\tR\bareaCode\x12\x18\n" +
-	"\apattern\x18\x03 \x01(\tR\apattern\x12\x14\n" +
-	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x05 \x01(\x05R\x06offset\"\xaa\x01\n" +
+	"\tarea_code\x18\x02 \x01(\tR\bareaCode\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x04 \x01(\tR\tpageToken\"\x83\x01\n" +
 	" ListPhoneNumberInventoryResponse\x127\n" +
-	"\x05items\x18\x01 \x03(\v2!.livekit.PhoneNumberInventoryItemR\x05items\x12\x1f\n" +
-	"\vtotal_count\x18\x02 \x01(\x05R\n" +
-	"totalCount\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x04 \x01(\x05R\x06offset\"?\n" +
-	"\x1aPurchasePhoneNumberRequest\x12!\n" +
-	"\fphone_number\x18\x01 \x01(\tR\vphoneNumber\"_\n" +
-	"\x1bPurchasePhoneNumberResponse\x12@\n" +
-	"\fphone_number\x18\x01 \x01(\v2\x1d.livekit.PurchasedPhoneNumberR\vphoneNumber\"P\n" +
+	"\x05items\x18\x01 \x03(\v2!.livekit.PhoneNumberInventoryItemR\x05items\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"A\n" +
+	"\x1aPurchasePhoneNumberRequest\x12#\n" +
+	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\"a\n" +
+	"\x1bPurchasePhoneNumberResponse\x12B\n" +
+	"\rphone_numbers\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\fphoneNumbers\"W\n" +
 	" ListPurchasedPhoneNumbersRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\xa7\x01\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\"\xa1\x01\n" +
 	"!ListPurchasedPhoneNumbersResponse\x123\n" +
-	"\x05items\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\x05items\x12\x1f\n" +
-	"\vtotal_count\x18\x02 \x01(\x05R\n" +
-	"totalCount\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x04 \x01(\x05R\x06offset\">\n" +
+	"\x05items\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\x05items\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x12\x1f\n" +
+	"\vtotal_count\x18\x03 \x01(\x05R\n" +
+	"totalCount\">\n" +
 	"\x19ReleasePhoneNumberRequest\x12!\n" +
-	"\fphone_number\x18\x01 \x01(\tR\vphoneNumber\"\xc4\x02\n" +
-	"\x18PhoneNumberInventoryItem\x12!\n" +
-	"\fphone_number\x18\x01 \x01(\tR\vphoneNumber\x12!\n" +
-	"\fcountry_code\x18\x02 \x01(\tR\vcountryCode\x12\x1b\n" +
-	"\tarea_code\x18\x03 \x01(\tR\bareaCode\x12\x1a\n" +
-	"\blocality\x18\x04 \x01(\tR\blocality\x12\x16\n" +
-	"\x06region\x18\x05 \x01(\tR\x06region\x12\"\n" +
-	"\fcapabilities\x18\x06 \x01(\tR\fcapabilities\x12,\n" +
-	"\x12monthly_cost_cents\x18\a \x01(\x03R\x10monthlyCostCents\x12\x1c\n" +
-	"\tavailable\x18\b \x01(\bR\tavailable\x12!\n" +
-	"\fcarrier_name\x18\t \x01(\tR\vcarrierName\"\xa9\x02\n" +
-	"\x14PurchasedPhoneNumber\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fphone_number\x18\x02 \x01(\tR\vphoneNumber\x12!\n" +
+	"\fphone_number\x18\x01 \x01(\tR\vphoneNumber\"\xb6\x02\n" +
+	"\x11GlobalPhoneNumber\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
+	"\ve164_format\x18\x02 \x01(\tR\n" +
+	"e164Format\x12!\n" +
 	"\fcountry_code\x18\x03 \x01(\tR\vcountryCode\x12\x1b\n" +
-	"\tarea_code\x18\x04 \x01(\tR\bareaCode\x12'\n" +
-	"\x0fnational_number\x18\x05 \x01(\tR\x0enationalNumber\x12\x1b\n" +
-	"\tis_mobile\x18\x06 \x01(\bR\bisMobile\x12\x16\n" +
-	"\x06status\x18\a \x01(\tR\x06status\x12\x1f\n" +
-	"\vassigned_at\x18\b \x01(\x03R\n" +
+	"\tarea_code\x18\x04 \x01(\tR\bareaCode\x12\x1f\n" +
+	"\vnumber_type\x18\x05 \x01(\tR\n" +
+	"numberType\x12\x1a\n" +
+	"\blocality\x18\x06 \x01(\tR\blocality\x12\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\x12\x1d\n" +
+	"\n" +
+	"spam_score\x18\b \x01(\x03R\tspamScore\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\t \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\n" +
+	" \x01(\x03R\tupdatedAt\"\xe6\x01\n" +
+	"\x0fPhoneNumberCost\x12\x1a\n" +
+	"\bcurrency\x18\x01 \x01(\tR\bcurrency\x12%\n" +
+	"\x0emonthly_rental\x18\x02 \x01(\x01R\rmonthlyRental\x12\x1d\n" +
+	"\n" +
+	"voice_cost\x18\x03 \x01(\x01R\tvoiceCost\x12,\n" +
+	"\x12voice_billing_unit\x18\x04 \x01(\tR\x10voiceBillingUnit\x12\x19\n" +
+	"\bsms_cost\x18\x05 \x01(\x01R\asmsCost\x12(\n" +
+	"\x10sms_billing_unit\x18\x06 \x01(\tR\x0esmsBillingUnit\"\xab\x01\n" +
+	"\x18PhoneNumberInventoryItem\x12=\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x12\"\n" +
+	"\fcapabilities\x18\x02 \x03(\tR\fcapabilities\x12,\n" +
+	"\x04cost\x18\x03 \x01(\v2\x18.livekit.PhoneNumberCostR\x04cost\"\xcb\x01\n" +
+	"\x14PurchasedPhoneNumber\x12=\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x122\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1a.livekit.PhoneNumberStatusR\x06status\x12\x1f\n" +
+	"\vassigned_at\x18\x03 \x01(\x03R\n" +
 	"assignedAt\x12\x1f\n" +
-	"\vreleased_at\x18\t \x01(\x03R\n" +
-	"releasedAt2\xb5\x03\n" +
+	"\vreleased_at\x18\x04 \x01(\x03R\n" +
+	"releasedAt*\x9b\x01\n" +
+	"\x11PhoneNumberStatus\x12#\n" +
+	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
+	"\x1aPHONE_NUMBER_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
+	"\x1bPHONE_NUMBER_STATUS_PENDING\x10\x02\x12 \n" +
+	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x032\xb5\x03\n" +
 	"\x12PhoneNumberService\x12q\n" +
 	"\x18ListPhoneNumberInventory\x12(.livekit.ListPhoneNumberInventoryRequest\x1a).livekit.ListPhoneNumberInventoryResponse\"\x00\x12b\n" +
 	"\x13PurchasePhoneNumber\x12#.livekit.PurchasePhoneNumberRequest\x1a$.livekit.PurchasePhoneNumberResponse\"\x00\x12t\n" +
@@ -715,36 +869,44 @@ func file_livekit_phone_number_proto_rawDescGZIP() []byte {
 	return file_livekit_phone_number_proto_rawDescData
 }
 
-var file_livekit_phone_number_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_livekit_phone_number_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_phone_number_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_livekit_phone_number_proto_goTypes = []any{
-	(*ListPhoneNumberInventoryRequest)(nil),   // 0: livekit.ListPhoneNumberInventoryRequest
-	(*ListPhoneNumberInventoryResponse)(nil),  // 1: livekit.ListPhoneNumberInventoryResponse
-	(*PurchasePhoneNumberRequest)(nil),        // 2: livekit.PurchasePhoneNumberRequest
-	(*PurchasePhoneNumberResponse)(nil),       // 3: livekit.PurchasePhoneNumberResponse
-	(*ListPurchasedPhoneNumbersRequest)(nil),  // 4: livekit.ListPurchasedPhoneNumbersRequest
-	(*ListPurchasedPhoneNumbersResponse)(nil), // 5: livekit.ListPurchasedPhoneNumbersResponse
-	(*ReleasePhoneNumberRequest)(nil),         // 6: livekit.ReleasePhoneNumberRequest
-	(*PhoneNumberInventoryItem)(nil),          // 7: livekit.PhoneNumberInventoryItem
-	(*PurchasedPhoneNumber)(nil),              // 8: livekit.PurchasedPhoneNumber
-	(*emptypb.Empty)(nil),                     // 9: google.protobuf.Empty
+	(PhoneNumberStatus)(0),                    // 0: livekit.PhoneNumberStatus
+	(*ListPhoneNumberInventoryRequest)(nil),   // 1: livekit.ListPhoneNumberInventoryRequest
+	(*ListPhoneNumberInventoryResponse)(nil),  // 2: livekit.ListPhoneNumberInventoryResponse
+	(*PurchasePhoneNumberRequest)(nil),        // 3: livekit.PurchasePhoneNumberRequest
+	(*PurchasePhoneNumberResponse)(nil),       // 4: livekit.PurchasePhoneNumberResponse
+	(*ListPurchasedPhoneNumbersRequest)(nil),  // 5: livekit.ListPurchasedPhoneNumbersRequest
+	(*ListPurchasedPhoneNumbersResponse)(nil), // 6: livekit.ListPurchasedPhoneNumbersResponse
+	(*ReleasePhoneNumberRequest)(nil),         // 7: livekit.ReleasePhoneNumberRequest
+	(*GlobalPhoneNumber)(nil),                 // 8: livekit.GlobalPhoneNumber
+	(*PhoneNumberCost)(nil),                   // 9: livekit.PhoneNumberCost
+	(*PhoneNumberInventoryItem)(nil),          // 10: livekit.PhoneNumberInventoryItem
+	(*PurchasedPhoneNumber)(nil),              // 11: livekit.PurchasedPhoneNumber
+	(*emptypb.Empty)(nil),                     // 12: google.protobuf.Empty
 }
 var file_livekit_phone_number_proto_depIdxs = []int32{
-	7, // 0: livekit.ListPhoneNumberInventoryResponse.items:type_name -> livekit.PhoneNumberInventoryItem
-	8, // 1: livekit.PurchasePhoneNumberResponse.phone_number:type_name -> livekit.PurchasedPhoneNumber
-	8, // 2: livekit.ListPurchasedPhoneNumbersResponse.items:type_name -> livekit.PurchasedPhoneNumber
-	0, // 3: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
-	2, // 4: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
-	4, // 5: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
-	6, // 6: livekit.PhoneNumberService.ReleasePhoneNumber:input_type -> livekit.ReleasePhoneNumberRequest
-	1, // 7: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
-	3, // 8: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
-	5, // 9: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
-	9, // 10: livekit.PhoneNumberService.ReleasePhoneNumber:output_type -> google.protobuf.Empty
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	10, // 0: livekit.ListPhoneNumberInventoryResponse.items:type_name -> livekit.PhoneNumberInventoryItem
+	11, // 1: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PurchasedPhoneNumber
+	11, // 2: livekit.ListPurchasedPhoneNumbersResponse.items:type_name -> livekit.PurchasedPhoneNumber
+	8,  // 3: livekit.PhoneNumberInventoryItem.phone_number:type_name -> livekit.GlobalPhoneNumber
+	9,  // 4: livekit.PhoneNumberInventoryItem.cost:type_name -> livekit.PhoneNumberCost
+	8,  // 5: livekit.PurchasedPhoneNumber.phone_number:type_name -> livekit.GlobalPhoneNumber
+	0,  // 6: livekit.PurchasedPhoneNumber.status:type_name -> livekit.PhoneNumberStatus
+	1,  // 7: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
+	3,  // 8: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
+	5,  // 9: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
+	7,  // 10: livekit.PhoneNumberService.ReleasePhoneNumber:input_type -> livekit.ReleasePhoneNumberRequest
+	2,  // 11: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
+	4,  // 12: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
+	6,  // 13: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
+	12, // 14: livekit.PhoneNumberService.ReleasePhoneNumber:output_type -> google.protobuf.Empty
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_livekit_phone_number_proto_init() }
@@ -757,13 +919,14 @@ func file_livekit_phone_number_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_phone_number_proto_rawDesc), len(file_livekit_phone_number_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   9,
+			NumEnums:      1,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_livekit_phone_number_proto_goTypes,
 		DependencyIndexes: file_livekit_phone_number_proto_depIdxs,
+		EnumInfos:         file_livekit_phone_number_proto_enumTypes,
 		MessageInfos:      file_livekit_phone_number_proto_msgTypes,
 	}.Build()
 	File_livekit_phone_number_proto = out.File
