@@ -1115,7 +1115,7 @@ func (x ServerInfo_Edition) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ServerInfo_Edition.Descriptor instead.
 func (ServerInfo_Edition) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{26, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{24, 0}
 }
 
 type ClientInfo_SDK int32
@@ -1200,7 +1200,7 @@ func (x ClientInfo_SDK) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ClientInfo_SDK.Descriptor instead.
 func (ClientInfo_SDK) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{27, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{25, 0}
 }
 
 // enum for operation types (specific to TextHeader)
@@ -1253,7 +1253,7 @@ func (x DataStream_OperationType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DataStream_OperationType.Descriptor instead.
 func (DataStream_OperationType) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36, 0}
 }
 
 type Pagination struct {
@@ -2670,7 +2670,7 @@ type ActiveSpeakerUpdate struct {
 
 func (x *ActiveSpeakerUpdate) Reset() {
 	*x = ActiveSpeakerUpdate{}
-	mi := &file_livekit_models_proto_msgTypes[14]
+	mi := &file_livekit_models_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2682,7 +2682,7 @@ func (x *ActiveSpeakerUpdate) String() string {
 func (*ActiveSpeakerUpdate) ProtoMessage() {}
 
 func (x *ActiveSpeakerUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[14]
+	mi := &file_livekit_models_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2695,7 +2695,7 @@ func (x *ActiveSpeakerUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ActiveSpeakerUpdate.ProtoReflect.Descriptor instead.
 func (*ActiveSpeakerUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{14}
+	return file_livekit_models_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ActiveSpeakerUpdate) GetSpeakers() []*SpeakerInfo {
@@ -2718,7 +2718,7 @@ type SpeakerInfo struct {
 
 func (x *SpeakerInfo) Reset() {
 	*x = SpeakerInfo{}
-	mi := &file_livekit_models_proto_msgTypes[15]
+	mi := &file_livekit_models_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2730,7 +2730,7 @@ func (x *SpeakerInfo) String() string {
 func (*SpeakerInfo) ProtoMessage() {}
 
 func (x *SpeakerInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[15]
+	mi := &file_livekit_models_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2743,7 +2743,7 @@ func (x *SpeakerInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpeakerInfo.ProtoReflect.Descriptor instead.
 func (*SpeakerInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{15}
+	return file_livekit_models_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SpeakerInfo) GetSid() string {
@@ -2787,7 +2787,7 @@ type UserPacket struct {
 	DestinationIdentities []string `protobuf:"bytes,6,rep,name=destination_identities,json=destinationIdentities,proto3" json:"destination_identities,omitempty"`
 	// topic under which the message was published
 	Topic *string `protobuf:"bytes,4,opt,name=topic,proto3,oneof" json:"topic,omitempty"`
-	// Unique ID to identify the message
+	// Unique ID to indentify the message
 	Id *string `protobuf:"bytes,8,opt,name=id,proto3,oneof" json:"id,omitempty"`
 	// start and end time allow relating the message to specific media time
 	StartTime *uint64 `protobuf:"varint,9,opt,name=start_time,json=startTime,proto3,oneof" json:"start_time,omitempty"`
@@ -2800,7 +2800,7 @@ type UserPacket struct {
 
 func (x *UserPacket) Reset() {
 	*x = UserPacket{}
-	mi := &file_livekit_models_proto_msgTypes[16]
+	mi := &file_livekit_models_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2812,7 +2812,7 @@ func (x *UserPacket) String() string {
 func (*UserPacket) ProtoMessage() {}
 
 func (x *UserPacket) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[16]
+	mi := &file_livekit_models_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2825,7 +2825,7 @@ func (x *UserPacket) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserPacket.ProtoReflect.Descriptor instead.
 func (*UserPacket) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{16}
+	return file_livekit_models_proto_rawDescGZIP(), []int{14}
 }
 
 // Deprecated: Marked as deprecated in livekit_models.proto.
@@ -2912,7 +2912,7 @@ type SipDTMF struct {
 
 func (x *SipDTMF) Reset() {
 	*x = SipDTMF{}
-	mi := &file_livekit_models_proto_msgTypes[17]
+	mi := &file_livekit_models_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2924,7 +2924,7 @@ func (x *SipDTMF) String() string {
 func (*SipDTMF) ProtoMessage() {}
 
 func (x *SipDTMF) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[17]
+	mi := &file_livekit_models_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2937,7 +2937,7 @@ func (x *SipDTMF) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SipDTMF.ProtoReflect.Descriptor instead.
 func (*SipDTMF) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{17}
+	return file_livekit_models_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *SipDTMF) GetCode() uint32 {
@@ -2966,7 +2966,7 @@ type Transcription struct {
 
 func (x *Transcription) Reset() {
 	*x = Transcription{}
-	mi := &file_livekit_models_proto_msgTypes[18]
+	mi := &file_livekit_models_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2978,7 +2978,7 @@ func (x *Transcription) String() string {
 func (*Transcription) ProtoMessage() {}
 
 func (x *Transcription) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[18]
+	mi := &file_livekit_models_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2991,7 +2991,7 @@ func (x *Transcription) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Transcription.ProtoReflect.Descriptor instead.
 func (*Transcription) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{18}
+	return file_livekit_models_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *Transcription) GetTranscribedParticipantIdentity() string {
@@ -3029,7 +3029,7 @@ type TranscriptionSegment struct {
 
 func (x *TranscriptionSegment) Reset() {
 	*x = TranscriptionSegment{}
-	mi := &file_livekit_models_proto_msgTypes[19]
+	mi := &file_livekit_models_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3041,7 +3041,7 @@ func (x *TranscriptionSegment) String() string {
 func (*TranscriptionSegment) ProtoMessage() {}
 
 func (x *TranscriptionSegment) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[19]
+	mi := &file_livekit_models_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3054,7 +3054,7 @@ func (x *TranscriptionSegment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TranscriptionSegment.ProtoReflect.Descriptor instead.
 func (*TranscriptionSegment) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{19}
+	return file_livekit_models_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *TranscriptionSegment) GetId() string {
@@ -3113,7 +3113,7 @@ type ChatMessage struct {
 
 func (x *ChatMessage) Reset() {
 	*x = ChatMessage{}
-	mi := &file_livekit_models_proto_msgTypes[20]
+	mi := &file_livekit_models_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3125,7 +3125,7 @@ func (x *ChatMessage) String() string {
 func (*ChatMessage) ProtoMessage() {}
 
 func (x *ChatMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[20]
+	mi := &file_livekit_models_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3138,7 +3138,7 @@ func (x *ChatMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChatMessage.ProtoReflect.Descriptor instead.
 func (*ChatMessage) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{20}
+	return file_livekit_models_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ChatMessage) GetId() string {
@@ -3196,7 +3196,7 @@ type RpcRequest struct {
 
 func (x *RpcRequest) Reset() {
 	*x = RpcRequest{}
-	mi := &file_livekit_models_proto_msgTypes[21]
+	mi := &file_livekit_models_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3208,7 +3208,7 @@ func (x *RpcRequest) String() string {
 func (*RpcRequest) ProtoMessage() {}
 
 func (x *RpcRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[21]
+	mi := &file_livekit_models_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3221,7 +3221,7 @@ func (x *RpcRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RpcRequest.ProtoReflect.Descriptor instead.
 func (*RpcRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{21}
+	return file_livekit_models_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *RpcRequest) GetId() string {
@@ -3268,7 +3268,7 @@ type RpcAck struct {
 
 func (x *RpcAck) Reset() {
 	*x = RpcAck{}
-	mi := &file_livekit_models_proto_msgTypes[22]
+	mi := &file_livekit_models_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3280,7 +3280,7 @@ func (x *RpcAck) String() string {
 func (*RpcAck) ProtoMessage() {}
 
 func (x *RpcAck) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[22]
+	mi := &file_livekit_models_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3293,7 +3293,7 @@ func (x *RpcAck) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RpcAck.ProtoReflect.Descriptor instead.
 func (*RpcAck) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{22}
+	return file_livekit_models_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RpcAck) GetRequestId() string {
@@ -3317,7 +3317,7 @@ type RpcResponse struct {
 
 func (x *RpcResponse) Reset() {
 	*x = RpcResponse{}
-	mi := &file_livekit_models_proto_msgTypes[23]
+	mi := &file_livekit_models_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3329,7 +3329,7 @@ func (x *RpcResponse) String() string {
 func (*RpcResponse) ProtoMessage() {}
 
 func (x *RpcResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[23]
+	mi := &file_livekit_models_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3342,7 +3342,7 @@ func (x *RpcResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RpcResponse.ProtoReflect.Descriptor instead.
 func (*RpcResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{23}
+	return file_livekit_models_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *RpcResponse) GetRequestId() string {
@@ -3404,7 +3404,7 @@ type RpcError struct {
 
 func (x *RpcError) Reset() {
 	*x = RpcError{}
-	mi := &file_livekit_models_proto_msgTypes[24]
+	mi := &file_livekit_models_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3416,7 +3416,7 @@ func (x *RpcError) String() string {
 func (*RpcError) ProtoMessage() {}
 
 func (x *RpcError) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[24]
+	mi := &file_livekit_models_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3429,7 +3429,7 @@ func (x *RpcError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RpcError.ProtoReflect.Descriptor instead.
 func (*RpcError) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{24}
+	return file_livekit_models_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *RpcError) GetCode() uint32 {
@@ -3464,7 +3464,7 @@ type ParticipantTracks struct {
 
 func (x *ParticipantTracks) Reset() {
 	*x = ParticipantTracks{}
-	mi := &file_livekit_models_proto_msgTypes[25]
+	mi := &file_livekit_models_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3476,7 +3476,7 @@ func (x *ParticipantTracks) String() string {
 func (*ParticipantTracks) ProtoMessage() {}
 
 func (x *ParticipantTracks) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[25]
+	mi := &file_livekit_models_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3489,7 +3489,7 @@ func (x *ParticipantTracks) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantTracks.ProtoReflect.Descriptor instead.
 func (*ParticipantTracks) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{25}
+	return file_livekit_models_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ParticipantTracks) GetParticipantSid() string {
@@ -3523,7 +3523,7 @@ type ServerInfo struct {
 
 func (x *ServerInfo) Reset() {
 	*x = ServerInfo{}
-	mi := &file_livekit_models_proto_msgTypes[26]
+	mi := &file_livekit_models_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3535,7 +3535,7 @@ func (x *ServerInfo) String() string {
 func (*ServerInfo) ProtoMessage() {}
 
 func (x *ServerInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[26]
+	mi := &file_livekit_models_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3548,7 +3548,7 @@ func (x *ServerInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerInfo.ProtoReflect.Descriptor instead.
 func (*ServerInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{26}
+	return file_livekit_models_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ServerInfo) GetEdition() ServerInfo_Edition {
@@ -3623,7 +3623,7 @@ type ClientInfo struct {
 
 func (x *ClientInfo) Reset() {
 	*x = ClientInfo{}
-	mi := &file_livekit_models_proto_msgTypes[27]
+	mi := &file_livekit_models_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3635,7 +3635,7 @@ func (x *ClientInfo) String() string {
 func (*ClientInfo) ProtoMessage() {}
 
 func (x *ClientInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[27]
+	mi := &file_livekit_models_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3648,7 +3648,7 @@ func (x *ClientInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientInfo.ProtoReflect.Descriptor instead.
 func (*ClientInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{27}
+	return file_livekit_models_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ClientInfo) GetSdk() ClientInfo_SDK {
@@ -3742,7 +3742,7 @@ type ClientConfiguration struct {
 
 func (x *ClientConfiguration) Reset() {
 	*x = ClientConfiguration{}
-	mi := &file_livekit_models_proto_msgTypes[28]
+	mi := &file_livekit_models_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3754,7 +3754,7 @@ func (x *ClientConfiguration) String() string {
 func (*ClientConfiguration) ProtoMessage() {}
 
 func (x *ClientConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[28]
+	mi := &file_livekit_models_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3767,7 +3767,7 @@ func (x *ClientConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientConfiguration.ProtoReflect.Descriptor instead.
 func (*ClientConfiguration) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{28}
+	return file_livekit_models_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ClientConfiguration) GetVideo() *VideoConfiguration {
@@ -3814,7 +3814,7 @@ type VideoConfiguration struct {
 
 func (x *VideoConfiguration) Reset() {
 	*x = VideoConfiguration{}
-	mi := &file_livekit_models_proto_msgTypes[29]
+	mi := &file_livekit_models_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3826,7 +3826,7 @@ func (x *VideoConfiguration) String() string {
 func (*VideoConfiguration) ProtoMessage() {}
 
 func (x *VideoConfiguration) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[29]
+	mi := &file_livekit_models_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3839,7 +3839,7 @@ func (x *VideoConfiguration) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VideoConfiguration.ProtoReflect.Descriptor instead.
 func (*VideoConfiguration) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{29}
+	return file_livekit_models_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *VideoConfiguration) GetHardwareEncoder() ClientConfigSetting {
@@ -3861,7 +3861,7 @@ type DisabledCodecs struct {
 
 func (x *DisabledCodecs) Reset() {
 	*x = DisabledCodecs{}
-	mi := &file_livekit_models_proto_msgTypes[30]
+	mi := &file_livekit_models_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3873,7 +3873,7 @@ func (x *DisabledCodecs) String() string {
 func (*DisabledCodecs) ProtoMessage() {}
 
 func (x *DisabledCodecs) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[30]
+	mi := &file_livekit_models_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3886,7 +3886,7 @@ func (x *DisabledCodecs) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DisabledCodecs.ProtoReflect.Descriptor instead.
 func (*DisabledCodecs) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{30}
+	return file_livekit_models_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *DisabledCodecs) GetCodecs() []*Codec {
@@ -3920,7 +3920,7 @@ type RTPDrift struct {
 
 func (x *RTPDrift) Reset() {
 	*x = RTPDrift{}
-	mi := &file_livekit_models_proto_msgTypes[31]
+	mi := &file_livekit_models_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3932,7 +3932,7 @@ func (x *RTPDrift) String() string {
 func (*RTPDrift) ProtoMessage() {}
 
 func (x *RTPDrift) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[31]
+	mi := &file_livekit_models_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3945,7 +3945,7 @@ func (x *RTPDrift) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTPDrift.ProtoReflect.Descriptor instead.
 func (*RTPDrift) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{31}
+	return file_livekit_models_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *RTPDrift) GetStartTime() *timestamppb.Timestamp {
@@ -4064,7 +4064,7 @@ type RTPStats struct {
 
 func (x *RTPStats) Reset() {
 	*x = RTPStats{}
-	mi := &file_livekit_models_proto_msgTypes[32]
+	mi := &file_livekit_models_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4076,7 +4076,7 @@ func (x *RTPStats) String() string {
 func (*RTPStats) ProtoMessage() {}
 
 func (x *RTPStats) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[32]
+	mi := &file_livekit_models_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4089,7 +4089,7 @@ func (x *RTPStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTPStats.ProtoReflect.Descriptor instead.
 func (*RTPStats) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{32}
+	return file_livekit_models_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *RTPStats) GetStartTime() *timestamppb.Timestamp {
@@ -4422,7 +4422,7 @@ type RTCPSenderReportState struct {
 
 func (x *RTCPSenderReportState) Reset() {
 	*x = RTCPSenderReportState{}
-	mi := &file_livekit_models_proto_msgTypes[33]
+	mi := &file_livekit_models_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4434,7 +4434,7 @@ func (x *RTCPSenderReportState) String() string {
 func (*RTCPSenderReportState) ProtoMessage() {}
 
 func (x *RTCPSenderReportState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[33]
+	mi := &file_livekit_models_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4447,7 +4447,7 @@ func (x *RTCPSenderReportState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTCPSenderReportState.ProtoReflect.Descriptor instead.
 func (*RTCPSenderReportState) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{33}
+	return file_livekit_models_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *RTCPSenderReportState) GetRtpTimestamp() uint32 {
@@ -4518,7 +4518,7 @@ type RTPForwarderState struct {
 
 func (x *RTPForwarderState) Reset() {
 	*x = RTPForwarderState{}
-	mi := &file_livekit_models_proto_msgTypes[34]
+	mi := &file_livekit_models_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4530,7 +4530,7 @@ func (x *RTPForwarderState) String() string {
 func (*RTPForwarderState) ProtoMessage() {}
 
 func (x *RTPForwarderState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[34]
+	mi := &file_livekit_models_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4543,7 +4543,7 @@ func (x *RTPForwarderState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTPForwarderState.ProtoReflect.Descriptor instead.
 func (*RTPForwarderState) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{34}
+	return file_livekit_models_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *RTPForwarderState) GetStarted() bool {
@@ -4635,7 +4635,7 @@ type RTPMungerState struct {
 
 func (x *RTPMungerState) Reset() {
 	*x = RTPMungerState{}
-	mi := &file_livekit_models_proto_msgTypes[35]
+	mi := &file_livekit_models_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4647,7 +4647,7 @@ func (x *RTPMungerState) String() string {
 func (*RTPMungerState) ProtoMessage() {}
 
 func (x *RTPMungerState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[35]
+	mi := &file_livekit_models_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4660,7 +4660,7 @@ func (x *RTPMungerState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RTPMungerState.ProtoReflect.Descriptor instead.
 func (*RTPMungerState) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{35}
+	return file_livekit_models_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *RTPMungerState) GetExtLastSequenceNumber() uint64 {
@@ -4720,7 +4720,7 @@ type VP8MungerState struct {
 
 func (x *VP8MungerState) Reset() {
 	*x = VP8MungerState{}
-	mi := &file_livekit_models_proto_msgTypes[36]
+	mi := &file_livekit_models_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4732,7 +4732,7 @@ func (x *VP8MungerState) String() string {
 func (*VP8MungerState) ProtoMessage() {}
 
 func (x *VP8MungerState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[36]
+	mi := &file_livekit_models_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4745,7 +4745,7 @@ func (x *VP8MungerState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use VP8MungerState.ProtoReflect.Descriptor instead.
 func (*VP8MungerState) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{36}
+	return file_livekit_models_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *VP8MungerState) GetExtLastPictureId() int32 {
@@ -4807,7 +4807,7 @@ type TimedVersion struct {
 
 func (x *TimedVersion) Reset() {
 	*x = TimedVersion{}
-	mi := &file_livekit_models_proto_msgTypes[37]
+	mi := &file_livekit_models_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4819,7 +4819,7 @@ func (x *TimedVersion) String() string {
 func (*TimedVersion) ProtoMessage() {}
 
 func (x *TimedVersion) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[37]
+	mi := &file_livekit_models_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4832,7 +4832,7 @@ func (x *TimedVersion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TimedVersion.ProtoReflect.Descriptor instead.
 func (*TimedVersion) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{37}
+	return file_livekit_models_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *TimedVersion) GetUnixMicro() int64 {
@@ -4857,7 +4857,7 @@ type DataStream struct {
 
 func (x *DataStream) Reset() {
 	*x = DataStream{}
-	mi := &file_livekit_models_proto_msgTypes[38]
+	mi := &file_livekit_models_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4869,7 +4869,7 @@ func (x *DataStream) String() string {
 func (*DataStream) ProtoMessage() {}
 
 func (x *DataStream) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[38]
+	mi := &file_livekit_models_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4882,7 +4882,7 @@ func (x *DataStream) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataStream.ProtoReflect.Descriptor instead.
 func (*DataStream) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36}
 }
 
 type WebhookConfig struct {
@@ -4895,7 +4895,7 @@ type WebhookConfig struct {
 
 func (x *WebhookConfig) Reset() {
 	*x = WebhookConfig{}
-	mi := &file_livekit_models_proto_msgTypes[39]
+	mi := &file_livekit_models_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4907,7 +4907,7 @@ func (x *WebhookConfig) String() string {
 func (*WebhookConfig) ProtoMessage() {}
 
 func (x *WebhookConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[39]
+	mi := &file_livekit_models_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4920,7 +4920,7 @@ func (x *WebhookConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebhookConfig.ProtoReflect.Descriptor instead.
 func (*WebhookConfig) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{39}
+	return file_livekit_models_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *WebhookConfig) GetUrl() string {
@@ -4951,7 +4951,7 @@ type DataStream_TextHeader struct {
 
 func (x *DataStream_TextHeader) Reset() {
 	*x = DataStream_TextHeader{}
-	mi := &file_livekit_models_proto_msgTypes[42]
+	mi := &file_livekit_models_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4963,7 +4963,7 @@ func (x *DataStream_TextHeader) String() string {
 func (*DataStream_TextHeader) ProtoMessage() {}
 
 func (x *DataStream_TextHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[42]
+	mi := &file_livekit_models_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4976,7 +4976,7 @@ func (x *DataStream_TextHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataStream_TextHeader.ProtoReflect.Descriptor instead.
 func (*DataStream_TextHeader) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38, 0}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36, 0}
 }
 
 func (x *DataStream_TextHeader) GetOperationType() DataStream_OperationType {
@@ -5024,7 +5024,7 @@ type DataStream_ByteHeader struct {
 
 func (x *DataStream_ByteHeader) Reset() {
 	*x = DataStream_ByteHeader{}
-	mi := &file_livekit_models_proto_msgTypes[43]
+	mi := &file_livekit_models_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5036,7 +5036,7 @@ func (x *DataStream_ByteHeader) String() string {
 func (*DataStream_ByteHeader) ProtoMessage() {}
 
 func (x *DataStream_ByteHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[43]
+	mi := &file_livekit_models_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5049,7 +5049,7 @@ func (x *DataStream_ByteHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataStream_ByteHeader.ProtoReflect.Descriptor instead.
 func (*DataStream_ByteHeader) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38, 1}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36, 1}
 }
 
 func (x *DataStream_ByteHeader) GetName() string {
@@ -5061,15 +5061,14 @@ func (x *DataStream_ByteHeader) GetName() string {
 
 // main DataStream.Header that contains a oneof for specific headers
 type DataStream_Header struct {
-	state       protoimpl.MessageState `protogen:"open.v1"`
-	StreamId    string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream
-	Timestamp   int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // using int64 for Unix timestamp
-	Topic       string                 `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
-	MimeType    string                 `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
-	TotalLength *uint64                `protobuf:"varint,5,opt,name=total_length,json=totalLength,proto3,oneof" json:"total_length,omitempty"` // only populated for finite streams, if it's a stream of unknown size this stays empty
-	// Deprecated: Marked as deprecated in livekit_models.proto.
-	EncryptionType Encryption_Type   `protobuf:"varint,7,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"`               //  this is set on the DataPacket
-	Attributes     map[string]string `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // user defined attributes map that can carry additional info
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	StreamId       string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream
+	Timestamp      int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`              // using int64 for Unix timestamp
+	Topic          string                 `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
+	MimeType       string                 `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
+	TotalLength    *uint64                `protobuf:"varint,5,opt,name=total_length,json=totalLength,proto3,oneof" json:"total_length,omitempty"`                                               // only populated for finite streams, if it's a stream of unknown size this stays empty
+	EncryptionType Encryption_Type        `protobuf:"varint,7,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"`               // defaults to NONE
+	Attributes     map[string]string      `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // user defined attributes map that can carry additional info
 	// oneof to choose between specific header types
 	//
 	// Types that are valid to be assigned to ContentHeader:
@@ -5083,7 +5082,7 @@ type DataStream_Header struct {
 
 func (x *DataStream_Header) Reset() {
 	*x = DataStream_Header{}
-	mi := &file_livekit_models_proto_msgTypes[44]
+	mi := &file_livekit_models_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5095,7 +5094,7 @@ func (x *DataStream_Header) String() string {
 func (*DataStream_Header) ProtoMessage() {}
 
 func (x *DataStream_Header) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[44]
+	mi := &file_livekit_models_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5108,7 +5107,7 @@ func (x *DataStream_Header) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataStream_Header.ProtoReflect.Descriptor instead.
 func (*DataStream_Header) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38, 2}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36, 2}
 }
 
 func (x *DataStream_Header) GetStreamId() string {
@@ -5146,7 +5145,6 @@ func (x *DataStream_Header) GetTotalLength() uint64 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in livekit_models.proto.
 func (x *DataStream_Header) GetEncryptionType() Encryption_Type {
 	if x != nil {
 		return x.EncryptionType
@@ -5203,20 +5201,19 @@ func (*DataStream_Header_TextHeader) isDataStream_Header_ContentHeader() {}
 func (*DataStream_Header_ByteHeader) isDataStream_Header_ContentHeader() {}
 
 type DataStream_Chunk struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	StreamId   string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream to map it to the correct header
-	ChunkIndex uint64                 `protobuf:"varint,2,opt,name=chunk_index,json=chunkIndex,proto3" json:"chunk_index,omitempty"`
-	Content    []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`  // content as binary (bytes)
-	Version    int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"` // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
-	// Deprecated: Marked as deprecated in livekit_models.proto.
-	Iv            []byte `protobuf:"bytes,5,opt,name=iv,proto3,oneof" json:"iv,omitempty"` // this is set on the DataPacket
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StreamId      string                 `protobuf:"bytes,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"` // unique identifier for this data stream to map it to the correct header
+	ChunkIndex    uint64                 `protobuf:"varint,2,opt,name=chunk_index,json=chunkIndex,proto3" json:"chunk_index,omitempty"`
+	Content       []byte                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`  // content as binary (bytes)
+	Version       int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"` // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
+	Iv            []byte                 `protobuf:"bytes,5,opt,name=iv,proto3,oneof" json:"iv,omitempty"`      // optional, initialization vector for AES-GCM encryption
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DataStream_Chunk) Reset() {
 	*x = DataStream_Chunk{}
-	mi := &file_livekit_models_proto_msgTypes[45]
+	mi := &file_livekit_models_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5228,7 +5225,7 @@ func (x *DataStream_Chunk) String() string {
 func (*DataStream_Chunk) ProtoMessage() {}
 
 func (x *DataStream_Chunk) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[45]
+	mi := &file_livekit_models_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5241,7 +5238,7 @@ func (x *DataStream_Chunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataStream_Chunk.ProtoReflect.Descriptor instead.
 func (*DataStream_Chunk) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38, 3}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36, 3}
 }
 
 func (x *DataStream_Chunk) GetStreamId() string {
@@ -5272,7 +5269,6 @@ func (x *DataStream_Chunk) GetVersion() int32 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in livekit_models.proto.
 func (x *DataStream_Chunk) GetIv() []byte {
 	if x != nil {
 		return x.Iv
@@ -5291,7 +5287,7 @@ type DataStream_Trailer struct {
 
 func (x *DataStream_Trailer) Reset() {
 	*x = DataStream_Trailer{}
-	mi := &file_livekit_models_proto_msgTypes[46]
+	mi := &file_livekit_models_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5303,7 +5299,7 @@ func (x *DataStream_Trailer) String() string {
 func (*DataStream_Trailer) ProtoMessage() {}
 
 func (x *DataStream_Trailer) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[46]
+	mi := &file_livekit_models_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5316,7 +5312,7 @@ func (x *DataStream_Trailer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataStream_Trailer.ProtoReflect.Descriptor instead.
 func (*DataStream_Trailer) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{38, 4}
+	return file_livekit_models_proto_rawDescGZIP(), []int{36, 4}
 }
 
 func (x *DataStream_Trailer) GetStreamId() string {
@@ -5505,7 +5501,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\frpc_response\x18\f \x01(\v2\x14.livekit.RpcResponseH\x00R\vrpcResponse\x12A\n" +
 	"\rstream_header\x18\r \x01(\v2\x1a.livekit.DataStream.HeaderH\x00R\fstreamHeader\x12>\n" +
 	"\fstream_chunk\x18\x0e \x01(\v2\x19.livekit.DataStream.ChunkH\x00R\vstreamChunk\x12D\n" +
-	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\x12E\n" +
+	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\x12\x1a\n" +
 	"\bsequence\x18\x10 \x01(\rR\bsequence\x12'\n" +
 	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\"\x1f\n" +
 	"\x04Kind\x12\f\n" +
@@ -5754,7 +5750,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fTimedVersion\x12\x1d\n" +
 	"\n" +
 	"unix_micro\x18\x01 \x01(\x03R\tunixMicro\x12\x14\n" +
-	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xe4\t\n" +
+	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xdc\t\n" +
 	"\n" +
 	"DataStream\x1a\xeb\x01\n" +
 	"\n" +
@@ -5766,14 +5762,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\tgenerated\x18\x05 \x01(\bR\tgenerated\x1a \n" +
 	"\n" +
 	"ByteHeader\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x1a\x99\x04\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x1a\x95\x04\n" +
 	"\x06Header\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x14\n" +
 	"\x05topic\x18\x03 \x01(\tR\x05topic\x12\x1b\n" +
 	"\tmime_type\x18\x04 \x01(\tR\bmimeType\x12&\n" +
-	"\ftotal_length\x18\x05 \x01(\x04H\x01R\vtotalLength\x88\x01\x01\x12E\n" +
-	"\x0fencryption_type\x18\a \x01(\x0e2\x18.livekit.Encryption.TypeB\x02\x18\x01R\x0eencryptionType\x12J\n" +
+	"\ftotal_length\x18\x05 \x01(\x04H\x01R\vtotalLength\x88\x01\x01\x12A\n" +
+	"\x0fencryption_type\x18\a \x01(\x0e2\x18.livekit.Encryption.TypeR\x0eencryptionType\x12J\n" +
 	"\n" +
 	"attributes\x18\b \x03(\v2*.livekit.DataStream.Header.AttributesEntryR\n" +
 	"attributes\x12A\n" +
@@ -5786,14 +5782,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x10\n" +
 	"\x0econtent_headerB\x0f\n" +
-	"\r_total_length\x1a\x99\x01\n" +
+	"\r_total_length\x1a\x95\x01\n" +
 	"\x05Chunk\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1f\n" +
 	"\vchunk_index\x18\x02 \x01(\x04R\n" +
 	"chunkIndex\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\fR\acontent\x12\x18\n" +
-	"\aversion\x18\x04 \x01(\x05R\aversion\x12\x17\n" +
-	"\x02iv\x18\x05 \x01(\fB\x02\x18\x01H\x00R\x02iv\x88\x01\x01B\x05\n" +
+	"\aversion\x18\x04 \x01(\x05R\aversion\x12\x13\n" +
+	"\x02iv\x18\x05 \x01(\fH\x00R\x02iv\x88\x01\x01B\x05\n" +
 	"\x03_iv\x1a\xca\x01\n" +
 	"\aTrailer\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x16\n" +
@@ -6090,20 +6086,20 @@ func file_livekit_models_proto_init() {
 		(*DataPacket_StreamChunk)(nil),
 		(*DataPacket_StreamTrailer)(nil),
 	}
-	file_livekit_models_proto_msgTypes[16].OneofWrappers = []any{}
-	file_livekit_models_proto_msgTypes[20].OneofWrappers = []any{}
-	file_livekit_models_proto_msgTypes[23].OneofWrappers = []any{
+	file_livekit_models_proto_msgTypes[14].OneofWrappers = []any{}
+	file_livekit_models_proto_msgTypes[18].OneofWrappers = []any{}
+	file_livekit_models_proto_msgTypes[21].OneofWrappers = []any{
 		(*RpcResponse_Payload)(nil),
 		(*RpcResponse_Error)(nil),
 	}
-	file_livekit_models_proto_msgTypes[34].OneofWrappers = []any{
+	file_livekit_models_proto_msgTypes[32].OneofWrappers = []any{
 		(*RTPForwarderState_Vp8Munger)(nil),
 	}
-	file_livekit_models_proto_msgTypes[44].OneofWrappers = []any{
+	file_livekit_models_proto_msgTypes[42].OneofWrappers = []any{
 		(*DataStream_Header_TextHeader)(nil),
 		(*DataStream_Header_ByteHeader)(nil),
 	}
-	file_livekit_models_proto_msgTypes[45].OneofWrappers = []any{}
+	file_livekit_models_proto_msgTypes[43].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
