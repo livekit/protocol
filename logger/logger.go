@@ -106,6 +106,10 @@ type UnlikelyLogger struct {
 	keysAndValues []any
 }
 
+func NewUnlikelyLogger(logger Logger, keysAndValues ...any) UnlikelyLogger {
+	return UnlikelyLogger{logger, keysAndValues}
+}
+
 func (l UnlikelyLogger) makeLogger() Logger {
 	return l.logger.WithCallDepth(1)
 }
