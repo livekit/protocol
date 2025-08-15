@@ -2392,7 +2392,6 @@ type DataPacket struct {
 	//	*DataPacket_StreamHeader
 	//	*DataPacket_StreamChunk
 	//	*DataPacket_StreamTrailer
-	//	*DataPacket_EncryptedPacket
 	Value isDataPacket_Value `protobuf_oneof:"value"`
 	// sequence number of reliable packet
 	Sequence uint32 `protobuf:"varint,16,opt,name=sequence,proto3" json:"sequence,omitempty"`
@@ -2570,15 +2569,6 @@ func (x *DataPacket) GetStreamTrailer() *DataStream_Trailer {
 	return nil
 }
 
-func (x *DataPacket) GetEncryptedPacket() *EncryptedPacket {
-	if x != nil {
-		if x, ok := x.Value.(*DataPacket_EncryptedPacket); ok {
-			return x.EncryptedPacket
-		}
-	}
-	return nil
-}
-
 func (x *DataPacket) GetSequence() uint32 {
 	if x != nil {
 		return x.Sequence
@@ -2644,10 +2634,6 @@ type DataPacket_StreamChunk struct {
 
 type DataPacket_StreamTrailer struct {
 	StreamTrailer *DataStream_Trailer `protobuf:"bytes,15,opt,name=stream_trailer,json=streamTrailer,proto3,oneof"`
-}
-
-type DataPacket_EncryptedPacket struct {
-	EncryptedPacket *EncryptedPacket `protobuf:"bytes,18,opt,name=encrypted_packet,json=encryptedPacket,proto3,oneof"`
 }
 
 func (*DataPacket_User) isDataPacket_Value() {}
@@ -5520,7 +5506,6 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\rstream_header\x18\r \x01(\v2\x1a.livekit.DataStream.HeaderH\x00R\fstreamHeader\x12>\n" +
 	"\fstream_chunk\x18\x0e \x01(\v2\x19.livekit.DataStream.ChunkH\x00R\vstreamChunk\x12D\n" +
 	"\x0estream_trailer\x18\x0f \x01(\v2\x1b.livekit.DataStream.TrailerH\x00R\rstreamTrailer\x12E\n" +
-	"\x10encrypted_packet\x18\x12 \x01(\v2\x18.livekit.EncryptedPacketH\x00R\x0fencryptedPacket\x12\x1a\n" +
 	"\bsequence\x18\x10 \x01(\rR\bsequence\x12'\n" +
 	"\x0fparticipant_sid\x18\x11 \x01(\tR\x0eparticipantSid\"\x1f\n" +
 	"\x04Kind\x12\f\n" +
@@ -6104,18 +6089,6 @@ func file_livekit_models_proto_init() {
 		(*DataPacket_StreamHeader)(nil),
 		(*DataPacket_StreamChunk)(nil),
 		(*DataPacket_StreamTrailer)(nil),
-		(*DataPacket_EncryptedPacket)(nil),
-	}
-	file_livekit_models_proto_msgTypes[13].OneofWrappers = []any{
-		(*EncryptedPacketPayload_User)(nil),
-		(*EncryptedPacketPayload_Metrics)(nil),
-		(*EncryptedPacketPayload_ChatMessage)(nil),
-		(*EncryptedPacketPayload_RpcRequest)(nil),
-		(*EncryptedPacketPayload_RpcAck)(nil),
-		(*EncryptedPacketPayload_RpcResponse)(nil),
-		(*EncryptedPacketPayload_StreamHeader)(nil),
-		(*EncryptedPacketPayload_StreamChunk)(nil),
-		(*EncryptedPacketPayload_StreamTrailer)(nil),
 	}
 	file_livekit_models_proto_msgTypes[16].OneofWrappers = []any{}
 	file_livekit_models_proto_msgTypes[20].OneofWrappers = []any{}
