@@ -82,6 +82,8 @@ message AgentVersion {
     string version = 1;
     bool current = 2;
     google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp deployed_at = 4;
+    map<string, string> attributes = 5;
 }
 
 message ListAgentVersionsRequest {
@@ -104,6 +106,15 @@ message UpdateAgentRequest {
 }
 
 message UpdateAgentResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message RestartAgentRequest {
+    string agent_id = 1;
+}
+
+message RestartAgentResponse {
     bool success = 1;
     string message = 2;
 }
@@ -184,6 +195,7 @@ service CloudAgent {
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}
     rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse) {}
+    rpc RestartAgent(RestartAgentRequest) returns (RestartAgentResponse) {}
     rpc DeployAgent(DeployAgentRequest) returns (DeployAgentResponse) {}
     rpc UpdateAgentSecrets(UpdateAgentSecretsRequest) returns (UpdateAgentSecretsResponse) {}
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}

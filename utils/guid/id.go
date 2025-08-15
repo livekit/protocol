@@ -17,6 +17,7 @@ package guid
 import (
 	"crypto/rand"
 	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	mrand "math/rand/v2"
 	"os"
@@ -48,6 +49,7 @@ const (
 	WHIPResourcePrefix      = "WH_"
 	RTMPResourcePrefix      = "RT_"
 	URLResourcePrefix       = "UR_"
+	AgentPrefix             = "A_"
 	AgentWorkerPrefix       = "AW_"
 	AgentJobPrefix          = "AJ_"
 	AgentDispatchPrefix     = "AD_"
@@ -67,6 +69,11 @@ var guidGeneratorPool = sync.Pool{
 func New(prefix string) string {
 	g := guidGeneratorPool.Get().(*guidGenerator)
 	defer guidGeneratorPool.Put(g)
+	return g.New(prefix)
+}
+
+func Hash(prefix string, data []byte) string {
+	g := newGeneratorFromSeed(sha256.Sum256(data))
 	return g.New(prefix)
 }
 
@@ -108,9 +115,13 @@ func newGenerator() (*guidGenerator, error) {
 		return nil, err
 	}
 
+	return newGeneratorFromSeed(seed), nil
+}
+
+func newGeneratorFromSeed(seed [32]byte) *guidGenerator {
 	return &guidGenerator{
 		rng: mrand.NewChaCha8(seed),
-	}, nil
+	}
 }
 
 func (g *guidGenerator) readIDChars(b []byte) {

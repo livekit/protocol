@@ -9,8 +9,8 @@ import "options.proto";
 import "livekit_internal.proto";
 import "livekit_rtc.proto";
 
-service RTCRest {
-  rpc Create(RTCRestCreateRequest) returns (RTCRestCreateResponse) {
+service WHIP {
+  rpc Create(WHIPCreateRequest) returns (WHIPCreateResponse) {
     option (psrpc.options) = {
       topics: true
       queue: true
@@ -23,7 +23,7 @@ service RTCRest {
   }
 }
 
-message RTCRestCreateRequest {
+message WHIPCreateRequest {
   message TrackList {
     repeated string track_names = 1;
   }
@@ -33,7 +33,7 @@ message RTCRestCreateRequest {
   map<string, TrackList> subscribed_participant_tracks = 3;
 }
 
-message RTCRestCreateResponse {
+message WHIPCreateResponse {
   string answer_sdp = 1;
   string participant_id = 2;
   repeated livekit.ICEServer ice_servers = 3;
@@ -42,8 +42,8 @@ message RTCRestCreateResponse {
 
 // ----------------------------------
 
-service RTCRestParticipant {
-  rpc ICETrickle(RTCRestParticipantICETrickleRequest) returns (google.protobuf.Empty) {
+service WHIPParticipant {
+  rpc ICETrickle(WHIPParticipantICETrickleRequest) returns (google.protobuf.Empty) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
@@ -54,7 +54,7 @@ service RTCRestParticipant {
     };
   }
 
-  rpc ICERestart(RTCRestParticipantICERestartRequest) returns (RTCRestParticipantICERestartResponse) {
+  rpc ICERestart(WHIPParticipantICERestartRequest) returns (WHIPParticipantICERestartResponse) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
@@ -65,7 +65,7 @@ service RTCRestParticipant {
     };
   }
 
-  rpc DeleteSession(RTCRestParticipantDeleteSessionRequest) returns (google.protobuf.Empty) {
+  rpc DeleteSession(WHIPParticipantDeleteSessionRequest) returns (google.protobuf.Empty) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
@@ -77,7 +77,7 @@ service RTCRestParticipant {
   }
 }
 
-message RTCRestParticipantICETrickleRequest {
+message WHIPParticipantICETrickleRequest {
   string room = 1;
   string participant_identity = 2;
   string participant_id = 3;
@@ -85,19 +85,19 @@ message RTCRestParticipantICETrickleRequest {
   string sdp_fragment = 5;
 }
 
-message RTCRestParticipantICERestartRequest {
+message WHIPParticipantICERestartRequest {
   string room = 1;
   string participant_identity = 2;
   string participant_id = 3;
   string sdp_fragment = 4;
 }
 
-message RTCRestParticipantICERestartResponse {
+message WHIPParticipantICERestartResponse {
   string ice_session_id = 1;
   string sdp_fragment = 2;
 }
 
-message RTCRestParticipantDeleteSessionRequest {
+message WHIPParticipantDeleteSessionRequest {
   string room = 1;
   string participant_identity = 2;
   string participant_id = 3;

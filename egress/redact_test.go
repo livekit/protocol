@@ -13,8 +13,9 @@ var (
 	file = &livekit.EncodedFileOutput{
 		Output: &livekit.EncodedFileOutput_S3{
 			S3: &livekit.S3Upload{
-				AccessKey: "ACCESS_KEY",
-				Secret:    "LONG_SECRET_STRING",
+				AccessKey:            "ACCESS_KEY",
+				Secret:               "LONG_SECRET_STRING",
+				AssumeRoleExternalId: "EXTERNAL_ID",
 			},
 		},
 	}
@@ -52,6 +53,7 @@ func TestRedactUpload(t *testing.T) {
 
 	require.Equal(t, "{access_key}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.AccessKey)
 	require.Equal(t, "{secret}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.Secret)
+	require.Equal(t, "{external_id}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.AssumeRoleExternalId)
 
 	cl = proto.Clone(image)
 	RedactUpload(cl.(UploadRequest))

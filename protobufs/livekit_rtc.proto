@@ -23,9 +23,9 @@ import "livekit_models.proto";
 
 message SignalRequest {
   oneof message {
-    // initial join exchange, for publisher
+    // participant offer for publisher
     SessionDescription offer = 1;
-    // participant answering publisher offer
+    // participant answering subscriber offer
     SessionDescription answer = 2;
     TrickleRequest trickle = 3;
     AddTrackRequest add_track = 4;
@@ -118,8 +118,10 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
+  repeated VideoLayer layers = 4;
+  VideoLayer.Mode video_layer_mode = 5;
 
-  // NEXT-ID: 4
+  // NEXT-ID: 6
 }
 
 message AddTrackRequest {
@@ -127,7 +129,6 @@ message AddTrackRequest {
   string cid = 1;
   string name = 2;
   TrackType type = 3;
-  // to be deprecated in favor of layers
   uint32 width = 4;
   uint32 height = 5;
   // true to add track and initialize to muted
@@ -470,4 +471,41 @@ message RequestResponse {
 
 message TrackSubscribed {
   string track_sid = 1;
+}
+
+message ConnectionSettings {
+  bool auto_subscribe = 1;
+  bool adaptive_stream = 2;
+  optional bool subscriber_allow_pause = 3;
+  bool disable_ice_lite = 4;
+}
+
+message JoinRequest {
+  ClientInfo client_info = 1;
+  ConnectionSettings connection_settings = 2;
+
+  string metadata = 3; // if not empty, will overwrite `metadata` in token
+
+  // will set keys provided via this
+  // will overwrite if the same key is in the token
+  // will not delete keys from token if there is a key collision and this sets that key to empty value
+  map<string, string> participant_attributes = 4;
+
+  repeated AddTrackRequest add_track_requests = 5;
+  SessionDescription publisher_offer = 6;
+
+  bool reconnect = 7;
+  ReconnectReason reconnect_reason = 8;
+  string participant_sid = 9;
+  SyncState sync_state = 10;
+}
+
+message WrappedJoinRequest {
+  enum Compression {
+    NONE = 0;
+    GZIP = 1;
+  }
+
+  Compression compression = 1;
+  bytes join_request = 2;   // marshalled JoinRequest + potentially compressed
 }

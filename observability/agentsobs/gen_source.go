@@ -17,14 +17,6 @@ const (
 	WorkerStateOffline   WorkerState = "offline"
 )
 
-type AgentKind string
-
-const (
-	AgentKindUndefined AgentKind = ""
-	AgentKindCloud     AgentKind = "cloud"
-	AgentKindSelfhost  AgentKind = "selfhost"
-)
-
 type JobKind string
 
 const (
@@ -32,6 +24,14 @@ const (
 	JobKindRoom        JobKind = "room"
 	JobKindPublisher   JobKind = "publisher"
 	JobKindParticipant JobKind = "participant"
+)
+
+type WorkerKind string
+
+const (
+	WorkerKindUndefined WorkerKind = ""
+	WorkerKindCloud     WorkerKind = "cloud"
+	WorkerKindSelfhost  WorkerKind = "selfhost"
 )
 
 type JobStatus string
@@ -48,6 +48,7 @@ type Rollup string
 
 const (
 	RollupUndefined    Rollup = ""
+	RollupAgent        Rollup = "agent"
 	RollupWorker       Rollup = "worker"
 	RollupWorkerSeries Rollup = "worker_series"
 	RollupJob          Rollup = "job"

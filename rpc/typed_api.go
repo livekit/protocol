@@ -185,16 +185,16 @@ func NewTypedParticipantServer(svc ParticipantServerImpl, bus psrpc.MessageBus, 
 	return NewParticipantServer[ParticipantTopic](svc, bus, opts...)
 }
 
-//counterfeiter:generate . TypedRTCRestParticipantClient
-type TypedRTCRestParticipantClient = RTCRestParticipantClient[ParticipantTopic]
-type TypedRTCRestParticipantServer = RTCRestParticipantServer[ParticipantTopic]
+//counterfeiter:generate . TypedWHIPParticipantClient
+type TypedWHIPParticipantClient = WHIPParticipantClient[ParticipantTopic]
+type TypedWHIPParticipantServer = WHIPParticipantServer[ParticipantTopic]
 
-func NewTypedRTCRestParticipantClient(params ClientParams) (TypedRTCRestParticipantClient, error) {
-	return NewRTCRestParticipantClient[ParticipantTopic](params.Args())
+func NewTypedWHIPParticipantClient(params ClientParams) (TypedWHIPParticipantClient, error) {
+	return NewWHIPParticipantClient[ParticipantTopic](params.Args())
 }
 
-func NewTypedRTCRestParticipantServer(svc RTCRestParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedRTCRestParticipantServer, error) {
-	return NewRTCRestParticipantServer[ParticipantTopic](svc, bus, opts...)
+func NewTypedWHIPParticipantServer(svc WHIPParticipantServerImpl, bus psrpc.MessageBus, opts ...psrpc.ServerOption) (TypedWHIPParticipantServer, error) {
+	return NewWHIPParticipantServer[ParticipantTopic](svc, bus, opts...)
 }
 
 //counterfeiter:generate . TypedAgentDispatchInternalClient
