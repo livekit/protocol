@@ -355,7 +355,7 @@ message UserPacket {
   // added by SDK to enable de-duping of messages, for INTERNAL USE ONLY
   bytes nonce = 11;
 
-  // NEXT_ID: 15
+  // NEXT_ID: 12
 }
 
 message SipDTMF {
