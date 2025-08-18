@@ -6,6 +6,16 @@ option go_package = "github.com/livekit/protocol/livekit";
 
 import "google/protobuf/empty.proto";
 
+// Telephony cost type enumeration
+enum TelephonyCostType {
+  TELEPHONY_COST_TYPE_UNSPECIFIED = 0;   // Default value
+  TELEPHONY_COST_TYPE_NUMBER_RENTAL = 1; // Monthly rental for the phone number
+  TELEPHONY_COST_TYPE_VOICE_INBOUND = 2; // Inbound voice calls
+  TELEPHONY_COST_TYPE_VOICE_OUTBOUND = 3; // Outbound voice calls
+  TELEPHONY_COST_TYPE_SMS_INBOUND = 4;   // Inbound SMS
+  TELEPHONY_COST_TYPE_SMS_OUTBOUND = 5;  // Outbound SMS
+}
+
 // Phone number status enumeration
 enum PhoneNumberStatus {
   PHONE_NUMBER_STATUS_UNSPECIFIED = 0;  // Default value
@@ -89,27 +99,21 @@ message GlobalPhoneNumber {
   int64 updated_at = 10;          // timestamp when updated
 }
 
-// PhoneNumberCost represents the pricing structure for a phone number
-message PhoneNumberCost {
-  string currency = 1;                    // Currency code (e.g., "USD", "EUR")
-
-  // Monthly rental cost
-  double monthly_rental = 2;              // Monthly rental cost (e.g., 10.00)
-
-  // Voice calling costs
-  double voice_cost = 3;                  // Voice cost per unit (e.g., 2.00)
-  string voice_billing_unit = 4;          // Voice billing unit (e.g., "minute", "second", "call")
-
-  // SMS costs
-  double sms_cost = 5;                    // SMS cost per unit (e.g., 0.50)
-  string sms_billing_unit = 6;            // SMS billing unit (e.g., "message", "character")
+// TelephonyCost represents the pricing structure for a specific telephony service
+message TelephonyCost {
+  TelephonyCostType resource = 1;       // Type of telephony service
+  string currency = 2;                  // Currency code (e.g., "USD", "EUR")
+  double price = 3;                     // Price for this service
+  string billing_unit = 4;              // Billing unit (e.g., "month", "minute", "message", "call")
 }
+
+
 
 // PhoneNumberInventoryItem - Represents an available phone number for purchase
 message PhoneNumberInventoryItem {
-  GlobalPhoneNumber phone_number = 1;  // Common phone number fields
-  repeated string capabilities = 2;    // Comma-separated capabilities (e.g., "voice,sms")
-  PhoneNumberCost cost = 3;           // Cost structure for this phone number
+  GlobalPhoneNumber phone_number = 1;     // Common phone number fields
+  repeated string capabilities = 2;       // Comma-separated capabilities (e.g., "voice,sms")
+  repeated TelephonyCost costs = 3;       // Array of costs for different services
 }
 
 // PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
