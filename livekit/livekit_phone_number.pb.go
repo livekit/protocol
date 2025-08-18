@@ -22,6 +22,65 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Telephony cost type enumeration
+type TelephonyCostType int32
+
+const (
+	TelephonyCostType_TELEPHONY_COST_TYPE_UNSPECIFIED    TelephonyCostType = 0 // Default value
+	TelephonyCostType_TELEPHONY_COST_TYPE_NUMBER_RENTAL  TelephonyCostType = 1 // Monthly rental for the phone number
+	TelephonyCostType_TELEPHONY_COST_TYPE_VOICE_INBOUND  TelephonyCostType = 2 // Inbound voice calls
+	TelephonyCostType_TELEPHONY_COST_TYPE_VOICE_OUTBOUND TelephonyCostType = 3 // Outbound voice calls
+	TelephonyCostType_TELEPHONY_COST_TYPE_SMS_INBOUND    TelephonyCostType = 4 // Inbound SMS
+	TelephonyCostType_TELEPHONY_COST_TYPE_SMS_OUTBOUND   TelephonyCostType = 5 // Outbound SMS
+)
+
+// Enum value maps for TelephonyCostType.
+var (
+	TelephonyCostType_name = map[int32]string{
+		0: "TELEPHONY_COST_TYPE_UNSPECIFIED",
+		1: "TELEPHONY_COST_TYPE_NUMBER_RENTAL",
+		2: "TELEPHONY_COST_TYPE_VOICE_INBOUND",
+		3: "TELEPHONY_COST_TYPE_VOICE_OUTBOUND",
+		4: "TELEPHONY_COST_TYPE_SMS_INBOUND",
+		5: "TELEPHONY_COST_TYPE_SMS_OUTBOUND",
+	}
+	TelephonyCostType_value = map[string]int32{
+		"TELEPHONY_COST_TYPE_UNSPECIFIED":    0,
+		"TELEPHONY_COST_TYPE_NUMBER_RENTAL":  1,
+		"TELEPHONY_COST_TYPE_VOICE_INBOUND":  2,
+		"TELEPHONY_COST_TYPE_VOICE_OUTBOUND": 3,
+		"TELEPHONY_COST_TYPE_SMS_INBOUND":    4,
+		"TELEPHONY_COST_TYPE_SMS_OUTBOUND":   5,
+	}
+)
+
+func (x TelephonyCostType) Enum() *TelephonyCostType {
+	p := new(TelephonyCostType)
+	*p = x
+	return p
+}
+
+func (x TelephonyCostType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TelephonyCostType) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_phone_number_proto_enumTypes[0].Descriptor()
+}
+
+func (TelephonyCostType) Type() protoreflect.EnumType {
+	return &file_livekit_phone_number_proto_enumTypes[0]
+}
+
+func (x TelephonyCostType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TelephonyCostType.Descriptor instead.
+func (TelephonyCostType) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{0}
+}
+
 // Phone number status enumeration
 type PhoneNumberStatus int32
 
@@ -59,11 +118,11 @@ func (x PhoneNumberStatus) String() string {
 }
 
 func (PhoneNumberStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_phone_number_proto_enumTypes[0].Descriptor()
+	return file_livekit_phone_number_proto_enumTypes[1].Descriptor()
 }
 
 func (PhoneNumberStatus) Type() protoreflect.EnumType {
-	return &file_livekit_phone_number_proto_enumTypes[0]
+	return &file_livekit_phone_number_proto_enumTypes[1]
 }
 
 func (x PhoneNumberStatus) Number() protoreflect.EnumNumber {
@@ -72,7 +131,7 @@ func (x PhoneNumberStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PhoneNumberStatus.Descriptor instead.
 func (PhoneNumberStatus) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{0}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{1}
 }
 
 // ListPhoneNumberInventoryRequest - Request to list available phone numbers
@@ -563,36 +622,31 @@ func (x *GlobalPhoneNumber) GetUpdatedAt() int64 {
 	return 0
 }
 
-// PhoneNumberCost represents the pricing structure for a phone number
-type PhoneNumberCost struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	Currency string                 `protobuf:"bytes,1,opt,name=currency,proto3" json:"currency,omitempty"` // Currency code (e.g., "USD", "EUR")
-	// Monthly rental cost
-	MonthlyRental float64 `protobuf:"fixed64,2,opt,name=monthly_rental,json=monthlyRental,proto3" json:"monthly_rental,omitempty"` // Monthly rental cost (e.g., 10.00)
-	// Voice calling costs
-	VoiceCost        float64 `protobuf:"fixed64,3,opt,name=voice_cost,json=voiceCost,proto3" json:"voice_cost,omitempty"`                      // Voice cost per unit (e.g., 2.00)
-	VoiceBillingUnit string  `protobuf:"bytes,4,opt,name=voice_billing_unit,json=voiceBillingUnit,proto3" json:"voice_billing_unit,omitempty"` // Voice billing unit (e.g., "minute", "second", "call")
-	// SMS costs
-	SmsCost        float64 `protobuf:"fixed64,5,opt,name=sms_cost,json=smsCost,proto3" json:"sms_cost,omitempty"`                      // SMS cost per unit (e.g., 0.50)
-	SmsBillingUnit string  `protobuf:"bytes,6,opt,name=sms_billing_unit,json=smsBillingUnit,proto3" json:"sms_billing_unit,omitempty"` // SMS billing unit (e.g., "message", "character")
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+// TelephonyCost represents the pricing structure for a specific telephony service
+type TelephonyCost struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Resource      TelephonyCostType      `protobuf:"varint,1,opt,name=resource,proto3,enum=livekit.TelephonyCostType" json:"resource,omitempty"` // Type of telephony service
+	Currency      string                 `protobuf:"bytes,2,opt,name=currency,proto3" json:"currency,omitempty"`                                 // Currency code (e.g., "USD", "EUR")
+	Price         float64                `protobuf:"fixed64,3,opt,name=price,proto3" json:"price,omitempty"`                                     // Price for this service
+	BillingUnit   string                 `protobuf:"bytes,4,opt,name=billing_unit,json=billingUnit,proto3" json:"billing_unit,omitempty"`        // Billing unit (e.g., "month", "minute", "message", "call")
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PhoneNumberCost) Reset() {
-	*x = PhoneNumberCost{}
+func (x *TelephonyCost) Reset() {
+	*x = TelephonyCost{}
 	mi := &file_livekit_phone_number_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PhoneNumberCost) String() string {
+func (x *TelephonyCost) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PhoneNumberCost) ProtoMessage() {}
+func (*TelephonyCost) ProtoMessage() {}
 
-func (x *PhoneNumberCost) ProtoReflect() protoreflect.Message {
+func (x *TelephonyCost) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_phone_number_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -604,49 +658,35 @@ func (x *PhoneNumberCost) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PhoneNumberCost.ProtoReflect.Descriptor instead.
-func (*PhoneNumberCost) Descriptor() ([]byte, []int) {
+// Deprecated: Use TelephonyCost.ProtoReflect.Descriptor instead.
+func (*TelephonyCost) Descriptor() ([]byte, []int) {
 	return file_livekit_phone_number_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *PhoneNumberCost) GetCurrency() string {
+func (x *TelephonyCost) GetResource() TelephonyCostType {
+	if x != nil {
+		return x.Resource
+	}
+	return TelephonyCostType_TELEPHONY_COST_TYPE_UNSPECIFIED
+}
+
+func (x *TelephonyCost) GetCurrency() string {
 	if x != nil {
 		return x.Currency
 	}
 	return ""
 }
 
-func (x *PhoneNumberCost) GetMonthlyRental() float64 {
+func (x *TelephonyCost) GetPrice() float64 {
 	if x != nil {
-		return x.MonthlyRental
+		return x.Price
 	}
 	return 0
 }
 
-func (x *PhoneNumberCost) GetVoiceCost() float64 {
+func (x *TelephonyCost) GetBillingUnit() string {
 	if x != nil {
-		return x.VoiceCost
-	}
-	return 0
-}
-
-func (x *PhoneNumberCost) GetVoiceBillingUnit() string {
-	if x != nil {
-		return x.VoiceBillingUnit
-	}
-	return ""
-}
-
-func (x *PhoneNumberCost) GetSmsCost() float64 {
-	if x != nil {
-		return x.SmsCost
-	}
-	return 0
-}
-
-func (x *PhoneNumberCost) GetSmsBillingUnit() string {
-	if x != nil {
-		return x.SmsBillingUnit
+		return x.BillingUnit
 	}
 	return ""
 }
@@ -656,7 +696,7 @@ type PhoneNumberInventoryItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PhoneNumber   *GlobalPhoneNumber     `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // Common phone number fields
 	Capabilities  []string               `protobuf:"bytes,2,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                  // Comma-separated capabilities (e.g., "voice,sms")
-	Cost          *PhoneNumberCost       `protobuf:"bytes,3,opt,name=cost,proto3" json:"cost,omitempty"`                                  // Cost structure for this phone number
+	Costs         []*TelephonyCost       `protobuf:"bytes,3,rep,name=costs,proto3" json:"costs,omitempty"`                                // Array of costs for different services
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -705,9 +745,9 @@ func (x *PhoneNumberInventoryItem) GetCapabilities() []string {
 	return nil
 }
 
-func (x *PhoneNumberInventoryItem) GetCost() *PhoneNumberCost {
+func (x *PhoneNumberInventoryItem) GetCosts() []*TelephonyCost {
 	if x != nil {
-		return x.Cost
+		return x.Costs
 	}
 	return nil
 }
@@ -826,26 +866,30 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"created_at\x18\t \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\n" +
-	" \x01(\x03R\tupdatedAt\"\xe6\x01\n" +
-	"\x0fPhoneNumberCost\x12\x1a\n" +
-	"\bcurrency\x18\x01 \x01(\tR\bcurrency\x12%\n" +
-	"\x0emonthly_rental\x18\x02 \x01(\x01R\rmonthlyRental\x12\x1d\n" +
-	"\n" +
-	"voice_cost\x18\x03 \x01(\x01R\tvoiceCost\x12,\n" +
-	"\x12voice_billing_unit\x18\x04 \x01(\tR\x10voiceBillingUnit\x12\x19\n" +
-	"\bsms_cost\x18\x05 \x01(\x01R\asmsCost\x12(\n" +
-	"\x10sms_billing_unit\x18\x06 \x01(\tR\x0esmsBillingUnit\"\xab\x01\n" +
+	" \x01(\x03R\tupdatedAt\"\x9c\x01\n" +
+	"\rTelephonyCost\x126\n" +
+	"\bresource\x18\x01 \x01(\x0e2\x1a.livekit.TelephonyCostTypeR\bresource\x12\x1a\n" +
+	"\bcurrency\x18\x02 \x01(\tR\bcurrency\x12\x14\n" +
+	"\x05price\x18\x03 \x01(\x01R\x05price\x12!\n" +
+	"\fbilling_unit\x18\x04 \x01(\tR\vbillingUnit\"\xab\x01\n" +
 	"\x18PhoneNumberInventoryItem\x12=\n" +
 	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x12\"\n" +
 	"\fcapabilities\x18\x02 \x03(\tR\fcapabilities\x12,\n" +
-	"\x04cost\x18\x03 \x01(\v2\x18.livekit.PhoneNumberCostR\x04cost\"\xcb\x01\n" +
+	"\x05costs\x18\x03 \x03(\v2\x16.livekit.TelephonyCostR\x05costs\"\xcb\x01\n" +
 	"\x14PurchasedPhoneNumber\x12=\n" +
 	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x122\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x1a.livekit.PhoneNumberStatusR\x06status\x12\x1f\n" +
 	"\vassigned_at\x18\x03 \x01(\x03R\n" +
 	"assignedAt\x12\x1f\n" +
 	"\vreleased_at\x18\x04 \x01(\x03R\n" +
-	"releasedAt*\x9b\x01\n" +
+	"releasedAt*\xf9\x01\n" +
+	"\x11TelephonyCostType\x12#\n" +
+	"\x1fTELEPHONY_COST_TYPE_UNSPECIFIED\x10\x00\x12%\n" +
+	"!TELEPHONY_COST_TYPE_NUMBER_RENTAL\x10\x01\x12%\n" +
+	"!TELEPHONY_COST_TYPE_VOICE_INBOUND\x10\x02\x12&\n" +
+	"\"TELEPHONY_COST_TYPE_VOICE_OUTBOUND\x10\x03\x12#\n" +
+	"\x1fTELEPHONY_COST_TYPE_SMS_INBOUND\x10\x04\x12$\n" +
+	" TELEPHONY_COST_TYPE_SMS_OUTBOUND\x10\x05*\x9b\x01\n" +
 	"\x11PhoneNumberStatus\x12#\n" +
 	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aPHONE_NUMBER_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
@@ -869,44 +913,46 @@ func file_livekit_phone_number_proto_rawDescGZIP() []byte {
 	return file_livekit_phone_number_proto_rawDescData
 }
 
-var file_livekit_phone_number_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_phone_number_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_livekit_phone_number_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_livekit_phone_number_proto_goTypes = []any{
-	(PhoneNumberStatus)(0),                    // 0: livekit.PhoneNumberStatus
-	(*ListPhoneNumberInventoryRequest)(nil),   // 1: livekit.ListPhoneNumberInventoryRequest
-	(*ListPhoneNumberInventoryResponse)(nil),  // 2: livekit.ListPhoneNumberInventoryResponse
-	(*PurchasePhoneNumberRequest)(nil),        // 3: livekit.PurchasePhoneNumberRequest
-	(*PurchasePhoneNumberResponse)(nil),       // 4: livekit.PurchasePhoneNumberResponse
-	(*ListPurchasedPhoneNumbersRequest)(nil),  // 5: livekit.ListPurchasedPhoneNumbersRequest
-	(*ListPurchasedPhoneNumbersResponse)(nil), // 6: livekit.ListPurchasedPhoneNumbersResponse
-	(*ReleasePhoneNumberRequest)(nil),         // 7: livekit.ReleasePhoneNumberRequest
-	(*GlobalPhoneNumber)(nil),                 // 8: livekit.GlobalPhoneNumber
-	(*PhoneNumberCost)(nil),                   // 9: livekit.PhoneNumberCost
-	(*PhoneNumberInventoryItem)(nil),          // 10: livekit.PhoneNumberInventoryItem
-	(*PurchasedPhoneNumber)(nil),              // 11: livekit.PurchasedPhoneNumber
-	(*emptypb.Empty)(nil),                     // 12: google.protobuf.Empty
+	(TelephonyCostType)(0),                    // 0: livekit.TelephonyCostType
+	(PhoneNumberStatus)(0),                    // 1: livekit.PhoneNumberStatus
+	(*ListPhoneNumberInventoryRequest)(nil),   // 2: livekit.ListPhoneNumberInventoryRequest
+	(*ListPhoneNumberInventoryResponse)(nil),  // 3: livekit.ListPhoneNumberInventoryResponse
+	(*PurchasePhoneNumberRequest)(nil),        // 4: livekit.PurchasePhoneNumberRequest
+	(*PurchasePhoneNumberResponse)(nil),       // 5: livekit.PurchasePhoneNumberResponse
+	(*ListPurchasedPhoneNumbersRequest)(nil),  // 6: livekit.ListPurchasedPhoneNumbersRequest
+	(*ListPurchasedPhoneNumbersResponse)(nil), // 7: livekit.ListPurchasedPhoneNumbersResponse
+	(*ReleasePhoneNumberRequest)(nil),         // 8: livekit.ReleasePhoneNumberRequest
+	(*GlobalPhoneNumber)(nil),                 // 9: livekit.GlobalPhoneNumber
+	(*TelephonyCost)(nil),                     // 10: livekit.TelephonyCost
+	(*PhoneNumberInventoryItem)(nil),          // 11: livekit.PhoneNumberInventoryItem
+	(*PurchasedPhoneNumber)(nil),              // 12: livekit.PurchasedPhoneNumber
+	(*emptypb.Empty)(nil),                     // 13: google.protobuf.Empty
 }
 var file_livekit_phone_number_proto_depIdxs = []int32{
-	10, // 0: livekit.ListPhoneNumberInventoryResponse.items:type_name -> livekit.PhoneNumberInventoryItem
-	11, // 1: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PurchasedPhoneNumber
-	11, // 2: livekit.ListPurchasedPhoneNumbersResponse.items:type_name -> livekit.PurchasedPhoneNumber
-	8,  // 3: livekit.PhoneNumberInventoryItem.phone_number:type_name -> livekit.GlobalPhoneNumber
-	9,  // 4: livekit.PhoneNumberInventoryItem.cost:type_name -> livekit.PhoneNumberCost
-	8,  // 5: livekit.PurchasedPhoneNumber.phone_number:type_name -> livekit.GlobalPhoneNumber
-	0,  // 6: livekit.PurchasedPhoneNumber.status:type_name -> livekit.PhoneNumberStatus
-	1,  // 7: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
-	3,  // 8: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
-	5,  // 9: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
-	7,  // 10: livekit.PhoneNumberService.ReleasePhoneNumber:input_type -> livekit.ReleasePhoneNumberRequest
-	2,  // 11: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
-	4,  // 12: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
-	6,  // 13: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
-	12, // 14: livekit.PhoneNumberService.ReleasePhoneNumber:output_type -> google.protobuf.Empty
-	11, // [11:15] is the sub-list for method output_type
-	7,  // [7:11] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	11, // 0: livekit.ListPhoneNumberInventoryResponse.items:type_name -> livekit.PhoneNumberInventoryItem
+	12, // 1: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PurchasedPhoneNumber
+	12, // 2: livekit.ListPurchasedPhoneNumbersResponse.items:type_name -> livekit.PurchasedPhoneNumber
+	0,  // 3: livekit.TelephonyCost.resource:type_name -> livekit.TelephonyCostType
+	9,  // 4: livekit.PhoneNumberInventoryItem.phone_number:type_name -> livekit.GlobalPhoneNumber
+	10, // 5: livekit.PhoneNumberInventoryItem.costs:type_name -> livekit.TelephonyCost
+	9,  // 6: livekit.PurchasedPhoneNumber.phone_number:type_name -> livekit.GlobalPhoneNumber
+	1,  // 7: livekit.PurchasedPhoneNumber.status:type_name -> livekit.PhoneNumberStatus
+	2,  // 8: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
+	4,  // 9: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
+	6,  // 10: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
+	8,  // 11: livekit.PhoneNumberService.ReleasePhoneNumber:input_type -> livekit.ReleasePhoneNumberRequest
+	3,  // 12: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
+	5,  // 13: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
+	7,  // 14: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
+	13, // 15: livekit.PhoneNumberService.ReleasePhoneNumber:output_type -> google.protobuf.Empty
+	12, // [12:16] is the sub-list for method output_type
+	8,  // [8:12] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_livekit_phone_number_proto_init() }
@@ -919,7 +965,7 @@ func file_livekit_phone_number_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_phone_number_proto_rawDesc), len(file_livekit_phone_number_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
