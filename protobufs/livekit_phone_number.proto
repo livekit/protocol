@@ -5,6 +5,8 @@ package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "livekit_models.proto";
 import "livekit_sip.proto";
 
 // Telephony cost type enumeration
@@ -49,13 +51,13 @@ message ListPhoneNumberInventoryRequest {
   string country_code = 1;        // Optional: Filter by country code (e.g., "US", "CA")
   string area_code = 2;           // Optional: Filter by area code (e.g., "415")
   int32 limit = 3;                // Optional: Maximum number of results (default: 50)
-  string page_token = 4;          // Optional: Token for pagination (empty for first page)
+  TokenPagination page_token = 4;          // Optional: Token for pagination (empty for first page)
 }
 
 // ListPhoneNumberInventoryResponse - Response containing available phone numbers
 message ListPhoneNumberInventoryResponse {
   repeated PhoneNumberInventoryItem items = 1;  // List of available phone numbers
-  string next_page_token = 2;                   // Token for next page (empty if no more pages)
+  TokenPagination next_page_token = 2;                   // Token for next page (empty if no more pages)
 }
 
 // PurchasePhoneNumberRequest - Request to purchase phone numbers
@@ -71,13 +73,13 @@ message PurchasePhoneNumberResponse {
 // ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
 message ListPurchasedPhoneNumbersRequest {
   int32 limit = 1;                // Optional: Maximum number of results (default: 50)
-  string page_token = 2;          // Optional: Token for pagination (empty for first page)
+  TokenPagination page_token = 2;          // Optional: Token for pagination (empty for first page)
 }
 
 // ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
 message ListPurchasedPhoneNumbersResponse {
   repeated PurchasedPhoneNumber items = 1;  // List of purchased phone numbers
-  string next_page_token = 2;               // Token for next page (empty if no more pages)
+  TokenPagination next_page_token = 2;               // Token for next page (empty if no more pages)
   int32 total_count = 3;                    // Total number of purchased phone numbers
 }
 
@@ -96,8 +98,8 @@ message GlobalPhoneNumber {
   string locality = 6;            // City/locality (e.g., "San Francisco")
   string region = 7;              // State/region (e.g., "CA")
   int64 spam_score = 8;           // can be used later for fraud detection
-  int64 created_at = 9;           // timestamp when created
-  int64 updated_at = 10;          // timestamp when updated
+  google.protobuf.Timestamp created_at = 9;           // timestamp when created
+  google.protobuf.Timestamp updated_at = 10;          // timestamp when updated
 }
 
 // TelephonyCost represents the pricing structure for a specific telephony service
@@ -121,7 +123,7 @@ message PhoneNumberInventoryItem {
 message PurchasedPhoneNumber {
   GlobalPhoneNumber phone_number = 1;  // Common phone number fields
   PhoneNumberStatus status = 2;        // Current status of the phone number
-  int64 assigned_at = 3;               // Timestamp when the number was assigned
-  int64 released_at = 4;               // Timestamp when the number was released (if applicable)
+  google.protobuf.Timestamp assigned_at = 3;               // Timestamp when the number was assigned
+  google.protobuf.Timestamp released_at = 4;               // Timestamp when the number was released (if applicable)
   SIPDispatchRuleInfo sip_dispatch_rule = 5;  // Optional: Associated SIP dispatch rule
 }

@@ -28,6 +28,10 @@ message Pagination {
   int32  limit = 2;
 }
 
+message TokenPagination {
+  string token = 1;
+}
+
 // ListUpdate is used for updated APIs where 'repeated string' field is modified.
 message ListUpdate {
   repeated string set = 1; // set the field to a new list
