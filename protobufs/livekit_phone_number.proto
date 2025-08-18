@@ -5,6 +5,7 @@ package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
 
 import "google/protobuf/empty.proto";
+import "livekit_sip.proto";
 
 // Telephony cost type enumeration
 enum TelephonyCostType {
@@ -122,4 +123,5 @@ message PurchasedPhoneNumber {
   PhoneNumberStatus status = 2;        // Current status of the phone number
   int64 assigned_at = 3;               // Timestamp when the number was assigned
   int64 released_at = 4;               // Timestamp when the number was released (if applicable)
+  SIPDispatchRuleInfo sip_dispatch_rule = 5;  // Optional: Associated SIP dispatch rule
 }
