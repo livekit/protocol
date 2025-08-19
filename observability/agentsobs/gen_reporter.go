@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_P0N4MSO = true
+const Version_IVKIM4G = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -57,6 +57,7 @@ type WorkerReporter interface {
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportStartTime(v time.Time)
+	ReportEndTime(v time.Time)
 	ReportJobsCurrent(v uint32)
 	ReportLive(v uint8)
 	ReportCPU(v int64)
@@ -73,6 +74,7 @@ type WorkerTx interface {
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportStartTime(v time.Time)
+	ReportEndTime(v time.Time)
 	ReportJobsCurrent(v uint32)
 	ReportLive(v uint8)
 	ReportCPU(v int64)

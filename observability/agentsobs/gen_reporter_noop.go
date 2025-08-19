@@ -94,6 +94,7 @@ func (r *noopWorkerReporter) TxAt(ts time.Time, f func(WorkerTx))               
 func (r *noopWorkerReporter) ReportLoad(v float32)                                {}
 func (r *noopWorkerReporter) ReportStatus(v WorkerStatus)                         {}
 func (r *noopWorkerReporter) ReportStartTime(v time.Time)                         {}
+func (r *noopWorkerReporter) ReportEndTime(v time.Time)                           {}
 func (r *noopWorkerReporter) ReportJobsCurrent(v uint32)                          {}
 func (r *noopWorkerReporter) ReportLive(v uint8)                                  {}
 func (r *noopWorkerReporter) ReportCPU(v int64)                                   {}
