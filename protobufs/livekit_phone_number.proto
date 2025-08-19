@@ -97,7 +97,7 @@ message GlobalPhoneNumber {
   string number_type  = 5;        // e.g., local, toll-free, national, mobile
   string locality = 6;            // City/locality (e.g., "San Francisco")
   string region = 7;              // State/region (e.g., "CA")
-  int64 spam_score = 8;           // can be used later for fraud detection
+  double spam_score = 8;          // can be used later for fraud detection
   google.protobuf.Timestamp created_at = 9;           // timestamp when created
   google.protobuf.Timestamp updated_at = 10;          // timestamp when updated
 }
