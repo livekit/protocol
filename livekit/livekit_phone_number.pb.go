@@ -516,7 +516,7 @@ type GlobalPhoneNumber struct {
 	NumberType    string                 `protobuf:"bytes,5,opt,name=number_type,json=numberType,proto3" json:"number_type,omitempty"`    // e.g., local, toll-free, national, mobile
 	Locality      string                 `protobuf:"bytes,6,opt,name=locality,proto3" json:"locality,omitempty"`                          // City/locality (e.g., "San Francisco")
 	Region        string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`                              // State/region (e.g., "CA")
-	SpamScore     int64                  `protobuf:"varint,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`      // can be used later for fraud detection
+	SpamScore     float64                `protobuf:"fixed64,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`     // can be used later for fraud detection
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`       // timestamp when created
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`      // timestamp when updated
 	unknownFields protoimpl.UnknownFields
@@ -602,7 +602,7 @@ func (x *GlobalPhoneNumber) GetRegion() string {
 	return ""
 }
 
-func (x *GlobalPhoneNumber) GetSpamScore() int64 {
+func (x *GlobalPhoneNumber) GetSpamScore() float64 {
 	if x != nil {
 		return x.SpamScore
 	}
@@ -870,7 +870,7 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\blocality\x18\x06 \x01(\tR\blocality\x12\x16\n" +
 	"\x06region\x18\a \x01(\tR\x06region\x12\x1d\n" +
 	"\n" +
-	"spam_score\x18\b \x01(\x03R\tspamScore\x129\n" +
+	"spam_score\x18\b \x01(\x01R\tspamScore\x129\n" +
 	"\n" +
 	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
