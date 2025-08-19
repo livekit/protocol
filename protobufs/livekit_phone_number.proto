@@ -83,9 +83,9 @@ message ListPurchasedPhoneNumbersResponse {
   int32 total_count = 3;                    // Total number of purchased phone numbers
 }
 
-// ReleasePhoneNumberRequest - Request to release a purchased phone number
+// ReleasePhoneNumberRequest - Request to release purchased phone numbers
 message ReleasePhoneNumberRequest {
-  string phone_number = 1;        // Phone number to release (e.g., "+1234567890")
+  repeated string phone_numbers = 1;  // Phone numbers to release (e.g., ["+1234567890", "+1234567891"])
 }
 
 // GlobalPhoneNumber represents a phone number with standardized format
