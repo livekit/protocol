@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+package livekit;
+
+option go_package = "github.com/livekit/protocol/livekit";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "livekit_models.proto";
+import "livekit_sip.proto";
+
+// Telephony cost type enumeration
+enum TelephonyCostType {
+  TELEPHONY_COST_TYPE_UNSPECIFIED = 0;   // Default value
+  TELEPHONY_COST_TYPE_NUMBER_RENTAL = 1; // Monthly rental for the phone number
+  TELEPHONY_COST_TYPE_VOICE_INBOUND = 2; // Inbound voice calls
+  TELEPHONY_COST_TYPE_VOICE_OUTBOUND = 3; // Outbound voice calls
+  TELEPHONY_COST_TYPE_SMS_INBOUND = 4;   // Inbound SMS
+  TELEPHONY_COST_TYPE_SMS_OUTBOUND = 5;  // Outbound SMS
+}
+
+// Phone number status enumeration
+enum PhoneNumberStatus {
+  PHONE_NUMBER_STATUS_UNSPECIFIED = 0;  // Default value
+  PHONE_NUMBER_STATUS_ACTIVE = 1;       // Number is active and ready for use
+  PHONE_NUMBER_STATUS_PENDING = 2;      // Number is being provisioned
+  PHONE_NUMBER_STATUS_RELEASED = 3;     // Number has been released
+}
+
+// Public Phone Number Service - External API for phone number management
+service PhoneNumberService {
+  // List available phone numbers in inventory
+  rpc ListPhoneNumberInventory(ListPhoneNumberInventoryRequest)
+      returns (ListPhoneNumberInventoryResponse) {}
+  
+  // Purchase a phone number from inventory
+  rpc PurchasePhoneNumber(PurchasePhoneNumberRequest)
+      returns (PurchasePhoneNumberResponse) {}
+  
+  // List purchased phone numbers for a project
+  rpc ListPurchasedPhoneNumbers(ListPurchasedPhoneNumbersRequest)
+      returns (ListPurchasedPhoneNumbersResponse) {}
+  
+  // Release a purchased phone number
+  rpc ReleasePhoneNumber(ReleasePhoneNumberRequest)
+      returns (google.protobuf.Empty) {}
+}
+
+// ListPhoneNumberInventoryRequest - Request to list available phone numbers
+message ListPhoneNumberInventoryRequest {
+  string country_code = 1;        // Optional: Filter by country code (e.g., "US", "CA")
+  string area_code = 2;           // Optional: Filter by area code (e.g., "415")
+  int32 limit = 3;                // Optional: Maximum number of results (default: 50)
+  TokenPagination page_token = 4;          // Optional: Token for pagination (empty for first page)
+}
+
+// ListPhoneNumberInventoryResponse - Response containing available phone numbers
+message ListPhoneNumberInventoryResponse {
+  repeated PhoneNumberInventoryItem items = 1;  // List of available phone numbers
+  TokenPagination next_page_token = 2;                   // Token for next page (empty if no more pages)
+}
+
+// PurchasePhoneNumberRequest - Request to purchase phone numbers
+message PurchasePhoneNumberRequest {
+  repeated string phone_numbers = 1;  // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
+}
+
+// PurchasePhoneNumberResponse - Response containing the purchased phone numbers
+message PurchasePhoneNumberResponse {
+  repeated PurchasedPhoneNumber phone_numbers = 1;  // Details of the purchased phone numbers
+}
+
+// ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
+message ListPurchasedPhoneNumbersRequest {
+  int32 limit = 1;                // Optional: Maximum number of results (default: 50)
+  TokenPagination page_token = 2;          // Optional: Token for pagination (empty for first page)
+}
+
+// ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
+message ListPurchasedPhoneNumbersResponse {
+  repeated PurchasedPhoneNumber items = 1;  // List of purchased phone numbers
+  TokenPagination next_page_token = 2;               // Token for next page (empty if no more pages)
+  int32 total_count = 3;                    // Total number of purchased phone numbers
+}
+
+// ReleasePhoneNumberRequest - Request to release purchased phone numbers
+message ReleasePhoneNumberRequest {
+  repeated string phone_numbers = 1;  // Phone numbers to release (e.g., ["+1234567890", "+1234567891"])
+}
+
+// GlobalPhoneNumber represents a phone number with standardized format
+message GlobalPhoneNumber {
+  string id = 1;                  // unique identifier
+  string e164_format = 2;         // e.g., "+14155552671"
+  string country_code = 3;        // e.g., "US"
+  string area_code = 4;           // e.g., "415"
+  string number_type  = 5;        // e.g., local, toll-free, national, mobile
+  string locality = 6;            // City/locality (e.g., "San Francisco")
+  string region = 7;              // State/region (e.g., "CA")
+  double spam_score = 8;          // can be used later for fraud detection
+  google.protobuf.Timestamp created_at = 9;           // timestamp when created
+  google.protobuf.Timestamp updated_at = 10;          // timestamp when updated
+}
+
+// TelephonyCost represents the pricing structure for a specific telephony service
+message TelephonyCost {
+  TelephonyCostType resource = 1;       // Type of telephony service
+  string currency = 2;                  // Currency code (e.g., "USD", "EUR")
+  double price = 3;                     // Price for this service
+  string billing_unit = 4;              // Billing unit (e.g., "month", "minute", "message", "call")
+}
+
+
+
+// PhoneNumberInventoryItem - Represents an available phone number for purchase
+message PhoneNumberInventoryItem {
+  GlobalPhoneNumber phone_number = 1;     // Common phone number fields
+  repeated string capabilities = 2;       // Comma-separated capabilities (e.g., "voice,sms")
+  repeated TelephonyCost costs = 3;       // Array of costs for different services
+}
+
+// PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
+message PurchasedPhoneNumber {
+  GlobalPhoneNumber phone_number = 1;  // Common phone number fields
+  PhoneNumberStatus status = 2;        // Current status of the phone number
+  google.protobuf.Timestamp assigned_at = 3;               // Timestamp when the number was assigned
+  google.protobuf.Timestamp released_at = 4;               // Timestamp when the number was released (if applicable)
+  SIPDispatchRuleInfo sip_dispatch_rule = 5;  // Optional: Associated SIP dispatch rule
+}
