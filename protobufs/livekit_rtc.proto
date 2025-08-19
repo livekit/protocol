@@ -118,8 +118,9 @@ enum SignalTarget {
 message SimulcastCodec {
   string codec = 1;
   string cid = 2;
+  repeated VideoLayer layers = 4;
 
-  // NEXT-ID: 4
+  // NEXT-ID: 5
 }
 
 message AddTrackRequest {
@@ -496,6 +497,7 @@ message JoinRequest {
   bool reconnect = 7;
   ReconnectReason reconnect_reason = 8;
   string participant_sid = 9;
+  SyncState sync_state = 10;
 }
 
 message WrappedJoinRequest {
