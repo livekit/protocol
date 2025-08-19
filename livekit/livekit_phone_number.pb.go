@@ -461,10 +461,10 @@ func (x *ListPurchasedPhoneNumbersResponse) GetTotalCount() int32 {
 	return 0
 }
 
-// ReleasePhoneNumberRequest - Request to release a purchased phone number
+// ReleasePhoneNumberRequest - Request to release purchased phone numbers
 type ReleasePhoneNumberRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumber   string                 `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // Phone number to release (e.g., "+1234567890")
+	PhoneNumbers  []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Phone numbers to release (e.g., ["+1234567890", "+1234567891"])
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -499,11 +499,11 @@ func (*ReleasePhoneNumberRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_phone_number_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ReleasePhoneNumberRequest) GetPhoneNumber() string {
+func (x *ReleasePhoneNumberRequest) GetPhoneNumbers() []string {
 	if x != nil {
-		return x.PhoneNumber
+		return x.PhoneNumbers
 	}
-	return ""
+	return nil
 }
 
 // GlobalPhoneNumber represents a phone number with standardized format
@@ -856,9 +856,9 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x05items\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\x05items\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\">\n" +
-	"\x19ReleasePhoneNumberRequest\x12!\n" +
-	"\fphone_number\x18\x01 \x01(\tR\vphoneNumber\"\xee\x02\n" +
+	"totalCount\"@\n" +
+	"\x19ReleasePhoneNumberRequest\x12#\n" +
+	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\"\xee\x02\n" +
 	"\x11GlobalPhoneNumber\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\ve164_format\x18\x02 \x01(\tR\n" +
