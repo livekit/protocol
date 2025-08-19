@@ -49,6 +49,7 @@ const (
 	WHIPResourcePrefix      = "WH_"
 	RTMPResourcePrefix      = "RT_"
 	URLResourcePrefix       = "UR_"
+	SIPHostnamePrefix       = "SH"
 	AgentPrefix             = "A_"
 	AgentWorkerPrefix       = "AW_"
 	AgentJobPrefix          = "AJ_"
