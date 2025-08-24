@@ -107,6 +107,8 @@ message SignalResponse {
     TrackSubscribed track_subscribed = 23;
     // notify to the participant when they have been moved to a new room
     RoomMovedResponse room_moved = 24;
+    // notify number of required media sections to satisfy subscribed tracks
+    MediaSectionsRequirement media_sections_requirement = 25;
   }
 }
 
@@ -378,14 +380,16 @@ message RoomMovedResponse {
 
 message SyncState {
   // last subscribe answer before reconnecting
-  SessionDescription answer = 1;
+  SessionDescription subscriber_answer = 1;
   UpdateSubscription subscription = 2;
   repeated TrackPublishedResponse publish_tracks = 3;
   repeated DataChannelInfo data_channels = 4;
   // last received server side offer before reconnecting
-  SessionDescription offer = 5;
+  SessionDescription subscriber_offer = 5;
   repeated string track_sids_disabled = 6;
   repeated DataChannelReceiveState datachannel_receive_states = 7;
+  SessionDescription publisher_offer = 8;
+  SessionDescription publisher_answer = 9;
 }
 
 message DataChannelReceiveState {
@@ -508,4 +512,9 @@ message WrappedJoinRequest {
 
   Compression compression = 1;
   bytes join_request = 2;   // marshalled JoinRequest + potentially compressed
+}
+
+message MediaSectionsRequirement {
+  uint32 num_audios = 1;
+  uint32 num_videos = 2;
 }

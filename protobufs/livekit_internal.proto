@@ -181,6 +181,7 @@ message StartSession {
   repeated livekit.AddTrackRequest add_track_requests = 21;
   SessionDescription publisher_offer = 22;
   SyncState sync_state = 23;
+  bool use_single_peer_connection = 24;
 }
 
 // room info that should not be returned to clients
