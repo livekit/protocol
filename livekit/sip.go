@@ -95,6 +95,23 @@ func (p *SIPStatus) TwirpErrorMeta() map[string]string {
 	}
 }
 
+// Name returns a lower-case short name for the transport.
+// It returns an empty string if transport is not specified.
+func (p SIPTransport) Name() string {
+	switch p {
+	case SIPTransport_SIP_TRANSPORT_AUTO:
+		return ""
+	case SIPTransport_SIP_TRANSPORT_UDP:
+		return "udp"
+	case SIPTransport_SIP_TRANSPORT_TCP:
+		return "tcp"
+	case SIPTransport_SIP_TRANSPORT_TLS:
+		return "tls"
+	default:
+		return strings.TrimPrefix(p.String(), "SIP_TRANSPORT_")
+	}
+}
+
 // ToProto implements DataPacket in Go SDK.
 func (p *SipDTMF) ToProto() *DataPacket {
 	return &DataPacket{
