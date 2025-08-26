@@ -14,36 +14,47 @@
 
 package tracer
 
-import "context"
+import (
+	"context"
 
-type Tracer interface {
-	Start(ctx context.Context, spanName string, opts ...interface{}) (context.Context, Span)
-}
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
+)
 
-type Span interface {
-	RecordError(err error)
-	End()
-}
+type TracerProvider = trace.TracerProvider
 
-var tracer Tracer = &NoOpTracer{}
+type Tracer = trace.Tracer
 
-// Can be used for your own tracing (for example, with Lightstep)
+type Span = trace.Span
+
+var globalTracer Tracer
+
+// SetTracer can be used for your own tracing (for example, with Lightstep).
+//
+// Deprecated: Use otel.SetTracerProvider.
 func SetTracer(t Tracer) {
-	tracer = t
+	globalTracer = t
 }
 
-func Start(ctx context.Context, spanName string, opts ...interface{}) (context.Context, Span) {
-	return tracer.Start(ctx, spanName, opts...)
+// Start a new span.
+//
+// Deprecated: Use otel.Tracer for your service, and call Start on it instead.
+func Start(ctx context.Context, spanName string, opts ...any) (context.Context, Span) {
+	tracer := globalTracer
+	if tracer == nil {
+		tracer = otel.Tracer("legacy")
+	}
+	var sopts []trace.SpanStartOption
+	for _, opt := range opts {
+		switch opt := opt.(type) {
+		case trace.SpanStartOption:
+			sopts = append(sopts, opt)
+		}
+	}
+	return tracer.Start(ctx, spanName, sopts...)
 }
 
-type NoOpTracer struct{}
+type NoOpTracer = noop.Tracer
 
-func (t *NoOpTracer) Start(ctx context.Context, _ string, _ ...interface{}) (context.Context, Span) {
-	return ctx, &NoOpSpan{}
-}
-
-type NoOpSpan struct{}
-
-func (s *NoOpSpan) RecordError(_ error) {}
-
-func (s *NoOpSpan) End() {}
+type NoOpSpan = noop.Span
