@@ -314,7 +314,6 @@ message EncryptedPacket {
 message EncryptedPacketPayload {
   oneof value {
     UserPacket user = 1;
-    MetricsBatch metrics = 2;
     ChatMessage chat_message = 3;
     RpcRequest rpc_request = 4;
     RpcAck rpc_ack = 5;
@@ -322,6 +321,8 @@ message EncryptedPacketPayload {
     DataStream.Header stream_header = 7;
     DataStream.Chunk stream_chunk = 8;
     DataStream.Trailer stream_trailer = 9;
+
+    // NEXT_ID: 10
   }
 }
 
