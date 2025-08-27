@@ -19,11 +19,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/logger"
-	"github.com/livekit/protocol/utils/must"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
+	"github.com/livekit/psrpc/pkg/middleware/otelpsrpc"
+
+	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/tracer"
+	"github.com/livekit/protocol/utils/must"
 )
 
 type PSRPCConfig struct {
@@ -42,9 +45,11 @@ var DefaultPSRPCConfig = PSRPCConfig{
 
 type ClientParams struct {
 	PSRPCConfig
-	Bus      psrpc.MessageBus
-	Logger   logger.Logger
-	Observer middleware.MetricsObserver
+	Bus            psrpc.MessageBus
+	Logger         logger.Logger
+	TracerProvider tracer.TracerProvider // will use default if unset
+	Observer       middleware.MetricsObserver
+	ClientOptions  []psrpc.ClientOption
 }
 
 func NewClientParams(
@@ -52,12 +57,14 @@ func NewClientParams(
 	bus psrpc.MessageBus,
 	logger logger.Logger,
 	observer middleware.MetricsObserver,
+	opts ...psrpc.ClientOption,
 ) ClientParams {
 	return ClientParams{
-		PSRPCConfig: config,
-		Bus:         bus,
-		Logger:      logger,
-		Observer:    observer,
+		PSRPCConfig:   config,
+		Bus:           bus,
+		Logger:        logger,
+		Observer:      observer,
+		ClientOptions: opts,
 	}
 }
 
@@ -79,6 +86,10 @@ func (p *ClientParams) Options() []psrpc.ClientOption {
 			Backoff:     p.Backoff,
 		}))
 	}
+	opts = append(opts, otelpsrpc.ClientOptions(otelpsrpc.Config{
+		TracerProvider: p.TracerProvider,
+	}))
+	opts = append(opts, p.ClientOptions...)
 	return opts
 }
 
@@ -90,21 +101,33 @@ func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
 	return psrpc.WithServerOptions(
 		middleware.WithServerMetrics(PSRPCMetricsObserver{}),
 		WithServerLogger(logger),
+		otelpsrpc.ServerOptions(otelpsrpc.Config{}),
 	)
 }
 
-func WithDefaultServerOptions(psrpcConfig PSRPCConfig, logger logger.Logger) psrpc.ServerOption {
-	return psrpc.WithServerOptions(
+func WithDefaultServerOptions(psrpcConfig PSRPCConfig, logger logger.Logger, extra ...psrpc.ServerOption) psrpc.ServerOption {
+	opts := []psrpc.ServerOption{
 		psrpc.WithServerChannelSize(psrpcConfig.BufferSize),
 		WithServerObservability(logger),
-	)
+	}
+	opts = append(opts, extra...)
+	return psrpc.WithServerOptions(opts...)
 }
 
 func WithClientObservability(logger logger.Logger) psrpc.ClientOption {
 	return psrpc.WithClientOptions(
 		middleware.WithClientMetrics(PSRPCMetricsObserver{}),
 		WithClientLogger(logger),
+		otelpsrpc.ClientOptions(otelpsrpc.Config{}),
 	)
+}
+
+func WithDefaultClientOptions(logger logger.Logger, extra ...psrpc.ClientOption) psrpc.ClientOption {
+	opts := []psrpc.ClientOption{
+		WithClientObservability(logger),
+	}
+	opts = append(opts, extra...)
+	return psrpc.WithClientOptions(opts...)
 }
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
