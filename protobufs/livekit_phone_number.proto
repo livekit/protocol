@@ -165,5 +165,5 @@ message PurchasedPhoneNumber {
   PhoneNumberStatus status = 3;        // Current status of the phone number
   google.protobuf.Timestamp assigned_at = 4;               // Timestamp when the number was assigned
   google.protobuf.Timestamp released_at = 5;               // Timestamp when the number was released (if applicable)
-  SIPDispatchRuleInfo sip_dispatch_rule = 6;  // Optional: Associated SIP dispatch rule
+  string sip_dispatch_rule_id  = 6;  // Optional: Associated SIP dispatch rule
 }
