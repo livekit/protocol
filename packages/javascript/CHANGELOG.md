@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 2.0.0
+
+### Minor Changes
+
+- Add encryption metadata for data packets - [#1127](https://github.com/livekit/protocol/pull/1127) ([@lukasIO](https://github.com/lukasIO))
+
+### Patch Changes
+
+- Add SIPHostnamePrefix - [#1155](https://github.com/livekit/protocol/pull/1155) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- update agents observability codegen - [#1173](https://github.com/livekit/protocol/pull/1173) ([@paulwe](https://github.com/paulwe))
+
 ## 1.40.0
 
 ### Patch Changes
