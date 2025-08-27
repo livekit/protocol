@@ -4,7 +4,6 @@ package livekit;
 
 option go_package = "github.com/livekit/protocol/livekit";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_sip.proto";
@@ -32,18 +31,26 @@ service PhoneNumberService {
   // List available phone numbers in inventory
   rpc ListPhoneNumberInventory(ListPhoneNumberInventoryRequest)
       returns (ListPhoneNumberInventoryResponse) {}
-  
+
   // Purchase a phone number from inventory
   rpc PurchasePhoneNumber(PurchasePhoneNumberRequest)
       returns (PurchasePhoneNumberResponse) {}
-  
+
   // List purchased phone numbers for a project
   rpc ListPurchasedPhoneNumbers(ListPurchasedPhoneNumbersRequest)
       returns (ListPurchasedPhoneNumbersResponse) {}
-  
+
+  // Get a purchased phone number
+  rpc GetPurchasedPhoneNumber(GetPurchasedPhoneNumberRequest)
+      returns (GetPurchasedPhoneNumberResponse) {}
+
+  // Update a purchased phone number
+  rpc UpdatePurchasedPhoneNumber(UpdatePurchasedPhoneNumberRequest)
+      returns (UpdatePurchasedPhoneNumberResponse) {}
+
   // Release a purchased phone number
-  rpc ReleasePhoneNumber(ReleasePhoneNumberRequest)
-      returns (google.protobuf.Empty) {}
+  rpc ReleasePurchasedPhoneNumber(ReleasePurchasedPhoneNumbersRequest)
+      returns (ReleasePurchasedPhoneNumbersResponse) {}
 }
 
 // ListPhoneNumberInventoryRequest - Request to list available phone numbers
@@ -63,6 +70,7 @@ message ListPhoneNumberInventoryResponse {
 // PurchasePhoneNumberRequest - Request to purchase phone numbers
 message PurchasePhoneNumberRequest {
   repeated string phone_numbers = 1;  // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
+  string sip_dispatch_rule_id = 2;    // Optional: SIP dispatch rule ID to apply to all purchased numbers
 }
 
 // PurchasePhoneNumberResponse - Response containing the purchased phone numbers
@@ -73,7 +81,9 @@ message PurchasePhoneNumberResponse {
 // ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
 message ListPurchasedPhoneNumbersRequest {
   int32 limit = 1;                // Optional: Maximum number of results (default: 50)
-  TokenPagination page_token = 2;          // Optional: Token for pagination (empty for first page)
+  PhoneNumberStatus status = 2;            // Optional: Filter by status (active, pending, released)
+  TokenPagination page_token = 3;          // Optional: Token for pagination (empty for first page)
+  string sip_dispatch_rule_id = 4;         // Optional: Filter by SIP dispatch rule ID
 }
 
 // ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
@@ -83,9 +93,38 @@ message ListPurchasedPhoneNumbersResponse {
   int32 total_count = 3;                    // Total number of purchased phone numbers
 }
 
-// ReleasePhoneNumberRequest - Request to release purchased phone numbers
-message ReleasePhoneNumberRequest {
-  repeated string phone_numbers = 1;  // Phone numbers to release (e.g., ["+1234567890", "+1234567891"])
+// GetPurchasedPhoneNumberRequest - Request to get a purchased phone number
+message GetPurchasedPhoneNumberRequest {
+  string purchased_phone_number_id = 1;  // Optional: Use purchased phone number ID for direct lookup
+  string phone_number = 2;               // Optional: Use phone number string for lookup
+}
+
+// GetPurchasedPhoneNumberResponse - Response containing the purchased phone number
+message GetPurchasedPhoneNumberResponse {
+  PurchasedPhoneNumber phone_number = 1;  // The purchased phone number details
+}
+
+// UpdatePurchasedPhoneNumberRequest - Request to update a purchased phone number
+message UpdatePurchasedPhoneNumberRequest {
+  string purchased_phone_number_id = 1;  // Optional: Use purchased phone number ID for direct lookup
+  string phone_number = 2;               // Optional: Use phone number string for lookup
+  string sip_dispatch_rule_id = 3;       // Optional: SIP dispatch rule ID to assign to the phone number
+}
+
+// UpdatePurchasedPhoneNumberResponse - Response containing the updated purchased phone number
+message UpdatePurchasedPhoneNumberResponse {
+  PurchasedPhoneNumber phone_number = 1;  // The updated purchased phone number details
+}
+
+// ReleasePurchasedPhoneNumbersRequest - Request to release purchased phone numbers
+message ReleasePurchasedPhoneNumbersRequest {
+  repeated string purchased_phone_number_ids = 1;  // Optional: Use purchased phone number IDs for direct lookup
+  repeated string phone_numbers = 2;               // Optional: Use phone number strings for lookup
+}
+
+// ReleasePurchasedPhoneNumbersResponse - Response for releasing purchased phone numbers
+message ReleasePurchasedPhoneNumbersResponse {
+  // Empty response - operation completed successfully
 }
 
 // GlobalPhoneNumber represents a phone number with standardized format
@@ -121,9 +160,10 @@ message PhoneNumberInventoryItem {
 
 // PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
 message PurchasedPhoneNumber {
-  GlobalPhoneNumber phone_number = 1;  // Common phone number fields
-  PhoneNumberStatus status = 2;        // Current status of the phone number
-  google.protobuf.Timestamp assigned_at = 3;               // Timestamp when the number was assigned
-  google.protobuf.Timestamp released_at = 4;               // Timestamp when the number was released (if applicable)
-  SIPDispatchRuleInfo sip_dispatch_rule = 5;  // Optional: Associated SIP dispatch rule
+  string purchased_phone_number_id = 1;  // Unique identifier for the purchased phone number
+  GlobalPhoneNumber phone_number = 2;  // Common phone number fields
+  PhoneNumberStatus status = 3;        // Current status of the phone number
+  google.protobuf.Timestamp assigned_at = 4;               // Timestamp when the number was assigned
+  google.protobuf.Timestamp released_at = 5;               // Timestamp when the number was released (if applicable)
+  SIPDispatchRuleInfo sip_dispatch_rule = 6;  // Optional: Associated SIP dispatch rule
 }
