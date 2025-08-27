@@ -1033,7 +1033,7 @@ type PurchasedPhoneNumber struct {
 	Status                 PhoneNumberStatus      `protobuf:"varint,3,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                                   // Current status of the phone number
 	AssignedAt             *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                                         // Timestamp when the number was assigned
 	ReleasedAt             *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                                         // Timestamp when the number was released (if applicable)
-	SipDispatchRule        *SIPDispatchRuleInfo   `protobuf:"bytes,6,opt,name=sip_dispatch_rule,json=sipDispatchRule,proto3" json:"sip_dispatch_rule,omitempty"`                        // Optional: Associated SIP dispatch rule
+	SipDispatchRuleId      string                 `protobuf:"bytes,6,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`                // Optional: Associated SIP dispatch rule
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -1103,11 +1103,11 @@ func (x *PurchasedPhoneNumber) GetReleasedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *PurchasedPhoneNumber) GetSipDispatchRule() *SIPDispatchRuleInfo {
+func (x *PurchasedPhoneNumber) GetSipDispatchRuleId() string {
 	if x != nil {
-		return x.SipDispatchRule
+		return x.SipDispatchRuleId
 	}
-	return nil
+	return ""
 }
 
 var File_livekit_phone_number_proto protoreflect.FileDescriptor
@@ -1180,7 +1180,7 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x18PhoneNumberInventoryItem\x12=\n" +
 	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x12\"\n" +
 	"\fcapabilities\x18\x02 \x03(\tR\fcapabilities\x12,\n" +
-	"\x05costs\x18\x03 \x03(\v2\x16.livekit.TelephonyCostR\x05costs\"\x88\x03\n" +
+	"\x05costs\x18\x03 \x03(\v2\x16.livekit.TelephonyCostR\x05costs\"\xef\x02\n" +
 	"\x14PurchasedPhoneNumber\x129\n" +
 	"\x19purchased_phone_number_id\x18\x01 \x01(\tR\x16purchasedPhoneNumberId\x12=\n" +
 	"\fphone_number\x18\x02 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x122\n" +
@@ -1188,8 +1188,8 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\vassigned_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"assignedAt\x12;\n" +
 	"\vreleased_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"releasedAt\x12H\n" +
-	"\x11sip_dispatch_rule\x18\x06 \x01(\v2\x1c.livekit.SIPDispatchRuleInfoR\x0fsipDispatchRule*\xf9\x01\n" +
+	"releasedAt\x12/\n" +
+	"\x14sip_dispatch_rule_id\x18\x06 \x01(\tR\x11sipDispatchRuleId*\xf9\x01\n" +
 	"\x11TelephonyCostType\x12#\n" +
 	"\x1fTELEPHONY_COST_TYPE_UNSPECIFIED\x10\x00\x12%\n" +
 	"!TELEPHONY_COST_TYPE_NUMBER_RENTAL\x10\x01\x12%\n" +
@@ -1245,7 +1245,6 @@ var file_livekit_phone_number_proto_goTypes = []any{
 	(*PurchasedPhoneNumber)(nil),                 // 17: livekit.PurchasedPhoneNumber
 	(*TokenPagination)(nil),                      // 18: livekit.TokenPagination
 	(*timestamppb.Timestamp)(nil),                // 19: google.protobuf.Timestamp
-	(*SIPDispatchRuleInfo)(nil),                  // 20: livekit.SIPDispatchRuleInfo
 }
 var file_livekit_phone_number_proto_depIdxs = []int32{
 	18, // 0: livekit.ListPhoneNumberInventoryRequest.page_token:type_name -> livekit.TokenPagination
@@ -1267,24 +1266,23 @@ var file_livekit_phone_number_proto_depIdxs = []int32{
 	1,  // 16: livekit.PurchasedPhoneNumber.status:type_name -> livekit.PhoneNumberStatus
 	19, // 17: livekit.PurchasedPhoneNumber.assigned_at:type_name -> google.protobuf.Timestamp
 	19, // 18: livekit.PurchasedPhoneNumber.released_at:type_name -> google.protobuf.Timestamp
-	20, // 19: livekit.PurchasedPhoneNumber.sip_dispatch_rule:type_name -> livekit.SIPDispatchRuleInfo
-	2,  // 20: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
-	4,  // 21: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
-	6,  // 22: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
-	8,  // 23: livekit.PhoneNumberService.GetPurchasedPhoneNumber:input_type -> livekit.GetPurchasedPhoneNumberRequest
-	10, // 24: livekit.PhoneNumberService.UpdatePurchasedPhoneNumber:input_type -> livekit.UpdatePurchasedPhoneNumberRequest
-	12, // 25: livekit.PhoneNumberService.ReleasePurchasedPhoneNumber:input_type -> livekit.ReleasePurchasedPhoneNumbersRequest
-	3,  // 26: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
-	5,  // 27: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
-	7,  // 28: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
-	9,  // 29: livekit.PhoneNumberService.GetPurchasedPhoneNumber:output_type -> livekit.GetPurchasedPhoneNumberResponse
-	11, // 30: livekit.PhoneNumberService.UpdatePurchasedPhoneNumber:output_type -> livekit.UpdatePurchasedPhoneNumberResponse
-	13, // 31: livekit.PhoneNumberService.ReleasePurchasedPhoneNumber:output_type -> livekit.ReleasePurchasedPhoneNumbersResponse
-	26, // [26:32] is the sub-list for method output_type
-	20, // [20:26] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	2,  // 19: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
+	4,  // 20: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
+	6,  // 21: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
+	8,  // 22: livekit.PhoneNumberService.GetPurchasedPhoneNumber:input_type -> livekit.GetPurchasedPhoneNumberRequest
+	10, // 23: livekit.PhoneNumberService.UpdatePurchasedPhoneNumber:input_type -> livekit.UpdatePurchasedPhoneNumberRequest
+	12, // 24: livekit.PhoneNumberService.ReleasePurchasedPhoneNumber:input_type -> livekit.ReleasePurchasedPhoneNumbersRequest
+	3,  // 25: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
+	5,  // 26: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
+	7,  // 27: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
+	9,  // 28: livekit.PhoneNumberService.GetPurchasedPhoneNumber:output_type -> livekit.GetPurchasedPhoneNumberResponse
+	11, // 29: livekit.PhoneNumberService.UpdatePurchasedPhoneNumber:output_type -> livekit.UpdatePurchasedPhoneNumberResponse
+	13, // 30: livekit.PhoneNumberService.ReleasePurchasedPhoneNumber:output_type -> livekit.ReleasePurchasedPhoneNumbersResponse
+	25, // [25:31] is the sub-list for method output_type
+	19, // [19:25] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_livekit_phone_number_proto_init() }
