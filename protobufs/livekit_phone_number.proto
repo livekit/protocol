@@ -6,7 +6,6 @@ option go_package = "github.com/livekit/protocol/livekit";
 
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
-import "livekit_sip.proto";
 
 // Telephony cost type enumeration
 enum TelephonyCostType {
