@@ -1114,7 +1114,7 @@ var File_livekit_phone_number_proto protoreflect.FileDescriptor
 
 const file_livekit_phone_number_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14livekit_models.proto\x1a\x11livekit_sip.proto\"\xb0\x01\n" +
+	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14livekit_models.proto\"\xb0\x01\n" +
 	"\x1fListPhoneNumberInventoryRequest\x12!\n" +
 	"\fcountry_code\x18\x01 \x01(\tR\vcountryCode\x12\x1b\n" +
 	"\tarea_code\x18\x02 \x01(\tR\bareaCode\x12\x14\n" +
@@ -1291,7 +1291,6 @@ func file_livekit_phone_number_proto_init() {
 		return
 	}
 	file_livekit_models_proto_init()
-	file_livekit_sip_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
