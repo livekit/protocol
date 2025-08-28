@@ -181,14 +181,16 @@ func (x *DeleteWHIPResourceRequest) GetStreamKey() string {
 }
 
 type ICERestartWHIPResourceRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ResourceId    string                 `protobuf:"bytes,1,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
-	StreamKey     string                 `protobuf:"bytes,2,opt,name=stream_key,json=streamKey,proto3" json:"stream_key,omitempty"`
-	UserFragment  string                 `protobuf:"bytes,3,opt,name=user_fragment,json=userFragment,proto3" json:"user_fragment,omitempty"`
-	Password      string                 `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
-	Candidates    []string               `protobuf:"bytes,5,rep,name=candidates,proto3" json:"candidates,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	ResourceId           string                 `protobuf:"bytes,1,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	StreamKey            string                 `protobuf:"bytes,2,opt,name=stream_key,json=streamKey,proto3" json:"stream_key,omitempty"`
+	UserFragment         string                 `protobuf:"bytes,3,opt,name=user_fragment,json=userFragment,proto3" json:"user_fragment,omitempty"`
+	Password             string                 `protobuf:"bytes,4,opt,name=password,proto3" json:"password,omitempty"`
+	Candidates           []string               `protobuf:"bytes,5,rep,name=candidates,proto3" json:"candidates,omitempty"`
+	RawTrickleIceSdpfrag string                 `protobuf:"bytes,6,opt,name=raw_trickle_ice_sdpfrag,json=rawTrickleIceSdpfrag,proto3" json:"raw_trickle_ice_sdpfrag,omitempty"`
+	IfMatch              string                 `protobuf:"bytes,7,opt,name=if_match,json=ifMatch,proto3" json:"if_match,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *ICERestartWHIPResourceRequest) Reset() {
@@ -256,9 +258,24 @@ func (x *ICERestartWHIPResourceRequest) GetCandidates() []string {
 	return nil
 }
 
+func (x *ICERestartWHIPResourceRequest) GetRawTrickleIceSdpfrag() string {
+	if x != nil {
+		return x.RawTrickleIceSdpfrag
+	}
+	return ""
+}
+
+func (x *ICERestartWHIPResourceRequest) GetIfMatch() string {
+	if x != nil {
+		return x.IfMatch
+	}
+	return ""
+}
+
 type ICERestartWHIPResourceResponse struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	TrickleIceSdpfrag string                 `protobuf:"bytes,1,opt,name=trickle_ice_sdpfrag,json=trickleIceSdpfrag,proto3" json:"trickle_ice_sdpfrag,omitempty"`
+	Etag              string                 `protobuf:"bytes,2,opt,name=etag,proto3" json:"etag,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -296,6 +313,13 @@ func (*ICERestartWHIPResourceResponse) Descriptor() ([]byte, []int) {
 func (x *ICERestartWHIPResourceResponse) GetTrickleIceSdpfrag() string {
 	if x != nil {
 		return x.TrickleIceSdpfrag
+	}
+	return ""
+}
+
+func (x *ICERestartWHIPResourceResponse) GetEtag() string {
+	if x != nil {
+		return x.Etag
 	}
 	return ""
 }
@@ -478,7 +502,7 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\vresource_id\x18\x01 \x01(\tR\n" +
 	"resourceId\x12\x1d\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xc0\x01\n" +
+	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\x92\x02\n" +
 	"\x1dICERestartWHIPResourceRequest\x12\x1f\n" +
 	"\vresource_id\x18\x01 \x01(\tR\n" +
 	"resourceId\x12\x1d\n" +
@@ -488,9 +512,12 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\bpassword\x18\x04 \x01(\tR\bpassword\x12\x1e\n" +
 	"\n" +
 	"candidates\x18\x05 \x03(\tR\n" +
-	"candidates\"P\n" +
+	"candidates\x125\n" +
+	"\x17raw_trickle_ice_sdpfrag\x18\x06 \x01(\tR\x14rawTrickleIceSdpfrag\x12\x19\n" +
+	"\bif_match\x18\a \x01(\tR\aifMatch\"d\n" +
 	"\x1eICERestartWHIPResourceResponse\x12.\n" +
-	"\x13trickle_ice_sdpfrag\x18\x01 \x01(\tR\x11trickleIceSdpfrag\"\x82\x02\n" +
+	"\x13trickle_ice_sdpfrag\x18\x01 \x01(\tR\x11trickleIceSdpfrag\x12\x12\n" +
+	"\x04etag\x18\x02 \x01(\tR\x04etag\"\x82\x02\n" +
 	"\x13StartIngressRequest\x12(\n" +
 	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12\x15\n" +
