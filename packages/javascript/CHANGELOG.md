@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.41.1
+
+### Patch Changes
+
+- Add fields needed for WHIP to SFU support - [#1183](https://github.com/livekit/protocol/pull/1183) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.41.0
 
 ### Minor Changes
