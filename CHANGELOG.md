@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.41.1
+
+### Patch Changes
+
+- Adding get and update apis for livekit phone numbers - [#1179](https://github.com/livekit/protocol/pull/1179) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
 ## 1.41.0
 
 ### Minor Changes
