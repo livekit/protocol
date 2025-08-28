@@ -77,10 +77,13 @@ message ICERestartWHIPResourceRequest {
   string user_fragment = 3;
   string password = 4;
   repeated string candidates = 5;
+  string raw_trickle_ice_sdpfrag = 6;
+  string if_match = 7;
 }
 
 message ICERestartWHIPResourceResponse {
   string trickle_ice_sdpfrag = 1;
+  string etag = 2;
 }
 
 message StartIngressRequest {
