@@ -9,7 +9,6 @@ package livekit
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -259,10 +258,11 @@ func (x *ListPhoneNumberInventoryResponse) GetNextPageToken() *TokenPagination {
 
 // PurchasePhoneNumberRequest - Request to purchase phone numbers
 type PurchasePhoneNumberRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumbers  []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	PhoneNumbers      []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"`                    // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
+	SipDispatchRuleId string                 `protobuf:"bytes,2,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"` // Optional: SIP dispatch rule ID to apply to all purchased numbers
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *PurchasePhoneNumberRequest) Reset() {
@@ -300,6 +300,13 @@ func (x *PurchasePhoneNumberRequest) GetPhoneNumbers() []string {
 		return x.PhoneNumbers
 	}
 	return nil
+}
+
+func (x *PurchasePhoneNumberRequest) GetSipDispatchRuleId() string {
+	if x != nil {
+		return x.SipDispatchRuleId
+	}
+	return ""
 }
 
 // PurchasePhoneNumberResponse - Response containing the purchased phone numbers
@@ -349,11 +356,13 @@ func (x *PurchasePhoneNumberResponse) GetPhoneNumbers() []*PurchasedPhoneNumber 
 
 // ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
 type ListPurchasedPhoneNumbersRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`                         // Optional: Maximum number of results (default: 50)
-	PageToken     *TokenPagination       `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"` // Optional: Token for pagination (empty for first page)
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Limit             int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`                                                     // Optional: Maximum number of results (default: 50)
+	Status            PhoneNumberStatus      `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                    // Optional: Filter by status (active, pending, released)
+	PageToken         *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`                             // Optional: Token for pagination (empty for first page)
+	SipDispatchRuleId string                 `protobuf:"bytes,4,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"` // Optional: Filter by SIP dispatch rule ID
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ListPurchasedPhoneNumbersRequest) Reset() {
@@ -393,11 +402,25 @@ func (x *ListPurchasedPhoneNumbersRequest) GetLimit() int32 {
 	return 0
 }
 
+func (x *ListPurchasedPhoneNumbersRequest) GetStatus() PhoneNumberStatus {
+	if x != nil {
+		return x.Status
+	}
+	return PhoneNumberStatus_PHONE_NUMBER_STATUS_UNSPECIFIED
+}
+
 func (x *ListPurchasedPhoneNumbersRequest) GetPageToken() *TokenPagination {
 	if x != nil {
 		return x.PageToken
 	}
 	return nil
+}
+
+func (x *ListPurchasedPhoneNumbersRequest) GetSipDispatchRuleId() string {
+	if x != nil {
+		return x.SipDispatchRuleId
+	}
+	return ""
 }
 
 // ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
@@ -461,28 +484,29 @@ func (x *ListPurchasedPhoneNumbersResponse) GetTotalCount() int32 {
 	return 0
 }
 
-// ReleasePhoneNumberRequest - Request to release purchased phone numbers
-type ReleasePhoneNumberRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumbers  []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Phone numbers to release (e.g., ["+1234567890", "+1234567891"])
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+// GetPurchasedPhoneNumberRequest - Request to get a purchased phone number
+type GetPurchasedPhoneNumberRequest struct {
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	PurchasedPhoneNumberId string                 `protobuf:"bytes,1,opt,name=purchased_phone_number_id,json=purchasedPhoneNumberId,proto3" json:"purchased_phone_number_id,omitempty"` // Optional: Use purchased phone number ID for direct lookup
+	PhoneNumber            string                 `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`                                      // Optional: Use phone number string for lookup
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
-func (x *ReleasePhoneNumberRequest) Reset() {
-	*x = ReleasePhoneNumberRequest{}
+func (x *GetPurchasedPhoneNumberRequest) Reset() {
+	*x = GetPurchasedPhoneNumberRequest{}
 	mi := &file_livekit_phone_number_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *ReleasePhoneNumberRequest) String() string {
+func (x *GetPurchasedPhoneNumberRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ReleasePhoneNumberRequest) ProtoMessage() {}
+func (*GetPurchasedPhoneNumberRequest) ProtoMessage() {}
 
-func (x *ReleasePhoneNumberRequest) ProtoReflect() protoreflect.Message {
+func (x *GetPurchasedPhoneNumberRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_phone_number_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -494,16 +518,264 @@ func (x *ReleasePhoneNumberRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ReleasePhoneNumberRequest.ProtoReflect.Descriptor instead.
-func (*ReleasePhoneNumberRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetPurchasedPhoneNumberRequest.ProtoReflect.Descriptor instead.
+func (*GetPurchasedPhoneNumberRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_phone_number_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *ReleasePhoneNumberRequest) GetPhoneNumbers() []string {
+func (x *GetPurchasedPhoneNumberRequest) GetPurchasedPhoneNumberId() string {
+	if x != nil {
+		return x.PurchasedPhoneNumberId
+	}
+	return ""
+}
+
+func (x *GetPurchasedPhoneNumberRequest) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+// GetPurchasedPhoneNumberResponse - Response containing the purchased phone number
+type GetPurchasedPhoneNumberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PhoneNumber   *PurchasedPhoneNumber  `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // The purchased phone number details
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPurchasedPhoneNumberResponse) Reset() {
+	*x = GetPurchasedPhoneNumberResponse{}
+	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPurchasedPhoneNumberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPurchasedPhoneNumberResponse) ProtoMessage() {}
+
+func (x *GetPurchasedPhoneNumberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPurchasedPhoneNumberResponse.ProtoReflect.Descriptor instead.
+func (*GetPurchasedPhoneNumberResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GetPurchasedPhoneNumberResponse) GetPhoneNumber() *PurchasedPhoneNumber {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return nil
+}
+
+// UpdatePurchasedPhoneNumberRequest - Request to update a purchased phone number
+type UpdatePurchasedPhoneNumberRequest struct {
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	PurchasedPhoneNumberId string                 `protobuf:"bytes,1,opt,name=purchased_phone_number_id,json=purchasedPhoneNumberId,proto3" json:"purchased_phone_number_id,omitempty"` // Optional: Use purchased phone number ID for direct lookup
+	PhoneNumber            string                 `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`                                      // Optional: Use phone number string for lookup
+	SipDispatchRuleId      string                 `protobuf:"bytes,3,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`                // Optional: SIP dispatch rule ID to assign to the phone number
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *UpdatePurchasedPhoneNumberRequest) Reset() {
+	*x = UpdatePurchasedPhoneNumberRequest{}
+	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePurchasedPhoneNumberRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePurchasedPhoneNumberRequest) ProtoMessage() {}
+
+func (x *UpdatePurchasedPhoneNumberRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePurchasedPhoneNumberRequest.ProtoReflect.Descriptor instead.
+func (*UpdatePurchasedPhoneNumberRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UpdatePurchasedPhoneNumberRequest) GetPurchasedPhoneNumberId() string {
+	if x != nil {
+		return x.PurchasedPhoneNumberId
+	}
+	return ""
+}
+
+func (x *UpdatePurchasedPhoneNumberRequest) GetPhoneNumber() string {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return ""
+}
+
+func (x *UpdatePurchasedPhoneNumberRequest) GetSipDispatchRuleId() string {
+	if x != nil {
+		return x.SipDispatchRuleId
+	}
+	return ""
+}
+
+// UpdatePurchasedPhoneNumberResponse - Response containing the updated purchased phone number
+type UpdatePurchasedPhoneNumberResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PhoneNumber   *PurchasedPhoneNumber  `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // The updated purchased phone number details
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdatePurchasedPhoneNumberResponse) Reset() {
+	*x = UpdatePurchasedPhoneNumberResponse{}
+	mi := &file_livekit_phone_number_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdatePurchasedPhoneNumberResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdatePurchasedPhoneNumberResponse) ProtoMessage() {}
+
+func (x *UpdatePurchasedPhoneNumberResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdatePurchasedPhoneNumberResponse.ProtoReflect.Descriptor instead.
+func (*UpdatePurchasedPhoneNumberResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *UpdatePurchasedPhoneNumberResponse) GetPhoneNumber() *PurchasedPhoneNumber {
+	if x != nil {
+		return x.PhoneNumber
+	}
+	return nil
+}
+
+// ReleasePurchasedPhoneNumbersRequest - Request to release purchased phone numbers
+type ReleasePurchasedPhoneNumbersRequest struct {
+	state                   protoimpl.MessageState `protogen:"open.v1"`
+	PurchasedPhoneNumberIds []string               `protobuf:"bytes,1,rep,name=purchased_phone_number_ids,json=purchasedPhoneNumberIds,proto3" json:"purchased_phone_number_ids,omitempty"` // Optional: Use purchased phone number IDs for direct lookup
+	PhoneNumbers            []string               `protobuf:"bytes,2,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"`                                      // Optional: Use phone number strings for lookup
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
+}
+
+func (x *ReleasePurchasedPhoneNumbersRequest) Reset() {
+	*x = ReleasePurchasedPhoneNumbersRequest{}
+	mi := &file_livekit_phone_number_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReleasePurchasedPhoneNumbersRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReleasePurchasedPhoneNumbersRequest) ProtoMessage() {}
+
+func (x *ReleasePurchasedPhoneNumbersRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReleasePurchasedPhoneNumbersRequest.ProtoReflect.Descriptor instead.
+func (*ReleasePurchasedPhoneNumbersRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ReleasePurchasedPhoneNumbersRequest) GetPurchasedPhoneNumberIds() []string {
+	if x != nil {
+		return x.PurchasedPhoneNumberIds
+	}
+	return nil
+}
+
+func (x *ReleasePurchasedPhoneNumbersRequest) GetPhoneNumbers() []string {
 	if x != nil {
 		return x.PhoneNumbers
 	}
 	return nil
+}
+
+// ReleasePurchasedPhoneNumbersResponse - Response for releasing purchased phone numbers
+type ReleasePurchasedPhoneNumbersResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReleasePurchasedPhoneNumbersResponse) Reset() {
+	*x = ReleasePurchasedPhoneNumbersResponse{}
+	mi := &file_livekit_phone_number_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReleasePurchasedPhoneNumbersResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReleasePurchasedPhoneNumbersResponse) ProtoMessage() {}
+
+func (x *ReleasePurchasedPhoneNumbersResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_phone_number_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReleasePurchasedPhoneNumbersResponse.ProtoReflect.Descriptor instead.
+func (*ReleasePurchasedPhoneNumbersResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{11}
 }
 
 // GlobalPhoneNumber represents a phone number with standardized format
@@ -525,7 +797,7 @@ type GlobalPhoneNumber struct {
 
 func (x *GlobalPhoneNumber) Reset() {
 	*x = GlobalPhoneNumber{}
-	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	mi := &file_livekit_phone_number_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -537,7 +809,7 @@ func (x *GlobalPhoneNumber) String() string {
 func (*GlobalPhoneNumber) ProtoMessage() {}
 
 func (x *GlobalPhoneNumber) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_phone_number_proto_msgTypes[7]
+	mi := &file_livekit_phone_number_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -550,7 +822,7 @@ func (x *GlobalPhoneNumber) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GlobalPhoneNumber.ProtoReflect.Descriptor instead.
 func (*GlobalPhoneNumber) Descriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{7}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GlobalPhoneNumber) GetId() string {
@@ -636,7 +908,7 @@ type TelephonyCost struct {
 
 func (x *TelephonyCost) Reset() {
 	*x = TelephonyCost{}
-	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	mi := &file_livekit_phone_number_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -648,7 +920,7 @@ func (x *TelephonyCost) String() string {
 func (*TelephonyCost) ProtoMessage() {}
 
 func (x *TelephonyCost) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_phone_number_proto_msgTypes[8]
+	mi := &file_livekit_phone_number_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -661,7 +933,7 @@ func (x *TelephonyCost) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TelephonyCost.ProtoReflect.Descriptor instead.
 func (*TelephonyCost) Descriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{8}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TelephonyCost) GetResource() TelephonyCostType {
@@ -704,7 +976,7 @@ type PhoneNumberInventoryItem struct {
 
 func (x *PhoneNumberInventoryItem) Reset() {
 	*x = PhoneNumberInventoryItem{}
-	mi := &file_livekit_phone_number_proto_msgTypes[9]
+	mi := &file_livekit_phone_number_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -716,7 +988,7 @@ func (x *PhoneNumberInventoryItem) String() string {
 func (*PhoneNumberInventoryItem) ProtoMessage() {}
 
 func (x *PhoneNumberInventoryItem) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_phone_number_proto_msgTypes[9]
+	mi := &file_livekit_phone_number_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -729,7 +1001,7 @@ func (x *PhoneNumberInventoryItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PhoneNumberInventoryItem.ProtoReflect.Descriptor instead.
 func (*PhoneNumberInventoryItem) Descriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{9}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *PhoneNumberInventoryItem) GetPhoneNumber() *GlobalPhoneNumber {
@@ -755,19 +1027,20 @@ func (x *PhoneNumberInventoryItem) GetCosts() []*TelephonyCost {
 
 // PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
 type PurchasedPhoneNumber struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumber     *GlobalPhoneNumber     `protobuf:"bytes,1,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`               // Common phone number fields
-	Status          PhoneNumberStatus      `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`            // Current status of the phone number
-	AssignedAt      *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                  // Timestamp when the number was assigned
-	ReleasedAt      *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                  // Timestamp when the number was released (if applicable)
-	SipDispatchRule *SIPDispatchRuleInfo   `protobuf:"bytes,5,opt,name=sip_dispatch_rule,json=sipDispatchRule,proto3" json:"sip_dispatch_rule,omitempty"` // Optional: Associated SIP dispatch rule
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	PurchasedPhoneNumberId string                 `protobuf:"bytes,1,opt,name=purchased_phone_number_id,json=purchasedPhoneNumberId,proto3" json:"purchased_phone_number_id,omitempty"` // Unique identifier for the purchased phone number
+	PhoneNumber            *GlobalPhoneNumber     `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`                                      // Common phone number fields
+	Status                 PhoneNumberStatus      `protobuf:"varint,3,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                                   // Current status of the phone number
+	AssignedAt             *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                                         // Timestamp when the number was assigned
+	ReleasedAt             *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                                         // Timestamp when the number was released (if applicable)
+	SipDispatchRuleId      string                 `protobuf:"bytes,6,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`                // Optional: Associated SIP dispatch rule
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *PurchasedPhoneNumber) Reset() {
 	*x = PurchasedPhoneNumber{}
-	mi := &file_livekit_phone_number_proto_msgTypes[10]
+	mi := &file_livekit_phone_number_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -779,7 +1052,7 @@ func (x *PurchasedPhoneNumber) String() string {
 func (*PurchasedPhoneNumber) ProtoMessage() {}
 
 func (x *PurchasedPhoneNumber) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_phone_number_proto_msgTypes[10]
+	mi := &file_livekit_phone_number_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -792,7 +1065,14 @@ func (x *PurchasedPhoneNumber) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchasedPhoneNumber.ProtoReflect.Descriptor instead.
 func (*PurchasedPhoneNumber) Descriptor() ([]byte, []int) {
-	return file_livekit_phone_number_proto_rawDescGZIP(), []int{10}
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *PurchasedPhoneNumber) GetPurchasedPhoneNumberId() string {
+	if x != nil {
+		return x.PurchasedPhoneNumberId
+	}
+	return ""
 }
 
 func (x *PurchasedPhoneNumber) GetPhoneNumber() *GlobalPhoneNumber {
@@ -823,18 +1103,18 @@ func (x *PurchasedPhoneNumber) GetReleasedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *PurchasedPhoneNumber) GetSipDispatchRule() *SIPDispatchRuleInfo {
+func (x *PurchasedPhoneNumber) GetSipDispatchRuleId() string {
 	if x != nil {
-		return x.SipDispatchRule
+		return x.SipDispatchRuleId
 	}
-	return nil
+	return ""
 }
 
 var File_livekit_phone_number_proto protoreflect.FileDescriptor
 
 const file_livekit_phone_number_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14livekit_models.proto\x1a\x11livekit_sip.proto\"\xb0\x01\n" +
+	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14livekit_models.proto\"\xb0\x01\n" +
 	"\x1fListPhoneNumberInventoryRequest\x12!\n" +
 	"\fcountry_code\x18\x01 \x01(\tR\vcountryCode\x12\x1b\n" +
 	"\tarea_code\x18\x02 \x01(\tR\bareaCode\x12\x14\n" +
@@ -843,22 +1123,38 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"page_token\x18\x04 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\"\x9d\x01\n" +
 	" ListPhoneNumberInventoryResponse\x127\n" +
 	"\x05items\x18\x01 \x03(\v2!.livekit.PhoneNumberInventoryItemR\x05items\x12@\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"A\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"r\n" +
 	"\x1aPurchasePhoneNumberRequest\x12#\n" +
-	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\"a\n" +
+	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\x12/\n" +
+	"\x14sip_dispatch_rule_id\x18\x02 \x01(\tR\x11sipDispatchRuleId\"a\n" +
 	"\x1bPurchasePhoneNumberResponse\x12B\n" +
-	"\rphone_numbers\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\fphoneNumbers\"q\n" +
+	"\rphone_numbers\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\fphoneNumbers\"\xd6\x01\n" +
 	" ListPurchasedPhoneNumbersRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\x127\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x122\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1a.livekit.PhoneNumberStatusR\x06status\x127\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\"\xbb\x01\n" +
+	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12/\n" +
+	"\x14sip_dispatch_rule_id\x18\x04 \x01(\tR\x11sipDispatchRuleId\"\xbb\x01\n" +
 	"!ListPurchasedPhoneNumbersResponse\x123\n" +
 	"\x05items\x18\x01 \x03(\v2\x1d.livekit.PurchasedPhoneNumberR\x05items\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\"@\n" +
-	"\x19ReleasePhoneNumberRequest\x12#\n" +
-	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\"\xee\x02\n" +
+	"totalCount\"~\n" +
+	"\x1eGetPurchasedPhoneNumberRequest\x129\n" +
+	"\x19purchased_phone_number_id\x18\x01 \x01(\tR\x16purchasedPhoneNumberId\x12!\n" +
+	"\fphone_number\x18\x02 \x01(\tR\vphoneNumber\"c\n" +
+	"\x1fGetPurchasedPhoneNumberResponse\x12@\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x1d.livekit.PurchasedPhoneNumberR\vphoneNumber\"\xb2\x01\n" +
+	"!UpdatePurchasedPhoneNumberRequest\x129\n" +
+	"\x19purchased_phone_number_id\x18\x01 \x01(\tR\x16purchasedPhoneNumberId\x12!\n" +
+	"\fphone_number\x18\x02 \x01(\tR\vphoneNumber\x12/\n" +
+	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tR\x11sipDispatchRuleId\"f\n" +
+	"\"UpdatePurchasedPhoneNumberResponse\x12@\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x1d.livekit.PurchasedPhoneNumberR\vphoneNumber\"\x87\x01\n" +
+	"#ReleasePurchasedPhoneNumbersRequest\x12;\n" +
+	"\x1apurchased_phone_number_ids\x18\x01 \x03(\tR\x17purchasedPhoneNumberIds\x12#\n" +
+	"\rphone_numbers\x18\x02 \x03(\tR\fphoneNumbers\"&\n" +
+	"$ReleasePurchasedPhoneNumbersResponse\"\xee\x02\n" +
 	"\x11GlobalPhoneNumber\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\ve164_format\x18\x02 \x01(\tR\n" +
@@ -884,15 +1180,16 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x18PhoneNumberInventoryItem\x12=\n" +
 	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x12\"\n" +
 	"\fcapabilities\x18\x02 \x03(\tR\fcapabilities\x12,\n" +
-	"\x05costs\x18\x03 \x03(\v2\x16.livekit.TelephonyCostR\x05costs\"\xcd\x02\n" +
-	"\x14PurchasedPhoneNumber\x12=\n" +
-	"\fphone_number\x18\x01 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x122\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x1a.livekit.PhoneNumberStatusR\x06status\x12;\n" +
-	"\vassigned_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"\x05costs\x18\x03 \x03(\v2\x16.livekit.TelephonyCostR\x05costs\"\xef\x02\n" +
+	"\x14PurchasedPhoneNumber\x129\n" +
+	"\x19purchased_phone_number_id\x18\x01 \x01(\tR\x16purchasedPhoneNumberId\x12=\n" +
+	"\fphone_number\x18\x02 \x01(\v2\x1a.livekit.GlobalPhoneNumberR\vphoneNumber\x122\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1a.livekit.PhoneNumberStatusR\x06status\x12;\n" +
+	"\vassigned_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"assignedAt\x12;\n" +
-	"\vreleased_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"releasedAt\x12H\n" +
-	"\x11sip_dispatch_rule\x18\x05 \x01(\v2\x1c.livekit.SIPDispatchRuleInfoR\x0fsipDispatchRule*\xf9\x01\n" +
+	"\vreleased_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"releasedAt\x12/\n" +
+	"\x14sip_dispatch_rule_id\x18\x06 \x01(\tR\x11sipDispatchRuleId*\xf9\x01\n" +
 	"\x11TelephonyCostType\x12#\n" +
 	"\x1fTELEPHONY_COST_TYPE_UNSPECIFIED\x10\x00\x12%\n" +
 	"!TELEPHONY_COST_TYPE_NUMBER_RENTAL\x10\x01\x12%\n" +
@@ -904,12 +1201,14 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aPHONE_NUMBER_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
 	"\x1bPHONE_NUMBER_STATUS_PENDING\x10\x02\x12 \n" +
-	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x032\xb5\x03\n" +
+	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x032\xc8\x05\n" +
 	"\x12PhoneNumberService\x12q\n" +
 	"\x18ListPhoneNumberInventory\x12(.livekit.ListPhoneNumberInventoryRequest\x1a).livekit.ListPhoneNumberInventoryResponse\"\x00\x12b\n" +
 	"\x13PurchasePhoneNumber\x12#.livekit.PurchasePhoneNumberRequest\x1a$.livekit.PurchasePhoneNumberResponse\"\x00\x12t\n" +
-	"\x19ListPurchasedPhoneNumbers\x12).livekit.ListPurchasedPhoneNumbersRequest\x1a*.livekit.ListPurchasedPhoneNumbersResponse\"\x00\x12R\n" +
-	"\x12ReleasePhoneNumber\x12\".livekit.ReleasePhoneNumberRequest\x1a\x16.google.protobuf.Empty\"\x00B%Z#github.com/livekit/protocol/livekitb\x06proto3"
+	"\x19ListPurchasedPhoneNumbers\x12).livekit.ListPurchasedPhoneNumbersRequest\x1a*.livekit.ListPurchasedPhoneNumbersResponse\"\x00\x12n\n" +
+	"\x17GetPurchasedPhoneNumber\x12'.livekit.GetPurchasedPhoneNumberRequest\x1a(.livekit.GetPurchasedPhoneNumberResponse\"\x00\x12w\n" +
+	"\x1aUpdatePurchasedPhoneNumber\x12*.livekit.UpdatePurchasedPhoneNumberRequest\x1a+.livekit.UpdatePurchasedPhoneNumberResponse\"\x00\x12|\n" +
+	"\x1bReleasePurchasedPhoneNumber\x12,.livekit.ReleasePurchasedPhoneNumbersRequest\x1a-.livekit.ReleasePurchasedPhoneNumbersResponse\"\x00B%Z#github.com/livekit/protocol/livekitb\x06proto3"
 
 var (
 	file_livekit_phone_number_proto_rawDescOnce sync.Once
@@ -924,57 +1223,66 @@ func file_livekit_phone_number_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_phone_number_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_livekit_phone_number_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_livekit_phone_number_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_livekit_phone_number_proto_goTypes = []any{
-	(TelephonyCostType)(0),                    // 0: livekit.TelephonyCostType
-	(PhoneNumberStatus)(0),                    // 1: livekit.PhoneNumberStatus
-	(*ListPhoneNumberInventoryRequest)(nil),   // 2: livekit.ListPhoneNumberInventoryRequest
-	(*ListPhoneNumberInventoryResponse)(nil),  // 3: livekit.ListPhoneNumberInventoryResponse
-	(*PurchasePhoneNumberRequest)(nil),        // 4: livekit.PurchasePhoneNumberRequest
-	(*PurchasePhoneNumberResponse)(nil),       // 5: livekit.PurchasePhoneNumberResponse
-	(*ListPurchasedPhoneNumbersRequest)(nil),  // 6: livekit.ListPurchasedPhoneNumbersRequest
-	(*ListPurchasedPhoneNumbersResponse)(nil), // 7: livekit.ListPurchasedPhoneNumbersResponse
-	(*ReleasePhoneNumberRequest)(nil),         // 8: livekit.ReleasePhoneNumberRequest
-	(*GlobalPhoneNumber)(nil),                 // 9: livekit.GlobalPhoneNumber
-	(*TelephonyCost)(nil),                     // 10: livekit.TelephonyCost
-	(*PhoneNumberInventoryItem)(nil),          // 11: livekit.PhoneNumberInventoryItem
-	(*PurchasedPhoneNumber)(nil),              // 12: livekit.PurchasedPhoneNumber
-	(*TokenPagination)(nil),                   // 13: livekit.TokenPagination
-	(*timestamppb.Timestamp)(nil),             // 14: google.protobuf.Timestamp
-	(*SIPDispatchRuleInfo)(nil),               // 15: livekit.SIPDispatchRuleInfo
-	(*emptypb.Empty)(nil),                     // 16: google.protobuf.Empty
+	(TelephonyCostType)(0),                       // 0: livekit.TelephonyCostType
+	(PhoneNumberStatus)(0),                       // 1: livekit.PhoneNumberStatus
+	(*ListPhoneNumberInventoryRequest)(nil),      // 2: livekit.ListPhoneNumberInventoryRequest
+	(*ListPhoneNumberInventoryResponse)(nil),     // 3: livekit.ListPhoneNumberInventoryResponse
+	(*PurchasePhoneNumberRequest)(nil),           // 4: livekit.PurchasePhoneNumberRequest
+	(*PurchasePhoneNumberResponse)(nil),          // 5: livekit.PurchasePhoneNumberResponse
+	(*ListPurchasedPhoneNumbersRequest)(nil),     // 6: livekit.ListPurchasedPhoneNumbersRequest
+	(*ListPurchasedPhoneNumbersResponse)(nil),    // 7: livekit.ListPurchasedPhoneNumbersResponse
+	(*GetPurchasedPhoneNumberRequest)(nil),       // 8: livekit.GetPurchasedPhoneNumberRequest
+	(*GetPurchasedPhoneNumberResponse)(nil),      // 9: livekit.GetPurchasedPhoneNumberResponse
+	(*UpdatePurchasedPhoneNumberRequest)(nil),    // 10: livekit.UpdatePurchasedPhoneNumberRequest
+	(*UpdatePurchasedPhoneNumberResponse)(nil),   // 11: livekit.UpdatePurchasedPhoneNumberResponse
+	(*ReleasePurchasedPhoneNumbersRequest)(nil),  // 12: livekit.ReleasePurchasedPhoneNumbersRequest
+	(*ReleasePurchasedPhoneNumbersResponse)(nil), // 13: livekit.ReleasePurchasedPhoneNumbersResponse
+	(*GlobalPhoneNumber)(nil),                    // 14: livekit.GlobalPhoneNumber
+	(*TelephonyCost)(nil),                        // 15: livekit.TelephonyCost
+	(*PhoneNumberInventoryItem)(nil),             // 16: livekit.PhoneNumberInventoryItem
+	(*PurchasedPhoneNumber)(nil),                 // 17: livekit.PurchasedPhoneNumber
+	(*TokenPagination)(nil),                      // 18: livekit.TokenPagination
+	(*timestamppb.Timestamp)(nil),                // 19: google.protobuf.Timestamp
 }
 var file_livekit_phone_number_proto_depIdxs = []int32{
-	13, // 0: livekit.ListPhoneNumberInventoryRequest.page_token:type_name -> livekit.TokenPagination
-	11, // 1: livekit.ListPhoneNumberInventoryResponse.items:type_name -> livekit.PhoneNumberInventoryItem
-	13, // 2: livekit.ListPhoneNumberInventoryResponse.next_page_token:type_name -> livekit.TokenPagination
-	12, // 3: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PurchasedPhoneNumber
-	13, // 4: livekit.ListPurchasedPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
-	12, // 5: livekit.ListPurchasedPhoneNumbersResponse.items:type_name -> livekit.PurchasedPhoneNumber
-	13, // 6: livekit.ListPurchasedPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
-	14, // 7: livekit.GlobalPhoneNumber.created_at:type_name -> google.protobuf.Timestamp
-	14, // 8: livekit.GlobalPhoneNumber.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 9: livekit.TelephonyCost.resource:type_name -> livekit.TelephonyCostType
-	9,  // 10: livekit.PhoneNumberInventoryItem.phone_number:type_name -> livekit.GlobalPhoneNumber
-	10, // 11: livekit.PhoneNumberInventoryItem.costs:type_name -> livekit.TelephonyCost
-	9,  // 12: livekit.PurchasedPhoneNumber.phone_number:type_name -> livekit.GlobalPhoneNumber
-	1,  // 13: livekit.PurchasedPhoneNumber.status:type_name -> livekit.PhoneNumberStatus
-	14, // 14: livekit.PurchasedPhoneNumber.assigned_at:type_name -> google.protobuf.Timestamp
-	14, // 15: livekit.PurchasedPhoneNumber.released_at:type_name -> google.protobuf.Timestamp
-	15, // 16: livekit.PurchasedPhoneNumber.sip_dispatch_rule:type_name -> livekit.SIPDispatchRuleInfo
-	2,  // 17: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
-	4,  // 18: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
-	6,  // 19: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
-	8,  // 20: livekit.PhoneNumberService.ReleasePhoneNumber:input_type -> livekit.ReleasePhoneNumberRequest
-	3,  // 21: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
-	5,  // 22: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
-	7,  // 23: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
-	16, // 24: livekit.PhoneNumberService.ReleasePhoneNumber:output_type -> google.protobuf.Empty
-	21, // [21:25] is the sub-list for method output_type
-	17, // [17:21] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	18, // 0: livekit.ListPhoneNumberInventoryRequest.page_token:type_name -> livekit.TokenPagination
+	16, // 1: livekit.ListPhoneNumberInventoryResponse.items:type_name -> livekit.PhoneNumberInventoryItem
+	18, // 2: livekit.ListPhoneNumberInventoryResponse.next_page_token:type_name -> livekit.TokenPagination
+	17, // 3: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PurchasedPhoneNumber
+	1,  // 4: livekit.ListPurchasedPhoneNumbersRequest.status:type_name -> livekit.PhoneNumberStatus
+	18, // 5: livekit.ListPurchasedPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
+	17, // 6: livekit.ListPurchasedPhoneNumbersResponse.items:type_name -> livekit.PurchasedPhoneNumber
+	18, // 7: livekit.ListPurchasedPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
+	17, // 8: livekit.GetPurchasedPhoneNumberResponse.phone_number:type_name -> livekit.PurchasedPhoneNumber
+	17, // 9: livekit.UpdatePurchasedPhoneNumberResponse.phone_number:type_name -> livekit.PurchasedPhoneNumber
+	19, // 10: livekit.GlobalPhoneNumber.created_at:type_name -> google.protobuf.Timestamp
+	19, // 11: livekit.GlobalPhoneNumber.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 12: livekit.TelephonyCost.resource:type_name -> livekit.TelephonyCostType
+	14, // 13: livekit.PhoneNumberInventoryItem.phone_number:type_name -> livekit.GlobalPhoneNumber
+	15, // 14: livekit.PhoneNumberInventoryItem.costs:type_name -> livekit.TelephonyCost
+	14, // 15: livekit.PurchasedPhoneNumber.phone_number:type_name -> livekit.GlobalPhoneNumber
+	1,  // 16: livekit.PurchasedPhoneNumber.status:type_name -> livekit.PhoneNumberStatus
+	19, // 17: livekit.PurchasedPhoneNumber.assigned_at:type_name -> google.protobuf.Timestamp
+	19, // 18: livekit.PurchasedPhoneNumber.released_at:type_name -> google.protobuf.Timestamp
+	2,  // 19: livekit.PhoneNumberService.ListPhoneNumberInventory:input_type -> livekit.ListPhoneNumberInventoryRequest
+	4,  // 20: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
+	6,  // 21: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:input_type -> livekit.ListPurchasedPhoneNumbersRequest
+	8,  // 22: livekit.PhoneNumberService.GetPurchasedPhoneNumber:input_type -> livekit.GetPurchasedPhoneNumberRequest
+	10, // 23: livekit.PhoneNumberService.UpdatePurchasedPhoneNumber:input_type -> livekit.UpdatePurchasedPhoneNumberRequest
+	12, // 24: livekit.PhoneNumberService.ReleasePurchasedPhoneNumber:input_type -> livekit.ReleasePurchasedPhoneNumbersRequest
+	3,  // 25: livekit.PhoneNumberService.ListPhoneNumberInventory:output_type -> livekit.ListPhoneNumberInventoryResponse
+	5,  // 26: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
+	7,  // 27: livekit.PhoneNumberService.ListPurchasedPhoneNumbers:output_type -> livekit.ListPurchasedPhoneNumbersResponse
+	9,  // 28: livekit.PhoneNumberService.GetPurchasedPhoneNumber:output_type -> livekit.GetPurchasedPhoneNumberResponse
+	11, // 29: livekit.PhoneNumberService.UpdatePurchasedPhoneNumber:output_type -> livekit.UpdatePurchasedPhoneNumberResponse
+	13, // 30: livekit.PhoneNumberService.ReleasePurchasedPhoneNumber:output_type -> livekit.ReleasePurchasedPhoneNumbersResponse
+	25, // [25:31] is the sub-list for method output_type
+	19, // [19:25] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_livekit_phone_number_proto_init() }
@@ -983,14 +1291,13 @@ func file_livekit_phone_number_proto_init() {
 		return
 	}
 	file_livekit_models_proto_init()
-	file_livekit_sip_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_phone_number_proto_rawDesc), len(file_livekit_phone_number_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   11,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
