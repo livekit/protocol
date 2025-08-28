@@ -1,12 +1,10 @@
 # github.com/livekit/protocol
 
-## 2.0.0
-
-### Major Changes
-
-- Adding public apis for Livekit Phone Numbers feature - [#1146](https://github.com/livekit/protocol/pull/1146) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+## 1.41.0
 
 ### Minor Changes
+
+- Adding public apis for Livekit Phone Numbers feature - [#1146](https://github.com/livekit/protocol/pull/1146) ([@nishadmusthafa](https://github.com/nishadmusthafa))
 
 - Add encryption metadata for data packets - [#1127](https://github.com/livekit/protocol/pull/1127) ([@lukasIO](https://github.com/lukasIO))
 
