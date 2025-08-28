@@ -1,6 +1,6 @@
 # @livekit/protocol
 
-## 2.0.0
+## 1.41.0
 
 ### Minor Changes
 
