@@ -718,8 +718,9 @@ message SIPCallInfo {
   SIPStatus call_status_code = 19;
   string audio_codec = 20;
   string media_encryption = 21;
+  string pcap_file_link = 25;
 
-  // NEXT ID: 25
+  // NEXT ID: 26
 }
 
 message SIPTransferInfo {
