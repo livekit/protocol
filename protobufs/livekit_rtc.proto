@@ -469,6 +469,8 @@ message RequestResponse {
     NOT_ALLOWED = 2;
     LIMIT_EXCEEDED = 3;
     QUEUED = 4;
+    UNCLASSIFIED_ERROR = 5;
+    UNSUPPORTED_TYPE= 6;
   }
 
   uint32 request_id = 1;
@@ -477,7 +479,10 @@ message RequestResponse {
   oneof request {
     TrickleRequest trickle = 4;
     AddTrackRequest add_track = 5;
-    UpdateParticipantMetadata update_metadata = 6;
+    MuteTrackRequest mute = 6;
+    UpdateParticipantMetadata update_metadata = 7;
+    UpdateLocalAudioTrack update_audio_track = 8;
+    UpdateLocalVideoTrack update_video_track = 9;
   }
 }
 
