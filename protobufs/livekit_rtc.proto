@@ -469,8 +469,8 @@ message RequestResponse {
     NOT_ALLOWED = 2;
     LIMIT_EXCEEDED = 3;
     QUEUED = 4;
-    UNCLASSIFIED_ERROR = 5;
-    UNSUPPORTED_TYPE= 6;
+    UNSUPPORTED_TYPE= 5;
+    UNCLASSIFIED_ERROR = 6;
   }
 
   uint32 request_id = 1;
