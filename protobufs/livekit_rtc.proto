@@ -468,11 +468,22 @@ message RequestResponse {
     NOT_FOUND = 1;
     NOT_ALLOWED = 2;
     LIMIT_EXCEEDED = 3;
+    QUEUED = 4;
+    UNSUPPORTED_TYPE= 5;
+    UNCLASSIFIED_ERROR = 6;
   }
 
   uint32 request_id = 1;
   Reason reason = 2;
   string message = 3;
+  oneof request {
+    TrickleRequest trickle = 4;
+    AddTrackRequest add_track = 5;
+    MuteTrackRequest mute = 6;
+    UpdateParticipantMetadata update_metadata = 7;
+    UpdateLocalAudioTrack update_audio_track = 8;
+    UpdateLocalVideoTrack update_video_track = 9;
+  }
 }
 
 message TrackSubscribed {

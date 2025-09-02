@@ -229,10 +229,13 @@ func (LeaveRequest_Action) EnumDescriptor() ([]byte, []int) {
 type RequestResponse_Reason int32
 
 const (
-	RequestResponse_OK             RequestResponse_Reason = 0
-	RequestResponse_NOT_FOUND      RequestResponse_Reason = 1
-	RequestResponse_NOT_ALLOWED    RequestResponse_Reason = 2
-	RequestResponse_LIMIT_EXCEEDED RequestResponse_Reason = 3
+	RequestResponse_OK                 RequestResponse_Reason = 0
+	RequestResponse_NOT_FOUND          RequestResponse_Reason = 1
+	RequestResponse_NOT_ALLOWED        RequestResponse_Reason = 2
+	RequestResponse_LIMIT_EXCEEDED     RequestResponse_Reason = 3
+	RequestResponse_QUEUED             RequestResponse_Reason = 4
+	RequestResponse_UNSUPPORTED_TYPE   RequestResponse_Reason = 5
+	RequestResponse_UNCLASSIFIED_ERROR RequestResponse_Reason = 6
 )
 
 // Enum value maps for RequestResponse_Reason.
@@ -242,12 +245,18 @@ var (
 		1: "NOT_FOUND",
 		2: "NOT_ALLOWED",
 		3: "LIMIT_EXCEEDED",
+		4: "QUEUED",
+		5: "UNSUPPORTED_TYPE",
+		6: "UNCLASSIFIED_ERROR",
 	}
 	RequestResponse_Reason_value = map[string]int32{
-		"OK":             0,
-		"NOT_FOUND":      1,
-		"NOT_ALLOWED":    2,
-		"LIMIT_EXCEEDED": 3,
+		"OK":                 0,
+		"NOT_FOUND":          1,
+		"NOT_ALLOWED":        2,
+		"LIMIT_EXCEEDED":     3,
+		"QUEUED":             4,
+		"UNSUPPORTED_TYPE":   5,
+		"UNCLASSIFIED_ERROR": 6,
 	}
 )
 
@@ -3840,10 +3849,19 @@ func (x *SubscriptionResponse) GetErr() SubscriptionError {
 }
 
 type RequestResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RequestId     uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	Reason        RequestResponse_Reason `protobuf:"varint,2,opt,name=reason,proto3,enum=livekit.RequestResponse_Reason" json:"reason,omitempty"`
-	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	RequestId uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Reason    RequestResponse_Reason `protobuf:"varint,2,opt,name=reason,proto3,enum=livekit.RequestResponse_Reason" json:"reason,omitempty"`
+	Message   string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
+	// Types that are valid to be assigned to Request:
+	//
+	//	*RequestResponse_Trickle
+	//	*RequestResponse_AddTrack
+	//	*RequestResponse_Mute
+	//	*RequestResponse_UpdateMetadata
+	//	*RequestResponse_UpdateAudioTrack
+	//	*RequestResponse_UpdateVideoTrack
+	Request       isRequestResponse_Request `protobuf_oneof:"request"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3898,6 +3916,107 @@ func (x *RequestResponse) GetMessage() string {
 	}
 	return ""
 }
+
+func (x *RequestResponse) GetRequest() isRequestResponse_Request {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *RequestResponse) GetTrickle() *TrickleRequest {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_Trickle); ok {
+			return x.Trickle
+		}
+	}
+	return nil
+}
+
+func (x *RequestResponse) GetAddTrack() *AddTrackRequest {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_AddTrack); ok {
+			return x.AddTrack
+		}
+	}
+	return nil
+}
+
+func (x *RequestResponse) GetMute() *MuteTrackRequest {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_Mute); ok {
+			return x.Mute
+		}
+	}
+	return nil
+}
+
+func (x *RequestResponse) GetUpdateMetadata() *UpdateParticipantMetadata {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_UpdateMetadata); ok {
+			return x.UpdateMetadata
+		}
+	}
+	return nil
+}
+
+func (x *RequestResponse) GetUpdateAudioTrack() *UpdateLocalAudioTrack {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_UpdateAudioTrack); ok {
+			return x.UpdateAudioTrack
+		}
+	}
+	return nil
+}
+
+func (x *RequestResponse) GetUpdateVideoTrack() *UpdateLocalVideoTrack {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_UpdateVideoTrack); ok {
+			return x.UpdateVideoTrack
+		}
+	}
+	return nil
+}
+
+type isRequestResponse_Request interface {
+	isRequestResponse_Request()
+}
+
+type RequestResponse_Trickle struct {
+	Trickle *TrickleRequest `protobuf:"bytes,4,opt,name=trickle,proto3,oneof"`
+}
+
+type RequestResponse_AddTrack struct {
+	AddTrack *AddTrackRequest `protobuf:"bytes,5,opt,name=add_track,json=addTrack,proto3,oneof"`
+}
+
+type RequestResponse_Mute struct {
+	Mute *MuteTrackRequest `protobuf:"bytes,6,opt,name=mute,proto3,oneof"`
+}
+
+type RequestResponse_UpdateMetadata struct {
+	UpdateMetadata *UpdateParticipantMetadata `protobuf:"bytes,7,opt,name=update_metadata,json=updateMetadata,proto3,oneof"`
+}
+
+type RequestResponse_UpdateAudioTrack struct {
+	UpdateAudioTrack *UpdateLocalAudioTrack `protobuf:"bytes,8,opt,name=update_audio_track,json=updateAudioTrack,proto3,oneof"`
+}
+
+type RequestResponse_UpdateVideoTrack struct {
+	UpdateVideoTrack *UpdateLocalVideoTrack `protobuf:"bytes,9,opt,name=update_video_track,json=updateVideoTrack,proto3,oneof"`
+}
+
+func (*RequestResponse_Trickle) isRequestResponse_Request() {}
+
+func (*RequestResponse_AddTrack) isRequestResponse_Request() {}
+
+func (*RequestResponse_Mute) isRequestResponse_Request() {}
+
+func (*RequestResponse_UpdateMetadata) isRequestResponse_Request() {}
+
+func (*RequestResponse_UpdateAudioTrack) isRequestResponse_Request() {}
+
+func (*RequestResponse_UpdateVideoTrack) isRequestResponse_Request() {}
 
 type TrackSubscribed struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -4502,17 +4621,28 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xc9\x01\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x9c\x05\n" +
 	"\x0fRequestResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rR\trequestId\x127\n" +
 	"\x06reason\x18\x02 \x01(\x0e2\x1f.livekit.RequestResponse.ReasonR\x06reason\x12\x18\n" +
-	"\amessage\x18\x03 \x01(\tR\amessage\"D\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
+	"\atrickle\x18\x04 \x01(\v2\x17.livekit.TrickleRequestH\x00R\atrickle\x127\n" +
+	"\tadd_track\x18\x05 \x01(\v2\x18.livekit.AddTrackRequestH\x00R\baddTrack\x12/\n" +
+	"\x04mute\x18\x06 \x01(\v2\x19.livekit.MuteTrackRequestH\x00R\x04mute\x12M\n" +
+	"\x0fupdate_metadata\x18\a \x01(\v2\".livekit.UpdateParticipantMetadataH\x00R\x0eupdateMetadata\x12N\n" +
+	"\x12update_audio_track\x18\b \x01(\v2\x1e.livekit.UpdateLocalAudioTrackH\x00R\x10updateAudioTrack\x12N\n" +
+	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\"~\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
 	"\vNOT_ALLOWED\x10\x02\x12\x12\n" +
-	"\x0eLIMIT_EXCEEDED\x10\x03\".\n" +
+	"\x0eLIMIT_EXCEEDED\x10\x03\x12\n" +
+	"\n" +
+	"\x06QUEUED\x10\x04\x12\x14\n" +
+	"\x10UNSUPPORTED_TYPE\x10\x05\x12\x16\n" +
+	"\x12UNCLASSIFIED_ERROR\x10\x06B\t\n" +
+	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xe4\x01\n" +
 	"\x12ConnectionSettings\x12%\n" +
@@ -4750,19 +4880,25 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	46,  // 90: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
 	74,  // 91: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
 	4,   // 92: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
-	75,  // 93: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
-	50,  // 94: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	55,  // 95: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
-	9,   // 96: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
-	16,  // 97: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
-	76,  // 98: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
-	39,  // 99: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
-	5,   // 100: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
-	101, // [101:101] is the sub-list for method output_type
-	101, // [101:101] is the sub-list for method input_type
-	101, // [101:101] is the sub-list for extension type_name
-	101, // [101:101] is the sub-list for extension extendee
-	0,   // [0:101] is the sub-list for field type_name
+	10,  // 93: livekit.RequestResponse.trickle:type_name -> livekit.TrickleRequest
+	9,   // 94: livekit.RequestResponse.add_track:type_name -> livekit.AddTrackRequest
+	11,  // 95: livekit.RequestResponse.mute:type_name -> livekit.MuteTrackRequest
+	24,  // 96: livekit.RequestResponse.update_metadata:type_name -> livekit.UpdateParticipantMetadata
+	20,  // 97: livekit.RequestResponse.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
+	21,  // 98: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
+	75,  // 99: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
+	50,  // 100: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	55,  // 101: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
+	9,   // 102: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
+	16,  // 103: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
+	76,  // 104: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
+	39,  // 105: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
+	5,   // 106: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
+	107, // [107:107] is the sub-list for method output_type
+	107, // [107:107] is the sub-list for method input_type
+	107, // [107:107] is the sub-list for extension type_name
+	107, // [107:107] is the sub-list for extension extendee
+	0,   // [0:107] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
@@ -4826,6 +4962,14 @@ func file_livekit_rtc_proto_init() {
 		(*SimulateScenario_DisconnectSignalOnResume)(nil),
 		(*SimulateScenario_DisconnectSignalOnResumeNoMessages)(nil),
 		(*SimulateScenario_LeaveRequestFullReconnect)(nil),
+	}
+	file_livekit_rtc_proto_msgTypes[42].OneofWrappers = []any{
+		(*RequestResponse_Trickle)(nil),
+		(*RequestResponse_AddTrack)(nil),
+		(*RequestResponse_Mute)(nil),
+		(*RequestResponse_UpdateMetadata)(nil),
+		(*RequestResponse_UpdateAudioTrack)(nil),
+		(*RequestResponse_UpdateVideoTrack)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[44].OneofWrappers = []any{}
 	type x struct{}
