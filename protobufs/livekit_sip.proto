@@ -470,6 +470,68 @@ message SIPDispatchRuleCallee {
   bool randomize = 3;
 }
 
+message SIPDispatchRuleDynamic {
+  string url = 1;
+  string method = 2;
+}
+
+// Defines the type of action for a SIP call
+enum DispatchAction {
+  // Answer the call and connect to a LiveKit room
+  ACTION_ANSWER = 0;
+
+  // Reject the call
+  ACTION_REJECT = 1;
+
+  // Transfer the call to another destination
+  ACTION_TRANSFER = 2;
+}
+
+// SIPDispatchRuleDynamicResponse is the response from the webhook URL.
+message SIPDispatchRuleDynamicResponse {
+  // Type of action to take
+  DispatchAction action = 1;
+
+  // Fields used when action is ACTION_ANSWER
+  // -----------------------------------
+  // Room name to connect to
+  string room_name = 2;
+  // Optional pin required to enter room
+  string pin = 3;
+  // Cloud-only, config preset to use
+  string room_preset = 4;
+  // RoomConfiguration to use if the participant initiates the room
+  RoomConfiguration room_config = 5;
+  //valid for only cloud
+  bool krisp_enabled = 6;
+  SIPMediaEncryption media_encryption = 7;
+
+  // Fields used when action is ACTION_REJECT
+  // -----------------------------------
+  // Status code to reject with
+  SIPStatusCode reject_status_code = 8;
+  // Optional reason message for rejection
+  string reject_reason = 9;
+
+  // Fields used when action is ACTION_TRANSFER
+  // -----------------------------------
+  // Destination to transfer to e.g. phone number
+  string transfer_to = 10;
+  // Optional human-readable name or department for transfer
+  string destination_name = 11;
+  // Max time to wait for transfer to be answered
+  google.protobuf.Duration transfer_ringing_timeout = 12;
+
+  // Common fields that apply to any action type
+  // -----------------------------------
+  // User-defined metadata.
+  // Participants created by this rule will inherit this metadata.
+  string metadata = 13;
+  // User-defined attributes.
+  // Participants created by this rule will inherit these attributes.
+  map<string, string> attributes = 14;
+}
+
 message SIPDispatchRule {
   oneof rule {
     // SIPDispatchRuleDirect is a `SIP Dispatch Rule` that puts a user directly into a room
@@ -482,6 +544,11 @@ message SIPDispatchRule {
 
     // SIPDispatchRuleCallee is a `SIP Dispatch Rule` that creates a new room for each callee.
     SIPDispatchRuleCallee dispatch_rule_callee = 3;
+
+    // SIPDispatchRuleDynamic is a webhook-based dispatch rule. SIP will send a request to
+    // a webhook URL that you must implement. You can return information about how the call
+    // should be dispatched.
+    SIPDispatchRuleDynamic dispatch_rule_dynamic = 4;
   }
 }
 
@@ -552,7 +619,26 @@ message SIPDispatchRuleInfo {
 
   bool krisp_enabled = 11;
   SIPMediaEncryption media_encryption = 12;
-  // NEXT ID: 13
+
+  // Fields from SIPDispatchRuleDynamicResponse for dynamic rules
+  // Type of action to take
+  DispatchAction action = 13;
+
+  // Fields used when action is ACTION_REJECT
+  // Status code to reject with
+  SIPStatusCode reject_status_code = 14;
+  // Optional reason message for rejection
+  string reject_reason = 15;
+
+  // Fields used when action is ACTION_TRANSFER
+  // Destination to transfer to e.g. phone number
+  string transfer_to = 16;
+  // Optional human-readable name or department for transfer
+  string destination_name = 17;
+  // Max time to wait for transfer to be answered
+  google.protobuf.Duration transfer_ringing_timeout = 18;
+
+  // NEXT ID: 19
 }
 
 message SIPDispatchRuleUpdate {
