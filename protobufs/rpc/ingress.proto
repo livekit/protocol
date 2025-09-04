@@ -20,6 +20,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
 import "livekit_ingress.proto";
+import "livekit_models.proto";
 import "google/protobuf/empty.proto";
 
 service IngressInternal {
@@ -56,7 +57,14 @@ service IngressHandler {
   rpc ICERestartWHIPResource(ICERestartWHIPResourceRequest) returns (ICERestartWHIPResourceResponse) {
     option (psrpc.options).topics = true;
   };
-
+  rpc WHIPRTCConnectionNotify(WHIPRTCConnectionNotifyRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        single_server: true;
+      }
+    };
+  };
 }
 
 message ListActiveIngressRequest {}
@@ -84,6 +92,18 @@ message ICERestartWHIPResourceRequest {
 message ICERestartWHIPResourceResponse {
   string trickle_ice_sdpfrag = 1;
   string etag = 2;
+}
+
+message WHIPRTCConnectionNotifyRequest {
+  string participant_id = 1;
+  bool closed = 2;
+  repeated WHIPTrackStats track_stats = 3;
+}
+
+message WHIPTrackStats {
+  livekit.TrackType track_type = 1;
+  livekit.VideoQuality quality = 2;
+  livekit.RTPStats stats = 3;
 }
 
 message StartIngressRequest {
