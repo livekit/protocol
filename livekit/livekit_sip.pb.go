@@ -3737,6 +3737,7 @@ type SIPCallInfo struct {
 	CallStatusCode   *SIPStatus       `protobuf:"bytes,19,opt,name=call_status_code,json=callStatusCode,proto3" json:"call_status_code,omitempty"`
 	AudioCodec       string           `protobuf:"bytes,20,opt,name=audio_codec,json=audioCodec,proto3" json:"audio_codec,omitempty"`
 	MediaEncryption  string           `protobuf:"bytes,21,opt,name=media_encryption,json=mediaEncryption,proto3" json:"media_encryption,omitempty"`
+	PcapFileLink     string           `protobuf:"bytes,25,opt,name=pcap_file_link,json=pcapFileLink,proto3" json:"pcap_file_link,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -3938,6 +3939,13 @@ func (x *SIPCallInfo) GetAudioCodec() string {
 func (x *SIPCallInfo) GetMediaEncryption() string {
 	if x != nil {
 		return x.MediaEncryption
+	}
+	return ""
+}
+
+func (x *SIPCallInfo) GetPcapFileLink() string {
+	if x != nil {
+		return x.PcapFileLink
 	}
 	return ""
 }
@@ -4437,7 +4445,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe2\b\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x88\t\n" +
 	"\vSIPCallInfo\x12\x17\n" +
 	"\acall_id\x18\x01 \x01(\tR\x06callId\x12\x19\n" +
 	"\btrunk_id\x18\x02 \x01(\tR\atrunkId\x12(\n" +
@@ -4467,7 +4475,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x10call_status_code\x18\x13 \x01(\v2\x12.livekit.SIPStatusR\x0ecallStatusCode\x12\x1f\n" +
 	"\vaudio_codec\x18\x14 \x01(\tR\n" +
 	"audioCodec\x12)\n" +
-	"\x10media_encryption\x18\x15 \x01(\tR\x0fmediaEncryption\x1aH\n" +
+	"\x10media_encryption\x18\x15 \x01(\tR\x0fmediaEncryption\x12$\n" +
+	"\x0epcap_file_link\x18\x19 \x01(\tR\fpcapFileLink\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xff\x02\n" +

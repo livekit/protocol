@@ -126,6 +126,7 @@ const (
 	AnalyticsEventType_SIP_CALL_ENDED                     AnalyticsEventType = 39
 	AnalyticsEventType_SIP_TRANSFER_REQUESTED             AnalyticsEventType = 43
 	AnalyticsEventType_SIP_TRANSFER_COMPLETE              AnalyticsEventType = 44
+	AnalyticsEventType_SIP_CALL_UPDATE                    AnalyticsEventType = 46
 	AnalyticsEventType_REPORT                             AnalyticsEventType = 40
 	AnalyticsEventType_API_CALL                           AnalyticsEventType = 41
 	AnalyticsEventType_WEBHOOK                            AnalyticsEventType = 42
@@ -175,6 +176,7 @@ var (
 		39: "SIP_CALL_ENDED",
 		43: "SIP_TRANSFER_REQUESTED",
 		44: "SIP_TRANSFER_COMPLETE",
+		46: "SIP_CALL_UPDATE",
 		40: "REPORT",
 		41: "API_CALL",
 		42: "WEBHOOK",
@@ -221,6 +223,7 @@ var (
 		"SIP_CALL_ENDED":                     39,
 		"SIP_TRANSFER_REQUESTED":             43,
 		"SIP_TRANSFER_COMPLETE":              44,
+		"SIP_CALL_UPDATE":                    46,
 		"REPORT":                             40,
 		"API_CALL":                           41,
 		"WEBHOOK":                            42,
@@ -2439,7 +2442,7 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"StreamType\x12\f\n" +
 	"\bUPSTREAM\x10\x00\x12\x0e\n" +
 	"\n" +
-	"DOWNSTREAM\x10\x01*\xb1\b\n" +
+	"DOWNSTREAM\x10\x01*\xc6\b\n" +
 	"\x12AnalyticsEventType\x12\x10\n" +
 	"\fROOM_CREATED\x10\x00\x12\x0e\n" +
 	"\n" +
@@ -2483,7 +2486,8 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x10SIP_CALL_STARTED\x10&\x12\x12\n" +
 	"\x0eSIP_CALL_ENDED\x10'\x12\x1a\n" +
 	"\x16SIP_TRANSFER_REQUESTED\x10+\x12\x19\n" +
-	"\x15SIP_TRANSFER_COMPLETE\x10,\x12\n" +
+	"\x15SIP_TRANSFER_COMPLETE\x10,\x12\x13\n" +
+	"\x0fSIP_CALL_UPDATE\x10.\x12\n" +
 	"\n" +
 	"\x06REPORT\x10(\x12\f\n" +
 	"\bAPI_CALL\x10)\x12\v\n" +

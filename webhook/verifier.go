@@ -16,6 +16,7 @@ package webhook
 
 import (
 	"crypto/sha256"
+	"crypto/subtle"
 	"encoding/base64"
 	"io"
 	"net/http"
@@ -59,7 +60,7 @@ func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
 	sha := sha256.Sum256(data)
 	hash := base64.StdEncoding.EncodeToString(sha[:])
 
-	if claims.Sha256 != hash {
+	if subtle.ConstantTimeCompare([]byte(claims.Sha256), []byte(hash)) != 1 {
 		return nil, ErrInvalidChecksum
 	}
 
