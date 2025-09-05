@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.42.0
+
+### Minor Changes
+
+- Adding a call_context field to SIPCallInfo - [#1188](https://github.com/livekit/protocol/pull/1188) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+### Patch Changes
+
+- Adding get and update apis for livekit phone numbers - [#1179](https://github.com/livekit/protocol/pull/1179) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- Adding an rpc to record call context using SipCallInfo - [#1189](https://github.com/livekit/protocol/pull/1189) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
 ## 1.41.0
 
 ### Minor Changes
