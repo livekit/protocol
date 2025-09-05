@@ -42,6 +42,7 @@ service IOInfo {
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
   rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
   rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
+  rpc RecordCallContext(RecordCallContextRequest) returns (google.protobuf.Empty);
 }
 
 message GetEgressRequest {
@@ -212,6 +213,12 @@ message UpdateSIPCallStateRequest {
   livekit.SIPTransferInfo transfer_info = 2;
 
    // NEXT ID: 3
+}
+
+message RecordCallContextRequest {
+  livekit.SIPCallInfo call_info = 1;
+
+  // NEXT ID: 2
 }
 
 enum SIPDispatchResult {
