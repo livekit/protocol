@@ -20,6 +20,7 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "livekit_models.proto";
@@ -719,8 +720,9 @@ message SIPCallInfo {
   string audio_codec = 20;
   string media_encryption = 21;
   string pcap_file_link = 25;
+  map<string, google.protobuf.Any> call_context = 26;
 
-  // NEXT ID: 26
+  // NEXT ID: 27
 }
 
 message SIPTransferInfo {
