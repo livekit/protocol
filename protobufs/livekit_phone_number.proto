@@ -7,15 +7,6 @@ option go_package = "github.com/livekit/protocol/livekit";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 
-// Telephony cost type enumeration
-enum TelephonyCostType {
-  TELEPHONY_COST_TYPE_UNSPECIFIED = 0;   // Default value
-  TELEPHONY_COST_TYPE_NUMBER_RENTAL = 1; // Monthly rental for the phone number
-  TELEPHONY_COST_TYPE_VOICE_INBOUND = 2; // Inbound voice calls
-  TELEPHONY_COST_TYPE_VOICE_OUTBOUND = 3; // Outbound voice calls
-  TELEPHONY_COST_TYPE_SMS_INBOUND = 4;   // Inbound SMS
-  TELEPHONY_COST_TYPE_SMS_OUTBOUND = 5;  // Outbound SMS
-}
 
 // Phone number status enumeration
 enum PhoneNumberStatus {
@@ -27,42 +18,42 @@ enum PhoneNumberStatus {
 
 // Public Phone Number Service - External API for phone number management
 service PhoneNumberService {
-  // List available phone numbers in inventory
-  rpc ListPhoneNumberInventory(ListPhoneNumberInventoryRequest)
-      returns (ListPhoneNumberInventoryResponse) {}
+  // Search available phone numbers in inventory
+  rpc SearchPhoneNumbers(SearchPhoneNumbersRequest)
+      returns (SearchPhoneNumbersResponse) {}
 
   // Purchase a phone number from inventory
   rpc PurchasePhoneNumber(PurchasePhoneNumberRequest)
       returns (PurchasePhoneNumberResponse) {}
 
-  // List purchased phone numbers for a project
-  rpc ListPurchasedPhoneNumbers(ListPurchasedPhoneNumbersRequest)
-      returns (ListPurchasedPhoneNumbersResponse) {}
+  // List phone numbers for a project
+  rpc ListPhoneNumbers(ListPhoneNumbersRequest)
+      returns (ListPhoneNumbersResponse) {}
 
-  // Get a purchased phone number
-  rpc GetPurchasedPhoneNumber(GetPurchasedPhoneNumberRequest)
-      returns (GetPurchasedPhoneNumberResponse) {}
+  // Get a phone number from a project
+  rpc GetPhoneNumber(GetPhoneNumberRequest)
+      returns (GetPhoneNumberResponse) {}
 
-  // Update a purchased phone number
-  rpc UpdatePurchasedPhoneNumber(UpdatePurchasedPhoneNumberRequest)
-      returns (UpdatePurchasedPhoneNumberResponse) {}
+  // Update a phone number in a project
+  rpc UpdatePhoneNumber(UpdatePhoneNumberRequest)
+      returns (UpdatePhoneNumberResponse) {}
 
-  // Release a purchased phone number
-  rpc ReleasePurchasedPhoneNumber(ReleasePurchasedPhoneNumbersRequest)
-      returns (ReleasePurchasedPhoneNumbersResponse) {}
+  // Release phone numbers
+  rpc ReleasePhoneNumbers(ReleasePhoneNumbersRequest)
+      returns (ReleasePhoneNumbersResponse) {}
 }
 
-// ListPhoneNumberInventoryRequest - Request to list available phone numbers
-message ListPhoneNumberInventoryRequest {
+// SearchPhoneNumbersRequest - Request to search available phone numbers
+message SearchPhoneNumbersRequest {
   string country_code = 1;        // Optional: Filter by country code (e.g., "US", "CA")
   string area_code = 2;           // Optional: Filter by area code (e.g., "415")
   int32 limit = 3;                // Optional: Maximum number of results (default: 50)
   TokenPagination page_token = 4;          // Optional: Token for pagination (empty for first page)
 }
 
-// ListPhoneNumberInventoryResponse - Response containing available phone numbers
-message ListPhoneNumberInventoryResponse {
-  repeated PhoneNumberInventoryItem items = 1;  // List of available phone numbers
+// SearchPhoneNumbersResponse - Response containing available phone numbers
+message SearchPhoneNumbersResponse {
+  repeated PhoneNumber items = 1;  // List of available phone numbers
   TokenPagination next_page_token = 2;                   // Token for next page (empty if no more pages)
 }
 
@@ -74,95 +65,73 @@ message PurchasePhoneNumberRequest {
 
 // PurchasePhoneNumberResponse - Response containing the purchased phone numbers
 message PurchasePhoneNumberResponse {
-  repeated PurchasedPhoneNumber phone_numbers = 1;  // Details of the purchased phone numbers
+  repeated PhoneNumber phone_numbers = 1;  // Details of the purchased phone numbers
 }
 
-// ListPurchasedPhoneNumbersRequest - Request to list purchased phone numbers
-message ListPurchasedPhoneNumbersRequest {
+// ListPhoneNumbersRequest - Request to list phone numbers
+message ListPhoneNumbersRequest {
   int32 limit = 1;                // Optional: Maximum number of results (default: 50)
   PhoneNumberStatus status = 2;            // Optional: Filter by status (active, pending, released)
   TokenPagination page_token = 3;          // Optional: Token for pagination (empty for first page)
   string sip_dispatch_rule_id = 4;         // Optional: Filter by SIP dispatch rule ID
 }
 
-// ListPurchasedPhoneNumbersResponse - Response containing purchased phone numbers
-message ListPurchasedPhoneNumbersResponse {
-  repeated PurchasedPhoneNumber items = 1;  // List of purchased phone numbers
+// ListPhoneNumbersResponse - Response containing phone numbers
+message ListPhoneNumbersResponse {
+  repeated PhoneNumber items = 1;  // List of phone numbers
   TokenPagination next_page_token = 2;               // Token for next page (empty if no more pages)
-  int32 total_count = 3;                    // Total number of purchased phone numbers
+  int32 total_count = 3;                    // Total number of phone numbers
 }
 
-// GetPurchasedPhoneNumberRequest - Request to get a purchased phone number
-message GetPurchasedPhoneNumberRequest {
-  string purchased_phone_number_id = 1;  // Optional: Use purchased phone number ID for direct lookup
+// GetPhoneNumberRequest - Request to get a phone number
+message GetPhoneNumberRequest {
+  string id = 1;  // Optional: Use phone number ID for direct lookup
   string phone_number = 2;               // Optional: Use phone number string for lookup
 }
 
-// GetPurchasedPhoneNumberResponse - Response containing the purchased phone number
-message GetPurchasedPhoneNumberResponse {
-  PurchasedPhoneNumber phone_number = 1;  // The purchased phone number details
+// GetPhoneNumberResponse - Response containing the phone number
+message GetPhoneNumberResponse {
+  PhoneNumber phone_number = 1;  // The phone number details
 }
 
-// UpdatePurchasedPhoneNumberRequest - Request to update a purchased phone number
-message UpdatePurchasedPhoneNumberRequest {
-  string purchased_phone_number_id = 1;  // Optional: Use purchased phone number ID for direct lookup
+// UpdatePhoneNumberRequest - Request to update a phone number
+message UpdatePhoneNumberRequest {
+  string id = 1;  // Optional: Use phone number ID for direct lookup
   string phone_number = 2;               // Optional: Use phone number string for lookup
   string sip_dispatch_rule_id = 3;       // Optional: SIP dispatch rule ID to assign to the phone number
 }
 
-// UpdatePurchasedPhoneNumberResponse - Response containing the updated purchased phone number
-message UpdatePurchasedPhoneNumberResponse {
-  PurchasedPhoneNumber phone_number = 1;  // The updated purchased phone number details
+// UpdatePhoneNumberResponse - Response containing the updated phone number
+message UpdatePhoneNumberResponse {
+  PhoneNumber phone_number = 1;  // The updated phone number details
 }
 
-// ReleasePurchasedPhoneNumbersRequest - Request to release purchased phone numbers
-message ReleasePurchasedPhoneNumbersRequest {
-  repeated string purchased_phone_number_ids = 1;  // Optional: Use purchased phone number IDs for direct lookup
+// ReleasePhoneNumbersRequest - Request to release phone numbers
+message ReleasePhoneNumbersRequest {
+  repeated string ids = 1;  // Optional: Use phone number IDs for direct lookup
   repeated string phone_numbers = 2;               // Optional: Use phone number strings for lookup
 }
 
-// ReleasePurchasedPhoneNumbersResponse - Response for releasing purchased phone numbers
-message ReleasePurchasedPhoneNumbersResponse {
+// ReleasePhoneNumbersResponse - Response for releasing phone numbers
+message ReleasePhoneNumbersResponse {
   // Empty response - operation completed successfully
 }
 
-// GlobalPhoneNumber represents a phone number with standardized format
-message GlobalPhoneNumber {
-  string id = 1;                  // unique identifier
-  string e164_format = 2;         // e.g., "+14155552671"
-  string country_code = 3;        // e.g., "US"
-  string area_code = 4;           // e.g., "415"
-  string number_type  = 5;        // e.g., local, toll-free, national, mobile
+// PhoneNumber - Unified phone number type for inventory and purchased numbers
+message PhoneNumber {
+  string id = 1;                  // Unique identifier
+  string e164_format = 2;         // Phone number in E.164 format (e.g., "+14155552671")
+  string country_code = 3;        // Country code (e.g., "US")
+  string area_code = 4;           // Area code (e.g., "415")
+  string number_type = 5;         // Number type (e.g., local, toll-free, national, mobile)
   string locality = 6;            // City/locality (e.g., "San Francisco")
   string region = 7;              // State/region (e.g., "CA")
-  double spam_score = 8;          // can be used later for fraud detection
-  google.protobuf.Timestamp created_at = 9;           // timestamp when created
-  google.protobuf.Timestamp updated_at = 10;          // timestamp when updated
-}
-
-// TelephonyCost represents the pricing structure for a specific telephony service
-message TelephonyCost {
-  TelephonyCostType resource = 1;       // Type of telephony service
-  string currency = 2;                  // Currency code (e.g., "USD", "EUR")
-  double price = 3;                     // Price for this service
-  string billing_unit = 4;              // Billing unit (e.g., "month", "minute", "message", "call")
-}
-
-
-
-// PhoneNumberInventoryItem - Represents an available phone number for purchase
-message PhoneNumberInventoryItem {
-  GlobalPhoneNumber phone_number = 1;     // Common phone number fields
-  repeated string capabilities = 2;       // Comma-separated capabilities (e.g., "voice,sms")
-  repeated TelephonyCost costs = 3;       // Array of costs for different services
-}
-
-// PurchasedPhoneNumber - Represents a phone number owned by a LiveKit project
-message PurchasedPhoneNumber {
-  string purchased_phone_number_id = 1;  // Unique identifier for the purchased phone number
-  GlobalPhoneNumber phone_number = 2;  // Common phone number fields
-  PhoneNumberStatus status = 3;        // Current status of the phone number
-  google.protobuf.Timestamp assigned_at = 4;               // Timestamp when the number was assigned
-  google.protobuf.Timestamp released_at = 5;               // Timestamp when the number was released (if applicable)
-  string sip_dispatch_rule_id  = 6;  // Optional: Associated SIP dispatch rule
+  double spam_score = 8;          // Spam score for fraud detection
+  google.protobuf.Timestamp created_at = 9;           // Creation timestamp
+  google.protobuf.Timestamp updated_at = 10;          // Last update timestamp
+  repeated string capabilities = 11;       // Available capabilities (e.g., "voice", "sms")
+  PhoneNumberStatus status = 12;        // Current status
+  google.protobuf.Timestamp assigned_at = 13;               // Assignment timestamp
+  google.protobuf.Timestamp released_at = 14;               // Release timestamp (if applicable)
+  string sip_dispatch_rule_id = 15;  // Associated SIP dispatch rule ID
 }
