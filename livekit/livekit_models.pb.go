@@ -979,9 +979,10 @@ func (Encryption_Type) EnumDescriptor() ([]byte, []int) {
 type VideoLayer_Mode int32
 
 const (
-	VideoLayer_MODE_UNUSED                        VideoLayer_Mode = 0
-	VideoLayer_ONE_SPATIAL_LAYER_PER_STREAM       VideoLayer_Mode = 1
-	VideoLayer_MULTIPLE_SPATIAL_LAYERS_PER_STREAM VideoLayer_Mode = 2
+	VideoLayer_MODE_UNUSED                                     VideoLayer_Mode = 0
+	VideoLayer_ONE_SPATIAL_LAYER_PER_STREAM                    VideoLayer_Mode = 1
+	VideoLayer_MULTIPLE_SPATIAL_LAYERS_PER_STREAM              VideoLayer_Mode = 2
+	VideoLayer_ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR VideoLayer_Mode = 3
 )
 
 // Enum value maps for VideoLayer_Mode.
@@ -990,11 +991,13 @@ var (
 		0: "MODE_UNUSED",
 		1: "ONE_SPATIAL_LAYER_PER_STREAM",
 		2: "MULTIPLE_SPATIAL_LAYERS_PER_STREAM",
+		3: "ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR",
 	}
 	VideoLayer_Mode_value = map[string]int32{
-		"MODE_UNUSED":                        0,
-		"ONE_SPATIAL_LAYER_PER_STREAM":       1,
-		"MULTIPLE_SPATIAL_LAYERS_PER_STREAM": 2,
+		"MODE_UNUSED":                                     0,
+		"ONE_SPATIAL_LAYER_PER_STREAM":                    1,
+		"MULTIPLE_SPATIAL_LAYERS_PER_STREAM":              2,
+		"ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR": 3,
 	}
 )
 
@@ -5780,7 +5783,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06stream\x18\x11 \x01(\tR\x06stream\x12/\n" +
 	"\aversion\x18\x12 \x01(\v2\x15.livekit.TimedVersionR\aversion\x12A\n" +
 	"\x0eaudio_features\x18\x13 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12J\n" +
-	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\xb3\x02\n" +
+	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\xe9\x02\n" +
 	"\n" +
 	"VideoLayer\x12/\n" +
 	"\aquality\x18\x01 \x01(\x0e2\x15.livekit.VideoQualityR\aquality\x12\x14\n" +
@@ -5789,11 +5792,12 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\abitrate\x18\x04 \x01(\rR\abitrate\x12\x12\n" +
 	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\x12#\n" +
 	"\rspatial_layer\x18\x06 \x01(\x05R\fspatialLayer\x12\x10\n" +
-	"\x03rid\x18\a \x01(\tR\x03rid\"a\n" +
+	"\x03rid\x18\a \x01(\tR\x03rid\"\x96\x01\n" +
 	"\x04Mode\x12\x0f\n" +
 	"\vMODE_UNUSED\x10\x00\x12 \n" +
 	"\x1cONE_SPATIAL_LAYER_PER_STREAM\x10\x01\x12&\n" +
-	"\"MULTIPLE_SPATIAL_LAYERS_PER_STREAM\x10\x02\"\x8c\b\n" +
+	"\"MULTIPLE_SPATIAL_LAYERS_PER_STREAM\x10\x02\x123\n" +
+	"/ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR\x10\x03\"\x8c\b\n" +
 	"\n" +
 	"DataPacket\x120\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.livekit.DataPacket.KindB\x02\x18\x01R\x04kind\x121\n" +
