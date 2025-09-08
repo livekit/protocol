@@ -174,10 +174,8 @@ message ParticipantInfo {
   map<string, string> attributes = 15;
   DisconnectReason disconnect_reason = 16;
   repeated KindDetail kind_details = 18;
-  // indicates that subscriber subscribes to track of the participant can skip reference timestamps
-  bool sub_skip_reference_ts = 19;
 
-  // NEXT_ID: 20
+  // NEXT_ID: 19 
 }
 
 enum TrackType {
@@ -259,6 +257,7 @@ message VideoLayer {
     MODE_UNUSED = 0;
     ONE_SPATIAL_LAYER_PER_STREAM = 1;
     MULTIPLE_SPATIAL_LAYERS_PER_STREAM = 2;
+    ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR = 3;
   }
 
   // for tracks with a single layer, this should be HIGH
