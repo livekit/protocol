@@ -20,7 +20,6 @@ option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
 import "livekit_ingress.proto";
-import "livekit_models.proto";
 import "google/protobuf/empty.proto";
 
 service IngressInternal {
@@ -97,13 +96,6 @@ message ICERestartWHIPResourceResponse {
 message WHIPRTCConnectionNotifyRequest {
   string participant_id = 1;
   bool closed = 2;
-  repeated WHIPTrackStats track_stats = 3;
-}
-
-message WHIPTrackStats {
-  livekit.TrackType track_type = 1;
-  livekit.VideoQuality quality = 2;
-  livekit.RTPStats stats = 3;
 }
 
 message StartIngressRequest {
