@@ -12,7 +12,7 @@ import (
 
 func TestRaw_DefaultFirstGroup(t *testing.T) {
 	src := `num-pushed=(guint64)123 num-gap=(uint64)456`
-	kv := New(src)
+	kv := NewKVRegexScanner(src)
 
 	rePushed := regexp.MustCompile(`\bnum-pushed=\(g?uint64\)(\d+)`)
 	reGap := regexp.MustCompile(`\bnum-gap=\(g?uint64\)(\d+)`)
@@ -28,7 +28,7 @@ func TestRaw_DefaultFirstGroup(t *testing.T) {
 
 func TestRaw_NamedGroup(t *testing.T) {
 	src := `plc-duration=(guint64)20000000`
-	kv := New(src)
+	kv := NewKVRegexScanner(src)
 
 	reDur := regexp.MustCompile(`\bplc-duration=\(g?uint64\)(?P<ns>\d+)`)
 
@@ -39,7 +39,7 @@ func TestRaw_NamedGroup(t *testing.T) {
 
 func TestUint64_Int64_Uint_Int(t *testing.T) {
 	src := `u64=(guint64)184 r64=(int64)-42 u=(uint)48000 i=(int)7`
-	kv := New(src)
+	kv := NewKVRegexScanner(src)
 
 	reU64 := regexp.MustCompile(`\bu64=\(g?uint64\)(\d+)`)
 	reI64 := regexp.MustCompile(`\br64=\(g?int64\)(-?\d+)`)
@@ -64,7 +64,7 @@ func TestUint64_Int64_Uint_Int(t *testing.T) {
 }
 
 func TestFloat64_AndRejectNaNInf(t *testing.T) {
-	kv := New(`rms=(double)-12.25 bad1=(double)nan bad2=(double)inf`)
+	kv := NewKVRegexScanner(`rms=(double)-12.25 bad1=(double)nan bad2=(double)inf`)
 	reOk := regexp.MustCompile(`\brms=\(g?double\)(-?[0-9.]+)`)
 	reNaN := regexp.MustCompile(`\bbad1=\(g?double\)([^,}\s]+)`)
 	reInf := regexp.MustCompile(`\bbad2=\(g?double\)([^,}\s]+)`)
@@ -81,7 +81,7 @@ func TestFloat64_AndRejectNaNInf(t *testing.T) {
 }
 
 func TestBool_CaseAndAliases(t *testing.T) {
-	kv := New(`b1=(gboolean)TRUE b2=(boolean)false b3=(boolean)Yes b4=(boolean)0 other=x`)
+	kv := NewKVRegexScanner(`b1=(gboolean)TRUE b2=(boolean)false b3=(boolean)Yes b4=(boolean)0 other=x`)
 	reB1 := regexp.MustCompile(`\bb1=\(g?boolean\)([^,}\s]+)`)
 	reB2 := regexp.MustCompile(`\bb2=\(g?boolean\)([^,}\s]+)`)
 	reB3 := regexp.MustCompile(`\bb3=\(g?boolean\)([^,}\s]+)`)
@@ -105,7 +105,7 @@ func TestBool_CaseAndAliases(t *testing.T) {
 }
 
 func TestString_Unquote(t *testing.T) {
-	kv := New(`msg=(string)"hello \"world\"" raw=(string)plain`)
+	kv := NewKVRegexScanner(`msg=(string)"hello \"world\"" raw=(string)plain`)
 	reQ := regexp.MustCompile(`\bmsg=\(string\)("(?:[^"\\]|\\.)*")`)
 	reRaw := regexp.MustCompile(`\braw=\(string\)([^,}\s]+)`)
 
@@ -119,7 +119,7 @@ func TestString_Unquote(t *testing.T) {
 }
 
 func TestDurationNs(t *testing.T) {
-	kv := New(`d=(guint64)20000000`) // 20ms
+	kv := NewKVRegexScanner(`d=(guint64)20000000`) // 20ms
 	re := regexp.MustCompile(`\bd=\(g?uint64\)(\d+)`)
 
 	d, ok := kv.DurationNs(re)
@@ -129,7 +129,7 @@ func TestDurationNs(t *testing.T) {
 
 func TestDurationNs_OverflowGuard(t *testing.T) {
 	overflow := strconv.FormatUint(math.MaxUint64, 10)
-	kv := New(`d=(guint64)` + overflow)
+	kv := NewKVRegexScanner(`d=(guint64)` + overflow)
 	re := regexp.MustCompile(`\bd=\(g?uint64\)(\d+)`)
 
 	_, ok := kv.DurationNs(re)
@@ -137,7 +137,7 @@ func TestDurationNs_OverflowGuard(t *testing.T) {
 }
 
 func TestNoCapturingGroup_ReturnsFalse(t *testing.T) {
-	kv := New(`nogrp=(uint)7`)
+	kv := NewKVRegexScanner(`nogrp=(uint)7`)
 	re := regexp.MustCompile(`\bnogrp=\(g?uint\)\d+`) // no capturing group
 
 	_, ok := kv.Uint(re)
@@ -145,7 +145,7 @@ func TestNoCapturingGroup_ReturnsFalse(t *testing.T) {
 }
 
 func TestMissingNamedGroup_ReturnsFalse(t *testing.T) {
-	kv := New(`v=(int)42`)
+	kv := NewKVRegexScanner(`v=(int)42`)
 	re := regexp.MustCompile(`\bv=\(g?int\)(?P<val>\d+)`)
 
 	_, ok := kv.Int(re, "nope") // named group doesn't exist

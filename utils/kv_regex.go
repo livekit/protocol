@@ -13,7 +13,7 @@ type Scanner struct {
 	src string
 }
 
-func New(s string) Scanner { return Scanner{src: s} }
+func NewKVRegexScanner(s string) Scanner { return Scanner{src: s} }
 
 // Raw returns the first capture group by default, or a named group if provided.
 // Example:
