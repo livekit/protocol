@@ -355,7 +355,3 @@ func (p *DataStream_Trailer) ToProto() *DataPacket {
 		},
 	}
 }
-
-func (m VideoLayer_Mode) IsSimulcast() bool {
-	return m == VideoLayer_ONE_SPATIAL_LAYER_PER_STREAM || m == VideoLayer_ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR
-}
