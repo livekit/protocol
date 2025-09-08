@@ -21,11 +21,18 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+enum AgentSecretKind {
+    AGENT_SECRET_KIND_UNKNOWN = 0;
+    AGENT_SECRET_KIND_ENVIRONMENT = 1;
+    AGENT_SECRET_KIND_FILE = 2;
+}
+
 message AgentSecret {
     string name = 1;
     bytes value = 2;
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp updated_at = 4;
+    AgentSecretKind kind = 5;
 }
 
 message CreateAgentRequest {
