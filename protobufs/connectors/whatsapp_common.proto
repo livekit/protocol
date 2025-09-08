@@ -1,0 +1,63 @@
+// Copyright 2025 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit.connectors;
+option go_package = "github.com/livekit/protocol/connectors";
+option csharp_namespace = "LiveKit.Proto.Connectors";
+option ruby_package = "LiveKit::Proto::Connectors";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message WhatsAppSession {
+  WhatsAppSdpType sdp_type = 1;
+  string sdp = 2;
+}
+
+enum WhatsAppSdpType {
+  WHATSAPP_SDP_TYPE_OFFER = 0;
+  WHATSAPP_SDP_TYPE_ANSWER = 1;
+}
+
+message WhatsAppCall {
+  string id = 1;
+  optional string to = 2;
+  optional string from = 3;
+  optional WhatsAppCallEvent event = 4;
+  optional google.protobuf.Timestamp timestamp = 5;
+  optional WhatsAppCallDirection direction = 6;
+  optional WhatsAppSession session = 7;
+  optional string biz_opaque_callback_data = 8;
+  optional WhatsAppCallStatus status = 9;
+  optional google.protobuf.Timestamp start_time = 10;
+  optional google.protobuf.Timestamp end_time = 11;
+  optional google.protobuf.Duration duration = 12;
+}
+
+enum WhatsAppCallEvent {
+  WHATSAPP_CALL_EVENT_CONNECT = 0;
+  WHATSAPP_CALL_EVENT_TERMINATE = 1;
+}
+
+enum WhatsAppCallDirection {
+  WHATSAPP_CALL_DIRECTION_USER_INITIATED = 0;
+  WHATSAPP_CALL_DIRECTION_BUSINESS_INITIATED = 1;
+}
+
+enum WhatsAppCallStatus {
+  WHATSAPP_CALL_STATUS_FAILED = 0;
+  WHATSAPP_CALL_STATUS_COMPLETED = 1;
+}

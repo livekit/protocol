@@ -1,0 +1,88 @@
+// Copyright 2025 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "connectors/whatsapp_webhook.proto";
+import "connectors/whatsapp_common.proto";
+
+service ConnectorsService {
+  rpc CreateWhatsAppParticipant(CreateWhatsAppParticipantRequest) returns (CreateWhatsAppParticipantResponse);
+
+  rpc DeleteWhatsAppParticipant(DeleteWhatsAppParticipantRequest) returns (DeleteWhatsAppParticipantResponse);
+  
+  rpc ConnectWhatsAppCall(ConnectWhatsAppCallRequest) returns (ConnectWhatsAppCallResponse);
+
+  rpc RejectWhatsAppCall(RejectWhatsAppCallRequest) returns (RejectWhatsAppCallResponse);
+  
+  rpc ListWhatsAppCalls(ListWhatsAppCallsRequest) returns (ListWhatsAppCallsResponse);
+}
+
+message CreateWhatsAppParticipantRequest {
+  string from_phone_number_id = 1;
+  string to_phone_number_id = 2;
+  optional string biz_opaque_callback_data = 3; // for logging purposes
+}
+
+message CreateWhatsAppParticipantResponse {
+}
+
+message DeleteWhatsAppParticipantRequest {
+  optional string whatsapp_call_id = 1;
+  optional livekit.connectors.WhatsAppCallWebhook call_terminate_webhook = 2;
+  optional bool is_call_rejected = 3;
+}
+
+message DeleteWhatsAppParticipantResponse {
+}
+
+message ConnectWhatsAppCallRequest {
+  string livekit_participant_identity= 1;
+  map<string, string> participant_attributes = 2;
+  livekit.connectors.WhatsAppCallWebhook call_connect_webhook = 3;
+  ConnectorsDispatchRule dispatch_rule = 4;
+}
+
+message ConnectWhatsAppCallResponse {
+  string whatsapp_call_id = 1;
+}
+
+message RejectWhatsAppCallRequest {
+  optional string whatsapp_call_id = 1;
+  optional livekit.connectors.WhatsAppCallWebhook call_connect_webhook = 2;
+}
+
+message RejectWhatsAppCallResponse {
+}
+
+message ListWhatsAppCallsRequest {
+  string from_phone_number_id = 1;
+}
+
+message ListWhatsAppCallsResponse {
+  repeated livekit.connectors.WhatsAppCall calls = 1;
+}
+
+message ConnectorsDispatchRule {
+  optional string room = 1;
+  optional string room_prefix = 2;
+  optional string room_suffix = 3;
+  optional string agent_name = 4;
+  // what is metadata for agent dispath? do we need it here?
+}
