@@ -19,9 +19,6 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-import "connectors/whatsapp_webhook.proto";
-import "connectors/whatsapp_common.proto";
-
 service ConnectorsService {
   rpc CreateWhatsAppParticipant(CreateWhatsAppParticipantRequest) returns (CreateWhatsAppParticipantResponse);
 
@@ -35,28 +32,78 @@ service ConnectorsService {
 }
 
 message CreateWhatsAppParticipantRequest {
+  // The number of the business that is initiating the call
   string from_phone_number_id = 1;
+  // The number of the user that is supossed to receive the call
   string to_phone_number_id = 2;
-  optional string biz_opaque_callback_data = 3; // for logging purposes
+  // The API key of the business that is initiating the call
+  string whatsapp_api_key = 3;
+  // An arbitrary string you can pass in that is useful for tracking and logging purposes.
+  optional string biz_opaque_callback_data = 4;
 }
 
 message CreateWhatsAppParticipantResponse {
+  // Call ID sent by Meta
+  string whatsapp_call_id = 1;
 }
 
 message DeleteWhatsAppParticipantRequest {
-  optional string whatsapp_call_id = 1;
-  optional livekit.connectors.WhatsAppCallWebhook call_terminate_webhook = 2;
-  optional bool is_call_rejected = 3;
+  oneof request {
+    DeleteWhatsAppParticipantWithCallId call_id = 1;
+    DeleteWhatsAppParticipantForRejectedCall rejected_call = 2;
+    DeleteWhatsAppParticipantForTerminatedCall terminated_call = 3;
+    // when the call is rejected by the other side, we receive a webhook: 
+    // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-status-webhook
+    string call_status_rejected_webhook = 4;
+    // when the call is terminated by the other side, we receive a webhook: 
+    // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-terminate-webhook
+    // terminate webhook is the same for both user and business initiated calls
+    string call_terminate_webhook = 5;
+  }
+}
+
+message DeleteWhatsAppParticipantWithCallId {
+  // when the call is rejected or terminated by the other side, we don't need to make any API calls
+  // we only need to do it when we are terminating the call
+  string phone_number_id = 1;
+  // Call ID sent by Meta
+  string whatsapp_call_id = 2;
+  string whatsapp_api_key = 3;
+  
+}
+
+message DeleteWhatsAppParticipantForRejectedCall {
+  // Call ID sent by Meta
+  string whatsapp_call_id = 1;
+}
+
+message DeleteWhatsAppParticipantForTerminatedCall {
+  // Call ID sent by Meta
+  string whatsapp_call_id = 1;
 }
 
 message DeleteWhatsAppParticipantResponse {
 }
 
 message ConnectWhatsAppCallRequest {
-  string livekit_participant_identity= 1;
-  map<string, string> participant_attributes = 2;
-  livekit.connectors.WhatsAppCallWebhook call_connect_webhook = 3;
-  ConnectorsDispatchRule dispatch_rule = 4;
+  // The number of the business that is conencting the call
+  string phone_number_id = 1;
+  // The API key of the business that is connecting the call
+  string whatsapp_api_key = 2;
+  // Participant identity created on LiveKit's end
+  string livekit_participant_identity= 3;
+  // Attributes of the LiveKit participant
+  map<string, string> livekit_participant_attributes = 4;
+  // Dispatch rule for the participant
+  ConnectorsDispatchRule dispatch_rule = 5;
+  oneof request {
+    // Call ID sent by Meta
+    string whatsapp_call_id = 6;
+    // When the call is ready to be connected with Meta, we receive a call connect webhook with the SDP:
+    // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/user-initiated-calls#call-connect-webhook
+    // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-connect-webhook
+    string call_connect_webhook = 7;
+  } 
 }
 
 message ConnectWhatsAppCallResponse {
@@ -64,19 +111,43 @@ message ConnectWhatsAppCallResponse {
 }
 
 message RejectWhatsAppCallRequest {
-  optional string whatsapp_call_id = 1;
-  optional livekit.connectors.WhatsAppCallWebhook call_connect_webhook = 2;
+  // The number of the business that is rejecting the call
+  string phone_number_id = 1;
+  // The API key of the business that is rejecting the call
+  string whatsapp_api_key = 2;
+  oneof request {
+    // Call ID sent by Meta
+    string whatsapp_call_id = 3;
+    // When the call is ready to be connected with Meta, we receive a call connect webhook with the SDP:
+    // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/user-initiated-calls#call-connect-webhook
+    // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-connect-webhook
+    string call_connect_webhook = 4;
+  }
 }
 
 message RejectWhatsAppCallResponse {
 }
 
 message ListWhatsAppCallsRequest {
-  string from_phone_number_id = 1;
+  // The number of the business that is listing the calls
+  string phone_number_id = 1;
 }
 
 message ListWhatsAppCallsResponse {
-  repeated livekit.connectors.WhatsAppCall calls = 1;
+  repeated WhatsAppCall calls = 1;
+
+}
+
+message WhatsAppCall {
+  // list of call ids that are currently active
+  string whatsapp_call_id = 1;
+  // Direction of the call
+  WhatsAppCallDirection direction = 2;
+}
+
+enum WhatsAppCallDirection {
+  WHATSAPP_CALL_DIRECTION_INBOUND = 0;
+  WHATSAPP_CALL_DIRECTION_OUTBOUND = 2;
 }
 
 message ConnectorsDispatchRule {

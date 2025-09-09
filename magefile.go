@@ -79,11 +79,6 @@ func Proto() error {
 		"rpc/whip_signal.proto",
 		"rpc/sip.proto",
 	}
-	connectorProtoFiles := []string{
-		"connectors/whatsapp_api.proto",
-		"connectors/whatsapp_common.proto",
-		"connectors/whatsapp_webhook.proto",
-	}
 
 	fmt.Println("generating protobuf")
 	target := "livekit"
@@ -196,19 +191,6 @@ func Proto() error {
 	cmd = exec.Command(protoc, args...)
 	mageutil.ConnectStd(cmd)
 	if err = cmd.Run(); err != nil {
-		return err
-	}
-
-	fmt.Println("generating connector protobuf")
-	args = append([]string{
-		"--go_out", ".",
-		"--go_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
-		"-I=./protobufs",
-	}, connectorProtoFiles...)
-	cmd = exec.Command(protoc, args...)
-	connectStd(cmd)
-	if err := cmd.Run(); err != nil {
 		return err
 	}
 
