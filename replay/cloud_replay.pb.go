@@ -24,6 +24,7 @@ const (
 
 type ListReplaysRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // optional
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -56,6 +57,13 @@ func (x *ListReplaysRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListReplaysRequest.ProtoReflect.Descriptor instead.
 func (*ListReplaysRequest) Descriptor() ([]byte, []int) {
 	return file_cloud_replay_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *ListReplaysRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
 }
 
 type ListReplaysResponse struct {
@@ -105,6 +113,9 @@ func (x *ListReplaysResponse) GetReplays() []*ReplayInfo {
 type ReplayInfo struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReplayId      string                 `protobuf:"bytes,1,opt,name=replay_id,json=replayId,proto3" json:"replay_id,omitempty"`
+	RoomName      string                 `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	StartTime     int64                  `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	Duration      int64                  `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -146,204 +157,25 @@ func (x *ReplayInfo) GetReplayId() string {
 	return ""
 }
 
-type LoadReplayRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ReplayId      string                 `protobuf:"bytes,1,opt,name=replay_id,json=replayId,proto3" json:"replay_id,omitempty"`
-	RoomName      string                 `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	StartingPts   int64                  `protobuf:"varint,3,opt,name=starting_pts,json=startingPts,proto3" json:"starting_pts,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LoadReplayRequest) Reset() {
-	*x = LoadReplayRequest{}
-	mi := &file_cloud_replay_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LoadReplayRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LoadReplayRequest) ProtoMessage() {}
-
-func (x *LoadReplayRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cloud_replay_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LoadReplayRequest.ProtoReflect.Descriptor instead.
-func (*LoadReplayRequest) Descriptor() ([]byte, []int) {
-	return file_cloud_replay_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *LoadReplayRequest) GetReplayId() string {
-	if x != nil {
-		return x.ReplayId
-	}
-	return ""
-}
-
-func (x *LoadReplayRequest) GetRoomName() string {
+func (x *ReplayInfo) GetRoomName() string {
 	if x != nil {
 		return x.RoomName
 	}
 	return ""
 }
 
-func (x *LoadReplayRequest) GetStartingPts() int64 {
+func (x *ReplayInfo) GetStartTime() int64 {
 	if x != nil {
-		return x.StartingPts
+		return x.StartTime
 	}
 	return 0
 }
 
-type LoadReplayResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LoadReplayResponse) Reset() {
-	*x = LoadReplayResponse{}
-	mi := &file_cloud_replay_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LoadReplayResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LoadReplayResponse) ProtoMessage() {}
-
-func (x *LoadReplayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cloud_replay_proto_msgTypes[4]
+func (x *ReplayInfo) GetDuration() int64 {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LoadReplayResponse.ProtoReflect.Descriptor instead.
-func (*LoadReplayResponse) Descriptor() ([]byte, []int) {
-	return file_cloud_replay_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *LoadReplayResponse) GetPlaybackId() string {
-	if x != nil {
-		return x.PlaybackId
-	}
-	return ""
-}
-
-type RoomSeekRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
-	Pts           int64                  `protobuf:"varint,2,opt,name=pts,proto3" json:"pts,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RoomSeekRequest) Reset() {
-	*x = RoomSeekRequest{}
-	mi := &file_cloud_replay_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RoomSeekRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RoomSeekRequest) ProtoMessage() {}
-
-func (x *RoomSeekRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cloud_replay_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RoomSeekRequest.ProtoReflect.Descriptor instead.
-func (*RoomSeekRequest) Descriptor() ([]byte, []int) {
-	return file_cloud_replay_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *RoomSeekRequest) GetPlaybackId() string {
-	if x != nil {
-		return x.PlaybackId
-	}
-	return ""
-}
-
-func (x *RoomSeekRequest) GetPts() int64 {
-	if x != nil {
-		return x.Pts
+		return x.Duration
 	}
 	return 0
-}
-
-type CloseReplayRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CloseReplayRequest) Reset() {
-	*x = CloseReplayRequest{}
-	mi := &file_cloud_replay_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CloseReplayRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CloseReplayRequest) ProtoMessage() {}
-
-func (x *CloseReplayRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cloud_replay_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CloseReplayRequest.ProtoReflect.Descriptor instead.
-func (*CloseReplayRequest) Descriptor() ([]byte, []int) {
-	return file_cloud_replay_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *CloseReplayRequest) GetPlaybackId() string {
-	if x != nil {
-		return x.PlaybackId
-	}
-	return ""
 }
 
 type DeleteReplayRequest struct {
@@ -355,7 +187,7 @@ type DeleteReplayRequest struct {
 
 func (x *DeleteReplayRequest) Reset() {
 	*x = DeleteReplayRequest{}
-	mi := &file_cloud_replay_proto_msgTypes[7]
+	mi := &file_cloud_replay_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -367,7 +199,7 @@ func (x *DeleteReplayRequest) String() string {
 func (*DeleteReplayRequest) ProtoMessage() {}
 
 func (x *DeleteReplayRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cloud_replay_proto_msgTypes[7]
+	mi := &file_cloud_replay_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +212,7 @@ func (x *DeleteReplayRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteReplayRequest.ProtoReflect.Descriptor instead.
 func (*DeleteReplayRequest) Descriptor() ([]byte, []int) {
-	return file_cloud_replay_proto_rawDescGZIP(), []int{7}
+	return file_cloud_replay_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *DeleteReplayRequest) GetReplayId() string {
@@ -390,40 +222,246 @@ func (x *DeleteReplayRequest) GetReplayId() string {
 	return ""
 }
 
+type PlaybackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReplayId      string                 `protobuf:"bytes,1,opt,name=replay_id,json=replayId,proto3" json:"replay_id,omitempty"`
+	RoomName      string                 `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`     // room to play into
+	StartTime     int64                  `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // initial cursor
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlaybackRequest) Reset() {
+	*x = PlaybackRequest{}
+	mi := &file_cloud_replay_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlaybackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlaybackRequest) ProtoMessage() {}
+
+func (x *PlaybackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cloud_replay_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlaybackRequest.ProtoReflect.Descriptor instead.
+func (*PlaybackRequest) Descriptor() ([]byte, []int) {
+	return file_cloud_replay_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *PlaybackRequest) GetReplayId() string {
+	if x != nil {
+		return x.ReplayId
+	}
+	return ""
+}
+
+func (x *PlaybackRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *PlaybackRequest) GetStartTime() int64 {
+	if x != nil {
+		return x.StartTime
+	}
+	return 0
+}
+
+type PlaybackResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PlaybackResponse) Reset() {
+	*x = PlaybackResponse{}
+	mi := &file_cloud_replay_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PlaybackResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlaybackResponse) ProtoMessage() {}
+
+func (x *PlaybackResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cloud_replay_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlaybackResponse.ProtoReflect.Descriptor instead.
+func (*PlaybackResponse) Descriptor() ([]byte, []int) {
+	return file_cloud_replay_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *PlaybackResponse) GetPlaybackId() string {
+	if x != nil {
+		return x.PlaybackId
+	}
+	return ""
+}
+
+type SeekRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
+	StartTime     int64                  `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // initial cursor
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SeekRequest) Reset() {
+	*x = SeekRequest{}
+	mi := &file_cloud_replay_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SeekRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SeekRequest) ProtoMessage() {}
+
+func (x *SeekRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cloud_replay_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SeekRequest.ProtoReflect.Descriptor instead.
+func (*SeekRequest) Descriptor() ([]byte, []int) {
+	return file_cloud_replay_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SeekRequest) GetPlaybackId() string {
+	if x != nil {
+		return x.PlaybackId
+	}
+	return ""
+}
+
+func (x *SeekRequest) GetStartTime() int64 {
+	if x != nil {
+		return x.StartTime
+	}
+	return 0
+}
+
+type ClosePlaybackRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClosePlaybackRequest) Reset() {
+	*x = ClosePlaybackRequest{}
+	mi := &file_cloud_replay_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClosePlaybackRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClosePlaybackRequest) ProtoMessage() {}
+
+func (x *ClosePlaybackRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cloud_replay_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClosePlaybackRequest.ProtoReflect.Descriptor instead.
+func (*ClosePlaybackRequest) Descriptor() ([]byte, []int) {
+	return file_cloud_replay_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ClosePlaybackRequest) GetPlaybackId() string {
+	if x != nil {
+		return x.PlaybackId
+	}
+	return ""
+}
+
 var File_cloud_replay_proto protoreflect.FileDescriptor
 
 const file_cloud_replay_proto_rawDesc = "" +
 	"\n" +
-	"\x12cloud_replay.proto\x12\x06replay\x1a\x1bgoogle/protobuf/empty.proto\"\x14\n" +
-	"\x12ListReplaysRequest\"C\n" +
+	"\x12cloud_replay.proto\x12\x06replay\x1a\x1bgoogle/protobuf/empty.proto\"1\n" +
+	"\x12ListReplaysRequest\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\"C\n" +
 	"\x13ListReplaysResponse\x12,\n" +
-	"\areplays\x18\x01 \x03(\v2\x12.replay.ReplayInfoR\areplays\")\n" +
+	"\areplays\x18\x01 \x03(\v2\x12.replay.ReplayInfoR\areplays\"\x81\x01\n" +
 	"\n" +
 	"ReplayInfo\x12\x1b\n" +
-	"\treplay_id\x18\x01 \x01(\tR\breplayId\"p\n" +
-	"\x11LoadReplayRequest\x12\x1b\n" +
 	"\treplay_id\x18\x01 \x01(\tR\breplayId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\x12!\n" +
-	"\fstarting_pts\x18\x03 \x01(\x03R\vstartingPts\"5\n" +
-	"\x12LoadReplayResponse\x12\x1f\n" +
-	"\vplayback_id\x18\x01 \x01(\tR\n" +
-	"playbackId\"D\n" +
-	"\x0fRoomSeekRequest\x12\x1f\n" +
-	"\vplayback_id\x18\x01 \x01(\tR\n" +
-	"playbackId\x12\x10\n" +
-	"\x03pts\x18\x02 \x01(\x03R\x03pts\"5\n" +
-	"\x12CloseReplayRequest\x12\x1f\n" +
-	"\vplayback_id\x18\x01 \x01(\tR\n" +
-	"playbackId\"2\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\x03 \x01(\x03R\tstartTime\x12\x1a\n" +
+	"\bduration\x18\x04 \x01(\x03R\bduration\"2\n" +
 	"\x13DeleteReplayRequest\x12\x1b\n" +
-	"\treplay_id\x18\x01 \x01(\tR\breplayId2\xdd\x02\n" +
+	"\treplay_id\x18\x01 \x01(\tR\breplayId\"j\n" +
+	"\x0fPlaybackRequest\x12\x1b\n" +
+	"\treplay_id\x18\x01 \x01(\tR\breplayId\x12\x1b\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\x03 \x01(\x03R\tstartTime\"3\n" +
+	"\x10PlaybackResponse\x12\x1f\n" +
+	"\vplayback_id\x18\x01 \x01(\tR\n" +
+	"playbackId\"M\n" +
+	"\vSeekRequest\x12\x1f\n" +
+	"\vplayback_id\x18\x01 \x01(\tR\n" +
+	"playbackId\x12\x1d\n" +
+	"\n" +
+	"start_time\x18\x02 \x01(\x03R\tstartTime\"7\n" +
+	"\x14ClosePlaybackRequest\x12\x1f\n" +
+	"\vplayback_id\x18\x01 \x01(\tR\n" +
+	"playbackId2\xc8\x02\n" +
 	"\x06Replay\x12F\n" +
 	"\vListReplays\x12\x1a.replay.ListReplaysRequest\x1a\x1b.replay.ListReplaysResponse\x12C\n" +
-	"\n" +
-	"LoadReplay\x12\x19.replay.LoadReplayRequest\x1a\x1a.replay.LoadReplayResponse\x12>\n" +
-	"\vSeekForRoom\x12\x17.replay.RoomSeekRequest\x1a\x16.google.protobuf.Empty\x12A\n" +
-	"\vCloseReplay\x12\x1a.replay.CloseReplayRequest\x1a\x16.google.protobuf.Empty\x12C\n" +
-	"\fDeleteReplay\x12\x1b.replay.DeleteReplayRequest\x1a\x16.google.protobuf.EmptyBEZ\"github.com/livekit/protocol/replay\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\fDeleteReplay\x12\x1b.replay.DeleteReplayRequest\x1a\x16.google.protobuf.Empty\x12=\n" +
+	"\bPlayback\x12\x17.replay.PlaybackRequest\x1a\x18.replay.PlaybackResponse\x123\n" +
+	"\x04Seek\x12\x13.replay.SeekRequest\x1a\x16.google.protobuf.Empty\x12=\n" +
+	"\x05Close\x12\x1c.replay.ClosePlaybackRequest\x1a\x16.google.protobuf.EmptyBEZ\"github.com/livekit/protocol/replay\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_cloud_replay_proto_rawDescOnce sync.Once
@@ -439,28 +477,28 @@ func file_cloud_replay_proto_rawDescGZIP() []byte {
 
 var file_cloud_replay_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_cloud_replay_proto_goTypes = []any{
-	(*ListReplaysRequest)(nil),  // 0: replay.ListReplaysRequest
-	(*ListReplaysResponse)(nil), // 1: replay.ListReplaysResponse
-	(*ReplayInfo)(nil),          // 2: replay.ReplayInfo
-	(*LoadReplayRequest)(nil),   // 3: replay.LoadReplayRequest
-	(*LoadReplayResponse)(nil),  // 4: replay.LoadReplayResponse
-	(*RoomSeekRequest)(nil),     // 5: replay.RoomSeekRequest
-	(*CloseReplayRequest)(nil),  // 6: replay.CloseReplayRequest
-	(*DeleteReplayRequest)(nil), // 7: replay.DeleteReplayRequest
-	(*emptypb.Empty)(nil),       // 8: google.protobuf.Empty
+	(*ListReplaysRequest)(nil),   // 0: replay.ListReplaysRequest
+	(*ListReplaysResponse)(nil),  // 1: replay.ListReplaysResponse
+	(*ReplayInfo)(nil),           // 2: replay.ReplayInfo
+	(*DeleteReplayRequest)(nil),  // 3: replay.DeleteReplayRequest
+	(*PlaybackRequest)(nil),      // 4: replay.PlaybackRequest
+	(*PlaybackResponse)(nil),     // 5: replay.PlaybackResponse
+	(*SeekRequest)(nil),          // 6: replay.SeekRequest
+	(*ClosePlaybackRequest)(nil), // 7: replay.ClosePlaybackRequest
+	(*emptypb.Empty)(nil),        // 8: google.protobuf.Empty
 }
 var file_cloud_replay_proto_depIdxs = []int32{
 	2, // 0: replay.ListReplaysResponse.replays:type_name -> replay.ReplayInfo
 	0, // 1: replay.Replay.ListReplays:input_type -> replay.ListReplaysRequest
-	3, // 2: replay.Replay.LoadReplay:input_type -> replay.LoadReplayRequest
-	5, // 3: replay.Replay.SeekForRoom:input_type -> replay.RoomSeekRequest
-	6, // 4: replay.Replay.CloseReplay:input_type -> replay.CloseReplayRequest
-	7, // 5: replay.Replay.DeleteReplay:input_type -> replay.DeleteReplayRequest
+	3, // 2: replay.Replay.DeleteReplay:input_type -> replay.DeleteReplayRequest
+	4, // 3: replay.Replay.Playback:input_type -> replay.PlaybackRequest
+	6, // 4: replay.Replay.Seek:input_type -> replay.SeekRequest
+	7, // 5: replay.Replay.Close:input_type -> replay.ClosePlaybackRequest
 	1, // 6: replay.Replay.ListReplays:output_type -> replay.ListReplaysResponse
-	4, // 7: replay.Replay.LoadReplay:output_type -> replay.LoadReplayResponse
-	8, // 8: replay.Replay.SeekForRoom:output_type -> google.protobuf.Empty
-	8, // 9: replay.Replay.CloseReplay:output_type -> google.protobuf.Empty
-	8, // 10: replay.Replay.DeleteReplay:output_type -> google.protobuf.Empty
+	8, // 7: replay.Replay.DeleteReplay:output_type -> google.protobuf.Empty
+	5, // 8: replay.Replay.Playback:output_type -> replay.PlaybackResponse
+	8, // 9: replay.Replay.Seek:output_type -> google.protobuf.Empty
+	8, // 10: replay.Replay.Close:output_type -> google.protobuf.Empty
 	6, // [6:11] is the sub-list for method output_type
 	1, // [1:6] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
