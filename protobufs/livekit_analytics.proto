@@ -103,6 +103,7 @@ enum AnalyticsEventType {
   TRACK_SUBSCRIBE_STATS = 27;
   PARTICIPANT_ACTIVE = 11;
   PARTICIPANT_RESUMED = 22;
+  PARTICIPANT_UPDATED = 47;
   EGRESS_STARTED = 12;
   EGRESS_ENDED = 13;
   EGRESS_UPDATED = 28;
@@ -129,7 +130,7 @@ enum AnalyticsEventType {
   API_CALL = 41;
   WEBHOOK = 42;
 
-  // NEXT_ID: 46
+  // NEXT_ID: 48
 }
 
 message AnalyticsClientMeta {
