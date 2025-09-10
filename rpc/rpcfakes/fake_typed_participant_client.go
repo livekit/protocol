@@ -63,6 +63,22 @@ type FakeTypedParticipantClient struct {
 		result1 *livekit.MuteRoomTrackResponse
 		result2 error
 	}
+	PerformRpcStub        func(context.Context, rpc.ParticipantTopic, *livekit.PerformRpcRequest, ...psrpc.RequestOption) (*livekit.PerformRpcResponse, error)
+	performRpcMutex       sync.RWMutex
+	performRpcArgsForCall []struct {
+		arg1 context.Context
+		arg2 rpc.ParticipantTopic
+		arg3 *livekit.PerformRpcRequest
+		arg4 []psrpc.RequestOption
+	}
+	performRpcReturns struct {
+		result1 *livekit.PerformRpcResponse
+		result2 error
+	}
+	performRpcReturnsOnCall map[int]struct {
+		result1 *livekit.PerformRpcResponse
+		result2 error
+	}
 	RemoveParticipantStub        func(context.Context, rpc.ParticipantTopic, *livekit.RoomParticipantIdentity, ...psrpc.RequestOption) (*livekit.RemoveParticipantResponse, error)
 	removeParticipantMutex       sync.RWMutex
 	removeParticipantArgsForCall []struct {
@@ -340,6 +356,73 @@ func (fake *FakeTypedParticipantClient) MutePublishedTrackReturnsOnCall(i int, r
 	}{result1, result2}
 }
 
+func (fake *FakeTypedParticipantClient) PerformRpc(arg1 context.Context, arg2 rpc.ParticipantTopic, arg3 *livekit.PerformRpcRequest, arg4 ...psrpc.RequestOption) (*livekit.PerformRpcResponse, error) {
+	fake.performRpcMutex.Lock()
+	ret, specificReturn := fake.performRpcReturnsOnCall[len(fake.performRpcArgsForCall)]
+	fake.performRpcArgsForCall = append(fake.performRpcArgsForCall, struct {
+		arg1 context.Context
+		arg2 rpc.ParticipantTopic
+		arg3 *livekit.PerformRpcRequest
+		arg4 []psrpc.RequestOption
+	}{arg1, arg2, arg3, arg4})
+	stub := fake.PerformRpcStub
+	fakeReturns := fake.performRpcReturns
+	fake.recordInvocation("PerformRpc", []interface{}{arg1, arg2, arg3, arg4})
+	fake.performRpcMutex.Unlock()
+	if stub != nil {
+		return stub(arg1, arg2, arg3, arg4...)
+	}
+	if specificReturn {
+		return ret.result1, ret.result2
+	}
+	return fakeReturns.result1, fakeReturns.result2
+}
+
+func (fake *FakeTypedParticipantClient) PerformRpcCallCount() int {
+	fake.performRpcMutex.RLock()
+	defer fake.performRpcMutex.RUnlock()
+	return len(fake.performRpcArgsForCall)
+}
+
+func (fake *FakeTypedParticipantClient) PerformRpcCalls(stub func(context.Context, rpc.ParticipantTopic, *livekit.PerformRpcRequest, ...psrpc.RequestOption) (*livekit.PerformRpcResponse, error)) {
+	fake.performRpcMutex.Lock()
+	defer fake.performRpcMutex.Unlock()
+	fake.PerformRpcStub = stub
+}
+
+func (fake *FakeTypedParticipantClient) PerformRpcArgsForCall(i int) (context.Context, rpc.ParticipantTopic, *livekit.PerformRpcRequest, []psrpc.RequestOption) {
+	fake.performRpcMutex.RLock()
+	defer fake.performRpcMutex.RUnlock()
+	argsForCall := fake.performRpcArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4
+}
+
+func (fake *FakeTypedParticipantClient) PerformRpcReturns(result1 *livekit.PerformRpcResponse, result2 error) {
+	fake.performRpcMutex.Lock()
+	defer fake.performRpcMutex.Unlock()
+	fake.PerformRpcStub = nil
+	fake.performRpcReturns = struct {
+		result1 *livekit.PerformRpcResponse
+		result2 error
+	}{result1, result2}
+}
+
+func (fake *FakeTypedParticipantClient) PerformRpcReturnsOnCall(i int, result1 *livekit.PerformRpcResponse, result2 error) {
+	fake.performRpcMutex.Lock()
+	defer fake.performRpcMutex.Unlock()
+	fake.PerformRpcStub = nil
+	if fake.performRpcReturnsOnCall == nil {
+		fake.performRpcReturnsOnCall = make(map[int]struct {
+			result1 *livekit.PerformRpcResponse
+			result2 error
+		})
+	}
+	fake.performRpcReturnsOnCall[i] = struct {
+		result1 *livekit.PerformRpcResponse
+		result2 error
+	}{result1, result2}
+}
+
 func (fake *FakeTypedParticipantClient) RemoveParticipant(arg1 context.Context, arg2 rpc.ParticipantTopic, arg3 *livekit.RoomParticipantIdentity, arg4 ...psrpc.RequestOption) (*livekit.RemoveParticipantResponse, error) {
 	fake.removeParticipantMutex.Lock()
 	ret, specificReturn := fake.removeParticipantReturnsOnCall[len(fake.removeParticipantArgsForCall)]
@@ -552,6 +635,8 @@ func (fake *FakeTypedParticipantClient) Invocations() map[string][][]interface{}
 	defer fake.moveParticipantMutex.RUnlock()
 	fake.mutePublishedTrackMutex.RLock()
 	defer fake.mutePublishedTrackMutex.RUnlock()
+	fake.performRpcMutex.RLock()
+	defer fake.performRpcMutex.RUnlock()
 	fake.removeParticipantMutex.RLock()
 	defer fake.removeParticipantMutex.RUnlock()
 	fake.updateParticipantMutex.RLock()
