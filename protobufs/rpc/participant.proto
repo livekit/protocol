@@ -83,4 +83,14 @@ service Participant {
       };
     };
   };
+  rpc PerformRpc(livekit.PerformRpcRequest) returns (livekit.PerformRpcResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params : {
+        group: "participant"
+        names: ["participant"]
+        typed: true
+      };
+    };
+  };
 }
