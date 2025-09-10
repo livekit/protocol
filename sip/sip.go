@@ -831,6 +831,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		attrs[livekit.AttrSIPPhoneNumber] = call.From.User
 		attrs[livekit.AttrSIPHostName] = call.From.Host
 		attrs[livekit.AttrSIPTrunkNumber] = call.To.User
+		attrs[livekit.AttrSIPTrunkHostName] = call.To.Host
 	}
 
 	room, rulePin, err := GetPinAndRoom(rule)

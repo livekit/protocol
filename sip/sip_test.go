@@ -673,6 +673,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			livekit.AttrSIPDispatchRuleID: "rule",
 			livekit.AttrSIPPhoneNumber:    "+11112222",
 			livekit.AttrSIPTrunkNumber:    "+3333",
+			livekit.AttrSIPTrunkHostName:  "sip2.example.com",
 			livekit.AttrSIPHostName:       "sip.example.com",
 		},
 	}, res)
