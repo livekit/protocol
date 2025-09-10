@@ -61,7 +61,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			livekit.AttrSIPCallID:        "call-id",
 			livekit.AttrSIPTrunkID:       "trunk",
 			livekit.AttrSIPTrunkNumber:   "+1111",
-			livekit.AttrSIPTrunkHostName: "sip2.example.com",
+			livekit.AttrSIPTrunkHostName: "xyz.sip.livekit.cloud",
 			livekit.AttrSIPPhoneNumber:   "+3333",
 			livekit.AttrSIPHostName:      "sip.example.com",
 		},

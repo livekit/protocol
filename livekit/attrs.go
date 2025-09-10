@@ -12,7 +12,9 @@ const (
 	AttrSIPDispatchRuleID = AttrSIPPrefix + "ruleID"
 	// AttrSIPTrunkNumber attribute contains number associate with LiveKit SIP Trunk.
 	// This attribute will be omitted if HidePhoneNumber is set.
-	AttrSIPTrunkNumber   = AttrSIPPrefix + "trunkPhoneNumber"
+	AttrSIPTrunkNumber = AttrSIPPrefix + "trunkPhoneNumber"
+	// AttrSIPTrunkHostName attribute contains host name associate with LiveKit SIP Trunk.
+	// This attribute will be omitted if HidePhoneNumber is set.
 	AttrSIPTrunkHostName = AttrSIPPrefix + "trunkHostName"
 	// AttrSIPPhoneNumber attribute contains number external to LiveKit SIP (caller for inbound and called number for outbound).
 	// This attribute will be omitted if HidePhoneNumber is set.
