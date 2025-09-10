@@ -56,7 +56,14 @@ service IngressHandler {
   rpc ICERestartWHIPResource(ICERestartWHIPResourceRequest) returns (ICERestartWHIPResourceResponse) {
     option (psrpc.options).topics = true;
   };
-
+  rpc WHIPRTCConnectionNotify(WHIPRTCConnectionNotifyRequest) returns (google.protobuf.Empty) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        single_server: true;
+      }
+    };
+  };
 }
 
 message ListActiveIngressRequest {}
@@ -84,6 +91,11 @@ message ICERestartWHIPResourceRequest {
 message ICERestartWHIPResourceResponse {
   string trickle_ice_sdpfrag = 1;
   string etag = 2;
+}
+
+message WHIPRTCConnectionNotifyRequest {
+  string participant_id = 1;
+  bool closed = 2;
 }
 
 message StartIngressRequest {

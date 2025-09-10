@@ -31,6 +31,7 @@ message WHIPCreateRequest {
   livekit.StartSession start_session = 1;
   string offer_sdp = 2;
   map<string, TrackList> subscribed_participant_tracks = 3;
+  bool from_ingress = 4;
 }
 
 message WHIPCreateResponse {
@@ -101,4 +102,5 @@ message WHIPParticipantDeleteSessionRequest {
   string room = 1;
   string participant_identity = 2;
   string participant_id = 3;
+  bool from_sweeper = 4;
 }

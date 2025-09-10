@@ -11,13 +11,16 @@ import "google/protobuf/empty.proto";
 // Experimental (not currently available)
 service Replay {
   rpc ListReplays(ListReplaysRequest) returns (ListReplaysResponse);
-  rpc LoadReplay(LoadReplayRequest) returns (LoadReplayResponse);
-  rpc SeekForRoom(RoomSeekRequest) returns (google.protobuf.Empty);
-  rpc CloseReplay(CloseReplayRequest) returns (google.protobuf.Empty);
   rpc DeleteReplay(DeleteReplayRequest) returns (google.protobuf.Empty);
+
+  rpc Playback(PlaybackRequest) returns (PlaybackResponse);
+  rpc Seek(SeekRequest) returns (google.protobuf.Empty);
+  rpc Close(ClosePlaybackRequest) returns (google.protobuf.Empty);
 }
 
-message ListReplaysRequest {}
+message ListReplaysRequest {
+  string room_name = 1; // optional
+}
 
 message ListReplaysResponse {
   repeated ReplayInfo replays = 1;
@@ -25,27 +28,30 @@ message ListReplaysResponse {
 
 message ReplayInfo {
   string replay_id = 1;
-}
-
-message LoadReplayRequest {
-  string replay_id = 1;
   string room_name = 2;
-  int64 starting_pts = 3;
-}
-
-message LoadReplayResponse {
-  string playback_id = 1;
-}
-
-message RoomSeekRequest {
-  string playback_id = 1;
-  int64 pts = 2;
-}
-
-message CloseReplayRequest {
-  string playback_id = 1;
+  int64 start_time = 3;
+  int64 duration = 4;
 }
 
 message DeleteReplayRequest {
   string replay_id = 1;
+}
+
+message PlaybackRequest {
+  string replay_id = 1;
+  string room_name = 2; // room to play into
+  int64 start_time = 3; // initial cursor
+}
+
+message PlaybackResponse {
+  string playback_id = 1;
+}
+
+message SeekRequest {
+  string playback_id = 1;
+  int64 start_time = 2; // initial cursor
+}
+
+message ClosePlaybackRequest {
+  string playback_id = 1;
 }

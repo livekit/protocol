@@ -175,7 +175,7 @@ message ParticipantInfo {
   DisconnectReason disconnect_reason = 16;
   repeated KindDetail kind_details = 18;
 
-  // NEXT_ID: 19
+  // NEXT_ID: 19 
 }
 
 enum TrackType {
@@ -257,6 +257,7 @@ message VideoLayer {
     MODE_UNUSED = 0;
     ONE_SPATIAL_LAYER_PER_STREAM = 1;
     MULTIPLE_SPATIAL_LAYERS_PER_STREAM = 2;
+    ONE_SPATIAL_LAYER_PER_STREAM_INCOMPLETE_RTCP_SR = 3;
   }
 
   // for tracks with a single layer, this should be HIGH
