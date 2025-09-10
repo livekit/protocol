@@ -269,8 +269,8 @@ func TestListUpdate(t *testing.T) {
 			Err:    true,
 		},
 		{
-			Name:   "set and del",
-			Update: &ListUpdate{Set: []string{"a"}, Del: []string{"b"}},
+			Name:   "set and remove",
+			Update: &ListUpdate{Set: []string{"a"}, Remove: []string{"b"}},
 			Err:    true,
 		},
 		{
@@ -292,15 +292,15 @@ func TestListUpdate(t *testing.T) {
 			Exp:    []string{"a", "b", "c"},
 		},
 		{
-			Name:   "del",
+			Name:   "remove",
 			Arr:    []string{"a", "b"},
-			Update: &ListUpdate{Del: []string{"b", "c"}},
+			Update: &ListUpdate{Remove: []string{"b", "c"}},
 			Exp:    []string{"a"},
 		},
 		{
-			Name:   "add and del",
+			Name:   "add and remove",
 			Arr:    []string{"a", "b", "c"},
-			Update: &ListUpdate{Add: []string{"b", "d"}, Del: []string{"c", "e"}},
+			Update: &ListUpdate{Add: []string{"b", "d"}, Remove: []string{"c", "e"}},
 			Exp:    []string{"a", "b", "d"},
 		},
 	}
