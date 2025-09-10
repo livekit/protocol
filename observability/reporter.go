@@ -2,6 +2,7 @@ package observability
 
 import (
 	"github.com/livekit/protocol/observability/agentsobs"
+	"github.com/livekit/protocol/observability/gatewayobs"
 	"github.com/livekit/protocol/observability/roomobs"
 )
 
@@ -10,6 +11,7 @@ const Project = "livekit"
 type Reporter interface {
 	Room() roomobs.Reporter
 	Agent() agentsobs.Reporter
+	Gateway() gatewayobs.Reporter
 	Close()
 }
 
@@ -25,6 +27,10 @@ func (reporter) Room() roomobs.Reporter {
 
 func (reporter) Agent() agentsobs.Reporter {
 	return agentsobs.NewNoopReporter()
+}
+
+func (reporter) Gateway() gatewayobs.Reporter {
+	return gatewayobs.NewNoopReporter()
 }
 
 func (reporter) Close() {}
