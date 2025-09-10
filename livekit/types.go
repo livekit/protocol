@@ -227,14 +227,14 @@ func (p *ListUpdate) Validate() error {
 	if p == nil {
 		return nil
 	}
-	change := len(p.Set)+len(p.Add)+len(p.Del) > 0
+	change := len(p.Set)+len(p.Add)+len(p.Remove) > 0
 	if !p.Clear && !change {
 		return fmt.Errorf("unsupported list update operation")
 	}
 	if p.Clear && change {
 		return fmt.Errorf("cannot clear and change the list at the same time")
 	}
-	if len(p.Set) > 0 && len(p.Add)+len(p.Del) > 0 {
+	if len(p.Set) > 0 && len(p.Add)+len(p.Remove) > 0 {
 		return fmt.Errorf("cannot set and change the list at the same time")
 	}
 	for _, v := range p.Set {
@@ -247,7 +247,7 @@ func (p *ListUpdate) Validate() error {
 			return fmt.Errorf("empty element in the list")
 		}
 	}
-	for _, v := range p.Del {
+	for _, v := range p.Remove {
 		if v == "" {
 			return fmt.Errorf("empty element in the list")
 		}
@@ -292,7 +292,7 @@ func applyListUpdate[T ~string](dst *[]T, u *ListUpdate) {
 		return
 	}
 	arr := slices.Clone(*dst)
-	for _, v := range u.Del {
+	for _, v := range u.Remove {
 		if i := slices.Index(arr, T(v)); i >= 0 {
 			arr = slices.Delete(arr, i, i+1)
 		}
