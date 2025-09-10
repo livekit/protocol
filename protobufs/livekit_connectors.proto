@@ -19,6 +19,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "livekit_rtc.proto";
+
 service ConnectorsService {
   rpc CreateWhatsAppParticipant(CreateWhatsAppParticipantRequest) returns (CreateWhatsAppParticipantResponse);
 
@@ -98,12 +100,21 @@ message ConnectWhatsAppCallRequest {
   ConnectorsDispatchRule dispatch_rule = 5;
   oneof request {
     // Call ID sent by Meta
-    string whatsapp_call_id = 6;
+    ConnectWhatsAppCallWithCallId call_id = 6;
     // When the call is ready to be connected with Meta, we receive a call connect webhook with the SDP:
     // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/user-initiated-calls#call-connect-webhook
     // https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-connect-webhook
     string call_connect_webhook = 7;
   } 
+}
+
+message ConnectWhatsAppCallWithCallId {
+  // Call ID sent by Meta
+  string whatsapp_call_id = 1;
+  // The call connect webhook comes with SDP from Meta
+  // It is offer SDP if it is a user initiated call
+  // and answer SDP if it is a business initiated call
+  SessionDescription sdp = 2;
 }
 
 message ConnectWhatsAppCallResponse {
