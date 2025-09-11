@@ -109,6 +109,8 @@ message SignalResponse {
     RoomMovedResponse room_moved = 24;
     // notify number of required media sections to satisfy subscribed tracks
     MediaSectionsRequirement media_sections_requirement = 25;
+    // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
+    SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
   }
 }
 
@@ -348,6 +350,11 @@ message SubscribedQualityUpdate {
   string track_sid = 1;
   repeated SubscribedQuality subscribed_qualities = 2 [deprecated = true];
   repeated SubscribedCodec subscribed_codecs = 3;
+}
+
+message SubscribedAudioCodecUpdate {
+  string track_sid = 1;
+  repeated SubscribedAudioCodec subscribed_codecs = 2;
 }
 
 message TrackPermission {
