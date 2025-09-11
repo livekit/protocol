@@ -149,6 +149,23 @@ func (s *egressInternalServer) Kill() {
 	s.rpc.Close(true)
 }
 
+// ===================================
+// EgressInternal Unimplemented Server
+// ===================================
+
+type UnimplementedEgressInternalServer struct{}
+
+func (UnimplementedEgressInternalServer) StartEgress(context.Context, *StartEgressRequest) (*livekit4.EgressInfo, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+func (UnimplementedEgressInternalServer) StartEgressAffinity(context.Context, *StartEgressRequest) float32 {
+	return -1
+}
+
+func (UnimplementedEgressInternalServer) ListActiveEgress(context.Context, *ListActiveEgressRequest) (*ListActiveEgressResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 // ==============================
 // EgressHandler Client Interface
 // ==============================
@@ -278,6 +295,20 @@ func (s *egressHandlerServer) Shutdown() {
 
 func (s *egressHandlerServer) Kill() {
 	s.rpc.Close(true)
+}
+
+// ==================================
+// EgressHandler Unimplemented Server
+// ==================================
+
+type UnimplementedEgressHandlerServer struct{}
+
+func (UnimplementedEgressHandlerServer) UpdateStream(context.Context, *livekit4.UpdateStreamRequest) (*livekit4.EgressInfo, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedEgressHandlerServer) StopEgress(context.Context, *livekit4.StopEgressRequest) (*livekit4.EgressInfo, error) {
+	return nil, psrpc.ErrUnimplemented
 }
 
 var psrpcFileDescriptor2 = []byte{

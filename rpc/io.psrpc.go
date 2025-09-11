@@ -309,6 +309,60 @@ func (s *iOInfoServer) Kill() {
 	s.rpc.Close(true)
 }
 
+// ===========================
+// IOInfo Unimplemented Server
+// ===========================
+
+type UnimplementedIOInfoServer struct{}
+
+func (UnimplementedIOInfoServer) CreateEgress(context.Context, *livekit4.EgressInfo) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) UpdateEgress(context.Context, *livekit4.EgressInfo) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) GetEgress(context.Context, *GetEgressRequest) (*livekit4.EgressInfo, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) ListEgress(context.Context, *livekit4.ListEgressRequest) (*livekit4.ListEgressResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) UpdateMetrics(context.Context, *UpdateMetricsRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) CreateIngress(context.Context, *livekit5.IngressInfo) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) GetIngressInfo(context.Context, *GetIngressInfoRequest) (*GetIngressInfoResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) UpdateIngressState(context.Context, *UpdateIngressStateRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) GetSIPTrunkAuthentication(context.Context, *GetSIPTrunkAuthenticationRequest) (*GetSIPTrunkAuthenticationResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) EvaluateSIPDispatchRules(context.Context, *EvaluateSIPDispatchRulesRequest) (*EvaluateSIPDispatchRulesResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) UpdateSIPCallState(context.Context, *UpdateSIPCallStateRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIOInfoServer) RecordCallContext(context.Context, *RecordCallContextRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor4 = []byte{
 	// 1743 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x18, 0xdd, 0x56, 0x1b, 0xc7,

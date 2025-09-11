@@ -149,6 +149,23 @@ func (s *sIPInternalServer) Kill() {
 	s.rpc.Close(true)
 }
 
+// ================================
+// SIPInternal Unimplemented Server
+// ================================
+
+type UnimplementedSIPInternalServer struct{}
+
+func (UnimplementedSIPInternalServer) CreateSIPParticipant(context.Context, *InternalCreateSIPParticipantRequest) (*InternalCreateSIPParticipantResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+func (UnimplementedSIPInternalServer) CreateSIPParticipantAffinity(context.Context, *InternalCreateSIPParticipantRequest) float32 {
+	return -1
+}
+
+func (UnimplementedSIPInternalServer) TransferSIPParticipant(context.Context, *InternalTransferSIPParticipantRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor11 = []byte{
 	// 1013 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xcd, 0x72, 0xdb, 0x36,

@@ -144,6 +144,16 @@ func (s *wHIPServer[TopicTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+// =========================
+// WHIP Unimplemented Server
+// =========================
+
+type UnimplementedWHIPServer struct{}
+
+func (UnimplementedWHIPServer) Create(context.Context, *WHIPCreateRequest) (*WHIPCreateResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 // ================================
 // WHIPParticipant Client Interface
 // ================================
@@ -311,6 +321,24 @@ func (s *wHIPParticipantServer[TopicTopicType]) Shutdown() {
 
 func (s *wHIPParticipantServer[TopicTopicType]) Kill() {
 	s.rpc.Close(true)
+}
+
+// ====================================
+// WHIPParticipant Unimplemented Server
+// ====================================
+
+type UnimplementedWHIPParticipantServer struct{}
+
+func (UnimplementedWHIPParticipantServer) ICETrickle(context.Context, *WHIPParticipantICETrickleRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedWHIPParticipantServer) ICERestart(context.Context, *WHIPParticipantICERestartRequest) (*WHIPParticipantICERestartResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedWHIPParticipantServer) DeleteSession(context.Context, *WHIPParticipantDeleteSessionRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
 }
 
 var psrpcFileDescriptor10 = []byte{

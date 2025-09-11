@@ -143,6 +143,16 @@ func (s *signalServer[NodeIdTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+// ===========================
+// Signal Unimplemented Server
+// ===========================
+
+type UnimplementedSignalServer struct{}
+
+func (UnimplementedSignalServer) RelaySignal(psrpc.ServerStream[*RelaySignalResponse, *RelaySignalRequest]) error {
+	return psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor9 = []byte{
 	// 313 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0x4f, 0x4e, 0xf3, 0x30,

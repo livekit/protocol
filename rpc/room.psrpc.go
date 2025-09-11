@@ -187,6 +187,24 @@ func (s *roomServer[RoomTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+// =========================
+// Room Unimplemented Server
+// =========================
+
+type UnimplementedRoomServer struct{}
+
+func (UnimplementedRoomServer) DeleteRoom(context.Context, *livekit6.DeleteRoomRequest) (*livekit6.DeleteRoomResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedRoomServer) SendData(context.Context, *livekit6.SendDataRequest) (*livekit6.SendDataResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedRoomServer) UpdateRoomMetadata(context.Context, *livekit6.UpdateRoomMetadataRequest) (*livekit1.Room, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor7 = []byte{
 	// 230 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x2a, 0x48, 0xd6,

@@ -180,6 +180,31 @@ func (s *agentInternalServer) Kill() {
 	s.rpc.Close(true)
 }
 
+// ==================================
+// AgentInternal Unimplemented Server
+// ==================================
+
+type UnimplementedAgentInternalServer struct{}
+
+func (UnimplementedAgentInternalServer) CheckEnabled(context.Context, *CheckEnabledRequest) (*CheckEnabledResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedAgentInternalServer) JobRequest(context.Context, *livekit2.Job) (*JobRequestResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+func (UnimplementedAgentInternalServer) JobRequestAffinity(context.Context, *livekit2.Job) float32 {
+	return -1
+}
+
+func (UnimplementedAgentInternalServer) JobTerminate(context.Context, *JobTerminateRequest) (*JobTerminateResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedAgentInternalServer) WorkerRegistered(context.Context, *google_protobuf.Empty) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor0 = []byte{
 	// 566 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0xdf, 0x8e, 0xd2, 0x4e,

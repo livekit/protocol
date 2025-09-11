@@ -167,6 +167,27 @@ func (s *ingressInternalServer) Kill() {
 	s.rpc.Close(true)
 }
 
+// ====================================
+// IngressInternal Unimplemented Server
+// ====================================
+
+type UnimplementedIngressInternalServer struct{}
+
+func (UnimplementedIngressInternalServer) StartIngress(context.Context, *StartIngressRequest) (*livekit5.IngressInfo, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+func (UnimplementedIngressInternalServer) StartIngressAffinity(context.Context, *StartIngressRequest) float32 {
+	return -1
+}
+
+func (UnimplementedIngressInternalServer) ListActiveIngress(context.Context, *ListActiveIngressRequest) (*ListActiveIngressResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIngressInternalServer) KillIngressSession(context.Context, *KillIngressSessionRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 // ===============================
 // IngressHandler Client Interface
 // ===============================
@@ -356,6 +377,32 @@ func (s *ingressHandlerServer) Shutdown() {
 
 func (s *ingressHandlerServer) Kill() {
 	s.rpc.Close(true)
+}
+
+// ===================================
+// IngressHandler Unimplemented Server
+// ===================================
+
+type UnimplementedIngressHandlerServer struct{}
+
+func (UnimplementedIngressHandlerServer) UpdateIngress(context.Context, *livekit5.UpdateIngressRequest) (*livekit5.IngressState, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIngressHandlerServer) DeleteIngress(context.Context, *livekit5.DeleteIngressRequest) (*livekit5.IngressState, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIngressHandlerServer) DeleteWHIPResource(context.Context, *DeleteWHIPResourceRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIngressHandlerServer) ICERestartWHIPResource(context.Context, *ICERestartWHIPResourceRequest) (*ICERestartWHIPResourceResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedIngressHandlerServer) WHIPRTCConnectionNotify(context.Context, *WHIPRTCConnectionNotifyRequest) (*google_protobuf.Empty, error) {
+	return nil, psrpc.ErrUnimplemented
 }
 
 var psrpcFileDescriptor3 = []byte{

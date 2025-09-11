@@ -145,6 +145,16 @@ func (s *roomManagerServer[NodeIdTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+// ================================
+// RoomManager Unimplemented Server
+// ================================
+
+type UnimplementedRoomManagerServer struct{}
+
+func (UnimplementedRoomManagerServer) CreateRoom(context.Context, *livekit6.CreateRoomRequest) (*livekit1.Room, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor8 = []byte{
 	// 185 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x44, 0xcd, 0x4d, 0x0a, 0xc2, 0x30,

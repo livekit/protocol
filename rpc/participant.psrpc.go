@@ -271,6 +271,40 @@ func (s *participantServer[ParticipantTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+// ================================
+// Participant Unimplemented Server
+// ================================
+
+type UnimplementedParticipantServer struct{}
+
+func (UnimplementedParticipantServer) RemoveParticipant(context.Context, *livekit6.RoomParticipantIdentity) (*livekit6.RemoveParticipantResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedParticipantServer) MutePublishedTrack(context.Context, *livekit6.MuteRoomTrackRequest) (*livekit6.MuteRoomTrackResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedParticipantServer) UpdateParticipant(context.Context, *livekit6.UpdateParticipantRequest) (*livekit1.ParticipantInfo, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedParticipantServer) UpdateSubscriptions(context.Context, *livekit6.UpdateSubscriptionsRequest) (*livekit6.UpdateSubscriptionsResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedParticipantServer) ForwardParticipant(context.Context, *livekit6.ForwardParticipantRequest) (*livekit6.ForwardParticipantResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedParticipantServer) MoveParticipant(context.Context, *livekit6.MoveParticipantRequest) (*livekit6.MoveParticipantResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedParticipantServer) PerformRpc(context.Context, *livekit6.PerformRpcRequest) (*livekit6.PerformRpcResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor6 = []byte{
 	// 358 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4d, 0x4b, 0xc3, 0x40,

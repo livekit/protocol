@@ -186,6 +186,24 @@ func (s *agentDispatchInternalServer[RoomTopicType]) Kill() {
 	s.rpc.Close(true)
 }
 
+// ==========================================
+// AgentDispatchInternal Unimplemented Server
+// ==========================================
+
+type UnimplementedAgentDispatchInternalServer struct{}
+
+func (UnimplementedAgentDispatchInternalServer) CreateDispatch(context.Context, *livekit3.AgentDispatch) (*livekit3.AgentDispatch, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedAgentDispatchInternalServer) DeleteDispatch(context.Context, *livekit3.DeleteAgentDispatchRequest) (*livekit3.AgentDispatch, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedAgentDispatchInternalServer) ListDispatch(context.Context, *livekit3.ListAgentDispatchRequest) (*livekit3.ListAgentDispatchResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor1 = []byte{
 	// 228 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x28, 0x2a, 0x48, 0xd6,
