@@ -354,7 +354,7 @@ message SubscribedQualityUpdate {
 
 message SubscribedAudioCodecUpdate {
   string track_sid = 1;
-  repeated SubscribedAudioCodec subscribed_codecs = 2;
+  repeated SubscribedAudioCodec subscribed_audio_codecs = 2;
 }
 
 message TrackPermission {
