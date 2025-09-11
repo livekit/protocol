@@ -16,6 +16,14 @@ enum PhoneNumberStatus {
   PHONE_NUMBER_STATUS_RELEASED = 3;     // Number has been released
 }
 
+// Phone number type enumeration
+enum PhoneNumberType {
+  PHONE_NUMBER_TYPE_UNKNOWN = 0;        // Default value - unknown or parsing error
+  PHONE_NUMBER_TYPE_MOBILE = 1;         // Mobile phone number
+  PHONE_NUMBER_TYPE_LOCAL = 2;          // Local/fixed line number
+  PHONE_NUMBER_TYPE_TOLL_FREE = 3;      // Toll-free number
+}
+
 // Public Phone Number Service - External API for phone number management
 service PhoneNumberService {
   // Search available phone numbers in inventory
@@ -123,7 +131,7 @@ message PhoneNumber {
   string e164_format = 2;         // Phone number in E.164 format (e.g., "+14155552671")
   string country_code = 3;        // Country code (e.g., "US")
   string area_code = 4;           // Area code (e.g., "415")
-  string number_type = 5;         // Number type (e.g., local, toll-free, national, mobile)
+  PhoneNumberType number_type = 5;         // Number type (mobile, local, toll-free, unknown)
   string locality = 6;            // City/locality (e.g., "San Francisco")
   string region = 7;              // State/region (e.g., "CA")
   double spam_score = 8;          // Spam score for fraud detection

@@ -1,6 +1,7 @@
 package sip
 
 import (
+	"github.com/livekit/protocol/livekit"
 	"github.com/nyaruka/phonenumbers"
 )
 
@@ -30,12 +31,12 @@ func ExtractAreaCode(phoneNumber string) string {
 }
 
 // DetermineNumberType determines the phone number type using the phonenumbers library
-func DetermineNumberType(phoneNumber string) string {
+func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 	// Parse the phone number without defaulting to any country
 	num, err := phonenumbers.Parse(phoneNumber, "")
 	if err != nil {
-		// If parsing fails, fall back to "local"
-		return "unknown"
+		// If parsing fails, fall back to unknown
+		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_UNKNOWN
 	}
 
 	numberType := phonenumbers.GetNumberType(num)
@@ -43,12 +44,12 @@ func DetermineNumberType(phoneNumber string) string {
 	// We are excluding a bunch of number types for now
 	switch numberType {
 	case phonenumbers.MOBILE:
-		return "mobile"
+		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_MOBILE
 	case phonenumbers.FIXED_LINE:
-		return "local"
+		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_LOCAL
 	case phonenumbers.TOLL_FREE:
-		return "toll-free"
+		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_TOLL_FREE
 	default:
-		return "unknown"
+		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_UNKNOWN
 	}
 }
