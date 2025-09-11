@@ -301,6 +301,10 @@ func (UnimplementedParticipantServer) MoveParticipant(context.Context, *livekit6
 	return nil, psrpc.ErrUnimplemented
 }
 
+func (UnimplementedParticipantServer) PerformRpc(context.Context, *livekit6.PerformRpcRequest) (*livekit6.PerformRpcResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
 var psrpcFileDescriptor6 = []byte{
 	// 358 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4d, 0x4b, 0xc3, 0x40,
