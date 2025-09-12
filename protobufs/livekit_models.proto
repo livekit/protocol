@@ -731,6 +731,7 @@ message DataStream {
     string topic = 3;
     string mime_type = 4;
     optional uint64 total_length = 5;  // only populated for finite streams, if it's a stream of unknown size this stays empty
+    bool push = 6;  // stream should be pushed to destination participants without requiring them to explicitly accept it.
     Encryption.Type encryption_type = 7 [deprecated=true];  //  this is set on the DataPacket
     map<string, string> attributes = 8;  // user defined attributes map that can carry additional info
 
