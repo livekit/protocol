@@ -1,5 +1,19 @@
 # @livekit/protocol
 
+## 1.42.0
+
+### Minor Changes
+
+- rename ListUpdate "del" field to "rename" - [#1203](https://github.com/livekit/protocol/pull/1203) ([@rektdeckard](https://github.com/rektdeckard))
+
+### Patch Changes
+
+- update psrpc - [#1204](https://github.com/livekit/protocol/pull/1204) ([@paulwe](https://github.com/paulwe))
+
+- Add fields needed for WHIP to SFU support - [#1183](https://github.com/livekit/protocol/pull/1183) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Suport for simulcast codec of audio. - [#1207](https://github.com/livekit/protocol/pull/1207) ([@boks1971](https://github.com/boks1971))
+
 ## 1.41.0
 
 ### Minor Changes
