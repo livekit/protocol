@@ -50,7 +50,7 @@ message CreateAgentResponse {
     string status = 3;
     string version = 4;
     string presigned_url = 5;
-    string build_id = 6;
+    string tag = 6;
 }
 
 message AgentDeployment {
@@ -141,7 +141,7 @@ message DeployAgentResponse {
     string message = 2;
     string agent_id = 3;
     string presigned_url = 4;
-    string build_id = 5;
+    string tag = 5;
 }
 
 message UpdateAgentSecretsRequest {
