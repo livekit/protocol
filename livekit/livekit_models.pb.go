@@ -5427,6 +5427,7 @@ type DataStream_Header struct {
 	Topic       string                 `protobuf:"bytes,3,opt,name=topic,proto3" json:"topic,omitempty"`
 	MimeType    string                 `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
 	TotalLength *uint64                `protobuf:"varint,5,opt,name=total_length,json=totalLength,proto3,oneof" json:"total_length,omitempty"` // only populated for finite streams, if it's a stream of unknown size this stays empty
+	Push        bool                   `protobuf:"varint,6,opt,name=push,proto3" json:"push,omitempty"`                                        // stream should be pushed to destination participants without requiring them to explicitly accept it.
 	// Deprecated: Marked as deprecated in livekit_models.proto.
 	EncryptionType Encryption_Type   `protobuf:"varint,7,opt,name=encryption_type,json=encryptionType,proto3,enum=livekit.Encryption_Type" json:"encryption_type,omitempty"`               //  this is set on the DataPacket
 	Attributes     map[string]string `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // user defined attributes map that can carry additional info
@@ -5504,6 +5505,13 @@ func (x *DataStream_Header) GetTotalLength() uint64 {
 		return *x.TotalLength
 	}
 	return 0
+}
+
+func (x *DataStream_Header) GetPush() bool {
+	if x != nil {
+		return x.Push
+	}
+	return false
 }
 
 // Deprecated: Marked as deprecated in livekit_models.proto.
@@ -6134,7 +6142,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fTimedVersion\x12\x1d\n" +
 	"\n" +
 	"unix_micro\x18\x01 \x01(\x03R\tunixMicro\x12\x14\n" +
-	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xe4\t\n" +
+	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xf8\t\n" +
 	"\n" +
 	"DataStream\x1a\xeb\x01\n" +
 	"\n" +
@@ -6146,13 +6154,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\tgenerated\x18\x05 \x01(\bR\tgenerated\x1a \n" +
 	"\n" +
 	"ByteHeader\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x1a\x99\x04\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x1a\xad\x04\n" +
 	"\x06Header\x12\x1b\n" +
 	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x14\n" +
 	"\x05topic\x18\x03 \x01(\tR\x05topic\x12\x1b\n" +
 	"\tmime_type\x18\x04 \x01(\tR\bmimeType\x12&\n" +
-	"\ftotal_length\x18\x05 \x01(\x04H\x01R\vtotalLength\x88\x01\x01\x12E\n" +
+	"\ftotal_length\x18\x05 \x01(\x04H\x01R\vtotalLength\x88\x01\x01\x12\x12\n" +
+	"\x04push\x18\x06 \x01(\bR\x04push\x12E\n" +
 	"\x0fencryption_type\x18\a \x01(\x0e2\x18.livekit.Encryption.TypeB\x02\x18\x01R\x0eencryptionType\x12J\n" +
 	"\n" +
 	"attributes\x18\b \x03(\v2*.livekit.DataStream.Header.AttributesEntryR\n" +
