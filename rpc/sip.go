@@ -133,6 +133,7 @@ func NewCreateSIPParticipantRequest(
 		attrs[livekit.AttrSIPPhoneNumber] = req.SipCallTo
 		attrs[livekit.AttrSIPHostName] = hostname
 		attrs[livekit.AttrSIPTrunkNumber] = outboundNumber
+		attrs[livekit.AttrSIPTrunkHostName] = ownHostname
 	}
 
 	var features []livekit.SIPFeature
