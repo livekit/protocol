@@ -75,6 +75,59 @@ func (PhoneNumberStatus) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_phone_number_proto_rawDescGZIP(), []int{0}
 }
 
+// Phone number type enumeration
+type PhoneNumberType int32
+
+const (
+	PhoneNumberType_PHONE_NUMBER_TYPE_UNKNOWN   PhoneNumberType = 0 // Default value - unknown or parsing error
+	PhoneNumberType_PHONE_NUMBER_TYPE_MOBILE    PhoneNumberType = 1 // Mobile phone number
+	PhoneNumberType_PHONE_NUMBER_TYPE_LOCAL     PhoneNumberType = 2 // Local/fixed line number
+	PhoneNumberType_PHONE_NUMBER_TYPE_TOLL_FREE PhoneNumberType = 3 // Toll-free number
+)
+
+// Enum value maps for PhoneNumberType.
+var (
+	PhoneNumberType_name = map[int32]string{
+		0: "PHONE_NUMBER_TYPE_UNKNOWN",
+		1: "PHONE_NUMBER_TYPE_MOBILE",
+		2: "PHONE_NUMBER_TYPE_LOCAL",
+		3: "PHONE_NUMBER_TYPE_TOLL_FREE",
+	}
+	PhoneNumberType_value = map[string]int32{
+		"PHONE_NUMBER_TYPE_UNKNOWN":   0,
+		"PHONE_NUMBER_TYPE_MOBILE":    1,
+		"PHONE_NUMBER_TYPE_LOCAL":     2,
+		"PHONE_NUMBER_TYPE_TOLL_FREE": 3,
+	}
+)
+
+func (x PhoneNumberType) Enum() *PhoneNumberType {
+	p := new(PhoneNumberType)
+	*p = x
+	return p
+}
+
+func (x PhoneNumberType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PhoneNumberType) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_phone_number_proto_enumTypes[1].Descriptor()
+}
+
+func (PhoneNumberType) Type() protoreflect.EnumType {
+	return &file_livekit_phone_number_proto_enumTypes[1]
+}
+
+func (x PhoneNumberType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PhoneNumberType.Descriptor instead.
+func (PhoneNumberType) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_phone_number_proto_rawDescGZIP(), []int{1}
+}
+
 // SearchPhoneNumbersRequest - Request to search available phone numbers
 type SearchPhoneNumbersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -722,21 +775,21 @@ func (*ReleasePhoneNumbersResponse) Descriptor() ([]byte, []int) {
 // PhoneNumber - Unified phone number type for inventory and purchased numbers
 type PhoneNumber struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                             // Unique identifier
-	E164Format        string                 `protobuf:"bytes,2,opt,name=e164_format,json=e164Format,proto3" json:"e164_format,omitempty"`                           // Phone number in E.164 format (e.g., "+14155552671")
-	CountryCode       string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`                        // Country code (e.g., "US")
-	AreaCode          string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                                 // Area code (e.g., "415")
-	NumberType        string                 `protobuf:"bytes,5,opt,name=number_type,json=numberType,proto3" json:"number_type,omitempty"`                           // Number type (e.g., local, toll-free, national, mobile)
-	Locality          string                 `protobuf:"bytes,6,opt,name=locality,proto3" json:"locality,omitempty"`                                                 // City/locality (e.g., "San Francisco")
-	Region            string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`                                                     // State/region (e.g., "CA")
-	SpamScore         float64                `protobuf:"fixed64,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`                            // Spam score for fraud detection
-	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                              // Creation timestamp
-	UpdatedAt         *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`                             // Last update timestamp
-	Capabilities      []string               `protobuf:"bytes,11,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                        // Available capabilities (e.g., "voice", "sms")
-	Status            PhoneNumberStatus      `protobuf:"varint,12,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                    // Current status
-	AssignedAt        *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                          // Assignment timestamp
-	ReleasedAt        *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                          // Release timestamp (if applicable)
-	SipDispatchRuleId string                 `protobuf:"bytes,15,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"` // Associated SIP dispatch rule ID
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                                 // Unique identifier
+	E164Format        string                 `protobuf:"bytes,2,opt,name=e164_format,json=e164Format,proto3" json:"e164_format,omitempty"`                               // Phone number in E.164 format (e.g., "+14155552671")
+	CountryCode       string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`                            // Country code (e.g., "US")
+	AreaCode          string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                                     // Area code (e.g., "415")
+	NumberType        PhoneNumberType        `protobuf:"varint,5,opt,name=number_type,json=numberType,proto3,enum=livekit.PhoneNumberType" json:"number_type,omitempty"` // Number type (mobile, local, toll-free, unknown)
+	Locality          string                 `protobuf:"bytes,6,opt,name=locality,proto3" json:"locality,omitempty"`                                                     // City/locality (e.g., "San Francisco")
+	Region            string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`                                                         // State/region (e.g., "CA")
+	SpamScore         float64                `protobuf:"fixed64,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`                                // Spam score for fraud detection
+	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                                  // Creation timestamp
+	UpdatedAt         *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`                                 // Last update timestamp
+	Capabilities      []string               `protobuf:"bytes,11,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                            // Available capabilities (e.g., "voice", "sms")
+	Status            PhoneNumberStatus      `protobuf:"varint,12,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                        // Current status
+	AssignedAt        *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                              // Assignment timestamp
+	ReleasedAt        *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                              // Release timestamp (if applicable)
+	SipDispatchRuleId string                 `protobuf:"bytes,15,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`     // Associated SIP dispatch rule ID
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -799,11 +852,11 @@ func (x *PhoneNumber) GetAreaCode() string {
 	return ""
 }
 
-func (x *PhoneNumber) GetNumberType() string {
+func (x *PhoneNumber) GetNumberType() PhoneNumberType {
 	if x != nil {
 		return x.NumberType
 	}
-	return ""
+	return PhoneNumberType_PHONE_NUMBER_TYPE_UNKNOWN
 }
 
 func (x *PhoneNumber) GetLocality() string {
@@ -920,14 +973,14 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x1aReleasePhoneNumbersRequest\x12\x10\n" +
 	"\x03ids\x18\x01 \x03(\tR\x03ids\x12#\n" +
 	"\rphone_numbers\x18\x02 \x03(\tR\fphoneNumbers\"\x1d\n" +
-	"\x1bReleasePhoneNumbersResponse\"\xeb\x04\n" +
+	"\x1bReleasePhoneNumbersResponse\"\x85\x05\n" +
 	"\vPhoneNumber\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\ve164_format\x18\x02 \x01(\tR\n" +
 	"e164Format\x12!\n" +
 	"\fcountry_code\x18\x03 \x01(\tR\vcountryCode\x12\x1b\n" +
-	"\tarea_code\x18\x04 \x01(\tR\bareaCode\x12\x1f\n" +
-	"\vnumber_type\x18\x05 \x01(\tR\n" +
+	"\tarea_code\x18\x04 \x01(\tR\bareaCode\x129\n" +
+	"\vnumber_type\x18\x05 \x01(\x0e2\x18.livekit.PhoneNumberTypeR\n" +
 	"numberType\x12\x1a\n" +
 	"\blocality\x18\x06 \x01(\tR\blocality\x12\x16\n" +
 	"\x06region\x18\a \x01(\tR\x06region\x12\x1d\n" +
@@ -949,7 +1002,12 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aPHONE_NUMBER_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
 	"\x1bPHONE_NUMBER_STATUS_PENDING\x10\x02\x12 \n" +
-	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x032\xcb\x04\n" +
+	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x03*\x8c\x01\n" +
+	"\x0fPhoneNumberType\x12\x1d\n" +
+	"\x19PHONE_NUMBER_TYPE_UNKNOWN\x10\x00\x12\x1c\n" +
+	"\x18PHONE_NUMBER_TYPE_MOBILE\x10\x01\x12\x1b\n" +
+	"\x17PHONE_NUMBER_TYPE_LOCAL\x10\x02\x12\x1f\n" +
+	"\x1bPHONE_NUMBER_TYPE_TOLL_FREE\x10\x032\xcb\x04\n" +
 	"\x12PhoneNumberService\x12_\n" +
 	"\x12SearchPhoneNumbers\x12\".livekit.SearchPhoneNumbersRequest\x1a#.livekit.SearchPhoneNumbersResponse\"\x00\x12b\n" +
 	"\x13PurchasePhoneNumber\x12#.livekit.PurchasePhoneNumberRequest\x1a$.livekit.PurchasePhoneNumberResponse\"\x00\x12Y\n" +
@@ -970,59 +1028,61 @@ func file_livekit_phone_number_proto_rawDescGZIP() []byte {
 	return file_livekit_phone_number_proto_rawDescData
 }
 
-var file_livekit_phone_number_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_phone_number_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_livekit_phone_number_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_livekit_phone_number_proto_goTypes = []any{
 	(PhoneNumberStatus)(0),              // 0: livekit.PhoneNumberStatus
-	(*SearchPhoneNumbersRequest)(nil),   // 1: livekit.SearchPhoneNumbersRequest
-	(*SearchPhoneNumbersResponse)(nil),  // 2: livekit.SearchPhoneNumbersResponse
-	(*PurchasePhoneNumberRequest)(nil),  // 3: livekit.PurchasePhoneNumberRequest
-	(*PurchasePhoneNumberResponse)(nil), // 4: livekit.PurchasePhoneNumberResponse
-	(*ListPhoneNumbersRequest)(nil),     // 5: livekit.ListPhoneNumbersRequest
-	(*ListPhoneNumbersResponse)(nil),    // 6: livekit.ListPhoneNumbersResponse
-	(*GetPhoneNumberRequest)(nil),       // 7: livekit.GetPhoneNumberRequest
-	(*GetPhoneNumberResponse)(nil),      // 8: livekit.GetPhoneNumberResponse
-	(*UpdatePhoneNumberRequest)(nil),    // 9: livekit.UpdatePhoneNumberRequest
-	(*UpdatePhoneNumberResponse)(nil),   // 10: livekit.UpdatePhoneNumberResponse
-	(*ReleasePhoneNumbersRequest)(nil),  // 11: livekit.ReleasePhoneNumbersRequest
-	(*ReleasePhoneNumbersResponse)(nil), // 12: livekit.ReleasePhoneNumbersResponse
-	(*PhoneNumber)(nil),                 // 13: livekit.PhoneNumber
-	(*TokenPagination)(nil),             // 14: livekit.TokenPagination
-	(*timestamppb.Timestamp)(nil),       // 15: google.protobuf.Timestamp
+	(PhoneNumberType)(0),                // 1: livekit.PhoneNumberType
+	(*SearchPhoneNumbersRequest)(nil),   // 2: livekit.SearchPhoneNumbersRequest
+	(*SearchPhoneNumbersResponse)(nil),  // 3: livekit.SearchPhoneNumbersResponse
+	(*PurchasePhoneNumberRequest)(nil),  // 4: livekit.PurchasePhoneNumberRequest
+	(*PurchasePhoneNumberResponse)(nil), // 5: livekit.PurchasePhoneNumberResponse
+	(*ListPhoneNumbersRequest)(nil),     // 6: livekit.ListPhoneNumbersRequest
+	(*ListPhoneNumbersResponse)(nil),    // 7: livekit.ListPhoneNumbersResponse
+	(*GetPhoneNumberRequest)(nil),       // 8: livekit.GetPhoneNumberRequest
+	(*GetPhoneNumberResponse)(nil),      // 9: livekit.GetPhoneNumberResponse
+	(*UpdatePhoneNumberRequest)(nil),    // 10: livekit.UpdatePhoneNumberRequest
+	(*UpdatePhoneNumberResponse)(nil),   // 11: livekit.UpdatePhoneNumberResponse
+	(*ReleasePhoneNumbersRequest)(nil),  // 12: livekit.ReleasePhoneNumbersRequest
+	(*ReleasePhoneNumbersResponse)(nil), // 13: livekit.ReleasePhoneNumbersResponse
+	(*PhoneNumber)(nil),                 // 14: livekit.PhoneNumber
+	(*TokenPagination)(nil),             // 15: livekit.TokenPagination
+	(*timestamppb.Timestamp)(nil),       // 16: google.protobuf.Timestamp
 }
 var file_livekit_phone_number_proto_depIdxs = []int32{
-	14, // 0: livekit.SearchPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
-	13, // 1: livekit.SearchPhoneNumbersResponse.items:type_name -> livekit.PhoneNumber
-	14, // 2: livekit.SearchPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
-	13, // 3: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PhoneNumber
+	15, // 0: livekit.SearchPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
+	14, // 1: livekit.SearchPhoneNumbersResponse.items:type_name -> livekit.PhoneNumber
+	15, // 2: livekit.SearchPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
+	14, // 3: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PhoneNumber
 	0,  // 4: livekit.ListPhoneNumbersRequest.status:type_name -> livekit.PhoneNumberStatus
-	14, // 5: livekit.ListPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
-	13, // 6: livekit.ListPhoneNumbersResponse.items:type_name -> livekit.PhoneNumber
-	14, // 7: livekit.ListPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
-	13, // 8: livekit.GetPhoneNumberResponse.phone_number:type_name -> livekit.PhoneNumber
-	13, // 9: livekit.UpdatePhoneNumberResponse.phone_number:type_name -> livekit.PhoneNumber
-	15, // 10: livekit.PhoneNumber.created_at:type_name -> google.protobuf.Timestamp
-	15, // 11: livekit.PhoneNumber.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 12: livekit.PhoneNumber.status:type_name -> livekit.PhoneNumberStatus
-	15, // 13: livekit.PhoneNumber.assigned_at:type_name -> google.protobuf.Timestamp
-	15, // 14: livekit.PhoneNumber.released_at:type_name -> google.protobuf.Timestamp
-	1,  // 15: livekit.PhoneNumberService.SearchPhoneNumbers:input_type -> livekit.SearchPhoneNumbersRequest
-	3,  // 16: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
-	5,  // 17: livekit.PhoneNumberService.ListPhoneNumbers:input_type -> livekit.ListPhoneNumbersRequest
-	7,  // 18: livekit.PhoneNumberService.GetPhoneNumber:input_type -> livekit.GetPhoneNumberRequest
-	9,  // 19: livekit.PhoneNumberService.UpdatePhoneNumber:input_type -> livekit.UpdatePhoneNumberRequest
-	11, // 20: livekit.PhoneNumberService.ReleasePhoneNumbers:input_type -> livekit.ReleasePhoneNumbersRequest
-	2,  // 21: livekit.PhoneNumberService.SearchPhoneNumbers:output_type -> livekit.SearchPhoneNumbersResponse
-	4,  // 22: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
-	6,  // 23: livekit.PhoneNumberService.ListPhoneNumbers:output_type -> livekit.ListPhoneNumbersResponse
-	8,  // 24: livekit.PhoneNumberService.GetPhoneNumber:output_type -> livekit.GetPhoneNumberResponse
-	10, // 25: livekit.PhoneNumberService.UpdatePhoneNumber:output_type -> livekit.UpdatePhoneNumberResponse
-	12, // 26: livekit.PhoneNumberService.ReleasePhoneNumbers:output_type -> livekit.ReleasePhoneNumbersResponse
-	21, // [21:27] is the sub-list for method output_type
-	15, // [15:21] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	15, // 5: livekit.ListPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
+	14, // 6: livekit.ListPhoneNumbersResponse.items:type_name -> livekit.PhoneNumber
+	15, // 7: livekit.ListPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
+	14, // 8: livekit.GetPhoneNumberResponse.phone_number:type_name -> livekit.PhoneNumber
+	14, // 9: livekit.UpdatePhoneNumberResponse.phone_number:type_name -> livekit.PhoneNumber
+	1,  // 10: livekit.PhoneNumber.number_type:type_name -> livekit.PhoneNumberType
+	16, // 11: livekit.PhoneNumber.created_at:type_name -> google.protobuf.Timestamp
+	16, // 12: livekit.PhoneNumber.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 13: livekit.PhoneNumber.status:type_name -> livekit.PhoneNumberStatus
+	16, // 14: livekit.PhoneNumber.assigned_at:type_name -> google.protobuf.Timestamp
+	16, // 15: livekit.PhoneNumber.released_at:type_name -> google.protobuf.Timestamp
+	2,  // 16: livekit.PhoneNumberService.SearchPhoneNumbers:input_type -> livekit.SearchPhoneNumbersRequest
+	4,  // 17: livekit.PhoneNumberService.PurchasePhoneNumber:input_type -> livekit.PurchasePhoneNumberRequest
+	6,  // 18: livekit.PhoneNumberService.ListPhoneNumbers:input_type -> livekit.ListPhoneNumbersRequest
+	8,  // 19: livekit.PhoneNumberService.GetPhoneNumber:input_type -> livekit.GetPhoneNumberRequest
+	10, // 20: livekit.PhoneNumberService.UpdatePhoneNumber:input_type -> livekit.UpdatePhoneNumberRequest
+	12, // 21: livekit.PhoneNumberService.ReleasePhoneNumbers:input_type -> livekit.ReleasePhoneNumbersRequest
+	3,  // 22: livekit.PhoneNumberService.SearchPhoneNumbers:output_type -> livekit.SearchPhoneNumbersResponse
+	5,  // 23: livekit.PhoneNumberService.PurchasePhoneNumber:output_type -> livekit.PurchasePhoneNumberResponse
+	7,  // 24: livekit.PhoneNumberService.ListPhoneNumbers:output_type -> livekit.ListPhoneNumbersResponse
+	9,  // 25: livekit.PhoneNumberService.GetPhoneNumber:output_type -> livekit.GetPhoneNumberResponse
+	11, // 26: livekit.PhoneNumberService.UpdatePhoneNumber:output_type -> livekit.UpdatePhoneNumberResponse
+	13, // 27: livekit.PhoneNumberService.ReleasePhoneNumbers:output_type -> livekit.ReleasePhoneNumbersResponse
+	22, // [22:28] is the sub-list for method output_type
+	16, // [16:22] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_livekit_phone_number_proto_init() }
@@ -1036,7 +1096,7 @@ func file_livekit_phone_number_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_phone_number_proto_rawDesc), len(file_livekit_phone_number_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,

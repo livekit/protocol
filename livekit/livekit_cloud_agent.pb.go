@@ -260,6 +260,7 @@ type CreateAgentResponse struct {
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	PresignedUrl  string                 `protobuf:"bytes,5,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
+	Tag           string                 `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -325,6 +326,13 @@ func (x *CreateAgentResponse) GetVersion() string {
 func (x *CreateAgentResponse) GetPresignedUrl() string {
 	if x != nil {
 		return x.PresignedUrl
+	}
+	return ""
+}
+
+func (x *CreateAgentResponse) GetTag() string {
+	if x != nil {
+		return x.Tag
 	}
 	return ""
 }
@@ -1159,6 +1167,7 @@ type DeployAgentResponse struct {
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	AgentId       string                 `protobuf:"bytes,3,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	PresignedUrl  string                 `protobuf:"bytes,4,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
+	Tag           string                 `protobuf:"bytes,5,opt,name=tag,proto3" json:"tag,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1217,6 +1226,13 @@ func (x *DeployAgentResponse) GetAgentId() string {
 func (x *DeployAgentResponse) GetPresignedUrl() string {
 	if x != nil {
 		return x.PresignedUrl
+	}
+	return ""
+}
+
+func (x *DeployAgentResponse) GetTag() string {
+	if x != nil {
+		return x.Tag
 	}
 	return ""
 }
@@ -1805,14 +1821,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
-	"\aregions\x18\x06 \x03(\tR\aregions\"\xa6\x01\n" +
+	"\aregions\x18\x06 \x03(\tR\aregions\"\xb8\x01\n" +
 	"\x13CreateAgentResponse\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x18\n" +
 	"\aversion\x18\x04 \x01(\tR\aversion\x12#\n" +
-	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\"\xdc\x02\n" +
+	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\x12\x10\n" +
+	"\x03tag\x18\x06 \x01(\tR\x03tag\"\xdc\x02\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\x12\x16\n" +
@@ -1885,12 +1902,13 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
-	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\x89\x01\n" +
+	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\x9b\x01\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
 	"\bagent_id\x18\x03 \x01(\tR\aagentId\x12#\n" +
-	"\rpresigned_url\x18\x04 \x01(\tR\fpresignedUrl\"\xa3\x01\n" +
+	"\rpresigned_url\x18\x04 \x01(\tR\fpresignedUrl\x12\x10\n" +
+	"\x03tag\x18\x05 \x01(\tR\x03tag\"\xa3\x01\n" +
 	"\x19UpdateAgentSecretsRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +

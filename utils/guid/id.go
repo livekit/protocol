@@ -61,6 +61,8 @@ const (
 	CloudAgentSecretPrefix  = "CAS_"
 	CloudAgentWorkerPrefix  = "CAW_"
 	AgentGatewayPrefix      = "GW_"
+	CarrierPrefix           = "CR_"
+	PhoneNumberPrefix       = "PN_"
 )
 
 var guidGeneratorPool = sync.Pool{
