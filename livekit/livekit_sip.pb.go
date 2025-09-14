@@ -3632,6 +3632,8 @@ type TransferSIPParticipantRequest struct {
 	// Add the following headers to the REFER SIP request.
 	Headers map[string]string `protobuf:"bytes,5,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Max time for the transfer destination to answer the call.
+	//
+	// Deprecated: Marked as deprecated in livekit_sip.proto.
 	RingingTimeout *durationpb.Duration `protobuf:"bytes,6,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -3702,6 +3704,7 @@ func (x *TransferSIPParticipantRequest) GetHeaders() map[string]string {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_sip.proto.
 func (x *TransferSIPParticipantRequest) GetRingingTimeout() *durationpb.Duration {
 	if x != nil {
 		return x.RingingTimeout
@@ -4443,15 +4446,15 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x12\x1e\n" +
-	"\vsip_call_id\x18\x04 \x01(\tR\tsipCallId\"\x84\x03\n" +
+	"\vsip_call_id\x18\x04 \x01(\tR\tsipCallId\"\x88\x03\n" +
 	"\x1dTransferSIPParticipantRequest\x121\n" +
 	"\x14participant_identity\x18\x01 \x01(\tR\x13participantIdentity\x12\x1b\n" +
 	"\troom_name\x18\x02 \x01(\tR\broomName\x12\x1f\n" +
 	"\vtransfer_to\x18\x03 \x01(\tR\n" +
 	"transferTo\x12#\n" +
 	"\rplay_dialtone\x18\x04 \x01(\bR\fplayDialtone\x12M\n" +
-	"\aheaders\x18\x05 \x03(\v23.livekit.TransferSIPParticipantRequest.HeadersEntryR\aheaders\x12B\n" +
-	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
+	"\aheaders\x18\x05 \x03(\v23.livekit.TransferSIPParticipantRequest.HeadersEntryR\aheaders\x12F\n" +
+	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationB\x02\x18\x01R\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc1\t\n" +
