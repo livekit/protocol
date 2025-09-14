@@ -691,7 +691,7 @@ message TransferSIPParticipantRequest {
   map<string, string> headers = 5;
 
   // Max time for the transfer destination to answer the call.
-  google.protobuf.Duration ringing_timeout = 6;
+  google.protobuf.Duration ringing_timeout = 6 [deprecated = true];
 }
 
 message SIPCallInfo {
