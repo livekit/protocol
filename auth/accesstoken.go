@@ -29,10 +29,11 @@ const (
 
 // AccessToken produces token signed with API key and secret
 type AccessToken struct {
-	apiKey   string
-	secret   string
-	grant    ClaimGrants
-	validFor time.Duration
+	apiKey                    string
+	secret                    string
+	grant                     ClaimGrants
+	validFor                  time.Duration
+	allowSensitiveCredentials bool
 }
 
 func NewAccessToken(key string, secret string) *AccessToken {
@@ -138,6 +139,16 @@ func (t *AccessToken) SetAgents(agents ...*livekit.RoomAgentDispatch) *AccessTok
 	return t
 }
 
+// SetAllowSensitiveCredentials enables the token to contain sensitive credentials, by default it is disabled.
+// When tokens are issued to end-users, it's not a good idea to issue sensitive data such as API keys/secrets in them
+// JWT tokens are not encrypted, so anything that is issued in them can be read by anyone.
+// When the tokens are used in a server environment (i.e. connecting from SIP or Agents), you can bypass the
+// credentials check by enabling this option.
+func (t *AccessToken) SetAllowSensitiveCredentials(allow bool) *AccessToken {
+	t.allowSensitiveCredentials = allow
+	return t
+}
+
 func (t *AccessToken) GetGrants() *ClaimGrants {
 	return &t.grant
 }
@@ -147,7 +158,7 @@ func (t *AccessToken) ToJWT() (string, error) {
 		return "", ErrKeysMissing
 	}
 
-	if t.grant.RoomConfig != nil {
+	if t.grant.RoomConfig != nil && !t.allowSensitiveCredentials {
 		if err := t.grant.RoomConfig.CheckCredentials(); err != nil {
 			return "", err
 		}
