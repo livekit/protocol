@@ -25,7 +25,8 @@
   "scripts": {
     "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
     "generate:version": "genversion --esm --semi src/gen/version.js",
-    "build": "pnpm generate:version && pnpm generate:proto && unbuild"
+    "build": "pnpm generate:version && pnpm generate:proto && unbuild",
+    "prepare": "pnpm build"
   },
   "keywords": [],
   "author": "LiveKit",
