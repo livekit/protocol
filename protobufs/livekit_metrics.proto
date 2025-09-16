@@ -89,10 +89,6 @@ message EventMetric {
 }
 
 message MetricsRecordingHeader {
-  message Part {
-    uint32 content_length = 1;
-  }
-
   string room_id = 1;
-  map<string, Part> parts = 2;
+  optional bool enable_user_data_training = 2;
 }
