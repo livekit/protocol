@@ -34,7 +34,7 @@ const (
 	DataChannelRpcDefaultResponseTimeout = 10000 * time.Millisecond
 )
 
-var rpcErrorMessages = map[DataChannelRpcErrorCode]string{
+var dataChannelRpcErrorMessages = map[DataChannelRpcErrorCode]string{
 	DataChannelRpcApplicationError:        "Application error in method handler",
 	DataChannelRpcConnectionTimeout:       "Connection timeout",
 	DataChannelRpcResponseTimeout:         "Response timeout",
@@ -89,7 +89,7 @@ func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 }
 
 func DataChannelRpcErrorFromBuiltInCodes(code DataChannelRpcErrorCode, data *string) *DataChannelRpcError {
-	return &DataChannelRpcError{Code: code, Message: rpcErrorMessages[code], Data: *data}
+	return &DataChannelRpcError{Code: code, Message: dataChannelRpcErrorMessages[code], Data: *data}
 }
 
 type DataChannelRpcPendingAckHandler struct {
