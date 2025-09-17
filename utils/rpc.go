@@ -7,97 +7,97 @@ import (
 	"github.com/livekit/psrpc"
 )
 
-type RpcErrorCode uint32
+type DataChannelRpcErrorCode uint32
 
 const (
-	RpcApplicationError RpcErrorCode = 1500 + iota
-	RpcConnectionTimeout
-	RpcResponseTimeout
-	RpcRecipientDisconnected
-	RpcResponsePayloadTooLarge
-	RpcSendFailed
+	DataChannelRpcApplicationError DataChannelRpcErrorCode = 1500 + iota
+	DataChannelRpcConnectionTimeout
+	DataChannelRpcResponseTimeout
+	DataChannelRpcRecipientDisconnected
+	DataChannelRpcResponsePayloadTooLarge
+	DataChannelRpcSendFailed
 )
 
 const (
-	RpcUnsupportedMethod RpcErrorCode = 1400 + iota
-	RpcRecipientNotFound
-	RpcRequestPayloadTooLarge
-	RpcUnsupportedServer
-	RpcUnsupportedVersion
+	DataChannelRpcUnsupportedMethod DataChannelRpcErrorCode = 1400 + iota
+	DataChannelRpcRecipientNotFound
+	DataChannelRpcRequestPayloadTooLarge
+	DataChannelRpcUnsupportedServer
+	DataChannelRpcUnsupportedVersion
 )
 
 const (
-	RpcMaxRoundTripLatency    = 2000 * time.Millisecond
-	RpcMaxMessageBytes        = 256
-	RpcMaxDataBytes           = 15360 // 15KiB
-	RpcMaxPayloadBytes        = 15360 // 15KiB
-	RpcDefaultResponseTimeout = 10000 * time.Millisecond
+	DataChannelRpcMaxRoundTripLatency    = 2000 * time.Millisecond
+	DataChannelRpcMaxMessageBytes        = 256
+	DataChannelRpcMaxDataBytes           = 15360 // 15KiB
+	DataChannelRpcMaxPayloadBytes        = 15360 // 15KiB
+	DataChannelRpcDefaultResponseTimeout = 10000 * time.Millisecond
 )
 
-var rpcErrorMessages = map[RpcErrorCode]string{
-	RpcApplicationError:        "Application error in method handler",
-	RpcConnectionTimeout:       "Connection timeout",
-	RpcResponseTimeout:         "Response timeout",
-	RpcRecipientDisconnected:   "Recipient disconnected",
-	RpcResponsePayloadTooLarge: "Response payload too large",
-	RpcSendFailed:              "Failed to send",
+var rpcErrorMessages = map[DataChannelRpcErrorCode]string{
+	DataChannelRpcApplicationError:        "Application error in method handler",
+	DataChannelRpcConnectionTimeout:       "Connection timeout",
+	DataChannelRpcResponseTimeout:         "Response timeout",
+	DataChannelRpcRecipientDisconnected:   "Recipient disconnected",
+	DataChannelRpcResponsePayloadTooLarge: "Response payload too large",
+	DataChannelRpcSendFailed:              "Failed to send",
 
-	RpcUnsupportedMethod:      "Method not supported at destination",
-	RpcRecipientNotFound:      "Recipient not found",
-	RpcRequestPayloadTooLarge: "Request payload too large",
-	RpcUnsupportedServer:      "RPC not supported by server",
-	RpcUnsupportedVersion:     "Unsupported RPC version",
+	DataChannelRpcUnsupportedMethod:      "Method not supported at destination",
+	DataChannelRpcRecipientNotFound:      "Recipient not found",
+	DataChannelRpcRequestPayloadTooLarge: "Request payload too large",
+	DataChannelRpcUnsupportedServer:      "RPC not supported by server",
+	DataChannelRpcUnsupportedVersion:     "Unsupported RPC version",
 }
 
-type RpcError struct {
-	Code    RpcErrorCode
+type DataChannelRpcError struct {
+	Code    DataChannelRpcErrorCode
 	Message string
 	Data    string
 }
 
-func (e *RpcError) Error() string {
+func (e *DataChannelRpcError) Error() string {
 	return fmt.Sprintf("RpcError %d: %s", e.Code, e.Message)
 }
 
-func (e *RpcError) PsrpcError() psrpc.Error {
+func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 	switch e.Code {
-	case RpcApplicationError:
+	case DataChannelRpcApplicationError:
 		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
-	case RpcConnectionTimeout:
+	case DataChannelRpcConnectionTimeout:
 		return psrpc.NewErrorf(psrpc.DeadlineExceeded, e.Message, "data", e.Data)
-	case RpcResponseTimeout:
+	case DataChannelRpcResponseTimeout:
 		return psrpc.NewErrorf(psrpc.DeadlineExceeded, e.Message, "data", e.Data)
-	case RpcRecipientDisconnected:
+	case DataChannelRpcRecipientDisconnected:
 		return psrpc.NewErrorf(psrpc.Unavailable, e.Message, "data", e.Data)
-	case RpcResponsePayloadTooLarge:
+	case DataChannelRpcResponsePayloadTooLarge:
 		return psrpc.NewErrorf(psrpc.MalformedResponse, e.Message, "data", e.Data)
-	case RpcSendFailed:
+	case DataChannelRpcSendFailed:
 		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
-	case RpcUnsupportedMethod:
+	case DataChannelRpcUnsupportedMethod:
 		return psrpc.NewErrorf(psrpc.InvalidArgument, e.Message, "data", e.Data)
-	case RpcRecipientNotFound:
+	case DataChannelRpcRecipientNotFound:
 		return psrpc.NewErrorf(psrpc.NotFound, e.Message, "data", e.Data)
-	case RpcRequestPayloadTooLarge:
+	case DataChannelRpcRequestPayloadTooLarge:
 		return psrpc.NewErrorf(psrpc.MalformedRequest, e.Message, "data", e.Data)
-	case RpcUnsupportedServer:
+	case DataChannelRpcUnsupportedServer:
 		return psrpc.NewErrorf(psrpc.Unimplemented, e.Message, "data", e.Data)
-	case RpcUnsupportedVersion:
+	case DataChannelRpcUnsupportedVersion:
 		return psrpc.NewErrorf(psrpc.Unimplemented, e.Message, "data", e.Data)
 	default:
 		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
 	}
 }
 
-func RpcErrorFromBuiltInCodes(code RpcErrorCode, data *string) *RpcError {
-	return &RpcError{Code: code, Message: rpcErrorMessages[code], Data: *data}
+func DataChannelRpcErrorFromBuiltInCodes(code DataChannelRpcErrorCode, data *string) *DataChannelRpcError {
+	return &DataChannelRpcError{Code: code, Message: rpcErrorMessages[code], Data: *data}
 }
 
-type RpcPendingAckHandler struct {
+type DataChannelRpcPendingAckHandler struct {
 	Resolve             func()
 	ParticipantIdentity string
 }
 
-type RpcPendingResponseHandler struct {
-	Resolve             func(payload string, err *RpcError)
+type DataChannelRpcPendingResponseHandler struct {
+	Resolve             func(payload string, err *DataChannelRpcError)
 	ParticipantIdentity string
 }
