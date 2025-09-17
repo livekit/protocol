@@ -71,6 +71,9 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
 	var (
 		hostname           string
 		enc                livekit.SIPMediaEncryption
@@ -190,6 +193,7 @@ func NewCreateSIPParticipantRequest(
 		MaxCallDuration:       req.MaxCallDuration,
 		MediaEncryption:       enc,
 		WaitUntilAnswered:     req.WaitUntilAnswered,
+		DisplayName:           req.DisplayName,
 	}, nil
 }
 

@@ -105,7 +105,15 @@ message InternalCreateSIPParticipantRequest {
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 29;
 
-  // NEXT ID: 31
+  // Optional display name for the 'From' SIP header.
+  //
+  // Cases:
+  // 1) Unspecified: Use legacy behavior - display name will be set to be the caller's number. 
+  // 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
+  // 3) Non-empty: Use the specified value as the display name.
+  optional string display_name = 31;
+
+  // NEXT ID: 32
 }
 
 message InternalCreateSIPParticipantResponse {
