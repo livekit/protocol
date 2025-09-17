@@ -678,7 +678,7 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 
 	// Validate display_name if provided
 	if p.DisplayName != nil {
-		if len(displayName) > 128 {
+		if len(*p.DisplayName) > 128 {
 			return errors.New("display_name too long (max 128 characters)")
 		}
 
