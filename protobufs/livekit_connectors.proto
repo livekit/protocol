@@ -43,6 +43,18 @@ message DialWhatsAppCallRequest {
   string whatsapp_api_key = 3;
   // An arbitrary string you can pass in that is useful for tracking and logging purposes.
   optional string biz_opaque_callback_data = 4;
+  // What LiveKit room should this participant be connected too
+  string room_name = 5;
+  // Optional identity of the participant in LiveKit room
+  string participant_identity= 6;
+  // Optional name of the participant in LiveKit room
+  string participant_name = 7;
+  // Optional user-defined metadata. Will be attached to a created Participant in the room.
+  string participant_metadata = 8;
+  // Optional user-defined attributes. Will be attached to a created Participant in the room.
+  map<string, string> participant_attributes = 9;
+  // Optional agents to dispatch the call to
+  repeated RoomAgentDispatch agents = 10;
 }
 
 message DialWhatsAppCallResponse {
@@ -64,23 +76,11 @@ message ConnectWhatsAppCallRequest {
   string whatsapp_phone_number_id = 1;
   // The API key of the business that is connecting the call
   string whatsapp_api_key = 2;
-  // What LiveKit room should this participant be connected too
-  string room_name = 3;
-  // Optional identity of the participant in LiveKit room
-  string participant_identity= 4;
-  // Optional name of the participant in LiveKit room
-  string participant_name = 5;
-  // Optional user-defined metadata. Will be attached to a created Participant in the room.
-  string participant_metadata = 6;
-  // Optional user-defined attributes. Will be attached to a created Participant in the room.
-  map<string, string> participant_attributes = 7;
-  // Optional agents to dispatch the call to
-  repeated RoomAgentDispatch agents = 8;
   // Call ID sent by Meta
-  string whatsapp_call_id = 9;
+  string whatsapp_call_id = 3;
   // The call connect webhook comes with SDP from Meta
   // It is the answer SDP for a business initiated call
-  SessionDescription sdp = 10;
+  SessionDescription sdp = 4;
 }
 
 message ConnectWhatsAppCallResponse {
