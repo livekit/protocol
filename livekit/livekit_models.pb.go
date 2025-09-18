@@ -42,6 +42,7 @@ const (
 	AudioCodec_DEFAULT_AC AudioCodec = 0
 	AudioCodec_OPUS       AudioCodec = 1
 	AudioCodec_AAC        AudioCodec = 2
+	AudioCodec_CODEC_MP3  AudioCodec = 3
 )
 
 // Enum value maps for AudioCodec.
@@ -50,11 +51,13 @@ var (
 		0: "DEFAULT_AC",
 		1: "OPUS",
 		2: "AAC",
+		3: "CODEC_MP3",
 	}
 	AudioCodec_value = map[string]int32{
 		"DEFAULT_AC": 0,
 		"OPUS":       1,
 		"AAC":        2,
+		"CODEC_MP3":  3,
 	}
 )
 
@@ -6143,13 +6146,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\rWebhookConfig\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1f\n" +
 	"\vsigning_key\x18\x02 \x01(\tR\n" +
-	"signingKey*/\n" +
+	"signingKey*>\n" +
 	"\n" +
 	"AudioCodec\x12\x0e\n" +
 	"\n" +
 	"DEFAULT_AC\x10\x00\x12\b\n" +
 	"\x04OPUS\x10\x01\x12\a\n" +
-	"\x03AAC\x10\x02*V\n" +
+	"\x03AAC\x10\x02\x12\r\n" +
+	"\tCODEC_MP3\x10\x03*V\n" +
 	"\n" +
 	"VideoCodec\x12\x0e\n" +
 	"\n" +
