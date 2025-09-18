@@ -68,6 +68,7 @@ enum AudioCodec {
   DEFAULT_AC = 0;
   OPUS = 1;
   AAC = 2;
+  MP3 = 3;
 }
 
 enum VideoCodec {
