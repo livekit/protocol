@@ -81,34 +81,46 @@ func (WhatsAppCallDirection) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_connectors_proto_rawDescGZIP(), []int{0}
 }
 
-type CreateWhatsAppParticipantRequest struct {
+type DialWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The number of the business that is initiating the call
-	FromPhoneNumberId string `protobuf:"bytes,1,opt,name=from_phone_number_id,json=fromPhoneNumberId,proto3" json:"from_phone_number_id,omitempty"`
+	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
 	// The number of the user that is supossed to receive the call
-	ToPhoneNumberId string `protobuf:"bytes,2,opt,name=to_phone_number_id,json=toPhoneNumberId,proto3" json:"to_phone_number_id,omitempty"`
+	ToPhoneNumber string `protobuf:"bytes,2,opt,name=to_phone_number,json=toPhoneNumber,proto3" json:"to_phone_number,omitempty"`
 	// The API key of the business that is initiating the call
 	WhatsappApiKey string `protobuf:"bytes,3,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
 	// An arbitrary string you can pass in that is useful for tracking and logging purposes.
 	BizOpaqueCallbackData *string `protobuf:"bytes,4,opt,name=biz_opaque_callback_data,json=bizOpaqueCallbackData,proto3,oneof" json:"biz_opaque_callback_data,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// What LiveKit room should this participant be connected too
+	RoomName string `protobuf:"bytes,5,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	// Optional identity of the participant in LiveKit room
+	ParticipantIdentity string `protobuf:"bytes,6,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	// Optional name of the participant in LiveKit room
+	ParticipantName string `protobuf:"bytes,7,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
+	// Optional user-defined metadata. Will be attached to a created Participant in the room.
+	ParticipantMetadata string `protobuf:"bytes,8,opt,name=participant_metadata,json=participantMetadata,proto3" json:"participant_metadata,omitempty"`
+	// Optional user-defined attributes. Will be attached to a created Participant in the room.
+	ParticipantAttributes map[string]string `protobuf:"bytes,9,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Optional agents to dispatch the call to
+	Agents        []*RoomAgentDispatch `protobuf:"bytes,10,rep,name=agents,proto3" json:"agents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateWhatsAppParticipantRequest) Reset() {
-	*x = CreateWhatsAppParticipantRequest{}
+func (x *DialWhatsAppCallRequest) Reset() {
+	*x = DialWhatsAppCallRequest{}
 	mi := &file_livekit_connectors_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateWhatsAppParticipantRequest) String() string {
+func (x *DialWhatsAppCallRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateWhatsAppParticipantRequest) ProtoMessage() {}
+func (*DialWhatsAppCallRequest) ProtoMessage() {}
 
-func (x *CreateWhatsAppParticipantRequest) ProtoReflect() protoreflect.Message {
+func (x *DialWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_connectors_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -120,40 +132,82 @@ func (x *CreateWhatsAppParticipantRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateWhatsAppParticipantRequest.ProtoReflect.Descriptor instead.
-func (*CreateWhatsAppParticipantRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use DialWhatsAppCallRequest.ProtoReflect.Descriptor instead.
+func (*DialWhatsAppCallRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_connectors_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *CreateWhatsAppParticipantRequest) GetFromPhoneNumberId() string {
+func (x *DialWhatsAppCallRequest) GetWhatsappPhoneNumberId() string {
 	if x != nil {
-		return x.FromPhoneNumberId
+		return x.WhatsappPhoneNumberId
 	}
 	return ""
 }
 
-func (x *CreateWhatsAppParticipantRequest) GetToPhoneNumberId() string {
+func (x *DialWhatsAppCallRequest) GetToPhoneNumber() string {
 	if x != nil {
-		return x.ToPhoneNumberId
+		return x.ToPhoneNumber
 	}
 	return ""
 }
 
-func (x *CreateWhatsAppParticipantRequest) GetWhatsappApiKey() string {
+func (x *DialWhatsAppCallRequest) GetWhatsappApiKey() string {
 	if x != nil {
 		return x.WhatsappApiKey
 	}
 	return ""
 }
 
-func (x *CreateWhatsAppParticipantRequest) GetBizOpaqueCallbackData() string {
+func (x *DialWhatsAppCallRequest) GetBizOpaqueCallbackData() string {
 	if x != nil && x.BizOpaqueCallbackData != nil {
 		return *x.BizOpaqueCallbackData
 	}
 	return ""
 }
 
-type CreateWhatsAppParticipantResponse struct {
+func (x *DialWhatsAppCallRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *DialWhatsAppCallRequest) GetParticipantIdentity() string {
+	if x != nil {
+		return x.ParticipantIdentity
+	}
+	return ""
+}
+
+func (x *DialWhatsAppCallRequest) GetParticipantName() string {
+	if x != nil {
+		return x.ParticipantName
+	}
+	return ""
+}
+
+func (x *DialWhatsAppCallRequest) GetParticipantMetadata() string {
+	if x != nil {
+		return x.ParticipantMetadata
+	}
+	return ""
+}
+
+func (x *DialWhatsAppCallRequest) GetParticipantAttributes() map[string]string {
+	if x != nil {
+		return x.ParticipantAttributes
+	}
+	return nil
+}
+
+func (x *DialWhatsAppCallRequest) GetAgents() []*RoomAgentDispatch {
+	if x != nil {
+		return x.Agents
+	}
+	return nil
+}
+
+type DialWhatsAppCallResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
@@ -161,20 +215,20 @@ type CreateWhatsAppParticipantResponse struct {
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *CreateWhatsAppParticipantResponse) Reset() {
-	*x = CreateWhatsAppParticipantResponse{}
+func (x *DialWhatsAppCallResponse) Reset() {
+	*x = DialWhatsAppCallResponse{}
 	mi := &file_livekit_connectors_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateWhatsAppParticipantResponse) String() string {
+func (x *DialWhatsAppCallResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateWhatsAppParticipantResponse) ProtoMessage() {}
+func (*DialWhatsAppCallResponse) ProtoMessage() {}
 
-func (x *CreateWhatsAppParticipantResponse) ProtoReflect() protoreflect.Message {
+func (x *DialWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_connectors_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -186,183 +240,42 @@ func (x *CreateWhatsAppParticipantResponse) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateWhatsAppParticipantResponse.ProtoReflect.Descriptor instead.
-func (*CreateWhatsAppParticipantResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use DialWhatsAppCallResponse.ProtoReflect.Descriptor instead.
+func (*DialWhatsAppCallResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_connectors_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreateWhatsAppParticipantResponse) GetWhatsappCallId() string {
+func (x *DialWhatsAppCallResponse) GetWhatsappCallId() string {
 	if x != nil {
 		return x.WhatsappCallId
 	}
 	return ""
 }
 
-type DeleteWhatsAppParticipantRequest struct {
+type DisconnectWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*DeleteWhatsAppParticipantRequest_CallId
-	//	*DeleteWhatsAppParticipantRequest_RejectedCall
-	//	*DeleteWhatsAppParticipantRequest_TerminatedCall
-	//	*DeleteWhatsAppParticipantRequest_CallStatusRejectedWebhook
-	//	*DeleteWhatsAppParticipantRequest_CallTerminateWebhook
-	Request       isDeleteWhatsAppParticipantRequest_Request `protobuf_oneof:"request"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteWhatsAppParticipantRequest) Reset() {
-	*x = DeleteWhatsAppParticipantRequest{}
-	mi := &file_livekit_connectors_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteWhatsAppParticipantRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteWhatsAppParticipantRequest) ProtoMessage() {}
-
-func (x *DeleteWhatsAppParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteWhatsAppParticipantRequest.ProtoReflect.Descriptor instead.
-func (*DeleteWhatsAppParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *DeleteWhatsAppParticipantRequest) GetRequest() isDeleteWhatsAppParticipantRequest_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
-func (x *DeleteWhatsAppParticipantRequest) GetCallId() *DeleteWhatsAppParticipantWithCallId {
-	if x != nil {
-		if x, ok := x.Request.(*DeleteWhatsAppParticipantRequest_CallId); ok {
-			return x.CallId
-		}
-	}
-	return nil
-}
-
-func (x *DeleteWhatsAppParticipantRequest) GetRejectedCall() *DeleteWhatsAppParticipantForRejectedCall {
-	if x != nil {
-		if x, ok := x.Request.(*DeleteWhatsAppParticipantRequest_RejectedCall); ok {
-			return x.RejectedCall
-		}
-	}
-	return nil
-}
-
-func (x *DeleteWhatsAppParticipantRequest) GetTerminatedCall() *DeleteWhatsAppParticipantForTerminatedCall {
-	if x != nil {
-		if x, ok := x.Request.(*DeleteWhatsAppParticipantRequest_TerminatedCall); ok {
-			return x.TerminatedCall
-		}
-	}
-	return nil
-}
-
-func (x *DeleteWhatsAppParticipantRequest) GetCallStatusRejectedWebhook() string {
-	if x != nil {
-		if x, ok := x.Request.(*DeleteWhatsAppParticipantRequest_CallStatusRejectedWebhook); ok {
-			return x.CallStatusRejectedWebhook
-		}
-	}
-	return ""
-}
-
-func (x *DeleteWhatsAppParticipantRequest) GetCallTerminateWebhook() string {
-	if x != nil {
-		if x, ok := x.Request.(*DeleteWhatsAppParticipantRequest_CallTerminateWebhook); ok {
-			return x.CallTerminateWebhook
-		}
-	}
-	return ""
-}
-
-type isDeleteWhatsAppParticipantRequest_Request interface {
-	isDeleteWhatsAppParticipantRequest_Request()
-}
-
-type DeleteWhatsAppParticipantRequest_CallId struct {
-	CallId *DeleteWhatsAppParticipantWithCallId `protobuf:"bytes,1,opt,name=call_id,json=callId,proto3,oneof"`
-}
-
-type DeleteWhatsAppParticipantRequest_RejectedCall struct {
-	RejectedCall *DeleteWhatsAppParticipantForRejectedCall `protobuf:"bytes,2,opt,name=rejected_call,json=rejectedCall,proto3,oneof"`
-}
-
-type DeleteWhatsAppParticipantRequest_TerminatedCall struct {
-	TerminatedCall *DeleteWhatsAppParticipantForTerminatedCall `protobuf:"bytes,3,opt,name=terminated_call,json=terminatedCall,proto3,oneof"`
-}
-
-type DeleteWhatsAppParticipantRequest_CallStatusRejectedWebhook struct {
-	// when the call is rejected by the other side, we receive a webhook:
-	// https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-status-webhook
-	CallStatusRejectedWebhook string `protobuf:"bytes,4,opt,name=call_status_rejected_webhook,json=callStatusRejectedWebhook,proto3,oneof"`
-}
-
-type DeleteWhatsAppParticipantRequest_CallTerminateWebhook struct {
-	// when the call is terminated by the other side, we receive a webhook:
-	// https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-terminate-webhook
-	// terminate webhook is the same for both user and business initiated calls
-	CallTerminateWebhook string `protobuf:"bytes,5,opt,name=call_terminate_webhook,json=callTerminateWebhook,proto3,oneof"`
-}
-
-func (*DeleteWhatsAppParticipantRequest_CallId) isDeleteWhatsAppParticipantRequest_Request() {}
-
-func (*DeleteWhatsAppParticipantRequest_RejectedCall) isDeleteWhatsAppParticipantRequest_Request() {}
-
-func (*DeleteWhatsAppParticipantRequest_TerminatedCall) isDeleteWhatsAppParticipantRequest_Request() {
-}
-
-func (*DeleteWhatsAppParticipantRequest_CallStatusRejectedWebhook) isDeleteWhatsAppParticipantRequest_Request() {
-}
-
-func (*DeleteWhatsAppParticipantRequest_CallTerminateWebhook) isDeleteWhatsAppParticipantRequest_Request() {
-}
-
-type DeleteWhatsAppParticipantWithCallId struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// when the call is rejected or terminated by the other side, we don't need to make any API calls
-	// we only need to do it when we are terminating the call
-	PhoneNumberId string `protobuf:"bytes,1,opt,name=phone_number_id,json=phoneNumberId,proto3" json:"phone_number_id,omitempty"`
 	// Call ID sent by Meta
-	WhatsappCallId string `protobuf:"bytes,2,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	WhatsappApiKey string `protobuf:"bytes,3,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
+	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
+	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
-func (x *DeleteWhatsAppParticipantWithCallId) Reset() {
-	*x = DeleteWhatsAppParticipantWithCallId{}
-	mi := &file_livekit_connectors_proto_msgTypes[3]
+func (x *DisconnectWhatsAppCallRequest) Reset() {
+	*x = DisconnectWhatsAppCallRequest{}
+	mi := &file_livekit_connectors_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DeleteWhatsAppParticipantWithCallId) String() string {
+func (x *DisconnectWhatsAppCallRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeleteWhatsAppParticipantWithCallId) ProtoMessage() {}
+func (*DisconnectWhatsAppCallRequest) ProtoMessage() {}
 
-func (x *DeleteWhatsAppParticipantWithCallId) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[3]
+func (x *DisconnectWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connectors_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -373,143 +286,46 @@ func (x *DeleteWhatsAppParticipantWithCallId) ProtoReflect() protoreflect.Messag
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteWhatsAppParticipantWithCallId.ProtoReflect.Descriptor instead.
-func (*DeleteWhatsAppParticipantWithCallId) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{3}
+// Deprecated: Use DisconnectWhatsAppCallRequest.ProtoReflect.Descriptor instead.
+func (*DisconnectWhatsAppCallRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *DeleteWhatsAppParticipantWithCallId) GetPhoneNumberId() string {
-	if x != nil {
-		return x.PhoneNumberId
-	}
-	return ""
-}
-
-func (x *DeleteWhatsAppParticipantWithCallId) GetWhatsappCallId() string {
+func (x *DisconnectWhatsAppCallRequest) GetWhatsappCallId() string {
 	if x != nil {
 		return x.WhatsappCallId
 	}
 	return ""
 }
 
-func (x *DeleteWhatsAppParticipantWithCallId) GetWhatsappApiKey() string {
+func (x *DisconnectWhatsAppCallRequest) GetWhatsappApiKey() string {
 	if x != nil {
 		return x.WhatsappApiKey
 	}
 	return ""
 }
 
-type DeleteWhatsAppParticipantForRejectedCall struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Call ID sent by Meta
-	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *DeleteWhatsAppParticipantForRejectedCall) Reset() {
-	*x = DeleteWhatsAppParticipantForRejectedCall{}
-	mi := &file_livekit_connectors_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteWhatsAppParticipantForRejectedCall) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteWhatsAppParticipantForRejectedCall) ProtoMessage() {}
-
-func (x *DeleteWhatsAppParticipantForRejectedCall) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteWhatsAppParticipantForRejectedCall.ProtoReflect.Descriptor instead.
-func (*DeleteWhatsAppParticipantForRejectedCall) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *DeleteWhatsAppParticipantForRejectedCall) GetWhatsappCallId() string {
-	if x != nil {
-		return x.WhatsappCallId
-	}
-	return ""
-}
-
-type DeleteWhatsAppParticipantForTerminatedCall struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Call ID sent by Meta
-	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *DeleteWhatsAppParticipantForTerminatedCall) Reset() {
-	*x = DeleteWhatsAppParticipantForTerminatedCall{}
-	mi := &file_livekit_connectors_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteWhatsAppParticipantForTerminatedCall) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteWhatsAppParticipantForTerminatedCall) ProtoMessage() {}
-
-func (x *DeleteWhatsAppParticipantForTerminatedCall) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteWhatsAppParticipantForTerminatedCall.ProtoReflect.Descriptor instead.
-func (*DeleteWhatsAppParticipantForTerminatedCall) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *DeleteWhatsAppParticipantForTerminatedCall) GetWhatsappCallId() string {
-	if x != nil {
-		return x.WhatsappCallId
-	}
-	return ""
-}
-
-type DeleteWhatsAppParticipantResponse struct {
+type DisconnectWhatsAppCallResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *DeleteWhatsAppParticipantResponse) Reset() {
-	*x = DeleteWhatsAppParticipantResponse{}
-	mi := &file_livekit_connectors_proto_msgTypes[6]
+func (x *DisconnectWhatsAppCallResponse) Reset() {
+	*x = DisconnectWhatsAppCallResponse{}
+	mi := &file_livekit_connectors_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *DeleteWhatsAppParticipantResponse) String() string {
+func (x *DisconnectWhatsAppCallResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*DeleteWhatsAppParticipantResponse) ProtoMessage() {}
+func (*DisconnectWhatsAppCallResponse) ProtoMessage() {}
 
-func (x *DeleteWhatsAppParticipantResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[6]
+func (x *DisconnectWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connectors_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -520,35 +336,29 @@ func (x *DeleteWhatsAppParticipantResponse) ProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use DeleteWhatsAppParticipantResponse.ProtoReflect.Descriptor instead.
-func (*DeleteWhatsAppParticipantResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{6}
+// Deprecated: Use DisconnectWhatsAppCallResponse.ProtoReflect.Descriptor instead.
+func (*DisconnectWhatsAppCallResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{3}
 }
 
 type ConnectWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The number of the business that is conencting the call
-	PhoneNumberId string `protobuf:"bytes,1,opt,name=phone_number_id,json=phoneNumberId,proto3" json:"phone_number_id,omitempty"`
+	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
 	// The API key of the business that is connecting the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	// Participant identity created on LiveKit's end
-	LivekitParticipantIdentity string `protobuf:"bytes,3,opt,name=livekit_participant_identity,json=livekitParticipantIdentity,proto3" json:"livekit_participant_identity,omitempty"`
-	// Attributes of the LiveKit participant
-	LivekitParticipantAttributes map[string]string `protobuf:"bytes,4,rep,name=livekit_participant_attributes,json=livekitParticipantAttributes,proto3" json:"livekit_participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Dispatch rule for the participant
-	DispatchRule *ConnectorsDispatchRule `protobuf:"bytes,5,opt,name=dispatch_rule,json=dispatchRule,proto3" json:"dispatch_rule,omitempty"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*ConnectWhatsAppCallRequest_WhatsappCallId
-	//	*ConnectWhatsAppCallRequest_CallConnectWebhook
-	Request       isConnectWhatsAppCallRequest_Request `protobuf_oneof:"request"`
+	// Call ID sent by Meta
+	WhatsappCallId string `protobuf:"bytes,3,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
+	// The call connect webhook comes with SDP from Meta
+	// It is the answer SDP for a business initiated call
+	Sdp           *SessionDescription `protobuf:"bytes,4,opt,name=sdp,proto3" json:"sdp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ConnectWhatsAppCallRequest) Reset() {
 	*x = ConnectWhatsAppCallRequest{}
-	mi := &file_livekit_connectors_proto_msgTypes[7]
+	mi := &file_livekit_connectors_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -560,7 +370,7 @@ func (x *ConnectWhatsAppCallRequest) String() string {
 func (*ConnectWhatsAppCallRequest) ProtoMessage() {}
 
 func (x *ConnectWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[7]
+	mi := &file_livekit_connectors_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -573,12 +383,12 @@ func (x *ConnectWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectWhatsAppCallRequest.ProtoReflect.Descriptor instead.
 func (*ConnectWhatsAppCallRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{7}
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *ConnectWhatsAppCallRequest) GetPhoneNumberId() string {
+func (x *ConnectWhatsAppCallRequest) GetWhatsappPhoneNumberId() string {
 	if x != nil {
-		return x.PhoneNumberId
+		return x.WhatsappPhoneNumberId
 	}
 	return ""
 }
@@ -590,71 +400,19 @@ func (x *ConnectWhatsAppCallRequest) GetWhatsappApiKey() string {
 	return ""
 }
 
-func (x *ConnectWhatsAppCallRequest) GetLivekitParticipantIdentity() string {
-	if x != nil {
-		return x.LivekitParticipantIdentity
-	}
-	return ""
-}
-
-func (x *ConnectWhatsAppCallRequest) GetLivekitParticipantAttributes() map[string]string {
-	if x != nil {
-		return x.LivekitParticipantAttributes
-	}
-	return nil
-}
-
-func (x *ConnectWhatsAppCallRequest) GetDispatchRule() *ConnectorsDispatchRule {
-	if x != nil {
-		return x.DispatchRule
-	}
-	return nil
-}
-
-func (x *ConnectWhatsAppCallRequest) GetRequest() isConnectWhatsAppCallRequest_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
 func (x *ConnectWhatsAppCallRequest) GetWhatsappCallId() string {
 	if x != nil {
-		if x, ok := x.Request.(*ConnectWhatsAppCallRequest_WhatsappCallId); ok {
-			return x.WhatsappCallId
-		}
+		return x.WhatsappCallId
 	}
 	return ""
 }
 
-func (x *ConnectWhatsAppCallRequest) GetCallConnectWebhook() string {
+func (x *ConnectWhatsAppCallRequest) GetSdp() *SessionDescription {
 	if x != nil {
-		if x, ok := x.Request.(*ConnectWhatsAppCallRequest_CallConnectWebhook); ok {
-			return x.CallConnectWebhook
-		}
+		return x.Sdp
 	}
-	return ""
+	return nil
 }
-
-type isConnectWhatsAppCallRequest_Request interface {
-	isConnectWhatsAppCallRequest_Request()
-}
-
-type ConnectWhatsAppCallRequest_WhatsappCallId struct {
-	// Call ID sent by Meta
-	WhatsappCallId string `protobuf:"bytes,6,opt,name=whatsapp_call_id,json=whatsappCallId,proto3,oneof"`
-}
-
-type ConnectWhatsAppCallRequest_CallConnectWebhook struct {
-	// When the call is ready to be connected with Meta, we receive a call connect webhook with the SDP:
-	// https://developers.facebook.com/docs/whatsapp/cloud-api/calling/user-initiated-calls#call-connect-webhook
-	// https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-connect-webhook
-	CallConnectWebhook string `protobuf:"bytes,7,opt,name=call_connect_webhook,json=callConnectWebhook,proto3,oneof"`
-}
-
-func (*ConnectWhatsAppCallRequest_WhatsappCallId) isConnectWhatsAppCallRequest_Request() {}
-
-func (*ConnectWhatsAppCallRequest_CallConnectWebhook) isConnectWhatsAppCallRequest_Request() {}
 
 type ConnectWhatsAppCallResponse struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -665,7 +423,7 @@ type ConnectWhatsAppCallResponse struct {
 
 func (x *ConnectWhatsAppCallResponse) Reset() {
 	*x = ConnectWhatsAppCallResponse{}
-	mi := &file_livekit_connectors_proto_msgTypes[8]
+	mi := &file_livekit_connectors_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -677,7 +435,7 @@ func (x *ConnectWhatsAppCallResponse) String() string {
 func (*ConnectWhatsAppCallResponse) ProtoMessage() {}
 
 func (x *ConnectWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[8]
+	mi := &file_livekit_connectors_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -690,7 +448,7 @@ func (x *ConnectWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectWhatsAppCallResponse.ProtoReflect.Descriptor instead.
 func (*ConnectWhatsAppCallResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{8}
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ConnectWhatsAppCallResponse) GetWhatsappCallId() string {
@@ -700,36 +458,48 @@ func (x *ConnectWhatsAppCallResponse) GetWhatsappCallId() string {
 	return ""
 }
 
-type RejectWhatsAppCallRequest struct {
+type AcceptWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The number of the business that is rejecting the call
-	PhoneNumberId string `protobuf:"bytes,1,opt,name=phone_number_id,json=phoneNumberId,proto3" json:"phone_number_id,omitempty"`
-	// The API key of the business that is rejecting the call
+	// The number of the business that is conencting the call
+	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
+	// The API key of the business that is connecting the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*RejectWhatsAppCallRequest_WhatsappCallId
-	//	*RejectWhatsAppCallRequest_CallConnectWebhook
-	Request       isRejectWhatsAppCallRequest_Request `protobuf_oneof:"request"`
+	// What LiveKit room should this participant be connected too
+	RoomName string `protobuf:"bytes,3,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	// Optional identity of the participant in LiveKit room
+	ParticipantIdentity string `protobuf:"bytes,4,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	// Optional name of the participant in LiveKit room
+	ParticipantName string `protobuf:"bytes,5,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
+	// Optional user-defined metadata. Will be attached to a created Participant in the room.
+	ParticipantMetadata string `protobuf:"bytes,6,opt,name=participant_metadata,json=participantMetadata,proto3" json:"participant_metadata,omitempty"`
+	// Optional user-defined attributes. Will be attached to a created Participant in the room.
+	ParticipantAttributes map[string]string `protobuf:"bytes,7,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Optional agents to dispatch the call to
+	Agents []*RoomAgentDispatch `protobuf:"bytes,8,rep,name=agents,proto3" json:"agents,omitempty"`
+	// Call ID sent by Meta
+	WhatsappCallId string `protobuf:"bytes,9,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
+	// The call accept webhook comes with SDP from Meta
+	// It is the for a user initiated call
+	Sdp           *SessionDescription `protobuf:"bytes,10,opt,name=sdp,proto3" json:"sdp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RejectWhatsAppCallRequest) Reset() {
-	*x = RejectWhatsAppCallRequest{}
-	mi := &file_livekit_connectors_proto_msgTypes[9]
+func (x *AcceptWhatsAppCallRequest) Reset() {
+	*x = AcceptWhatsAppCallRequest{}
+	mi := &file_livekit_connectors_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RejectWhatsAppCallRequest) String() string {
+func (x *AcceptWhatsAppCallRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RejectWhatsAppCallRequest) ProtoMessage() {}
+func (*AcceptWhatsAppCallRequest) ProtoMessage() {}
 
-func (x *RejectWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[9]
+func (x *AcceptWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connectors_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,91 +510,103 @@ func (x *RejectWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RejectWhatsAppCallRequest.ProtoReflect.Descriptor instead.
-func (*RejectWhatsAppCallRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{9}
+// Deprecated: Use AcceptWhatsAppCallRequest.ProtoReflect.Descriptor instead.
+func (*AcceptWhatsAppCallRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *RejectWhatsAppCallRequest) GetPhoneNumberId() string {
+func (x *AcceptWhatsAppCallRequest) GetWhatsappPhoneNumberId() string {
 	if x != nil {
-		return x.PhoneNumberId
+		return x.WhatsappPhoneNumberId
 	}
 	return ""
 }
 
-func (x *RejectWhatsAppCallRequest) GetWhatsappApiKey() string {
+func (x *AcceptWhatsAppCallRequest) GetWhatsappApiKey() string {
 	if x != nil {
 		return x.WhatsappApiKey
 	}
 	return ""
 }
 
-func (x *RejectWhatsAppCallRequest) GetRequest() isRejectWhatsAppCallRequest_Request {
+func (x *AcceptWhatsAppCallRequest) GetRoomName() string {
 	if x != nil {
-		return x.Request
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *AcceptWhatsAppCallRequest) GetParticipantIdentity() string {
+	if x != nil {
+		return x.ParticipantIdentity
+	}
+	return ""
+}
+
+func (x *AcceptWhatsAppCallRequest) GetParticipantName() string {
+	if x != nil {
+		return x.ParticipantName
+	}
+	return ""
+}
+
+func (x *AcceptWhatsAppCallRequest) GetParticipantMetadata() string {
+	if x != nil {
+		return x.ParticipantMetadata
+	}
+	return ""
+}
+
+func (x *AcceptWhatsAppCallRequest) GetParticipantAttributes() map[string]string {
+	if x != nil {
+		return x.ParticipantAttributes
 	}
 	return nil
 }
 
-func (x *RejectWhatsAppCallRequest) GetWhatsappCallId() string {
+func (x *AcceptWhatsAppCallRequest) GetAgents() []*RoomAgentDispatch {
 	if x != nil {
-		if x, ok := x.Request.(*RejectWhatsAppCallRequest_WhatsappCallId); ok {
-			return x.WhatsappCallId
-		}
+		return x.Agents
+	}
+	return nil
+}
+
+func (x *AcceptWhatsAppCallRequest) GetWhatsappCallId() string {
+	if x != nil {
+		return x.WhatsappCallId
 	}
 	return ""
 }
 
-func (x *RejectWhatsAppCallRequest) GetCallConnectWebhook() string {
+func (x *AcceptWhatsAppCallRequest) GetSdp() *SessionDescription {
 	if x != nil {
-		if x, ok := x.Request.(*RejectWhatsAppCallRequest_CallConnectWebhook); ok {
-			return x.CallConnectWebhook
-		}
+		return x.Sdp
 	}
-	return ""
+	return nil
 }
 
-type isRejectWhatsAppCallRequest_Request interface {
-	isRejectWhatsAppCallRequest_Request()
+type AcceptWhatsAppCallResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	WhatsappCallId string                 `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
-type RejectWhatsAppCallRequest_WhatsappCallId struct {
-	// Call ID sent by Meta
-	WhatsappCallId string `protobuf:"bytes,3,opt,name=whatsapp_call_id,json=whatsappCallId,proto3,oneof"`
-}
-
-type RejectWhatsAppCallRequest_CallConnectWebhook struct {
-	// When the call is ready to be connected with Meta, we receive a call connect webhook with the SDP:
-	// https://developers.facebook.com/docs/whatsapp/cloud-api/calling/user-initiated-calls#call-connect-webhook
-	// https://developers.facebook.com/docs/whatsapp/cloud-api/calling/business-initiated-calls#call-connect-webhook
-	CallConnectWebhook string `protobuf:"bytes,4,opt,name=call_connect_webhook,json=callConnectWebhook,proto3,oneof"`
-}
-
-func (*RejectWhatsAppCallRequest_WhatsappCallId) isRejectWhatsAppCallRequest_Request() {}
-
-func (*RejectWhatsAppCallRequest_CallConnectWebhook) isRejectWhatsAppCallRequest_Request() {}
-
-type RejectWhatsAppCallResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RejectWhatsAppCallResponse) Reset() {
-	*x = RejectWhatsAppCallResponse{}
-	mi := &file_livekit_connectors_proto_msgTypes[10]
+func (x *AcceptWhatsAppCallResponse) Reset() {
+	*x = AcceptWhatsAppCallResponse{}
+	mi := &file_livekit_connectors_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RejectWhatsAppCallResponse) String() string {
+func (x *AcceptWhatsAppCallResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RejectWhatsAppCallResponse) ProtoMessage() {}
+func (*AcceptWhatsAppCallResponse) ProtoMessage() {}
 
-func (x *RejectWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[10]
+func (x *AcceptWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_connectors_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -835,22 +617,29 @@ func (x *RejectWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RejectWhatsAppCallResponse.ProtoReflect.Descriptor instead.
-func (*RejectWhatsAppCallResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{10}
+// Deprecated: Use AcceptWhatsAppCallResponse.ProtoReflect.Descriptor instead.
+func (*AcceptWhatsAppCallResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AcceptWhatsAppCallResponse) GetWhatsappCallId() string {
+	if x != nil {
+		return x.WhatsappCallId
+	}
+	return ""
 }
 
 type ListWhatsAppCallsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The number of the business that is listing the calls
-	PhoneNumberId string `protobuf:"bytes,1,opt,name=phone_number_id,json=phoneNumberId,proto3" json:"phone_number_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *ListWhatsAppCallsRequest) Reset() {
 	*x = ListWhatsAppCallsRequest{}
-	mi := &file_livekit_connectors_proto_msgTypes[11]
+	mi := &file_livekit_connectors_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -862,7 +651,7 @@ func (x *ListWhatsAppCallsRequest) String() string {
 func (*ListWhatsAppCallsRequest) ProtoMessage() {}
 
 func (x *ListWhatsAppCallsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[11]
+	mi := &file_livekit_connectors_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -875,12 +664,12 @@ func (x *ListWhatsAppCallsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListWhatsAppCallsRequest.ProtoReflect.Descriptor instead.
 func (*ListWhatsAppCallsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{11}
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *ListWhatsAppCallsRequest) GetPhoneNumberId() string {
+func (x *ListWhatsAppCallsRequest) GetWhatsappPhoneNumberId() string {
 	if x != nil {
-		return x.PhoneNumberId
+		return x.WhatsappPhoneNumberId
 	}
 	return ""
 }
@@ -894,7 +683,7 @@ type ListWhatsAppCallsResponse struct {
 
 func (x *ListWhatsAppCallsResponse) Reset() {
 	*x = ListWhatsAppCallsResponse{}
-	mi := &file_livekit_connectors_proto_msgTypes[12]
+	mi := &file_livekit_connectors_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -906,7 +695,7 @@ func (x *ListWhatsAppCallsResponse) String() string {
 func (*ListWhatsAppCallsResponse) ProtoMessage() {}
 
 func (x *ListWhatsAppCallsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[12]
+	mi := &file_livekit_connectors_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -919,7 +708,7 @@ func (x *ListWhatsAppCallsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListWhatsAppCallsResponse.ProtoReflect.Descriptor instead.
 func (*ListWhatsAppCallsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{12}
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListWhatsAppCallsResponse) GetCalls() []*WhatsAppCall {
@@ -941,7 +730,7 @@ type WhatsAppCall struct {
 
 func (x *WhatsAppCall) Reset() {
 	*x = WhatsAppCall{}
-	mi := &file_livekit_connectors_proto_msgTypes[13]
+	mi := &file_livekit_connectors_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -953,7 +742,7 @@ func (x *WhatsAppCall) String() string {
 func (*WhatsAppCall) ProtoMessage() {}
 
 func (x *WhatsAppCall) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[13]
+	mi := &file_livekit_connectors_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -966,7 +755,7 @@ func (x *WhatsAppCall) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WhatsAppCall.ProtoReflect.Descriptor instead.
 func (*WhatsAppCall) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{13}
+	return file_livekit_connectors_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *WhatsAppCall) GetWhatsappCallId() string {
@@ -983,151 +772,72 @@ func (x *WhatsAppCall) GetDirection() WhatsAppCallDirection {
 	return WhatsAppCallDirection_WHATSAPP_CALL_DIRECTION_INBOUND
 }
 
-type ConnectorsDispatchRule struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Room          *string                `protobuf:"bytes,1,opt,name=room,proto3,oneof" json:"room,omitempty"`
-	RoomPrefix    *string                `protobuf:"bytes,2,opt,name=room_prefix,json=roomPrefix,proto3,oneof" json:"room_prefix,omitempty"`
-	RoomSuffix    *string                `protobuf:"bytes,3,opt,name=room_suffix,json=roomSuffix,proto3,oneof" json:"room_suffix,omitempty"`
-	AgentName     *string                `protobuf:"bytes,4,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"` // what is metadata for agent dispath? do we need it here?
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ConnectorsDispatchRule) Reset() {
-	*x = ConnectorsDispatchRule{}
-	mi := &file_livekit_connectors_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ConnectorsDispatchRule) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ConnectorsDispatchRule) ProtoMessage() {}
-
-func (x *ConnectorsDispatchRule) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_connectors_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ConnectorsDispatchRule.ProtoReflect.Descriptor instead.
-func (*ConnectorsDispatchRule) Descriptor() ([]byte, []int) {
-	return file_livekit_connectors_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *ConnectorsDispatchRule) GetRoom() string {
-	if x != nil && x.Room != nil {
-		return *x.Room
-	}
-	return ""
-}
-
-func (x *ConnectorsDispatchRule) GetRoomPrefix() string {
-	if x != nil && x.RoomPrefix != nil {
-		return *x.RoomPrefix
-	}
-	return ""
-}
-
-func (x *ConnectorsDispatchRule) GetRoomSuffix() string {
-	if x != nil && x.RoomSuffix != nil {
-		return *x.RoomSuffix
-	}
-	return ""
-}
-
-func (x *ConnectorsDispatchRule) GetAgentName() string {
-	if x != nil && x.AgentName != nil {
-		return *x.AgentName
-	}
-	return ""
-}
-
 var File_livekit_connectors_proto protoreflect.FileDescriptor
 
 const file_livekit_connectors_proto_rawDesc = "" +
 	"\n" +
-	"\x18livekit_connectors.proto\x12\alivekit\"\x85\x02\n" +
-	" CreateWhatsAppParticipantRequest\x12/\n" +
-	"\x14from_phone_number_id\x18\x01 \x01(\tR\x11fromPhoneNumberId\x12+\n" +
-	"\x12to_phone_number_id\x18\x02 \x01(\tR\x0ftoPhoneNumberId\x12(\n" +
+	"\x18livekit_connectors.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\"\x9f\x05\n" +
+	"\x17DialWhatsAppCallRequest\x127\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12&\n" +
+	"\x0fto_phone_number\x18\x02 \x01(\tR\rtoPhoneNumber\x12(\n" +
 	"\x10whatsapp_api_key\x18\x03 \x01(\tR\x0ewhatsappApiKey\x12<\n" +
-	"\x18biz_opaque_callback_data\x18\x04 \x01(\tH\x00R\x15bizOpaqueCallbackData\x88\x01\x01B\x1b\n" +
-	"\x19_biz_opaque_callback_data\"M\n" +
-	"!CreateWhatsAppParticipantResponse\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"\xab\x03\n" +
-	" DeleteWhatsAppParticipantRequest\x12G\n" +
-	"\acall_id\x18\x01 \x01(\v2,.livekit.DeleteWhatsAppParticipantWithCallIdH\x00R\x06callId\x12X\n" +
-	"\rrejected_call\x18\x02 \x01(\v21.livekit.DeleteWhatsAppParticipantForRejectedCallH\x00R\frejectedCall\x12^\n" +
-	"\x0fterminated_call\x18\x03 \x01(\v23.livekit.DeleteWhatsAppParticipantForTerminatedCallH\x00R\x0eterminatedCall\x12A\n" +
-	"\x1ccall_status_rejected_webhook\x18\x04 \x01(\tH\x00R\x19callStatusRejectedWebhook\x126\n" +
-	"\x16call_terminate_webhook\x18\x05 \x01(\tH\x00R\x14callTerminateWebhookB\t\n" +
-	"\arequest\"\xa1\x01\n" +
-	"#DeleteWhatsAppParticipantWithCallId\x12&\n" +
-	"\x0fphone_number_id\x18\x01 \x01(\tR\rphoneNumberId\x12(\n" +
-	"\x10whatsapp_call_id\x18\x02 \x01(\tR\x0ewhatsappCallId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x03 \x01(\tR\x0ewhatsappApiKey\"T\n" +
-	"(DeleteWhatsAppParticipantForRejectedCall\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"V\n" +
-	"*DeleteWhatsAppParticipantForTerminatedCall\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"#\n" +
-	"!DeleteWhatsAppParticipantResponse\"\xc0\x04\n" +
-	"\x1aConnectWhatsAppCallRequest\x12&\n" +
-	"\x0fphone_number_id\x18\x01 \x01(\tR\rphoneNumberId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12@\n" +
-	"\x1clivekit_participant_identity\x18\x03 \x01(\tR\x1alivekitParticipantIdentity\x12\x8b\x01\n" +
-	"\x1elivekit_participant_attributes\x18\x04 \x03(\v2E.livekit.ConnectWhatsAppCallRequest.LivekitParticipantAttributesEntryR\x1clivekitParticipantAttributes\x12D\n" +
-	"\rdispatch_rule\x18\x05 \x01(\v2\x1f.livekit.ConnectorsDispatchRuleR\fdispatchRule\x12*\n" +
-	"\x10whatsapp_call_id\x18\x06 \x01(\tH\x00R\x0ewhatsappCallId\x122\n" +
-	"\x14call_connect_webhook\x18\a \x01(\tH\x00R\x12callConnectWebhook\x1aO\n" +
-	"!LivekitParticipantAttributesEntry\x12\x10\n" +
+	"\x18biz_opaque_callback_data\x18\x04 \x01(\tH\x00R\x15bizOpaqueCallbackData\x88\x01\x01\x12\x1b\n" +
+	"\troom_name\x18\x05 \x01(\tR\broomName\x121\n" +
+	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x12)\n" +
+	"\x10participant_name\x18\a \x01(\tR\x0fparticipantName\x121\n" +
+	"\x14participant_metadata\x18\b \x01(\tR\x13participantMetadata\x12r\n" +
+	"\x16participant_attributes\x18\t \x03(\v2;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryR\x15participantAttributes\x122\n" +
+	"\x06agents\x18\n" +
+	" \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x1aH\n" +
+	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\t\n" +
-	"\arequest\"G\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x1b\n" +
+	"\x19_biz_opaque_callback_data\"D\n" +
+	"\x18DialWhatsAppCallResponse\x12(\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"s\n" +
+	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12(\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\" \n" +
+	"\x1eDisconnectWhatsAppCallResponse\"\xd8\x01\n" +
+	"\x1aConnectWhatsAppCallRequest\x127\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12(\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12(\n" +
+	"\x10whatsapp_call_id\x18\x03 \x01(\tR\x0ewhatsappCallId\x12-\n" +
+	"\x03sdp\x18\x04 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"G\n" +
 	"\x1bConnectWhatsAppCallResponse\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"\xd8\x01\n" +
-	"\x19RejectWhatsAppCallRequest\x12&\n" +
-	"\x0fphone_number_id\x18\x01 \x01(\tR\rphoneNumberId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12*\n" +
-	"\x10whatsapp_call_id\x18\x03 \x01(\tH\x00R\x0ewhatsappCallId\x122\n" +
-	"\x14call_connect_webhook\x18\x04 \x01(\tH\x00R\x12callConnectWebhookB\t\n" +
-	"\arequest\"\x1c\n" +
-	"\x1aRejectWhatsAppCallResponse\"B\n" +
-	"\x18ListWhatsAppCallsRequest\x12&\n" +
-	"\x0fphone_number_id\x18\x01 \x01(\tR\rphoneNumberId\"H\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"\xf9\x04\n" +
+	"\x19AcceptWhatsAppCallRequest\x127\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12(\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12\x1b\n" +
+	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12)\n" +
+	"\x10participant_name\x18\x05 \x01(\tR\x0fparticipantName\x121\n" +
+	"\x14participant_metadata\x18\x06 \x01(\tR\x13participantMetadata\x12t\n" +
+	"\x16participant_attributes\x18\a \x03(\v2=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryR\x15participantAttributes\x122\n" +
+	"\x06agents\x18\b \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x12(\n" +
+	"\x10whatsapp_call_id\x18\t \x01(\tR\x0ewhatsappCallId\x12-\n" +
+	"\x03sdp\x18\n" +
+	" \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x1aH\n" +
+	"\x1aParticipantAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"F\n" +
+	"\x1aAcceptWhatsAppCallResponse\x12(\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"S\n" +
+	"\x18ListWhatsAppCallsRequest\x127\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\"H\n" +
 	"\x19ListWhatsAppCallsResponse\x12+\n" +
 	"\x05calls\x18\x01 \x03(\v2\x15.livekit.WhatsAppCallR\x05calls\"v\n" +
 	"\fWhatsAppCall\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12<\n" +
-	"\tdirection\x18\x02 \x01(\x0e2\x1e.livekit.WhatsAppCallDirectionR\tdirection\"\xd9\x01\n" +
-	"\x16ConnectorsDispatchRule\x12\x17\n" +
-	"\x04room\x18\x01 \x01(\tH\x00R\x04room\x88\x01\x01\x12$\n" +
-	"\vroom_prefix\x18\x02 \x01(\tH\x01R\n" +
-	"roomPrefix\x88\x01\x01\x12$\n" +
-	"\vroom_suffix\x18\x03 \x01(\tH\x02R\n" +
-	"roomSuffix\x88\x01\x01\x12\"\n" +
-	"\n" +
-	"agent_name\x18\x04 \x01(\tH\x03R\tagentName\x88\x01\x01B\a\n" +
-	"\x05_roomB\x0e\n" +
-	"\f_room_prefixB\x0e\n" +
-	"\f_room_suffixB\r\n" +
-	"\v_agent_name*b\n" +
+	"\tdirection\x18\x02 \x01(\x0e2\x1e.livekit.WhatsAppCallDirectionR\tdirection*b\n" +
 	"\x15WhatsAppCallDirection\x12#\n" +
 	"\x1fWHATSAPP_CALL_DIRECTION_INBOUND\x10\x00\x12$\n" +
-	" WHATSAPP_CALL_DIRECTION_OUTBOUND\x10\x022\x98\x04\n" +
-	"\x11ConnectorsService\x12r\n" +
-	"\x19CreateWhatsAppParticipant\x12).livekit.CreateWhatsAppParticipantRequest\x1a*.livekit.CreateWhatsAppParticipantResponse\x12r\n" +
-	"\x19DeleteWhatsAppParticipant\x12).livekit.DeleteWhatsAppParticipantRequest\x1a*.livekit.DeleteWhatsAppParticipantResponse\x12`\n" +
+	" WHATSAPP_CALL_DIRECTION_OUTBOUND\x10\x022\xf4\x03\n" +
+	"\x11ConnectorsService\x12W\n" +
+	"\x10DialWhatsAppCall\x12 .livekit.DialWhatsAppCallRequest\x1a!.livekit.DialWhatsAppCallResponse\x12i\n" +
+	"\x16DisconnectWhatsAppCall\x12&.livekit.DisconnectWhatsAppCallRequest\x1a'.livekit.DisconnectWhatsAppCallResponse\x12`\n" +
 	"\x13ConnectWhatsAppCall\x12#.livekit.ConnectWhatsAppCallRequest\x1a$.livekit.ConnectWhatsAppCallResponse\x12]\n" +
-	"\x12RejectWhatsAppCall\x12\".livekit.RejectWhatsAppCallRequest\x1a#.livekit.RejectWhatsAppCallResponse\x12Z\n" +
+	"\x12AcceptWhatsAppCall\x12\".livekit.AcceptWhatsAppCallRequest\x1a#.livekit.AcceptWhatsAppCallResponse\x12Z\n" +
 	"\x11ListWhatsAppCalls\x12!.livekit.ListWhatsAppCallsRequest\x1a\".livekit.ListWhatsAppCallsResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
@@ -1143,49 +853,49 @@ func file_livekit_connectors_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_connectors_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_livekit_connectors_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_livekit_connectors_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_livekit_connectors_proto_goTypes = []any{
-	(WhatsAppCallDirection)(0),                         // 0: livekit.WhatsAppCallDirection
-	(*CreateWhatsAppParticipantRequest)(nil),           // 1: livekit.CreateWhatsAppParticipantRequest
-	(*CreateWhatsAppParticipantResponse)(nil),          // 2: livekit.CreateWhatsAppParticipantResponse
-	(*DeleteWhatsAppParticipantRequest)(nil),           // 3: livekit.DeleteWhatsAppParticipantRequest
-	(*DeleteWhatsAppParticipantWithCallId)(nil),        // 4: livekit.DeleteWhatsAppParticipantWithCallId
-	(*DeleteWhatsAppParticipantForRejectedCall)(nil),   // 5: livekit.DeleteWhatsAppParticipantForRejectedCall
-	(*DeleteWhatsAppParticipantForTerminatedCall)(nil), // 6: livekit.DeleteWhatsAppParticipantForTerminatedCall
-	(*DeleteWhatsAppParticipantResponse)(nil),          // 7: livekit.DeleteWhatsAppParticipantResponse
-	(*ConnectWhatsAppCallRequest)(nil),                 // 8: livekit.ConnectWhatsAppCallRequest
-	(*ConnectWhatsAppCallResponse)(nil),                // 9: livekit.ConnectWhatsAppCallResponse
-	(*RejectWhatsAppCallRequest)(nil),                  // 10: livekit.RejectWhatsAppCallRequest
-	(*RejectWhatsAppCallResponse)(nil),                 // 11: livekit.RejectWhatsAppCallResponse
-	(*ListWhatsAppCallsRequest)(nil),                   // 12: livekit.ListWhatsAppCallsRequest
-	(*ListWhatsAppCallsResponse)(nil),                  // 13: livekit.ListWhatsAppCallsResponse
-	(*WhatsAppCall)(nil),                               // 14: livekit.WhatsAppCall
-	(*ConnectorsDispatchRule)(nil),                     // 15: livekit.ConnectorsDispatchRule
-	nil,                                                // 16: livekit.ConnectWhatsAppCallRequest.LivekitParticipantAttributesEntry
+	(WhatsAppCallDirection)(0),             // 0: livekit.WhatsAppCallDirection
+	(*DialWhatsAppCallRequest)(nil),        // 1: livekit.DialWhatsAppCallRequest
+	(*DialWhatsAppCallResponse)(nil),       // 2: livekit.DialWhatsAppCallResponse
+	(*DisconnectWhatsAppCallRequest)(nil),  // 3: livekit.DisconnectWhatsAppCallRequest
+	(*DisconnectWhatsAppCallResponse)(nil), // 4: livekit.DisconnectWhatsAppCallResponse
+	(*ConnectWhatsAppCallRequest)(nil),     // 5: livekit.ConnectWhatsAppCallRequest
+	(*ConnectWhatsAppCallResponse)(nil),    // 6: livekit.ConnectWhatsAppCallResponse
+	(*AcceptWhatsAppCallRequest)(nil),      // 7: livekit.AcceptWhatsAppCallRequest
+	(*AcceptWhatsAppCallResponse)(nil),     // 8: livekit.AcceptWhatsAppCallResponse
+	(*ListWhatsAppCallsRequest)(nil),       // 9: livekit.ListWhatsAppCallsRequest
+	(*ListWhatsAppCallsResponse)(nil),      // 10: livekit.ListWhatsAppCallsResponse
+	(*WhatsAppCall)(nil),                   // 11: livekit.WhatsAppCall
+	nil,                                    // 12: livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
+	nil,                                    // 13: livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
+	(*RoomAgentDispatch)(nil),              // 14: livekit.RoomAgentDispatch
+	(*SessionDescription)(nil),             // 15: livekit.SessionDescription
 }
 var file_livekit_connectors_proto_depIdxs = []int32{
-	4,  // 0: livekit.DeleteWhatsAppParticipantRequest.call_id:type_name -> livekit.DeleteWhatsAppParticipantWithCallId
-	5,  // 1: livekit.DeleteWhatsAppParticipantRequest.rejected_call:type_name -> livekit.DeleteWhatsAppParticipantForRejectedCall
-	6,  // 2: livekit.DeleteWhatsAppParticipantRequest.terminated_call:type_name -> livekit.DeleteWhatsAppParticipantForTerminatedCall
-	16, // 3: livekit.ConnectWhatsAppCallRequest.livekit_participant_attributes:type_name -> livekit.ConnectWhatsAppCallRequest.LivekitParticipantAttributesEntry
-	15, // 4: livekit.ConnectWhatsAppCallRequest.dispatch_rule:type_name -> livekit.ConnectorsDispatchRule
-	14, // 5: livekit.ListWhatsAppCallsResponse.calls:type_name -> livekit.WhatsAppCall
-	0,  // 6: livekit.WhatsAppCall.direction:type_name -> livekit.WhatsAppCallDirection
-	1,  // 7: livekit.ConnectorsService.CreateWhatsAppParticipant:input_type -> livekit.CreateWhatsAppParticipantRequest
-	3,  // 8: livekit.ConnectorsService.DeleteWhatsAppParticipant:input_type -> livekit.DeleteWhatsAppParticipantRequest
-	8,  // 9: livekit.ConnectorsService.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
-	10, // 10: livekit.ConnectorsService.RejectWhatsAppCall:input_type -> livekit.RejectWhatsAppCallRequest
-	12, // 11: livekit.ConnectorsService.ListWhatsAppCalls:input_type -> livekit.ListWhatsAppCallsRequest
-	2,  // 12: livekit.ConnectorsService.CreateWhatsAppParticipant:output_type -> livekit.CreateWhatsAppParticipantResponse
-	7,  // 13: livekit.ConnectorsService.DeleteWhatsAppParticipant:output_type -> livekit.DeleteWhatsAppParticipantResponse
-	9,  // 14: livekit.ConnectorsService.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
-	11, // 15: livekit.ConnectorsService.RejectWhatsAppCall:output_type -> livekit.RejectWhatsAppCallResponse
-	13, // 16: livekit.ConnectorsService.ListWhatsAppCalls:output_type -> livekit.ListWhatsAppCallsResponse
-	12, // [12:17] is the sub-list for method output_type
-	7,  // [7:12] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	12, // 0: livekit.DialWhatsAppCallRequest.participant_attributes:type_name -> livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
+	14, // 1: livekit.DialWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
+	15, // 2: livekit.ConnectWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
+	13, // 3: livekit.AcceptWhatsAppCallRequest.participant_attributes:type_name -> livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
+	14, // 4: livekit.AcceptWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
+	15, // 5: livekit.AcceptWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
+	11, // 6: livekit.ListWhatsAppCallsResponse.calls:type_name -> livekit.WhatsAppCall
+	0,  // 7: livekit.WhatsAppCall.direction:type_name -> livekit.WhatsAppCallDirection
+	1,  // 8: livekit.ConnectorsService.DialWhatsAppCall:input_type -> livekit.DialWhatsAppCallRequest
+	3,  // 9: livekit.ConnectorsService.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
+	5,  // 10: livekit.ConnectorsService.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
+	7,  // 11: livekit.ConnectorsService.AcceptWhatsAppCall:input_type -> livekit.AcceptWhatsAppCallRequest
+	9,  // 12: livekit.ConnectorsService.ListWhatsAppCalls:input_type -> livekit.ListWhatsAppCallsRequest
+	2,  // 13: livekit.ConnectorsService.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
+	4,  // 14: livekit.ConnectorsService.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
+	6,  // 15: livekit.ConnectorsService.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
+	8,  // 16: livekit.ConnectorsService.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
+	10, // 17: livekit.ConnectorsService.ListWhatsAppCalls:output_type -> livekit.ListWhatsAppCallsResponse
+	13, // [13:18] is the sub-list for method output_type
+	8,  // [8:13] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_livekit_connectors_proto_init() }
@@ -1193,30 +903,16 @@ func file_livekit_connectors_proto_init() {
 	if File_livekit_connectors_proto != nil {
 		return
 	}
+	file_livekit_agent_dispatch_proto_init()
+	file_livekit_rtc_proto_init()
 	file_livekit_connectors_proto_msgTypes[0].OneofWrappers = []any{}
-	file_livekit_connectors_proto_msgTypes[2].OneofWrappers = []any{
-		(*DeleteWhatsAppParticipantRequest_CallId)(nil),
-		(*DeleteWhatsAppParticipantRequest_RejectedCall)(nil),
-		(*DeleteWhatsAppParticipantRequest_TerminatedCall)(nil),
-		(*DeleteWhatsAppParticipantRequest_CallStatusRejectedWebhook)(nil),
-		(*DeleteWhatsAppParticipantRequest_CallTerminateWebhook)(nil),
-	}
-	file_livekit_connectors_proto_msgTypes[7].OneofWrappers = []any{
-		(*ConnectWhatsAppCallRequest_WhatsappCallId)(nil),
-		(*ConnectWhatsAppCallRequest_CallConnectWebhook)(nil),
-	}
-	file_livekit_connectors_proto_msgTypes[9].OneofWrappers = []any{
-		(*RejectWhatsAppCallRequest_WhatsappCallId)(nil),
-		(*RejectWhatsAppCallRequest_CallConnectWebhook)(nil),
-	}
-	file_livekit_connectors_proto_msgTypes[14].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_connectors_proto_rawDesc), len(file_livekit_connectors_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   16,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
