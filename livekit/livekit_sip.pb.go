@@ -3378,9 +3378,16 @@ type CreateSIPParticipantRequest struct {
 	KrispEnabled    bool               `protobuf:"varint,14,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
 	MediaEncryption SIPMediaEncryption `protobuf:"varint,18,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
 	// Wait for the answer for the call before returning.
-	WaitUntilAnswered bool `protobuf:"varint,19,opt,name=wait_until_answered,json=waitUntilAnswered,proto3" json:"wait_until_answered,omitempty"` // NEXT ID: 21
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	WaitUntilAnswered bool `protobuf:"varint,19,opt,name=wait_until_answered,json=waitUntilAnswered,proto3" json:"wait_until_answered,omitempty"`
+	// Optional display name for the 'From' SIP header.
+	//
+	// Cases:
+	// 1) Unspecified: Use legacy behavior - display name will be set to be the caller's number.
+	// 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
+	// 3) Non-empty: Use the specified value as the display name.
+	DisplayName   *string `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"` // NEXT ID: 22
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateSIPParticipantRequest) Reset() {
@@ -3552,6 +3559,13 @@ func (x *CreateSIPParticipantRequest) GetWaitUntilAnswered() bool {
 		return x.WaitUntilAnswered
 	}
 	return false
+}
+
+func (x *CreateSIPParticipantRequest) GetDisplayName() string {
+	if x != nil && x.DisplayName != nil {
+		return *x.DisplayName
+	}
+	return ""
 }
 
 type SIPParticipantInfo struct {
@@ -4408,7 +4422,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa3\t\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xdc\t\n" +
 	"\x1bCreateSIPParticipantRequest\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x120\n" +
@@ -4432,13 +4446,15 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x11max_call_duration\x18\f \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12#\n" +
 	"\rkrisp_enabled\x18\x0e \x01(\bR\fkrispEnabled\x12F\n" +
 	"\x10media_encryption\x18\x12 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
-	"\x13wait_until_answered\x18\x13 \x01(\bR\x11waitUntilAnswered\x1aH\n" +
+	"\x13wait_until_answered\x18\x13 \x01(\bR\x11waitUntilAnswered\x12&\n" +
+	"\fdisplay_name\x18\x15 \x01(\tH\x00R\vdisplayName\x88\x01\x01\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xab\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
+	"\r_display_name\"\xab\x01\n" +
 	"\x12SIPParticipantInfo\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1b\n" +
@@ -4841,6 +4857,7 @@ func file_livekit_sip_proto_init() {
 		(*UpdateSIPDispatchRuleRequest_Update)(nil),
 	}
 	file_livekit_sip_proto_msgTypes[29].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[34].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
