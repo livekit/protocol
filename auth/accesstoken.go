@@ -93,6 +93,11 @@ func (t *AccessToken) SetInferenceGrant(grant *InferenceGrant) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) SetObservabilityGrant(grant *ObservabilityGrant) *AccessToken {
+	t.grant.Observability = grant
+	return t
+}
+
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t
