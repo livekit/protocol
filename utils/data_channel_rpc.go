@@ -64,9 +64,9 @@ func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 	case DataChannelRpcApplicationError:
 		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
 	case DataChannelRpcConnectionTimeout:
-		return psrpc.NewErrorf(psrpc.DeadlineExceeded, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Canceled, e.Message, "data", e.Data)
 	case DataChannelRpcResponseTimeout:
-		return psrpc.NewErrorf(psrpc.DeadlineExceeded, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Canceled, e.Message, "data", e.Data)
 	case DataChannelRpcRecipientDisconnected:
 		return psrpc.NewErrorf(psrpc.Unavailable, e.Message, "data", e.Data)
 	case DataChannelRpcResponsePayloadTooLarge:
