@@ -761,3 +761,9 @@ message WebhookConfig {
   string url = 1;
   string signing_key = 2;
 }
+
+message SubscribedAudioCodec {
+  string codec = 1;
+  bool enabled = 2;
+}
+
