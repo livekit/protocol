@@ -88,8 +88,8 @@ func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 	}
 }
 
-func DataChannelRpcErrorFromBuiltInCodes(code DataChannelRpcErrorCode, data *string) *DataChannelRpcError {
-	return &DataChannelRpcError{Code: code, Message: dataChannelRpcErrorMessages[code], Data: *data}
+func DataChannelRpcErrorFromBuiltInCodes(code DataChannelRpcErrorCode, data string) *DataChannelRpcError {
+	return &DataChannelRpcError{Code: code, Message: dataChannelRpcErrorMessages[code], Data: data}
 }
 
 type DataChannelRpcPendingAckHandler struct {
