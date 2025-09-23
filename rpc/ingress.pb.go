@@ -382,6 +382,7 @@ type StartIngressRequest struct {
 	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	WsUrl         string                 `protobuf:"bytes,3,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
 	LoggingFields map[string]string      `protobuf:"bytes,4,rep,name=logging_fields,json=loggingFields,proto3" json:"logging_fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	FeatureFlags  map[string]string      `protobuf:"bytes,5,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -440,6 +441,13 @@ func (x *StartIngressRequest) GetWsUrl() string {
 func (x *StartIngressRequest) GetLoggingFields() map[string]string {
 	if x != nil {
 		return x.LoggingFields
+	}
+	return nil
+}
+
+func (x *StartIngressRequest) GetFeatureFlags() map[string]string {
+	if x != nil {
+		return x.FeatureFlags
 	}
 	return nil
 }
@@ -572,13 +580,17 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\x04etag\x18\x02 \x01(\tR\x04etag\"_\n" +
 	"\x1eWHIPRTCConnectionNotifyRequest\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x12\x16\n" +
-	"\x06closed\x18\x02 \x01(\bR\x06closed\"\x82\x02\n" +
+	"\x06closed\x18\x02 \x01(\bR\x06closed\"\x94\x03\n" +
 	"\x13StartIngressRequest\x12(\n" +
 	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x03 \x01(\tR\x05wsUrl\x12R\n" +
-	"\x0elogging_fields\x18\x04 \x03(\v2+.rpc.StartIngressRequest.LoggingFieldsEntryR\rloggingFields\x1a@\n" +
+	"\x0elogging_fields\x18\x04 \x03(\v2+.rpc.StartIngressRequest.LoggingFieldsEntryR\rloggingFields\x12O\n" +
+	"\rfeature_flags\x18\x05 \x03(\v2*.rpc.StartIngressRequest.FeatureFlagsEntryR\ffeatureFlags\x1a@\n" +
 	"\x12LoggingFieldsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
+	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"P\n" +
 	"\x0eIngressSession\x12\x1d\n" +
@@ -613,7 +625,7 @@ func file_rpc_ingress_proto_rawDescGZIP() []byte {
 	return file_rpc_ingress_proto_rawDescData
 }
 
-var file_rpc_ingress_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_rpc_ingress_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_rpc_ingress_proto_goTypes = []any{
 	(*ListActiveIngressRequest)(nil),       // 0: rpc.ListActiveIngressRequest
 	(*ListActiveIngressResponse)(nil),      // 1: rpc.ListActiveIngressResponse
@@ -625,38 +637,40 @@ var file_rpc_ingress_proto_goTypes = []any{
 	(*IngressSession)(nil),                 // 7: rpc.IngressSession
 	(*KillIngressSessionRequest)(nil),      // 8: rpc.KillIngressSessionRequest
 	nil,                                    // 9: rpc.StartIngressRequest.LoggingFieldsEntry
-	(*livekit.IngressInfo)(nil),            // 10: livekit.IngressInfo
-	(*livekit.UpdateIngressRequest)(nil),   // 11: livekit.UpdateIngressRequest
-	(*livekit.DeleteIngressRequest)(nil),   // 12: livekit.DeleteIngressRequest
-	(*emptypb.Empty)(nil),                  // 13: google.protobuf.Empty
-	(*livekit.IngressState)(nil),           // 14: livekit.IngressState
+	nil,                                    // 10: rpc.StartIngressRequest.FeatureFlagsEntry
+	(*livekit.IngressInfo)(nil),            // 11: livekit.IngressInfo
+	(*livekit.UpdateIngressRequest)(nil),   // 12: livekit.UpdateIngressRequest
+	(*livekit.DeleteIngressRequest)(nil),   // 13: livekit.DeleteIngressRequest
+	(*emptypb.Empty)(nil),                  // 14: google.protobuf.Empty
+	(*livekit.IngressState)(nil),           // 15: livekit.IngressState
 }
 var file_rpc_ingress_proto_depIdxs = []int32{
 	7,  // 0: rpc.ListActiveIngressResponse.ingress_sessions:type_name -> rpc.IngressSession
-	10, // 1: rpc.StartIngressRequest.info:type_name -> livekit.IngressInfo
+	11, // 1: rpc.StartIngressRequest.info:type_name -> livekit.IngressInfo
 	9,  // 2: rpc.StartIngressRequest.logging_fields:type_name -> rpc.StartIngressRequest.LoggingFieldsEntry
-	7,  // 3: rpc.KillIngressSessionRequest.session:type_name -> rpc.IngressSession
-	6,  // 4: rpc.IngressInternal.StartIngress:input_type -> rpc.StartIngressRequest
-	0,  // 5: rpc.IngressInternal.ListActiveIngress:input_type -> rpc.ListActiveIngressRequest
-	8,  // 6: rpc.IngressInternal.KillIngressSession:input_type -> rpc.KillIngressSessionRequest
-	11, // 7: rpc.IngressHandler.UpdateIngress:input_type -> livekit.UpdateIngressRequest
-	12, // 8: rpc.IngressHandler.DeleteIngress:input_type -> livekit.DeleteIngressRequest
-	2,  // 9: rpc.IngressHandler.DeleteWHIPResource:input_type -> rpc.DeleteWHIPResourceRequest
-	3,  // 10: rpc.IngressHandler.ICERestartWHIPResource:input_type -> rpc.ICERestartWHIPResourceRequest
-	5,  // 11: rpc.IngressHandler.WHIPRTCConnectionNotify:input_type -> rpc.WHIPRTCConnectionNotifyRequest
-	10, // 12: rpc.IngressInternal.StartIngress:output_type -> livekit.IngressInfo
-	1,  // 13: rpc.IngressInternal.ListActiveIngress:output_type -> rpc.ListActiveIngressResponse
-	13, // 14: rpc.IngressInternal.KillIngressSession:output_type -> google.protobuf.Empty
-	14, // 15: rpc.IngressHandler.UpdateIngress:output_type -> livekit.IngressState
-	14, // 16: rpc.IngressHandler.DeleteIngress:output_type -> livekit.IngressState
-	13, // 17: rpc.IngressHandler.DeleteWHIPResource:output_type -> google.protobuf.Empty
-	4,  // 18: rpc.IngressHandler.ICERestartWHIPResource:output_type -> rpc.ICERestartWHIPResourceResponse
-	13, // 19: rpc.IngressHandler.WHIPRTCConnectionNotify:output_type -> google.protobuf.Empty
-	12, // [12:20] is the sub-list for method output_type
-	4,  // [4:12] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	10, // 3: rpc.StartIngressRequest.feature_flags:type_name -> rpc.StartIngressRequest.FeatureFlagsEntry
+	7,  // 4: rpc.KillIngressSessionRequest.session:type_name -> rpc.IngressSession
+	6,  // 5: rpc.IngressInternal.StartIngress:input_type -> rpc.StartIngressRequest
+	0,  // 6: rpc.IngressInternal.ListActiveIngress:input_type -> rpc.ListActiveIngressRequest
+	8,  // 7: rpc.IngressInternal.KillIngressSession:input_type -> rpc.KillIngressSessionRequest
+	12, // 8: rpc.IngressHandler.UpdateIngress:input_type -> livekit.UpdateIngressRequest
+	13, // 9: rpc.IngressHandler.DeleteIngress:input_type -> livekit.DeleteIngressRequest
+	2,  // 10: rpc.IngressHandler.DeleteWHIPResource:input_type -> rpc.DeleteWHIPResourceRequest
+	3,  // 11: rpc.IngressHandler.ICERestartWHIPResource:input_type -> rpc.ICERestartWHIPResourceRequest
+	5,  // 12: rpc.IngressHandler.WHIPRTCConnectionNotify:input_type -> rpc.WHIPRTCConnectionNotifyRequest
+	11, // 13: rpc.IngressInternal.StartIngress:output_type -> livekit.IngressInfo
+	1,  // 14: rpc.IngressInternal.ListActiveIngress:output_type -> rpc.ListActiveIngressResponse
+	14, // 15: rpc.IngressInternal.KillIngressSession:output_type -> google.protobuf.Empty
+	15, // 16: rpc.IngressHandler.UpdateIngress:output_type -> livekit.IngressState
+	15, // 17: rpc.IngressHandler.DeleteIngress:output_type -> livekit.IngressState
+	14, // 18: rpc.IngressHandler.DeleteWHIPResource:output_type -> google.protobuf.Empty
+	4,  // 19: rpc.IngressHandler.ICERestartWHIPResource:output_type -> rpc.ICERestartWHIPResourceResponse
+	14, // 20: rpc.IngressHandler.WHIPRTCConnectionNotify:output_type -> google.protobuf.Empty
+	13, // [13:21] is the sub-list for method output_type
+	5,  // [5:13] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_rpc_ingress_proto_init() }
@@ -670,7 +684,7 @@ func file_rpc_ingress_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_ingress_proto_rawDesc), len(file_rpc_ingress_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
