@@ -59,6 +59,7 @@ func Proto() error {
 		"livekit_rtc.proto",
 		"livekit_webhook.proto",
 		"livekit_metrics.proto",
+		"livekit_token_source.proto",
 	}
 	grpcProtoFiles := []string{
 		"infra/link.proto",
