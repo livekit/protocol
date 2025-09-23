@@ -1,5 +1,27 @@
 # github.com/livekit/protocol
 
+## 1.42.0
+
+### Minor Changes
+
+- rename ListUpdate "del" field to "rename" - [#1203](https://github.com/livekit/protocol/pull/1203) ([@rektdeckard](https://github.com/rektdeckard))
+
+- Utilities for phone number functionality - [#1206](https://github.com/livekit/protocol/pull/1206) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- Adding a call_context field to SIPCallInfo - [#1188](https://github.com/livekit/protocol/pull/1188) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- Added DisplayName field to CreateSIPParticipantRequest - [#1216](https://github.com/livekit/protocol/pull/1216) ([@alexlivekit](https://github.com/alexlivekit))
+
+### Patch Changes
+
+- Adding get and update apis for livekit phone numbers - [#1179](https://github.com/livekit/protocol/pull/1179) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- allow credentials to be stored in SIP tokens - [#1213](https://github.com/livekit/protocol/pull/1213) ([@davidzhao](https://github.com/davidzhao))
+
+- Unifying data types for phone numbers - [#1190](https://github.com/livekit/protocol/pull/1190) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
+- Adding an rpc to record call context using SipCallInfo - [#1189](https://github.com/livekit/protocol/pull/1189) ([@nishadmusthafa](https://github.com/nishadmusthafa))
+
 ## 1.41.0
 
 ### Minor Changes
