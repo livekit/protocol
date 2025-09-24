@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.42.1
+
+### Patch Changes
+
+- handle session timer skips >1 min - [#1227](https://github.com/livekit/protocol/pull/1227) ([@paulwe](https://github.com/paulwe))
+
 ## 1.42.0
 
 ### Minor Changes
