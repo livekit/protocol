@@ -56,35 +56,38 @@ type DataChannelRpcError struct {
 }
 
 func (e *DataChannelRpcError) Error() string {
+	if e.Data != "" {
+		return fmt.Sprintf("RpcError %d: %s: %s", e.Code, e.Message, e.Data)
+	}
 	return fmt.Sprintf("RpcError %d: %s", e.Code, e.Message)
 }
 
 func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 	switch e.Code {
 	case DataChannelRpcApplicationError:
-		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Internal, e.Error())
 	case DataChannelRpcConnectionTimeout:
-		return psrpc.NewErrorf(psrpc.Canceled, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Canceled, e.Error())
 	case DataChannelRpcResponseTimeout:
-		return psrpc.NewErrorf(psrpc.Canceled, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Canceled, e.Error())
 	case DataChannelRpcRecipientDisconnected:
-		return psrpc.NewErrorf(psrpc.Unavailable, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Unavailable, e.Error())
 	case DataChannelRpcResponsePayloadTooLarge:
-		return psrpc.NewErrorf(psrpc.MalformedResponse, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.MalformedResponse, e.Error())
 	case DataChannelRpcSendFailed:
-		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Internal, e.Error())
 	case DataChannelRpcUnsupportedMethod:
-		return psrpc.NewErrorf(psrpc.InvalidArgument, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.InvalidArgument, e.Error())
 	case DataChannelRpcRecipientNotFound:
-		return psrpc.NewErrorf(psrpc.NotFound, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.NotFound, e.Error())
 	case DataChannelRpcRequestPayloadTooLarge:
-		return psrpc.NewErrorf(psrpc.MalformedRequest, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.MalformedRequest, e.Error())
 	case DataChannelRpcUnsupportedServer:
-		return psrpc.NewErrorf(psrpc.Unimplemented, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Unimplemented, e.Error())
 	case DataChannelRpcUnsupportedVersion:
-		return psrpc.NewErrorf(psrpc.Unimplemented, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Unimplemented, e.Error())
 	default:
-		return psrpc.NewErrorf(psrpc.Internal, e.Message, "data", e.Data)
+		return psrpc.NewErrorf(psrpc.Internal, e.Error())
 	}
 }
 
