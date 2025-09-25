@@ -50,6 +50,7 @@ func Proto() error {
 		"livekit_sip.proto",
 		"livekit_cloud_agent.proto",
 		"livekit_phone_number.proto",
+		"livekit_connector.proto",
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",
@@ -78,6 +79,7 @@ func Proto() error {
 		"rpc/signal.proto",
 		"rpc/whip_signal.proto",
 		"rpc/sip.proto",
+		"rpc/connector.proto",
 	}
 
 	fmt.Println("generating protobuf")
