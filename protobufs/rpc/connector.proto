@@ -19,9 +19,9 @@ package rpc;
 option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
-import "livekit_connectors.proto";
+import "livekit_connector.proto";
 
-service ConnectorsInternal {
+service ConnectorInternal {
   rpc DialWhatsAppCall(InternalDialWhatsAppCallRequest) returns (livekit.DialWhatsAppCallResponse) {
     option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
@@ -33,7 +33,7 @@ service ConnectorsInternal {
   };
 }
 
-service ConnectorsHandler {
+service ConnectorHandler {
   rpc ConnectWhatsAppCall(livekit.ConnectWhatsAppCallRequest) returns (livekit.ConnectWhatsAppCallResponse) {
     option (psrpc.options) = {
       topics: true

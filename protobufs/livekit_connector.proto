@@ -22,7 +22,7 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_agent_dispatch.proto";
 import "livekit_rtc.proto";
 
-service Connectors {
+service Connector {
   rpc DialWhatsAppCall(DialWhatsAppCallRequest) returns (DialWhatsAppCallResponse);
 
   rpc DisconnectWhatsAppCall(DisconnectWhatsAppCallRequest) returns (DisconnectWhatsAppCallResponse);

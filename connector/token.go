@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package connectors
+package connector
 
 import (
 	"time"
@@ -21,7 +21,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
-type ConnectorsTokenParams struct {
+type ConnectorTokenParams struct {
 	APIKey                string
 	APISecret             string
 	RoomName              string
@@ -29,11 +29,10 @@ type ConnectorsTokenParams struct {
 	ParticipantName       string
 	ParticipantMetadata   string
 	ParticipantAttributes map[string]string
-	RoomPreset            string
-	RoomConfig            *livekit.RoomConfiguration
+	Agents                []*livekit.RoomAgentDispatch
 }
 
-func BuildConnectorsToken(params ConnectorsTokenParams) (string, error) {
+func BuildConnectorToken(params ConnectorTokenParams) (string, error) {
 	t := true
 	at := auth.NewAccessToken(params.APIKey, params.APISecret).
 		SetVideoGrant(&auth.VideoGrant{
@@ -44,12 +43,11 @@ func BuildConnectorsToken(params ConnectorsTokenParams) (string, error) {
 			CanPublishData:       &t,
 			CanUpdateOwnMetadata: &t,
 		}).
+		SetAgents(params.Agents...).
 		SetIdentity(params.ParticipantIdentity).
 		SetName(params.ParticipantName).
 		SetMetadata(params.ParticipantMetadata).
 		SetAttributes(params.ParticipantAttributes).
-		SetRoomPreset(params.RoomPreset).
-		SetRoomConfig(params.RoomConfig).
 		SetKind(livekit.ParticipantInfo_CONNECTOR).
 		SetValidFor(24 * time.Hour).
 		SetAllowSensitiveCredentials(true)

@@ -14,39 +14,39 @@
 
 package rpc
 
-type ConnectorsClient interface {
-	ConnectorsInternalClient
-	ConnectorsHandlerClient
+type ConnectorClient interface {
+	ConnectorInternalClient
+	ConnectorHandlerClient
 }
 
-type connectorsClient struct {
-	ConnectorsInternalClient
-	ConnectorsHandlerClient
+type connectorClient struct {
+	ConnectorInternalClient
+	ConnectorHandlerClient
 }
 
-func NewConnectorsClient(params ClientParams) (ConnectorsClient, error) {
+func NewConnectorClient(params ClientParams) (ConnectorClient, error) {
 	if params.Bus == nil {
 		return nil, nil
 	}
 	opts := params.Options()
 
-	internalClient, err := NewConnectorsInternalClient(params.Bus, opts...)
+	internalClient, err := NewConnectorInternalClient(params.Bus, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	handlerClient, err := NewConnectorsHandlerClient(params.Bus, opts...)
+	handlerClient, err := NewConnectorHandlerClient(params.Bus, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	return &connectorsClient{
+	return &connectorClient{
 		internalClient,
 		handlerClient,
 	}, nil
 }
 
-func (c *connectorsClient) Close() {
-	c.ConnectorsInternalClient.Close()
-	c.ConnectorsHandlerClient.Close()
+func (c *connectorClient) Close() {
+	c.ConnectorInternalClient.Close()
+	c.ConnectorHandlerClient.Close()
 }
