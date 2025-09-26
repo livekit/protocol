@@ -24,7 +24,8 @@ const (
 
 type ListReplaysRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // optional
+	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`                 // optional
+	StartedBefore int64                  `protobuf:"varint,2,opt,name=started_before,json=startedBefore,proto3" json:"started_before,omitempty"` // optional (for pagination), unix ms
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -64,6 +65,13 @@ func (x *ListReplaysRequest) GetRoomName() string {
 		return x.RoomName
 	}
 	return ""
+}
+
+func (x *ListReplaysRequest) GetStartedBefore() int64 {
+	if x != nil {
+		return x.StartedBefore
+	}
+	return 0
 }
 
 type ListReplaysResponse struct {
@@ -225,8 +233,8 @@ func (x *DeleteReplayRequest) GetReplayId() string {
 type PlaybackRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ReplayId      string                 `protobuf:"bytes,1,opt,name=replay_id,json=replayId,proto3" json:"replay_id,omitempty"`
-	RoomName      string                 `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`     // room to play into
-	StartTime     int64                  `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // initial cursor
+	PlaybackRoom  string                 `protobuf:"bytes,2,opt,name=playback_room,json=playbackRoom,proto3" json:"playback_room,omitempty"` // name of room to play into
+	Ts            int64                  `protobuf:"varint,3,opt,name=ts,proto3" json:"ts,omitempty"`                                        // initial timestamp (ms)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -268,16 +276,16 @@ func (x *PlaybackRequest) GetReplayId() string {
 	return ""
 }
 
-func (x *PlaybackRequest) GetRoomName() string {
+func (x *PlaybackRequest) GetPlaybackRoom() string {
 	if x != nil {
-		return x.RoomName
+		return x.PlaybackRoom
 	}
 	return ""
 }
 
-func (x *PlaybackRequest) GetStartTime() int64 {
+func (x *PlaybackRequest) GetTs() int64 {
 	if x != nil {
-		return x.StartTime
+		return x.Ts
 	}
 	return 0
 }
@@ -329,7 +337,7 @@ func (x *PlaybackResponse) GetPlaybackId() string {
 type SeekRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PlaybackId    string                 `protobuf:"bytes,1,opt,name=playback_id,json=playbackId,proto3" json:"playback_id,omitempty"`
-	StartTime     int64                  `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` // initial cursor
+	Ts            int64                  `protobuf:"varint,2,opt,name=ts,proto3" json:"ts,omitempty"` // timestamp (ms)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -371,9 +379,9 @@ func (x *SeekRequest) GetPlaybackId() string {
 	return ""
 }
 
-func (x *SeekRequest) GetStartTime() int64 {
+func (x *SeekRequest) GetTs() int64 {
 	if x != nil {
-		return x.StartTime
+		return x.Ts
 	}
 	return 0
 }
@@ -426,9 +434,10 @@ var File_cloud_replay_proto protoreflect.FileDescriptor
 
 const file_cloud_replay_proto_rawDesc = "" +
 	"\n" +
-	"\x12cloud_replay.proto\x12\x06replay\x1a\x1bgoogle/protobuf/empty.proto\"1\n" +
+	"\x12cloud_replay.proto\x12\x06replay\x1a\x1bgoogle/protobuf/empty.proto\"X\n" +
 	"\x12ListReplaysRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\"C\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12%\n" +
+	"\x0estarted_before\x18\x02 \x01(\x03R\rstartedBefore\"C\n" +
 	"\x13ListReplaysResponse\x12,\n" +
 	"\areplays\x18\x01 \x03(\v2\x12.replay.ReplayInfoR\areplays\"\x81\x01\n" +
 	"\n" +
@@ -439,20 +448,18 @@ const file_cloud_replay_proto_rawDesc = "" +
 	"start_time\x18\x03 \x01(\x03R\tstartTime\x12\x1a\n" +
 	"\bduration\x18\x04 \x01(\x03R\bduration\"2\n" +
 	"\x13DeleteReplayRequest\x12\x1b\n" +
-	"\treplay_id\x18\x01 \x01(\tR\breplayId\"j\n" +
+	"\treplay_id\x18\x01 \x01(\tR\breplayId\"c\n" +
 	"\x0fPlaybackRequest\x12\x1b\n" +
-	"\treplay_id\x18\x01 \x01(\tR\breplayId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\x12\x1d\n" +
-	"\n" +
-	"start_time\x18\x03 \x01(\x03R\tstartTime\"3\n" +
+	"\treplay_id\x18\x01 \x01(\tR\breplayId\x12#\n" +
+	"\rplayback_room\x18\x02 \x01(\tR\fplaybackRoom\x12\x0e\n" +
+	"\x02ts\x18\x03 \x01(\x03R\x02ts\"3\n" +
 	"\x10PlaybackResponse\x12\x1f\n" +
 	"\vplayback_id\x18\x01 \x01(\tR\n" +
-	"playbackId\"M\n" +
+	"playbackId\">\n" +
 	"\vSeekRequest\x12\x1f\n" +
 	"\vplayback_id\x18\x01 \x01(\tR\n" +
-	"playbackId\x12\x1d\n" +
-	"\n" +
-	"start_time\x18\x02 \x01(\x03R\tstartTime\"7\n" +
+	"playbackId\x12\x0e\n" +
+	"\x02ts\x18\x02 \x01(\x03R\x02ts\"7\n" +
 	"\x14ClosePlaybackRequest\x12\x1f\n" +
 	"\vplayback_id\x18\x01 \x01(\tR\n" +
 	"playbackId2\xc8\x02\n" +
