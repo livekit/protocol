@@ -31,6 +31,7 @@ message Job {
   string metadata = 6;
   string agent_name = 7;
   JobState state = 8;
+  bool enable_recording = 10;
 }
 
 message JobState {
