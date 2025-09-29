@@ -197,7 +197,7 @@ func (l *logAdapter) Printf(string, ...interface{}) {}
 
 // ---------------------------------
 
-func eventKey(event *livekit.WebhookEvent) string {
+func EventKey(event *livekit.WebhookEvent) string {
 	if event.EgressInfo != nil {
 		return event.EgressInfo.EgressId
 	}

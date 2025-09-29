@@ -56,6 +56,7 @@ type URLNotifierParams struct {
 	APIKey     string
 	APISecret  string
 	FieldsHook func(whi *livekit.WebhookInfo)
+	EventKey   func(event *livekit.WebhookEvent) string
 	FilterParams
 }
 
@@ -141,7 +142,12 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 
 	enqueuedAt := time.Now()
 
-	key := eventKey(event)
+	var key string
+	if n.params.EventKey != nil {
+		key = n.params.EventKey(event)
+	} else {
+		key = EventKey(event)
+	}
 
 	p := &NotifyParams{}
 	for _, o := range opts {
