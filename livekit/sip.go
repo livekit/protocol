@@ -700,23 +700,20 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	}
 
 	// Validate TransferTo URI format and ensure RFC compliance
-	validURIRegex := regexp.MustCompile(`^(sip:|tel:)`)
-	angleBracketRegex := regexp.MustCompile(`^<.*>$`)
-
 	var uriToValidate string
-	if angleBracketRegex.MatchString(p.TransferTo) {
+	if strings.HasPrefix(p.TransferTo, "<") && strings.HasSuffix(p.TransferTo, ">") {
 		// Extract inner URI for validation
 		uriToValidate = p.TransferTo[1 : len(p.TransferTo)-1]
 	} else {
 		uriToValidate = p.TransferTo
 	}
 
-	if !validURIRegex.MatchString(uriToValidate) {
+	if !strings.HasPrefix(uriToValidate, "sip:") && !strings.HasPrefix(uriToValidate, "tel:") {
 		return errors.New("transfer_to must be a valid SIP or TEL URI (sip: or tel:)")
 	}
 
 	// Ensure RFC compliance by wrapping in angle brackets if not already wrapped
-	if !angleBracketRegex.MatchString(p.TransferTo) {
+	if !strings.HasPrefix(p.TransferTo, "<") || !strings.HasSuffix(p.TransferTo, ">") {
 		p.TransferTo = fmt.Sprintf("<%s>", p.TransferTo)
 	}
 
