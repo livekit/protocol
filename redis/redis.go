@@ -19,9 +19,10 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/livekit/protocol/xtls"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/livekit/protocol/xtls"
 
 	"github.com/livekit/protocol/logger"
 )
@@ -129,14 +130,15 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	} else if len(conf.ClusterAddresses) > 0 {
 		logger.Infow("connecting to redis", "cluster", true, "addr", conf.ClusterAddresses)
 		rcOptions = &redis.UniversalOptions{
-			Addrs:        conf.ClusterAddresses,
-			Username:     conf.Username,
-			Password:     conf.Password,
-			DB:           conf.DB,
-			TLSConfig:    tlsConfig,
-			MaxRedirects: conf.GetMaxRedirects(),
-			PoolTimeout:  conf.PoolTimeout,
-			PoolSize:     conf.PoolSize,
+			Addrs:         conf.ClusterAddresses,
+			Username:      conf.Username,
+			Password:      conf.Password,
+			DB:            conf.DB,
+			TLSConfig:     tlsConfig,
+			MaxRedirects:  conf.GetMaxRedirects(),
+			PoolTimeout:   conf.PoolTimeout,
+			PoolSize:      conf.PoolSize,
+			IsClusterMode: true,
 		}
 	} else {
 		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)
