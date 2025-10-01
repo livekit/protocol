@@ -1437,20 +1437,16 @@ func (x *AddTrackRequest) GetAudioFeatures() []AudioTrackFeature {
 
 type AddDataTrackRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Unique track ID used to associate frames with the track.
-	Id uint32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.).
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// MIME type of the data sent over the track (e.g., `application/json`).
 	// This must be a valid MIME type as defined by RFC 2046.
-	MimeType string `protobuf:"bytes,3,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
+	MimeType string `protobuf:"bytes,2,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
-	Encryption Encryption_Type `protobuf:"varint,4,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
+	Encryption Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	// Nominal rate in frames per second (FPS) the publisher intends to publish frames at.
 	// If set, this establishes an upper bound on rate at which frames can be published.
-	NominalFps *uint32 `protobuf:"varint,5,opt,name=nominal_fps,json=nominalFps,proto3,oneof" json:"nominal_fps,omitempty"`
-	// ID used to match with the response.
-	RequestId     uint32 `protobuf:"varint,15,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	NominalFps    *uint32 `protobuf:"varint,4,opt,name=nominal_fps,json=nominalFps,proto3,oneof" json:"nominal_fps,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1485,13 +1481,6 @@ func (*AddDataTrackRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *AddDataTrackRequest) GetId() uint32 {
-	if x != nil {
-		return x.Id
-	}
-	return 0
-}
-
 func (x *AddDataTrackRequest) GetName() string {
 	if x != nil {
 		return x.Name
@@ -1516,13 +1505,6 @@ func (x *AddDataTrackRequest) GetEncryption() Encryption_Type {
 func (x *AddDataTrackRequest) GetNominalFps() uint32 {
 	if x != nil && x.NominalFps != nil {
 		return *x.NominalFps
-	}
-	return 0
-}
-
-func (x *AddDataTrackRequest) GetRequestId() uint32 {
-	if x != nil {
-		return x.RequestId
 	}
 	return 0
 }
@@ -2133,10 +2115,10 @@ func (x *UpdateSubscription) GetParticipantTracks() []*ParticipantTracks {
 
 type UpdateDataSubscription struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
-	TrackIds  []uint32               `protobuf:"varint,1,rep,packed,name=track_ids,json=trackIds,proto3" json:"track_ids,omitempty"`
+	TrackSids []string               `protobuf:"bytes,1,rep,name=track_sids,json=trackSids,proto3" json:"track_sids,omitempty"`
 	Subscribe bool                   `protobuf:"varint,2,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
 	// Options for each track subscription. Entries in this list align
-	// positionally with `track_ids`.
+	// positionally with `track_sids`.
 	Options       []*DataTrackSubscribeOptions `protobuf:"bytes,3,rep,name=options,proto3" json:"options,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2172,9 +2154,9 @@ func (*UpdateDataSubscription) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *UpdateDataSubscription) GetTrackIds() []uint32 {
+func (x *UpdateDataSubscription) GetTrackSids() []string {
 	if x != nil {
-		return x.TrackIds
+		return x.TrackSids
 	}
 	return nil
 }
@@ -4695,19 +4677,16 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x12\x16\n" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
-	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\xeb\x01\n" +
-	"\x13AddDataTrackRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\rR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
-	"\tmime_type\x18\x03 \x01(\tR\bmimeType\x128\n" +
+	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\xb6\x01\n" +
+	"\x13AddDataTrackRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1b\n" +
+	"\tmime_type\x18\x02 \x01(\tR\bmimeType\x128\n" +
 	"\n" +
-	"encryption\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
+	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\x12$\n" +
-	"\vnominal_fps\x18\x05 \x01(\rH\x00R\n" +
-	"nominalFps\x88\x01\x01\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x0f \x01(\rR\trequestIdB\x0e\n" +
-	"\f_nominal_fpsJ\x04\b\x06\x10\x0f\"{\n" +
+	"\vnominal_fps\x18\x04 \x01(\rH\x00R\n" +
+	"nominalFps\x88\x01\x01B\x0e\n" +
+	"\f_nominal_fps\"{\n" +
 	"\x0eTrickleRequest\x12$\n" +
 	"\rcandidateInit\x18\x01 \x01(\tR\rcandidateInit\x12-\n" +
 	"\x06target\x18\x02 \x01(\x0e2\x15.livekit.SignalTargetR\x06target\x12\x14\n" +
@@ -4757,9 +4736,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12I\n" +
-	"\x12participant_tracks\x18\x03 \x03(\v2\x1a.livekit.ParticipantTracksR\x11participantTracks\"\x91\x01\n" +
-	"\x16UpdateDataSubscription\x12\x1b\n" +
-	"\ttrack_ids\x18\x01 \x03(\rR\btrackIds\x12\x1c\n" +
+	"\x12participant_tracks\x18\x03 \x03(\v2\x1a.livekit.ParticipantTracksR\x11participantTracks\"\x93\x01\n" +
+	"\x16UpdateDataSubscription\x12\x1d\n" +
+	"\n" +
+	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12<\n" +
 	"\aoptions\x18\x03 \x03(\v2\".livekit.DataTrackSubscribeOptionsR\aoptions\"\xdd\x01\n" +
 	"\x13UpdateTrackSettings\x12\x1d\n" +
