@@ -55,6 +55,10 @@ message SignalRequest {
     UpdateLocalAudioTrack update_audio_track = 17;
     // Update local video track settings
     UpdateLocalVideoTrack update_video_track = 18;
+    // Publish a data track
+    AddDataTrackRequest add_data_track = 19;
+    // Update subscription state for one or more data tracks
+    UpdateDataSubscription update_data_subscription = 20;
   }
 }
 
@@ -160,6 +164,22 @@ message AddTrackRequest {
   repeated AudioTrackFeature audio_features = 17;
 }
 
+message AddDataTrackRequest {
+  // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+  string name = 1;
+
+  // MIME type of the data sent over the track (e.g., `application/json`).
+  // This must be a valid MIME type as defined by RFC 2046.
+  string mime_type = 2;
+
+  // Method used for end-to-end encryption (E2EE) on frame payloads.
+  Encryption.Type encryption = 3;
+
+  // Nominal rate in frames per second (FPS) the publisher intends to publish frames at.
+  // If set, this establishes an upper bound on rate at which frames can be published.
+  optional uint32 nominal_fps = 4;
+}
+
 message TrickleRequest {
   string candidateInit = 1;
   SignalTarget target = 2;
@@ -228,6 +248,14 @@ message UpdateSubscription {
   repeated string track_sids = 1;
   bool subscribe = 2;
   repeated ParticipantTracks participant_tracks = 3;
+}
+
+message UpdateDataSubscription {
+  repeated string track_sids = 1;
+  bool subscribe = 2;
+  // Options for each track subscription. Entries in this list align
+  // positionally with `track_sids`.
+  repeated DataTrackSubscribeOptions options = 3;
 }
 
 message UpdateTrackSettings {
