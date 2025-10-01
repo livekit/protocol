@@ -261,6 +261,7 @@ type CreateAgentResponse struct {
 	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	PresignedUrl  string                 `protobuf:"bytes,5,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
 	Tag           string                 `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
+	ServerRegions []string               `protobuf:"bytes,7,rep,name=server_regions,json=serverRegions,proto3" json:"server_regions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -337,6 +338,13 @@ func (x *CreateAgentResponse) GetTag() string {
 	return ""
 }
 
+func (x *CreateAgentResponse) GetServerRegions() []string {
+	if x != nil {
+		return x.ServerRegions
+	}
+	return nil
+}
+
 type AgentDeployment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Region        string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
@@ -351,6 +359,7 @@ type AgentDeployment struct {
 	MemReq        string                 `protobuf:"bytes,10,opt,name=mem_req,json=memReq,proto3" json:"mem_req,omitempty"`
 	MemLimit      string                 `protobuf:"bytes,11,opt,name=mem_limit,json=memLimit,proto3" json:"mem_limit,omitempty"`
 	CpuLimit      string                 `protobuf:"bytes,12,opt,name=cpu_limit,json=cpuLimit,proto3" json:"cpu_limit,omitempty"`
+	ServerRegion  string                 `protobuf:"bytes,13,opt,name=server_region,json=serverRegion,proto3" json:"server_region,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -465,6 +474,13 @@ func (x *AgentDeployment) GetMemLimit() string {
 func (x *AgentDeployment) GetCpuLimit() string {
 	if x != nil {
 		return x.CpuLimit
+	}
+	return ""
+}
+
+func (x *AgentDeployment) GetServerRegion() string {
+	if x != nil {
+		return x.ServerRegion
 	}
 	return ""
 }
@@ -1821,7 +1837,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
-	"\aregions\x18\x06 \x03(\tR\aregions\"\xb8\x01\n" +
+	"\aregions\x18\x06 \x03(\tR\aregions\"\xdf\x01\n" +
 	"\x13CreateAgentResponse\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
@@ -1829,7 +1845,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x18\n" +
 	"\aversion\x18\x04 \x01(\tR\aversion\x12#\n" +
 	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\x12\x10\n" +
-	"\x03tag\x18\x06 \x01(\tR\x03tag\"\xdc\x02\n" +
+	"\x03tag\x18\x06 \x01(\tR\x03tag\x12%\n" +
+	"\x0eserver_regions\x18\a \x03(\tR\rserverRegions\"\x81\x03\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\x12\x16\n" +
@@ -1843,7 +1860,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\amem_req\x18\n" +
 	" \x01(\tR\x06memReq\x12\x1b\n" +
 	"\tmem_limit\x18\v \x01(\tR\bmemLimit\x12\x1b\n" +
-	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\"\x93\x02\n" +
+	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\x12#\n" +
+	"\rserver_region\x18\r \x01(\tR\fserverRegion\"\x93\x02\n" +
 	"\tAgentInfo\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
