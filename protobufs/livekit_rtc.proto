@@ -165,27 +165,19 @@ message AddTrackRequest {
 }
 
 message AddDataTrackRequest {
-  // Unique track ID used to associate frames with the track.
-  uint32 id = 1;
-
-  // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.).
-  string name = 2;
+  // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+  string name = 1;
 
   // MIME type of the data sent over the track (e.g., `application/json`).
   // This must be a valid MIME type as defined by RFC 2046.
-  string mime_type = 3;
+  string mime_type = 2;
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
-  Encryption.Type encryption = 4;
+  Encryption.Type encryption = 3;
 
   // Nominal rate in frames per second (FPS) the publisher intends to publish frames at.
   // If set, this establishes an upper bound on rate at which frames can be published.
-  optional uint32 nominal_fps = 5;
-
-  reserved 6 to 14;
-
-  // ID used to match with the response.
-  uint32 request_id = 15;
+  optional uint32 nominal_fps = 4;
 }
 
 message TrickleRequest {
@@ -259,10 +251,10 @@ message UpdateSubscription {
 }
 
 message UpdateDataSubscription {
-  repeated uint32 track_ids = 1;
+  repeated string track_sids = 1;
   bool subscribe = 2;
   // Options for each track subscription. Entries in this list align
-  // positionally with `track_ids`.
+  // positionally with `track_sids`.
   repeated DataTrackSubscribeOptions options = 3;
 }
 
