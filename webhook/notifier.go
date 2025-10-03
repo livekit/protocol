@@ -31,11 +31,13 @@ type WebHookConfig struct {
 	APIKey              string                    `yaml:"api_key,omitempty"`
 	URLNotifier         URLNotifierConfig         `yaml:"url_notifier,omitempty"`
 	ResourceURLNotifier ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
+	FilterParams        FilterParams              `yaml:"filter_params,omitempty"`
 }
 
 var DefaultWebHookConfig = WebHookConfig{
 	URLNotifier:         DefaultURLNotifierConfig,
 	ResourceURLNotifier: DefaultResourceURLNotifierConfig,
+	FilterParams:        FilterParams{},
 }
 
 type NotifyParams struct {
@@ -63,6 +65,7 @@ type QueuedNotifier interface {
 	SetFilter(params FilterParams)
 	QueueNotify(ctx context.Context, event *livekit.WebhookEvent, opts ...NotifyOption) error
 	Stop(force bool)
+	IsAllowed(event string) bool
 }
 
 type DefaultNotifier struct {
@@ -83,11 +86,12 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 	}
 	for _, url := range config.URLs {
 		u := NewResourceURLNotifier(ResourceURLNotifierParams{
-			URL:       url,
-			Logger:    logger.GetLogger().WithComponent("webhook"),
-			APIKey:    config.APIKey,
-			APISecret: apiSecret,
-			Config:    config.ResourceURLNotifier,
+			URL:          url,
+			Logger:       logger.GetLogger().WithComponent("webhook"),
+			APIKey:       config.APIKey,
+			APISecret:    apiSecret,
+			Config:       config.ResourceURLNotifier,
+			FilterParams: config.FilterParams,
 		})
 		n.notifiers = append(n.notifiers, u)
 	}
@@ -100,6 +104,15 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 	})
 
 	return n, nil
+}
+
+func (n *DefaultNotifier) IsAllowed(event string) bool {
+	for _, u := range n.notifiers {
+		if u.IsAllowed(event) {
+			return true
+		}
+	}
+	return false
 }
 
 func (n *DefaultNotifier) Stop(force bool) {

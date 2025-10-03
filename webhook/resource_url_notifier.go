@@ -156,6 +156,10 @@ func (r *ResourceURLNotifier) SetFilter(params FilterParams) {
 	r.filter.SetFilter(params)
 }
 
+func (r *ResourceURLNotifier) IsAllowed(event string) bool {
+	return r.filter.IsAllowed(event)
+}
+
 func (r *ResourceURLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
