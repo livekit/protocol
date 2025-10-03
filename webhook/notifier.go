@@ -65,7 +65,6 @@ type QueuedNotifier interface {
 	SetFilter(params FilterParams)
 	QueueNotify(ctx context.Context, event *livekit.WebhookEvent, opts ...NotifyOption) error
 	Stop(force bool)
-	IsAllowed(event string) bool
 }
 
 type DefaultNotifier struct {
@@ -104,15 +103,6 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 	})
 
 	return n, nil
-}
-
-func (n *DefaultNotifier) IsAllowed(event string) bool {
-	for _, u := range n.notifiers {
-		if u.IsAllowed(event) {
-			return true
-		}
-	}
-	return false
 }
 
 func (n *DefaultNotifier) Stop(force bool) {
