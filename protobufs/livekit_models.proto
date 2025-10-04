@@ -221,9 +221,9 @@ message TrackInfo {
   bool muted = 4;
   // original width of video (unset for audio)
   // clients may receive a lower resolution version with simulcast
-  uint32 width = 5 [deprecated=true];
+  uint32 width = 5;
   // original height of video (unset for audio)
-  uint32 height = 6 [deprecated=true];
+  uint32 height = 6;
   // true if track is simulcasted
   bool simulcast = 7 [deprecated = true]; // see `video_layer_mode` in `codecs`
   // true if DTX (Discontinuous Transmission) is disabled for audio
