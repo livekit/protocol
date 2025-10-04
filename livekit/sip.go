@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/xtwirp"
 )
 
@@ -391,12 +392,12 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 		return err
 	}
 	if err := validateHeaders(p.Headers); err != nil {
-		fmt.Printf("Warning: Header validation failed for Headers field: %v\n", err)
+		logger.Warnw("Header validation failed for Headers field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
 	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
-		fmt.Printf("Warning: Header validation failed for AttributesToHeaders field: %v\n", err)
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 	return nil
@@ -487,12 +488,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 		return err
 	}
 	if err := validateHeaders(p.Headers); err != nil {
-		fmt.Printf("Warning: Header validation failed for Headers field: %v\n", err)
+		logger.Warnw("Header validation failed for Headers field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
 	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
-		fmt.Printf("Warning: Header validation failed for AttributesToHeaders field: %v\n", err)
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 	return nil
@@ -514,7 +515,7 @@ func (p *SIPOutboundConfig) Validate() error {
 	}
 	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
 	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
-		fmt.Printf("Warning: Header validation failed for AttributesToHeaders field: %v\n", err)
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 	return nil
@@ -723,7 +724,7 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	}
 
 	if err := validateHeaders(p.Headers); err != nil {
-		fmt.Printf("Warning: Header validation failed for Headers field: %v\n", err)
+		logger.Warnw("Header validation failed for Headers field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 
@@ -773,7 +774,7 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	}
 
 	if err := validateHeaders(p.Headers); err != nil {
-		fmt.Printf("Warning: Header validation failed for Headers field: %v\n", err)
+		logger.Warnw("Header validation failed for Headers field", err)
 		// No error, just a warning for SIP RFC validation for now
 	}
 
