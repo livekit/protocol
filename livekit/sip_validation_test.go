@@ -79,22 +79,22 @@ var InvalidHeaderNames = []string{
 // ValidHeaderValues contains valid SIP header values (implementation-specific restrictions)
 // Note: These restrictions are NOT in RFC 3261 but are applied for security/performance
 var ValidHeaderValues = []string{
-	"alice@example.com",                       // basic email
-	"<sip:alice@example.com>",                 // SIP URI with brackets
-	"Alice <sip:alice@example.com>",           // display name + URI
-	"\"Alice Smith\" <sip:alice@example.com>", // quoted display name
-	"SIP/2.0/UDP 192.168.1.1:5060",            // Via header
-	"1 INVITE",                                // CSeq header
-	"255",                                     // Max-Forwards (max valid)
-	"0",                                       // Max-Forwards (min valid)
-	"application/sdp",                         // Content-Type
-	"123",                                     // Content-Length
-	"3600",                                    // Expires
-	"call-123@example.com",                    // Call-ID
-	"text/plain; charset=utf-8",               // Content-Type with params
-	"<sip:user@[2001:db8::1]:5060>",           // IPv6 URI
-	"\"Alice & Bob\" <sip:alice@example.com>", // display name with & symbol
-	strings.Repeat("a", 1024),                 // max lenth
+	"u1@example.com",                       // basic email
+	"<sip:u2@example.com>",                 // SIP URI with brackets
+	"Alice <sip:u3@example.com>",           // display name + URI
+	"\"Alice Smith\" <sip:u4@example.com>", // quoted display name
+	"SIP/2.0/UDP 192.168.1.1:5060",         // Via header
+	"1 INVITE",                             // CSeq header
+	"255",                                  // Max-Forwards (max valid)
+	"0",                                    // Max-Forwards (min valid)
+	"application/sdp",                      // Content-Type
+	"123",                                  // Content-Length
+	"3600",                                 // Expires
+	"call-123@example.com",                 // Call-ID
+	"text/plain; charset=utf-8",            // Content-Type with params
+	"<sip:u5@[2001:db8::1]:5060>",          // IPv6 URI
+	"\"Alice & Bob\" <sip:u6@example.com>", // display name with & symbol
+	strings.Repeat("a", 1024),              // max length
 }
 
 // Note: These restrictions are NOT in RFC 3261 but are applied for security/performance
@@ -115,23 +115,6 @@ var InvalidHeaderValues = []string{
 	strings.Repeat("a", 1025),       // too long
 }
 
-// ValidDisplayNames contains valid display name formats
-var ValidDisplayNames = []string{
-	`"Alex Dev M" <sip:alex@example.com>`,
-	`"Alex's \"Dev\" M\\" <sip:alex@example.com>`,
-	`Alex Developer <sip:alex@example.com>`,
-}
-
-// InvalidDisplayNames contains invalid display name formats
-var InvalidDisplayNames = []string{
-	`"Alex "Dev" M" <sip:alex@example.com>`,     // unescaped quotes
-	`"Alex \M" <sip:alex@example.com>`,          // unescaped backslashes
-	`"Alex Developer" M <sip:alex@example.com>`, // unmatched quotes
-	`Alex "Developer" M <sip:alex@example.com>`, // unescaped quotes in unquoted
-	`"Alex Developer M <sip:alex@example.com>`,  // unterminated quote
-	`Alex Developer M" <sip:alex@example.com>`,  // unmatched quote
-}
-
 // testCaseName truncates a test case name to maxLen and adds dots with total size
 func testCaseName(name string, maxLen int, index int) string {
 	if len(name) <= maxLen {
@@ -144,44 +127,53 @@ func testCaseName(name string, maxLen int, index int) string {
 
 // ValidNameAddrHeaders contains valid Name-addr format headers with parameters
 var ValidNameAddrHeaders = []string{
-	"sip:a1@example.com",                            // basic SIP URI (no brackets needed)
-	"sips:a2@example.com",                           // secure SIP URI (no brackets needed)
-	"tel:+1-555-123-4567",                           // TEL URI (no brackets needed)
-	"<sip:a3@example.com>",                          // basic SIP URI with brackets
-	"<sips:a4@example.com>",                         // secure SIP URI with brackets
-	"<tel:+1-555-123-4567>",                         // TEL URI with brackets
-	"Alice <sip:a5@example.com>",                    // display name + SIP URI
-	"\"Alice Smith\" <sip:a6@example.com>",          // quoted display name
-	"<sip:a7@example.com;transport=tcp>",            // SIP URI with transport
-	"<sip:a8@example.com;lr>",                       // SIP URI with flag param
-	"<sip:a9@example.com:5060>",                     // SIP URI with port
-	"<sip:a10@example.com;transport=tcp;lr>",        // SIP URI with multiple params
-	"Alice <sip:a11@example.com;transport=tcp>",     // display name + params
-	"\"Alice \\\"Quote\\\"\" <sip:a12@example.com>", // quoted display
-	"<sip:a13@[2001:db8::1]:5060>",                  // IPv6 with params
-	"<sips:a14@192.0.2.4>;expires=60",               // SIPS URI with expires parameter
-	"Alice <sip:a15@example.com;transport=tcp>",     // display name + params
-	"\"Alice & Bob\" <sip:a16@example.com>",         // display name with & symbol
+	`"Alice Johnson" <sip:u1@example.com>`,
+	`"Alice \"Ace\" Johnson's device\\" <sip:u2@example.com>`,
+	`Alice Johnson <sip:u3@example.com>`,
+	`sip:u4@example.com`,                        // basic SIP URI (no brackets needed)
+	`sips:u5@example.com`,                       // secure SIP URI (no brackets needed)
+	`tel:+1-555-123-4567`,                       // TEL URI (no brackets needed)
+	`<sip:u6@example.com>`,                      // basic SIP URI with brackets
+	`<sips:u7@example.com>`,                     // secure SIP URI with brackets
+	`<tel:+1-555-123-4567>`,                     // TEL URI with brackets
+	`Alice <sip:u8@example.com>`,                // display name + SIP URI
+	`"Alice Johnson" <sip:u9@example.com>`,      // quoted display name
+	`<sip:u10@example.com;transport=tcp>`,       // SIP URI with transport
+	`<sip:u11@example.com;lr>`,                  // SIP URI with flag param
+	`<sip:u12@example.com:5060>`,                // SIP URI with port
+	`<sip:u13@example.com;transport=tcp;lr>`,    // SIP URI with multiple params
+	`Alice <sip:u14@example.com;transport=tcp>`, // display name + params
+	`"Alice \"Ace\"" <sip:u15@example.com>`,     // quoted display
+	`<sip:u16@[2001:db8::1]:5060>`,              // IPv6 with params
+	`<sips:u17@192.0.2.4>;expires=60`,           // SIPS URI with expires parameter
+	`Alice <sip:u18@example.com;transport=tcp>`, // display name + params
+	`"Alice & Bob" <sip:u19@example.com>`,       // display name with & symbol
 }
 
 // InvalidNameAddrHeaders contains invalid Name-addr format headers
 var InvalidNameAddrHeaders = []string{
-	"<sip:u1@example.com",                             // missing closing bracket
-	"sip:u2@example.com>",                             // missing opening bracket
-	"<sip:u3@example.com> <sip:u4@example.com>",       // multiple URIs
-	"Alice <sip:u5@example.com> <sip:u6@example.com>", // multiple URIs with display
-	"Alice sip:u7@example.com",                        // display name without brackets
-	"Alice sips:u8@example.com",                       // display name without brackets
-	"Alice&Bob <sip:u9@example.com>",                  // display name with & symbol
-	"sip:u10@example.com;transport=tcp",               // special chars without brackets
-	"sip:u11@example.com,transport=tcp",               // comma without brackets
-	"sip:u12@example.com?transport=tcp",               // question mark without brackets
-	"<sip:u13@example.com;transport=>",                // empty parameter value
-	"<sip:u14@example.com;=tcp>",                      // empty parameter name
-	"<sip:u15@example.com;transport tcp>",             // missing equals sign
-	"<sip:u16@example.com;transport=tcp;>",            // trailing semicolon
-	"<sip:u17@example.com;transport=tcp;;lr>",         // double semicolon
-	"<sip:u18@example.com;transport=tcp lr>",          // space in parameters
+	`"Alice "Ace" Johnson" <sip:u1@example.com>`,        // unescaped quotes
+	`"\Alice" <sip:u2@example.com>`,                     // unescaped backslashes
+	`"Alice" Johnson <sip:u3@example.com>`,              // unmatched quotes
+	`Alice "Ace" Johnson <sip:u4@example.com>`,          // unescaped quotes in unquoted
+	`"Alice Johnson <sip:u5@example.com>`,               // unterminated quote
+	`Alice Johnson" <sip:u6@example.com>`,               // unmatched quote
+	`<sip:u7@example.com`,                               // missing closing bracket
+	`sip:u8@example.com>`,                               // missing opening bracket
+	`<sip:u9@example.com> <sip:u10@example.com>`,        // multiple URIs
+	`Alice <sip:u11@example.com> <sip:u12@example.com>`, // multiple URIs with display
+	`Alice sip:u13@example.com`,                         // display name without brackets
+	`Alice sips:u14@example.com`,                        // display name without brackets
+	`Alice & Bob <sip:u15@example.com>`,                 // display name with & symbol
+	`sip:u16@example.com;transport=tcp`,                 // special chars without brackets
+	`sip:u17@example.com,transport=tcp`,                 // comma without brackets
+	`sip:u18@example.com?transport=tcp`,                 // question mark without brackets
+	`<sip:u19@example.com;transport=>`,                  // empty parameter value
+	`<sip:u20@example.com;=tcp>`,                        // empty parameter name
+	`<sip:u21@example.com;transport tcp>`,               // missing equals sign
+	`<sip:u22@example.com;transport=tcp;>`,              // trailing semicolon
+	`<sip:u23@example.com;transport=tcp;;lr>`,           // double semicolon
+	`<sip:u24@example.com;transport=tcp lr>`,            // space in parameters
 }
 
 // TestValidateHeaderName_ValidHeaders tests that all valid header names pass validation
