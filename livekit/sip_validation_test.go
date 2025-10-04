@@ -24,12 +24,11 @@ import (
 
 // ValidHeaderNames contains valid SIP header names
 var ValidHeaderNames = []string{
-	"A",                   // single letter
-	"a",                   // lowercase
-	"F",                   // single uppercase
-	"f",                   // single lowercase
-	"From",                // keyword
-	"Call-ID",             // hyphenated keyword
+	"Q",                   // single uppercase
+	"q",                   // single lowercase
+	"Qrom",                // keyword
+	"qrom",                // keyword
+	"Qall-ID",             // hyphenated keyword
 	"P-Asserted-Identity", // multiple hyphens
 	"X-",                  // hyphen at end
 	"-X",                  // hyphen at start
@@ -253,6 +252,19 @@ func TestValidateNameAddr_InvalidHeaders(t *testing.T) {
 			err := validateNameAddrHeader(nameAddr)
 			if err == nil {
 				t.Errorf("validateNameAddrHeader(%q) = nil, want error", nameAddr)
+			}
+		})
+	}
+}
+
+func TestFrobiddenSipHeaderNames(t *testing.T) {
+	i := 0
+	for name := range FrobiddenSipHeaderNames {
+		i++
+		t.Run(testCaseName(name, 32, i), func(t *testing.T) {
+			err := ValidateHeaderName(name)
+			if err == nil {
+				t.Errorf("ValidateHeaderName(%q) = nil, want error", name)
 			}
 		})
 	}
