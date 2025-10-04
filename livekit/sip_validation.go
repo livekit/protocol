@@ -16,6 +16,7 @@ package livekit
 
 import (
 	"errors"
+	fmt "fmt"
 	"regexp"
 	"strings"
 )
@@ -24,7 +25,8 @@ import (
 
 // RFC 3261 Section 25.1 - Header field names
 // token = 1*(alphanum / "-" / "." / "!" / "%" / "*" / "_" / "+" / "`" / "'" / "~")
-var reHeaderName = regexp.MustCompile(`^[a-zA-Z0-9\-\.!%*_+` + "`" + `'~]+$`)
+// Specifically lowercase since we're converting to lowercase for case-insensitive comparison
+var reHeaderName = regexp.MustCompile(`^[a-z0-9\-\.!%*_+` + "`" + `'~]+$`)
 
 // RFC 3261 Section 25.1 - Header field values (basic validation)
 // More specific validation is done per header type
@@ -34,35 +36,77 @@ var reHeaderValueBasic = regexp.MustCompile(`^[\x20-\x7E]*$`)
 var reSIPURI = regexp.MustCompile(`^(sip|sips):([^@]+@)?([^;]+)(;.*)?$`)
 
 // Required headers for SIP requests per RFC 3261 Section 8.1.1
-var requiredRequestHeaders = map[string]bool{
-	"Via":          true,
-	"From":         true,
-	"To":           true,
-	"Call-ID":      true,
-	"CSeq":         true,
-	"Max-Forwards": true,
+var RequiredRequestHeaders = map[string]bool{
+	"via":          true,
+	"from":         true,
+	"to":           true,
+	"call-id":      true,
+	"cseq":         true,
+	"max-forwards": true,
 }
 
 // Required headers for SIP responses per RFC 3261 Section 8.2.1
-var requiredResponseHeaders = map[string]bool{
-	"Via":     true,
-	"From":    true,
-	"To":      true,
-	"Call-ID": true,
-	"CSeq":    true,
+var RequiredResponseHeaders = map[string]bool{
+	"via":     true,
+	"from":    true,
+	"to":      true,
+	"call-id": true,
+	"cseq":    true,
+}
+
+// Crucial headers that can't be overridden by the user, and their shorthands
+var FrobiddenSipHeaderNames = map[string]bool{
+	"accept":           true,
+	"accept-encoding":  true,
+	"accept-language":  true,
+	"allow":            true,
+	"allow-events":     true, // rfc3903
+	"call-id":          true,
+	"contact":          true,
+	"content-encoding": true,
+	"content-length":   true,
+	"content-type":     true,
+	"cseq":             true,
+	"event":            true, // rfc3903
+	"expires":          true,
+	"from":             true, // We might allow this in the future, but for now we're printing
+	"max-forwards":     true,
+	"record-route":     true,
+	"refer-to":         true, // rfc3515
+	"referred-by":      true, // rfc3892
+	"reply-to":         true,
+	"route":            true,
+	"supported":        true,
+	"to":               true, // We might allow this in the future, but for now we're printing
+	"via":              true,
+
+	// Single-letter shorthands, a.k.a compact form
+	"b": true, // Referred-By; rfc3892
+	"c": true, // Content-Type
+	"e": true, // Content-Encoding
+	"f": true, // From
+	"i": true, // Call-ID
+	"k": true, // Supported
+	"l": true, // Content-Length
+	"m": true, // Contact
+	"o": true, // Event; rfc3903
+	"r": true, // Refer-To; rfc3515
+	"t": true, // To
+	"u": true, // Allow-Events; rfc3903
+	"v": true, // Via
 }
 
 // Headers that must comply with name-addr specification per RFC 3261 Section 20.10
 // name-addr = [display-name] <addr-spec>
 // addr-spec = SIP-URI / SIPS-URI / absoluteURI
 var nameAddrHeaders = map[string]bool{
-	"From":                true,
-	"To":                  true,
-	"Contact":             true,
-	"Route":               true,
-	"Record-Route":        true,
-	"Reply-To":            true,
-	"P-Asserted-Identity": true, // RFC 3325 Section 9.1
+	"from":                true,
+	"to":                  true,
+	"contact":             true,
+	"route":               true,
+	"record-route":        true,
+	"reply-to":            true,
+	"p-asserted-identity": true, // RFC 3325 Section 9.1
 }
 
 // ValidateHeaderName validates a SIP header name per RFC 3261 Section 25.1
@@ -75,8 +119,14 @@ func ValidateHeaderName(name string) error {
 		return errors.New("header name too long (max 255 characters)")
 	}
 
-	if !reHeaderName.MatchString(name) {
+	lowerName := strings.ToLower(name)
+	if !reHeaderName.MatchString(lowerName) {
 		return errors.New("header name contains invalid characters")
+	}
+
+	// Convert to lowercase for case-insensitive comparison
+	if forbidden, exists := FrobiddenSipHeaderNames[lowerName]; exists && forbidden {
+		return fmt.Errorf("header name %s not supported", name)
 	}
 
 	return nil
@@ -97,7 +147,10 @@ func ValidateHeaderValue(name, value string) error {
 		return errors.New("header value contains invalid characters")
 	}
 
-	if _, exists := nameAddrHeaders[name]; exists {
+	// Convert to lowercase for case-insensitive comparison
+	lowerName := strings.ToLower(name)
+	if _, exists := nameAddrHeaders[lowerName]; exists && false {
+		// TODO: Disabled since all supported headers are forbidden, re-enable when we allow some
 		return validateNameAddrHeader(value)
 	}
 
@@ -111,12 +164,13 @@ func findAngleBrackets(value string) (int, int, error) {
 	end := -1
 
 	for i, r := range value {
-		if r == '<' {
+		switch r {
+		case '<':
 			if start != -1 {
 				return -1, -1, errors.New("multiple opening brackets")
 			}
 			start = i
-		} else if r == '>' {
+		case '>':
 			if end != -1 {
 				return -1, -1, errors.New("multiple closing brackets")
 			}
@@ -161,7 +215,7 @@ func validateNameAddrHeader(value string) error {
 
 	// This is a bare URI, and should comply with addr-spec, no special characters
 	if strings.ContainsAny(value, ";,? ") {
-		return errors.New("Bare URI with special characters must be enclosed in angle brackets")
+		return errors.New("bare URI with special characters")
 	}
 
 	return validateURI(value)
@@ -212,7 +266,7 @@ func validateURI(uri string) error {
 
 	// For now, only support SIP/SIPS and TEL URIs
 	// RFC 3261 allows other absolute URIs, but we'll be restrictive
-	return errors.New("URI must be sip:, sips:, or tel:")
+	return errors.New("URI scheme must match one of sip, sips, or tel")
 }
 
 // validateSIPURI validates a SIP or SIPS URI per RFC 3261 Section 19.1
@@ -223,7 +277,7 @@ func validateSIPURI(uri string) error {
 
 	// Check for SIP or SIPS scheme
 	if !strings.HasPrefix(uri, "sip:") && !strings.HasPrefix(uri, "sips:") {
-		return errors.New("SIP URI must start with sip: or sips:")
+		return errors.New("SIP URI scheme must match sip or sips")
 	}
 
 	// Basic format validation
@@ -293,7 +347,7 @@ func validateTELURI(uri string) error {
 	}
 
 	if !strings.HasPrefix(uri, "tel:") {
-		return errors.New("TEL URI must start with tel:")
+		return errors.New("TEL URI scheme must match tel")
 	}
 
 	// Basic validation - TEL URIs are more complex, this is simplified
