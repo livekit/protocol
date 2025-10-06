@@ -22,6 +22,9 @@ var (
 )
 
 func FromTime(t time.Time) time.Time {
+	if t.IsZero() {
+		return time.Time{}
+	}
 	return epoch.Add(t.Sub(epoch))
 }
 
