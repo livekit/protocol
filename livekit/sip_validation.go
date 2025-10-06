@@ -18,10 +18,44 @@ import (
 	"errors"
 	fmt "fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
 // RFC 3261 compliant validation functions for SIP headers and messages
+
+// validTokenCharacters is a lookup table for RFC 3261 Section 25.1 token characters
+// token = 1*(alphanum / "-" / "." / "!" / "%" / "*" / "_" / "+" / "`" / "'" / "~")
+// Also includes LWS characters (space, tab) for display-name validation
+var validTokenCharacters [256]bool
+
+func init() {
+	// Initialize the lookup table for valid token characters
+	// Alphanumeric characters
+	for r := '0'; r <= '9'; r++ {
+		validTokenCharacters[r] = true
+	}
+	for r := 'A'; r <= 'Z'; r++ {
+		validTokenCharacters[r] = true
+	}
+	for r := 'a'; r <= 'z'; r++ {
+		validTokenCharacters[r] = true
+	}
+
+	// RFC 3261 Section 25.1 - Token characters + LWS characters
+	validTokenCharacters['-'] = true
+	validTokenCharacters['.'] = true
+	validTokenCharacters['!'] = true
+	validTokenCharacters['%'] = true
+	validTokenCharacters['*'] = true
+	validTokenCharacters['_'] = true
+	validTokenCharacters['+'] = true
+	validTokenCharacters['`'] = true
+	validTokenCharacters['\''] = true
+	validTokenCharacters['~'] = true
+	validTokenCharacters[' '] = true
+	validTokenCharacters['\t'] = true
+}
 
 // RFC 3261 Section 25.1 - Header field names
 // token = 1*(alphanum / "-" / "." / "!" / "%" / "*" / "_" / "+" / "`" / "'" / "~")
@@ -229,18 +263,17 @@ func validateDisplayName(displayName string) error {
 
 	// Check if display name is quoted
 	if strings.HasPrefix(displayName, "\"") && strings.HasSuffix(displayName, "\"") {
-		// Quoted display name - basic validation
-		quoted := displayName[1 : len(displayName)-1]
-		// Check for proper escaping
-		if strings.Contains(quoted, "\"") && !strings.Contains(quoted, "\\\"") {
-			return errors.New("unquoted display name contains unescaped quotes")
+		// Quoted display name - use strconv.Unquote to validate proper escaping
+		_, err := strconv.Unquote(displayName)
+		if err != nil {
+			return fmt.Errorf("quoted display name contains invalid escape sequences: %v", err)
 		}
 		return nil
 	}
 
 	// Unquoted display name - must not contain special characters
 	for _, r := range displayName {
-		if r == '<' || r == '>' || r == '"' || r == '\\' || r == '&' {
+		if int(r) >= len(validTokenCharacters) || !validTokenCharacters[r] {
 			return errors.New("unquoted display name contains special characters")
 		}
 	}
