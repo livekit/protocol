@@ -96,6 +96,8 @@ message ICERestartWHIPResourceResponse {
 message WHIPRTCConnectionNotifyRequest {
   string participant_id = 1;
   bool closed = 2;
+  livekit.InputVideoState video = 3;
+  livekit.InputAudioState audio = 4;
 }
 
 message StartIngressRequest {
