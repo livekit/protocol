@@ -141,82 +141,17 @@ func (x *InternalAcceptWhatsAppCallRequest) GetRoomJoinInfo() *InternalRoomJoinI
 	return nil
 }
 
-type InternalRoomJoinInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	WsUrl         string                 `protobuf:"bytes,1,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
-	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
-	ProjectId     string                 `protobuf:"bytes,3,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *InternalRoomJoinInfo) Reset() {
-	*x = InternalRoomJoinInfo{}
-	mi := &file_rpc_connector_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *InternalRoomJoinInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*InternalRoomJoinInfo) ProtoMessage() {}
-
-func (x *InternalRoomJoinInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_connector_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use InternalRoomJoinInfo.ProtoReflect.Descriptor instead.
-func (*InternalRoomJoinInfo) Descriptor() ([]byte, []int) {
-	return file_rpc_connector_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *InternalRoomJoinInfo) GetWsUrl() string {
-	if x != nil {
-		return x.WsUrl
-	}
-	return ""
-}
-
-func (x *InternalRoomJoinInfo) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-func (x *InternalRoomJoinInfo) GetProjectId() string {
-	if x != nil {
-		return x.ProjectId
-	}
-	return ""
-}
-
 var File_rpc_connector_proto protoreflect.FileDescriptor
 
 const file_rpc_connector_proto_rawDesc = "" +
 	"\n" +
-	"\x13rpc/connector.proto\x12\x03rpc\x1a\roptions.proto\x1a livekit_connector_whatsapp.proto\"\x9e\x01\n" +
+	"\x13rpc/connector.proto\x12\x03rpc\x1a\roptions.proto\x1a livekit_connector_whatsapp.proto\x1a\x10rpc/common.proto\"\x9e\x01\n" +
 	"\x1fInternalDialWhatsAppCallRequest\x12:\n" +
 	"\arequest\x18\x01 \x01(\v2 .livekit.DialWhatsAppCallRequestR\arequest\x12?\n" +
 	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo\"\xa2\x01\n" +
 	"!InternalAcceptWhatsAppCallRequest\x12<\n" +
 	"\arequest\x18\x01 \x01(\v2\".livekit.AcceptWhatsAppCallRequestR\arequest\x12?\n" +
-	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo\"b\n" +
-	"\x14InternalRoomJoinInfo\x12\x15\n" +
-	"\x06ws_url\x18\x01 \x01(\tR\x05wsUrl\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\x12\x1d\n" +
-	"\n" +
-	"project_id\x18\x03 \x01(\tR\tprojectId2\xe3\x01\n" +
+	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo2\xe3\x01\n" +
 	"\x11ConnectorInternal\x12c\n" +
 	"\x10DialWhatsAppCall\x12$.rpc.InternalDialWhatsAppCallRequest\x1a!.livekit.DialWhatsAppCallResponse\"\x06\xb2\x89\x01\x02\x10\x01\x12i\n" +
 	"\x12AcceptWhatsAppCall\x12&.rpc.InternalAcceptWhatsAppCallRequest\x1a#.livekit.AcceptWhatsAppCallResponse\"\x06\xb2\x89\x01\x02\x10\x012\x98\x02\n" +
@@ -236,12 +171,12 @@ func file_rpc_connector_proto_rawDescGZIP() []byte {
 	return file_rpc_connector_proto_rawDescData
 }
 
-var file_rpc_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_rpc_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_rpc_connector_proto_goTypes = []any{
 	(*InternalDialWhatsAppCallRequest)(nil),        // 0: rpc.InternalDialWhatsAppCallRequest
 	(*InternalAcceptWhatsAppCallRequest)(nil),      // 1: rpc.InternalAcceptWhatsAppCallRequest
-	(*InternalRoomJoinInfo)(nil),                   // 2: rpc.InternalRoomJoinInfo
-	(*livekit.DialWhatsAppCallRequest)(nil),        // 3: livekit.DialWhatsAppCallRequest
+	(*livekit.DialWhatsAppCallRequest)(nil),        // 2: livekit.DialWhatsAppCallRequest
+	(*InternalRoomJoinInfo)(nil),                   // 3: rpc.InternalRoomJoinInfo
 	(*livekit.AcceptWhatsAppCallRequest)(nil),      // 4: livekit.AcceptWhatsAppCallRequest
 	(*livekit.ConnectWhatsAppCallRequest)(nil),     // 5: livekit.ConnectWhatsAppCallRequest
 	(*livekit.DisconnectWhatsAppCallRequest)(nil),  // 6: livekit.DisconnectWhatsAppCallRequest
@@ -251,10 +186,10 @@ var file_rpc_connector_proto_goTypes = []any{
 	(*livekit.DisconnectWhatsAppCallResponse)(nil), // 10: livekit.DisconnectWhatsAppCallResponse
 }
 var file_rpc_connector_proto_depIdxs = []int32{
-	3,  // 0: rpc.InternalDialWhatsAppCallRequest.request:type_name -> livekit.DialWhatsAppCallRequest
-	2,  // 1: rpc.InternalDialWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
+	2,  // 0: rpc.InternalDialWhatsAppCallRequest.request:type_name -> livekit.DialWhatsAppCallRequest
+	3,  // 1: rpc.InternalDialWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
 	4,  // 2: rpc.InternalAcceptWhatsAppCallRequest.request:type_name -> livekit.AcceptWhatsAppCallRequest
-	2,  // 3: rpc.InternalAcceptWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
+	3,  // 3: rpc.InternalAcceptWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
 	0,  // 4: rpc.ConnectorInternal.DialWhatsAppCall:input_type -> rpc.InternalDialWhatsAppCallRequest
 	1,  // 5: rpc.ConnectorInternal.AcceptWhatsAppCall:input_type -> rpc.InternalAcceptWhatsAppCallRequest
 	5,  // 6: rpc.ConnectorHandler.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
@@ -275,13 +210,14 @@ func file_rpc_connector_proto_init() {
 	if File_rpc_connector_proto != nil {
 		return
 	}
+	file_rpc_common_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_connector_proto_rawDesc), len(file_rpc_connector_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
