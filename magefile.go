@@ -80,6 +80,7 @@ func Proto() error {
 		"rpc/whip_signal.proto",
 		"rpc/sip.proto",
 		"rpc/connector.proto",
+		"rpc/common.proto",
 	}
 
 	fmt.Println("generating protobuf")

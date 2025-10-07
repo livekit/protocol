@@ -20,6 +20,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
 import "livekit_connector_whatsapp.proto";
+import "rpc/common.proto";
 
 service ConnectorInternal {
   rpc DialWhatsAppCall(InternalDialWhatsAppCallRequest) returns (livekit.DialWhatsAppCallResponse) {
@@ -61,10 +62,4 @@ message InternalDialWhatsAppCallRequest {
 message InternalAcceptWhatsAppCallRequest {
   livekit.AcceptWhatsAppCallRequest request = 1;
   InternalRoomJoinInfo room_join_info = 2;
-}
-
-message InternalRoomJoinInfo {
-  string ws_url = 1;
-  string token = 2;
-  string project_id = 3;
 }
