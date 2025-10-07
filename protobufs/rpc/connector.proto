@@ -23,12 +23,10 @@ import "livekit_connector.proto";
 
 service ConnectorInternal {
   rpc DialWhatsAppCall(InternalDialWhatsAppCallRequest) returns (livekit.DialWhatsAppCallResponse) {
-    option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   };
   
   rpc AcceptWhatsAppCall(InternalAcceptWhatsAppCallRequest) returns (livekit.AcceptWhatsAppCallResponse) {
-    option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   };
 }
