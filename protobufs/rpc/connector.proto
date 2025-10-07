@@ -19,7 +19,7 @@ package rpc;
 option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
-import "livekit_connector.proto";
+import "livekit_connector_whatsapp.proto";
 
 service ConnectorInternal {
   rpc DialWhatsAppCall(InternalDialWhatsAppCallRequest) returns (livekit.DialWhatsAppCallResponse) {

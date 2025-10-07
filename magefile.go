@@ -51,6 +51,7 @@ func Proto() error {
 		"livekit_cloud_agent.proto",
 		"livekit_phone_number.proto",
 		"livekit_connector.proto",
+		"livekit_connector_whatsapp.proto",
 	}
 	protoFiles := []string{
 		"livekit_agent.proto",
