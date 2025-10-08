@@ -700,21 +700,28 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	}
 
 	// Validate TransferTo URI format and ensure RFC compliance
-	var uriToValidate string
+	var innerURI string
 	if strings.HasPrefix(p.TransferTo, "<") && strings.HasSuffix(p.TransferTo, ">") {
 		// Extract inner URI for validation
-		uriToValidate = p.TransferTo[1 : len(p.TransferTo)-1]
+		innerURI = p.TransferTo[1 : len(p.TransferTo)-1]
 	} else {
-		uriToValidate = p.TransferTo
+		innerURI = p.TransferTo
 	}
 
-	if !strings.HasPrefix(uriToValidate, "sip:") && !strings.HasPrefix(uriToValidate, "tel:") {
+	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "tel:") {
+		// In theroy, we should not support tel-URIs here, but that's a bigger change
 		return errors.New("transfer_to must be a valid SIP or TEL URI (sip: or tel:)")
 	}
 
-	// Ensure RFC compliance by wrapping in angle brackets if not already wrapped
-	if !strings.HasPrefix(p.TransferTo, "<") || !strings.HasSuffix(p.TransferTo, ">") {
-		p.TransferTo = fmt.Sprintf("<%s>", p.TransferTo)
+	if strings.HasPrefix(innerURI, "sip:") {
+		// addr-spec = sip:...
+		// name-addr = [ display-name ] <addr-spec>
+		// Both name-addr and addr-spec are allowed in RFC3515 (section-2.1).
+		// However, name-addr is more premissive and widely-supported, so we convert.
+		p.TransferTo = fmt.Sprintf("<%s>", innerURI)
+	} else {
+		// Not explicitly allowed in spec, but supported by many SIP implementations.
+		p.TransferTo = innerURI
 	}
 
 	if err := validateHeaderKeys(p.Headers); err != nil {
