@@ -79,11 +79,3 @@ message ChatContext {
   repeated ChatItem items = 1;
 }
 
-
-message AgentSessionReport {
-  string job_id = 1;
-  string room_sid = 2;
-  string room = 3;
-  ChatContext chat_history = 4;
-  google.protobuf.Timestamp created_at = 5;
-}
