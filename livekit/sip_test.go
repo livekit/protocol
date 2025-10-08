@@ -387,7 +387,7 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 				TransferTo:          "tel:+15105550100",
 			},
 			expectError: false,
-			expectedURI: "<tel:+15105550100>",
+			expectedURI: "tel:+15105550100",
 		},
 		{
 			name: "valid sip URI with brackets",
@@ -407,7 +407,7 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 				TransferTo:          "<tel:+15105550100>",
 			},
 			expectError: false,
-			expectedURI: "<tel:+15105550100>",
+			expectedURI: "tel:+15105550100",
 		},
 		{
 			name: "invalid URI - http",
@@ -520,7 +520,7 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 				TransferTo:          "tel:+1234567890;ext=123",
 			},
 			expectError: false,
-			expectedURI: "<tel:+1234567890;ext=123>",
+			expectedURI: "tel:+1234567890;ext=123",
 		},
 		{
 			name: "tel URI with parameters",
@@ -530,7 +530,7 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 				TransferTo:          "tel:+1234567890;phone-context=example.com",
 			},
 			expectError: false,
-			expectedURI: "<tel:+1234567890;phone-context=example.com>",
+			expectedURI: "tel:+1234567890;phone-context=example.com",
 		},
 		{
 			name: "sip URI with headers",
