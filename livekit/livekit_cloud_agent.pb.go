@@ -254,16 +254,17 @@ func (x *CreateAgentRequest) GetRegions() []string {
 }
 
 type CreateAgentResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Version       string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	PresignedUrl  string                 `protobuf:"bytes,5,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
-	Tag           string                 `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
-	ServerRegions []string               `protobuf:"bytes,7,rep,name=server_regions,json=serverRegions,proto3" json:"server_regions,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	AgentId              string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	AgentName            string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Status               string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Version              string                 `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	PresignedUrl         string                 `protobuf:"bytes,5,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
+	Tag                  string                 `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
+	ServerRegions        []string               `protobuf:"bytes,7,rep,name=server_regions,json=serverRegions,proto3" json:"server_regions,omitempty"`
+	PresignedPostRequest *PresignedPostRequest  `protobuf:"bytes,8,opt,name=presigned_post_request,json=presignedPostRequest,proto3" json:"presigned_post_request,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *CreateAgentResponse) Reset() {
@@ -345,6 +346,65 @@ func (x *CreateAgentResponse) GetServerRegions() []string {
 	return nil
 }
 
+func (x *CreateAgentResponse) GetPresignedPostRequest() *PresignedPostRequest {
+	if x != nil {
+		return x.PresignedPostRequest
+	}
+	return nil
+}
+
+type PresignedPostRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	Values        map[string]string      `protobuf:"bytes,2,rep,name=values,proto3" json:"values,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PresignedPostRequest) Reset() {
+	*x = PresignedPostRequest{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PresignedPostRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PresignedPostRequest) ProtoMessage() {}
+
+func (x *PresignedPostRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PresignedPostRequest.ProtoReflect.Descriptor instead.
+func (*PresignedPostRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PresignedPostRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *PresignedPostRequest) GetValues() map[string]string {
+	if x != nil {
+		return x.Values
+	}
+	return nil
+}
+
 type AgentDeployment struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Region        string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
@@ -366,7 +426,7 @@ type AgentDeployment struct {
 
 func (x *AgentDeployment) Reset() {
 	*x = AgentDeployment{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[3]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -378,7 +438,7 @@ func (x *AgentDeployment) String() string {
 func (*AgentDeployment) ProtoMessage() {}
 
 func (x *AgentDeployment) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[3]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -391,7 +451,7 @@ func (x *AgentDeployment) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentDeployment.ProtoReflect.Descriptor instead.
 func (*AgentDeployment) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{3}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AgentDeployment) GetRegion() string {
@@ -499,7 +559,7 @@ type AgentInfo struct {
 
 func (x *AgentInfo) Reset() {
 	*x = AgentInfo{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[4]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -511,7 +571,7 @@ func (x *AgentInfo) String() string {
 func (*AgentInfo) ProtoMessage() {}
 
 func (x *AgentInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[4]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -524,7 +584,7 @@ func (x *AgentInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentInfo.ProtoReflect.Descriptor instead.
 func (*AgentInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{4}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AgentInfo) GetAgentId() string {
@@ -579,7 +639,7 @@ type ListAgentsRequest struct {
 
 func (x *ListAgentsRequest) Reset() {
 	*x = ListAgentsRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[5]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -591,7 +651,7 @@ func (x *ListAgentsRequest) String() string {
 func (*ListAgentsRequest) ProtoMessage() {}
 
 func (x *ListAgentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[5]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -604,7 +664,7 @@ func (x *ListAgentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentsRequest.ProtoReflect.Descriptor instead.
 func (*ListAgentsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{5}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListAgentsRequest) GetAgentName() string {
@@ -630,7 +690,7 @@ type ListAgentsResponse struct {
 
 func (x *ListAgentsResponse) Reset() {
 	*x = ListAgentsResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[6]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -642,7 +702,7 @@ func (x *ListAgentsResponse) String() string {
 func (*ListAgentsResponse) ProtoMessage() {}
 
 func (x *ListAgentsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[6]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -655,7 +715,7 @@ func (x *ListAgentsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentsResponse.ProtoReflect.Descriptor instead.
 func (*ListAgentsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{6}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListAgentsResponse) GetAgents() []*AgentInfo {
@@ -678,7 +738,7 @@ type AgentVersion struct {
 
 func (x *AgentVersion) Reset() {
 	*x = AgentVersion{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[7]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -690,7 +750,7 @@ func (x *AgentVersion) String() string {
 func (*AgentVersion) ProtoMessage() {}
 
 func (x *AgentVersion) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[7]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -703,7 +763,7 @@ func (x *AgentVersion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentVersion.ProtoReflect.Descriptor instead.
 func (*AgentVersion) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{7}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *AgentVersion) GetVersion() string {
@@ -751,7 +811,7 @@ type ListAgentVersionsRequest struct {
 
 func (x *ListAgentVersionsRequest) Reset() {
 	*x = ListAgentVersionsRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[8]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -763,7 +823,7 @@ func (x *ListAgentVersionsRequest) String() string {
 func (*ListAgentVersionsRequest) ProtoMessage() {}
 
 func (x *ListAgentVersionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[8]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -776,7 +836,7 @@ func (x *ListAgentVersionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentVersionsRequest.ProtoReflect.Descriptor instead.
 func (*ListAgentVersionsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{8}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListAgentVersionsRequest) GetAgentId() string {
@@ -802,7 +862,7 @@ type ListAgentVersionsResponse struct {
 
 func (x *ListAgentVersionsResponse) Reset() {
 	*x = ListAgentVersionsResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[9]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -814,7 +874,7 @@ func (x *ListAgentVersionsResponse) String() string {
 func (*ListAgentVersionsResponse) ProtoMessage() {}
 
 func (x *ListAgentVersionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[9]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -827,7 +887,7 @@ func (x *ListAgentVersionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentVersionsResponse.ProtoReflect.Descriptor instead.
 func (*ListAgentVersionsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{9}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListAgentVersionsResponse) GetVersions() []*AgentVersion {
@@ -856,7 +916,7 @@ type UpdateAgentRequest struct {
 
 func (x *UpdateAgentRequest) Reset() {
 	*x = UpdateAgentRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[10]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -868,7 +928,7 @@ func (x *UpdateAgentRequest) String() string {
 func (*UpdateAgentRequest) ProtoMessage() {}
 
 func (x *UpdateAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[10]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -881,7 +941,7 @@ func (x *UpdateAgentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAgentRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAgentRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{10}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateAgentRequest) GetAgentId() string {
@@ -947,7 +1007,7 @@ type UpdateAgentResponse struct {
 
 func (x *UpdateAgentResponse) Reset() {
 	*x = UpdateAgentResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[11]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -959,7 +1019,7 @@ func (x *UpdateAgentResponse) String() string {
 func (*UpdateAgentResponse) ProtoMessage() {}
 
 func (x *UpdateAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[11]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -972,7 +1032,7 @@ func (x *UpdateAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAgentResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAgentResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{11}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UpdateAgentResponse) GetSuccess() bool {
@@ -998,7 +1058,7 @@ type RestartAgentRequest struct {
 
 func (x *RestartAgentRequest) Reset() {
 	*x = RestartAgentRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[12]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1010,7 +1070,7 @@ func (x *RestartAgentRequest) String() string {
 func (*RestartAgentRequest) ProtoMessage() {}
 
 func (x *RestartAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[12]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1023,7 +1083,7 @@ func (x *RestartAgentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartAgentRequest.ProtoReflect.Descriptor instead.
 func (*RestartAgentRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{12}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *RestartAgentRequest) GetAgentId() string {
@@ -1043,7 +1103,7 @@ type RestartAgentResponse struct {
 
 func (x *RestartAgentResponse) Reset() {
 	*x = RestartAgentResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[13]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1055,7 +1115,7 @@ func (x *RestartAgentResponse) String() string {
 func (*RestartAgentResponse) ProtoMessage() {}
 
 func (x *RestartAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[13]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1068,7 +1128,7 @@ func (x *RestartAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartAgentResponse.ProtoReflect.Descriptor instead.
 func (*RestartAgentResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{13}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *RestartAgentResponse) GetSuccess() bool {
@@ -1103,7 +1163,7 @@ type DeployAgentRequest struct {
 
 func (x *DeployAgentRequest) Reset() {
 	*x = DeployAgentRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[14]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1115,7 +1175,7 @@ func (x *DeployAgentRequest) String() string {
 func (*DeployAgentRequest) ProtoMessage() {}
 
 func (x *DeployAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[14]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1128,7 +1188,7 @@ func (x *DeployAgentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeployAgentRequest.ProtoReflect.Descriptor instead.
 func (*DeployAgentRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{14}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *DeployAgentRequest) GetAgentId() string {
@@ -1178,19 +1238,20 @@ func (x *DeployAgentRequest) GetCpuReq() string {
 }
 
 type DeployAgentResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	AgentId       string                 `protobuf:"bytes,3,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	PresignedUrl  string                 `protobuf:"bytes,4,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
-	Tag           string                 `protobuf:"bytes,5,opt,name=tag,proto3" json:"tag,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	Success              bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message              string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	AgentId              string                 `protobuf:"bytes,3,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	PresignedUrl         string                 `protobuf:"bytes,4,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
+	Tag                  string                 `protobuf:"bytes,5,opt,name=tag,proto3" json:"tag,omitempty"`
+	PresignedPostRequest *PresignedPostRequest  `protobuf:"bytes,6,opt,name=presigned_post_request,json=presignedPostRequest,proto3" json:"presigned_post_request,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *DeployAgentResponse) Reset() {
 	*x = DeployAgentResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[15]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1202,7 +1263,7 @@ func (x *DeployAgentResponse) String() string {
 func (*DeployAgentResponse) ProtoMessage() {}
 
 func (x *DeployAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[15]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1215,7 +1276,7 @@ func (x *DeployAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeployAgentResponse.ProtoReflect.Descriptor instead.
 func (*DeployAgentResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{15}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *DeployAgentResponse) GetSuccess() bool {
@@ -1253,6 +1314,13 @@ func (x *DeployAgentResponse) GetTag() string {
 	return ""
 }
 
+func (x *DeployAgentResponse) GetPresignedPostRequest() *PresignedPostRequest {
+	if x != nil {
+		return x.PresignedPostRequest
+	}
+	return nil
+}
+
 type UpdateAgentSecretsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
@@ -1265,7 +1333,7 @@ type UpdateAgentSecretsRequest struct {
 
 func (x *UpdateAgentSecretsRequest) Reset() {
 	*x = UpdateAgentSecretsRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[16]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1277,7 +1345,7 @@ func (x *UpdateAgentSecretsRequest) String() string {
 func (*UpdateAgentSecretsRequest) ProtoMessage() {}
 
 func (x *UpdateAgentSecretsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[16]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1290,7 +1358,7 @@ func (x *UpdateAgentSecretsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAgentSecretsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAgentSecretsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{16}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *UpdateAgentSecretsRequest) GetAgentId() string {
@@ -1331,7 +1399,7 @@ type UpdateAgentSecretsResponse struct {
 
 func (x *UpdateAgentSecretsResponse) Reset() {
 	*x = UpdateAgentSecretsResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[17]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1343,7 +1411,7 @@ func (x *UpdateAgentSecretsResponse) String() string {
 func (*UpdateAgentSecretsResponse) ProtoMessage() {}
 
 func (x *UpdateAgentSecretsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[17]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1356,7 +1424,7 @@ func (x *UpdateAgentSecretsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAgentSecretsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAgentSecretsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{17}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *UpdateAgentSecretsResponse) GetSuccess() bool {
@@ -1384,7 +1452,7 @@ type RollbackAgentRequest struct {
 
 func (x *RollbackAgentRequest) Reset() {
 	*x = RollbackAgentRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[18]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1396,7 +1464,7 @@ func (x *RollbackAgentRequest) String() string {
 func (*RollbackAgentRequest) ProtoMessage() {}
 
 func (x *RollbackAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[18]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1409,7 +1477,7 @@ func (x *RollbackAgentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RollbackAgentRequest.ProtoReflect.Descriptor instead.
 func (*RollbackAgentRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{18}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *RollbackAgentRequest) GetAgentId() string {
@@ -1443,7 +1511,7 @@ type RollbackAgentResponse struct {
 
 func (x *RollbackAgentResponse) Reset() {
 	*x = RollbackAgentResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[19]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1455,7 +1523,7 @@ func (x *RollbackAgentResponse) String() string {
 func (*RollbackAgentResponse) ProtoMessage() {}
 
 func (x *RollbackAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[19]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1468,7 +1536,7 @@ func (x *RollbackAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RollbackAgentResponse.ProtoReflect.Descriptor instead.
 func (*RollbackAgentResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{19}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *RollbackAgentResponse) GetSuccess() bool {
@@ -1495,7 +1563,7 @@ type DeleteAgentRequest struct {
 
 func (x *DeleteAgentRequest) Reset() {
 	*x = DeleteAgentRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[20]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1507,7 +1575,7 @@ func (x *DeleteAgentRequest) String() string {
 func (*DeleteAgentRequest) ProtoMessage() {}
 
 func (x *DeleteAgentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[20]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1520,7 +1588,7 @@ func (x *DeleteAgentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAgentRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAgentRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{20}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *DeleteAgentRequest) GetAgentId() string {
@@ -1547,7 +1615,7 @@ type DeleteAgentResponse struct {
 
 func (x *DeleteAgentResponse) Reset() {
 	*x = DeleteAgentResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[21]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1559,7 +1627,7 @@ func (x *DeleteAgentResponse) String() string {
 func (*DeleteAgentResponse) ProtoMessage() {}
 
 func (x *DeleteAgentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[21]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1572,7 +1640,7 @@ func (x *DeleteAgentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAgentResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAgentResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{21}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *DeleteAgentResponse) GetSuccess() bool {
@@ -1599,7 +1667,7 @@ type ListAgentSecretsRequest struct {
 
 func (x *ListAgentSecretsRequest) Reset() {
 	*x = ListAgentSecretsRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[22]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1611,7 +1679,7 @@ func (x *ListAgentSecretsRequest) String() string {
 func (*ListAgentSecretsRequest) ProtoMessage() {}
 
 func (x *ListAgentSecretsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[22]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1624,7 +1692,7 @@ func (x *ListAgentSecretsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentSecretsRequest.ProtoReflect.Descriptor instead.
 func (*ListAgentSecretsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{22}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ListAgentSecretsRequest) GetAgentId() string {
@@ -1650,7 +1718,7 @@ type ListAgentSecretsResponse struct {
 
 func (x *ListAgentSecretsResponse) Reset() {
 	*x = ListAgentSecretsResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[23]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1662,7 +1730,7 @@ func (x *ListAgentSecretsResponse) String() string {
 func (*ListAgentSecretsResponse) ProtoMessage() {}
 
 func (x *ListAgentSecretsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[23]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1675,7 +1743,7 @@ func (x *ListAgentSecretsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAgentSecretsResponse.ProtoReflect.Descriptor instead.
 func (*ListAgentSecretsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{23}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ListAgentSecretsResponse) GetSecrets() []*AgentSecret {
@@ -1695,7 +1763,7 @@ type SettingsParam struct {
 
 func (x *SettingsParam) Reset() {
 	*x = SettingsParam{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[24]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1707,7 +1775,7 @@ func (x *SettingsParam) String() string {
 func (*SettingsParam) ProtoMessage() {}
 
 func (x *SettingsParam) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[24]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1720,7 +1788,7 @@ func (x *SettingsParam) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SettingsParam.ProtoReflect.Descriptor instead.
 func (*SettingsParam) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{24}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *SettingsParam) GetName() string {
@@ -1746,7 +1814,7 @@ type ClientSettingsResponse struct {
 
 func (x *ClientSettingsResponse) Reset() {
 	*x = ClientSettingsResponse{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[25]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1758,7 +1826,7 @@ func (x *ClientSettingsResponse) String() string {
 func (*ClientSettingsResponse) ProtoMessage() {}
 
 func (x *ClientSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[25]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1771,7 +1839,7 @@ func (x *ClientSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientSettingsResponse.ProtoReflect.Descriptor instead.
 func (*ClientSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{25}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *ClientSettingsResponse) GetParams() []*SettingsParam {
@@ -1789,7 +1857,7 @@ type ClientSettingsRequest struct {
 
 func (x *ClientSettingsRequest) Reset() {
 	*x = ClientSettingsRequest{}
-	mi := &file_livekit_cloud_agent_proto_msgTypes[26]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1801,7 +1869,7 @@ func (x *ClientSettingsRequest) String() string {
 func (*ClientSettingsRequest) ProtoMessage() {}
 
 func (x *ClientSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_cloud_agent_proto_msgTypes[26]
+	mi := &file_livekit_cloud_agent_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1814,7 +1882,7 @@ func (x *ClientSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientSettingsRequest.ProtoReflect.Descriptor instead.
 func (*ClientSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{26}
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{27}
 }
 
 var File_livekit_cloud_agent_proto protoreflect.FileDescriptor
@@ -1837,7 +1905,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
-	"\aregions\x18\x06 \x03(\tR\aregions\"\xdf\x01\n" +
+	"\aregions\x18\x06 \x03(\tR\aregions\"\xb4\x02\n" +
 	"\x13CreateAgentResponse\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
@@ -1846,7 +1914,14 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\aversion\x18\x04 \x01(\tR\aversion\x12#\n" +
 	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x06 \x01(\tR\x03tag\x12%\n" +
-	"\x0eserver_regions\x18\a \x03(\tR\rserverRegions\"\x81\x03\n" +
+	"\x0eserver_regions\x18\a \x03(\tR\rserverRegions\x12S\n" +
+	"\x16presigned_post_request\x18\b \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xa6\x01\n" +
+	"\x14PresignedPostRequest\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12A\n" +
+	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
+	"\vValuesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x81\x03\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\x12\x16\n" +
@@ -1920,13 +1995,14 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
-	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\x9b\x01\n" +
+	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\xf0\x01\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
 	"\bagent_id\x18\x03 \x01(\tR\aagentId\x12#\n" +
 	"\rpresigned_url\x18\x04 \x01(\tR\fpresignedUrl\x12\x10\n" +
-	"\x03tag\x18\x05 \x01(\tR\x03tag\"\xa3\x01\n" +
+	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
+	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xa3\x01\n" +
 	"\x19UpdateAgentSecretsRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
@@ -1995,84 +2071,89 @@ func file_livekit_cloud_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_cloud_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_livekit_cloud_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
+var file_livekit_cloud_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_livekit_cloud_agent_proto_goTypes = []any{
 	(AgentSecretKind)(0),               // 0: livekit.AgentSecretKind
 	(*AgentSecret)(nil),                // 1: livekit.AgentSecret
 	(*CreateAgentRequest)(nil),         // 2: livekit.CreateAgentRequest
 	(*CreateAgentResponse)(nil),        // 3: livekit.CreateAgentResponse
-	(*AgentDeployment)(nil),            // 4: livekit.AgentDeployment
-	(*AgentInfo)(nil),                  // 5: livekit.AgentInfo
-	(*ListAgentsRequest)(nil),          // 6: livekit.ListAgentsRequest
-	(*ListAgentsResponse)(nil),         // 7: livekit.ListAgentsResponse
-	(*AgentVersion)(nil),               // 8: livekit.AgentVersion
-	(*ListAgentVersionsRequest)(nil),   // 9: livekit.ListAgentVersionsRequest
-	(*ListAgentVersionsResponse)(nil),  // 10: livekit.ListAgentVersionsResponse
-	(*UpdateAgentRequest)(nil),         // 11: livekit.UpdateAgentRequest
-	(*UpdateAgentResponse)(nil),        // 12: livekit.UpdateAgentResponse
-	(*RestartAgentRequest)(nil),        // 13: livekit.RestartAgentRequest
-	(*RestartAgentResponse)(nil),       // 14: livekit.RestartAgentResponse
-	(*DeployAgentRequest)(nil),         // 15: livekit.DeployAgentRequest
-	(*DeployAgentResponse)(nil),        // 16: livekit.DeployAgentResponse
-	(*UpdateAgentSecretsRequest)(nil),  // 17: livekit.UpdateAgentSecretsRequest
-	(*UpdateAgentSecretsResponse)(nil), // 18: livekit.UpdateAgentSecretsResponse
-	(*RollbackAgentRequest)(nil),       // 19: livekit.RollbackAgentRequest
-	(*RollbackAgentResponse)(nil),      // 20: livekit.RollbackAgentResponse
-	(*DeleteAgentRequest)(nil),         // 21: livekit.DeleteAgentRequest
-	(*DeleteAgentResponse)(nil),        // 22: livekit.DeleteAgentResponse
-	(*ListAgentSecretsRequest)(nil),    // 23: livekit.ListAgentSecretsRequest
-	(*ListAgentSecretsResponse)(nil),   // 24: livekit.ListAgentSecretsResponse
-	(*SettingsParam)(nil),              // 25: livekit.SettingsParam
-	(*ClientSettingsResponse)(nil),     // 26: livekit.ClientSettingsResponse
-	(*ClientSettingsRequest)(nil),      // 27: livekit.ClientSettingsRequest
-	nil,                                // 28: livekit.AgentVersion.AttributesEntry
-	(*timestamppb.Timestamp)(nil),      // 29: google.protobuf.Timestamp
+	(*PresignedPostRequest)(nil),       // 4: livekit.PresignedPostRequest
+	(*AgentDeployment)(nil),            // 5: livekit.AgentDeployment
+	(*AgentInfo)(nil),                  // 6: livekit.AgentInfo
+	(*ListAgentsRequest)(nil),          // 7: livekit.ListAgentsRequest
+	(*ListAgentsResponse)(nil),         // 8: livekit.ListAgentsResponse
+	(*AgentVersion)(nil),               // 9: livekit.AgentVersion
+	(*ListAgentVersionsRequest)(nil),   // 10: livekit.ListAgentVersionsRequest
+	(*ListAgentVersionsResponse)(nil),  // 11: livekit.ListAgentVersionsResponse
+	(*UpdateAgentRequest)(nil),         // 12: livekit.UpdateAgentRequest
+	(*UpdateAgentResponse)(nil),        // 13: livekit.UpdateAgentResponse
+	(*RestartAgentRequest)(nil),        // 14: livekit.RestartAgentRequest
+	(*RestartAgentResponse)(nil),       // 15: livekit.RestartAgentResponse
+	(*DeployAgentRequest)(nil),         // 16: livekit.DeployAgentRequest
+	(*DeployAgentResponse)(nil),        // 17: livekit.DeployAgentResponse
+	(*UpdateAgentSecretsRequest)(nil),  // 18: livekit.UpdateAgentSecretsRequest
+	(*UpdateAgentSecretsResponse)(nil), // 19: livekit.UpdateAgentSecretsResponse
+	(*RollbackAgentRequest)(nil),       // 20: livekit.RollbackAgentRequest
+	(*RollbackAgentResponse)(nil),      // 21: livekit.RollbackAgentResponse
+	(*DeleteAgentRequest)(nil),         // 22: livekit.DeleteAgentRequest
+	(*DeleteAgentResponse)(nil),        // 23: livekit.DeleteAgentResponse
+	(*ListAgentSecretsRequest)(nil),    // 24: livekit.ListAgentSecretsRequest
+	(*ListAgentSecretsResponse)(nil),   // 25: livekit.ListAgentSecretsResponse
+	(*SettingsParam)(nil),              // 26: livekit.SettingsParam
+	(*ClientSettingsResponse)(nil),     // 27: livekit.ClientSettingsResponse
+	(*ClientSettingsRequest)(nil),      // 28: livekit.ClientSettingsRequest
+	nil,                                // 29: livekit.PresignedPostRequest.ValuesEntry
+	nil,                                // 30: livekit.AgentVersion.AttributesEntry
+	(*timestamppb.Timestamp)(nil),      // 31: google.protobuf.Timestamp
 }
 var file_livekit_cloud_agent_proto_depIdxs = []int32{
-	29, // 0: livekit.AgentSecret.created_at:type_name -> google.protobuf.Timestamp
-	29, // 1: livekit.AgentSecret.updated_at:type_name -> google.protobuf.Timestamp
+	31, // 0: livekit.AgentSecret.created_at:type_name -> google.protobuf.Timestamp
+	31, // 1: livekit.AgentSecret.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: livekit.AgentSecret.kind:type_name -> livekit.AgentSecretKind
 	1,  // 3: livekit.CreateAgentRequest.secrets:type_name -> livekit.AgentSecret
-	4,  // 4: livekit.AgentInfo.agent_deployments:type_name -> livekit.AgentDeployment
-	1,  // 5: livekit.AgentInfo.secrets:type_name -> livekit.AgentSecret
-	29, // 6: livekit.AgentInfo.deployed_at:type_name -> google.protobuf.Timestamp
-	5,  // 7: livekit.ListAgentsResponse.agents:type_name -> livekit.AgentInfo
-	29, // 8: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
-	29, // 9: livekit.AgentVersion.deployed_at:type_name -> google.protobuf.Timestamp
-	28, // 10: livekit.AgentVersion.attributes:type_name -> livekit.AgentVersion.AttributesEntry
-	8,  // 11: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
-	1,  // 12: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
-	1,  // 13: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
-	1,  // 14: livekit.UpdateAgentSecretsRequest.secrets:type_name -> livekit.AgentSecret
-	1,  // 15: livekit.ListAgentSecretsResponse.secrets:type_name -> livekit.AgentSecret
-	25, // 16: livekit.ClientSettingsResponse.params:type_name -> livekit.SettingsParam
-	2,  // 17: livekit.CloudAgent.CreateAgent:input_type -> livekit.CreateAgentRequest
-	6,  // 18: livekit.CloudAgent.ListAgents:input_type -> livekit.ListAgentsRequest
-	9,  // 19: livekit.CloudAgent.ListAgentVersions:input_type -> livekit.ListAgentVersionsRequest
-	23, // 20: livekit.CloudAgent.ListAgentSecrets:input_type -> livekit.ListAgentSecretsRequest
-	11, // 21: livekit.CloudAgent.UpdateAgent:input_type -> livekit.UpdateAgentRequest
-	13, // 22: livekit.CloudAgent.RestartAgent:input_type -> livekit.RestartAgentRequest
-	15, // 23: livekit.CloudAgent.DeployAgent:input_type -> livekit.DeployAgentRequest
-	17, // 24: livekit.CloudAgent.UpdateAgentSecrets:input_type -> livekit.UpdateAgentSecretsRequest
-	19, // 25: livekit.CloudAgent.RollbackAgent:input_type -> livekit.RollbackAgentRequest
-	21, // 26: livekit.CloudAgent.DeleteAgent:input_type -> livekit.DeleteAgentRequest
-	27, // 27: livekit.CloudAgent.GetClientSettings:input_type -> livekit.ClientSettingsRequest
-	3,  // 28: livekit.CloudAgent.CreateAgent:output_type -> livekit.CreateAgentResponse
-	7,  // 29: livekit.CloudAgent.ListAgents:output_type -> livekit.ListAgentsResponse
-	10, // 30: livekit.CloudAgent.ListAgentVersions:output_type -> livekit.ListAgentVersionsResponse
-	24, // 31: livekit.CloudAgent.ListAgentSecrets:output_type -> livekit.ListAgentSecretsResponse
-	12, // 32: livekit.CloudAgent.UpdateAgent:output_type -> livekit.UpdateAgentResponse
-	14, // 33: livekit.CloudAgent.RestartAgent:output_type -> livekit.RestartAgentResponse
-	16, // 34: livekit.CloudAgent.DeployAgent:output_type -> livekit.DeployAgentResponse
-	18, // 35: livekit.CloudAgent.UpdateAgentSecrets:output_type -> livekit.UpdateAgentSecretsResponse
-	20, // 36: livekit.CloudAgent.RollbackAgent:output_type -> livekit.RollbackAgentResponse
-	22, // 37: livekit.CloudAgent.DeleteAgent:output_type -> livekit.DeleteAgentResponse
-	26, // 38: livekit.CloudAgent.GetClientSettings:output_type -> livekit.ClientSettingsResponse
-	28, // [28:39] is the sub-list for method output_type
-	17, // [17:28] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	4,  // 4: livekit.CreateAgentResponse.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	29, // 5: livekit.PresignedPostRequest.values:type_name -> livekit.PresignedPostRequest.ValuesEntry
+	5,  // 6: livekit.AgentInfo.agent_deployments:type_name -> livekit.AgentDeployment
+	1,  // 7: livekit.AgentInfo.secrets:type_name -> livekit.AgentSecret
+	31, // 8: livekit.AgentInfo.deployed_at:type_name -> google.protobuf.Timestamp
+	6,  // 9: livekit.ListAgentsResponse.agents:type_name -> livekit.AgentInfo
+	31, // 10: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
+	31, // 11: livekit.AgentVersion.deployed_at:type_name -> google.protobuf.Timestamp
+	30, // 12: livekit.AgentVersion.attributes:type_name -> livekit.AgentVersion.AttributesEntry
+	9,  // 13: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
+	1,  // 14: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
+	1,  // 15: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
+	4,  // 16: livekit.DeployAgentResponse.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	1,  // 17: livekit.UpdateAgentSecretsRequest.secrets:type_name -> livekit.AgentSecret
+	1,  // 18: livekit.ListAgentSecretsResponse.secrets:type_name -> livekit.AgentSecret
+	26, // 19: livekit.ClientSettingsResponse.params:type_name -> livekit.SettingsParam
+	2,  // 20: livekit.CloudAgent.CreateAgent:input_type -> livekit.CreateAgentRequest
+	7,  // 21: livekit.CloudAgent.ListAgents:input_type -> livekit.ListAgentsRequest
+	10, // 22: livekit.CloudAgent.ListAgentVersions:input_type -> livekit.ListAgentVersionsRequest
+	24, // 23: livekit.CloudAgent.ListAgentSecrets:input_type -> livekit.ListAgentSecretsRequest
+	12, // 24: livekit.CloudAgent.UpdateAgent:input_type -> livekit.UpdateAgentRequest
+	14, // 25: livekit.CloudAgent.RestartAgent:input_type -> livekit.RestartAgentRequest
+	16, // 26: livekit.CloudAgent.DeployAgent:input_type -> livekit.DeployAgentRequest
+	18, // 27: livekit.CloudAgent.UpdateAgentSecrets:input_type -> livekit.UpdateAgentSecretsRequest
+	20, // 28: livekit.CloudAgent.RollbackAgent:input_type -> livekit.RollbackAgentRequest
+	22, // 29: livekit.CloudAgent.DeleteAgent:input_type -> livekit.DeleteAgentRequest
+	28, // 30: livekit.CloudAgent.GetClientSettings:input_type -> livekit.ClientSettingsRequest
+	3,  // 31: livekit.CloudAgent.CreateAgent:output_type -> livekit.CreateAgentResponse
+	8,  // 32: livekit.CloudAgent.ListAgents:output_type -> livekit.ListAgentsResponse
+	11, // 33: livekit.CloudAgent.ListAgentVersions:output_type -> livekit.ListAgentVersionsResponse
+	25, // 34: livekit.CloudAgent.ListAgentSecrets:output_type -> livekit.ListAgentSecretsResponse
+	13, // 35: livekit.CloudAgent.UpdateAgent:output_type -> livekit.UpdateAgentResponse
+	15, // 36: livekit.CloudAgent.RestartAgent:output_type -> livekit.RestartAgentResponse
+	17, // 37: livekit.CloudAgent.DeployAgent:output_type -> livekit.DeployAgentResponse
+	19, // 38: livekit.CloudAgent.UpdateAgentSecrets:output_type -> livekit.UpdateAgentSecretsResponse
+	21, // 39: livekit.CloudAgent.RollbackAgent:output_type -> livekit.RollbackAgentResponse
+	23, // 40: livekit.CloudAgent.DeleteAgent:output_type -> livekit.DeleteAgentResponse
+	27, // 41: livekit.CloudAgent.GetClientSettings:output_type -> livekit.ClientSettingsResponse
+	31, // [31:42] is the sub-list for method output_type
+	20, // [20:31] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_livekit_cloud_agent_proto_init() }
@@ -2086,7 +2167,7 @@ func file_livekit_cloud_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_cloud_agent_proto_rawDesc), len(file_livekit_cloud_agent_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   28,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
