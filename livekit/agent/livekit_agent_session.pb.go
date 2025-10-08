@@ -546,82 +546,6 @@ func (x *ChatContext) GetItems() []*ChatContext_ChatItem {
 	return nil
 }
 
-type AgentSessionReport struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
-	RoomSid       string                 `protobuf:"bytes,2,opt,name=room_sid,json=roomSid,proto3" json:"room_sid,omitempty"`
-	Room          string                 `protobuf:"bytes,3,opt,name=room,proto3" json:"room,omitempty"`
-	ChatHistory   *ChatContext           `protobuf:"bytes,4,opt,name=chat_history,json=chatHistory,proto3" json:"chat_history,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentSessionReport) Reset() {
-	*x = AgentSessionReport{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentSessionReport) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentSessionReport) ProtoMessage() {}
-
-func (x *AgentSessionReport) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentSessionReport.ProtoReflect.Descriptor instead.
-func (*AgentSessionReport) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *AgentSessionReport) GetJobId() string {
-	if x != nil {
-		return x.JobId
-	}
-	return ""
-}
-
-func (x *AgentSessionReport) GetRoomSid() string {
-	if x != nil {
-		return x.RoomSid
-	}
-	return ""
-}
-
-func (x *AgentSessionReport) GetRoom() string {
-	if x != nil {
-		return x.Room
-	}
-	return ""
-}
-
-func (x *AgentSessionReport) GetChatHistory() *ChatContext {
-	if x != nil {
-		return x.ChatHistory
-	}
-	return nil
-}
-
-func (x *AgentSessionReport) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
 type ChatMessage_ChatContent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Payload:
@@ -634,7 +558,7 @@ type ChatMessage_ChatContent struct {
 
 func (x *ChatMessage_ChatContent) Reset() {
 	*x = ChatMessage_ChatContent{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[7]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -646,7 +570,7 @@ func (x *ChatMessage_ChatContent) String() string {
 func (*ChatMessage_ChatContent) ProtoMessage() {}
 
 func (x *ChatMessage_ChatContent) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[7]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -703,7 +627,7 @@ type ChatContext_ChatItem struct {
 
 func (x *ChatContext_ChatItem) Reset() {
 	*x = ChatContext_ChatItem{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[9]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -715,7 +639,7 @@ func (x *ChatContext_ChatItem) String() string {
 func (*ChatContext_ChatItem) ProtoMessage() {}
 
 func (x *ChatContext_ChatItem) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[9]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -872,14 +796,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\rfunction_call\x18\x02 \x01(\v2\x1b.livekit.agent.FunctionCallH\x00R\ffunctionCall\x12U\n" +
 	"\x14function_call_output\x18\x03 \x01(\v2!.livekit.agent.FunctionCallOutputH\x00R\x12functionCallOutput\x12B\n" +
 	"\ragent_handoff\x18\x04 \x01(\v2\x1b.livekit.agent.AgentHandoffH\x00R\fagentHandoffB\x06\n" +
-	"\x04item\"\xd4\x01\n" +
-	"\x12AgentSessionReport\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x19\n" +
-	"\broom_sid\x18\x02 \x01(\tR\aroomSid\x12\x12\n" +
-	"\x04room\x18\x03 \x01(\tR\x04room\x12=\n" +
-	"\fchat_history\x18\x04 \x01(\v2\x1a.livekit.agent.ChatContextR\vchatHistory\x129\n" +
-	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt*>\n" +
+	"\x04item*>\n" +
 	"\bChatRole\x12\r\n" +
 	"\tDEVELOPER\x10\x00\x12\n" +
 	"\n" +
@@ -900,7 +817,7 @@ func file_agent_livekit_agent_session_proto_rawDescGZIP() []byte {
 }
 
 var file_agent_livekit_agent_session_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_agent_livekit_agent_session_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_agent_livekit_agent_session_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_agent_livekit_agent_session_proto_goTypes = []any{
 	(ChatRole)(0),                   // 0: livekit.agent.ChatRole
 	(*MetricsReport)(nil),           // 1: livekit.agent.MetricsReport
@@ -909,35 +826,32 @@ var file_agent_livekit_agent_session_proto_goTypes = []any{
 	(*FunctionCallOutput)(nil),      // 4: livekit.agent.FunctionCallOutput
 	(*AgentHandoff)(nil),            // 5: livekit.agent.AgentHandoff
 	(*ChatContext)(nil),             // 6: livekit.agent.ChatContext
-	(*AgentSessionReport)(nil),      // 7: livekit.agent.AgentSessionReport
-	(*ChatMessage_ChatContent)(nil), // 8: livekit.agent.ChatMessage.ChatContent
-	nil,                             // 9: livekit.agent.ChatMessage.ExtraEntry
-	(*ChatContext_ChatItem)(nil),    // 10: livekit.agent.ChatContext.ChatItem
-	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
+	(*ChatMessage_ChatContent)(nil), // 7: livekit.agent.ChatMessage.ChatContent
+	nil,                             // 8: livekit.agent.ChatMessage.ExtraEntry
+	(*ChatContext_ChatItem)(nil),    // 9: livekit.agent.ChatContext.ChatItem
+	(*timestamppb.Timestamp)(nil),   // 10: google.protobuf.Timestamp
 }
 var file_agent_livekit_agent_session_proto_depIdxs = []int32{
-	11, // 0: livekit.agent.MetricsReport.started_speaking_at:type_name -> google.protobuf.Timestamp
-	11, // 1: livekit.agent.MetricsReport.stopped_speaking_at:type_name -> google.protobuf.Timestamp
+	10, // 0: livekit.agent.MetricsReport.started_speaking_at:type_name -> google.protobuf.Timestamp
+	10, // 1: livekit.agent.MetricsReport.stopped_speaking_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: livekit.agent.ChatMessage.role:type_name -> livekit.agent.ChatRole
-	8,  // 3: livekit.agent.ChatMessage.content:type_name -> livekit.agent.ChatMessage.ChatContent
-	9,  // 4: livekit.agent.ChatMessage.extra:type_name -> livekit.agent.ChatMessage.ExtraEntry
+	7,  // 3: livekit.agent.ChatMessage.content:type_name -> livekit.agent.ChatMessage.ChatContent
+	8,  // 4: livekit.agent.ChatMessage.extra:type_name -> livekit.agent.ChatMessage.ExtraEntry
 	1,  // 5: livekit.agent.ChatMessage.metrics:type_name -> livekit.agent.MetricsReport
-	11, // 6: livekit.agent.ChatMessage.created_at:type_name -> google.protobuf.Timestamp
-	11, // 7: livekit.agent.FunctionCall.created_at:type_name -> google.protobuf.Timestamp
-	11, // 8: livekit.agent.FunctionCallOutput.created_at:type_name -> google.protobuf.Timestamp
-	11, // 9: livekit.agent.AgentHandoff.created_at:type_name -> google.protobuf.Timestamp
-	10, // 10: livekit.agent.ChatContext.items:type_name -> livekit.agent.ChatContext.ChatItem
-	6,  // 11: livekit.agent.AgentSessionReport.chat_history:type_name -> livekit.agent.ChatContext
-	11, // 12: livekit.agent.AgentSessionReport.created_at:type_name -> google.protobuf.Timestamp
-	2,  // 13: livekit.agent.ChatContext.ChatItem.message:type_name -> livekit.agent.ChatMessage
-	3,  // 14: livekit.agent.ChatContext.ChatItem.function_call:type_name -> livekit.agent.FunctionCall
-	4,  // 15: livekit.agent.ChatContext.ChatItem.function_call_output:type_name -> livekit.agent.FunctionCallOutput
-	5,  // 16: livekit.agent.ChatContext.ChatItem.agent_handoff:type_name -> livekit.agent.AgentHandoff
-	17, // [17:17] is the sub-list for method output_type
-	17, // [17:17] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	10, // 6: livekit.agent.ChatMessage.created_at:type_name -> google.protobuf.Timestamp
+	10, // 7: livekit.agent.FunctionCall.created_at:type_name -> google.protobuf.Timestamp
+	10, // 8: livekit.agent.FunctionCallOutput.created_at:type_name -> google.protobuf.Timestamp
+	10, // 9: livekit.agent.AgentHandoff.created_at:type_name -> google.protobuf.Timestamp
+	9,  // 10: livekit.agent.ChatContext.items:type_name -> livekit.agent.ChatContext.ChatItem
+	2,  // 11: livekit.agent.ChatContext.ChatItem.message:type_name -> livekit.agent.ChatMessage
+	3,  // 12: livekit.agent.ChatContext.ChatItem.function_call:type_name -> livekit.agent.FunctionCall
+	4,  // 13: livekit.agent.ChatContext.ChatItem.function_call_output:type_name -> livekit.agent.FunctionCallOutput
+	5,  // 14: livekit.agent.ChatContext.ChatItem.agent_handoff:type_name -> livekit.agent.AgentHandoff
+	15, // [15:15] is the sub-list for method output_type
+	15, // [15:15] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_session_proto_init() }
@@ -948,10 +862,10 @@ func file_agent_livekit_agent_session_proto_init() {
 	file_agent_livekit_agent_session_proto_msgTypes[0].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[1].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[4].OneofWrappers = []any{}
-	file_agent_livekit_agent_session_proto_msgTypes[7].OneofWrappers = []any{
+	file_agent_livekit_agent_session_proto_msgTypes[6].OneofWrappers = []any{
 		(*ChatMessage_ChatContent_Text)(nil),
 	}
-	file_agent_livekit_agent_session_proto_msgTypes[9].OneofWrappers = []any{
+	file_agent_livekit_agent_session_proto_msgTypes[8].OneofWrappers = []any{
 		(*ChatContext_ChatItem_Message)(nil),
 		(*ChatContext_ChatItem_FunctionCall)(nil),
 		(*ChatContext_ChatItem_FunctionCallOutput)(nil),
@@ -963,7 +877,7 @@ func file_agent_livekit_agent_session_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_session_proto_rawDesc), len(file_agent_livekit_agent_session_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   10,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
