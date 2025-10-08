@@ -709,7 +709,8 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	}
 
 	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "tel:") {
-		// In theroy, we should not support tel-URIs here, but that's a bigger change
+		// In theory the Refer-To header can receive the full name-addr.
+		// This can make this check inaccurate, but we want to limit to just SIP and TEL URIs.
 		return errors.New("transfer_to must be a valid SIP or TEL URI (sip: or tel:)")
 	}
 
@@ -720,7 +721,7 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 		// However, name-addr is more premissive and widely-supported, so we convert.
 		p.TransferTo = fmt.Sprintf("<%s>", innerURI)
 	} else {
-		// Not explicitly allowed in spec, but supported by many SIP implementations.
+		// tel: URIs are not explicitly allowed in spec, but are generally supported.
 		p.TransferTo = innerURI
 	}
 
