@@ -33,11 +33,6 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
-const (
-	numWorkers       = 10
-	defaultQueueSize = 100
-)
-
 type URLNotifierConfig struct {
 	NumWorkers int `yaml:"num_workers,omitempty"`
 	QueueSize  int `yaml:"queue_size,omitempty"`
@@ -121,6 +116,10 @@ func (n *URLNotifier) SetFilter(params FilterParams) {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 	n.filter.SetFilter(params)
+}
+
+func (n *URLNotifier) IsAllowed(event string) bool {
+	return n.filter.IsAllowed(event)
 }
 
 func (n *URLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {

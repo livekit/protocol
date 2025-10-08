@@ -5190,17 +5190,70 @@ func (*DataStream) Descriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{39}
 }
 
+type FilterParams struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IncludeEvents []string               `protobuf:"bytes,1,rep,name=include_events,json=includeEvents,proto3" json:"include_events,omitempty"`
+	ExcludeEvents []string               `protobuf:"bytes,2,rep,name=exclude_events,json=excludeEvents,proto3" json:"exclude_events,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FilterParams) Reset() {
+	*x = FilterParams{}
+	mi := &file_livekit_models_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FilterParams) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FilterParams) ProtoMessage() {}
+
+func (x *FilterParams) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_models_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FilterParams.ProtoReflect.Descriptor instead.
+func (*FilterParams) Descriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *FilterParams) GetIncludeEvents() []string {
+	if x != nil {
+		return x.IncludeEvents
+	}
+	return nil
+}
+
+func (x *FilterParams) GetExcludeEvents() []string {
+	if x != nil {
+		return x.ExcludeEvents
+	}
+	return nil
+}
+
 type WebhookConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
 	SigningKey    string                 `protobuf:"bytes,2,opt,name=signing_key,json=signingKey,proto3" json:"signing_key,omitempty"`
+	FilterParams  *FilterParams          `protobuf:"bytes,3,opt,name=filter_params,json=filterParams,proto3" json:"filter_params,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *WebhookConfig) Reset() {
 	*x = WebhookConfig{}
-	mi := &file_livekit_models_proto_msgTypes[40]
+	mi := &file_livekit_models_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5212,7 +5265,7 @@ func (x *WebhookConfig) String() string {
 func (*WebhookConfig) ProtoMessage() {}
 
 func (x *WebhookConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[40]
+	mi := &file_livekit_models_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5225,7 +5278,7 @@ func (x *WebhookConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebhookConfig.ProtoReflect.Descriptor instead.
 func (*WebhookConfig) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{40}
+	return file_livekit_models_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *WebhookConfig) GetUrl() string {
@@ -5242,6 +5295,13 @@ func (x *WebhookConfig) GetSigningKey() string {
 	return ""
 }
 
+func (x *WebhookConfig) GetFilterParams() *FilterParams {
+	if x != nil {
+		return x.FilterParams
+	}
+	return nil
+}
+
 type SubscribedAudioCodec struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Codec         string                 `protobuf:"bytes,1,opt,name=codec,proto3" json:"codec,omitempty"`
@@ -5252,7 +5312,7 @@ type SubscribedAudioCodec struct {
 
 func (x *SubscribedAudioCodec) Reset() {
 	*x = SubscribedAudioCodec{}
-	mi := &file_livekit_models_proto_msgTypes[41]
+	mi := &file_livekit_models_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5264,7 +5324,7 @@ func (x *SubscribedAudioCodec) String() string {
 func (*SubscribedAudioCodec) ProtoMessage() {}
 
 func (x *SubscribedAudioCodec) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[41]
+	mi := &file_livekit_models_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5277,7 +5337,7 @@ func (x *SubscribedAudioCodec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscribedAudioCodec.ProtoReflect.Descriptor instead.
 func (*SubscribedAudioCodec) Descriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{41}
+	return file_livekit_models_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *SubscribedAudioCodec) GetCodec() string {
@@ -5308,7 +5368,7 @@ type DataStream_TextHeader struct {
 
 func (x *DataStream_TextHeader) Reset() {
 	*x = DataStream_TextHeader{}
-	mi := &file_livekit_models_proto_msgTypes[44]
+	mi := &file_livekit_models_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5320,7 +5380,7 @@ func (x *DataStream_TextHeader) String() string {
 func (*DataStream_TextHeader) ProtoMessage() {}
 
 func (x *DataStream_TextHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[44]
+	mi := &file_livekit_models_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5381,7 +5441,7 @@ type DataStream_ByteHeader struct {
 
 func (x *DataStream_ByteHeader) Reset() {
 	*x = DataStream_ByteHeader{}
-	mi := &file_livekit_models_proto_msgTypes[45]
+	mi := &file_livekit_models_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5393,7 +5453,7 @@ func (x *DataStream_ByteHeader) String() string {
 func (*DataStream_ByteHeader) ProtoMessage() {}
 
 func (x *DataStream_ByteHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[45]
+	mi := &file_livekit_models_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5440,7 +5500,7 @@ type DataStream_Header struct {
 
 func (x *DataStream_Header) Reset() {
 	*x = DataStream_Header{}
-	mi := &file_livekit_models_proto_msgTypes[46]
+	mi := &file_livekit_models_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5452,7 +5512,7 @@ func (x *DataStream_Header) String() string {
 func (*DataStream_Header) ProtoMessage() {}
 
 func (x *DataStream_Header) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[46]
+	mi := &file_livekit_models_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5573,7 +5633,7 @@ type DataStream_Chunk struct {
 
 func (x *DataStream_Chunk) Reset() {
 	*x = DataStream_Chunk{}
-	mi := &file_livekit_models_proto_msgTypes[47]
+	mi := &file_livekit_models_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5585,7 +5645,7 @@ func (x *DataStream_Chunk) String() string {
 func (*DataStream_Chunk) ProtoMessage() {}
 
 func (x *DataStream_Chunk) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[47]
+	mi := &file_livekit_models_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5648,7 +5708,7 @@ type DataStream_Trailer struct {
 
 func (x *DataStream_Trailer) Reset() {
 	*x = DataStream_Trailer{}
-	mi := &file_livekit_models_proto_msgTypes[48]
+	mi := &file_livekit_models_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5660,7 +5720,7 @@ func (x *DataStream_Trailer) String() string {
 func (*DataStream_Trailer) ProtoMessage() {}
 
 func (x *DataStream_Trailer) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_models_proto_msgTypes[48]
+	mi := &file_livekit_models_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6188,11 +6248,15 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06UPDATE\x10\x01\x12\n" +
 	"\n" +
 	"\x06DELETE\x10\x02\x12\f\n" +
-	"\bREACTION\x10\x03\"B\n" +
+	"\bREACTION\x10\x03\"\\\n" +
+	"\fFilterParams\x12%\n" +
+	"\x0einclude_events\x18\x01 \x03(\tR\rincludeEvents\x12%\n" +
+	"\x0eexclude_events\x18\x02 \x03(\tR\rexcludeEvents\"~\n" +
 	"\rWebhookConfig\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1f\n" +
 	"\vsigning_key\x18\x02 \x01(\tR\n" +
-	"signingKey\"F\n" +
+	"signingKey\x12:\n" +
+	"\rfilter_params\x18\x03 \x01(\v2\x15.livekit.FilterParamsR\ffilterParams\"F\n" +
 	"\x14SubscribedAudioCodec\x12\x14\n" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x18\n" +
 	"\aenabled\x18\x02 \x01(\bR\aenabled*;\n" +
@@ -6301,7 +6365,7 @@ func file_livekit_models_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_models_proto_enumTypes = make([]protoimpl.EnumInfo, 22)
-var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 51)
+var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 52)
 var file_livekit_models_proto_goTypes = []any{
 	(AudioCodec)(0),                 // 0: livekit.AudioCodec
 	(VideoCodec)(0),                 // 1: livekit.VideoCodec
@@ -6365,19 +6429,20 @@ var file_livekit_models_proto_goTypes = []any{
 	(*VP8MungerState)(nil),          // 59: livekit.VP8MungerState
 	(*TimedVersion)(nil),            // 60: livekit.TimedVersion
 	(*DataStream)(nil),              // 61: livekit.DataStream
-	(*WebhookConfig)(nil),           // 62: livekit.WebhookConfig
-	(*SubscribedAudioCodec)(nil),    // 63: livekit.SubscribedAudioCodec
-	nil,                             // 64: livekit.ParticipantInfo.AttributesEntry
-	nil,                             // 65: livekit.RTPStats.GapHistogramEntry
-	(*DataStream_TextHeader)(nil),   // 66: livekit.DataStream.TextHeader
-	(*DataStream_ByteHeader)(nil),   // 67: livekit.DataStream.ByteHeader
-	(*DataStream_Header)(nil),       // 68: livekit.DataStream.Header
-	(*DataStream_Chunk)(nil),        // 69: livekit.DataStream.Chunk
-	(*DataStream_Trailer)(nil),      // 70: livekit.DataStream.Trailer
-	nil,                             // 71: livekit.DataStream.Header.AttributesEntry
-	nil,                             // 72: livekit.DataStream.Trailer.AttributesEntry
-	(*MetricsBatch)(nil),            // 73: livekit.MetricsBatch
-	(*timestamppb.Timestamp)(nil),   // 74: google.protobuf.Timestamp
+	(*FilterParams)(nil),            // 62: livekit.FilterParams
+	(*WebhookConfig)(nil),           // 63: livekit.WebhookConfig
+	(*SubscribedAudioCodec)(nil),    // 64: livekit.SubscribedAudioCodec
+	nil,                             // 65: livekit.ParticipantInfo.AttributesEntry
+	nil,                             // 66: livekit.RTPStats.GapHistogramEntry
+	(*DataStream_TextHeader)(nil),   // 67: livekit.DataStream.TextHeader
+	(*DataStream_ByteHeader)(nil),   // 68: livekit.DataStream.ByteHeader
+	(*DataStream_Header)(nil),       // 69: livekit.DataStream.Header
+	(*DataStream_Chunk)(nil),        // 70: livekit.DataStream.Chunk
+	(*DataStream_Trailer)(nil),      // 71: livekit.DataStream.Trailer
+	nil,                             // 72: livekit.DataStream.Header.AttributesEntry
+	nil,                             // 73: livekit.DataStream.Trailer.AttributesEntry
+	(*MetricsBatch)(nil),            // 74: livekit.MetricsBatch
+	(*timestamppb.Timestamp)(nil),   // 75: google.protobuf.Timestamp
 }
 var file_livekit_models_proto_depIdxs = []int32{
 	26, // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
@@ -6387,7 +6452,7 @@ var file_livekit_models_proto_depIdxs = []int32{
 	32, // 4: livekit.ParticipantInfo.tracks:type_name -> livekit.TrackInfo
 	28, // 5: livekit.ParticipantInfo.permission:type_name -> livekit.ParticipantPermission
 	14, // 6: livekit.ParticipantInfo.kind:type_name -> livekit.ParticipantInfo.Kind
-	64, // 7: livekit.ParticipantInfo.attributes:type_name -> livekit.ParticipantInfo.AttributesEntry
+	65, // 7: livekit.ParticipantInfo.attributes:type_name -> livekit.ParticipantInfo.AttributesEntry
 	9,  // 8: livekit.ParticipantInfo.disconnect_reason:type_name -> livekit.DisconnectReason
 	15, // 9: livekit.ParticipantInfo.kind_details:type_name -> livekit.ParticipantInfo.KindDetail
 	33, // 10: livekit.SimulcastCodecInfo.layers:type_name -> livekit.VideoLayer
@@ -6406,14 +6471,14 @@ var file_livekit_models_proto_depIdxs = []int32{
 	37, // 23: livekit.DataPacket.speaker:type_name -> livekit.ActiveSpeakerUpdate
 	40, // 24: livekit.DataPacket.sip_dtmf:type_name -> livekit.SipDTMF
 	41, // 25: livekit.DataPacket.transcription:type_name -> livekit.Transcription
-	73, // 26: livekit.DataPacket.metrics:type_name -> livekit.MetricsBatch
+	74, // 26: livekit.DataPacket.metrics:type_name -> livekit.MetricsBatch
 	43, // 27: livekit.DataPacket.chat_message:type_name -> livekit.ChatMessage
 	44, // 28: livekit.DataPacket.rpc_request:type_name -> livekit.RpcRequest
 	45, // 29: livekit.DataPacket.rpc_ack:type_name -> livekit.RpcAck
 	46, // 30: livekit.DataPacket.rpc_response:type_name -> livekit.RpcResponse
-	68, // 31: livekit.DataPacket.stream_header:type_name -> livekit.DataStream.Header
-	69, // 32: livekit.DataPacket.stream_chunk:type_name -> livekit.DataStream.Chunk
-	70, // 33: livekit.DataPacket.stream_trailer:type_name -> livekit.DataStream.Trailer
+	69, // 31: livekit.DataPacket.stream_header:type_name -> livekit.DataStream.Header
+	70, // 32: livekit.DataPacket.stream_chunk:type_name -> livekit.DataStream.Chunk
+	71, // 33: livekit.DataPacket.stream_trailer:type_name -> livekit.DataStream.Trailer
 	35, // 34: livekit.DataPacket.encrypted_packet:type_name -> livekit.EncryptedPacket
 	16, // 35: livekit.EncryptedPacket.encryption_type:type_name -> livekit.Encryption.Type
 	39, // 36: livekit.EncryptedPacketPayload.user:type_name -> livekit.UserPacket
@@ -6421,9 +6486,9 @@ var file_livekit_models_proto_depIdxs = []int32{
 	44, // 38: livekit.EncryptedPacketPayload.rpc_request:type_name -> livekit.RpcRequest
 	45, // 39: livekit.EncryptedPacketPayload.rpc_ack:type_name -> livekit.RpcAck
 	46, // 40: livekit.EncryptedPacketPayload.rpc_response:type_name -> livekit.RpcResponse
-	68, // 41: livekit.EncryptedPacketPayload.stream_header:type_name -> livekit.DataStream.Header
-	69, // 42: livekit.EncryptedPacketPayload.stream_chunk:type_name -> livekit.DataStream.Chunk
-	70, // 43: livekit.EncryptedPacketPayload.stream_trailer:type_name -> livekit.DataStream.Trailer
+	69, // 41: livekit.EncryptedPacketPayload.stream_header:type_name -> livekit.DataStream.Header
+	70, // 42: livekit.EncryptedPacketPayload.stream_chunk:type_name -> livekit.DataStream.Chunk
+	71, // 43: livekit.EncryptedPacketPayload.stream_trailer:type_name -> livekit.DataStream.Trailer
 	38, // 44: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
 	42, // 45: livekit.Transcription.segments:type_name -> livekit.TranscriptionSegment
 	47, // 46: livekit.RpcResponse.error:type_name -> livekit.RpcError
@@ -6437,15 +6502,15 @@ var file_livekit_models_proto_depIdxs = []int32{
 	8,  // 54: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
 	26, // 55: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
 	26, // 56: livekit.DisabledCodecs.publish:type_name -> livekit.Codec
-	74, // 57: livekit.RTPDrift.start_time:type_name -> google.protobuf.Timestamp
-	74, // 58: livekit.RTPDrift.end_time:type_name -> google.protobuf.Timestamp
-	74, // 59: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
-	74, // 60: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
-	65, // 61: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
-	74, // 62: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
-	74, // 63: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
-	74, // 64: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
-	74, // 65: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
+	75, // 57: livekit.RTPDrift.start_time:type_name -> google.protobuf.Timestamp
+	75, // 58: livekit.RTPDrift.end_time:type_name -> google.protobuf.Timestamp
+	75, // 59: livekit.RTPStats.start_time:type_name -> google.protobuf.Timestamp
+	75, // 60: livekit.RTPStats.end_time:type_name -> google.protobuf.Timestamp
+	66, // 61: livekit.RTPStats.gap_histogram:type_name -> livekit.RTPStats.GapHistogramEntry
+	75, // 62: livekit.RTPStats.last_pli:type_name -> google.protobuf.Timestamp
+	75, // 63: livekit.RTPStats.last_fir:type_name -> google.protobuf.Timestamp
+	75, // 64: livekit.RTPStats.last_key_frame:type_name -> google.protobuf.Timestamp
+	75, // 65: livekit.RTPStats.last_layer_lock_pli:type_name -> google.protobuf.Timestamp
 	54, // 66: livekit.RTPStats.packet_drift:type_name -> livekit.RTPDrift
 	54, // 67: livekit.RTPStats.ntp_report_drift:type_name -> livekit.RTPDrift
 	54, // 68: livekit.RTPStats.rebased_report_drift:type_name -> livekit.RTPDrift
@@ -6453,17 +6518,18 @@ var file_livekit_models_proto_depIdxs = []int32{
 	58, // 70: livekit.RTPForwarderState.rtp_munger:type_name -> livekit.RTPMungerState
 	59, // 71: livekit.RTPForwarderState.vp8_munger:type_name -> livekit.VP8MungerState
 	56, // 72: livekit.RTPForwarderState.sender_report_state:type_name -> livekit.RTCPSenderReportState
-	21, // 73: livekit.DataStream.TextHeader.operation_type:type_name -> livekit.DataStream.OperationType
-	16, // 74: livekit.DataStream.Header.encryption_type:type_name -> livekit.Encryption.Type
-	71, // 75: livekit.DataStream.Header.attributes:type_name -> livekit.DataStream.Header.AttributesEntry
-	66, // 76: livekit.DataStream.Header.text_header:type_name -> livekit.DataStream.TextHeader
-	67, // 77: livekit.DataStream.Header.byte_header:type_name -> livekit.DataStream.ByteHeader
-	72, // 78: livekit.DataStream.Trailer.attributes:type_name -> livekit.DataStream.Trailer.AttributesEntry
-	79, // [79:79] is the sub-list for method output_type
-	79, // [79:79] is the sub-list for method input_type
-	79, // [79:79] is the sub-list for extension type_name
-	79, // [79:79] is the sub-list for extension extendee
-	0,  // [0:79] is the sub-list for field type_name
+	62, // 73: livekit.WebhookConfig.filter_params:type_name -> livekit.FilterParams
+	21, // 74: livekit.DataStream.TextHeader.operation_type:type_name -> livekit.DataStream.OperationType
+	16, // 75: livekit.DataStream.Header.encryption_type:type_name -> livekit.Encryption.Type
+	72, // 76: livekit.DataStream.Header.attributes:type_name -> livekit.DataStream.Header.AttributesEntry
+	67, // 77: livekit.DataStream.Header.text_header:type_name -> livekit.DataStream.TextHeader
+	68, // 78: livekit.DataStream.Header.byte_header:type_name -> livekit.DataStream.ByteHeader
+	73, // 79: livekit.DataStream.Trailer.attributes:type_name -> livekit.DataStream.Trailer.AttributesEntry
+	80, // [80:80] is the sub-list for method output_type
+	80, // [80:80] is the sub-list for method input_type
+	80, // [80:80] is the sub-list for extension type_name
+	80, // [80:80] is the sub-list for extension extendee
+	0,  // [0:80] is the sub-list for field type_name
 }
 
 func init() { file_livekit_models_proto_init() }
@@ -6506,18 +6572,18 @@ func file_livekit_models_proto_init() {
 	file_livekit_models_proto_msgTypes[35].OneofWrappers = []any{
 		(*RTPForwarderState_Vp8Munger)(nil),
 	}
-	file_livekit_models_proto_msgTypes[46].OneofWrappers = []any{
+	file_livekit_models_proto_msgTypes[47].OneofWrappers = []any{
 		(*DataStream_Header_TextHeader)(nil),
 		(*DataStream_Header_ByteHeader)(nil),
 	}
-	file_livekit_models_proto_msgTypes[47].OneofWrappers = []any{}
+	file_livekit_models_proto_msgTypes[48].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_models_proto_rawDesc), len(file_livekit_models_proto_rawDesc)),
 			NumEnums:      22,
-			NumMessages:   51,
+			NumMessages:   52,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
