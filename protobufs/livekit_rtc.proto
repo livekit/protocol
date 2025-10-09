@@ -115,6 +115,8 @@ message SignalResponse {
     MediaSectionsRequirement media_sections_requirement = 25;
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
+    // Sent in response to `AddDataTrackRequest`.
+    DataTrackPublishedResponse data_track_published = 27;
   }
 }
 
@@ -174,6 +176,25 @@ message AddDataTrackRequest {
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
+}
+
+message DataTrackPublishedResponse {
+
+  uint32 request_id = 1;
+
+  oneof result {
+    // Track was successfully published, track info is provided.
+    DataTrackInfo ok = 2;
+    // Track could not be published, reason is provided.
+    Error error = 3;
+  }
+
+  enum Error {
+    UNKNOWN           = 0; // Unknown reason.
+    INVALID_NAME      = 1; // Name is invalid.
+    INVALID_MIME_TYPE = 2; // MIME type is invalid.
+    NAME_TAKEN        = 3; // Publisher already has a data track published with the same name.
+  }
 }
 
 message TrickleRequest {
