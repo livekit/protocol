@@ -174,10 +174,6 @@ message AddDataTrackRequest {
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
-
-  // Nominal rate in frames per second (FPS) the publisher intends to publish frames at.
-  // If set, this establishes an upper bound on rate at which frames can be published.
-  optional uint32 nominal_fps = 4;
 }
 
 message TrickleRequest {
