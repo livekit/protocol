@@ -24,37 +24,125 @@ import (
 
 // RFC 3261 compliant validation functions for SIP headers and messages
 
-// validTokenCharacters is a lookup table for RFC 3261 Section 25.1 token characters
-// token = 1*(alphanum / "-" / "." / "!" / "%" / "*" / "_" / "+" / "`" / "'" / "~")
-// Also includes LWS characters (space, tab) for display-name validation
-var validTokenCharacters [256]bool
+type AllowedCharacters struct {
+	ascii [127]bool
+	utf8  bool
+}
+
+func NewAllowedCharacters() *AllowedCharacters {
+	return &AllowedCharacters{}
+}
+
+func (a *AllowedCharacters) AddUTF8() error {
+	a.utf8 = true
+	return nil
+}
+
+func (a *AllowedCharacters) AddNumbers() error {
+	for r := '0'; r <= '9'; r++ {
+		a.ascii[r] = true
+	}
+	return nil
+}
+
+func (a *AllowedCharacters) AddLowercaseASCII() error {
+	for r := 'a'; r <= 'z'; r++ {
+		a.ascii[r] = true
+	}
+	return nil
+}
+
+func (a *AllowedCharacters) AddUppercaseASCII() error {
+	for r := 'A'; r <= 'Z'; r++ {
+		a.ascii[r] = true
+	}
+	return nil
+}
+
+func (a *AllowedCharacters) AddPrintableLienarASCII() {
+	// Anything between 0x20 and 0x7E
+	for i := 0x20; i <= 0x7E; i++ {
+		a.ascii[i] = true
+	}
+}
+
+func (a *AllowedCharacters) Add(chars string) error {
+	for _, char := range chars {
+		if int(char) >= len(a.ascii) {
+			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
+		}
+		a.ascii[char] = true
+	}
+	return nil
+}
+
+func (a *AllowedCharacters) Remove(chars string) error {
+	for _, char := range chars {
+		if int(char) >= len(a.ascii) {
+			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
+		}
+		a.ascii[char] = false
+	}
+	return nil
+}
+
+func (a *AllowedCharacters) Copy() *AllowedCharacters {
+	return &AllowedCharacters{
+		ascii: a.ascii,
+		utf8:  a.utf8,
+	}
+}
+
+func (a *AllowedCharacters) Validate(target string) error {
+	for _, char := range target {
+		if int(char) >= len(a.ascii) && !a.utf8 {
+			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
+		}
+		if !a.ascii[char] {
+			return fmt.Errorf("char %d not allowed", char)
+		}
+	}
+	return nil
+}
+
+var tokenCharacters *AllowedCharacters
+var displayNameCharacters *AllowedCharacters
+var headerValuesCharacters *AllowedCharacters
 
 func init() {
-	// Initialize the lookup table for valid token characters
-	// Alphanumeric characters
-	for r := '0'; r <= '9'; r++ {
-		validTokenCharacters[r] = true
-	}
-	for r := 'A'; r <= 'Z'; r++ {
-		validTokenCharacters[r] = true
-	}
-	for r := 'a'; r <= 'z'; r++ {
-		validTokenCharacters[r] = true
-	}
+	// Per RFC 3261 Section 25.1
+	//	SIP-message    =  Request / Response
+	//	Request        =  Request-Line	*( message-header )	CRLF	[ message-body ]
+	//	Response       =  Status-Line	*( message-header )	CRLF	[ message-body ]
+	//	Request-Line   =  Method SP Request-URI SP SIP-Version CRLF
+	//	Method         =  (CAPITAL ASCII)
+	//	Request-URI    =  SIP-URI / SIPS-URI / absoluteURI
+	//	SIP-Version    =  "SIP" "/" 1*DIGIT "." 1*DIGIT (CAPITAL ASCII, DIGITS, "/.")
+	//	Status-Line    =  SIP-Version SP Status-Code SP Reason-Phrase CRLF
+	//	Status-Code    =  (Alphanum + "-")
+	//	Reason-Phrase  =  (Basically whatever...)
+	//	extension-header =  header-name (token) ":" header-value (Basically whatever...)
 
-	// RFC 3261 Section 25.1 - Token characters + LWS characters
-	validTokenCharacters['-'] = true
-	validTokenCharacters['.'] = true
-	validTokenCharacters['!'] = true
-	validTokenCharacters['%'] = true
-	validTokenCharacters['*'] = true
-	validTokenCharacters['_'] = true
-	validTokenCharacters['+'] = true
-	validTokenCharacters['`'] = true
-	validTokenCharacters['\''] = true
-	validTokenCharacters['~'] = true
-	validTokenCharacters[' '] = true
-	validTokenCharacters['\t'] = true
+	// URIs
+	//	SIP-URI        =  "sip:" [ userinfo ] hostport uri-parameters [ headers ]
+	//	SIPS-URI       =  "sips:" [ userinfo ] hostport uri-parameters [ headers ]
+
+	// One specific header form we care about:
+	//	name-addr      =  [ display-name ] LAQUOT addr-spec RAQUOT
+	//	display-name   =  *(token LWS)/ quoted-string
+	//	addr-spec      =  SIP-URI / SIPS-URI / absoluteURI
+
+	tokenCharacters = NewAllowedCharacters()
+	tokenCharacters.AddNumbers()
+	tokenCharacters.AddLowercaseASCII()
+	tokenCharacters.AddUppercaseASCII()
+	tokenCharacters.Add("-.!%*_+`'~")
+
+	displayNameCharacters = tokenCharacters.Copy()
+	displayNameCharacters.Add(" \t")
+
+	headerValuesCharacters = NewAllowedCharacters()
+	headerValuesCharacters.AddPrintableLienarASCII() // Specifically not adding UTF8 for now
 }
 
 // RFC 3261 Section 25.1 - Header field names
@@ -107,27 +195,16 @@ var FrobiddenSipHeaderNames = map[string]bool{
 	"max-forwards":     true,
 	"record-route":     true,
 	"refer-to":         true, // rfc3515
-	"referred-by":      true, // rfc3892
+	"referred-by":      true, // rfc3892sipUriCharacters
 	"reply-to":         true,
-	"route":            true,
-	"supported":        true,
-	"to":               true, // We might allow this in the future, but for now we're printing
-	"via":              true,
-
-	// Single-letter shorthands, a.k.a compact form
-	"b": true, // Referred-By; rfc3892
-	"c": true, // Content-Type
-	"e": true, // Content-Encoding
-	"f": true, // From
-	"i": true, // Call-ID
-	"k": true, // Supported
-	"l": true, // Content-Length
-	"m": true, // Contact
-	"o": true, // Event; rfc3903
-	"r": true, // Refer-To; rfc3515
-	"t": true, // To
-	"u": true, // Allow-Events; rfc3903
-	"v": true, // Via
+	"k":                true, // Supported
+	"l":                true, // Content-Length
+	"m":                true, // Contact
+	"o":                true, // Event; rfc3903
+	"r":                true, // Refer-To; rfc3515
+	"t":                true, // To
+	"u":                true, // Allow-Events; rfc3903
+	"v":                true, // Via
 }
 
 // Headers that must comply with name-addr specification per RFC 3261 Section 20.10
@@ -153,6 +230,10 @@ func ValidateHeaderName(name string) error {
 		return errors.New("header name too long (max 255 characters)")
 	}
 
+	if err := tokenCharacters.Validate(name); err != nil {
+		return fmt.Errorf("header name %s contains invalid characters: %w", name, err)
+	}
+
 	lowerName := strings.ToLower(name)
 	if !reHeaderName.MatchString(lowerName) {
 		return errors.New("header name contains invalid characters")
@@ -169,23 +250,25 @@ func ValidateHeaderName(name string) error {
 // ValidateHeaderValue validates a SIP header value per RFC 3261 Section 25.1
 func ValidateHeaderValue(name, value string) error {
 	if value == "" {
-		return errors.New("header value cannot be empty")
+		return fmt.Errorf("header %s: value cannot be empty", name)
 	}
 
 	if len(value) > 1024 {
-		return errors.New("header value too long (max 1024 characters)")
+		return fmt.Errorf("header %s: value too long (max 1024 characters)", name)
 	}
 
-	// Basic character validation - printable ASCII
-	if !reHeaderValueBasic.MatchString(value) {
-		return errors.New("header value contains invalid characters")
+	// Basic character validation - printable ASCII. We're stricter than the spec here - no UTF-8 for now
+	if err := headerValuesCharacters.Validate(value); err != nil {
+		return fmt.Errorf("header %s: value: %w", name, err)
 	}
 
 	// Convert to lowercase for case-insensitive comparison
 	lowerName := strings.ToLower(name)
 	if _, exists := nameAddrHeaders[lowerName]; exists && false {
 		// TODO: Disabled since all supported headers are forbidden, re-enable when we allow some
-		return validateNameAddrHeader(value)
+		if err := validateNameAddrHeader(value); err != nil {
+			return fmt.Errorf("header %s: value: %w", name, err)
+		}
 	}
 
 	return nil
@@ -231,28 +314,23 @@ func validateNameAddrHeader(value string) error {
 	// name-addr = [display-name] <addr-spec>
 	// addr-spec = SIP-URI / SIPS-URI / absoluteURI
 
+	uri := value
 	start, end, err := findAngleBrackets(value)
 	if err != nil {
 		return err
 	}
 	if start >= 0 || end >= 0 {
-		displayName := strings.TrimSpace(value[:start])
-		uri := value[start+1 : end]
-		if displayName != "" {
-			if err := validateDisplayName(displayName); err != nil {
-				return err
-			}
+		uri = value[start+1 : end]
+		if err := validateDisplayName(strings.TrimSpace(value[:start])); err != nil {
+			return err
 		}
-		// Keep in mind, this ignores header parameters, while validating URI parameters
-		return validateURI(uri)
+	} else {
+		// This is a bare URI, and should comply with addr-spec, no special characters
+		if strings.ContainsAny(value, ";,? ") {
+			return errors.New("bare URI with special characters")
+		}
 	}
-
-	// This is a bare URI, and should comply with addr-spec, no special characters
-	if strings.ContainsAny(value, ";,? ") {
-		return errors.New("bare URI with special characters")
-	}
-
-	return validateURI(value)
+	return validateURI(uri)
 }
 
 // validateDisplayName validates a display name in name-addr format
@@ -262,20 +340,18 @@ func validateDisplayName(displayName string) error {
 	}
 
 	// Check if display name is quoted
-	if strings.HasPrefix(displayName, "\"") && strings.HasSuffix(displayName, "\"") {
+	if strings.HasPrefix(displayName, `"`) && strings.HasSuffix(displayName, `"`) {
 		// Quoted display name - use strconv.Unquote to validate proper escaping
 		_, err := strconv.Unquote(displayName)
 		if err != nil {
-			return fmt.Errorf("quoted display name contains invalid escape sequences: %v", err)
+			return fmt.Errorf("display name: %w", err)
 		}
 		return nil
 	}
 
 	// Unquoted display name - must not contain special characters
-	for _, r := range displayName {
-		if int(r) >= len(validTokenCharacters) || !validTokenCharacters[r] {
-			return errors.New("unquoted display name contains special characters")
-		}
+	if err := displayNameCharacters.Validate(displayName); err != nil {
+		return fmt.Errorf("display name: %w", err)
 	}
 
 	return nil
@@ -283,146 +359,18 @@ func validateDisplayName(displayName string) error {
 
 // validateURI validates URIs that can appear in name-addr format
 func validateURI(uri string) error {
-	if uri == "" {
-		return errors.New("URI cannot be empty")
+	// Just do the basics, full validation should be done by sip service
+	scheme := strings.SplitN(uri, ":", 2)[0]
+	if scheme != "sip" && scheme != "sips" && scheme != "tel" {
+		// Technically, it either needs to be sip/s: or scheme://...
+		// Thus, tel: uri should not be supported here... but we allow it because of de-facto usage.
+		return errors.New("uri: scheme not one of sip, sips, or tel")
 	}
 
-	// Check for SIP/SIPS scheme
-	if strings.HasPrefix(uri, "sip:") || strings.HasPrefix(uri, "sips:") {
-		return validateSIPURI(uri)
-	}
-
-	// Check for TEL scheme
-	if strings.HasPrefix(uri, "tel:") {
-		return validateTELURI(uri)
-	}
-
-	// For now, only support SIP/SIPS and TEL URIs
-	// RFC 3261 allows other absolute URIs, but we'll be restrictive
-	return errors.New("URI scheme must match one of sip, sips, or tel")
-}
-
-// validateSIPURI validates a SIP or SIPS URI per RFC 3261 Section 19.1
-func validateSIPURI(uri string) error {
-	if uri == "" {
-		return errors.New("SIP URI cannot be empty")
-	}
-
-	// Check for SIP or SIPS scheme
-	if !strings.HasPrefix(uri, "sip:") && !strings.HasPrefix(uri, "sips:") {
-		return errors.New("SIP URI scheme must match sip or sips")
-	}
-
-	// Basic format validation
-	if !reSIPURI.MatchString(uri) {
-		return errors.New("SIP URI format is invalid")
-	}
-
-	// Validate URI parameters if present
-	if strings.Contains(uri, ";") {
-		return validateURIParameters(uri)
+	// Just no spaces, proper validation should be done in sip service
+	if strings.Contains(uri, " ") {
+		return errors.New("uri: contains spaces")
 	}
 
 	return nil
-}
-
-// validateURIParameters validates URI parameters
-func validateURIParameters(uri string) error {
-	// Split URI into base and parameters
-	parts := strings.Split(uri, ";")
-	if len(parts) < 2 {
-		return errors.New("invalid URI parameters")
-	}
-
-	// Validate each parameter
-	for _, param := range parts[1:] {
-		param = strings.TrimSpace(param)
-		if param == "" {
-			return errors.New("empty URI parameter")
-		}
-
-		// Check for valid parameter format: name=value or name
-		if strings.Contains(param, "=") {
-			paramParts := strings.SplitN(param, "=", 2)
-			if len(paramParts) != 2 {
-				return errors.New("invalid URI parameter format")
-			}
-			name := strings.TrimSpace(paramParts[0])
-			value := strings.TrimSpace(paramParts[1])
-
-			if name == "" {
-				return errors.New("URI parameter name cannot be empty")
-			}
-			if value == "" {
-				return errors.New("URI parameter value cannot be empty")
-			}
-
-		} else {
-			// Parameter without value - just validate name
-			if strings.TrimSpace(param) == "" {
-				return errors.New("URI parameter name cannot be empty")
-			}
-		}
-
-		// Check for invalid characters in parameter
-		if strings.Contains(param, " ") {
-			return errors.New("URI parameter contains spaces")
-		}
-	}
-
-	return nil
-}
-
-// validateTELURI validates a TEL URI per RFC 3966
-func validateTELURI(uri string) error {
-	if uri == "" {
-		return errors.New("TEL URI cannot be empty")
-	}
-
-	if !strings.HasPrefix(uri, "tel:") {
-		return errors.New("TEL URI scheme must match tel")
-	}
-
-	// Basic validation - TEL URIs are more complex, this is simplified
-	if len(uri) < 5 { // "tel:" + at least one character
-		return errors.New("TEL URI format is invalid")
-	}
-
-	return nil
-}
-
-// EscapeHeaderValue escapes special characters in header values per RFC 3261
-func EscapeHeaderValue(value string) string {
-	// Escape special characters that need to be quoted
-	var result strings.Builder
-	for _, r := range value {
-		switch r {
-		case ' ', '\t', '\r', '\n', '"', '\\':
-			// These characters need to be escaped or quoted
-			result.WriteString("\\")
-			result.WriteRune(r)
-		default:
-			result.WriteRune(r)
-		}
-	}
-	return result.String()
-}
-
-// UnescapeHeaderValue removes escaping from header values
-func UnescapeHeaderValue(value string) string {
-	var result strings.Builder
-	escaped := false
-
-	for _, r := range value {
-		if escaped {
-			result.WriteRune(r)
-			escaped = false
-		} else if r == '\\' {
-			escaped = true
-		} else {
-			result.WriteRune(r)
-		}
-	}
-
-	return result.String()
 }
