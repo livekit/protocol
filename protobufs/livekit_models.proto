@@ -148,8 +148,9 @@ message ParticipantInfo {
     SIP = 3;
     // LiveKit agents
     AGENT = 4;
-
-    // NEXT_ID: 7
+    // Connectors participants
+    CONNECTOR = 7;
+    // NEXT_ID: 8
   }
   enum KindDetail {
     CLOUD_AGENT = 0;

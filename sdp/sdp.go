@@ -153,6 +153,19 @@ func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
 	return streamID, true
 }
 
+func GetIP(sdp *sdp.SessionDescription) string {
+	if sdp.ConnectionInformation != nil && sdp.ConnectionInformation.NetworkType == "IN" {
+		return sdp.ConnectionInformation.Address.Address
+	}
+
+	for _, media := range sdp.MediaDescriptions {
+		if media.ConnectionInformation != nil && media.ConnectionInformation.NetworkType == "IN" {
+			return media.ConnectionInformation.Address.Address
+		}
+	}
+	return ""
+}
+
 func GetMediaStreamTrack(m *sdp.MediaDescription) string {
 	mst := ""
 	msid, ok := m.Attribute(sdp.AttrKeyMsid)
