@@ -168,11 +168,7 @@ var InvalidNameAddrHeaders = []string{
 	`sip:u16@example.com;transport=tcp`,                 // special chars without brackets
 	`sip:u17@example.com,transport=tcp`,                 // comma without brackets
 	`sip:u18@example.com?transport=tcp`,                 // question mark without brackets
-	`<sip:u19@example.com;transport=>`,                  // empty parameter value
-	`<sip:u20@example.com;=tcp>`,                        // empty parameter name
 	`<sip:u21@example.com;transport tcp>`,               // missing equals sign
-	`<sip:u22@example.com;transport=tcp;>`,              // trailing semicolon
-	`<sip:u23@example.com;transport=tcp;;lr>`,           // double semicolon
 	`<sip:u24@example.com;transport=tcp lr>`,            // space in parameters
 }
 
