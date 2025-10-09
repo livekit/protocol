@@ -47,6 +47,8 @@ func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_MOBILE
 	case phonenumbers.FIXED_LINE:
 		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_LOCAL
+	case phonenumbers.FIXED_LINE_OR_MOBILE:
+		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_LOCAL
 	case phonenumbers.TOLL_FREE:
 		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_TOLL_FREE
 	default:

@@ -65,7 +65,8 @@ message GetIngressInfoResponse {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
-  map<string,string> logging_fields = 4;
+  map<string, string> logging_fields = 4;
+  map<string, string> feature_flags = 5;
 }
 
 // Request to store an update to the ingress state ingress -> service

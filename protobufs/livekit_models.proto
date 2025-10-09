@@ -68,6 +68,7 @@ enum AudioCodec {
   DEFAULT_AC = 0;
   OPUS = 1;
   AAC = 2;
+  AC_MP3 = 3;
 }
 
 enum VideoCodec {
@@ -220,9 +221,9 @@ message TrackInfo {
   bool muted = 4;
   // original width of video (unset for audio)
   // clients may receive a lower resolution version with simulcast
-  uint32 width = 5 [deprecated=true];
+  uint32 width = 5;
   // original height of video (unset for audio)
-  uint32 height = 6 [deprecated=true];
+  uint32 height = 6;
   // true if track is simulcasted
   bool simulcast = 7 [deprecated = true]; // see `video_layer_mode` in `codecs`
   // true if DTX (Discontinuous Transmission) is disabled for audio
@@ -780,13 +781,18 @@ message DataStream {
   }
 }
 
+message FilterParams {
+  repeated string include_events = 1;
+  repeated string exclude_events = 2;
+}
+
 message WebhookConfig {
   string url = 1;
   string signing_key = 2;
+  FilterParams filter_params = 3;
 }
 
 message SubscribedAudioCodec {
   string codec = 1;
   bool enabled = 2;
 }
-

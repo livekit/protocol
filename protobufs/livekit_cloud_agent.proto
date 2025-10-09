@@ -51,6 +51,13 @@ message CreateAgentResponse {
     string version = 4;
     string presigned_url = 5;
     string tag = 6;
+    repeated string server_regions = 7;
+    PresignedPostRequest presigned_post_request = 8;
+}
+
+message PresignedPostRequest {
+  string url = 1;
+  map<string, string> values = 2;
 }
 
 message AgentDeployment {
@@ -66,6 +73,7 @@ message AgentDeployment {
     string mem_req = 10;
     string mem_limit = 11;
     string cpu_limit = 12;
+    string server_region = 13;
 }
 
 message AgentInfo {
@@ -142,6 +150,7 @@ message DeployAgentResponse {
     string agent_id = 3;
     string presigned_url = 4;
     string tag = 5;
+    PresignedPostRequest presigned_post_request = 6;
 }
 
 message UpdateAgentSecretsRequest {

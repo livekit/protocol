@@ -157,6 +157,7 @@ enum EncodedFileType {
   DEFAULT_FILETYPE = 0; // file type chosen based on codecs
   MP4  = 1;
   OGG = 2;
+  MP3 = 3;
 }
 
 message EncodedFileOutput {

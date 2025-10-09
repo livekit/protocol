@@ -96,13 +96,16 @@ message ICERestartWHIPResourceResponse {
 message WHIPRTCConnectionNotifyRequest {
   string participant_id = 1;
   bool closed = 2;
+  livekit.InputVideoState video = 3;
+  livekit.InputAudioState audio = 4;
 }
 
 message StartIngressRequest {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
-  map<string,string> logging_fields = 4;
+  map<string, string> logging_fields = 4;
+  map<string, string> feature_flags = 5;
 }
 
 message IngressSession {

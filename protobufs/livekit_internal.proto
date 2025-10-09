@@ -34,6 +34,7 @@ enum NodeType {
   SWEEPER = 5;
   DIRECTOR = 6;
   HOSTED_AGENT = 7;
+  SETTINGS = 8;
 }
 
 enum NodeState {
