@@ -17,7 +17,6 @@ package livekit
 import (
 	"errors"
 	fmt "fmt"
-	"regexp"
 	"strconv"
 	"strings"
 )
@@ -145,18 +144,6 @@ func init() {
 	headerValuesCharacters.AddPrintableLienarASCII() // Specifically not adding UTF8 for now
 }
 
-// RFC 3261 Section 25.1 - Header field names
-// token = 1*(alphanum / "-" / "." / "!" / "%" / "*" / "_" / "+" / "`" / "'" / "~")
-// Specifically lowercase since we're converting to lowercase for case-insensitive comparison
-var reHeaderName = regexp.MustCompile(`^[a-z0-9\-\.!%*_+` + "`" + `'~]+$`)
-
-// RFC 3261 Section 25.1 - Header field values (basic validation)
-// More specific validation is done per header type
-var reHeaderValueBasic = regexp.MustCompile(`^[\x20-\x7E]*$`)
-
-// RFC 3261 Section 19.1 - SIP URI validation
-var reSIPURI = regexp.MustCompile(`^(sip|sips):([^@]+@)?([^;]+)(;.*)?$`)
-
 // Required headers for SIP requests per RFC 3261 Section 8.1.1
 var RequiredRequestHeaders = map[string]bool{
 	"via":          true,
@@ -234,12 +221,8 @@ func ValidateHeaderName(name string) error {
 		return fmt.Errorf("header name %s contains invalid characters: %w", name, err)
 	}
 
-	lowerName := strings.ToLower(name)
-	if !reHeaderName.MatchString(lowerName) {
-		return errors.New("header name contains invalid characters")
-	}
-
 	// Convert to lowercase for case-insensitive comparison
+	lowerName := strings.ToLower(name)
 	if forbidden, exists := FrobiddenSipHeaderNames[lowerName]; exists && forbidden {
 		return fmt.Errorf("header name %s not supported", name)
 	}
