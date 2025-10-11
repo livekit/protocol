@@ -246,9 +246,8 @@ message SIPTrunkInfo {
   string name = 11;
   // User-defined metadata for the Trunk.
   string metadata = 12;
-  ProviderInfo provider_info = 15;
 
-  // NEXT ID: 16
+  // NEXT ID: 15
 }
 
 message CreateSIPInboundTrunkRequest {
@@ -743,7 +742,7 @@ message SIPCallInfo {
   string media_encryption = 21;
   string pcap_file_link = 25;
   repeated google.protobuf.Any call_context = 26;
-  SIPTrunkInfo trunk_info = 27;
+  ProviderInfo provider_info = 27;
 
   // NEXT ID: 28
 }
