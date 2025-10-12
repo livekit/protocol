@@ -105,6 +105,7 @@ message GetSIPTrunkAuthenticationResponse {
   string sip_trunk_id = 4;
   // Used in Cloud only
   string project_id = 5;
+  livekit.ProviderInfo provider_info = 6;
 }
 
 message EvaluateSIPDispatchRulesRequest {
