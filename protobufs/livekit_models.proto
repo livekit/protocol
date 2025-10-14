@@ -262,7 +262,7 @@ message DataTrackInfo {
   Encryption.Type encryption = 5;
 }
 
-message DataTrackSubscribeOptions {
+message DataTrackSubscriptionOptions {
   // Rate in frames per second (FPS) the subscriber wants to receive frames at.
   // If omitted, the subscriber defaults to the publisher's nominal FPS; if the
   // publisher has no nominal FPS, it will use the maximum.
