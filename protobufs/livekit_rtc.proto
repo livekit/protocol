@@ -116,7 +116,7 @@ message SignalResponse {
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
     // Sent in response to `PublishDataTrackRequest`.
-    DataTrackPublishedResponse data_track_published = 27;
+    PublishDataTrackResponse publish_data_track = 27;
   }
 }
 
@@ -178,7 +178,7 @@ message PublishDataTrackRequest {
   Encryption.Type encryption = 3;
 }
 
-message DataTrackPublishedResponse {
+message PublishDataTrackResponse {
 
   uint32 request_id = 1;
 
