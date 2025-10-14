@@ -394,12 +394,12 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		logger.Warnw("Header validation failed for Headers field", err)
-		// No error, just a warning for SIP RFC validation for now
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
 	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
 		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
-		// No error, just a warning for SIP RFC validation for now
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 	return nil
 }
@@ -490,12 +490,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		logger.Warnw("Header validation failed for Headers field", err)
-		// No error, just a warning for SIP RFC validation for now
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
 	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
 		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
-		// No error, just a warning for SIP RFC validation for now
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 	return nil
 }
@@ -726,7 +726,7 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 
 	if err := validateHeaders(p.Headers); err != nil {
 		logger.Warnw("Header validation failed for Headers field", err)
-		// No error, just a warning for SIP RFC validation for now
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 
 	// Validate display_name if provided
@@ -735,7 +735,7 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 			return errors.New("display_name too long (max 128 characters)")
 		}
 
-		// TODO: Validate display name doesn't contain invalid characters
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 
 	// Validate destination if provided
@@ -829,7 +829,7 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 
 	if err := validateHeaders(p.Headers); err != nil {
 		logger.Warnw("Header validation failed for Headers field", err)
-		// No error, just a warning for SIP RFC validation for now
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 
 	return nil
