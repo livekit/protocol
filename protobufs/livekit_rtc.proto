@@ -194,6 +194,7 @@ message DataTrackPublishedResponse {
     INVALID_NAME      = 1; // Name is invalid.
     INVALID_MIME_TYPE = 2; // MIME type is invalid.
     NAME_TAKEN        = 3; // Publisher already has a data track published with the same name.
+    UNAUTHORIZED      = 4; // Publisher is not authorized to publish data tracks.
   }
 }
 
