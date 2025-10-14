@@ -56,7 +56,7 @@ message SignalRequest {
     // Update local video track settings
     UpdateLocalVideoTrack update_video_track = 18;
     // Publish a data track
-    AddDataTrackRequest add_data_track = 19;
+    PublishDataTrackRequest publish_data_track = 19;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 20;
   }
@@ -115,7 +115,7 @@ message SignalResponse {
     MediaSectionsRequirement media_sections_requirement = 25;
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
-    // Sent in response to `AddDataTrackRequest`.
+    // Sent in response to `PublishDataTrackRequest`.
     DataTrackPublishedResponse data_track_published = 27;
   }
 }
@@ -166,7 +166,7 @@ message AddTrackRequest {
   repeated AudioTrackFeature audio_features = 17;
 }
 
-message AddDataTrackRequest {
+message PublishDataTrackRequest {
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
   string name = 1;
 
