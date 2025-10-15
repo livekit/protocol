@@ -51,6 +51,21 @@ func FromProtoSessionDescription(sd *livekit.SessionDescription) (webrtc.Session
 	}, sd.Id
 }
 
+func ToProtoMappedSessionDescription(sd webrtc.SessionDescription, id uint32, midToTrackID map[string]string) *livekit.MappedSessionDescription {
+	if sd.SDP == "" {
+		return nil
+	}
+
+	return &livekit.MappedSessionDescription{
+		SessionDescription: &livekit.SessionDescription{
+			Type: sd.Type.String(),
+			Sdp:  sd.SDP,
+			Id:   id,
+		},
+		MidToTrackId: midToTrackID,
+	}
+}
+
 func ToProtoTrickle(candidateInit webrtc.ICECandidateInit, target livekit.SignalTarget, final bool) *livekit.TrickleRequest {
 	data, _ := json.Marshal(candidateInit)
 	return &livekit.TrickleRequest{
