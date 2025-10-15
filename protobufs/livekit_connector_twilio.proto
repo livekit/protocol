@@ -29,21 +29,21 @@ message ConnectTwilioCallRequest {
   }
 
   // The Media Stream Direction for the call
-  TwilioStreamDirection stream_direction = 1;
+  TwilioStreamDirection twilio_stream_direction = 1;
   // What LiveKit room should this call be connected to
   string room_name = 2;
   // Optional agents to dispatch the call to
   repeated RoomAgentDispatch agents = 3;
   // Optional identity of the participant in LiveKit room
-  optional string participant_identity= 4;
+  string participant_identity= 4;
   // Optional name of the participant in LiveKit room
-  optional string participant_name = 5;
+  string participant_name = 5;
   // Optional user-defined metadata. Will be attached to a created Participant in the room.
-  optional string participant_metadata = 6;
+  string participant_metadata = 6;
   // Optional user-defined attributes. Will be attached to a created Participant in the room.
   map<string, string> participant_attributes = 7;
   // Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
-  optional string destination_country = 8;
+  string destination_country = 8;
 }
 
 message ConnectTwilioCallResponse {
