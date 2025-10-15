@@ -111,8 +111,6 @@ message SignalResponse {
     MediaSectionsRequirement media_sections_requirement = 25;
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
-    // sent when server answers publisher, includes the mid -> trackID mapping
-    MappedSessionDescription mapped_answer = 27;
   }
 }
 
@@ -220,11 +218,7 @@ message SessionDescription {
   string type = 1; // "answer" | "offer" | "pranswer" | "rollback"
   string sdp = 2;
   uint32 id = 3;
-}
-
-message MappedSessionDescription {
-  SessionDescription session_description = 1;
-  map<string, string> mid_to_track_id = 2;
+  map<string, string> mid_to_track_id = 4;
 }
 
 message ParticipantUpdate {
