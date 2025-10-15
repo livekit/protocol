@@ -22,30 +22,31 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_agent_dispatch.proto";
 
 message ConnectTwilioCallRequest {
+
+  enum TwilioStreamDirection {
+    TWILIO_STREAM_UNIDIRECTIONAL = 0;
+    TWILIO_STREAM_BIDIRECTIONAL = 1;
+  }
+
   // The Media Stream Direction for the call
   TwilioStreamDirection stream_direction = 1;
-  // What LiveKit room should this call be connected too
+  // What LiveKit room should this call be connected to
   string room_name = 2;
   // Optional agents to dispatch the call to
   repeated RoomAgentDispatch agents = 3;
   // Optional identity of the participant in LiveKit room
-  string participant_identity= 4;
+  optional string participant_identity= 4;
   // Optional name of the participant in LiveKit room
-  string participant_name = 5;
+  optional string participant_name = 5;
   // Optional user-defined metadata. Will be attached to a created Participant in the room.
-  string participant_metadata = 6;
+  optional string participant_metadata = 6;
   // Optional user-defined attributes. Will be attached to a created Participant in the room.
   map<string, string> participant_attributes = 7;
   // Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
-  string destination_country = 8;
+  optional string destination_country = 8;
 }
 
 message ConnectTwilioCallResponse {
   // The websocket URL which twilio media stream will connect to
   string connect_url = 1;
-}
-
-enum TwilioStreamDirection {
-  TWILIO_STREAM_UNIDIRECTIONAL = 0;
-  TWILIO_STREAM_BIDIRECTIONAL = 1;
 }

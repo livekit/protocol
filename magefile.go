@@ -52,12 +52,13 @@ func Proto() error {
 		"livekit_phone_number.proto",
 		"livekit_connector.proto",
 		"livekit_connector_whatsapp.proto",
+		"livekit_connector_twilio.proto",
 	}
 
 	agentProtoFiles := []string{
 		"agent/livekit_agent_session.proto",
 	}
-	
+
 	protoFiles := []string{
 		"livekit_agent.proto",
 		"livekit_analytics.proto",
@@ -173,7 +174,7 @@ func Proto() error {
 			return err
 		}
 	}
-	
+
 	fmt.Println("generating grpc protobuf")
 	args = append([]string{
 		"--go_out", ".",

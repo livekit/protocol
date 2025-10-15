@@ -20,6 +20,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
 import "livekit_connector_whatsapp.proto";
+import "livekit_connector_twilio.proto";
 import "rpc/common.proto";
 
 service ConnectorInternal {
