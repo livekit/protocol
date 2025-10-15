@@ -1,5 +1,21 @@
 # @livekit/protocol
 
+## 1.42.1
+
+### Patch Changes
+
+- Add InputVideo/AudioState to ICERestartWHIPResourceResponse - [#1237](https://github.com/livekit/protocol/pull/1237) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Document mono package, support Unix and Parse. - [#1242](https://github.com/livekit/protocol/pull/1242) ([@dennwc](https://github.com/dennwc))
+
+- Fix zero time handling in mono package. - [#1241](https://github.com/livekit/protocol/pull/1241) ([@dennwc](https://github.com/dennwc))
+
+- Setting service - [#1240](https://github.com/livekit/protocol/pull/1240) ([@paulwe](https://github.com/paulwe))
+
+- Enable recording - [#1233](https://github.com/livekit/protocol/pull/1233) ([@paulwe](https://github.com/paulwe))
+
+- handle session timer skips >1 min - [#1227](https://github.com/livekit/protocol/pull/1227) ([@paulwe](https://github.com/paulwe))
+
 ## 1.42.0
 
 ### Minor Changes
