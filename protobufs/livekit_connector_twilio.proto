@@ -23,13 +23,13 @@ import "livekit_agent_dispatch.proto";
 
 message ConnectTwilioCallRequest {
 
-  enum TwilioStreamDirection {
-    TWILIO_STREAM_UNIDIRECTIONAL = 0;
-    TWILIO_STREAM_BIDIRECTIONAL = 1;
+  enum TwilioCallDirection {
+    TWILIO_CALL_DIRECTION_INBOUND = 0;
+    TWILIO_CALL_DIRECTION_OUTBOUND = 1;
   }
 
-  // The Media Stream Direction for the call
-  TwilioStreamDirection twilio_stream_direction = 1;
+  // The Direction of the call
+  TwilioCallDirection twilio_call_direction = 1;
   // What LiveKit room should this call be connected to
   string room_name = 2;
   // Optional agents to dispatch the call to
