@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.42.2
+
+### Patch Changes
+
+- Include mid in SessionDescription - [#1257](https://github.com/livekit/protocol/pull/1257) ([@lukasIO](https://github.com/lukasIO))
+
 ## 1.42.1
 
 ## 1.42.0
