@@ -141,20 +141,76 @@ func (x *InternalAcceptWhatsAppCallRequest) GetRoomJoinInfo() *InternalRoomJoinI
 	return nil
 }
 
+type InternalConnectTwilioCallRequest struct {
+	state         protoimpl.MessageState            `protogen:"open.v1"`
+	Request       *livekit.ConnectTwilioCallRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
+	RoomJoinInfo  *InternalRoomJoinInfo             `protobuf:"bytes,2,opt,name=room_join_info,json=roomJoinInfo,proto3" json:"room_join_info,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InternalConnectTwilioCallRequest) Reset() {
+	*x = InternalConnectTwilioCallRequest{}
+	mi := &file_rpc_connector_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InternalConnectTwilioCallRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InternalConnectTwilioCallRequest) ProtoMessage() {}
+
+func (x *InternalConnectTwilioCallRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_connector_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InternalConnectTwilioCallRequest.ProtoReflect.Descriptor instead.
+func (*InternalConnectTwilioCallRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_connector_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *InternalConnectTwilioCallRequest) GetRequest() *livekit.ConnectTwilioCallRequest {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *InternalConnectTwilioCallRequest) GetRoomJoinInfo() *InternalRoomJoinInfo {
+	if x != nil {
+		return x.RoomJoinInfo
+	}
+	return nil
+}
+
 var File_rpc_connector_proto protoreflect.FileDescriptor
 
 const file_rpc_connector_proto_rawDesc = "" +
 	"\n" +
-	"\x13rpc/connector.proto\x12\x03rpc\x1a\roptions.proto\x1a livekit_connector_whatsapp.proto\x1a\x10rpc/common.proto\"\x9e\x01\n" +
+	"\x13rpc/connector.proto\x12\x03rpc\x1a\roptions.proto\x1a livekit_connector_whatsapp.proto\x1a\x1elivekit_connector_twilio.proto\x1a\x10rpc/common.proto\"\x9e\x01\n" +
 	"\x1fInternalDialWhatsAppCallRequest\x12:\n" +
 	"\arequest\x18\x01 \x01(\v2 .livekit.DialWhatsAppCallRequestR\arequest\x12?\n" +
 	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo\"\xa2\x01\n" +
 	"!InternalAcceptWhatsAppCallRequest\x12<\n" +
 	"\arequest\x18\x01 \x01(\v2\".livekit.AcceptWhatsAppCallRequestR\arequest\x12?\n" +
-	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo2\xe3\x01\n" +
+	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo\"\xa0\x01\n" +
+	" InternalConnectTwilioCallRequest\x12;\n" +
+	"\arequest\x18\x01 \x01(\v2!.livekit.ConnectTwilioCallRequestR\arequest\x12?\n" +
+	"\x0eroom_join_info\x18\x02 \x01(\v2\x19.rpc.InternalRoomJoinInfoR\froomJoinInfo2\xcb\x02\n" +
 	"\x11ConnectorInternal\x12c\n" +
 	"\x10DialWhatsAppCall\x12$.rpc.InternalDialWhatsAppCallRequest\x1a!.livekit.DialWhatsAppCallResponse\"\x06\xb2\x89\x01\x02\x10\x01\x12i\n" +
-	"\x12AcceptWhatsAppCall\x12&.rpc.InternalAcceptWhatsAppCallRequest\x1a#.livekit.AcceptWhatsAppCallResponse\"\x06\xb2\x89\x01\x02\x10\x012\x98\x02\n" +
+	"\x12AcceptWhatsAppCall\x12&.rpc.InternalAcceptWhatsAppCallRequest\x1a#.livekit.AcceptWhatsAppCallResponse\"\x06\xb2\x89\x01\x02\x10\x01\x12f\n" +
+	"\x11ConnectTwilioCall\x12%.rpc.InternalConnectTwilioCallRequest\x1a\".livekit.ConnectTwilioCallResponse\"\x06\xb2\x89\x01\x02\x10\x012\x98\x02\n" +
 	"\x10ConnectorHandler\x12|\n" +
 	"\x13ConnectWhatsAppCall\x12#.livekit.ConnectWhatsAppCallRequest\x1a$.livekit.ConnectWhatsAppCallResponse\"\x1a\xb2\x89\x01\x16\x10\x01\x1a\x12\x12\x10whatsapp_call_id\x12\x85\x01\n" +
 	"\x16DisconnectWhatsAppCall\x12&.livekit.DisconnectWhatsAppCallRequest\x1a'.livekit.DisconnectWhatsAppCallResponse\"\x1a\xb2\x89\x01\x16\x10\x01\x1a\x12\x12\x10whatsapp_call_idB!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
@@ -171,38 +227,45 @@ func file_rpc_connector_proto_rawDescGZIP() []byte {
 	return file_rpc_connector_proto_rawDescData
 }
 
-var file_rpc_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_rpc_connector_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_rpc_connector_proto_goTypes = []any{
 	(*InternalDialWhatsAppCallRequest)(nil),        // 0: rpc.InternalDialWhatsAppCallRequest
 	(*InternalAcceptWhatsAppCallRequest)(nil),      // 1: rpc.InternalAcceptWhatsAppCallRequest
-	(*livekit.DialWhatsAppCallRequest)(nil),        // 2: livekit.DialWhatsAppCallRequest
-	(*InternalRoomJoinInfo)(nil),                   // 3: rpc.InternalRoomJoinInfo
-	(*livekit.AcceptWhatsAppCallRequest)(nil),      // 4: livekit.AcceptWhatsAppCallRequest
-	(*livekit.ConnectWhatsAppCallRequest)(nil),     // 5: livekit.ConnectWhatsAppCallRequest
-	(*livekit.DisconnectWhatsAppCallRequest)(nil),  // 6: livekit.DisconnectWhatsAppCallRequest
-	(*livekit.DialWhatsAppCallResponse)(nil),       // 7: livekit.DialWhatsAppCallResponse
-	(*livekit.AcceptWhatsAppCallResponse)(nil),     // 8: livekit.AcceptWhatsAppCallResponse
-	(*livekit.ConnectWhatsAppCallResponse)(nil),    // 9: livekit.ConnectWhatsAppCallResponse
-	(*livekit.DisconnectWhatsAppCallResponse)(nil), // 10: livekit.DisconnectWhatsAppCallResponse
+	(*InternalConnectTwilioCallRequest)(nil),       // 2: rpc.InternalConnectTwilioCallRequest
+	(*livekit.DialWhatsAppCallRequest)(nil),        // 3: livekit.DialWhatsAppCallRequest
+	(*InternalRoomJoinInfo)(nil),                   // 4: rpc.InternalRoomJoinInfo
+	(*livekit.AcceptWhatsAppCallRequest)(nil),      // 5: livekit.AcceptWhatsAppCallRequest
+	(*livekit.ConnectTwilioCallRequest)(nil),       // 6: livekit.ConnectTwilioCallRequest
+	(*livekit.ConnectWhatsAppCallRequest)(nil),     // 7: livekit.ConnectWhatsAppCallRequest
+	(*livekit.DisconnectWhatsAppCallRequest)(nil),  // 8: livekit.DisconnectWhatsAppCallRequest
+	(*livekit.DialWhatsAppCallResponse)(nil),       // 9: livekit.DialWhatsAppCallResponse
+	(*livekit.AcceptWhatsAppCallResponse)(nil),     // 10: livekit.AcceptWhatsAppCallResponse
+	(*livekit.ConnectTwilioCallResponse)(nil),      // 11: livekit.ConnectTwilioCallResponse
+	(*livekit.ConnectWhatsAppCallResponse)(nil),    // 12: livekit.ConnectWhatsAppCallResponse
+	(*livekit.DisconnectWhatsAppCallResponse)(nil), // 13: livekit.DisconnectWhatsAppCallResponse
 }
 var file_rpc_connector_proto_depIdxs = []int32{
-	2,  // 0: rpc.InternalDialWhatsAppCallRequest.request:type_name -> livekit.DialWhatsAppCallRequest
-	3,  // 1: rpc.InternalDialWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
-	4,  // 2: rpc.InternalAcceptWhatsAppCallRequest.request:type_name -> livekit.AcceptWhatsAppCallRequest
-	3,  // 3: rpc.InternalAcceptWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
-	0,  // 4: rpc.ConnectorInternal.DialWhatsAppCall:input_type -> rpc.InternalDialWhatsAppCallRequest
-	1,  // 5: rpc.ConnectorInternal.AcceptWhatsAppCall:input_type -> rpc.InternalAcceptWhatsAppCallRequest
-	5,  // 6: rpc.ConnectorHandler.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
-	6,  // 7: rpc.ConnectorHandler.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
-	7,  // 8: rpc.ConnectorInternal.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
-	8,  // 9: rpc.ConnectorInternal.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
-	9,  // 10: rpc.ConnectorHandler.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
-	10, // 11: rpc.ConnectorHandler.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
-	8,  // [8:12] is the sub-list for method output_type
-	4,  // [4:8] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	3,  // 0: rpc.InternalDialWhatsAppCallRequest.request:type_name -> livekit.DialWhatsAppCallRequest
+	4,  // 1: rpc.InternalDialWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
+	5,  // 2: rpc.InternalAcceptWhatsAppCallRequest.request:type_name -> livekit.AcceptWhatsAppCallRequest
+	4,  // 3: rpc.InternalAcceptWhatsAppCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
+	6,  // 4: rpc.InternalConnectTwilioCallRequest.request:type_name -> livekit.ConnectTwilioCallRequest
+	4,  // 5: rpc.InternalConnectTwilioCallRequest.room_join_info:type_name -> rpc.InternalRoomJoinInfo
+	0,  // 6: rpc.ConnectorInternal.DialWhatsAppCall:input_type -> rpc.InternalDialWhatsAppCallRequest
+	1,  // 7: rpc.ConnectorInternal.AcceptWhatsAppCall:input_type -> rpc.InternalAcceptWhatsAppCallRequest
+	2,  // 8: rpc.ConnectorInternal.ConnectTwilioCall:input_type -> rpc.InternalConnectTwilioCallRequest
+	7,  // 9: rpc.ConnectorHandler.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
+	8,  // 10: rpc.ConnectorHandler.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
+	9,  // 11: rpc.ConnectorInternal.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
+	10, // 12: rpc.ConnectorInternal.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
+	11, // 13: rpc.ConnectorInternal.ConnectTwilioCall:output_type -> livekit.ConnectTwilioCallResponse
+	12, // 14: rpc.ConnectorHandler.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
+	13, // 15: rpc.ConnectorHandler.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
+	11, // [11:16] is the sub-list for method output_type
+	6,  // [6:11] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_rpc_connector_proto_init() }
@@ -217,7 +280,7 @@ func file_rpc_connector_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_connector_proto_rawDesc), len(file_rpc_connector_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

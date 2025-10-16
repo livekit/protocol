@@ -34,6 +34,8 @@ type Connector interface {
 	ConnectWhatsAppCall(context.Context, *ConnectWhatsAppCallRequest) (*ConnectWhatsAppCallResponse, error)
 
 	AcceptWhatsAppCall(context.Context, *AcceptWhatsAppCallRequest) (*AcceptWhatsAppCallResponse, error)
+
+	ConnectTwilioCall(context.Context, *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error)
 }
 
 // =========================
@@ -42,7 +44,7 @@ type Connector interface {
 
 type connectorProtobufClient struct {
 	client      HTTPClient
-	urls        [4]string
+	urls        [5]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -70,11 +72,12 @@ func NewConnectorProtobufClient(baseURL string, client HTTPClient, opts ...twirp
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "Connector")
-	urls := [4]string{
+	urls := [5]string{
 		serviceURL + "DialWhatsAppCall",
 		serviceURL + "DisconnectWhatsAppCall",
 		serviceURL + "ConnectWhatsAppCall",
 		serviceURL + "AcceptWhatsAppCall",
+		serviceURL + "ConnectTwilioCall",
 	}
 
 	return &connectorProtobufClient{
@@ -269,13 +272,59 @@ func (c *connectorProtobufClient) callAcceptWhatsAppCall(ctx context.Context, in
 	return out, nil
 }
 
+func (c *connectorProtobufClient) ConnectTwilioCall(ctx context.Context, in *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "Connector")
+	ctx = ctxsetters.WithMethodName(ctx, "ConnectTwilioCall")
+	caller := c.callConnectTwilioCall
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ConnectTwilioCallRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ConnectTwilioCallRequest) when calling interceptor")
+					}
+					return c.callConnectTwilioCall(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ConnectTwilioCallResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ConnectTwilioCallResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *connectorProtobufClient) callConnectTwilioCall(ctx context.Context, in *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+	out := new(ConnectTwilioCallResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // =====================
 // Connector JSON Client
 // =====================
 
 type connectorJSONClient struct {
 	client      HTTPClient
-	urls        [4]string
+	urls        [5]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -303,11 +352,12 @@ func NewConnectorJSONClient(baseURL string, client HTTPClient, opts ...twirp.Cli
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "Connector")
-	urls := [4]string{
+	urls := [5]string{
 		serviceURL + "DialWhatsAppCall",
 		serviceURL + "DisconnectWhatsAppCall",
 		serviceURL + "ConnectWhatsAppCall",
 		serviceURL + "AcceptWhatsAppCall",
+		serviceURL + "ConnectTwilioCall",
 	}
 
 	return &connectorJSONClient{
@@ -502,6 +552,52 @@ func (c *connectorJSONClient) callAcceptWhatsAppCall(ctx context.Context, in *Ac
 	return out, nil
 }
 
+func (c *connectorJSONClient) ConnectTwilioCall(ctx context.Context, in *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "Connector")
+	ctx = ctxsetters.WithMethodName(ctx, "ConnectTwilioCall")
+	caller := c.callConnectTwilioCall
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ConnectTwilioCallRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ConnectTwilioCallRequest) when calling interceptor")
+					}
+					return c.callConnectTwilioCall(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ConnectTwilioCallResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ConnectTwilioCallResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *connectorJSONClient) callConnectTwilioCall(ctx context.Context, in *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+	out := new(ConnectTwilioCallResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
 // ========================
 // Connector Server Handler
 // ========================
@@ -610,6 +706,9 @@ func (s *connectorServer) ServeHTTP(resp http.ResponseWriter, req *http.Request)
 		return
 	case "AcceptWhatsAppCall":
 		s.serveAcceptWhatsAppCall(ctx, resp, req)
+		return
+	case "ConnectTwilioCall":
+		s.serveConnectTwilioCall(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -1338,6 +1437,186 @@ func (s *connectorServer) serveAcceptWhatsAppCallProtobuf(ctx context.Context, r
 	callResponseSent(ctx, s.hooks)
 }
 
+func (s *connectorServer) serveConnectTwilioCall(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveConnectTwilioCallJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveConnectTwilioCallProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *connectorServer) serveConnectTwilioCallJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ConnectTwilioCall")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ConnectTwilioCallRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Connector.ConnectTwilioCall
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ConnectTwilioCallRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ConnectTwilioCallRequest) when calling interceptor")
+					}
+					return s.Connector.ConnectTwilioCall(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ConnectTwilioCallResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ConnectTwilioCallResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ConnectTwilioCallResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ConnectTwilioCallResponse and nil error while calling ConnectTwilioCall. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *connectorServer) serveConnectTwilioCallProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ConnectTwilioCall")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ConnectTwilioCallRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Connector.ConnectTwilioCall
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ConnectTwilioCallRequest) (*ConnectTwilioCallResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ConnectTwilioCallRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ConnectTwilioCallRequest) when calling interceptor")
+					}
+					return s.Connector.ConnectTwilioCall(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ConnectTwilioCallResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ConnectTwilioCallResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ConnectTwilioCallResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ConnectTwilioCallResponse and nil error while calling ConnectTwilioCall. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
 func (s *connectorServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor7, 0
 }
@@ -1354,20 +1633,23 @@ func (s *connectorServer) PathPrefix() string {
 }
 
 var twirpFileDescriptor7 = []byte{
-	// 238 bytes of a gzipped FileDescriptorProto
+	// 273 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x12, 0xcf, 0xc9, 0x2c, 0x4b,
 	0xcd, 0xce, 0x2c, 0x89, 0x4f, 0xce, 0xcf, 0xcb, 0x4b, 0x4d, 0x2e, 0xc9, 0x2f, 0xd2, 0x2b, 0x28,
 	0xca, 0x2f, 0xc9, 0x17, 0x62, 0x87, 0x4a, 0x48, 0x29, 0x60, 0xa8, 0x88, 0x2f, 0xcf, 0x48, 0x2c,
-	0x29, 0x4e, 0x2c, 0x28, 0x80, 0x28, 0x35, 0x9a, 0xc0, 0xcc, 0xc5, 0xe9, 0x0c, 0x93, 0x14, 0x0a,
-	0xe7, 0x12, 0x70, 0xc9, 0x4c, 0xcc, 0x09, 0x07, 0xa9, 0x71, 0x2c, 0x28, 0x70, 0x4e, 0xcc, 0xc9,
-	0x11, 0x52, 0xd0, 0x83, 0x1a, 0xa2, 0x87, 0x2e, 0x15, 0x94, 0x5a, 0x58, 0x9a, 0x5a, 0x5c, 0x22,
-	0xa5, 0x88, 0x47, 0x45, 0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x50, 0x26, 0x97, 0x98, 0x4b, 0x66,
-	0x31, 0xd4, 0x15, 0x28, 0xc6, 0xab, 0x21, 0x69, 0xc6, 0xa6, 0x00, 0x66, 0x89, 0x3a, 0x41, 0x75,
-	0x50, 0xab, 0x12, 0xb8, 0x84, 0x9d, 0xb1, 0xd8, 0xa3, 0x0c, 0xd7, 0xef, 0x8c, 0xdb, 0x12, 0x15,
-	0xfc, 0x8a, 0xa0, 0x36, 0xc4, 0x72, 0x09, 0x39, 0x26, 0x27, 0xa7, 0x16, 0xa0, 0x5a, 0xa0, 0x04,
-	0xd7, 0x8b, 0x29, 0x09, 0x33, 0x5f, 0x19, 0xaf, 0x1a, 0x88, 0xf1, 0x4e, 0x6e, 0x51, 0xca, 0xe9,
-	0x99, 0x25, 0x19, 0xa5, 0x49, 0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0x50, 0x0d, 0xfa, 0xe0, 0xe8, 0x4a,
-	0xce, 0xcf, 0x81, 0x09, 0xac, 0x62, 0xe2, 0xf5, 0xc9, 0x2c, 0x4b, 0xf5, 0xce, 0x2c, 0xd1, 0x0b,
-	0x00, 0x49, 0xbd, 0x62, 0xe2, 0x83, 0xf2, 0xad, 0xac, 0xc0, 0x02, 0x49, 0x6c, 0x60, 0x2d, 0xc6,
-	0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0x7a, 0x7c, 0x2f, 0xe1, 0x27, 0x02, 0x00, 0x00,
+	0x29, 0x4e, 0x2c, 0x28, 0x80, 0x28, 0x95, 0x92, 0xc3, 0x54, 0x51, 0x52, 0x9e, 0x99, 0x93, 0x99,
+	0x0f, 0x91, 0x37, 0x7a, 0xc3, 0xcc, 0xc5, 0xe9, 0x0c, 0x93, 0x12, 0x0a, 0xe7, 0x12, 0x70, 0xc9,
+	0x4c, 0xcc, 0x09, 0x07, 0x99, 0xe1, 0x58, 0x50, 0xe0, 0x9c, 0x98, 0x93, 0x23, 0xa4, 0xa0, 0x07,
+	0x35, 0x42, 0x0f, 0x5d, 0x2a, 0x28, 0xb5, 0xb0, 0x34, 0xb5, 0xb8, 0x44, 0x4a, 0x11, 0x8f, 0x8a,
+	0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0xa1, 0x4c, 0x2e, 0x31, 0x97, 0xcc, 0x62, 0xa8, 0x1b, 0x50,
+	0x8c, 0x57, 0x43, 0xd2, 0x8c, 0x4d, 0x01, 0xcc, 0x12, 0x75, 0x82, 0xea, 0xa0, 0x56, 0x25, 0x70,
+	0x09, 0x3b, 0x63, 0xb1, 0x47, 0x19, 0xae, 0xdf, 0x19, 0xb7, 0x25, 0x2a, 0xf8, 0x15, 0x41, 0x6d,
+	0x88, 0xe5, 0x12, 0x72, 0x4c, 0x4e, 0x4e, 0x2d, 0x40, 0xb5, 0x40, 0x09, 0xae, 0x17, 0x53, 0x12,
+	0x66, 0xbe, 0x32, 0x5e, 0x35, 0x50, 0xe3, 0xa3, 0xb8, 0x04, 0xa1, 0xb6, 0x87, 0x80, 0x63, 0x0a,
+	0x6c, 0xba, 0x22, 0xba, 0xcb, 0x10, 0x72, 0x30, 0xc3, 0x95, 0xf0, 0x29, 0x81, 0x98, 0xed, 0xe4,
+	0x16, 0xa5, 0x9c, 0x9e, 0x59, 0x92, 0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f, 0xab, 0x0f, 0x55, 0xaf,
+	0x0f, 0x4e, 0x0a, 0xc9, 0xf9, 0x39, 0x30, 0x81, 0x55, 0x4c, 0xbc, 0x3e, 0x99, 0x65, 0xa9, 0xde,
+	0x99, 0x25, 0x7a, 0x01, 0x20, 0xa9, 0x57, 0x4c, 0x7c, 0x50, 0xbe, 0x95, 0x15, 0x58, 0x20, 0x89,
+	0x0d, 0xac, 0xc5, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0x18, 0x8d, 0x1d, 0x42, 0xa3, 0x02, 0x00,
+	0x00,
 }

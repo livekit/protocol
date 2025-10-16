@@ -20,6 +20,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_connector_whatsapp.proto";
+import "livekit_connector_twilio.proto";
 
 service Connector {
   rpc DialWhatsAppCall(DialWhatsAppCallRequest) returns (DialWhatsAppCallResponse);
@@ -29,4 +30,6 @@ service Connector {
   rpc ConnectWhatsAppCall(ConnectWhatsAppCallRequest) returns (ConnectWhatsAppCallResponse);
 
   rpc AcceptWhatsAppCall(AcceptWhatsAppCallRequest) returns (AcceptWhatsAppCallResponse);
+
+  rpc ConnectTwilioCall(ConnectTwilioCallRequest) returns (ConnectTwilioCallResponse);
 }
