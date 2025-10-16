@@ -195,6 +195,7 @@ message ProviderInfo {
   string id = 1;
   string name = 2;
   ProviderType type = 3;
+  bool prevent_transfer = 4;
 }
 
 enum ProviderType {

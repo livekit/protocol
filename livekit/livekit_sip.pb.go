@@ -864,12 +864,13 @@ func (x *CreateSIPTrunkRequest) GetMetadata() string {
 }
 
 type ProviderInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type          ProviderType           `protobuf:"varint,3,opt,name=type,proto3,enum=livekit.ProviderType" json:"type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Type            ProviderType           `protobuf:"varint,3,opt,name=type,proto3,enum=livekit.ProviderType" json:"type,omitempty"`
+	PreventTransfer bool                   `protobuf:"varint,4,opt,name=prevent_transfer,json=preventTransfer,proto3" json:"prevent_transfer,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *ProviderInfo) Reset() {
@@ -921,6 +922,13 @@ func (x *ProviderInfo) GetType() ProviderType {
 		return x.Type
 	}
 	return ProviderType_PROVIDER_TYPE_UNKNOWN
+}
+
+func (x *ProviderInfo) GetPreventTransfer() bool {
+	if x != nil {
+		return x.PreventTransfer
+	}
+	return false
 }
 
 // Deprecated: Marked as deprecated in livekit_sip.proto.
@@ -4286,11 +4294,12 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x11outbound_password\x18\b \x01(\tR\x10outboundPassword\x12\x12\n" +
 	"\x04name\x18\n" +
 	" \x01(\tR\x04name\x12\x1a\n" +
-	"\bmetadata\x18\v \x01(\tR\bmetadata:\x02\x18\x01\"]\n" +
+	"\bmetadata\x18\v \x01(\tR\bmetadata:\x02\x18\x01\"\x88\x01\n" +
 	"\fProviderInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
-	"\x04type\x18\x03 \x01(\x0e2\x15.livekit.ProviderTypeR\x04type\"\xa6\x05\n" +
+	"\x04type\x18\x03 \x01(\x0e2\x15.livekit.ProviderTypeR\x04type\x12)\n" +
+	"\x10prevent_transfer\x18\x04 \x01(\bR\x0fpreventTransfer\"\xa6\x05\n" +
 	"\fSIPTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x123\n" +
