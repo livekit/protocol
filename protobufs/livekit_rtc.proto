@@ -256,6 +256,7 @@ message SessionDescription {
   string type = 1; // "answer" | "offer" | "pranswer" | "rollback"
   string sdp = 2;
   uint32 id = 3;
+  map<string, string> mid_to_track_id = 4;
 }
 
 message ParticipantUpdate {

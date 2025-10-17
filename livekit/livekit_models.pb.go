@@ -838,6 +838,8 @@ const (
 	ParticipantInfo_SIP ParticipantInfo_Kind = 3
 	// LiveKit agents
 	ParticipantInfo_AGENT ParticipantInfo_Kind = 4
+	// Connectors participants
+	ParticipantInfo_CONNECTOR ParticipantInfo_Kind = 7 // NEXT_ID: 8
 )
 
 // Enum value maps for ParticipantInfo_Kind.
@@ -848,13 +850,15 @@ var (
 		2: "EGRESS",
 		3: "SIP",
 		4: "AGENT",
+		7: "CONNECTOR",
 	}
 	ParticipantInfo_Kind_value = map[string]int32{
-		"STANDARD": 0,
-		"INGRESS":  1,
-		"EGRESS":   2,
-		"SIP":      3,
-		"AGENT":    4,
+		"STANDARD":  0,
+		"INGRESS":   1,
+		"EGRESS":    2,
+		"SIP":       3,
+		"AGENT":     4,
+		"CONNECTOR": 7,
 	}
 )
 
@@ -5980,14 +5984,15 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06JOINED\x10\x01\x12\n" +
 	"\n" +
 	"\x06ACTIVE\x10\x02\x12\x10\n" +
-	"\fDISCONNECTED\x10\x03\"A\n" +
+	"\fDISCONNECTED\x10\x03\"P\n" +
 	"\x04Kind\x12\f\n" +
 	"\bSTANDARD\x10\x00\x12\v\n" +
 	"\aINGRESS\x10\x01\x12\n" +
 	"\n" +
 	"\x06EGRESS\x10\x02\x12\a\n" +
 	"\x03SIP\x10\x03\x12\t\n" +
-	"\x05AGENT\x10\x04\",\n" +
+	"\x05AGENT\x10\x04\x12\r\n" +
+	"\tCONNECTOR\x10\a\",\n" +
 	"\n" +
 	"KindDetail\x12\x0f\n" +
 	"\vCLOUD_AGENT\x10\x00\x12\r\n" +

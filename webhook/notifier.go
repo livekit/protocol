@@ -188,8 +188,8 @@ type HTTPClientParams struct {
 }
 
 type FilterParams struct {
-	IncludeEvents []string
-	ExcludeEvents []string
+	IncludeEvents []string `yaml:"include_events,omitempty"`
+	ExcludeEvents []string `yaml:"exclude_events,omitempty"`
 }
 
 // ---------------------------------

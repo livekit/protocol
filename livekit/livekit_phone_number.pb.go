@@ -131,10 +131,10 @@ func (PhoneNumberType) EnumDescriptor() ([]byte, []int) {
 // SearchPhoneNumbersRequest - Request to search available phone numbers
 type SearchPhoneNumbersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CountryCode   string                 `protobuf:"bytes,1,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"` // Optional: Filter by country code (e.g., "US", "CA")
-	AreaCode      string                 `protobuf:"bytes,2,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`          // Optional: Filter by area code (e.g., "415")
-	Limit         int32                  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`                               // Optional: Maximum number of results (default: 50)
-	PageToken     *TokenPagination       `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`       // Optional: Token for pagination (empty for first page)
+	CountryCode   string                 `protobuf:"bytes,1,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"` // Filter by country code (e.g., "US", "CA")
+	AreaCode      *string                `protobuf:"bytes,2,opt,name=area_code,json=areaCode,proto3,oneof" json:"area_code,omitempty"`    // Filter by area code (e.g., "415")
+	Limit         *int32                 `protobuf:"varint,3,opt,name=limit,proto3,oneof" json:"limit,omitempty"`                         // Maximum number of results (default: 50)
+	PageToken     *TokenPagination       `protobuf:"bytes,4,opt,name=page_token,json=pageToken,proto3,oneof" json:"page_token,omitempty"` // Token for pagination (empty for first page)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -177,15 +177,15 @@ func (x *SearchPhoneNumbersRequest) GetCountryCode() string {
 }
 
 func (x *SearchPhoneNumbersRequest) GetAreaCode() string {
-	if x != nil {
-		return x.AreaCode
+	if x != nil && x.AreaCode != nil {
+		return *x.AreaCode
 	}
 	return ""
 }
 
 func (x *SearchPhoneNumbersRequest) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
+	if x != nil && x.Limit != nil {
+		return *x.Limit
 	}
 	return 0
 }
@@ -253,8 +253,8 @@ func (x *SearchPhoneNumbersResponse) GetNextPageToken() *TokenPagination {
 // PurchasePhoneNumberRequest - Request to purchase phone numbers
 type PurchasePhoneNumberRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	PhoneNumbers      []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"`                    // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
-	SipDispatchRuleId string                 `protobuf:"bytes,2,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"` // Optional: SIP dispatch rule ID to apply to all purchased numbers
+	PhoneNumbers      []string               `protobuf:"bytes,1,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"`                          // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
+	SipDispatchRuleId *string                `protobuf:"bytes,2,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3,oneof" json:"sip_dispatch_rule_id,omitempty"` // SIP dispatch rule ID to apply to all purchased numbers
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -297,8 +297,8 @@ func (x *PurchasePhoneNumberRequest) GetPhoneNumbers() []string {
 }
 
 func (x *PurchasePhoneNumberRequest) GetSipDispatchRuleId() string {
-	if x != nil {
-		return x.SipDispatchRuleId
+	if x != nil && x.SipDispatchRuleId != nil {
+		return *x.SipDispatchRuleId
 	}
 	return ""
 }
@@ -351,10 +351,10 @@ func (x *PurchasePhoneNumberResponse) GetPhoneNumbers() []*PhoneNumber {
 // ListPhoneNumbersRequest - Request to list phone numbers
 type ListPhoneNumbersRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Limit             int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`                                                     // Optional: Maximum number of results (default: 50)
-	Status            PhoneNumberStatus      `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                    // Optional: Filter by status (active, pending, released)
-	PageToken         *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`                             // Optional: Token for pagination (empty for first page)
-	SipDispatchRuleId string                 `protobuf:"bytes,4,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"` // Optional: Filter by SIP dispatch rule ID
+	Limit             *int32                 `protobuf:"varint,1,opt,name=limit,proto3,oneof" json:"limit,omitempty"`                                                     // Maximum number of results (default: 50)
+	Statuses          []PhoneNumberStatus    `protobuf:"varint,2,rep,packed,name=statuses,proto3,enum=livekit.PhoneNumberStatus" json:"statuses,omitempty"`               // Filter by statuses (active, pending, released)
+	PageToken         *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3,oneof" json:"page_token,omitempty"`                             // Token for pagination (empty for first page)
+	SipDispatchRuleId *string                `protobuf:"bytes,4,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3,oneof" json:"sip_dispatch_rule_id,omitempty"` // Filter by SIP dispatch rule ID
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -390,17 +390,17 @@ func (*ListPhoneNumbersRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *ListPhoneNumbersRequest) GetLimit() int32 {
-	if x != nil {
-		return x.Limit
+	if x != nil && x.Limit != nil {
+		return *x.Limit
 	}
 	return 0
 }
 
-func (x *ListPhoneNumbersRequest) GetStatus() PhoneNumberStatus {
+func (x *ListPhoneNumbersRequest) GetStatuses() []PhoneNumberStatus {
 	if x != nil {
-		return x.Status
+		return x.Statuses
 	}
-	return PhoneNumberStatus_PHONE_NUMBER_STATUS_UNSPECIFIED
+	return nil
 }
 
 func (x *ListPhoneNumbersRequest) GetPageToken() *TokenPagination {
@@ -411,8 +411,8 @@ func (x *ListPhoneNumbersRequest) GetPageToken() *TokenPagination {
 }
 
 func (x *ListPhoneNumbersRequest) GetSipDispatchRuleId() string {
-	if x != nil {
-		return x.SipDispatchRuleId
+	if x != nil && x.SipDispatchRuleId != nil {
+		return *x.SipDispatchRuleId
 	}
 	return ""
 }
@@ -481,8 +481,8 @@ func (x *ListPhoneNumbersResponse) GetTotalCount() int32 {
 // GetPhoneNumberRequest - Request to get a phone number
 type GetPhoneNumberRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                      // Optional: Use phone number ID for direct lookup
-	PhoneNumber   string                 `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"` // Optional: Use phone number string for lookup
+	Id            *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`                                      // Use phone number ID for direct lookup
+	PhoneNumber   *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"` // Use phone number string for lookup
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -518,15 +518,15 @@ func (*GetPhoneNumberRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *GetPhoneNumberRequest) GetId() string {
-	if x != nil {
-		return x.Id
+	if x != nil && x.Id != nil {
+		return *x.Id
 	}
 	return ""
 }
 
 func (x *GetPhoneNumberRequest) GetPhoneNumber() string {
-	if x != nil {
-		return x.PhoneNumber
+	if x != nil && x.PhoneNumber != nil {
+		return *x.PhoneNumber
 	}
 	return ""
 }
@@ -579,9 +579,9 @@ func (x *GetPhoneNumberResponse) GetPhoneNumber() *PhoneNumber {
 // UpdatePhoneNumberRequest - Request to update a phone number
 type UpdatePhoneNumberRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                            // Optional: Use phone number ID for direct lookup
-	PhoneNumber       string                 `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3" json:"phone_number,omitempty"`                       // Optional: Use phone number string for lookup
-	SipDispatchRuleId string                 `protobuf:"bytes,3,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"` // Optional: SIP dispatch rule ID to assign to the phone number
+	Id                *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`                                                            // Use phone number ID for direct lookup
+	PhoneNumber       *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`                       // Use phone number string for lookup
+	SipDispatchRuleId *string                `protobuf:"bytes,3,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3,oneof" json:"sip_dispatch_rule_id,omitempty"` // SIP dispatch rule ID to assign to the phone number
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -617,22 +617,22 @@ func (*UpdatePhoneNumberRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *UpdatePhoneNumberRequest) GetId() string {
-	if x != nil {
-		return x.Id
+	if x != nil && x.Id != nil {
+		return *x.Id
 	}
 	return ""
 }
 
 func (x *UpdatePhoneNumberRequest) GetPhoneNumber() string {
-	if x != nil {
-		return x.PhoneNumber
+	if x != nil && x.PhoneNumber != nil {
+		return *x.PhoneNumber
 	}
 	return ""
 }
 
 func (x *UpdatePhoneNumberRequest) GetSipDispatchRuleId() string {
-	if x != nil {
-		return x.SipDispatchRuleId
+	if x != nil && x.SipDispatchRuleId != nil {
+		return *x.SipDispatchRuleId
 	}
 	return ""
 }
@@ -685,8 +685,8 @@ func (x *UpdatePhoneNumberResponse) GetPhoneNumber() *PhoneNumber {
 // ReleasePhoneNumbersRequest - Request to release phone numbers
 type ReleasePhoneNumbersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`                                       // Optional: Use phone number IDs for direct lookup
-	PhoneNumbers  []string               `protobuf:"bytes,2,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Optional: Use phone number strings for lookup
+	Ids           []string               `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`                                       // Use phone number IDs for direct lookup
+	PhoneNumbers  []string               `protobuf:"bytes,2,rep,name=phone_numbers,json=phoneNumbers,proto3" json:"phone_numbers,omitempty"` // Use phone number strings for lookup
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -933,41 +933,54 @@ var File_livekit_phone_number_proto protoreflect.FileDescriptor
 
 const file_livekit_phone_number_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14livekit_models.proto\"\xaa\x01\n" +
+	"\x1alivekit_phone_number.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14livekit_models.proto\"\xe0\x01\n" +
 	"\x19SearchPhoneNumbersRequest\x12!\n" +
-	"\fcountry_code\x18\x01 \x01(\tR\vcountryCode\x12\x1b\n" +
-	"\tarea_code\x18\x02 \x01(\tR\bareaCode\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x127\n" +
+	"\fcountry_code\x18\x01 \x01(\tR\vcountryCode\x12 \n" +
+	"\tarea_code\x18\x02 \x01(\tH\x00R\bareaCode\x88\x01\x01\x12\x19\n" +
+	"\x05limit\x18\x03 \x01(\x05H\x01R\x05limit\x88\x01\x01\x12<\n" +
 	"\n" +
-	"page_token\x18\x04 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\"\x8a\x01\n" +
+	"page_token\x18\x04 \x01(\v2\x18.livekit.TokenPaginationH\x02R\tpageToken\x88\x01\x01B\f\n" +
+	"\n" +
+	"_area_codeB\b\n" +
+	"\x06_limitB\r\n" +
+	"\v_page_token\"\x8a\x01\n" +
 	"\x1aSearchPhoneNumbersResponse\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\x05items\x12@\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"r\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"\x90\x01\n" +
 	"\x1aPurchasePhoneNumberRequest\x12#\n" +
-	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x02 \x01(\tR\x11sipDispatchRuleId\"X\n" +
+	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\x124\n" +
+	"\x14sip_dispatch_rule_id\x18\x02 \x01(\tH\x00R\x11sipDispatchRuleId\x88\x01\x01B\x17\n" +
+	"\x15_sip_dispatch_rule_id\"X\n" +
 	"\x1bPurchasePhoneNumberResponse\x129\n" +
-	"\rphone_numbers\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\fphoneNumbers\"\xcd\x01\n" +
-	"\x17ListPhoneNumbersRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\x122\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x1a.livekit.PhoneNumberStatusR\x06status\x127\n" +
+	"\rphone_numbers\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\fphoneNumbers\"\x92\x02\n" +
+	"\x17ListPhoneNumbersRequest\x12\x19\n" +
+	"\x05limit\x18\x01 \x01(\x05H\x00R\x05limit\x88\x01\x01\x126\n" +
+	"\bstatuses\x18\x02 \x03(\x0e2\x1a.livekit.PhoneNumberStatusR\bstatuses\x12<\n" +
 	"\n" +
-	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x04 \x01(\tR\x11sipDispatchRuleId\"\xa9\x01\n" +
+	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationH\x01R\tpageToken\x88\x01\x01\x124\n" +
+	"\x14sip_dispatch_rule_id\x18\x04 \x01(\tH\x02R\x11sipDispatchRuleId\x88\x01\x01B\b\n" +
+	"\x06_limitB\r\n" +
+	"\v_page_tokenB\x17\n" +
+	"\x15_sip_dispatch_rule_id\"\xa9\x01\n" +
 	"\x18ListPhoneNumbersResponse\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\x05items\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\"J\n" +
-	"\x15GetPhoneNumberRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fphone_number\x18\x02 \x01(\tR\vphoneNumber\"Q\n" +
+	"totalCount\"l\n" +
+	"\x15GetPhoneNumberRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01B\x05\n" +
+	"\x03_idB\x0f\n" +
+	"\r_phone_number\"Q\n" +
 	"\x16GetPhoneNumberResponse\x127\n" +
-	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"~\n" +
-	"\x18UpdatePhoneNumberRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fphone_number\x18\x02 \x01(\tR\vphoneNumber\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tR\x11sipDispatchRuleId\"T\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"\xbe\x01\n" +
+	"\x18UpdatePhoneNumberRequest\x12\x13\n" +
+	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12&\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x124\n" +
+	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tH\x02R\x11sipDispatchRuleId\x88\x01\x01B\x05\n" +
+	"\x03_idB\x0f\n" +
+	"\r_phone_numberB\x17\n" +
+	"\x15_sip_dispatch_rule_id\"T\n" +
 	"\x19UpdatePhoneNumberResponse\x127\n" +
 	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"S\n" +
 	"\x1aReleasePhoneNumbersRequest\x12\x10\n" +
@@ -1054,7 +1067,7 @@ var file_livekit_phone_number_proto_depIdxs = []int32{
 	14, // 1: livekit.SearchPhoneNumbersResponse.items:type_name -> livekit.PhoneNumber
 	15, // 2: livekit.SearchPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
 	14, // 3: livekit.PurchasePhoneNumberResponse.phone_numbers:type_name -> livekit.PhoneNumber
-	0,  // 4: livekit.ListPhoneNumbersRequest.status:type_name -> livekit.PhoneNumberStatus
+	0,  // 4: livekit.ListPhoneNumbersRequest.statuses:type_name -> livekit.PhoneNumberStatus
 	15, // 5: livekit.ListPhoneNumbersRequest.page_token:type_name -> livekit.TokenPagination
 	14, // 6: livekit.ListPhoneNumbersResponse.items:type_name -> livekit.PhoneNumber
 	15, // 7: livekit.ListPhoneNumbersResponse.next_page_token:type_name -> livekit.TokenPagination
@@ -1091,6 +1104,11 @@ func file_livekit_phone_number_proto_init() {
 		return
 	}
 	file_livekit_models_proto_init()
+	file_livekit_phone_number_proto_msgTypes[0].OneofWrappers = []any{}
+	file_livekit_phone_number_proto_msgTypes[2].OneofWrappers = []any{}
+	file_livekit_phone_number_proto_msgTypes[4].OneofWrappers = []any{}
+	file_livekit_phone_number_proto_msgTypes[6].OneofWrappers = []any{}
+	file_livekit_phone_number_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

@@ -100,6 +100,7 @@ message AgentVersion {
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp deployed_at = 4;
     map<string, string> attributes = 5;
+    string status = 6;
 }
 
 message ListAgentVersionsRequest {
