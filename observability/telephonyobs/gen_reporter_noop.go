@@ -58,7 +58,7 @@ func NewNoopCarrierReporter() CarrierReporter {
 func (r *noopCarrierReporter) RegisterFunc(f func(ts time.Time, tx CarrierTx) bool) {}
 func (r *noopCarrierReporter) Tx(f func(CarrierTx))                                 {}
 func (r *noopCarrierReporter) TxAt(ts time.Time, f func(CarrierTx))                 {}
-func (r *noopCarrierReporter) WithCountry(callCountryCode string) CountryReporter {
+func (r *noopCarrierReporter) WithCountry(countryCode string) CountryReporter {
 	return &noopCountryReporter{}
 }
 func (r *noopCarrierReporter) WithDeferredCountry() (CountryReporter, KeyResolver) {
