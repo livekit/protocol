@@ -24,7 +24,9 @@ import "livekit_agent_dispatch.proto";
 message ConnectTwilioCallRequest {
 
   enum TwilioCallDirection {
+    // Call is inbound to LiveKit from Twilio
     TWILIO_CALL_DIRECTION_INBOUND = 0;
+    // Call is outbound from LiveKit to Twilio
     TWILIO_CALL_DIRECTION_OUTBOUND = 1;
   }
 

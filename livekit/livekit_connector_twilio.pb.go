@@ -38,7 +38,9 @@ const (
 type ConnectTwilioCallRequest_TwilioCallDirection int32
 
 const (
-	ConnectTwilioCallRequest_TWILIO_CALL_DIRECTION_INBOUND  ConnectTwilioCallRequest_TwilioCallDirection = 0
+	// Call is inbound to LiveKit from Twilio
+	ConnectTwilioCallRequest_TWILIO_CALL_DIRECTION_INBOUND ConnectTwilioCallRequest_TwilioCallDirection = 0
+	// Call is outbound from LiveKit to Twilio
 	ConnectTwilioCallRequest_TWILIO_CALL_DIRECTION_OUTBOUND ConnectTwilioCallRequest_TwilioCallDirection = 1
 )
 
