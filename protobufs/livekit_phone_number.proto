@@ -79,7 +79,7 @@ message PurchasePhoneNumberResponse {
 // ListPhoneNumbersRequest - Request to list phone numbers
 message ListPhoneNumbersRequest {
   optional int32 limit = 1;                 // Maximum number of results (default: 50)
-  optional repeated PhoneNumberStatus statuses = 2;  // Filter by statuses (active, pending, released)
+  repeated PhoneNumberStatus statuses = 2;           // Filter by statuses (active, pending, released)
   optional TokenPagination page_token = 3;  // Token for pagination (empty for first page)
   optional string sip_dispatch_rule_id = 4; // Filter by SIP dispatch rule ID
 }
