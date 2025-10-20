@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_R8RMFD0 = true
+const Version_AIHSTV8 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -35,7 +35,7 @@ type CarrierReporter interface {
 	RegisterFunc(func(ts time.Time, tx CarrierTx) bool)
 	Tx(func(tx CarrierTx))
 	TxAt(time.Time, func(tx CarrierTx))
-	WithCountry(countryCode string) CountryReporter
+	WithCountry(code string) CountryReporter
 	WithDeferredCountry() (CountryReporter, KeyResolver)
 	CarrierTx
 }
