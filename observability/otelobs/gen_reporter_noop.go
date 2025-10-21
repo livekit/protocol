@@ -58,5 +58,4 @@ func (r *noopSourceReporter) Tx(f func(SourceTx))                               
 func (r *noopSourceReporter) TxAt(ts time.Time, f func(SourceTx))                 {}
 func (r *noopSourceReporter) ReportDataType(v DataType)                           {}
 func (r *noopSourceReporter) ReportBytes(v uint64)                                {}
-func (r *noopSourceReporter) ReportDuration(v uint64)                             {}
 func (r *noopSourceReporter) ReportAllowedForTraining(v bool)                     {}

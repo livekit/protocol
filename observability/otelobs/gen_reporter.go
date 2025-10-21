@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_2AT6MB8 = true
+const Version_SJLS0N0 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -32,7 +32,6 @@ type ProjectReporter interface {
 type SourceTx interface {
 	ReportDataType(v DataType)
 	ReportBytes(v uint64)
-	ReportDuration(v uint64)
 	ReportAllowedForTraining(v bool)
 }
 
