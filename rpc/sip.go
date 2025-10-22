@@ -81,7 +81,6 @@ func NewCreateSIPParticipantRequest(
 		includeHeaders     livekit.SIPHeaderOptions
 		transport          livekit.SIPTransport
 		destinationCountry string
-		destinationRegion  string
 		authUser           string
 		authPass           string
 		hdrToAttr          map[string]string
@@ -164,15 +163,11 @@ func NewCreateSIPParticipantRequest(
 		participantIdentity = "sip_" + req.SipCallTo
 	}
 
-	// Set destination region from request
-	destinationRegion = req.DestinationRegion
-
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
 		DestinationCountry:    destinationCountry,
-		DestinationRegion:     destinationRegion,
 		Address:               hostname,
 		Hostname:              ownHostname,
 		Transport:             transport,
