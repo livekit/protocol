@@ -8,5 +8,6 @@ export * from "./gen/livekit_models_pb.js";
 export * from "./gen/livekit_room_pb.js";
 export * from "./gen/livekit_rtc_pb.js";
 export * from "./gen/livekit_sip_pb.js";
+export * from "./gen/livekit_token_source_pb.js";
 export * from "./gen/livekit_webhook_pb.js";
 export * from "./gen/version.js";

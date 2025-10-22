@@ -1,5 +1,47 @@
 # @livekit/protocol
 
+## 1.42.2
+
+### Patch Changes
+
+- Include mid in SessionDescription - [#1257](https://github.com/livekit/protocol/pull/1257) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.42.1
+
+### Patch Changes
+
+- Add InputVideo/AudioState to ICERestartWHIPResourceResponse - [#1237](https://github.com/livekit/protocol/pull/1237) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Document mono package, support Unix and Parse. - [#1242](https://github.com/livekit/protocol/pull/1242) ([@dennwc](https://github.com/dennwc))
+
+- Fix zero time handling in mono package. - [#1241](https://github.com/livekit/protocol/pull/1241) ([@dennwc](https://github.com/dennwc))
+
+- Setting service - [#1240](https://github.com/livekit/protocol/pull/1240) ([@paulwe](https://github.com/paulwe))
+
+- Enable recording - [#1233](https://github.com/livekit/protocol/pull/1233) ([@paulwe](https://github.com/paulwe))
+
+- handle session timer skips >1 min - [#1227](https://github.com/livekit/protocol/pull/1227) ([@paulwe](https://github.com/paulwe))
+
+## 1.42.0
+
+### Minor Changes
+
+- rename ListUpdate "del" field to "rename" - [#1203](https://github.com/livekit/protocol/pull/1203) ([@rektdeckard](https://github.com/rektdeckard))
+
+### Patch Changes
+
+- update psrpc - [#1204](https://github.com/livekit/protocol/pull/1204) ([@paulwe](https://github.com/paulwe))
+
+- add observability grant setter - [#1214](https://github.com/livekit/protocol/pull/1214) ([@paulwe](https://github.com/paulwe))
+
+- Add feature flags to GetIngressInfoResponse - [#1218](https://github.com/livekit/protocol/pull/1218) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add fields needed for WHIP to SFU support - [#1183](https://github.com/livekit/protocol/pull/1183) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Add new TokenSourceRequest / TokenSourceResponse message types - [#1224](https://github.com/livekit/protocol/pull/1224) ([@1egoman](https://github.com/1egoman))
+
+- Suport for simulcast codec of audio. - [#1207](https://github.com/livekit/protocol/pull/1207) ([@boks1971](https://github.com/boks1971))
+
 ## 1.41.0
 
 ### Minor Changes

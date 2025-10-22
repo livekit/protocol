@@ -30,6 +30,8 @@ func (f *filter) SetFilter(params FilterParams) {
 	f.params = params
 }
 
+// IncludeEvents and ExcludeEvents are mutually exclusive; only one will be checked
+// if neither are set, the event will be allowed
 func (f *filter) IsAllowed(event string) bool {
 	// includes get higher precendence than excludes
 	if len(f.params.IncludeEvents) != 0 {
@@ -40,6 +42,5 @@ func (f *filter) IsAllowed(event string) bool {
 		return !slices.Contains(f.params.ExcludeEvents, event)
 	}
 
-	// default allow
 	return true
 }

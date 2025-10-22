@@ -42,6 +42,7 @@ service IOInfo {
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
   rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
   rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
+  rpc RecordCallContext(RecordCallContextRequest) returns (google.protobuf.Empty);
 }
 
 message GetEgressRequest {
@@ -64,7 +65,8 @@ message GetIngressInfoResponse {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
-  map<string,string> logging_fields = 4;
+  map<string, string> logging_fields = 4;
+  map<string, string> feature_flags = 5;
 }
 
 // Request to store an update to the ingress state ingress -> service
@@ -103,6 +105,7 @@ message GetSIPTrunkAuthenticationResponse {
   string sip_trunk_id = 4;
   // Used in Cloud only
   string project_id = 5;
+  livekit.ProviderInfo provider_info = 6;
 }
 
 message EvaluateSIPDispatchRulesRequest {
@@ -212,6 +215,12 @@ message UpdateSIPCallStateRequest {
   livekit.SIPTransferInfo transfer_info = 2;
 
    // NEXT ID: 3
+}
+
+message RecordCallContextRequest {
+  livekit.SIPCallInfo call_info = 1;
+
+  // NEXT ID: 2
 }
 
 enum SIPDispatchResult {

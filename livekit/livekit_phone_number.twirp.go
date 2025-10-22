@@ -28,23 +28,23 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 
 // Public Phone Number Service - External API for phone number management
 type PhoneNumberService interface {
-	// List available phone numbers in inventory
-	ListPhoneNumberInventory(context.Context, *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error)
+	// Search available phone numbers in inventory
+	SearchPhoneNumbers(context.Context, *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error)
 
 	// Purchase a phone number from inventory
 	PurchasePhoneNumber(context.Context, *PurchasePhoneNumberRequest) (*PurchasePhoneNumberResponse, error)
 
-	// List purchased phone numbers for a project
-	ListPurchasedPhoneNumbers(context.Context, *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error)
+	// List phone numbers for a project
+	ListPhoneNumbers(context.Context, *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error)
 
-	// Get a purchased phone number
-	GetPurchasedPhoneNumber(context.Context, *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error)
+	// Get a phone number from a project
+	GetPhoneNumber(context.Context, *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error)
 
-	// Update a purchased phone number
-	UpdatePurchasedPhoneNumber(context.Context, *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error)
+	// Update a phone number in a project
+	UpdatePhoneNumber(context.Context, *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error)
 
-	// Release a purchased phone number
-	ReleasePurchasedPhoneNumber(context.Context, *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error)
+	// Release phone numbers
+	ReleasePhoneNumbers(context.Context, *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error)
 }
 
 // ==================================
@@ -82,12 +82,12 @@ func NewPhoneNumberServiceProtobufClient(baseURL string, client HTTPClient, opts
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "PhoneNumberService")
 	urls := [6]string{
-		serviceURL + "ListPhoneNumberInventory",
+		serviceURL + "SearchPhoneNumbers",
 		serviceURL + "PurchasePhoneNumber",
-		serviceURL + "ListPurchasedPhoneNumbers",
-		serviceURL + "GetPurchasedPhoneNumber",
-		serviceURL + "UpdatePurchasedPhoneNumber",
-		serviceURL + "ReleasePurchasedPhoneNumber",
+		serviceURL + "ListPhoneNumbers",
+		serviceURL + "GetPhoneNumber",
+		serviceURL + "UpdatePhoneNumber",
+		serviceURL + "ReleasePhoneNumbers",
 	}
 
 	return &phoneNumberServiceProtobufClient{
@@ -98,26 +98,26 @@ func NewPhoneNumberServiceProtobufClient(baseURL string, client HTTPClient, opts
 	}
 }
 
-func (c *phoneNumberServiceProtobufClient) ListPhoneNumberInventory(ctx context.Context, in *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
+func (c *phoneNumberServiceProtobufClient) SearchPhoneNumbers(ctx context.Context, in *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumberInventory")
-	caller := c.callListPhoneNumberInventory
+	ctx = ctxsetters.WithMethodName(ctx, "SearchPhoneNumbers")
+	caller := c.callSearchPhoneNumbers
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
+		caller = func(ctx context.Context, req *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPhoneNumberInventoryRequest)
+					typedReq, ok := req.(*SearchPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumberInventoryRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*SearchPhoneNumbersRequest) when calling interceptor")
 					}
-					return c.callListPhoneNumberInventory(ctx, typedReq)
+					return c.callSearchPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPhoneNumberInventoryResponse)
+				typedResp, ok := resp.(*SearchPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumberInventoryResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*SearchPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -127,8 +127,8 @@ func (c *phoneNumberServiceProtobufClient) ListPhoneNumberInventory(ctx context.
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceProtobufClient) callListPhoneNumberInventory(ctx context.Context, in *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
-	out := new(ListPhoneNumberInventoryResponse)
+func (c *phoneNumberServiceProtobufClient) callSearchPhoneNumbers(ctx context.Context, in *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
+	out := new(SearchPhoneNumbersResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -190,26 +190,26 @@ func (c *phoneNumberServiceProtobufClient) callPurchasePhoneNumber(ctx context.C
 	return out, nil
 }
 
-func (c *phoneNumberServiceProtobufClient) ListPurchasedPhoneNumbers(ctx context.Context, in *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
+func (c *phoneNumberServiceProtobufClient) ListPhoneNumbers(ctx context.Context, in *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "ListPurchasedPhoneNumbers")
-	caller := c.callListPurchasedPhoneNumbers
+	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumbers")
+	caller := c.callListPhoneNumbers
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
+		caller = func(ctx context.Context, req *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ListPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumbersRequest) when calling interceptor")
 					}
-					return c.callListPurchasedPhoneNumbers(ctx, typedReq)
+					return c.callListPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ListPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -219,8 +219,8 @@ func (c *phoneNumberServiceProtobufClient) ListPurchasedPhoneNumbers(ctx context
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceProtobufClient) callListPurchasedPhoneNumbers(ctx context.Context, in *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
-	out := new(ListPurchasedPhoneNumbersResponse)
+func (c *phoneNumberServiceProtobufClient) callListPhoneNumbers(ctx context.Context, in *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
+	out := new(ListPhoneNumbersResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -236,26 +236,26 @@ func (c *phoneNumberServiceProtobufClient) callListPurchasedPhoneNumbers(ctx con
 	return out, nil
 }
 
-func (c *phoneNumberServiceProtobufClient) GetPurchasedPhoneNumber(ctx context.Context, in *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
+func (c *phoneNumberServiceProtobufClient) GetPhoneNumber(ctx context.Context, in *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "GetPurchasedPhoneNumber")
-	caller := c.callGetPurchasedPhoneNumber
+	ctx = ctxsetters.WithMethodName(ctx, "GetPhoneNumber")
+	caller := c.callGetPhoneNumber
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
+		caller = func(ctx context.Context, req *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*GetPurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*GetPhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*GetPurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*GetPhoneNumberRequest) when calling interceptor")
 					}
-					return c.callGetPurchasedPhoneNumber(ctx, typedReq)
+					return c.callGetPhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*GetPurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*GetPhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*GetPurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -265,8 +265,8 @@ func (c *phoneNumberServiceProtobufClient) GetPurchasedPhoneNumber(ctx context.C
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceProtobufClient) callGetPurchasedPhoneNumber(ctx context.Context, in *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
-	out := new(GetPurchasedPhoneNumberResponse)
+func (c *phoneNumberServiceProtobufClient) callGetPhoneNumber(ctx context.Context, in *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
+	out := new(GetPhoneNumberResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -282,26 +282,26 @@ func (c *phoneNumberServiceProtobufClient) callGetPurchasedPhoneNumber(ctx conte
 	return out, nil
 }
 
-func (c *phoneNumberServiceProtobufClient) UpdatePurchasedPhoneNumber(ctx context.Context, in *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
+func (c *phoneNumberServiceProtobufClient) UpdatePhoneNumber(ctx context.Context, in *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "UpdatePurchasedPhoneNumber")
-	caller := c.callUpdatePurchasedPhoneNumber
+	ctx = ctxsetters.WithMethodName(ctx, "UpdatePhoneNumber")
+	caller := c.callUpdatePhoneNumber
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
+		caller = func(ctx context.Context, req *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*UpdatePurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*UpdatePhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*UpdatePurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*UpdatePhoneNumberRequest) when calling interceptor")
 					}
-					return c.callUpdatePurchasedPhoneNumber(ctx, typedReq)
+					return c.callUpdatePhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*UpdatePurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*UpdatePhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -311,8 +311,8 @@ func (c *phoneNumberServiceProtobufClient) UpdatePurchasedPhoneNumber(ctx contex
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceProtobufClient) callUpdatePurchasedPhoneNumber(ctx context.Context, in *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
-	out := new(UpdatePurchasedPhoneNumberResponse)
+func (c *phoneNumberServiceProtobufClient) callUpdatePhoneNumber(ctx context.Context, in *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
+	out := new(UpdatePhoneNumberResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -328,26 +328,26 @@ func (c *phoneNumberServiceProtobufClient) callUpdatePurchasedPhoneNumber(ctx co
 	return out, nil
 }
 
-func (c *phoneNumberServiceProtobufClient) ReleasePurchasedPhoneNumber(ctx context.Context, in *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
+func (c *phoneNumberServiceProtobufClient) ReleasePhoneNumbers(ctx context.Context, in *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "ReleasePurchasedPhoneNumber")
-	caller := c.callReleasePurchasedPhoneNumber
+	ctx = ctxsetters.WithMethodName(ctx, "ReleasePhoneNumbers")
+	caller := c.callReleasePhoneNumbers
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
+		caller = func(ctx context.Context, req *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ReleasePurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ReleasePhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ReleasePurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ReleasePhoneNumbersRequest) when calling interceptor")
 					}
-					return c.callReleasePurchasedPhoneNumber(ctx, typedReq)
+					return c.callReleasePhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ReleasePurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ReleasePhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -357,8 +357,8 @@ func (c *phoneNumberServiceProtobufClient) ReleasePurchasedPhoneNumber(ctx conte
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceProtobufClient) callReleasePurchasedPhoneNumber(ctx context.Context, in *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
-	out := new(ReleasePurchasedPhoneNumbersResponse)
+func (c *phoneNumberServiceProtobufClient) callReleasePhoneNumbers(ctx context.Context, in *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
+	out := new(ReleasePhoneNumbersResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -409,12 +409,12 @@ func NewPhoneNumberServiceJSONClient(baseURL string, client HTTPClient, opts ...
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "livekit", "PhoneNumberService")
 	urls := [6]string{
-		serviceURL + "ListPhoneNumberInventory",
+		serviceURL + "SearchPhoneNumbers",
 		serviceURL + "PurchasePhoneNumber",
-		serviceURL + "ListPurchasedPhoneNumbers",
-		serviceURL + "GetPurchasedPhoneNumber",
-		serviceURL + "UpdatePurchasedPhoneNumber",
-		serviceURL + "ReleasePurchasedPhoneNumber",
+		serviceURL + "ListPhoneNumbers",
+		serviceURL + "GetPhoneNumber",
+		serviceURL + "UpdatePhoneNumber",
+		serviceURL + "ReleasePhoneNumbers",
 	}
 
 	return &phoneNumberServiceJSONClient{
@@ -425,26 +425,26 @@ func NewPhoneNumberServiceJSONClient(baseURL string, client HTTPClient, opts ...
 	}
 }
 
-func (c *phoneNumberServiceJSONClient) ListPhoneNumberInventory(ctx context.Context, in *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
+func (c *phoneNumberServiceJSONClient) SearchPhoneNumbers(ctx context.Context, in *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumberInventory")
-	caller := c.callListPhoneNumberInventory
+	ctx = ctxsetters.WithMethodName(ctx, "SearchPhoneNumbers")
+	caller := c.callSearchPhoneNumbers
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
+		caller = func(ctx context.Context, req *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPhoneNumberInventoryRequest)
+					typedReq, ok := req.(*SearchPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumberInventoryRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*SearchPhoneNumbersRequest) when calling interceptor")
 					}
-					return c.callListPhoneNumberInventory(ctx, typedReq)
+					return c.callSearchPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPhoneNumberInventoryResponse)
+				typedResp, ok := resp.(*SearchPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumberInventoryResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*SearchPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -454,8 +454,8 @@ func (c *phoneNumberServiceJSONClient) ListPhoneNumberInventory(ctx context.Cont
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceJSONClient) callListPhoneNumberInventory(ctx context.Context, in *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
-	out := new(ListPhoneNumberInventoryResponse)
+func (c *phoneNumberServiceJSONClient) callSearchPhoneNumbers(ctx context.Context, in *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
+	out := new(SearchPhoneNumbersResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -517,26 +517,26 @@ func (c *phoneNumberServiceJSONClient) callPurchasePhoneNumber(ctx context.Conte
 	return out, nil
 }
 
-func (c *phoneNumberServiceJSONClient) ListPurchasedPhoneNumbers(ctx context.Context, in *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
+func (c *phoneNumberServiceJSONClient) ListPhoneNumbers(ctx context.Context, in *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "ListPurchasedPhoneNumbers")
-	caller := c.callListPurchasedPhoneNumbers
+	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumbers")
+	caller := c.callListPhoneNumbers
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
+		caller = func(ctx context.Context, req *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ListPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumbersRequest) when calling interceptor")
 					}
-					return c.callListPurchasedPhoneNumbers(ctx, typedReq)
+					return c.callListPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ListPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -546,8 +546,8 @@ func (c *phoneNumberServiceJSONClient) ListPurchasedPhoneNumbers(ctx context.Con
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceJSONClient) callListPurchasedPhoneNumbers(ctx context.Context, in *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
-	out := new(ListPurchasedPhoneNumbersResponse)
+func (c *phoneNumberServiceJSONClient) callListPhoneNumbers(ctx context.Context, in *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
+	out := new(ListPhoneNumbersResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -563,26 +563,26 @@ func (c *phoneNumberServiceJSONClient) callListPurchasedPhoneNumbers(ctx context
 	return out, nil
 }
 
-func (c *phoneNumberServiceJSONClient) GetPurchasedPhoneNumber(ctx context.Context, in *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
+func (c *phoneNumberServiceJSONClient) GetPhoneNumber(ctx context.Context, in *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "GetPurchasedPhoneNumber")
-	caller := c.callGetPurchasedPhoneNumber
+	ctx = ctxsetters.WithMethodName(ctx, "GetPhoneNumber")
+	caller := c.callGetPhoneNumber
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
+		caller = func(ctx context.Context, req *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*GetPurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*GetPhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*GetPurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*GetPhoneNumberRequest) when calling interceptor")
 					}
-					return c.callGetPurchasedPhoneNumber(ctx, typedReq)
+					return c.callGetPhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*GetPurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*GetPhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*GetPurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -592,8 +592,8 @@ func (c *phoneNumberServiceJSONClient) GetPurchasedPhoneNumber(ctx context.Conte
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceJSONClient) callGetPurchasedPhoneNumber(ctx context.Context, in *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
-	out := new(GetPurchasedPhoneNumberResponse)
+func (c *phoneNumberServiceJSONClient) callGetPhoneNumber(ctx context.Context, in *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
+	out := new(GetPhoneNumberResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -609,26 +609,26 @@ func (c *phoneNumberServiceJSONClient) callGetPurchasedPhoneNumber(ctx context.C
 	return out, nil
 }
 
-func (c *phoneNumberServiceJSONClient) UpdatePurchasedPhoneNumber(ctx context.Context, in *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
+func (c *phoneNumberServiceJSONClient) UpdatePhoneNumber(ctx context.Context, in *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "UpdatePurchasedPhoneNumber")
-	caller := c.callUpdatePurchasedPhoneNumber
+	ctx = ctxsetters.WithMethodName(ctx, "UpdatePhoneNumber")
+	caller := c.callUpdatePhoneNumber
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
+		caller = func(ctx context.Context, req *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*UpdatePurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*UpdatePhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*UpdatePurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*UpdatePhoneNumberRequest) when calling interceptor")
 					}
-					return c.callUpdatePurchasedPhoneNumber(ctx, typedReq)
+					return c.callUpdatePhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*UpdatePurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*UpdatePhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -638,8 +638,8 @@ func (c *phoneNumberServiceJSONClient) UpdatePurchasedPhoneNumber(ctx context.Co
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceJSONClient) callUpdatePurchasedPhoneNumber(ctx context.Context, in *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
-	out := new(UpdatePurchasedPhoneNumberResponse)
+func (c *phoneNumberServiceJSONClient) callUpdatePhoneNumber(ctx context.Context, in *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
+	out := new(UpdatePhoneNumberResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -655,26 +655,26 @@ func (c *phoneNumberServiceJSONClient) callUpdatePurchasedPhoneNumber(ctx contex
 	return out, nil
 }
 
-func (c *phoneNumberServiceJSONClient) ReleasePurchasedPhoneNumber(ctx context.Context, in *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
+func (c *phoneNumberServiceJSONClient) ReleasePhoneNumbers(ctx context.Context, in *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "PhoneNumberService")
-	ctx = ctxsetters.WithMethodName(ctx, "ReleasePurchasedPhoneNumber")
-	caller := c.callReleasePurchasedPhoneNumber
+	ctx = ctxsetters.WithMethodName(ctx, "ReleasePhoneNumbers")
+	caller := c.callReleasePhoneNumbers
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
+		caller = func(ctx context.Context, req *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ReleasePurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ReleasePhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ReleasePurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ReleasePhoneNumbersRequest) when calling interceptor")
 					}
-					return c.callReleasePurchasedPhoneNumber(ctx, typedReq)
+					return c.callReleasePhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ReleasePurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ReleasePhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -684,8 +684,8 @@ func (c *phoneNumberServiceJSONClient) ReleasePurchasedPhoneNumber(ctx context.C
 	return caller(ctx, in)
 }
 
-func (c *phoneNumberServiceJSONClient) callReleasePurchasedPhoneNumber(ctx context.Context, in *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
-	out := new(ReleasePurchasedPhoneNumbersResponse)
+func (c *phoneNumberServiceJSONClient) callReleasePhoneNumbers(ctx context.Context, in *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
+	out := new(ReleasePhoneNumbersResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -798,23 +798,23 @@ func (s *phoneNumberServiceServer) ServeHTTP(resp http.ResponseWriter, req *http
 	}
 
 	switch method {
-	case "ListPhoneNumberInventory":
-		s.serveListPhoneNumberInventory(ctx, resp, req)
+	case "SearchPhoneNumbers":
+		s.serveSearchPhoneNumbers(ctx, resp, req)
 		return
 	case "PurchasePhoneNumber":
 		s.servePurchasePhoneNumber(ctx, resp, req)
 		return
-	case "ListPurchasedPhoneNumbers":
-		s.serveListPurchasedPhoneNumbers(ctx, resp, req)
+	case "ListPhoneNumbers":
+		s.serveListPhoneNumbers(ctx, resp, req)
 		return
-	case "GetPurchasedPhoneNumber":
-		s.serveGetPurchasedPhoneNumber(ctx, resp, req)
+	case "GetPhoneNumber":
+		s.serveGetPhoneNumber(ctx, resp, req)
 		return
-	case "UpdatePurchasedPhoneNumber":
-		s.serveUpdatePurchasedPhoneNumber(ctx, resp, req)
+	case "UpdatePhoneNumber":
+		s.serveUpdatePhoneNumber(ctx, resp, req)
 		return
-	case "ReleasePurchasedPhoneNumber":
-		s.serveReleasePurchasedPhoneNumber(ctx, resp, req)
+	case "ReleasePhoneNumbers":
+		s.serveReleasePhoneNumbers(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -823,7 +823,7 @@ func (s *phoneNumberServiceServer) ServeHTTP(resp http.ResponseWriter, req *http
 	}
 }
 
-func (s *phoneNumberServiceServer) serveListPhoneNumberInventory(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveSearchPhoneNumbers(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -831,9 +831,9 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventory(ctx context.Con
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveListPhoneNumberInventoryJSON(ctx, resp, req)
+		s.serveSearchPhoneNumbersJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveListPhoneNumberInventoryProtobuf(ctx, resp, req)
+		s.serveSearchPhoneNumbersProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -841,9 +841,9 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventory(ctx context.Con
 	}
 }
 
-func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveSearchPhoneNumbersJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumberInventory")
+	ctx = ctxsetters.WithMethodName(ctx, "SearchPhoneNumbers")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -856,29 +856,29 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryJSON(ctx context
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(ListPhoneNumberInventoryRequest)
+	reqContent := new(SearchPhoneNumbersRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.PhoneNumberService.ListPhoneNumberInventory
+	handler := s.PhoneNumberService.SearchPhoneNumbers
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
+		handler = func(ctx context.Context, req *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPhoneNumberInventoryRequest)
+					typedReq, ok := req.(*SearchPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumberInventoryRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*SearchPhoneNumbersRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.ListPhoneNumberInventory(ctx, typedReq)
+					return s.PhoneNumberService.SearchPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPhoneNumberInventoryResponse)
+				typedResp, ok := resp.(*SearchPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumberInventoryResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*SearchPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -887,7 +887,7 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryJSON(ctx context
 	}
 
 	// Call service method
-	var respContent *ListPhoneNumberInventoryResponse
+	var respContent *SearchPhoneNumbersResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -898,7 +898,7 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryJSON(ctx context
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPhoneNumberInventoryResponse and nil error while calling ListPhoneNumberInventory. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SearchPhoneNumbersResponse and nil error while calling SearchPhoneNumbers. nil responses are not supported"))
 		return
 	}
 
@@ -924,9 +924,9 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryJSON(ctx context
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveSearchPhoneNumbersProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumberInventory")
+	ctx = ctxsetters.WithMethodName(ctx, "SearchPhoneNumbers")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -938,28 +938,28 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryProtobuf(ctx con
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(ListPhoneNumberInventoryRequest)
+	reqContent := new(SearchPhoneNumbersRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.PhoneNumberService.ListPhoneNumberInventory
+	handler := s.PhoneNumberService.SearchPhoneNumbers
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListPhoneNumberInventoryRequest) (*ListPhoneNumberInventoryResponse, error) {
+		handler = func(ctx context.Context, req *SearchPhoneNumbersRequest) (*SearchPhoneNumbersResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPhoneNumberInventoryRequest)
+					typedReq, ok := req.(*SearchPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumberInventoryRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*SearchPhoneNumbersRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.ListPhoneNumberInventory(ctx, typedReq)
+					return s.PhoneNumberService.SearchPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPhoneNumberInventoryResponse)
+				typedResp, ok := resp.(*SearchPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumberInventoryResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*SearchPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -968,7 +968,7 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryProtobuf(ctx con
 	}
 
 	// Call service method
-	var respContent *ListPhoneNumberInventoryResponse
+	var respContent *SearchPhoneNumbersResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -979,7 +979,7 @@ func (s *phoneNumberServiceServer) serveListPhoneNumberInventoryProtobuf(ctx con
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPhoneNumberInventoryResponse and nil error while calling ListPhoneNumberInventory. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *SearchPhoneNumbersResponse and nil error while calling SearchPhoneNumbers. nil responses are not supported"))
 		return
 	}
 
@@ -1183,7 +1183,7 @@ func (s *phoneNumberServiceServer) servePurchasePhoneNumberProtobuf(ctx context.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbers(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveListPhoneNumbers(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -1191,9 +1191,9 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbers(ctx context.Co
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveListPurchasedPhoneNumbersJSON(ctx, resp, req)
+		s.serveListPhoneNumbersJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveListPurchasedPhoneNumbersProtobuf(ctx, resp, req)
+		s.serveListPhoneNumbersProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -1201,9 +1201,9 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbers(ctx context.Co
 	}
 }
 
-func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveListPhoneNumbersJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListPurchasedPhoneNumbers")
+	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumbers")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1216,29 +1216,29 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersJSON(ctx contex
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(ListPurchasedPhoneNumbersRequest)
+	reqContent := new(ListPhoneNumbersRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.PhoneNumberService.ListPurchasedPhoneNumbers
+	handler := s.PhoneNumberService.ListPhoneNumbers
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
+		handler = func(ctx context.Context, req *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ListPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumbersRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.ListPurchasedPhoneNumbers(ctx, typedReq)
+					return s.PhoneNumberService.ListPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ListPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1247,7 +1247,7 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersJSON(ctx contex
 	}
 
 	// Call service method
-	var respContent *ListPurchasedPhoneNumbersResponse
+	var respContent *ListPhoneNumbersResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1258,7 +1258,7 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersJSON(ctx contex
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPurchasedPhoneNumbersResponse and nil error while calling ListPurchasedPhoneNumbers. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPhoneNumbersResponse and nil error while calling ListPhoneNumbers. nil responses are not supported"))
 		return
 	}
 
@@ -1284,9 +1284,9 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersJSON(ctx contex
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveListPhoneNumbersProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ListPurchasedPhoneNumbers")
+	ctx = ctxsetters.WithMethodName(ctx, "ListPhoneNumbers")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1298,28 +1298,28 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersProtobuf(ctx co
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(ListPurchasedPhoneNumbersRequest)
+	reqContent := new(ListPhoneNumbersRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.PhoneNumberService.ListPurchasedPhoneNumbers
+	handler := s.PhoneNumberService.ListPhoneNumbers
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ListPurchasedPhoneNumbersRequest) (*ListPurchasedPhoneNumbersResponse, error) {
+		handler = func(ctx context.Context, req *ListPhoneNumbersRequest) (*ListPhoneNumbersResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ListPurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ListPhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ListPurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ListPhoneNumbersRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.ListPurchasedPhoneNumbers(ctx, typedReq)
+					return s.PhoneNumberService.ListPhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ListPurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ListPhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ListPurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ListPhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1328,7 +1328,7 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersProtobuf(ctx co
 	}
 
 	// Call service method
-	var respContent *ListPurchasedPhoneNumbersResponse
+	var respContent *ListPhoneNumbersResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1339,7 +1339,7 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersProtobuf(ctx co
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPurchasedPhoneNumbersResponse and nil error while calling ListPurchasedPhoneNumbers. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListPhoneNumbersResponse and nil error while calling ListPhoneNumbers. nil responses are not supported"))
 		return
 	}
 
@@ -1363,7 +1363,7 @@ func (s *phoneNumberServiceServer) serveListPurchasedPhoneNumbersProtobuf(ctx co
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumber(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveGetPhoneNumber(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -1371,9 +1371,9 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumber(ctx context.Cont
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveGetPurchasedPhoneNumberJSON(ctx, resp, req)
+		s.serveGetPhoneNumberJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveGetPurchasedPhoneNumberProtobuf(ctx, resp, req)
+		s.serveGetPhoneNumberProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -1381,9 +1381,9 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumber(ctx context.Cont
 	}
 }
 
-func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveGetPhoneNumberJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "GetPurchasedPhoneNumber")
+	ctx = ctxsetters.WithMethodName(ctx, "GetPhoneNumber")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1396,29 +1396,29 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberJSON(ctx context.
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(GetPurchasedPhoneNumberRequest)
+	reqContent := new(GetPhoneNumberRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.PhoneNumberService.GetPurchasedPhoneNumber
+	handler := s.PhoneNumberService.GetPhoneNumber
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
+		handler = func(ctx context.Context, req *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*GetPurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*GetPhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*GetPurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*GetPhoneNumberRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.GetPurchasedPhoneNumber(ctx, typedReq)
+					return s.PhoneNumberService.GetPhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*GetPurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*GetPhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*GetPurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1427,7 +1427,7 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberJSON(ctx context.
 	}
 
 	// Call service method
-	var respContent *GetPurchasedPhoneNumberResponse
+	var respContent *GetPhoneNumberResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1438,7 +1438,7 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberJSON(ctx context.
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetPurchasedPhoneNumberResponse and nil error while calling GetPurchasedPhoneNumber. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetPhoneNumberResponse and nil error while calling GetPhoneNumber. nil responses are not supported"))
 		return
 	}
 
@@ -1464,9 +1464,9 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberJSON(ctx context.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveGetPhoneNumberProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "GetPurchasedPhoneNumber")
+	ctx = ctxsetters.WithMethodName(ctx, "GetPhoneNumber")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1478,28 +1478,28 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberProtobuf(ctx cont
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(GetPurchasedPhoneNumberRequest)
+	reqContent := new(GetPhoneNumberRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.PhoneNumberService.GetPurchasedPhoneNumber
+	handler := s.PhoneNumberService.GetPhoneNumber
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *GetPurchasedPhoneNumberRequest) (*GetPurchasedPhoneNumberResponse, error) {
+		handler = func(ctx context.Context, req *GetPhoneNumberRequest) (*GetPhoneNumberResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*GetPurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*GetPhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*GetPurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*GetPhoneNumberRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.GetPurchasedPhoneNumber(ctx, typedReq)
+					return s.PhoneNumberService.GetPhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*GetPurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*GetPhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*GetPurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*GetPhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1508,7 +1508,7 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberProtobuf(ctx cont
 	}
 
 	// Call service method
-	var respContent *GetPurchasedPhoneNumberResponse
+	var respContent *GetPhoneNumberResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1519,7 +1519,7 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberProtobuf(ctx cont
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetPurchasedPhoneNumberResponse and nil error while calling GetPurchasedPhoneNumber. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetPhoneNumberResponse and nil error while calling GetPhoneNumber. nil responses are not supported"))
 		return
 	}
 
@@ -1543,7 +1543,7 @@ func (s *phoneNumberServiceServer) serveGetPurchasedPhoneNumberProtobuf(ctx cont
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumber(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveUpdatePhoneNumber(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -1551,9 +1551,9 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumber(ctx context.C
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveUpdatePurchasedPhoneNumberJSON(ctx, resp, req)
+		s.serveUpdatePhoneNumberJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveUpdatePurchasedPhoneNumberProtobuf(ctx, resp, req)
+		s.serveUpdatePhoneNumberProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -1561,9 +1561,9 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumber(ctx context.C
 	}
 }
 
-func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveUpdatePhoneNumberJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "UpdatePurchasedPhoneNumber")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdatePhoneNumber")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1576,29 +1576,29 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberJSON(ctx conte
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(UpdatePurchasedPhoneNumberRequest)
+	reqContent := new(UpdatePhoneNumberRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.PhoneNumberService.UpdatePurchasedPhoneNumber
+	handler := s.PhoneNumberService.UpdatePhoneNumber
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
+		handler = func(ctx context.Context, req *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*UpdatePurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*UpdatePhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*UpdatePurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*UpdatePhoneNumberRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.UpdatePurchasedPhoneNumber(ctx, typedReq)
+					return s.PhoneNumberService.UpdatePhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*UpdatePurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*UpdatePhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1607,7 +1607,7 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberJSON(ctx conte
 	}
 
 	// Call service method
-	var respContent *UpdatePurchasedPhoneNumberResponse
+	var respContent *UpdatePhoneNumberResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1618,7 +1618,7 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberJSON(ctx conte
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdatePurchasedPhoneNumberResponse and nil error while calling UpdatePurchasedPhoneNumber. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdatePhoneNumberResponse and nil error while calling UpdatePhoneNumber. nil responses are not supported"))
 		return
 	}
 
@@ -1644,9 +1644,9 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberJSON(ctx conte
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveUpdatePhoneNumberProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "UpdatePurchasedPhoneNumber")
+	ctx = ctxsetters.WithMethodName(ctx, "UpdatePhoneNumber")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1658,28 +1658,28 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberProtobuf(ctx c
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(UpdatePurchasedPhoneNumberRequest)
+	reqContent := new(UpdatePhoneNumberRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.PhoneNumberService.UpdatePurchasedPhoneNumber
+	handler := s.PhoneNumberService.UpdatePhoneNumber
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *UpdatePurchasedPhoneNumberRequest) (*UpdatePurchasedPhoneNumberResponse, error) {
+		handler = func(ctx context.Context, req *UpdatePhoneNumberRequest) (*UpdatePhoneNumberResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*UpdatePurchasedPhoneNumberRequest)
+					typedReq, ok := req.(*UpdatePhoneNumberRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*UpdatePurchasedPhoneNumberRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*UpdatePhoneNumberRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.UpdatePurchasedPhoneNumber(ctx, typedReq)
+					return s.PhoneNumberService.UpdatePhoneNumber(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*UpdatePurchasedPhoneNumberResponse)
+				typedResp, ok := resp.(*UpdatePhoneNumberResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePurchasedPhoneNumberResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*UpdatePhoneNumberResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1688,7 +1688,7 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberProtobuf(ctx c
 	}
 
 	// Call service method
-	var respContent *UpdatePurchasedPhoneNumberResponse
+	var respContent *UpdatePhoneNumberResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1699,7 +1699,7 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberProtobuf(ctx c
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdatePurchasedPhoneNumberResponse and nil error while calling UpdatePurchasedPhoneNumber. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *UpdatePhoneNumberResponse and nil error while calling UpdatePhoneNumber. nil responses are not supported"))
 		return
 	}
 
@@ -1723,7 +1723,7 @@ func (s *phoneNumberServiceServer) serveUpdatePurchasedPhoneNumberProtobuf(ctx c
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumber(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveReleasePhoneNumbers(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -1731,9 +1731,9 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumber(ctx context.
 	}
 	switch strings.TrimSpace(strings.ToLower(header[:i])) {
 	case "application/json":
-		s.serveReleasePurchasedPhoneNumberJSON(ctx, resp, req)
+		s.serveReleasePhoneNumbersJSON(ctx, resp, req)
 	case "application/protobuf":
-		s.serveReleasePurchasedPhoneNumberProtobuf(ctx, resp, req)
+		s.serveReleasePhoneNumbersProtobuf(ctx, resp, req)
 	default:
 		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
 		twerr := badRouteError(msg, req.Method, req.URL.Path)
@@ -1741,9 +1741,9 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumber(ctx context.
 	}
 }
 
-func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveReleasePhoneNumbersJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ReleasePurchasedPhoneNumber")
+	ctx = ctxsetters.WithMethodName(ctx, "ReleasePhoneNumbers")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1756,29 +1756,29 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberJSON(ctx cont
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
-	reqContent := new(ReleasePurchasedPhoneNumbersRequest)
+	reqContent := new(ReleasePhoneNumbersRequest)
 	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
 	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
 		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
 		return
 	}
 
-	handler := s.PhoneNumberService.ReleasePurchasedPhoneNumber
+	handler := s.PhoneNumberService.ReleasePhoneNumbers
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
+		handler = func(ctx context.Context, req *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ReleasePurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ReleasePhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ReleasePurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ReleasePhoneNumbersRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.ReleasePurchasedPhoneNumber(ctx, typedReq)
+					return s.PhoneNumberService.ReleasePhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ReleasePurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ReleasePhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1787,7 +1787,7 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberJSON(ctx cont
 	}
 
 	// Call service method
-	var respContent *ReleasePurchasedPhoneNumbersResponse
+	var respContent *ReleasePhoneNumbersResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1798,7 +1798,7 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberJSON(ctx cont
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ReleasePurchasedPhoneNumbersResponse and nil error while calling ReleasePurchasedPhoneNumber. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ReleasePhoneNumbersResponse and nil error while calling ReleasePhoneNumbers. nil responses are not supported"))
 		return
 	}
 
@@ -1824,9 +1824,9 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberJSON(ctx cont
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *phoneNumberServiceServer) serveReleasePhoneNumbersProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "ReleasePurchasedPhoneNumber")
+	ctx = ctxsetters.WithMethodName(ctx, "ReleasePhoneNumbers")
 	ctx, err = callRequestRouted(ctx, s.hooks)
 	if err != nil {
 		s.writeError(ctx, resp, err)
@@ -1838,28 +1838,28 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberProtobuf(ctx 
 		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
 		return
 	}
-	reqContent := new(ReleasePurchasedPhoneNumbersRequest)
+	reqContent := new(ReleasePhoneNumbersRequest)
 	if err = proto.Unmarshal(buf, reqContent); err != nil {
 		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
 		return
 	}
 
-	handler := s.PhoneNumberService.ReleasePurchasedPhoneNumber
+	handler := s.PhoneNumberService.ReleasePhoneNumbers
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *ReleasePurchasedPhoneNumbersRequest) (*ReleasePurchasedPhoneNumbersResponse, error) {
+		handler = func(ctx context.Context, req *ReleasePhoneNumbersRequest) (*ReleasePhoneNumbersResponse, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*ReleasePurchasedPhoneNumbersRequest)
+					typedReq, ok := req.(*ReleasePhoneNumbersRequest)
 					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*ReleasePurchasedPhoneNumbersRequest) when calling interceptor")
+						return nil, twirp.InternalError("failed type assertion req.(*ReleasePhoneNumbersRequest) when calling interceptor")
 					}
-					return s.PhoneNumberService.ReleasePurchasedPhoneNumber(ctx, typedReq)
+					return s.PhoneNumberService.ReleasePhoneNumbers(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*ReleasePurchasedPhoneNumbersResponse)
+				typedResp, ok := resp.(*ReleasePhoneNumbersResponse)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePurchasedPhoneNumbersResponse) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*ReleasePhoneNumbersResponse) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1868,7 +1868,7 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberProtobuf(ctx 
 	}
 
 	// Call service method
-	var respContent *ReleasePurchasedPhoneNumbersResponse
+	var respContent *ReleasePhoneNumbersResponse
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -1879,7 +1879,7 @@ func (s *phoneNumberServiceServer) serveReleasePurchasedPhoneNumberProtobuf(ctx 
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *ReleasePurchasedPhoneNumbersResponse and nil error while calling ReleasePurchasedPhoneNumber. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ReleasePhoneNumbersResponse and nil error while calling ReleasePhoneNumbers. nil responses are not supported"))
 		return
 	}
 
@@ -1919,83 +1919,70 @@ func (s *phoneNumberServiceServer) PathPrefix() string {
 }
 
 var twirpFileDescriptor6 = []byte{
-	// 1236 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x57, 0xdd, 0x8e, 0xdb, 0x44,
-	0x14, 0xae, 0x93, 0xcd, 0x76, 0x73, 0xd2, 0x96, 0xec, 0xb0, 0x6a, 0x5d, 0x2f, 0x6d, 0xb2, 0xde,
-	0xb6, 0x84, 0x52, 0xb2, 0x22, 0x45, 0xad, 0xaa, 0xaa, 0x52, 0xb3, 0x59, 0xb7, 0x44, 0xda, 0x66,
-	0x23, 0xc7, 0xa9, 0x54, 0x6e, 0x2c, 0xc7, 0x99, 0xcd, 0x8e, 0xea, 0x78, 0x5c, 0xcf, 0x78, 0x21,
-	0x12, 0xe2, 0x96, 0x87, 0x00, 0x9e, 0x80, 0x1b, 0xc4, 0x2d, 0x2f, 0xc0, 0x13, 0xf0, 0x18, 0x70,
-	0xcd, 0x1d, 0xf2, 0x6f, 0x92, 0x8d, 0x9d, 0x04, 0x51, 0x89, 0x4b, 0x9f, 0xf9, 0xce, 0x9c, 0x33,
-	0xdf, 0xf9, 0x35, 0x48, 0x16, 0x39, 0xc7, 0x6f, 0x09, 0xd7, 0x9d, 0x33, 0x6a, 0x63, 0xdd, 0xf6,
-	0xc6, 0x03, 0xec, 0xd6, 0x1d, 0x97, 0x72, 0x8a, 0x2e, 0x47, 0x67, 0x52, 0x65, 0x44, 0xe9, 0xc8,
-	0xc2, 0x07, 0x81, 0x78, 0xe0, 0x9d, 0x1e, 0x70, 0x32, 0xc6, 0x8c, 0x1b, 0x63, 0x27, 0x44, 0x4a,
-	0x3b, 0xf1, 0x2d, 0x63, 0x3a, 0xc4, 0x16, 0x0b, 0xa5, 0xf2, 0x2f, 0x02, 0x54, 0x8e, 0x09, 0xe3,
-	0x5d, 0xff, 0xea, 0x4e, 0x70, 0x73, 0xdb, 0x3e, 0xc7, 0x36, 0xa7, 0xee, 0x44, 0xc5, 0xef, 0x3c,
-	0xcc, 0x38, 0xda, 0x83, 0x2b, 0x26, 0xf5, 0x6c, 0xee, 0x4e, 0x74, 0x93, 0x0e, 0xb1, 0x28, 0x54,
-	0x85, 0x5a, 0x51, 0x2d, 0x45, 0xb2, 0x16, 0x1d, 0x62, 0xb4, 0x0b, 0x45, 0xc3, 0xc5, 0x46, 0x78,
-	0x9e, 0x0b, 0xce, 0xb7, 0x7c, 0x41, 0x70, 0xb8, 0x03, 0x05, 0x8b, 0x8c, 0x09, 0x17, 0xf3, 0x55,
-	0xa1, 0x56, 0x50, 0xc3, 0x0f, 0xf4, 0x18, 0xc0, 0x31, 0x46, 0x58, 0xe7, 0xf4, 0x2d, 0xb6, 0xc5,
-	0x8d, 0xaa, 0x50, 0x2b, 0x35, 0xc4, 0x7a, 0xe4, 0x64, 0x5d, 0xf3, 0xa5, 0x5d, 0x63, 0x44, 0x6c,
-	0x83, 0x13, 0x6a, 0xab, 0x45, 0x1f, 0x1b, 0x08, 0xe5, 0x9f, 0x04, 0xa8, 0x66, 0xbb, 0xcc, 0x1c,
-	0x6a, 0x33, 0x8c, 0x1e, 0x43, 0x81, 0x70, 0x3c, 0x66, 0xa2, 0x50, 0xcd, 0xd7, 0x4a, 0x8d, 0xbd,
-	0xe4, 0xe2, 0x34, 0xad, 0x36, 0xc7, 0x63, 0x35, 0xc4, 0xa3, 0xe7, 0xf0, 0x81, 0x8d, 0xbf, 0xe1,
-	0xfa, 0x8c, 0x6f, 0xb9, 0x15, 0xbe, 0x5d, 0xf5, 0x15, 0xba, 0x89, 0x7f, 0x2e, 0x48, 0x5d, 0xcf,
-	0x35, 0xcf, 0x0c, 0x86, 0x67, 0x8c, 0xc5, 0x64, 0xee, 0xc3, 0xd5, 0xd9, 0x30, 0x86, 0x0e, 0x16,
-	0xd5, 0x2b, 0xce, 0x14, 0xca, 0xd0, 0x01, 0xec, 0x30, 0xe2, 0xe8, 0x43, 0xc2, 0x1c, 0x83, 0x9b,
-	0x67, 0xba, 0xeb, 0x59, 0x58, 0x27, 0xc3, 0x88, 0xd9, 0x6d, 0x46, 0x9c, 0xa3, 0xe8, 0x48, 0xf5,
-	0x2c, 0xdc, 0x1e, 0xca, 0x06, 0xec, 0xa6, 0xda, 0x8c, 0xd8, 0x38, 0x4c, 0x33, 0x5a, 0x6a, 0xdc,
-	0x9a, 0xb2, 0x12, 0x29, 0x0f, 0x67, 0xb5, 0xe7, 0x7c, 0x92, 0xff, 0x88, 0x69, 0x4f, 0x81, 0xb2,
-	0xf8, 0x75, 0x49, 0xa8, 0x85, 0xd9, 0x50, 0x37, 0x60, 0x93, 0x71, 0x83, 0x7b, 0x2c, 0x78, 0xc0,
-	0xb5, 0x86, 0x94, 0x16, 0x8d, 0x5e, 0x80, 0x50, 0x23, 0xe4, 0x85, 0xf4, 0xc8, 0xaf, 0x9d, 0x1e,
-	0x99, 0xdc, 0x6d, 0x64, 0x71, 0xf7, 0x9b, 0x00, 0x7b, 0x4b, 0x1e, 0x16, 0x51, 0xf8, 0x70, 0x3e,
-	0xa1, 0x56, 0x50, 0xf7, 0xbe, 0x92, 0x09, 0x55, 0xa0, 0xc4, 0x29, 0x37, 0x2c, 0x3d, 0xa8, 0xb6,
-	0xa8, 0x82, 0x20, 0x10, 0xb5, 0x7c, 0x89, 0xfc, 0x1d, 0xdc, 0x7e, 0x89, 0x53, 0x7d, 0x8f, 0x63,
-	0xf2, 0x04, 0x6e, 0x3a, 0xf1, 0xf1, 0x5c, 0x0b, 0xf1, 0x59, 0x09, 0x6b, 0xf9, 0xba, 0x93, 0xa2,
-	0xdf, 0x1e, 0xfa, 0x95, 0x3f, 0xab, 0x10, 0xe5, 0x5f, 0x69, 0x26, 0x2f, 0x64, 0x13, 0x2a, 0x99,
-	0xf6, 0x23, 0xea, 0x9e, 0x5f, 0xb8, 0x45, 0x08, 0x28, 0x58, 0xc1, 0xe0, 0x9c, 0x91, 0x5f, 0x05,
-	0xd8, 0xeb, 0x3b, 0x43, 0x83, 0xe3, 0xff, 0xed, 0xa1, 0x99, 0x79, 0x95, 0xcf, 0xca, 0xab, 0x53,
-	0x90, 0x97, 0xf9, 0xfc, 0xde, 0xc8, 0xf9, 0x5e, 0x80, 0x7d, 0x15, 0x5b, 0xd8, 0xaf, 0xfd, 0x65,
-	0xb5, 0xf9, 0x14, 0xa4, 0x4c, 0x7a, 0xe2, 0x36, 0x74, 0x23, 0x9d, 0x1f, 0xb6, 0xd8, 0xb6, 0x72,
-	0x8b, 0x6d, 0x4b, 0xbe, 0x07, 0x77, 0x96, 0x3b, 0x12, 0xbe, 0x59, 0xfe, 0x33, 0x07, 0xdb, 0x2f,
-	0x2d, 0x3a, 0x30, 0xac, 0x99, 0x63, 0x74, 0x0d, 0x72, 0x49, 0x9c, 0x72, 0x64, 0xe8, 0xa7, 0x3e,
-	0xfe, 0xfc, 0xd1, 0x17, 0xfa, 0x29, 0x75, 0xc7, 0x06, 0x8f, 0x42, 0x02, 0xbe, 0xe8, 0x45, 0x20,
-	0x59, 0x98, 0x4b, 0xf9, 0x15, 0x73, 0x69, 0xe3, 0xc2, 0x5c, 0xaa, 0x40, 0x29, 0x22, 0x80, 0x4f,
-	0x1c, 0x2c, 0x16, 0x42, 0x03, 0xa1, 0x48, 0x9b, 0x38, 0x18, 0x49, 0xb0, 0x65, 0x51, 0xd3, 0xb0,
-	0x08, 0x9f, 0x88, 0x9b, 0xa1, 0x72, 0xfc, 0x8d, 0xae, 0xc3, 0xa6, 0x8b, 0x47, 0x84, 0xda, 0xe2,
-	0xe5, 0xe0, 0x24, 0xfa, 0x42, 0xb7, 0x00, 0x98, 0x63, 0x8c, 0x75, 0x66, 0x52, 0x17, 0x8b, 0x5b,
-	0x55, 0xa1, 0x26, 0xa8, 0x45, 0x5f, 0xd2, 0xf3, 0x05, 0xe8, 0x09, 0x80, 0xe9, 0x62, 0x83, 0xe3,
-	0xa1, 0x6e, 0x70, 0xb1, 0x18, 0x04, 0x5b, 0xaa, 0x87, 0xb3, 0xbb, 0x1e, 0xcf, 0xee, 0xba, 0x16,
-	0xcf, 0x6e, 0xb5, 0x18, 0xa1, 0x9b, 0x7e, 0x7a, 0x83, 0x17, 0xe4, 0x53, 0xa0, 0x0a, 0xab, 0x55,
-	0x23, 0x74, 0x93, 0xcb, 0x3f, 0x0a, 0x70, 0x55, 0xc3, 0x16, 0xf6, 0xa3, 0x35, 0x69, 0x51, 0xc6,
-	0xd1, 0x23, 0xd8, 0x72, 0x31, 0xa3, 0x9e, 0x6b, 0x86, 0xf3, 0x7c, 0xb6, 0x29, 0xcf, 0x21, 0x7d,
-	0x22, 0xd4, 0x04, 0xeb, 0x53, 0x62, 0x7a, 0xae, 0x8b, 0x6d, 0x73, 0x12, 0xcf, 0xf9, 0xf8, 0xdb,
-	0x6f, 0xfe, 0x8e, 0x4b, 0xcc, 0x30, 0x10, 0x82, 0x1a, 0x7e, 0xf8, 0x51, 0x1a, 0x10, 0xcb, 0x22,
-	0xf6, 0x48, 0xf7, 0x6c, 0xc2, 0xa3, 0x28, 0x94, 0x22, 0x59, 0xdf, 0x26, 0x5c, 0xfe, 0x59, 0x00,
-	0x31, 0x6b, 0x2e, 0xa3, 0x67, 0xa9, 0x05, 0x32, 0xf5, 0x76, 0x21, 0x91, 0xe6, 0xcb, 0x56, 0x86,
-	0x2b, 0xa6, 0xe1, 0x18, 0x03, 0x62, 0x11, 0x4e, 0x70, 0x92, 0xb7, 0xb3, 0x32, 0xf4, 0x00, 0x0a,
-	0x26, 0x65, 0x9c, 0x89, 0xf9, 0xa0, 0xb7, 0x5f, 0x4f, 0x67, 0x42, 0x0d, 0x41, 0xf2, 0x5f, 0x39,
-	0xd8, 0x49, 0xcb, 0xef, 0xff, 0xd2, 0x7f, 0x9e, 0xa5, 0xf4, 0x9f, 0x7f, 0xf1, 0xc8, 0xe9, 0x80,
-	0xcd, 0xaf, 0x3d, 0x60, 0x9f, 0x42, 0xc9, 0x60, 0x8c, 0x8c, 0xec, 0x30, 0x9f, 0x36, 0x56, 0xe6,
-	0x13, 0xc4, 0xf0, 0xa6, 0xdf, 0x4b, 0x4a, 0x6e, 0x58, 0xe9, 0x81, 0x72, 0x61, 0xb5, 0x72, 0x0c,
-	0x6f, 0xf2, 0xcc, 0x4e, 0xba, 0x99, 0xd1, 0x49, 0xef, 0xff, 0x2d, 0xc0, 0xf6, 0x42, 0x52, 0xa2,
-	0x7d, 0xa8, 0x68, 0xca, 0xb1, 0xd2, 0xfd, 0xf2, 0xa4, 0xf3, 0x46, 0x6f, 0x9d, 0xf4, 0x34, 0x5d,
-	0x7b, 0xd3, 0x55, 0xf4, 0x7e, 0xa7, 0xd7, 0x55, 0x5a, 0xed, 0x17, 0x6d, 0xe5, 0xa8, 0x7c, 0x09,
-	0xdd, 0x85, 0xbd, 0x34, 0x50, 0xa7, 0xff, 0xea, 0x50, 0x51, 0x75, 0x55, 0xe9, 0x68, 0xcd, 0xe3,
-	0xb2, 0x90, 0x05, 0x7b, 0x7d, 0xd2, 0x6e, 0x29, 0x7a, 0xbb, 0x73, 0x78, 0xd2, 0xef, 0x1c, 0x95,
-	0x73, 0xe8, 0x1e, 0xc8, 0xd9, 0xb0, 0x93, 0xbe, 0x16, 0xe2, 0xf2, 0x59, 0xae, 0xf5, 0x5e, 0xf5,
-	0x92, 0xcb, 0x36, 0xd0, 0x1d, 0xa8, 0x66, 0x81, 0x92, 0xab, 0x0a, 0xf7, 0x7f, 0x10, 0x60, 0x7b,
-	0x21, 0x88, 0xbe, 0x01, 0x5f, 0x2f, 0x79, 0x48, 0x4f, 0x6b, 0x6a, 0xfd, 0xde, 0x85, 0xb7, 0xdf,
-	0x06, 0x29, 0x0d, 0xd4, 0x6c, 0x69, 0xed, 0xd7, 0x4a, 0x59, 0x40, 0x15, 0xd8, 0x4d, 0x3b, 0xef,
-	0x2a, 0x9d, 0xa3, 0x76, 0xe7, 0x65, 0x39, 0x87, 0xaa, 0xf0, 0x51, 0x1a, 0x40, 0x55, 0x8e, 0x95,
-	0x66, 0x4f, 0x39, 0x2a, 0xe7, 0x1b, 0xbf, 0x17, 0x00, 0xcd, 0x7a, 0x87, 0xdd, 0x73, 0xbf, 0xe6,
-	0xdf, 0x81, 0x98, 0xb5, 0xa1, 0xa3, 0x5a, 0x92, 0x9b, 0x2b, 0xfe, 0x3b, 0xa4, 0x4f, 0xd6, 0x40,
-	0x46, 0x13, 0xe5, 0x12, 0x1a, 0xc0, 0x87, 0x29, 0x1b, 0x30, 0xda, 0x5f, 0x18, 0xa4, 0x8b, 0x8b,
-	0x83, 0x74, 0x67, 0x39, 0x28, 0xb1, 0xc1, 0xe1, 0x66, 0xe6, 0xa2, 0x88, 0x2e, 0x78, 0xbb, 0x64,
-	0x12, 0x4b, 0xf7, 0xd7, 0x81, 0x26, 0x56, 0x6d, 0xb8, 0x91, 0xb1, 0x61, 0xa1, 0x8f, 0xa7, 0x0d,
-	0x62, 0xe9, 0x0e, 0x28, 0xd5, 0x56, 0x03, 0x13, 0x7b, 0x5f, 0x83, 0x94, 0xbd, 0xb7, 0xa0, 0xa9,
-	0xef, 0x2b, 0x17, 0x32, 0xe9, 0xd3, 0xb5, 0xb0, 0x89, 0xe1, 0x6f, 0x61, 0x77, 0xc9, 0xfa, 0x80,
-	0x1e, 0x24, 0xb7, 0xad, 0xb1, 0xed, 0x48, 0x9f, 0xad, 0x89, 0x8e, 0xad, 0x1f, 0xde, 0xfd, 0x6a,
-	0x7f, 0x44, 0xf8, 0x99, 0x37, 0xa8, 0x9b, 0x74, 0x7c, 0x10, 0x29, 0x87, 0xbf, 0xd3, 0x26, 0xb5,
-	0x62, 0xc1, 0x60, 0x33, 0x90, 0x3c, 0xfc, 0x27, 0x00, 0x00, 0xff, 0xff, 0x82, 0x3a, 0x98, 0x8a,
-	0x95, 0x0f, 0x00, 0x00,
+	// 1032 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0xdd, 0x6e, 0xe3, 0x44,
+	0x14, 0xae, 0x93, 0xa6, 0xdb, 0x1c, 0xf7, 0x27, 0x1d, 0xca, 0xae, 0xeb, 0x6c, 0x37, 0x59, 0x17,
+	0xa4, 0xa8, 0x17, 0xa9, 0x08, 0x88, 0x55, 0xc5, 0x0d, 0x69, 0xea, 0x2e, 0x81, 0x6c, 0x12, 0x9c,
+	0x04, 0x58, 0x84, 0x64, 0x4d, 0xec, 0xd9, 0x64, 0xb4, 0x8e, 0x6d, 0xec, 0xf1, 0x8a, 0xde, 0x70,
+	0xc7, 0x0d, 0xe2, 0x0d, 0x78, 0x02, 0x78, 0x15, 0xc4, 0x3b, 0x21, 0xff, 0xc4, 0xeb, 0xc4, 0x76,
+	0xb2, 0x12, 0x48, 0xdc, 0xd9, 0xe7, 0x7c, 0xe7, 0xcc, 0x37, 0xe7, 0x77, 0x40, 0x34, 0xe8, 0x1b,
+	0xf2, 0x9a, 0x32, 0xd5, 0x9e, 0x5b, 0x26, 0x51, 0x4d, 0x6f, 0x31, 0x25, 0x4e, 0xd3, 0x76, 0x2c,
+	0x66, 0xa1, 0x07, 0x91, 0x4e, 0xac, 0xcd, 0x2c, 0x6b, 0x66, 0x90, 0xab, 0x40, 0x3c, 0xf5, 0x5e,
+	0x5d, 0x31, 0xba, 0x20, 0x2e, 0xc3, 0x0b, 0x3b, 0x44, 0x8a, 0xa7, 0x4b, 0x2f, 0x0b, 0x4b, 0x27,
+	0x86, 0x1b, 0x4a, 0xa5, 0x3f, 0x39, 0x38, 0x1b, 0x11, 0xec, 0x68, 0xf3, 0xa1, 0xef, 0xbc, 0x1f,
+	0xf8, 0x76, 0x15, 0xf2, 0xa3, 0x47, 0x5c, 0x86, 0x9e, 0xc2, 0x81, 0x66, 0x79, 0x26, 0x73, 0xee,
+	0x55, 0xcd, 0xd2, 0x89, 0xc0, 0xd5, 0xb9, 0x46, 0x59, 0xe1, 0x23, 0x59, 0xc7, 0xd2, 0x09, 0xaa,
+	0x42, 0x19, 0x3b, 0x04, 0x87, 0xfa, 0x42, 0xa0, 0xdf, 0xf7, 0x05, 0x81, 0xf2, 0x14, 0x4a, 0x06,
+	0x5d, 0x50, 0x26, 0x14, 0xeb, 0x5c, 0xa3, 0xa4, 0x84, 0x3f, 0xe8, 0x19, 0x80, 0x8d, 0x67, 0x44,
+	0x65, 0xd6, 0x6b, 0x62, 0x0a, 0xbb, 0x75, 0xae, 0xc1, 0xb7, 0x84, 0x66, 0x44, 0xaf, 0x39, 0xf6,
+	0xa5, 0x43, 0x3c, 0xa3, 0x26, 0x66, 0xd4, 0x32, 0x95, 0xb2, 0x8f, 0x0d, 0x84, 0xd2, 0xaf, 0x1c,
+	0x88, 0x59, 0x64, 0x5d, 0xdb, 0x32, 0x5d, 0x82, 0x2e, 0xa1, 0x44, 0x19, 0x59, 0xb8, 0x02, 0x57,
+	0x2f, 0x36, 0xf8, 0xd6, 0x69, 0xec, 0x32, 0x81, 0x56, 0x42, 0x08, 0xfa, 0x1c, 0x8e, 0x4d, 0xf2,
+	0x13, 0x53, 0x13, 0x44, 0x0a, 0x5b, 0x88, 0x1c, 0xfa, 0x06, 0xc3, 0x98, 0x8c, 0x03, 0xe2, 0xd0,
+	0x73, 0xb4, 0x39, 0x76, 0x49, 0xd2, 0x7f, 0x14, 0xb9, 0x0b, 0x38, 0x4c, 0x66, 0x2b, 0xe4, 0x54,
+	0x56, 0x0e, 0xec, 0x04, 0x71, 0x74, 0x05, 0xa7, 0x2e, 0xb5, 0x55, 0x9d, 0xba, 0x36, 0x66, 0xda,
+	0x5c, 0x75, 0x3c, 0x83, 0xa8, 0x54, 0x8f, 0xc2, 0x78, 0xe2, 0x52, 0xfb, 0x36, 0x52, 0x29, 0x9e,
+	0x41, 0xba, 0xba, 0xf4, 0x1d, 0x54, 0x33, 0xcf, 0x8c, 0x02, 0x70, 0x9d, 0x75, 0x68, 0x5e, 0x20,
+	0x56, 0xa8, 0x48, 0x7f, 0x73, 0xf0, 0xa8, 0x47, 0x5d, 0x96, 0x55, 0x05, 0x71, 0x16, 0xb9, 0x64,
+	0x16, 0x5b, 0xb0, 0xe7, 0x32, 0xcc, 0x3c, 0x37, 0xa0, 0x7b, 0xd4, 0x12, 0xb3, 0x4e, 0x19, 0x05,
+	0x08, 0x25, 0x42, 0xae, 0x65, 0xbe, 0xf8, 0xce, 0x99, 0xcf, 0x8d, 0xd4, 0x6e, 0x5e, 0xa4, 0xfe,
+	0xe0, 0x40, 0x48, 0xdf, 0xe7, 0xff, 0x28, 0x14, 0x54, 0x03, 0x9e, 0x59, 0x0c, 0x1b, 0x6a, 0xd0,
+	0x36, 0x51, 0x2b, 0x40, 0x20, 0xea, 0xf8, 0x12, 0xe9, 0x4b, 0x78, 0xff, 0x39, 0x61, 0x19, 0x45,
+	0x74, 0x04, 0x05, 0xaa, 0x47, 0x4d, 0x57, 0xa0, 0xba, 0xdf, 0x8e, 0xc9, 0xfc, 0x46, 0x75, 0xc2,
+	0x27, 0x12, 0x29, 0x7d, 0x0d, 0x0f, 0xd7, 0x7d, 0x45, 0x97, 0x7e, 0xb6, 0x66, 0xcc, 0x05, 0xb7,
+	0xc8, 0xbe, 0xfb, 0x8a, 0xcb, 0x9f, 0x41, 0x98, 0xd8, 0x3a, 0x66, 0xe4, 0x3f, 0x61, 0x98, 0x9b,
+	0xca, 0x62, 0x5e, 0x2a, 0xc7, 0x70, 0x96, 0x71, 0xfe, 0xbf, 0xbd, 0xd5, 0x08, 0x44, 0x85, 0x18,
+	0x64, 0xb5, 0x93, 0xe2, 0x92, 0xaf, 0x40, 0x91, 0xea, 0xcb, 0xa6, 0xf5, 0x3f, 0xd3, 0x0d, 0x5d,
+	0x48, 0x37, 0xb4, 0x74, 0x0e, 0xd5, 0x4c, 0xa7, 0x21, 0x59, 0xe9, 0x97, 0x12, 0xf0, 0x09, 0x45,
+	0x2a, 0x7a, 0x35, 0xe0, 0xc9, 0x47, 0x9f, 0x7e, 0xa2, 0xbe, 0xb2, 0x9c, 0x05, 0x66, 0x51, 0xf0,
+	0xc0, 0x17, 0xdd, 0x05, 0x92, 0xd4, 0x3c, 0x2e, 0x6e, 0x99, 0xc7, 0xbb, 0x6b, 0xf3, 0xf8, 0x1a,
+	0xf8, 0x90, 0xbe, 0xca, 0xee, 0x6d, 0x22, 0x94, 0x82, 0xc6, 0x15, 0xb2, 0x82, 0x35, 0xbe, 0xb7,
+	0x89, 0x02, 0x66, 0xfc, 0x8d, 0x44, 0xd8, 0x37, 0x2c, 0x0d, 0x1b, 0x94, 0xdd, 0x0b, 0x7b, 0xa1,
+	0xdb, 0xe5, 0x3f, 0x7a, 0x08, 0x7b, 0x0e, 0x99, 0x51, 0xcb, 0x14, 0x1e, 0x04, 0x9a, 0xe8, 0x0f,
+	0x9d, 0x03, 0xb8, 0x36, 0x5e, 0xa8, 0xae, 0x66, 0x39, 0x44, 0xd8, 0xaf, 0x73, 0x0d, 0x4e, 0x29,
+	0xfb, 0x92, 0x91, 0x2f, 0x40, 0xd7, 0x00, 0x9a, 0x43, 0x30, 0x23, 0xba, 0x8a, 0x99, 0x50, 0x0e,
+	0x32, 0x27, 0x36, 0xc3, 0x3d, 0xd6, 0x5c, 0xee, 0xb1, 0xe6, 0x78, 0xb9, 0xc7, 0x94, 0x72, 0x84,
+	0x6e, 0x33, 0xdf, 0xd4, 0x0b, 0x6a, 0x22, 0x30, 0x85, 0xed, 0xa6, 0x11, 0xba, 0xcd, 0x90, 0x04,
+	0x07, 0x1a, 0xb6, 0xf1, 0x94, 0x1a, 0x94, 0x51, 0xe2, 0x0a, 0x7c, 0x98, 0xc7, 0xa4, 0x2c, 0x31,
+	0xdb, 0x0e, 0xde, 0x79, 0xb6, 0x7d, 0x06, 0x3c, 0x76, 0x5d, 0x3a, 0x33, 0x43, 0x4e, 0x87, 0x5b,
+	0x39, 0xc1, 0x12, 0xde, 0x66, 0xbe, 0xb1, 0x13, 0x16, 0x4e, 0x60, 0x7c, 0xb4, 0xdd, 0x78, 0x09,
+	0x6f, 0xb3, 0xdc, 0x8e, 0x3a, 0xce, 0xe9, 0xa8, 0xcb, 0xdf, 0x39, 0x38, 0x49, 0x5d, 0x04, 0x5d,
+	0x40, 0x6d, 0xf8, 0xc5, 0xa0, 0x2f, 0xab, 0xfd, 0xc9, 0x8b, 0x1b, 0x59, 0x51, 0x47, 0xe3, 0xf6,
+	0x78, 0x32, 0x52, 0x27, 0xfd, 0xd1, 0x50, 0xee, 0x74, 0xef, 0xba, 0xf2, 0x6d, 0x65, 0x07, 0x3d,
+	0x01, 0x31, 0x0b, 0xd4, 0xee, 0x8c, 0xbb, 0xdf, 0xc8, 0x15, 0x0e, 0xd5, 0xa0, 0x9a, 0xa5, 0x1f,
+	0xca, 0xfd, 0xdb, 0x6e, 0xff, 0x79, 0xa5, 0x80, 0xea, 0xf0, 0x38, 0x0b, 0xa0, 0xc8, 0x3d, 0xb9,
+	0x3d, 0x92, 0x6f, 0x2b, 0xc5, 0xcb, 0xdf, 0x38, 0x38, 0x5e, 0xab, 0x44, 0x74, 0x0e, 0x67, 0x2b,
+	0x56, 0xe3, 0x97, 0x43, 0x59, 0x9d, 0xf4, 0xbf, 0xea, 0x0f, 0xbe, 0xed, 0x57, 0x76, 0xd0, 0x63,
+	0x10, 0xd2, 0xea, 0x17, 0x83, 0x9b, 0x6e, 0xcf, 0xe7, 0x54, 0x85, 0x47, 0x69, 0x6d, 0x6f, 0xd0,
+	0x69, 0xf7, 0x2a, 0x85, 0x14, 0xe1, 0x40, 0x39, 0x1e, 0xf4, 0x7a, 0xea, 0x9d, 0x22, 0xcb, 0x95,
+	0x62, 0xeb, 0xaf, 0x5d, 0x40, 0xc9, 0x60, 0x11, 0xe7, 0x0d, 0xd5, 0x08, 0x52, 0x01, 0xa5, 0x9f,
+	0x22, 0x48, 0x8a, 0x0b, 0x25, 0xf7, 0x51, 0x25, 0x5e, 0x6c, 0xc4, 0x44, 0xa3, 0x62, 0x07, 0x4d,
+	0xe1, 0xbd, 0x8c, 0x5d, 0x8f, 0xde, 0x5a, 0xe7, 0xbf, 0x3e, 0xc4, 0x0f, 0x36, 0x83, 0xe2, 0x33,
+	0x5e, 0x42, 0x65, 0x7d, 0x49, 0xa2, 0x7a, 0x6c, 0x9b, 0xf3, 0x1e, 0x10, 0x9f, 0x6e, 0x40, 0xc4,
+	0xae, 0x47, 0x70, 0xb4, 0xba, 0x88, 0xd0, 0x93, 0xd8, 0x2c, 0x73, 0xdb, 0x89, 0xb5, 0x5c, 0x7d,
+	0xec, 0xf4, 0x07, 0x38, 0x49, 0xad, 0x02, 0xf4, 0x96, 0x4e, 0xde, 0x9a, 0x12, 0xa5, 0x4d, 0x90,
+	0x64, 0xc4, 0x33, 0xa6, 0x77, 0x22, 0xe2, 0xf9, 0x0b, 0x23, 0x11, 0xf1, 0x4d, 0x0b, 0x60, 0xe7,
+	0xe6, 0xc3, 0xef, 0x2f, 0x66, 0x94, 0xcd, 0xbd, 0x69, 0x53, 0xb3, 0x16, 0x57, 0x91, 0x4d, 0xf8,
+	0x68, 0xd7, 0x2c, 0x63, 0x29, 0x98, 0xee, 0x05, 0x92, 0x8f, 0xff, 0x09, 0x00, 0x00, 0xff, 0xff,
+	0x87, 0x94, 0x0e, 0xf4, 0xfb, 0x0b, 0x00, 0x00,
 }

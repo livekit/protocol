@@ -55,3 +55,12 @@ func BenchmarkNew(b *testing.B) {
 		_ = guid
 	})
 }
+
+func TestIsValidID(t *testing.T) {
+	require.True(t, IsValidID("A_SFo4igEG5Dg5"))
+	require.True(t, IsValidID("NM_OJOHANNESBURG1A_K6SMQw2ZCZyB"))
+	require.False(t, IsValidID("A_A_A_SFo4igEG5Dg5"))
+	require.False(t, IsValidID("_A_SFo4igEG5Dg5"))
+	require.False(t, IsValidID("_SFo4igEG5Dg5"))
+	require.False(t, IsValidID("SFo4igEG5Dg5"))
+}

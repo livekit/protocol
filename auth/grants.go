@@ -162,13 +162,14 @@ func checkOutputForCredentials(output any) error {
 }
 
 type ClaimGrants struct {
-	Identity  string          `json:"identity,omitempty"`
-	Name      string          `json:"name,omitempty"`
-	Kind      string          `json:"kind,omitempty"`
-	Video     *VideoGrant     `json:"video,omitempty"`
-	SIP       *SIPGrant       `json:"sip,omitempty"`
-	Agent     *AgentGrant     `json:"agent,omitempty"`
-	Inference *InferenceGrant `json:"inference,omitempty"`
+	Identity      string              `json:"identity,omitempty"`
+	Name          string              `json:"name,omitempty"`
+	Kind          string              `json:"kind,omitempty"`
+	Video         *VideoGrant         `json:"video,omitempty"`
+	SIP           *SIPGrant           `json:"sip,omitempty"`
+	Agent         *AgentGrant         `json:"agent,omitempty"`
+	Inference     *InferenceGrant     `json:"inference,omitempty"`
+	Observability *ObservabilityGrant `json:"observability,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -206,6 +207,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.SIP = c.SIP.Clone()
 	clone.Agent = c.Agent.Clone()
 	clone.Inference = c.Inference.Clone()
+	clone.Observability = c.Observability.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 
@@ -223,6 +225,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("SIP", c.SIP)
 	e.AddObject("Agent", c.Agent)
 	e.AddObject("Inference", c.Inference)
+	e.AddObject("Observability", c.Observability)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -560,7 +563,7 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // ------------------------------------------------------------------
 
 type InferenceGrant struct {
-	// Admin grants to all inference features (LLM, STT, TTS)
+	// Perform grants to all inference features (LLM, STT, TTS)
 	Perform bool `json:"perform,omitempty"`
 }
 
@@ -580,6 +583,32 @@ func (s *InferenceGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddBool("Perform", s.Perform)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+type ObservabilityGrant struct {
+	// Write grants to publish observability data
+	Write bool `json:"write,omitempty"`
+}
+
+func (s *ObservabilityGrant) Clone() *ObservabilityGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+
+	return &clone
+}
+
+func (s *ObservabilityGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Write", s.Write)
 	return nil
 }
 

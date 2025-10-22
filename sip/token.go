@@ -51,7 +51,8 @@ func BuildSIPToken(params SIPTokenParams) (string, error) {
 		SetRoomPreset(params.RoomPreset).
 		SetRoomConfig(params.RoomConfig).
 		SetKind(livekit.ParticipantInfo_SIP).
-		SetValidFor(24 * time.Hour)
+		SetValidFor(24 * time.Hour).
+		SetAllowSensitiveCredentials(true)
 
 	return at.ToJWT()
 }

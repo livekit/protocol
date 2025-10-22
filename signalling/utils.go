@@ -21,19 +21,20 @@ import (
 	"github.com/pion/webrtc/v4"
 )
 
-func ToProtoSessionDescription(sd webrtc.SessionDescription, id uint32) *livekit.SessionDescription {
+func ToProtoSessionDescription(sd webrtc.SessionDescription, id uint32, midToTrackID map[string]string) *livekit.SessionDescription {
 	if sd.SDP == "" {
 		return nil
 	}
 
 	return &livekit.SessionDescription{
-		Type: sd.Type.String(),
-		Sdp:  sd.SDP,
-		Id:   id,
+		Type:         sd.Type.String(),
+		Sdp:          sd.SDP,
+		Id:           id,
+		MidToTrackId: midToTrackID,
 	}
 }
 
-func FromProtoSessionDescription(sd *livekit.SessionDescription) (webrtc.SessionDescription, uint32) {
+func FromProtoSessionDescription(sd *livekit.SessionDescription) (webrtc.SessionDescription, uint32, map[string]string) {
 	var sdType webrtc.SDPType
 	switch sd.Type {
 	case webrtc.SDPTypeOffer.String():
@@ -48,7 +49,7 @@ func FromProtoSessionDescription(sd *livekit.SessionDescription) (webrtc.Session
 	return webrtc.SessionDescription{
 		Type: sdType,
 		SDP:  sd.Sdp,
-	}, sd.Id
+	}, sd.Id, sd.MidToTrackId
 }
 
 func ToProtoTrickle(candidateInit webrtc.ICECandidateInit, target livekit.SignalTarget, final bool) *livekit.TrickleRequest {

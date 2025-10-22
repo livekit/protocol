@@ -10,6 +10,7 @@ import (
 
 func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	r := &livekit.CreateSIPParticipantRequest{
+		SipTrunkId:          "trunk",
 		SipCallTo:           "+3333",
 		RoomName:            "room",
 		ParticipantIdentity: "",

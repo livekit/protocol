@@ -20,6 +20,7 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
 import "livekit_models.proto";
@@ -188,6 +189,18 @@ enum SIPMediaEncryption {
   SIP_MEDIA_ENCRYPT_DISABLE = 0; // do not enable encryption
   SIP_MEDIA_ENCRYPT_ALLOW = 1; // use encryption if available
   SIP_MEDIA_ENCRYPT_REQUIRE = 2; // require encryption
+}
+
+message ProviderInfo {
+  string id = 1;
+  string name = 2;
+  ProviderType type = 3;
+}
+
+enum ProviderType {
+  PROVIDER_TYPE_UNKNOWN = 0;
+  PROVIDER_TYPE_INTERNAL = 1;  // Internally implemented
+  PROVIDER_TYPE_EXTERNAL = 2;  // Vendor provided
 }
 
 message SIPTrunkInfo {
@@ -668,7 +681,15 @@ message CreateSIPParticipantRequest {
 
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 19;
-  // NEXT ID: 21
+
+  // Optional display name for the 'From' SIP header.
+  //
+  // Cases:
+  // 1) Unspecified: Use legacy behavior - display name will be set to be the caller's number.
+  // 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
+  // 3) Non-empty: Use the specified value as the display name.
+  optional string display_name = 21;
+  // NEXT ID: 22
 }
 
 message SIPParticipantInfo {
@@ -692,6 +713,7 @@ message TransferSIPParticipantRequest {
   // Max time for the transfer destination to answer the call.
   google.protobuf.Duration ringing_timeout = 6;
 }
+
 
 message SIPCallInfo {
   string call_id = 1;
@@ -718,8 +740,11 @@ message SIPCallInfo {
   SIPStatus call_status_code = 19;
   string audio_codec = 20;
   string media_encryption = 21;
+  string pcap_file_link = 25;
+  repeated google.protobuf.Any call_context = 26;
+  ProviderInfo provider_info = 27;
 
-  // NEXT ID: 25
+  // NEXT ID: 28
 }
 
 message SIPTransferInfo {

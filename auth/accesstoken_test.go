@@ -179,6 +179,57 @@ func TestAccessToken(t *testing.T) {
 		require.True(t, hasAgentName, "agentName should be present in camelCase")
 		_, hasAgentNameSnakeCase := agent["agent_name"]
 		require.False(t, hasAgentNameSnakeCase, "agent_name should not be present in snake_case")
+
+		t.Run("room configuration blocks sensitive credentials by default", func(t *testing.T) {
+			apiKey, secret := apiKeypair()
+			roomConfig := &livekit.RoomConfiguration{
+				Egress: &livekit.RoomEgress{
+					Room: &livekit.RoomCompositeEgressRequest{
+						FileOutputs: []*livekit.EncodedFileOutput{{
+							Output: &livekit.EncodedFileOutput_S3{S3: &livekit.S3Upload{Secret: "super-secret"}},
+						}},
+					},
+				},
+			}
+			_, err := NewAccessToken(apiKey, secret).
+				SetVideoGrant(&VideoGrant{RoomJoin: true, Room: "test-room"}).
+				SetRoomConfig(roomConfig).
+				ToJWT()
+			require.ErrorIs(t, err, ErrSensitiveCredentials)
+		})
+
+		t.Run("room configuration allows sensitive credentials when enabled", func(t *testing.T) {
+			apiKey, secret := apiKeypair()
+			roomConfig := &livekit.RoomConfiguration{
+				Egress: &livekit.RoomEgress{
+					Room: &livekit.RoomCompositeEgressRequest{
+						FileOutputs: []*livekit.EncodedFileOutput{{
+							Output: &livekit.EncodedFileOutput_S3{S3: &livekit.S3Upload{Secret: "super-secret"}},
+						}},
+					},
+				},
+			}
+			value, err := NewAccessToken(apiKey, secret).
+				SetVideoGrant(&VideoGrant{RoomJoin: true, Room: "test-room"}).
+				SetRoomConfig(roomConfig).
+				SetAllowSensitiveCredentials(true).
+				ToJWT()
+			require.NoError(t, err)
+
+			v, err := ParseAPIToken(value)
+			require.NoError(t, err)
+			claims, err := v.Verify(secret)
+			require.NoError(t, err)
+
+			rc := (*livekit.RoomConfiguration)(claims.RoomConfig)
+			require.NotNil(t, rc)
+			require.NotNil(t, rc.Egress)
+			require.NotNil(t, rc.Egress.Room)
+			require.NotEmpty(t, rc.Egress.Room.FileOutputs)
+			s3Out, ok := rc.Egress.Room.FileOutputs[0].Output.(*livekit.EncodedFileOutput_S3)
+			require.True(t, ok)
+			require.Equal(t, "super-secret", s3Out.S3.Secret)
+		})
 	})
 }
 

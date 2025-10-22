@@ -78,6 +78,7 @@ type ResourceURLNotifierParams struct {
 	APIKey     string
 	APISecret  string
 	FieldsHook func(whi *livekit.WebhookInfo)
+	EventKey   func(event *livekit.WebhookEvent) string
 	FilterParams
 }
 
@@ -155,6 +156,10 @@ func (r *ResourceURLNotifier) SetFilter(params FilterParams) {
 	r.filter.SetFilter(params)
 }
 
+func (r *ResourceURLNotifier) IsAllowed(event string) bool {
+	return r.filter.IsAllowed(event)
+}
+
 func (r *ResourceURLNotifier) RegisterProcessedHook(hook func(ctx context.Context, whi *livekit.WebhookInfo)) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -176,7 +181,12 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 		return errClosed
 	}
 
-	key := eventKey(event)
+	var key string
+	if r.params.EventKey != nil {
+		key = r.params.EventKey(event)
+	} else {
+		key = EventKey(event)
+	}
 
 	p := &NotifyParams{}
 	for _, o := range opts {

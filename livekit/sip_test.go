@@ -362,6 +362,201 @@ func TestSIPDispatchRuleFilter(t *testing.T) {
 	}
 }
 
+func TestTransferSIPParticipantRequestValidate(t *testing.T) {
+	cases := []struct {
+		name        string
+		req         *TransferSIPParticipantRequest
+		expectError bool
+		expectedURI string // Expected TransferTo after validation
+	}{
+		{
+			name: "valid sip URI without brackets",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:+15105550100@sip.telnyx.com",
+			},
+			expectError: false,
+			expectedURI: "<sip:+15105550100@sip.telnyx.com>",
+		},
+		{
+			name: "valid tel URI without brackets",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "tel:+15105550100",
+			},
+			expectError: false,
+			expectedURI: "tel:+15105550100",
+		},
+		{
+			name: "valid sip URI with brackets",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "<sip:+15105550100@sip.telnyx.com>",
+			},
+			expectError: false,
+			expectedURI: "<sip:+15105550100@sip.telnyx.com>",
+		},
+		{
+			name: "valid tel URI with brackets",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "<tel:+15105550100>",
+			},
+			expectError: false,
+			expectedURI: "tel:+15105550100",
+		},
+		{
+			name: "invalid URI - http",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "http://example.com",
+			},
+			expectError: true,
+		},
+		{
+			name: "invalid URI - mailto",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "mailto:test@example.com",
+			},
+			expectError: true,
+		},
+		{
+			name: "invalid URI - plain text",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "just-a-phone-number",
+			},
+			expectError: true,
+		},
+		{
+			name: "invalid URI - empty",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "",
+			},
+			expectError: true,
+		},
+		{
+			name: "missing room name",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:+15105550100@sip.telnyx.com",
+			},
+			expectError: true,
+		},
+		{
+			name: "missing participant identity",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "",
+				TransferTo:          "sip:+15105550100@sip.telnyx.com",
+			},
+			expectError: true,
+		},
+		{
+			name: "invalid URI with brackets - http",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "<http://example.com>",
+			},
+			expectError: true,
+		},
+		{
+			name: "complex sip URI with transport",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:+15105550100@my-livekit-demo.pstn.twilio.com;transport=tcp",
+			},
+			expectError: false,
+			expectedURI: "<sip:+15105550100@my-livekit-demo.pstn.twilio.com;transport=tcp>",
+		},
+		{
+			name: "sip URI with user and parameters",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:+15053128762@testdomain.com,123",
+			},
+			expectError: false,
+			expectedURI: "<sip:+15053128762@testdomain.com,123>",
+		},
+		{
+			name: "sip URI with multiple parameters",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:user@example.com;transport=tcp;lr;ttl=60",
+			},
+			expectError: false,
+			expectedURI: "<sip:user@example.com;transport=tcp;lr;ttl=60>",
+		},
+		{
+			name: "sip URI with port",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:+1234567890@example.com:5060",
+			},
+			expectError: false,
+			expectedURI: "<sip:+1234567890@example.com:5060>",
+		},
+		{
+			name: "tel URI with extension",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "tel:+1234567890;ext=123",
+			},
+			expectError: false,
+			expectedURI: "tel:+1234567890;ext=123",
+		},
+		{
+			name: "tel URI with parameters",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "tel:+1234567890;phone-context=example.com",
+			},
+			expectError: false,
+			expectedURI: "tel:+1234567890;phone-context=example.com",
+		},
+		{
+			name: "sip URI with headers",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:user@example.com?subject=test&priority=urgent",
+			},
+			expectError: false,
+			expectedURI: "<sip:user@example.com?subject=test&priority=urgent>",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			err := c.req.Validate()
+			if c.expectError {
+				require.Error(t, err, "Expected validation to fail")
+			} else {
+				require.NoError(t, err, "Expected validation to pass")
+				require.Equal(t, c.expectedURI, c.req.TransferTo, "TransferTo should be RFC-compliant after validation")
+			}
+		})
+	}
+}
+
 func TestGRPCStatus(t *testing.T) {
 	e := &SIPStatus{Code: SIPStatusCode_SIP_STATUS_BUSY_HERE}
 	st, ok := status.FromError(e)
