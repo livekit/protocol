@@ -687,7 +687,9 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	}
 
 	// Validate destination if provided
-	p.Destination.Validate()
+	if err := p.Destination.Validate(); err != nil {
+		return err
+	}
 
 	return nil
 }
