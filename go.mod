@@ -6,6 +6,7 @@ require (
 	buf.build/go/protoyaml v0.6.0
 	github.com/benbjohnson/clock v1.3.5
 	github.com/dennwc/iters v1.1.0
+	github.com/flaticols/countrycodes v0.0.2
 	github.com/frostbyte73/core v0.1.1
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gammazero/deque v1.1.0
@@ -54,7 +55,6 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/flaticols/countrycodes v0.0.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/cel-go v0.25.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
