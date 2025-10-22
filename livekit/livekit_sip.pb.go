@@ -3503,7 +3503,7 @@ type CreateSIPParticipantRequest struct {
 	// 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
 	// 3) Non-empty: Use the specified value as the display name.
 	DisplayName   *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
-	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3" json:"destination,omitempty"` // NEXT ID: 23
+	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"` // NEXT ID: 23
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4620,7 +4620,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x94\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa9\n" +
 	"\n" +
 	"\x1bCreateSIPParticipantRequest\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
@@ -4646,15 +4646,16 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\rkrisp_enabled\x18\x0e \x01(\bR\fkrispEnabled\x12F\n" +
 	"\x10media_encryption\x18\x12 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
 	"\x13wait_until_answered\x18\x13 \x01(\bR\x11waitUntilAnswered\x12&\n" +
-	"\fdisplay_name\x18\x15 \x01(\tH\x00R\vdisplayName\x88\x01\x01\x126\n" +
-	"\vdestination\x18\x16 \x01(\v2\x14.livekit.DestinationR\vdestination\x1aH\n" +
+	"\fdisplay_name\x18\x15 \x01(\tH\x00R\vdisplayName\x88\x01\x01\x12;\n" +
+	"\vdestination\x18\x16 \x01(\v2\x14.livekit.DestinationH\x01R\vdestination\x88\x01\x01\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
-	"\r_display_name\"\xab\x01\n" +
+	"\r_display_nameB\x0e\n" +
+	"\f_destination\"\xab\x01\n" +
 	"\x12SIPParticipantInfo\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1b\n" +
