@@ -690,7 +690,8 @@ message CreateSIPParticipantRequest {
   // 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
   // 3) Non-empty: Use the specified value as the display name.
   optional string display_name = 21;
-  // NEXT ID: 22
+  optional Destination destination = 22;
+  // NEXT ID: 23
 }
 
 message SIPParticipantInfo {
@@ -792,4 +793,10 @@ enum SIPCallDirection {
   SCD_UNKNOWN = 0;
   SCD_INBOUND = 1;
   SCD_OUTBOUND = 2;
+}
+
+message Destination {
+  string city = 1;
+  string country = 2;
+  string region = 3;
 }
