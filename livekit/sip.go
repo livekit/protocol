@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flaticols/countrycodes"
 	"github.com/livekit/protocol/utils/xtwirp"
 )
 
@@ -683,6 +684,29 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 		}
 
 		// TODO: Validate display name doesn't contain invalid characters
+	}
+
+	// Validate destination if provided
+	if p.Destination != nil {
+		if err := p.Destination.Validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (d *Destination) Validate() error {
+	// Rule 1: If city is specified, country must be specified
+	if d.City != "" && d.Country == "" {
+		return errors.New("if city is specified, country must also be specified")
+	}
+
+	// Rule 2: If country is specified, it must be a valid ISO 3166-1 alpha-2 code
+	if d.Country != "" {
+		if !countrycodes.IsValidAlpha2(d.Country) {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (e.g., 'US', 'IN', 'UK')")
+		}
 	}
 
 	return nil
