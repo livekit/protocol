@@ -704,3 +704,93 @@ func TestDispatchRuleUpdate(t *testing.T) {
 	require.True(t, r2 != out)
 	require.True(t, proto.Equal(r2, out))
 }
+
+func TestDestinationValidation(t *testing.T) {
+	tests := []struct {
+		name        string
+		destination *Destination
+		expectError bool
+		errorMsg    string
+	}{
+		{
+			name:        "nil destination should pass",
+			destination: nil,
+			expectError: false,
+		},
+		{
+			name:        "empty destination should pass",
+			destination: &Destination{},
+			expectError: false,
+		},
+		{
+			name: "valid country only",
+			destination: &Destination{
+				Country: "US",
+			},
+			expectError: false,
+		},
+		{
+			name: "valid country and city",
+			destination: &Destination{
+				Country: "US",
+				City:    "New York",
+			},
+			expectError: false,
+		},
+		{
+			name: "valid country and region",
+			destination: &Destination{
+				Country: "US",
+				Region:  "us-east-1",
+			},
+			expectError: false,
+		},
+		{
+			name: "city without country or region should fail",
+			destination: &Destination{
+				City: "New York",
+			},
+			expectError: true,
+			errorMsg:    "if city is specified, country or region must also be specified",
+		},
+		{
+			name: "invalid country code - 3 letters",
+			destination: &Destination{
+				Country: "USA",
+			},
+			expectError: true,
+			errorMsg:    "country must be a valid ISO 3166-1 alpha-2 code",
+		},
+		{
+			name: "invalid country code - 1 letter",
+			destination: &Destination{
+				Country: "U",
+			},
+			expectError: true,
+			errorMsg:    "country must be a valid ISO 3166-1 alpha-2 code",
+		},
+		{
+			name: "invalid country code - XX (should fail with IsCountry check)",
+			destination: &Destination{
+				Country: "XX",
+			},
+			expectError: true,
+			errorMsg:    "country must be a valid ISO 3166-1 alpha-2 code",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.destination.Validate()
+
+			if tt.expectError {
+				require.Error(t, err)
+				if tt.errorMsg != "" {
+					require.Contains(t, err.Error(), tt.errorMsg)
+				}
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}

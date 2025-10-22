@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flaticols/countrycodes"
 	"github.com/livekit/protocol/utils/xtwirp"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -687,25 +687,45 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	}
 
 	// Validate destination if provided
-	if p.Destination != nil {
-		if err := p.Destination.Validate(); err != nil {
-			return err
-		}
-	}
+	p.Destination.Validate()
 
 	return nil
 }
 
 func (d *Destination) Validate() error {
-	// Rule 1: If city is specified, country must be specified
-	if d.City != "" && d.Country == "" {
-		return errors.New("if city is specified, country must also be specified")
+	if d == nil {
+		return nil
 	}
 
-	// Rule 2: If country is specified, it must be a valid ISO 3166-1 alpha-2 code
+	// Rule 1: If city is specified, country must be specified
+	if d.City != "" && d.Country == "" && d.Region == "" {
+		return errors.New("if city is specified, country or region must also be specified")
+	}
+
+	// Rule 2: If country is specified, it must be a valid ISO 3166-1 alpha-2 code (2-letter only)
 	if d.Country != "" {
-		if !countrycodes.IsValidAlpha2(d.Country) {
-			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (e.g., 'US', 'IN', 'UK')")
+		// First check: must be exactly 2 characters
+		if len(d.Country) != 2 {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
+
+		// Use golang.org/x/text/language to validate 2-letter country codes
+		region, err := language.ParseRegion(d.Country)
+		if err != nil {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
+
+		// Check if the parsed region is actually a valid country
+		// This is the most direct way to validate - region.IsCountry() returns true
+		// only for actual valid countries, false for invalid codes like "XX"
+		if !region.IsCountry() {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
+
+		// Additional check: ensure the parsed region matches our input
+		// This prevents 3-letter codes like "USA" from being converted to "US"
+		if region.String() != d.Country {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
 		}
 	}
 
