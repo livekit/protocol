@@ -723,7 +723,7 @@ func (d *Destination) Validate() error {
 		}
 
 		// Additional check: ensure the parsed region matches our input
-		// This prevents 3-letter codes like "USA" from being converted to "US"
+		// This prevents auto corrections by the library
 		if region.String() != d.Country {
 			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
 		}
