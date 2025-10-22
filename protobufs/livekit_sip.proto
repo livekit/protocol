@@ -690,7 +690,7 @@ message CreateSIPParticipantRequest {
   // 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
   // 3) Non-empty: Use the specified value as the display name.
   optional string display_name = 21;
-  Destination destination = 22;
+  optional Destination destination = 22;
   // NEXT ID: 23
 }
 
