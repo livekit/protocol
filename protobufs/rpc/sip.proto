@@ -50,6 +50,7 @@ message InternalCreateSIPParticipantRequest {
   // Hostname for the 'From' SIP address in INVITE
   string hostname = 20;
   string destination_country = 30;
+  string destination_region = 32;
   livekit.SIPTransport transport = 16;
 
   // Number used to make the call
@@ -113,7 +114,7 @@ message InternalCreateSIPParticipantRequest {
   // 3) Non-empty: Use the specified value as the display name.
   optional string display_name = 31;
 
-  // NEXT ID: 32
+  // NEXT ID: 33
 }
 
 message InternalCreateSIPParticipantResponse {
