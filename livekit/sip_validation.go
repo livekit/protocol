@@ -23,49 +23,49 @@ import (
 
 // RFC 3261 compliant validation functions for SIP headers and messages
 
-type AllowedCharacters struct {
+type allowedCharacters struct {
 	ascii [127]bool
 	utf8  bool
 }
 
-func NewAllowedCharacters() *AllowedCharacters {
-	return &AllowedCharacters{}
+func NewAllowedCharacters() *allowedCharacters {
+	return &allowedCharacters{}
 }
 
-func (a *AllowedCharacters) AddUTF8() error {
+func (a *allowedCharacters) AddUTF8() error {
 	a.utf8 = true
 	return nil
 }
 
-func (a *AllowedCharacters) AddNumbers() error {
+func (a *allowedCharacters) AddNumbers() error {
 	for r := '0'; r <= '9'; r++ {
 		a.ascii[r] = true
 	}
 	return nil
 }
 
-func (a *AllowedCharacters) AddLowercaseASCII() error {
+func (a *allowedCharacters) AddLowercaseASCII() error {
 	for r := 'a'; r <= 'z'; r++ {
 		a.ascii[r] = true
 	}
 	return nil
 }
 
-func (a *AllowedCharacters) AddUppercaseASCII() error {
+func (a *allowedCharacters) AddUppercaseASCII() error {
 	for r := 'A'; r <= 'Z'; r++ {
 		a.ascii[r] = true
 	}
 	return nil
 }
 
-func (a *AllowedCharacters) AddPrintableLienarASCII() {
+func (a *allowedCharacters) AddPrintableLienarASCII() {
 	// Anything between 0x20 and 0x7E
 	for i := 0x20; i <= 0x7E; i++ {
 		a.ascii[i] = true
 	}
 }
 
-func (a *AllowedCharacters) Add(chars string) error {
+func (a *allowedCharacters) Add(chars string) error {
 	for _, char := range chars {
 		if int(char) >= len(a.ascii) {
 			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
@@ -75,7 +75,7 @@ func (a *AllowedCharacters) Add(chars string) error {
 	return nil
 }
 
-func (a *AllowedCharacters) Remove(chars string) error {
+func (a *allowedCharacters) Remove(chars string) error {
 	for _, char := range chars {
 		if int(char) >= len(a.ascii) {
 			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
@@ -85,14 +85,14 @@ func (a *AllowedCharacters) Remove(chars string) error {
 	return nil
 }
 
-func (a *AllowedCharacters) Copy() *AllowedCharacters {
-	return &AllowedCharacters{
+func (a *allowedCharacters) Copy() *allowedCharacters {
+	return &allowedCharacters{
 		ascii: a.ascii,
 		utf8:  a.utf8,
 	}
 }
 
-func (a *AllowedCharacters) Validate(target string) error {
+func (a *allowedCharacters) Validate(target string) error {
 	for _, char := range target {
 		if int(char) >= len(a.ascii) && !a.utf8 {
 			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
@@ -104,9 +104,9 @@ func (a *AllowedCharacters) Validate(target string) error {
 	return nil
 }
 
-var tokenCharacters *AllowedCharacters
-var displayNameCharacters *AllowedCharacters
-var headerValuesCharacters *AllowedCharacters
+var tokenCharacters *allowedCharacters
+var displayNameCharacters *allowedCharacters
+var headerValuesCharacters *allowedCharacters
 
 func init() {
 	// Per RFC 3261 Section 25.1
