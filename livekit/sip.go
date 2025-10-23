@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/xtwirp"
 	"golang.org/x/text/language"
 )
@@ -263,6 +264,29 @@ func validateHeaderValues(headers map[string]string) error {
 	return nil
 }
 
+// validateHeaders makes sure header names/keys and values are per SIP specifications
+func validateHeaders(headers map[string]string) error {
+	for headerName, headerValue := range headers {
+		if err := ValidateHeaderName(headerName); err != nil {
+			return fmt.Errorf("invalid header name: %w", err)
+		}
+		if err := ValidateHeaderValue(headerName, headerValue); err != nil {
+			return fmt.Errorf("invalid header value for %s: %w", headerName, err)
+		}
+	}
+	return nil
+}
+
+// validateHeaderNames Makes sure the values of the given map correspond to valid SIP header names
+func validateHeaderNames(attributesToHeaders map[string]string) error {
+	for _, headerName := range attributesToHeaders {
+		if err := ValidateHeaderName(headerName); err != nil {
+			return fmt.Errorf("invalid header name: %w", err)
+		}
+	}
+	return nil
+}
+
 func (p *SIPTrunkInfo) Validate() error {
 	if len(p.InboundNumbersRegex) != 0 {
 		return fmt.Errorf("trunks with InboundNumbersRegex are deprecated")
@@ -368,6 +392,15 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
+	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
 	return nil
 }
 
@@ -455,6 +488,15 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
+	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
 	return nil
 }
 
@@ -471,6 +513,11 @@ func (p *SIPOutboundConfig) Validate() error {
 	}
 	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
+	}
+	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
+	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
+		// No error, just a warning for SIP RFC validation for now
 	}
 	return nil
 }
@@ -677,13 +724,18 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 		return err
 	}
 
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+
 	// Validate display_name if provided
 	if p.DisplayName != nil {
 		if len(*p.DisplayName) > 128 {
 			return errors.New("display_name too long (max 128 characters)")
 		}
 
-		// TODO: Validate display name doesn't contain invalid characters
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 
 	// Validate destination if provided
@@ -773,6 +825,11 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 
 	if err := validateHeaderKeys(p.Headers); err != nil {
 		return err
+	}
+
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 
 	return nil
