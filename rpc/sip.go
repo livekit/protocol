@@ -194,6 +194,7 @@ func NewCreateSIPParticipantRequest(
 		MediaEncryption:       enc,
 		WaitUntilAnswered:     req.WaitUntilAnswered,
 		DisplayName:           req.DisplayName,
+		Destination:           req.Destination,
 	}, nil
 }
 

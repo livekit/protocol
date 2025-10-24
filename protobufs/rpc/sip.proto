@@ -113,7 +113,10 @@ message InternalCreateSIPParticipantRequest {
   // 3) Non-empty: Use the specified value as the display name.
   optional string display_name = 31;
 
-  // NEXT ID: 32
+  // Destination information for routing decisions
+  livekit.Destination destination = 32;
+
+  // NEXT ID: 33
 }
 
 message InternalCreateSIPParticipantResponse {
