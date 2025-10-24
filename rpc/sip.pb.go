@@ -97,7 +97,9 @@ type InternalCreateSIPParticipantRequest struct {
 	// 1) Unspecified: Use legacy behavior - display name will be set to be the caller's number.
 	// 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
 	// 3) Non-empty: Use the specified value as the display name.
-	DisplayName   *string `protobuf:"bytes,31,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
+	DisplayName *string `protobuf:"bytes,31,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
+	// Destination information for routing decisions
+	Destination   *livekit.Destination `protobuf:"bytes,32,opt,name=destination,proto3,oneof" json:"destination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -342,6 +344,13 @@ func (x *InternalCreateSIPParticipantRequest) GetDisplayName() string {
 	return ""
 }
 
+func (x *InternalCreateSIPParticipantRequest) GetDestination() *livekit.Destination {
+	if x != nil {
+		return x.Destination
+	}
+	return nil
+}
+
 type InternalCreateSIPParticipantResponse struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	ParticipantId       string                 `protobuf:"bytes,1,opt,name=participant_id,json=participantId,proto3" json:"participant_id,omitempty"`
@@ -485,7 +494,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\"\xb0\x0e\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\"\xfd\x0e\n" +
 	"#InternalCreateSIPParticipantRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tR\tprojectId\x12\x1e\n" +
@@ -519,7 +528,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x11max_call_duration\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12F\n" +
 	"\x10media_encryption\x18\x1c \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
 	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12&\n" +
-	"\fdisplay_name\x18\x1f \x01(\tH\x00R\vdisplayName\x88\x01\x01\x1aH\n" +
+	"\fdisplay_name\x18\x1f \x01(\tH\x00R\vdisplayName\x88\x01\x01\x12;\n" +
+	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationH\x01R\vdestination\x88\x01\x01\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
@@ -532,7 +542,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
-	"\r_display_name\"\xa0\x01\n" +
+	"\r_display_nameB\x0e\n" +
+	"\f_destination\"\xa0\x01\n" +
 	"$InternalCreateSIPParticipantResponse\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1e\n" +
@@ -578,7 +589,8 @@ var file_rpc_sip_proto_goTypes = []any{
 	(livekit.SIPFeature)(0),         // 10: livekit.SIPFeature
 	(*durationpb.Duration)(nil),     // 11: google.protobuf.Duration
 	(livekit.SIPMediaEncryption)(0), // 12: livekit.SIPMediaEncryption
-	(*emptypb.Empty)(nil),           // 13: google.protobuf.Empty
+	(*livekit.Destination)(nil),     // 13: livekit.Destination
+	(*emptypb.Empty)(nil),           // 14: google.protobuf.Empty
 }
 var file_rpc_sip_proto_depIdxs = []int32{
 	8,  // 0: rpc.InternalCreateSIPParticipantRequest.transport:type_name -> livekit.SIPTransport
@@ -591,17 +603,18 @@ var file_rpc_sip_proto_depIdxs = []int32{
 	11, // 7: rpc.InternalCreateSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
 	11, // 8: rpc.InternalCreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
 	12, // 9: rpc.InternalCreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
-	7,  // 10: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
-	11, // 11: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
-	0,  // 12: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
-	2,  // 13: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
-	1,  // 14: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
-	13, // 15: rpc.SIPInternal.TransferSIPParticipant:output_type -> google.protobuf.Empty
-	14, // [14:16] is the sub-list for method output_type
-	12, // [12:14] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	13, // 10: rpc.InternalCreateSIPParticipantRequest.destination:type_name -> livekit.Destination
+	7,  // 11: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
+	11, // 12: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	0,  // 13: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
+	2,  // 14: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
+	1,  // 15: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
+	14, // 16: rpc.SIPInternal.TransferSIPParticipant:output_type -> google.protobuf.Empty
+	15, // [15:17] is the sub-list for method output_type
+	13, // [13:15] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_rpc_sip_proto_init() }
