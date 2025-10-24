@@ -114,7 +114,7 @@ message InternalCreateSIPParticipantRequest {
   optional string display_name = 31;
 
   // Destination information for routing decisions
-  optional livekit.Destination destination = 32;
+  livekit.Destination destination = 32;
 
   // NEXT ID: 33
 }
