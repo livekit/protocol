@@ -99,7 +99,7 @@ type InternalCreateSIPParticipantRequest struct {
 	// 3) Non-empty: Use the specified value as the display name.
 	DisplayName *string `protobuf:"bytes,31,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
 	// Destination information for routing decisions
-	Destination   *livekit.Destination `protobuf:"bytes,32,opt,name=destination,proto3,oneof" json:"destination,omitempty"`
+	Destination   *livekit.Destination `protobuf:"bytes,32,opt,name=destination,proto3" json:"destination,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -494,7 +494,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\"\xfd\x0e\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\"\xe8\x0e\n" +
 	"#InternalCreateSIPParticipantRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tR\tprojectId\x12\x1e\n" +
@@ -528,8 +528,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x11max_call_duration\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12F\n" +
 	"\x10media_encryption\x18\x1c \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
 	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12&\n" +
-	"\fdisplay_name\x18\x1f \x01(\tH\x00R\vdisplayName\x88\x01\x01\x12;\n" +
-	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationH\x01R\vdestination\x88\x01\x01\x1aH\n" +
+	"\fdisplay_name\x18\x1f \x01(\tH\x00R\vdisplayName\x88\x01\x01\x126\n" +
+	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationR\vdestination\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
@@ -542,8 +542,7 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
-	"\r_display_nameB\x0e\n" +
-	"\f_destination\"\xa0\x01\n" +
+	"\r_display_name\"\xa0\x01\n" +
 	"$InternalCreateSIPParticipantResponse\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1e\n" +
