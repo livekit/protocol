@@ -495,11 +495,15 @@ type TestLogger interface {
 }
 
 func NewTestLogger(t TestLogger) Logger {
+	return NewTestLoggerLevel(t, 0)
+}
+
+func NewTestLoggerLevel(t TestLogger, lvl int) Logger {
 	return LogRLogger(funcr.New(func(prefix, args string) {
 		if prefix != "" {
 			t.Logf("%s: %s\n", prefix, args)
 		} else {
 			t.Log(args)
 		}
-	}, funcr.Options{}))
+	}, funcr.Options{Verbosity: lvl}))
 }
