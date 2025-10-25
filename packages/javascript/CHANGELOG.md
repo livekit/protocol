@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.42.3
+
+### Patch Changes
+
+- fix pretty-weeks-behave.md - [#1269](https://github.com/livekit/protocol/pull/1269) ([@paulwe](https://github.com/paulwe))
+
+- move rtp converter to separate util package - [#1267](https://github.com/livekit/protocol/pull/1267) ([@paulwe](https://github.com/paulwe))
+
 ## 1.42.2
 
 ### Patch Changes
