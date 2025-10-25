@@ -55,6 +55,10 @@ message SignalRequest {
     UpdateLocalAudioTrack update_audio_track = 17;
     // Update local video track settings
     UpdateLocalVideoTrack update_video_track = 18;
+    // Publish a data track
+    PublishDataTrackRequest publish_data_track = 19;
+    // Update subscription state for one or more data tracks
+    UpdateDataSubscription update_data_subscription = 20;
   }
 }
 
@@ -111,6 +115,8 @@ message SignalResponse {
     MediaSectionsRequirement media_sections_requirement = 25;
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
+    // Sent in response to `PublishDataTrackRequest`.
+    PublishDataTrackResponse publish_data_track = 27;
   }
 }
 
@@ -158,6 +164,38 @@ message AddTrackRequest {
   BackupCodecPolicy backup_codec_policy = 16;
 
   repeated AudioTrackFeature audio_features = 17;
+}
+
+message PublishDataTrackRequest {
+  // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+  string name = 1;
+
+  // MIME type of the data sent over the track (e.g., `application/json`).
+  // This must be a valid MIME type as defined by RFC 2046.
+  string mime_type = 2;
+
+  // Method used for end-to-end encryption (E2EE) on frame payloads.
+  Encryption.Type encryption = 3;
+}
+
+message PublishDataTrackResponse {
+
+  uint32 request_id = 1;
+
+  oneof result {
+    // Track was successfully published, track info is provided.
+    DataTrackInfo ok = 2;
+    // Track could not be published, reason is provided.
+    Error error = 3;
+  }
+
+  enum Error {
+    UNKNOWN           = 0; // Unknown reason.
+    INVALID_NAME      = 1; // Name is invalid.
+    INVALID_MIME_TYPE = 2; // MIME type is invalid.
+    NAME_TAKEN        = 3; // Publisher already has a data track published with the same name.
+    UNAUTHORIZED      = 4; // Publisher is not authorized to publish data tracks.
+  }
 }
 
 message TrickleRequest {
@@ -229,6 +267,17 @@ message UpdateSubscription {
   repeated string track_sids = 1;
   bool subscribe = 2;
   repeated ParticipantTracks participant_tracks = 3;
+}
+
+message UpdateDataSubscription {
+  message Update {
+    string sid = 1;
+    bool subscribe = 2;
+    // Options to apply when initially subscribing or updating an existing subscription.
+    // When unsubscribing, this field is ignored.
+    DataTrackSubscriptionOptions options = 3;
+  }
+  repeated Update updates = 1;
 }
 
 message UpdateTrackSettings {
