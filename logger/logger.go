@@ -20,6 +20,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -492,6 +493,7 @@ func (l LogRLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
 type TestLogger interface {
 	Logf(format string, args ...any)
 	Log(args ...any)
+	Cleanup(f func())
 }
 
 func NewTestLogger(t TestLogger) Logger {
@@ -499,7 +501,14 @@ func NewTestLogger(t TestLogger) Logger {
 }
 
 func NewTestLoggerLevel(t TestLogger, lvl int) Logger {
+	var closed atomic.Bool
+	t.Cleanup(func() {
+		closed.Store(true)
+	})
 	return LogRLogger(funcr.New(func(prefix, args string) {
+		if closed.Load() {
+			return
+		}
 		if prefix != "" {
 			t.Logf("%s: %s\n", prefix, args)
 		} else {
