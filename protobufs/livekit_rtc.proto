@@ -117,6 +117,8 @@ message SignalResponse {
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
     // Sent in response to `PublishDataTrackRequest`.
     PublishDataTrackResponse publish_data_track = 27;
+    // Sent to data track subscribers to provide mapping from track SIDs to handles.
+    DataTrackSubscriberHandles data_track_handles = 28;
   }
 }
 
@@ -185,6 +187,11 @@ message PublishDataTrackResponse {
   uint32 request_id = 1;
   // Information about the published track.
   DataTrackInfo info = 2;
+}
+
+message DataTrackSubscriberHandles {
+  // Mapping from track SIDs of subscribed tracks to handles.
+  map<string, uint32> handles = 1;
 }
 
 message TrickleRequest {
