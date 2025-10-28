@@ -205,7 +205,7 @@ message UnpublishDataTrackResponse {
 }
 
 message DataTrackSubscriberHandles {
-  // Mapping from track SIDs of subscribed tracks to handles.
+  // Mapping from data track SIDs to handles subscribers will see on incoming packets.
   map<string, uint32> handles = 1;
 }
 
