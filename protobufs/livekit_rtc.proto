@@ -57,8 +57,10 @@ message SignalRequest {
     UpdateLocalVideoTrack update_video_track = 18;
     // Publish a data track
     PublishDataTrackRequest publish_data_track = 19;
+    // Unpublish a data track
+    UnpublishDataTrackRequest unpublish_data_track = 20;
     // Update subscription state for one or more data tracks
-    UpdateDataSubscription update_data_subscription = 20;
+    UpdateDataSubscription update_data_subscription = 21;
   }
 }
 
@@ -117,8 +119,10 @@ message SignalResponse {
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
     // Sent in response to `PublishDataTrackRequest`.
     PublishDataTrackResponse publish_data_track = 27;
+    // Sent in response to `UnpublishDataTrackRequest` or SFU-initiated unpublish.
+    UnpublishDataTrackResponse unpublish_data_track = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
-    DataTrackSubscriberHandles data_track_handles = 28;
+    DataTrackSubscriberHandles data_track_handles = 29;
   }
 }
 
@@ -187,6 +191,16 @@ message PublishDataTrackResponse {
   uint32 request_id = 1;
   // Information about the published track.
   DataTrackInfo info = 2;
+}
+
+message UnpublishDataTrackRequest {
+  // Handle of the track to unpublish.
+  uint32 handle = 1;
+}
+
+message UnpublishDataTrackResponse {
+  // Handle of the track that was unpublished.
+  uint32 handle = 2;
 }
 
 message DataTrackSubscriberHandles {
@@ -542,6 +556,7 @@ message RequestResponse {
     UpdateLocalAudioTrack update_audio_track = 8;
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
+    UnpublishDataTrackRequest unpublish_data_track = 11;
   }
 }
 
