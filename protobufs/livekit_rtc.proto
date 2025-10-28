@@ -182,23 +182,9 @@ message PublishDataTrackRequest {
 }
 
 message PublishDataTrackResponse {
-
   uint32 request_id = 1;
-
-  oneof result {
-    // Track was successfully published, track info is provided.
-    DataTrackInfo ok = 2;
-    // Track could not be published, reason is provided.
-    Error error = 3;
-  }
-
-  enum Error {
-    UNKNOWN           = 0; // Unknown reason.
-    INVALID_NAME      = 1; // Name is invalid.
-    INVALID_MIME_TYPE = 2; // MIME type is invalid.
-    NAME_TAKEN        = 3; // Publisher already has a data track published with the same name.
-    UNAUTHORIZED      = 4; // Publisher is not authorized to publish data tracks.
-  }
+  // Information about the published track.
+  DataTrackInfo info = 2;
 }
 
 message TrickleRequest {
@@ -531,6 +517,11 @@ message RequestResponse {
     QUEUED = 4;
     UNSUPPORTED_TYPE= 5;
     UNCLASSIFIED_ERROR = 6;
+    DATA_TRACK_INVALID_HANDLE = 7;
+    DATA_TRACK_INVALID_NAME = 8;
+    DATA_TRACK_INVALID_MIME_TYPE = 9;
+    DATA_TRACK_NAME_TAKEN = 10;
+    reserved 11 to 15; // Reserved for future data track errors.
   }
 
   uint32 request_id = 1;
@@ -543,6 +534,7 @@ message RequestResponse {
     UpdateParticipantMetadata update_metadata = 7;
     UpdateLocalAudioTrack update_audio_track = 8;
     UpdateLocalVideoTrack update_video_track = 9;
+    PublishDataTrackRequest publish_data_track = 10;
   }
 }
 
