@@ -170,6 +170,9 @@ message PublishDataTrackRequest {
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
   string name = 1;
 
+  // 16-bit identifier attached to packets, unique per publisher.
+  uint32 handle = 2;
+
   // MIME type of the data sent over the track (e.g., `application/json`).
   // This must be a valid MIME type as defined by RFC 2046.
   string mime_type = 2;
