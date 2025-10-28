@@ -188,7 +188,8 @@ message PublishDataTrackRequest {
 }
 
 message PublishDataTrackResponse {
-  uint32 request_id = 1;
+  // Handle of the track that was published.
+  uint32 handle = 1;
   // Information about the published track.
   DataTrackInfo info = 2;
 }
