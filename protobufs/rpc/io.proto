@@ -106,6 +106,8 @@ message GetSIPTrunkAuthenticationResponse {
   // Used in Cloud only
   string project_id = 5;
   livekit.ProviderInfo provider_info = 6;
+  // Error code if authentication failed
+  SIPTrunkAuthenticationError error_code = 7;
 }
 
 message EvaluateSIPDispatchRulesRequest {
@@ -229,6 +231,12 @@ enum SIPDispatchResult {
   REQUEST_PIN = 2;
   REJECT = 3;
   DROP = 4;
+}
+
+enum SIPTrunkAuthenticationError {
+  SIP_TRUNK_AUTH_ERROR_NONE = 0;
+  SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED = 1;
+  SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND = 2;
 }
 
 message SIPCall {
