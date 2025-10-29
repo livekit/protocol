@@ -2331,15 +2331,16 @@ func (x *TrackInfo) GetBackupCodecPolicy() BackupCodecPolicy {
 }
 
 type DataTrackInfo struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Sid   string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Handle uint32                 `protobuf:"varint,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	Sid    string                 `protobuf:"bytes,2,opt,name=sid,proto3" json:"sid,omitempty"`
 	// Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// MIME type of the data sent over the track (e.g., `application/json`).
 	// This must be a valid MIME type as defined by RFC 2046.
-	MimeType string `protobuf:"bytes,3,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
+	MimeType string `protobuf:"bytes,4,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on packet payloads.
-	Encryption    Encryption_Type `protobuf:"varint,4,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
+	Encryption    Encryption_Type `protobuf:"varint,5,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2372,6 +2373,13 @@ func (x *DataTrackInfo) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DataTrackInfo.ProtoReflect.Descriptor instead.
 func (*DataTrackInfo) Descriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *DataTrackInfo) GetHandle() uint32 {
+	if x != nil {
+		return x.Handle
+	}
+	return 0
 }
 
 func (x *DataTrackInfo) GetSid() string {
@@ -6027,13 +6035,14 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06stream\x18\x11 \x01(\tR\x06stream\x12/\n" +
 	"\aversion\x18\x12 \x01(\v2\x15.livekit.TimedVersionR\aversion\x12A\n" +
 	"\x0eaudio_features\x18\x13 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12J\n" +
-	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\x8c\x01\n" +
-	"\rDataTrackInfo\x12\x10\n" +
-	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
-	"\tmime_type\x18\x03 \x01(\tR\bmimeType\x128\n" +
+	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\xa4\x01\n" +
+	"\rDataTrackInfo\x12\x16\n" +
+	"\x06handle\x18\x01 \x01(\rR\x06handle\x12\x10\n" +
+	"\x03sid\x18\x02 \x01(\tR\x03sid\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1b\n" +
+	"\tmime_type\x18\x04 \x01(\tR\bmimeType\x128\n" +
 	"\n" +
-	"encryption\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
+	"encryption\x18\x05 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\"Q\n" +
 	"\x1cDataTrackSubscriptionOptions\x12\"\n" +
 	"\n" +
