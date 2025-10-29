@@ -39,6 +39,6 @@ type Rollup string
 
 const (
 	RollupUndefined Rollup = ""
-	RollupCountry   Rollup = "country"
+	RollupPhone     Rollup = "phone"
 	RollupCall      Rollup = "call"
 )

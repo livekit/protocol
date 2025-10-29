@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_AIHSTV8 = true
+const Version_LQKK2M0 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -46,9 +46,20 @@ type CountryReporter interface {
 	RegisterFunc(func(ts time.Time, tx CountryTx) bool)
 	Tx(func(tx CountryTx))
 	TxAt(time.Time, func(tx CountryTx))
+	WithPhone(number string) PhoneReporter
+	WithDeferredPhone() (PhoneReporter, KeyResolver)
+	CountryTx
+}
+
+type PhoneTx interface{}
+
+type PhoneReporter interface {
+	RegisterFunc(func(ts time.Time, tx PhoneTx) bool)
+	Tx(func(tx PhoneTx))
+	TxAt(time.Time, func(tx PhoneTx))
 	WithCall(id string) CallReporter
 	WithDeferredCall() (CallReporter, KeyResolver)
-	CountryTx
+	PhoneTx
 }
 
 type CallTx interface {
