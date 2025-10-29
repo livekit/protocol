@@ -22,4 +22,6 @@ var (
 	ErrMissingWhatsAppCallId        = psrpc.NewErrorf(psrpc.InvalidArgument, "whatsapp call id is required")
 	ErrMissingWhatsAppApiKey        = psrpc.NewErrorf(psrpc.InvalidArgument, "whatsapp api key is required")
 	ErrIncorrectSDPType             = psrpc.NewErrorf(psrpc.InvalidArgument, "incorrect sdp type")
+	ErrConnectorNotFound            = psrpc.NewErrorf(psrpc.NotFound, "connector not found")
+	ErrWhatsAppCallNotFound         = psrpc.NewErrorf(psrpc.NotFound, "whatsapp call not found")
 )

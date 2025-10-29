@@ -45,6 +45,8 @@ message DialWhatsAppCallRequest {
   map<string, string> participant_attributes = 10;
   // Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 11;
+  // Meta cloud API version 
+  float whatsapp_cloud_api_version = 12;
 }
 
 message DialWhatsAppCallResponse {
@@ -62,15 +64,11 @@ message DisconnectWhatsAppCallResponse {
 }
 
 message ConnectWhatsAppCallRequest {
-  // The number of the business that is conencting the call
-  string whatsapp_phone_number_id = 1;
-  // The API key of the business that is connecting the call
-  string whatsapp_api_key = 2;
   // Call ID sent by Meta
-  string whatsapp_call_id = 3;
+  string whatsapp_call_id = 1;
   // The call connect webhook comes with SDP from Meta
   // It is the answer SDP for a business initiated call
-  SessionDescription sdp = 4;
+  SessionDescription sdp = 2;
 }
 
 message ConnectWhatsAppCallResponse {
@@ -102,7 +100,8 @@ message AcceptWhatsAppCallRequest {
   map<string, string> participant_attributes = 11;
   // Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 12;
-  
+  // Meta cloud API version
+  float whatsapp_cloud_api_version = 13;
 }
 
 message AcceptWhatsAppCallResponse {
