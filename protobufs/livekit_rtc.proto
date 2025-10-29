@@ -188,10 +188,8 @@ message PublishDataTrackRequest {
 }
 
 message PublishDataTrackResponse {
-  // Handle of the track that was published.
-  uint32 handle = 1;
   // Information about the published track.
-  DataTrackInfo info = 2;
+  DataTrackInfo info = 1;
 }
 
 message UnpublishDataTrackRequest {
@@ -200,13 +198,13 @@ message UnpublishDataTrackRequest {
 }
 
 message UnpublishDataTrackResponse {
-  // Handle of the track that was unpublished.
-  uint32 handle = 1;
+  // Information about the unpublished track.
+  DataTrackInfo info = 1;
 }
 
 message DataTrackSubscriberHandles {
-  // Mapping from data track SIDs to handles subscribers will see on incoming packets.
-  map<string, uint32> handles = 1;
+  // Mapping from handles subscribers will see on incoming packets to data track SIDs.
+  map<uint32, string> handles = 1;
 }
 
 message TrickleRequest {
@@ -539,11 +537,10 @@ message RequestResponse {
     QUEUED = 4;
     UNSUPPORTED_TYPE= 5;
     UNCLASSIFIED_ERROR = 6;
-    DATA_TRACK_INVALID_HANDLE = 7;
-    DATA_TRACK_INVALID_NAME = 8;
-    DATA_TRACK_INVALID_MIME_TYPE = 9;
-    DATA_TRACK_NAME_TAKEN = 10;
-    reserved 11 to 15; // Reserved for future data track errors.
+    INVALID_HANDLE = 7;
+    INVALID_NAME = 8;
+    INVALID_MIME_TYPE = 9;
+    NAME_TAKEN = 10;
   }
 
   uint32 request_id = 1;
