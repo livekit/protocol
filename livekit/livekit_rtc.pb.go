@@ -4862,12 +4862,13 @@ func (x *MediaSectionsRequirement) GetNumVideos() uint32 {
 }
 
 type UpdateDataSubscription_Update struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Sid       string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
-	Subscribe bool                   `protobuf:"varint,2,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Sid                 string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
+	ParticipantIdentity string                 `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	Subscribe           bool                   `protobuf:"varint,3,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
 	// Options to apply when initially subscribing or updating an existing subscription.
 	// When unsubscribing, this field is ignored.
-	Options       *DataTrackSubscriptionOptions `protobuf:"bytes,3,opt,name=options,proto3" json:"options,omitempty"`
+	Options       *DataTrackSubscriptionOptions `protobuf:"bytes,4,opt,name=options,proto3" json:"options,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4905,6 +4906,13 @@ func (*UpdateDataSubscription_Update) Descriptor() ([]byte, []int) {
 func (x *UpdateDataSubscription_Update) GetSid() string {
 	if x != nil {
 		return x.Sid
+	}
+	return ""
+}
+
+func (x *UpdateDataSubscription_Update) GetParticipantIdentity() string {
+	if x != nil {
+		return x.ParticipantIdentity
 	}
 	return ""
 }
@@ -5088,13 +5096,14 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12I\n" +
-	"\x12participant_tracks\x18\x03 \x03(\v2\x1a.livekit.ParticipantTracksR\x11participantTracks\"\xd5\x01\n" +
+	"\x12participant_tracks\x18\x03 \x03(\v2\x1a.livekit.ParticipantTracksR\x11participantTracks\"\x89\x02\n" +
 	"\x16UpdateDataSubscription\x12@\n" +
-	"\aupdates\x18\x01 \x03(\v2&.livekit.UpdateDataSubscription.UpdateR\aupdates\x1ay\n" +
+	"\aupdates\x18\x01 \x03(\v2&.livekit.UpdateDataSubscription.UpdateR\aupdates\x1a\xac\x01\n" +
 	"\x06Update\x12\x10\n" +
-	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1c\n" +
-	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12?\n" +
-	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"\xdd\x01\n" +
+	"\x03sid\x18\x01 \x01(\tR\x03sid\x121\n" +
+	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1c\n" +
+	"\tsubscribe\x18\x03 \x01(\bR\tsubscribe\x12?\n" +
+	"\aoptions\x18\x04 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"\xdd\x01\n" +
 	"\x13UpdateTrackSettings\x12\x1d\n" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1a\n" +
