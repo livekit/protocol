@@ -1726,8 +1726,8 @@ func (x *UnpublishDataTrackResponse) GetPubHandle() uint32 {
 
 type DataTrackSubscriberHandles struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Mapping from data track SIDs to handles subscribers will see on incoming packets.
-	Handles       map[string]uint32 `protobuf:"bytes,1,rep,name=handles,proto3" json:"handles,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"varint,2,opt,name=value"`
+	// Maps handles from incoming packets to the track SIDs that the packets belong to.
+	SubHandles    map[uint32]string `protobuf:"bytes,1,rep,name=sub_handles,json=subHandles,proto3" json:"sub_handles,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1762,9 +1762,9 @@ func (*DataTrackSubscriberHandles) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *DataTrackSubscriberHandles) GetHandles() map[string]uint32 {
+func (x *DataTrackSubscriberHandles) GetSubHandles() map[uint32]string {
 	if x != nil {
-		return x.Handles
+		return x.SubHandles
 	}
 	return nil
 }
@@ -5042,12 +5042,13 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\";\n" +
 	"\x1aUnpublishDataTrackResponse\x12\x1d\n" +
 	"\n" +
-	"pub_handle\x18\x01 \x01(\rR\tpubHandle\"\xa4\x01\n" +
-	"\x1aDataTrackSubscriberHandles\x12J\n" +
-	"\ahandles\x18\x01 \x03(\v20.livekit.DataTrackSubscriberHandles.HandlesEntryR\ahandles\x1a:\n" +
-	"\fHandlesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\rR\x05value:\x028\x01\"{\n" +
+	"pub_handle\x18\x01 \x01(\rR\tpubHandle\"\xb1\x01\n" +
+	"\x1aDataTrackSubscriberHandles\x12T\n" +
+	"\vsub_handles\x18\x01 \x03(\v23.livekit.DataTrackSubscriberHandles.SubHandlesEntryR\n" +
+	"subHandles\x1a=\n" +
+	"\x0fSubHandlesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\rR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"{\n" +
 	"\x0eTrickleRequest\x12$\n" +
 	"\rcandidateInit\x18\x01 \x01(\tR\rcandidateInit\x12-\n" +
 	"\x06target\x18\x02 \x01(\x0e2\x15.livekit.SignalTargetR\x06target\x12\x14\n" +
@@ -5403,7 +5404,7 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(*JoinRequest)(nil),                   // 58: livekit.JoinRequest
 	(*WrappedJoinRequest)(nil),            // 59: livekit.WrappedJoinRequest
 	(*MediaSectionsRequirement)(nil),      // 60: livekit.MediaSectionsRequirement
-	nil,                                   // 61: livekit.DataTrackSubscriberHandles.HandlesEntry
+	nil,                                   // 61: livekit.DataTrackSubscriberHandles.SubHandlesEntry
 	nil,                                   // 62: livekit.SessionDescription.MidToTrackIdEntry
 	(*UpdateDataSubscription_Update)(nil), // 63: livekit.UpdateDataSubscription.Update
 	nil,                                   // 64: livekit.UpdateParticipantMetadata.AttributesEntry
@@ -5490,7 +5491,7 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	72,  // 53: livekit.AddTrackRequest.audio_features:type_name -> livekit.AudioTrackFeature
 	70,  // 54: livekit.PublishDataTrackRequest.encryption:type_name -> livekit.Encryption.Type
 	73,  // 55: livekit.PublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
-	61,  // 56: livekit.DataTrackSubscriberHandles.handles:type_name -> livekit.DataTrackSubscriberHandles.HandlesEntry
+	61,  // 56: livekit.DataTrackSubscriberHandles.sub_handles:type_name -> livekit.DataTrackSubscriberHandles.SubHandlesEntry
 	0,   // 57: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
 	74,  // 58: livekit.JoinResponse.room:type_name -> livekit.Room
 	75,  // 59: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
