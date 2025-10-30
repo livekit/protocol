@@ -229,17 +229,17 @@ func (LeaveRequest_Action) EnumDescriptor() ([]byte, []int) {
 type RequestResponse_Reason int32
 
 const (
-	RequestResponse_OK                           RequestResponse_Reason = 0
-	RequestResponse_NOT_FOUND                    RequestResponse_Reason = 1
-	RequestResponse_NOT_ALLOWED                  RequestResponse_Reason = 2
-	RequestResponse_LIMIT_EXCEEDED               RequestResponse_Reason = 3
-	RequestResponse_QUEUED                       RequestResponse_Reason = 4
-	RequestResponse_UNSUPPORTED_TYPE             RequestResponse_Reason = 5
-	RequestResponse_UNCLASSIFIED_ERROR           RequestResponse_Reason = 6
-	RequestResponse_DATA_TRACK_INVALID_HANDLE    RequestResponse_Reason = 7
-	RequestResponse_DATA_TRACK_INVALID_NAME      RequestResponse_Reason = 8
-	RequestResponse_DATA_TRACK_INVALID_MIME_TYPE RequestResponse_Reason = 9
-	RequestResponse_DATA_TRACK_NAME_TAKEN        RequestResponse_Reason = 10
+	RequestResponse_OK                 RequestResponse_Reason = 0
+	RequestResponse_NOT_FOUND          RequestResponse_Reason = 1
+	RequestResponse_NOT_ALLOWED        RequestResponse_Reason = 2
+	RequestResponse_LIMIT_EXCEEDED     RequestResponse_Reason = 3
+	RequestResponse_QUEUED             RequestResponse_Reason = 4
+	RequestResponse_UNSUPPORTED_TYPE   RequestResponse_Reason = 5
+	RequestResponse_UNCLASSIFIED_ERROR RequestResponse_Reason = 6
+	RequestResponse_INVALID_HANDLE     RequestResponse_Reason = 7
+	RequestResponse_INVALID_NAME       RequestResponse_Reason = 8
+	RequestResponse_INVALID_MIME_TYPE  RequestResponse_Reason = 9
+	RequestResponse_NAME_TAKEN         RequestResponse_Reason = 10
 )
 
 // Enum value maps for RequestResponse_Reason.
@@ -252,23 +252,23 @@ var (
 		4:  "QUEUED",
 		5:  "UNSUPPORTED_TYPE",
 		6:  "UNCLASSIFIED_ERROR",
-		7:  "DATA_TRACK_INVALID_HANDLE",
-		8:  "DATA_TRACK_INVALID_NAME",
-		9:  "DATA_TRACK_INVALID_MIME_TYPE",
-		10: "DATA_TRACK_NAME_TAKEN",
+		7:  "INVALID_HANDLE",
+		8:  "INVALID_NAME",
+		9:  "INVALID_MIME_TYPE",
+		10: "NAME_TAKEN",
 	}
 	RequestResponse_Reason_value = map[string]int32{
-		"OK":                           0,
-		"NOT_FOUND":                    1,
-		"NOT_ALLOWED":                  2,
-		"LIMIT_EXCEEDED":               3,
-		"QUEUED":                       4,
-		"UNSUPPORTED_TYPE":             5,
-		"UNCLASSIFIED_ERROR":           6,
-		"DATA_TRACK_INVALID_HANDLE":    7,
-		"DATA_TRACK_INVALID_NAME":      8,
-		"DATA_TRACK_INVALID_MIME_TYPE": 9,
-		"DATA_TRACK_NAME_TAKEN":        10,
+		"OK":                 0,
+		"NOT_FOUND":          1,
+		"NOT_ALLOWED":        2,
+		"LIMIT_EXCEEDED":     3,
+		"QUEUED":             4,
+		"UNSUPPORTED_TYPE":   5,
+		"UNCLASSIFIED_ERROR": 6,
+		"INVALID_HANDLE":     7,
+		"INVALID_NAME":       8,
+		"INVALID_MIME_TYPE":  9,
+		"NAME_TAKEN":         10,
 	}
 )
 
@@ -1517,8 +1517,9 @@ func (x *AddTrackRequest) GetAudioFeatures() []AudioTrackFeature {
 
 type PublishDataTrackRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// 16-bit identifier attached to packets, unique per publisher.
-	Handle uint32 `protobuf:"varint,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	// Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
+	// This must be non-zero and unique for each data track published by the publisher.
+	PubHandle uint32 `protobuf:"varint,1,opt,name=pub_handle,json=pubHandle,proto3" json:"pub_handle,omitempty"`
 	// Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// MIME type of the data sent over the track (e.g., `application/json`).
@@ -1560,9 +1561,9 @@ func (*PublishDataTrackRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *PublishDataTrackRequest) GetHandle() uint32 {
+func (x *PublishDataTrackRequest) GetPubHandle() uint32 {
 	if x != nil {
-		return x.Handle
+		return x.PubHandle
 	}
 	return 0
 }
@@ -1590,10 +1591,8 @@ func (x *PublishDataTrackRequest) GetEncryption() Encryption_Type {
 
 type PublishDataTrackResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Handle of the track that was published.
-	Handle uint32 `protobuf:"varint,1,opt,name=handle,proto3" json:"handle,omitempty"`
 	// Information about the published track.
-	Info          *DataTrackInfo `protobuf:"bytes,2,opt,name=info,proto3" json:"info,omitempty"`
+	Info          *DataTrackInfo `protobuf:"bytes,1,opt,name=info,proto3" json:"info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1628,13 +1627,6 @@ func (*PublishDataTrackResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *PublishDataTrackResponse) GetHandle() uint32 {
-	if x != nil {
-		return x.Handle
-	}
-	return 0
-}
-
 func (x *PublishDataTrackResponse) GetInfo() *DataTrackInfo {
 	if x != nil {
 		return x.Info
@@ -1644,8 +1636,8 @@ func (x *PublishDataTrackResponse) GetInfo() *DataTrackInfo {
 
 type UnpublishDataTrackRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Handle of the track to unpublish.
-	Handle        uint32 `protobuf:"varint,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	// Publisher handle of the track to unpublish.
+	PubHandle     uint32 `protobuf:"varint,1,opt,name=pub_handle,json=pubHandle,proto3" json:"pub_handle,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1680,17 +1672,17 @@ func (*UnpublishDataTrackRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UnpublishDataTrackRequest) GetHandle() uint32 {
+func (x *UnpublishDataTrackRequest) GetPubHandle() uint32 {
 	if x != nil {
-		return x.Handle
+		return x.PubHandle
 	}
 	return 0
 }
 
 type UnpublishDataTrackResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Handle of the track that was unpublished.
-	Handle        uint32 `protobuf:"varint,1,opt,name=handle,proto3" json:"handle,omitempty"`
+	// Publisher handle of the track that was unpublished.
+	PubHandle     uint32 `protobuf:"varint,1,opt,name=pub_handle,json=pubHandle,proto3" json:"pub_handle,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1725,9 +1717,9 @@ func (*UnpublishDataTrackResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *UnpublishDataTrackResponse) GetHandle() uint32 {
+func (x *UnpublishDataTrackResponse) GetPubHandle() uint32 {
 	if x != nil {
-		return x.Handle
+		return x.PubHandle
 	}
 	return 0
 }
@@ -5034,21 +5026,23 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x12\x16\n" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
-	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\x9c\x01\n" +
-	"\x17PublishDataTrackRequest\x12\x16\n" +
-	"\x06handle\x18\x01 \x01(\rR\x06handle\x12\x12\n" +
+	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\xa3\x01\n" +
+	"\x17PublishDataTrackRequest\x12\x1d\n" +
+	"\n" +
+	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\tmime_type\x18\x03 \x01(\tR\bmimeType\x128\n" +
 	"\n" +
 	"encryption\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
-	"encryption\"^\n" +
-	"\x18PublishDataTrackResponse\x12\x16\n" +
-	"\x06handle\x18\x01 \x01(\rR\x06handle\x12*\n" +
-	"\x04info\x18\x02 \x01(\v2\x16.livekit.DataTrackInfoR\x04info\"3\n" +
-	"\x19UnpublishDataTrackRequest\x12\x16\n" +
-	"\x06handle\x18\x01 \x01(\rR\x06handle\"4\n" +
-	"\x1aUnpublishDataTrackResponse\x12\x16\n" +
-	"\x06handle\x18\x01 \x01(\rR\x06handle\"\xa4\x01\n" +
+	"encryption\"F\n" +
+	"\x18PublishDataTrackResponse\x12*\n" +
+	"\x04info\x18\x01 \x01(\v2\x16.livekit.DataTrackInfoR\x04info\":\n" +
+	"\x19UnpublishDataTrackRequest\x12\x1d\n" +
+	"\n" +
+	"pub_handle\x18\x01 \x01(\rR\tpubHandle\";\n" +
+	"\x1aUnpublishDataTrackResponse\x12\x1d\n" +
+	"\n" +
+	"pub_handle\x18\x01 \x01(\rR\tpubHandle\"\xa4\x01\n" +
 	"\x1aDataTrackSubscriberHandles\x12J\n" +
 	"\ahandles\x18\x01 \x03(\v20.livekit.DataTrackSubscriberHandles.HandlesEntryR\ahandles\x1a:\n" +
 	"\fHandlesEntry\x12\x10\n" +
@@ -5252,7 +5246,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xc6\a\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x94\a\n" +
 	"\x0fRequestResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rR\trequestId\x127\n" +
@@ -5266,7 +5260,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12P\n" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
-	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xfd\x01\n" +
+	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xcb\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5275,12 +5269,13 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
 	"\x06QUEUED\x10\x04\x12\x14\n" +
 	"\x10UNSUPPORTED_TYPE\x10\x05\x12\x16\n" +
-	"\x12UNCLASSIFIED_ERROR\x10\x06\x12\x1d\n" +
-	"\x19DATA_TRACK_INVALID_HANDLE\x10\a\x12\x1b\n" +
-	"\x17DATA_TRACK_INVALID_NAME\x10\b\x12 \n" +
-	"\x1cDATA_TRACK_INVALID_MIME_TYPE\x10\t\x12\x19\n" +
-	"\x15DATA_TRACK_NAME_TAKEN\x10\n" +
-	"\"\x04\b\v\x10\x0fB\t\n" +
+	"\x12UNCLASSIFIED_ERROR\x10\x06\x12\x12\n" +
+	"\x0eINVALID_HANDLE\x10\a\x12\x10\n" +
+	"\fINVALID_NAME\x10\b\x12\x15\n" +
+	"\x11INVALID_MIME_TYPE\x10\t\x12\x0e\n" +
+	"\n" +
+	"NAME_TAKEN\x10\n" +
+	"B\t\n" +
 	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xe4\x01\n" +
