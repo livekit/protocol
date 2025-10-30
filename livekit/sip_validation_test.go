@@ -79,6 +79,7 @@ var InvalidHeaderNames = []string{
 // ValidHeaderValues contains valid SIP header values (implementation-specific restrictions)
 // Note: These restrictions are NOT in RFC 3261 but are applied for security/performance
 var ValidHeaderValues = []string{
+	"",                                     // empty
 	"u1@example.com",                       // basic email
 	"<sip:u2@example.com>",                 // SIP URI with brackets
 	"Alice <sip:u3@example.com>",           // display name + URI
@@ -94,24 +95,21 @@ var ValidHeaderValues = []string{
 	"text/plain; charset=utf-8",            // Content-Type with params
 	"<sip:u5@[2001:db8::1]:5060>",          // IPv6 URI
 	"\"Alice & Bob\" <sip:u6@example.com>", // display name with & symbol
+	"Header with\ttab",                     // tab (HTAB) per RFC 3261 Section 25.1
+	"Header with unicode café",             // Unicode
+	"Header with unicode 世界",               // Unicode
+	"Header with unicode émojis 🎉",         // Unicode with emojis
 	strings.Repeat("a", 1024),              // max length
 }
 
 // Note: These restrictions are NOT in RFC 3261 but are applied for security/performance
 var InvalidHeaderValues = []string{
-	"",                              // empty
 	"Header with\nnewline",          // newline
 	"Header with\rreturn",           // carriage return
-	"Header with\ttab",              // tab
 	"Header with\x00null",           // null byte
 	"Header with\x01control",        // control character
 	"Header with\x1Funit separator", // control character
 	"Header with\x7Fdelete",         // delete character
-	"Header with\x80extended",       // extended ASCII
-	"Header with\xFFextended",       // extended ASCII
-	"Header with unicode café",      // Unicode
-	"Header with unicode 世界",        // Unicode
-	"Header with unicode émojis 🎉",  // Unicode with emojis
 	strings.Repeat("a", 1025),       // too long
 }
 

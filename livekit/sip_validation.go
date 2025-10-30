@@ -24,7 +24,7 @@ import (
 // RFC 3261 compliant validation functions for SIP headers and messages
 
 type allowedCharacters struct {
-	ascii [127]bool
+	ascii [128]bool
 	utf8  bool
 }
 
