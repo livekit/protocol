@@ -247,17 +247,22 @@ message TrackInfo {
 }
 
 message DataTrackInfo {
-  string sid = 1;
+
+  // Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
+  uint32 pub_handle = 1;
+
+  // Server-assigned track identifier.
+  string sid = 2;
 
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
-  string name = 2;
+  string name = 3;
 
   // MIME type of the data sent over the track (e.g., `application/json`).
   // This must be a valid MIME type as defined by RFC 2046.
-  string mime_type = 3;
+  string mime_type = 4;
 
   // Method used for end-to-end encryption (E2EE) on packet payloads.
-  Encryption.Type encryption = 4;
+  Encryption.Type encryption = 5;
 }
 
 message DataTrackSubscriptionOptions {

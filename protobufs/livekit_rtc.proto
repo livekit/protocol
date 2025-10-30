@@ -173,8 +173,9 @@ message AddTrackRequest {
 }
 
 message PublishDataTrackRequest {
-  // 16-bit identifier attached to packets, unique per publisher.
-  uint32 handle = 1;
+  // Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
+  // This must be non-zero and unique for each data track published by the publisher.
+  uint32 pub_handle = 1;
 
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
   string name = 2;
@@ -188,20 +189,18 @@ message PublishDataTrackRequest {
 }
 
 message PublishDataTrackResponse {
-  // Handle of the track that was published.
-  uint32 handle = 1;
   // Information about the published track.
-  DataTrackInfo info = 2;
+  DataTrackInfo info = 1;
 }
 
 message UnpublishDataTrackRequest {
-  // Handle of the track to unpublish.
-  uint32 handle = 1;
+  // Publisher handle of the track to unpublish.
+  uint32 pub_handle = 1;
 }
 
 message UnpublishDataTrackResponse {
-  // Handle of the track that was unpublished.
-  uint32 handle = 1;
+  // Publisher handle of the track that was unpublished.
+  uint32 pub_handle = 1;
 }
 
 message DataTrackSubscriberHandles {
