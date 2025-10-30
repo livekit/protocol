@@ -257,12 +257,8 @@ message DataTrackInfo {
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
   string name = 3;
 
-  // MIME type of the data sent over the track (e.g., `application/json`).
-  // This must be a valid MIME type as defined by RFC 2046.
-  string mime_type = 4;
-
   // Method used for end-to-end encryption (E2EE) on packet payloads.
-  Encryption.Type encryption = 5;
+  Encryption.Type encryption = 4;
 }
 
 message DataTrackSubscriptionOptions {
