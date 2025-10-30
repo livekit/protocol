@@ -95,7 +95,10 @@ func (a *allowedCharacters) Copy() *allowedCharacters {
 
 func (a *allowedCharacters) Validate(target string) error {
 	for _, char := range target {
-		if int(char) >= len(a.ascii) && !a.utf8 {
+		if int(char) >= len(a.ascii) {
+			if a.utf8 {
+				continue
+			}
 			return fmt.Errorf("char %d out of range, consider explicilty adding utf8 characters", char)
 		}
 		if !a.ascii[char] {
@@ -142,7 +145,8 @@ func init() {
 	displayNameCharacters.Add(" \t")
 
 	headerValuesCharacters = NewAllowedCharacters()
-	headerValuesCharacters.AddPrintableLienarASCII() // Specifically not adding UTF8 for now
+	headerValuesCharacters.AddPrintableLienarASCII()
+	headerValuesCharacters.AddUTF8()
 }
 
 // Required headers for SIP requests per RFC 3261 Section 8.1.1
