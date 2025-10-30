@@ -204,8 +204,8 @@ message UnpublishDataTrackResponse {
 }
 
 message DataTrackSubscriberHandles {
-  // Mapping from data track SIDs to handles subscribers will see on incoming packets.
-  map<string, uint32> handles = 1;
+  // Maps handles from incoming packets to the track SIDs that the packets belong to.
+  map<uint32, string> sub_handles = 1;
 }
 
 message TrickleRequest {
