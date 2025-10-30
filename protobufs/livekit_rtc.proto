@@ -178,6 +178,7 @@ message PublishDataTrackRequest {
   uint32 pub_handle = 1;
 
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+  // This must be non-empty and no longer than 256 characters.
   string name = 2;
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
