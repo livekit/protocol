@@ -238,24 +238,22 @@ const (
 	RequestResponse_UNCLASSIFIED_ERROR RequestResponse_Reason = 6
 	RequestResponse_INVALID_HANDLE     RequestResponse_Reason = 7
 	RequestResponse_INVALID_NAME       RequestResponse_Reason = 8
-	RequestResponse_INVALID_MIME_TYPE  RequestResponse_Reason = 9
-	RequestResponse_NAME_TAKEN         RequestResponse_Reason = 10
+	RequestResponse_NAME_TAKEN         RequestResponse_Reason = 9
 )
 
 // Enum value maps for RequestResponse_Reason.
 var (
 	RequestResponse_Reason_name = map[int32]string{
-		0:  "OK",
-		1:  "NOT_FOUND",
-		2:  "NOT_ALLOWED",
-		3:  "LIMIT_EXCEEDED",
-		4:  "QUEUED",
-		5:  "UNSUPPORTED_TYPE",
-		6:  "UNCLASSIFIED_ERROR",
-		7:  "INVALID_HANDLE",
-		8:  "INVALID_NAME",
-		9:  "INVALID_MIME_TYPE",
-		10: "NAME_TAKEN",
+		0: "OK",
+		1: "NOT_FOUND",
+		2: "NOT_ALLOWED",
+		3: "LIMIT_EXCEEDED",
+		4: "QUEUED",
+		5: "UNSUPPORTED_TYPE",
+		6: "UNCLASSIFIED_ERROR",
+		7: "INVALID_HANDLE",
+		8: "INVALID_NAME",
+		9: "NAME_TAKEN",
 	}
 	RequestResponse_Reason_value = map[string]int32{
 		"OK":                 0,
@@ -267,8 +265,7 @@ var (
 		"UNCLASSIFIED_ERROR": 6,
 		"INVALID_HANDLE":     7,
 		"INVALID_NAME":       8,
-		"INVALID_MIME_TYPE":  9,
-		"NAME_TAKEN":         10,
+		"NAME_TAKEN":         9,
 	}
 )
 
@@ -1522,11 +1519,8 @@ type PublishDataTrackRequest struct {
 	PubHandle uint32 `protobuf:"varint,1,opt,name=pub_handle,json=pubHandle,proto3" json:"pub_handle,omitempty"`
 	// Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// MIME type of the data sent over the track (e.g., `application/json`).
-	// This must be a valid MIME type as defined by RFC 2046.
-	MimeType string `protobuf:"bytes,3,opt,name=mime_type,json=mimeType,proto3" json:"mime_type,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
-	Encryption    Encryption_Type `protobuf:"varint,4,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
+	Encryption    Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1571,13 +1565,6 @@ func (x *PublishDataTrackRequest) GetPubHandle() uint32 {
 func (x *PublishDataTrackRequest) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *PublishDataTrackRequest) GetMimeType() string {
-	if x != nil {
-		return x.MimeType
 	}
 	return ""
 }
@@ -5026,14 +5013,13 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x12\x16\n" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
-	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\xa3\x01\n" +
+	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\x86\x01\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
-	"\tmime_type\x18\x03 \x01(\tR\bmimeType\x128\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
 	"\n" +
-	"encryption\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
+	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\"F\n" +
 	"\x18PublishDataTrackResponse\x12*\n" +
 	"\x04info\x18\x01 \x01(\v2\x16.livekit.DataTrackInfoR\x04info\":\n" +
@@ -5247,7 +5233,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x94\a\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xfd\x06\n" +
 	"\x0fRequestResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rR\trequestId\x127\n" +
@@ -5261,7 +5247,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12P\n" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
-	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xcb\x01\n" +
+	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xb4\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5272,11 +5258,9 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x10UNSUPPORTED_TYPE\x10\x05\x12\x16\n" +
 	"\x12UNCLASSIFIED_ERROR\x10\x06\x12\x12\n" +
 	"\x0eINVALID_HANDLE\x10\a\x12\x10\n" +
-	"\fINVALID_NAME\x10\b\x12\x15\n" +
-	"\x11INVALID_MIME_TYPE\x10\t\x12\x0e\n" +
+	"\fINVALID_NAME\x10\b\x12\x0e\n" +
 	"\n" +
-	"NAME_TAKEN\x10\n" +
-	"B\t\n" +
+	"NAME_TAKEN\x10\tB\t\n" +
 	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xe4\x01\n" +
