@@ -537,7 +537,7 @@ message RequestResponse {
     UNCLASSIFIED_ERROR = 6;
     INVALID_HANDLE = 7;
     INVALID_NAME = 8;
-    NAME_TAKEN = 9;
+    DUPLICATE = 9;
   }
 
   uint32 request_id = 1;
