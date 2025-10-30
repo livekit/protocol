@@ -27,6 +27,7 @@ import (
 )
 
 type TrackID string
+type DataTrackID string
 type ParticipantID string
 type ParticipantIdentity string
 type ParticipantName string
