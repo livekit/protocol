@@ -1521,6 +1521,7 @@ type PublishDataTrackRequest struct {
 	// This must be non-zero and unique for each data track published by the publisher.
 	PubHandle uint32 `protobuf:"varint,1,opt,name=pub_handle,json=pubHandle,proto3" json:"pub_handle,omitempty"`
 	// Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+	// This must be non-empty and no longer than 256 characters.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
 	Encryption    Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
