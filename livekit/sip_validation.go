@@ -63,6 +63,7 @@ func (a *allowedCharacters) AddPrintableLienarASCII() {
 	for i := 0x20; i <= 0x7E; i++ {
 		a.ascii[i] = true
 	}
+	a.ascii[0x09] = true // \t or HTAB
 }
 
 func (a *allowedCharacters) Add(chars string) error {
@@ -182,7 +183,6 @@ var FrobiddenSipHeaderNames = map[string]bool{
 	"max-forwards":     true,
 	"record-route":     true,
 	"refer-to":         true, // rfc3515
-	"referred-by":      true, // rfc3892sipUriCharacters
 	"reply-to":         true,
 	"k":                true, // Supported
 	"l":                true, // Content-Length
@@ -233,7 +233,7 @@ func ValidateHeaderName(name string) error {
 // ValidateHeaderValue validates a SIP header value per RFC 3261 Section 25.1
 func ValidateHeaderValue(name, value string) error {
 	if value == "" {
-		return fmt.Errorf("header %s: value cannot be empty", name)
+		return nil
 	}
 
 	if len(value) > 1024 {
