@@ -278,10 +278,11 @@ message UpdateSubscription {
 message UpdateDataSubscription {
   message Update {
     string sid = 1;
-    bool subscribe = 2;
+    string participant_identity = 2;
+    bool subscribe = 3;
     // Options to apply when initially subscribing or updating an existing subscription.
     // When unsubscribing, this field is ignored.
-    DataTrackSubscriptionOptions options = 3;
+    DataTrackSubscriptionOptions options = 4;
   }
   repeated Update updates = 1;
 }
