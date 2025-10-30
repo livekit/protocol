@@ -180,12 +180,8 @@ message PublishDataTrackRequest {
   // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
   string name = 2;
 
-  // MIME type of the data sent over the track (e.g., `application/json`).
-  // This must be a valid MIME type as defined by RFC 2046.
-  string mime_type = 3;
-
   // Method used for end-to-end encryption (E2EE) on frame payloads.
-  Encryption.Type encryption = 4;
+  Encryption.Type encryption = 3;
 }
 
 message PublishDataTrackResponse {
@@ -540,8 +536,7 @@ message RequestResponse {
     UNCLASSIFIED_ERROR = 6;
     INVALID_HANDLE = 7;
     INVALID_NAME = 8;
-    INVALID_MIME_TYPE = 9;
-    NAME_TAKEN = 10;
+    NAME_TAKEN = 9;
   }
 
   uint32 request_id = 1;
