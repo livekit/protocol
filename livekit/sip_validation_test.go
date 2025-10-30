@@ -174,7 +174,7 @@ var InvalidNameAddrHeaders = []string{
 func TestValidateHeaderName_ValidHeaders(t *testing.T) {
 	for i, headerName := range ValidHeaderNames {
 		t.Run(testCaseName(headerName, 32, i), func(t *testing.T) {
-			err := ValidateHeaderName(headerName)
+			err := ValidateHeaderName(headerName, true)
 			if err != nil {
 				t.Errorf("ValidateHeaderName(%q) = %v, want nil", headerName, err)
 			}
@@ -186,7 +186,7 @@ func TestValidateHeaderName_ValidHeaders(t *testing.T) {
 func TestValidateHeaderName_InvalidHeaders(t *testing.T) {
 	for i, headerName := range InvalidHeaderNames {
 		t.Run(testCaseName(headerName, 32, i), func(t *testing.T) {
-			err := ValidateHeaderName(headerName)
+			err := ValidateHeaderName(headerName, true)
 			if err == nil {
 				t.Errorf("ValidateHeaderName(%q) = nil, want error", headerName)
 			}
@@ -248,7 +248,7 @@ func TestFrobiddenSipHeaderNames(t *testing.T) {
 	for name := range FrobiddenSipHeaderNames {
 		i++
 		t.Run(testCaseName(name, 32, i), func(t *testing.T) {
-			err := ValidateHeaderName(name)
+			err := ValidateHeaderName(name, true)
 			if err == nil {
 				t.Errorf("ValidateHeaderName(%q) = nil, want error", name)
 			}

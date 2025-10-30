@@ -212,7 +212,7 @@ var nameAddrHeaders = map[string]bool{
 }
 
 // ValidateHeaderName validates a SIP header name per RFC 3261 Section 25.1
-func ValidateHeaderName(name string) error {
+func ValidateHeaderName(name string, restrictNames bool) error {
 	if name == "" {
 		return errors.New("header name cannot be empty")
 	}
@@ -226,9 +226,11 @@ func ValidateHeaderName(name string) error {
 	}
 
 	// Convert to lowercase for case-insensitive comparison
-	lowerName := strings.ToLower(name)
-	if forbidden, exists := FrobiddenSipHeaderNames[lowerName]; exists && forbidden {
-		return fmt.Errorf("header name %s not supported", name)
+	if restrictNames {
+		lowerName := strings.ToLower(name)
+		if forbidden, exists := FrobiddenSipHeaderNames[lowerName]; exists && forbidden {
+			return fmt.Errorf("header name %s not supported", name)
+		}
 	}
 
 	return nil
