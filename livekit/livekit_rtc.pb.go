@@ -238,22 +238,24 @@ const (
 	RequestResponse_UNCLASSIFIED_ERROR RequestResponse_Reason = 6
 	RequestResponse_INVALID_HANDLE     RequestResponse_Reason = 7
 	RequestResponse_INVALID_NAME       RequestResponse_Reason = 8
-	RequestResponse_DUPLICATE          RequestResponse_Reason = 9
+	RequestResponse_DUPLICATE_HANDLE   RequestResponse_Reason = 9
+	RequestResponse_DUPLICATE_NAME     RequestResponse_Reason = 10
 )
 
 // Enum value maps for RequestResponse_Reason.
 var (
 	RequestResponse_Reason_name = map[int32]string{
-		0: "OK",
-		1: "NOT_FOUND",
-		2: "NOT_ALLOWED",
-		3: "LIMIT_EXCEEDED",
-		4: "QUEUED",
-		5: "UNSUPPORTED_TYPE",
-		6: "UNCLASSIFIED_ERROR",
-		7: "INVALID_HANDLE",
-		8: "INVALID_NAME",
-		9: "DUPLICATE",
+		0:  "OK",
+		1:  "NOT_FOUND",
+		2:  "NOT_ALLOWED",
+		3:  "LIMIT_EXCEEDED",
+		4:  "QUEUED",
+		5:  "UNSUPPORTED_TYPE",
+		6:  "UNCLASSIFIED_ERROR",
+		7:  "INVALID_HANDLE",
+		8:  "INVALID_NAME",
+		9:  "DUPLICATE_HANDLE",
+		10: "DUPLICATE_NAME",
 	}
 	RequestResponse_Reason_value = map[string]int32{
 		"OK":                 0,
@@ -265,7 +267,8 @@ var (
 		"UNCLASSIFIED_ERROR": 6,
 		"INVALID_HANDLE":     7,
 		"INVALID_NAME":       8,
-		"DUPLICATE":          9,
+		"DUPLICATE_HANDLE":   9,
+		"DUPLICATE_NAME":     10,
 	}
 )
 
@@ -5242,7 +5245,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xfc\x06\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x97\a\n" +
 	"\x0fRequestResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rR\trequestId\x127\n" +
@@ -5256,7 +5259,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12P\n" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
-	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xb3\x01\n" +
+	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xce\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5267,8 +5270,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x10UNSUPPORTED_TYPE\x10\x05\x12\x16\n" +
 	"\x12UNCLASSIFIED_ERROR\x10\x06\x12\x12\n" +
 	"\x0eINVALID_HANDLE\x10\a\x12\x10\n" +
-	"\fINVALID_NAME\x10\b\x12\r\n" +
-	"\tDUPLICATE\x10\tB\t\n" +
+	"\fINVALID_NAME\x10\b\x12\x14\n" +
+	"\x10DUPLICATE_HANDLE\x10\t\x12\x12\n" +
+	"\x0eDUPLICATE_NAME\x10\n" +
+	"B\t\n" +
 	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xe4\x01\n" +
