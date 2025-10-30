@@ -212,6 +212,26 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		require.Error(t, err)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
+
+	t.Run("insecure skip verify", func(t *testing.T) {
+		urlNotifier := NewURLNotifier(URLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			HTTPClientParams: HTTPClientParams{
+				InsecureSkipVerify: true,
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
+			},
+		})
+		defer urlNotifier.Stop(false)
+
+		require.IsType(t, &http.Transport{}, urlNotifier.client.HTTPClient.Transport)
+		transport := urlNotifier.client.HTTPClient.Transport.(*http.Transport)
+		require.NotNil(t, transport.TLSClientConfig)
+		require.True(t, transport.TLSClientConfig.InsecureSkipVerify)
+	})
 }
 
 func TestURLNotifierFilter(t *testing.T) {
@@ -395,6 +415,23 @@ func TestResourceWebHook(t *testing.T) {
 		}
 		require.NoError(t, resourceURLNotifier.QueueNotify(context.Background(), event))
 		wg.Wait()
+	})
+
+	t.Run("insecure skip verify", func(t *testing.T) {
+		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			HTTPClientParams: HTTPClientParams{
+				InsecureSkipVerify: true,
+			},
+		})
+		defer resourceURLNotifier.Stop(false)
+
+		require.IsType(t, &http.Transport{}, resourceURLNotifier.client.HTTPClient.Transport)
+		transport := resourceURLNotifier.client.HTTPClient.Transport.(*http.Transport)
+		require.NotNil(t, transport.TLSClientConfig)
+		require.True(t, transport.TLSClientConfig.InsecureSkipVerify)
 	})
 
 }

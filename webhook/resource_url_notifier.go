@@ -117,18 +117,7 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 	}
 
 	rhc := retryablehttp.NewClient()
-	if params.RetryWaitMin > 0 {
-		rhc.RetryWaitMin = params.RetryWaitMin
-	}
-	if params.RetryWaitMax > 0 {
-		rhc.RetryWaitMax = params.RetryWaitMax
-	}
-	if params.MaxRetries > 0 {
-		rhc.RetryMax = params.MaxRetries
-	}
-	if params.ClientTimeout > 0 {
-		rhc.HTTPClient.Timeout = params.ClientTimeout
-	}
+	configureRetryableHTTPClient(rhc, params.HTTPClientParams)
 	rhc.Logger = &logAdapter{}
 	r := &ResourceURLNotifier{
 		params:         params,

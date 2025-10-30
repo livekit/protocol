@@ -29,6 +29,7 @@ import (
 type WebHookConfig struct {
 	URLs                []string                  `yaml:"urls,omitempty"`
 	APIKey              string                    `yaml:"api_key,omitempty"`
+	InsecureSkipVerify  bool                      `yaml:"insecure_skip_verify,omitempty"`
 	URLNotifier         URLNotifierConfig         `yaml:"url_notifier,omitempty"`
 	ResourceURLNotifier ResourceURLNotifierConfig `yaml:"resource_url_notifier,omitempty"`
 	FilterParams        FilterParams              `yaml:"filter_params,omitempty"`
@@ -89,6 +90,9 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 			Logger:       logger.GetLogger().WithComponent("webhook"),
 			APIKey:       config.APIKey,
 			APISecret:    apiSecret,
+			HTTPClientParams: HTTPClientParams{
+				InsecureSkipVerify: config.InsecureSkipVerify,
+			},
 			Config:       config.ResourceURLNotifier,
 			FilterParams: config.FilterParams,
 		})
@@ -99,6 +103,9 @@ func NewDefaultNotifier(config WebHookConfig, kp auth.KeyProvider) (QueuedNotifi
 		Logger:    logger.GetLogger().WithComponent("webhook"),
 		APIKey:    config.APIKey,
 		APISecret: apiSecret,
+		HTTPClientParams: HTTPClientParams{
+			InsecureSkipVerify: config.InsecureSkipVerify,
+		},
 		Config:    config.ResourceURLNotifier,
 	})
 
@@ -185,6 +192,7 @@ type HTTPClientParams struct {
 	RetryWaitMax  time.Duration
 	MaxRetries    int
 	ClientTimeout time.Duration
+	InsecureSkipVerify bool
 }
 
 type FilterParams struct {
