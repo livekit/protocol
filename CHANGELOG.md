@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.42.3
+
+### Patch Changes
+
+- Added warning prints to SIP headers - [#1238](https://github.com/livekit/protocol/pull/1238) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.42.2
 
 ### Patch Changes
