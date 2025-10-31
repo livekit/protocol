@@ -39,6 +39,7 @@ const (
 	NodePrefix                = "ND_"
 	ParticipantPrefix         = "PA_"
 	TrackPrefix               = "TR_"
+	DataTrackPrefix           = "DTR_"
 	APIKeyPrefix              = "API"
 	EgressPrefix              = "EG_"
 	IngressPrefix             = "IN_"
