@@ -458,6 +458,8 @@ type MetricsRecordingHeader struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
 	RoomId                 string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
 	EnableUserDataTraining *bool                  `protobuf:"varint,2,opt,name=enable_user_data_training,json=enableUserDataTraining,proto3,oneof" json:"enable_user_data_training,omitempty"`
+	Duration               uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"` // milliseconds
+	StartTime              *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -506,6 +508,20 @@ func (x *MetricsRecordingHeader) GetEnableUserDataTraining() bool {
 	return false
 }
 
+func (x *MetricsRecordingHeader) GetDuration() uint64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *MetricsRecordingHeader) GetStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartTime
+	}
+	return nil
+}
+
 var File_livekit_metrics_proto protoreflect.FileDescriptor
 
 const file_livekit_metrics_proto_rawDesc = "" +
@@ -539,10 +555,13 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\x8f\x01\n" +
+	"\x19_normalized_end_timestamp\"\xe6\x01\n" +
 	"\x16MetricsRecordingHeader\x12\x17\n" +
 	"\aroom_id\x18\x01 \x01(\tR\x06roomId\x12>\n" +
-	"\x19enable_user_data_training\x18\x02 \x01(\bH\x00R\x16enableUserDataTraining\x88\x01\x01B\x1c\n" +
+	"\x19enable_user_data_training\x18\x02 \x01(\bH\x00R\x16enableUserDataTraining\x88\x01\x01\x12\x1a\n" +
+	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
+	"\n" +
+	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTimeB\x1c\n" +
 	"\x1a_enable_user_data_training*\x81\a\n" +
 	"\vMetricLabel\x12\x13\n" +
 	"\x0fAGENTS_LLM_TTFT\x10\x00\x12\x13\n" +
@@ -599,11 +618,12 @@ var file_livekit_metrics_proto_depIdxs = []int32{
 	6, // 4: livekit.MetricSample.normalized_timestamp:type_name -> google.protobuf.Timestamp
 	6, // 5: livekit.EventMetric.normalized_start_timestamp:type_name -> google.protobuf.Timestamp
 	6, // 6: livekit.EventMetric.normalized_end_timestamp:type_name -> google.protobuf.Timestamp
-	7, // [7:7] is the sub-list for method output_type
-	7, // [7:7] is the sub-list for method input_type
-	7, // [7:7] is the sub-list for extension type_name
-	7, // [7:7] is the sub-list for extension extendee
-	0, // [0:7] is the sub-list for field type_name
+	6, // 7: livekit.MetricsRecordingHeader.start_time:type_name -> google.protobuf.Timestamp
+	8, // [8:8] is the sub-list for method output_type
+	8, // [8:8] is the sub-list for method input_type
+	8, // [8:8] is the sub-list for extension type_name
+	8, // [8:8] is the sub-list for extension extendee
+	0, // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_livekit_metrics_proto_init() }
