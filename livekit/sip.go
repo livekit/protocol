@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/xtwirp"
 	"golang.org/x/text/language"
 )
@@ -237,37 +236,10 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 	}
 }
 
-var reHeaders = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9\-_]*$`)
-
-func validateHeader(header string) error {
-	if !reHeaders.MatchString(header) {
-		return fmt.Errorf("invalid header name: %q", header)
-	}
-	return nil
-}
-
-func validateHeaderKeys(headers map[string]string) error {
-	for k := range headers {
-		if err := validateHeader(k); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func validateHeaderValues(headers map[string]string) error {
-	for _, v := range headers {
-		if err := validateHeader(v); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // validateHeaders makes sure header names/keys and values are per SIP specifications
 func validateHeaders(headers map[string]string) error {
 	for headerName, headerValue := range headers {
-		if err := ValidateHeaderName(headerName); err != nil {
+		if err := ValidateHeaderName(headerName, true); err != nil {
 			return fmt.Errorf("invalid header name: %w", err)
 		}
 		if err := ValidateHeaderValue(headerName, headerValue); err != nil {
@@ -278,9 +250,19 @@ func validateHeaders(headers map[string]string) error {
 }
 
 // validateHeaderNames Makes sure the values of the given map correspond to valid SIP header names
-func validateHeaderNames(attributesToHeaders map[string]string) error {
+func validateAttributesToHeaders(attributesToHeaders map[string]string) error {
 	for _, headerName := range attributesToHeaders {
-		if err := ValidateHeaderName(headerName); err != nil {
+		if err := ValidateHeaderName(headerName, false); err != nil {
+			return fmt.Errorf("invalid header name: %w", err)
+		}
+	}
+	return nil
+}
+
+// validateHeaderToAttributes Makes sure the keys of the given map correspond to valid SIP header names
+func validateHeaderToAttributes(headerToAttributes map[string]string) error {
+	for headerName, _ := range headerToAttributes {
+		if err := ValidateHeaderName(headerName, false); err != nil {
 			return fmt.Errorf("invalid header name: %w", err)
 		}
 	}
@@ -383,23 +365,14 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	if !hasAuth && !hasCIDR && !hasNumbers {
 		return errors.New("for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
-	if err := validateHeaderKeys(p.Headers); err != nil {
-		return err
-	}
-	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
-		return err
-	}
-	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
-		return err
-	}
 	if err := validateHeaders(p.Headers); err != nil {
-		logger.Warnw("Header validation failed for Headers field", err)
-		// TODO: Once we're happy with the validation, we want this to error out
+		return err
 	}
-	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
-	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
-		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
-		// TODO: Once we're happy with the validation, we want this to error out
+	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
+		return err
+	}
+	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
+		return err
 	}
 	return nil
 }
@@ -479,23 +452,14 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
 		return errors.New("trunk address should be a hostname or IP, not SIP URI")
 	}
-	if err := validateHeaderKeys(p.Headers); err != nil {
-		return err
-	}
-	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
-		return err
-	}
-	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
-		return err
-	}
 	if err := validateHeaders(p.Headers); err != nil {
-		logger.Warnw("Header validation failed for Headers field", err)
-		// TODO: Once we're happy with the validation, we want this to error out
+		return err
 	}
-	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
-	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
-		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
-		// TODO: Once we're happy with the validation, we want this to error out
+	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
+		return err
+	}
+	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
+		return err
 	}
 	return nil
 }
@@ -508,16 +472,11 @@ func (p *SIPOutboundConfig) Validate() error {
 	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Hostname, "sip:") || strings.HasPrefix(p.Hostname, "sips:") {
 		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
 	}
-	if err := validateHeaderKeys(p.HeadersToAttributes); err != nil {
+	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
 		return err
 	}
-	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
+	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return err
-	}
-	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
-	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
-		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
-		// No error, just a warning for SIP RFC validation for now
 	}
 	return nil
 }
@@ -720,26 +679,23 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 	if p.RoomName == "" {
 		return errors.New("missing room name")
 	}
-	if err := validateHeaderKeys(p.Headers); err != nil {
-		return err
-	}
-
-	if err := validateHeaders(p.Headers); err != nil {
-		logger.Warnw("Header validation failed for Headers field", err)
-		// TODO: Once we're happy with the validation, we want this to error out
-	}
 
 	// Validate display_name if provided
 	if p.DisplayName != nil {
 		if len(*p.DisplayName) > 128 {
-			return errors.New("display_name too long (max 128 characters)")
+			return errors.New("DisplayName too long (max 128 characters)")
 		}
-
-		// TODO: Once we're happy with the validation, we want this to error out
+		if _, err := strconv.Unquote("\"" + *p.DisplayName + "\""); err != nil {
+			return fmt.Errorf("DisplayName must be a valid quoted string: %w", err)
+		}
 	}
 
 	// Validate destination if provided
 	if err := p.Destination.Validate(); err != nil {
+		return err
+	}
+
+	if err := validateHeaders(p.Headers); err != nil {
 		return err
 	}
 
@@ -823,13 +779,8 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 		p.TransferTo = innerURI
 	}
 
-	if err := validateHeaderKeys(p.Headers); err != nil {
-		return err
-	}
-
 	if err := validateHeaders(p.Headers); err != nil {
-		logger.Warnw("Header validation failed for Headers field", err)
-		// TODO: Once we're happy with the validation, we want this to error out
+		return err
 	}
 
 	return nil
