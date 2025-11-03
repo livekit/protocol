@@ -23,29 +23,29 @@ import "livekit_agent_dispatch.proto";
 import "livekit_rtc.proto";
 
 message DialWhatsAppCallRequest {
-  // The number of the business that is initiating the call
+  // Required - The number of the business that is initiating the call
   string whatsapp_phone_number_id = 1;
-  // The number of the user that is supossed to receive the call
+  // Required - The number of the user that is supossed to receive the call
   string whatsapp_to_phone_number = 2;
-  // The API key of the business that is initiating the call
+  // Required - The API key of the business that is initiating the call
   string whatsapp_api_key = 3;
-  // WhatsApp Cloud API version, 23.0 and 24.0 are supported as of today
+  // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 12;
-  // An arbitrary string you can pass in that is useful for tracking and logging purposes.
+  // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
   string whatsapp_biz_opaque_callback_data = 4;
-  // What LiveKit room should this participant be connected too
+  // Optional - What LiveKit room should this participant be connected too
   string room_name = 5;
-  // Optional agents to dispatch the call to
+  // Optional - Agents to dispatch the call to
   repeated RoomAgentDispatch agents = 6;
-  // Optional identity of the participant in LiveKit room
+  // Optional - Identity of the participant in LiveKit room
   string participant_identity= 7;
-  // Optional name of the participant in LiveKit room
+  // Optional - Name of the participant in LiveKit room
   string participant_name = 8;
-  // Optional user-defined metadata. Will be attached to a created Participant in the room.
+  // Optional - User-defined metadata. Will be attached to a created Participant in the room.
   string participant_metadata = 9;
-  // Optional user-defined attributes. Will be attached to a created Participant in the room.
+  // Optional - User-defined attributes. Will be attached to a created Participant in the room.
   map<string, string> participant_attributes = 10;
-  // Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
+  // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 11;
   // Next - 13
 }
@@ -53,11 +53,14 @@ message DialWhatsAppCallRequest {
 message DialWhatsAppCallResponse {
   // Call ID sent by Meta
   string whatsapp_call_id = 1;
+  // The name of the LiveKit room that the call is connected to
+  string livekit_room_name = 2;
 }
 
 message DisconnectWhatsAppCallRequest {
-  // Call ID sent by Meta
+  // Required - Call ID sent by Meta
   string whatsapp_call_id = 1;
+  // Required - The API key of the business that is disconnecting the call
   string whatsapp_api_key = 2;
 }
 
@@ -65,9 +68,9 @@ message DisconnectWhatsAppCallResponse {
 }
 
 message ConnectWhatsAppCallRequest {
-  // Call ID sent by Meta
+  // Required - Call ID sent by Meta
   string whatsapp_call_id = 1;
-  // The call connect webhook comes with SDP from Meta
+  // Required - The call connect webhook comes with SDP from Meta
   // It is the answer SDP for a business initiated call
   SessionDescription sdp = 2;
 }
@@ -76,37 +79,39 @@ message ConnectWhatsAppCallResponse {
 }
 
 message AcceptWhatsAppCallRequest {
-  // The number of the business that is conencting the call
+  // Required - The number of the business that is conencting the call
   string whatsapp_phone_number_id = 1;
-  // The API key of the business that is connecting the call
+  // Required - The API key of the business that is connecting the call
   string whatsapp_api_key = 2;
-  // WhatsApp Cloud API version, 23.0 and 24.0 are supported as of today
+  // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 13;
-  // Call ID sent by Meta
+  // Required - Call ID sent by Meta
   string whatsapp_call_id = 3;
-  // An arbitrary string you can pass in that is useful for tracking and logging purposes.
+  // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
   string whatsapp_biz_opaque_callback_data = 4;
-  // The call accept webhook comes with SDP from Meta
+  // Required - The call accept webhook comes with SDP from Meta
   // It is the for a user initiated call
   SessionDescription sdp = 5;
-  // What LiveKit room should this participant be connected too
+  // Optional - What LiveKit room should this participant be connected too
   string room_name = 6;
-  // Optional agents to dispatch the call to
+  // Optional - Agents to dispatch the call to
   repeated RoomAgentDispatch agents = 7;
-  // Optional identity of the participant in LiveKit room
+  // Optional - Identity of the participant in LiveKit room
   string participant_identity= 8;
-  // Optional name of the participant in LiveKit room
+  // Optional - Name of the participant in LiveKit room
   string participant_name = 9;
-  // Optional user-defined metadata. Will be attached to a created Participant in the room.
+  // Optional - User-defined metadata. Will be attached to a created Participant in the room.
   string participant_metadata = 10;
-  // Optional user-defined attributes. Will be attached to a created Participant in the room.
+  // Optional - User-defined attributes. Will be attached to a created Participant in the room.
   map<string, string> participant_attributes = 11;
-  // Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
+  // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 12;
   // Next - 14
 }
 
 message AcceptWhatsAppCallResponse {
+  // The name of the LiveKit room that the call is connected to
+  string livekit_room_name = 1;
 }
 
 message WhatsAppCall {
