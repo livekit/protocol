@@ -33,3 +33,9 @@ service Connector {
 
   rpc ConnectTwilioCall(ConnectTwilioCallRequest) returns (ConnectTwilioCallResponse);
 }
+
+enum ConnectorType {
+  Unspecified = 0;
+  WhatsApp = 1;
+  Twilio = 2;
+}
