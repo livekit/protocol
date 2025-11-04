@@ -230,9 +230,9 @@ type DialWhatsAppCallResponse struct {
 	// Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
 	// The name of the LiveKit room that the call is connected to
-	LivekitRoomName string `protobuf:"bytes,2,opt,name=livekit_room_name,json=livekitRoomName,proto3" json:"livekit_room_name,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	RoomName      string `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DialWhatsAppCallResponse) Reset() {
@@ -272,9 +272,9 @@ func (x *DialWhatsAppCallResponse) GetWhatsappCallId() string {
 	return ""
 }
 
-func (x *DialWhatsAppCallResponse) GetLivekitRoomName() string {
+func (x *DialWhatsAppCallResponse) GetRoomName() string {
 	if x != nil {
-		return x.LivekitRoomName
+		return x.RoomName
 	}
 	return ""
 }
@@ -617,9 +617,9 @@ func (x *AcceptWhatsAppCallRequest) GetDestinationCountry() string {
 type AcceptWhatsAppCallResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the LiveKit room that the call is connected to
-	LivekitRoomName string `protobuf:"bytes,1,opt,name=livekit_room_name,json=livekitRoomName,proto3" json:"livekit_room_name,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	RoomName      string `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AcceptWhatsAppCallResponse) Reset() {
@@ -652,9 +652,9 @@ func (*AcceptWhatsAppCallResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_connector_whatsapp_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *AcceptWhatsAppCallResponse) GetLivekitRoomName() string {
+func (x *AcceptWhatsAppCallResponse) GetRoomName() string {
 	if x != nil {
-		return x.LivekitRoomName
+		return x.RoomName
 	}
 	return ""
 }
@@ -734,10 +734,10 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x13destination_country\x18\v \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"p\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
 	"\x18DialWhatsAppCallResponse\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12*\n" +
-	"\x11livekit_room_name\x18\x02 \x01(\tR\x0flivekitRoomName\"s\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12\x1b\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"s\n" +
 	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12(\n" +
 	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\" \n" +
@@ -763,9 +763,9 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x13destination_country\x18\f \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"H\n" +
-	"\x1aAcceptWhatsAppCallResponse\x12*\n" +
-	"\x11livekit_room_name\x18\x01 \x01(\tR\x0flivekitRoomName\"v\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"9\n" +
+	"\x1aAcceptWhatsAppCallResponse\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\"v\n" +
 	"\fWhatsAppCall\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12<\n" +
 	"\tdirection\x18\x02 \x01(\x0e2\x1e.livekit.WhatsAppCallDirectionR\tdirection*b\n" +
