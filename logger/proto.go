@@ -22,6 +22,8 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+
+	"github.com/livekit/protocol/livekit/logger"
 )
 
 func Proto(val proto.Message) zapcore.ObjectMarshaler {
@@ -45,6 +47,11 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		f := fields.Get(i)
 		k := f.JSONName()
 		v := p.m.Get(f)
+
+		if proto.HasExtension(f.Options(), logger.E_Redact) {
+			e.AddString(k, "<redacted>")
+			continue
+		}
 
 		if f.IsMap() {
 			if m := v.Map(); m.IsValid() {
