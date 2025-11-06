@@ -17,6 +17,7 @@ syntax = "proto3";
 package livekit;
 
 import "livekit_models.proto";
+import "logger/options.proto";
 
 option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
@@ -45,27 +46,27 @@ service Egress {
 
 // composite using a web browser
 message RoomCompositeEgressRequest {
-  string room_name = 1;          // required
-  string layout = 2;             // (optional)
-  bool audio_only = 3;           // (default false)
-  AudioMixing audio_mixing = 15; // only applies to audio_only egress (default DEFAULT_MIXING)
-  bool video_only = 4;           // (default false)
-  string custom_base_url = 5;    // template base url (default https://recorder.livekit.io)
-  oneof output {                 // deprecated (use _output fields)
+  string room_name = 1;           // required
+  string layout = 2;              // (optional)
+  bool audio_only = 3;            // (default false)
+  AudioMixing audio_mixing = 15;  // only applies to audio_only egress (default DEFAULT_MIXING)
+  bool video_only = 4;            // (default false)
+  string custom_base_url = 5;     // template base url (default https://recorder.livekit.io)
+  oneof output {                  // deprecated (use _output fields)
     EncodedFileOutput file = 6 [deprecated = true];
     StreamOutput stream = 7 [deprecated = true];
     SegmentedFileOutput segments = 10 [deprecated = true];
   }
   oneof options {
-    EncodingOptionsPreset preset = 8; // (default H264_720P_30)
-    EncodingOptions advanced = 9;     // (optional)
+    EncodingOptionsPreset preset = 8;  // (default H264_720P_30)
+    EncodingOptions advanced = 9;      // (optional)
   }
   repeated EncodedFileOutput file_outputs = 11;
   repeated StreamOutput stream_outputs = 12;
   repeated SegmentedFileOutput segment_outputs = 13;
   repeated ImageOutput image_outputs = 14;
 
-  repeated WebhookConfig webhooks = 16; // extra webhooks to call for this request
+  repeated WebhookConfig webhooks = 16;  // extra webhooks to call for this request
 
   // NEXT_ID: 17
 }
@@ -76,7 +77,7 @@ message WebEgressRequest {
   bool audio_only = 2;
   bool video_only = 3;
   bool await_start_signal = 12;
-  oneof output { // deprecated (use _output fields)
+  oneof output {  // deprecated (use _output fields)
     EncodedFileOutput file = 4 [deprecated = true];
     StreamOutput stream = 5 [deprecated = true];
     SegmentedFileOutput segments = 6 [deprecated = true];
@@ -90,80 +91,79 @@ message WebEgressRequest {
   repeated SegmentedFileOutput segment_outputs = 11;
   repeated ImageOutput image_outputs = 13;
 
-  repeated WebhookConfig webhooks = 14; // extra webhooks to call for this request
+  repeated WebhookConfig webhooks = 14;  // extra webhooks to call for this request
 
   // NEXT_ID: 15
-
 }
 
 // record audio and video from a single participant
 message ParticipantEgressRequest {
-  string room_name = 1;  // required
-  string identity = 2;   // required
-  bool screen_share = 3; // (default false)
+  string room_name = 1;   // required
+  string identity = 2;    // required
+  bool screen_share = 3;  // (default false)
   oneof options {
-    EncodingOptionsPreset preset = 4; // (default H264_720P_30)
-    EncodingOptions advanced = 5;     // (optional)
+    EncodingOptionsPreset preset = 4;  // (default H264_720P_30)
+    EncodingOptions advanced = 5;      // (optional)
   }
   repeated EncodedFileOutput file_outputs = 6;
   repeated StreamOutput stream_outputs = 7;
   repeated SegmentedFileOutput segment_outputs = 8;
   repeated ImageOutput image_outputs = 9;
 
-  repeated WebhookConfig webhooks = 10; // extra webhooks to call for this request
+  repeated WebhookConfig webhooks = 10;  // extra webhooks to call for this request
 
   // NEXT_ID: 11
 }
 
 // containerize up to one audio and one video track
 message TrackCompositeEgressRequest {
-  string room_name = 1;      // required
-  string audio_track_id = 2; // (optional)
-  string video_track_id = 3; // (optional)
-  oneof output {             // deprecated (use _output fields)
+  string room_name = 1;       // required
+  string audio_track_id = 2;  // (optional)
+  string video_track_id = 3;  // (optional)
+  oneof output {              // deprecated (use _output fields)
     EncodedFileOutput file = 4 [deprecated = true];
     StreamOutput stream = 5 [deprecated = true];
     SegmentedFileOutput segments = 8 [deprecated = true];
   }
   oneof options {
-    EncodingOptionsPreset preset = 6; // (default H264_720P_30)
-    EncodingOptions advanced = 7;     // (optional)
+    EncodingOptionsPreset preset = 6;  // (default H264_720P_30)
+    EncodingOptions advanced = 7;      // (optional)
   }
   repeated EncodedFileOutput file_outputs = 11;
   repeated StreamOutput stream_outputs = 12;
   repeated SegmentedFileOutput segment_outputs = 13;
   repeated ImageOutput image_outputs = 14;
 
-  repeated WebhookConfig webhooks = 15; // extra webhooks to call for this request
+  repeated WebhookConfig webhooks = 15;  // extra webhooks to call for this request
 
   // NEXT_ID: 16
 }
 
 // record tracks individually, without transcoding
 message TrackEgressRequest {
-  string room_name = 1;      // required
-  string track_id = 2;       // required
-  oneof output {             // required
+  string room_name = 1;  // required
+  string track_id = 2;   // required
+  oneof output {         // required
     DirectFileOutput file = 3;
     string websocket_url = 4;
   }
 
-  repeated WebhookConfig webhooks = 5; // extra webhooks to call for this request
+  repeated WebhookConfig webhooks = 5;  // extra webhooks to call for this request
 
   // NEXT_ID: 6
 }
 
 enum EncodedFileType {
-  DEFAULT_FILETYPE = 0; // file type chosen based on codecs
-  MP4  = 1;
+  DEFAULT_FILETYPE = 0;  // file type chosen based on codecs
+  MP4 = 1;
   OGG = 2;
   MP3 = 3;
 }
 
 message EncodedFileOutput {
-  EncodedFileType file_type = 1; // (optional)
-  string filepath = 2;           // see egress docs for templating (default {room_name}-{time})
-  bool disable_manifest = 6;     // disable upload of manifest file (default false)
+  EncodedFileType file_type = 1;  // (optional)
+  string filepath = 2;            // see egress docs for templating (default {room_name}-{time})
+  bool disable_manifest = 6;      // disable upload of manifest file (default false)
   oneof output {
     S3Upload s3 = 3;
     GCPUpload gcp = 4;
@@ -184,14 +184,14 @@ enum SegmentedFileSuffix {
 
 // Used to generate HLS segments or other kind of segmented output
 message SegmentedFileOutput {
-  SegmentedFileProtocol protocol = 1;       // (optional)
-  string filename_prefix = 2;               // (optional)
-  string playlist_name = 3;                 // (optional)
-  string live_playlist_name = 11;           // (optional, disabled if not provided). Path of a live playlist
-  uint32 segment_duration = 4;              // in seconds (optional)
-  SegmentedFileSuffix filename_suffix = 10; // (optional, default INDEX)
-  bool disable_manifest = 8;                // disable upload of manifest file (default false)
-  oneof output {                            // required
+  SegmentedFileProtocol protocol = 1;        // (optional)
+  string filename_prefix = 2;                // (optional)
+  string playlist_name = 3;                  // (optional)
+  string live_playlist_name = 11;            // (optional, disabled if not provided). Path of a live playlist
+  uint32 segment_duration = 4;               // in seconds (optional)
+  SegmentedFileSuffix filename_suffix = 10;  // (optional, default INDEX)
+  bool disable_manifest = 8;                 // disable upload of manifest file (default false)
+  oneof output {                             // required
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
     AzureBlobUpload azure = 7;
@@ -200,8 +200,8 @@ message SegmentedFileOutput {
 }
 
 message DirectFileOutput {
-  string filepath = 1;       // see egress docs for templating (default {track_id}-{time})
-  bool disable_manifest = 5; // disable upload of manifest file (default false)
+  string filepath = 1;        // see egress docs for templating (default {track_id}-{time})
+  bool disable_manifest = 5;  // disable upload of manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;
@@ -213,18 +213,18 @@ message DirectFileOutput {
 enum ImageFileSuffix {
   IMAGE_SUFFIX_INDEX = 0;
   IMAGE_SUFFIX_TIMESTAMP = 1;
-  IMAGE_SUFFIX_NONE_OVERWRITE = 2; // Do not append any suffix and overwrite the existing image with the latest
+  IMAGE_SUFFIX_NONE_OVERWRITE = 2;  // Do not append any suffix and overwrite the existing image with the latest
 }
 
 message ImageOutput {
-  uint32 capture_interval = 1;              // in seconds (required)
-  int32 width = 2;                          // (optional, defaults to track width)
-  int32 height = 3;                         // (optional, defaults to track height)
-  string filename_prefix = 4;               // (optional)
-  ImageFileSuffix filename_suffix = 5;      // (optional, default INDEX)
-  ImageCodec image_codec = 6;               // (optional)
-  bool disable_manifest = 7;                // disable upload of manifest file (default false)
-  oneof output {                            // required
+  uint32 capture_interval = 1;          // in seconds (required)
+  int32 width = 2;                      // (optional, defaults to track width)
+  int32 height = 3;                     // (optional, defaults to track height)
+  string filename_prefix = 4;           // (optional)
+  ImageFileSuffix filename_suffix = 5;  // (optional, default INDEX)
+  ImageCodec image_codec = 6;           // (optional)
+  bool disable_manifest = 7;            // disable upload of manifest file (default false)
+  oneof output {                        // required
     S3Upload s3 = 8;
     GCPUpload gcp = 9;
     AzureBlobUpload azure = 10;
@@ -233,39 +233,39 @@ message ImageOutput {
 }
 
 message S3Upload {
-  string access_key = 1;
-  string secret = 2;
+  string access_key = 1 [(logger.redact) = true];
+  string secret = 2 [(logger.redact) = true];
   string session_token = 11;
-  string assume_role_arn = 12;         // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
-  string assume_role_external_id = 13; // ExternalID to use when assuming role for upload
+  string assume_role_arn = 12 [(logger.redact) = true];  // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
+  string assume_role_external_id = 13;                   // ExternalID to use when assuming role for upload
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
   bool force_path_style = 6;
   map<string, string> metadata = 7;
   string tagging = 8;
-  string content_disposition = 9; // Content-Disposition header
+  string content_disposition = 9;  // Content-Disposition header
   ProxyConfig proxy = 10;
 
-  // NEXT_ID: 14 
+  // NEXT_ID: 14
 }
 
 message GCPUpload {
   // service account credentials serialized in JSON "credentials.json"
-  string credentials = 1;
+  string credentials = 1 [(logger.redact) = true];
   string bucket = 2;
   ProxyConfig proxy = 3;
 }
 
 message AzureBlobUpload {
-  string account_name = 1;
-  string account_key = 2;
+  string account_name = 1 [(logger.redact) = true];
+  string account_key = 2 [(logger.redact) = true];
   string container_name = 3;
 }
 
 message AliOSSUpload {
-  string access_key = 1;
-  string secret = 2;
+  string access_key = 1 [(logger.redact) = true];
+  string secret = 2 [(logger.redact) = true];
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
@@ -278,46 +278,46 @@ message ProxyConfig {
 }
 
 enum StreamProtocol {
-  DEFAULT_PROTOCOL = 0; // protocol chosen based on urls
+  DEFAULT_PROTOCOL = 0;  // protocol chosen based on urls
   RTMP = 1;
   SRT = 2;
 }
 
 message StreamOutput {
-  StreamProtocol protocol = 1; // required
-  repeated string urls = 2;    // required
+  StreamProtocol protocol = 1;  // required
+  repeated string urls = 2;     // required
 }
 
 enum AudioMixing {
-  DEFAULT_MIXING = 0;         // all users are mixed together
-  DUAL_CHANNEL_AGENT = 1;     // agent audio in the left channel, all other audio in the right channel
-  DUAL_CHANNEL_ALTERNATE = 2; // each new audio track alternates between left and right channels
+  DEFAULT_MIXING = 0;          // all users are mixed together
+  DUAL_CHANNEL_AGENT = 1;      // agent audio in the left channel, all other audio in the right channel
+  DUAL_CHANNEL_ALTERNATE = 2;  // each new audio track alternates between left and right channels
 }
 
 message EncodingOptions {
-  int32 width = 1;                // (default 1920)
-  int32 height = 2;               // (default 1080)
-  int32 depth = 3;                // (default 24)
-  int32 framerate = 4;            // (default 30)
-  AudioCodec audio_codec = 5;     // (default OPUS)
-  int32 audio_bitrate = 6;        // (default 128)
-  int32 audio_quality = 11;       // quality setting on audio encoder
-  int32 audio_frequency = 7;      // (default 44100)
-  VideoCodec video_codec = 8;     // (default H264_MAIN)
-  int32 video_bitrate = 9;        // (default 4500)
-  int32 video_quality = 12;       // quality setting on video encoder
-  double key_frame_interval = 10; // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
+  int32 width = 1;                 // (default 1920)
+  int32 height = 2;                // (default 1080)
+  int32 depth = 3;                 // (default 24)
+  int32 framerate = 4;             // (default 30)
+  AudioCodec audio_codec = 5;      // (default OPUS)
+  int32 audio_bitrate = 6;         // (default 128)
+  int32 audio_quality = 11;        // quality setting on audio encoder
+  int32 audio_frequency = 7;       // (default 44100)
+  VideoCodec video_codec = 8;      // (default H264_MAIN)
+  int32 video_bitrate = 9;         // (default 4500)
+  int32 video_quality = 12;        // quality setting on video encoder
+  double key_frame_interval = 10;  // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
 }
 
 enum EncodingOptionsPreset {
-  H264_720P_30 = 0;           //  1280x720, 30fps, 3000kpbs, H.264_MAIN / OPUS
-  H264_720P_60 = 1;           //  1280x720, 60fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_30 = 2;          // 1920x1080, 30fps, 4500kbps, H.264_MAIN / OPUS
-  H264_1080P_60 = 3;          // 1920x1080, 60fps, 6000kbps, H.264_MAIN / OPUS
-  PORTRAIT_H264_720P_30 = 4;  //  720x1280, 30fps, 3000kpbs, H.264_MAIN / OPUS
-  PORTRAIT_H264_720P_60 = 5;  //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
-  PORTRAIT_H264_1080P_30 = 6; // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
-  PORTRAIT_H264_1080P_60 = 7; // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
+  H264_720P_30 = 0;            //  1280x720, 30fps, 3000kpbs, H.264_MAIN / OPUS
+  H264_720P_60 = 1;            //  1280x720, 60fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_30 = 2;           // 1920x1080, 30fps, 4500kbps, H.264_MAIN / OPUS
+  H264_1080P_60 = 3;           // 1920x1080, 60fps, 6000kbps, H.264_MAIN / OPUS
+  PORTRAIT_H264_720P_30 = 4;   //  720x1280, 30fps, 3000kpbs, H.264_MAIN / OPUS
+  PORTRAIT_H264_720P_60 = 5;   //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
+  PORTRAIT_H264_1080P_30 = 6;  // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
+  PORTRAIT_H264_1080P_60 = 7;  // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
 }
 
 message UpdateLayoutRequest {
@@ -332,9 +332,9 @@ message UpdateStreamRequest {
 }
 
 message ListEgressRequest {
-  string room_name = 1; // (optional, filter by room name)
-  string egress_id = 2; // (optional, filter by egress ID)
-  bool active = 3;      // (optional, list active egress only)
+  string room_name = 1;  // (optional, filter by room name)
+  string egress_id = 2;  // (optional, filter by egress ID)
+  bool active = 3;       // (optional, list active egress only)
 }
 
 message ListEgressResponse {
@@ -379,7 +379,7 @@ message EgressInfo {
     TrackCompositeEgressRequest track_composite = 5;
     TrackEgressRequest track = 6;
   }
-  oneof result { // deprecated (use _result fields)
+  oneof result {  // deprecated (use _result fields)
     StreamInfoList stream = 7 [deprecated = true];
     FileInfo file = 8 [deprecated = true];
     SegmentsInfo segments = 12 [deprecated = true];
@@ -443,16 +443,16 @@ message ImagesInfo {
 
 message AutoParticipantEgress {
   oneof options {
-    EncodingOptionsPreset preset = 1; // (default H264_720P_30)
-    EncodingOptions advanced = 2;     // (optional)
+    EncodingOptionsPreset preset = 1;  // (default H264_720P_30)
+    EncodingOptions advanced = 2;      // (optional)
   }
   repeated EncodedFileOutput file_outputs = 3;
   repeated SegmentedFileOutput segment_outputs = 4;
 }
 
 message AutoTrackEgress {
-  string filepath = 1;       // see docs for templating (default {track_id}-{time})
-  bool disable_manifest = 5; // disables upload of json manifest file (default false)
+  string filepath = 1;        // see docs for templating (default {track_id}-{time})
+  bool disable_manifest = 5;  // disables upload of json manifest file (default false)
   oneof output {
     S3Upload s3 = 2;
     GCPUpload gcp = 3;
