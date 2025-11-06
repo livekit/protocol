@@ -2973,8 +2973,10 @@ type SIPDispatchRuleInfo struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	SipDispatchRuleId string                 `protobuf:"bytes,1,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`
 	Rule              *SIPDispatchRule       `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`
-	TrunkIds          []string               `protobuf:"bytes,3,rep,name=trunk_ids,json=trunkIds,proto3" json:"trunk_ids,omitempty"`
-	HidePhoneNumber   bool                   `protobuf:"varint,4,opt,name=hide_phone_number,json=hidePhoneNumber,proto3" json:"hide_phone_number,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_sip.proto.
+	TrunkIds        []string `protobuf:"bytes,3,rep,name=trunk_ids,json=trunkIds,proto3" json:"trunk_ids,omitempty"`
+	SourceIds       []string `protobuf:"bytes,13,rep,name=source_ids,json=sourceIds,proto3" json:"source_ids,omitempty"`
+	HidePhoneNumber bool     `protobuf:"varint,4,opt,name=hide_phone_number,json=hidePhoneNumber,proto3" json:"hide_phone_number,omitempty"`
 	// Dispatch Rule will only accept a call made to these numbers (if set).
 	InboundNumbers []string `protobuf:"bytes,7,rep,name=inbound_numbers,json=inboundNumbers,proto3" json:"inbound_numbers,omitempty"`
 	// Human-readable name for the Dispatch Rule.
@@ -2990,7 +2992,7 @@ type SIPDispatchRuleInfo struct {
 	// RoomConfiguration to use if the participant initiates the room
 	RoomConfig      *RoomConfiguration `protobuf:"bytes,10,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
 	KrispEnabled    bool               `protobuf:"varint,11,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
-	MediaEncryption SIPMediaEncryption `protobuf:"varint,12,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"` // NEXT ID: 13
+	MediaEncryption SIPMediaEncryption `protobuf:"varint,12,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"` // NEXT ID: 14
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -3039,9 +3041,17 @@ func (x *SIPDispatchRuleInfo) GetRule() *SIPDispatchRule {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_sip.proto.
 func (x *SIPDispatchRuleInfo) GetTrunkIds() []string {
 	if x != nil {
 		return x.TrunkIds
+	}
+	return nil
+}
+
+func (x *SIPDispatchRuleInfo) GetSourceIds() []string {
+	if x != nil {
+		return x.SourceIds
 	}
 	return nil
 }
@@ -4562,11 +4572,13 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\x128\n" +
 	"\areplace\x18\x02 \x01(\v2\x1c.livekit.SIPDispatchRuleInfoH\x00R\areplace\x128\n" +
 	"\x06update\x18\x03 \x01(\v2\x1e.livekit.SIPDispatchRuleUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\xee\x04\n" +
+	"\x06action\"\x91\x05\n" +
 	"\x13SIPDispatchRuleInfo\x12/\n" +
 	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\x12,\n" +
-	"\x04rule\x18\x02 \x01(\v2\x18.livekit.SIPDispatchRuleR\x04rule\x12\x1b\n" +
-	"\ttrunk_ids\x18\x03 \x03(\tR\btrunkIds\x12*\n" +
+	"\x04rule\x18\x02 \x01(\v2\x18.livekit.SIPDispatchRuleR\x04rule\x12\x1f\n" +
+	"\ttrunk_ids\x18\x03 \x03(\tB\x02\x18\x01R\btrunkIds\x12\x1d\n" +
+	"\n" +
+	"source_ids\x18\r \x03(\tR\tsourceIds\x12*\n" +
 	"\x11hide_phone_number\x18\x04 \x01(\bR\x0fhidePhoneNumber\x12'\n" +
 	"\x0finbound_numbers\x18\a \x03(\tR\x0einboundNumbers\x12\x12\n" +
 	"\x04name\x18\x05 \x01(\tR\x04name\x12\x1a\n" +
