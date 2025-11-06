@@ -62,7 +62,7 @@ message DisconnectWhatsAppCallRequest {
   // Required - Call ID sent by Meta
   string whatsapp_call_id = 1;
   // Required - The API key of the business that is disconnecting the call
-  string whatsapp_api_key = 2;
+  string whatsapp_api_key = 2 [(logger.redact) = true];
 }
 
 message DisconnectWhatsAppCallResponse {
