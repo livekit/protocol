@@ -16,7 +16,7 @@ import proto "google.golang.org/protobuf/proto"
 import twirp "github.com/twitchtv/twirp"
 import ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 
-import google_protobuf3 "google.golang.org/protobuf/types/known/emptypb"
+import google_protobuf4 "google.golang.org/protobuf/types/known/emptypb"
 
 // Version compatibility assertion.
 // If the constant is not defined in the package, that likely means
@@ -59,7 +59,7 @@ type SIP interface {
 
 	CreateSIPParticipant(context.Context, *CreateSIPParticipantRequest) (*SIPParticipantInfo, error)
 
-	TransferSIPParticipant(context.Context, *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error)
+	TransferSIPParticipant(context.Context, *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error)
 }
 
 // ===================
@@ -813,13 +813,13 @@ func (c *sIPProtobufClient) callCreateSIPParticipant(ctx context.Context, in *Cr
 	return out, nil
 }
 
-func (c *sIPProtobufClient) TransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
+func (c *sIPProtobufClient) TransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "SIP")
 	ctx = ctxsetters.WithMethodName(ctx, "TransferSIPParticipant")
 	caller := c.callTransferSIPParticipant
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
+		caller = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*TransferSIPParticipantRequest)
@@ -830,9 +830,9 @@ func (c *sIPProtobufClient) TransferSIPParticipant(ctx context.Context, in *Tran
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf3.Empty)
+				typedResp, ok := resp.(*google_protobuf4.Empty)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf3.Empty) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf4.Empty) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -842,8 +842,8 @@ func (c *sIPProtobufClient) TransferSIPParticipant(ctx context.Context, in *Tran
 	return caller(ctx, in)
 }
 
-func (c *sIPProtobufClient) callTransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
-	out := new(google_protobuf3.Empty)
+func (c *sIPProtobufClient) callTransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
+	out := new(google_protobuf4.Empty)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -1610,13 +1610,13 @@ func (c *sIPJSONClient) callCreateSIPParticipant(ctx context.Context, in *Create
 	return out, nil
 }
 
-func (c *sIPJSONClient) TransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
+func (c *sIPJSONClient) TransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
 	ctx = ctxsetters.WithServiceName(ctx, "SIP")
 	ctx = ctxsetters.WithMethodName(ctx, "TransferSIPParticipant")
 	caller := c.callTransferSIPParticipant
 	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
+		caller = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
 			resp, err := c.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*TransferSIPParticipantRequest)
@@ -1627,9 +1627,9 @@ func (c *sIPJSONClient) TransferSIPParticipant(ctx context.Context, in *Transfer
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf3.Empty)
+				typedResp, ok := resp.(*google_protobuf4.Empty)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf3.Empty) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf4.Empty) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -1639,8 +1639,8 @@ func (c *sIPJSONClient) TransferSIPParticipant(ctx context.Context, in *Transfer
 	return caller(ctx, in)
 }
 
-func (c *sIPJSONClient) callTransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
-	out := new(google_protobuf3.Empty)
+func (c *sIPJSONClient) callTransferSIPParticipant(ctx context.Context, in *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
+	out := new(google_protobuf4.Empty)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[15], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
@@ -4550,7 +4550,7 @@ func (s *sIPServer) serveTransferSIPParticipantJSON(ctx context.Context, resp ht
 
 	handler := s.SIP.TransferSIPParticipant
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
+		handler = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*TransferSIPParticipantRequest)
@@ -4561,9 +4561,9 @@ func (s *sIPServer) serveTransferSIPParticipantJSON(ctx context.Context, resp ht
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf3.Empty)
+				typedResp, ok := resp.(*google_protobuf4.Empty)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf3.Empty) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf4.Empty) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4572,7 +4572,7 @@ func (s *sIPServer) serveTransferSIPParticipantJSON(ctx context.Context, resp ht
 	}
 
 	// Call service method
-	var respContent *google_protobuf3.Empty
+	var respContent *google_protobuf4.Empty
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4583,7 +4583,7 @@ func (s *sIPServer) serveTransferSIPParticipantJSON(ctx context.Context, resp ht
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf3.Empty and nil error while calling TransferSIPParticipant. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf4.Empty and nil error while calling TransferSIPParticipant. nil responses are not supported"))
 		return
 	}
 
@@ -4631,7 +4631,7 @@ func (s *sIPServer) serveTransferSIPParticipantProtobuf(ctx context.Context, res
 
 	handler := s.SIP.TransferSIPParticipant
 	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf3.Empty, error) {
+		handler = func(ctx context.Context, req *TransferSIPParticipantRequest) (*google_protobuf4.Empty, error) {
 			resp, err := s.interceptor(
 				func(ctx context.Context, req interface{}) (interface{}, error) {
 					typedReq, ok := req.(*TransferSIPParticipantRequest)
@@ -4642,9 +4642,9 @@ func (s *sIPServer) serveTransferSIPParticipantProtobuf(ctx context.Context, res
 				},
 			)(ctx, req)
 			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf3.Empty)
+				typedResp, ok := resp.(*google_protobuf4.Empty)
 				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf3.Empty) when calling interceptor")
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf4.Empty) when calling interceptor")
 				}
 				return typedResp, err
 			}
@@ -4653,7 +4653,7 @@ func (s *sIPServer) serveTransferSIPParticipantProtobuf(ctx context.Context, res
 	}
 
 	// Call service method
-	var respContent *google_protobuf3.Empty
+	var respContent *google_protobuf4.Empty
 	func() {
 		defer ensurePanicResponses(ctx, resp, s.hooks)
 		respContent, err = handler(ctx, reqContent)
@@ -4664,7 +4664,7 @@ func (s *sIPServer) serveTransferSIPParticipantProtobuf(ctx context.Context, res
 		return
 	}
 	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf3.Empty and nil error while calling TransferSIPParticipant. nil responses are not supported"))
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf4.Empty and nil error while calling TransferSIPParticipant. nil responses are not supported"))
 		return
 	}
 
