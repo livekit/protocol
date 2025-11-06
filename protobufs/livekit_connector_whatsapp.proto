@@ -21,6 +21,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_agent_dispatch.proto";
 import "livekit_rtc.proto";
+import "logger/options.proto";
 
 message DialWhatsAppCallRequest {
   // Required - The number of the business that is initiating the call
