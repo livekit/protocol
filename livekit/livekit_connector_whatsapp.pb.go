@@ -738,10 +738,10 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
 	"\x18DialWhatsAppCallResponse\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\"s\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"y\n" +
 	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\" \n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12.\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\" \n" +
 	"\x1eDisconnectWhatsAppCallResponse\"u\n" +
 	"\x1aConnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12-\n" +
