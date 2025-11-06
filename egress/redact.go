@@ -24,6 +24,7 @@ func RedactUpload(req UploadRequest) {
 		s3.AccessKey = utils.Redact(s3.AccessKey, "{access_key}")
 		s3.Secret = utils.Redact(s3.Secret, "{secret}")
 		s3.AssumeRoleExternalId = utils.Redact(s3.AssumeRoleExternalId, "{external_id}")
+		s3.SessionToken = utils.Redact(s3.AssumeRoleExternalId, "{session_token}")
 		return
 	}
 

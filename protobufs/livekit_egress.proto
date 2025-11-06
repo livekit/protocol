@@ -235,7 +235,7 @@ message ImageOutput {
 message S3Upload {
   string access_key = 1 [(logger.redact) = true];
   string secret = 2 [(logger.redact) = true];
-  string session_token = 11;
+  string session_token = 11 [(logger.redact) = true];
   string assume_role_arn = 12 [(logger.redact) = true];  // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
   string assume_role_external_id = 13;                   // ExternalID to use when assuming role for upload
   string region = 3;

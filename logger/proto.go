@@ -49,7 +49,7 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		v := p.m.Get(f)
 
 		if proto.HasExtension(f.Options(), logger.E_Redact) {
-			e.AddString(k, fmt.Sprintf("<%s>", f.TextName()))
+			e.AddString(k, "<redacted>")
 			continue
 		}
 

@@ -40,6 +40,7 @@ func TestLoggerProto(t *testing.T) {
 		Secret:        "Field2",
 		AssumeRoleArn: "Field3",
 		SessionToken:  "Field4",
+		Endpoint:      "Field5",
 	}
 
 	l.Debugw("foo", "s3", logger.Proto(s3))
@@ -50,8 +51,9 @@ func TestLoggerProto(t *testing.T) {
 	require.NotEqual(t, 0, log.TS)
 	require.NotEqual(t, "", log.Caller)
 	require.Equal(t, "foo", log.Msg)
-	require.Equal(t, "<access_key>", log.S3["accessKey"])
-	require.Equal(t, "<secret>", log.S3["secret"])
-	require.Equal(t, "<assume_role_arn>", log.S3["assumeRoleArn"])
-	require.Equal(t, "Field4", log.S3["sessionToken"])
+	require.Equal(t, "<redacted>", log.S3["accessKey"])
+	require.Equal(t, "<redacted>", log.S3["secret"])
+	require.Equal(t, "<redacted>", log.S3["assumeRoleArn"])
+	require.Equal(t, "<redacted>", log.S3["sessionToken"])
+	require.Equal(t, "Field5", log.S3["endpoint"])
 }
