@@ -40,6 +40,7 @@ type InternalRoomJoinInfo struct {
 	WsUrl         string                 `protobuf:"bytes,1,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
 	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	ProjectId     string                 `protobuf:"bytes,3,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	RoomSvcToken  string                 `protobuf:"bytes,4,opt,name=room_svc_token,json=roomSvcToken,proto3" json:"room_svc_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -95,16 +96,24 @@ func (x *InternalRoomJoinInfo) GetProjectId() string {
 	return ""
 }
 
+func (x *InternalRoomJoinInfo) GetRoomSvcToken() string {
+	if x != nil {
+		return x.RoomSvcToken
+	}
+	return ""
+}
+
 var File_rpc_common_proto protoreflect.FileDescriptor
 
 const file_rpc_common_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/common.proto\x12\x03rpc\"b\n" +
+	"\x10rpc/common.proto\x12\x03rpc\"\x88\x01\n" +
 	"\x14InternalRoomJoinInfo\x12\x15\n" +
 	"\x06ws_url\x18\x01 \x01(\tR\x05wsUrl\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\x03 \x01(\tR\tprojectIdB!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
+	"project_id\x18\x03 \x01(\tR\tprojectId\x12$\n" +
+	"\x0eroom_svc_token\x18\x04 \x01(\tR\froomSvcTokenB!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var (
 	file_rpc_common_proto_rawDescOnce sync.Once
