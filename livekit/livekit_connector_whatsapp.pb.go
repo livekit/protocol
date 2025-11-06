@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -717,11 +718,11 @@ var File_livekit_connector_whatsapp_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\n" +
-	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\"\x8d\x06\n" +
+	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\x93\x06\n" +
 	"\x17DialWhatsAppCallRequest\x127\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x127\n" +
-	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tR\x15whatsappToPhoneNumber\x12(\n" +
-	"\x10whatsapp_api_key\x18\x03 \x01(\tR\x0ewhatsappApiKey\x12;\n" +
+	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tR\x15whatsappToPhoneNumber\x12.\n" +
+	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
 	"\troom_name\x18\x05 \x01(\tR\broomName\x122\n" +
@@ -745,10 +746,10 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x1aConnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12-\n" +
 	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"\x1d\n" +
-	"\x1bConnectWhatsAppCallResponse\"\xb1\x06\n" +
+	"\x1bConnectWhatsAppCallResponse\"\xb7\x06\n" +
 	"\x19AcceptWhatsAppCallRequest\x127\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12;\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12.\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12(\n" +
 	"\x10whatsapp_call_id\x18\x03 \x01(\tR\x0ewhatsappCallId\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12-\n" +

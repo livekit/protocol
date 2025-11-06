@@ -21,6 +21,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_agent_dispatch.proto";
 import "livekit_rtc.proto";
+import "logger/options.proto";
 
 message DialWhatsAppCallRequest {
   // Required - The number of the business that is initiating the call
@@ -28,7 +29,7 @@ message DialWhatsAppCallRequest {
   // Required - The number of the user that is supossed to receive the call
   string whatsapp_to_phone_number = 2;
   // Required - The API key of the business that is initiating the call
-  string whatsapp_api_key = 3;
+  string whatsapp_api_key = 3 [(logger.redact) = true];
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 12;
   // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
@@ -82,7 +83,7 @@ message AcceptWhatsAppCallRequest {
   // Required - The number of the business that is conencting the call
   string whatsapp_phone_number_id = 1;
   // Required - The API key of the business that is connecting the call
-  string whatsapp_api_key = 2;
+  string whatsapp_api_key = 2 [(logger.redact) = true];
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 13;
   // Required - Call ID sent by Meta
