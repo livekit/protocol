@@ -411,6 +411,8 @@ message StreamInfo {
   int64 duration = 4;
   Status status = 5;
   string error = 6;
+  int64 last_retry_at = 7;
+  int64 retries;
 }
 
 message FileInfo {
