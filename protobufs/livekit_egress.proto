@@ -412,7 +412,7 @@ message StreamInfo {
   Status status = 5;
   string error = 6;
   int64 last_retry_at = 7;
-  int64 retries;
+  int64 retries = 8;
 }
 
 message FileInfo {
