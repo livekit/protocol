@@ -455,13 +455,12 @@ func (x *EventMetric) GetRid() uint32 {
 }
 
 type MetricsRecordingHeader struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	RoomId                 string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-	EnableUserDataTraining *bool                  `protobuf:"varint,2,opt,name=enable_user_data_training,json=enableUserDataTraining,proto3,oneof" json:"enable_user_data_training,omitempty"`
-	Duration               uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"` // milliseconds
-	StartTime              *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoomId        string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	Duration      uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"` // milliseconds
+	StartTime     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetricsRecordingHeader) Reset() {
@@ -499,13 +498,6 @@ func (x *MetricsRecordingHeader) GetRoomId() string {
 		return x.RoomId
 	}
 	return ""
-}
-
-func (x *MetricsRecordingHeader) GetEnableUserDataTraining() bool {
-	if x != nil && x.EnableUserDataTraining != nil {
-		return *x.EnableUserDataTraining
-	}
-	return false
 }
 
 func (x *MetricsRecordingHeader) GetDuration() uint64 {
@@ -555,14 +547,12 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\xe6\x01\n" +
+	"\x19_normalized_end_timestamp\"\x88\x01\n" +
 	"\x16MetricsRecordingHeader\x12\x17\n" +
-	"\aroom_id\x18\x01 \x01(\tR\x06roomId\x12>\n" +
-	"\x19enable_user_data_training\x18\x02 \x01(\bH\x00R\x16enableUserDataTraining\x88\x01\x01\x12\x1a\n" +
+	"\aroom_id\x18\x01 \x01(\tR\x06roomId\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
 	"\n" +
-	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTimeB\x1c\n" +
-	"\x1a_enable_user_data_training*\x81\a\n" +
+	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime*\x81\a\n" +
 	"\vMetricLabel\x12\x13\n" +
 	"\x0fAGENTS_LLM_TTFT\x10\x00\x12\x13\n" +
 	"\x0fAGENTS_STT_TTFT\x10\x01\x12\x13\n" +
@@ -632,7 +622,6 @@ func file_livekit_metrics_proto_init() {
 		return
 	}
 	file_livekit_metrics_proto_msgTypes[3].OneofWrappers = []any{}
-	file_livekit_metrics_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
