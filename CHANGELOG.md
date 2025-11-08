@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.43.0
+
+### Patch Changes
+
+- Added warning prints to SIP headers - [#1238](https://github.com/livekit/protocol/pull/1238) ([@alexlivekit](https://github.com/alexlivekit))
+
+- removed observability field - [#1294](https://github.com/livekit/protocol/pull/1294) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.42.2
 
 ### Patch Changes
