@@ -1,5 +1,5 @@
 ---
-"@livekit/protocol": mintor
+"@livekit/protocol": minor
 ---
 
 feat: initial connector implementation
