@@ -90,7 +90,6 @@ message EventMetric {
 
 message MetricsRecordingHeader {
   string room_id = 1;
-  optional bool enable_user_data_training = 2;
   uint64 duration = 3; // milliseconds
   google.protobuf.Timestamp start_time = 4;
 }
