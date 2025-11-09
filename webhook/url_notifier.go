@@ -20,6 +20,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+	"net"
+	"net/http"
 	"sync"
 	"time"
 
@@ -90,6 +92,18 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	}
 	if params.ClientTimeout > 0 {
 		rhc.HTTPClient.Timeout = params.ClientTimeout
+	}
+	if params.ForceIPv4 {
+		var tr *http.Transport
+		if existing, ok := rhc.HTTPClient.Transport.(*http.Transport); ok && existing != nil {
+			tr = existing.Clone()
+		} else {
+			tr = http.DefaultTransport.(*http.Transport).Clone()
+		}
+		tr.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return (&net.Dialer{}).DialContext(ctx, "tcp4", addr)
+		}
+		rhc.HTTPClient.Transport = tr
 	}
 	n := &URLNotifier{
 		params: params,

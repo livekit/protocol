@@ -229,6 +229,9 @@ func TestURLNotifierFilter(t *testing.T) {
 			Config: URLNotifierConfig{
 				QueueSize: 20,
 			},
+			HTTPClientParams: HTTPClientParams{
+				ForceIPv4: true,
+			},
 		})
 		defer urlNotifier.Stop(false)
 
