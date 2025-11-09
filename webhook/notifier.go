@@ -185,6 +185,7 @@ type HTTPClientParams struct {
 	RetryWaitMax  time.Duration
 	MaxRetries    int
 	ClientTimeout time.Duration
+	ForceIPv4     bool
 }
 
 type FilterParams struct {
