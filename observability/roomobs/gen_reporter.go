@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_LNTFR10 = true
+const Version_JNN296G = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -43,6 +43,7 @@ type RoomReporter interface {
 type RoomSessionTx interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
+	ReportFeatures(v uint16)
 }
 
 type RoomSessionReporter interface {
