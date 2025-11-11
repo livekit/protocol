@@ -682,6 +682,10 @@ func kindDetailsToProto(details []string) []livekit.ParticipantInfo_KindDetail {
 			result = append(result, livekit.ParticipantInfo_CLOUD_AGENT)
 		case "forwarded":
 			result = append(result, livekit.ParticipantInfo_FORWARDED)
+		case "connector_whatsapp":
+			result = append(result, livekit.ParticipantInfo_CONNECTOR_WHATSAPP)
+		case "connector_twilio":
+			result = append(result, livekit.ParticipantInfo_CONNECTOR_TWILIO)
 		}
 	}
 	return result
