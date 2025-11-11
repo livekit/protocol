@@ -155,6 +155,8 @@ message ParticipantInfo {
   enum KindDetail {
     CLOUD_AGENT = 0;
     FORWARDED = 1;
+    CONNECTOR_WHATSAPP = 2;
+    CONNECTOR_TWILIO = 3;
   }
   string sid = 1;
   string identity = 2;

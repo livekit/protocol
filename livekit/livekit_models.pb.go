@@ -891,8 +891,10 @@ func (ParticipantInfo_Kind) EnumDescriptor() ([]byte, []int) {
 type ParticipantInfo_KindDetail int32
 
 const (
-	ParticipantInfo_CLOUD_AGENT ParticipantInfo_KindDetail = 0
-	ParticipantInfo_FORWARDED   ParticipantInfo_KindDetail = 1
+	ParticipantInfo_CLOUD_AGENT        ParticipantInfo_KindDetail = 0
+	ParticipantInfo_FORWARDED          ParticipantInfo_KindDetail = 1
+	ParticipantInfo_CONNECTOR_WHATSAPP ParticipantInfo_KindDetail = 2
+	ParticipantInfo_CONNECTOR_TWILIO   ParticipantInfo_KindDetail = 3
 )
 
 // Enum value maps for ParticipantInfo_KindDetail.
@@ -900,10 +902,14 @@ var (
 	ParticipantInfo_KindDetail_name = map[int32]string{
 		0: "CLOUD_AGENT",
 		1: "FORWARDED",
+		2: "CONNECTOR_WHATSAPP",
+		3: "CONNECTOR_TWILIO",
 	}
 	ParticipantInfo_KindDetail_value = map[string]int32{
-		"CLOUD_AGENT": 0,
-		"FORWARDED":   1,
+		"CLOUD_AGENT":        0,
+		"FORWARDED":          1,
+		"CONNECTOR_WHATSAPP": 2,
+		"CONNECTOR_TWILIO":   3,
 	}
 )
 
@@ -5812,7 +5818,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13can_update_metadata\x18\n" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
-	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\xb1\a\n" +
+	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\xdf\a\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -5853,11 +5859,13 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06EGRESS\x10\x02\x12\a\n" +
 	"\x03SIP\x10\x03\x12\t\n" +
 	"\x05AGENT\x10\x04\x12\r\n" +
-	"\tCONNECTOR\x10\a\",\n" +
+	"\tCONNECTOR\x10\a\"Z\n" +
 	"\n" +
 	"KindDetail\x12\x0f\n" +
 	"\vCLOUD_AGENT\x10\x00\x12\r\n" +
-	"\tFORWARDED\x10\x01\"3\n" +
+	"\tFORWARDED\x10\x01\x12\x16\n" +
+	"\x12CONNECTOR_WHATSAPP\x10\x02\x12\x14\n" +
+	"\x10CONNECTOR_TWILIO\x10\x03\"3\n" +
 	"\n" +
 	"Encryption\"%\n" +
 	"\x04Type\x12\b\n" +
