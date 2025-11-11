@@ -160,7 +160,7 @@ func TestGrants(t *testing.T) {
 }
 
 func TestParticipantKind(t *testing.T) {
-	const kindMin, kindMax = livekit.ParticipantInfo_STANDARD, livekit.ParticipantInfo_AGENT
+	const kindMin, kindMax = livekit.ParticipantInfo_STANDARD, livekit.ParticipantInfo_CONNECTOR
 	for k := kindMin; k <= kindMax; k++ {
 		k := k
 		t.Run(k.String(), func(t *testing.T) {
@@ -171,6 +171,16 @@ func TestParticipantKind(t *testing.T) {
 	if _, err := strconv.Atoi(kindNext.String()); err != nil {
 		t.Errorf("Please update kindMax to match protobuf. Missing value: %s", kindNext)
 	}
+}
+
+func TestParticipantKindDetail(t *testing.T) {
+	const detailMin, detailMax = livekit.ParticipantInfo_CLOUD_AGENT, livekit.ParticipantInfo_CONNECTOR_TWILIO
+	var details []livekit.ParticipantInfo_KindDetail
+	for k := detailMin; k <= detailMax; k++ {
+		details = append(details, k)
+	}
+
+	require.EqualValues(t, details, kindDetailsToProto(kindDetailsFromProto(details)))
 }
 
 func TestRoomConfiguration_CheckCredentials(t *testing.T) {
