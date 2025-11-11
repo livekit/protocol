@@ -220,7 +220,9 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Observability = c.Observability.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
-	clone.KindDetails = append([]string{}, c.KindDetails...)
+	if len(c.KindDetails) > 0 {
+		clone.KindDetails = append([]string{}, c.KindDetails...)
+	}
 
 	return &clone
 }
