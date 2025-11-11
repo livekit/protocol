@@ -11,6 +11,7 @@ var (
 	_ ProjectReporter = (*noopProjectReporter)(nil)
 	_ CarrierReporter = (*noopCarrierReporter)(nil)
 	_ CountryReporter = (*noopCountryReporter)(nil)
+	_ PhoneReporter   = (*noopPhoneReporter)(nil)
 	_ CallReporter    = (*noopCallReporter)(nil)
 )
 
@@ -58,7 +59,7 @@ func NewNoopCarrierReporter() CarrierReporter {
 func (r *noopCarrierReporter) RegisterFunc(f func(ts time.Time, tx CarrierTx) bool) {}
 func (r *noopCarrierReporter) Tx(f func(CarrierTx))                                 {}
 func (r *noopCarrierReporter) TxAt(ts time.Time, f func(CarrierTx))                 {}
-func (r *noopCarrierReporter) WithCountry(callCountryCode string) CountryReporter {
+func (r *noopCarrierReporter) WithCountry(code string) CountryReporter {
 	return &noopCountryReporter{}
 }
 func (r *noopCarrierReporter) WithDeferredCountry() (CountryReporter, KeyResolver) {
@@ -74,10 +75,26 @@ func NewNoopCountryReporter() CountryReporter {
 func (r *noopCountryReporter) RegisterFunc(f func(ts time.Time, tx CountryTx) bool) {}
 func (r *noopCountryReporter) Tx(f func(CountryTx))                                 {}
 func (r *noopCountryReporter) TxAt(ts time.Time, f func(CountryTx))                 {}
-func (r *noopCountryReporter) WithCall(id string) CallReporter {
+func (r *noopCountryReporter) WithPhone(number string) PhoneReporter {
+	return &noopPhoneReporter{}
+}
+func (r *noopCountryReporter) WithDeferredPhone() (PhoneReporter, KeyResolver) {
+	return &noopPhoneReporter{}, noopKeyResolver{}
+}
+
+type noopPhoneReporter struct{}
+
+func NewNoopPhoneReporter() PhoneReporter {
+	return &noopPhoneReporter{}
+}
+
+func (r *noopPhoneReporter) RegisterFunc(f func(ts time.Time, tx PhoneTx) bool) {}
+func (r *noopPhoneReporter) Tx(f func(PhoneTx))                                 {}
+func (r *noopPhoneReporter) TxAt(ts time.Time, f func(PhoneTx))                 {}
+func (r *noopPhoneReporter) WithCall(id string) CallReporter {
 	return &noopCallReporter{}
 }
-func (r *noopCountryReporter) WithDeferredCall() (CallReporter, KeyResolver) {
+func (r *noopPhoneReporter) WithDeferredCall() (CallReporter, KeyResolver) {
 	return &noopCallReporter{}, noopKeyResolver{}
 }
 

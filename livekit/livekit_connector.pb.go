@@ -24,6 +24,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -34,11 +35,65 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type ConnectorType int32
+
+const (
+	ConnectorType_Unspecified ConnectorType = 0
+	ConnectorType_WhatsApp    ConnectorType = 1
+	ConnectorType_Twilio      ConnectorType = 2
+)
+
+// Enum value maps for ConnectorType.
+var (
+	ConnectorType_name = map[int32]string{
+		0: "Unspecified",
+		1: "WhatsApp",
+		2: "Twilio",
+	}
+	ConnectorType_value = map[string]int32{
+		"Unspecified": 0,
+		"WhatsApp":    1,
+		"Twilio":      2,
+	}
+)
+
+func (x ConnectorType) Enum() *ConnectorType {
+	p := new(ConnectorType)
+	*p = x
+	return p
+}
+
+func (x ConnectorType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ConnectorType) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_connector_proto_enumTypes[0].Descriptor()
+}
+
+func (ConnectorType) Type() protoreflect.EnumType {
+	return &file_livekit_connector_proto_enumTypes[0]
+}
+
+func (x ConnectorType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ConnectorType.Descriptor instead.
+func (ConnectorType) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_connector_proto_rawDescGZIP(), []int{0}
+}
+
 var File_livekit_connector_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_proto_rawDesc = "" +
 	"\n" +
-	"\x17livekit_connector.proto\x12\alivekit\x1a livekit_connector_whatsapp.proto\x1a\x1elivekit_connector_twilio.proto2\xec\x03\n" +
+	"\x17livekit_connector.proto\x12\alivekit\x1a livekit_connector_whatsapp.proto\x1a\x1elivekit_connector_twilio.proto*:\n" +
+	"\rConnectorType\x12\x0f\n" +
+	"\vUnspecified\x10\x00\x12\f\n" +
+	"\bWhatsApp\x10\x01\x12\n" +
+	"\n" +
+	"\x06Twilio\x10\x022\xec\x03\n" +
 	"\tConnector\x12W\n" +
 	"\x10DialWhatsAppCall\x12 .livekit.DialWhatsAppCallRequest\x1a!.livekit.DialWhatsAppCallResponse\x12i\n" +
 	"\x16DisconnectWhatsAppCall\x12&.livekit.DisconnectWhatsAppCallRequest\x1a'.livekit.DisconnectWhatsAppCallResponse\x12`\n" +
@@ -46,34 +101,48 @@ const file_livekit_connector_proto_rawDesc = "" +
 	"\x12AcceptWhatsAppCall\x12\".livekit.AcceptWhatsAppCallRequest\x1a#.livekit.AcceptWhatsAppCallResponse\x12Z\n" +
 	"\x11ConnectTwilioCall\x12!.livekit.ConnectTwilioCallRequest\x1a\".livekit.ConnectTwilioCallResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
+var (
+	file_livekit_connector_proto_rawDescOnce sync.Once
+	file_livekit_connector_proto_rawDescData []byte
+)
+
+func file_livekit_connector_proto_rawDescGZIP() []byte {
+	file_livekit_connector_proto_rawDescOnce.Do(func() {
+		file_livekit_connector_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_livekit_connector_proto_rawDesc), len(file_livekit_connector_proto_rawDesc)))
+	})
+	return file_livekit_connector_proto_rawDescData
+}
+
+var file_livekit_connector_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_livekit_connector_proto_goTypes = []any{
-	(*DialWhatsAppCallRequest)(nil),        // 0: livekit.DialWhatsAppCallRequest
-	(*DisconnectWhatsAppCallRequest)(nil),  // 1: livekit.DisconnectWhatsAppCallRequest
-	(*ConnectWhatsAppCallRequest)(nil),     // 2: livekit.ConnectWhatsAppCallRequest
-	(*AcceptWhatsAppCallRequest)(nil),      // 3: livekit.AcceptWhatsAppCallRequest
-	(*ConnectTwilioCallRequest)(nil),       // 4: livekit.ConnectTwilioCallRequest
-	(*DialWhatsAppCallResponse)(nil),       // 5: livekit.DialWhatsAppCallResponse
-	(*DisconnectWhatsAppCallResponse)(nil), // 6: livekit.DisconnectWhatsAppCallResponse
-	(*ConnectWhatsAppCallResponse)(nil),    // 7: livekit.ConnectWhatsAppCallResponse
-	(*AcceptWhatsAppCallResponse)(nil),     // 8: livekit.AcceptWhatsAppCallResponse
-	(*ConnectTwilioCallResponse)(nil),      // 9: livekit.ConnectTwilioCallResponse
+	(ConnectorType)(0),                     // 0: livekit.ConnectorType
+	(*DialWhatsAppCallRequest)(nil),        // 1: livekit.DialWhatsAppCallRequest
+	(*DisconnectWhatsAppCallRequest)(nil),  // 2: livekit.DisconnectWhatsAppCallRequest
+	(*ConnectWhatsAppCallRequest)(nil),     // 3: livekit.ConnectWhatsAppCallRequest
+	(*AcceptWhatsAppCallRequest)(nil),      // 4: livekit.AcceptWhatsAppCallRequest
+	(*ConnectTwilioCallRequest)(nil),       // 5: livekit.ConnectTwilioCallRequest
+	(*DialWhatsAppCallResponse)(nil),       // 6: livekit.DialWhatsAppCallResponse
+	(*DisconnectWhatsAppCallResponse)(nil), // 7: livekit.DisconnectWhatsAppCallResponse
+	(*ConnectWhatsAppCallResponse)(nil),    // 8: livekit.ConnectWhatsAppCallResponse
+	(*AcceptWhatsAppCallResponse)(nil),     // 9: livekit.AcceptWhatsAppCallResponse
+	(*ConnectTwilioCallResponse)(nil),      // 10: livekit.ConnectTwilioCallResponse
 }
 var file_livekit_connector_proto_depIdxs = []int32{
-	0, // 0: livekit.Connector.DialWhatsAppCall:input_type -> livekit.DialWhatsAppCallRequest
-	1, // 1: livekit.Connector.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
-	2, // 2: livekit.Connector.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
-	3, // 3: livekit.Connector.AcceptWhatsAppCall:input_type -> livekit.AcceptWhatsAppCallRequest
-	4, // 4: livekit.Connector.ConnectTwilioCall:input_type -> livekit.ConnectTwilioCallRequest
-	5, // 5: livekit.Connector.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
-	6, // 6: livekit.Connector.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
-	7, // 7: livekit.Connector.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
-	8, // 8: livekit.Connector.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
-	9, // 9: livekit.Connector.ConnectTwilioCall:output_type -> livekit.ConnectTwilioCallResponse
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1,  // 0: livekit.Connector.DialWhatsAppCall:input_type -> livekit.DialWhatsAppCallRequest
+	2,  // 1: livekit.Connector.DisconnectWhatsAppCall:input_type -> livekit.DisconnectWhatsAppCallRequest
+	3,  // 2: livekit.Connector.ConnectWhatsAppCall:input_type -> livekit.ConnectWhatsAppCallRequest
+	4,  // 3: livekit.Connector.AcceptWhatsAppCall:input_type -> livekit.AcceptWhatsAppCallRequest
+	5,  // 4: livekit.Connector.ConnectTwilioCall:input_type -> livekit.ConnectTwilioCallRequest
+	6,  // 5: livekit.Connector.DialWhatsAppCall:output_type -> livekit.DialWhatsAppCallResponse
+	7,  // 6: livekit.Connector.DisconnectWhatsAppCall:output_type -> livekit.DisconnectWhatsAppCallResponse
+	8,  // 7: livekit.Connector.ConnectWhatsAppCall:output_type -> livekit.ConnectWhatsAppCallResponse
+	9,  // 8: livekit.Connector.AcceptWhatsAppCall:output_type -> livekit.AcceptWhatsAppCallResponse
+	10, // 9: livekit.Connector.ConnectTwilioCall:output_type -> livekit.ConnectTwilioCallResponse
+	5,  // [5:10] is the sub-list for method output_type
+	0,  // [0:5] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_livekit_connector_proto_init() }
@@ -88,13 +157,14 @@ func file_livekit_connector_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_connector_proto_rawDesc), len(file_livekit_connector_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_livekit_connector_proto_goTypes,
 		DependencyIndexes: file_livekit_connector_proto_depIdxs,
+		EnumInfos:         file_livekit_connector_proto_enumTypes,
 	}.Build()
 	File_livekit_connector_proto = out.File
 	file_livekit_connector_proto_goTypes = nil

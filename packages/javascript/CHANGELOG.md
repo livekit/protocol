@@ -1,5 +1,21 @@
 # @livekit/protocol
 
+## 1.43.0
+
+### Minor Changes
+
+- feat: initial connector implementation - [#1288](https://github.com/livekit/protocol/pull/1288) ([@anunaym14](https://github.com/anunaym14))
+
+### Patch Changes
+
+- removed observability field - [#1294](https://github.com/livekit/protocol/pull/1294) ([@davidzhao](https://github.com/davidzhao))
+
+- fix pretty-weeks-behave.md - [#1269](https://github.com/livekit/protocol/pull/1269) ([@paulwe](https://github.com/paulwe))
+
+- move rtp converter to separate util package - [#1267](https://github.com/livekit/protocol/pull/1267) ([@paulwe](https://github.com/paulwe))
+
+- add option to redact protobuf fields - [#1284](https://github.com/livekit/protocol/pull/1284) ([@paulwe](https://github.com/paulwe))
+
 ## 1.42.2
 
 ### Patch Changes

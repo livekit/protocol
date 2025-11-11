@@ -30,6 +30,7 @@ type ConnectorTokenParams struct {
 	ParticipantMetadata   string
 	ParticipantAttributes map[string]string
 	Agents                []*livekit.RoomAgentDispatch
+	Hidden                bool
 }
 
 func BuildConnectorToken(params ConnectorTokenParams) (string, error) {
@@ -42,6 +43,7 @@ func BuildConnectorToken(params ConnectorTokenParams) (string, error) {
 			CanPublish:           &t,
 			CanPublishData:       &t,
 			CanUpdateOwnMetadata: &t,
+			Hidden:               params.Hidden,
 		}).
 		SetAgents(params.Agents...).
 		SetIdentity(params.ParticipantIdentity).

@@ -87,5 +87,6 @@ const (
 	RollupParticipantSession      Rollup = "participant_session"
 	RollupTrackIndex              Rollup = "track_index"
 	RollupTrack                   Rollup = "track"
-	RollupProjectRoomIndex        Rollup = "project_room_index"
+	RollupStartTimeIndex          Rollup = "start_time_index"
+	RollupEndTimeIndex            Rollup = "end_time_index"
 )

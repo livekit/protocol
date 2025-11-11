@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_6TP95J0 = true
+const Version_LQKK2M0 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -35,7 +35,7 @@ type CarrierReporter interface {
 	RegisterFunc(func(ts time.Time, tx CarrierTx) bool)
 	Tx(func(tx CarrierTx))
 	TxAt(time.Time, func(tx CarrierTx))
-	WithCountry(callCountryCode string) CountryReporter
+	WithCountry(code string) CountryReporter
 	WithDeferredCountry() (CountryReporter, KeyResolver)
 	CarrierTx
 }
@@ -46,9 +46,20 @@ type CountryReporter interface {
 	RegisterFunc(func(ts time.Time, tx CountryTx) bool)
 	Tx(func(tx CountryTx))
 	TxAt(time.Time, func(tx CountryTx))
+	WithPhone(number string) PhoneReporter
+	WithDeferredPhone() (PhoneReporter, KeyResolver)
+	CountryTx
+}
+
+type PhoneTx interface{}
+
+type PhoneReporter interface {
+	RegisterFunc(func(ts time.Time, tx PhoneTx) bool)
+	Tx(func(tx PhoneTx))
+	TxAt(time.Time, func(tx PhoneTx))
 	WithCall(id string) CallReporter
 	WithDeferredCall() (CallReporter, KeyResolver)
-	CountryTx
+	PhoneTx
 }
 
 type CallTx interface {

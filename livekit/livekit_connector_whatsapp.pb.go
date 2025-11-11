@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -83,28 +84,30 @@ func (WhatsAppCallDirection) EnumDescriptor() ([]byte, []int) {
 
 type DialWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The number of the business that is initiating the call
+	// Required - The number of the business that is initiating the call
 	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
-	// The number of the user that is supossed to receive the call
+	// Required - The number of the user that is supossed to receive the call
 	WhatsappToPhoneNumber string `protobuf:"bytes,2,opt,name=whatsapp_to_phone_number,json=whatsappToPhoneNumber,proto3" json:"whatsapp_to_phone_number,omitempty"`
-	// The API key of the business that is initiating the call
+	// Required - The API key of the business that is initiating the call
 	WhatsappApiKey string `protobuf:"bytes,3,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	// An arbitrary string you can pass in that is useful for tracking and logging purposes.
+	// Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
+	WhatsappCloudApiVersion string `protobuf:"bytes,12,opt,name=whatsapp_cloud_api_version,json=whatsappCloudApiVersion,proto3" json:"whatsapp_cloud_api_version,omitempty"`
+	// Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
 	WhatsappBizOpaqueCallbackData string `protobuf:"bytes,4,opt,name=whatsapp_biz_opaque_callback_data,json=whatsappBizOpaqueCallbackData,proto3" json:"whatsapp_biz_opaque_callback_data,omitempty"`
-	// What LiveKit room should this participant be connected too
+	// Optional - What LiveKit room should this participant be connected too
 	RoomName string `protobuf:"bytes,5,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	// Optional agents to dispatch the call to
+	// Optional - Agents to dispatch the call to
 	Agents []*RoomAgentDispatch `protobuf:"bytes,6,rep,name=agents,proto3" json:"agents,omitempty"`
-	// Optional identity of the participant in LiveKit room
+	// Optional - Identity of the participant in LiveKit room
 	ParticipantIdentity string `protobuf:"bytes,7,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
-	// Optional name of the participant in LiveKit room
+	// Optional - Name of the participant in LiveKit room
 	ParticipantName string `protobuf:"bytes,8,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
-	// Optional user-defined metadata. Will be attached to a created Participant in the room.
+	// Optional - User-defined metadata. Will be attached to a created Participant in the room.
 	ParticipantMetadata string `protobuf:"bytes,9,opt,name=participant_metadata,json=participantMetadata,proto3" json:"participant_metadata,omitempty"`
-	// Optional user-defined attributes. Will be attached to a created Participant in the room.
+	// Optional - User-defined attributes. Will be attached to a created Participant in the room.
 	ParticipantAttributes map[string]string `protobuf:"bytes,10,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
-	DestinationCountry string `protobuf:"bytes,11,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
+	// Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
+	DestinationCountry string `protobuf:"bytes,11,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"` // Next - 13
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -156,6 +159,13 @@ func (x *DialWhatsAppCallRequest) GetWhatsappToPhoneNumber() string {
 func (x *DialWhatsAppCallRequest) GetWhatsappApiKey() string {
 	if x != nil {
 		return x.WhatsappApiKey
+	}
+	return ""
+}
+
+func (x *DialWhatsAppCallRequest) GetWhatsappCloudApiVersion() string {
+	if x != nil {
+		return x.WhatsappCloudApiVersion
 	}
 	return ""
 }
@@ -220,8 +230,10 @@ type DialWhatsAppCallResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// The name of the LiveKit room that the call is connected to
+	RoomName      string `protobuf:"bytes,2,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DialWhatsAppCallResponse) Reset() {
@@ -261,10 +273,18 @@ func (x *DialWhatsAppCallResponse) GetWhatsappCallId() string {
 	return ""
 }
 
+func (x *DialWhatsAppCallResponse) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
 type DisconnectWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Call ID sent by Meta
+	// Required - Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
+	// Required - The API key of the business that is disconnecting the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -352,15 +372,11 @@ func (*DisconnectWhatsAppCallResponse) Descriptor() ([]byte, []int) {
 
 type ConnectWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The number of the business that is conencting the call
-	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
-	// The API key of the business that is connecting the call
-	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	// Call ID sent by Meta
-	WhatsappCallId string `protobuf:"bytes,3,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	// The call connect webhook comes with SDP from Meta
+	// Required - Call ID sent by Meta
+	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
+	// Required - The call connect webhook comes with SDP from Meta
 	// It is the answer SDP for a business initiated call
-	Sdp           *SessionDescription `protobuf:"bytes,4,opt,name=sdp,proto3" json:"sdp,omitempty"`
+	Sdp           *SessionDescription `protobuf:"bytes,2,opt,name=sdp,proto3" json:"sdp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -393,20 +409,6 @@ func (x *ConnectWhatsAppCallRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ConnectWhatsAppCallRequest.ProtoReflect.Descriptor instead.
 func (*ConnectWhatsAppCallRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_connector_whatsapp_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ConnectWhatsAppCallRequest) GetWhatsappPhoneNumberId() string {
-	if x != nil {
-		return x.WhatsappPhoneNumberId
-	}
-	return ""
-}
-
-func (x *ConnectWhatsAppCallRequest) GetWhatsappApiKey() string {
-	if x != nil {
-		return x.WhatsappApiKey
-	}
-	return ""
 }
 
 func (x *ConnectWhatsAppCallRequest) GetWhatsappCallId() string {
@@ -461,31 +463,33 @@ func (*ConnectWhatsAppCallResponse) Descriptor() ([]byte, []int) {
 
 type AcceptWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The number of the business that is conencting the call
+	// Required - The number of the business that is conencting the call
 	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
-	// The API key of the business that is connecting the call
+	// Required - The API key of the business that is connecting the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	// Call ID sent by Meta
+	// Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
+	WhatsappCloudApiVersion string `protobuf:"bytes,13,opt,name=whatsapp_cloud_api_version,json=whatsappCloudApiVersion,proto3" json:"whatsapp_cloud_api_version,omitempty"`
+	// Required - Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,3,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	// An arbitrary string you can pass in that is useful for tracking and logging purposes.
+	// Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
 	WhatsappBizOpaqueCallbackData string `protobuf:"bytes,4,opt,name=whatsapp_biz_opaque_callback_data,json=whatsappBizOpaqueCallbackData,proto3" json:"whatsapp_biz_opaque_callback_data,omitempty"`
-	// The call accept webhook comes with SDP from Meta
+	// Required - The call accept webhook comes with SDP from Meta
 	// It is the for a user initiated call
 	Sdp *SessionDescription `protobuf:"bytes,5,opt,name=sdp,proto3" json:"sdp,omitempty"`
-	// What LiveKit room should this participant be connected too
+	// Optional - What LiveKit room should this participant be connected too
 	RoomName string `protobuf:"bytes,6,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	// Optional agents to dispatch the call to
+	// Optional - Agents to dispatch the call to
 	Agents []*RoomAgentDispatch `protobuf:"bytes,7,rep,name=agents,proto3" json:"agents,omitempty"`
-	// Optional identity of the participant in LiveKit room
+	// Optional - Identity of the participant in LiveKit room
 	ParticipantIdentity string `protobuf:"bytes,8,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
-	// Optional name of the participant in LiveKit room
+	// Optional - Name of the participant in LiveKit room
 	ParticipantName string `protobuf:"bytes,9,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
-	// Optional user-defined metadata. Will be attached to a created Participant in the room.
+	// Optional - User-defined metadata. Will be attached to a created Participant in the room.
 	ParticipantMetadata string `protobuf:"bytes,10,opt,name=participant_metadata,json=participantMetadata,proto3" json:"participant_metadata,omitempty"`
-	// Optional user-defined attributes. Will be attached to a created Participant in the room.
+	// Optional - User-defined attributes. Will be attached to a created Participant in the room.
 	ParticipantAttributes map[string]string `protobuf:"bytes,11,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
-	DestinationCountry string `protobuf:"bytes,12,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
+	// Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
+	DestinationCountry string `protobuf:"bytes,12,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"` // Next - 14
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -530,6 +534,13 @@ func (x *AcceptWhatsAppCallRequest) GetWhatsappPhoneNumberId() string {
 func (x *AcceptWhatsAppCallRequest) GetWhatsappApiKey() string {
 	if x != nil {
 		return x.WhatsappApiKey
+	}
+	return ""
+}
+
+func (x *AcceptWhatsAppCallRequest) GetWhatsappCloudApiVersion() string {
+	if x != nil {
+		return x.WhatsappCloudApiVersion
 	}
 	return ""
 }
@@ -605,7 +616,9 @@ func (x *AcceptWhatsAppCallRequest) GetDestinationCountry() string {
 }
 
 type AcceptWhatsAppCallResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The name of the LiveKit room that the call is connected to
+	RoomName      string `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -638,6 +651,13 @@ func (x *AcceptWhatsAppCallResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use AcceptWhatsAppCallResponse.ProtoReflect.Descriptor instead.
 func (*AcceptWhatsAppCallResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_connector_whatsapp_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AcceptWhatsAppCallResponse) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
 }
 
 type WhatsAppCall struct {
@@ -698,11 +718,12 @@ var File_livekit_connector_whatsapp_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\n" +
-	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\"\xd0\x05\n" +
+	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\x93\x06\n" +
 	"\x17DialWhatsAppCallRequest\x127\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x127\n" +
-	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tR\x15whatsappToPhoneNumber\x12(\n" +
-	"\x10whatsapp_api_key\x18\x03 \x01(\tR\x0ewhatsappApiKey\x12H\n" +
+	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tR\x15whatsappToPhoneNumber\x12.\n" +
+	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12;\n" +
+	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
 	"\troom_name\x18\x05 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\x06 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
@@ -714,22 +735,22 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x13destination_country\x18\v \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"D\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
 	"\x18DialWhatsAppCallResponse\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\"s\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12\x1b\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"y\n" +
 	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\" \n" +
-	"\x1eDisconnectWhatsAppCallResponse\"\xd8\x01\n" +
-	"\x1aConnectWhatsAppCallRequest\x127\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12(\n" +
-	"\x10whatsapp_call_id\x18\x03 \x01(\tR\x0ewhatsappCallId\x12-\n" +
-	"\x03sdp\x18\x04 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"\x1d\n" +
-	"\x1bConnectWhatsAppCallResponse\"\xf4\x05\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12.\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\" \n" +
+	"\x1eDisconnectWhatsAppCallResponse\"u\n" +
+	"\x1aConnectWhatsAppCallRequest\x12(\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12-\n" +
+	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"\x1d\n" +
+	"\x1bConnectWhatsAppCallResponse\"\xb7\x06\n" +
 	"\x19AcceptWhatsAppCallRequest\x127\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12(\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tR\x0ewhatsappApiKey\x12(\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12.\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12;\n" +
+	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12(\n" +
 	"\x10whatsapp_call_id\x18\x03 \x01(\tR\x0ewhatsappCallId\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12-\n" +
 	"\x03sdp\x18\x05 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x12\x1b\n" +
@@ -743,8 +764,9 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x13destination_country\x18\f \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x1c\n" +
-	"\x1aAcceptWhatsAppCallResponse\"v\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"9\n" +
+	"\x1aAcceptWhatsAppCallResponse\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\"v\n" +
 	"\fWhatsAppCall\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12<\n" +
 	"\tdirection\x18\x02 \x01(\x0e2\x1e.livekit.WhatsAppCallDirectionR\tdirection*b\n" +

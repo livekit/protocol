@@ -733,6 +733,7 @@ type AgentVersion struct {
 	DeployedAt    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=deployed_at,json=deployedAt,proto3" json:"deployed_at,omitempty"`
 	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	Owner         string                 `protobuf:"bytes,7,opt,name=owner,proto3" json:"owner,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -805,6 +806,13 @@ func (x *AgentVersion) GetAttributes() map[string]string {
 func (x *AgentVersion) GetStatus() string {
 	if x != nil {
 		return x.Status
+	}
+	return ""
+}
+
+func (x *AgentVersion) GetOwner() string {
+	if x != nil {
+		return x.Owner
 	}
 	return ""
 }
@@ -1959,7 +1967,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
-	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xd8\x02\n" +
+	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xee\x02\n" +
 	"\fAgentVersion\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x18\n" +
 	"\acurrent\x18\x02 \x01(\bR\acurrent\x129\n" +
@@ -1970,7 +1978,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
 	"attributes\x18\x05 \x03(\v2%.livekit.AgentVersion.AttributesEntryR\n" +
 	"attributes\x12\x16\n" +
-	"\x06status\x18\x06 \x01(\tR\x06status\x1a=\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12\x14\n" +
+	"\x05owner\x18\a \x01(\tR\x05owner\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +

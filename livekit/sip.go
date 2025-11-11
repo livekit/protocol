@@ -11,7 +11,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/xtwirp"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -262,6 +264,29 @@ func validateHeaderValues(headers map[string]string) error {
 	return nil
 }
 
+// validateHeaders makes sure header names/keys and values are per SIP specifications
+func validateHeaders(headers map[string]string) error {
+	for headerName, headerValue := range headers {
+		if err := ValidateHeaderName(headerName); err != nil {
+			return fmt.Errorf("invalid header name: %w", err)
+		}
+		if err := ValidateHeaderValue(headerName, headerValue); err != nil {
+			return fmt.Errorf("invalid header value for %s: %w", headerName, err)
+		}
+	}
+	return nil
+}
+
+// validateHeaderNames Makes sure the values of the given map correspond to valid SIP header names
+func validateHeaderNames(attributesToHeaders map[string]string) error {
+	for _, headerName := range attributesToHeaders {
+		if err := ValidateHeaderName(headerName); err != nil {
+			return fmt.Errorf("invalid header name: %w", err)
+		}
+	}
+	return nil
+}
+
 func (p *SIPTrunkInfo) Validate() error {
 	if len(p.InboundNumbersRegex) != 0 {
 		return fmt.Errorf("trunks with InboundNumbersRegex are deprecated")
@@ -367,6 +392,15 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
+	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
 	return nil
 }
 
@@ -454,6 +488,15 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
 	}
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
+	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
 	return nil
 }
 
@@ -470,6 +513,11 @@ func (p *SIPOutboundConfig) Validate() error {
 	}
 	if err := validateHeaderValues(p.AttributesToHeaders); err != nil {
 		return err
+	}
+	// Don't bother with HeadersToAttributes. If they're invalid, we just won't match
+	if err := validateHeaderNames(p.AttributesToHeaders); err != nil {
+		logger.Warnw("Header validation failed for AttributesToHeaders field", err)
+		// No error, just a warning for SIP RFC validation for now
 	}
 	return nil
 }
@@ -676,13 +724,63 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 		return err
 	}
 
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+
 	// Validate display_name if provided
 	if p.DisplayName != nil {
 		if len(*p.DisplayName) > 128 {
 			return errors.New("display_name too long (max 128 characters)")
 		}
 
-		// TODO: Validate display name doesn't contain invalid characters
+		// TODO: Once we're happy with the validation, we want this to error out
+	}
+
+	// Validate destination if provided
+	if err := p.Destination.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (d *Destination) Validate() error {
+	if d == nil {
+		return nil
+	}
+
+	// Rule 1: If city is specified, country must be specified
+	if d.City != "" && d.Country == "" && d.Region == "" {
+		return errors.New("if city is specified, country or region must also be specified")
+	}
+
+	// Rule 2: If country is specified, it must be a valid ISO 3166-1 alpha-2 code (2-letter only)
+	if d.Country != "" {
+		// First check: must be exactly 2 characters
+		if len(d.Country) != 2 {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
+
+		// Use golang.org/x/text/language to validate 2-letter country codes
+		region, err := language.ParseRegion(d.Country)
+		if err != nil {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
+
+		// Check if the parsed region is actually a valid country
+		// This is the most direct way to validate - region.IsCountry() returns true
+		// only for actual valid countries, false for invalid codes like "XX"
+		if !region.IsCountry() {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
+
+		// Additional check: ensure the parsed region matches our input
+		// This prevents auto corrections by the library
+		if region.String() != d.Country {
+			return errors.New("country must be a valid ISO 3166-1 alpha-2 code (2-letter like 'US', 'IN', 'UK')")
+		}
 	}
 
 	return nil
@@ -727,6 +825,11 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 
 	if err := validateHeaderKeys(p.Headers); err != nil {
 		return err
+	}
+
+	if err := validateHeaders(p.Headers); err != nil {
+		logger.Warnw("Header validation failed for Headers field", err)
+		// TODO: Once we're happy with the validation, we want this to error out
 	}
 
 	return nil
