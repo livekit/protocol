@@ -19,6 +19,7 @@ package rpc;
 option go_package = "github.com/livekit/protocol/rpc";
 
 import "options.proto";
+import "logger/options.proto";
 import "livekit_egress.proto";
 
 service EgressInternal {
@@ -56,7 +57,7 @@ message StartEgressRequest {
 
   // connection info
   string room_id = 3;
-  string token = 8;
+  string token = 8 [(logger.redact) = true];
   string ws_url = 9;
 
   // cloud only
