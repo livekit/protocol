@@ -1,7 +1,7 @@
 syntax = "proto3";
 package logger;
 
-option go_package = "github.com/livekit/protocol/logger";
+option go_package = "github.com/livekit/protocol/livekit/logger";
 
 import "google/protobuf/descriptor.proto";
 

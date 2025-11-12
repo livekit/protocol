@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -3882,7 +3883,7 @@ var File_livekit_egress_proto protoreflect.FileDescriptor
 
 const file_livekit_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\"\xd5\x06\n" +
+	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xd5\x06\n" +
 	"\x1aRoomCompositeEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x16\n" +
 	"\x06layout\x18\x02 \x01(\tR\x06layout\x12\x1d\n" +
@@ -4006,13 +4007,13 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x05azure\x18\n" +
 	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xac\x04\n" +
-	"\bS3Upload\x12\x1d\n" +
+	"\x06output\"\xc4\x04\n" +
+	"\bS3Upload\x12#\n" +
 	"\n" +
-	"access_key\x18\x01 \x01(\tR\taccessKey\x12\x16\n" +
-	"\x06secret\x18\x02 \x01(\tR\x06secret\x12#\n" +
-	"\rsession_token\x18\v \x01(\tR\fsessionToken\x12&\n" +
-	"\x0fassume_role_arn\x18\f \x01(\tR\rassumeRoleArn\x125\n" +
+	"access_key\x18\x01 \x01(\tB\x04\x88\xb5\x18\x01R\taccessKey\x12\x1c\n" +
+	"\x06secret\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x06secret\x12)\n" +
+	"\rsession_token\x18\v \x01(\tB\x04\x88\xb5\x18\x01R\fsessionToken\x12,\n" +
+	"\x0fassume_role_arn\x18\f \x01(\tB\x04\x88\xb5\x18\x01R\rassumeRoleArn\x125\n" +
 	"\x17assume_role_external_id\x18\r \x01(\tR\x14assumeRoleExternalId\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x16\n" +
@@ -4025,20 +4026,20 @@ const file_livekit_egress_proto_rawDesc = "" +
 	" \x01(\v2\x14.livekit.ProxyConfigR\x05proxy\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"q\n" +
-	"\tGCPUpload\x12 \n" +
-	"\vcredentials\x18\x01 \x01(\tR\vcredentials\x12\x16\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"w\n" +
+	"\tGCPUpload\x12&\n" +
+	"\vcredentials\x18\x01 \x01(\tB\x04\x88\xb5\x18\x01R\vcredentials\x12\x16\n" +
 	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x12*\n" +
-	"\x05proxy\x18\x03 \x01(\v2\x14.livekit.ProxyConfigR\x05proxy\"|\n" +
-	"\x0fAzureBlobUpload\x12!\n" +
-	"\faccount_name\x18\x01 \x01(\tR\vaccountName\x12\x1f\n" +
-	"\vaccount_key\x18\x02 \x01(\tR\n" +
+	"\x05proxy\x18\x03 \x01(\v2\x14.livekit.ProxyConfigR\x05proxy\"\x88\x01\n" +
+	"\x0fAzureBlobUpload\x12'\n" +
+	"\faccount_name\x18\x01 \x01(\tB\x04\x88\xb5\x18\x01R\vaccountName\x12%\n" +
+	"\vaccount_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\n" +
 	"accountKey\x12%\n" +
-	"\x0econtainer_name\x18\x03 \x01(\tR\rcontainerName\"\x91\x01\n" +
-	"\fAliOSSUpload\x12\x1d\n" +
+	"\x0econtainer_name\x18\x03 \x01(\tR\rcontainerName\"\x9d\x01\n" +
+	"\fAliOSSUpload\x12#\n" +
 	"\n" +
-	"access_key\x18\x01 \x01(\tR\taccessKey\x12\x16\n" +
-	"\x06secret\x18\x02 \x01(\tR\x06secret\x12\x16\n" +
+	"access_key\x18\x01 \x01(\tB\x04\x88\xb5\x18\x01R\taccessKey\x12\x1c\n" +
+	"\x06secret\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x06secret\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x16\n" +
 	"\x06bucket\x18\x05 \x01(\tR\x06bucket\"W\n" +

@@ -43,7 +43,7 @@ var File_logger_options_proto protoreflect.FileDescriptor
 const file_logger_options_proto_rawDesc = "" +
 	"\n" +
 	"\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:7\n" +
-	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\bR\x06redactB$Z\"github.com/livekit/protocol/loggerb\x06proto3"
+	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\bR\x06redactB,Z*github.com/livekit/protocol/livekit/loggerb\x06proto3"
 
 var file_logger_options_proto_goTypes = []any{
 	(*descriptorpb.FieldOptions)(nil), // 0: google.protobuf.FieldOptions
