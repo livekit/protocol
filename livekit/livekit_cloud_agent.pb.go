@@ -1343,6 +1343,7 @@ type UpdateAgentSecretsRequest struct {
 	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	Overwrite     bool                   `protobuf:"varint,3,opt,name=overwrite,proto3" json:"overwrite,omitempty"`
 	Secrets       []*AgentSecret         `protobuf:"bytes,4,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	Remove        []string               `protobuf:"bytes,5,rep,name=remove,proto3" json:"remove,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1401,6 +1402,13 @@ func (x *UpdateAgentSecretsRequest) GetOverwrite() bool {
 func (x *UpdateAgentSecretsRequest) GetSecrets() []*AgentSecret {
 	if x != nil {
 		return x.Secrets
+	}
+	return nil
+}
+
+func (x *UpdateAgentSecretsRequest) GetRemove() []string {
+	if x != nil {
+		return x.Remove
 	}
 	return nil
 }
@@ -2020,13 +2028,14 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bagent_id\x18\x03 \x01(\tR\aagentId\x12#\n" +
 	"\rpresigned_url\x18\x04 \x01(\tR\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
-	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xa3\x01\n" +
+	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xbb\x01\n" +
 	"\x19UpdateAgentSecretsRequest\x12\x19\n" +
 	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1c\n" +
 	"\toverwrite\x18\x03 \x01(\bR\toverwrite\x12.\n" +
-	"\asecrets\x18\x04 \x03(\v2\x14.livekit.AgentSecretR\asecrets\"P\n" +
+	"\asecrets\x18\x04 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x16\n" +
+	"\x06remove\x18\x05 \x03(\tR\x06remove\"P\n" +
 	"\x1aUpdateAgentSecretsResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"j\n" +
