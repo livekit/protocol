@@ -160,6 +160,7 @@ message UpdateAgentSecretsRequest {
     string agent_name = 2;
     bool overwrite = 3;
     repeated AgentSecret secrets = 4;
+    repeated string remove = 5;
 }
 
 message UpdateAgentSecretsResponse {
