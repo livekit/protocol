@@ -22,6 +22,7 @@ package rpc
 
 import (
 	livekit "github.com/livekit/protocol/livekit"
+	_ "github.com/livekit/protocol/livekit/logger"
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -304,7 +305,7 @@ var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14livekit_egress.proto\"\xa3\x04\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xa9\x04\n" +
 	"\x12StartEgressRequest\x12\x1b\n" +
 	"\tegress_id\x18\x01 \x01(\tR\begressId\x12L\n" +
 	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
@@ -312,8 +313,8 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\vparticipant\x18\r \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
 	"\x0ftrack_composite\x18\x06 \x01(\v2$.livekit.TrackCompositeEgressRequestH\x00R\x0etrackComposite\x123\n" +
 	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12\x17\n" +
-	"\aroom_id\x18\x03 \x01(\tR\x06roomId\x12\x14\n" +
-	"\x05token\x18\b \x01(\tR\x05token\x12\x15\n" +
+	"\aroom_id\x18\x03 \x01(\tR\x06roomId\x12\x1a\n" +
+	"\x05token\x18\b \x01(\tB\x04\x88\xb5\x18\x01R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\t \x01(\tR\x05wsUrl\x120\n" +
 	"\x14cloud_backup_enabled\x18\n" +
 	" \x01(\bR\x12cloudBackupEnabled\x12#\n" +
