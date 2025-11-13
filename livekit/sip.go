@@ -57,7 +57,7 @@ var sipCodeToGRPCCode = map[SIPStatusCode]codes.Code{
 
 	// 4xx - Client Failure Responses
 	SIPStatusCode_SIP_STATUS_BAD_REQUEST:                      codes.InvalidArgument,
-	SIPStatusCode_SIP_STATUS_UNAUTHORIZED:                     codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_UNAUTHORIZED:                     codes.PermissionDenied,
 	SIPStatusCode_SIP_STATUS_PAYMENT_REQUIRED:                 codes.PermissionDenied,
 	SIPStatusCode_SIP_STATUS_FORBIDDEN:                        codes.PermissionDenied,
 	SIPStatusCode_SIP_STATUS_NOTFOUND:                         codes.NotFound,
@@ -127,7 +127,10 @@ func (p *SIPStatus) GRPCStatus() *status.Status {
 	code, ok := sipCodeToGRPCCode[p.Code]
 	if !ok {
 		code = codes.Unknown // 1xx and 2xx codes should never emit an error, something is wrong.
-		if p.Code < 300 {
+		if p.Code < 200 {
+			code = codes.Unknown // 1xx are not final responses, something is wrong.
+		} else if p.Code < 300 {
+			return status.New(codes.OK, "OK") // Preserving previous behavior
 		} else if code < 500 {
 			code = codes.InvalidArgument
 		} else if code < 600 {
