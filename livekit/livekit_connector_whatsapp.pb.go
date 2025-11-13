@@ -21,7 +21,7 @@
 package livekit
 
 import (
-	_ "github.com/livekit/protocol/logger"
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
