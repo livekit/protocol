@@ -46,38 +46,99 @@ func (p *SIPStatus) Error() string {
 	return fmt.Sprintf("sip status: %d (%s)", p.Code, p.Code.ShortName())
 }
 
+// Maps SIP response codes received from remote SIP servers to GRPC error codes.
+var sipCodeToGRPCCode = map[SIPStatusCode]codes.Code{
+	// 3xx - Redirection Responses
+	SIPStatusCode_SIP_STATUS_MULTIPLE_CHOICES:    codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_MOVED_PERMANENTLY:   codes.NotFound,
+	SIPStatusCode_SIP_STATUS_MOVED_TEMPORARILY:   codes.NotFound,
+	SIPStatusCode_SIP_STATUS_USE_PROXY:           codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_ALTERNATIVE_SERVICE: codes.InvalidArgument,
+
+	// 4xx - Client Failure Responses
+	SIPStatusCode_SIP_STATUS_BAD_REQUEST:                      codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_UNAUTHORIZED:                     codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_PAYMENT_REQUIRED:                 codes.PermissionDenied,
+	SIPStatusCode_SIP_STATUS_FORBIDDEN:                        codes.PermissionDenied,
+	SIPStatusCode_SIP_STATUS_NOTFOUND:                         codes.NotFound,
+	SIPStatusCode_SIP_STATUS_METHOD_NOT_ALLOWED:               codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_NOT_ACCEPTABLE:                   codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_PROXY_AUTH_REQUIRED:              codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_REQUEST_TIMEOUT:                  codes.DeadlineExceeded,
+	SIPStatusCode_SIP_STATUS_CONFLICT:                         codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_GONE:                             codes.NotFound,
+	SIPStatusCode_SIP_STATUS_LENGTH_REQUIRED:                  codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_CONDITIONAL_REQUEST_FAILED:       codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_REQUEST_ENTITY_TOO_LARGE:         codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_REQUEST_URI_TOO_LONG:             codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_UNSUPPORTED_MEDIA_TYPE:           codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE:  codes.OutOfRange,
+	SIPStatusCode_SIP_STATUS_UNKNOWN_RESOURCE_PRIORITY:        codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_BAD_EXTENSION:                    codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_EXTENSION_REQUIRED:               codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_SESSION_INTERVAL_TOO_SMALL:       codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_INTERVAL_TOO_BRIEF:               codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_BAD_LOCATION_INFORMATION:         codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_BAD_ALERT_MESSAGE:                codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_USE_IDENTITY_HEADER:              codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_PROVIDE_REFERRER_IDENTITY:        codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_FLOW_FAILED:                      codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_ANONYMITY_DISALLOWED:             codes.PermissionDenied,
+	SIPStatusCode_SIP_STATUS_BAD_IDENTITY_INFO:                codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_UNSUPPORTED_CERTIFICATE:          codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_INVALID_IDENTITY_HEADER:          codes.Unauthenticated,
+	SIPStatusCode_SIP_STATUS_FIRST_HOP_LACKS_OUTBOUND_SUPPORT: codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_MAX_BREADTH_EXCEEDED:             codes.ResourceExhausted,
+	SIPStatusCode_SIP_STATUS_BAD_INFO_PACKAGE:                 codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_CONSENT_NEEDED:                   codes.PermissionDenied,
+	SIPStatusCode_SIP_STATUS_TEMPORARILY_UNAVAILABLE:          codes.ResourceExhausted,
+	SIPStatusCode_SIP_STATUS_CALL_TRANSACTION_DOES_NOT_EXISTS: codes.NotFound,
+	SIPStatusCode_SIP_STATUS_LOOP_DETECTED:                    codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_TOO_MANY_HOPS:                    codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_ADDRESS_INCOMPLETE:               codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_AMBIGUOUS:                        codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_BUSY_HERE:                        codes.ResourceExhausted,
+	SIPStatusCode_SIP_STATUS_REQUEST_TERMINATED:               codes.Aborted,
+	SIPStatusCode_SIP_STATUS_NOT_ACCEPTABLE_HERE:              codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_BAD_EVENT:                        codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_REQUEST_PENDING:                  codes.Aborted,
+	SIPStatusCode_SIP_STATUS_UNDECIPHERABLE:                   codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_SECURITY_AGREEMENT_REQUIRED:      codes.Unauthenticated,
+
+	// 5xx - Server Failure Responses
+	SIPStatusCode_SIP_STATUS_INTERNAL_SERVER_ERROR: codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_NOT_IMPLEMENTED:       codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_BAD_GATEWAY:           codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_SERVICE_UNAVAILABLE:   codes.FailedPrecondition,
+	SIPStatusCode_SIP_STATUS_GATEWAY_TIMEOUT:       codes.DeadlineExceeded,
+	SIPStatusCode_SIP_STATUS_VERSION_NOT_SUPPORTED: codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_MESSAGE_TOO_LARGE:     codes.InvalidArgument,
+
+	// 6xx - Global Failure Responses
+	SIPStatusCode_SIP_STATUS_GLOBAL_BUSY_EVERYWHERE:         codes.ResourceExhausted,
+	SIPStatusCode_SIP_STATUS_GLOBAL_DECLINE:                 codes.PermissionDenied,
+	SIPStatusCode_SIP_STATUS_GLOBAL_DOES_NOT_EXIST_ANYWHERE: codes.NotFound,
+	SIPStatusCode_SIP_STATUS_GLOBAL_NOT_ACCEPTABLE:          codes.InvalidArgument,
+	SIPStatusCode_SIP_STATUS_GLOBAL_UNWANTED:                codes.PermissionDenied,
+	SIPStatusCode_SIP_STATUS_GLOBAL_REJECTED:                codes.PermissionDenied,
+}
+
 func (p *SIPStatus) GRPCStatus() *status.Status {
+	code, ok := sipCodeToGRPCCode[p.Code]
+	if !ok {
+		code = codes.Unknown // 1xx and 2xx codes should never emit an error, something is wrong.
+		if p.Code < 300 {
+		} else if code < 500 {
+			code = codes.InvalidArgument
+		} else if code < 600 {
+			code = codes.Internal
+		} else if code < 700 {
+			code = codes.InvalidArgument // Same as 4xx ,but authoratative
+		}
+	}
 	msg := p.Status
 	if msg == "" {
 		msg = p.Code.ShortName()
-	}
-	var code = codes.Internal
-	switch p.Code {
-	case SIPStatusCode_SIP_STATUS_OK:
-		return status.New(codes.OK, "OK")
-	case SIPStatusCode_SIP_STATUS_REQUEST_TERMINATED:
-		code = codes.Aborted
-	case SIPStatusCode_SIP_STATUS_BAD_REQUEST,
-		SIPStatusCode_SIP_STATUS_NOTFOUND,
-		SIPStatusCode_SIP_STATUS_ADDRESS_INCOMPLETE,
-		SIPStatusCode_SIP_STATUS_AMBIGUOUS,
-		SIPStatusCode_SIP_STATUS_BAD_EXTENSION,
-		SIPStatusCode_SIP_STATUS_EXTENSION_REQUIRED:
-		code = codes.InvalidArgument
-	case SIPStatusCode_SIP_STATUS_REQUEST_TIMEOUT,
-		SIPStatusCode_SIP_STATUS_GATEWAY_TIMEOUT:
-		code = codes.DeadlineExceeded
-	case SIPStatusCode_SIP_STATUS_SERVICE_UNAVAILABLE,
-		SIPStatusCode_SIP_STATUS_TEMPORARILY_UNAVAILABLE,
-		SIPStatusCode_SIP_STATUS_BUSY_HERE,
-		SIPStatusCode_SIP_STATUS_GLOBAL_BUSY_EVERYWHERE,
-		SIPStatusCode_SIP_STATUS_NOT_IMPLEMENTED,
-		SIPStatusCode_SIP_STATUS_GLOBAL_DECLINE:
-		code = codes.Unavailable
-	case SIPStatusCode_SIP_STATUS_PROXY_AUTH_REQUIRED,
-		SIPStatusCode_SIP_STATUS_UNAUTHORIZED,
-		SIPStatusCode_SIP_STATUS_FORBIDDEN:
-		code = codes.PermissionDenied
 	}
 	st := status.New(code, fmt.Sprintf("sip status %d: %s", p.Code, msg))
 	if st2, err := st.WithDetails(p); err == nil {
