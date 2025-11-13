@@ -134,7 +134,7 @@ func (p *SIPStatus) GRPCStatus() *status.Status {
 		} else if code < 500 {
 			code = codes.InvalidArgument
 		} else if code < 600 {
-			code = codes.Internal
+			code = codes.FailedPrecondition // 5xx from remote server, per guideline (c) in gRPC docs
 		} else if code < 700 {
 			code = codes.InvalidArgument // Same as 4xx ,but authoratative
 		}
