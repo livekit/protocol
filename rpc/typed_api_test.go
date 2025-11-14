@@ -43,7 +43,7 @@ func TestMiddleware(t *testing.T) {
 					})
 
 					expected := []psrpc.RequestOption{func(*psrpc.RequestOpts) {}, func(*psrpc.RequestOpts) {}}
-					call(context.Background(), nil, expected...)
+					go call(context.Background(), nil, expected...)
 
 					eqPtr := func(a psrpc.RequestOption) func(a psrpc.RequestOption) bool {
 						return func(b psrpc.RequestOption) bool {
@@ -51,13 +51,13 @@ func TestMiddleware(t *testing.T) {
 						}
 					}
 
+					fp := reflect.ValueOf(c).Pointer()
+					f := runtime.FuncForPC(fp)
+					file, line := f.FileLine(fp)
+					name := fmt.Sprintf("%s:%d %s", file, line, f.Name())
+
 					select {
 					case res := <-ch:
-						fp := reflect.ValueOf(c).Pointer()
-						f := runtime.FuncForPC(fp)
-						file, line := f.FileLine(fp)
-						name := fmt.Sprintf("%s:%d %s", file, line, f.Name())
-
 						require.True(t, slices.ContainsFunc(res, eqPtr(expected[0])), "failed to receive option 0 from %s", name)
 						require.True(t, slices.ContainsFunc(res, eqPtr(expected[1])), "failed to receive option 0 from %s", name)
 					case <-time.After(time.Second):
