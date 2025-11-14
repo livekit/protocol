@@ -61,7 +61,7 @@ func TestMiddleware(t *testing.T) {
 						require.True(t, slices.ContainsFunc(res, eqPtr(expected[0])), "failed to receive option 0 from %s", name)
 						require.True(t, slices.ContainsFunc(res, eqPtr(expected[1])), "failed to receive option 0 from %s", name)
 					case <-time.After(time.Second):
-						require.FailNow(t, "timeout waiting for arguments")
+						require.FailNow(t, "timeout")
 					}
 				}
 			})
