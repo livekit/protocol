@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -5771,7 +5772,7 @@ var File_livekit_models_proto protoreflect.FileDescriptor
 
 const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_models.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x15livekit_metrics.proto\"=\n" +
+	"\x14livekit_models.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x15livekit_metrics.proto\x1a\x14logger/options.proto\"=\n" +
 	"\n" +
 	"Pagination\x12\x19\n" +
 	"\bafter_id\x18\x01 \x01(\tR\aafterId\x12\x14\n" +

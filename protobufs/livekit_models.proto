@@ -22,6 +22,7 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/timestamp.proto";
 
 import "livekit_metrics.proto";
+import "logger/options.proto";
 
 message Pagination {
   string after_id = 1; // list entities which IDs are greater
