@@ -3315,6 +3315,8 @@ type StreamInfo struct {
 	Duration      int64                  `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
 	Status        StreamInfo_Status      `protobuf:"varint,5,opt,name=status,proto3,enum=livekit.StreamInfo_Status" json:"status,omitempty"`
 	Error         string                 `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
+	LastRetryAt   int64                  `protobuf:"varint,7,opt,name=last_retry_at,json=lastRetryAt,proto3" json:"last_retry_at,omitempty"`
+	Retries       uint32                 `protobuf:"varint,8,opt,name=retries,proto3" json:"retries,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3389,6 +3391,20 @@ func (x *StreamInfo) GetError() string {
 		return x.Error
 	}
 	return ""
+}
+
+func (x *StreamInfo) GetLastRetryAt() int64 {
+	if x != nil {
+		return x.LastRetryAt
+	}
+	return 0
+}
+
+func (x *StreamInfo) GetRetries() uint32 {
+	if x != nil {
+		return x.Retries
+	}
+	return 0
 }
 
 type FileInfo struct {
@@ -4116,7 +4132,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\arequestB\b\n" +
 	"\x06result\"=\n" +
 	"\x0eStreamInfoList\x12'\n" +
-	"\x04info\x18\x01 \x03(\v2\x13.livekit.StreamInfoR\x04info:\x02\x18\x01\"\xee\x01\n" +
+	"\x04info\x18\x01 \x03(\v2\x13.livekit.StreamInfoR\x04info:\x02\x18\x01\"\xac\x02\n" +
 	"\n" +
 	"StreamInfo\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
@@ -4125,7 +4141,9 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\bended_at\x18\x03 \x01(\x03R\aendedAt\x12\x1a\n" +
 	"\bduration\x18\x04 \x01(\x03R\bduration\x122\n" +
 	"\x06status\x18\x05 \x01(\x0e2\x1a.livekit.StreamInfo.StatusR\x06status\x12\x14\n" +
-	"\x05error\x18\x06 \x01(\tR\x05error\".\n" +
+	"\x05error\x18\x06 \x01(\tR\x05error\x12\"\n" +
+	"\rlast_retry_at\x18\a \x01(\x03R\vlastRetryAt\x12\x18\n" +
+	"\aretries\x18\b \x01(\rR\aretries\".\n" +
 	"\x06Status\x12\n" +
 	"\n" +
 	"\x06ACTIVE\x10\x00\x12\f\n" +
