@@ -81,7 +81,7 @@ message NodeStats {
   uint64 nack_total = 11;
   float bytes_in_per_sec = 12 [deprecated=true];
   float bytes_out_per_sec = 13 [deprecated=true];
-  float packets_in_per_sec = 14 [deprecated=true];
+  float packets_in_per_sec = 14;
   float packets_out_per_sec = 15 [deprecated=true];
   float nack_per_sec = 16 [deprecated=true];
 
