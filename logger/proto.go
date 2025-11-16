@@ -15,15 +15,21 @@
 package logger
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"strconv"
+	"text/template"
 
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/dynamicpb"
+
+	"github.com/puzpuzpuz/xsync/v3"
 
 	"github.com/livekit/protocol/livekit/logger"
+	"github.com/livekit/protocol/utils/must"
 )
 
 func Proto(val proto.Message) zapcore.ObjectMarshaler {
@@ -49,7 +55,7 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		v := p.m.Get(f)
 
 		if proto.HasExtension(f.Options(), logger.E_Redact) {
-			e.AddString(k, "<redacted>")
+			e.AddString(k, marshalRedacted(f, v))
 			continue
 		}
 
@@ -182,4 +188,58 @@ func marshalProtoBytes(b []byte) string {
 	default:
 		return fmt.Sprintf("%s... (%.2fGB)", s, float64(n)/float64(1<<30))
 	}
+}
+
+var redactTemplates = xsync.NewMapOf[string, *template.Template]()
+
+func marshalRedacted(f protoreflect.FieldDescriptor, v protoreflect.Value) string {
+	if !proto.HasExtension(f.Options(), logger.E_RedactFormat) {
+		return "<redacted>"
+	}
+
+	text := proto.GetExtension(f.Options(), logger.E_RedactFormat).(string)
+	tpl, _ := redactTemplates.LoadOrCompute(text, func() *template.Template {
+		return template.Must(template.New("format").Parse(text))
+	})
+
+	var b bytes.Buffer
+	must.Do(tpl.Execute(&b, redactTemplateData{f, v}))
+	return b.String()
+}
+
+type redactTemplateData struct {
+	f protoreflect.FieldDescriptor
+	v protoreflect.Value
+}
+
+func (d redactTemplateData) TextName() string {
+	return d.f.TextName()
+}
+
+func (d redactTemplateData) Size() string {
+	if !d.v.IsValid() {
+		return "0"
+	}
+
+	msg := dynamicpb.NewMessage(d.f.ContainingMessage())
+
+	switch {
+	case d.f.IsList():
+		dst := msg.Mutable(d.f).List()
+		src := d.v.List()
+		for i := 0; i < src.Len(); i++ {
+			dst.Append(src.Get(i))
+		}
+	case d.f.IsMap():
+		dst := msg.Mutable(d.f).Map()
+		src := d.v.Map()
+		src.Range(func(k protoreflect.MapKey, v protoreflect.Value) bool {
+			dst.Set(k, v)
+			return true
+		})
+	default:
+		msg.Set(d.f, d.v)
+	}
+
+	return strconv.Itoa(proto.Size(msg.Interface()))
 }

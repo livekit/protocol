@@ -22,6 +22,7 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/timestamp.proto";
 
 import "livekit_metrics.proto";
+import "logger/options.proto";
 
 message Pagination {
   string after_id = 1; // list entities which IDs are greater
@@ -50,7 +51,7 @@ message Room {
   int64 creation_time_ms = 15;
   string turn_password = 6;
   repeated Codec enabled_codecs = 7;
-  string metadata = 8;
+  string metadata = 8 [(logger.redact) = true, (logger.redact_format) = "{{ .Size }} {{ .TextName }}"];
   uint32 num_participants = 9;
   uint32 num_publishers = 11;
   bool active_recording = 10;
@@ -175,7 +176,7 @@ message ParticipantInfo {
   // and can publish to the server
   bool is_publisher = 13;
   Kind kind = 14;
-  map<string, string> attributes = 15;
+  map<string, string> attributes = 15 [(logger.redact) = true, (logger.redact_format) = "{{ .Size }} {{ .TextName }}"];
   DisconnectReason disconnect_reason = 16;
   repeated KindDetail kind_details = 18;
 
