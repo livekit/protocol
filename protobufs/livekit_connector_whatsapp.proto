@@ -41,11 +41,20 @@ message DialWhatsAppCallRequest {
   // Optional - Identity of the participant in LiveKit room
   string participant_identity= 7;
   // Optional - Name of the participant in LiveKit room
-  string participant_name = 8;
+  string participant_name = 8 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // Optional - User-defined metadata. Will be attached to a created Participant in the room.
-  string participant_metadata = 9;
+  string participant_metadata = 9 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // Optional - User-defined attributes. Will be attached to a created Participant in the room.
-  map<string, string> participant_attributes = 10;
+  map<string, string> participant_attributes = 10 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 11;
   // Next - 13
@@ -100,11 +109,20 @@ message AcceptWhatsAppCallRequest {
   // Optional - Identity of the participant in LiveKit room
   string participant_identity= 8;
   // Optional - Name of the participant in LiveKit room
-  string participant_name = 9;
+  string participant_name = 9 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // Optional - User-defined metadata. Will be attached to a created Participant in the room.
-  string participant_metadata = 10;
+  string participant_metadata = 10 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // Optional - User-defined attributes. Will be attached to a created Participant in the room.
-  map<string, string> participant_attributes = 11;
+  map<string, string> participant_attributes = 11 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 12;
   // Next - 14

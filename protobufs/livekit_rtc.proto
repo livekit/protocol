@@ -21,6 +21,8 @@ option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 
+import "logger/options.proto";
+
 message SignalRequest {
   oneof message {
     // participant offer for publisher
@@ -290,11 +292,20 @@ message UpdateVideoLayers {
 }
 
 message UpdateParticipantMetadata {
-  string metadata = 1;
-  string name = 2;
+  string metadata = 1 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
+  string name = 2 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // attributes to update. it only updates attributes that have been set
   // to delete attributes, set the value to an empty string
-  map<string, string> attributes = 3;
+  map<string, string> attributes = 3 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   uint32 request_id = 4;
 }
 
@@ -509,12 +520,18 @@ message JoinRequest {
   ClientInfo client_info = 1;
   ConnectionSettings connection_settings = 2;
 
-  string metadata = 3; // if not empty, will overwrite `metadata` in token
+  string metadata = 3 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ]; // if not empty, will overwrite `metadata` in token
 
   // will set keys provided via this
   // will overwrite if the same key is in the token
   // will not delete keys from token if there is a key collision and this sets that key to empty value
-  map<string, string> participant_attributes = 4;
+  map<string, string> participant_attributes = 4 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
 
   repeated AddTrackRequest add_track_requests = 5;
   SessionDescription publisher_offer = 6;

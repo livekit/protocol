@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -240,15 +241,15 @@ var File_livekit_connector_twilio_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_twilio_proto_rawDesc = "" +
 	"\n" +
-	"\x1elivekit_connector_twilio.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\"\xb5\x05\n" +
+	"\x1elivekit_connector_twilio.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x14logger/options.proto\"\xae\x06\n" +
 	"\x18ConnectTwilioCallRequest\x12i\n" +
 	"\x15twilio_call_direction\x18\x01 \x01(\x0e25.livekit.ConnectTwilioCallRequest.TwilioCallDirectionR\x13twilioCallDirection\x12\x1b\n" +
 	"\troom_name\x18\x02 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\x03 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
-	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\x05 \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\x06 \x01(\tR\x13participantMetadata\x12s\n" +
-	"\x16participant_attributes\x18\a \x03(\v2<.livekit.ConnectTwilioCallRequest.ParticipantAttributesEntryR\x15participantAttributes\x12/\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12Q\n" +
+	"\x10participant_name\x18\x05 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\x06 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9b\x01\n" +
+	"\x16participant_attributes\x18\a \x03(\v2<.livekit.ConnectTwilioCallRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
 	"\x13destination_country\x18\b \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

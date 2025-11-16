@@ -321,8 +321,7 @@ type NodeStats struct {
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	BytesInPerSec float32 `protobuf:"fixed32,12,opt,name=bytes_in_per_sec,json=bytesInPerSec,proto3" json:"bytes_in_per_sec,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	BytesOutPerSec float32 `protobuf:"fixed32,13,opt,name=bytes_out_per_sec,json=bytesOutPerSec,proto3" json:"bytes_out_per_sec,omitempty"`
-	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	BytesOutPerSec  float32 `protobuf:"fixed32,13,opt,name=bytes_out_per_sec,json=bytesOutPerSec,proto3" json:"bytes_out_per_sec,omitempty"`
 	PacketsInPerSec float32 `protobuf:"fixed32,14,opt,name=packets_in_per_sec,json=packetsInPerSec,proto3" json:"packets_in_per_sec,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	PacketsOutPerSec float32 `protobuf:"fixed32,15,opt,name=packets_out_per_sec,json=packetsOutPerSec,proto3" json:"packets_out_per_sec,omitempty"`
@@ -554,7 +553,6 @@ func (x *NodeStats) GetBytesOutPerSec() float32 {
 	return 0
 }
 
-// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetPacketsInPerSec() float32 {
 	if x != nil {
 		return x.PacketsInPerSec
@@ -1343,7 +1341,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xb4\x13\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\xb0\x13\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1372,8 +1370,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\n" +
 	"nack_total\x18\v \x01(\x04R\tnackTotal\x12+\n" +
 	"\x10bytes_in_per_sec\x18\f \x01(\x02B\x02\x18\x01R\rbytesInPerSec\x12-\n" +
-	"\x11bytes_out_per_sec\x18\r \x01(\x02B\x02\x18\x01R\x0ebytesOutPerSec\x12/\n" +
-	"\x12packets_in_per_sec\x18\x0e \x01(\x02B\x02\x18\x01R\x0fpacketsInPerSec\x121\n" +
+	"\x11bytes_out_per_sec\x18\r \x01(\x02B\x02\x18\x01R\x0ebytesOutPerSec\x12+\n" +
+	"\x12packets_in_per_sec\x18\x0e \x01(\x02R\x0fpacketsInPerSec\x121\n" +
 	"\x13packets_out_per_sec\x18\x0f \x01(\x02B\x02\x18\x01R\x10packetsOutPerSec\x12$\n" +
 	"\fnack_per_sec\x18\x10 \x01(\x02B\x02\x18\x01R\n" +
 	"nackPerSec\x12\x19\n" +
