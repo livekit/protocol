@@ -5784,7 +5784,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03set\x18\x01 \x03(\tR\x03set\x12\x10\n" +
 	"\x03add\x18\x02 \x03(\tR\x03add\x12\x16\n" +
 	"\x06remove\x18\x03 \x03(\tR\x06remove\x12\x14\n" +
-	"\x05clear\x18\x04 \x01(\bR\x05clear\"\xc3\x04\n" +
+	"\x05clear\x18\x04 \x01(\bR\x05clear\"\x9e\x04\n" +
 	"\x04Room\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12#\n" +
@@ -5794,8 +5794,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\rcreation_time\x18\x05 \x01(\x03R\fcreationTime\x12(\n" +
 	"\x10creation_time_ms\x18\x0f \x01(\x03R\x0ecreationTimeMs\x12#\n" +
 	"\rturn_password\x18\x06 \x01(\tR\fturnPassword\x125\n" +
-	"\x0eenabled_codecs\x18\a \x03(\v2\x0e.livekit.CodecR\renabledCodecs\x12?\n" +
-	"\bmetadata\x18\b \x01(\tB#\x88\xb5\x18\x01\x92\xb5\x18\x1b{{ .Size }} {{ .TextName }}R\bmetadata\x12)\n" +
+	"\x0eenabled_codecs\x18\a \x03(\v2\x0e.livekit.CodecR\renabledCodecs\x12\x1a\n" +
+	"\bmetadata\x18\b \x01(\tR\bmetadata\x12)\n" +
 	"\x10num_participants\x18\t \x01(\rR\x0fnumParticipants\x12%\n" +
 	"\x0enum_publishers\x18\v \x01(\rR\rnumPublishers\x12)\n" +
 	"\x10active_recording\x18\n" +
@@ -5819,7 +5819,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13can_update_metadata\x18\n" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
-	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\x84\b\n" +
+	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\xdf\a\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -5837,9 +5837,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"permission\x12\x16\n" +
 	"\x06region\x18\f \x01(\tR\x06region\x12!\n" +
 	"\fis_publisher\x18\r \x01(\bR\visPublisher\x121\n" +
-	"\x04kind\x18\x0e \x01(\x0e2\x1d.livekit.ParticipantInfo.KindR\x04kind\x12m\n" +
+	"\x04kind\x18\x0e \x01(\x0e2\x1d.livekit.ParticipantInfo.KindR\x04kind\x12H\n" +
 	"\n" +
-	"attributes\x18\x0f \x03(\v2(.livekit.ParticipantInfo.AttributesEntryB#\x88\xb5\x18\x01\x92\xb5\x18\x1b{{ .Size }} {{ .TextName }}R\n" +
+	"attributes\x18\x0f \x03(\v2(.livekit.ParticipantInfo.AttributesEntryR\n" +
 	"attributes\x12F\n" +
 	"\x11disconnect_reason\x18\x10 \x01(\x0e2\x19.livekit.DisconnectReasonR\x10disconnectReason\x12F\n" +
 	"\fkind_details\x18\x12 \x03(\x0e2#.livekit.ParticipantInfo.KindDetailR\vkindDetails\x1a=\n" +
