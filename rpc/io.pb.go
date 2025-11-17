@@ -22,6 +22,7 @@ package rpc
 
 import (
 	livekit "github.com/livekit/protocol/livekit"
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
@@ -1232,7 +1233,7 @@ var File_rpc_io_proto protoreflect.FileDescriptor
 
 const file_rpc_io_proto_rawDesc = "" +
 	"\n" +
-	"\frpc/io.proto\x12\x03rpc\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x11livekit_sip.proto\x1a\x12livekit_room.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\"/\n" +
+	"\frpc/io.proto\x12\x03rpc\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x11livekit_sip.proto\x1a\x12livekit_room.proto\x1a\x14logger/options.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\"/\n" +
 	"\x10GetEgressRequest\x12\x1b\n" +
 	"\tegress_id\x18\x01 \x01(\tR\begressId\"\x87\x01\n" +
 	"\x14UpdateMetricsRequest\x12'\n" +
@@ -1268,10 +1269,10 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\ato_host\x18\x05 \x01(\tB\x02\x18\x01R\x06toHost\x12#\n" +
 	"\vsrc_address\x18\x04 \x01(\tB\x02\x18\x01R\n" +
 	"srcAddress\x12 \n" +
-	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xad\x02\n" +
-	"!GetSIPTrunkAuthenticationResponse\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x12\n" +
+	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xfd\x02\n" +
+	"!GetSIPTrunkAuthenticationResponse\x12B\n" +
+	"\busername\x18\x01 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\busername\x12B\n" +
+	"\bpassword\x18\x02 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x12\n" +
 	"\x04drop\x18\x03 \x01(\bR\x04drop\x12 \n" +
 	"\fsip_trunk_id\x18\x04 \x01(\tR\n" +
 	"sipTrunkId\x12\x1d\n" +
@@ -1279,7 +1280,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"project_id\x18\x05 \x01(\tR\tprojectId\x12:\n" +
 	"\rprovider_info\x18\x06 \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x12?\n" +
 	"\n" +
-	"error_code\x18\a \x01(\x0e2 .rpc.SIPTrunkAuthenticationErrorR\terrorCode\"\xd3\x04\n" +
+	"error_code\x18\a \x01(\x0e2 .rpc.SIPTrunkAuthenticationErrorR\terrorCode\"\xfc\x04\n" +
 	"\x1fEvaluateSIPDispatchRulesRequest\x12\"\n" +
 	"\vsip_call_id\x18\b \x01(\tB\x02\x18\x01R\tsipCallId\x120\n" +
 	"\x12sip_participant_id\x18\x01 \x01(\tB\x02\x18\x01R\x10sipParticipantId\x12 \n" +
@@ -1294,21 +1295,21 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x03pin\x18\x05 \x01(\tR\x03pin\x12\x15\n" +
 	"\x06no_pin\x18\x06 \x01(\bR\x05noPin\x12#\n" +
 	"\vcalled_host\x18\a \x01(\tB\x02\x18\x01R\n" +
-	"calledHost\x12d\n" +
-	"\x10extra_attributes\x18\t \x03(\v29.rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntryR\x0fextraAttributes\x12 \n" +
+	"calledHost\x12\x8c\x01\n" +
+	"\x10extra_attributes\x18\t \x03(\v29.rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fextraAttributes\x12 \n" +
 	"\x04call\x18\f \x01(\v2\f.rpc.SIPCallR\x04call\x1aB\n" +
 	"\x14ExtraAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xbe\f\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x87\x0e\n" +
 	" EvaluateSIPDispatchRulesResponse\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\a \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\b \x01(\tR\x13participantMetadata\x12w\n" +
-	"\x16participant_attributes\x18\v \x03(\v2@.rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntryR\x15participantAttributes\x12#\n" +
+	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12Q\n" +
+	"\x10participant_name\x18\a \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\b \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9f\x01\n" +
+	"\x16participant_attributes\x18\v \x03(\v2@.rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12#\n" +
 	"\vrequest_pin\x18\x03 \x01(\bB\x02\x18\x01R\n" +
-	"requestPin\x12\x14\n" +
-	"\x05token\x18\x04 \x01(\tR\x05token\x12\x15\n" +
+	"requestPin\x12<\n" +
+	"\x05token\x18\x04 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x05 \x01(\tR\x05wsUrl\x12.\n" +
 	"\x06result\x18\x06 \x01(\x0e2\x16.rpc.SIPDispatchResultR\x06result\x12 \n" +
 	"\fsip_trunk_id\x18\t \x01(\tR\n" +
@@ -1316,8 +1317,8 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x14sip_dispatch_rule_id\x18\n" +
 	" \x01(\tR\x11sipDispatchRuleId\x12\x1d\n" +
 	"\n" +
-	"project_id\x18\f \x01(\tR\tprojectId\x12L\n" +
-	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryR\aheaders\x12r\n" +
+	"project_id\x18\f \x01(\tR\tprojectId\x12t\n" +
+	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12r\n" +
 	"\x15headers_to_attributes\x18\x0e \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntryR\x13headersToAttributes\x12r\n" +
 	"\x15attributes_to_headers\x18\x12 \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\x13 \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12>\n" +

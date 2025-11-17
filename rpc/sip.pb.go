@@ -22,6 +22,7 @@ package rpc
 
 import (
 	livekit "github.com/livekit/protocol/livekit"
+	_ "github.com/livekit/protocol/livekit/logger"
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -494,7 +495,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\"\xe8\x0e\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xa9\x11\n" +
 	"#InternalCreateSIPParticipantRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tR\tprojectId\x12\x1e\n" +
@@ -506,20 +507,20 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x13destination_country\x18\x1e \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x10 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x16\n" +
 	"\x06number\x18\x03 \x01(\tR\x06number\x12\x17\n" +
-	"\acall_to\x18\x04 \x01(\tR\x06callTo\x12\x1a\n" +
-	"\busername\x18\x05 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x06 \x01(\tR\bpassword\x12\x1b\n" +
+	"\acall_to\x18\x04 \x01(\tR\x06callTo\x12B\n" +
+	"\busername\x18\x05 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\busername\x12B\n" +
+	"\bpassword\x18\x06 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x1b\n" +
 	"\troom_name\x18\a \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\x0e \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\x0f \x01(\tR\x13participantMetadata\x12z\n" +
-	"\x16participant_attributes\x18\x11 \x03(\v2C.rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntryR\x15participantAttributes\x12\x14\n" +
-	"\x05token\x18\t \x01(\tR\x05token\x12\x15\n" +
+	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12Q\n" +
+	"\x10participant_name\x18\x0e \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\x0f \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\xa2\x01\n" +
+	"\x16participant_attributes\x18\x11 \x03(\v2C.rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12<\n" +
+	"\x05token\x18\t \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\n" +
 	" \x01(\tR\x05wsUrl\x12\x12\n" +
 	"\x04dtmf\x18\v \x01(\tR\x04dtmf\x12#\n" +
-	"\rplay_dialtone\x18\f \x01(\bR\fplayDialtone\x12O\n" +
-	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryR\aheaders\x12u\n" +
+	"\rplay_dialtone\x18\f \x01(\bR\fplayDialtone\x12w\n" +
+	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12u\n" +
 	"\x15headers_to_attributes\x18\x16 \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.HeadersToAttributesEntryR\x13headersToAttributes\x12u\n" +
 	"\x15attributes_to_headers\x18\x1a \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\x1b \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12>\n" +
@@ -527,8 +528,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x0fringing_timeout\x18\x17 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12E\n" +
 	"\x11max_call_duration\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12F\n" +
 	"\x10media_encryption\x18\x1c \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
-	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12&\n" +
-	"\fdisplay_name\x18\x1f \x01(\tH\x00R\vdisplayName\x88\x01\x01\x126\n" +
+	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12N\n" +
+	"\fdisplay_name\x18\x1f \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>H\x00R\vdisplayName\x88\x01\x01\x126\n" +
 	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationR\vdestination\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -546,13 +547,13 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"$InternalCreateSIPParticipantResponse\x12%\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1e\n" +
-	"\vsip_call_id\x18\x03 \x01(\tR\tsipCallId\"\xe0\x02\n" +
+	"\vsip_call_id\x18\x03 \x01(\tR\tsipCallId\"\x88\x03\n" +
 	"%InternalTransferSIPParticipantRequest\x12\x1e\n" +
 	"\vsip_call_id\x18\x01 \x01(\tR\tsipCallId\x12\x1f\n" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
 	"transferTo\x12#\n" +
-	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12Q\n" +
-	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryR\aheaders\x12B\n" +
+	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12y\n" +
+	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
 	"\x0fringing_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
