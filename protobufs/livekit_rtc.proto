@@ -56,9 +56,9 @@ message SignalRequest {
     // Update local video track settings
     UpdateLocalVideoTrack update_video_track = 18;
     // Publish a data track
-    PublishDataTrackRequest publish_data_track = 19;
+    PublishDataTrackRequest publish_data_track_request = 19;
     // Unpublish a data track
-    UnpublishDataTrackRequest unpublish_data_track = 20;
+    UnpublishDataTrackRequest unpublish_data_track_request = 20;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 21;
   }
@@ -118,11 +118,11 @@ message SignalResponse {
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
     // Sent in response to `PublishDataTrackRequest`.
-    PublishDataTrackResponse publish_data_track = 27;
+    PublishDataTrackResponse publish_data_track_response = 27;
     // Sent in response to `UnpublishDataTrackRequest` or SFU-initiated unpublish.
-    UnpublishDataTrackResponse unpublish_data_track = 28;
+    UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
-    DataTrackSubscriberHandles data_track_handles = 29;
+    DataTrackSubscriberHandles data_track_subscriber_handles = 29;
   }
 }
 
@@ -201,8 +201,14 @@ message UnpublishDataTrackResponse {
 }
 
 message DataTrackSubscriberHandles {
+  message PublishedDataTrack {
+    string publisher_identity = 1;
+    string publisher_sid = 2;
+    string track_sid = 3;
+  }
+
   // Maps handles from incoming packets to the track SIDs that the packets belong to.
-  map<uint32, string> sub_handles = 1;
+  map<uint32, PublishedDataTrack> sub_handles = 1;
 }
 
 message TrickleRequest {
@@ -278,7 +284,7 @@ message UpdateSubscription {
 
 message UpdateDataSubscription {
   message Update {
-    string sid = 1;
+    string track_sid = 1;
     string participant_identity = 2;
     bool subscribe = 3;
     // Options to apply when initially subscribing or updating an existing subscription.
