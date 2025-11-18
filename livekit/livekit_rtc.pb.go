@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -4434,7 +4435,7 @@ var File_livekit_rtc_proto protoreflect.FileDescriptor
 
 const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
-	"\x11livekit_rtc.proto\x12\alivekit\x1a\x14livekit_models.proto\"\x9e\b\n" +
+	"\x11livekit_rtc.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\x9e\b\n" +
 	"\rSignalRequest\x123\n" +
 	"\x05offer\x18\x01 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x05offer\x125\n" +
 	"\x06answer\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x06answer\x123\n" +
@@ -4597,12 +4598,12 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\tRECONNECT\x10\x02\"a\n" +
 	"\x11UpdateVideoLayers\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12+\n" +
-	"\x06layers\x18\x02 \x03(\v2\x13.livekit.VideoLayerR\x06layers:\x02\x18\x01\"\xfd\x01\n" +
-	"\x19UpdateParticipantMetadata\x12\x1a\n" +
-	"\bmetadata\x18\x01 \x01(\tR\bmetadata\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12R\n" +
+	"\x06layers\x18\x02 \x03(\v2\x13.livekit.VideoLayerR\x06layers:\x02\x18\x01\"\xf5\x02\n" +
+	"\x19UpdateParticipantMetadata\x12B\n" +
+	"\bmetadata\x18\x01 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12:\n" +
+	"\x04name\x18\x02 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x04name\x12z\n" +
 	"\n" +
-	"attributes\x18\x03 \x03(\v22.livekit.UpdateParticipantMetadata.AttributesEntryR\n" +
+	"attributes\x18\x03 \x03(\v22.livekit.UpdateParticipantMetadata.AttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\n" +
 	"attributes\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x04 \x01(\rR\trequestId\x1a=\n" +
@@ -4735,13 +4736,13 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x0fadaptive_stream\x18\x02 \x01(\bR\x0eadaptiveStream\x129\n" +
 	"\x16subscriber_allow_pause\x18\x03 \x01(\bH\x00R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
 	"\x10disable_ice_lite\x18\x04 \x01(\bR\x0edisableIceLiteB\x19\n" +
-	"\x17_subscriber_allow_pause\"\xac\x05\n" +
+	"\x17_subscriber_allow_pause\"\xfd\x05\n" +
 	"\vJoinRequest\x124\n" +
 	"\vclient_info\x18\x01 \x01(\v2\x13.livekit.ClientInfoR\n" +
 	"clientInfo\x12L\n" +
-	"\x13connection_settings\x18\x02 \x01(\v2\x1b.livekit.ConnectionSettingsR\x12connectionSettings\x12\x1a\n" +
-	"\bmetadata\x18\x03 \x01(\tR\bmetadata\x12f\n" +
-	"\x16participant_attributes\x18\x04 \x03(\v2/.livekit.JoinRequest.ParticipantAttributesEntryR\x15participantAttributes\x12F\n" +
+	"\x13connection_settings\x18\x02 \x01(\v2\x1b.livekit.ConnectionSettingsR\x12connectionSettings\x12B\n" +
+	"\bmetadata\x18\x03 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12\x8e\x01\n" +
+	"\x16participant_attributes\x18\x04 \x03(\v2/.livekit.JoinRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12F\n" +
 	"\x12add_track_requests\x18\x05 \x03(\v2\x18.livekit.AddTrackRequestR\x10addTrackRequests\x12D\n" +
 	"\x0fpublisher_offer\x18\x06 \x01(\v2\x1b.livekit.SessionDescriptionR\x0epublisherOffer\x12\x1c\n" +
 	"\treconnect\x18\a \x01(\bR\treconnect\x12C\n" +
