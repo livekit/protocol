@@ -28,6 +28,7 @@ const (
 	NodePrefix              = guid.NodePrefix
 	ParticipantPrefix       = guid.ParticipantPrefix
 	TrackPrefix             = guid.TrackPrefix
+	DataTrackPrefix         = guid.DataTrackPrefix
 	APIKeyPrefix            = guid.APIKeyPrefix
 	EgressPrefix            = guid.EgressPrefix
 	IngressPrefix           = guid.IngressPrefix
