@@ -14,7 +14,8 @@
   },
   "pnpm": {
     "overrides": {
-      "minimatch": "10.0.3"
+      "minimatch": "10.0.3",
+      "js-yaml": "3.14.2"
     }
   },
   "packageManager": "pnpm@9.15.9"
