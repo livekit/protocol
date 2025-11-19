@@ -2,6 +2,9 @@
 export { protoInt64 } from "@bufbuild/protobuf";
 export * from "./gen/livekit_agent_dispatch_pb.js";
 export * from "./gen/livekit_agent_pb.js";
+export * from "./gen/livekit_connector_pb.js";
+export * from "./gen/livekit_connector_twilio_pb.js";
+export * from "./gen/livekit_connector_whatsapp_pb.js";
 export * from "./gen/livekit_egress_pb.js";
 export * from "./gen/livekit_ingress_pb.js";
 export * from "./gen/livekit_metrics_pb.js";
