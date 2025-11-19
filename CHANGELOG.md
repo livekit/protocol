@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.43.1
+
+### Patch Changes
+
+- add option to only use IPv4 for webhooks - [#1296](https://github.com/livekit/protocol/pull/1296) ([@davidzhao](https://github.com/davidzhao))
+
+- Redact metadata, attribute, participant name from logs. - [#1309](https://github.com/livekit/protocol/pull/1309) ([@boks1971](https://github.com/boks1971))
+
+- Adding more SIP return codes and updating SIP-to-grpc return code mapping - [#1305](https://github.com/livekit/protocol/pull/1305) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Switch to new header validation for SIP commands - [#1279](https://github.com/livekit/protocol/pull/1279) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.43.0
 
 ### Patch Changes
