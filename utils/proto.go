@@ -14,7 +14,11 @@
 
 package utils
 
-import "google.golang.org/protobuf/proto"
+import (
+	"github.com/livekit/protocol/livekit/logger"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
+)
 
 func CloneProto[T proto.Message](m T) T {
 	return proto.Clone(m).(T)
@@ -26,4 +30,16 @@ func CloneProtoSlice[T proto.Message](ms []T) []T {
 		cs[i] = CloneProto(ms[i])
 	}
 	return cs
+}
+
+func CloneProtoRedacted[T proto.Message](m T) T {
+	clone := proto.Clone(m).(T)
+	reflected := clone.ProtoReflect()
+	reflected.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		if proto.HasExtension(fd.Options(), logger.E_Redact) {
+			reflected.Clear(fd)
+		}
+		return true
+	})
+	return clone
 }
