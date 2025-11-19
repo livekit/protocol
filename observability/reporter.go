@@ -14,6 +14,7 @@ type Reporter interface {
 	Agent() agentsobs.Reporter
 	Gateway() gatewayobs.Reporter
 	Telephony() telephonyobs.Reporter
+	Connector() any // any is a placeholder for the connector type
 	Close()
 }
 
@@ -39,4 +40,9 @@ func (reporter) Telephony() telephonyobs.Reporter {
 	return telephonyobs.NewNoopReporter()
 }
 
-func (reporter) Close() {}
+func (reporter) Connector() any {
+	return nil
+}
+
+func (reporter) Close() {
+}
