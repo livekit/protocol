@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.43.2
+
+### Patch Changes
+
+- fix call depth for override logger - [#1313](https://github.com/livekit/protocol/pull/1313) ([@paulwe](https://github.com/paulwe))
+
+- Generate agent protos - [#1318](https://github.com/livekit/protocol/pull/1318) ([@toubatbrian](https://github.com/toubatbrian))
+
+- add missing proto import - [#1317](https://github.com/livekit/protocol/pull/1317) ([@paulwe](https://github.com/paulwe))
+
 ## 1.43.1
 
 ### Patch Changes
