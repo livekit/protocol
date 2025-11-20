@@ -1,4 +1,5 @@
 export { protoInt64 } from "@bufbuild/protobuf";
+export * as AgentSession from "./gen/agent/livekit_agent_session_pb.js";
 export * from "./gen/livekit_agent_dispatch_pb.js";
 export * from "./gen/livekit_agent_pb.js";
 export * from "./gen/livekit_connector_pb.js";
