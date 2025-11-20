@@ -34,12 +34,44 @@ func CloneProtoSlice[T proto.Message](ms []T) []T {
 
 func CloneProtoRedacted[T proto.Message](m T) T {
 	clone := proto.Clone(m).(T)
-	reflected := clone.ProtoReflect()
-	reflected.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
-		if proto.HasExtension(fd.Options(), logger.E_Redact) {
-			reflected.Clear(fd)
+
+	var redact func(msg proto.Message)
+	redact = func(msg proto.Message) {
+		if msg == nil {
+			return
 		}
-		return true
-	})
+
+		reflected := msg.ProtoReflect()
+		reflected.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+			if proto.HasExtension(fd.Options(), logger.E_Redact) {
+				reflected.Clear(fd)
+			}
+
+			if fd.Kind() == protoreflect.MessageKind {
+				switch {
+				case fd.IsList():
+					src := v.List()
+					for i := 0; i < src.Len(); i++ {
+						elem := src.Get(i).Message().Interface()
+						redact(elem)
+					}
+
+				case fd.IsMap():
+					src := v.Map()
+					src.Range(func(key protoreflect.MapKey, val protoreflect.Value) bool {
+						elem := val.Message().Interface()
+						redact(elem)
+						return true
+					})
+
+				default:
+					redact(v.Message().Interface())
+				}
+			}
+
+			return true
+		})
+	}
+	redact(clone)
 	return clone
 }

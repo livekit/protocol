@@ -174,7 +174,10 @@ message ParticipantInfo {
   int64 joined_at = 6;
   // timestamp when participant joined room, in milliseconds
   int64 joined_at_ms = 17;
-  string name = 9;
+  string name = 9 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   uint32 version = 10;
   ParticipantPermission permission = 11;
   string region = 12;
@@ -182,7 +185,10 @@ message ParticipantInfo {
   // and can publish to the server
   bool is_publisher = 13;
   Kind kind = 14;
-  map<string, string> attributes = 15;
+  map<string, string> attributes = 15 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   DisconnectReason disconnect_reason = 16;
   repeated KindDetail kind_details = 18;
 
@@ -227,7 +233,10 @@ message SimulcastCodecInfo {
 message TrackInfo {
   string sid = 1;
   TrackType type = 2;
-  string name = 3;
+  string name = 3 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   bool muted = 4;
   // original width of video (unset for audio)
   // clients may receive a lower resolution version with simulcast
