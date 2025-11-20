@@ -23,7 +23,7 @@
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
   "scripts": {
-    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto",
+    "generate:proto": "mkdir -p src/gen && protoc --es_out src/gen --es_opt target=dts+js -I=../../protobufs ../../protobufs/livekit_*.proto ../../protobufs/agent/livekit_*.proto",
     "generate:version": "genversion --esm --semi src/gen/version.js",
     "build": "pnpm generate:version && pnpm generate:proto && unbuild"
   },
