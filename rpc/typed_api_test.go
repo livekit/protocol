@@ -32,9 +32,9 @@ func TestMiddleware(t *testing.T) {
 		}
 
 		for _, c := range cases {
-			var o psrpc.ClientOpts
-			c.opt(&o)
 			t.Run(c.label, func(t *testing.T) {
+				var o psrpc.ClientOpts
+				c.opt(&o)
 				for _, c := range o.RpcInterceptors {
 					ch := make(chan []psrpc.RequestOption, 1)
 					call := c(psrpc.RPCInfo{}, func(ctx context.Context, req proto.Message, opts ...psrpc.RequestOption) (proto.Message, error) {
@@ -45,7 +45,7 @@ func TestMiddleware(t *testing.T) {
 					expected := []psrpc.RequestOption{func(*psrpc.RequestOpts) {}, func(*psrpc.RequestOpts) {}}
 					go call(context.Background(), nil, expected...)
 
-					eqPtr := func(a psrpc.RequestOption) func(a psrpc.RequestOption) bool {
+					eqPtr := func(a psrpc.RequestOption) func(psrpc.RequestOption) bool {
 						return func(b psrpc.RequestOption) bool {
 							return reflect.ValueOf(a).Pointer() == reflect.ValueOf(b).Pointer()
 						}

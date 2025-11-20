@@ -174,10 +174,7 @@ message ParticipantInfo {
   int64 joined_at = 6;
   // timestamp when participant joined room, in milliseconds
   int64 joined_at_ms = 17;
-  string name = 9 [
-    (logger.redact) = true,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
+  string name = 9 [(logger.redact) = true];
   uint32 version = 10;
   ParticipantPermission permission = 11;
   string region = 12;
@@ -233,9 +230,7 @@ message SimulcastCodecInfo {
 message TrackInfo {
   string sid = 1;
   TrackType type = 2;
-  string name = 3 [
-    (logger.redact) = true
-  ];
+  string name = 3 [(logger.redact) = true];
   bool muted = 4;
   // original width of video (unset for audio)
   // clients may receive a lower resolution version with simulcast

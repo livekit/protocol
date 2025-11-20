@@ -33,8 +33,5 @@ func FastLogisticFunc(x0, L, k float64) func(x float64) float64 {
 }
 
 func Abs[T constraints.Signed | constraints.Float](v T) T {
-	if v < 0 {
-		return -v
-	}
-	return v
+	return max(v, -v)
 }
