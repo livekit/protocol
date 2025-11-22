@@ -249,7 +249,6 @@ message TrackInfo {
 }
 
 message DataTrackInfo {
-
   // Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
   uint32 pub_handle = 1;
 
@@ -261,6 +260,16 @@ message DataTrackInfo {
 
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
+}
+
+enum DataTrackExtensionID {
+  DTEI_INVALID = 0;
+  DTEI_PARTICIPANT_SID = 1;
+}
+
+message DataTrackExtensionParticipantSid {
+  DataTrackExtensionID id = 1;
+  string participant_sid = 2;
 }
 
 message DataTrackSubscriptionOptions {
