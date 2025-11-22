@@ -22,7 +22,6 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/timestamp.proto";
 
 import "livekit_metrics.proto";
-import "logger/options.proto";
 
 message Pagination {
   string after_id = 1; // list entities which IDs are greater
@@ -186,7 +185,7 @@ message ParticipantInfo {
 enum TrackType {
   AUDIO = 0;
   VIDEO = 1;
-  DATA = 2 [deprecated = true];
+  DATA = 2;
 }
 
 enum TrackSource {
@@ -266,8 +265,7 @@ message DataTrackInfo {
 
 message DataTrackSubscriptionOptions {
   // Rate in frames per second (FPS) the subscriber wants to receive frames at.
-  // If omitted, the subscriber defaults to the publisher's nominal FPS; if the
-  // publisher has no nominal FPS, it will use the maximum.
+  // If omitted, the subscriber defaults to the publisher's fps
   optional uint32 target_fps = 1;
 }
 

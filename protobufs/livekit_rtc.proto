@@ -196,8 +196,8 @@ message UnpublishDataTrackRequest {
 }
 
 message UnpublishDataTrackResponse {
-  // Publisher handle of the track that was unpublished.
-  uint32 pub_handle = 1;
+  // Information about the unpublished track.
+  DataTrackInfo info = 1;
 }
 
 message DataTrackSubscriberHandles {
@@ -285,11 +285,10 @@ message UpdateSubscription {
 message UpdateDataSubscription {
   message Update {
     string track_sid = 1;
-    string participant_identity = 2;
-    bool subscribe = 3;
+    bool subscribe = 2;
     // Options to apply when initially subscribing or updating an existing subscription.
     // When unsubscribing, this field is ignored.
-    DataTrackSubscriptionOptions options = 4;
+    DataTrackSubscriptionOptions options = 3;
   }
   repeated Update updates = 1;
 }
@@ -463,6 +462,7 @@ message SyncState {
   SessionDescription offer = 5;
   repeated string track_sids_disabled = 6;
   repeated DataChannelReceiveState datachannel_receive_states = 7;
+  repeated PublishDataTrackResponse publish_data_tracks = 8;
 }
 
 message DataChannelReceiveState {
