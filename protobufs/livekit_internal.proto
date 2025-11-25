@@ -68,10 +68,12 @@ message NodeStats {
   float track_publish_attempts_per_sec = 37 [deprecated=true];
   int32 num_track_publish_success = 38;
   float track_publish_success_per_sec = 39 [deprecated=true];
+  int32 num_track_publish_cancels = 51;
   int32 num_track_subscribe_attempts = 40;
   float track_subscribe_attempts_per_sec = 41 [deprecated=true];
   int32 num_track_subscribe_success = 42;
   float track_subscribe_success_per_sec = 43 [deprecated=true];
+  int32 num_track_subscribe_cancels = 52;
 
   // packet
   uint64 bytes_in = 7;
@@ -113,6 +115,7 @@ message NodeStats {
   float participant_rtc_connected_per_sec = 45 [deprecated=true];
   uint64 participant_rtc_init = 46;
   float participant_rtc_init_per_sec = 47 [deprecated=true];
+  uint64 participant_rtc_canceled = 53;
 
   // forward metrics
   uint32 forward_latency = 48;
@@ -120,7 +123,7 @@ message NodeStats {
 
   repeated NodeStatsRate rates = 50;
 
-  // NEXT ID: 51
+  // NEXT ID: 54
 }
 
 // rates of different node stats (per second)
@@ -131,8 +134,10 @@ message NodeStatsRate {
 
   float track_publish_attempts = 4;
   float track_publish_success = 5;
+  float track_publish_cancels = 24;
   float track_subscribe_attempts = 6;
   float track_subscribe_success = 7;
+  float track_subscribe_cancels = 25;
 
   float bytes_in = 8;
   float bytes_out = 9;
@@ -149,6 +154,7 @@ message NodeStatsRate {
   float participant_signal_connected = 17;
   float participant_rtc_connected = 18;
   float participant_rtc_init = 19;
+  float participant_rtc_canceled = 26;
 
   // time weighted averages across stats windows forming part of a rate measurement interval
   float cpu_load = 20;
@@ -156,7 +162,7 @@ message NodeStatsRate {
   float memory_used = 22;
   float memory_total = 23;
 
-  // NEXT ID: 24
+  // NEXT ID: 27
 }
 
 message StartSession {
