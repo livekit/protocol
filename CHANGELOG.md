@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.43.3
+
+### Patch Changes
+
+- Cancellation counts for join/publish/subscribe. - [#1321](https://github.com/livekit/protocol/pull/1321) ([@boks1971](https://github.com/boks1971))
+
 ## 1.43.2
 
 ## 1.43.1
