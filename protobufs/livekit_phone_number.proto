@@ -14,6 +14,7 @@ enum PhoneNumberStatus {
   PHONE_NUMBER_STATUS_ACTIVE = 1;       // Number is active and ready for use
   PHONE_NUMBER_STATUS_PENDING = 2;      // Number is being provisioned
   PHONE_NUMBER_STATUS_RELEASED = 3;     // Number has been released
+  PHONE_NUMBER_STATUS_OFFLINE = 4;      // Number is offline (not associated with any dispatch rule)
 }
 
 // Phone number type enumeration
@@ -89,6 +90,7 @@ message ListPhoneNumbersResponse {
   repeated PhoneNumber items = 1;      // List of phone numbers
   TokenPagination next_page_token = 2; // Token for next page (empty if no more pages)
   int32 total_count = 3;               // Total number of phone numbers
+  int32 offline_count = 4;             // Total number of offline phone numbers
 }
 
 // GetPhoneNumberRequest - Request to get a phone number
@@ -141,5 +143,6 @@ message PhoneNumber {
   PhoneNumberStatus status = 12;              // Current status
   google.protobuf.Timestamp assigned_at = 13; // Assignment timestamp
   google.protobuf.Timestamp released_at = 14; // Release timestamp (if applicable)
-  string sip_dispatch_rule_id = 15;           // Associated SIP dispatch rule ID
+  string sip_dispatch_rule_id = 15 [deprecated=true]; // Associated SIP dispatch rule ID (deprecated: use sip_dispatch_rule_ids instead)
+  repeated string sip_dispatch_rule_ids = 16; // Associated SIP dispatch rule IDs
 }
