@@ -2,6 +2,7 @@ package livekit
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"slices"
 	"testing"
@@ -318,4 +319,63 @@ func TestListUpdate(t *testing.T) {
 			require.Equal(t, prev, c.Arr)
 		})
 	}
+}
+
+func TestEncodeTokenPagination(t *testing.T) {
+	t.Run("encode and decode", func(t *testing.T) {
+		offset := int32(10)
+		limit := int32(50)
+
+		tokenPagination, err := EncodeTokenPagination(offset, limit)
+		require.NoError(t, err)
+		require.NotNil(t, tokenPagination)
+		require.NotEmpty(t, tokenPagination.Token)
+
+		decodedOffset, decodedLimit, err := DecodeTokenPagination(tokenPagination)
+		require.NoError(t, err)
+		require.Equal(t, offset, decodedOffset)
+		require.Equal(t, limit, decodedLimit)
+	})
+
+	t.Run("encode zero values", func(t *testing.T) {
+		tokenPagination, err := EncodeTokenPagination(0, 0)
+		require.NoError(t, err)
+		require.NotNil(t, tokenPagination)
+		require.NotEmpty(t, tokenPagination.Token)
+
+		decodedOffset, decodedLimit, err := DecodeTokenPagination(tokenPagination)
+		require.NoError(t, err)
+		require.Equal(t, int32(0), decodedOffset)
+		require.Equal(t, int32(0), decodedLimit)
+	})
+
+	t.Run("decode nil token pagination", func(t *testing.T) {
+		offset, limit, err := DecodeTokenPagination(nil)
+		require.NoError(t, err)
+		require.Equal(t, int32(0), offset)
+		require.Equal(t, int32(0), limit)
+	})
+
+	t.Run("decode empty token", func(t *testing.T) {
+		tp := &TokenPagination{Token: ""}
+		offset, limit, err := DecodeTokenPagination(tp)
+		require.NoError(t, err)
+		require.Equal(t, int32(0), offset)
+		require.Equal(t, int32(0), limit)
+	})
+
+	t.Run("decode invalid token", func(t *testing.T) {
+		tp := &TokenPagination{Token: "invalid-token"}
+		_, _, err := DecodeTokenPagination(tp)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "failed to decode token")
+	})
+
+	t.Run("decode invalid json", func(t *testing.T) {
+		invalidJSON := base64.URLEncoding.EncodeToString([]byte("not json"))
+		tp := &TokenPagination{Token: invalidJSON}
+		_, _, err := DecodeTokenPagination(tp)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "failed to unmarshal")
+	})
 }
