@@ -230,6 +230,7 @@ message FeatureUsageInfo {
   enum Feature {
     KRISP_NOISE_CANCELLATION = 0;
     KRISP_BACKGROUND_VOICE_CANCELLATION = 1;
+    AIC_AUDIO_ENHANCEMENT = 2;
   }
   Feature feature = 1;
   string project_id = 2;
