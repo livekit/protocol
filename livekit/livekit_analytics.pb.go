@@ -262,6 +262,7 @@ type FeatureUsageInfo_Feature int32
 const (
 	FeatureUsageInfo_KRISP_NOISE_CANCELLATION            FeatureUsageInfo_Feature = 0
 	FeatureUsageInfo_KRISP_BACKGROUND_VOICE_CANCELLATION FeatureUsageInfo_Feature = 1
+	FeatureUsageInfo_AIC_AUDIO_ENHANCEMENT               FeatureUsageInfo_Feature = 2
 )
 
 // Enum value maps for FeatureUsageInfo_Feature.
@@ -269,10 +270,12 @@ var (
 	FeatureUsageInfo_Feature_name = map[int32]string{
 		0: "KRISP_NOISE_CANCELLATION",
 		1: "KRISP_BACKGROUND_VOICE_CANCELLATION",
+		2: "AIC_AUDIO_ENHANCEMENT",
 	}
 	FeatureUsageInfo_Feature_value = map[string]int32{
 		"KRISP_NOISE_CANCELLATION":            0,
 		"KRISP_BACKGROUND_VOICE_CANCELLATION": 1,
+		"AIC_AUDIO_ENHANCEMENT":               2,
 	}
 )
 
@@ -2360,7 +2363,7 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\tTimeRange\x129\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xa0\x03\n" +
+	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xbb\x03\n" +
 	"\x10FeatureUsageInfo\x12;\n" +
 	"\afeature\x18\x01 \x01(\x0e2!.livekit.FeatureUsageInfo.FeatureR\afeature\x12\x1d\n" +
 	"\n" +
@@ -2371,10 +2374,11 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x0eparticipant_id\x18\x06 \x01(\tR\rparticipantId\x12\x19\n" +
 	"\btrack_id\x18\a \x01(\tR\atrackId\x123\n" +
 	"\vtime_ranges\x18\b \x03(\v2\x12.livekit.TimeRangeR\n" +
-	"timeRanges\"P\n" +
+	"timeRanges\"k\n" +
 	"\aFeature\x12\x1c\n" +
 	"\x18KRISP_NOISE_CANCELLATION\x10\x00\x12'\n" +
-	"#KRISP_BACKGROUND_VOICE_CANCELLATION\x10\x01\"\x95\a\n" +
+	"#KRISP_BACKGROUND_VOICE_CANCELLATION\x10\x01\x12\x19\n" +
+	"\x15AIC_AUDIO_ENHANCEMENT\x10\x02\"\x95\a\n" +
 	"\x0eAPICallRequest\x12L\n" +
 	"\x13create_room_request\x18\x01 \x01(\v2\x1a.livekit.CreateRoomRequestH\x00R\x11createRoomRequest\x12I\n" +
 	"\x12list_rooms_request\x18\x02 \x01(\v2\x19.livekit.ListRoomsRequestH\x00R\x10listRoomsRequest\x12L\n" +
