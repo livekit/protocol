@@ -16,6 +16,8 @@ package livekit
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"slices"
@@ -163,6 +165,50 @@ func (p *Pagination) Filter(v PageItem) bool {
 		}
 	}
 	return true
+}
+
+// TokenPaginationData represents the data encoded in a TokenPagination token
+type TokenPaginationData struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+// EncodeTokenPagination encodes offset and limit into a TokenPagination.
+// The token is a base64-encoded JSON object containing the offset and limit values.
+func EncodeTokenPagination(offset, limit int32) (*TokenPagination, error) {
+	data := TokenPaginationData{
+		Offset: offset,
+		Limit:  limit,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal token pagination data: %w", err)
+	}
+
+	token := base64.URLEncoding.EncodeToString(jsonData)
+	return &TokenPagination{Token: token}, nil
+}
+
+// DecodeTokenPagination decodes a TokenPagination into offset and limit.
+// Returns an error if the token is invalid or cannot be decoded.
+// If the TokenPagination is nil or has an empty token, returns zero values without error.
+func DecodeTokenPagination(tp *TokenPagination) (offset, limit int32, err error) {
+	if tp == nil || tp.Token == "" {
+		return 0, 0, nil
+	}
+
+	decoded, err := base64.URLEncoding.DecodeString(tp.Token)
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to decode token: %w", err)
+	}
+
+	var data TokenPaginationData
+	if err := json.Unmarshal(decoded, &data); err != nil {
+		return 0, 0, fmt.Errorf("failed to unmarshal token pagination data: %w", err)
+	}
+
+	return data.Offset, data.Limit, nil
 }
 
 type pageIterReq[T any] interface {

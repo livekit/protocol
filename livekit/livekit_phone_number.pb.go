@@ -30,6 +30,7 @@ const (
 	PhoneNumberStatus_PHONE_NUMBER_STATUS_ACTIVE      PhoneNumberStatus = 1 // Number is active and ready for use
 	PhoneNumberStatus_PHONE_NUMBER_STATUS_PENDING     PhoneNumberStatus = 2 // Number is being provisioned
 	PhoneNumberStatus_PHONE_NUMBER_STATUS_RELEASED    PhoneNumberStatus = 3 // Number has been released
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_OFFLINE     PhoneNumberStatus = 4 // Number is offline (not associated with any dispatch rule)
 )
 
 // Enum value maps for PhoneNumberStatus.
@@ -39,12 +40,14 @@ var (
 		1: "PHONE_NUMBER_STATUS_ACTIVE",
 		2: "PHONE_NUMBER_STATUS_PENDING",
 		3: "PHONE_NUMBER_STATUS_RELEASED",
+		4: "PHONE_NUMBER_STATUS_OFFLINE",
 	}
 	PhoneNumberStatus_value = map[string]int32{
 		"PHONE_NUMBER_STATUS_UNSPECIFIED": 0,
 		"PHONE_NUMBER_STATUS_ACTIVE":      1,
 		"PHONE_NUMBER_STATUS_PENDING":     2,
 		"PHONE_NUMBER_STATUS_RELEASED":    3,
+		"PHONE_NUMBER_STATUS_OFFLINE":     4,
 	}
 )
 
@@ -423,6 +426,7 @@ type ListPhoneNumbersResponse struct {
 	Items         []*PhoneNumber         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`                                        // List of phone numbers
 	NextPageToken *TokenPagination       `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // Token for next page (empty if no more pages)
 	TotalCount    int32                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`           // Total number of phone numbers
+	OfflineCount  int32                  `protobuf:"varint,4,opt,name=offline_count,json=offlineCount,proto3" json:"offline_count,omitempty"`     // Total number of offline phone numbers
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -474,6 +478,13 @@ func (x *ListPhoneNumbersResponse) GetNextPageToken() *TokenPagination {
 func (x *ListPhoneNumbersResponse) GetTotalCount() int32 {
 	if x != nil {
 		return x.TotalCount
+	}
+	return 0
+}
+
+func (x *ListPhoneNumbersResponse) GetOfflineCount() int32 {
+	if x != nil {
+		return x.OfflineCount
 	}
 	return 0
 }
@@ -774,24 +785,26 @@ func (*ReleasePhoneNumbersResponse) Descriptor() ([]byte, []int) {
 
 // PhoneNumber - Unified phone number type for inventory and purchased numbers
 type PhoneNumber struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                                 // Unique identifier
-	E164Format        string                 `protobuf:"bytes,2,opt,name=e164_format,json=e164Format,proto3" json:"e164_format,omitempty"`                               // Phone number in E.164 format (e.g., "+14155552671")
-	CountryCode       string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`                            // Country code (e.g., "US")
-	AreaCode          string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                                     // Area code (e.g., "415")
-	NumberType        PhoneNumberType        `protobuf:"varint,5,opt,name=number_type,json=numberType,proto3,enum=livekit.PhoneNumberType" json:"number_type,omitempty"` // Number type (mobile, local, toll-free, unknown)
-	Locality          string                 `protobuf:"bytes,6,opt,name=locality,proto3" json:"locality,omitempty"`                                                     // City/locality (e.g., "San Francisco")
-	Region            string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`                                                         // State/region (e.g., "CA")
-	SpamScore         float64                `protobuf:"fixed64,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`                                // Spam score for fraud detection
-	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                                  // Creation timestamp
-	UpdatedAt         *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`                                 // Last update timestamp
-	Capabilities      []string               `protobuf:"bytes,11,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                            // Available capabilities (e.g., "voice", "sms")
-	Status            PhoneNumberStatus      `protobuf:"varint,12,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                        // Current status
-	AssignedAt        *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                              // Assignment timestamp
-	ReleasedAt        *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                              // Release timestamp (if applicable)
-	SipDispatchRuleId string                 `protobuf:"bytes,15,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`     // Associated SIP dispatch rule ID
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                                 // Unique identifier
+	E164Format   string                 `protobuf:"bytes,2,opt,name=e164_format,json=e164Format,proto3" json:"e164_format,omitempty"`                               // Phone number in E.164 format (e.g., "+14155552671")
+	CountryCode  string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`                            // Country code (e.g., "US")
+	AreaCode     string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                                     // Area code (e.g., "415")
+	NumberType   PhoneNumberType        `protobuf:"varint,5,opt,name=number_type,json=numberType,proto3,enum=livekit.PhoneNumberType" json:"number_type,omitempty"` // Number type (mobile, local, toll-free, unknown)
+	Locality     string                 `protobuf:"bytes,6,opt,name=locality,proto3" json:"locality,omitempty"`                                                     // City/locality (e.g., "San Francisco")
+	Region       string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`                                                         // State/region (e.g., "CA")
+	SpamScore    float64                `protobuf:"fixed64,8,opt,name=spam_score,json=spamScore,proto3" json:"spam_score,omitempty"`                                // Spam score for fraud detection
+	CreatedAt    *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                                  // Creation timestamp
+	UpdatedAt    *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`                                 // Last update timestamp
+	Capabilities []string               `protobuf:"bytes,11,rep,name=capabilities,proto3" json:"capabilities,omitempty"`                                            // Available capabilities (e.g., "voice", "sms")
+	Status       PhoneNumberStatus      `protobuf:"varint,12,opt,name=status,proto3,enum=livekit.PhoneNumberStatus" json:"status,omitempty"`                        // Current status
+	AssignedAt   *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=assigned_at,json=assignedAt,proto3" json:"assigned_at,omitempty"`                              // Assignment timestamp
+	ReleasedAt   *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=released_at,json=releasedAt,proto3" json:"released_at,omitempty"`                              // Release timestamp (if applicable)
+	// Deprecated: Marked as deprecated in livekit_phone_number.proto.
+	SipDispatchRuleId  string   `protobuf:"bytes,15,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3" json:"sip_dispatch_rule_id,omitempty"`    // Associated SIP dispatch rule ID (deprecated: use sip_dispatch_rule_ids instead)
+	SipDispatchRuleIds []string `protobuf:"bytes,16,rep,name=sip_dispatch_rule_ids,json=sipDispatchRuleIds,proto3" json:"sip_dispatch_rule_ids,omitempty"` // Associated SIP dispatch rule IDs
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *PhoneNumber) Reset() {
@@ -922,11 +935,19 @@ func (x *PhoneNumber) GetReleasedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_phone_number.proto.
 func (x *PhoneNumber) GetSipDispatchRuleId() string {
 	if x != nil {
 		return x.SipDispatchRuleId
 	}
 	return ""
+}
+
+func (x *PhoneNumber) GetSipDispatchRuleIds() []string {
+	if x != nil {
+		return x.SipDispatchRuleIds
+	}
+	return nil
 }
 
 var File_livekit_phone_number_proto protoreflect.FileDescriptor
@@ -961,12 +982,13 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x14sip_dispatch_rule_id\x18\x04 \x01(\tH\x02R\x11sipDispatchRuleId\x88\x01\x01B\b\n" +
 	"\x06_limitB\r\n" +
 	"\v_page_tokenB\x17\n" +
-	"\x15_sip_dispatch_rule_id\"\xa9\x01\n" +
+	"\x15_sip_dispatch_rule_id\"\xce\x01\n" +
 	"\x18ListPhoneNumbersResponse\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\x05items\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12\x1f\n" +
 	"\vtotal_count\x18\x03 \x01(\x05R\n" +
-	"totalCount\"l\n" +
+	"totalCount\x12#\n" +
+	"\roffline_count\x18\x04 \x01(\x05R\fofflineCount\"l\n" +
 	"\x15GetPhoneNumberRequest\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12&\n" +
 	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01B\x05\n" +
@@ -986,7 +1008,7 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x1aReleasePhoneNumbersRequest\x12\x10\n" +
 	"\x03ids\x18\x01 \x03(\tR\x03ids\x12#\n" +
 	"\rphone_numbers\x18\x02 \x03(\tR\fphoneNumbers\"\x1d\n" +
-	"\x1bReleasePhoneNumbersResponse\"\x85\x05\n" +
+	"\x1bReleasePhoneNumbersResponse\"\xbc\x05\n" +
 	"\vPhoneNumber\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\ve164_format\x18\x02 \x01(\tR\n" +
@@ -1009,13 +1031,15 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\vassigned_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"assignedAt\x12;\n" +
 	"\vreleased_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"releasedAt\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x0f \x01(\tR\x11sipDispatchRuleId*\x9b\x01\n" +
+	"releasedAt\x123\n" +
+	"\x14sip_dispatch_rule_id\x18\x0f \x01(\tB\x02\x18\x01R\x11sipDispatchRuleId\x121\n" +
+	"\x15sip_dispatch_rule_ids\x18\x10 \x03(\tR\x12sipDispatchRuleIds*\xbc\x01\n" +
 	"\x11PhoneNumberStatus\x12#\n" +
 	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aPHONE_NUMBER_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
 	"\x1bPHONE_NUMBER_STATUS_PENDING\x10\x02\x12 \n" +
-	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x03*\x8c\x01\n" +
+	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x03\x12\x1f\n" +
+	"\x1bPHONE_NUMBER_STATUS_OFFLINE\x10\x04*\x8c\x01\n" +
 	"\x0fPhoneNumberType\x12\x1d\n" +
 	"\x19PHONE_NUMBER_TYPE_UNKNOWN\x10\x00\x12\x1c\n" +
 	"\x18PHONE_NUMBER_TYPE_MOBILE\x10\x01\x12\x1b\n" +
