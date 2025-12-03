@@ -777,7 +777,7 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 	}
 	if specificRuleCnt == 0 && defaultRuleCnt == 0 {
 		err := &ErrNoDispatchMatched{NoRules: true, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
-		return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, err.Error()), err)
+		return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, "%s", err.Error()), err)
 	}
 	if specificRule != nil {
 		return specificRule, nil
@@ -786,7 +786,7 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 		return defaultRule, nil
 	}
 	err := &ErrNoDispatchMatched{NoRules: false, NoTrunks: trunk == nil, CalledNumber: req.CalledNumber}
-	return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, err.Error()), err)
+	return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, "%s", err.Error()), err)
 }
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
