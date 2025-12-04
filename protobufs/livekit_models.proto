@@ -188,8 +188,9 @@ message ParticipantInfo {
   ];
   DisconnectReason disconnect_reason = 16;
   repeated KindDetail kind_details = 18;
+  repeated DataTrackInfo data_tracks = 19;
 
-  // NEXT_ID: 19
+  // NEXT_ID: 20
 }
 
 enum TrackType {
@@ -256,6 +257,36 @@ message TrackInfo {
   TimedVersion version = 18;
   repeated AudioTrackFeature audio_features = 19;
   BackupCodecPolicy backup_codec_policy = 20;
+}
+
+message DataTrackInfo {
+  // Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
+  uint32 pub_handle = 1;
+
+  // Server-assigned track identifier.
+  string sid = 2;
+
+  // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+  string name = 3;
+
+  // Method used for end-to-end encryption (E2EE) on packet payloads.
+  Encryption.Type encryption = 4;
+}
+
+enum DataTrackExtensionID {
+  DTEI_INVALID = 0;
+  DTEI_PARTICIPANT_SID = 1;
+}
+
+message DataTrackExtensionParticipantSid {
+  DataTrackExtensionID id = 1;
+  string participant_sid = 2;
+}
+
+message DataTrackSubscriptionOptions {
+  // Rate in frames per second (FPS) the subscriber wants to receive frames at.
+  // If omitted, the subscriber defaults to the publisher's fps
+  optional uint32 target_fps = 1;
 }
 
 enum VideoQuality {
