@@ -57,6 +57,12 @@ message SignalRequest {
     UpdateLocalAudioTrack update_audio_track = 17;
     // Update local video track settings
     UpdateLocalVideoTrack update_video_track = 18;
+    // Publish a data track
+    PublishDataTrackRequest publish_data_track_request = 19;
+    // Unpublish a data track
+    UnpublishDataTrackRequest unpublish_data_track_request = 20;
+    // Update subscription state for one or more data tracks
+    UpdateDataSubscription update_data_subscription = 21;
   }
 }
 
@@ -113,6 +119,12 @@ message SignalResponse {
     MediaSectionsRequirement media_sections_requirement = 25;
     // when audio subscription changes, used to enable simulcasting of audio codecs based on subscriptions
     SubscribedAudioCodecUpdate subscribed_audio_codec_update = 26;
+    // Sent in response to `PublishDataTrackRequest`.
+    PublishDataTrackResponse publish_data_track_response = 27;
+    // Sent in response to `UnpublishDataTrackRequest` or SFU-initiated unpublish.
+    UnpublishDataTrackResponse unpublish_data_track_response = 28;
+    // Sent to data track subscribers to provide mapping from track SIDs to handles.
+    DataTrackSubscriberHandles data_track_subscriber_handles = 29;
   }
 }
 
@@ -160,6 +172,45 @@ message AddTrackRequest {
   BackupCodecPolicy backup_codec_policy = 16;
 
   repeated AudioTrackFeature audio_features = 17;
+}
+
+message PublishDataTrackRequest {
+  // Client-assigned, 16-bit identifier that will be attached to packets sent by the publisher.
+  // This must be non-zero and unique for each data track published by the publisher.
+  uint32 pub_handle = 1;
+
+  // Human-readable identifier (e.g., `geoLocation`, `servoPosition.x`, etc.), unique per publisher.
+  // This must be non-empty and no longer than 256 characters.
+  string name = 2;
+
+  // Method used for end-to-end encryption (E2EE) on frame payloads.
+  Encryption.Type encryption = 3;
+}
+
+message PublishDataTrackResponse {
+  // Information about the published track.
+  DataTrackInfo info = 1;
+}
+
+message UnpublishDataTrackRequest {
+  // Publisher handle of the track to unpublish.
+  uint32 pub_handle = 1;
+}
+
+message UnpublishDataTrackResponse {
+  // Information about the unpublished track.
+  DataTrackInfo info = 1;
+}
+
+message DataTrackSubscriberHandles {
+  message PublishedDataTrack {
+    string publisher_identity = 1;
+    string publisher_sid = 2;
+    string track_sid = 3;
+  }
+
+  // Maps handles from incoming packets to the track SIDs that the packets belong to.
+  map<uint32, PublishedDataTrack> sub_handles = 1;
 }
 
 message TrickleRequest {
@@ -231,6 +282,17 @@ message UpdateSubscription {
   repeated string track_sids = 1;
   bool subscribe = 2;
   repeated ParticipantTracks participant_tracks = 3;
+}
+
+message UpdateDataSubscription {
+  message Update {
+    string track_sid = 1;
+    bool subscribe = 2;
+    // Options to apply when initially subscribing or updating an existing subscription.
+    // When unsubscribing, this field is ignored.
+    DataTrackSubscriptionOptions options = 3;
+  }
+  repeated Update updates = 1;
 }
 
 message UpdateTrackSettings {
@@ -411,6 +473,7 @@ message SyncState {
   SessionDescription offer = 5;
   repeated string track_sids_disabled = 6;
   repeated DataChannelReceiveState datachannel_receive_states = 7;
+  repeated PublishDataTrackResponse publish_data_tracks = 8;
 }
 
 message DataChannelReceiveState {
@@ -490,6 +553,10 @@ message RequestResponse {
     QUEUED = 4;
     UNSUPPORTED_TYPE= 5;
     UNCLASSIFIED_ERROR = 6;
+    INVALID_HANDLE = 7;
+    INVALID_NAME = 8;
+    DUPLICATE_HANDLE = 9;
+    DUPLICATE_NAME = 10;
   }
 
   uint32 request_id = 1;
@@ -502,6 +569,8 @@ message RequestResponse {
     UpdateParticipantMetadata update_metadata = 7;
     UpdateLocalAudioTrack update_audio_track = 8;
     UpdateLocalVideoTrack update_video_track = 9;
+    PublishDataTrackRequest publish_data_track = 10;
+    UnpublishDataTrackRequest unpublish_data_track = 11;
   }
 }
 
