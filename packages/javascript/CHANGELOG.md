@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.43.4
+
+### Patch Changes
+
+- Use string constant as parameter to twirp.NewErrorf - [#1326](https://github.com/livekit/protocol/pull/1326) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- add tags to agent recording proto - [#1328](https://github.com/livekit/protocol/pull/1328) ([@paulwe](https://github.com/paulwe))
+
 ## 1.43.3
 
 ### Patch Changes
