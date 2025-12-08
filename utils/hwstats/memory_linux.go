@@ -27,15 +27,15 @@ import (
 )
 
 const (
-	memUsagePathV1          = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
-	memLimitPathV1          = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
-	memStatPathV1           = "/sys/fs/cgroup/memory/memory.stat"
-	totalInactiveFilePathV1 = "total_inactive_file"
+	memUsagePathV1      = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
+	memLimitPathV1      = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+	memStatPathV1       = "/sys/fs/cgroup/memory/memory.stat"
+	totalInactiveFileV1 = "total_inactive_file"
 
-	memCurrentPathV2   = "/sys/fs/cgroup/memory.current"
-	memMaxPathV2       = "/sys/fs/cgroup/memory.max"
-	memStatPathV2      = "/sys/fs/cgroup/memory.stat"
-	inactiveFilePathV2 = "inactive_file"
+	memCurrentPathV2 = "/sys/fs/cgroup/memory.current"
+	memMaxPathV2     = "/sys/fs/cgroup/memory.max"
+	memStatPathV2    = "/sys/fs/cgroup/memory.stat"
+	inactiveFileV2   = "inactive_file"
 )
 
 type memInfoGetter interface {
@@ -181,17 +181,16 @@ func readValueOfKeyFromFile(file string, key string) (uint64, error) {
 	scanner := bufio.NewScanner(fd)
 	for scanner.Scan() {
 		line := scanner.Text()
-		i := strings.IndexRune(line, ':')
-		if i < 0 {
+		parts := strings.Split(line, " ")
+		if len(parts) != 2 {
 			continue
 		}
 
-		field := line[:i]
-		if field != key {
+		if parts[0] != key {
 			continue
 		}
 
-		val := strings.TrimSpace(line[i+1:])
+		val := strings.TrimSpace(parts[1])
 		if v, err := strconv.ParseUint(val, 10, 64); err == nil {
 			return v, nil
 		}
