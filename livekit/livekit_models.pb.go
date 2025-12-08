@@ -885,7 +885,9 @@ const (
 	// LiveKit agents
 	ParticipantInfo_AGENT ParticipantInfo_Kind = 4
 	// Connectors participants
-	ParticipantInfo_CONNECTOR ParticipantInfo_Kind = 7 // NEXT_ID: 8
+	ParticipantInfo_CONNECTOR ParticipantInfo_Kind = 7
+	// Bridge participants
+	ParticipantInfo_BRIDGE ParticipantInfo_Kind = 8 // NEXT_ID: 9
 )
 
 // Enum value maps for ParticipantInfo_Kind.
@@ -897,6 +899,7 @@ var (
 		3: "SIP",
 		4: "AGENT",
 		7: "CONNECTOR",
+		8: "BRIDGE",
 	}
 	ParticipantInfo_Kind_value = map[string]int32{
 		"STANDARD":  0,
@@ -905,6 +908,7 @@ var (
 		"SIP":       3,
 		"AGENT":     4,
 		"CONNECTOR": 7,
+		"BRIDGE":    8,
 	}
 )
 
@@ -942,6 +946,7 @@ const (
 	ParticipantInfo_FORWARDED          ParticipantInfo_KindDetail = 1
 	ParticipantInfo_CONNECTOR_WHATSAPP ParticipantInfo_KindDetail = 2
 	ParticipantInfo_CONNECTOR_TWILIO   ParticipantInfo_KindDetail = 3
+	ParticipantInfo_BRIDGE_RTSP        ParticipantInfo_KindDetail = 4 // NEXT_ID: 5
 )
 
 // Enum value maps for ParticipantInfo_KindDetail.
@@ -951,12 +956,14 @@ var (
 		1: "FORWARDED",
 		2: "CONNECTOR_WHATSAPP",
 		3: "CONNECTOR_TWILIO",
+		4: "BRIDGE_RTSP",
 	}
 	ParticipantInfo_KindDetail_value = map[string]int32{
 		"CLOUD_AGENT":        0,
 		"FORWARDED":          1,
 		"CONNECTOR_WHATSAPP": 2,
 		"CONNECTOR_TWILIO":   3,
+		"BRIDGE_RTSP":        4,
 	}
 )
 
@@ -6043,7 +6050,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13can_update_metadata\x18\n" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
-	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\xee\b\n" +
+	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\x8b\t\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -6078,7 +6085,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06JOINED\x10\x01\x12\n" +
 	"\n" +
 	"\x06ACTIVE\x10\x02\x12\x10\n" +
-	"\fDISCONNECTED\x10\x03\"P\n" +
+	"\fDISCONNECTED\x10\x03\"\\\n" +
 	"\x04Kind\x12\f\n" +
 	"\bSTANDARD\x10\x00\x12\v\n" +
 	"\aINGRESS\x10\x01\x12\n" +
@@ -6086,13 +6093,16 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06EGRESS\x10\x02\x12\a\n" +
 	"\x03SIP\x10\x03\x12\t\n" +
 	"\x05AGENT\x10\x04\x12\r\n" +
-	"\tCONNECTOR\x10\a\"Z\n" +
+	"\tCONNECTOR\x10\a\x12\n" +
+	"\n" +
+	"\x06BRIDGE\x10\b\"k\n" +
 	"\n" +
 	"KindDetail\x12\x0f\n" +
 	"\vCLOUD_AGENT\x10\x00\x12\r\n" +
 	"\tFORWARDED\x10\x01\x12\x16\n" +
 	"\x12CONNECTOR_WHATSAPP\x10\x02\x12\x14\n" +
-	"\x10CONNECTOR_TWILIO\x10\x03\"3\n" +
+	"\x10CONNECTOR_TWILIO\x10\x03\x12\x0f\n" +
+	"\vBRIDGE_RTSP\x10\x04\"3\n" +
 	"\n" +
 	"Encryption\"%\n" +
 	"\x04Type\x12\b\n" +
