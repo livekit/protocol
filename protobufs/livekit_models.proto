@@ -154,13 +154,17 @@ message ParticipantInfo {
     AGENT = 4;
     // Connectors participants
     CONNECTOR = 7;
-    // NEXT_ID: 8
+    // Bridge participants
+    BRIDGE = 8;
+    // NEXT_ID: 9
   }
   enum KindDetail {
     CLOUD_AGENT = 0;
     FORWARDED = 1;
     CONNECTOR_WHATSAPP = 2;
     CONNECTOR_TWILIO = 3;
+    BRIDGE_RTSP = 4;
+    // NEXT_ID: 5
   }
   string sid = 1;
   string identity = 2;
