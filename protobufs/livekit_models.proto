@@ -163,9 +163,8 @@ message ParticipantInfo {
     FORWARDED = 1;
     CONNECTOR_WHATSAPP = 2;
     CONNECTOR_TWILIO = 3;
-    // reserved 4-9 for other connector types
-    BRIDGE_RTSP = 10;
-    // NEXT_ID: 11
+    BRIDGE_RTSP = 4;
+    // NEXT_ID: 5
   }
   string sid = 1;
   string identity = 2;
