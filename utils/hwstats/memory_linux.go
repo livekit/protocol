@@ -179,25 +179,6 @@ func readValueOfKeyFromFile(file string, key string) (uint64, error) {
 	defer fd.Close()
 
 	scanner := bufio.NewScanner(fd)
-	var memory Stats
-	memStats := map[string]*uint64{
-		"MemTotal":     &memory.Total,
-		"MemFree":      &memory.Free,
-		"MemAvailable": &memory.Available,
-		"Buffers":      &memory.Buffers,
-		"Cached":       &memory.Cached,
-		"Active":       &memory.Active,
-		"Inactive":     &memory.Inactive,
-		"SwapCached":   &memory.SwapCached,
-		"SwapTotal":    &memory.SwapTotal,
-		"SwapFree":     &memory.SwapFree,
-		"Mapped":       &memory.Mapped,
-		"Shmem":        &memory.Shmem,
-		"Slab":         &memory.Slab,
-		"PageTables":   &memory.PageTables,
-		"Committed_AS": &memory.Committed,
-		"VmallocUsed":  &memory.VmallocUsed,
-	}
 	for scanner.Scan() {
 		line := scanner.Text()
 		i := strings.IndexRune(line, ':')
