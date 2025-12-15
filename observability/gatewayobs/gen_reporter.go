@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_KSDK3M8 = true
+const Version_8IGGP5O = true
 
 type KeyResolver interface {
 	Resolve(string)
