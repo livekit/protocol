@@ -1,1 +1,2 @@
-packages/js/src/gen/* linguist-generated=true
+packages/js/src/gen/* linguist-generated
+gen_*.* linguist-generated
