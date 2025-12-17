@@ -4023,14 +4023,14 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x05azure\x18\n" +
 	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xc4\x04\n" +
+	"\x06output\"\xca\x04\n" +
 	"\bS3Upload\x12#\n" +
 	"\n" +
 	"access_key\x18\x01 \x01(\tB\x04\x88\xb5\x18\x01R\taccessKey\x12\x1c\n" +
 	"\x06secret\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x06secret\x12)\n" +
 	"\rsession_token\x18\v \x01(\tB\x04\x88\xb5\x18\x01R\fsessionToken\x12,\n" +
-	"\x0fassume_role_arn\x18\f \x01(\tB\x04\x88\xb5\x18\x01R\rassumeRoleArn\x125\n" +
-	"\x17assume_role_external_id\x18\r \x01(\tR\x14assumeRoleExternalId\x12\x16\n" +
+	"\x0fassume_role_arn\x18\f \x01(\tB\x04\x88\xb5\x18\x01R\rassumeRoleArn\x12;\n" +
+	"\x17assume_role_external_id\x18\r \x01(\tB\x04\x88\xb5\x18\x01R\x14assumeRoleExternalId\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x16\n" +
 	"\x06bucket\x18\x05 \x01(\tR\x06bucket\x12(\n" +
