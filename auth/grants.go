@@ -633,18 +633,10 @@ func sourceToString(source livekit.TrackSource) string {
 }
 
 func sourceToProto(sourceStr string) livekit.TrackSource {
-	switch strings.ToLower(sourceStr) {
-	case "camera":
-		return livekit.TrackSource_CAMERA
-	case "microphone":
-		return livekit.TrackSource_MICROPHONE
-	case "screen_share":
-		return livekit.TrackSource_SCREEN_SHARE
-	case "screen_share_audio":
-		return livekit.TrackSource_SCREEN_SHARE_AUDIO
-	default:
-		return livekit.TrackSource_UNKNOWN
+	if val, ok := livekit.TrackSource_value[strings.ToUpper(sourceStr)]; ok {
+		return livekit.TrackSource(val)
 	}
+	return livekit.TrackSource_UNKNOWN
 }
 
 func kindFromProto(source livekit.ParticipantInfo_Kind) string {
@@ -652,22 +644,10 @@ func kindFromProto(source livekit.ParticipantInfo_Kind) string {
 }
 
 func kindToProto(sourceStr string) livekit.ParticipantInfo_Kind {
-	switch strings.ToLower(sourceStr) {
-	case "", "standard":
-		return livekit.ParticipantInfo_STANDARD
-	case "ingress":
-		return livekit.ParticipantInfo_INGRESS
-	case "egress":
-		return livekit.ParticipantInfo_EGRESS
-	case "sip":
-		return livekit.ParticipantInfo_SIP
-	case "agent":
-		return livekit.ParticipantInfo_AGENT
-	case "connector":
-		return livekit.ParticipantInfo_CONNECTOR
-	default:
-		return livekit.ParticipantInfo_STANDARD
+	if val, ok := livekit.ParticipantInfo_Kind_value[strings.ToUpper(sourceStr)]; ok {
+		return livekit.ParticipantInfo_Kind(val)
 	}
+	return livekit.ParticipantInfo_STANDARD
 }
 
 func kindDetailsFromProto(details []livekit.ParticipantInfo_KindDetail) []string {
@@ -681,15 +661,8 @@ func kindDetailsFromProto(details []livekit.ParticipantInfo_KindDetail) []string
 func kindDetailsToProto(details []string) []livekit.ParticipantInfo_KindDetail {
 	result := make([]livekit.ParticipantInfo_KindDetail, 0, len(details))
 	for _, d := range details {
-		switch strings.ToLower(d) {
-		case "cloud_agent":
-			result = append(result, livekit.ParticipantInfo_CLOUD_AGENT)
-		case "forwarded":
-			result = append(result, livekit.ParticipantInfo_FORWARDED)
-		case "connector_whatsapp":
-			result = append(result, livekit.ParticipantInfo_CONNECTOR_WHATSAPP)
-		case "connector_twilio":
-			result = append(result, livekit.ParticipantInfo_CONNECTOR_TWILIO)
+		if val, ok := livekit.ParticipantInfo_KindDetail_value[strings.ToUpper(d)]; ok {
+			result = append(result, livekit.ParticipantInfo_KindDetail(val))
 		}
 	}
 	return result
