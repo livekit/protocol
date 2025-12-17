@@ -48,11 +48,19 @@ type protoMarshaller struct {
 }
 
 func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if !p.m.IsValid() {
+		return nil
+	}
+
 	fields := p.m.Descriptor().Fields()
 	for i := 0; i < fields.Len(); i++ {
 		f := fields.Get(i)
 		k := f.JSONName()
 		v := p.m.Get(f)
+
+		if protoFieldIsZero(f, v) {
+			continue
+		}
 
 		if proto.HasExtension(f.Options(), logger.E_Redact) {
 			e.AddString(k, marshalRedacted(f, v))
@@ -131,35 +139,21 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder) {
 	switch f.Kind() {
 	case protoreflect.BoolKind:
-		if b := v.Bool(); b {
-			e.AddBool(k, b)
-		}
+		e.AddBool(k, v.Bool())
 	case protoreflect.EnumKind:
 		e.AddString(k, marshalProtoEnum(f, v))
 	case protoreflect.Int32Kind, protoreflect.Int64Kind, protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind:
-		if n := v.Int(); n != 0 {
-			e.AddInt64(k, n)
-		}
+		e.AddInt64(k, v.Int())
 	case protoreflect.Uint32Kind, protoreflect.Uint64Kind, protoreflect.Fixed32Kind, protoreflect.Fixed64Kind:
-		if n := v.Uint(); n != 0 {
-			e.AddUint64(k, n)
-		}
+		e.AddUint64(k, v.Uint())
 	case protoreflect.FloatKind, protoreflect.DoubleKind:
-		if n := v.Float(); n != 0 {
-			e.AddFloat64(k, n)
-		}
+		e.AddFloat64(k, v.Float())
 	case protoreflect.StringKind:
-		if s := v.String(); s != "" {
-			e.AddString(k, s)
-		}
+		e.AddString(k, v.String())
 	case protoreflect.BytesKind:
-		if b := v.Bytes(); len(b) != 0 {
-			e.AddString(k, marshalProtoBytes(b))
-		}
+		e.AddString(k, marshalProtoBytes(v.Bytes()))
 	case protoreflect.MessageKind:
-		if m := v.Message(); m.IsValid() {
-			e.AddObject(k, protoMarshaller{m})
-		}
+		e.AddObject(k, protoMarshaller{v.Message()})
 	}
 }
 
@@ -217,10 +211,6 @@ func (d redactTemplateData) TextName() string {
 }
 
 func (d redactTemplateData) Size() string {
-	if !d.v.IsValid() {
-		return "0"
-	}
-
 	msg := dynamicpb.NewMessage(d.f.ContainingMessage())
 
 	switch {
@@ -242,4 +232,34 @@ func (d redactTemplateData) Size() string {
 	}
 
 	return strconv.Itoa(proto.Size(msg.Interface()))
+}
+
+func protoFieldIsZero(f protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+	if f.IsList() {
+		l := v.List()
+		return l == nil || l.Len() == 0
+	}
+	if f.IsMap() {
+		m := v.Map()
+		return m == nil || m.Len() == 0
+	}
+	switch f.Kind() {
+	case protoreflect.BoolKind:
+		return !v.Bool()
+	case protoreflect.EnumKind:
+		return false
+	case protoreflect.Int32Kind, protoreflect.Int64Kind, protoreflect.Sint32Kind, protoreflect.Sint64Kind, protoreflect.Sfixed32Kind, protoreflect.Sfixed64Kind:
+		return v.Int() == 0
+	case protoreflect.Uint32Kind, protoreflect.Uint64Kind, protoreflect.Fixed32Kind, protoreflect.Fixed64Kind:
+		return v.Uint() == 0
+	case protoreflect.FloatKind, protoreflect.DoubleKind:
+		return v.Float() == 0
+	case protoreflect.StringKind:
+		return v.String() == ""
+	case protoreflect.BytesKind:
+		return len(v.Bytes()) == 0
+	case protoreflect.MessageKind:
+		return !v.Message().IsValid()
+	}
+	return true
 }
