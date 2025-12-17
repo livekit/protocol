@@ -284,10 +284,14 @@ type DisconnectWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Required - Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
-	// Required - The API key of the business that is disconnecting the call
+	// The API key of the business that is disconnecting the call
+	// Optional - only if the user disconnected the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Set this to true if the user disconnected the call
+	// Otherwise, call will be disconnected when we hit a media timeout
+	UserDisconnected bool `protobuf:"varint,3,opt,name=user_disconnected,json=userDisconnected,proto3" json:"user_disconnected,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *DisconnectWhatsAppCallRequest) Reset() {
@@ -332,6 +336,13 @@ func (x *DisconnectWhatsAppCallRequest) GetWhatsappApiKey() string {
 		return x.WhatsappApiKey
 	}
 	return ""
+}
+
+func (x *DisconnectWhatsAppCallRequest) GetUserDisconnected() bool {
+	if x != nil {
+		return x.UserDisconnected
+	}
+	return false
 }
 
 type DisconnectWhatsAppCallResponse struct {
@@ -738,10 +749,11 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
 	"\x18DialWhatsAppCallResponse\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\"y\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"\xa6\x01\n" +
 	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12.\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\" \n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12+\n" +
+	"\x11user_disconnected\x18\x03 \x01(\bR\x10userDisconnected\" \n" +
 	"\x1eDisconnectWhatsAppCallResponse\"u\n" +
 	"\x1aConnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12-\n" +
