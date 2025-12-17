@@ -70,8 +70,12 @@ message DialWhatsAppCallResponse {
 message DisconnectWhatsAppCallRequest {
   // Required - Call ID sent by Meta
   string whatsapp_call_id = 1;
-  // Required - The API key of the business that is disconnecting the call
+  // The API key of the business that is disconnecting the call
+  // Optional - only if the user disconnected the call
   string whatsapp_api_key = 2 [(logger.redact) = true];
+  // Set this to true if the user disconnected the call
+  // Otherwise, call will be disconnected when we hit a media timeout
+  bool user_disconnected = 3;
 }
 
 message DisconnectWhatsAppCallResponse {
