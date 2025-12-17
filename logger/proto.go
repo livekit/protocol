@@ -48,6 +48,10 @@ type protoMarshaller struct {
 }
 
 func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if !p.m.IsValid() {
+		return nil
+	}
+
 	fields := p.m.Descriptor().Fields()
 	for i := 0; i < fields.Len(); i++ {
 		f := fields.Get(i)
@@ -85,10 +89,6 @@ type protoMapMarshaller struct {
 
 func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	p.m.Range(func(ki protoreflect.MapKey, vi protoreflect.Value) bool {
-		if protoFieldIsZero(p.f.MapValue(), vi) {
-			return true
-		}
-
 		var k string
 		switch p.f.MapKey().Kind() {
 		case protoreflect.BoolKind:
