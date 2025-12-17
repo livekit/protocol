@@ -82,6 +82,58 @@ func (WhatsAppCallDirection) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_connector_whatsapp_proto_rawDescGZIP(), []int{0}
 }
 
+type DisconnectWhatsAppCallRequest_DisconnectReason int32
+
+const (
+	// The call is being disconnected by the business
+	DisconnectWhatsAppCallRequest_BUSINESS_INITIATED DisconnectWhatsAppCallRequest_DisconnectReason = 0
+	// The call is disconnected by the user.
+	// This can be tracked as part of call terminate webhook
+	// https://developers.facebook.com/documentation/business-messaging/whatsapp/calling/user-initiated-calls#call-terminate-webhook
+	// Note that this webhook will also be sent when the call is disconnected by the business.
+	// Calling the API twice in such cases will result in an error.
+	DisconnectWhatsAppCallRequest_USER_INITIATED DisconnectWhatsAppCallRequest_DisconnectReason = 1
+)
+
+// Enum value maps for DisconnectWhatsAppCallRequest_DisconnectReason.
+var (
+	DisconnectWhatsAppCallRequest_DisconnectReason_name = map[int32]string{
+		0: "BUSINESS_INITIATED",
+		1: "USER_INITIATED",
+	}
+	DisconnectWhatsAppCallRequest_DisconnectReason_value = map[string]int32{
+		"BUSINESS_INITIATED": 0,
+		"USER_INITIATED":     1,
+	}
+)
+
+func (x DisconnectWhatsAppCallRequest_DisconnectReason) Enum() *DisconnectWhatsAppCallRequest_DisconnectReason {
+	p := new(DisconnectWhatsAppCallRequest_DisconnectReason)
+	*p = x
+	return p
+}
+
+func (x DisconnectWhatsAppCallRequest_DisconnectReason) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DisconnectWhatsAppCallRequest_DisconnectReason) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_connector_whatsapp_proto_enumTypes[1].Descriptor()
+}
+
+func (DisconnectWhatsAppCallRequest_DisconnectReason) Type() protoreflect.EnumType {
+	return &file_livekit_connector_whatsapp_proto_enumTypes[1]
+}
+
+func (x DisconnectWhatsAppCallRequest_DisconnectReason) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DisconnectWhatsAppCallRequest_DisconnectReason.Descriptor instead.
+func (DisconnectWhatsAppCallRequest_DisconnectReason) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_connector_whatsapp_proto_rawDescGZIP(), []int{2, 0}
+}
+
 type DialWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Required - The number of the business that is initiating the call
@@ -287,9 +339,8 @@ type DisconnectWhatsAppCallRequest struct {
 	// The API key of the business that is disconnecting the call
 	// Optional - only if the user disconnected the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
-	// Set this to true if the user disconnected the call
-	// Otherwise, call will be disconnected when we hit a media timeout
-	UserDisconnected bool `protobuf:"varint,3,opt,name=user_disconnected,json=userDisconnected,proto3" json:"user_disconnected,omitempty"`
+	// The reason for disconnecting the call
+	DisconnectReason DisconnectWhatsAppCallRequest_DisconnectReason `protobuf:"varint,3,opt,name=disconnect_reason,json=disconnectReason,proto3,enum=livekit.DisconnectWhatsAppCallRequest_DisconnectReason" json:"disconnect_reason,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -338,11 +389,11 @@ func (x *DisconnectWhatsAppCallRequest) GetWhatsappApiKey() string {
 	return ""
 }
 
-func (x *DisconnectWhatsAppCallRequest) GetUserDisconnected() bool {
+func (x *DisconnectWhatsAppCallRequest) GetDisconnectReason() DisconnectWhatsAppCallRequest_DisconnectReason {
 	if x != nil {
-		return x.UserDisconnected
+		return x.DisconnectReason
 	}
-	return false
+	return DisconnectWhatsAppCallRequest_BUSINESS_INITIATED
 }
 
 type DisconnectWhatsAppCallResponse struct {
@@ -749,11 +800,14 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
 	"\x18DialWhatsAppCallResponse\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\"\xa6\x01\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"\x9f\x02\n" +
 	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12.\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12+\n" +
-	"\x11user_disconnected\x18\x03 \x01(\bR\x10userDisconnected\" \n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12d\n" +
+	"\x11disconnect_reason\x18\x03 \x01(\x0e27.livekit.DisconnectWhatsAppCallRequest.DisconnectReasonR\x10disconnectReason\">\n" +
+	"\x10DisconnectReason\x12\x16\n" +
+	"\x12BUSINESS_INITIATED\x10\x00\x12\x12\n" +
+	"\x0eUSER_INITIATED\x10\x01\" \n" +
 	"\x1eDisconnectWhatsAppCallResponse\"u\n" +
 	"\x1aConnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12-\n" +
@@ -798,37 +852,39 @@ func file_livekit_connector_whatsapp_proto_rawDescGZIP() []byte {
 	return file_livekit_connector_whatsapp_proto_rawDescData
 }
 
-var file_livekit_connector_whatsapp_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_livekit_connector_whatsapp_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_livekit_connector_whatsapp_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_livekit_connector_whatsapp_proto_goTypes = []any{
-	(WhatsAppCallDirection)(0),             // 0: livekit.WhatsAppCallDirection
-	(*DialWhatsAppCallRequest)(nil),        // 1: livekit.DialWhatsAppCallRequest
-	(*DialWhatsAppCallResponse)(nil),       // 2: livekit.DialWhatsAppCallResponse
-	(*DisconnectWhatsAppCallRequest)(nil),  // 3: livekit.DisconnectWhatsAppCallRequest
-	(*DisconnectWhatsAppCallResponse)(nil), // 4: livekit.DisconnectWhatsAppCallResponse
-	(*ConnectWhatsAppCallRequest)(nil),     // 5: livekit.ConnectWhatsAppCallRequest
-	(*ConnectWhatsAppCallResponse)(nil),    // 6: livekit.ConnectWhatsAppCallResponse
-	(*AcceptWhatsAppCallRequest)(nil),      // 7: livekit.AcceptWhatsAppCallRequest
-	(*AcceptWhatsAppCallResponse)(nil),     // 8: livekit.AcceptWhatsAppCallResponse
-	(*WhatsAppCall)(nil),                   // 9: livekit.WhatsAppCall
-	nil,                                    // 10: livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
-	nil,                                    // 11: livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
-	(*RoomAgentDispatch)(nil),              // 12: livekit.RoomAgentDispatch
-	(*SessionDescription)(nil),             // 13: livekit.SessionDescription
+	(WhatsAppCallDirection)(0),                          // 0: livekit.WhatsAppCallDirection
+	(DisconnectWhatsAppCallRequest_DisconnectReason)(0), // 1: livekit.DisconnectWhatsAppCallRequest.DisconnectReason
+	(*DialWhatsAppCallRequest)(nil),                     // 2: livekit.DialWhatsAppCallRequest
+	(*DialWhatsAppCallResponse)(nil),                    // 3: livekit.DialWhatsAppCallResponse
+	(*DisconnectWhatsAppCallRequest)(nil),               // 4: livekit.DisconnectWhatsAppCallRequest
+	(*DisconnectWhatsAppCallResponse)(nil),              // 5: livekit.DisconnectWhatsAppCallResponse
+	(*ConnectWhatsAppCallRequest)(nil),                  // 6: livekit.ConnectWhatsAppCallRequest
+	(*ConnectWhatsAppCallResponse)(nil),                 // 7: livekit.ConnectWhatsAppCallResponse
+	(*AcceptWhatsAppCallRequest)(nil),                   // 8: livekit.AcceptWhatsAppCallRequest
+	(*AcceptWhatsAppCallResponse)(nil),                  // 9: livekit.AcceptWhatsAppCallResponse
+	(*WhatsAppCall)(nil),                                // 10: livekit.WhatsAppCall
+	nil,                                                 // 11: livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
+	nil,                                                 // 12: livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
+	(*RoomAgentDispatch)(nil),                           // 13: livekit.RoomAgentDispatch
+	(*SessionDescription)(nil),                          // 14: livekit.SessionDescription
 }
 var file_livekit_connector_whatsapp_proto_depIdxs = []int32{
-	12, // 0: livekit.DialWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
-	10, // 1: livekit.DialWhatsAppCallRequest.participant_attributes:type_name -> livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
-	13, // 2: livekit.ConnectWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
-	13, // 3: livekit.AcceptWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
-	12, // 4: livekit.AcceptWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
-	11, // 5: livekit.AcceptWhatsAppCallRequest.participant_attributes:type_name -> livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
-	0,  // 6: livekit.WhatsAppCall.direction:type_name -> livekit.WhatsAppCallDirection
-	7,  // [7:7] is the sub-list for method output_type
-	7,  // [7:7] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	13, // 0: livekit.DialWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
+	11, // 1: livekit.DialWhatsAppCallRequest.participant_attributes:type_name -> livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
+	1,  // 2: livekit.DisconnectWhatsAppCallRequest.disconnect_reason:type_name -> livekit.DisconnectWhatsAppCallRequest.DisconnectReason
+	14, // 3: livekit.ConnectWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
+	14, // 4: livekit.AcceptWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
+	13, // 5: livekit.AcceptWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
+	12, // 6: livekit.AcceptWhatsAppCallRequest.participant_attributes:type_name -> livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
+	0,  // 7: livekit.WhatsAppCall.direction:type_name -> livekit.WhatsAppCallDirection
+	8,  // [8:8] is the sub-list for method output_type
+	8,  // [8:8] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_livekit_connector_whatsapp_proto_init() }
@@ -843,7 +899,7 @@ func file_livekit_connector_whatsapp_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_connector_whatsapp_proto_rawDesc), len(file_livekit_connector_whatsapp_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   0,
