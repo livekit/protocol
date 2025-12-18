@@ -81,8 +81,9 @@ message DisconnectWhatsAppCallRequest {
 
   // Required - Call ID sent by Meta
   string whatsapp_call_id = 1;
-  // The API key of the business that is disconnecting the call
-  // Optional - only if the user disconnected the call
+  // The API key of the whatsapp business.
+  // It is only required if the DisconnectReason is BUSINESS_INITIATED, as we need to make an API call.
+  // For USER_INITIATED, this is not required.
   string whatsapp_api_key = 2 [(logger.redact) = true];
   // The reason for disconnecting the call
   DisconnectReason disconnect_reason = 3;
