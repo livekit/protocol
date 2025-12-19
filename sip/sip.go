@@ -131,6 +131,13 @@ func printID(s string) string {
 	return s
 }
 
+func printName(s string) string {
+	if s == "" {
+		return "<blank name>"
+	}
+	return s
+}
+
 // ValidateDispatchRules checks a set of dispatch rules for conflicts.
 //
 // Deprecated: use ValidateDispatchRulesIter
@@ -208,8 +215,9 @@ func (v *DispatchRuleValidator) Validate(r *livekit.SIPDispatchRuleInfo) error {
 				if v.opt.AllowConflicts {
 					continue
 				}
-				return twirp.NewErrorf(twirp.InvalidArgument, "Conflicting SIP Dispatch Rules: same Trunk+Number+PIN combination for for %q and %q",
-					printID(r.SipDispatchRuleId), printID(r2.SipDispatchRuleId))
+				return twirp.NewErrorf(twirp.InvalidArgument,
+					"Dispatch rule for the same trunk, number, and pin combination already exists in dispatch rule %q %q",
+					printID(r2.SipDispatchRuleId), printName(r2.Name))
 			}
 			v.byRuleKey[key] = r
 		}
