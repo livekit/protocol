@@ -337,8 +337,8 @@ type DisconnectWhatsAppCallRequest struct {
 	// Required - Call ID sent by Meta
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
 	// The API key of the whatsapp business.
-	// It is only required if the DisconnectReason is BUSINESS_INITIATED, as we need to make an API call.
-	// For USER_INITIATED, this is not required.
+	// Required if the DisconnectReason is BUSINESS_INITIATED.
+	// Optional for  USER_INITIATED as no API call to WhatsApp is needed.
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
 	// The reason for disconnecting the call
 	DisconnectReason DisconnectWhatsAppCallRequest_DisconnectReason `protobuf:"varint,3,opt,name=disconnect_reason,json=disconnectReason,proto3,enum=livekit.DisconnectWhatsAppCallRequest_DisconnectReason" json:"disconnect_reason,omitempty"`
