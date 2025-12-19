@@ -216,7 +216,7 @@ func (v *DispatchRuleValidator) Validate(r *livekit.SIPDispatchRuleInfo) error {
 					continue
 				}
 				return twirp.NewErrorf(twirp.InvalidArgument,
-					"Dispatch rule for the same trunk, number, and pin combination already exists in dispatch rule %q %q",
+					"Dispatch rule for the same trunk, number, and PIN combination already exists in dispatch rule %q %q",
 					printID(r2.SipDispatchRuleId), printName(r2.Name))
 			}
 			v.byRuleKey[key] = r
