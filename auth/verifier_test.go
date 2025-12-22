@@ -33,10 +33,10 @@ func TestVerifier(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, apiKey, v.APIKey())
-		_, err = v.Verify("")
+		_, _, err = v.Verify("")
 		require.Error(t, err)
 
-		_, err = v.Verify("anothersecret")
+		_, _, err = v.Verify("anothersecret")
 		require.Error(t, err)
 	})
 
@@ -44,7 +44,7 @@ func TestVerifier(t *testing.T) {
 		v, err := auth.ParseAPIToken(accessToken)
 		require.NoError(t, err)
 
-		_, err = v.Verify(secret)
+		_, _, err = v.Verify(secret)
 		require.Error(t, err)
 	})
 
@@ -62,7 +62,7 @@ func TestVerifier(t *testing.T) {
 		require.Equal(t, apiKey, v.APIKey())
 		require.Equal(t, "me", v.Identity())
 
-		decoded, err := v.Verify(secret)
+		_, decoded, err := v.Verify(secret)
 		require.NoError(t, err)
 		require.Equal(t, &claim, decoded.Video)
 	})
@@ -88,7 +88,7 @@ func TestVerifier(t *testing.T) {
 		v, err := auth.ParseAPIToken(authToken)
 		require.NoError(t, err)
 
-		decoded, err := v.Verify(secret)
+		_, decoded, err := v.Verify(secret)
 		require.NoError(t, err)
 
 		require.EqualValues(t, string(md), decoded.Metadata)
@@ -108,7 +108,7 @@ func TestVerifier(t *testing.T) {
 
 		v, err := auth.ParseAPIToken(token)
 		require.NoError(t, err)
-		decoded, err := v.Verify(secret)
+		_, decoded, err := v.Verify(secret)
 		require.NoError(t, err)
 
 		require.Nil(t, decoded.Video.CanSubscribe)
