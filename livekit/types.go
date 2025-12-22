@@ -59,6 +59,9 @@ func (s NodeID) String() string              { return string(s) }
 func (s JobID) String() string               { return string(s) }
 func (s DispatchID) String() string          { return string(s) }
 func (s AgentName) String() string           { return string(s) }
+func (s ParticipantKey) String() string {
+	return fmt.Sprintf("%s_%s_%s", s.ProjectID, s.RoomName, s.Identity)
+}
 
 type stringTypes interface {
 	ParticipantID | RoomID | TrackID | ParticipantIdentity | ParticipantName | RoomName | ConnectionID | NodeID
