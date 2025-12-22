@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -437,16 +438,16 @@ var File_livekit_agent_dispatch_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
-	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\"k\n" +
+	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"q\n" +
 	"\x1aCreateAgentDispatchRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x12\n" +
-	"\x04room\x18\x02 \x01(\tR\x04room\x12\x1a\n" +
-	"\bmetadata\x18\x03 \x01(\tR\bmetadata\"N\n" +
+	"\x04room\x18\x02 \x01(\tR\x04room\x12 \n" +
+	"\bmetadata\x18\x03 \x01(\tB\x04\x88\xb5\x18\x01R\bmetadata\"T\n" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x1a\n" +
-	"\bmetadata\x18\x02 \x01(\tR\bmetadata\"Q\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12 \n" +
+	"\bmetadata\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\bmetadata\"Q\n" +
 	"\x1aDeleteAgentDispatchRequest\x12\x1f\n" +
 	"\vdispatch_id\x18\x01 \x01(\tR\n" +
 	"dispatchId\x12\x12\n" +
@@ -456,13 +457,13 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"dispatchId\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
 	"\x19ListAgentDispatchResponse\x12A\n" +
-	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xa1\x01\n" +
+	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xa7\x01\n" +
 	"\rAgentDispatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x12\n" +
-	"\x04room\x18\x03 \x01(\tR\x04room\x12\x1a\n" +
-	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x121\n" +
+	"\x04room\x18\x03 \x01(\tR\x04room\x12 \n" +
+	"\bmetadata\x18\x04 \x01(\tB\x04\x88\xb5\x18\x01R\bmetadata\x121\n" +
 	"\x05state\x18\x05 \x01(\v2\x1b.livekit.AgentDispatchStateR\x05state\"t\n" +
 	"\x12AgentDispatchState\x12 \n" +
 	"\x04jobs\x18\x01 \x03(\v2\f.livekit.JobR\x04jobs\x12\x1d\n" +
