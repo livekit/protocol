@@ -68,10 +68,25 @@ message DialWhatsAppCallResponse {
 }
 
 message DisconnectWhatsAppCallRequest {
+  enum DisconnectReason {
+    // The call is being disconnected by the business
+    BUSINESS_INITIATED = 0;
+    // The call is disconnected by the user.
+    // This can be tracked as part of call terminate webhook
+    // https://developers.facebook.com/documentation/business-messaging/whatsapp/calling/user-initiated-calls#call-terminate-webhook
+    // Note that this webhook will also be sent when the call is disconnected by the business.
+    // Calling the API twice in such cases will result in an error.
+    USER_INITIATED = 1;
+  }
+
   // Required - Call ID sent by Meta
   string whatsapp_call_id = 1;
-  // Required - The API key of the business that is disconnecting the call
+  // The API key of the whatsapp business.
+  // Required if the DisconnectReason is BUSINESS_INITIATED.
+  // Optional for  USER_INITIATED as no API call to WhatsApp is needed.
   string whatsapp_api_key = 2 [(logger.redact) = true];
+  // The reason for disconnecting the call
+  DisconnectReason disconnect_reason = 3;
 }
 
 message DisconnectWhatsAppCallResponse {
