@@ -51,7 +51,7 @@ func Receive(r *http.Request, provider auth.KeyProvider) ([]byte, error) {
 		return nil, ErrSecretNotFound
 	}
 
-	claims, err := v.Verify(secret)
+	_, claims, err := v.Verify(secret)
 	if err != nil {
 		return nil, err
 	}
