@@ -1146,6 +1146,7 @@ type SIPCall struct {
 	To            *livekit.SIPUri        `protobuf:"bytes,5,opt,name=to,proto3" json:"to,omitempty"`                                  // To header
 	Via           []*livekit.SIPUri      `protobuf:"bytes,6,rep,name=via,proto3" json:"via,omitempty"`                                // Via headers
 	SipCallId     string                 `protobuf:"bytes,7,opt,name=sip_call_id,json=sipCallId,proto3" json:"sip_call_id,omitempty"` // SIP protocol generated call ID
+	ProjectId     string                 `protobuf:"bytes,8,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`   // LiveKit project ID (Cloud only)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1225,6 +1226,13 @@ func (x *SIPCall) GetVia() []*livekit.SIPUri {
 func (x *SIPCall) GetSipCallId() string {
 	if x != nil {
 		return x.SipCallId
+	}
+	return ""
+}
+
+func (x *SIPCall) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
 	}
 	return ""
 }
@@ -1346,7 +1354,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\tcall_info\x18\x01 \x01(\v2\x14.livekit.SIPCallInfoR\bcallInfo\x12=\n" +
 	"\rtransfer_info\x18\x02 \x01(\v2\x18.livekit.SIPTransferInfoR\ftransferInfo\"M\n" +
 	"\x18RecordCallContextRequest\x121\n" +
-	"\tcall_info\x18\x01 \x01(\v2\x14.livekit.SIPCallInfoR\bcallInfo\"\xf8\x01\n" +
+	"\tcall_info\x18\x01 \x01(\v2\x14.livekit.SIPCallInfoR\bcallInfo\"\x97\x02\n" +
 	"\aSIPCall\x12\x1c\n" +
 	"\n" +
 	"lk_call_id\x18\x01 \x01(\tR\blkCallId\x12\x1b\n" +
@@ -1355,7 +1363,9 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x04from\x18\x04 \x01(\v2\x0f.livekit.SIPUriR\x04from\x12\x1f\n" +
 	"\x02to\x18\x05 \x01(\v2\x0f.livekit.SIPUriR\x02to\x12!\n" +
 	"\x03via\x18\x06 \x03(\v2\x0f.livekit.SIPUriR\x03via\x12\x1e\n" +
-	"\vsip_call_id\x18\a \x01(\tR\tsipCallId*`\n" +
+	"\vsip_call_id\x18\a \x01(\tR\tsipCallId\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\b \x01(\tR\tprojectId*`\n" +
 	"\x11SIPDispatchResult\x12\x18\n" +
 	"\x14LEGACY_ACCEPT_OR_PIN\x10\x00\x12\n" +
 	"\n" +
