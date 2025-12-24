@@ -2,6 +2,7 @@ package observability
 
 import (
 	"github.com/livekit/protocol/observability/agentsobs"
+	"github.com/livekit/protocol/observability/egressobs"
 	"github.com/livekit/protocol/observability/gatewayobs"
 	"github.com/livekit/protocol/observability/roomobs"
 	"github.com/livekit/protocol/observability/telephonyobs"
@@ -47,7 +48,7 @@ func (reporter) Connector() any {
 }
 
 func (reporter) Egress() any {
-	return nil
+	return egressobs.NewNoopReporter()
 }
 
 func (reporter) Ingress() any {
