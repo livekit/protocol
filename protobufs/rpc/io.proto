@@ -272,4 +272,5 @@ message SIPCall {
   livekit.SIPUri to = 5; // To header
   repeated livekit.SIPUri via = 6; // Via headers
   string sip_call_id = 7; // SIP protocol generated call ID
+  string project_id = 8; // LiveKit project ID (Cloud only)
 }
