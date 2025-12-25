@@ -15,18 +15,18 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
-
 import "livekit_metrics.proto";
 import "logger/options.proto";
 
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
+
 message Pagination {
   string after_id = 1; // list entities which IDs are greater
-  int32  limit = 2;
+  int32 limit = 2;
 }
 
 message TokenPagination {
@@ -118,12 +118,12 @@ message ParticipantPermission {
   bool hidden = 7;
   // indicates it's a recorder instance
   // deprecated: use ParticipantInfo.kind instead
-  bool recorder = 8 [deprecated=true];
+  bool recorder = 8 [deprecated = true];
   // indicates that participant can update own metadata and attributes
   bool can_update_metadata = 10;
   // indicates that participant is an agent
   // deprecated: use ParticipantInfo.kind instead
-  bool agent = 11 [deprecated=true];
+  bool agent = 11 [deprecated = true];
   // if a participant can subscribe to metrics
   bool can_subscribe_metrics = 12;
 
@@ -213,9 +213,9 @@ enum TrackSource {
 
 message Encryption {
   enum Type {
-      NONE=0;
-      GCM=1;
-      CUSTOM=2;
+    NONE = 0;
+    GCM = 1;
+    CUSTOM = 2;
   }
 }
 
@@ -245,15 +245,15 @@ message TrackInfo {
   // true if track is simulcasted
   bool simulcast = 7 [deprecated = true]; // see `video_layer_mode` in `codecs`
   // true if DTX (Discontinuous Transmission) is disabled for audio
-  bool disable_dtx = 8 [deprecated=true];   // deprecated in favor of `audio_features`
+  bool disable_dtx = 8 [deprecated = true]; // deprecated in favor of `audio_features`
   // source of media
   TrackSource source = 9;
-  repeated VideoLayer layers = 10 [deprecated=true]; // see `codecs` for layers of individual codec
+  repeated VideoLayer layers = 10 [deprecated = true]; // see `codecs` for layers of individual codec
   // mime type of codec
   string mime_type = 11;
   string mid = 12;
   repeated SimulcastCodecInfo codecs = 13;
-  bool stereo = 14 [deprecated=true];   // deprecated in favor of `audio_features`
+  bool stereo = 14 [deprecated = true]; // deprecated in favor of `audio_features`
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 15;
   Encryption.Type encryption = 16;
@@ -318,6 +318,8 @@ message VideoLayer {
   uint32 ssrc = 5;
   int32 spatial_layer = 6;
   string rid = 7;
+
+  uint32 repair_ssrc = 8;
 }
 
 // new DataPacket API
@@ -326,14 +328,14 @@ message DataPacket {
     RELIABLE = 0;
     LOSSY = 1;
   }
-  Kind kind = 1 [deprecated=true];
+  Kind kind = 1 [deprecated = true];
   // participant identity of user that sent the message
   string participant_identity = 4;
   // identities of participants who will receive the message (sent to all by default)
   repeated string destination_identities = 5;
   oneof value {
     UserPacket user = 2;
-    ActiveSpeakerUpdate speaker = 3 [deprecated=true];
+    ActiveSpeakerUpdate speaker = 3 [deprecated = true];
     SipDTMF sip_dtmf = 6;
     Transcription transcription = 7;
     MetricsBatch metrics = 8;
@@ -376,7 +378,6 @@ message EncryptedPacketPayload {
   }
 }
 
-
 message ActiveSpeakerUpdate {
   option deprecated = true;
   repeated SpeakerInfo speakers = 1;
@@ -392,14 +393,14 @@ message SpeakerInfo {
 
 message UserPacket {
   // participant ID of user that sent the message
-  string participant_sid = 1 [deprecated=true];
-  string participant_identity = 5 [deprecated=true];
+  string participant_sid = 1 [deprecated = true];
+  string participant_identity = 5 [deprecated = true];
   // user defined payload
   bytes payload = 2;
   // the ID of the participants who will receive the message (sent to all by default)
-  repeated string destination_sids = 3 [deprecated=true];
+  repeated string destination_sids = 3 [deprecated = true];
   // identities of participants who will receive the message (sent to all by default)
-  repeated string destination_identities = 6 [deprecated=true];
+  repeated string destination_identities = 6 [deprecated = true];
   // topic under which the message was published
   optional string topic = 4;
   // Unique ID to identify the message
@@ -503,21 +504,21 @@ message ServerInfo {
 // details about the client
 message ClientInfo {
   enum SDK {
-     UNKNOWN = 0;
-     JS = 1;
-     SWIFT = 2;
-     ANDROID = 3;
-     FLUTTER = 4;
-     GO = 5;
-     UNITY = 6;
-     REACT_NATIVE = 7;
-     RUST = 8;
-     PYTHON = 9;
-     CPP = 10;
-     UNITY_WEB = 11;
-     NODE = 12;
-     UNREAL = 13;
-     ESP32 = 14;
+    UNKNOWN = 0;
+    JS = 1;
+    SWIFT = 2;
+    ANDROID = 3;
+    FLUTTER = 4;
+    GO = 5;
+    UNITY = 6;
+    REACT_NATIVE = 7;
+    RUST = 8;
+    PYTHON = 9;
+    CPP = 10;
+    UNITY_WEB = 11;
+    NODE = 12;
+    UNREAL = 13;
+    ESP32 = 14;
   }
 
   SDK sdk = 1;
@@ -749,7 +750,6 @@ enum AudioTrackFeature {
 }
 
 message DataStream {
-
   // enum for operation types (specific to TextHeader)
   enum OperationType {
     CREATE = 0;
@@ -761,11 +761,10 @@ message DataStream {
   // header properties specific to text streams
   message TextHeader {
     OperationType operation_type = 1;
-    int32 version = 2;  // Optional: Version for updates/edits
-    string reply_to_stream_id = 3;  // Optional: Reply to specific message
+    int32 version = 2; // Optional: Version for updates/edits
+    string reply_to_stream_id = 3; // Optional: Reply to specific message
     repeated string attached_stream_ids = 4; // file attachments for text streams
     bool generated = 5; // true if the text has been generated by an agent from a participant's audio transcription
-
   }
 
   // header properties specific to byte or file streams
@@ -776,12 +775,12 @@ message DataStream {
   // main DataStream.Header that contains a oneof for specific headers
   message Header {
     string stream_id = 1; // unique identifier for this data stream
-    int64 timestamp = 2;  // using int64 for Unix timestamp
+    int64 timestamp = 2; // using int64 for Unix timestamp
     string topic = 3;
     string mime_type = 4;
-    optional uint64 total_length = 5;  // only populated for finite streams, if it's a stream of unknown size this stays empty
-    Encryption.Type encryption_type = 7 [deprecated=true];  //  this is set on the DataPacket
-    map<string, string> attributes = 8;  // user defined attributes map that can carry additional info
+    optional uint64 total_length = 5; // only populated for finite streams, if it's a stream of unknown size this stays empty
+    Encryption.Type encryption_type = 7 [deprecated = true]; //  this is set on the DataPacket
+    map<string, string> attributes = 8; // user defined attributes map that can carry additional info
 
     // oneof to choose between specific header types
     oneof content_header {
@@ -791,11 +790,11 @@ message DataStream {
   }
 
   message Chunk {
-    string stream_id = 1;  // unique identifier for this data stream to map it to the correct header
+    string stream_id = 1; // unique identifier for this data stream to map it to the correct header
     uint64 chunk_index = 2;
     bytes content = 3; // content as binary (bytes)
     int32 version = 4; // a version indicating that this chunk_index has been retroactively modified and the original one needs to be replaced
-    optional bytes iv = 5 [deprecated=true]; // this is set on the DataPacket
+    optional bytes iv = 5 [deprecated = true]; // this is set on the DataPacket
   }
 
   message Trailer {
