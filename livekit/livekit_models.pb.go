@@ -2571,6 +2571,7 @@ type VideoLayer struct {
 	Ssrc          uint32 `protobuf:"varint,5,opt,name=ssrc,proto3" json:"ssrc,omitempty"`
 	SpatialLayer  int32  `protobuf:"varint,6,opt,name=spatial_layer,json=spatialLayer,proto3" json:"spatial_layer,omitempty"`
 	Rid           string `protobuf:"bytes,7,opt,name=rid,proto3" json:"rid,omitempty"`
+	RepairSsrc    uint32 `protobuf:"varint,8,opt,name=repair_ssrc,json=repairSsrc,proto3" json:"repair_ssrc,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2652,6 +2653,13 @@ func (x *VideoLayer) GetRid() string {
 		return x.Rid
 	}
 	return ""
+}
+
+func (x *VideoLayer) GetRepairSsrc() uint32 {
+	if x != nil {
+		return x.RepairSsrc
+	}
+	return 0
 }
 
 // new DataPacket API
@@ -6157,7 +6165,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x1cDataTrackSubscriptionOptions\x12\"\n" +
 	"\n" +
 	"target_fps\x18\x01 \x01(\rH\x00R\ttargetFps\x88\x01\x01B\r\n" +
-	"\v_target_fps\"\xe9\x02\n" +
+	"\v_target_fps\"\x8a\x03\n" +
 	"\n" +
 	"VideoLayer\x12/\n" +
 	"\aquality\x18\x01 \x01(\x0e2\x15.livekit.VideoQualityR\aquality\x12\x14\n" +
@@ -6166,7 +6174,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\abitrate\x18\x04 \x01(\rR\abitrate\x12\x12\n" +
 	"\x04ssrc\x18\x05 \x01(\rR\x04ssrc\x12#\n" +
 	"\rspatial_layer\x18\x06 \x01(\x05R\fspatialLayer\x12\x10\n" +
-	"\x03rid\x18\a \x01(\tR\x03rid\"\x96\x01\n" +
+	"\x03rid\x18\a \x01(\tR\x03rid\x12\x1f\n" +
+	"\vrepair_ssrc\x18\b \x01(\rR\n" +
+	"repairSsrc\"\x96\x01\n" +
 	"\x04Mode\x12\x0f\n" +
 	"\vMODE_UNUSED\x10\x00\x12 \n" +
 	"\x1cONE_SPATIAL_LAYER_PER_STREAM\x10\x01\x12&\n" +
