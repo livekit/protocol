@@ -654,8 +654,11 @@ message SIPDispatchRuleInfo {
   SIPDispatchRule rule = 2;
   repeated string trunk_ids = 3;
   bool hide_phone_number = 4;
-  // Dispatch Rule will only accept a call made to these numbers (if set).
+  // Dispatch Rule will only accept a call made from these numbers (if set).
   repeated string inbound_numbers = 7;
+
+  // Dispatch Rule will only accept a call made to these numbers (if set).
+  repeated string numbers = 13;
 
   // Human-readable name for the Dispatch Rule.
   string name = 5;
@@ -680,7 +683,7 @@ message SIPDispatchRuleInfo {
 
   bool krisp_enabled = 11;
   SIPMediaEncryption media_encryption = 12;
-  // NEXT ID: 13
+  // NEXT ID: 14
 }
 
 message SIPDispatchRuleUpdate {

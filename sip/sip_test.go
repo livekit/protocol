@@ -496,9 +496,9 @@ var dispatchCases = []struct {
 		expErr:  true,
 		invalid: true,
 	},
-	// Rules for specific numbers take priority.
+	// Rules for specific inbound numbers take priority.
 	{
-		name:  "direct/number specific",
+		name:  "direct/inbound number specific",
 		trunk: newSIPTrunkDispatch(),
 		rules: []*livekit.SIPDispatchRuleInfo{
 			{TrunkIds: nil, Rule: newDirectDispatch("sip1", "")},
@@ -507,7 +507,7 @@ var dispatchCases = []struct {
 		exp: 1,
 	},
 	{
-		name:  "direct/number specific pin",
+		name:  "direct/inbound number specific pin",
 		trunk: newSIPTrunkDispatch(),
 		rules: []*livekit.SIPDispatchRuleInfo{
 			{TrunkIds: nil, Rule: newDirectDispatch("sip1", "123")},
@@ -516,7 +516,7 @@ var dispatchCases = []struct {
 		exp: 1,
 	},
 	{
-		name:  "direct/number specific conflict",
+		name:  "direct/inbound number specific conflict",
 		trunk: newSIPTrunkDispatch(),
 		rules: []*livekit.SIPDispatchRuleInfo{
 			{TrunkIds: nil, Rule: newDirectDispatch("sip1", ""), InboundNumbers: []string{sipNumber1}},
@@ -525,7 +525,7 @@ var dispatchCases = []struct {
 		expErr:  true,
 		invalid: true,
 	},
-	// Check the "personal room" use case. Rule that accepts a number without a pin and requires pin for everyone else.
+	// Check the "personal room" use case. Rule that accepts an inbound number without a pin and requires pin for everyone else.
 	{
 		name:  "direct/open specific vs pin generic",
 		trunk: newSIPTrunkDispatch(),
@@ -566,6 +566,64 @@ var dispatchCases = []struct {
 		},
 		reqPin: "456",
 		exp:    1,
+	},
+	// Rules for specific numbers take priority.
+	{
+		name:  "direct/number specific",
+		trunk: newSIPTrunkDispatch(),
+		rules: []*livekit.SIPDispatchRuleInfo{
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_1", "")},
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_2", ""), Numbers: []string{sipNumber2}},
+		},
+		exp: 1,
+	},
+	{
+		name:  "direct/number specific pin",
+		trunk: newSIPTrunkDispatch(),
+		rules: []*livekit.SIPDispatchRuleInfo{
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_1", "123")},
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_2", "123"), Numbers: []string{sipNumber2}},
+		},
+		exp: 1,
+	},
+	{
+		name:  "direct/number specific conflict",
+		trunk: newSIPTrunkDispatch(),
+		rules: []*livekit.SIPDispatchRuleInfo{
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_1", ""), Numbers: []string{sipNumber1}},
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_2", ""), Numbers: []string{sipNumber1, sipNumber2}},
+		},
+		expErr:  true,
+		invalid: true,
+	},
+	{
+		name:  "direct/number + inbound number specific conflict",
+		trunk: newSIPTrunkDispatch(),
+		rules: []*livekit.SIPDispatchRuleInfo{
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_1", ""), Numbers: []string{sipNumber1}, InboundNumbers: []string{sipNumber1}},
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_2", ""), Numbers: []string{sipNumber1, sipNumber2}, InboundNumbers: []string{sipNumber1}},
+		},
+		expErr:  true,
+		invalid: true,
+	},
+	// Check the "personal room" use case. Rule that accepts a number without a pin and requires pin for everyone else.
+	{
+		name:  "direct/open specific vs pin generic",
+		trunk: newSIPTrunkDispatch(),
+		rules: []*livekit.SIPDispatchRuleInfo{
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_1", "123")},
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_2", ""), Numbers: []string{sipNumber2}},
+		},
+		exp: 1,
+	},
+	{
+		name:  "direct/open specific vs pin generic",
+		trunk: newSIPTrunkDispatch(),
+		rules: []*livekit.SIPDispatchRuleInfo{
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_1", "123")},
+			{TrunkIds: nil, Rule: newDirectDispatch("sip_2", ""), Numbers: []string{sipNumber2}, InboundNumbers: []string{sipNumber1}},
+		},
+		exp: 1,
 	},
 }
 
@@ -638,6 +696,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 		Rule:              newDirectDispatch("room", ""),
 		HidePhoneNumber:   false,
 		InboundNumbers:    nil,
+		Numbers:           nil,
 		Name:              "",
 		Metadata:          "rule-meta",
 		Attributes: map[string]string{
