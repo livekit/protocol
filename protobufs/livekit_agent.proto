@@ -61,6 +61,8 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
+
+    TextMessageResponse text_response = 8;
   };
 }
 
@@ -74,6 +76,8 @@ message ServerMessage {
     JobAssignment assignment = 3;
     JobTermination termination = 5;
     WorkerPong pong = 4;
+
+    TextMessageRequest text_request = 9;
   }
 }
 
@@ -180,4 +184,19 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1;
+}
+
+message TextMessageRequest {
+  string message_id = 1;
+  string participant_identity = 2;
+  string agent_name = 3;
+  bytes session_data = 4;
+  string text = 5;
+}
+
+message TextMessageResponse {
+  string message_id = 1;
+  string response = 2;
+  bytes session_data = 3;
+  string error = 4;
 }
