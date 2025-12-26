@@ -101,6 +101,9 @@ func DispatchRulePriority(info *livekit.SIPDispatchRuleInfo) int32 {
 	if len(info.InboundNumbers) == 0 {
 		priority += 1000
 	}
+	if len(info.Numbers) == 0 {
+		priority += 1000
+	}
 	return priority
 }
 
@@ -179,6 +182,7 @@ func NewDispatchRuleValidator(opts ...MatchDispatchRuleOpt) *DispatchRuleValidat
 type dispatchRuleKey struct {
 	Pin    string
 	Trunk  string
+	InboundNumber string
 	Number string
 }
 
@@ -201,25 +205,32 @@ func (v *DispatchRuleValidator) Validate(r *livekit.SIPDispatchRuleInfo) error {
 		// This rule matches all trunks, but collides only with other default ones (specific rules take priority).
 		trunks = []string{""}
 	}
-	numbers := r.InboundNumbers
+	inboundNumbers := r.InboundNumbers
+	if len(inboundNumbers) == 0 {
+		// This rule matches all numbers, but collides only with other default ones (specific rules take priority).
+		inboundNumbers = []string{""}
+	}
+	numbers := r.Numbers
 	if len(numbers) == 0 {
 		// This rule matches all numbers, but collides only with other default ones (specific rules take priority).
 		numbers = []string{""}
 	}
 	for _, trunk := range trunks {
-		for _, number := range numbers {
-			key := dispatchRuleKey{Pin: pin, Trunk: trunk, Number: NormalizeNumber(number)}
-			r2 := v.byRuleKey[key]
-			if r2 != nil {
-				v.opt.Conflict(r, r2, DispatchRuleConflictGeneric)
-				if v.opt.AllowConflicts {
-					continue
+		for _, inboundNumber := range inboundNumbers {
+			for _, number := range numbers {
+				key := dispatchRuleKey{Pin: pin, Trunk: trunk, Number: NormalizeNumber(number), InboundNumber: NormalizeNumber(inboundNumber)}
+				r2 := v.byRuleKey[key]
+				if r2 != nil {
+					v.opt.Conflict(r, r2, DispatchRuleConflictGeneric)
+					if v.opt.AllowConflicts {
+						continue
+					}
+					return twirp.NewErrorf(twirp.InvalidArgument,
+						"Dispatch rule for the same trunk, inbound number, number, and PIN combination already exists in dispatch rule %q %q",
+						printID(r2.SipDispatchRuleId), printName(r2.Name))
 				}
-				return twirp.NewErrorf(twirp.InvalidArgument,
-					"Dispatch rule for the same trunk, number, and PIN combination already exists in dispatch rule %q %q",
-					printID(r2.SipDispatchRuleId), printName(r2.Name))
+				v.byRuleKey[key] = r
 			}
-			v.byRuleKey[key] = r
 		}
 	}
 	return nil
@@ -739,6 +750,9 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 			return nil, err
 		}
 		if len(info.InboundNumbers) != 0 && !slices.Contains(info.InboundNumbers, req.CallingNumber) {
+			continue
+		}
+		if len(info.Numbers) != 0 && !slices.Contains(info.Numbers, req.CalledNumber) {
 			continue
 		}
 		_, rulePin, err := GetPinAndRoom(info)
