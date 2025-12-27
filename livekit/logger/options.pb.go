@@ -25,26 +25,26 @@ var file_logger_options_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*bool)(nil),
-		Field:         50001,
+		Field:         91841,
 		Name:          "logger.redact",
-		Tag:           "varint,50001,opt,name=redact",
+		Tag:           "varint,91841,opt,name=redact",
 		Filename:      "logger/options.proto",
 	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
-		Field:         50002,
+		Field:         91842,
 		Name:          "logger.redact_format",
-		Tag:           "bytes,50002,opt,name=redact_format",
+		Tag:           "bytes,91842,opt,name=redact_format",
 		Filename:      "logger/options.proto",
 	},
 }
 
 // Extension fields to descriptorpb.FieldOptions.
 var (
-	// optional bool redact = 50001;
+	// optional bool redact = 91841;
 	E_Redact = &file_logger_options_proto_extTypes[0]
-	// optional string redact_format = 50002;
+	// optional string redact_format = 91842;
 	E_RedactFormat = &file_logger_options_proto_extTypes[1]
 )
 
@@ -53,8 +53,8 @@ var File_logger_options_proto protoreflect.FileDescriptor
 const file_logger_options_proto_rawDesc = "" +
 	"\n" +
 	"\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:7\n" +
-	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18ц\x03 \x01(\bR\x06redact:D\n" +
-	"\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18҆\x03 \x01(\tR\fredactFormatB,Z*github.com/livekit/protocol/livekit/loggerb\x06proto3"
+	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\xc1\xcd\x05 \x01(\bR\x06redact:D\n" +
+	"\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\xc2\xcd\x05 \x01(\tR\fredactFormatB,Z*github.com/livekit/protocol/livekit/loggerb\x06proto3"
 
 var file_logger_options_proto_goTypes = []any{
 	(*descriptorpb.FieldOptions)(nil), // 0: google.protobuf.FieldOptions

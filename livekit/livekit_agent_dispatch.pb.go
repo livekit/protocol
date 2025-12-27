@@ -443,11 +443,11 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\x12 \n" +
-	"\bmetadata\x18\x03 \x01(\tB\x04\x88\xb5\x18\x01R\bmetadata\"T\n" +
+	"\bmetadata\x18\x03 \x01(\tB\x04\x88\xec,\x01R\bmetadata\"T\n" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12 \n" +
-	"\bmetadata\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\bmetadata\"Q\n" +
+	"\bmetadata\x18\x02 \x01(\tB\x04\x88\xec,\x01R\bmetadata\"Q\n" +
 	"\x1aDeleteAgentDispatchRequest\x12\x1f\n" +
 	"\vdispatch_id\x18\x01 \x01(\tR\n" +
 	"dispatchId\x12\x12\n" +
@@ -463,7 +463,7 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x12\n" +
 	"\x04room\x18\x03 \x01(\tR\x04room\x12 \n" +
-	"\bmetadata\x18\x04 \x01(\tB\x04\x88\xb5\x18\x01R\bmetadata\x121\n" +
+	"\bmetadata\x18\x04 \x01(\tB\x04\x88\xec,\x01R\bmetadata\x121\n" +
 	"\x05state\x18\x05 \x01(\v2\x1b.livekit.AgentDispatchStateR\x05state\"t\n" +
 	"\x12AgentDispatchState\x12 \n" +
 	"\x04jobs\x18\x01 \x03(\v2\f.livekit.JobR\x04jobs\x12\x1d\n" +

@@ -508,19 +508,19 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\ttransport\x18\x10 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x16\n" +
 	"\x06number\x18\x03 \x01(\tR\x06number\x12\x17\n" +
 	"\acall_to\x18\x04 \x01(\tR\x06callTo\x12B\n" +
-	"\busername\x18\x05 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\busername\x12B\n" +
-	"\bpassword\x18\x06 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x1b\n" +
+	"\busername\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\busername\x12B\n" +
+	"\bpassword\x18\x06 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x1b\n" +
 	"\troom_name\x18\a \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\x0e \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
-	"\x14participant_metadata\x18\x0f \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\xa2\x01\n" +
-	"\x16participant_attributes\x18\x11 \x03(\v2C.rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12<\n" +
-	"\x05token\x18\t \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
+	"\x10participant_name\x18\x0e \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\x0f \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\xa2\x01\n" +
+	"\x16participant_attributes\x18\x11 \x03(\v2C.rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12<\n" +
+	"\x05token\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\n" +
 	" \x01(\tR\x05wsUrl\x12\x12\n" +
 	"\x04dtmf\x18\v \x01(\tR\x04dtmf\x12#\n" +
 	"\rplay_dialtone\x18\f \x01(\bR\fplayDialtone\x12w\n" +
-	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12u\n" +
+	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12u\n" +
 	"\x15headers_to_attributes\x18\x16 \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.HeadersToAttributesEntryR\x13headersToAttributes\x12u\n" +
 	"\x15attributes_to_headers\x18\x1a \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\x1b \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12>\n" +
@@ -529,7 +529,7 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x11max_call_duration\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12F\n" +
 	"\x10media_encryption\x18\x1c \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
 	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12N\n" +
-	"\fdisplay_name\x18\x1f \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>H\x00R\vdisplayName\x88\x01\x01\x126\n" +
+	"\fdisplay_name\x18\x1f \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x00R\vdisplayName\x88\x01\x01\x126\n" +
 	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationR\vdestination\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -553,7 +553,7 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
 	"transferTo\x12#\n" +
 	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12y\n" +
-	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
+	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
 	"\x0fringing_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

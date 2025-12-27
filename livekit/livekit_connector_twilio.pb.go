@@ -247,9 +247,9 @@ const file_livekit_connector_twilio_proto_rawDesc = "" +
 	"\troom_name\x18\x02 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\x03 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
 	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\x05 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
-	"\x14participant_metadata\x18\x06 \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9b\x01\n" +
-	"\x16participant_attributes\x18\a \x03(\v2<.livekit.ConnectTwilioCallRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
+	"\x10participant_name\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\x06 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9b\x01\n" +
+	"\x16participant_attributes\x18\a \x03(\v2<.livekit.ConnectTwilioCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
 	"\x13destination_country\x18\b \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

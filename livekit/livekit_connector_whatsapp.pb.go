@@ -785,16 +785,16 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x17DialWhatsAppCallRequest\x127\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x127\n" +
 	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tR\x15whatsappToPhoneNumber\x12.\n" +
-	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12;\n" +
+	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
 	"\troom_name\x18\x05 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\x06 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
 	"\x14participant_identity\x18\a \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\b \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
-	"\x14participant_metadata\x18\t \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9a\x01\n" +
+	"\x10participant_name\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9a\x01\n" +
 	"\x16participant_attributes\x18\n" +
-	" \x03(\v2;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
+	" \x03(\v2;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
 	"\x13destination_country\x18\v \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -804,7 +804,7 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\troom_name\x18\x02 \x01(\tR\broomName\"\x9f\x02\n" +
 	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12.\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12d\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12d\n" +
 	"\x11disconnect_reason\x18\x03 \x01(\x0e27.livekit.DisconnectWhatsAppCallRequest.DisconnectReasonR\x10disconnectReason\">\n" +
 	"\x10DisconnectReason\x12\x16\n" +
 	"\x12BUSINESS_INITIATED\x10\x00\x12\x12\n" +
@@ -816,7 +816,7 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x1bConnectWhatsAppCallResponse\"\xb0\a\n" +
 	"\x19AcceptWhatsAppCallRequest\x127\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12.\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xb5\x18\x01R\x0ewhatsappApiKey\x12;\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12(\n" +
 	"\x10whatsapp_call_id\x18\x03 \x01(\tR\x0ewhatsappCallId\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12-\n" +
@@ -824,10 +824,10 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\troom_name\x18\x06 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\a \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
 	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\t \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x10participant_name\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
 	"\x14participant_metadata\x18\n" +
-	" \x01(\tB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9c\x01\n" +
-	"\x16participant_attributes\x18\v \x03(\v2=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xb5\x18\x01\x92\xb5\x18\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
+	" \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9c\x01\n" +
+	"\x16participant_attributes\x18\v \x03(\v2=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
 	"\x13destination_country\x18\f \x01(\tR\x12destinationCountry\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
