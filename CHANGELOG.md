@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.43.5
+
+### Patch Changes
+
+- Changing the wording on duplicate dispatch rule error message - [#1343](https://github.com/livekit/protocol/pull/1343) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Add project ID to internal SIPCall info. - [#1346](https://github.com/livekit/protocol/pull/1346) ([@dennwc](https://github.com/dennwc))
+
+- Store repair ssrc in TrackInfo for migration purposes. - [#1348](https://github.com/livekit/protocol/pull/1348) ([@boks1971](https://github.com/boks1971))
+
 ## 1.43.4
 
 ### Patch Changes
