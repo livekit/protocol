@@ -6,6 +6,6 @@ option go_package = "github.com/livekit/protocol/livekit/logger";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.FieldOptions {
-  bool redact = 50001;
-  string redact_format = 50002;
+  bool redact = 91841;
+  string redact_format = 91842;
 }
