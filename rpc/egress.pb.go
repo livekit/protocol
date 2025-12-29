@@ -59,6 +59,7 @@ type StartEgressRequest struct {
 	// cloud only
 	CloudBackupEnabled bool    `protobuf:"varint,10,opt,name=cloud_backup_enabled,json=cloudBackupEnabled,proto3" json:"cloud_backup_enabled,omitempty"`
 	EstimatedCpu       float64 `protobuf:"fixed64,14,opt,name=estimated_cpu,json=estimatedCpu,proto3" json:"estimated_cpu,omitempty"`
+	Retries            int32   `protobuf:"varint,15,opt,name=retries,proto3" json:"retries,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -187,6 +188,13 @@ func (x *StartEgressRequest) GetEstimatedCpu() float64 {
 	return 0
 }
 
+func (x *StartEgressRequest) GetRetries() int32 {
+	if x != nil {
+		return x.Retries
+	}
+	return 0
+}
+
 type isStartEgressRequest_Request interface {
 	isStartEgressRequest_Request()
 }
@@ -305,7 +313,7 @@ var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xa9\x04\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xc3\x04\n" +
 	"\x12StartEgressRequest\x12\x1b\n" +
 	"\tegress_id\x18\x01 \x01(\tR\begressId\x12L\n" +
 	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
@@ -318,7 +326,8 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\x06ws_url\x18\t \x01(\tR\x05wsUrl\x120\n" +
 	"\x14cloud_backup_enabled\x18\n" +
 	" \x01(\bR\x12cloudBackupEnabled\x12#\n" +
-	"\restimated_cpu\x18\x0e \x01(\x01R\festimatedCpuB\t\n" +
+	"\restimated_cpu\x18\x0e \x01(\x01R\festimatedCpu\x12\x18\n" +
+	"\aretries\x18\x0f \x01(\x05R\aretriesB\t\n" +
 	"\arequest\"\x19\n" +
 	"\x17ListActiveEgressRequest\"9\n" +
 	"\x18ListActiveEgressResponse\x12\x1d\n" +
