@@ -1534,6 +1534,7 @@ type TextMessageResponse struct {
 	Response      string                 `protobuf:"bytes,2,opt,name=response,proto3" json:"response,omitempty"`
 	SessionData   []byte                 `protobuf:"bytes,3,opt,name=session_data,json=sessionData,proto3" json:"session_data,omitempty"`
 	Error         string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	Terminate     bool                   `protobuf:"varint,5,opt,name=terminate,proto3" json:"terminate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1594,6 +1595,13 @@ func (x *TextMessageResponse) GetError() string {
 		return x.Error
 	}
 	return ""
+}
+
+func (x *TextMessageResponse) GetTerminate() bool {
+	if x != nil {
+		return x.Terminate
+	}
+	return false
 }
 
 var File_livekit_agent_proto protoreflect.FileDescriptor
@@ -1714,13 +1722,14 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
 	"agent_name\x18\x03 \x01(\tR\tagentName\x12!\n" +
 	"\fsession_data\x18\x04 \x01(\fR\vsessionData\x12\x12\n" +
-	"\x04text\x18\x05 \x01(\tR\x04text\"\x89\x01\n" +
+	"\x04text\x18\x05 \x01(\tR\x04text\"\xa7\x01\n" +
 	"\x13TextMessageResponse\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1a\n" +
 	"\bresponse\x18\x02 \x01(\tR\bresponse\x12!\n" +
 	"\fsession_data\x18\x03 \x01(\fR\vsessionData\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error*<\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\x12\x1c\n" +
+	"\tterminate\x18\x05 \x01(\bR\tterminate*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
 	"\fJT_PUBLISHER\x10\x01\x12\x12\n" +
