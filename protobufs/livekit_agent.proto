@@ -199,4 +199,5 @@ message TextMessageResponse {
   string response = 2;
   bytes session_data = 3;
   string error = 4;
+  bool terminate = 5;
 }
