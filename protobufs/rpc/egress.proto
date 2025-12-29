@@ -63,6 +63,7 @@ message StartEgressRequest {
   // cloud only
   bool cloud_backup_enabled = 10;
   double estimated_cpu = 14;
+  int32 retries = 15;
 }
 
 message ListActiveEgressRequest {}
