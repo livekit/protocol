@@ -188,10 +188,11 @@ message JobTermination {
 
 message TextMessageRequest {
   string message_id = 1;
-  string participant_identity = 2;
+  string session_id = 2;
   string agent_name = 3;
-  bytes session_data = 4;
-  string text = 5;
+  string metadata = 4;
+  bytes session_data = 5;
+  string text = 6;
 }
 
 message TextMessageResponse {
@@ -199,5 +200,4 @@ message TextMessageResponse {
   string response = 2;
   bytes session_data = 3;
   string error = 4;
-  bool terminate = 5;
 }
