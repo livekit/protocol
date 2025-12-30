@@ -43,10 +43,7 @@ message CreateIngressRequest {
   // publish as participant
   string participant_identity = 4;
   // name of publishing participant (used for display only)
-  string participant_name = 5 [
-    (logger.redact) = true,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
+  string participant_name = 5 [(logger.redact) = true];
   // metadata associated with the publishing participant
   string participant_metadata = 10 [
     (logger.redact) = true,
@@ -138,10 +135,7 @@ message IngressInfo {
   IngressVideoOptions video = 7;
   string room_name = 8;
   string participant_identity = 9;
-  string participant_name = 10 [
-    (logger.redact) = true,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
+  string participant_name = 10 [(logger.redact) = true];
   string participant_metadata = 14 [
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
@@ -196,10 +190,7 @@ message UpdateIngressRequest {
   string name = 2;
   string room_name = 3;
   string participant_identity = 4;
-  string participant_name = 5 [
-    (logger.redact) = true,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
+  string participant_name = 5 [(logger.redact) = true];
   string participant_metadata = 9 [
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
