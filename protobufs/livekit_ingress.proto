@@ -17,6 +17,7 @@ syntax = "proto3";
 package livekit;
 
 import "livekit_models.proto";
+import "logger/options.proto";
 
 option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
@@ -42,9 +43,12 @@ message CreateIngressRequest {
   // publish as participant
   string participant_identity = 4;
   // name of publishing participant (used for display only)
-  string participant_name = 5;
+  string participant_name = 5 [(logger.redact) = true];
   // metadata associated with the publishing participant
-  string participant_metadata = 10;
+  string participant_metadata = 10 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   // [depreacted ] whether to pass through the incoming media without transcoding, only compatible with some input types. Use `enable_transcoding` instead.
   bool bypass_transcoding = 8 [deprecated = true];
   // Whether to transcode the ingested media. Only WHIP supports disabling transcoding currently. WHIP will default to transcoding disabled. Replaces `bypass_transcoding. 
@@ -131,8 +135,11 @@ message IngressInfo {
   IngressVideoOptions video = 7;
   string room_name = 8;
   string participant_identity = 9;
-  string participant_name = 10;
-  string participant_metadata = 14;
+  string participant_name = 10 [(logger.redact) = true];
+  string participant_metadata = 14 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   bool reusable = 11;
   IngressState state = 12; // Description of error/stream non compliance and debug info for publisher otherwise (received bitrate, resolution, bandwidth)
   optional bool enabled = 16; // The default value is true and when set to false, the new connection attempts will be rejected
@@ -183,8 +190,11 @@ message UpdateIngressRequest {
   string name = 2;
   string room_name = 3;
   string participant_identity = 4;
-  string participant_name = 5;
-  string participant_metadata = 9;
+  string participant_name = 5 [(logger.redact) = true];
+  string participant_metadata = 9 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
   optional bool bypass_transcoding = 8 [deprecated = true];
   optional bool enable_transcoding = 10;
   IngressAudioOptions audio = 6;

@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -1425,17 +1426,17 @@ var File_livekit_ingress_proto protoreflect.FileDescriptor
 
 const file_livekit_ingress_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_ingress.proto\x12\alivekit\x1a\x14livekit_models.proto\"\xb1\x04\n" +
+	"\x15livekit_ingress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xdf\x04\n" +
 	"\x14CreateIngressRequest\x124\n" +
 	"\n" +
 	"input_type\x18\x01 \x01(\x0e2\x15.livekit.IngressInputR\tinputType\x12\x10\n" +
 	"\x03url\x18\t \x01(\tR\x03url\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\x05 \x01(\tR\x0fparticipantName\x121\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12/\n" +
+	"\x10participant_name\x18\x05 \x01(\tB\x04\x88\xec,\x01R\x0fparticipantName\x12Y\n" +
 	"\x14participant_metadata\x18\n" +
-	" \x01(\tR\x13participantMetadata\x121\n" +
+	" \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x121\n" +
 	"\x12bypass_transcoding\x18\b \x01(\bB\x02\x18\x01R\x11bypassTranscoding\x122\n" +
 	"\x12enable_transcoding\x18\v \x01(\bH\x00R\x11enableTranscoding\x88\x01\x01\x122\n" +
 	"\x05audio\x18\x06 \x01(\v2\x1c.livekit.IngressAudioOptionsR\x05audio\x122\n" +
@@ -1468,7 +1469,7 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"videoCodec\x12\x1d\n" +
 	"\n" +
 	"frame_rate\x18\x02 \x01(\x01R\tframeRate\x12+\n" +
-	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xaf\x05\n" +
+	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xdd\x05\n" +
 	"\vIngressInfo\x12\x1d\n" +
 	"\n" +
 	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x12\n" +
@@ -1483,10 +1484,10 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x05audio\x18\x06 \x01(\v2\x1c.livekit.IngressAudioOptionsR\x05audio\x122\n" +
 	"\x05video\x18\a \x01(\v2\x1c.livekit.IngressVideoOptionsR\x05video\x12\x1b\n" +
 	"\troom_name\x18\b \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\t \x01(\tR\x13participantIdentity\x12)\n" +
+	"\x14participant_identity\x18\t \x01(\tR\x13participantIdentity\x12/\n" +
 	"\x10participant_name\x18\n" +
-	" \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\x0e \x01(\tR\x13participantMetadata\x12\x1a\n" +
+	" \x01(\tB\x04\x88\xec,\x01R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\x0e \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x1a\n" +
 	"\breusable\x18\v \x01(\bR\breusable\x12+\n" +
 	"\x05state\x18\f \x01(\v2\x15.livekit.IngressStateR\x05state\x12\x1d\n" +
 	"\aenabled\x18\x10 \x01(\bH\x01R\aenabled\x88\x01\x01B\x15\n" +
@@ -1525,15 +1526,15 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x0faverage_bitrate\x18\x02 \x01(\rR\x0eaverageBitrate\x12\x1a\n" +
 	"\bchannels\x18\x03 \x01(\rR\bchannels\x12\x1f\n" +
 	"\vsample_rate\x18\x04 \x01(\rR\n" +
-	"sampleRate\"\xa4\x04\n" +
+	"sampleRate\"\xd2\x04\n" +
 	"\x14UpdateIngressRequest\x12\x1d\n" +
 	"\n" +
 	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\x05 \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\t \x01(\tR\x13participantMetadata\x126\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12/\n" +
+	"\x10participant_name\x18\x05 \x01(\tB\x04\x88\xec,\x01R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x126\n" +
 	"\x12bypass_transcoding\x18\b \x01(\bB\x02\x18\x01H\x00R\x11bypassTranscoding\x88\x01\x01\x122\n" +
 	"\x12enable_transcoding\x18\n" +
 	" \x01(\bH\x01R\x11enableTranscoding\x88\x01\x01\x122\n" +
