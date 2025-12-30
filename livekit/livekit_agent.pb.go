@@ -1453,14 +1453,15 @@ func (x *JobTermination) GetJobId() string {
 }
 
 type TextMessageRequest struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	MessageId           string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	ParticipantIdentity string                 `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
-	AgentName           string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	SessionData         []byte                 `protobuf:"bytes,4,opt,name=session_data,json=sessionData,proto3" json:"session_data,omitempty"`
-	Text                string                 `protobuf:"bytes,5,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	SessionId     string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	AgentName     string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Metadata      string                 `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	SessionData   []byte                 `protobuf:"bytes,5,opt,name=session_data,json=sessionData,proto3" json:"session_data,omitempty"`
+	Text          string                 `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TextMessageRequest) Reset() {
@@ -1500,9 +1501,9 @@ func (x *TextMessageRequest) GetMessageId() string {
 	return ""
 }
 
-func (x *TextMessageRequest) GetParticipantIdentity() string {
+func (x *TextMessageRequest) GetSessionId() string {
 	if x != nil {
-		return x.ParticipantIdentity
+		return x.SessionId
 	}
 	return ""
 }
@@ -1510,6 +1511,13 @@ func (x *TextMessageRequest) GetParticipantIdentity() string {
 func (x *TextMessageRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
+	}
+	return ""
+}
+
+func (x *TextMessageRequest) GetMetadata() string {
+	if x != nil {
+		return x.Metadata
 	}
 	return ""
 }
@@ -1534,7 +1542,6 @@ type TextMessageResponse struct {
 	Response      string                 `protobuf:"bytes,2,opt,name=response,proto3" json:"response,omitempty"`
 	SessionData   []byte                 `protobuf:"bytes,3,opt,name=session_data,json=sessionData,proto3" json:"session_data,omitempty"`
 	Error         string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
-	Terminate     bool                   `protobuf:"varint,5,opt,name=terminate,proto3" json:"terminate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1595,13 +1602,6 @@ func (x *TextMessageResponse) GetError() string {
 		return x.Error
 	}
 	return ""
-}
-
-func (x *TextMessageResponse) GetTerminate() bool {
-	if x != nil {
-		return x.Terminate
-	}
-	return false
 }
 
 var File_livekit_agent_proto protoreflect.FileDescriptor
@@ -1714,22 +1714,23 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"'\n" +
 	"\x0eJobTermination\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"\xbc\x01\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"\xc4\x01\n" +
 	"\x12TextMessageRequest\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x121\n" +
-	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1d\n" +
+	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x03 \x01(\tR\tagentName\x12!\n" +
-	"\fsession_data\x18\x04 \x01(\fR\vsessionData\x12\x12\n" +
-	"\x04text\x18\x05 \x01(\tR\x04text\"\xa7\x01\n" +
+	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1a\n" +
+	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12!\n" +
+	"\fsession_data\x18\x05 \x01(\fR\vsessionData\x12\x12\n" +
+	"\x04text\x18\x06 \x01(\tR\x04text\"\x89\x01\n" +
 	"\x13TextMessageResponse\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1a\n" +
 	"\bresponse\x18\x02 \x01(\tR\bresponse\x12!\n" +
 	"\fsession_data\x18\x03 \x01(\fR\vsessionData\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\x12\x1c\n" +
-	"\tterminate\x18\x05 \x01(\bR\tterminate*<\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
 	"\fJT_PUBLISHER\x10\x01\x12\x12\n" +
