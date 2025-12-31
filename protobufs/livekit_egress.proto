@@ -390,7 +390,8 @@ message EgressInfo {
   repeated ImagesInfo image_results = 20;
   string manifest_location = 23;
   bool backup_storage_used = 25;
-  // next ID: 27
+  int32 retries = 27;
+  // next ID: 28
 }
 
 message StreamInfoList {
