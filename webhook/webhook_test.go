@@ -346,6 +346,38 @@ func TestURLNotifierFilter(t *testing.T) {
 			webhookCheckInterval,
 		)
 	})
+
+	t.Run("room metadata changed", func(t *testing.T) {
+		urlNotifier := NewURLNotifier(URLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			FilterParams: FilterParams{
+				IncludeEvents: []string{EventRoomMetadataChanged},
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
+			},
+		})
+		defer urlNotifier.Stop(false)
+
+		numCalled := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			numCalled.Inc()
+		}
+
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomMetadataChanged})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
+		require.Eventually(
+			t,
+			func() bool {
+				return numCalled.Load() == 1
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
 }
 
 func newTestNotifier() *URLNotifier {
@@ -701,6 +733,8 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 }
 
 func TestResourceURLNotifierFilter(t *testing.T) {
+	InitWebhookStats(prometheus.Labels{})
+
 	s := newServer(testAddr)
 	require.NoError(t, s.Start())
 	defer s.Stop()
@@ -821,6 +855,39 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 		}
 
 		// EventRoomStarted should be allowed as IncludeEvents take precedence
+		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
+		require.Eventually(
+			t,
+			func() bool {
+				return numCalled.Load() == 1
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
+
+	t.Run("room metadata changed", func(t *testing.T) {
+		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
+			FilterParams: FilterParams{
+				IncludeEvents: []string{EventRoomMetadataChanged},
+			},
+		})
+		defer resourceURLNotifier.Stop(false)
+
+		numCalled := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			numCalled.Inc()
+		}
+
+		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomMetadataChanged})
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		require.Eventually(
