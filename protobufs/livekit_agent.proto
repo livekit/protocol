@@ -63,6 +63,7 @@ message WorkerMessage {
     MigrateJobRequest migrate_job = 7;
 
     TextMessageResponse text_response = 8;
+    UpdateSessionData update_session_data = 9;
   };
 }
 
@@ -195,9 +196,14 @@ message TextMessageRequest {
   string text = 6;
 }
 
+message UpdateSessionData {
+  string session_id = 1;
+  bytes session_data = 2;
+  int64 timestamp = 3;
+}
+
 message TextMessageResponse {
   string message_id = 1;
   string response = 2;
-  bytes session_data = 3;
-  string error = 4;
+  string error = 3;
 }
