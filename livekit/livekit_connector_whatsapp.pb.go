@@ -136,7 +136,7 @@ func (DisconnectWhatsAppCallRequest_DisconnectReason) EnumDescriptor() ([]byte, 
 
 type DialWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Required - The number of the business that is initiating the call
+	// Required - The phone number id of the business that is initiating the call
 	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
 	// Required - The number of the user that is supossed to receive the call
 	WhatsappToPhoneNumber string `protobuf:"bytes,2,opt,name=whatsapp_to_phone_number,json=whatsappToPhoneNumber,proto3" json:"whatsapp_to_phone_number,omitempty"`
@@ -151,6 +151,7 @@ type DialWhatsAppCallRequest struct {
 	// Optional - Agents to dispatch the call to
 	Agents []*RoomAgentDispatch `protobuf:"bytes,6,rep,name=agents,proto3" json:"agents,omitempty"`
 	// Optional - Identity of the participant in LiveKit room
+	// This is used for logging purposes, so it is advised to not put PII in this field.
 	ParticipantIdentity string `protobuf:"bytes,7,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	// Optional - Name of the participant in LiveKit room
 	ParticipantName string `protobuf:"bytes,8,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
@@ -526,7 +527,7 @@ func (*ConnectWhatsAppCallResponse) Descriptor() ([]byte, []int) {
 
 type AcceptWhatsAppCallRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Required - The number of the business that is conencting the call
+	// Required - The phone number id of the business that is conencting the call
 	WhatsappPhoneNumberId string `protobuf:"bytes,1,opt,name=whatsapp_phone_number_id,json=whatsappPhoneNumberId,proto3" json:"whatsapp_phone_number_id,omitempty"`
 	// Required - The API key of the business that is connecting the call
 	WhatsappApiKey string `protobuf:"bytes,2,opt,name=whatsapp_api_key,json=whatsappApiKey,proto3" json:"whatsapp_api_key,omitempty"`
@@ -544,6 +545,7 @@ type AcceptWhatsAppCallRequest struct {
 	// Optional - Agents to dispatch the call to
 	Agents []*RoomAgentDispatch `protobuf:"bytes,7,rep,name=agents,proto3" json:"agents,omitempty"`
 	// Optional - Identity of the participant in LiveKit room
+	// This is used for logging purposes, so it is advised to not put PII in this field.
 	ParticipantIdentity string `protobuf:"bytes,8,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	// Optional - Name of the participant in LiveKit room
 	ParticipantName string `protobuf:"bytes,9,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`
@@ -781,10 +783,10 @@ var File_livekit_connector_whatsapp_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\n" +
-	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\x8c\a\n" +
+	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\x92\a\n" +
 	"\x17DialWhatsAppCallRequest\x127\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x127\n" +
-	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tR\x15whatsappToPhoneNumber\x12.\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12=\n" +
+	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x15whatsappToPhoneNumber\x12.\n" +
 	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
