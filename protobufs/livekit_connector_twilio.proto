@@ -38,6 +38,7 @@ message ConnectTwilioCallRequest {
   // Optional agents to dispatch the call to
   repeated RoomAgentDispatch agents = 3;
   // Optional identity of the participant in LiveKit room
+  // This is used for logging purposes, so it is advised to not put PII in this field.
   string participant_identity= 4;
   // Optional name of the participant in LiveKit room
   string participant_name = 5 [

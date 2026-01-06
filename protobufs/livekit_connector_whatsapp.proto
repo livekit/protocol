@@ -24,10 +24,10 @@ import "livekit_rtc.proto";
 import "logger/options.proto";
 
 message DialWhatsAppCallRequest {
-  // Required - The number of the business that is initiating the call
+  // Required - The phone number id of the business that is initiating the call
   string whatsapp_phone_number_id = 1;
   // Required - The number of the user that is supossed to receive the call
-  string whatsapp_to_phone_number = 2;
+  string whatsapp_to_phone_number = 2 [(logger.redact) = true];
   // Required - The API key of the business that is initiating the call
   string whatsapp_api_key = 3 [(logger.redact) = true];
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
@@ -39,6 +39,7 @@ message DialWhatsAppCallRequest {
   // Optional - Agents to dispatch the call to
   repeated RoomAgentDispatch agents = 6;
   // Optional - Identity of the participant in LiveKit room
+  // This is used for logging purposes, so it is advised to not put PII in this field.
   string participant_identity= 7;
   // Optional - Name of the participant in LiveKit room
   string participant_name = 8 [
@@ -104,7 +105,7 @@ message ConnectWhatsAppCallResponse {
 }
 
 message AcceptWhatsAppCallRequest {
-  // Required - The number of the business that is conencting the call
+  // Required - The phone number id of the business that is conencting the call
   string whatsapp_phone_number_id = 1;
   // Required - The API key of the business that is connecting the call
   string whatsapp_api_key = 2 [(logger.redact) = true];
@@ -122,6 +123,7 @@ message AcceptWhatsAppCallRequest {
   // Optional - Agents to dispatch the call to
   repeated RoomAgentDispatch agents = 7;
   // Optional - Identity of the participant in LiveKit room
+  // This is used for logging purposes, so it is advised to not put PII in this field.
   string participant_identity= 8;
   // Optional - Name of the participant in LiveKit room
   string participant_name = 9 [
