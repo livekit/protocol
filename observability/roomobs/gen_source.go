@@ -81,6 +81,7 @@ type Rollup string
 const (
 	RollupUndefined               Rollup = ""
 	RollupProject                 Rollup = "project"
+	RollupRoomSession             Rollup = "room_session"
 	RollupRoomSessionIndex        Rollup = "room_session_index"
 	RollupParticipantIndex        Rollup = "participant_index"
 	RollupParticipantSessionIndex Rollup = "participant_session_index"
