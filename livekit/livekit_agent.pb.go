@@ -413,7 +413,7 @@ type WorkerMessage struct {
 	//	*WorkerMessage_SimulateJob
 	//	*WorkerMessage_MigrateJob
 	//	*WorkerMessage_TextResponse
-	//	*WorkerMessage_UpdateSessionData
+	//	*WorkerMessage_PushText
 	Message       isWorkerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -528,10 +528,10 @@ func (x *WorkerMessage) GetTextResponse() *TextMessageResponse {
 	return nil
 }
 
-func (x *WorkerMessage) GetUpdateSessionData() *UpdateSessionData {
+func (x *WorkerMessage) GetPushText() *PushTextRequest {
 	if x != nil {
-		if x, ok := x.Message.(*WorkerMessage_UpdateSessionData); ok {
-			return x.UpdateSessionData
+		if x, ok := x.Message.(*WorkerMessage_PushText); ok {
+			return x.PushText
 		}
 	}
 	return nil
@@ -577,8 +577,8 @@ type WorkerMessage_TextResponse struct {
 	TextResponse *TextMessageResponse `protobuf:"bytes,8,opt,name=text_response,json=textResponse,proto3,oneof"`
 }
 
-type WorkerMessage_UpdateSessionData struct {
-	UpdateSessionData *UpdateSessionData `protobuf:"bytes,9,opt,name=update_session_data,json=updateSessionData,proto3,oneof"`
+type WorkerMessage_PushText struct {
+	PushText *PushTextRequest `protobuf:"bytes,9,opt,name=push_text,json=pushText,proto3,oneof"`
 }
 
 func (*WorkerMessage_Register) isWorkerMessage_Message() {}
@@ -597,7 +597,7 @@ func (*WorkerMessage_MigrateJob) isWorkerMessage_Message() {}
 
 func (*WorkerMessage_TextResponse) isWorkerMessage_Message() {}
 
-func (*WorkerMessage_UpdateSessionData) isWorkerMessage_Message() {}
+func (*WorkerMessage_PushText) isWorkerMessage_Message() {}
 
 // from Server to Worker
 type ServerMessage struct {
@@ -733,7 +733,7 @@ type ServerMessage_Pong struct {
 }
 
 type ServerMessage_TextRequest struct {
-	TextRequest *TextMessageRequest `protobuf:"bytes,9,opt,name=text_request,json=textRequest,proto3,oneof"`
+	TextRequest *TextMessageRequest `protobuf:"bytes,6,opt,name=text_request,json=textRequest,proto3,oneof"`
 }
 
 func (*ServerMessage_Register) isServerMessage_Message() {}
@@ -1552,29 +1552,29 @@ func (x *TextMessageRequest) GetText() string {
 	return ""
 }
 
-type UpdateSessionData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	SessionData   []byte                 `protobuf:"bytes,2,opt,name=session_data,json=sessionData,proto3" json:"session_data,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+type PushTextRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The message_id of the TextMessageRequest that this push is for
+	MessageId     string `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	Content       string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UpdateSessionData) Reset() {
-	*x = UpdateSessionData{}
+func (x *PushTextRequest) Reset() {
+	*x = PushTextRequest{}
 	mi := &file_livekit_agent_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UpdateSessionData) String() string {
+func (x *PushTextRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UpdateSessionData) ProtoMessage() {}
+func (*PushTextRequest) ProtoMessage() {}
 
-func (x *UpdateSessionData) ProtoReflect() protoreflect.Message {
+func (x *PushTextRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1586,37 +1586,31 @@ func (x *UpdateSessionData) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UpdateSessionData.ProtoReflect.Descriptor instead.
-func (*UpdateSessionData) Descriptor() ([]byte, []int) {
+// Deprecated: Use PushTextRequest.ProtoReflect.Descriptor instead.
+func (*PushTextRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *UpdateSessionData) GetSessionId() string {
+func (x *PushTextRequest) GetMessageId() string {
 	if x != nil {
-		return x.SessionId
+		return x.MessageId
 	}
 	return ""
 }
 
-func (x *UpdateSessionData) GetSessionData() []byte {
+func (x *PushTextRequest) GetContent() string {
 	if x != nil {
-		return x.SessionData
+		return x.Content
 	}
-	return nil
-}
-
-func (x *UpdateSessionData) GetTimestamp() int64 {
-	if x != nil {
-		return x.Timestamp
-	}
-	return 0
+	return ""
 }
 
 type TextMessageResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	Response      string                 `protobuf:"bytes,2,opt,name=response,proto3" json:"response,omitempty"`
-	Error         string                 `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Indicate the request is completed
+	MessageId     string `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	SessionData   []byte `protobuf:"bytes,2,opt,name=session_data,json=sessionData,proto3" json:"session_data,omitempty"`
+	Error         string `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1658,11 +1652,11 @@ func (x *TextMessageResponse) GetMessageId() string {
 	return ""
 }
 
-func (x *TextMessageResponse) GetResponse() string {
+func (x *TextMessageResponse) GetSessionData() []byte {
 	if x != nil {
-		return x.Response
+		return x.SessionData
 	}
-	return ""
+	return nil
 }
 
 func (x *TextMessageResponse) GetError() string {
@@ -1702,7 +1696,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"updated_at\x18\x05 \x01(\x03R\tupdatedAt\x121\n" +
 	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x12\x1b\n" +
 	"\tworker_id\x18\a \x01(\tR\bworkerId\x12\x19\n" +
-	"\bagent_id\x18\b \x01(\tR\aagentId\"\xdb\x04\n" +
+	"\bagent_id\x18\b \x01(\tR\aagentId\"\xc6\x04\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
@@ -1713,8 +1707,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\fsimulate_job\x18\x06 \x01(\v2\x1b.livekit.SimulateJobRequestH\x00R\vsimulateJob\x12=\n" +
 	"\vmigrate_job\x18\a \x01(\v2\x1a.livekit.MigrateJobRequestH\x00R\n" +
 	"migrateJob\x12C\n" +
-	"\rtext_response\x18\b \x01(\v2\x1c.livekit.TextMessageResponseH\x00R\ftextResponse\x12L\n" +
-	"\x13update_session_data\x18\t \x01(\v2\x1a.livekit.UpdateSessionDataH\x00R\x11updateSessionDataB\t\n" +
+	"\rtext_response\x18\b \x01(\v2\x1c.livekit.TextMessageResponseH\x00R\ftextResponse\x127\n" +
+	"\tpush_text\x18\t \x01(\v2\x18.livekit.PushTextRequestH\x00R\bpushTextB\t\n" +
 	"\amessage\"\x81\x03\n" +
 	"\rServerMessage\x12=\n" +
 	"\bregister\x18\x01 \x01(\v2\x1f.livekit.RegisterWorkerResponseH\x00R\bregister\x12B\n" +
@@ -1724,7 +1718,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"assignment\x12;\n" +
 	"\vtermination\x18\x05 \x01(\v2\x17.livekit.JobTerminationH\x00R\vtermination\x12)\n" +
 	"\x04pong\x18\x04 \x01(\v2\x13.livekit.WorkerPongH\x00R\x04pong\x12@\n" +
-	"\ftext_request\x18\t \x01(\v2\x1b.livekit.TextMessageRequestH\x00R\vtextRequestB\t\n" +
+	"\ftext_request\x18\x06 \x01(\v2\x1b.livekit.TextMessageRequestH\x00R\vtextRequestB\t\n" +
 	"\amessage\"\x99\x01\n" +
 	"\x12SimulateJobRequest\x12$\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x10.livekit.JobTypeR\x04type\x12!\n" +
@@ -1793,16 +1787,15 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1a\n" +
 	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12!\n" +
 	"\fsession_data\x18\x05 \x01(\fR\vsessionData\x12\x12\n" +
-	"\x04text\x18\x06 \x01(\tR\x04text\"s\n" +
-	"\x11UpdateSessionData\x12\x1d\n" +
+	"\x04text\x18\x06 \x01(\tR\x04text\"J\n" +
+	"\x0fPushTextRequest\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12!\n" +
-	"\fsession_data\x18\x02 \x01(\fR\vsessionData\x12\x1c\n" +
-	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp\"f\n" +
+	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\"m\n" +
 	"\x13TextMessageResponse\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1a\n" +
-	"\bresponse\x18\x02 \x01(\tR\bresponse\x12\x14\n" +
+	"message_id\x18\x01 \x01(\tR\tmessageId\x12!\n" +
+	"\fsession_data\x18\x02 \x01(\fR\vsessionData\x12\x14\n" +
 	"\x05error\x18\x03 \x01(\tR\x05error*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
@@ -1855,7 +1848,7 @@ var file_livekit_agent_proto_goTypes = []any{
 	(*JobAssignment)(nil),          // 17: livekit.JobAssignment
 	(*JobTermination)(nil),         // 18: livekit.JobTermination
 	(*TextMessageRequest)(nil),     // 19: livekit.TextMessageRequest
-	(*UpdateSessionData)(nil),      // 20: livekit.UpdateSessionData
+	(*PushTextRequest)(nil),        // 20: livekit.PushTextRequest
 	(*TextMessageResponse)(nil),    // 21: livekit.TextMessageResponse
 	nil,                            // 22: livekit.AvailabilityResponse.ParticipantAttributesEntry
 	(*Room)(nil),                   // 23: livekit.Room
@@ -1877,7 +1870,7 @@ var file_livekit_agent_proto_depIdxs = []int32{
 	7,  // 10: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
 	12, // 11: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
 	21, // 12: livekit.WorkerMessage.text_response:type_name -> livekit.TextMessageResponse
-	20, // 13: livekit.WorkerMessage.update_session_data:type_name -> livekit.UpdateSessionData
+	20, // 13: livekit.WorkerMessage.push_text:type_name -> livekit.PushTextRequest
 	11, // 14: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
 	13, // 15: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
 	17, // 16: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
@@ -1918,7 +1911,7 @@ func file_livekit_agent_proto_init() {
 		(*WorkerMessage_SimulateJob)(nil),
 		(*WorkerMessage_MigrateJob)(nil),
 		(*WorkerMessage_TextResponse)(nil),
-		(*WorkerMessage_UpdateSessionData)(nil),
+		(*WorkerMessage_PushText)(nil),
 	}
 	file_livekit_agent_proto_msgTypes[3].OneofWrappers = []any{
 		(*ServerMessage_Register)(nil),
