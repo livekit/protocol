@@ -63,7 +63,7 @@ message WorkerMessage {
     MigrateJobRequest migrate_job = 7;
 
     TextMessageResponse text_response = 8;
-    UpdateSessionData update_session_data = 9;
+    PushTextRequest push_text = 9;
   };
 }
 
@@ -78,7 +78,7 @@ message ServerMessage {
     JobTermination termination = 5;
     WorkerPong pong = 4;
 
-    TextMessageRequest text_request = 9;
+    TextMessageRequest text_request = 6;
   }
 }
 
@@ -196,14 +196,17 @@ message TextMessageRequest {
   string text = 6;
 }
 
-message UpdateSessionData {
-  string session_id = 1;
-  bytes session_data = 2;
-  int64 timestamp = 3;
+
+message PushTextRequest {
+  // The message_id of the TextMessageRequest that this push is for
+  string message_id = 1;
+  string content = 2;
 }
 
+
 message TextMessageResponse {
+  // Indicate the request is completed
   string message_id = 1;
-  string response = 2;
+  bytes session_data = 2;
   string error = 3;
 }
