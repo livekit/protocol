@@ -68,3 +68,11 @@ func TestMiddleware(t *testing.T) {
 		}
 	})
 }
+
+func TestPropagateRequestTimeout(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 42*time.Second)
+	defer cancel()
+	var ro psrpc.RequestOpts
+	WithPropagateRequestTimeout(ctx)(&ro)
+	require.InEpsilon(t, 42*time.Second, ro.Timeout, 0.01)
+}
