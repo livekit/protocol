@@ -27,6 +27,19 @@ enum AgentSecretKind {
     AGENT_SECRET_KIND_FILE = 2;
 }
 
+enum AgentEventType {
+    AGENT_EVENT_TYPE_UNKNOWN = 0;
+    AGENT_EVENT_TYPE_APPLICATION_CRASHED = 1;
+    AGENT_EVENT_TYPE_RESTARTED_HIGH_DISK_USAGE = 2;
+    AGENT_EVENT_TYPE_RESTARTED_HIGH_MEMORY_USAGE = 3;
+}
+
+message AgentEvent {
+    AgentEventType type = 1;
+    int32 count = 2;
+    google.protobuf.Timestamp timestamp = 3;
+}
+
 message AgentSecret {
     string name = 1;
     bytes value = 2;
@@ -74,6 +87,7 @@ message AgentDeployment {
     string mem_limit = 11;
     string cpu_limit = 12;
     string server_region = 13;
+    repeated AgentEvent events = 14;
 }
 
 message AgentInfo {
