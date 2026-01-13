@@ -33,7 +33,7 @@
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "^1.10.0",
     "genversion": "^3.2.0",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "unbuild": "^2.0.0"
   },
   "dependencies": {
