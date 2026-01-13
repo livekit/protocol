@@ -708,11 +708,14 @@ func TestEvaluateDispatchRule(t *testing.T) {
 		CallingNumber: "+11112222",
 		CallingHost:   "sip.example.com",
 		CalledNumber:  "+3333",
+		CalledHost:    "sip2.example.com",
 		ExtraAttributes: map[string]string{
 			"prov-attr": "1",
 		},
 	}
-	tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+	tr := &livekit.SIPInboundTrunkInfo{
+		SipTrunkId: "trunk",
+	}
 	res, err := EvaluateDispatchRule("p_123", tr, d, r)
 	require.NoError(t, err)
 	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
@@ -732,6 +735,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			livekit.AttrSIPDispatchRuleID: "rule",
 			livekit.AttrSIPPhoneNumber:    "+11112222",
 			livekit.AttrSIPTrunkNumber:    "+3333",
+			livekit.AttrSIPTrunkHostName:  "sip2.example.com",
 			livekit.AttrSIPHostName:       "sip.example.com",
 		},
 	}, res)
