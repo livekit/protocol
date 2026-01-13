@@ -24,8 +24,29 @@ import (
 
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
+	"go.opentelemetry.io/otel/attribute"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	TraceKeyPref = "lk."
+
+	TraceKeyRoomPrefix = TraceKeyPref + "room."
+	TraceKeyRoomID     = attribute.Key(TraceKeyRoomPrefix + "id")
+	TraceKeyRoomName   = attribute.Key(TraceKeyRoomPrefix + "name")
+
+	TraceKeyParticipantPrefix   = TraceKeyPref + "participant."
+	TraceKeyParticipantID       = attribute.Key(TraceKeyParticipantPrefix + "id")
+	TraceKeyParticipantIdentity = attribute.Key(TraceKeyParticipantPrefix + "identity")
+
+	TraceKeyTrackPrefix = TraceKeyPref + "track."
+	TraceKeyTrackID     = attribute.Key(TraceKeyTrackPrefix + "id")
+
+	TraceKeySIPPrefix       = TraceKeyPref + "sip."
+	TraceKeySIPHeaderPrefix = TraceKeySIPPrefix + "h."
+	TraceKeySIPCallID       = attribute.Key(TraceKeySIPPrefix + "callID")
+	TraceKeySIPCallIDHeader = attribute.Key(TraceKeySIPHeaderPrefix + "CallID")
 )
 
 type TrackID string
@@ -47,6 +68,8 @@ type ParticipantKey struct {
 type JobID string
 type DispatchID string
 type AgentName string
+type SIPCallID string
+type SIPCallIDHeader string
 
 func (s TrackID) String() string             { return string(s) }
 func (s ParticipantID) String() string       { return string(s) }
@@ -59,8 +82,32 @@ func (s NodeID) String() string              { return string(s) }
 func (s JobID) String() string               { return string(s) }
 func (s DispatchID) String() string          { return string(s) }
 func (s AgentName) String() string           { return string(s) }
+func (s SIPCallID) String() string           { return string(s) }
+func (s SIPCallIDHeader) String() string     { return string(s) }
 func (s ParticipantKey) String() string {
 	return fmt.Sprintf("%s_%s_%s", s.ProjectID, s.RoomName, s.Identity)
+}
+
+func (s ParticipantID) Trace() attribute.KeyValue {
+	return TraceKeyParticipantID.String(string(s))
+}
+func (s ParticipantIdentity) Trace() attribute.KeyValue {
+	return TraceKeyParticipantIdentity.String(string(s))
+}
+func (s RoomID) Trace() attribute.KeyValue {
+	return TraceKeyRoomID.String(string(s))
+}
+func (s RoomName) Trace() attribute.KeyValue {
+	return TraceKeyRoomName.String(string(s))
+}
+func (s TrackID) Trace() attribute.KeyValue {
+	return TraceKeyTrackID.String(string(s))
+}
+func (s SIPCallID) Trace() attribute.KeyValue {
+	return TraceKeySIPCallID.String(string(s))
+}
+func (s SIPCallIDHeader) Trace() attribute.KeyValue {
+	return TraceKeySIPCallIDHeader.String(string(s))
 }
 
 type stringTypes interface {
