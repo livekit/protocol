@@ -45,7 +45,7 @@ const (
 
 	TraceKeySIPPrefix       = TraceKeyPref + "sip."
 	TraceKeySIPHeaderPrefix = TraceKeySIPPrefix + "h."
-	TraceKeySIPCallID       = attribute.Key(TraceKeySIPPrefix + "callID")
+	TraceKeySIPCallID       = attribute.Key(TraceKeySIPPrefix + "call.id")
 	TraceKeySIPCallIDHeader = attribute.Key(TraceKeySIPHeaderPrefix + "CallID")
 )
 
