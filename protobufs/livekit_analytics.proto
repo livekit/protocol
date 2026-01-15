@@ -226,6 +226,27 @@ message TimeRange {
   google.protobuf.Timestamp ended_at = 2;
 }
 
+message FeatureInfo {
+  // List of all possible aic model choices, from https://artifacts.ai-coustics.io/
+  enum AicModelType {
+    QUAIL_L16 = 0;
+    QUAIL_L8 = 1;
+    QUAIL_S16 = 2;
+    QUAIL_S8 = 3;
+    QUAIL_VF_L16 = 4;
+    SPARROW_L16 = 5;
+    SPARROW_L48 = 6;
+    SPARROW_L8 = 7;
+    SPARROW_S16 = 8;
+    SPARROW_S48 = 9;
+    SPARROW_S8 = 10;
+    SPARROW_XSS48 = 11;
+    SPARROW_XXS48 = 12;
+  }
+
+  optional AicModelType aic_model_type = 0;
+}
+
 message FeatureUsageInfo {
   enum Feature {
     KRISP_NOISE_CANCELLATION = 0;
@@ -241,8 +262,10 @@ message FeatureUsageInfo {
   string track_id = 7;
   // time ranges during which the feature was enabled.
   // for e. g., noise cancellation may not be applied when a media track is paused/muted,
-  // this allows reporting only periods during which a feature is avtive.
+  // this allows reporting only periods during which a feature is active.
   repeated TimeRange time_ranges = 8;
+
+  optional FeatureInfo feature_info = 9;
 }
 
 message APICallRequest {
