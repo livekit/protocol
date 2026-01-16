@@ -1,5 +1,33 @@
 # @livekit/protocol
 
+## 1.44.0
+
+### Patch Changes
+
+- Add auto_subscribe_data_track to StartSession. - [#1366](https://github.com/livekit/protocol/pull/1366) ([@boks1971](https://github.com/boks1971))
+
+- add helper to propagate psrpc request timeout - [#1361](https://github.com/livekit/protocol/pull/1361) ([@paulwe](https://github.com/paulwe))
+
+- skip logging redacted fields with zero values - [#1338](https://github.com/livekit/protocol/pull/1338) ([@paulwe](https://github.com/paulwe))
+
+- redact metadata in agent protos - [#1344](https://github.com/livekit/protocol/pull/1344) ([@paulwe](https://github.com/paulwe))
+
+- Add featureinfo nested field for reporting noise cancellation feature specific metadata - [#1367](https://github.com/livekit/protocol/pull/1367) ([@1egoman](https://github.com/1egoman))
+
+- update observability codegen - [#1335](https://github.com/livekit/protocol/pull/1335) ([@paulwe](https://github.com/paulwe))
+
+- Option to control auto subscribe of data tracks. - [#1365](https://github.com/livekit/protocol/pull/1365) ([@boks1971](https://github.com/boks1971))
+
+- Add project ID to internal SIPCall info. - [#1346](https://github.com/livekit/protocol/pull/1346) ([@dennwc](https://github.com/dennwc))
+
+- feat(whatsapp): add disconnect reason field for disconnect request - [#1341](https://github.com/livekit/protocol/pull/1341) ([@anunaym14](https://github.com/anunaym14))
+
+- redact egress assume_role_external_id in logs - [#1337](https://github.com/livekit/protocol/pull/1337) ([@paulwe](https://github.com/paulwe))
+
+- temporarily move extension ids to avoid etcd conflict - [#1352](https://github.com/livekit/protocol/pull/1352) ([@paulwe](https://github.com/paulwe))
+
+- Store repair ssrc in TrackInfo for migration purposes. - [#1348](https://github.com/livekit/protocol/pull/1348) ([@boks1971](https://github.com/boks1971))
+
 ## 1.43.4
 
 ### Patch Changes
