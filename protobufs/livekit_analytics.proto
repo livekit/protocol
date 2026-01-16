@@ -245,7 +245,7 @@ message FeatureUsageInfo {
   repeated TimeRange time_ranges = 8;
 
   // Feature specific metadata included in the report
-  optional map<string, string> feature_info = 9;
+  map<string, string> feature_info = 9;
 }
 
 message APICallRequest {
