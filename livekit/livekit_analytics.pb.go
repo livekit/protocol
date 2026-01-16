@@ -257,86 +257,6 @@ func (AnalyticsEventType) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_analytics_proto_rawDescGZIP(), []int{1}
 }
 
-// List of all possible aic model choices, from https://artifacts.ai-coustics.io/
-type FeatureInfo_AicModelType int32
-
-const (
-	FeatureInfo_QUAIL_L16     FeatureInfo_AicModelType = 0
-	FeatureInfo_QUAIL_L8      FeatureInfo_AicModelType = 1
-	FeatureInfo_QUAIL_S16     FeatureInfo_AicModelType = 2
-	FeatureInfo_QUAIL_S8      FeatureInfo_AicModelType = 3
-	FeatureInfo_QUAIL_VF_L16  FeatureInfo_AicModelType = 4
-	FeatureInfo_SPARROW_L16   FeatureInfo_AicModelType = 5
-	FeatureInfo_SPARROW_L48   FeatureInfo_AicModelType = 6
-	FeatureInfo_SPARROW_L8    FeatureInfo_AicModelType = 7
-	FeatureInfo_SPARROW_S16   FeatureInfo_AicModelType = 8
-	FeatureInfo_SPARROW_S48   FeatureInfo_AicModelType = 9
-	FeatureInfo_SPARROW_S8    FeatureInfo_AicModelType = 10
-	FeatureInfo_SPARROW_XSS48 FeatureInfo_AicModelType = 11
-	FeatureInfo_SPARROW_XXS48 FeatureInfo_AicModelType = 12
-)
-
-// Enum value maps for FeatureInfo_AicModelType.
-var (
-	FeatureInfo_AicModelType_name = map[int32]string{
-		0:  "QUAIL_L16",
-		1:  "QUAIL_L8",
-		2:  "QUAIL_S16",
-		3:  "QUAIL_S8",
-		4:  "QUAIL_VF_L16",
-		5:  "SPARROW_L16",
-		6:  "SPARROW_L48",
-		7:  "SPARROW_L8",
-		8:  "SPARROW_S16",
-		9:  "SPARROW_S48",
-		10: "SPARROW_S8",
-		11: "SPARROW_XSS48",
-		12: "SPARROW_XXS48",
-	}
-	FeatureInfo_AicModelType_value = map[string]int32{
-		"QUAIL_L16":     0,
-		"QUAIL_L8":      1,
-		"QUAIL_S16":     2,
-		"QUAIL_S8":      3,
-		"QUAIL_VF_L16":  4,
-		"SPARROW_L16":   5,
-		"SPARROW_L48":   6,
-		"SPARROW_L8":    7,
-		"SPARROW_S16":   8,
-		"SPARROW_S48":   9,
-		"SPARROW_S8":    10,
-		"SPARROW_XSS48": 11,
-		"SPARROW_XXS48": 12,
-	}
-)
-
-func (x FeatureInfo_AicModelType) Enum() *FeatureInfo_AicModelType {
-	p := new(FeatureInfo_AicModelType)
-	*p = x
-	return p
-}
-
-func (x FeatureInfo_AicModelType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (FeatureInfo_AicModelType) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_analytics_proto_enumTypes[2].Descriptor()
-}
-
-func (FeatureInfo_AicModelType) Type() protoreflect.EnumType {
-	return &file_livekit_analytics_proto_enumTypes[2]
-}
-
-func (x FeatureInfo_AicModelType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use FeatureInfo_AicModelType.Descriptor instead.
-func (FeatureInfo_AicModelType) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{12, 0}
-}
-
 type FeatureUsageInfo_Feature int32
 
 const (
@@ -370,11 +290,11 @@ func (x FeatureUsageInfo_Feature) String() string {
 }
 
 func (FeatureUsageInfo_Feature) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_analytics_proto_enumTypes[3].Descriptor()
+	return file_livekit_analytics_proto_enumTypes[2].Descriptor()
 }
 
 func (FeatureUsageInfo_Feature) Type() protoreflect.EnumType {
-	return &file_livekit_analytics_proto_enumTypes[3]
+	return &file_livekit_analytics_proto_enumTypes[2]
 }
 
 func (x FeatureUsageInfo_Feature) Number() protoreflect.EnumNumber {
@@ -383,7 +303,7 @@ func (x FeatureUsageInfo_Feature) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FeatureUsageInfo_Feature.Descriptor instead.
 func (FeatureUsageInfo_Feature) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{13, 0}
+	return file_livekit_analytics_proto_rawDescGZIP(), []int{12, 0}
 }
 
 type AnalyticsVideoLayer struct {
@@ -1627,50 +1547,6 @@ func (x *TimeRange) GetEndedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type FeatureInfo struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	AicModelType  *FeatureInfo_AicModelType `protobuf:"varint,1,opt,name=aic_model_type,json=aicModelType,proto3,enum=livekit.FeatureInfo_AicModelType,oneof" json:"aic_model_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FeatureInfo) Reset() {
-	*x = FeatureInfo{}
-	mi := &file_livekit_analytics_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FeatureInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FeatureInfo) ProtoMessage() {}
-
-func (x *FeatureInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_analytics_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FeatureInfo.ProtoReflect.Descriptor instead.
-func (*FeatureInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *FeatureInfo) GetAicModelType() FeatureInfo_AicModelType {
-	if x != nil && x.AicModelType != nil {
-		return *x.AicModelType
-	}
-	return FeatureInfo_QUAIL_L16
-}
-
 type FeatureUsageInfo struct {
 	state               protoimpl.MessageState   `protogen:"open.v1"`
 	Feature             FeatureUsageInfo_Feature `protobuf:"varint,1,opt,name=feature,proto3,enum=livekit.FeatureUsageInfo_Feature" json:"feature,omitempty"`
@@ -1683,15 +1559,16 @@ type FeatureUsageInfo struct {
 	// time ranges during which the feature was enabled.
 	// for e. g., noise cancellation may not be applied when a media track is paused/muted,
 	// this allows reporting only periods during which a feature is active.
-	TimeRanges    []*TimeRange `protobuf:"bytes,8,rep,name=time_ranges,json=timeRanges,proto3" json:"time_ranges,omitempty"`
-	FeatureInfo   *FeatureInfo `protobuf:"bytes,9,opt,name=feature_info,json=featureInfo,proto3,oneof" json:"feature_info,omitempty"`
+	TimeRanges []*TimeRange `protobuf:"bytes,8,rep,name=time_ranges,json=timeRanges,proto3" json:"time_ranges,omitempty"`
+	// Feature specific metadata included in the report
+	FeatureInfo   map[string]string `protobuf:"bytes,9,rep,name=feature_info,json=featureInfo,proto3" json:"feature_info,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *FeatureUsageInfo) Reset() {
 	*x = FeatureUsageInfo{}
-	mi := &file_livekit_analytics_proto_msgTypes[13]
+	mi := &file_livekit_analytics_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1703,7 +1580,7 @@ func (x *FeatureUsageInfo) String() string {
 func (*FeatureUsageInfo) ProtoMessage() {}
 
 func (x *FeatureUsageInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_analytics_proto_msgTypes[13]
+	mi := &file_livekit_analytics_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1716,7 +1593,7 @@ func (x *FeatureUsageInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeatureUsageInfo.ProtoReflect.Descriptor instead.
 func (*FeatureUsageInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{13}
+	return file_livekit_analytics_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *FeatureUsageInfo) GetFeature() FeatureUsageInfo_Feature {
@@ -1775,7 +1652,7 @@ func (x *FeatureUsageInfo) GetTimeRanges() []*TimeRange {
 	return nil
 }
 
-func (x *FeatureUsageInfo) GetFeatureInfo() *FeatureInfo {
+func (x *FeatureUsageInfo) GetFeatureInfo() map[string]string {
 	if x != nil {
 		return x.FeatureInfo
 	}
@@ -1803,7 +1680,7 @@ type APICallRequest struct {
 
 func (x *APICallRequest) Reset() {
 	*x = APICallRequest{}
-	mi := &file_livekit_analytics_proto_msgTypes[14]
+	mi := &file_livekit_analytics_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1815,7 +1692,7 @@ func (x *APICallRequest) String() string {
 func (*APICallRequest) ProtoMessage() {}
 
 func (x *APICallRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_analytics_proto_msgTypes[14]
+	mi := &file_livekit_analytics_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1828,7 +1705,7 @@ func (x *APICallRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use APICallRequest.ProtoReflect.Descriptor instead.
 func (*APICallRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{14}
+	return file_livekit_analytics_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *APICallRequest) GetMessage() isAPICallRequest_Message {
@@ -2015,7 +1892,7 @@ type APICallInfo struct {
 
 func (x *APICallInfo) Reset() {
 	*x = APICallInfo{}
-	mi := &file_livekit_analytics_proto_msgTypes[15]
+	mi := &file_livekit_analytics_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2027,7 +1904,7 @@ func (x *APICallInfo) String() string {
 func (*APICallInfo) ProtoMessage() {}
 
 func (x *APICallInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_analytics_proto_msgTypes[15]
+	mi := &file_livekit_analytics_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2040,7 +1917,7 @@ func (x *APICallInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use APICallInfo.ProtoReflect.Descriptor instead.
 func (*APICallInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{15}
+	return file_livekit_analytics_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *APICallInfo) GetProjectId() string {
@@ -2178,7 +2055,7 @@ type WebhookInfo struct {
 
 func (x *WebhookInfo) Reset() {
 	*x = WebhookInfo{}
-	mi := &file_livekit_analytics_proto_msgTypes[16]
+	mi := &file_livekit_analytics_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2190,7 +2067,7 @@ func (x *WebhookInfo) String() string {
 func (*WebhookInfo) ProtoMessage() {}
 
 func (x *WebhookInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_analytics_proto_msgTypes[16]
+	mi := &file_livekit_analytics_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2203,7 +2080,7 @@ func (x *WebhookInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebhookInfo.ProtoReflect.Descriptor instead.
 func (*WebhookInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_analytics_proto_rawDescGZIP(), []int{16}
+	return file_livekit_analytics_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *WebhookInfo) GetEventId() string {
@@ -2495,27 +2372,7 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\tTimeRange\x129\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xd5\x02\n" +
-	"\vFeatureInfo\x12L\n" +
-	"\x0eaic_model_type\x18\x01 \x01(\x0e2!.livekit.FeatureInfo.AicModelTypeH\x00R\faicModelType\x88\x01\x01\"\xe4\x01\n" +
-	"\fAicModelType\x12\r\n" +
-	"\tQUAIL_L16\x10\x00\x12\f\n" +
-	"\bQUAIL_L8\x10\x01\x12\r\n" +
-	"\tQUAIL_S16\x10\x02\x12\f\n" +
-	"\bQUAIL_S8\x10\x03\x12\x10\n" +
-	"\fQUAIL_VF_L16\x10\x04\x12\x0f\n" +
-	"\vSPARROW_L16\x10\x05\x12\x0f\n" +
-	"\vSPARROW_L48\x10\x06\x12\x0e\n" +
-	"\n" +
-	"SPARROW_L8\x10\a\x12\x0f\n" +
-	"\vSPARROW_S16\x10\b\x12\x0f\n" +
-	"\vSPARROW_S48\x10\t\x12\x0e\n" +
-	"\n" +
-	"SPARROW_S8\x10\n" +
-	"\x12\x11\n" +
-	"\rSPARROW_XSS48\x10\v\x12\x11\n" +
-	"\rSPARROW_XXS48\x10\fB\x11\n" +
-	"\x0f_aic_model_type\"\x8a\x04\n" +
+	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xca\x04\n" +
 	"\x10FeatureUsageInfo\x12;\n" +
 	"\afeature\x18\x01 \x01(\x0e2!.livekit.FeatureUsageInfo.FeatureR\afeature\x12\x1d\n" +
 	"\n" +
@@ -2526,13 +2383,15 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x0eparticipant_id\x18\x06 \x01(\tR\rparticipantId\x12\x19\n" +
 	"\btrack_id\x18\a \x01(\tR\atrackId\x123\n" +
 	"\vtime_ranges\x18\b \x03(\v2\x12.livekit.TimeRangeR\n" +
-	"timeRanges\x12<\n" +
-	"\ffeature_info\x18\t \x01(\v2\x14.livekit.FeatureInfoH\x00R\vfeatureInfo\x88\x01\x01\"k\n" +
+	"timeRanges\x12M\n" +
+	"\ffeature_info\x18\t \x03(\v2*.livekit.FeatureUsageInfo.FeatureInfoEntryR\vfeatureInfo\x1a>\n" +
+	"\x10FeatureInfoEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"k\n" +
 	"\aFeature\x12\x1c\n" +
 	"\x18KRISP_NOISE_CANCELLATION\x10\x00\x12'\n" +
 	"#KRISP_BACKGROUND_VOICE_CANCELLATION\x10\x01\x12\x19\n" +
-	"\x15AIC_AUDIO_ENHANCEMENT\x10\x02B\x0f\n" +
-	"\r_feature_info\"\x95\a\n" +
+	"\x15AIC_AUDIO_ENHANCEMENT\x10\x02\"\x95\a\n" +
 	"\x0eAPICallRequest\x12L\n" +
 	"\x13create_room_request\x18\x01 \x01(\v2\x1a.livekit.CreateRoomRequestH\x00R\x11createRoomRequest\x12I\n" +
 	"\x12list_rooms_request\x18\x02 \x01(\v2\x19.livekit.ListRoomsRequestH\x00R\x10listRoomsRequest\x12L\n" +
@@ -2663,120 +2522,118 @@ func file_livekit_analytics_proto_rawDescGZIP() []byte {
 	return file_livekit_analytics_proto_rawDescData
 }
 
-var file_livekit_analytics_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_livekit_analytics_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
 var file_livekit_analytics_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_livekit_analytics_proto_goTypes = []any{
 	(StreamType)(0),                    // 0: livekit.StreamType
 	(AnalyticsEventType)(0),            // 1: livekit.AnalyticsEventType
-	(FeatureInfo_AicModelType)(0),      // 2: livekit.FeatureInfo.AicModelType
-	(FeatureUsageInfo_Feature)(0),      // 3: livekit.FeatureUsageInfo.Feature
-	(*AnalyticsVideoLayer)(nil),        // 4: livekit.AnalyticsVideoLayer
-	(*AnalyticsStream)(nil),            // 5: livekit.AnalyticsStream
-	(*AnalyticsStat)(nil),              // 6: livekit.AnalyticsStat
-	(*AnalyticsStats)(nil),             // 7: livekit.AnalyticsStats
-	(*AnalyticsClientMeta)(nil),        // 8: livekit.AnalyticsClientMeta
-	(*AnalyticsEvent)(nil),             // 9: livekit.AnalyticsEvent
-	(*AnalyticsEvents)(nil),            // 10: livekit.AnalyticsEvents
-	(*AnalyticsRoomParticipant)(nil),   // 11: livekit.AnalyticsRoomParticipant
-	(*AnalyticsRoom)(nil),              // 12: livekit.AnalyticsRoom
-	(*AnalyticsNodeRooms)(nil),         // 13: livekit.AnalyticsNodeRooms
-	(*ReportInfo)(nil),                 // 14: livekit.ReportInfo
-	(*TimeRange)(nil),                  // 15: livekit.TimeRange
-	(*FeatureInfo)(nil),                // 16: livekit.FeatureInfo
-	(*FeatureUsageInfo)(nil),           // 17: livekit.FeatureUsageInfo
-	(*APICallRequest)(nil),             // 18: livekit.APICallRequest
-	(*APICallInfo)(nil),                // 19: livekit.APICallInfo
-	(*WebhookInfo)(nil),                // 20: livekit.WebhookInfo
-	(*timestamppb.Timestamp)(nil),      // 21: google.protobuf.Timestamp
-	(ReconnectReason)(0),               // 22: livekit.ReconnectReason
-	(*Room)(nil),                       // 23: livekit.Room
-	(*ParticipantInfo)(nil),            // 24: livekit.ParticipantInfo
-	(*TrackInfo)(nil),                  // 25: livekit.TrackInfo
-	(*ClientInfo)(nil),                 // 26: livekit.ClientInfo
-	(VideoQuality)(0),                  // 27: livekit.VideoQuality
-	(*EgressInfo)(nil),                 // 28: livekit.EgressInfo
-	(*IngressInfo)(nil),                // 29: livekit.IngressInfo
-	(*RTPStats)(nil),                   // 30: livekit.RTPStats
-	(*SIPCallInfo)(nil),                // 31: livekit.SIPCallInfo
-	(*SIPInboundTrunkInfo)(nil),        // 32: livekit.SIPInboundTrunkInfo
-	(*SIPOutboundTrunkInfo)(nil),       // 33: livekit.SIPOutboundTrunkInfo
-	(*SIPDispatchRuleInfo)(nil),        // 34: livekit.SIPDispatchRuleInfo
-	(*SIPTransferInfo)(nil),            // 35: livekit.SIPTransferInfo
-	(ParticipantInfo_State)(0),         // 36: livekit.ParticipantInfo.State
-	(*CreateRoomRequest)(nil),          // 37: livekit.CreateRoomRequest
-	(*ListRoomsRequest)(nil),           // 38: livekit.ListRoomsRequest
-	(*DeleteRoomRequest)(nil),          // 39: livekit.DeleteRoomRequest
-	(*ListParticipantsRequest)(nil),    // 40: livekit.ListParticipantsRequest
-	(*RoomParticipantIdentity)(nil),    // 41: livekit.RoomParticipantIdentity
-	(*MuteRoomTrackRequest)(nil),       // 42: livekit.MuteRoomTrackRequest
-	(*UpdateParticipantRequest)(nil),   // 43: livekit.UpdateParticipantRequest
-	(*UpdateSubscriptionsRequest)(nil), // 44: livekit.UpdateSubscriptionsRequest
-	(*SendDataRequest)(nil),            // 45: livekit.SendDataRequest
-	(*UpdateRoomMetadataRequest)(nil),  // 46: livekit.UpdateRoomMetadataRequest
+	(FeatureUsageInfo_Feature)(0),      // 2: livekit.FeatureUsageInfo.Feature
+	(*AnalyticsVideoLayer)(nil),        // 3: livekit.AnalyticsVideoLayer
+	(*AnalyticsStream)(nil),            // 4: livekit.AnalyticsStream
+	(*AnalyticsStat)(nil),              // 5: livekit.AnalyticsStat
+	(*AnalyticsStats)(nil),             // 6: livekit.AnalyticsStats
+	(*AnalyticsClientMeta)(nil),        // 7: livekit.AnalyticsClientMeta
+	(*AnalyticsEvent)(nil),             // 8: livekit.AnalyticsEvent
+	(*AnalyticsEvents)(nil),            // 9: livekit.AnalyticsEvents
+	(*AnalyticsRoomParticipant)(nil),   // 10: livekit.AnalyticsRoomParticipant
+	(*AnalyticsRoom)(nil),              // 11: livekit.AnalyticsRoom
+	(*AnalyticsNodeRooms)(nil),         // 12: livekit.AnalyticsNodeRooms
+	(*ReportInfo)(nil),                 // 13: livekit.ReportInfo
+	(*TimeRange)(nil),                  // 14: livekit.TimeRange
+	(*FeatureUsageInfo)(nil),           // 15: livekit.FeatureUsageInfo
+	(*APICallRequest)(nil),             // 16: livekit.APICallRequest
+	(*APICallInfo)(nil),                // 17: livekit.APICallInfo
+	(*WebhookInfo)(nil),                // 18: livekit.WebhookInfo
+	nil,                                // 19: livekit.FeatureUsageInfo.FeatureInfoEntry
+	(*timestamppb.Timestamp)(nil),      // 20: google.protobuf.Timestamp
+	(ReconnectReason)(0),               // 21: livekit.ReconnectReason
+	(*Room)(nil),                       // 22: livekit.Room
+	(*ParticipantInfo)(nil),            // 23: livekit.ParticipantInfo
+	(*TrackInfo)(nil),                  // 24: livekit.TrackInfo
+	(*ClientInfo)(nil),                 // 25: livekit.ClientInfo
+	(VideoQuality)(0),                  // 26: livekit.VideoQuality
+	(*EgressInfo)(nil),                 // 27: livekit.EgressInfo
+	(*IngressInfo)(nil),                // 28: livekit.IngressInfo
+	(*RTPStats)(nil),                   // 29: livekit.RTPStats
+	(*SIPCallInfo)(nil),                // 30: livekit.SIPCallInfo
+	(*SIPInboundTrunkInfo)(nil),        // 31: livekit.SIPInboundTrunkInfo
+	(*SIPOutboundTrunkInfo)(nil),       // 32: livekit.SIPOutboundTrunkInfo
+	(*SIPDispatchRuleInfo)(nil),        // 33: livekit.SIPDispatchRuleInfo
+	(*SIPTransferInfo)(nil),            // 34: livekit.SIPTransferInfo
+	(ParticipantInfo_State)(0),         // 35: livekit.ParticipantInfo.State
+	(*CreateRoomRequest)(nil),          // 36: livekit.CreateRoomRequest
+	(*ListRoomsRequest)(nil),           // 37: livekit.ListRoomsRequest
+	(*DeleteRoomRequest)(nil),          // 38: livekit.DeleteRoomRequest
+	(*ListParticipantsRequest)(nil),    // 39: livekit.ListParticipantsRequest
+	(*RoomParticipantIdentity)(nil),    // 40: livekit.RoomParticipantIdentity
+	(*MuteRoomTrackRequest)(nil),       // 41: livekit.MuteRoomTrackRequest
+	(*UpdateParticipantRequest)(nil),   // 42: livekit.UpdateParticipantRequest
+	(*UpdateSubscriptionsRequest)(nil), // 43: livekit.UpdateSubscriptionsRequest
+	(*SendDataRequest)(nil),            // 44: livekit.SendDataRequest
+	(*UpdateRoomMetadataRequest)(nil),  // 45: livekit.UpdateRoomMetadataRequest
 }
 var file_livekit_analytics_proto_depIdxs = []int32{
-	4,  // 0: livekit.AnalyticsStream.video_layers:type_name -> livekit.AnalyticsVideoLayer
-	21, // 1: livekit.AnalyticsStream.start_time:type_name -> google.protobuf.Timestamp
-	21, // 2: livekit.AnalyticsStream.end_time:type_name -> google.protobuf.Timestamp
+	3,  // 0: livekit.AnalyticsStream.video_layers:type_name -> livekit.AnalyticsVideoLayer
+	20, // 1: livekit.AnalyticsStream.start_time:type_name -> google.protobuf.Timestamp
+	20, // 2: livekit.AnalyticsStream.end_time:type_name -> google.protobuf.Timestamp
 	0,  // 3: livekit.AnalyticsStat.kind:type_name -> livekit.StreamType
-	21, // 4: livekit.AnalyticsStat.time_stamp:type_name -> google.protobuf.Timestamp
-	5,  // 5: livekit.AnalyticsStat.streams:type_name -> livekit.AnalyticsStream
-	6,  // 6: livekit.AnalyticsStats.stats:type_name -> livekit.AnalyticsStat
-	22, // 7: livekit.AnalyticsClientMeta.reconnect_reason:type_name -> livekit.ReconnectReason
+	20, // 4: livekit.AnalyticsStat.time_stamp:type_name -> google.protobuf.Timestamp
+	4,  // 5: livekit.AnalyticsStat.streams:type_name -> livekit.AnalyticsStream
+	5,  // 6: livekit.AnalyticsStats.stats:type_name -> livekit.AnalyticsStat
+	21, // 7: livekit.AnalyticsClientMeta.reconnect_reason:type_name -> livekit.ReconnectReason
 	1,  // 8: livekit.AnalyticsEvent.type:type_name -> livekit.AnalyticsEventType
-	21, // 9: livekit.AnalyticsEvent.timestamp:type_name -> google.protobuf.Timestamp
-	23, // 10: livekit.AnalyticsEvent.room:type_name -> livekit.Room
-	24, // 11: livekit.AnalyticsEvent.participant:type_name -> livekit.ParticipantInfo
-	25, // 12: livekit.AnalyticsEvent.track:type_name -> livekit.TrackInfo
-	26, // 13: livekit.AnalyticsEvent.client_info:type_name -> livekit.ClientInfo
-	8,  // 14: livekit.AnalyticsEvent.client_meta:type_name -> livekit.AnalyticsClientMeta
-	27, // 15: livekit.AnalyticsEvent.max_subscribed_video_quality:type_name -> livekit.VideoQuality
-	24, // 16: livekit.AnalyticsEvent.publisher:type_name -> livekit.ParticipantInfo
-	28, // 17: livekit.AnalyticsEvent.egress:type_name -> livekit.EgressInfo
-	29, // 18: livekit.AnalyticsEvent.ingress:type_name -> livekit.IngressInfo
-	30, // 19: livekit.AnalyticsEvent.rtp_stats:type_name -> livekit.RTPStats
-	31, // 20: livekit.AnalyticsEvent.sip_call:type_name -> livekit.SIPCallInfo
-	32, // 21: livekit.AnalyticsEvent.sip_inbound_trunk:type_name -> livekit.SIPInboundTrunkInfo
-	33, // 22: livekit.AnalyticsEvent.sip_outbound_trunk:type_name -> livekit.SIPOutboundTrunkInfo
-	34, // 23: livekit.AnalyticsEvent.sip_dispatch_rule:type_name -> livekit.SIPDispatchRuleInfo
-	35, // 24: livekit.AnalyticsEvent.sip_transfer:type_name -> livekit.SIPTransferInfo
-	14, // 25: livekit.AnalyticsEvent.report:type_name -> livekit.ReportInfo
-	19, // 26: livekit.AnalyticsEvent.api_call:type_name -> livekit.APICallInfo
-	20, // 27: livekit.AnalyticsEvent.webhook:type_name -> livekit.WebhookInfo
-	9,  // 28: livekit.AnalyticsEvents.events:type_name -> livekit.AnalyticsEvent
-	36, // 29: livekit.AnalyticsRoomParticipant.state:type_name -> livekit.ParticipantInfo.State
-	21, // 30: livekit.AnalyticsRoomParticipant.joined_at:type_name -> google.protobuf.Timestamp
-	21, // 31: livekit.AnalyticsRoom.created_at:type_name -> google.protobuf.Timestamp
-	11, // 32: livekit.AnalyticsRoom.participants:type_name -> livekit.AnalyticsRoomParticipant
-	21, // 33: livekit.AnalyticsNodeRooms.timestamp:type_name -> google.protobuf.Timestamp
-	12, // 34: livekit.AnalyticsNodeRooms.rooms:type_name -> livekit.AnalyticsRoom
-	17, // 35: livekit.ReportInfo.feature_usage:type_name -> livekit.FeatureUsageInfo
-	21, // 36: livekit.TimeRange.started_at:type_name -> google.protobuf.Timestamp
-	21, // 37: livekit.TimeRange.ended_at:type_name -> google.protobuf.Timestamp
-	2,  // 38: livekit.FeatureInfo.aic_model_type:type_name -> livekit.FeatureInfo.AicModelType
-	3,  // 39: livekit.FeatureUsageInfo.feature:type_name -> livekit.FeatureUsageInfo.Feature
-	15, // 40: livekit.FeatureUsageInfo.time_ranges:type_name -> livekit.TimeRange
-	16, // 41: livekit.FeatureUsageInfo.feature_info:type_name -> livekit.FeatureInfo
-	37, // 42: livekit.APICallRequest.create_room_request:type_name -> livekit.CreateRoomRequest
-	38, // 43: livekit.APICallRequest.list_rooms_request:type_name -> livekit.ListRoomsRequest
-	39, // 44: livekit.APICallRequest.delete_room_request:type_name -> livekit.DeleteRoomRequest
-	40, // 45: livekit.APICallRequest.list_participants_request:type_name -> livekit.ListParticipantsRequest
-	41, // 46: livekit.APICallRequest.room_participant_identity:type_name -> livekit.RoomParticipantIdentity
-	42, // 47: livekit.APICallRequest.mute_room_track_request:type_name -> livekit.MuteRoomTrackRequest
-	43, // 48: livekit.APICallRequest.update_participant_request:type_name -> livekit.UpdateParticipantRequest
-	44, // 49: livekit.APICallRequest.update_subscriptions_request:type_name -> livekit.UpdateSubscriptionsRequest
-	45, // 50: livekit.APICallRequest.send_data_request:type_name -> livekit.SendDataRequest
-	46, // 51: livekit.APICallRequest.update_room_metadata_request:type_name -> livekit.UpdateRoomMetadataRequest
-	18, // 52: livekit.APICallInfo.request:type_name -> livekit.APICallRequest
-	21, // 53: livekit.APICallInfo.started_at:type_name -> google.protobuf.Timestamp
-	21, // 54: livekit.WebhookInfo.created_at:type_name -> google.protobuf.Timestamp
-	21, // 55: livekit.WebhookInfo.queued_at:type_name -> google.protobuf.Timestamp
-	21, // 56: livekit.WebhookInfo.sent_at:type_name -> google.protobuf.Timestamp
-	57, // [57:57] is the sub-list for method output_type
-	57, // [57:57] is the sub-list for method input_type
-	57, // [57:57] is the sub-list for extension type_name
-	57, // [57:57] is the sub-list for extension extendee
-	0,  // [0:57] is the sub-list for field type_name
+	20, // 9: livekit.AnalyticsEvent.timestamp:type_name -> google.protobuf.Timestamp
+	22, // 10: livekit.AnalyticsEvent.room:type_name -> livekit.Room
+	23, // 11: livekit.AnalyticsEvent.participant:type_name -> livekit.ParticipantInfo
+	24, // 12: livekit.AnalyticsEvent.track:type_name -> livekit.TrackInfo
+	25, // 13: livekit.AnalyticsEvent.client_info:type_name -> livekit.ClientInfo
+	7,  // 14: livekit.AnalyticsEvent.client_meta:type_name -> livekit.AnalyticsClientMeta
+	26, // 15: livekit.AnalyticsEvent.max_subscribed_video_quality:type_name -> livekit.VideoQuality
+	23, // 16: livekit.AnalyticsEvent.publisher:type_name -> livekit.ParticipantInfo
+	27, // 17: livekit.AnalyticsEvent.egress:type_name -> livekit.EgressInfo
+	28, // 18: livekit.AnalyticsEvent.ingress:type_name -> livekit.IngressInfo
+	29, // 19: livekit.AnalyticsEvent.rtp_stats:type_name -> livekit.RTPStats
+	30, // 20: livekit.AnalyticsEvent.sip_call:type_name -> livekit.SIPCallInfo
+	31, // 21: livekit.AnalyticsEvent.sip_inbound_trunk:type_name -> livekit.SIPInboundTrunkInfo
+	32, // 22: livekit.AnalyticsEvent.sip_outbound_trunk:type_name -> livekit.SIPOutboundTrunkInfo
+	33, // 23: livekit.AnalyticsEvent.sip_dispatch_rule:type_name -> livekit.SIPDispatchRuleInfo
+	34, // 24: livekit.AnalyticsEvent.sip_transfer:type_name -> livekit.SIPTransferInfo
+	13, // 25: livekit.AnalyticsEvent.report:type_name -> livekit.ReportInfo
+	17, // 26: livekit.AnalyticsEvent.api_call:type_name -> livekit.APICallInfo
+	18, // 27: livekit.AnalyticsEvent.webhook:type_name -> livekit.WebhookInfo
+	8,  // 28: livekit.AnalyticsEvents.events:type_name -> livekit.AnalyticsEvent
+	35, // 29: livekit.AnalyticsRoomParticipant.state:type_name -> livekit.ParticipantInfo.State
+	20, // 30: livekit.AnalyticsRoomParticipant.joined_at:type_name -> google.protobuf.Timestamp
+	20, // 31: livekit.AnalyticsRoom.created_at:type_name -> google.protobuf.Timestamp
+	10, // 32: livekit.AnalyticsRoom.participants:type_name -> livekit.AnalyticsRoomParticipant
+	20, // 33: livekit.AnalyticsNodeRooms.timestamp:type_name -> google.protobuf.Timestamp
+	11, // 34: livekit.AnalyticsNodeRooms.rooms:type_name -> livekit.AnalyticsRoom
+	15, // 35: livekit.ReportInfo.feature_usage:type_name -> livekit.FeatureUsageInfo
+	20, // 36: livekit.TimeRange.started_at:type_name -> google.protobuf.Timestamp
+	20, // 37: livekit.TimeRange.ended_at:type_name -> google.protobuf.Timestamp
+	2,  // 38: livekit.FeatureUsageInfo.feature:type_name -> livekit.FeatureUsageInfo.Feature
+	14, // 39: livekit.FeatureUsageInfo.time_ranges:type_name -> livekit.TimeRange
+	19, // 40: livekit.FeatureUsageInfo.feature_info:type_name -> livekit.FeatureUsageInfo.FeatureInfoEntry
+	36, // 41: livekit.APICallRequest.create_room_request:type_name -> livekit.CreateRoomRequest
+	37, // 42: livekit.APICallRequest.list_rooms_request:type_name -> livekit.ListRoomsRequest
+	38, // 43: livekit.APICallRequest.delete_room_request:type_name -> livekit.DeleteRoomRequest
+	39, // 44: livekit.APICallRequest.list_participants_request:type_name -> livekit.ListParticipantsRequest
+	40, // 45: livekit.APICallRequest.room_participant_identity:type_name -> livekit.RoomParticipantIdentity
+	41, // 46: livekit.APICallRequest.mute_room_track_request:type_name -> livekit.MuteRoomTrackRequest
+	42, // 47: livekit.APICallRequest.update_participant_request:type_name -> livekit.UpdateParticipantRequest
+	43, // 48: livekit.APICallRequest.update_subscriptions_request:type_name -> livekit.UpdateSubscriptionsRequest
+	44, // 49: livekit.APICallRequest.send_data_request:type_name -> livekit.SendDataRequest
+	45, // 50: livekit.APICallRequest.update_room_metadata_request:type_name -> livekit.UpdateRoomMetadataRequest
+	16, // 51: livekit.APICallInfo.request:type_name -> livekit.APICallRequest
+	20, // 52: livekit.APICallInfo.started_at:type_name -> google.protobuf.Timestamp
+	20, // 53: livekit.WebhookInfo.created_at:type_name -> google.protobuf.Timestamp
+	20, // 54: livekit.WebhookInfo.queued_at:type_name -> google.protobuf.Timestamp
+	20, // 55: livekit.WebhookInfo.sent_at:type_name -> google.protobuf.Timestamp
+	56, // [56:56] is the sub-list for method output_type
+	56, // [56:56] is the sub-list for method input_type
+	56, // [56:56] is the sub-list for extension type_name
+	56, // [56:56] is the sub-list for extension extendee
+	0,  // [0:56] is the sub-list for field type_name
 }
 
 func init() { file_livekit_analytics_proto_init() }
@@ -2793,9 +2650,7 @@ func file_livekit_analytics_proto_init() {
 	file_livekit_analytics_proto_msgTypes[10].OneofWrappers = []any{
 		(*ReportInfo_FeatureUsage)(nil),
 	}
-	file_livekit_analytics_proto_msgTypes[12].OneofWrappers = []any{}
-	file_livekit_analytics_proto_msgTypes[13].OneofWrappers = []any{}
-	file_livekit_analytics_proto_msgTypes[14].OneofWrappers = []any{
+	file_livekit_analytics_proto_msgTypes[13].OneofWrappers = []any{
 		(*APICallRequest_CreateRoomRequest)(nil),
 		(*APICallRequest_ListRoomsRequest)(nil),
 		(*APICallRequest_DeleteRoomRequest)(nil),
@@ -2812,7 +2667,7 @@ func file_livekit_analytics_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_analytics_proto_rawDesc), len(file_livekit_analytics_proto_rawDesc)),
-			NumEnums:      4,
+			NumEnums:      3,
 			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
