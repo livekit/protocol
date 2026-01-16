@@ -3971,6 +3971,7 @@ type SIPCallInfo struct {
 	PcapFileLink     string           `protobuf:"bytes,25,opt,name=pcap_file_link,json=pcapFileLink,proto3" json:"pcap_file_link,omitempty"`
 	CallContext      []*anypb.Any     `protobuf:"bytes,26,rep,name=call_context,json=callContext,proto3" json:"call_context,omitempty"`
 	ProviderInfo     *ProviderInfo    `protobuf:"bytes,27,opt,name=provider_info,json=providerInfo,proto3" json:"provider_info,omitempty"`
+	SipCallId        string           `protobuf:"bytes,28,opt,name=sip_call_id,json=sipCallId,proto3" json:"sip_call_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -4195,6 +4196,13 @@ func (x *SIPCallInfo) GetProviderInfo() *ProviderInfo {
 		return x.ProviderInfo
 	}
 	return nil
+}
+
+func (x *SIPCallInfo) GetSipCallId() string {
+	if x != nil {
+		return x.SipCallId
+	}
+	return ""
 }
 
 type SIPTransferInfo struct {
@@ -4762,7 +4770,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa6\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc6\n" +
 	"\n" +
 	"\vSIPCallInfo\x12\x17\n" +
 	"\acall_id\x18\x01 \x01(\tR\x06callId\x12\x19\n" +
@@ -4796,7 +4804,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x10media_encryption\x18\x15 \x01(\tR\x0fmediaEncryption\x12$\n" +
 	"\x0epcap_file_link\x18\x19 \x01(\tR\fpcapFileLink\x127\n" +
 	"\fcall_context\x18\x1a \x03(\v2\x14.google.protobuf.AnyR\vcallContext\x12:\n" +
-	"\rprovider_info\x18\x1b \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x1aH\n" +
+	"\rprovider_info\x18\x1b \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x12\x1e\n" +
+	"\vsip_call_id\x18\x1c \x01(\tR\tsipCallId\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xff\x02\n" +
