@@ -226,27 +226,6 @@ message TimeRange {
   google.protobuf.Timestamp ended_at = 2;
 }
 
-message FeatureInfo {
-  // List of all possible aic model choices, from https://artifacts.ai-coustics.io/
-  enum AicModelType {
-    QUAIL_L16 = 0;
-    QUAIL_L8 = 1;
-    QUAIL_S16 = 2;
-    QUAIL_S8 = 3;
-    QUAIL_VF_L16 = 4;
-    SPARROW_L16 = 5;
-    SPARROW_L48 = 6;
-    SPARROW_L8 = 7;
-    SPARROW_S16 = 8;
-    SPARROW_S48 = 9;
-    SPARROW_S8 = 10;
-    SPARROW_XSS48 = 11;
-    SPARROW_XXS48 = 12;
-  }
-
-  optional AicModelType aic_model_type = 1;
-}
-
 message FeatureUsageInfo {
   enum Feature {
     KRISP_NOISE_CANCELLATION = 0;
@@ -265,7 +244,8 @@ message FeatureUsageInfo {
   // this allows reporting only periods during which a feature is active.
   repeated TimeRange time_ranges = 8;
 
-  optional FeatureInfo feature_info = 9;
+  // Feature specific metadata included in the report
+  optional map<string, string> feature_info = 9;
 }
 
 message APICallRequest {
