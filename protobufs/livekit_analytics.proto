@@ -241,8 +241,11 @@ message FeatureUsageInfo {
   string track_id = 7;
   // time ranges during which the feature was enabled.
   // for e. g., noise cancellation may not be applied when a media track is paused/muted,
-  // this allows reporting only periods during which a feature is avtive.
+  // this allows reporting only periods during which a feature is active.
   repeated TimeRange time_ranges = 8;
+
+  // Feature specific metadata included in the report
+  map<string, string> feature_info = 9;
 }
 
 message APICallRequest {
