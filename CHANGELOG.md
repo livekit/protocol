@@ -1,5 +1,33 @@
 # github.com/livekit/protocol
 
+## 1.44.0
+
+### Minor Changes
+
+- Add numbers field to SIPDispatchRuleInfo for filtering calls by called number - [#1351](https://github.com/livekit/protocol/pull/1351) ([@civilcoder55](https://github.com/civilcoder55))
+
+### Patch Changes
+
+- Add auto_subscribe_data_track to StartSession. - [#1366](https://github.com/livekit/protocol/pull/1366) ([@boks1971](https://github.com/boks1971))
+
+- Add TextMessageRequest and TextMessageResponse - [#1349](https://github.com/livekit/protocol/pull/1349) ([@longcw](https://github.com/longcw))
+
+- Add featureinfo nested field for reporting noise cancellation feature specific metadata - [#1367](https://github.com/livekit/protocol/pull/1367) ([@1egoman](https://github.com/1egoman))
+
+- Option to control auto subscribe of data tracks. - [#1365](https://github.com/livekit/protocol/pull/1365) ([@boks1971](https://github.com/boks1971))
+
+- Changing the wording on duplicate dispatch rule error message - [#1343](https://github.com/livekit/protocol/pull/1343) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Allow passing ClientParams to SIP RPC client. - [#1356](https://github.com/livekit/protocol/pull/1356) ([@dennwc](https://github.com/dennwc))
+
+- Add project ID to internal SIPCall info. - [#1346](https://github.com/livekit/protocol/pull/1346) ([@dennwc](https://github.com/dennwc))
+
+- Add helpers for tracing attributes. - [#1363](https://github.com/livekit/protocol/pull/1363) ([@dennwc](https://github.com/dennwc))
+
+- Add helper for setting Jaeger tracing. - [#1355](https://github.com/livekit/protocol/pull/1355) ([@dennwc](https://github.com/dennwc))
+
+- Store repair ssrc in TrackInfo for migration purposes. - [#1348](https://github.com/livekit/protocol/pull/1348) ([@boks1971](https://github.com/boks1971))
+
 ## 1.43.4
 
 ### Patch Changes
