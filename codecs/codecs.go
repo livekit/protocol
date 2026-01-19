@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/logger"
 	"github.com/pion/webrtc/v4"
 )
 
@@ -147,34 +148,28 @@ var (
 	}
 )
 
-func mergeFmtpLines(defaultFmtp, inputFmtp string) string {
-	if inputFmtp == "" {
-		return defaultFmtp
-	}
-	if defaultFmtp == "" {
-		return inputFmtp
+func areFmtpLinesEqual(a, b string) bool {
+	if a == b {
+		return true
 	}
 
-	var result strings.Builder
-	result.WriteString(defaultFmtp)
-
-	defaultKeys := make(map[string]struct{})
-	for _, param := range strings.Split(defaultFmtp, ";") {
-		if key, _, found := strings.Cut(param, "="); found {
-			defaultKeys[key] = struct{}{}
+	paramsA := make(map[string]string)
+	for _, param := range strings.Split(a, ";") {
+		if key, value, found := strings.Cut(param, "="); found {
+			paramsA[key] = value
 		}
 	}
 
-	for _, param := range strings.Split(inputFmtp, ";") {
-		if key, _, found := strings.Cut(param, "="); found {
-			if _, exists := defaultKeys[key]; !exists {
-				result.WriteByte(';')
-				result.WriteString(param)
+	count := 0
+	for _, param := range strings.Split(b, ";") {
+		if key, value, found := strings.Cut(param, "="); found {
+			if paramsA[key] != value {
+				return false
 			}
+			count++
 		}
 	}
-
-	return result.String()
+	return count == len(paramsA)
 }
 
 func ToWebrtcCodecParameters(codec *livekit.Codec) webrtc.RTPCodecParameters {
@@ -216,6 +211,15 @@ func ToWebrtcCodecParameters(codec *livekit.Codec) webrtc.RTPCodecParameters {
 		return webrtc.RTPCodecParameters{}
 	}
 
-	params.SDPFmtpLine = mergeFmtpLines(params.SDPFmtpLine, fmtp)
+	if fmtp != "" && !areFmtpLinesEqual(fmtp, params.SDPFmtpLine) {
+		logger.Warnw("non-standard fmtp, may not be supported",
+			nil,
+			"mime", codec.GetMime(),
+			"fmtp", fmtp,
+			"supportedFmtp", params.SDPFmtpLine,
+		)
+		params.SDPFmtpLine = fmtp
+	}
+
 	return params
 }
