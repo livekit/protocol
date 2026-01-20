@@ -17,6 +17,7 @@ package codecs
 import (
 	"strings"
 
+	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/pion/webrtc/v4"
@@ -25,7 +26,7 @@ import (
 var (
 	OpusCodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeOpus.String(),
+			MimeType:    mime.MimeTypeOpus.String(),
 			ClockRate:   48000,
 			Channels:    2,
 			SDPFmtpLine: "minptime=10;useinbandfec=1",
@@ -35,7 +36,7 @@ var (
 
 	RedCodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeRED.String(),
+			MimeType:    mime.MimeTypeRED.String(),
 			ClockRate:   48000,
 			Channels:    2,
 			SDPFmtpLine: "111/111",
@@ -45,7 +46,7 @@ var (
 
 	PCMUCodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:  MimeTypePCMU.String(),
+			MimeType:  mime.MimeTypePCMU.String(),
 			ClockRate: 8000,
 		},
 		PayloadType: 0,
@@ -53,7 +54,7 @@ var (
 
 	PCMACodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:  MimeTypePCMA.String(),
+			MimeType:  mime.MimeTypePCMA.String(),
 			ClockRate: 8000,
 		},
 		PayloadType: 8,
@@ -61,14 +62,14 @@ var (
 
 	VideoRTXCodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:  MimeTypeRTX.String(),
+			MimeType:  mime.MimeTypeRTX.String(),
 			ClockRate: 90000,
 		},
 	}
 
 	VP8CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:  MimeTypeVP8.String(),
+			MimeType:  mime.MimeTypeVP8.String(),
 			ClockRate: 90000,
 		},
 		PayloadType: 96,
@@ -76,7 +77,7 @@ var (
 
 	VP9ProfileId0CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeVP9.String(),
+			MimeType:    mime.MimeTypeVP9.String(),
 			ClockRate:   90000,
 			SDPFmtpLine: "profile-id=0",
 		},
@@ -85,7 +86,7 @@ var (
 
 	VP9ProfileId1CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeVP9.String(),
+			MimeType:    mime.MimeTypeVP9.String(),
 			ClockRate:   90000,
 			SDPFmtpLine: "profile-id=1",
 		},
@@ -94,7 +95,7 @@ var (
 
 	H264ProfileLevelId42e01fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeH264.String(),
+			MimeType:    mime.MimeTypeH264.String(),
 			ClockRate:   90000,
 			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42e01f",
 		},
@@ -103,7 +104,7 @@ var (
 
 	H264ProfileLevelId42e01fPacketizationMode1CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeH264.String(),
+			MimeType:    mime.MimeTypeH264.String(),
 			ClockRate:   90000,
 			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f",
 		},
@@ -113,7 +114,7 @@ var (
 	H264HighProfileFmtp            = "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=640032"
 	H264HighProfileCodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:    MimeTypeH264.String(),
+			MimeType:    mime.MimeTypeH264.String(),
 			ClockRate:   90000,
 			SDPFmtpLine: H264HighProfileFmtp,
 		},
@@ -122,7 +123,7 @@ var (
 
 	AV1CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:  MimeTypeAV1.String(),
+			MimeType:  mime.MimeTypeAV1.String(),
 			ClockRate: 90000,
 		},
 		PayloadType: 35,
@@ -130,7 +131,7 @@ var (
 
 	H265CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
-			MimeType:  MimeTypeH265.String(),
+			MimeType:  mime.MimeTypeH265.String(),
 			ClockRate: 90000,
 		},
 		PayloadType: 116,
@@ -176,28 +177,28 @@ func ToWebrtcCodecParameters(codec *livekit.Codec) webrtc.RTPCodecParameters {
 	fmtp := codec.GetFmtpLine()
 	var params webrtc.RTPCodecParameters
 
-	switch NormalizeMimeType(codec.GetMime()) {
-	case MimeTypeOpus:
+	switch mime.NormalizeMimeType(codec.GetMime()) {
+	case mime.MimeTypeOpus:
 		params = OpusCodecParameters
-	case MimeTypeRED:
+	case mime.MimeTypeRED:
 		params = RedCodecParameters
-	case MimeTypePCMU:
+	case mime.MimeTypePCMU:
 		params = PCMUCodecParameters
-	case MimeTypePCMA:
+	case mime.MimeTypePCMA:
 		params = PCMACodecParameters
-	case MimeTypeRTX:
+	case mime.MimeTypeRTX:
 		params = VideoRTXCodecParameters
-	case MimeTypeVP8:
+	case mime.MimeTypeVP8:
 		params = VP8CodecParameters
-	case MimeTypeVP9:
+	case mime.MimeTypeVP9:
 		if strings.Contains(fmtp, "profile-id=1") {
 			params = VP9ProfileId1CodecParameters
 		} else {
 			params = VP9ProfileId0CodecParameters
 		}
-	case MimeTypeAV1:
+	case mime.MimeTypeAV1:
 		params = AV1CodecParameters
-	case MimeTypeH264:
+	case mime.MimeTypeH264:
 		if strings.Contains(fmtp, "profile-level-id=640032") {
 			params = H264HighProfileCodecParameters
 		} else if strings.Contains(fmtp, "packetization-mode=0") {
@@ -205,7 +206,7 @@ func ToWebrtcCodecParameters(codec *livekit.Codec) webrtc.RTPCodecParameters {
 		} else {
 			params = H264ProfileLevelId42e01fPacketizationMode1CodecParameters
 		}
-	case MimeTypeH265:
+	case mime.MimeTypeH265:
 		params = H265CodecParameters
 	default:
 		return webrtc.RTPCodecParameters{}
