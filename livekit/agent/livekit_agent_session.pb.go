@@ -802,7 +802,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\n" +
 	"\x06SYSTEM\x10\x01\x12\b\n" +
 	"\x04USER\x10\x02\x12\r\n" +
-	"\tASSISTANT\x10\x03B+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
+	"\tASSISTANT\x10\x03BLZ)github.com/livekit/protocol/livekit/agent\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_agent_livekit_agent_session_proto_rawDescOnce sync.Once

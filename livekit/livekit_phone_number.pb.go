@@ -1051,7 +1051,7 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x10ListPhoneNumbers\x12 .livekit.ListPhoneNumbersRequest\x1a!.livekit.ListPhoneNumbersResponse\"\x00\x12S\n" +
 	"\x0eGetPhoneNumber\x12\x1e.livekit.GetPhoneNumberRequest\x1a\x1f.livekit.GetPhoneNumberResponse\"\x00\x12\\\n" +
 	"\x11UpdatePhoneNumber\x12!.livekit.UpdatePhoneNumberRequest\x1a\".livekit.UpdatePhoneNumberResponse\"\x00\x12b\n" +
-	"\x13ReleasePhoneNumbers\x12#.livekit.ReleasePhoneNumbersRequest\x1a$.livekit.ReleasePhoneNumbersResponse\"\x00B%Z#github.com/livekit/protocol/livekitb\x06proto3"
+	"\x13ReleasePhoneNumbers\x12#.livekit.ReleasePhoneNumbersRequest\x1a$.livekit.ReleasePhoneNumbersResponse\"\x00BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_phone_number_proto_rawDescOnce sync.Once
