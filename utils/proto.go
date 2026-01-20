@@ -14,7 +14,11 @@
 
 package utils
 
-import "google.golang.org/protobuf/proto"
+import (
+	"github.com/livekit/protocol/livekit/logger"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
+)
 
 func CloneProto[T proto.Message](m T) T {
 	return proto.Clone(m).(T)
@@ -26,4 +30,48 @@ func CloneProtoSlice[T proto.Message](ms []T) []T {
 		cs[i] = CloneProto(ms[i])
 	}
 	return cs
+}
+
+func CloneProtoRedacted[T proto.Message](m T) T {
+	clone := proto.Clone(m).(T)
+
+	var redact func(msg proto.Message)
+	redact = func(msg proto.Message) {
+		if msg == nil {
+			return
+		}
+
+		reflected := msg.ProtoReflect()
+		reflected.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+			if proto.HasExtension(fd.Options(), logger.E_Redact) {
+				reflected.Clear(fd)
+			}
+
+			if fd.Kind() == protoreflect.MessageKind {
+				switch {
+				case fd.IsList():
+					src := v.List()
+					for i := 0; i < src.Len(); i++ {
+						elem := src.Get(i).Message().Interface()
+						redact(elem)
+					}
+
+				case fd.IsMap():
+					src := v.Map()
+					src.Range(func(key protoreflect.MapKey, val protoreflect.Value) bool {
+						elem := val.Message().Interface()
+						redact(elem)
+						return true
+					})
+
+				default:
+					redact(v.Message().Interface())
+				}
+			}
+
+			return true
+		})
+	}
+	redact(clone)
+	return clone
 }

@@ -65,29 +65,29 @@ func (e *DataChannelRpcError) Error() string {
 func (e *DataChannelRpcError) PsrpcError() psrpc.Error {
 	switch e.Code {
 	case DataChannelRpcApplicationError:
-		return psrpc.NewErrorf(psrpc.Internal, e.Error())
+		return psrpc.NewError(psrpc.Internal, e)
 	case DataChannelRpcConnectionTimeout:
-		return psrpc.NewErrorf(psrpc.Canceled, e.Error())
+		return psrpc.NewError(psrpc.Canceled, e)
 	case DataChannelRpcResponseTimeout:
-		return psrpc.NewErrorf(psrpc.Canceled, e.Error())
+		return psrpc.NewError(psrpc.Canceled, e)
 	case DataChannelRpcRecipientDisconnected:
-		return psrpc.NewErrorf(psrpc.Unavailable, e.Error())
+		return psrpc.NewError(psrpc.Unavailable, e)
 	case DataChannelRpcResponsePayloadTooLarge:
-		return psrpc.NewErrorf(psrpc.MalformedResponse, e.Error())
+		return psrpc.NewError(psrpc.MalformedResponse, e)
 	case DataChannelRpcSendFailed:
-		return psrpc.NewErrorf(psrpc.Internal, e.Error())
+		return psrpc.NewError(psrpc.Internal, e)
 	case DataChannelRpcUnsupportedMethod:
-		return psrpc.NewErrorf(psrpc.InvalidArgument, e.Error())
+		return psrpc.NewError(psrpc.InvalidArgument, e)
 	case DataChannelRpcRecipientNotFound:
-		return psrpc.NewErrorf(psrpc.NotFound, e.Error())
+		return psrpc.NewError(psrpc.NotFound, e)
 	case DataChannelRpcRequestPayloadTooLarge:
-		return psrpc.NewErrorf(psrpc.MalformedRequest, e.Error())
+		return psrpc.NewError(psrpc.MalformedRequest, e)
 	case DataChannelRpcUnsupportedServer:
-		return psrpc.NewErrorf(psrpc.Unimplemented, e.Error())
+		return psrpc.NewError(psrpc.Unimplemented, e)
 	case DataChannelRpcUnsupportedVersion:
-		return psrpc.NewErrorf(psrpc.Unimplemented, e.Error())
+		return psrpc.NewError(psrpc.Unimplemented, e)
 	default:
-		return psrpc.NewErrorf(psrpc.Internal, e.Error())
+		return psrpc.NewError(psrpc.Internal, e)
 	}
 }
 

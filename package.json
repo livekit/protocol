@@ -1,7 +1,7 @@
 {
   "name": "github.com/livekit/protocol",
   "private": true,
-  "version": "1.43.0",
+  "version": "1.44.0",
   "scripts": {
     "changeset": "changeset",
     "ci:publish": "pnpm --filter @livekit/protocol run build && changeset publish"
@@ -14,7 +14,8 @@
   },
   "pnpm": {
     "overrides": {
-      "minimatch": "10.0.3"
+      "minimatch": "10.0.3",
+      "js-yaml": "3.14.2"
     }
   },
   "packageManager": "pnpm@9.15.9"

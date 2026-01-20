@@ -1,5 +1,63 @@
 # github.com/livekit/protocol
 
+## 1.44.0
+
+### Minor Changes
+
+- Add numbers field to SIPDispatchRuleInfo for filtering calls by called number - [#1351](https://github.com/livekit/protocol/pull/1351) ([@civilcoder55](https://github.com/civilcoder55))
+
+### Patch Changes
+
+- Add auto_subscribe_data_track to StartSession. - [#1366](https://github.com/livekit/protocol/pull/1366) ([@boks1971](https://github.com/boks1971))
+
+- Add TextMessageRequest and TextMessageResponse - [#1349](https://github.com/livekit/protocol/pull/1349) ([@longcw](https://github.com/longcw))
+
+- Add featureinfo nested field for reporting noise cancellation feature specific metadata - [#1367](https://github.com/livekit/protocol/pull/1367) ([@1egoman](https://github.com/1egoman))
+
+- Option to control auto subscribe of data tracks. - [#1365](https://github.com/livekit/protocol/pull/1365) ([@boks1971](https://github.com/boks1971))
+
+- Changing the wording on duplicate dispatch rule error message - [#1343](https://github.com/livekit/protocol/pull/1343) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Allow passing ClientParams to SIP RPC client. - [#1356](https://github.com/livekit/protocol/pull/1356) ([@dennwc](https://github.com/dennwc))
+
+- Add project ID to internal SIPCall info. - [#1346](https://github.com/livekit/protocol/pull/1346) ([@dennwc](https://github.com/dennwc))
+
+- Add helpers for tracing attributes. - [#1363](https://github.com/livekit/protocol/pull/1363) ([@dennwc](https://github.com/dennwc))
+
+- Add helper for setting Jaeger tracing. - [#1355](https://github.com/livekit/protocol/pull/1355) ([@dennwc](https://github.com/dennwc))
+
+- Store repair ssrc in TrackInfo for migration purposes. - [#1348](https://github.com/livekit/protocol/pull/1348) ([@boks1971](https://github.com/boks1971))
+
+## 1.43.4
+
+### Patch Changes
+
+- add tags to agent recording proto - [#1328](https://github.com/livekit/protocol/pull/1328) ([@paulwe](https://github.com/paulwe))
+
+## 1.43.3
+
+### Patch Changes
+
+- Data tracks initial protocol definition. - [#1327](https://github.com/livekit/protocol/pull/1327) ([@boks1971](https://github.com/boks1971))
+
+- Cancellation counts for join/publish/subscribe. - [#1321](https://github.com/livekit/protocol/pull/1321) ([@boks1971](https://github.com/boks1971))
+
+- Add ai coustics feature usage - [#1324](https://github.com/livekit/protocol/pull/1324) ([@lukasIO](https://github.com/lukasIO))
+
+## 1.43.2
+
+## 1.43.1
+
+### Patch Changes
+
+- add option to only use IPv4 for webhooks - [#1296](https://github.com/livekit/protocol/pull/1296) ([@davidzhao](https://github.com/davidzhao))
+
+- Redact metadata, attribute, participant name from logs. - [#1309](https://github.com/livekit/protocol/pull/1309) ([@boks1971](https://github.com/boks1971))
+
+- Adding more SIP return codes and updating SIP-to-grpc return code mapping - [#1305](https://github.com/livekit/protocol/pull/1305) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Switch to new header validation for SIP commands - [#1279](https://github.com/livekit/protocol/pull/1279) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.43.0
 
 ### Patch Changes

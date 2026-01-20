@@ -14,9 +14,7 @@
 
 package rpc
 
-import (
-	"github.com/livekit/psrpc"
-)
+import "github.com/livekit/psrpc"
 
 type SIPClient interface {
 	SIPInternalClient
@@ -27,11 +25,16 @@ type sipClient struct {
 }
 
 func NewSIPClient(bus psrpc.MessageBus) (SIPClient, error) {
-	if bus == nil {
+	return NewSIPClientWithParams(ClientParams{Bus: bus})
+}
+
+func NewSIPClientWithParams(params ClientParams) (SIPClient, error) {
+	if params.Bus == nil {
 		return nil, nil
 	}
+	opts := params.Options()
 
-	internalClient, err := NewSIPInternalClient(bus)
+	internalClient, err := NewSIPInternalClient(params.Bus, opts...)
 	if err != nil {
 		return nil, err
 	}

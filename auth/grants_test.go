@@ -173,6 +173,16 @@ func TestParticipantKind(t *testing.T) {
 	}
 }
 
+func TestParticipantKindDetail(t *testing.T) {
+	const detailMin, detailMax = livekit.ParticipantInfo_CLOUD_AGENT, livekit.ParticipantInfo_CONNECTOR_TWILIO
+	var details []livekit.ParticipantInfo_KindDetail
+	for k := detailMin; k <= detailMax; k++ {
+		details = append(details, k)
+	}
+
+	require.EqualValues(t, details, kindDetailsToProto(kindDetailsFromProto(details)))
+}
+
 func TestRoomConfiguration_CheckCredentials(t *testing.T) {
 	t.Parallel()
 

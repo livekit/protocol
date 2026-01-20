@@ -16,14 +16,37 @@ package livekit
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
 	"slices"
 
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
+	"go.opentelemetry.io/otel/attribute"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	TraceKeyPref = "lk."
+
+	TraceKeyRoomPrefix = TraceKeyPref + "room."
+	TraceKeyRoomID     = attribute.Key(TraceKeyRoomPrefix + "id")
+	TraceKeyRoomName   = attribute.Key(TraceKeyRoomPrefix + "name")
+
+	TraceKeyParticipantPrefix   = TraceKeyPref + "participant."
+	TraceKeyParticipantID       = attribute.Key(TraceKeyParticipantPrefix + "id")
+	TraceKeyParticipantIdentity = attribute.Key(TraceKeyParticipantPrefix + "identity")
+
+	TraceKeyTrackPrefix = TraceKeyPref + "track."
+	TraceKeyTrackID     = attribute.Key(TraceKeyTrackPrefix + "id")
+
+	TraceKeySIPPrefix       = TraceKeyPref + "sip."
+	TraceKeySIPHeaderPrefix = TraceKeySIPPrefix + "h."
+	TraceKeySIPCallID       = attribute.Key(TraceKeySIPPrefix + "call.id")
+	TraceKeySIPCallIDHeader = attribute.Key(TraceKeySIPHeaderPrefix + "CallID")
 )
 
 type TrackID string
@@ -45,6 +68,8 @@ type ParticipantKey struct {
 type JobID string
 type DispatchID string
 type AgentName string
+type SIPCallID string
+type SIPCallIDHeader string
 
 func (s TrackID) String() string             { return string(s) }
 func (s ParticipantID) String() string       { return string(s) }
@@ -57,6 +82,33 @@ func (s NodeID) String() string              { return string(s) }
 func (s JobID) String() string               { return string(s) }
 func (s DispatchID) String() string          { return string(s) }
 func (s AgentName) String() string           { return string(s) }
+func (s SIPCallID) String() string           { return string(s) }
+func (s SIPCallIDHeader) String() string     { return string(s) }
+func (s ParticipantKey) String() string {
+	return fmt.Sprintf("%s_%s_%s", s.ProjectID, s.RoomName, s.Identity)
+}
+
+func (s ParticipantID) Trace() attribute.KeyValue {
+	return TraceKeyParticipantID.String(string(s))
+}
+func (s ParticipantIdentity) Trace() attribute.KeyValue {
+	return TraceKeyParticipantIdentity.String(string(s))
+}
+func (s RoomID) Trace() attribute.KeyValue {
+	return TraceKeyRoomID.String(string(s))
+}
+func (s RoomName) Trace() attribute.KeyValue {
+	return TraceKeyRoomName.String(string(s))
+}
+func (s TrackID) Trace() attribute.KeyValue {
+	return TraceKeyTrackID.String(string(s))
+}
+func (s SIPCallID) Trace() attribute.KeyValue {
+	return TraceKeySIPCallID.String(string(s))
+}
+func (s SIPCallIDHeader) Trace() attribute.KeyValue {
+	return TraceKeySIPCallIDHeader.String(string(s))
+}
 
 type stringTypes interface {
 	ParticipantID | RoomID | TrackID | ParticipantIdentity | ParticipantName | RoomName | ConnectionID | NodeID
@@ -163,6 +215,50 @@ func (p *Pagination) Filter(v PageItem) bool {
 		}
 	}
 	return true
+}
+
+// TokenPaginationData represents the data encoded in a TokenPagination token
+type TokenPaginationData struct {
+	Offset int32 `json:"offset"`
+	Limit  int32 `json:"limit"`
+}
+
+// EncodeTokenPagination encodes offset and limit into a TokenPagination.
+// The token is a base64-encoded JSON object containing the offset and limit values.
+func EncodeTokenPagination(offset, limit int32) (*TokenPagination, error) {
+	data := TokenPaginationData{
+		Offset: offset,
+		Limit:  limit,
+	}
+
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal token pagination data: %w", err)
+	}
+
+	token := base64.URLEncoding.EncodeToString(jsonData)
+	return &TokenPagination{Token: token}, nil
+}
+
+// DecodeTokenPagination decodes a TokenPagination into offset and limit.
+// Returns an error if the token is invalid or cannot be decoded.
+// If the TokenPagination is nil or has an empty token, returns zero values without error.
+func DecodeTokenPagination(tp *TokenPagination) (offset, limit int32, err error) {
+	if tp == nil || tp.Token == "" {
+		return 0, 0, nil
+	}
+
+	decoded, err := base64.URLEncoding.DecodeString(tp.Token)
+	if err != nil {
+		return 0, 0, fmt.Errorf("failed to decode token: %w", err)
+	}
+
+	var data TokenPaginationData
+	if err := json.Unmarshal(decoded, &data); err != nil {
+		return 0, 0, fmt.Errorf("failed to unmarshal token pagination data: %w", err)
+	}
+
+	return data.Offset, data.Limit, nil
 }
 
 type pageIterReq[T any] interface {

@@ -27,8 +27,20 @@ func NewOverrideLogger(l logger.Logger) *OverrideLogger {
 	}
 
 	return &OverrideLogger{
-		Logger: l,
+		Logger: l.WithCallDepth(1),
 	}
+}
+
+func (l *OverrideLogger) Debugw(msg string, keysAndValues ...interface{}) {
+	l.Logger.Debugw(msg, keysAndValues...)
+}
+
+func (l *OverrideLogger) Infow(msg string, keysAndValues ...interface{}) {
+	l.Logger.Infow(msg, keysAndValues...)
+}
+
+func (l *OverrideLogger) Warnw(msg string, err error, keysAndValues ...interface{}) {
+	l.Logger.Warnw(msg, err, keysAndValues...)
 }
 
 func (l *OverrideLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {

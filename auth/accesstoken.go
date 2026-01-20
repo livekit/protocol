@@ -63,6 +63,11 @@ func (t *AccessToken) SetKind(kind livekit.ParticipantInfo_Kind) *AccessToken {
 	return t
 }
 
+func (t *AccessToken) SetKindDetail(details ...livekit.ParticipantInfo_KindDetail) *AccessToken {
+	t.grant.SetKindDetail(details...)
+	return t
+}
+
 // Deprecated: use SetVideoGrant instead
 func (t *AccessToken) AddGrant(grant *VideoGrant) *AccessToken {
 	return t.SetVideoGrant(grant)

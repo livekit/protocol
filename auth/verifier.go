@@ -58,9 +58,9 @@ func (v *APIKeyTokenVerifier) Identity() string {
 	return v.identity
 }
 
-func (v *APIKeyTokenVerifier) Verify(key interface{}) (*ClaimGrants, error) {
+func (v *APIKeyTokenVerifier) Verify(key interface{}) (*jwt.Claims, *ClaimGrants, error) {
 	if key == nil || key == "" {
-		return nil, ErrKeysMissing
+		return nil, nil, ErrKeysMissing
 	}
 	if s, ok := key.(string); ok {
 		key = []byte(s)
@@ -68,13 +68,13 @@ func (v *APIKeyTokenVerifier) Verify(key interface{}) (*ClaimGrants, error) {
 	out := jwt.Claims{}
 	claims := ClaimGrants{}
 	if err := v.token.Claims(key, &out, &claims); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	if err := out.Validate(jwt.Expected{Issuer: v.apiKey, Time: time.Now()}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	// copy over identity
 	claims.Identity = v.identity
-	return &claims, nil
+	return &out, &claims, nil
 }

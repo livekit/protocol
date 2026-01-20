@@ -57,15 +57,15 @@ func NewEgressClient(params ClientParams) (EgressClient, error) {
 	}
 
 	opts := params.Options()
-	timeout := params.Timeout
-	if timeout < 10*time.Second {
-		timeout = 10 * time.Second
+	baseTimeout := params.Timeout
+	if baseTimeout < 10*time.Second {
+		baseTimeout = 10 * time.Second
 	}
 
 	internalOpts := append(opts,
 		psrpc.WithClientChannelSize(1000),
 		middleware.WithRPCRetries(middleware.RetryOptions{
-			Timeout: timeout,
+			Timeout: baseTimeout,
 			GetRetryParameters: func(err error, attempt int) (retry bool, timeout time.Duration, waitTime time.Duration) {
 				if !isErrRecoverable(err) {
 					return false, 0, 0
@@ -77,7 +77,7 @@ func NewEgressClient(params ClientParams) (EgressClient, error) {
 
 				// backoff = base * 2 ^ (attempt - 1) * rand[1,2)
 				backoff := time.Duration(float64(backoffBase) * math.Pow(2, float64(attempt-1)) * (rand.Float64() + 1))
-				timeout = time.Duration(float64(timeout) * math.Pow(2, float64(attempt)))
+				timeout = time.Duration(float64(baseTimeout) * math.Pow(2, float64(attempt)))
 
 				return true, timeout, backoff
 			},

@@ -218,7 +218,7 @@ func TestAccessToken(t *testing.T) {
 
 			v, err := ParseAPIToken(value)
 			require.NoError(t, err)
-			claims, err := v.Verify(secret)
+			_, claims, err := v.Verify(secret)
 			require.NoError(t, err)
 
 			rc := (*livekit.RoomConfiguration)(claims.RoomConfig)

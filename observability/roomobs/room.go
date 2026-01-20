@@ -49,7 +49,6 @@ func ToClientOS(os string) ClientOS {
 
 func FormatBrowser(clientInfo *livekit.ClientInfo) string {
 	return strings.TrimSpace(fmt.Sprintf("%s %s", clientInfo.GetBrowser(), clientInfo.GetBrowserVersion()))
-
 }
 
 func FormatSDKVersion(clientInfo *livekit.ClientInfo) string {

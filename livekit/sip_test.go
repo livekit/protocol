@@ -561,7 +561,7 @@ func TestGRPCStatus(t *testing.T) {
 	e := &SIPStatus{Code: SIPStatusCode_SIP_STATUS_BUSY_HERE}
 	st, ok := status.FromError(e)
 	require.True(t, ok)
-	require.Equal(t, codes.Unavailable, st.Code())
+	require.Equal(t, codes.ResourceExhausted, st.Code())
 	require.Equal(t, "sip status 486: BUSY_HERE", st.Message())
 	details := st.Details()
 	require.Len(t, details, 1)
