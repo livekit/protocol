@@ -5,7 +5,6 @@ import (
 	"github.com/livekit/protocol/observability/egressobs"
 	"github.com/livekit/protocol/observability/gatewayobs"
 	"github.com/livekit/protocol/observability/roomobs"
-	"github.com/livekit/protocol/observability/telephonycallobs"
 	"github.com/livekit/protocol/observability/telephonyobs"
 )
 
@@ -19,7 +18,6 @@ type Reporter interface {
 	Connector() any // any is a placeholder for the connector type
 	Egress() egressobs.Reporter
 	Ingress() any
-	TelephonyCall() telephonycallobs.Reporter
 	Close()
 }
 
@@ -55,10 +53,6 @@ func (reporter) Egress() egressobs.Reporter {
 
 func (reporter) Ingress() any {
 	return nil
-}
-
-func (reporter) TelephonyCall() telephonyobs.Reporter {
-	return telephonyobs.NewNoopReporter()
 }
 
 func (reporter) Close() {
