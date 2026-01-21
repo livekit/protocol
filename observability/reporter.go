@@ -18,6 +18,7 @@ type Reporter interface {
 	Connector() any // any is a placeholder for the connector type
 	Egress() egressobs.Reporter
 	Ingress() any
+	TelephonyCall() telephonyobs.Reporter
 	Close()
 }
 
@@ -53,6 +54,10 @@ func (reporter) Egress() egressobs.Reporter {
 
 func (reporter) Ingress() any {
 	return nil
+}
+
+func (reporter) TelephonyCall() telephonyobs.Reporter {
+	return telephonyobs.NewNoopReporter()
 }
 
 func (reporter) Close() {
