@@ -486,6 +486,8 @@ func MatchTrunk(trunks []*livekit.SIPInboundTrunkInfo, call *rpc.SIPCall, opts .
 // MatchTrunkDetailed is like MatchTrunkIter but returns detailed match information
 func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.SIPCall, opts ...MatchTrunkOpt) (*TrunkMatchResult, error) {
 	defer it.Close()
+	log := logger.GetLogger()
+	
 	var opt matchTrunkOpts
 	for _, fnc := range opts {
 		fnc(&opt)
@@ -503,6 +505,14 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 		sawAnyTrunk      bool
 	)
 	calledNorm := NormalizeNumber(call.To.User)
+	log.Debugw("MatchTrunkDetailed: starting trunk matching",
+		"calledNumber", call.To.User,
+		"calledNumberNormalized", calledNorm,
+		"callingNumber", call.From.User,
+		"sourceIp", call.SourceIp,
+		"fromHost", call.From.Host)
+	
+	trunkIndex := 0
 	for {
 		tr, err := it.Next()
 		if err == io.EOF {
@@ -510,32 +520,81 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 		} else if err != nil {
 			return nil, err
 		}
+		trunkIndex++
 		if !sawAnyTrunk {
 			sawAnyTrunk = true
 			result.MatchType = TrunkMatchNone // We have trunks but haven't matched any yet
 		}
 		tr = opt.Replace(tr)
+		
+		log.Debugw("MatchTrunkDetailed: evaluating trunk",
+			"trunkIndex", trunkIndex,
+			"trunkID", tr.SipTrunkId,
+			"trunkName", tr.Name,
+			"trunkNumbers", tr.Numbers,
+			"trunkNumbersCount", len(tr.Numbers),
+			"allowedNumbers", tr.AllowedNumbers,
+			"allowedAddresses", tr.AllowedAddresses)
+		
 		// Do not consider it if number doesn't match.
-		if !matchNumbers(call.From.User, tr.AllowedNumbers) {
+		fromMatches := matchNumbers(call.From.User, tr.AllowedNumbers)
+		if !fromMatches {
+			log.Debugw("MatchTrunkDetailed: trunk filtered - calling number not allowed",
+				"trunkID", tr.SipTrunkId,
+				"callingNumber", call.From.User,
+				"allowedNumbers", tr.AllowedNumbers)
 			if !opt.Filtered(tr, TrunkFilteredCallingNumberDisallowed) {
 				continue
 			}
 		}
-		if !matchAddrMasks(call.SourceIp, call.From.Host, tr.AllowedAddresses) {
+		
+		addrMatches := matchAddrMasks(call.SourceIp, call.From.Host, tr.AllowedAddresses)
+		if !addrMatches {
+			log.Debugw("MatchTrunkDetailed: trunk filtered - source address not allowed",
+				"trunkID", tr.SipTrunkId,
+				"sourceIp", call.SourceIp,
+				"fromHost", call.From.Host,
+				"allowedAddresses", tr.AllowedAddresses)
 			if !opt.Filtered(tr, TrunkFilteredSourceAddressDisallowed) {
 				continue
 			}
 		}
+		
 		if len(tr.Numbers) == 0 {
 			// Default/wildcard trunk.
+			log.Debugw("MatchTrunkDetailed: trunk is default/wildcard (no specific numbers)",
+				"trunkID", tr.SipTrunkId)
 			defaultTrunkPrev = defaultTrunk
 			defaultTrunk = tr
 			result.DefaultTrunkCount++
 		} else {
 			for _, num := range tr.Numbers {
-				if num == call.To.User || NormalizeNumber(num) == calledNorm {
+				numNorm := NormalizeNumber(num)
+				directMatch := num == call.To.User
+				normalizedMatch := numNorm == calledNorm
+				matches := directMatch || normalizedMatch
+				
+				log.Debugw("MatchTrunkDetailed: checking trunk number",
+					"trunkID", tr.SipTrunkId,
+					"trunkNumber", num,
+					"trunkNumberNormalized", numNorm,
+					"calledNumber", call.To.User,
+					"calledNumberNormalized", calledNorm,
+					"directMatch", directMatch,
+					"normalizedMatch", normalizedMatch,
+					"matches", matches)
+				
+				if matches {
 					// Trunk specific to the number.
+					log.Debugw("MatchTrunkDetailed: trunk number matched!",
+						"trunkID", tr.SipTrunkId,
+						"trunkNumber", num,
+						"calledNumber", call.To.User)
 					if selectedTrunk != nil {
+						log.Debugw("MatchTrunkDetailed: multiple trunks matched, conflict detected",
+							"previousTrunkID", selectedTrunk.SipTrunkId,
+							"newTrunkID", tr.SipTrunkId,
+							"calledNumber", call.To.User)
 						opt.Conflict(selectedTrunk, tr, TrunkConflictCalledNumber)
 						if opt.AllowConflicts {
 							// This path is unreachable, since we pick the first trunk. Kept for completeness.
@@ -548,10 +607,16 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 						// Pick the first match as soon as it's found. We don't care about conflicts.
 						result.Trunk = selectedTrunk
 						result.MatchType = TrunkMatchSpecific
+						log.Debugw("MatchTrunkDetailed: returning matched trunk (allow conflicts)",
+							"trunkID", selectedTrunk.SipTrunkId)
 						return result, nil
 					}
 					// Keep searching! We want to know if there are any conflicting Trunk definitions.
 				} else {
+					log.Debugw("MatchTrunkDetailed: trunk number did not match",
+						"trunkID", tr.SipTrunkId,
+						"trunkNumber", num,
+						"calledNumber", call.To.User)
 					opt.Filtered(tr, TrunkFilteredCalledNumberDisallowed)
 				}
 			}
@@ -561,9 +626,16 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 	if selectedTrunk != nil {
 		result.Trunk = selectedTrunk
 		result.MatchType = TrunkMatchSpecific
+		log.Debugw("MatchTrunkDetailed: returning specific matched trunk",
+			"trunkID", selectedTrunk.SipTrunkId,
+			"calledNumber", call.To.User,
+			"matchType", result.MatchType)
 		return result, nil
 	}
 	if result.DefaultTrunkCount > 1 {
+		log.Debugw("MatchTrunkDetailed: multiple default trunks found, conflict detected",
+			"defaultTrunkCount", result.DefaultTrunkCount,
+			"calledNumber", call.To.User)
 		opt.Conflict(defaultTrunk, defaultTrunkPrev, TrunkConflictDefault)
 		if !opt.AllowConflicts {
 			return nil, twirp.NewErrorf(twirp.FailedPrecondition, "Multiple default SIP Trunks matched for %q", call.To.User)
@@ -572,7 +644,18 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 	if defaultTrunk != nil {
 		result.Trunk = defaultTrunk
 		result.MatchType = TrunkMatchDefault
+		log.Debugw("MatchTrunkDetailed: returning default trunk",
+			"trunkID", defaultTrunk.SipTrunkId,
+			"calledNumber", call.To.User,
+			"matchType", result.MatchType)
+		return result, nil
 	}
+	
+	log.Debugw("MatchTrunkDetailed: no trunk matched",
+		"calledNumber", call.To.User,
+		"trunksEvaluated", trunkIndex,
+		"matchType", result.MatchType,
+		"defaultTrunkCount", result.DefaultTrunkCount)
 	return result, nil
 }
 
