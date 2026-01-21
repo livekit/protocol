@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_A2HD0O8 = true
+const Version_J8004V8 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -44,6 +44,7 @@ type CallTx interface {
 	ReportTransport(v CallTransport)
 	ReportProviderCallID(v string)
 	ReportProviderName(v string)
+	ReportSIPCallID(v string)
 	ReportRoomID(v string)
 	ReportRoomName(v string)
 	ReportParticipantIdentity(v string)

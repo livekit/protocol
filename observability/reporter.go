@@ -5,6 +5,7 @@ import (
 	"github.com/livekit/protocol/observability/egressobs"
 	"github.com/livekit/protocol/observability/gatewayobs"
 	"github.com/livekit/protocol/observability/roomobs"
+	"github.com/livekit/protocol/observability/telephonycallobs"
 	"github.com/livekit/protocol/observability/telephonyobs"
 )
 
@@ -18,7 +19,7 @@ type Reporter interface {
 	Connector() any // any is a placeholder for the connector type
 	Egress() egressobs.Reporter
 	Ingress() any
-	TelephonyCall() telephonyobs.Reporter
+	TelephonyCall() telephonycallobs.Reporter
 	Close()
 }
 

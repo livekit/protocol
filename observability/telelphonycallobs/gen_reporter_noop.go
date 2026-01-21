@@ -70,6 +70,7 @@ func (r *noopCallReporter) ReportDirection(v CallDirection)                   {}
 func (r *noopCallReporter) ReportTransport(v CallTransport)                   {}
 func (r *noopCallReporter) ReportProviderCallID(v string)                     {}
 func (r *noopCallReporter) ReportProviderName(v string)                       {}
+func (r *noopCallReporter) ReportSIPCallID(v string)                          {}
 func (r *noopCallReporter) ReportRoomID(v string)                             {}
 func (r *noopCallReporter) ReportRoomName(v string)                           {}
 func (r *noopCallReporter) ReportParticipantIdentity(v string)                {}
