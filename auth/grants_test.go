@@ -138,6 +138,27 @@ func TestGrants(t *testing.T) {
 		require.True(t, reflect.DeepEqual(grants.Agent, clone.Agent))
 	})
 
+	t.Run("clone with Agent endpoints", func(t *testing.T) {
+		agent := &AgentGrant{
+			Admin:     false,
+			Endpoints: []string{"customer-service", "my-agent"},
+		}
+		grants := &ClaimGrants{
+			Identity: "identity",
+			Agent:    agent,
+		}
+		clone := grants.Clone()
+		require.NotSame(t, grants, clone)
+		require.NotSame(t, grants.Agent, clone.Agent)
+		require.NotSame(t, &grants.Agent.Endpoints, &clone.Agent.Endpoints)
+		require.Equal(t, grants.Agent.Endpoints, clone.Agent.Endpoints)
+		require.True(t, reflect.DeepEqual(grants, clone))
+
+		// Modifying clone should not affect original
+		clone.Agent.Endpoints[0] = "modified"
+		require.NotEqual(t, grants.Agent.Endpoints[0], clone.Agent.Endpoints[0])
+	})
+
 	t.Run("clone with Inference", func(t *testing.T) {
 		inference := &InferenceGrant{
 			Perform: true,
@@ -156,6 +177,64 @@ func TestGrants(t *testing.T) {
 		require.Equal(t, grants.Inference.Perform, clone.Inference.Perform)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Inference, clone.Inference))
+	})
+}
+
+func TestAgentGrantCanUseEndpoint(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil grant returns false", func(t *testing.T) {
+		var agent *AgentGrant
+		require.False(t, agent.CanUseEndpoint("any-endpoint"))
+	})
+
+	t.Run("admin alone does not grant endpoint access", func(t *testing.T) {
+		agent := &AgentGrant{Admin: true}
+		require.False(t, agent.CanUseEndpoint("customer-service"))
+		require.False(t, agent.CanUseEndpoint("my-agent"))
+	})
+
+	t.Run("empty endpoints denies access", func(t *testing.T) {
+		agent := &AgentGrant{Admin: false}
+		require.False(t, agent.CanUseEndpoint("customer-service"))
+	})
+
+	t.Run("explicit endpoint grants access", func(t *testing.T) {
+		agent := &AgentGrant{
+			Admin:     false,
+			Endpoints: []string{"customer-service", "my-agent"},
+		}
+		require.True(t, agent.CanUseEndpoint("customer-service"))
+		require.True(t, agent.CanUseEndpoint("my-agent"))
+		require.False(t, agent.CanUseEndpoint("other-agent"))
+	})
+
+	t.Run("wildcard grants access to all", func(t *testing.T) {
+		agent := &AgentGrant{
+			Admin:     false,
+			Endpoints: []string{"*"},
+		}
+		require.True(t, agent.CanUseEndpoint("customer-service"))
+		require.True(t, agent.CanUseEndpoint("my-agent"))
+		require.True(t, agent.CanUseEndpoint("any-endpoint"))
+	})
+
+	t.Run("wildcard with other endpoints", func(t *testing.T) {
+		agent := &AgentGrant{
+			Admin:     false,
+			Endpoints: []string{"specific-agent", "*"},
+		}
+		require.True(t, agent.CanUseEndpoint("specific-agent"))
+		require.True(t, agent.CanUseEndpoint("any-other-agent"))
+	})
+
+	t.Run("admin with endpoints grants endpoint access", func(t *testing.T) {
+		agent := &AgentGrant{
+			Admin:     true,
+			Endpoints: []string{"customer-service"},
+		}
+		require.True(t, agent.CanUseEndpoint("customer-service"))
+		require.False(t, agent.CanUseEndpoint("other-agent"))
 	})
 }
 
