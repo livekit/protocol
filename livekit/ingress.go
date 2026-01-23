@@ -1,5 +1,12 @@
 package livekit
 
+func (p *IngressInfo) ID() string {
+	if p == nil {
+		return ""
+	}
+	return p.IngressId
+}
+
 func (p *ListIngressRequest) Filter(info *IngressInfo) bool {
 	if info == nil {
 		return true // for FilterSlice to work correctly with missing IDs
