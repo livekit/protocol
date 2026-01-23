@@ -234,7 +234,9 @@ message EvaluateSIPDispatchRulesResponse {
 
   livekit.SIPMediaEncryption media_encryption = 22;
 
-  // NEXT ID: 23
+  map<string, string> feature_flags = 23;
+
+  // NEXT ID: 24
 }
 
 message UpdateSIPCallStateRequest {
