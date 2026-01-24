@@ -18,6 +18,7 @@ type Reporter interface {
 	Connector() any // any is a placeholder for the connector type
 	Egress() egressobs.Reporter
 	Ingress() any
+	GatewayMetrics() any // any is a placeholder for the gateway metrics type
 	Close()
 }
 
@@ -52,6 +53,10 @@ func (reporter) Egress() egressobs.Reporter {
 }
 
 func (reporter) Ingress() any {
+	return nil
+}
+
+func (reporter) GatewayMetrics() any {
 	return nil
 }
 
