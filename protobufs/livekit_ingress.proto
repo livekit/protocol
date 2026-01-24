@@ -212,7 +212,9 @@ message ListIngressRequest {
 }
 
 message ListIngressResponse {
+  TokenPagination next_page_token = 2;
   repeated IngressInfo items = 1;
+  // next field id: 3
 }
 
 message DeleteIngressRequest {
