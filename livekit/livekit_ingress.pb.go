@@ -1344,7 +1344,8 @@ func (x *ListIngressRequest) GetIngressId() string {
 
 type ListIngressResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*IngressInfo         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	NextPageToken *TokenPagination       `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	Items         []*IngressInfo         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"` // next field id: 3
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1377,6 +1378,13 @@ func (x *ListIngressResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListIngressResponse.ProtoReflect.Descriptor instead.
 func (*ListIngressResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_ingress_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ListIngressResponse) GetNextPageToken() *TokenPagination {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return nil
 }
 
 func (x *ListIngressResponse) GetItems() []*IngressInfo {
@@ -1558,8 +1566,9 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1d\n" +
 	"\n" +
-	"ingress_id\x18\x02 \x01(\tR\tingressId\"A\n" +
-	"\x13ListIngressResponse\x12*\n" +
+	"ingress_id\x18\x02 \x01(\tR\tingressId\"\x83\x01\n" +
+	"\x13ListIngressResponse\x12@\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.IngressInfoR\x05items\"5\n" +
 	"\x14DeleteIngressRequest\x12\x1d\n" +
 	"\n" +
@@ -1653,20 +1662,21 @@ var file_livekit_ingress_proto_depIdxs = []int32{
 	5,  // 20: livekit.UpdateIngressRequest.audio:type_name -> livekit.IngressAudioOptions
 	6,  // 21: livekit.UpdateIngressRequest.video:type_name -> livekit.IngressVideoOptions
 	22, // 22: livekit.ListIngressRequest.page_token:type_name -> livekit.TokenPagination
-	9,  // 23: livekit.ListIngressResponse.items:type_name -> livekit.IngressInfo
-	4,  // 24: livekit.Ingress.CreateIngress:input_type -> livekit.CreateIngressRequest
-	13, // 25: livekit.Ingress.UpdateIngress:input_type -> livekit.UpdateIngressRequest
-	14, // 26: livekit.Ingress.ListIngress:input_type -> livekit.ListIngressRequest
-	16, // 27: livekit.Ingress.DeleteIngress:input_type -> livekit.DeleteIngressRequest
-	9,  // 28: livekit.Ingress.CreateIngress:output_type -> livekit.IngressInfo
-	9,  // 29: livekit.Ingress.UpdateIngress:output_type -> livekit.IngressInfo
-	15, // 30: livekit.Ingress.ListIngress:output_type -> livekit.ListIngressResponse
-	9,  // 31: livekit.Ingress.DeleteIngress:output_type -> livekit.IngressInfo
-	28, // [28:32] is the sub-list for method output_type
-	24, // [24:28] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	22, // 23: livekit.ListIngressResponse.next_page_token:type_name -> livekit.TokenPagination
+	9,  // 24: livekit.ListIngressResponse.items:type_name -> livekit.IngressInfo
+	4,  // 25: livekit.Ingress.CreateIngress:input_type -> livekit.CreateIngressRequest
+	13, // 26: livekit.Ingress.UpdateIngress:input_type -> livekit.UpdateIngressRequest
+	14, // 27: livekit.Ingress.ListIngress:input_type -> livekit.ListIngressRequest
+	16, // 28: livekit.Ingress.DeleteIngress:input_type -> livekit.DeleteIngressRequest
+	9,  // 29: livekit.Ingress.CreateIngress:output_type -> livekit.IngressInfo
+	9,  // 30: livekit.Ingress.UpdateIngress:output_type -> livekit.IngressInfo
+	15, // 31: livekit.Ingress.ListIngress:output_type -> livekit.ListIngressResponse
+	9,  // 32: livekit.Ingress.DeleteIngress:output_type -> livekit.IngressInfo
+	29, // [29:33] is the sub-list for method output_type
+	25, // [25:29] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_livekit_ingress_proto_init() }
