@@ -1282,8 +1282,8 @@ func (x *UpdateIngressRequest) GetEnabled() bool {
 }
 
 type ListIngressRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Page  *Pagination            `protobuf:"bytes,3,opt,name=page,proto3" json:"page,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	PageToken *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// when blank, lists all ingress endpoints
 	RoomName      string `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`    // (optional, filter by room name)
 	IngressId     string `protobuf:"bytes,2,opt,name=ingress_id,json=ingressId,proto3" json:"ingress_id,omitempty"` // (optional, filter by ingress ID)
@@ -1321,9 +1321,9 @@ func (*ListIngressRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_ingress_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *ListIngressRequest) GetPage() *Pagination {
+func (x *ListIngressRequest) GetPageToken() *TokenPagination {
 	if x != nil {
-		return x.Page
+		return x.PageToken
 	}
 	return nil
 }
@@ -1552,9 +1552,10 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x13_bypass_transcodingB\x15\n" +
 	"\x13_enable_transcodingB\n" +
 	"\n" +
-	"\b_enabled\"y\n" +
-	"\x12ListIngressRequest\x12'\n" +
-	"\x04page\x18\x03 \x01(\v2\x13.livekit.PaginationR\x04page\x12\x1b\n" +
+	"\b_enabled\"\x89\x01\n" +
+	"\x12ListIngressRequest\x127\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1d\n" +
 	"\n" +
 	"ingress_id\x18\x02 \x01(\tR\tingressId\"A\n" +
@@ -1626,7 +1627,7 @@ var file_livekit_ingress_proto_goTypes = []any{
 	(VideoCodec)(0),                     // 19: livekit.VideoCodec
 	(*VideoLayer)(nil),                  // 20: livekit.VideoLayer
 	(*TrackInfo)(nil),                   // 21: livekit.TrackInfo
-	(*Pagination)(nil),                  // 22: livekit.Pagination
+	(*TokenPagination)(nil),             // 22: livekit.TokenPagination
 }
 var file_livekit_ingress_proto_depIdxs = []int32{
 	0,  // 0: livekit.CreateIngressRequest.input_type:type_name -> livekit.IngressInput
@@ -1651,7 +1652,7 @@ var file_livekit_ingress_proto_depIdxs = []int32{
 	21, // 19: livekit.IngressState.tracks:type_name -> livekit.TrackInfo
 	5,  // 20: livekit.UpdateIngressRequest.audio:type_name -> livekit.IngressAudioOptions
 	6,  // 21: livekit.UpdateIngressRequest.video:type_name -> livekit.IngressVideoOptions
-	22, // 22: livekit.ListIngressRequest.page:type_name -> livekit.Pagination
+	22, // 22: livekit.ListIngressRequest.page_token:type_name -> livekit.TokenPagination
 	9,  // 23: livekit.ListIngressResponse.items:type_name -> livekit.IngressInfo
 	4,  // 24: livekit.Ingress.CreateIngress:input_type -> livekit.CreateIngressRequest
 	13, // 25: livekit.Ingress.UpdateIngress:input_type -> livekit.UpdateIngressRequest
