@@ -172,6 +172,7 @@ type ClaimGrants struct {
 	Agent         *AgentGrant         `json:"agent,omitempty"`
 	Inference     *InferenceGrant     `json:"inference,omitempty"`
 	Observability *ObservabilityGrant `json:"observability,omitempty"`
+	Simulation    *SimulationGrant    `json:"simulation,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -218,6 +219,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Agent = c.Agent.Clone()
 	clone.Inference = c.Inference.Clone()
 	clone.Observability = c.Observability.Clone()
+	clone.Simulation = c.Simulation.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -240,6 +242,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Agent", c.Agent)
 	e.AddObject("Inference", c.Inference)
 	e.AddObject("Observability", c.Observability)
+	e.AddObject("Simulation", c.Simulation)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -623,6 +626,32 @@ func (s *ObservabilityGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddBool("Write", s.Write)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+type SimulationGrant struct {
+	// Dispatch grants access to dispatch simulated humans to evaluate an agent.
+	Dispatch bool `json:"dispatch,omitempty"`
+}
+
+func (s *SimulationGrant) Clone() *SimulationGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+
+	return &clone
+}
+
+func (s *SimulationGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Dispatch", s.Dispatch)
 	return nil
 }
 
