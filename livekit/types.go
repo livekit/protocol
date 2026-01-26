@@ -264,7 +264,7 @@ func DecodeTokenPagination(tp *TokenPagination) (offset, limit int32, err error)
 
 // CursorTokenData holds the encoded pieces used for cursor pagination.
 //
-// Instead of paginating with an offset ("page 3"), cursor pagination represents
+// Instead of paginating with an offset, cursor pagination represents
 // a position in an ordered list. The server returns a token for the last item in
 // a page, and the client sends it back to request the next page.
 //
