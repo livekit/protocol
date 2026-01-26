@@ -115,6 +115,9 @@ message GetSIPTrunkAuthenticationResponse {
   livekit.ProviderInfo provider_info = 6;
   // Error code if authentication failed
   SIPTrunkAuthenticationError error_code = 7;
+
+  // Optional per-project feature flag set
+  map<string, string> feature_flags = 8;
 }
 
 message EvaluateSIPDispatchRulesRequest {
@@ -234,7 +237,9 @@ message EvaluateSIPDispatchRulesResponse {
 
   livekit.SIPMediaEncryption media_encryption = 22;
 
-  // NEXT ID: 23
+  map<string, string> feature_flags = 23;
+
+  // NEXT ID: 24
 }
 
 message UpdateSIPCallStateRequest {
