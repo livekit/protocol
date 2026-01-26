@@ -362,6 +362,24 @@ func (c CursorCodec[P, T]) Decode(cp *CursorPagination) (primary P, tie T, ok bo
 	return primary, tie, true, nil
 }
 
+func (c CursorCodec[P, T]) Encode(primary P, tie T) (*CursorPagination, error) {
+	sortKey, err := c.SortKey.Encode(primary)
+	if err != nil {
+		return nil, fmt.Errorf("encode primary: %w", err)
+	}
+	tieKey, err := c.TieBreaker.Encode(tie)
+	if err != nil {
+		return nil, fmt.Errorf("encode tie: %w", err)
+	}
+	if sortKey == "" && tieKey == "" {
+		return nil, nil
+	}
+	return EncodeCursorPagination(CursorTokenData{
+		SortKey:    sortKey,
+		TieBreaker: tieKey,
+	})
+}
+
 var StringCursorCodec = ScalarCursorCodec[string]{
 	Encode: func(s string) (string, error) { return s, nil },
 	Decode: func(s string) (string, error) { return s, nil },
