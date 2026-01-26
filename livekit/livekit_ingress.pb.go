@@ -1283,7 +1283,7 @@ func (x *UpdateIngressRequest) GetEnabled() bool {
 
 type ListIngressRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
-	PageToken *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	PageToken *CursorPagination      `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// when blank, lists all ingress endpoints
 	RoomName      string `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`    // (optional, filter by room name)
 	IngressId     string `protobuf:"bytes,2,opt,name=ingress_id,json=ingressId,proto3" json:"ingress_id,omitempty"` // (optional, filter by ingress ID)
@@ -1321,7 +1321,7 @@ func (*ListIngressRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_ingress_proto_rawDescGZIP(), []int{10}
 }
 
-func (x *ListIngressRequest) GetPageToken() *TokenPagination {
+func (x *ListIngressRequest) GetPageToken() *CursorPagination {
 	if x != nil {
 		return x.PageToken
 	}
@@ -1344,7 +1344,7 @@ func (x *ListIngressRequest) GetIngressId() string {
 
 type ListIngressResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NextPageToken *TokenPagination       `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	NextPageToken *CursorPagination      `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	Items         []*IngressInfo         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"` // next field id: 3
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1380,7 +1380,7 @@ func (*ListIngressResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_ingress_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *ListIngressResponse) GetNextPageToken() *TokenPagination {
+func (x *ListIngressResponse) GetNextPageToken() *CursorPagination {
 	if x != nil {
 		return x.NextPageToken
 	}
@@ -1560,15 +1560,15 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x13_bypass_transcodingB\x15\n" +
 	"\x13_enable_transcodingB\n" +
 	"\n" +
-	"\b_enabled\"\x89\x01\n" +
-	"\x12ListIngressRequest\x127\n" +
+	"\b_enabled\"\x8a\x01\n" +
+	"\x12ListIngressRequest\x128\n" +
 	"\n" +
-	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12\x1b\n" +
+	"page_token\x18\x03 \x01(\v2\x19.livekit.CursorPaginationR\tpageToken\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1d\n" +
 	"\n" +
-	"ingress_id\x18\x02 \x01(\tR\tingressId\"\x83\x01\n" +
-	"\x13ListIngressResponse\x12@\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12*\n" +
+	"ingress_id\x18\x02 \x01(\tR\tingressId\"\x84\x01\n" +
+	"\x13ListIngressResponse\x12A\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x19.livekit.CursorPaginationR\rnextPageToken\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.IngressInfoR\x05items\"5\n" +
 	"\x14DeleteIngressRequest\x12\x1d\n" +
 	"\n" +
@@ -1636,7 +1636,7 @@ var file_livekit_ingress_proto_goTypes = []any{
 	(VideoCodec)(0),                     // 19: livekit.VideoCodec
 	(*VideoLayer)(nil),                  // 20: livekit.VideoLayer
 	(*TrackInfo)(nil),                   // 21: livekit.TrackInfo
-	(*TokenPagination)(nil),             // 22: livekit.TokenPagination
+	(*CursorPagination)(nil),            // 22: livekit.CursorPagination
 }
 var file_livekit_ingress_proto_depIdxs = []int32{
 	0,  // 0: livekit.CreateIngressRequest.input_type:type_name -> livekit.IngressInput
@@ -1661,8 +1661,8 @@ var file_livekit_ingress_proto_depIdxs = []int32{
 	21, // 19: livekit.IngressState.tracks:type_name -> livekit.TrackInfo
 	5,  // 20: livekit.UpdateIngressRequest.audio:type_name -> livekit.IngressAudioOptions
 	6,  // 21: livekit.UpdateIngressRequest.video:type_name -> livekit.IngressVideoOptions
-	22, // 22: livekit.ListIngressRequest.page_token:type_name -> livekit.TokenPagination
-	22, // 23: livekit.ListIngressResponse.next_page_token:type_name -> livekit.TokenPagination
+	22, // 22: livekit.ListIngressRequest.page_token:type_name -> livekit.CursorPagination
+	22, // 23: livekit.ListIngressResponse.next_page_token:type_name -> livekit.CursorPagination
 	9,  // 24: livekit.ListIngressResponse.items:type_name -> livekit.IngressInfo
 	4,  // 25: livekit.Ingress.CreateIngress:input_type -> livekit.CreateIngressRequest
 	13, // 26: livekit.Ingress.UpdateIngress:input_type -> livekit.UpdateIngressRequest
