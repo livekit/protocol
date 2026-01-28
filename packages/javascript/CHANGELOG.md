@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.44.1
+
+### Patch Changes
+
+- Sync schema versions - [#1385](https://github.com/livekit/protocol/pull/1385) ([@paulwe](https://github.com/paulwe))
+
 ## 1.44.0
 
 ### Patch Changes
