@@ -553,24 +553,59 @@ func (s *SIPGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 type AgentGrant struct {
 	// Admin grants to create/update/delete Cloud Agents.
 	Admin bool `json:"admin,omitempty"`
+
+	// Endpoints specifies which agent endpoints the holder can use.
+	// When empty, no endpoint access is granted.
+	// Use "*" to grant access to all endpoints.
+	Endpoints []string `json:"endpoints,omitempty"`
 }
 
-func (s *AgentGrant) Clone() *AgentGrant {
-	if s == nil {
+func (a *AgentGrant) SetEndpoints(endpoints []string) {
+	a.Endpoints = endpoints
+}
+
+func (a *AgentGrant) GetEndpoints() []string {
+	return a.Endpoints
+}
+
+// CanUseEndpoint returns true if the grant allows using the specified endpoint.
+// The endpoint must be explicitly listed in Endpoints, or Endpoints must contain
+// "*" for wildcard access. Note: Admin is a separate permission for Cloud Agents
+// CRUD operations and does not grant endpoint access.
+func (a *AgentGrant) CanUseEndpoint(endpoint string) bool {
+	if a == nil {
+		return false
+	}
+	for _, e := range a.Endpoints {
+		if e == "*" || e == endpoint {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *AgentGrant) Clone() *AgentGrant {
+	if a == nil {
 		return nil
 	}
 
-	clone := *s
+	clone := *a
+
+	if a.Endpoints != nil {
+		clone.Endpoints = make([]string, len(a.Endpoints))
+		copy(clone.Endpoints, a.Endpoints)
+	}
 
 	return &clone
 }
 
-func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
-	if s == nil {
+func (a *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if a == nil {
 		return nil
 	}
 
-	e.AddBool("Admin", s.Admin)
+	e.AddBool("Admin", a.Admin)
+	e.AddArray("Endpoints", logger.StringSlice(a.Endpoints))
 	return nil
 }
 
