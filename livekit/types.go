@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"io"
 	"slices"
+	"time"
 
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
@@ -259,6 +260,134 @@ func DecodeTokenPagination(tp *TokenPagination) (offset, limit int32, err error)
 	}
 
 	return data.Offset, data.Limit, nil
+}
+
+// CursorTokenData holds the encoded pieces used for cursor pagination.
+//
+// Instead of paginating with an offset, cursor pagination represents
+// a position in an ordered list. The server returns a token for the last item in
+// a page, and the client sends it back to request the next page.
+//
+// A cursor token contains:
+//   - sort_key: the value of the primary ordering column (e.g. created_at)
+//   - tie_breaker: a secondary stable key (usually a unique ID) to make ordering
+//     deterministic when multiple rows share the same sort_key value
+//
+// This matches common SQL ordering like:
+//
+//	ORDER BY created_at DESC, id DESC
+//
+// and next-page predicate like:
+//
+//	WHERE (created_at, id) < (:created_at, :id)
+//
+// (for descending order).
+type CursorTokenData struct {
+	SortKey    string `json:"sort_key"`
+	TieBreaker string `json:"tie_breaker"`
+}
+
+// EncodeTokenPaginationWithCursor encodes cursor token data into a TokenPagination.
+func EncodeTokenPaginationWithCursor(data CursorTokenData) (*TokenPagination, error) {
+	token, err := EncodeCursorToken(data)
+	if err != nil {
+		return nil, err
+	}
+	return &TokenPagination{Token: token}, nil
+}
+
+// DecodeTokenPaginationWithCursor decodes a TokenPagination into CursorTokenData.
+// If the TokenPagination is nil or has an empty token, returns zero values without error.
+func DecodeTokenPaginationWithCursor(tp *TokenPagination) (data CursorTokenData, ok bool, err error) {
+	if tp == nil || tp.Token == "" {
+		return CursorTokenData{}, false, nil
+	}
+	data, err = DecodeCursorToken(tp.Token)
+	if err != nil {
+		return CursorTokenData{}, false, err
+	}
+	return data, true, nil
+}
+
+func EncodeCursorToken(data CursorTokenData) (string, error) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal cursor token data: %w", err)
+	}
+	return base64.URLEncoding.EncodeToString(jsonData), nil
+}
+
+func DecodeCursorToken(token string) (CursorTokenData, error) {
+	decoded, err := base64.URLEncoding.DecodeString(token)
+	if err != nil {
+		return CursorTokenData{}, fmt.Errorf("failed to decode cursor token: %w", err)
+	}
+	var data CursorTokenData
+	if err := json.Unmarshal(decoded, &data); err != nil {
+		return CursorTokenData{}, fmt.Errorf("failed to unmarshal cursor token data: %w", err)
+	}
+	return data, nil
+}
+
+type ScalarCursorCodec[T any] struct {
+	Encode func(T) (string, error)
+	Decode func(string) (T, error)
+}
+
+type CursorCodec[S, T any] struct {
+	SortKey    ScalarCursorCodec[S]
+	TieBreaker ScalarCursorCodec[T]
+}
+
+func (c CursorCodec[P, T]) Decode(tp *TokenPagination) (primary P, tie T, ok bool, err error) {
+	data, ok, err := DecodeTokenPaginationWithCursor(tp)
+	if err != nil {
+		return *new(P), *new(T), false, err
+	}
+	if !ok {
+		return *new(P), *new(T), false, nil
+	}
+	if data.SortKey == "" && data.TieBreaker == "" {
+		return *new(P), *new(T), false, nil
+	}
+
+	primary, err = c.SortKey.Decode(data.SortKey)
+	if err != nil {
+		return *new(P), *new(T), false, fmt.Errorf("decode primary: %w", err)
+	}
+	tie, err = c.TieBreaker.Decode(data.TieBreaker)
+	if err != nil {
+		return *new(P), *new(T), false, fmt.Errorf("decode tie: %w", err)
+	}
+	return primary, tie, true, nil
+}
+
+func (c CursorCodec[P, T]) Encode(primary P, tie T) (*TokenPagination, error) {
+	sortKey, err := c.SortKey.Encode(primary)
+	if err != nil {
+		return nil, fmt.Errorf("encode primary: %w", err)
+	}
+	tieKey, err := c.TieBreaker.Encode(tie)
+	if err != nil {
+		return nil, fmt.Errorf("encode tie: %w", err)
+	}
+	if sortKey == "" && tieKey == "" {
+		return nil, nil
+	}
+	return EncodeTokenPaginationWithCursor(CursorTokenData{
+		SortKey:    sortKey,
+		TieBreaker: tieKey,
+	})
+}
+
+var StringCursorCodec = ScalarCursorCodec[string]{
+	Encode: func(s string) (string, error) { return s, nil },
+	Decode: func(s string) (string, error) { return s, nil },
+}
+
+var TimeRFC3339NanoCursorCodec = ScalarCursorCodec[time.Time]{
+	Encode: func(t time.Time) (string, error) { return t.UTC().Format(time.RFC3339Nano), nil },
+	Decode: func(s string) (time.Time, error) { return time.Parse(time.RFC3339Nano, s) },
 }
 
 type pageIterReq[T any] interface {
