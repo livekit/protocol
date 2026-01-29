@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"slices"
@@ -287,6 +288,9 @@ type CursorTokenData struct {
 	TieBreaker string `json:"tie_breaker"`
 }
 
+// ErrNoCursor indicates that no cursor was provided (e.g. first page request).
+var ErrNoCursor = errors.New("no cursor")
+
 // EncodeTokenPaginationWithCursor encodes cursor token data into a TokenPagination.
 func EncodeTokenPaginationWithCursor(data CursorTokenData) (*TokenPagination, error) {
 	token, err := EncodeCursorToken(data)
@@ -297,16 +301,16 @@ func EncodeTokenPaginationWithCursor(data CursorTokenData) (*TokenPagination, er
 }
 
 // DecodeTokenPaginationWithCursor decodes a TokenPagination into CursorTokenData.
-// If the TokenPagination is nil or has an empty token, returns zero values without error.
-func DecodeTokenPaginationWithCursor(tp *TokenPagination) (data CursorTokenData, ok bool, err error) {
+// Returns ErrNoCursor if the TokenPagination is nil or has an empty token.
+func DecodeTokenPaginationWithCursor(tp *TokenPagination) (data CursorTokenData, err error) {
 	if tp == nil || tp.Token == "" {
-		return CursorTokenData{}, false, nil
+		return CursorTokenData{}, ErrNoCursor
 	}
 	data, err = DecodeCursorToken(tp.Token)
 	if err != nil {
-		return CursorTokenData{}, false, err
+		return CursorTokenData{}, err
 	}
-	return data, true, nil
+	return data, nil
 }
 
 func EncodeCursorToken(data CursorTokenData) (string, error) {
@@ -339,27 +343,24 @@ type CursorCodec[S, T any] struct {
 	TieBreaker ScalarCursorCodec[T]
 }
 
-func (c CursorCodec[P, T]) Decode(tp *TokenPagination) (primary P, tie T, ok bool, err error) {
-	data, ok, err := DecodeTokenPaginationWithCursor(tp)
+func (c CursorCodec[P, T]) Decode(tp *TokenPagination) (primary P, tie T, err error) {
+	data, err := DecodeTokenPaginationWithCursor(tp)
 	if err != nil {
-		return *new(P), *new(T), false, err
-	}
-	if !ok {
-		return *new(P), *new(T), false, nil
+		return *new(P), *new(T), err
 	}
 	if data.SortKey == "" && data.TieBreaker == "" {
-		return *new(P), *new(T), false, nil
+		return *new(P), *new(T), ErrNoCursor
 	}
 
 	primary, err = c.SortKey.Decode(data.SortKey)
 	if err != nil {
-		return *new(P), *new(T), false, fmt.Errorf("decode primary: %w", err)
+		return *new(P), *new(T), fmt.Errorf("decode primary: %w", err)
 	}
 	tie, err = c.TieBreaker.Decode(data.TieBreaker)
 	if err != nil {
-		return *new(P), *new(T), false, fmt.Errorf("decode tie: %w", err)
+		return *new(P), *new(T), fmt.Errorf("decode tie: %w", err)
 	}
-	return primary, tie, true, nil
+	return primary, tie, nil
 }
 
 func (c CursorCodec[P, T]) Encode(primary P, tie T) (*TokenPagination, error) {
