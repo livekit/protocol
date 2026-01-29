@@ -103,11 +103,6 @@ func (t *AccessToken) SetObservabilityGrant(grant *ObservabilityGrant) *AccessTo
 	return t
 }
 
-func (t *AccessToken) SetSimulationGrant(grant *SimulationGrant) *AccessToken {
-	t.grant.Simulation = grant
-	return t
-}
-
 func (t *AccessToken) SetMetadata(md string) *AccessToken {
 	t.grant.Metadata = md
 	return t
