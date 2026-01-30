@@ -1,5 +1,5 @@
 ---
-"@fake-scope/fake-pkg": patch
+"@livekit/protocol": patch
 ---
 
 update room observability codegen
