@@ -18,14 +18,37 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"slices"
+	"time"
 
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
+	"go.opentelemetry.io/otel/attribute"
 	proto "google.golang.org/protobuf/proto"
 	"gopkg.in/yaml.v3"
+)
+
+const (
+	TraceKeyPref = "lk."
+
+	TraceKeyRoomPrefix = TraceKeyPref + "room."
+	TraceKeyRoomID     = attribute.Key(TraceKeyRoomPrefix + "id")
+	TraceKeyRoomName   = attribute.Key(TraceKeyRoomPrefix + "name")
+
+	TraceKeyParticipantPrefix   = TraceKeyPref + "participant."
+	TraceKeyParticipantID       = attribute.Key(TraceKeyParticipantPrefix + "id")
+	TraceKeyParticipantIdentity = attribute.Key(TraceKeyParticipantPrefix + "identity")
+
+	TraceKeyTrackPrefix = TraceKeyPref + "track."
+	TraceKeyTrackID     = attribute.Key(TraceKeyTrackPrefix + "id")
+
+	TraceKeySIPPrefix       = TraceKeyPref + "sip."
+	TraceKeySIPHeaderPrefix = TraceKeySIPPrefix + "h."
+	TraceKeySIPCallID       = attribute.Key(TraceKeySIPPrefix + "call.id")
+	TraceKeySIPCallIDHeader = attribute.Key(TraceKeySIPHeaderPrefix + "CallID")
 )
 
 type TrackID string
@@ -47,6 +70,8 @@ type ParticipantKey struct {
 type JobID string
 type DispatchID string
 type AgentName string
+type SIPCallID string
+type SIPCallIDHeader string
 
 func (s TrackID) String() string             { return string(s) }
 func (s ParticipantID) String() string       { return string(s) }
@@ -59,8 +84,32 @@ func (s NodeID) String() string              { return string(s) }
 func (s JobID) String() string               { return string(s) }
 func (s DispatchID) String() string          { return string(s) }
 func (s AgentName) String() string           { return string(s) }
+func (s SIPCallID) String() string           { return string(s) }
+func (s SIPCallIDHeader) String() string     { return string(s) }
 func (s ParticipantKey) String() string {
 	return fmt.Sprintf("%s_%s_%s", s.ProjectID, s.RoomName, s.Identity)
+}
+
+func (s ParticipantID) Trace() attribute.KeyValue {
+	return TraceKeyParticipantID.String(string(s))
+}
+func (s ParticipantIdentity) Trace() attribute.KeyValue {
+	return TraceKeyParticipantIdentity.String(string(s))
+}
+func (s RoomID) Trace() attribute.KeyValue {
+	return TraceKeyRoomID.String(string(s))
+}
+func (s RoomName) Trace() attribute.KeyValue {
+	return TraceKeyRoomName.String(string(s))
+}
+func (s TrackID) Trace() attribute.KeyValue {
+	return TraceKeyTrackID.String(string(s))
+}
+func (s SIPCallID) Trace() attribute.KeyValue {
+	return TraceKeySIPCallID.String(string(s))
+}
+func (s SIPCallIDHeader) Trace() attribute.KeyValue {
+	return TraceKeySIPCallIDHeader.String(string(s))
 }
 
 type stringTypes interface {
@@ -212,6 +261,134 @@ func DecodeTokenPagination(tp *TokenPagination) (offset, limit int32, err error)
 	}
 
 	return data.Offset, data.Limit, nil
+}
+
+// CursorTokenData holds the encoded pieces used for cursor pagination.
+//
+// Instead of paginating with an offset, cursor pagination represents
+// a position in an ordered list. The server returns a token for the last item in
+// a page, and the client sends it back to request the next page.
+//
+// A cursor token contains:
+//   - sort_key: the value of the primary ordering column (e.g. created_at)
+//   - tie_breaker: a secondary stable key (usually a unique ID) to make ordering
+//     deterministic when multiple rows share the same sort_key value
+//
+// This matches common SQL ordering like:
+//
+//	ORDER BY created_at DESC, id DESC
+//
+// and next-page predicate like:
+//
+//	WHERE (created_at, id) < (:created_at, :id)
+//
+// (for descending order).
+type CursorTokenData struct {
+	SortKey    string `json:"sort_key"`
+	TieBreaker string `json:"tie_breaker"`
+}
+
+// ErrNoCursor indicates that no cursor was provided (e.g. first page request).
+var ErrNoCursor = errors.New("no cursor")
+
+// EncodeTokenPaginationWithCursor encodes cursor token data into a TokenPagination.
+func EncodeTokenPaginationWithCursor(data CursorTokenData) (*TokenPagination, error) {
+	token, err := EncodeCursorToken(data)
+	if err != nil {
+		return nil, err
+	}
+	return &TokenPagination{Token: token}, nil
+}
+
+// DecodeTokenPaginationWithCursor decodes a TokenPagination into CursorTokenData.
+// Returns ErrNoCursor if the TokenPagination is nil or has an empty token.
+func DecodeTokenPaginationWithCursor(tp *TokenPagination) (data CursorTokenData, err error) {
+	if tp == nil || tp.Token == "" {
+		return CursorTokenData{}, ErrNoCursor
+	}
+	data, err = DecodeCursorToken(tp.Token)
+	if err != nil {
+		return CursorTokenData{}, err
+	}
+	return data, nil
+}
+
+func EncodeCursorToken(data CursorTokenData) (string, error) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal cursor token data: %w", err)
+	}
+	return base64.URLEncoding.EncodeToString(jsonData), nil
+}
+
+func DecodeCursorToken(token string) (CursorTokenData, error) {
+	decoded, err := base64.URLEncoding.DecodeString(token)
+	if err != nil {
+		return CursorTokenData{}, fmt.Errorf("failed to decode cursor token: %w", err)
+	}
+	var data CursorTokenData
+	if err := json.Unmarshal(decoded, &data); err != nil {
+		return CursorTokenData{}, fmt.Errorf("failed to unmarshal cursor token data: %w", err)
+	}
+	return data, nil
+}
+
+type ScalarCursorCodec[T any] struct {
+	Encode func(T) (string, error)
+	Decode func(string) (T, error)
+}
+
+type CursorCodec[S, T any] struct {
+	SortKey    ScalarCursorCodec[S]
+	TieBreaker ScalarCursorCodec[T]
+}
+
+func (c CursorCodec[P, T]) Decode(tp *TokenPagination) (primary P, tie T, err error) {
+	data, err := DecodeTokenPaginationWithCursor(tp)
+	if err != nil {
+		return *new(P), *new(T), err
+	}
+	if data.SortKey == "" && data.TieBreaker == "" {
+		return *new(P), *new(T), ErrNoCursor
+	}
+
+	primary, err = c.SortKey.Decode(data.SortKey)
+	if err != nil {
+		return *new(P), *new(T), fmt.Errorf("decode primary: %w", err)
+	}
+	tie, err = c.TieBreaker.Decode(data.TieBreaker)
+	if err != nil {
+		return *new(P), *new(T), fmt.Errorf("decode tie: %w", err)
+	}
+	return primary, tie, nil
+}
+
+func (c CursorCodec[P, T]) Encode(primary P, tie T) (*TokenPagination, error) {
+	sortKey, err := c.SortKey.Encode(primary)
+	if err != nil {
+		return nil, fmt.Errorf("encode primary: %w", err)
+	}
+	tieKey, err := c.TieBreaker.Encode(tie)
+	if err != nil {
+		return nil, fmt.Errorf("encode tie: %w", err)
+	}
+	if sortKey == "" && tieKey == "" {
+		return nil, nil
+	}
+	return EncodeTokenPaginationWithCursor(CursorTokenData{
+		SortKey:    sortKey,
+		TieBreaker: tieKey,
+	})
+}
+
+var StringCursorCodec = ScalarCursorCodec[string]{
+	Encode: func(s string) (string, error) { return s, nil },
+	Decode: func(s string) (string, error) { return s, nil },
+}
+
+var TimeRFC3339NanoCursorCodec = ScalarCursorCodec[time.Time]{
+	Encode: func(t time.Time) (string, error) { return t.UTC().Format(time.RFC3339Nano), nil },
+	Decode: func(s string) (time.Time, error) { return time.Parse(time.RFC3339Nano, s) },
 }
 
 type pageIterReq[T any] interface {

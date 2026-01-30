@@ -3,6 +3,8 @@ syntax = "proto3";
 package livekit.agent;
 
 option go_package = "github.com/livekit/protocol/livekit/agent";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
 

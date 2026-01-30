@@ -1043,8 +1043,9 @@ type StartSession struct {
 	Identity     string                 `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
 	ConnectionId string                 `protobuf:"bytes,3,opt,name=connection_id,json=connectionId,proto3" json:"connection_id,omitempty"`
 	// if a client is reconnecting (i.e. resume instead of restart)
-	Reconnect     bool `protobuf:"varint,4,opt,name=reconnect,proto3" json:"reconnect,omitempty"`
-	AutoSubscribe bool `protobuf:"varint,9,opt,name=auto_subscribe,json=autoSubscribe,proto3" json:"auto_subscribe,omitempty"`
+	Reconnect              bool  `protobuf:"varint,4,opt,name=reconnect,proto3" json:"reconnect,omitempty"`
+	AutoSubscribe          bool  `protobuf:"varint,9,opt,name=auto_subscribe,json=autoSubscribe,proto3" json:"auto_subscribe,omitempty"`
+	AutoSubscribeDataTrack *bool `protobuf:"varint,25,opt,name=auto_subscribe_data_track,json=autoSubscribeDataTrack,proto3,oneof" json:"auto_subscribe_data_track,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	Hidden bool        `protobuf:"varint,10,opt,name=hidden,proto3" json:"hidden,omitempty"`
 	Client *ClientInfo `protobuf:"bytes,11,opt,name=client,proto3" json:"client,omitempty"`
@@ -1129,6 +1130,13 @@ func (x *StartSession) GetReconnect() bool {
 func (x *StartSession) GetAutoSubscribe() bool {
 	if x != nil {
 		return x.AutoSubscribe
+	}
+	return false
+}
+
+func (x *StartSession) GetAutoSubscribeDataTrack() bool {
+	if x != nil && x.AutoSubscribeDataTrack != nil {
+		return *x.AutoSubscribeDataTrack
 	}
 	return false
 }
@@ -1381,7 +1389,7 @@ var File_livekit_internal_proto protoreflect.FileDescriptor
 
 const file_livekit_internal_proto_rawDesc = "" +
 	"\n" +
-	"\x16livekit_internal.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x12livekit_room.proto\x1a\x11livekit_rtc.proto\"\xd4\x01\n" +
+	"\x16livekit_internal.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x14livekit_egress.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto\x1a\x11livekit_rtc.proto\"\xd4\x01\n" +
 	"\x04Node\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x19\n" +
@@ -1487,13 +1495,14 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\x9f\a\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xfd\a\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12#\n" +
 	"\rconnection_id\x18\x03 \x01(\tR\fconnectionId\x12\x1c\n" +
 	"\treconnect\x18\x04 \x01(\bR\treconnect\x12%\n" +
-	"\x0eauto_subscribe\x18\t \x01(\bR\rautoSubscribe\x12\x1a\n" +
+	"\x0eauto_subscribe\x18\t \x01(\bR\rautoSubscribe\x12>\n" +
+	"\x19auto_subscribe_data_track\x18\x19 \x01(\bH\x00R\x16autoSubscribeDataTrack\x88\x01\x01\x12\x1a\n" +
 	"\x06hidden\x18\n" +
 	" \x01(\bB\x02\x18\x01R\x06hidden\x12+\n" +
 	"\x06client\x18\v \x01(\v2\x13.livekit.ClientInfoR\x06client\x12\x1e\n" +
@@ -1504,7 +1513,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x0fadaptive_stream\x18\x0f \x01(\bR\x0eadaptiveStream\x12%\n" +
 	"\x0eparticipant_id\x18\x10 \x01(\tR\rparticipantId\x12C\n" +
 	"\x10reconnect_reason\x18\x11 \x01(\x0e2\x18.livekit.ReconnectReasonR\x0freconnectReason\x129\n" +
-	"\x16subscriber_allow_pause\x18\x12 \x01(\bH\x00R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
+	"\x16subscriber_allow_pause\x18\x12 \x01(\bH\x01R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
 	"\x10disable_ice_lite\x18\x13 \x01(\bR\x0edisableIceLite\x12;\n" +
 	"\vcreate_room\x18\x14 \x01(\v2\x1a.livekit.CreateRoomRequestR\n" +
 	"createRoom\x12F\n" +
@@ -1512,7 +1521,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x0fpublisher_offer\x18\x16 \x01(\v2\x1b.livekit.SessionDescriptionR\x0epublisherOffer\x121\n" +
 	"\n" +
 	"sync_state\x18\x17 \x01(\v2\x12.livekit.SyncStateR\tsyncState\x12;\n" +
-	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnectionB\x19\n" +
+	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnectionB\x1c\n" +
+	"\x1a_auto_subscribe_data_trackB\x19\n" +
 	"\x17_subscriber_allow_pause\"\xe7\x02\n" +
 	"\fRoomInternal\x12;\n" +
 	"\ftrack_egress\x18\x01 \x01(\v2\x18.livekit.AutoTrackEgressR\vtrackEgress\x12M\n" +
@@ -1608,9 +1618,9 @@ func file_livekit_internal_proto_init() {
 	if File_livekit_internal_proto != nil {
 		return
 	}
-	file_livekit_models_proto_init()
-	file_livekit_egress_proto_init()
 	file_livekit_agent_dispatch_proto_init()
+	file_livekit_egress_proto_init()
+	file_livekit_models_proto_init()
 	file_livekit_room_proto_init()
 	file_livekit_rtc_proto_init()
 	file_livekit_internal_proto_msgTypes[3].OneofWrappers = []any{}

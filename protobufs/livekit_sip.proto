@@ -895,8 +895,9 @@ message SIPCallInfo {
   string pcap_file_link = 25;
   repeated google.protobuf.Any call_context = 26;
   ProviderInfo provider_info = 27;
+  string sip_call_id = 28;
 
-  // NEXT ID: 28
+  // NEXT ID: 29
 }
 
 message SIPTransferInfo {

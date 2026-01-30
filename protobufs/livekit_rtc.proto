@@ -15,13 +15,13 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
-
 import "logger/options.proto";
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
 
 message SignalRequest {
   oneof message {
@@ -316,8 +316,6 @@ message UpdateTrackSettings {
   uint32 priority = 8;
 }
 
-
-
 message UpdateLocalAudioTrack {
   string track_sid = 1;
   repeated AudioTrackFeature features = 2;
@@ -332,9 +330,9 @@ message UpdateLocalVideoTrack {
 message LeaveRequest {
   // indicates action clients should take on receiving this message
   enum Action {
-    DISCONNECT = 0;  // should disconnect
-    RESUME = 1;      // should attempt a resume with `reconnect=1` in join URL
-    RECONNECT = 2;   // should attempt a reconnect, i. e. no `reconnect=1`
+    DISCONNECT = 0; // should disconnect
+    RESUME = 1; // should attempt a resume with `reconnect=1` in join URL
+    RECONNECT = 2; // should attempt a reconnect, i. e. no `reconnect=1`
   }
 
   // sent when server initiates the disconnect due to server-restart
@@ -551,7 +549,7 @@ message RequestResponse {
     NOT_ALLOWED = 2;
     LIMIT_EXCEEDED = 3;
     QUEUED = 4;
-    UNSUPPORTED_TYPE= 5;
+    UNSUPPORTED_TYPE = 5;
     UNCLASSIFIED_ERROR = 6;
     INVALID_HANDLE = 7;
     INVALID_NAME = 8;
@@ -583,6 +581,7 @@ message ConnectionSettings {
   bool adaptive_stream = 2;
   optional bool subscriber_allow_pause = 3;
   bool disable_ice_lite = 4;
+  optional bool auto_subscribe_data_track = 5;
 }
 
 message JoinRequest {
@@ -618,7 +617,7 @@ message WrappedJoinRequest {
   }
 
   Compression compression = 1;
-  bytes join_request = 2;   // marshalled JoinRequest + potentially compressed
+  bytes join_request = 2; // marshalled JoinRequest + potentially compressed
 }
 
 message MediaSectionsRequirement {
