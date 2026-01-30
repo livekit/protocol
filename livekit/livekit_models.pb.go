@@ -1776,8 +1776,10 @@ type ParticipantPermission struct {
 	Agent bool `protobuf:"varint,11,opt,name=agent,proto3" json:"agent,omitempty"`
 	// if a participant can subscribe to metrics
 	CanSubscribeMetrics bool `protobuf:"varint,12,opt,name=can_subscribe_metrics,json=canSubscribeMetrics,proto3" json:"can_subscribe_metrics,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// if a participant can manage an agent session via RemoteSession (control and access state)
+	CanManageAgentSession bool `protobuf:"varint,13,opt,name=can_manage_agent_session,json=canManageAgentSession,proto3" json:"can_manage_agent_session,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *ParticipantPermission) Reset() {
@@ -1871,6 +1873,13 @@ func (x *ParticipantPermission) GetAgent() bool {
 func (x *ParticipantPermission) GetCanSubscribeMetrics() bool {
 	if x != nil {
 		return x.CanSubscribeMetrics
+	}
+	return false
+}
+
+func (x *ParticipantPermission) GetCanManageAgentSession() bool {
+	if x != nil {
+		return x.CanManageAgentSession
 	}
 	return false
 }
@@ -6046,7 +6055,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fPlayoutDelay\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x10\n" +
 	"\x03min\x18\x02 \x01(\rR\x03min\x12\x10\n" +
-	"\x03max\x18\x03 \x01(\rR\x03max\"\x83\x03\n" +
+	"\x03max\x18\x03 \x01(\rR\x03max\"\xbc\x03\n" +
 	"\x15ParticipantPermission\x12#\n" +
 	"\rcan_subscribe\x18\x01 \x01(\bR\fcanSubscribe\x12\x1f\n" +
 	"\vcan_publish\x18\x02 \x01(\bR\n" +
@@ -6058,7 +6067,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13can_update_metadata\x18\n" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
-	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\x8b\t\n" +
+	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\x127\n" +
+	"\x18can_manage_agent_session\x18\r \x01(\bR\x15canManageAgentSession\"\x8b\t\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
