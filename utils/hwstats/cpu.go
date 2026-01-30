@@ -205,6 +205,10 @@ func (c *CPUStats) monitorProcesses() {
 			}
 
 			for pid, stat := range procStats {
+				memory := stat.RSS * pageSize
+				stats.Memory[pid] += memory
+				stats.MemoryTotal += memory
+
 				// process usage as percent of total host cpu
 				procPercentUsage := float64(stat.UTime + stat.STime - prevStats[pid].UTime - prevStats[pid].STime)
 				if procPercentUsage == 0 {
@@ -219,10 +223,6 @@ func (c *CPUStats) monitorProcesses() {
 				cpu := hostCPU * procPercentUsage / 100 / (totalHostTime - prevTotalTime)
 				stats.Cpu[pid] += cpu
 				stats.CpuIdle -= cpu
-
-				memory := stat.RSS * pageSize
-				stats.Memory[pid] += memory
-				stats.MemoryTotal += memory
 			}
 
 			c.idleCPUs.Store(stats.CpuIdle)
