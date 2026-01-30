@@ -553,6 +553,8 @@ func (s *SIPGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 type AgentGrant struct {
 	// Admin grants to create/update/delete Cloud Agents.
 	Admin bool `json:"admin,omitempty"`
+	// CreateSimulation grants access to create simulations to evaluate an agent.
+	CreateSimulation bool `json:"createSimulation,omitempty"`
 }
 
 func (s *AgentGrant) Clone() *AgentGrant {
@@ -571,6 +573,7 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddBool("Admin", s.Admin)
+	e.AddBool("CreateSimulation", s.CreateSimulation)
 	return nil
 }
 
