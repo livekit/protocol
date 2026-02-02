@@ -6,6 +6,7 @@ import (
 	"github.com/livekit/protocol/observability/gatewayobs"
 	"github.com/livekit/protocol/observability/ingressobs"
 	"github.com/livekit/protocol/observability/roomobs"
+	"github.com/livekit/protocol/observability/storageobs"
 	"github.com/livekit/protocol/observability/telephonycallobs"
 	"github.com/livekit/protocol/observability/telephonyobs"
 )
@@ -22,7 +23,7 @@ type Reporter interface {
 	Ingress() ingressobs.Reporter
 	GatewayMetrics() any // any is a placeholder for the gateway metrics type
 	TelephonyCall() telephonycallobs.Reporter
-	Storage() any
+	Storage() storageobs.Reporter
 	Close()
 }
 
@@ -68,7 +69,7 @@ func (reporter) TelephonyCall() telephonycallobs.Reporter {
 	return telephonycallobs.NewNoopReporter()
 }
 
-func (reporter) Storage() any { return nil }
+func (reporter) Storage() storageobs.Reporter { return storageobs.NewNoopReporter() }
 
 func (reporter) Close() {
 }
