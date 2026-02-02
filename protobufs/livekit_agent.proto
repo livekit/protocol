@@ -187,11 +187,10 @@ message JobTermination {
   string job_id = 1;
 }
 
-message AgentSessionStateDelta {
-  // if base_version is empty, this is the delta from the initial state
-  optional string base_version = 1;
-  string new_version = 2;
-  bytes changeset = 3;
+message AgentSessionState {
+  uint64 version = 1;
+  bytes snapshot = 2;
+  bytes delta = 3;
 }
 
 message TextMessageRequest {
@@ -199,7 +198,7 @@ message TextMessageRequest {
   string session_id = 2;
   string agent_name = 3;
   string metadata = 4;
-  repeated AgentSessionStateDelta session_state = 5;
+  AgentSessionState session_state = 5;
   string text = 6;
 }
 
@@ -214,6 +213,6 @@ message PushTextRequest {
 message TextMessageResponse {
   // Indicate the request is completed
   string message_id = 1;
-  AgentSessionStateDelta session_state = 2;
+  AgentSessionState session_state = 2;
   string error = 3;
 }
