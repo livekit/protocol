@@ -205,24 +205,25 @@ func (c *CPUStats) monitorProcesses() {
 			}
 
 			for pid, stat := range procStats {
+				pidForGroup := pid
+				for ppids[pidForGroup] != self.PID && ppids[pidForGroup] != 0 {
+					// bundle usage up to first child of main go process
+					pidForGroup = ppids[pidForGroup]
+				}
+
+				memory := stat.RSS * pageSize
+				stats.Memory[pidForGroup] += memory
+				stats.MemoryTotal += memory
+
 				// process usage as percent of total host cpu
 				procPercentUsage := float64(stat.UTime + stat.STime - prevStats[pid].UTime - prevStats[pid].STime)
 				if procPercentUsage == 0 {
 					continue
 				}
 
-				for ppids[pid] != self.PID && ppids[pid] != 0 {
-					// bundle usage up to first child of main go process
-					pid = ppids[pid]
-				}
-
 				cpu := hostCPU * procPercentUsage / 100 / (totalHostTime - prevTotalTime)
-				stats.Cpu[pid] += cpu
+				stats.Cpu[pidForGroup] += cpu
 				stats.CpuIdle -= cpu
-
-				memory := stat.RSS * pageSize
-				stats.Memory[pid] += memory
-				stats.MemoryTotal += memory
 			}
 
 			c.idleCPUs.Store(stats.CpuIdle)

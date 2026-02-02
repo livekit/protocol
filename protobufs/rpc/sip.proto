@@ -141,7 +141,10 @@ message InternalCreateSIPParticipantRequest {
   // Destination information for routing decisions
   livekit.Destination destination = 32;
 
-  // NEXT ID: 33
+  // Project-level feature flags from ProjectSettings.FeatureFlags
+  map<string, string> feature_flags = 33;
+
+  // NEXT ID: 34
 }
 
 message InternalCreateSIPParticipantResponse {
@@ -165,5 +168,8 @@ message InternalTransferSIPParticipantRequest {
 
   // Max time for the transfer destination to answer the call.
   google.protobuf.Duration ringing_timeout = 5;
+
+  // Project-level feature flags from ProjectSettings.FeatureFlags
+  map<string, string> feature_flags = 6;
 }
 

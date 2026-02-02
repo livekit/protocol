@@ -204,13 +204,17 @@ message UpdateIngressRequest {
 }
 
 message ListIngressRequest {
+  TokenPagination page_token = 3;
   // when blank, lists all ingress endpoints
   string room_name = 1;  // (optional, filter by room name)
   string ingress_id = 2; // (optional, filter by ingress ID)
+  // next field id: 4
 }
 
 message ListIngressResponse {
+  TokenPagination next_page_token = 2;
   repeated IngressInfo items = 1;
+  // next field id: 3
 }
 
 message DeleteIngressRequest {
