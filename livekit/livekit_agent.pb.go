@@ -1468,30 +1468,29 @@ func (x *JobTermination) GetJobId() string {
 	return ""
 }
 
-type AgentSessionStateDelta struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// if base_version is empty, this is the delta from the initial state
-	BaseVersion   *string `protobuf:"bytes,1,opt,name=base_version,json=baseVersion,proto3,oneof" json:"base_version,omitempty"`
-	NewVersion    string  `protobuf:"bytes,2,opt,name=new_version,json=newVersion,proto3" json:"new_version,omitempty"`
-	Changeset     []byte  `protobuf:"bytes,3,opt,name=changeset,proto3" json:"changeset,omitempty"`
+type AgentSessionState struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Version       uint64                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+	Snapshot      []byte                 `protobuf:"bytes,2,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
+	Delta         []byte                 `protobuf:"bytes,3,opt,name=delta,proto3" json:"delta,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AgentSessionStateDelta) Reset() {
-	*x = AgentSessionStateDelta{}
+func (x *AgentSessionState) Reset() {
+	*x = AgentSessionState{}
 	mi := &file_livekit_agent_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AgentSessionStateDelta) String() string {
+func (x *AgentSessionState) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AgentSessionStateDelta) ProtoMessage() {}
+func (*AgentSessionState) ProtoMessage() {}
 
-func (x *AgentSessionStateDelta) ProtoReflect() protoreflect.Message {
+func (x *AgentSessionState) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1503,40 +1502,40 @@ func (x *AgentSessionStateDelta) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AgentSessionStateDelta.ProtoReflect.Descriptor instead.
-func (*AgentSessionStateDelta) Descriptor() ([]byte, []int) {
+// Deprecated: Use AgentSessionState.ProtoReflect.Descriptor instead.
+func (*AgentSessionState) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *AgentSessionStateDelta) GetBaseVersion() string {
-	if x != nil && x.BaseVersion != nil {
-		return *x.BaseVersion
+func (x *AgentSessionState) GetVersion() uint64 {
+	if x != nil {
+		return x.Version
 	}
-	return ""
+	return 0
 }
 
-func (x *AgentSessionStateDelta) GetNewVersion() string {
+func (x *AgentSessionState) GetSnapshot() []byte {
 	if x != nil {
-		return x.NewVersion
+		return x.Snapshot
 	}
-	return ""
+	return nil
 }
 
-func (x *AgentSessionStateDelta) GetChangeset() []byte {
+func (x *AgentSessionState) GetDelta() []byte {
 	if x != nil {
-		return x.Changeset
+		return x.Delta
 	}
 	return nil
 }
 
 type TextMessageRequest struct {
-	state         protoimpl.MessageState    `protogen:"open.v1"`
-	MessageId     string                    `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	SessionId     string                    `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	AgentName     string                    `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Metadata      string                    `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	SessionState  []*AgentSessionStateDelta `protobuf:"bytes,5,rep,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
-	Text          string                    `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	SessionId     string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	AgentName     string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Metadata      string                 `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	SessionState  *AgentSessionState     `protobuf:"bytes,5,opt,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
+	Text          string                 `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1599,7 +1598,7 @@ func (x *TextMessageRequest) GetMetadata() string {
 	return ""
 }
 
-func (x *TextMessageRequest) GetSessionState() []*AgentSessionStateDelta {
+func (x *TextMessageRequest) GetSessionState() *AgentSessionState {
 	if x != nil {
 		return x.SessionState
 	}
@@ -1669,9 +1668,9 @@ func (x *PushTextRequest) GetContent() string {
 type TextMessageResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Indicate the request is completed
-	MessageId     string                  `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	SessionState  *AgentSessionStateDelta `protobuf:"bytes,2,opt,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
-	Error         string                  `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
+	MessageId     string             `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	SessionState  *AgentSessionState `protobuf:"bytes,2,opt,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
+	Error         string             `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1713,7 +1712,7 @@ func (x *TextMessageResponse) GetMessageId() string {
 	return ""
 }
 
-func (x *TextMessageResponse) GetSessionState() *AgentSessionStateDelta {
+func (x *TextMessageResponse) GetSessionState() *AgentSessionState {
 	if x != nil {
 		return x.SessionState
 	}
@@ -1838,13 +1837,11 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"'\n" +
 	"\x0eJobTermination\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"\x90\x01\n" +
-	"\x16AgentSessionStateDelta\x12&\n" +
-	"\fbase_version\x18\x01 \x01(\tH\x00R\vbaseVersion\x88\x01\x01\x12\x1f\n" +
-	"\vnew_version\x18\x02 \x01(\tR\n" +
-	"newVersion\x12\x1c\n" +
-	"\tchangeset\x18\x03 \x01(\fR\tchangesetB\x0f\n" +
-	"\r_base_version\"\xe7\x01\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"_\n" +
+	"\x11AgentSessionState\x12\x18\n" +
+	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1a\n" +
+	"\bsnapshot\x18\x02 \x01(\fR\bsnapshot\x12\x14\n" +
+	"\x05delta\x18\x03 \x01(\fR\x05delta\"\xe2\x01\n" +
 	"\x12TextMessageRequest\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1d\n" +
@@ -1852,17 +1849,17 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1a\n" +
-	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12D\n" +
-	"\rsession_state\x18\x05 \x03(\v2\x1f.livekit.AgentSessionStateDeltaR\fsessionState\x12\x12\n" +
+	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12?\n" +
+	"\rsession_state\x18\x05 \x01(\v2\x1a.livekit.AgentSessionStateR\fsessionState\x12\x12\n" +
 	"\x04text\x18\x06 \x01(\tR\x04text\"J\n" +
 	"\x0fPushTextRequest\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"\x90\x01\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\"\x8b\x01\n" +
 	"\x13TextMessageResponse\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x12D\n" +
-	"\rsession_state\x18\x02 \x01(\v2\x1f.livekit.AgentSessionStateDeltaR\fsessionState\x12\x14\n" +
+	"message_id\x18\x01 \x01(\tR\tmessageId\x12?\n" +
+	"\rsession_state\x18\x02 \x01(\v2\x1a.livekit.AgentSessionStateR\fsessionState\x12\x14\n" +
 	"\x05error\x18\x03 \x01(\tR\x05error*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
@@ -1914,7 +1911,7 @@ var file_livekit_agent_proto_goTypes = []any{
 	(*UpdateWorkerStatus)(nil),     // 16: livekit.UpdateWorkerStatus
 	(*JobAssignment)(nil),          // 17: livekit.JobAssignment
 	(*JobTermination)(nil),         // 18: livekit.JobTermination
-	(*AgentSessionStateDelta)(nil), // 19: livekit.AgentSessionStateDelta
+	(*AgentSessionState)(nil),      // 19: livekit.AgentSessionState
 	(*TextMessageRequest)(nil),     // 20: livekit.TextMessageRequest
 	(*PushTextRequest)(nil),        // 21: livekit.PushTextRequest
 	(*TextMessageResponse)(nil),    // 22: livekit.TextMessageResponse
@@ -1956,8 +1953,8 @@ var file_livekit_agent_proto_depIdxs = []int32{
 	2,  // 28: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
 	1,  // 29: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
 	3,  // 30: livekit.JobAssignment.job:type_name -> livekit.Job
-	19, // 31: livekit.TextMessageRequest.session_state:type_name -> livekit.AgentSessionStateDelta
-	19, // 32: livekit.TextMessageResponse.session_state:type_name -> livekit.AgentSessionStateDelta
+	19, // 31: livekit.TextMessageRequest.session_state:type_name -> livekit.AgentSessionState
+	19, // 32: livekit.TextMessageResponse.session_state:type_name -> livekit.AgentSessionState
 	33, // [33:33] is the sub-list for method output_type
 	33, // [33:33] is the sub-list for method input_type
 	33, // [33:33] is the sub-list for extension type_name
@@ -1994,7 +1991,6 @@ func file_livekit_agent_proto_init() {
 	file_livekit_agent_proto_msgTypes[7].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[13].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[14].OneofWrappers = []any{}
-	file_livekit_agent_proto_msgTypes[16].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
