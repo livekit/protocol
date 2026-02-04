@@ -189,8 +189,8 @@ message JobTermination {
 
 message AgentSessionState {
   uint64 version = 1;
-  bytes snapshot = 2;
-  bytes delta = 3;
+  optional bytes snapshot = 2;
+  optional bytes delta = 3;
 }
 
 message TextMessageRequest {
