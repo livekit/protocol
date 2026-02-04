@@ -1469,10 +1469,13 @@ func (x *JobTermination) GetJobId() string {
 }
 
 type AgentSessionState struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Version       uint64                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
-	Snapshot      []byte                 `protobuf:"bytes,2,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
-	Delta         []byte                 `protobuf:"bytes,3,opt,name=delta,proto3" json:"delta,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Version uint64                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
+	// Types that are valid to be assigned to Data:
+	//
+	//	*AgentSessionState_Snapshot
+	//	*AgentSessionState_Delta
+	Data          isAgentSessionState_Data `protobuf_oneof:"data"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1514,19 +1517,46 @@ func (x *AgentSessionState) GetVersion() uint64 {
 	return 0
 }
 
+func (x *AgentSessionState) GetData() isAgentSessionState_Data {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 func (x *AgentSessionState) GetSnapshot() []byte {
 	if x != nil {
-		return x.Snapshot
+		if x, ok := x.Data.(*AgentSessionState_Snapshot); ok {
+			return x.Snapshot
+		}
 	}
 	return nil
 }
 
 func (x *AgentSessionState) GetDelta() []byte {
 	if x != nil {
-		return x.Delta
+		if x, ok := x.Data.(*AgentSessionState_Delta); ok {
+			return x.Delta
+		}
 	}
 	return nil
 }
+
+type isAgentSessionState_Data interface {
+	isAgentSessionState_Data()
+}
+
+type AgentSessionState_Snapshot struct {
+	Snapshot []byte `protobuf:"bytes,2,opt,name=snapshot,proto3,oneof"`
+}
+
+type AgentSessionState_Delta struct {
+	Delta []byte `protobuf:"bytes,3,opt,name=delta,proto3,oneof"`
+}
+
+func (*AgentSessionState_Snapshot) isAgentSessionState_Data() {}
+
+func (*AgentSessionState_Delta) isAgentSessionState_Data() {}
 
 type TextMessageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1534,7 +1564,7 @@ type TextMessageRequest struct {
 	SessionId     string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	AgentName     string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	Metadata      string                 `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	SessionState  *AgentSessionState     `protobuf:"bytes,5,opt,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
+	SessionState  *AgentSessionState     `protobuf:"bytes,5,opt,name=session_state,json=sessionState,proto3,oneof" json:"session_state,omitempty"`
 	Text          string                 `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1837,11 +1867,12 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"'\n" +
 	"\x0eJobTermination\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"_\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"k\n" +
 	"\x11AgentSessionState\x12\x18\n" +
-	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1a\n" +
-	"\bsnapshot\x18\x02 \x01(\fR\bsnapshot\x12\x14\n" +
-	"\x05delta\x18\x03 \x01(\fR\x05delta\"\xe2\x01\n" +
+	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1c\n" +
+	"\bsnapshot\x18\x02 \x01(\fH\x00R\bsnapshot\x12\x16\n" +
+	"\x05delta\x18\x03 \x01(\fH\x00R\x05deltaB\x06\n" +
+	"\x04data\"\xf9\x01\n" +
 	"\x12TextMessageRequest\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1d\n" +
@@ -1849,9 +1880,10 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1a\n" +
-	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12?\n" +
-	"\rsession_state\x18\x05 \x01(\v2\x1a.livekit.AgentSessionStateR\fsessionState\x12\x12\n" +
-	"\x04text\x18\x06 \x01(\tR\x04text\"J\n" +
+	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12D\n" +
+	"\rsession_state\x18\x05 \x01(\v2\x1a.livekit.AgentSessionStateH\x00R\fsessionState\x88\x01\x01\x12\x12\n" +
+	"\x04text\x18\x06 \x01(\tR\x04textB\x10\n" +
+	"\x0e_session_state\"J\n" +
 	"\x0fPushTextRequest\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x18\n" +
@@ -1991,6 +2023,11 @@ func file_livekit_agent_proto_init() {
 	file_livekit_agent_proto_msgTypes[7].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[13].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[14].OneofWrappers = []any{}
+	file_livekit_agent_proto_msgTypes[16].OneofWrappers = []any{
+		(*AgentSessionState_Snapshot)(nil),
+		(*AgentSessionState_Delta)(nil),
+	}
+	file_livekit_agent_proto_msgTypes[17].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
