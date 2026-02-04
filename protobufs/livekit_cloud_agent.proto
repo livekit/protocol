@@ -225,7 +225,9 @@ message ClientSettingsRequest {
 }
 
 message PrivateLink {
-  message AWSConfig {}
+  message AWSConfig {
+    // TODO: region? azs? hostnames? etc 
+  }
 
   string private_link_id = 1;
   string name = 2;
@@ -293,7 +295,9 @@ message PrivateLinkAttachementHealthStatus {
 }
 
 message CreatePrivateLinkRequest {
-  message AWSCreateConfig {}
+  message AWSCreateConfig {
+    // TODO: region? azs? hostnames? etc 
+  }
 
   string name = 1;
   oneof config {
