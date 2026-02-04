@@ -197,7 +197,7 @@ message ParticipantInfo {
   repeated DataTrackInfo data_tracks = 19;
 
   // protocol version of the participant, used for backward compatibility
-  optional int32 protocol_version = 20;
+  int32 protocol_version = 20;
  
   // NEXT_ID: 21
 }
