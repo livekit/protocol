@@ -224,6 +224,127 @@ message ClientSettingsResponse {
 message ClientSettingsRequest {
 }
 
+message PrivateLink {
+  message AWSConfig {}
+
+  string private_link_id = 1;
+  string name = 2;
+
+  oneof config {
+    AWSConfig aws = 3;
+  }
+}
+
+message PrivateLinkProvisioningStatus {
+  enum Status {
+    PRIVATE_LINK_STATUS_UNKNOWN = 0;
+    PRIVATE_LINK_STATUS_PENDING = 1;
+    PRIVATE_LINK_STATUS_READY = 2;
+    PRIVATE_LINK_STATUS_DELETING = 3;
+    PRIVATE_LINK_STATUS_DELETED = 4;
+    PRIVATE_LINK_STATUS_FAILED = 5;
+  }
+
+  Status status = 1;
+  optional string error = 2;
+}
+
+message PrivateLinkHealthStatus {
+  enum Status {
+    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNKNOWN = 0;
+    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_HEALTHY = 1;
+    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNHEALTHY = 2;
+  }
+
+  Status status = 1;
+  google.protobuf.Timestamp updated_at = 2;
+}
+
+message PrivateLinkAttachment {
+  string private_link_attachment_id = 1;
+  string private_link_id = 2;
+  string agent_id = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message PrivateLinkAttachmentProvisioningStatus {
+  enum Status {
+    PRIVATE_LINK_ATTACHMENT_STATUS_UNKNOWN = 0;
+    PRIVATE_LINK_ATTACHMENT_STATUS_PENDING = 1;
+    PRIVATE_LINK_ATTACHMENT_STATUS_READY = 2;
+    PRIVATE_LINK_ATTACHMENT_STATUS_DELETING = 3;
+    PRIVATE_LINK_ATTACHMENT_STATUS_DELETED = 4;
+    PRIVATE_LINK_ATTACHMENT_STATUS_FAILED = 5;
+  }
+
+  Status status = 1;
+  optional string error = 2;
+}
+
+message PrivateLinkAttachementHealthStatus {
+  enum Status {
+    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNKNOWN = 0;
+    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_HEALTHY = 1;
+    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNHEALTHY = 2;
+  }
+
+  Status status = 1;
+  google.protobuf.Timestamp updated_at = 2;
+}
+
+message CreatePrivateLinkRequest {
+  message AWSCreateConfig {}
+
+  string name = 1;
+  oneof config {
+    AWSCreateConfig aws = 2;
+  }
+}
+
+message CreatePrivateLinkResponse {
+  PrivateLink private_link = 1;
+}
+
+message GetPrivateLinkProvisioningStatusRequest {
+  string private_link_id = 1;
+}
+
+message GetPrivateLinkProvisioningStatusResponse {
+  PrivateLinkProvisioningStatus value = 1;
+}
+
+message GetPrivateLinkHealthStatusRequest {
+  string private_link_id = 1;
+}
+
+message GetPrivateLinkHealthStatusResponse {
+  PrivateLinkHealthStatus value = 1;
+}
+
+message CreatePrivateLinkAttachmentRequest {
+  string private_link_id = 1;
+  string agent_id = 2;
+}
+
+message CreatePrivateLinkAttachmentResponse {
+  PrivateLinkAttachment private_link_attachment = 1;
+}
+
+message GetPrivateLinkAttachementProvisioningStatusRequest {
+}
+
+message GetPrivateLinkAttachmentProvisioningStatusResponse {
+  PrivateLinkAttachmentProvisioningStatus value = 1;
+}
+
+message GetPrivateLinkAttachmentHealthStatusRequest {
+  string private_link_attachment_id = 1;
+}
+
+message GetPrivateLinkAttachmentHealthStatusResponse {
+  PrivateLinkAttachementHealthStatus value = 1;
+}
+
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
@@ -236,4 +357,11 @@ service CloudAgent {
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}
     rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse) {}
     rpc GetClientSettings(ClientSettingsRequest) returns (ClientSettingsResponse) {}
+
+    rpc CreatePrivateLink(CreatePrivateLinkRequest) returns (CreatePrivateLinkResponse) {}
+    rpc GetPrivateLinkProvisioningStatus(GetPrivateLinkProvisioningStatusRequest) returns (GetPrivateLinkProvisioningStatusResponse) {}
+    rpc GetPrivateLinkHealthStatus(GetPrivateLinkHealthStatusRequest) returns (GetPrivateLinkHealthStatusResponse) {}
+    rpc CreatePrivateLinkAttachment(CreatePrivateLinkAttachmentRequest) returns (CreatePrivateLinkAttachmentResponse) {}
+    rpc GetPrivateLinkAttachementStatus(GetPrivateLinkAttachementProvisioningStatusRequest) returns (GetPrivateLinkAttachmentProvisioningStatusResponse) {}
+    rpc GetPrivateLinkAttachmentHealthStatus(GetPrivateLinkAttachmentHealthStatusRequest) returns (GetPrivateLinkAttachmentHealthStatusResponse) {}
 }
