@@ -1471,8 +1471,8 @@ func (x *JobTermination) GetJobId() string {
 type AgentSessionState struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Version       uint64                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
-	Snapshot      []byte                 `protobuf:"bytes,2,opt,name=snapshot,proto3" json:"snapshot,omitempty"`
-	Delta         []byte                 `protobuf:"bytes,3,opt,name=delta,proto3" json:"delta,omitempty"`
+	Snapshot      []byte                 `protobuf:"bytes,2,opt,name=snapshot,proto3,oneof" json:"snapshot,omitempty"`
+	Delta         []byte                 `protobuf:"bytes,3,opt,name=delta,proto3,oneof" json:"delta,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1837,11 +1837,13 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"'\n" +
 	"\x0eJobTermination\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"_\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"\x80\x01\n" +
 	"\x11AgentSessionState\x12\x18\n" +
-	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1a\n" +
-	"\bsnapshot\x18\x02 \x01(\fR\bsnapshot\x12\x14\n" +
-	"\x05delta\x18\x03 \x01(\fR\x05delta\"\xe2\x01\n" +
+	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1f\n" +
+	"\bsnapshot\x18\x02 \x01(\fH\x00R\bsnapshot\x88\x01\x01\x12\x19\n" +
+	"\x05delta\x18\x03 \x01(\fH\x01R\x05delta\x88\x01\x01B\v\n" +
+	"\t_snapshotB\b\n" +
+	"\x06_delta\"\xe2\x01\n" +
 	"\x12TextMessageRequest\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1d\n" +
@@ -1991,6 +1993,7 @@ func file_livekit_agent_proto_init() {
 	file_livekit_agent_proto_msgTypes[7].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[13].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[14].OneofWrappers = []any{}
+	file_livekit_agent_proto_msgTypes[16].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
