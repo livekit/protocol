@@ -196,7 +196,10 @@ message ParticipantInfo {
   repeated KindDetail kind_details = 18;
   repeated DataTrackInfo data_tracks = 19;
 
-  // NEXT_ID: 20
+  // protocol version of the participant, used for backward compatibility
+  optional int32 protocol_version = 20;
+ 
+  // NEXT_ID: 21
 }
 
 enum TrackType {
