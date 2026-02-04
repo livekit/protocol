@@ -189,8 +189,10 @@ message JobTermination {
 
 message AgentSessionState {
   uint64 version = 1;
-  optional bytes snapshot = 2;
-  optional bytes delta = 3;
+  oneof data {
+    bytes snapshot = 2;
+    bytes delta = 3;
+  }
 }
 
 message TextMessageRequest {
@@ -198,7 +200,7 @@ message TextMessageRequest {
   string session_id = 2;
   string agent_name = 3;
   string metadata = 4;
-  AgentSessionState session_state = 5;
+  optional AgentSessionState session_state = 5;
   string text = 6;
 }
 
