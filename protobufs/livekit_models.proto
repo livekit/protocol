@@ -541,7 +541,7 @@ message ClientInfo {
   // e.g. "components-js:1.2.3,track-processors-js:1.2.3"
   string other_sdks = 11;
   // client protocol version
-  int32 client_proto = 12;
+  int32 client_protocol = 12;
 }
 
 // server provided client configuration
