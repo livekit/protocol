@@ -226,7 +226,7 @@ message ClientSettingsRequest {
 
 message PrivateLink {
   message AWSConfig {
-    // TODO: region? azs? hostnames? etc 
+    string endpoint = 1;
   }
 
   string private_link_id = 1;
@@ -296,7 +296,7 @@ message PrivateLinkAttachementHealthStatus {
 
 message CreatePrivateLinkRequest {
   message AWSCreateConfig {
-    // TODO: region? azs? hostnames? etc 
+    string endpoint = 1;
   }
 
   string name = 1;
@@ -325,30 +325,6 @@ message GetPrivateLinkHealthStatusResponse {
   PrivateLinkHealthStatus value = 1;
 }
 
-message CreatePrivateLinkAttachmentRequest {
-  string private_link_id = 1;
-  string agent_id = 2;
-}
-
-message CreatePrivateLinkAttachmentResponse {
-  PrivateLinkAttachment private_link_attachment = 1;
-}
-
-message GetPrivateLinkAttachementProvisioningStatusRequest {
-}
-
-message GetPrivateLinkAttachmentProvisioningStatusResponse {
-  PrivateLinkAttachmentProvisioningStatus value = 1;
-}
-
-message GetPrivateLinkAttachmentHealthStatusRequest {
-  string private_link_attachment_id = 1;
-}
-
-message GetPrivateLinkAttachmentHealthStatusResponse {
-  PrivateLinkAttachementHealthStatus value = 1;
-}
-
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
@@ -365,7 +341,4 @@ service CloudAgent {
     rpc CreatePrivateLink(CreatePrivateLinkRequest) returns (CreatePrivateLinkResponse) {}
     rpc GetPrivateLinkProvisioningStatus(GetPrivateLinkProvisioningStatusRequest) returns (GetPrivateLinkProvisioningStatusResponse) {}
     rpc GetPrivateLinkHealthStatus(GetPrivateLinkHealthStatusRequest) returns (GetPrivateLinkHealthStatusResponse) {}
-    rpc CreatePrivateLinkAttachment(CreatePrivateLinkAttachmentRequest) returns (CreatePrivateLinkAttachmentResponse) {}
-    rpc GetPrivateLinkAttachementStatus(GetPrivateLinkAttachementProvisioningStatusRequest) returns (GetPrivateLinkAttachmentProvisioningStatusResponse) {}
-    rpc GetPrivateLinkAttachmentHealthStatus(GetPrivateLinkAttachmentHealthStatusRequest) returns (GetPrivateLinkAttachmentHealthStatusResponse) {}
 }
