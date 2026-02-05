@@ -196,7 +196,7 @@ message ParticipantInfo {
   repeated KindDetail kind_details = 18;
   repeated DataTrackInfo data_tracks = 19;
 
-  // protocol version of the participant, used for backward compatibility
+  // protocol version used for client feature compatibility
   int32 client_protocol = 20;
  
   // NEXT_ID: 21
