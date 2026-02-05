@@ -309,6 +309,20 @@ message CreatePrivateLinkResponse {
   PrivateLink private_link = 1;
 }
 
+message DestroyPrivateLinkRequest {
+  string private_link_id = 1;
+}
+
+message DestroyPrivateLinkResponse {
+}
+
+message ListPrivateLinksRequest {
+}
+
+message ListPrivateLinksResponse {
+  repeated PrivateLink items = 1;
+}
+
 message GetPrivateLinkProvisioningStatusRequest {
   string private_link_id = 1;
 }
@@ -339,6 +353,8 @@ service CloudAgent {
     rpc GetClientSettings(ClientSettingsRequest) returns (ClientSettingsResponse) {}
 
     rpc CreatePrivateLink(CreatePrivateLinkRequest) returns (CreatePrivateLinkResponse) {}
+    rpc DestroyPrivateLink(DestroyPrivateLinkRequest) returns (DestroyPrivateLinkResponse) {}
+    rpc ListPrivateLinks(ListPrivateLinksRequest) returns (ListPrivateLinksResponse) {}
     rpc GetPrivateLinkProvisioningStatus(GetPrivateLinkProvisioningStatusRequest) returns (GetPrivateLinkProvisioningStatusResponse) {}
     rpc GetPrivateLinkHealthStatus(GetPrivateLinkHealthStatusRequest) returns (GetPrivateLinkHealthStatusResponse) {}
 }
