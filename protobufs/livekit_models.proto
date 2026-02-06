@@ -457,6 +457,8 @@ message RpcRequest {
   string payload = 3;
   uint32 response_timeout_ms = 4;
   uint32 version = 5;
+  // Compressed payload data. When set, this field is used instead of `payload`.
+  bytes compressed_payload = 6;
 }
 
 message RpcAck {
@@ -468,6 +470,8 @@ message RpcResponse {
   oneof value {
     string payload = 2;
     RpcError error = 3;
+    // Compressed payload data. When set, this field is used instead of `payload`.
+    bytes compressed_payload = 4;
   }
 }
 
