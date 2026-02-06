@@ -58,6 +58,7 @@ const (
 	AgentDispatchPrefix       = "AD_"
 	AgentBuilderPrefix        = "AB_"
 	AgentBuilderVersionPrefix = "ABV_"
+	AgentPrivateLinkPrefix    = "APL_"
 	CloudAgentPrefix          = "CA_"
 	CloudAgentRegionPrefix    = "CAR_"
 	CloudAgentVersionPrefix   = "CAV_"
@@ -102,8 +103,10 @@ func LocalNodeID() (string, error) {
 	return fmt.Sprintf("%s%s", NodePrefix, HashedID(hostname)[:8]), nil
 }
 
-var b57Index = newB57Index()
-var b57Chars = []byte(shortuuid.DefaultAlphabet)
+var (
+	b57Index = newB57Index()
+	b57Chars = []byte(shortuuid.DefaultAlphabet)
+)
 
 func newB57Index() [256]byte {
 	var index [256]byte

@@ -44,6 +44,7 @@ const (
 	AgentWorkerPrefix       = guid.AgentWorkerPrefix
 	AgentJobPrefix          = guid.AgentJobPrefix
 	AgentDispatchPrefix     = guid.AgentDispatchPrefix
+	AgentPrivateLinkPrefix  = guid.AgentPrivateLinkPrefix
 	CloudAgentPrefix        = guid.CloudAgentPrefix
 	CloudAgentRegionPrefix  = guid.CloudAgentRegionPrefix
 	CloudAgentVersionPrefix = guid.CloudAgentVersionPrefix
