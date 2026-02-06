@@ -262,38 +262,6 @@ message PrivateLinkHealthStatus {
   google.protobuf.Timestamp updated_at = 2;
 }
 
-message PrivateLinkAttachment {
-  string private_link_attachment_id = 1;
-  string private_link_id = 2;
-  string agent_id = 3;
-  google.protobuf.Timestamp created_at = 4;
-}
-
-message PrivateLinkAttachmentProvisioningStatus {
-  enum Status {
-    PRIVATE_LINK_ATTACHMENT_STATUS_UNKNOWN = 0;
-    PRIVATE_LINK_ATTACHMENT_STATUS_PENDING = 1;
-    PRIVATE_LINK_ATTACHMENT_STATUS_READY = 2;
-    PRIVATE_LINK_ATTACHMENT_STATUS_DELETING = 3;
-    PRIVATE_LINK_ATTACHMENT_STATUS_DELETED = 4;
-    PRIVATE_LINK_ATTACHMENT_STATUS_FAILED = 5;
-  }
-
-  Status status = 1;
-  optional string error = 2;
-}
-
-message PrivateLinkAttachementHealthStatus {
-  enum Status {
-    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNKNOWN = 0;
-    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_HEALTHY = 1;
-    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNHEALTHY = 2;
-  }
-
-  Status status = 1;
-  google.protobuf.Timestamp updated_at = 2;
-}
-
 message CreatePrivateLinkRequest {
   message AWSCreateConfig {
     string endpoint = 1;
