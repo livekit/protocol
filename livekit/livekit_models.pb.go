@@ -1907,8 +1907,10 @@ type ParticipantInfo struct {
 	DisconnectReason DisconnectReason             `protobuf:"varint,16,opt,name=disconnect_reason,json=disconnectReason,proto3,enum=livekit.DisconnectReason" json:"disconnect_reason,omitempty"`
 	KindDetails      []ParticipantInfo_KindDetail `protobuf:"varint,18,rep,packed,name=kind_details,json=kindDetails,proto3,enum=livekit.ParticipantInfo_KindDetail" json:"kind_details,omitempty"`
 	DataTracks       []*DataTrackInfo             `protobuf:"bytes,19,rep,name=data_tracks,json=dataTracks,proto3" json:"data_tracks,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// protocol version used for client feature compatibility
+	ClientProtocol int32 `protobuf:"varint,20,opt,name=client_protocol,json=clientProtocol,proto3" json:"client_protocol,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ParticipantInfo) Reset() {
@@ -2058,6 +2060,13 @@ func (x *ParticipantInfo) GetDataTracks() []*DataTrackInfo {
 		return x.DataTracks
 	}
 	return nil
+}
+
+func (x *ParticipantInfo) GetClientProtocol() int32 {
+	if x != nil {
+		return x.ClientProtocol
+	}
+	return 0
 }
 
 type Encryption struct {
@@ -4180,9 +4189,11 @@ type ClientInfo struct {
 	Network string `protobuf:"bytes,10,opt,name=network,proto3" json:"network,omitempty"`
 	// comma separated list of additional LiveKit SDKs in use of this client, with versions
 	// e.g. "components-js:1.2.3,track-processors-js:1.2.3"
-	OtherSdks     string `protobuf:"bytes,11,opt,name=other_sdks,json=otherSdks,proto3" json:"other_sdks,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	OtherSdks string `protobuf:"bytes,11,opt,name=other_sdks,json=otherSdks,proto3" json:"other_sdks,omitempty"`
+	// client protocol version
+	ClientProtocol int32 `protobuf:"varint,12,opt,name=client_protocol,json=clientProtocol,proto3" json:"client_protocol,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ClientInfo) Reset() {
@@ -4290,6 +4301,13 @@ func (x *ClientInfo) GetOtherSdks() string {
 		return x.OtherSdks
 	}
 	return ""
+}
+
+func (x *ClientInfo) GetClientProtocol() int32 {
+	if x != nil {
+		return x.ClientProtocol
+	}
+	return 0
 }
 
 // server provided client configuration
@@ -6068,7 +6086,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
 	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\x127\n" +
-	"\x18can_manage_agent_session\x18\r \x01(\bR\x15canManageAgentSession\"\x8b\t\n" +
+	"\x18can_manage_agent_session\x18\r \x01(\bR\x15canManageAgentSession\"\xb4\t\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -6093,7 +6111,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x11disconnect_reason\x18\x10 \x01(\x0e2\x19.livekit.DisconnectReasonR\x10disconnectReason\x12F\n" +
 	"\fkind_details\x18\x12 \x03(\x0e2#.livekit.ParticipantInfo.KindDetailR\vkindDetails\x127\n" +
 	"\vdata_tracks\x18\x13 \x03(\v2\x16.livekit.DataTrackInfoR\n" +
-	"dataTracks\x1a=\n" +
+	"dataTracks\x12'\n" +
+	"\x0fclient_protocol\x18\x14 \x01(\x05R\x0eclientProtocol\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\">\n" +
@@ -6317,7 +6336,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
 	"\aEdition\x12\f\n" +
 	"\bStandard\x10\x00\x12\t\n" +
-	"\x05Cloud\x10\x01\"\x8b\x04\n" +
+	"\x05Cloud\x10\x01\"\xb4\x04\n" +
 	"\n" +
 	"ClientInfo\x12)\n" +
 	"\x03sdk\x18\x01 \x01(\x0e2\x17.livekit.ClientInfo.SDKR\x03sdk\x12\x18\n" +
@@ -6333,7 +6352,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\anetwork\x18\n" +
 	" \x01(\tR\anetwork\x12\x1d\n" +
 	"\n" +
-	"other_sdks\x18\v \x01(\tR\totherSdks\"\xb3\x01\n" +
+	"other_sdks\x18\v \x01(\tR\totherSdks\x12'\n" +
+	"\x0fclient_protocol\x18\f \x01(\x05R\x0eclientProtocol\"\xb3\x01\n" +
 	"\x03SDK\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x06\n" +
 	"\x02JS\x10\x01\x12\t\n" +
