@@ -35,37 +35,39 @@ import (
 const Size = 12
 
 const (
-	RoomPrefix                = "RM_"
-	NodePrefix                = "ND_"
-	ParticipantPrefix         = "PA_"
-	TrackPrefix               = "TR_"
-	DataTrackPrefix           = "DTR_"
-	APIKeyPrefix              = "API"
-	EgressPrefix              = "EG_"
-	IngressPrefix             = "IN_"
-	SIPTrunkPrefix            = "ST_"
-	SIPDispatchRulePrefix     = "SDR_"
-	SIPCallPrefix             = "SCL_"
-	SIPTransferPrefix         = "STR_"
-	RPCPrefix                 = "RPC_"
-	WHIPResourcePrefix        = "WH_"
-	RTMPResourcePrefix        = "RT_"
-	URLResourcePrefix         = "UR_"
-	SIPHostnamePrefix         = "SH"
-	AgentPrefix               = "A_"
-	AgentWorkerPrefix         = "AW_"
-	AgentJobPrefix            = "AJ_"
-	AgentDispatchPrefix       = "AD_"
-	AgentBuilderPrefix        = "AB_"
-	AgentBuilderVersionPrefix = "ABV_"
-	CloudAgentPrefix          = "CA_"
-	CloudAgentRegionPrefix    = "CAR_"
-	CloudAgentVersionPrefix   = "CAV_"
-	CloudAgentSecretPrefix    = "CAS_"
-	CloudAgentWorkerPrefix    = "CAW_"
-	AgentGatewayPrefix        = "GW_"
-	CarrierPrefix             = "CR_"
-	PhoneNumberPrefix         = "PN_"
+	RoomPrefix                        = "RM_"
+	NodePrefix                        = "ND_"
+	ParticipantPrefix                 = "PA_"
+	TrackPrefix                       = "TR_"
+	DataTrackPrefix                   = "DTR_"
+	APIKeyPrefix                      = "API"
+	EgressPrefix                      = "EG_"
+	IngressPrefix                     = "IN_"
+	SIPTrunkPrefix                    = "ST_"
+	SIPDispatchRulePrefix             = "SDR_"
+	SIPCallPrefix                     = "SCL_"
+	SIPTransferPrefix                 = "STR_"
+	RPCPrefix                         = "RPC_"
+	WHIPResourcePrefix                = "WH_"
+	RTMPResourcePrefix                = "RT_"
+	URLResourcePrefix                 = "UR_"
+	SIPHostnamePrefix                 = "SH"
+	AgentPrefix                       = "A_"
+	AgentWorkerPrefix                 = "AW_"
+	AgentJobPrefix                    = "AJ_"
+	AgentDispatchPrefix               = "AD_"
+	AgentBuilderPrefix                = "AB_"
+	AgentBuilderVersionPrefix         = "ABV_"
+	CloudAgentPrefix                  = "CA_"
+	CloudAgentRegionPrefix            = "CAR_"
+	CloudAgentVersionPrefix           = "CAV_"
+	CloudAgentSecretPrefix            = "CAS_"
+	CloudAgentWorkerPrefix            = "CAW_"
+	CloudAgentPrivateLinkPrefix       = "CAPL_"
+	CloudAgentPrivateLinkSecretPrefix = "CAPLS_"
+	AgentGatewayPrefix                = "GW_"
+	CarrierPrefix                     = "CR_"
+	PhoneNumberPrefix                 = "PN_"
 )
 
 var guidGeneratorPool = sync.Pool{
@@ -102,8 +104,10 @@ func LocalNodeID() (string, error) {
 	return fmt.Sprintf("%s%s", NodePrefix, HashedID(hostname)[:8]), nil
 }
 
-var b57Index = newB57Index()
-var b57Chars = []byte(shortuuid.DefaultAlphabet)
+var (
+	b57Index = newB57Index()
+	b57Chars = []byte(shortuuid.DefaultAlphabet)
+)
 
 func newB57Index() [256]byte {
 	var index [256]byte
