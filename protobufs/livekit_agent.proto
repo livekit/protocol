@@ -199,9 +199,10 @@ message TextMessageRequest {
   string message_id = 1;
   string session_id = 2;
   string agent_name = 3;
-  string metadata = 4;
-  optional AgentSessionState session_state = 5;
-  string text = 6;
+  string endpoint = 4;
+  string metadata = 5;
+  optional AgentSessionState session_state = 6;
+  string text = 7;
 }
 
 
