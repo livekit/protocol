@@ -1563,9 +1563,10 @@ type TextMessageRequest struct {
 	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
 	SessionId     string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	AgentName     string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Metadata      string                 `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	SessionState  *AgentSessionState     `protobuf:"bytes,5,opt,name=session_state,json=sessionState,proto3,oneof" json:"session_state,omitempty"`
-	Text          string                 `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
+	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Metadata      string                 `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	SessionState  *AgentSessionState     `protobuf:"bytes,6,opt,name=session_state,json=sessionState,proto3,oneof" json:"session_state,omitempty"`
+	Text          string                 `protobuf:"bytes,7,opt,name=text,proto3" json:"text,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1617,6 +1618,13 @@ func (x *TextMessageRequest) GetSessionId() string {
 func (x *TextMessageRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
+	}
+	return ""
+}
+
+func (x *TextMessageRequest) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
 	}
 	return ""
 }
@@ -1872,7 +1880,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1c\n" +
 	"\bsnapshot\x18\x02 \x01(\fH\x00R\bsnapshot\x12\x16\n" +
 	"\x05delta\x18\x03 \x01(\fH\x00R\x05deltaB\x06\n" +
-	"\x04data\"\xf9\x01\n" +
+	"\x04data\"\x95\x02\n" +
 	"\x12TextMessageRequest\x12\x1d\n" +
 	"\n" +
 	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1d\n" +
@@ -1880,9 +1888,10 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1a\n" +
-	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12D\n" +
-	"\rsession_state\x18\x05 \x01(\v2\x1a.livekit.AgentSessionStateH\x00R\fsessionState\x88\x01\x01\x12\x12\n" +
-	"\x04text\x18\x06 \x01(\tR\x04textB\x10\n" +
+	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x1a\n" +
+	"\bmetadata\x18\x05 \x01(\tR\bmetadata\x12D\n" +
+	"\rsession_state\x18\x06 \x01(\v2\x1a.livekit.AgentSessionStateH\x00R\fsessionState\x88\x01\x01\x12\x12\n" +
+	"\x04text\x18\a \x01(\tR\x04textB\x10\n" +
 	"\x0e_session_state\"J\n" +
 	"\x0fPushTextRequest\x12\x1d\n" +
 	"\n" +
