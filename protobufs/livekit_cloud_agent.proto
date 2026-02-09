@@ -116,6 +116,7 @@ message AgentVersion {
     map<string, string> attributes = 5;
     string status = 6;
     string owner = 7;
+    bool draining = 8;
 }
 
 message ListAgentVersionsRequest {

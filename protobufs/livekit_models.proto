@@ -196,7 +196,10 @@ message ParticipantInfo {
   repeated KindDetail kind_details = 18;
   repeated DataTrackInfo data_tracks = 19;
 
-  // NEXT_ID: 20
+  // protocol version used for client feature compatibility
+  int32 client_protocol = 20;
+ 
+  // NEXT_ID: 21
 }
 
 enum TrackType {
@@ -537,6 +540,8 @@ message ClientInfo {
   // comma separated list of additional LiveKit SDKs in use of this client, with versions
   // e.g. "components-js:1.2.3,track-processors-js:1.2.3"
   string other_sdks = 11;
+  // client protocol version
+  int32 client_protocol = 12;
 }
 
 // server provided client configuration
