@@ -24,33 +24,34 @@ const (
 )
 
 const (
-	RoomPrefix                        = guid.RoomPrefix
-	NodePrefix                        = guid.NodePrefix
-	ParticipantPrefix                 = guid.ParticipantPrefix
-	TrackPrefix                       = guid.TrackPrefix
-	DataTrackPrefix                   = guid.DataTrackPrefix
-	APIKeyPrefix                      = guid.APIKeyPrefix
-	EgressPrefix                      = guid.EgressPrefix
-	IngressPrefix                     = guid.IngressPrefix
-	SIPTrunkPrefix                    = guid.SIPTrunkPrefix
-	SIPDispatchRulePrefix             = guid.SIPDispatchRulePrefix
-	SIPCallPrefix                     = guid.SIPCallPrefix
-	SIPTransferPrefix                 = guid.SIPTransferPrefix
-	RPCPrefix                         = guid.RPCPrefix
-	WHIPResourcePrefix                = guid.WHIPResourcePrefix
-	RTMPResourcePrefix                = guid.RTMPResourcePrefix
-	URLResourcePrefix                 = guid.URLResourcePrefix
-	SIPHostnamePrefix                 = guid.SIPHostnamePrefix
-	AgentWorkerPrefix                 = guid.AgentWorkerPrefix
-	AgentJobPrefix                    = guid.AgentJobPrefix
-	AgentDispatchPrefix               = guid.AgentDispatchPrefix
-	CloudAgentPrefix                  = guid.CloudAgentPrefix
-	CloudAgentRegionPrefix            = guid.CloudAgentRegionPrefix
-	CloudAgentVersionPrefix           = guid.CloudAgentVersionPrefix
-	CloudAgentSecretPrefix            = guid.CloudAgentSecretPrefix
-	CloudAgentWorkerPrefix            = guid.CloudAgentWorkerPrefix
-	CloudAgentPrivateLinkPrefix       = guid.CloudAgentPrivateLinkPrefix
-	CloudAgentPrivateLinkSecretPrefix = guid.CloudAgentPrivateLinkSecretPrefix
+	RoomPrefix                         = guid.RoomPrefix
+	NodePrefix                         = guid.NodePrefix
+	ParticipantPrefix                  = guid.ParticipantPrefix
+	TrackPrefix                        = guid.TrackPrefix
+	DataTrackPrefix                    = guid.DataTrackPrefix
+	APIKeyPrefix                       = guid.APIKeyPrefix
+	EgressPrefix                       = guid.EgressPrefix
+	IngressPrefix                      = guid.IngressPrefix
+	SIPTrunkPrefix                     = guid.SIPTrunkPrefix
+	SIPDispatchRulePrefix              = guid.SIPDispatchRulePrefix
+	SIPCallPrefix                      = guid.SIPCallPrefix
+	SIPTransferPrefix                  = guid.SIPTransferPrefix
+	RPCPrefix                          = guid.RPCPrefix
+	WHIPResourcePrefix                 = guid.WHIPResourcePrefix
+	RTMPResourcePrefix                 = guid.RTMPResourcePrefix
+	URLResourcePrefix                  = guid.URLResourcePrefix
+	SIPHostnamePrefix                  = guid.SIPHostnamePrefix
+	AgentWorkerPrefix                  = guid.AgentWorkerPrefix
+	AgentJobPrefix                     = guid.AgentJobPrefix
+	AgentDispatchPrefix                = guid.AgentDispatchPrefix
+	CloudAgentPrefix                   = guid.CloudAgentPrefix
+	CloudAgentRegionPrefix             = guid.CloudAgentRegionPrefix
+	CloudAgentVersionPrefix            = guid.CloudAgentVersionPrefix
+	CloudAgentSecretPrefix             = guid.CloudAgentSecretPrefix
+	CloudAgentWorkerPrefix             = guid.CloudAgentWorkerPrefix
+	CloudAgentPrivateLinkPrefix        = guid.CloudAgentPrivateLinkPrefix
+	CloudAgentPrivateLinkGatewayPrefix = guid.CloudAgentPrivateLinkGatewayPrefix
+	CloudAgentPrivateLinkSecretPrefix  = guid.CloudAgentPrivateLinkSecretPrefix
 )
 
 func NewGuid(prefix string) string {
