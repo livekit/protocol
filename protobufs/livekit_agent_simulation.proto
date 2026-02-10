@@ -19,6 +19,36 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+message SimulationRun {
+  enum Status {
+    STATUS_GENERATING = 0;
+    STATUS_RUNNING = 1;
+    STATUS_COMPLETED = 2;
+    STATUS_FAILED = 3;
+  }
+
+  message Job {
+    enum Status {
+      STATUS_PENDING = 0;
+      STATUS_RUNNING = 1;
+      STATUS_COMPLETED = 2;
+      STATUS_FAILED = 3;
+    }
+    string id = 1;
+    Status status = 2;
+    string instructions = 3;
+    string error = 4;
+  }
+
+  string id = 1;
+  string project_id = 2;
+  Status status = 3;
+  string agent_description = 4;
+  string error = 5;
+  int64 created_at = 6;
+  repeated Job jobs = 7;
+}
+
 message CreateSimulationRunRequest {
   string agent_name = 1;
   string agent_description = 2;
@@ -28,6 +58,23 @@ message CreateSimulationRunResponse {
   string simulation_run_id = 1;
 }
 
-service AgentSimulationService {
+message GetSimulationRunRequest {
+  string project_id = 1;
+  string simulation_run_id = 2;
+}
+message GetSimulationRunResponse {
+  SimulationRun run = 1;
+}
+
+message ListSimulationRunsRequest {
+  string project_id = 1;
+}
+message ListSimulationRunsResponse {
+  repeated SimulationRun runs = 1;
+}
+
+service AgentSimulation {
   rpc CreateSimulationRun(CreateSimulationRunRequest) returns (CreateSimulationRunResponse);
+  rpc GetSimulationRun(GetSimulationRunRequest) returns (GetSimulationRunResponse);
+  rpc ListSimulationRuns(ListSimulationRunsRequest) returns (ListSimulationRunsResponse);
 }
