@@ -35,6 +35,202 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type SimulationRun_Status int32
+
+const (
+	SimulationRun_STATUS_GENERATING SimulationRun_Status = 0
+	SimulationRun_STATUS_RUNNING    SimulationRun_Status = 1
+	SimulationRun_STATUS_COMPLETED  SimulationRun_Status = 2
+	SimulationRun_STATUS_FAILED     SimulationRun_Status = 3
+)
+
+// Enum value maps for SimulationRun_Status.
+var (
+	SimulationRun_Status_name = map[int32]string{
+		0: "STATUS_GENERATING",
+		1: "STATUS_RUNNING",
+		2: "STATUS_COMPLETED",
+		3: "STATUS_FAILED",
+	}
+	SimulationRun_Status_value = map[string]int32{
+		"STATUS_GENERATING": 0,
+		"STATUS_RUNNING":    1,
+		"STATUS_COMPLETED":  2,
+		"STATUS_FAILED":     3,
+	}
+)
+
+func (x SimulationRun_Status) Enum() *SimulationRun_Status {
+	p := new(SimulationRun_Status)
+	*p = x
+	return p
+}
+
+func (x SimulationRun_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SimulationRun_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_agent_simulation_proto_enumTypes[0].Descriptor()
+}
+
+func (SimulationRun_Status) Type() protoreflect.EnumType {
+	return &file_livekit_agent_simulation_proto_enumTypes[0]
+}
+
+func (x SimulationRun_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SimulationRun_Status.Descriptor instead.
+func (SimulationRun_Status) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{0, 0}
+}
+
+type SimulationRun_Job_Status int32
+
+const (
+	SimulationRun_Job_STATUS_PENDING   SimulationRun_Job_Status = 0
+	SimulationRun_Job_STATUS_RUNNING   SimulationRun_Job_Status = 1
+	SimulationRun_Job_STATUS_COMPLETED SimulationRun_Job_Status = 2
+	SimulationRun_Job_STATUS_FAILED    SimulationRun_Job_Status = 3
+)
+
+// Enum value maps for SimulationRun_Job_Status.
+var (
+	SimulationRun_Job_Status_name = map[int32]string{
+		0: "STATUS_PENDING",
+		1: "STATUS_RUNNING",
+		2: "STATUS_COMPLETED",
+		3: "STATUS_FAILED",
+	}
+	SimulationRun_Job_Status_value = map[string]int32{
+		"STATUS_PENDING":   0,
+		"STATUS_RUNNING":   1,
+		"STATUS_COMPLETED": 2,
+		"STATUS_FAILED":    3,
+	}
+)
+
+func (x SimulationRun_Job_Status) Enum() *SimulationRun_Job_Status {
+	p := new(SimulationRun_Job_Status)
+	*p = x
+	return p
+}
+
+func (x SimulationRun_Job_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SimulationRun_Job_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_agent_simulation_proto_enumTypes[1].Descriptor()
+}
+
+func (SimulationRun_Job_Status) Type() protoreflect.EnumType {
+	return &file_livekit_agent_simulation_proto_enumTypes[1]
+}
+
+func (x SimulationRun_Job_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SimulationRun_Job_Status.Descriptor instead.
+func (SimulationRun_Job_Status) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{0, 0, 0}
+}
+
+type SimulationRun struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	ProjectId        string                 `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	Status           SimulationRun_Status   `protobuf:"varint,3,opt,name=status,proto3,enum=livekit.SimulationRun_Status" json:"status,omitempty"`
+	AgentDescription string                 `protobuf:"bytes,4,opt,name=agent_description,json=agentDescription,proto3" json:"agent_description,omitempty"`
+	Error            string                 `protobuf:"bytes,5,opt,name=error,proto3" json:"error,omitempty"`
+	CreatedAt        int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Jobs             []*SimulationRun_Job   `protobuf:"bytes,7,rep,name=jobs,proto3" json:"jobs,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *SimulationRun) Reset() {
+	*x = SimulationRun{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SimulationRun) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SimulationRun) ProtoMessage() {}
+
+func (x *SimulationRun) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SimulationRun.ProtoReflect.Descriptor instead.
+func (*SimulationRun) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *SimulationRun) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SimulationRun) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *SimulationRun) GetStatus() SimulationRun_Status {
+	if x != nil {
+		return x.Status
+	}
+	return SimulationRun_STATUS_GENERATING
+}
+
+func (x *SimulationRun) GetAgentDescription() string {
+	if x != nil {
+		return x.AgentDescription
+	}
+	return ""
+}
+
+func (x *SimulationRun) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *SimulationRun) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *SimulationRun) GetJobs() []*SimulationRun_Job {
+	if x != nil {
+		return x.Jobs
+	}
+	return nil
+}
+
 type CreateSimulationRunRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	AgentName        string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
@@ -46,7 +242,7 @@ type CreateSimulationRunRequest struct {
 
 func (x *CreateSimulationRunRequest) Reset() {
 	*x = CreateSimulationRunRequest{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[0]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -58,7 +254,7 @@ func (x *CreateSimulationRunRequest) String() string {
 func (*CreateSimulationRunRequest) ProtoMessage() {}
 
 func (x *CreateSimulationRunRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[0]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -71,7 +267,7 @@ func (x *CreateSimulationRunRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSimulationRunRequest.ProtoReflect.Descriptor instead.
 func (*CreateSimulationRunRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{0}
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateSimulationRunRequest) GetAgentName() string {
@@ -104,7 +300,7 @@ type CreateSimulationRunResponse struct {
 
 func (x *CreateSimulationRunResponse) Reset() {
 	*x = CreateSimulationRunResponse{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[1]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -116,7 +312,7 @@ func (x *CreateSimulationRunResponse) String() string {
 func (*CreateSimulationRunResponse) ProtoMessage() {}
 
 func (x *CreateSimulationRunResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[1]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -129,7 +325,7 @@ func (x *CreateSimulationRunResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSimulationRunResponse.ProtoReflect.Descriptor instead.
 func (*CreateSimulationRunResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1}
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateSimulationRunResponse) GetSimulationRunId() string {
@@ -139,20 +335,310 @@ func (x *CreateSimulationRunResponse) GetSimulationRunId() string {
 	return ""
 }
 
+type GetSimulationRunRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId       string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	SimulationRunId string                 `protobuf:"bytes,2,opt,name=simulation_run_id,json=simulationRunId,proto3" json:"simulation_run_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetSimulationRunRequest) Reset() {
+	*x = GetSimulationRunRequest{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSimulationRunRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSimulationRunRequest) ProtoMessage() {}
+
+func (x *GetSimulationRunRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSimulationRunRequest.ProtoReflect.Descriptor instead.
+func (*GetSimulationRunRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *GetSimulationRunRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+func (x *GetSimulationRunRequest) GetSimulationRunId() string {
+	if x != nil {
+		return x.SimulationRunId
+	}
+	return ""
+}
+
+type GetSimulationRunResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Run           *SimulationRun         `protobuf:"bytes,1,opt,name=run,proto3" json:"run,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetSimulationRunResponse) Reset() {
+	*x = GetSimulationRunResponse{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetSimulationRunResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetSimulationRunResponse) ProtoMessage() {}
+
+func (x *GetSimulationRunResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetSimulationRunResponse.ProtoReflect.Descriptor instead.
+func (*GetSimulationRunResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *GetSimulationRunResponse) GetRun() *SimulationRun {
+	if x != nil {
+		return x.Run
+	}
+	return nil
+}
+
+type ListSimulationRunsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSimulationRunsRequest) Reset() {
+	*x = ListSimulationRunsRequest{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSimulationRunsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSimulationRunsRequest) ProtoMessage() {}
+
+func (x *ListSimulationRunsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSimulationRunsRequest.ProtoReflect.Descriptor instead.
+func (*ListSimulationRunsRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ListSimulationRunsRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
+}
+
+type ListSimulationRunsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Runs          []*SimulationRun       `protobuf:"bytes,1,rep,name=runs,proto3" json:"runs,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSimulationRunsResponse) Reset() {
+	*x = ListSimulationRunsResponse{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSimulationRunsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSimulationRunsResponse) ProtoMessage() {}
+
+func (x *ListSimulationRunsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListSimulationRunsResponse.ProtoReflect.Descriptor instead.
+func (*ListSimulationRunsResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *ListSimulationRunsResponse) GetRuns() []*SimulationRun {
+	if x != nil {
+		return x.Runs
+	}
+	return nil
+}
+
+type SimulationRun_Job struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Id            string                   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Status        SimulationRun_Job_Status `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.SimulationRun_Job_Status" json:"status,omitempty"`
+	Instructions  string                   `protobuf:"bytes,3,opt,name=instructions,proto3" json:"instructions,omitempty"`
+	Error         string                   `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SimulationRun_Job) Reset() {
+	*x = SimulationRun_Job{}
+	mi := &file_livekit_agent_simulation_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SimulationRun_Job) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SimulationRun_Job) ProtoMessage() {}
+
+func (x *SimulationRun_Job) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_simulation_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SimulationRun_Job.ProtoReflect.Descriptor instead.
+func (*SimulationRun_Job) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{0, 0}
+}
+
+func (x *SimulationRun_Job) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *SimulationRun_Job) GetStatus() SimulationRun_Job_Status {
+	if x != nil {
+		return x.Status
+	}
+	return SimulationRun_Job_STATUS_PENDING
+}
+
+func (x *SimulationRun_Job) GetInstructions() string {
+	if x != nil {
+		return x.Instructions
+	}
+	return ""
+}
+
+func (x *SimulationRun_Job) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
 var File_livekit_agent_simulation_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
-	"\x1elivekit_agent_simulation.proto\x12\alivekit\"\x91\x01\n" +
+	"\x1elivekit_agent_simulation.proto\x12\alivekit\"\xcd\x04\n" +
+	"\rSimulationRun\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x02 \x01(\tR\tprojectId\x125\n" +
+	"\x06status\x18\x03 \x01(\x0e2\x1d.livekit.SimulationRun.StatusR\x06status\x12+\n" +
+	"\x11agent_description\x18\x04 \x01(\tR\x10agentDescription\x12\x14\n" +
+	"\x05error\x18\x05 \x01(\tR\x05error\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x06 \x01(\x03R\tcreatedAt\x12.\n" +
+	"\x04jobs\x18\a \x03(\v2\x1a.livekit.SimulationRun.JobR\x04jobs\x1a\xe5\x01\n" +
+	"\x03Job\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
+	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
+	"\finstructions\x18\x03 \x01(\tR\finstructions\x12\x14\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\"Y\n" +
+	"\x06Status\x12\x12\n" +
+	"\x0eSTATUS_PENDING\x10\x00\x12\x12\n" +
+	"\x0eSTATUS_RUNNING\x10\x01\x12\x14\n" +
+	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
+	"\rSTATUS_FAILED\x10\x03\"\\\n" +
+	"\x06Status\x12\x15\n" +
+	"\x11STATUS_GENERATING\x10\x00\x12\x12\n" +
+	"\x0eSTATUS_RUNNING\x10\x01\x12\x14\n" +
+	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
+	"\rSTATUS_FAILED\x10\x03\"\x91\x01\n" +
 	"\x1aCreateSimulationRunRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12+\n" +
 	"\x11agent_description\x18\x02 \x01(\tR\x10agentDescription\x12'\n" +
 	"\x0fnum_simulations\x18\x03 \x01(\x05R\x0enumSimulations\"I\n" +
 	"\x1bCreateSimulationRunResponse\x12*\n" +
-	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId2z\n" +
-	"\x16AgentSimulationService\x12`\n" +
-	"\x13CreateSimulationRun\x12#.livekit.CreateSimulationRunRequest\x1a$.livekit.CreateSimulationRunResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\"d\n" +
+	"\x17GetSimulationRunRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12*\n" +
+	"\x11simulation_run_id\x18\x02 \x01(\tR\x0fsimulationRunId\"D\n" +
+	"\x18GetSimulationRunResponse\x12(\n" +
+	"\x03run\x18\x01 \x01(\v2\x16.livekit.SimulationRunR\x03run\":\n" +
+	"\x19ListSimulationRunsRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\"H\n" +
+	"\x1aListSimulationRunsResponse\x12*\n" +
+	"\x04runs\x18\x01 \x03(\v2\x16.livekit.SimulationRunR\x04runs2\xab\x02\n" +
+	"\x0fAgentSimulation\x12`\n" +
+	"\x13CreateSimulationRun\x12#.livekit.CreateSimulationRunRequest\x1a$.livekit.CreateSimulationRunResponse\x12W\n" +
+	"\x10GetSimulationRun\x12 .livekit.GetSimulationRunRequest\x1a!.livekit.GetSimulationRunResponse\x12]\n" +
+	"\x12ListSimulationRuns\x12\".livekit.ListSimulationRunsRequest\x1a#.livekit.ListSimulationRunsResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agent_simulation_proto_rawDescOnce sync.Once
@@ -166,19 +652,37 @@ func file_livekit_agent_simulation_proto_rawDescGZIP() []byte {
 	return file_livekit_agent_simulation_proto_rawDescData
 }
 
-var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_livekit_agent_simulation_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_livekit_agent_simulation_proto_goTypes = []any{
-	(*CreateSimulationRunRequest)(nil),  // 0: livekit.CreateSimulationRunRequest
-	(*CreateSimulationRunResponse)(nil), // 1: livekit.CreateSimulationRunResponse
+	(SimulationRun_Status)(0),           // 0: livekit.SimulationRun.Status
+	(SimulationRun_Job_Status)(0),       // 1: livekit.SimulationRun.Job.Status
+	(*SimulationRun)(nil),               // 2: livekit.SimulationRun
+	(*CreateSimulationRunRequest)(nil),  // 3: livekit.CreateSimulationRunRequest
+	(*CreateSimulationRunResponse)(nil), // 4: livekit.CreateSimulationRunResponse
+	(*GetSimulationRunRequest)(nil),     // 5: livekit.GetSimulationRunRequest
+	(*GetSimulationRunResponse)(nil),    // 6: livekit.GetSimulationRunResponse
+	(*ListSimulationRunsRequest)(nil),   // 7: livekit.ListSimulationRunsRequest
+	(*ListSimulationRunsResponse)(nil),  // 8: livekit.ListSimulationRunsResponse
+	(*SimulationRun_Job)(nil),           // 9: livekit.SimulationRun.Job
 }
 var file_livekit_agent_simulation_proto_depIdxs = []int32{
-	0, // 0: livekit.AgentSimulationService.CreateSimulationRun:input_type -> livekit.CreateSimulationRunRequest
-	1, // 1: livekit.AgentSimulationService.CreateSimulationRun:output_type -> livekit.CreateSimulationRunResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: livekit.SimulationRun.status:type_name -> livekit.SimulationRun.Status
+	9, // 1: livekit.SimulationRun.jobs:type_name -> livekit.SimulationRun.Job
+	2, // 2: livekit.GetSimulationRunResponse.run:type_name -> livekit.SimulationRun
+	2, // 3: livekit.ListSimulationRunsResponse.runs:type_name -> livekit.SimulationRun
+	1, // 4: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
+	3, // 5: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.CreateSimulationRunRequest
+	5, // 6: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.GetSimulationRunRequest
+	7, // 7: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.ListSimulationRunsRequest
+	4, // 8: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.CreateSimulationRunResponse
+	6, // 9: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.GetSimulationRunResponse
+	8, // 10: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.ListSimulationRunsResponse
+	8, // [8:11] is the sub-list for method output_type
+	5, // [5:8] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }
@@ -191,13 +695,14 @@ func file_livekit_agent_simulation_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_simulation_proto_rawDesc), len(file_livekit_agent_simulation_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      2,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_livekit_agent_simulation_proto_goTypes,
 		DependencyIndexes: file_livekit_agent_simulation_proto_depIdxs,
+		EnumInfos:         file_livekit_agent_simulation_proto_enumTypes,
 		MessageInfos:      file_livekit_agent_simulation_proto_msgTypes,
 	}.Build()
 	File_livekit_agent_simulation_proto = out.File
