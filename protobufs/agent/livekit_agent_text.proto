@@ -37,8 +37,11 @@ message TextMessageResponse {
   string message_id = 1;
   string session_id = 2;
   oneof event {
-    ChatContext.ChatItem message = 3;
-    TextMessageComplete complete = 4;
+    ChatMessage message = 3;
+    FunctionCall function_call = 4;
+    FunctionCallOutput function_call_output = 5;
+    AgentHandoff agent_handoff = 6;
+    TextMessageComplete complete = 7;
   }
 }
 
