@@ -412,8 +412,6 @@ type WorkerMessage struct {
 	//	*WorkerMessage_Ping
 	//	*WorkerMessage_SimulateJob
 	//	*WorkerMessage_MigrateJob
-	//	*WorkerMessage_TextResponse
-	//	*WorkerMessage_PushText
 	Message       isWorkerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -519,24 +517,6 @@ func (x *WorkerMessage) GetMigrateJob() *MigrateJobRequest {
 	return nil
 }
 
-func (x *WorkerMessage) GetTextResponse() *TextMessageResponse {
-	if x != nil {
-		if x, ok := x.Message.(*WorkerMessage_TextResponse); ok {
-			return x.TextResponse
-		}
-	}
-	return nil
-}
-
-func (x *WorkerMessage) GetPushText() *PushTextRequest {
-	if x != nil {
-		if x, ok := x.Message.(*WorkerMessage_PushText); ok {
-			return x.PushText
-		}
-	}
-	return nil
-}
-
 type isWorkerMessage_Message interface {
 	isWorkerMessage_Message()
 }
@@ -573,14 +553,6 @@ type WorkerMessage_MigrateJob struct {
 	MigrateJob *MigrateJobRequest `protobuf:"bytes,7,opt,name=migrate_job,json=migrateJob,proto3,oneof"`
 }
 
-type WorkerMessage_TextResponse struct {
-	TextResponse *TextMessageResponse `protobuf:"bytes,8,opt,name=text_response,json=textResponse,proto3,oneof"`
-}
-
-type WorkerMessage_PushText struct {
-	PushText *PushTextRequest `protobuf:"bytes,9,opt,name=push_text,json=pushText,proto3,oneof"`
-}
-
 func (*WorkerMessage_Register) isWorkerMessage_Message() {}
 
 func (*WorkerMessage_Availability) isWorkerMessage_Message() {}
@@ -595,10 +567,6 @@ func (*WorkerMessage_SimulateJob) isWorkerMessage_Message() {}
 
 func (*WorkerMessage_MigrateJob) isWorkerMessage_Message() {}
 
-func (*WorkerMessage_TextResponse) isWorkerMessage_Message() {}
-
-func (*WorkerMessage_PushText) isWorkerMessage_Message() {}
-
 // from Server to Worker
 type ServerMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -609,7 +577,6 @@ type ServerMessage struct {
 	//	*ServerMessage_Assignment
 	//	*ServerMessage_Termination
 	//	*ServerMessage_Pong
-	//	*ServerMessage_TextRequest
 	Message       isServerMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -697,15 +664,6 @@ func (x *ServerMessage) GetPong() *WorkerPong {
 	return nil
 }
 
-func (x *ServerMessage) GetTextRequest() *TextMessageRequest {
-	if x != nil {
-		if x, ok := x.Message.(*ServerMessage_TextRequest); ok {
-			return x.TextRequest
-		}
-	}
-	return nil
-}
-
 type isServerMessage_Message interface {
 	isServerMessage_Message()
 }
@@ -732,10 +690,6 @@ type ServerMessage_Pong struct {
 	Pong *WorkerPong `protobuf:"bytes,4,opt,name=pong,proto3,oneof"`
 }
 
-type ServerMessage_TextRequest struct {
-	TextRequest *TextMessageRequest `protobuf:"bytes,6,opt,name=text_request,json=textRequest,proto3,oneof"`
-}
-
 func (*ServerMessage_Register) isServerMessage_Message() {}
 
 func (*ServerMessage_Availability) isServerMessage_Message() {}
@@ -745,8 +699,6 @@ func (*ServerMessage_Assignment) isServerMessage_Message() {}
 func (*ServerMessage_Termination) isServerMessage_Message() {}
 
 func (*ServerMessage_Pong) isServerMessage_Message() {}
-
-func (*ServerMessage_TextRequest) isServerMessage_Message() {}
 
 type SimulateJobRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1468,294 +1420,6 @@ func (x *JobTermination) GetJobId() string {
 	return ""
 }
 
-type AgentSessionState struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	Version uint64                 `protobuf:"varint,1,opt,name=version,proto3" json:"version,omitempty"`
-	// Types that are valid to be assigned to Data:
-	//
-	//	*AgentSessionState_Snapshot
-	//	*AgentSessionState_Delta
-	Data          isAgentSessionState_Data `protobuf_oneof:"data"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentSessionState) Reset() {
-	*x = AgentSessionState{}
-	mi := &file_livekit_agent_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentSessionState) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentSessionState) ProtoMessage() {}
-
-func (x *AgentSessionState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentSessionState.ProtoReflect.Descriptor instead.
-func (*AgentSessionState) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16}
-}
-
-func (x *AgentSessionState) GetVersion() uint64 {
-	if x != nil {
-		return x.Version
-	}
-	return 0
-}
-
-func (x *AgentSessionState) GetData() isAgentSessionState_Data {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
-func (x *AgentSessionState) GetSnapshot() []byte {
-	if x != nil {
-		if x, ok := x.Data.(*AgentSessionState_Snapshot); ok {
-			return x.Snapshot
-		}
-	}
-	return nil
-}
-
-func (x *AgentSessionState) GetDelta() []byte {
-	if x != nil {
-		if x, ok := x.Data.(*AgentSessionState_Delta); ok {
-			return x.Delta
-		}
-	}
-	return nil
-}
-
-type isAgentSessionState_Data interface {
-	isAgentSessionState_Data()
-}
-
-type AgentSessionState_Snapshot struct {
-	Snapshot []byte `protobuf:"bytes,2,opt,name=snapshot,proto3,oneof"`
-}
-
-type AgentSessionState_Delta struct {
-	Delta []byte `protobuf:"bytes,3,opt,name=delta,proto3,oneof"`
-}
-
-func (*AgentSessionState_Snapshot) isAgentSessionState_Data() {}
-
-func (*AgentSessionState_Delta) isAgentSessionState_Data() {}
-
-type TextMessageRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	MessageId     string                 `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	SessionId     string                 `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	AgentName     string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Metadata      string                 `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	SessionState  *AgentSessionState     `protobuf:"bytes,5,opt,name=session_state,json=sessionState,proto3,oneof" json:"session_state,omitempty"`
-	Text          string                 `protobuf:"bytes,6,opt,name=text,proto3" json:"text,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TextMessageRequest) Reset() {
-	*x = TextMessageRequest{}
-	mi := &file_livekit_agent_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TextMessageRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TextMessageRequest) ProtoMessage() {}
-
-func (x *TextMessageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TextMessageRequest.ProtoReflect.Descriptor instead.
-func (*TextMessageRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *TextMessageRequest) GetMessageId() string {
-	if x != nil {
-		return x.MessageId
-	}
-	return ""
-}
-
-func (x *TextMessageRequest) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *TextMessageRequest) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
-	}
-	return ""
-}
-
-func (x *TextMessageRequest) GetMetadata() string {
-	if x != nil {
-		return x.Metadata
-	}
-	return ""
-}
-
-func (x *TextMessageRequest) GetSessionState() *AgentSessionState {
-	if x != nil {
-		return x.SessionState
-	}
-	return nil
-}
-
-func (x *TextMessageRequest) GetText() string {
-	if x != nil {
-		return x.Text
-	}
-	return ""
-}
-
-type PushTextRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The message_id of the TextMessageRequest that this push is for
-	MessageId     string `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	Content       string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PushTextRequest) Reset() {
-	*x = PushTextRequest{}
-	mi := &file_livekit_agent_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PushTextRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PushTextRequest) ProtoMessage() {}
-
-func (x *PushTextRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PushTextRequest.ProtoReflect.Descriptor instead.
-func (*PushTextRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *PushTextRequest) GetMessageId() string {
-	if x != nil {
-		return x.MessageId
-	}
-	return ""
-}
-
-func (x *PushTextRequest) GetContent() string {
-	if x != nil {
-		return x.Content
-	}
-	return ""
-}
-
-type TextMessageResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Indicate the request is completed
-	MessageId     string             `protobuf:"bytes,1,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	SessionState  *AgentSessionState `protobuf:"bytes,2,opt,name=session_state,json=sessionState,proto3" json:"session_state,omitempty"`
-	Error         string             `protobuf:"bytes,3,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *TextMessageResponse) Reset() {
-	*x = TextMessageResponse{}
-	mi := &file_livekit_agent_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *TextMessageResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*TextMessageResponse) ProtoMessage() {}
-
-func (x *TextMessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use TextMessageResponse.ProtoReflect.Descriptor instead.
-func (*TextMessageResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *TextMessageResponse) GetMessageId() string {
-	if x != nil {
-		return x.MessageId
-	}
-	return ""
-}
-
-func (x *TextMessageResponse) GetSessionState() *AgentSessionState {
-	if x != nil {
-		return x.SessionState
-	}
-	return nil
-}
-
-func (x *TextMessageResponse) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
 var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
@@ -1786,7 +1450,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"updated_at\x18\x05 \x01(\x03R\tupdatedAt\x121\n" +
 	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x12\x1b\n" +
 	"\tworker_id\x18\a \x01(\tR\bworkerId\x12\x19\n" +
-	"\bagent_id\x18\b \x01(\tR\aagentId\"\xc6\x04\n" +
+	"\bagent_id\x18\b \x01(\tR\aagentId\"\xc8\x03\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
@@ -1796,10 +1460,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x04ping\x18\x05 \x01(\v2\x13.livekit.WorkerPingH\x00R\x04ping\x12@\n" +
 	"\fsimulate_job\x18\x06 \x01(\v2\x1b.livekit.SimulateJobRequestH\x00R\vsimulateJob\x12=\n" +
 	"\vmigrate_job\x18\a \x01(\v2\x1a.livekit.MigrateJobRequestH\x00R\n" +
-	"migrateJob\x12C\n" +
-	"\rtext_response\x18\b \x01(\v2\x1c.livekit.TextMessageResponseH\x00R\ftextResponse\x127\n" +
-	"\tpush_text\x18\t \x01(\v2\x18.livekit.PushTextRequestH\x00R\bpushTextB\t\n" +
-	"\amessage\"\x81\x03\n" +
+	"migrateJobB\t\n" +
+	"\amessage\"\xbf\x02\n" +
 	"\rServerMessage\x12=\n" +
 	"\bregister\x18\x01 \x01(\v2\x1f.livekit.RegisterWorkerResponseH\x00R\bregister\x12B\n" +
 	"\favailability\x18\x02 \x01(\v2\x1c.livekit.AvailabilityRequestH\x00R\favailability\x128\n" +
@@ -1807,8 +1469,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"assignment\x18\x03 \x01(\v2\x16.livekit.JobAssignmentH\x00R\n" +
 	"assignment\x12;\n" +
 	"\vtermination\x18\x05 \x01(\v2\x17.livekit.JobTerminationH\x00R\vtermination\x12)\n" +
-	"\x04pong\x18\x04 \x01(\v2\x13.livekit.WorkerPongH\x00R\x04pong\x12@\n" +
-	"\ftext_request\x18\x06 \x01(\v2\x1b.livekit.TextMessageRequestH\x00R\vtextRequestB\t\n" +
+	"\x04pong\x18\x04 \x01(\v2\x13.livekit.WorkerPongH\x00R\x04pongB\t\n" +
 	"\amessage\"\x99\x01\n" +
 	"\x12SimulateJobRequest\x12$\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x10.livekit.JobTypeR\x04type\x12!\n" +
@@ -1867,32 +1528,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"'\n" +
 	"\x0eJobTermination\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\"k\n" +
-	"\x11AgentSessionState\x12\x18\n" +
-	"\aversion\x18\x01 \x01(\x04R\aversion\x12\x1c\n" +
-	"\bsnapshot\x18\x02 \x01(\fH\x00R\bsnapshot\x12\x16\n" +
-	"\x05delta\x18\x03 \x01(\fH\x00R\x05deltaB\x06\n" +
-	"\x04data\"\xf9\x01\n" +
-	"\x12TextMessageRequest\x12\x1d\n" +
-	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x02 \x01(\tR\tsessionId\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x03 \x01(\tR\tagentName\x12\x1a\n" +
-	"\bmetadata\x18\x04 \x01(\tR\bmetadata\x12D\n" +
-	"\rsession_state\x18\x05 \x01(\v2\x1a.livekit.AgentSessionStateH\x00R\fsessionState\x88\x01\x01\x12\x12\n" +
-	"\x04text\x18\x06 \x01(\tR\x04textB\x10\n" +
-	"\x0e_session_state\"J\n" +
-	"\x0fPushTextRequest\x12\x1d\n" +
-	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x12\x18\n" +
-	"\acontent\x18\x02 \x01(\tR\acontent\"\x8b\x01\n" +
-	"\x13TextMessageResponse\x12\x1d\n" +
-	"\n" +
-	"message_id\x18\x01 \x01(\tR\tmessageId\x12?\n" +
-	"\rsession_state\x18\x02 \x01(\v2\x1a.livekit.AgentSessionStateR\fsessionState\x12\x14\n" +
-	"\x05error\x18\x03 \x01(\tR\x05error*<\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
 	"\fJT_PUBLISHER\x10\x01\x12\x12\n" +
@@ -1922,7 +1558,7 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_livekit_agent_proto_goTypes = []any{
 	(JobType)(0),                   // 0: livekit.JobType
 	(WorkerStatus)(0),              // 1: livekit.WorkerStatus
@@ -1943,20 +1579,16 @@ var file_livekit_agent_proto_goTypes = []any{
 	(*UpdateWorkerStatus)(nil),     // 16: livekit.UpdateWorkerStatus
 	(*JobAssignment)(nil),          // 17: livekit.JobAssignment
 	(*JobTermination)(nil),         // 18: livekit.JobTermination
-	(*AgentSessionState)(nil),      // 19: livekit.AgentSessionState
-	(*TextMessageRequest)(nil),     // 20: livekit.TextMessageRequest
-	(*PushTextRequest)(nil),        // 21: livekit.PushTextRequest
-	(*TextMessageResponse)(nil),    // 22: livekit.TextMessageResponse
-	nil,                            // 23: livekit.AvailabilityResponse.ParticipantAttributesEntry
-	(*Room)(nil),                   // 24: livekit.Room
-	(*ParticipantInfo)(nil),        // 25: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),  // 26: livekit.ParticipantPermission
-	(*ServerInfo)(nil),             // 27: livekit.ServerInfo
+	nil,                            // 19: livekit.AvailabilityResponse.ParticipantAttributesEntry
+	(*Room)(nil),                   // 20: livekit.Room
+	(*ParticipantInfo)(nil),        // 21: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),  // 22: livekit.ParticipantPermission
+	(*ServerInfo)(nil),             // 23: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	24, // 1: livekit.Job.room:type_name -> livekit.Room
-	25, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	20, // 1: livekit.Job.room:type_name -> livekit.Room
+	21, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
 	4,  // 3: livekit.Job.state:type_name -> livekit.JobState
 	2,  // 4: livekit.JobState.status:type_name -> livekit.JobStatus
 	10, // 5: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
@@ -1966,32 +1598,27 @@ var file_livekit_agent_proto_depIdxs = []int32{
 	8,  // 9: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
 	7,  // 10: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
 	12, // 11: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
-	22, // 12: livekit.WorkerMessage.text_response:type_name -> livekit.TextMessageResponse
-	21, // 13: livekit.WorkerMessage.push_text:type_name -> livekit.PushTextRequest
-	11, // 14: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
-	13, // 15: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
-	17, // 16: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
-	18, // 17: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
-	9,  // 18: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	20, // 19: livekit.ServerMessage.text_request:type_name -> livekit.TextMessageRequest
-	0,  // 20: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	24, // 21: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	25, // 22: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
-	0,  // 23: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	26, // 24: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
-	27, // 25: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
-	3,  // 26: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	23, // 27: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
-	2,  // 28: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
-	1,  // 29: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	3,  // 30: livekit.JobAssignment.job:type_name -> livekit.Job
-	19, // 31: livekit.TextMessageRequest.session_state:type_name -> livekit.AgentSessionState
-	19, // 32: livekit.TextMessageResponse.session_state:type_name -> livekit.AgentSessionState
-	33, // [33:33] is the sub-list for method output_type
-	33, // [33:33] is the sub-list for method input_type
-	33, // [33:33] is the sub-list for extension type_name
-	33, // [33:33] is the sub-list for extension extendee
-	0,  // [0:33] is the sub-list for field type_name
+	11, // 12: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
+	13, // 13: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
+	17, // 14: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
+	18, // 15: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
+	9,  // 16: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
+	0,  // 17: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
+	20, // 18: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	21, // 19: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	0,  // 20: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
+	22, // 21: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	23, // 22: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	3,  // 23: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	19, // 24: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	2,  // 25: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
+	1,  // 26: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
+	3,  // 27: livekit.JobAssignment.job:type_name -> livekit.Job
+	28, // [28:28] is the sub-list for method output_type
+	28, // [28:28] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -2009,8 +1636,6 @@ func file_livekit_agent_proto_init() {
 		(*WorkerMessage_Ping)(nil),
 		(*WorkerMessage_SimulateJob)(nil),
 		(*WorkerMessage_MigrateJob)(nil),
-		(*WorkerMessage_TextResponse)(nil),
-		(*WorkerMessage_PushText)(nil),
 	}
 	file_livekit_agent_proto_msgTypes[3].OneofWrappers = []any{
 		(*ServerMessage_Register)(nil),
@@ -2018,23 +1643,17 @@ func file_livekit_agent_proto_init() {
 		(*ServerMessage_Assignment)(nil),
 		(*ServerMessage_Termination)(nil),
 		(*ServerMessage_Pong)(nil),
-		(*ServerMessage_TextRequest)(nil),
 	}
 	file_livekit_agent_proto_msgTypes[7].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[13].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[14].OneofWrappers = []any{}
-	file_livekit_agent_proto_msgTypes[16].OneofWrappers = []any{
-		(*AgentSessionState_Snapshot)(nil),
-		(*AgentSessionState_Delta)(nil),
-	}
-	file_livekit_agent_proto_msgTypes[17].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   21,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
