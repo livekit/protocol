@@ -30,10 +30,6 @@ message AgentSessionState {
   }
 }
 
-message TextMessageError {
-  string message = 1;
-  string code = 2;
-}
 
 // Request to send a text message to an agent.
 // message_id and session_id are optional — the server generates them if empty.
@@ -63,4 +59,20 @@ message TextSessionComplete {
   string message_id = 1;
   optional AgentSessionState session_state = 2;
   optional TextMessageError error = 3;
+}
+
+enum TextMessageErrorCode {
+  // Unexpected internal error
+  TME_INTERNAL = 0;
+  // Session state not found in cache or version mismatch
+  TME_SESSION_STATE_NOT_FOUND = 1;
+  // An exception was raised inside the user's text handler
+  TME_TEXT_HANDLER_ERROR = 2;
+  // The worker process exited before the text session completed
+  TME_PROCESS_CLOSED = 3;
+}
+
+message TextMessageError {
+  string message = 1;
+  TextMessageErrorCode code = 2;
 }
