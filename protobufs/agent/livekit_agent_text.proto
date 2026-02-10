@@ -22,6 +22,34 @@ option ruby_package = "LiveKit::Proto";
 
 import "agent/livekit_agent_session.proto";
 
+// Request to send a text message to an agent.
+message TextMessageRequest {
+  string text = 1;
+  string message_id = 2;
+  string session_id = 3;
+  string agent_name = 4;
+  string metadata = 5;
+  optional AgentSessionState session_state = 6;
+}
+
+// Response to a text message request, multiple responses may be sent for a single request until it is complete.
+message TextMessageResponse {
+  string message_id = 1;
+  string session_id = 2;
+  oneof event {
+    ChatContext.ChatItem message = 3;
+    TextMessageComplete complete = 4;
+  }
+}
+
+// Indicates the text message session is complete.
+message TextMessageComplete {
+  oneof result {
+    AgentSessionState session_state = 1;
+    TextMessageError error = 2;
+  }
+}
+
 message AgentSessionState {
   uint64 version = 1;
   oneof data {
@@ -30,46 +58,15 @@ message AgentSessionState {
   }
 }
 
-
-// Request to send a text message to an agent.
-// message_id and session_id are optional — the server generates them if empty.
-message TextMessageRequest {
-  string text = 1;
-  optional string message_id = 2;
-  optional string session_id = 3;
-  string agent_name = 4;
-  string metadata = 5;
-  optional AgentSessionState session_state = 6;
-}
-
-// Returned for each text message request, signals the session is created or resumed.
-message TextSessionStarted {
-  string session_id = 1;
-  string message_id = 2;
-}
-
-// Streaming response event with typed content.
-message TextResponseEvent {
-  string message_id = 1;
-  ChatContext.ChatItem item = 2;
-}
-
-// Indicates the text message session is complete.
-message TextSessionComplete {
-  string message_id = 1;
-  optional AgentSessionState session_state = 2;
-  optional TextMessageError error = 3;
-}
-
 enum TextMessageErrorCode {
   // Unexpected internal error
-  TME_INTERNAL = 0;
+  INTERNAL_ERROR = 0;
   // Session state not found in cache or version mismatch
-  TME_SESSION_STATE_NOT_FOUND = 1;
+  SESSION_STATE_NOT_FOUND = 1;
   // An exception was raised inside the user's text handler
-  TME_TEXT_HANDLER_ERROR = 2;
+  TEXT_HANDLER_ERROR = 2;
   // The worker process exited before the text session completed
-  TME_PROCESS_CLOSED = 3;
+  PROCESS_CLOSED = 3;
 }
 
 message TextMessageError {
