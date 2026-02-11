@@ -5219,12 +5219,12 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"request_id\x18\x04 \x01(\rR\trequestId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"[\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"g\n" +
 	"\tICEServer\x12\x12\n" +
-	"\x04urls\x18\x01 \x03(\tR\x04urls\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12\x1e\n" +
+	"\x04urls\x18\x01 \x03(\tR\x04urls\x12 \n" +
+	"\busername\x18\x02 \x01(\tB\x04\x88\xec,\x01R\busername\x12$\n" +
 	"\n" +
-	"credential\x18\x03 \x01(\tR\n" +
+	"credential\x18\x03 \x01(\tB\x04\x88\xec,\x01R\n" +
 	"credential\"C\n" +
 	"\x0fSpeakersChanged\x120\n" +
 	"\bspeakers\x18\x01 \x03(\v2\x14.livekit.SpeakerInfoR\bspeakers\"/\n" +
