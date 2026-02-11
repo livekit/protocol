@@ -232,6 +232,7 @@ message PrivateLink {
 
   string private_link_id = 1;
   string name = 2;
+  string region = 4;
 
   oneof config {
     AWSConfig aws = 3;
@@ -269,6 +270,7 @@ message CreatePrivateLinkRequest {
   }
 
   string name = 1;
+  string region = 3;
   oneof config {
     AWSCreateConfig aws = 2;
   }

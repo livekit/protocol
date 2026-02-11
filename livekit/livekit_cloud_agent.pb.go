@@ -2148,6 +2148,7 @@ type PrivateLink struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	PrivateLinkId string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Region        string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*PrivateLink_Aws
@@ -2196,6 +2197,13 @@ func (x *PrivateLink) GetPrivateLinkId() string {
 func (x *PrivateLink) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetRegion() string {
+	if x != nil {
+		return x.Region
 	}
 	return ""
 }
@@ -2331,8 +2339,9 @@ func (x *PrivateLinkHealthStatus) GetUpdatedAt() *timestamppb.Timestamp {
 }
 
 type CreatePrivateLinkRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	Name  string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Name   string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Region string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*CreatePrivateLinkRequest_Aws
@@ -2374,6 +2383,13 @@ func (*CreatePrivateLinkRequest) Descriptor() ([]byte, []int) {
 func (x *CreatePrivateLinkRequest) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *CreatePrivateLinkRequest) GetRegion() string {
+	if x != nil {
+		return x.Region
 	}
 	return ""
 }
@@ -3035,10 +3051,11 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\xb0\x01\n" +
+	"\x15ClientSettingsRequest\"\xc8\x01\n" +
 	"\vPrivateLink\x12&\n" +
 	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x122\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06region\x18\x04 \x01(\tR\x06region\x122\n" +
 	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigH\x00R\x03aws\x1a'\n" +
 	"\tAWSConfig\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
@@ -3061,9 +3078,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06Status\x121\n" +
 	"-PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNKNOWN\x10\x00\x121\n" +
 	"-PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_HEALTHY\x10\x01\x123\n" +
-	"/PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNHEALTHY\x10\x02\"\xae\x01\n" +
+	"/PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNHEALTHY\x10\x02\"\xc6\x01\n" +
 	"\x18CreatePrivateLinkRequest\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12E\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06region\x18\x03 \x01(\tR\x06region\x12E\n" +
 	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigH\x00R\x03aws\x1a-\n" +
 	"\x0fAWSCreateConfig\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
