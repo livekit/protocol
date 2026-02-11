@@ -373,11 +373,9 @@ message ICEServer {
   repeated string urls = 1;
   string username = 2 [
     (logger.redact) = true,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   string credential = 3 [
     (logger.redact) = true,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 }
 
