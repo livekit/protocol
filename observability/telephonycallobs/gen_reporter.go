@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_OCEQQJO = true
+const Version_T93RR0G = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -30,26 +30,20 @@ type ProjectReporter interface {
 }
 
 type CallTx interface {
-	ReportStartTime(v time.Time)
-	ReportEndTime(v time.Time)
-	ReportDuration(v uint64)
-	ReportDurationMinutes(v uint16)
 	ReportTrunkID(v string)
+	ReportTrunkType(v CallTrunkType)
 	ReportDispatchID(v string)
 	ReportToNumber(v string)
 	ReportToHost(v string)
 	ReportFromNumber(v string)
 	ReportFromHost(v string)
-	ReportDirection(v CallDirection)
+	ReportNumberType(v CallNumberType)
+	ReportCountryCode(v string)
 	ReportTransport(v CallTransport)
 	ReportProviderCallID(v string)
 	ReportProviderName(v string)
 	ReportSIPCallID(v string)
-	ReportRoomID(v string)
-	ReportRoomName(v string)
 	ReportParticipantIdentity(v string)
-	ReportError(v string)
-	ReportStatus(v CallStatus)
 	ReportResponseCode(v uint16)
 	ReportDisconnectReason(v string)
 	ReportTransferID(v string)
