@@ -446,49 +446,49 @@ func (VideoQuality) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{7}
 }
 
-type RpcPayloadType int32
+type RpcPayloadFormat int32
 
 const (
-	RpcPayloadType_UNCOMPRESSED RpcPayloadType = 0
-	RpcPayloadType_GZIP         RpcPayloadType = 1
+	RpcPayloadFormat_RPF_UNKNOWN RpcPayloadFormat = 0
+	RpcPayloadFormat_RPF_GZIP    RpcPayloadFormat = 1
 )
 
-// Enum value maps for RpcPayloadType.
+// Enum value maps for RpcPayloadFormat.
 var (
-	RpcPayloadType_name = map[int32]string{
-		0: "UNCOMPRESSED",
-		1: "GZIP",
+	RpcPayloadFormat_name = map[int32]string{
+		0: "RPF_UNKNOWN",
+		1: "RPF_GZIP",
 	}
-	RpcPayloadType_value = map[string]int32{
-		"UNCOMPRESSED": 0,
-		"GZIP":         1,
+	RpcPayloadFormat_value = map[string]int32{
+		"RPF_UNKNOWN": 0,
+		"RPF_GZIP":    1,
 	}
 )
 
-func (x RpcPayloadType) Enum() *RpcPayloadType {
-	p := new(RpcPayloadType)
+func (x RpcPayloadFormat) Enum() *RpcPayloadFormat {
+	p := new(RpcPayloadFormat)
 	*p = x
 	return p
 }
 
-func (x RpcPayloadType) String() string {
+func (x RpcPayloadFormat) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (RpcPayloadType) Descriptor() protoreflect.EnumDescriptor {
+func (RpcPayloadFormat) Descriptor() protoreflect.EnumDescriptor {
 	return file_livekit_models_proto_enumTypes[8].Descriptor()
 }
 
-func (RpcPayloadType) Type() protoreflect.EnumType {
+func (RpcPayloadFormat) Type() protoreflect.EnumType {
 	return &file_livekit_models_proto_enumTypes[8]
 }
 
-func (x RpcPayloadType) Number() protoreflect.EnumNumber {
+func (x RpcPayloadFormat) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use RpcPayloadType.Descriptor instead.
-func (RpcPayloadType) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use RpcPayloadFormat.Descriptor instead.
+func (RpcPayloadFormat) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{8}
 }
 
@@ -3811,10 +3811,10 @@ type RpcRequest struct {
 	Version           uint32                 `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
 	// Compressed payload data. When set, this field is used instead of `payload`.
 	CompressedPayload []byte `protobuf:"bytes,6,opt,name=compressed_payload,json=compressedPayload,proto3" json:"compressed_payload,omitempty"`
-	// Indicates the compression type used for compressed_payload.
-	PayloadType   RpcPayloadType `protobuf:"varint,7,opt,name=payload_type,json=payloadType,proto3,enum=livekit.RpcPayloadType" json:"payload_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Indicates the compression format used for compressed_payload.
+	CompressedPayloadFormat RpcPayloadFormat `protobuf:"varint,7,opt,name=compressed_payload_format,json=compressedPayloadFormat,proto3,enum=livekit.RpcPayloadFormat" json:"compressed_payload_format,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *RpcRequest) Reset() {
@@ -3889,11 +3889,11 @@ func (x *RpcRequest) GetCompressedPayload() []byte {
 	return nil
 }
 
-func (x *RpcRequest) GetPayloadType() RpcPayloadType {
+func (x *RpcRequest) GetCompressedPayloadFormat() RpcPayloadFormat {
 	if x != nil {
-		return x.PayloadType
+		return x.CompressedPayloadFormat
 	}
-	return RpcPayloadType_UNCOMPRESSED
+	return RpcPayloadFormat_RPF_UNKNOWN
 }
 
 type RpcAck struct {
@@ -3949,10 +3949,10 @@ type RpcResponse struct {
 	//	*RpcResponse_Error
 	//	*RpcResponse_CompressedPayload
 	Value isRpcResponse_Value `protobuf_oneof:"value"`
-	// Indicates the compression type used for compressed_payload.
-	PayloadType   RpcPayloadType `protobuf:"varint,5,opt,name=payload_type,json=payloadType,proto3,enum=livekit.RpcPayloadType" json:"payload_type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Indicates the compression format used for compressed_payload.
+	CompressedPayloadFormat RpcPayloadFormat `protobuf:"varint,5,opt,name=compressed_payload_format,json=compressedPayloadFormat,proto3,enum=livekit.RpcPayloadFormat" json:"compressed_payload_format,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *RpcResponse) Reset() {
@@ -4026,11 +4026,11 @@ func (x *RpcResponse) GetCompressedPayload() []byte {
 	return nil
 }
 
-func (x *RpcResponse) GetPayloadType() RpcPayloadType {
+func (x *RpcResponse) GetCompressedPayloadFormat() RpcPayloadFormat {
 	if x != nil {
-		return x.PayloadType
+		return x.CompressedPayloadFormat
 	}
-	return RpcPayloadType_UNCOMPRESSED
+	return RpcPayloadFormat_RPF_UNKNOWN
 }
 
 type isRpcResponse_Value interface {
@@ -6389,7 +6389,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12\x18\n" +
 	"\adeleted\x18\x05 \x01(\bR\adeleted\x12\x1c\n" +
 	"\tgenerated\x18\x06 \x01(\bR\tgeneratedB\x11\n" +
-	"\x0f_edit_timestamp\"\x83\x02\n" +
+	"\x0f_edit_timestamp\"\x9e\x02\n" +
 	"\n" +
 	"RpcRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
@@ -6397,18 +6397,18 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\apayload\x18\x03 \x01(\tR\apayload\x12.\n" +
 	"\x13response_timeout_ms\x18\x04 \x01(\rR\x11responseTimeoutMs\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\rR\aversion\x12-\n" +
-	"\x12compressed_payload\x18\x06 \x01(\fR\x11compressedPayload\x12:\n" +
-	"\fpayload_type\x18\a \x01(\x0e2\x17.livekit.RpcPayloadTypeR\vpayloadType\"'\n" +
+	"\x12compressed_payload\x18\x06 \x01(\fR\x11compressedPayload\x12U\n" +
+	"\x19compressed_payload_format\x18\a \x01(\x0e2\x19.livekit.RpcPayloadFormatR\x17compressedPayloadFormat\"'\n" +
 	"\x06RpcAck\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\"\xe9\x01\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\"\x84\x02\n" +
 	"\vRpcResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
 	"\apayload\x18\x02 \x01(\tH\x00R\apayload\x12)\n" +
 	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05error\x12/\n" +
-	"\x12compressed_payload\x18\x04 \x01(\fH\x00R\x11compressedPayload\x12:\n" +
-	"\fpayload_type\x18\x05 \x01(\x0e2\x17.livekit.RpcPayloadTypeR\vpayloadTypeB\a\n" +
+	"\x12compressed_payload\x18\x04 \x01(\fH\x00R\x11compressedPayload\x12U\n" +
+	"\x19compressed_payload_format\x18\x05 \x01(\x0e2\x19.livekit.RpcPayloadFormatR\x17compressedPayloadFormatB\a\n" +
 	"\x05value\"L\n" +
 	"\bRpcError\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\rR\x04code\x12\x18\n" +
@@ -6705,10 +6705,10 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"\x06MEDIUM\x10\x01\x12\b\n" +
 	"\x04HIGH\x10\x02\x12\a\n" +
-	"\x03OFF\x10\x03*,\n" +
-	"\x0eRpcPayloadType\x12\x10\n" +
-	"\fUNCOMPRESSED\x10\x00\x12\b\n" +
-	"\x04GZIP\x10\x01*@\n" +
+	"\x03OFF\x10\x03*1\n" +
+	"\x10RpcPayloadFormat\x12\x0f\n" +
+	"\vRPF_UNKNOWN\x10\x00\x12\f\n" +
+	"\bRPF_GZIP\x10\x01*@\n" +
 	"\x11ConnectionQuality\x12\b\n" +
 	"\x04POOR\x10\x00\x12\b\n" +
 	"\x04GOOD\x10\x01\x12\r\n" +
@@ -6780,7 +6780,7 @@ var file_livekit_models_proto_goTypes = []any{
 	(TrackSource)(0),                         // 5: livekit.TrackSource
 	(DataTrackExtensionID)(0),                // 6: livekit.DataTrackExtensionID
 	(VideoQuality)(0),                        // 7: livekit.VideoQuality
-	(RpcPayloadType)(0),                      // 8: livekit.RpcPayloadType
+	(RpcPayloadFormat)(0),                    // 8: livekit.RpcPayloadFormat
 	(ConnectionQuality)(0),                   // 9: livekit.ConnectionQuality
 	(ClientConfigSetting)(0),                 // 10: livekit.ClientConfigSetting
 	(DisconnectReason)(0),                    // 11: livekit.DisconnectReason
@@ -6904,9 +6904,9 @@ var file_livekit_models_proto_depIdxs = []int32{
 	76, // 46: livekit.EncryptedPacketPayload.stream_trailer:type_name -> livekit.DataStream.Trailer
 	43, // 47: livekit.ActiveSpeakerUpdate.speakers:type_name -> livekit.SpeakerInfo
 	47, // 48: livekit.Transcription.segments:type_name -> livekit.TranscriptionSegment
-	8,  // 49: livekit.RpcRequest.payload_type:type_name -> livekit.RpcPayloadType
+	8,  // 49: livekit.RpcRequest.compressed_payload_format:type_name -> livekit.RpcPayloadFormat
 	52, // 50: livekit.RpcResponse.error:type_name -> livekit.RpcError
-	8,  // 51: livekit.RpcResponse.payload_type:type_name -> livekit.RpcPayloadType
+	8,  // 51: livekit.RpcResponse.compressed_payload_format:type_name -> livekit.RpcPayloadFormat
 	21, // 52: livekit.ServerInfo.edition:type_name -> livekit.ServerInfo.Edition
 	22, // 53: livekit.ClientInfo.sdk:type_name -> livekit.ClientInfo.SDK
 	57, // 54: livekit.ClientConfiguration.video:type_name -> livekit.VideoConfiguration
