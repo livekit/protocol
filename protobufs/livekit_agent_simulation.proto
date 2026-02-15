@@ -49,10 +49,30 @@ message SimulationRun {
   repeated Job jobs = 7;
 }
 
+message Scenario {
+  string id = 1;
+  string project_id = 2;
+  string label = 3;
+  string instructions = 4;
+  string agent_expectations = 5;
+  string source_room_id = 6;
+  int64 created_at = 7;
+}
+
+message ScenarioCollection {
+  string id = 1;
+  string project_id = 2;
+  string label = 3;
+  int64 created_at = 4;
+  repeated Scenario scenarios = 5;
+}
+
 message CreateSimulationRunRequest {
   string agent_name = 1;
   string agent_description = 2;
   int32 num_simulations = 3;
+  string scenario_collection_id = 4;
+  string region = 5;
 }
 message CreateSimulationRunResponse {
   string simulation_run_id = 1;
@@ -73,8 +93,83 @@ message ListSimulationRunsResponse {
   repeated SimulationRun runs = 1;
 }
 
+message CreateScenarioRequest {
+  string label = 1;
+  string instructions = 2;
+  string agent_expectations = 3;
+  string scenario_collection_id = 4;
+}
+message CreateScenarioResponse {
+  Scenario scenario = 1;
+}
+
+message CreateScenarioFromSessionRequest {
+  string room_id = 1;
+  string scenario_collection_id = 2;
+  string label = 3;
+  string region = 4;
+}
+message CreateScenarioFromSessionResponse {
+  string job_id = 1;
+}
+
+message DeleteScenarioRequest {
+  string scenario_id = 1;
+}
+message DeleteScenarioResponse {}
+
+message CreateScenarioCollectionRequest {
+  string label = 1;
+}
+message CreateScenarioCollectionResponse {
+  ScenarioCollection scenario_collection = 1;
+}
+
+message DeleteScenarioCollectionRequest {
+  string scenario_collection_id = 1;
+}
+message DeleteScenarioCollectionResponse {}
+
+message ListScenarioCollectionsRequest {
+  string project_id = 1;
+}
+message ListScenarioCollectionsResponse {
+  repeated ScenarioCollection scenario_collections = 1;
+}
+
+message ListScenariosRequest {
+  string scenario_collection_id = 1;
+}
+message ListScenariosResponse {
+  repeated Scenario scenarios = 1;
+}
+
+message AddScenarioToCollectionRequest {
+  string scenario_collection_id = 1;
+  string scenario_id = 2;
+}
+message AddScenarioToCollectionResponse {}
+
+message RemoveScenarioFromCollectionRequest {
+  string scenario_collection_id = 1;
+  string scenario_id = 2;
+}
+message RemoveScenarioFromCollectionResponse {}
+
 service AgentSimulation {
   rpc CreateSimulationRun(CreateSimulationRunRequest) returns (CreateSimulationRunResponse);
   rpc GetSimulationRun(GetSimulationRunRequest) returns (GetSimulationRunResponse);
   rpc ListSimulationRuns(ListSimulationRunsRequest) returns (ListSimulationRunsResponse);
+
+  rpc CreateScenario(CreateScenarioRequest) returns (CreateScenarioResponse);
+  rpc CreateScenarioFromSession(CreateScenarioFromSessionRequest) returns (CreateScenarioFromSessionResponse);
+  rpc DeleteScenario(DeleteScenarioRequest) returns (DeleteScenarioResponse);
+
+  rpc CreateScenarioCollection(CreateScenarioCollectionRequest) returns (CreateScenarioCollectionResponse);
+  rpc DeleteScenarioCollection(DeleteScenarioCollectionRequest) returns (DeleteScenarioCollectionResponse);
+  rpc ListScenarioCollections(ListScenarioCollectionsRequest) returns (ListScenarioCollectionsResponse);
+
+  rpc ListScenarios(ListScenariosRequest) returns (ListScenariosResponse);
+  rpc AddScenarioToCollection(AddScenarioToCollectionRequest) returns (AddScenarioToCollectionResponse);
+  rpc RemoveScenarioFromCollection(RemoveScenarioFromCollectionRequest) returns (RemoveScenarioFromCollectionResponse);
 }
