@@ -77,11 +77,12 @@ message ScenarioCollection {
 }
 
 message CreateSimulationRunRequest {
-  string agent_name = 1;
-  string agent_description = 2;
-  int32 num_simulations = 3;
-  string scenario_collection_id = 4;
-  string region = 5;
+  string project_id = 1;
+  string agent_name = 2;
+  string agent_description = 3;
+  int32 num_simulations = 4;
+  string scenario_collection_id = 5;
+  string region = 6;
 }
 message CreateSimulationRunResponse {
   string simulation_run_id = 1;
@@ -103,39 +104,44 @@ message ListSimulationRunsResponse {
 }
 
 message CreateScenarioRequest {
-  string label = 1;
-  string instructions = 2;
-  string agent_expectations = 3;
-  string scenario_collection_id = 4;
+  string project_id = 1;
+  string label = 2;
+  string instructions = 3;
+  string agent_expectations = 4;
+  string scenario_collection_id = 5;
 }
 message CreateScenarioResponse {
   Scenario scenario = 1;
 }
 
 message CreateScenarioFromSessionRequest {
-  string room_id = 1;
-  string scenario_collection_id = 2;
-  string label = 3;
-  string region = 4;
+  string project_id = 1;
+  string room_id = 2;
+  string scenario_collection_id = 3;
+  string label = 4;
+  string region = 5;
 }
 message CreateScenarioFromSessionResponse {
   Scenario scenario = 1;
 }
 
 message DeleteScenarioRequest {
-  string scenario_id = 1;
+  string project_id = 1;
+  string scenario_id = 2;
 }
 message DeleteScenarioResponse {}
 
 message CreateScenarioCollectionRequest {
-  string label = 1;
+  string project_id = 1;
+  string label = 2;
 }
 message CreateScenarioCollectionResponse {
   ScenarioCollection scenario_collection = 1;
 }
 
 message DeleteScenarioCollectionRequest {
-  string scenario_collection_id = 1;
+  string project_id = 1;
+  string scenario_collection_id = 2;
 }
 message DeleteScenarioCollectionResponse {}
 
@@ -147,21 +153,24 @@ message ListScenarioCollectionsResponse {
 }
 
 message ListScenariosRequest {
-  string scenario_collection_id = 1;
+  string project_id = 1;
+  string scenario_collection_id = 2;
 }
 message ListScenariosResponse {
   repeated Scenario scenarios = 1;
 }
 
 message AddScenarioToCollectionRequest {
-  string scenario_collection_id = 1;
-  string scenario_id = 2;
+  string project_id = 1;
+  string scenario_collection_id = 2;
+  string scenario_id = 3;
 }
 message AddScenarioToCollectionResponse {}
 
 message RemoveScenarioFromCollectionRequest {
-  string scenario_collection_id = 1;
-  string scenario_id = 2;
+  string project_id = 1;
+  string scenario_collection_id = 2;
+  string scenario_id = 3;
 }
 message RemoveScenarioFromCollectionResponse {}
 
