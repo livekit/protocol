@@ -468,11 +468,12 @@ func (x *ScenarioCollection) GetScenarios() []*Scenario {
 
 type CreateSimulationRunRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	AgentName            string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	AgentDescription     string                 `protobuf:"bytes,2,opt,name=agent_description,json=agentDescription,proto3" json:"agent_description,omitempty"`
-	NumSimulations       int32                  `protobuf:"varint,3,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
-	ScenarioCollectionId string                 `protobuf:"bytes,4,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
-	Region               string                 `protobuf:"bytes,5,opt,name=region,proto3" json:"region,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	AgentName            string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	AgentDescription     string                 `protobuf:"bytes,3,opt,name=agent_description,json=agentDescription,proto3" json:"agent_description,omitempty"`
+	NumSimulations       int32                  `protobuf:"varint,4,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,5,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	Region               string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -505,6 +506,13 @@ func (x *CreateSimulationRunRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateSimulationRunRequest.ProtoReflect.Descriptor instead.
 func (*CreateSimulationRunRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CreateSimulationRunRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *CreateSimulationRunRequest) GetAgentName() string {
@@ -772,10 +780,11 @@ func (x *ListSimulationRunsResponse) GetRuns() []*SimulationRun {
 
 type CreateScenarioRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	Label                string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
-	Instructions         string                 `protobuf:"bytes,2,opt,name=instructions,proto3" json:"instructions,omitempty"`
-	AgentExpectations    string                 `protobuf:"bytes,3,opt,name=agent_expectations,json=agentExpectations,proto3" json:"agent_expectations,omitempty"`
-	ScenarioCollectionId string                 `protobuf:"bytes,4,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	Label                string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	Instructions         string                 `protobuf:"bytes,3,opt,name=instructions,proto3" json:"instructions,omitempty"`
+	AgentExpectations    string                 `protobuf:"bytes,4,opt,name=agent_expectations,json=agentExpectations,proto3" json:"agent_expectations,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,5,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -808,6 +817,13 @@ func (x *CreateScenarioRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateScenarioRequest.ProtoReflect.Descriptor instead.
 func (*CreateScenarioRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *CreateScenarioRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *CreateScenarioRequest) GetLabel() string {
@@ -884,10 +900,11 @@ func (x *CreateScenarioResponse) GetScenario() *Scenario {
 
 type CreateScenarioFromSessionRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	RoomId               string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-	ScenarioCollectionId string                 `protobuf:"bytes,2,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
-	Label                string                 `protobuf:"bytes,3,opt,name=label,proto3" json:"label,omitempty"`
-	Region               string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	RoomId               string                 `protobuf:"bytes,2,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,3,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	Label                string                 `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"`
+	Region               string                 `protobuf:"bytes,5,opt,name=region,proto3" json:"region,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -920,6 +937,13 @@ func (x *CreateScenarioFromSessionRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateScenarioFromSessionRequest.ProtoReflect.Descriptor instead.
 func (*CreateScenarioFromSessionRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CreateScenarioFromSessionRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *CreateScenarioFromSessionRequest) GetRoomId() string {
@@ -996,7 +1020,8 @@ func (x *CreateScenarioFromSessionResponse) GetScenario() *Scenario {
 
 type DeleteScenarioRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ScenarioId    string                 `protobuf:"bytes,1,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ScenarioId    string                 `protobuf:"bytes,2,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1029,6 +1054,13 @@ func (x *DeleteScenarioRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteScenarioRequest.ProtoReflect.Descriptor instead.
 func (*DeleteScenarioRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *DeleteScenarioRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *DeleteScenarioRequest) GetScenarioId() string {
@@ -1076,7 +1108,8 @@ func (*DeleteScenarioResponse) Descriptor() ([]byte, []int) {
 
 type CreateScenarioCollectionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Label         string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	Label         string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1109,6 +1142,13 @@ func (x *CreateScenarioCollectionRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateScenarioCollectionRequest.ProtoReflect.Descriptor instead.
 func (*CreateScenarioCollectionRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *CreateScenarioCollectionRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *CreateScenarioCollectionRequest) GetLabel() string {
@@ -1164,7 +1204,8 @@ func (x *CreateScenarioCollectionResponse) GetScenarioCollection() *ScenarioColl
 
 type DeleteScenarioCollectionRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	ScenarioCollectionId string                 `protobuf:"bytes,1,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,2,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1197,6 +1238,13 @@ func (x *DeleteScenarioCollectionRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DeleteScenarioCollectionRequest.ProtoReflect.Descriptor instead.
 func (*DeleteScenarioCollectionRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeleteScenarioCollectionRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *DeleteScenarioCollectionRequest) GetScenarioCollectionId() string {
@@ -1332,7 +1380,8 @@ func (x *ListScenarioCollectionsResponse) GetScenarioCollections() []*ScenarioCo
 
 type ListScenariosRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	ScenarioCollectionId string                 `protobuf:"bytes,1,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,2,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1365,6 +1414,13 @@ func (x *ListScenariosRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListScenariosRequest.ProtoReflect.Descriptor instead.
 func (*ListScenariosRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ListScenariosRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *ListScenariosRequest) GetScenarioCollectionId() string {
@@ -1420,8 +1476,9 @@ func (x *ListScenariosResponse) GetScenarios() []*Scenario {
 
 type AddScenarioToCollectionRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	ScenarioCollectionId string                 `protobuf:"bytes,1,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
-	ScenarioId           string                 `protobuf:"bytes,2,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,2,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	ScenarioId           string                 `protobuf:"bytes,3,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1454,6 +1511,13 @@ func (x *AddScenarioToCollectionRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use AddScenarioToCollectionRequest.ProtoReflect.Descriptor instead.
 func (*AddScenarioToCollectionRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *AddScenarioToCollectionRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *AddScenarioToCollectionRequest) GetScenarioCollectionId() string {
@@ -1508,8 +1572,9 @@ func (*AddScenarioToCollectionResponse) Descriptor() ([]byte, []int) {
 
 type RemoveScenarioFromCollectionRequest struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	ScenarioCollectionId string                 `protobuf:"bytes,1,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
-	ScenarioId           string                 `protobuf:"bytes,2,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
+	ProjectId            string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	ScenarioCollectionId string                 `protobuf:"bytes,2,opt,name=scenario_collection_id,json=scenarioCollectionId,proto3" json:"scenario_collection_id,omitempty"`
+	ScenarioId           string                 `protobuf:"bytes,3,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1542,6 +1607,13 @@ func (x *RemoveScenarioFromCollectionRequest) ProtoReflect() protoreflect.Messag
 // Deprecated: Use RemoveScenarioFromCollectionRequest.ProtoReflect.Descriptor instead.
 func (*RemoveScenarioFromCollectionRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *RemoveScenarioFromCollectionRequest) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
+	}
+	return ""
 }
 
 func (x *RemoveScenarioFromCollectionRequest) GetScenarioCollectionId() string {
@@ -1715,14 +1787,16 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05label\x18\x03 \x01(\tR\x05label\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x04 \x01(\x03R\tcreatedAt\x12/\n" +
-	"\tscenarios\x18\x05 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"\xdf\x01\n" +
+	"\tscenarios\x18\x05 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"\xfe\x01\n" +
 	"\x1aCreateSimulationRunRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12+\n" +
-	"\x11agent_description\x18\x02 \x01(\tR\x10agentDescription\x12'\n" +
-	"\x0fnum_simulations\x18\x03 \x01(\x05R\x0enumSimulations\x124\n" +
-	"\x16scenario_collection_id\x18\x04 \x01(\tR\x14scenarioCollectionId\x12\x16\n" +
-	"\x06region\x18\x05 \x01(\tR\x06region\"I\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12+\n" +
+	"\x11agent_description\x18\x03 \x01(\tR\x10agentDescription\x12'\n" +
+	"\x0fnum_simulations\x18\x04 \x01(\x05R\x0enumSimulations\x124\n" +
+	"\x16scenario_collection_id\x18\x05 \x01(\tR\x14scenarioCollectionId\x12\x16\n" +
+	"\x06region\x18\x06 \x01(\tR\x06region\"I\n" +
 	"\x1bCreateSimulationRunResponse\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\"d\n" +
 	"\x17GetSimulationRunRequest\x12\x1d\n" +
@@ -1735,49 +1809,65 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\"H\n" +
 	"\x1aListSimulationRunsResponse\x12*\n" +
-	"\x04runs\x18\x01 \x03(\v2\x16.livekit.SimulationRunR\x04runs\"\xb6\x01\n" +
-	"\x15CreateScenarioRequest\x12\x14\n" +
-	"\x05label\x18\x01 \x01(\tR\x05label\x12\"\n" +
-	"\finstructions\x18\x02 \x01(\tR\finstructions\x12-\n" +
-	"\x12agent_expectations\x18\x03 \x01(\tR\x11agentExpectations\x124\n" +
-	"\x16scenario_collection_id\x18\x04 \x01(\tR\x14scenarioCollectionId\"G\n" +
+	"\x04runs\x18\x01 \x03(\v2\x16.livekit.SimulationRunR\x04runs\"\xd5\x01\n" +
+	"\x15CreateScenarioRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x14\n" +
+	"\x05label\x18\x02 \x01(\tR\x05label\x12\"\n" +
+	"\finstructions\x18\x03 \x01(\tR\finstructions\x12-\n" +
+	"\x12agent_expectations\x18\x04 \x01(\tR\x11agentExpectations\x124\n" +
+	"\x16scenario_collection_id\x18\x05 \x01(\tR\x14scenarioCollectionId\"G\n" +
 	"\x16CreateScenarioResponse\x12-\n" +
-	"\bscenario\x18\x01 \x01(\v2\x11.livekit.ScenarioR\bscenario\"\x9f\x01\n" +
-	" CreateScenarioFromSessionRequest\x12\x17\n" +
-	"\aroom_id\x18\x01 \x01(\tR\x06roomId\x124\n" +
-	"\x16scenario_collection_id\x18\x02 \x01(\tR\x14scenarioCollectionId\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\x12\x16\n" +
-	"\x06region\x18\x04 \x01(\tR\x06region\"R\n" +
+	"\bscenario\x18\x01 \x01(\v2\x11.livekit.ScenarioR\bscenario\"\xbe\x01\n" +
+	" CreateScenarioFromSessionRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x17\n" +
+	"\aroom_id\x18\x02 \x01(\tR\x06roomId\x124\n" +
+	"\x16scenario_collection_id\x18\x03 \x01(\tR\x14scenarioCollectionId\x12\x14\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\x12\x16\n" +
+	"\x06region\x18\x05 \x01(\tR\x06region\"R\n" +
 	"!CreateScenarioFromSessionResponse\x12-\n" +
-	"\bscenario\x18\x01 \x01(\v2\x11.livekit.ScenarioR\bscenario\"8\n" +
-	"\x15DeleteScenarioRequest\x12\x1f\n" +
-	"\vscenario_id\x18\x01 \x01(\tR\n" +
+	"\bscenario\x18\x01 \x01(\v2\x11.livekit.ScenarioR\bscenario\"W\n" +
+	"\x15DeleteScenarioRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1f\n" +
+	"\vscenario_id\x18\x02 \x01(\tR\n" +
 	"scenarioId\"\x18\n" +
-	"\x16DeleteScenarioResponse\"7\n" +
-	"\x1fCreateScenarioCollectionRequest\x12\x14\n" +
-	"\x05label\x18\x01 \x01(\tR\x05label\"p\n" +
+	"\x16DeleteScenarioResponse\"V\n" +
+	"\x1fCreateScenarioCollectionRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x14\n" +
+	"\x05label\x18\x02 \x01(\tR\x05label\"p\n" +
 	" CreateScenarioCollectionResponse\x12L\n" +
-	"\x13scenario_collection\x18\x01 \x01(\v2\x1b.livekit.ScenarioCollectionR\x12scenarioCollection\"W\n" +
-	"\x1fDeleteScenarioCollectionRequest\x124\n" +
-	"\x16scenario_collection_id\x18\x01 \x01(\tR\x14scenarioCollectionId\"\"\n" +
+	"\x13scenario_collection\x18\x01 \x01(\v2\x1b.livekit.ScenarioCollectionR\x12scenarioCollection\"v\n" +
+	"\x1fDeleteScenarioCollectionRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x124\n" +
+	"\x16scenario_collection_id\x18\x02 \x01(\tR\x14scenarioCollectionId\"\"\n" +
 	" DeleteScenarioCollectionResponse\"?\n" +
 	"\x1eListScenarioCollectionsRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\"q\n" +
 	"\x1fListScenarioCollectionsResponse\x12N\n" +
-	"\x14scenario_collections\x18\x01 \x03(\v2\x1b.livekit.ScenarioCollectionR\x13scenarioCollections\"L\n" +
-	"\x14ListScenariosRequest\x124\n" +
-	"\x16scenario_collection_id\x18\x01 \x01(\tR\x14scenarioCollectionId\"H\n" +
+	"\x14scenario_collections\x18\x01 \x03(\v2\x1b.livekit.ScenarioCollectionR\x13scenarioCollections\"k\n" +
+	"\x14ListScenariosRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x124\n" +
+	"\x16scenario_collection_id\x18\x02 \x01(\tR\x14scenarioCollectionId\"H\n" +
 	"\x15ListScenariosResponse\x12/\n" +
-	"\tscenarios\x18\x01 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"w\n" +
-	"\x1eAddScenarioToCollectionRequest\x124\n" +
-	"\x16scenario_collection_id\x18\x01 \x01(\tR\x14scenarioCollectionId\x12\x1f\n" +
-	"\vscenario_id\x18\x02 \x01(\tR\n" +
+	"\tscenarios\x18\x01 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"\x96\x01\n" +
+	"\x1eAddScenarioToCollectionRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x124\n" +
+	"\x16scenario_collection_id\x18\x02 \x01(\tR\x14scenarioCollectionId\x12\x1f\n" +
+	"\vscenario_id\x18\x03 \x01(\tR\n" +
 	"scenarioId\"!\n" +
-	"\x1fAddScenarioToCollectionResponse\"|\n" +
-	"#RemoveScenarioFromCollectionRequest\x124\n" +
-	"\x16scenario_collection_id\x18\x01 \x01(\tR\x14scenarioCollectionId\x12\x1f\n" +
-	"\vscenario_id\x18\x02 \x01(\tR\n" +
+	"\x1fAddScenarioToCollectionResponse\"\x9b\x01\n" +
+	"#RemoveScenarioFromCollectionRequest\x12\x1d\n" +
+	"\n" +
+	"project_id\x18\x01 \x01(\tR\tprojectId\x124\n" +
+	"\x16scenario_collection_id\x18\x02 \x01(\tR\x14scenarioCollectionId\x12\x1f\n" +
+	"\vscenario_id\x18\x03 \x01(\tR\n" +
 	"scenarioId\"&\n" +
 	"$RemoveScenarioFromCollectionResponse2\xd0\t\n" +
 	"\x0fAgentSimulation\x12`\n" +
