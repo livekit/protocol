@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.44.1
+
+### Patch Changes
+
+- Redact ice server credentials in logs - [#1408](https://github.com/livekit/protocol/pull/1408) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- Changes for ingress observability support - [#1392](https://github.com/livekit/protocol/pull/1392) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- update room observability codegen - [#1395](https://github.com/livekit/protocol/pull/1395) ([@paulwe](https://github.com/paulwe))
+
+- Sync schema versions - [#1385](https://github.com/livekit/protocol/pull/1385) ([@paulwe](https://github.com/paulwe))
+
 ## 1.44.0
 
 ### Patch Changes
