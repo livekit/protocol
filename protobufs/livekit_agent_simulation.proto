@@ -50,6 +50,13 @@ message SimulationRun {
 }
 
 message Scenario {
+  enum Status {
+    // Scenario is being generated from a session by an LLM.
+    // instructions and agent_expectations are not yet available.
+    STATUS_GENERATING = 0;
+    STATUS_READY = 1;
+    STATUS_FAILED = 2;
+  }
   string id = 1;
   string project_id = 2;
   string label = 3;
@@ -57,6 +64,8 @@ message Scenario {
   string agent_expectations = 5;
   string source_room_id = 6;
   int64 created_at = 7;
+  Status status = 8;
+  string error = 9;
 }
 
 message ScenarioCollection {
@@ -110,7 +119,7 @@ message CreateScenarioFromSessionRequest {
   string region = 4;
 }
 message CreateScenarioFromSessionResponse {
-  string job_id = 1;
+  Scenario scenario = 1;
 }
 
 message DeleteScenarioRequest {
