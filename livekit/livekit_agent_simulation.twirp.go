@@ -22,28 +22,50 @@ import ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 // See https://twitchtv.github.io/twirp/docs/version_matrix.html
 const _ = twirp.TwirpPackageMinVersion_8_1_0
 
-// ================================
-// AgentSimulationService Interface
-// ================================
+// =========================
+// AgentSimulation Interface
+// =========================
 
-type AgentSimulationService interface {
+type AgentSimulation interface {
 	CreateSimulationRun(context.Context, *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error)
+
+	GetSimulationRun(context.Context, *GetSimulationRunRequest) (*GetSimulationRunResponse, error)
+
+	ListSimulationRuns(context.Context, *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error)
+
+	CreateScenario(context.Context, *CreateScenarioRequest) (*CreateScenarioResponse, error)
+
+	CreateScenarioFromSession(context.Context, *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error)
+
+	DeleteScenario(context.Context, *DeleteScenarioRequest) (*DeleteScenarioResponse, error)
+
+	CreateScenarioCollection(context.Context, *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error)
+
+	DeleteScenarioCollection(context.Context, *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error)
+
+	ListScenarioCollections(context.Context, *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error)
+
+	ListScenarios(context.Context, *ListScenariosRequest) (*ListScenariosResponse, error)
+
+	AddScenarioToCollection(context.Context, *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error)
+
+	RemoveScenarioFromCollection(context.Context, *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error)
 }
 
-// ======================================
-// AgentSimulationService Protobuf Client
-// ======================================
+// ===============================
+// AgentSimulation Protobuf Client
+// ===============================
 
-type agentSimulationServiceProtobufClient struct {
+type agentSimulationProtobufClient struct {
 	client      HTTPClient
-	urls        [1]string
+	urls        [12]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
 
-// NewAgentSimulationServiceProtobufClient creates a Protobuf client that implements the AgentSimulationService interface.
+// NewAgentSimulationProtobufClient creates a Protobuf client that implements the AgentSimulation interface.
 // It communicates using Protobuf and can be configured with a custom HTTPClient.
-func NewAgentSimulationServiceProtobufClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) AgentSimulationService {
+func NewAgentSimulationProtobufClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) AgentSimulation {
 	if c, ok := client.(*http.Client); ok {
 		client = withoutRedirects(c)
 	}
@@ -63,12 +85,23 @@ func NewAgentSimulationServiceProtobufClient(baseURL string, client HTTPClient, 
 
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
-	serviceURL += baseServicePath(pathPrefix, "livekit", "AgentSimulationService")
-	urls := [1]string{
+	serviceURL += baseServicePath(pathPrefix, "livekit", "AgentSimulation")
+	urls := [12]string{
 		serviceURL + "CreateSimulationRun",
+		serviceURL + "GetSimulationRun",
+		serviceURL + "ListSimulationRuns",
+		serviceURL + "CreateScenario",
+		serviceURL + "CreateScenarioFromSession",
+		serviceURL + "DeleteScenario",
+		serviceURL + "CreateScenarioCollection",
+		serviceURL + "DeleteScenarioCollection",
+		serviceURL + "ListScenarioCollections",
+		serviceURL + "ListScenarios",
+		serviceURL + "AddScenarioToCollection",
+		serviceURL + "RemoveScenarioFromCollection",
 	}
 
-	return &agentSimulationServiceProtobufClient{
+	return &agentSimulationProtobufClient{
 		client:      client,
 		urls:        urls,
 		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
@@ -76,9 +109,9 @@ func NewAgentSimulationServiceProtobufClient(baseURL string, client HTTPClient, 
 	}
 }
 
-func (c *agentSimulationServiceProtobufClient) CreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
+func (c *agentSimulationProtobufClient) CreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulationService")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
 	ctx = ctxsetters.WithMethodName(ctx, "CreateSimulationRun")
 	caller := c.callCreateSimulationRun
 	if c.interceptor != nil {
@@ -105,7 +138,7 @@ func (c *agentSimulationServiceProtobufClient) CreateSimulationRun(ctx context.C
 	return caller(ctx, in)
 }
 
-func (c *agentSimulationServiceProtobufClient) callCreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
+func (c *agentSimulationProtobufClient) callCreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
 	out := new(CreateSimulationRunResponse)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
 	if err != nil {
@@ -122,20 +155,526 @@ func (c *agentSimulationServiceProtobufClient) callCreateSimulationRun(ctx conte
 	return out, nil
 }
 
-// ==================================
-// AgentSimulationService JSON Client
-// ==================================
+func (c *agentSimulationProtobufClient) GetSimulationRun(ctx context.Context, in *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "GetSimulationRun")
+	caller := c.callGetSimulationRun
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSimulationRunRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSimulationRunRequest) when calling interceptor")
+					}
+					return c.callGetSimulationRun(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSimulationRunResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSimulationRunResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
 
-type agentSimulationServiceJSONClient struct {
+func (c *agentSimulationProtobufClient) callGetSimulationRun(ctx context.Context, in *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+	out := new(GetSimulationRunResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) ListSimulationRuns(ctx context.Context, in *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSimulationRuns")
+	caller := c.callListSimulationRuns
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSimulationRunsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSimulationRunsRequest) when calling interceptor")
+					}
+					return c.callListSimulationRuns(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSimulationRunsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSimulationRunsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callListSimulationRuns(ctx context.Context, in *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+	out := new(ListSimulationRunsResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) CreateScenario(ctx context.Context, in *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenario")
+	caller := c.callCreateScenario
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioRequest) when calling interceptor")
+					}
+					return c.callCreateScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callCreateScenario(ctx context.Context, in *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+	out := new(CreateScenarioResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) CreateScenarioFromSession(ctx context.Context, in *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioFromSession")
+	caller := c.callCreateScenarioFromSession
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioFromSessionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioFromSessionRequest) when calling interceptor")
+					}
+					return c.callCreateScenarioFromSession(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioFromSessionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioFromSessionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callCreateScenarioFromSession(ctx context.Context, in *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+	out := new(CreateScenarioFromSessionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) DeleteScenario(ctx context.Context, in *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenario")
+	caller := c.callDeleteScenario
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioRequest) when calling interceptor")
+					}
+					return c.callDeleteScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callDeleteScenario(ctx context.Context, in *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+	out := new(DeleteScenarioResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) CreateScenarioCollection(ctx context.Context, in *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioCollection")
+	caller := c.callCreateScenarioCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioCollectionRequest) when calling interceptor")
+					}
+					return c.callCreateScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callCreateScenarioCollection(ctx context.Context, in *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+	out := new(CreateScenarioCollectionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) DeleteScenarioCollection(ctx context.Context, in *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenarioCollection")
+	caller := c.callDeleteScenarioCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioCollectionRequest) when calling interceptor")
+					}
+					return c.callDeleteScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callDeleteScenarioCollection(ctx context.Context, in *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+	out := new(DeleteScenarioCollectionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) ListScenarioCollections(ctx context.Context, in *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarioCollections")
+	caller := c.callListScenarioCollections
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenarioCollectionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenarioCollectionsRequest) when calling interceptor")
+					}
+					return c.callListScenarioCollections(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenarioCollectionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenarioCollectionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callListScenarioCollections(ctx context.Context, in *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+	out := new(ListScenarioCollectionsResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) ListScenarios(ctx context.Context, in *ListScenariosRequest) (*ListScenariosResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarios")
+	caller := c.callListScenarios
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListScenariosRequest) (*ListScenariosResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenariosRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenariosRequest) when calling interceptor")
+					}
+					return c.callListScenarios(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenariosResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenariosResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callListScenarios(ctx context.Context, in *ListScenariosRequest) (*ListScenariosResponse, error) {
+	out := new(ListScenariosResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) AddScenarioToCollection(ctx context.Context, in *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "AddScenarioToCollection")
+	caller := c.callAddScenarioToCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddScenarioToCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddScenarioToCollectionRequest) when calling interceptor")
+					}
+					return c.callAddScenarioToCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*AddScenarioToCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*AddScenarioToCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callAddScenarioToCollection(ctx context.Context, in *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+	out := new(AddScenarioToCollectionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationProtobufClient) RemoveScenarioFromCollection(ctx context.Context, in *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveScenarioFromCollection")
+	caller := c.callRemoveScenarioFromCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveScenarioFromCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveScenarioFromCollectionRequest) when calling interceptor")
+					}
+					return c.callRemoveScenarioFromCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RemoveScenarioFromCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveScenarioFromCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationProtobufClient) callRemoveScenarioFromCollection(ctx context.Context, in *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+	out := new(RemoveScenarioFromCollectionResponse)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// ===========================
+// AgentSimulation JSON Client
+// ===========================
+
+type agentSimulationJSONClient struct {
 	client      HTTPClient
-	urls        [1]string
+	urls        [12]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
 
-// NewAgentSimulationServiceJSONClient creates a JSON client that implements the AgentSimulationService interface.
+// NewAgentSimulationJSONClient creates a JSON client that implements the AgentSimulation interface.
 // It communicates using JSON and can be configured with a custom HTTPClient.
-func NewAgentSimulationServiceJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) AgentSimulationService {
+func NewAgentSimulationJSONClient(baseURL string, client HTTPClient, opts ...twirp.ClientOption) AgentSimulation {
 	if c, ok := client.(*http.Client); ok {
 		client = withoutRedirects(c)
 	}
@@ -155,12 +694,23 @@ func NewAgentSimulationServiceJSONClient(baseURL string, client HTTPClient, opts
 
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
-	serviceURL += baseServicePath(pathPrefix, "livekit", "AgentSimulationService")
-	urls := [1]string{
+	serviceURL += baseServicePath(pathPrefix, "livekit", "AgentSimulation")
+	urls := [12]string{
 		serviceURL + "CreateSimulationRun",
+		serviceURL + "GetSimulationRun",
+		serviceURL + "ListSimulationRuns",
+		serviceURL + "CreateScenario",
+		serviceURL + "CreateScenarioFromSession",
+		serviceURL + "DeleteScenario",
+		serviceURL + "CreateScenarioCollection",
+		serviceURL + "DeleteScenarioCollection",
+		serviceURL + "ListScenarioCollections",
+		serviceURL + "ListScenarios",
+		serviceURL + "AddScenarioToCollection",
+		serviceURL + "RemoveScenarioFromCollection",
 	}
 
-	return &agentSimulationServiceJSONClient{
+	return &agentSimulationJSONClient{
 		client:      client,
 		urls:        urls,
 		interceptor: twirp.ChainInterceptors(clientOpts.Interceptors...),
@@ -168,9 +718,9 @@ func NewAgentSimulationServiceJSONClient(baseURL string, client HTTPClient, opts
 	}
 }
 
-func (c *agentSimulationServiceJSONClient) CreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
+func (c *agentSimulationJSONClient) CreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulationService")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
 	ctx = ctxsetters.WithMethodName(ctx, "CreateSimulationRun")
 	caller := c.callCreateSimulationRun
 	if c.interceptor != nil {
@@ -197,7 +747,7 @@ func (c *agentSimulationServiceJSONClient) CreateSimulationRun(ctx context.Conte
 	return caller(ctx, in)
 }
 
-func (c *agentSimulationServiceJSONClient) callCreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
+func (c *agentSimulationJSONClient) callCreateSimulationRun(ctx context.Context, in *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
 	out := new(CreateSimulationRunResponse)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[0], in, out)
 	if err != nil {
@@ -214,12 +764,518 @@ func (c *agentSimulationServiceJSONClient) callCreateSimulationRun(ctx context.C
 	return out, nil
 }
 
-// =====================================
-// AgentSimulationService Server Handler
-// =====================================
+func (c *agentSimulationJSONClient) GetSimulationRun(ctx context.Context, in *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "GetSimulationRun")
+	caller := c.callGetSimulationRun
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSimulationRunRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSimulationRunRequest) when calling interceptor")
+					}
+					return c.callGetSimulationRun(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSimulationRunResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSimulationRunResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
 
-type agentSimulationServiceServer struct {
-	AgentSimulationService
+func (c *agentSimulationJSONClient) callGetSimulationRun(ctx context.Context, in *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+	out := new(GetSimulationRunResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) ListSimulationRuns(ctx context.Context, in *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "ListSimulationRuns")
+	caller := c.callListSimulationRuns
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSimulationRunsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSimulationRunsRequest) when calling interceptor")
+					}
+					return c.callListSimulationRuns(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSimulationRunsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSimulationRunsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callListSimulationRuns(ctx context.Context, in *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+	out := new(ListSimulationRunsResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) CreateScenario(ctx context.Context, in *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenario")
+	caller := c.callCreateScenario
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioRequest) when calling interceptor")
+					}
+					return c.callCreateScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callCreateScenario(ctx context.Context, in *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+	out := new(CreateScenarioResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) CreateScenarioFromSession(ctx context.Context, in *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioFromSession")
+	caller := c.callCreateScenarioFromSession
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioFromSessionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioFromSessionRequest) when calling interceptor")
+					}
+					return c.callCreateScenarioFromSession(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioFromSessionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioFromSessionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callCreateScenarioFromSession(ctx context.Context, in *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+	out := new(CreateScenarioFromSessionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) DeleteScenario(ctx context.Context, in *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenario")
+	caller := c.callDeleteScenario
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioRequest) when calling interceptor")
+					}
+					return c.callDeleteScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callDeleteScenario(ctx context.Context, in *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+	out := new(DeleteScenarioResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) CreateScenarioCollection(ctx context.Context, in *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioCollection")
+	caller := c.callCreateScenarioCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioCollectionRequest) when calling interceptor")
+					}
+					return c.callCreateScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callCreateScenarioCollection(ctx context.Context, in *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+	out := new(CreateScenarioCollectionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[6], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) DeleteScenarioCollection(ctx context.Context, in *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenarioCollection")
+	caller := c.callDeleteScenarioCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioCollectionRequest) when calling interceptor")
+					}
+					return c.callDeleteScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callDeleteScenarioCollection(ctx context.Context, in *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+	out := new(DeleteScenarioCollectionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[7], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) ListScenarioCollections(ctx context.Context, in *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarioCollections")
+	caller := c.callListScenarioCollections
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenarioCollectionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenarioCollectionsRequest) when calling interceptor")
+					}
+					return c.callListScenarioCollections(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenarioCollectionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenarioCollectionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callListScenarioCollections(ctx context.Context, in *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+	out := new(ListScenarioCollectionsResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[8], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) ListScenarios(ctx context.Context, in *ListScenariosRequest) (*ListScenariosResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarios")
+	caller := c.callListScenarios
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *ListScenariosRequest) (*ListScenariosResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenariosRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenariosRequest) when calling interceptor")
+					}
+					return c.callListScenarios(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenariosResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenariosResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callListScenarios(ctx context.Context, in *ListScenariosRequest) (*ListScenariosResponse, error) {
+	out := new(ListScenariosResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[9], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) AddScenarioToCollection(ctx context.Context, in *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "AddScenarioToCollection")
+	caller := c.callAddScenarioToCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddScenarioToCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddScenarioToCollectionRequest) when calling interceptor")
+					}
+					return c.callAddScenarioToCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*AddScenarioToCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*AddScenarioToCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callAddScenarioToCollection(ctx context.Context, in *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+	out := new(AddScenarioToCollectionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[10], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *agentSimulationJSONClient) RemoveScenarioFromCollection(ctx context.Context, in *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "livekit")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveScenarioFromCollection")
+	caller := c.callRemoveScenarioFromCollection
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveScenarioFromCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveScenarioFromCollectionRequest) when calling interceptor")
+					}
+					return c.callRemoveScenarioFromCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RemoveScenarioFromCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveScenarioFromCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *agentSimulationJSONClient) callRemoveScenarioFromCollection(ctx context.Context, in *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+	out := new(RemoveScenarioFromCollectionResponse)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[11], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+// ==============================
+// AgentSimulation Server Handler
+// ==============================
+
+type agentSimulationServer struct {
+	AgentSimulation
 	interceptor      twirp.Interceptor
 	hooks            *twirp.ServerHooks
 	pathPrefix       string // prefix for routing
@@ -227,10 +1283,10 @@ type agentSimulationServiceServer struct {
 	jsonCamelCase    bool   // JSON fields are serialized as lowerCamelCase rather than keeping the original proto names
 }
 
-// NewAgentSimulationServiceServer builds a TwirpServer that can be used as an http.Handler to handle
+// NewAgentSimulationServer builds a TwirpServer that can be used as an http.Handler to handle
 // HTTP requests that are routed to the right method in the provided svc implementation.
 // The opts are twirp.ServerOption modifiers, for example twirp.WithServerHooks(hooks).
-func NewAgentSimulationServiceServer(svc AgentSimulationService, opts ...interface{}) TwirpServer {
+func NewAgentSimulationServer(svc AgentSimulation, opts ...interface{}) TwirpServer {
 	serverOpts := newServerOpts(opts)
 
 	// Using ReadOpt allows backwards and forwards compatibility with new options in the future
@@ -243,24 +1299,24 @@ func NewAgentSimulationServiceServer(svc AgentSimulationService, opts ...interfa
 		pathPrefix = "/twirp" // default prefix
 	}
 
-	return &agentSimulationServiceServer{
-		AgentSimulationService: svc,
-		hooks:                  serverOpts.Hooks,
-		interceptor:            twirp.ChainInterceptors(serverOpts.Interceptors...),
-		pathPrefix:             pathPrefix,
-		jsonSkipDefaults:       jsonSkipDefaults,
-		jsonCamelCase:          jsonCamelCase,
+	return &agentSimulationServer{
+		AgentSimulation:  svc,
+		hooks:            serverOpts.Hooks,
+		interceptor:      twirp.ChainInterceptors(serverOpts.Interceptors...),
+		pathPrefix:       pathPrefix,
+		jsonSkipDefaults: jsonSkipDefaults,
+		jsonCamelCase:    jsonCamelCase,
 	}
 }
 
 // writeError writes an HTTP response with a valid Twirp error format, and triggers hooks.
 // If err is not a twirp.Error, it will get wrapped with twirp.InternalErrorWith(err)
-func (s *agentSimulationServiceServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
+func (s *agentSimulationServer) writeError(ctx context.Context, resp http.ResponseWriter, err error) {
 	writeError(ctx, resp, err, s.hooks)
 }
 
 // handleRequestBodyError is used to handle error when the twirp server cannot read request
-func (s *agentSimulationServiceServer) handleRequestBodyError(ctx context.Context, resp http.ResponseWriter, msg string, err error) {
+func (s *agentSimulationServer) handleRequestBodyError(ctx context.Context, resp http.ResponseWriter, msg string, err error) {
 	if context.Canceled == ctx.Err() {
 		s.writeError(ctx, resp, twirp.NewError(twirp.Canceled, "failed to read request: context canceled"))
 		return
@@ -272,16 +1328,16 @@ func (s *agentSimulationServiceServer) handleRequestBodyError(ctx context.Contex
 	s.writeError(ctx, resp, twirp.WrapError(malformedRequestError(msg), err))
 }
 
-// AgentSimulationServicePathPrefix is a convenience constant that may identify URL paths.
+// AgentSimulationPathPrefix is a convenience constant that may identify URL paths.
 // Should be used with caution, it only matches routes generated by Twirp Go clients,
 // with the default "/twirp" prefix and default CamelCase service and method names.
 // More info: https://twitchtv.github.io/twirp/docs/routing.html
-const AgentSimulationServicePathPrefix = "/twirp/livekit.AgentSimulationService/"
+const AgentSimulationPathPrefix = "/twirp/livekit.AgentSimulation/"
 
-func (s *agentSimulationServiceServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
+func (s *agentSimulationServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	ctx = ctxsetters.WithPackageName(ctx, "livekit")
-	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulationService")
+	ctx = ctxsetters.WithServiceName(ctx, "AgentSimulation")
 	ctx = ctxsetters.WithResponseWriter(ctx, resp)
 
 	var err error
@@ -299,7 +1355,7 @@ func (s *agentSimulationServiceServer) ServeHTTP(resp http.ResponseWriter, req *
 
 	// Verify path format: [<prefix>]/<package>.<Service>/<Method>
 	prefix, pkgService, method := parseTwirpPath(req.URL.Path)
-	if pkgService != "livekit.AgentSimulationService" {
+	if pkgService != "livekit.AgentSimulation" {
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
 		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
 		return
@@ -314,6 +1370,39 @@ func (s *agentSimulationServiceServer) ServeHTTP(resp http.ResponseWriter, req *
 	case "CreateSimulationRun":
 		s.serveCreateSimulationRun(ctx, resp, req)
 		return
+	case "GetSimulationRun":
+		s.serveGetSimulationRun(ctx, resp, req)
+		return
+	case "ListSimulationRuns":
+		s.serveListSimulationRuns(ctx, resp, req)
+		return
+	case "CreateScenario":
+		s.serveCreateScenario(ctx, resp, req)
+		return
+	case "CreateScenarioFromSession":
+		s.serveCreateScenarioFromSession(ctx, resp, req)
+		return
+	case "DeleteScenario":
+		s.serveDeleteScenario(ctx, resp, req)
+		return
+	case "CreateScenarioCollection":
+		s.serveCreateScenarioCollection(ctx, resp, req)
+		return
+	case "DeleteScenarioCollection":
+		s.serveDeleteScenarioCollection(ctx, resp, req)
+		return
+	case "ListScenarioCollections":
+		s.serveListScenarioCollections(ctx, resp, req)
+		return
+	case "ListScenarios":
+		s.serveListScenarios(ctx, resp, req)
+		return
+	case "AddScenarioToCollection":
+		s.serveAddScenarioToCollection(ctx, resp, req)
+		return
+	case "RemoveScenarioFromCollection":
+		s.serveRemoveScenarioFromCollection(ctx, resp, req)
+		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
 		s.writeError(ctx, resp, badRouteError(msg, req.Method, req.URL.Path))
@@ -321,7 +1410,7 @@ func (s *agentSimulationServiceServer) ServeHTTP(resp http.ResponseWriter, req *
 	}
 }
 
-func (s *agentSimulationServiceServer) serveCreateSimulationRun(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *agentSimulationServer) serveCreateSimulationRun(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	header := req.Header.Get("Content-Type")
 	i := strings.Index(header, ";")
 	if i == -1 {
@@ -339,7 +1428,7 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRun(ctx context.Cont
 	}
 }
 
-func (s *agentSimulationServiceServer) serveCreateSimulationRunJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *agentSimulationServer) serveCreateSimulationRunJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "CreateSimulationRun")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -361,7 +1450,7 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRunJSON(ctx context.
 		return
 	}
 
-	handler := s.AgentSimulationService.CreateSimulationRun
+	handler := s.AgentSimulation.CreateSimulationRun
 	if s.interceptor != nil {
 		handler = func(ctx context.Context, req *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
 			resp, err := s.interceptor(
@@ -370,7 +1459,7 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRunJSON(ctx context.
 					if !ok {
 						return nil, twirp.InternalError("failed type assertion req.(*CreateSimulationRunRequest) when calling interceptor")
 					}
-					return s.AgentSimulationService.CreateSimulationRun(ctx, typedReq)
+					return s.AgentSimulation.CreateSimulationRun(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
@@ -422,7 +1511,7 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRunJSON(ctx context.
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *agentSimulationServiceServer) serveCreateSimulationRunProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+func (s *agentSimulationServer) serveCreateSimulationRunProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
 	var err error
 	ctx = ctxsetters.WithMethodName(ctx, "CreateSimulationRun")
 	ctx, err = callRequestRouted(ctx, s.hooks)
@@ -442,7 +1531,7 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRunProtobuf(ctx cont
 		return
 	}
 
-	handler := s.AgentSimulationService.CreateSimulationRun
+	handler := s.AgentSimulation.CreateSimulationRun
 	if s.interceptor != nil {
 		handler = func(ctx context.Context, req *CreateSimulationRunRequest) (*CreateSimulationRunResponse, error) {
 			resp, err := s.interceptor(
@@ -451,7 +1540,7 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRunProtobuf(ctx cont
 					if !ok {
 						return nil, twirp.InternalError("failed type assertion req.(*CreateSimulationRunRequest) when calling interceptor")
 					}
-					return s.AgentSimulationService.CreateSimulationRun(ctx, typedReq)
+					return s.AgentSimulation.CreateSimulationRun(ctx, typedReq)
 				},
 			)(ctx, req)
 			if resp != nil {
@@ -501,39 +1590,2076 @@ func (s *agentSimulationServiceServer) serveCreateSimulationRunProtobuf(ctx cont
 	callResponseSent(ctx, s.hooks)
 }
 
-func (s *agentSimulationServiceServer) ServiceDescriptor() ([]byte, int) {
+func (s *agentSimulationServer) serveGetSimulationRun(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveGetSimulationRunJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveGetSimulationRunProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveGetSimulationRunJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetSimulationRun")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(GetSimulationRunRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.GetSimulationRun
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSimulationRunRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSimulationRunRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.GetSimulationRun(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSimulationRunResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSimulationRunResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetSimulationRunResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetSimulationRunResponse and nil error while calling GetSimulationRun. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveGetSimulationRunProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "GetSimulationRun")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(GetSimulationRunRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.GetSimulationRun
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *GetSimulationRunRequest) (*GetSimulationRunResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*GetSimulationRunRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*GetSimulationRunRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.GetSimulationRun(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*GetSimulationRunResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*GetSimulationRunResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *GetSimulationRunResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *GetSimulationRunResponse and nil error while calling GetSimulationRun. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveListSimulationRuns(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListSimulationRunsJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListSimulationRunsProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveListSimulationRunsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSimulationRuns")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListSimulationRunsRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.ListSimulationRuns
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSimulationRunsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSimulationRunsRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.ListSimulationRuns(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSimulationRunsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSimulationRunsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSimulationRunsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSimulationRunsResponse and nil error while calling ListSimulationRuns. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveListSimulationRunsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListSimulationRuns")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListSimulationRunsRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.ListSimulationRuns
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListSimulationRunsRequest) (*ListSimulationRunsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListSimulationRunsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListSimulationRunsRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.ListSimulationRuns(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListSimulationRunsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListSimulationRunsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListSimulationRunsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListSimulationRunsResponse and nil error while calling ListSimulationRuns. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveCreateScenario(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveCreateScenarioJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveCreateScenarioProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveCreateScenarioJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenario")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(CreateScenarioRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.CreateScenario
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.CreateScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *CreateScenarioResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateScenarioResponse and nil error while calling CreateScenario. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveCreateScenarioProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenario")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(CreateScenarioRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.CreateScenario
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateScenarioRequest) (*CreateScenarioResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.CreateScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *CreateScenarioResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateScenarioResponse and nil error while calling CreateScenario. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveCreateScenarioFromSession(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveCreateScenarioFromSessionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveCreateScenarioFromSessionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveCreateScenarioFromSessionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioFromSession")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(CreateScenarioFromSessionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.CreateScenarioFromSession
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioFromSessionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioFromSessionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.CreateScenarioFromSession(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioFromSessionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioFromSessionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *CreateScenarioFromSessionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateScenarioFromSessionResponse and nil error while calling CreateScenarioFromSession. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveCreateScenarioFromSessionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioFromSession")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(CreateScenarioFromSessionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.CreateScenarioFromSession
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateScenarioFromSessionRequest) (*CreateScenarioFromSessionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioFromSessionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioFromSessionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.CreateScenarioFromSession(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioFromSessionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioFromSessionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *CreateScenarioFromSessionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateScenarioFromSessionResponse and nil error while calling CreateScenarioFromSession. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveDeleteScenario(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveDeleteScenarioJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveDeleteScenarioProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveDeleteScenarioJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenario")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(DeleteScenarioRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.DeleteScenario
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.DeleteScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *DeleteScenarioResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeleteScenarioResponse and nil error while calling DeleteScenario. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveDeleteScenarioProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenario")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(DeleteScenarioRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.DeleteScenario
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *DeleteScenarioRequest) (*DeleteScenarioResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.DeleteScenario(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *DeleteScenarioResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeleteScenarioResponse and nil error while calling DeleteScenario. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveCreateScenarioCollection(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveCreateScenarioCollectionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveCreateScenarioCollectionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveCreateScenarioCollectionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(CreateScenarioCollectionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.CreateScenarioCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.CreateScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *CreateScenarioCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateScenarioCollectionResponse and nil error while calling CreateScenarioCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveCreateScenarioCollectionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "CreateScenarioCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(CreateScenarioCollectionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.CreateScenarioCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *CreateScenarioCollectionRequest) (*CreateScenarioCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*CreateScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*CreateScenarioCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.CreateScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*CreateScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*CreateScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *CreateScenarioCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *CreateScenarioCollectionResponse and nil error while calling CreateScenarioCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveDeleteScenarioCollection(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveDeleteScenarioCollectionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveDeleteScenarioCollectionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveDeleteScenarioCollectionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenarioCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(DeleteScenarioCollectionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.DeleteScenarioCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.DeleteScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *DeleteScenarioCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeleteScenarioCollectionResponse and nil error while calling DeleteScenarioCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveDeleteScenarioCollectionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteScenarioCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(DeleteScenarioCollectionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.DeleteScenarioCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *DeleteScenarioCollectionRequest) (*DeleteScenarioCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteScenarioCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteScenarioCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.DeleteScenarioCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*DeleteScenarioCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*DeleteScenarioCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *DeleteScenarioCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *DeleteScenarioCollectionResponse and nil error while calling DeleteScenarioCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveListScenarioCollections(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListScenarioCollectionsJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListScenarioCollectionsProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveListScenarioCollectionsJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarioCollections")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListScenarioCollectionsRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.ListScenarioCollections
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenarioCollectionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenarioCollectionsRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.ListScenarioCollections(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenarioCollectionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenarioCollectionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListScenarioCollectionsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListScenarioCollectionsResponse and nil error while calling ListScenarioCollections. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveListScenarioCollectionsProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarioCollections")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListScenarioCollectionsRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.ListScenarioCollections
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListScenarioCollectionsRequest) (*ListScenarioCollectionsResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenarioCollectionsRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenarioCollectionsRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.ListScenarioCollections(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenarioCollectionsResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenarioCollectionsResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListScenarioCollectionsResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListScenarioCollectionsResponse and nil error while calling ListScenarioCollections. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveListScenarios(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveListScenariosJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveListScenariosProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveListScenariosJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarios")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(ListScenariosRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.ListScenarios
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListScenariosRequest) (*ListScenariosResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenariosRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenariosRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.ListScenarios(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenariosResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenariosResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListScenariosResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListScenariosResponse and nil error while calling ListScenarios. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveListScenariosProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "ListScenarios")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(ListScenariosRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.ListScenarios
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *ListScenariosRequest) (*ListScenariosResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*ListScenariosRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*ListScenariosRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.ListScenarios(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*ListScenariosResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*ListScenariosResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *ListScenariosResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListScenariosResponse and nil error while calling ListScenarios. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveAddScenarioToCollection(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveAddScenarioToCollectionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveAddScenarioToCollectionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveAddScenarioToCollectionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "AddScenarioToCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(AddScenarioToCollectionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.AddScenarioToCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddScenarioToCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddScenarioToCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.AddScenarioToCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*AddScenarioToCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*AddScenarioToCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *AddScenarioToCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddScenarioToCollectionResponse and nil error while calling AddScenarioToCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveAddScenarioToCollectionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "AddScenarioToCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(AddScenarioToCollectionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.AddScenarioToCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *AddScenarioToCollectionRequest) (*AddScenarioToCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*AddScenarioToCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*AddScenarioToCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.AddScenarioToCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*AddScenarioToCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*AddScenarioToCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *AddScenarioToCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *AddScenarioToCollectionResponse and nil error while calling AddScenarioToCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveRemoveScenarioFromCollection(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveRemoveScenarioFromCollectionJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveRemoveScenarioFromCollectionProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *agentSimulationServer) serveRemoveScenarioFromCollectionJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveScenarioFromCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(RemoveScenarioFromCollectionRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.AgentSimulation.RemoveScenarioFromCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveScenarioFromCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveScenarioFromCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.RemoveScenarioFromCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RemoveScenarioFromCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveScenarioFromCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *RemoveScenarioFromCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveScenarioFromCollectionResponse and nil error while calling RemoveScenarioFromCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) serveRemoveScenarioFromCollectionProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "RemoveScenarioFromCollection")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(RemoveScenarioFromCollectionRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.AgentSimulation.RemoveScenarioFromCollection
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *RemoveScenarioFromCollectionRequest) (*RemoveScenarioFromCollectionResponse, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*RemoveScenarioFromCollectionRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*RemoveScenarioFromCollectionRequest) when calling interceptor")
+					}
+					return s.AgentSimulation.RemoveScenarioFromCollection(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*RemoveScenarioFromCollectionResponse)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*RemoveScenarioFromCollectionResponse) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *RemoveScenarioFromCollectionResponse
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *RemoveScenarioFromCollectionResponse and nil error while calling RemoveScenarioFromCollection. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *agentSimulationServer) ServiceDescriptor() ([]byte, int) {
 	return twirpFileDescriptor8, 0
 }
 
-func (s *agentSimulationServiceServer) ProtocGenTwirpVersion() string {
+func (s *agentSimulationServer) ProtocGenTwirpVersion() string {
 	return "v8.1.3"
 }
 
 // PathPrefix returns the base service path, in the form: "/<prefix>/<package>.<Service>/"
 // that is everything in a Twirp route except for the <Method>. This can be used for routing,
 // for example to identify the requests that are targeted to this service in a mux.
-func (s *agentSimulationServiceServer) PathPrefix() string {
-	return baseServicePath(s.pathPrefix, "livekit", "AgentSimulationService")
+func (s *agentSimulationServer) PathPrefix() string {
+	return baseServicePath(s.pathPrefix, "livekit", "AgentSimulation")
 }
 
 var twirpFileDescriptor8 = []byte{
-	// 280 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x50, 0xcd, 0x4a, 0xc3, 0x40,
-	0x10, 0x26, 0x15, 0x95, 0x0e, 0xd8, 0xda, 0x15, 0x24, 0x54, 0x94, 0xd2, 0x0a, 0x16, 0x85, 0x14,
-	0xf4, 0xd6, 0x9b, 0x3f, 0x08, 0x45, 0x11, 0x49, 0x6f, 0x5e, 0x62, 0x9a, 0x0c, 0x75, 0x30, 0xbb,
-	0x1b, 0xb3, 0xbb, 0x39, 0xf8, 0x16, 0xbe, 0x86, 0x8f, 0xe6, 0x53, 0x48, 0x36, 0xab, 0xe9, 0xa1,
-	0x7a, 0x9c, 0xef, 0x6f, 0x3e, 0x3e, 0x38, 0xca, 0xa8, 0xc4, 0x57, 0xd2, 0x51, 0xbc, 0x44, 0xa1,
-	0x23, 0x45, 0xdc, 0x64, 0xb1, 0x26, 0x29, 0x82, 0xbc, 0x90, 0x5a, 0xb2, 0x6d, 0xc7, 0x0f, 0x3f,
-	0x3c, 0xe8, 0x5f, 0x17, 0x18, 0x6b, 0x9c, 0xff, 0x6a, 0x42, 0x23, 0x42, 0x7c, 0x33, 0xa8, 0x34,
-	0x3b, 0x04, 0xa8, 0x13, 0x44, 0xcc, 0xd1, 0xf7, 0x06, 0xde, 0xb8, 0x1d, 0xb6, 0x2d, 0xf2, 0x10,
-	0x73, 0x64, 0x67, 0xd0, 0xab, 0xe9, 0x14, 0x55, 0x52, 0x50, 0x5e, 0xb9, 0xfd, 0x96, 0x55, 0xed,
-	0x5a, 0xe2, 0xa6, 0xc1, 0xd9, 0x09, 0x74, 0x85, 0xe1, 0x2b, 0x5d, 0x94, 0xbf, 0x31, 0xf0, 0xc6,
-	0x9b, 0x61, 0x47, 0x18, 0xde, 0x7c, 0x57, 0xc3, 0x19, 0x1c, 0xac, 0xad, 0xa4, 0x72, 0x29, 0x14,
-	0xb2, 0x53, 0xe8, 0x35, 0x19, 0x51, 0x61, 0x44, 0x44, 0xa9, 0xab, 0xd6, 0x55, 0xab, 0x8e, 0x59,
-	0x7a, 0xfe, 0x0e, 0xfb, 0x97, 0x55, 0x8f, 0x26, 0x69, 0x8e, 0x45, 0x49, 0x09, 0xb2, 0x67, 0xd8,
-	0x5b, 0xf3, 0x84, 0x8d, 0x02, 0xb7, 0x4c, 0xf0, 0xf7, 0x2a, 0xfd, 0xe3, 0xff, 0x45, 0x75, 0xcf,
-	0xab, 0xdb, 0xa7, 0xd1, 0x92, 0xf4, 0x8b, 0x59, 0x04, 0x89, 0xe4, 0x13, 0xe7, 0x98, 0xd8, 0xfd,
-	0x13, 0x99, 0xfd, 0x00, 0x9f, 0xad, 0x9d, 0x7b, 0x2a, 0xf1, 0x8e, 0x74, 0xf0, 0x58, 0x51, 0x5f,
-	0xad, 0x8e, 0xbb, 0xa7, 0x53, 0x0b, 0x2c, 0xb6, 0xac, 0xe5, 0xe2, 0x3b, 0x00, 0x00, 0xff, 0xff,
-	0xa5, 0x43, 0x3b, 0x84, 0xd4, 0x01, 0x00, 0x00,
+	// 1189 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xdd, 0x6e, 0xe3, 0x44,
+	0x14, 0xc6, 0x4e, 0x9a, 0x6e, 0xce, 0xd2, 0x34, 0x9d, 0xa6, 0xad, 0xd7, 0x4b, 0x9b, 0xd4, 0xad,
+	0xd8, 0xec, 0x42, 0x53, 0xa9, 0x80, 0x80, 0xde, 0xa0, 0xd0, 0xa4, 0xdd, 0x2c, 0x21, 0x14, 0x27,
+	0xab, 0x15, 0x08, 0x14, 0x92, 0x78, 0x54, 0x5c, 0x12, 0x4f, 0xd6, 0x63, 0x17, 0x24, 0x78, 0x17,
+	0xae, 0xe1, 0x01, 0x78, 0x0b, 0x24, 0xde, 0x80, 0x2b, 0x84, 0xc4, 0x53, 0x20, 0xdb, 0x13, 0xff,
+	0x8f, 0x1b, 0xa0, 0xe2, 0xd2, 0x67, 0xce, 0xcf, 0x77, 0xfe, 0xbe, 0x13, 0x05, 0xf6, 0xa6, 0xfa,
+	0x0d, 0xfe, 0x46, 0xb7, 0x86, 0xa3, 0x2b, 0x6c, 0x58, 0x43, 0xaa, 0xcf, 0xec, 0xe9, 0xc8, 0xd2,
+	0x89, 0xd1, 0x98, 0x9b, 0xc4, 0x22, 0x68, 0x95, 0xbd, 0x2b, 0xbf, 0xe6, 0x61, 0xad, 0xef, 0xbf,
+	0xaa, 0xb6, 0x81, 0x4a, 0x20, 0xea, 0x9a, 0x24, 0xd4, 0x84, 0x7a, 0x51, 0x15, 0x75, 0x0d, 0xed,
+	0x02, 0xcc, 0x4d, 0x72, 0x8d, 0x27, 0xd6, 0x50, 0xd7, 0x24, 0xd1, 0x95, 0x17, 0x99, 0xa4, 0xa3,
+	0xa1, 0x77, 0xa0, 0x40, 0xad, 0x91, 0x65, 0x53, 0x29, 0x57, 0x13, 0xea, 0xa5, 0x93, 0xdd, 0x06,
+	0x73, 0xdd, 0x88, 0xb8, 0x6d, 0xf4, 0x5d, 0x25, 0x95, 0x29, 0xa3, 0x37, 0x60, 0xc3, 0x83, 0xa6,
+	0x61, 0x3a, 0x31, 0xf5, 0xb9, 0xa3, 0x26, 0xe5, 0x5d, 0xe7, 0x65, 0xf7, 0xa1, 0x15, 0xc8, 0x51,
+	0x05, 0x56, 0xb0, 0x69, 0x12, 0x53, 0x5a, 0x71, 0x15, 0xbc, 0x0f, 0x07, 0xd8, 0xc4, 0xc4, 0x23,
+	0x0b, 0x6b, 0xc3, 0x91, 0x25, 0x15, 0x6a, 0x42, 0x3d, 0xa7, 0x16, 0x99, 0xa4, 0x69, 0xa1, 0x06,
+	0xe4, 0xaf, 0xc9, 0x98, 0x4a, 0xab, 0xb5, 0x5c, 0xfd, 0xfe, 0x89, 0xcc, 0x81, 0xf5, 0x8c, 0x8c,
+	0x55, 0x57, 0x4f, 0xfe, 0x43, 0x80, 0xdc, 0x33, 0x32, 0x4e, 0xe4, 0xff, 0xbe, 0x9f, 0xa0, 0xe8,
+	0x26, 0xb8, 0xcf, 0xf7, 0x14, 0x4f, 0x52, 0x81, 0x57, 0x75, 0x83, 0x5a, 0xa6, 0x3d, 0x71, 0x94,
+	0xbc, 0x0a, 0x15, 0xd5, 0x88, 0x2c, 0xc8, 0x2d, 0x1f, 0xca, 0x4d, 0xf9, 0x0c, 0x0a, 0x9e, 0x2f,
+	0x84, 0xa0, 0xd4, 0x1f, 0x34, 0x07, 0xcf, 0xfb, 0xc3, 0xcb, 0x76, 0xaf, 0xd5, 0xe9, 0x5d, 0x94,
+	0x5f, 0x09, 0xc9, 0xd4, 0xe7, 0xbd, 0x9e, 0x23, 0x13, 0x50, 0x05, 0xca, 0x4c, 0x76, 0xf6, 0xc9,
+	0xc7, 0x97, 0xdd, 0xf6, 0xa0, 0xdd, 0x2a, 0x8b, 0x68, 0x03, 0xd6, 0x98, 0xf4, 0xbc, 0xd9, 0xe9,
+	0xb6, 0x5b, 0xe5, 0x9c, 0xf2, 0x85, 0xef, 0x7a, 0x0b, 0x36, 0xd8, 0xe3, 0x45, 0xbb, 0xd7, 0x56,
+	0x9b, 0x83, 0x3b, 0xf0, 0xfe, 0xa7, 0x00, 0xf7, 0xfa, 0x13, 0x6c, 0x8c, 0x4c, 0x9d, 0xfc, 0xd3,
+	0x51, 0xaa, 0xc0, 0xca, 0x74, 0x34, 0xc6, 0x53, 0x56, 0x27, 0xef, 0x23, 0x51, 0xc4, 0x7c, 0x4a,
+	0x11, 0x8f, 0x00, 0x79, 0xd3, 0x84, 0xbf, 0x9b, 0xe3, 0x89, 0x35, 0xf2, 0x34, 0xbd, 0x69, 0xf1,
+	0xe6, 0xac, 0x1d, 0x7a, 0x40, 0x87, 0x50, 0xa2, 0xc4, 0x36, 0x27, 0x78, 0x68, 0x12, 0x32, 0x73,
+	0xb0, 0x14, 0x3c, 0xa7, 0x9e, 0x54, 0x25, 0x64, 0xd6, 0xd1, 0x62, 0xf3, 0xb5, 0x1a, 0x9b, 0x2f,
+	0xe5, 0x27, 0x01, 0xd0, 0x22, 0xd3, 0x33, 0x32, 0x9d, 0x62, 0x17, 0xcb, 0xdd, 0xe4, 0x1c, 0x0d,
+	0x9d, 0x8f, 0x8f, 0xf6, 0x31, 0x14, 0x29, 0x8b, 0xec, 0x64, 0xe9, 0xcc, 0xf7, 0x46, 0x30, 0x95,
+	0xec, 0x45, 0x0d, 0x74, 0x94, 0xdf, 0x05, 0x90, 0xcf, 0x5c, 0xf3, 0xc8, 0xcc, 0xaa, 0xf8, 0xa5,
+	0x8d, 0xa9, 0xe5, 0x84, 0xf3, 0xca, 0x67, 0x8c, 0x66, 0x98, 0x61, 0x2f, 0xba, 0x92, 0xde, 0x68,
+	0x86, 0xd3, 0x77, 0x55, 0xe4, 0xec, 0xea, 0x23, 0x58, 0x37, 0xec, 0x59, 0x88, 0x71, 0xbc, 0xb1,
+	0x5f, 0x51, 0x4b, 0x86, 0x3d, 0x0b, 0xa2, 0x53, 0xf4, 0x36, 0x6c, 0x2f, 0x00, 0x0e, 0x27, 0x7e,
+	0xfd, 0x9c, 0x22, 0x79, 0x1d, 0xae, 0xd0, 0x44, 0x71, 0x3b, 0x1a, 0xda, 0x86, 0x82, 0x89, 0xaf,
+	0x1c, 0x00, 0x5e, 0x77, 0xd9, 0x97, 0xd2, 0x81, 0x87, 0xa9, 0x09, 0xd2, 0x39, 0x31, 0x28, 0x46,
+	0x4f, 0x60, 0x23, 0x40, 0x34, 0x34, 0x6d, 0x37, 0x8e, 0x97, 0xe8, 0x3a, 0x0d, 0x5b, 0x74, 0x34,
+	0x45, 0x83, 0x9d, 0x0b, 0x6c, 0xf1, 0x0a, 0x15, 0x6a, 0xa6, 0x10, 0x6f, 0x66, 0x6a, 0x14, 0x31,
+	0x3d, 0x4a, 0x0b, 0xa4, 0x64, 0x14, 0x86, 0xb6, 0x0e, 0x39, 0xd3, 0x36, 0x5c, 0xff, 0xf7, 0x4f,
+	0xb6, 0xd3, 0xf9, 0x46, 0x75, 0x54, 0x94, 0x53, 0x78, 0xd0, 0xd5, 0x69, 0xd4, 0x0d, 0x5d, 0x0e,
+	0xad, 0xf2, 0x14, 0xe4, 0x34, 0x5b, 0xbf, 0x62, 0x79, 0xd3, 0x36, 0xa8, 0x24, 0xb8, 0xe3, 0xc5,
+	0x03, 0xe1, 0xea, 0x28, 0xbf, 0x08, 0xb0, 0xc5, 0xaa, 0xbf, 0x18, 0x3e, 0x06, 0xc1, 0x1f, 0x6f,
+	0x21, 0x6b, 0xa5, 0xc5, 0xa5, 0x57, 0x3a, 0xc7, 0x5b, 0xe9, 0x7f, 0x35, 0x4d, 0xca, 0x05, 0x6c,
+	0xc7, 0x71, 0xb3, 0xf4, 0x8f, 0xe0, 0xde, 0xc2, 0x82, 0xf5, 0x21, 0x65, 0xc3, 0x7c, 0x15, 0xe5,
+	0x47, 0x01, 0x6a, 0x51, 0x4f, 0xe7, 0x26, 0x99, 0xf5, 0x31, 0xa5, 0x4e, 0xa1, 0x58, 0x31, 0x76,
+	0x60, 0x75, 0xc1, 0x37, 0x02, 0x1b, 0x5e, 0x8f, 0x69, 0xf8, 0xe0, 0xc5, 0x8c, 0x55, 0x48, 0xa7,
+	0x8e, 0x60, 0x41, 0xf2, 0x91, 0x05, 0x39, 0x85, 0xfd, 0x0c, 0x80, 0x2c, 0xeb, 0x2d, 0x28, 0x5c,
+	0x93, 0x71, 0x00, 0x70, 0xe5, 0x9a, 0x8c, 0x3b, 0x9a, 0xf2, 0x1e, 0x6c, 0xb5, 0xf0, 0x14, 0x27,
+	0xdb, 0x5b, 0x85, 0xfb, 0x3e, 0x70, 0xdf, 0x08, 0x16, 0xa2, 0x8e, 0xa6, 0x48, 0xb0, 0x1d, 0xb7,
+	0xf4, 0x42, 0x29, 0xef, 0x42, 0x35, 0x8a, 0x27, 0xc8, 0x2d, 0x73, 0x78, 0x94, 0x79, 0xbc, 0xd2,
+	0x61, 0x43, 0x96, 0x47, 0x17, 0x36, 0x53, 0x0a, 0xca, 0x1a, 0xf9, 0x30, 0xd1, 0xc8, 0x90, 0x07,
+	0x94, 0x2c, 0xb5, 0xf2, 0x02, 0xaa, 0xd1, 0x24, 0x92, 0x50, 0xf9, 0x1d, 0x14, 0x32, 0xc6, 0x4f,
+	0x81, 0x1a, 0xdf, 0x31, 0xab, 0xd3, 0x07, 0xb0, 0xe7, 0x6e, 0x69, 0x42, 0x63, 0xd9, 0x35, 0x7f,
+	0x09, 0x55, 0xae, 0x03, 0x56, 0xae, 0x1e, 0x54, 0x52, 0xd0, 0x2f, 0x76, 0x3f, 0xb3, 0x5e, 0x9b,
+	0xc9, 0xc4, 0xa8, 0xd2, 0x85, 0x4a, 0x38, 0x24, 0xfd, 0x6f, 0x55, 0x7a, 0x0a, 0x5b, 0x31, 0x6f,
+	0x0c, 0x76, 0xe4, 0x0c, 0x0a, 0x4b, 0x9c, 0xc1, 0x6f, 0x61, 0xaf, 0xa9, 0x69, 0x8b, 0x97, 0xc1,
+	0x5d, 0xf5, 0x31, 0xbe, 0x06, 0x62, 0x62, 0x0d, 0xf6, 0xa1, 0xca, 0x0d, 0xcc, 0xfa, 0xfc, 0x03,
+	0x1c, 0xa8, 0x78, 0x46, 0x6e, 0x22, 0xfb, 0xf9, 0xbf, 0x01, 0x7c, 0x1d, 0x0e, 0xb3, 0xa3, 0x7b,
+	0x28, 0x4f, 0x7e, 0x2b, 0xc2, 0x7a, 0xd3, 0x21, 0xdf, 0xe0, 0x0c, 0xa0, 0xaf, 0x60, 0x33, 0xe5,
+	0xf4, 0xa2, 0x03, 0xbf, 0x15, 0xfc, 0x5f, 0x1e, 0xf2, 0x61, 0xb6, 0x12, 0x6b, 0xf4, 0x0b, 0x28,
+	0xc7, 0x6f, 0x25, 0xaa, 0xf9, 0x96, 0x9c, 0x63, 0x2d, 0xef, 0x67, 0x68, 0x30, 0xc7, 0x5f, 0x02,
+	0x4a, 0x9e, 0x40, 0xa4, 0xf8, 0x86, 0xdc, 0xdb, 0x2a, 0x1f, 0x64, 0xea, 0x30, 0xf7, 0x9f, 0x42,
+	0x29, 0x4a, 0x55, 0x68, 0x2f, 0x9e, 0x6f, 0x94, 0x50, 0xe5, 0x2a, 0xf7, 0x9d, 0xb9, 0x34, 0xe1,
+	0x01, 0x97, 0xc6, 0xd1, 0x63, 0x8e, 0x75, 0xf2, 0x16, 0xc9, 0x4f, 0x96, 0x51, 0x0d, 0xd2, 0x88,
+	0xd2, 0x54, 0x28, 0x8d, 0xd4, 0xbb, 0x10, 0x4a, 0x23, 0x9d, 0xfd, 0x11, 0x01, 0x89, 0x47, 0xe2,
+	0xa8, 0xce, 0x81, 0x96, 0x58, 0x06, 0xf9, 0xf1, 0x12, 0x9a, 0x41, 0x40, 0x1e, 0xd5, 0x86, 0x02,
+	0xde, 0x42, 0xf3, 0xa1, 0x80, 0xb7, 0xf1, 0x36, 0x9a, 0xc2, 0x0e, 0x87, 0x76, 0xd1, 0xa3, 0xe8,
+	0xec, 0x70, 0x99, 0x5d, 0xae, 0xdf, 0xae, 0xe8, 0x33, 0xf8, 0x5a, 0x84, 0x23, 0xd1, 0x6e, 0xaa,
+	0xa9, 0xef, 0x79, 0x8f, 0xf7, 0x1c, 0xa0, 0xe7, 0x10, 0x56, 0x08, 0x7d, 0x36, 0x97, 0x86, 0xd0,
+	0xdf, 0xc2, 0x7d, 0xe8, 0x7b, 0x78, 0x2d, 0x8b, 0x7d, 0xd0, 0x9b, 0xbe, 0xa7, 0x25, 0x28, 0x52,
+	0x3e, 0x5a, 0x52, 0xdb, 0x0b, 0xfe, 0xe1, 0xf9, 0xe7, 0x07, 0x57, 0xba, 0xf5, 0xb5, 0x3d, 0x6e,
+	0x4c, 0xc8, 0xec, 0x98, 0x99, 0x1e, 0xbb, 0x7f, 0x93, 0x4c, 0xc8, 0x74, 0x21, 0xf8, 0x59, 0x5c,
+	0xeb, 0xea, 0x37, 0xf8, 0x23, 0xdd, 0x6a, 0x5c, 0x3a, 0x4f, 0x7f, 0x89, 0x25, 0xf6, 0x7d, 0x7a,
+	0xea, 0x0a, 0xc6, 0x05, 0xd7, 0xe4, 0xad, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff, 0xb7, 0x96, 0x14,
+	0xe1, 0x7b, 0x11, 0x00, 0x00,
 }
