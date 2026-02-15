@@ -70,14 +70,16 @@ func NewNoopModelReporter() ModelReporter {
 	return &noopModelReporter{}
 }
 
-func (r *noopModelReporter) RegisterFunc(f func(ts time.Time, tx ModelTx) bool) {}
-func (r *noopModelReporter) Tx(f func(ModelTx))                                 {}
-func (r *noopModelReporter) TxAt(ts time.Time, f func(ModelTx))                 {}
-func (r *noopModelReporter) ReportInferencePromptTokens(v uint64)               {}
-func (r *noopModelReporter) ReportInferencePromptCacheTokens(v uint64)          {}
-func (r *noopModelReporter) ReportInferenceCompletionTokens(v uint64)           {}
-func (r *noopModelReporter) ReportInferenceTotalTokens(v uint64)                {}
-func (r *noopModelReporter) ReportInferenceCacheCreateTokens(v uint64)          {}
-func (r *noopModelReporter) ReportInferenceCacheReadTokens(v uint64)            {}
-func (r *noopModelReporter) ReportSttDuration(v uint32)                         {}
-func (r *noopModelReporter) ReportTtsChars(v uint32)                            {}
+func (r *noopModelReporter) RegisterFunc(f func(ts time.Time, tx ModelTx) bool)   {}
+func (r *noopModelReporter) Tx(f func(ModelTx))                                   {}
+func (r *noopModelReporter) TxAt(ts time.Time, f func(ModelTx))                   {}
+func (r *noopModelReporter) ReportInferencePromptTokens(v uint64)                 {}
+func (r *noopModelReporter) ReportInferencePromptCacheTokens(v uint64)            {}
+func (r *noopModelReporter) ReportInferenceCompletionTokens(v uint64)             {}
+func (r *noopModelReporter) ReportInferenceTotalTokens(v uint64)                  {}
+func (r *noopModelReporter) ReportInferenceCacheCreateTokens(v uint64)            {}
+func (r *noopModelReporter) ReportInferenceCacheReadTokens(v uint64)              {}
+func (r *noopModelReporter) ReportSttDuration(v uint32)                           {}
+func (r *noopModelReporter) ReportTtsChars(v uint32)                              {}
+func (r *noopModelReporter) ReportBargeInRequests(v uint64)                       {}
+func (r *noopModelReporter) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
