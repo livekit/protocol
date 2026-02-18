@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_J2LFGS0 = true
+const Version_PKGHM18 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -49,6 +49,8 @@ type ModelTx interface {
 	ReportInferenceCacheReadTokens(v uint64)
 	ReportSttDuration(v uint32)
 	ReportTtsChars(v uint32)
+	ReportBargeInRequests(v uint64)
+	ReportBargeInRequestTypes(v ModelBargeInRequestTypes)
 }
 
 type ModelReporter interface {
