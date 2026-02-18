@@ -94,6 +94,7 @@ const (
 	SimulationRun_Job_STATUS_RUNNING   SimulationRun_Job_Status = 1
 	SimulationRun_Job_STATUS_COMPLETED SimulationRun_Job_Status = 2
 	SimulationRun_Job_STATUS_FAILED    SimulationRun_Job_Status = 3
+	SimulationRun_Job_STATUS_CANCELLED SimulationRun_Job_Status = 4
 )
 
 // Enum value maps for SimulationRun_Job_Status.
@@ -103,12 +104,14 @@ var (
 		1: "STATUS_RUNNING",
 		2: "STATUS_COMPLETED",
 		3: "STATUS_FAILED",
+		4: "STATUS_CANCELLED",
 	}
 	SimulationRun_Job_Status_value = map[string]int32{
 		"STATUS_PENDING":   0,
 		"STATUS_RUNNING":   1,
 		"STATUS_COMPLETED": 2,
 		"STATUS_FAILED":    3,
+		"STATUS_CANCELLED": 4,
 	}
 )
 
@@ -1707,7 +1710,7 @@ var File_livekit_agent_simulation_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
-	"\x1elivekit_agent_simulation.proto\x12\alivekit\"\xcd\x04\n" +
+	"\x1elivekit_agent_simulation.proto\x12\alivekit\"\xe3\x04\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1717,17 +1720,18 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05error\x18\x05 \x01(\tR\x05error\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\x03R\tcreatedAt\x12.\n" +
-	"\x04jobs\x18\a \x03(\v2\x1a.livekit.SimulationRun.JobR\x04jobs\x1a\xe5\x01\n" +
+	"\x04jobs\x18\a \x03(\v2\x1a.livekit.SimulationRun.JobR\x04jobs\x1a\xfb\x01\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
 	"\finstructions\x18\x03 \x01(\tR\finstructions\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\"Y\n" +
+	"\x05error\x18\x04 \x01(\tR\x05error\"o\n" +
 	"\x06Status\x12\x12\n" +
 	"\x0eSTATUS_PENDING\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_RUNNING\x10\x01\x12\x14\n" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
-	"\rSTATUS_FAILED\x10\x03\"\\\n" +
+	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
+	"\x10STATUS_CANCELLED\x10\x04\"\\\n" +
 	"\x06Status\x12\x15\n" +
 	"\x11STATUS_GENERATING\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_RUNNING\x10\x01\x12\x14\n" +
