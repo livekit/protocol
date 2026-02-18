@@ -49,10 +49,43 @@ message SimulationRun {
   repeated Job jobs = 7;
 }
 
+message Scenario {
+  enum Status {
+    // Scenario is being generated from a session by an LLM.
+    // instructions and agent_expectations are not yet available.
+    STATUS_GENERATING = 0;
+    STATUS_READY = 1;
+    STATUS_FAILED = 2;
+  }
+  string id = 1;
+  string project_id = 2;
+  string label = 3;
+  string instructions = 4;
+  string agent_expectations = 5;
+  string source_room_id = 6;
+  int64 created_at = 7;
+  Status status = 8;
+  string error = 9;
+  string group_id = 10;
+  // Set as participant attributes on the simulation participant's access token.
+  map<string, string> metadata = 11;
+}
+
+message ScenarioGroup {
+  string id = 1;
+  string project_id = 2;
+  string label = 3;
+  int64 created_at = 4;
+  repeated Scenario scenarios = 5;
+}
+
 message CreateSimulationRunRequest {
-  string agent_name = 1;
-  string agent_description = 2;
-  int32 num_simulations = 3;
+  string project_id = 1;
+  string agent_name = 2;
+  string agent_description = 3;
+  int32 num_simulations = 4;
+  string group_id = 5;
+  string region = 6;
 }
 message CreateSimulationRunResponse {
   string simulation_run_id = 1;
@@ -73,8 +106,90 @@ message ListSimulationRunsResponse {
   repeated SimulationRun runs = 1;
 }
 
+message CreateScenarioRequest {
+  string project_id = 1;
+  string label = 2;
+  string instructions = 3;
+  string agent_expectations = 4;
+  string group_id = 5;
+  map<string, string> metadata = 6;
+}
+message CreateScenarioResponse {
+  Scenario scenario = 1;
+}
+
+message CreateScenarioFromSessionRequest {
+  string project_id = 1;
+  string room_id = 2;
+  string group_id = 3;
+  string label = 4;
+  string region = 5;
+}
+message CreateScenarioFromSessionResponse {
+  Scenario scenario = 1;
+}
+
+message DeleteScenarioRequest {
+  string project_id = 1;
+  string scenario_id = 2;
+}
+message DeleteScenarioResponse {}
+
+message UpdateScenarioRequest {
+  string project_id = 1;
+  string scenario_id = 2;
+  string label = 3;
+  string instructions = 4;
+  string agent_expectations = 5;
+  string group_id = 6;
+  map<string, string> metadata = 7;
+}
+message UpdateScenarioResponse {
+  Scenario scenario = 1;
+}
+
+message CreateScenarioGroupRequest {
+  string project_id = 1;
+  string label = 2;
+}
+message CreateScenarioGroupResponse {
+  ScenarioGroup scenario_group = 1;
+}
+
+message DeleteScenarioGroupRequest {
+  string project_id = 1;
+  string group_id = 2;
+}
+message DeleteScenarioGroupResponse {}
+
+message ListScenarioGroupsRequest {
+  string project_id = 1;
+}
+message ListScenarioGroupsResponse {
+  repeated ScenarioGroup scenario_groups = 1;
+}
+
+message ListScenariosRequest {
+  string project_id = 1;
+  string group_id = 2;
+}
+message ListScenariosResponse {
+  repeated Scenario scenarios = 1;
+}
+
 service AgentSimulation {
   rpc CreateSimulationRun(CreateSimulationRunRequest) returns (CreateSimulationRunResponse);
   rpc GetSimulationRun(GetSimulationRunRequest) returns (GetSimulationRunResponse);
   rpc ListSimulationRuns(ListSimulationRunsRequest) returns (ListSimulationRunsResponse);
+
+  rpc CreateScenario(CreateScenarioRequest) returns (CreateScenarioResponse);
+  rpc CreateScenarioFromSession(CreateScenarioFromSessionRequest) returns (CreateScenarioFromSessionResponse);
+  rpc DeleteScenario(DeleteScenarioRequest) returns (DeleteScenarioResponse);
+  rpc UpdateScenario(UpdateScenarioRequest) returns (UpdateScenarioResponse);
+
+  rpc CreateScenarioGroup(CreateScenarioGroupRequest) returns (CreateScenarioGroupResponse);
+  rpc DeleteScenarioGroup(DeleteScenarioGroupRequest) returns (DeleteScenarioGroupResponse);
+  rpc ListScenarioGroups(ListScenarioGroupsRequest) returns (ListScenarioGroupsResponse);
+
+  rpc ListScenarios(ListScenariosRequest) returns (ListScenariosResponse);
 }
