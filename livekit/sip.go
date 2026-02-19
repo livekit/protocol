@@ -333,6 +333,17 @@ func validateHeaderToAttributes(headerToAttributes map[string]string) error {
 	return nil
 }
 
+// validateHost makes sure the given host is a valid SIP host
+func validateHost(host string) error {
+	if host == "" {
+		return nil
+	}
+	if strings.ContainsAny(host, "@;") || strings.HasPrefix(host, "sip:") || strings.HasPrefix(host, "sips:") {
+		return errors.New("host should be a domain name or IP, not SIP URI")
+	}
+	return nil
+}
+
 func (p *SIPTrunkInfo) Validate() error {
 	if len(p.InboundNumbersRegex) != 0 {
 		return fmt.Errorf("trunks with InboundNumbersRegex are deprecated")
@@ -525,6 +536,9 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return err
 	}
+	if err := validateHost(p.FromHost); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -540,6 +554,9 @@ func (p *SIPOutboundConfig) Validate() error {
 		return err
 	}
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
+		return err
+	}
+	if err := validateHost(p.FromHost); err != nil {
 		return err
 	}
 	return nil
@@ -562,6 +579,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	applyListUpdate(&info.Numbers, p.Numbers)
 	applyUpdate(&info.AuthUsername, p.AuthUsername)
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
+	applyUpdate(&info.FromHost, p.FromHost)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)

@@ -200,6 +200,29 @@ func TestSIPValidate(t *testing.T) {
 	}
 }
 
+func TestValidateHost(t *testing.T) {
+	cases := []struct {
+		name string
+		host string
+		exp  bool
+	}{
+		{name: "empty", host: "", exp: true},
+		{name: "domain", host: "from.example.com", exp: true},
+		{name: "ipv4", host: "1.2.3.4", exp: true},
+		{name: "sip uri", host: "sip:from.example.com", exp: false},
+		{name: "sips uri", host: "sips:from.example.com", exp: false},
+		{name: "userinfo", host: "user@from.example.com", exp: false},
+		{name: "uri params", host: "from.example.com;transport=tcp", exp: false},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			err := validateHost(c.host)
+			require.Equal(t, c.exp, err == nil, "error: %v", err)
+		})
+	}
+}
+
 func TestSIPInboundTrunkFilter(t *testing.T) {
 	list := []*SIPInboundTrunkInfo{
 		0: {SipTrunkId: "A"},

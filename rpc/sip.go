@@ -83,6 +83,7 @@ func NewCreateSIPParticipantRequest(
 		destinationCountry string
 		authUser           string
 		authPass           string
+		fromHost           string
 		hdrToAttr          map[string]string
 		attrToHdr          map[string]string
 	)
@@ -95,6 +96,7 @@ func NewCreateSIPParticipantRequest(
 		destinationCountry = trunk.DestinationCountry
 		authUser = trunk.AuthUsername
 		authPass = trunk.AuthPassword
+		fromHost = trunk.FromHost
 		hdrToAttr = trunk.HeadersToAttributes
 		attrToHdr = trunk.AttributesToHeaders
 	} else if t := req.Trunk; t != nil {
@@ -105,6 +107,7 @@ func NewCreateSIPParticipantRequest(
 		authPass = t.AuthPassword
 		hdrToAttr = t.HeadersToAttributes
 		attrToHdr = t.AttributesToHeaders
+		fromHost = t.FromHost
 	}
 
 	outboundNumber := req.SipNumber
@@ -163,13 +166,17 @@ func NewCreateSIPParticipantRequest(
 		participantIdentity = "sip_" + req.SipCallTo
 	}
 
+	if fromHost == "" {
+		fromHost = ownHostname
+	}
+
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
 		DestinationCountry:    destinationCountry,
 		Address:               hostname,
-		Hostname:              ownHostname,
+		Hostname:              fromHost,
 		Transport:             transport,
 		Number:                outboundNumber,
 		Username:              authUser,
