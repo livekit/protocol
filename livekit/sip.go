@@ -3,6 +3,7 @@ package livekit
 import (
 	"errors"
 	"fmt"
+	"net"
 	"regexp"
 	"slices"
 	"strconv"
@@ -333,7 +334,7 @@ func validateHeaderToAttributes(headerToAttributes map[string]string) error {
 	return nil
 }
 
-// validateHost makes sure the given host is a valid SIP host
+// validateHost validates a SIP host per RFC 3261 (host = hostname / IPv4address / IPv6reference).
 func validateHost(host string) error {
 	if host == "" {
 		return nil
@@ -341,7 +342,68 @@ func validateHost(host string) error {
 	if strings.ContainsAny(host, "@;") || strings.HasPrefix(host, "sip:") || strings.HasPrefix(host, "sips:") {
 		return errors.New("host should be a domain name or IP, not SIP URI")
 	}
+
+	// Try IPv6.
+	if host[0] == '[' {
+		if host[len(host)-1] != ']' {
+			return errors.New("invalid IPv6 reference: missing closing bracket")
+		}
+		ip := net.ParseIP(host[1 : len(host)-1])
+		if ip == nil || ip.To4() != nil {
+			return errors.New("invalid IPv6 reference")
+		}
+		return nil
+	}
+	if strings.ContainsRune(host, ']') {
+		return errors.New("invalid IPv6 reference: unexpected bracket")
+	}
+
+	// Try IPv4.
+	if ip := net.ParseIP(host); ip != nil {
+		if ip.To4() != nil {
+			return nil
+		}
+		return errors.New("IPv6 address must be enclosed in brackets")
+	}
+
+	// Try hostname.
+	if !isValidHostname(host) {
+		return errors.New("invalid hostname")
+	}
 	return nil
+}
+
+// isValidHostname checks hostname rules.
+// Total length ≤ 253, each label ≤ 63, labels start and end with a letter or digit,
+// and contain only letters, digits, or hyphens.
+func isValidHostname(host string) bool {
+	if len(host) > 253 {
+		return false
+	}
+	labels := strings.Split(host, ".")
+	for _, label := range labels {
+		n := len(label)
+		if n == 0 || n > 63 {
+			return false
+		}
+		if !isLetterOrDigit(label[0]) || !isLetterOrDigit(label[n-1]) {
+			return false
+		}
+		for i := 1; i < n-1; i++ {
+			if !isLetterOrDigit(label[i]) && label[i] != '-' {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+func isLetter(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+}
+
+func isLetterOrDigit(c byte) bool {
+	return isLetter(c) || (c >= '0' && c <= '9')
 }
 
 func (p *SIPTrunkInfo) Validate() error {

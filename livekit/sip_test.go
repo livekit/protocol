@@ -206,13 +206,34 @@ func TestValidateHost(t *testing.T) {
 		host string
 		exp  bool
 	}{
+		// Valid
 		{name: "empty", host: "", exp: true},
 		{name: "domain", host: "from.example.com", exp: true},
+		{name: "single label", host: "localhost", exp: true},
+		{name: "hyphenated label", host: "a-b.example.com", exp: true},
 		{name: "ipv4", host: "1.2.3.4", exp: true},
+		{name: "ipv6 reference", host: "[2001:db8::1]", exp: true},
+		{name: "ipv6 loopback", host: "[::1]", exp: true},
+		{name: "label starts with digit", host: "1example.com", exp: true},
+
+		// SIP URI rejection
 		{name: "sip uri", host: "sip:from.example.com", exp: false},
 		{name: "sips uri", host: "sips:from.example.com", exp: false},
 		{name: "userinfo", host: "user@from.example.com", exp: false},
 		{name: "uri params", host: "from.example.com;transport=tcp", exp: false},
+
+		// IPv6 bracket rules (RFC 3986)
+		{name: "ipv6 without brackets", host: "2001:db8::1", exp: false},
+		{name: "ipv6 missing close bracket", host: "[2001:db8::1", exp: false},
+		{name: "ipv6 missing open bracket", host: "2001:db8::1]", exp: false},
+		{name: "invalid ipv6 in brackets", host: "[2001:::1]", exp: false},
+
+		// Hostname label rules (RFC 1035)
+		{name: "label starts with hyphen", host: "-example.com", exp: false},
+		{name: "label ends with hyphen", host: "example-.com", exp: false},
+		{name: "empty label (double dot)", host: "example..com", exp: false},
+		{name: "trailing dot", host: "example.com.", exp: false},
+		{name: "underscore in label", host: "my_host.example.com", exp: false},
 	}
 
 	for _, c := range cases {
