@@ -49,7 +49,9 @@ type InternalCreateSIPParticipantRequest struct {
 	// IP or hostname that SIP INVITE is sent too
 	Address string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	// Hostname for the 'From' SIP address in INVITE
-	Hostname           string               `protobuf:"bytes,20,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Hostname string `protobuf:"bytes,20,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	// custom Hostname for the 'From' SIP address in INVITE
+	FromHostname       string               `protobuf:"bytes,34,opt,name=from_hostname,json=fromHostname,proto3" json:"from_hostname,omitempty"`
 	DestinationCountry string               `protobuf:"bytes,30,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
 	Transport          livekit.SIPTransport `protobuf:"varint,16,opt,name=transport,proto3,enum=livekit.SIPTransport" json:"transport,omitempty"`
 	// Number used to make the call
@@ -168,6 +170,13 @@ func (x *InternalCreateSIPParticipantRequest) GetAddress() string {
 func (x *InternalCreateSIPParticipantRequest) GetHostname() string {
 	if x != nil {
 		return x.Hostname
+	}
+	return ""
+}
+
+func (x *InternalCreateSIPParticipantRequest) GetFromHostname() string {
+	if x != nil {
+		return x.FromHostname
 	}
 	return ""
 }
@@ -513,7 +522,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xcb\x12\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xf0\x12\n" +
 	"#InternalCreateSIPParticipantRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tR\tprojectId\x12\x1e\n" +
@@ -521,7 +530,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\fsip_trunk_id\x18\x13 \x01(\tR\n" +
 	"sipTrunkId\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1a\n" +
-	"\bhostname\x18\x14 \x01(\tR\bhostname\x12/\n" +
+	"\bhostname\x18\x14 \x01(\tR\bhostname\x12#\n" +
+	"\rfrom_hostname\x18\" \x01(\tR\ffromHostname\x12/\n" +
 	"\x13destination_country\x18\x1e \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x10 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x16\n" +
 	"\x06number\x18\x03 \x01(\tR\x06number\x12\x17\n" +

@@ -50,6 +50,8 @@ message InternalCreateSIPParticipantRequest {
   string address = 2;
   // Hostname for the 'From' SIP address in INVITE
   string hostname = 20;
+  // custom Hostname for the 'From' SIP address in INVITE
+  string from_hostname = 34;
   string destination_country = 30;
   livekit.SIPTransport transport = 16;
 
@@ -144,7 +146,7 @@ message InternalCreateSIPParticipantRequest {
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 33;
 
-  // NEXT ID: 34
+  // NEXT ID: 35
 }
 
 message InternalCreateSIPParticipantResponse {

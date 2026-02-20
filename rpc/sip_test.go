@@ -135,7 +135,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 }
 
 func TestFromHostOption(t *testing.T) {
-	t.Run("uses trunk from_host", func(t *testing.T) {
+	t.Run("returns trunk from_hostname", func(t *testing.T) {
 		req := &livekit.CreateSIPParticipantRequest{
 			SipTrunkId: "trunk",
 			SipCallTo:  "+3333",
@@ -150,10 +150,11 @@ func TestFromHostOption(t *testing.T) {
 
 		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", req, trunk)
 		require.NoError(t, err)
-		require.Equal(t, "from-trunk.example.com", res.Hostname)
+		require.Equal(t, "xyz.sip.livekit.cloud", res.Hostname)
+		require.Equal(t, "from-trunk.example.com", res.FromHostname)
 	})
 
-	t.Run("uses request trunk from_host", func(t *testing.T) {
+	t.Run("returns request trunk from_hostname", func(t *testing.T) {
 		req := &livekit.CreateSIPParticipantRequest{
 			SipCallTo: "+3333",
 			SipNumber: "+1111",
@@ -166,10 +167,11 @@ func TestFromHostOption(t *testing.T) {
 
 		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", req, nil)
 		require.NoError(t, err)
-		require.Equal(t, "from-config.example.com", res.Hostname)
+		require.Equal(t, "xyz.sip.livekit.cloud", res.Hostname)
+		require.Equal(t, "from-config.example.com", res.FromHostname)
 	})
 
-	t.Run("falls back to own hostname when from_host is missing", func(t *testing.T) {
+	t.Run("returns empty from_hostname if trunk from_hostname is empty", func(t *testing.T) {
 		req := &livekit.CreateSIPParticipantRequest{
 			SipTrunkId: "trunk",
 			SipCallTo:  "+3333",
@@ -184,5 +186,6 @@ func TestFromHostOption(t *testing.T) {
 		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", req, trunk)
 		require.NoError(t, err)
 		require.Equal(t, "xyz.sip.livekit.cloud", res.Hostname)
+		require.Equal(t, "", res.FromHostname)
 	})
 }

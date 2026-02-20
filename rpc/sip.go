@@ -166,17 +166,14 @@ func NewCreateSIPParticipantRequest(
 		participantIdentity = "sip_" + req.SipCallTo
 	}
 
-	if fromHost == "" {
-		fromHost = ownHostname
-	}
-
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
 		DestinationCountry:    destinationCountry,
 		Address:               hostname,
-		Hostname:              fromHost,
+		Hostname:              ownHostname,
+		FromHostname:          fromHost,
 		Transport:             transport,
 		Number:                outboundNumber,
 		Username:              authUser,
