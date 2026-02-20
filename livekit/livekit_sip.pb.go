@@ -1750,6 +1750,10 @@ type SIPOutboundTrunkInfo struct {
 	// May be empty to have no authentication.
 	AuthUsername string `protobuf:"bytes,7,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	AuthPassword string `protobuf:"bytes,8,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
+	// Hostname or IP that SIP INVITE is sent from.
+	// Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
+	// If not set, the hostname of the SIP server will be used.
+	FromHost string `protobuf:"bytes,15,opt,name=from_host,json=fromHost,proto3" json:"from_host,omitempty"`
 	// Include these SIP X-* headers in INVITE request.
 	// These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
 	Headers map[string]string `protobuf:"bytes,9,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -1864,6 +1868,13 @@ func (x *SIPOutboundTrunkInfo) GetAuthPassword() string {
 	return ""
 }
 
+func (x *SIPOutboundTrunkInfo) GetFromHost() string {
+	if x != nil {
+		return x.FromHost
+	}
+	return ""
+}
+
 func (x *SIPOutboundTrunkInfo) GetHeaders() map[string]string {
 	if x != nil {
 		return x.Headers
@@ -1907,6 +1918,7 @@ type SIPOutboundTrunkUpdate struct {
 	Numbers            *ListUpdate            `protobuf:"bytes,3,opt,name=numbers,proto3" json:"numbers,omitempty"`
 	AuthUsername       *string                `protobuf:"bytes,4,opt,name=auth_username,json=authUsername,proto3,oneof" json:"auth_username,omitempty"`
 	AuthPassword       *string                `protobuf:"bytes,5,opt,name=auth_password,json=authPassword,proto3,oneof" json:"auth_password,omitempty"`
+	FromHost           *string                `protobuf:"bytes,10,opt,name=from_host,json=fromHost,proto3,oneof" json:"from_host,omitempty"`
 	Name               *string                `protobuf:"bytes,6,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Metadata           *string                `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
 	MediaEncryption    *SIPMediaEncryption    `protobuf:"varint,8,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
@@ -1982,6 +1994,13 @@ func (x *SIPOutboundTrunkUpdate) GetAuthUsername() string {
 func (x *SIPOutboundTrunkUpdate) GetAuthPassword() string {
 	if x != nil && x.AuthPassword != nil {
 		return *x.AuthPassword
+	}
+	return ""
+}
+
+func (x *SIPOutboundTrunkUpdate) GetFromHost() string {
+	if x != nil && x.FromHost != nil {
+		return *x.FromHost
 	}
 	return ""
 }
@@ -3448,6 +3467,10 @@ type SIPOutboundConfig struct {
 	// May be empty to have no authentication.
 	AuthUsername string `protobuf:"bytes,3,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	AuthPassword string `protobuf:"bytes,4,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
+	// Hostname or IP that SIP INVITE is sent from.
+	// Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
+	// If not set, the hostname of the SIP server will be used.
+	FromHost string `protobuf:"bytes,8,opt,name=from_host,json=fromHost,proto3" json:"from_host,omitempty"`
 	// Map SIP X-* headers from 200 OK to SIP participant attributes.
 	// Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
 	HeadersToAttributes map[string]string `protobuf:"bytes,5,rep,name=headers_to_attributes,json=headersToAttributes,proto3" json:"headers_to_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -3519,6 +3542,13 @@ func (x *SIPOutboundConfig) GetAuthUsername() string {
 func (x *SIPOutboundConfig) GetAuthPassword() string {
 	if x != nil {
 		return x.AuthPassword
+	}
+	return ""
+}
+
+func (x *SIPOutboundConfig) GetFromHost() string {
+	if x != nil {
+		return x.FromHost
 	}
 	return ""
 }
@@ -4545,7 +4575,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x129\n" +
 	"\areplace\x18\x02 \x01(\v2\x1d.livekit.SIPOutboundTrunkInfoH\x00R\areplace\x129\n" +
 	"\x06update\x18\x03 \x01(\v2\x1f.livekit.SIPOutboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\xe2\b\n" +
+	"\x06action\"\xff\b\n" +
 	"\x14SIPOutboundTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x12\x12\n" +
@@ -4556,7 +4586,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\ttransport\x18\x05 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x18\n" +
 	"\anumbers\x18\x06 \x03(\tR\anumbers\x12K\n" +
 	"\rauth_username\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthUsername\x12K\n" +
-	"\rauth_password\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12l\n" +
+	"\rauth_password\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12\x1b\n" +
+	"\tfrom_host\x18\x0f \x01(\tR\bfromHost\x12l\n" +
 	"\aheaders\x18\t \x03(\v2*.livekit.SIPOutboundTrunkInfo.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12j\n" +
 	"\x15headers_to_attributes\x18\n" +
 	" \x03(\v26.livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12j\n" +
@@ -4571,24 +4602,28 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xaa\x05\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xda\x05\n" +
 	"\x16SIPOutboundTrunkUpdate\x12\x1d\n" +
 	"\aaddress\x18\x01 \x01(\tH\x00R\aaddress\x88\x01\x01\x128\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportH\x01R\ttransport\x88\x01\x01\x124\n" +
 	"\x13destination_country\x18\t \x01(\tH\x02R\x12destinationCountry\x88\x01\x01\x12-\n" +
 	"\anumbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12P\n" +
 	"\rauth_username\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x03R\fauthUsername\x88\x01\x01\x12P\n" +
-	"\rauth_password\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
-	"\x04name\x18\x06 \x01(\tH\x05R\x04name\x88\x01\x01\x12G\n" +
-	"\bmetadata\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x06R\bmetadata\x88\x01\x01\x12K\n" +
-	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\aR\x0fmediaEncryption\x88\x01\x01B\n" +
+	"\rauth_password\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x04R\fauthPassword\x88\x01\x01\x12 \n" +
+	"\tfrom_host\x18\n" +
+	" \x01(\tH\x05R\bfromHost\x88\x01\x01\x12\x17\n" +
+	"\x04name\x18\x06 \x01(\tH\x06R\x04name\x88\x01\x01\x12G\n" +
+	"\bmetadata\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\aR\bmetadata\x88\x01\x01\x12K\n" +
+	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\bR\x0fmediaEncryption\x88\x01\x01B\n" +
 	"\n" +
 	"\b_addressB\f\n" +
 	"\n" +
 	"_transportB\x16\n" +
 	"\x14_destination_countryB\x10\n" +
 	"\x0e_auth_usernameB\x10\n" +
-	"\x0e_auth_passwordB\a\n" +
+	"\x0e_auth_passwordB\f\n" +
+	"\n" +
+	"_from_hostB\a\n" +
 	"\x05_nameB\v\n" +
 	"\t_metadataB\x13\n" +
 	"\x11_media_encryption\"=\n" +
@@ -4706,13 +4741,14 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x1bListSIPDispatchRuleResponse\x122\n" +
 	"\x05items\x18\x01 \x03(\v2\x1c.livekit.SIPDispatchRuleInfoR\x05items\"O\n" +
 	"\x1cDeleteSIPDispatchRuleRequest\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\x91\x05\n" +
+	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\xae\x05\n" +
 	"\x11SIPOutboundConfig\x12\x1a\n" +
 	"\bhostname\x18\x01 \x01(\tR\bhostname\x12/\n" +
 	"\x13destination_country\x18\a \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12K\n" +
 	"\rauth_username\x18\x03 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthUsername\x12K\n" +
-	"\rauth_password\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12g\n" +
+	"\rauth_password\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12\x1b\n" +
+	"\tfrom_host\x18\b \x01(\tR\bfromHost\x12g\n" +
 	"\x15headers_to_attributes\x18\x05 \x03(\v23.livekit.SIPOutboundConfig.HeadersToAttributesEntryR\x13headersToAttributes\x12g\n" +
 	"\x15attributes_to_headers\x18\x06 \x03(\v23.livekit.SIPOutboundConfig.AttributesToHeadersEntryR\x13attributesToHeaders\x1aF\n" +
 	"\x18HeadersToAttributesEntry\x12\x10\n" +

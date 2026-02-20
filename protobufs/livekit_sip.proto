@@ -451,6 +451,11 @@ message SIPOutboundTrunkInfo {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
+  // Hostname or IP that SIP INVITE is sent from.
+  // Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
+  // If not set, the hostname of the SIP server will be used.
+  string from_host = 15;
+
   // Include these SIP X-* headers in INVITE request.
   // These headers are sent as-is and may help identify this call as coming from LiveKit for the other SIP endpoint.
   map<string, string> headers = 9 [
@@ -473,7 +478,7 @@ message SIPOutboundTrunkInfo {
 
   SIPMediaEncryption media_encryption = 13;
 
-  // NEXT ID: 15
+  // NEXT ID: 16
 }
 
 message SIPOutboundTrunkUpdate {
@@ -489,6 +494,7 @@ message SIPOutboundTrunkUpdate {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  optional string from_host = 10;
   optional string name = 6;
   optional string metadata = 7 [
     (logger.redact) = true,
@@ -496,7 +502,7 @@ message SIPOutboundTrunkUpdate {
   ];
   optional SIPMediaEncryption media_encryption = 8;
 
-  // NEXT ID: 10
+  // NEXT ID: 11
 }
 
 message GetSIPInboundTrunkRequest {
@@ -740,6 +746,11 @@ message SIPOutboundConfig {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
+  // Hostname or IP that SIP INVITE is sent from.
+  // Note that this is not a SIP URI and should not contain the 'sip:' protocol prefix.
+  // If not set, the hostname of the SIP server will be used.
+  string from_host = 8;
+
   // Map SIP X-* headers from 200 OK to SIP participant attributes.
   // Keys are the names of X-* headers and values are the names of attributes they will be mapped to.
   map<string, string> headers_to_attributes = 5;
@@ -747,7 +758,7 @@ message SIPOutboundConfig {
   // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
   map<string, string> attributes_to_headers = 6;
 
-  // NEXT ID: 7
+  // NEXT ID: 9
 }
 
 // A SIP Participant is a singular SIP session connected to a LiveKit room via

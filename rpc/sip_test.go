@@ -133,3 +133,59 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, exp, res)
 }
+
+func TestFromHostOption(t *testing.T) {
+	t.Run("returns trunk from_hostname", func(t *testing.T) {
+		req := &livekit.CreateSIPParticipantRequest{
+			SipTrunkId: "trunk",
+			SipCallTo:  "+3333",
+			RoomName:   "room",
+		}
+		trunk := &livekit.SIPOutboundTrunkInfo{
+			SipTrunkId: "trunk",
+			Address:    "sip.example.com",
+			FromHost:   "from-trunk.example.com",
+			Numbers:    []string{"+1111"},
+		}
+
+		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", req, trunk)
+		require.NoError(t, err)
+		require.Equal(t, "xyz.sip.livekit.cloud", res.Hostname)
+		require.Equal(t, "from-trunk.example.com", res.FromHostname)
+	})
+
+	t.Run("returns request trunk from_hostname", func(t *testing.T) {
+		req := &livekit.CreateSIPParticipantRequest{
+			SipCallTo: "+3333",
+			SipNumber: "+1111",
+			RoomName:  "room",
+			Trunk: &livekit.SIPOutboundConfig{
+				Hostname: "sip.example.com",
+				FromHost: "from-config.example.com",
+			},
+		}
+
+		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", req, nil)
+		require.NoError(t, err)
+		require.Equal(t, "xyz.sip.livekit.cloud", res.Hostname)
+		require.Equal(t, "from-config.example.com", res.FromHostname)
+	})
+
+	t.Run("returns empty from_hostname if trunk from_hostname is empty", func(t *testing.T) {
+		req := &livekit.CreateSIPParticipantRequest{
+			SipTrunkId: "trunk",
+			SipCallTo:  "+3333",
+			RoomName:   "room",
+		}
+		trunk := &livekit.SIPOutboundTrunkInfo{
+			SipTrunkId: "trunk",
+			Address:    "sip.example.com",
+			Numbers:    []string{"+1111"},
+		}
+
+		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", req, trunk)
+		require.NoError(t, err)
+		require.Equal(t, "xyz.sip.livekit.cloud", res.Hostname)
+		require.Equal(t, "", res.FromHostname)
+	})
+}
