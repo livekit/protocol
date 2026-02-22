@@ -3763,6 +3763,8 @@ type RpcRequest struct {
 	Payload           string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
 	ResponseTimeoutMs uint32                 `protobuf:"varint,4,opt,name=response_timeout_ms,json=responseTimeoutMs,proto3" json:"response_timeout_ms,omitempty"`
 	Version           uint32                 `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
+	// Compressed payload data. When set, this field is used instead of `payload`.
+	CompressedPayload []byte `protobuf:"bytes,6,opt,name=compressed_payload,json=compressedPayload,proto3" json:"compressed_payload,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3832,6 +3834,13 @@ func (x *RpcRequest) GetVersion() uint32 {
 	return 0
 }
 
+func (x *RpcRequest) GetCompressedPayload() []byte {
+	if x != nil {
+		return x.CompressedPayload
+	}
+	return nil
+}
+
 type RpcAck struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -3883,6 +3892,7 @@ type RpcResponse struct {
 	//
 	//	*RpcResponse_Payload
 	//	*RpcResponse_Error
+	//	*RpcResponse_CompressedPayload
 	Value         isRpcResponse_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3950,6 +3960,15 @@ func (x *RpcResponse) GetError() *RpcError {
 	return nil
 }
 
+func (x *RpcResponse) GetCompressedPayload() []byte {
+	if x != nil {
+		if x, ok := x.Value.(*RpcResponse_CompressedPayload); ok {
+			return x.CompressedPayload
+		}
+	}
+	return nil
+}
+
 type isRpcResponse_Value interface {
 	isRpcResponse_Value()
 }
@@ -3962,9 +3981,16 @@ type RpcResponse_Error struct {
 	Error *RpcError `protobuf:"bytes,3,opt,name=error,proto3,oneof"`
 }
 
+type RpcResponse_CompressedPayload struct {
+	// Compressed payload data. When set, this field is used instead of `payload`.
+	CompressedPayload []byte `protobuf:"bytes,4,opt,name=compressed_payload,json=compressedPayload,proto3,oneof"`
+}
+
 func (*RpcResponse_Payload) isRpcResponse_Value() {}
 
 func (*RpcResponse_Error) isRpcResponse_Value() {}
+
+func (*RpcResponse_CompressedPayload) isRpcResponse_Value() {}
 
 type RpcError struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -6299,22 +6325,24 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12\x18\n" +
 	"\adeleted\x18\x05 \x01(\bR\adeleted\x12\x1c\n" +
 	"\tgenerated\x18\x06 \x01(\bR\tgeneratedB\x11\n" +
-	"\x0f_edit_timestamp\"\x98\x01\n" +
+	"\x0f_edit_timestamp\"\xc7\x01\n" +
 	"\n" +
 	"RpcRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06method\x18\x02 \x01(\tR\x06method\x12\x18\n" +
 	"\apayload\x18\x03 \x01(\tR\apayload\x12.\n" +
 	"\x13response_timeout_ms\x18\x04 \x01(\rR\x11responseTimeoutMs\x12\x18\n" +
-	"\aversion\x18\x05 \x01(\rR\aversion\"'\n" +
+	"\aversion\x18\x05 \x01(\rR\aversion\x12-\n" +
+	"\x12compressed_payload\x18\x06 \x01(\fR\x11compressedPayload\"'\n" +
 	"\x06RpcAck\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\"|\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\"\xad\x01\n" +
 	"\vRpcResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
 	"\apayload\x18\x02 \x01(\tH\x00R\apayload\x12)\n" +
-	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05errorB\a\n" +
+	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05error\x12/\n" +
+	"\x12compressed_payload\x18\x04 \x01(\fH\x00R\x11compressedPayloadB\a\n" +
 	"\x05value\"L\n" +
 	"\bRpcError\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\rR\x04code\x12\x18\n" +
@@ -6884,6 +6912,7 @@ func file_livekit_models_proto_init() {
 	file_livekit_models_proto_msgTypes[27].OneofWrappers = []any{
 		(*RpcResponse_Payload)(nil),
 		(*RpcResponse_Error)(nil),
+		(*RpcResponse_CompressedPayload)(nil),
 	}
 	file_livekit_models_proto_msgTypes[38].OneofWrappers = []any{
 		(*RTPForwarderState_Vp8Munger)(nil),
