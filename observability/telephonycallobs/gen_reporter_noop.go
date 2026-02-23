@@ -56,26 +56,20 @@ func NewNoopCallReporter() CallReporter {
 func (r *noopCallReporter) RegisterFunc(f func(ts time.Time, tx CallTx) bool)           {}
 func (r *noopCallReporter) Tx(f func(CallTx))                                           {}
 func (r *noopCallReporter) TxAt(ts time.Time, f func(CallTx))                           {}
-func (r *noopCallReporter) ReportStartTime(v time.Time)                                 {}
-func (r *noopCallReporter) ReportEndTime(v time.Time)                                   {}
-func (r *noopCallReporter) ReportDuration(v uint64)                                     {}
-func (r *noopCallReporter) ReportDurationMinutes(v uint16)                              {}
 func (r *noopCallReporter) ReportTrunkID(v string)                                      {}
+func (r *noopCallReporter) ReportTrunkType(v CallTrunkType)                             {}
 func (r *noopCallReporter) ReportDispatchID(v string)                                   {}
 func (r *noopCallReporter) ReportToNumber(v string)                                     {}
 func (r *noopCallReporter) ReportToHost(v string)                                       {}
 func (r *noopCallReporter) ReportFromNumber(v string)                                   {}
 func (r *noopCallReporter) ReportFromHost(v string)                                     {}
-func (r *noopCallReporter) ReportDirection(v CallDirection)                             {}
+func (r *noopCallReporter) ReportNumberType(v CallNumberType)                           {}
+func (r *noopCallReporter) ReportCountryCode(v string)                                  {}
 func (r *noopCallReporter) ReportTransport(v CallTransport)                             {}
 func (r *noopCallReporter) ReportProviderCallID(v string)                               {}
 func (r *noopCallReporter) ReportProviderName(v string)                                 {}
 func (r *noopCallReporter) ReportSIPCallID(v string)                                    {}
-func (r *noopCallReporter) ReportRoomID(v string)                                       {}
-func (r *noopCallReporter) ReportRoomName(v string)                                     {}
 func (r *noopCallReporter) ReportParticipantIdentity(v string)                          {}
-func (r *noopCallReporter) ReportError(v string)                                        {}
-func (r *noopCallReporter) ReportStatus(v CallStatus)                                   {}
 func (r *noopCallReporter) ReportResponseCode(v uint16)                                 {}
 func (r *noopCallReporter) ReportDisconnectReason(v string)                             {}
 func (r *noopCallReporter) ReportTransferID(v string)                                   {}
