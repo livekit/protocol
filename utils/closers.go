@@ -16,6 +16,7 @@ package utils
 
 import (
 	"io"
+	"slices"
 
 	"go.uber.org/multierr"
 )
@@ -28,7 +29,7 @@ func CombineClosers(cs ...io.Closer) Closers {
 
 func (s *Closers) Close() error {
 	var err error
-	for _, c := range *s {
+	for _, c := range slices.Backward(*s) {
 		if c != nil {
 			err = multierr.Append(err, c.Close())
 		}
