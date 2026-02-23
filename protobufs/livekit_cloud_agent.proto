@@ -27,6 +27,19 @@ enum AgentSecretKind {
     AGENT_SECRET_KIND_FILE = 2;
 }
 
+enum AgentEventType {
+    AGENT_EVENT_TYPE_UNKNOWN = 0;
+    AGENT_EVENT_TYPE_APPLICATION_CRASHED = 1;
+    AGENT_EVENT_TYPE_RESTARTED_HIGH_DISK_USAGE = 2;
+    AGENT_EVENT_TYPE_RESTARTED_HIGH_MEMORY_USAGE = 3;
+}
+
+message AgentEvent {
+    AgentEventType type = 1;
+    int32 count = 2;
+    google.protobuf.Timestamp timestamp = 3;
+}
+
 message AgentSecret {
     string name = 1;
     bytes value = 2;
@@ -74,6 +87,7 @@ message AgentDeployment {
     string mem_limit = 11;
     string cpu_limit = 12;
     string server_region = 13;
+    repeated AgentEvent events = 14;
 }
 
 message AgentInfo {
@@ -102,6 +116,7 @@ message AgentVersion {
     map<string, string> attributes = 5;
     string status = 6;
     string owner = 7;
+    bool draining = 8;
 }
 
 message ListAgentVersionsRequest {
@@ -210,6 +225,72 @@ message ClientSettingsResponse {
 message ClientSettingsRequest {
 }
 
+message PrivateLink {
+  message AWSConfig {
+    string endpoint = 1;
+  }
+
+  string private_link_id = 1;
+  string name = 2;
+  string region = 4;
+  uint32 port = 5;
+
+  oneof config {
+    AWSConfig aws = 3;
+  }
+}
+
+message PrivateLinkStatus {
+  enum Status {
+      PRIVATE_LINK_STATUS_UNKNOWN = 0;
+      PRIVATE_LINK_STATUS_PENDING = 1;
+      PRIVATE_LINK_STATUS_AVAILABLE = 2;
+      PRIVATE_LINK_STATUS_ERROR = 3;
+  }
+
+  Status status = 1;
+  google.protobuf.Timestamp updated_at = 2;
+}
+
+message CreatePrivateLinkRequest {
+  message AWSCreateConfig {
+    string endpoint = 1;
+  }
+
+  string name = 1;
+  string region = 3;
+  uint32 port = 4;
+  oneof config {
+    AWSCreateConfig aws = 2;
+  }
+}
+
+message CreatePrivateLinkResponse {
+  PrivateLink private_link = 1;
+}
+
+message DestroyPrivateLinkRequest {
+  string private_link_id = 1;
+}
+
+message DestroyPrivateLinkResponse {
+}
+
+message ListPrivateLinksRequest {
+}
+
+message ListPrivateLinksResponse {
+  repeated PrivateLink items = 1;
+}
+
+message GetPrivateLinkStatusRequest {
+  string private_link_id = 1;
+}
+
+message GetPrivateLinkStatusResponse {
+  PrivateLinkStatus value = 1;
+}
+
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
@@ -222,4 +303,9 @@ service CloudAgent {
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}
     rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse) {}
     rpc GetClientSettings(ClientSettingsRequest) returns (ClientSettingsResponse) {}
+
+    rpc CreatePrivateLink(CreatePrivateLinkRequest) returns (CreatePrivateLinkResponse) {}
+    rpc DestroyPrivateLink(DestroyPrivateLinkRequest) returns (DestroyPrivateLinkResponse) {}
+    rpc ListPrivateLinks(ListPrivateLinksRequest) returns (ListPrivateLinksResponse) {}
+    rpc GetPrivateLinkStatus(GetPrivateLinkStatusRequest) returns (GetPrivateLinkStatusResponse) {}
 }

@@ -4,7 +4,10 @@ import (
 	"github.com/livekit/protocol/observability/agentsobs"
 	"github.com/livekit/protocol/observability/egressobs"
 	"github.com/livekit/protocol/observability/gatewayobs"
+	"github.com/livekit/protocol/observability/ingressobs"
 	"github.com/livekit/protocol/observability/roomobs"
+	"github.com/livekit/protocol/observability/storageobs"
+	"github.com/livekit/protocol/observability/telephonycallobs"
 	"github.com/livekit/protocol/observability/telephonyobs"
 )
 
@@ -17,7 +20,10 @@ type Reporter interface {
 	Telephony() telephonyobs.Reporter
 	Connector() any // any is a placeholder for the connector type
 	Egress() egressobs.Reporter
-	Ingress() any
+	Ingress() ingressobs.Reporter
+	GatewayMetrics() any // any is a placeholder for the gateway metrics type
+	TelephonyCall() telephonycallobs.Reporter
+	Storage() storageobs.Reporter
 	Close()
 }
 
@@ -51,9 +57,19 @@ func (reporter) Egress() egressobs.Reporter {
 	return egressobs.NewNoopReporter()
 }
 
-func (reporter) Ingress() any {
+func (reporter) Ingress() ingressobs.Reporter {
+	return ingressobs.NewNoopReporter()
+}
+
+func (reporter) GatewayMetrics() any {
 	return nil
 }
+
+func (reporter) TelephonyCall() telephonycallobs.Reporter {
+	return telephonycallobs.NewNoopReporter()
+}
+
+func (reporter) Storage() storageobs.Reporter { return storageobs.NewNoopReporter() }
 
 func (reporter) Close() {
 }

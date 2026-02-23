@@ -79,6 +79,7 @@ func (r *noopRoomSessionReporter) TxAt(ts time.Time, f func(RoomSessionTx))     
 func (r *noopRoomSessionReporter) ReportStartTime(v time.Time)                              {}
 func (r *noopRoomSessionReporter) ReportEndTime(v time.Time)                                {}
 func (r *noopRoomSessionReporter) ReportFeatures(v uint16)                                  {}
+func (r *noopRoomSessionReporter) ReportRoomDuration(v uint32)                              {}
 func (r *noopRoomSessionReporter) WithParticipant(identity string) ParticipantReporter {
 	return &noopParticipantReporter{}
 }
@@ -126,6 +127,9 @@ func (r *noopParticipantSessionReporter) ReportStartTime(v time.Time)           
 func (r *noopParticipantSessionReporter) ReportEndTime(v time.Time)                       {}
 func (r *noopParticipantSessionReporter) ReportDuration(v uint16)                         {}
 func (r *noopParticipantSessionReporter) ReportDurationMinutes(v uint8)                   {}
+func (r *noopParticipantSessionReporter) ReportKind(v string)                             {}
+func (r *noopParticipantSessionReporter) ReportName(v string)                             {}
+func (r *noopParticipantSessionReporter) ReportFeatures(v uint16)                         {}
 func (r *noopParticipantSessionReporter) WithTrack(id string) TrackReporter {
 	return &noopTrackReporter{}
 }

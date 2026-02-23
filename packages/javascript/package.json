@@ -1,6 +1,6 @@
 {
   "name": "@livekit/protocol",
-  "version": "1.43.4",
+  "version": "1.44.0",
   "description": "",
   "type": "module",
   "require": "dist/index.cjs",
@@ -38,5 +38,8 @@
   },
   "dependencies": {
     "@bufbuild/protobuf": "^1.10.0"
+  },
+  "repository": {
+    "url": "https://github.com/livekit/protocol"
   }
 }

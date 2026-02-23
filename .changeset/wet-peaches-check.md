@@ -2,4 +2,4 @@
 "@livekit/protocol": patch
 ---
 
-update observability codegen
+Sync schema versions

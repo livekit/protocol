@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -1281,7 +1282,8 @@ func (x *UpdateIngressRequest) GetEnabled() bool {
 }
 
 type ListIngressRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	PageToken *TokenPagination       `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	// when blank, lists all ingress endpoints
 	RoomName      string `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`    // (optional, filter by room name)
 	IngressId     string `protobuf:"bytes,2,opt,name=ingress_id,json=ingressId,proto3" json:"ingress_id,omitempty"` // (optional, filter by ingress ID)
@@ -1319,6 +1321,13 @@ func (*ListIngressRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_ingress_proto_rawDescGZIP(), []int{10}
 }
 
+func (x *ListIngressRequest) GetPageToken() *TokenPagination {
+	if x != nil {
+		return x.PageToken
+	}
+	return nil
+}
+
 func (x *ListIngressRequest) GetRoomName() string {
 	if x != nil {
 		return x.RoomName
@@ -1335,7 +1344,8 @@ func (x *ListIngressRequest) GetIngressId() string {
 
 type ListIngressResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*IngressInfo         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	NextPageToken *TokenPagination       `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	Items         []*IngressInfo         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"` // next field id: 3
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1368,6 +1378,13 @@ func (x *ListIngressResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use ListIngressResponse.ProtoReflect.Descriptor instead.
 func (*ListIngressResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_ingress_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ListIngressResponse) GetNextPageToken() *TokenPagination {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return nil
 }
 
 func (x *ListIngressResponse) GetItems() []*IngressInfo {
@@ -1425,17 +1442,17 @@ var File_livekit_ingress_proto protoreflect.FileDescriptor
 
 const file_livekit_ingress_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_ingress.proto\x12\alivekit\x1a\x14livekit_models.proto\"\xb1\x04\n" +
+	"\x15livekit_ingress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xdf\x04\n" +
 	"\x14CreateIngressRequest\x124\n" +
 	"\n" +
 	"input_type\x18\x01 \x01(\x0e2\x15.livekit.IngressInputR\tinputType\x12\x10\n" +
 	"\x03url\x18\t \x01(\tR\x03url\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\x05 \x01(\tR\x0fparticipantName\x121\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12/\n" +
+	"\x10participant_name\x18\x05 \x01(\tB\x04\x88\xec,\x01R\x0fparticipantName\x12Y\n" +
 	"\x14participant_metadata\x18\n" +
-	" \x01(\tR\x13participantMetadata\x121\n" +
+	" \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x121\n" +
 	"\x12bypass_transcoding\x18\b \x01(\bB\x02\x18\x01R\x11bypassTranscoding\x122\n" +
 	"\x12enable_transcoding\x18\v \x01(\bH\x00R\x11enableTranscoding\x88\x01\x01\x122\n" +
 	"\x05audio\x18\x06 \x01(\v2\x1c.livekit.IngressAudioOptionsR\x05audio\x122\n" +
@@ -1468,7 +1485,7 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"videoCodec\x12\x1d\n" +
 	"\n" +
 	"frame_rate\x18\x02 \x01(\x01R\tframeRate\x12+\n" +
-	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xaf\x05\n" +
+	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xdd\x05\n" +
 	"\vIngressInfo\x12\x1d\n" +
 	"\n" +
 	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x12\n" +
@@ -1483,10 +1500,10 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x05audio\x18\x06 \x01(\v2\x1c.livekit.IngressAudioOptionsR\x05audio\x122\n" +
 	"\x05video\x18\a \x01(\v2\x1c.livekit.IngressVideoOptionsR\x05video\x12\x1b\n" +
 	"\troom_name\x18\b \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\t \x01(\tR\x13participantIdentity\x12)\n" +
+	"\x14participant_identity\x18\t \x01(\tR\x13participantIdentity\x12/\n" +
 	"\x10participant_name\x18\n" +
-	" \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\x0e \x01(\tR\x13participantMetadata\x12\x1a\n" +
+	" \x01(\tB\x04\x88\xec,\x01R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\x0e \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x1a\n" +
 	"\breusable\x18\v \x01(\bR\breusable\x12+\n" +
 	"\x05state\x18\f \x01(\v2\x15.livekit.IngressStateR\x05state\x12\x1d\n" +
 	"\aenabled\x18\x10 \x01(\bH\x01R\aenabled\x88\x01\x01B\x15\n" +
@@ -1525,15 +1542,15 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x0faverage_bitrate\x18\x02 \x01(\rR\x0eaverageBitrate\x12\x1a\n" +
 	"\bchannels\x18\x03 \x01(\rR\bchannels\x12\x1f\n" +
 	"\vsample_rate\x18\x04 \x01(\rR\n" +
-	"sampleRate\"\xa4\x04\n" +
+	"sampleRate\"\xd2\x04\n" +
 	"\x14UpdateIngressRequest\x12\x1d\n" +
 	"\n" +
 	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12)\n" +
-	"\x10participant_name\x18\x05 \x01(\tR\x0fparticipantName\x121\n" +
-	"\x14participant_metadata\x18\t \x01(\tR\x13participantMetadata\x126\n" +
+	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12/\n" +
+	"\x10participant_name\x18\x05 \x01(\tB\x04\x88\xec,\x01R\x0fparticipantName\x12Y\n" +
+	"\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x126\n" +
 	"\x12bypass_transcoding\x18\b \x01(\bB\x02\x18\x01H\x00R\x11bypassTranscoding\x88\x01\x01\x122\n" +
 	"\x12enable_transcoding\x18\n" +
 	" \x01(\bH\x01R\x11enableTranscoding\x88\x01\x01\x122\n" +
@@ -1543,12 +1560,15 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x13_bypass_transcodingB\x15\n" +
 	"\x13_enable_transcodingB\n" +
 	"\n" +
-	"\b_enabled\"P\n" +
-	"\x12ListIngressRequest\x12\x1b\n" +
+	"\b_enabled\"\x89\x01\n" +
+	"\x12ListIngressRequest\x127\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1d\n" +
 	"\n" +
-	"ingress_id\x18\x02 \x01(\tR\tingressId\"A\n" +
-	"\x13ListIngressResponse\x12*\n" +
+	"ingress_id\x18\x02 \x01(\tR\tingressId\"\x83\x01\n" +
+	"\x13ListIngressResponse\x12@\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.IngressInfoR\x05items\"5\n" +
 	"\x14DeleteIngressRequest\x12\x1d\n" +
 	"\n" +
@@ -1616,6 +1636,7 @@ var file_livekit_ingress_proto_goTypes = []any{
 	(VideoCodec)(0),                     // 19: livekit.VideoCodec
 	(*VideoLayer)(nil),                  // 20: livekit.VideoLayer
 	(*TrackInfo)(nil),                   // 21: livekit.TrackInfo
+	(*TokenPagination)(nil),             // 22: livekit.TokenPagination
 }
 var file_livekit_ingress_proto_depIdxs = []int32{
 	0,  // 0: livekit.CreateIngressRequest.input_type:type_name -> livekit.IngressInput
@@ -1640,20 +1661,22 @@ var file_livekit_ingress_proto_depIdxs = []int32{
 	21, // 19: livekit.IngressState.tracks:type_name -> livekit.TrackInfo
 	5,  // 20: livekit.UpdateIngressRequest.audio:type_name -> livekit.IngressAudioOptions
 	6,  // 21: livekit.UpdateIngressRequest.video:type_name -> livekit.IngressVideoOptions
-	9,  // 22: livekit.ListIngressResponse.items:type_name -> livekit.IngressInfo
-	4,  // 23: livekit.Ingress.CreateIngress:input_type -> livekit.CreateIngressRequest
-	13, // 24: livekit.Ingress.UpdateIngress:input_type -> livekit.UpdateIngressRequest
-	14, // 25: livekit.Ingress.ListIngress:input_type -> livekit.ListIngressRequest
-	16, // 26: livekit.Ingress.DeleteIngress:input_type -> livekit.DeleteIngressRequest
-	9,  // 27: livekit.Ingress.CreateIngress:output_type -> livekit.IngressInfo
-	9,  // 28: livekit.Ingress.UpdateIngress:output_type -> livekit.IngressInfo
-	15, // 29: livekit.Ingress.ListIngress:output_type -> livekit.ListIngressResponse
-	9,  // 30: livekit.Ingress.DeleteIngress:output_type -> livekit.IngressInfo
-	27, // [27:31] is the sub-list for method output_type
-	23, // [23:27] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	22, // 22: livekit.ListIngressRequest.page_token:type_name -> livekit.TokenPagination
+	22, // 23: livekit.ListIngressResponse.next_page_token:type_name -> livekit.TokenPagination
+	9,  // 24: livekit.ListIngressResponse.items:type_name -> livekit.IngressInfo
+	4,  // 25: livekit.Ingress.CreateIngress:input_type -> livekit.CreateIngressRequest
+	13, // 26: livekit.Ingress.UpdateIngress:input_type -> livekit.UpdateIngressRequest
+	14, // 27: livekit.Ingress.ListIngress:input_type -> livekit.ListIngressRequest
+	16, // 28: livekit.Ingress.DeleteIngress:input_type -> livekit.DeleteIngressRequest
+	9,  // 29: livekit.Ingress.CreateIngress:output_type -> livekit.IngressInfo
+	9,  // 30: livekit.Ingress.UpdateIngress:output_type -> livekit.IngressInfo
+	15, // 31: livekit.Ingress.ListIngress:output_type -> livekit.ListIngressResponse
+	9,  // 32: livekit.Ingress.DeleteIngress:output_type -> livekit.IngressInfo
+	29, // [29:33] is the sub-list for method output_type
+	25, // [25:29] is the sub-list for method input_type
+	25, // [25:25] is the sub-list for extension type_name
+	25, // [25:25] is the sub-list for extension extendee
+	0,  // [0:25] is the sub-list for field type_name
 }
 
 func init() { file_livekit_ingress_proto_init() }

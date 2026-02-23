@@ -1,0 +1,78 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit.agent;
+
+option go_package = "github.com/livekit/protocol/livekit/agent";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "agent/livekit_agent_session.proto";
+
+// Request to send a text message to an agent.
+message TextMessageRequest {
+  string text = 1;
+  string message_id = 2;
+  string session_id = 3;
+  string agent_name = 4;
+  string metadata = 5;
+  optional AgentSessionState session_state = 6;
+}
+
+// Response to a text message request, multiple responses may be sent for a single request until it is complete.
+message TextMessageResponse {
+  string message_id = 1;
+  string session_id = 2;
+  oneof event {
+    ChatMessage message = 3;
+    FunctionCall function_call = 4;
+    FunctionCallOutput function_call_output = 5;
+    AgentHandoff agent_handoff = 6;
+    TextMessageComplete complete = 7;
+  }
+}
+
+// Indicates the text message session is complete.
+message TextMessageComplete {
+  oneof result {
+    AgentSessionState session_state = 1;
+    TextMessageError error = 2;
+  }
+}
+
+message AgentSessionState {
+  uint64 version = 1;
+  oneof data {
+    bytes snapshot = 2;
+    bytes delta = 3;
+  }
+}
+
+enum TextMessageErrorCode {
+  // Unexpected internal error
+  INTERNAL_ERROR = 0;
+  // Session state not found in cache or version mismatch
+  SESSION_STATE_NOT_FOUND = 1;
+  // An exception was raised inside the user's text handler
+  TEXT_HANDLER_ERROR = 2;
+  // The worker process exited before the text session completed
+  PROCESS_CLOSED = 3;
+}
+
+message TextMessageError {
+  string message = 1;
+  TextMessageErrorCode code = 2;
+}

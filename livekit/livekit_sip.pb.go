@@ -3057,8 +3057,10 @@ type SIPDispatchRuleInfo struct {
 	Rule              *SIPDispatchRule       `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`
 	TrunkIds          []string               `protobuf:"bytes,3,rep,name=trunk_ids,json=trunkIds,proto3" json:"trunk_ids,omitempty"`
 	HidePhoneNumber   bool                   `protobuf:"varint,4,opt,name=hide_phone_number,json=hidePhoneNumber,proto3" json:"hide_phone_number,omitempty"`
-	// Dispatch Rule will only accept a call made to these numbers (if set).
+	// Dispatch Rule will only accept a call made from these numbers (if set).
 	InboundNumbers []string `protobuf:"bytes,7,rep,name=inbound_numbers,json=inboundNumbers,proto3" json:"inbound_numbers,omitempty"`
+	// Dispatch Rule will only accept a call made to these numbers (if set).
+	Numbers []string `protobuf:"bytes,13,rep,name=numbers,proto3" json:"numbers,omitempty"`
 	// Human-readable name for the Dispatch Rule.
 	Name string `protobuf:"bytes,5,opt,name=name,proto3" json:"name,omitempty"`
 	// User-defined metadata for the Dispatch Rule.
@@ -3072,7 +3074,7 @@ type SIPDispatchRuleInfo struct {
 	// RoomConfiguration to use if the participant initiates the room
 	RoomConfig      *RoomConfiguration `protobuf:"bytes,10,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
 	KrispEnabled    bool               `protobuf:"varint,11,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
-	MediaEncryption SIPMediaEncryption `protobuf:"varint,12,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"` // NEXT ID: 13
+	MediaEncryption SIPMediaEncryption `protobuf:"varint,12,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"` // NEXT ID: 14
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -3138,6 +3140,13 @@ func (x *SIPDispatchRuleInfo) GetHidePhoneNumber() bool {
 func (x *SIPDispatchRuleInfo) GetInboundNumbers() []string {
 	if x != nil {
 		return x.InboundNumbers
+	}
+	return nil
+}
+
+func (x *SIPDispatchRuleInfo) GetNumbers() []string {
+	if x != nil {
+		return x.Numbers
 	}
 	return nil
 }
@@ -3962,6 +3971,7 @@ type SIPCallInfo struct {
 	PcapFileLink     string           `protobuf:"bytes,25,opt,name=pcap_file_link,json=pcapFileLink,proto3" json:"pcap_file_link,omitempty"`
 	CallContext      []*anypb.Any     `protobuf:"bytes,26,rep,name=call_context,json=callContext,proto3" json:"call_context,omitempty"`
 	ProviderInfo     *ProviderInfo    `protobuf:"bytes,27,opt,name=provider_info,json=providerInfo,proto3" json:"provider_info,omitempty"`
+	SipCallId        string           `protobuf:"bytes,28,opt,name=sip_call_id,json=sipCallId,proto3" json:"sip_call_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -4186,6 +4196,13 @@ func (x *SIPCallInfo) GetProviderInfo() *ProviderInfo {
 		return x.ProviderInfo
 	}
 	return nil
+}
+
+func (x *SIPCallInfo) GetSipCallId() string {
+	if x != nil {
+		return x.SipCallId
+	}
+	return ""
 }
 
 type SIPTransferInfo struct {
@@ -4431,17 +4448,17 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x11livekit_sip.proto\x12\alivekit\x1a\x19google/protobuf/any.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto\x1a\x14logger/options.proto\"O\n" +
 	"\tSIPStatus\x12*\n" +
 	"\x04code\x18\x01 \x01(\x0e2\x16.livekit.SIPStatusCodeR\x04code\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\"\xa5\x05\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\"\x9d\x04\n" +
 	"\x15CreateSIPTrunkRequest\x12+\n" +
 	"\x11inbound_addresses\x18\x01 \x03(\tR\x10inboundAddresses\x12)\n" +
 	"\x10outbound_address\x18\x02 \x01(\tR\x0foutboundAddress\x12'\n" +
 	"\x0foutbound_number\x18\x03 \x01(\tR\x0eoutboundNumber\x126\n" +
 	"\x15inbound_numbers_regex\x18\x04 \x03(\tB\x02\x18\x01R\x13inboundNumbersRegex\x12'\n" +
-	"\x0finbound_numbers\x18\t \x03(\tR\x0einboundNumbers\x12Q\n" +
-	"\x10inbound_username\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0finboundUsername\x12Q\n" +
-	"\x10inbound_password\x18\x06 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0finboundPassword\x12S\n" +
-	"\x11outbound_username\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x10outboundUsername\x12S\n" +
-	"\x11outbound_password\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x10outboundPassword\x12\x12\n" +
+	"\x0finbound_numbers\x18\t \x03(\tR\x0einboundNumbers\x12/\n" +
+	"\x10inbound_username\x18\x05 \x01(\tB\x04\x88\xec,\x01R\x0finboundUsername\x12/\n" +
+	"\x10inbound_password\x18\x06 \x01(\tB\x04\x88\xec,\x01R\x0finboundPassword\x121\n" +
+	"\x11outbound_username\x18\a \x01(\tB\x04\x88\xec,\x01R\x10outboundUsername\x121\n" +
+	"\x11outbound_password\x18\b \x01(\tB\x04\x88\xec,\x01R\x10outboundPassword\x12\x12\n" +
 	"\x04name\x18\n" +
 	" \x01(\tR\x04name\x12B\n" +
 	"\bmetadata\x18\v \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata:\x02\x18\x01\"\x88\x01\n" +
@@ -4449,7 +4466,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
 	"\x04type\x18\x03 \x01(\x0e2\x15.livekit.ProviderTypeR\x04type\x12)\n" +
-	"\x10prevent_transfer\x18\x04 \x01(\bR\x0fpreventTransfer\"\xee\x06\n" +
+	"\x10prevent_transfer\x18\x04 \x01(\bR\x0fpreventTransfer\"\xe6\x05\n" +
 	"\fSIPTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x123\n" +
@@ -4460,11 +4477,11 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\ttransport\x18\r \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x126\n" +
 	"\x15inbound_numbers_regex\x18\x05 \x03(\tB\x02\x18\x01R\x13inboundNumbersRegex\x12'\n" +
 	"\x0finbound_numbers\x18\n" +
-	" \x03(\tR\x0einboundNumbers\x12Q\n" +
-	"\x10inbound_username\x18\x06 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0finboundUsername\x12Q\n" +
-	"\x10inbound_password\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0finboundPassword\x12S\n" +
-	"\x11outbound_username\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x10outboundUsername\x12S\n" +
-	"\x11outbound_password\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x10outboundPassword\x12\x12\n" +
+	" \x03(\tR\x0einboundNumbers\x12/\n" +
+	"\x10inbound_username\x18\x06 \x01(\tB\x04\x88\xec,\x01R\x0finboundUsername\x12/\n" +
+	"\x10inbound_password\x18\a \x01(\tB\x04\x88\xec,\x01R\x0finboundPassword\x121\n" +
+	"\x11outbound_username\x18\b \x01(\tB\x04\x88\xec,\x01R\x10outboundUsername\x121\n" +
+	"\x11outbound_password\x18\t \x01(\tB\x04\x88\xec,\x01R\x10outboundPassword\x12\x12\n" +
 	"\x04name\x18\v \x01(\tR\x04name\x12B\n" +
 	"\bmetadata\x18\f \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\"D\n" +
 	"\tTrunkKind\x12\x10\n" +
@@ -4478,7 +4495,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x128\n" +
 	"\areplace\x18\x02 \x01(\v2\x1c.livekit.SIPInboundTrunkInfoH\x00R\areplace\x128\n" +
 	"\x06update\x18\x03 \x01(\v2\x1e.livekit.SIPInboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\xe4\t\n" +
+	"\x06action\"\xa0\t\n" +
 	"\x13SIPInboundTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x12\x12\n" +
@@ -4486,9 +4503,9 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\bmetadata\x18\x03 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12\x18\n" +
 	"\anumbers\x18\x04 \x03(\tR\anumbers\x12+\n" +
 	"\x11allowed_addresses\x18\x05 \x03(\tR\x10allowedAddresses\x12'\n" +
-	"\x0fallowed_numbers\x18\x06 \x03(\tR\x0eallowedNumbers\x12K\n" +
-	"\rauth_username\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthUsername\x12K\n" +
-	"\rauth_password\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12k\n" +
+	"\x0fallowed_numbers\x18\x06 \x03(\tR\x0eallowedNumbers\x12)\n" +
+	"\rauth_username\x18\a \x01(\tB\x04\x88\xec,\x01R\fauthUsername\x12)\n" +
+	"\rauth_password\x18\b \x01(\tB\x04\x88\xec,\x01R\fauthPassword\x12k\n" +
 	"\aheaders\x18\t \x03(\v2).livekit.SIPInboundTrunkInfo.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12i\n" +
 	"\x15headers_to_attributes\x18\n" +
 	" \x03(\v25.livekit.SIPInboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12i\n" +
@@ -4506,13 +4523,13 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe8\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa4\x04\n" +
 	"\x15SIPInboundTrunkUpdate\x12-\n" +
 	"\anumbers\x18\x01 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12@\n" +
 	"\x11allowed_addresses\x18\x02 \x01(\v2\x13.livekit.ListUpdateR\x10allowedAddresses\x12<\n" +
-	"\x0fallowed_numbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\x0eallowedNumbers\x12P\n" +
-	"\rauth_username\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x00R\fauthUsername\x88\x01\x01\x12P\n" +
-	"\rauth_password\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x01R\fauthPassword\x88\x01\x01\x12\x17\n" +
+	"\x0fallowed_numbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\x0eallowedNumbers\x12.\n" +
+	"\rauth_username\x18\x04 \x01(\tB\x04\x88\xec,\x01H\x00R\fauthUsername\x88\x01\x01\x12.\n" +
+	"\rauth_password\x18\x05 \x01(\tB\x04\x88\xec,\x01H\x01R\fauthPassword\x88\x01\x01\x12\x17\n" +
 	"\x04name\x18\x06 \x01(\tH\x02R\x04name\x88\x01\x01\x12G\n" +
 	"\bmetadata\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x03R\bmetadata\x88\x01\x01\x12K\n" +
 	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x04R\x0fmediaEncryption\x88\x01\x01B\x10\n" +
@@ -4528,7 +4545,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x129\n" +
 	"\areplace\x18\x02 \x01(\v2\x1d.livekit.SIPOutboundTrunkInfoH\x00R\areplace\x129\n" +
 	"\x06update\x18\x03 \x01(\v2\x1f.livekit.SIPOutboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\xe2\b\n" +
+	"\x06action\"\x9e\b\n" +
 	"\x14SIPOutboundTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x12\x12\n" +
@@ -4537,9 +4554,9 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12/\n" +
 	"\x13destination_country\x18\x0e \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x05 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x18\n" +
-	"\anumbers\x18\x06 \x03(\tR\anumbers\x12K\n" +
-	"\rauth_username\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthUsername\x12K\n" +
-	"\rauth_password\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12l\n" +
+	"\anumbers\x18\x06 \x03(\tR\anumbers\x12)\n" +
+	"\rauth_username\x18\a \x01(\tB\x04\x88\xec,\x01R\fauthUsername\x12)\n" +
+	"\rauth_password\x18\b \x01(\tB\x04\x88\xec,\x01R\fauthPassword\x12l\n" +
 	"\aheaders\x18\t \x03(\v2*.livekit.SIPOutboundTrunkInfo.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12j\n" +
 	"\x15headers_to_attributes\x18\n" +
 	" \x03(\v26.livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12j\n" +
@@ -4554,14 +4571,14 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xaa\x05\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe6\x04\n" +
 	"\x16SIPOutboundTrunkUpdate\x12\x1d\n" +
 	"\aaddress\x18\x01 \x01(\tH\x00R\aaddress\x88\x01\x01\x128\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportH\x01R\ttransport\x88\x01\x01\x124\n" +
 	"\x13destination_country\x18\t \x01(\tH\x02R\x12destinationCountry\x88\x01\x01\x12-\n" +
-	"\anumbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12P\n" +
-	"\rauth_username\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x03R\fauthUsername\x88\x01\x01\x12P\n" +
-	"\rauth_password\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
+	"\anumbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12.\n" +
+	"\rauth_username\x18\x04 \x01(\tB\x04\x88\xec,\x01H\x03R\fauthUsername\x88\x01\x01\x12.\n" +
+	"\rauth_password\x18\x05 \x01(\tB\x04\x88\xec,\x01H\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
 	"\x04name\x18\x06 \x01(\tH\x05R\x04name\x88\x01\x01\x12G\n" +
 	"\bmetadata\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x06R\bmetadata\x88\x01\x01\x12K\n" +
 	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\aR\x0fmediaEncryption\x88\x01\x01B\n" +
@@ -4644,13 +4661,14 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\x128\n" +
 	"\areplace\x18\x02 \x01(\v2\x1c.livekit.SIPDispatchRuleInfoH\x00R\areplace\x128\n" +
 	"\x06update\x18\x03 \x01(\v2\x1e.livekit.SIPDispatchRuleUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\xbe\x05\n" +
+	"\x06action\"\xd8\x05\n" +
 	"\x13SIPDispatchRuleInfo\x12/\n" +
 	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\x12,\n" +
 	"\x04rule\x18\x02 \x01(\v2\x18.livekit.SIPDispatchRuleR\x04rule\x12\x1b\n" +
 	"\ttrunk_ids\x18\x03 \x03(\tR\btrunkIds\x12*\n" +
 	"\x11hide_phone_number\x18\x04 \x01(\bR\x0fhidePhoneNumber\x12'\n" +
-	"\x0finbound_numbers\x18\a \x03(\tR\x0einboundNumbers\x12\x12\n" +
+	"\x0finbound_numbers\x18\a \x03(\tR\x0einboundNumbers\x12\x18\n" +
+	"\anumbers\x18\r \x03(\tR\anumbers\x12\x12\n" +
 	"\x04name\x18\x05 \x01(\tR\x04name\x12B\n" +
 	"\bmetadata\x18\x06 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12t\n" +
 	"\n" +
@@ -4688,13 +4706,13 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x1bListSIPDispatchRuleResponse\x122\n" +
 	"\x05items\x18\x01 \x03(\v2\x1c.livekit.SIPDispatchRuleInfoR\x05items\"O\n" +
 	"\x1cDeleteSIPDispatchRuleRequest\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\x91\x05\n" +
+	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\xcd\x04\n" +
 	"\x11SIPOutboundConfig\x12\x1a\n" +
 	"\bhostname\x18\x01 \x01(\tR\bhostname\x12/\n" +
 	"\x13destination_country\x18\a \x01(\tR\x12destinationCountry\x123\n" +
-	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12K\n" +
-	"\rauth_username\x18\x03 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthUsername\x12K\n" +
-	"\rauth_password\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\fauthPassword\x12g\n" +
+	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12)\n" +
+	"\rauth_username\x18\x03 \x01(\tB\x04\x88\xec,\x01R\fauthUsername\x12)\n" +
+	"\rauth_password\x18\x04 \x01(\tB\x04\x88\xec,\x01R\fauthPassword\x12g\n" +
 	"\x15headers_to_attributes\x18\x05 \x03(\v23.livekit.SIPOutboundConfig.HeadersToAttributesEntryR\x13headersToAttributes\x12g\n" +
 	"\x15attributes_to_headers\x18\x06 \x03(\v23.livekit.SIPOutboundConfig.AttributesToHeadersEntryR\x13attributesToHeaders\x1aF\n" +
 	"\x18HeadersToAttributesEntry\x12\x10\n" +
@@ -4752,7 +4770,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa6\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc6\n" +
 	"\n" +
 	"\vSIPCallInfo\x12\x17\n" +
 	"\acall_id\x18\x01 \x01(\tR\x06callId\x12\x19\n" +
@@ -4786,7 +4804,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x10media_encryption\x18\x15 \x01(\tR\x0fmediaEncryption\x12$\n" +
 	"\x0epcap_file_link\x18\x19 \x01(\tR\fpcapFileLink\x127\n" +
 	"\fcall_context\x18\x1a \x03(\v2\x14.google.protobuf.AnyR\vcallContext\x12:\n" +
-	"\rprovider_info\x18\x1b \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x1aH\n" +
+	"\rprovider_info\x18\x1b \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x12\x1e\n" +
+	"\vsip_call_id\x18\x1c \x01(\tR\tsipCallId\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xff\x02\n" +

@@ -130,6 +130,13 @@ func WithDefaultClientOptions(logger logger.Logger, extra ...psrpc.ClientOption)
 	return psrpc.WithClientOptions(opts...)
 }
 
+func WithPropagateRequestTimeout(ctx context.Context) psrpc.RequestOption {
+	if deadline, ok := ctx.Deadline(); ok {
+		return psrpc.WithRequestTimeout(time.Until(deadline))
+	}
+	return func(ro *psrpc.RequestOpts) {}
+}
+
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -generate
 
 type TypedSignalClient = SignalClient[livekit.NodeID]

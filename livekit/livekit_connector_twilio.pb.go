@@ -93,6 +93,7 @@ type ConnectTwilioCallRequest struct {
 	// Optional agents to dispatch the call to
 	Agents []*RoomAgentDispatch `protobuf:"bytes,3,rep,name=agents,proto3" json:"agents,omitempty"`
 	// Optional identity of the participant in LiveKit room
+	// This is used for logging purposes, so it is advised to not put PII in this field.
 	ParticipantIdentity string `protobuf:"bytes,4,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	// Optional name of the participant in LiveKit room
 	ParticipantName string `protobuf:"bytes,5,opt,name=participant_name,json=participantName,proto3" json:"participant_name,omitempty"`

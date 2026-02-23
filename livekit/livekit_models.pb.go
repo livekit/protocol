@@ -1776,8 +1776,10 @@ type ParticipantPermission struct {
 	Agent bool `protobuf:"varint,11,opt,name=agent,proto3" json:"agent,omitempty"`
 	// if a participant can subscribe to metrics
 	CanSubscribeMetrics bool `protobuf:"varint,12,opt,name=can_subscribe_metrics,json=canSubscribeMetrics,proto3" json:"can_subscribe_metrics,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// if a participant can manage an agent session via RemoteSession (control and access state)
+	CanManageAgentSession bool `protobuf:"varint,13,opt,name=can_manage_agent_session,json=canManageAgentSession,proto3" json:"can_manage_agent_session,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *ParticipantPermission) Reset() {
@@ -1875,6 +1877,13 @@ func (x *ParticipantPermission) GetCanSubscribeMetrics() bool {
 	return false
 }
 
+func (x *ParticipantPermission) GetCanManageAgentSession() bool {
+	if x != nil {
+		return x.CanManageAgentSession
+	}
+	return false
+}
+
 type ParticipantInfo struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	Sid      string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
@@ -1898,8 +1907,10 @@ type ParticipantInfo struct {
 	DisconnectReason DisconnectReason             `protobuf:"varint,16,opt,name=disconnect_reason,json=disconnectReason,proto3,enum=livekit.DisconnectReason" json:"disconnect_reason,omitempty"`
 	KindDetails      []ParticipantInfo_KindDetail `protobuf:"varint,18,rep,packed,name=kind_details,json=kindDetails,proto3,enum=livekit.ParticipantInfo_KindDetail" json:"kind_details,omitempty"`
 	DataTracks       []*DataTrackInfo             `protobuf:"bytes,19,rep,name=data_tracks,json=dataTracks,proto3" json:"data_tracks,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// protocol version used for client feature compatibility
+	ClientProtocol int32 `protobuf:"varint,20,opt,name=client_protocol,json=clientProtocol,proto3" json:"client_protocol,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ParticipantInfo) Reset() {
@@ -2049,6 +2060,13 @@ func (x *ParticipantInfo) GetDataTracks() []*DataTrackInfo {
 		return x.DataTracks
 	}
 	return nil
+}
+
+func (x *ParticipantInfo) GetClientProtocol() int32 {
+	if x != nil {
+		return x.ClientProtocol
+	}
+	return 0
 }
 
 type Encryption struct {
@@ -3745,6 +3763,8 @@ type RpcRequest struct {
 	Payload           string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
 	ResponseTimeoutMs uint32                 `protobuf:"varint,4,opt,name=response_timeout_ms,json=responseTimeoutMs,proto3" json:"response_timeout_ms,omitempty"`
 	Version           uint32                 `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
+	// Compressed payload data. When set, this field is used instead of `payload`.
+	CompressedPayload []byte `protobuf:"bytes,6,opt,name=compressed_payload,json=compressedPayload,proto3" json:"compressed_payload,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3814,6 +3834,13 @@ func (x *RpcRequest) GetVersion() uint32 {
 	return 0
 }
 
+func (x *RpcRequest) GetCompressedPayload() []byte {
+	if x != nil {
+		return x.CompressedPayload
+	}
+	return nil
+}
+
 type RpcAck struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -3865,6 +3892,7 @@ type RpcResponse struct {
 	//
 	//	*RpcResponse_Payload
 	//	*RpcResponse_Error
+	//	*RpcResponse_CompressedPayload
 	Value         isRpcResponse_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3932,6 +3960,15 @@ func (x *RpcResponse) GetError() *RpcError {
 	return nil
 }
 
+func (x *RpcResponse) GetCompressedPayload() []byte {
+	if x != nil {
+		if x, ok := x.Value.(*RpcResponse_CompressedPayload); ok {
+			return x.CompressedPayload
+		}
+	}
+	return nil
+}
+
 type isRpcResponse_Value interface {
 	isRpcResponse_Value()
 }
@@ -3944,9 +3981,16 @@ type RpcResponse_Error struct {
 	Error *RpcError `protobuf:"bytes,3,opt,name=error,proto3,oneof"`
 }
 
+type RpcResponse_CompressedPayload struct {
+	// Compressed payload data. When set, this field is used instead of `payload`.
+	CompressedPayload []byte `protobuf:"bytes,4,opt,name=compressed_payload,json=compressedPayload,proto3,oneof"`
+}
+
 func (*RpcResponse_Payload) isRpcResponse_Value() {}
 
 func (*RpcResponse_Error) isRpcResponse_Value() {}
+
+func (*RpcResponse_CompressedPayload) isRpcResponse_Value() {}
 
 type RpcError struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -4171,9 +4215,11 @@ type ClientInfo struct {
 	Network string `protobuf:"bytes,10,opt,name=network,proto3" json:"network,omitempty"`
 	// comma separated list of additional LiveKit SDKs in use of this client, with versions
 	// e.g. "components-js:1.2.3,track-processors-js:1.2.3"
-	OtherSdks     string `protobuf:"bytes,11,opt,name=other_sdks,json=otherSdks,proto3" json:"other_sdks,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	OtherSdks string `protobuf:"bytes,11,opt,name=other_sdks,json=otherSdks,proto3" json:"other_sdks,omitempty"`
+	// client protocol version
+	ClientProtocol int32 `protobuf:"varint,12,opt,name=client_protocol,json=clientProtocol,proto3" json:"client_protocol,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ClientInfo) Reset() {
@@ -4281,6 +4327,13 @@ func (x *ClientInfo) GetOtherSdks() string {
 		return x.OtherSdks
 	}
 	return ""
+}
+
+func (x *ClientInfo) GetClientProtocol() int32 {
+	if x != nil {
+		return x.ClientProtocol
+	}
+	return 0
 }
 
 // server provided client configuration
@@ -6046,7 +6099,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fPlayoutDelay\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x10\n" +
 	"\x03min\x18\x02 \x01(\rR\x03min\x12\x10\n" +
-	"\x03max\x18\x03 \x01(\rR\x03max\"\x83\x03\n" +
+	"\x03max\x18\x03 \x01(\rR\x03max\"\xbc\x03\n" +
 	"\x15ParticipantPermission\x12#\n" +
 	"\rcan_subscribe\x18\x01 \x01(\bR\fcanSubscribe\x12\x1f\n" +
 	"\vcan_publish\x18\x02 \x01(\bR\n" +
@@ -6058,7 +6111,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13can_update_metadata\x18\n" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
-	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\"\x8b\t\n" +
+	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\x127\n" +
+	"\x18can_manage_agent_session\x18\r \x01(\bR\x15canManageAgentSession\"\xb4\t\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -6083,7 +6137,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x11disconnect_reason\x18\x10 \x01(\x0e2\x19.livekit.DisconnectReasonR\x10disconnectReason\x12F\n" +
 	"\fkind_details\x18\x12 \x03(\x0e2#.livekit.ParticipantInfo.KindDetailR\vkindDetails\x127\n" +
 	"\vdata_tracks\x18\x13 \x03(\v2\x16.livekit.DataTrackInfoR\n" +
-	"dataTracks\x1a=\n" +
+	"dataTracks\x12'\n" +
+	"\x0fclient_protocol\x18\x14 \x01(\x05R\x0eclientProtocol\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\">\n" +
@@ -6270,22 +6325,24 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12\x18\n" +
 	"\adeleted\x18\x05 \x01(\bR\adeleted\x12\x1c\n" +
 	"\tgenerated\x18\x06 \x01(\bR\tgeneratedB\x11\n" +
-	"\x0f_edit_timestamp\"\x98\x01\n" +
+	"\x0f_edit_timestamp\"\xc7\x01\n" +
 	"\n" +
 	"RpcRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06method\x18\x02 \x01(\tR\x06method\x12\x18\n" +
 	"\apayload\x18\x03 \x01(\tR\apayload\x12.\n" +
 	"\x13response_timeout_ms\x18\x04 \x01(\rR\x11responseTimeoutMs\x12\x18\n" +
-	"\aversion\x18\x05 \x01(\rR\aversion\"'\n" +
+	"\aversion\x18\x05 \x01(\rR\aversion\x12-\n" +
+	"\x12compressed_payload\x18\x06 \x01(\fR\x11compressedPayload\"'\n" +
 	"\x06RpcAck\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\"|\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\"\xad\x01\n" +
 	"\vRpcResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
 	"\apayload\x18\x02 \x01(\tH\x00R\apayload\x12)\n" +
-	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05errorB\a\n" +
+	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05error\x12/\n" +
+	"\x12compressed_payload\x18\x04 \x01(\fH\x00R\x11compressedPayloadB\a\n" +
 	"\x05value\"L\n" +
 	"\bRpcError\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\rR\x04code\x12\x18\n" +
@@ -6307,7 +6364,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
 	"\aEdition\x12\f\n" +
 	"\bStandard\x10\x00\x12\t\n" +
-	"\x05Cloud\x10\x01\"\x8b\x04\n" +
+	"\x05Cloud\x10\x01\"\xb4\x04\n" +
 	"\n" +
 	"ClientInfo\x12)\n" +
 	"\x03sdk\x18\x01 \x01(\x0e2\x17.livekit.ClientInfo.SDKR\x03sdk\x12\x18\n" +
@@ -6323,7 +6380,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\anetwork\x18\n" +
 	" \x01(\tR\anetwork\x12\x1d\n" +
 	"\n" +
-	"other_sdks\x18\v \x01(\tR\totherSdks\"\xb3\x01\n" +
+	"other_sdks\x18\v \x01(\tR\totherSdks\x12'\n" +
+	"\x0fclient_protocol\x18\f \x01(\x05R\x0eclientProtocol\"\xb3\x01\n" +
 	"\x03SDK\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x06\n" +
 	"\x02JS\x10\x01\x12\t\n" +
@@ -6854,6 +6912,7 @@ func file_livekit_models_proto_init() {
 	file_livekit_models_proto_msgTypes[27].OneofWrappers = []any{
 		(*RpcResponse_Payload)(nil),
 		(*RpcResponse_Error)(nil),
+		(*RpcResponse_CompressedPayload)(nil),
 	}
 	file_livekit_models_proto_msgTypes[38].OneofWrappers = []any{
 		(*RTPForwarderState_Vp8Munger)(nil),
