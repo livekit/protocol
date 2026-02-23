@@ -26,7 +26,6 @@ type Reporter interface {
 	Telephony() telephonyobs.Reporter
 	Egress() egressobs.Reporter
 	Ingress() ingressobs.Reporter
-	GatewayMetrics() any // any is a placeholder for the gateway metrics type
 	TelephonyCall() telephonycallobs.Reporter
 	Storage() storageobs.Reporter
 	Close()
@@ -64,10 +63,6 @@ func (reporter) Egress() egressobs.Reporter {
 
 func (reporter) Ingress() ingressobs.Reporter {
 	return ingressobs.NewNoopReporter()
-}
-
-func (reporter) GatewayMetrics() any {
-	return nil
 }
 
 func (reporter) TelephonyCall() telephonycallobs.Reporter {
