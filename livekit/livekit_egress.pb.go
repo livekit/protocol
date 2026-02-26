@@ -2961,7 +2961,7 @@ type EgressInfo struct {
 	ImageResults      []*ImagesInfo       `protobuf:"bytes,20,rep,name=image_results,json=imageResults,proto3" json:"image_results,omitempty"`
 	ManifestLocation  string              `protobuf:"bytes,23,opt,name=manifest_location,json=manifestLocation,proto3" json:"manifest_location,omitempty"`
 	BackupStorageUsed bool                `protobuf:"varint,25,opt,name=backup_storage_used,json=backupStorageUsed,proto3" json:"backup_storage_used,omitempty"`
-	Retries           int32               `protobuf:"varint,27,opt,name=retries,proto3" json:"retries,omitempty"` // next ID: 28
+	RetryCount        int32               `protobuf:"varint,27,opt,name=retry_count,json=retryCount,proto3" json:"retry_count,omitempty"` // next ID: 28
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -3204,9 +3204,9 @@ func (x *EgressInfo) GetBackupStorageUsed() bool {
 	return false
 }
 
-func (x *EgressInfo) GetRetries() int32 {
+func (x *EgressInfo) GetRetryCount() int32 {
 	if x != nil {
-		return x.Retries
+		return x.RetryCount
 	}
 	return 0
 }
@@ -4104,7 +4104,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x12ListEgressResponse\x12)\n" +
 	"\x05items\x18\x01 \x03(\v2\x13.livekit.EgressInfoR\x05items\"0\n" +
 	"\x11StopEgressRequest\x12\x1b\n" +
-	"\tegress_id\x18\x01 \x01(\tR\begressId\"\xd1\t\n" +
+	"\tegress_id\x18\x01 \x01(\tR\begressId\"\xd8\t\n" +
 	"\n" +
 	"EgressInfo\x12\x1b\n" +
 	"\tegress_id\x18\x01 \x01(\tR\begressId\x12\x17\n" +
@@ -4136,8 +4136,9 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0fsegment_results\x18\x11 \x03(\v2\x15.livekit.SegmentsInfoR\x0esegmentResults\x128\n" +
 	"\rimage_results\x18\x14 \x03(\v2\x13.livekit.ImagesInfoR\fimageResults\x12+\n" +
 	"\x11manifest_location\x18\x17 \x01(\tR\x10manifestLocation\x12.\n" +
-	"\x13backup_storage_used\x18\x19 \x01(\bR\x11backupStorageUsed\x12\x18\n" +
-	"\aretries\x18\x1b \x01(\x05R\aretriesB\t\n" +
+	"\x13backup_storage_used\x18\x19 \x01(\bR\x11backupStorageUsed\x12\x1f\n" +
+	"\vretry_count\x18\x1b \x01(\x05R\n" +
+	"retryCountB\t\n" +
 	"\arequestB\b\n" +
 	"\x06result\"=\n" +
 	"\x0eStreamInfoList\x12'\n" +
