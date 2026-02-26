@@ -2594,7 +2594,7 @@ type SIPDispatchRuleIndividual struct {
 	// Optional pin required to enter room
 	Pin string `protobuf:"bytes,2,opt,name=pin,proto3" json:"pin,omitempty"`
 	// Optionally append random suffix
-	Randomize     bool `protobuf:"varint,3,opt,name=randomize,proto3" json:"randomize,omitempty"`
+	NoRandomness  bool `protobuf:"varint,3,opt,name=no_randomness,json=noRandomness,proto3" json:"no_randomness,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2643,9 +2643,9 @@ func (x *SIPDispatchRuleIndividual) GetPin() string {
 	return ""
 }
 
-func (x *SIPDispatchRuleIndividual) GetRandomize() bool {
+func (x *SIPDispatchRuleIndividual) GetNoRandomness() bool {
 	if x != nil {
-		return x.Randomize
+		return x.NoRandomness
 	}
 	return false
 }
@@ -4632,12 +4632,12 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\"F\n" +
 	"\x15SIPDispatchRuleDirect\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x10\n" +
-	"\x03pin\x18\x02 \x01(\tR\x03pin\"l\n" +
+	"\x03pin\x18\x02 \x01(\tR\x03pin\"s\n" +
 	"\x19SIPDispatchRuleIndividual\x12\x1f\n" +
 	"\vroom_prefix\x18\x01 \x01(\tR\n" +
 	"roomPrefix\x12\x10\n" +
-	"\x03pin\x18\x02 \x01(\tR\x03pin\x12\x1c\n" +
-	"\trandomize\x18\x03 \x01(\bR\trandomize\"h\n" +
+	"\x03pin\x18\x02 \x01(\tR\x03pin\x12#\n" +
+	"\rno_randomness\x18\x03 \x01(\bR\fnoRandomness\"h\n" +
 	"\x15SIPDispatchRuleCallee\x12\x1f\n" +
 	"\vroom_prefix\x18\x01 \x01(\tR\n" +
 	"roomPrefix\x12\x10\n" +
