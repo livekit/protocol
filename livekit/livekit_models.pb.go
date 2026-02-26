@@ -2229,6 +2229,7 @@ type TrackInfo struct {
 	Version           *TimedVersion       `protobuf:"bytes,18,opt,name=version,proto3" json:"version,omitempty"`
 	AudioFeatures     []AudioTrackFeature `protobuf:"varint,19,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
 	BackupCodecPolicy BackupCodecPolicy   `protobuf:"varint,20,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
+	HasUserTimestamp  bool                `protobuf:"varint,21,opt,name=has_user_timestamp,json=hasUserTimestamp,proto3" json:"has_user_timestamp,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -2405,6 +2406,13 @@ func (x *TrackInfo) GetBackupCodecPolicy() BackupCodecPolicy {
 		return x.BackupCodecPolicy
 	}
 	return BackupCodecPolicy_PREFER_REGRESSION
+}
+
+func (x *TrackInfo) GetHasUserTimestamp() bool {
+	if x != nil {
+		return x.HasUserTimestamp
+	}
+	return false
 }
 
 type DataTrackInfo struct {
@@ -6179,7 +6187,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03cid\x18\x03 \x01(\tR\x03cid\x12+\n" +
 	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
 	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\x12\x17\n" +
-	"\asdp_cid\x18\x06 \x01(\tR\x06sdpCid\"\xfc\x05\n" +
+	"\asdp_cid\x18\x06 \x01(\tR\x06sdpCid\"\xaa\x06\n" +
 	"\tTrackInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12&\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x12.livekit.TrackTypeR\x04type\x12\x18\n" +
@@ -6205,7 +6213,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06stream\x18\x11 \x01(\tR\x06stream\x12/\n" +
 	"\aversion\x18\x12 \x01(\v2\x15.livekit.TimedVersionR\aversion\x12A\n" +
 	"\x0eaudio_features\x18\x13 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12J\n" +
-	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\"\x8e\x01\n" +
+	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12,\n" +
+	"\x12has_user_timestamp\x18\x15 \x01(\bR\x10hasUserTimestamp\"\x8e\x01\n" +
 	"\rDataTrackInfo\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x10\n" +

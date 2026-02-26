@@ -1361,6 +1361,7 @@ type AddTrackRequest struct {
 	Stream            string              `protobuf:"bytes,15,opt,name=stream,proto3" json:"stream,omitempty"`
 	BackupCodecPolicy BackupCodecPolicy   `protobuf:"varint,16,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
 	AudioFeatures     []AudioTrackFeature `protobuf:"varint,17,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
+	HasUserTimestamp  bool                `protobuf:"varint,18,opt,name=has_user_timestamp,json=hasUserTimestamp,proto3" json:"has_user_timestamp,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1514,6 +1515,13 @@ func (x *AddTrackRequest) GetAudioFeatures() []AudioTrackFeature {
 		return x.AudioFeatures
 	}
 	return nil
+}
+
+func (x *AddTrackRequest) GetHasUserTimestamp() bool {
+	if x != nil {
+		return x.HasUserTimestamp
+	}
+	return false
 }
 
 type PublishDataTrackRequest struct {
@@ -5071,7 +5079,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
 	"\x03cid\x18\x02 \x01(\tR\x03cid\x12+\n" +
 	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
-	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\x97\x05\n" +
+	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\xc5\x05\n" +
 	"\x0fAddTrackRequest\x12\x10\n" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12&\n" +
@@ -5094,7 +5102,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x12\x16\n" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
-	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\"\x86\x01\n" +
+	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12,\n" +
+	"\x12has_user_timestamp\x18\x12 \x01(\bR\x10hasUserTimestamp\"\x86\x01\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
