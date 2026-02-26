@@ -886,7 +886,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		if pref := rule.DispatchRuleIndividual.GetRoomPrefix(); pref != "" {
 			room = pref + "_" + from
 		}
-		if rule.DispatchRuleIndividual.Randomize {
+		if !rule.DispatchRuleIndividual.NoRandomness {
 			room += "_" + guid.New("")
 		}
 	case *livekit.SIPDispatchRule_DispatchRuleCallee:

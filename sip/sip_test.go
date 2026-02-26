@@ -336,7 +336,7 @@ func newIndividualDispatch(roomPref, pin string, randomize bool) *livekit.SIPDis
 	return &livekit.SIPDispatchRule{
 		Rule: &livekit.SIPDispatchRule_DispatchRuleIndividual{
 			DispatchRuleIndividual: &livekit.SIPDispatchRuleIndividual{
-				RoomPrefix: roomPref, Pin: pin, Randomize: randomize,
+				RoomPrefix: roomPref, Pin: pin, NoRandomness: !randomize,
 			},
 		},
 	}

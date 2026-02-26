@@ -525,7 +525,7 @@ message SIPDispatchRuleIndividual {
   string pin = 2;
 
   // Optionally append random suffix
-  bool randomize = 3;
+  bool no_randomness = 3;
 }
 
 message SIPDispatchRuleCallee {
