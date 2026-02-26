@@ -17,6 +17,7 @@ package sip
 import (
 	"fmt"
 	"net/netip"
+	"regexp"
 	"strconv"
 	"testing"
 
@@ -331,11 +332,11 @@ func newDirectDispatch(room, pin string) *livekit.SIPDispatchRule {
 	}
 }
 
-func newIndividualDispatch(roomPref, pin string) *livekit.SIPDispatchRule {
+func newIndividualDispatch(roomPref, pin string, randomize bool) *livekit.SIPDispatchRule {
 	return &livekit.SIPDispatchRule{
 		Rule: &livekit.SIPDispatchRule_DispatchRuleIndividual{
 			DispatchRuleIndividual: &livekit.SIPDispatchRuleIndividual{
-				RoomPrefix: roomPref, Pin: pin,
+				RoomPrefix: roomPref, Pin: pin, Randomize: randomize,
 			},
 		},
 	}
@@ -540,7 +541,7 @@ var dispatchCases = []struct {
 		name:  "direct vs individual/private",
 		trunk: newSIPTrunkDispatch(),
 		rules: []*livekit.SIPDispatchRuleInfo{
-			{TrunkIds: nil, Rule: newIndividualDispatch("pref_", "123")},
+			{TrunkIds: nil, Rule: newIndividualDispatch("pref_", "123", true)},
 			{TrunkIds: nil, Rule: newDirectDispatch("sip", "123")},
 		},
 		expErr:  true,
@@ -550,7 +551,7 @@ var dispatchCases = []struct {
 		name:  "direct vs individual/open",
 		trunk: newSIPTrunkDispatch(),
 		rules: []*livekit.SIPDispatchRuleInfo{
-			{TrunkIds: nil, Rule: newIndividualDispatch("pref_", "")},
+			{TrunkIds: nil, Rule: newIndividualDispatch("pref_", "", true)},
 			{TrunkIds: nil, Rule: newDirectDispatch("sip", "")},
 		},
 		expErr:  true,
@@ -561,7 +562,7 @@ var dispatchCases = []struct {
 		name:  "direct vs individual/priority",
 		trunk: newSIPTrunkDispatch(),
 		rules: []*livekit.SIPDispatchRuleInfo{
-			{TrunkIds: nil, Rule: newIndividualDispatch("pref_", "123")},
+			{TrunkIds: nil, Rule: newIndividualDispatch("pref_", "123", true)},
 			{TrunkIds: nil, Rule: newDirectDispatch("sip", "456")},
 		},
 		reqPin: "456",
@@ -691,71 +692,170 @@ func TestSIPValidateDispatchRules(t *testing.T) {
 }
 
 func TestEvaluateDispatchRule(t *testing.T) {
-	d := &livekit.SIPDispatchRuleInfo{
-		SipDispatchRuleId: "rule",
-		Rule:              newDirectDispatch("room", ""),
-		HidePhoneNumber:   false,
-		InboundNumbers:    nil,
-		Numbers:           nil,
-		Name:              "",
-		Metadata:          "rule-meta",
-		Attributes: map[string]string{
-			"rule-attr": "1",
-		},
-	}
-	r := &rpc.EvaluateSIPDispatchRulesRequest{
+	const projectID = "p_123"
+	const caller = "+15551234567"
+	const callee = "+3333"
+	const prefix = "testPrefix"
+	var quotedCaller = regexp.QuoteMeta(caller)
+
+	req := &rpc.EvaluateSIPDispatchRulesRequest{
 		SipCallId:     "call-id",
-		CallingNumber: "+11112222",
+		CallingNumber: caller,
 		CallingHost:   "sip.example.com",
-		CalledNumber:  "+3333",
-		ExtraAttributes: map[string]string{
-			"prov-attr": "1",
-		},
+		CalledNumber:  callee,
 	}
 	tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
-	res, err := EvaluateDispatchRule("p_123", tr, d, r)
-	require.NoError(t, err)
-	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
-		ProjectId:           "p_123",
-		Result:              rpc.SIPDispatchResult_ACCEPT,
-		SipTrunkId:          "trunk",
-		SipDispatchRuleId:   "rule",
-		RoomName:            "room",
-		ParticipantIdentity: "sip_+11112222",
-		ParticipantName:     "Phone +11112222",
-		ParticipantMetadata: "rule-meta",
-		ParticipantAttributes: map[string]string{
-			"rule-attr":                   "1",
-			"prov-attr":                   "1",
-			livekit.AttrSIPCallID:         "call-id",
-			livekit.AttrSIPTrunkID:        "trunk",
-			livekit.AttrSIPDispatchRuleID: "rule",
-			livekit.AttrSIPPhoneNumber:    "+11112222",
-			livekit.AttrSIPTrunkNumber:    "+3333",
-			livekit.AttrSIPHostName:       "sip.example.com",
-		},
-	}, res)
 
-	d.HidePhoneNumber = true
-	res, err = EvaluateDispatchRule("p_123", tr, d, r)
-	require.NoError(t, err)
-	require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
-		ProjectId:           "p_123",
-		Result:              rpc.SIPDispatchResult_ACCEPT,
-		SipTrunkId:          "trunk",
-		SipDispatchRuleId:   "rule",
-		RoomName:            "room",
-		ParticipantIdentity: "sip_c15a31c71649a522",
-		ParticipantName:     "Phone 2222",
-		ParticipantMetadata: "rule-meta",
-		ParticipantAttributes: map[string]string{
-			"rule-attr":                   "1",
-			"prov-attr":                   "1",
-			livekit.AttrSIPCallID:         "call-id",
-			livekit.AttrSIPTrunkID:        "trunk",
-			livekit.AttrSIPDispatchRuleID: "rule",
-		},
-	}, res)
+	t.Run("Direct", func(t *testing.T) {
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "rule",
+			Rule:              newDirectDispatch("room", ""),
+			HidePhoneNumber:   false,
+			InboundNumbers:    nil,
+			Numbers:           nil,
+			Name:              "",
+			Metadata:          "rule-meta",
+			Attributes: map[string]string{
+				"rule-attr": "1",
+			},
+		}
+		r := &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+			ExtraAttributes: map[string]string{
+				"prov-attr": "1",
+			},
+		}
+		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+			ProjectId:           "p_123",
+			Result:              rpc.SIPDispatchResult_ACCEPT,
+			SipTrunkId:          "trunk",
+			SipDispatchRuleId:   "rule",
+			RoomName:            "room",
+			ParticipantIdentity: "sip_+11112222",
+			ParticipantName:     "Phone +11112222",
+			ParticipantMetadata: "rule-meta",
+			ParticipantAttributes: map[string]string{
+				"rule-attr":                   "1",
+				"prov-attr":                   "1",
+				livekit.AttrSIPCallID:         "call-id",
+				livekit.AttrSIPTrunkID:        "trunk",
+				livekit.AttrSIPDispatchRuleID: "rule",
+				livekit.AttrSIPPhoneNumber:    "+11112222",
+				livekit.AttrSIPTrunkNumber:    "+3333",
+				livekit.AttrSIPHostName:       "sip.example.com",
+			},
+		}, res)
+
+		d.HidePhoneNumber = true
+		res, err = EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+			ProjectId:           "p_123",
+			Result:              rpc.SIPDispatchResult_ACCEPT,
+			SipTrunkId:          "trunk",
+			SipDispatchRuleId:   "rule",
+			RoomName:            "room",
+			ParticipantIdentity: "sip_c15a31c71649a522",
+			ParticipantName:     "Phone 2222",
+			ParticipantMetadata: "rule-meta",
+			ParticipantAttributes: map[string]string{
+				"rule-attr":                   "1",
+				"prov-attr":                   "1",
+				livekit.AttrSIPCallID:         "call-id",
+				livekit.AttrSIPTrunkID:        "trunk",
+				livekit.AttrSIPDispatchRuleID: "rule",
+			},
+		}, res)
+	})
+	t.Run("Individual", func(t *testing.T) {
+		t.Run("minimal", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch("", "", false),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_ACCEPT, res.Result)
+			require.Equal(t, caller, res.RoomName, "room name should be from")
+		})
+		t.Run("only prefix", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch(prefix, "", false),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_ACCEPT, res.Result)
+			require.Equal(t, prefix+"_"+caller, res.RoomName)
+		})
+		t.Run("only randomize", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch("", "", true),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_ACCEPT, res.Result)
+			require.Regexp(t, `^`+regexp.QuoteMeta(caller)+`_[a-zA-Z0-9]+$`, res.RoomName, "room name should be from_guid")
+		})
+		t.Run("only pin", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch("", "123", false),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_REQUEST_PIN, res.Result)
+			require.Empty(t, res.RoomName, "implementation does not set RoomName when returning REQUEST_PIN")
+		})
+		t.Run("prefix and randomize", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch(prefix, "", true),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_ACCEPT, res.Result)
+			require.Regexp(t, `^`+prefix+`_`+quotedCaller+`_[a-zA-Z0-9]+$`, res.RoomName, "room name should be prefix_from_guid")
+		})
+		t.Run("prefix and pin", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch(prefix, "123", false),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_REQUEST_PIN, res.Result)
+			require.Empty(t, res.RoomName, "implementation does not set RoomName when returning REQUEST_PIN")
+		})
+		t.Run("randomize and pin", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch("", "123", true),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			require.Equal(t, rpc.SIPDispatchResult_REQUEST_PIN, res.Result)
+			require.Empty(t, res.RoomName, "implementation does not set RoomName when returning REQUEST_PIN")
+		})
+		t.Run("all options", func(t *testing.T) {
+			testDR := livekit.SIPDispatchRuleInfo{
+				SipDispatchRuleId: "rule",
+				Rule:              newIndividualDispatch(prefix, "123", true),
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, &testDR, req)
+			require.NoError(t, err)
+			// Rule requires PIN; request does not send one, so implementation returns REQUEST_PIN.
+			require.Equal(t, rpc.SIPDispatchResult_REQUEST_PIN, res.Result)
+			require.Empty(t, res.RoomName, "implementation does not set RoomName when returning REQUEST_PIN")
+		})
+	})
 }
 
 func TestMatchIP(t *testing.T) {
