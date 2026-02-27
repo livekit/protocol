@@ -20,7 +20,7 @@ func TestGetSourceType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.sourceType.String(), func(t *testing.T) {
 			info := &livekit.EgressInfo{SourceType: tt.sourceType}
-			result := getSourceType(info)
+			result := GetSourceType(info)
 			require.Equal(t, tt.expected, string(result))
 		})
 	}
@@ -86,7 +86,7 @@ func TestGetRequestType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := getRequestType(tt.info)
+			result := GetRequestType(tt.info)
 			require.Equal(t, tt.expected, string(result))
 		})
 	}
@@ -138,7 +138,129 @@ func TestGetAudioOnly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			require.Equal(t, tt.audioOnly, getAudioOnly(tt.info))
+			require.Equal(t, tt.audioOnly, GetAudioOnly(tt.info))
+		})
+	}
+}
+
+func TestGetRequest(t *testing.T) {
+	tests := []struct {
+		name string
+		info *livekit.EgressInfo
+	}{
+		{
+			name: "RoomComposite",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_RoomComposite{
+					RoomComposite: &livekit.RoomCompositeEgressRequest{
+						RoomName: "test-room",
+					},
+				},
+			},
+		},
+		{
+			name: "Web",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Web{
+					Web: &livekit.WebEgressRequest{
+						Url: "https://example.com",
+					},
+				},
+			},
+		},
+		{
+			name: "Participant",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Participant{
+					Participant: &livekit.ParticipantEgressRequest{
+						RoomName: "test-room",
+					},
+				},
+			},
+		},
+		{
+			name: "TrackComposite",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_TrackComposite{
+					TrackComposite: &livekit.TrackCompositeEgressRequest{
+						RoomName: "test-room",
+					},
+				},
+			},
+		},
+		{
+			name: "Track",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Track{
+					Track: &livekit.TrackEgressRequest{
+						RoomName: "test-room",
+					},
+				},
+			},
+		},
+		{
+			name: "Undefined",
+			info: &livekit.EgressInfo{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := GetRequest(tt.info)
+			require.NoError(t, err)
+			if tt.info.Request == nil {
+				require.Empty(t, result)
+			} else {
+				require.NotEmpty(t, result)
+			}
+		})
+	}
+}
+
+func TestGetResult(t *testing.T) {
+	tests := []struct {
+		name string
+		info *livekit.EgressInfo
+	}{
+		{
+			name: "FileResult",
+			info: &livekit.EgressInfo{
+				Result: &livekit.EgressInfo_File{
+					File: &livekit.FileInfo{Filename: "test.mp4"},
+				},
+			},
+		},
+		{
+			name: "StreamResult",
+			info: &livekit.EgressInfo{
+				Result: &livekit.EgressInfo_Stream{
+					Stream: &livekit.StreamInfoList{},
+				},
+			},
+		},
+		{
+			name: "SegmentResult",
+			info: &livekit.EgressInfo{
+				Result: &livekit.EgressInfo_Segments{
+					Segments: &livekit.SegmentsInfo{},
+				},
+			},
+		},
+		{
+			name: "MultipleResults",
+			info: &livekit.EgressInfo{
+				FileResults: []*livekit.FileInfo{
+					{Filename: "test.mp4"},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := GetResult(tt.info)
+			require.NoError(t, err)
+			require.NotEmpty(t, result)
 		})
 	}
 }
@@ -160,7 +282,7 @@ func TestGetStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.status.String(), func(t *testing.T) {
 			info := &livekit.EgressInfo{Status: tt.status}
-			result := getStatus(info)
+			result := GetStatus(info)
 			require.Equal(t, tt.expected, string(result))
 		})
 	}
