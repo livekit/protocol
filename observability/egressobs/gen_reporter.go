@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_57DK1I8 = true
+const Version_QRLBLU8 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -30,29 +30,50 @@ type ProjectReporter interface {
 }
 
 type EgressTx interface {
+	ReportRequestType(v EgressRequestType)
+	ReportRoomName(v string)
+	ReportRequest(v string)
+	ReportAudioOnly(v bool)
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
-	ReportUpdateTime(v time.Time)
-	ReportDuration(v uint64)
-	ReportRequestType(v EgressRequestType)
-	ReportSourceType(v EgressSourceType)
-	ReportRegion(v string)
-	ReportRoomName(v string)
-	ReportRoomID(v string)
 	ReportStatus(v EgressStatus)
 	ReportDetails(v string)
 	ReportError(v string)
 	ReportErrorCode(v int32)
-	ReportManifestLocation(v string)
-	ReportBackupStorageUsed(v bool)
 	ReportResult(v string)
-	ReportRequest(v string)
-	ReportAudioOnly(v bool)
+	ReportManifestLocation(v string)
 }
 
 type EgressReporter interface {
 	RegisterFunc(func(ts time.Time, tx EgressTx) bool)
 	Tx(func(tx EgressTx))
 	TxAt(time.Time, func(tx EgressTx))
+	WithSession(id string) SessionReporter
+	WithDeferredSession() (SessionReporter, KeyResolver)
 	EgressTx
+}
+
+type SessionTx interface {
+	ReportStartTime(v time.Time)
+	ReportEndTime(v time.Time)
+	ReportUpdateTime(v time.Time)
+	ReportDuration(v uint64)
+	ReportRetryCount(v uint32)
+	ReportSourceType(v SessionSourceType)
+	ReportRegion(v string)
+	ReportRoomID(v string)
+	ReportStatus(v SessionStatus)
+	ReportDetails(v string)
+	ReportError(v string)
+	ReportErrorCode(v int32)
+	ReportManifestLocation(v string)
+	ReportBackupStorageUsed(v bool)
+	ReportResult(v string)
+}
+
+type SessionReporter interface {
+	RegisterFunc(func(ts time.Time, tx SessionTx) bool)
+	Tx(func(tx SessionTx))
+	TxAt(time.Time, func(tx SessionTx))
+	SessionTx
 }

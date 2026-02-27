@@ -10,6 +10,7 @@ var (
 	_ Reporter        = (*noopReporter)(nil)
 	_ ProjectReporter = (*noopProjectReporter)(nil)
 	_ EgressReporter  = (*noopEgressReporter)(nil)
+	_ SessionReporter = (*noopSessionReporter)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -56,21 +57,46 @@ func NewNoopEgressReporter() EgressReporter {
 func (r *noopEgressReporter) RegisterFunc(f func(ts time.Time, tx EgressTx) bool) {}
 func (r *noopEgressReporter) Tx(f func(EgressTx))                                 {}
 func (r *noopEgressReporter) TxAt(ts time.Time, f func(EgressTx))                 {}
+func (r *noopEgressReporter) ReportRequestType(v EgressRequestType)               {}
+func (r *noopEgressReporter) ReportRoomName(v string)                             {}
+func (r *noopEgressReporter) ReportRequest(v string)                              {}
+func (r *noopEgressReporter) ReportAudioOnly(v bool)                              {}
 func (r *noopEgressReporter) ReportStartTime(v time.Time)                         {}
 func (r *noopEgressReporter) ReportEndTime(v time.Time)                           {}
-func (r *noopEgressReporter) ReportUpdateTime(v time.Time)                        {}
-func (r *noopEgressReporter) ReportDuration(v uint64)                             {}
-func (r *noopEgressReporter) ReportRequestType(v EgressRequestType)               {}
-func (r *noopEgressReporter) ReportSourceType(v EgressSourceType)                 {}
-func (r *noopEgressReporter) ReportRegion(v string)                               {}
-func (r *noopEgressReporter) ReportRoomName(v string)                             {}
-func (r *noopEgressReporter) ReportRoomID(v string)                               {}
 func (r *noopEgressReporter) ReportStatus(v EgressStatus)                         {}
 func (r *noopEgressReporter) ReportDetails(v string)                              {}
 func (r *noopEgressReporter) ReportError(v string)                                {}
 func (r *noopEgressReporter) ReportErrorCode(v int32)                             {}
-func (r *noopEgressReporter) ReportManifestLocation(v string)                     {}
-func (r *noopEgressReporter) ReportBackupStorageUsed(v bool)                      {}
 func (r *noopEgressReporter) ReportResult(v string)                               {}
-func (r *noopEgressReporter) ReportRequest(v string)                              {}
-func (r *noopEgressReporter) ReportAudioOnly(v bool)                              {}
+func (r *noopEgressReporter) ReportManifestLocation(v string)                     {}
+func (r *noopEgressReporter) WithSession(id string) SessionReporter {
+	return &noopSessionReporter{}
+}
+func (r *noopEgressReporter) WithDeferredSession() (SessionReporter, KeyResolver) {
+	return &noopSessionReporter{}, noopKeyResolver{}
+}
+
+type noopSessionReporter struct{}
+
+func NewNoopSessionReporter() SessionReporter {
+	return &noopSessionReporter{}
+}
+
+func (r *noopSessionReporter) RegisterFunc(f func(ts time.Time, tx SessionTx) bool) {}
+func (r *noopSessionReporter) Tx(f func(SessionTx))                                 {}
+func (r *noopSessionReporter) TxAt(ts time.Time, f func(SessionTx))                 {}
+func (r *noopSessionReporter) ReportStartTime(v time.Time)                          {}
+func (r *noopSessionReporter) ReportEndTime(v time.Time)                            {}
+func (r *noopSessionReporter) ReportUpdateTime(v time.Time)                         {}
+func (r *noopSessionReporter) ReportDuration(v uint64)                              {}
+func (r *noopSessionReporter) ReportRetryCount(v uint32)                            {}
+func (r *noopSessionReporter) ReportSourceType(v SessionSourceType)                 {}
+func (r *noopSessionReporter) ReportRegion(v string)                                {}
+func (r *noopSessionReporter) ReportRoomID(v string)                                {}
+func (r *noopSessionReporter) ReportStatus(v SessionStatus)                         {}
+func (r *noopSessionReporter) ReportDetails(v string)                               {}
+func (r *noopSessionReporter) ReportError(v string)                                 {}
+func (r *noopSessionReporter) ReportErrorCode(v int32)                              {}
+func (r *noopSessionReporter) ReportManifestLocation(v string)                      {}
+func (r *noopSessionReporter) ReportBackupStorageUsed(v bool)                       {}
+func (r *noopSessionReporter) ReportResult(v string)                                {}

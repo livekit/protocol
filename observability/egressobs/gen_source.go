@@ -12,14 +12,6 @@ const (
 	EgressRequestTypeWeb            EgressRequestType = "web"
 )
 
-type EgressSourceType string
-
-const (
-	EgressSourceTypeUndefined EgressSourceType = ""
-	EgressSourceTypeSdk       EgressSourceType = "sdk"
-	EgressSourceTypeWeb       EgressSourceType = "web"
-)
-
 type EgressStatus string
 
 const (
@@ -33,6 +25,27 @@ const (
 	EgressStatusLimitReached EgressStatus = "limit_reached"
 )
 
+type SessionSourceType string
+
+const (
+	SessionSourceTypeUndefined SessionSourceType = ""
+	SessionSourceTypeSdk       SessionSourceType = "sdk"
+	SessionSourceTypeWeb       SessionSourceType = "web"
+)
+
+type SessionStatus string
+
+const (
+	SessionStatusUndefined    SessionStatus = ""
+	SessionStatusStarting     SessionStatus = "starting"
+	SessionStatusActive       SessionStatus = "active"
+	SessionStatusEnding       SessionStatus = "ending"
+	SessionStatusComplete     SessionStatus = "complete"
+	SessionStatusFailed       SessionStatus = "failed"
+	SessionStatusAborted      SessionStatus = "aborted"
+	SessionStatusLimitReached SessionStatus = "limit_reached"
+)
+
 type Rollup string
 
 const (
@@ -42,4 +55,6 @@ const (
 	RollupEndTimeIndex   Rollup = "end_time_index"
 	RollupStartTimeIndex Rollup = "start_time_index"
 	RollupRoomNameIndex  Rollup = "room_name_index"
+	RollupEgressEgress   Rollup = "egress_egress"
+	RollupSessionIndex   Rollup = "session_index"
 )
