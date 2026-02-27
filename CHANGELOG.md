@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.44.1
+
+### Patch Changes
+
+- update text message protocol for http endpoints - [#1407](https://github.com/livekit/protocol/pull/1407) ([@longcw](https://github.com/longcw))
+
+- Adding feature_flags field to InternalTransferSIPParticipantRequest, InternalCreateSIPParticipantRequest, and EvaluateSIPDispatchRulesResponse - [#1382](https://github.com/livekit/protocol/pull/1382) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.44.0
 
 ### Minor Changes
