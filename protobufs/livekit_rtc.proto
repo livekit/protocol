@@ -172,6 +172,8 @@ message AddTrackRequest {
   BackupCodecPolicy backup_codec_policy = 16;
 
   repeated AudioTrackFeature audio_features = 17;
+
+  repeated RTPTrailerFeature rtp_trailer_features = 18;
 }
 
 message PublishDataTrackRequest {
