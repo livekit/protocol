@@ -5,8 +5,9 @@ import (
 
 	"google.golang.org/protobuf/encoding/protojson"
 
+	"github.com/pkg/errors"
+
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/logger"
 )
 
 type EgressResults struct {
@@ -66,65 +67,61 @@ func GetStatus(info *livekit.EgressInfo) SessionStatus {
 }
 
 func GetRequest(info *livekit.EgressInfo) (string, error) {
-	logger := logger.GetLogger().WithValues("egressID", info.EgressId)
-
 	switch req := info.Request.(type) {
 	case *livekit.EgressInfo_RoomComposite:
 		b, err := protojson.Marshal(req.RoomComposite)
 		if err != nil {
-			logger.Warnw("failed serializing RoomComposite request", err, "request", info.Request)
+			return "", errors.Wrap(err, "failed serializing RoomComposite request")
 		}
-		return string(b), err
+		return string(b), nil
 	case *livekit.EgressInfo_Web:
 		b, err := protojson.Marshal(req.Web)
 		if err != nil {
-			logger.Warnw("failed serializing Web request", err, "request", info.Request)
+			return "", errors.Wrap(err, "failed serializing Web request")
 		}
-		return string(b), err
+		return string(b), nil
 	case *livekit.EgressInfo_Participant:
 		b, err := protojson.Marshal(req.Participant)
 		if err != nil {
-			logger.Warnw("failed serializing Participant request", err, "request", info.Request)
+			return "", errors.Wrap(err, "failed serializing Participant request")
 		}
-		return string(b), err
+		return string(b), nil
 	case *livekit.EgressInfo_TrackComposite:
 		b, err := protojson.Marshal(req.TrackComposite)
 		if err != nil {
-			logger.Warnw("failed serializing TrackComposite request", err, "request", info.Request)
+			return "", errors.Wrap(err, "failed serializing TrackComposite request")
 		}
-		return string(b), err
+		return string(b), nil
 	case *livekit.EgressInfo_Track:
 		b, err := protojson.Marshal(req.Track)
 		if err != nil {
-			logger.Warnw("failed serializing Track request", err, "request", info.Request)
+			return "", errors.Wrap(err, "failed serializing Track request")
 		}
-		return string(b), err
+		return string(b), nil
 	default:
 		return "", nil
 	}
 }
 
 func GetResult(info *livekit.EgressInfo) (string, error) {
-	logger := logger.GetLogger().WithValues("egressID", info.EgressId)
-
 	if file := info.GetFile(); file != nil {
 		b, err := protojson.Marshal(file)
 		if err != nil {
-			logger.Warnw("failed serializing File result", err, "result", info.GetFile())
+			return "", errors.Wrap(err, "failed serializing File result")
 		}
-		return string(b), err
+		return string(b), nil
 	} else if stream := info.GetStream(); stream != nil {
 		b, err := protojson.Marshal(stream)
 		if err != nil {
-			logger.Warnw("failed serializing Stream result", err, "result", info.GetStream())
+			return "", errors.Wrap(err, "failed serializing Stream result")
 		}
-		return string(b), err
+		return string(b), nil
 	} else if segments := info.GetSegments(); segments != nil {
 		b, err := protojson.Marshal(segments)
 		if err != nil {
-			logger.Warnw("failed serializing File result", err, "result", info.GetSegments())
+			return "", errors.Wrap(err, "failed serializing Segments result")
 		}
-		return string(b), err
+		return string(b), nil
 	} else {
 		results := &EgressResults{
 			FileResults:    info.FileResults,
@@ -134,9 +131,9 @@ func GetResult(info *livekit.EgressInfo) (string, error) {
 		}
 		b, err := json.Marshal(results)
 		if err != nil {
-			logger.Warnw("failed serializing Multiple result", err, "result", results)
+			return "", errors.Wrap(err, "failed serializing Multiple result")
 		}
-		return string(b), err
+		return string(b), nil
 	}
 }
 
