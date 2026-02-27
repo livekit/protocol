@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.44.2
+
+### Patch Changes
+
+- Added NoRandomness field to individual dispatch rule" - [#1426](https://github.com/livekit/protocol/pull/1426) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.44.1
 
 ### Patch Changes
