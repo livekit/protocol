@@ -173,7 +173,7 @@ message AddTrackRequest {
 
   repeated AudioTrackFeature audio_features = 17;
 
-  bool has_user_timestamp = 18;
+  repeated RTPTrailerFeature rtp_trailer_features = 18;
 }
 
 message PublishDataTrackRequest {
