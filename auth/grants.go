@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"errors"
 	"maps"
 	"strings"
@@ -242,6 +243,58 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Observability", c.Observability)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
+	return nil
+}
+
+// claimGrantsJSON is used for JSON marshaling/unmarshaling to support both
+// "video" (legacy) and "rtc" (new) field names for VideoGrant.
+// This enables backwards compatibility during the migration from VideoGrant to RTCGrant.
+type claimGrantsJSON struct {
+	Identity      string              `json:"identity,omitempty"`
+	Name          string              `json:"name,omitempty"`
+	Kind          string              `json:"kind,omitempty"`
+	KindDetails   []string            `json:"kindDetails,omitempty"`
+	Video         *VideoGrant         `json:"video,omitempty"`
+	RTC           *VideoGrant         `json:"rtc,omitempty"`
+	SIP           *SIPGrant           `json:"sip,omitempty"`
+	Agent         *AgentGrant         `json:"agent,omitempty"`
+	Inference     *InferenceGrant     `json:"inference,omitempty"`
+	Observability *ObservabilityGrant `json:"observability,omitempty"`
+	RoomConfig    *RoomConfiguration  `json:"roomConfig,omitempty"`
+	RoomPreset    string              `json:"roomPreset,omitempty"`
+	Sha256        string              `json:"sha256,omitempty"`
+	Metadata      string              `json:"metadata,omitempty"`
+	Attributes    map[string]string   `json:"attributes,omitempty"`
+}
+
+func (c *ClaimGrants) UnmarshalJSON(data []byte) error {
+	var j claimGrantsJSON
+	if err := json.Unmarshal(data, &j); err != nil {
+		return err
+	}
+
+	c.Identity = j.Identity
+	c.Name = j.Name
+	c.Kind = j.Kind
+	c.KindDetails = j.KindDetails
+	c.SIP = j.SIP
+	c.Agent = j.Agent
+	c.Inference = j.Inference
+	c.Observability = j.Observability
+	c.RoomConfig = j.RoomConfig
+	c.RoomPreset = j.RoomPreset
+	c.Sha256 = j.Sha256
+	c.Metadata = j.Metadata
+	c.Attributes = j.Attributes
+
+	// Support both "video" (legacy) and "rtc" (new) field names.
+	// If both are present, "rtc" takes precedence.
+	if j.RTC != nil {
+		c.Video = j.RTC
+	} else {
+		c.Video = j.Video
+	}
+
 	return nil
 }
 
