@@ -69,7 +69,9 @@ func (reporter) TelephonyCall() telephonycallobs.Reporter {
 	return telephonycallobs.NewNoopReporter()
 }
 
-func (reporter) Storage() storageobs.Reporter { return storageobs.NewNoopReporter() }
+func (reporter) Storage() storageobs.Reporter {
+	return storageobs.NewNoopReporter()
+}
 
 func (reporter) Close() {
 }
