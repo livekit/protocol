@@ -63,6 +63,7 @@ func (r *noopEgressReporter) ReportRequest(v string)                            
 func (r *noopEgressReporter) ReportAudioOnly(v bool)                              {}
 func (r *noopEgressReporter) ReportStartTime(v time.Time)                         {}
 func (r *noopEgressReporter) ReportEndTime(v time.Time)                           {}
+func (r *noopEgressReporter) ReportUpdateTime(v time.Time)                        {}
 func (r *noopEgressReporter) ReportStatus(v EgressStatus)                         {}
 func (r *noopEgressReporter) ReportDetails(v string)                              {}
 func (r *noopEgressReporter) ReportError(v string)                                {}

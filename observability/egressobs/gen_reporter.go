@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_QRLBLU8 = true
+const Version_5HDLFF0 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -36,6 +36,7 @@ type EgressTx interface {
 	ReportAudioOnly(v bool)
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
+	ReportUpdateTime(v time.Time)
 	ReportStatus(v EgressStatus)
 	ReportDetails(v string)
 	ReportError(v string)
