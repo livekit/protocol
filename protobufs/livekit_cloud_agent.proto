@@ -240,25 +240,12 @@ message PrivateLink {
   }
 }
 
-message PrivateLinkProvisioningStatus {
+message PrivateLinkStatus {
   enum Status {
-    PRIVATE_LINK_STATUS_UNKNOWN = 0;
-    PRIVATE_LINK_STATUS_PENDING = 1;
-    PRIVATE_LINK_STATUS_READY = 2;
-    PRIVATE_LINK_STATUS_DELETING = 3;
-    PRIVATE_LINK_STATUS_DELETED = 4;
-    PRIVATE_LINK_STATUS_FAILED = 5;
-  }
-
-  Status status = 1;
-  optional string error = 2;
-}
-
-message PrivateLinkHealthStatus {
-  enum Status {
-    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNKNOWN = 0;
-    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_HEALTHY = 1;
-    PRIVATE_LINK_ATTACHMENT_HEALTH_STATUS_UNHEALTHY = 2;
+      PRIVATE_LINK_STATUS_UNKNOWN = 0;
+      PRIVATE_LINK_STATUS_PENDING = 1;
+      PRIVATE_LINK_STATUS_AVAILABLE = 2;
+      PRIVATE_LINK_STATUS_ERROR = 3;
   }
 
   Status status = 1;
@@ -296,20 +283,12 @@ message ListPrivateLinksResponse {
   repeated PrivateLink items = 1;
 }
 
-message GetPrivateLinkProvisioningStatusRequest {
+message GetPrivateLinkStatusRequest {
   string private_link_id = 1;
 }
 
-message GetPrivateLinkProvisioningStatusResponse {
-  PrivateLinkProvisioningStatus value = 1;
-}
-
-message GetPrivateLinkHealthStatusRequest {
-  string private_link_id = 1;
-}
-
-message GetPrivateLinkHealthStatusResponse {
-  PrivateLinkHealthStatus value = 1;
+message GetPrivateLinkStatusResponse {
+  PrivateLinkStatus value = 1;
 }
 
 service CloudAgent {
@@ -328,6 +307,5 @@ service CloudAgent {
     rpc CreatePrivateLink(CreatePrivateLinkRequest) returns (CreatePrivateLinkResponse) {}
     rpc DestroyPrivateLink(DestroyPrivateLinkRequest) returns (DestroyPrivateLinkResponse) {}
     rpc ListPrivateLinks(ListPrivateLinksRequest) returns (ListPrivateLinksResponse) {}
-    rpc GetPrivateLinkProvisioningStatus(GetPrivateLinkProvisioningStatusRequest) returns (GetPrivateLinkProvisioningStatusResponse) {}
-    rpc GetPrivateLinkHealthStatus(GetPrivateLinkHealthStatusRequest) returns (GetPrivateLinkHealthStatusResponse) {}
+    rpc GetPrivateLinkStatus(GetPrivateLinkStatusRequest) returns (GetPrivateLinkStatusResponse) {}
 }

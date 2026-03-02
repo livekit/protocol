@@ -51,6 +51,7 @@ type ModelTx interface {
 	ReportTtsChars(v uint32)
 	ReportBargeInRequests(v uint64)
 	ReportBargeInRequestTypes(v ModelBargeInRequestTypes)
+	ReportVoiceCloneRequests(v uint64)
 }
 
 type ModelReporter interface {

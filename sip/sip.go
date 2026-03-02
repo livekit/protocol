@@ -180,10 +180,10 @@ func NewDispatchRuleValidator(opts ...MatchDispatchRuleOpt) *DispatchRuleValidat
 }
 
 type dispatchRuleKey struct {
-	Pin    string
-	Trunk  string
+	Pin           string
+	Trunk         string
 	InboundNumber string
-	Number string
+	Number        string
 }
 
 type DispatchRuleValidator struct {
@@ -882,7 +882,13 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		// TODO: Remove "_" if the prefix is empty for consistency with Callee dispatch rule.
 		// TODO: Do we need to escape specific characters in the number?
 		// TODO: Include actual SIP call ID in the room name?
-		room = fmt.Sprintf("%s_%s_%s", rule.DispatchRuleIndividual.GetRoomPrefix(), from, guid.New(""))
+		room = from
+		if pref := rule.DispatchRuleIndividual.GetRoomPrefix(); pref != "" {
+			room = pref + "_" + from
+		}
+		if !rule.DispatchRuleIndividual.NoRandomness {
+			room += "_" + guid.New("")
+		}
 	case *livekit.SIPDispatchRule_DispatchRuleCallee:
 		room = to
 		if pref := rule.DispatchRuleCallee.GetRoomPrefix(); pref != "" {
