@@ -1358,12 +1358,12 @@ type AddTrackRequest struct {
 	Encryption Encryption_Type `protobuf:"varint,14,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	// which stream the track belongs to, used to group tracks together.
 	// if not specified, server will infer it from track source to bundle camera/microphone, screenshare/audio together
-	Stream             string              `protobuf:"bytes,15,opt,name=stream,proto3" json:"stream,omitempty"`
-	BackupCodecPolicy  BackupCodecPolicy   `protobuf:"varint,16,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
-	AudioFeatures      []AudioTrackFeature `protobuf:"varint,17,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
-	RtpTrailerFeatures []RTPTrailerFeature `protobuf:"varint,18,rep,packed,name=rtp_trailer_features,json=rtpTrailerFeatures,proto3,enum=livekit.RTPTrailerFeature" json:"rtp_trailer_features,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	Stream                string                 `protobuf:"bytes,15,opt,name=stream,proto3" json:"stream,omitempty"`
+	BackupCodecPolicy     BackupCodecPolicy      `protobuf:"varint,16,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
+	AudioFeatures         []AudioTrackFeature    `protobuf:"varint,17,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
+	PacketTrailerFeatures []PacketTrailerFeature `protobuf:"varint,18,rep,packed,name=packet_trailer_features,json=packetTrailerFeatures,proto3,enum=livekit.PacketTrailerFeature" json:"packet_trailer_features,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *AddTrackRequest) Reset() {
@@ -1517,9 +1517,9 @@ func (x *AddTrackRequest) GetAudioFeatures() []AudioTrackFeature {
 	return nil
 }
 
-func (x *AddTrackRequest) GetRtpTrailerFeatures() []RTPTrailerFeature {
+func (x *AddTrackRequest) GetPacketTrailerFeatures() []PacketTrailerFeature {
 	if x != nil {
-		return x.RtpTrailerFeatures
+		return x.PacketTrailerFeatures
 	}
 	return nil
 }
@@ -5079,7 +5079,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
 	"\x03cid\x18\x02 \x01(\tR\x03cid\x12+\n" +
 	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
-	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\xe5\x05\n" +
+	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\"\xee\x05\n" +
 	"\x0fAddTrackRequest\x12\x10\n" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12&\n" +
@@ -5102,8 +5102,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x12\x16\n" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
-	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12L\n" +
-	"\x14rtp_trailer_features\x18\x12 \x03(\x0e2\x1a.livekit.RTPTrailerFeatureR\x12rtpTrailerFeatures\"\x86\x01\n" +
+	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12U\n" +
+	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\x86\x01\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
@@ -5498,7 +5498,7 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(Encryption_Type)(0),                  // 71: livekit.Encryption.Type
 	(BackupCodecPolicy)(0),                // 72: livekit.BackupCodecPolicy
 	(AudioTrackFeature)(0),                // 73: livekit.AudioTrackFeature
-	(RTPTrailerFeature)(0),                // 74: livekit.RTPTrailerFeature
+	(PacketTrailerFeature)(0),             // 74: livekit.PacketTrailerFeature
 	(*DataTrackInfo)(nil),                 // 75: livekit.DataTrackInfo
 	(*Room)(nil),                          // 76: livekit.Room
 	(*ParticipantInfo)(nil),               // 77: livekit.ParticipantInfo
@@ -5572,7 +5572,7 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	71,  // 51: livekit.AddTrackRequest.encryption:type_name -> livekit.Encryption.Type
 	72,  // 52: livekit.AddTrackRequest.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
 	73,  // 53: livekit.AddTrackRequest.audio_features:type_name -> livekit.AudioTrackFeature
-	74,  // 54: livekit.AddTrackRequest.rtp_trailer_features:type_name -> livekit.RTPTrailerFeature
+	74,  // 54: livekit.AddTrackRequest.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
 	71,  // 55: livekit.PublishDataTrackRequest.encryption:type_name -> livekit.Encryption.Type
 	75,  // 56: livekit.PublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
 	75,  // 57: livekit.UnpublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo

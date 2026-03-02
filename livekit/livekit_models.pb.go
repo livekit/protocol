@@ -815,46 +815,46 @@ func (AudioTrackFeature) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{13}
 }
 
-type RTPTrailerFeature int32
+type PacketTrailerFeature int32
 
 const (
-	RTPTrailerFeature_USER_TIMESTAMP RTPTrailerFeature = 0
+	PacketTrailerFeature_PTF_USER_TIMESTAMP PacketTrailerFeature = 0
 )
 
-// Enum value maps for RTPTrailerFeature.
+// Enum value maps for PacketTrailerFeature.
 var (
-	RTPTrailerFeature_name = map[int32]string{
-		0: "USER_TIMESTAMP",
+	PacketTrailerFeature_name = map[int32]string{
+		0: "PTF_USER_TIMESTAMP",
 	}
-	RTPTrailerFeature_value = map[string]int32{
-		"USER_TIMESTAMP": 0,
+	PacketTrailerFeature_value = map[string]int32{
+		"PTF_USER_TIMESTAMP": 0,
 	}
 )
 
-func (x RTPTrailerFeature) Enum() *RTPTrailerFeature {
-	p := new(RTPTrailerFeature)
+func (x PacketTrailerFeature) Enum() *PacketTrailerFeature {
+	p := new(PacketTrailerFeature)
 	*p = x
 	return p
 }
 
-func (x RTPTrailerFeature) String() string {
+func (x PacketTrailerFeature) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (RTPTrailerFeature) Descriptor() protoreflect.EnumDescriptor {
+func (PacketTrailerFeature) Descriptor() protoreflect.EnumDescriptor {
 	return file_livekit_models_proto_enumTypes[14].Descriptor()
 }
 
-func (RTPTrailerFeature) Type() protoreflect.EnumType {
+func (PacketTrailerFeature) Type() protoreflect.EnumType {
 	return &file_livekit_models_proto_enumTypes[14]
 }
 
-func (x RTPTrailerFeature) Number() protoreflect.EnumNumber {
+func (x PacketTrailerFeature) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use RTPTrailerFeature.Descriptor instead.
-func (RTPTrailerFeature) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use PacketTrailerFeature.Descriptor instead.
+func (PacketTrailerFeature) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{14}
 }
 
@@ -2266,15 +2266,15 @@ type TrackInfo struct {
 	// Deprecated: Marked as deprecated in livekit_models.proto.
 	Stereo bool `protobuf:"varint,14,opt,name=stereo,proto3" json:"stereo,omitempty"` // deprecated in favor of `audio_features`
 	// true if RED (Redundant Encoding) is disabled for audio
-	DisableRed         bool                `protobuf:"varint,15,opt,name=disable_red,json=disableRed,proto3" json:"disable_red,omitempty"`
-	Encryption         Encryption_Type     `protobuf:"varint,16,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
-	Stream             string              `protobuf:"bytes,17,opt,name=stream,proto3" json:"stream,omitempty"`
-	Version            *TimedVersion       `protobuf:"bytes,18,opt,name=version,proto3" json:"version,omitempty"`
-	AudioFeatures      []AudioTrackFeature `protobuf:"varint,19,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
-	BackupCodecPolicy  BackupCodecPolicy   `protobuf:"varint,20,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
-	RtpTrailerFeatures []RTPTrailerFeature `protobuf:"varint,21,rep,packed,name=rtp_trailer_features,json=rtpTrailerFeatures,proto3,enum=livekit.RTPTrailerFeature" json:"rtp_trailer_features,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	DisableRed            bool                   `protobuf:"varint,15,opt,name=disable_red,json=disableRed,proto3" json:"disable_red,omitempty"`
+	Encryption            Encryption_Type        `protobuf:"varint,16,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
+	Stream                string                 `protobuf:"bytes,17,opt,name=stream,proto3" json:"stream,omitempty"`
+	Version               *TimedVersion          `protobuf:"bytes,18,opt,name=version,proto3" json:"version,omitempty"`
+	AudioFeatures         []AudioTrackFeature    `protobuf:"varint,19,rep,packed,name=audio_features,json=audioFeatures,proto3,enum=livekit.AudioTrackFeature" json:"audio_features,omitempty"`
+	BackupCodecPolicy     BackupCodecPolicy      `protobuf:"varint,20,opt,name=backup_codec_policy,json=backupCodecPolicy,proto3,enum=livekit.BackupCodecPolicy" json:"backup_codec_policy,omitempty"`
+	PacketTrailerFeatures []PacketTrailerFeature `protobuf:"varint,21,rep,packed,name=packet_trailer_features,json=packetTrailerFeatures,proto3,enum=livekit.PacketTrailerFeature" json:"packet_trailer_features,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
 }
 
 func (x *TrackInfo) Reset() {
@@ -2451,9 +2451,9 @@ func (x *TrackInfo) GetBackupCodecPolicy() BackupCodecPolicy {
 	return BackupCodecPolicy_PREFER_REGRESSION
 }
 
-func (x *TrackInfo) GetRtpTrailerFeatures() []RTPTrailerFeature {
+func (x *TrackInfo) GetPacketTrailerFeatures() []PacketTrailerFeature {
 	if x != nil {
-		return x.RtpTrailerFeatures
+		return x.PacketTrailerFeatures
 	}
 	return nil
 }
@@ -6230,7 +6230,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03cid\x18\x03 \x01(\tR\x03cid\x12+\n" +
 	"\x06layers\x18\x04 \x03(\v2\x13.livekit.VideoLayerR\x06layers\x12B\n" +
 	"\x10video_layer_mode\x18\x05 \x01(\x0e2\x18.livekit.VideoLayer.ModeR\x0evideoLayerMode\x12\x17\n" +
-	"\asdp_cid\x18\x06 \x01(\tR\x06sdpCid\"\xca\x06\n" +
+	"\asdp_cid\x18\x06 \x01(\tR\x06sdpCid\"\xd3\x06\n" +
 	"\tTrackInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12&\n" +
 	"\x04type\x18\x02 \x01(\x0e2\x12.livekit.TrackTypeR\x04type\x12\x18\n" +
@@ -6256,8 +6256,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x06stream\x18\x11 \x01(\tR\x06stream\x12/\n" +
 	"\aversion\x18\x12 \x01(\v2\x15.livekit.TimedVersionR\aversion\x12A\n" +
 	"\x0eaudio_features\x18\x13 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12J\n" +
-	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12L\n" +
-	"\x14rtp_trailer_features\x18\x15 \x03(\x0e2\x1a.livekit.RTPTrailerFeatureR\x12rtpTrailerFeatures\"\x8e\x01\n" +
+	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12U\n" +
+	"\x17packet_trailer_features\x18\x15 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\x8e\x01\n" +
 	"\rDataTrackInfo\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x10\n" +
@@ -6738,9 +6738,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x14TF_ECHO_CANCELLATION\x10\x03\x12\x18\n" +
 	"\x14TF_NOISE_SUPPRESSION\x10\x04\x12\"\n" +
 	"\x1eTF_ENHANCED_NOISE_CANCELLATION\x10\x05\x12\x18\n" +
-	"\x14TF_PRECONNECT_BUFFER\x10\x06*'\n" +
-	"\x11RTPTrailerFeature\x12\x12\n" +
-	"\x0eUSER_TIMESTAMP\x10\x00BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x14TF_PRECONNECT_BUFFER\x10\x06*.\n" +
+	"\x14PacketTrailerFeature\x12\x16\n" +
+	"\x12PTF_USER_TIMESTAMP\x10\x00BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_models_proto_rawDescOnce sync.Once
@@ -6771,7 +6771,7 @@ var file_livekit_models_proto_goTypes = []any{
 	(ReconnectReason)(0),                     // 11: livekit.ReconnectReason
 	(SubscriptionError)(0),                   // 12: livekit.SubscriptionError
 	(AudioTrackFeature)(0),                   // 13: livekit.AudioTrackFeature
-	(RTPTrailerFeature)(0),                   // 14: livekit.RTPTrailerFeature
+	(PacketTrailerFeature)(0),                // 14: livekit.PacketTrailerFeature
 	(ParticipantInfo_State)(0),               // 15: livekit.ParticipantInfo.State
 	(ParticipantInfo_Kind)(0),                // 16: livekit.ParticipantInfo.Kind
 	(ParticipantInfo_KindDetail)(0),          // 17: livekit.ParticipantInfo.KindDetail
@@ -6861,7 +6861,7 @@ var file_livekit_models_proto_depIdxs = []int32{
 	65, // 18: livekit.TrackInfo.version:type_name -> livekit.TimedVersion
 	13, // 19: livekit.TrackInfo.audio_features:type_name -> livekit.AudioTrackFeature
 	3,  // 20: livekit.TrackInfo.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
-	14, // 21: livekit.TrackInfo.rtp_trailer_features:type_name -> livekit.RTPTrailerFeature
+	14, // 21: livekit.TrackInfo.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
 	18, // 22: livekit.DataTrackInfo.encryption:type_name -> livekit.Encryption.Type
 	6,  // 23: livekit.DataTrackExtensionParticipantSid.id:type_name -> livekit.DataTrackExtensionID
 	7,  // 24: livekit.VideoLayer.quality:type_name -> livekit.VideoQuality
