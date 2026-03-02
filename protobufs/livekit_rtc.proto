@@ -48,7 +48,7 @@ message SignalRequest {
     // Simulate conditions, for client validations
     SimulateScenario simulate = 13;
     // client triggered ping to server
-    int64 ping = 14; // deprecated by ping_req (message Ping)
+    int64 ping = 14;  // deprecated by ping_req (message Ping)
     // update a participant's own metadata, name, or attributes
     // requires canUpdateOwnParticipantMetadata permission
     UpdateParticipantMetadata update_metadata = 15;
@@ -102,7 +102,7 @@ message SignalResponse {
     // server initiated track unpublish
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
-    int64 pong = 18; // deprecated by pong_resp (message Pong)
+    int64 pong = 18;  // deprecated by pong_resp (message Pong)
     // sent when client reconnects
     ReconnectResponse reconnect = 19;
     // respond to Ping
@@ -152,7 +152,7 @@ message AddTrackRequest {
   // true to add track and initialize to muted
   bool muted = 6;
   // true if DTX (Discontinuous Transmission) is disabled for audio
-  bool disable_dtx = 7 [deprecated = true]; // deprecated in favor of audio_features
+  bool disable_dtx = 7 [deprecated = true];  // deprecated in favor of audio_features
   TrackSource source = 8;
   repeated VideoLayer layers = 9;
 
@@ -161,7 +161,7 @@ message AddTrackRequest {
   // server ID of track, publish new codec to exist track
   string sid = 11;
 
-  bool stereo = 12 [deprecated = true]; // deprecated in favor of audio_features
+  bool stereo = 12 [deprecated = true];  // deprecated in favor of audio_features
   // true if RED (Redundant Encoding) is disabled for audio
   bool disable_red = 13;
 
@@ -268,7 +268,7 @@ message TrackUnpublishedResponse {
 }
 
 message SessionDescription {
-  string type = 1; // "answer" | "offer" | "pranswer" | "rollback"
+  string type = 1;  // "answer" | "offer" | "pranswer" | "rollback"
   string sdp = 2;
   uint32 id = 3;
   map<string, string> mid_to_track_id = 4;
@@ -330,9 +330,9 @@ message UpdateLocalVideoTrack {
 message LeaveRequest {
   // indicates action clients should take on receiving this message
   enum Action {
-    DISCONNECT = 0; // should disconnect
-    RESUME = 1; // should attempt a resume with `reconnect=1` in join URL
-    RECONNECT = 2; // should attempt a reconnect, i. e. no `reconnect=1`
+    DISCONNECT = 0;  // should disconnect
+    RESUME = 1;      // should attempt a resume with `reconnect=1` in join URL
+    RECONNECT = 2;   // should attempt a reconnect, i. e. no `reconnect=1`
   }
 
   // sent when server initiates the disconnect due to server-restart
@@ -371,8 +371,12 @@ message UpdateParticipantMetadata {
 
 message ICEServer {
   repeated string urls = 1;
-  string username = 2;
-  string credential = 3;
+  string username = 2 [
+    (logger.redact) = true
+  ];
+  string credential = 3 [
+    (logger.redact) = true
+  ];
 }
 
 message SpeakersChanged {
@@ -591,7 +595,7 @@ message JoinRequest {
   string metadata = 3 [
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ]; // if not empty, will overwrite `metadata` in token
+  ];  // if not empty, will overwrite `metadata` in token
 
   // will set keys provided via this
   // will overwrite if the same key is in the token
@@ -617,7 +621,7 @@ message WrappedJoinRequest {
   }
 
   Compression compression = 1;
-  bytes join_request = 2; // marshalled JoinRequest + potentially compressed
+  bytes join_request = 2;  // marshalled JoinRequest + potentially compressed
 }
 
 message MediaSectionsRequirement {

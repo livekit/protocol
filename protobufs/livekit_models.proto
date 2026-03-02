@@ -126,8 +126,10 @@ message ParticipantPermission {
   bool agent = 11 [deprecated = true];
   // if a participant can subscribe to metrics
   bool can_subscribe_metrics = 12;
+  // if a participant can manage an agent session via RemoteSession (control and access state)
+  bool can_manage_agent_session = 13;
 
-  // NEXT_ID: 13
+  // NEXT_ID: 14
 }
 
 message ParticipantInfo {
@@ -194,7 +196,10 @@ message ParticipantInfo {
   repeated KindDetail kind_details = 18;
   repeated DataTrackInfo data_tracks = 19;
 
-  // NEXT_ID: 20
+  // protocol version used for client feature compatibility
+  int32 client_protocol = 20;
+ 
+  // NEXT_ID: 21
 }
 
 enum TrackType {
@@ -452,6 +457,8 @@ message RpcRequest {
   string payload = 3;
   uint32 response_timeout_ms = 4;
   uint32 version = 5;
+  // Compressed payload data. When set, this field is used instead of `payload`.
+  bytes compressed_payload = 6;
 }
 
 message RpcAck {
@@ -463,6 +470,8 @@ message RpcResponse {
   oneof value {
     string payload = 2;
     RpcError error = 3;
+    // Compressed payload data. When set, this field is used instead of `payload`.
+    bytes compressed_payload = 4;
   }
 }
 
@@ -535,6 +544,8 @@ message ClientInfo {
   // comma separated list of additional LiveKit SDKs in use of this client, with versions
   // e.g. "components-js:1.2.3,track-processors-js:1.2.3"
   string other_sdks = 11;
+  // client protocol version
+  int32 client_protocol = 12;
 }
 
 // server provided client configuration

@@ -31,16 +31,6 @@ service IngressInternal {
     option (psrpc.options).multi = true;
     option (psrpc.options).topics = true;
   };
-
-  rpc KillIngressSession(KillIngressSessionRequest) returns (google.protobuf.Empty) {
-    option (psrpc.options) = {
-      topics: true
-      topic_params: {
-        names: ["ingress_id", "resource_id"]
-        typed: false
-      }
-    };
-  };
 }
 
 service IngressHandler {

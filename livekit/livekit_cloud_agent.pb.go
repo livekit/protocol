@@ -137,6 +137,58 @@ func (AgentEventType) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{1}
 }
 
+type PrivateLinkStatus_Status int32
+
+const (
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_UNKNOWN   PrivateLinkStatus_Status = 0
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_PENDING   PrivateLinkStatus_Status = 1
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_AVAILABLE PrivateLinkStatus_Status = 2
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_ERROR     PrivateLinkStatus_Status = 3
+)
+
+// Enum value maps for PrivateLinkStatus_Status.
+var (
+	PrivateLinkStatus_Status_name = map[int32]string{
+		0: "PRIVATE_LINK_STATUS_UNKNOWN",
+		1: "PRIVATE_LINK_STATUS_PENDING",
+		2: "PRIVATE_LINK_STATUS_AVAILABLE",
+		3: "PRIVATE_LINK_STATUS_ERROR",
+	}
+	PrivateLinkStatus_Status_value = map[string]int32{
+		"PRIVATE_LINK_STATUS_UNKNOWN":   0,
+		"PRIVATE_LINK_STATUS_PENDING":   1,
+		"PRIVATE_LINK_STATUS_AVAILABLE": 2,
+		"PRIVATE_LINK_STATUS_ERROR":     3,
+	}
+)
+
+func (x PrivateLinkStatus_Status) Enum() *PrivateLinkStatus_Status {
+	p := new(PrivateLinkStatus_Status)
+	*p = x
+	return p
+}
+
+func (x PrivateLinkStatus_Status) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (PrivateLinkStatus_Status) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_cloud_agent_proto_enumTypes[2].Descriptor()
+}
+
+func (PrivateLinkStatus_Status) Type() protoreflect.EnumType {
+	return &file_livekit_cloud_agent_proto_enumTypes[2]
+}
+
+func (x PrivateLinkStatus_Status) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use PrivateLinkStatus_Status.Descriptor instead.
+func (PrivateLinkStatus_Status) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{30, 0}
+}
+
 type AgentEvent struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Type          AgentEventType         `protobuf:"varint,1,opt,name=type,proto3,enum=livekit.AgentEventType" json:"type,omitempty"`
@@ -854,6 +906,7 @@ type AgentVersion struct {
 	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
 	Owner         string                 `protobuf:"bytes,7,opt,name=owner,proto3" json:"owner,omitempty"`
+	Draining      bool                   `protobuf:"varint,8,opt,name=draining,proto3" json:"draining,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -935,6 +988,13 @@ func (x *AgentVersion) GetOwner() string {
 		return x.Owner
 	}
 	return ""
+}
+
+func (x *AgentVersion) GetDraining() bool {
+	if x != nil {
+		return x.Draining
+	}
+	return false
 }
 
 type ListAgentVersionsRequest struct {
@@ -2029,6 +2089,626 @@ func (*ClientSettingsRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{28}
 }
 
+type PrivateLink struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PrivateLinkId string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Region        string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
+	Port          uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
+	// Types that are valid to be assigned to Config:
+	//
+	//	*PrivateLink_Aws
+	Config        isPrivateLink_Config `protobuf_oneof:"config"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PrivateLink) Reset() {
+	*x = PrivateLink{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PrivateLink) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PrivateLink) ProtoMessage() {}
+
+func (x *PrivateLink) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PrivateLink.ProtoReflect.Descriptor instead.
+func (*PrivateLink) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *PrivateLink) GetPrivateLinkId() string {
+	if x != nil {
+		return x.PrivateLinkId
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetPort() uint32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
+func (x *PrivateLink) GetConfig() isPrivateLink_Config {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+func (x *PrivateLink) GetAws() *PrivateLink_AWSConfig {
+	if x != nil {
+		if x, ok := x.Config.(*PrivateLink_Aws); ok {
+			return x.Aws
+		}
+	}
+	return nil
+}
+
+type isPrivateLink_Config interface {
+	isPrivateLink_Config()
+}
+
+type PrivateLink_Aws struct {
+	Aws *PrivateLink_AWSConfig `protobuf:"bytes,3,opt,name=aws,proto3,oneof"`
+}
+
+func (*PrivateLink_Aws) isPrivateLink_Config() {}
+
+type PrivateLinkStatus struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Status        PrivateLinkStatus_Status `protobuf:"varint,1,opt,name=status,proto3,enum=livekit.PrivateLinkStatus_Status" json:"status,omitempty"`
+	UpdatedAt     *timestamppb.Timestamp   `protobuf:"bytes,2,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PrivateLinkStatus) Reset() {
+	*x = PrivateLinkStatus{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PrivateLinkStatus) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PrivateLinkStatus) ProtoMessage() {}
+
+func (x *PrivateLinkStatus) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PrivateLinkStatus.ProtoReflect.Descriptor instead.
+func (*PrivateLinkStatus) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *PrivateLinkStatus) GetStatus() PrivateLinkStatus_Status {
+	if x != nil {
+		return x.Status
+	}
+	return PrivateLinkStatus_PRIVATE_LINK_STATUS_UNKNOWN
+}
+
+func (x *PrivateLinkStatus) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type CreatePrivateLinkRequest struct {
+	state  protoimpl.MessageState `protogen:"open.v1"`
+	Name   string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Region string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Port   uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	// Types that are valid to be assigned to Config:
+	//
+	//	*CreatePrivateLinkRequest_Aws
+	Config        isCreatePrivateLinkRequest_Config `protobuf_oneof:"config"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePrivateLinkRequest) Reset() {
+	*x = CreatePrivateLinkRequest{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePrivateLinkRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePrivateLinkRequest) ProtoMessage() {}
+
+func (x *CreatePrivateLinkRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePrivateLinkRequest.ProtoReflect.Descriptor instead.
+func (*CreatePrivateLinkRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *CreatePrivateLinkRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreatePrivateLinkRequest) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *CreatePrivateLinkRequest) GetPort() uint32 {
+	if x != nil {
+		return x.Port
+	}
+	return 0
+}
+
+func (x *CreatePrivateLinkRequest) GetConfig() isCreatePrivateLinkRequest_Config {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+func (x *CreatePrivateLinkRequest) GetAws() *CreatePrivateLinkRequest_AWSCreateConfig {
+	if x != nil {
+		if x, ok := x.Config.(*CreatePrivateLinkRequest_Aws); ok {
+			return x.Aws
+		}
+	}
+	return nil
+}
+
+type isCreatePrivateLinkRequest_Config interface {
+	isCreatePrivateLinkRequest_Config()
+}
+
+type CreatePrivateLinkRequest_Aws struct {
+	Aws *CreatePrivateLinkRequest_AWSCreateConfig `protobuf:"bytes,2,opt,name=aws,proto3,oneof"`
+}
+
+func (*CreatePrivateLinkRequest_Aws) isCreatePrivateLinkRequest_Config() {}
+
+type CreatePrivateLinkResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PrivateLink   *PrivateLink           `protobuf:"bytes,1,opt,name=private_link,json=privateLink,proto3" json:"private_link,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePrivateLinkResponse) Reset() {
+	*x = CreatePrivateLinkResponse{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePrivateLinkResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePrivateLinkResponse) ProtoMessage() {}
+
+func (x *CreatePrivateLinkResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePrivateLinkResponse.ProtoReflect.Descriptor instead.
+func (*CreatePrivateLinkResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *CreatePrivateLinkResponse) GetPrivateLink() *PrivateLink {
+	if x != nil {
+		return x.PrivateLink
+	}
+	return nil
+}
+
+type DestroyPrivateLinkRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PrivateLinkId string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DestroyPrivateLinkRequest) Reset() {
+	*x = DestroyPrivateLinkRequest{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DestroyPrivateLinkRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DestroyPrivateLinkRequest) ProtoMessage() {}
+
+func (x *DestroyPrivateLinkRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DestroyPrivateLinkRequest.ProtoReflect.Descriptor instead.
+func (*DestroyPrivateLinkRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *DestroyPrivateLinkRequest) GetPrivateLinkId() string {
+	if x != nil {
+		return x.PrivateLinkId
+	}
+	return ""
+}
+
+type DestroyPrivateLinkResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DestroyPrivateLinkResponse) Reset() {
+	*x = DestroyPrivateLinkResponse{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DestroyPrivateLinkResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DestroyPrivateLinkResponse) ProtoMessage() {}
+
+func (x *DestroyPrivateLinkResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DestroyPrivateLinkResponse.ProtoReflect.Descriptor instead.
+func (*DestroyPrivateLinkResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{34}
+}
+
+type ListPrivateLinksRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPrivateLinksRequest) Reset() {
+	*x = ListPrivateLinksRequest{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPrivateLinksRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPrivateLinksRequest) ProtoMessage() {}
+
+func (x *ListPrivateLinksRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPrivateLinksRequest.ProtoReflect.Descriptor instead.
+func (*ListPrivateLinksRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{35}
+}
+
+type ListPrivateLinksResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*PrivateLink         `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListPrivateLinksResponse) Reset() {
+	*x = ListPrivateLinksResponse{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListPrivateLinksResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListPrivateLinksResponse) ProtoMessage() {}
+
+func (x *ListPrivateLinksResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListPrivateLinksResponse.ProtoReflect.Descriptor instead.
+func (*ListPrivateLinksResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *ListPrivateLinksResponse) GetItems() []*PrivateLink {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type GetPrivateLinkStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PrivateLinkId string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPrivateLinkStatusRequest) Reset() {
+	*x = GetPrivateLinkStatusRequest{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPrivateLinkStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPrivateLinkStatusRequest) ProtoMessage() {}
+
+func (x *GetPrivateLinkStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPrivateLinkStatusRequest.ProtoReflect.Descriptor instead.
+func (*GetPrivateLinkStatusRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *GetPrivateLinkStatusRequest) GetPrivateLinkId() string {
+	if x != nil {
+		return x.PrivateLinkId
+	}
+	return ""
+}
+
+type GetPrivateLinkStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Value         *PrivateLinkStatus     `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPrivateLinkStatusResponse) Reset() {
+	*x = GetPrivateLinkStatusResponse{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPrivateLinkStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPrivateLinkStatusResponse) ProtoMessage() {}
+
+func (x *GetPrivateLinkStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPrivateLinkStatusResponse.ProtoReflect.Descriptor instead.
+func (*GetPrivateLinkStatusResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *GetPrivateLinkStatusResponse) GetValue() *PrivateLinkStatus {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
+type PrivateLink_AWSConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PrivateLink_AWSConfig) Reset() {
+	*x = PrivateLink_AWSConfig{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PrivateLink_AWSConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PrivateLink_AWSConfig) ProtoMessage() {}
+
+func (x *PrivateLink_AWSConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PrivateLink_AWSConfig.ProtoReflect.Descriptor instead.
+func (*PrivateLink_AWSConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{29, 0}
+}
+
+func (x *PrivateLink_AWSConfig) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+type CreatePrivateLinkRequest_AWSCreateConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreatePrivateLinkRequest_AWSCreateConfig) Reset() {
+	*x = CreatePrivateLinkRequest_AWSCreateConfig{}
+	mi := &file_livekit_cloud_agent_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreatePrivateLinkRequest_AWSCreateConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreatePrivateLinkRequest_AWSCreateConfig) ProtoMessage() {}
+
+func (x *CreatePrivateLinkRequest_AWSCreateConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_cloud_agent_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreatePrivateLinkRequest_AWSCreateConfig.ProtoReflect.Descriptor instead.
+func (*CreatePrivateLinkRequest_AWSCreateConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{31, 0}
+}
+
+func (x *CreatePrivateLinkRequest_AWSCreateConfig) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
 var File_livekit_cloud_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_cloud_agent_proto_rawDesc = "" +
@@ -2101,7 +2781,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
 	"\bagent_id\x18\x02 \x01(\tR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
-	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xee\x02\n" +
+	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\x8a\x03\n" +
 	"\fAgentVersion\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x18\n" +
 	"\acurrent\x18\x02 \x01(\bR\acurrent\x129\n" +
@@ -2113,7 +2793,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"attributes\x18\x05 \x03(\v2%.livekit.AgentVersion.AttributesEntryR\n" +
 	"attributes\x12\x16\n" +
 	"\x06status\x18\x06 \x01(\tR\x06status\x12\x14\n" +
-	"\x05owner\x18\a \x01(\tR\x05owner\x1a=\n" +
+	"\x05owner\x18\a \x01(\tR\x05owner\x12\x1a\n" +
+	"\bdraining\x18\b \x01(\bR\bdraining\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
@@ -2191,7 +2872,45 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest*o\n" +
+	"\x15ClientSettingsRequest\"\xdc\x01\n" +
+	"\vPrivateLink\x12&\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
+	"\x04port\x18\x05 \x01(\rR\x04port\x122\n" +
+	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigH\x00R\x03aws\x1a'\n" +
+	"\tAWSConfig\x12\x1a\n" +
+	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
+	"\x06config\"\x98\x02\n" +
+	"\x11PrivateLinkStatus\x129\n" +
+	"\x06status\x18\x01 \x01(\x0e2!.livekit.PrivateLinkStatus.StatusR\x06status\x129\n" +
+	"\n" +
+	"updated_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x8c\x01\n" +
+	"\x06Status\x12\x1f\n" +
+	"\x1bPRIVATE_LINK_STATUS_UNKNOWN\x10\x00\x12\x1f\n" +
+	"\x1bPRIVATE_LINK_STATUS_PENDING\x10\x01\x12!\n" +
+	"\x1dPRIVATE_LINK_STATUS_AVAILABLE\x10\x02\x12\x1d\n" +
+	"\x19PRIVATE_LINK_STATUS_ERROR\x10\x03\"\xda\x01\n" +
+	"\x18CreatePrivateLinkRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
+	"\x06region\x18\x03 \x01(\tR\x06region\x12\x12\n" +
+	"\x04port\x18\x04 \x01(\rR\x04port\x12E\n" +
+	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigH\x00R\x03aws\x1a-\n" +
+	"\x0fAWSCreateConfig\x12\x1a\n" +
+	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
+	"\x06config\"T\n" +
+	"\x19CreatePrivateLinkResponse\x127\n" +
+	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"C\n" +
+	"\x19DestroyPrivateLinkRequest\x12&\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\"\x1c\n" +
+	"\x1aDestroyPrivateLinkResponse\"\x19\n" +
+	"\x17ListPrivateLinksRequest\"F\n" +
+	"\x18ListPrivateLinksResponse\x12*\n" +
+	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"E\n" +
+	"\x1bGetPrivateLinkStatusRequest\x12&\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\"P\n" +
+	"\x1cGetPrivateLinkStatusResponse\x120\n" +
+	"\x05value\x18\x01 \x01(\v2\x1a.livekit.PrivateLinkStatusR\x05value*o\n" +
 	"\x0fAgentSecretKind\x12\x1d\n" +
 	"\x19AGENT_SECRET_KIND_UNKNOWN\x10\x00\x12!\n" +
 	"\x1dAGENT_SECRET_KIND_ENVIRONMENT\x10\x01\x12\x1a\n" +
@@ -2200,7 +2919,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x18AGENT_EVENT_TYPE_UNKNOWN\x10\x00\x12(\n" +
 	"$AGENT_EVENT_TYPE_APPLICATION_CRASHED\x10\x01\x12.\n" +
 	"*AGENT_EVENT_TYPE_RESTARTED_HIGH_DISK_USAGE\x10\x02\x120\n" +
-	",AGENT_EVENT_TYPE_RESTARTED_HIGH_MEMORY_USAGE\x10\x032\x98\a\n" +
+	",AGENT_EVENT_TYPE_RESTARTED_HIGH_MEMORY_USAGE\x10\x032\x99\n" +
+	"\n" +
 	"\n" +
 	"CloudAgent\x12J\n" +
 	"\vCreateAgent\x12\x1b.livekit.CreateAgentRequest\x1a\x1c.livekit.CreateAgentResponse\"\x00\x12G\n" +
@@ -2214,7 +2934,11 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x12UpdateAgentSecrets\x12\".livekit.UpdateAgentSecretsRequest\x1a#.livekit.UpdateAgentSecretsResponse\"\x00\x12P\n" +
 	"\rRollbackAgent\x12\x1d.livekit.RollbackAgentRequest\x1a\x1e.livekit.RollbackAgentResponse\"\x00\x12J\n" +
 	"\vDeleteAgent\x12\x1b.livekit.DeleteAgentRequest\x1a\x1c.livekit.DeleteAgentResponse\"\x00\x12V\n" +
-	"\x11GetClientSettings\x12\x1e.livekit.ClientSettingsRequest\x1a\x1f.livekit.ClientSettingsResponse\"\x00BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x11GetClientSettings\x12\x1e.livekit.ClientSettingsRequest\x1a\x1f.livekit.ClientSettingsResponse\"\x00\x12\\\n" +
+	"\x11CreatePrivateLink\x12!.livekit.CreatePrivateLinkRequest\x1a\".livekit.CreatePrivateLinkResponse\"\x00\x12_\n" +
+	"\x12DestroyPrivateLink\x12\".livekit.DestroyPrivateLinkRequest\x1a#.livekit.DestroyPrivateLinkResponse\"\x00\x12Y\n" +
+	"\x10ListPrivateLinks\x12 .livekit.ListPrivateLinksRequest\x1a!.livekit.ListPrivateLinksResponse\"\x00\x12e\n" +
+	"\x14GetPrivateLinkStatus\x12$.livekit.GetPrivateLinkStatusRequest\x1a%.livekit.GetPrivateLinkStatusResponse\"\x00BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_cloud_agent_proto_rawDescOnce sync.Once
@@ -2228,95 +2952,123 @@ func file_livekit_cloud_agent_proto_rawDescGZIP() []byte {
 	return file_livekit_cloud_agent_proto_rawDescData
 }
 
-var file_livekit_cloud_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_livekit_cloud_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_livekit_cloud_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_livekit_cloud_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_livekit_cloud_agent_proto_goTypes = []any{
-	(AgentSecretKind)(0),               // 0: livekit.AgentSecretKind
-	(AgentEventType)(0),                // 1: livekit.AgentEventType
-	(*AgentEvent)(nil),                 // 2: livekit.AgentEvent
-	(*AgentSecret)(nil),                // 3: livekit.AgentSecret
-	(*CreateAgentRequest)(nil),         // 4: livekit.CreateAgentRequest
-	(*CreateAgentResponse)(nil),        // 5: livekit.CreateAgentResponse
-	(*PresignedPostRequest)(nil),       // 6: livekit.PresignedPostRequest
-	(*AgentDeployment)(nil),            // 7: livekit.AgentDeployment
-	(*AgentInfo)(nil),                  // 8: livekit.AgentInfo
-	(*ListAgentsRequest)(nil),          // 9: livekit.ListAgentsRequest
-	(*ListAgentsResponse)(nil),         // 10: livekit.ListAgentsResponse
-	(*AgentVersion)(nil),               // 11: livekit.AgentVersion
-	(*ListAgentVersionsRequest)(nil),   // 12: livekit.ListAgentVersionsRequest
-	(*ListAgentVersionsResponse)(nil),  // 13: livekit.ListAgentVersionsResponse
-	(*UpdateAgentRequest)(nil),         // 14: livekit.UpdateAgentRequest
-	(*UpdateAgentResponse)(nil),        // 15: livekit.UpdateAgentResponse
-	(*RestartAgentRequest)(nil),        // 16: livekit.RestartAgentRequest
-	(*RestartAgentResponse)(nil),       // 17: livekit.RestartAgentResponse
-	(*DeployAgentRequest)(nil),         // 18: livekit.DeployAgentRequest
-	(*DeployAgentResponse)(nil),        // 19: livekit.DeployAgentResponse
-	(*UpdateAgentSecretsRequest)(nil),  // 20: livekit.UpdateAgentSecretsRequest
-	(*UpdateAgentSecretsResponse)(nil), // 21: livekit.UpdateAgentSecretsResponse
-	(*RollbackAgentRequest)(nil),       // 22: livekit.RollbackAgentRequest
-	(*RollbackAgentResponse)(nil),      // 23: livekit.RollbackAgentResponse
-	(*DeleteAgentRequest)(nil),         // 24: livekit.DeleteAgentRequest
-	(*DeleteAgentResponse)(nil),        // 25: livekit.DeleteAgentResponse
-	(*ListAgentSecretsRequest)(nil),    // 26: livekit.ListAgentSecretsRequest
-	(*ListAgentSecretsResponse)(nil),   // 27: livekit.ListAgentSecretsResponse
-	(*SettingsParam)(nil),              // 28: livekit.SettingsParam
-	(*ClientSettingsResponse)(nil),     // 29: livekit.ClientSettingsResponse
-	(*ClientSettingsRequest)(nil),      // 30: livekit.ClientSettingsRequest
-	nil,                                // 31: livekit.PresignedPostRequest.ValuesEntry
-	nil,                                // 32: livekit.AgentVersion.AttributesEntry
-	(*timestamppb.Timestamp)(nil),      // 33: google.protobuf.Timestamp
+	(AgentSecretKind)(0),                             // 0: livekit.AgentSecretKind
+	(AgentEventType)(0),                              // 1: livekit.AgentEventType
+	(PrivateLinkStatus_Status)(0),                    // 2: livekit.PrivateLinkStatus.Status
+	(*AgentEvent)(nil),                               // 3: livekit.AgentEvent
+	(*AgentSecret)(nil),                              // 4: livekit.AgentSecret
+	(*CreateAgentRequest)(nil),                       // 5: livekit.CreateAgentRequest
+	(*CreateAgentResponse)(nil),                      // 6: livekit.CreateAgentResponse
+	(*PresignedPostRequest)(nil),                     // 7: livekit.PresignedPostRequest
+	(*AgentDeployment)(nil),                          // 8: livekit.AgentDeployment
+	(*AgentInfo)(nil),                                // 9: livekit.AgentInfo
+	(*ListAgentsRequest)(nil),                        // 10: livekit.ListAgentsRequest
+	(*ListAgentsResponse)(nil),                       // 11: livekit.ListAgentsResponse
+	(*AgentVersion)(nil),                             // 12: livekit.AgentVersion
+	(*ListAgentVersionsRequest)(nil),                 // 13: livekit.ListAgentVersionsRequest
+	(*ListAgentVersionsResponse)(nil),                // 14: livekit.ListAgentVersionsResponse
+	(*UpdateAgentRequest)(nil),                       // 15: livekit.UpdateAgentRequest
+	(*UpdateAgentResponse)(nil),                      // 16: livekit.UpdateAgentResponse
+	(*RestartAgentRequest)(nil),                      // 17: livekit.RestartAgentRequest
+	(*RestartAgentResponse)(nil),                     // 18: livekit.RestartAgentResponse
+	(*DeployAgentRequest)(nil),                       // 19: livekit.DeployAgentRequest
+	(*DeployAgentResponse)(nil),                      // 20: livekit.DeployAgentResponse
+	(*UpdateAgentSecretsRequest)(nil),                // 21: livekit.UpdateAgentSecretsRequest
+	(*UpdateAgentSecretsResponse)(nil),               // 22: livekit.UpdateAgentSecretsResponse
+	(*RollbackAgentRequest)(nil),                     // 23: livekit.RollbackAgentRequest
+	(*RollbackAgentResponse)(nil),                    // 24: livekit.RollbackAgentResponse
+	(*DeleteAgentRequest)(nil),                       // 25: livekit.DeleteAgentRequest
+	(*DeleteAgentResponse)(nil),                      // 26: livekit.DeleteAgentResponse
+	(*ListAgentSecretsRequest)(nil),                  // 27: livekit.ListAgentSecretsRequest
+	(*ListAgentSecretsResponse)(nil),                 // 28: livekit.ListAgentSecretsResponse
+	(*SettingsParam)(nil),                            // 29: livekit.SettingsParam
+	(*ClientSettingsResponse)(nil),                   // 30: livekit.ClientSettingsResponse
+	(*ClientSettingsRequest)(nil),                    // 31: livekit.ClientSettingsRequest
+	(*PrivateLink)(nil),                              // 32: livekit.PrivateLink
+	(*PrivateLinkStatus)(nil),                        // 33: livekit.PrivateLinkStatus
+	(*CreatePrivateLinkRequest)(nil),                 // 34: livekit.CreatePrivateLinkRequest
+	(*CreatePrivateLinkResponse)(nil),                // 35: livekit.CreatePrivateLinkResponse
+	(*DestroyPrivateLinkRequest)(nil),                // 36: livekit.DestroyPrivateLinkRequest
+	(*DestroyPrivateLinkResponse)(nil),               // 37: livekit.DestroyPrivateLinkResponse
+	(*ListPrivateLinksRequest)(nil),                  // 38: livekit.ListPrivateLinksRequest
+	(*ListPrivateLinksResponse)(nil),                 // 39: livekit.ListPrivateLinksResponse
+	(*GetPrivateLinkStatusRequest)(nil),              // 40: livekit.GetPrivateLinkStatusRequest
+	(*GetPrivateLinkStatusResponse)(nil),             // 41: livekit.GetPrivateLinkStatusResponse
+	nil,                                              // 42: livekit.PresignedPostRequest.ValuesEntry
+	nil,                                              // 43: livekit.AgentVersion.AttributesEntry
+	(*PrivateLink_AWSConfig)(nil),                    // 44: livekit.PrivateLink.AWSConfig
+	(*CreatePrivateLinkRequest_AWSCreateConfig)(nil), // 45: livekit.CreatePrivateLinkRequest.AWSCreateConfig
+	(*timestamppb.Timestamp)(nil),                    // 46: google.protobuf.Timestamp
 }
 var file_livekit_cloud_agent_proto_depIdxs = []int32{
 	1,  // 0: livekit.AgentEvent.type:type_name -> livekit.AgentEventType
-	33, // 1: livekit.AgentEvent.timestamp:type_name -> google.protobuf.Timestamp
-	33, // 2: livekit.AgentSecret.created_at:type_name -> google.protobuf.Timestamp
-	33, // 3: livekit.AgentSecret.updated_at:type_name -> google.protobuf.Timestamp
+	46, // 1: livekit.AgentEvent.timestamp:type_name -> google.protobuf.Timestamp
+	46, // 2: livekit.AgentSecret.created_at:type_name -> google.protobuf.Timestamp
+	46, // 3: livekit.AgentSecret.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: livekit.AgentSecret.kind:type_name -> livekit.AgentSecretKind
-	3,  // 5: livekit.CreateAgentRequest.secrets:type_name -> livekit.AgentSecret
-	6,  // 6: livekit.CreateAgentResponse.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	31, // 7: livekit.PresignedPostRequest.values:type_name -> livekit.PresignedPostRequest.ValuesEntry
-	2,  // 8: livekit.AgentDeployment.events:type_name -> livekit.AgentEvent
-	7,  // 9: livekit.AgentInfo.agent_deployments:type_name -> livekit.AgentDeployment
-	3,  // 10: livekit.AgentInfo.secrets:type_name -> livekit.AgentSecret
-	33, // 11: livekit.AgentInfo.deployed_at:type_name -> google.protobuf.Timestamp
-	8,  // 12: livekit.ListAgentsResponse.agents:type_name -> livekit.AgentInfo
-	33, // 13: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
-	33, // 14: livekit.AgentVersion.deployed_at:type_name -> google.protobuf.Timestamp
-	32, // 15: livekit.AgentVersion.attributes:type_name -> livekit.AgentVersion.AttributesEntry
-	11, // 16: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
-	3,  // 17: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
-	3,  // 18: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
-	6,  // 19: livekit.DeployAgentResponse.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	3,  // 20: livekit.UpdateAgentSecretsRequest.secrets:type_name -> livekit.AgentSecret
-	3,  // 21: livekit.ListAgentSecretsResponse.secrets:type_name -> livekit.AgentSecret
-	28, // 22: livekit.ClientSettingsResponse.params:type_name -> livekit.SettingsParam
-	4,  // 23: livekit.CloudAgent.CreateAgent:input_type -> livekit.CreateAgentRequest
-	9,  // 24: livekit.CloudAgent.ListAgents:input_type -> livekit.ListAgentsRequest
-	12, // 25: livekit.CloudAgent.ListAgentVersions:input_type -> livekit.ListAgentVersionsRequest
-	26, // 26: livekit.CloudAgent.ListAgentSecrets:input_type -> livekit.ListAgentSecretsRequest
-	14, // 27: livekit.CloudAgent.UpdateAgent:input_type -> livekit.UpdateAgentRequest
-	16, // 28: livekit.CloudAgent.RestartAgent:input_type -> livekit.RestartAgentRequest
-	18, // 29: livekit.CloudAgent.DeployAgent:input_type -> livekit.DeployAgentRequest
-	20, // 30: livekit.CloudAgent.UpdateAgentSecrets:input_type -> livekit.UpdateAgentSecretsRequest
-	22, // 31: livekit.CloudAgent.RollbackAgent:input_type -> livekit.RollbackAgentRequest
-	24, // 32: livekit.CloudAgent.DeleteAgent:input_type -> livekit.DeleteAgentRequest
-	30, // 33: livekit.CloudAgent.GetClientSettings:input_type -> livekit.ClientSettingsRequest
-	5,  // 34: livekit.CloudAgent.CreateAgent:output_type -> livekit.CreateAgentResponse
-	10, // 35: livekit.CloudAgent.ListAgents:output_type -> livekit.ListAgentsResponse
-	13, // 36: livekit.CloudAgent.ListAgentVersions:output_type -> livekit.ListAgentVersionsResponse
-	27, // 37: livekit.CloudAgent.ListAgentSecrets:output_type -> livekit.ListAgentSecretsResponse
-	15, // 38: livekit.CloudAgent.UpdateAgent:output_type -> livekit.UpdateAgentResponse
-	17, // 39: livekit.CloudAgent.RestartAgent:output_type -> livekit.RestartAgentResponse
-	19, // 40: livekit.CloudAgent.DeployAgent:output_type -> livekit.DeployAgentResponse
-	21, // 41: livekit.CloudAgent.UpdateAgentSecrets:output_type -> livekit.UpdateAgentSecretsResponse
-	23, // 42: livekit.CloudAgent.RollbackAgent:output_type -> livekit.RollbackAgentResponse
-	25, // 43: livekit.CloudAgent.DeleteAgent:output_type -> livekit.DeleteAgentResponse
-	29, // 44: livekit.CloudAgent.GetClientSettings:output_type -> livekit.ClientSettingsResponse
-	34, // [34:45] is the sub-list for method output_type
-	23, // [23:34] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	4,  // 5: livekit.CreateAgentRequest.secrets:type_name -> livekit.AgentSecret
+	7,  // 6: livekit.CreateAgentResponse.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	42, // 7: livekit.PresignedPostRequest.values:type_name -> livekit.PresignedPostRequest.ValuesEntry
+	3,  // 8: livekit.AgentDeployment.events:type_name -> livekit.AgentEvent
+	8,  // 9: livekit.AgentInfo.agent_deployments:type_name -> livekit.AgentDeployment
+	4,  // 10: livekit.AgentInfo.secrets:type_name -> livekit.AgentSecret
+	46, // 11: livekit.AgentInfo.deployed_at:type_name -> google.protobuf.Timestamp
+	9,  // 12: livekit.ListAgentsResponse.agents:type_name -> livekit.AgentInfo
+	46, // 13: livekit.AgentVersion.created_at:type_name -> google.protobuf.Timestamp
+	46, // 14: livekit.AgentVersion.deployed_at:type_name -> google.protobuf.Timestamp
+	43, // 15: livekit.AgentVersion.attributes:type_name -> livekit.AgentVersion.AttributesEntry
+	12, // 16: livekit.ListAgentVersionsResponse.versions:type_name -> livekit.AgentVersion
+	4,  // 17: livekit.UpdateAgentRequest.secrets:type_name -> livekit.AgentSecret
+	4,  // 18: livekit.DeployAgentRequest.secrets:type_name -> livekit.AgentSecret
+	7,  // 19: livekit.DeployAgentResponse.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	4,  // 20: livekit.UpdateAgentSecretsRequest.secrets:type_name -> livekit.AgentSecret
+	4,  // 21: livekit.ListAgentSecretsResponse.secrets:type_name -> livekit.AgentSecret
+	29, // 22: livekit.ClientSettingsResponse.params:type_name -> livekit.SettingsParam
+	44, // 23: livekit.PrivateLink.aws:type_name -> livekit.PrivateLink.AWSConfig
+	2,  // 24: livekit.PrivateLinkStatus.status:type_name -> livekit.PrivateLinkStatus.Status
+	46, // 25: livekit.PrivateLinkStatus.updated_at:type_name -> google.protobuf.Timestamp
+	45, // 26: livekit.CreatePrivateLinkRequest.aws:type_name -> livekit.CreatePrivateLinkRequest.AWSCreateConfig
+	32, // 27: livekit.CreatePrivateLinkResponse.private_link:type_name -> livekit.PrivateLink
+	32, // 28: livekit.ListPrivateLinksResponse.items:type_name -> livekit.PrivateLink
+	33, // 29: livekit.GetPrivateLinkStatusResponse.value:type_name -> livekit.PrivateLinkStatus
+	5,  // 30: livekit.CloudAgent.CreateAgent:input_type -> livekit.CreateAgentRequest
+	10, // 31: livekit.CloudAgent.ListAgents:input_type -> livekit.ListAgentsRequest
+	13, // 32: livekit.CloudAgent.ListAgentVersions:input_type -> livekit.ListAgentVersionsRequest
+	27, // 33: livekit.CloudAgent.ListAgentSecrets:input_type -> livekit.ListAgentSecretsRequest
+	15, // 34: livekit.CloudAgent.UpdateAgent:input_type -> livekit.UpdateAgentRequest
+	17, // 35: livekit.CloudAgent.RestartAgent:input_type -> livekit.RestartAgentRequest
+	19, // 36: livekit.CloudAgent.DeployAgent:input_type -> livekit.DeployAgentRequest
+	21, // 37: livekit.CloudAgent.UpdateAgentSecrets:input_type -> livekit.UpdateAgentSecretsRequest
+	23, // 38: livekit.CloudAgent.RollbackAgent:input_type -> livekit.RollbackAgentRequest
+	25, // 39: livekit.CloudAgent.DeleteAgent:input_type -> livekit.DeleteAgentRequest
+	31, // 40: livekit.CloudAgent.GetClientSettings:input_type -> livekit.ClientSettingsRequest
+	34, // 41: livekit.CloudAgent.CreatePrivateLink:input_type -> livekit.CreatePrivateLinkRequest
+	36, // 42: livekit.CloudAgent.DestroyPrivateLink:input_type -> livekit.DestroyPrivateLinkRequest
+	38, // 43: livekit.CloudAgent.ListPrivateLinks:input_type -> livekit.ListPrivateLinksRequest
+	40, // 44: livekit.CloudAgent.GetPrivateLinkStatus:input_type -> livekit.GetPrivateLinkStatusRequest
+	6,  // 45: livekit.CloudAgent.CreateAgent:output_type -> livekit.CreateAgentResponse
+	11, // 46: livekit.CloudAgent.ListAgents:output_type -> livekit.ListAgentsResponse
+	14, // 47: livekit.CloudAgent.ListAgentVersions:output_type -> livekit.ListAgentVersionsResponse
+	28, // 48: livekit.CloudAgent.ListAgentSecrets:output_type -> livekit.ListAgentSecretsResponse
+	16, // 49: livekit.CloudAgent.UpdateAgent:output_type -> livekit.UpdateAgentResponse
+	18, // 50: livekit.CloudAgent.RestartAgent:output_type -> livekit.RestartAgentResponse
+	20, // 51: livekit.CloudAgent.DeployAgent:output_type -> livekit.DeployAgentResponse
+	22, // 52: livekit.CloudAgent.UpdateAgentSecrets:output_type -> livekit.UpdateAgentSecretsResponse
+	24, // 53: livekit.CloudAgent.RollbackAgent:output_type -> livekit.RollbackAgentResponse
+	26, // 54: livekit.CloudAgent.DeleteAgent:output_type -> livekit.DeleteAgentResponse
+	30, // 55: livekit.CloudAgent.GetClientSettings:output_type -> livekit.ClientSettingsResponse
+	35, // 56: livekit.CloudAgent.CreatePrivateLink:output_type -> livekit.CreatePrivateLinkResponse
+	37, // 57: livekit.CloudAgent.DestroyPrivateLink:output_type -> livekit.DestroyPrivateLinkResponse
+	39, // 58: livekit.CloudAgent.ListPrivateLinks:output_type -> livekit.ListPrivateLinksResponse
+	41, // 59: livekit.CloudAgent.GetPrivateLinkStatus:output_type -> livekit.GetPrivateLinkStatusResponse
+	45, // [45:60] is the sub-list for method output_type
+	30, // [30:45] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_livekit_cloud_agent_proto_init() }
@@ -2324,13 +3076,19 @@ func file_livekit_cloud_agent_proto_init() {
 	if File_livekit_cloud_agent_proto != nil {
 		return
 	}
+	file_livekit_cloud_agent_proto_msgTypes[29].OneofWrappers = []any{
+		(*PrivateLink_Aws)(nil),
+	}
+	file_livekit_cloud_agent_proto_msgTypes[31].OneofWrappers = []any{
+		(*CreatePrivateLinkRequest_Aws)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_cloud_agent_proto_rawDesc), len(file_livekit_cloud_agent_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   31,
+			NumEnums:      3,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

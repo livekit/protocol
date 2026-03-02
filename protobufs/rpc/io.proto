@@ -66,6 +66,7 @@ message GetIngressInfoResponse {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
+  string project_id = 6;
   map<string, string> logging_fields = 4;
   map<string, string> feature_flags = 5;
 }
@@ -77,20 +78,20 @@ message UpdateIngressStateRequest {
 }
 
 message GetSIPTrunkAuthenticationRequest {
-  string sip_call_id = 6 [deprecated=true];
+  string sip_call_id = 6 [deprecated = true];
 
   // What Number is calling
-  string from = 2 [deprecated=true];
+  string from = 2 [deprecated = true];
   // What Host is calling
-  string from_host = 7 [deprecated=true];
+  string from_host = 7 [deprecated = true];
 
   // What Number was called
-  string to = 3 [deprecated=true];
+  string to = 3 [deprecated = true];
   // What Host was called
-  string to_host = 5 [deprecated=true];
+  string to_host = 5 [deprecated = true];
 
   // What is the IP address of the called number
-  string src_address = 4 [deprecated=true];
+  string src_address = 4 [deprecated = true];
 
   SIPCall call = 8;
 
@@ -107,7 +108,7 @@ message GetSIPTrunkAuthenticationResponse {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  bool   drop = 3;
+  bool drop = 3;
   // Trunk used to fulfill this request
   string sip_trunk_id = 4;
   // Used in Cloud only
@@ -115,25 +116,28 @@ message GetSIPTrunkAuthenticationResponse {
   livekit.ProviderInfo provider_info = 6;
   // Error code if authentication failed
   SIPTrunkAuthenticationError error_code = 7;
+
+  // Optional per-project feature flag set
+  map<string, string> feature_flags = 8;
 }
 
 message EvaluateSIPDispatchRulesRequest {
-  string sip_call_id = 8 [deprecated=true];
-  string sip_participant_id = 1 [deprecated=true];
+  string sip_call_id = 8 [deprecated = true];
+  string sip_participant_id = 1 [deprecated = true];
   // Trunk from the auth response, if any
   string sip_trunk_id = 10;
 
   // What Number is calling
-  string calling_number = 2 [deprecated=true];
+  string calling_number = 2 [deprecated = true];
 
   // What Host is calling
-  string calling_host = 11 [deprecated=true];
+  string calling_host = 11 [deprecated = true];
 
   // What Number was called
-  string called_number = 3 [deprecated=true];
+  string called_number = 3 [deprecated = true];
 
   // What is the IP address of the called number
-  string src_address = 4 [deprecated=true];
+  string src_address = 4 [deprecated = true];
 
   // What pin has been entered if any
   string pin = 5;
@@ -142,7 +146,7 @@ message EvaluateSIPDispatchRulesRequest {
   bool no_pin = 6;
 
   // What Host was called
-  string called_host = 7 [deprecated=true];
+  string called_host = 7 [deprecated = true];
 
   // Extra participant attributes added for this call.
   // Usually include provider-specific metadata.
@@ -178,7 +182,7 @@ message EvaluateSIPDispatchRulesResponse {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
-  bool request_pin = 3 [deprecated=true]; // see result
+  bool request_pin = 3 [deprecated = true];  // see result
 
   // optional token that should be used when creating LiveKit participant
   string token = 4 [
@@ -234,14 +238,16 @@ message EvaluateSIPDispatchRulesResponse {
 
   livekit.SIPMediaEncryption media_encryption = 22;
 
-  // NEXT ID: 23
+  map<string, string> feature_flags = 23;
+
+  // NEXT ID: 24
 }
 
 message UpdateSIPCallStateRequest {
   livekit.SIPCallInfo call_info = 1;
   livekit.SIPTransferInfo transfer_info = 2;
 
-   // NEXT ID: 3
+  // NEXT ID: 3
 }
 
 message RecordCallContextRequest {
@@ -251,7 +257,7 @@ message RecordCallContextRequest {
 }
 
 enum SIPDispatchResult {
-  LEGACY_ACCEPT_OR_PIN = 0; // check request_pin field
+  LEGACY_ACCEPT_OR_PIN = 0;  // check request_pin field
   ACCEPT = 1;
   REQUEST_PIN = 2;
   REJECT = 3;
@@ -266,11 +272,11 @@ enum SIPTrunkAuthenticationError {
 
 message SIPCall {
   string lk_call_id = 1;
-  string source_ip = 2; // source ip (without port)
-  livekit.SIPUri address = 3; // address in the request line (INVITE)
-  livekit.SIPUri from = 4; // From header
-  livekit.SIPUri to = 5; // To header
-  repeated livekit.SIPUri via = 6; // Via headers
-  string sip_call_id = 7; // SIP protocol generated call ID
-  string project_id = 8; // LiveKit project ID (Cloud only)
+  string source_ip = 2;             // source ip (without port)
+  livekit.SIPUri address = 3;       // address in the request line (INVITE)
+  livekit.SIPUri from = 4;          // From header
+  livekit.SIPUri to = 5;            // To header
+  repeated livekit.SIPUri via = 6;  // Via headers
+  string sip_call_id = 7;           // SIP protocol generated call ID
+  string project_id = 8;            // LiveKit project ID (Cloud only)
 }
