@@ -267,7 +267,7 @@ message TrackInfo {
   repeated AudioTrackFeature audio_features = 19;
   BackupCodecPolicy backup_codec_policy = 20;
 
-  repeated RTPTrailerFeature rtp_trailer_features = 21;
+  repeated PacketTrailerFeature packet_trailer_features = 21;
 }
 
 message DataTrackInfo {
@@ -762,8 +762,8 @@ enum AudioTrackFeature {
   TF_PRECONNECT_BUFFER = 6; // client will buffer audio once available and send it to the server via bytes stream once connected
 }
 
-enum RTPTrailerFeature {
-  USER_TIMESTAMP = 0;
+enum PacketTrailerFeature {
+  PTF_USER_TIMESTAMP = 0;
 }
 
 message DataStream {
