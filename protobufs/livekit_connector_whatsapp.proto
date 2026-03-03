@@ -19,9 +19,11 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/duration.proto";
 import "livekit_agent_dispatch.proto";
 import "livekit_rtc.proto";
 import "logger/options.proto";
+
 
 message DialWhatsAppCallRequest {
   // Required - The phone number id of the business that is initiating the call
@@ -58,7 +60,8 @@ message DialWhatsAppCallRequest {
   ];
   // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 11;
-  // Next - 13
+  // Max time for the callee to answer the call.
+  google.protobuf.Duration ringing_timeout = 13;
 }
 
 message DialWhatsAppCallResponse {
@@ -142,7 +145,10 @@ message AcceptWhatsAppCallRequest {
   ];
   // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
   string destination_country = 12;
-  // Next - 14
+  // Max time for the callee to answer the call.
+  google.protobuf.Duration ringing_timeout = 14;
+  // Wait for the answer for the call before returning.
+  bool wait_until_answered = 15;
 }
 
 message AcceptWhatsAppCallResponse {
