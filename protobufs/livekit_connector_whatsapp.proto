@@ -19,9 +19,11 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/duration.proto";
 import "livekit_agent_dispatch.proto";
 import "livekit_rtc.proto";
 import "logger/options.proto";
+
 
 message DialWhatsAppCallRequest {
   // Required - The phone number id of the business that is initiating the call
