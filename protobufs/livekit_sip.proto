@@ -523,6 +523,9 @@ message SIPDispatchRuleIndividual {
 
   // Optional pin required to enter room
   string pin = 2;
+
+  // Optionally append random suffix
+  bool no_randomness = 3;
 }
 
 message SIPDispatchRuleCallee {
