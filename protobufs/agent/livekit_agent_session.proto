@@ -31,7 +31,7 @@ message ChatMessage {
       string text = 1;
     }
   }
-  
+
   string id = 1;
   ChatRole role = 2;
   repeated ChatContent content = 3;
@@ -79,3 +79,130 @@ message ChatContext {
   repeated ChatItem items = 1;
 }
 
+message SessionAudioFrame {
+  bytes data = 1;
+  uint32 sample_rate = 2;
+  uint32 num_channels = 3;
+  uint32 samples_per_channel = 4;
+}
+
+enum SessionAgentState {
+  SESSION_AGENT_STATE_INITIALIZING = 0;
+  SESSION_AGENT_STATE_IDLE = 1;
+  SESSION_AGENT_STATE_LISTENING = 2;
+  SESSION_AGENT_STATE_THINKING = 3;
+  SESSION_AGENT_STATE_SPEAKING = 4;
+}
+
+enum SessionUserState {
+  SESSION_USER_STATE_SPEAKING = 0;
+  SESSION_USER_STATE_LISTENING = 1;
+  SESSION_USER_STATE_AWAY = 2;
+}
+
+message SessionEvent {
+  message AgentStateChanged {
+    SessionAgentState old_state = 1;
+    SessionAgentState new_state = 2;
+  }
+
+  message UserStateChanged {
+    SessionUserState old_state = 1;
+    SessionUserState new_state = 2;
+  }
+
+  message ConversationItemAdded {
+    ChatContext.ChatItem item = 1;
+  }
+
+  message UserInputTranscribed {
+    string transcript = 1;
+    bool is_final = 2;
+    optional string language = 3;
+  }
+
+  message FunctionToolsExecuted {
+    repeated FunctionCall function_calls = 1;
+    repeated FunctionCallOutput function_call_outputs = 2;
+  }
+
+  message MetricsCollected {
+    MetricsReport metrics = 1;
+  }
+
+  message Error {
+    string message = 1;
+  }
+
+  google.protobuf.Timestamp created_at = 1;
+  oneof event {
+    AgentStateChanged agent_state_changed = 10;
+    UserStateChanged user_state_changed = 11;
+    ConversationItemAdded conversation_item_added = 12;
+    UserInputTranscribed user_input_transcribed = 13;
+    FunctionToolsExecuted function_tools_executed = 14;
+    MetricsCollected metrics_collected = 15;
+    Error error = 16;
+  }
+}
+
+message SessionRequest {
+  message Ping {}
+
+  message GetState {}
+  message GetStateResponse {
+    SessionAgentState agent_state = 1;
+    SessionUserState user_state = 2;
+    string agent_id = 3;
+  }
+
+  message GetChatHistory {}
+  message GetChatHistoryResponse {
+    repeated ChatContext.ChatItem items = 1;
+  }
+
+  message SendMessage {
+    string text = 1;
+  }
+  message SendMessageResponse {
+    repeated ChatContext.ChatItem items = 1;
+  }
+
+  string request_id = 1;
+  oneof request {
+    Ping ping = 2;
+    GetState get_state = 3;
+    GetChatHistory get_chat_history = 4;
+    SendMessage send_message = 5;
+  }
+}
+
+message SessionResponse {
+  message Pong {}
+
+  string request_id = 1;
+  optional string error = 2;
+  oneof response {
+    Pong pong = 3;
+    SessionRequest.GetStateResponse get_state = 4;
+    SessionRequest.GetChatHistoryResponse get_chat_history = 5;
+    SessionRequest.SendMessageResponse send_message = 6;
+  }
+}
+
+message SessionAudioPlaybackFlush {}
+message SessionAudioPlaybackClear {}
+message SessionAudioPlaybackFinished {}
+
+message AgentSessionMessage {
+  oneof message {
+    SessionAudioFrame audio_input = 1;
+    SessionAudioFrame audio_output = 2;
+    SessionEvent event = 3;
+    SessionRequest request = 4;
+    SessionResponse response = 5;
+    SessionAudioPlaybackFlush audio_playback_flush = 6;
+    SessionAudioPlaybackClear audio_playback_clear = 7;
+    SessionAudioPlaybackFinished audio_playback_finished = 8;
+  }
+}
