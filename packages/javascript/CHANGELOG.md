@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.45.0
+
+### Minor Changes
+
+- Add PayloadTrailerFeature to TrackInfo and AddTrackRequest - [#1438](https://github.com/livekit/protocol/pull/1438) ([@chenosaurus](https://github.com/chenosaurus))
+
+### Patch Changes
+
+- move out connector protos - [#1429](https://github.com/livekit/protocol/pull/1429) ([@paulwe](https://github.com/paulwe))
+
+- add AGENT_ERROR disconnect reason - [#1434](https://github.com/livekit/protocol/pull/1434) ([@theomonnom](https://github.com/theomonnom))
+
 ## 1.44.1
 
 ### Patch Changes
