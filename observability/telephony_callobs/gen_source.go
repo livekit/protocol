@@ -1,5 +1,21 @@
 // Code generated; DO NOT EDIT.
-package telephonycallobs
+package telephony_callobs
+
+type CallTrunkType string
+
+const (
+	CallTrunkTypeUndefined CallTrunkType = ""
+	CallTrunkTypeInternal  CallTrunkType = "internal"
+	CallTrunkTypeExternal  CallTrunkType = "external"
+)
+
+type CallNumberType string
+
+const (
+	CallNumberTypeUndefined CallNumberType = ""
+	CallNumberTypeTollFree  CallNumberType = "toll_free"
+	CallNumberTypeRegular   CallNumberType = "regular"
+)
 
 type CallDirection string
 
