@@ -607,6 +607,8 @@ enum DisconnectReason {
   CONNECTION_TIMEOUT = 14;
   // media stream failure or media timeout
   MEDIA_FAILURE = 15;
+  // agent encountered an error
+  AGENT_ERROR = 16;
 }
 
 message RTPDrift {

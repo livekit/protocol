@@ -581,6 +581,8 @@ const (
 	DisconnectReason_CONNECTION_TIMEOUT DisconnectReason = 14
 	// media stream failure or media timeout
 	DisconnectReason_MEDIA_FAILURE DisconnectReason = 15
+	// agent encountered an error
+	DisconnectReason_AGENT_ERROR DisconnectReason = 16
 )
 
 // Enum value maps for DisconnectReason.
@@ -602,6 +604,7 @@ var (
 		13: "SIP_TRUNK_FAILURE",
 		14: "CONNECTION_TIMEOUT",
 		15: "MEDIA_FAILURE",
+		16: "AGENT_ERROR",
 	}
 	DisconnectReason_value = map[string]int32{
 		"UNKNOWN_REASON":      0,
@@ -620,6 +623,7 @@ var (
 		"SIP_TRUNK_FAILURE":   13,
 		"CONNECTION_TIMEOUT":  14,
 		"MEDIA_FAILURE":       15,
+		"AGENT_ERROR":         16,
 	}
 )
 
@@ -6648,7 +6652,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x13ClientConfigSetting\x12\t\n" +
 	"\x05UNSET\x10\x00\x12\f\n" +
 	"\bDISABLED\x10\x01\x12\v\n" +
-	"\aENABLED\x10\x02*\xd7\x02\n" +
+	"\aENABLED\x10\x02*\xe8\x02\n" +
 	"\x10DisconnectReason\x12\x12\n" +
 	"\x0eUNKNOWN_REASON\x10\x00\x12\x14\n" +
 	"\x10CLIENT_INITIATED\x10\x01\x12\x16\n" +
@@ -6666,7 +6670,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\rUSER_REJECTED\x10\f\x12\x15\n" +
 	"\x11SIP_TRUNK_FAILURE\x10\r\x12\x16\n" +
 	"\x12CONNECTION_TIMEOUT\x10\x0e\x12\x11\n" +
-	"\rMEDIA_FAILURE\x10\x0f*\x89\x01\n" +
+	"\rMEDIA_FAILURE\x10\x0f\x12\x0f\n" +
+	"\vAGENT_ERROR\x10\x10*\x89\x01\n" +
 	"\x0fReconnectReason\x12\x0e\n" +
 	"\n" +
 	"RR_UNKNOWN\x10\x00\x12\x1a\n" +
