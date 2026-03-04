@@ -5,12 +5,13 @@ import (
 
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/observability/agentsobs"
+	"github.com/livekit/protocol/observability/core_callobs"
 	"github.com/livekit/protocol/observability/egressobs"
 	"github.com/livekit/protocol/observability/gatewayobs"
 	"github.com/livekit/protocol/observability/ingressobs"
 	"github.com/livekit/protocol/observability/roomobs"
 	"github.com/livekit/protocol/observability/storageobs"
-	"github.com/livekit/protocol/observability/telephonycallobs"
+	"github.com/livekit/protocol/observability/telephony_callobs"
 	"github.com/livekit/protocol/observability/telephonyobs"
 )
 
@@ -26,7 +27,8 @@ type Reporter interface {
 	Telephony() telephonyobs.Reporter
 	Egress() egressobs.Reporter
 	Ingress() ingressobs.Reporter
-	TelephonyCall() telephonycallobs.Reporter
+	TelephonyCall() telephony_callobs.Reporter
+	CoreCall() core_callobs.Reporter
 	Storage() storageobs.Reporter
 	Close()
 }
@@ -65,8 +67,12 @@ func (reporter) Ingress() ingressobs.Reporter {
 	return ingressobs.NewNoopReporter()
 }
 
-func (reporter) TelephonyCall() telephonycallobs.Reporter {
-	return telephonycallobs.NewNoopReporter()
+func (reporter) TelephonyCall() telephony_callobs.Reporter {
+	return telephony_callobs.NewNoopReporter()
+}
+
+func (reporter) CoreCall() core_callobs.Reporter {
+	return core_callobs.NewNoopReporter()
 }
 
 func (reporter) Storage() storageobs.Reporter { return storageobs.NewNoopReporter() }
