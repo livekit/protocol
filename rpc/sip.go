@@ -98,8 +98,8 @@ func NewCreateSIPParticipantRequest(
 		authPass = trunk.AuthPassword
 		hdrToAttr = trunk.HeadersToAttributes
 		attrToHdr = trunk.AttributesToHeaders
-		if trunk.CustomFromHost != "" {
-			fromHostname = trunk.CustomFromHost
+		if trunk.FromHost != "" {
+			fromHostname = trunk.FromHost
 		}
 	} else if t := req.Trunk; t != nil {
 		hostname = t.Hostname
@@ -109,8 +109,8 @@ func NewCreateSIPParticipantRequest(
 		authPass = t.AuthPassword
 		hdrToAttr = t.HeadersToAttributes
 		attrToHdr = t.AttributesToHeaders
-		if t.CustomFromHost != "" {
-			fromHostname = t.CustomFromHost
+		if t.FromHost != "" {
+			fromHostname = t.FromHost
 		}
 	}
 

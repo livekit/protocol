@@ -516,12 +516,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
 		return errors.New("trunk address should be a hostname or IP, not SIP URI")
 	}
-	if p.CustomFromHost != "" {
-		if strings.Contains(p.CustomFromHost, "transport=") {
-			return errors.New("custom_from_host should not contain transport parameter")
+	if p.FromHost != "" {
+		if strings.Contains(p.FromHost, "transport=") {
+			return errors.New("from_host should not contain transport parameter")
 		}
-		if strings.ContainsAny(p.CustomFromHost, "@;") || strings.HasPrefix(p.CustomFromHost, "sip:") || strings.HasPrefix(p.CustomFromHost, "sips:") {
-			return errors.New("custom_from_host should be a hostname or IP, not SIP URI")
+		if strings.ContainsAny(p.FromHost, "@;") || strings.HasPrefix(p.FromHost, "sip:") || strings.HasPrefix(p.FromHost, "sips:") {
+			return errors.New("from_host should be a hostname or IP, not SIP URI")
 		}
 	}
 	if err := validateHeaders(p.Headers); err != nil {
@@ -544,12 +544,12 @@ func (p *SIPOutboundConfig) Validate() error {
 	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Hostname, "sip:") || strings.HasPrefix(p.Hostname, "sips:") {
 		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
 	}
-	if p.CustomFromHost != "" {
-		if strings.Contains(p.CustomFromHost, "transport=") {
-			return errors.New("custom_from_host should not contain transport parameter")
+	if p.FromHost != "" {
+		if strings.Contains(p.FromHost, "transport=") {
+			return errors.New("from_host should not contain transport parameter")
 		}
-		if strings.ContainsAny(p.CustomFromHost, "@;") || strings.HasPrefix(p.CustomFromHost, "sip:") || strings.HasPrefix(p.CustomFromHost, "sips:") {
-			return errors.New("custom_from_host should be a hostname or IP, not SIP URI")
+		if strings.ContainsAny(p.FromHost, "@;") || strings.HasPrefix(p.FromHost, "sip:") || strings.HasPrefix(p.FromHost, "sips:") {
+			return errors.New("from_host should be a hostname or IP, not SIP URI")
 		}
 	}
 	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
@@ -581,7 +581,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
-	applyUpdate(&info.CustomFromHost, p.CustomFromHost)
+	applyUpdate(&info.FromHost, p.FromHost)
 	return info.Validate()
 }
 

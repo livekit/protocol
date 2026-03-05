@@ -434,7 +434,7 @@ message SIPOutboundTrunkInfo {
   // Optional custom hostname for the 'From' SIP header in outbound INVITEs.
   // When set, outbound calls from this trunk will use this host instead of the default project SIP domain.
   // Enables originating calls from custom domains.
-  string custom_from_host = 15;
+  string from_host = 15;
 
   // NEXT ID: 16
 }
@@ -452,7 +452,7 @@ message SIPOutboundTrunkUpdate {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional SIPMediaEncryption media_encryption = 8;
-  optional string custom_from_host = 10;
+  optional string from_host = 10;
 
   // NEXT ID: 11
 }
@@ -703,7 +703,7 @@ message SIPOutboundConfig {
   map<string, string> attributes_to_headers = 6;
 
   // Optional custom hostname for the 'From' SIP header. When set, outbound calls use this host instead of the default project SIP domain.
-  string custom_from_host = 8;
+  string from_host = 8;
 
   // NEXT ID: 9
 }
