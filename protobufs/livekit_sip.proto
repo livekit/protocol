@@ -431,7 +431,12 @@ message SIPOutboundTrunkInfo {
 
   SIPMediaEncryption media_encryption = 13;
 
-  // NEXT ID: 15
+  // Optional custom hostname for the 'From' SIP header in outbound INVITEs.
+  // When set, outbound calls from this trunk will use this host instead of the default project SIP domain.
+  // Enables originating calls from custom domains.
+  string from_host = 15;
+
+  // NEXT ID: 16
 }
 
 message SIPOutboundTrunkUpdate {
@@ -447,8 +452,9 @@ message SIPOutboundTrunkUpdate {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional SIPMediaEncryption media_encryption = 8;
+  optional string from_host = 10;
 
-  // NEXT ID: 10
+  // NEXT ID: 11
 }
 
 message GetSIPInboundTrunkRequest {
@@ -696,7 +702,10 @@ message SIPOutboundConfig {
   // Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
   map<string, string> attributes_to_headers = 6;
 
-  // NEXT ID: 7
+  // Optional custom hostname for the 'From' SIP header. When set, outbound calls use this host instead of the default project SIP domain.
+  string from_host = 8;
+
+  // NEXT ID: 9
 }
 
 // A SIP Participant is a singular SIP session connected to a LiveKit room via

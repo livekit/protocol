@@ -1767,8 +1767,12 @@ type SIPOutboundTrunkInfo struct {
 	// lowercase header names should be used, for example: sip.h.x-custom-header.
 	IncludeHeaders  SIPHeaderOptions   `protobuf:"varint,12,opt,name=include_headers,json=includeHeaders,proto3,enum=livekit.SIPHeaderOptions" json:"include_headers,omitempty"`
 	MediaEncryption SIPMediaEncryption `protobuf:"varint,13,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Optional custom hostname for the 'From' SIP header in outbound INVITEs.
+	// When set, outbound calls from this trunk will use this host instead of the default project SIP domain.
+	// Enables originating calls from custom domains.
+	FromHost      string `protobuf:"bytes,15,opt,name=from_host,json=fromHost,proto3" json:"from_host,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SIPOutboundTrunkInfo) Reset() {
@@ -1899,6 +1903,13 @@ func (x *SIPOutboundTrunkInfo) GetMediaEncryption() SIPMediaEncryption {
 	return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
 }
 
+func (x *SIPOutboundTrunkInfo) GetFromHost() string {
+	if x != nil {
+		return x.FromHost
+	}
+	return ""
+}
+
 type SIPOutboundTrunkUpdate struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Address            *string                `protobuf:"bytes,1,opt,name=address,proto3,oneof" json:"address,omitempty"`
@@ -1910,6 +1921,7 @@ type SIPOutboundTrunkUpdate struct {
 	Name               *string                `protobuf:"bytes,6,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Metadata           *string                `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
 	MediaEncryption    *SIPMediaEncryption    `protobuf:"varint,8,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
+	FromHost           *string                `protobuf:"bytes,10,opt,name=from_host,json=fromHost,proto3,oneof" json:"from_host,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -2005,6 +2017,13 @@ func (x *SIPOutboundTrunkUpdate) GetMediaEncryption() SIPMediaEncryption {
 		return *x.MediaEncryption
 	}
 	return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+}
+
+func (x *SIPOutboundTrunkUpdate) GetFromHost() string {
+	if x != nil && x.FromHost != nil {
+		return *x.FromHost
+	}
+	return ""
 }
 
 type GetSIPInboundTrunkRequest struct {
@@ -3463,8 +3482,10 @@ type SIPOutboundConfig struct {
 	// Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
 	// Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
 	AttributesToHeaders map[string]string `protobuf:"bytes,6,rep,name=attributes_to_headers,json=attributesToHeaders,proto3" json:"attributes_to_headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// Optional custom hostname for the 'From' SIP header. When set, outbound calls use this host instead of the default project SIP domain.
+	FromHost      string `protobuf:"bytes,8,opt,name=from_host,json=fromHost,proto3" json:"from_host,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SIPOutboundConfig) Reset() {
@@ -3544,6 +3565,13 @@ func (x *SIPOutboundConfig) GetAttributesToHeaders() map[string]string {
 		return x.AttributesToHeaders
 	}
 	return nil
+}
+
+func (x *SIPOutboundConfig) GetFromHost() string {
+	if x != nil {
+		return x.FromHost
+	}
+	return ""
 }
 
 // A SIP Participant is a singular SIP session connected to a LiveKit room via
@@ -4554,7 +4582,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x129\n" +
 	"\areplace\x18\x02 \x01(\v2\x1d.livekit.SIPOutboundTrunkInfoH\x00R\areplace\x129\n" +
 	"\x06update\x18\x03 \x01(\v2\x1f.livekit.SIPOutboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\x9e\b\n" +
+	"\x06action\"\xbb\b\n" +
 	"\x14SIPOutboundTrunkInfo\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\x12\x12\n" +
@@ -4571,7 +4599,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	" \x03(\v26.livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12j\n" +
 	"\x15attributes_to_headers\x18\v \x03(\v26.livekit.SIPOutboundTrunkInfo.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\f \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12F\n" +
-	"\x10media_encryption\x18\r \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x1a:\n" +
+	"\x10media_encryption\x18\r \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12\x1b\n" +
+	"\tfrom_host\x18\x0f \x01(\tR\bfromHost\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
@@ -4580,7 +4609,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe6\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x96\x05\n" +
 	"\x16SIPOutboundTrunkUpdate\x12\x1d\n" +
 	"\aaddress\x18\x01 \x01(\tH\x00R\aaddress\x88\x01\x01\x128\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportH\x01R\ttransport\x88\x01\x01\x124\n" +
@@ -4590,7 +4619,9 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\rauth_password\x18\x05 \x01(\tB\x04\x88\xec,\x01H\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
 	"\x04name\x18\x06 \x01(\tH\x05R\x04name\x88\x01\x01\x12G\n" +
 	"\bmetadata\x18\a \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x06R\bmetadata\x88\x01\x01\x12K\n" +
-	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\aR\x0fmediaEncryption\x88\x01\x01B\n" +
+	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\aR\x0fmediaEncryption\x88\x01\x01\x12 \n" +
+	"\tfrom_host\x18\n" +
+	" \x01(\tH\bR\bfromHost\x88\x01\x01B\n" +
 	"\n" +
 	"\b_addressB\f\n" +
 	"\n" +
@@ -4600,7 +4631,9 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0e_auth_passwordB\a\n" +
 	"\x05_nameB\v\n" +
 	"\t_metadataB\x13\n" +
-	"\x11_media_encryption\"=\n" +
+	"\x11_media_encryptionB\f\n" +
+	"\n" +
+	"_from_host\"=\n" +
 	"\x19GetSIPInboundTrunkRequest\x12 \n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tR\n" +
 	"sipTrunkId\"P\n" +
@@ -4716,7 +4749,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x1bListSIPDispatchRuleResponse\x122\n" +
 	"\x05items\x18\x01 \x03(\v2\x1c.livekit.SIPDispatchRuleInfoR\x05items\"O\n" +
 	"\x1cDeleteSIPDispatchRuleRequest\x12/\n" +
-	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\xcd\x04\n" +
+	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tR\x11sipDispatchRuleId\"\xea\x04\n" +
 	"\x11SIPOutboundConfig\x12\x1a\n" +
 	"\bhostname\x18\x01 \x01(\tR\bhostname\x12/\n" +
 	"\x13destination_country\x18\a \x01(\tR\x12destinationCountry\x123\n" +
@@ -4724,7 +4757,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\rauth_username\x18\x03 \x01(\tB\x04\x88\xec,\x01R\fauthUsername\x12)\n" +
 	"\rauth_password\x18\x04 \x01(\tB\x04\x88\xec,\x01R\fauthPassword\x12g\n" +
 	"\x15headers_to_attributes\x18\x05 \x03(\v23.livekit.SIPOutboundConfig.HeadersToAttributesEntryR\x13headersToAttributes\x12g\n" +
-	"\x15attributes_to_headers\x18\x06 \x03(\v23.livekit.SIPOutboundConfig.AttributesToHeadersEntryR\x13attributesToHeaders\x1aF\n" +
+	"\x15attributes_to_headers\x18\x06 \x03(\v23.livekit.SIPOutboundConfig.AttributesToHeadersEntryR\x13attributesToHeaders\x12\x1b\n" +
+	"\tfrom_host\x18\b \x01(\tR\bfromHost\x1aF\n" +
 	"\x18HeadersToAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
