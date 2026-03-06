@@ -20,7 +20,7 @@ const Project = "livekit"
 var discardLogger = logger.LogRLogger(logr.Discard())
 
 type Reporter interface {
-	Logger(projectID string) (logger.Logger, error)
+	Logger(name, projectID string) (logger.Logger, error)
 	Room() roomobs.Reporter
 	Agent() agentsobs.Reporter
 	Gateway() gatewayobs.Reporter
@@ -39,7 +39,7 @@ func NewReporter() Reporter {
 
 type reporter struct{}
 
-func (reporter) Logger(projectID string) (logger.Logger, error) {
+func (reporter) Logger(name, projectID string) (logger.Logger, error) {
 	return discardLogger, nil
 }
 
