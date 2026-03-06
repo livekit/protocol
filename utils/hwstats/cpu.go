@@ -42,11 +42,21 @@ type CPUStats struct {
 	closeChan       chan struct{}
 }
 
+type ProcMemoryEntry struct {
+	Name   string
+	Memory int
+}
+
+type GroupMemory struct {
+	Total int
+	Procs map[int]ProcMemoryEntry
+}
+
 type ProcStats struct {
 	CpuIdle     float64
 	Cpu         map[int]float64
 	MemoryTotal int
-	Memory      map[int]int
+	Memory      map[int]*GroupMemory
 }
 
 func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
@@ -201,7 +211,7 @@ func (c *CPUStats) monitorProcesses() {
 				CpuIdle:     numCPU,
 				Cpu:         make(map[int]float64),
 				MemoryTotal: 0,
-				Memory:      make(map[int]int),
+				Memory:      make(map[int]*GroupMemory),
 			}
 
 			for pid, stat := range procStats {
@@ -212,7 +222,13 @@ func (c *CPUStats) monitorProcesses() {
 				}
 
 				memory := stat.RSS * pageSize
-				stats.Memory[pidForGroup] += memory
+				gm := stats.Memory[pidForGroup]
+				if gm == nil {
+					gm = &GroupMemory{Procs: make(map[int]ProcMemoryEntry)}
+					stats.Memory[pidForGroup] = gm
+				}
+				gm.Total += memory
+				gm.Procs[pid] = ProcMemoryEntry{Name: stat.Comm, Memory: memory}
 				stats.MemoryTotal += memory
 
 				// process usage as percent of total host cpu
