@@ -25,7 +25,7 @@ func TestGetCPUIdle(t *testing.T) {
 	require.NoError(t, err)
 
 	idle := st.GetCPUIdle()
-	require.GreaterOrEqual(t, 0.0, idle)
+	require.GreaterOrEqual(t, idle, 0.0)
 }
 
 func TestAggregateMemoryStats(t *testing.T) {
