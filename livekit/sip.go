@@ -333,6 +333,19 @@ func validateHeaderToAttributes(headerToAttributes map[string]string) error {
 	return nil
 }
 
+// validateHostnameFormat ensures value is a hostname or IP, not a SIP URI or containing transport parameter.
+// Returns nil if value is empty (for optional fields).
+// fieldName is used to construct error messages, e.g. "from_host" or "trunk hostname".
+func validateHostnameFormat(value, fieldName string) error {
+	if strings.Contains(value, "transport=") {
+		return errors.New(fieldName + " should not contain transport parameter")
+	}
+	if strings.ContainsAny(value, "@;") || strings.HasPrefix(value, "sip:") || strings.HasPrefix(value, "sips:") {
+		return errors.New(fieldName + " should be a hostname or IP, not SIP URI")
+	}
+	return nil
+}
+
 func (p *SIPTrunkInfo) Validate() error {
 	if len(p.InboundNumbersRegex) != 0 {
 		return fmt.Errorf("trunks with InboundNumbersRegex are deprecated")
@@ -511,18 +524,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	}
 	if p.Address == "" {
 		return errors.New("no outbound address specified")
-	} else if strings.Contains(p.Address, "transport=") {
-		return errors.New("trunk transport should be set as a field, not a URI parameter")
-	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
-		return errors.New("trunk address should be a hostname or IP, not SIP URI")
 	}
-	if p.FromHost != "" {
-		if strings.Contains(p.FromHost, "transport=") {
-			return errors.New("from_host should not contain transport parameter")
-		}
-		if strings.ContainsAny(p.FromHost, "@;") || strings.HasPrefix(p.FromHost, "sip:") || strings.HasPrefix(p.FromHost, "sips:") {
-			return errors.New("from_host should be a hostname or IP, not SIP URI")
-		}
+	if err := validateHostnameFormat(p.Address, "trunk address"); err != nil {
+		return err
+	}
+	if err := validateHostnameFormat(p.FromHost, "from_host"); err != nil {
+		return err
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
@@ -539,18 +546,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 func (p *SIPOutboundConfig) Validate() error {
 	if p.Hostname == "" {
 		return errors.New("no outbound hostname specified")
-	} else if strings.Contains(p.Hostname, "transport=") {
-		return errors.New("trunk transport should be set as a field, not a URI parameter")
-	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Hostname, "sip:") || strings.HasPrefix(p.Hostname, "sips:") {
-		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
 	}
-	if p.FromHost != "" {
-		if strings.Contains(p.FromHost, "transport=") {
-			return errors.New("from_host should not contain transport parameter")
-		}
-		if strings.ContainsAny(p.FromHost, "@;") || strings.HasPrefix(p.FromHost, "sip:") || strings.HasPrefix(p.FromHost, "sips:") {
-			return errors.New("from_host should be a hostname or IP, not SIP URI")
-		}
+	if err := validateHostnameFormat(p.Hostname, "trunk hostname"); err != nil {
+		return err
+	}
+	if err := validateHostnameFormat(p.FromHost, "from_host"); err != nil {
+		return err
 	}
 	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
 		return err

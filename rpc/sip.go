@@ -67,7 +67,7 @@ func (p *EvaluateSIPDispatchRulesRequest) SIPCall() *SIPCall {
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.
 func NewCreateSIPParticipantRequest(
-	projectID, callID, ownHostname, wsUrl, token string,
+	projectID, callID, fromHostname, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
@@ -86,7 +86,6 @@ func NewCreateSIPParticipantRequest(
 		hdrToAttr          map[string]string
 		attrToHdr          map[string]string
 	)
-	fromHostname := ownHostname
 	if trunk != nil {
 		hostname = trunk.Address
 		enc = trunk.MediaEncryption
@@ -98,9 +97,6 @@ func NewCreateSIPParticipantRequest(
 		authPass = trunk.AuthPassword
 		hdrToAttr = trunk.HeadersToAttributes
 		attrToHdr = trunk.AttributesToHeaders
-		if trunk.FromHost != "" {
-			fromHostname = trunk.FromHost
-		}
 	} else if t := req.Trunk; t != nil {
 		hostname = t.Hostname
 		transport = t.Transport
@@ -109,9 +105,6 @@ func NewCreateSIPParticipantRequest(
 		authPass = t.AuthPassword
 		hdrToAttr = t.HeadersToAttributes
 		attrToHdr = t.AttributesToHeaders
-		if t.FromHost != "" {
-			fromHostname = t.FromHost
-		}
 	}
 
 	outboundNumber := req.SipNumber
