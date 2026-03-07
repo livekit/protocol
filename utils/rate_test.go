@@ -24,6 +24,7 @@
 package utils
 
 import (
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -187,28 +188,49 @@ func runTest(t *testing.T, fn func(testRunner)) {
 				constructor: tt.constructor,
 				doneCh:      make(chan struct{}),
 			}
-			defer close(r.doneCh)
-			defer r.wg.Wait()
 
 			fn(&r)
 
-			// it's possible that there are some goroutines still waiting
-			// in taking the bandwidth. We need to keep moving the clock forward
-			// until all goroutines are finished
-			go func() {
-				ticker := time.NewTicker(5 * time.Millisecond)
-				defer ticker.Stop()
-
-				for {
-					select {
-					case <-ticker.C:
-						r.clock.Add(r.maxDuration)
-					case <-r.doneCh:
-					}
-				}
-			}()
+			r.advanceUntilDone()
+			close(r.doneCh)
 		})
 	}
+}
+
+func (r *runnerImpl) advanceUntilDone() {
+	if r.maxDuration <= 0 {
+		r.wg.Wait()
+		return
+	}
+
+	waitDone := make(chan struct{})
+	go func() {
+		r.wg.Wait()
+		close(waitDone)
+	}()
+
+	step := r.clockAdvanceStep()
+	for {
+		select {
+		case <-waitDone:
+			return
+		default:
+		}
+
+		r.clock.Add(step)
+		runtime.Gosched()
+	}
+}
+
+func (r *runnerImpl) clockAdvanceStep() time.Duration {
+	step := r.maxDuration / 1_000
+	if step < time.Millisecond {
+		return time.Millisecond
+	}
+	if step > 100*time.Millisecond {
+		return 100 * time.Millisecond
+	}
+	return step
 }
 
 // createLimiter builds a limiter with given options.
@@ -331,24 +353,14 @@ func TestDelayedRateLimiter(t *testing.T) {
 
 func TestPer(t *testing.T) {
 	runTest(t, func(r testRunner) {
-		clock := r.getClock()
 		rl := r.createLimiter(7, WithoutSlack, Per(time.Minute))
-		perRequest := time.Minute / 7
 
-		start := clock.Now()
-		require.Equal(t, start, rl.Take())
+		r.startTaking(rl)
+		r.startTaking(rl)
 
-		var ts time.Time
-		for i := 1; i <= 15; i++ {
-			clock.Add(perRequest)
-			ts = rl.Take()
-			require.Equal(t, start.Add(time.Duration(i)*perRequest), ts)
-		}
-
-		require.Less(t, start.Add(7*perRequest).Sub(start), time.Minute)
-		require.Greater(t, start.Add(8*perRequest).Sub(start), time.Minute)
-		require.Less(t, start.Add(14*perRequest).Sub(start), 2*time.Minute)
-		require.Greater(t, ts.Sub(start), 2*time.Minute)
+		r.assertCountAt(1*time.Second, 1)
+		r.assertCountAt(1*time.Minute, 8)
+		r.assertCountAt(2*time.Minute, 15)
 	})
 }
 
