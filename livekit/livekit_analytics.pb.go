@@ -104,6 +104,7 @@ const (
 	AnalyticsEventType_TRACK_SUBSCRIBE_STATS              AnalyticsEventType = 27
 	AnalyticsEventType_PARTICIPANT_ACTIVE                 AnalyticsEventType = 11
 	AnalyticsEventType_PARTICIPANT_RESUMED                AnalyticsEventType = 22
+	AnalyticsEventType_PARTICIPANT_UPDATED                AnalyticsEventType = 47
 	AnalyticsEventType_EGRESS_STARTED                     AnalyticsEventType = 12
 	AnalyticsEventType_EGRESS_ENDED                       AnalyticsEventType = 13
 	AnalyticsEventType_EGRESS_UPDATED                     AnalyticsEventType = 28
@@ -154,6 +155,7 @@ var (
 		27: "TRACK_SUBSCRIBE_STATS",
 		11: "PARTICIPANT_ACTIVE",
 		22: "PARTICIPANT_RESUMED",
+		47: "PARTICIPANT_UPDATED",
 		12: "EGRESS_STARTED",
 		13: "EGRESS_ENDED",
 		28: "EGRESS_UPDATED",
@@ -201,6 +203,7 @@ var (
 		"TRACK_SUBSCRIBE_STATS":              27,
 		"PARTICIPANT_ACTIVE":                 11,
 		"PARTICIPANT_RESUMED":                22,
+		"PARTICIPANT_UPDATED":                47,
 		"EGRESS_STARTED":                     12,
 		"EGRESS_ENDED":                       13,
 		"EGRESS_UPDATED":                     28,
@@ -2459,7 +2462,7 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"StreamType\x12\f\n" +
 	"\bUPSTREAM\x10\x00\x12\x0e\n" +
 	"\n" +
-	"DOWNSTREAM\x10\x01*\xc6\b\n" +
+	"DOWNSTREAM\x10\x01*\xdf\b\n" +
 	"\x12AnalyticsEventType\x12\x10\n" +
 	"\fROOM_CREATED\x10\x00\x12\x0e\n" +
 	"\n" +
@@ -2481,7 +2484,8 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x13TRACK_PUBLISH_STATS\x10\x1a\x12\x19\n" +
 	"\x15TRACK_SUBSCRIBE_STATS\x10\x1b\x12\x16\n" +
 	"\x12PARTICIPANT_ACTIVE\x10\v\x12\x17\n" +
-	"\x13PARTICIPANT_RESUMED\x10\x16\x12\x12\n" +
+	"\x13PARTICIPANT_RESUMED\x10\x16\x12\x17\n" +
+	"\x13PARTICIPANT_UPDATED\x10/\x12\x12\n" +
 	"\x0eEGRESS_STARTED\x10\f\x12\x10\n" +
 	"\fEGRESS_ENDED\x10\r\x12\x12\n" +
 	"\x0eEGRESS_UPDATED\x10\x1c\x12&\n" +
