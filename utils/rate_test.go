@@ -331,14 +331,24 @@ func TestDelayedRateLimiter(t *testing.T) {
 
 func TestPer(t *testing.T) {
 	runTest(t, func(r testRunner) {
+		clock := r.getClock()
 		rl := r.createLimiter(7, WithoutSlack, Per(time.Minute))
+		perRequest := time.Minute / 7
 
-		r.startTaking(rl)
-		r.startTaking(rl)
+		start := clock.Now()
+		require.Equal(t, start, rl.Take())
 
-		r.assertCountAt(1*time.Second, 1)
-		r.assertCountAt(1*time.Minute, 8)
-		r.assertCountAt(2*time.Minute, 15)
+		var ts time.Time
+		for i := 1; i <= 15; i++ {
+			clock.Add(perRequest)
+			ts = rl.Take()
+			require.Equal(t, start.Add(time.Duration(i)*perRequest), ts)
+		}
+
+		require.Less(t, start.Add(7*perRequest).Sub(start), time.Minute)
+		require.Greater(t, start.Add(8*perRequest).Sub(start), time.Minute)
+		require.Less(t, start.Add(14*perRequest).Sub(start), 2*time.Minute)
+		require.Greater(t, ts.Sub(start), 2*time.Minute)
 	})
 }
 
