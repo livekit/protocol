@@ -844,13 +844,13 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 		innerURI = p.TransferTo
 	}
 
-	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "tel:") {
+	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "sips:") && !strings.HasPrefix(innerURI, "tel:") {
 		// In theory the Refer-To header can receive the full name-addr.
 		// This can make this check inaccurate, but we want to limit to just SIP and TEL URIs.
-		return errors.New("transfer_to must be a valid SIP or TEL URI (sip: or tel:)")
+		return errors.New("transfer_to must be a valid SIP(s) or TEL URI (sip:, sips: or tel:)")
 	}
 
-	if strings.HasPrefix(innerURI, "sip:") {
+	if strings.HasPrefix(innerURI, "sip:") || strings.HasPrefix(innerURI, "sips:") {
 		// addr-spec = sip:...
 		// name-addr = [ display-name ] <addr-spec>
 		// Both name-addr and addr-spec are allowed in RFC3515 (section-2.1).
