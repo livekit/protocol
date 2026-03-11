@@ -226,9 +226,10 @@ message ClientSettingsRequest {
 }
 
 message PrivateLink {
+  [deprecated=true]
   message AWSConfig {
     string endpoint = 1;
-  } [deprecated=true];
+  };
 
   string private_link_id = 1;
   string name = 2;
@@ -236,9 +237,10 @@ message PrivateLink {
   uint32 port = 5;
   string endpoint = 6;
 
+  [deprecated=true]
   oneof config {
     AWSConfig aws = 3;
-  } [deprecated=true];
+  };
 }
 
 message PrivateLinkStatus {
