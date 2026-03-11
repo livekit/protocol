@@ -228,16 +228,17 @@ message ClientSettingsRequest {
 message PrivateLink {
   message AWSConfig {
     string endpoint = 1;
-  }
+  } [deprecated=true];
 
   string private_link_id = 1;
   string name = 2;
   string region = 4;
   uint32 port = 5;
+  string endpoint = 6;
 
   oneof config {
     AWSConfig aws = 3;
-  }
+  } [deprecated=true];
 }
 
 message PrivateLinkStatus {
