@@ -2095,6 +2095,7 @@ type PrivateLink struct {
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Region        string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
 	Port          uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
+	Endpoint      string                 `protobuf:"bytes,6,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*PrivateLink_Aws
@@ -2161,6 +2162,13 @@ func (x *PrivateLink) GetPort() uint32 {
 	return 0
 }
 
+func (x *PrivateLink) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
 func (x *PrivateLink) GetConfig() isPrivateLink_Config {
 	if x != nil {
 		return x.Config
@@ -2168,6 +2176,7 @@ func (x *PrivateLink) GetConfig() isPrivateLink_Config {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *PrivateLink) GetAws() *PrivateLink_AWSConfig {
 	if x != nil {
 		if x, ok := x.Config.(*PrivateLink_Aws); ok {
@@ -2182,6 +2191,7 @@ type isPrivateLink_Config interface {
 }
 
 type PrivateLink_Aws struct {
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Aws *PrivateLink_AWSConfig `protobuf:"bytes,3,opt,name=aws,proto3,oneof"`
 }
 
@@ -2622,8 +2632,9 @@ func (x *GetPrivateLinkStatusResponse) GetValue() *PrivateLinkStatus {
 }
 
 type PrivateLink_AWSConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Endpoint      string `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // Use the generic "endpoint" instead
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2658,6 +2669,7 @@ func (*PrivateLink_AWSConfig) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{29, 0}
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *PrivateLink_AWSConfig) GetEndpoint() string {
 	if x != nil {
 		return x.Endpoint
@@ -2872,15 +2884,16 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\xdc\x01\n" +
+	"\x15ClientSettingsRequest\"\x80\x02\n" +
 	"\vPrivateLink\x12&\n" +
 	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
-	"\x04port\x18\x05 \x01(\rR\x04port\x122\n" +
-	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigH\x00R\x03aws\x1a'\n" +
-	"\tAWSConfig\x12\x1a\n" +
-	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
+	"\x04port\x18\x05 \x01(\rR\x04port\x12\x1a\n" +
+	"\bendpoint\x18\x06 \x01(\tR\bendpoint\x126\n" +
+	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigB\x02\x18\x01H\x00R\x03aws\x1a+\n" +
+	"\tAWSConfig\x12\x1e\n" +
+	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
 	"\x06config\"\x98\x02\n" +
 	"\x11PrivateLinkStatus\x129\n" +
 	"\x06status\x18\x01 \x01(\x0e2!.livekit.PrivateLinkStatus.StatusR\x06status\x129\n" +
