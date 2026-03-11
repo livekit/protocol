@@ -255,14 +255,15 @@ message PrivateLinkStatus {
 
 message CreatePrivateLinkRequest {
   message AWSCreateConfig {
-    string endpoint = 1;
+    string endpoint = 1 [deprecated=true];
   }
 
   string name = 1;
   string region = 3;
   uint32 port = 4;
+  string endpoint = 5;
   oneof config {
-    AWSCreateConfig aws = 2;
+    AWSCreateConfig aws = 2 [deprecated=true];
   }
 }
 
