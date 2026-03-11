@@ -226,9 +226,8 @@ message ClientSettingsRequest {
 }
 
 message PrivateLink {
-  [deprecated=true]
   message AWSConfig {
-    string endpoint = 1;
+    string endpoint = 1 [deprecated=true]; // Use the generic "endpoint" instead
   };
 
   string private_link_id = 1;
@@ -237,9 +236,8 @@ message PrivateLink {
   uint32 port = 5;
   string endpoint = 6;
 
-  [deprecated=true]
   oneof config {
-    AWSConfig aws = 3;
+    AWSConfig aws = 3 [deprecated=true];
   };
 }
 
