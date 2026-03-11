@@ -2250,10 +2250,11 @@ func (x *PrivateLinkStatus) GetUpdatedAt() *timestamppb.Timestamp {
 }
 
 type CreatePrivateLinkRequest struct {
-	state  protoimpl.MessageState `protogen:"open.v1"`
-	Name   string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Region string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Port   uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Name     string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Region   string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Port     uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	Endpoint string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*CreatePrivateLinkRequest_Aws
@@ -2313,6 +2314,13 @@ func (x *CreatePrivateLinkRequest) GetPort() uint32 {
 	return 0
 }
 
+func (x *CreatePrivateLinkRequest) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
 func (x *CreatePrivateLinkRequest) GetConfig() isCreatePrivateLinkRequest_Config {
 	if x != nil {
 		return x.Config
@@ -2320,6 +2328,7 @@ func (x *CreatePrivateLinkRequest) GetConfig() isCreatePrivateLinkRequest_Config
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreatePrivateLinkRequest) GetAws() *CreatePrivateLinkRequest_AWSCreateConfig {
 	if x != nil {
 		if x, ok := x.Config.(*CreatePrivateLinkRequest_Aws); ok {
@@ -2334,6 +2343,7 @@ type isCreatePrivateLinkRequest_Config interface {
 }
 
 type CreatePrivateLinkRequest_Aws struct {
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Aws *CreatePrivateLinkRequest_AWSCreateConfig `protobuf:"bytes,2,opt,name=aws,proto3,oneof"`
 }
 
@@ -2678,8 +2688,9 @@ func (x *PrivateLink_AWSConfig) GetEndpoint() string {
 }
 
 type CreatePrivateLinkRequest_AWSCreateConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Endpoint      string `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2714,6 +2725,7 @@ func (*CreatePrivateLinkRequest_AWSCreateConfig) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{31, 0}
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreatePrivateLinkRequest_AWSCreateConfig) GetEndpoint() string {
 	if x != nil {
 		return x.Endpoint
@@ -2903,14 +2915,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x1bPRIVATE_LINK_STATUS_UNKNOWN\x10\x00\x12\x1f\n" +
 	"\x1bPRIVATE_LINK_STATUS_PENDING\x10\x01\x12!\n" +
 	"\x1dPRIVATE_LINK_STATUS_AVAILABLE\x10\x02\x12\x1d\n" +
-	"\x19PRIVATE_LINK_STATUS_ERROR\x10\x03\"\xda\x01\n" +
+	"\x19PRIVATE_LINK_STATUS_ERROR\x10\x03\"\xfe\x01\n" +
 	"\x18CreatePrivateLinkRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x12\n" +
-	"\x04port\x18\x04 \x01(\rR\x04port\x12E\n" +
-	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigH\x00R\x03aws\x1a-\n" +
-	"\x0fAWSCreateConfig\x12\x1a\n" +
-	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
+	"\x04port\x18\x04 \x01(\rR\x04port\x12\x1a\n" +
+	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12I\n" +
+	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigB\x02\x18\x01H\x00R\x03aws\x1a1\n" +
+	"\x0fAWSCreateConfig\x12\x1e\n" +
+	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
 	"\x06config\"T\n" +
 	"\x19CreatePrivateLinkResponse\x127\n" +
 	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"C\n" +
