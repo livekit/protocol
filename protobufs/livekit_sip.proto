@@ -23,6 +23,7 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_room.proto";
 import "logger/options.proto";
@@ -351,7 +352,10 @@ message SIPInboundTrunkInfo {
   bool krisp_enabled = 13;
   SIPMediaEncryption media_encryption = 16;
 
-  // NEXT ID: 17
+  google.protobuf.Timestamp created_at = 17;
+  google.protobuf.Timestamp updated_at = 18;
+
+  // NEXT ID: 19
 }
 
 message SIPInboundTrunkUpdate {
@@ -436,7 +440,10 @@ message SIPOutboundTrunkInfo {
   // Enables originating calls from custom domains.
   string from_host = 15;
 
-  // NEXT ID: 16
+  google.protobuf.Timestamp created_at = 16;
+  google.protobuf.Timestamp updated_at = 17;
+
+  // NEXT ID: 18
 }
 
 message SIPOutboundTrunkUpdate {
@@ -644,7 +651,11 @@ message SIPDispatchRuleInfo {
 
   bool krisp_enabled = 11;
   SIPMediaEncryption media_encryption = 12;
-  // NEXT ID: 14
+
+  google.protobuf.Timestamp created_at = 14;
+  google.protobuf.Timestamp updated_at = 15;
+
+  // NEXT ID: 16
 }
 
 message SIPDispatchRuleUpdate {
