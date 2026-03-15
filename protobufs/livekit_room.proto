@@ -90,7 +90,7 @@ message CreateRoomRequest {
   // limit number of participants that can be in a room
   uint32 max_participants = 3;
   // override the node room is allocated to, for debugging
-  string node_id = 4;
+  string node_id = 4 [(logger.name) = "nodeID"];
   // metadata of room
   string metadata = 5 [
     (logger.redact) = true,

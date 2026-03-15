@@ -7,6 +7,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
+import "logger/options.proto";
 
 enum ChatRole {
   DEVELOPER = 0;
@@ -46,7 +47,7 @@ message ChatMessage {
 
 message FunctionCall {
   string id = 1;
-  string call_id = 2;
+  string call_id = 2 [(logger.name) = "callID"];
   string arguments = 3;
   string name = 4;
   google.protobuf.Timestamp created_at = 5;
@@ -55,7 +56,7 @@ message FunctionCall {
 message FunctionCallOutput {
   string id = 1;
   string name = 2;
-  string call_id = 3;
+  string call_id = 3 [(logger.name) = "callID"];
   string output = 4;
   bool is_error = 5;
   google.protobuf.Timestamp created_at = 6;
@@ -63,8 +64,8 @@ message FunctionCallOutput {
 
 message AgentHandoff {
   string id = 1;
-  optional string old_agent_id = 2;
-  string new_agent_id = 3;
+  optional string old_agent_id = 2 [(logger.name) = "oldAgentID"];
+  string new_agent_id = 3 [(logger.name) = "newAgentID"];
   google.protobuf.Timestamp created_at = 4;
 }
 

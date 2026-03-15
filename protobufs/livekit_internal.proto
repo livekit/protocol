@@ -22,6 +22,7 @@ import "livekit_egress.proto";
 import "livekit_models.proto";
 import "livekit_room.proto";
 import "livekit_rtc.proto";
+import "logger/options.proto";
 
 option csharp_namespace = "LiveKit.Proto";
 option go_package = "github.com/livekit/protocol/livekit";
@@ -169,7 +170,7 @@ message NodeStatsRate {
 message StartSession {
   string room_name = 1;
   string identity = 2;
-  string connection_id = 3;
+  string connection_id = 3 [(logger.name) = "connectionID"];
   // if a client is reconnecting (i.e. resume instead of restart)
   bool reconnect = 4;
   bool auto_subscribe = 9;
@@ -182,7 +183,7 @@ message StartSession {
   string grants_json = 14;
   bool adaptive_stream = 15;
   //if reconnect, client will set current sid
-  string participant_id = 16;
+  string participant_id = 16 [(logger.name) = "participantID"];
   ReconnectReason reconnect_reason = 17;
   optional bool subscriber_allow_pause = 18;
   bool disable_ice_lite = 19;

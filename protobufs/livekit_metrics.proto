@@ -6,6 +6,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
+import "logger/options.proto";
 
 
 /*
@@ -89,7 +90,7 @@ message EventMetric {
 }
 
 message MetricsRecordingHeader {
-  string room_id = 1;
+  string room_id = 1 [(logger.name) = "roomID"];
   uint64 duration = 3; // milliseconds
   google.protobuf.Timestamp start_time = 4;
   map<string, string> room_tags = 5;

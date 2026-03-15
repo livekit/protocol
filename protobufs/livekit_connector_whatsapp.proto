@@ -27,7 +27,7 @@ import "logger/options.proto";
 
 message DialWhatsAppCallRequest {
   // Required - The phone number id of the business that is initiating the call
-  string whatsapp_phone_number_id = 1;
+  string whatsapp_phone_number_id = 1 [(logger.name) = "whatsappPhoneNumberID"];
   // Required - The number of the user that is supossed to receive the call
   string whatsapp_to_phone_number = 2 [(logger.redact) = true];
   // Required - The API key of the business that is initiating the call
@@ -66,7 +66,7 @@ message DialWhatsAppCallRequest {
 
 message DialWhatsAppCallResponse {
   // Call ID sent by Meta
-  string whatsapp_call_id = 1;
+  string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
   // The name of the LiveKit room that the call is connected to
   string room_name = 2;
 }
@@ -84,7 +84,7 @@ message DisconnectWhatsAppCallRequest {
   }
 
   // Required - Call ID sent by Meta
-  string whatsapp_call_id = 1;
+  string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
   // The API key of the whatsapp business.
   // Required if the DisconnectReason is BUSINESS_INITIATED.
   // Optional for  USER_INITIATED as no API call to WhatsApp is needed.
@@ -98,7 +98,7 @@ message DisconnectWhatsAppCallResponse {
 
 message ConnectWhatsAppCallRequest {
   // Required - Call ID sent by Meta
-  string whatsapp_call_id = 1;
+  string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
   // Required - The call connect webhook comes with SDP from Meta
   // It is the answer SDP for a business initiated call
   SessionDescription sdp = 2;
@@ -109,13 +109,13 @@ message ConnectWhatsAppCallResponse {
 
 message AcceptWhatsAppCallRequest {
   // Required - The phone number id of the business that is conencting the call
-  string whatsapp_phone_number_id = 1;
+  string whatsapp_phone_number_id = 1 [(logger.name) = "whatsappPhoneNumberID"];
   // Required - The API key of the business that is connecting the call
   string whatsapp_api_key = 2 [(logger.redact) = true];
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 13;
   // Required - Call ID sent by Meta
-  string whatsapp_call_id = 3;
+  string whatsapp_call_id = 3 [(logger.name) = "whatsappCallID"];
   // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
   string whatsapp_biz_opaque_callback_data = 4;
   // Required - The call accept webhook comes with SDP from Meta
@@ -158,7 +158,7 @@ message AcceptWhatsAppCallResponse {
 
 message WhatsAppCall {
   // list of call ids that are currently active
-  string whatsapp_call_id = 1;
+  string whatsapp_call_id = 1 [(logger.name) = "whatsappCallID"];
   // Direction of the call
   WhatsAppCallDirection direction = 2;
 }
