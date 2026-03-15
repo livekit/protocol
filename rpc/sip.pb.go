@@ -513,12 +513,13 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xcb\x12\n" +
-	"#InternalCreateSIPParticipantRequest\x12\x1d\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xf9\x12\n" +
+	"#InternalCreateSIPParticipantRequest\x12,\n" +
 	"\n" +
-	"project_id\x18\x12 \x01(\tR\tprojectId\x12\x1e\n" +
-	"\vsip_call_id\x18\r \x01(\tR\tsipCallId\x12 \n" +
-	"\fsip_trunk_id\x18\x13 \x01(\tR\n" +
+	"project_id\x18\x12 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12-\n" +
+	"\vsip_call_id\x18\r \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\x120\n" +
+	"\fsip_trunk_id\x18\x13 \x01(\tB\x0e\x9a\xec,\n" +
+	"sipTrunkIDR\n" +
 	"sipTrunkId\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1a\n" +
 	"\bhostname\x18\x14 \x01(\tR\bhostname\x12/\n" +
@@ -565,13 +566,13 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
-	"\r_display_name\"\xa0\x01\n" +
-	"$InternalCreateSIPParticipantResponse\x12%\n" +
-	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x121\n" +
-	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12\x1e\n" +
-	"\vsip_call_id\x18\x03 \x01(\tR\tsipCallId\"\xac\x04\n" +
-	"%InternalTransferSIPParticipantRequest\x12\x1e\n" +
-	"\vsip_call_id\x18\x01 \x01(\tR\tsipCallId\x12\x1f\n" +
+	"\r_display_name\"\xc2\x01\n" +
+	"$InternalCreateSIPParticipantResponse\x128\n" +
+	"\x0eparticipant_id\x18\x01 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x121\n" +
+	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12-\n" +
+	"\vsip_call_id\x18\x03 \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\"\xbb\x04\n" +
+	"%InternalTransferSIPParticipantRequest\x12-\n" +
+	"\vsip_call_id\x18\x01 \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\x12\x1f\n" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
 	"transferTo\x12#\n" +
 	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12y\n" +

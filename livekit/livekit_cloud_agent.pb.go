@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -2737,7 +2738,7 @@ var File_livekit_cloud_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x19livekit_cloud_agent.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\"\x89\x01\n" +
+	"\x19livekit_cloud_agent.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x89\x01\n" +
 	"\n" +
 	"AgentEvent\x12+\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x17.livekit.AgentEventTypeR\x04type\x12\x14\n" +
@@ -2758,9 +2759,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
-	"\aregions\x18\x06 \x03(\tR\aregions\"\xb4\x02\n" +
-	"\x13CreateAgentResponse\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\aregions\x18\x06 \x03(\tR\aregions\"\xc1\x02\n" +
+	"\x13CreateAgentResponse\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x18\n" +
@@ -2774,10 +2775,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xae\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xbb\x03\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
-	"\x06region\x18\x01 \x01(\tR\x06region\x12\x19\n" +
-	"\bagent_id\x18\x02 \x01(\tR\aagentId\x12\x16\n" +
+	"\x06region\x18\x01 \x01(\tR\x06region\x12&\n" +
+	"\bagent_id\x18\x02 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1a\n" +
 	"\breplicas\x18\x04 \x01(\x05R\breplicas\x12!\n" +
 	"\fmin_replicas\x18\x05 \x01(\x05R\vminReplicas\x12!\n" +
@@ -2790,20 +2791,20 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\tmem_limit\x18\v \x01(\tR\bmemLimit\x12\x1b\n" +
 	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\x12#\n" +
 	"\rserver_region\x18\r \x01(\tR\fserverRegion\x12+\n" +
-	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\"\x93\x02\n" +
-	"\tAgentInfo\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\"\xa0\x02\n" +
+	"\tAgentInfo\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\x12E\n" +
 	"\x11agent_deployments\x18\x04 \x03(\v2\x18.livekit.AgentDeploymentR\x10agentDeployments\x12.\n" +
 	"\asecrets\x18\x05 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12;\n" +
 	"\vdeployed_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"deployedAt\"M\n" +
+	"deployedAt\"Z\n" +
 	"\x11ListAgentsRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
-	"\bagent_id\x18\x02 \x01(\tR\aagentId\"@\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12&\n" +
+	"\bagent_id\x18\x02 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
 	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\x8a\x03\n" +
 	"\fAgentVersion\x12\x18\n" +
@@ -2821,15 +2822,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bdraining\x18\b \x01(\bR\bdraining\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
-	"\x18ListAgentVersionsRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
+	"\x18ListAgentVersionsRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"N\n" +
 	"\x19ListAgentVersionsResponse\x121\n" +
-	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x80\x02\n" +
-	"\x12UpdateAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12!\n" +
+	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x8d\x02\n" +
+	"\x12UpdateAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12!\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12\x1e\n" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
@@ -2839,29 +2840,29 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\asecrets\x18\a \x03(\v2\x14.livekit.AgentSecretR\asecrets\"I\n" +
 	"\x13UpdateAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"0\n" +
-	"\x13RestartAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\"J\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"=\n" +
+	"\x13RestartAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\"J\n" +
 	"\x14RestartAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xe6\x01\n" +
-	"\x12DeployAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12!\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xf3\x01\n" +
+	"\x12DeployAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12!\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
-	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\xf0\x01\n" +
+	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\xfd\x01\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
-	"\bagent_id\x18\x03 \x01(\tR\aagentId\x12#\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
+	"\bagent_id\x18\x03 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12#\n" +
 	"\rpresigned_url\x18\x04 \x01(\tR\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
-	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xbb\x01\n" +
-	"\x19UpdateAgentSecretsRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xc8\x01\n" +
+	"\x19UpdateAgentSecretsRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1c\n" +
 	"\toverwrite\x18\x03 \x01(\bR\toverwrite\x12.\n" +
@@ -2869,24 +2870,24 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06remove\x18\x05 \x03(\tR\x06remove\"P\n" +
 	"\x1aUpdateAgentSecretsResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"j\n" +
-	"\x14RollbackAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"w\n" +
+	"\x14RollbackAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\"K\n" +
 	"\x15RollbackAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"N\n" +
-	"\x12DeleteAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"[\n" +
+	"\x12DeleteAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"I\n" +
 	"\x13DeleteAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"S\n" +
-	"\x17ListAgentSecretsRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"`\n" +
+	"\x17ListAgentSecretsRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"J\n" +
 	"\x18ListAgentSecretsResponse\x12.\n" +
@@ -2896,9 +2897,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\x80\x02\n" +
-	"\vPrivateLink\x12&\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\x12\x12\n" +
+	"\x15ClientSettingsRequest\"\x93\x02\n" +
+	"\vPrivateLink\x129\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
 	"\x04port\x18\x05 \x01(\rR\x04port\x12\x1a\n" +
@@ -2926,15 +2927,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
 	"\x06config\"T\n" +
 	"\x19CreatePrivateLinkResponse\x127\n" +
-	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"C\n" +
-	"\x19DestroyPrivateLinkRequest\x12&\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\"\x1c\n" +
+	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"V\n" +
+	"\x19DestroyPrivateLinkRequest\x129\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\"\x1c\n" +
 	"\x1aDestroyPrivateLinkResponse\"\x19\n" +
 	"\x17ListPrivateLinksRequest\"F\n" +
 	"\x18ListPrivateLinksResponse\x12*\n" +
-	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"E\n" +
-	"\x1bGetPrivateLinkStatusRequest\x12&\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\"P\n" +
+	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"X\n" +
+	"\x1bGetPrivateLinkStatusRequest\x129\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\"P\n" +
 	"\x1cGetPrivateLinkStatusResponse\x120\n" +
 	"\x05value\x18\x01 \x01(\v2\x1a.livekit.PrivateLinkStatusR\x05value*o\n" +
 	"\x0fAgentSecretKind\x12\x1d\n" +

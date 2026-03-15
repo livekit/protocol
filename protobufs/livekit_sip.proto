@@ -245,7 +245,7 @@ message SIPTrunkInfo {
     TRUNK_OUTBOUND = 2;
   }
 
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
   TrunkKind kind = 14;
 
   // CIDR or IPs that traffic is accepted from
@@ -291,7 +291,7 @@ message CreateSIPInboundTrunkRequest {
 }
 
 message UpdateSIPInboundTrunkRequest {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
   oneof action {
     SIPInboundTrunkInfo replace = 2;
     SIPInboundTrunkUpdate update = 3;
@@ -299,7 +299,7 @@ message UpdateSIPInboundTrunkRequest {
 }
 
 message SIPInboundTrunkInfo {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
 
   // Human-readable name for the Trunk.
   string name = 2;
@@ -377,7 +377,7 @@ message CreateSIPOutboundTrunkRequest {
 }
 
 message UpdateSIPOutboundTrunkRequest {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
   oneof action {
     SIPOutboundTrunkInfo replace = 2;
     SIPOutboundTrunkUpdate update = 3;
@@ -385,7 +385,7 @@ message UpdateSIPOutboundTrunkRequest {
 }
 
 message SIPOutboundTrunkInfo {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
 
   // Human-readable name for the Trunk.
   string name = 2;
@@ -465,7 +465,7 @@ message SIPOutboundTrunkUpdate {
 }
 
 message GetSIPInboundTrunkRequest {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
 }
 
 message GetSIPInboundTrunkResponse {
@@ -473,7 +473,7 @@ message GetSIPInboundTrunkResponse {
 }
 
 message GetSIPOutboundTrunkRequest {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
 }
 
 message GetSIPOutboundTrunkResponse {
@@ -519,7 +519,7 @@ message ListSIPOutboundTrunkResponse {
 }
 
 message DeleteSIPTrunkRequest {
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
 }
 
 message SIPDispatchRuleDirect {
@@ -610,7 +610,7 @@ message CreateSIPDispatchRuleRequest {
 }
 
 message UpdateSIPDispatchRuleRequest {
-  string sip_dispatch_rule_id = 1;
+  string sip_dispatch_rule_id = 1 [(logger.name) = "sipDispatchRuleID"];
   oneof action {
     SIPDispatchRuleInfo replace = 2;
     SIPDispatchRuleUpdate update = 3;
@@ -618,7 +618,7 @@ message UpdateSIPDispatchRuleRequest {
 }
 
 message SIPDispatchRuleInfo {
-  string sip_dispatch_rule_id = 1;
+  string sip_dispatch_rule_id = 1 [(logger.name) = "sipDispatchRuleID"];
   SIPDispatchRule rule = 2;
   repeated string trunk_ids = 3;
   bool hide_phone_number = 4;
@@ -688,7 +688,7 @@ message ListSIPDispatchRuleResponse {
 }
 
 message DeleteSIPDispatchRuleRequest {
-  string sip_dispatch_rule_id = 1;
+  string sip_dispatch_rule_id = 1 [(logger.name) = "sipDispatchRuleID"];
 }
 
 message SIPOutboundConfig {
@@ -723,7 +723,7 @@ message SIPOutboundConfig {
 // a SIP Trunk into a SIP DispatchRule
 message CreateSIPParticipantRequest {
   // What SIP Trunk should be used to dial the user
-  string sip_trunk_id = 1;
+  string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
   SIPOutboundConfig trunk = 20;
 
   // What number should be dialed via SIP
@@ -808,10 +808,10 @@ message CreateSIPParticipantRequest {
 }
 
 message SIPParticipantInfo {
-  string participant_id = 1;
+  string participant_id = 1 [(logger.name) = "participantID"];
   string participant_identity = 2;
   string room_name = 3;
-  string sip_call_id = 4;
+  string sip_call_id = 4 [(logger.name) = "sipCallID"];
 }
 
 message TransferSIPParticipantRequest {
@@ -834,12 +834,12 @@ message TransferSIPParticipantRequest {
 
 
 message SIPCallInfo {
-  string call_id = 1;
-  string trunk_id = 2;
-  string dispatch_rule_id = 16;
+  string call_id = 1 [(logger.name) = "callID"];
+  string trunk_id = 2 [(logger.name) = "trunkID"];
+  string dispatch_rule_id = 16 [(logger.name) = "dispatchRuleID"];
   string region = 17;
   string room_name = 3;
-  string room_id = 4; // ID of the current/previous room published to
+  string room_id = 4 [(logger.name) = "roomID"]; // ID of the current/previous room published to
   string participant_identity = 5;
   map<string, string> participant_attributes = 18 [
     (logger.redact) = true,
@@ -864,14 +864,14 @@ message SIPCallInfo {
   string pcap_file_link = 25;
   repeated google.protobuf.Any call_context = 26;
   ProviderInfo provider_info = 27;
-  string sip_call_id = 28;
+  string sip_call_id = 28 [(logger.name) = "sipCallID"];
 
   // NEXT ID: 29
 }
 
 message SIPTransferInfo {
-  string transfer_id = 1;
-  string call_id = 2;
+  string transfer_id = 1 [(logger.name) = "transferID"];
+  string call_id = 2 [(logger.name) = "callID"];
   string transfer_to = 3;
   int64 transfer_initiated_at_ns = 4;
   int64 transfer_completed_at_ns = 5;

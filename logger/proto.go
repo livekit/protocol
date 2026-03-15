@@ -56,6 +56,9 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	for i := 0; i < fields.Len(); i++ {
 		f := fields.Get(i)
 		k := f.JSONName()
+		if proto.HasExtension(f.Options(), logger.E_Name) {
+			k = proto.GetExtension(f.Options(), logger.E_Name).(string)
+		}
 		v := p.m.Get(f)
 
 		if protoFieldIsZero(f, v) {

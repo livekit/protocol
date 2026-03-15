@@ -3962,11 +3962,11 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\rimage_outputs\x18\t \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
 	"\bwebhooks\x18\n" +
 	" \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\t\n" +
-	"\aoptions\"\xeb\x05\n" +
+	"\aoptions\"\x8f\x06\n" +
 	"\x1bTrackCompositeEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12$\n" +
-	"\x0eaudio_track_id\x18\x02 \x01(\tR\faudioTrackId\x12$\n" +
-	"\x0evideo_track_id\x18\x03 \x01(\tR\fvideoTrackId\x124\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x126\n" +
+	"\x0eaudio_track_id\x18\x02 \x01(\tB\x10\x9a\xec,\faudioTrackIDR\faudioTrackId\x126\n" +
+	"\x0evideo_track_id\x18\x03 \x01(\tB\x10\x9a\xec,\fvideoTrackIDR\fvideoTrackId\x124\n" +
 	"\x04file\x18\x04 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
 	"\x06stream\x18\x05 \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
 	"\bsegments\x18\b \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
@@ -3978,10 +3978,10 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
 	"\bwebhooks\x18\x0f \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xe2\x01\n" +
+	"\aoptions\"\xef\x01\n" +
 	"\x12TrackEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x19\n" +
-	"\btrack_id\x18\x02 \x01(\tR\atrackId\x12/\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12&\n" +
+	"\btrack_id\x18\x02 \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12/\n" +
 	"\x04file\x18\x03 \x01(\v2\x19.livekit.DirectFileOutputH\x00R\x04file\x12%\n" +
 	"\rwebsocket_url\x18\x04 \x01(\tH\x00R\fwebsocketUrl\x122\n" +
 	"\bwebhooks\x18\x05 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
@@ -4031,14 +4031,14 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x05azure\x18\n" +
 	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xca\x04\n" +
+	"\x06output\"\xe2\x04\n" +
 	"\bS3Upload\x12#\n" +
 	"\n" +
 	"access_key\x18\x01 \x01(\tB\x04\x88\xec,\x01R\taccessKey\x12\x1c\n" +
 	"\x06secret\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x06secret\x12)\n" +
 	"\rsession_token\x18\v \x01(\tB\x04\x88\xec,\x01R\fsessionToken\x12,\n" +
-	"\x0fassume_role_arn\x18\f \x01(\tB\x04\x88\xec,\x01R\rassumeRoleArn\x12;\n" +
-	"\x17assume_role_external_id\x18\r \x01(\tB\x04\x88\xec,\x01R\x14assumeRoleExternalId\x12\x16\n" +
+	"\x0fassume_role_arn\x18\f \x01(\tB\x04\x88\xec,\x01R\rassumeRoleArn\x12S\n" +
+	"\x17assume_role_external_id\x18\r \x01(\tB\x1c\x88\xec,\x01\x9a\xec,\x14assumeRoleExternalIDR\x14assumeRoleExternalId\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x16\n" +
 	"\x06bucket\x18\x05 \x01(\tR\x06bucket\x12(\n" +
@@ -4089,26 +4089,27 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\rvideo_bitrate\x18\t \x01(\x05R\fvideoBitrate\x12#\n" +
 	"\rvideo_quality\x18\f \x01(\x05R\fvideoQuality\x12,\n" +
 	"\x12key_frame_interval\x18\n" +
-	" \x01(\x01R\x10keyFrameInterval\"J\n" +
-	"\x13UpdateLayoutRequest\x12\x1b\n" +
-	"\tegress_id\x18\x01 \x01(\tR\begressId\x12\x16\n" +
-	"\x06layout\x18\x02 \x01(\tR\x06layout\"\x88\x01\n" +
-	"\x13UpdateStreamRequest\x12\x1b\n" +
-	"\tegress_id\x18\x01 \x01(\tR\begressId\x12&\n" +
+	" \x01(\x01R\x10keyFrameInterval\"X\n" +
+	"\x13UpdateLayoutRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x16\n" +
+	"\x06layout\x18\x02 \x01(\tR\x06layout\"\x96\x01\n" +
+	"\x13UpdateStreamRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12&\n" +
 	"\x0fadd_output_urls\x18\x02 \x03(\tR\raddOutputUrls\x12,\n" +
-	"\x12remove_output_urls\x18\x03 \x03(\tR\x10removeOutputUrls\"e\n" +
+	"\x12remove_output_urls\x18\x03 \x03(\tR\x10removeOutputUrls\"s\n" +
 	"\x11ListEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1b\n" +
-	"\tegress_id\x18\x02 \x01(\tR\begressId\x12\x16\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12)\n" +
+	"\tegress_id\x18\x02 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x16\n" +
 	"\x06active\x18\x03 \x01(\bR\x06active\"?\n" +
 	"\x12ListEgressResponse\x12)\n" +
-	"\x05items\x18\x01 \x03(\v2\x13.livekit.EgressInfoR\x05items\"0\n" +
-	"\x11StopEgressRequest\x12\x1b\n" +
-	"\tegress_id\x18\x01 \x01(\tR\begressId\"\xd8\t\n" +
+	"\x05items\x18\x01 \x03(\v2\x13.livekit.EgressInfoR\x05items\">\n" +
+	"\x11StopEgressRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"\xf2\t\n" +
 	"\n" +
-	"EgressInfo\x12\x1b\n" +
-	"\tegress_id\x18\x01 \x01(\tR\begressId\x12\x17\n" +
-	"\aroom_id\x18\x02 \x01(\tR\x06roomId\x12\x1b\n" +
+	"EgressInfo\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12#\n" +
+	"\aroom_id\x18\x02 \x01(\tB\n" +
+	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1b\n" +
 	"\troom_name\x18\r \x01(\tR\broomName\x12:\n" +
 	"\vsource_type\x18\x1a \x01(\x0e2\x19.livekit.EgressSourceTypeR\n" +
 	"sourceType\x12-\n" +

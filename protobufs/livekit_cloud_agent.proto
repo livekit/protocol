@@ -15,6 +15,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
+import "logger/options.proto";
 
 package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
@@ -58,7 +59,7 @@ message CreateAgentRequest {
 }
 
 message CreateAgentResponse {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
     string status = 3;
     string version = 4;
@@ -75,7 +76,7 @@ message PresignedPostRequest {
 
 message AgentDeployment {
     string region = 1;
-    string agent_id = 2;
+    string agent_id = 2 [(logger.name) = "agentID"];
     string status = 3;
     int32 replicas = 4;
     int32 min_replicas = 5;
@@ -91,7 +92,7 @@ message AgentDeployment {
 }
 
 message AgentInfo {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
     string version = 3;
     repeated AgentDeployment agent_deployments = 4;
@@ -101,7 +102,7 @@ message AgentInfo {
 
 message ListAgentsRequest {
     string agent_name = 1;
-    string agent_id = 2;
+    string agent_id = 2 [(logger.name) = "agentID"];
 }
 
 message ListAgentsResponse {
@@ -120,7 +121,7 @@ message AgentVersion {
 }
 
 message ListAgentVersionsRequest {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
 }
 
@@ -129,7 +130,7 @@ message ListAgentVersionsResponse {
 }
 
 message UpdateAgentRequest {
-    string agent_id              = 1;
+    string agent_id              = 1 [(logger.name) = "agentID"];
     string agent_name            = 2 [deprecated=true];
     int32 replicas               = 3 [deprecated=true];
     int32 max_replicas           = 4 [deprecated=true];
@@ -144,7 +145,7 @@ message UpdateAgentResponse {
 }
 
 message RestartAgentRequest {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
 }
 
 message RestartAgentResponse {
@@ -153,7 +154,7 @@ message RestartAgentResponse {
 }
 
 message DeployAgentRequest {
-    string agent_id              = 1;
+    string agent_id              = 1 [(logger.name) = "agentID"];
     string agent_name            = 2 [deprecated=true];
     repeated AgentSecret secrets = 3;
     int32 replicas               = 4 [deprecated=true];
@@ -164,14 +165,14 @@ message DeployAgentRequest {
 message DeployAgentResponse {
     bool success = 1;
     string message = 2;
-    string agent_id = 3;
+    string agent_id = 3 [(logger.name) = "agentID"];
     string presigned_url = 4;
     string tag = 5;
     PresignedPostRequest presigned_post_request = 6;
 }
 
 message UpdateAgentSecretsRequest {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
     bool overwrite = 3;
     repeated AgentSecret secrets = 4;
@@ -184,7 +185,7 @@ message UpdateAgentSecretsResponse {
 }
 
 message RollbackAgentRequest {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
     string version = 3;
 }
@@ -195,7 +196,7 @@ message RollbackAgentResponse {
 }
 
 message DeleteAgentRequest {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
 }
 
@@ -205,7 +206,7 @@ message DeleteAgentResponse {
 }
 
 message ListAgentSecretsRequest {
-    string agent_id = 1;
+    string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
 }
 
@@ -230,7 +231,7 @@ message PrivateLink {
     string endpoint = 1 [deprecated=true]; // Use the generic "endpoint" instead
   };
 
-  string private_link_id = 1;
+  string private_link_id = 1 [(logger.name) = "privateLinkID"];
   string name = 2;
   string region = 4;
   uint32 port = 5;
@@ -272,7 +273,7 @@ message CreatePrivateLinkResponse {
 }
 
 message DestroyPrivateLinkRequest {
-  string private_link_id = 1;
+  string private_link_id = 1 [(logger.name) = "privateLinkID"];
 }
 
 message DestroyPrivateLinkResponse {
@@ -286,7 +287,7 @@ message ListPrivateLinksResponse {
 }
 
 message GetPrivateLinkStatusRequest {
-  string private_link_id = 1;
+  string private_link_id = 1 [(logger.name) = "privateLinkID"];
 }
 
 message GetPrivateLinkStatusResponse {

@@ -6119,10 +6119,10 @@ var File_livekit_models_proto protoreflect.FileDescriptor
 
 const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_models.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x15livekit_metrics.proto\x1a\x14logger/options.proto\"=\n" +
+	"\x14livekit_models.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x15livekit_metrics.proto\x1a\x14logger/options.proto\"J\n" +
 	"\n" +
-	"Pagination\x12\x19\n" +
-	"\bafter_id\x18\x01 \x01(\tR\aafterId\x12\x14\n" +
+	"Pagination\x12&\n" +
+	"\bafter_id\x18\x01 \x01(\tB\v\x9a\xec,\aafterIDR\aafterId\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\"'\n" +
 	"\x0fTokenPagination\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"^\n" +
@@ -6361,10 +6361,10 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\t_end_time\"3\n" +
 	"\aSipDTMF\x12\x12\n" +
 	"\x04code\x18\x03 \x01(\rR\x04code\x12\x14\n" +
-	"\x05digit\x18\x04 \x01(\tR\x05digit\"\xaf\x01\n" +
+	"\x05digit\x18\x04 \x01(\tR\x05digit\"\xbc\x01\n" +
 	"\rTranscription\x12H\n" +
-	" transcribed_participant_identity\x18\x02 \x01(\tR\x1etranscribedParticipantIdentity\x12\x19\n" +
-	"\btrack_id\x18\x03 \x01(\tR\atrackId\x129\n" +
+	" transcribed_participant_identity\x18\x02 \x01(\tR\x1etranscribedParticipantIdentity\x12&\n" +
+	"\btrack_id\x18\x03 \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x129\n" +
 	"\bsegments\x18\x04 \x03(\v2\x1d.livekit.TranscriptionSegmentR\bsegments\"\xa6\x01\n" +
 	"\x14TranscriptionSegment\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
@@ -6389,13 +6389,13 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\apayload\x18\x03 \x01(\tR\apayload\x12.\n" +
 	"\x13response_timeout_ms\x18\x04 \x01(\rR\x11responseTimeoutMs\x12\x18\n" +
 	"\aversion\x18\x05 \x01(\rR\aversion\x12-\n" +
-	"\x12compressed_payload\x18\x06 \x01(\fR\x11compressedPayload\"'\n" +
-	"\x06RpcAck\x12\x1d\n" +
+	"\x12compressed_payload\x18\x06 \x01(\fR\x11compressedPayload\"6\n" +
+	"\x06RpcAck\x12,\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\"\xad\x01\n" +
-	"\vRpcResponse\x12\x1d\n" +
+	"request_id\x18\x01 \x01(\tB\r\x9a\xec,\trequestIDR\trequestId\"\xbc\x01\n" +
+	"\vRpcResponse\x12,\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1a\n" +
+	"request_id\x18\x01 \x01(\tB\r\x9a\xec,\trequestIDR\trequestId\x12\x1a\n" +
 	"\apayload\x18\x02 \x01(\tH\x00R\apayload\x12)\n" +
 	"\x05error\x18\x03 \x01(\v2\x11.livekit.RpcErrorH\x00R\x05error\x12/\n" +
 	"\x12compressed_payload\x18\x04 \x01(\fH\x00R\x11compressedPayloadB\a\n" +
@@ -6407,14 +6407,15 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x11ParticipantTracks\x12'\n" +
 	"\x0fparticipant_sid\x18\x01 \x01(\tR\x0eparticipantSid\x12\x1d\n" +
 	"\n" +
-	"track_sids\x18\x02 \x03(\tR\ttrackSids\"\x94\x02\n" +
+	"track_sids\x18\x02 \x03(\tR\ttrackSids\"\xa0\x02\n" +
 	"\n" +
 	"ServerInfo\x125\n" +
 	"\aedition\x18\x01 \x01(\x0e2\x1b.livekit.ServerInfo.EditionR\aedition\x12\x18\n" +
 	"\aversion\x18\x02 \x01(\tR\aversion\x12\x1a\n" +
 	"\bprotocol\x18\x03 \x01(\x05R\bprotocol\x12\x16\n" +
-	"\x06region\x18\x04 \x01(\tR\x06region\x12\x17\n" +
-	"\anode_id\x18\x05 \x01(\tR\x06nodeId\x12\x1d\n" +
+	"\x06region\x18\x04 \x01(\tR\x06region\x12#\n" +
+	"\anode_id\x18\x05 \x01(\tB\n" +
+	"\x9a\xec,\x06nodeIDR\x06nodeId\x12\x1d\n" +
 	"\n" +
 	"debug_info\x18\x06 \x01(\tR\tdebugInfo\x12%\n" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
@@ -6566,9 +6567,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x19ext_second_last_timestamp\x18\x04 \x01(\x04R\x16extSecondLastTimestamp\x12\x1f\n" +
 	"\vlast_marker\x18\x05 \x01(\bR\n" +
 	"lastMarker\x12,\n" +
-	"\x12second_last_marker\x18\x06 \x01(\bR\x10secondLastMarker\"\x98\x02\n" +
-	"\x0eVP8MungerState\x12-\n" +
-	"\x13ext_last_picture_id\x18\x01 \x01(\x05R\x10extLastPictureId\x12&\n" +
+	"\x12second_last_marker\x18\x06 \x01(\bR\x10secondLastMarker\"\xae\x02\n" +
+	"\x0eVP8MungerState\x12C\n" +
+	"\x13ext_last_picture_id\x18\x01 \x01(\x05B\x14\x9a\xec,\x10extLastPictureIDR\x10extLastPictureId\x12&\n" +
 	"\x0fpicture_id_used\x18\x02 \x01(\bR\rpictureIdUsed\x12'\n" +
 	"\x10last_tl0_pic_idx\x18\x03 \x01(\rR\rlastTl0PicIdx\x12'\n" +
 	"\x10tl0_pic_idx_used\x18\x04 \x01(\bR\rtl0PicIdxUsed\x12\x19\n" +
@@ -6580,21 +6581,22 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fTimedVersion\x12\x1d\n" +
 	"\n" +
 	"unix_micro\x18\x01 \x01(\x03R\tunixMicro\x12\x14\n" +
-	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xe4\t\n" +
+	"\x05ticks\x18\x02 \x01(\x05R\x05ticks\"\xa3\n" +
 	"\n" +
-	"DataStream\x1a\xeb\x01\n" +
+	"\n" +
+	"DataStream\x1a\x80\x02\n" +
 	"\n" +
 	"TextHeader\x12H\n" +
 	"\x0eoperation_type\x18\x01 \x01(\x0e2!.livekit.DataStream.OperationTypeR\roperationType\x12\x18\n" +
-	"\aversion\x18\x02 \x01(\x05R\aversion\x12+\n" +
-	"\x12reply_to_stream_id\x18\x03 \x01(\tR\x0freplyToStreamId\x12.\n" +
+	"\aversion\x18\x02 \x01(\x05R\aversion\x12@\n" +
+	"\x12reply_to_stream_id\x18\x03 \x01(\tB\x13\x9a\xec,\x0freplyToStreamIDR\x0freplyToStreamId\x12.\n" +
 	"\x13attached_stream_ids\x18\x04 \x03(\tR\x11attachedStreamIds\x12\x1c\n" +
 	"\tgenerated\x18\x05 \x01(\bR\tgenerated\x1a \n" +
 	"\n" +
 	"ByteHeader\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x1a\x99\x04\n" +
-	"\x06Header\x12\x1b\n" +
-	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1c\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x1a\xa7\x04\n" +
+	"\x06Header\x12)\n" +
+	"\tstream_id\x18\x01 \x01(\tB\f\x9a\xec,\bstreamIDR\bstreamId\x12\x1c\n" +
 	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x12\x14\n" +
 	"\x05topic\x18\x03 \x01(\tR\x05topic\x12\x1b\n" +
 	"\tmime_type\x18\x04 \x01(\tR\bmimeType\x12&\n" +
@@ -6612,17 +6614,17 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x10\n" +
 	"\x0econtent_headerB\x0f\n" +
-	"\r_total_length\x1a\x99\x01\n" +
-	"\x05Chunk\x12\x1b\n" +
-	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x1f\n" +
+	"\r_total_length\x1a\xa7\x01\n" +
+	"\x05Chunk\x12)\n" +
+	"\tstream_id\x18\x01 \x01(\tB\f\x9a\xec,\bstreamIDR\bstreamId\x12\x1f\n" +
 	"\vchunk_index\x18\x02 \x01(\x04R\n" +
 	"chunkIndex\x12\x18\n" +
 	"\acontent\x18\x03 \x01(\fR\acontent\x12\x18\n" +
 	"\aversion\x18\x04 \x01(\x05R\aversion\x12\x17\n" +
 	"\x02iv\x18\x05 \x01(\fB\x02\x18\x01H\x00R\x02iv\x88\x01\x01B\x05\n" +
-	"\x03_iv\x1a\xca\x01\n" +
-	"\aTrailer\x12\x1b\n" +
-	"\tstream_id\x18\x01 \x01(\tR\bstreamId\x12\x16\n" +
+	"\x03_iv\x1a\xd8\x01\n" +
+	"\aTrailer\x12)\n" +
+	"\tstream_id\x18\x01 \x01(\tB\f\x9a\xec,\bstreamIDR\bstreamId\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reason\x12K\n" +
 	"\n" +
 	"attributes\x18\x03 \x03(\v2+.livekit.DataStream.Trailer.AttributesEntryR\n" +

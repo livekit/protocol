@@ -8,6 +8,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
 import "livekit_models.proto";
+import "logger/options.proto";
 
 // Experimental (not currently available)
 service Replay {
@@ -30,31 +31,31 @@ message ListReplaysResponse {
 }
 
 message ReplayInfo {
-  string replay_id = 1;
+  string replay_id = 1 [(logger.name) = "replayID"];
   string room_name = 2;
   int64 start_time = 3;
   int64 duration = 4;
 }
 
 message DeleteReplayRequest {
-  string replay_id = 1;
+  string replay_id = 1 [(logger.name) = "replayID"];
 }
 
 message PlaybackRequest {
-  string replay_id = 1;
+  string replay_id = 1 [(logger.name) = "replayID"];
   string playback_room = 2; // name of room to play into
   int64 seek_offset = 3; // initial timestamp (ms)
 }
 
 message PlaybackResponse {
-  string playback_id = 1;
+  string playback_id = 1 [(logger.name) = "playbackID"];
 }
 
 message SeekRequest {
-  string playback_id = 1;
+  string playback_id = 1 [(logger.name) = "playbackID"];
   int64 seek_offset = 2; // timestamp (ms)
 }
 
 message ClosePlaybackRequest {
-  string playback_id = 1;
+  string playback_id = 1 [(logger.name) = "playbackID"];
 }

@@ -5166,12 +5166,12 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12(\n" +
 	"\x05track\x18\x02 \x01(\v2\x12.livekit.TrackInfoR\x05track\"7\n" +
 	"\x18TrackUnpublishedResponse\x12\x1b\n" +
-	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xe1\x01\n" +
+	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xf3\x01\n" +
 	"\x12SessionDescription\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x10\n" +
 	"\x03sdp\x18\x02 \x01(\tR\x03sdp\x12\x0e\n" +
-	"\x02id\x18\x03 \x01(\rR\x02id\x12T\n" +
-	"\x0fmid_to_track_id\x18\x04 \x03(\v2-.livekit.SessionDescription.MidToTrackIdEntryR\fmidToTrackId\x1a?\n" +
+	"\x02id\x18\x03 \x01(\rR\x02id\x12f\n" +
+	"\x0fmid_to_track_id\x18\x04 \x03(\v2-.livekit.SessionDescription.MidToTrackIdEntryB\x10\x9a\xec,\fmidToTrackIDR\fmidToTrackId\x1a?\n" +
 	"\x11MidToTrackIdEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"Q\n" +
@@ -5217,15 +5217,15 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\tRECONNECT\x10\x02\"a\n" +
 	"\x11UpdateVideoLayers\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12+\n" +
-	"\x06layers\x18\x02 \x03(\v2\x13.livekit.VideoLayerR\x06layers:\x02\x18\x01\"\xf5\x02\n" +
+	"\x06layers\x18\x02 \x03(\v2\x13.livekit.VideoLayerR\x06layers:\x02\x18\x01\"\x84\x03\n" +
 	"\x19UpdateParticipantMetadata\x12B\n" +
 	"\bmetadata\x18\x01 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12:\n" +
 	"\x04name\x18\x02 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x04name\x12z\n" +
 	"\n" +
 	"attributes\x18\x03 \x03(\v22.livekit.UpdateParticipantMetadata.AttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\n" +
-	"attributes\x12\x1d\n" +
+	"attributes\x12,\n" +
 	"\n" +
-	"request_id\x18\x04 \x01(\rR\trequestId\x1a=\n" +
+	"request_id\x18\x04 \x01(\rB\r\x9a\xec,\trequestIDR\trequestId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"g\n" +
@@ -5327,10 +5327,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x97\a\n" +
-	"\x0fRequestResponse\x12\x1d\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xa6\a\n" +
+	"\x0fRequestResponse\x12,\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\rR\trequestId\x127\n" +
+	"request_id\x18\x01 \x01(\rB\r\x9a\xec,\trequestIDR\trequestId\x127\n" +
 	"\x06reason\x18\x02 \x01(\x0e2\x1f.livekit.RequestResponse.ReasonR\x06reason\x12\x18\n" +
 	"\amessage\x18\x03 \x01(\tR\amessage\x123\n" +
 	"\atrickle\x18\x04 \x01(\v2\x17.livekit.TrickleRequestH\x00R\atrickle\x127\n" +

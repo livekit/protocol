@@ -8,6 +8,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
+import "logger/options.proto";
 
 
 // Phone number status enumeration
@@ -71,7 +72,7 @@ message SearchPhoneNumbersResponse {
 // PurchasePhoneNumberRequest - Request to purchase phone numbers
 message PurchasePhoneNumberRequest {
   repeated string phone_numbers = 1;        // Phone numbers to purchase (e.g., ["+1234567890", "+1234567891"])
-  optional string sip_dispatch_rule_id = 2; // SIP dispatch rule ID to apply to all purchased numbers
+  optional string sip_dispatch_rule_id = 2 [(logger.name) = "sipDispatchRuleID"]; // SIP dispatch rule ID to apply to all purchased numbers
 }
 
 // PurchasePhoneNumberResponse - Response containing the purchased phone numbers
@@ -84,7 +85,7 @@ message ListPhoneNumbersRequest {
   optional int32 limit = 1;                 // Maximum number of results (default: 50)
   repeated PhoneNumberStatus statuses = 2;           // Filter by statuses (active, pending, released)
   optional TokenPagination page_token = 3;  // Token for pagination (empty for first page)
-  optional string sip_dispatch_rule_id = 4; // Filter by SIP dispatch rule ID
+  optional string sip_dispatch_rule_id = 4 [(logger.name) = "sipDispatchRuleID"]; // Filter by SIP dispatch rule ID
 }
 
 // ListPhoneNumbersResponse - Response containing phone numbers
@@ -110,7 +111,7 @@ message GetPhoneNumberResponse {
 message UpdatePhoneNumberRequest {
   optional string id = 1;                   // Use phone number ID for direct lookup
   optional string phone_number = 2;         // Use phone number string for lookup
-  optional string sip_dispatch_rule_id = 3; // SIP dispatch rule ID to assign to the phone number
+  optional string sip_dispatch_rule_id = 3 [(logger.name) = "sipDispatchRuleID"]; // SIP dispatch rule ID to assign to the phone number
 }
 
 // UpdatePhoneNumberResponse - Response containing the updated phone number
@@ -145,6 +146,6 @@ message PhoneNumber {
   PhoneNumberStatus status = 12;              // Current status
   google.protobuf.Timestamp assigned_at = 13; // Assignment timestamp
   google.protobuf.Timestamp released_at = 14; // Release timestamp (if applicable)
-  string sip_dispatch_rule_id = 15 [deprecated=true]; // Associated SIP dispatch rule ID (deprecated: use sip_dispatch_rule_ids instead)
+  string sip_dispatch_rule_id = 15 [deprecated=true, (logger.name) = "sipDispatchRuleID"]; // Associated SIP dispatch rule ID (deprecated: use sip_dispatch_rule_ids instead)
   repeated string sip_dispatch_rule_ids = 16; // Associated SIP dispatch rule IDs
 }

@@ -7,6 +7,7 @@
 package agent
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -730,7 +731,7 @@ var File_agent_livekit_agent_session_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\n" +
-	"!agent/livekit_agent_session.proto\x12\rlivekit.agent\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcd\x04\n" +
+	"!agent/livekit_agent_session.proto\x12\rlivekit.agent\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xcd\x04\n" +
 	"\rMetricsReport\x12J\n" +
 	"\x13started_speaking_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x11startedSpeakingAt\x12J\n" +
 	"\x13stopped_speaking_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x11stoppedSpeakingAt\x124\n" +
@@ -764,27 +765,31 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"ExtraEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x18\n" +
-	"\x16_transcript_confidence\"\xa4\x01\n" +
+	"\x16_transcript_confidence\"\xb0\x01\n" +
 	"\fFunctionCall\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
-	"\acall_id\x18\x02 \x01(\tR\x06callId\x12\x1c\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
+	"\acall_id\x18\x02 \x01(\tB\n" +
+	"\x9a\xec,\x06callIDR\x06callId\x12\x1c\n" +
 	"\targuments\x18\x03 \x01(\tR\targuments\x12\x12\n" +
 	"\x04name\x18\x04 \x01(\tR\x04name\x129\n" +
 	"\n" +
-	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xbf\x01\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xcb\x01\n" +
 	"\x12FunctionCallOutput\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x17\n" +
-	"\acall_id\x18\x03 \x01(\tR\x06callId\x12\x16\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12#\n" +
+	"\acall_id\x18\x03 \x01(\tB\n" +
+	"\x9a\xec,\x06callIDR\x06callId\x12\x16\n" +
 	"\x06output\x18\x04 \x01(\tR\x06output\x12\x19\n" +
 	"\bis_error\x18\x05 \x01(\bR\aisError\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xb3\x01\n" +
+	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\xd3\x01\n" +
 	"\fAgentHandoff\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
-	"\fold_agent_id\x18\x02 \x01(\tH\x00R\n" +
-	"oldAgentId\x88\x01\x01\x12 \n" +
-	"\fnew_agent_id\x18\x03 \x01(\tR\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x125\n" +
+	"\fold_agent_id\x18\x02 \x01(\tB\x0e\x9a\xec,\n" +
+	"oldAgentIDH\x00R\n" +
+	"oldAgentId\x88\x01\x01\x120\n" +
+	"\fnew_agent_id\x18\x03 \x01(\tB\x0e\x9a\xec,\n" +
+	"newAgentIDR\n" +
 	"newAgentId\x129\n" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB\x0f\n" +
