@@ -1377,14 +1377,18 @@ type EncodingOptions struct {
 	Framerate        int32                  `protobuf:"varint,4,opt,name=framerate,proto3" json:"framerate,omitempty"`                                             // (default 30)
 	AudioCodec       AudioCodec             `protobuf:"varint,5,opt,name=audio_codec,json=audioCodec,proto3,enum=livekit.AudioCodec" json:"audio_codec,omitempty"` // (default OPUS)
 	AudioBitrate     int32                  `protobuf:"varint,6,opt,name=audio_bitrate,json=audioBitrate,proto3" json:"audio_bitrate,omitempty"`                   // (default 128)
-	AudioQuality     int32                  `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"`                  // quality setting on audio encoder
 	AudioFrequency   int32                  `protobuf:"varint,7,opt,name=audio_frequency,json=audioFrequency,proto3" json:"audio_frequency,omitempty"`             // (default 44100)
 	VideoCodec       VideoCodec             `protobuf:"varint,8,opt,name=video_codec,json=videoCodec,proto3,enum=livekit.VideoCodec" json:"video_codec,omitempty"` // (default H264_MAIN)
 	VideoBitrate     int32                  `protobuf:"varint,9,opt,name=video_bitrate,json=videoBitrate,proto3" json:"video_bitrate,omitempty"`                   // (default 4500)
-	VideoQuality     int32                  `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"`                  // quality setting on video encoder
 	KeyFrameInterval float64                `protobuf:"fixed64,10,opt,name=key_frame_interval,json=keyFrameInterval,proto3" json:"key_frame_interval,omitempty"`   // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// --- Deprecated ---
+	//
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	AudioQuality int32 `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"` // quality setting on audio encoder
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	VideoQuality  int32 `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"` // quality setting on video encoder
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *EncodingOptions) Reset() {
@@ -1459,13 +1463,6 @@ func (x *EncodingOptions) GetAudioBitrate() int32 {
 	return 0
 }
 
-func (x *EncodingOptions) GetAudioQuality() int32 {
-	if x != nil {
-		return x.AudioQuality
-	}
-	return 0
-}
-
 func (x *EncodingOptions) GetAudioFrequency() int32 {
 	if x != nil {
 		return x.AudioFrequency
@@ -1487,16 +1484,25 @@ func (x *EncodingOptions) GetVideoBitrate() int32 {
 	return 0
 }
 
-func (x *EncodingOptions) GetVideoQuality() int32 {
+func (x *EncodingOptions) GetKeyFrameInterval() float64 {
 	if x != nil {
-		return x.VideoQuality
+		return x.KeyFrameInterval
 	}
 	return 0
 }
 
-func (x *EncodingOptions) GetKeyFrameInterval() float64 {
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EncodingOptions) GetAudioQuality() int32 {
 	if x != nil {
-		return x.KeyFrameInterval
+		return x.AudioQuality
+	}
+	return 0
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EncodingOptions) GetVideoQuality() int32 {
+	if x != nil {
+		return x.VideoQuality
 	}
 	return 0
 }
@@ -5551,7 +5557,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\btrack_id\x18\x01 \x01(\tB\v\x9a\xec,\atrackIDH\x00R\atrackId\x123\n" +
 	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12\x16\n" +
 	"\x05topic\x18\x03 \x01(\tH\x00R\x05topicB\a\n" +
-	"\x05match\"\xca\x03\n" +
+	"\x05match\"\xd2\x03\n" +
 	"\x0fEncodingOptions\x12\x14\n" +
 	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
 	"\x06height\x18\x02 \x01(\x05R\x06height\x12\x14\n" +
@@ -5559,15 +5565,15 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\tframerate\x18\x04 \x01(\x05R\tframerate\x124\n" +
 	"\vaudio_codec\x18\x05 \x01(\x0e2\x13.livekit.AudioCodecR\n" +
 	"audioCodec\x12#\n" +
-	"\raudio_bitrate\x18\x06 \x01(\x05R\faudioBitrate\x12#\n" +
-	"\raudio_quality\x18\v \x01(\x05R\faudioQuality\x12'\n" +
+	"\raudio_bitrate\x18\x06 \x01(\x05R\faudioBitrate\x12'\n" +
 	"\x0faudio_frequency\x18\a \x01(\x05R\x0eaudioFrequency\x124\n" +
 	"\vvideo_codec\x18\b \x01(\x0e2\x13.livekit.VideoCodecR\n" +
 	"videoCodec\x12#\n" +
-	"\rvideo_bitrate\x18\t \x01(\x05R\fvideoBitrate\x12#\n" +
-	"\rvideo_quality\x18\f \x01(\x05R\fvideoQuality\x12,\n" +
+	"\rvideo_bitrate\x18\t \x01(\x05R\fvideoBitrate\x12,\n" +
 	"\x12key_frame_interval\x18\n" +
-	" \x01(\x01R\x10keyFrameInterval\"\xb7\x02\n" +
+	" \x01(\x01R\x10keyFrameInterval\x12'\n" +
+	"\raudio_quality\x18\v \x01(\x05B\x02\x18\x01R\faudioQuality\x12'\n" +
+	"\rvideo_quality\x18\f \x01(\x05B\x02\x18\x01R\fvideoQuality\"\xb7\x02\n" +
 	"\x06Output\x12)\n" +
 	"\x04file\x18\x01 \x01(\v2\x13.livekit.FileOutputH\x00R\x04file\x12/\n" +
 	"\x06stream\x18\x02 \x01(\v2\x15.livekit.StreamOutputH\x00R\x06stream\x12:\n" +
