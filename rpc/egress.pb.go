@@ -128,7 +128,6 @@ func (x *StartEgressRequest) GetReplay() *livekit.ExportReplayRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/egress.proto.
 func (x *StartEgressRequest) GetRoomComposite() *livekit.RoomCompositeEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*StartEgressRequest_RoomComposite); ok {
@@ -138,7 +137,6 @@ func (x *StartEgressRequest) GetRoomComposite() *livekit.RoomCompositeEgressRequ
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/egress.proto.
 func (x *StartEgressRequest) GetWeb() *livekit.WebEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*StartEgressRequest_Web); ok {
@@ -148,7 +146,6 @@ func (x *StartEgressRequest) GetWeb() *livekit.WebEgressRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/egress.proto.
 func (x *StartEgressRequest) GetParticipant() *livekit.ParticipantEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*StartEgressRequest_Participant); ok {
@@ -158,7 +155,6 @@ func (x *StartEgressRequest) GetParticipant() *livekit.ParticipantEgressRequest 
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/egress.proto.
 func (x *StartEgressRequest) GetTrackComposite() *livekit.TrackCompositeEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*StartEgressRequest_TrackComposite); ok {
@@ -168,7 +164,6 @@ func (x *StartEgressRequest) GetTrackComposite() *livekit.TrackCompositeEgressRe
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/egress.proto.
 func (x *StartEgressRequest) GetTrack() *livekit.TrackEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*StartEgressRequest_Track); ok {
@@ -234,28 +229,22 @@ type StartEgressRequest_Replay struct {
 
 type StartEgressRequest_RoomComposite struct {
 	// --- deprecated ---
-	//
-	// Deprecated: Marked as deprecated in rpc/egress.proto.
 	RoomComposite *livekit.RoomCompositeEgressRequest `protobuf:"bytes,5,opt,name=room_composite,json=roomComposite,proto3,oneof"`
 }
 
 type StartEgressRequest_Web struct {
-	// Deprecated: Marked as deprecated in rpc/egress.proto.
 	Web *livekit.WebEgressRequest `protobuf:"bytes,11,opt,name=web,proto3,oneof"`
 }
 
 type StartEgressRequest_Participant struct {
-	// Deprecated: Marked as deprecated in rpc/egress.proto.
 	Participant *livekit.ParticipantEgressRequest `protobuf:"bytes,13,opt,name=participant,proto3,oneof"`
 }
 
 type StartEgressRequest_TrackComposite struct {
-	// Deprecated: Marked as deprecated in rpc/egress.proto.
 	TrackComposite *livekit.TrackCompositeEgressRequest `protobuf:"bytes,6,opt,name=track_composite,json=trackComposite,proto3,oneof"`
 }
 
 type StartEgressRequest_Track struct {
-	// Deprecated: Marked as deprecated in rpc/egress.proto.
 	Track *livekit.TrackEgressRequest `protobuf:"bytes,7,opt,name=track,proto3,oneof"`
 }
 
@@ -357,16 +346,16 @@ var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xe7\x05\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xd3\x05\n" +
 	"\x12StartEgressRequest\x12)\n" +
 	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x125\n" +
 	"\x06egress\x18\x10 \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
-	"\x06replay\x18\x11 \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12P\n" +
-	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestB\x02\x18\x01H\x00R\rroomComposite\x121\n" +
-	"\x03web\x18\v \x01(\v2\x19.livekit.WebEgressRequestB\x02\x18\x01H\x00R\x03web\x12I\n" +
-	"\vparticipant\x18\r \x01(\v2!.livekit.ParticipantEgressRequestB\x02\x18\x01H\x00R\vparticipant\x12S\n" +
-	"\x0ftrack_composite\x18\x06 \x01(\v2$.livekit.TrackCompositeEgressRequestB\x02\x18\x01H\x00R\x0etrackComposite\x127\n" +
-	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestB\x02\x18\x01H\x00R\x05track\x12#\n" +
+	"\x06replay\x18\x11 \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12L\n" +
+	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
+	"\x03web\x18\v \x01(\v2\x19.livekit.WebEgressRequestH\x00R\x03web\x12E\n" +
+	"\vparticipant\x18\r \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
+	"\x0ftrack_composite\x18\x06 \x01(\v2$.livekit.TrackCompositeEgressRequestH\x00R\x0etrackComposite\x123\n" +
+	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12#\n" +
 	"\aroom_id\x18\x03 \x01(\tB\n" +
 	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1a\n" +
 	"\x05token\x18\b \x01(\tB\x04\x88\xec,\x01R\x05token\x12\x15\n" +

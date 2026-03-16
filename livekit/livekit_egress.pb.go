@@ -1863,7 +1863,6 @@ func (x *SegmentedFileOutput) GetOutput() isSegmentedFileOutput_Output {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *SegmentedFileOutput) GetS3() *S3Upload {
 	if x != nil {
 		if x, ok := x.Output.(*SegmentedFileOutput_S3); ok {
@@ -1873,7 +1872,6 @@ func (x *SegmentedFileOutput) GetS3() *S3Upload {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *SegmentedFileOutput) GetGcp() *GCPUpload {
 	if x != nil {
 		if x, ok := x.Output.(*SegmentedFileOutput_Gcp); ok {
@@ -1883,7 +1881,6 @@ func (x *SegmentedFileOutput) GetGcp() *GCPUpload {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *SegmentedFileOutput) GetAzure() *AzureBlobUpload {
 	if x != nil {
 		if x, ok := x.Output.(*SegmentedFileOutput_Azure); ok {
@@ -1893,7 +1890,6 @@ func (x *SegmentedFileOutput) GetAzure() *AzureBlobUpload {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *SegmentedFileOutput) GetAliOSS() *AliOSSUpload {
 	if x != nil {
 		if x, ok := x.Output.(*SegmentedFileOutput_AliOSS); ok {
@@ -1908,22 +1904,18 @@ type isSegmentedFileOutput_Output interface {
 }
 
 type SegmentedFileOutput_S3 struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	S3 *S3Upload `protobuf:"bytes,5,opt,name=s3,proto3,oneof"`
 }
 
 type SegmentedFileOutput_Gcp struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Gcp *GCPUpload `protobuf:"bytes,6,opt,name=gcp,proto3,oneof"`
 }
 
 type SegmentedFileOutput_Azure struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Azure *AzureBlobUpload `protobuf:"bytes,7,opt,name=azure,proto3,oneof"`
 }
 
 type SegmentedFileOutput_AliOSS struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	AliOSS *AliOSSUpload `protobuf:"bytes,9,opt,name=aliOSS,proto3,oneof"`
 }
 
@@ -2044,7 +2036,6 @@ func (x *ImageOutput) GetOutput() isImageOutput_Output {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *ImageOutput) GetS3() *S3Upload {
 	if x != nil {
 		if x, ok := x.Output.(*ImageOutput_S3); ok {
@@ -2054,7 +2045,6 @@ func (x *ImageOutput) GetS3() *S3Upload {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *ImageOutput) GetGcp() *GCPUpload {
 	if x != nil {
 		if x, ok := x.Output.(*ImageOutput_Gcp); ok {
@@ -2064,7 +2054,6 @@ func (x *ImageOutput) GetGcp() *GCPUpload {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *ImageOutput) GetAzure() *AzureBlobUpload {
 	if x != nil {
 		if x, ok := x.Output.(*ImageOutput_Azure); ok {
@@ -2074,7 +2063,6 @@ func (x *ImageOutput) GetAzure() *AzureBlobUpload {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *ImageOutput) GetAliOSS() *AliOSSUpload {
 	if x != nil {
 		if x, ok := x.Output.(*ImageOutput_AliOSS); ok {
@@ -2089,22 +2077,18 @@ type isImageOutput_Output interface {
 }
 
 type ImageOutput_S3 struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	S3 *S3Upload `protobuf:"bytes,8,opt,name=s3,proto3,oneof"`
 }
 
 type ImageOutput_Gcp struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Gcp *GCPUpload `protobuf:"bytes,9,opt,name=gcp,proto3,oneof"`
 }
 
 type ImageOutput_Azure struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Azure *AzureBlobUpload `protobuf:"bytes,10,opt,name=azure,proto3,oneof"`
 }
 
 type ImageOutput_AliOSS struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	AliOSS *AliOSSUpload `protobuf:"bytes,11,opt,name=aliOSS,proto3,oneof"`
 }
 
@@ -3058,7 +3042,6 @@ func (x *EgressInfo) GetReplay() *ExportReplayRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *EgressInfo) GetRoomComposite() *RoomCompositeEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*EgressInfo_RoomComposite); ok {
@@ -3068,7 +3051,6 @@ func (x *EgressInfo) GetRoomComposite() *RoomCompositeEgressRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *EgressInfo) GetWeb() *WebEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*EgressInfo_Web); ok {
@@ -3078,7 +3060,6 @@ func (x *EgressInfo) GetWeb() *WebEgressRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *EgressInfo) GetParticipant() *ParticipantEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*EgressInfo_Participant); ok {
@@ -3088,7 +3069,6 @@ func (x *EgressInfo) GetParticipant() *ParticipantEgressRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *EgressInfo) GetTrackComposite() *TrackCompositeEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*EgressInfo_TrackComposite); ok {
@@ -3098,7 +3078,6 @@ func (x *EgressInfo) GetTrackComposite() *TrackCompositeEgressRequest {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *EgressInfo) GetTrack() *TrackEgressRequest {
 	if x != nil {
 		if x, ok := x.Request.(*EgressInfo_Track); ok {
@@ -3235,27 +3214,22 @@ type EgressInfo_Replay struct {
 }
 
 type EgressInfo_RoomComposite struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	RoomComposite *RoomCompositeEgressRequest `protobuf:"bytes,4,opt,name=room_composite,json=roomComposite,proto3,oneof"`
 }
 
 type EgressInfo_Web struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Web *WebEgressRequest `protobuf:"bytes,14,opt,name=web,proto3,oneof"`
 }
 
 type EgressInfo_Participant struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Participant *ParticipantEgressRequest `protobuf:"bytes,19,opt,name=participant,proto3,oneof"`
 }
 
 type EgressInfo_TrackComposite struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	TrackComposite *TrackCompositeEgressRequest `protobuf:"bytes,5,opt,name=track_composite,json=trackComposite,proto3,oneof"`
 }
 
 type EgressInfo_Track struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
 	Track *TrackEgressRequest `protobuf:"bytes,6,opt,name=track,proto3,oneof"`
 }
 
@@ -4170,7 +4144,6 @@ func (*ExportReplayRequest_Preset) isExportReplayRequest_Encoding() {}
 
 func (*ExportReplayRequest_Advanced) isExportReplayRequest_Encoding() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type RoomCompositeEgressRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
@@ -4409,7 +4382,6 @@ func (*RoomCompositeEgressRequest_Preset) isRoomCompositeEgressRequest_Options()
 
 func (*RoomCompositeEgressRequest_Advanced) isRoomCompositeEgressRequest_Options() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type WebEgressRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Url              string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
@@ -4632,9 +4604,6 @@ func (*WebEgressRequest_Preset) isWebEgressRequest_Options() {}
 
 func (*WebEgressRequest_Advanced) isWebEgressRequest_Options() {}
 
-// record audio and video from a single participant
-//
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type ParticipantEgressRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	RoomName    string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
@@ -4781,7 +4750,6 @@ func (*ParticipantEgressRequest_Preset) isParticipantEgressRequest_Options() {}
 
 func (*ParticipantEgressRequest_Advanced) isParticipantEgressRequest_Options() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type TrackCompositeEgressRequest struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
 	RoomName     string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
@@ -4996,7 +4964,6 @@ func (*TrackCompositeEgressRequest_Preset) isTrackCompositeEgressRequest_Options
 
 func (*TrackCompositeEgressRequest_Advanced) isTrackCompositeEgressRequest_Options() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type TrackEgressRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	RoomName string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
@@ -5103,7 +5070,6 @@ func (*TrackEgressRequest_File) isTrackEgressRequest_Output() {}
 
 func (*TrackEgressRequest_WebsocketUrl) isTrackEgressRequest_Output() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type DirectFileOutput struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`
@@ -5234,7 +5200,6 @@ func (*DirectFileOutput_Azure) isDirectFileOutput_Output() {}
 
 func (*DirectFileOutput_AliOSS) isDirectFileOutput_Output() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type EncodedFileOutput struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	FileType        EncodedFileType        `protobuf:"varint,1,opt,name=file_type,json=fileType,proto3,enum=livekit.EncodedFileType" json:"file_type,omitempty"`
@@ -5373,7 +5338,6 @@ func (*EncodedFileOutput_Azure) isEncodedFileOutput_Output() {}
 
 func (*EncodedFileOutput_AliOSS) isEncodedFileOutput_Output() {}
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type UpdateLayoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EgressId      string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
@@ -5426,7 +5390,6 @@ func (x *UpdateLayoutRequest) GetLayout() string {
 	return ""
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type UpdateStreamRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	EgressId         string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
@@ -5487,7 +5450,6 @@ func (x *UpdateStreamRequest) GetRemoveOutputUrls() []string {
 	return nil
 }
 
-// Deprecated: Marked as deprecated in livekit_egress.proto.
 type StreamInfoList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Info          []*StreamInfo          `protobuf:"bytes,1,rep,name=info,proto3" json:"info,omitempty"`
@@ -5621,7 +5583,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x10disable_manifest\x18\x03 \x01(\bR\x0fdisableManifest\"W\n" +
 	"\fStreamOutput\x123\n" +
 	"\bprotocol\x18\x01 \x01(\x0e2\x17.livekit.StreamProtocolR\bprotocol\x12\x12\n" +
-	"\x04urls\x18\x02 \x03(\tR\x04urls\"\xb4\x04\n" +
+	"\x04urls\x18\x02 \x03(\tR\x04urls\"\xa4\x04\n" +
 	"\x13SegmentedFileOutput\x12:\n" +
 	"\bprotocol\x18\x01 \x01(\x0e2\x1e.livekit.SegmentedFileProtocolR\bprotocol\x12'\n" +
 	"\x0ffilename_prefix\x18\x02 \x01(\tR\x0efilenamePrefix\x12#\n" +
@@ -5630,12 +5592,12 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x10segment_duration\x18\x04 \x01(\rR\x0fsegmentDuration\x12E\n" +
 	"\x0ffilename_suffix\x18\n" +
 	" \x01(\x0e2\x1c.livekit.SegmentedFileSuffixR\x0efilenameSuffix\x12)\n" +
-	"\x10disable_manifest\x18\b \x01(\bR\x0fdisableManifest\x12'\n" +
-	"\x02s3\x18\x05 \x01(\v2\x11.livekit.S3UploadB\x02\x18\x01H\x00R\x02s3\x12*\n" +
-	"\x03gcp\x18\x06 \x01(\v2\x12.livekit.GCPUploadB\x02\x18\x01H\x00R\x03gcp\x124\n" +
-	"\x05azure\x18\a \x01(\v2\x18.livekit.AzureBlobUploadB\x02\x18\x01H\x00R\x05azure\x123\n" +
-	"\x06aliOSS\x18\t \x01(\v2\x15.livekit.AliOSSUploadB\x02\x18\x01H\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xfd\x03\n" +
+	"\x10disable_manifest\x18\b \x01(\bR\x0fdisableManifest\x12#\n" +
+	"\x02s3\x18\x05 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
+	"\x03gcp\x18\x06 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
+	"\x05azure\x18\a \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
+	"\x06aliOSS\x18\t \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
+	"\x06output\"\xed\x03\n" +
 	"\vImageOutput\x12)\n" +
 	"\x10capture_interval\x18\x01 \x01(\rR\x0fcaptureInterval\x12\x14\n" +
 	"\x05width\x18\x02 \x01(\x05R\x05width\x12\x16\n" +
@@ -5644,12 +5606,12 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0ffilename_suffix\x18\x05 \x01(\x0e2\x18.livekit.ImageFileSuffixR\x0efilenameSuffix\x124\n" +
 	"\vimage_codec\x18\x06 \x01(\x0e2\x13.livekit.ImageCodecR\n" +
 	"imageCodec\x12)\n" +
-	"\x10disable_manifest\x18\a \x01(\bR\x0fdisableManifest\x12'\n" +
-	"\x02s3\x18\b \x01(\v2\x11.livekit.S3UploadB\x02\x18\x01H\x00R\x02s3\x12*\n" +
-	"\x03gcp\x18\t \x01(\v2\x12.livekit.GCPUploadB\x02\x18\x01H\x00R\x03gcp\x124\n" +
+	"\x10disable_manifest\x18\a \x01(\bR\x0fdisableManifest\x12#\n" +
+	"\x02s3\x18\b \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
+	"\x03gcp\x18\t \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
 	"\x05azure\x18\n" +
-	" \x01(\v2\x18.livekit.AzureBlobUploadB\x02\x18\x01H\x00R\x05azure\x123\n" +
-	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadB\x02\x18\x01H\x00R\x06aliOSSB\b\n" +
+	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
+	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
 	"\x06output\"S\n" +
 	"\n" +
 	"McapOutput\x12\x1a\n" +
@@ -5714,7 +5676,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0fadd_stream_urls\x18\x04 \x03(\tR\raddStreamUrls\x12,\n" +
 	"\x12remove_stream_urls\x18\x05 \x03(\tR\x10removeStreamUrls\">\n" +
 	"\x11StopEgressRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"\xab\v\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"\x97\v\n" +
 	"\n" +
 	"EgressInfo\x12)\n" +
 	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12#\n" +
@@ -5731,12 +5693,12 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x12 \x01(\x03R\tupdatedAt\x125\n" +
 	"\x06egress\x18\x1d \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
-	"\x06replay\x18\x1e \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12P\n" +
-	"\x0eroom_composite\x18\x04 \x01(\v2#.livekit.RoomCompositeEgressRequestB\x02\x18\x01H\x00R\rroomComposite\x121\n" +
-	"\x03web\x18\x0e \x01(\v2\x19.livekit.WebEgressRequestB\x02\x18\x01H\x00R\x03web\x12I\n" +
-	"\vparticipant\x18\x13 \x01(\v2!.livekit.ParticipantEgressRequestB\x02\x18\x01H\x00R\vparticipant\x12S\n" +
-	"\x0ftrack_composite\x18\x05 \x01(\v2$.livekit.TrackCompositeEgressRequestB\x02\x18\x01H\x00R\x0etrackComposite\x127\n" +
-	"\x05track\x18\x06 \x01(\v2\x1b.livekit.TrackEgressRequestB\x02\x18\x01H\x00R\x05track\x12:\n" +
+	"\x06replay\x18\x1e \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12L\n" +
+	"\x0eroom_composite\x18\x04 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
+	"\x03web\x18\x0e \x01(\v2\x19.livekit.WebEgressRequestH\x00R\x03web\x12E\n" +
+	"\vparticipant\x18\x13 \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
+	"\x0ftrack_composite\x18\x05 \x01(\v2$.livekit.TrackCompositeEgressRequestH\x00R\x0etrackComposite\x123\n" +
+	"\x05track\x18\x06 \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12:\n" +
 	"\x0estream_results\x18\x0f \x03(\v2\x13.livekit.StreamInfoR\rstreamResults\x124\n" +
 	"\ffile_results\x18\x10 \x03(\v2\x11.livekit.FileInfoR\vfileResults\x12>\n" +
 	"\x0fsegment_results\x18\x11 \x03(\v2\x15.livekit.SegmentsInfoR\x0esegmentResults\x128\n" +
@@ -5838,7 +5800,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\bwebhooks\x18\v \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06sourceB\n" +
 	"\n" +
-	"\bencoding\"\xd9\x06\n" +
+	"\bencoding\"\xd5\x06\n" +
 	"\x1aRoomCompositeEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x16\n" +
 	"\x06layout\x18\x02 \x01(\tR\x06layout\x12\x1d\n" +
@@ -5858,9 +5820,9 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
 	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\x10 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\bwebhooks\x18\x10 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xf9\x05\n" +
+	"\aoptions\"\xf5\x05\n" +
 	"\x10WebEgressRequest\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
@@ -5878,9 +5840,9 @@ const file_livekit_egress_proto_rawDesc = "" +
 	" \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\v \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
 	"\rimage_outputs\x18\r \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\x0e \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\bwebhooks\x18\x0e \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xaa\x04\n" +
+	"\aoptions\"\xa6\x04\n" +
 	"\x18ParticipantEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12!\n" +
@@ -5892,8 +5854,8 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0fsegment_outputs\x18\b \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
 	"\rimage_outputs\x18\t \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
 	"\bwebhooks\x18\n" +
-	" \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\t\n" +
-	"\aoptions\"\x93\x06\n" +
+	" \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\t\n" +
+	"\aoptions\"\x8f\x06\n" +
 	"\x1bTrackCompositeEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x126\n" +
 	"\x0eaudio_track_id\x18\x02 \x01(\tB\x10\x9a\xec,\faudioTrackIDR\faudioTrackId\x126\n" +
@@ -5907,24 +5869,24 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
 	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
 	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\x0f \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\bwebhooks\x18\x0f \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
 	"\x06outputB\t\n" +
-	"\aoptions\"\xf3\x01\n" +
+	"\aoptions\"\xef\x01\n" +
 	"\x12TrackEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12&\n" +
 	"\btrack_id\x18\x02 \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12/\n" +
 	"\x04file\x18\x03 \x01(\v2\x19.livekit.DirectFileOutputH\x00R\x04file\x12%\n" +
 	"\rwebsocket_url\x18\x04 \x01(\tH\x00R\fwebsocketUrl\x122\n" +
-	"\bwebhooks\x18\x05 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
-	"\x06output\"\x97\x02\n" +
+	"\bwebhooks\x18\x05 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
+	"\x06output\"\x93\x02\n" +
 	"\x10DirectFileOutput\x12\x1a\n" +
 	"\bfilepath\x18\x01 \x01(\tR\bfilepath\x12)\n" +
 	"\x10disable_manifest\x18\x05 \x01(\bR\x0fdisableManifest\x12#\n" +
 	"\x02s3\x18\x02 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
 	"\x03gcp\x18\x03 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
 	"\x05azure\x18\x04 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
-	"\x06aliOSS\x18\x06 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSS:\x02\x18\x01B\b\n" +
-	"\x06output\"\xcf\x02\n" +
+	"\x06aliOSS\x18\x06 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
+	"\x06output\"\xcb\x02\n" +
 	"\x11EncodedFileOutput\x125\n" +
 	"\tfile_type\x18\x01 \x01(\x0e2\x18.livekit.EncodedFileTypeR\bfileType\x12\x1a\n" +
 	"\bfilepath\x18\x02 \x01(\tR\bfilepath\x12)\n" +
@@ -5932,17 +5894,17 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x02s3\x18\x03 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
 	"\x03gcp\x18\x04 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
 	"\x05azure\x18\x05 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
-	"\x06aliOSS\x18\a \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSS:\x02\x18\x01B\b\n" +
-	"\x06output\"\\\n" +
+	"\x06aliOSS\x18\a \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
+	"\x06output\"X\n" +
 	"\x13UpdateLayoutRequest\x12)\n" +
 	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x16\n" +
-	"\x06layout\x18\x02 \x01(\tR\x06layout:\x02\x18\x01\"\x9a\x01\n" +
+	"\x06layout\x18\x02 \x01(\tR\x06layout\"\x96\x01\n" +
 	"\x13UpdateStreamRequest\x12)\n" +
 	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12&\n" +
 	"\x0fadd_output_urls\x18\x02 \x03(\tR\raddOutputUrls\x12,\n" +
-	"\x12remove_output_urls\x18\x03 \x03(\tR\x10removeOutputUrls:\x02\x18\x01\"=\n" +
+	"\x12remove_output_urls\x18\x03 \x03(\tR\x10removeOutputUrls\"9\n" +
 	"\x0eStreamInfoList\x12'\n" +
-	"\x04info\x18\x01 \x03(\v2\x13.livekit.StreamInfoR\x04info:\x02\x18\x01*W\n" +
+	"\x04info\x18\x01 \x03(\v2\x13.livekit.StreamInfoR\x04info*W\n" +
 	"\fAudioChannel\x12\x16\n" +
 	"\x12AUDIO_CHANNEL_BOTH\x10\x00\x12\x16\n" +
 	"\x12AUDIO_CHANNEL_LEFT\x10\x01\x12\x17\n" +
@@ -5990,21 +5952,21 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\vAudioMixing\x12\x12\n" +
 	"\x0eDEFAULT_MIXING\x10\x00\x12\x16\n" +
 	"\x12DUAL_CHANNEL_AGENT\x10\x01\x12\x1a\n" +
-	"\x16DUAL_CHANNEL_ALTERNATE\x10\x022\xc3\x06\n" +
+	"\x16DUAL_CHANNEL_ALTERNATE\x10\x022\xa0\x06\n" +
 	"\x06Egress\x12?\n" +
 	"\vStartEgress\x12\x1b.livekit.StartEgressRequest\x1a\x13.livekit.EgressInfo\x12A\n" +
 	"\fUpdateEgress\x12\x1c.livekit.UpdateEgressRequest\x1a\x13.livekit.EgressInfo\x12E\n" +
 	"\n" +
 	"ListEgress\x12\x1a.livekit.ListEgressRequest\x1a\x1b.livekit.ListEgressResponse\x12=\n" +
 	"\n" +
-	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\x12Y\n" +
-	"\x18StartRoomCompositeEgress\x12#.livekit.RoomCompositeEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12E\n" +
-	"\x0eStartWebEgress\x12\x19.livekit.WebEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12U\n" +
-	"\x16StartParticipantEgress\x12!.livekit.ParticipantEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12[\n" +
-	"\x19StartTrackCompositeEgress\x12$.livekit.TrackCompositeEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12I\n" +
-	"\x10StartTrackEgress\x12\x1b.livekit.TrackEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12F\n" +
-	"\fUpdateLayout\x12\x1c.livekit.UpdateLayoutRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12F\n" +
-	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\x12T\n" +
+	"\x18StartRoomCompositeEgress\x12#.livekit.RoomCompositeEgressRequest\x1a\x13.livekit.EgressInfo\x12@\n" +
+	"\x0eStartWebEgress\x12\x19.livekit.WebEgressRequest\x1a\x13.livekit.EgressInfo\x12P\n" +
+	"\x16StartParticipantEgress\x12!.livekit.ParticipantEgressRequest\x1a\x13.livekit.EgressInfo\x12V\n" +
+	"\x19StartTrackCompositeEgress\x12$.livekit.TrackCompositeEgressRequest\x1a\x13.livekit.EgressInfo\x12D\n" +
+	"\x10StartTrackEgress\x12\x1b.livekit.TrackEgressRequest\x1a\x13.livekit.EgressInfo\x12A\n" +
+	"\fUpdateLayout\x12\x1c.livekit.UpdateLayoutRequest\x1a\x13.livekit.EgressInfo\x12A\n" +
+	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfoBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_egress_proto_rawDescOnce sync.Once
