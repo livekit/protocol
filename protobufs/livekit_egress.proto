@@ -37,13 +37,13 @@ service Egress {
   rpc StopEgress(StopEgressRequest) returns (EgressInfo);
 
   // --- Deprecated ---
-  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo) { option deprecated = true; };
-  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo) { option deprecated = true; };
-  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo) { option deprecated = true; };
-  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo) { option deprecated = true; };
-  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo) { option deprecated = true; };
-  rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo) { option deprecated = true; };
-  rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo) { option deprecated = true; };
+  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
+  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
+  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
+  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
+  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
+  rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
+  rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 }
 
 // --- Core Request ---
@@ -232,10 +232,10 @@ message SegmentedFileOutput {
 
   // --- Deprecated ---
   oneof output {
-    S3Upload s3 = 5 [deprecated = true];
-    GCPUpload gcp = 6 [deprecated = true];
-    AzureBlobUpload azure = 7 [deprecated = true];
-    AliOSSUpload aliOSS = 9 [deprecated = true];
+    S3Upload s3 = 5;
+    GCPUpload gcp = 6;
+    AzureBlobUpload azure = 7;
+    AliOSSUpload aliOSS = 9;
   }
 }
 
@@ -261,10 +261,10 @@ message ImageOutput {
 
   // --- Deprecated ---
   oneof output {
-    S3Upload s3 = 8 [deprecated = true];
-    GCPUpload gcp = 9 [deprecated = true];
-    AzureBlobUpload azure = 10 [deprecated = true];
-    AliOSSUpload aliOSS = 11 [deprecated = true];
+    S3Upload s3 = 8;
+    GCPUpload gcp = 9;
+    AzureBlobUpload azure = 10;
+    AliOSSUpload aliOSS = 11;
   }
 }
 
@@ -378,11 +378,11 @@ message EgressInfo {
     StartEgressRequest egress = 29;
     ExportReplayRequest replay = 30;
 
-    RoomCompositeEgressRequest room_composite = 4 [deprecated = true];
-    WebEgressRequest web = 14 [deprecated = true];
-    ParticipantEgressRequest participant = 19 [deprecated = true];
-    TrackCompositeEgressRequest track_composite = 5 [deprecated = true];
-    TrackEgressRequest track = 6 [deprecated = true];
+    RoomCompositeEgressRequest room_composite = 4;
+    WebEgressRequest web = 14;
+    ParticipantEgressRequest participant = 19;
+    TrackCompositeEgressRequest track_composite = 5;
+    TrackEgressRequest track = 6;
   }
 
   repeated StreamInfo stream_results = 15;
@@ -527,8 +527,6 @@ message ExportReplayRequest {
 // --- Deprecated ---
 
 message RoomCompositeEgressRequest {
-  option deprecated = true;
-
   string room_name = 1;
   string layout = 2;
   bool audio_only = 3;
@@ -558,8 +556,6 @@ enum AudioMixing {
 }
 
 message WebEgressRequest {
-  option deprecated = true;
-
   string url = 1;
   bool audio_only = 2;
   bool video_only = 3;
@@ -580,10 +576,7 @@ message WebEgressRequest {
   repeated WebhookConfig webhooks = 14;
 }
 
-// record audio and video from a single participant
 message ParticipantEgressRequest {
-  option deprecated = true;
-
   string room_name = 1;
   string identity = 2;
   bool screen_share = 3;
@@ -599,8 +592,6 @@ message ParticipantEgressRequest {
 }
 
 message TrackCompositeEgressRequest {
-  option deprecated = true;
-
   string room_name = 1;
   string audio_track_id = 2 [(logger.name) = "audioTrackID"];
   string video_track_id = 3 [(logger.name) = "videoTrackID"];
@@ -621,8 +612,6 @@ message TrackCompositeEgressRequest {
 }
 
 message TrackEgressRequest {
-  option deprecated = true;
-
   string room_name = 1;
   string track_id = 2 [(logger.name) = "trackID"];
   oneof output {
@@ -633,8 +622,6 @@ message TrackEgressRequest {
 }
 
 message DirectFileOutput {
-  option deprecated = true;
-
   string filepath = 1;
   bool disable_manifest = 5;
   oneof output {
@@ -646,8 +633,6 @@ message DirectFileOutput {
 }
 
 message EncodedFileOutput {
-  option deprecated = true;
-
   EncodedFileType file_type = 1;
   string filepath = 2;
   bool disable_manifest = 6;
@@ -660,22 +645,16 @@ message EncodedFileOutput {
 }
 
 message UpdateLayoutRequest {
-  option deprecated = true;
-
   string egress_id = 1 [(logger.name) = "egressID"];
   string layout = 2;
 }
 
 message UpdateStreamRequest {
-  option deprecated = true;
-
   string egress_id = 1 [(logger.name) = "egressID"];
   repeated string add_output_urls = 2;
   repeated string remove_output_urls = 3;
 }
 
 message StreamInfoList {
-  option deprecated = true;
-
   repeated StreamInfo info = 1;
 }
