@@ -48,11 +48,15 @@ message StartEgressRequest {
 
   // request
   oneof request {
-    livekit.RoomCompositeEgressRequest room_composite = 5;
-    livekit.WebEgressRequest web = 11;
-    livekit.ParticipantEgressRequest participant = 13;
-    livekit.TrackCompositeEgressRequest track_composite = 6;
-    livekit.TrackEgressRequest track = 7;
+    livekit.StartEgressRequest egress = 16;
+    livekit.ExportReplayRequest replay = 17;
+
+    // --- deprecated ---
+    livekit.RoomCompositeEgressRequest room_composite = 5 [deprecated = true];
+    livekit.WebEgressRequest web = 11 [deprecated = true];
+    livekit.ParticipantEgressRequest participant = 13 [deprecated = true];
+    livekit.TrackCompositeEgressRequest track_composite = 6 [deprecated = true];
+    livekit.TrackEgressRequest track = 7 [deprecated = true];
   }
 
   // connection info
