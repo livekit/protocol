@@ -19,12 +19,34 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/timestamp.proto";
+import "livekit_cloud_agent.proto";
+import "livekit_models.proto";
+import "agent/livekit_agent_session.proto";
+
+message SimulationRunSummary {
+  int32 passed = 1;
+  int32 failed = 2;
+  string going_well = 3;
+  string to_improve = 4;
+  repeated Issue issues = 5;
+  map<string, livekit.agent.ChatContext> chat_history = 6;
+
+  message Issue {
+    string description = 1;
+    string suggestion = 2;
+  }
+}
+
 message SimulationRun {
   enum Status {
-    STATUS_GENERATING = 0;
-    STATUS_RUNNING = 1;
-    STATUS_COMPLETED = 2;
-    STATUS_FAILED = 3;
+    STATUS_PENDING_UPLOAD = 0;
+    STATUS_GENERATING = 1;
+    STATUS_RUNNING = 2;
+    STATUS_SUMMARIZING = 3;
+    STATUS_COMPLETED = 4;
+    STATUS_FAILED = 5;
+    STATUS_CANCELLED = 6;
   }
 
   message Job {
@@ -39,6 +61,73 @@ message SimulationRun {
     Status status = 2;
     string instructions = 3;
     string error = 4;
+    string agent_expectations = 5;
+  }
+
+  message Create {
+    message Scenario {
+      string instructions = 1;
+      string agent_expectations = 2;
+      map<string, string> metadata = 3;
+    }
+    message Scenarios {
+      repeated Scenario scenarios = 1;
+    }
+
+    message Request {
+      string project_id = 1;
+      string agent_name = 2;
+      string agent_description = 3;
+      int32 num_simulations = 4;
+      string region = 6;
+
+      oneof source {
+        Scenarios scenarios = 7;
+        string group_id = 5;
+      }
+    }
+    message Response {
+      string simulation_run_id = 1;
+      PresignedPostRequest presigned_post_request = 2;
+    }
+  }
+
+  message ConfirmSourceUpload {
+    message Request {
+      string project_id = 1;
+      string simulation_run_id = 2;
+    }
+    message Response {}
+  }
+
+  message Get {
+    message Request {
+      string project_id = 1;
+      string simulation_run_id = 2;
+    }
+    message Response {
+      SimulationRun run = 1;
+    }
+  }
+
+  message List {
+    message Request {
+      string project_id = 1;
+      optional Status status = 2;
+      optional TokenPagination page_token = 3;
+    }
+    message Response {
+      repeated SimulationRun runs = 1;
+      TokenPagination next_page_token = 2;
+    }
+  }
+
+  message Cancel {
+    message Request {
+      string project_id = 1;
+      string simulation_run_id = 2;
+    }
+    message Response {}
   }
 
   string id = 1;
@@ -46,8 +135,9 @@ message SimulationRun {
   Status status = 3;
   string agent_description = 4;
   string error = 5;
-  int64 created_at = 6;
+  google.protobuf.Timestamp created_at = 6;
   repeated Job jobs = 7;
+  SimulationRunSummary summary = 8;
 }
 
 message Scenario {
@@ -58,13 +148,74 @@ message Scenario {
     STATUS_READY = 1;
     STATUS_FAILED = 2;
   }
+
+  message Create {
+    message Request {
+      string project_id = 1;
+      string label = 2;
+      string instructions = 3;
+      string agent_expectations = 4;
+      string group_id = 5;
+      map<string, string> metadata = 6;
+    }
+    message Response {
+      Scenario scenario = 1;
+    }
+  }
+
+  message CreateFromSession {
+    message Request {
+      string project_id = 1;
+      string room_id = 2;
+      string group_id = 3;
+      string label = 4;
+      string region = 5;
+    }
+    message Response {
+      Scenario scenario = 1;
+    }
+  }
+
+  message Delete {
+    message Request {
+      string project_id = 1;
+      string scenario_id = 2;
+    }
+    message Response {}
+  }
+
+  message Update {
+    message Request {
+      string project_id = 1;
+      string scenario_id = 2;
+      string label = 3;
+      string instructions = 4;
+      string agent_expectations = 5;
+      string group_id = 6;
+      map<string, string> metadata = 7;
+    }
+    message Response {
+      Scenario scenario = 1;
+    }
+  }
+
+  message List {
+    message Request {
+      string project_id = 1;
+      string group_id = 2;
+    }
+    message Response {
+      repeated Scenario scenarios = 1;
+    }
+  }
+
   string id = 1;
   string project_id = 2;
   string label = 3;
   string instructions = 4;
   string agent_expectations = 5;
   string source_room_id = 6;
-  int64 created_at = 7;
+  google.protobuf.Timestamp created_at = 7;
   Status status = 8;
   string error = 9;
   string group_id = 10;
@@ -73,124 +224,55 @@ message Scenario {
 }
 
 message ScenarioGroup {
+  message Create {
+    message Request {
+      string project_id = 1;
+      string label = 2;
+    }
+    message Response {
+      ScenarioGroup scenario_group = 1;
+    }
+  }
+
+  message Delete {
+    message Request {
+      string project_id = 1;
+      string group_id = 2;
+    }
+    message Response {}
+  }
+
+  message List {
+    message Request {
+      string project_id = 1;
+    }
+    message Response {
+      repeated ScenarioGroup scenario_groups = 1;
+    }
+  }
+
   string id = 1;
   string project_id = 2;
   string label = 3;
-  int64 created_at = 4;
+  google.protobuf.Timestamp created_at = 4;
   repeated Scenario scenarios = 5;
 }
 
-message CreateSimulationRunRequest {
-  string project_id = 1;
-  string agent_name = 2;
-  string agent_description = 3;
-  int32 num_simulations = 4;
-  string group_id = 5;
-  string region = 6;
-}
-message CreateSimulationRunResponse {
-  string simulation_run_id = 1;
-}
-
-message GetSimulationRunRequest {
-  string project_id = 1;
-  string simulation_run_id = 2;
-}
-message GetSimulationRunResponse {
-  SimulationRun run = 1;
-}
-
-message ListSimulationRunsRequest {
-  string project_id = 1;
-}
-message ListSimulationRunsResponse {
-  repeated SimulationRun runs = 1;
-}
-
-message CreateScenarioRequest {
-  string project_id = 1;
-  string label = 2;
-  string instructions = 3;
-  string agent_expectations = 4;
-  string group_id = 5;
-  map<string, string> metadata = 6;
-}
-message CreateScenarioResponse {
-  Scenario scenario = 1;
-}
-
-message CreateScenarioFromSessionRequest {
-  string project_id = 1;
-  string room_id = 2;
-  string group_id = 3;
-  string label = 4;
-  string region = 5;
-}
-message CreateScenarioFromSessionResponse {
-  Scenario scenario = 1;
-}
-
-message DeleteScenarioRequest {
-  string project_id = 1;
-  string scenario_id = 2;
-}
-message DeleteScenarioResponse {}
-
-message UpdateScenarioRequest {
-  string project_id = 1;
-  string scenario_id = 2;
-  string label = 3;
-  string instructions = 4;
-  string agent_expectations = 5;
-  string group_id = 6;
-  map<string, string> metadata = 7;
-}
-message UpdateScenarioResponse {
-  Scenario scenario = 1;
-}
-
-message CreateScenarioGroupRequest {
-  string project_id = 1;
-  string label = 2;
-}
-message CreateScenarioGroupResponse {
-  ScenarioGroup scenario_group = 1;
-}
-
-message DeleteScenarioGroupRequest {
-  string project_id = 1;
-  string group_id = 2;
-}
-message DeleteScenarioGroupResponse {}
-
-message ListScenarioGroupsRequest {
-  string project_id = 1;
-}
-message ListScenarioGroupsResponse {
-  repeated ScenarioGroup scenario_groups = 1;
-}
-
-message ListScenariosRequest {
-  string project_id = 1;
-  string group_id = 2;
-}
-message ListScenariosResponse {
-  repeated Scenario scenarios = 1;
-}
-
 service AgentSimulation {
-  rpc CreateSimulationRun(CreateSimulationRunRequest) returns (CreateSimulationRunResponse);
-  rpc GetSimulationRun(GetSimulationRunRequest) returns (GetSimulationRunResponse);
-  rpc ListSimulationRuns(ListSimulationRunsRequest) returns (ListSimulationRunsResponse);
+  rpc CreateSimulationRun(SimulationRun.Create.Request) returns (SimulationRun.Create.Response);
+  rpc ConfirmSimulationSourceUpload(SimulationRun.ConfirmSourceUpload.Request) returns (SimulationRun.ConfirmSourceUpload.Response);
+  rpc GetSimulationRun(SimulationRun.Get.Request) returns (SimulationRun.Get.Response);
+  rpc ListSimulationRuns(SimulationRun.List.Request) returns (SimulationRun.List.Response);
+  rpc CancelSimulationRun(SimulationRun.Cancel.Request) returns (SimulationRun.Cancel.Response);
 
-  rpc CreateScenario(CreateScenarioRequest) returns (CreateScenarioResponse);
-  rpc CreateScenarioFromSession(CreateScenarioFromSessionRequest) returns (CreateScenarioFromSessionResponse);
-  rpc DeleteScenario(DeleteScenarioRequest) returns (DeleteScenarioResponse);
-  rpc UpdateScenario(UpdateScenarioRequest) returns (UpdateScenarioResponse);
+  rpc CreateScenario(Scenario.Create.Request) returns (Scenario.Create.Response);
+  rpc CreateScenarioFromSession(Scenario.CreateFromSession.Request) returns (Scenario.CreateFromSession.Response);
+  rpc DeleteScenario(Scenario.Delete.Request) returns (Scenario.Delete.Response);
+  rpc UpdateScenario(Scenario.Update.Request) returns (Scenario.Update.Response);
 
-  rpc CreateScenarioGroup(CreateScenarioGroupRequest) returns (CreateScenarioGroupResponse);
-  rpc DeleteScenarioGroup(DeleteScenarioGroupRequest) returns (DeleteScenarioGroupResponse);
-  rpc ListScenarioGroups(ListScenarioGroupsRequest) returns (ListScenarioGroupsResponse);
+  rpc CreateScenarioGroup(ScenarioGroup.Create.Request) returns (ScenarioGroup.Create.Response);
+  rpc DeleteScenarioGroup(ScenarioGroup.Delete.Request) returns (ScenarioGroup.Delete.Response);
+  rpc ListScenarioGroups(ScenarioGroup.List.Request) returns (ScenarioGroup.List.Response);
 
-  rpc ListScenarios(ListScenariosRequest) returns (ListScenariosResponse);
+  rpc ListScenarios(Scenario.List.Request) returns (Scenario.List.Response);
 }
