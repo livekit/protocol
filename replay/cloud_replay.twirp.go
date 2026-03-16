@@ -17,6 +17,7 @@ import twirp "github.com/twitchtv/twirp"
 import ctxsetters "github.com/twitchtv/twirp/ctxsetters"
 
 import google_protobuf "google.golang.org/protobuf/types/known/emptypb"
+import livekit2 "github.com/livekit/protocol/livekit"
 
 import bytes "bytes"
 import errors "errors"
@@ -35,15 +36,21 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 
 // Experimental (not currently available)
 type Replay interface {
+	// List replays
 	ListReplays(context.Context, *ListReplaysRequest) (*ListReplaysResponse, error)
 
-	DeleteReplay(context.Context, *DeleteReplayRequest) (*google_protobuf.Empty, error)
-
+	// Playback controls
 	Playback(context.Context, *PlaybackRequest) (*PlaybackResponse, error)
 
 	Seek(context.Context, *SeekRequest) (*google_protobuf.Empty, error)
 
 	Close(context.Context, *ClosePlaybackRequest) (*google_protobuf.Empty, error)
+
+	// Export a stored replay using egress
+	Export(context.Context, *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error)
+
+	// Delete all stored data
+	DeleteReplay(context.Context, *DeleteReplayRequest) (*google_protobuf.Empty, error)
 }
 
 // ======================
@@ -52,7 +59,7 @@ type Replay interface {
 
 type replayProtobufClient struct {
 	client      HTTPClient
-	urls        [5]string
+	urls        [6]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -80,12 +87,13 @@ func NewReplayProtobufClient(baseURL string, client HTTPClient, opts ...twirp.Cl
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "replay", "Replay")
-	urls := [5]string{
+	urls := [6]string{
 		serviceURL + "ListReplays",
-		serviceURL + "DeleteReplay",
 		serviceURL + "Playback",
 		serviceURL + "Seek",
 		serviceURL + "Close",
+		serviceURL + "Export",
+		serviceURL + "DeleteReplay",
 	}
 
 	return &replayProtobufClient{
@@ -142,52 +150,6 @@ func (c *replayProtobufClient) callListReplays(ctx context.Context, in *ListRepl
 	return out, nil
 }
 
-func (c *replayProtobufClient) DeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "replay")
-	ctx = ctxsetters.WithServiceName(ctx, "Replay")
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
-	caller := c.callDeleteReplay
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteReplayRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
-					}
-					return c.callDeleteReplay(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf.Empty)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *replayProtobufClient) callDeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-	out := new(google_protobuf.Empty)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
 func (c *replayProtobufClient) Playback(ctx context.Context, in *PlaybackRequest) (*PlaybackResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "replay")
 	ctx = ctxsetters.WithServiceName(ctx, "Replay")
@@ -219,7 +181,7 @@ func (c *replayProtobufClient) Playback(ctx context.Context, in *PlaybackRequest
 
 func (c *replayProtobufClient) callPlayback(ctx context.Context, in *PlaybackRequest) (*PlaybackResponse, error) {
 	out := new(PlaybackResponse)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -265,7 +227,7 @@ func (c *replayProtobufClient) Seek(ctx context.Context, in *SeekRequest) (*goog
 
 func (c *replayProtobufClient) callSeek(ctx context.Context, in *SeekRequest) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
-	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -311,7 +273,99 @@ func (c *replayProtobufClient) Close(ctx context.Context, in *ClosePlaybackReque
 
 func (c *replayProtobufClient) callClose(ctx context.Context, in *ClosePlaybackRequest) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *replayProtobufClient) Export(ctx context.Context, in *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "replay")
+	ctx = ctxsetters.WithServiceName(ctx, "Replay")
+	ctx = ctxsetters.WithMethodName(ctx, "Export")
+	caller := c.callExport
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*livekit2.ExportReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*livekit2.ExportReplayRequest) when calling interceptor")
+					}
+					return c.callExport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*livekit2.EgressInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*livekit2.EgressInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *replayProtobufClient) callExport(ctx context.Context, in *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+	out := new(livekit2.EgressInfo)
 	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *replayProtobufClient) DeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "replay")
+	ctx = ctxsetters.WithServiceName(ctx, "Replay")
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
+	caller := c.callDeleteReplay
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
+					}
+					return c.callDeleteReplay(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *replayProtobufClient) callDeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	ctx, err := doProtobufRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -332,7 +386,7 @@ func (c *replayProtobufClient) callClose(ctx context.Context, in *ClosePlaybackR
 
 type replayJSONClient struct {
 	client      HTTPClient
-	urls        [5]string
+	urls        [6]string
 	interceptor twirp.Interceptor
 	opts        twirp.ClientOptions
 }
@@ -360,12 +414,13 @@ func NewReplayJSONClient(baseURL string, client HTTPClient, opts ...twirp.Client
 	// Build method URLs: <baseURL>[<prefix>]/<package>.<Service>/<Method>
 	serviceURL := sanitizeBaseURL(baseURL)
 	serviceURL += baseServicePath(pathPrefix, "replay", "Replay")
-	urls := [5]string{
+	urls := [6]string{
 		serviceURL + "ListReplays",
-		serviceURL + "DeleteReplay",
 		serviceURL + "Playback",
 		serviceURL + "Seek",
 		serviceURL + "Close",
+		serviceURL + "Export",
+		serviceURL + "DeleteReplay",
 	}
 
 	return &replayJSONClient{
@@ -422,52 +477,6 @@ func (c *replayJSONClient) callListReplays(ctx context.Context, in *ListReplaysR
 	return out, nil
 }
 
-func (c *replayJSONClient) DeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-	ctx = ctxsetters.WithPackageName(ctx, "replay")
-	ctx = ctxsetters.WithServiceName(ctx, "Replay")
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
-	caller := c.callDeleteReplay
-	if c.interceptor != nil {
-		caller = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-			resp, err := c.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteReplayRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
-					}
-					return c.callDeleteReplay(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf.Empty)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-	return caller(ctx, in)
-}
-
-func (c *replayJSONClient) callDeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-	out := new(google_protobuf.Empty)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
-	if err != nil {
-		twerr, ok := err.(twirp.Error)
-		if !ok {
-			twerr = twirp.InternalErrorWith(err)
-		}
-		callClientError(ctx, c.opts.Hooks, twerr)
-		return nil, err
-	}
-
-	callClientResponseReceived(ctx, c.opts.Hooks)
-
-	return out, nil
-}
-
 func (c *replayJSONClient) Playback(ctx context.Context, in *PlaybackRequest) (*PlaybackResponse, error) {
 	ctx = ctxsetters.WithPackageName(ctx, "replay")
 	ctx = ctxsetters.WithServiceName(ctx, "Replay")
@@ -499,7 +508,7 @@ func (c *replayJSONClient) Playback(ctx context.Context, in *PlaybackRequest) (*
 
 func (c *replayJSONClient) callPlayback(ctx context.Context, in *PlaybackRequest) (*PlaybackResponse, error) {
 	out := new(PlaybackResponse)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[1], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -545,7 +554,7 @@ func (c *replayJSONClient) Seek(ctx context.Context, in *SeekRequest) (*google_p
 
 func (c *replayJSONClient) callSeek(ctx context.Context, in *SeekRequest) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
-	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[2], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -591,7 +600,99 @@ func (c *replayJSONClient) Close(ctx context.Context, in *ClosePlaybackRequest) 
 
 func (c *replayJSONClient) callClose(ctx context.Context, in *ClosePlaybackRequest) (*google_protobuf.Empty, error) {
 	out := new(google_protobuf.Empty)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[3], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *replayJSONClient) Export(ctx context.Context, in *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "replay")
+	ctx = ctxsetters.WithServiceName(ctx, "Replay")
+	ctx = ctxsetters.WithMethodName(ctx, "Export")
+	caller := c.callExport
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*livekit2.ExportReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*livekit2.ExportReplayRequest) when calling interceptor")
+					}
+					return c.callExport(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*livekit2.EgressInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*livekit2.EgressInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *replayJSONClient) callExport(ctx context.Context, in *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+	out := new(livekit2.EgressInfo)
 	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[4], in, out)
+	if err != nil {
+		twerr, ok := err.(twirp.Error)
+		if !ok {
+			twerr = twirp.InternalErrorWith(err)
+		}
+		callClientError(ctx, c.opts.Hooks, twerr)
+		return nil, err
+	}
+
+	callClientResponseReceived(ctx, c.opts.Hooks)
+
+	return out, nil
+}
+
+func (c *replayJSONClient) DeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+	ctx = ctxsetters.WithPackageName(ctx, "replay")
+	ctx = ctxsetters.WithServiceName(ctx, "Replay")
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
+	caller := c.callDeleteReplay
+	if c.interceptor != nil {
+		caller = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+			resp, err := c.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
+					}
+					return c.callDeleteReplay(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+	return caller(ctx, in)
+}
+
+func (c *replayJSONClient) callDeleteReplay(ctx context.Context, in *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+	out := new(google_protobuf.Empty)
+	ctx, err := doJSONRequest(ctx, c.client, c.opts.Hooks, c.urls[5], in, out)
 	if err != nil {
 		twerr, ok := err.(twirp.Error)
 		if !ok {
@@ -706,9 +807,6 @@ func (s *replayServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	case "ListReplays":
 		s.serveListReplays(ctx, resp, req)
 		return
-	case "DeleteReplay":
-		s.serveDeleteReplay(ctx, resp, req)
-		return
 	case "Playback":
 		s.servePlayback(ctx, resp, req)
 		return
@@ -717,6 +815,12 @@ func (s *replayServer) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 		return
 	case "Close":
 		s.serveClose(ctx, resp, req)
+		return
+	case "Export":
+		s.serveExport(ctx, resp, req)
+		return
+	case "DeleteReplay":
+		s.serveDeleteReplay(ctx, resp, req)
 		return
 	default:
 		msg := fmt.Sprintf("no handler for path %q", req.URL.Path)
@@ -882,186 +986,6 @@ func (s *replayServer) serveListReplaysProtobuf(ctx context.Context, resp http.R
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *ListReplaysResponse and nil error while calling ListReplays. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	respBytes, err := proto.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/protobuf")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *replayServer) serveDeleteReplay(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	header := req.Header.Get("Content-Type")
-	i := strings.Index(header, ";")
-	if i == -1 {
-		i = len(header)
-	}
-	switch strings.TrimSpace(strings.ToLower(header[:i])) {
-	case "application/json":
-		s.serveDeleteReplayJSON(ctx, resp, req)
-	case "application/protobuf":
-		s.serveDeleteReplayProtobuf(ctx, resp, req)
-	default:
-		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
-		twerr := badRouteError(msg, req.Method, req.URL.Path)
-		s.writeError(ctx, resp, twerr)
-	}
-}
-
-func (s *replayServer) serveDeleteReplayJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	d := json.NewDecoder(req.Body)
-	rawReqBody := json.RawMessage{}
-	if err := d.Decode(&rawReqBody); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-	reqContent := new(DeleteReplayRequest)
-	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
-	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
-		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
-		return
-	}
-
-	handler := s.Replay.DeleteReplay
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteReplayRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
-					}
-					return s.Replay.DeleteReplay(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf.Empty)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *google_protobuf.Empty
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling DeleteReplay. nil responses are not supported"))
-		return
-	}
-
-	ctx = callResponsePrepared(ctx, s.hooks)
-
-	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
-	respBytes, err := marshaler.Marshal(respContent)
-	if err != nil {
-		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
-		return
-	}
-
-	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
-	resp.Header().Set("Content-Type", "application/json")
-	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
-	resp.WriteHeader(http.StatusOK)
-
-	if n, err := resp.Write(respBytes); err != nil {
-		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
-		twerr := twirp.NewError(twirp.Unknown, msg)
-		ctx = callError(ctx, s.hooks, twerr)
-	}
-	callResponseSent(ctx, s.hooks)
-}
-
-func (s *replayServer) serveDeleteReplayProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
-	var err error
-	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
-	ctx, err = callRequestRouted(ctx, s.hooks)
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-
-	buf, err := io.ReadAll(req.Body)
-	if err != nil {
-		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
-		return
-	}
-	reqContent := new(DeleteReplayRequest)
-	if err = proto.Unmarshal(buf, reqContent); err != nil {
-		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
-		return
-	}
-
-	handler := s.Replay.DeleteReplay
-	if s.interceptor != nil {
-		handler = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
-			resp, err := s.interceptor(
-				func(ctx context.Context, req interface{}) (interface{}, error) {
-					typedReq, ok := req.(*DeleteReplayRequest)
-					if !ok {
-						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
-					}
-					return s.Replay.DeleteReplay(ctx, typedReq)
-				},
-			)(ctx, req)
-			if resp != nil {
-				typedResp, ok := resp.(*google_protobuf.Empty)
-				if !ok {
-					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
-				}
-				return typedResp, err
-			}
-			return nil, err
-		}
-	}
-
-	// Call service method
-	var respContent *google_protobuf.Empty
-	func() {
-		defer ensurePanicResponses(ctx, resp, s.hooks)
-		respContent, err = handler(ctx, reqContent)
-	}()
-
-	if err != nil {
-		s.writeError(ctx, resp, err)
-		return
-	}
-	if respContent == nil {
-		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling DeleteReplay. nil responses are not supported"))
 		return
 	}
 
@@ -1602,6 +1526,366 @@ func (s *replayServer) serveCloseProtobuf(ctx context.Context, resp http.Respons
 	}
 	if respContent == nil {
 		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling Close. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *replayServer) serveExport(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveExportJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveExportProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *replayServer) serveExportJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Export")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(livekit2.ExportReplayRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Replay.Export
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*livekit2.ExportReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*livekit2.ExportReplayRequest) when calling interceptor")
+					}
+					return s.Replay.Export(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*livekit2.EgressInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*livekit2.EgressInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *livekit2.EgressInfo
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *livekit2.EgressInfo and nil error while calling Export. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *replayServer) serveExportProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "Export")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(livekit2.ExportReplayRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Replay.Export
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *livekit2.ExportReplayRequest) (*livekit2.EgressInfo, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*livekit2.ExportReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*livekit2.ExportReplayRequest) when calling interceptor")
+					}
+					return s.Replay.Export(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*livekit2.EgressInfo)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*livekit2.EgressInfo) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *livekit2.EgressInfo
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *livekit2.EgressInfo and nil error while calling Export. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	respBytes, err := proto.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal proto response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/protobuf")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *replayServer) serveDeleteReplay(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	header := req.Header.Get("Content-Type")
+	i := strings.Index(header, ";")
+	if i == -1 {
+		i = len(header)
+	}
+	switch strings.TrimSpace(strings.ToLower(header[:i])) {
+	case "application/json":
+		s.serveDeleteReplayJSON(ctx, resp, req)
+	case "application/protobuf":
+		s.serveDeleteReplayProtobuf(ctx, resp, req)
+	default:
+		msg := fmt.Sprintf("unexpected Content-Type: %q", req.Header.Get("Content-Type"))
+		twerr := badRouteError(msg, req.Method, req.URL.Path)
+		s.writeError(ctx, resp, twerr)
+	}
+}
+
+func (s *replayServer) serveDeleteReplayJSON(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	d := json.NewDecoder(req.Body)
+	rawReqBody := json.RawMessage{}
+	if err := d.Decode(&rawReqBody); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+	reqContent := new(DeleteReplayRequest)
+	unmarshaler := protojson.UnmarshalOptions{DiscardUnknown: true}
+	if err = unmarshaler.Unmarshal(rawReqBody, reqContent); err != nil {
+		s.handleRequestBodyError(ctx, resp, "the json request could not be decoded", err)
+		return
+	}
+
+	handler := s.Replay.DeleteReplay
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
+					}
+					return s.Replay.DeleteReplay(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *google_protobuf.Empty
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling DeleteReplay. nil responses are not supported"))
+		return
+	}
+
+	ctx = callResponsePrepared(ctx, s.hooks)
+
+	marshaler := &protojson.MarshalOptions{UseProtoNames: !s.jsonCamelCase, EmitUnpopulated: !s.jsonSkipDefaults}
+	respBytes, err := marshaler.Marshal(respContent)
+	if err != nil {
+		s.writeError(ctx, resp, wrapInternal(err, "failed to marshal json response"))
+		return
+	}
+
+	ctx = ctxsetters.WithStatusCode(ctx, http.StatusOK)
+	resp.Header().Set("Content-Type", "application/json")
+	resp.Header().Set("Content-Length", strconv.Itoa(len(respBytes)))
+	resp.WriteHeader(http.StatusOK)
+
+	if n, err := resp.Write(respBytes); err != nil {
+		msg := fmt.Sprintf("failed to write response, %d of %d bytes written: %s", n, len(respBytes), err.Error())
+		twerr := twirp.NewError(twirp.Unknown, msg)
+		ctx = callError(ctx, s.hooks, twerr)
+	}
+	callResponseSent(ctx, s.hooks)
+}
+
+func (s *replayServer) serveDeleteReplayProtobuf(ctx context.Context, resp http.ResponseWriter, req *http.Request) {
+	var err error
+	ctx = ctxsetters.WithMethodName(ctx, "DeleteReplay")
+	ctx, err = callRequestRouted(ctx, s.hooks)
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+
+	buf, err := io.ReadAll(req.Body)
+	if err != nil {
+		s.handleRequestBodyError(ctx, resp, "failed to read request body", err)
+		return
+	}
+	reqContent := new(DeleteReplayRequest)
+	if err = proto.Unmarshal(buf, reqContent); err != nil {
+		s.writeError(ctx, resp, malformedRequestError("the protobuf request could not be decoded"))
+		return
+	}
+
+	handler := s.Replay.DeleteReplay
+	if s.interceptor != nil {
+		handler = func(ctx context.Context, req *DeleteReplayRequest) (*google_protobuf.Empty, error) {
+			resp, err := s.interceptor(
+				func(ctx context.Context, req interface{}) (interface{}, error) {
+					typedReq, ok := req.(*DeleteReplayRequest)
+					if !ok {
+						return nil, twirp.InternalError("failed type assertion req.(*DeleteReplayRequest) when calling interceptor")
+					}
+					return s.Replay.DeleteReplay(ctx, typedReq)
+				},
+			)(ctx, req)
+			if resp != nil {
+				typedResp, ok := resp.(*google_protobuf.Empty)
+				if !ok {
+					return nil, twirp.InternalError("failed type assertion resp.(*google_protobuf.Empty) when calling interceptor")
+				}
+				return typedResp, err
+			}
+			return nil, err
+		}
+	}
+
+	// Call service method
+	var respContent *google_protobuf.Empty
+	func() {
+		defer ensurePanicResponses(ctx, resp, s.hooks)
+		respContent, err = handler(ctx, reqContent)
+	}()
+
+	if err != nil {
+		s.writeError(ctx, resp, err)
+		return
+	}
+	if respContent == nil {
+		s.writeError(ctx, resp, twirp.InternalError("received a nil *google_protobuf.Empty and nil error while calling DeleteReplay. nil responses are not supported"))
 		return
 	}
 
@@ -2206,41 +2490,44 @@ func callClientError(ctx context.Context, h *twirp.ClientHooks, err twirp.Error)
 }
 
 var twirpFileDescriptor0 = []byte{
-	// 574 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xcf, 0x6e, 0xd3, 0x4e,
-	0x10, 0x96, 0xdd, 0xfe, 0xfa, 0x4b, 0xc6, 0x49, 0x8b, 0x36, 0x15, 0x58, 0x0e, 0x88, 0xc8, 0x5c,
-	0x82, 0x14, 0xd9, 0x52, 0x7a, 0x40, 0xaa, 0x84, 0x54, 0x35, 0x29, 0x28, 0xa2, 0x82, 0xc8, 0xf4,
-	0xc4, 0xc5, 0x72, 0xe2, 0x89, 0x31, 0xb1, 0xbd, 0xc6, 0xde, 0x54, 0xf4, 0x8a, 0xc4, 0x99, 0x7b,
-	0x1f, 0x81, 0x27, 0xe1, 0x59, 0x50, 0x1f, 0x02, 0xd9, 0xbb, 0xeb, 0xa4, 0x49, 0x40, 0xe4, 0xe6,
-	0xfd, 0xe6, 0xdf, 0xf7, 0xcd, 0x8c, 0x07, 0xc8, 0x34, 0xa2, 0x0b, 0xdf, 0xcd, 0x30, 0x8d, 0xbc,
-	0x1b, 0x2b, 0xcd, 0x28, 0xa3, 0xe4, 0x80, 0xbf, 0x8c, 0x76, 0x40, 0x69, 0x10, 0xa1, 0x5d, 0xa2,
-	0x93, 0xc5, 0xcc, 0xc6, 0x38, 0x65, 0xc2, 0xc9, 0x38, 0x8e, 0xc2, 0x6b, 0x9c, 0x87, 0xcc, 0x8d,
-	0xa9, 0x8f, 0x51, 0x5e, 0xa1, 0x34, 0x08, 0x30, 0xb3, 0x69, 0xca, 0x42, 0x9a, 0x08, 0xd4, 0xfc,
-	0x04, 0xe4, 0x32, 0xcc, 0x99, 0x53, 0xa6, 0xcd, 0x1d, 0xfc, 0xbc, 0xc0, 0x9c, 0x91, 0x36, 0xd4,
-	0x33, 0x4a, 0x63, 0x37, 0xf1, 0x62, 0xd4, 0x95, 0x8e, 0xd2, 0xad, 0x3b, 0xb5, 0x02, 0x78, 0xeb,
-	0xc5, 0x48, 0x5e, 0x00, 0xa4, 0x5e, 0x80, 0x2e, 0xa3, 0x73, 0x4c, 0x74, 0xb5, 0xa3, 0x74, 0xb5,
-	0xbe, 0x6e, 0x89, 0x9a, 0xd6, 0x55, 0x81, 0x8e, 0xbd, 0x20, 0x4c, 0xbc, 0xa2, 0x8e, 0x53, 0x2f,
-	0x7c, 0x4b, 0xd0, 0xfc, 0xa6, 0x40, 0xeb, 0x5e, 0xb1, 0x3c, 0xa5, 0x49, 0x8e, 0xa4, 0x07, 0xff,
-	0x73, 0x59, 0xb9, 0xae, 0x74, 0xf6, 0xba, 0x5a, 0x9f, 0x58, 0x42, 0x34, 0xf7, 0x1c, 0x25, 0x33,
-	0xea, 0x48, 0x17, 0x72, 0x06, 0x47, 0x09, 0x7e, 0x61, 0xee, 0x0e, 0x1c, 0x9a, 0x45, 0xc0, 0xb8,
-	0xe2, 0xf1, 0x5d, 0x01, 0x58, 0x66, 0x26, 0xcf, 0xa1, 0xce, 0x73, 0xbb, 0xa1, 0xcf, 0xc5, 0x9e,
-	0x37, 0x6e, 0xef, 0x7a, 0x35, 0x0e, 0x8e, 0x86, 0x8e, 0xfc, 0xf2, 0xef, 0xf7, 0x45, 0x5d, 0xeb,
-	0xcb, 0x13, 0x80, 0x9c, 0x79, 0x19, 0x73, 0x59, 0x18, 0xa3, 0xbe, 0xd7, 0x51, 0xba, 0x7b, 0x4e,
-	0xbd, 0x44, 0xae, 0xc2, 0x18, 0x89, 0x01, 0x35, 0x7f, 0x91, 0x95, 0x84, 0xf4, 0xfd, 0xd2, 0x58,
-	0xbd, 0xcd, 0x33, 0x68, 0x0d, 0x31, 0x42, 0x86, 0x9c, 0x96, 0x1c, 0xc3, 0xbf, 0x33, 0x33, 0xbf,
-	0x2a, 0x70, 0x34, 0x8e, 0xbc, 0x9b, 0x89, 0x37, 0x9d, 0xef, 0x1e, 0x4e, 0x9e, 0x41, 0x33, 0x15,
-	0xd1, 0x6e, 0x21, 0x48, 0x88, 0x6b, 0x48, 0xd0, 0xa1, 0x34, 0x26, 0x4f, 0x41, 0xcb, 0x11, 0xe7,
-	0x2e, 0x9d, 0xcd, 0x72, 0x64, 0x42, 0x21, 0x14, 0xd0, 0xbb, 0x12, 0x31, 0x07, 0xf0, 0x60, 0xc9,
-	0x41, 0x0c, 0xd7, 0x06, 0xad, 0xca, 0x5c, 0xd1, 0x38, 0xbc, 0xbd, 0xeb, 0x81, 0x84, 0x47, 0x43,
-	0x67, 0xf9, 0xed, 0x9b, 0x2e, 0x68, 0xef, 0x11, 0x2b, 0x11, 0xbb, 0xc6, 0xaf, 0xb3, 0x54, 0x37,
-	0x58, 0xbe, 0x86, 0xe3, 0x41, 0x44, 0x73, 0x5c, 0x6f, 0xd7, 0xae, 0x95, 0xfa, 0x3f, 0x55, 0x38,
-	0xe0, 0x03, 0x23, 0xaf, 0x40, 0x5b, 0xd9, 0x6c, 0x62, 0xc8, 0x05, 0xde, 0xfc, 0xb7, 0x8c, 0xf6,
-	0x56, 0x9b, 0xe8, 0xd6, 0x00, 0x1a, 0xab, 0x8b, 0x40, 0x2a, 0xe7, 0x2d, 0xeb, 0x61, 0x3c, 0xb4,
-	0xf8, 0x15, 0xb0, 0xe4, 0x15, 0xb0, 0x2e, 0x8a, 0x2b, 0x40, 0x5e, 0x42, 0x4d, 0x6a, 0x23, 0x8f,
-	0x64, 0x82, 0x35, 0xb5, 0x86, 0xbe, 0x69, 0x10, 0x1c, 0x4e, 0x60, 0xbf, 0x18, 0x00, 0x69, 0x49,
-	0x8f, 0x95, 0x71, 0xfc, 0xa5, 0xe6, 0x7f, 0x65, 0x53, 0xc9, 0x63, 0x19, 0xb5, 0xad, 0xc7, 0x7f,
-	0x0a, 0x3f, 0xbf, 0xf8, 0x60, 0x06, 0x21, 0xfb, 0xb8, 0x98, 0x58, 0x53, 0x1a, 0xdb, 0xe2, 0x3f,
-	0xe6, 0xd7, 0x6d, 0x4a, 0x23, 0x9b, 0xa7, 0xfc, 0xa1, 0x36, 0x2f, 0xc3, 0x6b, 0x7c, 0x13, 0x32,
-	0x6b, 0x5c, 0x58, 0x7e, 0xa9, 0x87, 0xe2, 0x7d, 0x7a, 0x5a, 0x02, 0x93, 0x83, 0x32, 0xe2, 0xe4,
-	0x77, 0x00, 0x00, 0x00, 0xff, 0xff, 0x2f, 0x8a, 0x6d, 0xf2, 0x3b, 0x05, 0x00, 0x00,
+	// 611 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xdd, 0x4e, 0xdb, 0x4c,
+	0x10, 0x95, 0x13, 0xbe, 0x7c, 0x64, 0x1c, 0xa0, 0xda, 0xa0, 0xd6, 0x32, 0x54, 0x8d, 0xdc, 0x5e,
+	0xa4, 0x12, 0xb2, 0x25, 0xb8, 0xa8, 0x44, 0x85, 0x84, 0xf8, 0x69, 0x15, 0x15, 0xda, 0xc8, 0xe5,
+	0xaa, 0x37, 0x96, 0x13, 0x4f, 0x5c, 0x37, 0xb6, 0xd7, 0xf5, 0x6e, 0x10, 0x3c, 0x00, 0xea, 0x0b,
+	0xf4, 0x8a, 0x47, 0xe8, 0xa3, 0x55, 0x3c, 0x44, 0xe5, 0x5d, 0xaf, 0xf3, 0x43, 0xb8, 0xc8, 0x9d,
+	0x7d, 0x66, 0xce, 0xce, 0x99, 0x33, 0xbb, 0x03, 0x64, 0x18, 0xd3, 0x49, 0xe0, 0xe5, 0x98, 0xc5,
+	0xfe, 0xad, 0x9d, 0xe5, 0x94, 0x53, 0xd2, 0x90, 0x7f, 0xe6, 0x4e, 0x48, 0x69, 0x18, 0xa3, 0x23,
+	0xd0, 0xc1, 0x64, 0xe4, 0x60, 0x92, 0xf1, 0x32, 0xc9, 0xdc, 0x8e, 0xa3, 0x6b, 0x1c, 0x47, 0xdc,
+	0xc3, 0x30, 0x47, 0xc6, 0x16, 0xd1, 0x84, 0x06, 0x18, 0x4f, 0x51, 0x1a, 0x86, 0x98, 0x3b, 0x34,
+	0xe3, 0x11, 0x4d, 0x4b, 0xd4, 0xfa, 0x01, 0xe4, 0x22, 0x62, 0xdc, 0x15, 0xc5, 0x98, 0x8b, 0x3f,
+	0x27, 0xc8, 0x38, 0xd9, 0x81, 0x66, 0x4e, 0x69, 0xe2, 0xa5, 0x7e, 0x82, 0x86, 0xd6, 0xd1, 0xba,
+	0x4d, 0x77, 0xbd, 0x00, 0x3e, 0xfb, 0x09, 0x92, 0x77, 0x00, 0x99, 0x1f, 0xa2, 0xc7, 0xe9, 0x18,
+	0x53, 0xa3, 0xd6, 0xd1, 0xba, 0xfa, 0xbe, 0x61, 0x97, 0x35, 0xed, 0xab, 0x02, 0xed, 0xfb, 0x61,
+	0x94, 0xfa, 0x45, 0x1d, 0xb7, 0x59, 0xe4, 0x0a, 0xd0, 0xba, 0xd3, 0xa0, 0x3d, 0x57, 0x8c, 0x65,
+	0x34, 0x65, 0x48, 0xf6, 0xe0, 0x7f, 0xd9, 0x2c, 0x33, 0xb4, 0x4e, 0xbd, 0xab, 0xef, 0x13, 0xbb,
+	0xb4, 0x42, 0x66, 0xf6, 0xd2, 0x11, 0x75, 0x55, 0x0a, 0x39, 0x86, 0xad, 0x14, 0x6f, 0xb8, 0xb7,
+	0x82, 0x86, 0x8d, 0x82, 0xd0, 0xaf, 0x74, 0xfc, 0xd6, 0x00, 0xa6, 0x27, 0x93, 0xb7, 0xd0, 0x94,
+	0x67, 0x7b, 0x51, 0x20, 0x9b, 0x3d, 0x69, 0xdd, 0x3f, 0xec, 0xad, 0x4b, 0xb0, 0x77, 0xe6, 0xaa,
+	0xaf, 0x60, 0xde, 0x97, 0xda, 0x82, 0x2f, 0x2f, 0x01, 0x18, 0xf7, 0x73, 0xee, 0xf1, 0x28, 0x41,
+	0xa3, 0xde, 0xd1, 0xba, 0x75, 0xb7, 0x29, 0x90, 0xab, 0x28, 0x41, 0xf2, 0x0a, 0xf4, 0x60, 0x92,
+	0x0b, 0x41, 0x5e, 0xc2, 0x8c, 0x35, 0x11, 0x07, 0x05, 0x5d, 0x32, 0xeb, 0x97, 0x06, 0x5b, 0xfd,
+	0xd8, 0xbf, 0x1d, 0xf8, 0xc3, 0xb1, 0x1a, 0xc4, 0x0a, 0xda, 0x5e, 0xc3, 0x46, 0x56, 0xb2, 0xbd,
+	0x42, 0x53, 0xa9, 0xaf, 0xa5, 0x40, 0x97, 0xd2, 0x84, 0xbc, 0x81, 0x4d, 0x86, 0x38, 0xf6, 0xe8,
+	0x68, 0xc4, 0x90, 0x17, 0x3a, 0xa4, 0xce, 0x56, 0x81, 0x7e, 0x11, 0xe0, 0x25, 0xb3, 0x4e, 0xe1,
+	0xd9, 0x54, 0x48, 0x39, 0x24, 0x07, 0xf4, 0xea, 0xf8, 0x4a, 0xcb, 0xe6, 0xfd, 0xc3, 0x1e, 0x28,
+	0xb8, 0x77, 0xe6, 0x4e, 0xbf, 0x03, 0x2b, 0x00, 0xfd, 0x2b, 0x62, 0xd5, 0xc9, 0xaa, 0xfc, 0x25,
+	0x52, 0x6b, 0x4b, 0xa4, 0x7e, 0x84, 0xed, 0xd3, 0x98, 0x32, 0x5c, 0x34, 0x6e, 0x65, 0xb9, 0xc7,
+	0xd0, 0x3e, 0xc3, 0x18, 0x39, 0xca, 0x9b, 0xb1, 0xfa, 0x00, 0xf6, 0xef, 0xea, 0xd0, 0x90, 0x64,
+	0xf2, 0x01, 0xf4, 0x99, 0x8b, 0x4e, 0x4c, 0x75, 0x9f, 0x1f, 0x3f, 0x35, 0x73, 0x67, 0x69, 0xac,
+	0x34, 0xfd, 0x08, 0xd6, 0x55, 0x63, 0xe4, 0x85, 0x4a, 0x5c, 0x68, 0xd5, 0x34, 0x1e, 0x07, 0x4a,
+	0xfa, 0x01, 0xac, 0x15, 0x23, 0x20, 0x6d, 0x95, 0x31, 0x33, 0x10, 0xf3, 0xb9, 0x2d, 0x37, 0x8b,
+	0xad, 0x36, 0x8b, 0x7d, 0x5e, 0x6c, 0x16, 0x72, 0x04, 0xff, 0x09, 0x47, 0xc9, 0xae, 0x62, 0x2d,
+	0x33, 0xf8, 0x49, 0xfa, 0x7b, 0x68, 0x9c, 0xdf, 0x64, 0x34, 0xe7, 0x64, 0xb7, 0x7a, 0x8f, 0x12,
+	0x98, 0x33, 0xd6, 0x6c, 0x4f, 0xa3, 0x62, 0x77, 0x89, 0xa7, 0x78, 0x0a, 0xad, 0xd9, 0x21, 0x90,
+	0xca, 0x9c, 0x25, 0xa3, 0x79, 0x4a, 0xc1, 0xc9, 0xf9, 0x37, 0x2b, 0x8c, 0xf8, 0xf7, 0xc9, 0xc0,
+	0x1e, 0xd2, 0xc4, 0x29, 0xab, 0xc8, 0xfd, 0x39, 0xa4, 0xb1, 0x23, 0x4f, 0xfc, 0x53, 0xdb, 0xb8,
+	0x88, 0xae, 0xf1, 0x53, 0xc4, 0xed, 0x7e, 0x11, 0xf9, 0x5b, 0xdb, 0x2c, 0xff, 0x0f, 0x0f, 0x05,
+	0x30, 0x68, 0x08, 0xc6, 0xc1, 0xbf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xdc, 0x5e, 0xa3, 0x2b, 0x9d,
+	0x05, 0x00, 0x00,
 }

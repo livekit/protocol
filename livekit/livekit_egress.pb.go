@@ -36,295 +36,53 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type EncodedFileType int32
+type AudioChannel int32
 
 const (
-	EncodedFileType_DEFAULT_FILETYPE EncodedFileType = 0 // file type chosen based on codecs
-	EncodedFileType_MP4              EncodedFileType = 1
-	EncodedFileType_OGG              EncodedFileType = 2
-	EncodedFileType_MP3              EncodedFileType = 3
+	AudioChannel_AUDIO_CHANNEL_BOTH  AudioChannel = 0
+	AudioChannel_AUDIO_CHANNEL_LEFT  AudioChannel = 1
+	AudioChannel_AUDIO_CHANNEL_RIGHT AudioChannel = 2
 )
 
-// Enum value maps for EncodedFileType.
+// Enum value maps for AudioChannel.
 var (
-	EncodedFileType_name = map[int32]string{
-		0: "DEFAULT_FILETYPE",
-		1: "MP4",
-		2: "OGG",
-		3: "MP3",
+	AudioChannel_name = map[int32]string{
+		0: "AUDIO_CHANNEL_BOTH",
+		1: "AUDIO_CHANNEL_LEFT",
+		2: "AUDIO_CHANNEL_RIGHT",
 	}
-	EncodedFileType_value = map[string]int32{
-		"DEFAULT_FILETYPE": 0,
-		"MP4":              1,
-		"OGG":              2,
-		"MP3":              3,
+	AudioChannel_value = map[string]int32{
+		"AUDIO_CHANNEL_BOTH":  0,
+		"AUDIO_CHANNEL_LEFT":  1,
+		"AUDIO_CHANNEL_RIGHT": 2,
 	}
 )
 
-func (x EncodedFileType) Enum() *EncodedFileType {
-	p := new(EncodedFileType)
+func (x AudioChannel) Enum() *AudioChannel {
+	p := new(AudioChannel)
 	*p = x
 	return p
 }
 
-func (x EncodedFileType) String() string {
+func (x AudioChannel) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (EncodedFileType) Descriptor() protoreflect.EnumDescriptor {
+func (AudioChannel) Descriptor() protoreflect.EnumDescriptor {
 	return file_livekit_egress_proto_enumTypes[0].Descriptor()
 }
 
-func (EncodedFileType) Type() protoreflect.EnumType {
+func (AudioChannel) Type() protoreflect.EnumType {
 	return &file_livekit_egress_proto_enumTypes[0]
 }
 
-func (x EncodedFileType) Number() protoreflect.EnumNumber {
+func (x AudioChannel) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use EncodedFileType.Descriptor instead.
-func (EncodedFileType) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use AudioChannel.Descriptor instead.
+func (AudioChannel) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_egress_proto_rawDescGZIP(), []int{0}
-}
-
-type SegmentedFileProtocol int32
-
-const (
-	SegmentedFileProtocol_DEFAULT_SEGMENTED_FILE_PROTOCOL SegmentedFileProtocol = 0
-	SegmentedFileProtocol_HLS_PROTOCOL                    SegmentedFileProtocol = 1
-)
-
-// Enum value maps for SegmentedFileProtocol.
-var (
-	SegmentedFileProtocol_name = map[int32]string{
-		0: "DEFAULT_SEGMENTED_FILE_PROTOCOL",
-		1: "HLS_PROTOCOL",
-	}
-	SegmentedFileProtocol_value = map[string]int32{
-		"DEFAULT_SEGMENTED_FILE_PROTOCOL": 0,
-		"HLS_PROTOCOL":                    1,
-	}
-)
-
-func (x SegmentedFileProtocol) Enum() *SegmentedFileProtocol {
-	p := new(SegmentedFileProtocol)
-	*p = x
-	return p
-}
-
-func (x SegmentedFileProtocol) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SegmentedFileProtocol) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[1].Descriptor()
-}
-
-func (SegmentedFileProtocol) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[1]
-}
-
-func (x SegmentedFileProtocol) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SegmentedFileProtocol.Descriptor instead.
-func (SegmentedFileProtocol) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{1}
-}
-
-type SegmentedFileSuffix int32
-
-const (
-	SegmentedFileSuffix_INDEX     SegmentedFileSuffix = 0
-	SegmentedFileSuffix_TIMESTAMP SegmentedFileSuffix = 1
-)
-
-// Enum value maps for SegmentedFileSuffix.
-var (
-	SegmentedFileSuffix_name = map[int32]string{
-		0: "INDEX",
-		1: "TIMESTAMP",
-	}
-	SegmentedFileSuffix_value = map[string]int32{
-		"INDEX":     0,
-		"TIMESTAMP": 1,
-	}
-)
-
-func (x SegmentedFileSuffix) Enum() *SegmentedFileSuffix {
-	p := new(SegmentedFileSuffix)
-	*p = x
-	return p
-}
-
-func (x SegmentedFileSuffix) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (SegmentedFileSuffix) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[2].Descriptor()
-}
-
-func (SegmentedFileSuffix) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[2]
-}
-
-func (x SegmentedFileSuffix) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use SegmentedFileSuffix.Descriptor instead.
-func (SegmentedFileSuffix) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{2}
-}
-
-type ImageFileSuffix int32
-
-const (
-	ImageFileSuffix_IMAGE_SUFFIX_INDEX          ImageFileSuffix = 0
-	ImageFileSuffix_IMAGE_SUFFIX_TIMESTAMP      ImageFileSuffix = 1
-	ImageFileSuffix_IMAGE_SUFFIX_NONE_OVERWRITE ImageFileSuffix = 2 // Do not append any suffix and overwrite the existing image with the latest
-)
-
-// Enum value maps for ImageFileSuffix.
-var (
-	ImageFileSuffix_name = map[int32]string{
-		0: "IMAGE_SUFFIX_INDEX",
-		1: "IMAGE_SUFFIX_TIMESTAMP",
-		2: "IMAGE_SUFFIX_NONE_OVERWRITE",
-	}
-	ImageFileSuffix_value = map[string]int32{
-		"IMAGE_SUFFIX_INDEX":          0,
-		"IMAGE_SUFFIX_TIMESTAMP":      1,
-		"IMAGE_SUFFIX_NONE_OVERWRITE": 2,
-	}
-)
-
-func (x ImageFileSuffix) Enum() *ImageFileSuffix {
-	p := new(ImageFileSuffix)
-	*p = x
-	return p
-}
-
-func (x ImageFileSuffix) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ImageFileSuffix) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[3].Descriptor()
-}
-
-func (ImageFileSuffix) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[3]
-}
-
-func (x ImageFileSuffix) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ImageFileSuffix.Descriptor instead.
-func (ImageFileSuffix) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{3}
-}
-
-type StreamProtocol int32
-
-const (
-	StreamProtocol_DEFAULT_PROTOCOL StreamProtocol = 0 // protocol chosen based on urls
-	StreamProtocol_RTMP             StreamProtocol = 1
-	StreamProtocol_SRT              StreamProtocol = 2
-)
-
-// Enum value maps for StreamProtocol.
-var (
-	StreamProtocol_name = map[int32]string{
-		0: "DEFAULT_PROTOCOL",
-		1: "RTMP",
-		2: "SRT",
-	}
-	StreamProtocol_value = map[string]int32{
-		"DEFAULT_PROTOCOL": 0,
-		"RTMP":             1,
-		"SRT":              2,
-	}
-)
-
-func (x StreamProtocol) Enum() *StreamProtocol {
-	p := new(StreamProtocol)
-	*p = x
-	return p
-}
-
-func (x StreamProtocol) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (StreamProtocol) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[4].Descriptor()
-}
-
-func (StreamProtocol) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[4]
-}
-
-func (x StreamProtocol) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use StreamProtocol.Descriptor instead.
-func (StreamProtocol) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{4}
-}
-
-type AudioMixing int32
-
-const (
-	AudioMixing_DEFAULT_MIXING         AudioMixing = 0 // all users are mixed together
-	AudioMixing_DUAL_CHANNEL_AGENT     AudioMixing = 1 // agent audio in the left channel, all other audio in the right channel
-	AudioMixing_DUAL_CHANNEL_ALTERNATE AudioMixing = 2 // each new audio track alternates between left and right channels
-)
-
-// Enum value maps for AudioMixing.
-var (
-	AudioMixing_name = map[int32]string{
-		0: "DEFAULT_MIXING",
-		1: "DUAL_CHANNEL_AGENT",
-		2: "DUAL_CHANNEL_ALTERNATE",
-	}
-	AudioMixing_value = map[string]int32{
-		"DEFAULT_MIXING":         0,
-		"DUAL_CHANNEL_AGENT":     1,
-		"DUAL_CHANNEL_ALTERNATE": 2,
-	}
-)
-
-func (x AudioMixing) Enum() *AudioMixing {
-	p := new(AudioMixing)
-	*p = x
-	return p
-}
-
-func (x AudioMixing) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AudioMixing) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[5].Descriptor()
-}
-
-func (AudioMixing) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[5]
-}
-
-func (x AudioMixing) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AudioMixing.Descriptor instead.
-func (AudioMixing) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{5}
 }
 
 type EncodingOptionsPreset int32
@@ -375,11 +133,11 @@ func (x EncodingOptionsPreset) String() string {
 }
 
 func (EncodingOptionsPreset) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[6].Descriptor()
+	return file_livekit_egress_proto_enumTypes[1].Descriptor()
 }
 
 func (EncodingOptionsPreset) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[6]
+	return &file_livekit_egress_proto_enumTypes[1]
 }
 
 func (x EncodingOptionsPreset) Number() protoreflect.EnumNumber {
@@ -388,7 +146,298 @@ func (x EncodingOptionsPreset) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EncodingOptionsPreset.Descriptor instead.
 func (EncodingOptionsPreset) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{1}
+}
+
+type EncodedFileType int32
+
+const (
+	EncodedFileType_DEFAULT_FILETYPE EncodedFileType = 0 // file type chosen based on codecs
+	EncodedFileType_MP4              EncodedFileType = 1
+	EncodedFileType_OGG              EncodedFileType = 2
+	EncodedFileType_MP3              EncodedFileType = 3
+)
+
+// Enum value maps for EncodedFileType.
+var (
+	EncodedFileType_name = map[int32]string{
+		0: "DEFAULT_FILETYPE",
+		1: "MP4",
+		2: "OGG",
+		3: "MP3",
+	}
+	EncodedFileType_value = map[string]int32{
+		"DEFAULT_FILETYPE": 0,
+		"MP4":              1,
+		"OGG":              2,
+		"MP3":              3,
+	}
+)
+
+func (x EncodedFileType) Enum() *EncodedFileType {
+	p := new(EncodedFileType)
+	*p = x
+	return p
+}
+
+func (x EncodedFileType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EncodedFileType) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[2].Descriptor()
+}
+
+func (EncodedFileType) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[2]
+}
+
+func (x EncodedFileType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EncodedFileType.Descriptor instead.
+func (EncodedFileType) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{2}
+}
+
+type StreamProtocol int32
+
+const (
+	StreamProtocol_DEFAULT_PROTOCOL StreamProtocol = 0 // protocol chosen based on urls
+	StreamProtocol_RTMP             StreamProtocol = 1
+	StreamProtocol_SRT              StreamProtocol = 2
+	StreamProtocol_WEBSOCKET        StreamProtocol = 3
+)
+
+// Enum value maps for StreamProtocol.
+var (
+	StreamProtocol_name = map[int32]string{
+		0: "DEFAULT_PROTOCOL",
+		1: "RTMP",
+		2: "SRT",
+		3: "WEBSOCKET",
+	}
+	StreamProtocol_value = map[string]int32{
+		"DEFAULT_PROTOCOL": 0,
+		"RTMP":             1,
+		"SRT":              2,
+		"WEBSOCKET":        3,
+	}
+)
+
+func (x StreamProtocol) Enum() *StreamProtocol {
+	p := new(StreamProtocol)
+	*p = x
+	return p
+}
+
+func (x StreamProtocol) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (StreamProtocol) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[3].Descriptor()
+}
+
+func (StreamProtocol) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[3]
+}
+
+func (x StreamProtocol) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use StreamProtocol.Descriptor instead.
+func (StreamProtocol) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{3}
+}
+
+type SegmentedFileProtocol int32
+
+const (
+	SegmentedFileProtocol_DEFAULT_SEGMENTED_FILE_PROTOCOL SegmentedFileProtocol = 0
+	SegmentedFileProtocol_HLS_PROTOCOL                    SegmentedFileProtocol = 1
+)
+
+// Enum value maps for SegmentedFileProtocol.
+var (
+	SegmentedFileProtocol_name = map[int32]string{
+		0: "DEFAULT_SEGMENTED_FILE_PROTOCOL",
+		1: "HLS_PROTOCOL",
+	}
+	SegmentedFileProtocol_value = map[string]int32{
+		"DEFAULT_SEGMENTED_FILE_PROTOCOL": 0,
+		"HLS_PROTOCOL":                    1,
+	}
+)
+
+func (x SegmentedFileProtocol) Enum() *SegmentedFileProtocol {
+	p := new(SegmentedFileProtocol)
+	*p = x
+	return p
+}
+
+func (x SegmentedFileProtocol) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SegmentedFileProtocol) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[4].Descriptor()
+}
+
+func (SegmentedFileProtocol) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[4]
+}
+
+func (x SegmentedFileProtocol) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SegmentedFileProtocol.Descriptor instead.
+func (SegmentedFileProtocol) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{4}
+}
+
+type SegmentedFileSuffix int32
+
+const (
+	SegmentedFileSuffix_INDEX     SegmentedFileSuffix = 0
+	SegmentedFileSuffix_TIMESTAMP SegmentedFileSuffix = 1
+)
+
+// Enum value maps for SegmentedFileSuffix.
+var (
+	SegmentedFileSuffix_name = map[int32]string{
+		0: "INDEX",
+		1: "TIMESTAMP",
+	}
+	SegmentedFileSuffix_value = map[string]int32{
+		"INDEX":     0,
+		"TIMESTAMP": 1,
+	}
+)
+
+func (x SegmentedFileSuffix) Enum() *SegmentedFileSuffix {
+	p := new(SegmentedFileSuffix)
+	*p = x
+	return p
+}
+
+func (x SegmentedFileSuffix) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (SegmentedFileSuffix) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[5].Descriptor()
+}
+
+func (SegmentedFileSuffix) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[5]
+}
+
+func (x SegmentedFileSuffix) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use SegmentedFileSuffix.Descriptor instead.
+func (SegmentedFileSuffix) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{5}
+}
+
+type ImageFileSuffix int32
+
+const (
+	ImageFileSuffix_IMAGE_SUFFIX_INDEX          ImageFileSuffix = 0
+	ImageFileSuffix_IMAGE_SUFFIX_TIMESTAMP      ImageFileSuffix = 1
+	ImageFileSuffix_IMAGE_SUFFIX_NONE_OVERWRITE ImageFileSuffix = 2 // Do not append any suffix and overwrite the existing image with the latest
+)
+
+// Enum value maps for ImageFileSuffix.
+var (
+	ImageFileSuffix_name = map[int32]string{
+		0: "IMAGE_SUFFIX_INDEX",
+		1: "IMAGE_SUFFIX_TIMESTAMP",
+		2: "IMAGE_SUFFIX_NONE_OVERWRITE",
+	}
+	ImageFileSuffix_value = map[string]int32{
+		"IMAGE_SUFFIX_INDEX":          0,
+		"IMAGE_SUFFIX_TIMESTAMP":      1,
+		"IMAGE_SUFFIX_NONE_OVERWRITE": 2,
+	}
+)
+
+func (x ImageFileSuffix) Enum() *ImageFileSuffix {
+	p := new(ImageFileSuffix)
+	*p = x
+	return p
+}
+
+func (x ImageFileSuffix) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ImageFileSuffix) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[6].Descriptor()
+}
+
+func (ImageFileSuffix) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[6]
+}
+
+func (x ImageFileSuffix) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ImageFileSuffix.Descriptor instead.
+func (ImageFileSuffix) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_egress_proto_rawDescGZIP(), []int{6}
+}
+
+type EgressSourceType int32
+
+const (
+	EgressSourceType_EGRESS_SOURCE_TYPE_WEB EgressSourceType = 0
+	EgressSourceType_EGRESS_SOURCE_TYPE_SDK EgressSourceType = 1
+)
+
+// Enum value maps for EgressSourceType.
+var (
+	EgressSourceType_name = map[int32]string{
+		0: "EGRESS_SOURCE_TYPE_WEB",
+		1: "EGRESS_SOURCE_TYPE_SDK",
+	}
+	EgressSourceType_value = map[string]int32{
+		"EGRESS_SOURCE_TYPE_WEB": 0,
+		"EGRESS_SOURCE_TYPE_SDK": 1,
+	}
+)
+
+func (x EgressSourceType) Enum() *EgressSourceType {
+	p := new(EgressSourceType)
+	*p = x
+	return p
+}
+
+func (x EgressSourceType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EgressSourceType) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[7].Descriptor()
+}
+
+func (EgressSourceType) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[7]
+}
+
+func (x EgressSourceType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EgressSourceType.Descriptor instead.
+func (EgressSourceType) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{7}
 }
 
 type EgressStatus int32
@@ -436,11 +485,11 @@ func (x EgressStatus) String() string {
 }
 
 func (EgressStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[7].Descriptor()
+	return file_livekit_egress_proto_enumTypes[8].Descriptor()
 }
 
 func (EgressStatus) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[7]
+	return &file_livekit_egress_proto_enumTypes[8]
 }
 
 func (x EgressStatus) Number() protoreflect.EnumNumber {
@@ -449,53 +498,56 @@ func (x EgressStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EgressStatus.Descriptor instead.
 func (EgressStatus) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{7}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{8}
 }
 
-type EgressSourceType int32
+type AudioMixing int32
 
 const (
-	EgressSourceType_EGRESS_SOURCE_TYPE_WEB EgressSourceType = 0
-	EgressSourceType_EGRESS_SOURCE_TYPE_SDK EgressSourceType = 1
+	AudioMixing_DEFAULT_MIXING         AudioMixing = 0
+	AudioMixing_DUAL_CHANNEL_AGENT     AudioMixing = 1
+	AudioMixing_DUAL_CHANNEL_ALTERNATE AudioMixing = 2
 )
 
-// Enum value maps for EgressSourceType.
+// Enum value maps for AudioMixing.
 var (
-	EgressSourceType_name = map[int32]string{
-		0: "EGRESS_SOURCE_TYPE_WEB",
-		1: "EGRESS_SOURCE_TYPE_SDK",
+	AudioMixing_name = map[int32]string{
+		0: "DEFAULT_MIXING",
+		1: "DUAL_CHANNEL_AGENT",
+		2: "DUAL_CHANNEL_ALTERNATE",
 	}
-	EgressSourceType_value = map[string]int32{
-		"EGRESS_SOURCE_TYPE_WEB": 0,
-		"EGRESS_SOURCE_TYPE_SDK": 1,
+	AudioMixing_value = map[string]int32{
+		"DEFAULT_MIXING":         0,
+		"DUAL_CHANNEL_AGENT":     1,
+		"DUAL_CHANNEL_ALTERNATE": 2,
 	}
 )
 
-func (x EgressSourceType) Enum() *EgressSourceType {
-	p := new(EgressSourceType)
+func (x AudioMixing) Enum() *AudioMixing {
+	p := new(AudioMixing)
 	*p = x
 	return p
 }
 
-func (x EgressSourceType) String() string {
+func (x AudioMixing) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (EgressSourceType) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[8].Descriptor()
+func (AudioMixing) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_egress_proto_enumTypes[9].Descriptor()
 }
 
-func (EgressSourceType) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[8]
+func (AudioMixing) Type() protoreflect.EnumType {
+	return &file_livekit_egress_proto_enumTypes[9]
 }
 
-func (x EgressSourceType) Number() protoreflect.EnumNumber {
+func (x AudioMixing) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use EgressSourceType.Descriptor instead.
-func (EgressSourceType) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{8}
+// Deprecated: Use AudioMixing.Descriptor instead.
+func (AudioMixing) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{9}
 }
 
 type StreamInfo_Status int32
@@ -531,11 +583,11 @@ func (x StreamInfo_Status) String() string {
 }
 
 func (StreamInfo_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_egress_proto_enumTypes[9].Descriptor()
+	return file_livekit_egress_proto_enumTypes[10].Descriptor()
 }
 
 func (StreamInfo_Status) Type() protoreflect.EnumType {
-	return &file_livekit_egress_proto_enumTypes[9]
+	return &file_livekit_egress_proto_enumTypes[10]
 }
 
 func (x StreamInfo_Status) Number() protoreflect.EnumNumber {
@@ -544,18 +596,3589 @@ func (x StreamInfo_Status) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use StreamInfo_Status.Descriptor instead.
 func (StreamInfo_Status) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{23, 0}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{27, 0}
 }
 
-// composite using a web browser
+type StartEgressRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	RoomName string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	// Types that are valid to be assigned to Source:
+	//
+	//	*StartEgressRequest_Template
+	//	*StartEgressRequest_Web
+	//	*StartEgressRequest_Media
+	Source isStartEgressRequest_Source `protobuf_oneof:"source"`
+	// Optional — default H264_720P_30
+	//
+	// Types that are valid to be assigned to Encoding:
+	//
+	//	*StartEgressRequest_Preset
+	//	*StartEgressRequest_Advanced
+	Encoding isStartEgressRequest_Encoding `protobuf_oneof:"encoding"`
+	// At least one required
+	Outputs []*Output `protobuf:"bytes,7,rep,name=outputs,proto3" json:"outputs,omitempty"`
+	// Request-level storage default
+	Storage *StorageConfig `protobuf:"bytes,8,opt,name=storage,proto3" json:"storage,omitempty"`
+	// Optional additional webhook config
+	Webhooks      []*WebhookConfig `protobuf:"bytes,9,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartEgressRequest) Reset() {
+	*x = StartEgressRequest{}
+	mi := &file_livekit_egress_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartEgressRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartEgressRequest) ProtoMessage() {}
+
+func (x *StartEgressRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartEgressRequest.ProtoReflect.Descriptor instead.
+func (*StartEgressRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *StartEgressRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *StartEgressRequest) GetSource() isStartEgressRequest_Source {
+	if x != nil {
+		return x.Source
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetTemplate() *TemplateSource {
+	if x != nil {
+		if x, ok := x.Source.(*StartEgressRequest_Template); ok {
+			return x.Template
+		}
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetWeb() *WebSource {
+	if x != nil {
+		if x, ok := x.Source.(*StartEgressRequest_Web); ok {
+			return x.Web
+		}
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetMedia() *MediaSource {
+	if x != nil {
+		if x, ok := x.Source.(*StartEgressRequest_Media); ok {
+			return x.Media
+		}
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetEncoding() isStartEgressRequest_Encoding {
+	if x != nil {
+		return x.Encoding
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetPreset() EncodingOptionsPreset {
+	if x != nil {
+		if x, ok := x.Encoding.(*StartEgressRequest_Preset); ok {
+			return x.Preset
+		}
+	}
+	return EncodingOptionsPreset_H264_720P_30
+}
+
+func (x *StartEgressRequest) GetAdvanced() *EncodingOptions {
+	if x != nil {
+		if x, ok := x.Encoding.(*StartEgressRequest_Advanced); ok {
+			return x.Advanced
+		}
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetOutputs() []*Output {
+	if x != nil {
+		return x.Outputs
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetStorage() *StorageConfig {
+	if x != nil {
+		return x.Storage
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
+}
+
+type isStartEgressRequest_Source interface {
+	isStartEgressRequest_Source()
+}
+
+type StartEgressRequest_Template struct {
+	Template *TemplateSource `protobuf:"bytes,2,opt,name=template,proto3,oneof"`
+}
+
+type StartEgressRequest_Web struct {
+	Web *WebSource `protobuf:"bytes,3,opt,name=web,proto3,oneof"`
+}
+
+type StartEgressRequest_Media struct {
+	Media *MediaSource `protobuf:"bytes,4,opt,name=media,proto3,oneof"`
+}
+
+func (*StartEgressRequest_Template) isStartEgressRequest_Source() {}
+
+func (*StartEgressRequest_Web) isStartEgressRequest_Source() {}
+
+func (*StartEgressRequest_Media) isStartEgressRequest_Source() {}
+
+type isStartEgressRequest_Encoding interface {
+	isStartEgressRequest_Encoding()
+}
+
+type StartEgressRequest_Preset struct {
+	Preset EncodingOptionsPreset `protobuf:"varint,5,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"`
+}
+
+type StartEgressRequest_Advanced struct {
+	Advanced *EncodingOptions `protobuf:"bytes,6,opt,name=advanced,proto3,oneof"`
+}
+
+func (*StartEgressRequest_Preset) isStartEgressRequest_Encoding() {}
+
+func (*StartEgressRequest_Advanced) isStartEgressRequest_Encoding() {}
+
+// Room composite recording via layout template.
+// Service generates token, constructs recorder URL, awaits start signal.
+type TemplateSource struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Layout        string                 `protobuf:"bytes,1,opt,name=layout,proto3" json:"layout,omitempty"`
+	AudioOnly     bool                   `protobuf:"varint,2,opt,name=audio_only,json=audioOnly,proto3" json:"audio_only,omitempty"`
+	VideoOnly     bool                   `protobuf:"varint,3,opt,name=video_only,json=videoOnly,proto3" json:"video_only,omitempty"`
+	CustomBaseUrl string                 `protobuf:"bytes,4,opt,name=custom_base_url,json=customBaseUrl,proto3" json:"custom_base_url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TemplateSource) Reset() {
+	*x = TemplateSource{}
+	mi := &file_livekit_egress_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TemplateSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TemplateSource) ProtoMessage() {}
+
+func (x *TemplateSource) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TemplateSource.ProtoReflect.Descriptor instead.
+func (*TemplateSource) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *TemplateSource) GetLayout() string {
+	if x != nil {
+		return x.Layout
+	}
+	return ""
+}
+
+func (x *TemplateSource) GetAudioOnly() bool {
+	if x != nil {
+		return x.AudioOnly
+	}
+	return false
+}
+
+func (x *TemplateSource) GetVideoOnly() bool {
+	if x != nil {
+		return x.VideoOnly
+	}
+	return false
+}
+
+func (x *TemplateSource) GetCustomBaseUrl() string {
+	if x != nil {
+		return x.CustomBaseUrl
+	}
+	return ""
+}
+
+// Record a custom URL via headless browser.
+type WebSource struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Url              string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	AudioOnly        bool                   `protobuf:"varint,2,opt,name=audio_only,json=audioOnly,proto3" json:"audio_only,omitempty"`
+	VideoOnly        bool                   `protobuf:"varint,3,opt,name=video_only,json=videoOnly,proto3" json:"video_only,omitempty"`
+	AwaitStartSignal bool                   `protobuf:"varint,4,opt,name=await_start_signal,json=awaitStartSignal,proto3" json:"await_start_signal,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *WebSource) Reset() {
+	*x = WebSource{}
+	mi := &file_livekit_egress_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WebSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WebSource) ProtoMessage() {}
+
+func (x *WebSource) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WebSource.ProtoReflect.Descriptor instead.
+func (*WebSource) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *WebSource) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *WebSource) GetAudioOnly() bool {
+	if x != nil {
+		return x.AudioOnly
+	}
+	return false
+}
+
+func (x *WebSource) GetVideoOnly() bool {
+	if x != nil {
+		return x.VideoOnly
+	}
+	return false
+}
+
+func (x *WebSource) GetAwaitStartSignal() bool {
+	if x != nil {
+		return x.AwaitStartSignal
+	}
+	return false
+}
+
+// Capture tracks directly from a room via SDK.
+// Unifies deprecated Participant, TrackComposite, and Track egress.
+type MediaSource struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Video:
+	//
+	//	*MediaSource_VideoTrackId
+	//	*MediaSource_ParticipantVideo
+	Video         isMediaSource_Video `protobuf_oneof:"video"`
+	Audio         *AudioConfig        `protobuf:"bytes,3,opt,name=audio,proto3" json:"audio,omitempty"`
+	Data          *DataConfig         `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MediaSource) Reset() {
+	*x = MediaSource{}
+	mi := &file_livekit_egress_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MediaSource) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MediaSource) ProtoMessage() {}
+
+func (x *MediaSource) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MediaSource.ProtoReflect.Descriptor instead.
+func (*MediaSource) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *MediaSource) GetVideo() isMediaSource_Video {
+	if x != nil {
+		return x.Video
+	}
+	return nil
+}
+
+func (x *MediaSource) GetVideoTrackId() string {
+	if x != nil {
+		if x, ok := x.Video.(*MediaSource_VideoTrackId); ok {
+			return x.VideoTrackId
+		}
+	}
+	return ""
+}
+
+func (x *MediaSource) GetParticipantVideo() *ParticipantVideo {
+	if x != nil {
+		if x, ok := x.Video.(*MediaSource_ParticipantVideo); ok {
+			return x.ParticipantVideo
+		}
+	}
+	return nil
+}
+
+func (x *MediaSource) GetAudio() *AudioConfig {
+	if x != nil {
+		return x.Audio
+	}
+	return nil
+}
+
+func (x *MediaSource) GetData() *DataConfig {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type isMediaSource_Video interface {
+	isMediaSource_Video()
+}
+
+type MediaSource_VideoTrackId struct {
+	VideoTrackId string `protobuf:"bytes,1,opt,name=video_track_id,json=videoTrackId,proto3,oneof"`
+}
+
+type MediaSource_ParticipantVideo struct {
+	ParticipantVideo *ParticipantVideo `protobuf:"bytes,2,opt,name=participant_video,json=participantVideo,proto3,oneof"`
+}
+
+func (*MediaSource_VideoTrackId) isMediaSource_Video() {}
+
+func (*MediaSource_ParticipantVideo) isMediaSource_Video() {}
+
+type ParticipantVideo struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Identity          string                 `protobuf:"bytes,1,opt,name=identity,proto3" json:"identity,omitempty"`
+	PreferScreenShare bool                   `protobuf:"varint,2,opt,name=prefer_screen_share,json=preferScreenShare,proto3" json:"prefer_screen_share,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ParticipantVideo) Reset() {
+	*x = ParticipantVideo{}
+	mi := &file_livekit_egress_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ParticipantVideo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ParticipantVideo) ProtoMessage() {}
+
+func (x *ParticipantVideo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ParticipantVideo.ProtoReflect.Descriptor instead.
+func (*ParticipantVideo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ParticipantVideo) GetIdentity() string {
+	if x != nil {
+		return x.Identity
+	}
+	return ""
+}
+
+func (x *ParticipantVideo) GetPreferScreenShare() bool {
+	if x != nil {
+		return x.PreferScreenShare
+	}
+	return false
+}
+
+// Unified audio selection and channel routing.
+// Each route specifies both which audio to capture and which channel to output to.
+type AudioConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// If empty, all audio captured in both channels.
+	// If non-empty, only matching audio is captured and routed. Unmatched is excluded.
+	Routes        []*AudioRoute `protobuf:"bytes,1,rep,name=routes,proto3" json:"routes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioConfig) Reset() {
+	*x = AudioConfig{}
+	mi := &file_livekit_egress_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioConfig) ProtoMessage() {}
+
+func (x *AudioConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioConfig.ProtoReflect.Descriptor instead.
+func (*AudioConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *AudioConfig) GetRoutes() []*AudioRoute {
+	if x != nil {
+		return x.Routes
+	}
+	return nil
+}
+
+type AudioRoute struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Match:
+	//
+	//	*AudioRoute_TrackId
+	//	*AudioRoute_ParticipantIdentity
+	//	*AudioRoute_ParticipantKind
+	Match         isAudioRoute_Match `protobuf_oneof:"match"`
+	Channel       AudioChannel       `protobuf:"varint,4,opt,name=channel,proto3,enum=livekit.AudioChannel" json:"channel,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AudioRoute) Reset() {
+	*x = AudioRoute{}
+	mi := &file_livekit_egress_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AudioRoute) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AudioRoute) ProtoMessage() {}
+
+func (x *AudioRoute) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AudioRoute.ProtoReflect.Descriptor instead.
+func (*AudioRoute) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *AudioRoute) GetMatch() isAudioRoute_Match {
+	if x != nil {
+		return x.Match
+	}
+	return nil
+}
+
+func (x *AudioRoute) GetTrackId() string {
+	if x != nil {
+		if x, ok := x.Match.(*AudioRoute_TrackId); ok {
+			return x.TrackId
+		}
+	}
+	return ""
+}
+
+func (x *AudioRoute) GetParticipantIdentity() string {
+	if x != nil {
+		if x, ok := x.Match.(*AudioRoute_ParticipantIdentity); ok {
+			return x.ParticipantIdentity
+		}
+	}
+	return ""
+}
+
+func (x *AudioRoute) GetParticipantKind() ParticipantInfo_Kind {
+	if x != nil {
+		if x, ok := x.Match.(*AudioRoute_ParticipantKind); ok {
+			return x.ParticipantKind
+		}
+	}
+	return ParticipantInfo_STANDARD
+}
+
+func (x *AudioRoute) GetChannel() AudioChannel {
+	if x != nil {
+		return x.Channel
+	}
+	return AudioChannel_AUDIO_CHANNEL_BOTH
+}
+
+type isAudioRoute_Match interface {
+	isAudioRoute_Match()
+}
+
+type AudioRoute_TrackId struct {
+	TrackId string `protobuf:"bytes,1,opt,name=track_id,json=trackId,proto3,oneof"`
+}
+
+type AudioRoute_ParticipantIdentity struct {
+	ParticipantIdentity string `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3,oneof"`
+}
+
+type AudioRoute_ParticipantKind struct {
+	ParticipantKind ParticipantInfo_Kind `protobuf:"varint,3,opt,name=participant_kind,json=participantKind,proto3,enum=livekit.ParticipantInfo_Kind,oneof"`
+}
+
+func (*AudioRoute_TrackId) isAudioRoute_Match() {}
+
+func (*AudioRoute_ParticipantIdentity) isAudioRoute_Match() {}
+
+func (*AudioRoute_ParticipantKind) isAudioRoute_Match() {}
+
+type DataConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// If empty, all data tracks captured.
+	// If non-empty, only matching data tracks are captured.
+	Selectors     []*DataSelector `protobuf:"bytes,1,rep,name=selectors,proto3" json:"selectors,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DataConfig) Reset() {
+	*x = DataConfig{}
+	mi := &file_livekit_egress_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DataConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DataConfig) ProtoMessage() {}
+
+func (x *DataConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DataConfig.ProtoReflect.Descriptor instead.
+func (*DataConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *DataConfig) GetSelectors() []*DataSelector {
+	if x != nil {
+		return x.Selectors
+	}
+	return nil
+}
+
+type DataSelector struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Match:
+	//
+	//	*DataSelector_TrackId
+	//	*DataSelector_ParticipantIdentity
+	//	*DataSelector_Topic
+	Match         isDataSelector_Match `protobuf_oneof:"match"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DataSelector) Reset() {
+	*x = DataSelector{}
+	mi := &file_livekit_egress_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DataSelector) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DataSelector) ProtoMessage() {}
+
+func (x *DataSelector) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DataSelector.ProtoReflect.Descriptor instead.
+func (*DataSelector) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *DataSelector) GetMatch() isDataSelector_Match {
+	if x != nil {
+		return x.Match
+	}
+	return nil
+}
+
+func (x *DataSelector) GetTrackId() string {
+	if x != nil {
+		if x, ok := x.Match.(*DataSelector_TrackId); ok {
+			return x.TrackId
+		}
+	}
+	return ""
+}
+
+func (x *DataSelector) GetParticipantIdentity() string {
+	if x != nil {
+		if x, ok := x.Match.(*DataSelector_ParticipantIdentity); ok {
+			return x.ParticipantIdentity
+		}
+	}
+	return ""
+}
+
+func (x *DataSelector) GetTopic() string {
+	if x != nil {
+		if x, ok := x.Match.(*DataSelector_Topic); ok {
+			return x.Topic
+		}
+	}
+	return ""
+}
+
+type isDataSelector_Match interface {
+	isDataSelector_Match()
+}
+
+type DataSelector_TrackId struct {
+	TrackId string `protobuf:"bytes,1,opt,name=track_id,json=trackId,proto3,oneof"`
+}
+
+type DataSelector_ParticipantIdentity struct {
+	ParticipantIdentity string `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3,oneof"`
+}
+
+type DataSelector_Topic struct {
+	Topic string `protobuf:"bytes,3,opt,name=topic,proto3,oneof"`
+}
+
+func (*DataSelector_TrackId) isDataSelector_Match() {}
+
+func (*DataSelector_ParticipantIdentity) isDataSelector_Match() {}
+
+func (*DataSelector_Topic) isDataSelector_Match() {}
+
+type EncodingOptions struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Width            int32                  `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`                                                     // (default 1920)
+	Height           int32                  `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`                                                   // (default 1080)
+	Depth            int32                  `protobuf:"varint,3,opt,name=depth,proto3" json:"depth,omitempty"`                                                     // (default 24)
+	Framerate        int32                  `protobuf:"varint,4,opt,name=framerate,proto3" json:"framerate,omitempty"`                                             // (default 30)
+	AudioCodec       AudioCodec             `protobuf:"varint,5,opt,name=audio_codec,json=audioCodec,proto3,enum=livekit.AudioCodec" json:"audio_codec,omitempty"` // (default OPUS)
+	AudioBitrate     int32                  `protobuf:"varint,6,opt,name=audio_bitrate,json=audioBitrate,proto3" json:"audio_bitrate,omitempty"`                   // (default 128)
+	AudioQuality     int32                  `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"`                  // quality setting on audio encoder
+	AudioFrequency   int32                  `protobuf:"varint,7,opt,name=audio_frequency,json=audioFrequency,proto3" json:"audio_frequency,omitempty"`             // (default 44100)
+	VideoCodec       VideoCodec             `protobuf:"varint,8,opt,name=video_codec,json=videoCodec,proto3,enum=livekit.VideoCodec" json:"video_codec,omitempty"` // (default H264_MAIN)
+	VideoBitrate     int32                  `protobuf:"varint,9,opt,name=video_bitrate,json=videoBitrate,proto3" json:"video_bitrate,omitempty"`                   // (default 4500)
+	VideoQuality     int32                  `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"`                  // quality setting on video encoder
+	KeyFrameInterval float64                `protobuf:"fixed64,10,opt,name=key_frame_interval,json=keyFrameInterval,proto3" json:"key_frame_interval,omitempty"`   // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *EncodingOptions) Reset() {
+	*x = EncodingOptions{}
+	mi := &file_livekit_egress_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EncodingOptions) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EncodingOptions) ProtoMessage() {}
+
+func (x *EncodingOptions) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EncodingOptions.ProtoReflect.Descriptor instead.
+func (*EncodingOptions) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *EncodingOptions) GetWidth() int32 {
+	if x != nil {
+		return x.Width
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetHeight() int32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetDepth() int32 {
+	if x != nil {
+		return x.Depth
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetFramerate() int32 {
+	if x != nil {
+		return x.Framerate
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetAudioCodec() AudioCodec {
+	if x != nil {
+		return x.AudioCodec
+	}
+	return AudioCodec_DEFAULT_AC
+}
+
+func (x *EncodingOptions) GetAudioBitrate() int32 {
+	if x != nil {
+		return x.AudioBitrate
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetAudioQuality() int32 {
+	if x != nil {
+		return x.AudioQuality
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetAudioFrequency() int32 {
+	if x != nil {
+		return x.AudioFrequency
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetVideoCodec() VideoCodec {
+	if x != nil {
+		return x.VideoCodec
+	}
+	return VideoCodec_DEFAULT_VC
+}
+
+func (x *EncodingOptions) GetVideoBitrate() int32 {
+	if x != nil {
+		return x.VideoBitrate
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetVideoQuality() int32 {
+	if x != nil {
+		return x.VideoQuality
+	}
+	return 0
+}
+
+func (x *EncodingOptions) GetKeyFrameInterval() float64 {
+	if x != nil {
+		return x.KeyFrameInterval
+	}
+	return 0
+}
+
+type Output struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Config:
+	//
+	//	*Output_File
+	//	*Output_Stream
+	//	*Output_Segments
+	//	*Output_Images
+	//	*Output_Mcap
+	Config isOutput_Config `protobuf_oneof:"config"`
+	// Per-output storage override (falls back to request, then server)
+	Storage       *StorageConfig `protobuf:"bytes,6,opt,name=storage,proto3" json:"storage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Output) Reset() {
+	*x = Output{}
+	mi := &file_livekit_egress_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Output) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Output) ProtoMessage() {}
+
+func (x *Output) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Output.ProtoReflect.Descriptor instead.
+func (*Output) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *Output) GetConfig() isOutput_Config {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+func (x *Output) GetFile() *FileOutput {
+	if x != nil {
+		if x, ok := x.Config.(*Output_File); ok {
+			return x.File
+		}
+	}
+	return nil
+}
+
+func (x *Output) GetStream() *StreamOutput {
+	if x != nil {
+		if x, ok := x.Config.(*Output_Stream); ok {
+			return x.Stream
+		}
+	}
+	return nil
+}
+
+func (x *Output) GetSegments() *SegmentedFileOutput {
+	if x != nil {
+		if x, ok := x.Config.(*Output_Segments); ok {
+			return x.Segments
+		}
+	}
+	return nil
+}
+
+func (x *Output) GetImages() *ImageOutput {
+	if x != nil {
+		if x, ok := x.Config.(*Output_Images); ok {
+			return x.Images
+		}
+	}
+	return nil
+}
+
+func (x *Output) GetMcap() *McapOutput {
+	if x != nil {
+		if x, ok := x.Config.(*Output_Mcap); ok {
+			return x.Mcap
+		}
+	}
+	return nil
+}
+
+func (x *Output) GetStorage() *StorageConfig {
+	if x != nil {
+		return x.Storage
+	}
+	return nil
+}
+
+type isOutput_Config interface {
+	isOutput_Config()
+}
+
+type Output_File struct {
+	File *FileOutput `protobuf:"bytes,1,opt,name=file,proto3,oneof"`
+}
+
+type Output_Stream struct {
+	Stream *StreamOutput `protobuf:"bytes,2,opt,name=stream,proto3,oneof"` // reuses v1 StreamOutput
+}
+
+type Output_Segments struct {
+	Segments *SegmentedFileOutput `protobuf:"bytes,3,opt,name=segments,proto3,oneof"` // reuses v1 SegmentedFileOutput
+}
+
+type Output_Images struct {
+	Images *ImageOutput `protobuf:"bytes,4,opt,name=images,proto3,oneof"` // reuses v1 ImageOutput
+}
+
+type Output_Mcap struct {
+	Mcap *McapOutput `protobuf:"bytes,5,opt,name=mcap,proto3,oneof"`
+}
+
+func (*Output_File) isOutput_Config() {}
+
+func (*Output_Stream) isOutput_Config() {}
+
+func (*Output_Segments) isOutput_Config() {}
+
+func (*Output_Images) isOutput_Config() {}
+
+func (*Output_Mcap) isOutput_Config() {}
+
+// Unified file output — replaces v1 EncodedFileOutput and DirectFileOutput.
+// Whether transcoded depends on encoding options on the request.
+type FileOutput struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	FileType        EncodedFileType        `protobuf:"varint,1,opt,name=file_type,json=fileType,proto3,enum=livekit.EncodedFileType" json:"file_type,omitempty"`
+	Filepath        string                 `protobuf:"bytes,2,opt,name=filepath,proto3" json:"filepath,omitempty"`
+	DisableManifest bool                   `protobuf:"varint,3,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *FileOutput) Reset() {
+	*x = FileOutput{}
+	mi := &file_livekit_egress_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileOutput) ProtoMessage() {}
+
+func (x *FileOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileOutput.ProtoReflect.Descriptor instead.
+func (*FileOutput) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *FileOutput) GetFileType() EncodedFileType {
+	if x != nil {
+		return x.FileType
+	}
+	return EncodedFileType_DEFAULT_FILETYPE
+}
+
+func (x *FileOutput) GetFilepath() string {
+	if x != nil {
+		return x.Filepath
+	}
+	return ""
+}
+
+func (x *FileOutput) GetDisableManifest() bool {
+	if x != nil {
+		return x.DisableManifest
+	}
+	return false
+}
+
+type StreamOutput struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Protocol      StreamProtocol         `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.StreamProtocol" json:"protocol,omitempty"` // required
+	Urls          []string               `protobuf:"bytes,2,rep,name=urls,proto3" json:"urls,omitempty"`                                      // required
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamOutput) Reset() {
+	*x = StreamOutput{}
+	mi := &file_livekit_egress_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamOutput) ProtoMessage() {}
+
+func (x *StreamOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamOutput.ProtoReflect.Descriptor instead.
+func (*StreamOutput) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *StreamOutput) GetProtocol() StreamProtocol {
+	if x != nil {
+		return x.Protocol
+	}
+	return StreamProtocol_DEFAULT_PROTOCOL
+}
+
+func (x *StreamOutput) GetUrls() []string {
+	if x != nil {
+		return x.Urls
+	}
+	return nil
+}
+
+// Used to generate HLS segments or other kind of segmented output
+type SegmentedFileOutput struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Protocol         SegmentedFileProtocol  `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.SegmentedFileProtocol" json:"protocol,omitempty"`                                  // (optional)
+	FilenamePrefix   string                 `protobuf:"bytes,2,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                                    // (optional)
+	PlaylistName     string                 `protobuf:"bytes,3,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`                                          // (optional)
+	LivePlaylistName string                 `protobuf:"bytes,11,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`                           // (optional, disabled if not provided). Path of a live playlist
+	SegmentDuration  uint32                 `protobuf:"varint,4,opt,name=segment_duration,json=segmentDuration,proto3" json:"segment_duration,omitempty"`                                // in seconds (optional)
+	FilenameSuffix   SegmentedFileSuffix    `protobuf:"varint,10,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.SegmentedFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
+	DisableManifest  bool                   `protobuf:"varint,8,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                                // disable upload of manifest file (default false)
+	// --- Deprecated ---
+	//
+	// Types that are valid to be assigned to Output:
+	//
+	//	*SegmentedFileOutput_S3
+	//	*SegmentedFileOutput_Gcp
+	//	*SegmentedFileOutput_Azure
+	//	*SegmentedFileOutput_AliOSS
+	Output        isSegmentedFileOutput_Output `protobuf_oneof:"output"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SegmentedFileOutput) Reset() {
+	*x = SegmentedFileOutput{}
+	mi := &file_livekit_egress_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SegmentedFileOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SegmentedFileOutput) ProtoMessage() {}
+
+func (x *SegmentedFileOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SegmentedFileOutput.ProtoReflect.Descriptor instead.
+func (*SegmentedFileOutput) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *SegmentedFileOutput) GetProtocol() SegmentedFileProtocol {
+	if x != nil {
+		return x.Protocol
+	}
+	return SegmentedFileProtocol_DEFAULT_SEGMENTED_FILE_PROTOCOL
+}
+
+func (x *SegmentedFileOutput) GetFilenamePrefix() string {
+	if x != nil {
+		return x.FilenamePrefix
+	}
+	return ""
+}
+
+func (x *SegmentedFileOutput) GetPlaylistName() string {
+	if x != nil {
+		return x.PlaylistName
+	}
+	return ""
+}
+
+func (x *SegmentedFileOutput) GetLivePlaylistName() string {
+	if x != nil {
+		return x.LivePlaylistName
+	}
+	return ""
+}
+
+func (x *SegmentedFileOutput) GetSegmentDuration() uint32 {
+	if x != nil {
+		return x.SegmentDuration
+	}
+	return 0
+}
+
+func (x *SegmentedFileOutput) GetFilenameSuffix() SegmentedFileSuffix {
+	if x != nil {
+		return x.FilenameSuffix
+	}
+	return SegmentedFileSuffix_INDEX
+}
+
+func (x *SegmentedFileOutput) GetDisableManifest() bool {
+	if x != nil {
+		return x.DisableManifest
+	}
+	return false
+}
+
+func (x *SegmentedFileOutput) GetOutput() isSegmentedFileOutput_Output {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *SegmentedFileOutput) GetS3() *S3Upload {
+	if x != nil {
+		if x, ok := x.Output.(*SegmentedFileOutput_S3); ok {
+			return x.S3
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *SegmentedFileOutput) GetGcp() *GCPUpload {
+	if x != nil {
+		if x, ok := x.Output.(*SegmentedFileOutput_Gcp); ok {
+			return x.Gcp
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *SegmentedFileOutput) GetAzure() *AzureBlobUpload {
+	if x != nil {
+		if x, ok := x.Output.(*SegmentedFileOutput_Azure); ok {
+			return x.Azure
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *SegmentedFileOutput) GetAliOSS() *AliOSSUpload {
+	if x != nil {
+		if x, ok := x.Output.(*SegmentedFileOutput_AliOSS); ok {
+			return x.AliOSS
+		}
+	}
+	return nil
+}
+
+type isSegmentedFileOutput_Output interface {
+	isSegmentedFileOutput_Output()
+}
+
+type SegmentedFileOutput_S3 struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	S3 *S3Upload `protobuf:"bytes,5,opt,name=s3,proto3,oneof"`
+}
+
+type SegmentedFileOutput_Gcp struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Gcp *GCPUpload `protobuf:"bytes,6,opt,name=gcp,proto3,oneof"`
+}
+
+type SegmentedFileOutput_Azure struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Azure *AzureBlobUpload `protobuf:"bytes,7,opt,name=azure,proto3,oneof"`
+}
+
+type SegmentedFileOutput_AliOSS struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	AliOSS *AliOSSUpload `protobuf:"bytes,9,opt,name=aliOSS,proto3,oneof"`
+}
+
+func (*SegmentedFileOutput_S3) isSegmentedFileOutput_Output() {}
+
+func (*SegmentedFileOutput_Gcp) isSegmentedFileOutput_Output() {}
+
+func (*SegmentedFileOutput_Azure) isSegmentedFileOutput_Output() {}
+
+func (*SegmentedFileOutput_AliOSS) isSegmentedFileOutput_Output() {}
+
+// Capture images at a specified interval
+type ImageOutput struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	CaptureInterval uint32                 `protobuf:"varint,1,opt,name=capture_interval,json=captureInterval,proto3" json:"capture_interval,omitempty"`                           // in seconds (required)
+	Width           int32                  `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`                                                                      // (optional, defaults to track width)
+	Height          int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`                                                                    // (optional, defaults to track height)
+	FilenamePrefix  string                 `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                               // (optional)
+	FilenameSuffix  ImageFileSuffix        `protobuf:"varint,5,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.ImageFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
+	ImageCodec      ImageCodec             `protobuf:"varint,6,opt,name=image_codec,json=imageCodec,proto3,enum=livekit.ImageCodec" json:"image_codec,omitempty"`                  // (optional)
+	DisableManifest bool                   `protobuf:"varint,7,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                           // disable upload of manifest file (default false)
+	// --- Deprecated ---
+	//
+	// Types that are valid to be assigned to Output:
+	//
+	//	*ImageOutput_S3
+	//	*ImageOutput_Gcp
+	//	*ImageOutput_Azure
+	//	*ImageOutput_AliOSS
+	Output        isImageOutput_Output `protobuf_oneof:"output"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImageOutput) Reset() {
+	*x = ImageOutput{}
+	mi := &file_livekit_egress_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImageOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImageOutput) ProtoMessage() {}
+
+func (x *ImageOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImageOutput.ProtoReflect.Descriptor instead.
+func (*ImageOutput) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ImageOutput) GetCaptureInterval() uint32 {
+	if x != nil {
+		return x.CaptureInterval
+	}
+	return 0
+}
+
+func (x *ImageOutput) GetWidth() int32 {
+	if x != nil {
+		return x.Width
+	}
+	return 0
+}
+
+func (x *ImageOutput) GetHeight() int32 {
+	if x != nil {
+		return x.Height
+	}
+	return 0
+}
+
+func (x *ImageOutput) GetFilenamePrefix() string {
+	if x != nil {
+		return x.FilenamePrefix
+	}
+	return ""
+}
+
+func (x *ImageOutput) GetFilenameSuffix() ImageFileSuffix {
+	if x != nil {
+		return x.FilenameSuffix
+	}
+	return ImageFileSuffix_IMAGE_SUFFIX_INDEX
+}
+
+func (x *ImageOutput) GetImageCodec() ImageCodec {
+	if x != nil {
+		return x.ImageCodec
+	}
+	return ImageCodec_IC_DEFAULT
+}
+
+func (x *ImageOutput) GetDisableManifest() bool {
+	if x != nil {
+		return x.DisableManifest
+	}
+	return false
+}
+
+func (x *ImageOutput) GetOutput() isImageOutput_Output {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *ImageOutput) GetS3() *S3Upload {
+	if x != nil {
+		if x, ok := x.Output.(*ImageOutput_S3); ok {
+			return x.S3
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *ImageOutput) GetGcp() *GCPUpload {
+	if x != nil {
+		if x, ok := x.Output.(*ImageOutput_Gcp); ok {
+			return x.Gcp
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *ImageOutput) GetAzure() *AzureBlobUpload {
+	if x != nil {
+		if x, ok := x.Output.(*ImageOutput_Azure); ok {
+			return x.Azure
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *ImageOutput) GetAliOSS() *AliOSSUpload {
+	if x != nil {
+		if x, ok := x.Output.(*ImageOutput_AliOSS); ok {
+			return x.AliOSS
+		}
+	}
+	return nil
+}
+
+type isImageOutput_Output interface {
+	isImageOutput_Output()
+}
+
+type ImageOutput_S3 struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	S3 *S3Upload `protobuf:"bytes,8,opt,name=s3,proto3,oneof"`
+}
+
+type ImageOutput_Gcp struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Gcp *GCPUpload `protobuf:"bytes,9,opt,name=gcp,proto3,oneof"`
+}
+
+type ImageOutput_Azure struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Azure *AzureBlobUpload `protobuf:"bytes,10,opt,name=azure,proto3,oneof"`
+}
+
+type ImageOutput_AliOSS struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	AliOSS *AliOSSUpload `protobuf:"bytes,11,opt,name=aliOSS,proto3,oneof"`
+}
+
+func (*ImageOutput_S3) isImageOutput_Output() {}
+
+func (*ImageOutput_Gcp) isImageOutput_Output() {}
+
+func (*ImageOutput_Azure) isImageOutput_Output() {}
+
+func (*ImageOutput_AliOSS) isImageOutput_Output() {}
+
+// Raw track data packaged into MCAP container format.
+type McapOutput struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`
+	DisableManifest bool                   `protobuf:"varint,2,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *McapOutput) Reset() {
+	*x = McapOutput{}
+	mi := &file_livekit_egress_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *McapOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*McapOutput) ProtoMessage() {}
+
+func (x *McapOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use McapOutput.ProtoReflect.Descriptor instead.
+func (*McapOutput) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *McapOutput) GetFilepath() string {
+	if x != nil {
+		return x.Filepath
+	}
+	return ""
+}
+
+func (x *McapOutput) GetDisableManifest() bool {
+	if x != nil {
+		return x.DisableManifest
+	}
+	return false
+}
+
+type StorageConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Provider:
+	//
+	//	*StorageConfig_S3
+	//	*StorageConfig_Gcp
+	//	*StorageConfig_Azure
+	//	*StorageConfig_AliOss
+	Provider      isStorageConfig_Provider `protobuf_oneof:"provider"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StorageConfig) Reset() {
+	*x = StorageConfig{}
+	mi := &file_livekit_egress_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StorageConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StorageConfig) ProtoMessage() {}
+
+func (x *StorageConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StorageConfig.ProtoReflect.Descriptor instead.
+func (*StorageConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *StorageConfig) GetProvider() isStorageConfig_Provider {
+	if x != nil {
+		return x.Provider
+	}
+	return nil
+}
+
+func (x *StorageConfig) GetS3() *S3Upload {
+	if x != nil {
+		if x, ok := x.Provider.(*StorageConfig_S3); ok {
+			return x.S3
+		}
+	}
+	return nil
+}
+
+func (x *StorageConfig) GetGcp() *GCPUpload {
+	if x != nil {
+		if x, ok := x.Provider.(*StorageConfig_Gcp); ok {
+			return x.Gcp
+		}
+	}
+	return nil
+}
+
+func (x *StorageConfig) GetAzure() *AzureBlobUpload {
+	if x != nil {
+		if x, ok := x.Provider.(*StorageConfig_Azure); ok {
+			return x.Azure
+		}
+	}
+	return nil
+}
+
+func (x *StorageConfig) GetAliOss() *AliOSSUpload {
+	if x != nil {
+		if x, ok := x.Provider.(*StorageConfig_AliOss); ok {
+			return x.AliOss
+		}
+	}
+	return nil
+}
+
+type isStorageConfig_Provider interface {
+	isStorageConfig_Provider()
+}
+
+type StorageConfig_S3 struct {
+	S3 *S3Upload `protobuf:"bytes,1,opt,name=s3,proto3,oneof"`
+}
+
+type StorageConfig_Gcp struct {
+	Gcp *GCPUpload `protobuf:"bytes,2,opt,name=gcp,proto3,oneof"`
+}
+
+type StorageConfig_Azure struct {
+	Azure *AzureBlobUpload `protobuf:"bytes,3,opt,name=azure,proto3,oneof"`
+}
+
+type StorageConfig_AliOss struct {
+	AliOss *AliOSSUpload `protobuf:"bytes,4,opt,name=ali_oss,json=aliOss,proto3,oneof"`
+}
+
+func (*StorageConfig_S3) isStorageConfig_Provider() {}
+
+func (*StorageConfig_Gcp) isStorageConfig_Provider() {}
+
+func (*StorageConfig_Azure) isStorageConfig_Provider() {}
+
+func (*StorageConfig_AliOss) isStorageConfig_Provider() {}
+
+type S3Upload struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	AccessKey            string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	Secret               string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	SessionToken         string                 `protobuf:"bytes,11,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
+	AssumeRoleArn        string                 `protobuf:"bytes,12,opt,name=assume_role_arn,json=assumeRoleArn,proto3" json:"assume_role_arn,omitempty"`                        // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
+	AssumeRoleExternalId string                 `protobuf:"bytes,13,opt,name=assume_role_external_id,json=assumeRoleExternalId,proto3" json:"assume_role_external_id,omitempty"` // ExternalID to use when assuming role for upload
+	Region               string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Endpoint             string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Bucket               string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	ForcePathStyle       bool                   `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
+	Metadata             map[string]string      `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Tagging              string                 `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
+	ContentDisposition   string                 `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"` // Content-Disposition header
+	Proxy                *ProxyConfig           `protobuf:"bytes,10,opt,name=proxy,proto3" json:"proxy,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *S3Upload) Reset() {
+	*x = S3Upload{}
+	mi := &file_livekit_egress_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *S3Upload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*S3Upload) ProtoMessage() {}
+
+func (x *S3Upload) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use S3Upload.ProtoReflect.Descriptor instead.
+func (*S3Upload) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *S3Upload) GetAccessKey() string {
+	if x != nil {
+		return x.AccessKey
+	}
+	return ""
+}
+
+func (x *S3Upload) GetSecret() string {
+	if x != nil {
+		return x.Secret
+	}
+	return ""
+}
+
+func (x *S3Upload) GetSessionToken() string {
+	if x != nil {
+		return x.SessionToken
+	}
+	return ""
+}
+
+func (x *S3Upload) GetAssumeRoleArn() string {
+	if x != nil {
+		return x.AssumeRoleArn
+	}
+	return ""
+}
+
+func (x *S3Upload) GetAssumeRoleExternalId() string {
+	if x != nil {
+		return x.AssumeRoleExternalId
+	}
+	return ""
+}
+
+func (x *S3Upload) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *S3Upload) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *S3Upload) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+func (x *S3Upload) GetForcePathStyle() bool {
+	if x != nil {
+		return x.ForcePathStyle
+	}
+	return false
+}
+
+func (x *S3Upload) GetMetadata() map[string]string {
+	if x != nil {
+		return x.Metadata
+	}
+	return nil
+}
+
+func (x *S3Upload) GetTagging() string {
+	if x != nil {
+		return x.Tagging
+	}
+	return ""
+}
+
+func (x *S3Upload) GetContentDisposition() string {
+	if x != nil {
+		return x.ContentDisposition
+	}
+	return ""
+}
+
+func (x *S3Upload) GetProxy() *ProxyConfig {
+	if x != nil {
+		return x.Proxy
+	}
+	return nil
+}
+
+type GCPUpload struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// service account credentials serialized in JSON "credentials.json"
+	Credentials   string       `protobuf:"bytes,1,opt,name=credentials,proto3" json:"credentials,omitempty"`
+	Bucket        string       `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	Proxy         *ProxyConfig `protobuf:"bytes,3,opt,name=proxy,proto3" json:"proxy,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GCPUpload) Reset() {
+	*x = GCPUpload{}
+	mi := &file_livekit_egress_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GCPUpload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GCPUpload) ProtoMessage() {}
+
+func (x *GCPUpload) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GCPUpload.ProtoReflect.Descriptor instead.
+func (*GCPUpload) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *GCPUpload) GetCredentials() string {
+	if x != nil {
+		return x.Credentials
+	}
+	return ""
+}
+
+func (x *GCPUpload) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+func (x *GCPUpload) GetProxy() *ProxyConfig {
+	if x != nil {
+		return x.Proxy
+	}
+	return nil
+}
+
+type AzureBlobUpload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccountName   string                 `protobuf:"bytes,1,opt,name=account_name,json=accountName,proto3" json:"account_name,omitempty"`
+	AccountKey    string                 `protobuf:"bytes,2,opt,name=account_key,json=accountKey,proto3" json:"account_key,omitempty"`
+	ContainerName string                 `protobuf:"bytes,3,opt,name=container_name,json=containerName,proto3" json:"container_name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AzureBlobUpload) Reset() {
+	*x = AzureBlobUpload{}
+	mi := &file_livekit_egress_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AzureBlobUpload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AzureBlobUpload) ProtoMessage() {}
+
+func (x *AzureBlobUpload) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AzureBlobUpload.ProtoReflect.Descriptor instead.
+func (*AzureBlobUpload) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *AzureBlobUpload) GetAccountName() string {
+	if x != nil {
+		return x.AccountName
+	}
+	return ""
+}
+
+func (x *AzureBlobUpload) GetAccountKey() string {
+	if x != nil {
+		return x.AccountKey
+	}
+	return ""
+}
+
+func (x *AzureBlobUpload) GetContainerName() string {
+	if x != nil {
+		return x.ContainerName
+	}
+	return ""
+}
+
+type AliOSSUpload struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AccessKey     string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
+	Secret        string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
+	Region        string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Bucket        string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AliOSSUpload) Reset() {
+	*x = AliOSSUpload{}
+	mi := &file_livekit_egress_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AliOSSUpload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AliOSSUpload) ProtoMessage() {}
+
+func (x *AliOSSUpload) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AliOSSUpload.ProtoReflect.Descriptor instead.
+func (*AliOSSUpload) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *AliOSSUpload) GetAccessKey() string {
+	if x != nil {
+		return x.AccessKey
+	}
+	return ""
+}
+
+func (x *AliOSSUpload) GetSecret() string {
+	if x != nil {
+		return x.Secret
+	}
+	return ""
+}
+
+func (x *AliOSSUpload) GetRegion() string {
+	if x != nil {
+		return x.Region
+	}
+	return ""
+}
+
+func (x *AliOSSUpload) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *AliOSSUpload) GetBucket() string {
+	if x != nil {
+		return x.Bucket
+	}
+	return ""
+}
+
+type ProxyConfig struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ProxyConfig) Reset() {
+	*x = ProxyConfig{}
+	mi := &file_livekit_egress_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ProxyConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProxyConfig) ProtoMessage() {}
+
+func (x *ProxyConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProxyConfig.ProtoReflect.Descriptor instead.
+func (*ProxyConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ProxyConfig) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *ProxyConfig) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+func (x *ProxyConfig) GetPassword() string {
+	if x != nil {
+		return x.Password
+	}
+	return ""
+}
+
+type ListEgressRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // (optional, filter by room name)
+	EgressId      string                 `protobuf:"bytes,2,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"` // (optional, filter by egress ID)
+	Active        bool                   `protobuf:"varint,3,opt,name=active,proto3" json:"active,omitempty"`                    // (optional, list active egress only)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListEgressRequest) Reset() {
+	*x = ListEgressRequest{}
+	mi := &file_livekit_egress_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListEgressRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListEgressRequest) ProtoMessage() {}
+
+func (x *ListEgressRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListEgressRequest.ProtoReflect.Descriptor instead.
+func (*ListEgressRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ListEgressRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *ListEgressRequest) GetEgressId() string {
+	if x != nil {
+		return x.EgressId
+	}
+	return ""
+}
+
+func (x *ListEgressRequest) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
+}
+
+type ListEgressResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Items         []*EgressInfo          `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListEgressResponse) Reset() {
+	*x = ListEgressResponse{}
+	mi := &file_livekit_egress_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListEgressResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListEgressResponse) ProtoMessage() {}
+
+func (x *ListEgressResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListEgressResponse.ProtoReflect.Descriptor instead.
+func (*ListEgressResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ListEgressResponse) GetItems() []*EgressInfo {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
+type UpdateEgressRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	EgressId         string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
+	Url              string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	Layout           string                 `protobuf:"bytes,3,opt,name=layout,proto3" json:"layout,omitempty"`
+	AddStreamUrls    []string               `protobuf:"bytes,4,rep,name=add_stream_urls,json=addStreamUrls,proto3" json:"add_stream_urls,omitempty"`
+	RemoveStreamUrls []string               `protobuf:"bytes,5,rep,name=remove_stream_urls,json=removeStreamUrls,proto3" json:"remove_stream_urls,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *UpdateEgressRequest) Reset() {
+	*x = UpdateEgressRequest{}
+	mi := &file_livekit_egress_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateEgressRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateEgressRequest) ProtoMessage() {}
+
+func (x *UpdateEgressRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateEgressRequest.ProtoReflect.Descriptor instead.
+func (*UpdateEgressRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *UpdateEgressRequest) GetEgressId() string {
+	if x != nil {
+		return x.EgressId
+	}
+	return ""
+}
+
+func (x *UpdateEgressRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *UpdateEgressRequest) GetLayout() string {
+	if x != nil {
+		return x.Layout
+	}
+	return ""
+}
+
+func (x *UpdateEgressRequest) GetAddStreamUrls() []string {
+	if x != nil {
+		return x.AddStreamUrls
+	}
+	return nil
+}
+
+func (x *UpdateEgressRequest) GetRemoveStreamUrls() []string {
+	if x != nil {
+		return x.RemoveStreamUrls
+	}
+	return nil
+}
+
+type StopEgressRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EgressId      string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StopEgressRequest) Reset() {
+	*x = StopEgressRequest{}
+	mi := &file_livekit_egress_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StopEgressRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StopEgressRequest) ProtoMessage() {}
+
+func (x *StopEgressRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StopEgressRequest.ProtoReflect.Descriptor instead.
+func (*StopEgressRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *StopEgressRequest) GetEgressId() string {
+	if x != nil {
+		return x.EgressId
+	}
+	return ""
+}
+
+type EgressInfo struct {
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	EgressId   string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
+	RoomId     string                 `protobuf:"bytes,2,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	RoomName   string                 `protobuf:"bytes,13,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	SourceType EgressSourceType       `protobuf:"varint,26,opt,name=source_type,json=sourceType,proto3,enum=livekit.EgressSourceType" json:"source_type,omitempty"`
+	Status     EgressStatus           `protobuf:"varint,3,opt,name=status,proto3,enum=livekit.EgressStatus" json:"status,omitempty"`
+	StartedAt  int64                  `protobuf:"varint,10,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt    int64                  `protobuf:"varint,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	UpdatedAt  int64                  `protobuf:"varint,18,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	// Types that are valid to be assigned to Request:
+	//
+	//	*EgressInfo_Egress
+	//	*EgressInfo_Replay
+	//	*EgressInfo_RoomComposite
+	//	*EgressInfo_Web
+	//	*EgressInfo_Participant
+	//	*EgressInfo_TrackComposite
+	//	*EgressInfo_Track
+	Request           isEgressInfo_Request `protobuf_oneof:"request"`
+	StreamResults     []*StreamInfo        `protobuf:"bytes,15,rep,name=stream_results,json=streamResults,proto3" json:"stream_results,omitempty"`
+	FileResults       []*FileInfo          `protobuf:"bytes,16,rep,name=file_results,json=fileResults,proto3" json:"file_results,omitempty"`
+	SegmentResults    []*SegmentsInfo      `protobuf:"bytes,17,rep,name=segment_results,json=segmentResults,proto3" json:"segment_results,omitempty"`
+	ImageResults      []*ImagesInfo        `protobuf:"bytes,20,rep,name=image_results,json=imageResults,proto3" json:"image_results,omitempty"`
+	McapResults       []*McapInfo          `protobuf:"bytes,28,rep,name=mcap_results,json=mcapResults,proto3" json:"mcap_results,omitempty"`
+	Error             string               `protobuf:"bytes,9,opt,name=error,proto3" json:"error,omitempty"`
+	ErrorCode         int32                `protobuf:"varint,22,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"`
+	Details           string               `protobuf:"bytes,21,opt,name=details,proto3" json:"details,omitempty"`
+	ManifestLocation  string               `protobuf:"bytes,23,opt,name=manifest_location,json=manifestLocation,proto3" json:"manifest_location,omitempty"`
+	BackupStorageUsed bool                 `protobuf:"varint,25,opt,name=backup_storage_used,json=backupStorageUsed,proto3" json:"backup_storage_used,omitempty"`
+	RetryCount        int32                `protobuf:"varint,27,opt,name=retry_count,json=retryCount,proto3" json:"retry_count,omitempty"`
+	// --- Deprecated ---
+	//
+	// Types that are valid to be assigned to Result:
+	//
+	//	*EgressInfo_Stream
+	//	*EgressInfo_File
+	//	*EgressInfo_Segments
+	Result        isEgressInfo_Result `protobuf_oneof:"result"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EgressInfo) Reset() {
+	*x = EgressInfo{}
+	mi := &file_livekit_egress_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EgressInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EgressInfo) ProtoMessage() {}
+
+func (x *EgressInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EgressInfo.ProtoReflect.Descriptor instead.
+func (*EgressInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *EgressInfo) GetEgressId() string {
+	if x != nil {
+		return x.EgressId
+	}
+	return ""
+}
+
+func (x *EgressInfo) GetRoomId() string {
+	if x != nil {
+		return x.RoomId
+	}
+	return ""
+}
+
+func (x *EgressInfo) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *EgressInfo) GetSourceType() EgressSourceType {
+	if x != nil {
+		return x.SourceType
+	}
+	return EgressSourceType_EGRESS_SOURCE_TYPE_WEB
+}
+
+func (x *EgressInfo) GetStatus() EgressStatus {
+	if x != nil {
+		return x.Status
+	}
+	return EgressStatus_EGRESS_STARTING
+}
+
+func (x *EgressInfo) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *EgressInfo) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+func (x *EgressInfo) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
+func (x *EgressInfo) GetRequest() isEgressInfo_Request {
+	if x != nil {
+		return x.Request
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetEgress() *StartEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_Egress); ok {
+			return x.Egress
+		}
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetReplay() *ExportReplayRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_Replay); ok {
+			return x.Replay
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetRoomComposite() *RoomCompositeEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_RoomComposite); ok {
+			return x.RoomComposite
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetWeb() *WebEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_Web); ok {
+			return x.Web
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetParticipant() *ParticipantEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_Participant); ok {
+			return x.Participant
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetTrackComposite() *TrackCompositeEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_TrackComposite); ok {
+			return x.TrackComposite
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetTrack() *TrackEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*EgressInfo_Track); ok {
+			return x.Track
+		}
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetStreamResults() []*StreamInfo {
+	if x != nil {
+		return x.StreamResults
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetFileResults() []*FileInfo {
+	if x != nil {
+		return x.FileResults
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetSegmentResults() []*SegmentsInfo {
+	if x != nil {
+		return x.SegmentResults
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetImageResults() []*ImagesInfo {
+	if x != nil {
+		return x.ImageResults
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetMcapResults() []*McapInfo {
+	if x != nil {
+		return x.McapResults
+	}
+	return nil
+}
+
+func (x *EgressInfo) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *EgressInfo) GetErrorCode() int32 {
+	if x != nil {
+		return x.ErrorCode
+	}
+	return 0
+}
+
+func (x *EgressInfo) GetDetails() string {
+	if x != nil {
+		return x.Details
+	}
+	return ""
+}
+
+func (x *EgressInfo) GetManifestLocation() string {
+	if x != nil {
+		return x.ManifestLocation
+	}
+	return ""
+}
+
+func (x *EgressInfo) GetBackupStorageUsed() bool {
+	if x != nil {
+		return x.BackupStorageUsed
+	}
+	return false
+}
+
+func (x *EgressInfo) GetRetryCount() int32 {
+	if x != nil {
+		return x.RetryCount
+	}
+	return 0
+}
+
+func (x *EgressInfo) GetResult() isEgressInfo_Result {
+	if x != nil {
+		return x.Result
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetStream() *StreamInfoList {
+	if x != nil {
+		if x, ok := x.Result.(*EgressInfo_Stream); ok {
+			return x.Stream
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetFile() *FileInfo {
+	if x != nil {
+		if x, ok := x.Result.(*EgressInfo_File); ok {
+			return x.File
+		}
+	}
+	return nil
+}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+func (x *EgressInfo) GetSegments() *SegmentsInfo {
+	if x != nil {
+		if x, ok := x.Result.(*EgressInfo_Segments); ok {
+			return x.Segments
+		}
+	}
+	return nil
+}
+
+type isEgressInfo_Request interface {
+	isEgressInfo_Request()
+}
+
+type EgressInfo_Egress struct {
+	Egress *StartEgressRequest `protobuf:"bytes,29,opt,name=egress,proto3,oneof"`
+}
+
+type EgressInfo_Replay struct {
+	Replay *ExportReplayRequest `protobuf:"bytes,30,opt,name=replay,proto3,oneof"`
+}
+
+type EgressInfo_RoomComposite struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	RoomComposite *RoomCompositeEgressRequest `protobuf:"bytes,4,opt,name=room_composite,json=roomComposite,proto3,oneof"`
+}
+
+type EgressInfo_Web struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Web *WebEgressRequest `protobuf:"bytes,14,opt,name=web,proto3,oneof"`
+}
+
+type EgressInfo_Participant struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Participant *ParticipantEgressRequest `protobuf:"bytes,19,opt,name=participant,proto3,oneof"`
+}
+
+type EgressInfo_TrackComposite struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	TrackComposite *TrackCompositeEgressRequest `protobuf:"bytes,5,opt,name=track_composite,json=trackComposite,proto3,oneof"`
+}
+
+type EgressInfo_Track struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Track *TrackEgressRequest `protobuf:"bytes,6,opt,name=track,proto3,oneof"`
+}
+
+func (*EgressInfo_Egress) isEgressInfo_Request() {}
+
+func (*EgressInfo_Replay) isEgressInfo_Request() {}
+
+func (*EgressInfo_RoomComposite) isEgressInfo_Request() {}
+
+func (*EgressInfo_Web) isEgressInfo_Request() {}
+
+func (*EgressInfo_Participant) isEgressInfo_Request() {}
+
+func (*EgressInfo_TrackComposite) isEgressInfo_Request() {}
+
+func (*EgressInfo_Track) isEgressInfo_Request() {}
+
+type isEgressInfo_Result interface {
+	isEgressInfo_Result()
+}
+
+type EgressInfo_Stream struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Stream *StreamInfoList `protobuf:"bytes,7,opt,name=stream,proto3,oneof"`
+}
+
+type EgressInfo_File struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	File *FileInfo `protobuf:"bytes,8,opt,name=file,proto3,oneof"`
+}
+
+type EgressInfo_Segments struct {
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	Segments *SegmentsInfo `protobuf:"bytes,12,opt,name=segments,proto3,oneof"`
+}
+
+func (*EgressInfo_Stream) isEgressInfo_Result() {}
+
+func (*EgressInfo_File) isEgressInfo_Result() {}
+
+func (*EgressInfo_Segments) isEgressInfo_Result() {}
+
+type StreamInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	StartedAt     int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt       int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	Duration      int64                  `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
+	Status        StreamInfo_Status      `protobuf:"varint,5,opt,name=status,proto3,enum=livekit.StreamInfo_Status" json:"status,omitempty"`
+	Error         string                 `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
+	LastRetryAt   int64                  `protobuf:"varint,7,opt,name=last_retry_at,json=lastRetryAt,proto3" json:"last_retry_at,omitempty"`
+	Retries       uint32                 `protobuf:"varint,8,opt,name=retries,proto3" json:"retries,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StreamInfo) Reset() {
+	*x = StreamInfo{}
+	mi := &file_livekit_egress_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StreamInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StreamInfo) ProtoMessage() {}
+
+func (x *StreamInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StreamInfo.ProtoReflect.Descriptor instead.
+func (*StreamInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *StreamInfo) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *StreamInfo) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *StreamInfo) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+func (x *StreamInfo) GetDuration() int64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *StreamInfo) GetStatus() StreamInfo_Status {
+	if x != nil {
+		return x.Status
+	}
+	return StreamInfo_ACTIVE
+}
+
+func (x *StreamInfo) GetError() string {
+	if x != nil {
+		return x.Error
+	}
+	return ""
+}
+
+func (x *StreamInfo) GetLastRetryAt() int64 {
+	if x != nil {
+		return x.LastRetryAt
+	}
+	return 0
+}
+
+func (x *StreamInfo) GetRetries() uint32 {
+	if x != nil {
+		return x.Retries
+	}
+	return 0
+}
+
+type FileInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	StartedAt     int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt       int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	Duration      int64                  `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty"`
+	Size          int64                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	Location      string                 `protobuf:"bytes,5,opt,name=location,proto3" json:"location,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *FileInfo) Reset() {
+	*x = FileInfo{}
+	mi := &file_livekit_egress_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *FileInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FileInfo) ProtoMessage() {}
+
+func (x *FileInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
+func (*FileInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *FileInfo) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *FileInfo) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *FileInfo) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+func (x *FileInfo) GetDuration() int64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *FileInfo) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *FileInfo) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
+type SegmentsInfo struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	PlaylistName         string                 `protobuf:"bytes,1,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`
+	LivePlaylistName     string                 `protobuf:"bytes,8,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`
+	Duration             int64                  `protobuf:"varint,2,opt,name=duration,proto3" json:"duration,omitempty"`
+	Size                 int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
+	PlaylistLocation     string                 `protobuf:"bytes,4,opt,name=playlist_location,json=playlistLocation,proto3" json:"playlist_location,omitempty"`
+	LivePlaylistLocation string                 `protobuf:"bytes,9,opt,name=live_playlist_location,json=livePlaylistLocation,proto3" json:"live_playlist_location,omitempty"`
+	SegmentCount         int64                  `protobuf:"varint,5,opt,name=segment_count,json=segmentCount,proto3" json:"segment_count,omitempty"`
+	StartedAt            int64                  `protobuf:"varint,6,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt              int64                  `protobuf:"varint,7,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *SegmentsInfo) Reset() {
+	*x = SegmentsInfo{}
+	mi := &file_livekit_egress_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SegmentsInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SegmentsInfo) ProtoMessage() {}
+
+func (x *SegmentsInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SegmentsInfo.ProtoReflect.Descriptor instead.
+func (*SegmentsInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *SegmentsInfo) GetPlaylistName() string {
+	if x != nil {
+		return x.PlaylistName
+	}
+	return ""
+}
+
+func (x *SegmentsInfo) GetLivePlaylistName() string {
+	if x != nil {
+		return x.LivePlaylistName
+	}
+	return ""
+}
+
+func (x *SegmentsInfo) GetDuration() int64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *SegmentsInfo) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *SegmentsInfo) GetPlaylistLocation() string {
+	if x != nil {
+		return x.PlaylistLocation
+	}
+	return ""
+}
+
+func (x *SegmentsInfo) GetLivePlaylistLocation() string {
+	if x != nil {
+		return x.LivePlaylistLocation
+	}
+	return ""
+}
+
+func (x *SegmentsInfo) GetSegmentCount() int64 {
+	if x != nil {
+		return x.SegmentCount
+	}
+	return 0
+}
+
+func (x *SegmentsInfo) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *SegmentsInfo) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+type ImagesInfo struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	FilenamePrefix string                 `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`
+	ImageCount     int64                  `protobuf:"varint,1,opt,name=image_count,json=imageCount,proto3" json:"image_count,omitempty"`
+	StartedAt      int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt        int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ImagesInfo) Reset() {
+	*x = ImagesInfo{}
+	mi := &file_livekit_egress_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImagesInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImagesInfo) ProtoMessage() {}
+
+func (x *ImagesInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImagesInfo.ProtoReflect.Descriptor instead.
+func (*ImagesInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ImagesInfo) GetFilenamePrefix() string {
+	if x != nil {
+		return x.FilenamePrefix
+	}
+	return ""
+}
+
+func (x *ImagesInfo) GetImageCount() int64 {
+	if x != nil {
+		return x.ImageCount
+	}
+	return 0
+}
+
+func (x *ImagesInfo) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *ImagesInfo) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+type McapInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
+	StartedAt     int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	EndedAt       int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	Duration      int64                  `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
+	Size          int64                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
+	Location      string                 `protobuf:"bytes,6,opt,name=location,proto3" json:"location,omitempty"`
+	TrackCount    int64                  `protobuf:"varint,7,opt,name=track_count,json=trackCount,proto3" json:"track_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *McapInfo) Reset() {
+	*x = McapInfo{}
+	mi := &file_livekit_egress_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *McapInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*McapInfo) ProtoMessage() {}
+
+func (x *McapInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use McapInfo.ProtoReflect.Descriptor instead.
+func (*McapInfo) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *McapInfo) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *McapInfo) GetStartedAt() int64 {
+	if x != nil {
+		return x.StartedAt
+	}
+	return 0
+}
+
+func (x *McapInfo) GetEndedAt() int64 {
+	if x != nil {
+		return x.EndedAt
+	}
+	return 0
+}
+
+func (x *McapInfo) GetDuration() int64 {
+	if x != nil {
+		return x.Duration
+	}
+	return 0
+}
+
+func (x *McapInfo) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *McapInfo) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
+func (x *McapInfo) GetTrackCount() int64 {
+	if x != nil {
+		return x.TrackCount
+	}
+	return 0
+}
+
+type AutoParticipantEgress struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Options:
+	//
+	//	*AutoParticipantEgress_Preset
+	//	*AutoParticipantEgress_Advanced
+	Options        isAutoParticipantEgress_Options `protobuf_oneof:"options"`
+	FileOutputs    []*EncodedFileOutput            `protobuf:"bytes,3,rep,name=file_outputs,json=fileOutputs,proto3" json:"file_outputs,omitempty"`
+	SegmentOutputs []*SegmentedFileOutput          `protobuf:"bytes,4,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *AutoParticipantEgress) Reset() {
+	*x = AutoParticipantEgress{}
+	mi := &file_livekit_egress_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AutoParticipantEgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutoParticipantEgress) ProtoMessage() {}
+
+func (x *AutoParticipantEgress) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutoParticipantEgress.ProtoReflect.Descriptor instead.
+func (*AutoParticipantEgress) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *AutoParticipantEgress) GetOptions() isAutoParticipantEgress_Options {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetPreset() EncodingOptionsPreset {
+	if x != nil {
+		if x, ok := x.Options.(*AutoParticipantEgress_Preset); ok {
+			return x.Preset
+		}
+	}
+	return EncodingOptionsPreset_H264_720P_30
+}
+
+func (x *AutoParticipantEgress) GetAdvanced() *EncodingOptions {
+	if x != nil {
+		if x, ok := x.Options.(*AutoParticipantEgress_Advanced); ok {
+			return x.Advanced
+		}
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetFileOutputs() []*EncodedFileOutput {
+	if x != nil {
+		return x.FileOutputs
+	}
+	return nil
+}
+
+func (x *AutoParticipantEgress) GetSegmentOutputs() []*SegmentedFileOutput {
+	if x != nil {
+		return x.SegmentOutputs
+	}
+	return nil
+}
+
+type isAutoParticipantEgress_Options interface {
+	isAutoParticipantEgress_Options()
+}
+
+type AutoParticipantEgress_Preset struct {
+	Preset EncodingOptionsPreset `protobuf:"varint,1,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
+}
+
+type AutoParticipantEgress_Advanced struct {
+	Advanced *EncodingOptions `protobuf:"bytes,2,opt,name=advanced,proto3,oneof"` // (optional)
+}
+
+func (*AutoParticipantEgress_Preset) isAutoParticipantEgress_Options() {}
+
+func (*AutoParticipantEgress_Advanced) isAutoParticipantEgress_Options() {}
+
+type AutoTrackEgress struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see docs for templating (default {track_id}-{time})
+	DisableManifest bool                   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"` // disables upload of json manifest file (default false)
+	// Types that are valid to be assigned to Output:
+	//
+	//	*AutoTrackEgress_S3
+	//	*AutoTrackEgress_Gcp
+	//	*AutoTrackEgress_Azure
+	//	*AutoTrackEgress_AliOSS
+	Output        isAutoTrackEgress_Output `protobuf_oneof:"output"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AutoTrackEgress) Reset() {
+	*x = AutoTrackEgress{}
+	mi := &file_livekit_egress_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AutoTrackEgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AutoTrackEgress) ProtoMessage() {}
+
+func (x *AutoTrackEgress) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AutoTrackEgress.ProtoReflect.Descriptor instead.
+func (*AutoTrackEgress) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *AutoTrackEgress) GetFilepath() string {
+	if x != nil {
+		return x.Filepath
+	}
+	return ""
+}
+
+func (x *AutoTrackEgress) GetDisableManifest() bool {
+	if x != nil {
+		return x.DisableManifest
+	}
+	return false
+}
+
+func (x *AutoTrackEgress) GetOutput() isAutoTrackEgress_Output {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetS3() *S3Upload {
+	if x != nil {
+		if x, ok := x.Output.(*AutoTrackEgress_S3); ok {
+			return x.S3
+		}
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetGcp() *GCPUpload {
+	if x != nil {
+		if x, ok := x.Output.(*AutoTrackEgress_Gcp); ok {
+			return x.Gcp
+		}
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetAzure() *AzureBlobUpload {
+	if x != nil {
+		if x, ok := x.Output.(*AutoTrackEgress_Azure); ok {
+			return x.Azure
+		}
+	}
+	return nil
+}
+
+func (x *AutoTrackEgress) GetAliOSS() *AliOSSUpload {
+	if x != nil {
+		if x, ok := x.Output.(*AutoTrackEgress_AliOSS); ok {
+			return x.AliOSS
+		}
+	}
+	return nil
+}
+
+type isAutoTrackEgress_Output interface {
+	isAutoTrackEgress_Output()
+}
+
+type AutoTrackEgress_S3 struct {
+	S3 *S3Upload `protobuf:"bytes,2,opt,name=s3,proto3,oneof"`
+}
+
+type AutoTrackEgress_Gcp struct {
+	Gcp *GCPUpload `protobuf:"bytes,3,opt,name=gcp,proto3,oneof"`
+}
+
+type AutoTrackEgress_Azure struct {
+	Azure *AzureBlobUpload `protobuf:"bytes,4,opt,name=azure,proto3,oneof"`
+}
+
+type AutoTrackEgress_AliOSS struct {
+	AliOSS *AliOSSUpload `protobuf:"bytes,6,opt,name=aliOSS,proto3,oneof"`
+}
+
+func (*AutoTrackEgress_S3) isAutoTrackEgress_Output() {}
+
+func (*AutoTrackEgress_Gcp) isAutoTrackEgress_Output() {}
+
+func (*AutoTrackEgress_Azure) isAutoTrackEgress_Output() {}
+
+func (*AutoTrackEgress_AliOSS) isAutoTrackEgress_Output() {}
+
+type ExportReplayRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ReplayId      string                 `protobuf:"bytes,1,opt,name=replay_id,json=replayId,proto3" json:"replay_id,omitempty"`
+	StartOffsetMs int64                  `protobuf:"varint,2,opt,name=start_offset_ms,json=startOffsetMs,proto3" json:"start_offset_ms,omitempty"`
+	EndOffsetMs   int64                  `protobuf:"varint,3,opt,name=end_offset_ms,json=endOffsetMs,proto3" json:"end_offset_ms,omitempty"`
+	// Types that are valid to be assigned to Source:
+	//
+	//	*ExportReplayRequest_Template
+	//	*ExportReplayRequest_Web
+	//	*ExportReplayRequest_Media
+	Source isExportReplayRequest_Source `protobuf_oneof:"source"`
+	// Types that are valid to be assigned to Encoding:
+	//
+	//	*ExportReplayRequest_Preset
+	//	*ExportReplayRequest_Advanced
+	Encoding      isExportReplayRequest_Encoding `protobuf_oneof:"encoding"`
+	Outputs       []*Output                      `protobuf:"bytes,9,rep,name=outputs,proto3" json:"outputs,omitempty"`
+	Storage       *StorageConfig                 `protobuf:"bytes,10,opt,name=storage,proto3" json:"storage,omitempty"`
+	Webhooks      []*WebhookConfig               `protobuf:"bytes,11,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ExportReplayRequest) Reset() {
+	*x = ExportReplayRequest{}
+	mi := &file_livekit_egress_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ExportReplayRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExportReplayRequest) ProtoMessage() {}
+
+func (x *ExportReplayRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExportReplayRequest.ProtoReflect.Descriptor instead.
+func (*ExportReplayRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *ExportReplayRequest) GetReplayId() string {
+	if x != nil {
+		return x.ReplayId
+	}
+	return ""
+}
+
+func (x *ExportReplayRequest) GetStartOffsetMs() int64 {
+	if x != nil {
+		return x.StartOffsetMs
+	}
+	return 0
+}
+
+func (x *ExportReplayRequest) GetEndOffsetMs() int64 {
+	if x != nil {
+		return x.EndOffsetMs
+	}
+	return 0
+}
+
+func (x *ExportReplayRequest) GetSource() isExportReplayRequest_Source {
+	if x != nil {
+		return x.Source
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetTemplate() *TemplateSource {
+	if x != nil {
+		if x, ok := x.Source.(*ExportReplayRequest_Template); ok {
+			return x.Template
+		}
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetWeb() *WebSource {
+	if x != nil {
+		if x, ok := x.Source.(*ExportReplayRequest_Web); ok {
+			return x.Web
+		}
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetMedia() *MediaSource {
+	if x != nil {
+		if x, ok := x.Source.(*ExportReplayRequest_Media); ok {
+			return x.Media
+		}
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetEncoding() isExportReplayRequest_Encoding {
+	if x != nil {
+		return x.Encoding
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetPreset() EncodingOptionsPreset {
+	if x != nil {
+		if x, ok := x.Encoding.(*ExportReplayRequest_Preset); ok {
+			return x.Preset
+		}
+	}
+	return EncodingOptionsPreset_H264_720P_30
+}
+
+func (x *ExportReplayRequest) GetAdvanced() *EncodingOptions {
+	if x != nil {
+		if x, ok := x.Encoding.(*ExportReplayRequest_Advanced); ok {
+			return x.Advanced
+		}
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetOutputs() []*Output {
+	if x != nil {
+		return x.Outputs
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetStorage() *StorageConfig {
+	if x != nil {
+		return x.Storage
+	}
+	return nil
+}
+
+func (x *ExportReplayRequest) GetWebhooks() []*WebhookConfig {
+	if x != nil {
+		return x.Webhooks
+	}
+	return nil
+}
+
+type isExportReplayRequest_Source interface {
+	isExportReplayRequest_Source()
+}
+
+type ExportReplayRequest_Template struct {
+	Template *TemplateSource `protobuf:"bytes,4,opt,name=template,proto3,oneof"`
+}
+
+type ExportReplayRequest_Web struct {
+	Web *WebSource `protobuf:"bytes,5,opt,name=web,proto3,oneof"`
+}
+
+type ExportReplayRequest_Media struct {
+	Media *MediaSource `protobuf:"bytes,6,opt,name=media,proto3,oneof"`
+}
+
+func (*ExportReplayRequest_Template) isExportReplayRequest_Source() {}
+
+func (*ExportReplayRequest_Web) isExportReplayRequest_Source() {}
+
+func (*ExportReplayRequest_Media) isExportReplayRequest_Source() {}
+
+type isExportReplayRequest_Encoding interface {
+	isExportReplayRequest_Encoding()
+}
+
+type ExportReplayRequest_Preset struct {
+	Preset EncodingOptionsPreset `protobuf:"varint,7,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"`
+}
+
+type ExportReplayRequest_Advanced struct {
+	Advanced *EncodingOptions `protobuf:"bytes,8,opt,name=advanced,proto3,oneof"`
+}
+
+func (*ExportReplayRequest_Preset) isExportReplayRequest_Encoding() {}
+
+func (*ExportReplayRequest_Advanced) isExportReplayRequest_Encoding() {}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type RoomCompositeEgressRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`                                     // required
-	Layout        string                 `protobuf:"bytes,2,opt,name=layout,proto3" json:"layout,omitempty"`                                                         // (optional)
-	AudioOnly     bool                   `protobuf:"varint,3,opt,name=audio_only,json=audioOnly,proto3" json:"audio_only,omitempty"`                                 // (default false)
-	AudioMixing   AudioMixing            `protobuf:"varint,15,opt,name=audio_mixing,json=audioMixing,proto3,enum=livekit.AudioMixing" json:"audio_mixing,omitempty"` // only applies to audio_only egress (default DEFAULT_MIXING)
-	VideoOnly     bool                   `protobuf:"varint,4,opt,name=video_only,json=videoOnly,proto3" json:"video_only,omitempty"`                                 // (default false)
-	CustomBaseUrl string                 `protobuf:"bytes,5,opt,name=custom_base_url,json=customBaseUrl,proto3" json:"custom_base_url,omitempty"`                    // template base url (default https://recorder.livekit.io)
+	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	Layout        string                 `protobuf:"bytes,2,opt,name=layout,proto3" json:"layout,omitempty"`
+	AudioOnly     bool                   `protobuf:"varint,3,opt,name=audio_only,json=audioOnly,proto3" json:"audio_only,omitempty"`
+	AudioMixing   AudioMixing            `protobuf:"varint,15,opt,name=audio_mixing,json=audioMixing,proto3,enum=livekit.AudioMixing" json:"audio_mixing,omitempty"`
+	VideoOnly     bool                   `protobuf:"varint,4,opt,name=video_only,json=videoOnly,proto3" json:"video_only,omitempty"`
+	CustomBaseUrl string                 `protobuf:"bytes,5,opt,name=custom_base_url,json=customBaseUrl,proto3" json:"custom_base_url,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*RoomCompositeEgressRequest_File
@@ -571,14 +4194,14 @@ type RoomCompositeEgressRequest struct {
 	StreamOutputs  []*StreamOutput                      `protobuf:"bytes,12,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput               `protobuf:"bytes,13,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput                       `protobuf:"bytes,14,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
-	Webhooks       []*WebhookConfig                     `protobuf:"bytes,16,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
+	Webhooks       []*WebhookConfig                     `protobuf:"bytes,16,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *RoomCompositeEgressRequest) Reset() {
 	*x = RoomCompositeEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[0]
+	mi := &file_livekit_egress_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -590,7 +4213,7 @@ func (x *RoomCompositeEgressRequest) String() string {
 func (*RoomCompositeEgressRequest) ProtoMessage() {}
 
 func (x *RoomCompositeEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[0]
+	mi := &file_livekit_egress_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -603,7 +4226,7 @@ func (x *RoomCompositeEgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomCompositeEgressRequest.ProtoReflect.Descriptor instead.
 func (*RoomCompositeEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{0}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *RoomCompositeEgressRequest) GetRoomName() string {
@@ -775,18 +4398,18 @@ type isRoomCompositeEgressRequest_Options interface {
 }
 
 type RoomCompositeEgressRequest_Preset struct {
-	Preset EncodingOptionsPreset `protobuf:"varint,8,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
+	Preset EncodingOptionsPreset `protobuf:"varint,8,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"`
 }
 
 type RoomCompositeEgressRequest_Advanced struct {
-	Advanced *EncodingOptions `protobuf:"bytes,9,opt,name=advanced,proto3,oneof"` // (optional)
+	Advanced *EncodingOptions `protobuf:"bytes,9,opt,name=advanced,proto3,oneof"`
 }
 
 func (*RoomCompositeEgressRequest_Preset) isRoomCompositeEgressRequest_Options() {}
 
 func (*RoomCompositeEgressRequest_Advanced) isRoomCompositeEgressRequest_Options() {}
 
-// record any website
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type WebEgressRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Url              string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
@@ -808,14 +4431,14 @@ type WebEgressRequest struct {
 	StreamOutputs  []*StreamOutput            `protobuf:"bytes,10,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput     `protobuf:"bytes,11,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput             `protobuf:"bytes,13,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
-	Webhooks       []*WebhookConfig           `protobuf:"bytes,14,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
+	Webhooks       []*WebhookConfig           `protobuf:"bytes,14,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *WebEgressRequest) Reset() {
 	*x = WebEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[1]
+	mi := &file_livekit_egress_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -827,7 +4450,7 @@ func (x *WebEgressRequest) String() string {
 func (*WebEgressRequest) ProtoMessage() {}
 
 func (x *WebEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[1]
+	mi := &file_livekit_egress_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -840,7 +4463,7 @@ func (x *WebEgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WebEgressRequest.ProtoReflect.Descriptor instead.
 func (*WebEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{1}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *WebEgressRequest) GetUrl() string {
@@ -1010,11 +4633,13 @@ func (*WebEgressRequest_Preset) isWebEgressRequest_Options() {}
 func (*WebEgressRequest_Advanced) isWebEgressRequest_Options() {}
 
 // record audio and video from a single participant
+//
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type ParticipantEgressRequest struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
-	RoomName    string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`           // required
-	Identity    string                 `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`                           // required
-	ScreenShare bool                   `protobuf:"varint,3,opt,name=screen_share,json=screenShare,proto3" json:"screen_share,omitempty"` // (default false)
+	RoomName    string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	Identity    string                 `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	ScreenShare bool                   `protobuf:"varint,3,opt,name=screen_share,json=screenShare,proto3" json:"screen_share,omitempty"`
 	// Types that are valid to be assigned to Options:
 	//
 	//	*ParticipantEgressRequest_Preset
@@ -1024,14 +4649,14 @@ type ParticipantEgressRequest struct {
 	StreamOutputs  []*StreamOutput                    `protobuf:"bytes,7,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput             `protobuf:"bytes,8,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput                     `protobuf:"bytes,9,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
-	Webhooks       []*WebhookConfig                   `protobuf:"bytes,10,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
+	Webhooks       []*WebhookConfig                   `protobuf:"bytes,10,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ParticipantEgressRequest) Reset() {
 	*x = ParticipantEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[2]
+	mi := &file_livekit_egress_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1043,7 +4668,7 @@ func (x *ParticipantEgressRequest) String() string {
 func (*ParticipantEgressRequest) ProtoMessage() {}
 
 func (x *ParticipantEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[2]
+	mi := &file_livekit_egress_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1056,7 +4681,7 @@ func (x *ParticipantEgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ParticipantEgressRequest.ProtoReflect.Descriptor instead.
 func (*ParticipantEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{2}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ParticipantEgressRequest) GetRoomName() string {
@@ -1145,23 +4770,23 @@ type isParticipantEgressRequest_Options interface {
 }
 
 type ParticipantEgressRequest_Preset struct {
-	Preset EncodingOptionsPreset `protobuf:"varint,4,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
+	Preset EncodingOptionsPreset `protobuf:"varint,4,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"`
 }
 
 type ParticipantEgressRequest_Advanced struct {
-	Advanced *EncodingOptions `protobuf:"bytes,5,opt,name=advanced,proto3,oneof"` // (optional)
+	Advanced *EncodingOptions `protobuf:"bytes,5,opt,name=advanced,proto3,oneof"`
 }
 
 func (*ParticipantEgressRequest_Preset) isParticipantEgressRequest_Options() {}
 
 func (*ParticipantEgressRequest_Advanced) isParticipantEgressRequest_Options() {}
 
-// containerize up to one audio and one video track
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type TrackCompositeEgressRequest struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
-	RoomName     string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`               // required
-	AudioTrackId string                 `protobuf:"bytes,2,opt,name=audio_track_id,json=audioTrackId,proto3" json:"audio_track_id,omitempty"` // (optional)
-	VideoTrackId string                 `protobuf:"bytes,3,opt,name=video_track_id,json=videoTrackId,proto3" json:"video_track_id,omitempty"` // (optional)
+	RoomName     string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	AudioTrackId string                 `protobuf:"bytes,2,opt,name=audio_track_id,json=audioTrackId,proto3" json:"audio_track_id,omitempty"`
+	VideoTrackId string                 `protobuf:"bytes,3,opt,name=video_track_id,json=videoTrackId,proto3" json:"video_track_id,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*TrackCompositeEgressRequest_File
@@ -1177,14 +4802,14 @@ type TrackCompositeEgressRequest struct {
 	StreamOutputs  []*StreamOutput                       `protobuf:"bytes,12,rep,name=stream_outputs,json=streamOutputs,proto3" json:"stream_outputs,omitempty"`
 	SegmentOutputs []*SegmentedFileOutput                `protobuf:"bytes,13,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
 	ImageOutputs   []*ImageOutput                        `protobuf:"bytes,14,rep,name=image_outputs,json=imageOutputs,proto3" json:"image_outputs,omitempty"`
-	Webhooks       []*WebhookConfig                      `protobuf:"bytes,15,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
+	Webhooks       []*WebhookConfig                      `protobuf:"bytes,15,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
 
 func (x *TrackCompositeEgressRequest) Reset() {
 	*x = TrackCompositeEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[3]
+	mi := &file_livekit_egress_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1196,7 +4821,7 @@ func (x *TrackCompositeEgressRequest) String() string {
 func (*TrackCompositeEgressRequest) ProtoMessage() {}
 
 func (x *TrackCompositeEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[3]
+	mi := &file_livekit_egress_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1209,7 +4834,7 @@ func (x *TrackCompositeEgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrackCompositeEgressRequest.ProtoReflect.Descriptor instead.
 func (*TrackCompositeEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{3}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *TrackCompositeEgressRequest) GetRoomName() string {
@@ -1360,35 +4985,35 @@ type isTrackCompositeEgressRequest_Options interface {
 }
 
 type TrackCompositeEgressRequest_Preset struct {
-	Preset EncodingOptionsPreset `protobuf:"varint,6,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
+	Preset EncodingOptionsPreset `protobuf:"varint,6,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"`
 }
 
 type TrackCompositeEgressRequest_Advanced struct {
-	Advanced *EncodingOptions `protobuf:"bytes,7,opt,name=advanced,proto3,oneof"` // (optional)
+	Advanced *EncodingOptions `protobuf:"bytes,7,opt,name=advanced,proto3,oneof"`
 }
 
 func (*TrackCompositeEgressRequest_Preset) isTrackCompositeEgressRequest_Options() {}
 
 func (*TrackCompositeEgressRequest_Advanced) isTrackCompositeEgressRequest_Options() {}
 
-// record tracks individually, without transcoding
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type TrackEgressRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
-	RoomName string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // required
-	TrackId  string                 `protobuf:"bytes,2,opt,name=track_id,json=trackId,proto3" json:"track_id,omitempty"`    // required
+	RoomName string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	TrackId  string                 `protobuf:"bytes,2,opt,name=track_id,json=trackId,proto3" json:"track_id,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*TrackEgressRequest_File
 	//	*TrackEgressRequest_WebsocketUrl
 	Output        isTrackEgressRequest_Output `protobuf_oneof:"output"`
-	Webhooks      []*WebhookConfig            `protobuf:"bytes,5,rep,name=webhooks,proto3" json:"webhooks,omitempty"` // extra webhooks to call for this request
+	Webhooks      []*WebhookConfig            `protobuf:"bytes,5,rep,name=webhooks,proto3" json:"webhooks,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *TrackEgressRequest) Reset() {
 	*x = TrackEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[4]
+	mi := &file_livekit_egress_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1400,7 +5025,7 @@ func (x *TrackEgressRequest) String() string {
 func (*TrackEgressRequest) ProtoMessage() {}
 
 func (x *TrackEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[4]
+	mi := &file_livekit_egress_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1413,7 +5038,7 @@ func (x *TrackEgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrackEgressRequest.ProtoReflect.Descriptor instead.
 func (*TrackEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{4}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *TrackEgressRequest) GetRoomName() string {
@@ -1478,11 +5103,143 @@ func (*TrackEgressRequest_File) isTrackEgressRequest_Output() {}
 
 func (*TrackEgressRequest_WebsocketUrl) isTrackEgressRequest_Output() {}
 
+// Deprecated: Marked as deprecated in livekit_egress.proto.
+type DirectFileOutput struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`
+	DisableManifest bool                   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
+	// Types that are valid to be assigned to Output:
+	//
+	//	*DirectFileOutput_S3
+	//	*DirectFileOutput_Gcp
+	//	*DirectFileOutput_Azure
+	//	*DirectFileOutput_AliOSS
+	Output        isDirectFileOutput_Output `protobuf_oneof:"output"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DirectFileOutput) Reset() {
+	*x = DirectFileOutput{}
+	mi := &file_livekit_egress_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DirectFileOutput) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DirectFileOutput) ProtoMessage() {}
+
+func (x *DirectFileOutput) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_egress_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DirectFileOutput.ProtoReflect.Descriptor instead.
+func (*DirectFileOutput) Descriptor() ([]byte, []int) {
+	return file_livekit_egress_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *DirectFileOutput) GetFilepath() string {
+	if x != nil {
+		return x.Filepath
+	}
+	return ""
+}
+
+func (x *DirectFileOutput) GetDisableManifest() bool {
+	if x != nil {
+		return x.DisableManifest
+	}
+	return false
+}
+
+func (x *DirectFileOutput) GetOutput() isDirectFileOutput_Output {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+func (x *DirectFileOutput) GetS3() *S3Upload {
+	if x != nil {
+		if x, ok := x.Output.(*DirectFileOutput_S3); ok {
+			return x.S3
+		}
+	}
+	return nil
+}
+
+func (x *DirectFileOutput) GetGcp() *GCPUpload {
+	if x != nil {
+		if x, ok := x.Output.(*DirectFileOutput_Gcp); ok {
+			return x.Gcp
+		}
+	}
+	return nil
+}
+
+func (x *DirectFileOutput) GetAzure() *AzureBlobUpload {
+	if x != nil {
+		if x, ok := x.Output.(*DirectFileOutput_Azure); ok {
+			return x.Azure
+		}
+	}
+	return nil
+}
+
+func (x *DirectFileOutput) GetAliOSS() *AliOSSUpload {
+	if x != nil {
+		if x, ok := x.Output.(*DirectFileOutput_AliOSS); ok {
+			return x.AliOSS
+		}
+	}
+	return nil
+}
+
+type isDirectFileOutput_Output interface {
+	isDirectFileOutput_Output()
+}
+
+type DirectFileOutput_S3 struct {
+	S3 *S3Upload `protobuf:"bytes,2,opt,name=s3,proto3,oneof"`
+}
+
+type DirectFileOutput_Gcp struct {
+	Gcp *GCPUpload `protobuf:"bytes,3,opt,name=gcp,proto3,oneof"`
+}
+
+type DirectFileOutput_Azure struct {
+	Azure *AzureBlobUpload `protobuf:"bytes,4,opt,name=azure,proto3,oneof"`
+}
+
+type DirectFileOutput_AliOSS struct {
+	AliOSS *AliOSSUpload `protobuf:"bytes,6,opt,name=aliOSS,proto3,oneof"`
+}
+
+func (*DirectFileOutput_S3) isDirectFileOutput_Output() {}
+
+func (*DirectFileOutput_Gcp) isDirectFileOutput_Output() {}
+
+func (*DirectFileOutput_Azure) isDirectFileOutput_Output() {}
+
+func (*DirectFileOutput_AliOSS) isDirectFileOutput_Output() {}
+
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type EncodedFileOutput struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	FileType        EncodedFileType        `protobuf:"varint,1,opt,name=file_type,json=fileType,proto3,enum=livekit.EncodedFileType" json:"file_type,omitempty"` // (optional)
-	Filepath        string                 `protobuf:"bytes,2,opt,name=filepath,proto3" json:"filepath,omitempty"`                                               // see egress docs for templating (default {room_name}-{time})
-	DisableManifest bool                   `protobuf:"varint,6,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`         // disable upload of manifest file (default false)
+	FileType        EncodedFileType        `protobuf:"varint,1,opt,name=file_type,json=fileType,proto3,enum=livekit.EncodedFileType" json:"file_type,omitempty"`
+	Filepath        string                 `protobuf:"bytes,2,opt,name=filepath,proto3" json:"filepath,omitempty"`
+	DisableManifest bool                   `protobuf:"varint,6,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`
 	// Types that are valid to be assigned to Output:
 	//
 	//	*EncodedFileOutput_S3
@@ -1496,7 +5253,7 @@ type EncodedFileOutput struct {
 
 func (x *EncodedFileOutput) Reset() {
 	*x = EncodedFileOutput{}
-	mi := &file_livekit_egress_proto_msgTypes[5]
+	mi := &file_livekit_egress_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1508,7 +5265,7 @@ func (x *EncodedFileOutput) String() string {
 func (*EncodedFileOutput) ProtoMessage() {}
 
 func (x *EncodedFileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[5]
+	mi := &file_livekit_egress_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1521,7 +5278,7 @@ func (x *EncodedFileOutput) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncodedFileOutput.ProtoReflect.Descriptor instead.
 func (*EncodedFileOutput) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{5}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *EncodedFileOutput) GetFileType() EncodedFileType {
@@ -1616,1058 +5373,7 @@ func (*EncodedFileOutput_Azure) isEncodedFileOutput_Output() {}
 
 func (*EncodedFileOutput_AliOSS) isEncodedFileOutput_Output() {}
 
-// Used to generate HLS segments or other kind of segmented output
-type SegmentedFileOutput struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Protocol         SegmentedFileProtocol  `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.SegmentedFileProtocol" json:"protocol,omitempty"`                                  // (optional)
-	FilenamePrefix   string                 `protobuf:"bytes,2,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                                    // (optional)
-	PlaylistName     string                 `protobuf:"bytes,3,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`                                          // (optional)
-	LivePlaylistName string                 `protobuf:"bytes,11,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`                           // (optional, disabled if not provided). Path of a live playlist
-	SegmentDuration  uint32                 `protobuf:"varint,4,opt,name=segment_duration,json=segmentDuration,proto3" json:"segment_duration,omitempty"`                                // in seconds (optional)
-	FilenameSuffix   SegmentedFileSuffix    `protobuf:"varint,10,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.SegmentedFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
-	DisableManifest  bool                   `protobuf:"varint,8,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                                // disable upload of manifest file (default false)
-	// Types that are valid to be assigned to Output:
-	//
-	//	*SegmentedFileOutput_S3
-	//	*SegmentedFileOutput_Gcp
-	//	*SegmentedFileOutput_Azure
-	//	*SegmentedFileOutput_AliOSS
-	Output        isSegmentedFileOutput_Output `protobuf_oneof:"output"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SegmentedFileOutput) Reset() {
-	*x = SegmentedFileOutput{}
-	mi := &file_livekit_egress_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SegmentedFileOutput) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SegmentedFileOutput) ProtoMessage() {}
-
-func (x *SegmentedFileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SegmentedFileOutput.ProtoReflect.Descriptor instead.
-func (*SegmentedFileOutput) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *SegmentedFileOutput) GetProtocol() SegmentedFileProtocol {
-	if x != nil {
-		return x.Protocol
-	}
-	return SegmentedFileProtocol_DEFAULT_SEGMENTED_FILE_PROTOCOL
-}
-
-func (x *SegmentedFileOutput) GetFilenamePrefix() string {
-	if x != nil {
-		return x.FilenamePrefix
-	}
-	return ""
-}
-
-func (x *SegmentedFileOutput) GetPlaylistName() string {
-	if x != nil {
-		return x.PlaylistName
-	}
-	return ""
-}
-
-func (x *SegmentedFileOutput) GetLivePlaylistName() string {
-	if x != nil {
-		return x.LivePlaylistName
-	}
-	return ""
-}
-
-func (x *SegmentedFileOutput) GetSegmentDuration() uint32 {
-	if x != nil {
-		return x.SegmentDuration
-	}
-	return 0
-}
-
-func (x *SegmentedFileOutput) GetFilenameSuffix() SegmentedFileSuffix {
-	if x != nil {
-		return x.FilenameSuffix
-	}
-	return SegmentedFileSuffix_INDEX
-}
-
-func (x *SegmentedFileOutput) GetDisableManifest() bool {
-	if x != nil {
-		return x.DisableManifest
-	}
-	return false
-}
-
-func (x *SegmentedFileOutput) GetOutput() isSegmentedFileOutput_Output {
-	if x != nil {
-		return x.Output
-	}
-	return nil
-}
-
-func (x *SegmentedFileOutput) GetS3() *S3Upload {
-	if x != nil {
-		if x, ok := x.Output.(*SegmentedFileOutput_S3); ok {
-			return x.S3
-		}
-	}
-	return nil
-}
-
-func (x *SegmentedFileOutput) GetGcp() *GCPUpload {
-	if x != nil {
-		if x, ok := x.Output.(*SegmentedFileOutput_Gcp); ok {
-			return x.Gcp
-		}
-	}
-	return nil
-}
-
-func (x *SegmentedFileOutput) GetAzure() *AzureBlobUpload {
-	if x != nil {
-		if x, ok := x.Output.(*SegmentedFileOutput_Azure); ok {
-			return x.Azure
-		}
-	}
-	return nil
-}
-
-func (x *SegmentedFileOutput) GetAliOSS() *AliOSSUpload {
-	if x != nil {
-		if x, ok := x.Output.(*SegmentedFileOutput_AliOSS); ok {
-			return x.AliOSS
-		}
-	}
-	return nil
-}
-
-type isSegmentedFileOutput_Output interface {
-	isSegmentedFileOutput_Output()
-}
-
-type SegmentedFileOutput_S3 struct {
-	S3 *S3Upload `protobuf:"bytes,5,opt,name=s3,proto3,oneof"`
-}
-
-type SegmentedFileOutput_Gcp struct {
-	Gcp *GCPUpload `protobuf:"bytes,6,opt,name=gcp,proto3,oneof"`
-}
-
-type SegmentedFileOutput_Azure struct {
-	Azure *AzureBlobUpload `protobuf:"bytes,7,opt,name=azure,proto3,oneof"`
-}
-
-type SegmentedFileOutput_AliOSS struct {
-	AliOSS *AliOSSUpload `protobuf:"bytes,9,opt,name=aliOSS,proto3,oneof"`
-}
-
-func (*SegmentedFileOutput_S3) isSegmentedFileOutput_Output() {}
-
-func (*SegmentedFileOutput_Gcp) isSegmentedFileOutput_Output() {}
-
-func (*SegmentedFileOutput_Azure) isSegmentedFileOutput_Output() {}
-
-func (*SegmentedFileOutput_AliOSS) isSegmentedFileOutput_Output() {}
-
-type DirectFileOutput struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see egress docs for templating (default {track_id}-{time})
-	DisableManifest bool                   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"` // disable upload of manifest file (default false)
-	// Types that are valid to be assigned to Output:
-	//
-	//	*DirectFileOutput_S3
-	//	*DirectFileOutput_Gcp
-	//	*DirectFileOutput_Azure
-	//	*DirectFileOutput_AliOSS
-	Output        isDirectFileOutput_Output `protobuf_oneof:"output"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DirectFileOutput) Reset() {
-	*x = DirectFileOutput{}
-	mi := &file_livekit_egress_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DirectFileOutput) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DirectFileOutput) ProtoMessage() {}
-
-func (x *DirectFileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DirectFileOutput.ProtoReflect.Descriptor instead.
-func (*DirectFileOutput) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *DirectFileOutput) GetFilepath() string {
-	if x != nil {
-		return x.Filepath
-	}
-	return ""
-}
-
-func (x *DirectFileOutput) GetDisableManifest() bool {
-	if x != nil {
-		return x.DisableManifest
-	}
-	return false
-}
-
-func (x *DirectFileOutput) GetOutput() isDirectFileOutput_Output {
-	if x != nil {
-		return x.Output
-	}
-	return nil
-}
-
-func (x *DirectFileOutput) GetS3() *S3Upload {
-	if x != nil {
-		if x, ok := x.Output.(*DirectFileOutput_S3); ok {
-			return x.S3
-		}
-	}
-	return nil
-}
-
-func (x *DirectFileOutput) GetGcp() *GCPUpload {
-	if x != nil {
-		if x, ok := x.Output.(*DirectFileOutput_Gcp); ok {
-			return x.Gcp
-		}
-	}
-	return nil
-}
-
-func (x *DirectFileOutput) GetAzure() *AzureBlobUpload {
-	if x != nil {
-		if x, ok := x.Output.(*DirectFileOutput_Azure); ok {
-			return x.Azure
-		}
-	}
-	return nil
-}
-
-func (x *DirectFileOutput) GetAliOSS() *AliOSSUpload {
-	if x != nil {
-		if x, ok := x.Output.(*DirectFileOutput_AliOSS); ok {
-			return x.AliOSS
-		}
-	}
-	return nil
-}
-
-type isDirectFileOutput_Output interface {
-	isDirectFileOutput_Output()
-}
-
-type DirectFileOutput_S3 struct {
-	S3 *S3Upload `protobuf:"bytes,2,opt,name=s3,proto3,oneof"`
-}
-
-type DirectFileOutput_Gcp struct {
-	Gcp *GCPUpload `protobuf:"bytes,3,opt,name=gcp,proto3,oneof"`
-}
-
-type DirectFileOutput_Azure struct {
-	Azure *AzureBlobUpload `protobuf:"bytes,4,opt,name=azure,proto3,oneof"`
-}
-
-type DirectFileOutput_AliOSS struct {
-	AliOSS *AliOSSUpload `protobuf:"bytes,6,opt,name=aliOSS,proto3,oneof"`
-}
-
-func (*DirectFileOutput_S3) isDirectFileOutput_Output() {}
-
-func (*DirectFileOutput_Gcp) isDirectFileOutput_Output() {}
-
-func (*DirectFileOutput_Azure) isDirectFileOutput_Output() {}
-
-func (*DirectFileOutput_AliOSS) isDirectFileOutput_Output() {}
-
-type ImageOutput struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	CaptureInterval uint32                 `protobuf:"varint,1,opt,name=capture_interval,json=captureInterval,proto3" json:"capture_interval,omitempty"`                           // in seconds (required)
-	Width           int32                  `protobuf:"varint,2,opt,name=width,proto3" json:"width,omitempty"`                                                                      // (optional, defaults to track width)
-	Height          int32                  `protobuf:"varint,3,opt,name=height,proto3" json:"height,omitempty"`                                                                    // (optional, defaults to track height)
-	FilenamePrefix  string                 `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                               // (optional)
-	FilenameSuffix  ImageFileSuffix        `protobuf:"varint,5,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.ImageFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
-	ImageCodec      ImageCodec             `protobuf:"varint,6,opt,name=image_codec,json=imageCodec,proto3,enum=livekit.ImageCodec" json:"image_codec,omitempty"`                  // (optional)
-	DisableManifest bool                   `protobuf:"varint,7,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                           // disable upload of manifest file (default false)
-	// Types that are valid to be assigned to Output:
-	//
-	//	*ImageOutput_S3
-	//	*ImageOutput_Gcp
-	//	*ImageOutput_Azure
-	//	*ImageOutput_AliOSS
-	Output        isImageOutput_Output `protobuf_oneof:"output"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ImageOutput) Reset() {
-	*x = ImageOutput{}
-	mi := &file_livekit_egress_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ImageOutput) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ImageOutput) ProtoMessage() {}
-
-func (x *ImageOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ImageOutput.ProtoReflect.Descriptor instead.
-func (*ImageOutput) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ImageOutput) GetCaptureInterval() uint32 {
-	if x != nil {
-		return x.CaptureInterval
-	}
-	return 0
-}
-
-func (x *ImageOutput) GetWidth() int32 {
-	if x != nil {
-		return x.Width
-	}
-	return 0
-}
-
-func (x *ImageOutput) GetHeight() int32 {
-	if x != nil {
-		return x.Height
-	}
-	return 0
-}
-
-func (x *ImageOutput) GetFilenamePrefix() string {
-	if x != nil {
-		return x.FilenamePrefix
-	}
-	return ""
-}
-
-func (x *ImageOutput) GetFilenameSuffix() ImageFileSuffix {
-	if x != nil {
-		return x.FilenameSuffix
-	}
-	return ImageFileSuffix_IMAGE_SUFFIX_INDEX
-}
-
-func (x *ImageOutput) GetImageCodec() ImageCodec {
-	if x != nil {
-		return x.ImageCodec
-	}
-	return ImageCodec_IC_DEFAULT
-}
-
-func (x *ImageOutput) GetDisableManifest() bool {
-	if x != nil {
-		return x.DisableManifest
-	}
-	return false
-}
-
-func (x *ImageOutput) GetOutput() isImageOutput_Output {
-	if x != nil {
-		return x.Output
-	}
-	return nil
-}
-
-func (x *ImageOutput) GetS3() *S3Upload {
-	if x != nil {
-		if x, ok := x.Output.(*ImageOutput_S3); ok {
-			return x.S3
-		}
-	}
-	return nil
-}
-
-func (x *ImageOutput) GetGcp() *GCPUpload {
-	if x != nil {
-		if x, ok := x.Output.(*ImageOutput_Gcp); ok {
-			return x.Gcp
-		}
-	}
-	return nil
-}
-
-func (x *ImageOutput) GetAzure() *AzureBlobUpload {
-	if x != nil {
-		if x, ok := x.Output.(*ImageOutput_Azure); ok {
-			return x.Azure
-		}
-	}
-	return nil
-}
-
-func (x *ImageOutput) GetAliOSS() *AliOSSUpload {
-	if x != nil {
-		if x, ok := x.Output.(*ImageOutput_AliOSS); ok {
-			return x.AliOSS
-		}
-	}
-	return nil
-}
-
-type isImageOutput_Output interface {
-	isImageOutput_Output()
-}
-
-type ImageOutput_S3 struct {
-	S3 *S3Upload `protobuf:"bytes,8,opt,name=s3,proto3,oneof"`
-}
-
-type ImageOutput_Gcp struct {
-	Gcp *GCPUpload `protobuf:"bytes,9,opt,name=gcp,proto3,oneof"`
-}
-
-type ImageOutput_Azure struct {
-	Azure *AzureBlobUpload `protobuf:"bytes,10,opt,name=azure,proto3,oneof"`
-}
-
-type ImageOutput_AliOSS struct {
-	AliOSS *AliOSSUpload `protobuf:"bytes,11,opt,name=aliOSS,proto3,oneof"`
-}
-
-func (*ImageOutput_S3) isImageOutput_Output() {}
-
-func (*ImageOutput_Gcp) isImageOutput_Output() {}
-
-func (*ImageOutput_Azure) isImageOutput_Output() {}
-
-func (*ImageOutput_AliOSS) isImageOutput_Output() {}
-
-type S3Upload struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	AccessKey            string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	Secret               string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	SessionToken         string                 `protobuf:"bytes,11,opt,name=session_token,json=sessionToken,proto3" json:"session_token,omitempty"`
-	AssumeRoleArn        string                 `protobuf:"bytes,12,opt,name=assume_role_arn,json=assumeRoleArn,proto3" json:"assume_role_arn,omitempty"`                        // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
-	AssumeRoleExternalId string                 `protobuf:"bytes,13,opt,name=assume_role_external_id,json=assumeRoleExternalId,proto3" json:"assume_role_external_id,omitempty"` // ExternalID to use when assuming role for upload
-	Region               string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Endpoint             string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Bucket               string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	ForcePathStyle       bool                   `protobuf:"varint,6,opt,name=force_path_style,json=forcePathStyle,proto3" json:"force_path_style,omitempty"`
-	Metadata             map[string]string      `protobuf:"bytes,7,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	Tagging              string                 `protobuf:"bytes,8,opt,name=tagging,proto3" json:"tagging,omitempty"`
-	ContentDisposition   string                 `protobuf:"bytes,9,opt,name=content_disposition,json=contentDisposition,proto3" json:"content_disposition,omitempty"` // Content-Disposition header
-	Proxy                *ProxyConfig           `protobuf:"bytes,10,opt,name=proxy,proto3" json:"proxy,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *S3Upload) Reset() {
-	*x = S3Upload{}
-	mi := &file_livekit_egress_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *S3Upload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*S3Upload) ProtoMessage() {}
-
-func (x *S3Upload) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use S3Upload.ProtoReflect.Descriptor instead.
-func (*S3Upload) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *S3Upload) GetAccessKey() string {
-	if x != nil {
-		return x.AccessKey
-	}
-	return ""
-}
-
-func (x *S3Upload) GetSecret() string {
-	if x != nil {
-		return x.Secret
-	}
-	return ""
-}
-
-func (x *S3Upload) GetSessionToken() string {
-	if x != nil {
-		return x.SessionToken
-	}
-	return ""
-}
-
-func (x *S3Upload) GetAssumeRoleArn() string {
-	if x != nil {
-		return x.AssumeRoleArn
-	}
-	return ""
-}
-
-func (x *S3Upload) GetAssumeRoleExternalId() string {
-	if x != nil {
-		return x.AssumeRoleExternalId
-	}
-	return ""
-}
-
-func (x *S3Upload) GetRegion() string {
-	if x != nil {
-		return x.Region
-	}
-	return ""
-}
-
-func (x *S3Upload) GetEndpoint() string {
-	if x != nil {
-		return x.Endpoint
-	}
-	return ""
-}
-
-func (x *S3Upload) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-func (x *S3Upload) GetForcePathStyle() bool {
-	if x != nil {
-		return x.ForcePathStyle
-	}
-	return false
-}
-
-func (x *S3Upload) GetMetadata() map[string]string {
-	if x != nil {
-		return x.Metadata
-	}
-	return nil
-}
-
-func (x *S3Upload) GetTagging() string {
-	if x != nil {
-		return x.Tagging
-	}
-	return ""
-}
-
-func (x *S3Upload) GetContentDisposition() string {
-	if x != nil {
-		return x.ContentDisposition
-	}
-	return ""
-}
-
-func (x *S3Upload) GetProxy() *ProxyConfig {
-	if x != nil {
-		return x.Proxy
-	}
-	return nil
-}
-
-type GCPUpload struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// service account credentials serialized in JSON "credentials.json"
-	Credentials   string       `protobuf:"bytes,1,opt,name=credentials,proto3" json:"credentials,omitempty"`
-	Bucket        string       `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	Proxy         *ProxyConfig `protobuf:"bytes,3,opt,name=proxy,proto3" json:"proxy,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GCPUpload) Reset() {
-	*x = GCPUpload{}
-	mi := &file_livekit_egress_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GCPUpload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GCPUpload) ProtoMessage() {}
-
-func (x *GCPUpload) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GCPUpload.ProtoReflect.Descriptor instead.
-func (*GCPUpload) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *GCPUpload) GetCredentials() string {
-	if x != nil {
-		return x.Credentials
-	}
-	return ""
-}
-
-func (x *GCPUpload) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-func (x *GCPUpload) GetProxy() *ProxyConfig {
-	if x != nil {
-		return x.Proxy
-	}
-	return nil
-}
-
-type AzureBlobUpload struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccountName   string                 `protobuf:"bytes,1,opt,name=account_name,json=accountName,proto3" json:"account_name,omitempty"`
-	AccountKey    string                 `protobuf:"bytes,2,opt,name=account_key,json=accountKey,proto3" json:"account_key,omitempty"`
-	ContainerName string                 `protobuf:"bytes,3,opt,name=container_name,json=containerName,proto3" json:"container_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AzureBlobUpload) Reset() {
-	*x = AzureBlobUpload{}
-	mi := &file_livekit_egress_proto_msgTypes[11]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AzureBlobUpload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AzureBlobUpload) ProtoMessage() {}
-
-func (x *AzureBlobUpload) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[11]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AzureBlobUpload.ProtoReflect.Descriptor instead.
-func (*AzureBlobUpload) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *AzureBlobUpload) GetAccountName() string {
-	if x != nil {
-		return x.AccountName
-	}
-	return ""
-}
-
-func (x *AzureBlobUpload) GetAccountKey() string {
-	if x != nil {
-		return x.AccountKey
-	}
-	return ""
-}
-
-func (x *AzureBlobUpload) GetContainerName() string {
-	if x != nil {
-		return x.ContainerName
-	}
-	return ""
-}
-
-type AliOSSUpload struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessKey     string                 `protobuf:"bytes,1,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	Secret        string                 `protobuf:"bytes,2,opt,name=secret,proto3" json:"secret,omitempty"`
-	Region        string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Endpoint      string                 `protobuf:"bytes,4,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Bucket        string                 `protobuf:"bytes,5,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AliOSSUpload) Reset() {
-	*x = AliOSSUpload{}
-	mi := &file_livekit_egress_proto_msgTypes[12]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AliOSSUpload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AliOSSUpload) ProtoMessage() {}
-
-func (x *AliOSSUpload) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[12]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AliOSSUpload.ProtoReflect.Descriptor instead.
-func (*AliOSSUpload) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *AliOSSUpload) GetAccessKey() string {
-	if x != nil {
-		return x.AccessKey
-	}
-	return ""
-}
-
-func (x *AliOSSUpload) GetSecret() string {
-	if x != nil {
-		return x.Secret
-	}
-	return ""
-}
-
-func (x *AliOSSUpload) GetRegion() string {
-	if x != nil {
-		return x.Region
-	}
-	return ""
-}
-
-func (x *AliOSSUpload) GetEndpoint() string {
-	if x != nil {
-		return x.Endpoint
-	}
-	return ""
-}
-
-func (x *AliOSSUpload) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-type ProxyConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Password      string                 `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ProxyConfig) Reset() {
-	*x = ProxyConfig{}
-	mi := &file_livekit_egress_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ProxyConfig) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProxyConfig) ProtoMessage() {}
-
-func (x *ProxyConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProxyConfig.ProtoReflect.Descriptor instead.
-func (*ProxyConfig) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *ProxyConfig) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
-func (x *ProxyConfig) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
-
-func (x *ProxyConfig) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-type StreamOutput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Protocol      StreamProtocol         `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.StreamProtocol" json:"protocol,omitempty"` // required
-	Urls          []string               `protobuf:"bytes,2,rep,name=urls,proto3" json:"urls,omitempty"`                                      // required
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StreamOutput) Reset() {
-	*x = StreamOutput{}
-	mi := &file_livekit_egress_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StreamOutput) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StreamOutput) ProtoMessage() {}
-
-func (x *StreamOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StreamOutput.ProtoReflect.Descriptor instead.
-func (*StreamOutput) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *StreamOutput) GetProtocol() StreamProtocol {
-	if x != nil {
-		return x.Protocol
-	}
-	return StreamProtocol_DEFAULT_PROTOCOL
-}
-
-func (x *StreamOutput) GetUrls() []string {
-	if x != nil {
-		return x.Urls
-	}
-	return nil
-}
-
-type EncodingOptions struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Width            int32                  `protobuf:"varint,1,opt,name=width,proto3" json:"width,omitempty"`                                                     // (default 1920)
-	Height           int32                  `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`                                                   // (default 1080)
-	Depth            int32                  `protobuf:"varint,3,opt,name=depth,proto3" json:"depth,omitempty"`                                                     // (default 24)
-	Framerate        int32                  `protobuf:"varint,4,opt,name=framerate,proto3" json:"framerate,omitempty"`                                             // (default 30)
-	AudioCodec       AudioCodec             `protobuf:"varint,5,opt,name=audio_codec,json=audioCodec,proto3,enum=livekit.AudioCodec" json:"audio_codec,omitempty"` // (default OPUS)
-	AudioBitrate     int32                  `protobuf:"varint,6,opt,name=audio_bitrate,json=audioBitrate,proto3" json:"audio_bitrate,omitempty"`                   // (default 128)
-	AudioQuality     int32                  `protobuf:"varint,11,opt,name=audio_quality,json=audioQuality,proto3" json:"audio_quality,omitempty"`                  // quality setting on audio encoder
-	AudioFrequency   int32                  `protobuf:"varint,7,opt,name=audio_frequency,json=audioFrequency,proto3" json:"audio_frequency,omitempty"`             // (default 44100)
-	VideoCodec       VideoCodec             `protobuf:"varint,8,opt,name=video_codec,json=videoCodec,proto3,enum=livekit.VideoCodec" json:"video_codec,omitempty"` // (default H264_MAIN)
-	VideoBitrate     int32                  `protobuf:"varint,9,opt,name=video_bitrate,json=videoBitrate,proto3" json:"video_bitrate,omitempty"`                   // (default 4500)
-	VideoQuality     int32                  `protobuf:"varint,12,opt,name=video_quality,json=videoQuality,proto3" json:"video_quality,omitempty"`                  // quality setting on video encoder
-	KeyFrameInterval float64                `protobuf:"fixed64,10,opt,name=key_frame_interval,json=keyFrameInterval,proto3" json:"key_frame_interval,omitempty"`   // in seconds (default 4s for streaming, segment duration for segmented output, encoder default for files)
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *EncodingOptions) Reset() {
-	*x = EncodingOptions{}
-	mi := &file_livekit_egress_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EncodingOptions) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EncodingOptions) ProtoMessage() {}
-
-func (x *EncodingOptions) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EncodingOptions.ProtoReflect.Descriptor instead.
-func (*EncodingOptions) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{15}
-}
-
-func (x *EncodingOptions) GetWidth() int32 {
-	if x != nil {
-		return x.Width
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetHeight() int32 {
-	if x != nil {
-		return x.Height
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetDepth() int32 {
-	if x != nil {
-		return x.Depth
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetFramerate() int32 {
-	if x != nil {
-		return x.Framerate
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetAudioCodec() AudioCodec {
-	if x != nil {
-		return x.AudioCodec
-	}
-	return AudioCodec_DEFAULT_AC
-}
-
-func (x *EncodingOptions) GetAudioBitrate() int32 {
-	if x != nil {
-		return x.AudioBitrate
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetAudioQuality() int32 {
-	if x != nil {
-		return x.AudioQuality
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetAudioFrequency() int32 {
-	if x != nil {
-		return x.AudioFrequency
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetVideoCodec() VideoCodec {
-	if x != nil {
-		return x.VideoCodec
-	}
-	return VideoCodec_DEFAULT_VC
-}
-
-func (x *EncodingOptions) GetVideoBitrate() int32 {
-	if x != nil {
-		return x.VideoBitrate
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetVideoQuality() int32 {
-	if x != nil {
-		return x.VideoQuality
-	}
-	return 0
-}
-
-func (x *EncodingOptions) GetKeyFrameInterval() float64 {
-	if x != nil {
-		return x.KeyFrameInterval
-	}
-	return 0
-}
-
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type UpdateLayoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EgressId      string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
@@ -2678,7 +5384,7 @@ type UpdateLayoutRequest struct {
 
 func (x *UpdateLayoutRequest) Reset() {
 	*x = UpdateLayoutRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[16]
+	mi := &file_livekit_egress_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2690,7 +5396,7 @@ func (x *UpdateLayoutRequest) String() string {
 func (*UpdateLayoutRequest) ProtoMessage() {}
 
 func (x *UpdateLayoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[16]
+	mi := &file_livekit_egress_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2703,7 +5409,7 @@ func (x *UpdateLayoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLayoutRequest.ProtoReflect.Descriptor instead.
 func (*UpdateLayoutRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{16}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *UpdateLayoutRequest) GetEgressId() string {
@@ -2720,6 +5426,7 @@ func (x *UpdateLayoutRequest) GetLayout() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 type UpdateStreamRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	EgressId         string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
@@ -2731,7 +5438,7 @@ type UpdateStreamRequest struct {
 
 func (x *UpdateStreamRequest) Reset() {
 	*x = UpdateStreamRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[17]
+	mi := &file_livekit_egress_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2743,7 +5450,7 @@ func (x *UpdateStreamRequest) String() string {
 func (*UpdateStreamRequest) ProtoMessage() {}
 
 func (x *UpdateStreamRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[17]
+	mi := &file_livekit_egress_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2756,7 +5463,7 @@ func (x *UpdateStreamRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateStreamRequest.ProtoReflect.Descriptor instead.
 func (*UpdateStreamRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{17}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *UpdateStreamRequest) GetEgressId() string {
@@ -2780,496 +5487,6 @@ func (x *UpdateStreamRequest) GetRemoveOutputUrls() []string {
 	return nil
 }
 
-type ListEgressRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // (optional, filter by room name)
-	EgressId      string                 `protobuf:"bytes,2,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"` // (optional, filter by egress ID)
-	Active        bool                   `protobuf:"varint,3,opt,name=active,proto3" json:"active,omitempty"`                    // (optional, list active egress only)
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListEgressRequest) Reset() {
-	*x = ListEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListEgressRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListEgressRequest) ProtoMessage() {}
-
-func (x *ListEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListEgressRequest.ProtoReflect.Descriptor instead.
-func (*ListEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *ListEgressRequest) GetRoomName() string {
-	if x != nil {
-		return x.RoomName
-	}
-	return ""
-}
-
-func (x *ListEgressRequest) GetEgressId() string {
-	if x != nil {
-		return x.EgressId
-	}
-	return ""
-}
-
-func (x *ListEgressRequest) GetActive() bool {
-	if x != nil {
-		return x.Active
-	}
-	return false
-}
-
-type ListEgressResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*EgressInfo          `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ListEgressResponse) Reset() {
-	*x = ListEgressResponse{}
-	mi := &file_livekit_egress_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ListEgressResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListEgressResponse) ProtoMessage() {}
-
-func (x *ListEgressResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListEgressResponse.ProtoReflect.Descriptor instead.
-func (*ListEgressResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *ListEgressResponse) GetItems() []*EgressInfo {
-	if x != nil {
-		return x.Items
-	}
-	return nil
-}
-
-type StopEgressRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	EgressId      string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StopEgressRequest) Reset() {
-	*x = StopEgressRequest{}
-	mi := &file_livekit_egress_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StopEgressRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StopEgressRequest) ProtoMessage() {}
-
-func (x *StopEgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StopEgressRequest.ProtoReflect.Descriptor instead.
-func (*StopEgressRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{20}
-}
-
-func (x *StopEgressRequest) GetEgressId() string {
-	if x != nil {
-		return x.EgressId
-	}
-	return ""
-}
-
-type EgressInfo struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	EgressId   string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
-	RoomId     string                 `protobuf:"bytes,2,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-	RoomName   string                 `protobuf:"bytes,13,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	SourceType EgressSourceType       `protobuf:"varint,26,opt,name=source_type,json=sourceType,proto3,enum=livekit.EgressSourceType" json:"source_type,omitempty"`
-	Status     EgressStatus           `protobuf:"varint,3,opt,name=status,proto3,enum=livekit.EgressStatus" json:"status,omitempty"`
-	StartedAt  int64                  `protobuf:"varint,10,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt    int64                  `protobuf:"varint,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	UpdatedAt  int64                  `protobuf:"varint,18,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Details    string                 `protobuf:"bytes,21,opt,name=details,proto3" json:"details,omitempty"`
-	Error      string                 `protobuf:"bytes,9,opt,name=error,proto3" json:"error,omitempty"`
-	ErrorCode  int32                  `protobuf:"varint,22,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*EgressInfo_RoomComposite
-	//	*EgressInfo_Web
-	//	*EgressInfo_Participant
-	//	*EgressInfo_TrackComposite
-	//	*EgressInfo_Track
-	Request isEgressInfo_Request `protobuf_oneof:"request"`
-	// Types that are valid to be assigned to Result:
-	//
-	//	*EgressInfo_Stream
-	//	*EgressInfo_File
-	//	*EgressInfo_Segments
-	Result            isEgressInfo_Result `protobuf_oneof:"result"`
-	StreamResults     []*StreamInfo       `protobuf:"bytes,15,rep,name=stream_results,json=streamResults,proto3" json:"stream_results,omitempty"`
-	FileResults       []*FileInfo         `protobuf:"bytes,16,rep,name=file_results,json=fileResults,proto3" json:"file_results,omitempty"`
-	SegmentResults    []*SegmentsInfo     `protobuf:"bytes,17,rep,name=segment_results,json=segmentResults,proto3" json:"segment_results,omitempty"`
-	ImageResults      []*ImagesInfo       `protobuf:"bytes,20,rep,name=image_results,json=imageResults,proto3" json:"image_results,omitempty"`
-	ManifestLocation  string              `protobuf:"bytes,23,opt,name=manifest_location,json=manifestLocation,proto3" json:"manifest_location,omitempty"`
-	BackupStorageUsed bool                `protobuf:"varint,25,opt,name=backup_storage_used,json=backupStorageUsed,proto3" json:"backup_storage_used,omitempty"`
-	RetryCount        int32               `protobuf:"varint,27,opt,name=retry_count,json=retryCount,proto3" json:"retry_count,omitempty"` // next ID: 28
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *EgressInfo) Reset() {
-	*x = EgressInfo{}
-	mi := &file_livekit_egress_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *EgressInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EgressInfo) ProtoMessage() {}
-
-func (x *EgressInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EgressInfo.ProtoReflect.Descriptor instead.
-func (*EgressInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{21}
-}
-
-func (x *EgressInfo) GetEgressId() string {
-	if x != nil {
-		return x.EgressId
-	}
-	return ""
-}
-
-func (x *EgressInfo) GetRoomId() string {
-	if x != nil {
-		return x.RoomId
-	}
-	return ""
-}
-
-func (x *EgressInfo) GetRoomName() string {
-	if x != nil {
-		return x.RoomName
-	}
-	return ""
-}
-
-func (x *EgressInfo) GetSourceType() EgressSourceType {
-	if x != nil {
-		return x.SourceType
-	}
-	return EgressSourceType_EGRESS_SOURCE_TYPE_WEB
-}
-
-func (x *EgressInfo) GetStatus() EgressStatus {
-	if x != nil {
-		return x.Status
-	}
-	return EgressStatus_EGRESS_STARTING
-}
-
-func (x *EgressInfo) GetStartedAt() int64 {
-	if x != nil {
-		return x.StartedAt
-	}
-	return 0
-}
-
-func (x *EgressInfo) GetEndedAt() int64 {
-	if x != nil {
-		return x.EndedAt
-	}
-	return 0
-}
-
-func (x *EgressInfo) GetUpdatedAt() int64 {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return 0
-}
-
-func (x *EgressInfo) GetDetails() string {
-	if x != nil {
-		return x.Details
-	}
-	return ""
-}
-
-func (x *EgressInfo) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-func (x *EgressInfo) GetErrorCode() int32 {
-	if x != nil {
-		return x.ErrorCode
-	}
-	return 0
-}
-
-func (x *EgressInfo) GetRequest() isEgressInfo_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetRoomComposite() *RoomCompositeEgressRequest {
-	if x != nil {
-		if x, ok := x.Request.(*EgressInfo_RoomComposite); ok {
-			return x.RoomComposite
-		}
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetWeb() *WebEgressRequest {
-	if x != nil {
-		if x, ok := x.Request.(*EgressInfo_Web); ok {
-			return x.Web
-		}
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetParticipant() *ParticipantEgressRequest {
-	if x != nil {
-		if x, ok := x.Request.(*EgressInfo_Participant); ok {
-			return x.Participant
-		}
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetTrackComposite() *TrackCompositeEgressRequest {
-	if x != nil {
-		if x, ok := x.Request.(*EgressInfo_TrackComposite); ok {
-			return x.TrackComposite
-		}
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetTrack() *TrackEgressRequest {
-	if x != nil {
-		if x, ok := x.Request.(*EgressInfo_Track); ok {
-			return x.Track
-		}
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetResult() isEgressInfo_Result {
-	if x != nil {
-		return x.Result
-	}
-	return nil
-}
-
-// Deprecated: Marked as deprecated in livekit_egress.proto.
-func (x *EgressInfo) GetStream() *StreamInfoList {
-	if x != nil {
-		if x, ok := x.Result.(*EgressInfo_Stream); ok {
-			return x.Stream
-		}
-	}
-	return nil
-}
-
-// Deprecated: Marked as deprecated in livekit_egress.proto.
-func (x *EgressInfo) GetFile() *FileInfo {
-	if x != nil {
-		if x, ok := x.Result.(*EgressInfo_File); ok {
-			return x.File
-		}
-	}
-	return nil
-}
-
-// Deprecated: Marked as deprecated in livekit_egress.proto.
-func (x *EgressInfo) GetSegments() *SegmentsInfo {
-	if x != nil {
-		if x, ok := x.Result.(*EgressInfo_Segments); ok {
-			return x.Segments
-		}
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetStreamResults() []*StreamInfo {
-	if x != nil {
-		return x.StreamResults
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetFileResults() []*FileInfo {
-	if x != nil {
-		return x.FileResults
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetSegmentResults() []*SegmentsInfo {
-	if x != nil {
-		return x.SegmentResults
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetImageResults() []*ImagesInfo {
-	if x != nil {
-		return x.ImageResults
-	}
-	return nil
-}
-
-func (x *EgressInfo) GetManifestLocation() string {
-	if x != nil {
-		return x.ManifestLocation
-	}
-	return ""
-}
-
-func (x *EgressInfo) GetBackupStorageUsed() bool {
-	if x != nil {
-		return x.BackupStorageUsed
-	}
-	return false
-}
-
-func (x *EgressInfo) GetRetryCount() int32 {
-	if x != nil {
-		return x.RetryCount
-	}
-	return 0
-}
-
-type isEgressInfo_Request interface {
-	isEgressInfo_Request()
-}
-
-type EgressInfo_RoomComposite struct {
-	RoomComposite *RoomCompositeEgressRequest `protobuf:"bytes,4,opt,name=room_composite,json=roomComposite,proto3,oneof"`
-}
-
-type EgressInfo_Web struct {
-	Web *WebEgressRequest `protobuf:"bytes,14,opt,name=web,proto3,oneof"`
-}
-
-type EgressInfo_Participant struct {
-	Participant *ParticipantEgressRequest `protobuf:"bytes,19,opt,name=participant,proto3,oneof"`
-}
-
-type EgressInfo_TrackComposite struct {
-	TrackComposite *TrackCompositeEgressRequest `protobuf:"bytes,5,opt,name=track_composite,json=trackComposite,proto3,oneof"`
-}
-
-type EgressInfo_Track struct {
-	Track *TrackEgressRequest `protobuf:"bytes,6,opt,name=track,proto3,oneof"`
-}
-
-func (*EgressInfo_RoomComposite) isEgressInfo_Request() {}
-
-func (*EgressInfo_Web) isEgressInfo_Request() {}
-
-func (*EgressInfo_Participant) isEgressInfo_Request() {}
-
-func (*EgressInfo_TrackComposite) isEgressInfo_Request() {}
-
-func (*EgressInfo_Track) isEgressInfo_Request() {}
-
-type isEgressInfo_Result interface {
-	isEgressInfo_Result()
-}
-
-type EgressInfo_Stream struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
-	Stream *StreamInfoList `protobuf:"bytes,7,opt,name=stream,proto3,oneof"`
-}
-
-type EgressInfo_File struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
-	File *FileInfo `protobuf:"bytes,8,opt,name=file,proto3,oneof"`
-}
-
-type EgressInfo_Segments struct {
-	// Deprecated: Marked as deprecated in livekit_egress.proto.
-	Segments *SegmentsInfo `protobuf:"bytes,12,opt,name=segments,proto3,oneof"`
-}
-
-func (*EgressInfo_Stream) isEgressInfo_Result() {}
-
-func (*EgressInfo_File) isEgressInfo_Result() {}
-
-func (*EgressInfo_Segments) isEgressInfo_Result() {}
-
 // Deprecated: Marked as deprecated in livekit_egress.proto.
 type StreamInfoList struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -3280,7 +5497,7 @@ type StreamInfoList struct {
 
 func (x *StreamInfoList) Reset() {
 	*x = StreamInfoList{}
-	mi := &file_livekit_egress_proto_msgTypes[22]
+	mi := &file_livekit_egress_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3292,7 +5509,7 @@ func (x *StreamInfoList) String() string {
 func (*StreamInfoList) ProtoMessage() {}
 
 func (x *StreamInfoList) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[22]
+	mi := &file_livekit_egress_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3305,7 +5522,7 @@ func (x *StreamInfoList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamInfoList.ProtoReflect.Descriptor instead.
 func (*StreamInfoList) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{22}
+	return file_livekit_egress_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *StreamInfoList) GetInfo() []*StreamInfo {
@@ -3315,686 +5532,96 @@ func (x *StreamInfoList) GetInfo() []*StreamInfo {
 	return nil
 }
 
-type StreamInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
-	StartedAt     int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt       int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	Duration      int64                  `protobuf:"varint,4,opt,name=duration,proto3" json:"duration,omitempty"`
-	Status        StreamInfo_Status      `protobuf:"varint,5,opt,name=status,proto3,enum=livekit.StreamInfo_Status" json:"status,omitempty"`
-	Error         string                 `protobuf:"bytes,6,opt,name=error,proto3" json:"error,omitempty"`
-	LastRetryAt   int64                  `protobuf:"varint,7,opt,name=last_retry_at,json=lastRetryAt,proto3" json:"last_retry_at,omitempty"`
-	Retries       uint32                 `protobuf:"varint,8,opt,name=retries,proto3" json:"retries,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StreamInfo) Reset() {
-	*x = StreamInfo{}
-	mi := &file_livekit_egress_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StreamInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StreamInfo) ProtoMessage() {}
-
-func (x *StreamInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StreamInfo.ProtoReflect.Descriptor instead.
-func (*StreamInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{23}
-}
-
-func (x *StreamInfo) GetUrl() string {
-	if x != nil {
-		return x.Url
-	}
-	return ""
-}
-
-func (x *StreamInfo) GetStartedAt() int64 {
-	if x != nil {
-		return x.StartedAt
-	}
-	return 0
-}
-
-func (x *StreamInfo) GetEndedAt() int64 {
-	if x != nil {
-		return x.EndedAt
-	}
-	return 0
-}
-
-func (x *StreamInfo) GetDuration() int64 {
-	if x != nil {
-		return x.Duration
-	}
-	return 0
-}
-
-func (x *StreamInfo) GetStatus() StreamInfo_Status {
-	if x != nil {
-		return x.Status
-	}
-	return StreamInfo_ACTIVE
-}
-
-func (x *StreamInfo) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-func (x *StreamInfo) GetLastRetryAt() int64 {
-	if x != nil {
-		return x.LastRetryAt
-	}
-	return 0
-}
-
-func (x *StreamInfo) GetRetries() uint32 {
-	if x != nil {
-		return x.Retries
-	}
-	return 0
-}
-
-type FileInfo struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Filename      string                 `protobuf:"bytes,1,opt,name=filename,proto3" json:"filename,omitempty"`
-	StartedAt     int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt       int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	Duration      int64                  `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty"`
-	Size          int64                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
-	Location      string                 `protobuf:"bytes,5,opt,name=location,proto3" json:"location,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *FileInfo) Reset() {
-	*x = FileInfo{}
-	mi := &file_livekit_egress_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *FileInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*FileInfo) ProtoMessage() {}
-
-func (x *FileInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
-func (*FileInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{24}
-}
-
-func (x *FileInfo) GetFilename() string {
-	if x != nil {
-		return x.Filename
-	}
-	return ""
-}
-
-func (x *FileInfo) GetStartedAt() int64 {
-	if x != nil {
-		return x.StartedAt
-	}
-	return 0
-}
-
-func (x *FileInfo) GetEndedAt() int64 {
-	if x != nil {
-		return x.EndedAt
-	}
-	return 0
-}
-
-func (x *FileInfo) GetDuration() int64 {
-	if x != nil {
-		return x.Duration
-	}
-	return 0
-}
-
-func (x *FileInfo) GetSize() int64 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-func (x *FileInfo) GetLocation() string {
-	if x != nil {
-		return x.Location
-	}
-	return ""
-}
-
-type SegmentsInfo struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	PlaylistName         string                 `protobuf:"bytes,1,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`
-	LivePlaylistName     string                 `protobuf:"bytes,8,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`
-	Duration             int64                  `protobuf:"varint,2,opt,name=duration,proto3" json:"duration,omitempty"`
-	Size                 int64                  `protobuf:"varint,3,opt,name=size,proto3" json:"size,omitempty"`
-	PlaylistLocation     string                 `protobuf:"bytes,4,opt,name=playlist_location,json=playlistLocation,proto3" json:"playlist_location,omitempty"`
-	LivePlaylistLocation string                 `protobuf:"bytes,9,opt,name=live_playlist_location,json=livePlaylistLocation,proto3" json:"live_playlist_location,omitempty"`
-	SegmentCount         int64                  `protobuf:"varint,5,opt,name=segment_count,json=segmentCount,proto3" json:"segment_count,omitempty"`
-	StartedAt            int64                  `protobuf:"varint,6,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt              int64                  `protobuf:"varint,7,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *SegmentsInfo) Reset() {
-	*x = SegmentsInfo{}
-	mi := &file_livekit_egress_proto_msgTypes[25]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SegmentsInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SegmentsInfo) ProtoMessage() {}
-
-func (x *SegmentsInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[25]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SegmentsInfo.ProtoReflect.Descriptor instead.
-func (*SegmentsInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{25}
-}
-
-func (x *SegmentsInfo) GetPlaylistName() string {
-	if x != nil {
-		return x.PlaylistName
-	}
-	return ""
-}
-
-func (x *SegmentsInfo) GetLivePlaylistName() string {
-	if x != nil {
-		return x.LivePlaylistName
-	}
-	return ""
-}
-
-func (x *SegmentsInfo) GetDuration() int64 {
-	if x != nil {
-		return x.Duration
-	}
-	return 0
-}
-
-func (x *SegmentsInfo) GetSize() int64 {
-	if x != nil {
-		return x.Size
-	}
-	return 0
-}
-
-func (x *SegmentsInfo) GetPlaylistLocation() string {
-	if x != nil {
-		return x.PlaylistLocation
-	}
-	return ""
-}
-
-func (x *SegmentsInfo) GetLivePlaylistLocation() string {
-	if x != nil {
-		return x.LivePlaylistLocation
-	}
-	return ""
-}
-
-func (x *SegmentsInfo) GetSegmentCount() int64 {
-	if x != nil {
-		return x.SegmentCount
-	}
-	return 0
-}
-
-func (x *SegmentsInfo) GetStartedAt() int64 {
-	if x != nil {
-		return x.StartedAt
-	}
-	return 0
-}
-
-func (x *SegmentsInfo) GetEndedAt() int64 {
-	if x != nil {
-		return x.EndedAt
-	}
-	return 0
-}
-
-type ImagesInfo struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	FilenamePrefix string                 `protobuf:"bytes,4,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`
-	ImageCount     int64                  `protobuf:"varint,1,opt,name=image_count,json=imageCount,proto3" json:"image_count,omitempty"`
-	StartedAt      int64                  `protobuf:"varint,2,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
-	EndedAt        int64                  `protobuf:"varint,3,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *ImagesInfo) Reset() {
-	*x = ImagesInfo{}
-	mi := &file_livekit_egress_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ImagesInfo) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ImagesInfo) ProtoMessage() {}
-
-func (x *ImagesInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ImagesInfo.ProtoReflect.Descriptor instead.
-func (*ImagesInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *ImagesInfo) GetFilenamePrefix() string {
-	if x != nil {
-		return x.FilenamePrefix
-	}
-	return ""
-}
-
-func (x *ImagesInfo) GetImageCount() int64 {
-	if x != nil {
-		return x.ImageCount
-	}
-	return 0
-}
-
-func (x *ImagesInfo) GetStartedAt() int64 {
-	if x != nil {
-		return x.StartedAt
-	}
-	return 0
-}
-
-func (x *ImagesInfo) GetEndedAt() int64 {
-	if x != nil {
-		return x.EndedAt
-	}
-	return 0
-}
-
-type AutoParticipantEgress struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Options:
-	//
-	//	*AutoParticipantEgress_Preset
-	//	*AutoParticipantEgress_Advanced
-	Options        isAutoParticipantEgress_Options `protobuf_oneof:"options"`
-	FileOutputs    []*EncodedFileOutput            `protobuf:"bytes,3,rep,name=file_outputs,json=fileOutputs,proto3" json:"file_outputs,omitempty"`
-	SegmentOutputs []*SegmentedFileOutput          `protobuf:"bytes,4,rep,name=segment_outputs,json=segmentOutputs,proto3" json:"segment_outputs,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *AutoParticipantEgress) Reset() {
-	*x = AutoParticipantEgress{}
-	mi := &file_livekit_egress_proto_msgTypes[27]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AutoParticipantEgress) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AutoParticipantEgress) ProtoMessage() {}
-
-func (x *AutoParticipantEgress) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[27]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AutoParticipantEgress.ProtoReflect.Descriptor instead.
-func (*AutoParticipantEgress) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{27}
-}
-
-func (x *AutoParticipantEgress) GetOptions() isAutoParticipantEgress_Options {
-	if x != nil {
-		return x.Options
-	}
-	return nil
-}
-
-func (x *AutoParticipantEgress) GetPreset() EncodingOptionsPreset {
-	if x != nil {
-		if x, ok := x.Options.(*AutoParticipantEgress_Preset); ok {
-			return x.Preset
-		}
-	}
-	return EncodingOptionsPreset_H264_720P_30
-}
-
-func (x *AutoParticipantEgress) GetAdvanced() *EncodingOptions {
-	if x != nil {
-		if x, ok := x.Options.(*AutoParticipantEgress_Advanced); ok {
-			return x.Advanced
-		}
-	}
-	return nil
-}
-
-func (x *AutoParticipantEgress) GetFileOutputs() []*EncodedFileOutput {
-	if x != nil {
-		return x.FileOutputs
-	}
-	return nil
-}
-
-func (x *AutoParticipantEgress) GetSegmentOutputs() []*SegmentedFileOutput {
-	if x != nil {
-		return x.SegmentOutputs
-	}
-	return nil
-}
-
-type isAutoParticipantEgress_Options interface {
-	isAutoParticipantEgress_Options()
-}
-
-type AutoParticipantEgress_Preset struct {
-	Preset EncodingOptionsPreset `protobuf:"varint,1,opt,name=preset,proto3,enum=livekit.EncodingOptionsPreset,oneof"` // (default H264_720P_30)
-}
-
-type AutoParticipantEgress_Advanced struct {
-	Advanced *EncodingOptions `protobuf:"bytes,2,opt,name=advanced,proto3,oneof"` // (optional)
-}
-
-func (*AutoParticipantEgress_Preset) isAutoParticipantEgress_Options() {}
-
-func (*AutoParticipantEgress_Advanced) isAutoParticipantEgress_Options() {}
-
-type AutoTrackEgress struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Filepath        string                 `protobuf:"bytes,1,opt,name=filepath,proto3" json:"filepath,omitempty"`                                       // see docs for templating (default {track_id}-{time})
-	DisableManifest bool                   `protobuf:"varint,5,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"` // disables upload of json manifest file (default false)
-	// Types that are valid to be assigned to Output:
-	//
-	//	*AutoTrackEgress_S3
-	//	*AutoTrackEgress_Gcp
-	//	*AutoTrackEgress_Azure
-	//	*AutoTrackEgress_AliOSS
-	Output        isAutoTrackEgress_Output `protobuf_oneof:"output"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AutoTrackEgress) Reset() {
-	*x = AutoTrackEgress{}
-	mi := &file_livekit_egress_proto_msgTypes[28]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AutoTrackEgress) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AutoTrackEgress) ProtoMessage() {}
-
-func (x *AutoTrackEgress) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_egress_proto_msgTypes[28]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AutoTrackEgress.ProtoReflect.Descriptor instead.
-func (*AutoTrackEgress) Descriptor() ([]byte, []int) {
-	return file_livekit_egress_proto_rawDescGZIP(), []int{28}
-}
-
-func (x *AutoTrackEgress) GetFilepath() string {
-	if x != nil {
-		return x.Filepath
-	}
-	return ""
-}
-
-func (x *AutoTrackEgress) GetDisableManifest() bool {
-	if x != nil {
-		return x.DisableManifest
-	}
-	return false
-}
-
-func (x *AutoTrackEgress) GetOutput() isAutoTrackEgress_Output {
-	if x != nil {
-		return x.Output
-	}
-	return nil
-}
-
-func (x *AutoTrackEgress) GetS3() *S3Upload {
-	if x != nil {
-		if x, ok := x.Output.(*AutoTrackEgress_S3); ok {
-			return x.S3
-		}
-	}
-	return nil
-}
-
-func (x *AutoTrackEgress) GetGcp() *GCPUpload {
-	if x != nil {
-		if x, ok := x.Output.(*AutoTrackEgress_Gcp); ok {
-			return x.Gcp
-		}
-	}
-	return nil
-}
-
-func (x *AutoTrackEgress) GetAzure() *AzureBlobUpload {
-	if x != nil {
-		if x, ok := x.Output.(*AutoTrackEgress_Azure); ok {
-			return x.Azure
-		}
-	}
-	return nil
-}
-
-func (x *AutoTrackEgress) GetAliOSS() *AliOSSUpload {
-	if x != nil {
-		if x, ok := x.Output.(*AutoTrackEgress_AliOSS); ok {
-			return x.AliOSS
-		}
-	}
-	return nil
-}
-
-type isAutoTrackEgress_Output interface {
-	isAutoTrackEgress_Output()
-}
-
-type AutoTrackEgress_S3 struct {
-	S3 *S3Upload `protobuf:"bytes,2,opt,name=s3,proto3,oneof"`
-}
-
-type AutoTrackEgress_Gcp struct {
-	Gcp *GCPUpload `protobuf:"bytes,3,opt,name=gcp,proto3,oneof"`
-}
-
-type AutoTrackEgress_Azure struct {
-	Azure *AzureBlobUpload `protobuf:"bytes,4,opt,name=azure,proto3,oneof"`
-}
-
-type AutoTrackEgress_AliOSS struct {
-	AliOSS *AliOSSUpload `protobuf:"bytes,6,opt,name=aliOSS,proto3,oneof"`
-}
-
-func (*AutoTrackEgress_S3) isAutoTrackEgress_Output() {}
-
-func (*AutoTrackEgress_Gcp) isAutoTrackEgress_Output() {}
-
-func (*AutoTrackEgress_Azure) isAutoTrackEgress_Output() {}
-
-func (*AutoTrackEgress_AliOSS) isAutoTrackEgress_Output() {}
-
 var File_livekit_egress_proto protoreflect.FileDescriptor
 
 const file_livekit_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xd5\x06\n" +
-	"\x1aRoomCompositeEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x16\n" +
-	"\x06layout\x18\x02 \x01(\tR\x06layout\x12\x1d\n" +
+	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xd7\x03\n" +
+	"\x12StartEgressRequest\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x125\n" +
+	"\btemplate\x18\x02 \x01(\v2\x17.livekit.TemplateSourceH\x00R\btemplate\x12&\n" +
+	"\x03web\x18\x03 \x01(\v2\x12.livekit.WebSourceH\x00R\x03web\x12,\n" +
+	"\x05media\x18\x04 \x01(\v2\x14.livekit.MediaSourceH\x00R\x05media\x128\n" +
+	"\x06preset\x18\x05 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
+	"\badvanced\x18\x06 \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12)\n" +
+	"\aoutputs\x18\a \x03(\v2\x0f.livekit.OutputR\aoutputs\x120\n" +
+	"\astorage\x18\b \x01(\v2\x16.livekit.StorageConfigR\astorage\x122\n" +
+	"\bwebhooks\x18\t \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
+	"\x06sourceB\n" +
 	"\n" +
-	"audio_only\x18\x03 \x01(\bR\taudioOnly\x127\n" +
-	"\faudio_mixing\x18\x0f \x01(\x0e2\x14.livekit.AudioMixingR\vaudioMixing\x12\x1d\n" +
+	"\bencoding\"\x8e\x01\n" +
+	"\x0eTemplateSource\x12\x16\n" +
+	"\x06layout\x18\x01 \x01(\tR\x06layout\x12\x1d\n" +
 	"\n" +
-	"video_only\x18\x04 \x01(\bR\tvideoOnly\x12&\n" +
-	"\x0fcustom_base_url\x18\x05 \x01(\tR\rcustomBaseUrl\x124\n" +
-	"\x04file\x18\x06 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
-	"\x06stream\x18\a \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
-	"\bsegments\x18\n" +
-	" \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
-	"\x06preset\x18\b \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
-	"\badvanced\x18\t \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12=\n" +
-	"\ffile_outputs\x18\v \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
-	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
-	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\x10 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
-	"\x06outputB\t\n" +
-	"\aoptions\"\xf5\x05\n" +
-	"\x10WebEgressRequest\x12\x10\n" +
+	"audio_only\x18\x02 \x01(\bR\taudioOnly\x12\x1d\n" +
+	"\n" +
+	"video_only\x18\x03 \x01(\bR\tvideoOnly\x12&\n" +
+	"\x0fcustom_base_url\x18\x04 \x01(\tR\rcustomBaseUrl\"\x89\x01\n" +
+	"\tWebSource\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
 	"\n" +
 	"audio_only\x18\x02 \x01(\bR\taudioOnly\x12\x1d\n" +
 	"\n" +
 	"video_only\x18\x03 \x01(\bR\tvideoOnly\x12,\n" +
-	"\x12await_start_signal\x18\f \x01(\bR\x10awaitStartSignal\x124\n" +
-	"\x04file\x18\x04 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
-	"\x06stream\x18\x05 \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
-	"\bsegments\x18\x06 \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
-	"\x06preset\x18\a \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
-	"\badvanced\x18\b \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12=\n" +
-	"\ffile_outputs\x18\t \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
-	"\x0estream_outputs\x18\n" +
-	" \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
-	"\x0fsegment_outputs\x18\v \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\r \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\x0e \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
-	"\x06outputB\t\n" +
-	"\aoptions\"\xa6\x04\n" +
-	"\x18ParticipantEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
-	"\bidentity\x18\x02 \x01(\tR\bidentity\x12!\n" +
-	"\fscreen_share\x18\x03 \x01(\bR\vscreenShare\x128\n" +
-	"\x06preset\x18\x04 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x00R\x06preset\x126\n" +
-	"\badvanced\x18\x05 \x01(\v2\x18.livekit.EncodingOptionsH\x00R\badvanced\x12=\n" +
-	"\ffile_outputs\x18\x06 \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
-	"\x0estream_outputs\x18\a \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
-	"\x0fsegment_outputs\x18\b \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\t \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\n" +
-	" \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\t\n" +
-	"\aoptions\"\x8f\x06\n" +
-	"\x1bTrackCompositeEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x126\n" +
-	"\x0eaudio_track_id\x18\x02 \x01(\tB\x10\x9a\xec,\faudioTrackIDR\faudioTrackId\x126\n" +
-	"\x0evideo_track_id\x18\x03 \x01(\tB\x10\x9a\xec,\fvideoTrackIDR\fvideoTrackId\x124\n" +
-	"\x04file\x18\x04 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
-	"\x06stream\x18\x05 \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
-	"\bsegments\x18\b \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
-	"\x06preset\x18\x06 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
-	"\badvanced\x18\a \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12=\n" +
-	"\ffile_outputs\x18\v \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
-	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
-	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
-	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
-	"\bwebhooks\x18\x0f \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
-	"\x06outputB\t\n" +
-	"\aoptions\"\xef\x01\n" +
-	"\x12TrackEgressRequest\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12&\n" +
-	"\btrack_id\x18\x02 \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12/\n" +
-	"\x04file\x18\x03 \x01(\v2\x19.livekit.DirectFileOutputH\x00R\x04file\x12%\n" +
-	"\rwebsocket_url\x18\x04 \x01(\tH\x00R\fwebsocketUrl\x122\n" +
-	"\bwebhooks\x18\x05 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
-	"\x06output\"\xcb\x02\n" +
-	"\x11EncodedFileOutput\x125\n" +
+	"\x12await_start_signal\x18\x04 \x01(\bR\x10awaitStartSignal\"\xef\x01\n" +
+	"\vMediaSource\x128\n" +
+	"\x0evideo_track_id\x18\x01 \x01(\tB\x10\x9a\xec,\fvideoTrackIDH\x00R\fvideoTrackId\x12H\n" +
+	"\x11participant_video\x18\x02 \x01(\v2\x19.livekit.ParticipantVideoH\x00R\x10participantVideo\x12*\n" +
+	"\x05audio\x18\x03 \x01(\v2\x14.livekit.AudioConfigR\x05audio\x12'\n" +
+	"\x04data\x18\x04 \x01(\v2\x13.livekit.DataConfigR\x04dataB\a\n" +
+	"\x05video\"^\n" +
+	"\x10ParticipantVideo\x12\x1a\n" +
+	"\bidentity\x18\x01 \x01(\tR\bidentity\x12.\n" +
+	"\x13prefer_screen_share\x18\x02 \x01(\bR\x11preferScreenShare\":\n" +
+	"\vAudioConfig\x12+\n" +
+	"\x06routes\x18\x01 \x03(\v2\x13.livekit.AudioRouteR\x06routes\"\xf1\x01\n" +
+	"\n" +
+	"AudioRoute\x12(\n" +
+	"\btrack_id\x18\x01 \x01(\tB\v\x9a\xec,\atrackIDH\x00R\atrackId\x123\n" +
+	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12J\n" +
+	"\x10participant_kind\x18\x03 \x01(\x0e2\x1d.livekit.ParticipantInfo.KindH\x00R\x0fparticipantKind\x12/\n" +
+	"\achannel\x18\x04 \x01(\x0e2\x15.livekit.AudioChannelR\achannelB\a\n" +
+	"\x05match\"A\n" +
+	"\n" +
+	"DataConfig\x123\n" +
+	"\tselectors\x18\x01 \x03(\v2\x15.livekit.DataSelectorR\tselectors\"\x8e\x01\n" +
+	"\fDataSelector\x12(\n" +
+	"\btrack_id\x18\x01 \x01(\tB\v\x9a\xec,\atrackIDH\x00R\atrackId\x123\n" +
+	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12\x16\n" +
+	"\x05topic\x18\x03 \x01(\tH\x00R\x05topicB\a\n" +
+	"\x05match\"\xca\x03\n" +
+	"\x0fEncodingOptions\x12\x14\n" +
+	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
+	"\x06height\x18\x02 \x01(\x05R\x06height\x12\x14\n" +
+	"\x05depth\x18\x03 \x01(\x05R\x05depth\x12\x1c\n" +
+	"\tframerate\x18\x04 \x01(\x05R\tframerate\x124\n" +
+	"\vaudio_codec\x18\x05 \x01(\x0e2\x13.livekit.AudioCodecR\n" +
+	"audioCodec\x12#\n" +
+	"\raudio_bitrate\x18\x06 \x01(\x05R\faudioBitrate\x12#\n" +
+	"\raudio_quality\x18\v \x01(\x05R\faudioQuality\x12'\n" +
+	"\x0faudio_frequency\x18\a \x01(\x05R\x0eaudioFrequency\x124\n" +
+	"\vvideo_codec\x18\b \x01(\x0e2\x13.livekit.VideoCodecR\n" +
+	"videoCodec\x12#\n" +
+	"\rvideo_bitrate\x18\t \x01(\x05R\fvideoBitrate\x12#\n" +
+	"\rvideo_quality\x18\f \x01(\x05R\fvideoQuality\x12,\n" +
+	"\x12key_frame_interval\x18\n" +
+	" \x01(\x01R\x10keyFrameInterval\"\xb7\x02\n" +
+	"\x06Output\x12)\n" +
+	"\x04file\x18\x01 \x01(\v2\x13.livekit.FileOutputH\x00R\x04file\x12/\n" +
+	"\x06stream\x18\x02 \x01(\v2\x15.livekit.StreamOutputH\x00R\x06stream\x12:\n" +
+	"\bsegments\x18\x03 \x01(\v2\x1c.livekit.SegmentedFileOutputH\x00R\bsegments\x12.\n" +
+	"\x06images\x18\x04 \x01(\v2\x14.livekit.ImageOutputH\x00R\x06images\x12)\n" +
+	"\x04mcap\x18\x05 \x01(\v2\x13.livekit.McapOutputH\x00R\x04mcap\x120\n" +
+	"\astorage\x18\x06 \x01(\v2\x16.livekit.StorageConfigR\astorageB\b\n" +
+	"\x06config\"\x8a\x01\n" +
+	"\n" +
+	"FileOutput\x125\n" +
 	"\tfile_type\x18\x01 \x01(\x0e2\x18.livekit.EncodedFileTypeR\bfileType\x12\x1a\n" +
 	"\bfilepath\x18\x02 \x01(\tR\bfilepath\x12)\n" +
-	"\x10disable_manifest\x18\x06 \x01(\bR\x0fdisableManifest\x12#\n" +
-	"\x02s3\x18\x03 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
-	"\x03gcp\x18\x04 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
-	"\x05azure\x18\x05 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
-	"\x06aliOSS\x18\a \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xa4\x04\n" +
+	"\x10disable_manifest\x18\x03 \x01(\bR\x0fdisableManifest\"W\n" +
+	"\fStreamOutput\x123\n" +
+	"\bprotocol\x18\x01 \x01(\x0e2\x17.livekit.StreamProtocolR\bprotocol\x12\x12\n" +
+	"\x04urls\x18\x02 \x03(\tR\x04urls\"\xb4\x04\n" +
 	"\x13SegmentedFileOutput\x12:\n" +
 	"\bprotocol\x18\x01 \x01(\x0e2\x1e.livekit.SegmentedFileProtocolR\bprotocol\x12'\n" +
 	"\x0ffilename_prefix\x18\x02 \x01(\tR\x0efilenamePrefix\x12#\n" +
@@ -4003,20 +5630,12 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x10segment_duration\x18\x04 \x01(\rR\x0fsegmentDuration\x12E\n" +
 	"\x0ffilename_suffix\x18\n" +
 	" \x01(\x0e2\x1c.livekit.SegmentedFileSuffixR\x0efilenameSuffix\x12)\n" +
-	"\x10disable_manifest\x18\b \x01(\bR\x0fdisableManifest\x12#\n" +
-	"\x02s3\x18\x05 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
-	"\x03gcp\x18\x06 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
-	"\x05azure\x18\a \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
-	"\x06aliOSS\x18\t \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\x93\x02\n" +
-	"\x10DirectFileOutput\x12\x1a\n" +
-	"\bfilepath\x18\x01 \x01(\tR\bfilepath\x12)\n" +
-	"\x10disable_manifest\x18\x05 \x01(\bR\x0fdisableManifest\x12#\n" +
-	"\x02s3\x18\x02 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
-	"\x03gcp\x18\x03 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
-	"\x05azure\x18\x04 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
-	"\x06aliOSS\x18\x06 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xed\x03\n" +
+	"\x10disable_manifest\x18\b \x01(\bR\x0fdisableManifest\x12'\n" +
+	"\x02s3\x18\x05 \x01(\v2\x11.livekit.S3UploadB\x02\x18\x01H\x00R\x02s3\x12*\n" +
+	"\x03gcp\x18\x06 \x01(\v2\x12.livekit.GCPUploadB\x02\x18\x01H\x00R\x03gcp\x124\n" +
+	"\x05azure\x18\a \x01(\v2\x18.livekit.AzureBlobUploadB\x02\x18\x01H\x00R\x05azure\x123\n" +
+	"\x06aliOSS\x18\t \x01(\v2\x15.livekit.AliOSSUploadB\x02\x18\x01H\x00R\x06aliOSSB\b\n" +
+	"\x06output\"\xfd\x03\n" +
 	"\vImageOutput\x12)\n" +
 	"\x10capture_interval\x18\x01 \x01(\rR\x0fcaptureInterval\x12\x14\n" +
 	"\x05width\x18\x02 \x01(\x05R\x05width\x12\x16\n" +
@@ -4025,13 +5644,24 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0ffilename_suffix\x18\x05 \x01(\x0e2\x18.livekit.ImageFileSuffixR\x0efilenameSuffix\x124\n" +
 	"\vimage_codec\x18\x06 \x01(\x0e2\x13.livekit.ImageCodecR\n" +
 	"imageCodec\x12)\n" +
-	"\x10disable_manifest\x18\a \x01(\bR\x0fdisableManifest\x12#\n" +
-	"\x02s3\x18\b \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
-	"\x03gcp\x18\t \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
+	"\x10disable_manifest\x18\a \x01(\bR\x0fdisableManifest\x12'\n" +
+	"\x02s3\x18\b \x01(\v2\x11.livekit.S3UploadB\x02\x18\x01H\x00R\x02s3\x12*\n" +
+	"\x03gcp\x18\t \x01(\v2\x12.livekit.GCPUploadB\x02\x18\x01H\x00R\x03gcp\x124\n" +
 	"\x05azure\x18\n" +
-	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
-	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xe2\x04\n" +
+	" \x01(\v2\x18.livekit.AzureBlobUploadB\x02\x18\x01H\x00R\x05azure\x123\n" +
+	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadB\x02\x18\x01H\x00R\x06aliOSSB\b\n" +
+	"\x06output\"S\n" +
+	"\n" +
+	"McapOutput\x12\x1a\n" +
+	"\bfilepath\x18\x01 \x01(\tR\bfilepath\x12)\n" +
+	"\x10disable_manifest\x18\x02 \x01(\bR\x0fdisableManifest\"\xcc\x01\n" +
+	"\rStorageConfig\x12#\n" +
+	"\x02s3\x18\x01 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
+	"\x03gcp\x18\x02 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
+	"\x05azure\x18\x03 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x120\n" +
+	"\aali_oss\x18\x04 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOssB\n" +
+	"\n" +
+	"\bprovider\"\xe2\x04\n" +
 	"\bS3Upload\x12#\n" +
 	"\n" +
 	"access_key\x18\x01 \x01(\tB\x04\x88\xec,\x01R\taccessKey\x12\x1c\n" +
@@ -4066,45 +5696,25 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x06secret\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x06secret\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x1a\n" +
 	"\bendpoint\x18\x04 \x01(\tR\bendpoint\x12\x16\n" +
-	"\x06bucket\x18\x05 \x01(\tR\x06bucket\"W\n" +
+	"\x06bucket\x18\x05 \x01(\tR\x06bucket\"]\n" +
 	"\vProxyConfig\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1a\n" +
-	"\busername\x18\x02 \x01(\tR\busername\x12\x1a\n" +
-	"\bpassword\x18\x03 \x01(\tR\bpassword\"W\n" +
-	"\fStreamOutput\x123\n" +
-	"\bprotocol\x18\x01 \x01(\x0e2\x17.livekit.StreamProtocolR\bprotocol\x12\x12\n" +
-	"\x04urls\x18\x02 \x03(\tR\x04urls\"\xca\x03\n" +
-	"\x0fEncodingOptions\x12\x14\n" +
-	"\x05width\x18\x01 \x01(\x05R\x05width\x12\x16\n" +
-	"\x06height\x18\x02 \x01(\x05R\x06height\x12\x14\n" +
-	"\x05depth\x18\x03 \x01(\x05R\x05depth\x12\x1c\n" +
-	"\tframerate\x18\x04 \x01(\x05R\tframerate\x124\n" +
-	"\vaudio_codec\x18\x05 \x01(\x0e2\x13.livekit.AudioCodecR\n" +
-	"audioCodec\x12#\n" +
-	"\raudio_bitrate\x18\x06 \x01(\x05R\faudioBitrate\x12#\n" +
-	"\raudio_quality\x18\v \x01(\x05R\faudioQuality\x12'\n" +
-	"\x0faudio_frequency\x18\a \x01(\x05R\x0eaudioFrequency\x124\n" +
-	"\vvideo_codec\x18\b \x01(\x0e2\x13.livekit.VideoCodecR\n" +
-	"videoCodec\x12#\n" +
-	"\rvideo_bitrate\x18\t \x01(\x05R\fvideoBitrate\x12#\n" +
-	"\rvideo_quality\x18\f \x01(\x05R\fvideoQuality\x12,\n" +
-	"\x12key_frame_interval\x18\n" +
-	" \x01(\x01R\x10keyFrameInterval\"X\n" +
-	"\x13UpdateLayoutRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x16\n" +
-	"\x06layout\x18\x02 \x01(\tR\x06layout\"\x96\x01\n" +
-	"\x13UpdateStreamRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12&\n" +
-	"\x0fadd_output_urls\x18\x02 \x03(\tR\raddOutputUrls\x12,\n" +
-	"\x12remove_output_urls\x18\x03 \x03(\tR\x10removeOutputUrls\"s\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12 \n" +
+	"\bpassword\x18\x03 \x01(\tB\x04\x88\xec,\x01R\bpassword\"s\n" +
 	"\x11ListEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12)\n" +
 	"\tegress_id\x18\x02 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x16\n" +
 	"\x06active\x18\x03 \x01(\bR\x06active\"?\n" +
 	"\x12ListEgressResponse\x12)\n" +
-	"\x05items\x18\x01 \x03(\v2\x13.livekit.EgressInfoR\x05items\">\n" +
+	"\x05items\x18\x01 \x03(\v2\x13.livekit.EgressInfoR\x05items\"\xc0\x01\n" +
+	"\x13UpdateEgressRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\x12\x16\n" +
+	"\x06layout\x18\x03 \x01(\tR\x06layout\x12&\n" +
+	"\x0fadd_stream_urls\x18\x04 \x03(\tR\raddStreamUrls\x12,\n" +
+	"\x12remove_stream_urls\x18\x05 \x03(\tR\x10removeStreamUrls\">\n" +
 	"\x11StopEgressRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"\xf2\t\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"\xab\v\n" +
 	"\n" +
 	"EgressInfo\x12)\n" +
 	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12#\n" +
@@ -4119,31 +5729,32 @@ const file_livekit_egress_proto_rawDesc = "" +
 	" \x01(\x03R\tstartedAt\x12\x19\n" +
 	"\bended_at\x18\v \x01(\x03R\aendedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x12 \x01(\x03R\tupdatedAt\x12\x18\n" +
-	"\adetails\x18\x15 \x01(\tR\adetails\x12\x14\n" +
-	"\x05error\x18\t \x01(\tR\x05error\x12\x1d\n" +
-	"\n" +
-	"error_code\x18\x16 \x01(\x05R\terrorCode\x12L\n" +
-	"\x0eroom_composite\x18\x04 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
-	"\x03web\x18\x0e \x01(\v2\x19.livekit.WebEgressRequestH\x00R\x03web\x12E\n" +
-	"\vparticipant\x18\x13 \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
-	"\x0ftrack_composite\x18\x05 \x01(\v2$.livekit.TrackCompositeEgressRequestH\x00R\x0etrackComposite\x123\n" +
-	"\x05track\x18\x06 \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x125\n" +
-	"\x06stream\x18\a \x01(\v2\x17.livekit.StreamInfoListB\x02\x18\x01H\x01R\x06stream\x12+\n" +
-	"\x04file\x18\b \x01(\v2\x11.livekit.FileInfoB\x02\x18\x01H\x01R\x04file\x127\n" +
-	"\bsegments\x18\f \x01(\v2\x15.livekit.SegmentsInfoB\x02\x18\x01H\x01R\bsegments\x12:\n" +
+	"updated_at\x18\x12 \x01(\x03R\tupdatedAt\x125\n" +
+	"\x06egress\x18\x1d \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
+	"\x06replay\x18\x1e \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12P\n" +
+	"\x0eroom_composite\x18\x04 \x01(\v2#.livekit.RoomCompositeEgressRequestB\x02\x18\x01H\x00R\rroomComposite\x121\n" +
+	"\x03web\x18\x0e \x01(\v2\x19.livekit.WebEgressRequestB\x02\x18\x01H\x00R\x03web\x12I\n" +
+	"\vparticipant\x18\x13 \x01(\v2!.livekit.ParticipantEgressRequestB\x02\x18\x01H\x00R\vparticipant\x12S\n" +
+	"\x0ftrack_composite\x18\x05 \x01(\v2$.livekit.TrackCompositeEgressRequestB\x02\x18\x01H\x00R\x0etrackComposite\x127\n" +
+	"\x05track\x18\x06 \x01(\v2\x1b.livekit.TrackEgressRequestB\x02\x18\x01H\x00R\x05track\x12:\n" +
 	"\x0estream_results\x18\x0f \x03(\v2\x13.livekit.StreamInfoR\rstreamResults\x124\n" +
 	"\ffile_results\x18\x10 \x03(\v2\x11.livekit.FileInfoR\vfileResults\x12>\n" +
 	"\x0fsegment_results\x18\x11 \x03(\v2\x15.livekit.SegmentsInfoR\x0esegmentResults\x128\n" +
-	"\rimage_results\x18\x14 \x03(\v2\x13.livekit.ImagesInfoR\fimageResults\x12+\n" +
+	"\rimage_results\x18\x14 \x03(\v2\x13.livekit.ImagesInfoR\fimageResults\x124\n" +
+	"\fmcap_results\x18\x1c \x03(\v2\x11.livekit.McapInfoR\vmcapResults\x12\x14\n" +
+	"\x05error\x18\t \x01(\tR\x05error\x12\x1d\n" +
+	"\n" +
+	"error_code\x18\x16 \x01(\x05R\terrorCode\x12\x18\n" +
+	"\adetails\x18\x15 \x01(\tR\adetails\x12+\n" +
 	"\x11manifest_location\x18\x17 \x01(\tR\x10manifestLocation\x12.\n" +
 	"\x13backup_storage_used\x18\x19 \x01(\bR\x11backupStorageUsed\x12\x1f\n" +
 	"\vretry_count\x18\x1b \x01(\x05R\n" +
-	"retryCountB\t\n" +
+	"retryCount\x125\n" +
+	"\x06stream\x18\a \x01(\v2\x17.livekit.StreamInfoListB\x02\x18\x01H\x01R\x06stream\x12+\n" +
+	"\x04file\x18\b \x01(\v2\x11.livekit.FileInfoB\x02\x18\x01H\x01R\x04file\x127\n" +
+	"\bsegments\x18\f \x01(\v2\x15.livekit.SegmentsInfoB\x02\x18\x01H\x01R\bsegmentsB\t\n" +
 	"\arequestB\b\n" +
-	"\x06result\"=\n" +
-	"\x0eStreamInfoList\x12'\n" +
-	"\x04info\x18\x01 \x03(\v2\x13.livekit.StreamInfoR\x04info:\x02\x18\x01\"\xac\x02\n" +
+	"\x06result\"\xac\x02\n" +
 	"\n" +
 	"StreamInfo\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
@@ -4187,7 +5798,17 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"imageCount\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x02 \x01(\x03R\tstartedAt\x12\x19\n" +
-	"\bended_at\x18\x03 \x01(\x03R\aendedAt\"\x9a\x02\n" +
+	"\bended_at\x18\x03 \x01(\x03R\aendedAt\"\xcd\x01\n" +
+	"\bMcapInfo\x12\x1a\n" +
+	"\bfilename\x18\x01 \x01(\tR\bfilename\x12\x1d\n" +
+	"\n" +
+	"started_at\x18\x02 \x01(\x03R\tstartedAt\x12\x19\n" +
+	"\bended_at\x18\x03 \x01(\x03R\aendedAt\x12\x1a\n" +
+	"\bduration\x18\x04 \x01(\x03R\bduration\x12\x12\n" +
+	"\x04size\x18\x05 \x01(\x03R\x04size\x12\x1a\n" +
+	"\blocation\x18\x06 \x01(\tR\blocation\x12\x1f\n" +
+	"\vtrack_count\x18\a \x01(\x03R\n" +
+	"trackCount\"\x9a\x02\n" +
 	"\x15AutoParticipantEgress\x128\n" +
 	"\x06preset\x18\x01 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x00R\x06preset\x126\n" +
 	"\badvanced\x18\x02 \x01(\v2\x18.livekit.EncodingOptionsH\x00R\badvanced\x12=\n" +
@@ -4201,12 +5822,150 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x03gcp\x18\x03 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
 	"\x05azure\x18\x04 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\x06 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output*B\n" +
+	"\x06output\"\xb2\x04\n" +
+	"\x13ExportReplayRequest\x12)\n" +
+	"\treplay_id\x18\x01 \x01(\tB\f\x9a\xec,\breplayIDR\breplayId\x12&\n" +
+	"\x0fstart_offset_ms\x18\x02 \x01(\x03R\rstartOffsetMs\x12\"\n" +
+	"\rend_offset_ms\x18\x03 \x01(\x03R\vendOffsetMs\x125\n" +
+	"\btemplate\x18\x04 \x01(\v2\x17.livekit.TemplateSourceH\x00R\btemplate\x12&\n" +
+	"\x03web\x18\x05 \x01(\v2\x12.livekit.WebSourceH\x00R\x03web\x12,\n" +
+	"\x05media\x18\x06 \x01(\v2\x14.livekit.MediaSourceH\x00R\x05media\x128\n" +
+	"\x06preset\x18\a \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
+	"\badvanced\x18\b \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12)\n" +
+	"\aoutputs\x18\t \x03(\v2\x0f.livekit.OutputR\aoutputs\x120\n" +
+	"\astorage\x18\n" +
+	" \x01(\v2\x16.livekit.StorageConfigR\astorage\x122\n" +
+	"\bwebhooks\x18\v \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
+	"\x06sourceB\n" +
+	"\n" +
+	"\bencoding\"\xd9\x06\n" +
+	"\x1aRoomCompositeEgressRequest\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x16\n" +
+	"\x06layout\x18\x02 \x01(\tR\x06layout\x12\x1d\n" +
+	"\n" +
+	"audio_only\x18\x03 \x01(\bR\taudioOnly\x127\n" +
+	"\faudio_mixing\x18\x0f \x01(\x0e2\x14.livekit.AudioMixingR\vaudioMixing\x12\x1d\n" +
+	"\n" +
+	"video_only\x18\x04 \x01(\bR\tvideoOnly\x12&\n" +
+	"\x0fcustom_base_url\x18\x05 \x01(\tR\rcustomBaseUrl\x124\n" +
+	"\x04file\x18\x06 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
+	"\x06stream\x18\a \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
+	"\bsegments\x18\n" +
+	" \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
+	"\x06preset\x18\b \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
+	"\badvanced\x18\t \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12=\n" +
+	"\ffile_outputs\x18\v \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
+	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
+	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
+	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\x10 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\x06outputB\t\n" +
+	"\aoptions\"\xf9\x05\n" +
+	"\x10WebEgressRequest\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1d\n" +
+	"\n" +
+	"audio_only\x18\x02 \x01(\bR\taudioOnly\x12\x1d\n" +
+	"\n" +
+	"video_only\x18\x03 \x01(\bR\tvideoOnly\x12,\n" +
+	"\x12await_start_signal\x18\f \x01(\bR\x10awaitStartSignal\x124\n" +
+	"\x04file\x18\x04 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
+	"\x06stream\x18\x05 \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
+	"\bsegments\x18\x06 \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
+	"\x06preset\x18\a \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
+	"\badvanced\x18\b \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12=\n" +
+	"\ffile_outputs\x18\t \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
+	"\x0estream_outputs\x18\n" +
+	" \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
+	"\x0fsegment_outputs\x18\v \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
+	"\rimage_outputs\x18\r \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\x0e \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\x06outputB\t\n" +
+	"\aoptions\"\xaa\x04\n" +
+	"\x18ParticipantEgressRequest\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
+	"\bidentity\x18\x02 \x01(\tR\bidentity\x12!\n" +
+	"\fscreen_share\x18\x03 \x01(\bR\vscreenShare\x128\n" +
+	"\x06preset\x18\x04 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x00R\x06preset\x126\n" +
+	"\badvanced\x18\x05 \x01(\v2\x18.livekit.EncodingOptionsH\x00R\badvanced\x12=\n" +
+	"\ffile_outputs\x18\x06 \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
+	"\x0estream_outputs\x18\a \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
+	"\x0fsegment_outputs\x18\b \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
+	"\rimage_outputs\x18\t \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\n" +
+	" \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\t\n" +
+	"\aoptions\"\x93\x06\n" +
+	"\x1bTrackCompositeEgressRequest\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x126\n" +
+	"\x0eaudio_track_id\x18\x02 \x01(\tB\x10\x9a\xec,\faudioTrackIDR\faudioTrackId\x126\n" +
+	"\x0evideo_track_id\x18\x03 \x01(\tB\x10\x9a\xec,\fvideoTrackIDR\fvideoTrackId\x124\n" +
+	"\x04file\x18\x04 \x01(\v2\x1a.livekit.EncodedFileOutputB\x02\x18\x01H\x00R\x04file\x123\n" +
+	"\x06stream\x18\x05 \x01(\v2\x15.livekit.StreamOutputB\x02\x18\x01H\x00R\x06stream\x12>\n" +
+	"\bsegments\x18\b \x01(\v2\x1c.livekit.SegmentedFileOutputB\x02\x18\x01H\x00R\bsegments\x128\n" +
+	"\x06preset\x18\x06 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
+	"\badvanced\x18\a \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12=\n" +
+	"\ffile_outputs\x18\v \x03(\v2\x1a.livekit.EncodedFileOutputR\vfileOutputs\x12<\n" +
+	"\x0estream_outputs\x18\f \x03(\v2\x15.livekit.StreamOutputR\rstreamOutputs\x12E\n" +
+	"\x0fsegment_outputs\x18\r \x03(\v2\x1c.livekit.SegmentedFileOutputR\x0esegmentOutputs\x129\n" +
+	"\rimage_outputs\x18\x0e \x03(\v2\x14.livekit.ImageOutputR\fimageOutputs\x122\n" +
+	"\bwebhooks\x18\x0f \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\x06outputB\t\n" +
+	"\aoptions\"\xf3\x01\n" +
+	"\x12TrackEgressRequest\x12\x1b\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12&\n" +
+	"\btrack_id\x18\x02 \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12/\n" +
+	"\x04file\x18\x03 \x01(\v2\x19.livekit.DirectFileOutputH\x00R\x04file\x12%\n" +
+	"\rwebsocket_url\x18\x04 \x01(\tH\x00R\fwebsocketUrl\x122\n" +
+	"\bwebhooks\x18\x05 \x03(\v2\x16.livekit.WebhookConfigR\bwebhooks:\x02\x18\x01B\b\n" +
+	"\x06output\"\x97\x02\n" +
+	"\x10DirectFileOutput\x12\x1a\n" +
+	"\bfilepath\x18\x01 \x01(\tR\bfilepath\x12)\n" +
+	"\x10disable_manifest\x18\x05 \x01(\bR\x0fdisableManifest\x12#\n" +
+	"\x02s3\x18\x02 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
+	"\x03gcp\x18\x03 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
+	"\x05azure\x18\x04 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
+	"\x06aliOSS\x18\x06 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSS:\x02\x18\x01B\b\n" +
+	"\x06output\"\xcf\x02\n" +
+	"\x11EncodedFileOutput\x125\n" +
+	"\tfile_type\x18\x01 \x01(\x0e2\x18.livekit.EncodedFileTypeR\bfileType\x12\x1a\n" +
+	"\bfilepath\x18\x02 \x01(\tR\bfilepath\x12)\n" +
+	"\x10disable_manifest\x18\x06 \x01(\bR\x0fdisableManifest\x12#\n" +
+	"\x02s3\x18\x03 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
+	"\x03gcp\x18\x04 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
+	"\x05azure\x18\x05 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
+	"\x06aliOSS\x18\a \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSS:\x02\x18\x01B\b\n" +
+	"\x06output\"\\\n" +
+	"\x13UpdateLayoutRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12\x16\n" +
+	"\x06layout\x18\x02 \x01(\tR\x06layout:\x02\x18\x01\"\x9a\x01\n" +
+	"\x13UpdateStreamRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12&\n" +
+	"\x0fadd_output_urls\x18\x02 \x03(\tR\raddOutputUrls\x12,\n" +
+	"\x12remove_output_urls\x18\x03 \x03(\tR\x10removeOutputUrls:\x02\x18\x01\"=\n" +
+	"\x0eStreamInfoList\x12'\n" +
+	"\x04info\x18\x01 \x03(\v2\x13.livekit.StreamInfoR\x04info:\x02\x18\x01*W\n" +
+	"\fAudioChannel\x12\x16\n" +
+	"\x12AUDIO_CHANNEL_BOTH\x10\x00\x12\x16\n" +
+	"\x12AUDIO_CHANNEL_LEFT\x10\x01\x12\x17\n" +
+	"\x13AUDIO_CHANNEL_RIGHT\x10\x02*\xcf\x01\n" +
+	"\x15EncodingOptionsPreset\x12\x10\n" +
+	"\fH264_720P_30\x10\x00\x12\x10\n" +
+	"\fH264_720P_60\x10\x01\x12\x11\n" +
+	"\rH264_1080P_30\x10\x02\x12\x11\n" +
+	"\rH264_1080P_60\x10\x03\x12\x19\n" +
+	"\x15PORTRAIT_H264_720P_30\x10\x04\x12\x19\n" +
+	"\x15PORTRAIT_H264_720P_60\x10\x05\x12\x1a\n" +
+	"\x16PORTRAIT_H264_1080P_30\x10\x06\x12\x1a\n" +
+	"\x16PORTRAIT_H264_1080P_60\x10\a*B\n" +
 	"\x0fEncodedFileType\x12\x14\n" +
 	"\x10DEFAULT_FILETYPE\x10\x00\x12\a\n" +
 	"\x03MP4\x10\x01\x12\a\n" +
 	"\x03OGG\x10\x02\x12\a\n" +
-	"\x03MP3\x10\x03*N\n" +
+	"\x03MP3\x10\x03*H\n" +
+	"\x0eStreamProtocol\x12\x14\n" +
+	"\x10DEFAULT_PROTOCOL\x10\x00\x12\b\n" +
+	"\x04RTMP\x10\x01\x12\a\n" +
+	"\x03SRT\x10\x02\x12\r\n" +
+	"\tWEBSOCKET\x10\x03*N\n" +
 	"\x15SegmentedFileProtocol\x12#\n" +
 	"\x1fDEFAULT_SEGMENTED_FILE_PROTOCOL\x10\x00\x12\x10\n" +
 	"\fHLS_PROTOCOL\x10\x01*/\n" +
@@ -4216,24 +5975,10 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0fImageFileSuffix\x12\x16\n" +
 	"\x12IMAGE_SUFFIX_INDEX\x10\x00\x12\x1a\n" +
 	"\x16IMAGE_SUFFIX_TIMESTAMP\x10\x01\x12\x1f\n" +
-	"\x1bIMAGE_SUFFIX_NONE_OVERWRITE\x10\x02*9\n" +
-	"\x0eStreamProtocol\x12\x14\n" +
-	"\x10DEFAULT_PROTOCOL\x10\x00\x12\b\n" +
-	"\x04RTMP\x10\x01\x12\a\n" +
-	"\x03SRT\x10\x02*U\n" +
-	"\vAudioMixing\x12\x12\n" +
-	"\x0eDEFAULT_MIXING\x10\x00\x12\x16\n" +
-	"\x12DUAL_CHANNEL_AGENT\x10\x01\x12\x1a\n" +
-	"\x16DUAL_CHANNEL_ALTERNATE\x10\x02*\xcf\x01\n" +
-	"\x15EncodingOptionsPreset\x12\x10\n" +
-	"\fH264_720P_30\x10\x00\x12\x10\n" +
-	"\fH264_720P_60\x10\x01\x12\x11\n" +
-	"\rH264_1080P_30\x10\x02\x12\x11\n" +
-	"\rH264_1080P_60\x10\x03\x12\x19\n" +
-	"\x15PORTRAIT_H264_720P_30\x10\x04\x12\x19\n" +
-	"\x15PORTRAIT_H264_720P_60\x10\x05\x12\x1a\n" +
-	"\x16PORTRAIT_H264_1080P_30\x10\x06\x12\x1a\n" +
-	"\x16PORTRAIT_H264_1080P_60\x10\a*\x9f\x01\n" +
+	"\x1bIMAGE_SUFFIX_NONE_OVERWRITE\x10\x02*J\n" +
+	"\x10EgressSourceType\x12\x1a\n" +
+	"\x16EGRESS_SOURCE_TYPE_WEB\x10\x00\x12\x1a\n" +
+	"\x16EGRESS_SOURCE_TYPE_SDK\x10\x01*\x9f\x01\n" +
 	"\fEgressStatus\x12\x13\n" +
 	"\x0fEGRESS_STARTING\x10\x00\x12\x11\n" +
 	"\rEGRESS_ACTIVE\x10\x01\x12\x11\n" +
@@ -4241,22 +5986,25 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x0fEGRESS_COMPLETE\x10\x03\x12\x11\n" +
 	"\rEGRESS_FAILED\x10\x04\x12\x12\n" +
 	"\x0eEGRESS_ABORTED\x10\x05\x12\x18\n" +
-	"\x14EGRESS_LIMIT_REACHED\x10\x06*J\n" +
-	"\x10EgressSourceType\x12\x1a\n" +
-	"\x16EGRESS_SOURCE_TYPE_WEB\x10\x00\x12\x1a\n" +
-	"\x16EGRESS_SOURCE_TYPE_SDK\x10\x012\x9c\x05\n" +
-	"\x06Egress\x12T\n" +
-	"\x18StartRoomCompositeEgress\x12#.livekit.RoomCompositeEgressRequest\x1a\x13.livekit.EgressInfo\x12@\n" +
-	"\x0eStartWebEgress\x12\x19.livekit.WebEgressRequest\x1a\x13.livekit.EgressInfo\x12P\n" +
-	"\x16StartParticipantEgress\x12!.livekit.ParticipantEgressRequest\x1a\x13.livekit.EgressInfo\x12V\n" +
-	"\x19StartTrackCompositeEgress\x12$.livekit.TrackCompositeEgressRequest\x1a\x13.livekit.EgressInfo\x12D\n" +
-	"\x10StartTrackEgress\x12\x1b.livekit.TrackEgressRequest\x1a\x13.livekit.EgressInfo\x12A\n" +
-	"\fUpdateLayout\x12\x1c.livekit.UpdateLayoutRequest\x1a\x13.livekit.EgressInfo\x12A\n" +
-	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\x12E\n" +
+	"\x14EGRESS_LIMIT_REACHED\x10\x06*U\n" +
+	"\vAudioMixing\x12\x12\n" +
+	"\x0eDEFAULT_MIXING\x10\x00\x12\x16\n" +
+	"\x12DUAL_CHANNEL_AGENT\x10\x01\x12\x1a\n" +
+	"\x16DUAL_CHANNEL_ALTERNATE\x10\x022\xc3\x06\n" +
+	"\x06Egress\x12?\n" +
+	"\vStartEgress\x12\x1b.livekit.StartEgressRequest\x1a\x13.livekit.EgressInfo\x12A\n" +
+	"\fUpdateEgress\x12\x1c.livekit.UpdateEgressRequest\x1a\x13.livekit.EgressInfo\x12E\n" +
 	"\n" +
 	"ListEgress\x12\x1a.livekit.ListEgressRequest\x1a\x1b.livekit.ListEgressResponse\x12=\n" +
 	"\n" +
-	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfoBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\x12Y\n" +
+	"\x18StartRoomCompositeEgress\x12#.livekit.RoomCompositeEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12E\n" +
+	"\x0eStartWebEgress\x12\x19.livekit.WebEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12U\n" +
+	"\x16StartParticipantEgress\x12!.livekit.ParticipantEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12[\n" +
+	"\x19StartTrackCompositeEgress\x12$.livekit.TrackCompositeEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12I\n" +
+	"\x10StartTrackEgress\x12\x1b.livekit.TrackEgressRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12F\n" +
+	"\fUpdateLayout\x12\x1c.livekit.UpdateLayoutRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01\x12F\n" +
+	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x03\x88\x02\x01BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_egress_proto_rawDescOnce sync.Once
@@ -4270,170 +6018,229 @@ func file_livekit_egress_proto_rawDescGZIP() []byte {
 	return file_livekit_egress_proto_rawDescData
 }
 
-var file_livekit_egress_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
-var file_livekit_egress_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_livekit_egress_proto_enumTypes = make([]protoimpl.EnumInfo, 11)
+var file_livekit_egress_proto_msgTypes = make([]protoimpl.MessageInfo, 46)
 var file_livekit_egress_proto_goTypes = []any{
-	(EncodedFileType)(0),                // 0: livekit.EncodedFileType
-	(SegmentedFileProtocol)(0),          // 1: livekit.SegmentedFileProtocol
-	(SegmentedFileSuffix)(0),            // 2: livekit.SegmentedFileSuffix
-	(ImageFileSuffix)(0),                // 3: livekit.ImageFileSuffix
-	(StreamProtocol)(0),                 // 4: livekit.StreamProtocol
-	(AudioMixing)(0),                    // 5: livekit.AudioMixing
-	(EncodingOptionsPreset)(0),          // 6: livekit.EncodingOptionsPreset
-	(EgressStatus)(0),                   // 7: livekit.EgressStatus
-	(EgressSourceType)(0),               // 8: livekit.EgressSourceType
-	(StreamInfo_Status)(0),              // 9: livekit.StreamInfo.Status
-	(*RoomCompositeEgressRequest)(nil),  // 10: livekit.RoomCompositeEgressRequest
-	(*WebEgressRequest)(nil),            // 11: livekit.WebEgressRequest
-	(*ParticipantEgressRequest)(nil),    // 12: livekit.ParticipantEgressRequest
-	(*TrackCompositeEgressRequest)(nil), // 13: livekit.TrackCompositeEgressRequest
-	(*TrackEgressRequest)(nil),          // 14: livekit.TrackEgressRequest
-	(*EncodedFileOutput)(nil),           // 15: livekit.EncodedFileOutput
-	(*SegmentedFileOutput)(nil),         // 16: livekit.SegmentedFileOutput
-	(*DirectFileOutput)(nil),            // 17: livekit.DirectFileOutput
-	(*ImageOutput)(nil),                 // 18: livekit.ImageOutput
-	(*S3Upload)(nil),                    // 19: livekit.S3Upload
-	(*GCPUpload)(nil),                   // 20: livekit.GCPUpload
-	(*AzureBlobUpload)(nil),             // 21: livekit.AzureBlobUpload
-	(*AliOSSUpload)(nil),                // 22: livekit.AliOSSUpload
-	(*ProxyConfig)(nil),                 // 23: livekit.ProxyConfig
-	(*StreamOutput)(nil),                // 24: livekit.StreamOutput
-	(*EncodingOptions)(nil),             // 25: livekit.EncodingOptions
-	(*UpdateLayoutRequest)(nil),         // 26: livekit.UpdateLayoutRequest
-	(*UpdateStreamRequest)(nil),         // 27: livekit.UpdateStreamRequest
-	(*ListEgressRequest)(nil),           // 28: livekit.ListEgressRequest
-	(*ListEgressResponse)(nil),          // 29: livekit.ListEgressResponse
-	(*StopEgressRequest)(nil),           // 30: livekit.StopEgressRequest
-	(*EgressInfo)(nil),                  // 31: livekit.EgressInfo
-	(*StreamInfoList)(nil),              // 32: livekit.StreamInfoList
-	(*StreamInfo)(nil),                  // 33: livekit.StreamInfo
-	(*FileInfo)(nil),                    // 34: livekit.FileInfo
-	(*SegmentsInfo)(nil),                // 35: livekit.SegmentsInfo
-	(*ImagesInfo)(nil),                  // 36: livekit.ImagesInfo
-	(*AutoParticipantEgress)(nil),       // 37: livekit.AutoParticipantEgress
-	(*AutoTrackEgress)(nil),             // 38: livekit.AutoTrackEgress
-	nil,                                 // 39: livekit.S3Upload.MetadataEntry
-	(*WebhookConfig)(nil),               // 40: livekit.WebhookConfig
-	(ImageCodec)(0),                     // 41: livekit.ImageCodec
-	(AudioCodec)(0),                     // 42: livekit.AudioCodec
-	(VideoCodec)(0),                     // 43: livekit.VideoCodec
+	(AudioChannel)(0),                   // 0: livekit.AudioChannel
+	(EncodingOptionsPreset)(0),          // 1: livekit.EncodingOptionsPreset
+	(EncodedFileType)(0),                // 2: livekit.EncodedFileType
+	(StreamProtocol)(0),                 // 3: livekit.StreamProtocol
+	(SegmentedFileProtocol)(0),          // 4: livekit.SegmentedFileProtocol
+	(SegmentedFileSuffix)(0),            // 5: livekit.SegmentedFileSuffix
+	(ImageFileSuffix)(0),                // 6: livekit.ImageFileSuffix
+	(EgressSourceType)(0),               // 7: livekit.EgressSourceType
+	(EgressStatus)(0),                   // 8: livekit.EgressStatus
+	(AudioMixing)(0),                    // 9: livekit.AudioMixing
+	(StreamInfo_Status)(0),              // 10: livekit.StreamInfo.Status
+	(*StartEgressRequest)(nil),          // 11: livekit.StartEgressRequest
+	(*TemplateSource)(nil),              // 12: livekit.TemplateSource
+	(*WebSource)(nil),                   // 13: livekit.WebSource
+	(*MediaSource)(nil),                 // 14: livekit.MediaSource
+	(*ParticipantVideo)(nil),            // 15: livekit.ParticipantVideo
+	(*AudioConfig)(nil),                 // 16: livekit.AudioConfig
+	(*AudioRoute)(nil),                  // 17: livekit.AudioRoute
+	(*DataConfig)(nil),                  // 18: livekit.DataConfig
+	(*DataSelector)(nil),                // 19: livekit.DataSelector
+	(*EncodingOptions)(nil),             // 20: livekit.EncodingOptions
+	(*Output)(nil),                      // 21: livekit.Output
+	(*FileOutput)(nil),                  // 22: livekit.FileOutput
+	(*StreamOutput)(nil),                // 23: livekit.StreamOutput
+	(*SegmentedFileOutput)(nil),         // 24: livekit.SegmentedFileOutput
+	(*ImageOutput)(nil),                 // 25: livekit.ImageOutput
+	(*McapOutput)(nil),                  // 26: livekit.McapOutput
+	(*StorageConfig)(nil),               // 27: livekit.StorageConfig
+	(*S3Upload)(nil),                    // 28: livekit.S3Upload
+	(*GCPUpload)(nil),                   // 29: livekit.GCPUpload
+	(*AzureBlobUpload)(nil),             // 30: livekit.AzureBlobUpload
+	(*AliOSSUpload)(nil),                // 31: livekit.AliOSSUpload
+	(*ProxyConfig)(nil),                 // 32: livekit.ProxyConfig
+	(*ListEgressRequest)(nil),           // 33: livekit.ListEgressRequest
+	(*ListEgressResponse)(nil),          // 34: livekit.ListEgressResponse
+	(*UpdateEgressRequest)(nil),         // 35: livekit.UpdateEgressRequest
+	(*StopEgressRequest)(nil),           // 36: livekit.StopEgressRequest
+	(*EgressInfo)(nil),                  // 37: livekit.EgressInfo
+	(*StreamInfo)(nil),                  // 38: livekit.StreamInfo
+	(*FileInfo)(nil),                    // 39: livekit.FileInfo
+	(*SegmentsInfo)(nil),                // 40: livekit.SegmentsInfo
+	(*ImagesInfo)(nil),                  // 41: livekit.ImagesInfo
+	(*McapInfo)(nil),                    // 42: livekit.McapInfo
+	(*AutoParticipantEgress)(nil),       // 43: livekit.AutoParticipantEgress
+	(*AutoTrackEgress)(nil),             // 44: livekit.AutoTrackEgress
+	(*ExportReplayRequest)(nil),         // 45: livekit.ExportReplayRequest
+	(*RoomCompositeEgressRequest)(nil),  // 46: livekit.RoomCompositeEgressRequest
+	(*WebEgressRequest)(nil),            // 47: livekit.WebEgressRequest
+	(*ParticipantEgressRequest)(nil),    // 48: livekit.ParticipantEgressRequest
+	(*TrackCompositeEgressRequest)(nil), // 49: livekit.TrackCompositeEgressRequest
+	(*TrackEgressRequest)(nil),          // 50: livekit.TrackEgressRequest
+	(*DirectFileOutput)(nil),            // 51: livekit.DirectFileOutput
+	(*EncodedFileOutput)(nil),           // 52: livekit.EncodedFileOutput
+	(*UpdateLayoutRequest)(nil),         // 53: livekit.UpdateLayoutRequest
+	(*UpdateStreamRequest)(nil),         // 54: livekit.UpdateStreamRequest
+	(*StreamInfoList)(nil),              // 55: livekit.StreamInfoList
+	nil,                                 // 56: livekit.S3Upload.MetadataEntry
+	(*WebhookConfig)(nil),               // 57: livekit.WebhookConfig
+	(ParticipantInfo_Kind)(0),           // 58: livekit.ParticipantInfo.Kind
+	(AudioCodec)(0),                     // 59: livekit.AudioCodec
+	(VideoCodec)(0),                     // 60: livekit.VideoCodec
+	(ImageCodec)(0),                     // 61: livekit.ImageCodec
 }
 var file_livekit_egress_proto_depIdxs = []int32{
-	5,   // 0: livekit.RoomCompositeEgressRequest.audio_mixing:type_name -> livekit.AudioMixing
-	15,  // 1: livekit.RoomCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
-	24,  // 2: livekit.RoomCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
-	16,  // 3: livekit.RoomCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
-	6,   // 4: livekit.RoomCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25,  // 5: livekit.RoomCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15,  // 6: livekit.RoomCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24,  // 7: livekit.RoomCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16,  // 8: livekit.RoomCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18,  // 9: livekit.RoomCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	40,  // 10: livekit.RoomCompositeEgressRequest.webhooks:type_name -> livekit.WebhookConfig
-	15,  // 11: livekit.WebEgressRequest.file:type_name -> livekit.EncodedFileOutput
-	24,  // 12: livekit.WebEgressRequest.stream:type_name -> livekit.StreamOutput
-	16,  // 13: livekit.WebEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
-	6,   // 14: livekit.WebEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25,  // 15: livekit.WebEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15,  // 16: livekit.WebEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24,  // 17: livekit.WebEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16,  // 18: livekit.WebEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18,  // 19: livekit.WebEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	40,  // 20: livekit.WebEgressRequest.webhooks:type_name -> livekit.WebhookConfig
-	6,   // 21: livekit.ParticipantEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25,  // 22: livekit.ParticipantEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15,  // 23: livekit.ParticipantEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24,  // 24: livekit.ParticipantEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16,  // 25: livekit.ParticipantEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18,  // 26: livekit.ParticipantEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	40,  // 27: livekit.ParticipantEgressRequest.webhooks:type_name -> livekit.WebhookConfig
-	15,  // 28: livekit.TrackCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
-	24,  // 29: livekit.TrackCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
-	16,  // 30: livekit.TrackCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
-	6,   // 31: livekit.TrackCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
-	25,  // 32: livekit.TrackCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
-	15,  // 33: livekit.TrackCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
-	24,  // 34: livekit.TrackCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
-	16,  // 35: livekit.TrackCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	18,  // 36: livekit.TrackCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
-	40,  // 37: livekit.TrackCompositeEgressRequest.webhooks:type_name -> livekit.WebhookConfig
-	17,  // 38: livekit.TrackEgressRequest.file:type_name -> livekit.DirectFileOutput
-	40,  // 39: livekit.TrackEgressRequest.webhooks:type_name -> livekit.WebhookConfig
-	0,   // 40: livekit.EncodedFileOutput.file_type:type_name -> livekit.EncodedFileType
-	19,  // 41: livekit.EncodedFileOutput.s3:type_name -> livekit.S3Upload
-	20,  // 42: livekit.EncodedFileOutput.gcp:type_name -> livekit.GCPUpload
-	21,  // 43: livekit.EncodedFileOutput.azure:type_name -> livekit.AzureBlobUpload
-	22,  // 44: livekit.EncodedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	1,   // 45: livekit.SegmentedFileOutput.protocol:type_name -> livekit.SegmentedFileProtocol
-	2,   // 46: livekit.SegmentedFileOutput.filename_suffix:type_name -> livekit.SegmentedFileSuffix
-	19,  // 47: livekit.SegmentedFileOutput.s3:type_name -> livekit.S3Upload
-	20,  // 48: livekit.SegmentedFileOutput.gcp:type_name -> livekit.GCPUpload
-	21,  // 49: livekit.SegmentedFileOutput.azure:type_name -> livekit.AzureBlobUpload
-	22,  // 50: livekit.SegmentedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	19,  // 51: livekit.DirectFileOutput.s3:type_name -> livekit.S3Upload
-	20,  // 52: livekit.DirectFileOutput.gcp:type_name -> livekit.GCPUpload
-	21,  // 53: livekit.DirectFileOutput.azure:type_name -> livekit.AzureBlobUpload
-	22,  // 54: livekit.DirectFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	3,   // 55: livekit.ImageOutput.filename_suffix:type_name -> livekit.ImageFileSuffix
-	41,  // 56: livekit.ImageOutput.image_codec:type_name -> livekit.ImageCodec
-	19,  // 57: livekit.ImageOutput.s3:type_name -> livekit.S3Upload
-	20,  // 58: livekit.ImageOutput.gcp:type_name -> livekit.GCPUpload
-	21,  // 59: livekit.ImageOutput.azure:type_name -> livekit.AzureBlobUpload
-	22,  // 60: livekit.ImageOutput.aliOSS:type_name -> livekit.AliOSSUpload
-	39,  // 61: livekit.S3Upload.metadata:type_name -> livekit.S3Upload.MetadataEntry
-	23,  // 62: livekit.S3Upload.proxy:type_name -> livekit.ProxyConfig
-	23,  // 63: livekit.GCPUpload.proxy:type_name -> livekit.ProxyConfig
-	4,   // 64: livekit.StreamOutput.protocol:type_name -> livekit.StreamProtocol
-	42,  // 65: livekit.EncodingOptions.audio_codec:type_name -> livekit.AudioCodec
-	43,  // 66: livekit.EncodingOptions.video_codec:type_name -> livekit.VideoCodec
-	31,  // 67: livekit.ListEgressResponse.items:type_name -> livekit.EgressInfo
-	8,   // 68: livekit.EgressInfo.source_type:type_name -> livekit.EgressSourceType
-	7,   // 69: livekit.EgressInfo.status:type_name -> livekit.EgressStatus
-	10,  // 70: livekit.EgressInfo.room_composite:type_name -> livekit.RoomCompositeEgressRequest
-	11,  // 71: livekit.EgressInfo.web:type_name -> livekit.WebEgressRequest
-	12,  // 72: livekit.EgressInfo.participant:type_name -> livekit.ParticipantEgressRequest
-	13,  // 73: livekit.EgressInfo.track_composite:type_name -> livekit.TrackCompositeEgressRequest
-	14,  // 74: livekit.EgressInfo.track:type_name -> livekit.TrackEgressRequest
-	32,  // 75: livekit.EgressInfo.stream:type_name -> livekit.StreamInfoList
-	34,  // 76: livekit.EgressInfo.file:type_name -> livekit.FileInfo
-	35,  // 77: livekit.EgressInfo.segments:type_name -> livekit.SegmentsInfo
-	33,  // 78: livekit.EgressInfo.stream_results:type_name -> livekit.StreamInfo
-	34,  // 79: livekit.EgressInfo.file_results:type_name -> livekit.FileInfo
-	35,  // 80: livekit.EgressInfo.segment_results:type_name -> livekit.SegmentsInfo
-	36,  // 81: livekit.EgressInfo.image_results:type_name -> livekit.ImagesInfo
-	33,  // 82: livekit.StreamInfoList.info:type_name -> livekit.StreamInfo
-	9,   // 83: livekit.StreamInfo.status:type_name -> livekit.StreamInfo.Status
-	6,   // 84: livekit.AutoParticipantEgress.preset:type_name -> livekit.EncodingOptionsPreset
-	25,  // 85: livekit.AutoParticipantEgress.advanced:type_name -> livekit.EncodingOptions
-	15,  // 86: livekit.AutoParticipantEgress.file_outputs:type_name -> livekit.EncodedFileOutput
-	16,  // 87: livekit.AutoParticipantEgress.segment_outputs:type_name -> livekit.SegmentedFileOutput
-	19,  // 88: livekit.AutoTrackEgress.s3:type_name -> livekit.S3Upload
-	20,  // 89: livekit.AutoTrackEgress.gcp:type_name -> livekit.GCPUpload
-	21,  // 90: livekit.AutoTrackEgress.azure:type_name -> livekit.AzureBlobUpload
-	22,  // 91: livekit.AutoTrackEgress.aliOSS:type_name -> livekit.AliOSSUpload
-	10,  // 92: livekit.Egress.StartRoomCompositeEgress:input_type -> livekit.RoomCompositeEgressRequest
-	11,  // 93: livekit.Egress.StartWebEgress:input_type -> livekit.WebEgressRequest
-	12,  // 94: livekit.Egress.StartParticipantEgress:input_type -> livekit.ParticipantEgressRequest
-	13,  // 95: livekit.Egress.StartTrackCompositeEgress:input_type -> livekit.TrackCompositeEgressRequest
-	14,  // 96: livekit.Egress.StartTrackEgress:input_type -> livekit.TrackEgressRequest
-	26,  // 97: livekit.Egress.UpdateLayout:input_type -> livekit.UpdateLayoutRequest
-	27,  // 98: livekit.Egress.UpdateStream:input_type -> livekit.UpdateStreamRequest
-	28,  // 99: livekit.Egress.ListEgress:input_type -> livekit.ListEgressRequest
-	30,  // 100: livekit.Egress.StopEgress:input_type -> livekit.StopEgressRequest
-	31,  // 101: livekit.Egress.StartRoomCompositeEgress:output_type -> livekit.EgressInfo
-	31,  // 102: livekit.Egress.StartWebEgress:output_type -> livekit.EgressInfo
-	31,  // 103: livekit.Egress.StartParticipantEgress:output_type -> livekit.EgressInfo
-	31,  // 104: livekit.Egress.StartTrackCompositeEgress:output_type -> livekit.EgressInfo
-	31,  // 105: livekit.Egress.StartTrackEgress:output_type -> livekit.EgressInfo
-	31,  // 106: livekit.Egress.UpdateLayout:output_type -> livekit.EgressInfo
-	31,  // 107: livekit.Egress.UpdateStream:output_type -> livekit.EgressInfo
-	29,  // 108: livekit.Egress.ListEgress:output_type -> livekit.ListEgressResponse
-	31,  // 109: livekit.Egress.StopEgress:output_type -> livekit.EgressInfo
-	101, // [101:110] is the sub-list for method output_type
-	92,  // [92:101] is the sub-list for method input_type
-	92,  // [92:92] is the sub-list for extension type_name
-	92,  // [92:92] is the sub-list for extension extendee
-	0,   // [0:92] is the sub-list for field type_name
+	12,  // 0: livekit.StartEgressRequest.template:type_name -> livekit.TemplateSource
+	13,  // 1: livekit.StartEgressRequest.web:type_name -> livekit.WebSource
+	14,  // 2: livekit.StartEgressRequest.media:type_name -> livekit.MediaSource
+	1,   // 3: livekit.StartEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 4: livekit.StartEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	21,  // 5: livekit.StartEgressRequest.outputs:type_name -> livekit.Output
+	27,  // 6: livekit.StartEgressRequest.storage:type_name -> livekit.StorageConfig
+	57,  // 7: livekit.StartEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	15,  // 8: livekit.MediaSource.participant_video:type_name -> livekit.ParticipantVideo
+	16,  // 9: livekit.MediaSource.audio:type_name -> livekit.AudioConfig
+	18,  // 10: livekit.MediaSource.data:type_name -> livekit.DataConfig
+	17,  // 11: livekit.AudioConfig.routes:type_name -> livekit.AudioRoute
+	58,  // 12: livekit.AudioRoute.participant_kind:type_name -> livekit.ParticipantInfo.Kind
+	0,   // 13: livekit.AudioRoute.channel:type_name -> livekit.AudioChannel
+	19,  // 14: livekit.DataConfig.selectors:type_name -> livekit.DataSelector
+	59,  // 15: livekit.EncodingOptions.audio_codec:type_name -> livekit.AudioCodec
+	60,  // 16: livekit.EncodingOptions.video_codec:type_name -> livekit.VideoCodec
+	22,  // 17: livekit.Output.file:type_name -> livekit.FileOutput
+	23,  // 18: livekit.Output.stream:type_name -> livekit.StreamOutput
+	24,  // 19: livekit.Output.segments:type_name -> livekit.SegmentedFileOutput
+	25,  // 20: livekit.Output.images:type_name -> livekit.ImageOutput
+	26,  // 21: livekit.Output.mcap:type_name -> livekit.McapOutput
+	27,  // 22: livekit.Output.storage:type_name -> livekit.StorageConfig
+	2,   // 23: livekit.FileOutput.file_type:type_name -> livekit.EncodedFileType
+	3,   // 24: livekit.StreamOutput.protocol:type_name -> livekit.StreamProtocol
+	4,   // 25: livekit.SegmentedFileOutput.protocol:type_name -> livekit.SegmentedFileProtocol
+	5,   // 26: livekit.SegmentedFileOutput.filename_suffix:type_name -> livekit.SegmentedFileSuffix
+	28,  // 27: livekit.SegmentedFileOutput.s3:type_name -> livekit.S3Upload
+	29,  // 28: livekit.SegmentedFileOutput.gcp:type_name -> livekit.GCPUpload
+	30,  // 29: livekit.SegmentedFileOutput.azure:type_name -> livekit.AzureBlobUpload
+	31,  // 30: livekit.SegmentedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	6,   // 31: livekit.ImageOutput.filename_suffix:type_name -> livekit.ImageFileSuffix
+	61,  // 32: livekit.ImageOutput.image_codec:type_name -> livekit.ImageCodec
+	28,  // 33: livekit.ImageOutput.s3:type_name -> livekit.S3Upload
+	29,  // 34: livekit.ImageOutput.gcp:type_name -> livekit.GCPUpload
+	30,  // 35: livekit.ImageOutput.azure:type_name -> livekit.AzureBlobUpload
+	31,  // 36: livekit.ImageOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	28,  // 37: livekit.StorageConfig.s3:type_name -> livekit.S3Upload
+	29,  // 38: livekit.StorageConfig.gcp:type_name -> livekit.GCPUpload
+	30,  // 39: livekit.StorageConfig.azure:type_name -> livekit.AzureBlobUpload
+	31,  // 40: livekit.StorageConfig.ali_oss:type_name -> livekit.AliOSSUpload
+	56,  // 41: livekit.S3Upload.metadata:type_name -> livekit.S3Upload.MetadataEntry
+	32,  // 42: livekit.S3Upload.proxy:type_name -> livekit.ProxyConfig
+	32,  // 43: livekit.GCPUpload.proxy:type_name -> livekit.ProxyConfig
+	37,  // 44: livekit.ListEgressResponse.items:type_name -> livekit.EgressInfo
+	7,   // 45: livekit.EgressInfo.source_type:type_name -> livekit.EgressSourceType
+	8,   // 46: livekit.EgressInfo.status:type_name -> livekit.EgressStatus
+	11,  // 47: livekit.EgressInfo.egress:type_name -> livekit.StartEgressRequest
+	45,  // 48: livekit.EgressInfo.replay:type_name -> livekit.ExportReplayRequest
+	46,  // 49: livekit.EgressInfo.room_composite:type_name -> livekit.RoomCompositeEgressRequest
+	47,  // 50: livekit.EgressInfo.web:type_name -> livekit.WebEgressRequest
+	48,  // 51: livekit.EgressInfo.participant:type_name -> livekit.ParticipantEgressRequest
+	49,  // 52: livekit.EgressInfo.track_composite:type_name -> livekit.TrackCompositeEgressRequest
+	50,  // 53: livekit.EgressInfo.track:type_name -> livekit.TrackEgressRequest
+	38,  // 54: livekit.EgressInfo.stream_results:type_name -> livekit.StreamInfo
+	39,  // 55: livekit.EgressInfo.file_results:type_name -> livekit.FileInfo
+	40,  // 56: livekit.EgressInfo.segment_results:type_name -> livekit.SegmentsInfo
+	41,  // 57: livekit.EgressInfo.image_results:type_name -> livekit.ImagesInfo
+	42,  // 58: livekit.EgressInfo.mcap_results:type_name -> livekit.McapInfo
+	55,  // 59: livekit.EgressInfo.stream:type_name -> livekit.StreamInfoList
+	39,  // 60: livekit.EgressInfo.file:type_name -> livekit.FileInfo
+	40,  // 61: livekit.EgressInfo.segments:type_name -> livekit.SegmentsInfo
+	10,  // 62: livekit.StreamInfo.status:type_name -> livekit.StreamInfo.Status
+	1,   // 63: livekit.AutoParticipantEgress.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 64: livekit.AutoParticipantEgress.advanced:type_name -> livekit.EncodingOptions
+	52,  // 65: livekit.AutoParticipantEgress.file_outputs:type_name -> livekit.EncodedFileOutput
+	24,  // 66: livekit.AutoParticipantEgress.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	28,  // 67: livekit.AutoTrackEgress.s3:type_name -> livekit.S3Upload
+	29,  // 68: livekit.AutoTrackEgress.gcp:type_name -> livekit.GCPUpload
+	30,  // 69: livekit.AutoTrackEgress.azure:type_name -> livekit.AzureBlobUpload
+	31,  // 70: livekit.AutoTrackEgress.aliOSS:type_name -> livekit.AliOSSUpload
+	12,  // 71: livekit.ExportReplayRequest.template:type_name -> livekit.TemplateSource
+	13,  // 72: livekit.ExportReplayRequest.web:type_name -> livekit.WebSource
+	14,  // 73: livekit.ExportReplayRequest.media:type_name -> livekit.MediaSource
+	1,   // 74: livekit.ExportReplayRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 75: livekit.ExportReplayRequest.advanced:type_name -> livekit.EncodingOptions
+	21,  // 76: livekit.ExportReplayRequest.outputs:type_name -> livekit.Output
+	27,  // 77: livekit.ExportReplayRequest.storage:type_name -> livekit.StorageConfig
+	57,  // 78: livekit.ExportReplayRequest.webhooks:type_name -> livekit.WebhookConfig
+	9,   // 79: livekit.RoomCompositeEgressRequest.audio_mixing:type_name -> livekit.AudioMixing
+	52,  // 80: livekit.RoomCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
+	23,  // 81: livekit.RoomCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
+	24,  // 82: livekit.RoomCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
+	1,   // 83: livekit.RoomCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 84: livekit.RoomCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	52,  // 85: livekit.RoomCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	23,  // 86: livekit.RoomCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	24,  // 87: livekit.RoomCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	25,  // 88: livekit.RoomCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	57,  // 89: livekit.RoomCompositeEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	52,  // 90: livekit.WebEgressRequest.file:type_name -> livekit.EncodedFileOutput
+	23,  // 91: livekit.WebEgressRequest.stream:type_name -> livekit.StreamOutput
+	24,  // 92: livekit.WebEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
+	1,   // 93: livekit.WebEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 94: livekit.WebEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	52,  // 95: livekit.WebEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	23,  // 96: livekit.WebEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	24,  // 97: livekit.WebEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	25,  // 98: livekit.WebEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	57,  // 99: livekit.WebEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	1,   // 100: livekit.ParticipantEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 101: livekit.ParticipantEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	52,  // 102: livekit.ParticipantEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	23,  // 103: livekit.ParticipantEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	24,  // 104: livekit.ParticipantEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	25,  // 105: livekit.ParticipantEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	57,  // 106: livekit.ParticipantEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	52,  // 107: livekit.TrackCompositeEgressRequest.file:type_name -> livekit.EncodedFileOutput
+	23,  // 108: livekit.TrackCompositeEgressRequest.stream:type_name -> livekit.StreamOutput
+	24,  // 109: livekit.TrackCompositeEgressRequest.segments:type_name -> livekit.SegmentedFileOutput
+	1,   // 110: livekit.TrackCompositeEgressRequest.preset:type_name -> livekit.EncodingOptionsPreset
+	20,  // 111: livekit.TrackCompositeEgressRequest.advanced:type_name -> livekit.EncodingOptions
+	52,  // 112: livekit.TrackCompositeEgressRequest.file_outputs:type_name -> livekit.EncodedFileOutput
+	23,  // 113: livekit.TrackCompositeEgressRequest.stream_outputs:type_name -> livekit.StreamOutput
+	24,  // 114: livekit.TrackCompositeEgressRequest.segment_outputs:type_name -> livekit.SegmentedFileOutput
+	25,  // 115: livekit.TrackCompositeEgressRequest.image_outputs:type_name -> livekit.ImageOutput
+	57,  // 116: livekit.TrackCompositeEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	51,  // 117: livekit.TrackEgressRequest.file:type_name -> livekit.DirectFileOutput
+	57,  // 118: livekit.TrackEgressRequest.webhooks:type_name -> livekit.WebhookConfig
+	28,  // 119: livekit.DirectFileOutput.s3:type_name -> livekit.S3Upload
+	29,  // 120: livekit.DirectFileOutput.gcp:type_name -> livekit.GCPUpload
+	30,  // 121: livekit.DirectFileOutput.azure:type_name -> livekit.AzureBlobUpload
+	31,  // 122: livekit.DirectFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	2,   // 123: livekit.EncodedFileOutput.file_type:type_name -> livekit.EncodedFileType
+	28,  // 124: livekit.EncodedFileOutput.s3:type_name -> livekit.S3Upload
+	29,  // 125: livekit.EncodedFileOutput.gcp:type_name -> livekit.GCPUpload
+	30,  // 126: livekit.EncodedFileOutput.azure:type_name -> livekit.AzureBlobUpload
+	31,  // 127: livekit.EncodedFileOutput.aliOSS:type_name -> livekit.AliOSSUpload
+	38,  // 128: livekit.StreamInfoList.info:type_name -> livekit.StreamInfo
+	11,  // 129: livekit.Egress.StartEgress:input_type -> livekit.StartEgressRequest
+	35,  // 130: livekit.Egress.UpdateEgress:input_type -> livekit.UpdateEgressRequest
+	33,  // 131: livekit.Egress.ListEgress:input_type -> livekit.ListEgressRequest
+	36,  // 132: livekit.Egress.StopEgress:input_type -> livekit.StopEgressRequest
+	46,  // 133: livekit.Egress.StartRoomCompositeEgress:input_type -> livekit.RoomCompositeEgressRequest
+	47,  // 134: livekit.Egress.StartWebEgress:input_type -> livekit.WebEgressRequest
+	48,  // 135: livekit.Egress.StartParticipantEgress:input_type -> livekit.ParticipantEgressRequest
+	49,  // 136: livekit.Egress.StartTrackCompositeEgress:input_type -> livekit.TrackCompositeEgressRequest
+	50,  // 137: livekit.Egress.StartTrackEgress:input_type -> livekit.TrackEgressRequest
+	53,  // 138: livekit.Egress.UpdateLayout:input_type -> livekit.UpdateLayoutRequest
+	54,  // 139: livekit.Egress.UpdateStream:input_type -> livekit.UpdateStreamRequest
+	37,  // 140: livekit.Egress.StartEgress:output_type -> livekit.EgressInfo
+	37,  // 141: livekit.Egress.UpdateEgress:output_type -> livekit.EgressInfo
+	34,  // 142: livekit.Egress.ListEgress:output_type -> livekit.ListEgressResponse
+	37,  // 143: livekit.Egress.StopEgress:output_type -> livekit.EgressInfo
+	37,  // 144: livekit.Egress.StartRoomCompositeEgress:output_type -> livekit.EgressInfo
+	37,  // 145: livekit.Egress.StartWebEgress:output_type -> livekit.EgressInfo
+	37,  // 146: livekit.Egress.StartParticipantEgress:output_type -> livekit.EgressInfo
+	37,  // 147: livekit.Egress.StartTrackCompositeEgress:output_type -> livekit.EgressInfo
+	37,  // 148: livekit.Egress.StartTrackEgress:output_type -> livekit.EgressInfo
+	37,  // 149: livekit.Egress.UpdateLayout:output_type -> livekit.EgressInfo
+	37,  // 150: livekit.Egress.UpdateStream:output_type -> livekit.EgressInfo
+	140, // [140:151] is the sub-list for method output_type
+	129, // [129:140] is the sub-list for method input_type
+	129, // [129:129] is the sub-list for extension type_name
+	129, // [129:129] is the sub-list for extension extendee
+	0,   // [0:129] is the sub-list for field type_name
 }
 
 func init() { file_livekit_egress_proto_init() }
@@ -4443,59 +6250,54 @@ func file_livekit_egress_proto_init() {
 	}
 	file_livekit_models_proto_init()
 	file_livekit_egress_proto_msgTypes[0].OneofWrappers = []any{
-		(*RoomCompositeEgressRequest_File)(nil),
-		(*RoomCompositeEgressRequest_Stream)(nil),
-		(*RoomCompositeEgressRequest_Segments)(nil),
-		(*RoomCompositeEgressRequest_Preset)(nil),
-		(*RoomCompositeEgressRequest_Advanced)(nil),
-	}
-	file_livekit_egress_proto_msgTypes[1].OneofWrappers = []any{
-		(*WebEgressRequest_File)(nil),
-		(*WebEgressRequest_Stream)(nil),
-		(*WebEgressRequest_Segments)(nil),
-		(*WebEgressRequest_Preset)(nil),
-		(*WebEgressRequest_Advanced)(nil),
-	}
-	file_livekit_egress_proto_msgTypes[2].OneofWrappers = []any{
-		(*ParticipantEgressRequest_Preset)(nil),
-		(*ParticipantEgressRequest_Advanced)(nil),
+		(*StartEgressRequest_Template)(nil),
+		(*StartEgressRequest_Web)(nil),
+		(*StartEgressRequest_Media)(nil),
+		(*StartEgressRequest_Preset)(nil),
+		(*StartEgressRequest_Advanced)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[3].OneofWrappers = []any{
-		(*TrackCompositeEgressRequest_File)(nil),
-		(*TrackCompositeEgressRequest_Stream)(nil),
-		(*TrackCompositeEgressRequest_Segments)(nil),
-		(*TrackCompositeEgressRequest_Preset)(nil),
-		(*TrackCompositeEgressRequest_Advanced)(nil),
-	}
-	file_livekit_egress_proto_msgTypes[4].OneofWrappers = []any{
-		(*TrackEgressRequest_File)(nil),
-		(*TrackEgressRequest_WebsocketUrl)(nil),
-	}
-	file_livekit_egress_proto_msgTypes[5].OneofWrappers = []any{
-		(*EncodedFileOutput_S3)(nil),
-		(*EncodedFileOutput_Gcp)(nil),
-		(*EncodedFileOutput_Azure)(nil),
-		(*EncodedFileOutput_AliOSS)(nil),
+		(*MediaSource_VideoTrackId)(nil),
+		(*MediaSource_ParticipantVideo)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[6].OneofWrappers = []any{
+		(*AudioRoute_TrackId)(nil),
+		(*AudioRoute_ParticipantIdentity)(nil),
+		(*AudioRoute_ParticipantKind)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[8].OneofWrappers = []any{
+		(*DataSelector_TrackId)(nil),
+		(*DataSelector_ParticipantIdentity)(nil),
+		(*DataSelector_Topic)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[10].OneofWrappers = []any{
+		(*Output_File)(nil),
+		(*Output_Stream)(nil),
+		(*Output_Segments)(nil),
+		(*Output_Images)(nil),
+		(*Output_Mcap)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[13].OneofWrappers = []any{
 		(*SegmentedFileOutput_S3)(nil),
 		(*SegmentedFileOutput_Gcp)(nil),
 		(*SegmentedFileOutput_Azure)(nil),
 		(*SegmentedFileOutput_AliOSS)(nil),
 	}
-	file_livekit_egress_proto_msgTypes[7].OneofWrappers = []any{
-		(*DirectFileOutput_S3)(nil),
-		(*DirectFileOutput_Gcp)(nil),
-		(*DirectFileOutput_Azure)(nil),
-		(*DirectFileOutput_AliOSS)(nil),
-	}
-	file_livekit_egress_proto_msgTypes[8].OneofWrappers = []any{
+	file_livekit_egress_proto_msgTypes[14].OneofWrappers = []any{
 		(*ImageOutput_S3)(nil),
 		(*ImageOutput_Gcp)(nil),
 		(*ImageOutput_Azure)(nil),
 		(*ImageOutput_AliOSS)(nil),
 	}
-	file_livekit_egress_proto_msgTypes[21].OneofWrappers = []any{
+	file_livekit_egress_proto_msgTypes[16].OneofWrappers = []any{
+		(*StorageConfig_S3)(nil),
+		(*StorageConfig_Gcp)(nil),
+		(*StorageConfig_Azure)(nil),
+		(*StorageConfig_AliOss)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[26].OneofWrappers = []any{
+		(*EgressInfo_Egress)(nil),
+		(*EgressInfo_Replay)(nil),
 		(*EgressInfo_RoomComposite)(nil),
 		(*EgressInfo_Web)(nil),
 		(*EgressInfo_Participant)(nil),
@@ -4505,23 +6307,71 @@ func file_livekit_egress_proto_init() {
 		(*EgressInfo_File)(nil),
 		(*EgressInfo_Segments)(nil),
 	}
-	file_livekit_egress_proto_msgTypes[27].OneofWrappers = []any{
+	file_livekit_egress_proto_msgTypes[32].OneofWrappers = []any{
 		(*AutoParticipantEgress_Preset)(nil),
 		(*AutoParticipantEgress_Advanced)(nil),
 	}
-	file_livekit_egress_proto_msgTypes[28].OneofWrappers = []any{
+	file_livekit_egress_proto_msgTypes[33].OneofWrappers = []any{
 		(*AutoTrackEgress_S3)(nil),
 		(*AutoTrackEgress_Gcp)(nil),
 		(*AutoTrackEgress_Azure)(nil),
 		(*AutoTrackEgress_AliOSS)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[34].OneofWrappers = []any{
+		(*ExportReplayRequest_Template)(nil),
+		(*ExportReplayRequest_Web)(nil),
+		(*ExportReplayRequest_Media)(nil),
+		(*ExportReplayRequest_Preset)(nil),
+		(*ExportReplayRequest_Advanced)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[35].OneofWrappers = []any{
+		(*RoomCompositeEgressRequest_File)(nil),
+		(*RoomCompositeEgressRequest_Stream)(nil),
+		(*RoomCompositeEgressRequest_Segments)(nil),
+		(*RoomCompositeEgressRequest_Preset)(nil),
+		(*RoomCompositeEgressRequest_Advanced)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[36].OneofWrappers = []any{
+		(*WebEgressRequest_File)(nil),
+		(*WebEgressRequest_Stream)(nil),
+		(*WebEgressRequest_Segments)(nil),
+		(*WebEgressRequest_Preset)(nil),
+		(*WebEgressRequest_Advanced)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[37].OneofWrappers = []any{
+		(*ParticipantEgressRequest_Preset)(nil),
+		(*ParticipantEgressRequest_Advanced)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[38].OneofWrappers = []any{
+		(*TrackCompositeEgressRequest_File)(nil),
+		(*TrackCompositeEgressRequest_Stream)(nil),
+		(*TrackCompositeEgressRequest_Segments)(nil),
+		(*TrackCompositeEgressRequest_Preset)(nil),
+		(*TrackCompositeEgressRequest_Advanced)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[39].OneofWrappers = []any{
+		(*TrackEgressRequest_File)(nil),
+		(*TrackEgressRequest_WebsocketUrl)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[40].OneofWrappers = []any{
+		(*DirectFileOutput_S3)(nil),
+		(*DirectFileOutput_Gcp)(nil),
+		(*DirectFileOutput_Azure)(nil),
+		(*DirectFileOutput_AliOSS)(nil),
+	}
+	file_livekit_egress_proto_msgTypes[41].OneofWrappers = []any{
+		(*EncodedFileOutput_S3)(nil),
+		(*EncodedFileOutput_Gcp)(nil),
+		(*EncodedFileOutput_Azure)(nil),
+		(*EncodedFileOutput_AliOSS)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_egress_proto_rawDesc), len(file_livekit_egress_proto_rawDesc)),
-			NumEnums:      10,
-			NumMessages:   30,
+			NumEnums:      11,
+			NumMessages:   46,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
