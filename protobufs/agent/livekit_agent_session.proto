@@ -211,10 +211,9 @@ message SessionEvent {
     ConversationItemAdded conversation_item_added = 12;
     UserInputTranscribed user_input_transcribed = 13;
     FunctionToolsExecuted function_tools_executed = 14;
-    // removed: MetricsCollected metrics_collected = 15;
-    Error error = 16;
-    OverlappingSpeech overlapping_speech = 17;
-    SessionUsageUpdated session_usage_updated = 18;
+    Error error = 15;
+    OverlappingSpeech overlapping_speech = 16;
+    SessionUsageUpdated session_usage_updated = 17;
   }
 }
 
