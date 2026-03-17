@@ -3,9 +3,8 @@ syntax = "proto3";
 package livekit.agent;
 
 option go_package = "github.com/livekit/protocol/livekit/agent";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
 
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "logger/options.proto";
 
@@ -34,7 +33,7 @@ message ChatMessage {
       string text = 1;
     }
   }
-  
+
   string id = 1;
   ChatRole role = 2;
   repeated ChatContent content = 3;
@@ -69,6 +68,14 @@ message AgentHandoff {
   google.protobuf.Timestamp created_at = 4;
 }
 
+message AgentConfigUpdate {
+  string id = 1;
+  optional string instructions = 2;
+  repeated string tools_added = 3;
+  repeated string tools_removed = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
 message ChatContext {
   message ChatItem {
     oneof item {
@@ -76,9 +83,221 @@ message ChatContext {
       FunctionCall function_call = 2;
       FunctionCallOutput function_call_output = 3;
       AgentHandoff agent_handoff = 4;
+      AgentConfigUpdate agent_config_update = 5;
     }
   }
 
   repeated ChatItem items = 1;
 }
 
+enum AgentState {
+  AS_INITIALIZING = 0;
+  AS_IDLE = 1;
+  AS_LISTENING = 2;
+  AS_THINKING = 3;
+  AS_SPEAKING = 4;
+}
+
+enum UserState {
+  US_SPEAKING = 0;
+  US_LISTENING = 1;
+  US_AWAY = 2;
+}
+
+message LLMModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 input_tokens = 3;
+  int32 input_cached_tokens = 4;
+  int32 input_audio_tokens = 5;
+  int32 input_cached_audio_tokens = 6;
+  int32 input_text_tokens = 7;
+  int32 input_cached_text_tokens = 8;
+  int32 input_image_tokens = 9;
+  int32 input_cached_image_tokens = 10;
+  int32 output_tokens = 11;
+  int32 output_audio_tokens = 12;
+  int32 output_text_tokens = 13;
+  double session_duration = 14;
+}
+
+message TTSModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 input_tokens = 3;
+  int32 output_tokens = 4;
+  int32 characters_count = 5;
+  double audio_duration = 6;
+}
+
+message STTModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 input_tokens = 3;
+  int32 output_tokens = 4;
+  double audio_duration = 5;
+}
+
+message InterruptionModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 total_requests = 3;
+}
+
+message ModelUsage {
+  oneof usage {
+    LLMModelUsage llm = 1;
+    TTSModelUsage tts = 2;
+    STTModelUsage stt = 3;
+    InterruptionModelUsage interruption = 4;
+  }
+}
+
+message AgentSessionUsage {
+  repeated ModelUsage model_usage = 1;
+}
+
+message AgentSessionEvent {
+  message AgentStateChanged {
+    AgentState old_state = 1;
+    AgentState new_state = 2;
+  }
+
+  message UserStateChanged {
+    UserState old_state = 1;
+    UserState new_state = 2;
+  }
+
+  message ConversationItemAdded {
+    ChatContext.ChatItem item = 1;
+  }
+
+  message UserInputTranscribed {
+    string transcript = 1;
+    bool is_final = 2;
+    optional string language = 3;
+  }
+
+  message FunctionToolsExecuted {
+    repeated FunctionCall function_calls = 1;
+    repeated FunctionCallOutput function_call_outputs = 2;
+  }
+
+  message Error {
+    string message = 1;
+  }
+
+  message OverlappingSpeech {
+    bool is_interruption = 1;
+    optional google.protobuf.Timestamp overlap_started_at = 2;
+    double detection_delay = 3;
+    google.protobuf.Timestamp detected_at = 4;
+  }
+
+  message SessionUsageUpdated {
+    AgentSessionUsage usage = 1;
+  }
+
+  google.protobuf.Timestamp created_at = 1;
+  oneof event {
+    AgentStateChanged agent_state_changed = 10;
+    UserStateChanged user_state_changed = 11;
+    ConversationItemAdded conversation_item_added = 12;
+    UserInputTranscribed user_input_transcribed = 13;
+    FunctionToolsExecuted function_tools_executed = 14;
+    Error error = 15;
+    OverlappingSpeech overlapping_speech = 16;
+    SessionUsageUpdated session_usage_updated = 17;
+  }
+}
+
+message SessionRequest {
+  message Ping {}
+  message GetChatHistory {}
+  message RunInput {
+    string text = 1;
+  }
+  message GetAgentInfo {}
+  message GetSessionState {}
+  message GetRTCStats {}
+  message GetSessionUsage {}
+
+  string request_id = 1;
+  oneof request {
+    Ping ping = 2;
+    GetChatHistory get_chat_history = 4;
+    RunInput run_input = 5;
+    GetAgentInfo get_agent_info = 6;
+    GetSessionState get_session_state = 7;
+    GetRTCStats get_rtc_stats = 8;
+    GetSessionUsage get_session_usage = 9;
+  }
+}
+
+message SessionResponse {
+  message Pong {}
+  message GetChatHistoryResponse {
+    repeated ChatContext.ChatItem items = 1;
+  }
+  message GetAgentInfoResponse {
+    string id = 1;
+    optional string instructions = 2;
+    repeated string tools = 3;
+    repeated ChatContext.ChatItem chat_ctx = 4;
+  }
+  message RunInputResponse {
+    repeated ChatContext.ChatItem items = 1;
+  }
+  message GetSessionStateResponse {
+    AgentState agent_state = 1;
+    UserState user_state = 2;
+    string agent_id = 3;
+    map<string, string> options = 4;
+    google.protobuf.Timestamp created_at = 5;
+  }
+  message GetRTCStatsResponse {
+    repeated google.protobuf.Struct publisher_stats = 1;
+    repeated google.protobuf.Struct subscriber_stats = 2;
+  }
+  message GetSessionUsageResponse {
+    AgentSessionUsage usage = 1;
+    google.protobuf.Timestamp created_at = 2;
+  }
+
+  string request_id = 1;
+  optional string error = 2;
+  oneof response {
+    Pong pong = 3;
+    GetChatHistoryResponse get_chat_history = 5;
+    RunInputResponse run_input = 6;
+    GetAgentInfoResponse get_agent_info = 7;
+    GetSessionStateResponse get_session_state = 8;
+    GetRTCStatsResponse get_rtc_stats = 9;
+    GetSessionUsageResponse get_session_usage = 10;
+  }
+}
+
+message AgentSessionMessage {
+  message ConsoleIO {
+    message AudioFrame {
+      bytes data = 1;
+      uint32 sample_rate = 2;
+      uint32 num_channels = 3;
+      uint32 samples_per_channel = 4;
+    }
+    message AudioPlaybackFlush {}
+    message AudioPlaybackClear {}
+    message AudioPlaybackFinished {}
+  }
+
+  oneof message {
+    ConsoleIO.AudioFrame audio_input = 1;
+    ConsoleIO.AudioFrame audio_output = 2;
+    AgentSessionEvent event = 3;
+    SessionRequest request = 4;
+    SessionResponse response = 5;
+    ConsoleIO.AudioPlaybackFlush audio_playback_flush = 6;
+    ConsoleIO.AudioPlaybackClear audio_playback_clear = 7;
+    ConsoleIO.AudioPlaybackFinished audio_playback_finished = 8;
+  }
+}

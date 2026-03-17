@@ -53,10 +53,12 @@ func Proto() error {
 		"livekit_connector.proto",
 		"livekit_connector_whatsapp.proto",
 		"livekit_connector_twilio.proto",
+		"livekit_agent_simulation.proto",
 	}
 
 	agentProtoFiles := []string{
 		"agent/livekit_agent_session.proto",
+		"agent/livekit_agent_dev.proto",
 	}
 
 	protoFiles := []string{
