@@ -96,18 +96,18 @@ message SessionAudioFrame {
   uint32 samples_per_channel = 4;
 }
 
-enum SessionAgentState {
-  SESSION_AGENT_STATE_INITIALIZING = 0;
-  SESSION_AGENT_STATE_IDLE = 1;
-  SESSION_AGENT_STATE_LISTENING = 2;
-  SESSION_AGENT_STATE_THINKING = 3;
-  SESSION_AGENT_STATE_SPEAKING = 4;
+enum AgentState {
+  AS_INITIALIZING = 0;
+  AS_IDLE = 1;
+  AS_LISTENING = 2;
+  AS_THINKING = 3;
+  AS_SPEAKING = 4;
 }
 
-enum SessionUserState {
-  SESSION_USER_STATE_SPEAKING = 0;
-  SESSION_USER_STATE_LISTENING = 1;
-  SESSION_USER_STATE_AWAY = 2;
+enum UserState {
+  US_SPEAKING = 0;
+  US_LISTENING = 1;
+  US_AWAY = 2;
 }
 
 message LLMModelUsage {
@@ -163,15 +163,15 @@ message AgentSessionUsage {
   repeated ModelUsage model_usage = 1;
 }
 
-message SessionEvent {
+message AgentSessionEvent {
   message AgentStateChanged {
-    SessionAgentState old_state = 1;
-    SessionAgentState new_state = 2;
+    AgentState old_state = 1;
+    AgentState new_state = 2;
   }
 
   message UserStateChanged {
-    SessionUserState old_state = 1;
-    SessionUserState new_state = 2;
+    UserState old_state = 1;
+    UserState new_state = 2;
   }
 
   message ConversationItemAdded {
@@ -255,8 +255,8 @@ message SessionResponse {
     repeated ChatContext.ChatItem items = 1;
   }
   message GetSessionStateResponse {
-    SessionAgentState agent_state = 1;
-    SessionUserState user_state = 2;
+    AgentState agent_state = 1;
+    UserState user_state = 2;
     string agent_id = 3;
     map<string, string> options = 4;
     google.protobuf.Timestamp created_at = 5;
@@ -291,7 +291,7 @@ message AgentSessionMessage {
   oneof message {
     SessionAudioFrame audio_input = 1;
     SessionAudioFrame audio_output = 2;
-    SessionEvent event = 3;
+    AgentSessionEvent event = 3;
     SessionRequest request = 4;
     SessionResponse response = 5;
     SessionAudioPlaybackFlush audio_playback_flush = 6;

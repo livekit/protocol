@@ -27,5 +27,5 @@ message RunningAgentJobInfo {
   string url = 5;
   string token = 6;
   string worker_id = 7;
-  bool fake_job = 8;
+  bool mock_job = 8;
 }
