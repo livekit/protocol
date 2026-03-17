@@ -58,11 +58,11 @@ func Proto() error {
 
 	agentProtoFiles := []string{
 		"agent/livekit_agent_session.proto",
+		"agent/livekit_agent_dev.proto",
 	}
 
 	protoFiles := []string{
 		"livekit_agent.proto",
-		"livekit_agent_dev.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",

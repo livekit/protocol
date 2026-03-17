@@ -1,14 +1,11 @@
 syntax = "proto3";
 
-package livekit;
+package livekit.agent;
 
-option go_package = "github.com/livekit/protocol/livekit";
-
-import "livekit_agent.proto";
+option go_package = "github.com/livekit/protocol/livekit/agent";
 
 // AgentDevMessage is used for IPC between the CLI and agent processes
-// during dev-mode hot reload. Lives in livekit (not livekit.agent) because
-// it depends on livekit.Job, and livekit already imports livekit.agent.
+// during dev-mode hot reload.
 message AgentDevMessage {
   oneof message {
     GetRunningAgentJobsRequest get_running_jobs_request = 1;
@@ -23,7 +20,7 @@ message GetRunningAgentJobsResponse {
 }
 
 message RunningAgentJobInfo {
-  Job job = 1;
+  bytes job = 1;
   string accept_name = 2;
   string accept_identity = 3;
   string accept_metadata = 4;
