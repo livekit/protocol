@@ -62,6 +62,7 @@ message SimulationRun {
     string instructions = 3;
     string error = 4;
     string agent_expectations = 5;
+    string label = 6;
   }
 
   message Create {
@@ -69,6 +70,7 @@ message SimulationRun {
       string instructions = 1;
       string agent_expectations = 2;
       map<string, string> metadata = 3;
+      string label = 4;
     }
     message Scenarios {
       repeated Scenario scenarios = 1;
