@@ -89,13 +89,6 @@ message ChatContext {
   repeated ChatItem items = 1;
 }
 
-message SessionAudioFrame {
-  bytes data = 1;
-  uint32 sample_rate = 2;
-  uint32 num_channels = 3;
-  uint32 samples_per_channel = 4;
-}
-
 enum AgentState {
   AS_INITIALIZING = 0;
   AS_IDLE = 1;
@@ -283,19 +276,25 @@ message SessionResponse {
   }
 }
 
-message SessionAudioPlaybackFlush {}
-message SessionAudioPlaybackClear {}
-message SessionAudioPlaybackFinished {}
-
 message AgentSessionMessage {
+  message AudioFrame {
+    bytes data = 1;
+    uint32 sample_rate = 2;
+    uint32 num_channels = 3;
+    uint32 samples_per_channel = 4;
+  }
+  message AudioPlaybackFlush {}
+  message AudioPlaybackClear {}
+  message AudioPlaybackFinished {}
+
   oneof message {
-    SessionAudioFrame audio_input = 1;
-    SessionAudioFrame audio_output = 2;
+    AudioFrame audio_input = 1;
+    AudioFrame audio_output = 2;
     AgentSessionEvent event = 3;
     SessionRequest request = 4;
     SessionResponse response = 5;
-    SessionAudioPlaybackFlush audio_playback_flush = 6;
-    SessionAudioPlaybackClear audio_playback_clear = 7;
-    SessionAudioPlaybackFinished audio_playback_finished = 8;
+    AudioPlaybackFlush audio_playback_flush = 6;
+    AudioPlaybackClear audio_playback_clear = 7;
+    AudioPlaybackFinished audio_playback_finished = 8;
   }
 }
