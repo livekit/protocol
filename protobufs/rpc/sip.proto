@@ -26,7 +26,6 @@ import "logger/options.proto";
 
 service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
-    option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   };
   rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (google.protobuf.Empty) {
