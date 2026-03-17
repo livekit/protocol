@@ -7,8 +7,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 import "livekit_agent.proto";
 
 // AgentDevMessage is used for IPC between the CLI and agent processes
-// during dev-mode hot reload. Moved from livekit.agent package to livekit
-// to break the agent -> livekit import cycle.
+// during dev-mode hot reload. Lives in livekit (not livekit.agent) because
+// it depends on livekit.Job, and livekit already imports livekit.agent.
 message AgentDevMessage {
   oneof message {
     GetRunningAgentJobsRequest get_running_jobs_request = 1;
