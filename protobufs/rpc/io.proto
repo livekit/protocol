@@ -47,7 +47,7 @@ service IOInfo {
 }
 
 message GetEgressRequest {
-  string egress_id = 1;
+  string egress_id = 1 [(logger.name) = "egressID"];
 }
 
 message UpdateMetricsRequest {
@@ -58,7 +58,7 @@ message UpdateMetricsRequest {
 
 // Query an ingress info from an ingress ID or stream key
 message GetIngressInfoRequest {
-  string ingress_id = 1;
+  string ingress_id = 1 [(logger.name) = "ingressID"];
   string stream_key = 2;
 }
 
@@ -66,19 +66,19 @@ message GetIngressInfoResponse {
   livekit.IngressInfo info = 1;
   string token = 2;
   string ws_url = 3;
-  string project_id = 6;
+  string project_id = 6 [(logger.name) = "projectID"];
   map<string, string> logging_fields = 4;
   map<string, string> feature_flags = 5;
 }
 
 // Request to store an update to the ingress state ingress -> service
 message UpdateIngressStateRequest {
-  string ingress_id = 1;
+  string ingress_id = 1 [(logger.name) = "ingressID"];
   livekit.IngressState state = 2;
 }
 
 message GetSIPTrunkAuthenticationRequest {
-  string sip_call_id = 6 [deprecated = true];
+  string sip_call_id = 6 [deprecated = true, (logger.name) = "sipCallID"];
 
   // What Number is calling
   string from = 2 [deprecated = true];
@@ -110,9 +110,9 @@ message GetSIPTrunkAuthenticationResponse {
   ];
   bool drop = 3;
   // Trunk used to fulfill this request
-  string sip_trunk_id = 4;
+  string sip_trunk_id = 4 [(logger.name) = "sipTrunkID"];
   // Used in Cloud only
-  string project_id = 5;
+  string project_id = 5 [(logger.name) = "projectID"];
   livekit.ProviderInfo provider_info = 6;
   // Error code if authentication failed
   SIPTrunkAuthenticationError error_code = 7;
@@ -122,10 +122,10 @@ message GetSIPTrunkAuthenticationResponse {
 }
 
 message EvaluateSIPDispatchRulesRequest {
-  string sip_call_id = 8 [deprecated = true];
-  string sip_participant_id = 1 [deprecated = true];
+  string sip_call_id = 8 [deprecated = true, (logger.name) = "sipCallID"];
+  string sip_participant_id = 1 [deprecated = true, (logger.name) = "sipParticipantID"];
   // Trunk from the auth response, if any
-  string sip_trunk_id = 10;
+  string sip_trunk_id = 10 [(logger.name) = "sipTrunkID"];
 
   // What Number is calling
   string calling_number = 2 [deprecated = true];
@@ -196,12 +196,12 @@ message EvaluateSIPDispatchRulesResponse {
   SIPDispatchResult result = 6;
 
   // Trunk used to fulfill this request
-  string sip_trunk_id = 9;
+  string sip_trunk_id = 9 [(logger.name) = "sipTrunkID"];
   // Dispatch Rule used to fulfill this request
-  string sip_dispatch_rule_id = 10;
+  string sip_dispatch_rule_id = 10 [(logger.name) = "sipDispatchRuleID"];
 
   // Used in Cloud only
-  string project_id = 12;
+  string project_id = 12 [(logger.name) = "projectID"];
 
   // Include these SIP X-* headers in 200 OK response to INVITE.
   // These headers are included as-is and may help identify triggered LiveKit Dispatch Rule for the other SIP endpoint.
@@ -271,12 +271,12 @@ enum SIPTrunkAuthenticationError {
 }
 
 message SIPCall {
-  string lk_call_id = 1;
+  string lk_call_id = 1 [(logger.name) = "lkCallID"];
   string source_ip = 2;             // source ip (without port)
   livekit.SIPUri address = 3;       // address in the request line (INVITE)
   livekit.SIPUri from = 4;          // From header
   livekit.SIPUri to = 5;            // To header
   repeated livekit.SIPUri via = 6;  // Via headers
-  string sip_call_id = 7;           // SIP protocol generated call ID
-  string project_id = 8;            // LiveKit project ID (Cloud only)
+  string sip_call_id = 7 [(logger.name) = "sipCallID"];           // SIP protocol generated call ID
+  string project_id = 8 [(logger.name) = "projectID"];            // LiveKit project ID (Cloud only)
 }

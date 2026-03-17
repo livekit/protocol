@@ -67,7 +67,7 @@ func (p *EvaluateSIPDispatchRulesRequest) SIPCall() *SIPCall {
 // NewCreateSIPParticipantRequest fills InternalCreateSIPParticipantRequest from
 // livekit.CreateSIPParticipantRequest and livekit.SIPTrunkInfo.
 func NewCreateSIPParticipantRequest(
-	projectID, callID, ownHostname, wsUrl, token string,
+	projectID, callID, fromHostname, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
@@ -169,7 +169,7 @@ func NewCreateSIPParticipantRequest(
 		SipTrunkId:            trunkID,
 		DestinationCountry:    destinationCountry,
 		Address:               hostname,
-		Hostname:              ownHostname,
+		Hostname:              fromHostname,
 		Transport:             transport,
 		Number:                outboundNumber,
 		Username:              authUser,

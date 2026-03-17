@@ -7,10 +7,13 @@ import (
 )
 
 var (
-	_ Reporter         = (*noopReporter)(nil)
-	_ ProjectReporter  = (*noopProjectReporter)(nil)
-	_ ProviderReporter = (*noopProviderReporter)(nil)
-	_ ModelReporter    = (*noopModelReporter)(nil)
+	_ Reporter                  = (*noopReporter)(nil)
+	_ ProjectReporter           = (*noopProjectReporter)(nil)
+	_ RequestedPriorityReporter = (*noopRequestedPriorityReporter)(nil)
+	_ GrantedPriorityReporter   = (*noopGrantedPriorityReporter)(nil)
+	_ BillablePriorityReporter  = (*noopBillablePriorityReporter)(nil)
+	_ ProviderReporter          = (*noopProviderReporter)(nil)
+	_ ModelReporter             = (*noopModelReporter)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -41,10 +44,60 @@ func NewNoopProjectReporter() ProjectReporter {
 func (r *noopProjectReporter) RegisterFunc(f func(ts time.Time, tx ProjectTx) bool) {}
 func (r *noopProjectReporter) Tx(f func(ProjectTx))                                 {}
 func (r *noopProjectReporter) TxAt(ts time.Time, f func(ProjectTx))                 {}
-func (r *noopProjectReporter) WithProvider(name string) ProviderReporter {
+func (r *noopProjectReporter) WithRequestedPriority(priority string) RequestedPriorityReporter {
+	return &noopRequestedPriorityReporter{}
+}
+func (r *noopProjectReporter) WithDeferredRequestedPriority() (RequestedPriorityReporter, KeyResolver) {
+	return &noopRequestedPriorityReporter{}, noopKeyResolver{}
+}
+
+type noopRequestedPriorityReporter struct{}
+
+func NewNoopRequestedPriorityReporter() RequestedPriorityReporter {
+	return &noopRequestedPriorityReporter{}
+}
+
+func (r *noopRequestedPriorityReporter) RegisterFunc(f func(ts time.Time, tx RequestedPriorityTx) bool) {
+}
+func (r *noopRequestedPriorityReporter) Tx(f func(RequestedPriorityTx))                 {}
+func (r *noopRequestedPriorityReporter) TxAt(ts time.Time, f func(RequestedPriorityTx)) {}
+func (r *noopRequestedPriorityReporter) WithGrantedPriority(priority string) GrantedPriorityReporter {
+	return &noopGrantedPriorityReporter{}
+}
+func (r *noopRequestedPriorityReporter) WithDeferredGrantedPriority() (GrantedPriorityReporter, KeyResolver) {
+	return &noopGrantedPriorityReporter{}, noopKeyResolver{}
+}
+
+type noopGrantedPriorityReporter struct{}
+
+func NewNoopGrantedPriorityReporter() GrantedPriorityReporter {
+	return &noopGrantedPriorityReporter{}
+}
+
+func (r *noopGrantedPriorityReporter) RegisterFunc(f func(ts time.Time, tx GrantedPriorityTx) bool) {}
+func (r *noopGrantedPriorityReporter) Tx(f func(GrantedPriorityTx))                                 {}
+func (r *noopGrantedPriorityReporter) TxAt(ts time.Time, f func(GrantedPriorityTx))                 {}
+func (r *noopGrantedPriorityReporter) WithBillablePriority(priority string) BillablePriorityReporter {
+	return &noopBillablePriorityReporter{}
+}
+func (r *noopGrantedPriorityReporter) WithDeferredBillablePriority() (BillablePriorityReporter, KeyResolver) {
+	return &noopBillablePriorityReporter{}, noopKeyResolver{}
+}
+
+type noopBillablePriorityReporter struct{}
+
+func NewNoopBillablePriorityReporter() BillablePriorityReporter {
+	return &noopBillablePriorityReporter{}
+}
+
+func (r *noopBillablePriorityReporter) RegisterFunc(f func(ts time.Time, tx BillablePriorityTx) bool) {
+}
+func (r *noopBillablePriorityReporter) Tx(f func(BillablePriorityTx))                 {}
+func (r *noopBillablePriorityReporter) TxAt(ts time.Time, f func(BillablePriorityTx)) {}
+func (r *noopBillablePriorityReporter) WithProvider(name string) ProviderReporter {
 	return &noopProviderReporter{}
 }
-func (r *noopProjectReporter) WithDeferredProvider() (ProviderReporter, KeyResolver) {
+func (r *noopBillablePriorityReporter) WithDeferredProvider() (ProviderReporter, KeyResolver) {
 	return &noopProviderReporter{}, noopKeyResolver{}
 }
 
@@ -70,14 +123,17 @@ func NewNoopModelReporter() ModelReporter {
 	return &noopModelReporter{}
 }
 
-func (r *noopModelReporter) RegisterFunc(f func(ts time.Time, tx ModelTx) bool) {}
-func (r *noopModelReporter) Tx(f func(ModelTx))                                 {}
-func (r *noopModelReporter) TxAt(ts time.Time, f func(ModelTx))                 {}
-func (r *noopModelReporter) ReportInferencePromptTokens(v uint64)               {}
-func (r *noopModelReporter) ReportInferencePromptCacheTokens(v uint64)          {}
-func (r *noopModelReporter) ReportInferenceCompletionTokens(v uint64)           {}
-func (r *noopModelReporter) ReportInferenceTotalTokens(v uint64)                {}
-func (r *noopModelReporter) ReportInferenceCacheCreateTokens(v uint64)          {}
-func (r *noopModelReporter) ReportInferenceCacheReadTokens(v uint64)            {}
-func (r *noopModelReporter) ReportSttDuration(v uint32)                         {}
-func (r *noopModelReporter) ReportTtsChars(v uint32)                            {}
+func (r *noopModelReporter) RegisterFunc(f func(ts time.Time, tx ModelTx) bool)   {}
+func (r *noopModelReporter) Tx(f func(ModelTx))                                   {}
+func (r *noopModelReporter) TxAt(ts time.Time, f func(ModelTx))                   {}
+func (r *noopModelReporter) ReportInferencePromptTokens(v uint64)                 {}
+func (r *noopModelReporter) ReportInferencePromptCacheTokens(v uint64)            {}
+func (r *noopModelReporter) ReportInferenceCompletionTokens(v uint64)             {}
+func (r *noopModelReporter) ReportInferenceTotalTokens(v uint64)                  {}
+func (r *noopModelReporter) ReportInferenceCacheCreateTokens(v uint64)            {}
+func (r *noopModelReporter) ReportInferenceCacheReadTokens(v uint64)              {}
+func (r *noopModelReporter) ReportSttDuration(v uint32)                           {}
+func (r *noopModelReporter) ReportTtsChars(v uint32)                              {}
+func (r *noopModelReporter) ReportBargeInRequests(v uint64)                       {}
+func (r *noopModelReporter) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
+func (r *noopModelReporter) ReportVoiceCloneRequests(v uint64)                    {}

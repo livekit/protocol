@@ -239,7 +239,7 @@ func logFields(event *livekit.WebhookEvent, url string) []interface{} {
 	if event.Participant != nil {
 		fields = append(fields,
 			"participant", event.Participant.Identity,
-			"pID", event.Participant.Sid,
+			"participantID", event.Participant.Sid,
 		)
 	}
 	if event.Track != nil {

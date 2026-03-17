@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_J2LFGS0 = true
+const Version_NI039G8 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -24,9 +24,42 @@ type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
 	Tx(func(tx ProjectTx))
 	TxAt(time.Time, func(tx ProjectTx))
+	WithRequestedPriority(priority string) RequestedPriorityReporter
+	WithDeferredRequestedPriority() (RequestedPriorityReporter, KeyResolver)
+	ProjectTx
+}
+
+type RequestedPriorityTx interface{}
+
+type RequestedPriorityReporter interface {
+	RegisterFunc(func(ts time.Time, tx RequestedPriorityTx) bool)
+	Tx(func(tx RequestedPriorityTx))
+	TxAt(time.Time, func(tx RequestedPriorityTx))
+	WithGrantedPriority(priority string) GrantedPriorityReporter
+	WithDeferredGrantedPriority() (GrantedPriorityReporter, KeyResolver)
+	RequestedPriorityTx
+}
+
+type GrantedPriorityTx interface{}
+
+type GrantedPriorityReporter interface {
+	RegisterFunc(func(ts time.Time, tx GrantedPriorityTx) bool)
+	Tx(func(tx GrantedPriorityTx))
+	TxAt(time.Time, func(tx GrantedPriorityTx))
+	WithBillablePriority(priority string) BillablePriorityReporter
+	WithDeferredBillablePriority() (BillablePriorityReporter, KeyResolver)
+	GrantedPriorityTx
+}
+
+type BillablePriorityTx interface{}
+
+type BillablePriorityReporter interface {
+	RegisterFunc(func(ts time.Time, tx BillablePriorityTx) bool)
+	Tx(func(tx BillablePriorityTx))
+	TxAt(time.Time, func(tx BillablePriorityTx))
 	WithProvider(name string) ProviderReporter
 	WithDeferredProvider() (ProviderReporter, KeyResolver)
-	ProjectTx
+	BillablePriorityTx
 }
 
 type ProviderTx interface{}
@@ -49,6 +82,9 @@ type ModelTx interface {
 	ReportInferenceCacheReadTokens(v uint64)
 	ReportSttDuration(v uint32)
 	ReportTtsChars(v uint32)
+	ReportBargeInRequests(v uint64)
+	ReportBargeInRequestTypes(v ModelBargeInRequestTypes)
+	ReportVoiceCloneRequests(v uint64)
 }
 
 type ModelReporter interface {

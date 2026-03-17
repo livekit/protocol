@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "google/protobuf/empty.proto";
 import "options.proto";
 import "livekit_agent.proto";
+import "logger/options.proto";
 
 service AgentInternal {
   rpc CheckEnabled(CheckEnabledRequest) returns (CheckEnabledResponse) {
@@ -80,7 +81,7 @@ message JobRequestResponse {
 }
 
 message JobTerminateRequest {
-  string job_id = 1;
+  string job_id = 1 [(logger.name) = "jobID"];
   JobTerminateReason reason = 2;
 }
 

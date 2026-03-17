@@ -1,5 +1,37 @@
 # @livekit/protocol
 
+## 1.45.0
+
+### Minor Changes
+
+- Add PayloadTrailerFeature to TrackInfo and AddTrackRequest - [#1438](https://github.com/livekit/protocol/pull/1438) ([@chenosaurus](https://github.com/chenosaurus))
+
+### Patch Changes
+
+- move out connector protos - [#1429](https://github.com/livekit/protocol/pull/1429) ([@paulwe](https://github.com/paulwe))
+
+- add AGENT_ERROR disconnect reason - [#1434](https://github.com/livekit/protocol/pull/1434) ([@theomonnom](https://github.com/theomonnom))
+
+## 1.44.1
+
+### Patch Changes
+
+- Redact ice server credentials in logs - [#1408](https://github.com/livekit/protocol/pull/1408) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- remove cloud only methods from reporter interface - [#1423](https://github.com/livekit/protocol/pull/1423) ([@paulwe](https://github.com/paulwe))
+
+- do not log sip auth field lengths - [#1421](https://github.com/livekit/protocol/pull/1421) ([@paulwe](https://github.com/paulwe))
+
+- add stack utility - [#1422](https://github.com/livekit/protocol/pull/1422) ([@paulwe](https://github.com/paulwe))
+
+- Changes for ingress observability support - [#1392](https://github.com/livekit/protocol/pull/1392) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- remove last cloud only obs method - [#1425](https://github.com/livekit/protocol/pull/1425) ([@paulwe](https://github.com/paulwe))
+
+- update room observability codegen - [#1395](https://github.com/livekit/protocol/pull/1395) ([@paulwe](https://github.com/paulwe))
+
+- Sync schema versions - [#1385](https://github.com/livekit/protocol/pull/1385) ([@paulwe](https://github.com/paulwe))
+
 ## 1.44.0
 
 ### Patch Changes

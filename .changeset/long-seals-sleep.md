@@ -2,4 +2,4 @@
 "@livekit/protocol": patch
 ---
 
-update room observability codegen
+require logger name

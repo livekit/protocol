@@ -2,4 +2,4 @@
 "@livekit/protocol": patch
 ---
 
-Sync schema versions
+fix flaky test
