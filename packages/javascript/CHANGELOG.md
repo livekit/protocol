@@ -1,5 +1,27 @@
 # @livekit/protocol
 
+## 1.45.1
+
+### Patch Changes
+
+- add generic list type - [#1449](https://github.com/livekit/protocol/pull/1449) ([@paulwe](https://github.com/paulwe))
+
+- add livekit_agent_simulation service, agent remote session proto & cli dev proto - [#1404](https://github.com/livekit/protocol/pull/1404) ([@theomonnom](https://github.com/theomonnom))
+
+- fix flaky test - [#1445](https://github.com/livekit/protocol/pull/1445) ([@paulwe](https://github.com/paulwe))
+
+- require logger name - [#1444](https://github.com/livekit/protocol/pull/1444) ([@paulwe](https://github.com/paulwe))
+
+- normalize protobuf "id" log field names - [#1451](https://github.com/livekit/protocol/pull/1451) ([@paulwe](https://github.com/paulwe))
+
+- encode monotonic time in wall clock - [#1439](https://github.com/livekit/protocol/pull/1439) ([@paulwe](https://github.com/paulwe))
+
+- Allow sips: scheme in transfer URIs. - [#1446](https://github.com/livekit/protocol/pull/1446) ([@dennwc](https://github.com/dennwc))
+
+- export discard logger - [#1457](https://github.com/livekit/protocol/pull/1457) ([@paulwe](https://github.com/paulwe))
+
+- Rename log field pID to participantID - [#1452](https://github.com/livekit/protocol/pull/1452) ([@paulwe](https://github.com/paulwe))
+
 ## 1.45.0
 
 ### Minor Changes
