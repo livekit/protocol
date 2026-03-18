@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.45.1
+
+### Patch Changes
+
+- Dropping use of an affinity function in CreateSIPParticipant - [#1456](https://github.com/livekit/protocol/pull/1456) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.45.0
 
 ### Minor Changes
