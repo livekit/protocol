@@ -33,9 +33,10 @@ import (
 )
 
 var (
-	discardLogger        = logr.Discard()
-	defaultLogger Logger = LogRLogger(discardLogger)
-	pkgLogger     Logger = LogRLogger(discardLogger)
+	discardLogger      = logr.Discard()
+	discardLoggerIface = LogRLogger(discardLogger)
+	defaultLogger      = Logger(discardLoggerIface)
+	pkgLogger          = Logger(discardLoggerIface)
 )
 
 // InitFromConfig initializes a Zap-based logger
@@ -50,6 +51,10 @@ func InitFromConfig(conf *Config, name string) {
 // GetLogger returns the logger that was set with SetLogger with an extra depth of 1
 func GetLogger() Logger {
 	return defaultLogger
+}
+
+func GetDiscardLogger() Logger {
+	return discardLoggerIface
 }
 
 // SetLogger lets you use a custom logger. Pass in a logr.Logger with default depth
