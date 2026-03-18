@@ -185,10 +185,10 @@ message EncodingOptions {
 message Output {
   oneof config {
     FileOutput file = 1;
-    StreamOutput stream = 2;         // reuses v1 StreamOutput
-    SegmentedFileOutput segments = 3; // reuses v1 SegmentedFileOutput
-    ImageOutput images = 4;           // reuses v1 ImageOutput
-    McapOutput mcap = 5;
+    StreamOutput stream = 2;
+    SegmentedFileOutput segments = 3;
+    ImageOutput images = 4;
+    // 5 reserved for mcap;
   }
 
   // Per-output storage override (falls back to request, then server)
@@ -274,12 +274,6 @@ enum ImageFileSuffix {
   IMAGE_SUFFIX_INDEX = 0;
   IMAGE_SUFFIX_TIMESTAMP = 1;
   IMAGE_SUFFIX_NONE_OVERWRITE = 2;  // Do not append any suffix and overwrite the existing image with the latest
-}
-
-// Raw track data packaged into MCAP container format.
-message McapOutput {
-  string filepath = 1;
-  bool disable_manifest = 2;
 }
 
 // --- Storage ---
@@ -391,7 +385,6 @@ message EgressInfo {
   repeated FileInfo file_results = 16;
   repeated SegmentsInfo segment_results = 17;
   repeated ImagesInfo image_results = 20;
-  repeated McapInfo mcap_results = 28;
 
   string error = 9;
   int32 error_code = 22;
@@ -469,16 +462,6 @@ message ImagesInfo {
   int64 image_count = 1;
   int64 started_at = 2;
   int64 ended_at = 3;
-}
-
-message McapInfo {
-  string filename = 1;
-  int64 started_at = 2;
-  int64 ended_at = 3;
-  int64 duration = 4;
-  int64 size = 5;
-  string location = 6;
-  int64 track_count = 7;
 }
 
 // --- Auto Egress ---
