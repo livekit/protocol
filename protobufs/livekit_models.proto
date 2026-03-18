@@ -766,6 +766,7 @@ enum AudioTrackFeature {
 
 enum PacketTrailerFeature {
   PTF_USER_TIMESTAMP = 0;
+  PTF_FRAME_ID = 1;
 }
 
 message DataStream {
