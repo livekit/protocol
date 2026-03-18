@@ -34,10 +34,15 @@ service EgressInternal {
 }
 
 service EgressHandler {
-  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
+  rpc UpdateEgress(livekit.UpdateEgressRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
   }
   rpc StopEgress(livekit.StopEgressRequest) returns (livekit.EgressInfo) {
+    option (psrpc.options).topics = true;
+  }
+
+  // --- Deprecated ---
+  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
   }
 }
