@@ -1,8 +1,6 @@
 package observability
 
 import (
-	"github.com/go-logr/logr"
-
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/observability/agentsobs"
 	"github.com/livekit/protocol/observability/core_callobs"
@@ -16,8 +14,6 @@ import (
 )
 
 const Project = "livekit"
-
-var discardLogger = logger.LogRLogger(logr.Discard())
 
 type Reporter interface {
 	Logger(name, projectID string) (logger.Logger, error)
@@ -40,7 +36,7 @@ func NewReporter() Reporter {
 type reporter struct{}
 
 func (reporter) Logger(name, projectID string) (logger.Logger, error) {
-	return discardLogger, nil
+	return logger.GetDiscardLogger(), nil
 }
 
 func (reporter) Room() roomobs.Reporter {
