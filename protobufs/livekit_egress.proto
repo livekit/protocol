@@ -283,7 +283,7 @@ message StorageConfig {
     S3Upload s3 = 1;
     GCPUpload gcp = 2;
     AzureBlobUpload azure = 3;
-    AliOSSUpload ali_oss = 4;
+    AliOSSUpload aliOSS = 4;
   }
 }
 
