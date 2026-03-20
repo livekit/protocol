@@ -2097,7 +2097,7 @@ type StorageConfig struct {
 	//	*StorageConfig_S3
 	//	*StorageConfig_Gcp
 	//	*StorageConfig_Azure
-	//	*StorageConfig_AliOss
+	//	*StorageConfig_AliOSS
 	Provider      isStorageConfig_Provider `protobuf_oneof:"provider"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2167,10 +2167,10 @@ func (x *StorageConfig) GetAzure() *AzureBlobUpload {
 	return nil
 }
 
-func (x *StorageConfig) GetAliOss() *AliOSSUpload {
+func (x *StorageConfig) GetAliOSS() *AliOSSUpload {
 	if x != nil {
-		if x, ok := x.Provider.(*StorageConfig_AliOss); ok {
-			return x.AliOss
+		if x, ok := x.Provider.(*StorageConfig_AliOSS); ok {
+			return x.AliOSS
 		}
 	}
 	return nil
@@ -2192,8 +2192,8 @@ type StorageConfig_Azure struct {
 	Azure *AzureBlobUpload `protobuf:"bytes,3,opt,name=azure,proto3,oneof"`
 }
 
-type StorageConfig_AliOss struct {
-	AliOss *AliOSSUpload `protobuf:"bytes,4,opt,name=ali_oss,json=aliOss,proto3,oneof"`
+type StorageConfig_AliOSS struct {
+	AliOSS *AliOSSUpload `protobuf:"bytes,4,opt,name=aliOSS,proto3,oneof"`
 }
 
 func (*StorageConfig_S3) isStorageConfig_Provider() {}
@@ -2202,7 +2202,7 @@ func (*StorageConfig_Gcp) isStorageConfig_Provider() {}
 
 func (*StorageConfig_Azure) isStorageConfig_Provider() {}
 
-func (*StorageConfig_AliOss) isStorageConfig_Provider() {}
+func (*StorageConfig_AliOSS) isStorageConfig_Provider() {}
 
 type S3Upload struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
@@ -5448,12 +5448,12 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x05azure\x18\n" +
 	" \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\v \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xcc\x01\n" +
+	"\x06output\"\xcb\x01\n" +
 	"\rStorageConfig\x12#\n" +
 	"\x02s3\x18\x01 \x01(\v2\x11.livekit.S3UploadH\x00R\x02s3\x12&\n" +
 	"\x03gcp\x18\x02 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
-	"\x05azure\x18\x03 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x120\n" +
-	"\aali_oss\x18\x04 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOssB\n" +
+	"\x05azure\x18\x03 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
+	"\x06aliOSS\x18\x04 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\n" +
 	"\n" +
 	"\bprovider\"\xe2\x04\n" +
 	"\bS3Upload\x12#\n" +
@@ -5906,7 +5906,7 @@ var file_livekit_egress_proto_depIdxs = []int32{
 	27,  // 36: livekit.StorageConfig.s3:type_name -> livekit.S3Upload
 	28,  // 37: livekit.StorageConfig.gcp:type_name -> livekit.GCPUpload
 	29,  // 38: livekit.StorageConfig.azure:type_name -> livekit.AzureBlobUpload
-	30,  // 39: livekit.StorageConfig.ali_oss:type_name -> livekit.AliOSSUpload
+	30,  // 39: livekit.StorageConfig.aliOSS:type_name -> livekit.AliOSSUpload
 	54,  // 40: livekit.S3Upload.metadata:type_name -> livekit.S3Upload.MetadataEntry
 	31,  // 41: livekit.S3Upload.proxy:type_name -> livekit.ProxyConfig
 	31,  // 42: livekit.GCPUpload.proxy:type_name -> livekit.ProxyConfig
@@ -6072,7 +6072,7 @@ func file_livekit_egress_proto_init() {
 		(*StorageConfig_S3)(nil),
 		(*StorageConfig_Gcp)(nil),
 		(*StorageConfig_Azure)(nil),
-		(*StorageConfig_AliOss)(nil),
+		(*StorageConfig_AliOSS)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[25].OneofWrappers = []any{
 		(*EgressInfo_Egress)(nil),
