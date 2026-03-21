@@ -95,6 +95,43 @@ func TestVerifier(t *testing.T) {
 		require.EqualValues(t, attrs, decoded.Attributes)
 	})
 
+	t.Run("verify with KeyProvider", func(t *testing.T) {
+		claim := auth.VideoGrant{RoomJoin: true, Room: "testroom"}
+		at := auth.NewAccessToken(apiKey, secret).
+			SetVideoGrant(&claim).
+			SetValidFor(time.Minute).
+			SetIdentity("user1")
+		authToken, err := at.ToJWT()
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(authToken)
+		require.NoError(t, err)
+
+		// Passing a SimpleKeyProvider directly should work.
+		provider := auth.NewSimpleKeyProvider(apiKey, secret)
+		_, decoded, err := v.Verify(provider)
+		require.NoError(t, err)
+		require.Equal(t, "user1", decoded.Identity)
+		require.Equal(t, &claim, decoded.Video)
+	})
+
+	t.Run("verify with KeyProvider wrong key returns error", func(t *testing.T) {
+		claim := auth.VideoGrant{RoomJoin: true}
+		at := auth.NewAccessToken(apiKey, secret).
+			SetVideoGrant(&claim).
+			SetValidFor(time.Minute)
+		authToken, err := at.ToJWT()
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(authToken)
+		require.NoError(t, err)
+
+		// Provider with wrong key should fail.
+		provider := auth.NewSimpleKeyProvider("wrongkey", "wrongsecret")
+		_, _, err = v.Verify(provider)
+		require.Error(t, err)
+	})
+
 	t.Run("nil permissions are handled", func(t *testing.T) {
 		grant := &auth.VideoGrant{
 			Room:     "myroom",
