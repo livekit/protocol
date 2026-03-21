@@ -44,6 +44,9 @@ const (
 	CallStatusParticipantJoined CallStatus = "participant_joined"
 	CallStatusDisconnected      CallStatus = "disconnected"
 	CallStatusError             CallStatus = "error"
+	CallStatusPending           CallStatus = "pending"
+	CallStatusSuccess           CallStatus = "success"
+	CallStatusFailed            CallStatus = "failed"
 )
 
 type CallTransferStatus string
