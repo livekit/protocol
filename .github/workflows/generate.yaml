@@ -39,7 +39,7 @@ jobs:
         run: go mod tidy
 
       - name: Install generators
-        uses: magefile/mage-action@v3
+        uses: magefile/mage-action@v4
         with:
           version: latest
           install-only: true
@@ -50,7 +50,7 @@ jobs:
       - name: Generate Protobuf
         run: mage proto
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v5
 
       - name: Use Node.js 20
         uses: actions/setup-node@v6
@@ -66,7 +66,7 @@ jobs:
           pnpm --filter @livekit/protocol run generate:proto
 
       - name: Add changes
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v10
         with:
           add: '["livekit", "replay", "rpc", "infra", "packages/javascript/src/gen"]'
           default_author: github_actions
