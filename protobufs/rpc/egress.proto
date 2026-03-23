@@ -34,10 +34,15 @@ service EgressInternal {
 }
 
 service EgressHandler {
-  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
+  rpc UpdateEgress(livekit.UpdateEgressRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
   }
   rpc StopEgress(livekit.StopEgressRequest) returns (livekit.EgressInfo) {
+    option (psrpc.options).topics = true;
+  }
+
+  // --- Deprecated ---
+  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
   }
 }
@@ -48,6 +53,10 @@ message StartEgressRequest {
 
   // request
   oneof request {
+    livekit.StartEgressRequest egress = 16;
+    livekit.ExportReplayRequest replay = 17;
+
+    // --- deprecated ---
     livekit.RoomCompositeEgressRequest room_composite = 5;
     livekit.WebEgressRequest web = 11;
     livekit.ParticipantEgressRequest participant = 13;
