@@ -29,6 +29,10 @@ type RoomClient[RoomTopicType ~string] interface {
 
 	UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit6.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error)
 
+	ListParticipants(ctx context.Context, room RoomTopicType, req *livekit6.ListParticipantsRequest, opts ...psrpc.RequestOption) (*livekit6.ListParticipantsResponse, error)
+
+	GetParticipant(ctx context.Context, room RoomTopicType, req *livekit6.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit6.ParticipantInfo, error)
+
 	// Close immediately, without waiting for pending RPCs
 	Close()
 }
@@ -43,6 +47,10 @@ type RoomServerImpl interface {
 	SendData(context.Context, *livekit6.SendDataRequest) (*livekit6.SendDataResponse, error)
 
 	UpdateRoomMetadata(context.Context, *livekit6.UpdateRoomMetadataRequest) (*livekit1.Room, error)
+
+	ListParticipants(context.Context, *livekit6.ListParticipantsRequest) (*livekit6.ListParticipantsResponse, error)
+
+	GetParticipant(context.Context, *livekit6.RoomParticipantIdentity) (*livekit6.ParticipantInfo, error)
 }
 
 // =====================
@@ -56,6 +64,10 @@ type RoomServer[RoomTopicType ~string] interface {
 	DeregisterSendDataTopic(room RoomTopicType)
 	RegisterUpdateRoomMetadataTopic(room RoomTopicType) error
 	DeregisterUpdateRoomMetadataTopic(room RoomTopicType)
+	RegisterListParticipantsTopic(room RoomTopicType) error
+	DeregisterListParticipantsTopic(room RoomTopicType)
+	RegisterGetParticipantTopic(room RoomTopicType) error
+	DeregisterGetParticipantTopic(room RoomTopicType)
 	RegisterAllRoomTopics(room RoomTopicType) error
 	DeregisterAllRoomTopics(room RoomTopicType)
 
@@ -84,6 +96,8 @@ func NewRoomClient[RoomTopicType ~string](bus psrpc.MessageBus, opts ...psrpc.Cl
 	sd.RegisterMethod("DeleteRoom", false, false, true, true)
 	sd.RegisterMethod("SendData", false, false, true, true)
 	sd.RegisterMethod("UpdateRoomMetadata", false, false, true, true)
+	sd.RegisterMethod("ListParticipants", false, false, true, true)
+	sd.RegisterMethod("GetParticipant", false, false, true, true)
 
 	rpcClient, err := client.NewRPCClient(sd, bus, opts...)
 	if err != nil {
@@ -105,6 +119,14 @@ func (c *roomClient[RoomTopicType]) SendData(ctx context.Context, room RoomTopic
 
 func (c *roomClient[RoomTopicType]) UpdateRoomMetadata(ctx context.Context, room RoomTopicType, req *livekit6.UpdateRoomMetadataRequest, opts ...psrpc.RequestOption) (*livekit1.Room, error) {
 	return client.RequestSingle[*livekit1.Room](ctx, c.client, "UpdateRoomMetadata", []string{string(room)}, req, opts...)
+}
+
+func (c *roomClient[RoomTopicType]) ListParticipants(ctx context.Context, room RoomTopicType, req *livekit6.ListParticipantsRequest, opts ...psrpc.RequestOption) (*livekit6.ListParticipantsResponse, error) {
+	return client.RequestSingle[*livekit6.ListParticipantsResponse](ctx, c.client, "ListParticipants", []string{string(room)}, req, opts...)
+}
+
+func (c *roomClient[RoomTopicType]) GetParticipant(ctx context.Context, room RoomTopicType, req *livekit6.RoomParticipantIdentity, opts ...psrpc.RequestOption) (*livekit6.ParticipantInfo, error) {
+	return client.RequestSingle[*livekit6.ParticipantInfo](ctx, c.client, "GetParticipant", []string{string(room)}, req, opts...)
 }
 
 func (s *roomClient[RoomTopicType]) Close() {
@@ -133,6 +155,8 @@ func NewRoomServer[RoomTopicType ~string](svc RoomServerImpl, bus psrpc.MessageB
 	sd.RegisterMethod("DeleteRoom", false, false, true, true)
 	sd.RegisterMethod("SendData", false, false, true, true)
 	sd.RegisterMethod("UpdateRoomMetadata", false, false, true, true)
+	sd.RegisterMethod("ListParticipants", false, false, true, true)
+	sd.RegisterMethod("GetParticipant", false, false, true, true)
 	return &roomServer[RoomTopicType]{
 		svc: svc,
 		rpc: s,
@@ -163,11 +187,29 @@ func (s *roomServer[RoomTopicType]) DeregisterUpdateRoomMetadataTopic(room RoomT
 	s.rpc.DeregisterHandler("UpdateRoomMetadata", []string{string(room)})
 }
 
+func (s *roomServer[RoomTopicType]) RegisterListParticipantsTopic(room RoomTopicType) error {
+	return server.RegisterHandler(s.rpc, "ListParticipants", []string{string(room)}, s.svc.ListParticipants, nil)
+}
+
+func (s *roomServer[RoomTopicType]) DeregisterListParticipantsTopic(room RoomTopicType) {
+	s.rpc.DeregisterHandler("ListParticipants", []string{string(room)})
+}
+
+func (s *roomServer[RoomTopicType]) RegisterGetParticipantTopic(room RoomTopicType) error {
+	return server.RegisterHandler(s.rpc, "GetParticipant", []string{string(room)}, s.svc.GetParticipant, nil)
+}
+
+func (s *roomServer[RoomTopicType]) DeregisterGetParticipantTopic(room RoomTopicType) {
+	s.rpc.DeregisterHandler("GetParticipant", []string{string(room)})
+}
+
 func (s *roomServer[RoomTopicType]) allRoomTopicRegisterers() server.RegistererSlice {
 	return server.RegistererSlice{
 		server.NewRegisterer(s.RegisterDeleteRoomTopic, s.DeregisterDeleteRoomTopic),
 		server.NewRegisterer(s.RegisterSendDataTopic, s.DeregisterSendDataTopic),
 		server.NewRegisterer(s.RegisterUpdateRoomMetadataTopic, s.DeregisterUpdateRoomMetadataTopic),
+		server.NewRegisterer(s.RegisterListParticipantsTopic, s.DeregisterListParticipantsTopic),
+		server.NewRegisterer(s.RegisterGetParticipantTopic, s.DeregisterGetParticipantTopic),
 	}
 }
 
@@ -202,6 +244,14 @@ func (UnimplementedRoomServer) SendData(context.Context, *livekit6.SendDataReque
 }
 
 func (UnimplementedRoomServer) UpdateRoomMetadata(context.Context, *livekit6.UpdateRoomMetadataRequest) (*livekit1.Room, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedRoomServer) ListParticipants(context.Context, *livekit6.ListParticipantsRequest) (*livekit6.ListParticipantsResponse, error) {
+	return nil, psrpc.ErrUnimplemented
+}
+
+func (UnimplementedRoomServer) GetParticipant(context.Context, *livekit6.RoomParticipantIdentity) (*livekit6.ParticipantInfo, error) {
 	return nil, psrpc.ErrUnimplemented
 }
 
