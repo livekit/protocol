@@ -24,6 +24,7 @@ import (
 	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -160,9 +161,11 @@ type DialWhatsAppCallRequest struct {
 	// Optional - User-defined attributes. Will be attached to a created Participant in the room.
 	ParticipantAttributes map[string]string `protobuf:"bytes,10,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
-	DestinationCountry string `protobuf:"bytes,11,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"` // Next - 13
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	DestinationCountry string `protobuf:"bytes,11,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
+	// Max time for the callee to answer the call.
+	RingingTimeout *durationpb.Duration `protobuf:"bytes,13,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *DialWhatsAppCallRequest) Reset() {
@@ -277,6 +280,13 @@ func (x *DialWhatsAppCallRequest) GetDestinationCountry() string {
 		return x.DestinationCountry
 	}
 	return ""
+}
+
+func (x *DialWhatsAppCallRequest) GetRingingTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.RingingTimeout
+	}
+	return nil
 }
 
 type DialWhatsAppCallResponse struct {
@@ -554,9 +564,13 @@ type AcceptWhatsAppCallRequest struct {
 	// Optional - User-defined attributes. Will be attached to a created Participant in the room.
 	ParticipantAttributes map[string]string `protobuf:"bytes,11,rep,name=participant_attributes,json=participantAttributes,proto3" json:"participant_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
-	DestinationCountry string `protobuf:"bytes,12,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"` // Next - 14
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	DestinationCountry string `protobuf:"bytes,12,opt,name=destination_country,json=destinationCountry,proto3" json:"destination_country,omitempty"`
+	// Max time for the callee to answer the call.
+	RingingTimeout *durationpb.Duration `protobuf:"bytes,14,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
+	// Wait for the answer for the call before returning.
+	WaitUntilAnswered bool `protobuf:"varint,15,opt,name=wait_until_answered,json=waitUntilAnswered,proto3" json:"wait_until_answered,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *AcceptWhatsAppCallRequest) Reset() {
@@ -680,6 +694,20 @@ func (x *AcceptWhatsAppCallRequest) GetDestinationCountry() string {
 	return ""
 }
 
+func (x *AcceptWhatsAppCallRequest) GetRingingTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.RingingTimeout
+	}
+	return nil
+}
+
+func (x *AcceptWhatsAppCallRequest) GetWaitUntilAnswered() bool {
+	if x != nil {
+		return x.WaitUntilAnswered
+	}
+	return false
+}
+
 type AcceptWhatsAppCallResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the LiveKit room that the call is connected to
@@ -783,9 +811,9 @@ var File_livekit_connector_whatsapp_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\n" +
-	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\x92\a\n" +
-	"\x17DialWhatsAppCallRequest\x127\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12=\n" +
+	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xf1\a\n" +
+	"\x17DialWhatsAppCallRequest\x12R\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x19\x9a\xec,\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12=\n" +
 	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x15whatsappToPhoneNumber\x12.\n" +
 	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
@@ -797,30 +825,31 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9a\x01\n" +
 	"\x16participant_attributes\x18\n" +
 	" \x03(\v2;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
-	"\x13destination_country\x18\v \x01(\tR\x12destinationCountry\x1aH\n" +
+	"\x13destination_country\x18\v \x01(\tR\x12destinationCountry\x12B\n" +
+	"\x0fringing_timeout\x18\r \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
-	"\x18DialWhatsAppCallResponse\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\"\x9f\x02\n" +
-	"\x1dDisconnectWhatsAppCallRequest\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12.\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"u\n" +
+	"\x18DialWhatsAppCallResponse\x12<\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12\x1b\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"\xb3\x02\n" +
+	"\x1dDisconnectWhatsAppCallRequest\x12<\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12.\n" +
 	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12d\n" +
 	"\x11disconnect_reason\x18\x03 \x01(\x0e27.livekit.DisconnectWhatsAppCallRequest.DisconnectReasonR\x10disconnectReason\">\n" +
 	"\x10DisconnectReason\x12\x16\n" +
 	"\x12BUSINESS_INITIATED\x10\x00\x12\x12\n" +
 	"\x0eUSER_INITIATED\x10\x01\" \n" +
-	"\x1eDisconnectWhatsAppCallResponse\"u\n" +
-	"\x1aConnectWhatsAppCallRequest\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12-\n" +
+	"\x1eDisconnectWhatsAppCallResponse\"\x89\x01\n" +
+	"\x1aConnectWhatsAppCallRequest\x12<\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12-\n" +
 	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"\x1d\n" +
-	"\x1bConnectWhatsAppCallResponse\"\xb0\a\n" +
-	"\x19AcceptWhatsAppCallRequest\x127\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tR\x15whatsappPhoneNumberId\x12.\n" +
+	"\x1bConnectWhatsAppCallResponse\"\xd3\b\n" +
+	"\x19AcceptWhatsAppCallRequest\x12R\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x19\x9a\xec,\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12.\n" +
 	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
-	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12(\n" +
-	"\x10whatsapp_call_id\x18\x03 \x01(\tR\x0ewhatsappCallId\x12H\n" +
+	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12<\n" +
+	"\x10whatsapp_call_id\x18\x03 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12-\n" +
 	"\x03sdp\x18\x05 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x12\x1b\n" +
 	"\troom_name\x18\x06 \x01(\tR\broomName\x122\n" +
@@ -830,14 +859,16 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x14participant_metadata\x18\n" +
 	" \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9c\x01\n" +
 	"\x16participant_attributes\x18\v \x03(\v2=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
-	"\x13destination_country\x18\f \x01(\tR\x12destinationCountry\x1aH\n" +
+	"\x13destination_country\x18\f \x01(\tR\x12destinationCountry\x12B\n" +
+	"\x0fringing_timeout\x18\x0e \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12.\n" +
+	"\x13wait_until_answered\x18\x0f \x01(\bR\x11waitUntilAnswered\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"9\n" +
 	"\x1aAcceptWhatsAppCallResponse\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\"v\n" +
-	"\fWhatsAppCall\x12(\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tR\x0ewhatsappCallId\x12<\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\"\x8a\x01\n" +
+	"\fWhatsAppCall\x12<\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12<\n" +
 	"\tdirection\x18\x02 \x01(\x0e2\x1e.livekit.WhatsAppCallDirectionR\tdirection*b\n" +
 	"\x15WhatsAppCallDirection\x12#\n" +
 	"\x1fWHATSAPP_CALL_DIRECTION_INBOUND\x10\x00\x12$\n" +
@@ -872,22 +903,25 @@ var file_livekit_connector_whatsapp_proto_goTypes = []any{
 	nil,                                                 // 11: livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
 	nil,                                                 // 12: livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
 	(*RoomAgentDispatch)(nil),                           // 13: livekit.RoomAgentDispatch
-	(*SessionDescription)(nil),                          // 14: livekit.SessionDescription
+	(*durationpb.Duration)(nil),                         // 14: google.protobuf.Duration
+	(*SessionDescription)(nil),                          // 15: livekit.SessionDescription
 }
 var file_livekit_connector_whatsapp_proto_depIdxs = []int32{
 	13, // 0: livekit.DialWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
 	11, // 1: livekit.DialWhatsAppCallRequest.participant_attributes:type_name -> livekit.DialWhatsAppCallRequest.ParticipantAttributesEntry
-	1,  // 2: livekit.DisconnectWhatsAppCallRequest.disconnect_reason:type_name -> livekit.DisconnectWhatsAppCallRequest.DisconnectReason
-	14, // 3: livekit.ConnectWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
-	14, // 4: livekit.AcceptWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
-	13, // 5: livekit.AcceptWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
-	12, // 6: livekit.AcceptWhatsAppCallRequest.participant_attributes:type_name -> livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
-	0,  // 7: livekit.WhatsAppCall.direction:type_name -> livekit.WhatsAppCallDirection
-	8,  // [8:8] is the sub-list for method output_type
-	8,  // [8:8] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	14, // 2: livekit.DialWhatsAppCallRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	1,  // 3: livekit.DisconnectWhatsAppCallRequest.disconnect_reason:type_name -> livekit.DisconnectWhatsAppCallRequest.DisconnectReason
+	15, // 4: livekit.ConnectWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
+	15, // 5: livekit.AcceptWhatsAppCallRequest.sdp:type_name -> livekit.SessionDescription
+	13, // 6: livekit.AcceptWhatsAppCallRequest.agents:type_name -> livekit.RoomAgentDispatch
+	12, // 7: livekit.AcceptWhatsAppCallRequest.participant_attributes:type_name -> livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntry
+	14, // 8: livekit.AcceptWhatsAppCallRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	0,  // 9: livekit.WhatsAppCall.direction:type_name -> livekit.WhatsAppCallDirection
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_livekit_connector_whatsapp_proto_init() }

@@ -22,6 +22,7 @@ package rpc
 
 import (
 	livekit "github.com/livekit/protocol/livekit"
+	_ "github.com/livekit/protocol/livekit/logger"
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -342,7 +343,7 @@ var File_rpc_agent_proto protoreflect.FileDescriptor
 
 const file_rpc_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x0frpc/agent.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\roptions.proto\x1a\x13livekit_agent.proto\"\x15\n" +
+	"\x0frpc/agent.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\roptions.proto\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\x15\n" +
 	"\x13CheckEnabledRequest\"\xdc\x01\n" +
 	"\x14CheckEnabledResponse\x12!\n" +
 	"\froom_enabled\x18\x01 \x01(\bR\vroomEnabled\x12+\n" +
@@ -354,9 +355,9 @@ const file_rpc_agent_proto_rawDesc = "" +
 	"\vagent_names\x18\x04 \x03(\tR\n" +
 	"agentNames\"=\n" +
 	"\x12JobRequestResponse\x12'\n" +
-	"\x05state\x18\x01 \x01(\v2\x11.livekit.JobStateR\x05state\"]\n" +
-	"\x13JobTerminateRequest\x12\x15\n" +
-	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12/\n" +
+	"\x05state\x18\x01 \x01(\v2\x11.livekit.JobStateR\x05state\"h\n" +
+	"\x13JobTerminateRequest\x12 \n" +
+	"\x06job_id\x18\x01 \x01(\tB\t\x9a\xec,\x05jobIDR\x05jobId\x12/\n" +
 	"\x06reason\x18\x02 \x01(\x0e2\x17.rpc.JobTerminateReasonR\x06reason\"?\n" +
 	"\x14JobTerminateResponse\x12'\n" +
 	"\x05state\x18\x01 \x01(\v2\x11.livekit.JobStateR\x05state*D\n" +

@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -1389,7 +1390,7 @@ var File_livekit_internal_proto protoreflect.FileDescriptor
 
 const file_livekit_internal_proto_rawDesc = "" +
 	"\n" +
-	"\x16livekit_internal.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x14livekit_egress.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto\x1a\x11livekit_rtc.proto\"\xd4\x01\n" +
+	"\x16livekit_internal.proto\x12\alivekit\x1a\x1clivekit_agent_dispatch.proto\x1a\x14livekit_egress.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xd4\x01\n" +
 	"\x04Node\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x19\n" +
@@ -1495,11 +1496,11 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xfd\a\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xa2\b\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
-	"\bidentity\x18\x02 \x01(\tR\bidentity\x12#\n" +
-	"\rconnection_id\x18\x03 \x01(\tR\fconnectionId\x12\x1c\n" +
+	"\bidentity\x18\x02 \x01(\tR\bidentity\x125\n" +
+	"\rconnection_id\x18\x03 \x01(\tB\x10\x9a\xec,\fconnectionIDR\fconnectionId\x12\x1c\n" +
 	"\treconnect\x18\x04 \x01(\bR\treconnect\x12%\n" +
 	"\x0eauto_subscribe\x18\t \x01(\bR\rautoSubscribe\x12>\n" +
 	"\x19auto_subscribe_data_track\x18\x19 \x01(\bH\x00R\x16autoSubscribeDataTrack\x88\x01\x01\x12\x1a\n" +
@@ -1510,8 +1511,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x04name\x18\r \x01(\tR\x04name\x12\x1f\n" +
 	"\vgrants_json\x18\x0e \x01(\tR\n" +
 	"grantsJson\x12'\n" +
-	"\x0fadaptive_stream\x18\x0f \x01(\bR\x0eadaptiveStream\x12%\n" +
-	"\x0eparticipant_id\x18\x10 \x01(\tR\rparticipantId\x12C\n" +
+	"\x0fadaptive_stream\x18\x0f \x01(\bR\x0eadaptiveStream\x128\n" +
+	"\x0eparticipant_id\x18\x10 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12C\n" +
 	"\x10reconnect_reason\x18\x11 \x01(\x0e2\x18.livekit.ReconnectReasonR\x0freconnectReason\x129\n" +
 	"\x16subscriber_allow_pause\x18\x12 \x01(\bH\x01R\x14subscriberAllowPause\x88\x01\x01\x12(\n" +
 	"\x10disable_ice_lite\x18\x13 \x01(\bR\x0edisableIceLite\x12;\n" +

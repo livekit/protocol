@@ -20,10 +20,11 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
+import "logger/options.proto";
 
 message Job {
   string id = 1;
-  string dispatch_id = 9;
+  string dispatch_id = 9 [(logger.name) = "dispatchID"];
   JobType type = 2;
   Room room = 3;
   optional ParticipantInfo participant = 4;
@@ -41,8 +42,8 @@ message JobState {
   int64 ended_at = 4;
   int64 updated_at = 5;
   string participant_identity = 6;
-  string worker_id = 7;
-  string agent_id = 8;
+  string worker_id = 7 [(logger.name) = "workerID"];
+  string agent_id = 8 [(logger.name) = "agentID"];
 }
 
 // from Worker to Server
@@ -61,9 +62,6 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
-
-    TextMessageResponse text_response = 8;
-    PushTextRequest push_text = 9;
   };
 }
 
@@ -77,8 +75,6 @@ message ServerMessage {
     JobAssignment assignment = 3;
     JobTermination termination = 5;
     WorkerPong pong = 4;
-
-    TextMessageRequest text_request = 6;
   }
 }
 
@@ -127,7 +123,7 @@ message RegisterWorkerRequest {
 }
 
 message RegisterWorkerResponse {
-  string worker_id = 1;
+  string worker_id = 1 [(logger.name) = "workerID"];
   ServerInfo server_info = 3;
 }
 
@@ -145,7 +141,7 @@ message AvailabilityRequest {
 }
 
 message AvailabilityResponse {
-  string job_id = 1;
+  string job_id = 1 [(logger.name) = "jobID"];
   bool available = 2;
   bool supports_resume = 3;
   bool terminate = 8;
@@ -158,7 +154,7 @@ message AvailabilityResponse {
 }
 
 message UpdateJobStatus {
-  string job_id = 1;
+  string job_id = 1 [(logger.name) = "jobID"];
 
   // The worker can indicate the job end by either specifying SUCCESS or FAILED
   JobStatus status = 2;
@@ -184,29 +180,5 @@ message JobAssignment {
 }
 
 message JobTermination {
-  string job_id = 1;
-}
-
-message TextMessageRequest {
-  string message_id = 1;
-  string session_id = 2;
-  string agent_name = 3;
-  string metadata = 4;
-  bytes session_data = 5;
-  string text = 6;
-}
-
-
-message PushTextRequest {
-  // The message_id of the TextMessageRequest that this push is for
-  string message_id = 1;
-  string content = 2;
-}
-
-
-message TextMessageResponse {
-  // Indicate the request is completed
-  string message_id = 1;
-  bytes session_data = 2;
-  string error = 3;
+  string job_id = 1 [(logger.name) = "jobID"];
 }

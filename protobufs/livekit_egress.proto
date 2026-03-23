@@ -118,8 +118,8 @@ message ParticipantEgressRequest {
 // containerize up to one audio and one video track
 message TrackCompositeEgressRequest {
   string room_name = 1;       // required
-  string audio_track_id = 2;  // (optional)
-  string video_track_id = 3;  // (optional)
+  string audio_track_id = 2 [(logger.name) = "audioTrackID"];  // (optional)
+  string video_track_id = 3 [(logger.name) = "videoTrackID"];  // (optional)
   oneof output {              // deprecated (use _output fields)
     EncodedFileOutput file = 4 [deprecated = true];
     StreamOutput stream = 5 [deprecated = true];
@@ -142,7 +142,7 @@ message TrackCompositeEgressRequest {
 // record tracks individually, without transcoding
 message TrackEgressRequest {
   string room_name = 1;  // required
-  string track_id = 2;   // required
+  string track_id = 2 [(logger.name) = "trackID"];   // required
   oneof output {         // required
     DirectFileOutput file = 3;
     string websocket_url = 4;
@@ -237,7 +237,7 @@ message S3Upload {
   string secret = 2 [(logger.redact) = true];
   string session_token = 11 [(logger.redact) = true];
   string assume_role_arn = 12 [(logger.redact) = true];          // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
-  string assume_role_external_id = 13 [(logger.redact) = true];  // ExternalID to use when assuming role for upload
+  string assume_role_external_id = 13 [(logger.redact) = true, (logger.name) = "assumeRoleExternalID"];  // ExternalID to use when assuming role for upload
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
@@ -321,19 +321,19 @@ enum EncodingOptionsPreset {
 }
 
 message UpdateLayoutRequest {
-  string egress_id = 1;
+  string egress_id = 1 [(logger.name) = "egressID"];
   string layout = 2;
 }
 
 message UpdateStreamRequest {
-  string egress_id = 1;
+  string egress_id = 1 [(logger.name) = "egressID"];
   repeated string add_output_urls = 2;
   repeated string remove_output_urls = 3;
 }
 
 message ListEgressRequest {
   string room_name = 1;  // (optional, filter by room name)
-  string egress_id = 2;  // (optional, filter by egress ID)
+  string egress_id = 2 [(logger.name) = "egressID"];  // (optional, filter by egress ID)
   bool active = 3;       // (optional, list active egress only)
 }
 
@@ -342,7 +342,7 @@ message ListEgressResponse {
 }
 
 message StopEgressRequest {
-  string egress_id = 1;
+  string egress_id = 1 [(logger.name) = "egressID"];
 }
 
 enum EgressStatus {
@@ -361,8 +361,8 @@ enum EgressSourceType {
 }
 
 message EgressInfo {
-  string egress_id = 1;
-  string room_id = 2;
+  string egress_id = 1 [(logger.name) = "egressID"];
+  string room_id = 2 [(logger.name) = "roomID"];
   string room_name = 13;
   EgressSourceType source_type = 26;
   EgressStatus status = 3;
@@ -390,7 +390,8 @@ message EgressInfo {
   repeated ImagesInfo image_results = 20;
   string manifest_location = 23;
   bool backup_storage_used = 25;
-  // next ID: 27
+  int32 retry_count = 27;
+  // next ID: 28
 }
 
 message StreamInfoList {

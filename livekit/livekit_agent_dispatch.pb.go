@@ -447,13 +447,15 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12 \n" +
-	"\bmetadata\x18\x02 \x01(\tB\x04\x88\xec,\x01R\bmetadata\"Q\n" +
-	"\x1aDeleteAgentDispatchRequest\x12\x1f\n" +
-	"\vdispatch_id\x18\x01 \x01(\tR\n" +
+	"\bmetadata\x18\x02 \x01(\tB\x04\x88\xec,\x01R\bmetadata\"a\n" +
+	"\x1aDeleteAgentDispatchRequest\x12/\n" +
+	"\vdispatch_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"dispatchIDR\n" +
 	"dispatchId\x12\x12\n" +
-	"\x04room\x18\x02 \x01(\tR\x04room\"O\n" +
-	"\x18ListAgentDispatchRequest\x12\x1f\n" +
-	"\vdispatch_id\x18\x01 \x01(\tR\n" +
+	"\x04room\x18\x02 \x01(\tR\x04room\"_\n" +
+	"\x18ListAgentDispatchRequest\x12/\n" +
+	"\vdispatch_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"dispatchIDR\n" +
 	"dispatchId\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
 	"\x19ListAgentDispatchResponse\x12A\n" +

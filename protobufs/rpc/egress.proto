@@ -44,7 +44,7 @@ service EgressHandler {
 
 message StartEgressRequest {
   // request metadata
-  string egress_id = 1;
+  string egress_id = 1 [(logger.name) = "egressID"];
 
   // request
   oneof request {
@@ -56,13 +56,14 @@ message StartEgressRequest {
   }
 
   // connection info
-  string room_id = 3;
+  string room_id = 3 [(logger.name) = "roomID"];
   string token = 8 [(logger.redact) = true];
   string ws_url = 9;
 
   // cloud only
   bool cloud_backup_enabled = 10;
   double estimated_cpu = 14;
+  int32 retry_count = 15;
 }
 
 message ListActiveEgressRequest {}

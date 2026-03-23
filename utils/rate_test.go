@@ -24,6 +24,7 @@
 package utils
 
 import (
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -187,28 +188,49 @@ func runTest(t *testing.T, fn func(testRunner)) {
 				constructor: tt.constructor,
 				doneCh:      make(chan struct{}),
 			}
-			defer close(r.doneCh)
-			defer r.wg.Wait()
 
 			fn(&r)
 
-			// it's possible that there are some goroutines still waiting
-			// in taking the bandwidth. We need to keep moving the clock forward
-			// until all goroutines are finished
-			go func() {
-				ticker := time.NewTicker(5 * time.Millisecond)
-				defer ticker.Stop()
-
-				for {
-					select {
-					case <-ticker.C:
-						r.clock.Add(r.maxDuration)
-					case <-r.doneCh:
-					}
-				}
-			}()
+			r.advanceUntilDone()
+			close(r.doneCh)
 		})
 	}
+}
+
+func (r *runnerImpl) advanceUntilDone() {
+	if r.maxDuration <= 0 {
+		r.wg.Wait()
+		return
+	}
+
+	waitDone := make(chan struct{})
+	go func() {
+		r.wg.Wait()
+		close(waitDone)
+	}()
+
+	step := r.clockAdvanceStep()
+	for {
+		select {
+		case <-waitDone:
+			return
+		default:
+		}
+
+		r.clock.Add(step)
+		runtime.Gosched()
+	}
+}
+
+func (r *runnerImpl) clockAdvanceStep() time.Duration {
+	step := r.maxDuration / 1_000
+	if step < time.Millisecond {
+		return time.Millisecond
+	}
+	if step > 100*time.Millisecond {
+		return 100 * time.Millisecond
+	}
+	return step
 }
 
 // createLimiter builds a limiter with given options.

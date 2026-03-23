@@ -1,5 +1,59 @@
 # @livekit/protocol
 
+## 1.45.1
+
+### Patch Changes
+
+- add generic list type - [#1449](https://github.com/livekit/protocol/pull/1449) ([@paulwe](https://github.com/paulwe))
+
+- add livekit_agent_simulation service, agent remote session proto & cli dev proto - [#1404](https://github.com/livekit/protocol/pull/1404) ([@theomonnom](https://github.com/theomonnom))
+
+- fix flaky test - [#1445](https://github.com/livekit/protocol/pull/1445) ([@paulwe](https://github.com/paulwe))
+
+- require logger name - [#1444](https://github.com/livekit/protocol/pull/1444) ([@paulwe](https://github.com/paulwe))
+
+- normalize protobuf "id" log field names - [#1451](https://github.com/livekit/protocol/pull/1451) ([@paulwe](https://github.com/paulwe))
+
+- encode monotonic time in wall clock - [#1439](https://github.com/livekit/protocol/pull/1439) ([@paulwe](https://github.com/paulwe))
+
+- Allow sips: scheme in transfer URIs. - [#1446](https://github.com/livekit/protocol/pull/1446) ([@dennwc](https://github.com/dennwc))
+
+- export discard logger - [#1457](https://github.com/livekit/protocol/pull/1457) ([@paulwe](https://github.com/paulwe))
+
+- Rename log field pID to participantID - [#1452](https://github.com/livekit/protocol/pull/1452) ([@paulwe](https://github.com/paulwe))
+
+## 1.45.0
+
+### Minor Changes
+
+- Add PayloadTrailerFeature to TrackInfo and AddTrackRequest - [#1438](https://github.com/livekit/protocol/pull/1438) ([@chenosaurus](https://github.com/chenosaurus))
+
+### Patch Changes
+
+- move out connector protos - [#1429](https://github.com/livekit/protocol/pull/1429) ([@paulwe](https://github.com/paulwe))
+
+- add AGENT_ERROR disconnect reason - [#1434](https://github.com/livekit/protocol/pull/1434) ([@theomonnom](https://github.com/theomonnom))
+
+## 1.44.1
+
+### Patch Changes
+
+- Redact ice server credentials in logs - [#1408](https://github.com/livekit/protocol/pull/1408) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- remove cloud only methods from reporter interface - [#1423](https://github.com/livekit/protocol/pull/1423) ([@paulwe](https://github.com/paulwe))
+
+- do not log sip auth field lengths - [#1421](https://github.com/livekit/protocol/pull/1421) ([@paulwe](https://github.com/paulwe))
+
+- add stack utility - [#1422](https://github.com/livekit/protocol/pull/1422) ([@paulwe](https://github.com/paulwe))
+
+- Changes for ingress observability support - [#1392](https://github.com/livekit/protocol/pull/1392) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- remove last cloud only obs method - [#1425](https://github.com/livekit/protocol/pull/1425) ([@paulwe](https://github.com/paulwe))
+
+- update room observability codegen - [#1395](https://github.com/livekit/protocol/pull/1395) ([@paulwe](https://github.com/paulwe))
+
+- Sync schema versions - [#1385](https://github.com/livekit/protocol/pull/1385) ([@paulwe](https://github.com/paulwe))
+
 ## 1.44.0
 
 ### Patch Changes

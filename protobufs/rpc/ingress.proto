@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "options.proto";
 import "livekit_ingress.proto";
 import "google/protobuf/empty.proto";
+import "logger/options.proto";
 
 service IngressInternal {
   rpc StartIngress(StartIngressRequest) returns (livekit.IngressInfo) {
@@ -30,16 +31,6 @@ service IngressInternal {
   rpc ListActiveIngress(ListActiveIngressRequest) returns (ListActiveIngressResponse) {
     option (psrpc.options).multi = true;
     option (psrpc.options).topics = true;
-  };
-
-  rpc KillIngressSession(KillIngressSessionRequest) returns (google.protobuf.Empty) {
-    option (psrpc.options) = {
-      topics: true
-      topic_params: {
-        names: ["ingress_id", "resource_id"]
-        typed: false
-      }
-    };
   };
 }
 
@@ -74,12 +65,12 @@ message ListActiveIngressResponse {
 }
 
 message DeleteWHIPResourceRequest {
-  string resource_id = 1;
+  string resource_id = 1 [(logger.name) = "resourceID"];
   string stream_key = 2;
 }
 
 message ICERestartWHIPResourceRequest {
-  string resource_id = 1;
+  string resource_id = 1 [(logger.name) = "resourceID"];
   string stream_key = 2;
   string user_fragment = 3;
   string password = 4;
@@ -94,7 +85,7 @@ message ICERestartWHIPResourceResponse {
 }
 
 message WHIPRTCConnectionNotifyRequest {
-  string participant_id = 1;
+  string participant_id = 1 [(logger.name) = "participantID"];
   bool closed = 2;
   livekit.InputVideoState video = 3;
   livekit.InputAudioState audio = 4;
@@ -109,8 +100,8 @@ message StartIngressRequest {
 }
 
 message IngressSession {
-  string ingress_id = 1;
-  string resource_id = 2;
+  string ingress_id = 1 [(logger.name) = "ingressID"];
+  string resource_id = 2 [(logger.name) = "resourceID"];
 }
 
 message KillIngressSessionRequest {

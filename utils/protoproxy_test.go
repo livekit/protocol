@@ -40,46 +40,32 @@ func TestProtoProxy(t *testing.T) {
 		require.EqualValues(t, 0, proxy.Get().NumParticipants)
 
 		// immediate change
-		proxy.MarkDirty(true)
-		time.Sleep(100 * time.Millisecond)
+		<-proxy.MarkDirty(true)
+		awaitProxyUpdate(t, proxy)
 
 		require.EqualValues(t, 2, numParticipants.Load())
 		require.EqualValues(t, 1, proxy.Get().NumParticipants)
 
-		// queued updates
+		// queue an update while the cached value is still fresh so the worker
+		// picks it up on the next tick instead of triggering an immediate refresh.
 		proxy.MarkDirty(false)
-		select {
-		case <-proxy.Updated():
-			// consume previous notification
-		default:
-		}
+		assertNoProxyUpdate(t, proxy, 5*time.Millisecond)
 		require.EqualValues(t, 1, proxy.Get().NumParticipants)
 
 		// freeze and ensure that updates are not triggered
 		freeze.Store(true)
-		// freezing and consuming the previous notification to ensure counter does not increase in updateFn
-		select {
-		case <-proxy.Updated():
-		case <-time.After(100 * time.Millisecond):
-			t.Fatal("should have received an update")
-		}
-		// possible that ticker was updated while markDirty queued another update
-		require.GreaterOrEqual(t, int(proxy.Get().NumParticipants), 2)
+		awaitProxyUpdate(t, proxy)
+		require.EqualValues(t, 2, proxy.Get().NumParticipants)
 
 		// trigger another update, but should not get notification as freeze is in place and the model should not have changed
 		proxy.MarkDirty(false)
-		time.Sleep(500 * time.Millisecond)
-		select {
-		case <-proxy.Updated():
-			t.Fatal("should not have received an update")
-		default:
-		}
+		assertNoProxyUpdate(t, proxy, 100*time.Millisecond)
 		require.EqualValues(t, 2, proxy.Get().NumParticipants)
 
 		// ensure we didn't leak
 		proxy.Stop()
 
-		for i := 0; i < 10; i++ {
+		for range 10 {
 			if runtime.NumGoroutine() <= numGoRoutines {
 				break
 			}
@@ -112,7 +98,7 @@ func TestProtoProxy(t *testing.T) {
 	})
 
 	t.Run("await resolve when there is no change", func(t *testing.T) {
-		proxy := NewProtoProxy[*livekit.Room](10*time.Millisecond, func() *livekit.Room { return nil })
+		proxy := NewProtoProxy(10*time.Millisecond, func() *livekit.Room { return nil })
 		done := proxy.MarkDirty(true)
 		time.Sleep(100 * time.Millisecond)
 		select {
@@ -123,11 +109,31 @@ func TestProtoProxy(t *testing.T) {
 	})
 }
 
+func awaitProxyUpdate(t *testing.T, proxy *ProtoProxy[*livekit.Room]) {
+	t.Helper()
+
+	select {
+	case <-proxy.Updated():
+	case <-time.After(250 * time.Millisecond):
+		require.FailNow(t, "timed out waiting for proxy update")
+	}
+}
+
+func assertNoProxyUpdate(t *testing.T, proxy *ProtoProxy[*livekit.Room], d time.Duration) {
+	t.Helper()
+
+	select {
+	case <-proxy.Updated():
+		require.FailNow(t, "should not have received an update")
+	case <-time.After(d):
+	}
+}
+
 func createTestProxy() (*ProtoProxy[*livekit.Room], *atomic.Uint32, *atomic.Bool) {
 	// uses an update func that increments numParticipants each time
 	var numParticipants atomic.Uint32
 	var freeze atomic.Bool
-	return NewProtoProxy[*livekit.Room](
+	return NewProtoProxy(
 		10*time.Millisecond,
 		func() *livekit.Room {
 			if !freeze.Load() {

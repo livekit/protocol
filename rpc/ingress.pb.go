@@ -22,6 +22,7 @@ package rpc
 
 import (
 	livekit "github.com/livekit/protocol/livekit"
+	_ "github.com/livekit/protocol/livekit/logger"
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -568,19 +569,21 @@ var File_rpc_ingress_proto protoreflect.FileDescriptor
 
 const file_rpc_ingress_proto_rawDesc = "" +
 	"\n" +
-	"\x11rpc/ingress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x15livekit_ingress.proto\x1a\x1bgoogle/protobuf/empty.proto\"\x1a\n" +
+	"\x11rpc/ingress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x15livekit_ingress.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14logger/options.proto\"\x1a\n" +
 	"\x18ListActiveIngressRequest\"\x80\x01\n" +
 	"\x19ListActiveIngressResponse\x12#\n" +
 	"\vingress_ids\x18\x01 \x03(\tB\x02\x18\x01R\n" +
 	"ingressIds\x12>\n" +
-	"\x10ingress_sessions\x18\x02 \x03(\v2\x13.rpc.IngressSessionR\x0fingressSessions\"[\n" +
-	"\x19DeleteWHIPResourceRequest\x12\x1f\n" +
-	"\vresource_id\x18\x01 \x01(\tR\n" +
+	"\x10ingress_sessions\x18\x02 \x03(\v2\x13.rpc.IngressSessionR\x0fingressSessions\"k\n" +
+	"\x19DeleteWHIPResourceRequest\x12/\n" +
+	"\vresource_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"resourceIDR\n" +
 	"resourceId\x12\x1d\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\x92\x02\n" +
-	"\x1dICERestartWHIPResourceRequest\x12\x1f\n" +
-	"\vresource_id\x18\x01 \x01(\tR\n" +
+	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xa2\x02\n" +
+	"\x1dICERestartWHIPResourceRequest\x12/\n" +
+	"\vresource_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"resourceIDR\n" +
 	"resourceId\x12\x1d\n" +
 	"\n" +
 	"stream_key\x18\x02 \x01(\tR\tstreamKey\x12#\n" +
@@ -593,9 +596,9 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\bif_match\x18\a \x01(\tR\aifMatch\"d\n" +
 	"\x1eICERestartWHIPResourceResponse\x12.\n" +
 	"\x13trickle_ice_sdpfrag\x18\x01 \x01(\tR\x11trickleIceSdpfrag\x12\x12\n" +
-	"\x04etag\x18\x02 \x01(\tR\x04etag\"\xbf\x01\n" +
-	"\x1eWHIPRTCConnectionNotifyRequest\x12%\n" +
-	"\x0eparticipant_id\x18\x01 \x01(\tR\rparticipantId\x12\x16\n" +
+	"\x04etag\x18\x02 \x01(\tR\x04etag\"\xd2\x01\n" +
+	"\x1eWHIPRTCConnectionNotifyRequest\x128\n" +
+	"\x0eparticipant_id\x18\x01 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12\x16\n" +
 	"\x06closed\x18\x02 \x01(\bR\x06closed\x12.\n" +
 	"\x05video\x18\x03 \x01(\v2\x18.livekit.InputVideoStateR\x05video\x12.\n" +
 	"\x05audio\x18\x04 \x01(\v2\x18.livekit.InputAudioStateR\x05audio\"\x94\x03\n" +
@@ -610,19 +613,18 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"P\n" +
-	"\x0eIngressSession\x12\x1d\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"o\n" +
+	"\x0eIngressSession\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x1f\n" +
-	"\vresource_id\x18\x02 \x01(\tR\n" +
+	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12/\n" +
+	"\vresource_id\x18\x02 \x01(\tB\x0e\x9a\xec,\n" +
+	"resourceIDR\n" +
 	"resourceId\"J\n" +
 	"\x19KillIngressSessionRequest\x12-\n" +
-	"\asession\x18\x01 \x01(\v2\x13.rpc.IngressSessionR\asession2\xa8\x02\n" +
+	"\asession\x18\x01 \x01(\v2\x13.rpc.IngressSessionR\asession2\xb7\x01\n" +
 	"\x0fIngressInternal\x12F\n" +
 	"\fStartIngress\x12\x18.rpc.StartIngressRequest\x1a\x14.livekit.IngressInfo\"\x06\xb2\x89\x01\x020\x01\x12\\\n" +
-	"\x11ListActiveIngress\x12\x1d.rpc.ListActiveIngressRequest\x1a\x1e.rpc.ListActiveIngressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x01\x12o\n" +
-	"\x12KillIngressSession\x12\x1e.rpc.KillIngressSessionRequest\x1a\x16.google.protobuf.Empty\"!\xb2\x89\x01\x1d\x10\x01\x1a\x19\x12\n" +
-	"ingress_id\x12\vresource_id2\xd3\x03\n" +
+	"\x11ListActiveIngress\x12\x1d.rpc.ListActiveIngressRequest\x1a\x1e.rpc.ListActiveIngressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xd3\x03\n" +
 	"\x0eIngressHandler\x12M\n" +
 	"\rUpdateIngress\x12\x1d.livekit.UpdateIngressRequest\x1a\x15.livekit.IngressState\"\x06\xb2\x89\x01\x02\x10\x01\x12M\n" +
 	"\rDeleteIngress\x12\x1d.livekit.DeleteIngressRequest\x1a\x15.livekit.IngressState\"\x06\xb2\x89\x01\x02\x10\x01\x12T\n" +
@@ -661,8 +663,8 @@ var file_rpc_ingress_proto_goTypes = []any{
 	(*livekit.IngressInfo)(nil),            // 13: livekit.IngressInfo
 	(*livekit.UpdateIngressRequest)(nil),   // 14: livekit.UpdateIngressRequest
 	(*livekit.DeleteIngressRequest)(nil),   // 15: livekit.DeleteIngressRequest
-	(*emptypb.Empty)(nil),                  // 16: google.protobuf.Empty
-	(*livekit.IngressState)(nil),           // 17: livekit.IngressState
+	(*livekit.IngressState)(nil),           // 16: livekit.IngressState
+	(*emptypb.Empty)(nil),                  // 17: google.protobuf.Empty
 }
 var file_rpc_ingress_proto_depIdxs = []int32{
 	7,  // 0: rpc.ListActiveIngressResponse.ingress_sessions:type_name -> rpc.IngressSession
@@ -674,22 +676,20 @@ var file_rpc_ingress_proto_depIdxs = []int32{
 	7,  // 6: rpc.KillIngressSessionRequest.session:type_name -> rpc.IngressSession
 	6,  // 7: rpc.IngressInternal.StartIngress:input_type -> rpc.StartIngressRequest
 	0,  // 8: rpc.IngressInternal.ListActiveIngress:input_type -> rpc.ListActiveIngressRequest
-	8,  // 9: rpc.IngressInternal.KillIngressSession:input_type -> rpc.KillIngressSessionRequest
-	14, // 10: rpc.IngressHandler.UpdateIngress:input_type -> livekit.UpdateIngressRequest
-	15, // 11: rpc.IngressHandler.DeleteIngress:input_type -> livekit.DeleteIngressRequest
-	2,  // 12: rpc.IngressHandler.DeleteWHIPResource:input_type -> rpc.DeleteWHIPResourceRequest
-	3,  // 13: rpc.IngressHandler.ICERestartWHIPResource:input_type -> rpc.ICERestartWHIPResourceRequest
-	5,  // 14: rpc.IngressHandler.WHIPRTCConnectionNotify:input_type -> rpc.WHIPRTCConnectionNotifyRequest
-	13, // 15: rpc.IngressInternal.StartIngress:output_type -> livekit.IngressInfo
-	1,  // 16: rpc.IngressInternal.ListActiveIngress:output_type -> rpc.ListActiveIngressResponse
-	16, // 17: rpc.IngressInternal.KillIngressSession:output_type -> google.protobuf.Empty
-	17, // 18: rpc.IngressHandler.UpdateIngress:output_type -> livekit.IngressState
-	17, // 19: rpc.IngressHandler.DeleteIngress:output_type -> livekit.IngressState
-	16, // 20: rpc.IngressHandler.DeleteWHIPResource:output_type -> google.protobuf.Empty
-	4,  // 21: rpc.IngressHandler.ICERestartWHIPResource:output_type -> rpc.ICERestartWHIPResourceResponse
-	16, // 22: rpc.IngressHandler.WHIPRTCConnectionNotify:output_type -> google.protobuf.Empty
-	15, // [15:23] is the sub-list for method output_type
-	7,  // [7:15] is the sub-list for method input_type
+	14, // 9: rpc.IngressHandler.UpdateIngress:input_type -> livekit.UpdateIngressRequest
+	15, // 10: rpc.IngressHandler.DeleteIngress:input_type -> livekit.DeleteIngressRequest
+	2,  // 11: rpc.IngressHandler.DeleteWHIPResource:input_type -> rpc.DeleteWHIPResourceRequest
+	3,  // 12: rpc.IngressHandler.ICERestartWHIPResource:input_type -> rpc.ICERestartWHIPResourceRequest
+	5,  // 13: rpc.IngressHandler.WHIPRTCConnectionNotify:input_type -> rpc.WHIPRTCConnectionNotifyRequest
+	13, // 14: rpc.IngressInternal.StartIngress:output_type -> livekit.IngressInfo
+	1,  // 15: rpc.IngressInternal.ListActiveIngress:output_type -> rpc.ListActiveIngressResponse
+	16, // 16: rpc.IngressHandler.UpdateIngress:output_type -> livekit.IngressState
+	16, // 17: rpc.IngressHandler.DeleteIngress:output_type -> livekit.IngressState
+	17, // 18: rpc.IngressHandler.DeleteWHIPResource:output_type -> google.protobuf.Empty
+	4,  // 19: rpc.IngressHandler.ICERestartWHIPResource:output_type -> rpc.ICERestartWHIPResourceResponse
+	17, // 20: rpc.IngressHandler.WHIPRTCConnectionNotify:output_type -> google.protobuf.Empty
+	14, // [14:21] is the sub-list for method output_type
+	7,  // [7:14] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name

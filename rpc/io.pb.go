@@ -305,6 +305,7 @@ type GetIngressInfoResponse struct {
 	Info          *livekit.IngressInfo   `protobuf:"bytes,1,opt,name=info,proto3" json:"info,omitempty"`
 	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	WsUrl         string                 `protobuf:"bytes,3,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
+	ProjectId     string                 `protobuf:"bytes,6,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	LoggingFields map[string]string      `protobuf:"bytes,4,rep,name=logging_fields,json=loggingFields,proto3" json:"logging_fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	FeatureFlags  map[string]string      `protobuf:"bytes,5,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
@@ -358,6 +359,13 @@ func (x *GetIngressInfoResponse) GetToken() string {
 func (x *GetIngressInfoResponse) GetWsUrl() string {
 	if x != nil {
 		return x.WsUrl
+	}
+	return ""
+}
+
+func (x *GetIngressInfoResponse) GetProjectId() string {
+	if x != nil {
+		return x.ProjectId
 	}
 	return ""
 }
@@ -555,7 +563,9 @@ type GetSIPTrunkAuthenticationResponse struct {
 	ProjectId    string                `protobuf:"bytes,5,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	ProviderInfo *livekit.ProviderInfo `protobuf:"bytes,6,opt,name=provider_info,json=providerInfo,proto3" json:"provider_info,omitempty"`
 	// Error code if authentication failed
-	ErrorCode     SIPTrunkAuthenticationError `protobuf:"varint,7,opt,name=error_code,json=errorCode,proto3,enum=rpc.SIPTrunkAuthenticationError" json:"error_code,omitempty"`
+	ErrorCode SIPTrunkAuthenticationError `protobuf:"varint,7,opt,name=error_code,json=errorCode,proto3,enum=rpc.SIPTrunkAuthenticationError" json:"error_code,omitempty"`
+	// Optional per-project feature flag set
+	FeatureFlags  map[string]string `protobuf:"bytes,8,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -637,6 +647,13 @@ func (x *GetSIPTrunkAuthenticationResponse) GetErrorCode() SIPTrunkAuthenticatio
 		return x.ErrorCode
 	}
 	return SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_NONE
+}
+
+func (x *GetSIPTrunkAuthenticationResponse) GetFeatureFlags() map[string]string {
+	if x != nil {
+		return x.FeatureFlags
+	}
+	return nil
 }
 
 type EvaluateSIPDispatchRulesRequest struct {
@@ -852,6 +869,7 @@ type EvaluateSIPDispatchRulesResponse struct {
 	RoomPreset      string                     `protobuf:"bytes,20,opt,name=room_preset,json=roomPreset,proto3" json:"room_preset,omitempty"`
 	RoomConfig      *livekit.RoomConfiguration `protobuf:"bytes,21,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
 	MediaEncryption livekit.SIPMediaEncryption `protobuf:"varint,22,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
+	FeatureFlags    map[string]string          `protobuf:"bytes,23,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1039,6 +1057,13 @@ func (x *EvaluateSIPDispatchRulesResponse) GetMediaEncryption() livekit.SIPMedia
 		return x.MediaEncryption
 	}
 	return livekit.SIPMediaEncryption(0)
+}
+
+func (x *EvaluateSIPDispatchRulesResponse) GetFeatureFlags() map[string]string {
+	if x != nil {
+		return x.FeatureFlags
+	}
+	return nil
 }
 
 type UpdateSIPCallStateRequest struct {
@@ -1241,22 +1266,24 @@ var File_rpc_io_proto protoreflect.FileDescriptor
 
 const file_rpc_io_proto_rawDesc = "" +
 	"\n" +
-	"\frpc/io.proto\x12\x03rpc\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x11livekit_sip.proto\x1a\x12livekit_room.proto\x1a\x14logger/options.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\"/\n" +
-	"\x10GetEgressRequest\x12\x1b\n" +
-	"\tegress_id\x18\x01 \x01(\tR\begressId\"\x87\x01\n" +
+	"\frpc/io.proto\x12\x03rpc\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x11livekit_sip.proto\x1a\x12livekit_room.proto\x1a\x14logger/options.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\"=\n" +
+	"\x10GetEgressRequest\x12)\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"\x87\x01\n" +
 	"\x14UpdateMetricsRequest\x12'\n" +
 	"\x04info\x18\x01 \x01(\v2\x13.livekit.EgressInfoR\x04info\x12\"\n" +
 	"\ravg_cpu_usage\x18\x03 \x01(\x02R\vavgCpuUsage\x12\"\n" +
-	"\rmax_cpu_usage\x18\x04 \x01(\x02R\vmaxCpuUsage\"U\n" +
-	"\x15GetIngressInfoRequest\x12\x1d\n" +
+	"\rmax_cpu_usage\x18\x04 \x01(\x02R\vmaxCpuUsage\"d\n" +
+	"\x15GetIngressInfoRequest\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x1d\n" +
+	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12\x1d\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\x9d\x03\n" +
+	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xcb\x03\n" +
 	"\x16GetIngressInfoResponse\x12(\n" +
 	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12\x15\n" +
-	"\x06ws_url\x18\x03 \x01(\tR\x05wsUrl\x12U\n" +
+	"\x06ws_url\x18\x03 \x01(\tR\x05wsUrl\x12,\n" +
+	"\n" +
+	"project_id\x18\x06 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12U\n" +
 	"\x0elogging_fields\x18\x04 \x03(\v2..rpc.GetIngressInfoResponse.LoggingFieldsEntryR\rloggingFields\x12R\n" +
 	"\rfeature_flags\x18\x05 \x03(\v2-.rpc.GetIngressInfoResponse.FeatureFlagsEntryR\ffeatureFlags\x1a@\n" +
 	"\x12LoggingFieldsEntry\x12\x10\n" +
@@ -1264,36 +1291,42 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"g\n" +
-	"\x19UpdateIngressStateRequest\x12\x1d\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"v\n" +
+	"\x19UpdateIngressStateRequest\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tR\tingressId\x12+\n" +
-	"\x05state\x18\x02 \x01(\v2\x15.livekit.IngressStateR\x05state\"\xf7\x01\n" +
-	" GetSIPTrunkAuthenticationRequest\x12\"\n" +
-	"\vsip_call_id\x18\x06 \x01(\tB\x02\x18\x01R\tsipCallId\x12\x16\n" +
+	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12+\n" +
+	"\x05state\x18\x02 \x01(\v2\x15.livekit.IngressStateR\x05state\"\x84\x02\n" +
+	" GetSIPTrunkAuthenticationRequest\x12/\n" +
+	"\vsip_call_id\x18\x06 \x01(\tB\x0f\x9a\xec,\tsipCallID\x18\x01R\tsipCallId\x12\x16\n" +
 	"\x04from\x18\x02 \x01(\tB\x02\x18\x01R\x04from\x12\x1f\n" +
 	"\tfrom_host\x18\a \x01(\tB\x02\x18\x01R\bfromHost\x12\x12\n" +
 	"\x02to\x18\x03 \x01(\tB\x02\x18\x01R\x02to\x12\x1b\n" +
 	"\ato_host\x18\x05 \x01(\tB\x02\x18\x01R\x06toHost\x12#\n" +
 	"\vsrc_address\x18\x04 \x01(\tB\x02\x18\x01R\n" +
 	"srcAddress\x12 \n" +
-	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xfd\x02\n" +
+	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xbc\x04\n" +
 	"!GetSIPTrunkAuthenticationResponse\x12B\n" +
 	"\busername\x18\x01 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\busername\x12B\n" +
 	"\bpassword\x18\x02 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x12\n" +
-	"\x04drop\x18\x03 \x01(\bR\x04drop\x12 \n" +
-	"\fsip_trunk_id\x18\x04 \x01(\tR\n" +
-	"sipTrunkId\x12\x1d\n" +
+	"\x04drop\x18\x03 \x01(\bR\x04drop\x120\n" +
+	"\fsip_trunk_id\x18\x04 \x01(\tB\x0e\x9a\xec,\n" +
+	"sipTrunkIDR\n" +
+	"sipTrunkId\x12,\n" +
 	"\n" +
-	"project_id\x18\x05 \x01(\tR\tprojectId\x12:\n" +
+	"project_id\x18\x05 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12:\n" +
 	"\rprovider_info\x18\x06 \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x12?\n" +
 	"\n" +
-	"error_code\x18\a \x01(\x0e2 .rpc.SIPTrunkAuthenticationErrorR\terrorCode\"\xfc\x04\n" +
-	"\x1fEvaluateSIPDispatchRulesRequest\x12\"\n" +
-	"\vsip_call_id\x18\b \x01(\tB\x02\x18\x01R\tsipCallId\x120\n" +
-	"\x12sip_participant_id\x18\x01 \x01(\tB\x02\x18\x01R\x10sipParticipantId\x12 \n" +
+	"error_code\x18\a \x01(\x0e2 .rpc.SIPTrunkAuthenticationErrorR\terrorCode\x12]\n" +
+	"\rfeature_flags\x18\b \x03(\v28.rpc.GetSIPTrunkAuthenticationResponse.FeatureFlagsEntryR\ffeatureFlags\x1a?\n" +
+	"\x11FeatureFlagsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xad\x05\n" +
+	"\x1fEvaluateSIPDispatchRulesRequest\x12/\n" +
+	"\vsip_call_id\x18\b \x01(\tB\x0f\x9a\xec,\tsipCallID\x18\x01R\tsipCallId\x12D\n" +
+	"\x12sip_participant_id\x18\x01 \x01(\tB\x16\x9a\xec,\x10sipParticipantID\x18\x01R\x10sipParticipantId\x120\n" +
 	"\fsip_trunk_id\x18\n" +
-	" \x01(\tR\n" +
+	" \x01(\tB\x0e\x9a\xec,\n" +
+	"sipTrunkIDR\n" +
 	"sipTrunkId\x12)\n" +
 	"\x0ecalling_number\x18\x02 \x01(\tB\x02\x18\x01R\rcallingNumber\x12%\n" +
 	"\fcalling_host\x18\v \x01(\tB\x02\x18\x01R\vcallingHost\x12'\n" +
@@ -1308,7 +1341,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x04call\x18\f \x01(\v2\f.rpc.SIPCallR\x04call\x1aB\n" +
 	"\x14ExtraAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x87\x0e\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xdc\x0f\n" +
 	" EvaluateSIPDispatchRulesResponse\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12Q\n" +
@@ -1319,13 +1352,14 @@ const file_rpc_io_proto_rawDesc = "" +
 	"requestPin\x12<\n" +
 	"\x05token\x18\x04 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x05 \x01(\tR\x05wsUrl\x12.\n" +
-	"\x06result\x18\x06 \x01(\x0e2\x16.rpc.SIPDispatchResultR\x06result\x12 \n" +
-	"\fsip_trunk_id\x18\t \x01(\tR\n" +
-	"sipTrunkId\x12/\n" +
+	"\x06result\x18\x06 \x01(\x0e2\x16.rpc.SIPDispatchResultR\x06result\x120\n" +
+	"\fsip_trunk_id\x18\t \x01(\tB\x0e\x9a\xec,\n" +
+	"sipTrunkIDR\n" +
+	"sipTrunkId\x12F\n" +
 	"\x14sip_dispatch_rule_id\x18\n" +
-	" \x01(\tR\x11sipDispatchRuleId\x12\x1d\n" +
+	" \x01(\tB\x15\x9a\xec,\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x12,\n" +
 	"\n" +
-	"project_id\x18\f \x01(\tR\tprojectId\x12t\n" +
+	"project_id\x18\f \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12t\n" +
 	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12r\n" +
 	"\x15headers_to_attributes\x18\x0e \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntryR\x13headersToAttributes\x12r\n" +
 	"\x15attributes_to_headers\x18\x12 \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
@@ -1337,7 +1371,8 @@ const file_rpc_io_proto_rawDesc = "" +
 	"roomPreset\x12;\n" +
 	"\vroom_config\x18\x15 \x01(\v2\x1a.livekit.RoomConfigurationR\n" +
 	"roomConfig\x12F\n" +
-	"\x10media_encryption\x18\x16 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x1aH\n" +
+	"\x10media_encryption\x18\x16 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12\\\n" +
+	"\rfeature_flags\x18\x17 \x03(\v27.rpc.EvaluateSIPDispatchRulesResponse.FeatureFlagsEntryR\ffeatureFlags\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
@@ -1349,23 +1384,26 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
+	"\x11FeatureFlagsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8d\x01\n" +
 	"\x19UpdateSIPCallStateRequest\x121\n" +
 	"\tcall_info\x18\x01 \x01(\v2\x14.livekit.SIPCallInfoR\bcallInfo\x12=\n" +
 	"\rtransfer_info\x18\x02 \x01(\v2\x18.livekit.SIPTransferInfoR\ftransferInfo\"M\n" +
 	"\x18RecordCallContextRequest\x121\n" +
-	"\tcall_info\x18\x01 \x01(\v2\x14.livekit.SIPCallInfoR\bcallInfo\"\x97\x02\n" +
-	"\aSIPCall\x12\x1c\n" +
+	"\tcall_info\x18\x01 \x01(\v2\x14.livekit.SIPCallInfoR\bcallInfo\"\xc3\x02\n" +
+	"\aSIPCall\x12*\n" +
 	"\n" +
-	"lk_call_id\x18\x01 \x01(\tR\blkCallId\x12\x1b\n" +
+	"lk_call_id\x18\x01 \x01(\tB\f\x9a\xec,\blkCallIDR\blkCallId\x12\x1b\n" +
 	"\tsource_ip\x18\x02 \x01(\tR\bsourceIp\x12)\n" +
 	"\aaddress\x18\x03 \x01(\v2\x0f.livekit.SIPUriR\aaddress\x12#\n" +
 	"\x04from\x18\x04 \x01(\v2\x0f.livekit.SIPUriR\x04from\x12\x1f\n" +
 	"\x02to\x18\x05 \x01(\v2\x0f.livekit.SIPUriR\x02to\x12!\n" +
-	"\x03via\x18\x06 \x03(\v2\x0f.livekit.SIPUriR\x03via\x12\x1e\n" +
-	"\vsip_call_id\x18\a \x01(\tR\tsipCallId\x12\x1d\n" +
+	"\x03via\x18\x06 \x03(\v2\x0f.livekit.SIPUriR\x03via\x12-\n" +
+	"\vsip_call_id\x18\a \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\x12,\n" +
 	"\n" +
-	"project_id\x18\b \x01(\tR\tprojectId*`\n" +
+	"project_id\x18\b \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId*`\n" +
 	"\x11SIPDispatchResult\x12\x18\n" +
 	"\x14LEGACY_ACCEPT_OR_PIN\x10\x00\x12\n" +
 	"\n" +
@@ -1406,7 +1444,7 @@ func file_rpc_io_proto_rawDescGZIP() []byte {
 }
 
 var file_rpc_io_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_rpc_io_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_rpc_io_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_rpc_io_proto_goTypes = []any{
 	(SIPDispatchResult)(0),                    // 0: rpc.SIPDispatchResult
 	(SIPTrunkAuthenticationError)(0),          // 1: rpc.SIPTrunkAuthenticationError
@@ -1424,85 +1462,89 @@ var file_rpc_io_proto_goTypes = []any{
 	(*SIPCall)(nil),                           // 13: rpc.SIPCall
 	nil,                                       // 14: rpc.GetIngressInfoResponse.LoggingFieldsEntry
 	nil,                                       // 15: rpc.GetIngressInfoResponse.FeatureFlagsEntry
-	nil,                                       // 16: rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntry
-	nil,                                       // 17: rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntry
-	nil,                                       // 18: rpc.EvaluateSIPDispatchRulesResponse.HeadersEntry
-	nil,                                       // 19: rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntry
-	nil,                                       // 20: rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntry
-	(*livekit.EgressInfo)(nil),                // 21: livekit.EgressInfo
-	(*livekit.IngressInfo)(nil),               // 22: livekit.IngressInfo
-	(*livekit.IngressState)(nil),              // 23: livekit.IngressState
-	(*livekit.ProviderInfo)(nil),              // 24: livekit.ProviderInfo
-	(livekit.SIPHeaderOptions)(0),             // 25: livekit.SIPHeaderOptions
-	(livekit.SIPFeature)(0),                   // 26: livekit.SIPFeature
-	(*durationpb.Duration)(nil),               // 27: google.protobuf.Duration
-	(*livekit.RoomConfiguration)(nil),         // 28: livekit.RoomConfiguration
-	(livekit.SIPMediaEncryption)(0),           // 29: livekit.SIPMediaEncryption
-	(*livekit.SIPCallInfo)(nil),               // 30: livekit.SIPCallInfo
-	(*livekit.SIPTransferInfo)(nil),           // 31: livekit.SIPTransferInfo
-	(*livekit.SIPUri)(nil),                    // 32: livekit.SIPUri
-	(*livekit.ListEgressRequest)(nil),         // 33: livekit.ListEgressRequest
-	(*emptypb.Empty)(nil),                     // 34: google.protobuf.Empty
-	(*livekit.ListEgressResponse)(nil),        // 35: livekit.ListEgressResponse
+	nil,                                       // 16: rpc.GetSIPTrunkAuthenticationResponse.FeatureFlagsEntry
+	nil,                                       // 17: rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntry
+	nil,                                       // 18: rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntry
+	nil,                                       // 19: rpc.EvaluateSIPDispatchRulesResponse.HeadersEntry
+	nil,                                       // 20: rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntry
+	nil,                                       // 21: rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntry
+	nil,                                       // 22: rpc.EvaluateSIPDispatchRulesResponse.FeatureFlagsEntry
+	(*livekit.EgressInfo)(nil),                // 23: livekit.EgressInfo
+	(*livekit.IngressInfo)(nil),               // 24: livekit.IngressInfo
+	(*livekit.IngressState)(nil),              // 25: livekit.IngressState
+	(*livekit.ProviderInfo)(nil),              // 26: livekit.ProviderInfo
+	(livekit.SIPHeaderOptions)(0),             // 27: livekit.SIPHeaderOptions
+	(livekit.SIPFeature)(0),                   // 28: livekit.SIPFeature
+	(*durationpb.Duration)(nil),               // 29: google.protobuf.Duration
+	(*livekit.RoomConfiguration)(nil),         // 30: livekit.RoomConfiguration
+	(livekit.SIPMediaEncryption)(0),           // 31: livekit.SIPMediaEncryption
+	(*livekit.SIPCallInfo)(nil),               // 32: livekit.SIPCallInfo
+	(*livekit.SIPTransferInfo)(nil),           // 33: livekit.SIPTransferInfo
+	(*livekit.SIPUri)(nil),                    // 34: livekit.SIPUri
+	(*livekit.ListEgressRequest)(nil),         // 35: livekit.ListEgressRequest
+	(*emptypb.Empty)(nil),                     // 36: google.protobuf.Empty
+	(*livekit.ListEgressResponse)(nil),        // 37: livekit.ListEgressResponse
 }
 var file_rpc_io_proto_depIdxs = []int32{
-	21, // 0: rpc.UpdateMetricsRequest.info:type_name -> livekit.EgressInfo
-	22, // 1: rpc.GetIngressInfoResponse.info:type_name -> livekit.IngressInfo
+	23, // 0: rpc.UpdateMetricsRequest.info:type_name -> livekit.EgressInfo
+	24, // 1: rpc.GetIngressInfoResponse.info:type_name -> livekit.IngressInfo
 	14, // 2: rpc.GetIngressInfoResponse.logging_fields:type_name -> rpc.GetIngressInfoResponse.LoggingFieldsEntry
 	15, // 3: rpc.GetIngressInfoResponse.feature_flags:type_name -> rpc.GetIngressInfoResponse.FeatureFlagsEntry
-	23, // 4: rpc.UpdateIngressStateRequest.state:type_name -> livekit.IngressState
+	25, // 4: rpc.UpdateIngressStateRequest.state:type_name -> livekit.IngressState
 	13, // 5: rpc.GetSIPTrunkAuthenticationRequest.call:type_name -> rpc.SIPCall
-	24, // 6: rpc.GetSIPTrunkAuthenticationResponse.provider_info:type_name -> livekit.ProviderInfo
+	26, // 6: rpc.GetSIPTrunkAuthenticationResponse.provider_info:type_name -> livekit.ProviderInfo
 	1,  // 7: rpc.GetSIPTrunkAuthenticationResponse.error_code:type_name -> rpc.SIPTrunkAuthenticationError
-	16, // 8: rpc.EvaluateSIPDispatchRulesRequest.extra_attributes:type_name -> rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntry
-	13, // 9: rpc.EvaluateSIPDispatchRulesRequest.call:type_name -> rpc.SIPCall
-	17, // 10: rpc.EvaluateSIPDispatchRulesResponse.participant_attributes:type_name -> rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntry
-	0,  // 11: rpc.EvaluateSIPDispatchRulesResponse.result:type_name -> rpc.SIPDispatchResult
-	18, // 12: rpc.EvaluateSIPDispatchRulesResponse.headers:type_name -> rpc.EvaluateSIPDispatchRulesResponse.HeadersEntry
-	19, // 13: rpc.EvaluateSIPDispatchRulesResponse.headers_to_attributes:type_name -> rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntry
-	20, // 14: rpc.EvaluateSIPDispatchRulesResponse.attributes_to_headers:type_name -> rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntry
-	25, // 15: rpc.EvaluateSIPDispatchRulesResponse.include_headers:type_name -> livekit.SIPHeaderOptions
-	26, // 16: rpc.EvaluateSIPDispatchRulesResponse.enabled_features:type_name -> livekit.SIPFeature
-	27, // 17: rpc.EvaluateSIPDispatchRulesResponse.ringing_timeout:type_name -> google.protobuf.Duration
-	27, // 18: rpc.EvaluateSIPDispatchRulesResponse.max_call_duration:type_name -> google.protobuf.Duration
-	28, // 19: rpc.EvaluateSIPDispatchRulesResponse.room_config:type_name -> livekit.RoomConfiguration
-	29, // 20: rpc.EvaluateSIPDispatchRulesResponse.media_encryption:type_name -> livekit.SIPMediaEncryption
-	30, // 21: rpc.UpdateSIPCallStateRequest.call_info:type_name -> livekit.SIPCallInfo
-	31, // 22: rpc.UpdateSIPCallStateRequest.transfer_info:type_name -> livekit.SIPTransferInfo
-	30, // 23: rpc.RecordCallContextRequest.call_info:type_name -> livekit.SIPCallInfo
-	32, // 24: rpc.SIPCall.address:type_name -> livekit.SIPUri
-	32, // 25: rpc.SIPCall.from:type_name -> livekit.SIPUri
-	32, // 26: rpc.SIPCall.to:type_name -> livekit.SIPUri
-	32, // 27: rpc.SIPCall.via:type_name -> livekit.SIPUri
-	21, // 28: rpc.IOInfo.CreateEgress:input_type -> livekit.EgressInfo
-	21, // 29: rpc.IOInfo.UpdateEgress:input_type -> livekit.EgressInfo
-	2,  // 30: rpc.IOInfo.GetEgress:input_type -> rpc.GetEgressRequest
-	33, // 31: rpc.IOInfo.ListEgress:input_type -> livekit.ListEgressRequest
-	3,  // 32: rpc.IOInfo.UpdateMetrics:input_type -> rpc.UpdateMetricsRequest
-	22, // 33: rpc.IOInfo.CreateIngress:input_type -> livekit.IngressInfo
-	4,  // 34: rpc.IOInfo.GetIngressInfo:input_type -> rpc.GetIngressInfoRequest
-	6,  // 35: rpc.IOInfo.UpdateIngressState:input_type -> rpc.UpdateIngressStateRequest
-	7,  // 36: rpc.IOInfo.GetSIPTrunkAuthentication:input_type -> rpc.GetSIPTrunkAuthenticationRequest
-	9,  // 37: rpc.IOInfo.EvaluateSIPDispatchRules:input_type -> rpc.EvaluateSIPDispatchRulesRequest
-	11, // 38: rpc.IOInfo.UpdateSIPCallState:input_type -> rpc.UpdateSIPCallStateRequest
-	12, // 39: rpc.IOInfo.RecordCallContext:input_type -> rpc.RecordCallContextRequest
-	34, // 40: rpc.IOInfo.CreateEgress:output_type -> google.protobuf.Empty
-	34, // 41: rpc.IOInfo.UpdateEgress:output_type -> google.protobuf.Empty
-	21, // 42: rpc.IOInfo.GetEgress:output_type -> livekit.EgressInfo
-	35, // 43: rpc.IOInfo.ListEgress:output_type -> livekit.ListEgressResponse
-	34, // 44: rpc.IOInfo.UpdateMetrics:output_type -> google.protobuf.Empty
-	34, // 45: rpc.IOInfo.CreateIngress:output_type -> google.protobuf.Empty
-	5,  // 46: rpc.IOInfo.GetIngressInfo:output_type -> rpc.GetIngressInfoResponse
-	34, // 47: rpc.IOInfo.UpdateIngressState:output_type -> google.protobuf.Empty
-	8,  // 48: rpc.IOInfo.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
-	10, // 49: rpc.IOInfo.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
-	34, // 50: rpc.IOInfo.UpdateSIPCallState:output_type -> google.protobuf.Empty
-	34, // 51: rpc.IOInfo.RecordCallContext:output_type -> google.protobuf.Empty
-	40, // [40:52] is the sub-list for method output_type
-	28, // [28:40] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	16, // 8: rpc.GetSIPTrunkAuthenticationResponse.feature_flags:type_name -> rpc.GetSIPTrunkAuthenticationResponse.FeatureFlagsEntry
+	17, // 9: rpc.EvaluateSIPDispatchRulesRequest.extra_attributes:type_name -> rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntry
+	13, // 10: rpc.EvaluateSIPDispatchRulesRequest.call:type_name -> rpc.SIPCall
+	18, // 11: rpc.EvaluateSIPDispatchRulesResponse.participant_attributes:type_name -> rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntry
+	0,  // 12: rpc.EvaluateSIPDispatchRulesResponse.result:type_name -> rpc.SIPDispatchResult
+	19, // 13: rpc.EvaluateSIPDispatchRulesResponse.headers:type_name -> rpc.EvaluateSIPDispatchRulesResponse.HeadersEntry
+	20, // 14: rpc.EvaluateSIPDispatchRulesResponse.headers_to_attributes:type_name -> rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntry
+	21, // 15: rpc.EvaluateSIPDispatchRulesResponse.attributes_to_headers:type_name -> rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntry
+	27, // 16: rpc.EvaluateSIPDispatchRulesResponse.include_headers:type_name -> livekit.SIPHeaderOptions
+	28, // 17: rpc.EvaluateSIPDispatchRulesResponse.enabled_features:type_name -> livekit.SIPFeature
+	29, // 18: rpc.EvaluateSIPDispatchRulesResponse.ringing_timeout:type_name -> google.protobuf.Duration
+	29, // 19: rpc.EvaluateSIPDispatchRulesResponse.max_call_duration:type_name -> google.protobuf.Duration
+	30, // 20: rpc.EvaluateSIPDispatchRulesResponse.room_config:type_name -> livekit.RoomConfiguration
+	31, // 21: rpc.EvaluateSIPDispatchRulesResponse.media_encryption:type_name -> livekit.SIPMediaEncryption
+	22, // 22: rpc.EvaluateSIPDispatchRulesResponse.feature_flags:type_name -> rpc.EvaluateSIPDispatchRulesResponse.FeatureFlagsEntry
+	32, // 23: rpc.UpdateSIPCallStateRequest.call_info:type_name -> livekit.SIPCallInfo
+	33, // 24: rpc.UpdateSIPCallStateRequest.transfer_info:type_name -> livekit.SIPTransferInfo
+	32, // 25: rpc.RecordCallContextRequest.call_info:type_name -> livekit.SIPCallInfo
+	34, // 26: rpc.SIPCall.address:type_name -> livekit.SIPUri
+	34, // 27: rpc.SIPCall.from:type_name -> livekit.SIPUri
+	34, // 28: rpc.SIPCall.to:type_name -> livekit.SIPUri
+	34, // 29: rpc.SIPCall.via:type_name -> livekit.SIPUri
+	23, // 30: rpc.IOInfo.CreateEgress:input_type -> livekit.EgressInfo
+	23, // 31: rpc.IOInfo.UpdateEgress:input_type -> livekit.EgressInfo
+	2,  // 32: rpc.IOInfo.GetEgress:input_type -> rpc.GetEgressRequest
+	35, // 33: rpc.IOInfo.ListEgress:input_type -> livekit.ListEgressRequest
+	3,  // 34: rpc.IOInfo.UpdateMetrics:input_type -> rpc.UpdateMetricsRequest
+	24, // 35: rpc.IOInfo.CreateIngress:input_type -> livekit.IngressInfo
+	4,  // 36: rpc.IOInfo.GetIngressInfo:input_type -> rpc.GetIngressInfoRequest
+	6,  // 37: rpc.IOInfo.UpdateIngressState:input_type -> rpc.UpdateIngressStateRequest
+	7,  // 38: rpc.IOInfo.GetSIPTrunkAuthentication:input_type -> rpc.GetSIPTrunkAuthenticationRequest
+	9,  // 39: rpc.IOInfo.EvaluateSIPDispatchRules:input_type -> rpc.EvaluateSIPDispatchRulesRequest
+	11, // 40: rpc.IOInfo.UpdateSIPCallState:input_type -> rpc.UpdateSIPCallStateRequest
+	12, // 41: rpc.IOInfo.RecordCallContext:input_type -> rpc.RecordCallContextRequest
+	36, // 42: rpc.IOInfo.CreateEgress:output_type -> google.protobuf.Empty
+	36, // 43: rpc.IOInfo.UpdateEgress:output_type -> google.protobuf.Empty
+	23, // 44: rpc.IOInfo.GetEgress:output_type -> livekit.EgressInfo
+	37, // 45: rpc.IOInfo.ListEgress:output_type -> livekit.ListEgressResponse
+	36, // 46: rpc.IOInfo.UpdateMetrics:output_type -> google.protobuf.Empty
+	36, // 47: rpc.IOInfo.CreateIngress:output_type -> google.protobuf.Empty
+	5,  // 48: rpc.IOInfo.GetIngressInfo:output_type -> rpc.GetIngressInfoResponse
+	36, // 49: rpc.IOInfo.UpdateIngressState:output_type -> google.protobuf.Empty
+	8,  // 50: rpc.IOInfo.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
+	10, // 51: rpc.IOInfo.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
+	36, // 52: rpc.IOInfo.UpdateSIPCallState:output_type -> google.protobuf.Empty
+	36, // 53: rpc.IOInfo.RecordCallContext:output_type -> google.protobuf.Empty
+	42, // [42:54] is the sub-list for method output_type
+	30, // [30:42] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_rpc_io_proto_init() }
@@ -1516,7 +1558,7 @@ func file_rpc_io_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_io_proto_rawDesc), len(file_rpc_io_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
