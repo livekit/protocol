@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_PPAKM9O = true
+const Version_502HH1O = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -45,6 +45,8 @@ type RoomSessionTx interface {
 	ReportEndTime(v time.Time)
 	ReportFeatures(v uint16)
 	ReportRoomDuration(v uint32)
+	ReportTags(v []string)
+	ReportClosed(v bool)
 }
 
 type RoomSessionReporter interface {

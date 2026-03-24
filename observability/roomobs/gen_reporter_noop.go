@@ -80,6 +80,8 @@ func (r *noopRoomSessionReporter) ReportStartTime(v time.Time)                  
 func (r *noopRoomSessionReporter) ReportEndTime(v time.Time)                                {}
 func (r *noopRoomSessionReporter) ReportFeatures(v uint16)                                  {}
 func (r *noopRoomSessionReporter) ReportRoomDuration(v uint32)                              {}
+func (r *noopRoomSessionReporter) ReportTags(v []string)                                    {}
+func (r *noopRoomSessionReporter) ReportClosed(v bool)                                      {}
 func (r *noopRoomSessionReporter) WithParticipant(identity string) ParticipantReporter {
 	return &noopParticipantReporter{}
 }
