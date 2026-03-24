@@ -40,7 +40,7 @@ var File_rpc_room_proto protoreflect.FileDescriptor
 
 const file_rpc_room_proto_rawDesc = "" +
 	"\n" +
-	"\x0erpc/room.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto2\x9f\x02\n" +
+	"\x0erpc/room.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14livekit_models.proto\x1a\x12livekit_room.proto2\xf6\x03\n" +
 	"\x04Room\x12]\n" +
 	"\n" +
 	"DeleteRoom\x12\x1a.livekit.DeleteRoomRequest\x1a\x1b.livekit.DeleteRoomResponse\"\x16\xb2\x89\x01\x12\x10\x01\x1a\x0e\n" +
@@ -48,25 +48,37 @@ const file_rpc_room_proto_rawDesc = "" +
 	"\bSendData\x12\x18.livekit.SendDataRequest\x1a\x19.livekit.SendDataResponse\"\x16\xb2\x89\x01\x12\x10\x01\x1a\x0e\n" +
 	"\x04room\x12\x04room\x18\x01\x12_\n" +
 	"\x12UpdateRoomMetadata\x12\".livekit.UpdateRoomMetadataRequest\x1a\r.livekit.Room\"\x16\xb2\x89\x01\x12\x10\x01\x1a\x0e\n" +
+	"\x04room\x12\x04room\x18\x01\x12o\n" +
+	"\x10ListParticipants\x12 .livekit.ListParticipantsRequest\x1a!.livekit.ListParticipantsResponse\"\x16\xb2\x89\x01\x12\x10\x01\x1a\x0e\n" +
+	"\x04room\x12\x04room\x18\x01\x12d\n" +
+	"\x0eGetParticipant\x12 .livekit.RoomParticipantIdentity\x1a\x18.livekit.ParticipantInfo\"\x16\xb2\x89\x01\x12\x10\x01\x1a\x0e\n" +
 	"\x04room\x12\x04room\x18\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var file_rpc_room_proto_goTypes = []any{
 	(*livekit.DeleteRoomRequest)(nil),         // 0: livekit.DeleteRoomRequest
 	(*livekit.SendDataRequest)(nil),           // 1: livekit.SendDataRequest
 	(*livekit.UpdateRoomMetadataRequest)(nil), // 2: livekit.UpdateRoomMetadataRequest
-	(*livekit.DeleteRoomResponse)(nil),        // 3: livekit.DeleteRoomResponse
-	(*livekit.SendDataResponse)(nil),          // 4: livekit.SendDataResponse
-	(*livekit.Room)(nil),                      // 5: livekit.Room
+	(*livekit.ListParticipantsRequest)(nil),   // 3: livekit.ListParticipantsRequest
+	(*livekit.RoomParticipantIdentity)(nil),   // 4: livekit.RoomParticipantIdentity
+	(*livekit.DeleteRoomResponse)(nil),        // 5: livekit.DeleteRoomResponse
+	(*livekit.SendDataResponse)(nil),          // 6: livekit.SendDataResponse
+	(*livekit.Room)(nil),                      // 7: livekit.Room
+	(*livekit.ListParticipantsResponse)(nil),  // 8: livekit.ListParticipantsResponse
+	(*livekit.ParticipantInfo)(nil),           // 9: livekit.ParticipantInfo
 }
 var file_rpc_room_proto_depIdxs = []int32{
 	0, // 0: rpc.Room.DeleteRoom:input_type -> livekit.DeleteRoomRequest
 	1, // 1: rpc.Room.SendData:input_type -> livekit.SendDataRequest
 	2, // 2: rpc.Room.UpdateRoomMetadata:input_type -> livekit.UpdateRoomMetadataRequest
-	3, // 3: rpc.Room.DeleteRoom:output_type -> livekit.DeleteRoomResponse
-	4, // 4: rpc.Room.SendData:output_type -> livekit.SendDataResponse
-	5, // 5: rpc.Room.UpdateRoomMetadata:output_type -> livekit.Room
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
+	3, // 3: rpc.Room.ListParticipants:input_type -> livekit.ListParticipantsRequest
+	4, // 4: rpc.Room.GetParticipant:input_type -> livekit.RoomParticipantIdentity
+	5, // 5: rpc.Room.DeleteRoom:output_type -> livekit.DeleteRoomResponse
+	6, // 6: rpc.Room.SendData:output_type -> livekit.SendDataResponse
+	7, // 7: rpc.Room.UpdateRoomMetadata:output_type -> livekit.Room
+	8, // 8: rpc.Room.ListParticipants:output_type -> livekit.ListParticipantsResponse
+	9, // 9: rpc.Room.GetParticipant:output_type -> livekit.ParticipantInfo
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
