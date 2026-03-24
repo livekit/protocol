@@ -264,7 +264,10 @@ message RoomConfiguration {
   // Define agents that should be dispatched to this room
   repeated RoomAgentDispatch agents = 10;
 
-  // NEXT_ID: 12
+  // Tags to attach to the room
+  map<string, string> tags = 12;
+
+  // NEXT_ID: 13
 }
 
 message ForwardParticipantRequest {
