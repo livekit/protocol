@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "options.proto";
 import "logger/options.proto";
 import "livekit_egress.proto";
+import "google/protobuf/empty.proto";
 
 service EgressInternal {
   rpc StartEgress(StartEgressRequest) returns (livekit.EgressInfo) {
@@ -44,6 +45,19 @@ service EgressHandler {
   // --- Deprecated ---
   rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
+  }
+}
+
+service ReplayExport {
+  rpc EgressReady(google.protobuf.Empty) returns (EgressReadyResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        single_server: true
+        names: ["egressID"]
+        typed: false
+      }
+    };
   }
 }
 
@@ -79,4 +93,9 @@ message ListActiveEgressRequest {}
 
 message ListActiveEgressResponse {
   repeated string egress_ids = 1;
+}
+
+message EgressReadyResponse {
+  int64 start_at = 1;    // wallclock unix timestamp (nanoseconds)
+  int64 duration_ms = 2; // how long to record
 }
