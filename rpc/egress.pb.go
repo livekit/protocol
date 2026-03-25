@@ -46,6 +46,8 @@ type StartEgressRequest struct {
 	//
 	// Types that are valid to be assigned to Request:
 	//
+	//	*StartEgressRequest_Egress
+	//	*StartEgressRequest_Replay
 	//	*StartEgressRequest_RoomComposite
 	//	*StartEgressRequest_Web
 	//	*StartEgressRequest_Participant
@@ -104,6 +106,24 @@ func (x *StartEgressRequest) GetEgressId() string {
 func (x *StartEgressRequest) GetRequest() isStartEgressRequest_Request {
 	if x != nil {
 		return x.Request
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetEgress() *livekit.StartEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*StartEgressRequest_Egress); ok {
+			return x.Egress
+		}
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetReplay() *livekit.ExportReplayRequest {
+	if x != nil {
+		if x, ok := x.Request.(*StartEgressRequest_Replay); ok {
+			return x.Replay
+		}
 	}
 	return nil
 }
@@ -199,7 +219,16 @@ type isStartEgressRequest_Request interface {
 	isStartEgressRequest_Request()
 }
 
+type StartEgressRequest_Egress struct {
+	Egress *livekit.StartEgressRequest `protobuf:"bytes,16,opt,name=egress,proto3,oneof"`
+}
+
+type StartEgressRequest_Replay struct {
+	Replay *livekit.ExportReplayRequest `protobuf:"bytes,17,opt,name=replay,proto3,oneof"`
+}
+
 type StartEgressRequest_RoomComposite struct {
+	// --- deprecated ---
 	RoomComposite *livekit.RoomCompositeEgressRequest `protobuf:"bytes,5,opt,name=room_composite,json=roomComposite,proto3,oneof"`
 }
 
@@ -218,6 +247,10 @@ type StartEgressRequest_TrackComposite struct {
 type StartEgressRequest_Track struct {
 	Track *livekit.TrackEgressRequest `protobuf:"bytes,7,opt,name=track,proto3,oneof"`
 }
+
+func (*StartEgressRequest_Egress) isStartEgressRequest_Request() {}
+
+func (*StartEgressRequest_Replay) isStartEgressRequest_Request() {}
 
 func (*StartEgressRequest_RoomComposite) isStartEgressRequest_Request() {}
 
@@ -313,9 +346,11 @@ var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xe4\x04\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xd3\x05\n" +
 	"\x12StartEgressRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12L\n" +
+	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x125\n" +
+	"\x06egress\x18\x10 \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
+	"\x06replay\x18\x11 \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12L\n" +
 	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
 	"\x03web\x18\v \x01(\v2\x19.livekit.WebEgressRequestH\x00R\x03web\x12E\n" +
 	"\vparticipant\x18\r \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
@@ -337,11 +372,12 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"egress_ids\x18\x01 \x03(\tR\tegressIds2\xb2\x01\n" +
 	"\x0eEgressInternal\x12E\n" +
 	"\vStartEgress\x12\x17.rpc.StartEgressRequest\x1a\x13.livekit.EgressInfo\"\b\xb2\x89\x01\x04\x10\x010\x01\x12Y\n" +
-	"\x10ListActiveEgress\x12\x1c.rpc.ListActiveEgressRequest\x1a\x1d.rpc.ListActiveEgressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xa1\x01\n" +
+	"\x10ListActiveEgress\x12\x1c.rpc.ListActiveEgressRequest\x1a\x1d.rpc.ListActiveEgressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xec\x01\n" +
 	"\rEgressHandler\x12I\n" +
-	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12E\n" +
+	"\fUpdateEgress\x12\x1c.livekit.UpdateEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12E\n" +
 	"\n" +
-	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
+	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12I\n" +
+	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var (
 	file_rpc_egress_proto_rawDescOnce sync.Once
@@ -360,34 +396,41 @@ var file_rpc_egress_proto_goTypes = []any{
 	(*StartEgressRequest)(nil),                  // 0: rpc.StartEgressRequest
 	(*ListActiveEgressRequest)(nil),             // 1: rpc.ListActiveEgressRequest
 	(*ListActiveEgressResponse)(nil),            // 2: rpc.ListActiveEgressResponse
-	(*livekit.RoomCompositeEgressRequest)(nil),  // 3: livekit.RoomCompositeEgressRequest
-	(*livekit.WebEgressRequest)(nil),            // 4: livekit.WebEgressRequest
-	(*livekit.ParticipantEgressRequest)(nil),    // 5: livekit.ParticipantEgressRequest
-	(*livekit.TrackCompositeEgressRequest)(nil), // 6: livekit.TrackCompositeEgressRequest
-	(*livekit.TrackEgressRequest)(nil),          // 7: livekit.TrackEgressRequest
-	(*livekit.UpdateStreamRequest)(nil),         // 8: livekit.UpdateStreamRequest
-	(*livekit.StopEgressRequest)(nil),           // 9: livekit.StopEgressRequest
-	(*livekit.EgressInfo)(nil),                  // 10: livekit.EgressInfo
+	(*livekit.StartEgressRequest)(nil),          // 3: livekit.StartEgressRequest
+	(*livekit.ExportReplayRequest)(nil),         // 4: livekit.ExportReplayRequest
+	(*livekit.RoomCompositeEgressRequest)(nil),  // 5: livekit.RoomCompositeEgressRequest
+	(*livekit.WebEgressRequest)(nil),            // 6: livekit.WebEgressRequest
+	(*livekit.ParticipantEgressRequest)(nil),    // 7: livekit.ParticipantEgressRequest
+	(*livekit.TrackCompositeEgressRequest)(nil), // 8: livekit.TrackCompositeEgressRequest
+	(*livekit.TrackEgressRequest)(nil),          // 9: livekit.TrackEgressRequest
+	(*livekit.UpdateEgressRequest)(nil),         // 10: livekit.UpdateEgressRequest
+	(*livekit.StopEgressRequest)(nil),           // 11: livekit.StopEgressRequest
+	(*livekit.UpdateStreamRequest)(nil),         // 12: livekit.UpdateStreamRequest
+	(*livekit.EgressInfo)(nil),                  // 13: livekit.EgressInfo
 }
 var file_rpc_egress_proto_depIdxs = []int32{
-	3,  // 0: rpc.StartEgressRequest.room_composite:type_name -> livekit.RoomCompositeEgressRequest
-	4,  // 1: rpc.StartEgressRequest.web:type_name -> livekit.WebEgressRequest
-	5,  // 2: rpc.StartEgressRequest.participant:type_name -> livekit.ParticipantEgressRequest
-	6,  // 3: rpc.StartEgressRequest.track_composite:type_name -> livekit.TrackCompositeEgressRequest
-	7,  // 4: rpc.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
-	0,  // 5: rpc.EgressInternal.StartEgress:input_type -> rpc.StartEgressRequest
-	1,  // 6: rpc.EgressInternal.ListActiveEgress:input_type -> rpc.ListActiveEgressRequest
-	8,  // 7: rpc.EgressHandler.UpdateStream:input_type -> livekit.UpdateStreamRequest
-	9,  // 8: rpc.EgressHandler.StopEgress:input_type -> livekit.StopEgressRequest
-	10, // 9: rpc.EgressInternal.StartEgress:output_type -> livekit.EgressInfo
-	2,  // 10: rpc.EgressInternal.ListActiveEgress:output_type -> rpc.ListActiveEgressResponse
-	10, // 11: rpc.EgressHandler.UpdateStream:output_type -> livekit.EgressInfo
-	10, // 12: rpc.EgressHandler.StopEgress:output_type -> livekit.EgressInfo
-	9,  // [9:13] is the sub-list for method output_type
-	5,  // [5:9] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	3,  // 0: rpc.StartEgressRequest.egress:type_name -> livekit.StartEgressRequest
+	4,  // 1: rpc.StartEgressRequest.replay:type_name -> livekit.ExportReplayRequest
+	5,  // 2: rpc.StartEgressRequest.room_composite:type_name -> livekit.RoomCompositeEgressRequest
+	6,  // 3: rpc.StartEgressRequest.web:type_name -> livekit.WebEgressRequest
+	7,  // 4: rpc.StartEgressRequest.participant:type_name -> livekit.ParticipantEgressRequest
+	8,  // 5: rpc.StartEgressRequest.track_composite:type_name -> livekit.TrackCompositeEgressRequest
+	9,  // 6: rpc.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
+	0,  // 7: rpc.EgressInternal.StartEgress:input_type -> rpc.StartEgressRequest
+	1,  // 8: rpc.EgressInternal.ListActiveEgress:input_type -> rpc.ListActiveEgressRequest
+	10, // 9: rpc.EgressHandler.UpdateEgress:input_type -> livekit.UpdateEgressRequest
+	11, // 10: rpc.EgressHandler.StopEgress:input_type -> livekit.StopEgressRequest
+	12, // 11: rpc.EgressHandler.UpdateStream:input_type -> livekit.UpdateStreamRequest
+	13, // 12: rpc.EgressInternal.StartEgress:output_type -> livekit.EgressInfo
+	2,  // 13: rpc.EgressInternal.ListActiveEgress:output_type -> rpc.ListActiveEgressResponse
+	13, // 14: rpc.EgressHandler.UpdateEgress:output_type -> livekit.EgressInfo
+	13, // 15: rpc.EgressHandler.StopEgress:output_type -> livekit.EgressInfo
+	13, // 16: rpc.EgressHandler.UpdateStream:output_type -> livekit.EgressInfo
+	12, // [12:17] is the sub-list for method output_type
+	7,  // [7:12] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_rpc_egress_proto_init() }
@@ -396,6 +439,8 @@ func file_rpc_egress_proto_init() {
 		return
 	}
 	file_rpc_egress_proto_msgTypes[0].OneofWrappers = []any{
+		(*StartEgressRequest_Egress)(nil),
+		(*StartEgressRequest_Replay)(nil),
 		(*StartEgressRequest_RoomComposite)(nil),
 		(*StartEgressRequest_Web)(nil),
 		(*StartEgressRequest_Participant)(nil),
