@@ -1618,7 +1618,7 @@ func (s *connectorServer) serveConnectTwilioCallProtobuf(ctx context.Context, re
 }
 
 func (s *connectorServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor7, 0
+	return twirpFileDescriptor8, 0
 }
 
 func (s *connectorServer) ProtocGenTwirpVersion() string {
@@ -1632,7 +1632,7 @@ func (s *connectorServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "Connector")
 }
 
-var twirpFileDescriptor7 = []byte{
+var twirpFileDescriptor8 = []byte{
 	// 313 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0x41, 0x4b, 0xf3, 0x30,
 	0x1c, 0xc6, 0xdf, 0xb7, 0xc2, 0xd4, 0xbf, 0x4e, 0x6b, 0x04, 0x85, 0x1e, 0x64, 0x5b, 0x45, 0xc1,

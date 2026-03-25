@@ -1904,7 +1904,7 @@ func (s *phoneNumberServiceServer) serveReleasePhoneNumbersProtobuf(ctx context.
 }
 
 func (s *phoneNumberServiceServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor6, 0
+	return twirpFileDescriptor7, 0
 }
 
 func (s *phoneNumberServiceServer) ProtocGenTwirpVersion() string {
@@ -1918,7 +1918,7 @@ func (s *phoneNumberServiceServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "PhoneNumberService")
 }
 
-var twirpFileDescriptor6 = []byte{
+var twirpFileDescriptor7 = []byte{
 	// 1243 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x57, 0xe1, 0x6e, 0xdb, 0x54,
 	0x14, 0xce, 0x75, 0xda, 0xae, 0x39, 0x49, 0xdb, 0xec, 0x6e, 0x5d, 0x5d, 0x77, 0x5b, 0x33, 0x17,

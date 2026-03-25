@@ -1341,7 +1341,7 @@ func (s *ingressServer) serveDeleteIngressProtobuf(ctx context.Context, resp htt
 }
 
 func (s *ingressServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor2, 0
+	return twirpFileDescriptor3, 0
 }
 
 func (s *ingressServer) ProtocGenTwirpVersion() string {
@@ -1355,7 +1355,7 @@ func (s *ingressServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "Ingress")
 }
 
-var twirpFileDescriptor2 = []byte{
+var twirpFileDescriptor3 = []byte{
 	// 1623 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0xcf, 0x6f, 0xdb, 0xca,
 	0x11, 0x36, 0xf5, 0x5b, 0xa3, 0x48, 0x56, 0xd6, 0xf2, 0x7b, 0x7a, 0xfe, 0xd1, 0x0a, 0xf2, 0x6b,
