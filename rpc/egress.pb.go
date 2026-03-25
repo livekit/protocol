@@ -26,7 +26,6 @@ import (
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	_ "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -443,7 +442,7 @@ var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xd3\x05\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xd3\x05\n" +
 	"\x12StartEgressRequest\x12)\n" +
 	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x125\n" +
 	"\x06egress\x18\x10 \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
