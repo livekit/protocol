@@ -31,10 +31,10 @@ func GetEgressNotifyOptions(egressInfo *livekit.EgressInfo) []webhook.NotifyOpti
 	var whs []*livekit.WebhookConfig
 
 	switch req := egressInfo.Request.(type) {
-	case *livekit.EgressInfo_Egress:
-		if req.Egress != nil {
-			whs = req.Egress.Webhooks
-		}
+	// case *livekit.EgressInfo_Egress:
+	// 	if req.Egress != nil {
+	// 		whs = req.Egress.Webhooks
+	// 	}
 	case *livekit.EgressInfo_Replay:
 		if req.Replay != nil {
 			whs = req.Replay.Webhooks
