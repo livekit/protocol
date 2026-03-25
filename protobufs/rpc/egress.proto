@@ -49,13 +49,11 @@ service EgressHandler {
 }
 
 service ReplayExport {
-  rpc EgressReady(google.protobuf.Empty) returns (EgressReadyResponse) {
+  rpc EgressReady(EgressReadyRequest) returns (EgressReadyResponse) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
         single_server: true
-        names: ["egressID"]
-        typed: false
       }
     };
   }
@@ -93,6 +91,10 @@ message ListActiveEgressRequest {}
 
 message ListActiveEgressResponse {
   repeated string egress_ids = 1;
+}
+
+message EgressReadyRequest {
+  string egress_id = 1 [(logger.name) = "egressID"];
 }
 
 message EgressReadyResponse {
