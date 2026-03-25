@@ -3850,7 +3850,7 @@ func (s *agentSimulationServer) serveListScenariosProtobuf(ctx context.Context, 
 }
 
 func (s *agentSimulationServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor8, 0
+	return twirpFileDescriptor9, 0
 }
 
 func (s *agentSimulationServer) ProtocGenTwirpVersion() string {
@@ -3864,7 +3864,7 @@ func (s *agentSimulationServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "AgentSimulation")
 }
 
-var twirpFileDescriptor8 = []byte{
+var twirpFileDescriptor9 = []byte{
 	// 1852 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x59, 0x4f, 0x6f, 0xdb, 0xc8,
 	0x15, 0x37, 0xa9, 0x7f, 0xd6, 0x53, 0x24, 0xcb, 0xb3, 0xde, 0x54, 0x66, 0xe1, 0xc4, 0x51, 0x76,

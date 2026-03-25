@@ -14,9 +14,9 @@
 
 syntax = "proto3";
 
-package replay;
+package livekit;
 
-option go_package = "github.com/livekit/protocol/replay";
+option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
@@ -25,7 +25,6 @@ import "livekit_egress.proto";
 import "livekit_models.proto";
 import "logger/options.proto";
 
-// Experimental (not currently available)
 service Replay {
   // List replays
   rpc ListReplays(ListReplaysRequest) returns (ListReplaysResponse);
@@ -36,7 +35,7 @@ service Replay {
   rpc Close(ClosePlaybackRequest) returns (google.protobuf.Empty);
 
   // Export a stored replay using egress
-  rpc Export(livekit.ExportReplayRequest) returns (livekit.EgressInfo);
+  rpc Export(ExportReplayRequest) returns (EgressInfo);
 
   // Delete all stored data
   rpc DeleteReplay(DeleteReplayRequest) returns (google.protobuf.Empty);
