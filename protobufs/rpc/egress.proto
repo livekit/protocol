@@ -50,7 +50,14 @@ service EgressHandler {
 
 service ReplayExport {
   rpc EgressReady(google.protobuf.Empty) returns (EgressReadyResponse) {
-    option (psrpc.options).topics = true;
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        single_server: true
+        names: ["egressID"]
+        typed: false
+      }
+    };
   }
 }
 
