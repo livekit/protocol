@@ -62,6 +62,14 @@ func (v *APIKeyTokenVerifier) Verify(key interface{}) (*jwt.Claims, *ClaimGrants
 	if key == nil || key == "" {
 		return nil, nil, ErrKeysMissing
 	}
+	// If a KeyProvider is passed, resolve it to the secret string for this token's API key.
+	if kp, ok := key.(KeyProvider); ok {
+		secret := kp.GetSecret(v.apiKey)
+		if secret == "" {
+			return nil, nil, ErrKeysMissing
+		}
+		key = []byte(secret)
+	}
 	if s, ok := key.(string); ok {
 		key = []byte(s)
 	}
