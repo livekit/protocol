@@ -18,10 +18,9 @@
 // 	protoc        v4.23.4
 // source: cloud_replay.proto
 
-package replay
+package livekit
 
 import (
-	livekit "github.com/livekit/protocol/livekit"
 	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -39,9 +38,9 @@ const (
 )
 
 type ListReplaysRequest struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	RoomName      string                   `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // optional
-	PageToken     *livekit.TokenPagination `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoomName      string                 `protobuf:"bytes,1,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"` // optional
+	PageToken     *TokenPagination       `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -83,7 +82,7 @@ func (x *ListReplaysRequest) GetRoomName() string {
 	return ""
 }
 
-func (x *ListReplaysRequest) GetPageToken() *livekit.TokenPagination {
+func (x *ListReplaysRequest) GetPageToken() *TokenPagination {
 	if x != nil {
 		return x.PageToken
 	}
@@ -91,9 +90,9 @@ func (x *ListReplaysRequest) GetPageToken() *livekit.TokenPagination {
 }
 
 type ListReplaysResponse struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Replays       []*ReplayInfo            `protobuf:"bytes,1,rep,name=replays,proto3" json:"replays,omitempty"`
-	NextPageToken *livekit.TokenPagination `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Replays       []*ReplayInfo          `protobuf:"bytes,1,rep,name=replays,proto3" json:"replays,omitempty"`
+	NextPageToken *TokenPagination       `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -135,7 +134,7 @@ func (x *ListReplaysResponse) GetReplays() []*ReplayInfo {
 	return nil
 }
 
-func (x *ListReplaysResponse) GetNextPageToken() *livekit.TokenPagination {
+func (x *ListReplaysResponse) GetNextPageToken() *TokenPagination {
 	if x != nil {
 		return x.NextPageToken
 	}
@@ -458,13 +457,13 @@ var File_cloud_replay_proto protoreflect.FileDescriptor
 
 const file_cloud_replay_proto_rawDesc = "" +
 	"\n" +
-	"\x12cloud_replay.proto\x12\x06replay\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14livekit_egress.proto\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"j\n" +
+	"\x12cloud_replay.proto\x12\alivekit\x1a\x1bgoogle/protobuf/empty.proto\x1a\x14livekit_egress.proto\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"j\n" +
 	"\x12ListReplaysRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x127\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\"\x85\x01\n" +
-	"\x13ListReplaysResponse\x12,\n" +
-	"\areplays\x18\x01 \x03(\v2\x12.replay.ReplayInfoR\areplays\x12@\n" +
+	"page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\"\x86\x01\n" +
+	"\x13ListReplaysResponse\x12-\n" +
+	"\areplays\x18\x01 \x03(\v2\x13.livekit.ReplayInfoR\areplays\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"\x94\x01\n" +
 	"\n" +
 	"ReplayInfo\x12)\n" +
@@ -492,14 +491,14 @@ const file_cloud_replay_proto_rawDesc = "" +
 	"playbackIDR\n" +
 	"playbackId\"@\n" +
 	"\x13DeleteReplayRequest\x12)\n" +
-	"\treplay_id\x18\x01 \x01(\tB\f\x9a\xec,\breplayIDR\breplayId2\x85\x03\n" +
-	"\x06Replay\x12F\n" +
-	"\vListReplays\x12\x1a.replay.ListReplaysRequest\x1a\x1b.replay.ListReplaysResponse\x12=\n" +
-	"\bPlayback\x12\x17.replay.PlaybackRequest\x1a\x18.replay.PlaybackResponse\x123\n" +
-	"\x04Seek\x12\x13.replay.SeekRequest\x1a\x16.google.protobuf.Empty\x12=\n" +
-	"\x05Close\x12\x1c.replay.ClosePlaybackRequest\x1a\x16.google.protobuf.Empty\x12;\n" +
-	"\x06Export\x12\x1c.livekit.ExportReplayRequest\x1a\x13.livekit.EgressInfo\x12C\n" +
-	"\fDeleteReplay\x12\x1b.replay.DeleteReplayRequest\x1a\x16.google.protobuf.EmptyBEZ\"github.com/livekit/protocol/replay\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\treplay_id\x18\x01 \x01(\tB\f\x9a\xec,\breplayIDR\breplayId2\x8c\x03\n" +
+	"\x06Replay\x12H\n" +
+	"\vListReplays\x12\x1b.livekit.ListReplaysRequest\x1a\x1c.livekit.ListReplaysResponse\x12?\n" +
+	"\bPlayback\x12\x18.livekit.PlaybackRequest\x1a\x19.livekit.PlaybackResponse\x124\n" +
+	"\x04Seek\x12\x14.livekit.SeekRequest\x1a\x16.google.protobuf.Empty\x12>\n" +
+	"\x05Close\x12\x1d.livekit.ClosePlaybackRequest\x1a\x16.google.protobuf.Empty\x12;\n" +
+	"\x06Export\x12\x1c.livekit.ExportReplayRequest\x1a\x13.livekit.EgressInfo\x12D\n" +
+	"\fDeleteReplay\x12\x1c.livekit.DeleteReplayRequest\x1a\x16.google.protobuf.EmptyBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_cloud_replay_proto_rawDescOnce sync.Once
@@ -515,35 +514,35 @@ func file_cloud_replay_proto_rawDescGZIP() []byte {
 
 var file_cloud_replay_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_cloud_replay_proto_goTypes = []any{
-	(*ListReplaysRequest)(nil),          // 0: replay.ListReplaysRequest
-	(*ListReplaysResponse)(nil),         // 1: replay.ListReplaysResponse
-	(*ReplayInfo)(nil),                  // 2: replay.ReplayInfo
-	(*PlaybackRequest)(nil),             // 3: replay.PlaybackRequest
-	(*PlaybackResponse)(nil),            // 4: replay.PlaybackResponse
-	(*SeekRequest)(nil),                 // 5: replay.SeekRequest
-	(*ClosePlaybackRequest)(nil),        // 6: replay.ClosePlaybackRequest
-	(*DeleteReplayRequest)(nil),         // 7: replay.DeleteReplayRequest
-	(*livekit.TokenPagination)(nil),     // 8: livekit.TokenPagination
-	(*livekit.ExportReplayRequest)(nil), // 9: livekit.ExportReplayRequest
-	(*emptypb.Empty)(nil),               // 10: google.protobuf.Empty
-	(*livekit.EgressInfo)(nil),          // 11: livekit.EgressInfo
+	(*ListReplaysRequest)(nil),   // 0: livekit.ListReplaysRequest
+	(*ListReplaysResponse)(nil),  // 1: livekit.ListReplaysResponse
+	(*ReplayInfo)(nil),           // 2: livekit.ReplayInfo
+	(*PlaybackRequest)(nil),      // 3: livekit.PlaybackRequest
+	(*PlaybackResponse)(nil),     // 4: livekit.PlaybackResponse
+	(*SeekRequest)(nil),          // 5: livekit.SeekRequest
+	(*ClosePlaybackRequest)(nil), // 6: livekit.ClosePlaybackRequest
+	(*DeleteReplayRequest)(nil),  // 7: livekit.DeleteReplayRequest
+	(*TokenPagination)(nil),      // 8: livekit.TokenPagination
+	(*ExportReplayRequest)(nil),  // 9: livekit.ExportReplayRequest
+	(*emptypb.Empty)(nil),        // 10: google.protobuf.Empty
+	(*EgressInfo)(nil),           // 11: livekit.EgressInfo
 }
 var file_cloud_replay_proto_depIdxs = []int32{
-	8,  // 0: replay.ListReplaysRequest.page_token:type_name -> livekit.TokenPagination
-	2,  // 1: replay.ListReplaysResponse.replays:type_name -> replay.ReplayInfo
-	8,  // 2: replay.ListReplaysResponse.next_page_token:type_name -> livekit.TokenPagination
-	0,  // 3: replay.Replay.ListReplays:input_type -> replay.ListReplaysRequest
-	3,  // 4: replay.Replay.Playback:input_type -> replay.PlaybackRequest
-	5,  // 5: replay.Replay.Seek:input_type -> replay.SeekRequest
-	6,  // 6: replay.Replay.Close:input_type -> replay.ClosePlaybackRequest
-	9,  // 7: replay.Replay.Export:input_type -> livekit.ExportReplayRequest
-	7,  // 8: replay.Replay.DeleteReplay:input_type -> replay.DeleteReplayRequest
-	1,  // 9: replay.Replay.ListReplays:output_type -> replay.ListReplaysResponse
-	4,  // 10: replay.Replay.Playback:output_type -> replay.PlaybackResponse
-	10, // 11: replay.Replay.Seek:output_type -> google.protobuf.Empty
-	10, // 12: replay.Replay.Close:output_type -> google.protobuf.Empty
-	11, // 13: replay.Replay.Export:output_type -> livekit.EgressInfo
-	10, // 14: replay.Replay.DeleteReplay:output_type -> google.protobuf.Empty
+	8,  // 0: livekit.ListReplaysRequest.page_token:type_name -> livekit.TokenPagination
+	2,  // 1: livekit.ListReplaysResponse.replays:type_name -> livekit.ReplayInfo
+	8,  // 2: livekit.ListReplaysResponse.next_page_token:type_name -> livekit.TokenPagination
+	0,  // 3: livekit.Replay.ListReplays:input_type -> livekit.ListReplaysRequest
+	3,  // 4: livekit.Replay.Playback:input_type -> livekit.PlaybackRequest
+	5,  // 5: livekit.Replay.Seek:input_type -> livekit.SeekRequest
+	6,  // 6: livekit.Replay.Close:input_type -> livekit.ClosePlaybackRequest
+	9,  // 7: livekit.Replay.Export:input_type -> livekit.ExportReplayRequest
+	7,  // 8: livekit.Replay.DeleteReplay:input_type -> livekit.DeleteReplayRequest
+	1,  // 9: livekit.Replay.ListReplays:output_type -> livekit.ListReplaysResponse
+	4,  // 10: livekit.Replay.Playback:output_type -> livekit.PlaybackResponse
+	10, // 11: livekit.Replay.Seek:output_type -> google.protobuf.Empty
+	10, // 12: livekit.Replay.Close:output_type -> google.protobuf.Empty
+	11, // 13: livekit.Replay.Export:output_type -> livekit.EgressInfo
+	10, // 14: livekit.Replay.DeleteReplay:output_type -> google.protobuf.Empty
 	9,  // [9:15] is the sub-list for method output_type
 	3,  // [3:9] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
@@ -556,6 +555,8 @@ func file_cloud_replay_proto_init() {
 	if File_cloud_replay_proto != nil {
 		return
 	}
+	file_livekit_egress_proto_init()
+	file_livekit_models_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
