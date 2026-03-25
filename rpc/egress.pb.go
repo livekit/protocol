@@ -434,9 +434,9 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\fUpdateEgress\x12\x1c.livekit.UpdateEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12E\n" +
 	"\n" +
 	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12I\n" +
-	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x012W\n" +
-	"\fReplayExport\x12G\n" +
-	"\vEgressReady\x12\x16.google.protobuf.Empty\x1a\x18.rpc.EgressReadyResponse\"\x06\xb2\x89\x01\x02\x10\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
+	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x012e\n" +
+	"\fReplayExport\x12U\n" +
+	"\vEgressReady\x12\x16.google.protobuf.Empty\x1a\x18.rpc.EgressReadyResponse\"\x14\xb2\x89\x01\x10\x10\x01\x1a\f\x12\begressID \x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var (
 	file_rpc_egress_proto_rawDescOnce sync.Once
