@@ -25,25 +25,23 @@ option ruby_package = "LiveKit::Proto";
 
 service Egress {
   // Unified StartEgress RPC
-  rpc StartEgress(StartEgressRequest) returns (EgressInfo);
+  // rpc StartEgress(StartEgressRequest) returns (EgressInfo);
+  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
+  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
+  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
+  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
+  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 
   // Update url/template or stream outputs
-  rpc UpdateEgress(UpdateEgressRequest) returns (EgressInfo);
+  // rpc UpdateEgress(UpdateEgressRequest) returns (EgressInfo);
+  rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
+  rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
   // List available egress
   rpc ListEgress(ListEgressRequest) returns (ListEgressResponse);
 
   // Stop a recording or stream
   rpc StopEgress(StopEgressRequest) returns (EgressInfo);
-
-  // --- Deprecated ---
-  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
-  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
-  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
-  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
-  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
-  rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
-  rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 }
 
 // --- Core Request ---
@@ -232,7 +230,6 @@ message SegmentedFileOutput {
   SegmentedFileSuffix filename_suffix = 10;  // (optional, default INDEX)
   bool disable_manifest = 8;                 // disable upload of manifest file (default false)
 
-  // --- Deprecated ---
   oneof output {
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
@@ -261,7 +258,6 @@ message ImageOutput {
   ImageCodec image_codec = 6;           // (optional)
   bool disable_manifest = 7;            // disable upload of manifest file (default false)
 
-  // --- Deprecated ---
   oneof output {
     S3Upload s3 = 8;
     GCPUpload gcp = 9;
@@ -371,7 +367,7 @@ message EgressInfo {
   int64 updated_at = 18;
 
   oneof request {
-    StartEgressRequest egress = 29;
+    // StartEgressRequest egress = 29;
     ExportReplayRequest replay = 30;
 
     RoomCompositeEgressRequest room_composite = 4;
@@ -509,7 +505,7 @@ message ExportReplayRequest {
   repeated WebhookConfig webhooks = 11;
 }
 
-// --- Deprecated ---
+// --- V1 ---
 
 message RoomCompositeEgressRequest {
   string room_name = 1;
