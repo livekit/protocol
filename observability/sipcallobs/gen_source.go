@@ -1,5 +1,5 @@
 // Code generated; DO NOT EDIT.
-package telephony_callobs
+package sipcallobs
 
 type CallTrunkType string
 

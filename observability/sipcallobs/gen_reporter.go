@@ -1,6 +1,6 @@
 // Code generated; DO NOT EDIT.
 
-package telephony_callobs
+package sipcallobs
 
 import (
 	"time"

@@ -1,6 +1,6 @@
 // Code generated; DO NOT EDIT.
 
-package core_callobs
+package corecallobs
 
 import (
 	"time"
