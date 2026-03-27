@@ -17,8 +17,11 @@ package egress
 import "github.com/livekit/protocol/livekit"
 
 const (
+	EgressTypeTemplate = "template"
+	EgressTypeWeb      = "web"
+	EgressTypeMedia    = "media"
+
 	EgressTypeRoomComposite  = "room_composite"
-	EgressTypeWeb            = "web"
 	EgressTypeParticipant    = "participant"
 	EgressTypeTrackComposite = "track_composite"
 	EgressTypeTrack          = "track"
@@ -55,6 +58,14 @@ type DirectOutput interface {
 	GetWebsocketUrl() string
 }
 
+type EgressRequest interface {
+	GetMedia() *livekit.MediaSource
+	GetTemplate() *livekit.TemplateSource
+	GetWeb() *livekit.WebSource
+	GetOutputs() []*livekit.Output
+	GetStorage() *livekit.StorageConfig
+}
+
 type UploadRequest interface {
 	GetS3() *livekit.S3Upload
 	GetGcp() *livekit.GCPUpload
@@ -63,6 +74,20 @@ type UploadRequest interface {
 }
 
 func GetTypes(request interface{}) (string, string) {
+	if r, ok := request.(EgressRequest); ok {
+		var egressType string
+		if r.GetMedia() != nil {
+			egressType = EgressTypeMedia
+		} else if r.GetTemplate() != nil {
+			egressType = EgressTypeTemplate
+		} else if r.GetWeb() != nil {
+			egressType = EgressTypeWeb
+		} else {
+			egressType = Unknown
+		}
+		return egressType, GetOutputTypeV2(r.GetOutputs())
+	}
+
 	switch req := request.(type) {
 	case *livekit.EgressInfo_RoomComposite:
 		return EgressTypeRoomComposite, GetOutputType(req.RoomComposite)
@@ -81,6 +106,27 @@ func GetTypes(request interface{}) (string, string) {
 	}
 
 	return Unknown, Unknown
+}
+
+func GetOutputTypeV2(outputs []*livekit.Output) string {
+	if len(outputs) == 0 {
+		return Unknown
+	}
+	if len(outputs) > 1 {
+		return OutputTypeMultiple
+	}
+	switch outputs[0].Config.(type) {
+	case *livekit.Output_File:
+		return OutputTypeFile
+	case *livekit.Output_Stream:
+		return OutputTypeStream
+	case *livekit.Output_Segments:
+		return OutputTypeSegments
+	case *livekit.Output_Images:
+		return OutputTypeImages
+	default:
+		return Unknown
+	}
 }
 
 func GetOutputType(req interface{}) string {

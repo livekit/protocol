@@ -4408,7 +4408,7 @@ func (s *cloudAgentServer) serveGetPrivateLinkStatusProtobuf(ctx context.Context
 }
 
 func (s *cloudAgentServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor5, 0
+	return twirpFileDescriptor6, 0
 }
 
 func (s *cloudAgentServer) ProtocGenTwirpVersion() string {
@@ -4422,7 +4422,7 @@ func (s *cloudAgentServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "CloudAgent")
 }
 
-var twirpFileDescriptor5 = []byte{
+var twirpFileDescriptor6 = []byte{
 	// 2161 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x59, 0xcb, 0x73, 0x1b, 0x49,
 	0x19, 0xf7, 0xe8, 0x65, 0xe9, 0x93, 0xed, 0xd8, 0x6d, 0xc7, 0x19, 0xcb, 0x76, 0x62, 0x4f, 0x36,

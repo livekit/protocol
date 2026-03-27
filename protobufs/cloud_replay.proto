@@ -1,23 +1,44 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 syntax = "proto3";
 
-package replay;
+package livekit;
 
-option go_package = "github.com/livekit/protocol/replay";
+option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/empty.proto";
+import "livekit_egress.proto";
 import "livekit_models.proto";
 import "logger/options.proto";
 
-// Experimental (not currently available)
 service Replay {
+  // List replays
   rpc ListReplays(ListReplaysRequest) returns (ListReplaysResponse);
-  rpc DeleteReplay(DeleteReplayRequest) returns (google.protobuf.Empty);
 
+  // Playback controls
   rpc Playback(PlaybackRequest) returns (PlaybackResponse);
   rpc Seek(SeekRequest) returns (google.protobuf.Empty);
   rpc Close(ClosePlaybackRequest) returns (google.protobuf.Empty);
+
+  // Export a stored replay using egress
+  rpc Export(ExportReplayRequest) returns (EgressInfo);
+
+  // Delete all stored data
+  rpc DeleteReplay(DeleteReplayRequest) returns (google.protobuf.Empty);
 }
 
 message ListReplaysRequest {
@@ -34,17 +55,13 @@ message ReplayInfo {
   string replay_id = 1 [(logger.name) = "replayID"];
   string room_name = 2;
   int64 start_time = 3;
-  int64 duration = 4;
-}
-
-message DeleteReplayRequest {
-  string replay_id = 1 [(logger.name) = "replayID"];
+  int64 duration_ms = 4;
 }
 
 message PlaybackRequest {
   string replay_id = 1 [(logger.name) = "replayID"];
   string playback_room = 2; // name of room to play into
-  int64 seek_offset = 3; // initial timestamp (ms)
+  int64 seek_offset_ms = 3; // initial timestamp (ms)
 }
 
 message PlaybackResponse {
@@ -53,9 +70,13 @@ message PlaybackResponse {
 
 message SeekRequest {
   string playback_id = 1 [(logger.name) = "playbackID"];
-  int64 seek_offset = 2; // timestamp (ms)
+  int64 seek_offset_ms = 2; // timestamp (ms)
 }
 
 message ClosePlaybackRequest {
   string playback_id = 1 [(logger.name) = "playbackID"];
+}
+
+message DeleteReplayRequest {
+  string replay_id = 1 [(logger.name) = "replayID"];
 }

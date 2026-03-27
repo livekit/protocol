@@ -34,11 +34,27 @@ service EgressInternal {
 }
 
 service EgressHandler {
-  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
+  rpc UpdateEgress(livekit.UpdateEgressRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
   }
   rpc StopEgress(livekit.StopEgressRequest) returns (livekit.EgressInfo) {
     option (psrpc.options).topics = true;
+  }
+
+  // --- Deprecated ---
+  rpc UpdateStream(livekit.UpdateStreamRequest) returns (livekit.EgressInfo) {
+    option (psrpc.options).topics = true;
+  }
+}
+
+service ReplayExport {
+  rpc EgressReady(EgressReadyRequest) returns (EgressReadyResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        single_server: true
+      }
+    };
   }
 }
 
@@ -48,6 +64,10 @@ message StartEgressRequest {
 
   // request
   oneof request {
+    livekit.StartEgressRequest egress = 16;
+    livekit.ExportReplayRequest replay = 17;
+
+    // --- deprecated ---
     livekit.RoomCompositeEgressRequest room_composite = 5;
     livekit.WebEgressRequest web = 11;
     livekit.ParticipantEgressRequest participant = 13;
@@ -70,4 +90,13 @@ message ListActiveEgressRequest {}
 
 message ListActiveEgressResponse {
   repeated string egress_ids = 1;
+}
+
+message EgressReadyRequest {
+  string egress_id = 1 [(logger.name) = "egressID"];
+}
+
+message EgressReadyResponse {
+  int64 start_at = 1;    // wallclock unix timestamp (nanoseconds)
+  int64 duration_ms = 2; // how long to record
 }
