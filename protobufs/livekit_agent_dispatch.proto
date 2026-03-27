@@ -23,8 +23,8 @@ import "livekit_agent.proto";
 import "logger/options.proto";
 
 enum JobRestartPolicy {
-  ON_FAILURE = 0; // restart when the job fails (default)
-  NEVER = 1;      // never restart
+  JRP_ON_FAILURE = 0; // restart when the job fails (default)
+  JRP_NEVER = 1;      // never restart
 }
 
 service AgentDispatchService {
