@@ -1,3 +1,7 @@
 packages:
   - "packages/javascript"
   - "."
+
+minimumReleaseAge: 2880
+minimumReleaseAgeExclude:
+  - "@livekit/*"
