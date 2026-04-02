@@ -120,7 +120,7 @@ func ValidateEnableTranscoding(info *livekit.IngressInfo) error {
 		}
 	} else {
 		enableTranscoding = true
-		if info.EnableTranscoding != nil && *info.EnableTranscoding == false {
+		if info.EnableTranscoding != nil && !*info.EnableTranscoding {
 			return NewInvalidTranscodingBypassError("bypassing transcoding impossible with selected input type")
 		}
 	}
