@@ -370,6 +370,7 @@ func TestMetricsBatchBuilder(t *testing.T) {
 			NormalizedStartedAt: normalizedAt,
 			Metadata:            "md2",
 		})
+		require.NoError(t, err)
 
 		// should accept restricted label from PA_1
 		err = mbb.AddEventMetric(EventMetric{

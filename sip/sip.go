@@ -272,7 +272,7 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	// TODO: Could probably add methods on SIPDispatchRuleInfo struct instead.
 	switch rule := info.GetRule().GetRule().(type) {
 	default:
-		return "", "", fmt.Errorf("Unsupported SIP Dispatch Rule: %T", rule)
+		return "", "", fmt.Errorf("Unsupported SIP Dispatch Rule: %T", rule) //nolint:staticcheck // part of public API
 	case *livekit.SIPDispatchRule_DispatchRuleDirect:
 		pin = rule.DispatchRuleDirect.GetPin()
 		room = rule.DispatchRuleDirect.GetRoomName()
@@ -874,7 +874,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 			// This should never happen in practice, because matchSIPDispatchRule should remove rules with the wrong pin.
 			return nil, twirp.NewError(twirp.PermissionDenied, "Incorrect PIN for SIP room")
 		}
-	} else {
+	} else { //nolint:staticcheck // empty branch provides context for comment
 		// Pin was sent, but room doesn't require one. Assume user accidentally pressed phone button.
 	}
 	switch rule := rule.GetRule().GetRule().(type) {
@@ -898,19 +898,19 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 			room += "_" + guid.New("")
 		}
 	}
-	attrs[livekit.AttrSIPDispatchRuleID] = rule.SipDispatchRuleId
+	attrs[livekit.AttrSIPDispatchRuleID] = rule.GetSipDispatchRuleId()
 	resp := &rpc.EvaluateSIPDispatchRulesResponse{
 		ProjectId:             projectID,
 		SipTrunkId:            trunkID,
-		SipDispatchRuleId:     rule.SipDispatchRuleId,
+		SipDispatchRuleId:     rule.GetSipDispatchRuleId(),
 		Result:                rpc.SIPDispatchResult_ACCEPT,
 		RoomName:              room,
 		ParticipantIdentity:   fromID,
 		ParticipantName:       fromName,
-		ParticipantMetadata:   rule.Metadata,
+		ParticipantMetadata:   rule.GetMetadata(),
 		ParticipantAttributes: attrs,
-		RoomPreset:            rule.RoomPreset,
-		RoomConfig:            rule.RoomConfig,
+		RoomPreset:            rule.GetRoomPreset(),
+		RoomConfig:            rule.GetRoomConfig(),
 		MediaEncryption:       enc,
 	}
 	krispEnabled := false

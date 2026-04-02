@@ -40,16 +40,15 @@ jobs:
           go-version-file: "go.mod"
 
       - name: Set up gotestfmt
-        run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.4.1
+        run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@9eae5abc81d6d08f73268741ef4a8b97f29b60d8 # v2.4.1
 
       - name: Download Go modules
         run: go mod download
 
-      - name: Static Check
-        uses: amarpal/staticcheck-action@ab84170fc40f72c7045b5d669e149e06c2b96439
+      - name: Lint
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
         with:
-          checks: '["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022", "-SA1019"]'
-          install-go: false
+          version: v2.11.4
 
       - name: Test
         run: |
