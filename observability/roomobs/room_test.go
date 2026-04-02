@@ -17,7 +17,7 @@ func TestCountryCode(t *testing.T) {
 }
 
 func TestTag(t *testing.T) {
-	tag := NewTag("region", "us-west")
+	tag := ToTag("region", "us-west")
 
 	key, value := tag.KeyValue()
 	require.Equal(t, "region", key)
