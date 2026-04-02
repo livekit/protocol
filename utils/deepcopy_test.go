@@ -28,7 +28,7 @@ type copyTestType struct {
 	Vmap           map[int]int
 	Vpointer       *copyTestType
 	VunsafePointer unsafe.Pointer
-	vunexported    bool //nolint:U1000 // tests deep copy of unexported fields
+	vunexported    bool //nolint:unused // tests deep copy of unexported fields
 }
 
 func TestDeepCopy(t *testing.T) {
