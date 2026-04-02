@@ -45,10 +45,10 @@ jobs:
       - name: Download Go modules
         run: go mod download
 
-      - name: Static Check
-        run: |
-          go install honnef.co/go/tools/cmd/staticcheck@ff63afafc529279f454e02f1d060210bd4263951 # v0.7.0
-          staticcheck -checks 'all,-ST1000,-ST1003,-ST1020,-ST1021,-ST1022,-SA1019' ./...
+      - name: Lint
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
+        with:
+          version: v2.11.4
 
       - name: Test
         run: |
