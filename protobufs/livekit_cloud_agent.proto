@@ -249,6 +249,7 @@ message PrivateLinkStatus {
       PRIVATE_LINK_STATUS_PENDING_APPROVAL = 2;
       PRIVATE_LINK_STATUS_HEALTHY = 3;
       PRIVATE_LINK_STATUS_UNHEALTHY = 4;
+      PRIVATE_LINK_STATUS_APPROVED = 5;
   }
 
   Status status = 1;
