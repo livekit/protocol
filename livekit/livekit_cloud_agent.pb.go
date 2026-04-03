@@ -146,6 +146,7 @@ const (
 	PrivateLinkStatus_PRIVATE_LINK_STATUS_PENDING_APPROVAL PrivateLinkStatus_Status = 2
 	PrivateLinkStatus_PRIVATE_LINK_STATUS_HEALTHY          PrivateLinkStatus_Status = 3
 	PrivateLinkStatus_PRIVATE_LINK_STATUS_UNHEALTHY        PrivateLinkStatus_Status = 4
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_APPROVED         PrivateLinkStatus_Status = 5
 )
 
 // Enum value maps for PrivateLinkStatus_Status.
@@ -156,6 +157,7 @@ var (
 		2: "PRIVATE_LINK_STATUS_PENDING_APPROVAL",
 		3: "PRIVATE_LINK_STATUS_HEALTHY",
 		4: "PRIVATE_LINK_STATUS_UNHEALTHY",
+		5: "PRIVATE_LINK_STATUS_APPROVED",
 	}
 	PrivateLinkStatus_Status_value = map[string]int32{
 		"PRIVATE_LINK_STATUS_UNKNOWN":          0,
@@ -163,6 +165,7 @@ var (
 		"PRIVATE_LINK_STATUS_PENDING_APPROVAL": 2,
 		"PRIVATE_LINK_STATUS_HEALTHY":          3,
 		"PRIVATE_LINK_STATUS_UNHEALTHY":        4,
+		"PRIVATE_LINK_STATUS_APPROVED":         5,
 	}
 )
 
@@ -2918,18 +2921,19 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigB\x02\x18\x01H\x00R\x03aws\x1a+\n" +
 	"\tAWSConfig\x12\x1e\n" +
 	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
-	"\x06config\"\xe1\x02\n" +
+	"\x06config\"\x83\x03\n" +
 	"\x11PrivateLinkStatus\x129\n" +
 	"\x06status\x18\x01 \x01(\x0e2!.livekit.PrivateLinkStatus.StatusR\x06status\x129\n" +
 	"\n" +
 	"updated_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x16\n" +
-	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xbd\x01\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xdf\x01\n" +
 	"\x06Status\x12\x1f\n" +
 	"\x1bPRIVATE_LINK_STATUS_UNKNOWN\x10\x00\x12$\n" +
 	" PRIVATE_LINK_STATUS_PROVISIONING\x10\x01\x12(\n" +
 	"$PRIVATE_LINK_STATUS_PENDING_APPROVAL\x10\x02\x12\x1f\n" +
 	"\x1bPRIVATE_LINK_STATUS_HEALTHY\x10\x03\x12!\n" +
-	"\x1dPRIVATE_LINK_STATUS_UNHEALTHY\x10\x04\"\xfe\x01\n" +
+	"\x1dPRIVATE_LINK_STATUS_UNHEALTHY\x10\x04\x12 \n" +
+	"\x1cPRIVATE_LINK_STATUS_APPROVED\x10\x05\"\xfe\x01\n" +
 	"\x18CreatePrivateLinkRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x12\n" +
