@@ -245,13 +245,15 @@ message PrivateLink {
 message PrivateLinkStatus {
   enum Status {
       PRIVATE_LINK_STATUS_UNKNOWN = 0;
-      PRIVATE_LINK_STATUS_PENDING = 1;
-      PRIVATE_LINK_STATUS_AVAILABLE = 2;
-      PRIVATE_LINK_STATUS_ERROR = 3;
+      PRIVATE_LINK_STATUS_PROVISIONING = 1;
+      PRIVATE_LINK_STATUS_PENDING_APPROVAL = 2;
+      PRIVATE_LINK_STATUS_HEALTHY = 3;
+      PRIVATE_LINK_STATUS_UNHEALTHY = 4;
   }
 
   Status status = 1;
   google.protobuf.Timestamp updated_at = 2;
+  string reason = 3;
 }
 
 message CreatePrivateLinkRequest {
