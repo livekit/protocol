@@ -10,6 +10,8 @@ const (
 	EgressRequestTypeTrack          EgressRequestType = "track"
 	EgressRequestTypeParticipant    EgressRequestType = "participant"
 	EgressRequestTypeWeb            EgressRequestType = "web"
+	EgressRequestTypeEgress         EgressRequestType = "egress"
+	EgressRequestTypeReplay         EgressRequestType = "replay"
 )
 
 type EgressStatus string
@@ -31,6 +33,8 @@ const (
 	SessionSourceTypeUndefined SessionSourceType = ""
 	SessionSourceTypeSdk       SessionSourceType = "sdk"
 	SessionSourceTypeWeb       SessionSourceType = "web"
+	SessionSourceTypeTemplate  SessionSourceType = "template"
+	SessionSourceTypeMedia     SessionSourceType = "media"
 )
 
 type SessionStatus string

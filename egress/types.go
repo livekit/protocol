@@ -73,22 +73,14 @@ type UploadRequest interface {
 	GetAliOSS() *livekit.AliOSSUpload
 }
 
-func GetTypes(request interface{}) (string, string) {
-	if r, ok := request.(EgressRequest); ok {
-		var egressType string
-		if r.GetMedia() != nil {
-			egressType = EgressTypeMedia
-		} else if r.GetTemplate() != nil {
-			egressType = EgressTypeTemplate
-		} else if r.GetWeb() != nil {
-			egressType = EgressTypeWeb
-		} else {
-			egressType = Unknown
-		}
-		return egressType, GetOutputTypeV2(r.GetOutputs())
-	}
-
+func GetTypes(request any) (string, string) {
 	switch req := request.(type) {
+	// case *livekit.EgressInfo_Egress:
+	// 	return getSourceTypeV2(req.Egress), GetOutputTypeV2(req.Egress.Outputs)
+
+	case *livekit.EgressInfo_Replay:
+		return getSourceTypeV2(req.Replay), GetOutputTypeV2(req.Replay.Outputs)
+	
 	case *livekit.EgressInfo_RoomComposite:
 		return EgressTypeRoomComposite, GetOutputType(req.RoomComposite)
 
@@ -106,6 +98,17 @@ func GetTypes(request interface{}) (string, string) {
 	}
 
 	return Unknown, Unknown
+}
+
+func getSourceTypeV2(req EgressRequest) string {
+	if req.GetMedia() != nil {
+		return EgressTypeMedia
+	} else if req.GetTemplate() != nil {
+		return EgressTypeTemplate
+	} else if req.GetWeb() != nil {
+		return EgressTypeWeb
+	}
+	return Unknown
 }
 
 func GetOutputTypeV2(outputs []*livekit.Output) string {
