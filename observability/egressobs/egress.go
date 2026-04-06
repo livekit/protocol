@@ -11,6 +11,19 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
+type EgressStatus = string
+
+const (
+	EgressStatusUndefined    EgressStatus = ""
+	EgressStatusStarting     EgressStatus = "starting"
+	EgressStatusActive       EgressStatus = "active"
+	EgressStatusEnding       EgressStatus = "ending"
+	EgressStatusComplete     EgressStatus = "complete"
+	EgressStatusFailed       EgressStatus = "failed"
+	EgressStatusAborted      EgressStatus = "aborted"
+	EgressStatusLimitReached EgressStatus = "limit_reached"
+)
+
 type EgressResults struct {
 	FileResults    []*livekit.FileInfo
 	StreamResults  []*livekit.StreamInfo
@@ -70,24 +83,24 @@ func GetRequestType(info *livekit.EgressInfo) EgressRequestType {
 	}
 }
 
-func GetStatus(info *livekit.EgressInfo) SessionStatus {
+func GetStatus(info *livekit.EgressInfo) EgressStatus {
 	switch info.Status {
 	case livekit.EgressStatus_EGRESS_STARTING:
-		return SessionStatusStarting
+		return EgressStatusStarting
 	case livekit.EgressStatus_EGRESS_ACTIVE:
-		return SessionStatusActive
+		return EgressStatusActive
 	case livekit.EgressStatus_EGRESS_ENDING:
-		return SessionStatusEnding
+		return EgressStatusEnding
 	case livekit.EgressStatus_EGRESS_COMPLETE:
-		return SessionStatusComplete
+		return EgressStatusComplete
 	case livekit.EgressStatus_EGRESS_ABORTED:
-		return SessionStatusAborted
+		return EgressStatusAborted
 	case livekit.EgressStatus_EGRESS_LIMIT_REACHED:
-		return SessionStatusLimitReached
+		return EgressStatusLimitReached
 	case livekit.EgressStatus_EGRESS_FAILED:
-		return SessionStatusFailed
+		return EgressStatusFailed
 	default:
-		return SessionStatusUndefined
+		return EgressStatusUndefined
 	}
 }
 
