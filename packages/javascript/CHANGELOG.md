@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.45.2
+
+### Patch Changes
+
+- add room name and start time to agent MetricsRecordingHeader - [#1474](https://github.com/livekit/protocol/pull/1474) ([@paulwe](https://github.com/paulwe))
+
+- feat(rpc/room): add `ListParticipants` and `GetParticipant` - [#1459](https://github.com/livekit/protocol/pull/1459) ([@sohbit](https://github.com/sohbit))
+
+- add `Frame ID` packet trailer feature - [#1453](https://github.com/livekit/protocol/pull/1453) ([@chenosaurus](https://github.com/chenosaurus))
+
 ## 1.45.1
 
 ### Patch Changes
