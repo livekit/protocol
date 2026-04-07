@@ -235,7 +235,8 @@ message PrivateLink {
   string name = 2;
   string region = 4;
   uint32 port = 5;
-  string endpoint = 6;
+  string endpoint = 6; // Customer-provided endpoint identifier.
+  string lk_endpoint = 7; // LiveKit-provided DNS endpoint for agent code.
 
   oneof config {
     AWSConfig aws = 3 [deprecated=true];
