@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_SDGQPEG = true
+const Version_IG6KP18 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -37,7 +37,7 @@ type EgressTx interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
 	ReportUpdateTime(v time.Time)
-	ReportStatus(v EgressStatus)
+	ReportStatus(v string)
 	ReportDetails(v string)
 	ReportError(v string)
 	ReportErrorCode(v int32)
@@ -63,7 +63,7 @@ type SessionTx interface {
 	ReportSourceType(v SessionSourceType)
 	ReportRegion(v string)
 	ReportRoomID(v string)
-	ReportStatus(v SessionStatus)
+	ReportStatus(v string)
 	ReportDetails(v string)
 	ReportError(v string)
 	ReportErrorCode(v int32)
