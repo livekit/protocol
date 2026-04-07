@@ -236,7 +236,7 @@ message PrivateLink {
   string region = 4;
   uint32 port = 5;
   string endpoint = 6;
-  string lk_endpoint = 7;
+  string connection_endpoint = 7;
 
   oneof config {
     AWSConfig aws = 3 [deprecated=true];
