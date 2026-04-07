@@ -47,6 +47,7 @@ message AgentSecret {
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp updated_at = 4;
     AgentSecretKind kind = 5;
+    repeated string environments = 6;
 }
 
 message CreateAgentRequest {
@@ -56,6 +57,7 @@ message CreateAgentRequest {
     int32 max_replicas           = 4 [deprecated=true];
     string cpu_req               = 5 [deprecated=true];
     repeated string regions      = 6;
+    string environment           = 7;
 }
 
 message CreateAgentResponse {
@@ -67,6 +69,7 @@ message CreateAgentResponse {
     string tag = 6;
     repeated string server_regions = 7;
     PresignedPostRequest presigned_post_request = 8;
+    string environment = 9;
 }
 
 message PresignedPostRequest {
@@ -89,6 +92,7 @@ message AgentDeployment {
     string cpu_limit = 12;
     string server_region = 13;
     repeated AgentEvent events = 14;
+    string environment = 15;
 }
 
 message AgentInfo {
@@ -160,6 +164,7 @@ message DeployAgentRequest {
     int32 replicas               = 4 [deprecated=true];
     int32 max_replicas           = 5 [deprecated=true];
     string cpu_req               = 6 [deprecated=true];
+    string environment           = 7;
 }
 
 message DeployAgentResponse {
