@@ -2097,12 +2097,13 @@ func (*ClientSettingsRequest) Descriptor() ([]byte, []int) {
 }
 
 type PrivateLink struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PrivateLinkId string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Region        string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
-	Port          uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
-	Endpoint      string                 `protobuf:"bytes,6,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	PrivateLinkId      string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
+	Name               string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Region             string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
+	Port               uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
+	Endpoint           string                 `protobuf:"bytes,6,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	ConnectionEndpoint string                 `protobuf:"bytes,7,opt,name=connection_endpoint,json=connectionEndpoint,proto3" json:"connection_endpoint,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*PrivateLink_Aws
@@ -2172,6 +2173,13 @@ func (x *PrivateLink) GetPort() uint32 {
 func (x *PrivateLink) GetEndpoint() string {
 	if x != nil {
 		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetConnectionEndpoint() string {
+	if x != nil {
+		return x.ConnectionEndpoint
 	}
 	return ""
 }
@@ -2911,13 +2919,14 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\x93\x02\n" +
+	"\x15ClientSettingsRequest\"\xc4\x02\n" +
 	"\vPrivateLink\x129\n" +
 	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
 	"\x04port\x18\x05 \x01(\rR\x04port\x12\x1a\n" +
-	"\bendpoint\x18\x06 \x01(\tR\bendpoint\x126\n" +
+	"\bendpoint\x18\x06 \x01(\tR\bendpoint\x12/\n" +
+	"\x13connection_endpoint\x18\a \x01(\tR\x12connectionEndpoint\x126\n" +
 	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigB\x02\x18\x01H\x00R\x03aws\x1a+\n" +
 	"\tAWSConfig\x12\x1e\n" +
 	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
