@@ -57,7 +57,6 @@ message CreateAgentRequest {
     int32 max_replicas           = 4 [deprecated=true];
     string cpu_req               = 5 [deprecated=true];
     repeated string regions      = 6;
-    string environment           = 7;
 }
 
 message CreateAgentResponse {
@@ -69,7 +68,6 @@ message CreateAgentResponse {
     string tag = 6;
     repeated string server_regions = 7;
     PresignedPostRequest presigned_post_request = 8;
-    string environment = 9;
 }
 
 message PresignedPostRequest {
@@ -174,6 +172,7 @@ message DeployAgentResponse {
     string presigned_url = 4;
     string tag = 5;
     PresignedPostRequest presigned_post_request = 6;
+    string environment = 7;
 }
 
 message UpdateAgentSecretsRequest {
