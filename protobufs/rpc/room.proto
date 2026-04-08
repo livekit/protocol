@@ -53,4 +53,24 @@ service Room {
       };
     };
   };
+  rpc ListParticipants(livekit.ListParticipantsRequest) returns (livekit.ListParticipantsResponse) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "room"
+        names: ["room"]
+        typed: true
+      };
+    };
+  };
+  rpc GetParticipant(livekit.RoomParticipantIdentity) returns (livekit.ParticipantInfo) {
+    option (psrpc.options) = {
+      topics: true
+      topic_params: {
+        group: "room"
+        names: ["room"]
+        typed: true
+      };
+    };
+  };
 }

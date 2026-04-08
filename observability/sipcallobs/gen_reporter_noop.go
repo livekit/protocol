@@ -1,6 +1,6 @@
 // Code generated; DO NOT EDIT.
 
-package telephonycallobs
+package sipcallobs
 
 import (
 	"time"
@@ -61,11 +61,14 @@ func (r *noopCallReporter) ReportEndTime(v time.Time)                           
 func (r *noopCallReporter) ReportDuration(v uint64)                                     {}
 func (r *noopCallReporter) ReportDurationMinutes(v uint16)                              {}
 func (r *noopCallReporter) ReportTrunkID(v string)                                      {}
+func (r *noopCallReporter) ReportTrunkType(v CallTrunkType)                             {}
 func (r *noopCallReporter) ReportDispatchID(v string)                                   {}
 func (r *noopCallReporter) ReportToNumber(v string)                                     {}
 func (r *noopCallReporter) ReportToHost(v string)                                       {}
 func (r *noopCallReporter) ReportFromNumber(v string)                                   {}
 func (r *noopCallReporter) ReportFromHost(v string)                                     {}
+func (r *noopCallReporter) ReportNumberType(v CallNumberType)                           {}
+func (r *noopCallReporter) ReportCountryCode(v string)                                  {}
 func (r *noopCallReporter) ReportDirection(v CallDirection)                             {}
 func (r *noopCallReporter) ReportTransport(v CallTransport)                             {}
 func (r *noopCallReporter) ReportProviderCallID(v string)                               {}

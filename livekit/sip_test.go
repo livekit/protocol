@@ -380,6 +380,16 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 			expectedURI: "<sip:+15105550100@sip.telnyx.com>",
 		},
 		{
+			name: "valid sips URI without brackets",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sips:+15105550100@sip.telnyx.com",
+			},
+			expectError: false,
+			expectedURI: "<sips:+15105550100@sip.telnyx.com>",
+		},
+		{
 			name: "valid tel URI without brackets",
 			req: &TransferSIPParticipantRequest{
 				RoomName:            "room1",
@@ -398,6 +408,16 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 			},
 			expectError: false,
 			expectedURI: "<sip:+15105550100@sip.telnyx.com>",
+		},
+		{
+			name: "valid sips URI with brackets",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "<sips:+15105550100@sip.telnyx.com>",
+			},
+			expectError: false,
+			expectedURI: "<sips:+15105550100@sip.telnyx.com>",
 		},
 		{
 			name: "valid tel URI with brackets",

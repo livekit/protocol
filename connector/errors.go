@@ -23,10 +23,11 @@ var (
 	ErrMissingWhatsAppApiKey               = psrpc.NewErrorf(psrpc.InvalidArgument, "whatsapp api key is required")
 	ErrWhatsAppCallNotFound                = psrpc.NewErrorf(psrpc.NotFound, "whatsapp call not found")
 	ErrWhatsAppCloudApiVersionNotSupported = psrpc.NewErrorf(psrpc.InvalidArgument, "whatsapp cloud api version not supported")
-	ErrMissingCallIDInInitiateResponse     = psrpc.NewErrorf(psrpc.MalformedResponse, "missing call id in initiate response")
-	ErrWhatsAppAPICallFailedReasonUnknown  = psrpc.NewErrorf(psrpc.Unknown, "whatsapp api call failed with unknown reason")
+	ErrMissingCallIDInInitiateResponse     = psrpc.NewErrorf(psrpc.UpstreamClientError, "missing call id in initiate response")
+	ErrWhatsAppAPICallFailedReasonUnknown  = psrpc.NewErrorf(psrpc.UpstreamClientError, "whatsapp api call failed with unknown reason")
 
 	ErrAcceptTimeout = psrpc.NewErrorf(psrpc.DeadlineExceeded, "timeout waiting for call to be accepted")
+	ErrRoomNotReady  = psrpc.NewErrorf(psrpc.DeadlineExceeded, "timeout waiting for participants to publish in the livekit room before accepting the call")
 
 	ErrIncorrectSDPType = psrpc.NewErrorf(psrpc.InvalidArgument, "incorrect sdp type")
 	ErrSDPAnswerTimeout = psrpc.NewErrorf(psrpc.DeadlineExceeded, "timeout waiting for SDP answer")

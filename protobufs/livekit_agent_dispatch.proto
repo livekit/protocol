@@ -22,6 +22,11 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_agent.proto";
 import "logger/options.proto";
 
+enum JobRestartPolicy {
+  JRP_ON_FAILURE = 0; // restart when the job fails (default)
+  JRP_NEVER = 1;      // never restart
+}
+
 service AgentDispatchService {
   rpc CreateDispatch(CreateAgentDispatchRequest) returns (AgentDispatch);
   rpc DeleteDispatch(DeleteAgentDispatchRequest) returns (AgentDispatch);
@@ -32,20 +37,22 @@ message CreateAgentDispatchRequest {
   string agent_name = 1;
   string room = 2;
   string metadata = 3 [(logger.redact) = true];
+  JobRestartPolicy restart_policy = 4; // cloud only
 }
 
 message RoomAgentDispatch {
   string agent_name = 1;
   string metadata = 2 [(logger.redact) = true];
+  JobRestartPolicy restart_policy = 3; // cloud only
 }
 
 message DeleteAgentDispatchRequest {
-  string dispatch_id = 1;
+  string dispatch_id = 1 [(logger.name) = "dispatchID"];
   string room = 2;
 }
 
 message ListAgentDispatchRequest {
-  string dispatch_id = 1; // if set, only the dispatch whose id is given will be returned
+  string dispatch_id = 1 [(logger.name) = "dispatchID"]; // if set, only the dispatch whose id is given will be returned
   string room = 2;        // name of the room to list agents for. Must be set.
 }
 
@@ -59,6 +66,7 @@ message AgentDispatch {
   string room = 3;
   string metadata = 4 [(logger.redact) = true];
   AgentDispatchState state = 5;
+  JobRestartPolicy restart_policy = 6; // cloud only
 }
 
 message AgentDispatchState {

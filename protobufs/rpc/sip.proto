@@ -26,7 +26,6 @@ import "logger/options.proto";
 
 service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
-    option (psrpc.options).affinity_func = true;
     option (psrpc.options).topics = true;
   };
   rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (google.protobuf.Empty) {
@@ -42,10 +41,10 @@ service SIPInternal {
 
 message InternalCreateSIPParticipantRequest {
   // Used in Cloud only
-  string project_id = 18;
+  string project_id = 18 [(logger.name) = "projectID"];
 
-  string sip_call_id = 13;
-  string sip_trunk_id = 19;
+  string sip_call_id = 13 [(logger.name) = "sipCallID"];
+  string sip_trunk_id = 19 [(logger.name) = "sipTrunkID"];
   // IP or hostname that SIP INVITE is sent too
   string address = 2;
   // Hostname for the 'From' SIP address in INVITE
@@ -148,13 +147,13 @@ message InternalCreateSIPParticipantRequest {
 }
 
 message InternalCreateSIPParticipantResponse {
-  string participant_id = 1;
+  string participant_id = 1 [(logger.name) = "participantID"];
   string participant_identity = 2;
-  string sip_call_id = 3;
+  string sip_call_id = 3 [(logger.name) = "sipCallID"];
 }
 
 message InternalTransferSIPParticipantRequest {
-  string sip_call_id = 1;
+  string sip_call_id = 1 [(logger.name) = "sipCallID"];
   string transfer_to = 2;
 
   // Optionally play dialtone to the SIP participant as an audible indicator of being transferred

@@ -172,6 +172,8 @@ message AddTrackRequest {
   BackupCodecPolicy backup_codec_policy = 16;
 
   repeated AudioTrackFeature audio_features = 17;
+
+  repeated PacketTrailerFeature packet_trailer_features = 18;
 }
 
 message PublishDataTrackRequest {
@@ -271,7 +273,7 @@ message SessionDescription {
   string type = 1;  // "answer" | "offer" | "pranswer" | "rollback"
   string sdp = 2;
   uint32 id = 3;
-  map<string, string> mid_to_track_id = 4;
+  map<string, string> mid_to_track_id = 4 [(logger.name) = "midToTrackID"];
 }
 
 message ParticipantUpdate {
@@ -366,7 +368,7 @@ message UpdateParticipantMetadata {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  uint32 request_id = 4;
+  uint32 request_id = 4 [(logger.name) = "requestID"];
 }
 
 message ICEServer {
@@ -561,7 +563,7 @@ message RequestResponse {
     DUPLICATE_NAME = 10;
   }
 
-  uint32 request_id = 1;
+  uint32 request_id = 1 [(logger.name) = "requestID"];
   Reason reason = 2;
   string message = 3;
   oneof request {

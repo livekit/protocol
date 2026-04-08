@@ -8,6 +8,7 @@ import "google/protobuf/empty.proto";
 import "options.proto";
 import "livekit_internal.proto";
 import "livekit_rtc.proto";
+import "logger/options.proto";
 
 service WHIP {
   rpc Create(WHIPCreateRequest) returns (WHIPCreateResponse) {
@@ -36,9 +37,9 @@ message WHIPCreateRequest {
 
 message WHIPCreateResponse {
   string answer_sdp = 1;
-  string participant_id = 2;
+  string participant_id = 2 [(logger.name) = "participantID"];
   repeated livekit.ICEServer ice_servers = 3;
-  string ice_session_id = 4;
+  string ice_session_id = 4 [(logger.name) = "iceSessionID"];
 }
 
 // ----------------------------------
@@ -81,26 +82,26 @@ service WHIPParticipant {
 message WHIPParticipantICETrickleRequest {
   string room = 1;
   string participant_identity = 2;
-  string participant_id = 3;
-  string ice_session_id = 4;
+  string participant_id = 3 [(logger.name) = "participantID"];
+  string ice_session_id = 4 [(logger.name) = "iceSessionID"];
   string sdp_fragment = 5;
 }
 
 message WHIPParticipantICERestartRequest {
   string room = 1;
   string participant_identity = 2;
-  string participant_id = 3;
+  string participant_id = 3 [(logger.name) = "participantID"];
   string sdp_fragment = 4;
 }
 
 message WHIPParticipantICERestartResponse {
-  string ice_session_id = 1;
+  string ice_session_id = 1 [(logger.name) = "iceSessionID"];
   string sdp_fragment = 2;
 }
 
 message WHIPParticipantDeleteSessionRequest {
   string room = 1;
   string participant_identity = 2;
-  string participant_id = 3;
+  string participant_id = 3 [(logger.name) = "participantID"];
   bool from_sweeper = 4;
 }

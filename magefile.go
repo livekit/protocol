@@ -43,6 +43,7 @@ func Bootstrap() error {
 // regenerate protobuf
 func Proto() error {
 	twirpProtoFiles := []string{
+		"cloud_replay.proto",
 		"livekit_agent_dispatch.proto",
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
@@ -53,10 +54,12 @@ func Proto() error {
 		"livekit_connector.proto",
 		"livekit_connector_whatsapp.proto",
 		"livekit_connector_twilio.proto",
+		"livekit_agent_simulation.proto",
 	}
 
 	agentProtoFiles := []string{
 		"agent/livekit_agent_session.proto",
+		"agent/livekit_agent_dev.proto",
 	}
 
 	protoFiles := []string{
@@ -87,8 +90,6 @@ func Proto() error {
 		"rpc/signal.proto",
 		"rpc/whip_signal.proto",
 		"rpc/sip.proto",
-		"rpc/connector.proto",
-		"rpc/common.proto",
 	}
 
 	fmt.Println("generating protobuf")
@@ -125,23 +126,6 @@ func Proto() error {
 		"-I=./protobufs",
 	}, twirpProtoFiles...)
 	cmd := exec.Command(protoc, args...)
-	connectStd(cmd)
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	fmt.Println("generating replay twirp protobuf")
-	replayTarget := "replay"
-	args = append([]string{
-		"--go_out", replayTarget,
-		"--twirp_out", replayTarget,
-		"--go_opt=paths=source_relative",
-		"--twirp_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
-		"--plugin=twirp=" + twirpPath,
-		"-I=./protobufs",
-	}, "cloud_replay.proto")
-	cmd = exec.Command(protoc, args...)
 	connectStd(cmd)
 	if err := cmd.Run(); err != nil {
 		return err

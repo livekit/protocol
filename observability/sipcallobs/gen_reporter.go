@@ -1,12 +1,12 @@
 // Code generated; DO NOT EDIT.
 
-package telephonycallobs
+package sipcallobs
 
 import (
 	"time"
 )
 
-const Version_OCEQQJO = true
+const Version_LCQV1D8 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -35,11 +35,14 @@ type CallTx interface {
 	ReportDuration(v uint64)
 	ReportDurationMinutes(v uint16)
 	ReportTrunkID(v string)
+	ReportTrunkType(v CallTrunkType)
 	ReportDispatchID(v string)
 	ReportToNumber(v string)
 	ReportToHost(v string)
 	ReportFromNumber(v string)
 	ReportFromHost(v string)
+	ReportNumberType(v CallNumberType)
+	ReportCountryCode(v string)
 	ReportDirection(v CallDirection)
 	ReportTransport(v CallTransport)
 	ReportProviderCallID(v string)

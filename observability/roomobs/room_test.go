@@ -15,3 +15,12 @@ func TestTrackLayer(t *testing.T) {
 func TestCountryCode(t *testing.T) {
 	require.Equal(t, "us", UnpackCountryCode(PackCountryCode("us")))
 }
+
+func TestTag(t *testing.T) {
+	tag := ToTag("region", "us-west")
+
+	key, value := tag.KeyValue()
+	require.Equal(t, "region", key)
+	require.Equal(t, "us-west", value)
+	require.Equal(t, Tag("region\x1eus-west"), tag)
+}

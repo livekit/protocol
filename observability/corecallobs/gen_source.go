@@ -1,5 +1,5 @@
 // Code generated; DO NOT EDIT.
-package telephonycallobs
+package corecallobs
 
 type CallDirection string
 
@@ -10,13 +10,13 @@ const (
 	CallDirectionOutbound  CallDirection = "outbound"
 )
 
-type CallTransport string
+type CallCallType string
 
 const (
-	CallTransportUndefined CallTransport = ""
-	CallTransportUDP       CallTransport = "udp"
-	CallTransportTCP       CallTransport = "tcp"
-	CallTransportTLS       CallTransport = "tls"
+	CallCallTypeUndefined CallCallType = ""
+	CallCallTypeSIP       CallCallType = "sip"
+	CallCallTypeTwilio    CallCallType = "twilio"
+	CallCallTypeWhatsapp  CallCallType = "whatsapp"
 )
 
 type CallStatus string
@@ -28,24 +28,9 @@ const (
 	CallStatusParticipantJoined CallStatus = "participant_joined"
 	CallStatusDisconnected      CallStatus = "disconnected"
 	CallStatusError             CallStatus = "error"
-)
-
-type CallTransferStatus string
-
-const (
-	CallTransferStatusUndefined CallTransferStatus = ""
-	CallTransferStatusOngoing   CallTransferStatus = "ongoing"
-	CallTransferStatusSuccess   CallTransferStatus = "success"
-	CallTransferStatusFailed    CallTransferStatus = "failed"
-)
-
-type CallMediaEncryptionSettings string
-
-const (
-	CallMediaEncryptionSettingsUndefined CallMediaEncryptionSettings = ""
-	CallMediaEncryptionSettingsDisable   CallMediaEncryptionSettings = "disable"
-	CallMediaEncryptionSettingsAllow     CallMediaEncryptionSettings = "allow"
-	CallMediaEncryptionSettingsRequire   CallMediaEncryptionSettings = "require"
+	CallStatusPending           CallStatus = "pending"
+	CallStatusSuccess           CallStatus = "success"
+	CallStatusFailed            CallStatus = "failed"
 )
 
 type Rollup string

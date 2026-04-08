@@ -21,12 +21,13 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "agent/livekit_agent_session.proto";
+import "logger/options.proto";
 
 // Request to send a text message to an agent.
 message TextMessageRequest {
   string text = 1;
-  string message_id = 2;
-  string session_id = 3;
+  string message_id = 2 [(logger.name) = "messageID"];
+  string session_id = 3 [(logger.name) = "sessionID"];
   string agent_name = 4;
   string metadata = 5;
   optional AgentSessionState session_state = 6;
@@ -34,8 +35,8 @@ message TextMessageRequest {
 
 // Response to a text message request, multiple responses may be sent for a single request until it is complete.
 message TextMessageResponse {
-  string message_id = 1;
-  string session_id = 2;
+  string message_id = 1 [(logger.name) = "messageID"];
+  string session_id = 2 [(logger.name) = "sessionID"];
   oneof event {
     ChatMessage message = 3;
     FunctionCall function_call = 4;

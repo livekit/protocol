@@ -8,6 +8,32 @@ import (
 	"github.com/livekit/protocol/livekit"
 )
 
+const tagDelimiter = "\x1e"
+
+type Tag string
+
+func ToTag(key, value string) Tag {
+	return Tag(key + tagDelimiter + value)
+}
+
+func (t Tag) KeyValue() (string, string) {
+	key, value, ok := strings.Cut(string(t), tagDelimiter)
+	if !ok {
+		return string(t), ""
+	}
+	return key, value
+}
+
+type Tags []Tag
+
+func ToTags(m map[string]string) Tags {
+	t := make(Tags, 0, len(m))
+	for k, v := range m {
+		t = append(t, ToTag(k, v))
+	}
+	return t
+}
+
 func PackTrackLayer(x, y uint32) uint32 {
 	return uint32(x<<16 | y)
 }

@@ -25,6 +25,7 @@ import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
 import "livekit_room.proto";
+import "logger/options.proto";
 
 enum StreamType {
   UPSTREAM = 0;
@@ -66,10 +67,10 @@ message AnalyticsStat {
   StreamType kind = 2;
   google.protobuf.Timestamp time_stamp = 3;
   string node = 4;
-  string room_id = 5;
+  string room_id = 5 [(logger.name) = "roomID"];
   string room_name = 6;
-  string participant_id = 7;
-  string track_id = 8;
+  string participant_id = 7 [(logger.name) = "participantID"];
+  string track_id = 8 [(logger.name) = "trackID"];
   float score = 9; // average score
   repeated AnalyticsStream streams = 10;
   string mime = 11;
@@ -152,17 +153,17 @@ message AnalyticsEvent {
   string id = 25;
   AnalyticsEventType type = 1;
   google.protobuf.Timestamp timestamp = 2;
-  string room_id = 3;
+  string room_id = 3 [(logger.name) = "roomID"];
   Room room = 4;
-  string participant_id = 5;
+  string participant_id = 5 [(logger.name) = "participantID"];
   ParticipantInfo participant = 6;
-  string track_id = 7;
+  string track_id = 7 [(logger.name) = "trackID"];
   TrackInfo track = 8;
   string analytics_key = 10;
   ClientInfo client_info = 11;
   AnalyticsClientMeta client_meta = 12;
-  string egress_id = 13;
-  string ingress_id = 19;
+  string egress_id = 13 [(logger.name) = "egressID"];
+  string ingress_id = 19 [(logger.name) = "ingressID"];
   VideoQuality max_subscribed_video_quality = 14;
   ParticipantInfo publisher = 15;
   string mime = 16;
@@ -171,13 +172,13 @@ message AnalyticsEvent {
   string error = 20;
   RTPStats rtp_stats = 21;
   int32 video_layer = 22;
-  string node_id = 24;
-  string sip_call_id = 26;
+  string node_id = 24 [(logger.name) = "nodeID"];
+  string sip_call_id = 26 [(logger.name) = "sipCallID"];
   SIPCallInfo sip_call = 27;
-  string sip_trunk_id = 28;
+  string sip_trunk_id = 28 [(logger.name) = "sipTrunkID"];
   SIPInboundTrunkInfo sip_inbound_trunk = 29;
   SIPOutboundTrunkInfo sip_outbound_trunk = 30;
-  string sip_dispatch_rule_id = 31;
+  string sip_dispatch_rule_id = 31 [(logger.name) = "sipDispatchRuleID"];
   SIPDispatchRuleInfo sip_dispatch_rule = 32;
   SIPTransferInfo sip_transfer = 36;
   ReportInfo report = 33;
@@ -202,7 +203,7 @@ message AnalyticsRoomParticipant {
 message AnalyticsRoom {
   string id = 1;
   string name = 2;
-  string project_id = 5;
+  string project_id = 5 [(logger.name) = "projectID"];
   google.protobuf.Timestamp created_at = 3;
   repeated AnalyticsRoomParticipant participants = 4;
 
@@ -210,7 +211,7 @@ message AnalyticsRoom {
 }
 
 message AnalyticsNodeRooms {
-  string node_id = 1;
+  string node_id = 1 [(logger.name) = "nodeID"];
   uint64 sequence_number = 2;
   google.protobuf.Timestamp timestamp = 3;
   repeated AnalyticsRoom rooms = 4;
@@ -234,12 +235,12 @@ message FeatureUsageInfo {
     AIC_AUDIO_ENHANCEMENT = 2;
   }
   Feature feature = 1;
-  string project_id = 2;
+  string project_id = 2 [(logger.name) = "projectID"];
   string room_name = 3;
-  string room_id = 4;
+  string room_id = 4 [(logger.name) = "roomID"];
   string participant_identity = 5;
-  string participant_id = 6;
-  string track_id = 7;
+  string participant_id = 6 [(logger.name) = "participantID"];
+  string track_id = 7 [(logger.name) = "trackID"];
   // time ranges during which the feature was enabled.
   // for e. g., noise cancellation may not be applied when a media track is paused/muted,
   // this allows reporting only periods during which a feature is active.
@@ -265,34 +266,34 @@ message APICallRequest {
 }
 
 message APICallInfo {
-  string project_id = 1;
+  string project_id = 1 [(logger.name) = "projectID"];
   APICallRequest request = 2;
   string service = 3;
   string method = 4;
-  string node_id = 5;
+  string node_id = 5 [(logger.name) = "nodeID"];
   int32 status = 6;
   string twirp_error_code = 7;
   string twirp_error_message = 8;
   string room_name = 9;
-  string room_id = 10;
+  string room_id = 10 [(logger.name) = "roomID"];
   string participant_identity = 11;
-  string participant_id = 12;
-  string track_id = 13;
+  string participant_id = 12 [(logger.name) = "participantID"];
+  string track_id = 13 [(logger.name) = "trackID"];
   google.protobuf.Timestamp started_at = 14;
   int64 duration_ns = 15;
 }
 
 message WebhookInfo {
-  string event_id = 1;
+  string event_id = 1 [(logger.name) = "eventID"];
   string event = 2;
-  string project_id = 3;
+  string project_id = 3 [(logger.name) = "projectID"];
   string room_name = 4;
-  string room_id = 5;
+  string room_id = 5 [(logger.name) = "roomID"];
   string participant_identity = 6;
-  string participant_id = 7;
-  string track_id = 8;
-  string egress_id = 9;
-  string ingress_id = 10;
+  string participant_id = 7 [(logger.name) = "participantID"];
+  string track_id = 8 [(logger.name) = "trackID"];
+  string egress_id = 9 [(logger.name) = "egressID"];
+  string ingress_id = 10 [(logger.name) = "ingressID"];
   google.protobuf.Timestamp created_at = 11;
   google.protobuf.Timestamp queued_at = 12;
   int64 queue_duration_ns = 13;

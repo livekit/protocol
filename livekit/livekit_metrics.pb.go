@@ -7,6 +7,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -460,6 +461,8 @@ type MetricsRecordingHeader struct {
 	Duration      uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"` // milliseconds
 	StartTime     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	RoomTags      map[string]string      `protobuf:"bytes,5,rep,name=room_tags,json=roomTags,proto3" json:"room_tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	RoomName      string                 `protobuf:"bytes,6,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	RoomStartTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=room_start_time,json=roomStartTime,proto3" json:"room_start_time,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -522,11 +525,25 @@ func (x *MetricsRecordingHeader) GetRoomTags() map[string]string {
 	return nil
 }
 
+func (x *MetricsRecordingHeader) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *MetricsRecordingHeader) GetRoomStartTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.RoomStartTime
+	}
+	return nil
+}
+
 var File_livekit_metrics_proto protoreflect.FileDescriptor
 
 const file_livekit_metrics_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_metrics.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\"\x85\x02\n" +
+	"\x15livekit_metrics.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x85\x02\n" +
 	"\fMetricsBatch\x12!\n" +
 	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x12M\n" +
 	"\x14normalized_timestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x13normalizedTimestamp\x12\x19\n" +
@@ -555,13 +572,16 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\x91\x02\n" +
-	"\x16MetricsRecordingHeader\x12\x17\n" +
-	"\aroom_id\x18\x01 \x01(\tR\x06roomId\x12\x1a\n" +
+	"\x19_normalized_end_timestamp\"\xfe\x02\n" +
+	"\x16MetricsRecordingHeader\x12#\n" +
+	"\aroom_id\x18\x01 \x01(\tB\n" +
+	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
 	"\n" +
 	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12J\n" +
-	"\troom_tags\x18\x05 \x03(\v2-.livekit.MetricsRecordingHeader.RoomTagsEntryR\broomTags\x1a;\n" +
+	"\troom_tags\x18\x05 \x03(\v2-.livekit.MetricsRecordingHeader.RoomTagsEntryR\broomTags\x12\x1b\n" +
+	"\troom_name\x18\x06 \x01(\tR\broomName\x12B\n" +
+	"\x0froom_start_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\rroomStartTime\x1a;\n" +
 	"\rRoomTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*\x81\a\n" +
@@ -614,20 +634,21 @@ var file_livekit_metrics_proto_goTypes = []any{
 	(*timestamppb.Timestamp)(nil),  // 7: google.protobuf.Timestamp
 }
 var file_livekit_metrics_proto_depIdxs = []int32{
-	7, // 0: livekit.MetricsBatch.normalized_timestamp:type_name -> google.protobuf.Timestamp
-	2, // 1: livekit.MetricsBatch.time_series:type_name -> livekit.TimeSeriesMetric
-	4, // 2: livekit.MetricsBatch.events:type_name -> livekit.EventMetric
-	3, // 3: livekit.TimeSeriesMetric.samples:type_name -> livekit.MetricSample
-	7, // 4: livekit.MetricSample.normalized_timestamp:type_name -> google.protobuf.Timestamp
-	7, // 5: livekit.EventMetric.normalized_start_timestamp:type_name -> google.protobuf.Timestamp
-	7, // 6: livekit.EventMetric.normalized_end_timestamp:type_name -> google.protobuf.Timestamp
-	7, // 7: livekit.MetricsRecordingHeader.start_time:type_name -> google.protobuf.Timestamp
-	6, // 8: livekit.MetricsRecordingHeader.room_tags:type_name -> livekit.MetricsRecordingHeader.RoomTagsEntry
-	9, // [9:9] is the sub-list for method output_type
-	9, // [9:9] is the sub-list for method input_type
-	9, // [9:9] is the sub-list for extension type_name
-	9, // [9:9] is the sub-list for extension extendee
-	0, // [0:9] is the sub-list for field type_name
+	7,  // 0: livekit.MetricsBatch.normalized_timestamp:type_name -> google.protobuf.Timestamp
+	2,  // 1: livekit.MetricsBatch.time_series:type_name -> livekit.TimeSeriesMetric
+	4,  // 2: livekit.MetricsBatch.events:type_name -> livekit.EventMetric
+	3,  // 3: livekit.TimeSeriesMetric.samples:type_name -> livekit.MetricSample
+	7,  // 4: livekit.MetricSample.normalized_timestamp:type_name -> google.protobuf.Timestamp
+	7,  // 5: livekit.EventMetric.normalized_start_timestamp:type_name -> google.protobuf.Timestamp
+	7,  // 6: livekit.EventMetric.normalized_end_timestamp:type_name -> google.protobuf.Timestamp
+	7,  // 7: livekit.MetricsRecordingHeader.start_time:type_name -> google.protobuf.Timestamp
+	6,  // 8: livekit.MetricsRecordingHeader.room_tags:type_name -> livekit.MetricsRecordingHeader.RoomTagsEntry
+	7,  // 9: livekit.MetricsRecordingHeader.room_start_time:type_name -> google.protobuf.Timestamp
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_livekit_metrics_proto_init() }

@@ -21,6 +21,7 @@
 package livekit
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -140,25 +141,31 @@ func (AgentEventType) EnumDescriptor() ([]byte, []int) {
 type PrivateLinkStatus_Status int32
 
 const (
-	PrivateLinkStatus_PRIVATE_LINK_STATUS_UNKNOWN   PrivateLinkStatus_Status = 0
-	PrivateLinkStatus_PRIVATE_LINK_STATUS_PENDING   PrivateLinkStatus_Status = 1
-	PrivateLinkStatus_PRIVATE_LINK_STATUS_AVAILABLE PrivateLinkStatus_Status = 2
-	PrivateLinkStatus_PRIVATE_LINK_STATUS_ERROR     PrivateLinkStatus_Status = 3
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_UNKNOWN          PrivateLinkStatus_Status = 0
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_PROVISIONING     PrivateLinkStatus_Status = 1
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_PENDING_APPROVAL PrivateLinkStatus_Status = 2
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_HEALTHY          PrivateLinkStatus_Status = 3
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_UNHEALTHY        PrivateLinkStatus_Status = 4
+	PrivateLinkStatus_PRIVATE_LINK_STATUS_APPROVED         PrivateLinkStatus_Status = 5
 )
 
 // Enum value maps for PrivateLinkStatus_Status.
 var (
 	PrivateLinkStatus_Status_name = map[int32]string{
 		0: "PRIVATE_LINK_STATUS_UNKNOWN",
-		1: "PRIVATE_LINK_STATUS_PENDING",
-		2: "PRIVATE_LINK_STATUS_AVAILABLE",
-		3: "PRIVATE_LINK_STATUS_ERROR",
+		1: "PRIVATE_LINK_STATUS_PROVISIONING",
+		2: "PRIVATE_LINK_STATUS_PENDING_APPROVAL",
+		3: "PRIVATE_LINK_STATUS_HEALTHY",
+		4: "PRIVATE_LINK_STATUS_UNHEALTHY",
+		5: "PRIVATE_LINK_STATUS_APPROVED",
 	}
 	PrivateLinkStatus_Status_value = map[string]int32{
-		"PRIVATE_LINK_STATUS_UNKNOWN":   0,
-		"PRIVATE_LINK_STATUS_PENDING":   1,
-		"PRIVATE_LINK_STATUS_AVAILABLE": 2,
-		"PRIVATE_LINK_STATUS_ERROR":     3,
+		"PRIVATE_LINK_STATUS_UNKNOWN":          0,
+		"PRIVATE_LINK_STATUS_PROVISIONING":     1,
+		"PRIVATE_LINK_STATUS_PENDING_APPROVAL": 2,
+		"PRIVATE_LINK_STATUS_HEALTHY":          3,
+		"PRIVATE_LINK_STATUS_UNHEALTHY":        4,
+		"PRIVATE_LINK_STATUS_APPROVED":         5,
 	}
 )
 
@@ -2090,11 +2097,13 @@ func (*ClientSettingsRequest) Descriptor() ([]byte, []int) {
 }
 
 type PrivateLink struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PrivateLinkId string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Region        string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
-	Port          uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	PrivateLinkId      string                 `protobuf:"bytes,1,opt,name=private_link_id,json=privateLinkId,proto3" json:"private_link_id,omitempty"`
+	Name               string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Region             string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
+	Port               uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
+	Endpoint           string                 `protobuf:"bytes,6,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	ConnectionEndpoint string                 `protobuf:"bytes,7,opt,name=connection_endpoint,json=connectionEndpoint,proto3" json:"connection_endpoint,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*PrivateLink_Aws
@@ -2161,6 +2170,20 @@ func (x *PrivateLink) GetPort() uint32 {
 	return 0
 }
 
+func (x *PrivateLink) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetConnectionEndpoint() string {
+	if x != nil {
+		return x.ConnectionEndpoint
+	}
+	return ""
+}
+
 func (x *PrivateLink) GetConfig() isPrivateLink_Config {
 	if x != nil {
 		return x.Config
@@ -2168,6 +2191,7 @@ func (x *PrivateLink) GetConfig() isPrivateLink_Config {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *PrivateLink) GetAws() *PrivateLink_AWSConfig {
 	if x != nil {
 		if x, ok := x.Config.(*PrivateLink_Aws); ok {
@@ -2182,6 +2206,7 @@ type isPrivateLink_Config interface {
 }
 
 type PrivateLink_Aws struct {
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Aws *PrivateLink_AWSConfig `protobuf:"bytes,3,opt,name=aws,proto3,oneof"`
 }
 
@@ -2191,6 +2216,7 @@ type PrivateLinkStatus struct {
 	state         protoimpl.MessageState   `protogen:"open.v1"`
 	Status        PrivateLinkStatus_Status `protobuf:"varint,1,opt,name=status,proto3,enum=livekit.PrivateLinkStatus_Status" json:"status,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp   `protobuf:"bytes,2,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Reason        string                   `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2239,11 +2265,19 @@ func (x *PrivateLinkStatus) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *PrivateLinkStatus) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
 type CreatePrivateLinkRequest struct {
-	state  protoimpl.MessageState `protogen:"open.v1"`
-	Name   string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Region string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Port   uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Name     string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Region   string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Port     uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	Endpoint string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*CreatePrivateLinkRequest_Aws
@@ -2303,6 +2337,13 @@ func (x *CreatePrivateLinkRequest) GetPort() uint32 {
 	return 0
 }
 
+func (x *CreatePrivateLinkRequest) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
 func (x *CreatePrivateLinkRequest) GetConfig() isCreatePrivateLinkRequest_Config {
 	if x != nil {
 		return x.Config
@@ -2310,6 +2351,7 @@ func (x *CreatePrivateLinkRequest) GetConfig() isCreatePrivateLinkRequest_Config
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreatePrivateLinkRequest) GetAws() *CreatePrivateLinkRequest_AWSCreateConfig {
 	if x != nil {
 		if x, ok := x.Config.(*CreatePrivateLinkRequest_Aws); ok {
@@ -2324,6 +2366,7 @@ type isCreatePrivateLinkRequest_Config interface {
 }
 
 type CreatePrivateLinkRequest_Aws struct {
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Aws *CreatePrivateLinkRequest_AWSCreateConfig `protobuf:"bytes,2,opt,name=aws,proto3,oneof"`
 }
 
@@ -2622,8 +2665,9 @@ func (x *GetPrivateLinkStatusResponse) GetValue() *PrivateLinkStatus {
 }
 
 type PrivateLink_AWSConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Endpoint      string `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"` // Use the generic "endpoint" instead
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2658,6 +2702,7 @@ func (*PrivateLink_AWSConfig) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{29, 0}
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *PrivateLink_AWSConfig) GetEndpoint() string {
 	if x != nil {
 		return x.Endpoint
@@ -2666,8 +2711,9 @@ func (x *PrivateLink_AWSConfig) GetEndpoint() string {
 }
 
 type CreatePrivateLinkRequest_AWSCreateConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Endpoint      string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
+	Endpoint      string `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2702,6 +2748,7 @@ func (*CreatePrivateLinkRequest_AWSCreateConfig) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{31, 0}
 }
 
+// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreatePrivateLinkRequest_AWSCreateConfig) GetEndpoint() string {
 	if x != nil {
 		return x.Endpoint
@@ -2713,7 +2760,7 @@ var File_livekit_cloud_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x19livekit_cloud_agent.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\"\x89\x01\n" +
+	"\x19livekit_cloud_agent.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x89\x01\n" +
 	"\n" +
 	"AgentEvent\x12+\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x17.livekit.AgentEventTypeR\x04type\x12\x14\n" +
@@ -2734,9 +2781,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
-	"\aregions\x18\x06 \x03(\tR\aregions\"\xb4\x02\n" +
-	"\x13CreateAgentResponse\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\aregions\x18\x06 \x03(\tR\aregions\"\xc1\x02\n" +
+	"\x13CreateAgentResponse\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x18\n" +
@@ -2750,10 +2797,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xae\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xbb\x03\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
-	"\x06region\x18\x01 \x01(\tR\x06region\x12\x19\n" +
-	"\bagent_id\x18\x02 \x01(\tR\aagentId\x12\x16\n" +
+	"\x06region\x18\x01 \x01(\tR\x06region\x12&\n" +
+	"\bagent_id\x18\x02 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1a\n" +
 	"\breplicas\x18\x04 \x01(\x05R\breplicas\x12!\n" +
 	"\fmin_replicas\x18\x05 \x01(\x05R\vminReplicas\x12!\n" +
@@ -2766,20 +2813,20 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\tmem_limit\x18\v \x01(\tR\bmemLimit\x12\x1b\n" +
 	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\x12#\n" +
 	"\rserver_region\x18\r \x01(\tR\fserverRegion\x12+\n" +
-	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\"\x93\x02\n" +
-	"\tAgentInfo\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\"\xa0\x02\n" +
+	"\tAgentInfo\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\x12E\n" +
 	"\x11agent_deployments\x18\x04 \x03(\v2\x18.livekit.AgentDeploymentR\x10agentDeployments\x12.\n" +
 	"\asecrets\x18\x05 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12;\n" +
 	"\vdeployed_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"deployedAt\"M\n" +
+	"deployedAt\"Z\n" +
 	"\x11ListAgentsRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
-	"\bagent_id\x18\x02 \x01(\tR\aagentId\"@\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12&\n" +
+	"\bagent_id\x18\x02 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
 	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\x8a\x03\n" +
 	"\fAgentVersion\x12\x18\n" +
@@ -2797,15 +2844,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bdraining\x18\b \x01(\bR\bdraining\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
-	"\x18ListAgentVersionsRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
+	"\x18ListAgentVersionsRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"N\n" +
 	"\x19ListAgentVersionsResponse\x121\n" +
-	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x80\x02\n" +
-	"\x12UpdateAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12!\n" +
+	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x8d\x02\n" +
+	"\x12UpdateAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12!\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12\x1e\n" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
@@ -2815,29 +2862,29 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\asecrets\x18\a \x03(\v2\x14.livekit.AgentSecretR\asecrets\"I\n" +
 	"\x13UpdateAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"0\n" +
-	"\x13RestartAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\"J\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"=\n" +
+	"\x13RestartAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\"J\n" +
 	"\x14RestartAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xe6\x01\n" +
-	"\x12DeployAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12!\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xf3\x01\n" +
+	"\x12DeployAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12!\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
-	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\xf0\x01\n" +
+	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\"\xfd\x01\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12\x19\n" +
-	"\bagent_id\x18\x03 \x01(\tR\aagentId\x12#\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
+	"\bagent_id\x18\x03 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12#\n" +
 	"\rpresigned_url\x18\x04 \x01(\tR\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
-	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xbb\x01\n" +
-	"\x19UpdateAgentSecretsRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\xc8\x01\n" +
+	"\x19UpdateAgentSecretsRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1c\n" +
 	"\toverwrite\x18\x03 \x01(\bR\toverwrite\x12.\n" +
@@ -2845,24 +2892,24 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06remove\x18\x05 \x03(\tR\x06remove\"P\n" +
 	"\x1aUpdateAgentSecretsResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"j\n" +
-	"\x14RollbackAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"w\n" +
+	"\x14RollbackAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\"K\n" +
 	"\x15RollbackAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"N\n" +
-	"\x12DeleteAgentRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"[\n" +
+	"\x12DeleteAgentRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"I\n" +
 	"\x13DeleteAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"S\n" +
-	"\x17ListAgentSecretsRequest\x12\x19\n" +
-	"\bagent_id\x18\x01 \x01(\tR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"`\n" +
+	"\x17ListAgentSecretsRequest\x12&\n" +
+	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"J\n" +
 	"\x18ListAgentSecretsResponse\x12.\n" +
@@ -2872,43 +2919,49 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\xdc\x01\n" +
-	"\vPrivateLink\x12&\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\x12\x12\n" +
+	"\x15ClientSettingsRequest\"\xc4\x02\n" +
+	"\vPrivateLink\x129\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
-	"\x04port\x18\x05 \x01(\rR\x04port\x122\n" +
-	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigH\x00R\x03aws\x1a'\n" +
-	"\tAWSConfig\x12\x1a\n" +
-	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
-	"\x06config\"\x98\x02\n" +
+	"\x04port\x18\x05 \x01(\rR\x04port\x12\x1a\n" +
+	"\bendpoint\x18\x06 \x01(\tR\bendpoint\x12/\n" +
+	"\x13connection_endpoint\x18\a \x01(\tR\x12connectionEndpoint\x126\n" +
+	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigB\x02\x18\x01H\x00R\x03aws\x1a+\n" +
+	"\tAWSConfig\x12\x1e\n" +
+	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
+	"\x06config\"\x83\x03\n" +
 	"\x11PrivateLinkStatus\x129\n" +
 	"\x06status\x18\x01 \x01(\x0e2!.livekit.PrivateLinkStatus.StatusR\x06status\x129\n" +
 	"\n" +
-	"updated_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x8c\x01\n" +
+	"updated_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x16\n" +
+	"\x06reason\x18\x03 \x01(\tR\x06reason\"\xdf\x01\n" +
 	"\x06Status\x12\x1f\n" +
-	"\x1bPRIVATE_LINK_STATUS_UNKNOWN\x10\x00\x12\x1f\n" +
-	"\x1bPRIVATE_LINK_STATUS_PENDING\x10\x01\x12!\n" +
-	"\x1dPRIVATE_LINK_STATUS_AVAILABLE\x10\x02\x12\x1d\n" +
-	"\x19PRIVATE_LINK_STATUS_ERROR\x10\x03\"\xda\x01\n" +
+	"\x1bPRIVATE_LINK_STATUS_UNKNOWN\x10\x00\x12$\n" +
+	" PRIVATE_LINK_STATUS_PROVISIONING\x10\x01\x12(\n" +
+	"$PRIVATE_LINK_STATUS_PENDING_APPROVAL\x10\x02\x12\x1f\n" +
+	"\x1bPRIVATE_LINK_STATUS_HEALTHY\x10\x03\x12!\n" +
+	"\x1dPRIVATE_LINK_STATUS_UNHEALTHY\x10\x04\x12 \n" +
+	"\x1cPRIVATE_LINK_STATUS_APPROVED\x10\x05\"\xfe\x01\n" +
 	"\x18CreatePrivateLinkRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x12\n" +
-	"\x04port\x18\x04 \x01(\rR\x04port\x12E\n" +
-	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigH\x00R\x03aws\x1a-\n" +
-	"\x0fAWSCreateConfig\x12\x1a\n" +
-	"\bendpoint\x18\x01 \x01(\tR\bendpointB\b\n" +
+	"\x04port\x18\x04 \x01(\rR\x04port\x12\x1a\n" +
+	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12I\n" +
+	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigB\x02\x18\x01H\x00R\x03aws\x1a1\n" +
+	"\x0fAWSCreateConfig\x12\x1e\n" +
+	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
 	"\x06config\"T\n" +
 	"\x19CreatePrivateLinkResponse\x127\n" +
-	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"C\n" +
-	"\x19DestroyPrivateLinkRequest\x12&\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\"\x1c\n" +
+	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"V\n" +
+	"\x19DestroyPrivateLinkRequest\x129\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\"\x1c\n" +
 	"\x1aDestroyPrivateLinkResponse\"\x19\n" +
 	"\x17ListPrivateLinksRequest\"F\n" +
 	"\x18ListPrivateLinksResponse\x12*\n" +
-	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"E\n" +
-	"\x1bGetPrivateLinkStatusRequest\x12&\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tR\rprivateLinkId\"P\n" +
+	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"X\n" +
+	"\x1bGetPrivateLinkStatusRequest\x129\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\"P\n" +
 	"\x1cGetPrivateLinkStatusResponse\x120\n" +
 	"\x05value\x18\x01 \x01(\v2\x1a.livekit.PrivateLinkStatusR\x05value*o\n" +
 	"\x0fAgentSecretKind\x12\x1d\n" +

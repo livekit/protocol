@@ -10,27 +10,18 @@ const (
 	EgressRequestTypeTrack          EgressRequestType = "track"
 	EgressRequestTypeParticipant    EgressRequestType = "participant"
 	EgressRequestTypeWeb            EgressRequestType = "web"
+	EgressRequestTypeEgress         EgressRequestType = "egress"
+	EgressRequestTypeReplay         EgressRequestType = "replay"
 )
 
-type EgressSourceType string
+type SessionSourceType string
 
 const (
-	EgressSourceTypeUndefined EgressSourceType = ""
-	EgressSourceTypeSdk       EgressSourceType = "sdk"
-	EgressSourceTypeWeb       EgressSourceType = "web"
-)
-
-type EgressStatus string
-
-const (
-	EgressStatusUndefined    EgressStatus = ""
-	EgressStatusStarting     EgressStatus = "starting"
-	EgressStatusActive       EgressStatus = "active"
-	EgressStatusEnding       EgressStatus = "ending"
-	EgressStatusComplete     EgressStatus = "complete"
-	EgressStatusFailed       EgressStatus = "failed"
-	EgressStatusAborted      EgressStatus = "aborted"
-	EgressStatusLimitReached EgressStatus = "limit_reached"
+	SessionSourceTypeUndefined SessionSourceType = ""
+	SessionSourceTypeSdk       SessionSourceType = "sdk"
+	SessionSourceTypeWeb       SessionSourceType = "web"
+	SessionSourceTypeTemplate  SessionSourceType = "template"
+	SessionSourceTypeMedia     SessionSourceType = "media"
 )
 
 type Rollup string
@@ -42,4 +33,6 @@ const (
 	RollupEndTimeIndex   Rollup = "end_time_index"
 	RollupStartTimeIndex Rollup = "start_time_index"
 	RollupRoomNameIndex  Rollup = "room_name_index"
+	RollupEgressEgress   Rollup = "egress_egress"
+	RollupSessionIndex   Rollup = "session_index"
 )

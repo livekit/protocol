@@ -325,10 +325,23 @@ func validateAttributesToHeaders(attributesToHeaders map[string]string) error {
 
 // validateHeaderToAttributes Makes sure the keys of the given map correspond to valid SIP header names
 func validateHeaderToAttributes(headerToAttributes map[string]string) error {
-	for headerName, _ := range headerToAttributes {
+	for headerName := range headerToAttributes {
 		if err := ValidateHeaderName(headerName, false); err != nil {
 			return fmt.Errorf("invalid header name: %w", err)
 		}
+	}
+	return nil
+}
+
+// validateHostnameFormat ensures value is a hostname or IP, not a SIP URI or containing transport parameter.
+// Returns nil if value is empty (for optional fields).
+// fieldName is used to construct error messages, e.g. "from_host" or "trunk hostname".
+func validateHostnameFormat(value, fieldName string) error {
+	if strings.Contains(value, "transport=") {
+		return errors.New(fieldName + " should not contain transport parameter")
+	}
+	if strings.ContainsAny(value, "@;") || strings.HasPrefix(value, "sip:") || strings.HasPrefix(value, "sips:") {
+		return errors.New(fieldName + " should be a hostname or IP, not SIP URI")
 	}
 	return nil
 }
@@ -511,10 +524,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	}
 	if p.Address == "" {
 		return errors.New("no outbound address specified")
-	} else if strings.Contains(p.Address, "transport=") {
-		return errors.New("trunk transport should be set as a field, not a URI parameter")
-	} else if strings.ContainsAny(p.Address, "@;") || strings.HasPrefix(p.Address, "sip:") || strings.HasPrefix(p.Address, "sips:") {
-		return errors.New("trunk address should be a hostname or IP, not SIP URI")
+	}
+	if err := validateHostnameFormat(p.Address, "trunk address"); err != nil {
+		return err
+	}
+	if err := validateHostnameFormat(p.FromHost, "from_host"); err != nil {
+		return err
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
@@ -531,10 +546,12 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 func (p *SIPOutboundConfig) Validate() error {
 	if p.Hostname == "" {
 		return errors.New("no outbound hostname specified")
-	} else if strings.Contains(p.Hostname, "transport=") {
-		return errors.New("trunk transport should be set as a field, not a URI parameter")
-	} else if strings.ContainsAny(p.Hostname, "@;") || strings.HasPrefix(p.Hostname, "sip:") || strings.HasPrefix(p.Hostname, "sips:") {
-		return errors.New("trunk hostname should be a domain name or IP, not SIP URI")
+	}
+	if err := validateHostnameFormat(p.Hostname, "trunk hostname"); err != nil {
+		return err
+	}
+	if err := validateHostnameFormat(p.FromHost, "from_host"); err != nil {
+		return err
 	}
 	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
 		return err
@@ -565,6 +582,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
+	applyUpdate(&info.FromHost, p.FromHost)
 	return info.Validate()
 }
 
@@ -826,13 +844,13 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 		innerURI = p.TransferTo
 	}
 
-	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "tel:") {
+	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "sips:") && !strings.HasPrefix(innerURI, "tel:") {
 		// In theory the Refer-To header can receive the full name-addr.
 		// This can make this check inaccurate, but we want to limit to just SIP and TEL URIs.
-		return errors.New("transfer_to must be a valid SIP or TEL URI (sip: or tel:)")
+		return errors.New("transfer_to must be a valid SIP(s) or TEL URI (sip:, sips: or tel:)")
 	}
 
-	if strings.HasPrefix(innerURI, "sip:") {
+	if strings.HasPrefix(innerURI, "sip:") || strings.HasPrefix(innerURI, "sips:") {
 		// addr-spec = sip:...
 		// name-addr = [ display-name ] <addr-spec>
 		// Both name-addr and addr-spec are allowed in RFC3515 (section-2.1).

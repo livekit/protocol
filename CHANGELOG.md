@@ -1,5 +1,23 @@
 # github.com/livekit/protocol
 
+## 1.45.2
+
+## 1.45.1
+
+### Patch Changes
+
+- Dropping use of an affinity function in CreateSIPParticipant - [#1456](https://github.com/livekit/protocol/pull/1456) ([@alexlivekit](https://github.com/alexlivekit))
+
+## 1.45.0
+
+### Minor Changes
+
+- Add PayloadTrailerFeature to TrackInfo and AddTrackRequest - [#1438](https://github.com/livekit/protocol/pull/1438) ([@chenosaurus](https://github.com/chenosaurus))
+
+### Patch Changes
+
+- Added NoRandomness field to individual dispatch rule" - [#1426](https://github.com/livekit/protocol/pull/1426) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.44.1
 
 ### Patch Changes

@@ -1485,10 +1485,10 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"videoCodec\x12\x1d\n" +
 	"\n" +
 	"frame_rate\x18\x02 \x01(\x01R\tframeRate\x12+\n" +
-	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xdd\x05\n" +
-	"\vIngressInfo\x12\x1d\n" +
+	"\x06layers\x18\x03 \x03(\v2\x13.livekit.VideoLayerR\x06layers\"\xec\x05\n" +
+	"\vIngressInfo\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x12\n" +
+	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
 	"\n" +
 	"stream_key\x18\x03 \x01(\tR\tstreamKey\x12\x10\n" +
@@ -1509,20 +1509,22 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\aenabled\x18\x10 \x01(\bH\x01R\aenabled\x88\x01\x01B\x15\n" +
 	"\x13_enable_transcodingB\n" +
 	"\n" +
-	"\b_enabled\"\xf6\x03\n" +
+	"\b_enabled\"\x92\x04\n" +
 	"\fIngressState\x124\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x1c.livekit.IngressState.StatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12.\n" +
 	"\x05video\x18\x03 \x01(\v2\x18.livekit.InputVideoStateR\x05video\x12.\n" +
-	"\x05audio\x18\x04 \x01(\v2\x18.livekit.InputAudioStateR\x05audio\x12\x17\n" +
-	"\aroom_id\x18\x05 \x01(\tR\x06roomId\x12\x1d\n" +
+	"\x05audio\x18\x04 \x01(\v2\x18.livekit.InputAudioStateR\x05audio\x12#\n" +
+	"\aroom_id\x18\x05 \x01(\tB\n" +
+	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\a \x01(\x03R\tstartedAt\x12\x19\n" +
 	"\bended_at\x18\b \x01(\x03R\aendedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\n" +
-	" \x01(\x03R\tupdatedAt\x12\x1f\n" +
-	"\vresource_id\x18\t \x01(\tR\n" +
+	" \x01(\x03R\tupdatedAt\x12/\n" +
+	"\vresource_id\x18\t \x01(\tB\x0e\x9a\xec,\n" +
+	"resourceIDR\n" +
 	"resourceId\x12*\n" +
 	"\x06tracks\x18\x06 \x03(\v2\x12.livekit.TrackInfoR\x06tracks\"{\n" +
 	"\x06Status\x12\x15\n" +
@@ -1542,10 +1544,10 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x0faverage_bitrate\x18\x02 \x01(\rR\x0eaverageBitrate\x12\x1a\n" +
 	"\bchannels\x18\x03 \x01(\rR\bchannels\x12\x1f\n" +
 	"\vsample_rate\x18\x04 \x01(\rR\n" +
-	"sampleRate\"\xd2\x04\n" +
-	"\x14UpdateIngressRequest\x12\x1d\n" +
+	"sampleRate\"\xe1\x04\n" +
+	"\x14UpdateIngressRequest\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tR\tingressId\x12\x12\n" +
+	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12/\n" +
@@ -1560,19 +1562,19 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x13_bypass_transcodingB\x15\n" +
 	"\x13_enable_transcodingB\n" +
 	"\n" +
-	"\b_enabled\"\x89\x01\n" +
+	"\b_enabled\"\x98\x01\n" +
 	"\x12ListIngressRequest\x127\n" +
 	"\n" +
 	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1d\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x02 \x01(\tR\tingressId\"\x83\x01\n" +
+	"ingress_id\x18\x02 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\"\x83\x01\n" +
 	"\x13ListIngressResponse\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x12*\n" +
-	"\x05items\x18\x01 \x03(\v2\x14.livekit.IngressInfoR\x05items\"5\n" +
-	"\x14DeleteIngressRequest\x12\x1d\n" +
+	"\x05items\x18\x01 \x03(\v2\x14.livekit.IngressInfoR\x05items\"D\n" +
+	"\x14DeleteIngressRequest\x12,\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tR\tingressId*=\n" +
+	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId*=\n" +
 	"\fIngressInput\x12\x0e\n" +
 	"\n" +
 	"RTMP_INPUT\x10\x00\x12\x0e\n" +
