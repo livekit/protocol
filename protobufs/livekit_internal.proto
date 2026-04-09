@@ -43,7 +43,6 @@ enum NodeState {
   STARTING_UP = 0;
   SERVING = 1;
   SHUTTING_DOWN = 2;
-  SUSPENDED = 3;
 }
 
 message Node {
