@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_VMVUQTG = true
+const Version_Q19KEN0 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -36,6 +36,8 @@ type CallTx interface {
 	ReportDurationMinutes(v uint16)
 	ReportDirection(v CallDirection)
 	ReportCallType(v CallCallType)
+	ReportFrom(v string)
+	ReportTo(v string)
 	ReportRegion(v string)
 	ReportRoomID(v string)
 	ReportRoomName(v string)
