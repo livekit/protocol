@@ -134,21 +134,36 @@ message TdInferenceRequest {
   uint32 sample_rate = 4;
 }
 
-message TdInferenceResponse {
-  float probability = 1;
-  InferenceStats stats = 2;
-}
-
 message BiInferenceRequest {
   bytes audio = 1;
   AudioEncoding encoding = 2;
   uint32 sample_rate = 3;
 }
 
+message InferenceRequest {
+  oneof request {
+    TdInferenceRequest td_inference_request = 1;
+    BiInferenceRequest bi_inference_request = 2;
+  }
+}
+
+
+message TdInferenceResponse {
+  float probability = 1;
+  InferenceStats stats = 2;
+}
+
 message BiInferenceResponse {
   bool is_bargein = 1;
   repeated float probabilities = 2;
   InferenceStats stats = 3;
+}
+
+message InferenceResponse {
+  oneof response {
+    TdInferenceResponse td_inference_response = 1;
+    BiInferenceResponse bi_inference_response = 2;
+  }
 }
 
 // --- Server -> Client ---
@@ -174,6 +189,13 @@ message BiPrediction {
   float prediction_duration = 5;
 }
 
+message Prediction {
+  oneof prediction {
+    TdPrediction td_prediction = 1;
+    BiPrediction bi_prediction = 2;
+  }
+}
+
 message ServerMessage {
   google.protobuf.Timestamp server_created_at = 1;
   optional string request_id = 2;
@@ -184,7 +206,6 @@ message ServerMessage {
     InferenceStopped inference_stopped = 6;
     SessionClosed session_closed = 7;
     Error error = 8;
-    TdPrediction td_prediction = 9;
-    BiPrediction bi_prediction = 10;
+    Prediction prediction = 9;
   }
 }
