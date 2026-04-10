@@ -70,6 +70,17 @@ message CreateAgentResponse {
     PresignedPostRequest presigned_post_request = 8;
 }
 
+message CreateAgentV2Request {
+  repeated AgentSecret secrets   = 1;
+  repeated string regions        = 2;
+}
+
+message CreateAgentV2Response {
+  string agent_id                = 1 [(logger.name) = "agentID"];
+  string status                  = 2;
+  repeated string server_regions = 3;
+}
+
 message PresignedPostRequest {
   string url = 1;
   map<string, string> values = 2;
@@ -169,10 +180,26 @@ message DeployAgentResponse {
     bool success = 1;
     string message = 2;
     string agent_id = 3 [(logger.name) = "agentID"];
-    string presigned_url = 4;
+    string presigned_url = 4 [deprecated=true];
     string tag = 5;
     PresignedPostRequest presigned_post_request = 6;
     string environment = 7;
+}
+
+message DeployAgentV2Request {
+  string agent_id              = 1 [(logger.name) = "agentID"];
+  repeated AgentSecret secrets = 2;
+  string environment           = 3;
+  string region                = 4;
+}
+
+message DeployAgentV2Response {
+  bool success = 1;
+  string message = 2;
+  string agent_id = 3 [(logger.name) = "agentID"];
+  string tag = 4;
+  PresignedPostRequest presigned_req = 5;
+  string environment = 6;
 }
 
 message UpdateAgentSecretsRequest {
@@ -305,12 +332,14 @@ message GetPrivateLinkStatusResponse {
 
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
+    rpc CreateAgentV2(CreateAgentV2Request) returns (CreateAgentV2Response) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}
     rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse) {}
     rpc RestartAgent(RestartAgentRequest) returns (RestartAgentResponse) {}
     rpc DeployAgent(DeployAgentRequest) returns (DeployAgentResponse) {}
+    rpc DeployAgentV2(DeployAgentV2Request) returns (DeployAgentV2Response) {}
     rpc UpdateAgentSecrets(UpdateAgentSecretsRequest) returns (UpdateAgentSecretsResponse) {}
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}
     rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse) {}
