@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.45.3
+
+### Patch Changes
+
+- Add SUSPENDED node state. - [#1486](https://github.com/livekit/protocol/pull/1486) ([@boks1971](https://github.com/boks1971))
+
+- Add get_framework_info request/response support in agent session protocol and regenerate JavaScript protobuf types. - [#1493](https://github.com/livekit/protocol/pull/1493) ([@toubatbrian](https://github.com/toubatbrian))
+
 ## 1.45.2
 
 ### Patch Changes
