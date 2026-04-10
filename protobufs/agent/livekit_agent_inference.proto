@@ -1,0 +1,190 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+syntax = "proto3";
+
+package livekit.agent;
+
+option go_package = "github.com/livekit/protocol/livekit/agent";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+option optimize_for = SPEED;
+
+import "agent/livekit_agent_session.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
+// --- Shared Types ---
+
+enum AudioEncoding {
+  AUDIO_ENCODING_PCM_S16LE = 0;
+  AUDIO_ENCODING_OPUS = 1;
+}
+
+message SessionSettings {
+  uint32 sample_rate = 1;
+  AudioEncoding encoding = 2;
+  oneof type_settings {
+    TdSettings td_settings = 3;
+    BiSettings bi_settings = 4;
+  }
+}
+
+message InferenceStats {
+  google.protobuf.Duration e2e_latency = 1;
+  google.protobuf.Duration preprocessing_duration = 2;
+  google.protobuf.Duration inference_duration = 3;
+}
+
+message Error {
+  string message = 1;
+  // error code follows the HTTP status code convention
+  // 4xx for client errors
+  // 5xx for server errors
+  uint32 code = 2;
+}
+
+message ProcessingStats {
+  google.protobuf.Timestamp earliest_client_created_at = 1;
+  google.protobuf.Timestamp latest_client_created_at = 2;
+  google.protobuf.Duration e2e_latency = 3;
+  InferenceStats inference_stats = 4;
+}
+
+// --- Turn Detection Settings ---
+
+message TdSettings {
+  float detection_interval = 1;
+}
+
+// --- Barge-in Settings ---
+
+message BiSettings {
+  float threshold = 1;
+  uint32 min_frames = 2;
+  float max_audio_duration = 3;
+  float audio_prefix_duration = 4;
+  float detection_interval = 5;
+}
+
+// --- Client -> Server ---
+
+message SessionCreate {
+  SessionSettings settings = 1;
+}
+
+message InputAudio {
+  bytes audio = 1;
+  google.protobuf.Timestamp created_at = 2;
+  uint32 num_samples = 3;
+}
+
+message TdInputChatContext {
+  repeated ChatMessage messages = 1;
+}
+
+message SessionFlush {}
+
+message SessionClose {}
+
+message InferenceStart {
+  string request_id = 1;
+}
+
+message InferenceStop {
+  string request_id = 1;
+}
+
+message BufferStart {}
+
+message BufferStop {}
+
+message ClientMessage {
+  google.protobuf.Timestamp created_at = 1;
+  oneof message {
+    SessionCreate session_create = 2;
+    InputAudio input_audio = 3;
+    SessionFlush session_flush = 4;
+    SessionClose session_close = 5;
+    InferenceStart inference_start = 6;
+    InferenceStop inference_stop = 7;
+    BufferStart buffer_start = 8;
+    BufferStop buffer_stop = 9;
+    // only for turn detection
+    TdInputChatContext td_input_chat_context = 10;
+  }
+}
+
+// --- Server -> Model ---
+
+message TdInferenceRequest {
+  bytes audio = 1;
+  string assistant_text = 2;
+  AudioEncoding encoding = 3;
+  uint32 sample_rate = 4;
+}
+
+message TdInferenceResponse {
+  float probability = 1;
+  InferenceStats stats = 2;
+}
+
+message BiInferenceRequest {
+  bytes audio = 1;
+  AudioEncoding encoding = 2;
+  uint32 sample_rate = 3;
+}
+
+message BiInferenceResponse {
+  bool is_bargein = 1;
+  repeated float probabilities = 2;
+  InferenceStats stats = 3;
+}
+
+// --- Server -> Client ---
+
+message SessionCreated {}
+
+message InferenceStarted {}
+
+message InferenceStopped {}
+
+message SessionClosed {}
+
+message TdPrediction {
+  float probability = 1;
+  ProcessingStats processing_stats = 2;
+}
+
+message BiPrediction {
+  bool is_bargein = 1;
+  repeated float probabilities = 2;
+  ProcessingStats processing_stats = 3;
+  int64 created_at = 4;
+  float prediction_duration = 5;
+}
+
+message ServerMessage {
+  google.protobuf.Timestamp server_created_at = 1;
+  optional string request_id = 2;
+  optional google.protobuf.Timestamp client_created_at = 3;
+  oneof message {
+    SessionCreated session_created = 4;
+    InferenceStarted inference_started = 5;
+    InferenceStopped inference_stopped = 6;
+    SessionClosed session_closed = 7;
+    Error error = 8;
+    TdPrediction td_prediction = 9;
+    BiPrediction bi_prediction = 10;
+  }
+}
