@@ -8,7 +8,7 @@ option ruby_package = "LiveKit::Proto";
 import "google/protobuf/descriptor.proto";
 
 extend google.protobuf.FieldOptions {
-  bool redact = 91841;
-  string redact_format = 91842;
-  string name = 91843;
+  bool redact = 1285;
+  string redact_format = 1286;
+  string name = 1287;
 }
