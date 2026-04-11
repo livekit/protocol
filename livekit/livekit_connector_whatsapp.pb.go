@@ -811,54 +811,54 @@ var File_livekit_connector_whatsapp_proto protoreflect.FileDescriptor
 
 const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\n" +
-	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xf1\a\n" +
-	"\x17DialWhatsAppCallRequest\x12R\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x19\x9a\xec,\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12=\n" +
-	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x15whatsappToPhoneNumber\x12.\n" +
-	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
+	" livekit_connector_whatsapp.proto\x12\alivekit\x1a\x1egoogle/protobuf/duration.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x11livekit_rtc.proto\x1a\x14logger/options.proto\"\xe8\a\n" +
+	"\x17DialWhatsAppCallRequest\x12Q\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x18\xbaP\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12<\n" +
+	"\x18whatsapp_to_phone_number\x18\x02 \x01(\tB\x03\xa8P\x01R\x15whatsappToPhoneNumber\x12-\n" +
+	"\x10whatsapp_api_key\x18\x03 \x01(\tB\x03\xa8P\x01R\x0ewhatsappApiKey\x12;\n" +
 	"\x1awhatsapp_cloud_api_version\x18\f \x01(\tR\x17whatsappCloudApiVersion\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12\x1b\n" +
 	"\troom_name\x18\x05 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\x06 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
-	"\x14participant_identity\x18\a \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\b \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
-	"\x14participant_metadata\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9a\x01\n" +
+	"\x14participant_identity\x18\a \x01(\tR\x13participantIdentity\x12O\n" +
+	"\x10participant_name\x18\b \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\t \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x98\x01\n" +
 	"\x16participant_attributes\x18\n" +
-	" \x03(\v2;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
+	" \x03(\v2;.livekit.DialWhatsAppCallRequest.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
 	"\x13destination_country\x18\v \x01(\tR\x12destinationCountry\x12B\n" +
 	"\x0fringing_timeout\x18\r \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"u\n" +
-	"\x18DialWhatsAppCallResponse\x12<\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12\x1b\n" +
-	"\troom_name\x18\x02 \x01(\tR\broomName\"\xb3\x02\n" +
-	"\x1dDisconnectWhatsAppCallRequest\x12<\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12.\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12d\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"t\n" +
+	"\x18DialWhatsAppCallResponse\x12;\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12\x1b\n" +
+	"\troom_name\x18\x02 \x01(\tR\broomName\"\xb1\x02\n" +
+	"\x1dDisconnectWhatsAppCallRequest\x12;\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12-\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x03\xa8P\x01R\x0ewhatsappApiKey\x12d\n" +
 	"\x11disconnect_reason\x18\x03 \x01(\x0e27.livekit.DisconnectWhatsAppCallRequest.DisconnectReasonR\x10disconnectReason\">\n" +
 	"\x10DisconnectReason\x12\x16\n" +
 	"\x12BUSINESS_INITIATED\x10\x00\x12\x12\n" +
 	"\x0eUSER_INITIATED\x10\x01\" \n" +
-	"\x1eDisconnectWhatsAppCallResponse\"\x89\x01\n" +
-	"\x1aConnectWhatsAppCallRequest\x12<\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12-\n" +
+	"\x1eDisconnectWhatsAppCallResponse\"\x88\x01\n" +
+	"\x1aConnectWhatsAppCallRequest\x12;\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12-\n" +
 	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"\x1d\n" +
-	"\x1bConnectWhatsAppCallResponse\"\xd3\b\n" +
-	"\x19AcceptWhatsAppCallRequest\x12R\n" +
-	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x19\x9a\xec,\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12.\n" +
-	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x04\x88\xec,\x01R\x0ewhatsappApiKey\x12;\n" +
-	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12<\n" +
-	"\x10whatsapp_call_id\x18\x03 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12H\n" +
+	"\x1bConnectWhatsAppCallResponse\"\xca\b\n" +
+	"\x19AcceptWhatsAppCallRequest\x12Q\n" +
+	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x18\xbaP\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12-\n" +
+	"\x10whatsapp_api_key\x18\x02 \x01(\tB\x03\xa8P\x01R\x0ewhatsappApiKey\x12;\n" +
+	"\x1awhatsapp_cloud_api_version\x18\r \x01(\tR\x17whatsappCloudApiVersion\x12;\n" +
+	"\x10whatsapp_call_id\x18\x03 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12H\n" +
 	"!whatsapp_biz_opaque_callback_data\x18\x04 \x01(\tR\x1dwhatsappBizOpaqueCallbackData\x12-\n" +
 	"\x03sdp\x18\x05 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x12\x1b\n" +
 	"\troom_name\x18\x06 \x01(\tR\broomName\x122\n" +
 	"\x06agents\x18\a \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x121\n" +
-	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
+	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12O\n" +
+	"\x10participant_name\x18\t \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12W\n" +
 	"\x14participant_metadata\x18\n" +
-	" \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9c\x01\n" +
-	"\x16participant_attributes\x18\v \x03(\v2=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
+	" \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9a\x01\n" +
+	"\x16participant_attributes\x18\v \x03(\v2=.livekit.AcceptWhatsAppCallRequest.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12/\n" +
 	"\x13destination_country\x18\f \x01(\tR\x12destinationCountry\x12B\n" +
 	"\x0fringing_timeout\x18\x0e \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12.\n" +
 	"\x13wait_until_answered\x18\x0f \x01(\bR\x11waitUntilAnswered\x1aH\n" +
@@ -866,9 +866,9 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"9\n" +
 	"\x1aAcceptWhatsAppCallResponse\x12\x1b\n" +
-	"\troom_name\x18\x01 \x01(\tR\broomName\"\x8a\x01\n" +
-	"\fWhatsAppCall\x12<\n" +
-	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x12\x9a\xec,\x0ewhatsappCallIDR\x0ewhatsappCallId\x12<\n" +
+	"\troom_name\x18\x01 \x01(\tR\broomName\"\x89\x01\n" +
+	"\fWhatsAppCall\x12;\n" +
+	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12<\n" +
 	"\tdirection\x18\x02 \x01(\x0e2\x1e.livekit.WhatsAppCallDirectionR\tdirection*b\n" +
 	"\x15WhatsAppCallDirection\x12#\n" +
 	"\x1fWHATSAPP_CALL_DIRECTION_INBOUND\x10\x00\x12$\n" +

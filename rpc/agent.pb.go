@@ -355,9 +355,9 @@ const file_rpc_agent_proto_rawDesc = "" +
 	"\vagent_names\x18\x04 \x03(\tR\n" +
 	"agentNames\"=\n" +
 	"\x12JobRequestResponse\x12'\n" +
-	"\x05state\x18\x01 \x01(\v2\x11.livekit.JobStateR\x05state\"h\n" +
-	"\x13JobTerminateRequest\x12 \n" +
-	"\x06job_id\x18\x01 \x01(\tB\t\x9a\xec,\x05jobIDR\x05jobId\x12/\n" +
+	"\x05state\x18\x01 \x01(\v2\x11.livekit.JobStateR\x05state\"g\n" +
+	"\x13JobTerminateRequest\x12\x1f\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\x12/\n" +
 	"\x06reason\x18\x02 \x01(\x0e2\x17.rpc.JobTerminateReasonR\x06reason\"?\n" +
 	"\x14JobTerminateResponse\x12'\n" +
 	"\x05state\x18\x01 \x01(\v2\x11.livekit.JobStateR\x05state*D\n" +

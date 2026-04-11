@@ -572,10 +572,9 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\xfe\x02\n" +
-	"\x16MetricsRecordingHeader\x12#\n" +
-	"\aroom_id\x18\x01 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1a\n" +
+	"\x19_normalized_end_timestamp\"\xfd\x02\n" +
+	"\x16MetricsRecordingHeader\x12\"\n" +
+	"\aroom_id\x18\x01 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
 	"\n" +
 	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12J\n" +

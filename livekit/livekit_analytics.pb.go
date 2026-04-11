@@ -2268,19 +2268,19 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\n" +
 	"start_time\x18\x11 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
 	"\bend_time\x18\x12 \x01(\v2\x1a.google.protobuf.TimestampR\aendTime\x12/\n" +
-	"\x14packets_out_of_order\x18\x13 \x01(\rR\x11packetsOutOfOrder\"\xfe\x03\n" +
+	"\x14packets_out_of_order\x18\x13 \x01(\rR\x11packetsOutOfOrder\"\xfb\x03\n" +
 	"\rAnalyticsStat\x12\x0e\n" +
 	"\x02id\x18\x0e \x01(\tR\x02id\x12#\n" +
 	"\ranalytics_key\x18\x01 \x01(\tR\fanalyticsKey\x12'\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x13.livekit.StreamTypeR\x04kind\x129\n" +
 	"\n" +
 	"time_stamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimeStamp\x12\x12\n" +
-	"\x04node\x18\x04 \x01(\tR\x04node\x12#\n" +
-	"\aroom_id\x18\x05 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1b\n" +
-	"\troom_name\x18\x06 \x01(\tR\broomName\x128\n" +
-	"\x0eparticipant_id\x18\a \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12&\n" +
-	"\btrack_id\x18\b \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12\x14\n" +
+	"\x04node\x18\x04 \x01(\tR\x04node\x12\"\n" +
+	"\aroom_id\x18\x05 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1b\n" +
+	"\troom_name\x18\x06 \x01(\tR\broomName\x127\n" +
+	"\x0eparticipant_id\x18\a \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12%\n" +
+	"\btrack_id\x18\b \x01(\tB\n" +
+	"\xbaP\atrackIDR\atrackId\x12\x14\n" +
 	"\x05score\x18\t \x01(\x02R\x05score\x122\n" +
 	"\astreams\x18\n" +
 	" \x03(\v2\x18.livekit.AnalyticsStreamR\astreams\x12\x12\n" +
@@ -2304,27 +2304,27 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\n" +
 	"\b_countryB\n" +
 	"\n" +
-	"\b_isp_asn\"\xa1\r\n" +
+	"\b_isp_asn\"\x98\r\n" +
 	"\x0eAnalyticsEvent\x12\x0e\n" +
 	"\x02id\x18\x19 \x01(\tR\x02id\x12/\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x1b.livekit.AnalyticsEventTypeR\x04type\x128\n" +
-	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12#\n" +
-	"\aroom_id\x18\x03 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x12!\n" +
-	"\x04room\x18\x04 \x01(\v2\r.livekit.RoomR\x04room\x128\n" +
-	"\x0eparticipant_id\x18\x05 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12:\n" +
-	"\vparticipant\x18\x06 \x01(\v2\x18.livekit.ParticipantInfoR\vparticipant\x12&\n" +
-	"\btrack_id\x18\a \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12(\n" +
+	"\ttimestamp\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12\"\n" +
+	"\aroom_id\x18\x03 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12!\n" +
+	"\x04room\x18\x04 \x01(\v2\r.livekit.RoomR\x04room\x127\n" +
+	"\x0eparticipant_id\x18\x05 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12:\n" +
+	"\vparticipant\x18\x06 \x01(\v2\x18.livekit.ParticipantInfoR\vparticipant\x12%\n" +
+	"\btrack_id\x18\a \x01(\tB\n" +
+	"\xbaP\atrackIDR\atrackId\x12(\n" +
 	"\x05track\x18\b \x01(\v2\x12.livekit.TrackInfoR\x05track\x12#\n" +
 	"\ranalytics_key\x18\n" +
 	" \x01(\tR\fanalyticsKey\x124\n" +
 	"\vclient_info\x18\v \x01(\v2\x13.livekit.ClientInfoR\n" +
 	"clientInfo\x12=\n" +
 	"\vclient_meta\x18\f \x01(\v2\x1c.livekit.AnalyticsClientMetaR\n" +
-	"clientMeta\x12)\n" +
-	"\tegress_id\x18\r \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12,\n" +
+	"clientMeta\x12(\n" +
+	"\tegress_id\x18\r \x01(\tB\v\xbaP\begressIDR\begressId\x12+\n" +
 	"\n" +
-	"ingress_id\x18\x13 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12V\n" +
+	"ingress_id\x18\x13 \x01(\tB\f\xbaP\tingressIDR\tingressId\x12V\n" +
 	"\x1cmax_subscribed_video_quality\x18\x0e \x01(\x0e2\x15.livekit.VideoQualityR\x19maxSubscribedVideoQuality\x126\n" +
 	"\tpublisher\x18\x0f \x01(\v2\x18.livekit.ParticipantInfoR\tpublisher\x12\x12\n" +
 	"\x04mime\x18\x10 \x01(\tR\x04mime\x12+\n" +
@@ -2333,17 +2333,16 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x05error\x18\x14 \x01(\tR\x05error\x12.\n" +
 	"\trtp_stats\x18\x15 \x01(\v2\x11.livekit.RTPStatsR\brtpStats\x12\x1f\n" +
 	"\vvideo_layer\x18\x16 \x01(\x05R\n" +
-	"videoLayer\x12#\n" +
-	"\anode_id\x18\x18 \x01(\tB\n" +
-	"\x9a\xec,\x06nodeIDR\x06nodeId\x12-\n" +
-	"\vsip_call_id\x18\x1a \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\x12/\n" +
-	"\bsip_call\x18\x1b \x01(\v2\x14.livekit.SIPCallInfoR\asipCall\x120\n" +
-	"\fsip_trunk_id\x18\x1c \x01(\tB\x0e\x9a\xec,\n" +
+	"videoLayer\x12\"\n" +
+	"\anode_id\x18\x18 \x01(\tB\t\xbaP\x06nodeIDR\x06nodeId\x12,\n" +
+	"\vsip_call_id\x18\x1a \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\x12/\n" +
+	"\bsip_call\x18\x1b \x01(\v2\x14.livekit.SIPCallInfoR\asipCall\x12/\n" +
+	"\fsip_trunk_id\x18\x1c \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
 	"sipTrunkId\x12H\n" +
 	"\x11sip_inbound_trunk\x18\x1d \x01(\v2\x1c.livekit.SIPInboundTrunkInfoR\x0fsipInboundTrunk\x12K\n" +
-	"\x12sip_outbound_trunk\x18\x1e \x01(\v2\x1d.livekit.SIPOutboundTrunkInfoR\x10sipOutboundTrunk\x12F\n" +
-	"\x14sip_dispatch_rule_id\x18\x1f \x01(\tB\x15\x9a\xec,\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x12H\n" +
+	"\x12sip_outbound_trunk\x18\x1e \x01(\v2\x1d.livekit.SIPOutboundTrunkInfoR\x10sipOutboundTrunk\x12E\n" +
+	"\x14sip_dispatch_rule_id\x18\x1f \x01(\tB\x14\xbaP\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x12H\n" +
 	"\x11sip_dispatch_rule\x18  \x01(\v2\x1c.livekit.SIPDispatchRuleInfoR\x0fsipDispatchRule\x12;\n" +
 	"\fsip_transfer\x18$ \x01(\v2\x18.livekit.SIPTransferInfoR\vsipTransfer\x12+\n" +
 	"\x06report\x18! \x01(\v2\x13.livekit.ReportInfoR\x06report\x12/\n" +
@@ -2356,18 +2355,17 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x124\n" +
 	"\x05state\x18\x04 \x01(\x0e2\x1e.livekit.ParticipantInfo.StateR\x05state\x127\n" +
-	"\tjoined_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\"\xe3\x01\n" +
+	"\tjoined_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\"\xe2\x01\n" +
 	"\rAnalyticsRoom\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12,\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12+\n" +
 	"\n" +
-	"project_id\x18\x05 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x129\n" +
+	"project_id\x18\x05 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x129\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12E\n" +
-	"\fparticipants\x18\x04 \x03(\v2!.livekit.AnalyticsRoomParticipantR\fparticipants\"\xca\x01\n" +
-	"\x12AnalyticsNodeRooms\x12#\n" +
-	"\anode_id\x18\x01 \x01(\tB\n" +
-	"\x9a\xec,\x06nodeIDR\x06nodeId\x12'\n" +
+	"\fparticipants\x18\x04 \x03(\v2!.livekit.AnalyticsRoomParticipantR\fparticipants\"\xc9\x01\n" +
+	"\x12AnalyticsNodeRooms\x12\"\n" +
+	"\anode_id\x18\x01 \x01(\tB\t\xbaP\x06nodeIDR\x06nodeId\x12'\n" +
 	"\x0fsequence_number\x18\x02 \x01(\x04R\x0esequenceNumber\x128\n" +
 	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\x12,\n" +
 	"\x05rooms\x18\x04 \x03(\v2\x16.livekit.AnalyticsRoomR\x05rooms\"Y\n" +
@@ -2378,17 +2376,17 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\tTimeRange\x129\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\x85\x05\n" +
+	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\x81\x05\n" +
 	"\x10FeatureUsageInfo\x12;\n" +
-	"\afeature\x18\x01 \x01(\x0e2!.livekit.FeatureUsageInfo.FeatureR\afeature\x12,\n" +
+	"\afeature\x18\x01 \x01(\x0e2!.livekit.FeatureUsageInfo.FeatureR\afeature\x12+\n" +
 	"\n" +
-	"project_id\x18\x02 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12\x1b\n" +
-	"\troom_name\x18\x03 \x01(\tR\broomName\x12#\n" +
-	"\aroom_id\x18\x04 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x121\n" +
-	"\x14participant_identity\x18\x05 \x01(\tR\x13participantIdentity\x128\n" +
-	"\x0eparticipant_id\x18\x06 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12&\n" +
-	"\btrack_id\x18\a \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x123\n" +
+	"project_id\x18\x02 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12\x1b\n" +
+	"\troom_name\x18\x03 \x01(\tR\broomName\x12\"\n" +
+	"\aroom_id\x18\x04 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x121\n" +
+	"\x14participant_identity\x18\x05 \x01(\tR\x13participantIdentity\x127\n" +
+	"\x0eparticipant_id\x18\x06 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12%\n" +
+	"\btrack_id\x18\a \x01(\tB\n" +
+	"\xbaP\atrackIDR\atrackId\x123\n" +
 	"\vtime_ranges\x18\b \x03(\v2\x12.livekit.TimeRangeR\n" +
 	"timeRanges\x12M\n" +
 	"\ffeature_info\x18\t \x03(\v2*.livekit.FeatureUsageInfo.FeatureInfoEntryR\vfeatureInfo\x1a>\n" +
@@ -2411,44 +2409,44 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x11send_data_request\x18\t \x01(\v2\x18.livekit.SendDataRequestH\x00R\x0fsendDataRequest\x12e\n" +
 	"\x1cupdate_room_metadata_request\x18\n" +
 	" \x01(\v2\".livekit.UpdateRoomMetadataRequestH\x00R\x19updateRoomMetadataRequestB\t\n" +
-	"\amessage\"\xea\x04\n" +
-	"\vAPICallInfo\x12,\n" +
+	"\amessage\"\xe5\x04\n" +
+	"\vAPICallInfo\x12+\n" +
 	"\n" +
-	"project_id\x18\x01 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x121\n" +
+	"project_id\x18\x01 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x121\n" +
 	"\arequest\x18\x02 \x01(\v2\x17.livekit.APICallRequestR\arequest\x12\x18\n" +
 	"\aservice\x18\x03 \x01(\tR\aservice\x12\x16\n" +
-	"\x06method\x18\x04 \x01(\tR\x06method\x12#\n" +
-	"\anode_id\x18\x05 \x01(\tB\n" +
-	"\x9a\xec,\x06nodeIDR\x06nodeId\x12\x16\n" +
+	"\x06method\x18\x04 \x01(\tR\x06method\x12\"\n" +
+	"\anode_id\x18\x05 \x01(\tB\t\xbaP\x06nodeIDR\x06nodeId\x12\x16\n" +
 	"\x06status\x18\x06 \x01(\x05R\x06status\x12(\n" +
 	"\x10twirp_error_code\x18\a \x01(\tR\x0etwirpErrorCode\x12.\n" +
 	"\x13twirp_error_message\x18\b \x01(\tR\x11twirpErrorMessage\x12\x1b\n" +
-	"\troom_name\x18\t \x01(\tR\broomName\x12#\n" +
+	"\troom_name\x18\t \x01(\tR\broomName\x12\"\n" +
 	"\aroom_id\x18\n" +
-	" \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x121\n" +
-	"\x14participant_identity\x18\v \x01(\tR\x13participantIdentity\x128\n" +
-	"\x0eparticipant_id\x18\f \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12&\n" +
-	"\btrack_id\x18\r \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x129\n" +
+	" \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x121\n" +
+	"\x14participant_identity\x18\v \x01(\tR\x13participantIdentity\x127\n" +
+	"\x0eparticipant_id\x18\f \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12%\n" +
+	"\btrack_id\x18\r \x01(\tB\n" +
+	"\xbaP\atrackIDR\atrackId\x129\n" +
 	"\n" +
 	"started_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12\x1f\n" +
 	"\vduration_ns\x18\x0f \x01(\x03R\n" +
-	"durationNs\"\x93\a\n" +
-	"\vWebhookInfo\x12&\n" +
-	"\bevent_id\x18\x01 \x01(\tB\v\x9a\xec,\aeventIDR\aeventId\x12\x14\n" +
-	"\x05event\x18\x02 \x01(\tR\x05event\x12,\n" +
+	"durationNs\"\x8c\a\n" +
+	"\vWebhookInfo\x12%\n" +
+	"\bevent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aeventIDR\aeventId\x12\x14\n" +
+	"\x05event\x18\x02 \x01(\tR\x05event\x12+\n" +
 	"\n" +
-	"project_id\x18\x03 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12\x1b\n" +
-	"\troom_name\x18\x04 \x01(\tR\broomName\x12#\n" +
-	"\aroom_id\x18\x05 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x121\n" +
-	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x128\n" +
-	"\x0eparticipant_id\x18\a \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12&\n" +
-	"\btrack_id\x18\b \x01(\tB\v\x9a\xec,\atrackIDR\atrackId\x12)\n" +
-	"\tegress_id\x18\t \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12,\n" +
+	"project_id\x18\x03 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12\x1b\n" +
+	"\troom_name\x18\x04 \x01(\tR\broomName\x12\"\n" +
+	"\aroom_id\x18\x05 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x121\n" +
+	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x127\n" +
+	"\x0eparticipant_id\x18\a \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12%\n" +
+	"\btrack_id\x18\b \x01(\tB\n" +
+	"\xbaP\atrackIDR\atrackId\x12(\n" +
+	"\tegress_id\x18\t \x01(\tB\v\xbaP\begressIDR\begressId\x12+\n" +
 	"\n" +
 	"ingress_id\x18\n" +
-	" \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x129\n" +
+	" \x01(\tB\f\xbaP\tingressIDR\tingressId\x129\n" +
 	"\n" +
 	"created_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x127\n" +
 	"\tqueued_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\bqueuedAt\x12*\n" +
