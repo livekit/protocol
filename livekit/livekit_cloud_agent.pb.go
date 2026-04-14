@@ -2278,7 +2278,7 @@ type CreatePrivateLinkRequest struct {
 	Region      string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
 	Port        uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
 	Endpoint    string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	CloudRegion string                 `protobuf:"bytes,6,opt,name=cloud_region,json=cloudRegion,proto3" json:"cloud_region,omitempty"`
+	CloudRegion *string                `protobuf:"bytes,6,opt,name=cloud_region,json=cloudRegion,proto3,oneof" json:"cloud_region,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*CreatePrivateLinkRequest_Aws
@@ -2346,8 +2346,8 @@ func (x *CreatePrivateLinkRequest) GetEndpoint() string {
 }
 
 func (x *CreatePrivateLinkRequest) GetCloudRegion() string {
-	if x != nil {
-		return x.CloudRegion
+	if x != nil && x.CloudRegion != nil {
+		return *x.CloudRegion
 	}
 	return ""
 }
@@ -2963,17 +2963,18 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"$PRIVATE_LINK_STATUS_PENDING_APPROVAL\x10\x02\x12\x1f\n" +
 	"\x1bPRIVATE_LINK_STATUS_HEALTHY\x10\x03\x12!\n" +
 	"\x1dPRIVATE_LINK_STATUS_UNHEALTHY\x10\x04\x12 \n" +
-	"\x1cPRIVATE_LINK_STATUS_APPROVED\x10\x05\"\xa1\x02\n" +
+	"\x1cPRIVATE_LINK_STATUS_APPROVED\x10\x05\"\xb7\x02\n" +
 	"\x18CreatePrivateLinkRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x12\n" +
 	"\x04port\x18\x04 \x01(\rR\x04port\x12\x1a\n" +
-	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12!\n" +
-	"\fcloud_region\x18\x06 \x01(\tR\vcloudRegion\x12I\n" +
+	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12&\n" +
+	"\fcloud_region\x18\x06 \x01(\tH\x01R\vcloudRegion\x88\x01\x01\x12I\n" +
 	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigB\x02\x18\x01H\x00R\x03aws\x1a1\n" +
 	"\x0fAWSCreateConfig\x12\x1e\n" +
 	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
-	"\x06config\"T\n" +
+	"\x06configB\x0f\n" +
+	"\r_cloud_region\"T\n" +
 	"\x19CreatePrivateLinkResponse\x127\n" +
 	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"U\n" +
 	"\x19DestroyPrivateLinkRequest\x128\n" +

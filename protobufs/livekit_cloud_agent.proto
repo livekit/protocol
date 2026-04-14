@@ -267,7 +267,7 @@ message CreatePrivateLinkRequest {
   string region = 3;
   uint32 port = 4;
   string endpoint = 5;
-  string cloud_region = 6;
+  optional string cloud_region = 6;
   oneof config {
     AWSCreateConfig aws = 2 [deprecated=true];
   }
