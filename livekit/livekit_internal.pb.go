@@ -1261,6 +1261,7 @@ type RoomInternal struct {
 	AgentDispatches   []*RoomAgentDispatch   `protobuf:"bytes,5,rep,name=agent_dispatches,json=agentDispatches,proto3" json:"agent_dispatches,omitempty"`
 	SyncStreams       bool                   `protobuf:"varint,4,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
 	ReplayEnabled     bool                   `protobuf:"varint,6,opt,name=replay_enabled,json=replayEnabled,proto3" json:"replay_enabled,omitempty"`
+	ExportRoom        bool                   `protobuf:"varint,7,opt,name=export_room,json=exportRoom,proto3" json:"export_room,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1333,6 +1334,13 @@ func (x *RoomInternal) GetSyncStreams() bool {
 func (x *RoomInternal) GetReplayEnabled() bool {
 	if x != nil {
 		return x.ReplayEnabled
+	}
+	return false
+}
+
+func (x *RoomInternal) GetExportRoom() bool {
+	if x != nil {
+		return x.ExportRoom
 	}
 	return false
 }
@@ -1527,14 +1535,16 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"sync_state\x18\x17 \x01(\v2\x12.livekit.SyncStateR\tsyncState\x12;\n" +
 	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnectionB\x1c\n" +
 	"\x1a_auto_subscribe_data_trackB\x19\n" +
-	"\x17_subscriber_allow_pause\"\xe7\x02\n" +
+	"\x17_subscriber_allow_pause\"\x88\x03\n" +
 	"\fRoomInternal\x12;\n" +
 	"\ftrack_egress\x18\x01 \x01(\v2\x18.livekit.AutoTrackEgressR\vtrackEgress\x12M\n" +
 	"\x12participant_egress\x18\x02 \x01(\v2\x1e.livekit.AutoParticipantEgressR\x11participantEgress\x12:\n" +
 	"\rplayout_delay\x18\x03 \x01(\v2\x15.livekit.PlayoutDelayR\fplayoutDelay\x12E\n" +
 	"\x10agent_dispatches\x18\x05 \x03(\v2\x1a.livekit.RoomAgentDispatchR\x0fagentDispatches\x12!\n" +
 	"\fsync_streams\x18\x04 \x01(\bR\vsyncStreams\x12%\n" +
-	"\x0ereplay_enabled\x18\x06 \x01(\bR\rreplayEnabled\"\xa9\x01\n" +
+	"\x0ereplay_enabled\x18\x06 \x01(\bR\rreplayEnabled\x12\x1f\n" +
+	"\vexport_room\x18\a \x01(\bR\n" +
+	"exportRoom\"\xa9\x01\n" +
 	"\tICEConfig\x12N\n" +
 	"\x15preference_subscriber\x18\x01 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x14preferenceSubscriber\x12L\n" +
 	"\x14preference_publisher\x18\x02 \x01(\x0e2\x19.livekit.ICECandidateTypeR\x13preferencePublisher*v\n" +
