@@ -63,7 +63,7 @@ type CreateRoomRequest struct {
 	// replay
 	ReplayEnabled bool `protobuf:"varint,13,opt,name=replay_enabled,json=replayEnabled,proto3" json:"replay_enabled,omitempty"`
 	// Define agents that should be dispatched to this room
-	Agents        []*RoomAgentDispatch `protobuf:"bytes,14,rep,name=agents,proto3" json:"agents,omitempty"` // NEXT-ID: 15
+	Agents        []*RoomAgentDispatch `protobuf:"bytes,14,rep,name=agents,proto3" json:"agents,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
