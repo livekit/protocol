@@ -71,8 +71,8 @@ message CreateAgentResponse {
 }
 
 message CreateAgentV2Request {
-  repeated AgentSecret secrets   = 1;
-  repeated string regions        = 2;
+  repeated AgentSecret secrets = 1;
+  repeated string regions      = 2;
 }
 
 message CreateAgentV2Response {
@@ -102,6 +102,7 @@ message AgentDeployment {
     string server_region = 13;
     repeated AgentEvent events = 14;
     string environment = 15;
+    string version = 16;
 }
 
 message AgentInfo {
@@ -190,7 +191,6 @@ message DeployAgentV2Request {
   string agent_id              = 1 [(logger.name) = "agentID"];
   repeated AgentSecret secrets = 2;
   string environment           = 3;
-  string region                = 4;
 }
 
 message DeployAgentV2Response {
@@ -229,6 +229,7 @@ message RollbackAgentResponse {
 message DeleteAgentRequest {
     string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
+    string environment = 3; // optional
 }
 
 message DeleteAgentResponse {
