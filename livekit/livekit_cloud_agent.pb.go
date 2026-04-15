@@ -713,6 +713,7 @@ type AgentDeployment struct {
 	ServerRegion  string                 `protobuf:"bytes,13,opt,name=server_region,json=serverRegion,proto3" json:"server_region,omitempty"`
 	Events        []*AgentEvent          `protobuf:"bytes,14,rep,name=events,proto3" json:"events,omitempty"`
 	Environment   string                 `protobuf:"bytes,15,opt,name=environment,proto3" json:"environment,omitempty"`
+	Version       string                 `protobuf:"bytes,16,opt,name=version,proto3" json:"version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -848,6 +849,13 @@ func (x *AgentDeployment) GetEvents() []*AgentEvent {
 func (x *AgentDeployment) GetEnvironment() string {
 	if x != nil {
 		return x.Environment
+	}
+	return ""
+}
+
+func (x *AgentDeployment) GetVersion() string {
+	if x != nil {
+		return x.Version
 	}
 	return ""
 }
@@ -1675,7 +1683,6 @@ type DeployAgentV2Request struct {
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	Secrets       []*AgentSecret         `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	Environment   string                 `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"`
-	Region        string                 `protobuf:"bytes,4,opt,name=region,proto3" json:"region,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1727,13 +1734,6 @@ func (x *DeployAgentV2Request) GetSecrets() []*AgentSecret {
 func (x *DeployAgentV2Request) GetEnvironment() string {
 	if x != nil {
 		return x.Environment
-	}
-	return ""
-}
-
-func (x *DeployAgentV2Request) GetRegion() string {
-	if x != nil {
-		return x.Region
 	}
 	return ""
 }
@@ -2066,6 +2066,7 @@ type DeleteAgentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Environment   string                 `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"` // optional
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2110,6 +2111,13 @@ func (x *DeleteAgentRequest) GetAgentId() string {
 func (x *DeleteAgentRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
+	}
+	return ""
+}
+
+func (x *DeleteAgentRequest) GetEnvironment() string {
+	if x != nil {
+		return x.Environment
 	}
 	return ""
 }
@@ -2571,11 +2579,12 @@ func (x *PrivateLinkStatus) GetReason() string {
 }
 
 type CreatePrivateLinkRequest struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	Name     string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Region   string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Port     uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
-	Endpoint string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Name        string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Region      string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Port        uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"`
+	Endpoint    string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	CloudRegion *string                `protobuf:"bytes,6,opt,name=cloud_region,json=cloudRegion,proto3,oneof" json:"cloud_region,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*CreatePrivateLinkRequest_Aws
@@ -2638,6 +2647,13 @@ func (x *CreatePrivateLinkRequest) GetPort() uint32 {
 func (x *CreatePrivateLinkRequest) GetEndpoint() string {
 	if x != nil {
 		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *CreatePrivateLinkRequest) GetCloudRegion() string {
+	if x != nil && x.CloudRegion != nil {
+		return *x.CloudRegion
 	}
 	return ""
 }
@@ -3080,9 +3096,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
-	"\aregions\x18\x06 \x03(\tR\aregions\"\xc1\x02\n" +
-	"\x13CreateAgentResponse\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\aregions\x18\x06 \x03(\tR\aregions\"\xc0\x02\n" +
+	"\x13CreateAgentResponse\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x18\n" +
@@ -3093,9 +3110,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x16presigned_post_request\x18\b \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"`\n" +
 	"\x14CreateAgentV2Request\x12.\n" +
 	"\asecrets\x18\x01 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x18\n" +
-	"\aregions\x18\x02 \x03(\tR\aregions\"~\n" +
-	"\x15CreateAgentV2Response\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x16\n" +
+	"\aregions\x18\x02 \x03(\tR\aregions\"}\n" +
+	"\x15CreateAgentV2Response\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12%\n" +
 	"\x0eserver_regions\x18\x03 \x03(\tR\rserverRegions\"\xa6\x01\n" +
 	"\x14PresignedPostRequest\x12\x10\n" +
@@ -3103,10 +3121,11 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xdd\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xf6\x03\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
-	"\x06region\x18\x01 \x01(\tR\x06region\x12&\n" +
-	"\bagent_id\x18\x02 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x16\n" +
+	"\x06region\x18\x01 \x01(\tR\x06region\x12%\n" +
+	"\bagent_id\x18\x02 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12\x1a\n" +
 	"\breplicas\x18\x04 \x01(\x05R\breplicas\x12!\n" +
 	"\fmin_replicas\x18\x05 \x01(\x05R\vminReplicas\x12!\n" +
@@ -3120,20 +3139,23 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\x12#\n" +
 	"\rserver_region\x18\r \x01(\tR\fserverRegion\x12+\n" +
 	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\x12 \n" +
-	"\venvironment\x18\x0f \x01(\tR\venvironment\"\xa0\x02\n" +
-	"\tAgentInfo\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\venvironment\x18\x0f \x01(\tR\venvironment\x12\x18\n" +
+	"\aversion\x18\x10 \x01(\tR\aversion\"\x9f\x02\n" +
+	"\tAgentInfo\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\x12E\n" +
 	"\x11agent_deployments\x18\x04 \x03(\v2\x18.livekit.AgentDeploymentR\x10agentDeployments\x12.\n" +
 	"\asecrets\x18\x05 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12;\n" +
 	"\vdeployed_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"deployedAt\"Z\n" +
+	"deployedAt\"Y\n" +
 	"\x11ListAgentsRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12&\n" +
-	"\bagent_id\x18\x02 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\"@\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12%\n" +
+	"\bagent_id\x18\x02 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
 	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\x8a\x03\n" +
 	"\fAgentVersion\x12\x18\n" +
@@ -3151,15 +3173,17 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bdraining\x18\b \x01(\bR\bdraining\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"a\n" +
-	"\x18ListAgentVersionsRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"`\n" +
+	"\x18ListAgentVersionsRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"N\n" +
 	"\x19ListAgentVersionsResponse\x121\n" +
-	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x8d\x02\n" +
-	"\x12UpdateAgentRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12!\n" +
+	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x8c\x02\n" +
+	"\x12UpdateAgentRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12!\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12\x1e\n" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
@@ -3169,43 +3193,48 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\asecrets\x18\a \x03(\v2\x14.livekit.AgentSecretR\asecrets\"I\n" +
 	"\x13UpdateAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"=\n" +
-	"\x13RestartAgentRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\"J\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"<\n" +
+	"\x13RestartAgentRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\"J\n" +
 	"\x14RestartAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x95\x02\n" +
-	"\x12DeployAgentRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12!\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x94\x02\n" +
+	"\x12DeployAgentRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12!\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\xa3\x02\n" +
+	"\venvironment\x18\a \x01(\tR\venvironment\"\xa2\x02\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
-	"\bagent_id\x18\x03 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12'\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
+	"\bagent_id\x18\x03 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12'\n" +
 	"\rpresigned_url\x18\x04 \x01(\tB\x02\x18\x01R\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
 	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\xa8\x01\n" +
-	"\x14DeployAgentV2Request\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12.\n" +
+	"\venvironment\x18\a \x01(\tR\venvironment\"\x8f\x01\n" +
+	"\x14DeployAgentV2Request\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12.\n" +
 	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12 \n" +
-	"\venvironment\x18\x03 \x01(\tR\venvironment\x12\x16\n" +
-	"\x06region\x18\x04 \x01(\tR\x06region\"\xeb\x01\n" +
+	"\venvironment\x18\x03 \x01(\tR\venvironment\"\xea\x01\n" +
 	"\x15DeployAgentV2Response\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\x12&\n" +
-	"\bagent_id\x18\x03 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x10\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
+	"\bagent_id\x18\x03 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x10\n" +
 	"\x03tag\x18\x04 \x01(\tR\x03tag\x12B\n" +
 	"\rpresigned_req\x18\x05 \x01(\v2\x1d.livekit.PresignedPostRequestR\fpresignedReq\x12 \n" +
-	"\venvironment\x18\x06 \x01(\tR\venvironment\"\xc8\x01\n" +
-	"\x19UpdateAgentSecretsRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\venvironment\x18\x06 \x01(\tR\venvironment\"\xc7\x01\n" +
+	"\x19UpdateAgentSecretsRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1c\n" +
 	"\toverwrite\x18\x03 \x01(\bR\toverwrite\x12.\n" +
@@ -3213,24 +3242,28 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06remove\x18\x05 \x03(\tR\x06remove\"P\n" +
 	"\x1aUpdateAgentSecretsResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"w\n" +
-	"\x14RollbackAgentRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"v\n" +
+	"\x14RollbackAgentRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x18\n" +
 	"\aversion\x18\x03 \x01(\tR\aversion\"K\n" +
 	"\x15RollbackAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"[\n" +
-	"\x12DeleteAgentRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"|\n" +
+	"\x12DeleteAgentRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\"I\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12 \n" +
+	"\venvironment\x18\x03 \x01(\tR\venvironment\"I\n" +
 	"\x13DeleteAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"`\n" +
-	"\x17ListAgentSecretsRequest\x12&\n" +
-	"\bagent_id\x18\x01 \x01(\tB\v\x9a\xec,\aagentIDR\aagentId\x12\x1d\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"_\n" +
+	"\x17ListAgentSecretsRequest\x12%\n" +
+	"\bagent_id\x18\x01 \x01(\tB\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"J\n" +
 	"\x18ListAgentSecretsResponse\x12.\n" +
@@ -3240,9 +3273,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\xc4\x02\n" +
-	"\vPrivateLink\x129\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\x12\x12\n" +
+	"\x15ClientSettingsRequest\"\xc3\x02\n" +
+	"\vPrivateLink\x128\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x10\xbaP\rprivateLinkIDR\rprivateLinkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
 	"\x04port\x18\x05 \x01(\rR\x04port\x12\x1a\n" +
@@ -3263,26 +3296,28 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"$PRIVATE_LINK_STATUS_PENDING_APPROVAL\x10\x02\x12\x1f\n" +
 	"\x1bPRIVATE_LINK_STATUS_HEALTHY\x10\x03\x12!\n" +
 	"\x1dPRIVATE_LINK_STATUS_UNHEALTHY\x10\x04\x12 \n" +
-	"\x1cPRIVATE_LINK_STATUS_APPROVED\x10\x05\"\xfe\x01\n" +
+	"\x1cPRIVATE_LINK_STATUS_APPROVED\x10\x05\"\xb7\x02\n" +
 	"\x18CreatePrivateLinkRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x03 \x01(\tR\x06region\x12\x12\n" +
 	"\x04port\x18\x04 \x01(\rR\x04port\x12\x1a\n" +
-	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12I\n" +
+	"\bendpoint\x18\x05 \x01(\tR\bendpoint\x12&\n" +
+	"\fcloud_region\x18\x06 \x01(\tH\x01R\vcloudRegion\x88\x01\x01\x12I\n" +
 	"\x03aws\x18\x02 \x01(\v21.livekit.CreatePrivateLinkRequest.AWSCreateConfigB\x02\x18\x01H\x00R\x03aws\x1a1\n" +
 	"\x0fAWSCreateConfig\x12\x1e\n" +
 	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
-	"\x06config\"T\n" +
+	"\x06configB\x0f\n" +
+	"\r_cloud_region\"T\n" +
 	"\x19CreatePrivateLinkResponse\x127\n" +
-	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"V\n" +
-	"\x19DestroyPrivateLinkRequest\x129\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\"\x1c\n" +
+	"\fprivate_link\x18\x01 \x01(\v2\x14.livekit.PrivateLinkR\vprivateLink\"U\n" +
+	"\x19DestroyPrivateLinkRequest\x128\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x10\xbaP\rprivateLinkIDR\rprivateLinkId\"\x1c\n" +
 	"\x1aDestroyPrivateLinkResponse\"\x19\n" +
 	"\x17ListPrivateLinksRequest\"F\n" +
 	"\x18ListPrivateLinksResponse\x12*\n" +
-	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"X\n" +
-	"\x1bGetPrivateLinkStatusRequest\x129\n" +
-	"\x0fprivate_link_id\x18\x01 \x01(\tB\x11\x9a\xec,\rprivateLinkIDR\rprivateLinkId\"P\n" +
+	"\x05items\x18\x01 \x03(\v2\x14.livekit.PrivateLinkR\x05items\"W\n" +
+	"\x1bGetPrivateLinkStatusRequest\x128\n" +
+	"\x0fprivate_link_id\x18\x01 \x01(\tB\x10\xbaP\rprivateLinkIDR\rprivateLinkId\"P\n" +
 	"\x1cGetPrivateLinkStatusResponse\x120\n" +
 	"\x05value\x18\x01 \x01(\v2\x1a.livekit.PrivateLinkStatusR\x05value*o\n" +
 	"\x0fAgentSecretKind\x12\x1d\n" +
