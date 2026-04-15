@@ -15,6 +15,9 @@
 package hwstats
 
 import (
+	"os"
+	"strconv"
+	"sync"
 	"time"
 
 	"github.com/frostbyte73/core"
@@ -26,6 +29,33 @@ import (
 
 // This object returns cgroup quota aware cpu stats. On other systems than Linux,
 // it falls back to full system stats
+
+const CPURequestEnvVar = "LIVEKIT_CPU_REQUEST"
+
+var (
+	effectiveCPURequestOnce sync.Once
+	effectiveCPURequest     float64
+)
+
+// EffectiveCPURequest returns the value of LIVEKIT_CPU_REQUEST when set and valid.
+// The result is parsed at most once; use for stats normalization and optional
+// GOMAXPROCS tuning (see utils/hwstats/maxprocs).
+func EffectiveCPURequest() float64 {
+	effectiveCPURequestOnce.Do(parseCPURequestEnvOnce)
+	return effectiveCPURequest
+}
+
+func parseCPURequestEnvOnce() {
+	cpuReq := os.Getenv(CPURequestEnvVar)
+	if cpuReq == "" {
+		return
+	}
+	n, err := strconv.ParseFloat(cpuReq, 64)
+	if err != nil || n <= 0 {
+		return
+	}
+	effectiveCPURequest = n
+}
 
 type platformCPUMonitor interface {
 	getCPUIdle() (float64, error)
@@ -139,6 +169,9 @@ func (c *CPUStats) GetCPUIdle() float64 {
 }
 
 func (c *CPUStats) NumCPU() float64 {
+	if n := EffectiveCPURequest(); n > 0 {
+		return n
+	}
 	return c.platform.numCPU()
 }
 
@@ -186,7 +219,7 @@ func (c *CPUStats) monitorCPULoad() {
 }
 
 func (c *CPUStats) monitorProcesses() {
-	numCPU := c.platform.numCPU()
+	numCPU := c.NumCPU()
 	pageSize := getPageSize()
 
 	fs, err := procfs.NewFS(procfs.DefaultMountPoint)
