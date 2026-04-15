@@ -41,11 +41,11 @@ var (
 // The result is parsed at most once; use for stats normalization and optional
 // GOMAXPROCS tuning (see utils/hwstats/maxprocs).
 func EffectiveCPURequest() float64 {
-	effectiveCPURequestOnce.Do(parseCPURequestEnvOnce)
+	effectiveCPURequestOnce.Do(parseCPURequestEnv)
 	return effectiveCPURequest
 }
 
-func parseCPURequestEnvOnce() {
+func parseCPURequestEnv() {
 	cpuReq := os.Getenv(CPURequestEnvVar)
 	if cpuReq == "" {
 		return
