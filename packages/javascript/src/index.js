@@ -1,5 +1,6 @@
 // @ts-check
-export { protoInt64, Timestamp } from "@bufbuild/protobuf";
+import { protoInt64, Timestamp } from "@bufbuild/protobuf";
+export { protoInt64, Timestamp };
 export * as AgentSession from "./gen/agent/livekit_agent_session_pb.js";
 export * from "./gen/livekit_agent_dispatch_pb.js";
 export * from "./gen/livekit_agent_pb.js";
