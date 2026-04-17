@@ -532,6 +532,15 @@ message ClientInfo {
     ESP32 = 14;
   }
 
+  // Optional capabilities advertised by the client at connect time. The SFU
+  // uses these flags to decide whether to enable features that require
+  // client-side support (e.g. passing RTP packet trailers through to the
+  // subscriber instead of stripping them).
+  enum Capability {
+    CAP_UNKNOWN = 0;
+    CAP_PACKET_TRAILER = 1;
+  }
+
   SDK sdk = 1;
   string version = 2;
   int32 protocol = 3;
@@ -548,6 +557,9 @@ message ClientInfo {
   string other_sdks = 11;
   // client protocol version
   int32 client_protocol = 12;
+  // capabilities the client advertises. Populated automatically by each SDK;
+  // not a user-configurable setting.
+  repeated Capability capabilities = 13;
 }
 
 // server provided client configuration
