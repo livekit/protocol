@@ -96,6 +96,8 @@ message CreateRoomRequest {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  // search tags
+  map<string, string> tags = 15;
   // auto-egress configurations
   RoomEgress egress = 6;
   // playout delay of subscriber
@@ -110,7 +112,7 @@ message CreateRoomRequest {
   // Define agents that should be dispatched to this room
   repeated RoomAgentDispatch agents = 14;
 
-  // NEXT-ID: 15
+  // NEXT-ID: 16
 }
 
 message RoomEgress {
