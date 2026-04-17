@@ -237,6 +237,7 @@ message PrivateLink {
   uint32 port = 5;
   string endpoint = 6;
   string connection_endpoint = 7;
+  string cloud_region = 8;
 
   oneof config {
     AWSConfig aws = 3 [deprecated=true];
