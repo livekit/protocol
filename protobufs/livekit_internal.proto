@@ -206,6 +206,7 @@ message RoomInternal {
   bool sync_streams = 4;
   bool replay_enabled = 6;
   bool export_room = 7;
+  map<string, string> tags = 8;
 }
 
 enum ICECandidateType {
