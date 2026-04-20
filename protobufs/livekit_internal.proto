@@ -43,6 +43,7 @@ enum NodeState {
   STARTING_UP = 0;
   SERVING = 1;
   SHUTTING_DOWN = 2;
+  SUSPENDED = 3;
 }
 
 message Node {
@@ -204,6 +205,8 @@ message RoomInternal {
   repeated RoomAgentDispatch agent_dispatches = 5;
   bool sync_streams = 4;
   bool replay_enabled = 6;
+  bool export_room = 7;
+  map<string, string> tags = 8;
 }
 
 enum ICECandidateType {

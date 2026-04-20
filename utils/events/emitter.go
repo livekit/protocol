@@ -301,7 +301,7 @@ type blockingObserver[V any] struct {
 	ch   chan V
 }
 
-func (o *blockingObserver[V]) emit(v V) {
+func (o *blockingObserver[V]) emit(v V) { //nolint:unused // implements Observer interface
 	select {
 	case o.ch <- v:
 	case <-o.done:
@@ -318,7 +318,7 @@ func (o *blockingObserver[V]) Events() <-chan V {
 
 type nonblockingCallback[V any] func(V)
 
-func (o nonblockingCallback[V]) emit(v V) {
+func (o nonblockingCallback[V]) emit(v V) { //nolint:unused // implements Observer interface
 	go o(v)
 }
 
@@ -328,7 +328,7 @@ func (o nonblockingCallback[V]) Events() <-chan V { return nil }
 
 type blockingCallback[V any] func(V)
 
-func (o blockingCallback[V]) emit(v V) {
+func (o blockingCallback[V]) emit(v V) { //nolint:unused // implements Observer interface
 	o(v)
 }
 

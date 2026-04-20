@@ -25,8 +25,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
-      - uses: actions/cache@v5
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/go/pkg/mod
@@ -35,21 +35,20 @@ jobs:
           key: livekit-protocol
 
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Set up gotestfmt
-        run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@v2.4.1
+        run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@9eae5abc81d6d08f73268741ef4a8b97f29b60d8 # v2.4.1
 
       - name: Download Go modules
         run: go mod download
 
-      - name: Static Check
-        uses: amarpal/staticcheck-action@master
+      - name: Lint
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
         with:
-          checks: '["all", "-ST1000", "-ST1003", "-ST1020", "-ST1021", "-ST1022", "-SA1019"]'
-          install-go: false
+          version: v2.11.4
 
       - name: Test
         run: |

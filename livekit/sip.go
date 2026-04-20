@@ -325,7 +325,7 @@ func validateAttributesToHeaders(attributesToHeaders map[string]string) error {
 
 // validateHeaderToAttributes Makes sure the keys of the given map correspond to valid SIP header names
 func validateHeaderToAttributes(headerToAttributes map[string]string) error {
-	for headerName, _ := range headerToAttributes {
+	for headerName := range headerToAttributes {
 		if err := ValidateHeaderName(headerName, false); err != nil {
 			return fmt.Errorf("invalid header name: %w", err)
 		}

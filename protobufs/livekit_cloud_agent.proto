@@ -236,6 +236,8 @@ message PrivateLink {
   string region = 4;
   uint32 port = 5;
   string endpoint = 6;
+  string connection_endpoint = 7;
+  string cloud_region = 8;
 
   oneof config {
     AWSConfig aws = 3 [deprecated=true];
@@ -245,13 +247,16 @@ message PrivateLink {
 message PrivateLinkStatus {
   enum Status {
       PRIVATE_LINK_STATUS_UNKNOWN = 0;
-      PRIVATE_LINK_STATUS_PENDING = 1;
-      PRIVATE_LINK_STATUS_AVAILABLE = 2;
-      PRIVATE_LINK_STATUS_ERROR = 3;
+      PRIVATE_LINK_STATUS_PROVISIONING = 1;
+      PRIVATE_LINK_STATUS_PENDING_APPROVAL = 2;
+      PRIVATE_LINK_STATUS_HEALTHY = 3;
+      PRIVATE_LINK_STATUS_UNHEALTHY = 4;
+      PRIVATE_LINK_STATUS_APPROVED = 5;
   }
 
   Status status = 1;
   google.protobuf.Timestamp updated_at = 2;
+  string reason = 3;
 }
 
 message CreatePrivateLinkRequest {
@@ -263,6 +268,7 @@ message CreatePrivateLinkRequest {
   string region = 3;
   uint32 port = 4;
   string endpoint = 5;
+  optional string cloud_region = 6;
   oneof config {
     AWSCreateConfig aws = 2 [deprecated=true];
   }

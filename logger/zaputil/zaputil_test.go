@@ -51,8 +51,8 @@ func (c *testCore) With(fields []zapcore.Field) zapcore.Core {
 	}
 }
 
-func (s *testCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
-	s.init()
-	s.writeCount.Inc()
+func (c *testCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
+	c.init()
+	c.writeCount.Inc()
 	return nil
 }

@@ -94,4 +94,6 @@ message MetricsRecordingHeader {
   uint64 duration = 3; // milliseconds
   google.protobuf.Timestamp start_time = 4;
   map<string, string> room_tags = 5;
+  string room_name = 6;
+  google.protobuf.Timestamp room_start_time = 7;
 }

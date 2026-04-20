@@ -5,7 +5,7 @@ type Hook[T any] struct {
 	prev *T
 }
 
-func (h *Hook[T]) getListHook() *Hook[T] {
+func (h *Hook[T]) getListHook() *Hook[T] { //nolint:unused // implements hookAccessor interface
 	return h
 }
 

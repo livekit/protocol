@@ -46,6 +46,8 @@ type StartEgressRequest struct {
 	//
 	// Types that are valid to be assigned to Request:
 	//
+	//	*StartEgressRequest_Egress
+	//	*StartEgressRequest_Replay
 	//	*StartEgressRequest_RoomComposite
 	//	*StartEgressRequest_Web
 	//	*StartEgressRequest_Participant
@@ -53,9 +55,10 @@ type StartEgressRequest struct {
 	//	*StartEgressRequest_Track
 	Request isStartEgressRequest_Request `protobuf_oneof:"request"`
 	// connection info
-	RoomId string `protobuf:"bytes,3,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-	Token  string `protobuf:"bytes,8,opt,name=token,proto3" json:"token,omitempty"`
-	WsUrl  string `protobuf:"bytes,9,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
+	RoomId   string `protobuf:"bytes,3,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	RoomName string `protobuf:"bytes,18,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	Token    string `protobuf:"bytes,8,opt,name=token,proto3" json:"token,omitempty"`
+	WsUrl    string `protobuf:"bytes,9,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
 	// cloud only
 	CloudBackupEnabled bool    `protobuf:"varint,10,opt,name=cloud_backup_enabled,json=cloudBackupEnabled,proto3" json:"cloud_backup_enabled,omitempty"`
 	EstimatedCpu       float64 `protobuf:"fixed64,14,opt,name=estimated_cpu,json=estimatedCpu,proto3" json:"estimated_cpu,omitempty"`
@@ -104,6 +107,24 @@ func (x *StartEgressRequest) GetEgressId() string {
 func (x *StartEgressRequest) GetRequest() isStartEgressRequest_Request {
 	if x != nil {
 		return x.Request
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetEgress() *livekit.StartEgressRequest {
+	if x != nil {
+		if x, ok := x.Request.(*StartEgressRequest_Egress); ok {
+			return x.Egress
+		}
+	}
+	return nil
+}
+
+func (x *StartEgressRequest) GetReplay() *livekit.ExportReplayRequest {
+	if x != nil {
+		if x, ok := x.Request.(*StartEgressRequest_Replay); ok {
+			return x.Replay
+		}
 	}
 	return nil
 }
@@ -160,6 +181,13 @@ func (x *StartEgressRequest) GetRoomId() string {
 	return ""
 }
 
+func (x *StartEgressRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
 func (x *StartEgressRequest) GetToken() string {
 	if x != nil {
 		return x.Token
@@ -199,7 +227,16 @@ type isStartEgressRequest_Request interface {
 	isStartEgressRequest_Request()
 }
 
+type StartEgressRequest_Egress struct {
+	Egress *livekit.StartEgressRequest `protobuf:"bytes,16,opt,name=egress,proto3,oneof"`
+}
+
+type StartEgressRequest_Replay struct {
+	Replay *livekit.ExportReplayRequest `protobuf:"bytes,17,opt,name=replay,proto3,oneof"`
+}
+
 type StartEgressRequest_RoomComposite struct {
+	// --- deprecated ---
 	RoomComposite *livekit.RoomCompositeEgressRequest `protobuf:"bytes,5,opt,name=room_composite,json=roomComposite,proto3,oneof"`
 }
 
@@ -218,6 +255,10 @@ type StartEgressRequest_TrackComposite struct {
 type StartEgressRequest_Track struct {
 	Track *livekit.TrackEgressRequest `protobuf:"bytes,7,opt,name=track,proto3,oneof"`
 }
+
+func (*StartEgressRequest_Egress) isStartEgressRequest_Request() {}
+
+func (*StartEgressRequest_Replay) isStartEgressRequest_Request() {}
 
 func (*StartEgressRequest_RoomComposite) isStartEgressRequest_Request() {}
 
@@ -309,21 +350,119 @@ func (x *ListActiveEgressResponse) GetEgressIds() []string {
 	return nil
 }
 
+type EgressReadyRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	EgressId      string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EgressReadyRequest) Reset() {
+	*x = EgressReadyRequest{}
+	mi := &file_rpc_egress_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EgressReadyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EgressReadyRequest) ProtoMessage() {}
+
+func (x *EgressReadyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_egress_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EgressReadyRequest.ProtoReflect.Descriptor instead.
+func (*EgressReadyRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_egress_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *EgressReadyRequest) GetEgressId() string {
+	if x != nil {
+		return x.EgressId
+	}
+	return ""
+}
+
+type EgressReadyResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	StartAt       int64                  `protobuf:"varint,1,opt,name=start_at,json=startAt,proto3" json:"start_at,omitempty"`          // wallclock unix timestamp (nanoseconds)
+	DurationMs    int64                  `protobuf:"varint,2,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"` // how long to record
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EgressReadyResponse) Reset() {
+	*x = EgressReadyResponse{}
+	mi := &file_rpc_egress_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EgressReadyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EgressReadyResponse) ProtoMessage() {}
+
+func (x *EgressReadyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_egress_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EgressReadyResponse.ProtoReflect.Descriptor instead.
+func (*EgressReadyResponse) Descriptor() ([]byte, []int) {
+	return file_rpc_egress_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *EgressReadyResponse) GetStartAt() int64 {
+	if x != nil {
+		return x.StartAt
+	}
+	return 0
+}
+
+func (x *EgressReadyResponse) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
 var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xe4\x04\n" +
-	"\x12StartEgressRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x12L\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xed\x05\n" +
+	"\x12StartEgressRequest\x12(\n" +
+	"\tegress_id\x18\x01 \x01(\tB\v\xbaP\begressIDR\begressId\x125\n" +
+	"\x06egress\x18\x10 \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
+	"\x06replay\x18\x11 \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12L\n" +
 	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
 	"\x03web\x18\v \x01(\v2\x19.livekit.WebEgressRequestH\x00R\x03web\x12E\n" +
 	"\vparticipant\x18\r \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
 	"\x0ftrack_composite\x18\x06 \x01(\v2$.livekit.TrackCompositeEgressRequestH\x00R\x0etrackComposite\x123\n" +
-	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12#\n" +
-	"\aroom_id\x18\x03 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1a\n" +
-	"\x05token\x18\b \x01(\tB\x04\x88\xec,\x01R\x05token\x12\x15\n" +
+	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12\"\n" +
+	"\aroom_id\x18\x03 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1b\n" +
+	"\troom_name\x18\x12 \x01(\tR\broomName\x12\x19\n" +
+	"\x05token\x18\b \x01(\tB\x03\xa8P\x01R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\t \x01(\tR\x05wsUrl\x120\n" +
 	"\x14cloud_backup_enabled\x18\n" +
 	" \x01(\bR\x12cloudBackupEnabled\x12#\n" +
@@ -334,14 +473,24 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\x17ListActiveEgressRequest\"9\n" +
 	"\x18ListActiveEgressResponse\x12\x1d\n" +
 	"\n" +
-	"egress_ids\x18\x01 \x03(\tR\tegressIds2\xb2\x01\n" +
+	"egress_ids\x18\x01 \x03(\tR\tegressIds\">\n" +
+	"\x12EgressReadyRequest\x12(\n" +
+	"\tegress_id\x18\x01 \x01(\tB\v\xbaP\begressIDR\begressId\"Q\n" +
+	"\x13EgressReadyResponse\x12\x19\n" +
+	"\bstart_at\x18\x01 \x01(\x03R\astartAt\x12\x1f\n" +
+	"\vduration_ms\x18\x02 \x01(\x03R\n" +
+	"durationMs2\xb2\x01\n" +
 	"\x0eEgressInternal\x12E\n" +
 	"\vStartEgress\x12\x17.rpc.StartEgressRequest\x1a\x13.livekit.EgressInfo\"\b\xb2\x89\x01\x04\x10\x010\x01\x12Y\n" +
-	"\x10ListActiveEgress\x12\x1c.rpc.ListActiveEgressRequest\x1a\x1d.rpc.ListActiveEgressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xa1\x01\n" +
+	"\x10ListActiveEgress\x12\x1c.rpc.ListActiveEgressRequest\x1a\x1d.rpc.ListActiveEgressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xec\x01\n" +
 	"\rEgressHandler\x12I\n" +
-	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12E\n" +
+	"\fUpdateEgress\x12\x1c.livekit.UpdateEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12E\n" +
 	"\n" +
-	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
+	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12I\n" +
+	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x012\\\n" +
+	"\fReplayExport\x12L\n" +
+	"\vEgressReady\x12\x17.rpc.EgressReadyRequest\x1a\x18.rpc.EgressReadyResponse\"\n" +
+	"\xb2\x89\x01\x06\x10\x01\x1a\x02 \x01B!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var (
 	file_rpc_egress_proto_rawDescOnce sync.Once
@@ -355,39 +504,50 @@ func file_rpc_egress_proto_rawDescGZIP() []byte {
 	return file_rpc_egress_proto_rawDescData
 }
 
-var file_rpc_egress_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_rpc_egress_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_rpc_egress_proto_goTypes = []any{
 	(*StartEgressRequest)(nil),                  // 0: rpc.StartEgressRequest
 	(*ListActiveEgressRequest)(nil),             // 1: rpc.ListActiveEgressRequest
 	(*ListActiveEgressResponse)(nil),            // 2: rpc.ListActiveEgressResponse
-	(*livekit.RoomCompositeEgressRequest)(nil),  // 3: livekit.RoomCompositeEgressRequest
-	(*livekit.WebEgressRequest)(nil),            // 4: livekit.WebEgressRequest
-	(*livekit.ParticipantEgressRequest)(nil),    // 5: livekit.ParticipantEgressRequest
-	(*livekit.TrackCompositeEgressRequest)(nil), // 6: livekit.TrackCompositeEgressRequest
-	(*livekit.TrackEgressRequest)(nil),          // 7: livekit.TrackEgressRequest
-	(*livekit.UpdateStreamRequest)(nil),         // 8: livekit.UpdateStreamRequest
-	(*livekit.StopEgressRequest)(nil),           // 9: livekit.StopEgressRequest
-	(*livekit.EgressInfo)(nil),                  // 10: livekit.EgressInfo
+	(*EgressReadyRequest)(nil),                  // 3: rpc.EgressReadyRequest
+	(*EgressReadyResponse)(nil),                 // 4: rpc.EgressReadyResponse
+	(*livekit.StartEgressRequest)(nil),          // 5: livekit.StartEgressRequest
+	(*livekit.ExportReplayRequest)(nil),         // 6: livekit.ExportReplayRequest
+	(*livekit.RoomCompositeEgressRequest)(nil),  // 7: livekit.RoomCompositeEgressRequest
+	(*livekit.WebEgressRequest)(nil),            // 8: livekit.WebEgressRequest
+	(*livekit.ParticipantEgressRequest)(nil),    // 9: livekit.ParticipantEgressRequest
+	(*livekit.TrackCompositeEgressRequest)(nil), // 10: livekit.TrackCompositeEgressRequest
+	(*livekit.TrackEgressRequest)(nil),          // 11: livekit.TrackEgressRequest
+	(*livekit.UpdateEgressRequest)(nil),         // 12: livekit.UpdateEgressRequest
+	(*livekit.StopEgressRequest)(nil),           // 13: livekit.StopEgressRequest
+	(*livekit.UpdateStreamRequest)(nil),         // 14: livekit.UpdateStreamRequest
+	(*livekit.EgressInfo)(nil),                  // 15: livekit.EgressInfo
 }
 var file_rpc_egress_proto_depIdxs = []int32{
-	3,  // 0: rpc.StartEgressRequest.room_composite:type_name -> livekit.RoomCompositeEgressRequest
-	4,  // 1: rpc.StartEgressRequest.web:type_name -> livekit.WebEgressRequest
-	5,  // 2: rpc.StartEgressRequest.participant:type_name -> livekit.ParticipantEgressRequest
-	6,  // 3: rpc.StartEgressRequest.track_composite:type_name -> livekit.TrackCompositeEgressRequest
-	7,  // 4: rpc.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
-	0,  // 5: rpc.EgressInternal.StartEgress:input_type -> rpc.StartEgressRequest
-	1,  // 6: rpc.EgressInternal.ListActiveEgress:input_type -> rpc.ListActiveEgressRequest
-	8,  // 7: rpc.EgressHandler.UpdateStream:input_type -> livekit.UpdateStreamRequest
-	9,  // 8: rpc.EgressHandler.StopEgress:input_type -> livekit.StopEgressRequest
-	10, // 9: rpc.EgressInternal.StartEgress:output_type -> livekit.EgressInfo
-	2,  // 10: rpc.EgressInternal.ListActiveEgress:output_type -> rpc.ListActiveEgressResponse
-	10, // 11: rpc.EgressHandler.UpdateStream:output_type -> livekit.EgressInfo
-	10, // 12: rpc.EgressHandler.StopEgress:output_type -> livekit.EgressInfo
-	9,  // [9:13] is the sub-list for method output_type
-	5,  // [5:9] is the sub-list for method input_type
-	5,  // [5:5] is the sub-list for extension type_name
-	5,  // [5:5] is the sub-list for extension extendee
-	0,  // [0:5] is the sub-list for field type_name
+	5,  // 0: rpc.StartEgressRequest.egress:type_name -> livekit.StartEgressRequest
+	6,  // 1: rpc.StartEgressRequest.replay:type_name -> livekit.ExportReplayRequest
+	7,  // 2: rpc.StartEgressRequest.room_composite:type_name -> livekit.RoomCompositeEgressRequest
+	8,  // 3: rpc.StartEgressRequest.web:type_name -> livekit.WebEgressRequest
+	9,  // 4: rpc.StartEgressRequest.participant:type_name -> livekit.ParticipantEgressRequest
+	10, // 5: rpc.StartEgressRequest.track_composite:type_name -> livekit.TrackCompositeEgressRequest
+	11, // 6: rpc.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
+	0,  // 7: rpc.EgressInternal.StartEgress:input_type -> rpc.StartEgressRequest
+	1,  // 8: rpc.EgressInternal.ListActiveEgress:input_type -> rpc.ListActiveEgressRequest
+	12, // 9: rpc.EgressHandler.UpdateEgress:input_type -> livekit.UpdateEgressRequest
+	13, // 10: rpc.EgressHandler.StopEgress:input_type -> livekit.StopEgressRequest
+	14, // 11: rpc.EgressHandler.UpdateStream:input_type -> livekit.UpdateStreamRequest
+	3,  // 12: rpc.ReplayExport.EgressReady:input_type -> rpc.EgressReadyRequest
+	15, // 13: rpc.EgressInternal.StartEgress:output_type -> livekit.EgressInfo
+	2,  // 14: rpc.EgressInternal.ListActiveEgress:output_type -> rpc.ListActiveEgressResponse
+	15, // 15: rpc.EgressHandler.UpdateEgress:output_type -> livekit.EgressInfo
+	15, // 16: rpc.EgressHandler.StopEgress:output_type -> livekit.EgressInfo
+	15, // 17: rpc.EgressHandler.UpdateStream:output_type -> livekit.EgressInfo
+	4,  // 18: rpc.ReplayExport.EgressReady:output_type -> rpc.EgressReadyResponse
+	13, // [13:19] is the sub-list for method output_type
+	7,  // [7:13] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_rpc_egress_proto_init() }
@@ -396,6 +556,8 @@ func file_rpc_egress_proto_init() {
 		return
 	}
 	file_rpc_egress_proto_msgTypes[0].OneofWrappers = []any{
+		(*StartEgressRequest_Egress)(nil),
+		(*StartEgressRequest_Replay)(nil),
 		(*StartEgressRequest_RoomComposite)(nil),
 		(*StartEgressRequest_Web)(nil),
 		(*StartEgressRequest_Participant)(nil),
@@ -408,9 +570,9 @@ func file_rpc_egress_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_egress_proto_rawDesc), len(file_rpc_egress_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
-			NumServices:   2,
+			NumServices:   3,
 		},
 		GoTypes:           file_rpc_egress_proto_goTypes,
 		DependencyIndexes: file_rpc_egress_proto_depIdxs,

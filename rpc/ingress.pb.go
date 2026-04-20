@@ -574,15 +574,15 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\x19ListActiveIngressResponse\x12#\n" +
 	"\vingress_ids\x18\x01 \x03(\tB\x02\x18\x01R\n" +
 	"ingressIds\x12>\n" +
-	"\x10ingress_sessions\x18\x02 \x03(\v2\x13.rpc.IngressSessionR\x0fingressSessions\"k\n" +
-	"\x19DeleteWHIPResourceRequest\x12/\n" +
-	"\vresource_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"\x10ingress_sessions\x18\x02 \x03(\v2\x13.rpc.IngressSessionR\x0fingressSessions\"j\n" +
+	"\x19DeleteWHIPResourceRequest\x12.\n" +
+	"\vresource_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"resourceIDR\n" +
 	"resourceId\x12\x1d\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xa2\x02\n" +
-	"\x1dICERestartWHIPResourceRequest\x12/\n" +
-	"\vresource_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xa1\x02\n" +
+	"\x1dICERestartWHIPResourceRequest\x12.\n" +
+	"\vresource_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"resourceIDR\n" +
 	"resourceId\x12\x1d\n" +
 	"\n" +
@@ -596,9 +596,9 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\bif_match\x18\a \x01(\tR\aifMatch\"d\n" +
 	"\x1eICERestartWHIPResourceResponse\x12.\n" +
 	"\x13trickle_ice_sdpfrag\x18\x01 \x01(\tR\x11trickleIceSdpfrag\x12\x12\n" +
-	"\x04etag\x18\x02 \x01(\tR\x04etag\"\xd2\x01\n" +
-	"\x1eWHIPRTCConnectionNotifyRequest\x128\n" +
-	"\x0eparticipant_id\x18\x01 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x12\x16\n" +
+	"\x04etag\x18\x02 \x01(\tR\x04etag\"\xd1\x01\n" +
+	"\x1eWHIPRTCConnectionNotifyRequest\x127\n" +
+	"\x0eparticipant_id\x18\x01 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12\x16\n" +
 	"\x06closed\x18\x02 \x01(\bR\x06closed\x12.\n" +
 	"\x05video\x18\x03 \x01(\v2\x18.livekit.InputVideoStateR\x05video\x12.\n" +
 	"\x05audio\x18\x04 \x01(\v2\x18.livekit.InputAudioStateR\x05audio\"\x94\x03\n" +
@@ -613,11 +613,11 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"o\n" +
-	"\x0eIngressSession\x12,\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"m\n" +
+	"\x0eIngressSession\x12+\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tB\r\x9a\xec,\tingressIDR\tingressId\x12/\n" +
-	"\vresource_id\x18\x02 \x01(\tB\x0e\x9a\xec,\n" +
+	"ingress_id\x18\x01 \x01(\tB\f\xbaP\tingressIDR\tingressId\x12.\n" +
+	"\vresource_id\x18\x02 \x01(\tB\r\xbaP\n" +
 	"resourceIDR\n" +
 	"resourceId\"J\n" +
 	"\x19KillIngressSessionRequest\x12-\n" +

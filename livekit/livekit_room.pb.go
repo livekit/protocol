@@ -52,6 +52,8 @@ type CreateRoomRequest struct {
 	NodeId string `protobuf:"bytes,4,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	// metadata of room
 	Metadata string `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	// search tags
+	Tags map[string]string `protobuf:"bytes,15,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// auto-egress configurations
 	Egress *RoomEgress `protobuf:"bytes,6,opt,name=egress,proto3" json:"egress,omitempty"`
 	// playout delay of subscriber
@@ -63,7 +65,7 @@ type CreateRoomRequest struct {
 	// replay
 	ReplayEnabled bool `protobuf:"varint,13,opt,name=replay_enabled,json=replayEnabled,proto3" json:"replay_enabled,omitempty"`
 	// Define agents that should be dispatched to this room
-	Agents        []*RoomAgentDispatch `protobuf:"bytes,14,rep,name=agents,proto3" json:"agents,omitempty"` // NEXT-ID: 15
+	Agents        []*RoomAgentDispatch `protobuf:"bytes,14,rep,name=agents,proto3" json:"agents,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -145,6 +147,13 @@ func (x *CreateRoomRequest) GetMetadata() string {
 		return x.Metadata
 	}
 	return ""
+}
+
+func (x *CreateRoomRequest) GetTags() map[string]string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
 }
 
 func (x *CreateRoomRequest) GetEgress() *RoomEgress {
@@ -1168,7 +1177,9 @@ type RoomConfiguration struct {
 	// so not recommended for rooms with frequent subscription changes
 	SyncStreams bool `protobuf:"varint,9,opt,name=sync_streams,json=syncStreams,proto3" json:"sync_streams,omitempty"`
 	// Define agents that should be dispatched to this room
-	Agents        []*RoomAgentDispatch `protobuf:"bytes,10,rep,name=agents,proto3" json:"agents,omitempty"`
+	Agents []*RoomAgentDispatch `protobuf:"bytes,10,rep,name=agents,proto3" json:"agents,omitempty"`
+	// Tags to attach to the room
+	Tags          map[string]string `protobuf:"bytes,12,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1269,6 +1280,13 @@ func (x *RoomConfiguration) GetSyncStreams() bool {
 func (x *RoomConfiguration) GetAgents() []*RoomAgentDispatch {
 	if x != nil {
 		return x.Agents
+	}
+	return nil
+}
+
+func (x *RoomConfiguration) GetTags() map[string]string {
+	if x != nil {
+		return x.Tags
 	}
 	return nil
 }
@@ -1595,7 +1613,7 @@ var File_livekit_room_proto protoreflect.FileDescriptor
 
 const file_livekit_room_proto_rawDesc = "" +
 	"\n" +
-	"\x12livekit_room.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x14logger/options.proto\"\xb1\x04\n" +
+	"\x12livekit_room.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x1clivekit_agent_dispatch.proto\x1a\x14logger/options.proto\"\xa1\x05\n" +
 	"\x11CreateRoomRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1f\n" +
 	"\vroom_preset\x18\f \x01(\tR\n" +
@@ -1603,16 +1621,19 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\rempty_timeout\x18\x02 \x01(\rR\femptyTimeout\x12+\n" +
 	"\x11departure_timeout\x18\n" +
 	" \x01(\rR\x10departureTimeout\x12)\n" +
-	"\x10max_participants\x18\x03 \x01(\rR\x0fmaxParticipants\x12#\n" +
-	"\anode_id\x18\x04 \x01(\tB\n" +
-	"\x9a\xec,\x06nodeIDR\x06nodeId\x12B\n" +
-	"\bmetadata\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12+\n" +
+	"\x10max_participants\x18\x03 \x01(\rR\x0fmaxParticipants\x12\"\n" +
+	"\anode_id\x18\x04 \x01(\tB\t\xbaP\x06nodeIDR\x06nodeId\x12@\n" +
+	"\bmetadata\x18\x05 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x128\n" +
+	"\x04tags\x18\x0f \x03(\v2$.livekit.CreateRoomRequest.TagsEntryR\x04tags\x12+\n" +
 	"\x06egress\x18\x06 \x01(\v2\x13.livekit.RoomEgressR\x06egress\x12*\n" +
 	"\x11min_playout_delay\x18\a \x01(\rR\x0fminPlayoutDelay\x12*\n" +
 	"\x11max_playout_delay\x18\b \x01(\rR\x0fmaxPlayoutDelay\x12!\n" +
 	"\fsync_streams\x18\t \x01(\bR\vsyncStreams\x12%\n" +
 	"\x0ereplay_enabled\x18\r \x01(\bR\rreplayEnabled\x122\n" +
-	"\x06agents\x18\x0e \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\"\xb9\x01\n" +
+	"\x06agents\x18\x0e \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x1a7\n" +
+	"\tTagsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb9\x01\n" +
 	"\n" +
 	"RoomEgress\x127\n" +
 	"\x04room\x18\x01 \x01(\v2#.livekit.RoomCompositeEgressRequestR\x04room\x12@\n" +
@@ -1643,17 +1664,17 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\ttrack_sid\x18\x03 \x01(\tR\btrackSid\x12\x14\n" +
 	"\x05muted\x18\x04 \x01(\bR\x05muted\"A\n" +
 	"\x15MuteRoomTrackResponse\x12(\n" +
-	"\x05track\x18\x01 \x01(\v2\x12.livekit.TrackInfoR\x05track\"\xc4\x03\n" +
+	"\x05track\x18\x01 \x01(\v2\x12.livekit.TrackInfoR\x05track\"\xbe\x03\n" +
 	"\x18UpdateParticipantRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
-	"\bidentity\x18\x02 \x01(\tR\bidentity\x12B\n" +
-	"\bmetadata\x18\x03 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12>\n" +
+	"\bidentity\x18\x02 \x01(\tR\bidentity\x12@\n" +
+	"\bmetadata\x18\x03 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12>\n" +
 	"\n" +
 	"permission\x18\x04 \x01(\v2\x1e.livekit.ParticipantPermissionR\n" +
-	"permission\x12:\n" +
-	"\x04name\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x04name\x12y\n" +
+	"permission\x128\n" +
+	"\x04name\x18\x05 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x04name\x12w\n" +
 	"\n" +
-	"attributes\x18\x06 \x03(\v21.livekit.UpdateParticipantRequest.AttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\n" +
+	"attributes\x18\x06 \x03(\v21.livekit.UpdateParticipantRequest.AttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\n" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -1675,22 +1696,26 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x05topic\x18\x05 \x01(\tH\x00R\x05topic\x88\x01\x01\x12\x14\n" +
 	"\x05nonce\x18\a \x01(\fR\x05nonceB\b\n" +
 	"\x06_topic\"\x12\n" +
-	"\x10SendDataResponse\"s\n" +
+	"\x10SendDataResponse\"q\n" +
 	"\x19UpdateRoomMetadataRequest\x12\x12\n" +
-	"\x04room\x18\x01 \x01(\tR\x04room\x12B\n" +
-	"\bmetadata\x18\x02 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\"\xc4\x03\n" +
+	"\x04room\x18\x01 \x01(\tR\x04room\x12@\n" +
+	"\bmetadata\x18\x02 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\"\xb5\x04\n" +
 	"\x11RoomConfiguration\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
 	"\rempty_timeout\x18\x02 \x01(\rR\femptyTimeout\x12+\n" +
 	"\x11departure_timeout\x18\x03 \x01(\rR\x10departureTimeout\x12)\n" +
-	"\x10max_participants\x18\x04 \x01(\rR\x0fmaxParticipants\x12B\n" +
-	"\bmetadata\x18\v \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12+\n" +
+	"\x10max_participants\x18\x04 \x01(\rR\x0fmaxParticipants\x12@\n" +
+	"\bmetadata\x18\v \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12+\n" +
 	"\x06egress\x18\x05 \x01(\v2\x13.livekit.RoomEgressR\x06egress\x12*\n" +
 	"\x11min_playout_delay\x18\a \x01(\rR\x0fminPlayoutDelay\x12*\n" +
 	"\x11max_playout_delay\x18\b \x01(\rR\x0fmaxPlayoutDelay\x12!\n" +
 	"\fsync_streams\x18\t \x01(\bR\vsyncStreams\x122\n" +
 	"\x06agents\x18\n" +
-	" \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\"v\n" +
+	" \x03(\v2\x1a.livekit.RoomAgentDispatchR\x06agents\x128\n" +
+	"\x04tags\x18\f \x03(\v2$.livekit.RoomConfiguration.TagsEntryR\x04tags\x1a7\n" +
+	"\tTagsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"v\n" +
 	"\x19ForwardParticipantRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12)\n" +
@@ -1740,7 +1765,7 @@ func file_livekit_room_proto_rawDescGZIP() []byte {
 	return file_livekit_room_proto_rawDescData
 }
 
-var file_livekit_room_proto_msgTypes = make([]protoimpl.MessageInfo, 27)
+var file_livekit_room_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_livekit_room_proto_goTypes = []any{
 	(*CreateRoomRequest)(nil),           // 0: livekit.CreateRoomRequest
 	(*RoomEgress)(nil),                  // 1: livekit.RoomEgress
@@ -1768,67 +1793,71 @@ var file_livekit_room_proto_goTypes = []any{
 	(*MoveParticipantResponse)(nil),     // 23: livekit.MoveParticipantResponse
 	(*PerformRpcRequest)(nil),           // 24: livekit.PerformRpcRequest
 	(*PerformRpcResponse)(nil),          // 25: livekit.PerformRpcResponse
-	nil,                                 // 26: livekit.UpdateParticipantRequest.AttributesEntry
-	(*RoomAgentDispatch)(nil),           // 27: livekit.RoomAgentDispatch
-	(*RoomCompositeEgressRequest)(nil),  // 28: livekit.RoomCompositeEgressRequest
-	(*AutoParticipantEgress)(nil),       // 29: livekit.AutoParticipantEgress
-	(*AutoTrackEgress)(nil),             // 30: livekit.AutoTrackEgress
-	(*Room)(nil),                        // 31: livekit.Room
-	(*ParticipantInfo)(nil),             // 32: livekit.ParticipantInfo
-	(*TrackInfo)(nil),                   // 33: livekit.TrackInfo
-	(*ParticipantPermission)(nil),       // 34: livekit.ParticipantPermission
-	(*ParticipantTracks)(nil),           // 35: livekit.ParticipantTracks
-	(DataPacket_Kind)(0),                // 36: livekit.DataPacket.Kind
+	nil,                                 // 26: livekit.CreateRoomRequest.TagsEntry
+	nil,                                 // 27: livekit.UpdateParticipantRequest.AttributesEntry
+	nil,                                 // 28: livekit.RoomConfiguration.TagsEntry
+	(*RoomAgentDispatch)(nil),           // 29: livekit.RoomAgentDispatch
+	(*RoomCompositeEgressRequest)(nil),  // 30: livekit.RoomCompositeEgressRequest
+	(*AutoParticipantEgress)(nil),       // 31: livekit.AutoParticipantEgress
+	(*AutoTrackEgress)(nil),             // 32: livekit.AutoTrackEgress
+	(*Room)(nil),                        // 33: livekit.Room
+	(*ParticipantInfo)(nil),             // 34: livekit.ParticipantInfo
+	(*TrackInfo)(nil),                   // 35: livekit.TrackInfo
+	(*ParticipantPermission)(nil),       // 36: livekit.ParticipantPermission
+	(*ParticipantTracks)(nil),           // 37: livekit.ParticipantTracks
+	(DataPacket_Kind)(0),                // 38: livekit.DataPacket.Kind
 }
 var file_livekit_room_proto_depIdxs = []int32{
-	1,  // 0: livekit.CreateRoomRequest.egress:type_name -> livekit.RoomEgress
-	27, // 1: livekit.CreateRoomRequest.agents:type_name -> livekit.RoomAgentDispatch
-	28, // 2: livekit.RoomEgress.room:type_name -> livekit.RoomCompositeEgressRequest
-	29, // 3: livekit.RoomEgress.participant:type_name -> livekit.AutoParticipantEgress
-	30, // 4: livekit.RoomEgress.tracks:type_name -> livekit.AutoTrackEgress
-	27, // 5: livekit.RoomAgent.dispatches:type_name -> livekit.RoomAgentDispatch
-	31, // 6: livekit.ListRoomsResponse.rooms:type_name -> livekit.Room
-	32, // 7: livekit.ListParticipantsResponse.participants:type_name -> livekit.ParticipantInfo
-	33, // 8: livekit.MuteRoomTrackResponse.track:type_name -> livekit.TrackInfo
-	34, // 9: livekit.UpdateParticipantRequest.permission:type_name -> livekit.ParticipantPermission
-	26, // 10: livekit.UpdateParticipantRequest.attributes:type_name -> livekit.UpdateParticipantRequest.AttributesEntry
-	35, // 11: livekit.UpdateSubscriptionsRequest.participant_tracks:type_name -> livekit.ParticipantTracks
-	36, // 12: livekit.SendDataRequest.kind:type_name -> livekit.DataPacket.Kind
-	1,  // 13: livekit.RoomConfiguration.egress:type_name -> livekit.RoomEgress
-	27, // 14: livekit.RoomConfiguration.agents:type_name -> livekit.RoomAgentDispatch
-	0,  // 15: livekit.RoomService.CreateRoom:input_type -> livekit.CreateRoomRequest
-	3,  // 16: livekit.RoomService.ListRooms:input_type -> livekit.ListRoomsRequest
-	5,  // 17: livekit.RoomService.DeleteRoom:input_type -> livekit.DeleteRoomRequest
-	7,  // 18: livekit.RoomService.ListParticipants:input_type -> livekit.ListParticipantsRequest
-	9,  // 19: livekit.RoomService.GetParticipant:input_type -> livekit.RoomParticipantIdentity
-	9,  // 20: livekit.RoomService.RemoveParticipant:input_type -> livekit.RoomParticipantIdentity
-	11, // 21: livekit.RoomService.MutePublishedTrack:input_type -> livekit.MuteRoomTrackRequest
-	13, // 22: livekit.RoomService.UpdateParticipant:input_type -> livekit.UpdateParticipantRequest
-	14, // 23: livekit.RoomService.UpdateSubscriptions:input_type -> livekit.UpdateSubscriptionsRequest
-	16, // 24: livekit.RoomService.SendData:input_type -> livekit.SendDataRequest
-	18, // 25: livekit.RoomService.UpdateRoomMetadata:input_type -> livekit.UpdateRoomMetadataRequest
-	20, // 26: livekit.RoomService.ForwardParticipant:input_type -> livekit.ForwardParticipantRequest
-	22, // 27: livekit.RoomService.MoveParticipant:input_type -> livekit.MoveParticipantRequest
-	24, // 28: livekit.RoomService.PerformRpc:input_type -> livekit.PerformRpcRequest
-	31, // 29: livekit.RoomService.CreateRoom:output_type -> livekit.Room
-	4,  // 30: livekit.RoomService.ListRooms:output_type -> livekit.ListRoomsResponse
-	6,  // 31: livekit.RoomService.DeleteRoom:output_type -> livekit.DeleteRoomResponse
-	8,  // 32: livekit.RoomService.ListParticipants:output_type -> livekit.ListParticipantsResponse
-	32, // 33: livekit.RoomService.GetParticipant:output_type -> livekit.ParticipantInfo
-	10, // 34: livekit.RoomService.RemoveParticipant:output_type -> livekit.RemoveParticipantResponse
-	12, // 35: livekit.RoomService.MutePublishedTrack:output_type -> livekit.MuteRoomTrackResponse
-	32, // 36: livekit.RoomService.UpdateParticipant:output_type -> livekit.ParticipantInfo
-	15, // 37: livekit.RoomService.UpdateSubscriptions:output_type -> livekit.UpdateSubscriptionsResponse
-	17, // 38: livekit.RoomService.SendData:output_type -> livekit.SendDataResponse
-	31, // 39: livekit.RoomService.UpdateRoomMetadata:output_type -> livekit.Room
-	21, // 40: livekit.RoomService.ForwardParticipant:output_type -> livekit.ForwardParticipantResponse
-	23, // 41: livekit.RoomService.MoveParticipant:output_type -> livekit.MoveParticipantResponse
-	25, // 42: livekit.RoomService.PerformRpc:output_type -> livekit.PerformRpcResponse
-	29, // [29:43] is the sub-list for method output_type
-	15, // [15:29] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	26, // 0: livekit.CreateRoomRequest.tags:type_name -> livekit.CreateRoomRequest.TagsEntry
+	1,  // 1: livekit.CreateRoomRequest.egress:type_name -> livekit.RoomEgress
+	29, // 2: livekit.CreateRoomRequest.agents:type_name -> livekit.RoomAgentDispatch
+	30, // 3: livekit.RoomEgress.room:type_name -> livekit.RoomCompositeEgressRequest
+	31, // 4: livekit.RoomEgress.participant:type_name -> livekit.AutoParticipantEgress
+	32, // 5: livekit.RoomEgress.tracks:type_name -> livekit.AutoTrackEgress
+	29, // 6: livekit.RoomAgent.dispatches:type_name -> livekit.RoomAgentDispatch
+	33, // 7: livekit.ListRoomsResponse.rooms:type_name -> livekit.Room
+	34, // 8: livekit.ListParticipantsResponse.participants:type_name -> livekit.ParticipantInfo
+	35, // 9: livekit.MuteRoomTrackResponse.track:type_name -> livekit.TrackInfo
+	36, // 10: livekit.UpdateParticipantRequest.permission:type_name -> livekit.ParticipantPermission
+	27, // 11: livekit.UpdateParticipantRequest.attributes:type_name -> livekit.UpdateParticipantRequest.AttributesEntry
+	37, // 12: livekit.UpdateSubscriptionsRequest.participant_tracks:type_name -> livekit.ParticipantTracks
+	38, // 13: livekit.SendDataRequest.kind:type_name -> livekit.DataPacket.Kind
+	1,  // 14: livekit.RoomConfiguration.egress:type_name -> livekit.RoomEgress
+	29, // 15: livekit.RoomConfiguration.agents:type_name -> livekit.RoomAgentDispatch
+	28, // 16: livekit.RoomConfiguration.tags:type_name -> livekit.RoomConfiguration.TagsEntry
+	0,  // 17: livekit.RoomService.CreateRoom:input_type -> livekit.CreateRoomRequest
+	3,  // 18: livekit.RoomService.ListRooms:input_type -> livekit.ListRoomsRequest
+	5,  // 19: livekit.RoomService.DeleteRoom:input_type -> livekit.DeleteRoomRequest
+	7,  // 20: livekit.RoomService.ListParticipants:input_type -> livekit.ListParticipantsRequest
+	9,  // 21: livekit.RoomService.GetParticipant:input_type -> livekit.RoomParticipantIdentity
+	9,  // 22: livekit.RoomService.RemoveParticipant:input_type -> livekit.RoomParticipantIdentity
+	11, // 23: livekit.RoomService.MutePublishedTrack:input_type -> livekit.MuteRoomTrackRequest
+	13, // 24: livekit.RoomService.UpdateParticipant:input_type -> livekit.UpdateParticipantRequest
+	14, // 25: livekit.RoomService.UpdateSubscriptions:input_type -> livekit.UpdateSubscriptionsRequest
+	16, // 26: livekit.RoomService.SendData:input_type -> livekit.SendDataRequest
+	18, // 27: livekit.RoomService.UpdateRoomMetadata:input_type -> livekit.UpdateRoomMetadataRequest
+	20, // 28: livekit.RoomService.ForwardParticipant:input_type -> livekit.ForwardParticipantRequest
+	22, // 29: livekit.RoomService.MoveParticipant:input_type -> livekit.MoveParticipantRequest
+	24, // 30: livekit.RoomService.PerformRpc:input_type -> livekit.PerformRpcRequest
+	33, // 31: livekit.RoomService.CreateRoom:output_type -> livekit.Room
+	4,  // 32: livekit.RoomService.ListRooms:output_type -> livekit.ListRoomsResponse
+	6,  // 33: livekit.RoomService.DeleteRoom:output_type -> livekit.DeleteRoomResponse
+	8,  // 34: livekit.RoomService.ListParticipants:output_type -> livekit.ListParticipantsResponse
+	34, // 35: livekit.RoomService.GetParticipant:output_type -> livekit.ParticipantInfo
+	10, // 36: livekit.RoomService.RemoveParticipant:output_type -> livekit.RemoveParticipantResponse
+	12, // 37: livekit.RoomService.MutePublishedTrack:output_type -> livekit.MuteRoomTrackResponse
+	34, // 38: livekit.RoomService.UpdateParticipant:output_type -> livekit.ParticipantInfo
+	15, // 39: livekit.RoomService.UpdateSubscriptions:output_type -> livekit.UpdateSubscriptionsResponse
+	17, // 40: livekit.RoomService.SendData:output_type -> livekit.SendDataResponse
+	33, // 41: livekit.RoomService.UpdateRoomMetadata:output_type -> livekit.Room
+	21, // 42: livekit.RoomService.ForwardParticipant:output_type -> livekit.ForwardParticipantResponse
+	23, // 43: livekit.RoomService.MoveParticipant:output_type -> livekit.MoveParticipantResponse
+	25, // 44: livekit.RoomService.PerformRpc:output_type -> livekit.PerformRpcResponse
+	31, // [31:45] is the sub-list for method output_type
+	17, // [17:31] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_livekit_room_proto_init() }
@@ -1846,7 +1875,7 @@ func file_livekit_room_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_room_proto_rawDesc), len(file_livekit_room_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   27,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

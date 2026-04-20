@@ -7,7 +7,21 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/livekit/protocol/egress"
 	"github.com/livekit/protocol/livekit"
+)
+
+type EgressStatus = string
+
+const (
+	EgressStatusUndefined    EgressStatus = ""
+	EgressStatusStarting     EgressStatus = "starting"
+	EgressStatusActive       EgressStatus = "active"
+	EgressStatusEnding       EgressStatus = "ending"
+	EgressStatusComplete     EgressStatus = "complete"
+	EgressStatusFailed       EgressStatus = "failed"
+	EgressStatusAborted      EgressStatus = "aborted"
+	EgressStatusLimitReached EgressStatus = "limit_reached"
 )
 
 type EgressResults struct {
@@ -18,18 +32,42 @@ type EgressResults struct {
 }
 
 func GetSourceType(info *livekit.EgressInfo) SessionSourceType {
-	switch info.SourceType {
-	case livekit.EgressSourceType_EGRESS_SOURCE_TYPE_WEB:
-		return SessionSourceTypeWeb
-	case livekit.EgressSourceType_EGRESS_SOURCE_TYPE_SDK:
-		return SessionSourceTypeSdk
+	switch r := info.Request.(type) {
+	// case *livekit.EgressInfo_Egress:
+	// 	return getSourceTypeV2(r.Egress)
+	case *livekit.EgressInfo_Replay:
+		return getSourceTypeV2(r.Replay)
 	default:
-		return SessionSourceTypeUndefined
+		switch info.SourceType {
+		case livekit.EgressSourceType_EGRESS_SOURCE_TYPE_WEB:
+			return SessionSourceTypeWeb
+		case livekit.EgressSourceType_EGRESS_SOURCE_TYPE_SDK:
+			return SessionSourceTypeSdk
+		default:
+			return SessionSourceTypeUndefined
+		}
 	}
+}
+
+func getSourceTypeV2(r egress.EgressRequest) SessionSourceType {
+	if r.GetMedia() != nil {
+		return SessionSourceTypeMedia
+	}
+	if r.GetTemplate() != nil {
+		return SessionSourceTypeTemplate
+	}
+	if r.GetWeb() != nil {
+		return SessionSourceTypeWeb
+	}
+	return SessionSourceTypeUndefined
 }
 
 func GetRequestType(info *livekit.EgressInfo) EgressRequestType {
 	switch info.Request.(type) {
+	// case *livekit.EgressInfo_Egress:
+	// 	return EgressRequestTypeEgress
+	case *livekit.EgressInfo_Replay:
+		return EgressRequestTypeReplay
 	case *livekit.EgressInfo_RoomComposite:
 		return EgressRequestTypeRoomComposite
 	case *livekit.EgressInfo_Web:
@@ -45,29 +83,41 @@ func GetRequestType(info *livekit.EgressInfo) EgressRequestType {
 	}
 }
 
-func GetStatus(info *livekit.EgressInfo) SessionStatus {
+func GetStatus(info *livekit.EgressInfo) EgressStatus {
 	switch info.Status {
 	case livekit.EgressStatus_EGRESS_STARTING:
-		return SessionStatusStarting
+		return EgressStatusStarting
 	case livekit.EgressStatus_EGRESS_ACTIVE:
-		return SessionStatusActive
+		return EgressStatusActive
 	case livekit.EgressStatus_EGRESS_ENDING:
-		return SessionStatusEnding
+		return EgressStatusEnding
 	case livekit.EgressStatus_EGRESS_COMPLETE:
-		return SessionStatusComplete
+		return EgressStatusComplete
 	case livekit.EgressStatus_EGRESS_ABORTED:
-		return SessionStatusAborted
+		return EgressStatusAborted
 	case livekit.EgressStatus_EGRESS_LIMIT_REACHED:
-		return SessionStatusLimitReached
+		return EgressStatusLimitReached
 	case livekit.EgressStatus_EGRESS_FAILED:
-		return SessionStatusFailed
+		return EgressStatusFailed
 	default:
-		return SessionStatusUndefined
+		return EgressStatusUndefined
 	}
 }
 
 func GetRequest(info *livekit.EgressInfo) (string, error) {
 	switch req := info.Request.(type) {
+	// case *livekit.EgressInfo_Egress:
+	// 	b, err := protojson.Marshal(req.Egress)
+	// 	if err != nil {
+	// 		return "", errors.Wrap(err, "failed to marshal egress request")
+	// 	}
+	// 	return string(b), nil
+	case *livekit.EgressInfo_Replay:
+		b, err := protojson.Marshal(req.Replay)
+		if err != nil {
+			return "", errors.Wrap(err, "failed serializing Replay request")
+		}
+		return string(b), nil
 	case *livekit.EgressInfo_RoomComposite:
 		b, err := protojson.Marshal(req.RoomComposite)
 		if err != nil {

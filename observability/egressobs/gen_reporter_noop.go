@@ -64,7 +64,7 @@ func (r *noopEgressReporter) ReportAudioOnly(v bool)                            
 func (r *noopEgressReporter) ReportStartTime(v time.Time)                         {}
 func (r *noopEgressReporter) ReportEndTime(v time.Time)                           {}
 func (r *noopEgressReporter) ReportUpdateTime(v time.Time)                        {}
-func (r *noopEgressReporter) ReportStatus(v EgressStatus)                         {}
+func (r *noopEgressReporter) ReportStatus(v string)                               {}
 func (r *noopEgressReporter) ReportDetails(v string)                              {}
 func (r *noopEgressReporter) ReportError(v string)                                {}
 func (r *noopEgressReporter) ReportErrorCode(v int32)                             {}
@@ -94,7 +94,7 @@ func (r *noopSessionReporter) ReportRetryCount(v uint32)                        
 func (r *noopSessionReporter) ReportSourceType(v SessionSourceType)                 {}
 func (r *noopSessionReporter) ReportRegion(v string)                                {}
 func (r *noopSessionReporter) ReportRoomID(v string)                                {}
-func (r *noopSessionReporter) ReportStatus(v SessionStatus)                         {}
+func (r *noopSessionReporter) ReportStatus(v string)                                {}
 func (r *noopSessionReporter) ReportDetails(v string)                               {}
 func (r *noopSessionReporter) ReportError(v string)                                 {}
 func (r *noopSessionReporter) ReportErrorCode(v int32)                              {}

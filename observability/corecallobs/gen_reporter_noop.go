@@ -1,6 +1,6 @@
 // Code generated; DO NOT EDIT.
 
-package core_callobs
+package corecallobs
 
 import (
 	"time"
@@ -62,6 +62,8 @@ func (r *noopCallReporter) ReportDuration(v uint64)                           {}
 func (r *noopCallReporter) ReportDurationMinutes(v uint16)                    {}
 func (r *noopCallReporter) ReportDirection(v CallDirection)                   {}
 func (r *noopCallReporter) ReportCallType(v CallCallType)                     {}
+func (r *noopCallReporter) ReportFrom(v string)                               {}
+func (r *noopCallReporter) ReportTo(v string)                                 {}
 func (r *noopCallReporter) ReportRegion(v string)                             {}
 func (r *noopCallReporter) ReportRoomID(v string)                             {}
 func (r *noopCallReporter) ReportRoomName(v string)                           {}

@@ -1,6 +1,6 @@
 module github.com/livekit/protocol
 
-go 1.24.0
+go 1.25.0
 
 require (
 	buf.build/go/protoyaml v0.6.0
@@ -9,7 +9,7 @@ require (
 	github.com/frostbyte73/core v0.1.1
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gammazero/deque v1.1.0
-	github.com/go-jose/go-jose/v3 v3.0.4
+	github.com/go-jose/go-jose/v3 v3.0.5
 	github.com/go-logr/logr v1.4.3
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jxskiss/base62 v1.1.0

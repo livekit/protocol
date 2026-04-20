@@ -542,7 +542,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			require.NotNil(t, rqi)
 			require.NotNil(t, rqi.resourceQueue)
 			require.NotSame(t, rqi.resourceQueue, rq)
-			rq = rqi.resourceQueue
+			rq = rqi.resourceQueue //nolint:staticcheck // used in next loop iteration
 			time.Sleep(10 * time.Millisecond)
 		}
 
