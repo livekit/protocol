@@ -36,7 +36,7 @@ message SessionSettings {
   uint32 sample_rate = 1;
   AudioEncoding encoding = 2;
   oneof type_settings {
-    EouSettings eou_settings = 3;
+    EotSettings eot_settings = 3;
     InterruptionSettings interruption_settings = 4;
   }
 }
@@ -49,9 +49,9 @@ message Error {
   uint32 code = 2;
 }
 
-// --- End of Turn (EOU) Settings ---
+// --- End of Turn (EOT) Settings ---
 
-message EouSettings {
+message EotSettings {
   google.protobuf.Duration detection_interval = 1;
 }
 
@@ -79,7 +79,7 @@ message InputAudio {
   uint32 num_samples = 3;
 }
 
-message EouInputChatContext {
+message EotInputChatContext {
   repeated ChatMessage messages = 1;
 }
 
@@ -112,13 +112,13 @@ message ClientMessage {
     BufferStart buffer_start = 8;
     BufferStop buffer_stop = 9;
     // only for end of turn
-    EouInputChatContext eou_input_chat_context = 10;
+    EotInputChatContext eot_input_chat_context = 10;
   }
 }
 
 // --- Server -> Model ---
 
-message EouInferenceRequest {
+message EotInferenceRequest {
   bytes audio = 1;
   string assistant_text = 2;
   AudioEncoding encoding = 3;
@@ -133,7 +133,7 @@ message InterruptionInferenceRequest {
 
 message InferenceRequest {
   oneof request {
-    EouInferenceRequest eou_inference_request = 1;
+    EotInferenceRequest eot_inference_request = 1;
     InterruptionInferenceRequest interruption_inference_request = 2;
   }
 }
@@ -154,7 +154,7 @@ message ProcessingStats {
 }
 
 
-message EouInferenceResponse {
+message EotInferenceResponse {
   float probability = 1;
   InferenceStats stats = 2;
 }
@@ -168,7 +168,7 @@ message InterruptionInferenceResponse {
 
 message InferenceResponse {
   oneof response {
-    EouInferenceResponse eou_inference_response = 1;
+    EotInferenceResponse eot_inference_response = 1;
     InterruptionInferenceResponse interruption_inference_response = 2;
   }
 }
@@ -183,7 +183,7 @@ message InferenceStopped {}
 
 message SessionClosed {}
 
-message EouPrediction {
+message EotPrediction {
   float probability = 1;
   ProcessingStats processing_stats = 2;
 }
@@ -198,7 +198,7 @@ message InterruptionPrediction {
 
 message Prediction {
   oneof prediction {
-    EouPrediction eou_prediction = 1;
+    EotPrediction eot_prediction = 1;
     InterruptionPrediction interruption_prediction = 2;
   }
 }
