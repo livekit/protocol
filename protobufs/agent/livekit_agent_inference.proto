@@ -20,9 +20,9 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 option optimize_for = SPEED;
 
-import "agent/livekit_agent_session.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "agent/livekit_agent_session.proto";
 
 // --- Shared Types ---
 
@@ -35,15 +35,9 @@ message SessionSettings {
   uint32 sample_rate = 1;
   AudioEncoding encoding = 2;
   oneof type_settings {
-    TdSettings td_settings = 3;
-    BiSettings bi_settings = 4;
+    EouSettings eou_settings = 3;
+    InterruptionSettings interruption_settings = 4;
   }
-}
-
-message InferenceStats {
-  google.protobuf.Duration e2e_latency = 1;
-  google.protobuf.Duration preprocessing_duration = 2;
-  google.protobuf.Duration inference_duration = 3;
 }
 
 message Error {
@@ -54,22 +48,15 @@ message Error {
   uint32 code = 2;
 }
 
-message ProcessingStats {
-  google.protobuf.Timestamp earliest_client_created_at = 1;
-  google.protobuf.Timestamp latest_client_created_at = 2;
-  google.protobuf.Duration e2e_latency = 3;
-  InferenceStats inference_stats = 4;
-}
+// --- End of Turn (EOU) Settings ---
 
-// --- Turn Detection Settings ---
-
-message TdSettings {
+message EouSettings {
   float detection_interval = 1;
 }
 
-// --- Barge-in Settings ---
+// --- Interruption Settings ---
 
-message BiSettings {
+message InterruptionSettings {
   float threshold = 1;
   uint32 min_frames = 2;
   float max_audio_duration = 3;
@@ -89,7 +76,7 @@ message InputAudio {
   uint32 num_samples = 3;
 }
 
-message TdInputChatContext {
+message EouInputChatContext {
   repeated ChatMessage messages = 1;
 }
 
@@ -120,21 +107,21 @@ message ClientMessage {
     InferenceStop inference_stop = 7;
     BufferStart buffer_start = 8;
     BufferStop buffer_stop = 9;
-    // only for turn detection
-    TdInputChatContext td_input_chat_context = 10;
+    // only for end of turn
+    EouInputChatContext eou_input_chat_context = 10;
   }
 }
 
 // --- Server -> Model ---
 
-message TdInferenceRequest {
+message EouInferenceRequest {
   bytes audio = 1;
   string assistant_text = 2;
   AudioEncoding encoding = 3;
   uint32 sample_rate = 4;
 }
 
-message BiInferenceRequest {
+message InterruptionInferenceRequest {
   bytes audio = 1;
   AudioEncoding encoding = 2;
   uint32 sample_rate = 3;
@@ -142,18 +129,31 @@ message BiInferenceRequest {
 
 message InferenceRequest {
   oneof request {
-    TdInferenceRequest td_inference_request = 1;
-    BiInferenceRequest bi_inference_request = 2;
+    EouInferenceRequest eou_inference_request = 1;
+    InterruptionInferenceRequest interruption_inference_request = 2;
   }
 }
 
+message InferenceStats {
+  google.protobuf.Duration e2e_latency = 1;
+  google.protobuf.Duration preprocessing_duration = 2;
+  google.protobuf.Duration inference_duration = 3;
+}
 
-message TdInferenceResponse {
+message ProcessingStats {
+  google.protobuf.Timestamp earliest_client_created_at = 1;
+  google.protobuf.Timestamp latest_client_created_at = 2;
+  google.protobuf.Duration e2e_latency = 3;
+  InferenceStats inference_stats = 4;
+}
+
+
+message EouInferenceResponse {
   float probability = 1;
   InferenceStats stats = 2;
 }
 
-message BiInferenceResponse {
+message InterruptionInferenceResponse {
   bool is_bargein = 1;
   repeated float probabilities = 2;
   InferenceStats stats = 3;
@@ -161,8 +161,8 @@ message BiInferenceResponse {
 
 message InferenceResponse {
   oneof response {
-    TdInferenceResponse td_inference_response = 1;
-    BiInferenceResponse bi_inference_response = 2;
+    EouInferenceResponse eou_inference_response = 1;
+    InterruptionInferenceResponse interruption_inference_response = 2;
   }
 }
 
@@ -176,12 +176,12 @@ message InferenceStopped {}
 
 message SessionClosed {}
 
-message TdPrediction {
+message EouPrediction {
   float probability = 1;
   ProcessingStats processing_stats = 2;
 }
 
-message BiPrediction {
+message InterruptionPrediction {
   bool is_bargein = 1;
   repeated float probabilities = 2;
   ProcessingStats processing_stats = 3;
@@ -191,8 +191,8 @@ message BiPrediction {
 
 message Prediction {
   oneof prediction {
-    TdPrediction td_prediction = 1;
-    BiPrediction bi_prediction = 2;
+    EouPrediction eou_prediction = 1;
+    InterruptionPrediction interruption_prediction = 2;
   }
 }
 
