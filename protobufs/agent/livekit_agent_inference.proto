@@ -160,7 +160,7 @@ message EotInferenceResponse {
 }
 
 message InterruptionInferenceResponse {
-  bool is_bargein = 1;
+  bool is_interruption = 1;
   // per frame probabilities
   repeated float probabilities = 2;
   InferenceStats stats = 3;
