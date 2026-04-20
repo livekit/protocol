@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 syntax = "proto3";
 
 package livekit.agent;
@@ -20,9 +21,9 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 option optimize_for = SPEED;
 
+import "agent/livekit_agent_session.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
-import "agent/livekit_agent_session.proto";
 
 // --- Shared Types ---
 
@@ -51,17 +52,19 @@ message Error {
 // --- End of Turn (EOU) Settings ---
 
 message EouSettings {
-  float detection_interval = 1;
+  google.protobuf.Duration detection_interval = 1;
 }
 
 // --- Interruption Settings ---
 
 message InterruptionSettings {
+  // detection threshold in range [0.0, 1.0]; higher values are less sensitive
   float threshold = 1;
+  // minimum number of frames with probability greater than threshold to trigger an interruption
   uint32 min_frames = 2;
-  float max_audio_duration = 3;
-  float audio_prefix_duration = 4;
-  float detection_interval = 5;
+  google.protobuf.Duration max_audio_duration = 3;
+  google.protobuf.Duration audio_prefix_duration = 4;
+  google.protobuf.Duration detection_interval = 5;
 }
 
 // --- Client -> Server ---
@@ -92,6 +95,7 @@ message InferenceStop {
   string request_id = 1;
 }
 
+// audio buffer sentinel messages
 message BufferStart {}
 
 message BufferStop {}
@@ -135,6 +139,7 @@ message InferenceRequest {
 }
 
 message InferenceStats {
+  // server-side e2e latency (server input to server output)
   google.protobuf.Duration e2e_latency = 1;
   google.protobuf.Duration preprocessing_duration = 2;
   google.protobuf.Duration inference_duration = 3;
@@ -143,6 +148,7 @@ message InferenceStats {
 message ProcessingStats {
   google.protobuf.Timestamp earliest_client_created_at = 1;
   google.protobuf.Timestamp latest_client_created_at = 2;
+  // client-side e2e latency (client send to client receive)
   google.protobuf.Duration e2e_latency = 3;
   InferenceStats inference_stats = 4;
 }
@@ -155,6 +161,7 @@ message EouInferenceResponse {
 
 message InterruptionInferenceResponse {
   bool is_bargein = 1;
+  // per frame probabilities
   repeated float probabilities = 2;
   InferenceStats stats = 3;
 }
@@ -185,8 +192,8 @@ message InterruptionPrediction {
   bool is_bargein = 1;
   repeated float probabilities = 2;
   ProcessingStats processing_stats = 3;
-  int64 created_at = 4;
-  float prediction_duration = 5;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Duration prediction_duration = 5;
 }
 
 message Prediction {
@@ -199,6 +206,7 @@ message Prediction {
 message ServerMessage {
   google.protobuf.Timestamp server_created_at = 1;
   optional string request_id = 2;
+  // echoes the client-side created_at timestamp
   optional google.protobuf.Timestamp client_created_at = 3;
   oneof message {
     SessionCreated session_created = 4;
