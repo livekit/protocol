@@ -189,7 +189,7 @@ message EotPrediction {
 }
 
 message InterruptionPrediction {
-  bool is_bargein = 1;
+  bool is_interruption = 1;
   repeated float probabilities = 2;
   ProcessingStats processing_stats = 3;
   google.protobuf.Timestamp created_at = 4;
