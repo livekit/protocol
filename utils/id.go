@@ -50,6 +50,7 @@ const (
 	CloudAgentSecretPrefix             = guid.CloudAgentSecretPrefix
 	CloudAgentWorkerPrefix             = guid.CloudAgentWorkerPrefix
 	CloudAgentPrivateLinkPrefix        = guid.CloudAgentPrivateLinkPrefix
+	CloudAgentPrivateLinkClusterPrefix = guid.CloudAgentPrivateLinkClusterPrefix
 	CloudAgentPrivateLinkGatewayPrefix = guid.CloudAgentPrivateLinkGatewayPrefix
 	CloudAgentPrivateLinkSecretPrefix  = guid.CloudAgentPrivateLinkSecretPrefix
 )
