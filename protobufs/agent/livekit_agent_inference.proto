@@ -41,7 +41,7 @@ message SessionSettings {
   }
 }
 
-message Error {
+message InferenceError {
   string message = 1;
   // error code follows the HTTP status code convention
   // 4xx for client errors
@@ -196,13 +196,6 @@ message InterruptionPrediction {
   google.protobuf.Duration prediction_duration = 5;
 }
 
-message Prediction {
-  oneof prediction {
-    EotPrediction eot_prediction = 1;
-    InterruptionPrediction interruption_prediction = 2;
-  }
-}
-
 message ServerMessage {
   google.protobuf.Timestamp server_created_at = 1;
   optional string request_id = 2;
@@ -213,7 +206,8 @@ message ServerMessage {
     InferenceStarted inference_started = 5;
     InferenceStopped inference_stopped = 6;
     SessionClosed session_closed = 7;
-    Error error = 8;
-    Prediction prediction = 9;
+    InferenceError error = 8;
+    EotPrediction eot_prediction = 9;
+    InterruptionPrediction interruption_prediction = 10;
   }
 }
