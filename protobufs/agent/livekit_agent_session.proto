@@ -27,6 +27,15 @@ message MetricsReport {
   optional double e2e_latency = 8;
 }
 
+message TimedString {
+  string text = 1;
+  optional double start_time = 2;
+  optional double end_time = 3;
+  optional double confidence = 4;
+  optional double start_time_offset = 5;
+  optional string speaker_id = 6;
+}
+
 message ChatMessage {
   message ChatContent {
     oneof payload {
