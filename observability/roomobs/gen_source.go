@@ -88,7 +88,9 @@ const (
 	RollupTrackIndex              Rollup = "track_index"
 	RollupTrack                   Rollup = "track"
 	RollupStartTimeIndex          Rollup = "start_time_index"
-	RollupEndTimeIndex            Rollup = "end_time_index"
-	RollupSessionIDIndex          Rollup = "session_id_index"
-	RollupRoomSession             Rollup = "room_session"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	RollupEndTimeIndex Rollup = "end_time_index"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	RollupSessionIDIndex Rollup = "session_id_index"
+	RollupRoomSession    Rollup = "room_session"
 )

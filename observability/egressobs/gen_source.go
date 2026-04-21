@@ -27,8 +27,9 @@ const (
 type Rollup string
 
 const (
-	RollupUndefined      Rollup = ""
-	RollupProject        Rollup = "project"
+	RollupUndefined Rollup = ""
+	RollupProject   Rollup = "project"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
 	RollupEgressIndex    Rollup = "egress_index"
 	RollupEndTimeIndex   Rollup = "end_time_index"
 	RollupStartTimeIndex Rollup = "start_time_index"
