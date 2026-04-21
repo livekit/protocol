@@ -72,6 +72,11 @@ const (
 	PhoneNumberPrefix                  = "PN_"
 )
 
+const (
+	IDAlphabet       = shortuuid.DefaultAlphabet
+	HashedIDAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+)
+
 var guidGeneratorPool = sync.Pool{
 	New: func() any {
 		return must.Get(newGenerator())
