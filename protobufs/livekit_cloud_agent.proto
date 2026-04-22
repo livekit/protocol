@@ -103,6 +103,7 @@ message AgentDeployment {
     repeated AgentEvent events = 14;
     string environment = 15;
     string version = 16;
+    string agent_name = 17;
 }
 
 message AgentInfo {
@@ -132,6 +133,7 @@ message AgentVersion {
     string status = 6;
     string owner = 7;
     bool draining = 8;
+    bool active = 9;
 }
 
 message ListAgentVersionsRequest {
