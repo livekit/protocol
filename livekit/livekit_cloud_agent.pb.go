@@ -592,6 +592,7 @@ type AgentDeployment struct {
 	CpuLimit      string                 `protobuf:"bytes,12,opt,name=cpu_limit,json=cpuLimit,proto3" json:"cpu_limit,omitempty"`
 	ServerRegion  string                 `protobuf:"bytes,13,opt,name=server_region,json=serverRegion,proto3" json:"server_region,omitempty"`
 	Events        []*AgentEvent          `protobuf:"bytes,14,rep,name=events,proto3" json:"events,omitempty"`
+	AgentName     string                 `protobuf:"bytes,15,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -722,6 +723,13 @@ func (x *AgentDeployment) GetEvents() []*AgentEvent {
 		return x.Events
 	}
 	return nil
+}
+
+func (x *AgentDeployment) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
 }
 
 type AgentInfo struct {
@@ -2814,7 +2822,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xba\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xd9\x03\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12%\n" +
 	"\bagent_id\x18\x02 \x01(\tB\n" +
@@ -2831,7 +2839,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\tmem_limit\x18\v \x01(\tR\bmemLimit\x12\x1b\n" +
 	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\x12#\n" +
 	"\rserver_region\x18\r \x01(\tR\fserverRegion\x12+\n" +
-	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\"\x9f\x02\n" +
+	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x0f \x01(\tR\tagentName\"\x9f\x02\n" +
 	"\tAgentInfo\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +

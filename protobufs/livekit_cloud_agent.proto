@@ -89,6 +89,7 @@ message AgentDeployment {
     string cpu_limit = 12;
     string server_region = 13;
     repeated AgentEvent events = 14;
+    string agent_name = 15;
 }
 
 message AgentInfo {
