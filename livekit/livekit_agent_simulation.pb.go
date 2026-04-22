@@ -1195,6 +1195,7 @@ type SimulationRun_ConfirmSourceUpload_Request struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	ProjectId       string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	SimulationRunId string                 `protobuf:"bytes,2,opt,name=simulation_run_id,json=simulationRunId,proto3" json:"simulation_run_id,omitempty"`
+	CodeEntrypoint  string                 `protobuf:"bytes,3,opt,name=code_entrypoint,json=codeEntrypoint,proto3" json:"code_entrypoint,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1239,6 +1240,13 @@ func (x *SimulationRun_ConfirmSourceUpload_Request) GetProjectId() string {
 func (x *SimulationRun_ConfirmSourceUpload_Request) GetSimulationRunId() string {
 	if x != nil {
 		return x.SimulationRunId
+	}
+	return ""
+}
+
+func (x *SimulationRun_ConfirmSourceUpload_Request) GetCodeEntrypoint() string {
+	if x != nil {
+		return x.CodeEntrypoint
 	}
 	return ""
 }
@@ -2724,7 +2732,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
-	"suggestion\"\x9b\x12\n" +
+	"suggestion\"\xc5\x12\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2773,12 +2781,13 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x06source\x1a\x8b\x01\n" +
 	"\bResponse\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12S\n" +
-	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x1aw\n" +
-	"\x13ConfirmSourceUpload\x1aT\n" +
+	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x1a\xa0\x01\n" +
+	"\x13ConfirmSourceUpload\x1a}\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12*\n" +
-	"\x11simulation_run_id\x18\x02 \x01(\tR\x0fsimulationRunId\x1a\n" +
+	"\x11simulation_run_id\x18\x02 \x01(\tR\x0fsimulationRunId\x12'\n" +
+	"\x0fcode_entrypoint\x18\x03 \x01(\tR\x0ecodeEntrypoint\x1a\n" +
 	"\n" +
 	"\bResponse\x1a\x91\x01\n" +
 	"\x03Get\x1aT\n" +
