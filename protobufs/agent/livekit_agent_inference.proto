@@ -184,8 +184,14 @@ message InferenceStopped {}
 message SessionClosed {}
 
 message EotPrediction {
+  enum EotBackend {
+    EOT_BACKEND_UNKNOWN = 0;
+    EOT_BACKEND_MULTIMODAL = 1;
+    EOT_BACKEND_TEXT = 2;
+  }
   float probability = 1;
   ProcessingStats processing_stats = 2;
+  EotBackend backend = 3;
 }
 
 message InterruptionPrediction {
