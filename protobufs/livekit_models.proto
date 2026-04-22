@@ -537,7 +537,7 @@ message ClientInfo {
   // client-side support (e.g. passing RTP packet trailers through to the
   // subscriber instead of stripping them).
   enum Capability {
-    CAP_UNKNOWN = 0;
+    CAP_UNUSED = 0;
     CAP_PACKET_TRAILER = 1;
   }
 
