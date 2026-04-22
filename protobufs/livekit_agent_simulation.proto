@@ -98,6 +98,7 @@ message SimulationRun {
     message Request {
       string project_id = 1;
       string simulation_run_id = 2;
+      string code_entrypoint = 3;
     }
     message Response {}
   }
