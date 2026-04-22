@@ -83,6 +83,55 @@ func (AudioEncoding) EnumDescriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{0}
 }
 
+type EotPrediction_EotBackend int32
+
+const (
+	EotPrediction_EOT_BACKEND_UNKNOWN    EotPrediction_EotBackend = 0
+	EotPrediction_EOT_BACKEND_MULTIMODAL EotPrediction_EotBackend = 1
+	EotPrediction_EOT_BACKEND_TEXT       EotPrediction_EotBackend = 2
+)
+
+// Enum value maps for EotPrediction_EotBackend.
+var (
+	EotPrediction_EotBackend_name = map[int32]string{
+		0: "EOT_BACKEND_UNKNOWN",
+		1: "EOT_BACKEND_MULTIMODAL",
+		2: "EOT_BACKEND_TEXT",
+	}
+	EotPrediction_EotBackend_value = map[string]int32{
+		"EOT_BACKEND_UNKNOWN":    0,
+		"EOT_BACKEND_MULTIMODAL": 1,
+		"EOT_BACKEND_TEXT":       2,
+	}
+)
+
+func (x EotPrediction_EotBackend) Enum() *EotPrediction_EotBackend {
+	p := new(EotPrediction_EotBackend)
+	*p = x
+	return p
+}
+
+func (x EotPrediction_EotBackend) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EotPrediction_EotBackend) Descriptor() protoreflect.EnumDescriptor {
+	return file_agent_livekit_agent_inference_proto_enumTypes[1].Descriptor()
+}
+
+func (EotPrediction_EotBackend) Type() protoreflect.EnumType {
+	return &file_agent_livekit_agent_inference_proto_enumTypes[1]
+}
+
+func (x EotPrediction_EotBackend) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EotPrediction_EotBackend.Descriptor instead.
+func (EotPrediction_EotBackend) EnumDescriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{26, 0}
+}
+
 type SessionSettings struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	SampleRate uint32                 `protobuf:"varint,1,opt,name=sample_rate,json=sampleRate,proto3" json:"sample_rate,omitempty"`
@@ -1622,9 +1671,10 @@ func (*SessionClosed) Descriptor() ([]byte, []int) {
 }
 
 type EotPrediction struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Probability     float32                `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
-	ProcessingStats *ProcessingStats       `protobuf:"bytes,2,opt,name=processing_stats,json=processingStats,proto3" json:"processing_stats,omitempty"`
+	state           protoimpl.MessageState   `protogen:"open.v1"`
+	Probability     float32                  `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
+	ProcessingStats *ProcessingStats         `protobuf:"bytes,2,opt,name=processing_stats,json=processingStats,proto3" json:"processing_stats,omitempty"`
+	Backend         EotPrediction_EotBackend `protobuf:"varint,3,opt,name=backend,proto3,enum=livekit.agent.EotPrediction_EotBackend" json:"backend,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1671,6 +1721,13 @@ func (x *EotPrediction) GetProcessingStats() *ProcessingStats {
 		return x.ProcessingStats
 	}
 	return nil
+}
+
+func (x *EotPrediction) GetBackend() EotPrediction_EotBackend {
+	if x != nil {
+		return x.Backend
+	}
+	return EotPrediction_EOT_BACKEND_UNKNOWN
 }
 
 type InterruptionPrediction struct {
@@ -2039,10 +2096,16 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x0eSessionCreated\"\x12\n" +
 	"\x10InferenceStarted\"\x12\n" +
 	"\x10InferenceStopped\"\x0f\n" +
-	"\rSessionClosed\"|\n" +
+	"\rSessionClosed\"\x98\x02\n" +
 	"\rEotPrediction\x12 \n" +
 	"\vprobability\x18\x01 \x01(\x02R\vprobability\x12I\n" +
-	"\x10processing_stats\x18\x02 \x01(\v2\x1e.livekit.agent.ProcessingStatsR\x0fprocessingStats\"\xb9\x02\n" +
+	"\x10processing_stats\x18\x02 \x01(\v2\x1e.livekit.agent.ProcessingStatsR\x0fprocessingStats\x12A\n" +
+	"\abackend\x18\x03 \x01(\x0e2'.livekit.agent.EotPrediction.EotBackendR\abackend\"W\n" +
+	"\n" +
+	"EotBackend\x12\x17\n" +
+	"\x13EOT_BACKEND_UNKNOWN\x10\x00\x12\x1a\n" +
+	"\x16EOT_BACKEND_MULTIMODAL\x10\x01\x12\x14\n" +
+	"\x10EOT_BACKEND_TEXT\x10\x02\"\xb9\x02\n" +
 	"\x16InterruptionPrediction\x12'\n" +
 	"\x0fis_interruption\x18\x01 \x01(\bR\x0eisInterruption\x12$\n" +
 	"\rprobabilities\x18\x02 \x03(\x02R\rprobabilities\x12I\n" +
@@ -2082,97 +2145,99 @@ func file_agent_livekit_agent_inference_proto_rawDescGZIP() []byte {
 	return file_agent_livekit_agent_inference_proto_rawDescData
 }
 
-var file_agent_livekit_agent_inference_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_agent_livekit_agent_inference_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_agent_livekit_agent_inference_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_agent_livekit_agent_inference_proto_goTypes = []any{
 	(AudioEncoding)(0),                    // 0: livekit.agent.AudioEncoding
-	(*SessionSettings)(nil),               // 1: livekit.agent.SessionSettings
-	(*InferenceError)(nil),                // 2: livekit.agent.InferenceError
-	(*EotSettings)(nil),                   // 3: livekit.agent.EotSettings
-	(*InterruptionSettings)(nil),          // 4: livekit.agent.InterruptionSettings
-	(*SessionCreate)(nil),                 // 5: livekit.agent.SessionCreate
-	(*InputAudio)(nil),                    // 6: livekit.agent.InputAudio
-	(*EotInputChatContext)(nil),           // 7: livekit.agent.EotInputChatContext
-	(*SessionFlush)(nil),                  // 8: livekit.agent.SessionFlush
-	(*SessionClose)(nil),                  // 9: livekit.agent.SessionClose
-	(*InferenceStart)(nil),                // 10: livekit.agent.InferenceStart
-	(*InferenceStop)(nil),                 // 11: livekit.agent.InferenceStop
-	(*BufferStart)(nil),                   // 12: livekit.agent.BufferStart
-	(*BufferStop)(nil),                    // 13: livekit.agent.BufferStop
-	(*ClientMessage)(nil),                 // 14: livekit.agent.ClientMessage
-	(*EotInferenceRequest)(nil),           // 15: livekit.agent.EotInferenceRequest
-	(*InterruptionInferenceRequest)(nil),  // 16: livekit.agent.InterruptionInferenceRequest
-	(*InferenceRequest)(nil),              // 17: livekit.agent.InferenceRequest
-	(*InferenceStats)(nil),                // 18: livekit.agent.InferenceStats
-	(*ProcessingStats)(nil),               // 19: livekit.agent.ProcessingStats
-	(*EotInferenceResponse)(nil),          // 20: livekit.agent.EotInferenceResponse
-	(*InterruptionInferenceResponse)(nil), // 21: livekit.agent.InterruptionInferenceResponse
-	(*InferenceResponse)(nil),             // 22: livekit.agent.InferenceResponse
-	(*SessionCreated)(nil),                // 23: livekit.agent.SessionCreated
-	(*InferenceStarted)(nil),              // 24: livekit.agent.InferenceStarted
-	(*InferenceStopped)(nil),              // 25: livekit.agent.InferenceStopped
-	(*SessionClosed)(nil),                 // 26: livekit.agent.SessionClosed
-	(*EotPrediction)(nil),                 // 27: livekit.agent.EotPrediction
-	(*InterruptionPrediction)(nil),        // 28: livekit.agent.InterruptionPrediction
-	(*ServerMessage)(nil),                 // 29: livekit.agent.ServerMessage
-	(*durationpb.Duration)(nil),           // 30: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),         // 31: google.protobuf.Timestamp
-	(*ChatMessage)(nil),                   // 32: livekit.agent.ChatMessage
+	(EotPrediction_EotBackend)(0),         // 1: livekit.agent.EotPrediction.EotBackend
+	(*SessionSettings)(nil),               // 2: livekit.agent.SessionSettings
+	(*InferenceError)(nil),                // 3: livekit.agent.InferenceError
+	(*EotSettings)(nil),                   // 4: livekit.agent.EotSettings
+	(*InterruptionSettings)(nil),          // 5: livekit.agent.InterruptionSettings
+	(*SessionCreate)(nil),                 // 6: livekit.agent.SessionCreate
+	(*InputAudio)(nil),                    // 7: livekit.agent.InputAudio
+	(*EotInputChatContext)(nil),           // 8: livekit.agent.EotInputChatContext
+	(*SessionFlush)(nil),                  // 9: livekit.agent.SessionFlush
+	(*SessionClose)(nil),                  // 10: livekit.agent.SessionClose
+	(*InferenceStart)(nil),                // 11: livekit.agent.InferenceStart
+	(*InferenceStop)(nil),                 // 12: livekit.agent.InferenceStop
+	(*BufferStart)(nil),                   // 13: livekit.agent.BufferStart
+	(*BufferStop)(nil),                    // 14: livekit.agent.BufferStop
+	(*ClientMessage)(nil),                 // 15: livekit.agent.ClientMessage
+	(*EotInferenceRequest)(nil),           // 16: livekit.agent.EotInferenceRequest
+	(*InterruptionInferenceRequest)(nil),  // 17: livekit.agent.InterruptionInferenceRequest
+	(*InferenceRequest)(nil),              // 18: livekit.agent.InferenceRequest
+	(*InferenceStats)(nil),                // 19: livekit.agent.InferenceStats
+	(*ProcessingStats)(nil),               // 20: livekit.agent.ProcessingStats
+	(*EotInferenceResponse)(nil),          // 21: livekit.agent.EotInferenceResponse
+	(*InterruptionInferenceResponse)(nil), // 22: livekit.agent.InterruptionInferenceResponse
+	(*InferenceResponse)(nil),             // 23: livekit.agent.InferenceResponse
+	(*SessionCreated)(nil),                // 24: livekit.agent.SessionCreated
+	(*InferenceStarted)(nil),              // 25: livekit.agent.InferenceStarted
+	(*InferenceStopped)(nil),              // 26: livekit.agent.InferenceStopped
+	(*SessionClosed)(nil),                 // 27: livekit.agent.SessionClosed
+	(*EotPrediction)(nil),                 // 28: livekit.agent.EotPrediction
+	(*InterruptionPrediction)(nil),        // 29: livekit.agent.InterruptionPrediction
+	(*ServerMessage)(nil),                 // 30: livekit.agent.ServerMessage
+	(*durationpb.Duration)(nil),           // 31: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),         // 32: google.protobuf.Timestamp
+	(*ChatMessage)(nil),                   // 33: livekit.agent.ChatMessage
 }
 var file_agent_livekit_agent_inference_proto_depIdxs = []int32{
 	0,  // 0: livekit.agent.SessionSettings.encoding:type_name -> livekit.agent.AudioEncoding
-	3,  // 1: livekit.agent.SessionSettings.eot_settings:type_name -> livekit.agent.EotSettings
-	4,  // 2: livekit.agent.SessionSettings.interruption_settings:type_name -> livekit.agent.InterruptionSettings
-	30, // 3: livekit.agent.EotSettings.detection_interval:type_name -> google.protobuf.Duration
-	30, // 4: livekit.agent.InterruptionSettings.max_audio_duration:type_name -> google.protobuf.Duration
-	30, // 5: livekit.agent.InterruptionSettings.audio_prefix_duration:type_name -> google.protobuf.Duration
-	30, // 6: livekit.agent.InterruptionSettings.detection_interval:type_name -> google.protobuf.Duration
-	1,  // 7: livekit.agent.SessionCreate.settings:type_name -> livekit.agent.SessionSettings
-	31, // 8: livekit.agent.InputAudio.created_at:type_name -> google.protobuf.Timestamp
-	32, // 9: livekit.agent.EotInputChatContext.messages:type_name -> livekit.agent.ChatMessage
-	31, // 10: livekit.agent.ClientMessage.created_at:type_name -> google.protobuf.Timestamp
-	5,  // 11: livekit.agent.ClientMessage.session_create:type_name -> livekit.agent.SessionCreate
-	6,  // 12: livekit.agent.ClientMessage.input_audio:type_name -> livekit.agent.InputAudio
-	8,  // 13: livekit.agent.ClientMessage.session_flush:type_name -> livekit.agent.SessionFlush
-	9,  // 14: livekit.agent.ClientMessage.session_close:type_name -> livekit.agent.SessionClose
-	10, // 15: livekit.agent.ClientMessage.inference_start:type_name -> livekit.agent.InferenceStart
-	11, // 16: livekit.agent.ClientMessage.inference_stop:type_name -> livekit.agent.InferenceStop
-	12, // 17: livekit.agent.ClientMessage.buffer_start:type_name -> livekit.agent.BufferStart
-	13, // 18: livekit.agent.ClientMessage.buffer_stop:type_name -> livekit.agent.BufferStop
-	7,  // 19: livekit.agent.ClientMessage.eot_input_chat_context:type_name -> livekit.agent.EotInputChatContext
+	4,  // 1: livekit.agent.SessionSettings.eot_settings:type_name -> livekit.agent.EotSettings
+	5,  // 2: livekit.agent.SessionSettings.interruption_settings:type_name -> livekit.agent.InterruptionSettings
+	31, // 3: livekit.agent.EotSettings.detection_interval:type_name -> google.protobuf.Duration
+	31, // 4: livekit.agent.InterruptionSettings.max_audio_duration:type_name -> google.protobuf.Duration
+	31, // 5: livekit.agent.InterruptionSettings.audio_prefix_duration:type_name -> google.protobuf.Duration
+	31, // 6: livekit.agent.InterruptionSettings.detection_interval:type_name -> google.protobuf.Duration
+	2,  // 7: livekit.agent.SessionCreate.settings:type_name -> livekit.agent.SessionSettings
+	32, // 8: livekit.agent.InputAudio.created_at:type_name -> google.protobuf.Timestamp
+	33, // 9: livekit.agent.EotInputChatContext.messages:type_name -> livekit.agent.ChatMessage
+	32, // 10: livekit.agent.ClientMessage.created_at:type_name -> google.protobuf.Timestamp
+	6,  // 11: livekit.agent.ClientMessage.session_create:type_name -> livekit.agent.SessionCreate
+	7,  // 12: livekit.agent.ClientMessage.input_audio:type_name -> livekit.agent.InputAudio
+	9,  // 13: livekit.agent.ClientMessage.session_flush:type_name -> livekit.agent.SessionFlush
+	10, // 14: livekit.agent.ClientMessage.session_close:type_name -> livekit.agent.SessionClose
+	11, // 15: livekit.agent.ClientMessage.inference_start:type_name -> livekit.agent.InferenceStart
+	12, // 16: livekit.agent.ClientMessage.inference_stop:type_name -> livekit.agent.InferenceStop
+	13, // 17: livekit.agent.ClientMessage.buffer_start:type_name -> livekit.agent.BufferStart
+	14, // 18: livekit.agent.ClientMessage.buffer_stop:type_name -> livekit.agent.BufferStop
+	8,  // 19: livekit.agent.ClientMessage.eot_input_chat_context:type_name -> livekit.agent.EotInputChatContext
 	0,  // 20: livekit.agent.EotInferenceRequest.encoding:type_name -> livekit.agent.AudioEncoding
 	0,  // 21: livekit.agent.InterruptionInferenceRequest.encoding:type_name -> livekit.agent.AudioEncoding
-	15, // 22: livekit.agent.InferenceRequest.eot_inference_request:type_name -> livekit.agent.EotInferenceRequest
-	16, // 23: livekit.agent.InferenceRequest.interruption_inference_request:type_name -> livekit.agent.InterruptionInferenceRequest
-	30, // 24: livekit.agent.InferenceStats.e2e_latency:type_name -> google.protobuf.Duration
-	30, // 25: livekit.agent.InferenceStats.preprocessing_duration:type_name -> google.protobuf.Duration
-	30, // 26: livekit.agent.InferenceStats.inference_duration:type_name -> google.protobuf.Duration
-	31, // 27: livekit.agent.ProcessingStats.earliest_client_created_at:type_name -> google.protobuf.Timestamp
-	31, // 28: livekit.agent.ProcessingStats.latest_client_created_at:type_name -> google.protobuf.Timestamp
-	30, // 29: livekit.agent.ProcessingStats.e2e_latency:type_name -> google.protobuf.Duration
-	18, // 30: livekit.agent.ProcessingStats.inference_stats:type_name -> livekit.agent.InferenceStats
-	18, // 31: livekit.agent.EotInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
-	18, // 32: livekit.agent.InterruptionInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
-	20, // 33: livekit.agent.InferenceResponse.eot_inference_response:type_name -> livekit.agent.EotInferenceResponse
-	21, // 34: livekit.agent.InferenceResponse.interruption_inference_response:type_name -> livekit.agent.InterruptionInferenceResponse
-	19, // 35: livekit.agent.EotPrediction.processing_stats:type_name -> livekit.agent.ProcessingStats
-	19, // 36: livekit.agent.InterruptionPrediction.processing_stats:type_name -> livekit.agent.ProcessingStats
-	31, // 37: livekit.agent.InterruptionPrediction.created_at:type_name -> google.protobuf.Timestamp
-	30, // 38: livekit.agent.InterruptionPrediction.prediction_duration:type_name -> google.protobuf.Duration
-	31, // 39: livekit.agent.ServerMessage.server_created_at:type_name -> google.protobuf.Timestamp
-	31, // 40: livekit.agent.ServerMessage.client_created_at:type_name -> google.protobuf.Timestamp
-	23, // 41: livekit.agent.ServerMessage.session_created:type_name -> livekit.agent.SessionCreated
-	24, // 42: livekit.agent.ServerMessage.inference_started:type_name -> livekit.agent.InferenceStarted
-	25, // 43: livekit.agent.ServerMessage.inference_stopped:type_name -> livekit.agent.InferenceStopped
-	26, // 44: livekit.agent.ServerMessage.session_closed:type_name -> livekit.agent.SessionClosed
-	2,  // 45: livekit.agent.ServerMessage.error:type_name -> livekit.agent.InferenceError
-	27, // 46: livekit.agent.ServerMessage.eot_prediction:type_name -> livekit.agent.EotPrediction
-	28, // 47: livekit.agent.ServerMessage.interruption_prediction:type_name -> livekit.agent.InterruptionPrediction
-	48, // [48:48] is the sub-list for method output_type
-	48, // [48:48] is the sub-list for method input_type
-	48, // [48:48] is the sub-list for extension type_name
-	48, // [48:48] is the sub-list for extension extendee
-	0,  // [0:48] is the sub-list for field type_name
+	16, // 22: livekit.agent.InferenceRequest.eot_inference_request:type_name -> livekit.agent.EotInferenceRequest
+	17, // 23: livekit.agent.InferenceRequest.interruption_inference_request:type_name -> livekit.agent.InterruptionInferenceRequest
+	31, // 24: livekit.agent.InferenceStats.e2e_latency:type_name -> google.protobuf.Duration
+	31, // 25: livekit.agent.InferenceStats.preprocessing_duration:type_name -> google.protobuf.Duration
+	31, // 26: livekit.agent.InferenceStats.inference_duration:type_name -> google.protobuf.Duration
+	32, // 27: livekit.agent.ProcessingStats.earliest_client_created_at:type_name -> google.protobuf.Timestamp
+	32, // 28: livekit.agent.ProcessingStats.latest_client_created_at:type_name -> google.protobuf.Timestamp
+	31, // 29: livekit.agent.ProcessingStats.e2e_latency:type_name -> google.protobuf.Duration
+	19, // 30: livekit.agent.ProcessingStats.inference_stats:type_name -> livekit.agent.InferenceStats
+	19, // 31: livekit.agent.EotInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
+	19, // 32: livekit.agent.InterruptionInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
+	21, // 33: livekit.agent.InferenceResponse.eot_inference_response:type_name -> livekit.agent.EotInferenceResponse
+	22, // 34: livekit.agent.InferenceResponse.interruption_inference_response:type_name -> livekit.agent.InterruptionInferenceResponse
+	20, // 35: livekit.agent.EotPrediction.processing_stats:type_name -> livekit.agent.ProcessingStats
+	1,  // 36: livekit.agent.EotPrediction.backend:type_name -> livekit.agent.EotPrediction.EotBackend
+	20, // 37: livekit.agent.InterruptionPrediction.processing_stats:type_name -> livekit.agent.ProcessingStats
+	32, // 38: livekit.agent.InterruptionPrediction.created_at:type_name -> google.protobuf.Timestamp
+	31, // 39: livekit.agent.InterruptionPrediction.prediction_duration:type_name -> google.protobuf.Duration
+	32, // 40: livekit.agent.ServerMessage.server_created_at:type_name -> google.protobuf.Timestamp
+	32, // 41: livekit.agent.ServerMessage.client_created_at:type_name -> google.protobuf.Timestamp
+	24, // 42: livekit.agent.ServerMessage.session_created:type_name -> livekit.agent.SessionCreated
+	25, // 43: livekit.agent.ServerMessage.inference_started:type_name -> livekit.agent.InferenceStarted
+	26, // 44: livekit.agent.ServerMessage.inference_stopped:type_name -> livekit.agent.InferenceStopped
+	27, // 45: livekit.agent.ServerMessage.session_closed:type_name -> livekit.agent.SessionClosed
+	3,  // 46: livekit.agent.ServerMessage.error:type_name -> livekit.agent.InferenceError
+	28, // 47: livekit.agent.ServerMessage.eot_prediction:type_name -> livekit.agent.EotPrediction
+	29, // 48: livekit.agent.ServerMessage.interruption_prediction:type_name -> livekit.agent.InterruptionPrediction
+	49, // [49:49] is the sub-list for method output_type
+	49, // [49:49] is the sub-list for method input_type
+	49, // [49:49] is the sub-list for extension type_name
+	49, // [49:49] is the sub-list for extension extendee
+	0,  // [0:49] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_inference_proto_init() }
@@ -2218,7 +2283,7 @@ func file_agent_livekit_agent_inference_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_inference_proto_rawDesc), len(file_agent_livekit_agent_inference_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   0,
