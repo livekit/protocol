@@ -1329,18 +1329,18 @@ func (ClientInfo_SDK) EnumDescriptor() ([]byte, []int) {
 type ClientInfo_Capability int32
 
 const (
-	ClientInfo_CAP_UNKNOWN        ClientInfo_Capability = 0
+	ClientInfo_CAP_UNUSED         ClientInfo_Capability = 0
 	ClientInfo_CAP_PACKET_TRAILER ClientInfo_Capability = 1
 )
 
 // Enum value maps for ClientInfo_Capability.
 var (
 	ClientInfo_Capability_name = map[int32]string{
-		0: "CAP_UNKNOWN",
+		0: "CAP_UNUSED",
 		1: "CAP_PACKET_TRAILER",
 	}
 	ClientInfo_Capability_value = map[string]int32{
-		"CAP_UNKNOWN":        0,
+		"CAP_UNUSED":         0,
 		"CAP_PACKET_TRAILER": 1,
 	}
 )
@@ -6485,7 +6485,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
 	"\aEdition\x12\f\n" +
 	"\bStandard\x10\x00\x12\t\n" +
-	"\x05Cloud\x10\x01\"\xaf\x05\n" +
+	"\x05Cloud\x10\x01\"\xae\x05\n" +
 	"\n" +
 	"ClientInfo\x12)\n" +
 	"\x03sdk\x18\x01 \x01(\x0e2\x17.livekit.ClientInfo.SDKR\x03sdk\x12\x18\n" +
@@ -6522,10 +6522,11 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x04NODE\x10\f\x12\n" +
 	"\n" +
 	"\x06UNREAL\x10\r\x12\t\n" +
-	"\x05ESP32\x10\x0e\"5\n" +
+	"\x05ESP32\x10\x0e\"4\n" +
 	"\n" +
-	"Capability\x12\x0f\n" +
-	"\vCAP_UNKNOWN\x10\x00\x12\x16\n" +
+	"Capability\x12\x0e\n" +
+	"\n" +
+	"CAP_UNUSED\x10\x00\x12\x16\n" +
 	"\x12CAP_PACKET_TRAILER\x10\x01\"\xc9\x02\n" +
 	"\x13ClientConfiguration\x121\n" +
 	"\x05video\x18\x01 \x01(\v2\x1b.livekit.VideoConfigurationR\x05video\x123\n" +
