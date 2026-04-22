@@ -714,6 +714,7 @@ type AgentDeployment struct {
 	Events        []*AgentEvent          `protobuf:"bytes,14,rep,name=events,proto3" json:"events,omitempty"`
 	Environment   string                 `protobuf:"bytes,15,opt,name=environment,proto3" json:"environment,omitempty"`
 	Version       string                 `protobuf:"bytes,16,opt,name=version,proto3" json:"version,omitempty"`
+	AgentName     string                 `protobuf:"bytes,17,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -856,6 +857,13 @@ func (x *AgentDeployment) GetEnvironment() string {
 func (x *AgentDeployment) GetVersion() string {
 	if x != nil {
 		return x.Version
+	}
+	return ""
+}
+
+func (x *AgentDeployment) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
 	}
 	return ""
 }
@@ -1050,6 +1058,7 @@ type AgentVersion struct {
 	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
 	Owner         string                 `protobuf:"bytes,7,opt,name=owner,proto3" json:"owner,omitempty"`
 	Draining      bool                   `protobuf:"varint,8,opt,name=draining,proto3" json:"draining,omitempty"`
+	Active        bool                   `protobuf:"varint,9,opt,name=active,proto3" json:"active,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1136,6 +1145,13 @@ func (x *AgentVersion) GetOwner() string {
 func (x *AgentVersion) GetDraining() bool {
 	if x != nil {
 		return x.Draining
+	}
+	return false
+}
+
+func (x *AgentVersion) GetActive() bool {
+	if x != nil {
+		return x.Active
 	}
 	return false
 }
@@ -2410,6 +2426,7 @@ type PrivateLink struct {
 	Port               uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"`
 	Endpoint           string                 `protobuf:"bytes,6,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
 	ConnectionEndpoint string                 `protobuf:"bytes,7,opt,name=connection_endpoint,json=connectionEndpoint,proto3" json:"connection_endpoint,omitempty"`
+	CloudRegion        string                 `protobuf:"bytes,8,opt,name=cloud_region,json=cloudRegion,proto3" json:"cloud_region,omitempty"`
 	// Types that are valid to be assigned to Config:
 	//
 	//	*PrivateLink_Aws
@@ -2486,6 +2503,13 @@ func (x *PrivateLink) GetEndpoint() string {
 func (x *PrivateLink) GetConnectionEndpoint() string {
 	if x != nil {
 		return x.ConnectionEndpoint
+	}
+	return ""
+}
+
+func (x *PrivateLink) GetCloudRegion() string {
+	if x != nil {
+		return x.CloudRegion
 	}
 	return ""
 }
@@ -3121,7 +3145,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xf6\x03\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x95\x04\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12%\n" +
 	"\bagent_id\x18\x02 \x01(\tB\n" +
@@ -3140,7 +3164,9 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\rserver_region\x18\r \x01(\tR\fserverRegion\x12+\n" +
 	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\x12 \n" +
 	"\venvironment\x18\x0f \x01(\tR\venvironment\x12\x18\n" +
-	"\aversion\x18\x10 \x01(\tR\aversion\"\x9f\x02\n" +
+	"\aversion\x18\x10 \x01(\tR\aversion\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x11 \x01(\tR\tagentName\"\x9f\x02\n" +
 	"\tAgentInfo\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
@@ -3157,7 +3183,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bagent_id\x18\x02 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\"@\n" +
 	"\x12ListAgentsResponse\x12*\n" +
-	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\x8a\x03\n" +
+	"\x06agents\x18\x01 \x03(\v2\x12.livekit.AgentInfoR\x06agents\"\xa2\x03\n" +
 	"\fAgentVersion\x12\x18\n" +
 	"\aversion\x18\x01 \x01(\tR\aversion\x12\x18\n" +
 	"\acurrent\x18\x02 \x01(\bR\acurrent\x129\n" +
@@ -3170,7 +3196,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"attributes\x12\x16\n" +
 	"\x06status\x18\x06 \x01(\tR\x06status\x12\x14\n" +
 	"\x05owner\x18\a \x01(\tR\x05owner\x12\x1a\n" +
-	"\bdraining\x18\b \x01(\bR\bdraining\x1a=\n" +
+	"\bdraining\x18\b \x01(\bR\bdraining\x12\x16\n" +
+	"\x06active\x18\t \x01(\bR\x06active\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"`\n" +
@@ -3273,14 +3300,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value\"H\n" +
 	"\x16ClientSettingsResponse\x12.\n" +
 	"\x06params\x18\x01 \x03(\v2\x16.livekit.SettingsParamR\x06params\"\x17\n" +
-	"\x15ClientSettingsRequest\"\xc3\x02\n" +
+	"\x15ClientSettingsRequest\"\xe6\x02\n" +
 	"\vPrivateLink\x128\n" +
 	"\x0fprivate_link_id\x18\x01 \x01(\tB\x10\xbaP\rprivateLinkIDR\rprivateLinkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06region\x18\x04 \x01(\tR\x06region\x12\x12\n" +
 	"\x04port\x18\x05 \x01(\rR\x04port\x12\x1a\n" +
 	"\bendpoint\x18\x06 \x01(\tR\bendpoint\x12/\n" +
-	"\x13connection_endpoint\x18\a \x01(\tR\x12connectionEndpoint\x126\n" +
+	"\x13connection_endpoint\x18\a \x01(\tR\x12connectionEndpoint\x12!\n" +
+	"\fcloud_region\x18\b \x01(\tR\vcloudRegion\x126\n" +
 	"\x03aws\x18\x03 \x01(\v2\x1e.livekit.PrivateLink.AWSConfigB\x02\x18\x01H\x00R\x03aws\x1a+\n" +
 	"\tAWSConfig\x12\x1e\n" +
 	"\bendpoint\x18\x01 \x01(\tB\x02\x18\x01R\bendpointB\b\n" +
