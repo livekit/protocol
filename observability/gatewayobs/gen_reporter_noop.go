@@ -137,3 +137,5 @@ func (r *noopModelReporter) ReportTtsChars(v uint32)                            
 func (r *noopModelReporter) ReportBargeInRequests(v uint64)                       {}
 func (r *noopModelReporter) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
 func (r *noopModelReporter) ReportVoiceCloneRequests(v uint64)                    {}
+func (r *noopModelReporter) ReportEotRequests(v uint64)                           {}
+func (r *noopModelReporter) ReportEotRequestTypes(v ModelEotRequestTypes)         {}
