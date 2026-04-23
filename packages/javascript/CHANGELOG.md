@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.45.5
+
+### Patch Changes
+
+- export alphabets used in guids - [#1508](https://github.com/livekit/protocol/pull/1508) ([@paulwe](https://github.com/paulwe))
+
 ## 1.45.4
 
 ### Patch Changes
