@@ -550,7 +550,8 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 						result.MatchType = TrunkMatchSpecific
 						return result, nil
 					}
-					// Keep searching! We want to know if there are any conflicting Trunk definitions.
+					// A trunk matches at most once per call; remaining numbers on this trunk cannot change the decision.
+					break
 				} else {
 					opt.Filtered(tr, TrunkFilteredCalledNumberDisallowed)
 				}
