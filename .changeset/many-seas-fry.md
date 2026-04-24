@@ -1,5 +1,5 @@
 ---
-"@fake-scope/fake-pkg": patch
+"github.com/livekit/protocol": patch
 ---
 
 Add turn detection protobufs
