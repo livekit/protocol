@@ -187,6 +187,9 @@ message PublishDataTrackRequest {
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
+
+  // Schema describing frames published on the track.
+  optional DataTrackSchema schema = 4;
 }
 
 message PublishDataTrackResponse {
@@ -561,6 +564,7 @@ message RequestResponse {
     INVALID_NAME = 8;
     DUPLICATE_HANDLE = 9;
     DUPLICATE_NAME = 10;
+    INVALID_SCHEMA = 11;
   }
 
   uint32 request_id = 1 [(logger.name) = "requestID"];
