@@ -16,14 +16,14 @@ syntax = "proto3";
 
 package livekit.agent;
 
-option go_package = "github.com/livekit/protocol/livekit/agent";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
-option optimize_for = SPEED;
-
 import "agent/livekit_agent_session.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit/agent";
+option optimize_for = SPEED;
+option ruby_package = "LiveKit::Proto";
 
 // --- Shared Types ---
 
@@ -139,20 +139,17 @@ message InferenceRequest {
 }
 
 message InferenceStats {
-  // server-side e2e latency (server input to server output)
-  google.protobuf.Duration e2e_latency = 1;
-  google.protobuf.Duration preprocessing_duration = 2;
-  google.protobuf.Duration inference_duration = 3;
+  // proxy -> model: audio window timestamps
+  optional google.protobuf.Timestamp earliest_client_created_at = 1;
+  optional google.protobuf.Timestamp latest_client_created_at = 2;
+  // proxy side e2e latency (proxy send -> proxy receive)
+  optional google.protobuf.Duration client_e2e_latency = 3;
+  // model side e2e latency (model endpoint receive -> model endpoint return)
+  google.protobuf.Duration server_e2e_latency = 4;
+  // model side inference stats
+  google.protobuf.Duration preprocessing_duration = 5;
+  google.protobuf.Duration inference_duration = 6;
 }
-
-message ProcessingStats {
-  google.protobuf.Timestamp earliest_client_created_at = 1;
-  google.protobuf.Timestamp latest_client_created_at = 2;
-  // client-side e2e latency (client send to client receive)
-  google.protobuf.Duration e2e_latency = 3;
-  InferenceStats inference_stats = 4;
-}
-
 
 message EotInferenceResponse {
   float probability = 1;
@@ -190,16 +187,14 @@ message EotPrediction {
     EOT_BACKEND_TEXT = 2;
   }
   float probability = 1;
-  ProcessingStats processing_stats = 2;
+  InferenceStats processing_stats = 2;
   EotBackend backend = 3;
 }
 
 message InterruptionPrediction {
   bool is_interruption = 1;
   repeated float probabilities = 2;
-  ProcessingStats processing_stats = 3;
-  google.protobuf.Timestamp created_at = 4;
-  google.protobuf.Duration prediction_duration = 5;
+  InferenceStats processing_stats = 3;
 }
 
 message ServerMessage {
