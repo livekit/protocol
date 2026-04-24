@@ -2,4 +2,4 @@
 "github.com/livekit/protocol": patch
 ---
 
-Add turn detection protobufs
+fix change set for eot changes
