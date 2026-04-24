@@ -129,7 +129,7 @@ func (x EotPrediction_EotBackend) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EotPrediction_EotBackend.Descriptor instead.
 func (EotPrediction_EotBackend) EnumDescriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{26, 0}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{25, 0}
 }
 
 type SessionSettings struct {
@@ -1203,10 +1203,16 @@ func (*InferenceRequest_InterruptionInferenceRequest) isInferenceRequest_Request
 
 type InferenceStats struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// server-side e2e latency (server input to server output)
-	E2ELatency            *durationpb.Duration `protobuf:"bytes,1,opt,name=e2e_latency,json=e2eLatency,proto3" json:"e2e_latency,omitempty"`
-	PreprocessingDuration *durationpb.Duration `protobuf:"bytes,2,opt,name=preprocessing_duration,json=preprocessingDuration,proto3" json:"preprocessing_duration,omitempty"`
-	InferenceDuration     *durationpb.Duration `protobuf:"bytes,3,opt,name=inference_duration,json=inferenceDuration,proto3" json:"inference_duration,omitempty"`
+	// proxy -> model: audio window timestamps
+	EarliestClientCreatedAt *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=earliest_client_created_at,json=earliestClientCreatedAt,proto3,oneof" json:"earliest_client_created_at,omitempty"`
+	LatestClientCreatedAt   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=latest_client_created_at,json=latestClientCreatedAt,proto3,oneof" json:"latest_client_created_at,omitempty"`
+	// proxy side e2e latency (proxy send -> proxy receive)
+	ClientE2ELatency *durationpb.Duration `protobuf:"bytes,3,opt,name=client_e2e_latency,json=clientE2eLatency,proto3,oneof" json:"client_e2e_latency,omitempty"`
+	// model side e2e latency (model endpoint receive -> model endpoint return)
+	ServerE2ELatency *durationpb.Duration `protobuf:"bytes,4,opt,name=server_e2e_latency,json=serverE2eLatency,proto3" json:"server_e2e_latency,omitempty"`
+	// model side inference stats
+	PreprocessingDuration *durationpb.Duration `protobuf:"bytes,5,opt,name=preprocessing_duration,json=preprocessingDuration,proto3" json:"preprocessing_duration,omitempty"`
+	InferenceDuration     *durationpb.Duration `protobuf:"bytes,6,opt,name=inference_duration,json=inferenceDuration,proto3" json:"inference_duration,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
 }
@@ -1241,9 +1247,30 @@ func (*InferenceStats) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *InferenceStats) GetE2ELatency() *durationpb.Duration {
+func (x *InferenceStats) GetEarliestClientCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.E2ELatency
+		return x.EarliestClientCreatedAt
+	}
+	return nil
+}
+
+func (x *InferenceStats) GetLatestClientCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.LatestClientCreatedAt
+	}
+	return nil
+}
+
+func (x *InferenceStats) GetClientE2ELatency() *durationpb.Duration {
+	if x != nil {
+		return x.ClientE2ELatency
+	}
+	return nil
+}
+
+func (x *InferenceStats) GetServerE2ELatency() *durationpb.Duration {
+	if x != nil {
+		return x.ServerE2ELatency
 	}
 	return nil
 }
@@ -1262,75 +1289,6 @@ func (x *InferenceStats) GetInferenceDuration() *durationpb.Duration {
 	return nil
 }
 
-type ProcessingStats struct {
-	state                   protoimpl.MessageState `protogen:"open.v1"`
-	EarliestClientCreatedAt *timestamppb.Timestamp `protobuf:"bytes,1,opt,name=earliest_client_created_at,json=earliestClientCreatedAt,proto3" json:"earliest_client_created_at,omitempty"`
-	LatestClientCreatedAt   *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=latest_client_created_at,json=latestClientCreatedAt,proto3" json:"latest_client_created_at,omitempty"`
-	// client-side e2e latency (client send to client receive)
-	E2ELatency     *durationpb.Duration `protobuf:"bytes,3,opt,name=e2e_latency,json=e2eLatency,proto3" json:"e2e_latency,omitempty"`
-	InferenceStats *InferenceStats      `protobuf:"bytes,4,opt,name=inference_stats,json=inferenceStats,proto3" json:"inference_stats,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *ProcessingStats) Reset() {
-	*x = ProcessingStats{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ProcessingStats) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProcessingStats) ProtoMessage() {}
-
-func (x *ProcessingStats) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProcessingStats.ProtoReflect.Descriptor instead.
-func (*ProcessingStats) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *ProcessingStats) GetEarliestClientCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.EarliestClientCreatedAt
-	}
-	return nil
-}
-
-func (x *ProcessingStats) GetLatestClientCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.LatestClientCreatedAt
-	}
-	return nil
-}
-
-func (x *ProcessingStats) GetE2ELatency() *durationpb.Duration {
-	if x != nil {
-		return x.E2ELatency
-	}
-	return nil
-}
-
-func (x *ProcessingStats) GetInferenceStats() *InferenceStats {
-	if x != nil {
-		return x.InferenceStats
-	}
-	return nil
-}
-
 type EotInferenceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Probability   float32                `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
@@ -1341,7 +1299,7 @@ type EotInferenceResponse struct {
 
 func (x *EotInferenceResponse) Reset() {
 	*x = EotInferenceResponse{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[19]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1353,7 +1311,7 @@ func (x *EotInferenceResponse) String() string {
 func (*EotInferenceResponse) ProtoMessage() {}
 
 func (x *EotInferenceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[19]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1366,7 +1324,7 @@ func (x *EotInferenceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EotInferenceResponse.ProtoReflect.Descriptor instead.
 func (*EotInferenceResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{19}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *EotInferenceResponse) GetProbability() float32 {
@@ -1395,7 +1353,7 @@ type InterruptionInferenceResponse struct {
 
 func (x *InterruptionInferenceResponse) Reset() {
 	*x = InterruptionInferenceResponse{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[20]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1407,7 +1365,7 @@ func (x *InterruptionInferenceResponse) String() string {
 func (*InterruptionInferenceResponse) ProtoMessage() {}
 
 func (x *InterruptionInferenceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[20]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1420,7 +1378,7 @@ func (x *InterruptionInferenceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterruptionInferenceResponse.ProtoReflect.Descriptor instead.
 func (*InterruptionInferenceResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{20}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *InterruptionInferenceResponse) GetIsInterruption() bool {
@@ -1457,7 +1415,7 @@ type InferenceResponse struct {
 
 func (x *InferenceResponse) Reset() {
 	*x = InferenceResponse{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[21]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1469,7 +1427,7 @@ func (x *InferenceResponse) String() string {
 func (*InferenceResponse) ProtoMessage() {}
 
 func (x *InferenceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[21]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1482,7 +1440,7 @@ func (x *InferenceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InferenceResponse.ProtoReflect.Descriptor instead.
 func (*InferenceResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{21}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *InferenceResponse) GetResponse() isInferenceResponse_Response {
@@ -1534,7 +1492,7 @@ type SessionCreated struct {
 
 func (x *SessionCreated) Reset() {
 	*x = SessionCreated{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[22]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1546,7 +1504,7 @@ func (x *SessionCreated) String() string {
 func (*SessionCreated) ProtoMessage() {}
 
 func (x *SessionCreated) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[22]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1559,7 +1517,7 @@ func (x *SessionCreated) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionCreated.ProtoReflect.Descriptor instead.
 func (*SessionCreated) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{22}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{21}
 }
 
 type InferenceStarted struct {
@@ -1570,7 +1528,7 @@ type InferenceStarted struct {
 
 func (x *InferenceStarted) Reset() {
 	*x = InferenceStarted{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[23]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1582,7 +1540,7 @@ func (x *InferenceStarted) String() string {
 func (*InferenceStarted) ProtoMessage() {}
 
 func (x *InferenceStarted) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[23]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1595,7 +1553,7 @@ func (x *InferenceStarted) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InferenceStarted.ProtoReflect.Descriptor instead.
 func (*InferenceStarted) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{23}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{22}
 }
 
 type InferenceStopped struct {
@@ -1606,7 +1564,7 @@ type InferenceStopped struct {
 
 func (x *InferenceStopped) Reset() {
 	*x = InferenceStopped{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[24]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1618,7 +1576,7 @@ func (x *InferenceStopped) String() string {
 func (*InferenceStopped) ProtoMessage() {}
 
 func (x *InferenceStopped) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[24]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1631,7 +1589,7 @@ func (x *InferenceStopped) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InferenceStopped.ProtoReflect.Descriptor instead.
 func (*InferenceStopped) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{24}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{23}
 }
 
 type SessionClosed struct {
@@ -1642,7 +1600,7 @@ type SessionClosed struct {
 
 func (x *SessionClosed) Reset() {
 	*x = SessionClosed{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[25]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1654,7 +1612,7 @@ func (x *SessionClosed) String() string {
 func (*SessionClosed) ProtoMessage() {}
 
 func (x *SessionClosed) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[25]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1667,21 +1625,21 @@ func (x *SessionClosed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionClosed.ProtoReflect.Descriptor instead.
 func (*SessionClosed) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{25}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{24}
 }
 
 type EotPrediction struct {
-	state           protoimpl.MessageState   `protogen:"open.v1"`
-	Probability     float32                  `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
-	ProcessingStats *ProcessingStats         `protobuf:"bytes,2,opt,name=processing_stats,json=processingStats,proto3" json:"processing_stats,omitempty"`
-	Backend         EotPrediction_EotBackend `protobuf:"varint,3,opt,name=backend,proto3,enum=livekit.agent.EotPrediction_EotBackend" json:"backend,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state          protoimpl.MessageState   `protogen:"open.v1"`
+	Probability    float32                  `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
+	InferenceStats *InferenceStats          `protobuf:"bytes,2,opt,name=inference_stats,json=inferenceStats,proto3" json:"inference_stats,omitempty"`
+	Backend        EotPrediction_EotBackend `protobuf:"varint,3,opt,name=backend,proto3,enum=livekit.agent.EotPrediction_EotBackend" json:"backend,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *EotPrediction) Reset() {
 	*x = EotPrediction{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[26]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1693,7 +1651,7 @@ func (x *EotPrediction) String() string {
 func (*EotPrediction) ProtoMessage() {}
 
 func (x *EotPrediction) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[26]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1706,7 +1664,7 @@ func (x *EotPrediction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EotPrediction.ProtoReflect.Descriptor instead.
 func (*EotPrediction) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{26}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *EotPrediction) GetProbability() float32 {
@@ -1716,9 +1674,9 @@ func (x *EotPrediction) GetProbability() float32 {
 	return 0
 }
 
-func (x *EotPrediction) GetProcessingStats() *ProcessingStats {
+func (x *EotPrediction) GetInferenceStats() *InferenceStats {
 	if x != nil {
-		return x.ProcessingStats
+		return x.InferenceStats
 	}
 	return nil
 }
@@ -1731,19 +1689,17 @@ func (x *EotPrediction) GetBackend() EotPrediction_EotBackend {
 }
 
 type InterruptionPrediction struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	IsInterruption     bool                   `protobuf:"varint,1,opt,name=is_interruption,json=isInterruption,proto3" json:"is_interruption,omitempty"`
-	Probabilities      []float32              `protobuf:"fixed32,2,rep,packed,name=probabilities,proto3" json:"probabilities,omitempty"`
-	ProcessingStats    *ProcessingStats       `protobuf:"bytes,3,opt,name=processing_stats,json=processingStats,proto3" json:"processing_stats,omitempty"`
-	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	PredictionDuration *durationpb.Duration   `protobuf:"bytes,5,opt,name=prediction_duration,json=predictionDuration,proto3" json:"prediction_duration,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	IsInterruption bool                   `protobuf:"varint,1,opt,name=is_interruption,json=isInterruption,proto3" json:"is_interruption,omitempty"`
+	Probabilities  []float32              `protobuf:"fixed32,2,rep,packed,name=probabilities,proto3" json:"probabilities,omitempty"`
+	InferenceStats *InferenceStats        `protobuf:"bytes,3,opt,name=inference_stats,json=inferenceStats,proto3" json:"inference_stats,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *InterruptionPrediction) Reset() {
 	*x = InterruptionPrediction{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[27]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1755,7 +1711,7 @@ func (x *InterruptionPrediction) String() string {
 func (*InterruptionPrediction) ProtoMessage() {}
 
 func (x *InterruptionPrediction) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[27]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1768,7 +1724,7 @@ func (x *InterruptionPrediction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterruptionPrediction.ProtoReflect.Descriptor instead.
 func (*InterruptionPrediction) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{27}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *InterruptionPrediction) GetIsInterruption() bool {
@@ -1785,23 +1741,9 @@ func (x *InterruptionPrediction) GetProbabilities() []float32 {
 	return nil
 }
 
-func (x *InterruptionPrediction) GetProcessingStats() *ProcessingStats {
+func (x *InterruptionPrediction) GetInferenceStats() *InferenceStats {
 	if x != nil {
-		return x.ProcessingStats
-	}
-	return nil
-}
-
-func (x *InterruptionPrediction) GetCreatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *InterruptionPrediction) GetPredictionDuration() *durationpb.Duration {
-	if x != nil {
-		return x.PredictionDuration
+		return x.InferenceStats
 	}
 	return nil
 }
@@ -1828,7 +1770,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[28]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1840,7 +1782,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_inference_proto_msgTypes[28]
+	mi := &file_agent_livekit_agent_inference_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1853,7 +1795,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{28}
+	return file_agent_livekit_agent_inference_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ServerMessage) GetServerCreatedAt() *timestamppb.Timestamp {
@@ -2069,18 +2011,17 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x10InferenceRequest\x12X\n" +
 	"\x15eot_inference_request\x18\x01 \x01(\v2\".livekit.agent.EotInferenceRequestH\x00R\x13eotInferenceRequest\x12s\n" +
 	"\x1einterruption_inference_request\x18\x02 \x01(\v2+.livekit.agent.InterruptionInferenceRequestH\x00R\x1cinterruptionInferenceRequestB\t\n" +
-	"\arequest\"\xe8\x01\n" +
-	"\x0eInferenceStats\x12:\n" +
-	"\ve2e_latency\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\n" +
-	"e2eLatency\x12P\n" +
-	"\x16preprocessing_duration\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x15preprocessingDuration\x12H\n" +
-	"\x12inference_duration\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\"\xc3\x02\n" +
-	"\x0fProcessingStats\x12W\n" +
-	"\x1aearliest_client_created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x17earliestClientCreatedAt\x12S\n" +
-	"\x18latest_client_created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x15latestClientCreatedAt\x12:\n" +
-	"\ve2e_latency\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\n" +
-	"e2eLatency\x12F\n" +
-	"\x0finference_stats\x18\x04 \x01(\v2\x1d.livekit.agent.InferenceStatsR\x0einferenceStats\"m\n" +
+	"\arequest\"\xce\x04\n" +
+	"\x0eInferenceStats\x12\\\n" +
+	"\x1aearliest_client_created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampH\x00R\x17earliestClientCreatedAt\x88\x01\x01\x12X\n" +
+	"\x18latest_client_created_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampH\x01R\x15latestClientCreatedAt\x88\x01\x01\x12L\n" +
+	"\x12client_e2e_latency\x18\x03 \x01(\v2\x19.google.protobuf.DurationH\x02R\x10clientE2eLatency\x88\x01\x01\x12G\n" +
+	"\x12server_e2e_latency\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x10serverE2eLatency\x12P\n" +
+	"\x16preprocessing_duration\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x15preprocessingDuration\x12H\n" +
+	"\x12inference_duration\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDurationB\x1d\n" +
+	"\x1b_earliest_client_created_atB\x1b\n" +
+	"\x19_latest_client_created_atB\x15\n" +
+	"\x13_client_e2e_latency\"m\n" +
 	"\x14EotInferenceResponse\x12 \n" +
 	"\vprobability\x18\x01 \x01(\x02R\vprobability\x123\n" +
 	"\x05stats\x18\x02 \x01(\v2\x1d.livekit.agent.InferenceStatsR\x05stats\"\xa3\x01\n" +
@@ -2096,23 +2037,20 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x0eSessionCreated\"\x12\n" +
 	"\x10InferenceStarted\"\x12\n" +
 	"\x10InferenceStopped\"\x0f\n" +
-	"\rSessionClosed\"\x98\x02\n" +
+	"\rSessionClosed\"\x95\x02\n" +
 	"\rEotPrediction\x12 \n" +
-	"\vprobability\x18\x01 \x01(\x02R\vprobability\x12I\n" +
-	"\x10processing_stats\x18\x02 \x01(\v2\x1e.livekit.agent.ProcessingStatsR\x0fprocessingStats\x12A\n" +
+	"\vprobability\x18\x01 \x01(\x02R\vprobability\x12F\n" +
+	"\x0finference_stats\x18\x02 \x01(\v2\x1d.livekit.agent.InferenceStatsR\x0einferenceStats\x12A\n" +
 	"\abackend\x18\x03 \x01(\x0e2'.livekit.agent.EotPrediction.EotBackendR\abackend\"W\n" +
 	"\n" +
 	"EotBackend\x12\x17\n" +
 	"\x13EOT_BACKEND_UNKNOWN\x10\x00\x12\x1a\n" +
 	"\x16EOT_BACKEND_MULTIMODAL\x10\x01\x12\x14\n" +
-	"\x10EOT_BACKEND_TEXT\x10\x02\"\xb9\x02\n" +
+	"\x10EOT_BACKEND_TEXT\x10\x02\"\xaf\x01\n" +
 	"\x16InterruptionPrediction\x12'\n" +
 	"\x0fis_interruption\x18\x01 \x01(\bR\x0eisInterruption\x12$\n" +
-	"\rprobabilities\x18\x02 \x03(\x02R\rprobabilities\x12I\n" +
-	"\x10processing_stats\x18\x03 \x01(\v2\x1e.livekit.agent.ProcessingStatsR\x0fprocessingStats\x129\n" +
-	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12J\n" +
-	"\x13prediction_duration\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x12predictionDuration\"\x89\x06\n" +
+	"\rprobabilities\x18\x02 \x03(\x02R\rprobabilities\x12F\n" +
+	"\x0finference_stats\x18\x03 \x01(\v2\x1d.livekit.agent.InferenceStatsR\x0einferenceStats\"\x89\x06\n" +
 	"\rServerMessage\x12F\n" +
 	"\x11server_created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x0fserverCreatedAt\x12\"\n" +
 	"\n" +
@@ -2146,7 +2084,7 @@ func file_agent_livekit_agent_inference_proto_rawDescGZIP() []byte {
 }
 
 var file_agent_livekit_agent_inference_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_agent_livekit_agent_inference_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_agent_livekit_agent_inference_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_agent_livekit_agent_inference_proto_goTypes = []any{
 	(AudioEncoding)(0),                    // 0: livekit.agent.AudioEncoding
 	(EotPrediction_EotBackend)(0),         // 1: livekit.agent.EotPrediction.EotBackend
@@ -2168,33 +2106,32 @@ var file_agent_livekit_agent_inference_proto_goTypes = []any{
 	(*InterruptionInferenceRequest)(nil),  // 17: livekit.agent.InterruptionInferenceRequest
 	(*InferenceRequest)(nil),              // 18: livekit.agent.InferenceRequest
 	(*InferenceStats)(nil),                // 19: livekit.agent.InferenceStats
-	(*ProcessingStats)(nil),               // 20: livekit.agent.ProcessingStats
-	(*EotInferenceResponse)(nil),          // 21: livekit.agent.EotInferenceResponse
-	(*InterruptionInferenceResponse)(nil), // 22: livekit.agent.InterruptionInferenceResponse
-	(*InferenceResponse)(nil),             // 23: livekit.agent.InferenceResponse
-	(*SessionCreated)(nil),                // 24: livekit.agent.SessionCreated
-	(*InferenceStarted)(nil),              // 25: livekit.agent.InferenceStarted
-	(*InferenceStopped)(nil),              // 26: livekit.agent.InferenceStopped
-	(*SessionClosed)(nil),                 // 27: livekit.agent.SessionClosed
-	(*EotPrediction)(nil),                 // 28: livekit.agent.EotPrediction
-	(*InterruptionPrediction)(nil),        // 29: livekit.agent.InterruptionPrediction
-	(*ServerMessage)(nil),                 // 30: livekit.agent.ServerMessage
-	(*durationpb.Duration)(nil),           // 31: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),         // 32: google.protobuf.Timestamp
-	(*ChatMessage)(nil),                   // 33: livekit.agent.ChatMessage
+	(*EotInferenceResponse)(nil),          // 20: livekit.agent.EotInferenceResponse
+	(*InterruptionInferenceResponse)(nil), // 21: livekit.agent.InterruptionInferenceResponse
+	(*InferenceResponse)(nil),             // 22: livekit.agent.InferenceResponse
+	(*SessionCreated)(nil),                // 23: livekit.agent.SessionCreated
+	(*InferenceStarted)(nil),              // 24: livekit.agent.InferenceStarted
+	(*InferenceStopped)(nil),              // 25: livekit.agent.InferenceStopped
+	(*SessionClosed)(nil),                 // 26: livekit.agent.SessionClosed
+	(*EotPrediction)(nil),                 // 27: livekit.agent.EotPrediction
+	(*InterruptionPrediction)(nil),        // 28: livekit.agent.InterruptionPrediction
+	(*ServerMessage)(nil),                 // 29: livekit.agent.ServerMessage
+	(*durationpb.Duration)(nil),           // 30: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),         // 31: google.protobuf.Timestamp
+	(*ChatMessage)(nil),                   // 32: livekit.agent.ChatMessage
 }
 var file_agent_livekit_agent_inference_proto_depIdxs = []int32{
 	0,  // 0: livekit.agent.SessionSettings.encoding:type_name -> livekit.agent.AudioEncoding
 	4,  // 1: livekit.agent.SessionSettings.eot_settings:type_name -> livekit.agent.EotSettings
 	5,  // 2: livekit.agent.SessionSettings.interruption_settings:type_name -> livekit.agent.InterruptionSettings
-	31, // 3: livekit.agent.EotSettings.detection_interval:type_name -> google.protobuf.Duration
-	31, // 4: livekit.agent.InterruptionSettings.max_audio_duration:type_name -> google.protobuf.Duration
-	31, // 5: livekit.agent.InterruptionSettings.audio_prefix_duration:type_name -> google.protobuf.Duration
-	31, // 6: livekit.agent.InterruptionSettings.detection_interval:type_name -> google.protobuf.Duration
+	30, // 3: livekit.agent.EotSettings.detection_interval:type_name -> google.protobuf.Duration
+	30, // 4: livekit.agent.InterruptionSettings.max_audio_duration:type_name -> google.protobuf.Duration
+	30, // 5: livekit.agent.InterruptionSettings.audio_prefix_duration:type_name -> google.protobuf.Duration
+	30, // 6: livekit.agent.InterruptionSettings.detection_interval:type_name -> google.protobuf.Duration
 	2,  // 7: livekit.agent.SessionCreate.settings:type_name -> livekit.agent.SessionSettings
-	32, // 8: livekit.agent.InputAudio.created_at:type_name -> google.protobuf.Timestamp
-	33, // 9: livekit.agent.EotInputChatContext.messages:type_name -> livekit.agent.ChatMessage
-	32, // 10: livekit.agent.ClientMessage.created_at:type_name -> google.protobuf.Timestamp
+	31, // 8: livekit.agent.InputAudio.created_at:type_name -> google.protobuf.Timestamp
+	32, // 9: livekit.agent.EotInputChatContext.messages:type_name -> livekit.agent.ChatMessage
+	31, // 10: livekit.agent.ClientMessage.created_at:type_name -> google.protobuf.Timestamp
 	6,  // 11: livekit.agent.ClientMessage.session_create:type_name -> livekit.agent.SessionCreate
 	7,  // 12: livekit.agent.ClientMessage.input_audio:type_name -> livekit.agent.InputAudio
 	9,  // 13: livekit.agent.ClientMessage.session_flush:type_name -> livekit.agent.SessionFlush
@@ -2208,36 +2145,33 @@ var file_agent_livekit_agent_inference_proto_depIdxs = []int32{
 	0,  // 21: livekit.agent.InterruptionInferenceRequest.encoding:type_name -> livekit.agent.AudioEncoding
 	16, // 22: livekit.agent.InferenceRequest.eot_inference_request:type_name -> livekit.agent.EotInferenceRequest
 	17, // 23: livekit.agent.InferenceRequest.interruption_inference_request:type_name -> livekit.agent.InterruptionInferenceRequest
-	31, // 24: livekit.agent.InferenceStats.e2e_latency:type_name -> google.protobuf.Duration
-	31, // 25: livekit.agent.InferenceStats.preprocessing_duration:type_name -> google.protobuf.Duration
-	31, // 26: livekit.agent.InferenceStats.inference_duration:type_name -> google.protobuf.Duration
-	32, // 27: livekit.agent.ProcessingStats.earliest_client_created_at:type_name -> google.protobuf.Timestamp
-	32, // 28: livekit.agent.ProcessingStats.latest_client_created_at:type_name -> google.protobuf.Timestamp
-	31, // 29: livekit.agent.ProcessingStats.e2e_latency:type_name -> google.protobuf.Duration
-	19, // 30: livekit.agent.ProcessingStats.inference_stats:type_name -> livekit.agent.InferenceStats
-	19, // 31: livekit.agent.EotInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
-	19, // 32: livekit.agent.InterruptionInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
-	21, // 33: livekit.agent.InferenceResponse.eot_inference_response:type_name -> livekit.agent.EotInferenceResponse
-	22, // 34: livekit.agent.InferenceResponse.interruption_inference_response:type_name -> livekit.agent.InterruptionInferenceResponse
-	20, // 35: livekit.agent.EotPrediction.processing_stats:type_name -> livekit.agent.ProcessingStats
-	1,  // 36: livekit.agent.EotPrediction.backend:type_name -> livekit.agent.EotPrediction.EotBackend
-	20, // 37: livekit.agent.InterruptionPrediction.processing_stats:type_name -> livekit.agent.ProcessingStats
-	32, // 38: livekit.agent.InterruptionPrediction.created_at:type_name -> google.protobuf.Timestamp
-	31, // 39: livekit.agent.InterruptionPrediction.prediction_duration:type_name -> google.protobuf.Duration
-	32, // 40: livekit.agent.ServerMessage.server_created_at:type_name -> google.protobuf.Timestamp
-	32, // 41: livekit.agent.ServerMessage.client_created_at:type_name -> google.protobuf.Timestamp
-	24, // 42: livekit.agent.ServerMessage.session_created:type_name -> livekit.agent.SessionCreated
-	25, // 43: livekit.agent.ServerMessage.inference_started:type_name -> livekit.agent.InferenceStarted
-	26, // 44: livekit.agent.ServerMessage.inference_stopped:type_name -> livekit.agent.InferenceStopped
-	27, // 45: livekit.agent.ServerMessage.session_closed:type_name -> livekit.agent.SessionClosed
-	3,  // 46: livekit.agent.ServerMessage.error:type_name -> livekit.agent.InferenceError
-	28, // 47: livekit.agent.ServerMessage.eot_prediction:type_name -> livekit.agent.EotPrediction
-	29, // 48: livekit.agent.ServerMessage.interruption_prediction:type_name -> livekit.agent.InterruptionPrediction
-	49, // [49:49] is the sub-list for method output_type
-	49, // [49:49] is the sub-list for method input_type
-	49, // [49:49] is the sub-list for extension type_name
-	49, // [49:49] is the sub-list for extension extendee
-	0,  // [0:49] is the sub-list for field type_name
+	31, // 24: livekit.agent.InferenceStats.earliest_client_created_at:type_name -> google.protobuf.Timestamp
+	31, // 25: livekit.agent.InferenceStats.latest_client_created_at:type_name -> google.protobuf.Timestamp
+	30, // 26: livekit.agent.InferenceStats.client_e2e_latency:type_name -> google.protobuf.Duration
+	30, // 27: livekit.agent.InferenceStats.server_e2e_latency:type_name -> google.protobuf.Duration
+	30, // 28: livekit.agent.InferenceStats.preprocessing_duration:type_name -> google.protobuf.Duration
+	30, // 29: livekit.agent.InferenceStats.inference_duration:type_name -> google.protobuf.Duration
+	19, // 30: livekit.agent.EotInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
+	19, // 31: livekit.agent.InterruptionInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
+	20, // 32: livekit.agent.InferenceResponse.eot_inference_response:type_name -> livekit.agent.EotInferenceResponse
+	21, // 33: livekit.agent.InferenceResponse.interruption_inference_response:type_name -> livekit.agent.InterruptionInferenceResponse
+	19, // 34: livekit.agent.EotPrediction.inference_stats:type_name -> livekit.agent.InferenceStats
+	1,  // 35: livekit.agent.EotPrediction.backend:type_name -> livekit.agent.EotPrediction.EotBackend
+	19, // 36: livekit.agent.InterruptionPrediction.inference_stats:type_name -> livekit.agent.InferenceStats
+	31, // 37: livekit.agent.ServerMessage.server_created_at:type_name -> google.protobuf.Timestamp
+	31, // 38: livekit.agent.ServerMessage.client_created_at:type_name -> google.protobuf.Timestamp
+	23, // 39: livekit.agent.ServerMessage.session_created:type_name -> livekit.agent.SessionCreated
+	24, // 40: livekit.agent.ServerMessage.inference_started:type_name -> livekit.agent.InferenceStarted
+	25, // 41: livekit.agent.ServerMessage.inference_stopped:type_name -> livekit.agent.InferenceStopped
+	26, // 42: livekit.agent.ServerMessage.session_closed:type_name -> livekit.agent.SessionClosed
+	3,  // 43: livekit.agent.ServerMessage.error:type_name -> livekit.agent.InferenceError
+	27, // 44: livekit.agent.ServerMessage.eot_prediction:type_name -> livekit.agent.EotPrediction
+	28, // 45: livekit.agent.ServerMessage.interruption_prediction:type_name -> livekit.agent.InterruptionPrediction
+	46, // [46:46] is the sub-list for method output_type
+	46, // [46:46] is the sub-list for method input_type
+	46, // [46:46] is the sub-list for extension type_name
+	46, // [46:46] is the sub-list for extension extendee
+	0,  // [0:46] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_inference_proto_init() }
@@ -2265,11 +2199,12 @@ func file_agent_livekit_agent_inference_proto_init() {
 		(*InferenceRequest_EotInferenceRequest)(nil),
 		(*InferenceRequest_InterruptionInferenceRequest)(nil),
 	}
-	file_agent_livekit_agent_inference_proto_msgTypes[21].OneofWrappers = []any{
+	file_agent_livekit_agent_inference_proto_msgTypes[17].OneofWrappers = []any{}
+	file_agent_livekit_agent_inference_proto_msgTypes[20].OneofWrappers = []any{
 		(*InferenceResponse_EotInferenceResponse)(nil),
 		(*InferenceResponse_InterruptionInferenceResponse)(nil),
 	}
-	file_agent_livekit_agent_inference_proto_msgTypes[28].OneofWrappers = []any{
+	file_agent_livekit_agent_inference_proto_msgTypes[27].OneofWrappers = []any{
 		(*ServerMessage_SessionCreated)(nil),
 		(*ServerMessage_InferenceStarted)(nil),
 		(*ServerMessage_InferenceStopped)(nil),
@@ -2284,7 +2219,7 @@ func file_agent_livekit_agent_inference_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_inference_proto_rawDesc), len(file_agent_livekit_agent_inference_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   29,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
