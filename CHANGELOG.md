@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.45.6
+
+### Patch Changes
+
+- Add turn detection protobufs - [#1485](https://github.com/livekit/protocol/pull/1485) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- fix change set for eot changes - [#1515](https://github.com/livekit/protocol/pull/1515) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.45.5
 
 ## 1.45.4
