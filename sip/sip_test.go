@@ -287,6 +287,32 @@ func TestSIPMatchTrunk(t *testing.T) {
 	}
 }
 
+// TestSIPMatchTrunkSameTrunkDuplicateNumberForms verifies that a trunk listing
+// the same number in both +E.164 and bare forms is not treated as a conflict
+// with itself. Regression test for "Multiple SIP Trunks matched" when a user
+// configures both "+19793169351" and "19793169351" on one trunk.
+func TestSIPMatchTrunkSameTrunkDuplicateNumberForms(t *testing.T) {
+	trunks := []*livekit.SIPInboundTrunkInfo{
+		{SipTrunkId: "aaa", Numbers: []string{"+" + sipNumber2, sipNumber2}},
+	}
+	for _, toNum := range []string{sipNumber2, "+" + sipNumber2} {
+		t.Run("to="+toNum, func(t *testing.T) {
+			call := &rpc.SIPCall{
+				SipCallId: "test-call-id",
+				SourceIp:  "1.1.1.1",
+				From:      &livekit.SIPUri{User: sipNumber1, Host: "sip.example.com"},
+				To:        &livekit.SIPUri{User: toNum},
+			}
+			call.Address = call.To
+			got, err := MatchTrunkIter(iters.Slice(trunks), call, WithTrunkConflict(func(t1, t2 *livekit.SIPInboundTrunkInfo, reason TrunkConflictReason) {
+				t.Fatalf("unexpected conflict: %v\n%v\nvs\n%v", reason, t1, t2)
+			}))
+			require.NoError(t, err)
+			require.Equal(t, trunks[0], got)
+		})
+	}
+}
+
 func TestSIPValidateTrunks(t *testing.T) {
 	for _, c := range trunkCases {
 		c := c
