@@ -187,14 +187,14 @@ message EotPrediction {
     EOT_BACKEND_TEXT = 2;
   }
   float probability = 1;
-  InferenceStats processing_stats = 2;
+  InferenceStats inference_stats = 2;
   EotBackend backend = 3;
 }
 
 message InterruptionPrediction {
   bool is_interruption = 1;
   repeated float probabilities = 2;
-  InferenceStats processing_stats = 3;
+  InferenceStats inference_stats = 3;
 }
 
 message ServerMessage {
