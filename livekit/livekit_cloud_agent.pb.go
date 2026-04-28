@@ -1513,10 +1513,9 @@ func (x *RestartAgentResponse) GetMessage() string {
 }
 
 type DeployAgentRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	AgentId   string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	AgentName string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Secrets   []*AgentSecret         `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	AgentId string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	Secrets []*AgentSecret         `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Replicas int32 `protobuf:"varint,4,opt,name=replicas,proto3" json:"replicas,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
@@ -1561,13 +1560,6 @@ func (*DeployAgentRequest) Descriptor() ([]byte, []int) {
 func (x *DeployAgentRequest) GetAgentId() string {
 	if x != nil {
 		return x.AgentId
-	}
-	return ""
-}
-
-func (x *DeployAgentRequest) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
 	}
 	return ""
 }
@@ -1709,7 +1701,6 @@ type DeployAgentV2Request struct {
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	Secrets       []*AgentSecret         `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	Environment   string                 `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"`
-	AgentName     string                 `protobuf:"bytes,4,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1765,13 +1756,6 @@ func (x *DeployAgentV2Request) GetEnvironment() string {
 	return ""
 }
 
-func (x *DeployAgentV2Request) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
-	}
-	return ""
-}
-
 type DeployAgentV2Response struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -1780,7 +1764,6 @@ type DeployAgentV2Response struct {
 	Tag           string                 `protobuf:"bytes,4,opt,name=tag,proto3" json:"tag,omitempty"`
 	PresignedReq  *PresignedPostRequest  `protobuf:"bytes,5,opt,name=presigned_req,json=presignedReq,proto3" json:"presigned_req,omitempty"`
 	Environment   string                 `protobuf:"bytes,6,opt,name=environment,proto3" json:"environment,omitempty"`
-	AgentName     string                 `protobuf:"bytes,7,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1853,13 +1836,6 @@ func (x *DeployAgentV2Response) GetPresignedReq() *PresignedPostRequest {
 func (x *DeployAgentV2Response) GetEnvironment() string {
 	if x != nil {
 		return x.Environment
-	}
-	return ""
-}
-
-func (x *DeployAgentV2Response) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
 	}
 	return ""
 }
@@ -3256,17 +3232,16 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\xbaP\aagentIDR\aagentId\"J\n" +
 	"\x14RestartAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x90\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x83\x02\n" +
 	"\x12DeployAgentRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
-	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12.\n" +
+	"\xbaP\aagentIDR\aagentId\x12.\n" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\xa2\x02\n" +
+	"\venvironment\x18\a \x01(\tR\venvironmentJ\x04\b\x02\x10\x03R\n" +
+	"agent_name\"\xa2\x02\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
@@ -3275,14 +3250,12 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\rpresigned_url\x18\x04 \x01(\tB\x02\x18\x01R\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
 	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\xae\x01\n" +
+	"\venvironment\x18\a \x01(\tR\venvironment\"\x8f\x01\n" +
 	"\x14DeployAgentV2Request\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12.\n" +
 	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12 \n" +
-	"\venvironment\x18\x03 \x01(\tR\venvironment\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x04 \x01(\tR\tagentName\"\x89\x02\n" +
+	"\venvironment\x18\x03 \x01(\tR\venvironment\"\xea\x01\n" +
 	"\x15DeployAgentV2Response\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
@@ -3290,9 +3263,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\xbaP\aagentIDR\aagentId\x12\x10\n" +
 	"\x03tag\x18\x04 \x01(\tR\x03tag\x12B\n" +
 	"\rpresigned_req\x18\x05 \x01(\v2\x1d.livekit.PresignedPostRequestR\fpresignedReq\x12 \n" +
-	"\venvironment\x18\x06 \x01(\tR\venvironment\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\a \x01(\tR\tagentName\"\xc7\x01\n" +
+	"\venvironment\x18\x06 \x01(\tR\venvironment\"\xc7\x01\n" +
 	"\x19UpdateAgentSecretsRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
