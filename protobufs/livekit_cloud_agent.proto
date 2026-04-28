@@ -70,15 +70,17 @@ message CreateAgentResponse {
     PresignedPostRequest presigned_post_request = 8;
 }
 
-message CreateAgentV2Request {
+message CreateAgentV2Request {gi
   repeated AgentSecret secrets = 1;
   repeated string regions      = 2;
+  string agent_name = 3; 
 }
 
 message CreateAgentV2Response {
   string agent_id                = 1 [(logger.name) = "agentID"];
   string status                  = 2;
   repeated string server_regions = 3;
+  string agent_name = 4;
 }
 
 message PresignedPostRequest {
@@ -145,7 +147,7 @@ message ListAgentVersionsResponse {
 
 message UpdateAgentRequest {
     string agent_id              = 1 [(logger.name) = "agentID"];
-    string agent_name            = 2 [deprecated=true];
+    string agent_name            = 2 ;
     int32 replicas               = 3 [deprecated=true];
     int32 max_replicas           = 4 [deprecated=true];
     string cpu_req               = 5 [deprecated=true];
@@ -191,6 +193,7 @@ message DeployAgentV2Request {
   string agent_id              = 1 [(logger.name) = "agentID"];
   repeated AgentSecret secrets = 2;
   string environment           = 3;
+  string agent_name = 4;
 }
 
 message DeployAgentV2Response {
@@ -200,6 +203,7 @@ message DeployAgentV2Response {
   string tag = 4;
   PresignedPostRequest presigned_req = 5;
   string environment = 6;
+  string agent_name = 7;
 }
 
 message UpdateAgentSecretsRequest {
