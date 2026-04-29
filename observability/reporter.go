@@ -3,6 +3,7 @@ package observability
 import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/observability/agentsobs"
+	"github.com/livekit/protocol/observability/agentsv2obs"
 	"github.com/livekit/protocol/observability/corecallobs"
 	"github.com/livekit/protocol/observability/egressobs"
 	"github.com/livekit/protocol/observability/gatewayobs"
@@ -19,6 +20,7 @@ type Reporter interface {
 	Logger(name, projectID string) (logger.Logger, error)
 	Room() roomobs.Reporter
 	Agent() agentsobs.Reporter
+	AgentV2() agentsv2obs.Reporter
 	Gateway() gatewayobs.Reporter
 	Telephony() telephonyobs.Reporter
 	Egress() egressobs.Reporter
@@ -45,6 +47,10 @@ func (reporter) Room() roomobs.Reporter {
 
 func (reporter) Agent() agentsobs.Reporter {
 	return agentsobs.NewNoopReporter()
+}
+
+func (reporter) AgentV2() agentsv2obs.Reporter {
+	return agentsv2obs.NewNoopReporter()
 }
 
 func (reporter) Gateway() gatewayobs.Reporter {
