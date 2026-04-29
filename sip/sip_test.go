@@ -332,6 +332,39 @@ func TestSIPValidateTrunks(t *testing.T) {
 	}
 }
 
+// TestSIPValidateTrunksNormalizedNumbers verifies conflict detection treats different
+// forms of the same number as equivalent. A single trunk listing the same number in
+// multiple forms must not be flagged against itself; two different trunks listing the
+// same number in different forms must be flagged as conflicting.
+func TestSIPValidateTrunksNormalizedNumbers(t *testing.T) {
+	t.Run("same trunk duplicate Numbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{"+" + sipNumber2, sipNumber2}},
+		}
+		require.NoError(t, ValidateTrunks(trunks))
+	})
+	t.Run("same trunk duplicate AllowedNumbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{sipNumber2}, AllowedNumbers: []string{"+" + sipNumber1, sipNumber1}},
+		}
+		require.NoError(t, ValidateTrunks(trunks))
+	})
+	t.Run("different trunks different Numbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{"+" + sipNumber2}},
+			{SipTrunkId: "bbb", Numbers: []string{sipNumber2}},
+		}
+		require.Error(t, ValidateTrunks(trunks))
+	})
+	t.Run("different trunks different AllowedNumbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{sipNumber2}, AllowedNumbers: []string{"+" + sipNumber1}},
+			{SipTrunkId: "bbb", Numbers: []string{sipNumber2}, AllowedNumbers: []string{sipNumber1}},
+		}
+		require.Error(t, ValidateTrunks(trunks))
+	})
+}
+
 func newSIPTrunkDispatch() *livekit.SIPTrunkInfo {
 	return &livekit.SIPTrunkInfo{
 		SipTrunkId:     sipTrunkID1,

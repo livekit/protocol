@@ -301,7 +301,7 @@ func NormalizeNumber(num string) string {
 
 func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *livekit.SIPInboundTrunkInfo, opt *matchTrunkOpts) error {
 	if len(t.AllowedNumbers) == 0 {
-		if t2 := byInbound[""]; t2 != nil {
+		if t2 := byInbound[""]; t2 != nil && t2.SipTrunkId != t.SipTrunkId {
 			opt.Conflict(t, t2, TrunkConflictCalledNumber)
 			if opt.AllowConflicts {
 				return nil
@@ -311,10 +311,18 @@ func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *
 		}
 		byInbound[""] = t
 	} else {
+		var seen map[string]struct{}
 		for _, num := range t.AllowedNumbers {
 			inboundKey := NormalizeNumber(num)
+			if _, ok := seen[inboundKey]; ok {
+				continue
+			}
+			if seen == nil {
+				seen = make(map[string]struct{})
+			}
+			seen[inboundKey] = struct{}{}
 			t2 := byInbound[inboundKey]
-			if t2 != nil {
+			if t2 != nil && t2.SipTrunkId != t.SipTrunkId {
 				opt.Conflict(t, t2, TrunkConflictCallingNumber)
 				if opt.AllowConflicts {
 					continue
@@ -362,11 +370,22 @@ func ValidateTrunksIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], opts ...Mat
 				return err
 			}
 		} else {
+			var seen map[string]struct{}
 			for _, num := range t.Numbers {
-				byInbound := byOutboundAndInbound[num]
+				// Normalize so different forms of the same number (e.g. "+123" and "123")
+				// share a conflict bucket across trunks.
+				key := NormalizeNumber(num)
+				if _, ok := seen[key]; ok {
+					continue
+				}
+				if seen == nil {
+					seen = make(map[string]struct{})
+				}
+				seen[key] = struct{}{}
+				byInbound := byOutboundAndInbound[key]
 				if byInbound == nil {
 					byInbound = make(map[string]*livekit.SIPInboundTrunkInfo)
-					byOutboundAndInbound[num] = byInbound
+					byOutboundAndInbound[key] = byInbound
 				}
 				if err := validateTrunkInbound(byInbound, t, &opt); err != nil {
 					return err
