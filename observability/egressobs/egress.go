@@ -25,10 +25,10 @@ const (
 )
 
 type EgressResults struct {
-	FileResults    []*livekit.FileInfo
-	StreamResults  []*livekit.StreamInfo
-	SegmentResults []*livekit.SegmentsInfo
-	ImageResults   []*livekit.ImagesInfo
+	FileResults    []*livekit.FileInfo     `json:"file_results,omitempty"`
+	StreamResults  []*livekit.StreamInfo   `json:"stream_results,omitempty"`
+	SegmentResults []*livekit.SegmentsInfo `json:"segment_results,omitempty"`
+	ImageResults   []*livekit.ImagesInfo   `json:"image_results,omitempty"`
 }
 
 func GetSourceType(info *livekit.EgressInfo) SessionSourceType {
@@ -154,37 +154,36 @@ func GetRequest(info *livekit.EgressInfo) (string, error) {
 }
 
 func GetResult(info *livekit.EgressInfo) (string, error) {
+	var results *EgressResults
+
 	if file := info.GetFile(); file != nil {
-		b, err := protojson.Marshal(file)
-		if err != nil {
-			return "", errors.Wrap(err, "failed serializing File result")
+		results = &EgressResults{
+			FileResults: []*livekit.FileInfo{
+				file,
+			},
 		}
-		return string(b), nil
 	} else if stream := info.GetStream(); stream != nil {
-		b, err := protojson.Marshal(stream)
-		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Stream result")
-		}
-		return string(b), nil
+		results = &EgressResults{}
+		results.StreamResults = append(results.StreamResults, stream.Info...)
 	} else if segments := info.GetSegments(); segments != nil {
-		b, err := protojson.Marshal(segments)
-		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Segments result")
+		results = &EgressResults{
+			SegmentResults: []*livekit.SegmentsInfo{
+				segments,
+			},
 		}
-		return string(b), nil
 	} else {
-		results := &EgressResults{
+		results = &EgressResults{
 			FileResults:    info.FileResults,
 			StreamResults:  info.StreamResults,
 			SegmentResults: info.SegmentResults,
 			ImageResults:   info.ImageResults,
 		}
-		b, err := json.Marshal(results)
-		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Multiple result")
-		}
-		return string(b), nil
 	}
+	b, err := json.Marshal(results)
+	if err != nil {
+		return "", errors.Wrap(err, "failed serializing results")
+	}
+	return string(b), nil
 }
 
 func GetAudioOnly(info *livekit.EgressInfo) bool {

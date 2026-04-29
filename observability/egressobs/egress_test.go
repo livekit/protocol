@@ -219,32 +219,38 @@ func TestGetRequest(t *testing.T) {
 
 func TestGetResult(t *testing.T) {
 	tests := []struct {
-		name string
-		info *livekit.EgressInfo
+		name     string
+		info     *livekit.EgressInfo
+		expected string
 	}{
 		{
 			name: "FileResult",
 			info: &livekit.EgressInfo{
 				Result: &livekit.EgressInfo_File{
-					File: &livekit.FileInfo{Filename: "test.mp4"},
+					File: &livekit.FileInfo{Filename: "test.mp4", Size: 1024},
 				},
 			},
+			expected: `{"file_results":[{"filename":"test.mp4", "size":1024}]}`,
 		},
 		{
 			name: "StreamResult",
 			info: &livekit.EgressInfo{
 				Result: &livekit.EgressInfo_Stream{
-					Stream: &livekit.StreamInfoList{},
+					Stream: &livekit.StreamInfoList{
+						Info: []*livekit.StreamInfo{{Url: "rtmp://example.com/live"}},
+					},
 				},
 			},
+			expected: `{"stream_results":[{"url":"rtmp://example.com/live"}]}`,
 		},
 		{
 			name: "SegmentResult",
 			info: &livekit.EgressInfo{
 				Result: &livekit.EgressInfo_Segments{
-					Segments: &livekit.SegmentsInfo{},
+					Segments: &livekit.SegmentsInfo{PlaylistName: "playlist.m3u8"},
 				},
 			},
+			expected: `{"segment_results":[{"playlist_name":"playlist.m3u8"}]}`,
 		},
 		{
 			name: "MultipleResults",
@@ -253,6 +259,7 @@ func TestGetResult(t *testing.T) {
 					{Filename: "test.mp4"},
 				},
 			},
+			expected: `{"file_results":[{"filename":"test.mp4"}]}`,
 		},
 	}
 
@@ -260,7 +267,7 @@ func TestGetResult(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result, err := GetResult(tt.info)
 			require.NoError(t, err)
-			require.NotEmpty(t, result)
+			require.JSONEq(t, tt.expected, result)
 		})
 	}
 }
