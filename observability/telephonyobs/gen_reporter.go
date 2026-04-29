@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,16 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithCarrier(id string) CarrierReporter
 	WithDeferredCarrier() (CarrierReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type CarrierTx interface{}
+type carrierReporter interface {
+}
+
+type CarrierTx interface {
+	Project() ProjectTx
+	carrierReporter
+}
 
 type CarrierReporter interface {
 	RegisterFunc(func(ts time.Time, tx CarrierTx) bool)
@@ -37,10 +48,16 @@ type CarrierReporter interface {
 	TxAt(time.Time, func(tx CarrierTx))
 	WithCountry(code string) CountryReporter
 	WithDeferredCountry() (CountryReporter, KeyResolver)
-	CarrierTx
+	carrierReporter
 }
 
-type CountryTx interface{}
+type countryReporter interface {
+}
+
+type CountryTx interface {
+	Carrier() CarrierTx
+	countryReporter
+}
 
 type CountryReporter interface {
 	RegisterFunc(func(ts time.Time, tx CountryTx) bool)
@@ -48,10 +65,16 @@ type CountryReporter interface {
 	TxAt(time.Time, func(tx CountryTx))
 	WithPhone(number string) PhoneReporter
 	WithDeferredPhone() (PhoneReporter, KeyResolver)
-	CountryTx
+	countryReporter
 }
 
-type PhoneTx interface{}
+type phoneReporter interface {
+}
+
+type PhoneTx interface {
+	Country() CountryTx
+	phoneReporter
+}
 
 type PhoneReporter interface {
 	RegisterFunc(func(ts time.Time, tx PhoneTx) bool)
@@ -59,10 +82,10 @@ type PhoneReporter interface {
 	TxAt(time.Time, func(tx PhoneTx))
 	WithCall(id string) CallReporter
 	WithDeferredCall() (CallReporter, KeyResolver)
-	PhoneTx
+	phoneReporter
 }
 
-type CallTx interface {
+type callReporter interface {
 	ReportDirection(v DirectionType)
 	ReportNumberType(v NumberType)
 	ReportStatus(v CallStatus)
@@ -75,9 +98,14 @@ type CallTx interface {
 	ReportEndTime(v time.Time)
 }
 
+type CallTx interface {
+	Phone() PhoneTx
+	callReporter
+}
+
 type CallReporter interface {
 	RegisterFunc(func(ts time.Time, tx CallTx) bool)
 	Tx(func(tx CallTx))
 	TxAt(time.Time, func(tx CallTx))
-	CallTx
+	callReporter
 }

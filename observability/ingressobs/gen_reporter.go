@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,16 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithIngress(id string) IngressReporter
 	WithDeferredIngress() (IngressReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type IngressTx interface{}
+type ingressReporter interface {
+}
+
+type IngressTx interface {
+	Project() ProjectTx
+	ingressReporter
+}
 
 type IngressReporter interface {
 	RegisterFunc(func(ts time.Time, tx IngressTx) bool)
@@ -37,10 +48,10 @@ type IngressReporter interface {
 	TxAt(time.Time, func(tx IngressTx))
 	WithSession(id string) SessionReporter
 	WithDeferredSession() (SessionReporter, KeyResolver)
-	IngressTx
+	ingressReporter
 }
 
-type SessionTx interface {
+type sessionReporter interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
 	ReportDuration(v uint64)
@@ -55,9 +66,14 @@ type SessionTx interface {
 	ReportReusable(v bool)
 }
 
+type SessionTx interface {
+	Ingress() IngressTx
+	sessionReporter
+}
+
 type SessionReporter interface {
 	RegisterFunc(func(ts time.Time, tx SessionTx) bool)
 	Tx(func(tx SessionTx))
 	TxAt(time.Time, func(tx SessionTx))
-	SessionTx
+	sessionReporter
 }

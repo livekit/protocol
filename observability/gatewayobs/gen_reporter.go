@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,16 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithRequestedPriority(priority string) RequestedPriorityReporter
 	WithDeferredRequestedPriority() (RequestedPriorityReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type RequestedPriorityTx interface{}
+type requestedPriorityReporter interface {
+}
+
+type RequestedPriorityTx interface {
+	Project() ProjectTx
+	requestedPriorityReporter
+}
 
 type RequestedPriorityReporter interface {
 	RegisterFunc(func(ts time.Time, tx RequestedPriorityTx) bool)
@@ -37,10 +48,16 @@ type RequestedPriorityReporter interface {
 	TxAt(time.Time, func(tx RequestedPriorityTx))
 	WithGrantedPriority(priority string) GrantedPriorityReporter
 	WithDeferredGrantedPriority() (GrantedPriorityReporter, KeyResolver)
-	RequestedPriorityTx
+	requestedPriorityReporter
 }
 
-type GrantedPriorityTx interface{}
+type grantedPriorityReporter interface {
+}
+
+type GrantedPriorityTx interface {
+	RequestedPriority() RequestedPriorityTx
+	grantedPriorityReporter
+}
 
 type GrantedPriorityReporter interface {
 	RegisterFunc(func(ts time.Time, tx GrantedPriorityTx) bool)
@@ -48,10 +65,16 @@ type GrantedPriorityReporter interface {
 	TxAt(time.Time, func(tx GrantedPriorityTx))
 	WithBillablePriority(priority string) BillablePriorityReporter
 	WithDeferredBillablePriority() (BillablePriorityReporter, KeyResolver)
-	GrantedPriorityTx
+	grantedPriorityReporter
 }
 
-type BillablePriorityTx interface{}
+type billablePriorityReporter interface {
+}
+
+type BillablePriorityTx interface {
+	GrantedPriority() GrantedPriorityTx
+	billablePriorityReporter
+}
 
 type BillablePriorityReporter interface {
 	RegisterFunc(func(ts time.Time, tx BillablePriorityTx) bool)
@@ -59,10 +82,16 @@ type BillablePriorityReporter interface {
 	TxAt(time.Time, func(tx BillablePriorityTx))
 	WithProvider(name string) ProviderReporter
 	WithDeferredProvider() (ProviderReporter, KeyResolver)
-	BillablePriorityTx
+	billablePriorityReporter
 }
 
-type ProviderTx interface{}
+type providerReporter interface {
+}
+
+type ProviderTx interface {
+	BillablePriority() BillablePriorityTx
+	providerReporter
+}
 
 type ProviderReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProviderTx) bool)
@@ -70,10 +99,10 @@ type ProviderReporter interface {
 	TxAt(time.Time, func(tx ProviderTx))
 	WithModel(name string) ModelReporter
 	WithDeferredModel() (ModelReporter, KeyResolver)
-	ProviderTx
+	providerReporter
 }
 
-type ModelTx interface {
+type modelReporter interface {
 	ReportInferencePromptTokens(v uint64)
 	ReportInferencePromptCacheTokens(v uint64)
 	ReportInferenceCompletionTokens(v uint64)
@@ -87,9 +116,14 @@ type ModelTx interface {
 	ReportVoiceCloneRequests(v uint64)
 }
 
+type ModelTx interface {
+	Provider() ProviderTx
+	modelReporter
+}
+
 type ModelReporter interface {
 	RegisterFunc(func(ts time.Time, tx ModelTx) bool)
 	Tx(func(tx ModelTx))
 	TxAt(time.Time, func(tx ModelTx))
-	ModelTx
+	modelReporter
 }

@@ -9,8 +9,11 @@ import (
 var (
 	_ Reporter        = (*noopReporter)(nil)
 	_ ProjectReporter = (*noopProjectReporter)(nil)
+	_ ProjectTx       = (*noopProjectTx)(nil)
 	_ IngressReporter = (*noopIngressReporter)(nil)
+	_ IngressTx       = (*noopIngressTx)(nil)
 	_ SessionReporter = (*noopSessionReporter)(nil)
+	_ SessionTx       = (*noopSessionTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -48,6 +51,8 @@ func (r *noopProjectReporter) WithDeferredIngress() (IngressReporter, KeyResolve
 	return &noopIngressReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopIngressReporter struct{}
 
 func NewNoopIngressReporter() IngressReporter {
@@ -62,6 +67,12 @@ func (r *noopIngressReporter) WithSession(id string) SessionReporter {
 }
 func (r *noopIngressReporter) WithDeferredSession() (SessionReporter, KeyResolver) {
 	return &noopSessionReporter{}, noopKeyResolver{}
+}
+
+type noopIngressTx struct{}
+
+func (t *noopIngressTx) Project() ProjectTx {
+	return &noopProjectTx{}
 }
 
 type noopSessionReporter struct{}
@@ -85,3 +96,22 @@ func (r *noopSessionReporter) ReportStatus(v SessionStatus)                     
 func (r *noopSessionReporter) ReportAudioOnly(v bool)                               {}
 func (r *noopSessionReporter) ReportTranscoded(v bool)                              {}
 func (r *noopSessionReporter) ReportReusable(v bool)                                {}
+
+type noopSessionTx struct{}
+
+func (t *noopSessionTx) Ingress() IngressTx {
+	return &noopIngressTx{}
+}
+
+func (t *noopSessionTx) ReportStartTime(v time.Time)        {}
+func (t *noopSessionTx) ReportEndTime(v time.Time)          {}
+func (t *noopSessionTx) ReportDuration(v uint64)            {}
+func (t *noopSessionTx) ReportInputType(v SessionInputType) {}
+func (t *noopSessionTx) ReportRegion(v string)              {}
+func (t *noopSessionTx) ReportRoomName(v string)            {}
+func (t *noopSessionTx) ReportRoomID(v string)              {}
+func (t *noopSessionTx) ReportError(v string)               {}
+func (t *noopSessionTx) ReportStatus(v SessionStatus)       {}
+func (t *noopSessionTx) ReportAudioOnly(v bool)             {}
+func (t *noopSessionTx) ReportTranscoded(v bool)            {}
+func (t *noopSessionTx) ReportReusable(v bool)              {}

@@ -9,10 +9,15 @@ import (
 var (
 	_ Reporter           = (*noopReporter)(nil)
 	_ ProjectReporter    = (*noopProjectReporter)(nil)
+	_ ProjectTx          = (*noopProjectTx)(nil)
 	_ CloudAgentReporter = (*noopCloudAgentReporter)(nil)
+	_ CloudAgentTx       = (*noopCloudAgentTx)(nil)
 	_ AgentReporter      = (*noopAgentReporter)(nil)
+	_ AgentTx            = (*noopAgentTx)(nil)
 	_ WorkerReporter     = (*noopWorkerReporter)(nil)
+	_ WorkerTx           = (*noopWorkerTx)(nil)
 	_ JobReporter        = (*noopJobReporter)(nil)
+	_ JobTx              = (*noopJobTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -50,6 +55,8 @@ func (r *noopProjectReporter) WithDeferredCloudAgent() (CloudAgentReporter, KeyR
 	return &noopCloudAgentReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopCloudAgentReporter struct{}
 
 func NewNoopCloudAgentReporter() CloudAgentReporter {
@@ -66,6 +73,12 @@ func (r *noopCloudAgentReporter) WithDeferredAgent() (AgentReporter, KeyResolver
 	return &noopAgentReporter{}, noopKeyResolver{}
 }
 
+type noopCloudAgentTx struct{}
+
+func (t *noopCloudAgentTx) Project() ProjectTx {
+	return &noopProjectTx{}
+}
+
 type noopAgentReporter struct{}
 
 func NewNoopAgentReporter() AgentReporter {
@@ -80,6 +93,12 @@ func (r *noopAgentReporter) WithWorker(id string) WorkerReporter {
 }
 func (r *noopAgentReporter) WithDeferredWorker() (WorkerReporter, KeyResolver) {
 	return &noopWorkerReporter{}, noopKeyResolver{}
+}
+
+type noopAgentTx struct{}
+
+func (t *noopAgentTx) CloudAgent() CloudAgentTx {
+	return &noopCloudAgentTx{}
 }
 
 type noopWorkerReporter struct{}
@@ -112,6 +131,27 @@ func (r *noopWorkerReporter) WithDeferredJob() (JobReporter, KeyResolver) {
 	return &noopJobReporter{}, noopKeyResolver{}
 }
 
+type noopWorkerTx struct{}
+
+func (t *noopWorkerTx) Agent() AgentTx {
+	return &noopAgentTx{}
+}
+
+func (t *noopWorkerTx) ReportLoad(v float32)        {}
+func (t *noopWorkerTx) ReportStatus(v WorkerStatus) {}
+func (t *noopWorkerTx) ReportStartTime(v time.Time) {}
+func (t *noopWorkerTx) ReportEndTime(v time.Time)   {}
+func (t *noopWorkerTx) ReportJobsCurrent(v uint32)  {}
+func (t *noopWorkerTx) ReportLive(v uint8)          {}
+func (t *noopWorkerTx) ReportCPU(v int64)           {}
+func (t *noopWorkerTx) ReportCPULimit(v int64)      {}
+func (t *noopWorkerTx) ReportMem(v int64)           {}
+func (t *noopWorkerTx) ReportMemLimit(v int64)      {}
+func (t *noopWorkerTx) ReportRegion(v string)       {}
+func (t *noopWorkerTx) ReportVersion(v string)      {}
+func (t *noopWorkerTx) ReportSdkVersion(v string)   {}
+func (t *noopWorkerTx) ReportState(v WorkerState)   {}
+
 type noopJobReporter struct{}
 
 func NewNoopJobReporter() JobReporter {
@@ -130,3 +170,19 @@ func (r *noopJobReporter) ReportDurationMinutes(v uint8)                    {}
 func (r *noopJobReporter) ReportStartTime(v time.Time)                      {}
 func (r *noopJobReporter) ReportEndTime(v time.Time)                        {}
 func (r *noopJobReporter) ReportJoinLatency(v uint32)                       {}
+
+type noopJobTx struct{}
+
+func (t *noopJobTx) Worker() WorkerTx {
+	return &noopWorkerTx{}
+}
+
+func (t *noopJobTx) ReportRoomSessionID(v string)  {}
+func (t *noopJobTx) ReportKind(v JobKind)          {}
+func (t *noopJobTx) ReportWorkerKind(v WorkerKind) {}
+func (t *noopJobTx) ReportStatus(v JobStatus)      {}
+func (t *noopJobTx) ReportDuration(v uint32)       {}
+func (t *noopJobTx) ReportDurationMinutes(v uint8) {}
+func (t *noopJobTx) ReportStartTime(v time.Time)   {}
+func (t *noopJobTx) ReportEndTime(v time.Time)     {}
+func (t *noopJobTx) ReportJoinLatency(v uint32)    {}

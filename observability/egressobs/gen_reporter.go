@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,10 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithEgress(id string) EgressReporter
 	WithDeferredEgress() (EgressReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type EgressTx interface {
+type egressReporter interface {
 	ReportRequestType(v EgressRequestType)
 	ReportRoomName(v string)
 	ReportRequest(v string)
@@ -45,16 +50,21 @@ type EgressTx interface {
 	ReportManifestLocation(v string)
 }
 
+type EgressTx interface {
+	Project() ProjectTx
+	egressReporter
+}
+
 type EgressReporter interface {
 	RegisterFunc(func(ts time.Time, tx EgressTx) bool)
 	Tx(func(tx EgressTx))
 	TxAt(time.Time, func(tx EgressTx))
 	WithSession(id string) SessionReporter
 	WithDeferredSession() (SessionReporter, KeyResolver)
-	EgressTx
+	egressReporter
 }
 
-type SessionTx interface {
+type sessionReporter interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
 	ReportUpdateTime(v time.Time)
@@ -72,9 +82,14 @@ type SessionTx interface {
 	ReportResult(v string)
 }
 
+type SessionTx interface {
+	Egress() EgressTx
+	sessionReporter
+}
+
 type SessionReporter interface {
 	RegisterFunc(func(ts time.Time, tx SessionTx) bool)
 	Tx(func(tx SessionTx))
 	TxAt(time.Time, func(tx SessionTx))
-	SessionTx
+	sessionReporter
 }
