@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,16 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithRoom(name string) RoomReporter
 	WithDeferredRoom() (RoomReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type RoomTx interface{}
+type roomReporter interface {
+}
+
+type RoomTx interface {
+	Project() ProjectTx
+	roomReporter
+}
 
 type RoomReporter interface {
 	RegisterFunc(func(ts time.Time, tx RoomTx) bool)
@@ -37,10 +48,10 @@ type RoomReporter interface {
 	TxAt(time.Time, func(tx RoomTx))
 	WithRoomSession(id string) RoomSessionReporter
 	WithDeferredRoomSession() (RoomSessionReporter, KeyResolver)
-	RoomTx
+	roomReporter
 }
 
-type RoomSessionTx interface {
+type roomSessionReporter interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
 	ReportFeatures(v uint16)
@@ -49,16 +60,27 @@ type RoomSessionTx interface {
 	ReportClosed(v bool)
 }
 
+type RoomSessionTx interface {
+	Room() RoomTx
+	roomSessionReporter
+}
+
 type RoomSessionReporter interface {
 	RegisterFunc(func(ts time.Time, tx RoomSessionTx) bool)
 	Tx(func(tx RoomSessionTx))
 	TxAt(time.Time, func(tx RoomSessionTx))
 	WithParticipant(identity string) ParticipantReporter
 	WithDeferredParticipant() (ParticipantReporter, KeyResolver)
-	RoomSessionTx
+	roomSessionReporter
 }
 
-type ParticipantTx interface{}
+type participantReporter interface {
+}
+
+type ParticipantTx interface {
+	RoomSession() RoomSessionTx
+	participantReporter
+}
 
 type ParticipantReporter interface {
 	RegisterFunc(func(ts time.Time, tx ParticipantTx) bool)
@@ -66,10 +88,10 @@ type ParticipantReporter interface {
 	TxAt(time.Time, func(tx ParticipantTx))
 	WithParticipantSession(id string) ParticipantSessionReporter
 	WithDeferredParticipantSession() (ParticipantSessionReporter, KeyResolver)
-	ParticipantTx
+	participantReporter
 }
 
-type ParticipantSessionTx interface {
+type participantSessionReporter interface {
 	ReportRegion(v string)
 	ReportClientConnectTime(v uint16)
 	ReportConnectResult(v ConnectionResult)
@@ -89,16 +111,21 @@ type ParticipantSessionTx interface {
 	ReportFeatures(v uint16)
 }
 
+type ParticipantSessionTx interface {
+	Participant() ParticipantTx
+	participantSessionReporter
+}
+
 type ParticipantSessionReporter interface {
 	RegisterFunc(func(ts time.Time, tx ParticipantSessionTx) bool)
 	Tx(func(tx ParticipantSessionTx))
 	TxAt(time.Time, func(tx ParticipantSessionTx))
 	WithTrack(id string) TrackReporter
 	WithDeferredTrack() (TrackReporter, KeyResolver)
-	ParticipantSessionTx
+	participantSessionReporter
 }
 
-type TrackTx interface {
+type trackReporter interface {
 	ReportName(v string)
 	ReportKind(v TrackKind)
 	ReportType(v TrackType)
@@ -115,9 +142,14 @@ type TrackTx interface {
 	ReportScore(v float32)
 }
 
+type TrackTx interface {
+	ParticipantSession() ParticipantSessionTx
+	trackReporter
+}
+
 type TrackReporter interface {
 	RegisterFunc(func(ts time.Time, tx TrackTx) bool)
 	Tx(func(tx TrackTx))
 	TxAt(time.Time, func(tx TrackTx))
-	TrackTx
+	trackReporter
 }

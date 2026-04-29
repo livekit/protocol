@@ -9,7 +9,9 @@ import (
 var (
 	_ Reporter        = (*noopReporter)(nil)
 	_ ProjectReporter = (*noopProjectReporter)(nil)
+	_ ProjectTx       = (*noopProjectTx)(nil)
 	_ EventReporter   = (*noopEventReporter)(nil)
+	_ EventTx         = (*noopEventTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -47,6 +49,8 @@ func (r *noopProjectReporter) WithDeferredEvent() (EventReporter, KeyResolver) {
 	return &noopEventReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopEventReporter struct{}
 
 func NewNoopEventReporter() EventReporter {
@@ -62,3 +66,16 @@ func (r *noopEventReporter) ReportOperation(v EventOperation)                   
 func (r *noopEventReporter) ReportPath(v string)                                {}
 func (r *noopEventReporter) ReportSize(v uint64)                                {}
 func (r *noopEventReporter) ReportLifetime(v uint64)                            {}
+
+type noopEventTx struct{}
+
+func (t *noopEventTx) Project() ProjectTx {
+	return &noopProjectTx{}
+}
+
+func (t *noopEventTx) ReportService(v EventService)     {}
+func (t *noopEventTx) ReportServiceID(v string)         {}
+func (t *noopEventTx) ReportOperation(v EventOperation) {}
+func (t *noopEventTx) ReportPath(v string)              {}
+func (t *noopEventTx) ReportSize(v uint64)              {}
+func (t *noopEventTx) ReportLifetime(v uint64)          {}

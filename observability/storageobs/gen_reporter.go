@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,10 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithEvent(id string) EventReporter
 	WithDeferredEvent() (EventReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type EventTx interface {
+type eventReporter interface {
 	ReportService(v EventService)
 	ReportServiceID(v string)
 	ReportOperation(v EventOperation)
@@ -38,9 +43,14 @@ type EventTx interface {
 	ReportLifetime(v uint64)
 }
 
+type EventTx interface {
+	Project() ProjectTx
+	eventReporter
+}
+
 type EventReporter interface {
 	RegisterFunc(func(ts time.Time, tx EventTx) bool)
 	Tx(func(tx EventTx))
 	TxAt(time.Time, func(tx EventTx))
-	EventTx
+	eventReporter
 }

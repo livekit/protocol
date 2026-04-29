@@ -9,11 +9,17 @@ import (
 var (
 	_ Reporter                   = (*noopReporter)(nil)
 	_ ProjectReporter            = (*noopProjectReporter)(nil)
+	_ ProjectTx                  = (*noopProjectTx)(nil)
 	_ RoomReporter               = (*noopRoomReporter)(nil)
+	_ RoomTx                     = (*noopRoomTx)(nil)
 	_ RoomSessionReporter        = (*noopRoomSessionReporter)(nil)
+	_ RoomSessionTx              = (*noopRoomSessionTx)(nil)
 	_ ParticipantReporter        = (*noopParticipantReporter)(nil)
+	_ ParticipantTx              = (*noopParticipantTx)(nil)
 	_ ParticipantSessionReporter = (*noopParticipantSessionReporter)(nil)
+	_ ParticipantSessionTx       = (*noopParticipantSessionTx)(nil)
 	_ TrackReporter              = (*noopTrackReporter)(nil)
+	_ TrackTx                    = (*noopTrackTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -51,6 +57,8 @@ func (r *noopProjectReporter) WithDeferredRoom() (RoomReporter, KeyResolver) {
 	return &noopRoomReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopRoomReporter struct{}
 
 func NewNoopRoomReporter() RoomReporter {
@@ -65,6 +73,12 @@ func (r *noopRoomReporter) WithRoomSession(id string) RoomSessionReporter {
 }
 func (r *noopRoomReporter) WithDeferredRoomSession() (RoomSessionReporter, KeyResolver) {
 	return &noopRoomSessionReporter{}, noopKeyResolver{}
+}
+
+type noopRoomTx struct{}
+
+func (t *noopRoomTx) Project() ProjectTx {
+	return &noopProjectTx{}
 }
 
 type noopRoomSessionReporter struct{}
@@ -89,6 +103,19 @@ func (r *noopRoomSessionReporter) WithDeferredParticipant() (ParticipantReporter
 	return &noopParticipantReporter{}, noopKeyResolver{}
 }
 
+type noopRoomSessionTx struct{}
+
+func (t *noopRoomSessionTx) Room() RoomTx {
+	return &noopRoomTx{}
+}
+
+func (t *noopRoomSessionTx) ReportStartTime(v time.Time) {}
+func (t *noopRoomSessionTx) ReportEndTime(v time.Time)   {}
+func (t *noopRoomSessionTx) ReportFeatures(v uint16)     {}
+func (t *noopRoomSessionTx) ReportRoomDuration(v uint32) {}
+func (t *noopRoomSessionTx) ReportTags(v []string)       {}
+func (t *noopRoomSessionTx) ReportClosed(v bool)         {}
+
 type noopParticipantReporter struct{}
 
 func NewNoopParticipantReporter() ParticipantReporter {
@@ -103,6 +130,12 @@ func (r *noopParticipantReporter) WithParticipantSession(id string) ParticipantS
 }
 func (r *noopParticipantReporter) WithDeferredParticipantSession() (ParticipantSessionReporter, KeyResolver) {
 	return &noopParticipantSessionReporter{}, noopKeyResolver{}
+}
+
+type noopParticipantTx struct{}
+
+func (t *noopParticipantTx) RoomSession() RoomSessionTx {
+	return &noopRoomSessionTx{}
 }
 
 type noopParticipantSessionReporter struct{}
@@ -139,6 +172,30 @@ func (r *noopParticipantSessionReporter) WithDeferredTrack() (TrackReporter, Key
 	return &noopTrackReporter{}, noopKeyResolver{}
 }
 
+type noopParticipantSessionTx struct{}
+
+func (t *noopParticipantSessionTx) Participant() ParticipantTx {
+	return &noopParticipantTx{}
+}
+
+func (t *noopParticipantSessionTx) ReportRegion(v string)                  {}
+func (t *noopParticipantSessionTx) ReportClientConnectTime(v uint16)       {}
+func (t *noopParticipantSessionTx) ReportConnectResult(v ConnectionResult) {}
+func (t *noopParticipantSessionTx) ReportConnectionType(v ConnectionType)  {}
+func (t *noopParticipantSessionTx) ReportOs(v ClientOS)                    {}
+func (t *noopParticipantSessionTx) ReportDeviceModel(v string)             {}
+func (t *noopParticipantSessionTx) ReportBrowser(v string)                 {}
+func (t *noopParticipantSessionTx) ReportSdkVersion(v string)              {}
+func (t *noopParticipantSessionTx) ReportCountry(v uint16)                 {}
+func (t *noopParticipantSessionTx) ReportIspAsn(v uint32)                  {}
+func (t *noopParticipantSessionTx) ReportStartTime(v time.Time)            {}
+func (t *noopParticipantSessionTx) ReportEndTime(v time.Time)              {}
+func (t *noopParticipantSessionTx) ReportDuration(v uint16)                {}
+func (t *noopParticipantSessionTx) ReportDurationMinutes(v uint8)          {}
+func (t *noopParticipantSessionTx) ReportKind(v string)                    {}
+func (t *noopParticipantSessionTx) ReportName(v string)                    {}
+func (t *noopParticipantSessionTx) ReportFeatures(v uint16)                {}
+
 type noopTrackReporter struct{}
 
 func NewNoopTrackReporter() TrackReporter {
@@ -162,3 +219,24 @@ func (r *noopTrackReporter) ReportSendPackets(v uint32)                         
 func (r *noopTrackReporter) ReportRecvPackets(v uint32)                         {}
 func (r *noopTrackReporter) ReportPacketsLost(v uint32)                         {}
 func (r *noopTrackReporter) ReportScore(v float32)                              {}
+
+type noopTrackTx struct{}
+
+func (t *noopTrackTx) ParticipantSession() ParticipantSessionTx {
+	return &noopParticipantSessionTx{}
+}
+
+func (t *noopTrackTx) ReportName(v string)        {}
+func (t *noopTrackTx) ReportKind(v TrackKind)     {}
+func (t *noopTrackTx) ReportType(v TrackType)     {}
+func (t *noopTrackTx) ReportSource(v TrackSource) {}
+func (t *noopTrackTx) ReportMime(v MimeType)      {}
+func (t *noopTrackTx) ReportLayer(v uint32)       {}
+func (t *noopTrackTx) ReportDuration(v uint16)    {}
+func (t *noopTrackTx) ReportFrames(v uint16)      {}
+func (t *noopTrackTx) ReportSendBytes(v uint32)   {}
+func (t *noopTrackTx) ReportRecvBytes(v uint32)   {}
+func (t *noopTrackTx) ReportSendPackets(v uint32) {}
+func (t *noopTrackTx) ReportRecvPackets(v uint32) {}
+func (t *noopTrackTx) ReportPacketsLost(v uint32) {}
+func (t *noopTrackTx) ReportScore(v float32)      {}

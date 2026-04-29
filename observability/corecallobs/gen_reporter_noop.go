@@ -9,7 +9,9 @@ import (
 var (
 	_ Reporter        = (*noopReporter)(nil)
 	_ ProjectReporter = (*noopProjectReporter)(nil)
+	_ ProjectTx       = (*noopProjectTx)(nil)
 	_ CallReporter    = (*noopCallReporter)(nil)
+	_ CallTx          = (*noopCallTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -47,6 +49,8 @@ func (r *noopProjectReporter) WithDeferredCall() (CallReporter, KeyResolver) {
 	return &noopCallReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopCallReporter struct{}
 
 func NewNoopCallReporter() CallReporter {
@@ -69,3 +73,23 @@ func (r *noopCallReporter) ReportRoomID(v string)                             {}
 func (r *noopCallReporter) ReportRoomName(v string)                           {}
 func (r *noopCallReporter) ReportError(v string)                              {}
 func (r *noopCallReporter) ReportStatus(v CallStatus)                         {}
+
+type noopCallTx struct{}
+
+func (t *noopCallTx) Project() ProjectTx {
+	return &noopProjectTx{}
+}
+
+func (t *noopCallTx) ReportStartTime(v time.Time)     {}
+func (t *noopCallTx) ReportEndTime(v time.Time)       {}
+func (t *noopCallTx) ReportDuration(v uint64)         {}
+func (t *noopCallTx) ReportDurationMinutes(v uint16)  {}
+func (t *noopCallTx) ReportDirection(v CallDirection) {}
+func (t *noopCallTx) ReportCallType(v CallCallType)   {}
+func (t *noopCallTx) ReportFrom(v string)             {}
+func (t *noopCallTx) ReportTo(v string)               {}
+func (t *noopCallTx) ReportRegion(v string)           {}
+func (t *noopCallTx) ReportRoomID(v string)           {}
+func (t *noopCallTx) ReportRoomName(v string)         {}
+func (t *noopCallTx) ReportError(v string)            {}
+func (t *noopCallTx) ReportStatus(v CallStatus)       {}
