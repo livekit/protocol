@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,16 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithCloudAgent(id string) CloudAgentReporter
 	WithDeferredCloudAgent() (CloudAgentReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type CloudAgentTx interface{}
+type cloudAgentReporter interface {
+}
+
+type CloudAgentTx interface {
+	Project() ProjectTx
+	cloudAgentReporter
+}
 
 type CloudAgentReporter interface {
 	RegisterFunc(func(ts time.Time, tx CloudAgentTx) bool)
@@ -37,10 +48,16 @@ type CloudAgentReporter interface {
 	TxAt(time.Time, func(tx CloudAgentTx))
 	WithAgent(name string) AgentReporter
 	WithDeferredAgent() (AgentReporter, KeyResolver)
-	CloudAgentTx
+	cloudAgentReporter
 }
 
-type AgentTx interface{}
+type agentReporter interface {
+}
+
+type AgentTx interface {
+	CloudAgent() CloudAgentTx
+	agentReporter
+}
 
 type AgentReporter interface {
 	RegisterFunc(func(ts time.Time, tx AgentTx) bool)
@@ -48,10 +65,10 @@ type AgentReporter interface {
 	TxAt(time.Time, func(tx AgentTx))
 	WithWorker(id string) WorkerReporter
 	WithDeferredWorker() (WorkerReporter, KeyResolver)
-	AgentTx
+	agentReporter
 }
 
-type WorkerTx interface {
+type workerReporter interface {
 	ReportLoad(v float32)
 	ReportStatus(v WorkerStatus)
 	ReportStartTime(v time.Time)
@@ -68,16 +85,21 @@ type WorkerTx interface {
 	ReportState(v WorkerState)
 }
 
+type WorkerTx interface {
+	Agent() AgentTx
+	workerReporter
+}
+
 type WorkerReporter interface {
 	RegisterFunc(func(ts time.Time, tx WorkerTx) bool)
 	Tx(func(tx WorkerTx))
 	TxAt(time.Time, func(tx WorkerTx))
 	WithJob(id string) JobReporter
 	WithDeferredJob() (JobReporter, KeyResolver)
-	WorkerTx
+	workerReporter
 }
 
-type JobTx interface {
+type jobReporter interface {
 	ReportRoomSessionID(v string)
 	ReportKind(v JobKind)
 	ReportWorkerKind(v WorkerKind)
@@ -89,9 +111,14 @@ type JobTx interface {
 	ReportJoinLatency(v uint32)
 }
 
+type JobTx interface {
+	Worker() WorkerTx
+	jobReporter
+}
+
 type JobReporter interface {
 	RegisterFunc(func(ts time.Time, tx JobTx) bool)
 	Tx(func(tx JobTx))
 	TxAt(time.Time, func(tx JobTx))
-	JobTx
+	jobReporter
 }

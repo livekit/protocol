@@ -9,10 +9,15 @@ import (
 var (
 	_ Reporter        = (*noopReporter)(nil)
 	_ ProjectReporter = (*noopProjectReporter)(nil)
+	_ ProjectTx       = (*noopProjectTx)(nil)
 	_ CarrierReporter = (*noopCarrierReporter)(nil)
+	_ CarrierTx       = (*noopCarrierTx)(nil)
 	_ CountryReporter = (*noopCountryReporter)(nil)
+	_ CountryTx       = (*noopCountryTx)(nil)
 	_ PhoneReporter   = (*noopPhoneReporter)(nil)
+	_ PhoneTx         = (*noopPhoneTx)(nil)
 	_ CallReporter    = (*noopCallReporter)(nil)
+	_ CallTx          = (*noopCallTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -50,6 +55,8 @@ func (r *noopProjectReporter) WithDeferredCarrier() (CarrierReporter, KeyResolve
 	return &noopCarrierReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopCarrierReporter struct{}
 
 func NewNoopCarrierReporter() CarrierReporter {
@@ -64,6 +71,12 @@ func (r *noopCarrierReporter) WithCountry(code string) CountryReporter {
 }
 func (r *noopCarrierReporter) WithDeferredCountry() (CountryReporter, KeyResolver) {
 	return &noopCountryReporter{}, noopKeyResolver{}
+}
+
+type noopCarrierTx struct{}
+
+func (t *noopCarrierTx) Project() ProjectTx {
+	return &noopProjectTx{}
 }
 
 type noopCountryReporter struct{}
@@ -82,6 +95,12 @@ func (r *noopCountryReporter) WithDeferredPhone() (PhoneReporter, KeyResolver) {
 	return &noopPhoneReporter{}, noopKeyResolver{}
 }
 
+type noopCountryTx struct{}
+
+func (t *noopCountryTx) Carrier() CarrierTx {
+	return &noopCarrierTx{}
+}
+
 type noopPhoneReporter struct{}
 
 func NewNoopPhoneReporter() PhoneReporter {
@@ -96,6 +115,12 @@ func (r *noopPhoneReporter) WithCall(id string) CallReporter {
 }
 func (r *noopPhoneReporter) WithDeferredCall() (CallReporter, KeyResolver) {
 	return &noopCallReporter{}, noopKeyResolver{}
+}
+
+type noopPhoneTx struct{}
+
+func (t *noopPhoneTx) Country() CountryTx {
+	return &noopCountryTx{}
 }
 
 type noopCallReporter struct{}
@@ -117,3 +142,20 @@ func (r *noopCallReporter) ReportDuration(v uint32)                           {}
 func (r *noopCallReporter) ReportDurationMinutes(v uint16)                    {}
 func (r *noopCallReporter) ReportStartTime(v time.Time)                       {}
 func (r *noopCallReporter) ReportEndTime(v time.Time)                         {}
+
+type noopCallTx struct{}
+
+func (t *noopCallTx) Phone() PhoneTx {
+	return &noopPhoneTx{}
+}
+
+func (t *noopCallTx) ReportDirection(v DirectionType) {}
+func (t *noopCallTx) ReportNumberType(v NumberType)   {}
+func (t *noopCallTx) ReportStatus(v CallStatus)       {}
+func (t *noopCallTx) ReportTrunkType(v TrunkType)     {}
+func (t *noopCallTx) ReportCountryCode(v string)      {}
+func (t *noopCallTx) ReportPhoneNumber(v string)      {}
+func (t *noopCallTx) ReportDuration(v uint32)         {}
+func (t *noopCallTx) ReportDurationMinutes(v uint16)  {}
+func (t *noopCallTx) ReportStartTime(v time.Time)     {}
+func (t *noopCallTx) ReportEndTime(v time.Time)       {}

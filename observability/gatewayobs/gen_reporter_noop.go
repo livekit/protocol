@@ -9,11 +9,17 @@ import (
 var (
 	_ Reporter                  = (*noopReporter)(nil)
 	_ ProjectReporter           = (*noopProjectReporter)(nil)
+	_ ProjectTx                 = (*noopProjectTx)(nil)
 	_ RequestedPriorityReporter = (*noopRequestedPriorityReporter)(nil)
+	_ RequestedPriorityTx       = (*noopRequestedPriorityTx)(nil)
 	_ GrantedPriorityReporter   = (*noopGrantedPriorityReporter)(nil)
+	_ GrantedPriorityTx         = (*noopGrantedPriorityTx)(nil)
 	_ BillablePriorityReporter  = (*noopBillablePriorityReporter)(nil)
+	_ BillablePriorityTx        = (*noopBillablePriorityTx)(nil)
 	_ ProviderReporter          = (*noopProviderReporter)(nil)
+	_ ProviderTx                = (*noopProviderTx)(nil)
 	_ ModelReporter             = (*noopModelReporter)(nil)
+	_ ModelTx                   = (*noopModelTx)(nil)
 )
 
 type noopKeyResolver struct{}
@@ -51,6 +57,8 @@ func (r *noopProjectReporter) WithDeferredRequestedPriority() (RequestedPriority
 	return &noopRequestedPriorityReporter{}, noopKeyResolver{}
 }
 
+type noopProjectTx struct{}
+
 type noopRequestedPriorityReporter struct{}
 
 func NewNoopRequestedPriorityReporter() RequestedPriorityReporter {
@@ -68,6 +76,12 @@ func (r *noopRequestedPriorityReporter) WithDeferredGrantedPriority() (GrantedPr
 	return &noopGrantedPriorityReporter{}, noopKeyResolver{}
 }
 
+type noopRequestedPriorityTx struct{}
+
+func (t *noopRequestedPriorityTx) Project() ProjectTx {
+	return &noopProjectTx{}
+}
+
 type noopGrantedPriorityReporter struct{}
 
 func NewNoopGrantedPriorityReporter() GrantedPriorityReporter {
@@ -82,6 +96,12 @@ func (r *noopGrantedPriorityReporter) WithBillablePriority(priority string) Bill
 }
 func (r *noopGrantedPriorityReporter) WithDeferredBillablePriority() (BillablePriorityReporter, KeyResolver) {
 	return &noopBillablePriorityReporter{}, noopKeyResolver{}
+}
+
+type noopGrantedPriorityTx struct{}
+
+func (t *noopGrantedPriorityTx) RequestedPriority() RequestedPriorityTx {
+	return &noopRequestedPriorityTx{}
 }
 
 type noopBillablePriorityReporter struct{}
@@ -101,6 +121,12 @@ func (r *noopBillablePriorityReporter) WithDeferredProvider() (ProviderReporter,
 	return &noopProviderReporter{}, noopKeyResolver{}
 }
 
+type noopBillablePriorityTx struct{}
+
+func (t *noopBillablePriorityTx) GrantedPriority() GrantedPriorityTx {
+	return &noopGrantedPriorityTx{}
+}
+
 type noopProviderReporter struct{}
 
 func NewNoopProviderReporter() ProviderReporter {
@@ -115,6 +141,12 @@ func (r *noopProviderReporter) WithModel(name string) ModelReporter {
 }
 func (r *noopProviderReporter) WithDeferredModel() (ModelReporter, KeyResolver) {
 	return &noopModelReporter{}, noopKeyResolver{}
+}
+
+type noopProviderTx struct{}
+
+func (t *noopProviderTx) BillablePriority() BillablePriorityTx {
+	return &noopBillablePriorityTx{}
 }
 
 type noopModelReporter struct{}
@@ -137,3 +169,21 @@ func (r *noopModelReporter) ReportTtsChars(v uint32)                            
 func (r *noopModelReporter) ReportBargeInRequests(v uint64)                       {}
 func (r *noopModelReporter) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
 func (r *noopModelReporter) ReportVoiceCloneRequests(v uint64)                    {}
+
+type noopModelTx struct{}
+
+func (t *noopModelTx) Provider() ProviderTx {
+	return &noopProviderTx{}
+}
+
+func (t *noopModelTx) ReportInferencePromptTokens(v uint64)                 {}
+func (t *noopModelTx) ReportInferencePromptCacheTokens(v uint64)            {}
+func (t *noopModelTx) ReportInferenceCompletionTokens(v uint64)             {}
+func (t *noopModelTx) ReportInferenceTotalTokens(v uint64)                  {}
+func (t *noopModelTx) ReportInferenceCacheCreateTokens(v uint64)            {}
+func (t *noopModelTx) ReportInferenceCacheReadTokens(v uint64)              {}
+func (t *noopModelTx) ReportSttDuration(v uint32)                           {}
+func (t *noopModelTx) ReportTtsChars(v uint32)                              {}
+func (t *noopModelTx) ReportBargeInRequests(v uint64)                       {}
+func (t *noopModelTx) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
+func (t *noopModelTx) ReportVoiceCloneRequests(v uint64)                    {}

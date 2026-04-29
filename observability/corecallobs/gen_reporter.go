@@ -18,7 +18,12 @@ type Reporter interface {
 	WithDeferredProject() (ProjectReporter, KeyResolver)
 }
 
-type ProjectTx interface{}
+type projectReporter interface {
+}
+
+type ProjectTx interface {
+	projectReporter
+}
 
 type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
@@ -26,10 +31,10 @@ type ProjectReporter interface {
 	TxAt(time.Time, func(tx ProjectTx))
 	WithCall(id string) CallReporter
 	WithDeferredCall() (CallReporter, KeyResolver)
-	ProjectTx
+	projectReporter
 }
 
-type CallTx interface {
+type callReporter interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
 	ReportDuration(v uint64)
@@ -45,9 +50,14 @@ type CallTx interface {
 	ReportStatus(v CallStatus)
 }
 
+type CallTx interface {
+	Project() ProjectTx
+	callReporter
+}
+
 type CallReporter interface {
 	RegisterFunc(func(ts time.Time, tx CallTx) bool)
 	Tx(func(tx CallTx))
 	TxAt(time.Time, func(tx CallTx))
-	CallTx
+	callReporter
 }
