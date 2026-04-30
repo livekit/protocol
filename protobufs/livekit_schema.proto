@@ -1,0 +1,77 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
+
+import "logger/options.proto";
+
+// Schema registration service for data tracks.
+service SchemaService {
+  rpc RegisterSchema(RegisterSchemaRequest) returns (RegisterSchemaResponse);
+  rpc UnregisterSchema(UnregisterSchemaRequest) returns (UnregisterSchemaResponse);
+  rpc GetSchema(GetSchemaRequest) returns (GetSchemaResponse);
+}
+
+message RegisterSchemaRequest {
+  SchemaDefinition schema = 1;
+  // If true, an existing schema with the same name will be overwritten;
+  // otherwise the request fails when a schema with that name already exists.
+  bool allow_override = 2;
+}
+
+message RegisterSchemaResponse {}
+
+message UnregisterSchemaRequest {
+  string name = 1;
+}
+
+message UnregisterSchemaResponse {}
+
+message GetSchemaRequest {
+  string name = 1;
+}
+
+message GetSchemaResponse {
+  SchemaDefinition schema = 1;
+}
+
+message SchemaDefinition {
+  // Unique identifier of the schema.
+  string name = 1;
+
+  // Format the schema is defined in.
+  SchemaType type = 2;
+
+  // Schema definition.
+  bytes data = 3 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
+}
+
+enum SchemaType {
+  SCHEMA_TYPE_UNSPECIFIED = 0;
+  SCHEMA_TYPE_PROTOBUF = 1;
+  SCHEMA_TYPE_FLATBUFFER = 2;
+  SCHEMA_TYPE_ROS1MSG = 3;
+  SCHEMA_TYPE_ROS2IDL = 4;
+  SCHEMA_TYPE_OMGIDL = 5;
+  SCHEMA_TYPE_JSONSCHEMA = 6;
+}
