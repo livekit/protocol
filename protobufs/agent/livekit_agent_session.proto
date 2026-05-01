@@ -6,6 +6,7 @@ option go_package = "github.com/livekit/protocol/livekit/agent";
 
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "logger/options.proto";
 
 enum ChatRole {
@@ -203,6 +204,28 @@ message AgentSessionEvent {
     google.protobuf.Timestamp detected_at = 4;
   }
 
+  message AmdPrediction {
+    enum AMDCategory {
+      AMDCATEGORY_HUMAN = 1;
+      AMDCATEGORY_MACHINE_IVR = 2;
+      AMDCATEGORY_MACHINE_VM = 3;
+      AMDCATEGORY_MACHINE_UNAVAILABLE = 4;
+      AMDCATEGORY_UNCERTAIN = 5;
+    }
+    google.protobuf.Duration speech_duration = 1;
+    AMDCategory category = 2;
+    string reason = 3;
+    string transcript = 4;
+    google.protobuf.Duration delay = 5;
+  }
+
+  message EotPrediction {
+    float probability = 1;
+    float threshold = 2;
+    google.protobuf.Duration inference_duration = 3;
+    google.protobuf.Duration delay = 4;
+  }
+
   message SessionUsageUpdated {
     AgentSessionUsage usage = 1;
   }
@@ -217,6 +240,8 @@ message AgentSessionEvent {
     Error error = 15;
     OverlappingSpeech overlapping_speech = 16;
     SessionUsageUpdated session_usage_updated = 17;
+    AmdPrediction amd_prediction = 18;
+    EotPrediction eot_prediction = 19;
   }
 }
 
