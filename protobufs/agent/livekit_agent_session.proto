@@ -114,6 +114,15 @@ enum UserState {
   US_AWAY = 2;
 }
 
+enum AmdCategory {
+  AMD_UNKNOWN = 0;
+  AMD_HUMAN = 1;
+  AMD_MACHINE_IVR = 2;
+  AMD_MACHINE_VM = 3;
+  AMD_MACHINE_UNAVAILABLE = 4;
+  AMD_UNCERTAIN = 5;
+}
+
 message LLMModelUsage {
   string provider = 1;
   string model = 2;
@@ -205,15 +214,8 @@ message AgentSessionEvent {
   }
 
   message AmdPrediction {
-    enum AMDCategory {
-      AMDCATEGORY_HUMAN = 1;
-      AMDCATEGORY_MACHINE_IVR = 2;
-      AMDCATEGORY_MACHINE_VM = 3;
-      AMDCATEGORY_MACHINE_UNAVAILABLE = 4;
-      AMDCATEGORY_UNCERTAIN = 5;
-    }
     google.protobuf.Duration speech_duration = 1;
-    AMDCategory category = 2;
+    AmdCategory category = 2;
     string reason = 3;
     string transcript = 4;
     google.protobuf.Duration delay = 5;
