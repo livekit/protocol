@@ -221,13 +221,6 @@ message AgentSessionEvent {
     google.protobuf.Duration delay = 5;
   }
 
-  message EotPrediction {
-    float probability = 1;
-    float threshold = 2;
-    google.protobuf.Duration inference_duration = 3;
-    google.protobuf.Duration delay = 4;
-  }
-
   message SessionUsageUpdated {
     AgentSessionUsage usage = 1;
   }
@@ -243,7 +236,6 @@ message AgentSessionEvent {
     OverlappingSpeech overlapping_speech = 16;
     SessionUsageUpdated session_usage_updated = 17;
     AmdPrediction amd_prediction = 18;
-    EotPrediction eot_prediction = 19;
   }
 }
 
