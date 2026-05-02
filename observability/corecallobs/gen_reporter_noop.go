@@ -63,6 +63,7 @@ func (r *noopCallReporter) TxAt(ts time.Time, f func(CallTx))                 {}
 func (r *noopCallReporter) ReportStartTime(v time.Time)                       {}
 func (r *noopCallReporter) ReportEndTime(v time.Time)                         {}
 func (r *noopCallReporter) ReportDuration(v uint64)                           {}
+func (r *noopCallReporter) ReportDurationSeconds(v uint64)                    {}
 func (r *noopCallReporter) ReportDurationMinutes(v uint16)                    {}
 func (r *noopCallReporter) ReportDirection(v CallDirection)                   {}
 func (r *noopCallReporter) ReportCallType(v CallCallType)                     {}
@@ -83,6 +84,7 @@ func (t *noopCallTx) Project() ProjectTx {
 func (t *noopCallTx) ReportStartTime(v time.Time)     {}
 func (t *noopCallTx) ReportEndTime(v time.Time)       {}
 func (t *noopCallTx) ReportDuration(v uint64)         {}
+func (t *noopCallTx) ReportDurationSeconds(v uint64)  {}
 func (t *noopCallTx) ReportDurationMinutes(v uint16)  {}
 func (t *noopCallTx) ReportDirection(v CallDirection) {}
 func (t *noopCallTx) ReportCallType(v CallCallType)   {}
