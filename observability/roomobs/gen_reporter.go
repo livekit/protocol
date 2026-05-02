@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_G1QTVIG = true
+const Version_G73HPJG = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -105,6 +105,7 @@ type participantSessionReporter interface {
 	ReportStartTime(v time.Time)
 	ReportEndTime(v time.Time)
 	ReportDuration(v uint16)
+	ReportDurationSeconds(v uint16)
 	ReportDurationMinutes(v uint8)
 	ReportKind(v string)
 	ReportName(v string)
