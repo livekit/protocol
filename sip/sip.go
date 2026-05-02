@@ -28,6 +28,7 @@ import (
 	"github.com/dennwc/iters"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -833,6 +834,7 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
+	rule.Upgrade()
 	call := req.SIPCall()
 	sentPin := req.GetPin()
 
@@ -887,6 +889,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
 				MediaEncryption:   enc,
+				Media:             rule.Media,
 				RequestPin:        true,
 			}, nil
 		}
@@ -948,6 +951,10 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		if rule.MediaEncryption != 0 {
 			resp.MediaEncryption = rule.MediaEncryption
 		}
+		media := proto.CloneOf(rule.Media)
+		media = media.UpgradeWith(resp.MediaEncryption)
+		resp.Media = media
+		resp.MediaEncryption = media.Encryption.Deref()
 	}
 	if krispEnabled {
 		resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)

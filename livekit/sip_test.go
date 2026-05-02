@@ -616,7 +616,7 @@ func TestInboundTrunkUpdate(t *testing.T) {
 		Metadata: "test",
 	}, out))
 
-	r2 := cloneProto(r)
+	r2 := proto.CloneOf(r)
 	r2.Numbers = []string{"T4"}
 	upd2 := &UpdateSIPInboundTrunkRequest{
 		Action: &UpdateSIPInboundTrunkRequest_Replace{
@@ -661,7 +661,7 @@ func TestOutboundTrunkUpdate(t *testing.T) {
 		Metadata: "test",
 	}, out))
 
-	r2 := cloneProto(r)
+	r2 := proto.CloneOf(r)
 	r2.Numbers = []string{"T4"}
 	upd2 := &UpdateSIPOutboundTrunkRequest{
 		Action: &UpdateSIPOutboundTrunkRequest_Replace{
@@ -685,6 +685,7 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
 	}
 	name2 := "Test2"
 	upd := &UpdateSIPDispatchRuleRequest{
@@ -694,13 +695,16 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				TrunkIds: &ListUpdate{
 					Set: []string{"T3"},
 				},
+				Media: &SIPMediaConfig{
+					Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+				},
 			},
 		},
 	}
 	out, err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
 	require.NoError(t, err)
 	require.True(t, r != out)
-	require.True(t, proto.Equal(&SIPDispatchRuleInfo{
+	exp := &SIPDispatchRuleInfo{
 		Name:     "Test2",
 		TrunkIds: []string{"T3"},
 		Rule: &SIPDispatchRule{
@@ -708,9 +712,14 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
-	}, out))
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+		Media: &SIPMediaConfig{
+			Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		},
+	}
+	require.True(t, proto.Equal(exp, out), "%v\nvs\n%v", exp, out)
 
-	r2 := cloneProto(r)
+	r2 := proto.CloneOf(r)
 	r2.TrunkIds = []string{"T4"}
 	upd2 := &UpdateSIPDispatchRuleRequest{
 		Action: &UpdateSIPDispatchRuleRequest_Replace{

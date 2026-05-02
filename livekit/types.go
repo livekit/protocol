@@ -198,10 +198,6 @@ func marshalProto(o proto.Message) (map[string]interface{}, error) {
 	return m, nil
 }
 
-func cloneProto[T proto.Message](m T) T {
-	return proto.Clone(m).(T)
-}
-
 func IsJobType(jobType JobType) bool {
 	_, ok := JobType_name[int32(jobType)]
 	return ok

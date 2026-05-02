@@ -223,6 +223,19 @@ enum SIPMediaEncryption {
   SIP_MEDIA_ENCRYPT_REQUIRE = 2; // require encryption
 }
 
+message SIPCodec {
+  string name = 1;
+  uint32 rate = 2;
+}
+
+message SIPMediaConfig {
+  // if set, ignore the default codecs and use the list below.
+  bool only_listed_codecs = 1;
+  // List of allowed codecs. If only_listed_codecs is not set, this list is added to default codecs.
+  repeated SIPCodec codecs = 2;
+  optional SIPMediaEncryption encryption = 3;
+}
+
 message ProviderInfo {
   string id = 1;
   string name = 2;
@@ -649,13 +662,14 @@ message SIPDispatchRuleInfo {
   // RoomConfiguration to use if the participant initiates the room
   RoomConfiguration room_config = 10;
 
+  SIPMediaConfig media = 16;
   bool krisp_enabled = 11;
-  SIPMediaEncryption media_encryption = 12;
+  SIPMediaEncryption media_encryption = 12 [deprecated=true];
 
   google.protobuf.Timestamp created_at = 14;
   google.protobuf.Timestamp updated_at = 15;
 
-  // NEXT ID: 16
+  // NEXT ID: 17
 }
 
 message SIPDispatchRuleUpdate {
@@ -670,7 +684,8 @@ message SIPDispatchRuleUpdate {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  optional SIPMediaEncryption media_encryption = 6;
+  optional SIPMediaEncryption media_encryption = 6 [deprecated=true];
+  SIPMediaConfig media = 7;
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
@@ -788,7 +803,8 @@ message CreateSIPParticipantRequest {
   // Enable voice isolation for the callee.
   bool krisp_enabled = 14;
 
-  SIPMediaEncryption media_encryption = 18;
+  SIPMediaEncryption media_encryption = 18 [deprecated = true];
+  SIPMediaConfig media = 23;
 
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 19;
@@ -804,7 +820,7 @@ message CreateSIPParticipantRequest {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional Destination destination = 22;
-  // NEXT ID: 23
+  // NEXT ID: 24
 }
 
 message SIPParticipantInfo {
