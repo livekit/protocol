@@ -33,6 +33,7 @@ message Job {
   string agent_name = 7;
   JobState state = 8;
   bool enable_recording = 10;
+  string environment = 11;
 }
 
 message JobState {
@@ -120,6 +121,7 @@ message RegisterWorkerRequest {
   uint32 ping_interval = 5;
   optional string namespace = 6;
   ParticipantPermission allowed_permissions = 7;
+  string environment = 9;
 }
 
 message RegisterWorkerResponse {
