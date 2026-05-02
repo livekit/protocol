@@ -87,6 +87,7 @@ func (r *noopSessionReporter) TxAt(ts time.Time, f func(SessionTx))             
 func (r *noopSessionReporter) ReportStartTime(v time.Time)                          {}
 func (r *noopSessionReporter) ReportEndTime(v time.Time)                            {}
 func (r *noopSessionReporter) ReportDuration(v uint64)                              {}
+func (r *noopSessionReporter) ReportDurationSeconds(v uint64)                       {}
 func (r *noopSessionReporter) ReportInputType(v SessionInputType)                   {}
 func (r *noopSessionReporter) ReportRegion(v string)                                {}
 func (r *noopSessionReporter) ReportRoomName(v string)                              {}
@@ -106,6 +107,7 @@ func (t *noopSessionTx) Ingress() IngressTx {
 func (t *noopSessionTx) ReportStartTime(v time.Time)        {}
 func (t *noopSessionTx) ReportEndTime(v time.Time)          {}
 func (t *noopSessionTx) ReportDuration(v uint64)            {}
+func (t *noopSessionTx) ReportDurationSeconds(v uint64)     {}
 func (t *noopSessionTx) ReportInputType(v SessionInputType) {}
 func (t *noopSessionTx) ReportRegion(v string)              {}
 func (t *noopSessionTx) ReportRoomName(v string)            {}

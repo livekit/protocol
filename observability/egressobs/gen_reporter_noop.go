@@ -115,6 +115,7 @@ func (r *noopSessionReporter) ReportStartTime(v time.Time)                      
 func (r *noopSessionReporter) ReportEndTime(v time.Time)                            {}
 func (r *noopSessionReporter) ReportUpdateTime(v time.Time)                         {}
 func (r *noopSessionReporter) ReportDuration(v uint64)                              {}
+func (r *noopSessionReporter) ReportDurationSeconds(v uint64)                       {}
 func (r *noopSessionReporter) ReportRetryCount(v uint32)                            {}
 func (r *noopSessionReporter) ReportSourceType(v SessionSourceType)                 {}
 func (r *noopSessionReporter) ReportRegion(v string)                                {}
@@ -137,6 +138,7 @@ func (t *noopSessionTx) ReportStartTime(v time.Time)          {}
 func (t *noopSessionTx) ReportEndTime(v time.Time)            {}
 func (t *noopSessionTx) ReportUpdateTime(v time.Time)         {}
 func (t *noopSessionTx) ReportDuration(v uint64)              {}
+func (t *noopSessionTx) ReportDurationSeconds(v uint64)       {}
 func (t *noopSessionTx) ReportRetryCount(v uint32)            {}
 func (t *noopSessionTx) ReportSourceType(v SessionSourceType) {}
 func (t *noopSessionTx) ReportRegion(v string)                {}

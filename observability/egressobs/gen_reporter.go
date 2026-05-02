@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_9K0LIKO = true
+const Version_HAKUONO = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -69,6 +69,7 @@ type sessionReporter interface {
 	ReportEndTime(v time.Time)
 	ReportUpdateTime(v time.Time)
 	ReportDuration(v uint64)
+	ReportDurationSeconds(v uint64)
 	ReportRetryCount(v uint32)
 	ReportSourceType(v SessionSourceType)
 	ReportRegion(v string)
