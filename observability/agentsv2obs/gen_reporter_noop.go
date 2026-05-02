@@ -190,6 +190,7 @@ func (r *noopJobReporter) ReportKind(v JobKind)                             {}
 func (r *noopJobReporter) ReportWorkerKind(v WorkerKind)                    {}
 func (r *noopJobReporter) ReportStatus(v JobStatus)                         {}
 func (r *noopJobReporter) ReportDuration(v uint32)                          {}
+func (r *noopJobReporter) ReportDurationSeconds(v uint32)                   {}
 func (r *noopJobReporter) ReportDurationMinutes(v uint8)                    {}
 func (r *noopJobReporter) ReportStartTime(v time.Time)                      {}
 func (r *noopJobReporter) ReportEndTime(v time.Time)                        {}
@@ -201,12 +202,13 @@ func (t *noopJobTx) Worker() WorkerTx {
 	return &noopWorkerTx{}
 }
 
-func (t *noopJobTx) ReportRoomSessionID(v string)  {}
-func (t *noopJobTx) ReportKind(v JobKind)          {}
-func (t *noopJobTx) ReportWorkerKind(v WorkerKind) {}
-func (t *noopJobTx) ReportStatus(v JobStatus)      {}
-func (t *noopJobTx) ReportDuration(v uint32)       {}
-func (t *noopJobTx) ReportDurationMinutes(v uint8) {}
-func (t *noopJobTx) ReportStartTime(v time.Time)   {}
-func (t *noopJobTx) ReportEndTime(v time.Time)     {}
-func (t *noopJobTx) ReportJoinLatency(v uint32)    {}
+func (t *noopJobTx) ReportRoomSessionID(v string)   {}
+func (t *noopJobTx) ReportKind(v JobKind)           {}
+func (t *noopJobTx) ReportWorkerKind(v WorkerKind)  {}
+func (t *noopJobTx) ReportStatus(v JobStatus)       {}
+func (t *noopJobTx) ReportDuration(v uint32)        {}
+func (t *noopJobTx) ReportDurationSeconds(v uint32) {}
+func (t *noopJobTx) ReportDurationMinutes(v uint8)  {}
+func (t *noopJobTx) ReportStartTime(v time.Time)    {}
+func (t *noopJobTx) ReportEndTime(v time.Time)      {}
+func (t *noopJobTx) ReportJoinLatency(v uint32)     {}

@@ -139,6 +139,7 @@ func (r *noopCallReporter) ReportTrunkType(v TrunkType)                       {}
 func (r *noopCallReporter) ReportCountryCode(v string)                        {}
 func (r *noopCallReporter) ReportPhoneNumber(v string)                        {}
 func (r *noopCallReporter) ReportDuration(v uint32)                           {}
+func (r *noopCallReporter) ReportDurationSeconds(v uint32)                    {}
 func (r *noopCallReporter) ReportDurationMinutes(v uint16)                    {}
 func (r *noopCallReporter) ReportStartTime(v time.Time)                       {}
 func (r *noopCallReporter) ReportEndTime(v time.Time)                         {}
@@ -156,6 +157,7 @@ func (t *noopCallTx) ReportTrunkType(v TrunkType)     {}
 func (t *noopCallTx) ReportCountryCode(v string)      {}
 func (t *noopCallTx) ReportPhoneNumber(v string)      {}
 func (t *noopCallTx) ReportDuration(v uint32)         {}
+func (t *noopCallTx) ReportDurationSeconds(v uint32)  {}
 func (t *noopCallTx) ReportDurationMinutes(v uint16)  {}
 func (t *noopCallTx) ReportStartTime(v time.Time)     {}
 func (t *noopCallTx) ReportEndTime(v time.Time)       {}
