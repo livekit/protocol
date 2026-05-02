@@ -45,7 +45,7 @@ func (h *SessionTimer) Advance(now time.Time) (millis, secs, mins int64) {
 		h.lastSec += secs * 1000
 	}
 	if ts > h.lastMin {
-		mins := max((ts-h.lastMin+59999)/60000, h.minMins)
+		mins = max((ts-h.lastMin+59999)/60000, h.minMins)
 		h.minMins = 0
 		h.lastMin += mins * 60000
 	}
