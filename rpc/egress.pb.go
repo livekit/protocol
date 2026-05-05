@@ -55,9 +55,10 @@ type StartEgressRequest struct {
 	//	*StartEgressRequest_Track
 	Request isStartEgressRequest_Request `protobuf_oneof:"request"`
 	// connection info
-	RoomId string `protobuf:"bytes,3,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-	Token  string `protobuf:"bytes,8,opt,name=token,proto3" json:"token,omitempty"`
-	WsUrl  string `protobuf:"bytes,9,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
+	RoomId   string `protobuf:"bytes,3,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	RoomName string `protobuf:"bytes,18,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	Token    string `protobuf:"bytes,8,opt,name=token,proto3" json:"token,omitempty"`
+	WsUrl    string `protobuf:"bytes,9,opt,name=ws_url,json=wsUrl,proto3" json:"ws_url,omitempty"`
 	// cloud only
 	CloudBackupEnabled bool    `protobuf:"varint,10,opt,name=cloud_backup_enabled,json=cloudBackupEnabled,proto3" json:"cloud_backup_enabled,omitempty"`
 	EstimatedCpu       float64 `protobuf:"fixed64,14,opt,name=estimated_cpu,json=estimatedCpu,proto3" json:"estimated_cpu,omitempty"`
@@ -176,6 +177,13 @@ func (x *StartEgressRequest) GetTrack() *livekit.TrackEgressRequest {
 func (x *StartEgressRequest) GetRoomId() string {
 	if x != nil {
 		return x.RoomId
+	}
+	return ""
+}
+
+func (x *StartEgressRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
 	}
 	return ""
 }
@@ -442,19 +450,19 @@ var File_rpc_egress_proto protoreflect.FileDescriptor
 
 const file_rpc_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xd3\x05\n" +
-	"\x12StartEgressRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\x125\n" +
+	"\x10rpc/egress.proto\x12\x03rpc\x1a\roptions.proto\x1a\x14logger/options.proto\x1a\x14livekit_egress.proto\"\xed\x05\n" +
+	"\x12StartEgressRequest\x12(\n" +
+	"\tegress_id\x18\x01 \x01(\tB\v\xbaP\begressIDR\begressId\x125\n" +
 	"\x06egress\x18\x10 \x01(\v2\x1b.livekit.StartEgressRequestH\x00R\x06egress\x126\n" +
 	"\x06replay\x18\x11 \x01(\v2\x1c.livekit.ExportReplayRequestH\x00R\x06replay\x12L\n" +
 	"\x0eroom_composite\x18\x05 \x01(\v2#.livekit.RoomCompositeEgressRequestH\x00R\rroomComposite\x12-\n" +
 	"\x03web\x18\v \x01(\v2\x19.livekit.WebEgressRequestH\x00R\x03web\x12E\n" +
 	"\vparticipant\x18\r \x01(\v2!.livekit.ParticipantEgressRequestH\x00R\vparticipant\x12O\n" +
 	"\x0ftrack_composite\x18\x06 \x01(\v2$.livekit.TrackCompositeEgressRequestH\x00R\x0etrackComposite\x123\n" +
-	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12#\n" +
-	"\aroom_id\x18\x03 \x01(\tB\n" +
-	"\x9a\xec,\x06roomIDR\x06roomId\x12\x1a\n" +
-	"\x05token\x18\b \x01(\tB\x04\x88\xec,\x01R\x05token\x12\x15\n" +
+	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12\"\n" +
+	"\aroom_id\x18\x03 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1b\n" +
+	"\troom_name\x18\x12 \x01(\tR\broomName\x12\x19\n" +
+	"\x05token\x18\b \x01(\tB\x03\xa8P\x01R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\t \x01(\tR\x05wsUrl\x120\n" +
 	"\x14cloud_backup_enabled\x18\n" +
 	" \x01(\bR\x12cloudBackupEnabled\x12#\n" +
@@ -465,9 +473,9 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\x17ListActiveEgressRequest\"9\n" +
 	"\x18ListActiveEgressResponse\x12\x1d\n" +
 	"\n" +
-	"egress_ids\x18\x01 \x03(\tR\tegressIds\"?\n" +
-	"\x12EgressReadyRequest\x12)\n" +
-	"\tegress_id\x18\x01 \x01(\tB\f\x9a\xec,\begressIDR\begressId\"Q\n" +
+	"egress_ids\x18\x01 \x03(\tR\tegressIds\">\n" +
+	"\x12EgressReadyRequest\x12(\n" +
+	"\tegress_id\x18\x01 \x01(\tB\v\xbaP\begressIDR\begressId\"Q\n" +
 	"\x13EgressReadyResponse\x12\x19\n" +
 	"\bstart_at\x18\x01 \x01(\x03R\astartAt\x12\x1f\n" +
 	"\vduration_ms\x18\x02 \x01(\x03R\n" +

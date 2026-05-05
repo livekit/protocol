@@ -25,36 +25,36 @@ var file_logger_options_proto_extTypes = []protoimpl.ExtensionInfo{
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*bool)(nil),
-		Field:         91841,
+		Field:         1285,
 		Name:          "logger.redact",
-		Tag:           "varint,91841,opt,name=redact",
+		Tag:           "varint,1285,opt,name=redact",
 		Filename:      "logger/options.proto",
 	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
-		Field:         91842,
+		Field:         1286,
 		Name:          "logger.redact_format",
-		Tag:           "bytes,91842,opt,name=redact_format",
+		Tag:           "bytes,1286,opt,name=redact_format",
 		Filename:      "logger/options.proto",
 	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
-		Field:         91843,
+		Field:         1287,
 		Name:          "logger.name",
-		Tag:           "bytes,91843,opt,name=name",
+		Tag:           "bytes,1287,opt,name=name",
 		Filename:      "logger/options.proto",
 	},
 }
 
 // Extension fields to descriptorpb.FieldOptions.
 var (
-	// optional bool redact = 91841;
+	// optional bool redact = 1285;
 	E_Redact = &file_logger_options_proto_extTypes[0]
-	// optional string redact_format = 91842;
+	// optional string redact_format = 1286;
 	E_RedactFormat = &file_logger_options_proto_extTypes[1]
-	// optional string name = 91843;
+	// optional string name = 1287;
 	E_Name = &file_logger_options_proto_extTypes[2]
 )
 
@@ -62,10 +62,13 @@ var File_logger_options_proto protoreflect.FileDescriptor
 
 const file_logger_options_proto_rawDesc = "" +
 	"\n" +
-	"\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:7\n" +
-	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\xc1\xcd\x05 \x01(\bR\x06redact:D\n" +
-	"\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\xc2\xcd\x05 \x01(\tR\fredactFormat:3\n" +
-	"\x04name\x12\x1d.google.protobuf.FieldOptions\x18\xc3\xcd\x05 \x01(\tR\x04nameBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:6\n" +
+	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\x85\n" +
+	" \x01(\bR\x06redact:C\n" +
+	"\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\x86\n" +
+	" \x01(\tR\fredactFormat:2\n" +
+	"\x04name\x12\x1d.google.protobuf.FieldOptions\x18\x87\n" +
+	" \x01(\tR\x04nameBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var file_logger_options_proto_goTypes = []any{
 	(*descriptorpb.FieldOptions)(nil), // 0: google.protobuf.FieldOptions

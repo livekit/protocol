@@ -508,36 +508,36 @@ var File_livekit_agent_dispatch_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
-	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xb3\x01\n" +
+	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xb2\x01\n" +
 	"\x1aCreateAgentDispatchRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x12\n" +
-	"\x04room\x18\x02 \x01(\tR\x04room\x12 \n" +
-	"\bmetadata\x18\x03 \x01(\tB\x04\x88\xec,\x01R\bmetadata\x12@\n" +
-	"\x0erestart_policy\x18\x04 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\"\x96\x01\n" +
+	"\x04room\x18\x02 \x01(\tR\x04room\x12\x1f\n" +
+	"\bmetadata\x18\x03 \x01(\tB\x03\xa8P\x01R\bmetadata\x12@\n" +
+	"\x0erestart_policy\x18\x04 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\"\x95\x01\n" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12 \n" +
-	"\bmetadata\x18\x02 \x01(\tB\x04\x88\xec,\x01R\bmetadata\x12@\n" +
-	"\x0erestart_policy\x18\x03 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\"a\n" +
-	"\x1aDeleteAgentDispatchRequest\x12/\n" +
-	"\vdispatch_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x1f\n" +
+	"\bmetadata\x18\x02 \x01(\tB\x03\xa8P\x01R\bmetadata\x12@\n" +
+	"\x0erestart_policy\x18\x03 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\"`\n" +
+	"\x1aDeleteAgentDispatchRequest\x12.\n" +
+	"\vdispatch_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"dispatchIDR\n" +
 	"dispatchId\x12\x12\n" +
-	"\x04room\x18\x02 \x01(\tR\x04room\"_\n" +
-	"\x18ListAgentDispatchRequest\x12/\n" +
-	"\vdispatch_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
+	"\x18ListAgentDispatchRequest\x12.\n" +
+	"\vdispatch_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"dispatchIDR\n" +
 	"dispatchId\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
 	"\x19ListAgentDispatchResponse\x12A\n" +
-	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xe9\x01\n" +
+	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xe8\x01\n" +
 	"\rAgentDispatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x12\n" +
-	"\x04room\x18\x03 \x01(\tR\x04room\x12 \n" +
-	"\bmetadata\x18\x04 \x01(\tB\x04\x88\xec,\x01R\bmetadata\x121\n" +
+	"\x04room\x18\x03 \x01(\tR\x04room\x12\x1f\n" +
+	"\bmetadata\x18\x04 \x01(\tB\x03\xa8P\x01R\bmetadata\x121\n" +
 	"\x05state\x18\x05 \x01(\v2\x1b.livekit.AgentDispatchStateR\x05state\x12@\n" +
 	"\x0erestart_policy\x18\x06 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\"t\n" +
 	"\x12AgentDispatchState\x12 \n" +

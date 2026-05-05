@@ -464,34 +464,34 @@ const file_cloud_replay_proto_rawDesc = "" +
 	"page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\tpageToken\"\x86\x01\n" +
 	"\x13ListReplaysResponse\x12-\n" +
 	"\areplays\x18\x01 \x03(\v2\x13.livekit.ReplayInfoR\areplays\x12@\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"\x94\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"\x93\x01\n" +
 	"\n" +
-	"ReplayInfo\x12)\n" +
-	"\treplay_id\x18\x01 \x01(\tB\f\x9a\xec,\breplayIDR\breplayId\x12\x1b\n" +
+	"ReplayInfo\x12(\n" +
+	"\treplay_id\x18\x01 \x01(\tB\v\xbaP\breplayIDR\breplayId\x12\x1b\n" +
 	"\troom_name\x18\x02 \x01(\tR\broomName\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\x03R\tstartTime\x12\x1f\n" +
 	"\vduration_ms\x18\x04 \x01(\x03R\n" +
-	"durationMs\"\x87\x01\n" +
-	"\x0fPlaybackRequest\x12)\n" +
-	"\treplay_id\x18\x01 \x01(\tB\f\x9a\xec,\breplayIDR\breplayId\x12#\n" +
+	"durationMs\"\x86\x01\n" +
+	"\x0fPlaybackRequest\x12(\n" +
+	"\treplay_id\x18\x01 \x01(\tB\v\xbaP\breplayIDR\breplayId\x12#\n" +
 	"\rplayback_room\x18\x02 \x01(\tR\fplaybackRoom\x12$\n" +
-	"\x0eseek_offset_ms\x18\x03 \x01(\x03R\fseekOffsetMs\"C\n" +
-	"\x10PlaybackResponse\x12/\n" +
-	"\vplayback_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"\x0eseek_offset_ms\x18\x03 \x01(\x03R\fseekOffsetMs\"B\n" +
+	"\x10PlaybackResponse\x12.\n" +
+	"\vplayback_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"playbackIDR\n" +
-	"playbackId\"d\n" +
-	"\vSeekRequest\x12/\n" +
-	"\vplayback_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"playbackId\"c\n" +
+	"\vSeekRequest\x12.\n" +
+	"\vplayback_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"playbackIDR\n" +
 	"playbackId\x12$\n" +
-	"\x0eseek_offset_ms\x18\x02 \x01(\x03R\fseekOffsetMs\"G\n" +
-	"\x14ClosePlaybackRequest\x12/\n" +
-	"\vplayback_id\x18\x01 \x01(\tB\x0e\x9a\xec,\n" +
+	"\x0eseek_offset_ms\x18\x02 \x01(\x03R\fseekOffsetMs\"F\n" +
+	"\x14ClosePlaybackRequest\x12.\n" +
+	"\vplayback_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"playbackIDR\n" +
-	"playbackId\"@\n" +
-	"\x13DeleteReplayRequest\x12)\n" +
-	"\treplay_id\x18\x01 \x01(\tB\f\x9a\xec,\breplayIDR\breplayId2\x8c\x03\n" +
+	"playbackId\"?\n" +
+	"\x13DeleteReplayRequest\x12(\n" +
+	"\treplay_id\x18\x01 \x01(\tB\v\xbaP\breplayIDR\breplayId2\x8c\x03\n" +
 	"\x06Replay\x12H\n" +
 	"\vListReplays\x12\x1b.livekit.ListReplaysRequest\x1a\x1c.livekit.ListReplaysResponse\x12?\n" +
 	"\bPlayback\x12\x18.livekit.PlaybackRequest\x1a\x19.livekit.PlaybackResponse\x124\n" +

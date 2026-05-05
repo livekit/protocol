@@ -6,6 +6,7 @@ import (
 	"unsafe"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/utils"
 )
 
 const tagDelimiter = "\x1e"
@@ -25,6 +26,10 @@ func (t Tag) KeyValue() (string, string) {
 }
 
 type Tags []Tag
+
+func (t Tags) Strings() []string {
+	return utils.CastStringSlice[string](t)
+}
 
 func ToTags(m map[string]string) Tags {
 	t := make(Tags, 0, len(m))

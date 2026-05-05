@@ -22,6 +22,13 @@ func Get[T any](v T, err error) T {
 	return v
 }
 
+func Get2[T0, T1 any](v0 T0, v1 T1, err error) (T0, T1) {
+	if err != nil {
+		panic(err)
+	}
+	return v0, v1
+}
+
 func BeOK[T any](v T, ok bool) T {
 	if !ok {
 		panic("not ok")

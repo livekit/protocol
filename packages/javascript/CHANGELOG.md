@@ -1,5 +1,33 @@
 # @livekit/protocol
 
+## 1.45.6
+
+## 1.45.5
+
+### Patch Changes
+
+- export alphabets used in guids - [#1508](https://github.com/livekit/protocol/pull/1508) ([@paulwe](https://github.com/paulwe))
+
+## 1.45.4
+
+### Patch Changes
+
+- Create room tags - [#1504](https://github.com/livekit/protocol/pull/1504) ([@paulwe](https://github.com/paulwe))
+
+- Export analytics proto - [#1501](https://github.com/livekit/protocol/pull/1501) ([@lukasIO](https://github.com/lukasIO))
+
+- add TimedString proto for word-level alignment metadata in agent - [#1502](https://github.com/livekit/protocol/pull/1502) ([@longcw](https://github.com/longcw))
+
+- move proto options to use lk reserved range - [#1495](https://github.com/livekit/protocol/pull/1495) ([@paulwe](https://github.com/paulwe))
+
+## 1.45.3
+
+### Patch Changes
+
+- Add SUSPENDED node state. - [#1486](https://github.com/livekit/protocol/pull/1486) ([@boks1971](https://github.com/boks1971))
+
+- Add get_framework_info request/response support in agent session protocol and regenerate JavaScript protobuf types. - [#1493](https://github.com/livekit/protocol/pull/1493) ([@toubatbrian](https://github.com/toubatbrian))
+
 ## 1.45.2
 
 ### Patch Changes

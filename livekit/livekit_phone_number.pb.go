@@ -968,19 +968,19 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\v_page_token\"\x8a\x01\n" +
 	"\x1aSearchPhoneNumbersResponse\x12*\n" +
 	"\x05items\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\x05items\x12@\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"\xa7\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\"\xa6\x01\n" +
 	"\x1aPurchasePhoneNumberRequest\x12#\n" +
-	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\x12K\n" +
-	"\x14sip_dispatch_rule_id\x18\x02 \x01(\tB\x15\x9a\xec,\x11sipDispatchRuleIDH\x00R\x11sipDispatchRuleId\x88\x01\x01B\x17\n" +
+	"\rphone_numbers\x18\x01 \x03(\tR\fphoneNumbers\x12J\n" +
+	"\x14sip_dispatch_rule_id\x18\x02 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDH\x00R\x11sipDispatchRuleId\x88\x01\x01B\x17\n" +
 	"\x15_sip_dispatch_rule_id\"X\n" +
 	"\x1bPurchasePhoneNumberResponse\x129\n" +
-	"\rphone_numbers\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\fphoneNumbers\"\xa9\x02\n" +
+	"\rphone_numbers\x18\x01 \x03(\v2\x14.livekit.PhoneNumberR\fphoneNumbers\"\xa8\x02\n" +
 	"\x17ListPhoneNumbersRequest\x12\x19\n" +
 	"\x05limit\x18\x01 \x01(\x05H\x00R\x05limit\x88\x01\x01\x126\n" +
 	"\bstatuses\x18\x02 \x03(\x0e2\x1a.livekit.PhoneNumberStatusR\bstatuses\x12<\n" +
 	"\n" +
-	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationH\x01R\tpageToken\x88\x01\x01\x12K\n" +
-	"\x14sip_dispatch_rule_id\x18\x04 \x01(\tB\x15\x9a\xec,\x11sipDispatchRuleIDH\x02R\x11sipDispatchRuleId\x88\x01\x01B\b\n" +
+	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationH\x01R\tpageToken\x88\x01\x01\x12J\n" +
+	"\x14sip_dispatch_rule_id\x18\x04 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDH\x02R\x11sipDispatchRuleId\x88\x01\x01B\b\n" +
 	"\x06_limitB\r\n" +
 	"\v_page_tokenB\x17\n" +
 	"\x15_sip_dispatch_rule_id\"\xce\x01\n" +
@@ -996,11 +996,11 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x03_idB\x0f\n" +
 	"\r_phone_number\"Q\n" +
 	"\x16GetPhoneNumberResponse\x127\n" +
-	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"\xd5\x01\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"\xd4\x01\n" +
 	"\x18UpdatePhoneNumberRequest\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12&\n" +
-	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12K\n" +
-	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tB\x15\x9a\xec,\x11sipDispatchRuleIDH\x02R\x11sipDispatchRuleId\x88\x01\x01B\x05\n" +
+	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12J\n" +
+	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDH\x02R\x11sipDispatchRuleId\x88\x01\x01B\x05\n" +
 	"\x03_idB\x0f\n" +
 	"\r_phone_numberB\x17\n" +
 	"\x15_sip_dispatch_rule_id\"T\n" +
@@ -1009,7 +1009,7 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x1aReleasePhoneNumbersRequest\x12\x10\n" +
 	"\x03ids\x18\x01 \x03(\tR\x03ids\x12#\n" +
 	"\rphone_numbers\x18\x02 \x03(\tR\fphoneNumbers\"\x1d\n" +
-	"\x1bReleasePhoneNumbersResponse\"\xd1\x05\n" +
+	"\x1bReleasePhoneNumbersResponse\"\xd0\x05\n" +
 	"\vPhoneNumber\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\ve164_format\x18\x02 \x01(\tR\n" +
@@ -1032,8 +1032,8 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\vassigned_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"assignedAt\x12;\n" +
 	"\vreleased_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\n" +
-	"releasedAt\x12H\n" +
-	"\x14sip_dispatch_rule_id\x18\x0f \x01(\tB\x17\x9a\xec,\x11sipDispatchRuleID\x18\x01R\x11sipDispatchRuleId\x121\n" +
+	"releasedAt\x12G\n" +
+	"\x14sip_dispatch_rule_id\x18\x0f \x01(\tB\x16\xbaP\x11sipDispatchRuleID\x18\x01R\x11sipDispatchRuleId\x121\n" +
 	"\x15sip_dispatch_rule_ids\x18\x10 \x03(\tR\x12sipDispatchRuleIds*\xbc\x01\n" +
 	"\x11PhoneNumberStatus\x12#\n" +
 	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +

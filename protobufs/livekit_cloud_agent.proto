@@ -47,6 +47,7 @@ message AgentSecret {
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp updated_at = 4;
     AgentSecretKind kind = 5;
+    repeated string environments = 6;
 }
 
 message CreateAgentRequest {
@@ -69,6 +70,17 @@ message CreateAgentResponse {
     PresignedPostRequest presigned_post_request = 8;
 }
 
+message CreateAgentV2Request {
+  repeated AgentSecret secrets = 1;
+  repeated string regions      = 2;
+}
+
+message CreateAgentV2Response {
+  string agent_id                = 1 [(logger.name) = "agentID"];
+  string status                  = 2;
+  repeated string server_regions = 3;
+}
+
 message PresignedPostRequest {
   string url = 1;
   map<string, string> values = 2;
@@ -89,6 +101,9 @@ message AgentDeployment {
     string cpu_limit = 12;
     string server_region = 13;
     repeated AgentEvent events = 14;
+    string environment = 15;
+    string version = 16;
+    string agent_name = 17;
 }
 
 message AgentInfo {
@@ -118,6 +133,7 @@ message AgentVersion {
     string status = 6;
     string owner = 7;
     bool draining = 8;
+    bool active = 9;
 }
 
 message ListAgentVersionsRequest {
@@ -160,15 +176,32 @@ message DeployAgentRequest {
     int32 replicas               = 4 [deprecated=true];
     int32 max_replicas           = 5 [deprecated=true];
     string cpu_req               = 6 [deprecated=true];
+    string environment           = 7;
 }
 
 message DeployAgentResponse {
     bool success = 1;
     string message = 2;
     string agent_id = 3 [(logger.name) = "agentID"];
-    string presigned_url = 4;
+    string presigned_url = 4 [deprecated=true];
     string tag = 5;
     PresignedPostRequest presigned_post_request = 6;
+    string environment = 7;
+}
+
+message DeployAgentV2Request {
+  string agent_id              = 1 [(logger.name) = "agentID"];
+  repeated AgentSecret secrets = 2;
+  string environment           = 3;
+}
+
+message DeployAgentV2Response {
+  bool success = 1;
+  string message = 2;
+  string agent_id = 3 [(logger.name) = "agentID"];
+  string tag = 4;
+  PresignedPostRequest presigned_req = 5;
+  string environment = 6;
 }
 
 message UpdateAgentSecretsRequest {
@@ -198,6 +231,7 @@ message RollbackAgentResponse {
 message DeleteAgentRequest {
     string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
+    string environment = 3; // optional
 }
 
 message DeleteAgentResponse {
@@ -237,6 +271,7 @@ message PrivateLink {
   uint32 port = 5;
   string endpoint = 6;
   string connection_endpoint = 7;
+  string cloud_region = 8;
 
   oneof config {
     AWSConfig aws = 3 [deprecated=true];
@@ -267,6 +302,7 @@ message CreatePrivateLinkRequest {
   string region = 3;
   uint32 port = 4;
   string endpoint = 5;
+  optional string cloud_region = 6;
   oneof config {
     AWSCreateConfig aws = 2 [deprecated=true];
   }
@@ -300,12 +336,14 @@ message GetPrivateLinkStatusResponse {
 
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
+    rpc CreateAgentV2(CreateAgentV2Request) returns (CreateAgentV2Response) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}
     rpc UpdateAgent(UpdateAgentRequest) returns (UpdateAgentResponse) {}
     rpc RestartAgent(RestartAgentRequest) returns (RestartAgentResponse) {}
     rpc DeployAgent(DeployAgentRequest) returns (DeployAgentResponse) {}
+    rpc DeployAgentV2(DeployAgentV2Request) returns (DeployAgentV2Response) {}
     rpc UpdateAgentSecrets(UpdateAgentSecretsRequest) returns (UpdateAgentSecretsResponse) {}
     rpc RollbackAgent(RollbackAgentRequest) returns (RollbackAgentResponse) {}
     rpc DeleteAgent(DeleteAgentRequest) returns (DeleteAgentResponse) {}

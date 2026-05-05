@@ -1,5 +1,23 @@
 # github.com/livekit/protocol
 
+## 1.45.6
+
+### Patch Changes
+
+- Add turn detection protobufs - [#1485](https://github.com/livekit/protocol/pull/1485) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- fix change set for eot changes - [#1515](https://github.com/livekit/protocol/pull/1515) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+## 1.45.5
+
+## 1.45.4
+
+## 1.45.3
+
+### Patch Changes
+
+- Add SUSPENDED node state. - [#1486](https://github.com/livekit/protocol/pull/1486) ([@boks1971](https://github.com/boks1971))
+
 ## 1.45.2
 
 ## 1.45.1

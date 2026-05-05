@@ -513,12 +513,12 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xf9\x12\n" +
-	"#InternalCreateSIPParticipantRequest\x12,\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\"\xe6\x12\n" +
+	"#InternalCreateSIPParticipantRequest\x12+\n" +
 	"\n" +
-	"project_id\x18\x12 \x01(\tB\r\x9a\xec,\tprojectIDR\tprojectId\x12-\n" +
-	"\vsip_call_id\x18\r \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\x120\n" +
-	"\fsip_trunk_id\x18\x13 \x01(\tB\x0e\x9a\xec,\n" +
+	"project_id\x18\x12 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12,\n" +
+	"\vsip_call_id\x18\r \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\x12/\n" +
+	"\fsip_trunk_id\x18\x13 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
 	"sipTrunkId\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1a\n" +
@@ -526,20 +526,20 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x13destination_country\x18\x1e \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x10 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x16\n" +
 	"\x06number\x18\x03 \x01(\tR\x06number\x12\x17\n" +
-	"\acall_to\x18\x04 \x01(\tR\x06callTo\x12B\n" +
-	"\busername\x18\x05 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\busername\x12B\n" +
-	"\bpassword\x18\x06 \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x1b\n" +
+	"\acall_to\x18\x04 \x01(\tR\x06callTo\x12@\n" +
+	"\busername\x18\x05 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\busername\x12@\n" +
+	"\bpassword\x18\x06 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x1b\n" +
 	"\troom_name\x18\a \x01(\tR\broomName\x121\n" +
-	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12Q\n" +
-	"\x10participant_name\x18\x0e \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12Y\n" +
-	"\x14participant_metadata\x18\x0f \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\xa2\x01\n" +
-	"\x16participant_attributes\x18\x11 \x03(\v2C.rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12<\n" +
-	"\x05token\x18\t \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
+	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x12O\n" +
+	"\x10participant_name\x18\x0e \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\x0f \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\xa0\x01\n" +
+	"\x16participant_attributes\x18\x11 \x03(\v2C.rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12:\n" +
+	"\x05token\x18\t \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\n" +
 	" \x01(\tR\x05wsUrl\x12\x12\n" +
 	"\x04dtmf\x18\v \x01(\tR\x04dtmf\x12#\n" +
-	"\rplay_dialtone\x18\f \x01(\bR\fplayDialtone\x12w\n" +
-	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12u\n" +
+	"\rplay_dialtone\x18\f \x01(\bR\fplayDialtone\x12u\n" +
+	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12u\n" +
 	"\x15headers_to_attributes\x18\x16 \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.HeadersToAttributesEntryR\x13headersToAttributes\x12u\n" +
 	"\x15attributes_to_headers\x18\x1a \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\x1b \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12>\n" +
@@ -547,8 +547,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x0fringing_timeout\x18\x17 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12E\n" +
 	"\x11max_call_duration\x18\x18 \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12F\n" +
 	"\x10media_encryption\x18\x1c \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
-	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12N\n" +
-	"\fdisplay_name\x18\x1f \x01(\tB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>H\x00R\vdisplayName\x88\x01\x01\x126\n" +
+	"\x13wait_until_answered\x18\x1d \x01(\bR\x11waitUntilAnswered\x12L\n" +
+	"\fdisplay_name\x18\x1f \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x00R\vdisplayName\x88\x01\x01\x126\n" +
 	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationR\vdestination\x12_\n" +
 	"\rfeature_flags\x18! \x03(\v2:.rpc.InternalCreateSIPParticipantRequest.FeatureFlagsEntryR\ffeatureFlags\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
@@ -566,17 +566,17 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0f\n" +
-	"\r_display_name\"\xc2\x01\n" +
-	"$InternalCreateSIPParticipantResponse\x128\n" +
-	"\x0eparticipant_id\x18\x01 \x01(\tB\x11\x9a\xec,\rparticipantIDR\rparticipantId\x121\n" +
-	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12-\n" +
-	"\vsip_call_id\x18\x03 \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\"\xbb\x04\n" +
-	"%InternalTransferSIPParticipantRequest\x12-\n" +
-	"\vsip_call_id\x18\x01 \x01(\tB\r\x9a\xec,\tsipCallIDR\tsipCallId\x12\x1f\n" +
+	"\r_display_name\"\xc0\x01\n" +
+	"$InternalCreateSIPParticipantResponse\x127\n" +
+	"\x0eparticipant_id\x18\x01 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x121\n" +
+	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12,\n" +
+	"\vsip_call_id\x18\x03 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\"\xb8\x04\n" +
+	"%InternalTransferSIPParticipantRequest\x12,\n" +
+	"\vsip_call_id\x18\x01 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\x12\x1f\n" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
 	"transferTo\x12#\n" +
-	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12y\n" +
-	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB&\x88\xec,\x01\x92\xec,\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
+	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12w\n" +
+	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
 	"\x0fringing_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12a\n" +
 	"\rfeature_flags\x18\x06 \x03(\v2<.rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntryR\ffeatureFlags\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +

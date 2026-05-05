@@ -64,11 +64,17 @@ const (
 	CloudAgentSecretPrefix             = "CAS_"
 	CloudAgentWorkerPrefix             = "CAW_"
 	CloudAgentPrivateLinkPrefix        = "CAPL_"
+	CloudAgentPrivateLinkClusterPrefix = "CAPLC_"
 	CloudAgentPrivateLinkGatewayPrefix = "CAPLG_"
 	CloudAgentPrivateLinkSecretPrefix  = "CAPLS_"
 	AgentGatewayPrefix                 = "GW_"
 	CarrierPrefix                      = "CR_"
 	PhoneNumberPrefix                  = "PN_"
+)
+
+const (
+	IDAlphabet       = shortuuid.DefaultAlphabet
+	HashedIDAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 )
 
 var guidGeneratorPool = sync.Pool{
