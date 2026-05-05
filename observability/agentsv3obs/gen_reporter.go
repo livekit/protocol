@@ -1,12 +1,12 @@
 // Code generated; DO NOT EDIT.
 
-package agentsv2obs
+package agentsv3obs
 
 import (
 	"time"
 )
 
-const Version_Q2H41LG = true
+const Version_MAT8U20 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -29,33 +29,16 @@ type ProjectReporter interface {
 	RegisterFunc(func(ts time.Time, tx ProjectTx) bool)
 	Tx(func(tx ProjectTx))
 	TxAt(time.Time, func(tx ProjectTx))
-	WithEnv(name string) EnvReporter
-	WithDeferredEnv() (EnvReporter, KeyResolver)
-	projectReporter
-}
-
-type envReporter interface {
-}
-
-type EnvTx interface {
-	Project() ProjectTx
-	envReporter
-}
-
-type EnvReporter interface {
-	RegisterFunc(func(ts time.Time, tx EnvTx) bool)
-	Tx(func(tx EnvTx))
-	TxAt(time.Time, func(tx EnvTx))
 	WithCloudAgent(id string) CloudAgentReporter
 	WithDeferredCloudAgent() (CloudAgentReporter, KeyResolver)
-	envReporter
+	projectReporter
 }
 
 type cloudAgentReporter interface {
 }
 
 type CloudAgentTx interface {
-	Env() EnvTx
+	Project() ProjectTx
 	cloudAgentReporter
 }
 
@@ -80,9 +63,26 @@ type AgentReporter interface {
 	RegisterFunc(func(ts time.Time, tx AgentTx) bool)
 	Tx(func(tx AgentTx))
 	TxAt(time.Time, func(tx AgentTx))
+	WithDeployment(name string) DeploymentReporter
+	WithDeferredDeployment() (DeploymentReporter, KeyResolver)
+	agentReporter
+}
+
+type deploymentReporter interface {
+}
+
+type DeploymentTx interface {
+	Agent() AgentTx
+	deploymentReporter
+}
+
+type DeploymentReporter interface {
+	RegisterFunc(func(ts time.Time, tx DeploymentTx) bool)
+	Tx(func(tx DeploymentTx))
+	TxAt(time.Time, func(tx DeploymentTx))
 	WithWorker(id string) WorkerReporter
 	WithDeferredWorker() (WorkerReporter, KeyResolver)
-	agentReporter
+	deploymentReporter
 }
 
 type workerReporter interface {
@@ -103,7 +103,7 @@ type workerReporter interface {
 }
 
 type WorkerTx interface {
-	Agent() AgentTx
+	Deployment() DeploymentTx
 	workerReporter
 }
 

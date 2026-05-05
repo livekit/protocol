@@ -1,5 +1,5 @@
 // Code generated; DO NOT EDIT.
-package agentsv2obs
+package agentsv3obs
 
 type WorkerStatus string
 
