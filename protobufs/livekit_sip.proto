@@ -355,7 +355,10 @@ message SIPInboundTrunkInfo {
   google.protobuf.Timestamp created_at = 17;
   google.protobuf.Timestamp updated_at = 18;
 
-  // NEXT ID: 19
+  // Max time a call can last without incoming RTP data received. If unset, defaults are used.
+  google.protobuf.Duration media_timeout = 19;
+
+  // NEXT ID: 20
 }
 
 message SIPInboundTrunkUpdate {
@@ -370,6 +373,7 @@ message SIPInboundTrunkUpdate {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional SIPMediaEncryption media_encryption = 8;
+  optional google.protobuf.Duration media_timeout = 9;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -443,7 +447,10 @@ message SIPOutboundTrunkInfo {
   google.protobuf.Timestamp created_at = 16;
   google.protobuf.Timestamp updated_at = 17;
 
-  // NEXT ID: 18
+  // Max time a call can last without incoming RTP data received. If unset, defaults are used.
+  google.protobuf.Duration media_timeout = 18;
+
+  // NEXT ID: 19
 }
 
 message SIPOutboundTrunkUpdate {
@@ -460,8 +467,9 @@ message SIPOutboundTrunkUpdate {
   ];
   optional SIPMediaEncryption media_encryption = 8;
   optional string from_host = 10;
+  optional google.protobuf.Duration media_timeout = 11;
 
-  // NEXT ID: 11
+  // NEXT ID: 12
 }
 
 message GetSIPInboundTrunkRequest {
@@ -716,7 +724,10 @@ message SIPOutboundConfig {
   // Optional custom hostname for the 'From' SIP header. When set, outbound calls use this host instead of the default project SIP domain.
   string from_host = 8;
 
-  // NEXT ID: 9
+  // Max time a call can last without incoming RTP data received. If unset, defaults are used.
+  google.protobuf.Duration media_timeout = 9;
+
+  // NEXT ID: 10
 }
 
 // A SIP Participant is a singular SIP session connected to a LiveKit room via
