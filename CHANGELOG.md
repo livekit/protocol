@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.45.7
+
+### Patch Changes
+
+- feat(agents): add session events for amd - [#1526](https://github.com/livekit/protocol/pull/1526) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.45.6
 
 ### Patch Changes
