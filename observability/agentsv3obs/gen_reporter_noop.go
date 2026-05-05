@@ -1,6 +1,6 @@
 // Code generated; DO NOT EDIT.
 
-package agentsv2obs
+package agentsv3obs
 
 import (
 	"time"
@@ -10,12 +10,12 @@ var (
 	_ Reporter           = (*noopReporter)(nil)
 	_ ProjectReporter    = (*noopProjectReporter)(nil)
 	_ ProjectTx          = (*noopProjectTx)(nil)
-	_ EnvReporter        = (*noopEnvReporter)(nil)
-	_ EnvTx              = (*noopEnvTx)(nil)
 	_ CloudAgentReporter = (*noopCloudAgentReporter)(nil)
 	_ CloudAgentTx       = (*noopCloudAgentTx)(nil)
 	_ AgentReporter      = (*noopAgentReporter)(nil)
 	_ AgentTx            = (*noopAgentTx)(nil)
+	_ DeploymentReporter = (*noopDeploymentReporter)(nil)
+	_ DeploymentTx       = (*noopDeploymentTx)(nil)
 	_ WorkerReporter     = (*noopWorkerReporter)(nil)
 	_ WorkerTx           = (*noopWorkerTx)(nil)
 	_ JobReporter        = (*noopJobReporter)(nil)
@@ -50,36 +50,14 @@ func NewNoopProjectReporter() ProjectReporter {
 func (r *noopProjectReporter) RegisterFunc(f func(ts time.Time, tx ProjectTx) bool) {}
 func (r *noopProjectReporter) Tx(f func(ProjectTx))                                 {}
 func (r *noopProjectReporter) TxAt(ts time.Time, f func(ProjectTx))                 {}
-func (r *noopProjectReporter) WithEnv(name string) EnvReporter {
-	return &noopEnvReporter{}
-}
-func (r *noopProjectReporter) WithDeferredEnv() (EnvReporter, KeyResolver) {
-	return &noopEnvReporter{}, noopKeyResolver{}
-}
-
-type noopProjectTx struct{}
-
-type noopEnvReporter struct{}
-
-func NewNoopEnvReporter() EnvReporter {
-	return &noopEnvReporter{}
-}
-
-func (r *noopEnvReporter) RegisterFunc(f func(ts time.Time, tx EnvTx) bool) {}
-func (r *noopEnvReporter) Tx(f func(EnvTx))                                 {}
-func (r *noopEnvReporter) TxAt(ts time.Time, f func(EnvTx))                 {}
-func (r *noopEnvReporter) WithCloudAgent(id string) CloudAgentReporter {
+func (r *noopProjectReporter) WithCloudAgent(id string) CloudAgentReporter {
 	return &noopCloudAgentReporter{}
 }
-func (r *noopEnvReporter) WithDeferredCloudAgent() (CloudAgentReporter, KeyResolver) {
+func (r *noopProjectReporter) WithDeferredCloudAgent() (CloudAgentReporter, KeyResolver) {
 	return &noopCloudAgentReporter{}, noopKeyResolver{}
 }
 
-type noopEnvTx struct{}
-
-func (t *noopEnvTx) Project() ProjectTx {
-	return &noopProjectTx{}
-}
+type noopProjectTx struct{}
 
 type noopCloudAgentReporter struct{}
 
@@ -99,8 +77,8 @@ func (r *noopCloudAgentReporter) WithDeferredAgent() (AgentReporter, KeyResolver
 
 type noopCloudAgentTx struct{}
 
-func (t *noopCloudAgentTx) Env() EnvTx {
-	return &noopEnvTx{}
+func (t *noopCloudAgentTx) Project() ProjectTx {
+	return &noopProjectTx{}
 }
 
 type noopAgentReporter struct{}
@@ -112,17 +90,39 @@ func NewNoopAgentReporter() AgentReporter {
 func (r *noopAgentReporter) RegisterFunc(f func(ts time.Time, tx AgentTx) bool) {}
 func (r *noopAgentReporter) Tx(f func(AgentTx))                                 {}
 func (r *noopAgentReporter) TxAt(ts time.Time, f func(AgentTx))                 {}
-func (r *noopAgentReporter) WithWorker(id string) WorkerReporter {
-	return &noopWorkerReporter{}
+func (r *noopAgentReporter) WithDeployment(name string) DeploymentReporter {
+	return &noopDeploymentReporter{}
 }
-func (r *noopAgentReporter) WithDeferredWorker() (WorkerReporter, KeyResolver) {
-	return &noopWorkerReporter{}, noopKeyResolver{}
+func (r *noopAgentReporter) WithDeferredDeployment() (DeploymentReporter, KeyResolver) {
+	return &noopDeploymentReporter{}, noopKeyResolver{}
 }
 
 type noopAgentTx struct{}
 
 func (t *noopAgentTx) CloudAgent() CloudAgentTx {
 	return &noopCloudAgentTx{}
+}
+
+type noopDeploymentReporter struct{}
+
+func NewNoopDeploymentReporter() DeploymentReporter {
+	return &noopDeploymentReporter{}
+}
+
+func (r *noopDeploymentReporter) RegisterFunc(f func(ts time.Time, tx DeploymentTx) bool) {}
+func (r *noopDeploymentReporter) Tx(f func(DeploymentTx))                                 {}
+func (r *noopDeploymentReporter) TxAt(ts time.Time, f func(DeploymentTx))                 {}
+func (r *noopDeploymentReporter) WithWorker(id string) WorkerReporter {
+	return &noopWorkerReporter{}
+}
+func (r *noopDeploymentReporter) WithDeferredWorker() (WorkerReporter, KeyResolver) {
+	return &noopWorkerReporter{}, noopKeyResolver{}
+}
+
+type noopDeploymentTx struct{}
+
+func (t *noopDeploymentTx) Agent() AgentTx {
+	return &noopAgentTx{}
 }
 
 type noopWorkerReporter struct{}
@@ -157,8 +157,8 @@ func (r *noopWorkerReporter) WithDeferredJob() (JobReporter, KeyResolver) {
 
 type noopWorkerTx struct{}
 
-func (t *noopWorkerTx) Agent() AgentTx {
-	return &noopAgentTx{}
+func (t *noopWorkerTx) Deployment() DeploymentTx {
+	return &noopDeploymentTx{}
 }
 
 func (t *noopWorkerTx) ReportLoad(v float32)        {}

@@ -1,4 +1,4 @@
-package agentsv2obs
+package agentsv3obs
 
 import "github.com/livekit/protocol/livekit"
 
