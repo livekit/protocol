@@ -28,6 +28,7 @@ import (
 	"github.com/dennwc/iters"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -837,12 +838,12 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	sentPin := req.GetPin()
 
 	trunkID := req.SipTrunkId
+	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+	var mediaTimeout *durationpb.Duration
 	if trunk != nil {
 		trunkID = trunk.SipTrunkId
-	}
-	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
-	if trunk != nil {
 		enc = trunk.MediaEncryption
+		mediaTimeout = trunk.MediaTimeout
 	}
 	attrs := maps.Clone(rule.Attributes)
 	if attrs == nil {
@@ -881,14 +882,16 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	}
 	if rulePin != "" {
 		if sentPin == "" {
-			return &rpc.EvaluateSIPDispatchRulesResponse{
+			respPin := &rpc.EvaluateSIPDispatchRulesResponse{
 				ProjectId:         projectID,
 				SipTrunkId:        trunkID,
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
 				MediaEncryption:   enc,
 				RequestPin:        true,
-			}, nil
+				MediaTimeout:      mediaTimeout,
+			}
+			return respPin, nil
 		}
 		if rulePin != sentPin {
 			// This should never happen in practice, because matchSIPDispatchRule should remove rules with the wrong pin.
@@ -932,6 +935,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		RoomPreset:            rule.GetRoomPreset(),
 		RoomConfig:            rule.GetRoomConfig(),
 		MediaEncryption:       enc,
+		MediaTimeout:          mediaTimeout,
 	}
 	krispEnabled := false
 	if trunk != nil {
@@ -941,6 +945,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		resp.IncludeHeaders = trunk.IncludeHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
 		resp.MaxCallDuration = trunk.MaxCallDuration
+		resp.MediaTimeout = trunk.MediaTimeout
 		krispEnabled = krispEnabled || trunk.KrispEnabled
 	}
 	if rule != nil {

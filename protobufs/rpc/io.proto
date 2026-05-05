@@ -240,7 +240,10 @@ message EvaluateSIPDispatchRulesResponse {
 
   map<string, string> feature_flags = 23;
 
-  // NEXT ID: 24
+  // Per-call RTP media timeout; if unset, SIP service defaults apply.
+  google.protobuf.Duration media_timeout = 24;
+
+  // NEXT ID: 25
 }
 
 message UpdateSIPCallStateRequest {
