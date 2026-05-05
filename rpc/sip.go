@@ -76,16 +76,17 @@ func NewCreateSIPParticipantRequest(
 		return nil, err
 	}
 	var (
-		hostname       string
-		enc            livekit.SIPMediaEncryption
-		headers        map[string]string
-		includeHeaders livekit.SIPHeaderOptions
-		transport      livekit.SIPTransport
-		authUser       string
-		authPass       string
-		hdrToAttr      map[string]string
-		attrToHdr      map[string]string
-		mediaTimeout   *durationpb.Duration
+		hostname           string
+		enc                livekit.SIPMediaEncryption
+		headers            map[string]string
+		includeHeaders     livekit.SIPHeaderOptions
+		transport          livekit.SIPTransport
+		destinationCountry string
+		authUser           string
+		authPass           string
+		hdrToAttr          map[string]string
+		attrToHdr          map[string]string
+		mediaTimeout       *durationpb.Duration
 	)
 	if trunk != nil {
 		hostname = trunk.Address

@@ -21,6 +21,10 @@
 package rpc
 
 import (
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	livekit "github.com/livekit/protocol/livekit"
 	_ "github.com/livekit/protocol/livekit/logger"
 	_ "github.com/livekit/psrpc/protoc-gen-psrpc/options"
@@ -28,9 +32,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -103,7 +104,7 @@ type InternalCreateSIPParticipantRequest struct {
 	Destination *livekit.Destination `protobuf:"bytes,32,opt,name=destination,proto3" json:"destination,omitempty"`
 	// Project-level feature flags from ProjectSettings.FeatureFlags
 	FeatureFlags map[string]string `protobuf:"bytes,33,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Per-call media silence timeouts; if unset, SIP service defaults apply.
+	// Per-call RTP media timeout; if unset, SIP service defaults apply.
 	MediaTimeout  *durationpb.Duration `protobuf:"bytes,34,opt,name=media_timeout,json=mediaTimeout,proto3" json:"media_timeout,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

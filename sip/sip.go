@@ -839,7 +839,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 
 	trunkID := req.SipTrunkId
 	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
-	mediaTimeout := durationpb.New(0)
+	var mediaTimeout *durationpb.Duration
 	if trunk != nil {
 		trunkID = trunk.SipTrunkId
 		enc = trunk.MediaEncryption

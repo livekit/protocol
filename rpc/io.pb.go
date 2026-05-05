@@ -870,7 +870,7 @@ type EvaluateSIPDispatchRulesResponse struct {
 	RoomConfig      *livekit.RoomConfiguration `protobuf:"bytes,21,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
 	MediaEncryption livekit.SIPMediaEncryption `protobuf:"varint,22,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
 	FeatureFlags    map[string]string          `protobuf:"bytes,23,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Per-call media silence timeouts; if unset, SIP service defaults apply.
+	// Per-call RTP media timeout; if unset, SIP service defaults apply.
 	MediaTimeout  *durationpb.Duration `protobuf:"bytes,24,opt,name=media_timeout,json=mediaTimeout,proto3" json:"media_timeout,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
