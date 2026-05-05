@@ -341,10 +341,9 @@ func (x *AgentSecret) GetEnvironments() []string {
 }
 
 type CreateAgentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
-	AgentName string         `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Secrets   []*AgentSecret `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Secrets   []*AgentSecret         `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Replicas int32 `protobuf:"varint,3,opt,name=replicas,proto3" json:"replicas,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
@@ -386,7 +385,6 @@ func (*CreateAgentRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_cloud_agent_proto_rawDescGZIP(), []int{2}
 }
 
-// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *CreateAgentRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
@@ -536,6 +534,7 @@ type CreateAgentV2Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Secrets       []*AgentSecret         `protobuf:"bytes,1,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	Regions       []string               `protobuf:"bytes,2,rep,name=regions,proto3" json:"regions,omitempty"`
+	AgentName     string                 `protobuf:"bytes,3,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -584,11 +583,19 @@ func (x *CreateAgentV2Request) GetRegions() []string {
 	return nil
 }
 
+func (x *CreateAgentV2Request) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
+}
+
 type CreateAgentV2Response struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
 	ServerRegions []string               `protobuf:"bytes,3,rep,name=server_regions,json=serverRegions,proto3" json:"server_regions,omitempty"`
+	AgentName     string                 `protobuf:"bytes,4,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -642,6 +649,13 @@ func (x *CreateAgentV2Response) GetServerRegions() []string {
 		return x.ServerRegions
 	}
 	return nil
+}
+
+func (x *CreateAgentV2Response) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
 }
 
 type PresignedPostRequest struct {
@@ -1253,10 +1267,9 @@ func (x *ListAgentVersionsResponse) GetVersions() []*AgentVersion {
 }
 
 type UpdateAgentRequest struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	AgentId string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
-	AgentName string `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	AgentId   string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	AgentName string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Replicas int32 `protobuf:"varint,3,opt,name=replicas,proto3" json:"replicas,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
@@ -1306,7 +1319,6 @@ func (x *UpdateAgentRequest) GetAgentId() string {
 	return ""
 }
 
-// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 func (x *UpdateAgentRequest) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
@@ -1503,9 +1515,7 @@ func (x *RestartAgentResponse) GetMessage() string {
 type DeployAgentRequest struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	AgentId string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
-	AgentName string         `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Secrets   []*AgentSecret `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	Secrets []*AgentSecret         `protobuf:"bytes,3,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	Replicas int32 `protobuf:"varint,4,opt,name=replicas,proto3" json:"replicas,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
@@ -1550,14 +1560,6 @@ func (*DeployAgentRequest) Descriptor() ([]byte, []int) {
 func (x *DeployAgentRequest) GetAgentId() string {
 	if x != nil {
 		return x.AgentId
-	}
-	return ""
-}
-
-// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
-func (x *DeployAgentRequest) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
 	}
 	return ""
 }
@@ -3112,10 +3114,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
 	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12,\n" +
 	"\x04kind\x18\x05 \x01(\x0e2\x18.livekit.AgentSecretKindR\x04kind\x12\"\n" +
-	"\fenvironments\x18\x06 \x03(\tR\fenvironments\"\xe5\x01\n" +
-	"\x12CreateAgentRequest\x12!\n" +
+	"\fenvironments\x18\x06 \x03(\tR\fenvironments\"\xe1\x01\n" +
+	"\x12CreateAgentRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12.\n" +
 	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
@@ -3131,15 +3133,19 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\rpresigned_url\x18\x05 \x01(\tR\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x06 \x01(\tR\x03tag\x12%\n" +
 	"\x0eserver_regions\x18\a \x03(\tR\rserverRegions\x12S\n" +
-	"\x16presigned_post_request\x18\b \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"`\n" +
+	"\x16presigned_post_request\x18\b \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\"\x7f\n" +
 	"\x14CreateAgentV2Request\x12.\n" +
 	"\asecrets\x18\x01 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x18\n" +
-	"\aregions\x18\x02 \x03(\tR\aregions\"}\n" +
+	"\aregions\x18\x02 \x03(\tR\aregions\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x03 \x01(\tR\tagentName\"\x9c\x01\n" +
 	"\x15CreateAgentV2Response\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\tR\x06status\x12%\n" +
-	"\x0eserver_regions\x18\x03 \x03(\tR\rserverRegions\"\xa6\x01\n" +
+	"\x0eserver_regions\x18\x03 \x03(\tR\rserverRegions\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x04 \x01(\tR\tagentName\"\xa6\x01\n" +
 	"\x14PresignedPostRequest\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12A\n" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
@@ -3207,12 +3213,12 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\"N\n" +
 	"\x19ListAgentVersionsResponse\x121\n" +
-	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x8c\x02\n" +
+	"\bversions\x18\x01 \x03(\v2\x15.livekit.AgentVersionR\bversions\"\x88\x02\n" +
 	"\x12UpdateAgentRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
-	"\xbaP\aagentIDR\aagentId\x12!\n" +
+	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12\x1e\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1e\n" +
 	"\breplicas\x18\x03 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x04 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x05 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x18\n" +
@@ -3226,17 +3232,16 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\xbaP\aagentIDR\aagentId\"J\n" +
 	"\x14RestartAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x94\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x83\x02\n" +
 	"\x12DeployAgentRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
-	"\xbaP\aagentIDR\aagentId\x12!\n" +
-	"\n" +
-	"agent_name\x18\x02 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
+	"\xbaP\aagentIDR\aagentId\x12.\n" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
 	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\xa2\x02\n" +
+	"\venvironment\x18\a \x01(\tR\venvironmentJ\x04\b\x02\x10\x03R\n" +
+	"agent_name\"\xa2\x02\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
