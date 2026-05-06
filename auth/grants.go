@@ -35,6 +35,12 @@ var tokenMarshaler = protojson.MarshalOptions{
 	EmitDefaultValues: false,
 }
 
+// tokenUnmarshaler discards unknown fields so that older servers can accept
+// tokens issued by newer clients that include fields the server does not yet know about.
+var tokenUnmarshaler = protojson.UnmarshalOptions{
+	DiscardUnknown: true,
+}
+
 var ErrSensitiveCredentials = errors.New("room configuration should not contain sensitive credentials")
 
 func (c *RoomConfiguration) Clone() *RoomConfiguration {
@@ -49,7 +55,7 @@ func (c *RoomConfiguration) MarshalJSON() ([]byte, error) {
 }
 
 func (c *RoomConfiguration) UnmarshalJSON(data []byte) error {
-	return protojson.Unmarshal(data, (*livekit.RoomConfiguration)(c))
+	return tokenUnmarshaler.Unmarshal(data, (*livekit.RoomConfiguration)(c))
 }
 
 // CheckCredentials checks if the room configuration contains sensitive credentials
