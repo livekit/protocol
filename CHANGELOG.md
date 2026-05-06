@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.45.8
+
+### Patch Changes
+
+- Allow setting a list of SIP codecs for SDP. - [#1530](https://github.com/livekit/protocol/pull/1530) ([@dennwc](https://github.com/dennwc))
+
 ## 1.45.7
 
 ### Patch Changes
