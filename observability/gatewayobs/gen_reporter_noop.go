@@ -169,6 +169,8 @@ func (r *noopModelReporter) ReportTtsChars(v uint32)                            
 func (r *noopModelReporter) ReportBargeInRequests(v uint64)                       {}
 func (r *noopModelReporter) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
 func (r *noopModelReporter) ReportVoiceCloneRequests(v uint64)                    {}
+func (r *noopModelReporter) ReportEotRequests(v uint64)                           {}
+func (r *noopModelReporter) ReportRequestTypes(v ModelRequestTypes)               {}
 
 type noopModelTx struct{}
 
@@ -187,3 +189,5 @@ func (t *noopModelTx) ReportTtsChars(v uint32)                              {}
 func (t *noopModelTx) ReportBargeInRequests(v uint64)                       {}
 func (t *noopModelTx) ReportBargeInRequestTypes(v ModelBargeInRequestTypes) {}
 func (t *noopModelTx) ReportVoiceCloneRequests(v uint64)                    {}
+func (t *noopModelTx) ReportEotRequests(v uint64)                           {}
+func (t *noopModelTx) ReportRequestTypes(v ModelRequestTypes)               {}
