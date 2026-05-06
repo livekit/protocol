@@ -9,6 +9,14 @@ const (
 	ModelBargeInRequestTypesSelfHosted ModelBargeInRequestTypes = "self_hosted"
 )
 
+type ModelRequestTypes string
+
+const (
+	ModelRequestTypesUndefined  ModelRequestTypes = ""
+	ModelRequestTypesCloud      ModelRequestTypes = "cloud"
+	ModelRequestTypesSelfHosted ModelRequestTypes = "self_hosted"
+)
+
 type Rollup string
 
 const (
