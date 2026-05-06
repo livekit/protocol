@@ -1048,10 +1048,16 @@ func (p *SIPCodec) Validate() error {
 }
 
 func (p *SIPDispatchRuleInfo) Upgrade() {
+	if p == nil {
+		return
+	}
 	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
 }
 
 func (p *CreateSIPParticipantRequest) Upgrade() {
+	if p == nil {
+		return
+	}
 	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
 }
 
