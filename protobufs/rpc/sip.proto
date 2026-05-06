@@ -121,7 +121,8 @@ message InternalCreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 24;
 
-  livekit.SIPMediaEncryption media_encryption = 28;
+  livekit.SIPMediaEncryption media_encryption = 28 [deprecated = true];
+  livekit.SIPMediaConfig media = 34;
 
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 29;
@@ -143,7 +144,7 @@ message InternalCreateSIPParticipantRequest {
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 33;
 
-  // NEXT ID: 34
+  // NEXT ID: 35
 }
 
 message InternalCreateSIPParticipantResponse {
