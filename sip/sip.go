@@ -834,7 +834,6 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
-	rule.Upgrade()
 	call := req.SIPCall()
 	sentPin := req.GetPin()
 

@@ -73,7 +73,6 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
-	req.Upgrade()
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
