@@ -7,8 +7,6 @@ import (
 	"net"
 	"strings"
 
-	"google.golang.org/protobuf/proto"
-
 	"github.com/livekit/protocol/livekit"
 )
 
@@ -73,7 +71,6 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
-	req.Upgrade()
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -166,8 +163,6 @@ func NewCreateSIPParticipantRequest(
 		participantIdentity = "sip_" + req.SipCallTo
 	}
 
-	media := proto.CloneOf(req.Media)
-	media = media.UpgradeWith(enc)
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
@@ -196,8 +191,7 @@ func NewCreateSIPParticipantRequest(
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
-		MediaEncryption:       media.Encryption.Deref(),
-		Media:                 media,
+		MediaEncryption:       enc,
 		WaitUntilAnswered:     req.WaitUntilAnswered,
 		DisplayName:           req.DisplayName,
 		Destination:           req.Destination,
@@ -217,12 +211,4 @@ func NewTransferSIPParticipantRequest(
 		Headers:        req.Headers,
 		RingingTimeout: req.RingingTimeout,
 	}, nil
-}
-
-func (p *InternalCreateSIPParticipantRequest) Upgrade() {
-	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
-}
-
-func (p *EvaluateSIPDispatchRulesResponse) Upgrade() {
-	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
 }

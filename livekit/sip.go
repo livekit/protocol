@@ -8,12 +8,11 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/utils/xtwirp"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -494,7 +493,7 @@ var (
 )
 
 func (p *UpdateSIPOutboundTrunkRequest_Replace) Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, error) {
-	val := proto.CloneOf(p.Replace)
+	val := cloneProto(p.Replace)
 	if val == nil {
 		return nil, errors.New("missing trunk")
 	}
@@ -512,7 +511,7 @@ func (p *UpdateSIPOutboundTrunkRequest_Update) Apply(info *SIPOutboundTrunkInfo)
 	if diff == nil {
 		return nil, errors.New("missing trunk update")
 	}
-	val := proto.CloneOf(info)
+	val := cloneProto(info)
 	if err := diff.Apply(val); err != nil {
 		return nil, err
 	}
@@ -598,7 +597,7 @@ var (
 )
 
 func (p *UpdateSIPInboundTrunkRequest_Replace) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
-	val := proto.CloneOf(p.Replace)
+	val := cloneProto(p.Replace)
 	if val == nil {
 		return nil, errors.New("missing trunk")
 	}
@@ -616,7 +615,7 @@ func (p *UpdateSIPInboundTrunkRequest_Update) Apply(info *SIPInboundTrunkInfo) (
 	if diff == nil {
 		return nil, errors.New("missing trunk update")
 	}
-	val := proto.CloneOf(info)
+	val := cloneProto(info)
 	if err := diff.Apply(val); err != nil {
 		return nil, err
 	}
@@ -702,15 +701,10 @@ func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
 	}
 	applyListUpdate(&info.TrunkIds, p.TrunkIds)
 	applyUpdatePtr(&info.Rule, p.Rule)
-	applyUpdatePtr(&info.Media, p.Media)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	applyMapDiff(&info.Attributes, p.Attributes)
-	info.Upgrade()
-	if m := info.Media; m != nil {
-		info.MediaEncryption = m.Encryption.Deref()
-	}
 	return info.Validate()
 }
 
@@ -725,7 +719,7 @@ var (
 )
 
 func (p *UpdateSIPDispatchRuleRequest_Replace) Apply(info *SIPDispatchRuleInfo) (*SIPDispatchRuleInfo, error) {
-	val := proto.CloneOf(p.Replace)
+	val := cloneProto(p.Replace)
 	if val == nil {
 		return nil, errors.New("missing dispatch rule")
 	}
@@ -743,7 +737,7 @@ func (p *UpdateSIPDispatchRuleRequest_Update) Apply(info *SIPDispatchRuleInfo) (
 	if diff == nil {
 		return nil, errors.New("missing dispatch rule update")
 	}
-	val := proto.CloneOf(info)
+	val := cloneProto(info)
 	if err := diff.Apply(val); err != nil {
 		return nil, err
 	}
@@ -1030,53 +1024,3 @@ var (
 		")", "",
 	)
 )
-
-func (p *SIPCodec) Validate() error {
-	if p.Name == "" {
-		return errors.New("missing codec name")
-	}
-	if strings.ContainsAny(p.Name, " \t\n\r") {
-		return errors.New("invalid codec name")
-	}
-	if strings.Contains(p.Name, "/") {
-		return errors.New("codec name must not contain '/'")
-	}
-	if p.Rate == 0 {
-		return errors.New("invalid codec sample rate")
-	}
-	return nil
-}
-
-func (p *SIPDispatchRuleInfo) Upgrade() {
-	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
-}
-
-func (p *CreateSIPParticipantRequest) Upgrade() {
-	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
-}
-
-func (p *SIPMediaConfig) Validate() error {
-	for _, c := range p.Codecs {
-		if err := c.Validate(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func (p *SIPMediaEncryption) Deref() SIPMediaEncryption {
-	if p == nil {
-		return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
-	}
-	return *p
-}
-
-func (p *SIPMediaConfig) UpgradeWith(enc SIPMediaEncryption) *SIPMediaConfig {
-	if p == nil {
-		p = new(SIPMediaConfig)
-	}
-	if p.Encryption == nil {
-		p.Encryption = &enc
-	}
-	return p
-}
