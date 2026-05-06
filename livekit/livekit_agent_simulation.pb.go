@@ -649,6 +649,10 @@ type SimulationRun_Job struct {
 	Error             string                   `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`
 	AgentExpectations string                   `protobuf:"bytes,5,opt,name=agent_expectations,json=agentExpectations,proto3" json:"agent_expectations,omitempty"`
 	Label             string                   `protobuf:"bytes,6,opt,name=label,proto3" json:"label,omitempty"`
+	Tags              []string                 `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
+	DurationMs        int64                    `protobuf:"varint,8,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	ScenarioId        string                   `protobuf:"bytes,9,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
+	StartedAt         *timestamppb.Timestamp   `protobuf:"bytes,10,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -723,6 +727,34 @@ func (x *SimulationRun_Job) GetLabel() string {
 		return x.Label
 	}
 	return ""
+}
+
+func (x *SimulationRun_Job) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *SimulationRun_Job) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+func (x *SimulationRun_Job) GetScenarioId() string {
+	if x != nil {
+		return x.ScenarioId
+	}
+	return ""
+}
+
+func (x *SimulationRun_Job) GetStartedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartedAt
+	}
+	return nil
 }
 
 type SimulationRun_Create struct {
@@ -2732,7 +2764,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
-	"suggestion\"\xc5\x12\n" +
+	"suggestion\"\xd6\x13\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2743,14 +2775,22 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12.\n" +
 	"\x04jobs\x18\a \x03(\v2\x1a.livekit.SimulationRun.JobR\x04jobs\x127\n" +
-	"\asummary\x18\b \x01(\v2\x1d.livekit.SimulationRunSummaryR\asummary\x1a\xc0\x02\n" +
+	"\asummary\x18\b \x01(\v2\x1d.livekit.SimulationRunSummaryR\asummary\x1a\xd1\x03\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
 	"\finstructions\x18\x03 \x01(\tR\finstructions\x12\x14\n" +
 	"\x05error\x18\x04 \x01(\tR\x05error\x12-\n" +
 	"\x12agent_expectations\x18\x05 \x01(\tR\x11agentExpectations\x12\x14\n" +
-	"\x05label\x18\x06 \x01(\tR\x05label\"o\n" +
+	"\x05label\x18\x06 \x01(\tR\x05label\x12\x12\n" +
+	"\x04tags\x18\a \x03(\tR\x04tags\x12\x1f\n" +
+	"\vduration_ms\x18\b \x01(\x03R\n" +
+	"durationMs\x12\x1f\n" +
+	"\vscenario_id\x18\t \x01(\tR\n" +
+	"scenarioId\x129\n" +
+	"\n" +
+	"started_at\x18\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\"o\n" +
 	"\x06Status\x12\x12\n" +
 	"\x0eSTATUS_PENDING\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_RUNNING\x10\x01\x12\x14\n" +
@@ -3034,54 +3074,55 @@ var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	5,  // 10: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
 	56, // 11: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
 	1,  // 12: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
-	19, // 13: livekit.SimulationRun.Create.Scenario.metadata:type_name -> livekit.SimulationRun.Create.Scenario.MetadataEntry
-	15, // 14: livekit.SimulationRun.Create.Scenarios.scenarios:type_name -> livekit.SimulationRun.Create.Scenario
-	16, // 15: livekit.SimulationRun.Create.Request.scenarios:type_name -> livekit.SimulationRun.Create.Scenarios
-	57, // 16: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	4,  // 17: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
-	0,  // 18: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
-	58, // 19: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
-	4,  // 20: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
-	58, // 21: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
-	36, // 22: livekit.Scenario.Create.Request.metadata:type_name -> livekit.Scenario.Create.Request.MetadataEntry
-	5,  // 23: livekit.Scenario.Create.Response.scenario:type_name -> livekit.Scenario
-	5,  // 24: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
-	43, // 25: livekit.Scenario.Update.Request.metadata:type_name -> livekit.Scenario.Update.Request.MetadataEntry
-	5,  // 26: livekit.Scenario.Update.Response.scenario:type_name -> livekit.Scenario
-	5,  // 27: livekit.Scenario.List.Response.scenarios:type_name -> livekit.Scenario
-	6,  // 28: livekit.ScenarioGroup.Create.Response.scenario_group:type_name -> livekit.ScenarioGroup
-	6,  // 29: livekit.ScenarioGroup.List.Response.scenario_groups:type_name -> livekit.ScenarioGroup
-	17, // 30: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
-	20, // 31: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
-	22, // 32: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
-	24, // 33: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
-	26, // 34: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
-	34, // 35: livekit.AgentSimulation.CreateScenario:input_type -> livekit.Scenario.Create.Request
-	37, // 36: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
-	39, // 37: livekit.AgentSimulation.DeleteScenario:input_type -> livekit.Scenario.Delete.Request
-	41, // 38: livekit.AgentSimulation.UpdateScenario:input_type -> livekit.Scenario.Update.Request
-	49, // 39: livekit.AgentSimulation.CreateScenarioGroup:input_type -> livekit.ScenarioGroup.Create.Request
-	51, // 40: livekit.AgentSimulation.DeleteScenarioGroup:input_type -> livekit.ScenarioGroup.Delete.Request
-	53, // 41: livekit.AgentSimulation.ListScenarioGroups:input_type -> livekit.ScenarioGroup.List.Request
-	44, // 42: livekit.AgentSimulation.ListScenarios:input_type -> livekit.Scenario.List.Request
-	18, // 43: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
-	21, // 44: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
-	23, // 45: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
-	25, // 46: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
-	27, // 47: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
-	35, // 48: livekit.AgentSimulation.CreateScenario:output_type -> livekit.Scenario.Create.Response
-	38, // 49: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
-	40, // 50: livekit.AgentSimulation.DeleteScenario:output_type -> livekit.Scenario.Delete.Response
-	42, // 51: livekit.AgentSimulation.UpdateScenario:output_type -> livekit.Scenario.Update.Response
-	50, // 52: livekit.AgentSimulation.CreateScenarioGroup:output_type -> livekit.ScenarioGroup.Create.Response
-	52, // 53: livekit.AgentSimulation.DeleteScenarioGroup:output_type -> livekit.ScenarioGroup.Delete.Response
-	54, // 54: livekit.AgentSimulation.ListScenarioGroups:output_type -> livekit.ScenarioGroup.List.Response
-	45, // 55: livekit.AgentSimulation.ListScenarios:output_type -> livekit.Scenario.List.Response
-	43, // [43:56] is the sub-list for method output_type
-	30, // [30:43] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	55, // 13: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
+	19, // 14: livekit.SimulationRun.Create.Scenario.metadata:type_name -> livekit.SimulationRun.Create.Scenario.MetadataEntry
+	15, // 15: livekit.SimulationRun.Create.Scenarios.scenarios:type_name -> livekit.SimulationRun.Create.Scenario
+	16, // 16: livekit.SimulationRun.Create.Request.scenarios:type_name -> livekit.SimulationRun.Create.Scenarios
+	57, // 17: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	4,  // 18: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
+	0,  // 19: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
+	58, // 20: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
+	4,  // 21: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
+	58, // 22: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
+	36, // 23: livekit.Scenario.Create.Request.metadata:type_name -> livekit.Scenario.Create.Request.MetadataEntry
+	5,  // 24: livekit.Scenario.Create.Response.scenario:type_name -> livekit.Scenario
+	5,  // 25: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
+	43, // 26: livekit.Scenario.Update.Request.metadata:type_name -> livekit.Scenario.Update.Request.MetadataEntry
+	5,  // 27: livekit.Scenario.Update.Response.scenario:type_name -> livekit.Scenario
+	5,  // 28: livekit.Scenario.List.Response.scenarios:type_name -> livekit.Scenario
+	6,  // 29: livekit.ScenarioGroup.Create.Response.scenario_group:type_name -> livekit.ScenarioGroup
+	6,  // 30: livekit.ScenarioGroup.List.Response.scenario_groups:type_name -> livekit.ScenarioGroup
+	17, // 31: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
+	20, // 32: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
+	22, // 33: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
+	24, // 34: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
+	26, // 35: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
+	34, // 36: livekit.AgentSimulation.CreateScenario:input_type -> livekit.Scenario.Create.Request
+	37, // 37: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
+	39, // 38: livekit.AgentSimulation.DeleteScenario:input_type -> livekit.Scenario.Delete.Request
+	41, // 39: livekit.AgentSimulation.UpdateScenario:input_type -> livekit.Scenario.Update.Request
+	49, // 40: livekit.AgentSimulation.CreateScenarioGroup:input_type -> livekit.ScenarioGroup.Create.Request
+	51, // 41: livekit.AgentSimulation.DeleteScenarioGroup:input_type -> livekit.ScenarioGroup.Delete.Request
+	53, // 42: livekit.AgentSimulation.ListScenarioGroups:input_type -> livekit.ScenarioGroup.List.Request
+	44, // 43: livekit.AgentSimulation.ListScenarios:input_type -> livekit.Scenario.List.Request
+	18, // 44: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
+	21, // 45: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
+	23, // 46: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
+	25, // 47: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
+	27, // 48: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
+	35, // 49: livekit.AgentSimulation.CreateScenario:output_type -> livekit.Scenario.Create.Response
+	38, // 50: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
+	40, // 51: livekit.AgentSimulation.DeleteScenario:output_type -> livekit.Scenario.Delete.Response
+	42, // 52: livekit.AgentSimulation.UpdateScenario:output_type -> livekit.Scenario.Update.Response
+	50, // 53: livekit.AgentSimulation.CreateScenarioGroup:output_type -> livekit.ScenarioGroup.Create.Response
+	52, // 54: livekit.AgentSimulation.DeleteScenarioGroup:output_type -> livekit.ScenarioGroup.Delete.Response
+	54, // 55: livekit.AgentSimulation.ListScenarioGroups:output_type -> livekit.ScenarioGroup.List.Response
+	45, // 56: livekit.AgentSimulation.ListScenarios:output_type -> livekit.Scenario.List.Response
+	44, // [44:57] is the sub-list for method output_type
+	31, // [31:44] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }
