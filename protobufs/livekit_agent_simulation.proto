@@ -64,9 +64,9 @@ message SimulationRun {
     string agent_expectations = 5;
     string label = 6;
     repeated string tags = 7;
-    int64 duration_ms = 8;
     string scenario_id = 9;
     google.protobuf.Timestamp started_at = 10;
+    google.protobuf.Timestamp ended_at = 11;
   }
 
   message Create {
