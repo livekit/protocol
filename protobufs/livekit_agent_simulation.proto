@@ -63,6 +63,10 @@ message SimulationRun {
     string error = 4;
     string agent_expectations = 5;
     string label = 6;
+    repeated string tags = 7;
+    int64 duration_ms = 8;
+    string scenario_id = 9;
+    google.protobuf.Timestamp started_at = 10;
   }
 
   message Create {
