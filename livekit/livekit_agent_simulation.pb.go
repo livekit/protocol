@@ -302,6 +302,8 @@ type SimulationRun struct {
 	ScenarioGroup    *ScenarioGroup         `protobuf:"bytes,10,opt,name=scenario_group,json=scenarioGroup,proto3" json:"scenario_group,omitempty"`
 	EndedAt          *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
 	JobCount         int32                  `protobuf:"varint,12,opt,name=job_count,json=jobCount,proto3" json:"job_count,omitempty"`
+	PassedCount      int32                  `protobuf:"varint,13,opt,name=passed_count,json=passedCount,proto3" json:"passed_count,omitempty"`
+	FailedCount      int32                  `protobuf:"varint,14,opt,name=failed_count,json=failedCount,proto3" json:"failed_count,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -416,6 +418,20 @@ func (x *SimulationRun) GetEndedAt() *timestamppb.Timestamp {
 func (x *SimulationRun) GetJobCount() int32 {
 	if x != nil {
 		return x.JobCount
+	}
+	return 0
+}
+
+func (x *SimulationRun) GetPassedCount() int32 {
+	if x != nil {
+		return x.PassedCount
+	}
+	return 0
+}
+
+func (x *SimulationRun) GetFailedCount() int32 {
+	if x != nil {
+		return x.FailedCount
 	}
 	return 0
 }
@@ -2812,7 +2828,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
-	"suggestion\"\xbb\x15\n" +
+	"suggestion\"\x81\x16\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2829,7 +2845,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x0escenario_group\x18\n" +
 	" \x01(\v2\x16.livekit.ScenarioGroupR\rscenarioGroup\x125\n" +
 	"\bended_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12\x1b\n" +
-	"\tjob_count\x18\f \x01(\x05R\bjobCount\x1a\x84\x04\n" +
+	"\tjob_count\x18\f \x01(\x05R\bjobCount\x12!\n" +
+	"\fpassed_count\x18\r \x01(\x05R\vpassedCount\x12!\n" +
+	"\ffailed_count\x18\x0e \x01(\x05R\vfailedCount\x1a\x84\x04\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
