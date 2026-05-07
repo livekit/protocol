@@ -650,6 +650,7 @@ type SimulationRun_Job struct {
 	AgentExpectations string                   `protobuf:"bytes,5,opt,name=agent_expectations,json=agentExpectations,proto3" json:"agent_expectations,omitempty"`
 	Label             string                   `protobuf:"bytes,6,opt,name=label,proto3" json:"label,omitempty"`
 	Tags              []string                 `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
+	RoomName          string                   `protobuf:"bytes,8,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
 	ScenarioId        string                   `protobuf:"bytes,9,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	StartedAt         *timestamppb.Timestamp   `protobuf:"bytes,10,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	EndedAt           *timestamppb.Timestamp   `protobuf:"bytes,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
@@ -734,6 +735,13 @@ func (x *SimulationRun_Job) GetTags() []string {
 		return x.Tags
 	}
 	return nil
+}
+
+func (x *SimulationRun_Job) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
 }
 
 func (x *SimulationRun_Job) GetScenarioId() string {
@@ -2764,7 +2772,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
-	"suggestion\"\xec\x13\n" +
+	"suggestion\"\x89\x14\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2775,7 +2783,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12.\n" +
 	"\x04jobs\x18\a \x03(\v2\x1a.livekit.SimulationRun.JobR\x04jobs\x127\n" +
-	"\asummary\x18\b \x01(\v2\x1d.livekit.SimulationRunSummaryR\asummary\x1a\xe7\x03\n" +
+	"\asummary\x18\b \x01(\v2\x1d.livekit.SimulationRunSummaryR\asummary\x1a\x84\x04\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -2783,7 +2791,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05error\x18\x04 \x01(\tR\x05error\x12-\n" +
 	"\x12agent_expectations\x18\x05 \x01(\tR\x11agentExpectations\x12\x14\n" +
 	"\x05label\x18\x06 \x01(\tR\x05label\x12\x12\n" +
-	"\x04tags\x18\a \x03(\tR\x04tags\x12\x1f\n" +
+	"\x04tags\x18\a \x03(\tR\x04tags\x12\x1b\n" +
+	"\troom_name\x18\b \x01(\tR\broomName\x12\x1f\n" +
 	"\vscenario_id\x18\t \x01(\tR\n" +
 	"scenarioId\x129\n" +
 	"\n" +
