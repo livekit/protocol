@@ -21,10 +21,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/livekit/protocol/utils/protojson"
-
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/utils/protojson"
 )
 
 // Receive reads and verifies incoming webhook is signed with key/secret pair

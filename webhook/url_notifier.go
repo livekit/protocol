@@ -29,11 +29,10 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/protocol/utils/protojson"
-
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/utils/protojson"
 )
 
 type URLNotifierConfig struct {
