@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_IN1F4V8 = true
+const Version_9V68R3G = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -115,7 +115,7 @@ type modelReporter interface {
 	ReportBargeInRequestTypes(v ModelBargeInRequestTypes)
 	ReportVoiceCloneRequests(v uint64)
 	ReportEotRequests(v uint64)
-	ReportRequestTypes(v ModelRequestTypes)
+	ReportEotRequestTypes(v ModelEotRequestTypes)
 }
 
 type ModelTx interface {
