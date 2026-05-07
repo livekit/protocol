@@ -28,12 +28,12 @@ import (
 
 	"github.com/frostbyte73/core"
 	"github.com/hashicorp/go-retryablehttp"
-	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
+	"github.com/livekit/protocol/utils/protojson"
 )
 
 const (

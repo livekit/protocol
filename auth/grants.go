@@ -22,24 +22,14 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/exp/slices"
-	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
+	"github.com/livekit/protocol/utils/protojson"
 )
 
 type RoomConfiguration livekit.RoomConfiguration
-
-var tokenMarshaler = protojson.MarshalOptions{
-	EmitDefaultValues: false,
-}
-
-// tokenUnmarshaler discards unknown fields so that older servers can accept
-// tokens issued by newer clients that include fields the server does not yet know about.
-var tokenUnmarshaler = protojson.UnmarshalOptions{
-	DiscardUnknown: true,
-}
 
 var ErrSensitiveCredentials = errors.New("room configuration should not contain sensitive credentials")
 
@@ -51,11 +41,11 @@ func (c *RoomConfiguration) Clone() *RoomConfiguration {
 }
 
 func (c *RoomConfiguration) MarshalJSON() ([]byte, error) {
-	return tokenMarshaler.Marshal((*livekit.RoomConfiguration)(c))
+	return protojson.Marshal((*livekit.RoomConfiguration)(c))
 }
 
 func (c *RoomConfiguration) UnmarshalJSON(data []byte) error {
-	return tokenUnmarshaler.Unmarshal(data, (*livekit.RoomConfiguration)(c))
+	return protojson.Unmarshal(data, (*livekit.RoomConfiguration)(c))
 }
 
 // CheckCredentials checks if the room configuration contains sensitive credentials

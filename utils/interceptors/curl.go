@@ -8,8 +8,9 @@ import (
 	"sort"
 
 	"github.com/twitchtv/twirp"
-	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/livekit/protocol/utils/protojson"
 )
 
 // NewCurlPrinter creates a Twirp interceptor that prints a curl commands for each request made.
