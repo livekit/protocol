@@ -28,7 +28,8 @@ import (
 
 	"github.com/frostbyte73/core"
 	"github.com/hashicorp/go-retryablehttp"
-	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/livekit/protocol/utils/protojson"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"

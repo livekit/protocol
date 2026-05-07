@@ -21,7 +21,7 @@ import (
 	"io"
 	"net/http"
 
-	"google.golang.org/protobuf/encoding/protojson"
+	"github.com/livekit/protocol/utils/protojson"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
