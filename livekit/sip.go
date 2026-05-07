@@ -1081,7 +1081,8 @@ func (p *SIPMediaConfig) UpgradeWith(enc SIPMediaEncryption) *SIPMediaConfig {
 	if p == nil {
 		p = new(SIPMediaConfig)
 	}
-	if p.Encryption == nil {
+	// Ignore DISABLE as it's a zero value which means "unset".
+	if p.Encryption == nil && enc != SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE {
 		p.Encryption = &enc
 	}
 	return p

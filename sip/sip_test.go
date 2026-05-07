@@ -933,6 +933,34 @@ func TestEvaluateDispatchRule(t *testing.T) {
 	})
 }
 
+// Regression: trunk-level MediaEncryption must be honored when the dispatch rule specifies
+// neither MediaEncryption nor Media. A prior version called rule.Upgrade() at the top of
+// EvaluateDispatchRule, which pinned rule.Media.Encryption to rule.MediaEncryption (0)
+// before the trunk was consulted, causing the inbound trunk's encryption setting to be
+// silently dropped.
+func TestEvaluateDispatchRule_TrunkOnlyEncryption(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CallingHost:   "sip.example.com",
+		CalledNumber:  "+3333",
+	}
+	tr := &livekit.SIPInboundTrunkInfo{
+		SipTrunkId:      "trunk",
+		MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+	}
+	res, err := EvaluateDispatchRule("p_123", tr, d, r)
+	require.NoError(t, err)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, res.MediaEncryption)
+	require.NotNil(t, res.Media)
+	require.NotNil(t, res.Media.Encryption)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
+}
+
 func TestMatchIP(t *testing.T) {
 	cases := []struct {
 		addr  string
