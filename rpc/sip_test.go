@@ -150,3 +150,28 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 }
+
+// Regression: trunk-level MediaEncryption must be honored when the request specifies
+// neither MediaEncryption nor Media. A prior version called req.Upgrade() at the top of
+// NewCreateSIPParticipantRequest, which pinned req.Media.Encryption to req.MediaEncryption (0)
+// before the trunk was consulted, causing outbound INVITEs to omit SRTP and upstream
+// providers (e.g. Twilio) to reject with 488 / 32208.
+func TestNewCreateSIPParticipantRequest_TrunkOnlyEncryption(t *testing.T) {
+	r := &livekit.CreateSIPParticipantRequest{
+		SipTrunkId: "trunk",
+		SipCallTo:  "+3333",
+		RoomName:   "room",
+	}
+	tr := &livekit.SIPOutboundTrunkInfo{
+		SipTrunkId:      "trunk",
+		Address:         "sip.example.com",
+		Numbers:         []string{"+1111"},
+		MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+	}
+	res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+	require.NoError(t, err)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, res.MediaEncryption)
+	require.NotNil(t, res.Media)
+	require.NotNil(t, res.Media.Encryption)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
+}
