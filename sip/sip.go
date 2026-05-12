@@ -29,7 +29,6 @@ import (
 	"github.com/twitchtv/twirp"
 	"golang.org/x/exp/slices"
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -841,11 +840,9 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 
 	trunkID := req.SipTrunkId
 	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
-	var mediaTimeout *durationpb.Duration
 	if trunk != nil {
 		trunkID = trunk.SipTrunkId
 		enc = trunk.MediaEncryption
-		mediaTimeout = trunk.MediaTimeout
 	}
 	attrs := maps.Clone(rule.Attributes)
 	if attrs == nil {
@@ -892,7 +889,6 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 				MediaEncryption:   enc,
 				Media:             rule.Media,
 				RequestPin:        true,
-				MediaTimeout:      mediaTimeout,
 			}, nil
 		}
 		if rulePin != sentPin {
@@ -937,7 +933,6 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		RoomPreset:            rule.GetRoomPreset(),
 		RoomConfig:            rule.GetRoomConfig(),
 		MediaEncryption:       enc,
-		MediaTimeout:          mediaTimeout,
 	}
 	krispEnabled := false
 	if trunk != nil {

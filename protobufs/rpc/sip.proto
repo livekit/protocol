@@ -144,10 +144,7 @@ message InternalCreateSIPParticipantRequest {
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 33;
 
-  // Per-call RTP media timeout; if unset, SIP service defaults apply.
-  google.protobuf.Duration media_timeout = 35;
-
-  // NEXT ID: 36
+  // NEXT ID: 35
 }
 
 message InternalCreateSIPParticipantResponse {

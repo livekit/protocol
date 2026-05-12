@@ -234,6 +234,8 @@ message SIPMediaConfig {
   // List of allowed codecs. If only_listed_codecs is not set, this list is added to default codecs.
   repeated SIPCodec codecs = 2;
   optional SIPMediaEncryption encryption = 3;
+  // Use specific media timeout. If zero or not specified, will use default timeout.
+  optional google.protobuf.Duration media_timeout = 4;
 }
 
 message ProviderInfo {
@@ -368,10 +370,7 @@ message SIPInboundTrunkInfo {
   google.protobuf.Timestamp created_at = 17;
   google.protobuf.Timestamp updated_at = 18;
 
-  // Max time a call can last without incoming RTP data received. If unset, defaults are used.
-  google.protobuf.Duration media_timeout = 19;
-
-  // NEXT ID: 20
+  // NEXT ID: 19
 }
 
 message SIPInboundTrunkUpdate {
@@ -386,7 +385,6 @@ message SIPInboundTrunkUpdate {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional SIPMediaEncryption media_encryption = 8;
-  optional google.protobuf.Duration media_timeout = 9;
 }
 
 message CreateSIPOutboundTrunkRequest {
@@ -460,10 +458,7 @@ message SIPOutboundTrunkInfo {
   google.protobuf.Timestamp created_at = 16;
   google.protobuf.Timestamp updated_at = 17;
 
-  // Max time a call can last without incoming RTP data received. If unset, defaults are used.
-  google.protobuf.Duration media_timeout = 18;
-
-  // NEXT ID: 19
+  // NEXT ID: 18
 }
 
 message SIPOutboundTrunkUpdate {
@@ -480,9 +475,8 @@ message SIPOutboundTrunkUpdate {
   ];
   optional SIPMediaEncryption media_encryption = 8;
   optional string from_host = 10;
-  optional google.protobuf.Duration media_timeout = 11;
 
-  // NEXT ID: 12
+  // NEXT ID: 11
 }
 
 message GetSIPInboundTrunkRequest {
@@ -739,10 +733,7 @@ message SIPOutboundConfig {
   // Optional custom hostname for the 'From' SIP header. When set, outbound calls use this host instead of the default project SIP domain.
   string from_host = 8;
 
-  // Max time a call can last without incoming RTP data received. If unset, defaults are used.
-  google.protobuf.Duration media_timeout = 9;
-
-  // NEXT ID: 10
+  // NEXT ID: 9
 }
 
 // A SIP Participant is a singular SIP session connected to a LiveKit room via

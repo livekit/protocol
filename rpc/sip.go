@@ -10,7 +10,6 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/livekit"
-	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func (p *GetSIPTrunkAuthenticationRequest) SIPCall() *SIPCall {
@@ -89,7 +88,6 @@ func NewCreateSIPParticipantRequest(
 		authPass           string
 		hdrToAttr          map[string]string
 		attrToHdr          map[string]string
-		mediaTimeout       *durationpb.Duration
 	)
 	if trunk != nil {
 		hostname = trunk.Address
@@ -102,7 +100,6 @@ func NewCreateSIPParticipantRequest(
 		authPass = trunk.AuthPassword
 		hdrToAttr = trunk.HeadersToAttributes
 		attrToHdr = trunk.AttributesToHeaders
-		mediaTimeout = trunk.MediaTimeout
 	} else if t := req.Trunk; t != nil {
 		hostname = t.Hostname
 		transport = t.Transport
@@ -111,7 +108,6 @@ func NewCreateSIPParticipantRequest(
 		authPass = t.AuthPassword
 		hdrToAttr = t.HeadersToAttributes
 		attrToHdr = t.AttributesToHeaders
-		mediaTimeout = t.MediaTimeout
 	}
 
 	outboundNumber := req.SipNumber
@@ -205,7 +201,6 @@ func NewCreateSIPParticipantRequest(
 		WaitUntilAnswered:     req.WaitUntilAnswered,
 		DisplayName:           req.DisplayName,
 		Destination:           req.Destination,
-		MediaTimeout:          mediaTimeout,
 	}, nil
 }
 
