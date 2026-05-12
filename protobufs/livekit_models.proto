@@ -282,6 +282,30 @@ message DataTrackInfo {
 
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
+
+  // Schema used by frames sent on this track. The track is untyped if not specified.
+  optional DataTrackSchemaId schema = 5;
+}
+
+message DataTrackSchemaId {
+  string name = 1;
+  DataTrackSchemaFormat format = 2;
+}
+
+message DataTrackSchemaDefinition {
+  DataTrackSchemaId id = 1;
+  bytes definition = 2;
+}
+
+enum DataTrackSchemaFormat {
+  DATA_TRACK_SCHEMA_FORMAT_OTHER = 0;
+  DATA_TRACK_SCHEMA_FORMAT_PROTOBUF = 1;
+  DATA_TRACK_SCHEMA_FORMAT_FLATBUFFER = 2;
+  DATA_TRACK_SCHEMA_FORMAT_ROS1_MSG = 3;
+  DATA_TRACK_SCHEMA_FORMAT_ROS2_MSG = 4;
+  DATA_TRACK_SCHEMA_FORMAT_ROS2_IDL = 5;
+  DATA_TRACK_SCHEMA_FORMAT_OMG_IDL = 6;
+  DATA_TRACK_SCHEMA_FORMAT_JSON_SCHEMA = 7;
 }
 
 enum DataTrackExtensionID {
