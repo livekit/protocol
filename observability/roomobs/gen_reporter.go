@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_J7RCQFO = true
+const Version_IRCV090 = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -110,6 +110,7 @@ type participantSessionReporter interface {
 	ReportKind(v string)
 	ReportName(v string)
 	ReportFeatures(v uint16)
+	ReportAttributes(v map[string]string)
 }
 
 type ParticipantSessionTx interface {
