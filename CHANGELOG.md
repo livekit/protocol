@@ -1,5 +1,19 @@
 # github.com/livekit/protocol
 
+## 1.45.8
+
+### Patch Changes
+
+- Allow setting a list of SIP codecs for SDP. - [#1530](https://github.com/livekit/protocol/pull/1530) ([@dennwc](https://github.com/dennwc))
+
+- fix: ensure we don't reject tokens on unknown fields - [#1536](https://github.com/livekit/protocol/pull/1536) ([@davidzhao](https://github.com/davidzhao))
+
+## 1.45.7
+
+### Patch Changes
+
+- feat(agents): add session events for amd - [#1526](https://github.com/livekit/protocol/pull/1526) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.45.6
 
 ### Patch Changes

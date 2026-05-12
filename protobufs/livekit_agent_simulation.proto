@@ -63,6 +63,11 @@ message SimulationRun {
     string error = 4;
     string agent_expectations = 5;
     string label = 6;
+    repeated string tags = 7;
+    string room_name = 8;
+    string scenario_id = 9;
+    google.protobuf.Timestamp started_at = 10;
+    google.protobuf.Timestamp ended_at = 11;
   }
 
   message Create {
@@ -141,6 +146,13 @@ message SimulationRun {
   google.protobuf.Timestamp created_at = 6;
   repeated Job jobs = 7;
   SimulationRunSummary summary = 8;
+  string agent_name = 9;
+  ScenarioGroup scenario_group = 10;
+  google.protobuf.Timestamp ended_at = 11;
+  int32 job_count = 12;
+  int32 passed_count = 13;
+  int32 failed_count = 14;
+  int32 num_simulations = 15;
 }
 
 message Scenario {
@@ -259,6 +271,7 @@ message ScenarioGroup {
   string label = 3;
   google.protobuf.Timestamp created_at = 4;
   repeated Scenario scenarios = 5;
+  int32 scenario_count = 6;
 }
 
 service AgentSimulation {

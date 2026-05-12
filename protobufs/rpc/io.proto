@@ -236,11 +236,12 @@ message EvaluateSIPDispatchRulesResponse {
   string room_preset = 20;
   livekit.RoomConfiguration room_config = 21;
 
-  livekit.SIPMediaEncryption media_encryption = 22;
+  livekit.SIPMediaEncryption media_encryption = 22 [deprecated = true];
+  livekit.SIPMediaConfig media = 24;
 
   map<string, string> feature_flags = 23;
 
-  // NEXT ID: 24
+  // NEXT ID: 25
 }
 
 message UpdateSIPCallStateRequest {

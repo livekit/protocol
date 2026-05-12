@@ -1,5 +1,31 @@
 # @livekit/protocol
 
+## 1.45.8
+
+### Patch Changes
+
+- rename agent environment to deployment - [#1532](https://github.com/livekit/protocol/pull/1532) ([@paulwe](https://github.com/paulwe))
+
+- Allow setting a list of SIP codecs for SDP. - [#1530](https://github.com/livekit/protocol/pull/1530) ([@dennwc](https://github.com/dennwc))
+
+## 1.45.7
+
+### Patch Changes
+
+- update observability codegen for ingress/egress - [#1529](https://github.com/livekit/protocol/pull/1529) ([@paulwe](https://github.com/paulwe))
+
+- add agents reporter with env - [#1525](https://github.com/livekit/protocol/pull/1525) ([@paulwe](https://github.com/paulwe))
+
+- Fix the egress results serialization format - [#1521](https://github.com/livekit/protocol/pull/1521) ([@biglittlebigben](https://github.com/biglittlebigben))
+
+- update otel - [#1524](https://github.com/livekit/protocol/pull/1524) ([@paulwe](https://github.com/paulwe))
+
+- Agent env - [#1527](https://github.com/livekit/protocol/pull/1527) ([@paulwe](https://github.com/paulwe))
+
+- codegen observability parent tx accessors - [#1522](https://github.com/livekit/protocol/pull/1522) ([@paulwe](https://github.com/paulwe))
+
+- add duration seconds reporting - [#1528](https://github.com/livekit/protocol/pull/1528) ([@paulwe](https://github.com/paulwe))
+
 ## 1.45.6
 
 ## 1.45.5

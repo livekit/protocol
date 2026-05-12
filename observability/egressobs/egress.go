@@ -3,7 +3,7 @@ package egressobs
 import (
 	"encoding/json"
 
-	"google.golang.org/protobuf/encoding/protojson"
+	"github.com/livekit/protocol/utils/protojson"
 
 	"github.com/pkg/errors"
 

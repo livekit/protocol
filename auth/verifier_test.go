@@ -18,7 +18,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/json"
+	"github.com/go-jose/go-jose/v3/jwt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/auth"
@@ -93,6 +95,51 @@ func TestVerifier(t *testing.T) {
 
 		require.EqualValues(t, string(md), decoded.Metadata)
 		require.EqualValues(t, attrs, decoded.Attributes)
+	})
+
+	t.Run("unknown fields are ignored for forward compatibility", func(t *testing.T) {
+		// Simulate a token issued by a newer client whose claims include fields
+		// this server does not yet know about. The server should still accept the
+		// token rather than failing with `unknown field`. This guards against
+		// requiring server upgrades before client upgrades can roll out.
+		sig, err := jose.NewSigner(
+			jose.SigningKey{Algorithm: jose.HS256, Key: []byte(secret)},
+			(&jose.SignerOptions{}).WithType("JWT"),
+		)
+		require.NoError(t, err)
+
+		claims := map[string]interface{}{
+			"iss": apiKey,
+			"sub": "me",
+			"nbf": jwt.NewNumericDate(time.Now()),
+			"exp": jwt.NewNumericDate(time.Now().Add(time.Minute)),
+			// unknown top-level claim grants field
+			"someFutureGrant": map[string]interface{}{"enabled": true},
+			"video": map[string]interface{}{
+				"roomJoin": true,
+				"room":     "myroom",
+				// unknown field inside a known grant
+				"someFutureVideoField": "future-value",
+			},
+			"roomConfig": map[string]interface{}{
+				"name": "myroom",
+				// unknown field inside a protojson-decoded message
+				"someFutureRoomConfigField": "future-value",
+			},
+		}
+		token, err := jwt.Signed(sig).Claims(claims).CompactSerialize()
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(token)
+		require.NoError(t, err)
+
+		_, decoded, err := v.Verify(secret)
+		require.NoError(t, err)
+		require.NotNil(t, decoded.Video)
+		require.Equal(t, "myroom", decoded.Video.Room)
+		require.True(t, decoded.Video.RoomJoin)
+		require.NotNil(t, decoded.RoomConfig)
+		require.Equal(t, "myroom", decoded.RoomConfig.Name)
 	})
 
 	t.Run("nil permissions are handled", func(t *testing.T) {

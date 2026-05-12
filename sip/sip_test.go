@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/dennwc/iters"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/stretchr/testify/require"
 
@@ -777,6 +778,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			Attributes: map[string]string{
 				"rule-attr": "1",
 			},
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
 		}
 		r := &rpc.EvaluateSIPDispatchRulesRequest{
 			SipCallId:     "call-id",
@@ -790,7 +792,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
 		res, err := EvaluateDispatchRule("p_123", tr, d, r)
 		require.NoError(t, err)
-		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		exp := &rpc.EvaluateSIPDispatchRulesResponse{
 			ProjectId:           "p_123",
 			Result:              rpc.SIPDispatchResult_ACCEPT,
 			SipTrunkId:          "trunk",
@@ -809,12 +811,21 @@ func TestEvaluateDispatchRule(t *testing.T) {
 				livekit.AttrSIPTrunkNumber:    "+3333",
 				livekit.AttrSIPHostName:       "sip.example.com",
 			},
-		}, res)
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+			Media: &livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		}
+		require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 
 		d.HidePhoneNumber = true
+		d.MediaEncryption = 0
+		d.Media = &livekit.SIPMediaConfig{
+			Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		}
 		res, err = EvaluateDispatchRule("p_123", tr, d, r)
 		require.NoError(t, err)
-		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		exp = &rpc.EvaluateSIPDispatchRulesResponse{
 			ProjectId:           "p_123",
 			Result:              rpc.SIPDispatchResult_ACCEPT,
 			SipTrunkId:          "trunk",
@@ -830,7 +841,12 @@ func TestEvaluateDispatchRule(t *testing.T) {
 				livekit.AttrSIPTrunkID:        "trunk",
 				livekit.AttrSIPDispatchRuleID: "rule",
 			},
-		}, res)
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
+			Media: &livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		}
+		require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 	})
 	t.Run("Individual", func(t *testing.T) {
 		t.Run("minimal", func(t *testing.T) {
@@ -915,6 +931,34 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			require.Empty(t, res.RoomName, "implementation does not set RoomName when returning REQUEST_PIN")
 		})
 	})
+}
+
+// Regression: trunk-level MediaEncryption must be honored when the dispatch rule specifies
+// neither MediaEncryption nor Media. A prior version called rule.Upgrade() at the top of
+// EvaluateDispatchRule, which pinned rule.Media.Encryption to rule.MediaEncryption (0)
+// before the trunk was consulted, causing the inbound trunk's encryption setting to be
+// silently dropped.
+func TestEvaluateDispatchRule_TrunkOnlyEncryption(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CallingHost:   "sip.example.com",
+		CalledNumber:  "+3333",
+	}
+	tr := &livekit.SIPInboundTrunkInfo{
+		SipTrunkId:      "trunk",
+		MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+	}
+	res, err := EvaluateDispatchRule("p_123", tr, d, r)
+	require.NoError(t, err)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, res.MediaEncryption)
+	require.NotNil(t, res.Media)
+	require.NotNil(t, res.Media.Encryption)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
 }
 
 func TestMatchIP(t *testing.T) {
