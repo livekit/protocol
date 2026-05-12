@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_948D42G = true
+const Version_AULSHIO = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -66,8 +66,6 @@ type sessionReporter interface {
 	ReportTranscoded(v bool)
 	ReportReusable(v bool)
 	ReportURL(v string)
-	ReportVideoEnabled(v bool)
-	ReportAudioEnabled(v bool)
 	ReportVideoOptions(v string)
 	ReportAudioOptions(v string)
 }
