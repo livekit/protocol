@@ -97,6 +97,11 @@ func (r *noopSessionReporter) ReportStatus(v SessionStatus)                     
 func (r *noopSessionReporter) ReportAudioOnly(v bool)                               {}
 func (r *noopSessionReporter) ReportTranscoded(v bool)                              {}
 func (r *noopSessionReporter) ReportReusable(v bool)                                {}
+func (r *noopSessionReporter) ReportURL(v string)                                   {}
+func (r *noopSessionReporter) ReportVideoEnabled(v bool)                            {}
+func (r *noopSessionReporter) ReportAudioEnabled(v bool)                            {}
+func (r *noopSessionReporter) ReportVideoOptions(v string)                          {}
+func (r *noopSessionReporter) ReportAudioOptions(v string)                          {}
 
 type noopSessionTx struct{}
 
@@ -117,3 +122,8 @@ func (t *noopSessionTx) ReportStatus(v SessionStatus)       {}
 func (t *noopSessionTx) ReportAudioOnly(v bool)             {}
 func (t *noopSessionTx) ReportTranscoded(v bool)            {}
 func (t *noopSessionTx) ReportReusable(v bool)              {}
+func (t *noopSessionTx) ReportURL(v string)                 {}
+func (t *noopSessionTx) ReportVideoEnabled(v bool)          {}
+func (t *noopSessionTx) ReportAudioEnabled(v bool)          {}
+func (t *noopSessionTx) ReportVideoOptions(v string)        {}
+func (t *noopSessionTx) ReportAudioOptions(v string)        {}
