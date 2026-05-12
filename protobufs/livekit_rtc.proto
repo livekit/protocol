@@ -63,6 +63,8 @@ message SignalRequest {
     UnpublishDataTrackRequest unpublish_data_track_request = 20;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 21;
+    // Get the definition for a known data track schema
+    ResolveDataTrackSchemaRequest resolve_data_track_schema = 22;
   }
 }
 
@@ -125,6 +127,8 @@ message SignalResponse {
     UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
     DataTrackSubscriberHandles data_track_subscriber_handles = 29;
+    // Sent in response to `ResolveDataTrackSchemaRequest`.
+    ResolveDataTrackSchemaResponse resolve_data_track_schema_response = 30;
   }
 }
 
@@ -189,7 +193,7 @@ message PublishDataTrackRequest {
   Encryption.Type encryption = 3;
 
   // Schema used by frames sent on this track. The track is untyped if not specified.
-  optional DataTrackSchemaDefinition schema = 4;
+  optional DataTrackSchemaDefinition schema_definition = 4;
 }
 
 message PublishDataTrackResponse {
@@ -298,6 +302,16 @@ message UpdateDataSubscription {
     DataTrackSubscriptionOptions options = 3;
   }
   repeated Update updates = 1;
+}
+
+message ResolveDataTrackSchemaRequest {
+  // ID of the schema to resolve.
+  DataTrackSchemaId schema_id = 1;
+}
+
+message ResolveDataTrackSchemaResponse {
+  // Definition of the requested schema.
+  DataTrackSchemaDefinition schema_definition = 1;
 }
 
 message UpdateTrackSettings {
@@ -579,6 +593,7 @@ message RequestResponse {
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
     UnpublishDataTrackRequest unpublish_data_track = 11;
+    ResolveDataTrackSchemaRequest resolve_data_track_schema = 12;
   }
 }
 

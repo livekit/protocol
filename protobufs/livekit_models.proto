@@ -284,7 +284,7 @@ message DataTrackInfo {
   Encryption.Type encryption = 4;
 
   // Schema used by frames sent on this track. The track is untyped if not specified.
-  optional DataTrackSchemaId schema = 5;
+  optional DataTrackSchemaId schema_id = 5;
 }
 
 message DataTrackSchemaId {
