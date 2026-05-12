@@ -283,7 +283,8 @@ message DataTrackInfo {
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
 
-  // Schema used by frames sent on this track. The track is untyped if not specified.
+  // ID of the schema used by frames on this track. If not specified, the track is untyped.
+  // Definition is stored out-of-band.
   optional DataTrackSchemaId schema_id = 5;
 }
 
