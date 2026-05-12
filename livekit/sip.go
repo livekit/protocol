@@ -1093,6 +1093,7 @@ func (p *SIPMediaConfig) Validate() error {
 		if dur < 0 {
 			return errors.New("media_timeout must not be negative")
 		}
+		// Zero means use default
 		if dur > MaxSIPMediaTimeout {
 			return fmt.Errorf("media_timeout must not exceed %v", MaxSIPMediaTimeout)
 		}
