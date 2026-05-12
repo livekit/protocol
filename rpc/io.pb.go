@@ -866,12 +866,12 @@ type EvaluateSIPDispatchRulesResponse struct {
 	// Room preset and config are used only to generate tokens
 	// once tokens are returned by this response consistently, it will no longer
 	// be needed
-	RoomPreset string                     `protobuf:"bytes,20,opt,name=room_preset,json=roomPreset,proto3" json:"room_preset,omitempty"`
-	RoomConfig *livekit.RoomConfiguration `protobuf:"bytes,21,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
-	// Deprecated: Marked as deprecated in rpc/io.proto.
+	RoomPreset      string                     `protobuf:"bytes,20,opt,name=room_preset,json=roomPreset,proto3" json:"room_preset,omitempty"`
+	RoomConfig      *livekit.RoomConfiguration `protobuf:"bytes,21,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
 	MediaEncryption livekit.SIPMediaEncryption `protobuf:"varint,22,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
-	Media           *livekit.SIPMediaConfig    `protobuf:"bytes,24,opt,name=media,proto3" json:"media,omitempty"`
 	FeatureFlags    map[string]string          `protobuf:"bytes,23,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Per-call RTP media timeout; if unset, SIP service defaults apply.
+	MediaTimeout    *durationpb.Duration `protobuf:"bytes,24,opt,name=media_timeout,json=mediaTimeout,proto3" json:"media_timeout,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1054,7 +1054,6 @@ func (x *EvaluateSIPDispatchRulesResponse) GetRoomConfig() *livekit.RoomConfigur
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/io.proto.
 func (x *EvaluateSIPDispatchRulesResponse) GetMediaEncryption() livekit.SIPMediaEncryption {
 	if x != nil {
 		return x.MediaEncryption
@@ -1062,16 +1061,16 @@ func (x *EvaluateSIPDispatchRulesResponse) GetMediaEncryption() livekit.SIPMedia
 	return livekit.SIPMediaEncryption(0)
 }
 
-func (x *EvaluateSIPDispatchRulesResponse) GetMedia() *livekit.SIPMediaConfig {
+func (x *EvaluateSIPDispatchRulesResponse) GetFeatureFlags() map[string]string {
 	if x != nil {
-		return x.Media
+		return x.FeatureFlags
 	}
 	return nil
 }
 
-func (x *EvaluateSIPDispatchRulesResponse) GetFeatureFlags() map[string]string {
+func (x *EvaluateSIPDispatchRulesResponse) GetMediaTimeout() *durationpb.Duration {
 	if x != nil {
-		return x.FeatureFlags
+		return x.MediaTimeout
 	}
 	return nil
 }

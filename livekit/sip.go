@@ -7,14 +7,34 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/utils/xtwirp"
 )
+
+// MaxSIPMediaTimeout is the maximum allowed trunk / API value for media_timeout
+// (no incoming RTP before the RTP path is torn down)
+const MaxSIPMediaTimeout = 10 * time.Minute
+
+func validateDuration(name string, d *durationpb.Duration, min, max *time.Duration) error {
+	if d == nil {
+		return nil
+	}
+	dur := d.AsDuration()
+	if min != nil && dur < *min {
+		return fmt.Errorf("%s must not be less than %v", name, *min)
+	}
+	if max != nil && dur > *max {
+		return fmt.Errorf("%s must not be greater than %v", name, *max)
+	}
+	return nil
+}
 
 var (
 	_ xtwirp.ErrorMeta = (*SIPStatus)(nil)
@@ -452,6 +472,10 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return err
 	}
+	timeout := MaxSIPMediaTimeout
+	if err := validateDuration("media_timeout", p.MediaTimeout, nil, &timeout); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -463,6 +487,10 @@ func (p *SIPInboundTrunkUpdate) Validate() error {
 		return err
 	}
 	if err := p.AllowedNumbers.Validate(); err != nil {
+		return err
+	}
+	timeout := MaxSIPMediaTimeout
+	if err := validateDuration("media_timeout", p.MediaTimeout, nil, &timeout); err != nil {
 		return err
 	}
 	return nil
@@ -480,6 +508,7 @@ func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
+	applyUpdatePtr(&info.MediaTimeout, p.MediaTimeout)
 	return info.Validate()
 }
 
@@ -541,6 +570,10 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return err
 	}
+	timeout := MaxSIPMediaTimeout
+	if err := validateDuration("media_timeout", p.MediaTimeout, nil, &timeout); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -560,11 +593,19 @@ func (p *SIPOutboundConfig) Validate() error {
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return err
 	}
+	timeout := MaxSIPMediaTimeout
+	if err := validateDuration("media_timeout", p.MediaTimeout, nil, &timeout); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (p *SIPOutboundTrunkUpdate) Validate() error {
 	if err := p.Numbers.Validate(); err != nil {
+		return err
+	}
+	timeout := MaxSIPMediaTimeout
+	if err := validateDuration("media_timeout", p.MediaTimeout, nil, &timeout); err != nil {
 		return err
 	}
 	return nil
@@ -584,6 +625,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	applyUpdate(&info.FromHost, p.FromHost)
+	applyUpdatePtr(&info.MediaTimeout, p.MediaTimeout)
 	return info.Validate()
 }
 

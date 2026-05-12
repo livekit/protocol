@@ -105,6 +105,8 @@ type InternalCreateSIPParticipantRequest struct {
 	Destination *livekit.Destination `protobuf:"bytes,32,opt,name=destination,proto3" json:"destination,omitempty"`
 	// Project-level feature flags from ProjectSettings.FeatureFlags
 	FeatureFlags  map[string]string `protobuf:"bytes,33,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Per-call RTP media timeout; if unset, SIP service defaults apply.
+	MediaTimeout  *durationpb.Duration `protobuf:"bytes,34,opt,name=media_timeout,json=mediaTimeout,proto3" json:"media_timeout,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -328,19 +330,11 @@ func (x *InternalCreateSIPParticipantRequest) GetMaxCallDuration() *durationpb.D
 	return nil
 }
 
-// Deprecated: Marked as deprecated in rpc/sip.proto.
 func (x *InternalCreateSIPParticipantRequest) GetMediaEncryption() livekit.SIPMediaEncryption {
 	if x != nil {
 		return x.MediaEncryption
 	}
 	return livekit.SIPMediaEncryption(0)
-}
-
-func (x *InternalCreateSIPParticipantRequest) GetMedia() *livekit.SIPMediaConfig {
-	if x != nil {
-		return x.Media
-	}
-	return nil
 }
 
 func (x *InternalCreateSIPParticipantRequest) GetWaitUntilAnswered() bool {
@@ -367,6 +361,13 @@ func (x *InternalCreateSIPParticipantRequest) GetDestination() *livekit.Destinat
 func (x *InternalCreateSIPParticipantRequest) GetFeatureFlags() map[string]string {
 	if x != nil {
 		return x.FeatureFlags
+	}
+	return nil
+}
+
+func (x *InternalCreateSIPParticipantRequest) GetMediaTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.MediaTimeout
 	}
 	return nil
 }

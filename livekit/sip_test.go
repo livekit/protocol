@@ -3,11 +3,13 @@ package livekit
 import (
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestSIPTrunkAs(t *testing.T) {
@@ -187,6 +189,64 @@ func TestSIPValidate(t *testing.T) {
 				Numbers: []string{"+2222"},
 				HeadersToAttributes: map[string]string{
 					"From ": "from",
+				},
+			},
+			exp: false,
+		},
+		{
+			name: "inbound media_timeout over max",
+			req: &SIPInboundTrunkInfo{
+				Numbers:      []string{"+1111"},
+				MediaTimeout: durationpb.New(20 * time.Minute),
+			},
+			exp: false,
+		},
+		{
+			name: "inbound media_timeout ok",
+			req: &SIPInboundTrunkInfo{
+				Numbers:      []string{"+1111"},
+				MediaTimeout: durationpb.New(5 * time.Minute),
+			},
+			exp: true,
+		},
+		{
+			name: "outbound media_timeout over max",
+			req: &SIPOutboundTrunkInfo{
+				Address:      "sip.example.com",
+				Numbers:      []string{"+2222"},
+				MediaTimeout: durationpb.New(20 * time.Minute),
+			},
+			exp: false,
+		},
+		{
+			name: "outbound media_timeout ok",
+			req: &SIPOutboundTrunkInfo{
+				Address:      "sip.example.com",
+				Numbers:      []string{"+2222"},
+				MediaTimeout: durationpb.New(5 * time.Minute),
+			},
+			exp: true,
+		},
+		{
+			name: "CreateSIPParticipantRequest media_timeout ok",
+			req: &CreateSIPParticipantRequest{
+				SipCallTo: "+3333",
+				RoomName:  "room",
+				Trunk: &SIPOutboundConfig{
+					MediaTimeout: durationpb.New(5 * time.Minute),
+					Hostname:     "sip.example.com",
+				},
+			},
+			exp: true,
+		},
+		{
+			name: "CreateSIPParticipantRequest media_timeout invalid",
+			req: &CreateSIPParticipantRequest{
+				SipCallTo: "+3333",
+				RoomName:  "room",
+				Trunk: &SIPOutboundConfig{
+					MediaTimeout: durationpb.New(20 * time.Minute),
+					Hostname:     "sip.example.com",
 				},
 			},
 			exp: false,
