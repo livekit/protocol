@@ -308,6 +308,8 @@ enum DataTrackSchemaFormat {
   DATA_TRACK_SCHEMA_FORMAT_OMG_IDL = 6;
   DATA_TRACK_SCHEMA_FORMAT_JSON_SCHEMA = 7;
 }
+// Mirrors the well-known schema encodings from the MCAP spec:
+// https://mcap.dev/spec/registry#schema-encodings
 
 enum DataTrackExtensionID {
   DTEI_INVALID = 0;
