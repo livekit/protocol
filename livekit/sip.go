@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
 	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
@@ -15,6 +16,10 @@ import (
 
 	"github.com/livekit/protocol/utils/xtwirp"
 )
+
+// MaxSIPMediaTimeout is the maximum allowed trunk / API value for media_timeout
+// (no incoming RTP before the RTP path is torn down)
+const MaxSIPMediaTimeout = 10 * time.Minute
 
 var (
 	_ xtwirp.ErrorMeta = (*SIPStatus)(nil)
@@ -686,11 +691,17 @@ func (p *SIPDispatchRuleInfo) Validate() error {
 	if p.Rule == nil {
 		return errors.New("missing rule")
 	}
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (p *SIPDispatchRuleUpdate) Validate() error {
 	if err := p.TrunkIds.Validate(); err != nil {
+		return err
+	}
+	if err := p.Media.Validate(); err != nil {
 		return err
 	}
 	return nil
@@ -702,7 +713,7 @@ func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
 	}
 	applyListUpdate(&info.TrunkIds, p.TrunkIds)
 	applyUpdatePtr(&info.Rule, p.Rule)
-	applyUpdatePtr(&info.Media, p.Media)
+	applyUpdatePtr(&info.Media, p.Media) // TODO: Consider applying partial updates
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
@@ -777,16 +788,16 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 			return fmt.Errorf("DisplayName must be a valid quoted string: %w", err)
 		}
 	}
-
 	// Validate destination if provided
 	if err := p.Destination.Validate(); err != nil {
 		return err
 	}
-
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
 	}
-
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1061,20 +1072,33 @@ func (p *CreateSIPParticipantRequest) Upgrade() {
 	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
 }
 
-func (p *SIPMediaConfig) Validate() error {
-	for _, c := range p.Codecs {
-		if err := c.Validate(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (p *SIPMediaEncryption) Deref() SIPMediaEncryption {
 	if p == nil {
 		return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
 	}
 	return *p
+}
+
+func (p *SIPMediaConfig) Validate() error {
+	if p == nil { // When optional, p can be nil
+		return nil
+	}
+	for _, c := range p.Codecs {
+		if err := c.Validate(); err != nil {
+			return err
+		}
+	}
+	if p.MediaTimeout != nil {
+		dur := p.MediaTimeout.AsDuration()
+		if dur < 0 {
+			return errors.New("media_timeout must not be negative")
+		}
+		// Zero means use default
+		if dur > MaxSIPMediaTimeout {
+			return fmt.Errorf("media_timeout must not exceed %v", MaxSIPMediaTimeout)
+		}
+	}
+	return nil
 }
 
 func (p *SIPMediaConfig) UpgradeWith(enc SIPMediaEncryption) *SIPMediaConfig {
