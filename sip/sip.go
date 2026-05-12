@@ -839,11 +839,9 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	sentPin := req.GetPin()
 
 	trunkID := req.SipTrunkId
-	if trunk != nil {
-		trunkID = trunk.SipTrunkId
-	}
 	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
 	if trunk != nil {
+		trunkID = trunk.SipTrunkId
 		enc = trunk.MediaEncryption
 	}
 	attrs := maps.Clone(rule.Attributes)
