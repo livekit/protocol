@@ -283,14 +283,58 @@ message DataTrackInfo {
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
 
-  // ID of the schema used by frames on this track. If not specified, the track is untyped.
-  // Definition is stored out-of-band.
-  optional DataTrackSchemaId schema_id = 5;
+  // Type information for this track. If unset, the track is untyped and frame payloads
+  // are treated as opaque bytes.
+  optional DataTrackTypeInfo type_info = 5;
 }
 
+// Encoding for frame payloads.
+//
+// Mirrors the well-known message encodings from the MCAP spec:
+// https://mcap.dev/spec/registry#message-encodings
+//
+enum DataTrackFrameEncoding {
+  DATA_TRACK_FRAME_ENCODING_UNSPECIFIED = 0;
+  DATA_TRACK_FRAME_ENCODING_ROS1 = 1;
+  DATA_TRACK_FRAME_ENCODING_CDR = 2;
+  DATA_TRACK_FRAME_ENCODING_PROTOBUF = 3;
+  DATA_TRACK_FRAME_ENCODING_FLATBUFFER = 4;
+  DATA_TRACK_FRAME_ENCODING_CBOR = 5;
+  DATA_TRACK_FRAME_ENCODING_MSGPACK = 6;
+  DATA_TRACK_FRAME_ENCODING_JSON = 7;
+}
+
+// Encoding for schema definitions.
+//
+// Mirrors the well-known schema encodings from the MCAP spec:
+// https://mcap.dev/spec/registry#schema-encodings
+//
+enum DataTrackSchemaEncoding {
+  DATA_TRACK_SCHEMA_ENCODING_UNSPECIFIED = 0;
+  DATA_TRACK_SCHEMA_ENCODING_PROTOBUF = 1;
+  DATA_TRACK_SCHEMA_ENCODING_FLATBUFFER = 2;
+  DATA_TRACK_SCHEMA_ENCODING_ROS1_MSG = 3;
+  DATA_TRACK_SCHEMA_ENCODING_ROS2_MSG = 4;
+  DATA_TRACK_SCHEMA_ENCODING_ROS2_IDL = 5;
+  DATA_TRACK_SCHEMA_ENCODING_OMG_IDL = 6;
+  DATA_TRACK_SCHEMA_ENCODING_JSON_SCHEMA = 7;
+}
+
+// Type information for a data track.
+message DataTrackTypeInfo {
+  DataTrackFrameEncoding frame_encoding = 1;
+
+  // ID of the schema used by frames on this track.
+  optional DataTrackSchemaId schema = 2;
+}
+
+// Identifier for a data track schema.
+//
+// Schemas with the same name but different encodings are distinct.
+//
 message DataTrackSchemaId {
   string name = 1;
-  DataTrackSchemaFormat format = 2;
+  DataTrackSchemaEncoding encoding = 2;
 }
 
 message DataTrackSchemaDefinition {
@@ -298,18 +342,14 @@ message DataTrackSchemaDefinition {
   bytes definition = 2;
 }
 
-enum DataTrackSchemaFormat {
-  DATA_TRACK_SCHEMA_FORMAT_UNSPECIFIED = 0;
-  DATA_TRACK_SCHEMA_FORMAT_PROTOBUF = 1;
-  DATA_TRACK_SCHEMA_FORMAT_FLATBUFFER = 2;
-  DATA_TRACK_SCHEMA_FORMAT_ROS1_MSG = 3;
-  DATA_TRACK_SCHEMA_FORMAT_ROS2_MSG = 4;
-  DATA_TRACK_SCHEMA_FORMAT_ROS2_IDL = 5;
-  DATA_TRACK_SCHEMA_FORMAT_OMG_IDL = 6;
-  DATA_TRACK_SCHEMA_FORMAT_JSON_SCHEMA = 7;
+// Type definition for a data track.
+message DataTrackTypeDefinition {
+  DataTrackFrameEncoding frame_encoding = 1;
+
+  // Schema definition for frames on this track. Must be compatible
+  // with the frame encoding, and may be omitted for self-describing frame encodings.
+  optional DataTrackSchemaDefinition schema = 2;
 }
-// Mirrors the well-known schema encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#schema-encodings
 
 enum DataTrackExtensionID {
   DTEI_INVALID = 0;
