@@ -340,6 +340,7 @@ message SIPInboundTrunkInfo {
   // May be empty to have no authentication.
   string auth_username = 7 [(logger.redact) = true];
   string auth_password = 8 [(logger.redact) = true];
+  string auth_realm = 19;
 
   // Include these SIP X-* headers in 200 OK responses.
   map<string, string> headers = 9 [
@@ -370,7 +371,7 @@ message SIPInboundTrunkInfo {
   google.protobuf.Timestamp created_at = 17;
   google.protobuf.Timestamp updated_at = 18;
 
-  // NEXT ID: 19
+  // NEXT ID: 20
 }
 
 message SIPInboundTrunkUpdate {
@@ -379,6 +380,7 @@ message SIPInboundTrunkUpdate {
   ListUpdate allowed_numbers = 3;
   optional string auth_username = 4 [(logger.redact) = true];
   optional string auth_password = 5 [(logger.redact) = true];
+  optional string auth_realm = 9;
   optional string name = 6;
   optional string metadata = 7 [
     (logger.redact) = true,

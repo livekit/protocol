@@ -482,6 +482,7 @@ func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
 	applyListUpdate(&info.AllowedNumbers, p.AllowedNumbers)
 	applyUpdate(&info.AuthUsername, p.AuthUsername)
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
+	applyUpdate(&info.AuthRealm, p.AuthRealm)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)

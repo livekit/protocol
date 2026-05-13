@@ -556,6 +556,7 @@ type GetSIPTrunkAuthenticationResponse struct {
 	// Expected username and password
 	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Realm    string `protobuf:"bytes,9,opt,name=realm,proto3" json:"realm,omitempty"`
 	Drop     bool   `protobuf:"varint,3,opt,name=drop,proto3" json:"drop,omitempty"`
 	// Trunk used to fulfill this request
 	SipTrunkId string `protobuf:"bytes,4,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
@@ -610,6 +611,13 @@ func (x *GetSIPTrunkAuthenticationResponse) GetUsername() string {
 func (x *GetSIPTrunkAuthenticationResponse) GetPassword() string {
 	if x != nil {
 		return x.Password
+	}
+	return ""
+}
+
+func (x *GetSIPTrunkAuthenticationResponse) GetRealm() string {
+	if x != nil {
+		return x.Realm
 	}
 	return ""
 }
@@ -1314,10 +1322,11 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\ato_host\x18\x05 \x01(\tB\x02\x18\x01R\x06toHost\x12#\n" +
 	"\vsrc_address\x18\x04 \x01(\tB\x02\x18\x01R\n" +
 	"srcAddress\x12 \n" +
-	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xb6\x04\n" +
+	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xcc\x04\n" +
 	"!GetSIPTrunkAuthenticationResponse\x12@\n" +
 	"\busername\x18\x01 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\busername\x12@\n" +
-	"\bpassword\x18\x02 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x12\n" +
+	"\bpassword\x18\x02 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x14\n" +
+	"\x05realm\x18\t \x01(\tR\x05realm\x12\x12\n" +
 	"\x04drop\x18\x03 \x01(\bR\x04drop\x12/\n" +
 	"\fsip_trunk_id\x18\x04 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
