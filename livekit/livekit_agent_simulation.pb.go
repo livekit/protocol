@@ -718,9 +718,10 @@ type SimulationRun_Job struct {
 	ScenarioId        string                   `protobuf:"bytes,9,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	StartedAt         *timestamppb.Timestamp   `protobuf:"bytes,10,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	EndedAt           *timestamppb.Timestamp   `protobuf:"bytes,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	RoomSessionId     string                   `protobuf:"bytes,12,opt,name=room_session_id,json=roomSessionId,proto3" json:"room_session_id,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// ID of the room session this job ran in. Empty until the room session has started.
+	RoomId        string `protobuf:"bytes,12,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Job) Reset() {
@@ -830,9 +831,9 @@ func (x *SimulationRun_Job) GetEndedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *SimulationRun_Job) GetRoomSessionId() string {
+func (x *SimulationRun_Job) GetRoomId() string {
 	if x != nil {
-		return x.RoomSessionId
+		return x.RoomId
 	}
 	return ""
 }
@@ -2844,7 +2845,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
-	"suggestion\"\xd2\x16\n" +
+	"suggestion\"\xc3\x16\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2864,7 +2865,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\tjob_count\x18\f \x01(\x05R\bjobCount\x12!\n" +
 	"\fpassed_count\x18\r \x01(\x05R\vpassedCount\x12!\n" +
 	"\ffailed_count\x18\x0e \x01(\x05R\vfailedCount\x12'\n" +
-	"\x0fnum_simulations\x18\x0f \x01(\x05R\x0enumSimulations\x1a\xac\x04\n" +
+	"\x0fnum_simulations\x18\x0f \x01(\x05R\x0enumSimulations\x1a\x9d\x04\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -2879,8 +2880,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12&\n" +
-	"\x0froom_session_id\x18\f \x01(\tR\rroomSessionId\"o\n" +
+	"\bended_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12\x17\n" +
+	"\aroom_id\x18\f \x01(\tR\x06roomId\"o\n" +
 	"\x06Status\x12\x12\n" +
 	"\x0eSTATUS_PENDING\x10\x00\x12\x12\n" +
 	"\x0eSTATUS_RUNNING\x10\x01\x12\x14\n" +

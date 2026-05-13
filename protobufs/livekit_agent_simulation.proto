@@ -68,7 +68,8 @@ message SimulationRun {
     string scenario_id = 9;
     google.protobuf.Timestamp started_at = 10;
     google.protobuf.Timestamp ended_at = 11;
-    string room_session_id = 12;
+    // ID of the room session this job ran in. Empty until the room session has started.
+    string room_id = 12;
   }
 
   message Create {
