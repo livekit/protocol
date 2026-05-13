@@ -166,7 +166,8 @@ func (r *noopParticipantSessionReporter) ReportDurationMinutes(v uint8)         
 func (r *noopParticipantSessionReporter) ReportKind(v string)                             {}
 func (r *noopParticipantSessionReporter) ReportName(v string)                             {}
 func (r *noopParticipantSessionReporter) ReportFeatures(v uint16)                         {}
-func (r *noopParticipantSessionReporter) ReportAttributes(v map[string]string)            {}
+func (r *noopParticipantSessionReporter) ReportCallID(v string)                           {}
+func (r *noopParticipantSessionReporter) ReportIngressID(v string)                        {}
 func (r *noopParticipantSessionReporter) WithTrack(id string) TrackReporter {
 	return &noopTrackReporter{}
 }
@@ -198,7 +199,8 @@ func (t *noopParticipantSessionTx) ReportDurationMinutes(v uint8)          {}
 func (t *noopParticipantSessionTx) ReportKind(v string)                    {}
 func (t *noopParticipantSessionTx) ReportName(v string)                    {}
 func (t *noopParticipantSessionTx) ReportFeatures(v uint16)                {}
-func (t *noopParticipantSessionTx) ReportAttributes(v map[string]string)   {}
+func (t *noopParticipantSessionTx) ReportCallID(v string)                  {}
+func (t *noopParticipantSessionTx) ReportIngressID(v string)               {}
 
 type noopTrackReporter struct{}
 
