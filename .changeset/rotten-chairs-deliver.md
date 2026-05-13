@@ -1,0 +1,5 @@
+---
+
+---
+
+Wire CanManageAgentSession through VideoGrant
