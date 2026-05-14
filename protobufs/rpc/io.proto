@@ -108,6 +108,7 @@ message GetSIPTrunkAuthenticationResponse {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  string realm = 9;
   bool drop = 3;
   // Trunk used to fulfill this request
   string sip_trunk_id = 4 [(logger.name) = "sipTrunkID"];

@@ -832,6 +832,21 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 	return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, "%s", err.Error()), err)
 }
 
+// InboundTrunkAuthPrompt creates a GetSIPTrunkAuthenticationResponse based on the SIPInboundTrunkInfo.
+func InboundTrunkAuthPrompt(trunk *livekit.SIPInboundTrunkInfo) (*rpc.GetSIPTrunkAuthenticationResponse, error) {
+	return &rpc.GetSIPTrunkAuthenticationResponse{
+		SipTrunkId: trunk.SipTrunkId,
+		Username:   trunk.AuthUsername,
+		Password:   trunk.AuthPassword,
+		Realm:      trunk.AuthRealm,
+		ProviderInfo: &livekit.ProviderInfo{
+			Id:   trunk.SipTrunkId,
+			Name: trunk.Name,
+			Type: livekit.ProviderType_PROVIDER_TYPE_EXTERNAL,
+		},
+	}, nil
+}
+
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
 	rule.Upgrade()
