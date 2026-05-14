@@ -192,8 +192,7 @@ message PublishDataTrackRequest {
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
 
-  // Type definition for this track. If unset, the track is untyped and frame payloads
-  // are treated as opaque bytes.
+  // Type definition for this track. If unset, the track is untyped.
   optional DataTrackTypeDefinition type_definition = 4;
 }
 

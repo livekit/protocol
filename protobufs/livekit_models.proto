@@ -283,8 +283,7 @@ message DataTrackInfo {
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
 
-  // Type information for this track. If unset, the track is untyped and frame payloads
-  // are treated as opaque bytes.
+  // Type information for this track. If unset, the track is untyped.
   optional DataTrackTypeInfo type_info = 5;
 }
 
