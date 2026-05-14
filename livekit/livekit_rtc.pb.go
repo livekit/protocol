@@ -230,18 +230,18 @@ func (LeaveRequest_Action) EnumDescriptor() ([]byte, []int) {
 type RequestResponse_Reason int32
 
 const (
-	RequestResponse_OK                 RequestResponse_Reason = 0
-	RequestResponse_NOT_FOUND          RequestResponse_Reason = 1
-	RequestResponse_NOT_ALLOWED        RequestResponse_Reason = 2
-	RequestResponse_LIMIT_EXCEEDED     RequestResponse_Reason = 3
-	RequestResponse_QUEUED             RequestResponse_Reason = 4
-	RequestResponse_UNSUPPORTED_TYPE   RequestResponse_Reason = 5
-	RequestResponse_UNCLASSIFIED_ERROR RequestResponse_Reason = 6
-	RequestResponse_INVALID_HANDLE     RequestResponse_Reason = 7
-	RequestResponse_INVALID_NAME       RequestResponse_Reason = 8
-	RequestResponse_DUPLICATE_HANDLE   RequestResponse_Reason = 9
-	RequestResponse_DUPLICATE_NAME     RequestResponse_Reason = 10
-	RequestResponse_INVALID_SCHEMA     RequestResponse_Reason = 11
+	RequestResponse_OK                      RequestResponse_Reason = 0
+	RequestResponse_NOT_FOUND               RequestResponse_Reason = 1
+	RequestResponse_NOT_ALLOWED             RequestResponse_Reason = 2
+	RequestResponse_LIMIT_EXCEEDED          RequestResponse_Reason = 3
+	RequestResponse_QUEUED                  RequestResponse_Reason = 4
+	RequestResponse_UNSUPPORTED_TYPE        RequestResponse_Reason = 5
+	RequestResponse_UNCLASSIFIED_ERROR      RequestResponse_Reason = 6
+	RequestResponse_INVALID_HANDLE          RequestResponse_Reason = 7
+	RequestResponse_INVALID_NAME            RequestResponse_Reason = 8
+	RequestResponse_DUPLICATE_HANDLE        RequestResponse_Reason = 9
+	RequestResponse_DUPLICATE_NAME          RequestResponse_Reason = 10
+	RequestResponse_INVALID_TYPE_DEFINITION RequestResponse_Reason = 11
 )
 
 // Enum value maps for RequestResponse_Reason.
@@ -258,21 +258,21 @@ var (
 		8:  "INVALID_NAME",
 		9:  "DUPLICATE_HANDLE",
 		10: "DUPLICATE_NAME",
-		11: "INVALID_SCHEMA",
+		11: "INVALID_TYPE_DEFINITION",
 	}
 	RequestResponse_Reason_value = map[string]int32{
-		"OK":                 0,
-		"NOT_FOUND":          1,
-		"NOT_ALLOWED":        2,
-		"LIMIT_EXCEEDED":     3,
-		"QUEUED":             4,
-		"UNSUPPORTED_TYPE":   5,
-		"UNCLASSIFIED_ERROR": 6,
-		"INVALID_HANDLE":     7,
-		"INVALID_NAME":       8,
-		"DUPLICATE_HANDLE":   9,
-		"DUPLICATE_NAME":     10,
-		"INVALID_SCHEMA":     11,
+		"OK":                      0,
+		"NOT_FOUND":               1,
+		"NOT_ALLOWED":             2,
+		"LIMIT_EXCEEDED":          3,
+		"QUEUED":                  4,
+		"UNSUPPORTED_TYPE":        5,
+		"UNCLASSIFIED_ERROR":      6,
+		"INVALID_HANDLE":          7,
+		"INVALID_NAME":            8,
+		"DUPLICATE_HANDLE":        9,
+		"DUPLICATE_NAME":          10,
+		"INVALID_TYPE_DEFINITION": 11,
 	}
 )
 
@@ -1571,8 +1571,7 @@ type PublishDataTrackRequest struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
 	Encryption Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
-	// Type definition for this track. If unset, the track is untyped and frame payloads
-	// are treated as opaque bytes.
+	// Type definition for this track. If unset, the track is untyped.
 	TypeDefinition *DataTrackTypeDefinition `protobuf:"bytes,4,opt,name=type_definition,json=typeDefinition,proto3,oneof" json:"type_definition,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -5487,7 +5486,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x92\b\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x9b\b\n" +
 	"\x0fRequestResponse\x12+\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x127\n" +
@@ -5502,7 +5501,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
 	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\x12W\n" +
-	"\x15get_data_track_schema\x18\f \x01(\v2\".livekit.GetDataTrackSchemaRequestH\x00R\x12getDataTrackSchema\"\xe2\x01\n" +
+	"\x15get_data_track_schema\x18\f \x01(\v2\".livekit.GetDataTrackSchemaRequestH\x00R\x12getDataTrackSchema\"\xeb\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5516,8 +5515,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\fINVALID_NAME\x10\b\x12\x14\n" +
 	"\x10DUPLICATE_HANDLE\x10\t\x12\x12\n" +
 	"\x0eDUPLICATE_NAME\x10\n" +
-	"\x12\x12\n" +
-	"\x0eINVALID_SCHEMA\x10\vB\t\n" +
+	"\x12\x1b\n" +
+	"\x17INVALID_TYPE_DEFINITION\x10\vB\t\n" +
 	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xc2\x02\n" +

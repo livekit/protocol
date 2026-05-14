@@ -356,13 +356,20 @@ type DataTrackFrameEncoding int32
 
 const (
 	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_UNSPECIFIED DataTrackFrameEncoding = 0
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_ROS1        DataTrackFrameEncoding = 1
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_CDR         DataTrackFrameEncoding = 2
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_PROTOBUF    DataTrackFrameEncoding = 3
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_FLATBUFFER  DataTrackFrameEncoding = 4
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_CBOR        DataTrackFrameEncoding = 5
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_MSGPACK     DataTrackFrameEncoding = 6
-	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_JSON        DataTrackFrameEncoding = 7
+	// ROS 1: must be described by `ROS1_MSG` schema encoding.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_ROS1 DataTrackFrameEncoding = 1
+	// CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_CDR DataTrackFrameEncoding = 2
+	// Protocol Buffer: must be described by `PROTOBUF` schema encoding.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_PROTOBUF DataTrackFrameEncoding = 3
+	// FlatBuffer: must be described by `FLATBUFFER` schema encoding.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_FLATBUFFER DataTrackFrameEncoding = 4
+	// CBOR: self-describing.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_CBOR DataTrackFrameEncoding = 5
+	// MessagePack: self-describing.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_MSGPACK DataTrackFrameEncoding = 6
+	// JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
+	DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_JSON DataTrackFrameEncoding = 7
 )
 
 // Enum value maps for DataTrackFrameEncoding.
@@ -424,12 +431,19 @@ type DataTrackSchemaEncoding int32
 
 const (
 	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_UNSPECIFIED DataTrackSchemaEncoding = 0
-	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_PROTOBUF    DataTrackSchemaEncoding = 1
-	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_FLATBUFFER  DataTrackSchemaEncoding = 2
-	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_ROS1_MSG    DataTrackSchemaEncoding = 3
-	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_ROS2_MSG    DataTrackSchemaEncoding = 4
-	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_ROS2_IDL    DataTrackSchemaEncoding = 5
-	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_OMG_IDL     DataTrackSchemaEncoding = 6
+	// Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
+	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_PROTOBUF DataTrackSchemaEncoding = 1
+	// FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
+	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_FLATBUFFER DataTrackSchemaEncoding = 2
+	// ROS 1 Message: describes `ROS1` frame encoding.
+	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_ROS1_MSG DataTrackSchemaEncoding = 3
+	// ROS 2 Message: describes `CDR` frame encoding.
+	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_ROS2_MSG DataTrackSchemaEncoding = 4
+	// ROS 2 IDL: describes `CDR` frame encoding.
+	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_ROS2_IDL DataTrackSchemaEncoding = 5
+	// OMG IDL: describes `CDR` frame encoding.
+	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_OMG_IDL DataTrackSchemaEncoding = 6
+	// JSON Schema: describes `JSON` frame encoding.
 	DataTrackSchemaEncoding_DATA_TRACK_SCHEMA_ENCODING_JSON_SCHEMA DataTrackSchemaEncoding = 7
 )
 
@@ -2661,8 +2675,7 @@ type DataTrackInfo struct {
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on packet payloads.
 	Encryption Encryption_Type `protobuf:"varint,4,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
-	// Type information for this track. If unset, the track is untyped and frame payloads
-	// are treated as opaque bytes.
+	// Type information for this track. If unset, the track is untyped.
 	TypeInfo      *DataTrackTypeInfo `protobuf:"bytes,5,opt,name=type_info,json=typeInfo,proto3,oneof" json:"type_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2791,7 +2804,8 @@ func (x *DataTrackTypeInfo) GetSchema() *DataTrackSchemaId {
 //
 // Schemas with the same name but different encodings are distinct.
 type DataTrackSchemaId struct {
-	state         protoimpl.MessageState  `protogen:"open.v1"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// This must be non-empty and no longer than 256 characters.
 	Name          string                  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Encoding      DataTrackSchemaEncoding `protobuf:"varint,2,opt,name=encoding,proto3,enum=livekit.DataTrackSchemaEncoding" json:"encoding,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -2843,9 +2857,10 @@ func (x *DataTrackSchemaId) GetEncoding() DataTrackSchemaEncoding {
 }
 
 type DataTrackSchemaDefinition struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            *DataTrackSchemaId     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Definition    []byte                 `protobuf:"bytes,2,opt,name=definition,proto3" json:"definition,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Id    *DataTrackSchemaId     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// This must not exceed 50 KB.
+	Definition    []byte `protobuf:"bytes,2,opt,name=definition,proto3" json:"definition,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -6705,11 +6720,11 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\a_schema\"e\n" +
 	"\x11DataTrackSchemaId\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12<\n" +
-	"\bencoding\x18\x02 \x01(\x0e2 .livekit.DataTrackSchemaEncodingR\bencoding\"g\n" +
+	"\bencoding\x18\x02 \x01(\x0e2 .livekit.DataTrackSchemaEncodingR\bencoding\"\x8d\x01\n" +
 	"\x19DataTrackSchemaDefinition\x12*\n" +
-	"\x02id\x18\x01 \x01(\v2\x1a.livekit.DataTrackSchemaIdR\x02id\x12\x1e\n" +
+	"\x02id\x18\x01 \x01(\v2\x1a.livekit.DataTrackSchemaIdR\x02id\x12D\n" +
 	"\n" +
-	"definition\x18\x02 \x01(\fR\n" +
+	"definition\x18\x02 \x01(\fB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\n" +
 	"definition\"\xad\x01\n" +
 	"\x17DataTrackTypeDefinition\x12F\n" +
 	"\x0eframe_encoding\x18\x01 \x01(\x0e2\x1f.livekit.DataTrackFrameEncodingR\rframeEncoding\x12?\n" +
