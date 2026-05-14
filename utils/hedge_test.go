@@ -89,6 +89,26 @@ func TestHedgeCall(t *testing.T) {
 		require.EqualValues(t, 2, attempts.Load())
 	})
 
+	t.Run("immediate retry when no requests in flight", func(t *testing.T) {
+		var attempts atomic.Uint32
+		start := time.Now()
+		res, err := HedgeCall(context.Background(), HedgeParams[uint32]{
+			Timeout:     1 * time.Second,
+			RetryDelay:  500 * time.Millisecond,
+			MaxAttempts: 2,
+			Func: func(context.Context) (uint32, error) {
+				n := attempts.Add(1)
+				if n == 1 {
+					return 0, errors.New("transient")
+				}
+				return n, nil
+			},
+		})
+		require.NoError(t, err)
+		require.EqualValues(t, 2, res)
+		require.Less(t, time.Since(start), 100*time.Millisecond)
+	})
+
 	t.Run("max failures", func(t *testing.T) {
 		var attempts atomic.Uint32
 		_, err := HedgeCall(context.Background(), HedgeParams[uint32]{
