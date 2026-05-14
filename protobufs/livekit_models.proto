@@ -294,12 +294,19 @@ message DataTrackInfo {
 //
 enum DataTrackFrameEncoding {
   DATA_TRACK_FRAME_ENCODING_UNSPECIFIED = 0;
+  // ROS 1: must be described by `ROS1_MSG` schema encoding.
   DATA_TRACK_FRAME_ENCODING_ROS1 = 1;
+  // CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
   DATA_TRACK_FRAME_ENCODING_CDR = 2;
+  // Protocol Buffer: must be described by `PROTOBUF` schema encoding.
   DATA_TRACK_FRAME_ENCODING_PROTOBUF = 3;
+  // FlatBuffer: must be described by `FLATBUFFER` schema encoding.
   DATA_TRACK_FRAME_ENCODING_FLATBUFFER = 4;
+  // CBOR: self-describing.
   DATA_TRACK_FRAME_ENCODING_CBOR = 5;
+  // MessagePack: self-describing.
   DATA_TRACK_FRAME_ENCODING_MSGPACK = 6;
+  // JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
   DATA_TRACK_FRAME_ENCODING_JSON = 7;
 }
 
@@ -310,12 +317,19 @@ enum DataTrackFrameEncoding {
 //
 enum DataTrackSchemaEncoding {
   DATA_TRACK_SCHEMA_ENCODING_UNSPECIFIED = 0;
+  // Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_PROTOBUF = 1;
+  // FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_FLATBUFFER = 2;
+  // ROS 1 Message: describes `ROS1` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_ROS1_MSG = 3;
+  // ROS 2 Message: describes `CDR` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_ROS2_MSG = 4;
+  // ROS 2 IDL: describes `CDR` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_ROS2_IDL = 5;
+  // OMG IDL: describes `CDR` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_OMG_IDL = 6;
+  // JSON Schema: describes `JSON` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_JSON_SCHEMA = 7;
 }
 
