@@ -339,7 +339,10 @@ message DataTrackSchemaId {
 
 message DataTrackSchemaDefinition {
   DataTrackSchemaId id = 1;
-  bytes definition = 2;
+  bytes definition = 2 [
+    (logger.redact) = true,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
 }
 
 // Type definition for a data track.
