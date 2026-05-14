@@ -332,12 +332,14 @@ message DataTrackTypeInfo {
 // Schemas with the same name but different encodings are distinct.
 //
 message DataTrackSchemaId {
+  // This must be non-empty and no longer than 256 characters.
   string name = 1;
   DataTrackSchemaEncoding encoding = 2;
 }
 
 message DataTrackSchemaDefinition {
   DataTrackSchemaId id = 1;
+  // This must not exceed 50 KB.
   bytes definition = 2 [
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
