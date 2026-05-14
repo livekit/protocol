@@ -1454,6 +1454,7 @@ type SIPInboundTrunkInfo struct {
 	// May be empty to have no authentication.
 	AuthUsername string `protobuf:"bytes,7,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	AuthPassword string `protobuf:"bytes,8,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
+	AuthRealm    string `protobuf:"bytes,19,opt,name=auth_realm,json=authRealm,proto3" json:"auth_realm,omitempty"`
 	// Include these SIP X-* headers in 200 OK responses.
 	Headers map[string]string `protobuf:"bytes,9,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Map SIP X-* headers from INVITE to SIP participant attributes.
@@ -1566,6 +1567,13 @@ func (x *SIPInboundTrunkInfo) GetAuthPassword() string {
 	return ""
 }
 
+func (x *SIPInboundTrunkInfo) GetAuthRealm() string {
+	if x != nil {
+		return x.AuthRealm
+	}
+	return ""
+}
+
 func (x *SIPInboundTrunkInfo) GetHeaders() map[string]string {
 	if x != nil {
 		return x.Headers
@@ -1643,6 +1651,7 @@ type SIPInboundTrunkUpdate struct {
 	AllowedNumbers   *ListUpdate            `protobuf:"bytes,3,opt,name=allowed_numbers,json=allowedNumbers,proto3" json:"allowed_numbers,omitempty"`
 	AuthUsername     *string                `protobuf:"bytes,4,opt,name=auth_username,json=authUsername,proto3,oneof" json:"auth_username,omitempty"`
 	AuthPassword     *string                `protobuf:"bytes,5,opt,name=auth_password,json=authPassword,proto3,oneof" json:"auth_password,omitempty"`
+	AuthRealm        *string                `protobuf:"bytes,9,opt,name=auth_realm,json=authRealm,proto3,oneof" json:"auth_realm,omitempty"`
 	Name             *string                `protobuf:"bytes,6,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Metadata         *string                `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
 	MediaEncryption  *SIPMediaEncryption    `protobuf:"varint,8,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
@@ -1711,6 +1720,13 @@ func (x *SIPInboundTrunkUpdate) GetAuthUsername() string {
 func (x *SIPInboundTrunkUpdate) GetAuthPassword() string {
 	if x != nil && x.AuthPassword != nil {
 		return *x.AuthPassword
+	}
+	return ""
+}
+
+func (x *SIPInboundTrunkUpdate) GetAuthRealm() string {
+	if x != nil && x.AuthRealm != nil {
+		return *x.AuthRealm
 	}
 	return ""
 }
@@ -4748,7 +4764,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x128\n" +
 	"\areplace\x18\x02 \x01(\v2\x1c.livekit.SIPInboundTrunkInfoH\x00R\areplace\x128\n" +
 	"\x06update\x18\x03 \x01(\v2\x1e.livekit.SIPInboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\x9f\n" +
+	"\x06action\"\xbe\n" +
 	"\n" +
 	"\x13SIPInboundTrunkInfo\x12/\n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tB\r\xbaP\n" +
@@ -4760,7 +4776,9 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x11allowed_addresses\x18\x05 \x03(\tR\x10allowedAddresses\x12'\n" +
 	"\x0fallowed_numbers\x18\x06 \x03(\tR\x0eallowedNumbers\x12(\n" +
 	"\rauth_username\x18\a \x01(\tB\x03\xa8P\x01R\fauthUsername\x12(\n" +
-	"\rauth_password\x18\b \x01(\tB\x03\xa8P\x01R\fauthPassword\x12i\n" +
+	"\rauth_password\x18\b \x01(\tB\x03\xa8P\x01R\fauthPassword\x12\x1d\n" +
+	"\n" +
+	"auth_realm\x18\x13 \x01(\tR\tauthRealm\x12i\n" +
 	"\aheaders\x18\t \x03(\v2).livekit.SIPInboundTrunkInfo.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12i\n" +
 	"\x15headers_to_attributes\x18\n" +
 	" \x03(\v25.livekit.SIPInboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12i\n" +
@@ -4782,18 +4800,21 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa0\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xd3\x04\n" +
 	"\x15SIPInboundTrunkUpdate\x12-\n" +
 	"\anumbers\x18\x01 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12@\n" +
 	"\x11allowed_addresses\x18\x02 \x01(\v2\x13.livekit.ListUpdateR\x10allowedAddresses\x12<\n" +
 	"\x0fallowed_numbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\x0eallowedNumbers\x12-\n" +
 	"\rauth_username\x18\x04 \x01(\tB\x03\xa8P\x01H\x00R\fauthUsername\x88\x01\x01\x12-\n" +
-	"\rauth_password\x18\x05 \x01(\tB\x03\xa8P\x01H\x01R\fauthPassword\x88\x01\x01\x12\x17\n" +
-	"\x04name\x18\x06 \x01(\tH\x02R\x04name\x88\x01\x01\x12E\n" +
-	"\bmetadata\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x03R\bmetadata\x88\x01\x01\x12K\n" +
-	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x04R\x0fmediaEncryption\x88\x01\x01B\x10\n" +
+	"\rauth_password\x18\x05 \x01(\tB\x03\xa8P\x01H\x01R\fauthPassword\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"auth_realm\x18\t \x01(\tH\x02R\tauthRealm\x88\x01\x01\x12\x17\n" +
+	"\x04name\x18\x06 \x01(\tH\x03R\x04name\x88\x01\x01\x12E\n" +
+	"\bmetadata\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x04R\bmetadata\x88\x01\x01\x12K\n" +
+	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x05R\x0fmediaEncryption\x88\x01\x01B\x10\n" +
 	"\x0e_auth_usernameB\x10\n" +
-	"\x0e_auth_passwordB\a\n" +
+	"\x0e_auth_passwordB\r\n" +
+	"\v_auth_realmB\a\n" +
 	"\x05_nameB\v\n" +
 	"\t_metadataB\x13\n" +
 	"\x11_media_encryption\"T\n" +
