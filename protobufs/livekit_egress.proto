@@ -334,10 +334,14 @@ message ListEgressRequest {
   string room_name = 1;                               // (optional, filter by room name)
   string egress_id = 2 [(logger.name) = "egressID"];  // (optional, filter by egress ID)
   bool active = 3;                                    // (optional, list active egress only)
+  TokenPagination page_token = 4;
+  // next field id: 5
 }
 
 message ListEgressResponse {
   repeated EgressInfo items = 1;
+  TokenPagination next_page_token = 2;
+  // next field id: 3
 }
 
 message UpdateEgressRequest {
