@@ -5,5 +5,3 @@ packages:
 minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - "@livekit/*"
-  # Renovate security update: minimatch@10.2.3
-  - minimatch@10.2.3
