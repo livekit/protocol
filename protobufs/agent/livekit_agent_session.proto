@@ -163,12 +163,19 @@ message InterruptionModelUsage {
   int32 total_requests = 3;
 }
 
+message EotModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 total_requests = 3;
+}
+
 message ModelUsage {
   oneof usage {
     LLMModelUsage llm = 1;
     TTSModelUsage tts = 2;
     STTModelUsage stt = 3;
     InterruptionModelUsage interruption = 4;
+    EotModelUsage eot = 5;
   }
 }
 
@@ -221,6 +228,13 @@ message AgentSessionEvent {
     google.protobuf.Duration delay = 5;
   }
 
+  message EotPrediction {
+    float probability = 1;
+    float threshold = 2;
+    google.protobuf.Duration inference_duration = 3;
+    google.protobuf.Duration delay = 4;
+  }
+
   message SessionUsageUpdated {
     AgentSessionUsage usage = 1;
   }
@@ -236,6 +250,7 @@ message AgentSessionEvent {
     OverlappingSpeech overlapping_speech = 16;
     SessionUsageUpdated session_usage_updated = 17;
     AmdPrediction amd_prediction = 18;
+    EotPrediction eot_prediction = 19;
   }
 }
 
