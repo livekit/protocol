@@ -63,8 +63,10 @@ message SignalRequest {
     UnpublishDataTrackRequest unpublish_data_track_request = 20;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 21;
-    // Get the definition for a known data track schema
-    GetDataTrackSchemaRequest get_data_track_schema = 22;
+    // Define a data track schema.
+    DefineDataTrackSchemaRequest define_data_track_schema = 22;
+    // Get the definition for a defined data track schema.
+    GetDataTrackSchemaRequest get_data_track_schema = 23;
   }
 }
 
@@ -192,8 +194,9 @@ message PublishDataTrackRequest {
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
 
-  // Type definition for this track. If unset, the track is untyped.
-  optional DataTrackTypeDefinition type_definition = 4;
+  // Type info for this track if the track is typed.
+  // If set, the type must be defined via `DefineDataTrackSchemaRequest`.
+  optional DataTrackTypeInfo type_info = 4;
 }
 
 message PublishDataTrackResponse {
@@ -304,8 +307,13 @@ message UpdateDataSubscription {
   repeated Update updates = 1;
 }
 
+message DefineDataTrackSchemaRequest {
+  // Schema to define.
+  DataTrackSchemaDefinition schema_definition = 1;
+}
+
 message GetDataTrackSchemaRequest {
-  // ID of the schema to get.
+  // ID of the schema to get the definition for.
   DataTrackSchemaId schema_id = 1;
 }
 
