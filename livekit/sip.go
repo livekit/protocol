@@ -15,6 +15,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/utils/xtwirp"
+	"github.com/livekit/psrpc"
 )
 
 // MaxSIPMediaTimeout is the maximum allowed trunk / API value for media_timeout
@@ -136,11 +137,11 @@ func (p *SIPStatus) GRPCStatus() *status.Status {
 			code = codes.Unknown // 1xx are not final responses, something is wrong.
 		} else if p.Code < 300 {
 			return status.New(codes.OK, "OK") // Preserving previous behavior
-		} else if code < 500 {
+		} else if p.Code < 500 {
 			code = codes.InvalidArgument
-		} else if code < 600 {
+		} else if p.Code < 600 {
 			code = codes.FailedPrecondition // 5xx from remote server, per guideline (c) in gRPC docs
-		} else if code < 700 {
+		} else if p.Code < 700 {
 			code = codes.InvalidArgument // Same as 4xx ,but authoritative
 		}
 	}
@@ -446,7 +447,7 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	hasCIDR := len(p.AllowedAddresses) != 0
 	hasNumbers := len(p.Numbers) != 0 // TODO: remove this condition, it doesn't really help with security
 	if !hasAuth && !hasCIDR && !hasNumbers {
-		return errors.New("for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
+		return psrpc.NewErrorf(psrpc.InvalidArgument, "for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
