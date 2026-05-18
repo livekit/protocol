@@ -35,6 +35,7 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
+	"github.com/livekit/psrpc"
 )
 
 //go:generate stringer -type TrunkFilteredReason -trimprefix TrunkFiltered
@@ -273,7 +274,7 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	// TODO: Could probably add methods on SIPDispatchRuleInfo struct instead.
 	switch rule := info.GetRule().GetRule().(type) {
 	default:
-		return "", "", fmt.Errorf("Unsupported SIP Dispatch Rule: %T", rule) //nolint:staticcheck // part of public API
+		return "", "", psrpc.NewErrorf(psrpc.InvalidArgument, "unsupported SIP Dispatch Rule: %T", rule)
 	case *livekit.SIPDispatchRule_DispatchRuleDirect:
 		pin = rule.DispatchRuleDirect.GetPin()
 		room = rule.DispatchRuleDirect.GetRoomName()
