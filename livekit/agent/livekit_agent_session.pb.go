@@ -1704,6 +1704,7 @@ type SessionRequest struct {
 	//	*SessionRequest_GetRtcStats
 	//	*SessionRequest_GetSessionUsage_
 	//	*SessionRequest_GetFrameworkInfo_
+	//	*SessionRequest_UpdateIo
 	Request       isSessionRequest_Request `protobuf_oneof:"request"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1825,6 +1826,15 @@ func (x *SessionRequest) GetGetFrameworkInfo() *SessionRequest_GetFrameworkInfo 
 	return nil
 }
 
+func (x *SessionRequest) GetUpdateIo() *SessionRequest_UpdateIO {
+	if x != nil {
+		if x, ok := x.Request.(*SessionRequest_UpdateIo); ok {
+			return x.UpdateIo
+		}
+	}
+	return nil
+}
+
 type isSessionRequest_Request interface {
 	isSessionRequest_Request()
 }
@@ -1861,6 +1871,10 @@ type SessionRequest_GetFrameworkInfo_ struct {
 	GetFrameworkInfo *SessionRequest_GetFrameworkInfo `protobuf:"bytes,10,opt,name=get_framework_info,json=getFrameworkInfo,proto3,oneof"`
 }
 
+type SessionRequest_UpdateIo struct {
+	UpdateIo *SessionRequest_UpdateIO `protobuf:"bytes,11,opt,name=update_io,json=updateIo,proto3,oneof"`
+}
+
 func (*SessionRequest_Ping_) isSessionRequest_Request() {}
 
 func (*SessionRequest_GetChatHistory_) isSessionRequest_Request() {}
@@ -1877,6 +1891,8 @@ func (*SessionRequest_GetSessionUsage_) isSessionRequest_Request() {}
 
 func (*SessionRequest_GetFrameworkInfo_) isSessionRequest_Request() {}
 
+func (*SessionRequest_UpdateIo) isSessionRequest_Request() {}
+
 type SessionResponse struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	RequestId string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
@@ -1891,6 +1907,7 @@ type SessionResponse struct {
 	//	*SessionResponse_GetRtcStats
 	//	*SessionResponse_GetSessionUsage
 	//	*SessionResponse_GetFrameworkInfo
+	//	*SessionResponse_UpdateIo
 	Response      isSessionResponse_Response `protobuf_oneof:"response"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2019,6 +2036,15 @@ func (x *SessionResponse) GetGetFrameworkInfo() *SessionResponse_GetFrameworkInf
 	return nil
 }
 
+func (x *SessionResponse) GetUpdateIo() *SessionResponse_UpdateIOResponse {
+	if x != nil {
+		if x, ok := x.Response.(*SessionResponse_UpdateIo); ok {
+			return x.UpdateIo
+		}
+	}
+	return nil
+}
+
 type isSessionResponse_Response interface {
 	isSessionResponse_Response()
 }
@@ -2055,6 +2081,10 @@ type SessionResponse_GetFrameworkInfo struct {
 	GetFrameworkInfo *SessionResponse_GetFrameworkInfoResponse `protobuf:"bytes,11,opt,name=get_framework_info,json=getFrameworkInfo,proto3,oneof"`
 }
 
+type SessionResponse_UpdateIo struct {
+	UpdateIo *SessionResponse_UpdateIOResponse `protobuf:"bytes,12,opt,name=update_io,json=updateIo,proto3,oneof"`
+}
+
 func (*SessionResponse_Pong_) isSessionResponse_Response() {}
 
 func (*SessionResponse_GetChatHistory) isSessionResponse_Response() {}
@@ -2070,6 +2100,8 @@ func (*SessionResponse_GetRtcStats) isSessionResponse_Response() {}
 func (*SessionResponse_GetSessionUsage) isSessionResponse_Response() {}
 
 func (*SessionResponse_GetFrameworkInfo) isSessionResponse_Response() {}
+
+func (*SessionResponse_UpdateIo) isSessionResponse_Response() {}
 
 type AgentSessionMessage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -3301,6 +3333,170 @@ func (*SessionRequest_GetFrameworkInfo) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{16, 7}
 }
 
+type SessionRequest_UpdateIO struct {
+	state         protoimpl.MessageState          `protogen:"open.v1"`
+	Input         *SessionRequest_UpdateIO_Input  `protobuf:"bytes,1,opt,name=input,proto3,oneof" json:"input,omitempty"`
+	Output        *SessionRequest_UpdateIO_Output `protobuf:"bytes,2,opt,name=output,proto3,oneof" json:"output,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SessionRequest_UpdateIO) Reset() {
+	*x = SessionRequest_UpdateIO{}
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionRequest_UpdateIO) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionRequest_UpdateIO) ProtoMessage() {}
+
+func (x *SessionRequest_UpdateIO) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionRequest_UpdateIO.ProtoReflect.Descriptor instead.
+func (*SessionRequest_UpdateIO) Descriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{16, 8}
+}
+
+func (x *SessionRequest_UpdateIO) GetInput() *SessionRequest_UpdateIO_Input {
+	if x != nil {
+		return x.Input
+	}
+	return nil
+}
+
+func (x *SessionRequest_UpdateIO) GetOutput() *SessionRequest_UpdateIO_Output {
+	if x != nil {
+		return x.Output
+	}
+	return nil
+}
+
+type SessionRequest_UpdateIO_Input struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AudioEnabled  *bool                  `protobuf:"varint,1,opt,name=audio_enabled,json=audioEnabled,proto3,oneof" json:"audio_enabled,omitempty"`
+	VideoEnabled  *bool                  `protobuf:"varint,2,opt,name=video_enabled,json=videoEnabled,proto3,oneof" json:"video_enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SessionRequest_UpdateIO_Input) Reset() {
+	*x = SessionRequest_UpdateIO_Input{}
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionRequest_UpdateIO_Input) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionRequest_UpdateIO_Input) ProtoMessage() {}
+
+func (x *SessionRequest_UpdateIO_Input) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionRequest_UpdateIO_Input.ProtoReflect.Descriptor instead.
+func (*SessionRequest_UpdateIO_Input) Descriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{16, 8, 0}
+}
+
+func (x *SessionRequest_UpdateIO_Input) GetAudioEnabled() bool {
+	if x != nil && x.AudioEnabled != nil {
+		return *x.AudioEnabled
+	}
+	return false
+}
+
+func (x *SessionRequest_UpdateIO_Input) GetVideoEnabled() bool {
+	if x != nil && x.VideoEnabled != nil {
+		return *x.VideoEnabled
+	}
+	return false
+}
+
+type SessionRequest_UpdateIO_Output struct {
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	AudioEnabled         *bool                  `protobuf:"varint,1,opt,name=audio_enabled,json=audioEnabled,proto3,oneof" json:"audio_enabled,omitempty"`
+	VideoEnabled         *bool                  `protobuf:"varint,2,opt,name=video_enabled,json=videoEnabled,proto3,oneof" json:"video_enabled,omitempty"`
+	TranscriptionEnabled *bool                  `protobuf:"varint,3,opt,name=transcription_enabled,json=transcriptionEnabled,proto3,oneof" json:"transcription_enabled,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
+}
+
+func (x *SessionRequest_UpdateIO_Output) Reset() {
+	*x = SessionRequest_UpdateIO_Output{}
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionRequest_UpdateIO_Output) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionRequest_UpdateIO_Output) ProtoMessage() {}
+
+func (x *SessionRequest_UpdateIO_Output) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionRequest_UpdateIO_Output.ProtoReflect.Descriptor instead.
+func (*SessionRequest_UpdateIO_Output) Descriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{16, 8, 1}
+}
+
+func (x *SessionRequest_UpdateIO_Output) GetAudioEnabled() bool {
+	if x != nil && x.AudioEnabled != nil {
+		return *x.AudioEnabled
+	}
+	return false
+}
+
+func (x *SessionRequest_UpdateIO_Output) GetVideoEnabled() bool {
+	if x != nil && x.VideoEnabled != nil {
+		return *x.VideoEnabled
+	}
+	return false
+}
+
+func (x *SessionRequest_UpdateIO_Output) GetTranscriptionEnabled() bool {
+	if x != nil && x.TranscriptionEnabled != nil {
+		return *x.TranscriptionEnabled
+	}
+	return false
+}
+
 type SessionResponse_Pong struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -3309,7 +3505,7 @@ type SessionResponse_Pong struct {
 
 func (x *SessionResponse_Pong) Reset() {
 	*x = SessionResponse_Pong{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[40]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3321,7 +3517,7 @@ func (x *SessionResponse_Pong) String() string {
 func (*SessionResponse_Pong) ProtoMessage() {}
 
 func (x *SessionResponse_Pong) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[40]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3346,7 +3542,7 @@ type SessionResponse_GetChatHistoryResponse struct {
 
 func (x *SessionResponse_GetChatHistoryResponse) Reset() {
 	*x = SessionResponse_GetChatHistoryResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[41]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3358,7 +3554,7 @@ func (x *SessionResponse_GetChatHistoryResponse) String() string {
 func (*SessionResponse_GetChatHistoryResponse) ProtoMessage() {}
 
 func (x *SessionResponse_GetChatHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[41]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3393,7 +3589,7 @@ type SessionResponse_GetAgentInfoResponse struct {
 
 func (x *SessionResponse_GetAgentInfoResponse) Reset() {
 	*x = SessionResponse_GetAgentInfoResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[42]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3405,7 +3601,7 @@ func (x *SessionResponse_GetAgentInfoResponse) String() string {
 func (*SessionResponse_GetAgentInfoResponse) ProtoMessage() {}
 
 func (x *SessionResponse_GetAgentInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[42]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3458,7 +3654,7 @@ type SessionResponse_RunInputResponse struct {
 
 func (x *SessionResponse_RunInputResponse) Reset() {
 	*x = SessionResponse_RunInputResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[43]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3470,7 +3666,7 @@ func (x *SessionResponse_RunInputResponse) String() string {
 func (*SessionResponse_RunInputResponse) ProtoMessage() {}
 
 func (x *SessionResponse_RunInputResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[43]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3506,7 +3702,7 @@ type SessionResponse_GetSessionStateResponse struct {
 
 func (x *SessionResponse_GetSessionStateResponse) Reset() {
 	*x = SessionResponse_GetSessionStateResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[44]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3518,7 +3714,7 @@ func (x *SessionResponse_GetSessionStateResponse) String() string {
 func (*SessionResponse_GetSessionStateResponse) ProtoMessage() {}
 
 func (x *SessionResponse_GetSessionStateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[44]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3579,7 +3775,7 @@ type SessionResponse_GetRTCStatsResponse struct {
 
 func (x *SessionResponse_GetRTCStatsResponse) Reset() {
 	*x = SessionResponse_GetRTCStatsResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[45]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3591,7 +3787,7 @@ func (x *SessionResponse_GetRTCStatsResponse) String() string {
 func (*SessionResponse_GetRTCStatsResponse) ProtoMessage() {}
 
 func (x *SessionResponse_GetRTCStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[45]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3631,7 +3827,7 @@ type SessionResponse_GetSessionUsageResponse struct {
 
 func (x *SessionResponse_GetSessionUsageResponse) Reset() {
 	*x = SessionResponse_GetSessionUsageResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[46]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3643,7 +3839,7 @@ func (x *SessionResponse_GetSessionUsageResponse) String() string {
 func (*SessionResponse_GetSessionUsageResponse) ProtoMessage() {}
 
 func (x *SessionResponse_GetSessionUsageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[46]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3683,7 +3879,7 @@ type SessionResponse_GetFrameworkInfoResponse struct {
 
 func (x *SessionResponse_GetFrameworkInfoResponse) Reset() {
 	*x = SessionResponse_GetFrameworkInfoResponse{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[47]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3695,7 +3891,7 @@ func (x *SessionResponse_GetFrameworkInfoResponse) String() string {
 func (*SessionResponse_GetFrameworkInfoResponse) ProtoMessage() {}
 
 func (x *SessionResponse_GetFrameworkInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[47]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3725,6 +3921,42 @@ func (x *SessionResponse_GetFrameworkInfoResponse) GetSdkVersion() string {
 	return ""
 }
 
+type SessionResponse_UpdateIOResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SessionResponse_UpdateIOResponse) Reset() {
+	*x = SessionResponse_UpdateIOResponse{}
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionResponse_UpdateIOResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionResponse_UpdateIOResponse) ProtoMessage() {}
+
+func (x *SessionResponse_UpdateIOResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionResponse_UpdateIOResponse.ProtoReflect.Descriptor instead.
+func (*SessionResponse_UpdateIOResponse) Descriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{17, 8}
+}
+
 type AgentSessionMessage_ConsoleIO struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -3733,7 +3965,7 @@ type AgentSessionMessage_ConsoleIO struct {
 
 func (x *AgentSessionMessage_ConsoleIO) Reset() {
 	*x = AgentSessionMessage_ConsoleIO{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[49]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3745,7 +3977,7 @@ func (x *AgentSessionMessage_ConsoleIO) String() string {
 func (*AgentSessionMessage_ConsoleIO) ProtoMessage() {}
 
 func (x *AgentSessionMessage_ConsoleIO) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[49]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3773,7 +4005,7 @@ type AgentSessionMessage_ConsoleIO_AudioFrame struct {
 
 func (x *AgentSessionMessage_ConsoleIO_AudioFrame) Reset() {
 	*x = AgentSessionMessage_ConsoleIO_AudioFrame{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[50]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3785,7 +4017,7 @@ func (x *AgentSessionMessage_ConsoleIO_AudioFrame) String() string {
 func (*AgentSessionMessage_ConsoleIO_AudioFrame) ProtoMessage() {}
 
 func (x *AgentSessionMessage_ConsoleIO_AudioFrame) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[50]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3837,7 +4069,7 @@ type AgentSessionMessage_ConsoleIO_AudioPlaybackFlush struct {
 
 func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackFlush) Reset() {
 	*x = AgentSessionMessage_ConsoleIO_AudioPlaybackFlush{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[51]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3849,7 +4081,7 @@ func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackFlush) String() string {
 func (*AgentSessionMessage_ConsoleIO_AudioPlaybackFlush) ProtoMessage() {}
 
 func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackFlush) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[51]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3873,7 +4105,7 @@ type AgentSessionMessage_ConsoleIO_AudioPlaybackClear struct {
 
 func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackClear) Reset() {
 	*x = AgentSessionMessage_ConsoleIO_AudioPlaybackClear{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[52]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3885,7 +4117,7 @@ func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackClear) String() string {
 func (*AgentSessionMessage_ConsoleIO_AudioPlaybackClear) ProtoMessage() {}
 
 func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackClear) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[52]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3909,7 +4141,7 @@ type AgentSessionMessage_ConsoleIO_AudioPlaybackFinished struct {
 
 func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackFinished) Reset() {
 	*x = AgentSessionMessage_ConsoleIO_AudioPlaybackFinished{}
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[53]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3921,7 +4153,7 @@ func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackFinished) String() string {
 func (*AgentSessionMessage_ConsoleIO_AudioPlaybackFinished) ProtoMessage() {}
 
 func (x *AgentSessionMessage_ConsoleIO_AudioPlaybackFinished) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_proto_msgTypes[53]
+	mi := &file_agent_livekit_agent_session_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4140,7 +4372,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x05delay\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\x05delay\x1aM\n" +
 	"\x13SessionUsageUpdated\x126\n" +
 	"\x05usage\x18\x01 \x01(\v2 .livekit.agent.AgentSessionUsageR\x05usageB\a\n" +
-	"\x05event\"\xe7\x06\n" +
+	"\x05event\"\xbd\v\n" +
 	"\x0eSessionRequest\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x128\n" +
@@ -4152,7 +4384,8 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\rget_rtc_stats\x18\b \x01(\v2).livekit.agent.SessionRequest.GetRTCStatsH\x00R\vgetRtcStats\x12[\n" +
 	"\x11get_session_usage\x18\t \x01(\v2-.livekit.agent.SessionRequest.GetSessionUsageH\x00R\x0fgetSessionUsage\x12^\n" +
 	"\x12get_framework_info\x18\n" +
-	" \x01(\v2..livekit.agent.SessionRequest.GetFrameworkInfoH\x00R\x10getFrameworkInfo\x1a\x06\n" +
+	" \x01(\v2..livekit.agent.SessionRequest.GetFrameworkInfoH\x00R\x10getFrameworkInfo\x12E\n" +
+	"\tupdate_io\x18\v \x01(\v2&.livekit.agent.SessionRequest.UpdateIOH\x00R\bupdateIo\x1a\x06\n" +
 	"\x04Ping\x1a\x10\n" +
 	"\x0eGetChatHistory\x1a\x1e\n" +
 	"\bRunInput\x12\x12\n" +
@@ -4161,8 +4394,25 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x0fGetSessionState\x1a\r\n" +
 	"\vGetRTCStats\x1a\x11\n" +
 	"\x0fGetSessionUsage\x1a\x12\n" +
-	"\x10GetFrameworkInfoB\t\n" +
-	"\arequest\"\x9e\x0f\n" +
+	"\x10GetFrameworkInfo\x1a\x8c\x04\n" +
+	"\bUpdateIO\x12G\n" +
+	"\x05input\x18\x01 \x01(\v2,.livekit.agent.SessionRequest.UpdateIO.InputH\x00R\x05input\x88\x01\x01\x12J\n" +
+	"\x06output\x18\x02 \x01(\v2-.livekit.agent.SessionRequest.UpdateIO.OutputH\x01R\x06output\x88\x01\x01\x1a\x7f\n" +
+	"\x05Input\x12(\n" +
+	"\raudio_enabled\x18\x01 \x01(\bH\x00R\faudioEnabled\x88\x01\x01\x12(\n" +
+	"\rvideo_enabled\x18\x02 \x01(\bH\x01R\fvideoEnabled\x88\x01\x01B\x10\n" +
+	"\x0e_audio_enabledB\x10\n" +
+	"\x0e_video_enabled\x1a\xd4\x01\n" +
+	"\x06Output\x12(\n" +
+	"\raudio_enabled\x18\x01 \x01(\bH\x00R\faudioEnabled\x88\x01\x01\x12(\n" +
+	"\rvideo_enabled\x18\x02 \x01(\bH\x01R\fvideoEnabled\x88\x01\x01\x128\n" +
+	"\x15transcription_enabled\x18\x03 \x01(\bH\x02R\x14transcriptionEnabled\x88\x01\x01B\x10\n" +
+	"\x0e_audio_enabledB\x10\n" +
+	"\x0e_video_enabledB\x18\n" +
+	"\x16_transcription_enabledB\b\n" +
+	"\x06_inputB\t\n" +
+	"\a_outputB\t\n" +
+	"\arequest\"\x82\x10\n" +
 	"\x0fSessionResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x19\n" +
@@ -4175,7 +4425,8 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\rget_rtc_stats\x18\t \x01(\v22.livekit.agent.SessionResponse.GetRTCStatsResponseH\x00R\vgetRtcStats\x12d\n" +
 	"\x11get_session_usage\x18\n" +
 	" \x01(\v26.livekit.agent.SessionResponse.GetSessionUsageResponseH\x00R\x0fgetSessionUsage\x12g\n" +
-	"\x12get_framework_info\x18\v \x01(\v27.livekit.agent.SessionResponse.GetFrameworkInfoResponseH\x00R\x10getFrameworkInfo\x1a\x06\n" +
+	"\x12get_framework_info\x18\v \x01(\v27.livekit.agent.SessionResponse.GetFrameworkInfoResponseH\x00R\x10getFrameworkInfo\x12N\n" +
+	"\tupdate_io\x18\f \x01(\v2/.livekit.agent.SessionResponse.UpdateIOResponseH\x00R\bupdateIo\x1a\x06\n" +
 	"\x04Pong\x1aS\n" +
 	"\x16GetChatHistoryResponse\x129\n" +
 	"\x05items\x18\x01 \x03(\v2#.livekit.agent.ChatContext.ChatItemR\x05items\x1a\xb6\x01\n" +
@@ -4209,7 +4460,8 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x18GetFrameworkInfoResponse\x12\x10\n" +
 	"\x03sdk\x18\x01 \x01(\tR\x03sdk\x12\x1f\n" +
 	"\vsdk_version\x18\x02 \x01(\tR\n" +
-	"sdkVersionB\n" +
+	"sdkVersion\x1a\x12\n" +
+	"\x10UpdateIOResponseB\n" +
 	"\n" +
 	"\bresponseB\b\n" +
 	"\x06_error\"\xdf\a\n" +
@@ -4273,82 +4525,86 @@ func file_agent_livekit_agent_session_proto_rawDescGZIP() []byte {
 }
 
 var file_agent_livekit_agent_session_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_agent_livekit_agent_session_proto_msgTypes = make([]protoimpl.MessageInfo, 54)
+var file_agent_livekit_agent_session_proto_msgTypes = make([]protoimpl.MessageInfo, 58)
 var file_agent_livekit_agent_session_proto_goTypes = []any{
-	(ChatRole)(0),                                    // 0: livekit.agent.ChatRole
-	(AgentState)(0),                                  // 1: livekit.agent.AgentState
-	(UserState)(0),                                   // 2: livekit.agent.UserState
-	(AmdCategory)(0),                                 // 3: livekit.agent.AmdCategory
-	(*MetricsReport)(nil),                            // 4: livekit.agent.MetricsReport
-	(*TimedString)(nil),                              // 5: livekit.agent.TimedString
-	(*ChatMessage)(nil),                              // 6: livekit.agent.ChatMessage
-	(*FunctionCall)(nil),                             // 7: livekit.agent.FunctionCall
-	(*FunctionCallOutput)(nil),                       // 8: livekit.agent.FunctionCallOutput
-	(*AgentHandoff)(nil),                             // 9: livekit.agent.AgentHandoff
-	(*AgentConfigUpdate)(nil),                        // 10: livekit.agent.AgentConfigUpdate
-	(*ChatContext)(nil),                              // 11: livekit.agent.ChatContext
-	(*LLMModelUsage)(nil),                            // 12: livekit.agent.LLMModelUsage
-	(*TTSModelUsage)(nil),                            // 13: livekit.agent.TTSModelUsage
-	(*STTModelUsage)(nil),                            // 14: livekit.agent.STTModelUsage
-	(*InterruptionModelUsage)(nil),                   // 15: livekit.agent.InterruptionModelUsage
-	(*EotModelUsage)(nil),                            // 16: livekit.agent.EotModelUsage
-	(*ModelUsage)(nil),                               // 17: livekit.agent.ModelUsage
-	(*AgentSessionUsage)(nil),                        // 18: livekit.agent.AgentSessionUsage
-	(*AgentSessionEvent)(nil),                        // 19: livekit.agent.AgentSessionEvent
-	(*SessionRequest)(nil),                           // 20: livekit.agent.SessionRequest
-	(*SessionResponse)(nil),                          // 21: livekit.agent.SessionResponse
-	(*AgentSessionMessage)(nil),                      // 22: livekit.agent.AgentSessionMessage
-	(*ChatMessage_ChatContent)(nil),                  // 23: livekit.agent.ChatMessage.ChatContent
-	nil,                                              // 24: livekit.agent.ChatMessage.ExtraEntry
-	(*ChatContext_ChatItem)(nil),                     // 25: livekit.agent.ChatContext.ChatItem
-	(*AgentSessionEvent_AgentStateChanged)(nil),      // 26: livekit.agent.AgentSessionEvent.AgentStateChanged
-	(*AgentSessionEvent_UserStateChanged)(nil),       // 27: livekit.agent.AgentSessionEvent.UserStateChanged
-	(*AgentSessionEvent_ConversationItemAdded)(nil),  // 28: livekit.agent.AgentSessionEvent.ConversationItemAdded
-	(*AgentSessionEvent_UserInputTranscribed)(nil),   // 29: livekit.agent.AgentSessionEvent.UserInputTranscribed
-	(*AgentSessionEvent_FunctionToolsExecuted)(nil),  // 30: livekit.agent.AgentSessionEvent.FunctionToolsExecuted
-	(*AgentSessionEvent_Error)(nil),                  // 31: livekit.agent.AgentSessionEvent.Error
-	(*AgentSessionEvent_OverlappingSpeech)(nil),      // 32: livekit.agent.AgentSessionEvent.OverlappingSpeech
-	(*AgentSessionEvent_AmdPrediction)(nil),          // 33: livekit.agent.AgentSessionEvent.AmdPrediction
-	(*AgentSessionEvent_EotPrediction)(nil),          // 34: livekit.agent.AgentSessionEvent.EotPrediction
-	(*AgentSessionEvent_SessionUsageUpdated)(nil),    // 35: livekit.agent.AgentSessionEvent.SessionUsageUpdated
-	(*SessionRequest_Ping)(nil),                      // 36: livekit.agent.SessionRequest.Ping
-	(*SessionRequest_GetChatHistory)(nil),            // 37: livekit.agent.SessionRequest.GetChatHistory
-	(*SessionRequest_RunInput)(nil),                  // 38: livekit.agent.SessionRequest.RunInput
-	(*SessionRequest_GetAgentInfo)(nil),              // 39: livekit.agent.SessionRequest.GetAgentInfo
-	(*SessionRequest_GetSessionState)(nil),           // 40: livekit.agent.SessionRequest.GetSessionState
-	(*SessionRequest_GetRTCStats)(nil),               // 41: livekit.agent.SessionRequest.GetRTCStats
-	(*SessionRequest_GetSessionUsage)(nil),           // 42: livekit.agent.SessionRequest.GetSessionUsage
-	(*SessionRequest_GetFrameworkInfo)(nil),          // 43: livekit.agent.SessionRequest.GetFrameworkInfo
-	(*SessionResponse_Pong)(nil),                     // 44: livekit.agent.SessionResponse.Pong
-	(*SessionResponse_GetChatHistoryResponse)(nil),   // 45: livekit.agent.SessionResponse.GetChatHistoryResponse
-	(*SessionResponse_GetAgentInfoResponse)(nil),     // 46: livekit.agent.SessionResponse.GetAgentInfoResponse
-	(*SessionResponse_RunInputResponse)(nil),         // 47: livekit.agent.SessionResponse.RunInputResponse
-	(*SessionResponse_GetSessionStateResponse)(nil),  // 48: livekit.agent.SessionResponse.GetSessionStateResponse
-	(*SessionResponse_GetRTCStatsResponse)(nil),      // 49: livekit.agent.SessionResponse.GetRTCStatsResponse
-	(*SessionResponse_GetSessionUsageResponse)(nil),  // 50: livekit.agent.SessionResponse.GetSessionUsageResponse
-	(*SessionResponse_GetFrameworkInfoResponse)(nil), // 51: livekit.agent.SessionResponse.GetFrameworkInfoResponse
-	nil,                                   // 52: livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
-	(*AgentSessionMessage_ConsoleIO)(nil), // 53: livekit.agent.AgentSessionMessage.ConsoleIO
-	(*AgentSessionMessage_ConsoleIO_AudioFrame)(nil),            // 54: livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
-	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFlush)(nil),    // 55: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFlush
-	(*AgentSessionMessage_ConsoleIO_AudioPlaybackClear)(nil),    // 56: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackClear
-	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFinished)(nil), // 57: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFinished
-	(*timestamppb.Timestamp)(nil),                               // 58: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),                                 // 59: google.protobuf.Duration
-	(*structpb.Struct)(nil),                                     // 60: google.protobuf.Struct
+	(ChatRole)(0),                                               // 0: livekit.agent.ChatRole
+	(AgentState)(0),                                             // 1: livekit.agent.AgentState
+	(UserState)(0),                                              // 2: livekit.agent.UserState
+	(AmdCategory)(0),                                            // 3: livekit.agent.AmdCategory
+	(*MetricsReport)(nil),                                       // 4: livekit.agent.MetricsReport
+	(*TimedString)(nil),                                         // 5: livekit.agent.TimedString
+	(*ChatMessage)(nil),                                         // 6: livekit.agent.ChatMessage
+	(*FunctionCall)(nil),                                        // 7: livekit.agent.FunctionCall
+	(*FunctionCallOutput)(nil),                                  // 8: livekit.agent.FunctionCallOutput
+	(*AgentHandoff)(nil),                                        // 9: livekit.agent.AgentHandoff
+	(*AgentConfigUpdate)(nil),                                   // 10: livekit.agent.AgentConfigUpdate
+	(*ChatContext)(nil),                                         // 11: livekit.agent.ChatContext
+	(*LLMModelUsage)(nil),                                       // 12: livekit.agent.LLMModelUsage
+	(*TTSModelUsage)(nil),                                       // 13: livekit.agent.TTSModelUsage
+	(*STTModelUsage)(nil),                                       // 14: livekit.agent.STTModelUsage
+	(*InterruptionModelUsage)(nil),                              // 15: livekit.agent.InterruptionModelUsage
+	(*EotModelUsage)(nil),                                       // 16: livekit.agent.EotModelUsage
+	(*ModelUsage)(nil),                                          // 17: livekit.agent.ModelUsage
+	(*AgentSessionUsage)(nil),                                   // 18: livekit.agent.AgentSessionUsage
+	(*AgentSessionEvent)(nil),                                   // 19: livekit.agent.AgentSessionEvent
+	(*SessionRequest)(nil),                                      // 20: livekit.agent.SessionRequest
+	(*SessionResponse)(nil),                                     // 21: livekit.agent.SessionResponse
+	(*AgentSessionMessage)(nil),                                 // 22: livekit.agent.AgentSessionMessage
+	(*ChatMessage_ChatContent)(nil),                             // 23: livekit.agent.ChatMessage.ChatContent
+	nil,                                                         // 24: livekit.agent.ChatMessage.ExtraEntry
+	(*ChatContext_ChatItem)(nil),                                // 25: livekit.agent.ChatContext.ChatItem
+	(*AgentSessionEvent_AgentStateChanged)(nil),                 // 26: livekit.agent.AgentSessionEvent.AgentStateChanged
+	(*AgentSessionEvent_UserStateChanged)(nil),                  // 27: livekit.agent.AgentSessionEvent.UserStateChanged
+	(*AgentSessionEvent_ConversationItemAdded)(nil),             // 28: livekit.agent.AgentSessionEvent.ConversationItemAdded
+	(*AgentSessionEvent_UserInputTranscribed)(nil),              // 29: livekit.agent.AgentSessionEvent.UserInputTranscribed
+	(*AgentSessionEvent_FunctionToolsExecuted)(nil),             // 30: livekit.agent.AgentSessionEvent.FunctionToolsExecuted
+	(*AgentSessionEvent_Error)(nil),                             // 31: livekit.agent.AgentSessionEvent.Error
+	(*AgentSessionEvent_OverlappingSpeech)(nil),                 // 32: livekit.agent.AgentSessionEvent.OverlappingSpeech
+	(*AgentSessionEvent_AmdPrediction)(nil),                     // 33: livekit.agent.AgentSessionEvent.AmdPrediction
+	(*AgentSessionEvent_EotPrediction)(nil),                     // 34: livekit.agent.AgentSessionEvent.EotPrediction
+	(*AgentSessionEvent_SessionUsageUpdated)(nil),               // 35: livekit.agent.AgentSessionEvent.SessionUsageUpdated
+	(*SessionRequest_Ping)(nil),                                 // 36: livekit.agent.SessionRequest.Ping
+	(*SessionRequest_GetChatHistory)(nil),                       // 37: livekit.agent.SessionRequest.GetChatHistory
+	(*SessionRequest_RunInput)(nil),                             // 38: livekit.agent.SessionRequest.RunInput
+	(*SessionRequest_GetAgentInfo)(nil),                         // 39: livekit.agent.SessionRequest.GetAgentInfo
+	(*SessionRequest_GetSessionState)(nil),                      // 40: livekit.agent.SessionRequest.GetSessionState
+	(*SessionRequest_GetRTCStats)(nil),                          // 41: livekit.agent.SessionRequest.GetRTCStats
+	(*SessionRequest_GetSessionUsage)(nil),                      // 42: livekit.agent.SessionRequest.GetSessionUsage
+	(*SessionRequest_GetFrameworkInfo)(nil),                     // 43: livekit.agent.SessionRequest.GetFrameworkInfo
+	(*SessionRequest_UpdateIO)(nil),                             // 44: livekit.agent.SessionRequest.UpdateIO
+	(*SessionRequest_UpdateIO_Input)(nil),                       // 45: livekit.agent.SessionRequest.UpdateIO.Input
+	(*SessionRequest_UpdateIO_Output)(nil),                      // 46: livekit.agent.SessionRequest.UpdateIO.Output
+	(*SessionResponse_Pong)(nil),                                // 47: livekit.agent.SessionResponse.Pong
+	(*SessionResponse_GetChatHistoryResponse)(nil),              // 48: livekit.agent.SessionResponse.GetChatHistoryResponse
+	(*SessionResponse_GetAgentInfoResponse)(nil),                // 49: livekit.agent.SessionResponse.GetAgentInfoResponse
+	(*SessionResponse_RunInputResponse)(nil),                    // 50: livekit.agent.SessionResponse.RunInputResponse
+	(*SessionResponse_GetSessionStateResponse)(nil),             // 51: livekit.agent.SessionResponse.GetSessionStateResponse
+	(*SessionResponse_GetRTCStatsResponse)(nil),                 // 52: livekit.agent.SessionResponse.GetRTCStatsResponse
+	(*SessionResponse_GetSessionUsageResponse)(nil),             // 53: livekit.agent.SessionResponse.GetSessionUsageResponse
+	(*SessionResponse_GetFrameworkInfoResponse)(nil),            // 54: livekit.agent.SessionResponse.GetFrameworkInfoResponse
+	(*SessionResponse_UpdateIOResponse)(nil),                    // 55: livekit.agent.SessionResponse.UpdateIOResponse
+	nil,                                                         // 56: livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
+	(*AgentSessionMessage_ConsoleIO)(nil),                       // 57: livekit.agent.AgentSessionMessage.ConsoleIO
+	(*AgentSessionMessage_ConsoleIO_AudioFrame)(nil),            // 58: livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
+	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFlush)(nil),    // 59: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFlush
+	(*AgentSessionMessage_ConsoleIO_AudioPlaybackClear)(nil),    // 60: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackClear
+	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFinished)(nil), // 61: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFinished
+	(*timestamppb.Timestamp)(nil),                               // 62: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),                                 // 63: google.protobuf.Duration
+	(*structpb.Struct)(nil),                                     // 64: google.protobuf.Struct
 }
 var file_agent_livekit_agent_session_proto_depIdxs = []int32{
-	58, // 0: livekit.agent.MetricsReport.started_speaking_at:type_name -> google.protobuf.Timestamp
-	58, // 1: livekit.agent.MetricsReport.stopped_speaking_at:type_name -> google.protobuf.Timestamp
+	62, // 0: livekit.agent.MetricsReport.started_speaking_at:type_name -> google.protobuf.Timestamp
+	62, // 1: livekit.agent.MetricsReport.stopped_speaking_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: livekit.agent.ChatMessage.role:type_name -> livekit.agent.ChatRole
 	23, // 3: livekit.agent.ChatMessage.content:type_name -> livekit.agent.ChatMessage.ChatContent
 	24, // 4: livekit.agent.ChatMessage.extra:type_name -> livekit.agent.ChatMessage.ExtraEntry
 	4,  // 5: livekit.agent.ChatMessage.metrics:type_name -> livekit.agent.MetricsReport
-	58, // 6: livekit.agent.ChatMessage.created_at:type_name -> google.protobuf.Timestamp
-	58, // 7: livekit.agent.FunctionCall.created_at:type_name -> google.protobuf.Timestamp
-	58, // 8: livekit.agent.FunctionCallOutput.created_at:type_name -> google.protobuf.Timestamp
-	58, // 9: livekit.agent.AgentHandoff.created_at:type_name -> google.protobuf.Timestamp
-	58, // 10: livekit.agent.AgentConfigUpdate.created_at:type_name -> google.protobuf.Timestamp
+	62, // 6: livekit.agent.ChatMessage.created_at:type_name -> google.protobuf.Timestamp
+	62, // 7: livekit.agent.FunctionCall.created_at:type_name -> google.protobuf.Timestamp
+	62, // 8: livekit.agent.FunctionCallOutput.created_at:type_name -> google.protobuf.Timestamp
+	62, // 9: livekit.agent.AgentHandoff.created_at:type_name -> google.protobuf.Timestamp
+	62, // 10: livekit.agent.AgentConfigUpdate.created_at:type_name -> google.protobuf.Timestamp
 	25, // 11: livekit.agent.ChatContext.items:type_name -> livekit.agent.ChatContext.ChatItem
 	12, // 12: livekit.agent.ModelUsage.llm:type_name -> livekit.agent.LLMModelUsage
 	13, // 13: livekit.agent.ModelUsage.tts:type_name -> livekit.agent.TTSModelUsage
@@ -4356,7 +4612,7 @@ var file_agent_livekit_agent_session_proto_depIdxs = []int32{
 	15, // 15: livekit.agent.ModelUsage.interruption:type_name -> livekit.agent.InterruptionModelUsage
 	16, // 16: livekit.agent.ModelUsage.eot:type_name -> livekit.agent.EotModelUsage
 	17, // 17: livekit.agent.AgentSessionUsage.model_usage:type_name -> livekit.agent.ModelUsage
-	58, // 18: livekit.agent.AgentSessionEvent.created_at:type_name -> google.protobuf.Timestamp
+	62, // 18: livekit.agent.AgentSessionEvent.created_at:type_name -> google.protobuf.Timestamp
 	26, // 19: livekit.agent.AgentSessionEvent.agent_state_changed:type_name -> livekit.agent.AgentSessionEvent.AgentStateChanged
 	27, // 20: livekit.agent.AgentSessionEvent.user_state_changed:type_name -> livekit.agent.AgentSessionEvent.UserStateChanged
 	28, // 21: livekit.agent.AgentSessionEvent.conversation_item_added:type_name -> livekit.agent.AgentSessionEvent.ConversationItemAdded
@@ -4375,58 +4631,62 @@ var file_agent_livekit_agent_session_proto_depIdxs = []int32{
 	41, // 34: livekit.agent.SessionRequest.get_rtc_stats:type_name -> livekit.agent.SessionRequest.GetRTCStats
 	42, // 35: livekit.agent.SessionRequest.get_session_usage:type_name -> livekit.agent.SessionRequest.GetSessionUsage
 	43, // 36: livekit.agent.SessionRequest.get_framework_info:type_name -> livekit.agent.SessionRequest.GetFrameworkInfo
-	44, // 37: livekit.agent.SessionResponse.pong:type_name -> livekit.agent.SessionResponse.Pong
-	45, // 38: livekit.agent.SessionResponse.get_chat_history:type_name -> livekit.agent.SessionResponse.GetChatHistoryResponse
-	47, // 39: livekit.agent.SessionResponse.run_input:type_name -> livekit.agent.SessionResponse.RunInputResponse
-	46, // 40: livekit.agent.SessionResponse.get_agent_info:type_name -> livekit.agent.SessionResponse.GetAgentInfoResponse
-	48, // 41: livekit.agent.SessionResponse.get_session_state:type_name -> livekit.agent.SessionResponse.GetSessionStateResponse
-	49, // 42: livekit.agent.SessionResponse.get_rtc_stats:type_name -> livekit.agent.SessionResponse.GetRTCStatsResponse
-	50, // 43: livekit.agent.SessionResponse.get_session_usage:type_name -> livekit.agent.SessionResponse.GetSessionUsageResponse
-	51, // 44: livekit.agent.SessionResponse.get_framework_info:type_name -> livekit.agent.SessionResponse.GetFrameworkInfoResponse
-	54, // 45: livekit.agent.AgentSessionMessage.audio_input:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
-	54, // 46: livekit.agent.AgentSessionMessage.audio_output:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
-	19, // 47: livekit.agent.AgentSessionMessage.event:type_name -> livekit.agent.AgentSessionEvent
-	20, // 48: livekit.agent.AgentSessionMessage.request:type_name -> livekit.agent.SessionRequest
-	21, // 49: livekit.agent.AgentSessionMessage.response:type_name -> livekit.agent.SessionResponse
-	55, // 50: livekit.agent.AgentSessionMessage.audio_playback_flush:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFlush
-	56, // 51: livekit.agent.AgentSessionMessage.audio_playback_clear:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackClear
-	57, // 52: livekit.agent.AgentSessionMessage.audio_playback_finished:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFinished
-	6,  // 53: livekit.agent.ChatContext.ChatItem.message:type_name -> livekit.agent.ChatMessage
-	7,  // 54: livekit.agent.ChatContext.ChatItem.function_call:type_name -> livekit.agent.FunctionCall
-	8,  // 55: livekit.agent.ChatContext.ChatItem.function_call_output:type_name -> livekit.agent.FunctionCallOutput
-	9,  // 56: livekit.agent.ChatContext.ChatItem.agent_handoff:type_name -> livekit.agent.AgentHandoff
-	10, // 57: livekit.agent.ChatContext.ChatItem.agent_config_update:type_name -> livekit.agent.AgentConfigUpdate
-	1,  // 58: livekit.agent.AgentSessionEvent.AgentStateChanged.old_state:type_name -> livekit.agent.AgentState
-	1,  // 59: livekit.agent.AgentSessionEvent.AgentStateChanged.new_state:type_name -> livekit.agent.AgentState
-	2,  // 60: livekit.agent.AgentSessionEvent.UserStateChanged.old_state:type_name -> livekit.agent.UserState
-	2,  // 61: livekit.agent.AgentSessionEvent.UserStateChanged.new_state:type_name -> livekit.agent.UserState
-	25, // 62: livekit.agent.AgentSessionEvent.ConversationItemAdded.item:type_name -> livekit.agent.ChatContext.ChatItem
-	7,  // 63: livekit.agent.AgentSessionEvent.FunctionToolsExecuted.function_calls:type_name -> livekit.agent.FunctionCall
-	8,  // 64: livekit.agent.AgentSessionEvent.FunctionToolsExecuted.function_call_outputs:type_name -> livekit.agent.FunctionCallOutput
-	58, // 65: livekit.agent.AgentSessionEvent.OverlappingSpeech.overlap_started_at:type_name -> google.protobuf.Timestamp
-	58, // 66: livekit.agent.AgentSessionEvent.OverlappingSpeech.detected_at:type_name -> google.protobuf.Timestamp
-	59, // 67: livekit.agent.AgentSessionEvent.AmdPrediction.speech_duration:type_name -> google.protobuf.Duration
-	3,  // 68: livekit.agent.AgentSessionEvent.AmdPrediction.category:type_name -> livekit.agent.AmdCategory
-	59, // 69: livekit.agent.AgentSessionEvent.AmdPrediction.delay:type_name -> google.protobuf.Duration
-	59, // 70: livekit.agent.AgentSessionEvent.EotPrediction.inference_duration:type_name -> google.protobuf.Duration
-	59, // 71: livekit.agent.AgentSessionEvent.EotPrediction.delay:type_name -> google.protobuf.Duration
-	18, // 72: livekit.agent.AgentSessionEvent.SessionUsageUpdated.usage:type_name -> livekit.agent.AgentSessionUsage
-	25, // 73: livekit.agent.SessionResponse.GetChatHistoryResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
-	25, // 74: livekit.agent.SessionResponse.GetAgentInfoResponse.chat_ctx:type_name -> livekit.agent.ChatContext.ChatItem
-	25, // 75: livekit.agent.SessionResponse.RunInputResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
-	1,  // 76: livekit.agent.SessionResponse.GetSessionStateResponse.agent_state:type_name -> livekit.agent.AgentState
-	2,  // 77: livekit.agent.SessionResponse.GetSessionStateResponse.user_state:type_name -> livekit.agent.UserState
-	52, // 78: livekit.agent.SessionResponse.GetSessionStateResponse.options:type_name -> livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
-	58, // 79: livekit.agent.SessionResponse.GetSessionStateResponse.created_at:type_name -> google.protobuf.Timestamp
-	60, // 80: livekit.agent.SessionResponse.GetRTCStatsResponse.publisher_stats:type_name -> google.protobuf.Struct
-	60, // 81: livekit.agent.SessionResponse.GetRTCStatsResponse.subscriber_stats:type_name -> google.protobuf.Struct
-	18, // 82: livekit.agent.SessionResponse.GetSessionUsageResponse.usage:type_name -> livekit.agent.AgentSessionUsage
-	58, // 83: livekit.agent.SessionResponse.GetSessionUsageResponse.created_at:type_name -> google.protobuf.Timestamp
-	84, // [84:84] is the sub-list for method output_type
-	84, // [84:84] is the sub-list for method input_type
-	84, // [84:84] is the sub-list for extension type_name
-	84, // [84:84] is the sub-list for extension extendee
-	0,  // [0:84] is the sub-list for field type_name
+	44, // 37: livekit.agent.SessionRequest.update_io:type_name -> livekit.agent.SessionRequest.UpdateIO
+	47, // 38: livekit.agent.SessionResponse.pong:type_name -> livekit.agent.SessionResponse.Pong
+	48, // 39: livekit.agent.SessionResponse.get_chat_history:type_name -> livekit.agent.SessionResponse.GetChatHistoryResponse
+	50, // 40: livekit.agent.SessionResponse.run_input:type_name -> livekit.agent.SessionResponse.RunInputResponse
+	49, // 41: livekit.agent.SessionResponse.get_agent_info:type_name -> livekit.agent.SessionResponse.GetAgentInfoResponse
+	51, // 42: livekit.agent.SessionResponse.get_session_state:type_name -> livekit.agent.SessionResponse.GetSessionStateResponse
+	52, // 43: livekit.agent.SessionResponse.get_rtc_stats:type_name -> livekit.agent.SessionResponse.GetRTCStatsResponse
+	53, // 44: livekit.agent.SessionResponse.get_session_usage:type_name -> livekit.agent.SessionResponse.GetSessionUsageResponse
+	54, // 45: livekit.agent.SessionResponse.get_framework_info:type_name -> livekit.agent.SessionResponse.GetFrameworkInfoResponse
+	55, // 46: livekit.agent.SessionResponse.update_io:type_name -> livekit.agent.SessionResponse.UpdateIOResponse
+	58, // 47: livekit.agent.AgentSessionMessage.audio_input:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
+	58, // 48: livekit.agent.AgentSessionMessage.audio_output:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
+	19, // 49: livekit.agent.AgentSessionMessage.event:type_name -> livekit.agent.AgentSessionEvent
+	20, // 50: livekit.agent.AgentSessionMessage.request:type_name -> livekit.agent.SessionRequest
+	21, // 51: livekit.agent.AgentSessionMessage.response:type_name -> livekit.agent.SessionResponse
+	59, // 52: livekit.agent.AgentSessionMessage.audio_playback_flush:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFlush
+	60, // 53: livekit.agent.AgentSessionMessage.audio_playback_clear:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackClear
+	61, // 54: livekit.agent.AgentSessionMessage.audio_playback_finished:type_name -> livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFinished
+	6,  // 55: livekit.agent.ChatContext.ChatItem.message:type_name -> livekit.agent.ChatMessage
+	7,  // 56: livekit.agent.ChatContext.ChatItem.function_call:type_name -> livekit.agent.FunctionCall
+	8,  // 57: livekit.agent.ChatContext.ChatItem.function_call_output:type_name -> livekit.agent.FunctionCallOutput
+	9,  // 58: livekit.agent.ChatContext.ChatItem.agent_handoff:type_name -> livekit.agent.AgentHandoff
+	10, // 59: livekit.agent.ChatContext.ChatItem.agent_config_update:type_name -> livekit.agent.AgentConfigUpdate
+	1,  // 60: livekit.agent.AgentSessionEvent.AgentStateChanged.old_state:type_name -> livekit.agent.AgentState
+	1,  // 61: livekit.agent.AgentSessionEvent.AgentStateChanged.new_state:type_name -> livekit.agent.AgentState
+	2,  // 62: livekit.agent.AgentSessionEvent.UserStateChanged.old_state:type_name -> livekit.agent.UserState
+	2,  // 63: livekit.agent.AgentSessionEvent.UserStateChanged.new_state:type_name -> livekit.agent.UserState
+	25, // 64: livekit.agent.AgentSessionEvent.ConversationItemAdded.item:type_name -> livekit.agent.ChatContext.ChatItem
+	7,  // 65: livekit.agent.AgentSessionEvent.FunctionToolsExecuted.function_calls:type_name -> livekit.agent.FunctionCall
+	8,  // 66: livekit.agent.AgentSessionEvent.FunctionToolsExecuted.function_call_outputs:type_name -> livekit.agent.FunctionCallOutput
+	62, // 67: livekit.agent.AgentSessionEvent.OverlappingSpeech.overlap_started_at:type_name -> google.protobuf.Timestamp
+	62, // 68: livekit.agent.AgentSessionEvent.OverlappingSpeech.detected_at:type_name -> google.protobuf.Timestamp
+	63, // 69: livekit.agent.AgentSessionEvent.AmdPrediction.speech_duration:type_name -> google.protobuf.Duration
+	3,  // 70: livekit.agent.AgentSessionEvent.AmdPrediction.category:type_name -> livekit.agent.AmdCategory
+	63, // 71: livekit.agent.AgentSessionEvent.AmdPrediction.delay:type_name -> google.protobuf.Duration
+	63, // 72: livekit.agent.AgentSessionEvent.EotPrediction.inference_duration:type_name -> google.protobuf.Duration
+	63, // 73: livekit.agent.AgentSessionEvent.EotPrediction.delay:type_name -> google.protobuf.Duration
+	18, // 74: livekit.agent.AgentSessionEvent.SessionUsageUpdated.usage:type_name -> livekit.agent.AgentSessionUsage
+	45, // 75: livekit.agent.SessionRequest.UpdateIO.input:type_name -> livekit.agent.SessionRequest.UpdateIO.Input
+	46, // 76: livekit.agent.SessionRequest.UpdateIO.output:type_name -> livekit.agent.SessionRequest.UpdateIO.Output
+	25, // 77: livekit.agent.SessionResponse.GetChatHistoryResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
+	25, // 78: livekit.agent.SessionResponse.GetAgentInfoResponse.chat_ctx:type_name -> livekit.agent.ChatContext.ChatItem
+	25, // 79: livekit.agent.SessionResponse.RunInputResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
+	1,  // 80: livekit.agent.SessionResponse.GetSessionStateResponse.agent_state:type_name -> livekit.agent.AgentState
+	2,  // 81: livekit.agent.SessionResponse.GetSessionStateResponse.user_state:type_name -> livekit.agent.UserState
+	56, // 82: livekit.agent.SessionResponse.GetSessionStateResponse.options:type_name -> livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
+	62, // 83: livekit.agent.SessionResponse.GetSessionStateResponse.created_at:type_name -> google.protobuf.Timestamp
+	64, // 84: livekit.agent.SessionResponse.GetRTCStatsResponse.publisher_stats:type_name -> google.protobuf.Struct
+	64, // 85: livekit.agent.SessionResponse.GetRTCStatsResponse.subscriber_stats:type_name -> google.protobuf.Struct
+	18, // 86: livekit.agent.SessionResponse.GetSessionUsageResponse.usage:type_name -> livekit.agent.AgentSessionUsage
+	62, // 87: livekit.agent.SessionResponse.GetSessionUsageResponse.created_at:type_name -> google.protobuf.Timestamp
+	88, // [88:88] is the sub-list for method output_type
+	88, // [88:88] is the sub-list for method input_type
+	88, // [88:88] is the sub-list for extension type_name
+	88, // [88:88] is the sub-list for extension extendee
+	0,  // [0:88] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_session_proto_init() }
@@ -4467,6 +4727,7 @@ func file_agent_livekit_agent_session_proto_init() {
 		(*SessionRequest_GetRtcStats)(nil),
 		(*SessionRequest_GetSessionUsage_)(nil),
 		(*SessionRequest_GetFrameworkInfo_)(nil),
+		(*SessionRequest_UpdateIo)(nil),
 	}
 	file_agent_livekit_agent_session_proto_msgTypes[17].OneofWrappers = []any{
 		(*SessionResponse_Pong_)(nil),
@@ -4477,6 +4738,7 @@ func file_agent_livekit_agent_session_proto_init() {
 		(*SessionResponse_GetRtcStats)(nil),
 		(*SessionResponse_GetSessionUsage)(nil),
 		(*SessionResponse_GetFrameworkInfo)(nil),
+		(*SessionResponse_UpdateIo)(nil),
 	}
 	file_agent_livekit_agent_session_proto_msgTypes[18].OneofWrappers = []any{
 		(*AgentSessionMessage_AudioInput)(nil),
@@ -4500,14 +4762,17 @@ func file_agent_livekit_agent_session_proto_init() {
 	}
 	file_agent_livekit_agent_session_proto_msgTypes[25].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[28].OneofWrappers = []any{}
+	file_agent_livekit_agent_session_proto_msgTypes[40].OneofWrappers = []any{}
+	file_agent_livekit_agent_session_proto_msgTypes[41].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[42].OneofWrappers = []any{}
+	file_agent_livekit_agent_session_proto_msgTypes[45].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_session_proto_rawDesc), len(file_agent_livekit_agent_session_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   54,
+			NumMessages:   58,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
