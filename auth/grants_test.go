@@ -15,6 +15,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"reflect"
 	"strconv"
 	"testing"
@@ -156,6 +157,120 @@ func TestGrants(t *testing.T) {
 		require.Equal(t, grants.Inference.Perform, clone.Inference.Perform)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Inference, clone.Inference))
+	})
+}
+
+func TestClaimGrantsVideoRTCCompat(t *testing.T) {
+	t.Parallel()
+
+	t.Run("unmarshal with video field", func(t *testing.T) {
+		jsonData := `{"identity":"user1","video":{"roomJoin":true,"room":"test-room","canPublish":true}}`
+
+		var grants ClaimGrants
+		err := json.Unmarshal([]byte(jsonData), &grants)
+		require.NoError(t, err)
+		require.Equal(t, "user1", grants.Identity)
+		require.NotNil(t, grants.Video)
+		require.True(t, grants.Video.RoomJoin)
+		require.Equal(t, "test-room", grants.Video.Room)
+		require.True(t, grants.Video.GetCanPublish())
+	})
+
+	t.Run("unmarshal with rtc field", func(t *testing.T) {
+		jsonData := `{"identity":"user2","rtc":{"roomJoin":true,"room":"rtc-room","canSubscribe":false}}`
+
+		var grants ClaimGrants
+		err := json.Unmarshal([]byte(jsonData), &grants)
+		require.NoError(t, err)
+		require.Equal(t, "user2", grants.Identity)
+		require.NotNil(t, grants.Video)
+		require.True(t, grants.Video.RoomJoin)
+		require.Equal(t, "rtc-room", grants.Video.Room)
+		require.False(t, grants.Video.GetCanSubscribe())
+	})
+
+	t.Run("unmarshal with both video and rtc fields prefers rtc", func(t *testing.T) {
+		jsonData := `{"identity":"user3","video":{"room":"video-room"},"rtc":{"room":"rtc-room"}}`
+
+		var grants ClaimGrants
+		err := json.Unmarshal([]byte(jsonData), &grants)
+		require.NoError(t, err)
+		require.NotNil(t, grants.Video)
+		require.Equal(t, "rtc-room", grants.Video.Room, "rtc field should take precedence over video")
+	})
+
+	t.Run("marshal outputs video field", func(t *testing.T) {
+		grants := &ClaimGrants{
+			Identity: "user4",
+			Video: &VideoGrant{
+				RoomJoin: true,
+				Room:     "my-room",
+			},
+		}
+
+		data, err := json.Marshal(grants)
+		require.NoError(t, err)
+
+		// Verify the output contains "video" not "rtc"
+		var rawMap map[string]interface{}
+		err = json.Unmarshal(data, &rawMap)
+		require.NoError(t, err)
+		require.Contains(t, rawMap, "video", "marshaled JSON should contain 'video' field")
+		require.NotContains(t, rawMap, "rtc", "marshaled JSON should not contain 'rtc' field")
+	})
+
+	t.Run("roundtrip with video field preserves data", func(t *testing.T) {
+		original := &ClaimGrants{
+			Identity: "user5",
+			Name:     "Test User",
+			Video: &VideoGrant{
+				RoomJoin:   true,
+				Room:       "test-room",
+				RoomCreate: true,
+			},
+			SIP: &SIPGrant{Admin: true},
+		}
+
+		data, err := json.Marshal(original)
+		require.NoError(t, err)
+
+		var decoded ClaimGrants
+		err = json.Unmarshal(data, &decoded)
+		require.NoError(t, err)
+
+		require.Equal(t, original.Identity, decoded.Identity)
+		require.Equal(t, original.Name, decoded.Name)
+		require.Equal(t, original.Video.RoomJoin, decoded.Video.RoomJoin)
+		require.Equal(t, original.Video.Room, decoded.Video.Room)
+		require.Equal(t, original.Video.RoomCreate, decoded.Video.RoomCreate)
+		require.Equal(t, original.SIP.Admin, decoded.SIP.Admin)
+	})
+
+	t.Run("unmarshal with all grant types via rtc", func(t *testing.T) {
+		jsonData := `{
+			"identity": "agent1",
+			"kind": "agent",
+			"rtc": {"roomJoin": true, "room": "agent-room", "agent": true},
+			"sip": {"admin": true},
+			"agent": {"admin": true},
+			"inference": {"perform": true}
+		}`
+
+		var grants ClaimGrants
+		err := json.Unmarshal([]byte(jsonData), &grants)
+		require.NoError(t, err)
+		require.Equal(t, "agent1", grants.Identity)
+		require.Equal(t, "agent", grants.Kind)
+		require.NotNil(t, grants.Video)
+		require.True(t, grants.Video.RoomJoin)
+		require.Equal(t, "agent-room", grants.Video.Room)
+		require.True(t, grants.Video.Agent)
+		require.NotNil(t, grants.SIP)
+		require.True(t, grants.SIP.Admin)
+		require.NotNil(t, grants.Agent)
+		require.True(t, grants.Agent.Admin)
+		require.NotNil(t, grants.Inference)
+		require.True(t, grants.Inference.Perform)
 	})
 }
 
