@@ -204,6 +204,10 @@ message AgentSessionEvent {
     optional string language = 3;
   }
 
+  message FunctionToolsStarted {
+    repeated FunctionCall function_calls = 1;
+  }
+
   message FunctionToolsExecuted {
     repeated FunctionCall function_calls = 1;
     repeated FunctionCallOutput function_call_outputs = 2;
@@ -251,6 +255,7 @@ message AgentSessionEvent {
     SessionUsageUpdated session_usage_updated = 17;
     AmdPrediction amd_prediction = 18;
     EotPrediction eot_prediction = 19;
+    FunctionToolsStarted function_tools_started = 20;
   }
 }
 
