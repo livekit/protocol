@@ -586,7 +586,6 @@ message RequestResponse {
     INVALID_NAME = 8;
     DUPLICATE_HANDLE = 9;
     DUPLICATE_NAME = 10;
-    INVALID_TYPE_DEFINITION = 11;
   }
 
   uint32 request_id = 1 [(logger.name) = "requestID"];
