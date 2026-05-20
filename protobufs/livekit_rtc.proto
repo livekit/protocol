@@ -63,6 +63,8 @@ message SignalRequest {
     UnpublishDataTrackRequest unpublish_data_track_request = 20;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 21;
+    // Get the definition for a known data track schema
+    GetDataTrackSchemaRequest get_data_track_schema = 22;
   }
 }
 
@@ -125,6 +127,8 @@ message SignalResponse {
     UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
     DataTrackSubscriberHandles data_track_subscriber_handles = 29;
+    // Sent in response to `GetDataTrackSchemaRequest`.
+    GetDataTrackSchemaResponse get_data_track_schema_response = 30;
   }
 }
 
@@ -187,6 +191,9 @@ message PublishDataTrackRequest {
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
+
+  // Type definition for this track. If unset, the track is untyped.
+  optional DataTrackTypeDefinition type_definition = 4;
 }
 
 message PublishDataTrackResponse {
@@ -295,6 +302,16 @@ message UpdateDataSubscription {
     DataTrackSubscriptionOptions options = 3;
   }
   repeated Update updates = 1;
+}
+
+message GetDataTrackSchemaRequest {
+  // ID of the schema to get.
+  DataTrackSchemaId schema_id = 1;
+}
+
+message GetDataTrackSchemaResponse {
+  // Definition of the requested schema.
+  DataTrackSchemaDefinition schema_definition = 1;
 }
 
 message UpdateTrackSettings {
@@ -561,6 +578,7 @@ message RequestResponse {
     INVALID_NAME = 8;
     DUPLICATE_HANDLE = 9;
     DUPLICATE_NAME = 10;
+    INVALID_TYPE_DEFINITION = 11;
   }
 
   uint32 request_id = 1 [(logger.name) = "requestID"];
@@ -575,6 +593,7 @@ message RequestResponse {
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
     UnpublishDataTrackRequest unpublish_data_track = 11;
+    GetDataTrackSchemaRequest get_data_track_schema = 12;
   }
 }
 

@@ -224,23 +224,24 @@ func (x LeaveRequest_Action) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use LeaveRequest_Action.Descriptor instead.
 func (LeaveRequest_Action) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{22, 0}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{24, 0}
 }
 
 type RequestResponse_Reason int32
 
 const (
-	RequestResponse_OK                 RequestResponse_Reason = 0
-	RequestResponse_NOT_FOUND          RequestResponse_Reason = 1
-	RequestResponse_NOT_ALLOWED        RequestResponse_Reason = 2
-	RequestResponse_LIMIT_EXCEEDED     RequestResponse_Reason = 3
-	RequestResponse_QUEUED             RequestResponse_Reason = 4
-	RequestResponse_UNSUPPORTED_TYPE   RequestResponse_Reason = 5
-	RequestResponse_UNCLASSIFIED_ERROR RequestResponse_Reason = 6
-	RequestResponse_INVALID_HANDLE     RequestResponse_Reason = 7
-	RequestResponse_INVALID_NAME       RequestResponse_Reason = 8
-	RequestResponse_DUPLICATE_HANDLE   RequestResponse_Reason = 9
-	RequestResponse_DUPLICATE_NAME     RequestResponse_Reason = 10
+	RequestResponse_OK                      RequestResponse_Reason = 0
+	RequestResponse_NOT_FOUND               RequestResponse_Reason = 1
+	RequestResponse_NOT_ALLOWED             RequestResponse_Reason = 2
+	RequestResponse_LIMIT_EXCEEDED          RequestResponse_Reason = 3
+	RequestResponse_QUEUED                  RequestResponse_Reason = 4
+	RequestResponse_UNSUPPORTED_TYPE        RequestResponse_Reason = 5
+	RequestResponse_UNCLASSIFIED_ERROR      RequestResponse_Reason = 6
+	RequestResponse_INVALID_HANDLE          RequestResponse_Reason = 7
+	RequestResponse_INVALID_NAME            RequestResponse_Reason = 8
+	RequestResponse_DUPLICATE_HANDLE        RequestResponse_Reason = 9
+	RequestResponse_DUPLICATE_NAME          RequestResponse_Reason = 10
+	RequestResponse_INVALID_TYPE_DEFINITION RequestResponse_Reason = 11
 )
 
 // Enum value maps for RequestResponse_Reason.
@@ -257,19 +258,21 @@ var (
 		8:  "INVALID_NAME",
 		9:  "DUPLICATE_HANDLE",
 		10: "DUPLICATE_NAME",
+		11: "INVALID_TYPE_DEFINITION",
 	}
 	RequestResponse_Reason_value = map[string]int32{
-		"OK":                 0,
-		"NOT_FOUND":          1,
-		"NOT_ALLOWED":        2,
-		"LIMIT_EXCEEDED":     3,
-		"QUEUED":             4,
-		"UNSUPPORTED_TYPE":   5,
-		"UNCLASSIFIED_ERROR": 6,
-		"INVALID_HANDLE":     7,
-		"INVALID_NAME":       8,
-		"DUPLICATE_HANDLE":   9,
-		"DUPLICATE_NAME":     10,
+		"OK":                      0,
+		"NOT_FOUND":               1,
+		"NOT_ALLOWED":             2,
+		"LIMIT_EXCEEDED":          3,
+		"QUEUED":                  4,
+		"UNSUPPORTED_TYPE":        5,
+		"UNCLASSIFIED_ERROR":      6,
+		"INVALID_HANDLE":          7,
+		"INVALID_NAME":            8,
+		"DUPLICATE_HANDLE":        9,
+		"DUPLICATE_NAME":          10,
+		"INVALID_TYPE_DEFINITION": 11,
 	}
 )
 
@@ -297,7 +300,7 @@ func (x RequestResponse_Reason) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RequestResponse_Reason.Descriptor instead.
 func (RequestResponse_Reason) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{49, 0}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{51, 0}
 }
 
 type WrappedJoinRequest_Compression int32
@@ -343,7 +346,7 @@ func (x WrappedJoinRequest_Compression) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WrappedJoinRequest_Compression.Descriptor instead.
 func (WrappedJoinRequest_Compression) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{53, 0}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{55, 0}
 }
 
 type SignalRequest struct {
@@ -370,6 +373,7 @@ type SignalRequest struct {
 	//	*SignalRequest_PublishDataTrackRequest
 	//	*SignalRequest_UnpublishDataTrackRequest
 	//	*SignalRequest_UpdateDataSubscription
+	//	*SignalRequest_GetDataTrackSchema
 	Message       isSignalRequest_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -593,6 +597,15 @@ func (x *SignalRequest) GetUpdateDataSubscription() *UpdateDataSubscription {
 	return nil
 }
 
+func (x *SignalRequest) GetGetDataTrackSchema() *GetDataTrackSchemaRequest {
+	if x != nil {
+		if x, ok := x.Message.(*SignalRequest_GetDataTrackSchema); ok {
+			return x.GetDataTrackSchema
+		}
+	}
+	return nil
+}
+
 type isSignalRequest_Message interface {
 	isSignalRequest_Message()
 }
@@ -697,6 +710,11 @@ type SignalRequest_UpdateDataSubscription struct {
 	UpdateDataSubscription *UpdateDataSubscription `protobuf:"bytes,21,opt,name=update_data_subscription,json=updateDataSubscription,proto3,oneof"`
 }
 
+type SignalRequest_GetDataTrackSchema struct {
+	// Get the definition for a known data track schema
+	GetDataTrackSchema *GetDataTrackSchemaRequest `protobuf:"bytes,22,opt,name=get_data_track_schema,json=getDataTrackSchema,proto3,oneof"`
+}
+
 func (*SignalRequest_Offer) isSignalRequest_Message() {}
 
 func (*SignalRequest_Answer) isSignalRequest_Message() {}
@@ -737,6 +755,8 @@ func (*SignalRequest_UnpublishDataTrackRequest) isSignalRequest_Message() {}
 
 func (*SignalRequest_UpdateDataSubscription) isSignalRequest_Message() {}
 
+func (*SignalRequest_GetDataTrackSchema) isSignalRequest_Message() {}
+
 type SignalResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Message:
@@ -769,6 +789,7 @@ type SignalResponse struct {
 	//	*SignalResponse_PublishDataTrackResponse
 	//	*SignalResponse_UnpublishDataTrackResponse
 	//	*SignalResponse_DataTrackSubscriberHandles
+	//	*SignalResponse_GetDataTrackSchemaResponse
 	Message       isSignalResponse_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1063,6 +1084,15 @@ func (x *SignalResponse) GetDataTrackSubscriberHandles() *DataTrackSubscriberHan
 	return nil
 }
 
+func (x *SignalResponse) GetGetDataTrackSchemaResponse() *GetDataTrackSchemaResponse {
+	if x != nil {
+		if x, ok := x.Message.(*SignalResponse_GetDataTrackSchemaResponse); ok {
+			return x.GetDataTrackSchemaResponse
+		}
+	}
+	return nil
+}
+
 type isSignalResponse_Message interface {
 	isSignalResponse_Message()
 }
@@ -1208,6 +1238,11 @@ type SignalResponse_DataTrackSubscriberHandles struct {
 	DataTrackSubscriberHandles *DataTrackSubscriberHandles `protobuf:"bytes,29,opt,name=data_track_subscriber_handles,json=dataTrackSubscriberHandles,proto3,oneof"`
 }
 
+type SignalResponse_GetDataTrackSchemaResponse struct {
+	// Sent in response to `GetDataTrackSchemaRequest`.
+	GetDataTrackSchemaResponse *GetDataTrackSchemaResponse `protobuf:"bytes,30,opt,name=get_data_track_schema_response,json=getDataTrackSchemaResponse,proto3,oneof"`
+}
+
 func (*SignalResponse_Join) isSignalResponse_Message() {}
 
 func (*SignalResponse_Answer) isSignalResponse_Message() {}
@@ -1263,6 +1298,8 @@ func (*SignalResponse_PublishDataTrackResponse) isSignalResponse_Message() {}
 func (*SignalResponse_UnpublishDataTrackResponse) isSignalResponse_Message() {}
 
 func (*SignalResponse_DataTrackSubscriberHandles) isSignalResponse_Message() {}
+
+func (*SignalResponse_GetDataTrackSchemaResponse) isSignalResponse_Message() {}
 
 type SimulcastCodec struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -1533,9 +1570,11 @@ type PublishDataTrackRequest struct {
 	// This must be non-empty and no longer than 256 characters.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
-	Encryption    Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Encryption Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
+	// Type definition for this track. If unset, the track is untyped.
+	TypeDefinition *DataTrackTypeDefinition `protobuf:"bytes,4,opt,name=type_definition,json=typeDefinition,proto3,oneof" json:"type_definition,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *PublishDataTrackRequest) Reset() {
@@ -1587,6 +1626,13 @@ func (x *PublishDataTrackRequest) GetEncryption() Encryption_Type {
 		return x.Encryption
 	}
 	return Encryption_NONE
+}
+
+func (x *PublishDataTrackRequest) GetTypeDefinition() *DataTrackTypeDefinition {
+	if x != nil {
+		return x.TypeDefinition
+	}
+	return nil
 }
 
 type PublishDataTrackResponse struct {
@@ -2425,6 +2471,96 @@ func (x *UpdateDataSubscription) GetUpdates() []*UpdateDataSubscription_Update {
 	return nil
 }
 
+type GetDataTrackSchemaRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID of the schema to get.
+	SchemaId      *DataTrackSchemaId `protobuf:"bytes,1,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDataTrackSchemaRequest) Reset() {
+	*x = GetDataTrackSchemaRequest{}
+	mi := &file_livekit_rtc_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDataTrackSchemaRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDataTrackSchemaRequest) ProtoMessage() {}
+
+func (x *GetDataTrackSchemaRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDataTrackSchemaRequest.ProtoReflect.Descriptor instead.
+func (*GetDataTrackSchemaRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetDataTrackSchemaRequest) GetSchemaId() *DataTrackSchemaId {
+	if x != nil {
+		return x.SchemaId
+	}
+	return nil
+}
+
+type GetDataTrackSchemaResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Definition of the requested schema.
+	SchemaDefinition *DataTrackSchemaDefinition `protobuf:"bytes,1,opt,name=schema_definition,json=schemaDefinition,proto3" json:"schema_definition,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *GetDataTrackSchemaResponse) Reset() {
+	*x = GetDataTrackSchemaResponse{}
+	mi := &file_livekit_rtc_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDataTrackSchemaResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDataTrackSchemaResponse) ProtoMessage() {}
+
+func (x *GetDataTrackSchemaResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDataTrackSchemaResponse.ProtoReflect.Descriptor instead.
+func (*GetDataTrackSchemaResponse) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetDataTrackSchemaResponse) GetSchemaDefinition() *DataTrackSchemaDefinition {
+	if x != nil {
+		return x.SchemaDefinition
+	}
+	return nil
+}
+
 type UpdateTrackSettings struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	TrackSids []string               `protobuf:"bytes,1,rep,name=track_sids,json=trackSids,proto3" json:"track_sids,omitempty"`
@@ -2451,7 +2587,7 @@ type UpdateTrackSettings struct {
 
 func (x *UpdateTrackSettings) Reset() {
 	*x = UpdateTrackSettings{}
-	mi := &file_livekit_rtc_proto_msgTypes[19]
+	mi := &file_livekit_rtc_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2463,7 +2599,7 @@ func (x *UpdateTrackSettings) String() string {
 func (*UpdateTrackSettings) ProtoMessage() {}
 
 func (x *UpdateTrackSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[19]
+	mi := &file_livekit_rtc_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2476,7 +2612,7 @@ func (x *UpdateTrackSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTrackSettings.ProtoReflect.Descriptor instead.
 func (*UpdateTrackSettings) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{19}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *UpdateTrackSettings) GetTrackSids() []string {
@@ -2538,7 +2674,7 @@ type UpdateLocalAudioTrack struct {
 
 func (x *UpdateLocalAudioTrack) Reset() {
 	*x = UpdateLocalAudioTrack{}
-	mi := &file_livekit_rtc_proto_msgTypes[20]
+	mi := &file_livekit_rtc_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2550,7 +2686,7 @@ func (x *UpdateLocalAudioTrack) String() string {
 func (*UpdateLocalAudioTrack) ProtoMessage() {}
 
 func (x *UpdateLocalAudioTrack) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[20]
+	mi := &file_livekit_rtc_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2563,7 +2699,7 @@ func (x *UpdateLocalAudioTrack) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLocalAudioTrack.ProtoReflect.Descriptor instead.
 func (*UpdateLocalAudioTrack) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *UpdateLocalAudioTrack) GetTrackSid() string {
@@ -2591,7 +2727,7 @@ type UpdateLocalVideoTrack struct {
 
 func (x *UpdateLocalVideoTrack) Reset() {
 	*x = UpdateLocalVideoTrack{}
-	mi := &file_livekit_rtc_proto_msgTypes[21]
+	mi := &file_livekit_rtc_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2603,7 +2739,7 @@ func (x *UpdateLocalVideoTrack) String() string {
 func (*UpdateLocalVideoTrack) ProtoMessage() {}
 
 func (x *UpdateLocalVideoTrack) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[21]
+	mi := &file_livekit_rtc_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2616,7 +2752,7 @@ func (x *UpdateLocalVideoTrack) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLocalVideoTrack.ProtoReflect.Descriptor instead.
 func (*UpdateLocalVideoTrack) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{21}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *UpdateLocalVideoTrack) GetTrackSid() string {
@@ -2655,7 +2791,7 @@ type LeaveRequest struct {
 
 func (x *LeaveRequest) Reset() {
 	*x = LeaveRequest{}
-	mi := &file_livekit_rtc_proto_msgTypes[22]
+	mi := &file_livekit_rtc_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2667,7 +2803,7 @@ func (x *LeaveRequest) String() string {
 func (*LeaveRequest) ProtoMessage() {}
 
 func (x *LeaveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[22]
+	mi := &file_livekit_rtc_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2680,7 +2816,7 @@ func (x *LeaveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaveRequest.ProtoReflect.Descriptor instead.
 func (*LeaveRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{22}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *LeaveRequest) GetCanReconnect() bool {
@@ -2724,7 +2860,7 @@ type UpdateVideoLayers struct {
 
 func (x *UpdateVideoLayers) Reset() {
 	*x = UpdateVideoLayers{}
-	mi := &file_livekit_rtc_proto_msgTypes[23]
+	mi := &file_livekit_rtc_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2736,7 +2872,7 @@ func (x *UpdateVideoLayers) String() string {
 func (*UpdateVideoLayers) ProtoMessage() {}
 
 func (x *UpdateVideoLayers) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[23]
+	mi := &file_livekit_rtc_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2749,7 +2885,7 @@ func (x *UpdateVideoLayers) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateVideoLayers.ProtoReflect.Descriptor instead.
 func (*UpdateVideoLayers) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{23}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *UpdateVideoLayers) GetTrackSid() string {
@@ -2780,7 +2916,7 @@ type UpdateParticipantMetadata struct {
 
 func (x *UpdateParticipantMetadata) Reset() {
 	*x = UpdateParticipantMetadata{}
-	mi := &file_livekit_rtc_proto_msgTypes[24]
+	mi := &file_livekit_rtc_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2792,7 +2928,7 @@ func (x *UpdateParticipantMetadata) String() string {
 func (*UpdateParticipantMetadata) ProtoMessage() {}
 
 func (x *UpdateParticipantMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[24]
+	mi := &file_livekit_rtc_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2805,7 +2941,7 @@ func (x *UpdateParticipantMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateParticipantMetadata.ProtoReflect.Descriptor instead.
 func (*UpdateParticipantMetadata) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{24}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *UpdateParticipantMetadata) GetMetadata() string {
@@ -2847,7 +2983,7 @@ type ICEServer struct {
 
 func (x *ICEServer) Reset() {
 	*x = ICEServer{}
-	mi := &file_livekit_rtc_proto_msgTypes[25]
+	mi := &file_livekit_rtc_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2859,7 +2995,7 @@ func (x *ICEServer) String() string {
 func (*ICEServer) ProtoMessage() {}
 
 func (x *ICEServer) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[25]
+	mi := &file_livekit_rtc_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2872,7 +3008,7 @@ func (x *ICEServer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ICEServer.ProtoReflect.Descriptor instead.
 func (*ICEServer) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{25}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ICEServer) GetUrls() []string {
@@ -2905,7 +3041,7 @@ type SpeakersChanged struct {
 
 func (x *SpeakersChanged) Reset() {
 	*x = SpeakersChanged{}
-	mi := &file_livekit_rtc_proto_msgTypes[26]
+	mi := &file_livekit_rtc_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2917,7 +3053,7 @@ func (x *SpeakersChanged) String() string {
 func (*SpeakersChanged) ProtoMessage() {}
 
 func (x *SpeakersChanged) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[26]
+	mi := &file_livekit_rtc_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2930,7 +3066,7 @@ func (x *SpeakersChanged) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SpeakersChanged.ProtoReflect.Descriptor instead.
 func (*SpeakersChanged) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{26}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *SpeakersChanged) GetSpeakers() []*SpeakerInfo {
@@ -2949,7 +3085,7 @@ type RoomUpdate struct {
 
 func (x *RoomUpdate) Reset() {
 	*x = RoomUpdate{}
-	mi := &file_livekit_rtc_proto_msgTypes[27]
+	mi := &file_livekit_rtc_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2961,7 +3097,7 @@ func (x *RoomUpdate) String() string {
 func (*RoomUpdate) ProtoMessage() {}
 
 func (x *RoomUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[27]
+	mi := &file_livekit_rtc_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2974,7 +3110,7 @@ func (x *RoomUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomUpdate.ProtoReflect.Descriptor instead.
 func (*RoomUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{27}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *RoomUpdate) GetRoom() *Room {
@@ -2995,7 +3131,7 @@ type ConnectionQualityInfo struct {
 
 func (x *ConnectionQualityInfo) Reset() {
 	*x = ConnectionQualityInfo{}
-	mi := &file_livekit_rtc_proto_msgTypes[28]
+	mi := &file_livekit_rtc_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3007,7 +3143,7 @@ func (x *ConnectionQualityInfo) String() string {
 func (*ConnectionQualityInfo) ProtoMessage() {}
 
 func (x *ConnectionQualityInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[28]
+	mi := &file_livekit_rtc_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3020,7 +3156,7 @@ func (x *ConnectionQualityInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionQualityInfo.ProtoReflect.Descriptor instead.
 func (*ConnectionQualityInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{28}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ConnectionQualityInfo) GetParticipantSid() string {
@@ -3053,7 +3189,7 @@ type ConnectionQualityUpdate struct {
 
 func (x *ConnectionQualityUpdate) Reset() {
 	*x = ConnectionQualityUpdate{}
-	mi := &file_livekit_rtc_proto_msgTypes[29]
+	mi := &file_livekit_rtc_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3065,7 +3201,7 @@ func (x *ConnectionQualityUpdate) String() string {
 func (*ConnectionQualityUpdate) ProtoMessage() {}
 
 func (x *ConnectionQualityUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[29]
+	mi := &file_livekit_rtc_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3078,7 +3214,7 @@ func (x *ConnectionQualityUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionQualityUpdate.ProtoReflect.Descriptor instead.
 func (*ConnectionQualityUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{29}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *ConnectionQualityUpdate) GetUpdates() []*ConnectionQualityInfo {
@@ -3099,7 +3235,7 @@ type StreamStateInfo struct {
 
 func (x *StreamStateInfo) Reset() {
 	*x = StreamStateInfo{}
-	mi := &file_livekit_rtc_proto_msgTypes[30]
+	mi := &file_livekit_rtc_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3111,7 +3247,7 @@ func (x *StreamStateInfo) String() string {
 func (*StreamStateInfo) ProtoMessage() {}
 
 func (x *StreamStateInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[30]
+	mi := &file_livekit_rtc_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3124,7 +3260,7 @@ func (x *StreamStateInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamStateInfo.ProtoReflect.Descriptor instead.
 func (*StreamStateInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{30}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *StreamStateInfo) GetParticipantSid() string {
@@ -3157,7 +3293,7 @@ type StreamStateUpdate struct {
 
 func (x *StreamStateUpdate) Reset() {
 	*x = StreamStateUpdate{}
-	mi := &file_livekit_rtc_proto_msgTypes[31]
+	mi := &file_livekit_rtc_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3169,7 +3305,7 @@ func (x *StreamStateUpdate) String() string {
 func (*StreamStateUpdate) ProtoMessage() {}
 
 func (x *StreamStateUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[31]
+	mi := &file_livekit_rtc_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3182,7 +3318,7 @@ func (x *StreamStateUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamStateUpdate.ProtoReflect.Descriptor instead.
 func (*StreamStateUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{31}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *StreamStateUpdate) GetStreamStates() []*StreamStateInfo {
@@ -3202,7 +3338,7 @@ type SubscribedQuality struct {
 
 func (x *SubscribedQuality) Reset() {
 	*x = SubscribedQuality{}
-	mi := &file_livekit_rtc_proto_msgTypes[32]
+	mi := &file_livekit_rtc_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3214,7 +3350,7 @@ func (x *SubscribedQuality) String() string {
 func (*SubscribedQuality) ProtoMessage() {}
 
 func (x *SubscribedQuality) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[32]
+	mi := &file_livekit_rtc_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3227,7 +3363,7 @@ func (x *SubscribedQuality) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscribedQuality.ProtoReflect.Descriptor instead.
 func (*SubscribedQuality) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{32}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *SubscribedQuality) GetQuality() VideoQuality {
@@ -3254,7 +3390,7 @@ type SubscribedCodec struct {
 
 func (x *SubscribedCodec) Reset() {
 	*x = SubscribedCodec{}
-	mi := &file_livekit_rtc_proto_msgTypes[33]
+	mi := &file_livekit_rtc_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3266,7 +3402,7 @@ func (x *SubscribedCodec) String() string {
 func (*SubscribedCodec) ProtoMessage() {}
 
 func (x *SubscribedCodec) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[33]
+	mi := &file_livekit_rtc_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3279,7 +3415,7 @@ func (x *SubscribedCodec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscribedCodec.ProtoReflect.Descriptor instead.
 func (*SubscribedCodec) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{33}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *SubscribedCodec) GetCodec() string {
@@ -3308,7 +3444,7 @@ type SubscribedQualityUpdate struct {
 
 func (x *SubscribedQualityUpdate) Reset() {
 	*x = SubscribedQualityUpdate{}
-	mi := &file_livekit_rtc_proto_msgTypes[34]
+	mi := &file_livekit_rtc_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3320,7 +3456,7 @@ func (x *SubscribedQualityUpdate) String() string {
 func (*SubscribedQualityUpdate) ProtoMessage() {}
 
 func (x *SubscribedQualityUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[34]
+	mi := &file_livekit_rtc_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3333,7 +3469,7 @@ func (x *SubscribedQualityUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscribedQualityUpdate.ProtoReflect.Descriptor instead.
 func (*SubscribedQualityUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{34}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *SubscribedQualityUpdate) GetTrackSid() string {
@@ -3368,7 +3504,7 @@ type SubscribedAudioCodecUpdate struct {
 
 func (x *SubscribedAudioCodecUpdate) Reset() {
 	*x = SubscribedAudioCodecUpdate{}
-	mi := &file_livekit_rtc_proto_msgTypes[35]
+	mi := &file_livekit_rtc_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3380,7 +3516,7 @@ func (x *SubscribedAudioCodecUpdate) String() string {
 func (*SubscribedAudioCodecUpdate) ProtoMessage() {}
 
 func (x *SubscribedAudioCodecUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[35]
+	mi := &file_livekit_rtc_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3393,7 +3529,7 @@ func (x *SubscribedAudioCodecUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscribedAudioCodecUpdate.ProtoReflect.Descriptor instead.
 func (*SubscribedAudioCodecUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{35}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *SubscribedAudioCodecUpdate) GetTrackSid() string {
@@ -3423,7 +3559,7 @@ type TrackPermission struct {
 
 func (x *TrackPermission) Reset() {
 	*x = TrackPermission{}
-	mi := &file_livekit_rtc_proto_msgTypes[36]
+	mi := &file_livekit_rtc_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3435,7 +3571,7 @@ func (x *TrackPermission) String() string {
 func (*TrackPermission) ProtoMessage() {}
 
 func (x *TrackPermission) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[36]
+	mi := &file_livekit_rtc_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3448,7 +3584,7 @@ func (x *TrackPermission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrackPermission.ProtoReflect.Descriptor instead.
 func (*TrackPermission) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{36}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *TrackPermission) GetParticipantSid() string {
@@ -3489,7 +3625,7 @@ type SubscriptionPermission struct {
 
 func (x *SubscriptionPermission) Reset() {
 	*x = SubscriptionPermission{}
-	mi := &file_livekit_rtc_proto_msgTypes[37]
+	mi := &file_livekit_rtc_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3501,7 +3637,7 @@ func (x *SubscriptionPermission) String() string {
 func (*SubscriptionPermission) ProtoMessage() {}
 
 func (x *SubscriptionPermission) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[37]
+	mi := &file_livekit_rtc_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3514,7 +3650,7 @@ func (x *SubscriptionPermission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscriptionPermission.ProtoReflect.Descriptor instead.
 func (*SubscriptionPermission) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{37}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *SubscriptionPermission) GetAllParticipants() bool {
@@ -3542,7 +3678,7 @@ type SubscriptionPermissionUpdate struct {
 
 func (x *SubscriptionPermissionUpdate) Reset() {
 	*x = SubscriptionPermissionUpdate{}
-	mi := &file_livekit_rtc_proto_msgTypes[38]
+	mi := &file_livekit_rtc_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3554,7 +3690,7 @@ func (x *SubscriptionPermissionUpdate) String() string {
 func (*SubscriptionPermissionUpdate) ProtoMessage() {}
 
 func (x *SubscriptionPermissionUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[38]
+	mi := &file_livekit_rtc_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3567,7 +3703,7 @@ func (x *SubscriptionPermissionUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscriptionPermissionUpdate.ProtoReflect.Descriptor instead.
 func (*SubscriptionPermissionUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{38}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *SubscriptionPermissionUpdate) GetParticipantSid() string {
@@ -3605,7 +3741,7 @@ type RoomMovedResponse struct {
 
 func (x *RoomMovedResponse) Reset() {
 	*x = RoomMovedResponse{}
-	mi := &file_livekit_rtc_proto_msgTypes[39]
+	mi := &file_livekit_rtc_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3617,7 +3753,7 @@ func (x *RoomMovedResponse) String() string {
 func (*RoomMovedResponse) ProtoMessage() {}
 
 func (x *RoomMovedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[39]
+	mi := &file_livekit_rtc_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3630,7 +3766,7 @@ func (x *RoomMovedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RoomMovedResponse.ProtoReflect.Descriptor instead.
 func (*RoomMovedResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{39}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *RoomMovedResponse) GetRoom() *Room {
@@ -3683,7 +3819,7 @@ type SyncState struct {
 
 func (x *SyncState) Reset() {
 	*x = SyncState{}
-	mi := &file_livekit_rtc_proto_msgTypes[40]
+	mi := &file_livekit_rtc_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3695,7 +3831,7 @@ func (x *SyncState) String() string {
 func (*SyncState) ProtoMessage() {}
 
 func (x *SyncState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[40]
+	mi := &file_livekit_rtc_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3708,7 +3844,7 @@ func (x *SyncState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncState.ProtoReflect.Descriptor instead.
 func (*SyncState) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{40}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *SyncState) GetAnswer() *SessionDescription {
@@ -3777,7 +3913,7 @@ type DataChannelReceiveState struct {
 
 func (x *DataChannelReceiveState) Reset() {
 	*x = DataChannelReceiveState{}
-	mi := &file_livekit_rtc_proto_msgTypes[41]
+	mi := &file_livekit_rtc_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3789,7 +3925,7 @@ func (x *DataChannelReceiveState) String() string {
 func (*DataChannelReceiveState) ProtoMessage() {}
 
 func (x *DataChannelReceiveState) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[41]
+	mi := &file_livekit_rtc_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3802,7 +3938,7 @@ func (x *DataChannelReceiveState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataChannelReceiveState.ProtoReflect.Descriptor instead.
 func (*DataChannelReceiveState) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{41}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *DataChannelReceiveState) GetPublisherSid() string {
@@ -3830,7 +3966,7 @@ type DataChannelInfo struct {
 
 func (x *DataChannelInfo) Reset() {
 	*x = DataChannelInfo{}
-	mi := &file_livekit_rtc_proto_msgTypes[42]
+	mi := &file_livekit_rtc_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3842,7 +3978,7 @@ func (x *DataChannelInfo) String() string {
 func (*DataChannelInfo) ProtoMessage() {}
 
 func (x *DataChannelInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[42]
+	mi := &file_livekit_rtc_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3855,7 +3991,7 @@ func (x *DataChannelInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DataChannelInfo.ProtoReflect.Descriptor instead.
 func (*DataChannelInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{42}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *DataChannelInfo) GetLabel() string {
@@ -3899,7 +4035,7 @@ type SimulateScenario struct {
 
 func (x *SimulateScenario) Reset() {
 	*x = SimulateScenario{}
-	mi := &file_livekit_rtc_proto_msgTypes[43]
+	mi := &file_livekit_rtc_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3911,7 +4047,7 @@ func (x *SimulateScenario) String() string {
 func (*SimulateScenario) ProtoMessage() {}
 
 func (x *SimulateScenario) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[43]
+	mi := &file_livekit_rtc_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3924,7 +4060,7 @@ func (x *SimulateScenario) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SimulateScenario.ProtoReflect.Descriptor instead.
 func (*SimulateScenario) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{43}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *SimulateScenario) GetScenario() isSimulateScenario_Scenario {
@@ -4094,7 +4230,7 @@ type Ping struct {
 
 func (x *Ping) Reset() {
 	*x = Ping{}
-	mi := &file_livekit_rtc_proto_msgTypes[44]
+	mi := &file_livekit_rtc_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4106,7 +4242,7 @@ func (x *Ping) String() string {
 func (*Ping) ProtoMessage() {}
 
 func (x *Ping) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[44]
+	mi := &file_livekit_rtc_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4119,7 +4255,7 @@ func (x *Ping) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ping.ProtoReflect.Descriptor instead.
 func (*Ping) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{44}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *Ping) GetTimestamp() int64 {
@@ -4147,7 +4283,7 @@ type Pong struct {
 
 func (x *Pong) Reset() {
 	*x = Pong{}
-	mi := &file_livekit_rtc_proto_msgTypes[45]
+	mi := &file_livekit_rtc_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4159,7 +4295,7 @@ func (x *Pong) String() string {
 func (*Pong) ProtoMessage() {}
 
 func (x *Pong) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[45]
+	mi := &file_livekit_rtc_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4172,7 +4308,7 @@ func (x *Pong) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Pong.ProtoReflect.Descriptor instead.
 func (*Pong) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{45}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *Pong) GetLastPingTimestamp() int64 {
@@ -4198,7 +4334,7 @@ type RegionSettings struct {
 
 func (x *RegionSettings) Reset() {
 	*x = RegionSettings{}
-	mi := &file_livekit_rtc_proto_msgTypes[46]
+	mi := &file_livekit_rtc_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4210,7 +4346,7 @@ func (x *RegionSettings) String() string {
 func (*RegionSettings) ProtoMessage() {}
 
 func (x *RegionSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[46]
+	mi := &file_livekit_rtc_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4223,7 +4359,7 @@ func (x *RegionSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegionSettings.ProtoReflect.Descriptor instead.
 func (*RegionSettings) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{46}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *RegionSettings) GetRegions() []*RegionInfo {
@@ -4244,7 +4380,7 @@ type RegionInfo struct {
 
 func (x *RegionInfo) Reset() {
 	*x = RegionInfo{}
-	mi := &file_livekit_rtc_proto_msgTypes[47]
+	mi := &file_livekit_rtc_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4256,7 +4392,7 @@ func (x *RegionInfo) String() string {
 func (*RegionInfo) ProtoMessage() {}
 
 func (x *RegionInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[47]
+	mi := &file_livekit_rtc_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4269,7 +4405,7 @@ func (x *RegionInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegionInfo.ProtoReflect.Descriptor instead.
 func (*RegionInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{47}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *RegionInfo) GetRegion() string {
@@ -4303,7 +4439,7 @@ type SubscriptionResponse struct {
 
 func (x *SubscriptionResponse) Reset() {
 	*x = SubscriptionResponse{}
-	mi := &file_livekit_rtc_proto_msgTypes[48]
+	mi := &file_livekit_rtc_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4315,7 +4451,7 @@ func (x *SubscriptionResponse) String() string {
 func (*SubscriptionResponse) ProtoMessage() {}
 
 func (x *SubscriptionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[48]
+	mi := &file_livekit_rtc_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4328,7 +4464,7 @@ func (x *SubscriptionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubscriptionResponse.ProtoReflect.Descriptor instead.
 func (*SubscriptionResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{48}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *SubscriptionResponse) GetTrackSid() string {
@@ -4360,6 +4496,7 @@ type RequestResponse struct {
 	//	*RequestResponse_UpdateVideoTrack
 	//	*RequestResponse_PublishDataTrack
 	//	*RequestResponse_UnpublishDataTrack
+	//	*RequestResponse_GetDataTrackSchema
 	Request       isRequestResponse_Request `protobuf_oneof:"request"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -4367,7 +4504,7 @@ type RequestResponse struct {
 
 func (x *RequestResponse) Reset() {
 	*x = RequestResponse{}
-	mi := &file_livekit_rtc_proto_msgTypes[49]
+	mi := &file_livekit_rtc_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4379,7 +4516,7 @@ func (x *RequestResponse) String() string {
 func (*RequestResponse) ProtoMessage() {}
 
 func (x *RequestResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[49]
+	mi := &file_livekit_rtc_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4392,7 +4529,7 @@ func (x *RequestResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestResponse.ProtoReflect.Descriptor instead.
 func (*RequestResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{49}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *RequestResponse) GetRequestId() uint32 {
@@ -4495,6 +4632,15 @@ func (x *RequestResponse) GetUnpublishDataTrack() *UnpublishDataTrackRequest {
 	return nil
 }
 
+func (x *RequestResponse) GetGetDataTrackSchema() *GetDataTrackSchemaRequest {
+	if x != nil {
+		if x, ok := x.Request.(*RequestResponse_GetDataTrackSchema); ok {
+			return x.GetDataTrackSchema
+		}
+	}
+	return nil
+}
+
 type isRequestResponse_Request interface {
 	isRequestResponse_Request()
 }
@@ -4531,6 +4677,10 @@ type RequestResponse_UnpublishDataTrack struct {
 	UnpublishDataTrack *UnpublishDataTrackRequest `protobuf:"bytes,11,opt,name=unpublish_data_track,json=unpublishDataTrack,proto3,oneof"`
 }
 
+type RequestResponse_GetDataTrackSchema struct {
+	GetDataTrackSchema *GetDataTrackSchemaRequest `protobuf:"bytes,12,opt,name=get_data_track_schema,json=getDataTrackSchema,proto3,oneof"`
+}
+
 func (*RequestResponse_Trickle) isRequestResponse_Request() {}
 
 func (*RequestResponse_AddTrack) isRequestResponse_Request() {}
@@ -4547,6 +4697,8 @@ func (*RequestResponse_PublishDataTrack) isRequestResponse_Request() {}
 
 func (*RequestResponse_UnpublishDataTrack) isRequestResponse_Request() {}
 
+func (*RequestResponse_GetDataTrackSchema) isRequestResponse_Request() {}
+
 type TrackSubscribed struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TrackSid      string                 `protobuf:"bytes,1,opt,name=track_sid,json=trackSid,proto3" json:"track_sid,omitempty"`
@@ -4556,7 +4708,7 @@ type TrackSubscribed struct {
 
 func (x *TrackSubscribed) Reset() {
 	*x = TrackSubscribed{}
-	mi := &file_livekit_rtc_proto_msgTypes[50]
+	mi := &file_livekit_rtc_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4568,7 +4720,7 @@ func (x *TrackSubscribed) String() string {
 func (*TrackSubscribed) ProtoMessage() {}
 
 func (x *TrackSubscribed) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[50]
+	mi := &file_livekit_rtc_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4581,7 +4733,7 @@ func (x *TrackSubscribed) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrackSubscribed.ProtoReflect.Descriptor instead.
 func (*TrackSubscribed) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{50}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *TrackSubscribed) GetTrackSid() string {
@@ -4604,7 +4756,7 @@ type ConnectionSettings struct {
 
 func (x *ConnectionSettings) Reset() {
 	*x = ConnectionSettings{}
-	mi := &file_livekit_rtc_proto_msgTypes[51]
+	mi := &file_livekit_rtc_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4616,7 +4768,7 @@ func (x *ConnectionSettings) String() string {
 func (*ConnectionSettings) ProtoMessage() {}
 
 func (x *ConnectionSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[51]
+	mi := &file_livekit_rtc_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4629,7 +4781,7 @@ func (x *ConnectionSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectionSettings.ProtoReflect.Descriptor instead.
 func (*ConnectionSettings) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{51}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *ConnectionSettings) GetAutoSubscribe() bool {
@@ -4688,7 +4840,7 @@ type JoinRequest struct {
 
 func (x *JoinRequest) Reset() {
 	*x = JoinRequest{}
-	mi := &file_livekit_rtc_proto_msgTypes[52]
+	mi := &file_livekit_rtc_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4700,7 +4852,7 @@ func (x *JoinRequest) String() string {
 func (*JoinRequest) ProtoMessage() {}
 
 func (x *JoinRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[52]
+	mi := &file_livekit_rtc_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4713,7 +4865,7 @@ func (x *JoinRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRequest.ProtoReflect.Descriptor instead.
 func (*JoinRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{52}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *JoinRequest) GetClientInfo() *ClientInfo {
@@ -4796,7 +4948,7 @@ type WrappedJoinRequest struct {
 
 func (x *WrappedJoinRequest) Reset() {
 	*x = WrappedJoinRequest{}
-	mi := &file_livekit_rtc_proto_msgTypes[53]
+	mi := &file_livekit_rtc_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4808,7 +4960,7 @@ func (x *WrappedJoinRequest) String() string {
 func (*WrappedJoinRequest) ProtoMessage() {}
 
 func (x *WrappedJoinRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[53]
+	mi := &file_livekit_rtc_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4821,7 +4973,7 @@ func (x *WrappedJoinRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WrappedJoinRequest.ProtoReflect.Descriptor instead.
 func (*WrappedJoinRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{53}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *WrappedJoinRequest) GetCompression() WrappedJoinRequest_Compression {
@@ -4848,7 +5000,7 @@ type MediaSectionsRequirement struct {
 
 func (x *MediaSectionsRequirement) Reset() {
 	*x = MediaSectionsRequirement{}
-	mi := &file_livekit_rtc_proto_msgTypes[54]
+	mi := &file_livekit_rtc_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4860,7 +5012,7 @@ func (x *MediaSectionsRequirement) String() string {
 func (*MediaSectionsRequirement) ProtoMessage() {}
 
 func (x *MediaSectionsRequirement) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[54]
+	mi := &file_livekit_rtc_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4873,7 +5025,7 @@ func (x *MediaSectionsRequirement) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MediaSectionsRequirement.ProtoReflect.Descriptor instead.
 func (*MediaSectionsRequirement) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{54}
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *MediaSectionsRequirement) GetNumAudios() uint32 {
@@ -4901,7 +5053,7 @@ type DataTrackSubscriberHandles_PublishedDataTrack struct {
 
 func (x *DataTrackSubscriberHandles_PublishedDataTrack) Reset() {
 	*x = DataTrackSubscriberHandles_PublishedDataTrack{}
-	mi := &file_livekit_rtc_proto_msgTypes[55]
+	mi := &file_livekit_rtc_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4913,7 +5065,7 @@ func (x *DataTrackSubscriberHandles_PublishedDataTrack) String() string {
 func (*DataTrackSubscriberHandles_PublishedDataTrack) ProtoMessage() {}
 
 func (x *DataTrackSubscriberHandles_PublishedDataTrack) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[55]
+	mi := &file_livekit_rtc_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4963,7 +5115,7 @@ type UpdateDataSubscription_Update struct {
 
 func (x *UpdateDataSubscription_Update) Reset() {
 	*x = UpdateDataSubscription_Update{}
-	mi := &file_livekit_rtc_proto_msgTypes[58]
+	mi := &file_livekit_rtc_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4975,7 +5127,7 @@ func (x *UpdateDataSubscription_Update) String() string {
 func (*UpdateDataSubscription_Update) ProtoMessage() {}
 
 func (x *UpdateDataSubscription_Update) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[58]
+	mi := &file_livekit_rtc_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5016,8 +5168,7 @@ var File_livekit_rtc_proto protoreflect.FileDescriptor
 
 const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
-	"\x11livekit_rtc.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xc3\n" +
-	"\n" +
+	"\x11livekit_rtc.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\x9c\v\n" +
 	"\rSignalRequest\x123\n" +
 	"\x05offer\x18\x01 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x05offer\x125\n" +
 	"\x06answer\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x06answer\x123\n" +
@@ -5040,8 +5191,9 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\x12 \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12_\n" +
 	"\x1apublish_data_track_request\x18\x13 \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x17publishDataTrackRequest\x12e\n" +
 	"\x1cunpublish_data_track_request\x18\x14 \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x19unpublishDataTrackRequest\x12[\n" +
-	"\x18update_data_subscription\x18\x15 \x01(\v2\x1f.livekit.UpdateDataSubscriptionH\x00R\x16updateDataSubscriptionB\t\n" +
-	"\amessage\"\xd9\x0f\n" +
+	"\x18update_data_subscription\x18\x15 \x01(\v2\x1f.livekit.UpdateDataSubscriptionH\x00R\x16updateDataSubscription\x12W\n" +
+	"\x15get_data_track_schema\x18\x16 \x01(\v2\".livekit.GetDataTrackSchemaRequestH\x00R\x12getDataTrackSchemaB\t\n" +
+	"\amessage\"\xc4\x10\n" +
 	"\x0eSignalResponse\x12+\n" +
 	"\x04join\x18\x01 \x01(\v2\x15.livekit.JoinResponseH\x00R\x04join\x125\n" +
 	"\x06answer\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x06answer\x123\n" +
@@ -5073,7 +5225,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x1dsubscribed_audio_codec_update\x18\x1a \x01(\v2#.livekit.SubscribedAudioCodecUpdateH\x00R\x1asubscribedAudioCodecUpdate\x12b\n" +
 	"\x1bpublish_data_track_response\x18\x1b \x01(\v2!.livekit.PublishDataTrackResponseH\x00R\x18publishDataTrackResponse\x12h\n" +
 	"\x1dunpublish_data_track_response\x18\x1c \x01(\v2#.livekit.UnpublishDataTrackResponseH\x00R\x1aunpublishDataTrackResponse\x12h\n" +
-	"\x1ddata_track_subscriber_handles\x18\x1d \x01(\v2#.livekit.DataTrackSubscriberHandlesH\x00R\x1adataTrackSubscriberHandlesB\t\n" +
+	"\x1ddata_track_subscriber_handles\x18\x1d \x01(\v2#.livekit.DataTrackSubscriberHandlesH\x00R\x1adataTrackSubscriberHandles\x12i\n" +
+	"\x1eget_data_track_schema_response\x18\x1e \x01(\v2#.livekit.GetDataTrackSchemaResponseH\x00R\x1agetDataTrackSchemaResponseB\t\n" +
 	"\amessage\"\xa9\x01\n" +
 	"\x0eSimulcastCodec\x12\x14\n" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
@@ -5103,14 +5256,16 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
 	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12U\n" +
-	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\x86\x01\n" +
+	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xea\x01\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
 	"\n" +
 	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
-	"encryption\"F\n" +
+	"encryption\x12N\n" +
+	"\x0ftype_definition\x18\x04 \x01(\v2 .livekit.DataTrackTypeDefinitionH\x00R\x0etypeDefinition\x88\x01\x01B\x12\n" +
+	"\x10_type_definition\"F\n" +
 	"\x18PublishDataTrackResponse\x12*\n" +
 	"\x04info\x18\x01 \x01(\v2\x16.livekit.DataTrackInfoR\x04info\":\n" +
 	"\x19UnpublishDataTrackRequest\x12\x1d\n" +
@@ -5187,7 +5342,11 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06Update\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12?\n" +
-	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"\xdd\x01\n" +
+	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"T\n" +
+	"\x19GetDataTrackSchemaRequest\x127\n" +
+	"\tschema_id\x18\x01 \x01(\v2\x1a.livekit.DataTrackSchemaIdR\bschemaId\"m\n" +
+	"\x1aGetDataTrackSchemaResponse\x12O\n" +
+	"\x11schema_definition\x18\x01 \x01(\v2\".livekit.DataTrackSchemaDefinitionR\x10schemaDefinition\"\xdd\x01\n" +
 	"\x13UpdateTrackSettings\x12\x1d\n" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1a\n" +
@@ -5327,7 +5486,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xa5\a\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\x9b\b\n" +
 	"\x0fRequestResponse\x12+\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x127\n" +
@@ -5341,7 +5500,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12P\n" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
-	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xce\x01\n" +
+	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\x12W\n" +
+	"\x15get_data_track_schema\x18\f \x01(\v2\".livekit.GetDataTrackSchemaRequestH\x00R\x12getDataTrackSchema\"\xeb\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5355,7 +5515,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\fINVALID_NAME\x10\b\x12\x14\n" +
 	"\x10DUPLICATE_HANDLE\x10\t\x12\x12\n" +
 	"\x0eDUPLICATE_NAME\x10\n" +
-	"B\t\n" +
+	"\x12\x1b\n" +
+	"\x17INVALID_TYPE_DEFINITION\x10\vB\t\n" +
 	"\arequest\".\n" +
 	"\x0fTrackSubscribed\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\"\xc2\x02\n" +
@@ -5422,7 +5583,7 @@ func file_livekit_rtc_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_rtc_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_livekit_rtc_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
+var file_livekit_rtc_proto_msgTypes = make([]protoimpl.MessageInfo, 63)
 var file_livekit_rtc_proto_goTypes = []any{
 	(SignalTarget)(0),                                     // 0: livekit.SignalTarget
 	(StreamState)(0),                                      // 1: livekit.StreamState
@@ -5449,73 +5610,78 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(*ParticipantUpdate)(nil),                             // 22: livekit.ParticipantUpdate
 	(*UpdateSubscription)(nil),                            // 23: livekit.UpdateSubscription
 	(*UpdateDataSubscription)(nil),                        // 24: livekit.UpdateDataSubscription
-	(*UpdateTrackSettings)(nil),                           // 25: livekit.UpdateTrackSettings
-	(*UpdateLocalAudioTrack)(nil),                         // 26: livekit.UpdateLocalAudioTrack
-	(*UpdateLocalVideoTrack)(nil),                         // 27: livekit.UpdateLocalVideoTrack
-	(*LeaveRequest)(nil),                                  // 28: livekit.LeaveRequest
-	(*UpdateVideoLayers)(nil),                             // 29: livekit.UpdateVideoLayers
-	(*UpdateParticipantMetadata)(nil),                     // 30: livekit.UpdateParticipantMetadata
-	(*ICEServer)(nil),                                     // 31: livekit.ICEServer
-	(*SpeakersChanged)(nil),                               // 32: livekit.SpeakersChanged
-	(*RoomUpdate)(nil),                                    // 33: livekit.RoomUpdate
-	(*ConnectionQualityInfo)(nil),                         // 34: livekit.ConnectionQualityInfo
-	(*ConnectionQualityUpdate)(nil),                       // 35: livekit.ConnectionQualityUpdate
-	(*StreamStateInfo)(nil),                               // 36: livekit.StreamStateInfo
-	(*StreamStateUpdate)(nil),                             // 37: livekit.StreamStateUpdate
-	(*SubscribedQuality)(nil),                             // 38: livekit.SubscribedQuality
-	(*SubscribedCodec)(nil),                               // 39: livekit.SubscribedCodec
-	(*SubscribedQualityUpdate)(nil),                       // 40: livekit.SubscribedQualityUpdate
-	(*SubscribedAudioCodecUpdate)(nil),                    // 41: livekit.SubscribedAudioCodecUpdate
-	(*TrackPermission)(nil),                               // 42: livekit.TrackPermission
-	(*SubscriptionPermission)(nil),                        // 43: livekit.SubscriptionPermission
-	(*SubscriptionPermissionUpdate)(nil),                  // 44: livekit.SubscriptionPermissionUpdate
-	(*RoomMovedResponse)(nil),                             // 45: livekit.RoomMovedResponse
-	(*SyncState)(nil),                                     // 46: livekit.SyncState
-	(*DataChannelReceiveState)(nil),                       // 47: livekit.DataChannelReceiveState
-	(*DataChannelInfo)(nil),                               // 48: livekit.DataChannelInfo
-	(*SimulateScenario)(nil),                              // 49: livekit.SimulateScenario
-	(*Ping)(nil),                                          // 50: livekit.Ping
-	(*Pong)(nil),                                          // 51: livekit.Pong
-	(*RegionSettings)(nil),                                // 52: livekit.RegionSettings
-	(*RegionInfo)(nil),                                    // 53: livekit.RegionInfo
-	(*SubscriptionResponse)(nil),                          // 54: livekit.SubscriptionResponse
-	(*RequestResponse)(nil),                               // 55: livekit.RequestResponse
-	(*TrackSubscribed)(nil),                               // 56: livekit.TrackSubscribed
-	(*ConnectionSettings)(nil),                            // 57: livekit.ConnectionSettings
-	(*JoinRequest)(nil),                                   // 58: livekit.JoinRequest
-	(*WrappedJoinRequest)(nil),                            // 59: livekit.WrappedJoinRequest
-	(*MediaSectionsRequirement)(nil),                      // 60: livekit.MediaSectionsRequirement
-	(*DataTrackSubscriberHandles_PublishedDataTrack)(nil), // 61: livekit.DataTrackSubscriberHandles.PublishedDataTrack
-	nil,                                   // 62: livekit.DataTrackSubscriberHandles.SubHandlesEntry
-	nil,                                   // 63: livekit.SessionDescription.MidToTrackIdEntry
-	(*UpdateDataSubscription_Update)(nil), // 64: livekit.UpdateDataSubscription.Update
-	nil,                                   // 65: livekit.UpdateParticipantMetadata.AttributesEntry
-	nil,                                   // 66: livekit.JoinRequest.ParticipantAttributesEntry
-	(*VideoLayer)(nil),                    // 67: livekit.VideoLayer
-	(VideoLayer_Mode)(0),                  // 68: livekit.VideoLayer.Mode
-	(TrackType)(0),                        // 69: livekit.TrackType
-	(TrackSource)(0),                      // 70: livekit.TrackSource
-	(Encryption_Type)(0),                  // 71: livekit.Encryption.Type
-	(BackupCodecPolicy)(0),                // 72: livekit.BackupCodecPolicy
-	(AudioTrackFeature)(0),                // 73: livekit.AudioTrackFeature
-	(PacketTrailerFeature)(0),             // 74: livekit.PacketTrailerFeature
-	(*DataTrackInfo)(nil),                 // 75: livekit.DataTrackInfo
-	(*Room)(nil),                          // 76: livekit.Room
-	(*ParticipantInfo)(nil),               // 77: livekit.ParticipantInfo
-	(*ClientConfiguration)(nil),           // 78: livekit.ClientConfiguration
-	(*ServerInfo)(nil),                    // 79: livekit.ServerInfo
-	(*Codec)(nil),                         // 80: livekit.Codec
-	(*TrackInfo)(nil),                     // 81: livekit.TrackInfo
-	(*ParticipantTracks)(nil),             // 82: livekit.ParticipantTracks
-	(VideoQuality)(0),                     // 83: livekit.VideoQuality
-	(DisconnectReason)(0),                 // 84: livekit.DisconnectReason
-	(*SpeakerInfo)(nil),                   // 85: livekit.SpeakerInfo
-	(ConnectionQuality)(0),                // 86: livekit.ConnectionQuality
-	(*SubscribedAudioCodec)(nil),          // 87: livekit.SubscribedAudioCodec
-	(SubscriptionError)(0),                // 88: livekit.SubscriptionError
-	(*ClientInfo)(nil),                    // 89: livekit.ClientInfo
-	(ReconnectReason)(0),                  // 90: livekit.ReconnectReason
-	(*DataTrackSubscriptionOptions)(nil),  // 91: livekit.DataTrackSubscriptionOptions
+	(*GetDataTrackSchemaRequest)(nil),                     // 25: livekit.GetDataTrackSchemaRequest
+	(*GetDataTrackSchemaResponse)(nil),                    // 26: livekit.GetDataTrackSchemaResponse
+	(*UpdateTrackSettings)(nil),                           // 27: livekit.UpdateTrackSettings
+	(*UpdateLocalAudioTrack)(nil),                         // 28: livekit.UpdateLocalAudioTrack
+	(*UpdateLocalVideoTrack)(nil),                         // 29: livekit.UpdateLocalVideoTrack
+	(*LeaveRequest)(nil),                                  // 30: livekit.LeaveRequest
+	(*UpdateVideoLayers)(nil),                             // 31: livekit.UpdateVideoLayers
+	(*UpdateParticipantMetadata)(nil),                     // 32: livekit.UpdateParticipantMetadata
+	(*ICEServer)(nil),                                     // 33: livekit.ICEServer
+	(*SpeakersChanged)(nil),                               // 34: livekit.SpeakersChanged
+	(*RoomUpdate)(nil),                                    // 35: livekit.RoomUpdate
+	(*ConnectionQualityInfo)(nil),                         // 36: livekit.ConnectionQualityInfo
+	(*ConnectionQualityUpdate)(nil),                       // 37: livekit.ConnectionQualityUpdate
+	(*StreamStateInfo)(nil),                               // 38: livekit.StreamStateInfo
+	(*StreamStateUpdate)(nil),                             // 39: livekit.StreamStateUpdate
+	(*SubscribedQuality)(nil),                             // 40: livekit.SubscribedQuality
+	(*SubscribedCodec)(nil),                               // 41: livekit.SubscribedCodec
+	(*SubscribedQualityUpdate)(nil),                       // 42: livekit.SubscribedQualityUpdate
+	(*SubscribedAudioCodecUpdate)(nil),                    // 43: livekit.SubscribedAudioCodecUpdate
+	(*TrackPermission)(nil),                               // 44: livekit.TrackPermission
+	(*SubscriptionPermission)(nil),                        // 45: livekit.SubscriptionPermission
+	(*SubscriptionPermissionUpdate)(nil),                  // 46: livekit.SubscriptionPermissionUpdate
+	(*RoomMovedResponse)(nil),                             // 47: livekit.RoomMovedResponse
+	(*SyncState)(nil),                                     // 48: livekit.SyncState
+	(*DataChannelReceiveState)(nil),                       // 49: livekit.DataChannelReceiveState
+	(*DataChannelInfo)(nil),                               // 50: livekit.DataChannelInfo
+	(*SimulateScenario)(nil),                              // 51: livekit.SimulateScenario
+	(*Ping)(nil),                                          // 52: livekit.Ping
+	(*Pong)(nil),                                          // 53: livekit.Pong
+	(*RegionSettings)(nil),                                // 54: livekit.RegionSettings
+	(*RegionInfo)(nil),                                    // 55: livekit.RegionInfo
+	(*SubscriptionResponse)(nil),                          // 56: livekit.SubscriptionResponse
+	(*RequestResponse)(nil),                               // 57: livekit.RequestResponse
+	(*TrackSubscribed)(nil),                               // 58: livekit.TrackSubscribed
+	(*ConnectionSettings)(nil),                            // 59: livekit.ConnectionSettings
+	(*JoinRequest)(nil),                                   // 60: livekit.JoinRequest
+	(*WrappedJoinRequest)(nil),                            // 61: livekit.WrappedJoinRequest
+	(*MediaSectionsRequirement)(nil),                      // 62: livekit.MediaSectionsRequirement
+	(*DataTrackSubscriberHandles_PublishedDataTrack)(nil), // 63: livekit.DataTrackSubscriberHandles.PublishedDataTrack
+	nil,                                   // 64: livekit.DataTrackSubscriberHandles.SubHandlesEntry
+	nil,                                   // 65: livekit.SessionDescription.MidToTrackIdEntry
+	(*UpdateDataSubscription_Update)(nil), // 66: livekit.UpdateDataSubscription.Update
+	nil,                                   // 67: livekit.UpdateParticipantMetadata.AttributesEntry
+	nil,                                   // 68: livekit.JoinRequest.ParticipantAttributesEntry
+	(*VideoLayer)(nil),                    // 69: livekit.VideoLayer
+	(VideoLayer_Mode)(0),                  // 70: livekit.VideoLayer.Mode
+	(TrackType)(0),                        // 71: livekit.TrackType
+	(TrackSource)(0),                      // 72: livekit.TrackSource
+	(Encryption_Type)(0),                  // 73: livekit.Encryption.Type
+	(BackupCodecPolicy)(0),                // 74: livekit.BackupCodecPolicy
+	(AudioTrackFeature)(0),                // 75: livekit.AudioTrackFeature
+	(PacketTrailerFeature)(0),             // 76: livekit.PacketTrailerFeature
+	(*DataTrackTypeDefinition)(nil),       // 77: livekit.DataTrackTypeDefinition
+	(*DataTrackInfo)(nil),                 // 78: livekit.DataTrackInfo
+	(*Room)(nil),                          // 79: livekit.Room
+	(*ParticipantInfo)(nil),               // 80: livekit.ParticipantInfo
+	(*ClientConfiguration)(nil),           // 81: livekit.ClientConfiguration
+	(*ServerInfo)(nil),                    // 82: livekit.ServerInfo
+	(*Codec)(nil),                         // 83: livekit.Codec
+	(*TrackInfo)(nil),                     // 84: livekit.TrackInfo
+	(*ParticipantTracks)(nil),             // 85: livekit.ParticipantTracks
+	(*DataTrackSchemaId)(nil),             // 86: livekit.DataTrackSchemaId
+	(*DataTrackSchemaDefinition)(nil),     // 87: livekit.DataTrackSchemaDefinition
+	(VideoQuality)(0),                     // 88: livekit.VideoQuality
+	(DisconnectReason)(0),                 // 89: livekit.DisconnectReason
+	(*SpeakerInfo)(nil),                   // 90: livekit.SpeakerInfo
+	(ConnectionQuality)(0),                // 91: livekit.ConnectionQuality
+	(*SubscribedAudioCodec)(nil),          // 92: livekit.SubscribedAudioCodec
+	(SubscriptionError)(0),                // 93: livekit.SubscriptionError
+	(*ClientInfo)(nil),                    // 94: livekit.ClientInfo
+	(ReconnectReason)(0),                  // 95: livekit.ReconnectReason
+	(*DataTrackSubscriptionOptions)(nil),  // 96: livekit.DataTrackSubscriptionOptions
 }
 var file_livekit_rtc_proto_depIdxs = []int32{
 	21,  // 0: livekit.SignalRequest.offer:type_name -> livekit.SessionDescription
@@ -5524,132 +5690,138 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	9,   // 3: livekit.SignalRequest.add_track:type_name -> livekit.AddTrackRequest
 	16,  // 4: livekit.SignalRequest.mute:type_name -> livekit.MuteTrackRequest
 	23,  // 5: livekit.SignalRequest.subscription:type_name -> livekit.UpdateSubscription
-	25,  // 6: livekit.SignalRequest.track_setting:type_name -> livekit.UpdateTrackSettings
-	28,  // 7: livekit.SignalRequest.leave:type_name -> livekit.LeaveRequest
-	29,  // 8: livekit.SignalRequest.update_layers:type_name -> livekit.UpdateVideoLayers
-	43,  // 9: livekit.SignalRequest.subscription_permission:type_name -> livekit.SubscriptionPermission
-	46,  // 10: livekit.SignalRequest.sync_state:type_name -> livekit.SyncState
-	49,  // 11: livekit.SignalRequest.simulate:type_name -> livekit.SimulateScenario
-	30,  // 12: livekit.SignalRequest.update_metadata:type_name -> livekit.UpdateParticipantMetadata
-	50,  // 13: livekit.SignalRequest.ping_req:type_name -> livekit.Ping
-	26,  // 14: livekit.SignalRequest.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
-	27,  // 15: livekit.SignalRequest.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
+	27,  // 6: livekit.SignalRequest.track_setting:type_name -> livekit.UpdateTrackSettings
+	30,  // 7: livekit.SignalRequest.leave:type_name -> livekit.LeaveRequest
+	31,  // 8: livekit.SignalRequest.update_layers:type_name -> livekit.UpdateVideoLayers
+	45,  // 9: livekit.SignalRequest.subscription_permission:type_name -> livekit.SubscriptionPermission
+	48,  // 10: livekit.SignalRequest.sync_state:type_name -> livekit.SyncState
+	51,  // 11: livekit.SignalRequest.simulate:type_name -> livekit.SimulateScenario
+	32,  // 12: livekit.SignalRequest.update_metadata:type_name -> livekit.UpdateParticipantMetadata
+	52,  // 13: livekit.SignalRequest.ping_req:type_name -> livekit.Ping
+	28,  // 14: livekit.SignalRequest.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
+	29,  // 15: livekit.SignalRequest.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
 	10,  // 16: livekit.SignalRequest.publish_data_track_request:type_name -> livekit.PublishDataTrackRequest
 	12,  // 17: livekit.SignalRequest.unpublish_data_track_request:type_name -> livekit.UnpublishDataTrackRequest
 	24,  // 18: livekit.SignalRequest.update_data_subscription:type_name -> livekit.UpdateDataSubscription
-	17,  // 19: livekit.SignalResponse.join:type_name -> livekit.JoinResponse
-	21,  // 20: livekit.SignalResponse.answer:type_name -> livekit.SessionDescription
-	21,  // 21: livekit.SignalResponse.offer:type_name -> livekit.SessionDescription
-	15,  // 22: livekit.SignalResponse.trickle:type_name -> livekit.TrickleRequest
-	22,  // 23: livekit.SignalResponse.update:type_name -> livekit.ParticipantUpdate
-	19,  // 24: livekit.SignalResponse.track_published:type_name -> livekit.TrackPublishedResponse
-	28,  // 25: livekit.SignalResponse.leave:type_name -> livekit.LeaveRequest
-	16,  // 26: livekit.SignalResponse.mute:type_name -> livekit.MuteTrackRequest
-	32,  // 27: livekit.SignalResponse.speakers_changed:type_name -> livekit.SpeakersChanged
-	33,  // 28: livekit.SignalResponse.room_update:type_name -> livekit.RoomUpdate
-	35,  // 29: livekit.SignalResponse.connection_quality:type_name -> livekit.ConnectionQualityUpdate
-	37,  // 30: livekit.SignalResponse.stream_state_update:type_name -> livekit.StreamStateUpdate
-	40,  // 31: livekit.SignalResponse.subscribed_quality_update:type_name -> livekit.SubscribedQualityUpdate
-	44,  // 32: livekit.SignalResponse.subscription_permission_update:type_name -> livekit.SubscriptionPermissionUpdate
-	20,  // 33: livekit.SignalResponse.track_unpublished:type_name -> livekit.TrackUnpublishedResponse
-	18,  // 34: livekit.SignalResponse.reconnect:type_name -> livekit.ReconnectResponse
-	51,  // 35: livekit.SignalResponse.pong_resp:type_name -> livekit.Pong
-	54,  // 36: livekit.SignalResponse.subscription_response:type_name -> livekit.SubscriptionResponse
-	55,  // 37: livekit.SignalResponse.request_response:type_name -> livekit.RequestResponse
-	56,  // 38: livekit.SignalResponse.track_subscribed:type_name -> livekit.TrackSubscribed
-	45,  // 39: livekit.SignalResponse.room_moved:type_name -> livekit.RoomMovedResponse
-	60,  // 40: livekit.SignalResponse.media_sections_requirement:type_name -> livekit.MediaSectionsRequirement
-	41,  // 41: livekit.SignalResponse.subscribed_audio_codec_update:type_name -> livekit.SubscribedAudioCodecUpdate
-	11,  // 42: livekit.SignalResponse.publish_data_track_response:type_name -> livekit.PublishDataTrackResponse
-	13,  // 43: livekit.SignalResponse.unpublish_data_track_response:type_name -> livekit.UnpublishDataTrackResponse
-	14,  // 44: livekit.SignalResponse.data_track_subscriber_handles:type_name -> livekit.DataTrackSubscriberHandles
-	67,  // 45: livekit.SimulcastCodec.layers:type_name -> livekit.VideoLayer
-	68,  // 46: livekit.SimulcastCodec.video_layer_mode:type_name -> livekit.VideoLayer.Mode
-	69,  // 47: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
-	70,  // 48: livekit.AddTrackRequest.source:type_name -> livekit.TrackSource
-	67,  // 49: livekit.AddTrackRequest.layers:type_name -> livekit.VideoLayer
-	8,   // 50: livekit.AddTrackRequest.simulcast_codecs:type_name -> livekit.SimulcastCodec
-	71,  // 51: livekit.AddTrackRequest.encryption:type_name -> livekit.Encryption.Type
-	72,  // 52: livekit.AddTrackRequest.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
-	73,  // 53: livekit.AddTrackRequest.audio_features:type_name -> livekit.AudioTrackFeature
-	74,  // 54: livekit.AddTrackRequest.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
-	71,  // 55: livekit.PublishDataTrackRequest.encryption:type_name -> livekit.Encryption.Type
-	75,  // 56: livekit.PublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
-	75,  // 57: livekit.UnpublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
-	62,  // 58: livekit.DataTrackSubscriberHandles.sub_handles:type_name -> livekit.DataTrackSubscriberHandles.SubHandlesEntry
-	0,   // 59: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
-	76,  // 60: livekit.JoinResponse.room:type_name -> livekit.Room
-	77,  // 61: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
-	77,  // 62: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
-	31,  // 63: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
-	78,  // 64: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	79,  // 65: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
-	80,  // 66: livekit.JoinResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	31,  // 67: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
-	78,  // 68: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	79,  // 69: livekit.ReconnectResponse.server_info:type_name -> livekit.ServerInfo
-	81,  // 70: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
-	63,  // 71: livekit.SessionDescription.mid_to_track_id:type_name -> livekit.SessionDescription.MidToTrackIdEntry
-	77,  // 72: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
-	82,  // 73: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
-	64,  // 74: livekit.UpdateDataSubscription.updates:type_name -> livekit.UpdateDataSubscription.Update
-	83,  // 75: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
-	73,  // 76: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
-	84,  // 77: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
-	3,   // 78: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
-	52,  // 79: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
-	67,  // 80: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
-	65,  // 81: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
-	85,  // 82: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
-	76,  // 83: livekit.RoomUpdate.room:type_name -> livekit.Room
-	86,  // 84: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
-	34,  // 85: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
-	1,   // 86: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
-	36,  // 87: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
-	83,  // 88: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
-	38,  // 89: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
-	38,  // 90: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
-	39,  // 91: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
-	87,  // 92: livekit.SubscribedAudioCodecUpdate.subscribed_audio_codecs:type_name -> livekit.SubscribedAudioCodec
-	42,  // 93: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
-	76,  // 94: livekit.RoomMovedResponse.room:type_name -> livekit.Room
-	77,  // 95: livekit.RoomMovedResponse.participant:type_name -> livekit.ParticipantInfo
-	77,  // 96: livekit.RoomMovedResponse.other_participants:type_name -> livekit.ParticipantInfo
-	21,  // 97: livekit.SyncState.answer:type_name -> livekit.SessionDescription
-	23,  // 98: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
-	19,  // 99: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
-	48,  // 100: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
-	21,  // 101: livekit.SyncState.offer:type_name -> livekit.SessionDescription
-	47,  // 102: livekit.SyncState.datachannel_receive_states:type_name -> livekit.DataChannelReceiveState
-	11,  // 103: livekit.SyncState.publish_data_tracks:type_name -> livekit.PublishDataTrackResponse
-	0,   // 104: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
-	2,   // 105: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
-	53,  // 106: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
-	88,  // 107: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
-	4,   // 108: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
-	15,  // 109: livekit.RequestResponse.trickle:type_name -> livekit.TrickleRequest
-	9,   // 110: livekit.RequestResponse.add_track:type_name -> livekit.AddTrackRequest
-	16,  // 111: livekit.RequestResponse.mute:type_name -> livekit.MuteTrackRequest
-	30,  // 112: livekit.RequestResponse.update_metadata:type_name -> livekit.UpdateParticipantMetadata
-	26,  // 113: livekit.RequestResponse.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
-	27,  // 114: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
-	10,  // 115: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
-	12,  // 116: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
-	89,  // 117: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
-	57,  // 118: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	66,  // 119: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
-	9,   // 120: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
-	21,  // 121: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
-	90,  // 122: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
-	46,  // 123: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
-	5,   // 124: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
-	61,  // 125: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
-	91,  // 126: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
-	127, // [127:127] is the sub-list for method output_type
-	127, // [127:127] is the sub-list for method input_type
-	127, // [127:127] is the sub-list for extension type_name
-	127, // [127:127] is the sub-list for extension extendee
-	0,   // [0:127] is the sub-list for field type_name
+	25,  // 19: livekit.SignalRequest.get_data_track_schema:type_name -> livekit.GetDataTrackSchemaRequest
+	17,  // 20: livekit.SignalResponse.join:type_name -> livekit.JoinResponse
+	21,  // 21: livekit.SignalResponse.answer:type_name -> livekit.SessionDescription
+	21,  // 22: livekit.SignalResponse.offer:type_name -> livekit.SessionDescription
+	15,  // 23: livekit.SignalResponse.trickle:type_name -> livekit.TrickleRequest
+	22,  // 24: livekit.SignalResponse.update:type_name -> livekit.ParticipantUpdate
+	19,  // 25: livekit.SignalResponse.track_published:type_name -> livekit.TrackPublishedResponse
+	30,  // 26: livekit.SignalResponse.leave:type_name -> livekit.LeaveRequest
+	16,  // 27: livekit.SignalResponse.mute:type_name -> livekit.MuteTrackRequest
+	34,  // 28: livekit.SignalResponse.speakers_changed:type_name -> livekit.SpeakersChanged
+	35,  // 29: livekit.SignalResponse.room_update:type_name -> livekit.RoomUpdate
+	37,  // 30: livekit.SignalResponse.connection_quality:type_name -> livekit.ConnectionQualityUpdate
+	39,  // 31: livekit.SignalResponse.stream_state_update:type_name -> livekit.StreamStateUpdate
+	42,  // 32: livekit.SignalResponse.subscribed_quality_update:type_name -> livekit.SubscribedQualityUpdate
+	46,  // 33: livekit.SignalResponse.subscription_permission_update:type_name -> livekit.SubscriptionPermissionUpdate
+	20,  // 34: livekit.SignalResponse.track_unpublished:type_name -> livekit.TrackUnpublishedResponse
+	18,  // 35: livekit.SignalResponse.reconnect:type_name -> livekit.ReconnectResponse
+	53,  // 36: livekit.SignalResponse.pong_resp:type_name -> livekit.Pong
+	56,  // 37: livekit.SignalResponse.subscription_response:type_name -> livekit.SubscriptionResponse
+	57,  // 38: livekit.SignalResponse.request_response:type_name -> livekit.RequestResponse
+	58,  // 39: livekit.SignalResponse.track_subscribed:type_name -> livekit.TrackSubscribed
+	47,  // 40: livekit.SignalResponse.room_moved:type_name -> livekit.RoomMovedResponse
+	62,  // 41: livekit.SignalResponse.media_sections_requirement:type_name -> livekit.MediaSectionsRequirement
+	43,  // 42: livekit.SignalResponse.subscribed_audio_codec_update:type_name -> livekit.SubscribedAudioCodecUpdate
+	11,  // 43: livekit.SignalResponse.publish_data_track_response:type_name -> livekit.PublishDataTrackResponse
+	13,  // 44: livekit.SignalResponse.unpublish_data_track_response:type_name -> livekit.UnpublishDataTrackResponse
+	14,  // 45: livekit.SignalResponse.data_track_subscriber_handles:type_name -> livekit.DataTrackSubscriberHandles
+	26,  // 46: livekit.SignalResponse.get_data_track_schema_response:type_name -> livekit.GetDataTrackSchemaResponse
+	69,  // 47: livekit.SimulcastCodec.layers:type_name -> livekit.VideoLayer
+	70,  // 48: livekit.SimulcastCodec.video_layer_mode:type_name -> livekit.VideoLayer.Mode
+	71,  // 49: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
+	72,  // 50: livekit.AddTrackRequest.source:type_name -> livekit.TrackSource
+	69,  // 51: livekit.AddTrackRequest.layers:type_name -> livekit.VideoLayer
+	8,   // 52: livekit.AddTrackRequest.simulcast_codecs:type_name -> livekit.SimulcastCodec
+	73,  // 53: livekit.AddTrackRequest.encryption:type_name -> livekit.Encryption.Type
+	74,  // 54: livekit.AddTrackRequest.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
+	75,  // 55: livekit.AddTrackRequest.audio_features:type_name -> livekit.AudioTrackFeature
+	76,  // 56: livekit.AddTrackRequest.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
+	73,  // 57: livekit.PublishDataTrackRequest.encryption:type_name -> livekit.Encryption.Type
+	77,  // 58: livekit.PublishDataTrackRequest.type_definition:type_name -> livekit.DataTrackTypeDefinition
+	78,  // 59: livekit.PublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
+	78,  // 60: livekit.UnpublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
+	64,  // 61: livekit.DataTrackSubscriberHandles.sub_handles:type_name -> livekit.DataTrackSubscriberHandles.SubHandlesEntry
+	0,   // 62: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
+	79,  // 63: livekit.JoinResponse.room:type_name -> livekit.Room
+	80,  // 64: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
+	80,  // 65: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
+	33,  // 66: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
+	81,  // 67: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	82,  // 68: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
+	83,  // 69: livekit.JoinResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	33,  // 70: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
+	81,  // 71: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	82,  // 72: livekit.ReconnectResponse.server_info:type_name -> livekit.ServerInfo
+	84,  // 73: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
+	65,  // 74: livekit.SessionDescription.mid_to_track_id:type_name -> livekit.SessionDescription.MidToTrackIdEntry
+	80,  // 75: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
+	85,  // 76: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
+	66,  // 77: livekit.UpdateDataSubscription.updates:type_name -> livekit.UpdateDataSubscription.Update
+	86,  // 78: livekit.GetDataTrackSchemaRequest.schema_id:type_name -> livekit.DataTrackSchemaId
+	87,  // 79: livekit.GetDataTrackSchemaResponse.schema_definition:type_name -> livekit.DataTrackSchemaDefinition
+	88,  // 80: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
+	75,  // 81: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
+	89,  // 82: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
+	3,   // 83: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
+	54,  // 84: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
+	69,  // 85: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
+	67,  // 86: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
+	90,  // 87: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
+	79,  // 88: livekit.RoomUpdate.room:type_name -> livekit.Room
+	91,  // 89: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
+	36,  // 90: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
+	1,   // 91: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
+	38,  // 92: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
+	88,  // 93: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
+	40,  // 94: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
+	40,  // 95: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
+	41,  // 96: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
+	92,  // 97: livekit.SubscribedAudioCodecUpdate.subscribed_audio_codecs:type_name -> livekit.SubscribedAudioCodec
+	44,  // 98: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
+	79,  // 99: livekit.RoomMovedResponse.room:type_name -> livekit.Room
+	80,  // 100: livekit.RoomMovedResponse.participant:type_name -> livekit.ParticipantInfo
+	80,  // 101: livekit.RoomMovedResponse.other_participants:type_name -> livekit.ParticipantInfo
+	21,  // 102: livekit.SyncState.answer:type_name -> livekit.SessionDescription
+	23,  // 103: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
+	19,  // 104: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
+	50,  // 105: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
+	21,  // 106: livekit.SyncState.offer:type_name -> livekit.SessionDescription
+	49,  // 107: livekit.SyncState.datachannel_receive_states:type_name -> livekit.DataChannelReceiveState
+	11,  // 108: livekit.SyncState.publish_data_tracks:type_name -> livekit.PublishDataTrackResponse
+	0,   // 109: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
+	2,   // 110: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
+	55,  // 111: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
+	93,  // 112: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
+	4,   // 113: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
+	15,  // 114: livekit.RequestResponse.trickle:type_name -> livekit.TrickleRequest
+	9,   // 115: livekit.RequestResponse.add_track:type_name -> livekit.AddTrackRequest
+	16,  // 116: livekit.RequestResponse.mute:type_name -> livekit.MuteTrackRequest
+	32,  // 117: livekit.RequestResponse.update_metadata:type_name -> livekit.UpdateParticipantMetadata
+	28,  // 118: livekit.RequestResponse.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
+	29,  // 119: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
+	10,  // 120: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
+	12,  // 121: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
+	25,  // 122: livekit.RequestResponse.get_data_track_schema:type_name -> livekit.GetDataTrackSchemaRequest
+	94,  // 123: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
+	59,  // 124: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	68,  // 125: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
+	9,   // 126: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
+	21,  // 127: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
+	95,  // 128: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
+	48,  // 129: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
+	5,   // 130: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
+	63,  // 131: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
+	96,  // 132: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
+	133, // [133:133] is the sub-list for method output_type
+	133, // [133:133] is the sub-list for method input_type
+	133, // [133:133] is the sub-list for extension type_name
+	133, // [133:133] is the sub-list for extension extendee
+	0,   // [0:133] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
@@ -5679,6 +5851,7 @@ func file_livekit_rtc_proto_init() {
 		(*SignalRequest_PublishDataTrackRequest)(nil),
 		(*SignalRequest_UnpublishDataTrackRequest)(nil),
 		(*SignalRequest_UpdateDataSubscription)(nil),
+		(*SignalRequest_GetDataTrackSchema)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[1].OneofWrappers = []any{
 		(*SignalResponse_Join)(nil),
@@ -5709,8 +5882,10 @@ func file_livekit_rtc_proto_init() {
 		(*SignalResponse_PublishDataTrackResponse)(nil),
 		(*SignalResponse_UnpublishDataTrackResponse)(nil),
 		(*SignalResponse_DataTrackSubscriberHandles)(nil),
+		(*SignalResponse_GetDataTrackSchemaResponse)(nil),
 	}
-	file_livekit_rtc_proto_msgTypes[43].OneofWrappers = []any{
+	file_livekit_rtc_proto_msgTypes[4].OneofWrappers = []any{}
+	file_livekit_rtc_proto_msgTypes[45].OneofWrappers = []any{
 		(*SimulateScenario_SpeakerUpdate)(nil),
 		(*SimulateScenario_NodeFailure)(nil),
 		(*SimulateScenario_Migration)(nil),
@@ -5721,7 +5896,7 @@ func file_livekit_rtc_proto_init() {
 		(*SimulateScenario_DisconnectSignalOnResumeNoMessages)(nil),
 		(*SimulateScenario_LeaveRequestFullReconnect)(nil),
 	}
-	file_livekit_rtc_proto_msgTypes[49].OneofWrappers = []any{
+	file_livekit_rtc_proto_msgTypes[51].OneofWrappers = []any{
 		(*RequestResponse_Trickle)(nil),
 		(*RequestResponse_AddTrack)(nil),
 		(*RequestResponse_Mute)(nil),
@@ -5730,15 +5905,16 @@ func file_livekit_rtc_proto_init() {
 		(*RequestResponse_UpdateVideoTrack)(nil),
 		(*RequestResponse_PublishDataTrack)(nil),
 		(*RequestResponse_UnpublishDataTrack)(nil),
+		(*RequestResponse_GetDataTrackSchema)(nil),
 	}
-	file_livekit_rtc_proto_msgTypes[51].OneofWrappers = []any{}
+	file_livekit_rtc_proto_msgTypes[53].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_rtc_proto_rawDesc), len(file_livekit_rtc_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   61,
+			NumMessages:   63,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
