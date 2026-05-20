@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.46.0
+
+### Patch Changes
+
+- add local protojson with permissive defaults - [#1542](https://github.com/livekit/protocol/pull/1542) ([@paulwe](https://github.com/paulwe))
+
+- Fix SIP trunk-level MediaEncryption being silently dropped on outbound and inbound calls. The early `req.Upgrade()` / `rule.Upgrade()` calls pinned `Media.Encryption` to the (legacy) request/rule field before the trunk's MediaEncryption was merged, causing INVITEs to omit SRTP when only the trunk had it configured. - [#1540](https://github.com/livekit/protocol/pull/1540) ([@hechen-eng](https://github.com/hechen-eng))
+
+- Add optional authentication realm to SIPInboundTrunk. - [#1558](https://github.com/livekit/protocol/pull/1558) ([@dennwc](https://github.com/dennwc))
+
+- Add TokenPagination field to ListEgress API and RPC - [#1556](https://github.com/livekit/protocol/pull/1556) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.45.8
 
 ### Patch Changes
