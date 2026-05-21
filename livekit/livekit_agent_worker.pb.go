@@ -38,11 +38,11 @@ const (
 
 type WorkerInfo struct {
 	state         protoimpl.MessageState   `protogen:"open.v1"`
-	WorkerType    string                   `protobuf:"bytes,1,opt,name=worker_type,json=workerType,proto3" json:"worker_type,omitempty"`
-	AgentName     string                   `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	ActiveJobs    float32                  `protobuf:"fixed32,3,opt,name=active_jobs,json=activeJobs,proto3" json:"active_jobs,omitempty"`
-	SdkVersion    string                   `protobuf:"bytes,4,opt,name=sdk_version,json=sdkVersion,proto3" json:"sdk_version,omitempty"`
-	WorkerLoad    float32                  `protobuf:"fixed32,5,opt,name=worker_load,json=workerLoad,proto3" json:"worker_load,omitempty"`
+	WorkerType    string                   `protobuf:"bytes,1,opt,name=worker_type,proto3" json:"worker_type,omitempty"`
+	AgentName     string                   `protobuf:"bytes,2,opt,name=agent_name,proto3" json:"agent_name,omitempty"`
+	ActiveJobs    float32                  `protobuf:"fixed32,3,opt,name=active_jobs,proto3" json:"active_jobs,omitempty"`
+	SdkVersion    string                   `protobuf:"bytes,4,opt,name=sdk_version,proto3" json:"sdk_version,omitempty"`
+	WorkerLoad    float32                  `protobuf:"fixed32,5,opt,name=worker_load,proto3" json:"worker_load,omitempty"`
 	Flags         *WorkerInfo_FeatureFlags `protobuf:"bytes,6,opt,name=flags,proto3" json:"flags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -122,7 +122,7 @@ func (x *WorkerInfo) GetFlags() *WorkerInfo_FeatureFlags {
 
 type WorkerInfo_FeatureFlags struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
-	AgentDeploymentEnabled bool                   `protobuf:"varint,1,opt,name=agent_deployment_enabled,json=agentDeploymentEnabled,proto3" json:"agent_deployment_enabled,omitempty"`
+	AgentDeploymentEnabled bool                   `protobuf:"varint,1,opt,name=agent_deployment_enabled,proto3" json:"agent_deployment_enabled,omitempty"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -168,22 +168,19 @@ var File_livekit_agent_worker_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_worker_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_agent_worker.proto\x12\alivekit\x1a\x14logger/options.proto\"\xb1\x02\n" +
+	"\x1alivekit_agent_worker.proto\x12\alivekit\x1a\x14logger/options.proto\"\xb8\x02\n" +
 	"\n" +
-	"WorkerInfo\x12\x1f\n" +
-	"\vworker_type\x18\x01 \x01(\tR\n" +
-	"workerType\x12\x1d\n" +
+	"WorkerInfo\x12 \n" +
+	"\vworker_type\x18\x01 \x01(\tR\vworker_type\x12\x1e\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1f\n" +
-	"\vactive_jobs\x18\x03 \x01(\x02R\n" +
-	"activeJobs\x12\x1f\n" +
-	"\vsdk_version\x18\x04 \x01(\tR\n" +
-	"sdkVersion\x12\x1f\n" +
-	"\vworker_load\x18\x05 \x01(\x02R\n" +
-	"workerLoad\x126\n" +
-	"\x05flags\x18\x06 \x01(\v2 .livekit.WorkerInfo.FeatureFlagsR\x05flags\x1aH\n" +
-	"\fFeatureFlags\x128\n" +
-	"\x18agent_deployment_enabled\x18\x01 \x01(\bR\x16agentDeploymentEnabledBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"agent_name\x18\x02 \x01(\tR\n" +
+	"agent_name\x12 \n" +
+	"\vactive_jobs\x18\x03 \x01(\x02R\vactive_jobs\x12 \n" +
+	"\vsdk_version\x18\x04 \x01(\tR\vsdk_version\x12 \n" +
+	"\vworker_load\x18\x05 \x01(\x02R\vworker_load\x126\n" +
+	"\x05flags\x18\x06 \x01(\v2 .livekit.WorkerInfo.FeatureFlagsR\x05flags\x1aJ\n" +
+	"\fFeatureFlags\x12:\n" +
+	"\x18agent_deployment_enabled\x18\x01 \x01(\bR\x18agent_deployment_enabledBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agent_worker_proto_rawDescOnce sync.Once
