@@ -104,6 +104,7 @@ message AgentDeployment {
     string deployment = 15;
     string version = 16;
     string agent_name = 17;
+    bool deployment_enabled = 18;
 }
 
 message AgentInfo {
