@@ -23,13 +23,13 @@ import "logger/options.proto";
 
 message WorkerInfo {
   message FeatureFlags {
-    bool agent_deployment_enabled = 1;
+    bool agent_deployment_enabled = 1 [json_name = "agent_deployment_enabled"];
   }
 
-  string worker_type = 1;
-  string agent_name  = 2;
-  float active_jobs  = 3;
-  string sdk_version = 4;
-  float worker_load  = 5;
-  FeatureFlags flags = 6;
+  string worker_type = 1 [json_name = "worker_type"];
+  string agent_name  = 2 [json_name = "agent_name"];
+  float active_jobs  = 3 [json_name = "active_jobs"];
+  string sdk_version = 4 [json_name = "sdk_version"];
+  float worker_load  = 5 [json_name = "worker_load"];
+  FeatureFlags flags = 6 [json_name = "flags"];
 }
