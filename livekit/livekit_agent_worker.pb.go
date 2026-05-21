@@ -37,15 +37,15 @@ const (
 )
 
 type WorkerInfo struct {
-	state         protoimpl.MessageState   `protogen:"open.v1"`
-	WorkerType    string                   `protobuf:"bytes,1,opt,name=worker_type,json=workerType,proto3" json:"worker_type,omitempty"`
-	AgentName     string                   `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	ActiveJobs    float32                  `protobuf:"fixed32,3,opt,name=active_jobs,json=activeJobs,proto3" json:"active_jobs,omitempty"`
-	SdkVersion    string                   `protobuf:"bytes,4,opt,name=sdk_version,json=sdkVersion,proto3" json:"sdk_version,omitempty"`
-	WorkerLoad    float32                  `protobuf:"fixed32,5,opt,name=worker_load,json=workerLoad,proto3" json:"worker_load,omitempty"`
-	Flags         *WorkerInfo_FeatureFlags `protobuf:"bytes,6,opt,name=flags,proto3" json:"flags,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	WorkerType      string                 `protobuf:"bytes,1,opt,name=worker_type,json=workerType,proto3" json:"worker_type,omitempty"`
+	AgentName       string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	ActiveJobs      float32                `protobuf:"fixed32,3,opt,name=active_jobs,json=activeJobs,proto3" json:"active_jobs,omitempty"`
+	SdkVersion      string                 `protobuf:"bytes,4,opt,name=sdk_version,json=sdkVersion,proto3" json:"sdk_version,omitempty"`
+	WorkerLoad      float32                `protobuf:"fixed32,5,opt,name=worker_load,json=workerLoad,proto3" json:"worker_load,omitempty"`
+	ProtocolVersion int32                  `protobuf:"varint,6,opt,name=protocol_version,json=protocolVersion,proto3" json:"protocol_version,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *WorkerInfo) Reset() {
@@ -113,62 +113,18 @@ func (x *WorkerInfo) GetWorkerLoad() float32 {
 	return 0
 }
 
-func (x *WorkerInfo) GetFlags() *WorkerInfo_FeatureFlags {
+func (x *WorkerInfo) GetProtocolVersion() int32 {
 	if x != nil {
-		return x.Flags
+		return x.ProtocolVersion
 	}
-	return nil
-}
-
-type WorkerInfo_FeatureFlags struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	AgentDeploymentEnabled bool                   `protobuf:"varint,1,opt,name=agent_deployment_enabled,json=agentDeploymentEnabled,proto3" json:"agent_deployment_enabled,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
-}
-
-func (x *WorkerInfo_FeatureFlags) Reset() {
-	*x = WorkerInfo_FeatureFlags{}
-	mi := &file_livekit_agent_worker_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *WorkerInfo_FeatureFlags) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*WorkerInfo_FeatureFlags) ProtoMessage() {}
-
-func (x *WorkerInfo_FeatureFlags) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_worker_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use WorkerInfo_FeatureFlags.ProtoReflect.Descriptor instead.
-func (*WorkerInfo_FeatureFlags) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_worker_proto_rawDescGZIP(), []int{0, 0}
-}
-
-func (x *WorkerInfo_FeatureFlags) GetAgentDeploymentEnabled() bool {
-	if x != nil {
-		return x.AgentDeploymentEnabled
-	}
-	return false
+	return 0
 }
 
 var File_livekit_agent_worker_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_worker_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_agent_worker.proto\x12\alivekit\x1a\x14logger/options.proto\"\xb1\x02\n" +
+	"\x1alivekit_agent_worker.proto\x12\alivekit\x1a\x14logger/options.proto\"\xda\x01\n" +
 	"\n" +
 	"WorkerInfo\x12\x1f\n" +
 	"\vworker_type\x18\x01 \x01(\tR\n" +
@@ -180,10 +136,8 @@ const file_livekit_agent_worker_proto_rawDesc = "" +
 	"\vsdk_version\x18\x04 \x01(\tR\n" +
 	"sdkVersion\x12\x1f\n" +
 	"\vworker_load\x18\x05 \x01(\x02R\n" +
-	"workerLoad\x126\n" +
-	"\x05flags\x18\x06 \x01(\v2 .livekit.WorkerInfo.FeatureFlagsR\x05flags\x1aH\n" +
-	"\fFeatureFlags\x128\n" +
-	"\x18agent_deployment_enabled\x18\x01 \x01(\bR\x16agentDeploymentEnabledBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"workerLoad\x12)\n" +
+	"\x10protocol_version\x18\x06 \x01(\x05R\x0fprotocolVersionBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agent_worker_proto_rawDescOnce sync.Once
@@ -197,18 +151,16 @@ func file_livekit_agent_worker_proto_rawDescGZIP() []byte {
 	return file_livekit_agent_worker_proto_rawDescData
 }
 
-var file_livekit_agent_worker_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_livekit_agent_worker_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_livekit_agent_worker_proto_goTypes = []any{
-	(*WorkerInfo)(nil),              // 0: livekit.WorkerInfo
-	(*WorkerInfo_FeatureFlags)(nil), // 1: livekit.WorkerInfo.FeatureFlags
+	(*WorkerInfo)(nil), // 0: livekit.WorkerInfo
 }
 var file_livekit_agent_worker_proto_depIdxs = []int32{
-	1, // 0: livekit.WorkerInfo.flags:type_name -> livekit.WorkerInfo.FeatureFlags
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // [0:0] is the sub-list for method output_type
+	0, // [0:0] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_worker_proto_init() }
@@ -222,7 +174,7 @@ func file_livekit_agent_worker_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_worker_proto_rawDesc), len(file_livekit_agent_worker_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

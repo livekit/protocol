@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//   http://www.apache.org/licenses/LICENSE-2.0
+//	http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,20 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-syntax = "proto3";
+package livekit
 
-package livekit;
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
+type WorkerProtocolVersion int
 
-import "logger/options.proto";
+const CurrentWorkerProtocol = 1
 
-message WorkerInfo {
-  string worker_type     = 1;
-  string agent_name      = 2;
-  float active_jobs      = 3;
-  string sdk_version     = 4;
-  float worker_load      = 5;
-  int32 protocol_version = 6;
+func (v WorkerProtocolVersion) SupportsAgentDeployment() bool {
+	return v > 0
+}
+
+func (info *WorkerInfo) Protocol() WorkerProtocolVersion {
+	return WorkerProtocolVersion(info.GetProtocolVersion())
 }
