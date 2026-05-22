@@ -36,7 +36,14 @@ func Proto(val proto.Message) zapcore.ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
-	return protoMarshaller{val.ProtoReflect()}
+	return protoMarshaller{m: val.ProtoReflect(), redact: true}
+}
+
+func UnredactedProto(val proto.Message) zapcore.ObjectMarshaler {
+	if val == nil {
+		return nil
+	}
+	return protoMarshaller{m: val.ProtoReflect()}
 }
 
 var _ zapcore.ObjectMarshaler = protoMarshaller{}
@@ -44,7 +51,8 @@ var _ zapcore.ObjectMarshaler = protoMapMarshaller{}
 var _ zapcore.ArrayMarshaler = protoListMarshaller{}
 
 type protoMarshaller struct {
-	m protoreflect.Message
+	m      protoreflect.Message
+	redact bool
 }
 
 func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
@@ -65,29 +73,30 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 			continue
 		}
 
-		if proto.HasExtension(f.Options(), logger.E_Redact) {
+		if p.redact && proto.HasExtension(f.Options(), logger.E_Redact) {
 			e.AddString(k, marshalRedacted(f, v))
 			continue
 		}
 
 		if f.IsMap() {
 			if m := v.Map(); m.IsValid() {
-				e.AddObject(k, protoMapMarshaller{f, m})
+				e.AddObject(k, protoMapMarshaller{f: f, m: m, redact: p.redact})
 			}
 		} else if f.IsList() {
 			if m := v.List(); m.IsValid() {
-				e.AddArray(k, protoListMarshaller{f, m})
+				e.AddArray(k, protoListMarshaller{f: f, m: m, redact: p.redact})
 			}
 		} else {
-			marshalProtoField(k, f, v, e)
+			marshalProtoField(k, f, v, e, p.redact)
 		}
 	}
 	return nil
 }
 
 type protoMapMarshaller struct {
-	f protoreflect.FieldDescriptor
-	m protoreflect.Map
+	f      protoreflect.FieldDescriptor
+	m      protoreflect.Map
+	redact bool
 }
 
 func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
@@ -103,15 +112,16 @@ func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		case protoreflect.StringKind:
 			k = ki.String()
 		}
-		marshalProtoField(k, p.f.MapValue(), vi, e)
+		marshalProtoField(k, p.f.MapValue(), vi, e, p.redact)
 		return true
 	})
 	return nil
 }
 
 type protoListMarshaller struct {
-	f protoreflect.FieldDescriptor
-	m protoreflect.List
+	f      protoreflect.FieldDescriptor
+	m      protoreflect.List
+	redact bool
 }
 
 func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
@@ -133,13 +143,13 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 		case protoreflect.BytesKind:
 			e.AppendString(marshalProtoBytes(v.Bytes()))
 		case protoreflect.MessageKind:
-			e.AppendObject(protoMarshaller{v.Message()})
+			e.AppendObject(protoMarshaller{m: v.Message(), redact: p.redact})
 		}
 	}
 	return nil
 }
 
-func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder) {
+func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder, redact bool) {
 	switch f.Kind() {
 	case protoreflect.BoolKind:
 		e.AddBool(k, v.Bool())
@@ -156,7 +166,7 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 	case protoreflect.BytesKind:
 		e.AddString(k, marshalProtoBytes(v.Bytes()))
 	case protoreflect.MessageKind:
-		e.AddObject(k, protoMarshaller{v.Message()})
+		e.AddObject(k, protoMarshaller{m: v.Message(), redact: redact})
 	}
 }
 
