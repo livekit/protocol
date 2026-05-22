@@ -45,6 +45,11 @@ message InternalCreateSIPParticipantRequest {
 
   string sip_call_id = 13 [(logger.name) = "sipCallID"];
   string sip_trunk_id = 19 [(logger.name) = "sipTrunkID"];
+
+  livekit.SIPRequestDest sip_request_uri = 35; // INVITE <uri>
+  livekit.SIPNamedDest   sip_from_header = 36; // From: "Name" <uri>
+  livekit.SIPNamedDest   sip_to_header   = 37; // To:   "Name" <uri>
+
   // IP or hostname that SIP INVITE is sent too
   string address = 2;
   // Hostname for the 'From' SIP address in INVITE
@@ -144,7 +149,7 @@ message InternalCreateSIPParticipantRequest {
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 33;
 
-  // NEXT ID: 35
+  // NEXT ID: 38
 }
 
 message InternalCreateSIPParticipantResponse {
