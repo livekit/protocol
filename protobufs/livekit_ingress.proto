@@ -43,10 +43,10 @@ message CreateIngressRequest {
   // publish as participant
   string participant_identity = 4;
   // name of publishing participant (used for display only)
-  string participant_name = 5 [(logger.redact) = true];
+  string participant_name = 5 [(logger.sensitivity) = SENSITIVITY_PII];
   // metadata associated with the publishing participant
   string participant_metadata = 10 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // [depreacted ] whether to pass through the incoming media without transcoding, only compatible with some input types. Use `enable_transcoding` instead.
@@ -135,9 +135,9 @@ message IngressInfo {
   IngressVideoOptions video = 7;
   string room_name = 8;
   string participant_identity = 9;
-  string participant_name = 10 [(logger.redact) = true];
+  string participant_name = 10 [(logger.sensitivity) = SENSITIVITY_PII];
   string participant_metadata = 14 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   bool reusable = 11;
@@ -190,9 +190,9 @@ message UpdateIngressRequest {
   string name = 2;
   string room_name = 3;
   string participant_identity = 4;
-  string participant_name = 5 [(logger.redact) = true];
+  string participant_name = 5 [(logger.sensitivity) = SENSITIVITY_PII];
   string participant_metadata = 9 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional bool bypass_transcoding = 8 [deprecated = true];

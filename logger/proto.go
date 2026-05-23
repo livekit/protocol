@@ -32,18 +32,25 @@ import (
 	"github.com/livekit/protocol/utils/must"
 )
 
+// Proto returns a zapcore.ObjectMarshaler that redacts every field whose
+// (logger.sensitivity) is at or above SENSITIVITY_PII. Use in routine
+// application and debug logs.
 func Proto(val proto.Message) zapcore.ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
-	return protoMarshaller{m: val.ProtoReflect(), redact: true}
+	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_UNSPECIFIED}
 }
 
+// UnredactedProto returns a zapcore.ObjectMarshaler that exposes PII-tier
+// fields while still redacting SECRET-tier fields (credentials, tokens, API
+// keys). Use only in observability events where operator context legitimately
+// requires user-identifying data.
 func UnredactedProto(val proto.Message) zapcore.ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
-	return protoMarshaller{m: val.ProtoReflect()}
+	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_PII}
 }
 
 var _ zapcore.ObjectMarshaler = protoMarshaller{}
@@ -51,8 +58,15 @@ var _ zapcore.ObjectMarshaler = protoMapMarshaller{}
 var _ zapcore.ArrayMarshaler = protoListMarshaller{}
 
 type protoMarshaller struct {
-	m      protoreflect.Message
-	redact bool
+	m        protoreflect.Message
+	maxLevel logger.Sensitivity
+}
+
+func fieldSensitivity(f protoreflect.FieldDescriptor) logger.Sensitivity {
+	if !proto.HasExtension(f.Options(), logger.E_Sensitivity) {
+		return logger.Sensitivity_SENSITIVITY_UNSPECIFIED
+	}
+	return proto.GetExtension(f.Options(), logger.E_Sensitivity).(logger.Sensitivity)
 }
 
 func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
@@ -73,30 +87,30 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 			continue
 		}
 
-		if p.redact && proto.HasExtension(f.Options(), logger.E_Redact) {
+		if fieldSensitivity(f) > p.maxLevel {
 			e.AddString(k, marshalRedacted(f, v))
 			continue
 		}
 
 		if f.IsMap() {
 			if m := v.Map(); m.IsValid() {
-				e.AddObject(k, protoMapMarshaller{f: f, m: m, redact: p.redact})
+				e.AddObject(k, protoMapMarshaller{f: f, m: m, maxLevel: p.maxLevel})
 			}
 		} else if f.IsList() {
 			if m := v.List(); m.IsValid() {
-				e.AddArray(k, protoListMarshaller{f: f, m: m, redact: p.redact})
+				e.AddArray(k, protoListMarshaller{f: f, m: m, maxLevel: p.maxLevel})
 			}
 		} else {
-			marshalProtoField(k, f, v, e, p.redact)
+			marshalProtoField(k, f, v, e, p.maxLevel)
 		}
 	}
 	return nil
 }
 
 type protoMapMarshaller struct {
-	f      protoreflect.FieldDescriptor
-	m      protoreflect.Map
-	redact bool
+	f        protoreflect.FieldDescriptor
+	m        protoreflect.Map
+	maxLevel logger.Sensitivity
 }
 
 func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
@@ -112,16 +126,16 @@ func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		case protoreflect.StringKind:
 			k = ki.String()
 		}
-		marshalProtoField(k, p.f.MapValue(), vi, e, p.redact)
+		marshalProtoField(k, p.f.MapValue(), vi, e, p.maxLevel)
 		return true
 	})
 	return nil
 }
 
 type protoListMarshaller struct {
-	f      protoreflect.FieldDescriptor
-	m      protoreflect.List
-	redact bool
+	f        protoreflect.FieldDescriptor
+	m        protoreflect.List
+	maxLevel logger.Sensitivity
 }
 
 func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
@@ -143,13 +157,13 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 		case protoreflect.BytesKind:
 			e.AppendString(marshalProtoBytes(v.Bytes()))
 		case protoreflect.MessageKind:
-			e.AppendObject(protoMarshaller{m: v.Message(), redact: p.redact})
+			e.AppendObject(protoMarshaller{m: v.Message(), maxLevel: p.maxLevel})
 		}
 	}
 	return nil
 }
 
-func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder, redact bool) {
+func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder, maxLevel logger.Sensitivity) {
 	switch f.Kind() {
 	case protoreflect.BoolKind:
 		e.AddBool(k, v.Bool())
@@ -166,7 +180,7 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 	case protoreflect.BytesKind:
 		e.AddString(k, marshalProtoBytes(v.Bytes()))
 	case protoreflect.MessageKind:
-		e.AddObject(k, protoMarshaller{m: v.Message(), redact: redact})
+		e.AddObject(k, protoMarshaller{m: v.Message(), maxLevel: maxLevel})
 	}
 }
 
