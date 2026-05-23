@@ -313,8 +313,9 @@ message DefineDataTrackSchemaRequest {
 }
 
 message GetDataTrackSchemaRequest {
+  string participant_identity = 1;
   // ID of the schema to get the definition for.
-  DataTrackSchemaId schema_id = 1;
+  DataTrackSchemaId schema_id = 2;
 }
 
 message GetDataTrackSchemaResponse {
@@ -586,6 +587,7 @@ message RequestResponse {
     INVALID_NAME = 8;
     DUPLICATE_HANDLE = 9;
     DUPLICATE_NAME = 10;
+    INVALID_REQUEST = 11;
   }
 
   uint32 request_id = 1 [(logger.name) = "requestID"];
@@ -600,7 +602,8 @@ message RequestResponse {
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
     UnpublishDataTrackRequest unpublish_data_track = 11;
-    GetDataTrackSchemaRequest get_data_track_schema = 12;
+    DefineDataTrackSchemaRequest define_data_track_schema = 12;
+    GetDataTrackSchemaRequest get_data_track_schema = 13;
   }
 }
 
