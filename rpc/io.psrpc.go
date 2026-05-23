@@ -43,6 +43,7 @@ type IOInfoClient interface {
 	UpdateIngressState(ctx context.Context, req *UpdateIngressStateRequest, opts ...psrpc.RequestOption) (*google_protobuf.Empty, error)
 
 	// sip
+	// Deprecated: use IOInfoSIP. Retained for backward compatibility until callers migrate.
 	GetSIPTrunkAuthentication(ctx context.Context, req *GetSIPTrunkAuthenticationRequest, opts ...psrpc.RequestOption) (*GetSIPTrunkAuthenticationResponse, error)
 
 	EvaluateSIPDispatchRules(ctx context.Context, req *EvaluateSIPDispatchRulesRequest, opts ...psrpc.RequestOption) (*EvaluateSIPDispatchRulesResponse, error)
@@ -79,6 +80,7 @@ type IOInfoServerImpl interface {
 	UpdateIngressState(context.Context, *UpdateIngressStateRequest) (*google_protobuf.Empty, error)
 
 	// sip
+	// Deprecated: use IOInfoSIP. Retained for backward compatibility until callers migrate.
 	GetSIPTrunkAuthentication(context.Context, *GetSIPTrunkAuthenticationRequest) (*GetSIPTrunkAuthenticationResponse, error)
 
 	EvaluateSIPDispatchRules(context.Context, *EvaluateSIPDispatchRulesRequest) (*EvaluateSIPDispatchRulesResponse, error)

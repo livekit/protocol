@@ -1449,6 +1449,11 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x19GetSIPTrunkAuthentication\x12%.rpc.GetSIPTrunkAuthenticationRequest\x1a&.rpc.GetSIPTrunkAuthenticationResponse\x12g\n" +
 	"\x18EvaluateSIPDispatchRules\x12$.rpc.EvaluateSIPDispatchRulesRequest\x1a%.rpc.EvaluateSIPDispatchRulesResponse\x12L\n" +
 	"\x12UpdateSIPCallState\x12\x1e.rpc.UpdateSIPCallStateRequest\x1a\x16.google.protobuf.Empty\x12J\n" +
+	"\x11RecordCallContext\x12\x1d.rpc.RecordCallContextRequest\x1a\x16.google.protobuf.Empty2\xfa\x02\n" +
+	"\tIOInfoSIP\x12j\n" +
+	"\x19GetSIPTrunkAuthentication\x12%.rpc.GetSIPTrunkAuthenticationRequest\x1a&.rpc.GetSIPTrunkAuthenticationResponse\x12g\n" +
+	"\x18EvaluateSIPDispatchRules\x12$.rpc.EvaluateSIPDispatchRulesRequest\x1a%.rpc.EvaluateSIPDispatchRulesResponse\x12L\n" +
+	"\x12UpdateSIPCallState\x12\x1e.rpc.UpdateSIPCallStateRequest\x1a\x16.google.protobuf.Empty\x12J\n" +
 	"\x11RecordCallContext\x12\x1d.rpc.RecordCallContextRequest\x1a\x16.google.protobuf.EmptyB!Z\x1fgithub.com/livekit/protocol/rpcb\x06proto3"
 
 var (
@@ -1550,20 +1555,28 @@ var file_rpc_io_proto_depIdxs = []int32{
 	9,  // 40: rpc.IOInfo.EvaluateSIPDispatchRules:input_type -> rpc.EvaluateSIPDispatchRulesRequest
 	11, // 41: rpc.IOInfo.UpdateSIPCallState:input_type -> rpc.UpdateSIPCallStateRequest
 	12, // 42: rpc.IOInfo.RecordCallContext:input_type -> rpc.RecordCallContextRequest
-	37, // 43: rpc.IOInfo.CreateEgress:output_type -> google.protobuf.Empty
-	37, // 44: rpc.IOInfo.UpdateEgress:output_type -> google.protobuf.Empty
-	23, // 45: rpc.IOInfo.GetEgress:output_type -> livekit.EgressInfo
-	38, // 46: rpc.IOInfo.ListEgress:output_type -> livekit.ListEgressResponse
-	37, // 47: rpc.IOInfo.UpdateMetrics:output_type -> google.protobuf.Empty
-	37, // 48: rpc.IOInfo.CreateIngress:output_type -> google.protobuf.Empty
-	5,  // 49: rpc.IOInfo.GetIngressInfo:output_type -> rpc.GetIngressInfoResponse
-	37, // 50: rpc.IOInfo.UpdateIngressState:output_type -> google.protobuf.Empty
-	8,  // 51: rpc.IOInfo.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
-	10, // 52: rpc.IOInfo.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
-	37, // 53: rpc.IOInfo.UpdateSIPCallState:output_type -> google.protobuf.Empty
-	37, // 54: rpc.IOInfo.RecordCallContext:output_type -> google.protobuf.Empty
-	43, // [43:55] is the sub-list for method output_type
-	31, // [31:43] is the sub-list for method input_type
+	7,  // 43: rpc.IOInfoSIP.GetSIPTrunkAuthentication:input_type -> rpc.GetSIPTrunkAuthenticationRequest
+	9,  // 44: rpc.IOInfoSIP.EvaluateSIPDispatchRules:input_type -> rpc.EvaluateSIPDispatchRulesRequest
+	11, // 45: rpc.IOInfoSIP.UpdateSIPCallState:input_type -> rpc.UpdateSIPCallStateRequest
+	12, // 46: rpc.IOInfoSIP.RecordCallContext:input_type -> rpc.RecordCallContextRequest
+	37, // 47: rpc.IOInfo.CreateEgress:output_type -> google.protobuf.Empty
+	37, // 48: rpc.IOInfo.UpdateEgress:output_type -> google.protobuf.Empty
+	23, // 49: rpc.IOInfo.GetEgress:output_type -> livekit.EgressInfo
+	38, // 50: rpc.IOInfo.ListEgress:output_type -> livekit.ListEgressResponse
+	37, // 51: rpc.IOInfo.UpdateMetrics:output_type -> google.protobuf.Empty
+	37, // 52: rpc.IOInfo.CreateIngress:output_type -> google.protobuf.Empty
+	5,  // 53: rpc.IOInfo.GetIngressInfo:output_type -> rpc.GetIngressInfoResponse
+	37, // 54: rpc.IOInfo.UpdateIngressState:output_type -> google.protobuf.Empty
+	8,  // 55: rpc.IOInfo.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
+	10, // 56: rpc.IOInfo.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
+	37, // 57: rpc.IOInfo.UpdateSIPCallState:output_type -> google.protobuf.Empty
+	37, // 58: rpc.IOInfo.RecordCallContext:output_type -> google.protobuf.Empty
+	8,  // 59: rpc.IOInfoSIP.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
+	10, // 60: rpc.IOInfoSIP.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
+	37, // 61: rpc.IOInfoSIP.UpdateSIPCallState:output_type -> google.protobuf.Empty
+	37, // 62: rpc.IOInfoSIP.RecordCallContext:output_type -> google.protobuf.Empty
+	47, // [47:63] is the sub-list for method output_type
+	31, // [31:47] is the sub-list for method input_type
 	31, // [31:31] is the sub-list for extension type_name
 	31, // [31:31] is the sub-list for extension extendee
 	0,  // [0:31] is the sub-list for field type_name
@@ -1582,7 +1595,7 @@ func file_rpc_io_proto_init() {
 			NumEnums:      2,
 			NumMessages:   21,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_rpc_io_proto_goTypes,
 		DependencyIndexes: file_rpc_io_proto_depIdxs,
