@@ -35,6 +35,7 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
+	"github.com/livekit/psrpc"
 )
 
 //go:generate stringer -type TrunkFilteredReason -trimprefix TrunkFiltered
@@ -273,7 +274,7 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	// TODO: Could probably add methods on SIPDispatchRuleInfo struct instead.
 	switch rule := info.GetRule().GetRule().(type) {
 	default:
-		return "", "", fmt.Errorf("Unsupported SIP Dispatch Rule: %T", rule) //nolint:staticcheck // part of public API
+		return "", "", psrpc.NewErrorf(psrpc.InvalidArgument, "unsupported SIP Dispatch Rule: %T", rule)
 	case *livekit.SIPDispatchRule_DispatchRuleDirect:
 		pin = rule.DispatchRuleDirect.GetPin()
 		room = rule.DispatchRuleDirect.GetRoomName()
@@ -832,6 +833,21 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 	return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, "%s", err.Error()), err)
 }
 
+// InboundTrunkAuthPrompt creates a GetSIPTrunkAuthenticationResponse based on the SIPInboundTrunkInfo.
+func InboundTrunkAuthPrompt(trunk *livekit.SIPInboundTrunkInfo) (*rpc.GetSIPTrunkAuthenticationResponse, error) {
+	return &rpc.GetSIPTrunkAuthenticationResponse{
+		SipTrunkId: trunk.SipTrunkId,
+		Username:   trunk.AuthUsername,
+		Password:   trunk.AuthPassword,
+		Realm:      trunk.AuthRealm,
+		ProviderInfo: &livekit.ProviderInfo{
+			Id:   trunk.SipTrunkId,
+			Name: trunk.Name,
+			Type: livekit.ProviderType_PROVIDER_TYPE_EXTERNAL,
+		},
+	}, nil
+}
+
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
 	rule.Upgrade()
@@ -839,11 +855,9 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 	sentPin := req.GetPin()
 
 	trunkID := req.SipTrunkId
-	if trunk != nil {
-		trunkID = trunk.SipTrunkId
-	}
 	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
 	if trunk != nil {
+		trunkID = trunk.SipTrunkId
 		enc = trunk.MediaEncryption
 	}
 	attrs := maps.Clone(rule.Attributes)

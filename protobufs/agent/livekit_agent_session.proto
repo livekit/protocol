@@ -163,12 +163,19 @@ message InterruptionModelUsage {
   int32 total_requests = 3;
 }
 
+message EotModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 total_requests = 3;
+}
+
 message ModelUsage {
   oneof usage {
     LLMModelUsage llm = 1;
     TTSModelUsage tts = 2;
     STTModelUsage stt = 3;
     InterruptionModelUsage interruption = 4;
+    EotModelUsage eot = 5;
   }
 }
 
@@ -197,6 +204,10 @@ message AgentSessionEvent {
     optional string language = 3;
   }
 
+  message FunctionToolsStarted {
+    repeated FunctionCall function_calls = 1;
+  }
+
   message FunctionToolsExecuted {
     repeated FunctionCall function_calls = 1;
     repeated FunctionCallOutput function_call_outputs = 2;
@@ -221,6 +232,13 @@ message AgentSessionEvent {
     google.protobuf.Duration delay = 5;
   }
 
+  message EotPrediction {
+    float probability = 1;
+    float threshold = 2;
+    google.protobuf.Duration inference_duration = 3;
+    google.protobuf.Duration delay = 4;
+  }
+
   message SessionUsageUpdated {
     AgentSessionUsage usage = 1;
   }
@@ -236,6 +254,8 @@ message AgentSessionEvent {
     OverlappingSpeech overlapping_speech = 16;
     SessionUsageUpdated session_usage_updated = 17;
     AmdPrediction amd_prediction = 18;
+    EotPrediction eot_prediction = 19;
+    FunctionToolsStarted function_tools_started = 20;
   }
 }
 
@@ -250,6 +270,19 @@ message SessionRequest {
   message GetRTCStats {}
   message GetSessionUsage {}
   message GetFrameworkInfo {}
+  message UpdateIO {
+    message Input {
+      optional bool audio_enabled = 1;
+      optional bool video_enabled = 2;
+    }
+    message Output {
+      optional bool audio_enabled = 1;
+      optional bool video_enabled = 2;
+      optional bool transcription_enabled = 3;
+    }
+    optional Input input = 1;
+    optional Output output = 2;
+  }
 
   string request_id = 1;
   oneof request {
@@ -261,6 +294,7 @@ message SessionRequest {
     GetRTCStats get_rtc_stats = 8;
     GetSessionUsage get_session_usage = 9;
     GetFrameworkInfo get_framework_info = 10;
+    UpdateIO update_io = 11;
   }
 }
 
@@ -297,6 +331,7 @@ message SessionResponse {
     string sdk = 1;
     string sdk_version = 2;
   }
+  message UpdateIOResponse {}
 
   string request_id = 1;
   optional string error = 2;
@@ -309,6 +344,7 @@ message SessionResponse {
     GetRTCStatsResponse get_rtc_stats = 9;
     GetSessionUsageResponse get_session_usage = 10;
     GetFrameworkInfoResponse get_framework_info = 11;
+    UpdateIOResponse update_io = 12;
   }
 }
 

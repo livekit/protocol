@@ -1,5 +1,23 @@
 # github.com/livekit/protocol
 
+## 1.46.0
+
+### Minor Changes
+
+- Adding ability to specify media timeout per CreateSIPParticipant request and per Dispatch Rule. - [#1534](https://github.com/livekit/protocol/pull/1534) ([@alexlivekit](https://github.com/alexlivekit))
+
+### Patch Changes
+
+- feat(eot): add eot prediction event and usage - [#1566](https://github.com/livekit/protocol/pull/1566) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Adding a test for EvaluateDispatchRule - [#1555](https://github.com/livekit/protocol/pull/1555) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Wrap SIP validation errors with typed psrpc codes (`InvalidArgument` for unsupported dispatch rule and inbound trunk auth, `FailedPrecondition` for outbound trunk missing numbers) so Twirp surfaces them as 4xx instead of 500. Also fix `SIPStatus.GRPCStatus()` fallback ladder which compared the wrong variable. - [#1565](https://github.com/livekit/protocol/pull/1565) ([@hechen-eng](https://github.com/hechen-eng))
+
+- Fix SIP trunk-level MediaEncryption being silently dropped on outbound and inbound calls. The early `req.Upgrade()` / `rule.Upgrade()` calls pinned `Media.Encryption` to the (legacy) request/rule field before the trunk's MediaEncryption was merged, causing INVITEs to omit SRTP when only the trunk had it configured. - [#1540](https://github.com/livekit/protocol/pull/1540) ([@hechen-eng](https://github.com/hechen-eng))
+
+- Add optional authentication realm to SIPInboundTrunk. - [#1558](https://github.com/livekit/protocol/pull/1558) ([@dennwc](https://github.com/dennwc))
+
 ## 1.45.8
 
 ### Patch Changes

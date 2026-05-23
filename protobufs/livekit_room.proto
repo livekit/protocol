@@ -157,6 +157,9 @@ message RoomParticipantIdentity {
   string room = 1;
   // identity of the participant
   string identity = 2;
+  // Unix timestamp used to invalidate token whose nbf is before this value.
+  // Used only by RemoveParticipant; defaults to now(server)+leeway(1min) if left empty.
+  int64 revoke_token_ts = 3;
 }
 
 message RemoveParticipantResponse {

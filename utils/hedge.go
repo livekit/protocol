@@ -35,6 +35,10 @@ type HedgeParams[T any] struct {
 // race retries if the function takes too long to return
 // |---------------- attempt 1 ----------------|
 // |    delay    |--------- attempt 2 ---------|
+//
+// If an attempt fails while no others are in flight, the next attempt
+// starts immediately rather than waiting out RetryDelay:
+// |-- attempt 1 --X|-- attempt 2 ----------|
 func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err error) {
 	ctx, cancel := context.WithTimeout(ctx, params.Timeout)
 	defer cancel()
@@ -73,6 +77,11 @@ func HedgeCall[T any](ctx context.Context, params HedgeParams[T]) (v T, err erro
 			if done++; done == params.MaxAttempts {
 				err = multierr.Append(err, ErrMaxAttemptsReached)
 				return
+			}
+			// No attempts are currently in flight — skip the remaining
+			// RetryDelay so the next attempt fires on the next iteration.
+			if attempt == done && attempt < params.MaxAttempts {
+				delay.Reset(0)
 			}
 		case <-ctx.Done():
 			err = multierr.Append(err, ctx.Err())

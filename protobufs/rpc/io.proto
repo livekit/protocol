@@ -40,6 +40,17 @@ service IOInfo {
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
 
   // sip
+  // Deprecated: use IOInfoSIP. Retained for backward compatibility until callers migrate.
+  rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
+  rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
+  rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
+  rpc RecordCallContext(RecordCallContextRequest) returns (google.protobuf.Empty);
+}
+
+// IOInfoSIP exposes the SIP-specific IO methods as a standalone psrpc service so
+// that nodes which do not run the SIP service can avoid subscribing to these
+// methods. The method set mirrors the SIP section of IOInfo above.
+service IOInfoSIP {
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
   rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
   rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
@@ -108,6 +119,7 @@ message GetSIPTrunkAuthenticationResponse {
     (logger.redact) = true,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  string realm = 9;
   bool drop = 3;
   // Trunk used to fulfill this request
   string sip_trunk_id = 4 [(logger.name) = "sipTrunkID"];

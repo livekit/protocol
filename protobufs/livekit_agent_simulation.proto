@@ -68,6 +68,7 @@ message SimulationRun {
     string scenario_id = 9;
     google.protobuf.Timestamp started_at = 10;
     google.protobuf.Timestamp ended_at = 11;
+    string room_id = 12;
   }
 
   message Create {
