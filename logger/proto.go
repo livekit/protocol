@@ -62,13 +62,6 @@ type protoMarshaller struct {
 	maxLevel logger.Sensitivity
 }
 
-func fieldSensitivity(f protoreflect.FieldDescriptor) logger.Sensitivity {
-	if !proto.HasExtension(f.Options(), logger.E_Sensitivity) {
-		return logger.Sensitivity_SENSITIVITY_UNSPECIFIED
-	}
-	return proto.GetExtension(f.Options(), logger.E_Sensitivity).(logger.Sensitivity)
-}
-
 func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	if !p.m.IsValid() {
 		return nil
@@ -259,6 +252,13 @@ func (d redactTemplateData) Size() string {
 	}
 
 	return strconv.Itoa(proto.Size(msg.Interface()))
+}
+
+func fieldSensitivity(f protoreflect.FieldDescriptor) logger.Sensitivity {
+	if !proto.HasExtension(f.Options(), logger.E_Sensitivity) {
+		return logger.Sensitivity_SENSITIVITY_UNSPECIFIED
+	}
+	return proto.GetExtension(f.Options(), logger.E_Sensitivity).(logger.Sensitivity)
 }
 
 func protoFieldIsZero(f protoreflect.FieldDescriptor, v protoreflect.Value) bool {
