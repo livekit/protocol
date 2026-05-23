@@ -1324,8 +1324,8 @@ const file_rpc_io_proto_rawDesc = "" +
 	"srcAddress\x12 \n" +
 	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xcc\x04\n" +
 	"!GetSIPTrunkAuthenticationResponse\x12@\n" +
-	"\busername\x18\x01 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\busername\x12@\n" +
-	"\bpassword\x18\x02 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x14\n" +
+	"\busername\x18\x01 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\busername\x12@\n" +
+	"\bpassword\x18\x02 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x02R\bpassword\x12\x14\n" +
 	"\x05realm\x18\t \x01(\tR\x05realm\x12\x12\n" +
 	"\x04drop\x18\x03 \x01(\bR\x04drop\x12/\n" +
 	"\fsip_trunk_id\x18\x04 \x01(\tB\r\xbaP\n" +
@@ -1356,7 +1356,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x06no_pin\x18\x06 \x01(\bR\x05noPin\x12#\n" +
 	"\vcalled_host\x18\a \x01(\tB\x02\x18\x01R\n" +
 	"calledHost\x12\x8a\x01\n" +
-	"\x10extra_attributes\x18\t \x03(\v29.rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fextraAttributes\x12 \n" +
+	"\x10extra_attributes\x18\t \x03(\v29.rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x0fextraAttributes\x12 \n" +
 	"\x04call\x18\f \x01(\v2\f.rpc.SIPCallR\x04call\x1aB\n" +
 	"\x14ExtraAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -1364,12 +1364,12 @@ const file_rpc_io_proto_rawDesc = "" +
 	" EvaluateSIPDispatchRulesResponse\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12O\n" +
-	"\x10participant_name\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12W\n" +
-	"\x14participant_metadata\x18\b \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9d\x01\n" +
-	"\x16participant_attributes\x18\v \x03(\v2@.rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12#\n" +
+	"\x10participant_name\x18\a \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\b \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x13participantMetadata\x12\x9d\x01\n" +
+	"\x16participant_attributes\x18\v \x03(\v2@.rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x15participantAttributes\x12#\n" +
 	"\vrequest_pin\x18\x03 \x01(\bB\x02\x18\x01R\n" +
 	"requestPin\x12:\n" +
-	"\x05token\x18\x04 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
+	"\x05token\x18\x04 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x02R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x05 \x01(\tR\x05wsUrl\x12.\n" +
 	"\x06result\x18\x06 \x01(\x0e2\x16.rpc.SIPDispatchResultR\x06result\x12/\n" +
 	"\fsip_trunk_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -1379,7 +1379,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	" \x01(\tB\x14\xbaP\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x12+\n" +
 	"\n" +
 	"project_id\x18\f \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12r\n" +
-	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12r\n" +
+	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12r\n" +
 	"\x15headers_to_attributes\x18\x0e \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntryR\x13headersToAttributes\x12r\n" +
 	"\x15attributes_to_headers\x18\x12 \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\x13 \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12>\n" +
