@@ -381,17 +381,17 @@ message UpdateVideoLayers {
 
 message UpdateParticipantMetadata {
   string metadata = 1 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   string name = 2 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // attributes to update. it only updates attributes that have been set
   // to delete attributes, set the value to an empty string
   map<string, string> attributes = 3 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   uint32 request_id = 4 [(logger.name) = "requestID"];
@@ -400,10 +400,10 @@ message UpdateParticipantMetadata {
 message ICEServer {
   repeated string urls = 1;
   string username = 2 [
-    (logger.redact) = true
+    (logger.sensitivity) = SENSITIVITY_PII
   ];
   string credential = 3 [
-    (logger.redact) = true
+    (logger.sensitivity) = SENSITIVITY_SECRET
   ];
 }
 
@@ -624,7 +624,7 @@ message JoinRequest {
   ConnectionSettings connection_settings = 2;
 
   string metadata = 3 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];  // if not empty, will overwrite `metadata` in token
 
@@ -632,7 +632,7 @@ message JoinRequest {
   // will overwrite if the same key is in the token
   // will not delete keys from token if there is a key collision and this sets that key to empty value
   map<string, string> participant_attributes = 4 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 

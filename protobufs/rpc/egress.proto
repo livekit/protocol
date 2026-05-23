@@ -78,7 +78,7 @@ message StartEgressRequest {
   // connection info
   string room_id = 3 [(logger.name) = "roomID"];
   string room_name = 18;
-  string token = 8 [(logger.redact) = true];
+  string token = 8 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string ws_url = 9;
 
   // cloud only
