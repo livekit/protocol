@@ -11,6 +11,7 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	descriptorpb "google.golang.org/protobuf/types/descriptorpb"
 	reflect "reflect"
+	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -21,15 +22,66 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Sensitivity int32
+
+const (
+	// Unannotated default — safe to log.
+	// Identifiers, IDs, timestamps, enums, status fields.
+	Sensitivity_SENSITIVITY_UNSPECIFIED Sensitivity = 0
+	// User-identifying or user-controlled data: display names, phone numbers,
+	// metadata, attributes, custom headers, auth usernames, semi-public account
+	// identifiers (AWS role ARNs, Azure account names).
+	// Redacted by logger.Proto(); exposed by logger.UnredactedProto() for
+	// operator-facing observability events.
+	Sensitivity_SENSITIVITY_PII Sensitivity = 1
+	// Credentials and authentication material: passwords, access keys, session
+	// tokens, signing keys, API keys, ICE credentials.
+	// ALWAYS redacted, including by logger.UnredactedProto().
+	Sensitivity_SENSITIVITY_SECRET Sensitivity = 2
+)
+
+// Enum value maps for Sensitivity.
+var (
+	Sensitivity_name = map[int32]string{
+		0: "SENSITIVITY_UNSPECIFIED",
+		1: "SENSITIVITY_PII",
+		2: "SENSITIVITY_SECRET",
+	}
+	Sensitivity_value = map[string]int32{
+		"SENSITIVITY_UNSPECIFIED": 0,
+		"SENSITIVITY_PII":         1,
+		"SENSITIVITY_SECRET":      2,
+	}
+)
+
+func (x Sensitivity) Enum() *Sensitivity {
+	p := new(Sensitivity)
+	*p = x
+	return p
+}
+
+func (x Sensitivity) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Sensitivity) Descriptor() protoreflect.EnumDescriptor {
+	return file_logger_options_proto_enumTypes[0].Descriptor()
+}
+
+func (Sensitivity) Type() protoreflect.EnumType {
+	return &file_logger_options_proto_enumTypes[0]
+}
+
+func (x Sensitivity) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Sensitivity.Descriptor instead.
+func (Sensitivity) EnumDescriptor() ([]byte, []int) {
+	return file_logger_options_proto_rawDescGZIP(), []int{0}
+}
+
 var file_logger_options_proto_extTypes = []protoimpl.ExtensionInfo{
-	{
-		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
-		ExtensionType: (*bool)(nil),
-		Field:         1285,
-		Name:          "logger.redact",
-		Tag:           "varint,1285,opt,name=redact",
-		Filename:      "logger/options.proto",
-	},
 	{
 		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
 		ExtensionType: (*string)(nil),
@@ -46,40 +98,67 @@ var file_logger_options_proto_extTypes = []protoimpl.ExtensionInfo{
 		Tag:           "bytes,1287,opt,name=name",
 		Filename:      "logger/options.proto",
 	},
+	{
+		ExtendedType:  (*descriptorpb.FieldOptions)(nil),
+		ExtensionType: (*Sensitivity)(nil),
+		Field:         1288,
+		Name:          "logger.sensitivity",
+		Tag:           "varint,1288,opt,name=sensitivity,enum=logger.Sensitivity",
+		Filename:      "logger/options.proto",
+	},
 }
 
 // Extension fields to descriptorpb.FieldOptions.
 var (
-	// optional bool redact = 1285;
-	E_Redact = &file_logger_options_proto_extTypes[0]
 	// optional string redact_format = 1286;
-	E_RedactFormat = &file_logger_options_proto_extTypes[1]
+	E_RedactFormat = &file_logger_options_proto_extTypes[0]
 	// optional string name = 1287;
-	E_Name = &file_logger_options_proto_extTypes[2]
+	E_Name = &file_logger_options_proto_extTypes[1]
+	// optional logger.Sensitivity sensitivity = 1288;
+	E_Sensitivity = &file_logger_options_proto_extTypes[2]
 )
 
 var File_logger_options_proto protoreflect.FileDescriptor
 
 const file_logger_options_proto_rawDesc = "" +
 	"\n" +
-	"\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto:6\n" +
-	"\x06redact\x12\x1d.google.protobuf.FieldOptions\x18\x85\n" +
-	" \x01(\bR\x06redact:C\n" +
+	"\x14logger/options.proto\x12\x06logger\x1a google/protobuf/descriptor.proto*W\n" +
+	"\vSensitivity\x12\x1b\n" +
+	"\x17SENSITIVITY_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fSENSITIVITY_PII\x10\x01\x12\x16\n" +
+	"\x12SENSITIVITY_SECRET\x10\x02:C\n" +
 	"\rredact_format\x12\x1d.google.protobuf.FieldOptions\x18\x86\n" +
 	" \x01(\tR\fredactFormat:2\n" +
 	"\x04name\x12\x1d.google.protobuf.FieldOptions\x18\x87\n" +
-	" \x01(\tR\x04nameBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	" \x01(\tR\x04name:U\n" +
+	"\vsensitivity\x12\x1d.google.protobuf.FieldOptions\x18\x88\n" +
+	" \x01(\x0e2\x13.logger.SensitivityR\vsensitivityBMZ*github.com/livekit/protocol/livekit/logger\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
+var (
+	file_logger_options_proto_rawDescOnce sync.Once
+	file_logger_options_proto_rawDescData []byte
+)
+
+func file_logger_options_proto_rawDescGZIP() []byte {
+	file_logger_options_proto_rawDescOnce.Do(func() {
+		file_logger_options_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_logger_options_proto_rawDesc), len(file_logger_options_proto_rawDesc)))
+	})
+	return file_logger_options_proto_rawDescData
+}
+
+var file_logger_options_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_logger_options_proto_goTypes = []any{
-	(*descriptorpb.FieldOptions)(nil), // 0: google.protobuf.FieldOptions
+	(Sensitivity)(0),                  // 0: logger.Sensitivity
+	(*descriptorpb.FieldOptions)(nil), // 1: google.protobuf.FieldOptions
 }
 var file_logger_options_proto_depIdxs = []int32{
-	0, // 0: logger.redact:extendee -> google.protobuf.FieldOptions
-	0, // 1: logger.redact_format:extendee -> google.protobuf.FieldOptions
-	0, // 2: logger.name:extendee -> google.protobuf.FieldOptions
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
+	1, // 0: logger.redact_format:extendee -> google.protobuf.FieldOptions
+	1, // 1: logger.name:extendee -> google.protobuf.FieldOptions
+	1, // 2: logger.sensitivity:extendee -> google.protobuf.FieldOptions
+	0, // 3: logger.sensitivity:type_name -> logger.Sensitivity
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	3, // [3:4] is the sub-list for extension type_name
 	0, // [0:3] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
 }
@@ -94,13 +173,14 @@ func file_logger_options_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_logger_options_proto_rawDesc), len(file_logger_options_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   0,
 			NumExtensions: 3,
 			NumServices:   0,
 		},
 		GoTypes:           file_logger_options_proto_goTypes,
 		DependencyIndexes: file_logger_options_proto_depIdxs,
+		EnumInfos:         file_logger_options_proto_enumTypes,
 		ExtensionInfos:    file_logger_options_proto_extTypes,
 	}.Build()
 	File_logger_options_proto = out.File

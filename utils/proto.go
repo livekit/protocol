@@ -43,8 +43,10 @@ func CloneProtoRedacted[T proto.Message](m T) T {
 
 		reflected := msg.ProtoReflect()
 		reflected.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
-			if proto.HasExtension(fd.Options(), logger.E_Redact) {
-				reflected.Clear(fd)
+			if proto.HasExtension(fd.Options(), logger.E_Sensitivity) {
+				if proto.GetExtension(fd.Options(), logger.E_Sensitivity).(logger.Sensitivity) >= logger.Sensitivity_SENSITIVITY_PII {
+					reflected.Clear(fd)
+				}
 			}
 
 			if fd.Kind() == protoreflect.MessageKind {
