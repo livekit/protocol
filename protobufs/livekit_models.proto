@@ -355,7 +355,7 @@ message DataTrackSchemaDefinition {
   DataTrackSchemaId id = 1;
   // This must not exceed 50 KB.
   bytes definition = 2 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 }
