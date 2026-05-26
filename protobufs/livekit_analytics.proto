@@ -233,7 +233,7 @@ message FeatureUsageInfo {
     KRISP_NOISE_CANCELLATION = 0;
     KRISP_BACKGROUND_VOICE_CANCELLATION = 1;
     AIC_AUDIO_ENHANCEMENT = 2;
-    KRISP_VIVA_VOICE_ISOLATION = 3;
+    KRISP_VIVA = 3;
   }
   Feature feature = 1;
   string project_id = 2 [(logger.name) = "projectID"];
