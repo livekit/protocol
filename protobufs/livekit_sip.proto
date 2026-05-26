@@ -745,6 +745,10 @@ message CreateSIPParticipantRequest {
   string sip_trunk_id = 1 [(logger.name) = "sipTrunkID"];
   SIPOutboundConfig trunk = 20;
 
+  SIPRequestDest sip_request_uri = 24; // INVITE <uri>
+  SIPNamedDest   sip_to_header   = 25; // To:   "Name" <uri>
+  SIPNamedDest   sip_from_header = 26; // From: "Name" <uri>
+
   // What number should be dialed via SIP
   string sip_call_to = 2;
 
@@ -824,7 +828,7 @@ message CreateSIPParticipantRequest {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional Destination destination = 22;
-  // NEXT ID: 24
+  // NEXT ID: 27
 }
 
 message SIPParticipantInfo {
@@ -908,6 +912,21 @@ message SIPUri {
   string ip = 3;
   uint32 port = 4;
   SIPTransport transport = 5;
+}
+
+message SIPRequestDest {
+  oneof uri {
+    string raw = 1; // <sip:user@sip.example.com:5060;transport=tcp>
+    SIPUri values = 2;
+  }
+}
+
+message SIPNamedDest {
+  string display_name = 3;
+  oneof uri {
+    string raw = 1; // <sip:user@sip.example.com:5060;transport=tcp>
+    SIPUri values = 2;
+  }
 }
 
 enum SIPCallStatus {
