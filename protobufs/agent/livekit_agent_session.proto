@@ -183,6 +183,12 @@ message AgentSessionUsage {
   repeated ModelUsage model_usage = 1;
 }
 
+// Application-defined event carried over the remote session wire.
+message CustomEvent {
+  string type = 1;
+  google.protobuf.Struct payload = 2;
+}
+
 message AgentSessionEvent {
   message AgentStateChanged {
     AgentState old_state = 1;
@@ -256,6 +262,7 @@ message AgentSessionEvent {
     AmdPrediction amd_prediction = 18;
     EotPrediction eot_prediction = 19;
     FunctionToolsStarted function_tools_started = 20;
+    CustomEvent custom_event = 21;
   }
 }
 
