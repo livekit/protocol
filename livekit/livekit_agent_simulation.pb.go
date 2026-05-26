@@ -657,6 +657,7 @@ type SimulationRunSummary_Issue struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Description   string                 `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
 	Suggestion    string                 `protobuf:"bytes,2,opt,name=suggestion,proto3" json:"suggestion,omitempty"`
+	Label         string                 `protobuf:"bytes,3,opt,name=label,proto3" json:"label,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -701,6 +702,13 @@ func (x *SimulationRunSummary_Issue) GetDescription() string {
 func (x *SimulationRunSummary_Issue) GetSuggestion() string {
 	if x != nil {
 		return x.Suggestion
+	}
+	return ""
+}
+
+func (x *SimulationRunSummary_Issue) GetLabel() string {
+	if x != nil {
+		return x.Label
 	}
 	return ""
 }
@@ -2827,7 +2835,7 @@ var File_livekit_agent_simulation_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
-	"\x1elivekit_agent_simulation.proto\x12\alivekit\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x19livekit_cloud_agent.proto\x1a\x14livekit_models.proto\x1a!agent/livekit_agent_session.proto\"\xbb\x03\n" +
+	"\x1elivekit_agent_simulation.proto\x12\alivekit\x1a!agent/livekit_agent_session.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x19livekit_cloud_agent.proto\x1a\x14livekit_models.proto\"\xd1\x03\n" +
 	"\x14SimulationRunSummary\x12\x16\n" +
 	"\x06passed\x18\x01 \x01(\x05R\x06passed\x12\x16\n" +
 	"\x06failed\x18\x02 \x01(\x05R\x06failed\x12\x1d\n" +
@@ -2839,12 +2847,13 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fchat_history\x18\x06 \x03(\v2..livekit.SimulationRunSummary.ChatHistoryEntryR\vchatHistory\x1aZ\n" +
 	"\x10ChatHistoryEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x120\n" +
-	"\x05value\x18\x02 \x01(\v2\x1a.livekit.agent.ChatContextR\x05value:\x028\x01\x1aI\n" +
+	"\x05value\x18\x02 \x01(\v2\x1a.livekit.agent.ChatContextR\x05value:\x028\x01\x1a_\n" +
 	"\x05Issue\x12 \n" +
 	"\vdescription\x18\x01 \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
-	"suggestion\"\xc3\x16\n" +
+	"suggestion\x12\x14\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xc3\x16\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +

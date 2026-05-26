@@ -15,14 +15,15 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
 
+import "agent/livekit_agent_session.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_cloud_agent.proto";
 import "livekit_models.proto";
-import "agent/livekit_agent_session.proto";
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
 
 message SimulationRunSummary {
   int32 passed = 1;
@@ -35,6 +36,7 @@ message SimulationRunSummary {
   message Issue {
     string description = 1;
     string suggestion = 2;
+    string label = 3;
   }
 }
 
