@@ -71,6 +71,12 @@ message SimulationRun {
     google.protobuf.Timestamp started_at = 10;
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
+    Usage usage = 13;
+
+    message Usage {
+      int32 text_turns_count = 1;
+      int32 audio_turns_count = 2;
+    }
   }
 
   message Create {
@@ -156,6 +162,13 @@ message SimulationRun {
   int32 passed_count = 13;
   int32 failed_count = 14;
   int32 num_simulations = 15;
+  // Aggregate usage across all jobs in this run (sum of Job.usage).
+  Usage usage = 16;
+
+  message Usage {
+    int32 text_turns_count = 1;
+    int32 audio_turns_count = 2;
+  }
 }
 
 message Scenario {
