@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.46.2
+
+### Patch Changes
+
+- remove the stale proto export - [#1584](https://github.com/livekit/protocol/pull/1584) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Add Krisp Viva to FeatureUsageInfo enum - [#1583](https://github.com/livekit/protocol/pull/1583) ([@lukasIO](https://github.com/lukasIO))
+
+- Allow specifying exact To header and request line for SIP outbound. - [#1577](https://github.com/livekit/protocol/pull/1577) ([@dennwc](https://github.com/dennwc))
+
 ## 1.46.1
 
 ### Patch Changes
