@@ -3,7 +3,6 @@ export { protoInt64, Timestamp };
 export * as AgentSession from "./gen/agent/livekit_agent_session_pb.js";
 export * as AgentInference from "./gen/agent/livekit_agent_inference_pb.js";
 export * as AgentText from "./gen/agent/livekit_agent_text_pb.js";
-export * as AgentTurnDetector from "./gen/agent/livekit_agent_turn_detector_pb.js";
 export * as AgentDev from "./gen/agent/livekit_agent_dev_pb.js";
 export * from "./gen/livekit_agent_dispatch_pb.js";
 export * from "./gen/livekit_agent_pb.js";
