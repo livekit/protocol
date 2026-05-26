@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.46.3
+
+### Patch Changes
+
+- Add custom event protobuf for agent remote session - [#1588](https://github.com/livekit/protocol/pull/1588) ([@toubatbrian](https://github.com/toubatbrian))
+
 ## 1.46.2
 
 ### Patch Changes
