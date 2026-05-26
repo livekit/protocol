@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.46.1
+
+### Patch Changes
+
+- export missing proto messages - [#1582](https://github.com/livekit/protocol/pull/1582) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- add logger.UnredactedProto helper that skips field redaction - [#1578](https://github.com/livekit/protocol/pull/1578) ([@paulwe](https://github.com/paulwe))
+
 ## 1.46.0
 
 ### Patch Changes
