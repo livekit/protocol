@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.46.1
+
+### Patch Changes
+
+- feat(agents): add function call start event - [#1571](https://github.com/livekit/protocol/pull/1571) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.46.0
 
 ### Minor Changes
