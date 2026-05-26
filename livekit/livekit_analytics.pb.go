@@ -264,7 +264,7 @@ const (
 	FeatureUsageInfo_KRISP_NOISE_CANCELLATION            FeatureUsageInfo_Feature = 0
 	FeatureUsageInfo_KRISP_BACKGROUND_VOICE_CANCELLATION FeatureUsageInfo_Feature = 1
 	FeatureUsageInfo_AIC_AUDIO_ENHANCEMENT               FeatureUsageInfo_Feature = 2
-	FeatureUsageInfo_KRISP_VIVA_VOICE_ISOLATION          FeatureUsageInfo_Feature = 3
+	FeatureUsageInfo_KRISP_VIVA                          FeatureUsageInfo_Feature = 3
 )
 
 // Enum value maps for FeatureUsageInfo_Feature.
@@ -273,13 +273,13 @@ var (
 		0: "KRISP_NOISE_CANCELLATION",
 		1: "KRISP_BACKGROUND_VOICE_CANCELLATION",
 		2: "AIC_AUDIO_ENHANCEMENT",
-		3: "KRISP_VIVA_VOICE_ISOLATION",
+		3: "KRISP_VIVA",
 	}
 	FeatureUsageInfo_Feature_value = map[string]int32{
 		"KRISP_NOISE_CANCELLATION":            0,
 		"KRISP_BACKGROUND_VOICE_CANCELLATION": 1,
 		"AIC_AUDIO_ENHANCEMENT":               2,
-		"KRISP_VIVA_VOICE_ISOLATION":          3,
+		"KRISP_VIVA":                          3,
 	}
 )
 
@@ -2379,7 +2379,7 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\tTimeRange\x129\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\xa2\x05\n" +
+	"\bended_at\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\"\x91\x05\n" +
 	"\x10FeatureUsageInfo\x12;\n" +
 	"\afeature\x18\x01 \x01(\x0e2!.livekit.FeatureUsageInfo.FeatureR\afeature\x12+\n" +
 	"\n" +
@@ -2395,12 +2395,13 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\ffeature_info\x18\t \x03(\v2*.livekit.FeatureUsageInfo.FeatureInfoEntryR\vfeatureInfo\x1a>\n" +
 	"\x10FeatureInfoEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8b\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"{\n" +
 	"\aFeature\x12\x1c\n" +
 	"\x18KRISP_NOISE_CANCELLATION\x10\x00\x12'\n" +
 	"#KRISP_BACKGROUND_VOICE_CANCELLATION\x10\x01\x12\x19\n" +
-	"\x15AIC_AUDIO_ENHANCEMENT\x10\x02\x12\x1e\n" +
-	"\x1aKRISP_VIVA_VOICE_ISOLATION\x10\x03\"\x95\a\n" +
+	"\x15AIC_AUDIO_ENHANCEMENT\x10\x02\x12\x0e\n" +
+	"\n" +
+	"KRISP_VIVA\x10\x03\"\x95\a\n" +
 	"\x0eAPICallRequest\x12L\n" +
 	"\x13create_room_request\x18\x01 \x01(\v2\x1a.livekit.CreateRoomRequestH\x00R\x11createRoomRequest\x12I\n" +
 	"\x12list_rooms_request\x18\x02 \x01(\v2\x19.livekit.ListRoomsRequestH\x00R\x10listRoomsRequest\x12L\n" +
