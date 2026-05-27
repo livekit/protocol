@@ -1450,9 +1450,9 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12.\n" +
-	"\x10participant_name\x18\x05 \x01(\tB\x03\xa8P\x01R\x0fparticipantName\x12W\n" +
+	"\x10participant_name\x18\x05 \x01(\tB\x03\xc0P\x01R\x0fparticipantName\x12W\n" +
 	"\x14participant_metadata\x18\n" +
-	" \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x121\n" +
+	" \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x13participantMetadata\x121\n" +
 	"\x12bypass_transcoding\x18\b \x01(\bB\x02\x18\x01R\x11bypassTranscoding\x122\n" +
 	"\x12enable_transcoding\x18\v \x01(\bH\x00R\x11enableTranscoding\x88\x01\x01\x122\n" +
 	"\x05audio\x18\x06 \x01(\v2\x1c.livekit.IngressAudioOptionsR\x05audio\x122\n" +
@@ -1502,8 +1502,8 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\troom_name\x18\b \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\t \x01(\tR\x13participantIdentity\x12.\n" +
 	"\x10participant_name\x18\n" +
-	" \x01(\tB\x03\xa8P\x01R\x0fparticipantName\x12W\n" +
-	"\x14participant_metadata\x18\x0e \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x1a\n" +
+	" \x01(\tB\x03\xc0P\x01R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\x0e \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x13participantMetadata\x12\x1a\n" +
 	"\breusable\x18\v \x01(\bR\breusable\x12+\n" +
 	"\x05state\x18\f \x01(\v2\x15.livekit.IngressStateR\x05state\x12\x1d\n" +
 	"\aenabled\x18\x10 \x01(\bH\x01R\aenabled\x88\x01\x01B\x15\n" +
@@ -1550,8 +1550,8 @@ const file_livekit_ingress_proto_rawDesc = "" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12.\n" +
-	"\x10participant_name\x18\x05 \x01(\tB\x03\xa8P\x01R\x0fparticipantName\x12W\n" +
-	"\x14participant_metadata\x18\t \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x126\n" +
+	"\x10participant_name\x18\x05 \x01(\tB\x03\xc0P\x01R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\t \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x13participantMetadata\x126\n" +
 	"\x12bypass_transcoding\x18\b \x01(\bB\x02\x18\x01H\x00R\x11bypassTranscoding\x88\x01\x01\x122\n" +
 	"\x12enable_transcoding\x18\n" +
 	" \x01(\bH\x01R\x11enableTranscoding\x88\x01\x01\x122\n" +

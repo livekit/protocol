@@ -462,7 +462,7 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\x05track\x18\a \x01(\v2\x1b.livekit.TrackEgressRequestH\x00R\x05track\x12\"\n" +
 	"\aroom_id\x18\x03 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1b\n" +
 	"\troom_name\x18\x12 \x01(\tR\broomName\x12\x19\n" +
-	"\x05token\x18\b \x01(\tB\x03\xa8P\x01R\x05token\x12\x15\n" +
+	"\x05token\x18\b \x01(\tB\x03\xc0P\x02R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\t \x01(\tR\x05wsUrl\x120\n" +
 	"\x14cloud_backup_enabled\x18\n" +
 	" \x01(\bR\x12cloudBackupEnabled\x12#\n" +

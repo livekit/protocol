@@ -29,9 +29,9 @@ message DialWhatsAppCallRequest {
   // Required - The phone number id of the business that is initiating the call
   string whatsapp_phone_number_id = 1 [(logger.name) = "whatsappPhoneNumberID"];
   // Required - The number of the user that is supossed to receive the call
-  string whatsapp_to_phone_number = 2 [(logger.redact) = true];
+  string whatsapp_to_phone_number = 2 [(logger.sensitivity) = SENSITIVITY_PII];
   // Required - The API key of the business that is initiating the call
-  string whatsapp_api_key = 3 [(logger.redact) = true];
+  string whatsapp_api_key = 3 [(logger.sensitivity) = SENSITIVITY_SECRET];
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 12;
   // Optional - An arbitrary string you can pass in that is useful for tracking and logging purposes.
@@ -45,17 +45,17 @@ message DialWhatsAppCallRequest {
   string participant_identity= 7;
   // Optional - Name of the participant in LiveKit room
   string participant_name = 8 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Optional - User-defined metadata. Will be attached to a created Participant in the room.
   string participant_metadata = 9 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Optional - User-defined attributes. Will be attached to a created Participant in the room.
   map<string, string> participant_attributes = 10 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.
@@ -88,7 +88,7 @@ message DisconnectWhatsAppCallRequest {
   // The API key of the whatsapp business.
   // Required if the DisconnectReason is BUSINESS_INITIATED.
   // Optional for  USER_INITIATED as no API call to WhatsApp is needed.
-  string whatsapp_api_key = 2 [(logger.redact) = true];
+  string whatsapp_api_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   // The reason for disconnecting the call
   DisconnectReason disconnect_reason = 3;
 }
@@ -111,7 +111,7 @@ message AcceptWhatsAppCallRequest {
   // Required - The phone number id of the business that is conencting the call
   string whatsapp_phone_number_id = 1 [(logger.name) = "whatsappPhoneNumberID"];
   // Required - The API key of the business that is connecting the call
-  string whatsapp_api_key = 2 [(logger.redact) = true];
+  string whatsapp_api_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   // Required - WhatsApp Cloud API version, eg: 23.0, 24.0, etc.
   string whatsapp_cloud_api_version = 13;
   // Required - Call ID sent by Meta
@@ -130,17 +130,17 @@ message AcceptWhatsAppCallRequest {
   string participant_identity= 8;
   // Optional - Name of the participant in LiveKit room
   string participant_name = 9 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Optional - User-defined metadata. Will be attached to a created Participant in the room.
   string participant_metadata = 10 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Optional - User-defined attributes. Will be attached to a created Participant in the room.
   map<string, string> participant_attributes = 11 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Optional - Country where the call terminates as ISO 3166-1 alpha-2 (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2). This will be used by the livekit infrastructure to route calls.

@@ -38,15 +38,23 @@ const (
 type CallStatus string
 
 const (
-	CallStatusUndefined         CallStatus = ""
-	CallStatusActive            CallStatus = "active"
-	CallStatusCallIncoming      CallStatus = "call_incoming"
+	CallStatusUndefined CallStatus = ""
+	CallStatusActive    CallStatus = "active"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	CallStatusCallIncoming CallStatus = "call_incoming"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
 	CallStatusParticipantJoined CallStatus = "participant_joined"
-	CallStatusDisconnected      CallStatus = "disconnected"
-	CallStatusError             CallStatus = "error"
-	CallStatusPending           CallStatus = "pending"
-	CallStatusSuccess           CallStatus = "success"
-	CallStatusFailed            CallStatus = "failed"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	CallStatusDisconnected CallStatus = "disconnected"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	CallStatusError CallStatus = "error"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	CallStatusPending CallStatus = "pending"
+	// Deprecated: removed from schema; retained for compatibility with stored data.
+	CallStatusSuccess    CallStatus = "success"
+	CallStatusFailed     CallStatus = "failed"
+	CallStatusConnecting CallStatus = "connecting"
+	CallStatusCompleted  CallStatus = "completed"
 )
 
 type CallTransferStatus string

@@ -1,7 +1,6 @@
 package rpc
 
 import (
-	"errors"
 	"maps"
 	"math/rand/v2"
 	"net"
@@ -10,6 +9,7 @@ import (
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/psrpc"
 )
 
 func (p *GetSIPTrunkAuthenticationRequest) SIPCall() *SIPCall {
@@ -113,7 +113,7 @@ func NewCreateSIPParticipantRequest(
 	outboundNumber := req.SipNumber
 	if outboundNumber == "" {
 		if trunk == nil || len(trunk.Numbers) == 0 {
-			return nil, errors.New("no numbers on outbound trunk")
+			return nil, psrpc.NewErrorf(psrpc.FailedPrecondition, "no numbers on outbound trunk")
 		}
 		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}
@@ -173,6 +173,9 @@ func NewCreateSIPParticipantRequest(
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
 		DestinationCountry:    destinationCountry,
+		SipRequestUri:         req.SipRequestUri,
+		SipFromHeader:         req.SipFromHeader,
+		SipToHeader:           req.SipToHeader,
 		Address:               hostname,
 		Hostname:              fromHostname,
 		Transport:             transport,
