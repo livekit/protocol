@@ -373,8 +373,8 @@ type SignalRequest struct {
 	//	*SignalRequest_PublishDataTrackRequest
 	//	*SignalRequest_UnpublishDataTrackRequest
 	//	*SignalRequest_UpdateDataSubscription
-	//	*SignalRequest_DefineDataTrackSchema
-	//	*SignalRequest_GetDataTrackSchema
+	//	*SignalRequest_StoreDataBlobRequest
+	//	*SignalRequest_GetDataBlobRequest
 	Message       isSignalRequest_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -598,19 +598,19 @@ func (x *SignalRequest) GetUpdateDataSubscription() *UpdateDataSubscription {
 	return nil
 }
 
-func (x *SignalRequest) GetDefineDataTrackSchema() *DefineDataTrackSchemaRequest {
+func (x *SignalRequest) GetStoreDataBlobRequest() *StoreDataBlobRequest {
 	if x != nil {
-		if x, ok := x.Message.(*SignalRequest_DefineDataTrackSchema); ok {
-			return x.DefineDataTrackSchema
+		if x, ok := x.Message.(*SignalRequest_StoreDataBlobRequest); ok {
+			return x.StoreDataBlobRequest
 		}
 	}
 	return nil
 }
 
-func (x *SignalRequest) GetGetDataTrackSchema() *GetDataTrackSchemaRequest {
+func (x *SignalRequest) GetGetDataBlobRequest() *GetDataBlobRequest {
 	if x != nil {
-		if x, ok := x.Message.(*SignalRequest_GetDataTrackSchema); ok {
-			return x.GetDataTrackSchema
+		if x, ok := x.Message.(*SignalRequest_GetDataBlobRequest); ok {
+			return x.GetDataBlobRequest
 		}
 	}
 	return nil
@@ -720,14 +720,14 @@ type SignalRequest_UpdateDataSubscription struct {
 	UpdateDataSubscription *UpdateDataSubscription `protobuf:"bytes,21,opt,name=update_data_subscription,json=updateDataSubscription,proto3,oneof"`
 }
 
-type SignalRequest_DefineDataTrackSchema struct {
-	// Define a data track schema.
-	DefineDataTrackSchema *DefineDataTrackSchemaRequest `protobuf:"bytes,22,opt,name=define_data_track_schema,json=defineDataTrackSchema,proto3,oneof"`
+type SignalRequest_StoreDataBlobRequest struct {
+	// Store a data blob.
+	StoreDataBlobRequest *StoreDataBlobRequest `protobuf:"bytes,22,opt,name=store_data_blob_request,json=storeDataBlobRequest,proto3,oneof"`
 }
 
-type SignalRequest_GetDataTrackSchema struct {
-	// Get the definition for a defined data track schema.
-	GetDataTrackSchema *GetDataTrackSchemaRequest `protobuf:"bytes,23,opt,name=get_data_track_schema,json=getDataTrackSchema,proto3,oneof"`
+type SignalRequest_GetDataBlobRequest struct {
+	// Retrieve a stored data blob.
+	GetDataBlobRequest *GetDataBlobRequest `protobuf:"bytes,23,opt,name=get_data_blob_request,json=getDataBlobRequest,proto3,oneof"`
 }
 
 func (*SignalRequest_Offer) isSignalRequest_Message() {}
@@ -770,9 +770,9 @@ func (*SignalRequest_UnpublishDataTrackRequest) isSignalRequest_Message() {}
 
 func (*SignalRequest_UpdateDataSubscription) isSignalRequest_Message() {}
 
-func (*SignalRequest_DefineDataTrackSchema) isSignalRequest_Message() {}
+func (*SignalRequest_StoreDataBlobRequest) isSignalRequest_Message() {}
 
-func (*SignalRequest_GetDataTrackSchema) isSignalRequest_Message() {}
+func (*SignalRequest_GetDataBlobRequest) isSignalRequest_Message() {}
 
 type SignalResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -806,7 +806,7 @@ type SignalResponse struct {
 	//	*SignalResponse_PublishDataTrackResponse
 	//	*SignalResponse_UnpublishDataTrackResponse
 	//	*SignalResponse_DataTrackSubscriberHandles
-	//	*SignalResponse_GetDataTrackSchemaResponse
+	//	*SignalResponse_GetDataBlobResponse
 	Message       isSignalResponse_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1101,10 +1101,10 @@ func (x *SignalResponse) GetDataTrackSubscriberHandles() *DataTrackSubscriberHan
 	return nil
 }
 
-func (x *SignalResponse) GetGetDataTrackSchemaResponse() *GetDataTrackSchemaResponse {
+func (x *SignalResponse) GetGetDataBlobResponse() *GetDataBlobResponse {
 	if x != nil {
-		if x, ok := x.Message.(*SignalResponse_GetDataTrackSchemaResponse); ok {
-			return x.GetDataTrackSchemaResponse
+		if x, ok := x.Message.(*SignalResponse_GetDataBlobResponse); ok {
+			return x.GetDataBlobResponse
 		}
 	}
 	return nil
@@ -1255,9 +1255,9 @@ type SignalResponse_DataTrackSubscriberHandles struct {
 	DataTrackSubscriberHandles *DataTrackSubscriberHandles `protobuf:"bytes,29,opt,name=data_track_subscriber_handles,json=dataTrackSubscriberHandles,proto3,oneof"`
 }
 
-type SignalResponse_GetDataTrackSchemaResponse struct {
-	// Sent in response to `GetDataTrackSchemaRequest`.
-	GetDataTrackSchemaResponse *GetDataTrackSchemaResponse `protobuf:"bytes,30,opt,name=get_data_track_schema_response,json=getDataTrackSchemaResponse,proto3,oneof"`
+type SignalResponse_GetDataBlobResponse struct {
+	// Sent in response to `GetDataBlobRequest`.
+	GetDataBlobResponse *GetDataBlobResponse `protobuf:"bytes,30,opt,name=get_data_blob_response,json=getDataBlobResponse,proto3,oneof"`
 }
 
 func (*SignalResponse_Join) isSignalResponse_Message() {}
@@ -1316,7 +1316,7 @@ func (*SignalResponse_UnpublishDataTrackResponse) isSignalResponse_Message() {}
 
 func (*SignalResponse_DataTrackSubscriberHandles) isSignalResponse_Message() {}
 
-func (*SignalResponse_GetDataTrackSchemaResponse) isSignalResponse_Message() {}
+func (*SignalResponse_GetDataBlobResponse) isSignalResponse_Message() {}
 
 type SimulcastCodec struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
@@ -1589,7 +1589,7 @@ type PublishDataTrackRequest struct {
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
 	Encryption Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	// Type info for this track if the track is typed.
-	// If set, the type must be defined via `DefineDataTrackSchemaRequest`.
+	// If set, the associated schema must be stored with `StoreDataBlobRequest`.
 	TypeInfo      *DataTrackTypeInfo `protobuf:"bytes,4,opt,name=type_info,json=typeInfo,proto3,oneof" json:"type_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2489,75 +2489,31 @@ func (x *UpdateDataSubscription) GetUpdates() []*UpdateDataSubscription_Update {
 	return nil
 }
 
-type DefineDataTrackSchemaRequest struct {
+type StoreDataBlobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Schema to define.
-	SchemaDefinition *DataTrackSchemaDefinition `protobuf:"bytes,1,opt,name=schema_definition,json=schemaDefinition,proto3" json:"schema_definition,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *DefineDataTrackSchemaRequest) Reset() {
-	*x = DefineDataTrackSchemaRequest{}
-	mi := &file_livekit_rtc_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DefineDataTrackSchemaRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DefineDataTrackSchemaRequest) ProtoMessage() {}
-
-func (x *DefineDataTrackSchemaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DefineDataTrackSchemaRequest.ProtoReflect.Descriptor instead.
-func (*DefineDataTrackSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *DefineDataTrackSchemaRequest) GetSchemaDefinition() *DataTrackSchemaDefinition {
-	if x != nil {
-		return x.SchemaDefinition
-	}
-	return nil
-}
-
-type GetDataTrackSchemaRequest struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	ParticipantIdentity string                 `protobuf:"bytes,1,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
-	// ID of the schema to get the definition for.
-	SchemaId      *DataTrackSchemaId `protobuf:"bytes,2,opt,name=schema_id,json=schemaId,proto3" json:"schema_id,omitempty"`
+	// Unique key the data blob is identified by.
+	Key *DataBlobKey `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// Contents of the data blob. This must not exceed 50 KB.
+	Contents      []byte `protobuf:"bytes,2,opt,name=contents,proto3" json:"contents,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *GetDataTrackSchemaRequest) Reset() {
-	*x = GetDataTrackSchemaRequest{}
-	mi := &file_livekit_rtc_proto_msgTypes[20]
+func (x *StoreDataBlobRequest) Reset() {
+	*x = StoreDataBlobRequest{}
+	mi := &file_livekit_rtc_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetDataTrackSchemaRequest) String() string {
+func (x *StoreDataBlobRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetDataTrackSchemaRequest) ProtoMessage() {}
+func (*StoreDataBlobRequest) ProtoMessage() {}
 
-func (x *GetDataTrackSchemaRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_rtc_proto_msgTypes[20]
+func (x *StoreDataBlobRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2568,47 +2524,94 @@ func (x *GetDataTrackSchemaRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDataTrackSchemaRequest.ProtoReflect.Descriptor instead.
-func (*GetDataTrackSchemaRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
+// Deprecated: Use StoreDataBlobRequest.ProtoReflect.Descriptor instead.
+func (*StoreDataBlobRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *GetDataTrackSchemaRequest) GetParticipantIdentity() string {
+func (x *StoreDataBlobRequest) GetKey() *DataBlobKey {
 	if x != nil {
-		return x.ParticipantIdentity
-	}
-	return ""
-}
-
-func (x *GetDataTrackSchemaRequest) GetSchemaId() *DataTrackSchemaId {
-	if x != nil {
-		return x.SchemaId
+		return x.Key
 	}
 	return nil
 }
 
-type GetDataTrackSchemaResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Definition of the requested schema.
-	SchemaDefinition *DataTrackSchemaDefinition `protobuf:"bytes,1,opt,name=schema_definition,json=schemaDefinition,proto3" json:"schema_definition,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+func (x *StoreDataBlobRequest) GetContents() []byte {
+	if x != nil {
+		return x.Contents
+	}
+	return nil
 }
 
-func (x *GetDataTrackSchemaResponse) Reset() {
-	*x = GetDataTrackSchemaResponse{}
+type GetDataBlobRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unique key of the data blob to retrieve.
+	Key           *DataBlobKey `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDataBlobRequest) Reset() {
+	*x = GetDataBlobRequest{}
+	mi := &file_livekit_rtc_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDataBlobRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDataBlobRequest) ProtoMessage() {}
+
+func (x *GetDataBlobRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_rtc_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDataBlobRequest.ProtoReflect.Descriptor instead.
+func (*GetDataBlobRequest) Descriptor() ([]byte, []int) {
+	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetDataBlobRequest) GetKey() *DataBlobKey {
+	if x != nil {
+		return x.Key
+	}
+	return nil
+}
+
+type GetDataBlobResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Unqiue key identifying the retrived data blob.
+	Key *DataBlobKey `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// Contents of the retrived data blob.
+	Contents      []byte `protobuf:"bytes,2,opt,name=contents,proto3" json:"contents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDataBlobResponse) Reset() {
+	*x = GetDataBlobResponse{}
 	mi := &file_livekit_rtc_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *GetDataTrackSchemaResponse) String() string {
+func (x *GetDataBlobResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetDataTrackSchemaResponse) ProtoMessage() {}
+func (*GetDataBlobResponse) ProtoMessage() {}
 
-func (x *GetDataTrackSchemaResponse) ProtoReflect() protoreflect.Message {
+func (x *GetDataBlobResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_rtc_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2620,14 +2623,21 @@ func (x *GetDataTrackSchemaResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetDataTrackSchemaResponse.ProtoReflect.Descriptor instead.
-func (*GetDataTrackSchemaResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use GetDataBlobResponse.ProtoReflect.Descriptor instead.
+func (*GetDataBlobResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *GetDataTrackSchemaResponse) GetSchemaDefinition() *DataTrackSchemaDefinition {
+func (x *GetDataBlobResponse) GetKey() *DataBlobKey {
 	if x != nil {
-		return x.SchemaDefinition
+		return x.Key
+	}
+	return nil
+}
+
+func (x *GetDataBlobResponse) GetContents() []byte {
+	if x != nil {
+		return x.Contents
 	}
 	return nil
 }
@@ -4567,8 +4577,8 @@ type RequestResponse struct {
 	//	*RequestResponse_UpdateVideoTrack
 	//	*RequestResponse_PublishDataTrack
 	//	*RequestResponse_UnpublishDataTrack
-	//	*RequestResponse_DefineDataTrackSchema
-	//	*RequestResponse_GetDataTrackSchema
+	//	*RequestResponse_StoreDataBlob
+	//	*RequestResponse_GetDataBlob
 	Request       isRequestResponse_Request `protobuf_oneof:"request"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -4704,19 +4714,19 @@ func (x *RequestResponse) GetUnpublishDataTrack() *UnpublishDataTrackRequest {
 	return nil
 }
 
-func (x *RequestResponse) GetDefineDataTrackSchema() *DefineDataTrackSchemaRequest {
+func (x *RequestResponse) GetStoreDataBlob() *StoreDataBlobRequest {
 	if x != nil {
-		if x, ok := x.Request.(*RequestResponse_DefineDataTrackSchema); ok {
-			return x.DefineDataTrackSchema
+		if x, ok := x.Request.(*RequestResponse_StoreDataBlob); ok {
+			return x.StoreDataBlob
 		}
 	}
 	return nil
 }
 
-func (x *RequestResponse) GetGetDataTrackSchema() *GetDataTrackSchemaRequest {
+func (x *RequestResponse) GetGetDataBlob() *GetDataBlobRequest {
 	if x != nil {
-		if x, ok := x.Request.(*RequestResponse_GetDataTrackSchema); ok {
-			return x.GetDataTrackSchema
+		if x, ok := x.Request.(*RequestResponse_GetDataBlob); ok {
+			return x.GetDataBlob
 		}
 	}
 	return nil
@@ -4758,12 +4768,12 @@ type RequestResponse_UnpublishDataTrack struct {
 	UnpublishDataTrack *UnpublishDataTrackRequest `protobuf:"bytes,11,opt,name=unpublish_data_track,json=unpublishDataTrack,proto3,oneof"`
 }
 
-type RequestResponse_DefineDataTrackSchema struct {
-	DefineDataTrackSchema *DefineDataTrackSchemaRequest `protobuf:"bytes,12,opt,name=define_data_track_schema,json=defineDataTrackSchema,proto3,oneof"`
+type RequestResponse_StoreDataBlob struct {
+	StoreDataBlob *StoreDataBlobRequest `protobuf:"bytes,12,opt,name=store_data_blob,json=storeDataBlob,proto3,oneof"`
 }
 
-type RequestResponse_GetDataTrackSchema struct {
-	GetDataTrackSchema *GetDataTrackSchemaRequest `protobuf:"bytes,13,opt,name=get_data_track_schema,json=getDataTrackSchema,proto3,oneof"`
+type RequestResponse_GetDataBlob struct {
+	GetDataBlob *GetDataBlobRequest `protobuf:"bytes,13,opt,name=get_data_blob,json=getDataBlob,proto3,oneof"`
 }
 
 func (*RequestResponse_Trickle) isRequestResponse_Request() {}
@@ -4782,9 +4792,9 @@ func (*RequestResponse_PublishDataTrack) isRequestResponse_Request() {}
 
 func (*RequestResponse_UnpublishDataTrack) isRequestResponse_Request() {}
 
-func (*RequestResponse_DefineDataTrackSchema) isRequestResponse_Request() {}
+func (*RequestResponse_StoreDataBlob) isRequestResponse_Request() {}
 
-func (*RequestResponse_GetDataTrackSchema) isRequestResponse_Request() {}
+func (*RequestResponse_GetDataBlob) isRequestResponse_Request() {}
 
 type TrackSubscribed struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -5255,7 +5265,7 @@ var File_livekit_rtc_proto protoreflect.FileDescriptor
 
 const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
-	"\x11livekit_rtc.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xfe\v\n" +
+	"\x11livekit_rtc.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xed\v\n" +
 	"\rSignalRequest\x123\n" +
 	"\x05offer\x18\x01 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x05offer\x125\n" +
 	"\x06answer\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x06answer\x123\n" +
@@ -5278,10 +5288,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\x12 \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12_\n" +
 	"\x1apublish_data_track_request\x18\x13 \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x17publishDataTrackRequest\x12e\n" +
 	"\x1cunpublish_data_track_request\x18\x14 \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x19unpublishDataTrackRequest\x12[\n" +
-	"\x18update_data_subscription\x18\x15 \x01(\v2\x1f.livekit.UpdateDataSubscriptionH\x00R\x16updateDataSubscription\x12`\n" +
-	"\x18define_data_track_schema\x18\x16 \x01(\v2%.livekit.DefineDataTrackSchemaRequestH\x00R\x15defineDataTrackSchema\x12W\n" +
-	"\x15get_data_track_schema\x18\x17 \x01(\v2\".livekit.GetDataTrackSchemaRequestH\x00R\x12getDataTrackSchemaB\t\n" +
-	"\amessage\"\xc4\x10\n" +
+	"\x18update_data_subscription\x18\x15 \x01(\v2\x1f.livekit.UpdateDataSubscriptionH\x00R\x16updateDataSubscription\x12V\n" +
+	"\x17store_data_blob_request\x18\x16 \x01(\v2\x1d.livekit.StoreDataBlobRequestH\x00R\x14storeDataBlobRequest\x12P\n" +
+	"\x15get_data_blob_request\x18\x17 \x01(\v2\x1b.livekit.GetDataBlobRequestH\x00R\x12getDataBlobRequestB\t\n" +
+	"\amessage\"\xae\x10\n" +
 	"\x0eSignalResponse\x12+\n" +
 	"\x04join\x18\x01 \x01(\v2\x15.livekit.JoinResponseH\x00R\x04join\x125\n" +
 	"\x06answer\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x06answer\x123\n" +
@@ -5313,8 +5323,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x1dsubscribed_audio_codec_update\x18\x1a \x01(\v2#.livekit.SubscribedAudioCodecUpdateH\x00R\x1asubscribedAudioCodecUpdate\x12b\n" +
 	"\x1bpublish_data_track_response\x18\x1b \x01(\v2!.livekit.PublishDataTrackResponseH\x00R\x18publishDataTrackResponse\x12h\n" +
 	"\x1dunpublish_data_track_response\x18\x1c \x01(\v2#.livekit.UnpublishDataTrackResponseH\x00R\x1aunpublishDataTrackResponse\x12h\n" +
-	"\x1ddata_track_subscriber_handles\x18\x1d \x01(\v2#.livekit.DataTrackSubscriberHandlesH\x00R\x1adataTrackSubscriberHandles\x12i\n" +
-	"\x1eget_data_track_schema_response\x18\x1e \x01(\v2#.livekit.GetDataTrackSchemaResponseH\x00R\x1agetDataTrackSchemaResponseB\t\n" +
+	"\x1ddata_track_subscriber_handles\x18\x1d \x01(\v2#.livekit.DataTrackSubscriberHandlesH\x00R\x1adataTrackSubscriberHandles\x12S\n" +
+	"\x16get_data_blob_response\x18\x1e \x01(\v2\x1c.livekit.GetDataBlobResponseH\x00R\x13getDataBlobResponseB\t\n" +
 	"\amessage\"\xa9\x01\n" +
 	"\x0eSimulcastCodec\x12\x14\n" +
 	"\x05codec\x18\x01 \x01(\tR\x05codec\x12\x10\n" +
@@ -5431,14 +5441,15 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06Update\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12?\n" +
-	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"o\n" +
-	"\x1cDefineDataTrackSchemaRequest\x12O\n" +
-	"\x11schema_definition\x18\x01 \x01(\v2\".livekit.DataTrackSchemaDefinitionR\x10schemaDefinition\"\x87\x01\n" +
-	"\x19GetDataTrackSchemaRequest\x121\n" +
-	"\x14participant_identity\x18\x01 \x01(\tR\x13participantIdentity\x127\n" +
-	"\tschema_id\x18\x02 \x01(\v2\x1a.livekit.DataTrackSchemaIdR\bschemaId\"m\n" +
-	"\x1aGetDataTrackSchemaResponse\x12O\n" +
-	"\x11schema_definition\x18\x01 \x01(\v2\".livekit.DataTrackSchemaDefinitionR\x10schemaDefinition\"\xdd\x01\n" +
+	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"\x80\x01\n" +
+	"\x14StoreDataBlobRequest\x12&\n" +
+	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12@\n" +
+	"\bcontents\x18\x02 \x01(\fB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bcontents\"<\n" +
+	"\x12GetDataBlobRequest\x12&\n" +
+	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"\x7f\n" +
+	"\x13GetDataBlobResponse\x12&\n" +
+	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12@\n" +
+	"\bcontents\x18\x02 \x01(\fB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bcontents\"\xdd\x01\n" +
 	"\x13UpdateTrackSettings\x12\x1d\n" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1a\n" +
@@ -5578,7 +5589,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xf5\b\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xc6\b\n" +
 	"\x0fRequestResponse\x12+\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x127\n" +
@@ -5592,9 +5603,9 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12P\n" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
-	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\x12`\n" +
-	"\x18define_data_track_schema\x18\f \x01(\v2%.livekit.DefineDataTrackSchemaRequestH\x00R\x15defineDataTrackSchema\x12W\n" +
-	"\x15get_data_track_schema\x18\r \x01(\v2\".livekit.GetDataTrackSchemaRequestH\x00R\x12getDataTrackSchema\"\xe3\x01\n" +
+	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\x12G\n" +
+	"\x0fstore_data_blob\x18\f \x01(\v2\x1d.livekit.StoreDataBlobRequestH\x00R\rstoreDataBlob\x12A\n" +
+	"\rget_data_blob\x18\r \x01(\v2\x1b.livekit.GetDataBlobRequestH\x00R\vgetDataBlob\"\xe3\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5703,9 +5714,9 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(*ParticipantUpdate)(nil),                             // 22: livekit.ParticipantUpdate
 	(*UpdateSubscription)(nil),                            // 23: livekit.UpdateSubscription
 	(*UpdateDataSubscription)(nil),                        // 24: livekit.UpdateDataSubscription
-	(*DefineDataTrackSchemaRequest)(nil),                  // 25: livekit.DefineDataTrackSchemaRequest
-	(*GetDataTrackSchemaRequest)(nil),                     // 26: livekit.GetDataTrackSchemaRequest
-	(*GetDataTrackSchemaResponse)(nil),                    // 27: livekit.GetDataTrackSchemaResponse
+	(*StoreDataBlobRequest)(nil),                          // 25: livekit.StoreDataBlobRequest
+	(*GetDataBlobRequest)(nil),                            // 26: livekit.GetDataBlobRequest
+	(*GetDataBlobResponse)(nil),                           // 27: livekit.GetDataBlobResponse
 	(*UpdateTrackSettings)(nil),                           // 28: livekit.UpdateTrackSettings
 	(*UpdateLocalAudioTrack)(nil),                         // 29: livekit.UpdateLocalAudioTrack
 	(*UpdateLocalVideoTrack)(nil),                         // 30: livekit.UpdateLocalVideoTrack
@@ -5765,17 +5776,16 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(*Codec)(nil),                         // 84: livekit.Codec
 	(*TrackInfo)(nil),                     // 85: livekit.TrackInfo
 	(*ParticipantTracks)(nil),             // 86: livekit.ParticipantTracks
-	(*DataTrackSchemaDefinition)(nil),     // 87: livekit.DataTrackSchemaDefinition
-	(*DataTrackSchemaId)(nil),             // 88: livekit.DataTrackSchemaId
-	(VideoQuality)(0),                     // 89: livekit.VideoQuality
-	(DisconnectReason)(0),                 // 90: livekit.DisconnectReason
-	(*SpeakerInfo)(nil),                   // 91: livekit.SpeakerInfo
-	(ConnectionQuality)(0),                // 92: livekit.ConnectionQuality
-	(*SubscribedAudioCodec)(nil),          // 93: livekit.SubscribedAudioCodec
-	(SubscriptionError)(0),                // 94: livekit.SubscriptionError
-	(*ClientInfo)(nil),                    // 95: livekit.ClientInfo
-	(ReconnectReason)(0),                  // 96: livekit.ReconnectReason
-	(*DataTrackSubscriptionOptions)(nil),  // 97: livekit.DataTrackSubscriptionOptions
+	(*DataBlobKey)(nil),                   // 87: livekit.DataBlobKey
+	(VideoQuality)(0),                     // 88: livekit.VideoQuality
+	(DisconnectReason)(0),                 // 89: livekit.DisconnectReason
+	(*SpeakerInfo)(nil),                   // 90: livekit.SpeakerInfo
+	(ConnectionQuality)(0),                // 91: livekit.ConnectionQuality
+	(*SubscribedAudioCodec)(nil),          // 92: livekit.SubscribedAudioCodec
+	(SubscriptionError)(0),                // 93: livekit.SubscriptionError
+	(*ClientInfo)(nil),                    // 94: livekit.ClientInfo
+	(ReconnectReason)(0),                  // 95: livekit.ReconnectReason
+	(*DataTrackSubscriptionOptions)(nil),  // 96: livekit.DataTrackSubscriptionOptions
 }
 var file_livekit_rtc_proto_depIdxs = []int32{
 	21,  // 0: livekit.SignalRequest.offer:type_name -> livekit.SessionDescription
@@ -5797,8 +5807,8 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	10,  // 16: livekit.SignalRequest.publish_data_track_request:type_name -> livekit.PublishDataTrackRequest
 	12,  // 17: livekit.SignalRequest.unpublish_data_track_request:type_name -> livekit.UnpublishDataTrackRequest
 	24,  // 18: livekit.SignalRequest.update_data_subscription:type_name -> livekit.UpdateDataSubscription
-	25,  // 19: livekit.SignalRequest.define_data_track_schema:type_name -> livekit.DefineDataTrackSchemaRequest
-	26,  // 20: livekit.SignalRequest.get_data_track_schema:type_name -> livekit.GetDataTrackSchemaRequest
+	25,  // 19: livekit.SignalRequest.store_data_blob_request:type_name -> livekit.StoreDataBlobRequest
+	26,  // 20: livekit.SignalRequest.get_data_blob_request:type_name -> livekit.GetDataBlobRequest
 	17,  // 21: livekit.SignalResponse.join:type_name -> livekit.JoinResponse
 	21,  // 22: livekit.SignalResponse.answer:type_name -> livekit.SessionDescription
 	21,  // 23: livekit.SignalResponse.offer:type_name -> livekit.SessionDescription
@@ -5825,7 +5835,7 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	11,  // 44: livekit.SignalResponse.publish_data_track_response:type_name -> livekit.PublishDataTrackResponse
 	13,  // 45: livekit.SignalResponse.unpublish_data_track_response:type_name -> livekit.UnpublishDataTrackResponse
 	14,  // 46: livekit.SignalResponse.data_track_subscriber_handles:type_name -> livekit.DataTrackSubscriberHandles
-	27,  // 47: livekit.SignalResponse.get_data_track_schema_response:type_name -> livekit.GetDataTrackSchemaResponse
+	27,  // 47: livekit.SignalResponse.get_data_blob_response:type_name -> livekit.GetDataBlobResponse
 	70,  // 48: livekit.SimulcastCodec.layers:type_name -> livekit.VideoLayer
 	71,  // 49: livekit.SimulcastCodec.video_layer_mode:type_name -> livekit.VideoLayer.Mode
 	72,  // 50: livekit.AddTrackRequest.type:type_name -> livekit.TrackType
@@ -5857,27 +5867,27 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	81,  // 76: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
 	86,  // 77: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
 	67,  // 78: livekit.UpdateDataSubscription.updates:type_name -> livekit.UpdateDataSubscription.Update
-	87,  // 79: livekit.DefineDataTrackSchemaRequest.schema_definition:type_name -> livekit.DataTrackSchemaDefinition
-	88,  // 80: livekit.GetDataTrackSchemaRequest.schema_id:type_name -> livekit.DataTrackSchemaId
-	87,  // 81: livekit.GetDataTrackSchemaResponse.schema_definition:type_name -> livekit.DataTrackSchemaDefinition
-	89,  // 82: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
+	87,  // 79: livekit.StoreDataBlobRequest.key:type_name -> livekit.DataBlobKey
+	87,  // 80: livekit.GetDataBlobRequest.key:type_name -> livekit.DataBlobKey
+	87,  // 81: livekit.GetDataBlobResponse.key:type_name -> livekit.DataBlobKey
+	88,  // 82: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
 	76,  // 83: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
-	90,  // 84: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
+	89,  // 84: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
 	3,   // 85: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
 	55,  // 86: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
 	70,  // 87: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
 	68,  // 88: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
-	91,  // 89: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
+	90,  // 89: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
 	80,  // 90: livekit.RoomUpdate.room:type_name -> livekit.Room
-	92,  // 91: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
+	91,  // 91: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
 	37,  // 92: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
 	1,   // 93: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
 	39,  // 94: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
-	89,  // 95: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
+	88,  // 95: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
 	41,  // 96: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
 	41,  // 97: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
 	42,  // 98: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
-	93,  // 99: livekit.SubscribedAudioCodecUpdate.subscribed_audio_codecs:type_name -> livekit.SubscribedAudioCodec
+	92,  // 99: livekit.SubscribedAudioCodecUpdate.subscribed_audio_codecs:type_name -> livekit.SubscribedAudioCodec
 	45,  // 100: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
 	80,  // 101: livekit.RoomMovedResponse.room:type_name -> livekit.Room
 	81,  // 102: livekit.RoomMovedResponse.participant:type_name -> livekit.ParticipantInfo
@@ -5892,7 +5902,7 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	0,   // 111: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
 	2,   // 112: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
 	56,  // 113: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
-	94,  // 114: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
+	93,  // 114: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
 	4,   // 115: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
 	15,  // 116: livekit.RequestResponse.trickle:type_name -> livekit.TrickleRequest
 	9,   // 117: livekit.RequestResponse.add_track:type_name -> livekit.AddTrackRequest
@@ -5902,18 +5912,18 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	30,  // 121: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
 	10,  // 122: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
 	12,  // 123: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
-	25,  // 124: livekit.RequestResponse.define_data_track_schema:type_name -> livekit.DefineDataTrackSchemaRequest
-	26,  // 125: livekit.RequestResponse.get_data_track_schema:type_name -> livekit.GetDataTrackSchemaRequest
-	95,  // 126: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
+	25,  // 124: livekit.RequestResponse.store_data_blob:type_name -> livekit.StoreDataBlobRequest
+	26,  // 125: livekit.RequestResponse.get_data_blob:type_name -> livekit.GetDataBlobRequest
+	94,  // 126: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
 	60,  // 127: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
 	69,  // 128: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
 	9,   // 129: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
 	21,  // 130: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
-	96,  // 131: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
+	95,  // 131: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
 	49,  // 132: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
 	5,   // 133: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
 	64,  // 134: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
-	97,  // 135: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
+	96,  // 135: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
 	136, // [136:136] is the sub-list for method output_type
 	136, // [136:136] is the sub-list for method input_type
 	136, // [136:136] is the sub-list for extension type_name
@@ -5948,8 +5958,8 @@ func file_livekit_rtc_proto_init() {
 		(*SignalRequest_PublishDataTrackRequest)(nil),
 		(*SignalRequest_UnpublishDataTrackRequest)(nil),
 		(*SignalRequest_UpdateDataSubscription)(nil),
-		(*SignalRequest_DefineDataTrackSchema)(nil),
-		(*SignalRequest_GetDataTrackSchema)(nil),
+		(*SignalRequest_StoreDataBlobRequest)(nil),
+		(*SignalRequest_GetDataBlobRequest)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[1].OneofWrappers = []any{
 		(*SignalResponse_Join)(nil),
@@ -5980,7 +5990,7 @@ func file_livekit_rtc_proto_init() {
 		(*SignalResponse_PublishDataTrackResponse)(nil),
 		(*SignalResponse_UnpublishDataTrackResponse)(nil),
 		(*SignalResponse_DataTrackSubscriberHandles)(nil),
-		(*SignalResponse_GetDataTrackSchemaResponse)(nil),
+		(*SignalResponse_GetDataBlobResponse)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[4].OneofWrappers = []any{}
 	file_livekit_rtc_proto_msgTypes[46].OneofWrappers = []any{
@@ -6003,8 +6013,8 @@ func file_livekit_rtc_proto_init() {
 		(*RequestResponse_UpdateVideoTrack)(nil),
 		(*RequestResponse_PublishDataTrack)(nil),
 		(*RequestResponse_UnpublishDataTrack)(nil),
-		(*RequestResponse_DefineDataTrackSchema)(nil),
-		(*RequestResponse_GetDataTrackSchema)(nil),
+		(*RequestResponse_StoreDataBlob)(nil),
+		(*RequestResponse_GetDataBlob)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[54].OneofWrappers = []any{}
 	type x struct{}
