@@ -282,91 +282,6 @@ message DataTrackInfo {
 
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
-
-  // Type information for this track. If unset, the track is untyped.
-  optional DataTrackTypeInfo type_info = 5;
-}
-
-// Encoding for frame payloads.
-//
-// Mirrors the well-known message encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#message-encodings
-//
-enum DataTrackFrameEncoding {
-  DATA_TRACK_FRAME_ENCODING_UNSPECIFIED = 0;
-  // ROS 1: must be described by `ROS1_MSG` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_ROS1 = 1;
-  // CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_CDR = 2;
-  // Protocol Buffer: must be described by `PROTOBUF` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_PROTOBUF = 3;
-  // FlatBuffer: must be described by `FLATBUFFER` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_FLATBUFFER = 4;
-  // CBOR: self-describing.
-  DATA_TRACK_FRAME_ENCODING_CBOR = 5;
-  // MessagePack: self-describing.
-  DATA_TRACK_FRAME_ENCODING_MSGPACK = 6;
-  // JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_JSON = 7;
-}
-
-// Encoding for schema definitions.
-//
-// Mirrors the well-known schema encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#schema-encodings
-//
-enum DataTrackSchemaEncoding {
-  DATA_TRACK_SCHEMA_ENCODING_UNSPECIFIED = 0;
-  // Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_PROTOBUF = 1;
-  // FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_FLATBUFFER = 2;
-  // ROS 1 Message: describes `ROS1` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_ROS1_MSG = 3;
-  // ROS 2 Message: describes `CDR` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_ROS2_MSG = 4;
-  // ROS 2 IDL: describes `CDR` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_ROS2_IDL = 5;
-  // OMG IDL: describes `CDR` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_OMG_IDL = 6;
-  // JSON Schema: describes `JSON` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_JSON_SCHEMA = 7;
-}
-
-// Type information for a data track.
-message DataTrackTypeInfo {
-  DataTrackFrameEncoding frame_encoding = 1;
-
-  // ID of the schema used by frames on this track.
-  optional DataTrackSchemaId schema = 2;
-}
-
-// Identifier for a data track schema.
-//
-// Schemas with the same name but different encodings are distinct.
-//
-message DataTrackSchemaId {
-  // This must be non-empty and no longer than 256 characters.
-  string name = 1;
-  DataTrackSchemaEncoding encoding = 2;
-}
-
-message DataTrackSchemaDefinition {
-  DataTrackSchemaId id = 1;
-  // This must not exceed 50 KB.
-  bytes definition = 2 [
-    (logger.sensitivity) = SENSITIVITY_PII,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
-}
-
-// Type definition for a data track.
-message DataTrackTypeDefinition {
-  DataTrackFrameEncoding frame_encoding = 1;
-
-  // Schema definition for frames on this track. Must be compatible
-  // with the frame encoding, and may be omitted for self-describing frame encodings.
-  optional DataTrackSchemaDefinition schema = 2;
 }
 
 enum DataTrackExtensionID {
@@ -383,6 +298,26 @@ message DataTrackSubscriptionOptions {
   // Rate in frames per second (FPS) the subscriber wants to receive frames at.
   // If omitted, the subscriber defaults to the publisher's fps
   optional uint32 target_fps = 1;
+}
+
+// Key used to uniquely identify a data blob for storage and retrieval.
+message DataBlobKey {
+  oneof key {
+    // Generic string key, blob contains arbitrary data.
+    string generic = 1;
+    // Add additional key types here for storing specific types of blobs.
+  }
+}
+
+// A blob of data stored in a room identified by a unique key.
+message DataBlob {
+  // Unique key the data blob is identified by.
+  DataBlobKey key = 1;
+  // Contents of the data blob. This must not exceed 50 KB.
+  bytes contents = 2 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
 }
 
 enum VideoQuality {
