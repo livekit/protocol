@@ -63,6 +63,10 @@ message SignalRequest {
     UnpublishDataTrackRequest unpublish_data_track_request = 20;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 21;
+    // Store a data blob.
+    StoreDataBlobRequest store_data_blob_request = 22;
+    // Retrieve a stored data blob.
+    GetDataBlobRequest get_data_blob_request = 23;
   }
 }
 
@@ -125,6 +129,8 @@ message SignalResponse {
     UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
     DataTrackSubscriberHandles data_track_subscriber_handles = 29;
+    // Sent in response to `GetDataBlobRequest`.
+    GetDataBlobResponse get_data_blob_response = 30;
   }
 }
 
@@ -295,6 +301,21 @@ message UpdateDataSubscription {
     DataTrackSubscriptionOptions options = 3;
   }
   repeated Update updates = 1;
+}
+
+message StoreDataBlobRequest {
+  DataBlob blob = 1;
+}
+
+message GetDataBlobRequest {
+  // Identity of the participant who owns the blob.
+  string participant_identity = 1;
+  // Unique key of the data blob to retrieve.
+  DataBlobKey key = 2;
+}
+
+message GetDataBlobResponse {
+  DataBlob blob = 1;
 }
 
 message UpdateTrackSettings {
@@ -575,6 +596,8 @@ message RequestResponse {
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
     UnpublishDataTrackRequest unpublish_data_track = 11;
+    StoreDataBlobRequest store_data_blob = 12;
+    GetDataBlobRequest get_data_blob = 13;
   }
 }
 
