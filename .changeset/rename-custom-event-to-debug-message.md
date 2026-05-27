@@ -1,5 +1,5 @@
 ---
-"@livekit/protocol": minor
+"@livekit/protocol": patch
 ---
 
 agent_session: rename `CustomEvent` → `DebugMessage`; drop `type` field, keep only `payload`
