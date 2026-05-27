@@ -1,5 +1,7 @@
 # github.com/livekit/protocol
 
+## 1.46.4
+
 ## 1.46.3
 
 ### Patch Changes
