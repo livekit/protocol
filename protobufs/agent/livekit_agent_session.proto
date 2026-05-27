@@ -183,7 +183,7 @@ message AgentSessionUsage {
   repeated ModelUsage model_usage = 1;
 }
 
-// Free-form debug/trace payload carried over the remote session wire.
+// Debug/trace payload carried over the remote session wire.
 // Internal: surfaced only to the debugger/recorder, not to user code.
 message DebugMessage {
   google.protobuf.Struct payload = 1;
