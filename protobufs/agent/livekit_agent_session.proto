@@ -183,6 +183,12 @@ message AgentSessionUsage {
   repeated ModelUsage model_usage = 1;
 }
 
+// Debug/trace payload carried over the remote session wire.
+// Internal: surfaced only to the debugger/recorder, not to user code.
+message DebugMessage {
+  google.protobuf.Struct payload = 1;
+}
+
 message AgentSessionEvent {
   message AgentStateChanged {
     AgentState old_state = 1;
@@ -256,6 +262,7 @@ message AgentSessionEvent {
     AmdPrediction amd_prediction = 18;
     EotPrediction eot_prediction = 19;
     FunctionToolsStarted function_tools_started = 20;
+    DebugMessage debug_message = 21;
   }
 }
 

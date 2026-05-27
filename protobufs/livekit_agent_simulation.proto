@@ -15,14 +15,15 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
 
+import "agent/livekit_agent_session.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_cloud_agent.proto";
 import "livekit_models.proto";
-import "agent/livekit_agent_session.proto";
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
 
 message SimulationRunSummary {
   int32 passed = 1;
@@ -35,6 +36,7 @@ message SimulationRunSummary {
   message Issue {
     string description = 1;
     string suggestion = 2;
+    string label = 3;
   }
 }
 
@@ -69,6 +71,12 @@ message SimulationRun {
     google.protobuf.Timestamp started_at = 10;
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
+    Usage usage = 13;
+
+    message Usage {
+      int32 text_turns_count = 1;
+      int32 audio_turns_count = 2;
+    }
   }
 
   message Create {
@@ -154,6 +162,13 @@ message SimulationRun {
   int32 passed_count = 13;
   int32 failed_count = 14;
   int32 num_simulations = 15;
+  // Aggregate usage across all jobs in this run (sum of Job.usage).
+  Usage usage = 16;
+
+  message Usage {
+    int32 text_turns_count = 1;
+    int32 audio_turns_count = 2;
+  }
 }
 
 message Scenario {

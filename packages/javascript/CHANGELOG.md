@@ -1,5 +1,32 @@
 # @livekit/protocol
 
+## 1.46.4
+
+### Patch Changes
+
+- agent_session: rename `CustomEvent` → `DebugMessage`; drop `type` field, keep only `payload` - [#1593](https://github.com/livekit/protocol/pull/1593) ([@toubatbrian](https://github.com/toubatbrian))
+
+  Renames the agent-session event added in #1588 before any consumer ships it. The
+  message is repositioned as an internal debug/trace channel surfaced only to the
+  debugger/recorder, not to user code, so the `type` discriminator was unnecessary
+  — callers just emit a JSON `payload`.
+
+  Wire-level: `AgentSessionEvent.custom_event` (field 21) → `AgentSessionEvent.debug_message`
+  (same field number 21, same type slot, no schema-compat concerns since nothing
+  has been built against it yet downstream).
+
+## 1.46.3
+
+## 1.46.2
+
+### Patch Changes
+
+- remove the stale proto export - [#1584](https://github.com/livekit/protocol/pull/1584) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Add Krisp Viva to FeatureUsageInfo enum - [#1583](https://github.com/livekit/protocol/pull/1583) ([@lukasIO](https://github.com/lukasIO))
+
+- Allow specifying exact To header and request line for SIP outbound. - [#1577](https://github.com/livekit/protocol/pull/1577) ([@dennwc](https://github.com/dennwc))
+
 ## 1.46.1
 
 ### Patch Changes

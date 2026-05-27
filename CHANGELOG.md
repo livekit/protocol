@@ -1,5 +1,19 @@
 # github.com/livekit/protocol
 
+## 1.46.4
+
+## 1.46.3
+
+### Patch Changes
+
+- Add custom event protobuf for agent remote session - [#1588](https://github.com/livekit/protocol/pull/1588) ([@toubatbrian](https://github.com/toubatbrian))
+
+## 1.46.2
+
+### Patch Changes
+
+- Allow specifying exact To header and request line for SIP outbound. - [#1577](https://github.com/livekit/protocol/pull/1577) ([@dennwc](https://github.com/dennwc))
+
 ## 1.46.1
 
 ### Patch Changes
