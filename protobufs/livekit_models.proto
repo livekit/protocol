@@ -351,24 +351,6 @@ message DataTrackSchemaId {
   DataTrackSchemaEncoding encoding = 2;
 }
 
-message DataTrackSchemaDefinition {
-  DataTrackSchemaId id = 1;
-  // This must not exceed 50 KB.
-  bytes definition = 2 [
-    (logger.sensitivity) = SENSITIVITY_PII,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
-}
-
-// Type definition for a data track.
-message DataTrackTypeDefinition {
-  DataTrackFrameEncoding frame_encoding = 1;
-
-  // Schema definition for frames on this track. Must be compatible
-  // with the frame encoding, and may be omitted for self-describing frame encodings.
-  optional DataTrackSchemaDefinition schema = 2;
-}
-
 enum DataTrackExtensionID {
   DTEI_INVALID = 0;
   DTEI_PARTICIPANT_SID = 1;
@@ -383,6 +365,18 @@ message DataTrackSubscriptionOptions {
   // Rate in frames per second (FPS) the subscriber wants to receive frames at.
   // If omitted, the subscriber defaults to the publisher's fps
   optional uint32 target_fps = 1;
+}
+
+// Key used to uniquely identify a data blob for storage and retrieval.
+message DataBlobKey {
+  // Identity of the participant who owns the blob.
+  string participant_identity = 1;
+  oneof key {
+    // Generic string key, blob contains arbitrary data.
+    string generic = 2;
+    // Data track schema identifier, blob contains schema definition.
+    DataTrackSchemaId schema_id = 3;
+  }
 }
 
 enum VideoQuality {

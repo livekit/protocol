@@ -63,10 +63,10 @@ message SignalRequest {
     UnpublishDataTrackRequest unpublish_data_track_request = 20;
     // Update subscription state for one or more data tracks
     UpdateDataSubscription update_data_subscription = 21;
-    // Define a data track schema.
-    DefineDataTrackSchemaRequest define_data_track_schema = 22;
-    // Get the definition for a defined data track schema.
-    GetDataTrackSchemaRequest get_data_track_schema = 23;
+    // Store a data blob.
+    StoreDataBlobRequest store_data_blob_request = 22;
+    // Retrieve a stored data blob.
+    GetDataBlobRequest get_data_blob_request = 23;
   }
 }
 
@@ -129,8 +129,8 @@ message SignalResponse {
     UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
     DataTrackSubscriberHandles data_track_subscriber_handles = 29;
-    // Sent in response to `GetDataTrackSchemaRequest`.
-    GetDataTrackSchemaResponse get_data_track_schema_response = 30;
+    // Sent in response to `GetDataBlobRequest`.
+    GetDataBlobResponse get_data_blob_response = 30;
   }
 }
 
@@ -195,7 +195,7 @@ message PublishDataTrackRequest {
   Encryption.Type encryption = 3;
 
   // Type info for this track if the track is typed.
-  // If set, the type must be defined via `DefineDataTrackSchemaRequest`.
+  // If set, the associated schema must be stored with `StoreDataBlobRequest`.
   optional DataTrackTypeInfo type_info = 4;
 }
 
@@ -307,20 +307,29 @@ message UpdateDataSubscription {
   repeated Update updates = 1;
 }
 
-message DefineDataTrackSchemaRequest {
-  // Schema to define.
-  DataTrackSchemaDefinition schema_definition = 1;
+message StoreDataBlobRequest {
+  // Unique key the data blob is identified by.
+  DataBlobKey key = 1;
+  // Contents of the data blob. This must not exceed 50 KB.
+  bytes contents = 2 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
 }
 
-message GetDataTrackSchemaRequest {
-  string participant_identity = 1;
-  // ID of the schema to get the definition for.
-  DataTrackSchemaId schema_id = 2;
+message GetDataBlobRequest {
+  // Unique key of the data blob to retrieve.
+  DataBlobKey key = 1;
 }
 
-message GetDataTrackSchemaResponse {
-  // Definition of the requested schema.
-  DataTrackSchemaDefinition schema_definition = 1;
+message GetDataBlobResponse {
+  // Unqiue key identifying the retrived data blob.
+  DataBlobKey key = 1;
+  // Contents of the retrived data blob.
+  bytes contents = 2 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
 }
 
 message UpdateTrackSettings {
@@ -602,8 +611,8 @@ message RequestResponse {
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
     UnpublishDataTrackRequest unpublish_data_track = 11;
-    DefineDataTrackSchemaRequest define_data_track_schema = 12;
-    GetDataTrackSchemaRequest get_data_track_schema = 13;
+    StoreDataBlobRequest store_data_blob = 12;
+    GetDataBlobRequest get_data_blob = 13;
   }
 }
 
