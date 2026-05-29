@@ -1588,9 +1588,11 @@ type PublishDataTrackRequest struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
 	Encryption Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
-	// Type info for this track if the track is typed.
+	// Encoding for frame payloads on this track. If unspecified, the track is untyped.
+	FrameEncoding *DataTrackFrameEncoding `protobuf:"varint,4,opt,name=frame_encoding,json=frameEncoding,proto3,enum=livekit.DataTrackFrameEncoding,oneof" json:"frame_encoding,omitempty"`
+	// ID of the schema used by frames on this track if the track is typed.
 	// If set, the associated schema must be stored with `StoreDataBlobRequest`.
-	TypeInfo      *DataTrackTypeInfo `protobuf:"bytes,4,opt,name=type_info,json=typeInfo,proto3,oneof" json:"type_info,omitempty"`
+	Schema        *DataTrackSchemaId `protobuf:"bytes,5,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1646,9 +1648,16 @@ func (x *PublishDataTrackRequest) GetEncryption() Encryption_Type {
 	return Encryption_NONE
 }
 
-func (x *PublishDataTrackRequest) GetTypeInfo() *DataTrackTypeInfo {
+func (x *PublishDataTrackRequest) GetFrameEncoding() DataTrackFrameEncoding {
+	if x != nil && x.FrameEncoding != nil {
+		return *x.FrameEncoding
+	}
+	return DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_UNSPECIFIED
+}
+
+func (x *PublishDataTrackRequest) GetSchema() *DataTrackSchemaId {
 	if x != nil {
-		return x.TypeInfo
+		return x.Schema
 	}
 	return nil
 }
@@ -2545,8 +2554,10 @@ func (x *StoreDataBlobRequest) GetContents() []byte {
 
 type GetDataBlobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
+	// Identity of the participant who owns the blob.
+	ParticipantIdentity string `protobuf:"bytes,1,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	// Unique key of the data blob to retrieve.
-	Key           *DataBlobKey `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key           *DataBlobKey `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2579,6 +2590,13 @@ func (x *GetDataBlobRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use GetDataBlobRequest.ProtoReflect.Descriptor instead.
 func (*GetDataBlobRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetDataBlobRequest) GetParticipantIdentity() string {
+	if x != nil {
+		return x.ParticipantIdentity
+	}
+	return ""
 }
 
 func (x *GetDataBlobRequest) GetKey() *DataBlobKey {
@@ -5354,17 +5372,18 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
 	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12U\n" +
-	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xd2\x01\n" +
+	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xaa\x02\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
 	"\n" +
 	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
-	"encryption\x12<\n" +
-	"\ttype_info\x18\x04 \x01(\v2\x1a.livekit.DataTrackTypeInfoH\x00R\btypeInfo\x88\x01\x01B\f\n" +
-	"\n" +
-	"_type_info\"F\n" +
+	"encryption\x12K\n" +
+	"\x0eframe_encoding\x18\x04 \x01(\x0e2\x1f.livekit.DataTrackFrameEncodingH\x00R\rframeEncoding\x88\x01\x01\x127\n" +
+	"\x06schema\x18\x05 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01B\x11\n" +
+	"\x0f_frame_encodingB\t\n" +
+	"\a_schema\"F\n" +
 	"\x18PublishDataTrackResponse\x12*\n" +
 	"\x04info\x18\x01 \x01(\v2\x16.livekit.DataTrackInfoR\x04info\":\n" +
 	"\x19UnpublishDataTrackRequest\x12\x1d\n" +
@@ -5444,9 +5463,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"\x80\x01\n" +
 	"\x14StoreDataBlobRequest\x12&\n" +
 	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12@\n" +
-	"\bcontents\x18\x02 \x01(\fB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bcontents\"<\n" +
-	"\x12GetDataBlobRequest\x12&\n" +
-	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"\x7f\n" +
+	"\bcontents\x18\x02 \x01(\fB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bcontents\"o\n" +
+	"\x12GetDataBlobRequest\x121\n" +
+	"\x14participant_identity\x18\x01 \x01(\tR\x13participantIdentity\x12&\n" +
+	"\x03key\x18\x02 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"\x7f\n" +
 	"\x13GetDataBlobResponse\x12&\n" +
 	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12@\n" +
 	"\bcontents\x18\x02 \x01(\fB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bcontents\"\xdd\x01\n" +
@@ -5767,25 +5787,26 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(BackupCodecPolicy)(0),                // 75: livekit.BackupCodecPolicy
 	(AudioTrackFeature)(0),                // 76: livekit.AudioTrackFeature
 	(PacketTrailerFeature)(0),             // 77: livekit.PacketTrailerFeature
-	(*DataTrackTypeInfo)(nil),             // 78: livekit.DataTrackTypeInfo
-	(*DataTrackInfo)(nil),                 // 79: livekit.DataTrackInfo
-	(*Room)(nil),                          // 80: livekit.Room
-	(*ParticipantInfo)(nil),               // 81: livekit.ParticipantInfo
-	(*ClientConfiguration)(nil),           // 82: livekit.ClientConfiguration
-	(*ServerInfo)(nil),                    // 83: livekit.ServerInfo
-	(*Codec)(nil),                         // 84: livekit.Codec
-	(*TrackInfo)(nil),                     // 85: livekit.TrackInfo
-	(*ParticipantTracks)(nil),             // 86: livekit.ParticipantTracks
-	(*DataBlobKey)(nil),                   // 87: livekit.DataBlobKey
-	(VideoQuality)(0),                     // 88: livekit.VideoQuality
-	(DisconnectReason)(0),                 // 89: livekit.DisconnectReason
-	(*SpeakerInfo)(nil),                   // 90: livekit.SpeakerInfo
-	(ConnectionQuality)(0),                // 91: livekit.ConnectionQuality
-	(*SubscribedAudioCodec)(nil),          // 92: livekit.SubscribedAudioCodec
-	(SubscriptionError)(0),                // 93: livekit.SubscriptionError
-	(*ClientInfo)(nil),                    // 94: livekit.ClientInfo
-	(ReconnectReason)(0),                  // 95: livekit.ReconnectReason
-	(*DataTrackSubscriptionOptions)(nil),  // 96: livekit.DataTrackSubscriptionOptions
+	(DataTrackFrameEncoding)(0),           // 78: livekit.DataTrackFrameEncoding
+	(*DataTrackSchemaId)(nil),             // 79: livekit.DataTrackSchemaId
+	(*DataTrackInfo)(nil),                 // 80: livekit.DataTrackInfo
+	(*Room)(nil),                          // 81: livekit.Room
+	(*ParticipantInfo)(nil),               // 82: livekit.ParticipantInfo
+	(*ClientConfiguration)(nil),           // 83: livekit.ClientConfiguration
+	(*ServerInfo)(nil),                    // 84: livekit.ServerInfo
+	(*Codec)(nil),                         // 85: livekit.Codec
+	(*TrackInfo)(nil),                     // 86: livekit.TrackInfo
+	(*ParticipantTracks)(nil),             // 87: livekit.ParticipantTracks
+	(*DataBlobKey)(nil),                   // 88: livekit.DataBlobKey
+	(VideoQuality)(0),                     // 89: livekit.VideoQuality
+	(DisconnectReason)(0),                 // 90: livekit.DisconnectReason
+	(*SpeakerInfo)(nil),                   // 91: livekit.SpeakerInfo
+	(ConnectionQuality)(0),                // 92: livekit.ConnectionQuality
+	(*SubscribedAudioCodec)(nil),          // 93: livekit.SubscribedAudioCodec
+	(SubscriptionError)(0),                // 94: livekit.SubscriptionError
+	(*ClientInfo)(nil),                    // 95: livekit.ClientInfo
+	(ReconnectReason)(0),                  // 96: livekit.ReconnectReason
+	(*DataTrackSubscriptionOptions)(nil),  // 97: livekit.DataTrackSubscriptionOptions
 }
 var file_livekit_rtc_proto_depIdxs = []int32{
 	21,  // 0: livekit.SignalRequest.offer:type_name -> livekit.SessionDescription
@@ -5847,88 +5868,89 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	76,  // 56: livekit.AddTrackRequest.audio_features:type_name -> livekit.AudioTrackFeature
 	77,  // 57: livekit.AddTrackRequest.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
 	74,  // 58: livekit.PublishDataTrackRequest.encryption:type_name -> livekit.Encryption.Type
-	78,  // 59: livekit.PublishDataTrackRequest.type_info:type_name -> livekit.DataTrackTypeInfo
-	79,  // 60: livekit.PublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
-	79,  // 61: livekit.UnpublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
-	65,  // 62: livekit.DataTrackSubscriberHandles.sub_handles:type_name -> livekit.DataTrackSubscriberHandles.SubHandlesEntry
-	0,   // 63: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
-	80,  // 64: livekit.JoinResponse.room:type_name -> livekit.Room
-	81,  // 65: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
-	81,  // 66: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
-	34,  // 67: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
-	82,  // 68: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	83,  // 69: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
-	84,  // 70: livekit.JoinResponse.enabled_publish_codecs:type_name -> livekit.Codec
-	34,  // 71: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
-	82,  // 72: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
-	83,  // 73: livekit.ReconnectResponse.server_info:type_name -> livekit.ServerInfo
-	85,  // 74: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
-	66,  // 75: livekit.SessionDescription.mid_to_track_id:type_name -> livekit.SessionDescription.MidToTrackIdEntry
-	81,  // 76: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
-	86,  // 77: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
-	67,  // 78: livekit.UpdateDataSubscription.updates:type_name -> livekit.UpdateDataSubscription.Update
-	87,  // 79: livekit.StoreDataBlobRequest.key:type_name -> livekit.DataBlobKey
-	87,  // 80: livekit.GetDataBlobRequest.key:type_name -> livekit.DataBlobKey
-	87,  // 81: livekit.GetDataBlobResponse.key:type_name -> livekit.DataBlobKey
-	88,  // 82: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
-	76,  // 83: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
-	89,  // 84: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
-	3,   // 85: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
-	55,  // 86: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
-	70,  // 87: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
-	68,  // 88: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
-	90,  // 89: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
-	80,  // 90: livekit.RoomUpdate.room:type_name -> livekit.Room
-	91,  // 91: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
-	37,  // 92: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
-	1,   // 93: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
-	39,  // 94: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
-	88,  // 95: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
-	41,  // 96: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
-	41,  // 97: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
-	42,  // 98: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
-	92,  // 99: livekit.SubscribedAudioCodecUpdate.subscribed_audio_codecs:type_name -> livekit.SubscribedAudioCodec
-	45,  // 100: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
-	80,  // 101: livekit.RoomMovedResponse.room:type_name -> livekit.Room
-	81,  // 102: livekit.RoomMovedResponse.participant:type_name -> livekit.ParticipantInfo
-	81,  // 103: livekit.RoomMovedResponse.other_participants:type_name -> livekit.ParticipantInfo
-	21,  // 104: livekit.SyncState.answer:type_name -> livekit.SessionDescription
-	23,  // 105: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
-	19,  // 106: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
-	51,  // 107: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
-	21,  // 108: livekit.SyncState.offer:type_name -> livekit.SessionDescription
-	50,  // 109: livekit.SyncState.datachannel_receive_states:type_name -> livekit.DataChannelReceiveState
-	11,  // 110: livekit.SyncState.publish_data_tracks:type_name -> livekit.PublishDataTrackResponse
-	0,   // 111: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
-	2,   // 112: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
-	56,  // 113: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
-	93,  // 114: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
-	4,   // 115: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
-	15,  // 116: livekit.RequestResponse.trickle:type_name -> livekit.TrickleRequest
-	9,   // 117: livekit.RequestResponse.add_track:type_name -> livekit.AddTrackRequest
-	16,  // 118: livekit.RequestResponse.mute:type_name -> livekit.MuteTrackRequest
-	33,  // 119: livekit.RequestResponse.update_metadata:type_name -> livekit.UpdateParticipantMetadata
-	29,  // 120: livekit.RequestResponse.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
-	30,  // 121: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
-	10,  // 122: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
-	12,  // 123: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
-	25,  // 124: livekit.RequestResponse.store_data_blob:type_name -> livekit.StoreDataBlobRequest
-	26,  // 125: livekit.RequestResponse.get_data_blob:type_name -> livekit.GetDataBlobRequest
-	94,  // 126: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
-	60,  // 127: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	69,  // 128: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
-	9,   // 129: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
-	21,  // 130: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
-	95,  // 131: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
-	49,  // 132: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
-	5,   // 133: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
-	64,  // 134: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
-	96,  // 135: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
-	136, // [136:136] is the sub-list for method output_type
-	136, // [136:136] is the sub-list for method input_type
-	136, // [136:136] is the sub-list for extension type_name
-	136, // [136:136] is the sub-list for extension extendee
-	0,   // [0:136] is the sub-list for field type_name
+	78,  // 59: livekit.PublishDataTrackRequest.frame_encoding:type_name -> livekit.DataTrackFrameEncoding
+	79,  // 60: livekit.PublishDataTrackRequest.schema:type_name -> livekit.DataTrackSchemaId
+	80,  // 61: livekit.PublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
+	80,  // 62: livekit.UnpublishDataTrackResponse.info:type_name -> livekit.DataTrackInfo
+	65,  // 63: livekit.DataTrackSubscriberHandles.sub_handles:type_name -> livekit.DataTrackSubscriberHandles.SubHandlesEntry
+	0,   // 64: livekit.TrickleRequest.target:type_name -> livekit.SignalTarget
+	81,  // 65: livekit.JoinResponse.room:type_name -> livekit.Room
+	82,  // 66: livekit.JoinResponse.participant:type_name -> livekit.ParticipantInfo
+	82,  // 67: livekit.JoinResponse.other_participants:type_name -> livekit.ParticipantInfo
+	34,  // 68: livekit.JoinResponse.ice_servers:type_name -> livekit.ICEServer
+	83,  // 69: livekit.JoinResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	84,  // 70: livekit.JoinResponse.server_info:type_name -> livekit.ServerInfo
+	85,  // 71: livekit.JoinResponse.enabled_publish_codecs:type_name -> livekit.Codec
+	34,  // 72: livekit.ReconnectResponse.ice_servers:type_name -> livekit.ICEServer
+	83,  // 73: livekit.ReconnectResponse.client_configuration:type_name -> livekit.ClientConfiguration
+	84,  // 74: livekit.ReconnectResponse.server_info:type_name -> livekit.ServerInfo
+	86,  // 75: livekit.TrackPublishedResponse.track:type_name -> livekit.TrackInfo
+	66,  // 76: livekit.SessionDescription.mid_to_track_id:type_name -> livekit.SessionDescription.MidToTrackIdEntry
+	82,  // 77: livekit.ParticipantUpdate.participants:type_name -> livekit.ParticipantInfo
+	87,  // 78: livekit.UpdateSubscription.participant_tracks:type_name -> livekit.ParticipantTracks
+	67,  // 79: livekit.UpdateDataSubscription.updates:type_name -> livekit.UpdateDataSubscription.Update
+	88,  // 80: livekit.StoreDataBlobRequest.key:type_name -> livekit.DataBlobKey
+	88,  // 81: livekit.GetDataBlobRequest.key:type_name -> livekit.DataBlobKey
+	88,  // 82: livekit.GetDataBlobResponse.key:type_name -> livekit.DataBlobKey
+	89,  // 83: livekit.UpdateTrackSettings.quality:type_name -> livekit.VideoQuality
+	76,  // 84: livekit.UpdateLocalAudioTrack.features:type_name -> livekit.AudioTrackFeature
+	90,  // 85: livekit.LeaveRequest.reason:type_name -> livekit.DisconnectReason
+	3,   // 86: livekit.LeaveRequest.action:type_name -> livekit.LeaveRequest.Action
+	55,  // 87: livekit.LeaveRequest.regions:type_name -> livekit.RegionSettings
+	70,  // 88: livekit.UpdateVideoLayers.layers:type_name -> livekit.VideoLayer
+	68,  // 89: livekit.UpdateParticipantMetadata.attributes:type_name -> livekit.UpdateParticipantMetadata.AttributesEntry
+	91,  // 90: livekit.SpeakersChanged.speakers:type_name -> livekit.SpeakerInfo
+	81,  // 91: livekit.RoomUpdate.room:type_name -> livekit.Room
+	92,  // 92: livekit.ConnectionQualityInfo.quality:type_name -> livekit.ConnectionQuality
+	37,  // 93: livekit.ConnectionQualityUpdate.updates:type_name -> livekit.ConnectionQualityInfo
+	1,   // 94: livekit.StreamStateInfo.state:type_name -> livekit.StreamState
+	39,  // 95: livekit.StreamStateUpdate.stream_states:type_name -> livekit.StreamStateInfo
+	89,  // 96: livekit.SubscribedQuality.quality:type_name -> livekit.VideoQuality
+	41,  // 97: livekit.SubscribedCodec.qualities:type_name -> livekit.SubscribedQuality
+	41,  // 98: livekit.SubscribedQualityUpdate.subscribed_qualities:type_name -> livekit.SubscribedQuality
+	42,  // 99: livekit.SubscribedQualityUpdate.subscribed_codecs:type_name -> livekit.SubscribedCodec
+	93,  // 100: livekit.SubscribedAudioCodecUpdate.subscribed_audio_codecs:type_name -> livekit.SubscribedAudioCodec
+	45,  // 101: livekit.SubscriptionPermission.track_permissions:type_name -> livekit.TrackPermission
+	81,  // 102: livekit.RoomMovedResponse.room:type_name -> livekit.Room
+	82,  // 103: livekit.RoomMovedResponse.participant:type_name -> livekit.ParticipantInfo
+	82,  // 104: livekit.RoomMovedResponse.other_participants:type_name -> livekit.ParticipantInfo
+	21,  // 105: livekit.SyncState.answer:type_name -> livekit.SessionDescription
+	23,  // 106: livekit.SyncState.subscription:type_name -> livekit.UpdateSubscription
+	19,  // 107: livekit.SyncState.publish_tracks:type_name -> livekit.TrackPublishedResponse
+	51,  // 108: livekit.SyncState.data_channels:type_name -> livekit.DataChannelInfo
+	21,  // 109: livekit.SyncState.offer:type_name -> livekit.SessionDescription
+	50,  // 110: livekit.SyncState.datachannel_receive_states:type_name -> livekit.DataChannelReceiveState
+	11,  // 111: livekit.SyncState.publish_data_tracks:type_name -> livekit.PublishDataTrackResponse
+	0,   // 112: livekit.DataChannelInfo.target:type_name -> livekit.SignalTarget
+	2,   // 113: livekit.SimulateScenario.switch_candidate_protocol:type_name -> livekit.CandidateProtocol
+	56,  // 114: livekit.RegionSettings.regions:type_name -> livekit.RegionInfo
+	94,  // 115: livekit.SubscriptionResponse.err:type_name -> livekit.SubscriptionError
+	4,   // 116: livekit.RequestResponse.reason:type_name -> livekit.RequestResponse.Reason
+	15,  // 117: livekit.RequestResponse.trickle:type_name -> livekit.TrickleRequest
+	9,   // 118: livekit.RequestResponse.add_track:type_name -> livekit.AddTrackRequest
+	16,  // 119: livekit.RequestResponse.mute:type_name -> livekit.MuteTrackRequest
+	33,  // 120: livekit.RequestResponse.update_metadata:type_name -> livekit.UpdateParticipantMetadata
+	29,  // 121: livekit.RequestResponse.update_audio_track:type_name -> livekit.UpdateLocalAudioTrack
+	30,  // 122: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
+	10,  // 123: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
+	12,  // 124: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
+	25,  // 125: livekit.RequestResponse.store_data_blob:type_name -> livekit.StoreDataBlobRequest
+	26,  // 126: livekit.RequestResponse.get_data_blob:type_name -> livekit.GetDataBlobRequest
+	95,  // 127: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
+	60,  // 128: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	69,  // 129: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
+	9,   // 130: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
+	21,  // 131: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
+	96,  // 132: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
+	49,  // 133: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
+	5,   // 134: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
+	64,  // 135: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
+	97,  // 136: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
+	137, // [137:137] is the sub-list for method output_type
+	137, // [137:137] is the sub-list for method input_type
+	137, // [137:137] is the sub-list for extension type_name
+	137, // [137:137] is the sub-list for extension extendee
+	0,   // [0:137] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
