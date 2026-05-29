@@ -318,8 +318,10 @@ message StoreDataBlobRequest {
 }
 
 message GetDataBlobRequest {
+  // Identity of the participant who owns the blob.
+  string participant_identity = 1;
   // Unique key of the data blob to retrieve.
-  DataBlobKey key = 1;
+  DataBlobKey key = 2;
 }
 
 message GetDataBlobResponse {

@@ -369,13 +369,11 @@ message DataTrackSubscriptionOptions {
 
 // Key used to uniquely identify a data blob for storage and retrieval.
 message DataBlobKey {
-  // Identity of the participant who owns the blob.
-  string participant_identity = 1;
   oneof key {
     // Generic string key, blob contains arbitrary data.
-    string generic = 2;
+    string generic = 1;
     // Data track schema identifier, blob contains schema definition.
-    DataTrackSchemaId schema_id = 3;
+    DataTrackSchemaId schema_id = 2;
   }
 }
 
