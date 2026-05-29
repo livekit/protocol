@@ -194,9 +194,12 @@ message PublishDataTrackRequest {
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
 
-  // Type info for this track if the track is typed.
+  // Encoding for frame payloads on this track. If unspecified, the track is untyped.
+  optional DataTrackFrameEncoding frame_encoding = 4;
+
+  // ID of the schema used by frames on this track if the track is typed.
   // If set, the associated schema must be stored with `StoreDataBlobRequest`.
-  optional DataTrackTypeInfo type_info = 4;
+  optional DataTrackSchemaId schema = 5;
 }
 
 message PublishDataTrackResponse {

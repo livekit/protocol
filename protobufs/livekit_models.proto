@@ -283,8 +283,11 @@ message DataTrackInfo {
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
 
-  // Type information for this track. If unset, the track is untyped.
-  optional DataTrackTypeInfo type_info = 5;
+  // Encoding for frame payloads on this track. If unspecified, the track is untyped.
+  optional DataTrackFrameEncoding frame_encoding = 5;
+
+  // ID of the schema used by frames on this track if the track is typed.
+  optional DataTrackSchemaId schema = 6;
 }
 
 // Encoding for frame payloads.
@@ -331,14 +334,6 @@ enum DataTrackSchemaEncoding {
   DATA_TRACK_SCHEMA_ENCODING_OMG_IDL = 6;
   // JSON Schema: describes `JSON` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_JSON_SCHEMA = 7;
-}
-
-// Type information for a data track.
-message DataTrackTypeInfo {
-  DataTrackFrameEncoding frame_encoding = 1;
-
-  // ID of the schema used by frames on this track.
-  optional DataTrackSchemaId schema = 2;
 }
 
 // Identifier for a data track schema.
