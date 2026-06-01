@@ -98,11 +98,10 @@ message MediaSource {
   oneof video {
     string video_track_id = 1 [(logger.name) = "videoTrackID"];
     ParticipantVideo participant_video = 2;
-    // string layout = 3;
   }
 
-  AudioConfig audio = 4;
-  DataConfig data = 5;
+  AudioConfig audio = 3;
+  DataConfig data = 4;
 }
 
 message ParticipantVideo {
