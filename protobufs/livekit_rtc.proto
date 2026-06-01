@@ -311,13 +311,7 @@ message UpdateDataSubscription {
 }
 
 message StoreDataBlobRequest {
-  // Unique key the data blob is identified by.
-  DataBlobKey key = 1;
-  // Contents of the data blob. This must not exceed 50 KB.
-  bytes contents = 2 [
-    (logger.sensitivity) = SENSITIVITY_PII,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
+  DataBlob blob = 1;
 }
 
 message GetDataBlobRequest {
@@ -328,13 +322,7 @@ message GetDataBlobRequest {
 }
 
 message GetDataBlobResponse {
-  // Unqiue key identifying the retrived data blob.
-  DataBlobKey key = 1;
-  // Contents of the retrived data blob.
-  bytes contents = 2 [
-    (logger.sensitivity) = SENSITIVITY_PII,
-    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
-  ];
+  DataBlob blob = 1;
 }
 
 message UpdateTrackSettings {

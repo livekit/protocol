@@ -372,6 +372,17 @@ message DataBlobKey {
   }
 }
 
+// A blob of data stored in a room identified by a unique key.
+message DataBlob {
+  // Unique key the data blob is identified by.
+  DataBlobKey key = 1;
+  // Contents of the data blob. This must not exceed 50 KB.
+  bytes contents = 2 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
+}
+
 enum VideoQuality {
   LOW = 0;
   MEDIUM = 1;
