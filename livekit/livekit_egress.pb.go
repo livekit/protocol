@@ -928,8 +928,8 @@ type MediaSource struct {
 	//	*MediaSource_VideoTrackId
 	//	*MediaSource_ParticipantVideo
 	Video         isMediaSource_Video `protobuf_oneof:"video"`
-	Audio         *AudioConfig        `protobuf:"bytes,4,opt,name=audio,proto3" json:"audio,omitempty"`
-	Data          *DataConfig         `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`
+	Audio         *AudioConfig        `protobuf:"bytes,3,opt,name=audio,proto3" json:"audio,omitempty"`
+	Data          *DataConfig         `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1012,7 +1012,7 @@ type MediaSource_VideoTrackId struct {
 }
 
 type MediaSource_ParticipantVideo struct {
-	ParticipantVideo *ParticipantVideo `protobuf:"bytes,2,opt,name=participant_video,json=participantVideo,proto3,oneof"` // string layout = 3;
+	ParticipantVideo *ParticipantVideo `protobuf:"bytes,2,opt,name=participant_video,json=participantVideo,proto3,oneof"`
 }
 
 func (*MediaSource_VideoTrackId) isMediaSource_Video() {}
@@ -5378,8 +5378,8 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\vMediaSource\x127\n" +
 	"\x0evideo_track_id\x18\x01 \x01(\tB\x0f\xbaP\fvideoTrackIDH\x00R\fvideoTrackId\x12H\n" +
 	"\x11participant_video\x18\x02 \x01(\v2\x19.livekit.ParticipantVideoH\x00R\x10participantVideo\x12*\n" +
-	"\x05audio\x18\x04 \x01(\v2\x14.livekit.AudioConfigR\x05audio\x12'\n" +
-	"\x04data\x18\x05 \x01(\v2\x13.livekit.DataConfigR\x04dataB\a\n" +
+	"\x05audio\x18\x03 \x01(\v2\x14.livekit.AudioConfigR\x05audio\x12'\n" +
+	"\x04data\x18\x04 \x01(\v2\x13.livekit.DataConfigR\x04dataB\a\n" +
 	"\x05video\"^\n" +
 	"\x10ParticipantVideo\x12\x1a\n" +
 	"\bidentity\x18\x01 \x01(\tR\bidentity\x12.\n" +
