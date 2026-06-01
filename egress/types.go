@@ -75,12 +75,12 @@ type UploadRequest interface {
 
 func GetTypes(request any) (string, string) {
 	switch req := request.(type) {
-	// case *livekit.EgressInfo_Egress:
-	// 	return getSourceTypeV2(req.Egress), GetOutputTypeV2(req.Egress.Outputs)
+	case *livekit.EgressInfo_Egress:
+		return getSourceTypeV2(req.Egress), GetOutputTypeV2(req.Egress.Outputs)
 
 	case *livekit.EgressInfo_Replay:
 		return getSourceTypeV2(req.Replay), GetOutputTypeV2(req.Replay.Outputs)
-	
+
 	case *livekit.EgressInfo_RoomComposite:
 		return EgressTypeRoomComposite, GetOutputType(req.RoomComposite)
 
