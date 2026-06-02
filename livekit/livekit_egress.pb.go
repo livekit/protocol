@@ -1067,7 +1067,7 @@ func (x *ParticipantVideo) GetPreferScreenShare() bool {
 // Each route specifies both which audio to capture and which channel to output to.
 type AudioConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	CaptureAll    bool                   `protobuf:"varint,1,opt,name=capture_all,json=captureAll,proto3" json:"capture_all,omitempty"`
+	CaptureAll    bool                   `protobuf:"varint,1,opt,name=capture_all,json=captureAll,proto3" json:"capture_all,omitempty"` // If true, all unmatched audio is recorded to both channels
 	Routes        []*AudioRoute          `protobuf:"bytes,2,rep,name=routes,proto3" json:"routes,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
