@@ -38,7 +38,7 @@ service Egress {
   // Stop a recording or stream
   rpc StopEgress(StopEgressRequest) returns (EgressInfo);
 
-  // To be deprecated
+  // TODO: deprecate
   rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
   rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
   rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
@@ -99,10 +99,11 @@ message MediaSource {
     string video_track_id = 1 [(logger.name) = "videoTrackID"];
     ParticipantVideo participant_video = 2;
   }
-
   AudioConfig audio = 3;
-  DataConfig data = 4;
+  // TODO: DataConfig data = 4;
 }
+
+// --- Video Configuration ---
 
 message ParticipantVideo {
   string identity = 1;
@@ -114,9 +115,8 @@ message ParticipantVideo {
 // Unified audio selection and channel routing.
 // Each route specifies both which audio to capture and which channel to output to.
 message AudioConfig {
-  // If empty, all audio captured in both channels.
-  // If non-empty, only matching audio is captured and routed. Unmatched is excluded.
-  repeated AudioRoute routes = 1;
+  bool capture_all = 1;
+  repeated AudioRoute routes = 2;
 }
 
 message AudioRoute {
@@ -125,6 +125,7 @@ message AudioRoute {
     string participant_identity = 2;
     ParticipantInfo.Kind participant_kind = 3;
   }
+
   AudioChannel channel = 4;
 }
 
@@ -137,16 +138,14 @@ enum AudioChannel {
 // --- Data Track Configuration ---
 
 message DataConfig {
-  // If empty, all data tracks captured.
-  // If non-empty, only matching data tracks are captured.
-  repeated DataSelector selectors = 1;
+  bool capture_all = 1;
+  repeated DataSelector selectors = 2;
 }
 
 message DataSelector {
   oneof match {
     string track_id = 1 [(logger.name) = "trackID"];
     string participant_identity = 2;
-    string topic = 3;
   }
 }
 
@@ -188,7 +187,7 @@ message Output {
     StreamOutput stream = 2;
     SegmentedFileOutput segments = 3;
     ImageOutput images = 4;
-    // 5 reserved for mcap;
+    // TODO: DataOutput data = 5;
   }
 
   // Per-output storage override (falls back to request, then server)
@@ -232,6 +231,7 @@ message SegmentedFileOutput {
   SegmentedFileSuffix filename_suffix = 10;  // (optional, default INDEX)
   bool disable_manifest = 8;                 // disable upload of manifest file (default false)
 
+  // TODO: deprecate
   oneof output {
     S3Upload s3 = 5;
     GCPUpload gcp = 6;
@@ -260,6 +260,7 @@ message ImageOutput {
   ImageCodec image_codec = 6;           // (optional)
   bool disable_manifest = 7;            // disable upload of manifest file (default false)
 
+  // TODO: deprecate
   oneof output {
     S3Upload s3 = 8;
     GCPUpload gcp = 9;
@@ -376,6 +377,7 @@ message EgressInfo {
     StartEgressRequest egress = 29;
     ExportReplayRequest replay = 30;
 
+    // TODO: deprecate
     RoomCompositeEgressRequest room_composite = 4;
     WebEgressRequest web = 14;
     ParticipantEgressRequest participant = 19;
@@ -511,7 +513,7 @@ message ExportReplayRequest {
   repeated WebhookConfig webhooks = 11;
 }
 
-// --- V1 ---
+// TODO: deprecate --- V1 ---
 
 message RoomCompositeEgressRequest {
   string room_name = 1;
