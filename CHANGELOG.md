@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.46.5
+
+### Patch Changes
+
+- feat(inference): add default thresholds in session created message - [#1598](https://github.com/livekit/protocol/pull/1598) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.46.4
 
 ## 1.46.3
