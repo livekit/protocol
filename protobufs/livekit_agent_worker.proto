@@ -19,8 +19,6 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-import "logger/options.proto";
-
 message WorkerInfo {
   string worker_type     = 1;
   string agent_name      = 2;
