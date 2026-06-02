@@ -115,7 +115,7 @@ message ParticipantVideo {
 // Unified audio selection and channel routing.
 // Each route specifies both which audio to capture and which channel to output to.
 message AudioConfig {
-  bool capture_all = 1;
+  bool capture_all = 1; // If true, all unmatched audio is recorded to both channels
   repeated AudioRoute routes = 2;
 }
 
