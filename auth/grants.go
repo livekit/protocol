@@ -278,6 +278,9 @@ type VideoGrant struct {
 	// if a participant can subscribe to metrics
 	CanSubscribeMetrics *bool `json:"canSubscribeMetrics,omitempty"`
 
+	// if a participant can manage an agent session via RemoteSession
+	CanManageAgentSession *bool `json:"canManageAgentSession,omitempty"`
+
 	// destination room which this participant can forward to
 	DestinationRoom string `json:"destinationRoom,omitempty"`
 }
@@ -307,6 +310,10 @@ func (v *VideoGrant) SetCanUpdateOwnMetadata(val bool) {
 
 func (v *VideoGrant) SetCanSubscribeMetrics(val bool) {
 	v.CanSubscribeMetrics = &val
+}
+
+func (v *VideoGrant) SetCanManageAgentSession(val bool) {
+	v.CanManageAgentSession = &val
 }
 
 func (v *VideoGrant) GetCanPublish() bool {
@@ -373,6 +380,13 @@ func (v *VideoGrant) GetCanSubscribeMetrics() bool {
 	return *v.CanSubscribeMetrics
 }
 
+func (v *VideoGrant) GetCanManageAgentSession() bool {
+	if v.CanManageAgentSession == nil {
+		return false
+	}
+	return *v.CanManageAgentSession
+}
+
 func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission) bool {
 	if permission == nil {
 		return false
@@ -405,6 +419,9 @@ func (v *VideoGrant) MatchesPermission(permission *livekit.ParticipantPermission
 	if v.GetCanSubscribeMetrics() != permission.CanSubscribeMetrics {
 		return false
 	}
+	if v.GetCanManageAgentSession() != permission.CanManageAgentSession {
+		return false
+	}
 
 	return true
 }
@@ -423,6 +440,7 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 	v.Recorder = permission.Recorder
 	v.Agent = permission.Agent
 	v.SetCanSubscribeMetrics(permission.CanSubscribeMetrics)
+	v.SetCanManageAgentSession(permission.CanManageAgentSession)
 }
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
@@ -435,7 +453,8 @@ func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 		Hidden:              v.Hidden,
 		Recorder:            v.Recorder,
 		Agent:               v.Agent,
-		CanSubscribeMetrics: v.GetCanSubscribeMetrics(),
+		CanSubscribeMetrics:   v.GetCanSubscribeMetrics(),
+		CanManageAgentSession: v.GetCanManageAgentSession(),
 	}
 }
 
@@ -469,6 +488,16 @@ func (v *VideoGrant) Clone() *VideoGrant {
 	if v.CanUpdateOwnMetadata != nil {
 		canUpdateOwnMetadata := *v.CanUpdateOwnMetadata
 		clone.CanUpdateOwnMetadata = &canUpdateOwnMetadata
+	}
+
+	if v.CanSubscribeMetrics != nil {
+		canSubscribeMetrics := *v.CanSubscribeMetrics
+		clone.CanSubscribeMetrics = &canSubscribeMetrics
+	}
+
+	if v.CanManageAgentSession != nil {
+		canManageAgentSession := *v.CanManageAgentSession
+		clone.CanManageAgentSession = &canManageAgentSession
 	}
 
 	return &clone
@@ -508,6 +537,7 @@ func (v *VideoGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	logBoolPtr("Agent", &v.Agent)
 
 	logBoolPtr("CanSubscribeMetrics", v.CanSubscribeMetrics)
+	logBoolPtr("CanManageAgentSession", v.CanManageAgentSession)
 	e.AddString("DestinationRoom", v.DestinationRoom)
 	return nil
 }

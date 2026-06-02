@@ -566,7 +566,10 @@ type RoomParticipantIdentity struct {
 	// name of the room
 	Room string `protobuf:"bytes,1,opt,name=room,proto3" json:"room,omitempty"`
 	// identity of the participant
-	Identity      string `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	Identity string `protobuf:"bytes,2,opt,name=identity,proto3" json:"identity,omitempty"`
+	// Unix timestamp used to invalidate token whose nbf is before this value.
+	// Used only by RemoveParticipant; defaults to now(server)+leeway(1min) if left empty.
+	RevokeTokenTs int64 `protobuf:"varint,3,opt,name=revoke_token_ts,json=revokeTokenTs,proto3" json:"revoke_token_ts,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -613,6 +616,13 @@ func (x *RoomParticipantIdentity) GetIdentity() string {
 		return x.Identity
 	}
 	return ""
+}
+
+func (x *RoomParticipantIdentity) GetRevokeTokenTs() int64 {
+	if x != nil {
+		return x.RevokeTokenTs
+	}
+	return 0
 }
 
 type RemoveParticipantResponse struct {
@@ -1623,7 +1633,7 @@ const file_livekit_room_proto_rawDesc = "" +
 	" \x01(\rR\x10departureTimeout\x12)\n" +
 	"\x10max_participants\x18\x03 \x01(\rR\x0fmaxParticipants\x12\"\n" +
 	"\anode_id\x18\x04 \x01(\tB\t\xbaP\x06nodeIDR\x06nodeId\x12@\n" +
-	"\bmetadata\x18\x05 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x128\n" +
+	"\bmetadata\x18\x05 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x128\n" +
 	"\x04tags\x18\x0f \x03(\v2$.livekit.CreateRoomRequest.TagsEntryR\x04tags\x12+\n" +
 	"\x06egress\x18\x06 \x01(\v2\x13.livekit.RoomEgressR\x06egress\x12*\n" +
 	"\x11min_playout_delay\x18\a \x01(\rR\x0fminPlayoutDelay\x12*\n" +
@@ -1653,10 +1663,11 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x17ListParticipantsRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\"X\n" +
 	"\x18ListParticipantsResponse\x12<\n" +
-	"\fparticipants\x18\x01 \x03(\v2\x18.livekit.ParticipantInfoR\fparticipants\"I\n" +
+	"\fparticipants\x18\x01 \x03(\v2\x18.livekit.ParticipantInfoR\fparticipants\"q\n" +
 	"\x17RoomParticipantIdentity\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
-	"\bidentity\x18\x02 \x01(\tR\bidentity\"\x1b\n" +
+	"\bidentity\x18\x02 \x01(\tR\bidentity\x12&\n" +
+	"\x0frevoke_token_ts\x18\x03 \x01(\x03R\rrevokeTokenTs\"\x1b\n" +
 	"\x19RemoveParticipantResponse\"y\n" +
 	"\x14MuteRoomTrackRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
@@ -1668,13 +1679,13 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x18UpdateParticipantRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x12@\n" +
-	"\bmetadata\x18\x03 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12>\n" +
+	"\bmetadata\x18\x03 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12>\n" +
 	"\n" +
 	"permission\x18\x04 \x01(\v2\x1e.livekit.ParticipantPermissionR\n" +
 	"permission\x128\n" +
-	"\x04name\x18\x05 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x04name\x12w\n" +
+	"\x04name\x18\x05 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x04name\x12w\n" +
 	"\n" +
-	"attributes\x18\x06 \x03(\v21.livekit.UpdateParticipantRequest.AttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\n" +
+	"attributes\x18\x06 \x03(\v21.livekit.UpdateParticipantRequest.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -1699,13 +1710,13 @@ const file_livekit_room_proto_rawDesc = "" +
 	"\x10SendDataResponse\"q\n" +
 	"\x19UpdateRoomMetadataRequest\x12\x12\n" +
 	"\x04room\x18\x01 \x01(\tR\x04room\x12@\n" +
-	"\bmetadata\x18\x02 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\"\xb5\x04\n" +
+	"\bmetadata\x18\x02 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\"\xb5\x04\n" +
 	"\x11RoomConfiguration\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12#\n" +
 	"\rempty_timeout\x18\x02 \x01(\rR\femptyTimeout\x12+\n" +
 	"\x11departure_timeout\x18\x03 \x01(\rR\x10departureTimeout\x12)\n" +
 	"\x10max_participants\x18\x04 \x01(\rR\x0fmaxParticipants\x12@\n" +
-	"\bmetadata\x18\v \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12+\n" +
+	"\bmetadata\x18\v \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12+\n" +
 	"\x06egress\x18\x05 \x01(\v2\x13.livekit.RoomEgressR\x06egress\x12*\n" +
 	"\x11min_playout_delay\x18\a \x01(\rR\x0fminPlayoutDelay\x12*\n" +
 	"\x11max_playout_delay\x18\b \x01(\rR\x0fmaxPlayoutDelay\x12!\n" +

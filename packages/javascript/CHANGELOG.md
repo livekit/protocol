@@ -1,5 +1,52 @@
 # @livekit/protocol
 
+## 1.46.4
+
+### Patch Changes
+
+- agent_session: rename `CustomEvent` → `DebugMessage`; drop `type` field, keep only `payload` - [#1593](https://github.com/livekit/protocol/pull/1593) ([@toubatbrian](https://github.com/toubatbrian))
+
+  Renames the agent-session event added in #1588 before any consumer ships it. The
+  message is repositioned as an internal debug/trace channel surfaced only to the
+  debugger/recorder, not to user code, so the `type` discriminator was unnecessary
+  — callers just emit a JSON `payload`.
+
+  Wire-level: `AgentSessionEvent.custom_event` (field 21) → `AgentSessionEvent.debug_message`
+  (same field number 21, same type slot, no schema-compat concerns since nothing
+  has been built against it yet downstream).
+
+## 1.46.3
+
+## 1.46.2
+
+### Patch Changes
+
+- remove the stale proto export - [#1584](https://github.com/livekit/protocol/pull/1584) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Add Krisp Viva to FeatureUsageInfo enum - [#1583](https://github.com/livekit/protocol/pull/1583) ([@lukasIO](https://github.com/lukasIO))
+
+- Allow specifying exact To header and request line for SIP outbound. - [#1577](https://github.com/livekit/protocol/pull/1577) ([@dennwc](https://github.com/dennwc))
+
+## 1.46.1
+
+### Patch Changes
+
+- export missing proto messages - [#1582](https://github.com/livekit/protocol/pull/1582) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- add logger.UnredactedProto helper that skips field redaction - [#1578](https://github.com/livekit/protocol/pull/1578) ([@paulwe](https://github.com/paulwe))
+
+## 1.46.0
+
+### Patch Changes
+
+- add local protojson with permissive defaults - [#1542](https://github.com/livekit/protocol/pull/1542) ([@paulwe](https://github.com/paulwe))
+
+- Fix SIP trunk-level MediaEncryption being silently dropped on outbound and inbound calls. The early `req.Upgrade()` / `rule.Upgrade()` calls pinned `Media.Encryption` to the (legacy) request/rule field before the trunk's MediaEncryption was merged, causing INVITEs to omit SRTP when only the trunk had it configured. - [#1540](https://github.com/livekit/protocol/pull/1540) ([@hechen-eng](https://github.com/hechen-eng))
+
+- Add optional authentication realm to SIPInboundTrunk. - [#1558](https://github.com/livekit/protocol/pull/1558) ([@dennwc](https://github.com/dennwc))
+
+- Add TokenPagination field to ListEgress API and RPC - [#1556](https://github.com/livekit/protocol/pull/1556) ([@biglittlebigben](https://github.com/biglittlebigben))
+
 ## 1.45.8
 
 ### Patch Changes

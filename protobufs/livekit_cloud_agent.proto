@@ -47,7 +47,7 @@ message AgentSecret {
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp updated_at = 4;
     AgentSecretKind kind = 5;
-    repeated string environments = 6;
+    repeated string deployments = 6;
 }
 
 message CreateAgentRequest {
@@ -101,9 +101,10 @@ message AgentDeployment {
     string cpu_limit = 12;
     string server_region = 13;
     repeated AgentEvent events = 14;
-    string environment = 15;
+    string deployment = 15;
     string version = 16;
     string agent_name = 17;
+    bool deployment_enabled = 18;
 }
 
 message AgentInfo {
@@ -176,7 +177,7 @@ message DeployAgentRequest {
     int32 replicas               = 4 [deprecated=true];
     int32 max_replicas           = 5 [deprecated=true];
     string cpu_req               = 6 [deprecated=true];
-    string environment           = 7;
+    string deployment            = 7;
 }
 
 message DeployAgentResponse {
@@ -186,13 +187,13 @@ message DeployAgentResponse {
     string presigned_url = 4 [deprecated=true];
     string tag = 5;
     PresignedPostRequest presigned_post_request = 6;
-    string environment = 7;
+    string deployment = 7;
 }
 
 message DeployAgentV2Request {
   string agent_id              = 1 [(logger.name) = "agentID"];
   repeated AgentSecret secrets = 2;
-  string environment           = 3;
+  string deployment           = 3;
 }
 
 message DeployAgentV2Response {
@@ -201,7 +202,7 @@ message DeployAgentV2Response {
   string agent_id = 3 [(logger.name) = "agentID"];
   string tag = 4;
   PresignedPostRequest presigned_req = 5;
-  string environment = 6;
+  string deployment = 6;
 }
 
 message UpdateAgentSecretsRequest {
@@ -231,7 +232,7 @@ message RollbackAgentResponse {
 message DeleteAgentRequest {
     string agent_id = 1 [(logger.name) = "agentID"];
     string agent_name = 2;
-    string environment = 3; // optional
+    string deployment = 3; // optional
 }
 
 message DeleteAgentResponse {

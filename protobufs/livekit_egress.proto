@@ -25,12 +25,7 @@ option ruby_package = "LiveKit::Proto";
 
 service Egress {
   // Unified StartEgress RPC
-  // rpc StartEgress(StartEgressRequest) returns (EgressInfo);
-  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
-  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
-  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
-  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
-  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
+  rpc StartEgress(StartEgressRequest) returns (EgressInfo);
 
   // Update url/template or stream outputs
   // rpc UpdateEgress(UpdateEgressRequest) returns (EgressInfo);
@@ -42,6 +37,13 @@ service Egress {
 
   // Stop a recording or stream
   rpc StopEgress(StopEgressRequest) returns (EgressInfo);
+
+  // To be deprecated
+  rpc StartRoomCompositeEgress(RoomCompositeEgressRequest) returns (EgressInfo);
+  rpc StartWebEgress(WebEgressRequest) returns (EgressInfo);
+  rpc StartParticipantEgress(ParticipantEgressRequest) returns (EgressInfo);
+  rpc StartTrackCompositeEgress(TrackCompositeEgressRequest) returns (EgressInfo);
+  rpc StartTrackEgress(TrackEgressRequest) returns (EgressInfo);
 }
 
 // --- Core Request ---
@@ -284,18 +286,18 @@ message StorageConfig {
 }
 
 message S3Upload {
-  string access_key = 1 [(logger.redact) = true];
-  string secret = 2 [(logger.redact) = true];
-  string session_token = 11 [(logger.redact) = true];
-  string assume_role_arn = 12 [(logger.redact) = true]; // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
-  string assume_role_external_id = 13 [(logger.redact) = true, (logger.name) = "assumeRoleExternalID"];  // ExternalID to use when assuming role for upload
+  string access_key = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  string secret = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  string session_token = 11 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  string assume_role_arn = 12 [(logger.sensitivity) = SENSITIVITY_PII]; // ARN of the role to assume for file upload. Egress will make an AssumeRole API call using the provided access_key and secret to assume that role. On LiveKit cloud, this is only available on accounts that have the feature enabled
+  string assume_role_external_id = 13 [(logger.sensitivity) = SENSITIVITY_SECRET, (logger.name) = "assumeRoleExternalID"];  // ExternalID to use when assuming role for upload
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
   bool force_path_style = 6;
-  map<string, string> metadata = 7;
-  string tagging = 8;
-  string content_disposition = 9;  // Content-Disposition header
+  map<string, string> metadata = 7 [(logger.sensitivity) = SENSITIVITY_PII];
+  string tagging = 8 [(logger.sensitivity) = SENSITIVITY_PII];
+  string content_disposition = 9 [(logger.sensitivity) = SENSITIVITY_PII];  // Content-Disposition header
   ProxyConfig proxy = 10;
 
   // NEXT_ID: 14
@@ -303,20 +305,20 @@ message S3Upload {
 
 message GCPUpload {
   // service account credentials serialized in JSON "credentials.json"
-  string credentials = 1 [(logger.redact) = true];
+  string credentials = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string bucket = 2;
   ProxyConfig proxy = 3;
 }
 
 message AzureBlobUpload {
-  string account_name = 1 [(logger.redact) = true];
-  string account_key = 2 [(logger.redact) = true];
+  string account_name = 1 [(logger.sensitivity) = SENSITIVITY_PII];
+  string account_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string container_name = 3;
 }
 
 message AliOSSUpload {
-  string access_key = 1 [(logger.redact) = true];
-  string secret = 2 [(logger.redact) = true];
+  string access_key = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
+  string secret = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string region = 3;
   string endpoint = 4;
   string bucket = 5;
@@ -325,7 +327,7 @@ message AliOSSUpload {
 message ProxyConfig {
   string url = 1;
   string username = 2;
-  string password = 3 [(logger.redact) = true];
+  string password = 3 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
 
 // --- Control RPCs ---
@@ -334,10 +336,14 @@ message ListEgressRequest {
   string room_name = 1;                               // (optional, filter by room name)
   string egress_id = 2 [(logger.name) = "egressID"];  // (optional, filter by egress ID)
   bool active = 3;                                    // (optional, list active egress only)
+  TokenPagination page_token = 4;
+  // next field id: 5
 }
 
 message ListEgressResponse {
   repeated EgressInfo items = 1;
+  TokenPagination next_page_token = 2;
+  // next field id: 3
 }
 
 message UpdateEgressRequest {
@@ -367,7 +373,7 @@ message EgressInfo {
   int64 updated_at = 18;
 
   oneof request {
-    // StartEgressRequest egress = 29;
+    StartEgressRequest egress = 29;
     ExportReplayRequest replay = 30;
 
     RoomCompositeEgressRequest room_composite = 4;

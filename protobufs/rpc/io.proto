@@ -40,6 +40,17 @@ service IOInfo {
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
 
   // sip
+  // Deprecated: use IOInfoSIP. Retained for backward compatibility until callers migrate.
+  rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
+  rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
+  rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
+  rpc RecordCallContext(RecordCallContextRequest) returns (google.protobuf.Empty);
+}
+
+// IOInfoSIP exposes the SIP-specific IO methods as a standalone psrpc service so
+// that nodes which do not run the SIP service can avoid subscribing to these
+// methods. The method set mirrors the SIP section of IOInfo above.
+service IOInfoSIP {
   rpc GetSIPTrunkAuthentication(GetSIPTrunkAuthenticationRequest) returns (GetSIPTrunkAuthenticationResponse);
   rpc EvaluateSIPDispatchRules(EvaluateSIPDispatchRulesRequest) returns (EvaluateSIPDispatchRulesResponse);
   rpc UpdateSIPCallState(UpdateSIPCallStateRequest) returns (google.protobuf.Empty);
@@ -101,13 +112,14 @@ message GetSIPTrunkAuthenticationRequest {
 message GetSIPTrunkAuthenticationResponse {
   // Expected username and password
   string username = 1 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   string password = 2 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_SECRET,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
+  string realm = 9;
   bool drop = 3;
   // Trunk used to fulfill this request
   string sip_trunk_id = 4 [(logger.name) = "sipTrunkID"];
@@ -151,7 +163,7 @@ message EvaluateSIPDispatchRulesRequest {
   // Extra participant attributes added for this call.
   // Usually include provider-specific metadata.
   map<string, string> extra_attributes = 9 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
@@ -168,17 +180,17 @@ message EvaluateSIPDispatchRulesResponse {
   string participant_identity = 2;
   // What should be used for the LiveKit participant name
   string participant_name = 7 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // What should be used for the LiveKit participant metadata
   string participant_metadata = 8 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // What should be used for the LiveKit participant attributes
   map<string, string> participant_attributes = 11 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
@@ -186,7 +198,7 @@ message EvaluateSIPDispatchRulesResponse {
 
   // optional token that should be used when creating LiveKit participant
   string token = 4 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_SECRET,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
@@ -206,7 +218,7 @@ message EvaluateSIPDispatchRulesResponse {
   // Include these SIP X-* headers in 200 OK response to INVITE.
   // These headers are included as-is and may help identify triggered LiveKit Dispatch Rule for the other SIP endpoint.
   map<string, string> headers = 13 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // Map SIP X-* headers from INVITE to SIP participant attributes.

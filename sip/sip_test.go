@@ -20,9 +20,11 @@ import (
 	"regexp"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/dennwc/iters"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/stretchr/testify/require"
 
@@ -959,6 +961,29 @@ func TestEvaluateDispatchRule_TrunkOnlyEncryption(t *testing.T) {
 	require.NotNil(t, res.Media)
 	require.NotNil(t, res.Media.Encryption)
 	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
+	require.Nil(t, res.Media.MediaTimeout)
+}
+
+func TestEvaluateDispatchRule_RespectsRuleMediaTimeout(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+		Media: &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(5 * time.Minute),
+		},
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CallingHost:   "sip.example.com",
+		CalledNumber:  "+3333",
+	}
+	tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+	res, err := EvaluateDispatchRule("p_123", tr, d, r)
+	require.NoError(t, err)
+	require.NotNil(t, res.Media)
+	require.NotNil(t, res.Media.MediaTimeout)
+	require.Equal(t, 5*time.Minute, res.Media.MediaTimeout.AsDuration())
 }
 
 func TestMatchIP(t *testing.T) {

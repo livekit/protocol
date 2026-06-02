@@ -556,6 +556,7 @@ type GetSIPTrunkAuthenticationResponse struct {
 	// Expected username and password
 	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Realm    string `protobuf:"bytes,9,opt,name=realm,proto3" json:"realm,omitempty"`
 	Drop     bool   `protobuf:"varint,3,opt,name=drop,proto3" json:"drop,omitempty"`
 	// Trunk used to fulfill this request
 	SipTrunkId string `protobuf:"bytes,4,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
@@ -610,6 +611,13 @@ func (x *GetSIPTrunkAuthenticationResponse) GetUsername() string {
 func (x *GetSIPTrunkAuthenticationResponse) GetPassword() string {
 	if x != nil {
 		return x.Password
+	}
+	return ""
+}
+
+func (x *GetSIPTrunkAuthenticationResponse) GetRealm() string {
+	if x != nil {
+		return x.Realm
 	}
 	return ""
 }
@@ -1314,10 +1322,11 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\ato_host\x18\x05 \x01(\tB\x02\x18\x01R\x06toHost\x12#\n" +
 	"\vsrc_address\x18\x04 \x01(\tB\x02\x18\x01R\n" +
 	"srcAddress\x12 \n" +
-	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xb6\x04\n" +
+	"\x04call\x18\b \x01(\v2\f.rpc.SIPCallR\x04call\"\xcc\x04\n" +
 	"!GetSIPTrunkAuthenticationResponse\x12@\n" +
-	"\busername\x18\x01 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\busername\x12@\n" +
-	"\bpassword\x18\x02 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bpassword\x12\x12\n" +
+	"\busername\x18\x01 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\busername\x12@\n" +
+	"\bpassword\x18\x02 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x02R\bpassword\x12\x14\n" +
+	"\x05realm\x18\t \x01(\tR\x05realm\x12\x12\n" +
 	"\x04drop\x18\x03 \x01(\bR\x04drop\x12/\n" +
 	"\fsip_trunk_id\x18\x04 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
@@ -1347,7 +1356,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x06no_pin\x18\x06 \x01(\bR\x05noPin\x12#\n" +
 	"\vcalled_host\x18\a \x01(\tB\x02\x18\x01R\n" +
 	"calledHost\x12\x8a\x01\n" +
-	"\x10extra_attributes\x18\t \x03(\v29.rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fextraAttributes\x12 \n" +
+	"\x10extra_attributes\x18\t \x03(\v29.rpc.EvaluateSIPDispatchRulesRequest.ExtraAttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x0fextraAttributes\x12 \n" +
 	"\x04call\x18\f \x01(\v2\f.rpc.SIPCallR\x04call\x1aB\n" +
 	"\x14ExtraAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -1355,12 +1364,12 @@ const file_rpc_io_proto_rawDesc = "" +
 	" EvaluateSIPDispatchRulesResponse\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12O\n" +
-	"\x10participant_name\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12W\n" +
-	"\x14participant_metadata\x18\b \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9d\x01\n" +
-	"\x16participant_attributes\x18\v \x03(\v2@.rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12#\n" +
+	"\x10participant_name\x18\a \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\b \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x13participantMetadata\x12\x9d\x01\n" +
+	"\x16participant_attributes\x18\v \x03(\v2@.rpc.EvaluateSIPDispatchRulesResponse.ParticipantAttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x15participantAttributes\x12#\n" +
 	"\vrequest_pin\x18\x03 \x01(\bB\x02\x18\x01R\n" +
 	"requestPin\x12:\n" +
-	"\x05token\x18\x04 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x05token\x12\x15\n" +
+	"\x05token\x18\x04 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x02R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x05 \x01(\tR\x05wsUrl\x12.\n" +
 	"\x06result\x18\x06 \x01(\x0e2\x16.rpc.SIPDispatchResultR\x06result\x12/\n" +
 	"\fsip_trunk_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -1370,7 +1379,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	" \x01(\tB\x14\xbaP\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x12+\n" +
 	"\n" +
 	"project_id\x18\f \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12r\n" +
-	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12r\n" +
+	"\aheaders\x18\r \x03(\v22.rpc.EvaluateSIPDispatchRulesResponse.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12r\n" +
 	"\x15headers_to_attributes\x18\x0e \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.HeadersToAttributesEntryR\x13headersToAttributes\x12r\n" +
 	"\x15attributes_to_headers\x18\x12 \x03(\v2>.rpc.EvaluateSIPDispatchRulesResponse.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
 	"\x0finclude_headers\x18\x13 \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12>\n" +
@@ -1437,6 +1446,11 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\rCreateIngress\x12\x14.livekit.IngressInfo\x1a\x16.google.protobuf.Empty\x12I\n" +
 	"\x0eGetIngressInfo\x12\x1a.rpc.GetIngressInfoRequest\x1a\x1b.rpc.GetIngressInfoResponse\x12L\n" +
 	"\x12UpdateIngressState\x12\x1e.rpc.UpdateIngressStateRequest\x1a\x16.google.protobuf.Empty\x12j\n" +
+	"\x19GetSIPTrunkAuthentication\x12%.rpc.GetSIPTrunkAuthenticationRequest\x1a&.rpc.GetSIPTrunkAuthenticationResponse\x12g\n" +
+	"\x18EvaluateSIPDispatchRules\x12$.rpc.EvaluateSIPDispatchRulesRequest\x1a%.rpc.EvaluateSIPDispatchRulesResponse\x12L\n" +
+	"\x12UpdateSIPCallState\x12\x1e.rpc.UpdateSIPCallStateRequest\x1a\x16.google.protobuf.Empty\x12J\n" +
+	"\x11RecordCallContext\x12\x1d.rpc.RecordCallContextRequest\x1a\x16.google.protobuf.Empty2\xfa\x02\n" +
+	"\tIOInfoSIP\x12j\n" +
 	"\x19GetSIPTrunkAuthentication\x12%.rpc.GetSIPTrunkAuthenticationRequest\x1a&.rpc.GetSIPTrunkAuthenticationResponse\x12g\n" +
 	"\x18EvaluateSIPDispatchRules\x12$.rpc.EvaluateSIPDispatchRulesRequest\x1a%.rpc.EvaluateSIPDispatchRulesResponse\x12L\n" +
 	"\x12UpdateSIPCallState\x12\x1e.rpc.UpdateSIPCallStateRequest\x1a\x16.google.protobuf.Empty\x12J\n" +
@@ -1541,20 +1555,28 @@ var file_rpc_io_proto_depIdxs = []int32{
 	9,  // 40: rpc.IOInfo.EvaluateSIPDispatchRules:input_type -> rpc.EvaluateSIPDispatchRulesRequest
 	11, // 41: rpc.IOInfo.UpdateSIPCallState:input_type -> rpc.UpdateSIPCallStateRequest
 	12, // 42: rpc.IOInfo.RecordCallContext:input_type -> rpc.RecordCallContextRequest
-	37, // 43: rpc.IOInfo.CreateEgress:output_type -> google.protobuf.Empty
-	37, // 44: rpc.IOInfo.UpdateEgress:output_type -> google.protobuf.Empty
-	23, // 45: rpc.IOInfo.GetEgress:output_type -> livekit.EgressInfo
-	38, // 46: rpc.IOInfo.ListEgress:output_type -> livekit.ListEgressResponse
-	37, // 47: rpc.IOInfo.UpdateMetrics:output_type -> google.protobuf.Empty
-	37, // 48: rpc.IOInfo.CreateIngress:output_type -> google.protobuf.Empty
-	5,  // 49: rpc.IOInfo.GetIngressInfo:output_type -> rpc.GetIngressInfoResponse
-	37, // 50: rpc.IOInfo.UpdateIngressState:output_type -> google.protobuf.Empty
-	8,  // 51: rpc.IOInfo.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
-	10, // 52: rpc.IOInfo.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
-	37, // 53: rpc.IOInfo.UpdateSIPCallState:output_type -> google.protobuf.Empty
-	37, // 54: rpc.IOInfo.RecordCallContext:output_type -> google.protobuf.Empty
-	43, // [43:55] is the sub-list for method output_type
-	31, // [31:43] is the sub-list for method input_type
+	7,  // 43: rpc.IOInfoSIP.GetSIPTrunkAuthentication:input_type -> rpc.GetSIPTrunkAuthenticationRequest
+	9,  // 44: rpc.IOInfoSIP.EvaluateSIPDispatchRules:input_type -> rpc.EvaluateSIPDispatchRulesRequest
+	11, // 45: rpc.IOInfoSIP.UpdateSIPCallState:input_type -> rpc.UpdateSIPCallStateRequest
+	12, // 46: rpc.IOInfoSIP.RecordCallContext:input_type -> rpc.RecordCallContextRequest
+	37, // 47: rpc.IOInfo.CreateEgress:output_type -> google.protobuf.Empty
+	37, // 48: rpc.IOInfo.UpdateEgress:output_type -> google.protobuf.Empty
+	23, // 49: rpc.IOInfo.GetEgress:output_type -> livekit.EgressInfo
+	38, // 50: rpc.IOInfo.ListEgress:output_type -> livekit.ListEgressResponse
+	37, // 51: rpc.IOInfo.UpdateMetrics:output_type -> google.protobuf.Empty
+	37, // 52: rpc.IOInfo.CreateIngress:output_type -> google.protobuf.Empty
+	5,  // 53: rpc.IOInfo.GetIngressInfo:output_type -> rpc.GetIngressInfoResponse
+	37, // 54: rpc.IOInfo.UpdateIngressState:output_type -> google.protobuf.Empty
+	8,  // 55: rpc.IOInfo.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
+	10, // 56: rpc.IOInfo.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
+	37, // 57: rpc.IOInfo.UpdateSIPCallState:output_type -> google.protobuf.Empty
+	37, // 58: rpc.IOInfo.RecordCallContext:output_type -> google.protobuf.Empty
+	8,  // 59: rpc.IOInfoSIP.GetSIPTrunkAuthentication:output_type -> rpc.GetSIPTrunkAuthenticationResponse
+	10, // 60: rpc.IOInfoSIP.EvaluateSIPDispatchRules:output_type -> rpc.EvaluateSIPDispatchRulesResponse
+	37, // 61: rpc.IOInfoSIP.UpdateSIPCallState:output_type -> google.protobuf.Empty
+	37, // 62: rpc.IOInfoSIP.RecordCallContext:output_type -> google.protobuf.Empty
+	47, // [47:63] is the sub-list for method output_type
+	31, // [31:47] is the sub-list for method input_type
 	31, // [31:31] is the sub-list for extension type_name
 	31, // [31:31] is the sub-list for extension extendee
 	0,  // [0:31] is the sub-list for field type_name
@@ -1573,7 +1595,7 @@ func file_rpc_io_proto_init() {
 			NumEnums:      2,
 			NumMessages:   21,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_rpc_io_proto_goTypes,
 		DependencyIndexes: file_rpc_io_proto_depIdxs,

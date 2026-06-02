@@ -159,3 +159,11 @@ func RoomFeatureFromParticipantKind(k livekit.ParticipantInfo_Kind) RoomFeature 
 		return 0
 	}
 }
+
+func ParticipantKindCode(k livekit.ParticipantInfo_Kind) int32 {
+	return int32(k)
+}
+
+func ParticipantKindDetailsCodes(d []livekit.ParticipantInfo_KindDetail) []int32 {
+	return *(*[]int32)(unsafe.Pointer(&d))
+}
