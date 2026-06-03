@@ -369,6 +369,7 @@ type NodeStats struct {
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	ParticipantRtcInitPerSec float32 `protobuf:"fixed32,47,opt,name=participant_rtc_init_per_sec,json=participantRtcInitPerSec,proto3" json:"participant_rtc_init_per_sec,omitempty"`
 	ParticipantRtcCanceled   uint64  `protobuf:"varint,53,opt,name=participant_rtc_canceled,json=participantRtcCanceled,proto3" json:"participant_rtc_canceled,omitempty"`
+	ParticipantRtcActive     uint64  `protobuf:"varint,54,opt,name=participant_rtc_active,json=participantRtcActive,proto3" json:"participant_rtc_active,omitempty"`
 	// forward metrics
 	ForwardLatency uint32           `protobuf:"varint,48,opt,name=forward_latency,json=forwardLatency,proto3" json:"forward_latency,omitempty"`
 	ForwardJitter  uint32           `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
@@ -774,6 +775,13 @@ func (x *NodeStats) GetParticipantRtcCanceled() uint64 {
 	return 0
 }
 
+func (x *NodeStats) GetParticipantRtcActive() uint64 {
+	if x != nil {
+		return x.ParticipantRtcActive
+	}
+	return 0
+}
+
 func (x *NodeStats) GetForwardLatency() uint32 {
 	if x != nil {
 		return x.ForwardLatency
@@ -820,6 +828,7 @@ type NodeStatsRate struct {
 	ParticipantRtcConnected    float32                `protobuf:"fixed32,18,opt,name=participant_rtc_connected,json=participantRtcConnected,proto3" json:"participant_rtc_connected,omitempty"`
 	ParticipantRtcInit         float32                `protobuf:"fixed32,19,opt,name=participant_rtc_init,json=participantRtcInit,proto3" json:"participant_rtc_init,omitempty"`
 	ParticipantRtcCanceled     float32                `protobuf:"fixed32,26,opt,name=participant_rtc_canceled,json=participantRtcCanceled,proto3" json:"participant_rtc_canceled,omitempty"`
+	ParticipantRtcActive       float32                `protobuf:"fixed32,27,opt,name=participant_rtc_active,json=participantRtcActive,proto3" json:"participant_rtc_active,omitempty"`
 	// time weighted averages across stats windows forming part of a rate measurement interval
 	CpuLoad       float32 `protobuf:"fixed32,20,opt,name=cpu_load,json=cpuLoad,proto3" json:"cpu_load,omitempty"`
 	MemoryLoad    float32 `protobuf:"fixed32,21,opt,name=memory_load,json=memoryLoad,proto3" json:"memory_load,omitempty"`
@@ -1009,6 +1018,13 @@ func (x *NodeStatsRate) GetParticipantRtcInit() float32 {
 func (x *NodeStatsRate) GetParticipantRtcCanceled() float32 {
 	if x != nil {
 		return x.ParticipantRtcCanceled
+	}
+	return 0
+}
+
+func (x *NodeStatsRate) GetParticipantRtcActive() float32 {
+	if x != nil {
+		return x.ParticipantRtcActive
 	}
 	return 0
 }
@@ -1417,7 +1433,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xe4\x14\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\x9a\x15\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1478,10 +1494,11 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"!participant_rtc_connected_per_sec\x18- \x01(\x02B\x02\x18\x01R\x1dparticipantRtcConnectedPerSec\x120\n" +
 	"\x14participant_rtc_init\x18. \x01(\x04R\x12participantRtcInit\x12B\n" +
 	"\x1cparticipant_rtc_init_per_sec\x18/ \x01(\x02B\x02\x18\x01R\x18participantRtcInitPerSec\x128\n" +
-	"\x18participant_rtc_canceled\x185 \x01(\x04R\x16participantRtcCanceled\x12'\n" +
+	"\x18participant_rtc_canceled\x185 \x01(\x04R\x16participantRtcCanceled\x124\n" +
+	"\x16participant_rtc_active\x186 \x01(\x04R\x14participantRtcActive\x12'\n" +
 	"\x0fforward_latency\x180 \x01(\rR\x0eforwardLatency\x12%\n" +
 	"\x0eforward_jitter\x181 \x01(\rR\rforwardJitter\x12,\n" +
-	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\xee\b\n" +
+	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\xa4\t\n" +
 	"\rNodeStatsRate\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x19\n" +
@@ -1509,7 +1526,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x1cparticipant_signal_connected\x18\x11 \x01(\x02R\x1aparticipantSignalConnected\x12:\n" +
 	"\x19participant_rtc_connected\x18\x12 \x01(\x02R\x17participantRtcConnected\x120\n" +
 	"\x14participant_rtc_init\x18\x13 \x01(\x02R\x12participantRtcInit\x128\n" +
-	"\x18participant_rtc_canceled\x18\x1a \x01(\x02R\x16participantRtcCanceled\x12\x19\n" +
+	"\x18participant_rtc_canceled\x18\x1a \x01(\x02R\x16participantRtcCanceled\x124\n" +
+	"\x16participant_rtc_active\x18\x1b \x01(\x02R\x14participantRtcActive\x12\x19\n" +
 	"\bcpu_load\x18\x14 \x01(\x02R\acpuLoad\x12\x1f\n" +
 	"\vmemory_load\x18\x15 \x01(\x02R\n" +
 	"memoryLoad\x12\x1f\n" +
