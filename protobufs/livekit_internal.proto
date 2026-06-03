@@ -119,6 +119,7 @@ message NodeStats {
   uint64 participant_rtc_init = 46;
   float participant_rtc_init_per_sec = 47 [deprecated = true];
   uint64 participant_rtc_canceled = 53;
+  uint64 participant_rtc_active = 54;
 
   // forward metrics
   uint32 forward_latency = 48;
@@ -126,7 +127,7 @@ message NodeStats {
 
   repeated NodeStatsRate rates = 50;
 
-  // NEXT ID: 54
+  // NEXT ID: 55
 }
 
 // rates of different node stats (per second)
@@ -158,6 +159,7 @@ message NodeStatsRate {
   float participant_rtc_connected = 18;
   float participant_rtc_init = 19;
   float participant_rtc_canceled = 26;
+  float participant_rtc_active = 27;
 
   // time weighted averages across stats windows forming part of a rate measurement interval
   float cpu_load = 20;
@@ -165,7 +167,7 @@ message NodeStatsRate {
   float memory_used = 22;
   float memory_total = 23;
 
-  // NEXT ID: 27
+  // NEXT ID: 28
 }
 
 message StartSession {
