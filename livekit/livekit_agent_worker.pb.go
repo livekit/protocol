@@ -21,7 +21,6 @@
 package livekit
 
 import (
-	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -124,7 +123,7 @@ var File_livekit_agent_worker_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_worker_proto_rawDesc = "" +
 	"\n" +
-	"\x1alivekit_agent_worker.proto\x12\alivekit\x1a\x14logger/options.proto\"\xda\x01\n" +
+	"\x1alivekit_agent_worker.proto\x12\alivekit\"\xda\x01\n" +
 	"\n" +
 	"WorkerInfo\x12\x1f\n" +
 	"\vworker_type\x18\x01 \x01(\tR\n" +
