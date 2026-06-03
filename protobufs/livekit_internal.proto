@@ -114,6 +114,8 @@ message NodeStats {
   // participant joins
   uint64 participant_signal_connected = 26;
   float participant_signal_connected_per_sec = 27 [deprecated = true];
+  uint64 participant_signal_failed = 55;
+  uint64 participant_signal_validation_failed = 56;
   uint64 participant_rtc_connected = 44;
   float participant_rtc_connected_per_sec = 45 [deprecated = true];
   uint64 participant_rtc_init = 46;
@@ -127,7 +129,7 @@ message NodeStats {
 
   repeated NodeStatsRate rates = 50;
 
-  // NEXT ID: 55
+  // NEXT ID: 57
 }
 
 // rates of different node stats (per second)
@@ -156,6 +158,8 @@ message NodeStatsRate {
   float retransmit_packets_out = 16;
 
   float participant_signal_connected = 17;
+  float participant_signal_failed = 28;
+  float participant_signal_validation_failed = 29;
   float participant_rtc_connected = 18;
   float participant_rtc_init = 19;
   float participant_rtc_canceled = 26;
@@ -167,7 +171,7 @@ message NodeStatsRate {
   float memory_used = 22;
   float memory_total = 23;
 
-  // NEXT ID: 28
+  // NEXT ID: 30
 }
 
 message StartSession {
