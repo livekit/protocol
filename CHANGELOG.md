@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.46.6
+
+### Patch Changes
+
+- Add prometheus metrics to ConfigObserver - [#1602](https://github.com/livekit/protocol/pull/1602) ([@fede1024](https://github.com/fede1024))
+
 ## 1.46.5
 
 ### Patch Changes
