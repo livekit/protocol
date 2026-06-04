@@ -23,9 +23,10 @@ import (
 	"testing"
 	"time"
 
+	"sync/atomic"
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
@@ -100,7 +101,7 @@ func TestURLNotifierDropped(t *testing.T) {
 	s.handler = func(w http.ResponseWriter, r *http.Request) {
 		decodedEvent, err := ReceiveWebhookEvent(r, authProvider)
 		require.NoError(t, err)
-		totalReceived.Inc()
+		totalReceived.Add(1)
 		totalDropped.Add(decodedEvent.NumDropped)
 	}
 	// send multiple notifications
@@ -133,7 +134,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		urlNotifier := newTestNotifier()
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 		for i := 0; i < 10; i++ {
 			_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -147,7 +148,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		urlNotifier := newTestNotifier()
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 		for i := 0; i < 10; i++ {
 			_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -182,7 +183,7 @@ func TestURLNotifierLifecycle(t *testing.T) {
 			time.Sleep(time.Second)
 			if r.Context().Err() == nil {
 				// inc if not canceled
-				numCalled.Inc()
+				numCalled.Add(1)
 			}
 		}
 		defer urlNotifier.Stop(false)
@@ -237,7 +238,7 @@ func TestURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -268,7 +269,7 @@ func TestURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -299,7 +300,7 @@ func TestURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -331,7 +332,7 @@ func TestURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		// EventRoomStarted should be allowed as IncludeEvents take precedence
@@ -415,21 +416,21 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			_, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
-			totalReceived.Inc()
+			totalReceived.Add(1)
 		}
 		// send multiple notifications
 		for i := 0; i < 10; i++ {
 			err := resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 			if err == errQueueFull {
-				totalDropped.Inc()
+				totalDropped.Add(1)
 			}
 			err = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventParticipantJoined})
 			if err == errQueueFull {
-				totalDropped.Inc()
+				totalDropped.Add(1)
 			}
 			err = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 			if err == errQueueFull {
-				totalDropped.Inc()
+				totalDropped.Add(1)
 			}
 		}
 
@@ -456,7 +457,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 			time.Sleep(5 * time.Millisecond)
 			_, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
-			totalReceived.Inc()
+			totalReceived.Add(1)
 		}
 		// send multiple notifications
 		for i := 0; i < 10; i++ {
@@ -482,7 +483,7 @@ func TestResourceURLNotifierDropped(t *testing.T) {
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
 			_, err := ReceiveWebhookEvent(r, authProvider)
 			require.NoError(t, err)
-			totalReceived.Inc()
+			totalReceived.Add(1)
 		}
 
 		// check that resource queues change for the same event key
@@ -566,7 +567,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		resourceURLNotifier := newTestResourceNotifier(200*time.Millisecond, 200*time.Millisecond, 50)
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 		for i := 0; i < 10; i++ {
 			roomName := fmt.Sprintf("room%d", i)
@@ -609,7 +610,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		resourceURLNotifier := newTestResourceNotifier(time.Minute, 200*time.Millisecond, 50)
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 		for i := 0; i < 10; i++ {
 			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -623,7 +624,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		resourceURLNotifier := newTestResourceNotifier(time.Minute, 200*time.Millisecond, 50)
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 		for i := 0; i < 10; i++ {
 			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -661,7 +662,7 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 			time.Sleep(time.Second)
 			if r.Context().Err() == nil {
 				// inc if not canceled
-				numCalled.Inc()
+				numCalled.Add(1)
 			}
 		}
 		defer resourceURLNotifier.Stop(false)
@@ -720,7 +721,7 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -752,7 +753,7 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -784,7 +785,7 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
@@ -817,7 +818,7 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
-			numCalled.Inc()
+			numCalled.Add(1)
 		}
 
 		// EventRoomStarted should be allowed as IncludeEvents take precedence

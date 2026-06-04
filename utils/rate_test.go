@@ -29,7 +29,7 @@ import (
 	"testing"
 	"time"
 
-	"go.uber.org/atomic"
+	"sync/atomic"
 
 	"github.com/benbjohnson/clock"
 	"github.com/stretchr/testify/require"
@@ -250,7 +250,7 @@ func (r *runnerImpl) startTaking(rls ...Limiter) {
 			for _, rl := range rls {
 				rl.Take()
 			}
-			r.count.Inc()
+			r.count.Add(1)
 			select {
 			case <-r.doneCh:
 				return
@@ -265,7 +265,7 @@ func (r *runnerImpl) takeOnceAfter(d time.Duration, rl Limiter) {
 	r.wg.Add(1)
 	r.afterFunc(d, func() {
 		rl.Take()
-		r.count.Inc()
+		r.count.Add(1)
 		r.wg.Done()
 	})
 }

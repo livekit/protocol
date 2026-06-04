@@ -17,9 +17,10 @@ package redis
 import (
 	"context"
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/livekit/protocol/xtls"
@@ -155,7 +156,7 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	rc = redis.NewUniversalClient(rcOptions)
 
 	if err := rc.Ping(context.Background()).Err(); err != nil {
-		err = errors.Wrap(err, "unable to connect to redis")
+		err = fmt.Errorf("unable to connect to redis: %w", err)
 		return nil, err
 	}
 

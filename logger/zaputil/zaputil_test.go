@@ -15,8 +15,8 @@
 package zaputil
 
 import (
-	"go.uber.org/atomic"
 	"go.uber.org/zap/zapcore"
+	"sync/atomic"
 )
 
 type testStringer string
@@ -53,6 +53,6 @@ func (c *testCore) With(fields []zapcore.Field) zapcore.Core {
 
 func (c *testCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	c.init()
-	c.writeCount.Inc()
+	c.writeCount.Add(1)
 	return nil
 }

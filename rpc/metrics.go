@@ -20,8 +20,8 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"go.uber.org/atomic"
 	"golang.org/x/exp/maps"
+	"sync/atomic"
 
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"

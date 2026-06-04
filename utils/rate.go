@@ -27,7 +27,7 @@ import (
 	"sync"
 	"time"
 
-	"go.uber.org/atomic"
+	"sync/atomic"
 )
 
 type LeakyBucket struct {

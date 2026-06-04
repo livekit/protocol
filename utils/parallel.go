@@ -17,8 +17,7 @@ package utils
 import (
 	"runtime"
 	"sync"
-
-	"go.uber.org/atomic"
+	"sync/atomic"
 )
 
 // ParallelExec will executes the given function with each element of vals, if len(vals) >= parallelThreshold,
@@ -32,7 +31,7 @@ func ParallelExec[T any](vals []T, parallelThreshold, step uint64, fn func(T)) {
 	}
 
 	// parallel - enables much more efficient multi-core utilization
-	start := atomic.NewUint64(0)
+	var start atomic.Uint64
 	end := uint64(len(vals))
 
 	var wg sync.WaitGroup

@@ -15,17 +15,27 @@
 package hwstats
 
 import (
+	"math"
 	"os"
 	"strconv"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/frostbyte73/core"
 	"github.com/prometheus/procfs"
-	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/logger"
 )
+
+// atomicFloat64 stores a float64 in a sync/atomic.Uint64 via its IEEE-754 bit
+// representation. sync/atomic has no Float64.
+type atomicFloat64 struct {
+	v atomic.Uint64
+}
+
+func (a *atomicFloat64) Load() float64   { return math.Float64frombits(a.v.Load()) }
+func (a *atomicFloat64) Store(v float64) { a.v.Store(math.Float64bits(v)) }
 
 // This object returns cgroup quota aware cpu stats. On other systems than Linux,
 // it falls back to full system stats
@@ -63,7 +73,7 @@ type platformCPUMonitor interface {
 }
 
 type CPUStats struct {
-	idleCPUs atomic.Float64
+	idleCPUs atomicFloat64
 	platform platformCPUMonitor
 
 	idleCallback    func(idle float64)

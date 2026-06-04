@@ -18,9 +18,9 @@ import (
 	"slices"
 	"sync"
 
-	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"sync/atomic"
 )
 
 type deferredWrite struct {
