@@ -18,9 +18,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
-	"github.com/go-jose/go-jose/v3/json"
-	"github.com/go-jose/go-jose/v3/jwt"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/json"
+	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/auth"
@@ -28,7 +28,7 @@ import (
 
 func TestVerifier(t *testing.T) {
 	apiKey := "APID3B67uxk4Nj2GKiRPibAZ9"
-	secret := "YHC-CUhbQhGeVCaYgn1BNA++"
+	secret := "7uxiM/OjTlB+X4Ep6TrZfi+PK2A/ekuPwiw"
 	accessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDg5MzAzMDgsImlzcyI6IkFQSUQzQjY3dXhrNE5qMkdLaVJQaWJBWjkiLCJuYmYiOjE2MDg5MjY3MDgsInJvb21fam9pbiI6dHJ1ZSwicm9vbV9zaWQiOiJteWlkIiwic3ViIjoiQVBJRDNCNjd1eGs0TmoyR0tpUlBpYkFaOSJ9.cmHEBq0MLyRqphmVLM2cLXg5ao5Sro7am8yXhcYKcwE"
 	t.Run("cannot decode with incorrect key", func(t *testing.T) {
 		v, err := auth.ParseAPIToken(accessToken)
@@ -127,7 +127,7 @@ func TestVerifier(t *testing.T) {
 				"someFutureRoomConfigField": "future-value",
 			},
 		}
-		token, err := jwt.Signed(sig).Claims(claims).CompactSerialize()
+		token, err := jwt.Signed(sig).Claims(claims).Serialize()
 		require.NoError(t, err)
 
 		v, err := auth.ParseAPIToken(token)

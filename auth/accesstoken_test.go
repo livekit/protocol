@@ -21,7 +21,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v3/jwt"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/livekit"
@@ -59,7 +60,7 @@ func TestAccessToken(t *testing.T) {
 		require.Len(t, strings.Split(value, "."), 3)
 
 		// ensure it's a valid JWT
-		token, err := jwt.ParseSigned(value)
+		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
 		require.NoError(t, err)
 
 		decodedGrant := ClaimGrants{}
@@ -79,7 +80,7 @@ func TestAccessToken(t *testing.T) {
 			SetVideoGrant(&VideoGrant{RoomJoin: true, Room: "myroom"}).
 			ToJWT()
 		require.NoError(t, err)
-		token, err := jwt.ParseSigned(value)
+		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
 		require.NoError(t, err)
 
 		decodedGrant := ClaimGrants{}
@@ -97,7 +98,7 @@ func TestAccessToken(t *testing.T) {
 			SetVideoGrant(videoGrant)
 		value, err := at.ToJWT()
 		require.NoError(t, err)
-		token, err := jwt.ParseSigned(value)
+		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
 		require.NoError(t, err)
 
 		claim := jwt.Claims{}
@@ -135,7 +136,7 @@ func TestAccessToken(t *testing.T) {
 		require.NoError(t, err)
 
 		// Parse and verify the token
-		token, err := jwt.ParseSigned(value)
+		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
 		require.NoError(t, err)
 
 		decodedGrant := ClaimGrants{}

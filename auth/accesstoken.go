@@ -17,8 +17,8 @@ package auth
 import (
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
-	"github.com/go-jose/go-jose/v3/jwt"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/go-jose/go-jose/v4/jwt"
 
 	"github.com/livekit/protocol/livekit"
 )
@@ -191,5 +191,5 @@ func (t *AccessToken) ToJWT() (string, error) {
 		Expiry:    jwt.NewNumericDate(time.Now().Add(validFor)),
 		Subject:   t.grant.Identity,
 	}
-	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).CompactSerialize()
+	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).Serialize()
 }
