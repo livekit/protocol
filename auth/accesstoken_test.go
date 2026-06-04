@@ -21,8 +21,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v4"
-	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/livekit"
@@ -60,12 +58,10 @@ func TestAccessToken(t *testing.T) {
 		require.Len(t, strings.Split(value, "."), 3)
 
 		// ensure it's a valid JWT
-		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
+		decoded := tokenClaims{}
+		_, _, err = unverifiedParser.ParseUnverified(value, &decoded)
 		require.NoError(t, err)
-
-		decodedGrant := ClaimGrants{}
-		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
-		require.NoError(t, err)
+		decodedGrant := decoded.ClaimGrants
 
 		require.EqualValues(t, livekit.ParticipantInfo_AGENT, decodedGrant.GetParticipantKind())
 		require.EqualValues(t, videoGrant, decodedGrant.Video)
@@ -80,15 +76,12 @@ func TestAccessToken(t *testing.T) {
 			SetVideoGrant(&VideoGrant{RoomJoin: true, Room: "myroom"}).
 			ToJWT()
 		require.NoError(t, err)
-		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
-		require.NoError(t, err)
-
-		decodedGrant := ClaimGrants{}
-		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
+		decoded := tokenClaims{}
+		_, _, err = unverifiedParser.ParseUnverified(value, &decoded)
 		require.NoError(t, err)
 
 		// default validity
-		require.EqualValues(t, livekit.ParticipantInfo_STANDARD, decodedGrant.GetParticipantKind())
+		require.EqualValues(t, livekit.ParticipantInfo_STANDARD, decoded.GetParticipantKind())
 	})
 
 	t.Run("default validity should be more than a minute", func(t *testing.T) {
@@ -98,17 +91,13 @@ func TestAccessToken(t *testing.T) {
 			SetVideoGrant(videoGrant)
 		value, err := at.ToJWT()
 		require.NoError(t, err)
-		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
+		decoded := tokenClaims{}
+		_, _, err = unverifiedParser.ParseUnverified(value, &decoded)
 		require.NoError(t, err)
-
-		claim := jwt.Claims{}
-		decodedGrant := ClaimGrants{}
-		err = token.UnsafeClaimsWithoutVerification(&claim, &decodedGrant)
-		require.NoError(t, err)
-		require.EqualValues(t, videoGrant, decodedGrant.Video)
+		require.EqualValues(t, videoGrant, decoded.Video)
 
 		// default validity
-		require.True(t, claim.Expiry.Time().Sub(claim.IssuedAt.Time()) > time.Minute)
+		require.True(t, decoded.ExpiresAt.Sub(decoded.IssuedAt.Time) > time.Minute)
 	})
 
 	t.Run("room configuration serialization and deserialization", func(t *testing.T) {
@@ -136,15 +125,12 @@ func TestAccessToken(t *testing.T) {
 		require.NoError(t, err)
 
 		// Parse and verify the token
-		token, err := jwt.ParseSigned(value, []jose.SignatureAlgorithm{jose.HS256})
-		require.NoError(t, err)
-
-		decodedGrant := ClaimGrants{}
-		err = token.UnsafeClaimsWithoutVerification(&decodedGrant)
+		decoded := tokenClaims{}
+		_, _, err = unverifiedParser.ParseUnverified(value, &decoded)
 		require.NoError(t, err)
 
 		// Check if the room configuration was correctly serialized and deserialized
-		roomDecoded := (*livekit.RoomConfiguration)(decodedGrant.RoomConfig)
+		roomDecoded := (*livekit.RoomConfiguration)(decoded.RoomConfig)
 		require.NotNil(t, roomDecoded)
 		agents := roomDecoded.Agents
 		require.NotNil(t, agents)

@@ -17,11 +17,17 @@ package auth
 import (
 	"time"
 
-	"github.com/go-jose/go-jose/v4"
-	"github.com/go-jose/go-jose/v4/jwt"
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/livekit/protocol/livekit"
 )
+
+// tokenClaims combines the JWT registered claims with LiveKit grants for
+// signing and verification.
+type tokenClaims struct {
+	jwt.RegisteredClaims
+	ClaimGrants
+}
 
 const (
 	defaultValidDuration = 6 * time.Hour
@@ -174,22 +180,21 @@ func (t *AccessToken) ToJWT() (string, error) {
 		}
 	}
 
-	sig, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.HS256, Key: []byte(t.secret)},
-		(&jose.SignerOptions{}).WithType("JWT"))
-	if err != nil {
-		return "", err
-	}
-
 	validFor := defaultValidDuration
 	if t.validFor > 0 {
 		validFor = t.validFor
 	}
 
-	cl := jwt.Claims{
-		Issuer:    t.apiKey,
-		NotBefore: jwt.NewNumericDate(time.Now()),
-		Expiry:    jwt.NewNumericDate(time.Now().Add(validFor)),
-		Subject:   t.grant.Identity,
+	now := time.Now()
+	claims := tokenClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Issuer:    t.apiKey,
+			Subject:   t.grant.Identity,
+			IssuedAt:  jwt.NewNumericDate(now),
+			NotBefore: jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(validFor)),
+		},
+		ClaimGrants: t.grant,
 	}
-	return jwt.Signed(sig).Claims(cl).Claims(&t.grant).Serialize()
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(t.secret))
 }
