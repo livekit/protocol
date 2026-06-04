@@ -28,7 +28,7 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
-var ErrNotConfigured = errors.New("Redis is not configured")
+var ErrNotConfigured = errors.New("redis is not configured")
 
 type RedisConfig struct {
 	Address  string `yaml:"address,omitempty"`
