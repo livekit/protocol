@@ -19,6 +19,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/utils/configutil"
@@ -26,6 +28,7 @@ import (
 
 const testConfig0 = `foo: a`
 const testConfig1 = `foo: b`
+const testConfigInvalid = `foo: [unterminated`
 
 type TestConfig struct {
 	Foo string `yaml:"foo"`
@@ -54,6 +57,7 @@ func TestConfigObserver(t *testing.T) {
 
 	obs, conf, err := NewConfigObserver(f.Name(), testConfigBuilder{})
 	require.NoError(t, err)
+	t.Cleanup(obs.Close)
 
 	require.Equal(t, "a", conf.Foo)
 	require.Equal(t, "c", conf.Bar)
@@ -63,6 +67,13 @@ func TestConfigObserver(t *testing.T) {
 	})
 
 	require.Equal(t, "a", atomicFoo.Load())
+
+	// the initial load publishes the config hash but does not count as a reload
+	require.Zero(t, counterVecValue(promConfigReloadTotal, f.Name(), "success"))
+	require.Equal(t,
+		float64(configHash([]byte(testConfig0))),
+		gaugeVecValue(promConfigHash, f.Name()),
+	)
 
 	done := make(chan struct{})
 	obs.Observe(func(c *TestConfig) {
@@ -81,4 +92,46 @@ func TestConfigObserver(t *testing.T) {
 	}
 
 	require.Equal(t, "b", atomicFoo.Load())
+
+	// the reload is counted and the hash gauge tracks the new config
+	require.Equal(t, float64(1), counterVecValue(promConfigReloadTotal, f.Name(), "success"))
+	require.Equal(t,
+		float64(configHash([]byte(testConfig1))),
+		gaugeVecValue(promConfigHash, f.Name()),
+	)
+
+	_, err = f.WriteAt([]byte(testConfigInvalid), 0)
+	require.NoError(t, err)
+
+	require.Eventually(t, func() bool {
+		return counterVecValue(promConfigReloadTotal, f.Name(), "failure") == 1
+	}, time.Second, 5*time.Millisecond)
+	require.Equal(t,
+		float64(configHash([]byte(testConfig1))),
+		gaugeVecValue(promConfigHash, f.Name()),
+	)
+}
+
+func gaugeVecValue(g *prometheus.GaugeVec, labels ...string) float64 {
+	m, err := g.GetMetricWithLabelValues(labels...)
+	if err != nil {
+		return 0
+	}
+	var dtoM dto.Metric
+	if err := m.Write(&dtoM); err != nil {
+		return 0
+	}
+	return dtoM.GetGauge().GetValue()
+}
+
+func counterVecValue(c *prometheus.CounterVec, labels ...string) float64 {
+	m, err := c.GetMetricWithLabelValues(labels...)
+	if err != nil {
+		return 0
+	}
+	var dtoM dto.Metric
+	if err := m.Write(&dtoM); err != nil {
+		return 0
+	}
+	return dtoM.GetCounter().GetValue()
 }
