@@ -29,6 +29,7 @@ import (
 const testConfig0 = `foo: a`
 const testConfig1 = `foo: b`
 const testConfigInvalid = `foo: [unterminated`
+const testConfig1Recover = `foo: b # recovered after invalid`
 
 type TestConfig struct {
 	Foo string `yaml:"foo"`
@@ -68,15 +69,17 @@ func TestConfigObserver(t *testing.T) {
 
 	require.Equal(t, "a", atomicFoo.Load())
 
-	// the initial load publishes the config hash but does not count as a reload
+	// the initial load publishes the config hash but does not count as a reload,
+	// and the load state is populated as healthy (0) from the start
 	require.Zero(t, counterVecValue(promConfigReloadTotal, f.Name(), "success"))
 	require.Equal(t,
 		float64(configHash([]byte(testConfig0))),
 		gaugeVecValue(promConfigHash, f.Name()),
 	)
+	require.Zero(t, gaugeVecValue(promConfigLoadState, f.Name()))
 
 	done := make(chan struct{})
-	obs.Observe(func(c *TestConfig) {
+	unsubscribe := obs.Observe(func(c *TestConfig) {
 		require.Equal(t, "b", c.Foo)
 		require.Equal(t, "c", c.Bar)
 		close(done)
@@ -93,12 +96,17 @@ func TestConfigObserver(t *testing.T) {
 
 	require.Equal(t, "b", atomicFoo.Load())
 
-	// the reload is counted and the hash gauge tracks the new config
+	// the reload is counted, the hash gauge tracks the new config, and the load
+	// state stays healthy (0)
 	require.Equal(t, float64(1), counterVecValue(promConfigReloadTotal, f.Name(), "success"))
 	require.Equal(t,
 		float64(configHash([]byte(testConfig1))),
 		gaugeVecValue(promConfigHash, f.Name()),
 	)
+	require.Zero(t, gaugeVecValue(promConfigLoadState, f.Name()))
+
+	// stop the one-shot observer above; the remaining writes don't expect it
+	unsubscribe()
 
 	_, err = f.WriteAt([]byte(testConfigInvalid), 0)
 	require.NoError(t, err)
@@ -110,6 +118,16 @@ func TestConfigObserver(t *testing.T) {
 		float64(configHash([]byte(testConfig1))),
 		gaugeVecValue(promConfigHash, f.Name()),
 	)
+	require.Equal(t, float64(1), gaugeVecValue(promConfigLoadState, f.Name()))
+
+	// a subsequent valid load clears the failure state back to 0
+	_, err = f.WriteAt([]byte(testConfig1Recover), 0)
+	require.NoError(t, err)
+
+	require.Eventually(t, func() bool {
+		return counterVecValue(promConfigReloadTotal, f.Name(), "success") == 2
+	}, time.Second, 5*time.Millisecond)
+	require.Zero(t, gaugeVecValue(promConfigLoadState, f.Name()))
 }
 
 func gaugeVecValue(g *prometheus.GaugeVec, labels ...string) float64 {

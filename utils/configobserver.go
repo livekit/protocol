@@ -131,8 +131,14 @@ func (c *ConfigObserver[T]) reload(path string) error {
 	return nil
 }
 
-func (c *ConfigObserver[T]) load(path string) (*T, error) {
-	conf, err := c.builder.New()
+func (c *ConfigObserver[T]) load(path string) (conf *T, err error) {
+	// always record the load outcome so livekit_config_load_state is populated
+	// from the initial load onward and flips on every subsequent load attempt.
+	if path != "" {
+		defer func() { setConfigLoadState(path, err != nil) }()
+	}
+
+	conf, err = c.builder.New()
 	if err != nil {
 		return nil, err
 	}
@@ -184,6 +190,13 @@ var (
 		Name:      "hash",
 		Help:      "Short checksum of the config file currently in use, for detecting changes. Not updated when a reload fails",
 	}, []string{"file"})
+
+	promConfigLoadState = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "livekit",
+		Subsystem: "config",
+		Name:      "load_state",
+		Help:      "0 when the config file last loaded successfully, 1 when the last load failed.",
+	}, []string{"file"})
 )
 
 // configHash returns a small checksum of the config bytes, used only to detect
@@ -198,6 +211,16 @@ func recordConfigReload(file string, success bool) {
 		status = "failure"
 	}
 	promConfigReloadTotal.WithLabelValues(file, status).Inc()
+}
+
+// setConfigLoadState publishes whether the most recent load of file failed:
+// 0 on success, 1 on failure.
+func setConfigLoadState(file string, failed bool) {
+	v := 0.0
+	if failed {
+		v = 1
+	}
+	promConfigLoadState.WithLabelValues(file).Set(v)
 }
 
 // setConfigHash publishes the checksum of the config currently in use for file.
