@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"sync/atomic"
+	"go.uber.org/atomic"
 )
 
 func TestHedgeCall(t *testing.T) {

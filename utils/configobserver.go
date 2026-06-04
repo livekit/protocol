@@ -19,8 +19,8 @@ import (
 	"os"
 
 	"github.com/fsnotify/fsnotify"
+	"go.uber.org/atomic"
 	"gopkg.in/yaml.v3"
-	"sync/atomic"
 
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/events"

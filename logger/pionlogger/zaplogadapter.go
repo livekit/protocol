@@ -17,9 +17,9 @@ package pionlogger
 import (
 	"fmt"
 
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"sync/atomic"
 
 	"github.com/livekit/protocol/logger"
 )

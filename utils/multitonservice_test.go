@@ -19,7 +19,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"sync/atomic"
+	"go.uber.org/atomic"
 )
 
 type testService struct {
@@ -31,7 +31,7 @@ func newTestService(key string) *testService {
 	return &testService{key: key}
 }
 
-func (s *testService) Kill() { s.killCalls.Add(1) }
+func (s *testService) Kill() { s.killCalls.Inc() }
 
 func TestMultitonService(t *testing.T) {
 	t.Run("start and stop are called", func(t *testing.T) {

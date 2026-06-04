@@ -27,7 +27,7 @@ import (
 
 	"github.com/frostbyte73/core"
 	"github.com/hashicorp/go-retryablehttp"
-	"sync/atomic"
+	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
@@ -224,7 +224,7 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 			ph(ctx, whi)
 		}
 	}) {
-		n.dropped.Add(1)
+		n.dropped.Inc()
 
 		fields := logFields(event, params.URL)
 		params.Logger.Infow("dropped webhook", fields...)
