@@ -16,9 +16,12 @@ package utils
 
 import (
 	"fmt"
+	"hash/crc32"
 	"os"
 
 	"github.com/fsnotify/fsnotify"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go.uber.org/atomic"
 	"gopkg.in/yaml.v3"
 
@@ -119,9 +122,11 @@ func (c *ConfigObserver[T]) watch() {
 func (c *ConfigObserver[T]) reload(path string) error {
 	conf, err := c.load(path)
 	if err != nil {
+		recordConfigReload(path, false)
 		return err
 	}
 
+	recordConfigReload(path, true)
 	c.EmitConfigUpdate(conf)
 	return nil
 }
@@ -132,6 +137,8 @@ func (c *ConfigObserver[T]) load(path string) (*T, error) {
 		return nil, err
 	}
 
+	var hash uint32
+	hasHash := false
 	if path != "" {
 		b, err := os.ReadFile(path)
 		if err != nil {
@@ -145,6 +152,9 @@ func (c *ConfigObserver[T]) load(path string) (*T, error) {
 		if err := yaml.Unmarshal(b, conf); err != nil {
 			return nil, fmt.Errorf("cannot parse config: %v", err)
 		}
+
+		hash = configHash(b)
+		hasHash = true
 	}
 
 	if d, ok := c.builder.(ConfigDefaulter[T]); ok {
@@ -153,5 +163,44 @@ func (c *ConfigObserver[T]) load(path string) (*T, error) {
 
 	c.conf.Store(conf)
 
+	if hasHash {
+		setConfigHash(path, hash)
+	}
+
 	return conf, err
+}
+
+var (
+	promConfigReloadTotal = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "livekit",
+		Subsystem: "config",
+		Name:      "reload_total",
+		Help:      "Number of times the config file has been reloaded, labeled by file and whether the reload succeeded",
+	}, []string{"file", "status"})
+
+	promConfigHash = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Namespace: "livekit",
+		Subsystem: "config",
+		Name:      "hash",
+		Help:      "Short checksum of the config file currently in use, for detecting changes. Not updated when a reload fails",
+	}, []string{"file"})
+)
+
+// configHash returns a small checksum of the config bytes, used only to detect
+// when the config content changes (not for any security purpose).
+func configHash(b []byte) uint32 {
+	return crc32.ChecksumIEEE(b) % 1_000_000
+}
+
+func recordConfigReload(file string, success bool) {
+	status := "success"
+	if !success {
+		status = "failure"
+	}
+	promConfigReloadTotal.WithLabelValues(file, status).Inc()
+}
+
+// setConfigHash publishes the checksum of the config currently in use for file.
+func setConfigHash(file string, hash uint32) {
+	promConfigHash.WithLabelValues(file).Set(float64(hash))
 }
