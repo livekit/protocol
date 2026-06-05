@@ -22,7 +22,7 @@ require (
 	github.com/nyaruka/phonenumbers v1.8.0
 	github.com/pion/logging v0.2.4
 	github.com/pion/sdp/v3 v3.0.18
-	github.com/pion/webrtc/v4 v4.2.14
+	github.com/pion/webrtc/v4 v4.2.11
 	github.com/prometheus/client_golang v1.23.2
 	github.com/prometheus/procfs v0.20.1
 	github.com/puzpuzpuz/xsync/v4 v4.5.0
@@ -76,7 +76,7 @@ require (
 	github.com/pion/randutil v0.1.0 // indirect
 	github.com/pion/rtcp v1.2.16 // indirect
 	github.com/pion/rtp v1.10.2 // indirect
-	github.com/pion/sctp v1.10.0 // indirect
+	github.com/pion/sctp v1.9.5 // indirect
 	github.com/pion/srtp/v3 v3.0.11 // indirect
 	github.com/pion/stun/v3 v3.1.4 // indirect
 	github.com/pion/transport/v4 v4.0.2 // indirect
