@@ -25,7 +25,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/logr/funcr"
-	"github.com/puzpuzpuz/xsync/v3"
+	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -210,8 +210,8 @@ func (c *sharedConfig) ComponentLevel(component string) zap.AtomicLevel {
 type zapConfig struct {
 	conf          *Config
 	sc            *sharedConfig
-	writeEnablers *xsync.MapOf[string, *zaputil.WriteEnabler]
-	levelEnablers *xsync.MapOf[string, *zaputil.OrLevelEnabler]
+	writeEnablers *xsync.Map[string, *zaputil.WriteEnabler]
+	levelEnablers *xsync.Map[string, *zaputil.OrLevelEnabler]
 	tap           *zaputil.WriteEnabler
 }
 
@@ -253,8 +253,8 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 	zc := &zapConfig{
 		conf:          conf,
 		sc:            newSharedConfig(conf),
-		writeEnablers: xsync.NewMapOf[string, *zaputil.WriteEnabler](),
-		levelEnablers: xsync.NewMapOf[string, *zaputil.OrLevelEnabler](),
+		writeEnablers: xsync.NewMap[string, *zaputil.WriteEnabler](),
+		levelEnablers: xsync.NewMap[string, *zaputil.OrLevelEnabler](),
 		tap:           zaputil.NewDiscardWriteEnabler(),
 	}
 	for _, opt := range opts {
@@ -299,8 +299,8 @@ func newZapLogger[T zaputil.Encoder[T]](zap *zap.SugaredLogger, zc *zapConfig, e
 func (l *zapLogger[T]) makeZap() *zap.SugaredLogger {
 	var console *zaputil.WriteEnabler
 	if l.minLevel == nil {
-		console, _ = l.writeEnablers.LoadOrCompute(l.component, func() *zaputil.WriteEnabler {
-			return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component))
+		console, _ = l.writeEnablers.LoadOrCompute(l.component, func() (*zaputil.WriteEnabler, bool) {
+			return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component)), false
 		})
 	} else {
 		enab := zaputil.OrLevelEnabler{l.minLevel, l.sc.ComponentLevel(l.component)}
@@ -331,8 +331,8 @@ func (l zapLoggerComponentLeveler[T]) ComponentLevel(component string) zapcore.L
 		component = l.zl.component + "." + component
 	}
 
-	enab, _ := l.zl.levelEnablers.LoadOrCompute(component, func() *zaputil.OrLevelEnabler {
-		return &zaputil.OrLevelEnabler{l.zl.sc.ComponentLevel(component), l.zl.tap}
+	enab, _ := l.zl.levelEnablers.LoadOrCompute(component, func() (*zaputil.OrLevelEnabler, bool) {
+		return &zaputil.OrLevelEnabler{l.zl.sc.ComponentLevel(component), l.zl.tap}, false
 	})
 	return enab
 }
