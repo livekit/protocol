@@ -292,7 +292,7 @@ message SessionRequest {
   }
   // Sent by a simulation controller after it has computed a provisional
   // verdict, giving the agent under test a chance to override it.
-  message SimulationFinalize {
+  message FinalizeSimulation {
     bool provisional_success = 1;
     string provisional_reason = 2;
   }
@@ -308,7 +308,7 @@ message SessionRequest {
     GetSessionUsage get_session_usage = 9;
     GetFrameworkInfo get_framework_info = 10;
     UpdateIO update_io = 11;
-    SimulationFinalize simulation_finalize = 12;
+    FinalizeSimulation finalize_simulation = 12;
   }
 }
 
@@ -346,9 +346,9 @@ message SessionResponse {
     string sdk_version = 2;
   }
   message UpdateIOResponse {}
-  // The agent's final verdict, returned in response to SimulationFinalize.
+  // The agent's final verdict, returned in response to FinalizeSimulation.
   // If the agent did not override, success/reason echo the provisional values.
-  message SimulationFinalizeResponse {
+  message FinalizeSimulationResponse {
     bool success = 1;
     string reason = 2;
     bool overridden = 3;
@@ -366,7 +366,7 @@ message SessionResponse {
     GetSessionUsageResponse get_session_usage = 10;
     GetFrameworkInfoResponse get_framework_info = 11;
     UpdateIOResponse update_io = 12;
-    SimulationFinalizeResponse simulation_finalize = 13;
+    FinalizeSimulationResponse finalize_simulation = 13;
   }
 }
 
