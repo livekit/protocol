@@ -350,11 +350,11 @@ message SessionResponse {
   // FinalizeSimulation. Reported alongside (not replacing) the simulator's
   // provisional verdict; user_verdict is unset when the agent set none.
   message FinalizeSimulationResponse {
-    message UserVerdict {
+    message SimulationVerdict {
       bool success = 1;
       string reason = 2;
     }
-    UserVerdict user_verdict = 1;
+    SimulationVerdict user_verdict = 1;
   }
 
   string request_id = 1;

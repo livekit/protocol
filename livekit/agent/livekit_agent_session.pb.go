@@ -4169,8 +4169,8 @@ func (*SessionResponse_UpdateIOResponse) Descriptor() ([]byte, []int) {
 // FinalizeSimulation. Reported alongside (not replacing) the simulator's
 // provisional verdict; user_verdict is unset when the agent set none.
 type SessionResponse_FinalizeSimulationResponse struct {
-	state         protoimpl.MessageState                                  `protogen:"open.v1"`
-	UserVerdict   *SessionResponse_FinalizeSimulationResponse_UserVerdict `protobuf:"bytes,1,opt,name=user_verdict,json=userVerdict,proto3" json:"user_verdict,omitempty"`
+	state         protoimpl.MessageState                                        `protogen:"open.v1"`
+	UserVerdict   *SessionResponse_FinalizeSimulationResponse_SimulationVerdict `protobuf:"bytes,1,opt,name=user_verdict,json=userVerdict,proto3" json:"user_verdict,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4205,14 +4205,14 @@ func (*SessionResponse_FinalizeSimulationResponse) Descriptor() ([]byte, []int) 
 	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{18, 9}
 }
 
-func (x *SessionResponse_FinalizeSimulationResponse) GetUserVerdict() *SessionResponse_FinalizeSimulationResponse_UserVerdict {
+func (x *SessionResponse_FinalizeSimulationResponse) GetUserVerdict() *SessionResponse_FinalizeSimulationResponse_SimulationVerdict {
 	if x != nil {
 		return x.UserVerdict
 	}
 	return nil
 }
 
-type SessionResponse_FinalizeSimulationResponse_UserVerdict struct {
+type SessionResponse_FinalizeSimulationResponse_SimulationVerdict struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
@@ -4220,20 +4220,20 @@ type SessionResponse_FinalizeSimulationResponse_UserVerdict struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SessionResponse_FinalizeSimulationResponse_UserVerdict) Reset() {
-	*x = SessionResponse_FinalizeSimulationResponse_UserVerdict{}
+func (x *SessionResponse_FinalizeSimulationResponse_SimulationVerdict) Reset() {
+	*x = SessionResponse_FinalizeSimulationResponse_SimulationVerdict{}
 	mi := &file_agent_livekit_agent_session_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SessionResponse_FinalizeSimulationResponse_UserVerdict) String() string {
+func (x *SessionResponse_FinalizeSimulationResponse_SimulationVerdict) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SessionResponse_FinalizeSimulationResponse_UserVerdict) ProtoMessage() {}
+func (*SessionResponse_FinalizeSimulationResponse_SimulationVerdict) ProtoMessage() {}
 
-func (x *SessionResponse_FinalizeSimulationResponse_UserVerdict) ProtoReflect() protoreflect.Message {
+func (x *SessionResponse_FinalizeSimulationResponse_SimulationVerdict) ProtoReflect() protoreflect.Message {
 	mi := &file_agent_livekit_agent_session_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4245,19 +4245,19 @@ func (x *SessionResponse_FinalizeSimulationResponse_UserVerdict) ProtoReflect() 
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SessionResponse_FinalizeSimulationResponse_UserVerdict.ProtoReflect.Descriptor instead.
-func (*SessionResponse_FinalizeSimulationResponse_UserVerdict) Descriptor() ([]byte, []int) {
+// Deprecated: Use SessionResponse_FinalizeSimulationResponse_SimulationVerdict.ProtoReflect.Descriptor instead.
+func (*SessionResponse_FinalizeSimulationResponse_SimulationVerdict) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{18, 9, 0}
 }
 
-func (x *SessionResponse_FinalizeSimulationResponse_UserVerdict) GetSuccess() bool {
+func (x *SessionResponse_FinalizeSimulationResponse_SimulationVerdict) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-func (x *SessionResponse_FinalizeSimulationResponse_UserVerdict) GetReason() string {
+func (x *SessionResponse_FinalizeSimulationResponse_SimulationVerdict) GetReason() string {
 	if x != nil {
 		return x.Reason
 	}
@@ -4729,7 +4729,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x12FinalizeSimulation\x12/\n" +
 	"\x13provisional_success\x18\x01 \x01(\bR\x12provisionalSuccess\x12-\n" +
 	"\x12provisional_reason\x18\x02 \x01(\tR\x11provisionalReasonB\t\n" +
-	"\arequest\"\xba\x12\n" +
+	"\arequest\"\xc6\x12\n" +
 	"\x0fSessionResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x19\n" +
@@ -4779,10 +4779,10 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x03sdk\x18\x01 \x01(\tR\x03sdk\x12\x1f\n" +
 	"\vsdk_version\x18\x02 \x01(\tR\n" +
 	"sdkVersion\x1a\x12\n" +
-	"\x10UpdateIOResponse\x1a\xc7\x01\n" +
-	"\x1aFinalizeSimulationResponse\x12h\n" +
-	"\fuser_verdict\x18\x01 \x01(\v2E.livekit.agent.SessionResponse.FinalizeSimulationResponse.UserVerdictR\vuserVerdict\x1a?\n" +
-	"\vUserVerdict\x12\x18\n" +
+	"\x10UpdateIOResponse\x1a\xd3\x01\n" +
+	"\x1aFinalizeSimulationResponse\x12n\n" +
+	"\fuser_verdict\x18\x01 \x01(\v2K.livekit.agent.SessionResponse.FinalizeSimulationResponse.SimulationVerdictR\vuserVerdict\x1aE\n" +
+	"\x11SimulationVerdict\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
 	"\x06reason\x18\x02 \x01(\tR\x06reasonB\n" +
 	"\n" +
@@ -4911,15 +4911,15 @@ var file_agent_livekit_agent_session_proto_goTypes = []any{
 	(*SessionResponse_UpdateIOResponse)(nil),           // 58: livekit.agent.SessionResponse.UpdateIOResponse
 	(*SessionResponse_FinalizeSimulationResponse)(nil), // 59: livekit.agent.SessionResponse.FinalizeSimulationResponse
 	nil, // 60: livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
-	(*SessionResponse_FinalizeSimulationResponse_UserVerdict)(nil), // 61: livekit.agent.SessionResponse.FinalizeSimulationResponse.UserVerdict
-	(*AgentSessionMessage_ConsoleIO)(nil),                          // 62: livekit.agent.AgentSessionMessage.ConsoleIO
-	(*AgentSessionMessage_ConsoleIO_AudioFrame)(nil),               // 63: livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
-	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFlush)(nil),       // 64: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFlush
-	(*AgentSessionMessage_ConsoleIO_AudioPlaybackClear)(nil),       // 65: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackClear
-	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFinished)(nil),    // 66: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFinished
-	(*timestamppb.Timestamp)(nil),                                  // 67: google.protobuf.Timestamp
-	(*structpb.Struct)(nil),                                        // 68: google.protobuf.Struct
-	(*durationpb.Duration)(nil),                                    // 69: google.protobuf.Duration
+	(*SessionResponse_FinalizeSimulationResponse_SimulationVerdict)(nil), // 61: livekit.agent.SessionResponse.FinalizeSimulationResponse.SimulationVerdict
+	(*AgentSessionMessage_ConsoleIO)(nil),                                // 62: livekit.agent.AgentSessionMessage.ConsoleIO
+	(*AgentSessionMessage_ConsoleIO_AudioFrame)(nil),                     // 63: livekit.agent.AgentSessionMessage.ConsoleIO.AudioFrame
+	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFlush)(nil),             // 64: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFlush
+	(*AgentSessionMessage_ConsoleIO_AudioPlaybackClear)(nil),             // 65: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackClear
+	(*AgentSessionMessage_ConsoleIO_AudioPlaybackFinished)(nil),          // 66: livekit.agent.AgentSessionMessage.ConsoleIO.AudioPlaybackFinished
+	(*timestamppb.Timestamp)(nil),                                        // 67: google.protobuf.Timestamp
+	(*structpb.Struct)(nil),                                              // 68: google.protobuf.Struct
+	(*durationpb.Duration)(nil),                                          // 69: google.protobuf.Duration
 }
 var file_agent_livekit_agent_session_proto_depIdxs = []int32{
 	67, // 0: livekit.agent.MetricsReport.started_speaking_at:type_name -> google.protobuf.Timestamp
@@ -5016,7 +5016,7 @@ var file_agent_livekit_agent_session_proto_depIdxs = []int32{
 	68, // 91: livekit.agent.SessionResponse.GetRTCStatsResponse.subscriber_stats:type_name -> google.protobuf.Struct
 	18, // 92: livekit.agent.SessionResponse.GetSessionUsageResponse.usage:type_name -> livekit.agent.AgentSessionUsage
 	67, // 93: livekit.agent.SessionResponse.GetSessionUsageResponse.created_at:type_name -> google.protobuf.Timestamp
-	61, // 94: livekit.agent.SessionResponse.FinalizeSimulationResponse.user_verdict:type_name -> livekit.agent.SessionResponse.FinalizeSimulationResponse.UserVerdict
+	61, // 94: livekit.agent.SessionResponse.FinalizeSimulationResponse.user_verdict:type_name -> livekit.agent.SessionResponse.FinalizeSimulationResponse.SimulationVerdict
 	95, // [95:95] is the sub-list for method output_type
 	95, // [95:95] is the sub-list for method input_type
 	95, // [95:95] is the sub-list for extension type_name
