@@ -346,12 +346,13 @@ message SessionResponse {
     string sdk_version = 2;
   }
   message UpdateIOResponse {}
-  // The agent's final verdict, returned in response to FinalizeSimulation.
-  // If the agent did not override, success/reason echo the provisional values.
+  // The agent's own verdict, returned in response to FinalizeSimulation. This
+  // is reported alongside (not replacing) the simulator's provisional verdict;
+  // verdict_set is false when the agent set no verdict of its own.
   message FinalizeSimulationResponse {
     bool success = 1;
     string reason = 2;
-    bool overridden = 3;
+    bool verdict_set = 3;
   }
 
   string request_id = 1;

@@ -4165,13 +4165,14 @@ func (*SessionResponse_UpdateIOResponse) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{18, 8}
 }
 
-// The agent's final verdict, returned in response to FinalizeSimulation.
-// If the agent did not override, success/reason echo the provisional values.
+// The agent's own verdict, returned in response to FinalizeSimulation. This
+// is reported alongside (not replacing) the simulator's provisional verdict;
+// verdict_set is false when the agent set no verdict of its own.
 type SessionResponse_FinalizeSimulationResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	Overridden    bool                   `protobuf:"varint,3,opt,name=overridden,proto3" json:"overridden,omitempty"`
+	VerdictSet    bool                   `protobuf:"varint,3,opt,name=verdict_set,json=verdictSet,proto3" json:"verdict_set,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -4220,9 +4221,9 @@ func (x *SessionResponse_FinalizeSimulationResponse) GetReason() string {
 	return ""
 }
 
-func (x *SessionResponse_FinalizeSimulationResponse) GetOverridden() bool {
+func (x *SessionResponse_FinalizeSimulationResponse) GetVerdictSet() bool {
 	if x != nil {
-		return x.Overridden
+		return x.VerdictSet
 	}
 	return false
 }
@@ -4692,7 +4693,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x12FinalizeSimulation\x12/\n" +
 	"\x13provisional_success\x18\x01 \x01(\bR\x12provisionalSuccess\x12-\n" +
 	"\x12provisional_reason\x18\x02 \x01(\tR\x11provisionalReasonB\t\n" +
-	"\arequest\"\xe0\x11\n" +
+	"\arequest\"\xe1\x11\n" +
 	"\x0fSessionResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12\x19\n" +
@@ -4742,13 +4743,12 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x03sdk\x18\x01 \x01(\tR\x03sdk\x12\x1f\n" +
 	"\vsdk_version\x18\x02 \x01(\tR\n" +
 	"sdkVersion\x1a\x12\n" +
-	"\x10UpdateIOResponse\x1an\n" +
+	"\x10UpdateIOResponse\x1ao\n" +
 	"\x1aFinalizeSimulationResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x1e\n" +
-	"\n" +
-	"overridden\x18\x03 \x01(\bR\n" +
-	"overriddenB\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x1f\n" +
+	"\vverdict_set\x18\x03 \x01(\bR\n" +
+	"verdictSetB\n" +
 	"\n" +
 	"\bresponseB\b\n" +
 	"\x06_error\"\xdf\a\n" +
