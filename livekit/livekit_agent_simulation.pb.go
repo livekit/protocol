@@ -1075,12 +1075,11 @@ func (x *SimulationRun_Job_Usage) GetAudioTurnsCount() int32 {
 }
 
 type SimulationRun_Create_Request struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId        string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	AgentName        string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	AgentDescription string                 `protobuf:"bytes,3,opt,name=agent_description,json=agentDescription,proto3" json:"agent_description,omitempty"`
-	NumSimulations   int32                  `protobuf:"varint,4,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
-	Region           string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId      string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	AgentName      string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	NumSimulations int32                  `protobuf:"varint,4,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
+	Region         string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
 	// When set, run these scenarios (loaded from a scenarios.yaml).
 	// When unset, generate num_simulations scenarios from the uploaded agent source.
 	ScenarioGroup *ScenarioGroup `protobuf:"bytes,7,opt,name=scenario_group,json=scenarioGroup,proto3,oneof" json:"scenario_group,omitempty"`
@@ -1128,13 +1127,6 @@ func (x *SimulationRun_Create_Request) GetProjectId() string {
 func (x *SimulationRun_Create_Request) GetAgentName() string {
 	if x != nil {
 		return x.AgentName
-	}
-	return ""
-}
-
-func (x *SimulationRun_Create_Request) GetAgentDescription() string {
-	if x != nil {
-		return x.AgentDescription
 	}
 	return ""
 }
@@ -1766,7 +1758,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xe1\x15\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xcd\x15\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1812,18 +1804,17 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xa5\x03\n" +
-	"\x06Create\x1a\x8c\x02\n" +
+	"\x1a\x91\x03\n" +
+	"\x06Create\x1a\xf8\x01\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12+\n" +
-	"\x11agent_description\x18\x03 \x01(\tR\x10agentDescription\x12'\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12'\n" +
 	"\x0fnum_simulations\x18\x04 \x01(\x05R\x0enumSimulations\x12\x16\n" +
 	"\x06region\x18\x06 \x01(\tR\x06region\x12B\n" +
 	"\x0escenario_group\x18\a \x01(\v2\x16.livekit.ScenarioGroupH\x00R\rscenarioGroup\x88\x01\x01B\x11\n" +
-	"\x0f_scenario_group\x1a\x8b\x01\n" +
+	"\x0f_scenario_groupJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
 	"\bResponse\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12S\n" +
 	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x1a\xa0\x01\n" +
