@@ -265,6 +265,9 @@ type VideoGrant struct {
 	// by default, a participant is not allowed to update its own metadata
 	CanUpdateOwnMetadata *bool `json:"canUpdateOwnMetadata,omitempty"`
 
+	// names of the agents a participant may dispatch. This does not require RoomAdmin.
+	CanDispatchAgents []string `json:"canDispatchAgents,omitempty"`
+
 	// actions on ingresses
 	IngressAdmin bool `json:"ingressAdmin,omitempty"` // applies to all ingress
 
@@ -445,14 +448,14 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 	return &livekit.ParticipantPermission{
-		CanPublish:          v.GetCanPublish(),
-		CanPublishData:      v.GetCanPublishData(),
-		CanSubscribe:        v.GetCanSubscribe(),
-		CanPublishSources:   v.GetCanPublishSources(),
-		CanUpdateMetadata:   v.GetCanUpdateOwnMetadata(),
-		Hidden:              v.Hidden,
-		Recorder:            v.Recorder,
-		Agent:               v.Agent,
+		CanPublish:            v.GetCanPublish(),
+		CanPublishData:        v.GetCanPublishData(),
+		CanSubscribe:          v.GetCanSubscribe(),
+		CanPublishSources:     v.GetCanPublishSources(),
+		CanUpdateMetadata:     v.GetCanUpdateOwnMetadata(),
+		Hidden:                v.Hidden,
+		Recorder:              v.Recorder,
+		Agent:                 v.Agent,
 		CanSubscribeMetrics:   v.GetCanSubscribeMetrics(),
 		CanManageAgentSession: v.GetCanManageAgentSession(),
 	}
@@ -483,6 +486,11 @@ func (v *VideoGrant) Clone() *VideoGrant {
 	if v.CanPublishSources != nil {
 		clone.CanPublishSources = make([]string, len(v.CanPublishSources))
 		copy(clone.CanPublishSources, v.CanPublishSources)
+	}
+
+	if v.CanDispatchAgents != nil {
+		clone.CanDispatchAgents = make([]string, len(v.CanDispatchAgents))
+		copy(clone.CanDispatchAgents, v.CanDispatchAgents)
 	}
 
 	if v.CanUpdateOwnMetadata != nil {
@@ -539,6 +547,8 @@ func (v *VideoGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	logBoolPtr("CanSubscribeMetrics", v.CanSubscribeMetrics)
 	logBoolPtr("CanManageAgentSession", v.CanManageAgentSession)
 	e.AddString("DestinationRoom", v.DestinationRoom)
+
+	e.AddArray("CanDispatchAgents", logger.StringSlice(v.CanDispatchAgents))
 	return nil
 }
 
