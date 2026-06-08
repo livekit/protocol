@@ -290,6 +290,10 @@ message SessionRequest {
     optional Input input = 1;
     optional Output output = 2;
   }
+  message FinalizeSimulation {
+    bool provisional_success = 1;
+    string provisional_reason = 2;
+  }
 
   string request_id = 1;
   oneof request {
@@ -302,6 +306,7 @@ message SessionRequest {
     GetSessionUsage get_session_usage = 9;
     GetFrameworkInfo get_framework_info = 10;
     UpdateIO update_io = 11;
+    FinalizeSimulation finalize_simulation = 12;
   }
 }
 
@@ -339,6 +344,13 @@ message SessionResponse {
     string sdk_version = 2;
   }
   message UpdateIOResponse {}
+  message FinalizeSimulationResponse {
+    message SimulationVerdict {
+      bool success = 1;
+      string reason = 2;
+    }
+    SimulationVerdict user_verdict = 1;
+  }
 
   string request_id = 1;
   optional string error = 2;
@@ -352,6 +364,7 @@ message SessionResponse {
     GetSessionUsageResponse get_session_usage = 10;
     GetFrameworkInfoResponse get_framework_info = 11;
     UpdateIOResponse update_io = 12;
+    FinalizeSimulationResponse finalize_simulation = 13;
   }
 }
 
