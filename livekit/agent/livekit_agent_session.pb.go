@@ -3539,8 +3539,6 @@ func (x *SessionRequest_UpdateIO) GetOutput() *SessionRequest_UpdateIO_Output {
 	return nil
 }
 
-// Sent by a simulation controller after it has computed a provisional
-// verdict, giving the agent under test a chance to override it.
 type SessionRequest_FinalizeSimulation struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	ProvisionalSuccess bool                   `protobuf:"varint,1,opt,name=provisional_success,json=provisionalSuccess,proto3" json:"provisional_success,omitempty"`
@@ -4165,9 +4163,6 @@ func (*SessionResponse_UpdateIOResponse) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_session_proto_rawDescGZIP(), []int{18, 8}
 }
 
-// The agent's own verdict from on_simulation_end, returned in response to
-// FinalizeSimulation. Reported alongside (not replacing) the simulator's
-// provisional verdict; user_verdict is unset when the agent set none.
 type SessionResponse_FinalizeSimulationResponse struct {
 	state         protoimpl.MessageState                                        `protogen:"open.v1"`
 	UserVerdict   *SessionResponse_FinalizeSimulationResponse_SimulationVerdict `protobuf:"bytes,1,opt,name=user_verdict,json=userVerdict,proto3" json:"user_verdict,omitempty"`

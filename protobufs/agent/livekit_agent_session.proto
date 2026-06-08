@@ -290,8 +290,6 @@ message SessionRequest {
     optional Input input = 1;
     optional Output output = 2;
   }
-  // Sent by a simulation controller after it has computed a provisional
-  // verdict, giving the agent under test a chance to override it.
   message FinalizeSimulation {
     bool provisional_success = 1;
     string provisional_reason = 2;
@@ -346,9 +344,6 @@ message SessionResponse {
     string sdk_version = 2;
   }
   message UpdateIOResponse {}
-  // The agent's own verdict from on_simulation_end, returned in response to
-  // FinalizeSimulation. Reported alongside (not replacing) the simulator's
-  // provisional verdict; user_verdict is unset when the agent set none.
   message FinalizeSimulationResponse {
     message SimulationVerdict {
       bool success = 1;
