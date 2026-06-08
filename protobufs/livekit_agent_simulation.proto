@@ -81,9 +81,10 @@ message SimulationRun {
 
   message Create {
     message Request {
+      reserved 3;  // was agent_description (input never consumed; description is derived from source)
+      reserved "agent_description";
       string project_id = 1;
       string agent_name = 2;
-      string agent_description = 3;
       int32 num_simulations = 4;
       string region = 6;
 
