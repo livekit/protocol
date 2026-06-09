@@ -566,10 +566,7 @@ type GetSIPTrunkAuthenticationResponse struct {
 	// Error code if authentication failed
 	ErrorCode SIPTrunkAuthenticationError `protobuf:"varint,7,opt,name=error_code,json=errorCode,proto3,enum=rpc.SIPTrunkAuthenticationError" json:"error_code,omitempty"`
 	// Optional per-project feature flag set
-	FeatureFlags map[string]string `protobuf:"bytes,8,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Per-call observability context resolved by cloud-io at auth time.
-	// Downstream services (cloud-sip) use this to drive local observability
-	// reporting without per-call DB or RPC lookups.
+	FeatureFlags  map[string]string     `protobuf:"bytes,8,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Observability *SIPCallObservability `protobuf:"bytes,10,opt,name=observability,proto3" json:"observability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1095,21 +1092,10 @@ func (x *EvaluateSIPDispatchRulesResponse) GetFeatureFlags() map[string]string {
 	return nil
 }
 
-// SIPCallObservability bundles per-call observability routing + telephony
-// metadata that cloud-io resolves at call setup, so downstream services
-// (cloud-sip) can do local observability reporting without an extra DB or
-// RPC round-trip per call. Mirrors cloud_protocol.ObservabilityRoute for the
-// route fields; protocol cannot depend on cloud-protocol, so we redeclare
-// rather than reuse.
 type SIPCallObservability struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Project's user-data region (destination key for the observability sink).
-	Destination string `protobuf:"bytes,1,opt,name=destination,proto3" json:"destination,omitempty"`
-	// Object lifetime for written observability data, in days.
-	LifetimeDays uint32 `protobuf:"varint,2,opt,name=lifetime_days,json=lifetimeDays,proto3" json:"lifetime_days,omitempty"`
-	// Telephony billing metadata, resolved from PurchasedPhoneNumber +
-	// PhoneNumberInventoryItem at dispatch time. Empty for outbound or when
-	// the dialed number isn't in inventory.
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Destination   string                  `protobuf:"bytes,1,opt,name=destination,proto3" json:"destination,omitempty"`
+	LifetimeDays  uint32                  `protobuf:"varint,2,opt,name=lifetime_days,json=lifetimeDays,proto3" json:"lifetime_days,omitempty"`
 	CarrierId     string                  `protobuf:"bytes,3,opt,name=carrier_id,json=carrierId,proto3" json:"carrier_id,omitempty"`
 	CountryCode   string                  `protobuf:"bytes,4,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`
 	NumberType    livekit.PhoneNumberType `protobuf:"varint,5,opt,name=number_type,json=numberType,proto3,enum=livekit.PhoneNumberType" json:"number_type,omitempty"`
@@ -1460,7 +1446,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x04call\x18\f \x01(\v2\f.rpc.SIPCallR\x04call\x1aB\n" +
 	"\x14ExtraAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x97\x10\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x82\x10\n" +
 	" EvaluateSIPDispatchRulesResponse\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12O\n" +
@@ -1507,7 +1493,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x19\x10\x1aR\robservability\"\xda\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xda\x01\n" +
 	"\x14SIPCallObservability\x12 \n" +
 	"\vdestination\x18\x01 \x01(\tR\vdestination\x12#\n" +
 	"\rlifetime_days\x18\x02 \x01(\rR\flifetimeDays\x12\x1d\n" +
