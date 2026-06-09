@@ -107,11 +107,7 @@ type InternalCreateSIPParticipantRequest struct {
 	// Destination information for routing decisions
 	Destination *livekit.Destination `protobuf:"bytes,32,opt,name=destination,proto3" json:"destination,omitempty"`
 	// Project-level feature flags from ProjectSettings.FeatureFlags
-	FeatureFlags map[string]string `protobuf:"bytes,33,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// Per-call observability context resolved by cloud-io at call setup.
-	// Downstream services (cloud-sip) use this to drive local observability
-	// reporting without per-call DB or RPC lookups. See SIPCallObservability
-	// in rpc/io.proto.
+	FeatureFlags  map[string]string     `protobuf:"bytes,33,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Observability *SIPCallObservability `protobuf:"bytes,38,opt,name=observability,proto3" json:"observability,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
