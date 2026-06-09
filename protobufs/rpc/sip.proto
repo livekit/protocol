@@ -23,6 +23,7 @@ import "google/protobuf/duration.proto";
 import "options.proto";
 import "livekit_sip.proto";
 import "logger/options.proto";
+import "rpc/io.proto";
 
 service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
@@ -149,7 +150,13 @@ message InternalCreateSIPParticipantRequest {
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 33;
 
-  // NEXT ID: 38
+  // Per-call observability context resolved by cloud-io at call setup.
+  // Downstream services (cloud-sip) use this to drive local observability
+  // reporting without per-call DB or RPC lookups. See SIPCallObservability
+  // in rpc/io.proto.
+  SIPCallObservability observability = 38;
+
+  // NEXT ID: 39
 }
 
 message InternalCreateSIPParticipantResponse {
