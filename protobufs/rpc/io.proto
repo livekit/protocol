@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "livekit_phone_number.proto";
 import "livekit_room.proto";
 import "logger/options.proto";
 import "google/protobuf/empty.proto";
@@ -131,6 +132,13 @@ message GetSIPTrunkAuthenticationResponse {
 
   // Optional per-project feature flag set
   map<string, string> feature_flags = 8;
+
+  // Per-call observability context resolved by cloud-io at auth time.
+  // Downstream services (cloud-sip) use this to drive local observability
+  // reporting without per-call DB or RPC lookups.
+  SIPCallObservability observability = 10;
+
+  // NEXT ID: 11
 }
 
 message EvaluateSIPDispatchRulesRequest {
@@ -253,7 +261,30 @@ message EvaluateSIPDispatchRulesResponse {
 
   map<string, string> feature_flags = 23;
 
-  // NEXT ID: 25
+  reserved 25;
+  reserved "observability";
+
+  // NEXT ID: 26
+}
+
+// SIPCallObservability bundles per-call observability routing + telephony
+// metadata that cloud-io resolves at call setup, so downstream services
+// (cloud-sip) can do local observability reporting without an extra DB or
+// RPC round-trip per call. Mirrors cloud_protocol.ObservabilityRoute for the
+// route fields; protocol cannot depend on cloud-protocol, so we redeclare
+// rather than reuse.
+message SIPCallObservability {
+  // Project's user-data region (destination key for the observability sink).
+  string destination = 1;
+  // Object lifetime for written observability data, in days.
+  uint32 lifetime_days = 2;
+
+  // Telephony billing metadata, resolved from PurchasedPhoneNumber +
+  // PhoneNumberInventoryItem at dispatch time. Empty for outbound or when
+  // the dialed number isn't in inventory.
+  string carrier_id = 3;
+  string country_code = 4;
+  livekit.PhoneNumberType number_type = 5;
 }
 
 message UpdateSIPCallStateRequest {
