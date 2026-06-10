@@ -199,8 +199,9 @@ message StartSession {
   SessionDescription publisher_offer = 22;
   SyncState sync_state = 23;
   bool use_single_peer_connection = 24;
+  int64 token_expires_at = 26;
 
-  // NEXT ID: 26
+  // NEXT ID: 27
 }
 
 // room info that should not be returned to clients
