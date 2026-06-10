@@ -21,6 +21,7 @@ option go_package = "github.com/livekit/protocol/rpc";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
 import "livekit_sip.proto";
+import "livekit_phone_number.proto";
 import "livekit_room.proto";
 import "logger/options.proto";
 import "google/protobuf/empty.proto";
@@ -131,6 +132,10 @@ message GetSIPTrunkAuthenticationResponse {
 
   // Optional per-project feature flag set
   map<string, string> feature_flags = 8;
+
+  SIPCallObservability observability = 10;
+
+  // NEXT ID: 11
 }
 
 message EvaluateSIPDispatchRulesRequest {
@@ -254,6 +259,15 @@ message EvaluateSIPDispatchRulesResponse {
   map<string, string> feature_flags = 23;
 
   // NEXT ID: 25
+}
+
+message SIPCallObservability {
+  string destination = 1;
+  uint32 lifetime_days = 2;
+
+  string carrier_id = 3;
+  string country_code = 4;
+  livekit.PhoneNumberType number_type = 5;
 }
 
 message UpdateSIPCallStateRequest {
