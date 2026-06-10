@@ -91,6 +91,10 @@ message SimulationRun {
       // When set, run these scenarios (loaded from a scenarios.yaml).
       // When unset, generate num_simulations scenarios from the uploaded agent source.
       optional ScenarioGroup scenario_group = 7;
+
+      // Maximum simulate jobs running in parallel for this run. Clamped to the
+      // project's concurrency quota; 0/unset uses the server default.
+      optional int32 concurrency = 8;
     }
     message Response {
       string simulation_run_id = 1;
@@ -154,6 +158,8 @@ message SimulationRun {
   int32 num_simulations = 15;
   // Aggregate usage across all jobs in this run (sum of Job.usage).
   Usage usage = 16;
+  // Maximum simulate jobs running in parallel for this run (0 = server default).
+  int32 concurrency = 17;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -191,12 +197,22 @@ message ScenarioGroup {
   repeated Scenario scenarios = 2;
 }
 
+// How the simulated user interacts with the agent under test.
+enum SimulationMode {
+  SIMULATION_MODE_UNSPECIFIED = 0;
+  // The simulator chats over text streams (no audio).
+  SIMULATION_MODE_TEXT = 1;
+  // The simulator publishes/subscribes audio in the room.
+  SIMULATION_MODE_AUDIO = 2;
+}
+
 // Carried (protojson-encoded) in the simulation room's metadata so the agent
 // under test can read the scenario + run identity synchronously at connect.
 message SimulationDispatch {
   string simulation_run_id = 1;
   string job_id = 2;
   Scenario scenario = 3;
+  SimulationMode mode = 4;
 }
 
 service AgentSimulation {
