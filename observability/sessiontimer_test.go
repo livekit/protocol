@@ -88,4 +88,30 @@ func TestSessionTimer(t *testing.T) {
 		require.EqualValues(t, 45, secs)
 		require.EqualValues(t, 3, mins)
 	})
+
+	t.Run("Reset re-anchors so pre-reset time is not counted", func(t *testing.T) {
+		ts := time.Now()
+		st := NewSessionTimer(ts)
+
+		// 90s elapse before the participant actually joins; that time should not
+		// be billed once we re-anchor to the join time.
+		joinedAt := ts.Add(90 * time.Second)
+		st.Reset(joinedAt)
+
+		millis, secs, mins := st.Advance(joinedAt.Add(30 * time.Second))
+		require.EqualValues(t, 30000, millis)
+		require.EqualValues(t, 30, secs)
+		require.EqualValues(t, 1, mins)
+	})
+
+	t.Run("Reset preserves min-seconds option", func(t *testing.T) {
+		ts := time.Now()
+		st := NewSessionTimer(ts, WithMinSeconds(45))
+
+		joinedAt := ts.Add(10 * time.Second)
+		st.Reset(joinedAt)
+
+		_, secs, _ := st.Advance(joinedAt.Add(time.Second))
+		require.EqualValues(t, 45, secs)
+	})
 }
