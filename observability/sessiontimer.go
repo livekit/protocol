@@ -1,14 +1,12 @@
 package observability
 
 import (
-	"sync"
 	"time"
 
 	"github.com/livekit/protocol/utils/options"
 )
 
 type SessionTimer struct {
-	mu        sync.Mutex
 	lastMilli int64
 	lastSec   int64
 	lastMin   int64
@@ -36,13 +34,8 @@ func NewSessionTimer(startTime time.Time, opts ...SessionTimerOption) *SessionTi
 }
 
 // Reset re-anchors the timer to startTime so that subsequent Advance calls
-// measure elapsed time from startTime. It is intended to be called before the
-// first Advance (e.g. when a participant actually joins) so that wall-clock
-// time accrued before startTime is not counted toward the reported duration.
-// The configured min-seconds/min-minutes options are preserved.
+// measure elapsed time from startTime.
 func (h *SessionTimer) Reset(startTime time.Time) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
 	ts := startTime.UnixMilli()
 	h.lastMilli = ts
 	h.lastSec = ts
@@ -50,8 +43,6 @@ func (h *SessionTimer) Reset(startTime time.Time) {
 }
 
 func (h *SessionTimer) Advance(now time.Time) (millis, secs, mins int64) {
-	h.mu.Lock()
-	defer h.mu.Unlock()
 	ts := now.UnixMilli()
 	if ts > h.lastMilli {
 		millis = ts - h.lastMilli
