@@ -2479,6 +2479,7 @@ func (x *UpdateDataSubscription) GetUpdates() []*UpdateDataSubscription_Update {
 type StoreDataBlobRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Blob          *DataBlob              `protobuf:"bytes,1,opt,name=blob,proto3" json:"blob,omitempty"`
+	RequestId     uint32                 `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2520,12 +2521,20 @@ func (x *StoreDataBlobRequest) GetBlob() *DataBlob {
 	return nil
 }
 
+func (x *StoreDataBlobRequest) GetRequestId() uint32 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
+}
+
 type GetDataBlobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Identity of the participant who owns the blob.
 	ParticipantIdentity string `protobuf:"bytes,1,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	// Unique key of the data blob to retrieve.
 	Key           *DataBlobKey `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	RequestId     uint32       `protobuf:"varint,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2574,9 +2583,17 @@ func (x *GetDataBlobRequest) GetKey() *DataBlobKey {
 	return nil
 }
 
+func (x *GetDataBlobRequest) GetRequestId() uint32 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
+}
+
 type GetDataBlobResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Blob          *DataBlob              `protobuf:"bytes,1,opt,name=blob,proto3" json:"blob,omitempty"`
+	RequestId     uint32                 `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2616,6 +2633,13 @@ func (x *GetDataBlobResponse) GetBlob() *DataBlob {
 		return x.Blob
 	}
 	return nil
+}
+
+func (x *GetDataBlobResponse) GetRequestId() uint32 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
 }
 
 type UpdateTrackSettings struct {
@@ -4553,8 +4577,6 @@ type RequestResponse struct {
 	//	*RequestResponse_UpdateVideoTrack
 	//	*RequestResponse_PublishDataTrack
 	//	*RequestResponse_UnpublishDataTrack
-	//	*RequestResponse_StoreDataBlob
-	//	*RequestResponse_GetDataBlob
 	Request       isRequestResponse_Request `protobuf_oneof:"request"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -4690,24 +4712,6 @@ func (x *RequestResponse) GetUnpublishDataTrack() *UnpublishDataTrackRequest {
 	return nil
 }
 
-func (x *RequestResponse) GetStoreDataBlob() *StoreDataBlobRequest {
-	if x != nil {
-		if x, ok := x.Request.(*RequestResponse_StoreDataBlob); ok {
-			return x.StoreDataBlob
-		}
-	}
-	return nil
-}
-
-func (x *RequestResponse) GetGetDataBlob() *GetDataBlobRequest {
-	if x != nil {
-		if x, ok := x.Request.(*RequestResponse_GetDataBlob); ok {
-			return x.GetDataBlob
-		}
-	}
-	return nil
-}
-
 type isRequestResponse_Request interface {
 	isRequestResponse_Request()
 }
@@ -4744,14 +4748,6 @@ type RequestResponse_UnpublishDataTrack struct {
 	UnpublishDataTrack *UnpublishDataTrackRequest `protobuf:"bytes,11,opt,name=unpublish_data_track,json=unpublishDataTrack,proto3,oneof"`
 }
 
-type RequestResponse_StoreDataBlob struct {
-	StoreDataBlob *StoreDataBlobRequest `protobuf:"bytes,12,opt,name=store_data_blob,json=storeDataBlob,proto3,oneof"`
-}
-
-type RequestResponse_GetDataBlob struct {
-	GetDataBlob *GetDataBlobRequest `protobuf:"bytes,13,opt,name=get_data_blob,json=getDataBlob,proto3,oneof"`
-}
-
 func (*RequestResponse_Trickle) isRequestResponse_Request() {}
 
 func (*RequestResponse_AddTrack) isRequestResponse_Request() {}
@@ -4767,10 +4763,6 @@ func (*RequestResponse_UpdateVideoTrack) isRequestResponse_Request() {}
 func (*RequestResponse_PublishDataTrack) isRequestResponse_Request() {}
 
 func (*RequestResponse_UnpublishDataTrack) isRequestResponse_Request() {}
-
-func (*RequestResponse_StoreDataBlob) isRequestResponse_Request() {}
-
-func (*RequestResponse_GetDataBlob) isRequestResponse_Request() {}
 
 type TrackSubscribed struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -5414,14 +5406,20 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06Update\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12?\n" +
-	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"=\n" +
+	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"j\n" +
 	"\x14StoreDataBlobRequest\x12%\n" +
-	"\x04blob\x18\x01 \x01(\v2\x11.livekit.DataBlobR\x04blob\"o\n" +
+	"\x04blob\x18\x01 \x01(\v2\x11.livekit.DataBlobR\x04blob\x12+\n" +
+	"\n" +
+	"request_id\x18\x02 \x01(\rB\f\xbaP\trequestIDR\trequestId\"\x9c\x01\n" +
 	"\x12GetDataBlobRequest\x121\n" +
 	"\x14participant_identity\x18\x01 \x01(\tR\x13participantIdentity\x12&\n" +
-	"\x03key\x18\x02 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"<\n" +
+	"\x03key\x18\x02 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12+\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\rB\f\xbaP\trequestIDR\trequestId\"i\n" +
 	"\x13GetDataBlobResponse\x12%\n" +
-	"\x04blob\x18\x01 \x01(\v2\x11.livekit.DataBlobR\x04blob\"\xdd\x01\n" +
+	"\x04blob\x18\x01 \x01(\v2\x11.livekit.DataBlobR\x04blob\x12+\n" +
+	"\n" +
+	"request_id\x18\x02 \x01(\rB\f\xbaP\trequestIDR\trequestId\"\xdd\x01\n" +
 	"\x13UpdateTrackSettings\x12\x1d\n" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1a\n" +
@@ -5561,7 +5559,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\bdistance\x18\x03 \x01(\x03R\bdistance\"a\n" +
 	"\x14SubscriptionResponse\x12\x1b\n" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12,\n" +
-	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xb1\b\n" +
+	"\x03err\x18\x02 \x01(\x0e2\x1a.livekit.SubscriptionErrorR\x03err\"\xa5\a\n" +
 	"\x0fRequestResponse\x12+\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x127\n" +
@@ -5575,9 +5573,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12update_video_track\x18\t \x01(\v2\x1e.livekit.UpdateLocalVideoTrackH\x00R\x10updateVideoTrack\x12P\n" +
 	"\x12publish_data_track\x18\n" +
 	" \x01(\v2 .livekit.PublishDataTrackRequestH\x00R\x10publishDataTrack\x12V\n" +
-	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\x12G\n" +
-	"\x0fstore_data_blob\x18\f \x01(\v2\x1d.livekit.StoreDataBlobRequestH\x00R\rstoreDataBlob\x12A\n" +
-	"\rget_data_blob\x18\r \x01(\v2\x1b.livekit.GetDataBlobRequestH\x00R\vgetDataBlob\"\xce\x01\n" +
+	"\x14unpublish_data_track\x18\v \x01(\v2\".livekit.UnpublishDataTrackRequestH\x00R\x12unpublishDataTrack\"\xce\x01\n" +
 	"\x06Reason\x12\x06\n" +
 	"\x02OK\x10\x00\x12\r\n" +
 	"\tNOT_FOUND\x10\x01\x12\x0f\n" +
@@ -5882,23 +5878,21 @@ var file_livekit_rtc_proto_depIdxs = []int32{
 	30,  // 120: livekit.RequestResponse.update_video_track:type_name -> livekit.UpdateLocalVideoTrack
 	10,  // 121: livekit.RequestResponse.publish_data_track:type_name -> livekit.PublishDataTrackRequest
 	12,  // 122: livekit.RequestResponse.unpublish_data_track:type_name -> livekit.UnpublishDataTrackRequest
-	25,  // 123: livekit.RequestResponse.store_data_blob:type_name -> livekit.StoreDataBlobRequest
-	26,  // 124: livekit.RequestResponse.get_data_blob:type_name -> livekit.GetDataBlobRequest
-	94,  // 125: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
-	60,  // 126: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
-	69,  // 127: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
-	9,   // 128: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
-	21,  // 129: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
-	95,  // 130: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
-	49,  // 131: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
-	5,   // 132: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
-	64,  // 133: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
-	96,  // 134: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
-	135, // [135:135] is the sub-list for method output_type
-	135, // [135:135] is the sub-list for method input_type
-	135, // [135:135] is the sub-list for extension type_name
-	135, // [135:135] is the sub-list for extension extendee
-	0,   // [0:135] is the sub-list for field type_name
+	94,  // 123: livekit.JoinRequest.client_info:type_name -> livekit.ClientInfo
+	60,  // 124: livekit.JoinRequest.connection_settings:type_name -> livekit.ConnectionSettings
+	69,  // 125: livekit.JoinRequest.participant_attributes:type_name -> livekit.JoinRequest.ParticipantAttributesEntry
+	9,   // 126: livekit.JoinRequest.add_track_requests:type_name -> livekit.AddTrackRequest
+	21,  // 127: livekit.JoinRequest.publisher_offer:type_name -> livekit.SessionDescription
+	95,  // 128: livekit.JoinRequest.reconnect_reason:type_name -> livekit.ReconnectReason
+	49,  // 129: livekit.JoinRequest.sync_state:type_name -> livekit.SyncState
+	5,   // 130: livekit.WrappedJoinRequest.compression:type_name -> livekit.WrappedJoinRequest.Compression
+	64,  // 131: livekit.DataTrackSubscriberHandles.SubHandlesEntry.value:type_name -> livekit.DataTrackSubscriberHandles.PublishedDataTrack
+	96,  // 132: livekit.UpdateDataSubscription.Update.options:type_name -> livekit.DataTrackSubscriptionOptions
+	133, // [133:133] is the sub-list for method output_type
+	133, // [133:133] is the sub-list for method input_type
+	133, // [133:133] is the sub-list for extension type_name
+	133, // [133:133] is the sub-list for extension extendee
+	0,   // [0:133] is the sub-list for field type_name
 }
 
 func init() { file_livekit_rtc_proto_init() }
@@ -5982,8 +5976,6 @@ func file_livekit_rtc_proto_init() {
 		(*RequestResponse_UpdateVideoTrack)(nil),
 		(*RequestResponse_PublishDataTrack)(nil),
 		(*RequestResponse_UnpublishDataTrack)(nil),
-		(*RequestResponse_StoreDataBlob)(nil),
-		(*RequestResponse_GetDataBlob)(nil),
 	}
 	file_livekit_rtc_proto_msgTypes[54].OneofWrappers = []any{}
 	type x struct{}
