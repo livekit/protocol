@@ -305,6 +305,7 @@ message UpdateDataSubscription {
 
 message StoreDataBlobRequest {
   DataBlob blob = 1;
+  uint32 request_id = 2 [(logger.name) = "requestID"];
 }
 
 message GetDataBlobRequest {
@@ -312,10 +313,12 @@ message GetDataBlobRequest {
   string participant_identity = 1;
   // Unique key of the data blob to retrieve.
   DataBlobKey key = 2;
+  uint32 request_id = 3 [(logger.name) = "requestID"];
 }
 
 message GetDataBlobResponse {
   DataBlob blob = 1;
+  uint32 request_id = 2 [(logger.name) = "requestID"];
 }
 
 message UpdateTrackSettings {
@@ -597,8 +600,6 @@ message RequestResponse {
     UpdateLocalVideoTrack update_video_track = 9;
     PublishDataTrackRequest publish_data_track = 10;
     UnpublishDataTrackRequest unpublish_data_track = 11;
-    StoreDataBlobRequest store_data_blob = 12;
-    GetDataBlobRequest get_data_blob = 13;
   }
 }
 
