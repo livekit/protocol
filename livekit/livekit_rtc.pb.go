@@ -2478,8 +2478,8 @@ func (x *UpdateDataSubscription) GetUpdates() []*UpdateDataSubscription_Update {
 
 type StoreDataBlobRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Blob          *DataBlob              `protobuf:"bytes,1,opt,name=blob,proto3" json:"blob,omitempty"`
-	RequestId     uint32                 `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	RequestId     uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Blob          *DataBlob              `protobuf:"bytes,2,opt,name=blob,proto3" json:"blob,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2514,13 +2514,6 @@ func (*StoreDataBlobRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *StoreDataBlobRequest) GetBlob() *DataBlob {
-	if x != nil {
-		return x.Blob
-	}
-	return nil
-}
-
 func (x *StoreDataBlobRequest) GetRequestId() uint32 {
 	if x != nil {
 		return x.RequestId
@@ -2528,13 +2521,20 @@ func (x *StoreDataBlobRequest) GetRequestId() uint32 {
 	return 0
 }
 
+func (x *StoreDataBlobRequest) GetBlob() *DataBlob {
+	if x != nil {
+		return x.Blob
+	}
+	return nil
+}
+
 type GetDataBlobRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	RequestId uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	// Identity of the participant who owns the blob.
-	ParticipantIdentity string `protobuf:"bytes,1,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	ParticipantIdentity string `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	// Unique key of the data blob to retrieve.
-	Key           *DataBlobKey `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	RequestId     uint32       `protobuf:"varint,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Key           *DataBlobKey `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2569,6 +2569,13 @@ func (*GetDataBlobRequest) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{20}
 }
 
+func (x *GetDataBlobRequest) GetRequestId() uint32 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
+}
+
 func (x *GetDataBlobRequest) GetParticipantIdentity() string {
 	if x != nil {
 		return x.ParticipantIdentity
@@ -2583,17 +2590,10 @@ func (x *GetDataBlobRequest) GetKey() *DataBlobKey {
 	return nil
 }
 
-func (x *GetDataBlobRequest) GetRequestId() uint32 {
-	if x != nil {
-		return x.RequestId
-	}
-	return 0
-}
-
 type GetDataBlobResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Blob          *DataBlob              `protobuf:"bytes,1,opt,name=blob,proto3" json:"blob,omitempty"`
-	RequestId     uint32                 `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	RequestId     uint32                 `protobuf:"varint,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	Blob          *DataBlob              `protobuf:"bytes,2,opt,name=blob,proto3" json:"blob,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2628,18 +2628,18 @@ func (*GetDataBlobResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_rtc_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *GetDataBlobResponse) GetBlob() *DataBlob {
-	if x != nil {
-		return x.Blob
-	}
-	return nil
-}
-
 func (x *GetDataBlobResponse) GetRequestId() uint32 {
 	if x != nil {
 		return x.RequestId
 	}
 	return 0
+}
+
+func (x *GetDataBlobResponse) GetBlob() *DataBlob {
+	if x != nil {
+		return x.Blob
+	}
+	return nil
 }
 
 type UpdateTrackSettings struct {
@@ -5407,19 +5407,19 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\ttrack_sid\x18\x01 \x01(\tR\btrackSid\x12\x1c\n" +
 	"\tsubscribe\x18\x02 \x01(\bR\tsubscribe\x12?\n" +
 	"\aoptions\x18\x03 \x01(\v2%.livekit.DataTrackSubscriptionOptionsR\aoptions\"j\n" +
-	"\x14StoreDataBlobRequest\x12%\n" +
-	"\x04blob\x18\x01 \x01(\v2\x11.livekit.DataBlobR\x04blob\x12+\n" +
+	"\x14StoreDataBlobRequest\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\rB\f\xbaP\trequestIDR\trequestId\"\x9c\x01\n" +
-	"\x12GetDataBlobRequest\x121\n" +
-	"\x14participant_identity\x18\x01 \x01(\tR\x13participantIdentity\x12&\n" +
-	"\x03key\x18\x02 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12+\n" +
+	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x12%\n" +
+	"\x04blob\x18\x02 \x01(\v2\x11.livekit.DataBlobR\x04blob\"\x9c\x01\n" +
+	"\x12GetDataBlobRequest\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\rB\f\xbaP\trequestIDR\trequestId\"i\n" +
-	"\x13GetDataBlobResponse\x12%\n" +
-	"\x04blob\x18\x01 \x01(\v2\x11.livekit.DataBlobR\x04blob\x12+\n" +
+	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x121\n" +
+	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12&\n" +
+	"\x03key\x18\x03 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"i\n" +
+	"\x13GetDataBlobResponse\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\rB\f\xbaP\trequestIDR\trequestId\"\xdd\x01\n" +
+	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x12%\n" +
+	"\x04blob\x18\x02 \x01(\v2\x11.livekit.DataBlobR\x04blob\"\xdd\x01\n" +
 	"\x13UpdateTrackSettings\x12\x1d\n" +
 	"\n" +
 	"track_sids\x18\x01 \x03(\tR\ttrackSids\x12\x1a\n" +
