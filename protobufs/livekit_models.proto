@@ -539,6 +539,7 @@ message ClientInfo {
   enum Capability {
     CAP_UNUSED = 0;
     CAP_PACKET_TRAILER = 1;
+    CAP_COMPRESSION_DEFLATE_RAW = 2;
   }
 
   SDK sdk = 1;
