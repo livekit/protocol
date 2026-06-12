@@ -80,6 +80,113 @@ func Errorw(msg string, err error, keysAndValues ...any) {
 	pkgLogger.Errorw(msg, err, keysAndValues...)
 }
 
+// Audit logging emits structured records of security- or billing-relevant
+// actions (sign-ins, resource creation, deletions, ...). Every audit line
+// carries serviceName, userID, projectID, and auditLog=true so it can be
+// routed or filtered apart from the regular log stream downstream.
+//
+// An audit logger is derived from a Logger, so audit lines inherit whatever
+// context that logger has bound. Pass GetLogger() for the global logger, or a
+// request-scoped logger to capture its context (room, participant, ...).
+//
+// When a request or handler operates on a single user/project, bind the scope
+// once and log many events against it:
+//
+//	audit := logger.NewAuditEmitter(l, "billing")
+//	a := audit.Scope(logger.AuditScope{UserID: userID, ProjectID: projectID})
+//	a.Log("invoice created", "amount", cents)
+//	a.LogError("invoice failed", err)
+//
+// When the user/project vary per call, log directly against the emitter:
+//
+//	audit.Log(logger.AuditScope{UserID: userID, ProjectID: projectID}, "invoice created")
+const (
+	auditUnknownService = "unknown-service"
+	auditUnknownValue   = "unknown"
+	auditUnknownAction  = "unknown-action"
+)
+
+// AuditScope identifies the subject of an audit event. It is a struct rather
+// than positional arguments so the same-typed UserID/ProjectID can't be
+// silently swapped at the call site, and so new fields can be added without
+// breaking existing callers.
+type AuditScope struct {
+	UserID    string
+	ProjectID string
+	Action    string
+}
+
+// AuditEmitter emits audit logs tagged with a single service name, through the
+// logger it was constructed with. Construct one at startup with NewAuditEmitter
+// and reuse it.
+type AuditEmitter struct {
+	base        Logger
+	serviceName string
+}
+
+// AuditLogger is an AuditEmitter with an AuditScope bound for the lifetime of a
+// scope such as a request or handler. Obtain one via AuditEmitter.Scope.
+type AuditLogger struct {
+	emitter AuditEmitter
+	scope   AuditScope
+}
+
+// NewAuditEmitter returns an AuditEmitter that emits through l and tags every
+// audit log with serviceName. Audit lines inherit l's bound context.
+func NewAuditEmitter(l Logger, serviceName string) AuditEmitter {
+	return AuditEmitter{base: l, serviceName: auditDefault(serviceName, auditUnknownService)}
+}
+
+// Scope binds an AuditScope for repeated logging against the same user/project.
+func (e AuditEmitter) Scope(scope AuditScope) AuditLogger {
+	return AuditLogger{emitter: e, scope: scope}
+}
+
+// Log records a successful audit event for the given scope.
+func (e AuditEmitter) Log(scope AuditScope, msg string, keysAndValues ...any) {
+	e.logger(scope).Infow(msg, append(keysAndValues, "outcome", "success")...)
+}
+
+// LogError records an audit event that failed for the given scope.
+func (e AuditEmitter) LogError(scope AuditScope, msg string, err error, keysAndValues ...any) {
+	keysAndValues = append(keysAndValues, "error", err.Error(), "outcome", "failure")
+	e.logger(scope).Infow(msg, keysAndValues...)
+}
+
+// Log records a successful audit event for the bound scope.
+func (l AuditLogger) Log(msg string, keysAndValues ...any) {
+	l.emitter.logger(l.scope).Infow(msg, append(keysAndValues, "outcome", "success")...)
+}
+
+// LogError records an audit event that failed for the bound scope.
+func (l AuditLogger) LogError(msg string, err error, keysAndValues ...any) {
+	l.emitter.logger(l.scope).Errorw(msg, err, append(keysAndValues, "error", err.Error(), "outcome", "failure")...)
+}
+
+// logger returns the base logger with the audit fields bound. It adds one level
+// of call depth to account for the Log/LogError wrapper above it. A zero-value
+// AuditEmitter (no base) falls back to the global logger rather than panicking.
+func (e AuditEmitter) logger(scope AuditScope) Logger {
+	base := e.base
+	if base == nil {
+		base = defaultLogger
+	}
+	return base.WithCallDepth(1).WithValues(
+		"auditLog", true,
+		"serviceName", e.serviceName,
+		"userID", auditDefault(scope.UserID, auditUnknownValue),
+		"projectID", auditDefault(scope.ProjectID, auditUnknownValue),
+		"action", auditDefault(scope.Action, auditUnknownAction),
+	)
+}
+
+func auditDefault(value, fallback string) string {
+	if value != "" {
+		return value
+	}
+	return fallback
+}
+
 func ParseZapLevel(level string) zapcore.Level {
 	lvl := zapcore.InfoLevel
 	if level != "" {

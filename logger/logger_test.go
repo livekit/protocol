@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
 	"runtime"
 	"strings"
@@ -118,6 +119,100 @@ func TestLoggerComponent(t *testing.T) {
 type TestLogOutput struct {
 	testutil.TestLogOutput
 	Bar string
+}
+
+type auditLogOutput struct {
+	testutil.TestLogOutput
+	Action      string
+	UserID      string
+	ProjectID   string
+	ServiceName string
+	AuditLog    bool
+	Error       string
+	Room        string
+}
+
+func TestAudit(t *testing.T) {
+	t.Cleanup(func() {
+		defaultLogger = LogRLogger(discardLogger)
+		pkgLogger = LogRLogger(discardLogger)
+	})
+
+	setup := func() *testutil.BufferedWriteSyncer {
+		ws := &testutil.BufferedWriteSyncer{}
+		l := must.Get(NewZapLogger(&Config{}, WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel))))
+		SetLogger(l, "TEST")
+		return ws
+	}
+
+	scope := AuditScope{UserID: "user-456", ProjectID: "proj-123"}
+
+	t.Run("success", func(t *testing.T) {
+		ws := setup()
+		NewAuditEmitter(GetLogger(), "my-service").Scope(scope).Log("user signed in", "action", "login")
+
+		var log auditLogOutput
+		require.NoError(t, ws.Unmarshal(&log))
+		require.Equal(t, "info", log.Level)
+		require.Equal(t, "user signed in", log.Msg)
+		require.Equal(t, "my-service", log.ServiceName)
+		require.Equal(t, "proj-123", log.ProjectID)
+		require.Equal(t, "user-456", log.UserID)
+		require.True(t, log.AuditLog)
+		require.Equal(t, "login", log.Action)
+		require.Empty(t, log.Error)
+		// caller must point at this test file, not logger.go
+		require.Contains(t, log.Caller, "logger_test.go")
+	})
+
+	t.Run("error", func(t *testing.T) {
+		ws := setup()
+		NewAuditEmitter(GetLogger(), "my-service").Scope(scope).LogError("user sign-in failed", errors.New("boom"))
+
+		var log auditLogOutput
+		require.NoError(t, ws.Unmarshal(&log))
+		require.Equal(t, "error", log.Level)
+		require.Equal(t, "user sign-in failed", log.Msg)
+		require.Equal(t, "my-service", log.ServiceName)
+		require.Equal(t, "proj-123", log.ProjectID)
+		require.Equal(t, "user-456", log.UserID)
+		require.True(t, log.AuditLog)
+		require.Equal(t, "boom", log.Error)
+	})
+
+	t.Run("direct log with varying scope", func(t *testing.T) {
+		ws := setup()
+		NewAuditEmitter(GetLogger(), "my-service").Log(scope, "invoice created")
+
+		var log auditLogOutput
+		require.NoError(t, ws.Unmarshal(&log))
+		require.Equal(t, "my-service", log.ServiceName)
+		require.Equal(t, "invoice created", log.Msg)
+	})
+
+	t.Run("inherits context bound on the base logger", func(t *testing.T) {
+		ws := setup()
+		l := GetLogger().WithValues("room", "room-1")
+		NewAuditEmitter(l, "billing-service").Scope(scope).Log("invoice created")
+
+		var log auditLogOutput
+		require.NoError(t, ws.Unmarshal(&log))
+		require.Equal(t, "billing-service", log.ServiceName)
+		require.Equal(t, "invoice created", log.Msg)
+		require.Equal(t, "room-1", log.Room) // came from the base logger
+		require.Equal(t, "user-456", log.UserID)
+	})
+
+	t.Run("empty scope and service fall back to unknown", func(t *testing.T) {
+		ws := setup()
+		NewAuditEmitter(GetLogger(), "").Log(AuditScope{}, "no context")
+
+		var log auditLogOutput
+		require.NoError(t, ws.Unmarshal(&log))
+		require.Equal(t, "unknown-service", log.ServiceName)
+		require.Equal(t, "unknown", log.UserID)
+		require.Equal(t, "unknown", log.ProjectID)
+	})
 }
 
 type logFunc func(string, ...any)
