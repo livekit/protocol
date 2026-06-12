@@ -17,6 +17,7 @@ package sip
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"maps"
@@ -850,15 +851,17 @@ func InboundTrunkAuthPrompt(trunk *livekit.SIPInboundTrunkInfo) (*rpc.GetSIPTrun
 
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
+	if rule == nil {
+		return nil, errors.New("no dispatch rule")
+	}
+	trunk.Upgrade()
 	rule.Upgrade()
 	call := req.SIPCall()
 	sentPin := req.GetPin()
 
 	trunkID := req.SipTrunkId
-	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
 	if trunk != nil {
 		trunkID = trunk.SipTrunkId
-		enc = trunk.MediaEncryption
 	}
 	attrs := maps.Clone(rule.Attributes)
 	if attrs == nil {
@@ -890,6 +893,16 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		attrs[livekit.AttrSIPHostName] = call.From.Host
 		attrs[livekit.AttrSIPTrunkNumber] = call.To.User
 	}
+	var mediaConf *livekit.SIPMediaConfig
+	if trunk != nil {
+		media := proto.CloneOf(trunk.Media)
+		mediaConf = mediaConf.Merge(media)
+	}
+	{
+		media := proto.CloneOf(rule.Media)
+		mediaConf = mediaConf.Merge(media)
+	}
+	enc := mediaConf.Encryption.Deref()
 
 	room, rulePin, err := GetPinAndRoom(rule)
 	if err != nil {
@@ -902,9 +915,9 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 				SipTrunkId:        trunkID,
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
-				MediaEncryption:   enc,
-				Media:             rule.Media,
 				RequestPin:        true,
+				MediaEncryption:   enc,
+				Media:             mediaConf,
 			}, nil
 		}
 		if rulePin != sentPin {
@@ -949,6 +962,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		RoomPreset:            rule.GetRoomPreset(),
 		RoomConfig:            rule.GetRoomConfig(),
 		MediaEncryption:       enc,
+		Media:                 mediaConf,
 	}
 	krispEnabled := false
 	if trunk != nil {
@@ -958,18 +972,10 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		resp.IncludeHeaders = trunk.IncludeHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
 		resp.MaxCallDuration = trunk.MaxCallDuration
+
 		krispEnabled = krispEnabled || trunk.KrispEnabled
 	}
-	if rule != nil {
-		krispEnabled = krispEnabled || rule.KrispEnabled
-		if rule.MediaEncryption != 0 {
-			resp.MediaEncryption = rule.MediaEncryption
-		}
-		media := proto.CloneOf(rule.Media)
-		media = media.UpgradeWith(resp.MediaEncryption)
-		resp.Media = media
-		resp.MediaEncryption = media.Encryption.Deref()
-	}
+	krispEnabled = krispEnabled || rule.KrispEnabled
 	if krispEnabled {
 		resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)
 	}
