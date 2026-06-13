@@ -201,6 +201,7 @@ message EotPrediction {
   float probability = 1;
   InferenceStats inference_stats = 2;
   EotBackend backend = 3;
+  float backchannel_probability = 4;
 }
 
 message InterruptionPrediction {
