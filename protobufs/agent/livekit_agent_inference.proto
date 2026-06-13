@@ -184,7 +184,9 @@ message SessionCreated {
   map<string, float> default_thresholds = 1;
   // Catch-all default applied to languages not present in default_thresholds.
   float default_threshold = 2;
-  float default_backchannel_threshold = 3;
+  // same structure, but for backchannel
+  map<string, float> default_backchannel_thresholds = 3;
+  float default_backchannel_threshold = 4;
 }
 
 message InferenceStarted {}
