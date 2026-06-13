@@ -15,12 +15,11 @@
 package auth_test
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
-	"github.com/go-jose/go-jose/v3"
-	"github.com/go-jose/go-jose/v3/json"
-	"github.com/go-jose/go-jose/v3/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/auth"
@@ -102,32 +101,26 @@ func TestVerifier(t *testing.T) {
 		// this server does not yet know about. The server should still accept the
 		// token rather than failing with `unknown field`. This guards against
 		// requiring server upgrades before client upgrades can roll out.
-		sig, err := jose.NewSigner(
-			jose.SigningKey{Algorithm: jose.HS256, Key: []byte(secret)},
-			(&jose.SignerOptions{}).WithType("JWT"),
-		)
-		require.NoError(t, err)
-
-		claims := map[string]interface{}{
+		claims := jwt.MapClaims{
 			"iss": apiKey,
 			"sub": "me",
 			"nbf": jwt.NewNumericDate(time.Now()),
 			"exp": jwt.NewNumericDate(time.Now().Add(time.Minute)),
 			// unknown top-level claim grants field
-			"someFutureGrant": map[string]interface{}{"enabled": true},
-			"video": map[string]interface{}{
+			"someFutureGrant": map[string]any{"enabled": true},
+			"video": map[string]any{
 				"roomJoin": true,
 				"room":     "myroom",
 				// unknown field inside a known grant
 				"someFutureVideoField": "future-value",
 			},
-			"roomConfig": map[string]interface{}{
+			"roomConfig": map[string]any{
 				"name": "myroom",
 				// unknown field inside a protojson-decoded message
 				"someFutureRoomConfigField": "future-value",
 			},
 		}
-		token, err := jwt.Signed(sig).Claims(claims).CompactSerialize()
+		token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(secret))
 		require.NoError(t, err)
 
 		v, err := auth.ParseAPIToken(token)

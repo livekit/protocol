@@ -2,10 +2,9 @@ package egressobs
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/livekit/protocol/utils/protojson"
-
-	"github.com/pkg/errors"
 
 	"github.com/livekit/protocol/egress"
 	"github.com/livekit/protocol/livekit"
@@ -115,37 +114,37 @@ func GetRequest(info *livekit.EgressInfo) (string, error) {
 	case *livekit.EgressInfo_Replay:
 		b, err := protojson.Marshal(req.Replay)
 		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Replay request")
+			return "", fmt.Errorf("failed serializing Replay request: %w", err)
 		}
 		return string(b), nil
 	case *livekit.EgressInfo_RoomComposite:
 		b, err := protojson.Marshal(req.RoomComposite)
 		if err != nil {
-			return "", errors.Wrap(err, "failed serializing RoomComposite request")
+			return "", fmt.Errorf("failed serializing RoomComposite request: %w", err)
 		}
 		return string(b), nil
 	case *livekit.EgressInfo_Web:
 		b, err := protojson.Marshal(req.Web)
 		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Web request")
+			return "", fmt.Errorf("failed serializing Web request: %w", err)
 		}
 		return string(b), nil
 	case *livekit.EgressInfo_Participant:
 		b, err := protojson.Marshal(req.Participant)
 		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Participant request")
+			return "", fmt.Errorf("failed serializing Participant request: %w", err)
 		}
 		return string(b), nil
 	case *livekit.EgressInfo_TrackComposite:
 		b, err := protojson.Marshal(req.TrackComposite)
 		if err != nil {
-			return "", errors.Wrap(err, "failed serializing TrackComposite request")
+			return "", fmt.Errorf("failed serializing TrackComposite request: %w", err)
 		}
 		return string(b), nil
 	case *livekit.EgressInfo_Track:
 		b, err := protojson.Marshal(req.Track)
 		if err != nil {
-			return "", errors.Wrap(err, "failed serializing Track request")
+			return "", fmt.Errorf("failed serializing Track request: %w", err)
 		}
 		return string(b), nil
 	default:
@@ -181,7 +180,7 @@ func GetResult(info *livekit.EgressInfo) (string, error) {
 	}
 	b, err := json.Marshal(results)
 	if err != nil {
-		return "", errors.Wrap(err, "failed serializing results")
+		return "", fmt.Errorf("failed serializing results: %w", err)
 	}
 	return string(b), nil
 }
