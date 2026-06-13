@@ -1492,9 +1492,10 @@ type SessionCreated struct {
 	// barge-in sessions.
 	DefaultThresholds map[string]float32 `protobuf:"bytes,1,rep,name=default_thresholds,json=defaultThresholds,proto3" json:"default_thresholds,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"fixed32,2,opt,name=value"`
 	// Catch-all default applied to languages not present in default_thresholds.
-	DefaultThreshold float32 `protobuf:"fixed32,2,opt,name=default_threshold,json=defaultThreshold,proto3" json:"default_threshold,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	DefaultThreshold            float32 `protobuf:"fixed32,2,opt,name=default_threshold,json=defaultThreshold,proto3" json:"default_threshold,omitempty"`
+	DefaultBackchannelThreshold float32 `protobuf:"fixed32,3,opt,name=default_backchannel_threshold,json=defaultBackchannelThreshold,proto3" json:"default_backchannel_threshold,omitempty"`
+	unknownFields               protoimpl.UnknownFields
+	sizeCache                   protoimpl.SizeCache
 }
 
 func (x *SessionCreated) Reset() {
@@ -1537,6 +1538,13 @@ func (x *SessionCreated) GetDefaultThresholds() map[string]float32 {
 func (x *SessionCreated) GetDefaultThreshold() float32 {
 	if x != nil {
 		return x.DefaultThreshold
+	}
+	return 0
+}
+
+func (x *SessionCreated) GetDefaultBackchannelThreshold() float32 {
+	if x != nil {
+		return x.DefaultBackchannelThreshold
 	}
 	return 0
 }
@@ -2062,10 +2070,11 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x16eot_inference_response\x18\x01 \x01(\v2#.livekit.agent.EotInferenceResponseH\x00R\x14eotInferenceResponse\x12v\n" +
 	"\x1finterruption_inference_response\x18\x02 \x01(\v2,.livekit.agent.InterruptionInferenceResponseH\x00R\x1dinterruptionInferenceResponseB\n" +
 	"\n" +
-	"\bresponse\"\xe8\x01\n" +
+	"\bresponse\"\xac\x02\n" +
 	"\x0eSessionCreated\x12c\n" +
 	"\x12default_thresholds\x18\x01 \x03(\v24.livekit.agent.SessionCreated.DefaultThresholdsEntryR\x11defaultThresholds\x12+\n" +
-	"\x11default_threshold\x18\x02 \x01(\x02R\x10defaultThreshold\x1aD\n" +
+	"\x11default_threshold\x18\x02 \x01(\x02R\x10defaultThreshold\x12B\n" +
+	"\x1ddefault_backchannel_threshold\x18\x03 \x01(\x02R\x1bdefaultBackchannelThreshold\x1aD\n" +
 	"\x16DefaultThresholdsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\x02R\x05value:\x028\x01\"\x12\n" +
