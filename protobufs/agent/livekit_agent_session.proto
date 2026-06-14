@@ -114,6 +114,20 @@ enum UserState {
   US_AWAY = 2;
 }
 
+enum ToolCallStatus {
+  TC_RUNNING = 0;
+  TC_DONE = 1;
+  TC_ERROR = 2;
+  TC_CANCELLED = 3;
+}
+
+enum ToolReplyStatus {
+  TR_SCHEDULED = 0;
+  TR_COMPLETED = 1;
+  TR_INTERRUPTED = 2;
+  TR_SKIPPED = 3;
+}
+
 enum AmdCategory {
   AMD_UNKNOWN = 0;
   AMD_HUMAN = 1;
@@ -249,6 +263,37 @@ message AgentSessionEvent {
     AgentSessionUsage usage = 1;
   }
 
+  // Per-call tool lifecycle. One flat status update per occurrence:
+  // a call started -> the call updated (progress and the terminal entry) ->
+  // the deferred reply voicing buffered updates advanced.
+  message ToolStatusUpdated {
+    message Started {
+      FunctionCall function_call = 1;
+    }
+    message CallUpdated {
+      // synthetic id: call_id (inline), call_id_update_N, or call_id_final
+      string id = 1 [(logger.name) = "ID"];
+      string call_id = 2 [(logger.name) = "callID"];
+      // raw update text, result text, or error message; unset for cancelled / empty returns
+      optional string message = 3;
+      // TC_RUNNING marks a progress update; any other value is the terminal entry
+      ToolCallStatus status = 4;
+    }
+    message ReplyUpdated {
+      // buffered update ids covered by this reply; one reply can span calls
+      repeated string update_ids = 1 [(logger.name) = "updateIDs"];
+      ToolReplyStatus status = 2;
+      // id of the speech that voices this reply
+      string speech_id = 3 [(logger.name) = "speechID"];
+    }
+
+    oneof update {
+      Started started = 1;
+      CallUpdated call_updated = 2;
+      ReplyUpdated reply_updated = 3;
+    }
+  }
+
   google.protobuf.Timestamp created_at = 1;
   oneof event {
     AgentStateChanged agent_state_changed = 10;
@@ -263,6 +308,7 @@ message AgentSessionEvent {
     EotPrediction eot_prediction = 19;
     FunctionToolsStarted function_tools_started = 20;
     DebugMessage debug_message = 21;
+    ToolStatusUpdated tool_status_updated = 22;
   }
 }
 
