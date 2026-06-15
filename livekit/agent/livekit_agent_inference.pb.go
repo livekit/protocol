@@ -1493,8 +1493,11 @@ type SessionCreated struct {
 	DefaultThresholds map[string]float32 `protobuf:"bytes,1,rep,name=default_thresholds,json=defaultThresholds,proto3" json:"default_thresholds,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"fixed32,2,opt,name=value"`
 	// Catch-all default applied to languages not present in default_thresholds.
 	DefaultThreshold float32 `protobuf:"fixed32,2,opt,name=default_threshold,json=defaultThreshold,proto3" json:"default_threshold,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// same structure, but for backchannel
+	DefaultBackchannelThresholds map[string]float32 `protobuf:"bytes,3,rep,name=default_backchannel_thresholds,json=defaultBackchannelThresholds,proto3" json:"default_backchannel_thresholds,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"fixed32,2,opt,name=value"`
+	DefaultBackchannelThreshold  float32            `protobuf:"fixed32,4,opt,name=default_backchannel_threshold,json=defaultBackchannelThreshold,proto3" json:"default_backchannel_threshold,omitempty"`
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *SessionCreated) Reset() {
@@ -1537,6 +1540,20 @@ func (x *SessionCreated) GetDefaultThresholds() map[string]float32 {
 func (x *SessionCreated) GetDefaultThreshold() float32 {
 	if x != nil {
 		return x.DefaultThreshold
+	}
+	return 0
+}
+
+func (x *SessionCreated) GetDefaultBackchannelThresholds() map[string]float32 {
+	if x != nil {
+		return x.DefaultBackchannelThresholds
+	}
+	return nil
+}
+
+func (x *SessionCreated) GetDefaultBackchannelThreshold() float32 {
+	if x != nil {
+		return x.DefaultBackchannelThreshold
 	}
 	return 0
 }
@@ -1650,12 +1667,13 @@ func (*SessionClosed) Descriptor() ([]byte, []int) {
 }
 
 type EotPrediction struct {
-	state          protoimpl.MessageState   `protogen:"open.v1"`
-	Probability    float32                  `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
-	InferenceStats *InferenceStats          `protobuf:"bytes,2,opt,name=inference_stats,json=inferenceStats,proto3" json:"inference_stats,omitempty"`
-	Backend        EotPrediction_EotBackend `protobuf:"varint,3,opt,name=backend,proto3,enum=livekit.agent.EotPrediction_EotBackend" json:"backend,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state                  protoimpl.MessageState   `protogen:"open.v1"`
+	Probability            float32                  `protobuf:"fixed32,1,opt,name=probability,proto3" json:"probability,omitempty"`
+	InferenceStats         *InferenceStats          `protobuf:"bytes,2,opt,name=inference_stats,json=inferenceStats,proto3" json:"inference_stats,omitempty"`
+	Backend                EotPrediction_EotBackend `protobuf:"varint,3,opt,name=backend,proto3,enum=livekit.agent.EotPrediction_EotBackend" json:"backend,omitempty"`
+	BackchannelProbability float32                  `protobuf:"fixed32,4,opt,name=backchannel_probability,json=backchannelProbability,proto3" json:"backchannel_probability,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *EotPrediction) Reset() {
@@ -1707,6 +1725,13 @@ func (x *EotPrediction) GetBackend() EotPrediction_EotBackend {
 		return x.Backend
 	}
 	return EotPrediction_EOT_BACKEND_UNKNOWN
+}
+
+func (x *EotPrediction) GetBackchannelProbability() float32 {
+	if x != nil {
+		return x.BackchannelProbability
+	}
+	return 0
 }
 
 type InterruptionPrediction struct {
@@ -2054,20 +2079,26 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x16eot_inference_response\x18\x01 \x01(\v2#.livekit.agent.EotInferenceResponseH\x00R\x14eotInferenceResponse\x12v\n" +
 	"\x1finterruption_inference_response\x18\x02 \x01(\v2,.livekit.agent.InterruptionInferenceResponseH\x00R\x1dinterruptionInferenceResponseB\n" +
 	"\n" +
-	"\bresponse\"\xe8\x01\n" +
+	"\bresponse\"\x85\x04\n" +
 	"\x0eSessionCreated\x12c\n" +
 	"\x12default_thresholds\x18\x01 \x03(\v24.livekit.agent.SessionCreated.DefaultThresholdsEntryR\x11defaultThresholds\x12+\n" +
-	"\x11default_threshold\x18\x02 \x01(\x02R\x10defaultThreshold\x1aD\n" +
+	"\x11default_threshold\x18\x02 \x01(\x02R\x10defaultThreshold\x12\x85\x01\n" +
+	"\x1edefault_backchannel_thresholds\x18\x03 \x03(\v2?.livekit.agent.SessionCreated.DefaultBackchannelThresholdsEntryR\x1cdefaultBackchannelThresholds\x12B\n" +
+	"\x1ddefault_backchannel_threshold\x18\x04 \x01(\x02R\x1bdefaultBackchannelThreshold\x1aD\n" +
 	"\x16DefaultThresholdsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\x02R\x05value:\x028\x01\x1aO\n" +
+	"!DefaultBackchannelThresholdsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\x02R\x05value:\x028\x01\"\x12\n" +
 	"\x10InferenceStarted\"\x12\n" +
 	"\x10InferenceStopped\"\x0f\n" +
-	"\rSessionClosed\"\x95\x02\n" +
+	"\rSessionClosed\"\xce\x02\n" +
 	"\rEotPrediction\x12 \n" +
 	"\vprobability\x18\x01 \x01(\x02R\vprobability\x12F\n" +
 	"\x0finference_stats\x18\x02 \x01(\v2\x1d.livekit.agent.InferenceStatsR\x0einferenceStats\x12A\n" +
-	"\abackend\x18\x03 \x01(\x0e2'.livekit.agent.EotPrediction.EotBackendR\abackend\"W\n" +
+	"\abackend\x18\x03 \x01(\x0e2'.livekit.agent.EotPrediction.EotBackendR\abackend\x127\n" +
+	"\x17backchannel_probability\x18\x04 \x01(\x02R\x16backchannelProbability\"W\n" +
 	"\n" +
 	"EotBackend\x12\x17\n" +
 	"\x13EOT_BACKEND_UNKNOWN\x10\x00\x12\x1a\n" +
@@ -2110,7 +2141,7 @@ func file_agent_livekit_agent_inference_proto_rawDescGZIP() []byte {
 }
 
 var file_agent_livekit_agent_inference_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_agent_livekit_agent_inference_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_agent_livekit_agent_inference_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_agent_livekit_agent_inference_proto_goTypes = []any{
 	(AudioEncoding)(0),                    // 0: livekit.agent.AudioEncoding
 	(EotPrediction_EotBackend)(0),         // 1: livekit.agent.EotPrediction.EotBackend
@@ -2143,22 +2174,23 @@ var file_agent_livekit_agent_inference_proto_goTypes = []any{
 	(*InterruptionPrediction)(nil),        // 28: livekit.agent.InterruptionPrediction
 	(*ServerMessage)(nil),                 // 29: livekit.agent.ServerMessage
 	nil,                                   // 30: livekit.agent.SessionCreated.DefaultThresholdsEntry
-	(*durationpb.Duration)(nil),           // 31: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),         // 32: google.protobuf.Timestamp
-	(*ChatMessage)(nil),                   // 33: livekit.agent.ChatMessage
+	nil,                                   // 31: livekit.agent.SessionCreated.DefaultBackchannelThresholdsEntry
+	(*durationpb.Duration)(nil),           // 32: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),         // 33: google.protobuf.Timestamp
+	(*ChatMessage)(nil),                   // 34: livekit.agent.ChatMessage
 }
 var file_agent_livekit_agent_inference_proto_depIdxs = []int32{
 	0,  // 0: livekit.agent.SessionSettings.encoding:type_name -> livekit.agent.AudioEncoding
 	4,  // 1: livekit.agent.SessionSettings.eot_settings:type_name -> livekit.agent.EotSettings
 	5,  // 2: livekit.agent.SessionSettings.interruption_settings:type_name -> livekit.agent.InterruptionSettings
-	31, // 3: livekit.agent.EotSettings.detection_interval:type_name -> google.protobuf.Duration
-	31, // 4: livekit.agent.InterruptionSettings.max_audio_duration:type_name -> google.protobuf.Duration
-	31, // 5: livekit.agent.InterruptionSettings.audio_prefix_duration:type_name -> google.protobuf.Duration
-	31, // 6: livekit.agent.InterruptionSettings.detection_interval:type_name -> google.protobuf.Duration
+	32, // 3: livekit.agent.EotSettings.detection_interval:type_name -> google.protobuf.Duration
+	32, // 4: livekit.agent.InterruptionSettings.max_audio_duration:type_name -> google.protobuf.Duration
+	32, // 5: livekit.agent.InterruptionSettings.audio_prefix_duration:type_name -> google.protobuf.Duration
+	32, // 6: livekit.agent.InterruptionSettings.detection_interval:type_name -> google.protobuf.Duration
 	2,  // 7: livekit.agent.SessionCreate.settings:type_name -> livekit.agent.SessionSettings
-	32, // 8: livekit.agent.InputAudio.created_at:type_name -> google.protobuf.Timestamp
-	33, // 9: livekit.agent.EotInputChatContext.messages:type_name -> livekit.agent.ChatMessage
-	32, // 10: livekit.agent.ClientMessage.created_at:type_name -> google.protobuf.Timestamp
+	33, // 8: livekit.agent.InputAudio.created_at:type_name -> google.protobuf.Timestamp
+	34, // 9: livekit.agent.EotInputChatContext.messages:type_name -> livekit.agent.ChatMessage
+	33, // 10: livekit.agent.ClientMessage.created_at:type_name -> google.protobuf.Timestamp
 	6,  // 11: livekit.agent.ClientMessage.session_create:type_name -> livekit.agent.SessionCreate
 	7,  // 12: livekit.agent.ClientMessage.input_audio:type_name -> livekit.agent.InputAudio
 	9,  // 13: livekit.agent.ClientMessage.session_flush:type_name -> livekit.agent.SessionFlush
@@ -2172,34 +2204,35 @@ var file_agent_livekit_agent_inference_proto_depIdxs = []int32{
 	0,  // 21: livekit.agent.InterruptionInferenceRequest.encoding:type_name -> livekit.agent.AudioEncoding
 	16, // 22: livekit.agent.InferenceRequest.eot_inference_request:type_name -> livekit.agent.EotInferenceRequest
 	17, // 23: livekit.agent.InferenceRequest.interruption_inference_request:type_name -> livekit.agent.InterruptionInferenceRequest
-	32, // 24: livekit.agent.InferenceStats.earliest_client_created_at:type_name -> google.protobuf.Timestamp
-	32, // 25: livekit.agent.InferenceStats.latest_client_created_at:type_name -> google.protobuf.Timestamp
-	31, // 26: livekit.agent.InferenceStats.client_e2e_latency:type_name -> google.protobuf.Duration
-	31, // 27: livekit.agent.InferenceStats.server_e2e_latency:type_name -> google.protobuf.Duration
-	31, // 28: livekit.agent.InferenceStats.preprocessing_duration:type_name -> google.protobuf.Duration
-	31, // 29: livekit.agent.InferenceStats.inference_duration:type_name -> google.protobuf.Duration
+	33, // 24: livekit.agent.InferenceStats.earliest_client_created_at:type_name -> google.protobuf.Timestamp
+	33, // 25: livekit.agent.InferenceStats.latest_client_created_at:type_name -> google.protobuf.Timestamp
+	32, // 26: livekit.agent.InferenceStats.client_e2e_latency:type_name -> google.protobuf.Duration
+	32, // 27: livekit.agent.InferenceStats.server_e2e_latency:type_name -> google.protobuf.Duration
+	32, // 28: livekit.agent.InferenceStats.preprocessing_duration:type_name -> google.protobuf.Duration
+	32, // 29: livekit.agent.InferenceStats.inference_duration:type_name -> google.protobuf.Duration
 	19, // 30: livekit.agent.EotInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
 	19, // 31: livekit.agent.InterruptionInferenceResponse.stats:type_name -> livekit.agent.InferenceStats
 	20, // 32: livekit.agent.InferenceResponse.eot_inference_response:type_name -> livekit.agent.EotInferenceResponse
 	21, // 33: livekit.agent.InferenceResponse.interruption_inference_response:type_name -> livekit.agent.InterruptionInferenceResponse
 	30, // 34: livekit.agent.SessionCreated.default_thresholds:type_name -> livekit.agent.SessionCreated.DefaultThresholdsEntry
-	19, // 35: livekit.agent.EotPrediction.inference_stats:type_name -> livekit.agent.InferenceStats
-	1,  // 36: livekit.agent.EotPrediction.backend:type_name -> livekit.agent.EotPrediction.EotBackend
-	19, // 37: livekit.agent.InterruptionPrediction.inference_stats:type_name -> livekit.agent.InferenceStats
-	32, // 38: livekit.agent.ServerMessage.server_created_at:type_name -> google.protobuf.Timestamp
-	32, // 39: livekit.agent.ServerMessage.client_created_at:type_name -> google.protobuf.Timestamp
-	23, // 40: livekit.agent.ServerMessage.session_created:type_name -> livekit.agent.SessionCreated
-	24, // 41: livekit.agent.ServerMessage.inference_started:type_name -> livekit.agent.InferenceStarted
-	25, // 42: livekit.agent.ServerMessage.inference_stopped:type_name -> livekit.agent.InferenceStopped
-	26, // 43: livekit.agent.ServerMessage.session_closed:type_name -> livekit.agent.SessionClosed
-	3,  // 44: livekit.agent.ServerMessage.error:type_name -> livekit.agent.InferenceError
-	27, // 45: livekit.agent.ServerMessage.eot_prediction:type_name -> livekit.agent.EotPrediction
-	28, // 46: livekit.agent.ServerMessage.interruption_prediction:type_name -> livekit.agent.InterruptionPrediction
-	47, // [47:47] is the sub-list for method output_type
-	47, // [47:47] is the sub-list for method input_type
-	47, // [47:47] is the sub-list for extension type_name
-	47, // [47:47] is the sub-list for extension extendee
-	0,  // [0:47] is the sub-list for field type_name
+	31, // 35: livekit.agent.SessionCreated.default_backchannel_thresholds:type_name -> livekit.agent.SessionCreated.DefaultBackchannelThresholdsEntry
+	19, // 36: livekit.agent.EotPrediction.inference_stats:type_name -> livekit.agent.InferenceStats
+	1,  // 37: livekit.agent.EotPrediction.backend:type_name -> livekit.agent.EotPrediction.EotBackend
+	19, // 38: livekit.agent.InterruptionPrediction.inference_stats:type_name -> livekit.agent.InferenceStats
+	33, // 39: livekit.agent.ServerMessage.server_created_at:type_name -> google.protobuf.Timestamp
+	33, // 40: livekit.agent.ServerMessage.client_created_at:type_name -> google.protobuf.Timestamp
+	23, // 41: livekit.agent.ServerMessage.session_created:type_name -> livekit.agent.SessionCreated
+	24, // 42: livekit.agent.ServerMessage.inference_started:type_name -> livekit.agent.InferenceStarted
+	25, // 43: livekit.agent.ServerMessage.inference_stopped:type_name -> livekit.agent.InferenceStopped
+	26, // 44: livekit.agent.ServerMessage.session_closed:type_name -> livekit.agent.SessionClosed
+	3,  // 45: livekit.agent.ServerMessage.error:type_name -> livekit.agent.InferenceError
+	27, // 46: livekit.agent.ServerMessage.eot_prediction:type_name -> livekit.agent.EotPrediction
+	28, // 47: livekit.agent.ServerMessage.interruption_prediction:type_name -> livekit.agent.InterruptionPrediction
+	48, // [48:48] is the sub-list for method output_type
+	48, // [48:48] is the sub-list for method input_type
+	48, // [48:48] is the sub-list for extension type_name
+	48, // [48:48] is the sub-list for extension extendee
+	0,  // [0:48] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_inference_proto_init() }
@@ -2247,7 +2280,7 @@ func file_agent_livekit_agent_inference_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_inference_proto_rawDesc), len(file_agent_livekit_agent_inference_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   29,
+			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
