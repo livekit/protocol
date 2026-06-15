@@ -1436,7 +1436,7 @@ type DataStream_CompressionType int32
 
 const (
 	DataStream_NONE        DataStream_CompressionType = 0
-	DataStream_DEFLATE_RAW DataStream_CompressionType = 1
+	DataStream_DEFLATE_RAW DataStream_CompressionType = 1 // DEFLATE_RAW = DEFLATE without header+checksum/trailer
 )
 
 // Enum value maps for DataStream_CompressionType.
