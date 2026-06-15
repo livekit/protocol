@@ -263,20 +263,28 @@ message AgentSessionEvent {
     AgentSessionUsage usage = 1;
   }
 
-  // Per-call tool lifecycle. One flat status update per occurrence:
-  // a call started -> the call updated (progress and the terminal entry) ->
-  // the deferred reply voicing buffered updates advanced.
-  message ToolStatusUpdated {
+  // Per-call tool lifecycle. One flat update per occurrence: a call started ->
+  // progress updates while it runs (CallUpdated) -> the single terminal entry (Ended),
+  // with the deferred reply voicing buffered updates advancing separately (ReplyUpdated).
+  message ToolExecutionUpdated {
     message Started {
       FunctionCall function_call = 1;
     }
+    // a progress update emitted via ctx.update() while the call runs
     message CallUpdated {
-      // synthetic id: call_id (inline), call_id_update_N, or call_id_final
+      // synthetic id: call_id (inline) or call_id_update_N
       string id = 1 [(logger.name) = "ID"];
       string call_id = 2 [(logger.name) = "callID"];
-      // raw update text, result text, or error message; unset for cancelled / empty returns
+      string message = 3;
+    }
+    // the call's single terminal entry
+    message Ended {
+      // synthetic id: call_id (inline) or call_id_final (deferred)
+      string id = 1 [(logger.name) = "ID"];
+      string call_id = 2 [(logger.name) = "callID"];
+      // result text or error message; unset for cancelled / empty returns
       optional string message = 3;
-      // TC_RUNNING marks a progress update; any other value is the terminal entry
+      // TC_DONE, TC_ERROR, or TC_CANCELLED
       ToolCallStatus status = 4;
     }
     message ReplyUpdated {
@@ -291,6 +299,7 @@ message AgentSessionEvent {
       Started started = 1;
       CallUpdated call_updated = 2;
       ReplyUpdated reply_updated = 3;
+      Ended ended = 4;
     }
   }
 
@@ -308,7 +317,7 @@ message AgentSessionEvent {
     EotPrediction eot_prediction = 19;
     FunctionToolsStarted function_tools_started = 20;
     DebugMessage debug_message = 21;
-    ToolStatusUpdated tool_status_updated = 22;
+    ToolExecutionUpdated tool_execution_updated = 22;
   }
 }
 
