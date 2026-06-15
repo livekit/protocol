@@ -21,7 +21,9 @@ import (
 	"fmt"
 	"time"
 
+	entraid "github.com/redis/go-redis-entraid"
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/auth"
 
 	"github.com/livekit/protocol/xtls"
 
@@ -50,6 +52,7 @@ type RedisConfig struct {
 	MaxRedirects *int          `yaml:"max_redirects,omitempty"`
 	PoolTimeout  time.Duration `yaml:"pool_timeout,omitempty"`
 	PoolSize     int           `yaml:"pool_size,omitempty"`
+	AzureEntra   bool          `yaml:"azure_entra,omitempty"`
 }
 
 func (r *RedisConfig) IsConfigured() bool {
@@ -72,19 +75,26 @@ func (r *RedisConfig) GetMaxRedirects() int {
 	return 2
 }
 
-func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
-	if conf == nil {
-		return nil, nil
-	}
+type clientOptions struct {
+	streamingCredentialsProvider auth.StreamingCredentialsProvider
+}
 
-	if !conf.IsConfigured() {
-		return nil, ErrNotConfigured
-	}
+type Option func(*clientOptions)
 
-	var rcOptions *redis.UniversalOptions
-	var rc redis.UniversalClient
+func WithStreamingCredentialsProvider(p auth.StreamingCredentialsProvider) Option {
+	return func(o *clientOptions) {
+		o.streamingCredentialsProvider = p
+	}
+}
+
+var azureEntraProviderFactory = newAzureEntraCredentialsProvider
+
+func newAzureEntraCredentialsProvider() (auth.StreamingCredentialsProvider, error) {
+	return entraid.NewDefaultAzureCredentialsProvider(entraid.DefaultAzureCredentialsProviderOptions{})
+}
+
+func buildRedisOptions(conf *RedisConfig, co clientOptions) (*redis.UniversalOptions, error) {
 	var tlsConfig *tls.Config
-
 	if conf.TLS != nil && conf.TLS.Enabled {
 		var err error
 		tlsConfig, err = conf.TLS.ClientTLSConfig()
@@ -97,6 +107,7 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 		}
 	}
 
+	var rcOptions *redis.UniversalOptions
 	if len(conf.SentinelAddresses) > 0 {
 		logger.Infow("connecting to redis", "sentinel", true, "addr", conf.SentinelAddresses, "masterName", conf.MasterName)
 
@@ -153,11 +164,45 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			PoolSize:    conf.PoolSize,
 		}
 	}
-	rc = redis.NewUniversalClient(rcOptions)
+
+	provider := co.streamingCredentialsProvider
+	if provider == nil && conf.AzureEntra {
+		p, err := azureEntraProviderFactory()
+		if err != nil {
+			return nil, fmt.Errorf("unable to create Azure Entra credentials provider: %w", err)
+		}
+		provider = p
+	}
+	if provider != nil {
+		rcOptions.StreamingCredentialsProvider = provider
+	}
+
+	return rcOptions, nil
+}
+
+func GetRedisClient(conf *RedisConfig, opts ...Option) (redis.UniversalClient, error) {
+	if conf == nil {
+		return nil, nil
+	}
+
+	if !conf.IsConfigured() {
+		return nil, ErrNotConfigured
+	}
+
+	var co clientOptions
+	for _, opt := range opts {
+		opt(&co)
+	}
+
+	rcOptions, err := buildRedisOptions(conf, co)
+	if err != nil {
+		return nil, err
+	}
+
+	rc := redis.NewUniversalClient(rcOptions)
 
 	if err := rc.Ping(context.Background()).Err(); err != nil {
-		err = fmt.Errorf("unable to connect to redis: %w", err)
-		return nil, err
+		return nil, fmt.Errorf("unable to connect to redis: %w", err)
 	}
 
 	return rc, nil
