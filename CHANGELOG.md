@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.46.7
+
+### Patch Changes
+
+- Add a feature map to internal SIPCall. - [#1615](https://github.com/livekit/protocol/pull/1615) ([@dennwc](https://github.com/dennwc))
+
 ## 1.46.6
 
 ### Patch Changes
