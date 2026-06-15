@@ -18,7 +18,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/puzpuzpuz/xsync/v3"
+	"github.com/puzpuzpuz/xsync/v4"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/logger"
@@ -26,16 +26,16 @@ import (
 )
 
 type loggerCache struct {
-	m *xsync.MapOf[string, logger.Logger]
+	m *xsync.Map[string, logger.Logger]
 }
 
 func newLoggerCache() loggerCache {
-	return loggerCache{m: xsync.NewMapOf[string, logger.Logger]()}
+	return loggerCache{m: xsync.NewMap[string, logger.Logger]()}
 }
 
 func (c loggerCache) Get(info psrpc.RPCInfo, l logger.Logger) logger.Logger {
-	wl, _ := c.m.LoadOrCompute(info.Method, func() logger.Logger {
-		return l.WithComponent("psrpc").WithComponent(info.Service).WithComponent(info.Method)
+	wl, _ := c.m.LoadOrCompute(info.Method, func() (logger.Logger, bool) {
+		return l.WithComponent("psrpc").WithComponent(info.Service).WithComponent(info.Method), false
 	})
 	return wl
 }

@@ -26,7 +26,7 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/types/dynamicpb"
 
-	"github.com/puzpuzpuz/xsync/v3"
+	"github.com/puzpuzpuz/xsync/v4"
 
 	"github.com/livekit/protocol/livekit/logger"
 	"github.com/livekit/protocol/utils/must"
@@ -204,7 +204,7 @@ func marshalProtoBytes(b []byte) string {
 	}
 }
 
-var redactTemplates = xsync.NewMapOf[string, *template.Template]()
+var redactTemplates = xsync.NewMap[string, *template.Template]()
 
 func marshalRedacted(f protoreflect.FieldDescriptor, v protoreflect.Value) string {
 	if !proto.HasExtension(f.Options(), logger.E_RedactFormat) {
@@ -212,8 +212,8 @@ func marshalRedacted(f protoreflect.FieldDescriptor, v protoreflect.Value) strin
 	}
 
 	text := proto.GetExtension(f.Options(), logger.E_RedactFormat).(string)
-	tpl, _ := redactTemplates.LoadOrCompute(text, func() *template.Template {
-		return template.Must(template.New("format").Parse(text))
+	tpl, _ := redactTemplates.LoadOrCompute(text, func() (*template.Template, bool) {
+		return template.Must(template.New("format").Parse(text)), false
 	})
 
 	var b bytes.Buffer

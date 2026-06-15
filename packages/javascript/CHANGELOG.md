@@ -1,5 +1,9 @@
 # @livekit/protocol
 
+## 1.46.6
+
+## 1.46.5
+
 ## 1.46.4
 
 ### Patch Changes

@@ -311,21 +311,21 @@ message UpdateDataSubscription {
 }
 
 message StoreDataBlobRequest {
-  DataBlob blob = 1;
-  uint32 request_id = 2 [(logger.name) = "requestID"];
+  uint32 request_id = 1 [(logger.name) = "requestID"];
+  DataBlob blob = 2;
 }
 
 message GetDataBlobRequest {
+  uint32 request_id = 1 [(logger.name) = "requestID"];
   // Identity of the participant who owns the blob.
-  string participant_identity = 1;
+  string participant_identity = 2;
   // Unique key of the data blob to retrieve.
-  DataBlobKey key = 2;
-  uint32 request_id = 3 [(logger.name) = "requestID"];
+  DataBlobKey key = 3;
 }
 
 message GetDataBlobResponse {
-  DataBlob blob = 1;
-  uint32 request_id = 2 [(logger.name) = "requestID"];
+  uint32 request_id = 1 [(logger.name) = "requestID"];
+  DataBlob blob = 2;
 }
 
 message UpdateTrackSettings {
