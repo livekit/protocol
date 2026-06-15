@@ -811,7 +811,7 @@ message DataStream {
   // client protocol >= 2 which advertise a client capability of CAP_COMPRESSION_DEFLATE_RAW
   enum CompressionType {
     NONE = 0;
-    DEFLATE_RAW = 1;
+    DEFLATE_RAW = 1; // DEFLATE_RAW = DEFLATE without header+checksum/trailer
   }
 
   // main DataStream.Header that contains a oneof for specific headers
