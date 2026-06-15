@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.46.7
+
+### Patch Changes
+
+- add backchannel probability to the eot prediction - [#1624](https://github.com/livekit/protocol/pull/1624) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.46.6
 
 ## 1.46.5
