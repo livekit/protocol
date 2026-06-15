@@ -310,7 +310,7 @@ type SimulationRun struct {
 	Usage *SimulationRun_Usage `protobuf:"bytes,16,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Maximum simulate jobs running in parallel for this run (0 = server default).
 	Concurrency int32 `protobuf:"varint,17,opt,name=concurrency,proto3" json:"concurrency,omitempty"`
-	// Conversation channel for every job in this run; unspecified = TEXT.
+	// Conversation mode for every job in this run; unspecified = TEXT.
 	Mode          SimulationMode `protobuf:"varint,18,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1164,7 +1164,7 @@ type SimulationRun_Create_Request struct {
 	// Maximum simulate jobs running in parallel for this run. Clamped to the
 	// project's concurrency quota; 0/unset uses the server default.
 	Concurrency *int32 `protobuf:"varint,8,opt,name=concurrency,proto3,oneof" json:"concurrency,omitempty"`
-	// Conversation channel for every job in this run; unspecified = TEXT.
+	// Conversation mode for every job in this run; unspecified = TEXT.
 	Mode          SimulationMode `protobuf:"varint,9,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
