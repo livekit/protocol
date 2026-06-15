@@ -96,7 +96,7 @@ message SimulationRun {
       // project's concurrency quota; 0/unset uses the server default.
       optional int32 concurrency = 8;
 
-      // Conversation channel for every job in this run; unspecified = TEXT.
+      // Conversation mode for every job in this run; unspecified = TEXT.
       SimulationMode mode = 9;
     }
     message Response {
@@ -163,7 +163,7 @@ message SimulationRun {
   Usage usage = 16;
   // Maximum simulate jobs running in parallel for this run (0 = server default).
   int32 concurrency = 17;
-  // Conversation channel for every job in this run; unspecified = TEXT.
+  // Conversation mode for every job in this run; unspecified = TEXT.
   SimulationMode mode = 18;
 
   message Usage {
