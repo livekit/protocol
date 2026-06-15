@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.46.8
+
+### Patch Changes
+
+- Add CAP_COMPRESSION_DEFLATE_RAW and data stream fields for compression and inline payloads - [#1621](https://github.com/livekit/protocol/pull/1621) ([@1egoman](https://github.com/1egoman))
+
 ## 1.46.7
 
 ### Patch Changes
