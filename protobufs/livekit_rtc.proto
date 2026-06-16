@@ -187,6 +187,9 @@ message PublishDataTrackRequest {
 
   // Method used for end-to-end encryption (E2EE) on frame payloads.
   Encryption.Type encryption = 3;
+
+  // Reliability mode for frames sent on this track.
+  DataTrackReliability reliability = 4;
 }
 
 message PublishDataTrackResponse {

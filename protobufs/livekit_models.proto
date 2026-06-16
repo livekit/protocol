@@ -282,6 +282,9 @@ message DataTrackInfo {
 
   // Method used for end-to-end encryption (E2EE) on packet payloads.
   Encryption.Type encryption = 4;
+
+  // Reliability mode used by the publisher for this track.
+  DataTrackReliability reliability = 5;
 }
 
 enum DataTrackExtensionID {
@@ -298,6 +301,11 @@ message DataTrackSubscriptionOptions {
   // Rate in frames per second (FPS) the subscriber wants to receive frames at.
   // If omitted, the subscriber defaults to the publisher's fps
   optional uint32 target_fps = 1;
+
+  // Reliability requested by the subscriber. This is currently used as
+  // subscription intent/validation; delivery follows the track's published
+  // reliability.
+  DataTrackReliability reliability = 2;
 }
 
 enum VideoQuality {
@@ -540,6 +548,7 @@ message ClientInfo {
     CAP_UNUSED = 0;
     CAP_PACKET_TRAILER = 1;
     CAP_COMPRESSION_DEFLATE_RAW = 2;
+    CAP_RELIABLE_DATA_TRACK = 3;
   }
 
   SDK sdk = 1;
@@ -864,4 +873,9 @@ message WebhookConfig {
 message SubscribedAudioCodec {
   string codec = 1;
   bool enabled = 2;
+}
+
+enum DataTrackReliability {
+  DTR_LOSSY = 0;
+  DTR_RELIABLE = 1;
 }
