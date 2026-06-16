@@ -129,8 +129,10 @@ message SignalResponse {
     UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
     DataTrackSubscriberHandles data_track_subscriber_handles = 29;
+    // Sent in response to `StoreDataBlobRequest`.
+    StoreDataBlobResponse store_data_blob_response = 30;
     // Sent in response to `GetDataBlobRequest`.
-    GetDataBlobResponse get_data_blob_response = 30;
+    GetDataBlobResponse get_data_blob_response = 31;
   }
 }
 
@@ -306,6 +308,12 @@ message UpdateDataSubscription {
 message StoreDataBlobRequest {
   uint32 request_id = 1 [(logger.name) = "requestID"];
   DataBlob blob = 2;
+}
+
+message StoreDataBlobResponse {
+  uint32 request_id = 1 [(logger.name) = "requestID"];
+  // Unique key the data blob was stored under.
+  DataBlobKey key = 2;
 }
 
 message GetDataBlobRequest {
