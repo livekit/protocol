@@ -1449,7 +1449,7 @@ var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xb2\x04\n" +
+	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xb7\x04\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\vdispatch_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -1458,8 +1458,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x04type\x18\x02 \x01(\x0e2\x10.livekit.JobTypeR\x04type\x12!\n" +
 	"\x04room\x18\x03 \x01(\v2\r.livekit.RoomR\x04room\x12?\n" +
 	"\vparticipant\x18\x04 \x01(\v2\x18.livekit.ParticipantInfoH\x00R\vparticipant\x88\x01\x01\x12 \n" +
-	"\tnamespace\x18\x05 \x01(\tB\x02\x18\x01R\tnamespace\x12\x1a\n" +
-	"\bmetadata\x18\x06 \x01(\tR\bmetadata\x12\x1d\n" +
+	"\tnamespace\x18\x05 \x01(\tB\x02\x18\x01R\tnamespace\x12\x1f\n" +
+	"\bmetadata\x18\x06 \x01(\tB\x03\xc0P\x01R\bmetadata\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\a \x01(\tR\tagentName\x12'\n" +
 	"\x05state\x18\b \x01(\v2\x11.livekit.JobStateR\x05state\x12)\n" +
