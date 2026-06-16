@@ -7,13 +7,20 @@ import (
 	"slices"
 	"strconv"
 	"strings"
+	"time"
 
+	"golang.org/x/text/language"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/utils/xtwirp"
-	"golang.org/x/text/language"
+	"github.com/livekit/psrpc"
 )
+
+// MaxSIPMediaTimeout is the maximum allowed trunk / API value for media_timeout
+// (no incoming RTP before the RTP path is torn down)
+const MaxSIPMediaTimeout = 10 * time.Minute
 
 var (
 	_ xtwirp.ErrorMeta = (*SIPStatus)(nil)
@@ -130,11 +137,11 @@ func (p *SIPStatus) GRPCStatus() *status.Status {
 			code = codes.Unknown // 1xx are not final responses, something is wrong.
 		} else if p.Code < 300 {
 			return status.New(codes.OK, "OK") // Preserving previous behavior
-		} else if code < 500 {
+		} else if p.Code < 500 {
 			code = codes.InvalidArgument
-		} else if code < 600 {
+		} else if p.Code < 600 {
 			code = codes.FailedPrecondition // 5xx from remote server, per guideline (c) in gRPC docs
-		} else if code < 700 {
+		} else if p.Code < 700 {
 			code = codes.InvalidArgument // Same as 4xx ,but authoritative
 		}
 	}
@@ -440,7 +447,7 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	hasCIDR := len(p.AllowedAddresses) != 0
 	hasNumbers := len(p.Numbers) != 0 // TODO: remove this condition, it doesn't really help with security
 	if !hasAuth && !hasCIDR && !hasNumbers {
-		return errors.New("for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
+		return psrpc.NewErrorf(psrpc.InvalidArgument, "for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
@@ -476,6 +483,7 @@ func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
 	applyListUpdate(&info.AllowedNumbers, p.AllowedNumbers)
 	applyUpdate(&info.AuthUsername, p.AuthUsername)
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
+	applyUpdate(&info.AuthRealm, p.AuthRealm)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
@@ -493,7 +501,7 @@ var (
 )
 
 func (p *UpdateSIPOutboundTrunkRequest_Replace) Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, error) {
-	val := cloneProto(p.Replace)
+	val := proto.CloneOf(p.Replace)
 	if val == nil {
 		return nil, errors.New("missing trunk")
 	}
@@ -511,7 +519,7 @@ func (p *UpdateSIPOutboundTrunkRequest_Update) Apply(info *SIPOutboundTrunkInfo)
 	if diff == nil {
 		return nil, errors.New("missing trunk update")
 	}
-	val := cloneProto(info)
+	val := proto.CloneOf(info)
 	if err := diff.Apply(val); err != nil {
 		return nil, err
 	}
@@ -597,7 +605,7 @@ var (
 )
 
 func (p *UpdateSIPInboundTrunkRequest_Replace) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
-	val := cloneProto(p.Replace)
+	val := proto.CloneOf(p.Replace)
 	if val == nil {
 		return nil, errors.New("missing trunk")
 	}
@@ -615,7 +623,7 @@ func (p *UpdateSIPInboundTrunkRequest_Update) Apply(info *SIPInboundTrunkInfo) (
 	if diff == nil {
 		return nil, errors.New("missing trunk update")
 	}
-	val := cloneProto(info)
+	val := proto.CloneOf(info)
 	if err := diff.Apply(val); err != nil {
 		return nil, err
 	}
@@ -685,11 +693,17 @@ func (p *SIPDispatchRuleInfo) Validate() error {
 	if p.Rule == nil {
 		return errors.New("missing rule")
 	}
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (p *SIPDispatchRuleUpdate) Validate() error {
 	if err := p.TrunkIds.Validate(); err != nil {
+		return err
+	}
+	if err := p.Media.Validate(); err != nil {
 		return err
 	}
 	return nil
@@ -701,10 +715,15 @@ func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
 	}
 	applyListUpdate(&info.TrunkIds, p.TrunkIds)
 	applyUpdatePtr(&info.Rule, p.Rule)
+	applyUpdatePtr(&info.Media, p.Media) // TODO: Consider applying partial updates
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
 	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	applyMapDiff(&info.Attributes, p.Attributes)
+	info.Upgrade()
+	if m := info.Media; m != nil {
+		info.MediaEncryption = m.Encryption.Deref()
+	}
 	return info.Validate()
 }
 
@@ -719,7 +738,7 @@ var (
 )
 
 func (p *UpdateSIPDispatchRuleRequest_Replace) Apply(info *SIPDispatchRuleInfo) (*SIPDispatchRuleInfo, error) {
-	val := cloneProto(p.Replace)
+	val := proto.CloneOf(p.Replace)
 	if val == nil {
 		return nil, errors.New("missing dispatch rule")
 	}
@@ -737,7 +756,7 @@ func (p *UpdateSIPDispatchRuleRequest_Update) Apply(info *SIPDispatchRuleInfo) (
 	if diff == nil {
 		return nil, errors.New("missing dispatch rule update")
 	}
-	val := cloneProto(info)
+	val := proto.CloneOf(info)
 	if err := diff.Apply(val); err != nil {
 		return nil, err
 	}
@@ -771,16 +790,16 @@ func (p *CreateSIPParticipantRequest) Validate() error {
 			return fmt.Errorf("DisplayName must be a valid quoted string: %w", err)
 		}
 	}
-
 	// Validate destination if provided
 	if err := p.Destination.Validate(); err != nil {
 		return err
 	}
-
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
 	}
-
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -1024,3 +1043,73 @@ var (
 		")", "",
 	)
 )
+
+func (p *SIPCodec) Validate() error {
+	if p.Name == "" {
+		return errors.New("missing codec name")
+	}
+	if strings.ContainsAny(p.Name, " \t\n\r") {
+		return errors.New("invalid codec name")
+	}
+	if strings.Contains(p.Name, "/") {
+		return errors.New("codec name must not contain '/'")
+	}
+	if p.Rate == 0 {
+		return errors.New("invalid codec sample rate")
+	}
+	return nil
+}
+
+func (p *SIPDispatchRuleInfo) Upgrade() {
+	if p == nil {
+		return
+	}
+	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+}
+
+func (p *CreateSIPParticipantRequest) Upgrade() {
+	if p == nil {
+		return
+	}
+	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+}
+
+func (p *SIPMediaEncryption) Deref() SIPMediaEncryption {
+	if p == nil {
+		return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+	}
+	return *p
+}
+
+func (p *SIPMediaConfig) Validate() error {
+	if p == nil { // When optional, p can be nil
+		return nil
+	}
+	for _, c := range p.Codecs {
+		if err := c.Validate(); err != nil {
+			return err
+		}
+	}
+	if p.MediaTimeout != nil {
+		dur := p.MediaTimeout.AsDuration()
+		if dur < 0 {
+			return errors.New("media_timeout must not be negative")
+		}
+		// Zero means use default
+		if dur > MaxSIPMediaTimeout {
+			return fmt.Errorf("media_timeout must not exceed %v", MaxSIPMediaTimeout)
+		}
+	}
+	return nil
+}
+
+func (p *SIPMediaConfig) UpgradeWith(enc SIPMediaEncryption) *SIPMediaConfig {
+	if p == nil {
+		p = new(SIPMediaConfig)
+	}
+	// Ignore DISABLE as it's a zero value which means "unset".
+	if p.Encryption == nil && enc != SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE {
+		p.Encryption = &enc
+	}
+	return p
+}

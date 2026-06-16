@@ -752,7 +752,7 @@ func (x SIPTrunkInfo_TrunkKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SIPTrunkInfo_TrunkKind.Descriptor instead.
 func (SIPTrunkInfo_TrunkKind) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{3, 0}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{5, 0}
 }
 
 // SIPStatus is returned as an error detail in CreateSIPParticipant.
@@ -946,6 +946,129 @@ func (x *CreateSIPTrunkRequest) GetMetadata() string {
 	return ""
 }
 
+type SIPCodec struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Rate          uint32                 `protobuf:"varint,2,opt,name=rate,proto3" json:"rate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SIPCodec) Reset() {
+	*x = SIPCodec{}
+	mi := &file_livekit_sip_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SIPCodec) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SIPCodec) ProtoMessage() {}
+
+func (x *SIPCodec) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_sip_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SIPCodec.ProtoReflect.Descriptor instead.
+func (*SIPCodec) Descriptor() ([]byte, []int) {
+	return file_livekit_sip_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SIPCodec) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *SIPCodec) GetRate() uint32 {
+	if x != nil {
+		return x.Rate
+	}
+	return 0
+}
+
+type SIPMediaConfig struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// if set, ignore the default codecs and use the list below.
+	OnlyListedCodecs bool `protobuf:"varint,1,opt,name=only_listed_codecs,json=onlyListedCodecs,proto3" json:"only_listed_codecs,omitempty"`
+	// List of allowed codecs. If only_listed_codecs is not set, this list is added to default codecs.
+	Codecs     []*SIPCodec         `protobuf:"bytes,2,rep,name=codecs,proto3" json:"codecs,omitempty"`
+	Encryption *SIPMediaEncryption `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"encryption,omitempty"`
+	// Use specific media timeout. If zero or not specified, will use default timeout.
+	MediaTimeout  *durationpb.Duration `protobuf:"bytes,4,opt,name=media_timeout,json=mediaTimeout,proto3,oneof" json:"media_timeout,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SIPMediaConfig) Reset() {
+	*x = SIPMediaConfig{}
+	mi := &file_livekit_sip_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SIPMediaConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SIPMediaConfig) ProtoMessage() {}
+
+func (x *SIPMediaConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_sip_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SIPMediaConfig.ProtoReflect.Descriptor instead.
+func (*SIPMediaConfig) Descriptor() ([]byte, []int) {
+	return file_livekit_sip_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SIPMediaConfig) GetOnlyListedCodecs() bool {
+	if x != nil {
+		return x.OnlyListedCodecs
+	}
+	return false
+}
+
+func (x *SIPMediaConfig) GetCodecs() []*SIPCodec {
+	if x != nil {
+		return x.Codecs
+	}
+	return nil
+}
+
+func (x *SIPMediaConfig) GetEncryption() SIPMediaEncryption {
+	if x != nil && x.Encryption != nil {
+		return *x.Encryption
+	}
+	return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+}
+
+func (x *SIPMediaConfig) GetMediaTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.MediaTimeout
+	}
+	return nil
+}
+
 type ProviderInfo struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -958,7 +1081,7 @@ type ProviderInfo struct {
 
 func (x *ProviderInfo) Reset() {
 	*x = ProviderInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[2]
+	mi := &file_livekit_sip_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -970,7 +1093,7 @@ func (x *ProviderInfo) String() string {
 func (*ProviderInfo) ProtoMessage() {}
 
 func (x *ProviderInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[2]
+	mi := &file_livekit_sip_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -983,7 +1106,7 @@ func (x *ProviderInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProviderInfo.ProtoReflect.Descriptor instead.
 func (*ProviderInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{2}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ProviderInfo) GetId() string {
@@ -1050,7 +1173,7 @@ type SIPTrunkInfo struct {
 
 func (x *SIPTrunkInfo) Reset() {
 	*x = SIPTrunkInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[3]
+	mi := &file_livekit_sip_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1062,7 +1185,7 @@ func (x *SIPTrunkInfo) String() string {
 func (*SIPTrunkInfo) ProtoMessage() {}
 
 func (x *SIPTrunkInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[3]
+	mi := &file_livekit_sip_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1075,7 +1198,7 @@ func (x *SIPTrunkInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPTrunkInfo.ProtoReflect.Descriptor instead.
 func (*SIPTrunkInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{3}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SIPTrunkInfo) GetSipTrunkId() string {
@@ -1186,7 +1309,7 @@ type CreateSIPInboundTrunkRequest struct {
 
 func (x *CreateSIPInboundTrunkRequest) Reset() {
 	*x = CreateSIPInboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[4]
+	mi := &file_livekit_sip_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1198,7 +1321,7 @@ func (x *CreateSIPInboundTrunkRequest) String() string {
 func (*CreateSIPInboundTrunkRequest) ProtoMessage() {}
 
 func (x *CreateSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[4]
+	mi := &file_livekit_sip_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1211,7 +1334,7 @@ func (x *CreateSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSIPInboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*CreateSIPInboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{4}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *CreateSIPInboundTrunkRequest) GetTrunk() *SIPInboundTrunkInfo {
@@ -1235,7 +1358,7 @@ type UpdateSIPInboundTrunkRequest struct {
 
 func (x *UpdateSIPInboundTrunkRequest) Reset() {
 	*x = UpdateSIPInboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[5]
+	mi := &file_livekit_sip_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1247,7 +1370,7 @@ func (x *UpdateSIPInboundTrunkRequest) String() string {
 func (*UpdateSIPInboundTrunkRequest) ProtoMessage() {}
 
 func (x *UpdateSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[5]
+	mi := &file_livekit_sip_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1260,7 +1383,7 @@ func (x *UpdateSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSIPInboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSIPInboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{5}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateSIPInboundTrunkRequest) GetSipTrunkId() string {
@@ -1331,6 +1454,7 @@ type SIPInboundTrunkInfo struct {
 	// May be empty to have no authentication.
 	AuthUsername string `protobuf:"bytes,7,opt,name=auth_username,json=authUsername,proto3" json:"auth_username,omitempty"`
 	AuthPassword string `protobuf:"bytes,8,opt,name=auth_password,json=authPassword,proto3" json:"auth_password,omitempty"`
+	AuthRealm    string `protobuf:"bytes,19,opt,name=auth_realm,json=authRealm,proto3" json:"auth_realm,omitempty"`
 	// Include these SIP X-* headers in 200 OK responses.
 	Headers map[string]string `protobuf:"bytes,9,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Map SIP X-* headers from INVITE to SIP participant attributes.
@@ -1359,7 +1483,7 @@ type SIPInboundTrunkInfo struct {
 
 func (x *SIPInboundTrunkInfo) Reset() {
 	*x = SIPInboundTrunkInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[6]
+	mi := &file_livekit_sip_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1371,7 +1495,7 @@ func (x *SIPInboundTrunkInfo) String() string {
 func (*SIPInboundTrunkInfo) ProtoMessage() {}
 
 func (x *SIPInboundTrunkInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[6]
+	mi := &file_livekit_sip_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1384,7 +1508,7 @@ func (x *SIPInboundTrunkInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPInboundTrunkInfo.ProtoReflect.Descriptor instead.
 func (*SIPInboundTrunkInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{6}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SIPInboundTrunkInfo) GetSipTrunkId() string {
@@ -1439,6 +1563,13 @@ func (x *SIPInboundTrunkInfo) GetAuthUsername() string {
 func (x *SIPInboundTrunkInfo) GetAuthPassword() string {
 	if x != nil {
 		return x.AuthPassword
+	}
+	return ""
+}
+
+func (x *SIPInboundTrunkInfo) GetAuthRealm() string {
+	if x != nil {
+		return x.AuthRealm
 	}
 	return ""
 }
@@ -1520,6 +1651,7 @@ type SIPInboundTrunkUpdate struct {
 	AllowedNumbers   *ListUpdate            `protobuf:"bytes,3,opt,name=allowed_numbers,json=allowedNumbers,proto3" json:"allowed_numbers,omitempty"`
 	AuthUsername     *string                `protobuf:"bytes,4,opt,name=auth_username,json=authUsername,proto3,oneof" json:"auth_username,omitempty"`
 	AuthPassword     *string                `protobuf:"bytes,5,opt,name=auth_password,json=authPassword,proto3,oneof" json:"auth_password,omitempty"`
+	AuthRealm        *string                `protobuf:"bytes,9,opt,name=auth_realm,json=authRealm,proto3,oneof" json:"auth_realm,omitempty"`
 	Name             *string                `protobuf:"bytes,6,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	Metadata         *string                `protobuf:"bytes,7,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
 	MediaEncryption  *SIPMediaEncryption    `protobuf:"varint,8,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
@@ -1529,7 +1661,7 @@ type SIPInboundTrunkUpdate struct {
 
 func (x *SIPInboundTrunkUpdate) Reset() {
 	*x = SIPInboundTrunkUpdate{}
-	mi := &file_livekit_sip_proto_msgTypes[7]
+	mi := &file_livekit_sip_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1541,7 +1673,7 @@ func (x *SIPInboundTrunkUpdate) String() string {
 func (*SIPInboundTrunkUpdate) ProtoMessage() {}
 
 func (x *SIPInboundTrunkUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[7]
+	mi := &file_livekit_sip_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1554,7 +1686,7 @@ func (x *SIPInboundTrunkUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPInboundTrunkUpdate.ProtoReflect.Descriptor instead.
 func (*SIPInboundTrunkUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{7}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SIPInboundTrunkUpdate) GetNumbers() *ListUpdate {
@@ -1592,6 +1724,13 @@ func (x *SIPInboundTrunkUpdate) GetAuthPassword() string {
 	return ""
 }
 
+func (x *SIPInboundTrunkUpdate) GetAuthRealm() string {
+	if x != nil && x.AuthRealm != nil {
+		return *x.AuthRealm
+	}
+	return ""
+}
+
 func (x *SIPInboundTrunkUpdate) GetName() string {
 	if x != nil && x.Name != nil {
 		return *x.Name
@@ -1622,7 +1761,7 @@ type CreateSIPOutboundTrunkRequest struct {
 
 func (x *CreateSIPOutboundTrunkRequest) Reset() {
 	*x = CreateSIPOutboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[8]
+	mi := &file_livekit_sip_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1634,7 +1773,7 @@ func (x *CreateSIPOutboundTrunkRequest) String() string {
 func (*CreateSIPOutboundTrunkRequest) ProtoMessage() {}
 
 func (x *CreateSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[8]
+	mi := &file_livekit_sip_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1647,7 +1786,7 @@ func (x *CreateSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSIPOutboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*CreateSIPOutboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{8}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CreateSIPOutboundTrunkRequest) GetTrunk() *SIPOutboundTrunkInfo {
@@ -1671,7 +1810,7 @@ type UpdateSIPOutboundTrunkRequest struct {
 
 func (x *UpdateSIPOutboundTrunkRequest) Reset() {
 	*x = UpdateSIPOutboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[9]
+	mi := &file_livekit_sip_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1683,7 +1822,7 @@ func (x *UpdateSIPOutboundTrunkRequest) String() string {
 func (*UpdateSIPOutboundTrunkRequest) ProtoMessage() {}
 
 func (x *UpdateSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[9]
+	mi := &file_livekit_sip_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1696,7 +1835,7 @@ func (x *UpdateSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSIPOutboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSIPOutboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{9}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateSIPOutboundTrunkRequest) GetSipTrunkId() string {
@@ -1796,7 +1935,7 @@ type SIPOutboundTrunkInfo struct {
 
 func (x *SIPOutboundTrunkInfo) Reset() {
 	*x = SIPOutboundTrunkInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[10]
+	mi := &file_livekit_sip_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1808,7 +1947,7 @@ func (x *SIPOutboundTrunkInfo) String() string {
 func (*SIPOutboundTrunkInfo) ProtoMessage() {}
 
 func (x *SIPOutboundTrunkInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[10]
+	mi := &file_livekit_sip_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1821,7 +1960,7 @@ func (x *SIPOutboundTrunkInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPOutboundTrunkInfo.ProtoReflect.Descriptor instead.
 func (*SIPOutboundTrunkInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{10}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SIPOutboundTrunkInfo) GetSipTrunkId() string {
@@ -1961,7 +2100,7 @@ type SIPOutboundTrunkUpdate struct {
 
 func (x *SIPOutboundTrunkUpdate) Reset() {
 	*x = SIPOutboundTrunkUpdate{}
-	mi := &file_livekit_sip_proto_msgTypes[11]
+	mi := &file_livekit_sip_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1973,7 +2112,7 @@ func (x *SIPOutboundTrunkUpdate) String() string {
 func (*SIPOutboundTrunkUpdate) ProtoMessage() {}
 
 func (x *SIPOutboundTrunkUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[11]
+	mi := &file_livekit_sip_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1986,7 +2125,7 @@ func (x *SIPOutboundTrunkUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPOutboundTrunkUpdate.ProtoReflect.Descriptor instead.
 func (*SIPOutboundTrunkUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{11}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SIPOutboundTrunkUpdate) GetAddress() string {
@@ -2068,7 +2207,7 @@ type GetSIPInboundTrunkRequest struct {
 
 func (x *GetSIPInboundTrunkRequest) Reset() {
 	*x = GetSIPInboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[12]
+	mi := &file_livekit_sip_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2080,7 +2219,7 @@ func (x *GetSIPInboundTrunkRequest) String() string {
 func (*GetSIPInboundTrunkRequest) ProtoMessage() {}
 
 func (x *GetSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[12]
+	mi := &file_livekit_sip_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2093,7 +2232,7 @@ func (x *GetSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSIPInboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*GetSIPInboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{12}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *GetSIPInboundTrunkRequest) GetSipTrunkId() string {
@@ -2112,7 +2251,7 @@ type GetSIPInboundTrunkResponse struct {
 
 func (x *GetSIPInboundTrunkResponse) Reset() {
 	*x = GetSIPInboundTrunkResponse{}
-	mi := &file_livekit_sip_proto_msgTypes[13]
+	mi := &file_livekit_sip_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2124,7 +2263,7 @@ func (x *GetSIPInboundTrunkResponse) String() string {
 func (*GetSIPInboundTrunkResponse) ProtoMessage() {}
 
 func (x *GetSIPInboundTrunkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[13]
+	mi := &file_livekit_sip_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2137,7 +2276,7 @@ func (x *GetSIPInboundTrunkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSIPInboundTrunkResponse.ProtoReflect.Descriptor instead.
 func (*GetSIPInboundTrunkResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{13}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetSIPInboundTrunkResponse) GetTrunk() *SIPInboundTrunkInfo {
@@ -2156,7 +2295,7 @@ type GetSIPOutboundTrunkRequest struct {
 
 func (x *GetSIPOutboundTrunkRequest) Reset() {
 	*x = GetSIPOutboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[14]
+	mi := &file_livekit_sip_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2168,7 +2307,7 @@ func (x *GetSIPOutboundTrunkRequest) String() string {
 func (*GetSIPOutboundTrunkRequest) ProtoMessage() {}
 
 func (x *GetSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[14]
+	mi := &file_livekit_sip_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2181,7 +2320,7 @@ func (x *GetSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSIPOutboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*GetSIPOutboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{14}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetSIPOutboundTrunkRequest) GetSipTrunkId() string {
@@ -2200,7 +2339,7 @@ type GetSIPOutboundTrunkResponse struct {
 
 func (x *GetSIPOutboundTrunkResponse) Reset() {
 	*x = GetSIPOutboundTrunkResponse{}
-	mi := &file_livekit_sip_proto_msgTypes[15]
+	mi := &file_livekit_sip_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2212,7 +2351,7 @@ func (x *GetSIPOutboundTrunkResponse) String() string {
 func (*GetSIPOutboundTrunkResponse) ProtoMessage() {}
 
 func (x *GetSIPOutboundTrunkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[15]
+	mi := &file_livekit_sip_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2225,7 +2364,7 @@ func (x *GetSIPOutboundTrunkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSIPOutboundTrunkResponse.ProtoReflect.Descriptor instead.
 func (*GetSIPOutboundTrunkResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{15}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetSIPOutboundTrunkResponse) GetTrunk() *SIPOutboundTrunkInfo {
@@ -2245,7 +2384,7 @@ type ListSIPTrunkRequest struct {
 
 func (x *ListSIPTrunkRequest) Reset() {
 	*x = ListSIPTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[16]
+	mi := &file_livekit_sip_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2257,7 +2396,7 @@ func (x *ListSIPTrunkRequest) String() string {
 func (*ListSIPTrunkRequest) ProtoMessage() {}
 
 func (x *ListSIPTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[16]
+	mi := &file_livekit_sip_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2270,7 +2409,7 @@ func (x *ListSIPTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPTrunkRequest.ProtoReflect.Descriptor instead.
 func (*ListSIPTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{16}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListSIPTrunkRequest) GetPage() *Pagination {
@@ -2290,7 +2429,7 @@ type ListSIPTrunkResponse struct {
 
 func (x *ListSIPTrunkResponse) Reset() {
 	*x = ListSIPTrunkResponse{}
-	mi := &file_livekit_sip_proto_msgTypes[17]
+	mi := &file_livekit_sip_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2302,7 +2441,7 @@ func (x *ListSIPTrunkResponse) String() string {
 func (*ListSIPTrunkResponse) ProtoMessage() {}
 
 func (x *ListSIPTrunkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[17]
+	mi := &file_livekit_sip_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2315,7 +2454,7 @@ func (x *ListSIPTrunkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPTrunkResponse.ProtoReflect.Descriptor instead.
 func (*ListSIPTrunkResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{17}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *ListSIPTrunkResponse) GetItems() []*SIPTrunkInfo {
@@ -2340,7 +2479,7 @@ type ListSIPInboundTrunkRequest struct {
 
 func (x *ListSIPInboundTrunkRequest) Reset() {
 	*x = ListSIPInboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[18]
+	mi := &file_livekit_sip_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2352,7 +2491,7 @@ func (x *ListSIPInboundTrunkRequest) String() string {
 func (*ListSIPInboundTrunkRequest) ProtoMessage() {}
 
 func (x *ListSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[18]
+	mi := &file_livekit_sip_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2365,7 +2504,7 @@ func (x *ListSIPInboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPInboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*ListSIPInboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{18}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ListSIPInboundTrunkRequest) GetPage() *Pagination {
@@ -2398,7 +2537,7 @@ type ListSIPInboundTrunkResponse struct {
 
 func (x *ListSIPInboundTrunkResponse) Reset() {
 	*x = ListSIPInboundTrunkResponse{}
-	mi := &file_livekit_sip_proto_msgTypes[19]
+	mi := &file_livekit_sip_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2410,7 +2549,7 @@ func (x *ListSIPInboundTrunkResponse) String() string {
 func (*ListSIPInboundTrunkResponse) ProtoMessage() {}
 
 func (x *ListSIPInboundTrunkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[19]
+	mi := &file_livekit_sip_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2423,7 +2562,7 @@ func (x *ListSIPInboundTrunkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPInboundTrunkResponse.ProtoReflect.Descriptor instead.
 func (*ListSIPInboundTrunkResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{19}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ListSIPInboundTrunkResponse) GetItems() []*SIPInboundTrunkInfo {
@@ -2448,7 +2587,7 @@ type ListSIPOutboundTrunkRequest struct {
 
 func (x *ListSIPOutboundTrunkRequest) Reset() {
 	*x = ListSIPOutboundTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[20]
+	mi := &file_livekit_sip_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2460,7 +2599,7 @@ func (x *ListSIPOutboundTrunkRequest) String() string {
 func (*ListSIPOutboundTrunkRequest) ProtoMessage() {}
 
 func (x *ListSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[20]
+	mi := &file_livekit_sip_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2473,7 +2612,7 @@ func (x *ListSIPOutboundTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPOutboundTrunkRequest.ProtoReflect.Descriptor instead.
 func (*ListSIPOutboundTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{20}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ListSIPOutboundTrunkRequest) GetPage() *Pagination {
@@ -2506,7 +2645,7 @@ type ListSIPOutboundTrunkResponse struct {
 
 func (x *ListSIPOutboundTrunkResponse) Reset() {
 	*x = ListSIPOutboundTrunkResponse{}
-	mi := &file_livekit_sip_proto_msgTypes[21]
+	mi := &file_livekit_sip_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2518,7 +2657,7 @@ func (x *ListSIPOutboundTrunkResponse) String() string {
 func (*ListSIPOutboundTrunkResponse) ProtoMessage() {}
 
 func (x *ListSIPOutboundTrunkResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[21]
+	mi := &file_livekit_sip_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2531,7 +2670,7 @@ func (x *ListSIPOutboundTrunkResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPOutboundTrunkResponse.ProtoReflect.Descriptor instead.
 func (*ListSIPOutboundTrunkResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{21}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ListSIPOutboundTrunkResponse) GetItems() []*SIPOutboundTrunkInfo {
@@ -2550,7 +2689,7 @@ type DeleteSIPTrunkRequest struct {
 
 func (x *DeleteSIPTrunkRequest) Reset() {
 	*x = DeleteSIPTrunkRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[22]
+	mi := &file_livekit_sip_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2562,7 +2701,7 @@ func (x *DeleteSIPTrunkRequest) String() string {
 func (*DeleteSIPTrunkRequest) ProtoMessage() {}
 
 func (x *DeleteSIPTrunkRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[22]
+	mi := &file_livekit_sip_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2575,7 +2714,7 @@ func (x *DeleteSIPTrunkRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSIPTrunkRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSIPTrunkRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{22}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *DeleteSIPTrunkRequest) GetSipTrunkId() string {
@@ -2597,7 +2736,7 @@ type SIPDispatchRuleDirect struct {
 
 func (x *SIPDispatchRuleDirect) Reset() {
 	*x = SIPDispatchRuleDirect{}
-	mi := &file_livekit_sip_proto_msgTypes[23]
+	mi := &file_livekit_sip_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2609,7 +2748,7 @@ func (x *SIPDispatchRuleDirect) String() string {
 func (*SIPDispatchRuleDirect) ProtoMessage() {}
 
 func (x *SIPDispatchRuleDirect) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[23]
+	mi := &file_livekit_sip_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2622,7 +2761,7 @@ func (x *SIPDispatchRuleDirect) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleDirect.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleDirect) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{23}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *SIPDispatchRuleDirect) GetRoomName() string {
@@ -2653,7 +2792,7 @@ type SIPDispatchRuleIndividual struct {
 
 func (x *SIPDispatchRuleIndividual) Reset() {
 	*x = SIPDispatchRuleIndividual{}
-	mi := &file_livekit_sip_proto_msgTypes[24]
+	mi := &file_livekit_sip_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2665,7 +2804,7 @@ func (x *SIPDispatchRuleIndividual) String() string {
 func (*SIPDispatchRuleIndividual) ProtoMessage() {}
 
 func (x *SIPDispatchRuleIndividual) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[24]
+	mi := &file_livekit_sip_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2678,7 +2817,7 @@ func (x *SIPDispatchRuleIndividual) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleIndividual.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleIndividual) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{24}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SIPDispatchRuleIndividual) GetRoomPrefix() string {
@@ -2716,7 +2855,7 @@ type SIPDispatchRuleCallee struct {
 
 func (x *SIPDispatchRuleCallee) Reset() {
 	*x = SIPDispatchRuleCallee{}
-	mi := &file_livekit_sip_proto_msgTypes[25]
+	mi := &file_livekit_sip_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2728,7 +2867,7 @@ func (x *SIPDispatchRuleCallee) String() string {
 func (*SIPDispatchRuleCallee) ProtoMessage() {}
 
 func (x *SIPDispatchRuleCallee) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[25]
+	mi := &file_livekit_sip_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2741,7 +2880,7 @@ func (x *SIPDispatchRuleCallee) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleCallee.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleCallee) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{25}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *SIPDispatchRuleCallee) GetRoomPrefix() string {
@@ -2779,7 +2918,7 @@ type SIPDispatchRule struct {
 
 func (x *SIPDispatchRule) Reset() {
 	*x = SIPDispatchRule{}
-	mi := &file_livekit_sip_proto_msgTypes[26]
+	mi := &file_livekit_sip_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2791,7 +2930,7 @@ func (x *SIPDispatchRule) String() string {
 func (*SIPDispatchRule) ProtoMessage() {}
 
 func (x *SIPDispatchRule) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[26]
+	mi := &file_livekit_sip_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2804,7 +2943,7 @@ func (x *SIPDispatchRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRule.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRule) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{26}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *SIPDispatchRule) GetRule() isSIPDispatchRule_Rule {
@@ -2915,7 +3054,7 @@ type CreateSIPDispatchRuleRequest struct {
 
 func (x *CreateSIPDispatchRuleRequest) Reset() {
 	*x = CreateSIPDispatchRuleRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[27]
+	mi := &file_livekit_sip_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2927,7 +3066,7 @@ func (x *CreateSIPDispatchRuleRequest) String() string {
 func (*CreateSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *CreateSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[27]
+	mi := &file_livekit_sip_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2940,7 +3079,7 @@ func (x *CreateSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*CreateSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{27}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *CreateSIPDispatchRuleRequest) GetDispatchRule() *SIPDispatchRuleInfo {
@@ -3036,7 +3175,7 @@ type UpdateSIPDispatchRuleRequest struct {
 
 func (x *UpdateSIPDispatchRuleRequest) Reset() {
 	*x = UpdateSIPDispatchRuleRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[28]
+	mi := &file_livekit_sip_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3048,7 +3187,7 @@ func (x *UpdateSIPDispatchRuleRequest) String() string {
 func (*UpdateSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *UpdateSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[28]
+	mi := &file_livekit_sip_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3061,7 +3200,7 @@ func (x *UpdateSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{28}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *UpdateSIPDispatchRuleRequest) GetSipDispatchRuleId() string {
@@ -3133,8 +3272,10 @@ type SIPDispatchRuleInfo struct {
 	// Cloud-only, config preset to use
 	RoomPreset string `protobuf:"bytes,9,opt,name=room_preset,json=roomPreset,proto3" json:"room_preset,omitempty"`
 	// RoomConfiguration to use if the participant initiates the room
-	RoomConfig      *RoomConfiguration     `protobuf:"bytes,10,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
-	KrispEnabled    bool                   `protobuf:"varint,11,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
+	RoomConfig   *RoomConfiguration `protobuf:"bytes,10,opt,name=room_config,json=roomConfig,proto3" json:"room_config,omitempty"`
+	Media        *SIPMediaConfig    `protobuf:"bytes,16,opt,name=media,proto3" json:"media,omitempty"`
+	KrispEnabled bool               `protobuf:"varint,11,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_sip.proto.
 	MediaEncryption SIPMediaEncryption     `protobuf:"varint,12,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
 	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -3144,7 +3285,7 @@ type SIPDispatchRuleInfo struct {
 
 func (x *SIPDispatchRuleInfo) Reset() {
 	*x = SIPDispatchRuleInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[29]
+	mi := &file_livekit_sip_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3156,7 +3297,7 @@ func (x *SIPDispatchRuleInfo) String() string {
 func (*SIPDispatchRuleInfo) ProtoMessage() {}
 
 func (x *SIPDispatchRuleInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[29]
+	mi := &file_livekit_sip_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3169,7 +3310,7 @@ func (x *SIPDispatchRuleInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleInfo.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{29}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *SIPDispatchRuleInfo) GetSipDispatchRuleId() string {
@@ -3249,6 +3390,13 @@ func (x *SIPDispatchRuleInfo) GetRoomConfig() *RoomConfiguration {
 	return nil
 }
 
+func (x *SIPDispatchRuleInfo) GetMedia() *SIPMediaConfig {
+	if x != nil {
+		return x.Media
+	}
+	return nil
+}
+
 func (x *SIPDispatchRuleInfo) GetKrispEnabled() bool {
 	if x != nil {
 		return x.KrispEnabled
@@ -3256,6 +3404,7 @@ func (x *SIPDispatchRuleInfo) GetKrispEnabled() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in livekit_sip.proto.
 func (x *SIPDispatchRuleInfo) GetMediaEncryption() SIPMediaEncryption {
 	if x != nil {
 		return x.MediaEncryption
@@ -3278,20 +3427,22 @@ func (x *SIPDispatchRuleInfo) GetUpdatedAt() *timestamppb.Timestamp {
 }
 
 type SIPDispatchRuleUpdate struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	TrunkIds        *ListUpdate            `protobuf:"bytes,1,opt,name=trunk_ids,json=trunkIds,proto3" json:"trunk_ids,omitempty"`
-	Rule            *SIPDispatchRule       `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`
-	Name            *string                `protobuf:"bytes,3,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	Metadata        *string                `protobuf:"bytes,4,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
-	Attributes      map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	MediaEncryption *SIPMediaEncryption    `protobuf:"varint,6,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	TrunkIds   *ListUpdate            `protobuf:"bytes,1,opt,name=trunk_ids,json=trunkIds,proto3" json:"trunk_ids,omitempty"`
+	Rule       *SIPDispatchRule       `protobuf:"bytes,2,opt,name=rule,proto3" json:"rule,omitempty"`
+	Name       *string                `protobuf:"bytes,3,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	Metadata   *string                `protobuf:"bytes,4,opt,name=metadata,proto3,oneof" json:"metadata,omitempty"`
+	Attributes map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Deprecated: Marked as deprecated in livekit_sip.proto.
+	MediaEncryption *SIPMediaEncryption `protobuf:"varint,6,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption,oneof" json:"media_encryption,omitempty"`
+	Media           *SIPMediaConfig     `protobuf:"bytes,7,opt,name=media,proto3" json:"media,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
 
 func (x *SIPDispatchRuleUpdate) Reset() {
 	*x = SIPDispatchRuleUpdate{}
-	mi := &file_livekit_sip_proto_msgTypes[30]
+	mi := &file_livekit_sip_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3303,7 +3454,7 @@ func (x *SIPDispatchRuleUpdate) String() string {
 func (*SIPDispatchRuleUpdate) ProtoMessage() {}
 
 func (x *SIPDispatchRuleUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[30]
+	mi := &file_livekit_sip_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3316,7 +3467,7 @@ func (x *SIPDispatchRuleUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPDispatchRuleUpdate.ProtoReflect.Descriptor instead.
 func (*SIPDispatchRuleUpdate) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{30}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *SIPDispatchRuleUpdate) GetTrunkIds() *ListUpdate {
@@ -3354,11 +3505,19 @@ func (x *SIPDispatchRuleUpdate) GetAttributes() map[string]string {
 	return nil
 }
 
+// Deprecated: Marked as deprecated in livekit_sip.proto.
 func (x *SIPDispatchRuleUpdate) GetMediaEncryption() SIPMediaEncryption {
 	if x != nil && x.MediaEncryption != nil {
 		return *x.MediaEncryption
 	}
 	return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+}
+
+func (x *SIPDispatchRuleUpdate) GetMedia() *SIPMediaConfig {
+	if x != nil {
+		return x.Media
+	}
+	return nil
 }
 
 // ListSIPDispatchRuleRequest lists dispatch rules for given filters. If no filters are set, all rules are listed.
@@ -3376,7 +3535,7 @@ type ListSIPDispatchRuleRequest struct {
 
 func (x *ListSIPDispatchRuleRequest) Reset() {
 	*x = ListSIPDispatchRuleRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[31]
+	mi := &file_livekit_sip_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3388,7 +3547,7 @@ func (x *ListSIPDispatchRuleRequest) String() string {
 func (*ListSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *ListSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[31]
+	mi := &file_livekit_sip_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3401,7 +3560,7 @@ func (x *ListSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*ListSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{31}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ListSIPDispatchRuleRequest) GetPage() *Pagination {
@@ -3434,7 +3593,7 @@ type ListSIPDispatchRuleResponse struct {
 
 func (x *ListSIPDispatchRuleResponse) Reset() {
 	*x = ListSIPDispatchRuleResponse{}
-	mi := &file_livekit_sip_proto_msgTypes[32]
+	mi := &file_livekit_sip_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3446,7 +3605,7 @@ func (x *ListSIPDispatchRuleResponse) String() string {
 func (*ListSIPDispatchRuleResponse) ProtoMessage() {}
 
 func (x *ListSIPDispatchRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[32]
+	mi := &file_livekit_sip_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3459,7 +3618,7 @@ func (x *ListSIPDispatchRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSIPDispatchRuleResponse.ProtoReflect.Descriptor instead.
 func (*ListSIPDispatchRuleResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{32}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *ListSIPDispatchRuleResponse) GetItems() []*SIPDispatchRuleInfo {
@@ -3478,7 +3637,7 @@ type DeleteSIPDispatchRuleRequest struct {
 
 func (x *DeleteSIPDispatchRuleRequest) Reset() {
 	*x = DeleteSIPDispatchRuleRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[33]
+	mi := &file_livekit_sip_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3490,7 +3649,7 @@ func (x *DeleteSIPDispatchRuleRequest) String() string {
 func (*DeleteSIPDispatchRuleRequest) ProtoMessage() {}
 
 func (x *DeleteSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[33]
+	mi := &file_livekit_sip_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3503,7 +3662,7 @@ func (x *DeleteSIPDispatchRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteSIPDispatchRuleRequest.ProtoReflect.Descriptor instead.
 func (*DeleteSIPDispatchRuleRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{33}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *DeleteSIPDispatchRuleRequest) GetSipDispatchRuleId() string {
@@ -3539,7 +3698,7 @@ type SIPOutboundConfig struct {
 
 func (x *SIPOutboundConfig) Reset() {
 	*x = SIPOutboundConfig{}
-	mi := &file_livekit_sip_proto_msgTypes[34]
+	mi := &file_livekit_sip_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3551,7 +3710,7 @@ func (x *SIPOutboundConfig) String() string {
 func (*SIPOutboundConfig) ProtoMessage() {}
 
 func (x *SIPOutboundConfig) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[34]
+	mi := &file_livekit_sip_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3564,7 +3723,7 @@ func (x *SIPOutboundConfig) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPOutboundConfig.ProtoReflect.Descriptor instead.
 func (*SIPOutboundConfig) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{34}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *SIPOutboundConfig) GetHostname() string {
@@ -3628,8 +3787,11 @@ func (x *SIPOutboundConfig) GetFromHost() string {
 type CreateSIPParticipantRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// What SIP Trunk should be used to dial the user
-	SipTrunkId string             `protobuf:"bytes,1,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
-	Trunk      *SIPOutboundConfig `protobuf:"bytes,20,opt,name=trunk,proto3" json:"trunk,omitempty"`
+	SipTrunkId    string             `protobuf:"bytes,1,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
+	Trunk         *SIPOutboundConfig `protobuf:"bytes,20,opt,name=trunk,proto3" json:"trunk,omitempty"`
+	SipRequestUri *SIPRequestDest    `protobuf:"bytes,24,opt,name=sip_request_uri,json=sipRequestUri,proto3" json:"sip_request_uri,omitempty"` // INVITE <uri>
+	SipToHeader   *SIPNamedDest      `protobuf:"bytes,25,opt,name=sip_to_header,json=sipToHeader,proto3" json:"sip_to_header,omitempty"`       // To:   "Name" <uri>
+	SipFromHeader *SIPNamedDest      `protobuf:"bytes,26,opt,name=sip_from_header,json=sipFromHeader,proto3" json:"sip_from_header,omitempty"` // From: "Name" <uri>
 	// What number should be dialed via SIP
 	SipCallTo string `protobuf:"bytes,2,opt,name=sip_call_to,json=sipCallTo,proto3" json:"sip_call_to,omitempty"`
 	// Optional SIP From number to use. If empty, trunk number is used.
@@ -3669,8 +3831,10 @@ type CreateSIPParticipantRequest struct {
 	// Max call duration.
 	MaxCallDuration *durationpb.Duration `protobuf:"bytes,12,opt,name=max_call_duration,json=maxCallDuration,proto3" json:"max_call_duration,omitempty"`
 	// Enable voice isolation for the callee.
-	KrispEnabled    bool               `protobuf:"varint,14,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
+	KrispEnabled bool `protobuf:"varint,14,opt,name=krisp_enabled,json=krispEnabled,proto3" json:"krisp_enabled,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_sip.proto.
 	MediaEncryption SIPMediaEncryption `protobuf:"varint,18,opt,name=media_encryption,json=mediaEncryption,proto3,enum=livekit.SIPMediaEncryption" json:"media_encryption,omitempty"`
+	Media           *SIPMediaConfig    `protobuf:"bytes,23,opt,name=media,proto3" json:"media,omitempty"`
 	// Wait for the answer for the call before returning.
 	WaitUntilAnswered bool `protobuf:"varint,19,opt,name=wait_until_answered,json=waitUntilAnswered,proto3" json:"wait_until_answered,omitempty"`
 	// Optional display name for the 'From' SIP header.
@@ -3680,14 +3844,14 @@ type CreateSIPParticipantRequest struct {
 	// 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
 	// 3) Non-empty: Use the specified value as the display name.
 	DisplayName   *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
-	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"` // NEXT ID: 23
+	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"` // NEXT ID: 27
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *CreateSIPParticipantRequest) Reset() {
 	*x = CreateSIPParticipantRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[35]
+	mi := &file_livekit_sip_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3699,7 +3863,7 @@ func (x *CreateSIPParticipantRequest) String() string {
 func (*CreateSIPParticipantRequest) ProtoMessage() {}
 
 func (x *CreateSIPParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[35]
+	mi := &file_livekit_sip_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3712,7 +3876,7 @@ func (x *CreateSIPParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSIPParticipantRequest.ProtoReflect.Descriptor instead.
 func (*CreateSIPParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{35}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *CreateSIPParticipantRequest) GetSipTrunkId() string {
@@ -3725,6 +3889,27 @@ func (x *CreateSIPParticipantRequest) GetSipTrunkId() string {
 func (x *CreateSIPParticipantRequest) GetTrunk() *SIPOutboundConfig {
 	if x != nil {
 		return x.Trunk
+	}
+	return nil
+}
+
+func (x *CreateSIPParticipantRequest) GetSipRequestUri() *SIPRequestDest {
+	if x != nil {
+		return x.SipRequestUri
+	}
+	return nil
+}
+
+func (x *CreateSIPParticipantRequest) GetSipToHeader() *SIPNamedDest {
+	if x != nil {
+		return x.SipToHeader
+	}
+	return nil
+}
+
+func (x *CreateSIPParticipantRequest) GetSipFromHeader() *SIPNamedDest {
+	if x != nil {
+		return x.SipFromHeader
 	}
 	return nil
 }
@@ -3842,11 +4027,19 @@ func (x *CreateSIPParticipantRequest) GetKrispEnabled() bool {
 	return false
 }
 
+// Deprecated: Marked as deprecated in livekit_sip.proto.
 func (x *CreateSIPParticipantRequest) GetMediaEncryption() SIPMediaEncryption {
 	if x != nil {
 		return x.MediaEncryption
 	}
 	return SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
+}
+
+func (x *CreateSIPParticipantRequest) GetMedia() *SIPMediaConfig {
+	if x != nil {
+		return x.Media
+	}
+	return nil
 }
 
 func (x *CreateSIPParticipantRequest) GetWaitUntilAnswered() bool {
@@ -3882,7 +4075,7 @@ type SIPParticipantInfo struct {
 
 func (x *SIPParticipantInfo) Reset() {
 	*x = SIPParticipantInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[36]
+	mi := &file_livekit_sip_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3894,7 +4087,7 @@ func (x *SIPParticipantInfo) String() string {
 func (*SIPParticipantInfo) ProtoMessage() {}
 
 func (x *SIPParticipantInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[36]
+	mi := &file_livekit_sip_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3907,7 +4100,7 @@ func (x *SIPParticipantInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPParticipantInfo.ProtoReflect.Descriptor instead.
 func (*SIPParticipantInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{36}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *SIPParticipantInfo) GetParticipantId() string {
@@ -3955,7 +4148,7 @@ type TransferSIPParticipantRequest struct {
 
 func (x *TransferSIPParticipantRequest) Reset() {
 	*x = TransferSIPParticipantRequest{}
-	mi := &file_livekit_sip_proto_msgTypes[37]
+	mi := &file_livekit_sip_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3967,7 +4160,7 @@ func (x *TransferSIPParticipantRequest) String() string {
 func (*TransferSIPParticipantRequest) ProtoMessage() {}
 
 func (x *TransferSIPParticipantRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[37]
+	mi := &file_livekit_sip_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3980,7 +4173,7 @@ func (x *TransferSIPParticipantRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TransferSIPParticipantRequest.ProtoReflect.Descriptor instead.
 func (*TransferSIPParticipantRequest) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{37}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *TransferSIPParticipantRequest) GetParticipantIdentity() string {
@@ -4064,7 +4257,7 @@ type SIPCallInfo struct {
 
 func (x *SIPCallInfo) Reset() {
 	*x = SIPCallInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[38]
+	mi := &file_livekit_sip_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4076,7 +4269,7 @@ func (x *SIPCallInfo) String() string {
 func (*SIPCallInfo) ProtoMessage() {}
 
 func (x *SIPCallInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[38]
+	mi := &file_livekit_sip_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4089,7 +4282,7 @@ func (x *SIPCallInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPCallInfo.ProtoReflect.Descriptor instead.
 func (*SIPCallInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{38}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *SIPCallInfo) GetCallId() string {
@@ -4307,7 +4500,7 @@ type SIPTransferInfo struct {
 
 func (x *SIPTransferInfo) Reset() {
 	*x = SIPTransferInfo{}
-	mi := &file_livekit_sip_proto_msgTypes[39]
+	mi := &file_livekit_sip_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4319,7 +4512,7 @@ func (x *SIPTransferInfo) String() string {
 func (*SIPTransferInfo) ProtoMessage() {}
 
 func (x *SIPTransferInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[39]
+	mi := &file_livekit_sip_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4332,7 +4525,7 @@ func (x *SIPTransferInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPTransferInfo.ProtoReflect.Descriptor instead.
 func (*SIPTransferInfo) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{39}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *SIPTransferInfo) GetTransferId() string {
@@ -4404,7 +4597,7 @@ type SIPUri struct {
 
 func (x *SIPUri) Reset() {
 	*x = SIPUri{}
-	mi := &file_livekit_sip_proto_msgTypes[40]
+	mi := &file_livekit_sip_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4416,7 +4609,7 @@ func (x *SIPUri) String() string {
 func (*SIPUri) ProtoMessage() {}
 
 func (x *SIPUri) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[40]
+	mi := &file_livekit_sip_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4429,7 +4622,7 @@ func (x *SIPUri) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SIPUri.ProtoReflect.Descriptor instead.
 func (*SIPUri) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{40}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *SIPUri) GetUser() string {
@@ -4467,6 +4660,178 @@ func (x *SIPUri) GetTransport() SIPTransport {
 	return SIPTransport_SIP_TRANSPORT_AUTO
 }
 
+type SIPRequestDest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Types that are valid to be assigned to Uri:
+	//
+	//	*SIPRequestDest_Raw
+	//	*SIPRequestDest_Values
+	Uri           isSIPRequestDest_Uri `protobuf_oneof:"uri"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SIPRequestDest) Reset() {
+	*x = SIPRequestDest{}
+	mi := &file_livekit_sip_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SIPRequestDest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SIPRequestDest) ProtoMessage() {}
+
+func (x *SIPRequestDest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_sip_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SIPRequestDest.ProtoReflect.Descriptor instead.
+func (*SIPRequestDest) Descriptor() ([]byte, []int) {
+	return file_livekit_sip_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *SIPRequestDest) GetUri() isSIPRequestDest_Uri {
+	if x != nil {
+		return x.Uri
+	}
+	return nil
+}
+
+func (x *SIPRequestDest) GetRaw() string {
+	if x != nil {
+		if x, ok := x.Uri.(*SIPRequestDest_Raw); ok {
+			return x.Raw
+		}
+	}
+	return ""
+}
+
+func (x *SIPRequestDest) GetValues() *SIPUri {
+	if x != nil {
+		if x, ok := x.Uri.(*SIPRequestDest_Values); ok {
+			return x.Values
+		}
+	}
+	return nil
+}
+
+type isSIPRequestDest_Uri interface {
+	isSIPRequestDest_Uri()
+}
+
+type SIPRequestDest_Raw struct {
+	Raw string `protobuf:"bytes,1,opt,name=raw,proto3,oneof"` // <sip:user@sip.example.com:5060;transport=tcp>
+}
+
+type SIPRequestDest_Values struct {
+	Values *SIPUri `protobuf:"bytes,2,opt,name=values,proto3,oneof"`
+}
+
+func (*SIPRequestDest_Raw) isSIPRequestDest_Uri() {}
+
+func (*SIPRequestDest_Values) isSIPRequestDest_Uri() {}
+
+type SIPNamedDest struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	DisplayName string                 `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	// Types that are valid to be assigned to Uri:
+	//
+	//	*SIPNamedDest_Raw
+	//	*SIPNamedDest_Values
+	Uri           isSIPNamedDest_Uri `protobuf_oneof:"uri"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SIPNamedDest) Reset() {
+	*x = SIPNamedDest{}
+	mi := &file_livekit_sip_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SIPNamedDest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SIPNamedDest) ProtoMessage() {}
+
+func (x *SIPNamedDest) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_sip_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SIPNamedDest.ProtoReflect.Descriptor instead.
+func (*SIPNamedDest) Descriptor() ([]byte, []int) {
+	return file_livekit_sip_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *SIPNamedDest) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *SIPNamedDest) GetUri() isSIPNamedDest_Uri {
+	if x != nil {
+		return x.Uri
+	}
+	return nil
+}
+
+func (x *SIPNamedDest) GetRaw() string {
+	if x != nil {
+		if x, ok := x.Uri.(*SIPNamedDest_Raw); ok {
+			return x.Raw
+		}
+	}
+	return ""
+}
+
+func (x *SIPNamedDest) GetValues() *SIPUri {
+	if x != nil {
+		if x, ok := x.Uri.(*SIPNamedDest_Values); ok {
+			return x.Values
+		}
+	}
+	return nil
+}
+
+type isSIPNamedDest_Uri interface {
+	isSIPNamedDest_Uri()
+}
+
+type SIPNamedDest_Raw struct {
+	Raw string `protobuf:"bytes,1,opt,name=raw,proto3,oneof"` // <sip:user@sip.example.com:5060;transport=tcp>
+}
+
+type SIPNamedDest_Values struct {
+	Values *SIPUri `protobuf:"bytes,2,opt,name=values,proto3,oneof"`
+}
+
+func (*SIPNamedDest_Raw) isSIPNamedDest_Uri() {}
+
+func (*SIPNamedDest_Values) isSIPNamedDest_Uri() {}
+
 type Destination struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	City          string                 `protobuf:"bytes,1,opt,name=city,proto3" json:"city,omitempty"`
@@ -4478,7 +4843,7 @@ type Destination struct {
 
 func (x *Destination) Reset() {
 	*x = Destination{}
-	mi := &file_livekit_sip_proto_msgTypes[41]
+	mi := &file_livekit_sip_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4490,7 +4855,7 @@ func (x *Destination) String() string {
 func (*Destination) ProtoMessage() {}
 
 func (x *Destination) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_sip_proto_msgTypes[41]
+	mi := &file_livekit_sip_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4503,7 +4868,7 @@ func (x *Destination) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Destination.ProtoReflect.Descriptor instead.
 func (*Destination) Descriptor() ([]byte, []int) {
-	return file_livekit_sip_proto_rawDescGZIP(), []int{41}
+	return file_livekit_sip_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *Destination) GetCity() string {
@@ -4541,13 +4906,25 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0foutbound_number\x18\x03 \x01(\tR\x0eoutboundNumber\x126\n" +
 	"\x15inbound_numbers_regex\x18\x04 \x03(\tB\x02\x18\x01R\x13inboundNumbersRegex\x12'\n" +
 	"\x0finbound_numbers\x18\t \x03(\tR\x0einboundNumbers\x12.\n" +
-	"\x10inbound_username\x18\x05 \x01(\tB\x03\xa8P\x01R\x0finboundUsername\x12.\n" +
-	"\x10inbound_password\x18\x06 \x01(\tB\x03\xa8P\x01R\x0finboundPassword\x120\n" +
-	"\x11outbound_username\x18\a \x01(\tB\x03\xa8P\x01R\x10outboundUsername\x120\n" +
-	"\x11outbound_password\x18\b \x01(\tB\x03\xa8P\x01R\x10outboundPassword\x12\x12\n" +
+	"\x10inbound_username\x18\x05 \x01(\tB\x03\xc0P\x01R\x0finboundUsername\x12.\n" +
+	"\x10inbound_password\x18\x06 \x01(\tB\x03\xc0P\x02R\x0finboundPassword\x120\n" +
+	"\x11outbound_username\x18\a \x01(\tB\x03\xc0P\x01R\x10outboundUsername\x120\n" +
+	"\x11outbound_password\x18\b \x01(\tB\x03\xc0P\x02R\x10outboundPassword\x12\x12\n" +
 	"\x04name\x18\n" +
 	" \x01(\tR\x04name\x12@\n" +
-	"\bmetadata\x18\v \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata:\x02\x18\x01\"\x88\x01\n" +
+	"\bmetadata\x18\v \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata:\x02\x18\x01\"2\n" +
+	"\bSIPCodec\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
+	"\x04rate\x18\x02 \x01(\rR\x04rate\"\x91\x02\n" +
+	"\x0eSIPMediaConfig\x12,\n" +
+	"\x12only_listed_codecs\x18\x01 \x01(\bR\x10onlyListedCodecs\x12)\n" +
+	"\x06codecs\x18\x02 \x03(\v2\x11.livekit.SIPCodecR\x06codecs\x12@\n" +
+	"\n" +
+	"encryption\x18\x03 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x00R\n" +
+	"encryption\x88\x01\x01\x12C\n" +
+	"\rmedia_timeout\x18\x04 \x01(\v2\x19.google.protobuf.DurationH\x01R\fmediaTimeout\x88\x01\x01B\r\n" +
+	"\v_encryptionB\x10\n" +
+	"\x0e_media_timeout\"\x88\x01\n" +
 	"\fProviderInfo\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12)\n" +
@@ -4565,12 +4942,12 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x15inbound_numbers_regex\x18\x05 \x03(\tB\x02\x18\x01R\x13inboundNumbersRegex\x12'\n" +
 	"\x0finbound_numbers\x18\n" +
 	" \x03(\tR\x0einboundNumbers\x12.\n" +
-	"\x10inbound_username\x18\x06 \x01(\tB\x03\xa8P\x01R\x0finboundUsername\x12.\n" +
-	"\x10inbound_password\x18\a \x01(\tB\x03\xa8P\x01R\x0finboundPassword\x120\n" +
-	"\x11outbound_username\x18\b \x01(\tB\x03\xa8P\x01R\x10outboundUsername\x120\n" +
-	"\x11outbound_password\x18\t \x01(\tB\x03\xa8P\x01R\x10outboundPassword\x12\x12\n" +
+	"\x10inbound_username\x18\x06 \x01(\tB\x03\xc0P\x01R\x0finboundUsername\x12.\n" +
+	"\x10inbound_password\x18\a \x01(\tB\x03\xc0P\x02R\x0finboundPassword\x120\n" +
+	"\x11outbound_username\x18\b \x01(\tB\x03\xc0P\x01R\x10outboundUsername\x120\n" +
+	"\x11outbound_password\x18\t \x01(\tB\x03\xc0P\x02R\x10outboundPassword\x12\x12\n" +
 	"\x04name\x18\v \x01(\tR\x04name\x12@\n" +
-	"\bmetadata\x18\f \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\"D\n" +
+	"\bmetadata\x18\f \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\"D\n" +
 	"\tTrunkKind\x12\x10\n" +
 	"\fTRUNK_LEGACY\x10\x00\x12\x11\n" +
 	"\rTRUNK_INBOUND\x10\x01\x12\x12\n" +
@@ -4583,20 +4960,22 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkId\x128\n" +
 	"\areplace\x18\x02 \x01(\v2\x1c.livekit.SIPInboundTrunkInfoH\x00R\areplace\x128\n" +
 	"\x06update\x18\x03 \x01(\v2\x1e.livekit.SIPInboundTrunkUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\x9f\n" +
+	"\x06action\"\xbe\n" +
 	"\n" +
 	"\x13SIPInboundTrunkInfo\x12/\n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
 	"sipTrunkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12@\n" +
-	"\bmetadata\x18\x03 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12\x18\n" +
+	"\bmetadata\x18\x03 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12\x18\n" +
 	"\anumbers\x18\x04 \x03(\tR\anumbers\x12+\n" +
 	"\x11allowed_addresses\x18\x05 \x03(\tR\x10allowedAddresses\x12'\n" +
 	"\x0fallowed_numbers\x18\x06 \x03(\tR\x0eallowedNumbers\x12(\n" +
-	"\rauth_username\x18\a \x01(\tB\x03\xa8P\x01R\fauthUsername\x12(\n" +
-	"\rauth_password\x18\b \x01(\tB\x03\xa8P\x01R\fauthPassword\x12i\n" +
-	"\aheaders\x18\t \x03(\v2).livekit.SIPInboundTrunkInfo.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12i\n" +
+	"\rauth_username\x18\a \x01(\tB\x03\xc0P\x01R\fauthUsername\x12(\n" +
+	"\rauth_password\x18\b \x01(\tB\x03\xc0P\x02R\fauthPassword\x12\x1d\n" +
+	"\n" +
+	"auth_realm\x18\x13 \x01(\tR\tauthRealm\x12i\n" +
+	"\aheaders\x18\t \x03(\v2).livekit.SIPInboundTrunkInfo.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12i\n" +
 	"\x15headers_to_attributes\x18\n" +
 	" \x03(\v25.livekit.SIPInboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12i\n" +
 	"\x15attributes_to_headers\x18\x0e \x03(\v25.livekit.SIPInboundTrunkInfo.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
@@ -4617,18 +4996,21 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa0\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xd3\x04\n" +
 	"\x15SIPInboundTrunkUpdate\x12-\n" +
 	"\anumbers\x18\x01 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12@\n" +
 	"\x11allowed_addresses\x18\x02 \x01(\v2\x13.livekit.ListUpdateR\x10allowedAddresses\x12<\n" +
 	"\x0fallowed_numbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\x0eallowedNumbers\x12-\n" +
-	"\rauth_username\x18\x04 \x01(\tB\x03\xa8P\x01H\x00R\fauthUsername\x88\x01\x01\x12-\n" +
-	"\rauth_password\x18\x05 \x01(\tB\x03\xa8P\x01H\x01R\fauthPassword\x88\x01\x01\x12\x17\n" +
-	"\x04name\x18\x06 \x01(\tH\x02R\x04name\x88\x01\x01\x12E\n" +
-	"\bmetadata\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x03R\bmetadata\x88\x01\x01\x12K\n" +
-	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x04R\x0fmediaEncryption\x88\x01\x01B\x10\n" +
+	"\rauth_username\x18\x04 \x01(\tB\x03\xc0P\x01H\x00R\fauthUsername\x88\x01\x01\x12-\n" +
+	"\rauth_password\x18\x05 \x01(\tB\x03\xc0P\x02H\x01R\fauthPassword\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"auth_realm\x18\t \x01(\tH\x02R\tauthRealm\x88\x01\x01\x12\x17\n" +
+	"\x04name\x18\x06 \x01(\tH\x03R\x04name\x88\x01\x01\x12E\n" +
+	"\bmetadata\x18\a \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01H\x04R\bmetadata\x88\x01\x01\x12K\n" +
+	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x05R\x0fmediaEncryption\x88\x01\x01B\x10\n" +
 	"\x0e_auth_usernameB\x10\n" +
-	"\x0e_auth_passwordB\a\n" +
+	"\x0e_auth_passwordB\r\n" +
+	"\v_auth_realmB\a\n" +
 	"\x05_nameB\v\n" +
 	"\t_metadataB\x13\n" +
 	"\x11_media_encryption\"T\n" +
@@ -4646,14 +5028,14 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"sipTrunkIDR\n" +
 	"sipTrunkId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12@\n" +
-	"\bmetadata\x18\x03 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12\x18\n" +
+	"\bmetadata\x18\x03 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12\x18\n" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12/\n" +
 	"\x13destination_country\x18\x0e \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x05 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12\x18\n" +
 	"\anumbers\x18\x06 \x03(\tR\anumbers\x12(\n" +
-	"\rauth_username\x18\a \x01(\tB\x03\xa8P\x01R\fauthUsername\x12(\n" +
-	"\rauth_password\x18\b \x01(\tB\x03\xa8P\x01R\fauthPassword\x12j\n" +
-	"\aheaders\x18\t \x03(\v2*.livekit.SIPOutboundTrunkInfo.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12j\n" +
+	"\rauth_username\x18\a \x01(\tB\x03\xc0P\x01R\fauthUsername\x12(\n" +
+	"\rauth_password\x18\b \x01(\tB\x03\xc0P\x02R\fauthPassword\x12j\n" +
+	"\aheaders\x18\t \x03(\v2*.livekit.SIPOutboundTrunkInfo.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12j\n" +
 	"\x15headers_to_attributes\x18\n" +
 	" \x03(\v26.livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntryR\x13headersToAttributes\x12j\n" +
 	"\x15attributes_to_headers\x18\v \x03(\v26.livekit.SIPOutboundTrunkInfo.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
@@ -4678,10 +5060,10 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportH\x01R\ttransport\x88\x01\x01\x124\n" +
 	"\x13destination_country\x18\t \x01(\tH\x02R\x12destinationCountry\x88\x01\x01\x12-\n" +
 	"\anumbers\x18\x03 \x01(\v2\x13.livekit.ListUpdateR\anumbers\x12-\n" +
-	"\rauth_username\x18\x04 \x01(\tB\x03\xa8P\x01H\x03R\fauthUsername\x88\x01\x01\x12-\n" +
-	"\rauth_password\x18\x05 \x01(\tB\x03\xa8P\x01H\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
+	"\rauth_username\x18\x04 \x01(\tB\x03\xc0P\x01H\x03R\fauthUsername\x88\x01\x01\x12-\n" +
+	"\rauth_password\x18\x05 \x01(\tB\x03\xc0P\x02H\x04R\fauthPassword\x88\x01\x01\x12\x17\n" +
 	"\x04name\x18\x06 \x01(\tH\x05R\x04name\x88\x01\x01\x12E\n" +
-	"\bmetadata\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x06R\bmetadata\x88\x01\x01\x12K\n" +
+	"\bmetadata\x18\a \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01H\x06R\bmetadata\x88\x01\x01\x12K\n" +
 	"\x10media_encryption\x18\b \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\aR\x0fmediaEncryption\x88\x01\x01\x12 \n" +
 	"\tfrom_host\x18\n" +
 	" \x01(\tH\bR\bfromHost\x88\x01\x01B\n" +
@@ -4755,9 +5137,9 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x11hide_phone_number\x18\x03 \x01(\bB\x02\x18\x01R\x0fhidePhoneNumber\x12+\n" +
 	"\x0finbound_numbers\x18\x06 \x03(\tB\x02\x18\x01R\x0einboundNumbers\x12\x16\n" +
 	"\x04name\x18\x04 \x01(\tB\x02\x18\x01R\x04name\x12B\n" +
-	"\bmetadata\x18\x05 \x01(\tB&\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>\x18\x01R\bmetadata\x12}\n" +
+	"\bmetadata\x18\x05 \x01(\tB&\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01\x18\x01R\bmetadata\x12}\n" +
 	"\n" +
-	"attributes\x18\a \x03(\v25.livekit.CreateSIPDispatchRuleRequest.AttributesEntryB&\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>\x18\x01R\n" +
+	"attributes\x18\a \x03(\v25.livekit.CreateSIPDispatchRuleRequest.AttributesEntryB&\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01\x18\x01R\n" +
 	"attributes\x12#\n" +
 	"\vroom_preset\x18\b \x01(\tB\x02\x18\x01R\n" +
 	"roomPreset\x12?\n" +
@@ -4770,7 +5152,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x128\n" +
 	"\areplace\x18\x02 \x01(\v2\x1c.livekit.SIPDispatchRuleInfoH\x00R\areplace\x128\n" +
 	"\x06update\x18\x03 \x01(\v2\x1e.livekit.SIPDispatchRuleUpdateH\x00R\x06updateB\b\n" +
-	"\x06action\"\xe0\x06\n" +
+	"\x06action\"\x93\a\n" +
 	"\x13SIPDispatchRuleInfo\x12E\n" +
 	"\x14sip_dispatch_rule_id\x18\x01 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDR\x11sipDispatchRuleId\x12,\n" +
 	"\x04rule\x18\x02 \x01(\v2\x18.livekit.SIPDispatchRuleR\x04rule\x12\x1b\n" +
@@ -4779,33 +5161,35 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0finbound_numbers\x18\a \x03(\tR\x0einboundNumbers\x12\x18\n" +
 	"\anumbers\x18\r \x03(\tR\anumbers\x12\x12\n" +
 	"\x04name\x18\x05 \x01(\tR\x04name\x12@\n" +
-	"\bmetadata\x18\x06 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\bmetadata\x12r\n" +
+	"\bmetadata\x18\x06 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12r\n" +
 	"\n" +
-	"attributes\x18\b \x03(\v2,.livekit.SIPDispatchRuleInfo.AttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\n" +
+	"attributes\x18\b \x03(\v2,.livekit.SIPDispatchRuleInfo.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
 	"attributes\x12\x1f\n" +
 	"\vroom_preset\x18\t \x01(\tR\n" +
 	"roomPreset\x12;\n" +
 	"\vroom_config\x18\n" +
 	" \x01(\v2\x1a.livekit.RoomConfigurationR\n" +
-	"roomConfig\x12#\n" +
-	"\rkrisp_enabled\x18\v \x01(\bR\fkrispEnabled\x12F\n" +
-	"\x10media_encryption\x18\f \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x129\n" +
+	"roomConfig\x12-\n" +
+	"\x05media\x18\x10 \x01(\v2\x17.livekit.SIPMediaConfigR\x05media\x12#\n" +
+	"\rkrisp_enabled\x18\v \x01(\bR\fkrispEnabled\x12J\n" +
+	"\x10media_encryption\x18\f \x01(\x0e2\x1b.livekit.SIPMediaEncryptionB\x02\x18\x01R\x0fmediaEncryption\x129\n" +
 	"\n" +
 	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x84\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb7\x04\n" +
 	"\x15SIPDispatchRuleUpdate\x120\n" +
 	"\ttrunk_ids\x18\x01 \x01(\v2\x13.livekit.ListUpdateR\btrunkIds\x12,\n" +
 	"\x04rule\x18\x02 \x01(\v2\x18.livekit.SIPDispatchRuleR\x04rule\x12\x17\n" +
 	"\x04name\x18\x03 \x01(\tH\x00R\x04name\x88\x01\x01\x12E\n" +
-	"\bmetadata\x18\x04 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x01R\bmetadata\x88\x01\x01\x12t\n" +
+	"\bmetadata\x18\x04 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01H\x01R\bmetadata\x88\x01\x01\x12t\n" +
 	"\n" +
-	"attributes\x18\x05 \x03(\v2..livekit.SIPDispatchRuleUpdate.AttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\n" +
-	"attributes\x12K\n" +
-	"\x10media_encryption\x18\x06 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionH\x02R\x0fmediaEncryption\x88\x01\x01\x1a=\n" +
+	"attributes\x18\x05 \x03(\v2..livekit.SIPDispatchRuleUpdate.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
+	"attributes\x12O\n" +
+	"\x10media_encryption\x18\x06 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionB\x02\x18\x01H\x02R\x0fmediaEncryption\x88\x01\x01\x12-\n" +
+	"\x05media\x18\a \x01(\v2\x17.livekit.SIPMediaConfigR\x05media\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\a\n" +
@@ -4824,8 +5208,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\bhostname\x18\x01 \x01(\tR\bhostname\x12/\n" +
 	"\x13destination_country\x18\a \x01(\tR\x12destinationCountry\x123\n" +
 	"\ttransport\x18\x02 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\x12(\n" +
-	"\rauth_username\x18\x03 \x01(\tB\x03\xa8P\x01R\fauthUsername\x12(\n" +
-	"\rauth_password\x18\x04 \x01(\tB\x03\xa8P\x01R\fauthPassword\x12g\n" +
+	"\rauth_username\x18\x03 \x01(\tB\x03\xc0P\x01R\fauthUsername\x12(\n" +
+	"\rauth_password\x18\x04 \x01(\tB\x03\xc0P\x02R\fauthPassword\x12g\n" +
 	"\x15headers_to_attributes\x18\x05 \x03(\v23.livekit.SIPOutboundConfig.HeadersToAttributesEntryR\x13headersToAttributes\x12g\n" +
 	"\x15attributes_to_headers\x18\x06 \x03(\v23.livekit.SIPOutboundConfig.AttributesToHeadersEntryR\x13attributesToHeaders\x12\x1b\n" +
 	"\tfrom_host\x18\b \x01(\tR\bfromHost\x1aF\n" +
@@ -4834,33 +5218,37 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xf7\v\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe5\r\n" +
 	"\x1bCreateSIPParticipantRequest\x12/\n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
 	"sipTrunkId\x120\n" +
-	"\x05trunk\x18\x14 \x01(\v2\x1a.livekit.SIPOutboundConfigR\x05trunk\x12\x1e\n" +
+	"\x05trunk\x18\x14 \x01(\v2\x1a.livekit.SIPOutboundConfigR\x05trunk\x12?\n" +
+	"\x0fsip_request_uri\x18\x18 \x01(\v2\x17.livekit.SIPRequestDestR\rsipRequestUri\x129\n" +
+	"\rsip_to_header\x18\x19 \x01(\v2\x15.livekit.SIPNamedDestR\vsipToHeader\x12=\n" +
+	"\x0fsip_from_header\x18\x1a \x01(\v2\x15.livekit.SIPNamedDestR\rsipFromHeader\x12\x1e\n" +
 	"\vsip_call_to\x18\x02 \x01(\tR\tsipCallTo\x12\x1d\n" +
 	"\n" +
 	"sip_number\x18\x0f \x01(\tR\tsipNumber\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +
 	"\x14participant_identity\x18\x04 \x01(\tR\x13participantIdentity\x12O\n" +
-	"\x10participant_name\x18\a \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x0fparticipantName\x12W\n" +
-	"\x14participant_metadata\x18\b \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x13participantMetadata\x12\x9c\x01\n" +
-	"\x16participant_attributes\x18\t \x03(\v2?.livekit.CreateSIPParticipantRequest.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12\x12\n" +
+	"\x10participant_name\x18\a \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x0fparticipantName\x12W\n" +
+	"\x14participant_metadata\x18\b \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x13participantMetadata\x12\x9c\x01\n" +
+	"\x16participant_attributes\x18\t \x03(\v2?.livekit.CreateSIPParticipantRequest.ParticipantAttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x15participantAttributes\x12\x12\n" +
 	"\x04dtmf\x18\x05 \x01(\tR\x04dtmf\x12'\n" +
 	"\rplay_ringtone\x18\x06 \x01(\bB\x02\x18\x01R\fplayRingtone\x12#\n" +
 	"\rplay_dialtone\x18\r \x01(\bR\fplayDialtone\x12*\n" +
 	"\x11hide_phone_number\x18\n" +
 	" \x01(\bR\x0fhidePhoneNumber\x12q\n" +
-	"\aheaders\x18\x10 \x03(\v21.livekit.CreateSIPParticipantRequest.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
+	"\aheaders\x18\x10 \x03(\v21.livekit.CreateSIPParticipantRequest.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12B\n" +
 	"\x0finclude_headers\x18\x11 \x01(\x0e2\x19.livekit.SIPHeaderOptionsR\x0eincludeHeaders\x12B\n" +
 	"\x0fringing_timeout\x18\v \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12E\n" +
 	"\x11max_call_duration\x18\f \x01(\v2\x19.google.protobuf.DurationR\x0fmaxCallDuration\x12#\n" +
-	"\rkrisp_enabled\x18\x0e \x01(\bR\fkrispEnabled\x12F\n" +
-	"\x10media_encryption\x18\x12 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionR\x0fmediaEncryption\x12.\n" +
+	"\rkrisp_enabled\x18\x0e \x01(\bR\fkrispEnabled\x12J\n" +
+	"\x10media_encryption\x18\x12 \x01(\x0e2\x1b.livekit.SIPMediaEncryptionB\x02\x18\x01R\x0fmediaEncryption\x12-\n" +
+	"\x05media\x18\x17 \x01(\v2\x17.livekit.SIPMediaConfigR\x05media\x12.\n" +
 	"\x13wait_until_answered\x18\x13 \x01(\bR\x11waitUntilAnswered\x12L\n" +
-	"\fdisplay_name\x18\x15 \x01(\tB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>H\x00R\vdisplayName\x88\x01\x01\x12;\n" +
+	"\fdisplay_name\x18\x15 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01H\x00R\vdisplayName\x88\x01\x01\x12;\n" +
 	"\vdestination\x18\x16 \x01(\v2\x14.livekit.DestinationH\x01R\vdestination\x88\x01\x01\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -4881,7 +5269,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\vtransfer_to\x18\x03 \x01(\tR\n" +
 	"transferTo\x12#\n" +
 	"\rplay_dialtone\x18\x04 \x01(\bR\fplayDialtone\x12s\n" +
-	"\aheaders\x18\x05 \x03(\v23.livekit.TransferSIPParticipantRequest.HeadersEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\aheaders\x12B\n" +
+	"\aheaders\x18\x05 \x03(\v23.livekit.TransferSIPParticipantRequest.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12B\n" +
 	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -4895,7 +5283,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x12\"\n" +
 	"\aroom_id\x18\x04 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x121\n" +
 	"\x14participant_identity\x18\x05 \x01(\tR\x13participantIdentity\x12\x8c\x01\n" +
-	"\x16participant_attributes\x18\x12 \x03(\v2/.livekit.SIPCallInfo.ParticipantAttributesEntryB$\xa8P\x01\xb2P\x1e<redacted ({{ .Size }} bytes)>R\x15participantAttributes\x12*\n" +
+	"\x16participant_attributes\x18\x12 \x03(\v2/.livekit.SIPCallInfo.ParticipantAttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\x15participantAttributes\x12*\n" +
 	"\bfrom_uri\x18\x06 \x01(\v2\x0f.livekit.SIPUriR\afromUri\x12&\n" +
 	"\x06to_uri\x18\a \x01(\v2\x0f.livekit.SIPUriR\x05toUri\x12!\n" +
 	"\n" +
@@ -4941,7 +5329,16 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x04host\x18\x02 \x01(\tR\x04host\x12\x0e\n" +
 	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x12\n" +
 	"\x04port\x18\x04 \x01(\rR\x04port\x123\n" +
-	"\ttransport\x18\x05 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\"S\n" +
+	"\ttransport\x18\x05 \x01(\x0e2\x15.livekit.SIPTransportR\ttransport\"V\n" +
+	"\x0eSIPRequestDest\x12\x12\n" +
+	"\x03raw\x18\x01 \x01(\tH\x00R\x03raw\x12)\n" +
+	"\x06values\x18\x02 \x01(\v2\x0f.livekit.SIPUriH\x00R\x06valuesB\x05\n" +
+	"\x03uri\"w\n" +
+	"\fSIPNamedDest\x12!\n" +
+	"\fdisplay_name\x18\x03 \x01(\tR\vdisplayName\x12\x12\n" +
+	"\x03raw\x18\x01 \x01(\tH\x00R\x03raw\x12)\n" +
+	"\x06values\x18\x02 \x01(\v2\x0f.livekit.SIPUriH\x00R\x06valuesB\x05\n" +
+	"\x03uri\"S\n" +
 	"\vDestination\x12\x12\n" +
 	"\x04city\x18\x01 \x01(\tR\x04city\x12\x18\n" +
 	"\acountry\x18\x02 \x01(\tR\acountry\x12\x16\n" +
@@ -5090,7 +5487,7 @@ func file_livekit_sip_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_sip_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
-var file_livekit_sip_proto_msgTypes = make([]protoimpl.MessageInfo, 57)
+var file_livekit_sip_proto_msgTypes = make([]protoimpl.MessageInfo, 61)
 var file_livekit_sip_proto_goTypes = []any{
 	(SIPStatusCode)(0),                    // 0: livekit.SIPStatusCode
 	(SIPTransport)(0),                     // 1: livekit.SIPTransport
@@ -5104,197 +5501,212 @@ var file_livekit_sip_proto_goTypes = []any{
 	(SIPTrunkInfo_TrunkKind)(0),           // 9: livekit.SIPTrunkInfo.TrunkKind
 	(*SIPStatus)(nil),                     // 10: livekit.SIPStatus
 	(*CreateSIPTrunkRequest)(nil),         // 11: livekit.CreateSIPTrunkRequest
-	(*ProviderInfo)(nil),                  // 12: livekit.ProviderInfo
-	(*SIPTrunkInfo)(nil),                  // 13: livekit.SIPTrunkInfo
-	(*CreateSIPInboundTrunkRequest)(nil),  // 14: livekit.CreateSIPInboundTrunkRequest
-	(*UpdateSIPInboundTrunkRequest)(nil),  // 15: livekit.UpdateSIPInboundTrunkRequest
-	(*SIPInboundTrunkInfo)(nil),           // 16: livekit.SIPInboundTrunkInfo
-	(*SIPInboundTrunkUpdate)(nil),         // 17: livekit.SIPInboundTrunkUpdate
-	(*CreateSIPOutboundTrunkRequest)(nil), // 18: livekit.CreateSIPOutboundTrunkRequest
-	(*UpdateSIPOutboundTrunkRequest)(nil), // 19: livekit.UpdateSIPOutboundTrunkRequest
-	(*SIPOutboundTrunkInfo)(nil),          // 20: livekit.SIPOutboundTrunkInfo
-	(*SIPOutboundTrunkUpdate)(nil),        // 21: livekit.SIPOutboundTrunkUpdate
-	(*GetSIPInboundTrunkRequest)(nil),     // 22: livekit.GetSIPInboundTrunkRequest
-	(*GetSIPInboundTrunkResponse)(nil),    // 23: livekit.GetSIPInboundTrunkResponse
-	(*GetSIPOutboundTrunkRequest)(nil),    // 24: livekit.GetSIPOutboundTrunkRequest
-	(*GetSIPOutboundTrunkResponse)(nil),   // 25: livekit.GetSIPOutboundTrunkResponse
-	(*ListSIPTrunkRequest)(nil),           // 26: livekit.ListSIPTrunkRequest
-	(*ListSIPTrunkResponse)(nil),          // 27: livekit.ListSIPTrunkResponse
-	(*ListSIPInboundTrunkRequest)(nil),    // 28: livekit.ListSIPInboundTrunkRequest
-	(*ListSIPInboundTrunkResponse)(nil),   // 29: livekit.ListSIPInboundTrunkResponse
-	(*ListSIPOutboundTrunkRequest)(nil),   // 30: livekit.ListSIPOutboundTrunkRequest
-	(*ListSIPOutboundTrunkResponse)(nil),  // 31: livekit.ListSIPOutboundTrunkResponse
-	(*DeleteSIPTrunkRequest)(nil),         // 32: livekit.DeleteSIPTrunkRequest
-	(*SIPDispatchRuleDirect)(nil),         // 33: livekit.SIPDispatchRuleDirect
-	(*SIPDispatchRuleIndividual)(nil),     // 34: livekit.SIPDispatchRuleIndividual
-	(*SIPDispatchRuleCallee)(nil),         // 35: livekit.SIPDispatchRuleCallee
-	(*SIPDispatchRule)(nil),               // 36: livekit.SIPDispatchRule
-	(*CreateSIPDispatchRuleRequest)(nil),  // 37: livekit.CreateSIPDispatchRuleRequest
-	(*UpdateSIPDispatchRuleRequest)(nil),  // 38: livekit.UpdateSIPDispatchRuleRequest
-	(*SIPDispatchRuleInfo)(nil),           // 39: livekit.SIPDispatchRuleInfo
-	(*SIPDispatchRuleUpdate)(nil),         // 40: livekit.SIPDispatchRuleUpdate
-	(*ListSIPDispatchRuleRequest)(nil),    // 41: livekit.ListSIPDispatchRuleRequest
-	(*ListSIPDispatchRuleResponse)(nil),   // 42: livekit.ListSIPDispatchRuleResponse
-	(*DeleteSIPDispatchRuleRequest)(nil),  // 43: livekit.DeleteSIPDispatchRuleRequest
-	(*SIPOutboundConfig)(nil),             // 44: livekit.SIPOutboundConfig
-	(*CreateSIPParticipantRequest)(nil),   // 45: livekit.CreateSIPParticipantRequest
-	(*SIPParticipantInfo)(nil),            // 46: livekit.SIPParticipantInfo
-	(*TransferSIPParticipantRequest)(nil), // 47: livekit.TransferSIPParticipantRequest
-	(*SIPCallInfo)(nil),                   // 48: livekit.SIPCallInfo
-	(*SIPTransferInfo)(nil),               // 49: livekit.SIPTransferInfo
-	(*SIPUri)(nil),                        // 50: livekit.SIPUri
-	(*Destination)(nil),                   // 51: livekit.Destination
-	nil,                                   // 52: livekit.SIPInboundTrunkInfo.HeadersEntry
-	nil,                                   // 53: livekit.SIPInboundTrunkInfo.HeadersToAttributesEntry
-	nil,                                   // 54: livekit.SIPInboundTrunkInfo.AttributesToHeadersEntry
-	nil,                                   // 55: livekit.SIPOutboundTrunkInfo.HeadersEntry
-	nil,                                   // 56: livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntry
-	nil,                                   // 57: livekit.SIPOutboundTrunkInfo.AttributesToHeadersEntry
-	nil,                                   // 58: livekit.CreateSIPDispatchRuleRequest.AttributesEntry
-	nil,                                   // 59: livekit.SIPDispatchRuleInfo.AttributesEntry
-	nil,                                   // 60: livekit.SIPDispatchRuleUpdate.AttributesEntry
-	nil,                                   // 61: livekit.SIPOutboundConfig.HeadersToAttributesEntry
-	nil,                                   // 62: livekit.SIPOutboundConfig.AttributesToHeadersEntry
-	nil,                                   // 63: livekit.CreateSIPParticipantRequest.ParticipantAttributesEntry
-	nil,                                   // 64: livekit.CreateSIPParticipantRequest.HeadersEntry
-	nil,                                   // 65: livekit.TransferSIPParticipantRequest.HeadersEntry
-	nil,                                   // 66: livekit.SIPCallInfo.ParticipantAttributesEntry
-	(*durationpb.Duration)(nil),           // 67: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),         // 68: google.protobuf.Timestamp
-	(*ListUpdate)(nil),                    // 69: livekit.ListUpdate
-	(*Pagination)(nil),                    // 70: livekit.Pagination
-	(*RoomConfiguration)(nil),             // 71: livekit.RoomConfiguration
-	(DisconnectReason)(0),                 // 72: livekit.DisconnectReason
-	(*anypb.Any)(nil),                     // 73: google.protobuf.Any
-	(*emptypb.Empty)(nil),                 // 74: google.protobuf.Empty
+	(*SIPCodec)(nil),                      // 12: livekit.SIPCodec
+	(*SIPMediaConfig)(nil),                // 13: livekit.SIPMediaConfig
+	(*ProviderInfo)(nil),                  // 14: livekit.ProviderInfo
+	(*SIPTrunkInfo)(nil),                  // 15: livekit.SIPTrunkInfo
+	(*CreateSIPInboundTrunkRequest)(nil),  // 16: livekit.CreateSIPInboundTrunkRequest
+	(*UpdateSIPInboundTrunkRequest)(nil),  // 17: livekit.UpdateSIPInboundTrunkRequest
+	(*SIPInboundTrunkInfo)(nil),           // 18: livekit.SIPInboundTrunkInfo
+	(*SIPInboundTrunkUpdate)(nil),         // 19: livekit.SIPInboundTrunkUpdate
+	(*CreateSIPOutboundTrunkRequest)(nil), // 20: livekit.CreateSIPOutboundTrunkRequest
+	(*UpdateSIPOutboundTrunkRequest)(nil), // 21: livekit.UpdateSIPOutboundTrunkRequest
+	(*SIPOutboundTrunkInfo)(nil),          // 22: livekit.SIPOutboundTrunkInfo
+	(*SIPOutboundTrunkUpdate)(nil),        // 23: livekit.SIPOutboundTrunkUpdate
+	(*GetSIPInboundTrunkRequest)(nil),     // 24: livekit.GetSIPInboundTrunkRequest
+	(*GetSIPInboundTrunkResponse)(nil),    // 25: livekit.GetSIPInboundTrunkResponse
+	(*GetSIPOutboundTrunkRequest)(nil),    // 26: livekit.GetSIPOutboundTrunkRequest
+	(*GetSIPOutboundTrunkResponse)(nil),   // 27: livekit.GetSIPOutboundTrunkResponse
+	(*ListSIPTrunkRequest)(nil),           // 28: livekit.ListSIPTrunkRequest
+	(*ListSIPTrunkResponse)(nil),          // 29: livekit.ListSIPTrunkResponse
+	(*ListSIPInboundTrunkRequest)(nil),    // 30: livekit.ListSIPInboundTrunkRequest
+	(*ListSIPInboundTrunkResponse)(nil),   // 31: livekit.ListSIPInboundTrunkResponse
+	(*ListSIPOutboundTrunkRequest)(nil),   // 32: livekit.ListSIPOutboundTrunkRequest
+	(*ListSIPOutboundTrunkResponse)(nil),  // 33: livekit.ListSIPOutboundTrunkResponse
+	(*DeleteSIPTrunkRequest)(nil),         // 34: livekit.DeleteSIPTrunkRequest
+	(*SIPDispatchRuleDirect)(nil),         // 35: livekit.SIPDispatchRuleDirect
+	(*SIPDispatchRuleIndividual)(nil),     // 36: livekit.SIPDispatchRuleIndividual
+	(*SIPDispatchRuleCallee)(nil),         // 37: livekit.SIPDispatchRuleCallee
+	(*SIPDispatchRule)(nil),               // 38: livekit.SIPDispatchRule
+	(*CreateSIPDispatchRuleRequest)(nil),  // 39: livekit.CreateSIPDispatchRuleRequest
+	(*UpdateSIPDispatchRuleRequest)(nil),  // 40: livekit.UpdateSIPDispatchRuleRequest
+	(*SIPDispatchRuleInfo)(nil),           // 41: livekit.SIPDispatchRuleInfo
+	(*SIPDispatchRuleUpdate)(nil),         // 42: livekit.SIPDispatchRuleUpdate
+	(*ListSIPDispatchRuleRequest)(nil),    // 43: livekit.ListSIPDispatchRuleRequest
+	(*ListSIPDispatchRuleResponse)(nil),   // 44: livekit.ListSIPDispatchRuleResponse
+	(*DeleteSIPDispatchRuleRequest)(nil),  // 45: livekit.DeleteSIPDispatchRuleRequest
+	(*SIPOutboundConfig)(nil),             // 46: livekit.SIPOutboundConfig
+	(*CreateSIPParticipantRequest)(nil),   // 47: livekit.CreateSIPParticipantRequest
+	(*SIPParticipantInfo)(nil),            // 48: livekit.SIPParticipantInfo
+	(*TransferSIPParticipantRequest)(nil), // 49: livekit.TransferSIPParticipantRequest
+	(*SIPCallInfo)(nil),                   // 50: livekit.SIPCallInfo
+	(*SIPTransferInfo)(nil),               // 51: livekit.SIPTransferInfo
+	(*SIPUri)(nil),                        // 52: livekit.SIPUri
+	(*SIPRequestDest)(nil),                // 53: livekit.SIPRequestDest
+	(*SIPNamedDest)(nil),                  // 54: livekit.SIPNamedDest
+	(*Destination)(nil),                   // 55: livekit.Destination
+	nil,                                   // 56: livekit.SIPInboundTrunkInfo.HeadersEntry
+	nil,                                   // 57: livekit.SIPInboundTrunkInfo.HeadersToAttributesEntry
+	nil,                                   // 58: livekit.SIPInboundTrunkInfo.AttributesToHeadersEntry
+	nil,                                   // 59: livekit.SIPOutboundTrunkInfo.HeadersEntry
+	nil,                                   // 60: livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntry
+	nil,                                   // 61: livekit.SIPOutboundTrunkInfo.AttributesToHeadersEntry
+	nil,                                   // 62: livekit.CreateSIPDispatchRuleRequest.AttributesEntry
+	nil,                                   // 63: livekit.SIPDispatchRuleInfo.AttributesEntry
+	nil,                                   // 64: livekit.SIPDispatchRuleUpdate.AttributesEntry
+	nil,                                   // 65: livekit.SIPOutboundConfig.HeadersToAttributesEntry
+	nil,                                   // 66: livekit.SIPOutboundConfig.AttributesToHeadersEntry
+	nil,                                   // 67: livekit.CreateSIPParticipantRequest.ParticipantAttributesEntry
+	nil,                                   // 68: livekit.CreateSIPParticipantRequest.HeadersEntry
+	nil,                                   // 69: livekit.TransferSIPParticipantRequest.HeadersEntry
+	nil,                                   // 70: livekit.SIPCallInfo.ParticipantAttributesEntry
+	(*durationpb.Duration)(nil),           // 71: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),         // 72: google.protobuf.Timestamp
+	(*ListUpdate)(nil),                    // 73: livekit.ListUpdate
+	(*Pagination)(nil),                    // 74: livekit.Pagination
+	(*RoomConfiguration)(nil),             // 75: livekit.RoomConfiguration
+	(DisconnectReason)(0),                 // 76: livekit.DisconnectReason
+	(*anypb.Any)(nil),                     // 77: google.protobuf.Any
+	(*emptypb.Empty)(nil),                 // 78: google.protobuf.Empty
 }
 var file_livekit_sip_proto_depIdxs = []int32{
 	0,   // 0: livekit.SIPStatus.code:type_name -> livekit.SIPStatusCode
-	4,   // 1: livekit.ProviderInfo.type:type_name -> livekit.ProviderType
-	9,   // 2: livekit.SIPTrunkInfo.kind:type_name -> livekit.SIPTrunkInfo.TrunkKind
-	1,   // 3: livekit.SIPTrunkInfo.transport:type_name -> livekit.SIPTransport
-	16,  // 4: livekit.CreateSIPInboundTrunkRequest.trunk:type_name -> livekit.SIPInboundTrunkInfo
-	16,  // 5: livekit.UpdateSIPInboundTrunkRequest.replace:type_name -> livekit.SIPInboundTrunkInfo
-	17,  // 6: livekit.UpdateSIPInboundTrunkRequest.update:type_name -> livekit.SIPInboundTrunkUpdate
-	52,  // 7: livekit.SIPInboundTrunkInfo.headers:type_name -> livekit.SIPInboundTrunkInfo.HeadersEntry
-	53,  // 8: livekit.SIPInboundTrunkInfo.headers_to_attributes:type_name -> livekit.SIPInboundTrunkInfo.HeadersToAttributesEntry
-	54,  // 9: livekit.SIPInboundTrunkInfo.attributes_to_headers:type_name -> livekit.SIPInboundTrunkInfo.AttributesToHeadersEntry
-	2,   // 10: livekit.SIPInboundTrunkInfo.include_headers:type_name -> livekit.SIPHeaderOptions
-	67,  // 11: livekit.SIPInboundTrunkInfo.ringing_timeout:type_name -> google.protobuf.Duration
-	67,  // 12: livekit.SIPInboundTrunkInfo.max_call_duration:type_name -> google.protobuf.Duration
-	3,   // 13: livekit.SIPInboundTrunkInfo.media_encryption:type_name -> livekit.SIPMediaEncryption
-	68,  // 14: livekit.SIPInboundTrunkInfo.created_at:type_name -> google.protobuf.Timestamp
-	68,  // 15: livekit.SIPInboundTrunkInfo.updated_at:type_name -> google.protobuf.Timestamp
-	69,  // 16: livekit.SIPInboundTrunkUpdate.numbers:type_name -> livekit.ListUpdate
-	69,  // 17: livekit.SIPInboundTrunkUpdate.allowed_addresses:type_name -> livekit.ListUpdate
-	69,  // 18: livekit.SIPInboundTrunkUpdate.allowed_numbers:type_name -> livekit.ListUpdate
-	3,   // 19: livekit.SIPInboundTrunkUpdate.media_encryption:type_name -> livekit.SIPMediaEncryption
-	20,  // 20: livekit.CreateSIPOutboundTrunkRequest.trunk:type_name -> livekit.SIPOutboundTrunkInfo
-	20,  // 21: livekit.UpdateSIPOutboundTrunkRequest.replace:type_name -> livekit.SIPOutboundTrunkInfo
-	21,  // 22: livekit.UpdateSIPOutboundTrunkRequest.update:type_name -> livekit.SIPOutboundTrunkUpdate
-	1,   // 23: livekit.SIPOutboundTrunkInfo.transport:type_name -> livekit.SIPTransport
-	55,  // 24: livekit.SIPOutboundTrunkInfo.headers:type_name -> livekit.SIPOutboundTrunkInfo.HeadersEntry
-	56,  // 25: livekit.SIPOutboundTrunkInfo.headers_to_attributes:type_name -> livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntry
-	57,  // 26: livekit.SIPOutboundTrunkInfo.attributes_to_headers:type_name -> livekit.SIPOutboundTrunkInfo.AttributesToHeadersEntry
-	2,   // 27: livekit.SIPOutboundTrunkInfo.include_headers:type_name -> livekit.SIPHeaderOptions
-	3,   // 28: livekit.SIPOutboundTrunkInfo.media_encryption:type_name -> livekit.SIPMediaEncryption
-	68,  // 29: livekit.SIPOutboundTrunkInfo.created_at:type_name -> google.protobuf.Timestamp
-	68,  // 30: livekit.SIPOutboundTrunkInfo.updated_at:type_name -> google.protobuf.Timestamp
-	1,   // 31: livekit.SIPOutboundTrunkUpdate.transport:type_name -> livekit.SIPTransport
-	69,  // 32: livekit.SIPOutboundTrunkUpdate.numbers:type_name -> livekit.ListUpdate
-	3,   // 33: livekit.SIPOutboundTrunkUpdate.media_encryption:type_name -> livekit.SIPMediaEncryption
-	16,  // 34: livekit.GetSIPInboundTrunkResponse.trunk:type_name -> livekit.SIPInboundTrunkInfo
-	20,  // 35: livekit.GetSIPOutboundTrunkResponse.trunk:type_name -> livekit.SIPOutboundTrunkInfo
-	70,  // 36: livekit.ListSIPTrunkRequest.page:type_name -> livekit.Pagination
-	13,  // 37: livekit.ListSIPTrunkResponse.items:type_name -> livekit.SIPTrunkInfo
-	70,  // 38: livekit.ListSIPInboundTrunkRequest.page:type_name -> livekit.Pagination
-	16,  // 39: livekit.ListSIPInboundTrunkResponse.items:type_name -> livekit.SIPInboundTrunkInfo
-	70,  // 40: livekit.ListSIPOutboundTrunkRequest.page:type_name -> livekit.Pagination
-	20,  // 41: livekit.ListSIPOutboundTrunkResponse.items:type_name -> livekit.SIPOutboundTrunkInfo
-	33,  // 42: livekit.SIPDispatchRule.dispatch_rule_direct:type_name -> livekit.SIPDispatchRuleDirect
-	34,  // 43: livekit.SIPDispatchRule.dispatch_rule_individual:type_name -> livekit.SIPDispatchRuleIndividual
-	35,  // 44: livekit.SIPDispatchRule.dispatch_rule_callee:type_name -> livekit.SIPDispatchRuleCallee
-	39,  // 45: livekit.CreateSIPDispatchRuleRequest.dispatch_rule:type_name -> livekit.SIPDispatchRuleInfo
-	36,  // 46: livekit.CreateSIPDispatchRuleRequest.rule:type_name -> livekit.SIPDispatchRule
-	58,  // 47: livekit.CreateSIPDispatchRuleRequest.attributes:type_name -> livekit.CreateSIPDispatchRuleRequest.AttributesEntry
-	71,  // 48: livekit.CreateSIPDispatchRuleRequest.room_config:type_name -> livekit.RoomConfiguration
-	39,  // 49: livekit.UpdateSIPDispatchRuleRequest.replace:type_name -> livekit.SIPDispatchRuleInfo
-	40,  // 50: livekit.UpdateSIPDispatchRuleRequest.update:type_name -> livekit.SIPDispatchRuleUpdate
-	36,  // 51: livekit.SIPDispatchRuleInfo.rule:type_name -> livekit.SIPDispatchRule
-	59,  // 52: livekit.SIPDispatchRuleInfo.attributes:type_name -> livekit.SIPDispatchRuleInfo.AttributesEntry
-	71,  // 53: livekit.SIPDispatchRuleInfo.room_config:type_name -> livekit.RoomConfiguration
-	3,   // 54: livekit.SIPDispatchRuleInfo.media_encryption:type_name -> livekit.SIPMediaEncryption
-	68,  // 55: livekit.SIPDispatchRuleInfo.created_at:type_name -> google.protobuf.Timestamp
-	68,  // 56: livekit.SIPDispatchRuleInfo.updated_at:type_name -> google.protobuf.Timestamp
-	69,  // 57: livekit.SIPDispatchRuleUpdate.trunk_ids:type_name -> livekit.ListUpdate
-	36,  // 58: livekit.SIPDispatchRuleUpdate.rule:type_name -> livekit.SIPDispatchRule
-	60,  // 59: livekit.SIPDispatchRuleUpdate.attributes:type_name -> livekit.SIPDispatchRuleUpdate.AttributesEntry
-	3,   // 60: livekit.SIPDispatchRuleUpdate.media_encryption:type_name -> livekit.SIPMediaEncryption
-	70,  // 61: livekit.ListSIPDispatchRuleRequest.page:type_name -> livekit.Pagination
-	39,  // 62: livekit.ListSIPDispatchRuleResponse.items:type_name -> livekit.SIPDispatchRuleInfo
-	1,   // 63: livekit.SIPOutboundConfig.transport:type_name -> livekit.SIPTransport
-	61,  // 64: livekit.SIPOutboundConfig.headers_to_attributes:type_name -> livekit.SIPOutboundConfig.HeadersToAttributesEntry
-	62,  // 65: livekit.SIPOutboundConfig.attributes_to_headers:type_name -> livekit.SIPOutboundConfig.AttributesToHeadersEntry
-	44,  // 66: livekit.CreateSIPParticipantRequest.trunk:type_name -> livekit.SIPOutboundConfig
-	63,  // 67: livekit.CreateSIPParticipantRequest.participant_attributes:type_name -> livekit.CreateSIPParticipantRequest.ParticipantAttributesEntry
-	64,  // 68: livekit.CreateSIPParticipantRequest.headers:type_name -> livekit.CreateSIPParticipantRequest.HeadersEntry
-	2,   // 69: livekit.CreateSIPParticipantRequest.include_headers:type_name -> livekit.SIPHeaderOptions
-	67,  // 70: livekit.CreateSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
-	67,  // 71: livekit.CreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
-	3,   // 72: livekit.CreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
-	51,  // 73: livekit.CreateSIPParticipantRequest.destination:type_name -> livekit.Destination
-	65,  // 74: livekit.TransferSIPParticipantRequest.headers:type_name -> livekit.TransferSIPParticipantRequest.HeadersEntry
-	67,  // 75: livekit.TransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
-	66,  // 76: livekit.SIPCallInfo.participant_attributes:type_name -> livekit.SIPCallInfo.ParticipantAttributesEntry
-	50,  // 77: livekit.SIPCallInfo.from_uri:type_name -> livekit.SIPUri
-	50,  // 78: livekit.SIPCallInfo.to_uri:type_name -> livekit.SIPUri
-	7,   // 79: livekit.SIPCallInfo.enabled_features:type_name -> livekit.SIPFeature
-	8,   // 80: livekit.SIPCallInfo.call_direction:type_name -> livekit.SIPCallDirection
-	5,   // 81: livekit.SIPCallInfo.call_status:type_name -> livekit.SIPCallStatus
-	72,  // 82: livekit.SIPCallInfo.disconnect_reason:type_name -> livekit.DisconnectReason
-	10,  // 83: livekit.SIPCallInfo.call_status_code:type_name -> livekit.SIPStatus
-	73,  // 84: livekit.SIPCallInfo.call_context:type_name -> google.protobuf.Any
-	12,  // 85: livekit.SIPCallInfo.provider_info:type_name -> livekit.ProviderInfo
-	6,   // 86: livekit.SIPTransferInfo.transfer_status:type_name -> livekit.SIPTransferStatus
-	10,  // 87: livekit.SIPTransferInfo.transfer_status_code:type_name -> livekit.SIPStatus
-	1,   // 88: livekit.SIPUri.transport:type_name -> livekit.SIPTransport
-	26,  // 89: livekit.SIP.ListSIPTrunk:input_type -> livekit.ListSIPTrunkRequest
-	14,  // 90: livekit.SIP.CreateSIPInboundTrunk:input_type -> livekit.CreateSIPInboundTrunkRequest
-	18,  // 91: livekit.SIP.CreateSIPOutboundTrunk:input_type -> livekit.CreateSIPOutboundTrunkRequest
-	15,  // 92: livekit.SIP.UpdateSIPInboundTrunk:input_type -> livekit.UpdateSIPInboundTrunkRequest
-	19,  // 93: livekit.SIP.UpdateSIPOutboundTrunk:input_type -> livekit.UpdateSIPOutboundTrunkRequest
-	22,  // 94: livekit.SIP.GetSIPInboundTrunk:input_type -> livekit.GetSIPInboundTrunkRequest
-	24,  // 95: livekit.SIP.GetSIPOutboundTrunk:input_type -> livekit.GetSIPOutboundTrunkRequest
-	28,  // 96: livekit.SIP.ListSIPInboundTrunk:input_type -> livekit.ListSIPInboundTrunkRequest
-	30,  // 97: livekit.SIP.ListSIPOutboundTrunk:input_type -> livekit.ListSIPOutboundTrunkRequest
-	32,  // 98: livekit.SIP.DeleteSIPTrunk:input_type -> livekit.DeleteSIPTrunkRequest
-	37,  // 99: livekit.SIP.CreateSIPDispatchRule:input_type -> livekit.CreateSIPDispatchRuleRequest
-	38,  // 100: livekit.SIP.UpdateSIPDispatchRule:input_type -> livekit.UpdateSIPDispatchRuleRequest
-	41,  // 101: livekit.SIP.ListSIPDispatchRule:input_type -> livekit.ListSIPDispatchRuleRequest
-	43,  // 102: livekit.SIP.DeleteSIPDispatchRule:input_type -> livekit.DeleteSIPDispatchRuleRequest
-	45,  // 103: livekit.SIP.CreateSIPParticipant:input_type -> livekit.CreateSIPParticipantRequest
-	47,  // 104: livekit.SIP.TransferSIPParticipant:input_type -> livekit.TransferSIPParticipantRequest
-	27,  // 105: livekit.SIP.ListSIPTrunk:output_type -> livekit.ListSIPTrunkResponse
-	16,  // 106: livekit.SIP.CreateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
-	20,  // 107: livekit.SIP.CreateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
-	16,  // 108: livekit.SIP.UpdateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
-	20,  // 109: livekit.SIP.UpdateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
-	23,  // 110: livekit.SIP.GetSIPInboundTrunk:output_type -> livekit.GetSIPInboundTrunkResponse
-	25,  // 111: livekit.SIP.GetSIPOutboundTrunk:output_type -> livekit.GetSIPOutboundTrunkResponse
-	29,  // 112: livekit.SIP.ListSIPInboundTrunk:output_type -> livekit.ListSIPInboundTrunkResponse
-	31,  // 113: livekit.SIP.ListSIPOutboundTrunk:output_type -> livekit.ListSIPOutboundTrunkResponse
-	13,  // 114: livekit.SIP.DeleteSIPTrunk:output_type -> livekit.SIPTrunkInfo
-	39,  // 115: livekit.SIP.CreateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	39,  // 116: livekit.SIP.UpdateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	42,  // 117: livekit.SIP.ListSIPDispatchRule:output_type -> livekit.ListSIPDispatchRuleResponse
-	39,  // 118: livekit.SIP.DeleteSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
-	46,  // 119: livekit.SIP.CreateSIPParticipant:output_type -> livekit.SIPParticipantInfo
-	74,  // 120: livekit.SIP.TransferSIPParticipant:output_type -> google.protobuf.Empty
-	105, // [105:121] is the sub-list for method output_type
-	89,  // [89:105] is the sub-list for method input_type
-	89,  // [89:89] is the sub-list for extension type_name
-	89,  // [89:89] is the sub-list for extension extendee
-	0,   // [0:89] is the sub-list for field type_name
+	12,  // 1: livekit.SIPMediaConfig.codecs:type_name -> livekit.SIPCodec
+	3,   // 2: livekit.SIPMediaConfig.encryption:type_name -> livekit.SIPMediaEncryption
+	71,  // 3: livekit.SIPMediaConfig.media_timeout:type_name -> google.protobuf.Duration
+	4,   // 4: livekit.ProviderInfo.type:type_name -> livekit.ProviderType
+	9,   // 5: livekit.SIPTrunkInfo.kind:type_name -> livekit.SIPTrunkInfo.TrunkKind
+	1,   // 6: livekit.SIPTrunkInfo.transport:type_name -> livekit.SIPTransport
+	18,  // 7: livekit.CreateSIPInboundTrunkRequest.trunk:type_name -> livekit.SIPInboundTrunkInfo
+	18,  // 8: livekit.UpdateSIPInboundTrunkRequest.replace:type_name -> livekit.SIPInboundTrunkInfo
+	19,  // 9: livekit.UpdateSIPInboundTrunkRequest.update:type_name -> livekit.SIPInboundTrunkUpdate
+	56,  // 10: livekit.SIPInboundTrunkInfo.headers:type_name -> livekit.SIPInboundTrunkInfo.HeadersEntry
+	57,  // 11: livekit.SIPInboundTrunkInfo.headers_to_attributes:type_name -> livekit.SIPInboundTrunkInfo.HeadersToAttributesEntry
+	58,  // 12: livekit.SIPInboundTrunkInfo.attributes_to_headers:type_name -> livekit.SIPInboundTrunkInfo.AttributesToHeadersEntry
+	2,   // 13: livekit.SIPInboundTrunkInfo.include_headers:type_name -> livekit.SIPHeaderOptions
+	71,  // 14: livekit.SIPInboundTrunkInfo.ringing_timeout:type_name -> google.protobuf.Duration
+	71,  // 15: livekit.SIPInboundTrunkInfo.max_call_duration:type_name -> google.protobuf.Duration
+	3,   // 16: livekit.SIPInboundTrunkInfo.media_encryption:type_name -> livekit.SIPMediaEncryption
+	72,  // 17: livekit.SIPInboundTrunkInfo.created_at:type_name -> google.protobuf.Timestamp
+	72,  // 18: livekit.SIPInboundTrunkInfo.updated_at:type_name -> google.protobuf.Timestamp
+	73,  // 19: livekit.SIPInboundTrunkUpdate.numbers:type_name -> livekit.ListUpdate
+	73,  // 20: livekit.SIPInboundTrunkUpdate.allowed_addresses:type_name -> livekit.ListUpdate
+	73,  // 21: livekit.SIPInboundTrunkUpdate.allowed_numbers:type_name -> livekit.ListUpdate
+	3,   // 22: livekit.SIPInboundTrunkUpdate.media_encryption:type_name -> livekit.SIPMediaEncryption
+	22,  // 23: livekit.CreateSIPOutboundTrunkRequest.trunk:type_name -> livekit.SIPOutboundTrunkInfo
+	22,  // 24: livekit.UpdateSIPOutboundTrunkRequest.replace:type_name -> livekit.SIPOutboundTrunkInfo
+	23,  // 25: livekit.UpdateSIPOutboundTrunkRequest.update:type_name -> livekit.SIPOutboundTrunkUpdate
+	1,   // 26: livekit.SIPOutboundTrunkInfo.transport:type_name -> livekit.SIPTransport
+	59,  // 27: livekit.SIPOutboundTrunkInfo.headers:type_name -> livekit.SIPOutboundTrunkInfo.HeadersEntry
+	60,  // 28: livekit.SIPOutboundTrunkInfo.headers_to_attributes:type_name -> livekit.SIPOutboundTrunkInfo.HeadersToAttributesEntry
+	61,  // 29: livekit.SIPOutboundTrunkInfo.attributes_to_headers:type_name -> livekit.SIPOutboundTrunkInfo.AttributesToHeadersEntry
+	2,   // 30: livekit.SIPOutboundTrunkInfo.include_headers:type_name -> livekit.SIPHeaderOptions
+	3,   // 31: livekit.SIPOutboundTrunkInfo.media_encryption:type_name -> livekit.SIPMediaEncryption
+	72,  // 32: livekit.SIPOutboundTrunkInfo.created_at:type_name -> google.protobuf.Timestamp
+	72,  // 33: livekit.SIPOutboundTrunkInfo.updated_at:type_name -> google.protobuf.Timestamp
+	1,   // 34: livekit.SIPOutboundTrunkUpdate.transport:type_name -> livekit.SIPTransport
+	73,  // 35: livekit.SIPOutboundTrunkUpdate.numbers:type_name -> livekit.ListUpdate
+	3,   // 36: livekit.SIPOutboundTrunkUpdate.media_encryption:type_name -> livekit.SIPMediaEncryption
+	18,  // 37: livekit.GetSIPInboundTrunkResponse.trunk:type_name -> livekit.SIPInboundTrunkInfo
+	22,  // 38: livekit.GetSIPOutboundTrunkResponse.trunk:type_name -> livekit.SIPOutboundTrunkInfo
+	74,  // 39: livekit.ListSIPTrunkRequest.page:type_name -> livekit.Pagination
+	15,  // 40: livekit.ListSIPTrunkResponse.items:type_name -> livekit.SIPTrunkInfo
+	74,  // 41: livekit.ListSIPInboundTrunkRequest.page:type_name -> livekit.Pagination
+	18,  // 42: livekit.ListSIPInboundTrunkResponse.items:type_name -> livekit.SIPInboundTrunkInfo
+	74,  // 43: livekit.ListSIPOutboundTrunkRequest.page:type_name -> livekit.Pagination
+	22,  // 44: livekit.ListSIPOutboundTrunkResponse.items:type_name -> livekit.SIPOutboundTrunkInfo
+	35,  // 45: livekit.SIPDispatchRule.dispatch_rule_direct:type_name -> livekit.SIPDispatchRuleDirect
+	36,  // 46: livekit.SIPDispatchRule.dispatch_rule_individual:type_name -> livekit.SIPDispatchRuleIndividual
+	37,  // 47: livekit.SIPDispatchRule.dispatch_rule_callee:type_name -> livekit.SIPDispatchRuleCallee
+	41,  // 48: livekit.CreateSIPDispatchRuleRequest.dispatch_rule:type_name -> livekit.SIPDispatchRuleInfo
+	38,  // 49: livekit.CreateSIPDispatchRuleRequest.rule:type_name -> livekit.SIPDispatchRule
+	62,  // 50: livekit.CreateSIPDispatchRuleRequest.attributes:type_name -> livekit.CreateSIPDispatchRuleRequest.AttributesEntry
+	75,  // 51: livekit.CreateSIPDispatchRuleRequest.room_config:type_name -> livekit.RoomConfiguration
+	41,  // 52: livekit.UpdateSIPDispatchRuleRequest.replace:type_name -> livekit.SIPDispatchRuleInfo
+	42,  // 53: livekit.UpdateSIPDispatchRuleRequest.update:type_name -> livekit.SIPDispatchRuleUpdate
+	38,  // 54: livekit.SIPDispatchRuleInfo.rule:type_name -> livekit.SIPDispatchRule
+	63,  // 55: livekit.SIPDispatchRuleInfo.attributes:type_name -> livekit.SIPDispatchRuleInfo.AttributesEntry
+	75,  // 56: livekit.SIPDispatchRuleInfo.room_config:type_name -> livekit.RoomConfiguration
+	13,  // 57: livekit.SIPDispatchRuleInfo.media:type_name -> livekit.SIPMediaConfig
+	3,   // 58: livekit.SIPDispatchRuleInfo.media_encryption:type_name -> livekit.SIPMediaEncryption
+	72,  // 59: livekit.SIPDispatchRuleInfo.created_at:type_name -> google.protobuf.Timestamp
+	72,  // 60: livekit.SIPDispatchRuleInfo.updated_at:type_name -> google.protobuf.Timestamp
+	73,  // 61: livekit.SIPDispatchRuleUpdate.trunk_ids:type_name -> livekit.ListUpdate
+	38,  // 62: livekit.SIPDispatchRuleUpdate.rule:type_name -> livekit.SIPDispatchRule
+	64,  // 63: livekit.SIPDispatchRuleUpdate.attributes:type_name -> livekit.SIPDispatchRuleUpdate.AttributesEntry
+	3,   // 64: livekit.SIPDispatchRuleUpdate.media_encryption:type_name -> livekit.SIPMediaEncryption
+	13,  // 65: livekit.SIPDispatchRuleUpdate.media:type_name -> livekit.SIPMediaConfig
+	74,  // 66: livekit.ListSIPDispatchRuleRequest.page:type_name -> livekit.Pagination
+	41,  // 67: livekit.ListSIPDispatchRuleResponse.items:type_name -> livekit.SIPDispatchRuleInfo
+	1,   // 68: livekit.SIPOutboundConfig.transport:type_name -> livekit.SIPTransport
+	65,  // 69: livekit.SIPOutboundConfig.headers_to_attributes:type_name -> livekit.SIPOutboundConfig.HeadersToAttributesEntry
+	66,  // 70: livekit.SIPOutboundConfig.attributes_to_headers:type_name -> livekit.SIPOutboundConfig.AttributesToHeadersEntry
+	46,  // 71: livekit.CreateSIPParticipantRequest.trunk:type_name -> livekit.SIPOutboundConfig
+	53,  // 72: livekit.CreateSIPParticipantRequest.sip_request_uri:type_name -> livekit.SIPRequestDest
+	54,  // 73: livekit.CreateSIPParticipantRequest.sip_to_header:type_name -> livekit.SIPNamedDest
+	54,  // 74: livekit.CreateSIPParticipantRequest.sip_from_header:type_name -> livekit.SIPNamedDest
+	67,  // 75: livekit.CreateSIPParticipantRequest.participant_attributes:type_name -> livekit.CreateSIPParticipantRequest.ParticipantAttributesEntry
+	68,  // 76: livekit.CreateSIPParticipantRequest.headers:type_name -> livekit.CreateSIPParticipantRequest.HeadersEntry
+	2,   // 77: livekit.CreateSIPParticipantRequest.include_headers:type_name -> livekit.SIPHeaderOptions
+	71,  // 78: livekit.CreateSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	71,  // 79: livekit.CreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
+	3,   // 80: livekit.CreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
+	13,  // 81: livekit.CreateSIPParticipantRequest.media:type_name -> livekit.SIPMediaConfig
+	55,  // 82: livekit.CreateSIPParticipantRequest.destination:type_name -> livekit.Destination
+	69,  // 83: livekit.TransferSIPParticipantRequest.headers:type_name -> livekit.TransferSIPParticipantRequest.HeadersEntry
+	71,  // 84: livekit.TransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	70,  // 85: livekit.SIPCallInfo.participant_attributes:type_name -> livekit.SIPCallInfo.ParticipantAttributesEntry
+	52,  // 86: livekit.SIPCallInfo.from_uri:type_name -> livekit.SIPUri
+	52,  // 87: livekit.SIPCallInfo.to_uri:type_name -> livekit.SIPUri
+	7,   // 88: livekit.SIPCallInfo.enabled_features:type_name -> livekit.SIPFeature
+	8,   // 89: livekit.SIPCallInfo.call_direction:type_name -> livekit.SIPCallDirection
+	5,   // 90: livekit.SIPCallInfo.call_status:type_name -> livekit.SIPCallStatus
+	76,  // 91: livekit.SIPCallInfo.disconnect_reason:type_name -> livekit.DisconnectReason
+	10,  // 92: livekit.SIPCallInfo.call_status_code:type_name -> livekit.SIPStatus
+	77,  // 93: livekit.SIPCallInfo.call_context:type_name -> google.protobuf.Any
+	14,  // 94: livekit.SIPCallInfo.provider_info:type_name -> livekit.ProviderInfo
+	6,   // 95: livekit.SIPTransferInfo.transfer_status:type_name -> livekit.SIPTransferStatus
+	10,  // 96: livekit.SIPTransferInfo.transfer_status_code:type_name -> livekit.SIPStatus
+	1,   // 97: livekit.SIPUri.transport:type_name -> livekit.SIPTransport
+	52,  // 98: livekit.SIPRequestDest.values:type_name -> livekit.SIPUri
+	52,  // 99: livekit.SIPNamedDest.values:type_name -> livekit.SIPUri
+	28,  // 100: livekit.SIP.ListSIPTrunk:input_type -> livekit.ListSIPTrunkRequest
+	16,  // 101: livekit.SIP.CreateSIPInboundTrunk:input_type -> livekit.CreateSIPInboundTrunkRequest
+	20,  // 102: livekit.SIP.CreateSIPOutboundTrunk:input_type -> livekit.CreateSIPOutboundTrunkRequest
+	17,  // 103: livekit.SIP.UpdateSIPInboundTrunk:input_type -> livekit.UpdateSIPInboundTrunkRequest
+	21,  // 104: livekit.SIP.UpdateSIPOutboundTrunk:input_type -> livekit.UpdateSIPOutboundTrunkRequest
+	24,  // 105: livekit.SIP.GetSIPInboundTrunk:input_type -> livekit.GetSIPInboundTrunkRequest
+	26,  // 106: livekit.SIP.GetSIPOutboundTrunk:input_type -> livekit.GetSIPOutboundTrunkRequest
+	30,  // 107: livekit.SIP.ListSIPInboundTrunk:input_type -> livekit.ListSIPInboundTrunkRequest
+	32,  // 108: livekit.SIP.ListSIPOutboundTrunk:input_type -> livekit.ListSIPOutboundTrunkRequest
+	34,  // 109: livekit.SIP.DeleteSIPTrunk:input_type -> livekit.DeleteSIPTrunkRequest
+	39,  // 110: livekit.SIP.CreateSIPDispatchRule:input_type -> livekit.CreateSIPDispatchRuleRequest
+	40,  // 111: livekit.SIP.UpdateSIPDispatchRule:input_type -> livekit.UpdateSIPDispatchRuleRequest
+	43,  // 112: livekit.SIP.ListSIPDispatchRule:input_type -> livekit.ListSIPDispatchRuleRequest
+	45,  // 113: livekit.SIP.DeleteSIPDispatchRule:input_type -> livekit.DeleteSIPDispatchRuleRequest
+	47,  // 114: livekit.SIP.CreateSIPParticipant:input_type -> livekit.CreateSIPParticipantRequest
+	49,  // 115: livekit.SIP.TransferSIPParticipant:input_type -> livekit.TransferSIPParticipantRequest
+	29,  // 116: livekit.SIP.ListSIPTrunk:output_type -> livekit.ListSIPTrunkResponse
+	18,  // 117: livekit.SIP.CreateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
+	22,  // 118: livekit.SIP.CreateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
+	18,  // 119: livekit.SIP.UpdateSIPInboundTrunk:output_type -> livekit.SIPInboundTrunkInfo
+	22,  // 120: livekit.SIP.UpdateSIPOutboundTrunk:output_type -> livekit.SIPOutboundTrunkInfo
+	25,  // 121: livekit.SIP.GetSIPInboundTrunk:output_type -> livekit.GetSIPInboundTrunkResponse
+	27,  // 122: livekit.SIP.GetSIPOutboundTrunk:output_type -> livekit.GetSIPOutboundTrunkResponse
+	31,  // 123: livekit.SIP.ListSIPInboundTrunk:output_type -> livekit.ListSIPInboundTrunkResponse
+	33,  // 124: livekit.SIP.ListSIPOutboundTrunk:output_type -> livekit.ListSIPOutboundTrunkResponse
+	15,  // 125: livekit.SIP.DeleteSIPTrunk:output_type -> livekit.SIPTrunkInfo
+	41,  // 126: livekit.SIP.CreateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	41,  // 127: livekit.SIP.UpdateSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	44,  // 128: livekit.SIP.ListSIPDispatchRule:output_type -> livekit.ListSIPDispatchRuleResponse
+	41,  // 129: livekit.SIP.DeleteSIPDispatchRule:output_type -> livekit.SIPDispatchRuleInfo
+	48,  // 130: livekit.SIP.CreateSIPParticipant:output_type -> livekit.SIPParticipantInfo
+	78,  // 131: livekit.SIP.TransferSIPParticipant:output_type -> google.protobuf.Empty
+	116, // [116:132] is the sub-list for method output_type
+	100, // [100:116] is the sub-list for method input_type
+	100, // [100:100] is the sub-list for extension type_name
+	100, // [100:100] is the sub-list for extension extendee
+	0,   // [0:100] is the sub-list for field type_name
 }
 
 func init() { file_livekit_sip_proto_init() }
@@ -5304,34 +5716,43 @@ func file_livekit_sip_proto_init() {
 	}
 	file_livekit_models_proto_init()
 	file_livekit_room_proto_init()
-	file_livekit_sip_proto_msgTypes[5].OneofWrappers = []any{
+	file_livekit_sip_proto_msgTypes[3].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[7].OneofWrappers = []any{
 		(*UpdateSIPInboundTrunkRequest_Replace)(nil),
 		(*UpdateSIPInboundTrunkRequest_Update)(nil),
 	}
-	file_livekit_sip_proto_msgTypes[7].OneofWrappers = []any{}
-	file_livekit_sip_proto_msgTypes[9].OneofWrappers = []any{
+	file_livekit_sip_proto_msgTypes[9].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[11].OneofWrappers = []any{
 		(*UpdateSIPOutboundTrunkRequest_Replace)(nil),
 		(*UpdateSIPOutboundTrunkRequest_Update)(nil),
 	}
-	file_livekit_sip_proto_msgTypes[11].OneofWrappers = []any{}
-	file_livekit_sip_proto_msgTypes[26].OneofWrappers = []any{
+	file_livekit_sip_proto_msgTypes[13].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[28].OneofWrappers = []any{
 		(*SIPDispatchRule_DispatchRuleDirect)(nil),
 		(*SIPDispatchRule_DispatchRuleIndividual)(nil),
 		(*SIPDispatchRule_DispatchRuleCallee)(nil),
 	}
-	file_livekit_sip_proto_msgTypes[28].OneofWrappers = []any{
+	file_livekit_sip_proto_msgTypes[30].OneofWrappers = []any{
 		(*UpdateSIPDispatchRuleRequest_Replace)(nil),
 		(*UpdateSIPDispatchRuleRequest_Update)(nil),
 	}
-	file_livekit_sip_proto_msgTypes[30].OneofWrappers = []any{}
-	file_livekit_sip_proto_msgTypes[35].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[32].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[37].OneofWrappers = []any{}
+	file_livekit_sip_proto_msgTypes[43].OneofWrappers = []any{
+		(*SIPRequestDest_Raw)(nil),
+		(*SIPRequestDest_Values)(nil),
+	}
+	file_livekit_sip_proto_msgTypes[44].OneofWrappers = []any{
+		(*SIPNamedDest_Raw)(nil),
+		(*SIPNamedDest_Values)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_sip_proto_rawDesc), len(file_livekit_sip_proto_rawDesc)),
 			NumEnums:      10,
-			NumMessages:   57,
+			NumMessages:   61,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

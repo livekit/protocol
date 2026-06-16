@@ -117,6 +117,10 @@ message ClientMessage {
 }
 
 // --- Server -> Model ---
+//
+// NOTE: these messages are not currently used on the wire between the model
+// server (infserve) and the gateway; that communication is presently done via
+// JSON requests and responses. They are kept here for reference and future use.
 
 message EotInferenceRequest {
   bytes audio = 1;
@@ -172,7 +176,15 @@ message InferenceResponse {
 
 // --- Server -> Client ---
 
-message SessionCreated {}
+message SessionCreated {
+  // Server-recommended default detection thresholds keyed by language code
+  // (e.g. "en", "es"). The threshold semantics match the session type: EOT
+  // probability threshold for EOT sessions, interruption threshold for
+  // barge-in sessions.
+  map<string, float> default_thresholds = 1;
+  // Catch-all default applied to languages not present in default_thresholds.
+  float default_threshold = 2;
+}
 
 message InferenceStarted {}
 

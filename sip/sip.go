@@ -28,12 +28,14 @@ import (
 	"github.com/dennwc/iters"
 	"github.com/twitchtv/twirp"
 	"golang.org/x/exp/slices"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
+	"github.com/livekit/psrpc"
 )
 
 //go:generate stringer -type TrunkFilteredReason -trimprefix TrunkFiltered
@@ -272,7 +274,7 @@ func GetPinAndRoom(info *livekit.SIPDispatchRuleInfo) (room, pin string, err err
 	// TODO: Could probably add methods on SIPDispatchRuleInfo struct instead.
 	switch rule := info.GetRule().GetRule().(type) {
 	default:
-		return "", "", fmt.Errorf("Unsupported SIP Dispatch Rule: %T", rule) //nolint:staticcheck // part of public API
+		return "", "", psrpc.NewErrorf(psrpc.InvalidArgument, "unsupported SIP Dispatch Rule: %T", rule)
 	case *livekit.SIPDispatchRule_DispatchRuleDirect:
 		pin = rule.DispatchRuleDirect.GetPin()
 		room = rule.DispatchRuleDirect.GetRoomName()
@@ -301,7 +303,7 @@ func NormalizeNumber(num string) string {
 
 func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *livekit.SIPInboundTrunkInfo, opt *matchTrunkOpts) error {
 	if len(t.AllowedNumbers) == 0 {
-		if t2 := byInbound[""]; t2 != nil {
+		if t2 := byInbound[""]; t2 != nil && t2.SipTrunkId != t.SipTrunkId {
 			opt.Conflict(t, t2, TrunkConflictCalledNumber)
 			if opt.AllowConflicts {
 				return nil
@@ -311,10 +313,18 @@ func validateTrunkInbound(byInbound map[string]*livekit.SIPInboundTrunkInfo, t *
 		}
 		byInbound[""] = t
 	} else {
+		var seen map[string]struct{}
 		for _, num := range t.AllowedNumbers {
 			inboundKey := NormalizeNumber(num)
+			if _, ok := seen[inboundKey]; ok {
+				continue
+			}
+			if seen == nil {
+				seen = make(map[string]struct{})
+			}
+			seen[inboundKey] = struct{}{}
 			t2 := byInbound[inboundKey]
-			if t2 != nil {
+			if t2 != nil && t2.SipTrunkId != t.SipTrunkId {
 				opt.Conflict(t, t2, TrunkConflictCallingNumber)
 				if opt.AllowConflicts {
 					continue
@@ -362,11 +372,22 @@ func ValidateTrunksIter(it iters.Iter[*livekit.SIPInboundTrunkInfo], opts ...Mat
 				return err
 			}
 		} else {
+			var seen map[string]struct{}
 			for _, num := range t.Numbers {
-				byInbound := byOutboundAndInbound[num]
+				// Normalize so different forms of the same number (e.g. "+123" and "123")
+				// share a conflict bucket across trunks.
+				key := NormalizeNumber(num)
+				if _, ok := seen[key]; ok {
+					continue
+				}
+				if seen == nil {
+					seen = make(map[string]struct{})
+				}
+				seen[key] = struct{}{}
+				byInbound := byOutboundAndInbound[key]
 				if byInbound == nil {
 					byInbound = make(map[string]*livekit.SIPInboundTrunkInfo)
-					byOutboundAndInbound[num] = byInbound
+					byOutboundAndInbound[key] = byInbound
 				}
 				if err := validateTrunkInbound(byInbound, t, &opt); err != nil {
 					return err
@@ -812,17 +833,31 @@ func MatchDispatchRuleIter(trunk *livekit.SIPInboundTrunkInfo, rules iters.Iter[
 	return nil, twirp.WrapError(twirp.NewErrorf(twirp.FailedPrecondition, "%s", err.Error()), err)
 }
 
+// InboundTrunkAuthPrompt creates a GetSIPTrunkAuthenticationResponse based on the SIPInboundTrunkInfo.
+func InboundTrunkAuthPrompt(trunk *livekit.SIPInboundTrunkInfo) (*rpc.GetSIPTrunkAuthenticationResponse, error) {
+	return &rpc.GetSIPTrunkAuthenticationResponse{
+		SipTrunkId: trunk.SipTrunkId,
+		Username:   trunk.AuthUsername,
+		Password:   trunk.AuthPassword,
+		Realm:      trunk.AuthRealm,
+		ProviderInfo: &livekit.ProviderInfo{
+			Id:   trunk.SipTrunkId,
+			Name: trunk.Name,
+			Type: livekit.ProviderType_PROVIDER_TYPE_EXTERNAL,
+		},
+	}, nil
+}
+
 // EvaluateDispatchRule checks a selected Dispatch Rule against the provided request.
 func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, rule *livekit.SIPDispatchRuleInfo, req *rpc.EvaluateSIPDispatchRulesRequest) (*rpc.EvaluateSIPDispatchRulesResponse, error) {
+	rule.Upgrade()
 	call := req.SIPCall()
 	sentPin := req.GetPin()
 
 	trunkID := req.SipTrunkId
-	if trunk != nil {
-		trunkID = trunk.SipTrunkId
-	}
 	enc := livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE
 	if trunk != nil {
+		trunkID = trunk.SipTrunkId
 		enc = trunk.MediaEncryption
 	}
 	attrs := maps.Clone(rule.Attributes)
@@ -868,6 +903,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 				SipDispatchRuleId: rule.SipDispatchRuleId,
 				Result:            rpc.SIPDispatchResult_REQUEST_PIN,
 				MediaEncryption:   enc,
+				Media:             rule.Media,
 				RequestPin:        true,
 			}, nil
 		}
@@ -929,6 +965,10 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		if rule.MediaEncryption != 0 {
 			resp.MediaEncryption = rule.MediaEncryption
 		}
+		media := proto.CloneOf(rule.Media)
+		media = media.UpgradeWith(resp.MediaEncryption)
+		resp.Media = media
+		resp.MediaEncryption = media.Encryption.Deref()
 	}
 	if krispEnabled {
 		resp.EnabledFeatures = append(resp.EnabledFeatures, livekit.SIPFeature_KRISP_ENABLED)

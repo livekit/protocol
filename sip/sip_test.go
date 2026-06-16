@@ -20,8 +20,11 @@ import (
 	"regexp"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/dennwc/iters"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/stretchr/testify/require"
 
@@ -330,6 +333,39 @@ func TestSIPValidateTrunks(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestSIPValidateTrunksNormalizedNumbers verifies conflict detection treats different
+// forms of the same number as equivalent. A single trunk listing the same number in
+// multiple forms must not be flagged against itself; two different trunks listing the
+// same number in different forms must be flagged as conflicting.
+func TestSIPValidateTrunksNormalizedNumbers(t *testing.T) {
+	t.Run("same trunk duplicate Numbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{"+" + sipNumber2, sipNumber2}},
+		}
+		require.NoError(t, ValidateTrunks(trunks))
+	})
+	t.Run("same trunk duplicate AllowedNumbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{sipNumber2}, AllowedNumbers: []string{"+" + sipNumber1, sipNumber1}},
+		}
+		require.NoError(t, ValidateTrunks(trunks))
+	})
+	t.Run("different trunks different Numbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{"+" + sipNumber2}},
+			{SipTrunkId: "bbb", Numbers: []string{sipNumber2}},
+		}
+		require.Error(t, ValidateTrunks(trunks))
+	})
+	t.Run("different trunks different AllowedNumbers forms", func(t *testing.T) {
+		trunks := []*livekit.SIPInboundTrunkInfo{
+			{SipTrunkId: "aaa", Numbers: []string{sipNumber2}, AllowedNumbers: []string{"+" + sipNumber1}},
+			{SipTrunkId: "bbb", Numbers: []string{sipNumber2}, AllowedNumbers: []string{sipNumber1}},
+		}
+		require.Error(t, ValidateTrunks(trunks))
+	})
 }
 
 func newSIPTrunkDispatch() *livekit.SIPTrunkInfo {
@@ -744,6 +780,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			Attributes: map[string]string{
 				"rule-attr": "1",
 			},
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
 		}
 		r := &rpc.EvaluateSIPDispatchRulesRequest{
 			SipCallId:     "call-id",
@@ -757,7 +794,7 @@ func TestEvaluateDispatchRule(t *testing.T) {
 		tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
 		res, err := EvaluateDispatchRule("p_123", tr, d, r)
 		require.NoError(t, err)
-		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		exp := &rpc.EvaluateSIPDispatchRulesResponse{
 			ProjectId:           "p_123",
 			Result:              rpc.SIPDispatchResult_ACCEPT,
 			SipTrunkId:          "trunk",
@@ -776,12 +813,21 @@ func TestEvaluateDispatchRule(t *testing.T) {
 				livekit.AttrSIPTrunkNumber:    "+3333",
 				livekit.AttrSIPHostName:       "sip.example.com",
 			},
-		}, res)
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+			Media: &livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		}
+		require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 
 		d.HidePhoneNumber = true
+		d.MediaEncryption = 0
+		d.Media = &livekit.SIPMediaConfig{
+			Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		}
 		res, err = EvaluateDispatchRule("p_123", tr, d, r)
 		require.NoError(t, err)
-		require.Equal(t, &rpc.EvaluateSIPDispatchRulesResponse{
+		exp = &rpc.EvaluateSIPDispatchRulesResponse{
 			ProjectId:           "p_123",
 			Result:              rpc.SIPDispatchResult_ACCEPT,
 			SipTrunkId:          "trunk",
@@ -797,7 +843,12 @@ func TestEvaluateDispatchRule(t *testing.T) {
 				livekit.AttrSIPTrunkID:        "trunk",
 				livekit.AttrSIPDispatchRuleID: "rule",
 			},
-		}, res)
+			MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
+			Media: &livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		}
+		require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 	})
 	t.Run("Individual", func(t *testing.T) {
 		t.Run("minimal", func(t *testing.T) {
@@ -882,6 +933,57 @@ func TestEvaluateDispatchRule(t *testing.T) {
 			require.Empty(t, res.RoomName, "implementation does not set RoomName when returning REQUEST_PIN")
 		})
 	})
+}
+
+// Regression: trunk-level MediaEncryption must be honored when the dispatch rule specifies
+// neither MediaEncryption nor Media. A prior version called rule.Upgrade() at the top of
+// EvaluateDispatchRule, which pinned rule.Media.Encryption to rule.MediaEncryption (0)
+// before the trunk was consulted, causing the inbound trunk's encryption setting to be
+// silently dropped.
+func TestEvaluateDispatchRule_TrunkOnlyEncryption(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CallingHost:   "sip.example.com",
+		CalledNumber:  "+3333",
+	}
+	tr := &livekit.SIPInboundTrunkInfo{
+		SipTrunkId:      "trunk",
+		MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+	}
+	res, err := EvaluateDispatchRule("p_123", tr, d, r)
+	require.NoError(t, err)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, res.MediaEncryption)
+	require.NotNil(t, res.Media)
+	require.NotNil(t, res.Media.Encryption)
+	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
+	require.Nil(t, res.Media.MediaTimeout)
+}
+
+func TestEvaluateDispatchRule_RespectsRuleMediaTimeout(t *testing.T) {
+	d := &livekit.SIPDispatchRuleInfo{
+		SipDispatchRuleId: "rule",
+		Rule:              newDirectDispatch("room", ""),
+		Media: &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(5 * time.Minute),
+		},
+	}
+	r := &rpc.EvaluateSIPDispatchRulesRequest{
+		SipCallId:     "call-id",
+		CallingNumber: "+11112222",
+		CallingHost:   "sip.example.com",
+		CalledNumber:  "+3333",
+	}
+	tr := &livekit.SIPInboundTrunkInfo{SipTrunkId: "trunk"}
+	res, err := EvaluateDispatchRule("p_123", tr, d, r)
+	require.NoError(t, err)
+	require.NotNil(t, res.Media)
+	require.NotNil(t, res.Media.MediaTimeout)
+	require.Equal(t, 5*time.Minute, res.Media.MediaTimeout.AsDuration())
 }
 
 func TestMatchIP(t *testing.T) {

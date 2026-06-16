@@ -6,6 +6,7 @@ option go_package = "github.com/livekit/protocol/livekit/agent";
 
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "logger/options.proto";
 
 enum ChatRole {
@@ -113,6 +114,15 @@ enum UserState {
   US_AWAY = 2;
 }
 
+enum AmdCategory {
+  AMD_UNKNOWN = 0;
+  AMD_HUMAN = 1;
+  AMD_MACHINE_IVR = 2;
+  AMD_MACHINE_VM = 3;
+  AMD_MACHINE_UNAVAILABLE = 4;
+  AMD_UNCERTAIN = 5;
+}
+
 message LLMModelUsage {
   string provider = 1;
   string model = 2;
@@ -153,17 +163,30 @@ message InterruptionModelUsage {
   int32 total_requests = 3;
 }
 
+message EotModelUsage {
+  string provider = 1;
+  string model = 2;
+  int32 total_requests = 3;
+}
+
 message ModelUsage {
   oneof usage {
     LLMModelUsage llm = 1;
     TTSModelUsage tts = 2;
     STTModelUsage stt = 3;
     InterruptionModelUsage interruption = 4;
+    EotModelUsage eot = 5;
   }
 }
 
 message AgentSessionUsage {
   repeated ModelUsage model_usage = 1;
+}
+
+// Debug/trace payload carried over the remote session wire.
+// Internal: surfaced only to the debugger/recorder, not to user code.
+message DebugMessage {
+  google.protobuf.Struct payload = 1;
 }
 
 message AgentSessionEvent {
@@ -187,6 +210,10 @@ message AgentSessionEvent {
     optional string language = 3;
   }
 
+  message FunctionToolsStarted {
+    repeated FunctionCall function_calls = 1;
+  }
+
   message FunctionToolsExecuted {
     repeated FunctionCall function_calls = 1;
     repeated FunctionCallOutput function_call_outputs = 2;
@@ -203,6 +230,21 @@ message AgentSessionEvent {
     google.protobuf.Timestamp detected_at = 4;
   }
 
+  message AmdPrediction {
+    google.protobuf.Duration speech_duration = 1;
+    AmdCategory category = 2;
+    string reason = 3;
+    string transcript = 4;
+    google.protobuf.Duration delay = 5;
+  }
+
+  message EotPrediction {
+    float probability = 1;
+    float threshold = 2;
+    google.protobuf.Duration inference_duration = 3;
+    google.protobuf.Duration delay = 4;
+  }
+
   message SessionUsageUpdated {
     AgentSessionUsage usage = 1;
   }
@@ -217,6 +259,10 @@ message AgentSessionEvent {
     Error error = 15;
     OverlappingSpeech overlapping_speech = 16;
     SessionUsageUpdated session_usage_updated = 17;
+    AmdPrediction amd_prediction = 18;
+    EotPrediction eot_prediction = 19;
+    FunctionToolsStarted function_tools_started = 20;
+    DebugMessage debug_message = 21;
   }
 }
 
@@ -231,6 +277,19 @@ message SessionRequest {
   message GetRTCStats {}
   message GetSessionUsage {}
   message GetFrameworkInfo {}
+  message UpdateIO {
+    message Input {
+      optional bool audio_enabled = 1;
+      optional bool video_enabled = 2;
+    }
+    message Output {
+      optional bool audio_enabled = 1;
+      optional bool video_enabled = 2;
+      optional bool transcription_enabled = 3;
+    }
+    optional Input input = 1;
+    optional Output output = 2;
+  }
 
   string request_id = 1;
   oneof request {
@@ -242,6 +301,7 @@ message SessionRequest {
     GetRTCStats get_rtc_stats = 8;
     GetSessionUsage get_session_usage = 9;
     GetFrameworkInfo get_framework_info = 10;
+    UpdateIO update_io = 11;
   }
 }
 
@@ -278,6 +338,7 @@ message SessionResponse {
     string sdk = 1;
     string sdk_version = 2;
   }
+  message UpdateIOResponse {}
 
   string request_id = 1;
   optional string error = 2;
@@ -290,6 +351,7 @@ message SessionResponse {
     GetRTCStatsResponse get_rtc_stats = 9;
     GetSessionUsageResponse get_session_usage = 10;
     GetFrameworkInfoResponse get_framework_info = 11;
+    UpdateIOResponse update_io = 12;
   }
 }
 

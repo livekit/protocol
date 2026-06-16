@@ -45,6 +45,11 @@ message InternalCreateSIPParticipantRequest {
 
   string sip_call_id = 13 [(logger.name) = "sipCallID"];
   string sip_trunk_id = 19 [(logger.name) = "sipTrunkID"];
+
+  livekit.SIPRequestDest sip_request_uri = 35; // INVITE <uri>
+  livekit.SIPNamedDest   sip_from_header = 36; // From: "Name" <uri>
+  livekit.SIPNamedDest   sip_to_header   = 37; // To:   "Name" <uri>
+
   // IP or hostname that SIP INVITE is sent too
   string address = 2;
   // Hostname for the 'From' SIP address in INVITE
@@ -59,32 +64,32 @@ message InternalCreateSIPParticipantRequest {
   string call_to = 4;
 
   string username = 5 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   string password = 6 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_SECRET,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
   string room_name = 7;
   string participant_identity = 8;
   string participant_name = 14 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   string participant_metadata = 15 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   map<string, string> participant_attributes = 17 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
   // optional token that should be used when creating LiveKit participant
   string token = 9 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_SECRET,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
@@ -99,7 +104,7 @@ message InternalCreateSIPParticipantRequest {
   bool play_dialtone = 12;
 
   map<string, string> headers = 21 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   map<string, string> headers_to_attributes = 22;
@@ -121,7 +126,8 @@ message InternalCreateSIPParticipantRequest {
   // Max call duration.
   google.protobuf.Duration max_call_duration = 24;
 
-  livekit.SIPMediaEncryption media_encryption = 28;
+  livekit.SIPMediaEncryption media_encryption = 28 [deprecated = true];
+  livekit.SIPMediaConfig media = 34;
 
   // Wait for the answer for the call before returning.
   bool wait_until_answered = 29;
@@ -133,7 +139,7 @@ message InternalCreateSIPParticipantRequest {
   // 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
   // 3) Non-empty: Use the specified value as the display name.
   optional string display_name = 31 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
@@ -143,7 +149,7 @@ message InternalCreateSIPParticipantRequest {
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 33;
 
-  // NEXT ID: 34
+  // NEXT ID: 38
 }
 
 message InternalCreateSIPParticipantResponse {
@@ -161,7 +167,7 @@ message InternalTransferSIPParticipantRequest {
 
   // Add the following headers to the REFER SIP request.
   map<string, string> headers = 4 [
-    (logger.redact) = true,
+    (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 

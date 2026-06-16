@@ -263,7 +263,7 @@ type AgentSecret struct {
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Kind          AgentSecretKind        `protobuf:"varint,5,opt,name=kind,proto3,enum=livekit.AgentSecretKind" json:"kind,omitempty"`
-	Environments  []string               `protobuf:"bytes,6,rep,name=environments,proto3" json:"environments,omitempty"`
+	Deployments   []string               `protobuf:"bytes,6,rep,name=deployments,proto3" json:"deployments,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -333,9 +333,9 @@ func (x *AgentSecret) GetKind() AgentSecretKind {
 	return AgentSecretKind_AGENT_SECRET_KIND_UNKNOWN
 }
 
-func (x *AgentSecret) GetEnvironments() []string {
+func (x *AgentSecret) GetDeployments() []string {
 	if x != nil {
-		return x.Environments
+		return x.Deployments
 	}
 	return nil
 }
@@ -697,26 +697,27 @@ func (x *PresignedPostRequest) GetValues() map[string]string {
 }
 
 type AgentDeployment struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Region        string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
-	AgentId       string                 `protobuf:"bytes,2,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Replicas      int32                  `protobuf:"varint,4,opt,name=replicas,proto3" json:"replicas,omitempty"`
-	MinReplicas   int32                  `protobuf:"varint,5,opt,name=min_replicas,json=minReplicas,proto3" json:"min_replicas,omitempty"`
-	MaxReplicas   int32                  `protobuf:"varint,6,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
-	CpuReq        string                 `protobuf:"bytes,7,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
-	CurCpu        string                 `protobuf:"bytes,8,opt,name=cur_cpu,json=curCpu,proto3" json:"cur_cpu,omitempty"`
-	CurMem        string                 `protobuf:"bytes,9,opt,name=cur_mem,json=curMem,proto3" json:"cur_mem,omitempty"`
-	MemReq        string                 `protobuf:"bytes,10,opt,name=mem_req,json=memReq,proto3" json:"mem_req,omitempty"`
-	MemLimit      string                 `protobuf:"bytes,11,opt,name=mem_limit,json=memLimit,proto3" json:"mem_limit,omitempty"`
-	CpuLimit      string                 `protobuf:"bytes,12,opt,name=cpu_limit,json=cpuLimit,proto3" json:"cpu_limit,omitempty"`
-	ServerRegion  string                 `protobuf:"bytes,13,opt,name=server_region,json=serverRegion,proto3" json:"server_region,omitempty"`
-	Events        []*AgentEvent          `protobuf:"bytes,14,rep,name=events,proto3" json:"events,omitempty"`
-	Environment   string                 `protobuf:"bytes,15,opt,name=environment,proto3" json:"environment,omitempty"`
-	Version       string                 `protobuf:"bytes,16,opt,name=version,proto3" json:"version,omitempty"`
-	AgentName     string                 `protobuf:"bytes,17,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Region            string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
+	AgentId           string                 `protobuf:"bytes,2,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
+	Status            string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Replicas          int32                  `protobuf:"varint,4,opt,name=replicas,proto3" json:"replicas,omitempty"`
+	MinReplicas       int32                  `protobuf:"varint,5,opt,name=min_replicas,json=minReplicas,proto3" json:"min_replicas,omitempty"`
+	MaxReplicas       int32                  `protobuf:"varint,6,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
+	CpuReq            string                 `protobuf:"bytes,7,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
+	CurCpu            string                 `protobuf:"bytes,8,opt,name=cur_cpu,json=curCpu,proto3" json:"cur_cpu,omitempty"`
+	CurMem            string                 `protobuf:"bytes,9,opt,name=cur_mem,json=curMem,proto3" json:"cur_mem,omitempty"`
+	MemReq            string                 `protobuf:"bytes,10,opt,name=mem_req,json=memReq,proto3" json:"mem_req,omitempty"`
+	MemLimit          string                 `protobuf:"bytes,11,opt,name=mem_limit,json=memLimit,proto3" json:"mem_limit,omitempty"`
+	CpuLimit          string                 `protobuf:"bytes,12,opt,name=cpu_limit,json=cpuLimit,proto3" json:"cpu_limit,omitempty"`
+	ServerRegion      string                 `protobuf:"bytes,13,opt,name=server_region,json=serverRegion,proto3" json:"server_region,omitempty"`
+	Events            []*AgentEvent          `protobuf:"bytes,14,rep,name=events,proto3" json:"events,omitempty"`
+	Deployment        string                 `protobuf:"bytes,15,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	Version           string                 `protobuf:"bytes,16,opt,name=version,proto3" json:"version,omitempty"`
+	AgentName         string                 `protobuf:"bytes,17,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	DeploymentEnabled bool                   `protobuf:"varint,18,opt,name=deployment_enabled,json=deploymentEnabled,proto3" json:"deployment_enabled,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *AgentDeployment) Reset() {
@@ -847,9 +848,9 @@ func (x *AgentDeployment) GetEvents() []*AgentEvent {
 	return nil
 }
 
-func (x *AgentDeployment) GetEnvironment() string {
+func (x *AgentDeployment) GetDeployment() string {
 	if x != nil {
-		return x.Environment
+		return x.Deployment
 	}
 	return ""
 }
@@ -866,6 +867,13 @@ func (x *AgentDeployment) GetAgentName() string {
 		return x.AgentName
 	}
 	return ""
+}
+
+func (x *AgentDeployment) GetDeploymentEnabled() bool {
+	if x != nil {
+		return x.DeploymentEnabled
+	}
+	return false
 }
 
 type AgentInfo struct {
@@ -1512,7 +1520,7 @@ type DeployAgentRequest struct {
 	MaxReplicas int32 `protobuf:"varint,5,opt,name=max_replicas,json=maxReplicas,proto3" json:"max_replicas,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_cloud_agent.proto.
 	CpuReq        string `protobuf:"bytes,6,opt,name=cpu_req,json=cpuReq,proto3" json:"cpu_req,omitempty"`
-	Environment   string `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
+	Deployment    string `protobuf:"bytes,7,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1593,9 +1601,9 @@ func (x *DeployAgentRequest) GetCpuReq() string {
 	return ""
 }
 
-func (x *DeployAgentRequest) GetEnvironment() string {
+func (x *DeployAgentRequest) GetDeployment() string {
 	if x != nil {
-		return x.Environment
+		return x.Deployment
 	}
 	return ""
 }
@@ -1609,7 +1617,7 @@ type DeployAgentResponse struct {
 	PresignedUrl         string                `protobuf:"bytes,4,opt,name=presigned_url,json=presignedUrl,proto3" json:"presigned_url,omitempty"`
 	Tag                  string                `protobuf:"bytes,5,opt,name=tag,proto3" json:"tag,omitempty"`
 	PresignedPostRequest *PresignedPostRequest `protobuf:"bytes,6,opt,name=presigned_post_request,json=presignedPostRequest,proto3" json:"presigned_post_request,omitempty"`
-	Environment          string                `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
+	Deployment           string                `protobuf:"bytes,7,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -1687,9 +1695,9 @@ func (x *DeployAgentResponse) GetPresignedPostRequest() *PresignedPostRequest {
 	return nil
 }
 
-func (x *DeployAgentResponse) GetEnvironment() string {
+func (x *DeployAgentResponse) GetDeployment() string {
 	if x != nil {
-		return x.Environment
+		return x.Deployment
 	}
 	return ""
 }
@@ -1698,7 +1706,7 @@ type DeployAgentV2Request struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	Secrets       []*AgentSecret         `protobuf:"bytes,2,rep,name=secrets,proto3" json:"secrets,omitempty"`
-	Environment   string                 `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"`
+	Deployment    string                 `protobuf:"bytes,3,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1747,9 +1755,9 @@ func (x *DeployAgentV2Request) GetSecrets() []*AgentSecret {
 	return nil
 }
 
-func (x *DeployAgentV2Request) GetEnvironment() string {
+func (x *DeployAgentV2Request) GetDeployment() string {
 	if x != nil {
-		return x.Environment
+		return x.Deployment
 	}
 	return ""
 }
@@ -1761,7 +1769,7 @@ type DeployAgentV2Response struct {
 	AgentId       string                 `protobuf:"bytes,3,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	Tag           string                 `protobuf:"bytes,4,opt,name=tag,proto3" json:"tag,omitempty"`
 	PresignedReq  *PresignedPostRequest  `protobuf:"bytes,5,opt,name=presigned_req,json=presignedReq,proto3" json:"presigned_req,omitempty"`
-	Environment   string                 `protobuf:"bytes,6,opt,name=environment,proto3" json:"environment,omitempty"`
+	Deployment    string                 `protobuf:"bytes,6,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1831,9 +1839,9 @@ func (x *DeployAgentV2Response) GetPresignedReq() *PresignedPostRequest {
 	return nil
 }
 
-func (x *DeployAgentV2Response) GetEnvironment() string {
+func (x *DeployAgentV2Response) GetDeployment() string {
 	if x != nil {
-		return x.Environment
+		return x.Deployment
 	}
 	return ""
 }
@@ -2082,7 +2090,7 @@ type DeleteAgentRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentId       string                 `protobuf:"bytes,1,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	AgentName     string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Environment   string                 `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"` // optional
+	Deployment    string                 `protobuf:"bytes,3,opt,name=deployment,proto3" json:"deployment,omitempty"` // optional
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2131,9 +2139,9 @@ func (x *DeleteAgentRequest) GetAgentName() string {
 	return ""
 }
 
-func (x *DeleteAgentRequest) GetEnvironment() string {
+func (x *DeleteAgentRequest) GetDeployment() string {
 	if x != nil {
-		return x.Environment
+		return x.Deployment
 	}
 	return ""
 }
@@ -3103,7 +3111,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"AgentEvent\x12+\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x17.livekit.AgentEventTypeR\x04type\x12\x14\n" +
 	"\x05count\x18\x02 \x01(\x05R\x05count\x128\n" +
-	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xff\x01\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xfd\x01\n" +
 	"\vAgentSecret\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\fR\x05value\x129\n" +
@@ -3111,8 +3119,8 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
 	"updated_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12,\n" +
-	"\x04kind\x18\x05 \x01(\x0e2\x18.livekit.AgentSecretKindR\x04kind\x12\"\n" +
-	"\fenvironments\x18\x06 \x03(\tR\fenvironments\"\xe5\x01\n" +
+	"\x04kind\x18\x05 \x01(\x0e2\x18.livekit.AgentSecretKindR\x04kind\x12 \n" +
+	"\vdeployments\x18\x06 \x03(\tR\vdeployments\"\xe5\x01\n" +
 	"\x12CreateAgentRequest\x12!\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tB\x02\x18\x01R\tagentName\x12.\n" +
@@ -3145,7 +3153,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x95\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc2\x04\n" +
 	"\x0fAgentDeployment\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12%\n" +
 	"\bagent_id\x18\x02 \x01(\tB\n" +
@@ -3162,11 +3170,14 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\tmem_limit\x18\v \x01(\tR\bmemLimit\x12\x1b\n" +
 	"\tcpu_limit\x18\f \x01(\tR\bcpuLimit\x12#\n" +
 	"\rserver_region\x18\r \x01(\tR\fserverRegion\x12+\n" +
-	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\x12 \n" +
-	"\venvironment\x18\x0f \x01(\tR\venvironment\x12\x18\n" +
+	"\x06events\x18\x0e \x03(\v2\x13.livekit.AgentEventR\x06events\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x0f \x01(\tR\n" +
+	"deployment\x12\x18\n" +
 	"\aversion\x18\x10 \x01(\tR\aversion\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x11 \x01(\tR\tagentName\"\x9f\x02\n" +
+	"agent_name\x18\x11 \x01(\tR\tagentName\x12-\n" +
+	"\x12deployment_enabled\x18\x12 \x01(\bR\x11deploymentEnabled\"\x9f\x02\n" +
 	"\tAgentInfo\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
@@ -3226,7 +3237,7 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\xbaP\aagentIDR\aagentId\"J\n" +
 	"\x14RestartAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x94\x02\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x92\x02\n" +
 	"\x12DeployAgentRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12!\n" +
@@ -3235,8 +3246,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\asecrets\x18\x03 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
 	"\breplicas\x18\x04 \x01(\x05B\x02\x18\x01R\breplicas\x12%\n" +
 	"\fmax_replicas\x18\x05 \x01(\x05B\x02\x18\x01R\vmaxReplicas\x12\x1b\n" +
-	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\xa2\x02\n" +
+	"\acpu_req\x18\x06 \x01(\tB\x02\x18\x01R\x06cpuReq\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\a \x01(\tR\n" +
+	"deployment\"\xa0\x02\n" +
 	"\x13DeployAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
@@ -3244,21 +3257,27 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\xbaP\aagentIDR\aagentId\x12'\n" +
 	"\rpresigned_url\x18\x04 \x01(\tB\x02\x18\x01R\fpresignedUrl\x12\x10\n" +
 	"\x03tag\x18\x05 \x01(\tR\x03tag\x12S\n" +
-	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x12 \n" +
-	"\venvironment\x18\a \x01(\tR\venvironment\"\x8f\x01\n" +
+	"\x16presigned_post_request\x18\x06 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\a \x01(\tR\n" +
+	"deployment\"\x8d\x01\n" +
 	"\x14DeployAgentV2Request\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12.\n" +
-	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12 \n" +
-	"\venvironment\x18\x03 \x01(\tR\venvironment\"\xea\x01\n" +
+	"\asecrets\x18\x02 \x03(\v2\x14.livekit.AgentSecretR\asecrets\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x03 \x01(\tR\n" +
+	"deployment\"\xe8\x01\n" +
 	"\x15DeployAgentV2Response\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
 	"\bagent_id\x18\x03 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x10\n" +
 	"\x03tag\x18\x04 \x01(\tR\x03tag\x12B\n" +
-	"\rpresigned_req\x18\x05 \x01(\v2\x1d.livekit.PresignedPostRequestR\fpresignedReq\x12 \n" +
-	"\venvironment\x18\x06 \x01(\tR\venvironment\"\xc7\x01\n" +
+	"\rpresigned_req\x18\x05 \x01(\v2\x1d.livekit.PresignedPostRequestR\fpresignedReq\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x06 \x01(\tR\n" +
+	"deployment\"\xc7\x01\n" +
 	"\x19UpdateAgentSecretsRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
@@ -3278,13 +3297,15 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\aversion\x18\x03 \x01(\tR\aversion\"K\n" +
 	"\x15RollbackAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"|\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"z\n" +
 	"\x12DeleteAgentRequest\x12%\n" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12 \n" +
-	"\venvironment\x18\x03 \x01(\tR\venvironment\"I\n" +
+	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x03 \x01(\tR\n" +
+	"deployment\"I\n" +
 	"\x13DeleteAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"_\n" +

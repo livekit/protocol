@@ -3,11 +3,13 @@ package livekit
 import (
 	"slices"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func TestSIPTrunkAs(t *testing.T) {
@@ -42,160 +44,291 @@ func TestSIPTrunkAs(t *testing.T) {
 }
 
 func TestSIPValidate(t *testing.T) {
-	cases := []struct {
+	type validateable interface {
+		Validate() error
+	}
+	type validateTestCase struct {
 		name string
-		req  interface {
-			Validate() error
-		}
-		exp bool
-	}{
-		{
-			name: "inbound empty",
-			req:  &SIPInboundTrunkInfo{},
-			exp:  false,
-		},
-		{
-			name: "inbound numbers",
-			req: &SIPInboundTrunkInfo{
-				Numbers: []string{"+1111"},
+		req  validateable
+		exp  bool
+	}
+	cases := map[string][]validateTestCase{
+		"SIPInboundTrunkInfo": {
+			{
+				name: "inbound empty",
+				req:  &SIPInboundTrunkInfo{},
+				exp:  false,
 			},
-			exp: true,
-		},
-		{
-			name: "inbound ips",
-			req: &SIPInboundTrunkInfo{
-				AllowedAddresses: []string{"1.1.1.1"},
-			},
-			exp: true,
-		},
-		{
-			name: "inbound auth",
-			req: &SIPInboundTrunkInfo{
-				AuthUsername: "user",
-				AuthPassword: "pass",
-			},
-			exp: true,
-		},
-		{
-			name: "inbound x-header",
-			req: &SIPInboundTrunkInfo{
-				Numbers: []string{"+1111"},
-				HeadersToAttributes: map[string]string{
-					"X-Test": "test",
+			{
+				name: "inbound numbers",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
 				},
+				exp: true,
 			},
-			exp: true,
-		},
-		{
-			name: "inbound other header",
-			req: &SIPInboundTrunkInfo{
-				Numbers: []string{"+1111"},
-				HeadersToAttributes: map[string]string{
-					"From": "from",
+			{
+				name: "inbound ips",
+				req: &SIPInboundTrunkInfo{
+					AllowedAddresses: []string{"1.1.1.1"},
 				},
+				exp: true,
 			},
-			exp: true,
-		},
-		{
-			name: "inbound invalid header",
-			req: &SIPInboundTrunkInfo{
-				Numbers: []string{"+1111"},
-				HeadersToAttributes: map[string]string{
-					"From ": "from",
+			{
+				name: "inbound auth",
+				req: &SIPInboundTrunkInfo{
+					AuthUsername: "user",
+					AuthPassword: "pass",
 				},
+				exp: true,
 			},
-			exp: false,
-		},
-		{
-			name: "outbound empty",
-			req:  &SIPOutboundTrunkInfo{},
-			exp:  false,
-		},
-		{
-			name: "outbound no numbers",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip.example.com",
-			},
-			exp: false,
-		},
-		{
-			name: "outbound with numbers",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip.example.com",
-				Numbers: []string{"+2222"},
-			},
-			exp: true,
-		},
-		{
-			name: "outbound with user",
-			req: &SIPOutboundTrunkInfo{
-				Address: "user@sip.example.com",
-				Numbers: []string{"+2222"},
-			},
-			exp: false,
-		},
-		{
-			name: "outbound with transport",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip.example.com;transport=tcp",
-				Numbers: []string{"+2222"},
-			},
-			exp: false,
-		},
-		{
-			name: "outbound with schema",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip:example.com",
-				Numbers: []string{"+2222"},
-			},
-			exp: false,
-		},
-		{
-			name: "outbound with schema (tls)",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sips:example.com",
-				Numbers: []string{"+2222"},
-			},
-			exp: false,
-		},
-		{
-			name: "outbound x-header",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip.example.com",
-				Numbers: []string{"+2222"},
-				HeadersToAttributes: map[string]string{
-					"X-Test": "test",
+			{
+				name: "inbound x-header",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
+					HeadersToAttributes: map[string]string{
+						"X-Test": "test",
+					},
 				},
+				exp: true,
 			},
-			exp: true,
-		},
-		{
-			name: "outbound other header",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip.example.com",
-				Numbers: []string{"+2222"},
-				HeadersToAttributes: map[string]string{
-					"From": "from",
+			{
+				name: "inbound other header",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
+					HeadersToAttributes: map[string]string{
+						"From": "from",
+					},
 				},
+				exp: true,
 			},
-			exp: true,
-		},
-		{
-			name: "outbound invalid header",
-			req: &SIPOutboundTrunkInfo{
-				Address: "sip.example.com",
-				Numbers: []string{"+2222"},
-				HeadersToAttributes: map[string]string{
-					"From ": "from",
+			{
+				name: "inbound invalid header",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
+					HeadersToAttributes: map[string]string{
+						"From ": "from",
+					},
 				},
+				exp: false,
 			},
-			exp: false,
+		},
+		"SIPOutboundTrunkInfo": {
+			{
+				name: "outbound empty",
+				req:  &SIPOutboundTrunkInfo{},
+				exp:  false,
+			},
+			{
+				name: "outbound no numbers",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+				},
+				exp: false,
+			},
+			{
+				name: "outbound with numbers",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+					Numbers: []string{"+2222"},
+				},
+				exp: true,
+			},
+			{
+				name: "outbound with user",
+				req: &SIPOutboundTrunkInfo{
+					Address: "user@sip.example.com",
+					Numbers: []string{"+2222"},
+				},
+				exp: false,
+			},
+			{
+				name: "outbound with transport",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com;transport=tcp",
+					Numbers: []string{"+2222"},
+				},
+				exp: false,
+			},
+			{
+				name: "outbound with schema",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip:example.com",
+					Numbers: []string{"+2222"},
+				},
+				exp: false,
+			},
+			{
+				name: "outbound with schema (tls)",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sips:example.com",
+					Numbers: []string{"+2222"},
+				},
+				exp: false,
+			},
+			{
+				name: "outbound x-header",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+					Numbers: []string{"+2222"},
+					HeadersToAttributes: map[string]string{
+						"X-Test": "test",
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "outbound other header",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+					Numbers: []string{"+2222"},
+					HeadersToAttributes: map[string]string{
+						"From": "from",
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "outbound invalid header",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+					Numbers: []string{"+2222"},
+					HeadersToAttributes: map[string]string{
+						"From ": "from",
+					},
+				},
+				exp: false,
+			},
+		},
+		"SIPMediaConfig": {
+			{
+				name: "media_timeout_missing",
+				req:  &SIPMediaConfig{},
+				exp:  true,
+			},
+			{
+				name: "media_timeout_ok",
+				req: &SIPMediaConfig{
+					MediaTimeout: durationpb.New(5 * time.Minute),
+				},
+				exp: true,
+			},
+			{
+				name: "media_timeout_negative",
+				req: &SIPMediaConfig{
+					MediaTimeout: durationpb.New(-1 * time.Minute),
+				},
+				exp: false,
+			},
+			{
+				name: "media_timeout_zero",
+				req: &SIPMediaConfig{
+					MediaTimeout: durationpb.New(0 * time.Minute),
+				},
+				exp: true,
+			},
+			{
+				name: "media_timeout_over_max",
+				req: &SIPMediaConfig{
+					MediaTimeout: durationpb.New(20 * time.Minute),
+				},
+				exp: false,
+			},
+		},
+		"CreateSIPDispatchRuleRequest": {
+			{
+				name: "dispatch_rule_validates_embedded_media_ok",
+				req: &CreateSIPDispatchRuleRequest{
+					DispatchRule: &SIPDispatchRuleInfo{
+						Rule: &SIPDispatchRule{
+							Rule: &SIPDispatchRule_DispatchRuleDirect{
+								DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "r"},
+							},
+						},
+						// Sanity
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "dispatch_rule_validates_embedded_media_timeout_over_max",
+				req: &CreateSIPDispatchRuleRequest{
+					DispatchRule: &SIPDispatchRuleInfo{
+						Rule: &SIPDispatchRule{
+							Rule: &SIPDispatchRule_DispatchRuleDirect{
+								DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "r"},
+							},
+						},
+						// Just here to make sure it links to SIPMediaConfig.Validate()
+						Media: &SIPMediaConfig{
+							MediaTimeout: durationpb.New(20 * time.Minute),
+						},
+					},
+				},
+				exp: false,
+			},
+		},
+		"UpdateSIPDispatchRuleRequest": {
+			{
+				name: "update_diff_validates_embedded_media_ok",
+				req: &UpdateSIPDispatchRuleRequest{
+					SipDispatchRuleId: "id",
+					Action: &UpdateSIPDispatchRuleRequest_Update{
+						Update: &SIPDispatchRuleUpdate{}, // Sanity
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_diff_validates_embedded_media_timeout_over_max",
+				req: &UpdateSIPDispatchRuleRequest{
+					SipDispatchRuleId: "id",
+					Action: &UpdateSIPDispatchRuleRequest_Update{
+						Update: &SIPDispatchRuleUpdate{
+							// Just here to make sure it links to SIPMediaConfig.Validate()
+							Media: &SIPMediaConfig{
+								MediaTimeout: durationpb.New(20 * time.Minute),
+							},
+						},
+					},
+				},
+				exp: false,
+			},
+		},
+		"CreateSIPParticipantRequest": {
+			{
+				name: "participant_validates_embedded_media_ok",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId: "trunk",
+					SipCallTo:  "+1000",
+					RoomName:   "room",
+					// Sanity
+				},
+				exp: true,
+			},
+			{
+				name: "participant_validates_embedded_media_timeout_over_max",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId: "trunk",
+					SipCallTo:  "+1000",
+					RoomName:   "room",
+					// Just here to make sure it links to SIPMediaConfig.Validate()
+					Media: &SIPMediaConfig{
+						MediaTimeout: durationpb.New(20 * time.Minute),
+					},
+				},
+				exp: false,
+			},
 		},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			err := c.req.Validate()
-			require.Equal(t, c.exp, err == nil, "error: %v", err)
+
+	for name, class := range cases {
+		t.Run(name, func(t *testing.T) {
+			for _, c := range class {
+				t.Run(c.name, func(t *testing.T) {
+					err := c.req.Validate()
+					require.Equal(t, c.exp, err == nil, "error: %v", err)
+				})
+			}
 		})
 	}
 }
@@ -616,7 +749,7 @@ func TestInboundTrunkUpdate(t *testing.T) {
 		Metadata: "test",
 	}, out))
 
-	r2 := cloneProto(r)
+	r2 := proto.CloneOf(r)
 	r2.Numbers = []string{"T4"}
 	upd2 := &UpdateSIPInboundTrunkRequest{
 		Action: &UpdateSIPInboundTrunkRequest_Replace{
@@ -661,7 +794,7 @@ func TestOutboundTrunkUpdate(t *testing.T) {
 		Metadata: "test",
 	}, out))
 
-	r2 := cloneProto(r)
+	r2 := proto.CloneOf(r)
 	r2.Numbers = []string{"T4"}
 	upd2 := &UpdateSIPOutboundTrunkRequest{
 		Action: &UpdateSIPOutboundTrunkRequest_Replace{
@@ -685,6 +818,7 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
 	}
 	name2 := "Test2"
 	upd := &UpdateSIPDispatchRuleRequest{
@@ -694,13 +828,16 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				TrunkIds: &ListUpdate{
 					Set: []string{"T3"},
 				},
+				Media: &SIPMediaConfig{
+					Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+				},
 			},
 		},
 	}
 	out, err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
 	require.NoError(t, err)
 	require.True(t, r != out)
-	require.True(t, proto.Equal(&SIPDispatchRuleInfo{
+	exp := &SIPDispatchRuleInfo{
 		Name:     "Test2",
 		TrunkIds: []string{"T3"},
 		Rule: &SIPDispatchRule{
@@ -708,9 +845,14 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
-	}, out))
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+		Media: &SIPMediaConfig{
+			Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		},
+	}
+	require.True(t, proto.Equal(exp, out), "%v\nvs\n%v", exp, out)
 
-	r2 := cloneProto(r)
+	r2 := proto.CloneOf(r)
 	r2.TrunkIds = []string{"T4"}
 	upd2 := &UpdateSIPDispatchRuleRequest{
 		Action: &UpdateSIPDispatchRuleRequest_Replace{

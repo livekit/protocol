@@ -1,13 +1,15 @@
 package rpc
 
 import (
-	"errors"
 	"maps"
 	"math/rand/v2"
 	"net"
 	"strings"
 
+	"google.golang.org/protobuf/proto"
+
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/psrpc"
 )
 
 func (p *GetSIPTrunkAuthenticationRequest) SIPCall() *SIPCall {
@@ -71,6 +73,7 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
+	req.Upgrade()
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -110,7 +113,7 @@ func NewCreateSIPParticipantRequest(
 	outboundNumber := req.SipNumber
 	if outboundNumber == "" {
 		if trunk == nil || len(trunk.Numbers) == 0 {
-			return nil, errors.New("no numbers on outbound trunk")
+			return nil, psrpc.NewErrorf(psrpc.FailedPrecondition, "no numbers on outbound trunk")
 		}
 		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}
@@ -163,11 +166,16 @@ func NewCreateSIPParticipantRequest(
 		participantIdentity = "sip_" + req.SipCallTo
 	}
 
+	media := proto.CloneOf(req.Media)
+	media = media.UpgradeWith(enc)
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
 		SipTrunkId:            trunkID,
 		DestinationCountry:    destinationCountry,
+		SipRequestUri:         req.SipRequestUri,
+		SipFromHeader:         req.SipFromHeader,
+		SipToHeader:           req.SipToHeader,
 		Address:               hostname,
 		Hostname:              fromHostname,
 		Transport:             transport,
@@ -191,7 +199,8 @@ func NewCreateSIPParticipantRequest(
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
-		MediaEncryption:       enc,
+		MediaEncryption:       media.Encryption.Deref(),
+		Media:                 media,
 		WaitUntilAnswered:     req.WaitUntilAnswered,
 		DisplayName:           req.DisplayName,
 		Destination:           req.Destination,
@@ -211,4 +220,12 @@ func NewTransferSIPParticipantRequest(
 		Headers:        req.Headers,
 		RingingTimeout: req.RingingTimeout,
 	}, nil
+}
+
+func (p *InternalCreateSIPParticipantRequest) Upgrade() {
+	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+}
+
+func (p *EvaluateSIPDispatchRulesResponse) Upgrade() {
+	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
 }

@@ -7,8 +7,26 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/descriptor.proto";
 
+enum Sensitivity {
+  // Unannotated default — safe to log.
+  // Identifiers, IDs, timestamps, enums, status fields.
+  SENSITIVITY_UNSPECIFIED = 0;
+
+  // User-identifying or user-controlled data: display names, phone numbers,
+  // metadata, attributes, custom headers, auth usernames, semi-public account
+  // identifiers (AWS role ARNs, Azure account names).
+  // Redacted by logger.Proto(); exposed by logger.UnredactedProto() for
+  // operator-facing observability events.
+  SENSITIVITY_PII = 1;
+
+  // Credentials and authentication material: passwords, access keys, session
+  // tokens, signing keys, API keys, ICE credentials.
+  // ALWAYS redacted, including by logger.UnredactedProto().
+  SENSITIVITY_SECRET = 2;
+}
+
 extend google.protobuf.FieldOptions {
-  bool redact = 1285;
   string redact_format = 1286;
   string name = 1287;
+  Sensitivity sensitivity = 1288;
 }
