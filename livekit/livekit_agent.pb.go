@@ -191,13 +191,13 @@ type Job struct {
 	Room        *Room                  `protobuf:"bytes,3,opt,name=room,proto3" json:"room,omitempty"`
 	Participant *ParticipantInfo       `protobuf:"bytes,4,opt,name=participant,proto3,oneof" json:"participant,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_agent.proto.
-	Namespace       string    `protobuf:"bytes,5,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Metadata        string    `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	AgentName       string    `protobuf:"bytes,7,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	State           *JobState `protobuf:"bytes,8,opt,name=state,proto3" json:"state,omitempty"`
-	EnableRecording bool      `protobuf:"varint,10,opt,name=enable_recording,json=enableRecording,proto3" json:"enable_recording,omitempty"`
-	Deployment      string    `protobuf:"bytes,11,opt,name=deployment,proto3" json:"deployment,omitempty"`
-	Simulation      bool      `protobuf:"varint,12,opt,name=simulation,proto3" json:"simulation,omitempty"`
+	Namespace       string            `protobuf:"bytes,5,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Metadata        string            `protobuf:"bytes,6,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	AgentName       string            `protobuf:"bytes,7,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	State           *JobState         `protobuf:"bytes,8,opt,name=state,proto3" json:"state,omitempty"`
+	EnableRecording bool              `protobuf:"varint,10,opt,name=enable_recording,json=enableRecording,proto3" json:"enable_recording,omitempty"`
+	Deployment      string            `protobuf:"bytes,11,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	Attributes      map[string]string `protobuf:"bytes,12,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -310,11 +310,11 @@ func (x *Job) GetDeployment() string {
 	return ""
 }
 
-func (x *Job) GetSimulation() bool {
+func (x *Job) GetAttributes() map[string]string {
 	if x != nil {
-		return x.Simulation
+		return x.Attributes
 	}
-	return false
+	return nil
 }
 
 type JobState struct {
@@ -1449,7 +1449,7 @@ var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xd0\x03\n" +
+	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xb2\x04\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\vdispatch_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -1467,10 +1467,13 @@ const file_livekit_agent_proto_rawDesc = "" +
 	" \x01(\bR\x0fenableRecording\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\v \x01(\tR\n" +
-	"deployment\x12\x1e\n" +
+	"deployment\x12A\n" +
 	"\n" +
-	"simulation\x18\f \x01(\bR\n" +
-	"simulationB\x0e\n" +
+	"attributes\x18\f \x03(\v2\x1c.livekit.Job.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x1a=\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
 	"\f_participant\"\xa9\x02\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
@@ -1594,7 +1597,7 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_livekit_agent_proto_goTypes = []any{
 	(JobType)(0),                   // 0: livekit.JobType
 	(WorkerStatus)(0),              // 1: livekit.WorkerStatus
@@ -1615,46 +1618,48 @@ var file_livekit_agent_proto_goTypes = []any{
 	(*UpdateWorkerStatus)(nil),     // 16: livekit.UpdateWorkerStatus
 	(*JobAssignment)(nil),          // 17: livekit.JobAssignment
 	(*JobTermination)(nil),         // 18: livekit.JobTermination
-	nil,                            // 19: livekit.AvailabilityResponse.ParticipantAttributesEntry
-	(*Room)(nil),                   // 20: livekit.Room
-	(*ParticipantInfo)(nil),        // 21: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),  // 22: livekit.ParticipantPermission
-	(*ServerInfo)(nil),             // 23: livekit.ServerInfo
+	nil,                            // 19: livekit.Job.AttributesEntry
+	nil,                            // 20: livekit.AvailabilityResponse.ParticipantAttributesEntry
+	(*Room)(nil),                   // 21: livekit.Room
+	(*ParticipantInfo)(nil),        // 22: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),  // 23: livekit.ParticipantPermission
+	(*ServerInfo)(nil),             // 24: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	20, // 1: livekit.Job.room:type_name -> livekit.Room
-	21, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	21, // 1: livekit.Job.room:type_name -> livekit.Room
+	22, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
 	4,  // 3: livekit.Job.state:type_name -> livekit.JobState
-	2,  // 4: livekit.JobState.status:type_name -> livekit.JobStatus
-	10, // 5: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
-	14, // 6: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
-	16, // 7: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
-	15, // 8: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
-	8,  // 9: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
-	7,  // 10: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
-	12, // 11: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
-	11, // 12: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
-	13, // 13: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
-	17, // 14: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
-	18, // 15: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
-	9,  // 16: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	0,  // 17: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	20, // 18: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	21, // 19: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
-	0,  // 20: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	22, // 21: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
-	23, // 22: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
-	3,  // 23: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	19, // 24: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
-	2,  // 25: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
-	1,  // 26: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	3,  // 27: livekit.JobAssignment.job:type_name -> livekit.Job
-	28, // [28:28] is the sub-list for method output_type
-	28, // [28:28] is the sub-list for method input_type
-	28, // [28:28] is the sub-list for extension type_name
-	28, // [28:28] is the sub-list for extension extendee
-	0,  // [0:28] is the sub-list for field type_name
+	19, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
+	2,  // 5: livekit.JobState.status:type_name -> livekit.JobStatus
+	10, // 6: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
+	14, // 7: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
+	16, // 8: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
+	15, // 9: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
+	8,  // 10: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
+	7,  // 11: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
+	12, // 12: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
+	11, // 13: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
+	13, // 14: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
+	17, // 15: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
+	18, // 16: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
+	9,  // 17: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
+	0,  // 18: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
+	21, // 19: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	22, // 20: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	0,  // 21: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
+	23, // 22: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	24, // 23: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	3,  // 24: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	20, // 25: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	2,  // 26: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
+	1,  // 27: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
+	3,  // 28: livekit.JobAssignment.job:type_name -> livekit.Job
+	29, // [29:29] is the sub-list for method output_type
+	29, // [29:29] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -1689,7 +1694,7 @@ func file_livekit_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   17,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -89,7 +89,7 @@ type CreateAgentDispatchRequest struct {
 	Metadata      string                 `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	RestartPolicy JobRestartPolicy       `protobuf:"varint,4,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
 	Deployment    string                 `protobuf:"bytes,5,opt,name=deployment,proto3" json:"deployment,omitempty"`
-	Simulation    bool                   `protobuf:"varint,6,opt,name=simulation,proto3" json:"simulation,omitempty"`
+	Attributes    map[string]string      `protobuf:"bytes,6,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -159,11 +159,11 @@ func (x *CreateAgentDispatchRequest) GetDeployment() string {
 	return ""
 }
 
-func (x *CreateAgentDispatchRequest) GetSimulation() bool {
+func (x *CreateAgentDispatchRequest) GetAttributes() map[string]string {
 	if x != nil {
-		return x.Simulation
+		return x.Attributes
 	}
-	return false
+	return nil
 }
 
 type RoomAgentDispatch struct {
@@ -172,7 +172,7 @@ type RoomAgentDispatch struct {
 	Metadata      string                 `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	RestartPolicy JobRestartPolicy       `protobuf:"varint,3,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
 	Deployment    string                 `protobuf:"bytes,4,opt,name=deployment,proto3" json:"deployment,omitempty"`
-	Simulation    bool                   `protobuf:"varint,5,opt,name=simulation,proto3" json:"simulation,omitempty"`
+	Attributes    map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -235,11 +235,11 @@ func (x *RoomAgentDispatch) GetDeployment() string {
 	return ""
 }
 
-func (x *RoomAgentDispatch) GetSimulation() bool {
+func (x *RoomAgentDispatch) GetAttributes() map[string]string {
 	if x != nil {
-		return x.Simulation
+		return x.Attributes
 	}
-	return false
+	return nil
 }
 
 type DeleteAgentDispatchRequest struct {
@@ -399,7 +399,7 @@ type AgentDispatch struct {
 	State         *AgentDispatchState    `protobuf:"bytes,5,opt,name=state,proto3" json:"state,omitempty"`
 	RestartPolicy JobRestartPolicy       `protobuf:"varint,6,opt,name=restart_policy,json=restartPolicy,proto3,enum=livekit.JobRestartPolicy" json:"restart_policy,omitempty"` // cloud only
 	Deployment    string                 `protobuf:"bytes,7,opt,name=deployment,proto3" json:"deployment,omitempty"`
-	Simulation    bool                   `protobuf:"varint,8,opt,name=simulation,proto3" json:"simulation,omitempty"`
+	Attributes    map[string]string      `protobuf:"bytes,8,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -483,11 +483,11 @@ func (x *AgentDispatch) GetDeployment() string {
 	return ""
 }
 
-func (x *AgentDispatch) GetSimulation() bool {
+func (x *AgentDispatch) GetAttributes() map[string]string {
 	if x != nil {
-		return x.Simulation
+		return x.Attributes
 	}
-	return false
+	return nil
 }
 
 type AgentDispatchState struct {
@@ -556,7 +556,7 @@ var File_livekit_agent_dispatch_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
-	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xf2\x01\n" +
+	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xeb\x02\n" +
 	"\x1aCreateAgentDispatchRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x12\n" +
@@ -565,10 +565,13 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\x0erestart_policy\x18\x04 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\x05 \x01(\tR\n" +
-	"deployment\x12\x1e\n" +
+	"deployment\x12X\n" +
 	"\n" +
-	"simulation\x18\x06 \x01(\bR\n" +
-	"simulation\"\xd5\x01\n" +
+	"attributes\x18\x06 \x03(\v23.livekit.CreateAgentDispatchRequest.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x1a=\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc5\x02\n" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x1f\n" +
@@ -576,10 +579,13 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\x0erestart_policy\x18\x03 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\x04 \x01(\tR\n" +
-	"deployment\x12\x1e\n" +
+	"deployment\x12O\n" +
 	"\n" +
-	"simulation\x18\x05 \x01(\bR\n" +
-	"simulation\"`\n" +
+	"attributes\x18\x05 \x03(\v2*.livekit.RoomAgentDispatch.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x1a=\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"`\n" +
 	"\x1aDeleteAgentDispatchRequest\x12.\n" +
 	"\vdispatch_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"dispatchIDR\n" +
@@ -591,7 +597,7 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"dispatchId\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
 	"\x19ListAgentDispatchResponse\x12A\n" +
-	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xa8\x02\n" +
+	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\x94\x03\n" +
 	"\rAgentDispatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -602,10 +608,13 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\x0erestart_policy\x18\x06 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\a \x01(\tR\n" +
-	"deployment\x12\x1e\n" +
+	"deployment\x12K\n" +
 	"\n" +
-	"simulation\x18\b \x01(\bR\n" +
-	"simulation\"t\n" +
+	"attributes\x18\b \x03(\v2&.livekit.AgentDispatch.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x1a=\n" +
+	"\x0fAttributesEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"t\n" +
 	"\x12AgentDispatchState\x12 \n" +
 	"\x04jobs\x18\x01 \x03(\v2\f.livekit.JobR\x04jobs\x12\x1d\n" +
 	"\n" +
@@ -633,7 +642,7 @@ func file_livekit_agent_dispatch_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_dispatch_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_livekit_agent_dispatch_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_livekit_agent_dispatch_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_livekit_agent_dispatch_proto_goTypes = []any{
 	(JobRestartPolicy)(0),              // 0: livekit.JobRestartPolicy
 	(*CreateAgentDispatchRequest)(nil), // 1: livekit.CreateAgentDispatchRequest
@@ -643,26 +652,32 @@ var file_livekit_agent_dispatch_proto_goTypes = []any{
 	(*ListAgentDispatchResponse)(nil),  // 5: livekit.ListAgentDispatchResponse
 	(*AgentDispatch)(nil),              // 6: livekit.AgentDispatch
 	(*AgentDispatchState)(nil),         // 7: livekit.AgentDispatchState
-	(*Job)(nil),                        // 8: livekit.Job
+	nil,                                // 8: livekit.CreateAgentDispatchRequest.AttributesEntry
+	nil,                                // 9: livekit.RoomAgentDispatch.AttributesEntry
+	nil,                                // 10: livekit.AgentDispatch.AttributesEntry
+	(*Job)(nil),                        // 11: livekit.Job
 }
 var file_livekit_agent_dispatch_proto_depIdxs = []int32{
-	0, // 0: livekit.CreateAgentDispatchRequest.restart_policy:type_name -> livekit.JobRestartPolicy
-	0, // 1: livekit.RoomAgentDispatch.restart_policy:type_name -> livekit.JobRestartPolicy
-	6, // 2: livekit.ListAgentDispatchResponse.agent_dispatches:type_name -> livekit.AgentDispatch
-	7, // 3: livekit.AgentDispatch.state:type_name -> livekit.AgentDispatchState
-	0, // 4: livekit.AgentDispatch.restart_policy:type_name -> livekit.JobRestartPolicy
-	8, // 5: livekit.AgentDispatchState.jobs:type_name -> livekit.Job
-	1, // 6: livekit.AgentDispatchService.CreateDispatch:input_type -> livekit.CreateAgentDispatchRequest
-	3, // 7: livekit.AgentDispatchService.DeleteDispatch:input_type -> livekit.DeleteAgentDispatchRequest
-	4, // 8: livekit.AgentDispatchService.ListDispatch:input_type -> livekit.ListAgentDispatchRequest
-	6, // 9: livekit.AgentDispatchService.CreateDispatch:output_type -> livekit.AgentDispatch
-	6, // 10: livekit.AgentDispatchService.DeleteDispatch:output_type -> livekit.AgentDispatch
-	5, // 11: livekit.AgentDispatchService.ListDispatch:output_type -> livekit.ListAgentDispatchResponse
-	9, // [9:12] is the sub-list for method output_type
-	6, // [6:9] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	0,  // 0: livekit.CreateAgentDispatchRequest.restart_policy:type_name -> livekit.JobRestartPolicy
+	8,  // 1: livekit.CreateAgentDispatchRequest.attributes:type_name -> livekit.CreateAgentDispatchRequest.AttributesEntry
+	0,  // 2: livekit.RoomAgentDispatch.restart_policy:type_name -> livekit.JobRestartPolicy
+	9,  // 3: livekit.RoomAgentDispatch.attributes:type_name -> livekit.RoomAgentDispatch.AttributesEntry
+	6,  // 4: livekit.ListAgentDispatchResponse.agent_dispatches:type_name -> livekit.AgentDispatch
+	7,  // 5: livekit.AgentDispatch.state:type_name -> livekit.AgentDispatchState
+	0,  // 6: livekit.AgentDispatch.restart_policy:type_name -> livekit.JobRestartPolicy
+	10, // 7: livekit.AgentDispatch.attributes:type_name -> livekit.AgentDispatch.AttributesEntry
+	11, // 8: livekit.AgentDispatchState.jobs:type_name -> livekit.Job
+	1,  // 9: livekit.AgentDispatchService.CreateDispatch:input_type -> livekit.CreateAgentDispatchRequest
+	3,  // 10: livekit.AgentDispatchService.DeleteDispatch:input_type -> livekit.DeleteAgentDispatchRequest
+	4,  // 11: livekit.AgentDispatchService.ListDispatch:input_type -> livekit.ListAgentDispatchRequest
+	6,  // 12: livekit.AgentDispatchService.CreateDispatch:output_type -> livekit.AgentDispatch
+	6,  // 13: livekit.AgentDispatchService.DeleteDispatch:output_type -> livekit.AgentDispatch
+	5,  // 14: livekit.AgentDispatchService.ListDispatch:output_type -> livekit.ListAgentDispatchResponse
+	12, // [12:15] is the sub-list for method output_type
+	9,  // [9:12] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_dispatch_proto_init() }
@@ -677,7 +692,7 @@ func file_livekit_agent_dispatch_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_dispatch_proto_rawDesc), len(file_livekit_agent_dispatch_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   7,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
