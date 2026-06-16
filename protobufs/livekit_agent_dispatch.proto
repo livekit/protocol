@@ -39,6 +39,7 @@ message CreateAgentDispatchRequest {
   string metadata = 3 [(logger.sensitivity) = SENSITIVITY_PII];
   JobRestartPolicy restart_policy = 4; // cloud only
   string deployment = 5;
+  bool simulation = 6;
 }
 
 message RoomAgentDispatch {
@@ -46,6 +47,7 @@ message RoomAgentDispatch {
   string metadata = 2 [(logger.sensitivity) = SENSITIVITY_PII];
   JobRestartPolicy restart_policy = 3; // cloud only
   string deployment = 4;
+  bool simulation = 5;
 }
 
 message DeleteAgentDispatchRequest {
@@ -70,6 +72,7 @@ message AgentDispatch {
   AgentDispatchState state = 5;
   JobRestartPolicy restart_policy = 6; // cloud only
   string deployment = 7;
+  bool simulation = 8;
 }
 
 message AgentDispatchState {

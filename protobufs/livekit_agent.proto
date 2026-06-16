@@ -34,6 +34,7 @@ message Job {
   JobState state = 8;
   bool enable_recording = 10;
   string deployment = 11;
+  bool simulation = 12;
 }
 
 message JobState {
