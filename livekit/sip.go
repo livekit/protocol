@@ -449,6 +449,9 @@ func (p *SIPInboundTrunkInfo) Validate() error {
 	if !hasAuth && !hasCIDR && !hasNumbers {
 		return psrpc.NewErrorf(psrpc.InvalidArgument, "for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
 	}
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	if err := validateHeaders(p.Headers); err != nil {
 		return err
 	}
@@ -471,6 +474,9 @@ func (p *SIPInboundTrunkUpdate) Validate() error {
 	if err := p.AllowedNumbers.Validate(); err != nil {
 		return err
 	}
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -486,7 +492,8 @@ func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
 	applyUpdate(&info.AuthRealm, p.AuthRealm)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
-	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
+	updateMediaConfig(info, &info.Media, &info.MediaEncryption, p.Media, p.MediaEncryption)
+	info.Upgrade()
 	return info.Validate()
 }
 
@@ -548,6 +555,9 @@ func (p *SIPOutboundTrunkInfo) Validate() error {
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
 		return err
 	}
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -574,6 +584,9 @@ func (p *SIPOutboundTrunkUpdate) Validate() error {
 	if err := p.Numbers.Validate(); err != nil {
 		return err
 	}
+	if err := p.Media.Validate(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -589,8 +602,9 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 	applyUpdate(&info.AuthPassword, p.AuthPassword)
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
-	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	applyUpdate(&info.FromHost, p.FromHost)
+	updateMediaConfig(info, &info.Media, &info.MediaEncryption, p.Media, p.MediaEncryption)
+	info.Upgrade()
 	return info.Validate()
 }
 
@@ -715,15 +729,11 @@ func (p *SIPDispatchRuleUpdate) Apply(info *SIPDispatchRuleInfo) error {
 	}
 	applyListUpdate(&info.TrunkIds, p.TrunkIds)
 	applyUpdatePtr(&info.Rule, p.Rule)
-	applyUpdatePtr(&info.Media, p.Media) // TODO: Consider applying partial updates
 	applyUpdate(&info.Name, p.Name)
 	applyUpdate(&info.Metadata, p.Metadata)
-	applyUpdate(&info.MediaEncryption, p.MediaEncryption)
 	applyMapDiff(&info.Attributes, p.Attributes)
+	updateMediaConfig(info, &info.Media, &info.MediaEncryption, p.Media, p.MediaEncryption)
 	info.Upgrade()
-	if m := info.Media; m != nil {
-		info.MediaEncryption = m.Encryption.Deref()
-	}
 	return info.Validate()
 }
 
@@ -1060,6 +1070,20 @@ func (p *SIPCodec) Validate() error {
 	return nil
 }
 
+func (p *SIPInboundTrunkInfo) Upgrade() {
+	if p == nil {
+		return
+	}
+	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+}
+
+func (p *SIPOutboundTrunkInfo) Upgrade() {
+	if p == nil {
+		return
+	}
+	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+}
+
 func (p *SIPDispatchRuleInfo) Upgrade() {
 	if p == nil {
 		return
@@ -1112,4 +1136,59 @@ func (p *SIPMediaConfig) UpgradeWith(enc SIPMediaEncryption) *SIPMediaConfig {
 		p.Encryption = &enc
 	}
 	return p
+}
+
+func (p *SIPMediaConfig) Merge(p2 *SIPMediaConfig) *SIPMediaConfig {
+	if p == nil {
+		return p2
+	}
+	if p2 == nil {
+		return p
+	}
+	r := proto.CloneOf(p2)
+	r.Encryption = p.Encryption.Merge(p2.Encryption)
+	if p2.MediaTimeout == nil {
+		r.MediaTimeout = p.MediaTimeout
+	}
+	if len(p2.Codecs) == 0 {
+		r.OnlyListedCodecs = p.OnlyListedCodecs
+		r.Codecs = p.Codecs
+	}
+	return r
+}
+
+func updateMediaConfig(
+	info interface{ Upgrade() },
+	dstMedia **SIPMediaConfig, dstEnc *SIPMediaEncryption,
+	media *SIPMediaConfig, enc *SIPMediaEncryption,
+) {
+	applyUpdatePtr(dstMedia, media) // TODO: Consider applying partial updates
+	applyUpdate(dstEnc, enc)
+	info.Upgrade()
+	// downgrade to a legacy field
+	if m := *dstMedia; m != nil {
+		*dstEnc = m.Encryption.Deref()
+	}
+}
+
+func (p *SIPMediaEncryption) Merge(p2 *SIPMediaEncryption) *SIPMediaEncryption {
+	if p == nil {
+		return p2
+	}
+	if p2 == nil {
+		return p
+	}
+	v := *p
+	v = v.MergeValue(*p2)
+	return &v
+}
+
+func (p SIPMediaEncryption) MergeValue(p2 SIPMediaEncryption) SIPMediaEncryption {
+	if p == p2 {
+		return p2
+	}
+	if p2 == SIPMediaEncryption_SIP_MEDIA_ENCRYPT_DISABLE {
+		return p
+	}
+	return p2
 }

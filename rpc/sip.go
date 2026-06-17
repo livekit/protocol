@@ -79,7 +79,6 @@ func NewCreateSIPParticipantRequest(
 	}
 	var (
 		hostname           string
-		enc                livekit.SIPMediaEncryption
 		headers            map[string]string
 		includeHeaders     livekit.SIPHeaderOptions
 		transport          livekit.SIPTransport
@@ -88,10 +87,11 @@ func NewCreateSIPParticipantRequest(
 		authPass           string
 		hdrToAttr          map[string]string
 		attrToHdr          map[string]string
+		mediaConf          *livekit.SIPMediaConfig
 	)
 	if trunk != nil {
+		trunk.Upgrade()
 		hostname = trunk.Address
-		enc = trunk.MediaEncryption
 		headers = trunk.Headers
 		includeHeaders = trunk.IncludeHeaders
 		transport = trunk.Transport
@@ -100,6 +100,9 @@ func NewCreateSIPParticipantRequest(
 		authPass = trunk.AuthPassword
 		hdrToAttr = trunk.HeadersToAttributes
 		attrToHdr = trunk.AttributesToHeaders
+
+		media := proto.CloneOf(trunk.Media)
+		mediaConf = mediaConf.Merge(media)
 	} else if t := req.Trunk; t != nil {
 		hostname = t.Hostname
 		transport = t.Transport
@@ -145,9 +148,6 @@ func NewCreateSIPParticipantRequest(
 	if req.KrispEnabled {
 		features = append(features, livekit.SIPFeature_KRISP_ENABLED)
 	}
-	if req.MediaEncryption != 0 {
-		enc = req.MediaEncryption
-	}
 
 	if len(req.Headers) != 0 {
 		headers = maps.Clone(headers)
@@ -165,9 +165,10 @@ func NewCreateSIPParticipantRequest(
 	if participantIdentity == "" {
 		participantIdentity = "sip_" + req.SipCallTo
 	}
-
-	media := proto.CloneOf(req.Media)
-	media = media.UpgradeWith(enc)
+	{
+		media := proto.CloneOf(req.Media)
+		mediaConf = mediaConf.Merge(media)
+	}
 	return &InternalCreateSIPParticipantRequest{
 		ProjectId:             projectID,
 		SipCallId:             callID,
@@ -199,8 +200,8 @@ func NewCreateSIPParticipantRequest(
 		EnabledFeatures:       features,
 		RingingTimeout:        req.RingingTimeout,
 		MaxCallDuration:       req.MaxCallDuration,
-		MediaEncryption:       media.Encryption.Deref(),
-		Media:                 media,
+		MediaEncryption:       mediaConf.Encryption.Deref(),
+		Media:                 mediaConf,
 		WaitUntilAnswered:     req.WaitUntilAnswered,
 		DisplayName:           req.DisplayName,
 		Destination:           req.Destination,
