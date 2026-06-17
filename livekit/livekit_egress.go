@@ -20,6 +20,7 @@ const (
 	EndReasonSrcClosed      = "Source closed"
 	EndReasonLimitReached   = "Session limit reached"
 	EndReasonStreamsStopped = "All streams stopped"
+	EndReasonCPUExhausted   = "CPU exhausted"
 	EndReasonFailure        = "Failure"
 )
 
