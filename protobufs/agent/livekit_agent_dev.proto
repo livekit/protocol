@@ -10,7 +10,14 @@ message AgentDevMessage {
   oneof message {
     GetRunningAgentJobsRequest get_running_jobs_request = 1;
     GetRunningAgentJobsResponse get_running_jobs_response = 2;
+    ServerInfo server_info = 3;
   }
+}
+
+// ServerInfo is sent by the agent to the CLI when the dev-reload channel opens,
+message ServerInfo {
+  string agent_name = 1;
+  string url = 2;
 }
 
 message GetRunningAgentJobsRequest {}
