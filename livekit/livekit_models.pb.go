@@ -824,6 +824,7 @@ type PacketTrailerFeature int32
 const (
 	PacketTrailerFeature_PTF_USER_TIMESTAMP PacketTrailerFeature = 0
 	PacketTrailerFeature_PTF_FRAME_ID       PacketTrailerFeature = 1
+	PacketTrailerFeature_PTF_USER_DATA      PacketTrailerFeature = 2
 )
 
 // Enum value maps for PacketTrailerFeature.
@@ -831,10 +832,12 @@ var (
 	PacketTrailerFeature_name = map[int32]string{
 		0: "PTF_USER_TIMESTAMP",
 		1: "PTF_FRAME_ID",
+		2: "PTF_USER_DATA",
 	}
 	PacketTrailerFeature_value = map[string]int32{
 		"PTF_USER_TIMESTAMP": 0,
 		"PTF_FRAME_ID":       1,
+		"PTF_USER_DATA":      2,
 	}
 )
 
@@ -6891,10 +6894,11 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x14TF_ECHO_CANCELLATION\x10\x03\x12\x18\n" +
 	"\x14TF_NOISE_SUPPRESSION\x10\x04\x12\"\n" +
 	"\x1eTF_ENHANCED_NOISE_CANCELLATION\x10\x05\x12\x18\n" +
-	"\x14TF_PRECONNECT_BUFFER\x10\x06*@\n" +
+	"\x14TF_PRECONNECT_BUFFER\x10\x06*S\n" +
 	"\x14PacketTrailerFeature\x12\x16\n" +
 	"\x12PTF_USER_TIMESTAMP\x10\x00\x12\x10\n" +
-	"\fPTF_FRAME_ID\x10\x01BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\fPTF_FRAME_ID\x10\x01\x12\x11\n" +
+	"\rPTF_USER_DATA\x10\x02BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_models_proto_rawDescOnce sync.Once
