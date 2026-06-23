@@ -184,6 +184,9 @@ message SessionCreated {
   map<string, float> default_thresholds = 1;
   // Catch-all default applied to languages not present in default_thresholds.
   float default_threshold = 2;
+  // same structure, but for backchannel
+  map<string, float> default_backchannel_thresholds = 3;
+  float default_backchannel_threshold = 4;
 }
 
 message InferenceStarted {}
@@ -201,6 +204,7 @@ message EotPrediction {
   float probability = 1;
   InferenceStats inference_stats = 2;
   EotBackend backend = 3;
+  float backchannel_probability = 4;
 }
 
 message InterruptionPrediction {

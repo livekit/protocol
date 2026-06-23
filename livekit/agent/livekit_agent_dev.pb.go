@@ -29,6 +29,7 @@ type AgentDevMessage struct {
 	//
 	//	*AgentDevMessage_GetRunningJobsRequest
 	//	*AgentDevMessage_GetRunningJobsResponse
+	//	*AgentDevMessage_ServerInfo
 	Message       isAgentDevMessage_Message `protobuf_oneof:"message"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -89,6 +90,15 @@ func (x *AgentDevMessage) GetGetRunningJobsResponse() *GetRunningAgentJobsRespon
 	return nil
 }
 
+func (x *AgentDevMessage) GetServerInfo() *ServerInfo {
+	if x != nil {
+		if x, ok := x.Message.(*AgentDevMessage_ServerInfo); ok {
+			return x.ServerInfo
+		}
+	}
+	return nil
+}
+
 type isAgentDevMessage_Message interface {
 	isAgentDevMessage_Message()
 }
@@ -101,9 +111,68 @@ type AgentDevMessage_GetRunningJobsResponse struct {
 	GetRunningJobsResponse *GetRunningAgentJobsResponse `protobuf:"bytes,2,opt,name=get_running_jobs_response,json=getRunningJobsResponse,proto3,oneof"`
 }
 
+type AgentDevMessage_ServerInfo struct {
+	ServerInfo *ServerInfo `protobuf:"bytes,3,opt,name=server_info,json=serverInfo,proto3,oneof"`
+}
+
 func (*AgentDevMessage_GetRunningJobsRequest) isAgentDevMessage_Message() {}
 
 func (*AgentDevMessage_GetRunningJobsResponse) isAgentDevMessage_Message() {}
+
+func (*AgentDevMessage_ServerInfo) isAgentDevMessage_Message() {}
+
+// ServerInfo is sent by the agent to the CLI when the dev-reload channel opens,
+type ServerInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	Url           string                 `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerInfo) Reset() {
+	*x = ServerInfo{}
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerInfo) ProtoMessage() {}
+
+func (x *ServerInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerInfo.ProtoReflect.Descriptor instead.
+func (*ServerInfo) Descriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ServerInfo) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
+}
+
+func (x *ServerInfo) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
 
 type GetRunningAgentJobsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -113,7 +182,7 @@ type GetRunningAgentJobsRequest struct {
 
 func (x *GetRunningAgentJobsRequest) Reset() {
 	*x = GetRunningAgentJobsRequest{}
-	mi := &file_agent_livekit_agent_dev_proto_msgTypes[1]
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -125,7 +194,7 @@ func (x *GetRunningAgentJobsRequest) String() string {
 func (*GetRunningAgentJobsRequest) ProtoMessage() {}
 
 func (x *GetRunningAgentJobsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_dev_proto_msgTypes[1]
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -138,7 +207,7 @@ func (x *GetRunningAgentJobsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRunningAgentJobsRequest.ProtoReflect.Descriptor instead.
 func (*GetRunningAgentJobsRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{1}
+	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{2}
 }
 
 type GetRunningAgentJobsResponse struct {
@@ -150,7 +219,7 @@ type GetRunningAgentJobsResponse struct {
 
 func (x *GetRunningAgentJobsResponse) Reset() {
 	*x = GetRunningAgentJobsResponse{}
-	mi := &file_agent_livekit_agent_dev_proto_msgTypes[2]
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -162,7 +231,7 @@ func (x *GetRunningAgentJobsResponse) String() string {
 func (*GetRunningAgentJobsResponse) ProtoMessage() {}
 
 func (x *GetRunningAgentJobsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_dev_proto_msgTypes[2]
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -175,7 +244,7 @@ func (x *GetRunningAgentJobsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRunningAgentJobsResponse.ProtoReflect.Descriptor instead.
 func (*GetRunningAgentJobsResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{2}
+	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetRunningAgentJobsResponse) GetJobs() []*RunningAgentJobInfo {
@@ -201,7 +270,7 @@ type RunningAgentJobInfo struct {
 
 func (x *RunningAgentJobInfo) Reset() {
 	*x = RunningAgentJobInfo{}
-	mi := &file_agent_livekit_agent_dev_proto_msgTypes[3]
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -213,7 +282,7 @@ func (x *RunningAgentJobInfo) String() string {
 func (*RunningAgentJobInfo) ProtoMessage() {}
 
 func (x *RunningAgentJobInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_dev_proto_msgTypes[3]
+	mi := &file_agent_livekit_agent_dev_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -226,7 +295,7 @@ func (x *RunningAgentJobInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RunningAgentJobInfo.ProtoReflect.Descriptor instead.
 func (*RunningAgentJobInfo) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{3}
+	return file_agent_livekit_agent_dev_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RunningAgentJobInfo) GetJob() []byte {
@@ -289,11 +358,18 @@ var File_agent_livekit_agent_dev_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_dev_proto_rawDesc = "" +
 	"\n" +
-	"\x1dagent/livekit_agent_dev.proto\x12\rlivekit.agent\"\xeb\x01\n" +
+	"\x1dagent/livekit_agent_dev.proto\x12\rlivekit.agent\"\xa9\x02\n" +
 	"\x0fAgentDevMessage\x12d\n" +
 	"\x18get_running_jobs_request\x18\x01 \x01(\v2).livekit.agent.GetRunningAgentJobsRequestH\x00R\x15getRunningJobsRequest\x12g\n" +
-	"\x19get_running_jobs_response\x18\x02 \x01(\v2*.livekit.agent.GetRunningAgentJobsResponseH\x00R\x16getRunningJobsResponseB\t\n" +
-	"\amessage\"\x1c\n" +
+	"\x19get_running_jobs_response\x18\x02 \x01(\v2*.livekit.agent.GetRunningAgentJobsResponseH\x00R\x16getRunningJobsResponse\x12<\n" +
+	"\vserver_info\x18\x03 \x01(\v2\x19.livekit.agent.ServerInfoH\x00R\n" +
+	"serverInfoB\t\n" +
+	"\amessage\"=\n" +
+	"\n" +
+	"ServerInfo\x12\x1d\n" +
+	"\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
+	"\x03url\x18\x02 \x01(\tR\x03url\"\x1c\n" +
 	"\x1aGetRunningAgentJobsRequest\"U\n" +
 	"\x1bGetRunningAgentJobsResponse\x126\n" +
 	"\x04jobs\x18\x01 \x03(\v2\".livekit.agent.RunningAgentJobInfoR\x04jobs\"\xfa\x01\n" +
@@ -320,22 +396,24 @@ func file_agent_livekit_agent_dev_proto_rawDescGZIP() []byte {
 	return file_agent_livekit_agent_dev_proto_rawDescData
 }
 
-var file_agent_livekit_agent_dev_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_agent_livekit_agent_dev_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_agent_livekit_agent_dev_proto_goTypes = []any{
 	(*AgentDevMessage)(nil),             // 0: livekit.agent.AgentDevMessage
-	(*GetRunningAgentJobsRequest)(nil),  // 1: livekit.agent.GetRunningAgentJobsRequest
-	(*GetRunningAgentJobsResponse)(nil), // 2: livekit.agent.GetRunningAgentJobsResponse
-	(*RunningAgentJobInfo)(nil),         // 3: livekit.agent.RunningAgentJobInfo
+	(*ServerInfo)(nil),                  // 1: livekit.agent.ServerInfo
+	(*GetRunningAgentJobsRequest)(nil),  // 2: livekit.agent.GetRunningAgentJobsRequest
+	(*GetRunningAgentJobsResponse)(nil), // 3: livekit.agent.GetRunningAgentJobsResponse
+	(*RunningAgentJobInfo)(nil),         // 4: livekit.agent.RunningAgentJobInfo
 }
 var file_agent_livekit_agent_dev_proto_depIdxs = []int32{
-	1, // 0: livekit.agent.AgentDevMessage.get_running_jobs_request:type_name -> livekit.agent.GetRunningAgentJobsRequest
-	2, // 1: livekit.agent.AgentDevMessage.get_running_jobs_response:type_name -> livekit.agent.GetRunningAgentJobsResponse
-	3, // 2: livekit.agent.GetRunningAgentJobsResponse.jobs:type_name -> livekit.agent.RunningAgentJobInfo
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 0: livekit.agent.AgentDevMessage.get_running_jobs_request:type_name -> livekit.agent.GetRunningAgentJobsRequest
+	3, // 1: livekit.agent.AgentDevMessage.get_running_jobs_response:type_name -> livekit.agent.GetRunningAgentJobsResponse
+	1, // 2: livekit.agent.AgentDevMessage.server_info:type_name -> livekit.agent.ServerInfo
+	4, // 3: livekit.agent.GetRunningAgentJobsResponse.jobs:type_name -> livekit.agent.RunningAgentJobInfo
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_dev_proto_init() }
@@ -346,6 +424,7 @@ func file_agent_livekit_agent_dev_proto_init() {
 	file_agent_livekit_agent_dev_proto_msgTypes[0].OneofWrappers = []any{
 		(*AgentDevMessage_GetRunningJobsRequest)(nil),
 		(*AgentDevMessage_GetRunningJobsResponse)(nil),
+		(*AgentDevMessage_ServerInfo)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -353,7 +432,7 @@ func file_agent_livekit_agent_dev_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_dev_proto_rawDesc), len(file_agent_livekit_agent_dev_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

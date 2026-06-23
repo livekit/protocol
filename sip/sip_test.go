@@ -30,6 +30,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/rpc"
+	"github.com/livekit/protocol/utils/prototest"
 )
 
 func TestNormalizeNumber(t *testing.T) {
@@ -935,33 +936,185 @@ func TestEvaluateDispatchRule(t *testing.T) {
 	})
 }
 
-// Regression: trunk-level MediaEncryption must be honored when the dispatch rule specifies
-// neither MediaEncryption nor Media. A prior version called rule.Upgrade() at the top of
-// EvaluateDispatchRule, which pinned rule.Media.Encryption to rule.MediaEncryption (0)
-// before the trunk was consulted, causing the inbound trunk's encryption setting to be
-// silently dropped.
-func TestEvaluateDispatchRule_TrunkOnlyEncryption(t *testing.T) {
-	d := &livekit.SIPDispatchRuleInfo{
-		SipDispatchRuleId: "rule",
-		Rule:              newDirectDispatch("room", ""),
+func TestEvaluateDispatchRuleMediaConfig(t *testing.T) {
+	newDisp := func() *livekit.SIPDispatchRuleInfo {
+		return &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "rule",
+			Rule:              newDirectDispatch("room", ""),
+		}
 	}
-	r := &rpc.EvaluateSIPDispatchRulesRequest{
-		SipCallId:     "call-id",
-		CallingNumber: "+11112222",
-		CallingHost:   "sip.example.com",
-		CalledNumber:  "+3333",
+	newReq := func() *rpc.EvaluateSIPDispatchRulesRequest {
+		return &rpc.EvaluateSIPDispatchRulesRequest{
+			SipCallId:     "call-id",
+			CallingNumber: "+11112222",
+			CallingHost:   "sip.example.com",
+			CalledNumber:  "+3333",
+		}
 	}
-	tr := &livekit.SIPInboundTrunkInfo{
-		SipTrunkId:      "trunk",
-		MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+	newTrunk := func() *livekit.SIPInboundTrunkInfo {
+		return &livekit.SIPInboundTrunkInfo{
+			SipTrunkId: "trunk",
+		}
 	}
-	res, err := EvaluateDispatchRule("p_123", tr, d, r)
-	require.NoError(t, err)
-	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, res.MediaEncryption)
-	require.NotNil(t, res.Media)
-	require.NotNil(t, res.Media.Encryption)
-	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
-	require.Nil(t, res.Media.MediaTimeout)
+	check := func(
+		t testing.TB,
+		d *livekit.SIPDispatchRuleInfo, tr *livekit.SIPInboundTrunkInfo,
+		media *livekit.SIPMediaConfig,
+	) {
+		r := newReq()
+		res, err := EvaluateDispatchRule("p_123", tr, d, r)
+		require.NoError(t, err)
+		require.Equal(t, media.Encryption.Deref(), res.MediaEncryption)
+		require.NotNil(t, res.Media)
+		prototest.Equals(t, media, res.Media)
+	}
+
+	t.Run("empty", func(t *testing.T) {
+		tr := newTrunk()
+
+		d := newDisp()
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{},
+		)
+	})
+	t.Run("trunk only legacy", func(t *testing.T) {
+		// Regression: trunk-level MediaEncryption must be honored when the dispatch rule specifies
+		// neither MediaEncryption nor Media. A prior version called rule.Upgrade() at the top of
+		// EvaluateDispatchRule, which pinned rule.Media.Encryption to rule.MediaEncryption (0)
+		// before the trunk was consulted, causing the inbound trunk's encryption setting to be
+		// silently dropped.
+		tr := newTrunk()
+		tr.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		d := newDisp()
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("dispatch only legacy", func(t *testing.T) {
+		tr := newTrunk()
+
+		d := newDisp()
+		d.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("trunk only media", func(t *testing.T) {
+		tr := newTrunk()
+		tr.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		d := newDisp()
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("dispatch only media", func(t *testing.T) {
+		tr := newTrunk()
+
+		d := newDisp()
+		d.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("both legacy", func(t *testing.T) {
+		tr := newTrunk()
+		tr.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		d := newDisp()
+		d.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
+	t.Run("both media", func(t *testing.T) {
+		tr := newTrunk()
+		tr.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(15 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		d := newDisp()
+		d.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		}
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
+	t.Run("trunk legacy and dispatch media", func(t *testing.T) {
+		tr := newTrunk()
+		tr.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		d := newDisp()
+		d.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		}
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
+	t.Run("trunk media and dispatch legacy", func(t *testing.T) {
+		tr := newTrunk()
+		tr.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		d := newDisp()
+		d.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW
+
+		check(
+			t, d, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
 }
 
 func TestEvaluateDispatchRule_RespectsRuleMediaTimeout(t *testing.T) {
