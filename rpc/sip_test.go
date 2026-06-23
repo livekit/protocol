@@ -2,11 +2,14 @@ package rpc
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/utils/prototest"
 )
 
 func TestNewCreateSIPParticipantRequest(t *testing.T) {
@@ -151,27 +154,166 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 }
 
-// Regression: trunk-level MediaEncryption must be honored when the request specifies
-// neither MediaEncryption nor Media. A prior version called req.Upgrade() at the top of
-// NewCreateSIPParticipantRequest, which pinned req.Media.Encryption to req.MediaEncryption (0)
-// before the trunk was consulted, causing outbound INVITEs to omit SRTP and upstream
-// providers (e.g. Twilio) to reject with 488 / 32208.
-func TestNewCreateSIPParticipantRequest_TrunkOnlyEncryption(t *testing.T) {
-	r := &livekit.CreateSIPParticipantRequest{
-		SipTrunkId: "trunk",
-		SipCallTo:  "+3333",
-		RoomName:   "room",
+func TestNewCreateSIPParticipantRequestMediaConfig(t *testing.T) {
+	newReq := func() *livekit.CreateSIPParticipantRequest {
+		return &livekit.CreateSIPParticipantRequest{
+			SipTrunkId: "trunk",
+			SipCallTo:  "+3333",
+			RoomName:   "room",
+		}
 	}
-	tr := &livekit.SIPOutboundTrunkInfo{
-		SipTrunkId:      "trunk",
-		Address:         "sip.example.com",
-		Numbers:         []string{"+1111"},
-		MediaEncryption: livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+	newTrunk := func() *livekit.SIPOutboundTrunkInfo {
+		return &livekit.SIPOutboundTrunkInfo{
+			SipTrunkId: "trunk",
+			Address:    "sip.example.com",
+			Numbers:    []string{"+1111"},
+		}
 	}
-	res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
-	require.NoError(t, err)
-	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, res.MediaEncryption)
-	require.NotNil(t, res.Media)
-	require.NotNil(t, res.Media.Encryption)
-	require.Equal(t, livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE, *res.Media.Encryption)
+	check := func(
+		t testing.TB,
+		r *livekit.CreateSIPParticipantRequest, tr *livekit.SIPOutboundTrunkInfo,
+		media *livekit.SIPMediaConfig,
+	) {
+		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+		require.NoError(t, err)
+		require.Equal(t, *media.Encryption, res.MediaEncryption)
+		require.NotNil(t, res.Media)
+		prototest.Equals(t, media, res.Media)
+	}
+	t.Run("trunk only legacy", func(t *testing.T) {
+		// Regression: trunk-level MediaEncryption must be honored when the request specifies
+		// neither MediaEncryption nor Media. A prior version called req.Upgrade() at the top of
+		// NewCreateSIPParticipantRequest, which pinned req.Media.Encryption to req.MediaEncryption (0)
+		// before the trunk was consulted, causing outbound INVITEs to omit SRTP and upstream
+		// providers (e.g. Twilio) to reject with 488 / 32208.
+		r := newReq()
+
+		tr := newTrunk()
+		tr.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("req only legacy", func(t *testing.T) {
+		r := newReq()
+		r.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		tr := newTrunk()
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("trunk only media", func(t *testing.T) {
+		r := newReq()
+
+		tr := newTrunk()
+		tr.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("req only media", func(t *testing.T) {
+		r := newReq()
+		r.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		tr := newTrunk()
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+			},
+		)
+	})
+	t.Run("both legacy", func(t *testing.T) {
+		r := newReq()
+		r.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW
+
+		tr := newTrunk()
+		tr.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
+	t.Run("both media", func(t *testing.T) {
+		r := newReq()
+		r.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		}
+
+		tr := newTrunk()
+		tr.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(15 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
+	t.Run("trunk legacy and req media", func(t *testing.T) {
+		r := newReq()
+		r.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		}
+
+		tr := newTrunk()
+		tr.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
+	t.Run("trunk media and req legacy", func(t *testing.T) {
+		r := newReq()
+		r.MediaEncryption = livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW
+
+		tr := newTrunk()
+		tr.Media = &livekit.SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		}
+
+		check(
+			t, r, tr,
+			&livekit.SIPMediaConfig{
+				MediaTimeout: durationpb.New(10 * time.Second),
+				Encryption:   new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+			},
+		)
+	})
 }

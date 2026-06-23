@@ -199,7 +199,11 @@ message ParticipantInfo {
   // protocol version used for client feature compatibility
   int32 client_protocol = 20;
 
-  // NEXT_ID: 21
+  // capabilities the participant's client advertises, mirrored from ClientInfo.
+  // Lets other participants perform client-side feature detection.
+  repeated ClientInfo.Capability capabilities = 21;
+
+  // NEXT_ID: 22
 }
 
 enum TrackType {
@@ -622,6 +626,7 @@ message ClientInfo {
   enum Capability {
     CAP_UNUSED = 0;
     CAP_PACKET_TRAILER = 1;
+    CAP_COMPRESSION_DEFLATE_RAW = 2;
   }
 
   SDK sdk = 1;
@@ -862,6 +867,7 @@ enum AudioTrackFeature {
 enum PacketTrailerFeature {
   PTF_USER_TIMESTAMP = 0;
   PTF_FRAME_ID = 1;
+  PTF_USER_DATA = 2;
 }
 
 message DataStream {
@@ -887,6 +893,15 @@ message DataStream {
     string name = 1;
   }
 
+  // The compression type of the whole data stream
+  //
+  // This will only get populated when send to participants with a
+  // client protocol >= 2 which advertise a client capability of CAP_COMPRESSION_DEFLATE_RAW
+  enum CompressionType {
+    NONE = 0;
+    DEFLATE_RAW = 1; // DEFLATE_RAW = DEFLATE without header+checksum/trailer
+  }
+
   // main DataStream.Header that contains a oneof for specific headers
   message Header {
     string stream_id = 1 [(logger.name) = "streamID"]; // unique identifier for this data stream
@@ -902,6 +917,10 @@ message DataStream {
       TextHeader text_header = 9;
       ByteHeader byte_header = 10;
     }
+
+    // Optional inline content so that a data stream can be sent as a single packet for short payloads.
+    optional bytes inline_content = 11; // content as binary (bytes)
+    CompressionType compression = 12;
   }
 
   message Chunk {
