@@ -72,10 +72,30 @@ message SimulationRun {
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
     Usage usage = 13;
+    // Audio-mode pipeline metrics aggregated over the call's measured turns.
+    // Only populated for audio jobs. A -1 field means the datum was
+    // unavailable (Tier-1 metrics require the agent's backchannel).
+    AudioMetrics audio_metrics = 14;
 
     message Usage {
       int32 text_turns_count = 1;
       int32 audio_turns_count = 2;
+    }
+
+    message AudioMetrics {
+      // Tier 0 — true end-to-end response latency off the waveform (our
+      // playout end -> the agent's speech onset). Always present for audio.
+      float e2e_latency_p50_s = 1;
+      float e2e_latency_p95_s = 2;
+      // Tier 1 — mean over turns; -1 when the backchannel is absent.
+      float wer = 3;          // normalized word error rate of the agent's STT of us
+      float llm_ttft_s = 4;
+      float stt_delay_s = 5;
+      float tts_ttfb_s = 6;
+      // Call-level barge-in count.
+      int32 interruptions = 7;
+      // Turns that contributed measurements (context for the aggregates).
+      int32 sample_count = 8;
     }
   }
 
