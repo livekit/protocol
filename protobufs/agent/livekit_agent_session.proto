@@ -222,6 +222,7 @@ message AgentSessionEvent {
     string transcript = 1;
     bool is_final = 2;
     optional string language = 3;
+    string item_id = 4;
   }
 
   message FunctionToolsStarted {

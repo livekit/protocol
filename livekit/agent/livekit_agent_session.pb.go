@@ -2860,6 +2860,7 @@ type AgentSessionEvent_UserInputTranscribed struct {
 	Transcript    string                 `protobuf:"bytes,1,opt,name=transcript,proto3" json:"transcript,omitempty"`
 	IsFinal       bool                   `protobuf:"varint,2,opt,name=is_final,json=isFinal,proto3" json:"is_final,omitempty"`
 	Language      *string                `protobuf:"bytes,3,opt,name=language,proto3,oneof" json:"language,omitempty"`
+	ItemId        string                 `protobuf:"bytes,4,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2911,6 +2912,13 @@ func (x *AgentSessionEvent_UserInputTranscribed) GetIsFinal() bool {
 func (x *AgentSessionEvent_UserInputTranscribed) GetLanguage() string {
 	if x != nil && x.Language != nil {
 		return *x.Language
+	}
+	return ""
+}
+
+func (x *AgentSessionEvent_UserInputTranscribed) GetItemId() string {
+	if x != nil {
+		return x.ItemId
 	}
 	return ""
 }
