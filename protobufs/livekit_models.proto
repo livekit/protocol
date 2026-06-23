@@ -304,6 +304,26 @@ message DataTrackSubscriptionOptions {
   optional uint32 target_fps = 1;
 }
 
+// Key used to uniquely identify a data blob for storage and retrieval.
+message DataBlobKey {
+  oneof key {
+    // Generic string key, blob contains arbitrary data.
+    string generic = 1;
+    // Add additional key types here for storing specific types of blobs.
+  }
+}
+
+// A blob of data stored in a room identified by a unique key.
+message DataBlob {
+  // Unique key the data blob is identified by.
+  DataBlobKey key = 1;
+  // Contents of the data blob. This must not exceed 50 KB.
+  bytes contents = 2 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
+}
+
 enum VideoQuality {
   LOW = 0;
   MEDIUM = 1;
