@@ -348,156 +348,6 @@ func (TrackSource) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{5}
 }
 
-// Well-known encoding for frame payloads.
-//
-// Mirrors the well-known message encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#message-encodings
-type DataTrackWellKnownFrameEncoding int32
-
-const (
-	DataTrackWellKnownFrameEncoding_DTFE_UNSPECIFIED DataTrackWellKnownFrameEncoding = 0
-	// ROS 1: must be described by `ROS1_MSG` schema encoding.
-	DataTrackWellKnownFrameEncoding_DTFE_ROS1 DataTrackWellKnownFrameEncoding = 1
-	// CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
-	DataTrackWellKnownFrameEncoding_DTFE_CDR DataTrackWellKnownFrameEncoding = 2
-	// Protocol Buffer: must be described by `PROTOBUF` schema encoding.
-	DataTrackWellKnownFrameEncoding_DTFE_PROTOBUF DataTrackWellKnownFrameEncoding = 3
-	// FlatBuffer: must be described by `FLATBUFFER` schema encoding.
-	DataTrackWellKnownFrameEncoding_DTFE_FLATBUFFER DataTrackWellKnownFrameEncoding = 4
-	// CBOR: self-describing.
-	DataTrackWellKnownFrameEncoding_DTFE_CBOR DataTrackWellKnownFrameEncoding = 5
-	// MessagePack: self-describing.
-	DataTrackWellKnownFrameEncoding_DTFE_MSGPACK DataTrackWellKnownFrameEncoding = 6
-	// JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
-	DataTrackWellKnownFrameEncoding_DTFE_JSON DataTrackWellKnownFrameEncoding = 7
-)
-
-// Enum value maps for DataTrackWellKnownFrameEncoding.
-var (
-	DataTrackWellKnownFrameEncoding_name = map[int32]string{
-		0: "DTFE_UNSPECIFIED",
-		1: "DTFE_ROS1",
-		2: "DTFE_CDR",
-		3: "DTFE_PROTOBUF",
-		4: "DTFE_FLATBUFFER",
-		5: "DTFE_CBOR",
-		6: "DTFE_MSGPACK",
-		7: "DTFE_JSON",
-	}
-	DataTrackWellKnownFrameEncoding_value = map[string]int32{
-		"DTFE_UNSPECIFIED": 0,
-		"DTFE_ROS1":        1,
-		"DTFE_CDR":         2,
-		"DTFE_PROTOBUF":    3,
-		"DTFE_FLATBUFFER":  4,
-		"DTFE_CBOR":        5,
-		"DTFE_MSGPACK":     6,
-		"DTFE_JSON":        7,
-	}
-)
-
-func (x DataTrackWellKnownFrameEncoding) Enum() *DataTrackWellKnownFrameEncoding {
-	p := new(DataTrackWellKnownFrameEncoding)
-	*p = x
-	return p
-}
-
-func (x DataTrackWellKnownFrameEncoding) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (DataTrackWellKnownFrameEncoding) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[6].Descriptor()
-}
-
-func (DataTrackWellKnownFrameEncoding) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[6]
-}
-
-func (x DataTrackWellKnownFrameEncoding) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use DataTrackWellKnownFrameEncoding.Descriptor instead.
-func (DataTrackWellKnownFrameEncoding) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{6}
-}
-
-// Well-known encoding for schema definition.
-//
-// Mirrors the well-known schema encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#schema-encodings
-type DataTrackWellKnownSchemaEncoding int32
-
-const (
-	DataTrackWellKnownSchemaEncoding_DTSE_UNSPECIFIED DataTrackWellKnownSchemaEncoding = 0
-	// Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_PROTOBUF DataTrackWellKnownSchemaEncoding = 1
-	// FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_FLATBUFFER DataTrackWellKnownSchemaEncoding = 2
-	// ROS 1 Message: describes `ROS1` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_ROS1_MSG DataTrackWellKnownSchemaEncoding = 3
-	// ROS 2 Message: describes `CDR` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_ROS2_MSG DataTrackWellKnownSchemaEncoding = 4
-	// ROS 2 IDL: describes `CDR` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_ROS2_IDL DataTrackWellKnownSchemaEncoding = 5
-	// OMG IDL: describes `CDR` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_OMG_IDL DataTrackWellKnownSchemaEncoding = 6
-	// JSON Schema: describes `JSON` frame encoding.
-	DataTrackWellKnownSchemaEncoding_DTSE_JSON_SCHEMA DataTrackWellKnownSchemaEncoding = 7
-)
-
-// Enum value maps for DataTrackWellKnownSchemaEncoding.
-var (
-	DataTrackWellKnownSchemaEncoding_name = map[int32]string{
-		0: "DTSE_UNSPECIFIED",
-		1: "DTSE_PROTOBUF",
-		2: "DTSE_FLATBUFFER",
-		3: "DTSE_ROS1_MSG",
-		4: "DTSE_ROS2_MSG",
-		5: "DTSE_ROS2_IDL",
-		6: "DTSE_OMG_IDL",
-		7: "DTSE_JSON_SCHEMA",
-	}
-	DataTrackWellKnownSchemaEncoding_value = map[string]int32{
-		"DTSE_UNSPECIFIED": 0,
-		"DTSE_PROTOBUF":    1,
-		"DTSE_FLATBUFFER":  2,
-		"DTSE_ROS1_MSG":    3,
-		"DTSE_ROS2_MSG":    4,
-		"DTSE_ROS2_IDL":    5,
-		"DTSE_OMG_IDL":     6,
-		"DTSE_JSON_SCHEMA": 7,
-	}
-)
-
-func (x DataTrackWellKnownSchemaEncoding) Enum() *DataTrackWellKnownSchemaEncoding {
-	p := new(DataTrackWellKnownSchemaEncoding)
-	*p = x
-	return p
-}
-
-func (x DataTrackWellKnownSchemaEncoding) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (DataTrackWellKnownSchemaEncoding) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[7].Descriptor()
-}
-
-func (DataTrackWellKnownSchemaEncoding) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[7]
-}
-
-func (x DataTrackWellKnownSchemaEncoding) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use DataTrackWellKnownSchemaEncoding.Descriptor instead.
-func (DataTrackWellKnownSchemaEncoding) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{7}
-}
-
 type DataTrackExtensionID int32
 
 const (
@@ -528,11 +378,11 @@ func (x DataTrackExtensionID) String() string {
 }
 
 func (DataTrackExtensionID) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[8].Descriptor()
+	return file_livekit_models_proto_enumTypes[6].Descriptor()
 }
 
 func (DataTrackExtensionID) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[8]
+	return &file_livekit_models_proto_enumTypes[6]
 }
 
 func (x DataTrackExtensionID) Number() protoreflect.EnumNumber {
@@ -541,7 +391,7 @@ func (x DataTrackExtensionID) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DataTrackExtensionID.Descriptor instead.
 func (DataTrackExtensionID) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{8}
+	return file_livekit_models_proto_rawDescGZIP(), []int{6}
 }
 
 type VideoQuality int32
@@ -580,11 +430,11 @@ func (x VideoQuality) String() string {
 }
 
 func (VideoQuality) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[9].Descriptor()
+	return file_livekit_models_proto_enumTypes[7].Descriptor()
 }
 
 func (VideoQuality) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[9]
+	return &file_livekit_models_proto_enumTypes[7]
 }
 
 func (x VideoQuality) Number() protoreflect.EnumNumber {
@@ -593,7 +443,7 @@ func (x VideoQuality) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use VideoQuality.Descriptor instead.
 func (VideoQuality) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{9}
+	return file_livekit_models_proto_rawDescGZIP(), []int{7}
 }
 
 type ConnectionQuality int32
@@ -632,11 +482,11 @@ func (x ConnectionQuality) String() string {
 }
 
 func (ConnectionQuality) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[10].Descriptor()
+	return file_livekit_models_proto_enumTypes[8].Descriptor()
 }
 
 func (ConnectionQuality) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[10]
+	return &file_livekit_models_proto_enumTypes[8]
 }
 
 func (x ConnectionQuality) Number() protoreflect.EnumNumber {
@@ -645,7 +495,7 @@ func (x ConnectionQuality) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ConnectionQuality.Descriptor instead.
 func (ConnectionQuality) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{10}
+	return file_livekit_models_proto_rawDescGZIP(), []int{8}
 }
 
 type ClientConfigSetting int32
@@ -681,11 +531,11 @@ func (x ClientConfigSetting) String() string {
 }
 
 func (ClientConfigSetting) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[11].Descriptor()
+	return file_livekit_models_proto_enumTypes[9].Descriptor()
 }
 
 func (ClientConfigSetting) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[11]
+	return &file_livekit_models_proto_enumTypes[9]
 }
 
 func (x ClientConfigSetting) Number() protoreflect.EnumNumber {
@@ -694,7 +544,7 @@ func (x ClientConfigSetting) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ClientConfigSetting.Descriptor instead.
 func (ClientConfigSetting) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{11}
+	return file_livekit_models_proto_rawDescGZIP(), []int{9}
 }
 
 type DisconnectReason int32
@@ -788,11 +638,11 @@ func (x DisconnectReason) String() string {
 }
 
 func (DisconnectReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[12].Descriptor()
+	return file_livekit_models_proto_enumTypes[10].Descriptor()
 }
 
 func (DisconnectReason) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[12]
+	return &file_livekit_models_proto_enumTypes[10]
 }
 
 func (x DisconnectReason) Number() protoreflect.EnumNumber {
@@ -801,7 +651,7 @@ func (x DisconnectReason) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DisconnectReason.Descriptor instead.
 func (DisconnectReason) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{12}
+	return file_livekit_models_proto_rawDescGZIP(), []int{10}
 }
 
 type ReconnectReason int32
@@ -843,11 +693,11 @@ func (x ReconnectReason) String() string {
 }
 
 func (ReconnectReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[13].Descriptor()
+	return file_livekit_models_proto_enumTypes[11].Descriptor()
 }
 
 func (ReconnectReason) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[13]
+	return &file_livekit_models_proto_enumTypes[11]
 }
 
 func (x ReconnectReason) Number() protoreflect.EnumNumber {
@@ -856,7 +706,7 @@ func (x ReconnectReason) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ReconnectReason.Descriptor instead.
 func (ReconnectReason) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{13}
+	return file_livekit_models_proto_rawDescGZIP(), []int{11}
 }
 
 type SubscriptionError int32
@@ -892,11 +742,11 @@ func (x SubscriptionError) String() string {
 }
 
 func (SubscriptionError) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[14].Descriptor()
+	return file_livekit_models_proto_enumTypes[12].Descriptor()
 }
 
 func (SubscriptionError) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[14]
+	return &file_livekit_models_proto_enumTypes[12]
 }
 
 func (x SubscriptionError) Number() protoreflect.EnumNumber {
@@ -905,7 +755,7 @@ func (x SubscriptionError) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SubscriptionError.Descriptor instead.
 func (SubscriptionError) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{14}
+	return file_livekit_models_proto_rawDescGZIP(), []int{12}
 }
 
 type AudioTrackFeature int32
@@ -953,11 +803,11 @@ func (x AudioTrackFeature) String() string {
 }
 
 func (AudioTrackFeature) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[15].Descriptor()
+	return file_livekit_models_proto_enumTypes[13].Descriptor()
 }
 
 func (AudioTrackFeature) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[15]
+	return &file_livekit_models_proto_enumTypes[13]
 }
 
 func (x AudioTrackFeature) Number() protoreflect.EnumNumber {
@@ -966,7 +816,7 @@ func (x AudioTrackFeature) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AudioTrackFeature.Descriptor instead.
 func (AudioTrackFeature) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{15}
+	return file_livekit_models_proto_rawDescGZIP(), []int{13}
 }
 
 type PacketTrailerFeature int32
@@ -1002,11 +852,11 @@ func (x PacketTrailerFeature) String() string {
 }
 
 func (PacketTrailerFeature) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[16].Descriptor()
+	return file_livekit_models_proto_enumTypes[14].Descriptor()
 }
 
 func (PacketTrailerFeature) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[16]
+	return &file_livekit_models_proto_enumTypes[14]
 }
 
 func (x PacketTrailerFeature) Number() protoreflect.EnumNumber {
@@ -1015,7 +865,7 @@ func (x PacketTrailerFeature) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PacketTrailerFeature.Descriptor instead.
 func (PacketTrailerFeature) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_models_proto_rawDescGZIP(), []int{16}
+	return file_livekit_models_proto_rawDescGZIP(), []int{14}
 }
 
 type ParticipantInfo_State int32
@@ -1058,11 +908,11 @@ func (x ParticipantInfo_State) String() string {
 }
 
 func (ParticipantInfo_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[17].Descriptor()
+	return file_livekit_models_proto_enumTypes[15].Descriptor()
 }
 
 func (ParticipantInfo_State) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[17]
+	return &file_livekit_models_proto_enumTypes[15]
 }
 
 func (x ParticipantInfo_State) Number() protoreflect.EnumNumber {
@@ -1126,11 +976,11 @@ func (x ParticipantInfo_Kind) String() string {
 }
 
 func (ParticipantInfo_Kind) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[18].Descriptor()
+	return file_livekit_models_proto_enumTypes[16].Descriptor()
 }
 
 func (ParticipantInfo_Kind) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[18]
+	return &file_livekit_models_proto_enumTypes[16]
 }
 
 func (x ParticipantInfo_Kind) Number() protoreflect.EnumNumber {
@@ -1181,11 +1031,11 @@ func (x ParticipantInfo_KindDetail) String() string {
 }
 
 func (ParticipantInfo_KindDetail) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[19].Descriptor()
+	return file_livekit_models_proto_enumTypes[17].Descriptor()
 }
 
 func (ParticipantInfo_KindDetail) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[19]
+	return &file_livekit_models_proto_enumTypes[17]
 }
 
 func (x ParticipantInfo_KindDetail) Number() protoreflect.EnumNumber {
@@ -1230,11 +1080,11 @@ func (x Encryption_Type) String() string {
 }
 
 func (Encryption_Type) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_models_proto_enumTypes[20].Descriptor()
+	return file_livekit_models_proto_enumTypes[18].Descriptor()
 }
 
 func (Encryption_Type) Type() protoreflect.EnumType {
-	return &file_livekit_models_proto_enumTypes[20]
+	return &file_livekit_models_proto_enumTypes[18]
 }
 
 func (x Encryption_Type) Number() protoreflect.EnumNumber {
@@ -1244,6 +1094,156 @@ func (x Encryption_Type) Number() protoreflect.EnumNumber {
 // Deprecated: Use Encryption_Type.Descriptor instead.
 func (Encryption_Type) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{8, 0}
+}
+
+// Well-known encoding for frame payloads.
+//
+// Mirrors the well-known message encodings from the MCAP spec:
+// https://mcap.dev/spec/registry#message-encodings
+type DataTrackFrameEncoding_WellKnownFrameEncoding int32
+
+const (
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED DataTrackFrameEncoding_WellKnownFrameEncoding = 0
+	// ROS 1: must be described by `ROS1_MSG` schema encoding.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_ROS1 DataTrackFrameEncoding_WellKnownFrameEncoding = 1
+	// CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_CDR DataTrackFrameEncoding_WellKnownFrameEncoding = 2
+	// Protocol Buffer: must be described by `PROTOBUF` schema encoding.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_PROTOBUF DataTrackFrameEncoding_WellKnownFrameEncoding = 3
+	// FlatBuffer: must be described by `FLATBUFFER` schema encoding.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_FLATBUFFER DataTrackFrameEncoding_WellKnownFrameEncoding = 4
+	// CBOR: self-describing.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_CBOR DataTrackFrameEncoding_WellKnownFrameEncoding = 5
+	// MessagePack: self-describing.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_MSGPACK DataTrackFrameEncoding_WellKnownFrameEncoding = 6
+	// JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
+	DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_JSON DataTrackFrameEncoding_WellKnownFrameEncoding = 7
+)
+
+// Enum value maps for DataTrackFrameEncoding_WellKnownFrameEncoding.
+var (
+	DataTrackFrameEncoding_WellKnownFrameEncoding_name = map[int32]string{
+		0: "WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED",
+		1: "WELL_KNOWN_FRAME_ENCODING_ROS1",
+		2: "WELL_KNOWN_FRAME_ENCODING_CDR",
+		3: "WELL_KNOWN_FRAME_ENCODING_PROTOBUF",
+		4: "WELL_KNOWN_FRAME_ENCODING_FLATBUFFER",
+		5: "WELL_KNOWN_FRAME_ENCODING_CBOR",
+		6: "WELL_KNOWN_FRAME_ENCODING_MSGPACK",
+		7: "WELL_KNOWN_FRAME_ENCODING_JSON",
+	}
+	DataTrackFrameEncoding_WellKnownFrameEncoding_value = map[string]int32{
+		"WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED": 0,
+		"WELL_KNOWN_FRAME_ENCODING_ROS1":        1,
+		"WELL_KNOWN_FRAME_ENCODING_CDR":         2,
+		"WELL_KNOWN_FRAME_ENCODING_PROTOBUF":    3,
+		"WELL_KNOWN_FRAME_ENCODING_FLATBUFFER":  4,
+		"WELL_KNOWN_FRAME_ENCODING_CBOR":        5,
+		"WELL_KNOWN_FRAME_ENCODING_MSGPACK":     6,
+		"WELL_KNOWN_FRAME_ENCODING_JSON":        7,
+	}
+)
+
+func (x DataTrackFrameEncoding_WellKnownFrameEncoding) Enum() *DataTrackFrameEncoding_WellKnownFrameEncoding {
+	p := new(DataTrackFrameEncoding_WellKnownFrameEncoding)
+	*p = x
+	return p
+}
+
+func (x DataTrackFrameEncoding_WellKnownFrameEncoding) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DataTrackFrameEncoding_WellKnownFrameEncoding) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_models_proto_enumTypes[19].Descriptor()
+}
+
+func (DataTrackFrameEncoding_WellKnownFrameEncoding) Type() protoreflect.EnumType {
+	return &file_livekit_models_proto_enumTypes[19]
+}
+
+func (x DataTrackFrameEncoding_WellKnownFrameEncoding) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DataTrackFrameEncoding_WellKnownFrameEncoding.Descriptor instead.
+func (DataTrackFrameEncoding_WellKnownFrameEncoding) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{12, 0}
+}
+
+// Well-known encoding for schema definition.
+//
+// Mirrors the well-known schema encodings from the MCAP spec:
+// https://mcap.dev/spec/registry#schema-encodings
+type DataTrackSchemaEncoding_WellKnownSchemaEncoding int32
+
+const (
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED DataTrackSchemaEncoding_WellKnownSchemaEncoding = 0
+	// Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF DataTrackSchemaEncoding_WellKnownSchemaEncoding = 1
+	// FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER DataTrackSchemaEncoding_WellKnownSchemaEncoding = 2
+	// ROS 1 Message: describes `ROS1` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG DataTrackSchemaEncoding_WellKnownSchemaEncoding = 3
+	// ROS 2 Message: describes `CDR` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG DataTrackSchemaEncoding_WellKnownSchemaEncoding = 4
+	// ROS 2 IDL: describes `CDR` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL DataTrackSchemaEncoding_WellKnownSchemaEncoding = 5
+	// OMG IDL: describes `CDR` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL DataTrackSchemaEncoding_WellKnownSchemaEncoding = 6
+	// JSON Schema: describes `JSON` frame encoding.
+	DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA DataTrackSchemaEncoding_WellKnownSchemaEncoding = 7
+)
+
+// Enum value maps for DataTrackSchemaEncoding_WellKnownSchemaEncoding.
+var (
+	DataTrackSchemaEncoding_WellKnownSchemaEncoding_name = map[int32]string{
+		0: "WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED",
+		1: "WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF",
+		2: "WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER",
+		3: "WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG",
+		4: "WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG",
+		5: "WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL",
+		6: "WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL",
+		7: "WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA",
+	}
+	DataTrackSchemaEncoding_WellKnownSchemaEncoding_value = map[string]int32{
+		"WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED": 0,
+		"WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF":    1,
+		"WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER":  2,
+		"WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG":    3,
+		"WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG":    4,
+		"WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL":    5,
+		"WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL":     6,
+		"WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA": 7,
+	}
+)
+
+func (x DataTrackSchemaEncoding_WellKnownSchemaEncoding) Enum() *DataTrackSchemaEncoding_WellKnownSchemaEncoding {
+	p := new(DataTrackSchemaEncoding_WellKnownSchemaEncoding)
+	*p = x
+	return p
+}
+
+func (x DataTrackSchemaEncoding_WellKnownSchemaEncoding) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (DataTrackSchemaEncoding_WellKnownSchemaEncoding) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_models_proto_enumTypes[20].Descriptor()
+}
+
+func (DataTrackSchemaEncoding_WellKnownSchemaEncoding) Type() protoreflect.EnumType {
+	return &file_livekit_models_proto_enumTypes[20]
+}
+
+func (x DataTrackSchemaEncoding_WellKnownSchemaEncoding) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use DataTrackSchemaEncoding_WellKnownSchemaEncoding.Descriptor instead.
+func (DataTrackSchemaEncoding_WellKnownSchemaEncoding) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_models_proto_rawDescGZIP(), []int{13, 0}
 }
 
 type VideoLayer_Mode int32
@@ -2870,13 +2870,13 @@ func (x *DataTrackFrameEncoding) GetEncoding() isDataTrackFrameEncoding_Encoding
 	return nil
 }
 
-func (x *DataTrackFrameEncoding) GetWellKnown() DataTrackWellKnownFrameEncoding {
+func (x *DataTrackFrameEncoding) GetWellKnown() DataTrackFrameEncoding_WellKnownFrameEncoding {
 	if x != nil {
 		if x, ok := x.Encoding.(*DataTrackFrameEncoding_WellKnown); ok {
 			return x.WellKnown
 		}
 	}
-	return DataTrackWellKnownFrameEncoding_DTFE_UNSPECIFIED
+	return DataTrackFrameEncoding_WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED
 }
 
 func (x *DataTrackFrameEncoding) GetCustom() string {
@@ -2893,7 +2893,7 @@ type isDataTrackFrameEncoding_Encoding interface {
 }
 
 type DataTrackFrameEncoding_WellKnown struct {
-	WellKnown DataTrackWellKnownFrameEncoding `protobuf:"varint,1,opt,name=well_known,json=wellKnown,proto3,enum=livekit.DataTrackWellKnownFrameEncoding,oneof"`
+	WellKnown DataTrackFrameEncoding_WellKnownFrameEncoding `protobuf:"varint,1,opt,name=well_known,json=wellKnown,proto3,enum=livekit.DataTrackFrameEncoding_WellKnownFrameEncoding,oneof"`
 }
 
 type DataTrackFrameEncoding_Custom struct {
@@ -2954,13 +2954,13 @@ func (x *DataTrackSchemaEncoding) GetEncoding() isDataTrackSchemaEncoding_Encodi
 	return nil
 }
 
-func (x *DataTrackSchemaEncoding) GetWellKnown() DataTrackWellKnownSchemaEncoding {
+func (x *DataTrackSchemaEncoding) GetWellKnown() DataTrackSchemaEncoding_WellKnownSchemaEncoding {
 	if x != nil {
 		if x, ok := x.Encoding.(*DataTrackSchemaEncoding_WellKnown); ok {
 			return x.WellKnown
 		}
 	}
-	return DataTrackWellKnownSchemaEncoding_DTSE_UNSPECIFIED
+	return DataTrackSchemaEncoding_WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED
 }
 
 func (x *DataTrackSchemaEncoding) GetCustom() string {
@@ -2977,7 +2977,7 @@ type isDataTrackSchemaEncoding_Encoding interface {
 }
 
 type DataTrackSchemaEncoding_WellKnown struct {
-	WellKnown DataTrackWellKnownSchemaEncoding `protobuf:"varint,1,opt,name=well_known,json=wellKnown,proto3,enum=livekit.DataTrackWellKnownSchemaEncoding,oneof"`
+	WellKnown DataTrackSchemaEncoding_WellKnownSchemaEncoding `protobuf:"varint,1,opt,name=well_known,json=wellKnown,proto3,enum=livekit.DataTrackSchemaEncoding_WellKnownSchemaEncoding,oneof"`
 }
 
 type DataTrackSchemaEncoding_Custom struct {
@@ -6952,17 +6952,35 @@ const file_livekit_models_proto_rawDesc = "" +
 	"encryption\x12F\n" +
 	"\x0eframe_encoding\x18\x05 \x01(\v2\x1f.livekit.DataTrackFrameEncodingR\rframeEncoding\x127\n" +
 	"\x06schema\x18\x06 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x00R\x06schema\x88\x01\x01B\t\n" +
-	"\a_schema\"\x89\x01\n" +
-	"\x16DataTrackFrameEncoding\x12I\n" +
+	"\a_schema\"\xe5\x03\n" +
+	"\x16DataTrackFrameEncoding\x12W\n" +
 	"\n" +
-	"well_known\x18\x01 \x01(\x0e2(.livekit.DataTrackWellKnownFrameEncodingH\x00R\twellKnown\x12\x18\n" +
-	"\x06custom\x18\x02 \x01(\tH\x00R\x06customB\n" +
+	"well_known\x18\x01 \x01(\x0e26.livekit.DataTrackFrameEncoding.WellKnownFrameEncodingH\x00R\twellKnown\x12\x18\n" +
+	"\x06custom\x18\x02 \x01(\tH\x00R\x06custom\"\xcb\x02\n" +
+	"\x16WellKnownFrameEncoding\x12)\n" +
+	"%WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED\x10\x00\x12\"\n" +
+	"\x1eWELL_KNOWN_FRAME_ENCODING_ROS1\x10\x01\x12!\n" +
+	"\x1dWELL_KNOWN_FRAME_ENCODING_CDR\x10\x02\x12&\n" +
+	"\"WELL_KNOWN_FRAME_ENCODING_PROTOBUF\x10\x03\x12(\n" +
+	"$WELL_KNOWN_FRAME_ENCODING_FLATBUFFER\x10\x04\x12\"\n" +
+	"\x1eWELL_KNOWN_FRAME_ENCODING_CBOR\x10\x05\x12%\n" +
+	"!WELL_KNOWN_FRAME_ENCODING_MSGPACK\x10\x06\x12\"\n" +
+	"\x1eWELL_KNOWN_FRAME_ENCODING_JSON\x10\aB\n" +
 	"\n" +
-	"\bencoding\"\x8b\x01\n" +
-	"\x17DataTrackSchemaEncoding\x12J\n" +
+	"\bencoding\"\x85\x04\n" +
+	"\x17DataTrackSchemaEncoding\x12Y\n" +
 	"\n" +
-	"well_known\x18\x01 \x01(\x0e2).livekit.DataTrackWellKnownSchemaEncodingH\x00R\twellKnown\x12\x18\n" +
-	"\x06custom\x18\x02 \x01(\tH\x00R\x06customB\n" +
+	"well_known\x18\x01 \x01(\x0e28.livekit.DataTrackSchemaEncoding.WellKnownSchemaEncodingH\x00R\twellKnown\x12\x18\n" +
+	"\x06custom\x18\x02 \x01(\tH\x00R\x06custom\"\xe8\x02\n" +
+	"\x17WellKnownSchemaEncoding\x12*\n" +
+	"&WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED\x10\x00\x12'\n" +
+	"#WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF\x10\x01\x12)\n" +
+	"%WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER\x10\x02\x12'\n" +
+	"#WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG\x10\x03\x12'\n" +
+	"#WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG\x10\x04\x12'\n" +
+	"#WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL\x10\x05\x12&\n" +
+	"\"WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL\x10\x06\x12*\n" +
+	"&WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA\x10\aB\n" +
 	"\n" +
 	"\bencoding\"e\n" +
 	"\x11DataTrackSchemaId\x12\x12\n" +
@@ -7405,25 +7423,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"MICROPHONE\x10\x02\x12\x10\n" +
 	"\fSCREEN_SHARE\x10\x03\x12\x16\n" +
-	"\x12SCREEN_SHARE_AUDIO\x10\x04*\xac\x01\n" +
-	"\x1fDataTrackWellKnownFrameEncoding\x12\x14\n" +
-	"\x10DTFE_UNSPECIFIED\x10\x00\x12\r\n" +
-	"\tDTFE_ROS1\x10\x01\x12\f\n" +
-	"\bDTFE_CDR\x10\x02\x12\x11\n" +
-	"\rDTFE_PROTOBUF\x10\x03\x12\x13\n" +
-	"\x0fDTFE_FLATBUFFER\x10\x04\x12\r\n" +
-	"\tDTFE_CBOR\x10\x05\x12\x10\n" +
-	"\fDTFE_MSGPACK\x10\x06\x12\r\n" +
-	"\tDTFE_JSON\x10\a*\xc1\x01\n" +
-	" DataTrackWellKnownSchemaEncoding\x12\x14\n" +
-	"\x10DTSE_UNSPECIFIED\x10\x00\x12\x11\n" +
-	"\rDTSE_PROTOBUF\x10\x01\x12\x13\n" +
-	"\x0fDTSE_FLATBUFFER\x10\x02\x12\x11\n" +
-	"\rDTSE_ROS1_MSG\x10\x03\x12\x11\n" +
-	"\rDTSE_ROS2_MSG\x10\x04\x12\x11\n" +
-	"\rDTSE_ROS2_IDL\x10\x05\x12\x10\n" +
-	"\fDTSE_OMG_IDL\x10\x06\x12\x14\n" +
-	"\x10DTSE_JSON_SCHEMA\x10\a*B\n" +
+	"\x12SCREEN_SHARE_AUDIO\x10\x04*B\n" +
 	"\x14DataTrackExtensionID\x12\x10\n" +
 	"\fDTEI_INVALID\x10\x00\x12\x18\n" +
 	"\x14DTEI_PARTICIPANT_SID\x10\x01*6\n" +
@@ -7501,108 +7501,108 @@ func file_livekit_models_proto_rawDescGZIP() []byte {
 var file_livekit_models_proto_enumTypes = make([]protoimpl.EnumInfo, 28)
 var file_livekit_models_proto_msgTypes = make([]protoimpl.MessageInfo, 60)
 var file_livekit_models_proto_goTypes = []any{
-	(AudioCodec)(0),                          // 0: livekit.AudioCodec
-	(VideoCodec)(0),                          // 1: livekit.VideoCodec
-	(ImageCodec)(0),                          // 2: livekit.ImageCodec
-	(BackupCodecPolicy)(0),                   // 3: livekit.BackupCodecPolicy
-	(TrackType)(0),                           // 4: livekit.TrackType
-	(TrackSource)(0),                         // 5: livekit.TrackSource
-	(DataTrackWellKnownFrameEncoding)(0),     // 6: livekit.DataTrackWellKnownFrameEncoding
-	(DataTrackWellKnownSchemaEncoding)(0),    // 7: livekit.DataTrackWellKnownSchemaEncoding
-	(DataTrackExtensionID)(0),                // 8: livekit.DataTrackExtensionID
-	(VideoQuality)(0),                        // 9: livekit.VideoQuality
-	(ConnectionQuality)(0),                   // 10: livekit.ConnectionQuality
-	(ClientConfigSetting)(0),                 // 11: livekit.ClientConfigSetting
-	(DisconnectReason)(0),                    // 12: livekit.DisconnectReason
-	(ReconnectReason)(0),                     // 13: livekit.ReconnectReason
-	(SubscriptionError)(0),                   // 14: livekit.SubscriptionError
-	(AudioTrackFeature)(0),                   // 15: livekit.AudioTrackFeature
-	(PacketTrailerFeature)(0),                // 16: livekit.PacketTrailerFeature
-	(ParticipantInfo_State)(0),               // 17: livekit.ParticipantInfo.State
-	(ParticipantInfo_Kind)(0),                // 18: livekit.ParticipantInfo.Kind
-	(ParticipantInfo_KindDetail)(0),          // 19: livekit.ParticipantInfo.KindDetail
-	(Encryption_Type)(0),                     // 20: livekit.Encryption.Type
-	(VideoLayer_Mode)(0),                     // 21: livekit.VideoLayer.Mode
-	(DataPacket_Kind)(0),                     // 22: livekit.DataPacket.Kind
-	(ServerInfo_Edition)(0),                  // 23: livekit.ServerInfo.Edition
-	(ClientInfo_SDK)(0),                      // 24: livekit.ClientInfo.SDK
-	(ClientInfo_Capability)(0),               // 25: livekit.ClientInfo.Capability
-	(DataStream_OperationType)(0),            // 26: livekit.DataStream.OperationType
-	(DataStream_CompressionType)(0),          // 27: livekit.DataStream.CompressionType
-	(*Pagination)(nil),                       // 28: livekit.Pagination
-	(*TokenPagination)(nil),                  // 29: livekit.TokenPagination
-	(*ListUpdate)(nil),                       // 30: livekit.ListUpdate
-	(*Room)(nil),                             // 31: livekit.Room
-	(*Codec)(nil),                            // 32: livekit.Codec
-	(*PlayoutDelay)(nil),                     // 33: livekit.PlayoutDelay
-	(*ParticipantPermission)(nil),            // 34: livekit.ParticipantPermission
-	(*ParticipantInfo)(nil),                  // 35: livekit.ParticipantInfo
-	(*Encryption)(nil),                       // 36: livekit.Encryption
-	(*SimulcastCodecInfo)(nil),               // 37: livekit.SimulcastCodecInfo
-	(*TrackInfo)(nil),                        // 38: livekit.TrackInfo
-	(*DataTrackInfo)(nil),                    // 39: livekit.DataTrackInfo
-	(*DataTrackFrameEncoding)(nil),           // 40: livekit.DataTrackFrameEncoding
-	(*DataTrackSchemaEncoding)(nil),          // 41: livekit.DataTrackSchemaEncoding
-	(*DataTrackSchemaId)(nil),                // 42: livekit.DataTrackSchemaId
-	(*DataTrackExtensionParticipantSid)(nil), // 43: livekit.DataTrackExtensionParticipantSid
-	(*DataTrackSubscriptionOptions)(nil),     // 44: livekit.DataTrackSubscriptionOptions
-	(*DataBlobKey)(nil),                      // 45: livekit.DataBlobKey
-	(*DataBlob)(nil),                         // 46: livekit.DataBlob
-	(*VideoLayer)(nil),                       // 47: livekit.VideoLayer
-	(*DataPacket)(nil),                       // 48: livekit.DataPacket
-	(*EncryptedPacket)(nil),                  // 49: livekit.EncryptedPacket
-	(*EncryptedPacketPayload)(nil),           // 50: livekit.EncryptedPacketPayload
-	(*ActiveSpeakerUpdate)(nil),              // 51: livekit.ActiveSpeakerUpdate
-	(*SpeakerInfo)(nil),                      // 52: livekit.SpeakerInfo
-	(*UserPacket)(nil),                       // 53: livekit.UserPacket
-	(*SipDTMF)(nil),                          // 54: livekit.SipDTMF
-	(*Transcription)(nil),                    // 55: livekit.Transcription
-	(*TranscriptionSegment)(nil),             // 56: livekit.TranscriptionSegment
-	(*ChatMessage)(nil),                      // 57: livekit.ChatMessage
-	(*RpcRequest)(nil),                       // 58: livekit.RpcRequest
-	(*RpcAck)(nil),                           // 59: livekit.RpcAck
-	(*RpcResponse)(nil),                      // 60: livekit.RpcResponse
-	(*RpcError)(nil),                         // 61: livekit.RpcError
-	(*ParticipantTracks)(nil),                // 62: livekit.ParticipantTracks
-	(*ServerInfo)(nil),                       // 63: livekit.ServerInfo
-	(*ClientInfo)(nil),                       // 64: livekit.ClientInfo
-	(*ClientConfiguration)(nil),              // 65: livekit.ClientConfiguration
-	(*VideoConfiguration)(nil),               // 66: livekit.VideoConfiguration
-	(*DisabledCodecs)(nil),                   // 67: livekit.DisabledCodecs
-	(*RTPDrift)(nil),                         // 68: livekit.RTPDrift
-	(*RTPStats)(nil),                         // 69: livekit.RTPStats
-	(*RTCPSenderReportState)(nil),            // 70: livekit.RTCPSenderReportState
-	(*RTPForwarderState)(nil),                // 71: livekit.RTPForwarderState
-	(*RTPMungerState)(nil),                   // 72: livekit.RTPMungerState
-	(*VP8MungerState)(nil),                   // 73: livekit.VP8MungerState
-	(*TimedVersion)(nil),                     // 74: livekit.TimedVersion
-	(*DataStream)(nil),                       // 75: livekit.DataStream
-	(*FilterParams)(nil),                     // 76: livekit.FilterParams
-	(*WebhookConfig)(nil),                    // 77: livekit.WebhookConfig
-	(*SubscribedAudioCodec)(nil),             // 78: livekit.SubscribedAudioCodec
-	nil,                                      // 79: livekit.ParticipantInfo.AttributesEntry
-	nil,                                      // 80: livekit.RTPStats.GapHistogramEntry
-	(*DataStream_TextHeader)(nil),            // 81: livekit.DataStream.TextHeader
-	(*DataStream_ByteHeader)(nil),            // 82: livekit.DataStream.ByteHeader
-	(*DataStream_Header)(nil),                // 83: livekit.DataStream.Header
-	(*DataStream_Chunk)(nil),                 // 84: livekit.DataStream.Chunk
-	(*DataStream_Trailer)(nil),               // 85: livekit.DataStream.Trailer
-	nil,                                      // 86: livekit.DataStream.Header.AttributesEntry
-	nil,                                      // 87: livekit.DataStream.Trailer.AttributesEntry
-	(*MetricsBatch)(nil),                     // 88: livekit.MetricsBatch
-	(*timestamppb.Timestamp)(nil),            // 89: google.protobuf.Timestamp
+	(AudioCodec)(0),                                      // 0: livekit.AudioCodec
+	(VideoCodec)(0),                                      // 1: livekit.VideoCodec
+	(ImageCodec)(0),                                      // 2: livekit.ImageCodec
+	(BackupCodecPolicy)(0),                               // 3: livekit.BackupCodecPolicy
+	(TrackType)(0),                                       // 4: livekit.TrackType
+	(TrackSource)(0),                                     // 5: livekit.TrackSource
+	(DataTrackExtensionID)(0),                            // 6: livekit.DataTrackExtensionID
+	(VideoQuality)(0),                                    // 7: livekit.VideoQuality
+	(ConnectionQuality)(0),                               // 8: livekit.ConnectionQuality
+	(ClientConfigSetting)(0),                             // 9: livekit.ClientConfigSetting
+	(DisconnectReason)(0),                                // 10: livekit.DisconnectReason
+	(ReconnectReason)(0),                                 // 11: livekit.ReconnectReason
+	(SubscriptionError)(0),                               // 12: livekit.SubscriptionError
+	(AudioTrackFeature)(0),                               // 13: livekit.AudioTrackFeature
+	(PacketTrailerFeature)(0),                            // 14: livekit.PacketTrailerFeature
+	(ParticipantInfo_State)(0),                           // 15: livekit.ParticipantInfo.State
+	(ParticipantInfo_Kind)(0),                            // 16: livekit.ParticipantInfo.Kind
+	(ParticipantInfo_KindDetail)(0),                      // 17: livekit.ParticipantInfo.KindDetail
+	(Encryption_Type)(0),                                 // 18: livekit.Encryption.Type
+	(DataTrackFrameEncoding_WellKnownFrameEncoding)(0),   // 19: livekit.DataTrackFrameEncoding.WellKnownFrameEncoding
+	(DataTrackSchemaEncoding_WellKnownSchemaEncoding)(0), // 20: livekit.DataTrackSchemaEncoding.WellKnownSchemaEncoding
+	(VideoLayer_Mode)(0),                                 // 21: livekit.VideoLayer.Mode
+	(DataPacket_Kind)(0),                                 // 22: livekit.DataPacket.Kind
+	(ServerInfo_Edition)(0),                              // 23: livekit.ServerInfo.Edition
+	(ClientInfo_SDK)(0),                                  // 24: livekit.ClientInfo.SDK
+	(ClientInfo_Capability)(0),                           // 25: livekit.ClientInfo.Capability
+	(DataStream_OperationType)(0),                        // 26: livekit.DataStream.OperationType
+	(DataStream_CompressionType)(0),                      // 27: livekit.DataStream.CompressionType
+	(*Pagination)(nil),                                   // 28: livekit.Pagination
+	(*TokenPagination)(nil),                              // 29: livekit.TokenPagination
+	(*ListUpdate)(nil),                                   // 30: livekit.ListUpdate
+	(*Room)(nil),                                         // 31: livekit.Room
+	(*Codec)(nil),                                        // 32: livekit.Codec
+	(*PlayoutDelay)(nil),                                 // 33: livekit.PlayoutDelay
+	(*ParticipantPermission)(nil),                        // 34: livekit.ParticipantPermission
+	(*ParticipantInfo)(nil),                              // 35: livekit.ParticipantInfo
+	(*Encryption)(nil),                                   // 36: livekit.Encryption
+	(*SimulcastCodecInfo)(nil),                           // 37: livekit.SimulcastCodecInfo
+	(*TrackInfo)(nil),                                    // 38: livekit.TrackInfo
+	(*DataTrackInfo)(nil),                                // 39: livekit.DataTrackInfo
+	(*DataTrackFrameEncoding)(nil),                       // 40: livekit.DataTrackFrameEncoding
+	(*DataTrackSchemaEncoding)(nil),                      // 41: livekit.DataTrackSchemaEncoding
+	(*DataTrackSchemaId)(nil),                            // 42: livekit.DataTrackSchemaId
+	(*DataTrackExtensionParticipantSid)(nil),             // 43: livekit.DataTrackExtensionParticipantSid
+	(*DataTrackSubscriptionOptions)(nil),                 // 44: livekit.DataTrackSubscriptionOptions
+	(*DataBlobKey)(nil),                                  // 45: livekit.DataBlobKey
+	(*DataBlob)(nil),                                     // 46: livekit.DataBlob
+	(*VideoLayer)(nil),                                   // 47: livekit.VideoLayer
+	(*DataPacket)(nil),                                   // 48: livekit.DataPacket
+	(*EncryptedPacket)(nil),                              // 49: livekit.EncryptedPacket
+	(*EncryptedPacketPayload)(nil),                       // 50: livekit.EncryptedPacketPayload
+	(*ActiveSpeakerUpdate)(nil),                          // 51: livekit.ActiveSpeakerUpdate
+	(*SpeakerInfo)(nil),                                  // 52: livekit.SpeakerInfo
+	(*UserPacket)(nil),                                   // 53: livekit.UserPacket
+	(*SipDTMF)(nil),                                      // 54: livekit.SipDTMF
+	(*Transcription)(nil),                                // 55: livekit.Transcription
+	(*TranscriptionSegment)(nil),                         // 56: livekit.TranscriptionSegment
+	(*ChatMessage)(nil),                                  // 57: livekit.ChatMessage
+	(*RpcRequest)(nil),                                   // 58: livekit.RpcRequest
+	(*RpcAck)(nil),                                       // 59: livekit.RpcAck
+	(*RpcResponse)(nil),                                  // 60: livekit.RpcResponse
+	(*RpcError)(nil),                                     // 61: livekit.RpcError
+	(*ParticipantTracks)(nil),                            // 62: livekit.ParticipantTracks
+	(*ServerInfo)(nil),                                   // 63: livekit.ServerInfo
+	(*ClientInfo)(nil),                                   // 64: livekit.ClientInfo
+	(*ClientConfiguration)(nil),                          // 65: livekit.ClientConfiguration
+	(*VideoConfiguration)(nil),                           // 66: livekit.VideoConfiguration
+	(*DisabledCodecs)(nil),                               // 67: livekit.DisabledCodecs
+	(*RTPDrift)(nil),                                     // 68: livekit.RTPDrift
+	(*RTPStats)(nil),                                     // 69: livekit.RTPStats
+	(*RTCPSenderReportState)(nil),                        // 70: livekit.RTCPSenderReportState
+	(*RTPForwarderState)(nil),                            // 71: livekit.RTPForwarderState
+	(*RTPMungerState)(nil),                               // 72: livekit.RTPMungerState
+	(*VP8MungerState)(nil),                               // 73: livekit.VP8MungerState
+	(*TimedVersion)(nil),                                 // 74: livekit.TimedVersion
+	(*DataStream)(nil),                                   // 75: livekit.DataStream
+	(*FilterParams)(nil),                                 // 76: livekit.FilterParams
+	(*WebhookConfig)(nil),                                // 77: livekit.WebhookConfig
+	(*SubscribedAudioCodec)(nil),                         // 78: livekit.SubscribedAudioCodec
+	nil,                                                  // 79: livekit.ParticipantInfo.AttributesEntry
+	nil,                                                  // 80: livekit.RTPStats.GapHistogramEntry
+	(*DataStream_TextHeader)(nil),                        // 81: livekit.DataStream.TextHeader
+	(*DataStream_ByteHeader)(nil),                        // 82: livekit.DataStream.ByteHeader
+	(*DataStream_Header)(nil),                            // 83: livekit.DataStream.Header
+	(*DataStream_Chunk)(nil),                             // 84: livekit.DataStream.Chunk
+	(*DataStream_Trailer)(nil),                           // 85: livekit.DataStream.Trailer
+	nil,                                                  // 86: livekit.DataStream.Header.AttributesEntry
+	nil,                                                  // 87: livekit.DataStream.Trailer.AttributesEntry
+	(*MetricsBatch)(nil),                                 // 88: livekit.MetricsBatch
+	(*timestamppb.Timestamp)(nil),                        // 89: google.protobuf.Timestamp
 }
 var file_livekit_models_proto_depIdxs = []int32{
 	32, // 0: livekit.Room.enabled_codecs:type_name -> livekit.Codec
 	74, // 1: livekit.Room.version:type_name -> livekit.TimedVersion
 	5,  // 2: livekit.ParticipantPermission.can_publish_sources:type_name -> livekit.TrackSource
-	17, // 3: livekit.ParticipantInfo.state:type_name -> livekit.ParticipantInfo.State
+	15, // 3: livekit.ParticipantInfo.state:type_name -> livekit.ParticipantInfo.State
 	38, // 4: livekit.ParticipantInfo.tracks:type_name -> livekit.TrackInfo
 	34, // 5: livekit.ParticipantInfo.permission:type_name -> livekit.ParticipantPermission
-	18, // 6: livekit.ParticipantInfo.kind:type_name -> livekit.ParticipantInfo.Kind
+	16, // 6: livekit.ParticipantInfo.kind:type_name -> livekit.ParticipantInfo.Kind
 	79, // 7: livekit.ParticipantInfo.attributes:type_name -> livekit.ParticipantInfo.AttributesEntry
-	12, // 8: livekit.ParticipantInfo.disconnect_reason:type_name -> livekit.DisconnectReason
-	19, // 9: livekit.ParticipantInfo.kind_details:type_name -> livekit.ParticipantInfo.KindDetail
+	10, // 8: livekit.ParticipantInfo.disconnect_reason:type_name -> livekit.DisconnectReason
+	17, // 9: livekit.ParticipantInfo.kind_details:type_name -> livekit.ParticipantInfo.KindDetail
 	39, // 10: livekit.ParticipantInfo.data_tracks:type_name -> livekit.DataTrackInfo
 	25, // 11: livekit.ParticipantInfo.capabilities:type_name -> livekit.ClientInfo.Capability
 	47, // 12: livekit.SimulcastCodecInfo.layers:type_name -> livekit.VideoLayer
@@ -7611,21 +7611,21 @@ var file_livekit_models_proto_depIdxs = []int32{
 	5,  // 15: livekit.TrackInfo.source:type_name -> livekit.TrackSource
 	47, // 16: livekit.TrackInfo.layers:type_name -> livekit.VideoLayer
 	37, // 17: livekit.TrackInfo.codecs:type_name -> livekit.SimulcastCodecInfo
-	20, // 18: livekit.TrackInfo.encryption:type_name -> livekit.Encryption.Type
+	18, // 18: livekit.TrackInfo.encryption:type_name -> livekit.Encryption.Type
 	74, // 19: livekit.TrackInfo.version:type_name -> livekit.TimedVersion
-	15, // 20: livekit.TrackInfo.audio_features:type_name -> livekit.AudioTrackFeature
+	13, // 20: livekit.TrackInfo.audio_features:type_name -> livekit.AudioTrackFeature
 	3,  // 21: livekit.TrackInfo.backup_codec_policy:type_name -> livekit.BackupCodecPolicy
-	16, // 22: livekit.TrackInfo.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
-	20, // 23: livekit.DataTrackInfo.encryption:type_name -> livekit.Encryption.Type
+	14, // 22: livekit.TrackInfo.packet_trailer_features:type_name -> livekit.PacketTrailerFeature
+	18, // 23: livekit.DataTrackInfo.encryption:type_name -> livekit.Encryption.Type
 	40, // 24: livekit.DataTrackInfo.frame_encoding:type_name -> livekit.DataTrackFrameEncoding
 	42, // 25: livekit.DataTrackInfo.schema:type_name -> livekit.DataTrackSchemaId
-	6,  // 26: livekit.DataTrackFrameEncoding.well_known:type_name -> livekit.DataTrackWellKnownFrameEncoding
-	7,  // 27: livekit.DataTrackSchemaEncoding.well_known:type_name -> livekit.DataTrackWellKnownSchemaEncoding
+	19, // 26: livekit.DataTrackFrameEncoding.well_known:type_name -> livekit.DataTrackFrameEncoding.WellKnownFrameEncoding
+	20, // 27: livekit.DataTrackSchemaEncoding.well_known:type_name -> livekit.DataTrackSchemaEncoding.WellKnownSchemaEncoding
 	41, // 28: livekit.DataTrackSchemaId.encoding:type_name -> livekit.DataTrackSchemaEncoding
-	8,  // 29: livekit.DataTrackExtensionParticipantSid.id:type_name -> livekit.DataTrackExtensionID
+	6,  // 29: livekit.DataTrackExtensionParticipantSid.id:type_name -> livekit.DataTrackExtensionID
 	42, // 30: livekit.DataBlobKey.schema_id:type_name -> livekit.DataTrackSchemaId
 	45, // 31: livekit.DataBlob.key:type_name -> livekit.DataBlobKey
-	9,  // 32: livekit.VideoLayer.quality:type_name -> livekit.VideoQuality
+	7,  // 32: livekit.VideoLayer.quality:type_name -> livekit.VideoQuality
 	22, // 33: livekit.DataPacket.kind:type_name -> livekit.DataPacket.Kind
 	53, // 34: livekit.DataPacket.user:type_name -> livekit.UserPacket
 	51, // 35: livekit.DataPacket.speaker:type_name -> livekit.ActiveSpeakerUpdate
@@ -7640,7 +7640,7 @@ var file_livekit_models_proto_depIdxs = []int32{
 	84, // 44: livekit.DataPacket.stream_chunk:type_name -> livekit.DataStream.Chunk
 	85, // 45: livekit.DataPacket.stream_trailer:type_name -> livekit.DataStream.Trailer
 	49, // 46: livekit.DataPacket.encrypted_packet:type_name -> livekit.EncryptedPacket
-	20, // 47: livekit.EncryptedPacket.encryption_type:type_name -> livekit.Encryption.Type
+	18, // 47: livekit.EncryptedPacket.encryption_type:type_name -> livekit.Encryption.Type
 	53, // 48: livekit.EncryptedPacketPayload.user:type_name -> livekit.UserPacket
 	57, // 49: livekit.EncryptedPacketPayload.chat_message:type_name -> livekit.ChatMessage
 	58, // 50: livekit.EncryptedPacketPayload.rpc_request:type_name -> livekit.RpcRequest
@@ -7657,10 +7657,10 @@ var file_livekit_models_proto_depIdxs = []int32{
 	25, // 61: livekit.ClientInfo.capabilities:type_name -> livekit.ClientInfo.Capability
 	66, // 62: livekit.ClientConfiguration.video:type_name -> livekit.VideoConfiguration
 	66, // 63: livekit.ClientConfiguration.screen:type_name -> livekit.VideoConfiguration
-	11, // 64: livekit.ClientConfiguration.resume_connection:type_name -> livekit.ClientConfigSetting
+	9,  // 64: livekit.ClientConfiguration.resume_connection:type_name -> livekit.ClientConfigSetting
 	67, // 65: livekit.ClientConfiguration.disabled_codecs:type_name -> livekit.DisabledCodecs
-	11, // 66: livekit.ClientConfiguration.force_relay:type_name -> livekit.ClientConfigSetting
-	11, // 67: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
+	9,  // 66: livekit.ClientConfiguration.force_relay:type_name -> livekit.ClientConfigSetting
+	9,  // 67: livekit.VideoConfiguration.hardware_encoder:type_name -> livekit.ClientConfigSetting
 	32, // 68: livekit.DisabledCodecs.codecs:type_name -> livekit.Codec
 	32, // 69: livekit.DisabledCodecs.publish:type_name -> livekit.Codec
 	89, // 70: livekit.RTPDrift.start_time:type_name -> google.protobuf.Timestamp
@@ -7681,7 +7681,7 @@ var file_livekit_models_proto_depIdxs = []int32{
 	70, // 85: livekit.RTPForwarderState.sender_report_state:type_name -> livekit.RTCPSenderReportState
 	76, // 86: livekit.WebhookConfig.filter_params:type_name -> livekit.FilterParams
 	26, // 87: livekit.DataStream.TextHeader.operation_type:type_name -> livekit.DataStream.OperationType
-	20, // 88: livekit.DataStream.Header.encryption_type:type_name -> livekit.Encryption.Type
+	18, // 88: livekit.DataStream.Header.encryption_type:type_name -> livekit.Encryption.Type
 	86, // 89: livekit.DataStream.Header.attributes:type_name -> livekit.DataStream.Header.AttributesEntry
 	81, // 90: livekit.DataStream.Header.text_header:type_name -> livekit.DataStream.TextHeader
 	82, // 91: livekit.DataStream.Header.byte_header:type_name -> livekit.DataStream.ByteHeader
