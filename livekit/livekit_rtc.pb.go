@@ -1606,7 +1606,7 @@ type PublishDataTrackRequest struct {
 	// Method used for end-to-end encryption (E2EE) on frame payloads.
 	Encryption Encryption_Type `protobuf:"varint,3,opt,name=encryption,proto3,enum=livekit.Encryption_Type" json:"encryption,omitempty"`
 	// Encoding for frame payloads on this track. If unspecified, the track is untyped.
-	FrameEncoding *DataTrackFrameEncoding `protobuf:"varint,4,opt,name=frame_encoding,json=frameEncoding,proto3,enum=livekit.DataTrackFrameEncoding,oneof" json:"frame_encoding,omitempty"`
+	FrameEncoding *DataTrackFrameEncoding `protobuf:"bytes,4,opt,name=frame_encoding,json=frameEncoding,proto3,oneof" json:"frame_encoding,omitempty"`
 	// ID of the schema used by frames on this track if the track is typed.
 	// If set, the associated schema must be stored with `StoreDataBlobRequest`.
 	Schema        *DataTrackSchemaId `protobuf:"bytes,5,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
@@ -1665,11 +1665,11 @@ func (x *PublishDataTrackRequest) GetEncryption() Encryption_Type {
 	return Encryption_NONE
 }
 
-func (x *PublishDataTrackRequest) GetFrameEncoding() DataTrackFrameEncoding {
-	if x != nil && x.FrameEncoding != nil {
-		return *x.FrameEncoding
+func (x *PublishDataTrackRequest) GetFrameEncoding() *DataTrackFrameEncoding {
+	if x != nil {
+		return x.FrameEncoding
 	}
-	return DataTrackFrameEncoding_DATA_TRACK_FRAME_ENCODING_UNSPECIFIED
+	return nil
 }
 
 func (x *PublishDataTrackRequest) GetSchema() *DataTrackSchemaId {
@@ -5423,7 +5423,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\n" +
 	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\x12K\n" +
-	"\x0eframe_encoding\x18\x04 \x01(\x0e2\x1f.livekit.DataTrackFrameEncodingH\x00R\rframeEncoding\x88\x01\x01\x127\n" +
+	"\x0eframe_encoding\x18\x04 \x01(\v2\x1f.livekit.DataTrackFrameEncodingH\x00R\rframeEncoding\x88\x01\x01\x127\n" +
 	"\x06schema\x18\x05 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01B\x11\n" +
 	"\x0f_frame_encodingB\t\n" +
 	"\a_schema\"F\n" +
@@ -5837,7 +5837,7 @@ var file_livekit_rtc_proto_goTypes = []any{
 	(BackupCodecPolicy)(0),                // 76: livekit.BackupCodecPolicy
 	(AudioTrackFeature)(0),                // 77: livekit.AudioTrackFeature
 	(PacketTrailerFeature)(0),             // 78: livekit.PacketTrailerFeature
-	(DataTrackFrameEncoding)(0),           // 79: livekit.DataTrackFrameEncoding
+	(*DataTrackFrameEncoding)(nil),        // 79: livekit.DataTrackFrameEncoding
 	(*DataTrackSchemaId)(nil),             // 80: livekit.DataTrackSchemaId
 	(*DataTrackInfo)(nil),                 // 81: livekit.DataTrackInfo
 	(*Room)(nil),                          // 82: livekit.Room
