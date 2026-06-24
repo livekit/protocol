@@ -320,7 +320,7 @@ message DataTrackFrameEncoding {
         WELL_KNOWN_FRAME_ENCODING_JSON = 7;
     }
 
-    oneof encoding {
+    oneof value {
         WellKnownFrameEncoding well_known = 1;
         // Identifier of a custom encoding not covered by the well-known cases.
         // This must be non-empty and no longer than 25 characters.
@@ -353,7 +353,7 @@ message DataTrackSchemaEncoding {
       WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA = 7;
     }
 
-    oneof encoding {
+    oneof value {
         WellKnownSchemaEncoding well_known = 1;
         // Identifier of a custom encoding not covered by the well-known cases.
         // This must be non-empty and no longer than 25 characters.
