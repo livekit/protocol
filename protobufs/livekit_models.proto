@@ -296,66 +296,67 @@ message DataTrackInfo {
 
 // Encoding for frame payloads.
 message DataTrackFrameEncoding {
+
+    // Well-known encoding for frame payloads.
+    //
+    // Mirrors the well-known message encodings from the MCAP spec:
+    // https://mcap.dev/spec/registry#message-encodings
+    //
+    enum WellKnownFrameEncoding {
+        WELL_KNOWN_FRAME_ENCODING_UNSPECIFIED = 0;
+        // ROS 1: must be described by `ROS1_MSG` schema encoding.
+        WELL_KNOWN_FRAME_ENCODING_ROS1 = 1;
+        // CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
+        WELL_KNOWN_FRAME_ENCODING_CDR = 2;
+        // Protocol Buffer: must be described by `PROTOBUF` schema encoding.
+        WELL_KNOWN_FRAME_ENCODING_PROTOBUF = 3;
+        // FlatBuffer: must be described by `FLATBUFFER` schema encoding.
+        WELL_KNOWN_FRAME_ENCODING_FLATBUFFER = 4;
+        // CBOR: self-describing.
+        WELL_KNOWN_FRAME_ENCODING_CBOR = 5;
+        // MessagePack: self-describing.
+        WELL_KNOWN_FRAME_ENCODING_MSGPACK = 6;
+        // JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
+        WELL_KNOWN_FRAME_ENCODING_JSON = 7;
+    }
+
     oneof encoding {
-        DataTrackWellKnownFrameEncoding well_known = 1;
+        WellKnownFrameEncoding well_known = 1;
         // Identifier of a custom encoding not covered by the well-known cases.
         string custom = 2;
     }
-}
-
-// Well-known encoding for frame payloads.
-//
-// Mirrors the well-known message encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#message-encodings
-//
-enum DataTrackWellKnownFrameEncoding {
-  DTFE_UNSPECIFIED = 0;
-  // ROS 1: must be described by `ROS1_MSG` schema encoding.
-  DTFE_ROS1 = 1;
-  // CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
-  DTFE_CDR = 2;
-  // Protocol Buffer: must be described by `PROTOBUF` schema encoding.
-  DTFE_PROTOBUF = 3;
-  // FlatBuffer: must be described by `FLATBUFFER` schema encoding.
-  DTFE_FLATBUFFER = 4;
-  // CBOR: self-describing.
-  DTFE_CBOR = 5;
-  // MessagePack: self-describing.
-  DTFE_MSGPACK = 6;
-  // JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
-  DTFE_JSON = 7;
 }
 
 // Encoding for schema definition.
 message DataTrackSchemaEncoding {
+    // Well-known encoding for schema definition.
+    //
+    // Mirrors the well-known schema encodings from the MCAP spec:
+    // https://mcap.dev/spec/registry#schema-encodings
+    //
+    enum WellKnownSchemaEncoding {
+      WELL_KNOWN_SCHEMA_ENCODING_UNSPECIFIED = 0;
+      // Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_PROTOBUF = 1;
+      // FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_FLATBUFFER = 2;
+      // ROS 1 Message: describes `ROS1` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_ROS1_MSG = 3;
+      // ROS 2 Message: describes `CDR` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG = 4;
+      // ROS 2 IDL: describes `CDR` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL = 5;
+      // OMG IDL: describes `CDR` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL = 6;
+      // JSON Schema: describes `JSON` frame encoding.
+      WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA = 7;
+    }
+
     oneof encoding {
-        DataTrackWellKnownSchemaEncoding well_known = 1;
+        WellKnownSchemaEncoding well_known = 1;
         // Identifier of a custom encoding not covered by the well-known cases.
         string custom = 2;
     }
-}
-
-// Well-known encoding for schema definition.
-//
-// Mirrors the well-known schema encodings from the MCAP spec:
-// https://mcap.dev/spec/registry#schema-encodings
-//
-enum DataTrackWellKnownSchemaEncoding {
-  DTSE_UNSPECIFIED = 0;
-  // Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
-  DTSE_PROTOBUF = 1;
-  // FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
-  DTSE_FLATBUFFER = 2;
-  // ROS 1 Message: describes `ROS1` frame encoding.
-  DTSE_ROS1_MSG = 3;
-  // ROS 2 Message: describes `CDR` frame encoding.
-  DTSE_ROS2_MSG = 4;
-  // ROS 2 IDL: describes `CDR` frame encoding.
-  DTSE_ROS2_IDL = 5;
-  // OMG IDL: describes `CDR` frame encoding.
-  DTSE_OMG_IDL = 6;
-  // JSON Schema: describes `JSON` frame encoding.
-  DTSE_JSON_SCHEMA = 7;
 }
 
 // Identifier for a data track schema.
