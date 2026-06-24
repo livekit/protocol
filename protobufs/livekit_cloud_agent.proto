@@ -81,6 +81,20 @@ message CreateAgentV2Response {
   repeated string server_regions = 3;
 }
 
+message PromoteAgentRequest {
+  string agent_id = 1 [(logger.name) = "agentID"];
+  string src_deployment = 2;
+  string dst_deployment = 3;
+}
+
+message PromoteAgentResponse {
+  bool success = 1;
+  string message = 2;
+  string agent_id = 3 [(logger.name) = "agentID"];
+  string src_deployment = 4;
+  string dst_deployment = 5;
+}
+
 message PresignedPostRequest {
   string url = 1;
   map<string, string> values = 2;
@@ -338,6 +352,7 @@ message GetPrivateLinkStatusResponse {
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
     rpc CreateAgentV2(CreateAgentV2Request) returns (CreateAgentV2Response) {}
+    rpc PromoteAgent(PromoteAgentRequest) returns (PromoteAgentResponse) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}
