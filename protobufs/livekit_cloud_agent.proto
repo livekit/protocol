@@ -120,6 +120,7 @@ message AgentDeployment {
     string version = 16;
     string agent_name = 17;
     bool deployment_enabled = 18;
+    google.protobuf.Timestamp last_scraped_at = 19;
 }
 
 message AgentInfo {
