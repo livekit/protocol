@@ -711,6 +711,7 @@ type PromoteAgentResponse struct {
 	AgentId       string                 `protobuf:"bytes,3,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
 	SrcDeployment string                 `protobuf:"bytes,4,opt,name=src_deployment,json=srcDeployment,proto3" json:"src_deployment,omitempty"`
 	DstDeployment string                 `protobuf:"bytes,5,opt,name=dst_deployment,json=dstDeployment,proto3" json:"dst_deployment,omitempty"`
+	VersionTag    string                 `protobuf:"bytes,6,opt,name=version_tag,json=versionTag,proto3" json:"version_tag,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -776,6 +777,13 @@ func (x *PromoteAgentResponse) GetSrcDeployment() string {
 func (x *PromoteAgentResponse) GetDstDeployment() string {
 	if x != nil {
 		return x.DstDeployment
+	}
+	return ""
+}
+
+func (x *PromoteAgentResponse) GetVersionTag() string {
+	if x != nil {
+		return x.VersionTag
 	}
 	return ""
 }
@@ -3288,14 +3296,16 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\bagent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12%\n" +
 	"\x0esrc_deployment\x18\x02 \x01(\tR\rsrcDeployment\x12%\n" +
-	"\x0edst_deployment\x18\x03 \x01(\tR\rdstDeployment\"\xbf\x01\n" +
+	"\x0edst_deployment\x18\x03 \x01(\tR\rdstDeployment\"\xe0\x01\n" +
 	"\x14PromoteAgentResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12%\n" +
 	"\bagent_id\x18\x03 \x01(\tB\n" +
 	"\xbaP\aagentIDR\aagentId\x12%\n" +
 	"\x0esrc_deployment\x18\x04 \x01(\tR\rsrcDeployment\x12%\n" +
-	"\x0edst_deployment\x18\x05 \x01(\tR\rdstDeployment\"\xa6\x01\n" +
+	"\x0edst_deployment\x18\x05 \x01(\tR\rdstDeployment\x12\x1f\n" +
+	"\vversion_tag\x18\x06 \x01(\tR\n" +
+	"versionTag\"\xa6\x01\n" +
 	"\x14PresignedPostRequest\x12\x10\n" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12A\n" +
 	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
