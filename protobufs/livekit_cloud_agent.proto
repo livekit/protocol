@@ -93,6 +93,7 @@ message PromoteAgentResponse {
   string agent_id = 3 [(logger.name) = "agentID"];
   string src_deployment = 4;
   string dst_deployment = 5;
+  string version_tag = 6;
 }
 
 message PresignedPostRequest {
