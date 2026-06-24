@@ -288,18 +288,27 @@ message DataTrackInfo {
   Encryption.Type encryption = 4;
 
   // Encoding for frame payloads on this track. If unspecified, the track is untyped.
-  optional DataTrackFrameEncoding frame_encoding = 5;
+  DataTrackFrameEncoding frame_encoding = 5;
 
   // ID of the schema used by frames on this track if the track is typed.
   optional DataTrackSchemaId schema = 6;
 }
 
 // Encoding for frame payloads.
+message DataTrackFrameEncoding {
+    oneof encoding {
+        DataTrackWellKnownFrameEncoding well_known = 1;
+        // Identifier of a custom encoding not covered by the well-known cases.
+        string custom = 2;
+    }
+}
+
+// Well-known encoding for frame payloads.
 //
 // Mirrors the well-known message encodings from the MCAP spec:
 // https://mcap.dev/spec/registry#message-encodings
 //
-enum DataTrackFrameEncoding {
+enum DataTrackWellKnownFrameEncoding {
   DATA_TRACK_FRAME_ENCODING_UNSPECIFIED = 0;
   // ROS 1: must be described by `ROS1_MSG` schema encoding.
   DATA_TRACK_FRAME_ENCODING_ROS1 = 1;
@@ -317,12 +326,21 @@ enum DataTrackFrameEncoding {
   DATA_TRACK_FRAME_ENCODING_JSON = 7;
 }
 
-// Encoding for schema definitions.
+// Encoding for schema definition.
+message DataTrackSchemaEncoding {
+    oneof encoding {
+        DataTrackWellKnownSchemaEncoding well_known = 1;
+        // Identifier of a custom encoding not covered by the well-known cases.
+        string custom = 2;
+    }
+}
+
+// Well-known encoding for schema definition.
 //
 // Mirrors the well-known schema encodings from the MCAP spec:
 // https://mcap.dev/spec/registry#schema-encodings
 //
-enum DataTrackSchemaEncoding {
+enum DataTrackWellKnownSchemaEncoding {
   DATA_TRACK_SCHEMA_ENCODING_UNSPECIFIED = 0;
   // Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
   DATA_TRACK_SCHEMA_ENCODING_PROTOBUF = 1;
