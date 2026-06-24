@@ -309,21 +309,21 @@ message DataTrackFrameEncoding {
 // https://mcap.dev/spec/registry#message-encodings
 //
 enum DataTrackWellKnownFrameEncoding {
-  DATA_TRACK_FRAME_ENCODING_UNSPECIFIED = 0;
+  DTFE_UNSPECIFIED = 0;
   // ROS 1: must be described by `ROS1_MSG` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_ROS1 = 1;
+  DTFE_ROS1 = 1;
   // CDR: must be described by `ROS2_MSG`, `ROS2_IDL`, or `OMG_IDL` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_CDR = 2;
+  DTFE_CDR = 2;
   // Protocol Buffer: must be described by `PROTOBUF` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_PROTOBUF = 3;
+  DTFE_PROTOBUF = 3;
   // FlatBuffer: must be described by `FLATBUFFER` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_FLATBUFFER = 4;
+  DTFE_FLATBUFFER = 4;
   // CBOR: self-describing.
-  DATA_TRACK_FRAME_ENCODING_CBOR = 5;
+  DTFE_CBOR = 5;
   // MessagePack: self-describing.
-  DATA_TRACK_FRAME_ENCODING_MSGPACK = 6;
+  DTFE_MSGPACK = 6;
   // JSON: self-describing or described by `JSON_SCHEMA` schema encoding.
-  DATA_TRACK_FRAME_ENCODING_JSON = 7;
+  DTFE_JSON = 7;
 }
 
 // Encoding for schema definition.
@@ -341,21 +341,21 @@ message DataTrackSchemaEncoding {
 // https://mcap.dev/spec/registry#schema-encodings
 //
 enum DataTrackWellKnownSchemaEncoding {
-  DATA_TRACK_SCHEMA_ENCODING_UNSPECIFIED = 0;
+  DTSE_UNSPECIFIED = 0;
   // Protocol Buffer IDL: describes `PROTOBUF` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_PROTOBUF = 1;
+  DTSE_PROTOBUF = 1;
   // FlatBuffer IDL: describes `FLATBUFFER` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_FLATBUFFER = 2;
+  DTSE_FLATBUFFER = 2;
   // ROS 1 Message: describes `ROS1` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_ROS1_MSG = 3;
+  DTSE_ROS1_MSG = 3;
   // ROS 2 Message: describes `CDR` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_ROS2_MSG = 4;
+  DTSE_ROS2_MSG = 4;
   // ROS 2 IDL: describes `CDR` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_ROS2_IDL = 5;
+  DTSE_ROS2_IDL = 5;
   // OMG IDL: describes `CDR` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_OMG_IDL = 6;
+  DTSE_OMG_IDL = 6;
   // JSON Schema: describes `JSON` frame encoding.
-  DATA_TRACK_SCHEMA_ENCODING_JSON_SCHEMA = 7;
+  DTSE_JSON_SCHEMA = 7;
 }
 
 // Identifier for a data track schema.
