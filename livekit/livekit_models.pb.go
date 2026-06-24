@@ -2824,11 +2824,11 @@ func (x *DataTrackInfo) GetSchema() *DataTrackSchemaId {
 // Encoding for frame payloads.
 type DataTrackFrameEncoding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Encoding:
+	// Types that are valid to be assigned to Value:
 	//
 	//	*DataTrackFrameEncoding_WellKnown
 	//	*DataTrackFrameEncoding_Custom
-	Encoding      isDataTrackFrameEncoding_Encoding `protobuf_oneof:"encoding"`
+	Value         isDataTrackFrameEncoding_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2863,16 +2863,16 @@ func (*DataTrackFrameEncoding) Descriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *DataTrackFrameEncoding) GetEncoding() isDataTrackFrameEncoding_Encoding {
+func (x *DataTrackFrameEncoding) GetValue() isDataTrackFrameEncoding_Value {
 	if x != nil {
-		return x.Encoding
+		return x.Value
 	}
 	return nil
 }
 
 func (x *DataTrackFrameEncoding) GetWellKnown() DataTrackFrameEncoding_WellKnownFrameEncoding {
 	if x != nil {
-		if x, ok := x.Encoding.(*DataTrackFrameEncoding_WellKnown); ok {
+		if x, ok := x.Value.(*DataTrackFrameEncoding_WellKnown); ok {
 			return x.WellKnown
 		}
 	}
@@ -2881,15 +2881,15 @@ func (x *DataTrackFrameEncoding) GetWellKnown() DataTrackFrameEncoding_WellKnown
 
 func (x *DataTrackFrameEncoding) GetCustom() string {
 	if x != nil {
-		if x, ok := x.Encoding.(*DataTrackFrameEncoding_Custom); ok {
+		if x, ok := x.Value.(*DataTrackFrameEncoding_Custom); ok {
 			return x.Custom
 		}
 	}
 	return ""
 }
 
-type isDataTrackFrameEncoding_Encoding interface {
-	isDataTrackFrameEncoding_Encoding()
+type isDataTrackFrameEncoding_Value interface {
+	isDataTrackFrameEncoding_Value()
 }
 
 type DataTrackFrameEncoding_WellKnown struct {
@@ -2902,18 +2902,18 @@ type DataTrackFrameEncoding_Custom struct {
 	Custom string `protobuf:"bytes,2,opt,name=custom,proto3,oneof"`
 }
 
-func (*DataTrackFrameEncoding_WellKnown) isDataTrackFrameEncoding_Encoding() {}
+func (*DataTrackFrameEncoding_WellKnown) isDataTrackFrameEncoding_Value() {}
 
-func (*DataTrackFrameEncoding_Custom) isDataTrackFrameEncoding_Encoding() {}
+func (*DataTrackFrameEncoding_Custom) isDataTrackFrameEncoding_Value() {}
 
 // Encoding for schema definition.
 type DataTrackSchemaEncoding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Encoding:
+	// Types that are valid to be assigned to Value:
 	//
 	//	*DataTrackSchemaEncoding_WellKnown
 	//	*DataTrackSchemaEncoding_Custom
-	Encoding      isDataTrackSchemaEncoding_Encoding `protobuf_oneof:"encoding"`
+	Value         isDataTrackSchemaEncoding_Value `protobuf_oneof:"value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2948,16 +2948,16 @@ func (*DataTrackSchemaEncoding) Descriptor() ([]byte, []int) {
 	return file_livekit_models_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *DataTrackSchemaEncoding) GetEncoding() isDataTrackSchemaEncoding_Encoding {
+func (x *DataTrackSchemaEncoding) GetValue() isDataTrackSchemaEncoding_Value {
 	if x != nil {
-		return x.Encoding
+		return x.Value
 	}
 	return nil
 }
 
 func (x *DataTrackSchemaEncoding) GetWellKnown() DataTrackSchemaEncoding_WellKnownSchemaEncoding {
 	if x != nil {
-		if x, ok := x.Encoding.(*DataTrackSchemaEncoding_WellKnown); ok {
+		if x, ok := x.Value.(*DataTrackSchemaEncoding_WellKnown); ok {
 			return x.WellKnown
 		}
 	}
@@ -2966,15 +2966,15 @@ func (x *DataTrackSchemaEncoding) GetWellKnown() DataTrackSchemaEncoding_WellKno
 
 func (x *DataTrackSchemaEncoding) GetCustom() string {
 	if x != nil {
-		if x, ok := x.Encoding.(*DataTrackSchemaEncoding_Custom); ok {
+		if x, ok := x.Value.(*DataTrackSchemaEncoding_Custom); ok {
 			return x.Custom
 		}
 	}
 	return ""
 }
 
-type isDataTrackSchemaEncoding_Encoding interface {
-	isDataTrackSchemaEncoding_Encoding()
+type isDataTrackSchemaEncoding_Value interface {
+	isDataTrackSchemaEncoding_Value()
 }
 
 type DataTrackSchemaEncoding_WellKnown struct {
@@ -2987,9 +2987,9 @@ type DataTrackSchemaEncoding_Custom struct {
 	Custom string `protobuf:"bytes,2,opt,name=custom,proto3,oneof"`
 }
 
-func (*DataTrackSchemaEncoding_WellKnown) isDataTrackSchemaEncoding_Encoding() {}
+func (*DataTrackSchemaEncoding_WellKnown) isDataTrackSchemaEncoding_Value() {}
 
-func (*DataTrackSchemaEncoding_Custom) isDataTrackSchemaEncoding_Encoding() {}
+func (*DataTrackSchemaEncoding_Custom) isDataTrackSchemaEncoding_Value() {}
 
 // Identifier for a data track schema.
 //
@@ -6954,7 +6954,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"encryption\x12F\n" +
 	"\x0eframe_encoding\x18\x05 \x01(\v2\x1f.livekit.DataTrackFrameEncodingR\rframeEncoding\x127\n" +
 	"\x06schema\x18\x06 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x00R\x06schema\x88\x01\x01B\t\n" +
-	"\a_schema\"\xe5\x03\n" +
+	"\a_schema\"\xe2\x03\n" +
 	"\x16DataTrackFrameEncoding\x12W\n" +
 	"\n" +
 	"well_known\x18\x01 \x01(\x0e26.livekit.DataTrackFrameEncoding.WellKnownFrameEncodingH\x00R\twellKnown\x12\x18\n" +
@@ -6967,9 +6967,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"$WELL_KNOWN_FRAME_ENCODING_FLATBUFFER\x10\x04\x12\"\n" +
 	"\x1eWELL_KNOWN_FRAME_ENCODING_CBOR\x10\x05\x12%\n" +
 	"!WELL_KNOWN_FRAME_ENCODING_MSGPACK\x10\x06\x12\"\n" +
-	"\x1eWELL_KNOWN_FRAME_ENCODING_JSON\x10\aB\n" +
-	"\n" +
-	"\bencoding\"\x85\x04\n" +
+	"\x1eWELL_KNOWN_FRAME_ENCODING_JSON\x10\aB\a\n" +
+	"\x05value\"\x82\x04\n" +
 	"\x17DataTrackSchemaEncoding\x12Y\n" +
 	"\n" +
 	"well_known\x18\x01 \x01(\x0e28.livekit.DataTrackSchemaEncoding.WellKnownSchemaEncodingH\x00R\twellKnown\x12\x18\n" +
@@ -6982,9 +6981,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"#WELL_KNOWN_SCHEMA_ENCODING_ROS2_MSG\x10\x04\x12'\n" +
 	"#WELL_KNOWN_SCHEMA_ENCODING_ROS2_IDL\x10\x05\x12&\n" +
 	"\"WELL_KNOWN_SCHEMA_ENCODING_OMG_IDL\x10\x06\x12*\n" +
-	"&WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA\x10\aB\n" +
-	"\n" +
-	"\bencoding\"e\n" +
+	"&WELL_KNOWN_SCHEMA_ENCODING_JSON_SCHEMA\x10\aB\a\n" +
+	"\x05value\"e\n" +
 	"\x11DataTrackSchemaId\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12<\n" +
 	"\bencoding\x18\x02 \x01(\v2 .livekit.DataTrackSchemaEncodingR\bencoding\"z\n" +
