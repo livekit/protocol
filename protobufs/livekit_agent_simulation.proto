@@ -96,6 +96,22 @@ message SimulationRun {
       int32 interruptions = 7;
       // Turns that contributed measurements (context for the aggregates).
       int32 sample_count = 8;
+      // Per-turn breakdown behind the aggregates above, one entry per measured
+      // turn in order. A -1 field means the datum was unavailable for that turn.
+      repeated TurnMetrics turns = 9;
+
+      message TurnMetrics {
+        int32 turn = 1;  // 1-based turn index
+        // Tier 0 — true end-to-end response latency off the waveform.
+        float response_latency_s = 2;
+        // Tier 1 — the agent's own pipeline, broadcast over its RemoteSession;
+        // -1 when the backchannel is absent.
+        float wer = 3;
+        float stt_delay_s = 4;
+        float llm_ttft_s = 5;
+        float tts_ttfb_s = 6;
+        float e2e_latency_s = 7;
+      }
     }
   }
 
