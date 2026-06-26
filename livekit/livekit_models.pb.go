@@ -2898,7 +2898,7 @@ type DataTrackFrameEncoding_WellKnown struct {
 
 type DataTrackFrameEncoding_Custom struct {
 	// Identifier of a custom encoding not covered by the well-known cases.
-	// This must be non-empty and no longer than 25 characters.
+	// This must be non-empty and no longer than 32 characters.
 	Custom string `protobuf:"bytes,2,opt,name=custom,proto3,oneof"`
 }
 
@@ -2983,7 +2983,7 @@ type DataTrackSchemaEncoding_WellKnown struct {
 
 type DataTrackSchemaEncoding_Custom struct {
 	// Identifier of a custom encoding not covered by the well-known cases.
-	// This must be non-empty and no longer than 25 characters.
+	// This must be non-empty and no longer than 32 characters.
 	Custom string `protobuf:"bytes,2,opt,name=custom,proto3,oneof"`
 }
 
