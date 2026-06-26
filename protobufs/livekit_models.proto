@@ -323,7 +323,7 @@ message DataTrackFrameEncoding {
     oneof value {
         WellKnownFrameEncoding well_known = 1;
         // Identifier of a custom encoding not covered by the well-known cases.
-        // This must be non-empty and no longer than 25 characters.
+        // This must be non-empty and no longer than 32 characters.
         string custom = 2;
     }
 }
@@ -356,7 +356,7 @@ message DataTrackSchemaEncoding {
     oneof value {
         WellKnownSchemaEncoding well_known = 1;
         // Identifier of a custom encoding not covered by the well-known cases.
-        // This must be non-empty and no longer than 25 characters.
+        // This must be non-empty and no longer than 32 characters.
         string custom = 2;
     }
 }
