@@ -6993,10 +6993,10 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x1cDataTrackSubscriptionOptions\x12\"\n" +
 	"\n" +
 	"target_fps\x18\x01 \x01(\rH\x00R\ttargetFps\x88\x01\x01B\r\n" +
-	"\v_target_fps\"k\n" +
+	"\v_target_fps\"x\n" +
 	"\vDataBlobKey\x12\x1a\n" +
-	"\ageneric\x18\x01 \x01(\tH\x00R\ageneric\x129\n" +
-	"\tschema_id\x18\x02 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x00R\bschemaIdB\x05\n" +
+	"\ageneric\x18\x01 \x01(\tH\x00R\ageneric\x12F\n" +
+	"\tschema_id\x18\x02 \x01(\v2\x1a.livekit.DataTrackSchemaIdB\v\xbaP\bschemaIDH\x00R\bschemaIdB\x05\n" +
 	"\x03key\"t\n" +
 	"\bDataBlob\x12&\n" +
 	"\x03key\x18\x01 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\x12@\n" +
