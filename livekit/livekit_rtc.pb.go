@@ -5511,11 +5511,11 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x15StoreDataBlobResponse\x12+\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x12&\n" +
-	"\x03key\x18\x02 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"\x9c\x01\n" +
+	"\x03key\x18\x02 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"\xb4\x01\n" +
 	"\x12GetDataBlobRequest\x12+\n" +
 	"\n" +
-	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x121\n" +
-	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12&\n" +
+	"request_id\x18\x01 \x01(\rB\f\xbaP\trequestIDR\trequestId\x12I\n" +
+	"\x14participant_identity\x18\x02 \x01(\tB\x16\xbaP\x13participantIdentityR\x13participantIdentity\x12&\n" +
 	"\x03key\x18\x03 \x01(\v2\x14.livekit.DataBlobKeyR\x03key\"i\n" +
 	"\x13GetDataBlobResponse\x12+\n" +
 	"\n" +
