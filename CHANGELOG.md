@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.48.1
+
+### Patch Changes
+
+- Data track schema metadata and storage - [#1553](https://github.com/livekit/protocol/pull/1553) ([@ladvoc](https://github.com/ladvoc))
+
 ## 1.48.0
 
 ### Minor Changes
