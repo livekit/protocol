@@ -393,7 +393,7 @@ message DataBlobKey {
     // Generic string key, blob contains arbitrary data.
     string generic = 1;
     // Data track schema identifier, blob contains schema definition.
-    DataTrackSchemaId schema_id = 2;
+    DataTrackSchemaId schema_id = 2 [(logger.name) = "schemaID"];
   }
 }
 
