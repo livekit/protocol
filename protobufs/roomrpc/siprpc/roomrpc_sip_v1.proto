@@ -1,0 +1,48 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit/roomrpc/siprpc";
+option csharp_namespace = "LiveKit.Proto.RoomRPC.SIP";
+option ruby_package = "LiveKit::Proto::RoomRPC::SIP";
+
+import "logger/options.proto";
+
+service SIPParticipantV1 {
+  // RPC: lk.sip.GetRemoteHeaders
+  rpc GetRemoteHeaders(GetRemoteHeadersV1Request) returns (GetRemoteHeadersV1Response);
+  // RPC: lk.sip.EndCall
+  rpc EndCall(EndCallV1Request) returns (EndCallV1Response);
+}
+
+message GetRemoteHeadersV1Request {
+  repeated string include = 1; // list of headers to include
+  repeated string exclude = 2; // list of headers to exclude
+}
+message GetRemoteHeadersV1Response {
+  map<string,string> headers = 1 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
+}
+
+message EndCallV1Request {
+  map<string,string> headers = 1 [
+    (logger.sensitivity) = SENSITIVITY_PII,
+    (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
+  ];
+}
+message EndCallV1Response {}

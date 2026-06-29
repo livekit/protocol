@@ -67,7 +67,7 @@ message SimulationRun {
     string label = 6;
     repeated string tags = 7;
     string room_name = 8;
-    string scenario_id = 9;
+    reserved 9;  // was scenario_id (scenarios are no longer stored)
     google.protobuf.Timestamp started_at = 10;
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
@@ -80,27 +80,24 @@ message SimulationRun {
   }
 
   message Create {
-    message Scenario {
-      string instructions = 1;
-      string agent_expectations = 2;
-      map<string, string> metadata = 3;
-      string label = 4;
-    }
-    message Scenarios {
-      repeated Scenario scenarios = 1;
-    }
-
     message Request {
+      reserved 3;  // was agent_description (input never consumed; description is derived from source)
+      reserved "agent_description";
       string project_id = 1;
       string agent_name = 2;
-      string agent_description = 3;
       int32 num_simulations = 4;
       string region = 6;
 
-      oneof source {
-        Scenarios scenarios = 7;
-        string group_id = 5;
-      }
+      // When set, run these scenarios (loaded from a scenarios.yaml).
+      // When unset, generate num_simulations scenarios from the uploaded agent source.
+      optional ScenarioGroup scenario_group = 7;
+
+      // Maximum simulate jobs running in parallel for this run. Clamped to the
+      // project's concurrency quota; 0/unset uses the server default.
+      optional int32 concurrency = 8;
+
+      // Conversation mode for every job in this run; unspecified = TEXT.
+      SimulationMode mode = 9;
     }
     message Response {
       string simulation_run_id = 1;
@@ -164,6 +161,10 @@ message SimulationRun {
   int32 num_simulations = 15;
   // Aggregate usage across all jobs in this run (sum of Job.usage).
   Usage usage = 16;
+  // Maximum simulate jobs running in parallel for this run (0 = server default).
+  int32 concurrency = 17;
+  // Conversation mode for every job in this run; unspecified = TEXT.
+  SimulationMode mode = 18;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -171,123 +172,52 @@ message SimulationRun {
   }
 }
 
+// A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
+// are no longer stored server-side; the yaml file is the source of truth.
 message Scenario {
-  enum Status {
-    // Scenario is being generated from a session by an LLM.
-    // instructions and agent_expectations are not yet available.
-    STATUS_GENERATING = 0;
-    STATUS_READY = 1;
-    STATUS_FAILED = 2;
-  }
-
-  message Create {
-    message Request {
-      string project_id = 1;
-      string label = 2;
-      string instructions = 3;
-      string agent_expectations = 4;
-      string group_id = 5;
-      map<string, string> metadata = 6;
-    }
-    message Response {
-      Scenario scenario = 1;
-    }
-  }
-
   message CreateFromSession {
     message Request {
       string project_id = 1;
       string room_id = 2;
-      string group_id = 3;
-      string label = 4;
-      string region = 5;
+      string region = 3;
     }
     message Response {
       Scenario scenario = 1;
     }
   }
 
-  message Delete {
-    message Request {
-      string project_id = 1;
-      string scenario_id = 2;
-    }
-    message Response {}
-  }
-
-  message Update {
-    message Request {
-      string project_id = 1;
-      string scenario_id = 2;
-      string label = 3;
-      string instructions = 4;
-      string agent_expectations = 5;
-      string group_id = 6;
-      map<string, string> metadata = 7;
-    }
-    message Response {
-      Scenario scenario = 1;
-    }
-  }
-
-  message List {
-    message Request {
-      string project_id = 1;
-      string group_id = 2;
-    }
-    message Response {
-      repeated Scenario scenarios = 1;
-    }
-  }
-
-  string id = 1;
-  string project_id = 2;
-  string label = 3;
-  string instructions = 4;
-  string agent_expectations = 5;
-  string source_room_id = 6;
-  google.protobuf.Timestamp created_at = 7;
-  Status status = 8;
-  string error = 9;
-  string group_id = 10;
+  string label = 1;
+  string instructions = 2;
+  string agent_expectations = 3;
   // Set as participant attributes on the simulation participant's access token.
-  map<string, string> metadata = 11;
+  map<string, string> tags = 4;
+  // Arbitrary JSON-encoded object, surfaced to the agent under test as
+  // SimulationContext userdata (e.g. inputs and benchmark target state).
+  string userdata = 5;
 }
 
+// A named group of scenarios, mirroring a whole scenarios.yaml file.
 message ScenarioGroup {
-  message Create {
-    message Request {
-      string project_id = 1;
-      string label = 2;
-    }
-    message Response {
-      ScenarioGroup scenario_group = 1;
-    }
-  }
+  string name = 1;
+  repeated Scenario scenarios = 2;
+}
 
-  message Delete {
-    message Request {
-      string project_id = 1;
-      string group_id = 2;
-    }
-    message Response {}
-  }
+// How the simulated user interacts with the agent under test.
+enum SimulationMode {
+  SIMULATION_MODE_UNSPECIFIED = 0;
+  // The simulator chats over text streams (no audio).
+  SIMULATION_MODE_TEXT = 1;
+  // The simulator publishes/subscribes audio in the room.
+  SIMULATION_MODE_AUDIO = 2;
+}
 
-  message List {
-    message Request {
-      string project_id = 1;
-    }
-    message Response {
-      repeated ScenarioGroup scenario_groups = 1;
-    }
-  }
-
-  string id = 1;
-  string project_id = 2;
-  string label = 3;
-  google.protobuf.Timestamp created_at = 4;
-  repeated Scenario scenarios = 5;
-  int32 scenario_count = 6;
+// Carried (protojson-encoded) in the simulation room's metadata so the agent
+// under test can read the scenario + run identity synchronously at connect.
+message SimulationDispatch {
+  string simulation_run_id = 1;
+  string job_id = 2;
+  Scenario scenario = 3;
+  SimulationMode mode = 4;
 }
 
 service AgentSimulation {
@@ -297,14 +227,5 @@ service AgentSimulation {
   rpc ListSimulationRuns(SimulationRun.List.Request) returns (SimulationRun.List.Response);
   rpc CancelSimulationRun(SimulationRun.Cancel.Request) returns (SimulationRun.Cancel.Response);
 
-  rpc CreateScenario(Scenario.Create.Request) returns (Scenario.Create.Response);
   rpc CreateScenarioFromSession(Scenario.CreateFromSession.Request) returns (Scenario.CreateFromSession.Response);
-  rpc DeleteScenario(Scenario.Delete.Request) returns (Scenario.Delete.Response);
-  rpc UpdateScenario(Scenario.Update.Request) returns (Scenario.Update.Response);
-
-  rpc CreateScenarioGroup(ScenarioGroup.Create.Request) returns (ScenarioGroup.Create.Response);
-  rpc DeleteScenarioGroup(ScenarioGroup.Delete.Request) returns (ScenarioGroup.Delete.Response);
-  rpc ListScenarioGroups(ScenarioGroup.List.Request) returns (ScenarioGroup.List.Response);
-
-  rpc ListScenarios(Scenario.List.Request) returns (Scenario.List.Response);
 }

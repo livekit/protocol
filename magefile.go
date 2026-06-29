@@ -94,8 +94,16 @@ func Proto() error {
 		"rpc/sip.proto",
 	}
 
+	// mapped proto directory:
+	//    ./protobufs/roomrpc/<name>rpc
+	// and generated Go package:
+	//    ./livekit/roomrpc/<name>rpc
+	roomrpcTypeNames := []string{
+		"sip",
+	}
+
 	fmt.Println("generating protobuf")
-	target := "livekit"
+	const target = "./livekit"
 	if err := os.MkdirAll(target, 0755); err != nil {
 		return err
 	}
@@ -155,6 +163,29 @@ func Proto() error {
 			"-I=./protobufs",
 		}
 		args = append(args, agentProtoFiles...)
+		cmd := exec.Command(protoc, args...)
+		connectStd(cmd)
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+
+	fmt.Println("generating protobuf (livekit/roomrpc)")
+	for _, protoName := range roomrpcTypeNames {
+		pkgName := "roomrpc/" + protoName + "rpc"
+		protoFiles, err := os.ReadDir(filepath.Join("./protobufs", pkgName))
+		if err != nil {
+			return err
+		}
+		args := []string{
+			"--go_out", target,
+			"--go_opt=paths=source_relative",
+			"--plugin=go=" + protocGoPath,
+			"-I=./protobufs",
+		}
+		for _, protoFile := range protoFiles {
+			args = append(args, filepath.Join(pkgName, protoFile.Name()))
+		}
 		cmd := exec.Command(protoc, args...)
 		connectStd(cmd)
 		if err := cmd.Run(); err != nil {

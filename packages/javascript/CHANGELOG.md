@@ -1,5 +1,35 @@
 # @livekit/protocol
 
+## 1.48.0
+
+### Minor Changes
+
+- Add PTF_USER_DATA to the PacketTrailerFeature enum for arbitrary per-frame user data. - [#1639](https://github.com/livekit/protocol/pull/1639) ([@chenosaurus](https://github.com/chenosaurus))
+
+- Introduce a participant RPC protobuf registry for well-known LiveKit RPCs. - [#1618](https://github.com/livekit/protocol/pull/1618) ([@dennwc](https://github.com/dennwc))
+
+- Add codec config to inbound and outbound SIP trunks. - [#1620](https://github.com/livekit/protocol/pull/1620) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add capabilities to ParticipantInfo - [#1637](https://github.com/livekit/protocol/pull/1637) ([@1egoman](https://github.com/1egoman))
+
+- agent dev protocol to send down ServerInfo - [#1638](https://github.com/livekit/protocol/pull/1638) ([@davidzhao](https://github.com/davidzhao))
+
+## 1.47.0
+
+## 1.46.8
+
+### Patch Changes
+
+- Add CAP_COMPRESSION_DEFLATE_RAW and data stream fields for compression and inline payloads - [#1621](https://github.com/livekit/protocol/pull/1621) ([@1egoman](https://github.com/1egoman))
+
+## 1.46.7
+
+### Patch Changes
+
+- add backchannel probability to the eot prediction - [#1624](https://github.com/livekit/protocol/pull/1624) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.46.6
 
 ## 1.46.5
