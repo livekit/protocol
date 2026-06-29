@@ -125,27 +125,47 @@ func testCaseName(name string, maxLen int, index int) string {
 
 // ValidNameAddrHeaders contains valid Name-addr format headers with parameters
 var ValidNameAddrHeaders = []string{
-	`"Alice Johnson" <sip:u1@example.com>`,
-	`"Alice \"Ace\" Johnson's device\\" <sip:u2@example.com>`,
+	// addr-spec schemes (bare)
+	`sip:u4@exmaple.com`,
+	`sips:u5@exmaple.com`,
+	`tel:+1-555-123-4567`,
+
+	// bare addr-spec + header params (RFC 3261 §25.1 *( SEMI to-param ))
+	`sip:user@host;tag=abc`,
+	`sip:user@host;tag=abc;x-custom=val`,
+	`sip:r@host;cid="2UWQFN309shb3@ref.example"`, // quoted header param value
+
+	// bracketed addr-spec (no display name)
+	`<sip:u4@exmaple.com>`,
+	`<sips:u5@exmaple.com>`,
+	`<tel:+1-555-123-4567>`,
+	`<sip:u10@example.com;transport=tcp>`,                      // SIP URI with transport
+	`<sip:u11@example.com;lr>`,                                 // SIP URI with flag param
+	`<sip:u12@example.com:5060>`,                               // SIP URI with port
+	`<sip:user@host;transport=tcp;lr>`,                         // 2 uri-params
+	`<sip:user@[2001:db8::1]:5060>`,                            // IPv6 + port
+	`<sip:user@host?X-Custom=val>`,                             // uri-header
+	`<sip:user@host?X-Foo=1&X-Bar=2>`,                          // 2 uri-headers
+	`<sip:user@host;transport=tcp?X-Custom=val>`,               // uri-param + uri-header
+	`<sip:user@host;transport=tcp;user=phone?X-Foo=1&X-Bar=2>`, // 2 uri-params + 2 uri-headers
+
+	// bracketed addr-spec + header params after >
+	`<sip:user@host>;tag=abc`,
+	`<sip:user@host>;tag=abc;x-custom=val`,
+	`<sip:user@host;transport=tcp>;tag=abc`,
+	`<sip:user@host;transport=tcp;lr>;tag=abc`,
+	`<sip:user@host?X-Custom=val>;tag=abc`,
+	`<sip:user@host?X-Foo=1&X-Bar=2>;tag=abc`,
+	`<sip:user@host;transport=tcp?X-Custom=val>;tag=abc`,
+	`<sip:user@host;transport=tcp;user=phone?X-Foo=1&X-Bar=2>;tag=abc;x-custom=val`,
+
+	// name-addr (display name + bracketed URI)
+	`Alice <sip:user@host>`,
+	`"Alice Johnson" <sip:user@host>`,
 	`Alice Johnson <sip:u3@example.com>`,
-	`sip:u4@example.com`,                        // basic SIP URI (no brackets needed)
-	`sips:u5@example.com`,                       // secure SIP URI (no brackets needed)
-	`tel:+1-555-123-4567`,                       // TEL URI (no brackets needed)
-	`<sip:u6@example.com>`,                      // basic SIP URI with brackets
-	`<sips:u7@example.com>`,                     // secure SIP URI with brackets
-	`<tel:+1-555-123-4567>`,                     // TEL URI with brackets
-	`Alice <sip:u8@example.com>`,                // display name + SIP URI
-	`"Alice Johnson" <sip:u9@example.com>`,      // quoted display name
-	`<sip:u10@example.com;transport=tcp>`,       // SIP URI with transport
-	`<sip:u11@example.com;lr>`,                  // SIP URI with flag param
-	`<sip:u12@example.com:5060>`,                // SIP URI with port
-	`<sip:u13@example.com;transport=tcp;lr>`,    // SIP URI with multiple params
-	`Alice <sip:u14@example.com;transport=tcp>`, // display name + params
-	`"Alice \"Ace\"" <sip:u15@example.com>`,     // quoted display
-	`<sip:u16@[2001:db8::1]:5060>`,              // IPv6 with params
-	`<sips:u17@192.0.2.4>;expires=60`,           // SIPS URI with expires parameter
-	`Alice <sip:u18@example.com;transport=tcp>`, // display name + params
-	`"Alice & Bob" <sip:u19@example.com>`,       // display name with & symbol
+	`"Alice \"Ace\" Johnson's device\\" <sip:user@host>`, // quoted + escapes
+	`"Alice & Bob" <sip:user@host>`,                      // special char in quoted display
+	`Alice <sip:user@host;transport=tcp?X-Custom=val>;tag=abc`,
 }
 
 // InvalidNameAddrHeaders contains invalid Name-addr format headers
@@ -163,7 +183,8 @@ var InvalidNameAddrHeaders = []string{
 	`Alice sip:u13@example.com`,                         // display name without brackets
 	`Alice sips:u14@example.com`,                        // display name without brackets
 	`Alice & Bob <sip:u15@example.com>`,                 // display name with & symbol
-	`sip:u16@example.com;transport=tcp`,                 // special chars without brackets
+	`a-value`,                                           // bare token, not a URI
+	`sip:user@host?X-Custom=val`,                        // uri-header in bare addr-spec (RFC 3261 §20)
 	`sip:u17@example.com,transport=tcp`,                 // comma without brackets
 	`sip:u18@example.com?transport=tcp`,                 // question mark without brackets
 	`<sip:u21@example.com;transport tcp>`,               // missing equals sign
