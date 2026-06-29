@@ -697,6 +697,25 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 			expectError: false,
 			expectedURI: "<sip:user@example.com?subject=test&priority=urgent>",
 		},
+		{
+			name: "invalid URI - doubled scheme and two @",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "tel:sip:sip:15140916@103.30.234.216:33006@104.232.254.84:33006",
+			},
+			expectError: true,
+		},
+		{
+			name: "valid attended-transfer Replaces header with extra @",
+			req: &TransferSIPParticipantRequest{
+				RoomName:            "room1",
+				ParticipantIdentity: "participant1",
+				TransferTo:          "sip:bob@biloxi.example.com?Replaces=12345@192.0.2.1;to-tag=7743;from-tag=6472",
+			},
+			expectError: false,
+			expectedURI: "<sip:bob@biloxi.example.com?Replaces=12345@192.0.2.1;to-tag=7743;from-tag=6472>",
+		},
 	}
 
 	for _, c := range cases {

@@ -879,6 +879,18 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 		return errors.New("transfer_to must be a valid SIP(s) or TEL URI (sip:, sips: or tel:)")
 	}
 
+	// A valid addr-spec has at most one "@"; more than one means a malformed target
+	// (e.g. a client double-prefixed scheme: "tel:sip:sip:NN@host@host") that never
+	// routes. Strip headers/params first: an attended-transfer "?Replaces=callid@host"
+	// legitimately adds an "@".
+	addrSpec := innerURI
+	if i := strings.IndexAny(addrSpec, "?;"); i >= 0 {
+		addrSpec = addrSpec[:i]
+	}
+	if strings.Count(addrSpec, "@") > 1 {
+		return errors.New(`transfer_to is malformed: addr-spec must contain at most one "@"`)
+	}
+
 	if strings.HasPrefix(innerURI, "sip:") || strings.HasPrefix(innerURI, "sips:") {
 		// addr-spec = sip:...
 		// name-addr = [ display-name ] <addr-spec>
