@@ -326,7 +326,7 @@ message StoreDataBlobResponse {
 message GetDataBlobRequest {
   uint32 request_id = 1 [(logger.name) = "requestID"];
   // Identity of the participant who owns the blob.
-  string participant_identity = 2;
+  string participant_identity = 2 [(logger.name) = "participantIdentity"];
   // Unique key of the data blob to retrieve.
   DataBlobKey key = 3;
 }
