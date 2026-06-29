@@ -288,7 +288,7 @@ message DataTrackInfo {
   Encryption.Type encryption = 4;
 
   // Encoding for frame payloads on this track. If unspecified, the track is untyped.
-  DataTrackFrameEncoding frame_encoding = 5;
+  optional DataTrackFrameEncoding frame_encoding = 5;
 
   // ID of the schema used by frames on this track if the track is typed.
   optional DataTrackSchemaId schema = 6;
