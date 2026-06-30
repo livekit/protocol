@@ -774,8 +774,8 @@ func (p *UpdateSIPDispatchRuleRequest_Update) Apply(info *SIPDispatchRuleInfo) (
 }
 
 func (p *CreateSIPParticipantRequest) Validate() error {
-	if p.SipTrunkId == "" && p.Trunk == nil {
-		return errors.New("missing sip trunk id")
+	if p.SipTrunkId == "" && p.Trunk == nil && p.SipNumber == "" {
+		return errors.New("missing sip trunk id and sip number")
 	}
 	if p.Trunk != nil {
 		if err := p.Trunk.Validate(); err != nil {
