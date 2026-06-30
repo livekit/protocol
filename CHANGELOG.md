@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.48.2
+
+### Patch Changes
+
+- Enabling soft fail for sip validation - [#1650](https://github.com/livekit/protocol/pull/1650) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Use camel case log name in `DataBlobKey` - [#1649](https://github.com/livekit/protocol/pull/1649) ([@ladvoc](https://github.com/ladvoc))
+
 ## 1.48.1
 
 ### Patch Changes
