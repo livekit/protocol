@@ -1,5 +1,15 @@
 # github.com/livekit/protocol
 
+## 1.49.0
+
+### Minor Changes
+
+- Support cloud agent attributes in CRUD operations - [#1636](https://github.com/livekit/protocol/pull/1636) ([@rektdeckard](https://github.com/rektdeckard))
+
+### Patch Changes
+
+- Relax SIP outbound validation to support carriers. - [#1611](https://github.com/livekit/protocol/pull/1611) ([@dennwc](https://github.com/dennwc))
+
 ## 1.48.2
 
 ### Patch Changes

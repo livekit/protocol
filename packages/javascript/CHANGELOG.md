@@ -1,5 +1,15 @@
 # @livekit/protocol
 
+## 1.49.0
+
+### Minor Changes
+
+- Support cloud agent attributes in CRUD operations - [#1636](https://github.com/livekit/protocol/pull/1636) ([@rektdeckard](https://github.com/rektdeckard))
+
+### Patch Changes
+
+- add job id in MetricsRecordingHeader for chat log re-injection - [#1646](https://github.com/livekit/protocol/pull/1646) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.48.2
 
 ### Patch Changes
