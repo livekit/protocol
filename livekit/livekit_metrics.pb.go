@@ -463,6 +463,7 @@ type MetricsRecordingHeader struct {
 	RoomTags      map[string]string      `protobuf:"bytes,5,rep,name=room_tags,json=roomTags,proto3" json:"room_tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	RoomName      string                 `protobuf:"bytes,6,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
 	RoomStartTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=room_start_time,json=roomStartTime,proto3" json:"room_start_time,omitempty"`
+	JobId         string                 `protobuf:"bytes,8,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -539,6 +540,13 @@ func (x *MetricsRecordingHeader) GetRoomStartTime() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *MetricsRecordingHeader) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
 var File_livekit_metrics_proto protoreflect.FileDescriptor
 
 const file_livekit_metrics_proto_rawDesc = "" +
@@ -572,7 +580,7 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\xfd\x02\n" +
+	"\x19_normalized_end_timestamp\"\x94\x03\n" +
 	"\x16MetricsRecordingHeader\x12\"\n" +
 	"\aroom_id\x18\x01 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
@@ -580,7 +588,8 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"start_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x12J\n" +
 	"\troom_tags\x18\x05 \x03(\v2-.livekit.MetricsRecordingHeader.RoomTagsEntryR\broomTags\x12\x1b\n" +
 	"\troom_name\x18\x06 \x01(\tR\broomName\x12B\n" +
-	"\x0froom_start_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\rroomStartTime\x1a;\n" +
+	"\x0froom_start_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\rroomStartTime\x12\x15\n" +
+	"\x06job_id\x18\b \x01(\tR\x05jobId\x1a;\n" +
 	"\rRoomTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*\x81\a\n" +
