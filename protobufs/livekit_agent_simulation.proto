@@ -72,9 +72,8 @@ message SimulationRun {
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
     Usage usage = 13;
-    // Audio-mode pipeline metrics aggregated over the call's measured turns.
-    // Only populated for audio jobs. A -1 field means the datum was
-    // unavailable (Tier-1 metrics require the agent's backchannel).
+    // Metrics for an audio job, aggregated over the call's measured turns.
+    // Unset for text jobs; a -1 field was not measured (see AudioMetrics).
     AudioMetrics audio_metrics = 14;
 
     message Usage {
@@ -82,35 +81,83 @@ message SimulationRun {
       int32 audio_turns_count = 2;
     }
 
+    // Per-call audio metrics, grouped by pipeline stage. A -1 means the metric
+    // was not measured for this call; for counts, Scores are 0-1 unless noted.
     message AudioMetrics {
-      // Tier 0 — true end-to-end response latency off the waveform (our
-      // playout end -> the agent's speech onset). Always present for audio.
-      float e2e_latency_p50_s = 1;
-      float e2e_latency_p95_s = 2;
-      // Tier 1 — mean over turns; -1 when the backchannel is absent.
-      float wer = 3;          // normalized word error rate of the agent's STT of us
-      float llm_ttft_s = 4;
-      float stt_delay_s = 5;
-      float tts_ttfb_s = 6;
-      // Call-level barge-in count.
-      int32 interruptions = 7;
-      // Turns that contributed measurements (context for the aggregates).
-      int32 sample_count = 8;
-      // Per-turn breakdown behind the aggregates above, one entry per measured
-      // turn in order. A -1 field means the datum was unavailable for that turn.
-      repeated TurnMetrics turns = 9;
+      reserved 21, 30, 31;
+
+      // -- overall --
+      float accuracy_score = 1;    // how accurately the agent achieved the intended outcome
+      float experience_score = 2;  // overall quality of the caller experience
+
+      // -- speech recognition --
+      float stt_wer = 33;                     // word error rate of the agent's transcription of the caller
+      float stt_cer = 34;                     // character error rate
+      float stt_keyterm_accuracy = 35;        // recall of key terms (names, IDs, amounts) in the transcription
+      float stt_transcription_latency_s = 40; // seconds from the end of caller speech to the final transcript
+
+      // -- speech synthesis --
+      float tts_ttfb_s = 43;                  // seconds to the first audio of a reply
+      float tts_speech_rate_wpm = 45;         // speaking rate, words per minute
+      float tts_naturalness_score = 22;       // overall perceptual naturalness
+      float tts_prosody_score = 37;           // pitch and intonation
+      float tts_expressiveness_score = 38;    // expressiveness and affect
+      float tts_enunciation_score = 32;       // clarity of structured entities (emails, phone numbers, codes)
+      float tts_uptalk_score = 39;            // appropriate terminal intonation; low = inappropriate uptalk
+      float tts_wer = 36;                     // intelligibility: intended text vs a transcription of the output audio
+      float tts_conversationality_score = 55; // sounds conversational rather than read-aloud
+      float tts_hallucination_rate = 56;      // fraction of output audio not traceable to the input text
+      float tts_audio_quality_mos = 57;       // 1-5 mean opinion score (coloration, noise, discontinuity, loudness)
+      float tts_voice_consistency_score = 58; // voice stays consistent within and across turns
+      int32 tts_spoken_artifact_count = 59;   // spoken markup, clicks, or vowel prolongation
+
+      // -- language model --
+      float llm_ttft_s = 41;                  // seconds to the first token
+      float llm_ttfs_s = 48;                  // seconds to the first complete sentence
+      float llm_throughput_tps = 42;          // output tokens per second
+
+      // -- conversation timing & turn-taking --
+      float turn_taking_score = 10;           // overall turn-taking quality
+      float response_latency_p50_s = 11;      // reply latency from the audio; a gap is > 0, an overlap < 0
+      float response_latency_p90_s = 12;
+      float response_latency_p95_s = 13;
+      float agent_yield_latency_s = 14;       // seconds for the agent to stop after the caller barges in
+      int32 eot_misprediction_count = 15;     // times the agent started before the caller's turn ended
+      float overlap_ratio = 16;               // overlapping speech / total speech
+      float silence_total_s = 17;             // dead air within the conversation
+      int32 awkward_silence_count = 18;       // inter-turn gaps beyond the natural-pause threshold
+      int32 unanswered_caller_turns = 19;     // caller spoke but the agent never responded
+      int32 false_interruption_count = 23;    // agent paused for what was not a real interruption
+      int32 false_interruption_unrecovered_count = 24; // of those, the ones it never resumed from
+      float agent_e2e_latency_s = 44;         // agent's self-reported end-to-end reply latency
+      int32 interruption_count = 51;          // total barge-ins, caller and agent
+
+      // -- simulator conduct --
+      bool simulator_early_termination = 46;  // the simulated caller ended a still-progressing conversation
+      bool simulator_late_termination = 47;   // the simulated caller dragged on after the goal was met
+
+      // -- language quality --
+      float conciseness_score = 20;           // brevity of the agent's replies
+
+      // -- run context --
+      int32 measured_turn_count = 50;         // turns carrying at least one measurement
+      bool has_remote_session = 52;           // false when only waveform-derived metrics are available
+      string metrics_version = 53;            // metric-suite version; scores compare only within a version
+      string judge_model = 54;                // model used for judge-scored metrics
+
+      repeated TurnMetrics turns = 60;        // per-turn breakdown
 
       message TurnMetrics {
-        int32 turn = 1;  // 1-based turn index
-        // Tier 0 — true end-to-end response latency off the waveform.
-        float response_latency_s = 2;
-        // Tier 1 — the agent's own pipeline, broadcast over its RemoteSession;
-        // -1 when the backchannel is absent.
-        float wer = 3;
-        float stt_delay_s = 4;
-        float llm_ttft_s = 5;
-        float tts_ttfb_s = 6;
-        float e2e_latency_s = 7;
+        int32 turn = 1;                        // 1-based turn index
+        float response_latency_s = 2;          // reply latency from the audio
+        bool agent_cut_in = 3;                 // agent started before the caller finished this turn
+        float stt_wer = 4;
+        float stt_transcription_latency_s = 5;
+        float llm_ttft_s = 6;
+        float llm_ttfs_s = 10;
+        float tts_ttfb_s = 7;
+        float agent_e2e_latency_s = 8;
+        float conciseness_score = 9;
       }
     }
   }
