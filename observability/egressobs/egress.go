@@ -32,8 +32,8 @@ type EgressResults struct {
 
 func GetSourceType(info *livekit.EgressInfo) SessionSourceType {
 	switch r := info.Request.(type) {
-	// case *livekit.EgressInfo_Egress:
-	// 	return getSourceTypeV2(r.Egress)
+	case *livekit.EgressInfo_Egress:
+		return getSourceTypeV2(r.Egress)
 	case *livekit.EgressInfo_Replay:
 		return getSourceTypeV2(r.Replay)
 	default:
@@ -63,8 +63,8 @@ func getSourceTypeV2(r egress.EgressRequest) SessionSourceType {
 
 func GetRequestType(info *livekit.EgressInfo) EgressRequestType {
 	switch info.Request.(type) {
-	// case *livekit.EgressInfo_Egress:
-	// 	return EgressRequestTypeEgress
+	case *livekit.EgressInfo_Egress:
+		return EgressRequestTypeEgress
 	case *livekit.EgressInfo_Replay:
 		return EgressRequestTypeReplay
 	case *livekit.EgressInfo_RoomComposite:
@@ -105,12 +105,12 @@ func GetStatus(info *livekit.EgressInfo) EgressStatus {
 
 func GetRequest(info *livekit.EgressInfo) (string, error) {
 	switch req := info.Request.(type) {
-	// case *livekit.EgressInfo_Egress:
-	// 	b, err := protojson.Marshal(req.Egress)
-	// 	if err != nil {
-	// 		return "", errors.Wrap(err, "failed to marshal egress request")
-	// 	}
-	// 	return string(b), nil
+	case *livekit.EgressInfo_Egress:
+		b, err := protojson.Marshal(req.Egress)
+		if err != nil {
+			return "", errors.Wrap(err, "failed serializing Egress request")
+		}
+		return string(b), nil
 	case *livekit.EgressInfo_Replay:
 		b, err := protojson.Marshal(req.Replay)
 		if err != nil {
