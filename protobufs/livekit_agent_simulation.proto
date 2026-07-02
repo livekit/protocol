@@ -107,21 +107,21 @@ message SimulationRun {
 
     // The agent's perception of the caller.
     message Stt {
-      optional float wer = 1;                     // word error rate, pooled: word_errors / words
-      optional uint32 words = 2;                  // pooling stats: run WER = sum errors / sum words
+      optional float wer = 1;                       // word error rate, pooled: word_errors / words
+      optional uint32 words = 2;                    // pooling stats: run WER = sum errors / sum words
       optional uint32 word_errors = 3;
-      optional float cer = 4;                     // character error rate, pooled
-      optional float keyterm_recall = 5;          // recall of uttered key entities (names, IDs, amounts)
+      optional float cer = 4;                       // character error rate, pooled
+      optional float keyterm_recall = 5;            // recall of uttered key entities (names, IDs, amounts)
       optional uint32 keyterms_uttered = 6;
       optional uint32 keyterms_recognized = 7;
-      optional float transcription_latency_s = 8; // agent-reported STT/endpointing delay, mean
+      optional uint32 transcription_latency_ms = 8; // agent-reported STT/endpointing delay, mean
     }
 
     message Llm {
-      optional float ttft_s = 1;            // time to first token, mean (per-turn in turns)
-      optional float ttfs_s = 2;            // time to first sentence — the smallest speakable unit
-      optional float tokens_per_second = 3; // decode rate, mean
-      optional float conciseness_score = 4;    // judged 0-1: brief enough for voice
+      optional uint32 ttft_ms = 1;            // time to first token, mean (per-turn in turns)
+      optional uint32 ttfs_ms = 2;            // time to first sentence — the smallest speakable unit
+      optional float tokens_per_second = 3;   // decode rate, mean
+      optional float conciseness_score = 4;   // judged 0-1: brief enough for voice
     }
 
     // The agent's voice.
@@ -129,8 +129,8 @@ message SimulationRun {
       // Time to first AUDIO — the user-relevant signal. Some providers stream
       // bytes before actual speech, so byte-level TTFB alone over-promises;
       // it is kept below for disambiguation.
-      optional float ttfa_s = 1;
-      optional float ttfb_s = 2;               // provider byte-level TTFB, agent-reported
+      optional uint32 ttfa_ms = 1;
+      optional uint32 ttfb_ms = 2;             // provider byte-level TTFB, agent-reported
       optional float wer = 3;                  // intelligibility: intended text vs a transcription of the output audio
       optional float speech_rate_wpm = 4;      // speaking rate; conversational English ~110-150
       optional float naturalness_score = 5;    // judged 0-1: prosody / expressiveness
@@ -140,21 +140,21 @@ message SimulationRun {
     // End-to-end floor dynamics, measured off the audio timeline — the ground
     // truth of what the caller hears, independent of agent self-reports.
     message Conversation {
-      optional float turn_taking_score = 1;      // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
-      optional float response_latency_p50_s = 2; // floor-transfer offset; a gap is > 0, an overlap < 0
-      optional float response_latency_p90_s = 3;
-      optional float response_latency_p95_s = 4;
-      optional float agent_yield_latency_s = 5;  // how long the agent talks after a barge-in, mean
+      optional float turn_taking_score = 1;         // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
+      optional int32 response_latency_p50_ms = 2;   // floor-transfer offset; a gap is > 0, an overlap < 0
+      optional int32 response_latency_p90_ms = 3;
+      optional int32 response_latency_p95_ms = 4;
+      optional uint32 agent_yield_latency_ms = 5;   // how long the agent talks after a barge-in, mean
       optional uint32 eot_misprediction_count = 6;  // agent started before the caller's turn ended
       optional float overlap_ratio = 7;             // overlapping speech / total speech
-      optional float overlap_speech_s = 8;          // pooling stats for overlap_ratio
-      optional float total_speech_s = 9;
-      optional float silence_total_s = 10;          // dead air within the conversation
+      optional uint32 overlap_speech_ms = 8;        // pooling stats for overlap_ratio
+      optional uint32 total_speech_ms = 9;
+      optional uint32 silence_total_ms = 10;        // dead air within the conversation
       optional uint32 awkward_silence_count = 11;   // gaps past the natural-pause threshold
-      optional uint32 unanswered_persona_turns = 12;  // the simulated party spoke, the agent never responded
+      optional uint32 unanswered_persona_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;             // agent paused for a non-interruption
       optional uint32 false_interruption_unrecovered_count = 14; // of those, never resumed
-      optional float agent_reported_e2e_latency_s = 15;          // the agent's own claim;
+      optional uint32 agent_reported_e2e_latency_ms = 15;        // the agent's own claim;
     }
 
     // Was the call spoiled by the simulator, not the agent? Diagnostic only —
@@ -165,26 +165,20 @@ message SimulationRun {
       optional bool late_termination = 2;   // simulator dragged on after the goal was met
     }
 
-    enum Speaker {
-      SPEAKER_UNSPECIFIED = 0;
-      AGENT = 1;    // the agent under test
-      PERSONA = 2;  // the simulated party (caller or callee)
-    }
-
     message Turn {
-      uint32 index = 1;            // 1-based, conversation order
-      Speaker speaker = 2;
-      optional float start_s = 3;  // relative to t0; unset if the turn could not be aligned to the audio
-      optional float end_s = 4;
+      uint32 index = 1;  // 1-based, conversation order
+      livekit.agent.ChatRole role = 2; // ASSISTANT — the agent under test, USER — simulator persona.
+      optional uint32 start_ms = 3;  // relative to t0; unset if the turn could not be aligned to the audio
+      optional uint32 end_ms = 4;
       // Agent-turn measurements; a negative response latency is a cut-in (the
       // agent started before the caller's turn ended).
-      optional float response_latency_s = 5;
-      optional float transcription_delay_s = 6;
-      optional float llm_ttft_s = 7;
-      optional float llm_ttfs_s = 8;
-      optional float tts_ttfa_s = 9;
-      optional float tts_ttfb_s = 10;
-      optional float agent_reported_e2e_latency_s = 11;
+      optional int32 response_latency_ms = 5;
+      optional uint32 transcription_delay_ms = 6;
+      optional uint32 llm_ttft_ms = 7;
+      optional uint32 llm_ttfs_ms = 8;
+      optional uint32 tts_ttfa_ms = 9;
+      optional uint32 tts_ttfb_ms = 10;
+      optional uint32 agent_reported_e2e_latency_ms = 11;
       optional float conciseness_score = 12;
       optional float naturalness_score = 13;
       repeated string flags = 14;  // judge failure tags ("verbosity_or_filler", ...)
