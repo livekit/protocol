@@ -154,7 +154,7 @@ message SimulationRun {
       optional uint32 unanswered_persona_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;             // agent paused for a non-interruption
       optional uint32 false_interruption_unrecovered_count = 14; // of those, never resumed
-      optional uint32 agent_reported_e2e_latency_ms = 15;        // the agent's own claim;
+      optional uint32 agent_reported_e2e_latency_ms = 15;        // the agent's own claim, mean
     }
 
     // Was the call spoiled by the simulator, not the agent? Diagnostic only —
@@ -181,7 +181,8 @@ message SimulationRun {
       optional uint32 agent_reported_e2e_latency_ms = 11;
       optional float conciseness_score = 12;
       optional float naturalness_score = 13;
-      repeated string flags = 14;  // judge failure tags ("verbosity_or_filler", ...)
+      optional float enunciation_score = 14;  // judged 0-1: this turn's key entities audibly intact
+      repeated string flags = 15;  // judge failure tags ("verbosity_or_filler", ...)
     }
   }
 
