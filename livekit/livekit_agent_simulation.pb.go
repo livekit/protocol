@@ -1709,7 +1709,7 @@ type SimulationRun_JobMetrics_Conversation struct {
 	UnansweredPersonaTurns            *uint32                `protobuf:"varint,12,opt,name=unanswered_persona_turns,json=unansweredPersonaTurns,proto3,oneof" json:"unanswered_persona_turns,omitempty"`                                    // the simulated party spoke, the agent never responded
 	FalseInterruptionCount            *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"`                                    // agent paused for a non-interruption
 	FalseInterruptionUnrecoveredCount *uint32                `protobuf:"varint,14,opt,name=false_interruption_unrecovered_count,json=falseInterruptionUnrecoveredCount,proto3,oneof" json:"false_interruption_unrecovered_count,omitempty"` // of those, never resumed
-	AgentReportedE2ELatencyMs         *uint32                `protobuf:"varint,15,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"`                       // the agent's own claim;
+	AgentReportedE2ELatencyMs         *uint32                `protobuf:"varint,15,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"`                       // the agent's own claim, mean
 	unknownFields                     protoimpl.UnknownFields
 	sizeCache                         protoimpl.SizeCache
 }
@@ -1921,7 +1921,8 @@ type SimulationRun_JobMetrics_Turn struct {
 	AgentReportedE2ELatencyMs *uint32  `protobuf:"varint,11,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"`
 	ConcisenessScore          *float32 `protobuf:"fixed32,12,opt,name=conciseness_score,json=concisenessScore,proto3,oneof" json:"conciseness_score,omitempty"`
 	NaturalnessScore          *float32 `protobuf:"fixed32,13,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"`
-	Flags                     []string `protobuf:"bytes,14,rep,name=flags,proto3" json:"flags,omitempty"` // judge failure tags ("verbosity_or_filler", ...)
+	EnunciationScore          *float32 `protobuf:"fixed32,14,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // judged 0-1: this turn's key entities audibly intact
+	Flags                     []string `protobuf:"bytes,15,rep,name=flags,proto3" json:"flags,omitempty"`                                                       // judge failure tags ("verbosity_or_filler", ...)
 	unknownFields             protoimpl.UnknownFields
 	sizeCache                 protoimpl.SizeCache
 }
@@ -2043,6 +2044,13 @@ func (x *SimulationRun_JobMetrics_Turn) GetConcisenessScore() float32 {
 func (x *SimulationRun_JobMetrics_Turn) GetNaturalnessScore() float32 {
 	if x != nil && x.NaturalnessScore != nil {
 		return *x.NaturalnessScore
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetEnunciationScore() float32 {
+	if x != nil && x.EnunciationScore != nil {
+		return *x.EnunciationScore
 	}
 	return 0
 }
@@ -2757,7 +2765,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x9c<\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xe4<\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2807,7 +2815,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xd1\x1f\n" +
+	"\x1a\x99 \n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2907,7 +2915,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11early_termination\x18\x01 \x01(\bH\x00R\x10earlyTermination\x88\x01\x01\x12.\n" +
 	"\x10late_termination\x18\x02 \x01(\bH\x01R\x0flateTermination\x88\x01\x01B\x14\n" +
 	"\x12_early_terminationB\x13\n" +
-	"\x11_late_termination\x1a\xa3\x06\n" +
+	"\x11_late_termination\x1a\xeb\x06\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x1e\n" +
@@ -2923,8 +2931,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x1dagent_reported_e2e_latency_ms\x18\v \x01(\rH\bR\x19agentReportedE2eLatencyMs\x88\x01\x01\x120\n" +
 	"\x11conciseness_score\x18\f \x01(\x02H\tR\x10concisenessScore\x88\x01\x01\x120\n" +
 	"\x11naturalness_score\x18\r \x01(\x02H\n" +
-	"R\x10naturalnessScore\x88\x01\x01\x12\x14\n" +
-	"\x05flags\x18\x0e \x03(\tR\x05flagsB\v\n" +
+	"R\x10naturalnessScore\x88\x01\x01\x120\n" +
+	"\x11enunciation_score\x18\x0e \x01(\x02H\vR\x10enunciationScore\x88\x01\x01\x12\x14\n" +
+	"\x05flags\x18\x0f \x03(\tR\x05flagsB\v\n" +
 	"\t_start_msB\t\n" +
 	"\a_end_msB\x16\n" +
 	"\x14_response_latency_msB\x19\n" +
@@ -2935,7 +2944,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_tts_ttfb_msB \n" +
 	"\x1e_agent_reported_e2e_latency_msB\x14\n" +
 	"\x12_conciseness_scoreB\x14\n" +
-	"\x12_naturalness_scoreB\x11\n" +
+	"\x12_naturalness_scoreB\x14\n" +
+	"\x12_enunciation_scoreB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x12\n" +
 	"\x10_task_completion\x1a\xcb\x04\n" +
