@@ -91,9 +91,9 @@ message SimulationRun {
     // The accuracy anchor: the scenario verdict as 1/0, or the fraction of the declared target state the call reached.
     optional float task_completion = 3;
 
-    Stt stt = 4;
-    Llm llm = 5;
-    Tts tts = 6;
+    STT stt = 4;
+    LLM llm = 5;
+    TTS tts = 6;
     Conversation conversation = 7;
     Simulator simulator = 8;
 
@@ -106,7 +106,7 @@ message SimulationRun {
     google.protobuf.Timestamp t0 = 13;  // call start (first speech edge); turn times relative to it
 
     // The agent's perception of the caller.
-    message Stt {
+    message STT {
       optional float wer = 1;                       // word error rate, pooled: word_errors / words
       optional uint32 words = 2;                    // pooling stats: run WER = sum errors / sum words
       optional uint32 word_errors = 3;
@@ -117,7 +117,7 @@ message SimulationRun {
       optional uint32 transcription_latency_ms = 8; // agent-reported STT/endpointing delay, mean
     }
 
-    message Llm {
+    message LLM {
       optional uint32 ttft_ms = 1;            // time to first token, mean (per-turn in turns)
       optional uint32 ttfs_ms = 2;            // time to first sentence — the smallest speakable unit
       optional float tokens_per_second = 3;   // decode rate, mean
@@ -125,7 +125,7 @@ message SimulationRun {
     }
 
     // The agent's voice.
-    message Tts {
+    message TTS {
       // Time to first AUDIO — the user-relevant signal. Some providers stream
       // bytes before actual speech, so byte-level TTFB alone over-promises;
       // it is kept below for disambiguation.
@@ -192,9 +192,9 @@ message SimulationRun {
     optional float experience_score = 2;
     optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
 
-    JobMetrics.Stt stt = 4;
-    JobMetrics.Llm llm = 5;
-    JobMetrics.Tts tts = 6;
+    JobMetrics.STT stt = 4;
+    JobMetrics.LLM llm = 5;
+    JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
 
     uint32 jobs_total = 9;
