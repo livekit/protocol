@@ -72,11 +72,134 @@ message SimulationRun {
     google.protobuf.Timestamp ended_at = 11;
     string room_id = 12;
     Usage usage = 13;
+    // Quality metrics for this job's call. Unset when the job produced none.
+    JobMetrics metrics = 14;
 
     message Usage {
       int32 text_turns_count = 1;
       int32 audio_turns_count = 2;
     }
+  }
+
+  message JobMetrics {
+    // Headline scores, 0-1, computed by the worker as weighted means over the
+    // members that ran (a missing member renormalizes the rest):
+    //   accuracy   = task_completion x3 + stt.keyterm_recall + (1 - stt.wer) + tts.enunciation_score
+    //   experience = conversation.turn_taking_score x2 + tts.naturalness_score + llm.conciseness_score
+    optional float accuracy_score = 1;
+    optional float experience_score = 2;
+    // The accuracy anchor: the scenario verdict as 1/0, or the fraction of the declared target state the call reached.
+    optional float task_completion = 3;
+
+    STT stt = 4;
+    LLM llm = 5;
+    TTS tts = 6;
+    Conversation conversation = 7;
+    Simulator simulator = 8;
+
+    // Conversation timeline: one entry per transcript turn, both speakers.
+    repeated Turn turns = 9;
+
+    string judge_model = 10;            // text judge for judged scores; "" if none ran
+    string audio_judge_model = 11;      // audio (LALM) judge; "" if none ran
+    bool has_remote_session = 12;       // false = waveform-only capture (e.g. SIP)
+    google.protobuf.Timestamp t0 = 13;  // call start (first speech edge); turn times relative to it
+
+    // The agent's perception of the caller.
+    message STT {
+      optional float wer = 1;                       // word error rate, pooled: word_errors / words
+      optional uint32 words = 2;                    // pooling stats: run WER = sum errors / sum words
+      optional uint32 word_errors = 3;
+      optional float cer = 4;                       // character error rate, pooled
+      optional float keyterm_recall = 5;            // recall of uttered key entities (names, IDs, amounts)
+      optional uint32 keyterms_uttered = 6;
+      optional uint32 keyterms_recognized = 7;
+      optional uint32 transcription_latency_ms = 8; // agent-reported STT/endpointing delay, mean
+    }
+
+    message LLM {
+      optional uint32 ttft_ms = 1;            // time to first token, mean (per-turn in turns)
+      optional uint32 ttfs_ms = 2;            // time to first sentence — the smallest speakable unit
+      optional float tokens_per_second = 3;   // decode rate, mean
+      optional float conciseness_score = 4;   // judged 0-1: brief enough for voice
+    }
+
+    // The agent's voice.
+    message TTS {
+      // Time to first AUDIO — the user-relevant signal. Some providers stream
+      // bytes before actual speech, so byte-level TTFB alone over-promises;
+      // it is kept below for disambiguation.
+      optional uint32 ttfa_ms = 1;
+      optional uint32 ttfb_ms = 2;             // provider byte-level TTFB, agent-reported
+      optional float wer = 3;                  // intelligibility: intended text vs a transcription of the output audio
+      optional float speech_rate_wpm = 4;      // speaking rate; conversational English ~110-150
+      optional float naturalness_score = 5;    // judged 0-1: prosody / expressiveness
+      optional float enunciation_score = 6;    // judged 0-1: key entities audibly intact
+    }
+
+    // End-to-end floor dynamics, measured off the audio timeline — the ground
+    // truth of what the caller hears, independent of agent self-reports.
+    message Conversation {
+      optional float turn_taking_score = 1;         // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
+      optional int32 response_latency_p50_ms = 2;   // floor-transfer offset; a gap is > 0, an overlap < 0
+      optional int32 response_latency_p90_ms = 3;
+      optional int32 response_latency_p95_ms = 4;
+      optional uint32 agent_yield_latency_ms = 5;   // how long the agent talks after a barge-in, mean
+      optional uint32 eot_misprediction_count = 6;  // agent started before the caller's turn ended
+      optional float overlap_ratio = 7;             // overlapping speech / total speech
+      optional uint32 overlap_speech_ms = 8;        // pooling stats for overlap_ratio
+      optional uint32 total_speech_ms = 9;
+      optional uint32 silence_total_ms = 10;        // dead air within the conversation
+      optional uint32 awkward_silence_count = 11;   // gaps past the natural-pause threshold
+      optional uint32 unanswered_persona_turns = 12;             // the simulated party spoke, the agent never responded
+      optional uint32 false_interruption_count = 13;             // agent paused for a non-interruption
+      optional uint32 false_interruption_unrecovered_count = 14; // of those, never resumed
+      optional uint32 agent_reported_e2e_latency_ms = 15;        // the agent's own claim, mean
+    }
+
+    // Was the call spoiled by the simulator, not the agent? Diagnostic only —
+    // never folded into the scores; run aggregation excludes flagged calls
+    // from the two headline scores.
+    message Simulator {
+      optional bool early_termination = 1;  // simulator ended a still-progressing call
+      optional bool late_termination = 2;   // simulator dragged on after the goal was met
+    }
+
+    message Turn {
+      uint32 index = 1;  // 1-based, conversation order
+      livekit.agent.ChatRole role = 2; // ASSISTANT — the agent under test, USER — simulator persona.
+      optional uint32 start_ms = 3;  // relative to t0; unset if the turn could not be aligned to the audio
+      optional uint32 end_ms = 4;
+      // Agent-turn measurements; a negative response latency is a cut-in (the
+      // agent started before the caller's turn ended).
+      optional int32 response_latency_ms = 5;
+      optional uint32 transcription_delay_ms = 6;
+      optional uint32 llm_ttft_ms = 7;
+      optional uint32 llm_ttfs_ms = 8;
+      optional uint32 tts_ttfa_ms = 9;
+      optional uint32 tts_ttfb_ms = 10;
+      optional uint32 agent_reported_e2e_latency_ms = 11;
+      optional float conciseness_score = 12;
+      optional float naturalness_score = 13;
+      optional float enunciation_score = 14;  // judged 0-1: this turn's key entities audibly intact
+      repeated string flags = 15;  // judge failure tags ("verbosity_or_filler", ...)
+    }
+  }
+
+  // Aggregates over this run's jobs. Reuses the JobMetrics group shapes.
+  message RunMetrics {
+    optional float accuracy_score = 1;     // mean over scored jobs
+    optional float experience_score = 2;
+    optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
+
+    JobMetrics.STT stt = 4;
+    JobMetrics.LLM llm = 5;
+    JobMetrics.TTS tts = 6;
+    JobMetrics.Conversation conversation = 7;
+
+    uint32 jobs_total = 9;
+    uint32 jobs_failed = 10;           // infra failures, excluded from aggregates
+    uint32 jobs_simulator_fault = 11;  // spoiled by the simulator: flagged, not scored
   }
 
   message Create {
@@ -165,6 +288,8 @@ message SimulationRun {
   int32 concurrency = 17;
   // Conversation mode for every job in this run; unspecified = TEXT.
   SimulationMode mode = 18;
+  // Run-level metric aggregates.
+  RunMetrics metrics = 19;
 
   message Usage {
     int32 text_turns_count = 1;
