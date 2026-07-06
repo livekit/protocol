@@ -1064,9 +1064,6 @@ func (p *SIPCodec) Validate() error {
 	if strings.Contains(p.Name, "/") {
 		return errors.New("codec name must not contain '/'")
 	}
-	if p.Rate == 0 {
-		return errors.New("invalid codec sample rate")
-	}
 	return nil
 }
 
