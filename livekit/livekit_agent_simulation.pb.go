@@ -1697,8 +1697,8 @@ type SimulationRun_JobMetrics_Conversation struct {
 	state                             protoimpl.MessageState `protogen:"open.v1"`
 	TurnTakingScore                   *float32               `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                 // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
 	ResponseLatencyP50Ms              *int32                 `protobuf:"varint,2,opt,name=response_latency_p50_ms,json=responseLatencyP50Ms,proto3,oneof" json:"response_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
-	ResponseLatencyP90Ms              *int32                 `protobuf:"varint,3,opt,name=response_latency_p90_ms,json=responseLatencyP90Ms,proto3,oneof" json:"response_latency_p90_ms,omitempty"`
-	ResponseLatencyP95Ms              *int32                 `protobuf:"varint,4,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
+	ResponseLatencyP95Ms              *int32                 `protobuf:"varint,3,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
+	ResponseLatencyP99Ms              *int32                 `protobuf:"varint,4,opt,name=response_latency_p99_ms,json=responseLatencyP99Ms,proto3,oneof" json:"response_latency_p99_ms,omitempty"`
 	AgentYieldLatencyMs               *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`     // how long the agent talks after a barge-in, mean
 	EotMispredictionCount             *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended
 	OverlapRatio                      *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
@@ -1758,16 +1758,16 @@ func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP50Ms() int32 
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP90Ms() int32 {
-	if x != nil && x.ResponseLatencyP90Ms != nil {
-		return *x.ResponseLatencyP90Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP95Ms() int32 {
+	if x != nil && x.ResponseLatencyP95Ms != nil {
+		return *x.ResponseLatencyP95Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP95Ms() int32 {
-	if x != nil && x.ResponseLatencyP95Ms != nil {
-		return *x.ResponseLatencyP95Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP99Ms() int32 {
+	if x != nil && x.ResponseLatencyP99Ms != nil {
+		return *x.ResponseLatencyP99Ms
 	}
 	return 0
 }
@@ -2881,8 +2881,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fConversation\x12/\n" +
 	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12:\n" +
 	"\x17response_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14responseLatencyP50Ms\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p90_ms\x18\x03 \x01(\x05H\x02R\x14responseLatencyP90Ms\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p95_ms\x18\x04 \x01(\x05H\x03R\x14responseLatencyP95Ms\x88\x01\x01\x128\n" +
+	"\x17response_latency_p95_ms\x18\x03 \x01(\x05H\x02R\x14responseLatencyP95Ms\x88\x01\x01\x12:\n" +
+	"\x17response_latency_p99_ms\x18\x04 \x01(\x05H\x03R\x14responseLatencyP99Ms\x88\x01\x01\x128\n" +
 	"\x16agent_yield_latency_ms\x18\x05 \x01(\rH\x04R\x13agentYieldLatencyMs\x88\x01\x01\x12;\n" +
 	"\x17eot_misprediction_count\x18\x06 \x01(\rH\x05R\x15eotMispredictionCount\x88\x01\x01\x12(\n" +
 	"\roverlap_ratio\x18\a \x01(\x02H\x06R\foverlapRatio\x88\x01\x01\x12/\n" +
@@ -2898,8 +2898,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x1dagent_reported_e2e_latency_ms\x18\x0f \x01(\rH\x0eR\x19agentReportedE2eLatencyMs\x88\x01\x01B\x14\n" +
 	"\x12_turn_taking_scoreB\x1a\n" +
 	"\x18_response_latency_p50_msB\x1a\n" +
-	"\x18_response_latency_p90_msB\x1a\n" +
-	"\x18_response_latency_p95_msB\x19\n" +
+	"\x18_response_latency_p95_msB\x1a\n" +
+	"\x18_response_latency_p99_msB\x19\n" +
 	"\x17_agent_yield_latency_msB\x1a\n" +
 	"\x18_eot_misprediction_countB\x10\n" +
 	"\x0e_overlap_ratioB\x14\n" +

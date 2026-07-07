@@ -142,8 +142,8 @@ message SimulationRun {
     message Conversation {
       optional float turn_taking_score = 1;         // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
       optional int32 response_latency_p50_ms = 2;   // floor-transfer offset; a gap is > 0, an overlap < 0
-      optional int32 response_latency_p90_ms = 3;
-      optional int32 response_latency_p95_ms = 4;
+      optional int32 response_latency_p95_ms = 3;
+      optional int32 response_latency_p99_ms = 4;
       optional uint32 agent_yield_latency_ms = 5;   // how long the agent talks after a barge-in, mean
       optional uint32 eot_misprediction_count = 6;  // agent started before the caller's turn ended
       optional float overlap_ratio = 7;             // overlapping speech / total speech
