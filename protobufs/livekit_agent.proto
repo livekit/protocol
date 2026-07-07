@@ -15,12 +15,13 @@
 syntax = "proto3";
 
 package livekit;
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
 
 import "livekit_models.proto";
 import "logger/options.proto";
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
 
 message Job {
   string id = 1;
@@ -35,6 +36,7 @@ message Job {
   bool enable_recording = 10;
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
+  bool enable_redaction = 13;
 }
 
 message JobState {
@@ -64,7 +66,7 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
-  };
+  }
 }
 
 // from Server to Worker
