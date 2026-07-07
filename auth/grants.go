@@ -581,6 +581,8 @@ type AgentGrant struct {
 	Admin bool `json:"admin,omitempty"`
 	// SimulationAdmin grants access to manage simulations and scenarios for evaluating agents.
 	SimulationAdmin bool `json:"simulationAdmin,omitempty"`
+	// DispatchAdmin grants access to manage the project's outbound agent dispatch queue.
+	DispatchAdmin bool `json:"dispatchAdmin,omitempty"`
 }
 
 func (s *AgentGrant) Clone() *AgentGrant {
@@ -600,6 +602,7 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 	e.AddBool("Admin", s.Admin)
 	e.AddBool("SimulationAdmin", s.SimulationAdmin)
+	e.AddBool("DispatchAdmin", s.DispatchAdmin)
 	return nil
 }
 

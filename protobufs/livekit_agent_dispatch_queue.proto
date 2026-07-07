@@ -1,0 +1,167 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "google/protobuf/timestamp.proto";
+import "livekit_models.proto";
+import "logger/options.proto";
+
+// Queued outbound agent dispatch jobs, drained by the project's dispatch
+// queue scheduler within its available outbound concurrency. See the
+// "Agent Dispatch Queueing Service" design doc for the full model.
+message QueuedJob {
+  enum Status {
+    STATUS_QUEUED = 0;
+    STATUS_DISPATCHING = 1;
+    STATUS_RUNNING = 2;
+    STATUS_SUCCEEDED = 3;
+    STATUS_FAILED = 4;
+    STATUS_CANCELLED = 5;
+    STATUS_EXPIRED = 6;
+  }
+
+  message Input {
+    string agent_name = 1;
+    // Opaque payload passed to the agent job (e.g. phone number, account context, room name).
+    string dispatch_payload = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    // Unique per project. Re-adding with the same key returns the existing job.
+    string idempotency_key = 3;
+    // Never dispatch after this time; job transitions to STATUS_EXPIRED instead.
+    optional google.protobuf.Timestamp expires_at = 4;
+    // Per-job callbacks, signed with the project key, same pattern as Egress
+    // per-request webhooks. Project-level webhooks fire regardless.
+    repeated WebhookConfig webhooks = 5;
+  }
+
+  message Add {
+    message Request {
+      string project_id = 1;
+      // Up to 1,000 per request. Validation is atomic per request: if any
+      // entry is invalid, nothing is enqueued.
+      repeated Input jobs = 2;
+    }
+    message Response {
+      // Same order and length as the request. Entries whose idempotency_key
+      // already existed return the pre-existing job unchanged.
+      repeated QueuedJob jobs = 1;
+    }
+  }
+
+  message Remove {
+    message Request {
+      string project_id = 1;
+      string job_id = 2 [(logger.name) = "jobID"];
+    }
+    message Response {}
+  }
+
+  message Get {
+    message Request {
+      string project_id = 1;
+      string job_id = 2 [(logger.name) = "jobID"];
+    }
+    message Response {
+      QueuedJob job = 1;
+    }
+  }
+
+  message List {
+    message Request {
+      string project_id = 1;
+      optional Status status = 2;
+      optional TokenPagination page_token = 3;
+      optional int32 page_size = 4;
+    }
+    message Response {
+      repeated QueuedJob jobs = 1;
+      TokenPagination next_page_token = 2;
+    }
+  }
+
+  // Re-queues jobs currently in STATUS_FAILED or STATUS_EXPIRED. Jobs in any
+  // other state are left untouched and reported back with their existing state.
+  message Retry {
+    message Request {
+      string project_id = 1;
+      repeated string job_ids = 2 [(logger.name) = "jobIDs"];
+      // If set, replaces the job's expires_at for this attempt.
+      optional google.protobuf.Timestamp expires_at = 3;
+    }
+    message Response {
+      repeated QueuedJob jobs = 1;
+    }
+  }
+
+  string id = 1;
+  string project_id = 2;
+  Status status = 3;
+  Input input = 4;
+  // Set once dispatch is invoked; the join point into existing dispatch APIs.
+  string dispatch_id = 5 [(logger.name) = "dispatchID"];
+  // Set once the room is created.
+  string room_name = 6;
+  // Written by the agent (via job state update) before exiting; carried on the terminal webhook.
+  string result = 7;
+  // Populated for STATUS_FAILED / infra-retry exhaustion.
+  string error = 8;
+  // Infra-level dispatch attempts.
+  int32 attempts = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp dispatched_at = 11;
+  google.protobuf.Timestamp completed_at = 12;
+}
+
+// Per-project settings for the outbound dispatch queue.
+message DispatchQueueConfig {
+  message Get {
+    message Request {
+      string project_id = 1;
+    }
+    message Response {
+      DispatchQueueConfig config = 1;
+    }
+  }
+
+  message Update {
+    message Request {
+      string project_id = 1;
+      // Concurrency headroom reserved for inbound sessions; outbound
+      // admission is capped at the project's remaining reservations minus
+      // this value.
+      uint32 reserved_inbound_concurrency = 2;
+    }
+    message Response {
+      DispatchQueueConfig config = 1;
+    }
+  }
+
+  uint32 reserved_inbound_concurrency = 1;
+}
+
+service AgentDispatchQueue {
+  rpc AddJobs(QueuedJob.Add.Request) returns (QueuedJob.Add.Response);
+  rpc RemoveJob(QueuedJob.Remove.Request) returns (QueuedJob.Remove.Response);
+  rpc GetJob(QueuedJob.Get.Request) returns (QueuedJob.Get.Response);
+  rpc ListJobs(QueuedJob.List.Request) returns (QueuedJob.List.Response);
+  rpc RetryJobs(QueuedJob.Retry.Request) returns (QueuedJob.Retry.Response);
+  rpc GetDispatchQueueConfig(DispatchQueueConfig.Get.Request) returns (DispatchQueueConfig.Get.Response);
+  rpc UpdateDispatchQueueConfig(DispatchQueueConfig.Update.Request) returns (DispatchQueueConfig.Update.Response);
+}
