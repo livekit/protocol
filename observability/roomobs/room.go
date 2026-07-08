@@ -129,11 +129,12 @@ func TrackSourceFromProto(p livekit.TrackSource) TrackSource {
 
 type RoomFeature uint16
 
-func (f RoomFeature) HasIngress() bool   { return f&IngressRoomFeature != 0 }
-func (f RoomFeature) HasEgress() bool    { return f&EgressRoomFeature != 0 }
-func (f RoomFeature) HasSIP() bool       { return f&SIPRoomFeature != 0 }
-func (f RoomFeature) HasAgent() bool     { return f&AgentRoomFeature != 0 }
-func (f RoomFeature) HasConnector() bool { return f&ConnectorRoomFeature != 0 }
+func (f RoomFeature) HasIngress() bool    { return f&IngressRoomFeature != 0 }
+func (f RoomFeature) HasEgress() bool     { return f&EgressRoomFeature != 0 }
+func (f RoomFeature) HasSIP() bool        { return f&SIPRoomFeature != 0 }
+func (f RoomFeature) HasAgent() bool      { return f&AgentRoomFeature != 0 }
+func (f RoomFeature) HasConnector() bool  { return f&ConnectorRoomFeature != 0 }
+func (f RoomFeature) HasSimulation() bool { return f&SimulationRoomFeature != 0 }
 
 const (
 	IngressRoomFeature RoomFeature = 1 << iota
@@ -141,6 +142,7 @@ const (
 	SIPRoomFeature
 	AgentRoomFeature
 	ConnectorRoomFeature
+	SimulationRoomFeature
 )
 
 func RoomFeatureFromParticipantKind(k livekit.ParticipantInfo_Kind) RoomFeature {
