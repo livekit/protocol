@@ -204,6 +204,9 @@ message PublishDataTrackRequest {
   // ID of the schema used by frames on this track if the track is typed.
   // If set, the associated schema must be stored with `StoreDataBlobRequest`.
   optional DataTrackSchemaId schema = 5;
+
+  // Whether dynacast is enabled for this track.
+  bool is_dynacasted = 6;
 }
 
 message PublishDataTrackResponse {
