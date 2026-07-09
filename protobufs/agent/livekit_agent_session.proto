@@ -26,6 +26,8 @@ message MetricsReport {
   optional double llm_node_ttft = 6;
   optional double tts_node_ttfb = 7;
   optional double e2e_latency = 8;
+  optional double llm_node_tps = 9;
+  optional double llm_node_ttfs = 10;
 }
 
 message TimedString {
@@ -303,6 +305,12 @@ message AgentSessionEvent {
     }
   }
 
+  message AgentFalseInterruption {
+    // Agent paused its own speech for what turned out not to be a real interruption (a backchannel, brief noise, etc.).
+    bool resumed = 1;
+    optional double resume_delay = 2;  // unset if not resumed
+  }
+
   google.protobuf.Timestamp created_at = 1;
   oneof event {
     AgentStateChanged agent_state_changed = 10;
@@ -318,6 +326,7 @@ message AgentSessionEvent {
     FunctionToolsStarted function_tools_started = 20;
     DebugMessage debug_message = 21;
     ToolExecutionUpdated tool_execution_updated = 22;
+    AgentFalseInterruption agent_false_interruption = 23;
   }
 }
 
