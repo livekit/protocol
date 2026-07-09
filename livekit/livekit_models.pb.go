@@ -2744,7 +2744,9 @@ type DataTrackInfo struct {
 	// Encoding for frame payloads on this track. If unspecified, the track is untyped.
 	FrameEncoding *DataTrackFrameEncoding `protobuf:"bytes,5,opt,name=frame_encoding,json=frameEncoding,proto3,oneof" json:"frame_encoding,omitempty"`
 	// ID of the schema used by frames on this track if the track is typed.
-	Schema        *DataTrackSchemaId `protobuf:"bytes,6,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
+	Schema *DataTrackSchemaId `protobuf:"bytes,6,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
+	// Whether dynacast is enabled for this track.
+	IsDynacasted  bool `protobuf:"varint,7,opt,name=is_dynacasted,json=isDynacasted,proto3" json:"is_dynacasted,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2819,6 +2821,13 @@ func (x *DataTrackInfo) GetSchema() *DataTrackSchemaId {
 		return x.Schema
 	}
 	return nil
+}
+
+func (x *DataTrackInfo) GetIsDynacasted() bool {
+	if x != nil {
+		return x.IsDynacasted
+	}
+	return false
 }
 
 // Encoding for frame payloads.
@@ -6943,7 +6952,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\aversion\x18\x12 \x01(\v2\x15.livekit.TimedVersionR\aversion\x12A\n" +
 	"\x0eaudio_features\x18\x13 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12J\n" +
 	"\x13backup_codec_policy\x18\x14 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12U\n" +
-	"\x17packet_trailer_features\x18\x15 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xb2\x02\n" +
+	"\x17packet_trailer_features\x18\x15 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xd7\x02\n" +
 	"\rDataTrackInfo\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x10\n" +
@@ -6953,7 +6962,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"encryption\x18\x04 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\x12K\n" +
 	"\x0eframe_encoding\x18\x05 \x01(\v2\x1f.livekit.DataTrackFrameEncodingH\x00R\rframeEncoding\x88\x01\x01\x127\n" +
-	"\x06schema\x18\x06 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01B\x11\n" +
+	"\x06schema\x18\x06 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01\x12#\n" +
+	"\ris_dynacasted\x18\a \x01(\bR\fisDynacastedB\x11\n" +
 	"\x0f_frame_encodingB\t\n" +
 	"\a_schema\"\xe2\x03\n" +
 	"\x16DataTrackFrameEncoding\x12W\n" +
