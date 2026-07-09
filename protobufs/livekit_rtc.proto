@@ -129,6 +129,8 @@ message SignalResponse {
     UnpublishDataTrackResponse unpublish_data_track_response = 28;
     // Sent to data track subscribers to provide mapping from track SIDs to handles.
     DataTrackSubscriberHandles data_track_subscriber_handles = 29;
+    // Sent to data track publisher to indicate a change in demand.
+    DataTrackDemandUpdate data_track_demand_update = 32;
     // Sent in response to `StoreDataBlobRequest`.
     StoreDataBlobResponse store_data_blob_response = 30;
     // Sent in response to `GetDataBlobRequest`.
@@ -228,6 +230,15 @@ message DataTrackSubscriberHandles {
 
   // Maps handles from incoming packets to the track SIDs that the packets belong to.
   map<uint32, PublishedDataTrack> sub_handles = 1;
+}
+
+message DataTrackDemandUpdate {
+  // Publisher handle of the track.
+  uint32 pub_handle = 1;
+
+  // Number of participants currently subscribed to the track. Used
+  // by the publisher when dynacast is enabled for the track.
+  uint32 subscriber_count = 2;
 }
 
 message TrickleRequest {
