@@ -308,7 +308,6 @@ message AgentSessionEvent {
   message AgentFalseInterruption {
     // Agent paused its own speech for what turned out not to be a real interruption (a backchannel, brief noise, etc.).
     bool resumed = 1;
-    optional double resume_delay = 2;  // unset if not resumed
   }
 
   google.protobuf.Timestamp created_at = 1;
