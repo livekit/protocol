@@ -3467,8 +3467,7 @@ func (*AgentSessionEvent_ToolExecutionUpdated_Ended_) isAgentSessionEvent_ToolEx
 type AgentSessionEvent_AgentFalseInterruption struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Agent paused its own speech for what turned out not to be a real interruption (a backchannel, brief noise, etc.).
-	Resumed       bool     `protobuf:"varint,1,opt,name=resumed,proto3" json:"resumed,omitempty"`
-	ResumeDelay   *float64 `protobuf:"fixed64,2,opt,name=resume_delay,json=resumeDelay,proto3,oneof" json:"resume_delay,omitempty"` // unset if not resumed
+	Resumed       bool `protobuf:"varint,1,opt,name=resumed,proto3" json:"resumed,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3508,13 +3507,6 @@ func (x *AgentSessionEvent_AgentFalseInterruption) GetResumed() bool {
 		return x.Resumed
 	}
 	return false
-}
-
-func (x *AgentSessionEvent_AgentFalseInterruption) GetResumeDelay() float64 {
-	if x != nil && x.ResumeDelay != nil {
-		return *x.ResumeDelay
-	}
-	return 0
 }
 
 type AgentSessionEvent_ToolExecutionUpdated_Started struct {
@@ -5191,7 +5183,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\vmodel_usage\x18\x01 \x03(\v2\x19.livekit.agent.ModelUsageR\n" +
 	"modelUsage\"A\n" +
 	"\fDebugMessage\x121\n" +
-	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\x86 \n" +
+	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xcd\x1f\n" +
 	"\x11AgentSessionEvent\x129\n" +
 	"\n" +
 	"created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12d\n" +
@@ -5277,11 +5269,9 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"update_ids\x18\x01 \x03(\tB\f\xbaP\tupdateIDsR\tupdateIds\x126\n" +
 	"\x06status\x18\x02 \x01(\x0e2\x1e.livekit.agent.ToolReplyStatusR\x06status\x12(\n" +
 	"\tspeech_id\x18\x03 \x01(\tB\v\xbaP\bspeechIDR\bspeechIdB\b\n" +
-	"\x06update\x1ak\n" +
+	"\x06update\x1a2\n" +
 	"\x16AgentFalseInterruption\x12\x18\n" +
-	"\aresumed\x18\x01 \x01(\bR\aresumed\x12&\n" +
-	"\fresume_delay\x18\x02 \x01(\x01H\x00R\vresumeDelay\x88\x01\x01B\x0f\n" +
-	"\r_resume_delayB\a\n" +
+	"\aresumed\x18\x01 \x01(\bR\aresumedB\a\n" +
 	"\x05event\"\x98\r\n" +
 	"\x0eSessionRequest\x12\x1d\n" +
 	"\n" +
@@ -5735,7 +5725,6 @@ func file_agent_livekit_agent_session_proto_init() {
 		(*AgentSessionEvent_ToolExecutionUpdated_ReplyUpdated_)(nil),
 		(*AgentSessionEvent_ToolExecutionUpdated_Ended_)(nil),
 	}
-	file_agent_livekit_agent_session_proto_msgTypes[35].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[38].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[48].OneofWrappers = []any{}
 	file_agent_livekit_agent_session_proto_msgTypes[50].OneofWrappers = []any{}
