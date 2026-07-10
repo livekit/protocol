@@ -267,6 +267,130 @@ message SimulationRun {
     message Response {}
   }
 
+  // One record in a job's live event stream, emitted by the simulator while
+  // the conversation runs and persisted in order. Events are append-only and
+  // immutable: streams that arrive later (the agent's STT of an earlier
+  // utterance, playout timing) are their own events correlated by `ordinal`,
+  // never edits. The final JobMetrics.turns remains the authoritative aligned
+  // record; events are the live/replay feed.
+  message JobEvent {
+    enum Type {
+      TYPE_UNSPECIFIED = 0;
+      // What the simulated user said: the persona's own text (audio mode: the
+      // TTS input; text mode: the sent message).
+      TYPE_PERSONA_UTTERANCE = 1;
+      // The agent's committed reply text, from its conversation items.
+      TYPE_AGENT_UTTERANCE = 2;
+      // The agent's final STT transcript of a persona utterance. Absent for
+      // agents without a session host (e.g. SIP).
+      TYPE_AGENT_HEARD_PERSONA = 3;
+      // The simulator's STT transcript of the agent's speech.
+      TYPE_PERSONA_HEARD_AGENT = 4;
+      // Timing enrichment: when persona utterance `ref_ordinal` was audible,
+      // truncation by interruption included.
+      TYPE_PERSONA_PLAYOUT = 5;
+      // Job lifecycle milestone; `phase` is set.
+      TYPE_JOB_PHASE = 6;
+    }
+
+    enum Phase {
+      PHASE_UNSPECIFIED = 0;
+      PHASE_CONNECTED = 1;      // simulator joined the room
+      PHASE_AGENT_JOINED = 2;   // agent participant found
+      PHASE_SESSION_READY = 3;  // agent's session host reachable
+      PHASE_CONVERSATION = 4;   // first turn underway
+      PHASE_JUDGING = 5;        // call over, verdict pending
+      PHASE_FINISHED = 6;       // handler done (informational; the job row is authoritative)
+    }
+
+    // One span of the word alignment between a reference text and a
+    // transcript of it, produced by the same computation that pools into
+    // JobMetrics WER — clients render these, they never recompute.
+    message Align {
+      enum Kind {
+        KIND_UNSPECIFIED = 0;
+        KIND_EQUAL = 1;
+        KIND_SUBSTITUTION = 2;
+        KIND_DELETION = 3;   // reference words the transcript missed
+        KIND_INSERTION = 4;  // transcript words with no reference source
+      }
+      Kind kind = 1;
+      string gold = 2;   // normalized reference tokens in this span ("" for insertions)
+      string heard = 3;  // normalized transcript tokens ("" for deletions)
+    }
+
+    int64 run_seq = 1;   // server-assigned, strictly increasing within the run; the poll cursor
+    string job_id = 2;   // SimulationRun.Job.id
+    // Queue retry attempt that produced this event. A retried job restarts
+    // its stream; clients render only the highest attempt per job.
+    uint32 attempt = 3;
+    int64 seq = 4;       // producer-assigned, contiguous from 1 per (job_id, attempt); dedup key
+    google.protobuf.Timestamp ts = 5;  // producer (simulator) wall clock
+
+    Type type = 6;
+    // Counts events of the same Type within the attempt (1-based). Pairs
+    // perception streams by order: the Nth AGENT_HEARD_PERSONA transcribes
+    // the Nth PERSONA_UTTERANCE.
+    uint32 ordinal = 7;
+    string text = 8;
+
+    // Heard events (TYPE_AGENT_HEARD_PERSONA, TYPE_PERSONA_HEARD_AGENT):
+    // which uttered ordinal `text` transcribes, plus its error rates.
+    uint32 ref_ordinal = 9;
+    optional float wer = 10;
+    optional uint32 words = 11;        // pooling stats: run WER = sum errors / sum words
+    optional uint32 word_errors = 12;
+    optional float cer = 13;
+    repeated Align alignment = 14;
+
+    // TYPE_PERSONA_PLAYOUT: when the utterance was audible (wall clock).
+    google.protobuf.Timestamp started_at = 15;
+    google.protobuf.Timestamp ended_at = 16;
+
+    // TYPE_AGENT_UTTERANCE: the agent's self-reported pipeline timings.
+    optional uint32 transcription_delay_ms = 17;
+    optional uint32 llm_ttft_ms = 18;
+    optional uint32 tts_ttfb_ms = 19;
+    optional uint32 e2e_latency_ms = 20;
+
+    // TYPE_JOB_PHASE:
+    Phase phase = 21;
+    string detail = 22;  // annotation, e.g. failure reason on PHASE_FINISHED
+  }
+
+  message GetEvents {
+    message Request {
+      string project_id = 1;
+      string simulation_run_id = 2;
+      // Serve events with run_seq > after; 0 starts from the beginning. The
+      // cursor is run-global: events of concurrent jobs interleave, but each
+      // job's stream stays internally ordered.
+      int64 after = 3;
+      // Restrict to one job (SimulationRun.Job.id). Narrows results only;
+      // the cursor semantics are unchanged.
+      string job_id = 4;
+      // Page size; the server clamps (default 500, max 2000).
+      int32 limit = 5;
+    }
+    message Response {
+      repeated JobEvent events = 1;  // ascending run_seq
+      // Cursor for the next call: run_seq of the last served event, or
+      // `after` echoed back when there were none.
+      int64 next = 2;
+      bool has_more = 3;  // the page was truncated by limit; poll again immediately
+      // Progress snapshot. A terminal run_status is the end-of-stream signal:
+      // every event is flushed by the time the run terminalizes, even when a
+      // worker died mid-job. GetSimulationRun stays the authoritative read.
+      Status run_status = 4;
+      repeated JobState jobs = 5;
+
+      message JobState {
+        string job_id = 1;
+        Job.Status status = 2;
+      }
+    }
+  }
+
   string id = 1;
   string project_id = 2;
   Status status = 3;
@@ -355,6 +479,7 @@ service AgentSimulation {
   rpc CreateSimulationRun(SimulationRun.Create.Request) returns (SimulationRun.Create.Response);
   rpc ConfirmSimulationSourceUpload(SimulationRun.ConfirmSourceUpload.Request) returns (SimulationRun.ConfirmSourceUpload.Response);
   rpc GetSimulationRun(SimulationRun.Get.Request) returns (SimulationRun.Get.Response);
+  rpc GetSimulationRunEvents(SimulationRun.GetEvents.Request) returns (SimulationRun.GetEvents.Response);
   rpc ListSimulationRuns(SimulationRun.List.Request) returns (SimulationRun.List.Response);
   rpc CancelSimulationRun(SimulationRun.Cancel.Request) returns (SimulationRun.Cancel.Response);
 
