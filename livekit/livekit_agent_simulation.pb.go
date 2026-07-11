@@ -1553,6 +1553,9 @@ type SimulationRun_JobEvent struct {
 	// TYPE_PERSONA_PLAYOUT: when the utterance was audible (wall clock).
 	StartedAt *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	EndedAt   *timestamppb.Timestamp `protobuf:"bytes,16,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	// Playback was cut before the utterance finished (barge-in): the tail
+	// of the scripted text was never voiced, so nothing could hear it.
+	Interrupted bool `protobuf:"varint,23,opt,name=interrupted,proto3" json:"interrupted,omitempty"`
 	// TYPE_AGENT_UTTERANCE: the agent's self-reported pipeline timings.
 	TranscriptionDelayMs *uint32 `protobuf:"varint,17,opt,name=transcription_delay_ms,json=transcriptionDelayMs,proto3,oneof" json:"transcription_delay_ms,omitempty"`
 	LlmTtftMs            *uint32 `protobuf:"varint,18,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`
@@ -1705,6 +1708,13 @@ func (x *SimulationRun_JobEvent) GetEndedAt() *timestamppb.Timestamp {
 		return x.EndedAt
 	}
 	return nil
+}
+
+func (x *SimulationRun_JobEvent) GetInterrupted() bool {
+	if x != nil {
+		return x.Interrupted
+	}
+	return false
 }
 
 func (x *SimulationRun_JobEvent) GetTranscriptionDelayMs() uint32 {
@@ -3498,7 +3508,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xe4L\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x86M\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3749,7 +3759,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12*\n" +
 	"\x11simulation_run_id\x18\x02 \x01(\tR\x0fsimulationRunId\x1a\n" +
 	"\n" +
-	"\bResponse\x1a\x83\f\n" +
+	"\bResponse\x1a\xa5\f\n" +
 	"\bJobEvent\x12\x17\n" +
 	"\arun_seq\x18\x01 \x01(\x03R\x06runSeq\x12\x15\n" +
 	"\x06job_id\x18\x02 \x01(\tR\x05jobId\x12\x18\n" +
@@ -3770,7 +3780,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\talignment\x18\x0e \x03(\v2%.livekit.SimulationRun.JobEvent.AlignR\talignment\x129\n" +
 	"\n" +
 	"started_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x125\n" +
-	"\bended_at\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x129\n" +
+	"\bended_at\x18\x10 \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12 \n" +
+	"\vinterrupted\x18\x17 \x01(\bR\vinterrupted\x129\n" +
 	"\x16transcription_delay_ms\x18\x11 \x01(\rH\x04R\x14transcriptionDelayMs\x88\x01\x01\x12#\n" +
 	"\vllm_ttft_ms\x18\x12 \x01(\rH\x05R\tllmTtftMs\x88\x01\x01\x12#\n" +
 	"\vtts_ttfb_ms\x18\x13 \x01(\rH\x06R\tttsTtfbMs\x88\x01\x01\x12)\n" +

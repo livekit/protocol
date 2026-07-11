@@ -349,6 +349,9 @@ message SimulationRun {
     // TYPE_PERSONA_PLAYOUT: when the utterance was audible (wall clock).
     google.protobuf.Timestamp started_at = 15;
     google.protobuf.Timestamp ended_at = 16;
+    // Playback was cut before the utterance finished (barge-in): the tail
+    // of the scripted text was never voiced, so nothing could hear it.
+    bool interrupted = 23;
 
     // TYPE_AGENT_UTTERANCE: the agent's self-reported pipeline timings.
     optional uint32 transcription_delay_ms = 17;
