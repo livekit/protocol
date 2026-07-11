@@ -328,14 +328,17 @@ message SimulationRun {
     google.protobuf.Timestamp ts = 5;  // producer (simulator) wall clock
 
     Type type = 6;
-    // Counts events of the same Type within the attempt (1-based). Pairs
-    // perception streams by order: the Nth AGENT_HEARD_PERSONA transcribes
-    // the Nth PERSONA_UTTERANCE.
+    // Counts events of the same Type within the attempt (1-based).
     uint32 ordinal = 7;
     string text = 8;
 
-    // Heard events (TYPE_AGENT_HEARD_PERSONA, TYPE_PERSONA_HEARD_AGENT):
-    // which uttered ordinal `text` transcribes, plus its error rates.
+    // Heard events (TYPE_AGENT_HEARD_PERSONA, TYPE_PERSONA_HEARD_AGENT) are
+    // cumulative snapshots: `ref_ordinal` names the uttered turn being
+    // transcribed (0 = nothing to anchor to yet) and `text` carries
+    // everything heard for that turn so far — the producer re-segments the
+    // whole transcript stream as finals arrive, so a higher-seq snapshot for
+    // the same ref supersedes the previous one and mispairings repair
+    // themselves.
     uint32 ref_ordinal = 9;
     optional float wer = 10;
     optional uint32 words = 11;        // pooling stats: run WER = sum errors / sum words
