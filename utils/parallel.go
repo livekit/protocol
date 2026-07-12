@@ -21,6 +21,34 @@ import (
 	"go.uber.org/atomic"
 )
 
+// parallelState holds all shared state for one parallel ParallelExec call in a
+// single heap object. Keeping it in one struct (rather than separate local
+// variables captured by the goroutines) means the workers can share it through
+// one pointer, so launching them allocates only this struct plus a single
+// reused worker funcval instead of one object per goroutine.
+type parallelState[T any] struct {
+	vals  []T
+	fn    func(T)
+	step  uint64
+	end   uint64
+	start atomic.Uint64
+	wg    sync.WaitGroup
+}
+
+func (s *parallelState[T]) run() {
+	defer s.wg.Done()
+	for {
+		n := s.start.Add(s.step)
+		if n >= s.end+s.step {
+			return
+		}
+
+		for i := n - s.step; i < n && i < s.end; i++ {
+			s.fn(s.vals[i])
+		}
+	}
+}
+
 // ParallelExec will executes the given function with each element of vals, if len(vals) >= parallelThreshold,
 // will execute them in parallel, with the given step size. So fn must be thread-safe.
 func ParallelExec[T any](vals []T, parallelThreshold, step uint64, fn func(T)) {
@@ -32,29 +60,25 @@ func ParallelExec[T any](vals []T, parallelThreshold, step uint64, fn func(T)) {
 	}
 
 	// parallel - enables much more efficient multi-core utilization
-	start := atomic.NewUint64(0)
-	end := uint64(len(vals))
-
-	var wg sync.WaitGroup
 	numCPU := runtime.NumCPU()
 	if numCPU > len(vals) {
 		numCPU = len(vals)
 	}
-	wg.Add(numCPU)
-	for p := 0; p < numCPU; p++ {
-		go func() {
-			defer wg.Done()
-			for {
-				n := start.Add(step)
-				if n >= end+step {
-					return
-				}
 
-				for i := n - step; i < n && i < end; i++ {
-					fn(vals[i])
-				}
-			}
-		}()
+	st := &parallelState[T]{
+		vals: vals,
+		fn:   fn,
+		step: step,
+		end:  uint64(len(vals)),
 	}
-	wg.Wait()
+	st.wg.Add(numCPU)
+
+	// Hoist the worker funcval out of the spawn loop so every `go worker()`
+	// reuses it. A `go` statement on a method value or generic function would
+	// otherwise allocate a funcval (carrying the type dictionary) per goroutine.
+	worker := st.run
+	for p := 0; p < numCPU; p++ {
+		go worker()
+	}
+	st.wg.Wait()
 }
