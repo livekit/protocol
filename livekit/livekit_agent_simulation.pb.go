@@ -313,12 +313,8 @@ type SimulationRun struct {
 	Mode SimulationMode `protobuf:"varint,18,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
 	// Run-level metric aggregates.
 	Metrics *SimulationRun_RunMetrics `protobuf:"bytes,19,opt,name=metrics,proto3" json:"metrics,omitempty"`
-	// A SimulationRunSummary message, serialized with proto.Marshal and then
-	// zstd-compressed: decompress, then proto.Unmarshal into
-	// SimulationRunSummary. It stays a plain proto you can decode - it is just
-	// compressed by default, so the blob travels storage, PSRPC, and HTTP
-	// without re-encoding (a 100-scenario run measured 9.5MB decompressed,
-	// ~120KB as this field).
+	// zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
+	// Compressed by default so the blob ships as-is on every hop.
 	SummaryZstd   []byte `protobuf:"bytes,20,opt,name=summary_zstd,json=summaryZstd,proto3" json:"summary_zstd,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
