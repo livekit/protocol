@@ -450,9 +450,11 @@ type ConnectWhatsAppCallRequest struct {
 	WhatsappCallId string `protobuf:"bytes,1,opt,name=whatsapp_call_id,json=whatsappCallId,proto3" json:"whatsapp_call_id,omitempty"`
 	// Required - The call connect webhook comes with SDP from Meta
 	// It is the answer SDP for a business initiated call
-	Sdp           *SessionDescription `protobuf:"bytes,2,opt,name=sdp,proto3" json:"sdp,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Sdp *SessionDescription `protobuf:"bytes,2,opt,name=sdp,proto3" json:"sdp,omitempty"`
+	// Wait for the answer for the call before returning.
+	WaitUntilAnswered bool `protobuf:"varint,3,opt,name=wait_until_answered,json=waitUntilAnswered,proto3" json:"wait_until_answered,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *ConnectWhatsAppCallRequest) Reset() {
@@ -497,6 +499,13 @@ func (x *ConnectWhatsAppCallRequest) GetSdp() *SessionDescription {
 		return x.Sdp
 	}
 	return nil
+}
+
+func (x *ConnectWhatsAppCallRequest) GetWaitUntilAnswered() bool {
+	if x != nil {
+		return x.WaitUntilAnswered
+	}
+	return false
 }
 
 type ConnectWhatsAppCallResponse struct {
@@ -840,10 +849,11 @@ const file_livekit_connector_whatsapp_proto_rawDesc = "" +
 	"\x10DisconnectReason\x12\x16\n" +
 	"\x12BUSINESS_INITIATED\x10\x00\x12\x12\n" +
 	"\x0eUSER_INITIATED\x10\x01\" \n" +
-	"\x1eDisconnectWhatsAppCallResponse\"\x88\x01\n" +
+	"\x1eDisconnectWhatsAppCallResponse\"\xb8\x01\n" +
 	"\x1aConnectWhatsAppCallRequest\x12;\n" +
 	"\x10whatsapp_call_id\x18\x01 \x01(\tB\x11\xbaP\x0ewhatsappCallIDR\x0ewhatsappCallId\x12-\n" +
-	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\"\x1d\n" +
+	"\x03sdp\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionR\x03sdp\x12.\n" +
+	"\x13wait_until_answered\x18\x03 \x01(\bR\x11waitUntilAnswered\"\x1d\n" +
 	"\x1bConnectWhatsAppCallResponse\"\xca\b\n" +
 	"\x19AcceptWhatsAppCallRequest\x12Q\n" +
 	"\x18whatsapp_phone_number_id\x18\x01 \x01(\tB\x18\xbaP\x15whatsappPhoneNumberIDR\x15whatsappPhoneNumberId\x12-\n" +

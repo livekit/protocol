@@ -198,6 +198,7 @@ type Job struct {
 	EnableRecording bool              `protobuf:"varint,10,opt,name=enable_recording,json=enableRecording,proto3" json:"enable_recording,omitempty"`
 	Deployment      string            `protobuf:"bytes,11,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	Attributes      map[string]string `protobuf:"bytes,12,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	EnableRedaction bool              `protobuf:"varint,13,opt,name=enable_redaction,json=enableRedaction,proto3" json:"enable_redaction,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -315,6 +316,13 @@ func (x *Job) GetAttributes() map[string]string {
 		return x.Attributes
 	}
 	return nil
+}
+
+func (x *Job) GetEnableRedaction() bool {
+	if x != nil {
+		return x.EnableRedaction
+	}
+	return false
 }
 
 type JobState struct {
@@ -1449,7 +1457,7 @@ var File_livekit_agent_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xb7\x04\n" +
+	"\x13livekit_agent.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xe2\x04\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12.\n" +
 	"\vdispatch_id\x18\t \x01(\tB\r\xbaP\n" +
@@ -1470,7 +1478,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"deployment\x12A\n" +
 	"\n" +
 	"attributes\x18\f \x03(\v2\x1c.livekit.Job.AttributesEntryB\x03\xc0P\x01R\n" +
-	"attributes\x1a=\n" +
+	"attributes\x12)\n" +
+	"\x10enable_redaction\x18\r \x01(\bR\x0fenableRedaction\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +

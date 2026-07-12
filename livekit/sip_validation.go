@@ -209,6 +209,13 @@ var nameAddrHeaders = map[string]bool{
 	"record-route":        true,
 	"reply-to":            true,
 	"p-asserted-identity": true, // RFC 3325 Section 9.1
+	"referred-by":         true, // RFC 3892 Section 3
+}
+
+var softFailureReporter func(err error)
+
+func SetSoftFailureReporter(reporter func(err error)) {
+	softFailureReporter = reporter
 }
 
 // ValidateHeaderName validates a SIP header name per RFC 3261 Section 25.1
@@ -253,10 +260,13 @@ func ValidateHeaderValue(name, value string) error {
 
 	// Convert to lowercase for case-insensitive comparison
 	lowerName := strings.ToLower(name)
-	if _, exists := nameAddrHeaders[lowerName]; exists && false {
-		// TODO: Disabled since all supported headers are forbidden, re-enable when we allow some
+	if _, exists := nameAddrHeaders[lowerName]; exists {
 		if err := validateNameAddrHeader(value); err != nil {
-			return fmt.Errorf("header %s: value: %w", name, err)
+			err = fmt.Errorf("header %s: value: %w", name, err)
+			// For now do not actually error out on header values, just note failure.
+			if cb := softFailureReporter; cb != nil {
+				cb(err)
+			}
 		}
 	}
 
@@ -315,7 +325,7 @@ func validateNameAddrHeader(value string) error {
 		}
 	} else {
 		// This is a bare URI, and should comply with addr-spec, no special characters
-		if strings.ContainsAny(value, ";,? ") {
+		if strings.ContainsAny(value, ",? ") {
 			return errors.New("bare URI with special characters")
 		}
 	}

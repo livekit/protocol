@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/durationpb"
+
+	"github.com/livekit/protocol/utils/prototest"
 )
 
 func TestSIPTrunkAs(t *testing.T) {
@@ -724,30 +726,66 @@ func TestGRPCStatus(t *testing.T) {
 }
 
 func TestInboundTrunkUpdate(t *testing.T) {
+	update := func(r *SIPInboundTrunkInfo, u *SIPInboundTrunkUpdate) *SIPInboundTrunkInfo {
+		upd := &UpdateSIPInboundTrunkRequest{
+			Action: &UpdateSIPInboundTrunkRequest_Update{
+				Update: u,
+			},
+		}
+		out, err := upd.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
+		require.NoError(t, err)
+		require.True(t, r != out)
+		return out
+	}
 	r := &SIPInboundTrunkInfo{
 		Name:     "Test",
 		Numbers:  []string{"T1", "T2"},
 		Metadata: "test",
 	}
-	name2 := "Test2"
-	upd := &UpdateSIPInboundTrunkRequest{
-		Action: &UpdateSIPInboundTrunkRequest_Update{
-			Update: &SIPInboundTrunkUpdate{
-				Name: &name2,
-				Numbers: &ListUpdate{
-					Set: []string{"T3"},
-				},
-			},
+	out := update(r, &SIPInboundTrunkUpdate{
+		Name: new("Test2"),
+		Numbers: &ListUpdate{
+			Set: []string{"T3"},
 		},
-	}
-	out, err := upd.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
-	require.NoError(t, err)
-	require.True(t, r != out)
-	require.True(t, proto.Equal(&SIPInboundTrunkInfo{
+	})
+	prototest.Equals(t, &SIPInboundTrunkInfo{
 		Name:     "Test2",
 		Numbers:  []string{"T3"},
 		Metadata: "test",
-	}, out))
+		Media:    &SIPMediaConfig{},
+	}, out)
+
+	// Update of legacy MediaEncryption propagates to a new SIPMediaConfig.
+	out = update(out, &SIPInboundTrunkUpdate{
+		MediaEncryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+	})
+	prototest.Equals(t, &SIPInboundTrunkInfo{
+		Name:            "Test2",
+		Numbers:         []string{"T3"},
+		Metadata:        "test",
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+		Media: &SIPMediaConfig{
+			Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		},
+	}, out)
+
+	// Update of a new SIPMediaConfig downgrades to legacy MediaEncryption.
+	out = update(out, &SIPInboundTrunkUpdate{
+		Media: &SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		},
+	})
+	prototest.Equals(t, &SIPInboundTrunkInfo{
+		Name:            "Test2",
+		Numbers:         []string{"T3"},
+		Metadata:        "test",
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
+		Media: &SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		},
+	}, out)
 
 	r2 := proto.CloneOf(r)
 	r2.Numbers = []string{"T4"}
@@ -757,42 +795,80 @@ func TestInboundTrunkUpdate(t *testing.T) {
 		},
 	}
 
-	out, err = upd2.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
+	out, err := upd2.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
 	require.NoError(t, err)
 	require.True(t, r != out)
 	require.True(t, r2 != out)
-	require.True(t, proto.Equal(r2, out))
+	prototest.Equals(t, r2, out)
 }
 
 func TestOutboundTrunkUpdate(t *testing.T) {
+	update := func(r *SIPOutboundTrunkInfo, u *SIPOutboundTrunkUpdate) *SIPOutboundTrunkInfo {
+		upd := &UpdateSIPOutboundTrunkRequest{
+			Action: &UpdateSIPOutboundTrunkRequest_Update{
+				Update: u,
+			},
+		}
+		out, err := upd.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
+		require.NoError(t, err)
+		require.True(t, r != out)
+		return out
+	}
 	r := &SIPOutboundTrunkInfo{
 		Name:     "Test",
 		Address:  "sip.example.com",
 		Numbers:  []string{"T1", "T2"},
 		Metadata: "test",
 	}
-	name2 := "Test2"
-	addr2 := "sip2.example.com"
-	upd := &UpdateSIPOutboundTrunkRequest{
-		Action: &UpdateSIPOutboundTrunkRequest_Update{
-			Update: &SIPOutboundTrunkUpdate{
-				Name:    &name2,
-				Address: &addr2,
-				Numbers: &ListUpdate{
-					Set: []string{"T3"},
-				},
-			},
+
+	out := update(r, &SIPOutboundTrunkUpdate{
+		Name:    new("Test2"),
+		Address: new("sip2.example.com"),
+		Numbers: &ListUpdate{
+			Set: []string{"T3"},
 		},
-	}
-	out, err := upd.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
-	require.NoError(t, err)
-	require.True(t, r != out)
-	require.True(t, proto.Equal(&SIPOutboundTrunkInfo{
+	})
+	prototest.Equals(t, &SIPOutboundTrunkInfo{
 		Name:     "Test2",
 		Address:  "sip2.example.com",
 		Numbers:  []string{"T3"},
 		Metadata: "test",
-	}, out))
+		Media:    &SIPMediaConfig{},
+	}, out)
+
+	// Update of legacy MediaEncryption propagates to a new SIPMediaConfig.
+	out = update(out, &SIPOutboundTrunkUpdate{
+		MediaEncryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+	})
+	prototest.Equals(t, &SIPOutboundTrunkInfo{
+		Name:            "Test2",
+		Address:         "sip2.example.com",
+		Numbers:         []string{"T3"},
+		Metadata:        "test",
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE,
+		Media: &SIPMediaConfig{
+			Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+		},
+	}, out)
+
+	// Update of a new SIPMediaConfig downgrades to legacy MediaEncryption.
+	out = update(out, &SIPOutboundTrunkUpdate{
+		Media: &SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		},
+	})
+	prototest.Equals(t, &SIPOutboundTrunkInfo{
+		Name:            "Test2",
+		Address:         "sip2.example.com",
+		Numbers:         []string{"T3"},
+		Metadata:        "test",
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
+		Media: &SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		},
+	}, out)
 
 	r2 := proto.CloneOf(r)
 	r2.Numbers = []string{"T4"}
@@ -802,14 +878,25 @@ func TestOutboundTrunkUpdate(t *testing.T) {
 		},
 	}
 
-	out, err = upd2.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
+	out, err := upd2.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
 	require.NoError(t, err)
 	require.True(t, r != out)
 	require.True(t, r2 != out)
-	require.True(t, proto.Equal(r2, out))
+	prototest.Equals(t, r2, out)
 }
 
 func TestDispatchRuleUpdate(t *testing.T) {
+	update := func(r *SIPDispatchRuleInfo, u *SIPDispatchRuleUpdate) *SIPDispatchRuleInfo {
+		upd := &UpdateSIPDispatchRuleRequest{
+			Action: &UpdateSIPDispatchRuleRequest_Update{
+				Update: u,
+			},
+		}
+		out, err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
+		require.NoError(t, err)
+		require.True(t, r != out)
+		return out
+	}
 	r := &SIPDispatchRuleInfo{
 		Name:     "Test",
 		TrunkIds: []string{"T1", "T2"},
@@ -818,26 +905,30 @@ func TestDispatchRuleUpdate(t *testing.T) {
 				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
-		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
 	}
-	name2 := "Test2"
-	upd := &UpdateSIPDispatchRuleRequest{
-		Action: &UpdateSIPDispatchRuleRequest_Update{
-			Update: &SIPDispatchRuleUpdate{
-				Name: &name2,
-				TrunkIds: &ListUpdate{
-					Set: []string{"T3"},
-				},
-				Media: &SIPMediaConfig{
-					Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
-				},
+
+	out := update(r, &SIPDispatchRuleUpdate{
+		Name: new("Test2"),
+		TrunkIds: &ListUpdate{
+			Set: []string{"T3"},
+		},
+	})
+	prototest.Equals(t, &SIPDispatchRuleInfo{
+		Name:     "Test2",
+		TrunkIds: []string{"T3"},
+		Rule: &SIPDispatchRule{
+			Rule: &SIPDispatchRule_DispatchRuleDirect{
+				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
 			},
 		},
-	}
-	out, err := upd.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
-	require.NoError(t, err)
-	require.True(t, r != out)
-	exp := &SIPDispatchRuleInfo{
+		Media: &SIPMediaConfig{},
+	}, out)
+
+	// Update of legacy MediaEncryption propagates to a new SIPMediaConfig.
+	out = update(out, &SIPDispatchRuleUpdate{
+		MediaEncryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
+	})
+	prototest.Equals(t, &SIPDispatchRuleInfo{
 		Name:     "Test2",
 		TrunkIds: []string{"T3"},
 		Rule: &SIPDispatchRule{
@@ -849,8 +940,29 @@ func TestDispatchRuleUpdate(t *testing.T) {
 		Media: &SIPMediaConfig{
 			Encryption: new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
 		},
-	}
-	require.True(t, proto.Equal(exp, out), "%v\nvs\n%v", exp, out)
+	}, out)
+
+	// Update of a new SIPMediaConfig downgrades to legacy MediaEncryption.
+	out = update(out, &SIPDispatchRuleUpdate{
+		Media: &SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		},
+	})
+	prototest.Equals(t, &SIPDispatchRuleInfo{
+		Name:     "Test2",
+		TrunkIds: []string{"T3"},
+		Rule: &SIPDispatchRule{
+			Rule: &SIPDispatchRule_DispatchRuleDirect{
+				DispatchRuleDirect: &SIPDispatchRuleDirect{RoomName: "test"},
+			},
+		},
+		MediaEncryption: SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW,
+		Media: &SIPMediaConfig{
+			MediaTimeout: durationpb.New(10 * time.Second),
+			Encryption:   new(SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
+		},
+	}, out)
 
 	r2 := proto.CloneOf(r)
 	r2.TrunkIds = []string{"T4"}
@@ -860,7 +972,7 @@ func TestDispatchRuleUpdate(t *testing.T) {
 		},
 	}
 
-	out, err = upd2.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
+	out, err := upd2.Action.(UpdateSIPDispatchRuleRequestAction).Apply(r)
 	require.NoError(t, err)
 	require.True(t, r != out)
 	require.True(t, r2 != out)

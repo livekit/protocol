@@ -102,6 +102,8 @@ message ConnectWhatsAppCallRequest {
   // Required - The call connect webhook comes with SDP from Meta
   // It is the answer SDP for a business initiated call
   SessionDescription sdp = 2;
+  // Wait for the answer for the call before returning.
+  bool wait_until_answered = 3;
 }
 
 message ConnectWhatsAppCallResponse {

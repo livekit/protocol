@@ -361,10 +361,12 @@ type NodeStats struct {
 	// participant joins
 	ParticipantSignalConnected uint64 `protobuf:"varint,26,opt,name=participant_signal_connected,json=participantSignalConnected,proto3" json:"participant_signal_connected,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	ParticipantSignalConnectedPerSec  float32 `protobuf:"fixed32,27,opt,name=participant_signal_connected_per_sec,json=participantSignalConnectedPerSec,proto3" json:"participant_signal_connected_per_sec,omitempty"`
-	ParticipantSignalFailed           uint64  `protobuf:"varint,55,opt,name=participant_signal_failed,json=participantSignalFailed,proto3" json:"participant_signal_failed,omitempty"`
-	ParticipantSignalValidationFailed uint64  `protobuf:"varint,56,opt,name=participant_signal_validation_failed,json=participantSignalValidationFailed,proto3" json:"participant_signal_validation_failed,omitempty"`
-	ParticipantRtcConnected           uint64  `protobuf:"varint,44,opt,name=participant_rtc_connected,json=participantRtcConnected,proto3" json:"participant_rtc_connected,omitempty"`
+	ParticipantSignalConnectedPerSec float32 `protobuf:"fixed32,27,opt,name=participant_signal_connected_per_sec,json=participantSignalConnectedPerSec,proto3" json:"participant_signal_connected_per_sec,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	ParticipantSignalFailed uint64 `protobuf:"varint,55,opt,name=participant_signal_failed,json=participantSignalFailed,proto3" json:"participant_signal_failed,omitempty"`
+	// Deprecated: Marked as deprecated in livekit_internal.proto.
+	ParticipantSignalValidationFailed uint64 `protobuf:"varint,56,opt,name=participant_signal_validation_failed,json=participantSignalValidationFailed,proto3" json:"participant_signal_validation_failed,omitempty"`
+	ParticipantRtcConnected           uint64 `protobuf:"varint,44,opt,name=participant_rtc_connected,json=participantRtcConnected,proto3" json:"participant_rtc_connected,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
 	ParticipantRtcConnectedPerSec float32 `protobuf:"fixed32,45,opt,name=participant_rtc_connected_per_sec,json=participantRtcConnectedPerSec,proto3" json:"participant_rtc_connected_per_sec,omitempty"`
 	ParticipantRtcInit            uint64  `protobuf:"varint,46,opt,name=participant_rtc_init,json=participantRtcInit,proto3" json:"participant_rtc_init,omitempty"`
@@ -740,6 +742,7 @@ func (x *NodeStats) GetParticipantSignalConnectedPerSec() float32 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetParticipantSignalFailed() uint64 {
 	if x != nil {
 		return x.ParticipantSignalFailed
@@ -747,6 +750,7 @@ func (x *NodeStats) GetParticipantSignalFailed() uint64 {
 	return 0
 }
 
+// Deprecated: Marked as deprecated in livekit_internal.proto.
 func (x *NodeStats) GetParticipantSignalValidationFailed() uint64 {
 	if x != nil {
 		return x.ParticipantSignalValidationFailed
@@ -1473,7 +1477,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xa7\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\xaf\x16\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1529,9 +1533,9 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x1cretransmit_bytes_out_per_sec\x18\x18 \x01(\x02B\x02\x18\x01R\x18retransmitBytesOutPerSec\x12F\n" +
 	"\x1eretransmit_packets_out_per_sec\x18\x19 \x01(\x02B\x02\x18\x01R\x1aretransmitPacketsOutPerSec\x12@\n" +
 	"\x1cparticipant_signal_connected\x18\x1a \x01(\x04R\x1aparticipantSignalConnected\x12R\n" +
-	"$participant_signal_connected_per_sec\x18\x1b \x01(\x02B\x02\x18\x01R participantSignalConnectedPerSec\x12:\n" +
-	"\x19participant_signal_failed\x187 \x01(\x04R\x17participantSignalFailed\x12O\n" +
-	"$participant_signal_validation_failed\x188 \x01(\x04R!participantSignalValidationFailed\x12:\n" +
+	"$participant_signal_connected_per_sec\x18\x1b \x01(\x02B\x02\x18\x01R participantSignalConnectedPerSec\x12>\n" +
+	"\x19participant_signal_failed\x187 \x01(\x04B\x02\x18\x01R\x17participantSignalFailed\x12S\n" +
+	"$participant_signal_validation_failed\x188 \x01(\x04B\x02\x18\x01R!participantSignalValidationFailed\x12:\n" +
 	"\x19participant_rtc_connected\x18, \x01(\x04R\x17participantRtcConnected\x12L\n" +
 	"!participant_rtc_connected_per_sec\x18- \x01(\x02B\x02\x18\x01R\x1dparticipantRtcConnectedPerSec\x120\n" +
 	"\x14participant_rtc_init\x18. \x01(\x04R\x12participantRtcInit\x12B\n" +

@@ -1,5 +1,45 @@
 # github.com/livekit/protocol
 
+## 1.49.0
+
+### Minor Changes
+
+- Support cloud agent attributes in CRUD operations - [#1636](https://github.com/livekit/protocol/pull/1636) ([@rektdeckard](https://github.com/rektdeckard))
+
+### Patch Changes
+
+- Relax SIP outbound validation to support carriers. - [#1611](https://github.com/livekit/protocol/pull/1611) ([@dennwc](https://github.com/dennwc))
+
+## 1.48.2
+
+### Patch Changes
+
+- Enabling soft fail for sip validation - [#1650](https://github.com/livekit/protocol/pull/1650) ([@alexlivekit](https://github.com/alexlivekit))
+
+- Use camel case log name in `DataBlobKey` - [#1649](https://github.com/livekit/protocol/pull/1649) ([@ladvoc](https://github.com/ladvoc))
+
+## 1.48.1
+
+### Patch Changes
+
+- Data track schema metadata and storage - [#1553](https://github.com/livekit/protocol/pull/1553) ([@ladvoc](https://github.com/ladvoc))
+
+## 1.48.0
+
+### Minor Changes
+
+- Add PTF_USER_DATA to the PacketTrailerFeature enum for arbitrary per-frame user data. - [#1639](https://github.com/livekit/protocol/pull/1639) ([@chenosaurus](https://github.com/chenosaurus))
+
+- Introduce a participant RPC protobuf registry for well-known LiveKit RPCs. - [#1618](https://github.com/livekit/protocol/pull/1618) ([@dennwc](https://github.com/dennwc))
+
+- Add codec config to inbound and outbound SIP trunks. - [#1620](https://github.com/livekit/protocol/pull/1620) ([@dennwc](https://github.com/dennwc))
+
+### Patch Changes
+
+- Add capabilities to ParticipantInfo - [#1637](https://github.com/livekit/protocol/pull/1637) ([@1egoman](https://github.com/1egoman))
+
+- agent dev protocol to send down ServerInfo - [#1638](https://github.com/livekit/protocol/pull/1638) ([@davidzhao](https://github.com/davidzhao))
+
 ## 1.47.0
 
 ### Minor Changes
