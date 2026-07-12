@@ -274,7 +274,9 @@ message SimulationRun {
   string error = 5;
   google.protobuf.Timestamp created_at = 6;
   repeated Job jobs = 7;
-  SimulationRunSummary summary = 8;
+  // was: SimulationRunSummary summary (replaced by summary_zstd)
+  reserved 8;
+  reserved "summary";
   string agent_name = 9;
   ScenarioGroup scenario_group = 10;
   google.protobuf.Timestamp ended_at = 11;
@@ -290,6 +292,10 @@ message SimulationRun {
   SimulationMode mode = 18;
   // Run-level metric aggregates.
   RunMetrics metrics = 19;
+
+  // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
+  // Compressed by default so the blob ships as-is on every hop.
+  bytes summary_zstd = 20;
 
   message Usage {
     int32 text_turns_count = 1;
