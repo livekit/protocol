@@ -1,5 +1,21 @@
 # github.com/livekit/protocol
 
+## 1.47.0
+
+### Minor Changes
+
+- agent simulation: add SimulationMode to the Create request and run info, so a - [#1627](https://github.com/livekit/protocol/pull/1627) ([@Bobronium](https://github.com/Bobronium))
+  run can request audio mode. Unspecified stays TEXT, so existing callers are
+  unaffected.
+
+## 1.46.8
+
+## 1.46.7
+
+### Patch Changes
+
+- Add a feature map to internal SIPCall. - [#1615](https://github.com/livekit/protocol/pull/1615) ([@dennwc](https://github.com/dennwc))
+
 ## 1.46.6
 
 ### Patch Changes

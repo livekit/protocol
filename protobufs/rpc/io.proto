@@ -306,4 +306,5 @@ message SIPCall {
   repeated livekit.SIPUri via = 6;  // Via headers
   string sip_call_id = 7 [(logger.name) = "sipCallID"];           // SIP protocol generated call ID
   string project_id = 8 [(logger.name) = "projectID"];            // LiveKit project ID (Cloud only)
+  map<string,string> features = 9;
 }

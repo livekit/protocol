@@ -309,13 +309,15 @@ type SimulationRun struct {
 	Usage *SimulationRun_Usage `protobuf:"bytes,16,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Maximum simulate jobs running in parallel for this run (0 = server default).
 	Concurrency int32 `protobuf:"varint,17,opt,name=concurrency,proto3" json:"concurrency,omitempty"`
+	// Conversation mode for every job in this run; unspecified = TEXT.
+	Mode SimulationMode `protobuf:"varint,18,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
 	// A SimulationRunSummary message, serialized with proto.Marshal and then
 	// zstd-compressed: decompress, then proto.Unmarshal into
 	// SimulationRunSummary. It stays a plain proto you can decode - it is just
 	// compressed by default, so the blob travels storage, PSRPC, and HTTP
 	// without re-encoding (a 100-scenario run measured 9.5MB decompressed,
 	// ~120KB as this field).
-	SummaryZstd   []byte `protobuf:"bytes,18,opt,name=summary_zstd,json=summaryZstd,proto3" json:"summary_zstd,omitempty"`
+	SummaryZstd   []byte `protobuf:"bytes,19,opt,name=summary_zstd,json=summaryZstd,proto3" json:"summary_zstd,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -460,6 +462,13 @@ func (x *SimulationRun) GetConcurrency() int32 {
 		return x.Concurrency
 	}
 	return 0
+}
+
+func (x *SimulationRun) GetMode() SimulationMode {
+	if x != nil {
+		return x.Mode
+	}
+	return SimulationMode_SIMULATION_MODE_UNSPECIFIED
 }
 
 func (x *SimulationRun) GetSummaryZstd() []byte {
@@ -1160,7 +1169,9 @@ type SimulationRun_Create_Request struct {
 	ScenarioGroup *ScenarioGroup `protobuf:"bytes,7,opt,name=scenario_group,json=scenarioGroup,proto3,oneof" json:"scenario_group,omitempty"`
 	// Maximum simulate jobs running in parallel for this run. Clamped to the
 	// project's concurrency quota; 0/unset uses the server default.
-	Concurrency   *int32 `protobuf:"varint,8,opt,name=concurrency,proto3,oneof" json:"concurrency,omitempty"`
+	Concurrency *int32 `protobuf:"varint,8,opt,name=concurrency,proto3,oneof" json:"concurrency,omitempty"`
+	// Conversation mode for every job in this run; unspecified = TEXT.
+	Mode          SimulationMode `protobuf:"varint,9,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1235,6 +1246,13 @@ func (x *SimulationRun_Create_Request) GetConcurrency() int32 {
 		return *x.Concurrency
 	}
 	return 0
+}
+
+func (x *SimulationRun_Create_Request) GetMode() SimulationMode {
+	if x != nil {
+		return x.Mode
+	}
+	return SimulationMode_SIMULATION_MODE_UNSPECIFIED
 }
 
 type SimulationRun_Create_Response struct {
@@ -1843,7 +1861,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x9f\x16\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xf9\x16\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -1864,8 +1882,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\ffailed_count\x18\x0e \x01(\x05R\vfailedCount\x12'\n" +
 	"\x0fnum_simulations\x18\x0f \x01(\x05R\x0enumSimulations\x122\n" +
 	"\x05usage\x18\x10 \x01(\v2\x1c.livekit.SimulationRun.UsageR\x05usage\x12 \n" +
-	"\vconcurrency\x18\x11 \x01(\x05R\vconcurrency\x12!\n" +
-	"\fsummary_zstd\x18\x12 \x01(\fR\vsummaryZstd\x1a\x99\x05\n" +
+	"\vconcurrency\x18\x11 \x01(\x05R\vconcurrency\x12+\n" +
+	"\x04mode\x18\x12 \x01(\x0e2\x17.livekit.SimulationModeR\x04mode\x12!\n" +
+	"\fsummary_zstd\x18\x13 \x01(\fR\vsummaryZstd\x1a\x99\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -1890,8 +1909,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xc8\x03\n" +
-	"\x06Create\x1a\xaf\x02\n" +
+	"\x1a\xf5\x03\n" +
+	"\x06Create\x1a\xdc\x02\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -1900,7 +1919,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x0fnum_simulations\x18\x04 \x01(\x05R\x0enumSimulations\x12\x16\n" +
 	"\x06region\x18\x06 \x01(\tR\x06region\x12B\n" +
 	"\x0escenario_group\x18\a \x01(\v2\x16.livekit.ScenarioGroupH\x00R\rscenarioGroup\x88\x01\x01\x12%\n" +
-	"\vconcurrency\x18\b \x01(\x05H\x01R\vconcurrency\x88\x01\x01B\x11\n" +
+	"\vconcurrency\x18\b \x01(\x05H\x01R\vconcurrency\x88\x01\x01\x12+\n" +
+	"\x04mode\x18\t \x01(\x0e2\x17.livekit.SimulationModeR\x04modeB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
 	"\bResponse\x12*\n" +
@@ -2049,40 +2069,42 @@ var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	6,  // 5: livekit.SimulationRun.scenario_group:type_name -> livekit.ScenarioGroup
 	32, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
 	16, // 7: livekit.SimulationRun.usage:type_name -> livekit.SimulationRun.Usage
-	29, // 8: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
-	5,  // 9: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
-	5,  // 10: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
-	0,  // 11: livekit.SimulationDispatch.mode:type_name -> livekit.SimulationMode
-	33, // 12: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
-	2,  // 13: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
-	32, // 14: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
-	32, // 15: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
-	17, // 16: livekit.SimulationRun.Job.usage:type_name -> livekit.SimulationRun.Job.Usage
-	6,  // 17: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
-	34, // 18: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	4,  // 19: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
-	1,  // 20: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
-	35, // 21: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
-	4,  // 22: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
-	35, // 23: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
-	5,  // 24: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
-	18, // 25: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
-	20, // 26: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
-	22, // 27: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
-	24, // 28: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
-	26, // 29: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
-	30, // 30: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
-	19, // 31: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
-	21, // 32: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
-	23, // 33: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
-	25, // 34: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
-	27, // 35: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
-	31, // 36: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
-	31, // [31:37] is the sub-list for method output_type
-	25, // [25:31] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	0,  // 8: livekit.SimulationRun.mode:type_name -> livekit.SimulationMode
+	29, // 9: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
+	5,  // 10: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
+	5,  // 11: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
+	0,  // 12: livekit.SimulationDispatch.mode:type_name -> livekit.SimulationMode
+	33, // 13: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
+	2,  // 14: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
+	32, // 15: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
+	32, // 16: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
+	17, // 17: livekit.SimulationRun.Job.usage:type_name -> livekit.SimulationRun.Job.Usage
+	6,  // 18: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
+	0,  // 19: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
+	34, // 20: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	4,  // 21: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
+	1,  // 22: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
+	35, // 23: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
+	4,  // 24: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
+	35, // 25: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
+	5,  // 26: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
+	18, // 27: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
+	20, // 28: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
+	22, // 29: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
+	24, // 30: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
+	26, // 31: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
+	30, // 32: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
+	19, // 33: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
+	21, // 34: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
+	23, // 35: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
+	25, // 36: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
+	27, // 37: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
+	31, // 38: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
+	33, // [33:39] is the sub-list for method output_type
+	27, // [27:33] is the sub-list for method input_type
+	27, // [27:27] is the sub-list for extension type_name
+	27, // [27:27] is the sub-list for extension extendee
+	0,  // [0:27] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }

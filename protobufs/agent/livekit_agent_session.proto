@@ -114,6 +114,20 @@ enum UserState {
   US_AWAY = 2;
 }
 
+enum ToolCallStatus {
+  TC_RUNNING = 0;
+  TC_DONE = 1;
+  TC_ERROR = 2;
+  TC_CANCELLED = 3;
+}
+
+enum ToolReplyStatus {
+  TR_SCHEDULED = 0;
+  TR_COMPLETED = 1;
+  TR_INTERRUPTED = 2;
+  TR_SKIPPED = 3;
+}
+
 enum AmdCategory {
   AMD_UNKNOWN = 0;
   AMD_HUMAN = 1;
@@ -249,6 +263,46 @@ message AgentSessionEvent {
     AgentSessionUsage usage = 1;
   }
 
+  // Per-call tool lifecycle. One flat update per occurrence: a call started ->
+  // progress updates while it runs (CallUpdated) -> the single terminal entry (Ended),
+  // with the deferred reply voicing buffered updates advancing separately (ReplyUpdated).
+  message ToolExecutionUpdated {
+    message Started {
+      FunctionCall function_call = 1;
+    }
+    // a progress update emitted via ctx.update() while the call runs
+    message CallUpdated {
+      // synthetic id: call_id (inline) or call_id_update_N
+      string id = 1 [(logger.name) = "ID"];
+      string call_id = 2 [(logger.name) = "callID"];
+      string message = 3;
+    }
+    // the call's single terminal entry
+    message Ended {
+      // synthetic id: call_id (inline) or call_id_final (deferred)
+      string id = 1 [(logger.name) = "ID"];
+      string call_id = 2 [(logger.name) = "callID"];
+      // result text or error message; unset for cancelled / empty returns
+      optional string message = 3;
+      // TC_DONE, TC_ERROR, or TC_CANCELLED
+      ToolCallStatus status = 4;
+    }
+    message ReplyUpdated {
+      // buffered update ids covered by this reply; one reply can span calls
+      repeated string update_ids = 1 [(logger.name) = "updateIDs"];
+      ToolReplyStatus status = 2;
+      // id of the speech that voices this reply
+      string speech_id = 3 [(logger.name) = "speechID"];
+    }
+
+    oneof update {
+      Started started = 1;
+      CallUpdated call_updated = 2;
+      ReplyUpdated reply_updated = 3;
+      Ended ended = 4;
+    }
+  }
+
   google.protobuf.Timestamp created_at = 1;
   oneof event {
     AgentStateChanged agent_state_changed = 10;
@@ -263,6 +317,7 @@ message AgentSessionEvent {
     EotPrediction eot_prediction = 19;
     FunctionToolsStarted function_tools_started = 20;
     DebugMessage debug_message = 21;
+    ToolExecutionUpdated tool_execution_updated = 22;
   }
 }
 

@@ -33,6 +33,15 @@ func NewSessionTimer(startTime time.Time, opts ...SessionTimerOption) *SessionTi
 	return options.Apply(&SessionTimer{lastMilli: ts, lastSec: ts, lastMin: ts}, opts)
 }
 
+// Reset re-anchors the timer to startTime so that subsequent Advance calls
+// measure elapsed time from startTime.
+func (h *SessionTimer) Reset(startTime time.Time) {
+	ts := startTime.UnixMilli()
+	h.lastMilli = ts
+	h.lastSec = ts
+	h.lastMin = ts
+}
+
 func (h *SessionTimer) Advance(now time.Time) (millis, secs, mins int64) {
 	ts := now.UnixMilli()
 	if ts > h.lastMilli {
