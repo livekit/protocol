@@ -148,7 +148,10 @@ message SimulationRun {
   string error = 5;
   google.protobuf.Timestamp created_at = 6;
   repeated Job jobs = 7;
-  SimulationRunSummary summary = 8;
+  // Removed: the summary previously embedded here (field 8) decompressed to
+  // multi-MB payloads on every fetch. Use summary_zstd instead.
+  reserved 8;
+  reserved "summary";
   string agent_name = 9;
   ScenarioGroup scenario_group = 10;
   google.protobuf.Timestamp ended_at = 11;
@@ -160,6 +163,14 @@ message SimulationRun {
   Usage usage = 16;
   // Maximum simulate jobs running in parallel for this run (0 = server default).
   int32 concurrency = 17;
+
+  // A SimulationRunSummary message, serialized with proto.Marshal and then
+  // zstd-compressed: decompress, then proto.Unmarshal into
+  // SimulationRunSummary. It stays a plain proto you can decode - it is just
+  // compressed by default, so the blob travels storage, PSRPC, and HTTP
+  // without re-encoding (a 100-scenario run measured 9.5MB decompressed,
+  // ~120KB as this field).
+  bytes summary_zstd = 18;
 
   message Usage {
     int32 text_turns_count = 1;
