@@ -15,9 +15,16 @@
 package livekit
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/logger/testutil"
+	"github.com/livekit/protocol/logger/zaputil"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap/zapcore"
 )
 
 // Valid Header Test Cases
@@ -275,4 +282,52 @@ func TestFrobiddenSipHeaderNames(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestLogSoftErrors(t *testing.T) {
+	ws := &testutil.BufferedWriteSyncer{}
+
+	l, err := logger.NewZapLogger(&logger.Config{}, logger.WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel)))
+	require.NoError(t, err)
+
+	errs := []error{
+		errors.New("hard error 1"),
+		newSoftValidationErr(fmt.Errorf("soft error 1")),
+		errors.New("hard error 2"),
+		newSoftValidationErr(fmt.Errorf("soft error 2")),
+		errors.New("hard error 3"),
+	}
+
+	err = LogSoftErrors(l, errs)
+
+	// Verify that the helper consolidates errors.
+	require.Error(t, err)
+	require.ErrorContains(t, err, "hard error 1")
+	require.ErrorContains(t, err, "hard error 2")
+	require.ErrorContains(t, err, "hard error 3")
+	require.False(t, strings.Contains(err.Error(), "soft error 1"))
+	require.False(t, strings.Contains(err.Error(), "soft error 2"))
+
+	// Verify that the helper logs soft errors.
+	logBuffer := ws.Buffer.String()
+	require.Contains(t, logBuffer, "soft error 1")
+	require.Contains(t, logBuffer, "soft error 2")
+	require.NotContains(t, logBuffer, "hard error 1")
+	require.NotContains(t, logBuffer, "hard error 2")
+	require.NotContains(t, logBuffer, "hard error 3")
+}
+
+func TestJoinErrors(t *testing.T) {
+	errs := []error{
+		errors.New("hard error 1"),
+		errors.New("hard error 2"),
+		newSoftValidationErr(fmt.Errorf("soft error 1")),
+	}
+
+	err := JoinErrors(errs)
+
+	require.Error(t, err)
+	require.ErrorContains(t, err, "hard error 1")
+	require.ErrorContains(t, err, "hard error 2")
+	require.False(t, strings.Contains(err.Error(), "soft error 1"))
 }

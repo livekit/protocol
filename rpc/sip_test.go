@@ -82,8 +82,8 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 			Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_REQUIRE),
 		},
 	}
-	res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
-	require.NoError(t, err)
+	res, errs := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+	require.Empty(t, errs)
 	require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 
 	r.HidePhoneNumber = true
@@ -91,8 +91,8 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	r.Media = &livekit.SIPMediaConfig{
 		Encryption: new(livekit.SIPMediaEncryption_SIP_MEDIA_ENCRYPT_ALLOW),
 	}
-	res, err = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
-	require.NoError(t, err)
+	res, errs = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+	require.Empty(t, errs)
 	exp = &InternalCreateSIPParticipantRequest{
 		ProjectId:           "p_123",
 		SipCallId:           "call-id",
@@ -149,8 +149,8 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	}
 	exp.ParticipantAttributes = expAttrs1
 	exp.ParticipantAttributes[livekit.AttrSIPTrunkID] = ""
-	res, err = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, nil)
-	require.NoError(t, err)
+	res, errs = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, nil)
+	require.Empty(t, errs)
 	require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 }
 
@@ -174,8 +174,8 @@ func TestNewCreateSIPParticipantRequestMediaConfig(t *testing.T) {
 		r *livekit.CreateSIPParticipantRequest, tr *livekit.SIPOutboundTrunkInfo,
 		media *livekit.SIPMediaConfig,
 	) {
-		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
-		require.NoError(t, err)
+		res, errs := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+		require.Empty(t, errs)
 		require.Equal(t, *media.Encryption, res.MediaEncryption)
 		require.NotNil(t, res.Media)
 		prototest.Equals(t, media, res.Media)

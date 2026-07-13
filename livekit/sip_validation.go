@@ -19,9 +19,18 @@ import (
 	fmt "fmt"
 	"strconv"
 	"strings"
+
+	"github.com/livekit/protocol/logger"
 )
 
 // RFC 3261 compliant validation functions for SIP headers and messages
+//
+// Some of the Validate* functions return error slices comprised of all errors
+// encountered during validation. Of these errors, some might soft errors,
+// that is, errors which reflect real validation failures but should probably
+// be ignored by the caller using the LogSoftErrors helper, e.g.:
+//
+// err := LogSoftErrors(ValidateHeaderValue(headerName, headerValue))
 
 type allowedCharacters struct {
 	ascii [128]bool
@@ -212,10 +221,45 @@ var nameAddrHeaders = map[string]bool{
 	"referred-by":         true, // RFC 3892 Section 3
 }
 
-var softFailureReporter func(err error)
+// SoftValidationErr is an error that should not prevent further processing.
+var SoftValidationErr = errors.New("soft validation failure")
 
-func SetSoftFailureReporter(reporter func(err error)) {
-	softFailureReporter = reporter
+type errorFn func(error)
+
+// perHardSoftErrors invokes the supplied callbacks against errors.
+func perHardSoftErrors(errs []error, hardErrFn, softErrFn errorFn) {
+	for _, err := range errs {
+		if errors.Is(err, SoftValidationErr) {
+			softErrFn(err)
+			continue
+		}
+		hardErrFn(err)
+	}
+}
+
+// LogSoftErrors returns a new error comprised of all hard errors in the given
+// slice and logs a warning for each soft error.
+func LogSoftErrors(logger logger.Logger, errs []error) error {
+	var hardErrs []error
+	perHardSoftErrors(errs, func(err error) {
+		hardErrs = append(hardErrs, err)
+	}, func(err error) {
+		logger.Warnw("soft validation error", err)
+	})
+	return errors.Join(hardErrs...)
+}
+
+// JoinErrors returns a new error comprised of all hard erros in the given slice.
+func JoinErrors(errs []error) error {
+	var hardErrs []error
+	perHardSoftErrors(errs, func(err error) {
+		hardErrs = append(hardErrs, err)
+	}, func(err error) {})
+	return errors.Join(hardErrs...)
+}
+
+func newSoftValidationErr(err error) error {
+	return fmt.Errorf("%w: %w", SoftValidationErr, err)
 }
 
 // ValidateHeaderName validates a SIP header name per RFC 3261 Section 25.1
@@ -244,33 +288,30 @@ func ValidateHeaderName(name string, restrictNames bool) error {
 }
 
 // ValidateHeaderValue validates a SIP header value per RFC 3261 Section 25.1
-func ValidateHeaderValue(name, value string) error {
+func ValidateHeaderValue(name, value string) []error {
 	if value == "" {
 		return nil
 	}
 
 	if len(value) > 1024 {
-		return fmt.Errorf("header %s: value too long (max 1024 characters)", name)
+		return []error{fmt.Errorf("header %s: value too long (max 1024 characters)", name)}
 	}
 
 	// Basic character validation - printable ASCII. We're stricter than the spec here - no UTF-8 for now
 	if err := headerValuesCharacters.Validate(value); err != nil {
-		return fmt.Errorf("header %s: value: %w", name, err)
+		return []error{fmt.Errorf("header %s: value: %w", name, err)}
 	}
 
 	// Convert to lowercase for case-insensitive comparison
+	var errs []error
 	lowerName := strings.ToLower(name)
 	if _, exists := nameAddrHeaders[lowerName]; exists {
 		if err := validateNameAddrHeader(value); err != nil {
-			err = fmt.Errorf("header %s: value: %w", name, err)
-			// For now do not actually error out on header values, just note failure.
-			if cb := softFailureReporter; cb != nil {
-				cb(err)
-			}
+			errs = append(errs, fmt.Errorf("header %s: value: %w", name, newSoftValidationErr(err)))
 		}
 	}
 
-	return nil
+	return errs
 }
 
 // findAngleBrackets efficiently finds angle brackets in a single scan

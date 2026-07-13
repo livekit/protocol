@@ -72,10 +72,10 @@ func NewCreateSIPParticipantRequest(
 	projectID, callID, fromHostname, wsUrl, token string,
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
-) (*InternalCreateSIPParticipantRequest, error) {
+) (*InternalCreateSIPParticipantRequest, []error) {
 	req.Upgrade()
-	if err := req.Validate(); err != nil {
-		return nil, err
+	if errs := req.Validate(); errs != nil {
+		return nil, errs
 	}
 	var (
 		hostname           string
@@ -116,7 +116,7 @@ func NewCreateSIPParticipantRequest(
 	outboundNumber := req.SipNumber
 	if outboundNumber == "" {
 		if trunk == nil || len(trunk.Numbers) == 0 {
-			return nil, psrpc.NewErrorf(psrpc.FailedPrecondition, "no numbers on outbound trunk")
+			return nil, []error{psrpc.NewErrorf(psrpc.FailedPrecondition, "no numbers on outbound trunk")}
 		}
 		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}

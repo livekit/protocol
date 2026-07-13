@@ -308,16 +308,17 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 }
 
 // validateHeaders makes sure header names/keys and values are per SIP specifications
-func validateHeaders(headers map[string]string) error {
+func validateHeaders(headers map[string]string) []error {
+	var errs []error
 	for headerName, headerValue := range headers {
 		if err := ValidateHeaderName(headerName, true); err != nil {
-			return fmt.Errorf("invalid header name: %w", err)
+			errs = append(errs, fmt.Errorf("invalid header name: %w", err))
+			continue
 		}
-		if err := ValidateHeaderValue(headerName, headerValue); err != nil {
-			return fmt.Errorf("invalid header value for %s: %w", headerName, err)
-		}
+		valueErrs := ValidateHeaderValue(headerName, headerValue)
+		errs = append(errs, valueErrs...)
 	}
-	return nil
+	return errs
 }
 
 // validateHeaderNames Makes sure the values of the given map correspond to valid SIP header names
@@ -360,38 +361,32 @@ func (p *SIPTrunkInfo) Validate() error {
 	return nil
 }
 
-func (p *CreateSIPOutboundTrunkRequest) Validate() error {
+func (p *CreateSIPOutboundTrunkRequest) Validate() []error {
 	if p.Trunk == nil {
-		return errors.New("missing trunk")
+		return []error{errors.New("missing trunk")}
 	}
 	if p.Trunk.SipTrunkId != "" {
-		return errors.New("trunk id must not be set")
+		return []error{errors.New("trunk id must not be set")}
 	}
-	if err := p.Trunk.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return p.Trunk.Validate()
 }
 
-func (p *CreateSIPInboundTrunkRequest) Validate() error {
+func (p *CreateSIPInboundTrunkRequest) Validate() []error {
 	if p.Trunk == nil {
-		return errors.New("missing trunk")
+		return []error{errors.New("missing trunk")}
 	}
 	if p.Trunk.SipTrunkId != "" {
-		return errors.New("trunk id must not be set")
+		return []error{errors.New("trunk id must not be set")}
 	}
-	if err := p.Trunk.Validate(); err != nil {
-		return err
-	}
-	return nil
+	return p.Trunk.Validate()
 }
 
-func (p *UpdateSIPOutboundTrunkRequest) Validate() error {
+func (p *UpdateSIPOutboundTrunkRequest) Validate() []error {
 	if p.SipTrunkId == "" {
-		return errors.New("trunk id must be set")
+		return []error{errors.New("trunk id must be set")}
 	}
 	if p.Action == nil {
-		return errors.New("missing or unsupported update action")
+		return []error{errors.New("missing or unsupported update action")}
 	}
 	switch a := p.Action.(type) {
 	default:
@@ -399,27 +394,27 @@ func (p *UpdateSIPOutboundTrunkRequest) Validate() error {
 	case *UpdateSIPOutboundTrunkRequest_Replace:
 		info := a.Replace
 		if info == nil {
-			return errors.New("missing trunk")
+			return []error{errors.New("missing trunk")}
 		}
 		if info.SipTrunkId != "" && info.SipTrunkId != p.SipTrunkId {
-			return errors.New("trunk id in the info must be empty or match the id in the update")
+			return []error{errors.New("trunk id in the info must be empty or match the id in the update")}
 		}
 		return info.Validate()
 	case *UpdateSIPOutboundTrunkRequest_Update:
 		diff := a.Update
 		if diff == nil {
-			return errors.New("missing trunk update")
+			return []error{errors.New("missing trunk update")}
 		}
-		return diff.Validate()
+		return []error{diff.Validate()}
 	}
 }
 
-func (p *UpdateSIPInboundTrunkRequest) Validate() error {
+func (p *UpdateSIPInboundTrunkRequest) Validate() []error {
 	if p.SipTrunkId == "" {
-		return errors.New("trunk id must be set")
+		return []error{errors.New("trunk id must be set")}
 	}
 	if p.Action == nil {
-		return errors.New("missing or unsupported update action")
+		return []error{errors.New("missing or unsupported update action")}
 	}
 	switch a := p.Action.(type) {
 	default:
@@ -427,39 +422,39 @@ func (p *UpdateSIPInboundTrunkRequest) Validate() error {
 	case *UpdateSIPInboundTrunkRequest_Replace:
 		info := a.Replace
 		if info == nil {
-			return errors.New("missing trunk")
+			return []error{errors.New("missing trunk")}
 		}
 		if info.SipTrunkId != "" && info.SipTrunkId != p.SipTrunkId {
-			return errors.New("trunk id in the info must be empty or match the id in the update")
+			return []error{errors.New("trunk id in the info must be empty or match the id in the update")}
 		}
 		return info.Validate()
 	case *UpdateSIPInboundTrunkRequest_Update:
 		diff := a.Update
 		if diff == nil {
-			return errors.New("missing trunk update")
+			return []error{errors.New("missing trunk update")}
 		}
-		return diff.Validate()
+		return []error{diff.Validate()}
 	}
 }
 
-func (p *SIPInboundTrunkInfo) Validate() error {
+func (p *SIPInboundTrunkInfo) Validate() []error {
 	hasAuth := p.AuthUsername != "" || p.AuthPassword != ""
 	hasCIDR := len(p.AllowedAddresses) != 0
 	hasNumbers := len(p.Numbers) != 0 // TODO: remove this condition, it doesn't really help with security
 	if !hasAuth && !hasCIDR && !hasNumbers {
-		return psrpc.NewErrorf(psrpc.InvalidArgument, "for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")
+		return []error{psrpc.NewErrorf(psrpc.InvalidArgument, "for security, one of the fields must be set: AuthUsername+AuthPassword, AllowedAddresses or Numbers")}
 	}
 	if err := p.Media.Validate(); err != nil {
-		return err
+		return []error{err}
 	}
-	if err := validateHeaders(p.Headers); err != nil {
-		return err
+	if errs := validateHeaders(p.Headers); len(errs) > 0 {
+		return errs
 	}
 	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
-		return err
+		return []error{err}
 	}
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
-		return err
+		return []error{err}
 	}
 	return nil
 }
@@ -480,9 +475,9 @@ func (p *SIPInboundTrunkUpdate) Validate() error {
 	return nil
 }
 
-func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
+func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) []error {
 	if err := p.Validate(); err != nil {
-		return err
+		return []error{err}
 	}
 	applyListUpdate(&info.Numbers, p.Numbers)
 	applyListUpdate(&info.AllowedAddresses, p.AllowedAddresses)
@@ -499,7 +494,7 @@ func (p *SIPInboundTrunkUpdate) Apply(info *SIPInboundTrunkInfo) error {
 
 type UpdateSIPOutboundTrunkRequestAction interface {
 	isUpdateSIPOutboundTrunkRequest_Action
-	Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, error)
+	Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, []error)
 }
 
 var (
@@ -507,56 +502,56 @@ var (
 	_ UpdateSIPOutboundTrunkRequestAction = (*UpdateSIPOutboundTrunkRequest_Update)(nil)
 )
 
-func (p *UpdateSIPOutboundTrunkRequest_Replace) Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, error) {
+func (p *UpdateSIPOutboundTrunkRequest_Replace) Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, []error) {
 	val := proto.CloneOf(p.Replace)
 	if val == nil {
-		return nil, errors.New("missing trunk")
+		return nil, []error{errors.New("missing trunk")}
 	}
 	if info.SipTrunkId != "" {
 		val.SipTrunkId = info.SipTrunkId
 	}
-	if err := val.Validate(); err != nil {
-		return nil, err
+	if errs := val.Validate(); len(errs) > 0 {
+		return nil, errs
 	}
 	return val, nil
 }
 
-func (p *UpdateSIPOutboundTrunkRequest_Update) Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, error) {
+func (p *UpdateSIPOutboundTrunkRequest_Update) Apply(info *SIPOutboundTrunkInfo) (*SIPOutboundTrunkInfo, []error) {
 	diff := p.Update
 	if diff == nil {
-		return nil, errors.New("missing trunk update")
+		return nil, []error{errors.New("missing trunk update")}
 	}
 	val := proto.CloneOf(info)
-	if err := diff.Apply(val); err != nil {
-		return nil, err
+	if errs := diff.Apply(val); len(errs) > 0 {
+		return nil, errs
 	}
 	return val, nil
 }
 
-func (p *SIPOutboundTrunkInfo) Validate() error {
+func (p *SIPOutboundTrunkInfo) Validate() []error {
 	if len(p.Numbers) == 0 {
-		return errors.New("no trunk numbers specified")
+		return []error{errors.New("no trunk numbers specified")}
 	}
 	if p.Address == "" {
-		return errors.New("no outbound address specified")
+		return []error{errors.New("no outbound address specified")}
 	}
 	if err := validateHostnameFormat(p.Address, "trunk address"); err != nil {
-		return err
+		return []error{err}
 	}
 	if err := validateHostnameFormat(p.FromHost, "from_host"); err != nil {
-		return err
+		return []error{err}
 	}
-	if err := validateHeaders(p.Headers); err != nil {
-		return err
+	if errs := validateHeaders(p.Headers); len(errs) > 0 {
+		return errs
 	}
 	if err := validateAttributesToHeaders(p.AttributesToHeaders); err != nil {
-		return err
+		return []error{err}
 	}
 	if err := validateHeaderToAttributes(p.HeadersToAttributes); err != nil {
-		return err
+		return []error{err}
 	}
 	if err := p.Media.Validate(); err != nil {
-		return err
+		return []error{err}
 	}
 	return nil
 }
@@ -590,9 +585,9 @@ func (p *SIPOutboundTrunkUpdate) Validate() error {
 	return nil
 }
 
-func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
+func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) []error {
 	if err := p.Validate(); err != nil {
-		return err
+		return []error{err}
 	}
 	applyUpdate(&info.Address, p.Address)
 	applyUpdate(&info.Transport, p.Transport)
@@ -610,7 +605,7 @@ func (p *SIPOutboundTrunkUpdate) Apply(info *SIPOutboundTrunkInfo) error {
 
 type UpdateSIPInboundTrunkRequestAction interface {
 	isUpdateSIPInboundTrunkRequest_Action
-	Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error)
+	Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, []error)
 }
 
 var (
@@ -618,24 +613,24 @@ var (
 	_ UpdateSIPInboundTrunkRequestAction = (*UpdateSIPInboundTrunkRequest_Update)(nil)
 )
 
-func (p *UpdateSIPInboundTrunkRequest_Replace) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
+func (p *UpdateSIPInboundTrunkRequest_Replace) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, []error) {
 	val := proto.CloneOf(p.Replace)
 	if val == nil {
-		return nil, errors.New("missing trunk")
+		return nil, []error{errors.New("missing trunk")}
 	}
 	if info.SipTrunkId != "" {
 		val.SipTrunkId = info.SipTrunkId
 	}
-	if err := val.Validate(); err != nil {
-		return nil, err
+	if errs := val.Validate(); len(errs) > 0 {
+		return nil, errs
 	}
 	return val, nil
 }
 
-func (p *UpdateSIPInboundTrunkRequest_Update) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, error) {
+func (p *UpdateSIPInboundTrunkRequest_Update) Apply(info *SIPInboundTrunkInfo) (*SIPInboundTrunkInfo, []error) {
 	diff := p.Update
 	if diff == nil {
-		return nil, errors.New("missing trunk update")
+		return nil, []error{errors.New("missing trunk update")}
 	}
 	val := proto.CloneOf(info)
 	if err := diff.Apply(val); err != nil {
@@ -773,42 +768,42 @@ func (p *UpdateSIPDispatchRuleRequest_Update) Apply(info *SIPDispatchRuleInfo) (
 	return val, nil
 }
 
-func (p *CreateSIPParticipantRequest) Validate() error {
+func (p *CreateSIPParticipantRequest) Validate() []error {
 	if p.SipTrunkId == "" && p.Trunk == nil && p.SipNumber == "" {
-		return errors.New("missing sip trunk id and sip number")
+		return []error{errors.New("missing sip trunk id and sip number")}
 	}
 	if p.Trunk != nil {
 		if err := p.Trunk.Validate(); err != nil {
-			return err
+			return []error{err}
 		}
 	}
 	if p.SipCallTo == "" {
-		return errors.New("missing sip callee number")
+		return []error{errors.New("missing sip callee number")}
 	} else if strings.Contains(p.SipCallTo, "@") {
-		return errors.New("SipCallTo should be a phone number or SIP user, not a full SIP URI")
+		return []error{errors.New("SipCallTo should be a phone number or SIP user, not a full SIP URI")}
 	}
 	if p.RoomName == "" {
-		return errors.New("missing room name")
+		return []error{errors.New("missing room name")}
 	}
 
 	// Validate display_name if provided
 	if p.DisplayName != nil {
 		if len(*p.DisplayName) > 128 {
-			return errors.New("DisplayName too long (max 128 characters)")
+			return []error{errors.New("DisplayName too long (max 128 characters)")}
 		}
 		if _, err := strconv.Unquote("\"" + *p.DisplayName + "\""); err != nil {
-			return fmt.Errorf("DisplayName must be a valid quoted string: %w", err)
+			return []error{fmt.Errorf("DisplayName must be a valid quoted string: %w", err)}
 		}
 	}
 	// Validate destination if provided
 	if err := p.Destination.Validate(); err != nil {
-		return err
+		return []error{err}
 	}
-	if err := validateHeaders(p.Headers); err != nil {
-		return err
+	if errs := validateHeaders(p.Headers); len(errs) > 0 {
+		return errs
 	}
 	if err := p.Media.Validate(); err != nil {
-		return err
+		return []error{err}
 	}
 	return nil
 }
@@ -853,15 +848,15 @@ func (d *Destination) Validate() error {
 	return nil
 }
 
-func (p *TransferSIPParticipantRequest) Validate() error {
+func (p *TransferSIPParticipantRequest) Validate() []error {
 	if p.RoomName == "" {
-		return errors.New("missing room name")
+		return []error{errors.New("missing room name")}
 	}
 	if p.ParticipantIdentity == "" {
-		return errors.New("missing participant identity")
+		return []error{errors.New("missing participant identity")}
 	}
 	if p.TransferTo == "" {
-		return errors.New("missing transfer to")
+		return []error{errors.New("missing transfer to")}
 	}
 
 	// Validate TransferTo URI format and ensure RFC compliance
@@ -876,7 +871,7 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 	if !strings.HasPrefix(innerURI, "sip:") && !strings.HasPrefix(innerURI, "sips:") && !strings.HasPrefix(innerURI, "tel:") {
 		// In theory the Refer-To header can receive the full name-addr.
 		// This can make this check inaccurate, but we want to limit to just SIP and TEL URIs.
-		return errors.New("transfer_to must be a valid SIP(s) or TEL URI (sip:, sips: or tel:)")
+		return []error{errors.New("transfer_to must be a valid SIP(s) or TEL URI (sip:, sips: or tel:)")}
 	}
 
 	if strings.HasPrefix(innerURI, "sip:") || strings.HasPrefix(innerURI, "sips:") {
@@ -890,8 +885,8 @@ func (p *TransferSIPParticipantRequest) Validate() error {
 		p.TransferTo = innerURI
 	}
 
-	if err := validateHeaders(p.Headers); err != nil {
-		return err
+	if errs := validateHeaders(p.Headers); len(errs) > 0 {
+		return errs
 	}
 
 	return nil

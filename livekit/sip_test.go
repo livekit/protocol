@@ -45,13 +45,43 @@ func TestSIPTrunkAs(t *testing.T) {
 	})
 }
 
-func TestSIPValidate(t *testing.T) {
-	type validateable interface {
-		Validate() error
+// Helper to handle the fact taht some of the Validate methods return `error`
+// and some return `[]error`.
+func validate(t *testing.T, req any) []error {
+	t.Helper()
+
+	var errs []error
+	switch v := req.(type) {
+	case *SIPInboundTrunkInfo:
+		errs = v.Validate()
+	case *SIPOutboundTrunkInfo:
+		errs = v.Validate()
+	case *SIPMediaConfig:
+		if err := v.Validate(); err != nil {
+			errs = []error{v.Validate()}
+		}
+	case *CreateSIPDispatchRuleRequest:
+		if err := v.Validate(); err != nil {
+			errs = []error{v.Validate()}
+		}
+	case *UpdateSIPDispatchRuleRequest:
+		if err := v.Validate(); err != nil {
+			errs = []error{v.Validate()}
+		}
+	case *CreateSIPParticipantRequest:
+		errs = v.Validate()
+	default:
+		t.Fatalf("unexpected request type: %T", v)
 	}
+
+	return errs
+}
+
+func TestSIPValidate(t *testing.T) {
+
 	type validateTestCase struct {
 		name string
-		req  validateable
+		req  any
 		exp  bool
 	}
 	cases := map[string][]validateTestCase{
@@ -327,8 +357,8 @@ func TestSIPValidate(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			for _, c := range class {
 				t.Run(c.name, func(t *testing.T) {
-					err := c.req.Validate()
-					require.Equal(t, c.exp, err == nil, "error: %v", err)
+					errs := validate(t, c.req)
+					require.Equal(t, c.exp, len(errs) == 0, "errors: %v", errs)
 				})
 			}
 		})
@@ -701,11 +731,11 @@ func TestTransferSIPParticipantRequestValidate(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			err := c.req.Validate()
+			errs := c.req.Validate()
 			if c.expectError {
-				require.Error(t, err, "Expected validation to fail")
+				require.NotEmpty(t, errs, "Expected validation to fail")
 			} else {
-				require.NoError(t, err, "Expected validation to pass")
+				require.Empty(t, errs, "Expected validation to pass")
 				require.Equal(t, c.expectedURI, c.req.TransferTo, "TransferTo should be RFC-compliant after validation")
 			}
 		})
@@ -732,8 +762,8 @@ func TestInboundTrunkUpdate(t *testing.T) {
 				Update: u,
 			},
 		}
-		out, err := upd.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
-		require.NoError(t, err)
+		out, errs := upd.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
+		require.Empty(t, errs)
 		require.True(t, r != out)
 		return out
 	}
@@ -795,8 +825,8 @@ func TestInboundTrunkUpdate(t *testing.T) {
 		},
 	}
 
-	out, err := upd2.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
-	require.NoError(t, err)
+	out, errs := upd2.Action.(UpdateSIPInboundTrunkRequestAction).Apply(r)
+	require.Empty(t, errs)
 	require.True(t, r != out)
 	require.True(t, r2 != out)
 	prototest.Equals(t, r2, out)
@@ -809,8 +839,8 @@ func TestOutboundTrunkUpdate(t *testing.T) {
 				Update: u,
 			},
 		}
-		out, err := upd.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
-		require.NoError(t, err)
+		out, errs := upd.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
+		require.Empty(t, errs)
 		require.True(t, r != out)
 		return out
 	}
@@ -878,8 +908,8 @@ func TestOutboundTrunkUpdate(t *testing.T) {
 		},
 	}
 
-	out, err := upd2.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
-	require.NoError(t, err)
+	out, errs := upd2.Action.(UpdateSIPOutboundTrunkRequestAction).Apply(r)
+	require.Empty(t, errs)
 	require.True(t, r != out)
 	require.True(t, r2 != out)
 	prototest.Equals(t, r2, out)
