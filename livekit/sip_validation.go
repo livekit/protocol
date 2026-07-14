@@ -19,6 +19,8 @@ import (
 	fmt "fmt"
 	"strconv"
 	"strings"
+
+	"github.com/livekit/protocol/logger"
 )
 
 // RFC 3261 compliant validation functions for SIP headers and messages
@@ -212,10 +214,68 @@ var nameAddrHeaders = map[string]bool{
 	"referred-by":         true, // RFC 3892 Section 3
 }
 
-var softFailureReporter func(err error)
+// Deprecated: has no effect. Use ValidationResult method variants instead.
+func SetSoftFailureReporter(reporter func(err error)) {}
 
-func SetSoftFailureReporter(reporter func(err error)) {
-	softFailureReporter = reporter
+// ValidationResult holds information about something that's been validated.
+type ValidationResult struct {
+	err      error
+	softErrs []error
+}
+
+// OK returns whether or not an error was seen.
+func (vr ValidationResult) OK() bool {
+	return vr.err == nil
+}
+
+// Error returns the error associated with the result.
+func (vr ValidationResult) Error() error {
+	return vr.err
+}
+
+// SoftErrors returns errors that can probably be ignored.
+func (vr ValidationResult) SoftErrors() []error {
+	return vr.softErrs
+}
+
+// Combine returns a new validation result that is comprised of this result and
+// the other result.
+func (vr ValidationResult) Combine(other ValidationResult) ValidationResult {
+	var err error
+	if vr.err != nil {
+		err = vr.err
+	} else {
+		err = other.err
+	}
+	softErrs := append(vr.softErrs, other.softErrs...)
+	return ValidationResult{err, softErrs}
+}
+
+// WithError returns a new ValidationResult with the given error.
+func (vr ValidationResult) WithError(err error) ValidationResult {
+	return ValidationResult{err, vr.softErrs}
+}
+
+// LogSoftErrors logs warnings for each of the result's soft errors and
+// returns the result's associated error, if any.
+func (vr ValidationResult) LogSoftErrors(l logger.Logger) error {
+	for _, err := range vr.softErrs {
+		l.Warnw("soft validation failure: %w", err)
+	}
+	return vr.err
+}
+
+// LogUnlikelySoftErrors is a variant of LogSoftErrors.
+func (vr ValidationResult) LogUnlikelySoftErrors(l logger.UnlikelyLogger) error {
+	for _, err := range vr.softErrs {
+		l.Warnw("soft validation failure: %w", err)
+	}
+	return vr.err
+}
+
+// ValidationFailure returns a new ValidationResult.
+func ValidationFailure(err error) ValidationResult {
+	return ValidationResult{err, nil}
 }
 
 // ValidateHeaderName validates a SIP header name per RFC 3261 Section 25.1
@@ -245,32 +305,33 @@ func ValidateHeaderName(name string, restrictNames bool) error {
 
 // ValidateHeaderValue validates a SIP header value per RFC 3261 Section 25.1
 func ValidateHeaderValue(name, value string) error {
+	return ValidateHeaderValueResult(name, value).Error()
+}
+
+// ValidateHeaderValueResult
+func ValidateHeaderValueResult(name, value string) ValidationResult {
 	if value == "" {
-		return nil
+		return ValidationResult{}
 	}
 
 	if len(value) > 1024 {
-		return fmt.Errorf("header %s: value too long (max 1024 characters)", name)
+		return ValidationFailure(fmt.Errorf("header %s: value too long (max 1024 characters)", name))
 	}
 
 	// Basic character validation - printable ASCII. We're stricter than the spec here - no UTF-8 for now
 	if err := headerValuesCharacters.Validate(value); err != nil {
-		return fmt.Errorf("header %s: value: %w", name, err)
+		return ValidationFailure(fmt.Errorf("header %s: value: %w", name, err))
 	}
 
 	// Convert to lowercase for case-insensitive comparison
+	var softErrs []error
 	lowerName := strings.ToLower(name)
 	if _, exists := nameAddrHeaders[lowerName]; exists {
 		if err := validateNameAddrHeader(value); err != nil {
-			err = fmt.Errorf("header %s: value: %w", name, err)
-			// For now do not actually error out on header values, just note failure.
-			if cb := softFailureReporter; cb != nil {
-				cb(err)
-			}
+			softErrs = append(softErrs, fmt.Errorf("header %s: value: %w", name, err))
 		}
 	}
-
-	return nil
+	return ValidationResult{nil, softErrs}
 }
 
 // findAngleBrackets efficiently finds angle brackets in a single scan
