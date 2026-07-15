@@ -20,6 +20,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -147,6 +148,87 @@ func TestProtoNestedSecretAlwaysRedacted(t *testing.T) {
 		entry := iceServers[0].(map[string]any)
 		require.Equal(t, "<redacted>", entry["credential"], "credential must be redacted by %s", name)
 	}
+}
+
+func TestProtoWithLimitUnderLimit(t *testing.T) {
+	msg := &livekit.ListEgressResponse{
+		Items: []*livekit.EgressInfo{
+			{EgressId: "EG_1", RoomName: "room-1"},
+			{EgressId: "EG_2", RoomName: "room-2"},
+		},
+	}
+
+	fields := marshalFields(t, logger.ProtoWithLimit(msg, 1<<20))
+	require.NotContains(t, fields, "truncatedProto")
+	require.Len(t, fields["items"].([]any), 2)
+}
+
+func TestProtoWithLimitSummary(t *testing.T) {
+	msg := &livekit.ListEgressResponse{
+		Items: []*livekit.EgressInfo{
+			{EgressId: "EG_1", RoomName: "room-1"},
+			{EgressId: "EG_2", RoomName: "room-2"},
+			{EgressId: "EG_3", RoomName: "room-3"},
+		},
+		NextPageToken: &livekit.TokenPagination{Token: "next"},
+	}
+
+	fields := marshalFields(t, logger.ProtoWithLimit(msg, 8))
+	require.Equal(t, "livekit.ListEgressResponse", fields["truncatedProto"])
+	require.Equal(t, proto.Size(msg), fields["protoBytes"])
+	require.Equal(t, 3, fields["itemsCount"])
+
+	// Lists become counts and nested messages are dropped; nothing else at the
+	// root of this message, so the summary is exactly these three keys.
+	require.NotContains(t, fields, "items")
+	require.NotContains(t, fields, "nextPageToken")
+	require.Len(t, fields, 3)
+}
+
+func TestProtoWithLimitSummaryFieldCounts(t *testing.T) {
+	msg := &livekit.ParticipantInfo{
+		Identity:   "user-123",
+		Attributes: map[string]string{"a": "1", "b": "2"},
+		Tracks:     []*livekit.TrackInfo{{Sid: "TR1"}},
+	}
+
+	fields := marshalFields(t, logger.ProtoWithLimit(msg, 1))
+	require.Equal(t, "livekit.ParticipantInfo", fields["truncatedProto"])
+	require.Equal(t, 2, fields["attributesCount"])
+	require.Equal(t, 1, fields["tracksCount"])
+
+	// Scalars are preserved; collection contents are not.
+	require.Equal(t, "user-123", fields["identity"])
+	require.NotContains(t, fields, "attributes")
+	require.NotContains(t, fields, "tracks")
+}
+
+func TestProtoWithLimitSummaryScalars(t *testing.T) {
+	msg := &livekit.S3Upload{
+		AccessKey: "AKIAEXAMPLE",
+		Region:    "us-east-1",
+		Bucket:    strings.Repeat("b", 300),
+	}
+
+	fields := marshalFields(t, logger.ProtoWithLimit(msg, 1))
+	require.Equal(t, "livekit.S3Upload", fields["truncatedProto"])
+	require.Equal(t, "us-east-1", fields["region"])
+
+	// Sensitivity redaction applies in the summary.
+	require.Equal(t, "<redacted>", fields["accessKey"])
+
+	// Long strings are capped with a size marker.
+	bucket := fields["bucket"].(string)
+	require.True(t, strings.HasPrefix(bucket, strings.Repeat("b", 256)))
+	require.Contains(t, bucket, "(300 bytes)")
+}
+
+func TestProtoWithLimitNilSafe(t *testing.T) {
+	require.Nil(t, logger.ProtoWithLimit(nil, 1))
+
+	require.NotPanics(t, func() {
+		marshalFields(t, logger.ProtoWithLimit((*livekit.S3Upload)(nil), 1))
+	})
 }
 
 func TestProtoNilSafe(t *testing.T) {
