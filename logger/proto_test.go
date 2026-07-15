@@ -175,8 +175,8 @@ func TestProtoWithLimitSummary(t *testing.T) {
 
 	fields := marshalFields(t, logger.ProtoWithLimit(msg, 8))
 	require.Equal(t, "livekit.ListEgressResponse", fields["truncatedProto"])
-	require.Equal(t, int64(proto.Size(msg)), fields["protoBytes"])
-	require.Equal(t, int64(3), fields["itemsCount"])
+	require.Equal(t, proto.Size(msg), fields["protoBytes"])
+	require.Equal(t, 3, fields["itemsCount"])
 
 	// Lists become counts and nested messages are dropped; nothing else at the
 	// root of this message, so the summary is exactly these three keys.
@@ -194,8 +194,8 @@ func TestProtoWithLimitSummaryFieldCounts(t *testing.T) {
 
 	fields := marshalFields(t, logger.ProtoWithLimit(msg, 1))
 	require.Equal(t, "livekit.ParticipantInfo", fields["truncatedProto"])
-	require.Equal(t, int64(2), fields["attributesCount"])
-	require.Equal(t, int64(1), fields["tracksCount"])
+	require.Equal(t, 2, fields["attributesCount"])
+	require.Equal(t, 1, fields["tracksCount"])
 
 	// Scalars are preserved; collection contents are not.
 	require.Equal(t, "user-123", fields["identity"])
