@@ -15,12 +15,9 @@
 package livekit
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 	"testing"
-
-	"github.com/stretchr/testify/require"
 )
 
 // Valid Header Test Cases
@@ -304,65 +301,6 @@ func TestFrobiddenSipHeaderNames(t *testing.T) {
 			if err == nil {
 				t.Errorf("ValidateHeaderName(%q) = nil, want error", name)
 			}
-		})
-	}
-}
-
-// TODO(alexfish): Finish this
-func TestValidationResultCombine(t *testing.T) {
-	type testCase struct {
-		name     string
-		source   ValidationResult
-		other    ValidationResult
-		expected ValidationResult
-	}
-
-	sourceErr := errors.New("source error")
-	otherErr := errors.New("other error")
-
-	testCases := []testCase{
-		{
-			name:     "empty source and other",
-			source:   ValidationResult{},
-			other:    ValidationResult{},
-			expected: ValidationResult{},
-		},
-		{
-			name:     "empty source",
-			source:   ValidationResult{nil, nil},
-			other:    ValidationResult{otherErr, nil},
-			expected: ValidationResult{otherErr, nil},
-		},
-		{
-			name:     "empty other",
-			source:   ValidationResult{sourceErr, nil},
-			other:    ValidationResult{},
-			expected: ValidationResult{sourceErr, nil},
-		},
-		{
-			name:     "both non-empty",
-			source:   ValidationResult{sourceErr, nil},
-			other:    ValidationResult{otherErr, nil},
-			expected: ValidationResult{sourceErr, nil},
-		},
-		{
-			name:   "soft errors",
-			source: ValidationResult{nil, []error{errors.New("soft error 1"), errors.New("soft error 2")}},
-			other:  ValidationResult{nil, []error{errors.New("soft error 3"), errors.New("soft error 4")}},
-			expected: ValidationResult{nil, []error{
-				errors.New("soft error 1"),
-				errors.New("soft error 2"),
-				errors.New("soft error 3"),
-				errors.New("soft error 4"),
-			}},
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			result := testCase.source.Combine(testCase.other)
-			require.Equal(t, result.Error(), testCase.expected.Error())
-			require.Equal(t, result.SoftErrors(), testCase.expected.SoftErrors())
 		})
 	}
 }

@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/xtwirp"
 	"github.com/livekit/psrpc"
 )
@@ -305,6 +306,62 @@ func (p *SIPOutboundTrunkInfo) AsTrunkInfo() *SIPTrunkInfo {
 		OutboundUsername: p.AuthUsername,
 		OutboundPassword: p.AuthPassword,
 	}
+}
+
+// ValidationResult holds information about something that's been validated.
+type ValidationResult struct {
+	err      error
+	softErrs []error
+}
+
+// OK returns whether or not an error was seen.
+func (vr ValidationResult) OK() bool {
+	return vr.err == nil
+}
+
+// Error returns the error associated with the result.
+func (vr ValidationResult) Error() error {
+	return vr.err
+}
+
+// SoftErrors returns errors that can probably be ignored.
+func (vr ValidationResult) SoftErrors() []error {
+	return vr.softErrs
+}
+
+// Combine returns a new validation result that is comprised of this result and
+// the other result.
+func (vr ValidationResult) Combine(other ValidationResult) ValidationResult {
+	err := errors.Join(vr.err, other.err)
+	softErrs := append(vr.softErrs, other.softErrs...)
+	return ValidationResult{err, softErrs}
+}
+
+// WithError returns a new ValidationResult with the given error.
+func (vr ValidationResult) WithError(err error) ValidationResult {
+	return ValidationResult{err, vr.softErrs}
+}
+
+// LogSoftErrors logs warnings for each of the result's soft errors and
+// returns the result's associated error, if any.
+func (vr ValidationResult) LogSoftErrors(l logger.Logger) error {
+	for _, err := range vr.softErrs {
+		l.Warnw("soft validation failure: %w", err)
+	}
+	return vr.err
+}
+
+// LogUnlikelySoftErrors is a variant of LogSoftErrors.
+func (vr ValidationResult) LogUnlikelySoftErrors(l logger.UnlikelyLogger) error {
+	for _, err := range vr.softErrs {
+		l.Warnw("soft validation failure: %w", err)
+	}
+	return vr.err
+}
+
+// ValidationFailure returns a new ValidationResult.
+func ValidationFailure(err error) ValidationResult {
+	return ValidationResult{err, nil}
 }
 
 func validateHeaders(headers map[string]string) ValidationResult {
