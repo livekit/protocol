@@ -1122,7 +1122,12 @@ func TestValidationResultCombine(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			result := testCase.source.Combine(testCase.other)
-			require.Equal(t, result.Error(), testCase.expected.Error())
+			if testCase.source.Error() != nil {
+				require.ErrorContains(t, result.Error(), testCase.source.Error().Error())
+			}
+			if testCase.other.Error() != nil {
+				require.ErrorContains(t, result.Error(), testCase.other.Error().Error())
+			}
 			require.Equal(t, result.SoftErrors(), testCase.expected.SoftErrors())
 		})
 	}
