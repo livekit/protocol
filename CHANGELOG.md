@@ -1,5 +1,25 @@
 # github.com/livekit/protocol
 
+## 1.50.0
+
+### Minor Changes
+
+- agent: add `llm_node_tps` and `llm_node_ttfs` to `MetricsReport`, and an `AgentFalseInterruption` event to `AgentSessionEvent` - [#1661](https://github.com/livekit/protocol/pull/1661) ([@Bobronium](https://github.com/Bobronium))
+
+- agent_simulations: add JobMetrics/RunMetrics to SimulationRun — per-job quality metrics grouped by - [#1644](https://github.com/livekit/protocol/pull/1644) ([@Bobronium](https://github.com/Bobronium))
+  pipeline stage (stt/llm/tts/conversation, plus a per-turn timeline and headline
+  accuracy/experience scores) and run-level aggregates. Unset optional fields mean "not measured";
+
+- Add validation method variants that include information about soft errors. - [#1667](https://github.com/livekit/protocol/pull/1667) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- add redaction flag in Job - [#1657](https://github.com/livekit/protocol/pull/1657) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Add wait_until_answered to ConnectWhatsAppCallRequest. - [#1653](https://github.com/livekit/protocol/pull/1653) ([@anunaym14](https://github.com/anunaym14))
+
+- Relax SIP codec validation. - [#1656](https://github.com/livekit/protocol/pull/1656) ([@dennwc](https://github.com/dennwc))
+
 ## 1.49.0
 
 ### Minor Changes
