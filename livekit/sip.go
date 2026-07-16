@@ -441,7 +441,7 @@ func (p *CreateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
 	if p.Trunk.SipTrunkId != "" {
 		return ValidationFailure(errors.New("trunk id must not be set"))
 	}
-	return p.ValidateResult()
+	return p.Trunk.ValidateResult()
 }
 
 func (p *UpdateSIPOutboundTrunkRequest) Validate() error {

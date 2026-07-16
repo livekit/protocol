@@ -2,6 +2,7 @@ package livekit
 
 import (
 	errors "errors"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -50,11 +51,16 @@ func TestSIPValidate(t *testing.T) {
 	type validateable interface {
 		Validate() error
 	}
+	type resultValidateable interface {
+		ValidateResult() ValidationResult
+	}
+
 	type validateTestCase struct {
 		name string
 		req  validateable
 		exp  bool
 	}
+
 	cases := map[string][]validateTestCase{
 		"SIPInboundTrunkInfo": {
 			{
@@ -322,7 +328,193 @@ func TestSIPValidate(t *testing.T) {
 				exp: false,
 			},
 		},
+		"CreateSIPInboundTrunkRequest": {
+			{
+				name: "create_inbound_missing_trunk",
+				req:  &CreateSIPInboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "create_inbound_trunk_id_set",
+				req: &CreateSIPInboundTrunkRequest{
+					Trunk: &SIPInboundTrunkInfo{
+						SipTrunkId: "id",
+						Numbers:    []string{"+1111"},
+					},
+				},
+				exp: false,
+			},
+			{
+				name: "create_inbound_valid",
+				req: &CreateSIPInboundTrunkRequest{
+					Trunk: &SIPInboundTrunkInfo{
+						Numbers: []string{"+1111"},
+					},
+				},
+				exp: true,
+			},
+		},
+		"CreateSIPOutboundTrunkRequest": {
+			{
+				name: "create_outbound_missing_trunk",
+				req:  &CreateSIPOutboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "create_outbound_trunk_id_set",
+				req: &CreateSIPOutboundTrunkRequest{
+					Trunk: &SIPOutboundTrunkInfo{
+						SipTrunkId: "id",
+					},
+				},
+				exp: false,
+			},
+			{
+				name: "create_outbound_valid",
+				req: &CreateSIPOutboundTrunkRequest{
+					Trunk: &SIPOutboundTrunkInfo{
+						Address: "sip.example.com",
+						Numbers: []string{"+2222"},
+					},
+				},
+				exp: true,
+			},
+		},
+		"UpdateSIPInboundTrunkRequest": {
+			{
+				name: "update_inbound_missing_id",
+				req:  &UpdateSIPInboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "update_inbound_missing_action",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+				},
+				exp: false,
+			},
+			{
+				name: "update_inbound_update_ok",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Update{
+						Update: &SIPInboundTrunkUpdate{},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_inbound_replace_ok",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Replace{
+						Replace: &SIPInboundTrunkInfo{
+							Numbers: []string{"+1111"},
+						},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_inbound_replace_id_mismatch",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Replace{
+						Replace: &SIPInboundTrunkInfo{
+							SipTrunkId: "other",
+							Numbers:    []string{"+1111"},
+						},
+					},
+				},
+				exp: false,
+			},
+		},
+		"UpdateSIPOutboundTrunkRequest": {
+			{
+				name: "update_outbound_missing id",
+				req:  &UpdateSIPOutboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "update_outbound_missing_action",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+				},
+				exp: false,
+			},
+			{
+				name: "update_outbound_update_ok",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Update{
+						Update: &SIPOutboundTrunkUpdate{},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_outbound_replace_ok",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Replace{
+						Replace: &SIPOutboundTrunkInfo{
+							Address: "sip.example.com",
+							Numbers: []string{"+2222"},
+						},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_outbound_replace_id_mismatch",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Replace{
+						Replace: &SIPOutboundTrunkInfo{
+							SipTrunkId: "other",
+							Address:    "sip.example.com",
+							Numbers:    []string{"+2222"},
+						},
+					},
+				},
+				exp: false,
+			},
+		},
+		"TransferSIPParticipantRequest": {
+			{
+				name: "transfer_valid",
+				req: &TransferSIPParticipantRequest{
+					RoomName:            "room1",
+					ParticipantIdentity: "participant1",
+					TransferTo:          "tel:+15105550100",
+				},
+				exp: true,
+			},
+			{
+				name: "transfer_missing_room",
+				req:  &TransferSIPParticipantRequest{},
+				exp:  false,
+			},
+			{
+				name: "transfer_missing_participant",
+				req: &TransferSIPParticipantRequest{
+					RoomName: "room1",
+				},
+				exp: false,
+			},
+			{
+				name: "transfer_invalid_uri",
+				req: &TransferSIPParticipantRequest{
+					RoomName:            "room1",
+					ParticipantIdentity: "participant1",
+					TransferTo:          "http://example.com",
+				},
+				exp: false,
+			},
+		},
 	}
+
+	resultValidatableTypes := make(map[string]bool)
 
 	for name, class := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -330,10 +522,28 @@ func TestSIPValidate(t *testing.T) {
 				t.Run(c.name, func(t *testing.T) {
 					err := c.req.Validate()
 					require.Equal(t, c.exp, err == nil, "error: %v", err)
+
+					if v, ok := c.req.(resultValidateable); ok {
+						result := v.ValidateResult()
+						require.Equal(t, c.exp, result.Error() == nil, "error: %v", err)
+						resultValidatableTypes[fmt.Sprintf("%T", v)] = true
+					}
 				})
 			}
 		})
 	}
+
+	wantResultValidateableTypes := map[string]bool{
+		"*livekit.CreateSIPInboundTrunkRequest":  true,
+		"*livekit.CreateSIPOutboundTrunkRequest": true,
+		"*livekit.CreateSIPParticipantRequest":   true,
+		"*livekit.SIPInboundTrunkInfo":           true,
+		"*livekit.SIPOutboundTrunkInfo":          true,
+		"*livekit.TransferSIPParticipantRequest": true,
+		"*livekit.UpdateSIPInboundTrunkRequest":  true,
+		"*livekit.UpdateSIPOutboundTrunkRequest": true,
+	}
+	require.Equal(t, wantResultValidateableTypes, resultValidatableTypes)
 }
 
 func TestSIPInboundTrunkFilter(t *testing.T) {
