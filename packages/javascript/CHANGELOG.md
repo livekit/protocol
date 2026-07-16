@@ -1,5 +1,17 @@
 # @livekit/protocol
 
+## 1.50.0
+
+### Minor Changes
+
+- Add validation method variants that include information about soft errors. - [#1667](https://github.com/livekit/protocol/pull/1667) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- add redaction flag in Job - [#1657](https://github.com/livekit/protocol/pull/1657) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Add wait_until_answered to ConnectWhatsAppCallRequest. - [#1653](https://github.com/livekit/protocol/pull/1653) ([@anunaym14](https://github.com/anunaym14))
+
 ## 1.49.0
 
 ### Minor Changes
