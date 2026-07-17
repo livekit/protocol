@@ -55,9 +55,10 @@ func TestSIPValidate(t *testing.T) {
 		ValidateResult() ValidationResult
 	}
 	type validateTestCase struct {
-		name string
-		req  validateable
-		exp  bool
+		name         string
+		req          validateable
+		exp          bool
+		wantSoftErrs bool
 	}
 
 	cases := map[string][]validateTestCase{
@@ -118,6 +119,27 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp: false,
+			},
+			{
+				name: "inbound invalid header",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
+					HeadersToAttributes: map[string]string{
+						"From ": "from",
+					},
+				},
+				exp: false,
+			},
+			{
+				name: "inbound invalid header value",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
+					HeadersToAttributes: map[string]string{
+						"From": "<sip:u7@example.com", // missing closing bracket
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
 			},
 		},
 		"SIPOutboundTrunkInfo": {
@@ -205,6 +227,18 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp: false,
+			},
+			{
+				name: "outbound invalid header value",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+					Numbers: []string{"+2222"},
+					HeadersToAttributes: map[string]string{
+						"From": "<sip:u7@example.com", // missing closing bracket
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
 			},
 		},
 		"SIPMediaConfig": {
@@ -326,6 +360,20 @@ func TestSIPValidate(t *testing.T) {
 				},
 				exp: false,
 			},
+			{
+				name: "invalid_header_value_soft_failure",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId: "trunk",
+					SipCallTo:  "+1000",
+					RoomName:   "room",
+					Headers: map[string]string{
+						"From": "<sip:u7@example.com", // missing closing bracket
+					},
+					// Sanity
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
 		},
 		"CreateSIPInboundTrunkRequest": {
 			{
@@ -352,6 +400,19 @@ func TestSIPValidate(t *testing.T) {
 				},
 				exp: true,
 			},
+			{
+				name: "create_inbound_valid_soft_failure",
+				req: &CreateSIPInboundTrunkRequest{
+					Trunk: &SIPInboundTrunkInfo{
+						Numbers: []string{"+1111"},
+						Headers: map[string]string{
+							"From": "<sip:u7@example.com", // missing closing bracket
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
 		},
 		"CreateSIPOutboundTrunkRequest": {
 			{
@@ -377,6 +438,20 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp: true,
+			},
+			{
+				name: "create_outbound_valid_soft_failure",
+				req: &CreateSIPOutboundTrunkRequest{
+					Trunk: &SIPOutboundTrunkInfo{
+						Address: "sip.example.com",
+						Numbers: []string{"+2222"},
+						Headers: map[string]string{
+							"From": "<sip:u7@example.com", // missing closing bracket
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
 			},
 		},
 		"UpdateSIPInboundTrunkRequest": {
@@ -413,6 +488,22 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp: true,
+			},
+			{
+				name: "update_inbound_replace_ok_soft_failrues",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Replace{
+						Replace: &SIPInboundTrunkInfo{
+							Numbers: []string{"+1111"},
+							Headers: map[string]string{
+								"From": "<sip:u7@example.com", // missing closing bracket
+							},
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
 			},
 			{
 				name: "update_inbound_replace_id_mismatch",
@@ -465,6 +556,23 @@ func TestSIPValidate(t *testing.T) {
 				exp: true,
 			},
 			{
+				name: "update_outbound_replace_ok_soft_failures",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Replace{
+						Replace: &SIPOutboundTrunkInfo{
+							Address: "sip.example.com",
+							Numbers: []string{"+2222"},
+							Headers: map[string]string{
+								"From": "<sip:u7@example.com", // missing closing bracket
+							},
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+			{
 				name: "update_outbound_replace_id_mismatch",
 				req: &UpdateSIPOutboundTrunkRequest{
 					SipTrunkId: "id",
@@ -482,6 +590,19 @@ func TestSIPValidate(t *testing.T) {
 		"TransferSIPParticipantRequest": {
 			{
 				name: "transfer_valid",
+				req: &TransferSIPParticipantRequest{
+					RoomName:            "room1",
+					ParticipantIdentity: "participant1",
+					TransferTo:          "tel:+15105550100",
+					Headers: map[string]string{
+						"From": "<sip:u7@example.com",
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+			{
+				name: "transfer_valid_soft_failures",
 				req: &TransferSIPParticipantRequest{
 					RoomName:            "room1",
 					ParticipantIdentity: "participant1",
@@ -526,6 +647,13 @@ func TestSIPValidate(t *testing.T) {
 						result := v.ValidateResult()
 						require.Equal(t, c.exp, result.Error() == nil, "error: %v", err)
 						resultValidatableTypes[fmt.Sprintf("%T", v)] = true
+
+						hasSoftErrs := len(result.SoftErrors()) > 0
+						if c.wantSoftErrs {
+							require.Equal(t, c.wantSoftErrs, hasSoftErrs, "got zero soft validation errors; want at least one")
+						} else {
+							require.Equal(t, c.wantSoftErrs, hasSoftErrs, "got at least one soft validation error; want zero; %v", result.SoftErrors())
+						}
 					}
 				})
 			}
