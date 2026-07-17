@@ -1,7 +1,7 @@
 package livekit
 
 import (
-	errors "errors"
+	"errors"
 	"fmt"
 	"slices"
 	"testing"
@@ -121,21 +121,11 @@ func TestSIPValidate(t *testing.T) {
 				exp: false,
 			},
 			{
-				name: "inbound invalid header",
-				req: &SIPInboundTrunkInfo{
-					Numbers: []string{"+1111"},
-					HeadersToAttributes: map[string]string{
-						"From ": "from",
-					},
-				},
-				exp: false,
-			},
-			{
 				name: "inbound invalid header value",
 				req: &SIPInboundTrunkInfo{
 					Numbers: []string{"+1111"},
-					HeadersToAttributes: map[string]string{
-						"From": "<sip:u7@example.com", // missing closing bracket
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
 					},
 				},
 				exp:          true,
@@ -233,12 +223,12 @@ func TestSIPValidate(t *testing.T) {
 				req: &SIPOutboundTrunkInfo{
 					Address: "sip.example.com",
 					Numbers: []string{"+2222"},
-					HeadersToAttributes: map[string]string{
-						"From": "<sip:u7@example.com", // missing closing bracket
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
 					},
 				},
 				exp:          true,
-				wantSoftErrs: true,
+				wantSoftErrs: false,
 			},
 		},
 		"SIPMediaConfig": {
@@ -367,7 +357,7 @@ func TestSIPValidate(t *testing.T) {
 					SipCallTo:  "+1000",
 					RoomName:   "room",
 					Headers: map[string]string{
-						"From": "<sip:u7@example.com", // missing closing bracket
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
 					},
 					// Sanity
 				},
@@ -406,7 +396,7 @@ func TestSIPValidate(t *testing.T) {
 					Trunk: &SIPInboundTrunkInfo{
 						Numbers: []string{"+1111"},
 						Headers: map[string]string{
-							"From": "<sip:u7@example.com", // missing closing bracket
+							"Referred-By": "<sip:u7@example.com", // missing closing bracket
 						},
 					},
 				},
@@ -446,7 +436,7 @@ func TestSIPValidate(t *testing.T) {
 						Address: "sip.example.com",
 						Numbers: []string{"+2222"},
 						Headers: map[string]string{
-							"From": "<sip:u7@example.com", // missing closing bracket
+							"Referred-By": "<sip:u7@example.com", // missing closing bracket
 						},
 					},
 				},
@@ -497,7 +487,7 @@ func TestSIPValidate(t *testing.T) {
 						Replace: &SIPInboundTrunkInfo{
 							Numbers: []string{"+1111"},
 							Headers: map[string]string{
-								"From": "<sip:u7@example.com", // missing closing bracket
+								"Referred-By": "<sip:u7@example.com", // missing closing bracket
 							},
 						},
 					},
@@ -564,7 +554,7 @@ func TestSIPValidate(t *testing.T) {
 							Address: "sip.example.com",
 							Numbers: []string{"+2222"},
 							Headers: map[string]string{
-								"From": "<sip:u7@example.com", // missing closing bracket
+								"Referred-By": "<sip:u7@example.com", // missing closing bracket
 							},
 						},
 					},
@@ -594,12 +584,8 @@ func TestSIPValidate(t *testing.T) {
 					RoomName:            "room1",
 					ParticipantIdentity: "participant1",
 					TransferTo:          "tel:+15105550100",
-					Headers: map[string]string{
-						"From": "<sip:u7@example.com",
-					},
 				},
-				exp:          true,
-				wantSoftErrs: true,
+				exp: true,
 			},
 			{
 				name: "transfer_valid_soft_failures",
@@ -607,8 +593,12 @@ func TestSIPValidate(t *testing.T) {
 					RoomName:            "room1",
 					ParticipantIdentity: "participant1",
 					TransferTo:          "tel:+15105550100",
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
+					},
 				},
-				exp: true,
+				exp:          true,
+				wantSoftErrs: true,
 			},
 			{
 				name: "transfer_missing_room",
@@ -1466,6 +1456,60 @@ func TestValidationResultCombine(t *testing.T) {
 				require.ErrorContains(t, result.Error(), testCase.other.Error().Error())
 			}
 			require.Equal(t, result.SoftErrors(), testCase.expected.SoftErrors())
+		})
+	}
+}
+
+func errMsgs(errs []error) []string {
+	ret := make([]string, 0, len(errs))
+	for _, err := range errs {
+		ret = append(ret, err.Error())
+	}
+	return ret
+}
+
+func TestValidateHeaders(t *testing.T) {
+	type testCase struct {
+		name     string
+		headers  map[string]string
+		expected ValidationResult
+	}
+
+	testCases := []testCase{
+		{
+			name:     "empty headers",
+			headers:  map[string]string{},
+			expected: ValidationResult{},
+		},
+		{
+			name: "valid header",
+			headers: map[string]string{
+				"Reffered-By": "<sip:u7@example.com",
+			},
+			expected: ValidationResult{},
+		},
+		{
+			name: "multiple soft failures",
+			headers: map[string]string{
+				"P-Asserted-Identity": "<",
+				"Referred-By":         "<",
+			},
+			expected: ValidationResult{softErrs: []error{
+				errors.New("header P-Asserted-Identity: value: mismatched angle brackets"),
+				errors.New("header Referred-By: value: mismatched angle brackets"),
+			}},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			result := validateHeaders(testCase.headers)
+			if testCase.expected.Error() != nil {
+				require.Error(t, result.Error())
+			} else {
+				require.NoError(t, result.Error())
+			}
+			require.Equal(t, len(testCase.expected.SoftErrors()), len(result.SoftErrors()), "soft error slice lengths differ; got soft errors: %v", result.SoftErrors())
 		})
 	}
 }
