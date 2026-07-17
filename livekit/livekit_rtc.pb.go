@@ -1626,9 +1626,7 @@ type PublishDataTrackRequest struct {
 	FrameEncoding *DataTrackFrameEncoding `protobuf:"bytes,4,opt,name=frame_encoding,json=frameEncoding,proto3,oneof" json:"frame_encoding,omitempty"`
 	// ID of the schema used by frames on this track if the track is typed.
 	// If set, the associated schema must be stored with `StoreDataBlobRequest`.
-	Schema *DataTrackSchemaId `protobuf:"bytes,5,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
-	// Whether dynacast is enabled for this track.
-	IsDynacasted  bool `protobuf:"varint,6,opt,name=is_dynacasted,json=isDynacasted,proto3" json:"is_dynacasted,omitempty"`
+	Schema        *DataTrackSchemaId `protobuf:"bytes,5,opt,name=schema,proto3,oneof" json:"schema,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1696,13 +1694,6 @@ func (x *PublishDataTrackRequest) GetSchema() *DataTrackSchemaId {
 		return x.Schema
 	}
 	return nil
-}
-
-func (x *PublishDataTrackRequest) GetIsDynacasted() bool {
-	if x != nil {
-		return x.IsDynacasted
-	}
-	return false
 }
 
 type PublishDataTrackResponse struct {
@@ -1889,11 +1880,10 @@ type DataTrackDemandUpdate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Publisher handle of the track.
 	PubHandle uint32 `protobuf:"varint,1,opt,name=pub_handle,json=pubHandle,proto3" json:"pub_handle,omitempty"`
-	// Number of participants currently subscribed to the track. Used
-	// by the publisher when dynacast is enabled for the track.
-	SubscriberCount uint32 `protobuf:"varint,2,opt,name=subscriber_count,json=subscriberCount,proto3" json:"subscriber_count,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Whether or not the track currently has any subscribers.
+	HasSubscribers bool `protobuf:"varint,2,opt,name=has_subscribers,json=hasSubscribers,proto3" json:"has_subscribers,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *DataTrackDemandUpdate) Reset() {
@@ -1933,11 +1923,11 @@ func (x *DataTrackDemandUpdate) GetPubHandle() uint32 {
 	return 0
 }
 
-func (x *DataTrackDemandUpdate) GetSubscriberCount() uint32 {
+func (x *DataTrackDemandUpdate) GetHasSubscribers() bool {
 	if x != nil {
-		return x.SubscriberCount
+		return x.HasSubscribers
 	}
-	return 0
+	return false
 }
 
 type TrickleRequest struct {
@@ -5497,7 +5487,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x06stream\x18\x0f \x01(\tR\x06stream\x12J\n" +
 	"\x13backup_codec_policy\x18\x10 \x01(\x0e2\x1a.livekit.BackupCodecPolicyR\x11backupCodecPolicy\x12A\n" +
 	"\x0eaudio_features\x18\x11 \x03(\x0e2\x1a.livekit.AudioTrackFeatureR\raudioFeatures\x12U\n" +
-	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xcf\x02\n" +
+	"\x17packet_trailer_features\x18\x12 \x03(\x0e2\x1d.livekit.PacketTrailerFeatureR\x15packetTrailerFeatures\"\xaa\x02\n" +
 	"\x17PublishDataTrackRequest\x12\x1d\n" +
 	"\n" +
 	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12\x12\n" +
@@ -5506,8 +5496,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"encryption\x18\x03 \x01(\x0e2\x18.livekit.Encryption.TypeR\n" +
 	"encryption\x12K\n" +
 	"\x0eframe_encoding\x18\x04 \x01(\v2\x1f.livekit.DataTrackFrameEncodingH\x00R\rframeEncoding\x88\x01\x01\x127\n" +
-	"\x06schema\x18\x05 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01\x12#\n" +
-	"\ris_dynacasted\x18\x06 \x01(\bR\fisDynacastedB\x11\n" +
+	"\x06schema\x18\x05 \x01(\v2\x1a.livekit.DataTrackSchemaIdH\x01R\x06schema\x88\x01\x01B\x11\n" +
 	"\x0f_frame_encodingB\t\n" +
 	"\a_schema\"F\n" +
 	"\x18PublishDataTrackResponse\x12*\n" +
@@ -5526,11 +5515,11 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\ttrack_sid\x18\x03 \x01(\tR\btrackSid\x1au\n" +
 	"\x0fSubHandlesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\rR\x03key\x12L\n" +
-	"\x05value\x18\x02 \x01(\v26.livekit.DataTrackSubscriberHandles.PublishedDataTrackR\x05value:\x028\x01\"a\n" +
+	"\x05value\x18\x02 \x01(\v26.livekit.DataTrackSubscriberHandles.PublishedDataTrackR\x05value:\x028\x01\"_\n" +
 	"\x15DataTrackDemandUpdate\x12\x1d\n" +
 	"\n" +
-	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12)\n" +
-	"\x10subscriber_count\x18\x02 \x01(\rR\x0fsubscriberCount\"{\n" +
+	"pub_handle\x18\x01 \x01(\rR\tpubHandle\x12'\n" +
+	"\x0fhas_subscribers\x18\x02 \x01(\bR\x0ehasSubscribers\"{\n" +
 	"\x0eTrickleRequest\x12$\n" +
 	"\rcandidateInit\x18\x01 \x01(\tR\rcandidateInit\x12-\n" +
 	"\x06target\x18\x02 \x01(\x0e2\x15.livekit.SignalTargetR\x06target\x12\x14\n" +
