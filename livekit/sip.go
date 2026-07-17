@@ -365,15 +365,18 @@ func ValidationFailure(err error) ValidationResult {
 }
 
 func validateHeaders(headers map[string]string) ValidationResult {
+	ret := ValidationResult{}
 	for headerName, headerValue := range headers {
 		if err := ValidateHeaderName(headerName, true); err != nil {
-			return ValidationFailure(fmt.Errorf("invalid header name: %w", err))
+			return ret.WithError(fmt.Errorf("invalid header name: %w", err))
 		}
-		if err := ValidateHeaderValue(headerName, headerValue); err != nil {
-			return ValidationFailure(fmt.Errorf("invalid header value for %s: %w", headerName, err))
+		result := ValidateHeaderValueResult(headerName, headerValue)
+		if !result.OK() {
+			return ret.WithError(fmt.Errorf("invalid header value for %s: %w", headerName, result.Error()))
 		}
+		ret = ret.Combine(result)
 	}
-	return ValidationResult{}
+	return ret
 }
 
 // validateHeaderNames Makes sure the values of the given map correspond to valid SIP header names
@@ -441,7 +444,7 @@ func (p *CreateSIPInboundTrunkRequest) ValidateResult() ValidationResult {
 	if p.Trunk.SipTrunkId != "" {
 		return ValidationFailure(errors.New("trunk id must not be set"))
 	}
-	return p.ValidateResult()
+	return p.Trunk.ValidateResult()
 }
 
 func (p *UpdateSIPOutboundTrunkRequest) Validate() error {

@@ -1,7 +1,8 @@
 package livekit
 
 import (
-	errors "errors"
+	"errors"
+	"fmt"
 	"slices"
 	"testing"
 	"time"
@@ -50,11 +51,16 @@ func TestSIPValidate(t *testing.T) {
 	type validateable interface {
 		Validate() error
 	}
-	type validateTestCase struct {
-		name string
-		req  validateable
-		exp  bool
+	type resultValidateable interface {
+		ValidateResult() ValidationResult
 	}
+	type validateTestCase struct {
+		name         string
+		req          validateable
+		exp          bool
+		wantSoftErrs bool
+	}
+
 	cases := map[string][]validateTestCase{
 		"SIPInboundTrunkInfo": {
 			{
@@ -113,6 +119,17 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp: false,
+			},
+			{
+				name: "inbound invalid header value",
+				req: &SIPInboundTrunkInfo{
+					Numbers: []string{"+1111"},
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
 			},
 		},
 		"SIPOutboundTrunkInfo": {
@@ -200,6 +217,18 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp: false,
+			},
+			{
+				name: "outbound invalid header value",
+				req: &SIPOutboundTrunkInfo{
+					Address: "sip.example.com",
+					Numbers: []string{"+2222"},
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
 			},
 		},
 		"SIPMediaConfig": {
@@ -321,8 +350,281 @@ func TestSIPValidate(t *testing.T) {
 				},
 				exp: false,
 			},
+			{
+				name: "invalid_header_value_soft_failure",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId: "trunk",
+					SipCallTo:  "+1000",
+					RoomName:   "room",
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
+					},
+					// Sanity
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+		},
+		"CreateSIPInboundTrunkRequest": {
+			{
+				name: "create_inbound_missing_trunk",
+				req:  &CreateSIPInboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "create_inbound_trunk_id_set",
+				req: &CreateSIPInboundTrunkRequest{
+					Trunk: &SIPInboundTrunkInfo{
+						SipTrunkId: "id",
+						Numbers:    []string{"+1111"},
+					},
+				},
+				exp: false,
+			},
+			{
+				name: "create_inbound_valid",
+				req: &CreateSIPInboundTrunkRequest{
+					Trunk: &SIPInboundTrunkInfo{
+						Numbers: []string{"+1111"},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "create_inbound_valid_soft_failure",
+				req: &CreateSIPInboundTrunkRequest{
+					Trunk: &SIPInboundTrunkInfo{
+						Numbers: []string{"+1111"},
+						Headers: map[string]string{
+							"Referred-By": "<sip:u7@example.com", // missing closing bracket
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+		},
+		"CreateSIPOutboundTrunkRequest": {
+			{
+				name: "create_outbound_missing_trunk",
+				req:  &CreateSIPOutboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "create_outbound_trunk_id_set",
+				req: &CreateSIPOutboundTrunkRequest{
+					Trunk: &SIPOutboundTrunkInfo{
+						SipTrunkId: "id",
+					},
+				},
+				exp: false,
+			},
+			{
+				name: "create_outbound_valid",
+				req: &CreateSIPOutboundTrunkRequest{
+					Trunk: &SIPOutboundTrunkInfo{
+						Address: "sip.example.com",
+						Numbers: []string{"+2222"},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "create_outbound_valid_soft_failure",
+				req: &CreateSIPOutboundTrunkRequest{
+					Trunk: &SIPOutboundTrunkInfo{
+						Address: "sip.example.com",
+						Numbers: []string{"+2222"},
+						Headers: map[string]string{
+							"Referred-By": "<sip:u7@example.com", // missing closing bracket
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+		},
+		"UpdateSIPInboundTrunkRequest": {
+			{
+				name: "update_inbound_missing_id",
+				req:  &UpdateSIPInboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "update_inbound_missing_action",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+				},
+				exp: false,
+			},
+			{
+				name: "update_inbound_update_ok",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Update{
+						Update: &SIPInboundTrunkUpdate{},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_inbound_replace_ok",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Replace{
+						Replace: &SIPInboundTrunkInfo{
+							Numbers: []string{"+1111"},
+						},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_inbound_replace_ok_soft_failrues",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Replace{
+						Replace: &SIPInboundTrunkInfo{
+							Numbers: []string{"+1111"},
+							Headers: map[string]string{
+								"Referred-By": "<sip:u7@example.com", // missing closing bracket
+							},
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+			{
+				name: "update_inbound_replace_id_mismatch",
+				req: &UpdateSIPInboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPInboundTrunkRequest_Replace{
+						Replace: &SIPInboundTrunkInfo{
+							SipTrunkId: "other",
+							Numbers:    []string{"+1111"},
+						},
+					},
+				},
+				exp: false,
+			},
+		},
+		"UpdateSIPOutboundTrunkRequest": {
+			{
+				name: "update_outbound_missing id",
+				req:  &UpdateSIPOutboundTrunkRequest{},
+				exp:  false,
+			},
+			{
+				name: "update_outbound_missing_action",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+				},
+				exp: false,
+			},
+			{
+				name: "update_outbound_update_ok",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Update{
+						Update: &SIPOutboundTrunkUpdate{},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_outbound_replace_ok",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Replace{
+						Replace: &SIPOutboundTrunkInfo{
+							Address: "sip.example.com",
+							Numbers: []string{"+2222"},
+						},
+					},
+				},
+				exp: true,
+			},
+			{
+				name: "update_outbound_replace_ok_soft_failures",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Replace{
+						Replace: &SIPOutboundTrunkInfo{
+							Address: "sip.example.com",
+							Numbers: []string{"+2222"},
+							Headers: map[string]string{
+								"Referred-By": "<sip:u7@example.com", // missing closing bracket
+							},
+						},
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+			{
+				name: "update_outbound_replace_id_mismatch",
+				req: &UpdateSIPOutboundTrunkRequest{
+					SipTrunkId: "id",
+					Action: &UpdateSIPOutboundTrunkRequest_Replace{
+						Replace: &SIPOutboundTrunkInfo{
+							SipTrunkId: "other",
+							Address:    "sip.example.com",
+							Numbers:    []string{"+2222"},
+						},
+					},
+				},
+				exp: false,
+			},
+		},
+		"TransferSIPParticipantRequest": {
+			{
+				name: "transfer_valid",
+				req: &TransferSIPParticipantRequest{
+					RoomName:            "room1",
+					ParticipantIdentity: "participant1",
+					TransferTo:          "tel:+15105550100",
+				},
+				exp: true,
+			},
+			{
+				name: "transfer_valid_soft_failures",
+				req: &TransferSIPParticipantRequest{
+					RoomName:            "room1",
+					ParticipantIdentity: "participant1",
+					TransferTo:          "tel:+15105550100",
+					Headers: map[string]string{
+						"Referred-By": "<sip:u7@example.com", // missing closing bracket
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+			{
+				name: "transfer_missing_room",
+				req:  &TransferSIPParticipantRequest{},
+				exp:  false,
+			},
+			{
+				name: "transfer_missing_participant",
+				req: &TransferSIPParticipantRequest{
+					RoomName: "room1",
+				},
+				exp: false,
+			},
+			{
+				name: "transfer_invalid_uri",
+				req: &TransferSIPParticipantRequest{
+					RoomName:            "room1",
+					ParticipantIdentity: "participant1",
+					TransferTo:          "http://example.com",
+				},
+				exp: false,
+			},
 		},
 	}
+
+	resultValidatableTypes := make(map[string]bool)
 
 	for name, class := range cases {
 		t.Run(name, func(t *testing.T) {
@@ -330,10 +632,35 @@ func TestSIPValidate(t *testing.T) {
 				t.Run(c.name, func(t *testing.T) {
 					err := c.req.Validate()
 					require.Equal(t, c.exp, err == nil, "error: %v", err)
+
+					if v, ok := c.req.(resultValidateable); ok {
+						result := v.ValidateResult()
+						require.Equal(t, c.exp, result.Error() == nil, "error: %v", err)
+						resultValidatableTypes[fmt.Sprintf("%T", v)] = true
+
+						hasSoftErrs := len(result.SoftErrors()) > 0
+						if c.wantSoftErrs {
+							require.Equal(t, c.wantSoftErrs, hasSoftErrs, "got zero soft validation errors; want at least one")
+						} else {
+							require.Equal(t, c.wantSoftErrs, hasSoftErrs, "got at least one soft validation error; want zero; %v", result.SoftErrors())
+						}
+					}
 				})
 			}
 		})
 	}
+
+	wantResultValidateableTypes := map[string]bool{
+		"*livekit.CreateSIPInboundTrunkRequest":  true,
+		"*livekit.CreateSIPOutboundTrunkRequest": true,
+		"*livekit.CreateSIPParticipantRequest":   true,
+		"*livekit.SIPInboundTrunkInfo":           true,
+		"*livekit.SIPOutboundTrunkInfo":          true,
+		"*livekit.TransferSIPParticipantRequest": true,
+		"*livekit.UpdateSIPInboundTrunkRequest":  true,
+		"*livekit.UpdateSIPOutboundTrunkRequest": true,
+	}
+	require.Equal(t, wantResultValidateableTypes, resultValidatableTypes)
 }
 
 func TestSIPInboundTrunkFilter(t *testing.T) {
@@ -1129,6 +1456,60 @@ func TestValidationResultCombine(t *testing.T) {
 				require.ErrorContains(t, result.Error(), testCase.other.Error().Error())
 			}
 			require.Equal(t, result.SoftErrors(), testCase.expected.SoftErrors())
+		})
+	}
+}
+
+func errMsgs(errs []error) []string {
+	ret := make([]string, 0, len(errs))
+	for _, err := range errs {
+		ret = append(ret, err.Error())
+	}
+	return ret
+}
+
+func TestValidateHeaders(t *testing.T) {
+	type testCase struct {
+		name     string
+		headers  map[string]string
+		expected ValidationResult
+	}
+
+	testCases := []testCase{
+		{
+			name:     "empty headers",
+			headers:  map[string]string{},
+			expected: ValidationResult{},
+		},
+		{
+			name: "valid header",
+			headers: map[string]string{
+				"Reffered-By": "<sip:u7@example.com",
+			},
+			expected: ValidationResult{},
+		},
+		{
+			name: "multiple soft failures",
+			headers: map[string]string{
+				"P-Asserted-Identity": "<",
+				"Referred-By":         "<",
+			},
+			expected: ValidationResult{softErrs: []error{
+				errors.New("header P-Asserted-Identity: value: mismatched angle brackets"),
+				errors.New("header Referred-By: value: mismatched angle brackets"),
+			}},
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			result := validateHeaders(testCase.headers)
+			if testCase.expected.Error() != nil {
+				require.Error(t, result.Error())
+			} else {
+				require.NoError(t, result.Error())
+			}
+			require.Equal(t, len(testCase.expected.SoftErrors()), len(result.SoftErrors()), "soft error slice lengths differ; got soft errors: %v", result.SoftErrors())
 		})
 	}
 }
