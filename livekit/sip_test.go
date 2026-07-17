@@ -54,7 +54,6 @@ func TestSIPValidate(t *testing.T) {
 	type resultValidateable interface {
 		ValidateResult() ValidationResult
 	}
-
 	type validateTestCase struct {
 		name string
 		req  validateable
