@@ -236,9 +236,8 @@ message DataTrackDemandUpdate {
   // Publisher handle of the track.
   uint32 pub_handle = 1;
 
-  // Number of participants currently subscribed to the track. Used
-  // by the publisher when dynacast is enabled for the track.
-  uint32 subscriber_count = 2;
+  // Whether or not the track currently has any subscribers.
+  bool has_subscribers = 2;
 }
 
 message TrickleRequest {
