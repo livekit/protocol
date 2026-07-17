@@ -292,9 +292,9 @@ func TestValidateHeaderValueResult(t *testing.T) {
 	}
 }
 
-func TestFrobiddenSipHeaderNames(t *testing.T) {
+func TestForbiddenSipHeaderNames(t *testing.T) {
 	i := 0
-	for name := range FrobiddenSipHeaderNames {
+	for name := range ForbiddenSipHeaderNames {
 		i++
 		t.Run(testCaseName(name, 32, i), func(t *testing.T) {
 			err := ValidateHeaderName(name, true)
