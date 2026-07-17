@@ -228,7 +228,7 @@ func TestSIPValidate(t *testing.T) {
 					},
 				},
 				exp:          true,
-				wantSoftErrs: false,
+				wantSoftErrs: true,
 			},
 		},
 		"SIPMediaConfig": {
