@@ -1046,7 +1046,7 @@ type SimulationRun_RunMetrics struct {
 	Tts                *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
 	Conversation       *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
 	JobsTotal          uint32                                 `protobuf:"varint,9,opt,name=jobs_total,json=jobsTotal,proto3" json:"jobs_total,omitempty"`
-	JobsFailed         uint32                                 `protobuf:"varint,10,opt,name=jobs_failed,json=jobsFailed,proto3" json:"jobs_failed,omitempty"`                           // infra failures, excluded from aggregates
+	JobsMeasured       uint32                                 `protobuf:"varint,10,opt,name=jobs_measured,json=jobsMeasured,proto3" json:"jobs_measured,omitempty"`                     // composites cover jobs_measured - jobs_simulator_fault
 	JobsSimulatorFault uint32                                 `protobuf:"varint,11,opt,name=jobs_simulator_fault,json=jobsSimulatorFault,proto3" json:"jobs_simulator_fault,omitempty"` // spoiled by the simulator: flagged, not scored
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
@@ -1138,9 +1138,9 @@ func (x *SimulationRun_RunMetrics) GetJobsTotal() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_RunMetrics) GetJobsFailed() uint32 {
+func (x *SimulationRun_RunMetrics) GetJobsMeasured() uint32 {
 	if x != nil {
-		return x.JobsFailed
+		return x.JobsMeasured
 	}
 	return 0
 }
@@ -1442,7 +1442,9 @@ type SimulationRun_JobMetrics_STT struct {
 	Wer                    *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`    // word error rate, pooled: word_errors / words
 	Words                  *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"` // pooling stats: run WER = sum errors / sum words
 	WordErrors             *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`
-	Cer                    *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                          // character error rate, pooled
+	Cer                    *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"` // character error rate, pooled
+	Chars                  *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`
+	CharErrors             *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`
 	KeytermRecall          *float32               `protobuf:"fixed32,5,opt,name=keyterm_recall,json=keytermRecall,proto3,oneof" json:"keyterm_recall,omitempty"` // recall of uttered key entities (names, IDs, amounts)
 	KeytermsUttered        *uint32                `protobuf:"varint,6,opt,name=keyterms_uttered,json=keytermsUttered,proto3,oneof" json:"keyterms_uttered,omitempty"`
 	KeytermsRecognized     *uint32                `protobuf:"varint,7,opt,name=keyterms_recognized,json=keytermsRecognized,proto3,oneof" json:"keyterms_recognized,omitempty"`
@@ -1505,6 +1507,20 @@ func (x *SimulationRun_JobMetrics_STT) GetWordErrors() uint32 {
 func (x *SimulationRun_JobMetrics_STT) GetCer() float32 {
 	if x != nil && x.Cer != nil {
 		return *x.Cer
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetChars() uint32 {
+	if x != nil && x.Chars != nil {
+		return *x.Chars
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetCharErrors() uint32 {
+	if x != nil && x.CharErrors != nil {
+		return *x.CharErrors
 	}
 	return 0
 }
@@ -1612,8 +1628,13 @@ type SimulationRun_JobMetrics_TTS struct {
 	// bytes before actual speech, so byte-level TTFB alone over-promises;
 	// it is kept below for disambiguation.
 	TtfaMs           *uint32  `protobuf:"varint,1,opt,name=ttfa_ms,json=ttfaMs,proto3,oneof" json:"ttfa_ms,omitempty"`
-	TtfbMs           *uint32  `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`                                // provider byte-level TTFB, agent-reported
-	Wer              *float32 `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                   // intelligibility: intended text vs a transcription of the output audio
+	TtfbMs           *uint32  `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"` // provider byte-level TTFB, agent-reported
+	Wer              *float32 `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                    // word error rate, pooled: word_errors / words
+	Words            *uint32  `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`
+	WordErrors       *uint32  `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`
+	Cer              *float32 `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"` // character error rate, pooled
+	Chars            *uint32  `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`
+	CharErrors       *uint32  `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`
 	SpeechRateWpm    *float32 `protobuf:"fixed32,4,opt,name=speech_rate_wpm,json=speechRateWpm,proto3,oneof" json:"speech_rate_wpm,omitempty"`        // speaking rate; conversational English ~110-150
 	NaturalnessScore *float32 `protobuf:"fixed32,5,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"` // judged 0-1: prosody / expressiveness
 	EnunciationScore *float32 `protobuf:"fixed32,6,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // judged 0-1: key entities audibly intact
@@ -1668,6 +1689,41 @@ func (x *SimulationRun_JobMetrics_TTS) GetTtfbMs() uint32 {
 func (x *SimulationRun_JobMetrics_TTS) GetWer() float32 {
 	if x != nil && x.Wer != nil {
 		return *x.Wer
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetWords() uint32 {
+	if x != nil && x.Words != nil {
+		return *x.Words
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetWordErrors() uint32 {
+	if x != nil && x.WordErrors != nil {
+		return *x.WordErrors
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetCer() float32 {
+	if x != nil && x.Cer != nil {
+		return *x.Cer
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetChars() uint32 {
+	if x != nil && x.Chars != nil {
+		return *x.Chars
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetCharErrors() uint32 {
+	if x != nil && x.CharErrors != nil {
+		return *x.CharErrors
 	}
 	return 0
 }
@@ -2767,7 +2823,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xdd<\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x91?\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2817,7 +2873,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\x99 \n" +
+	"\x1a\xc9\"\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2834,21 +2890,27 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"judgeModel\x12*\n" +
 	"\x11audio_judge_model\x18\v \x01(\tR\x0faudioJudgeModel\x12,\n" +
 	"\x12has_remote_session\x18\f \x01(\bR\x10hasRemoteSession\x12*\n" +
-	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x1a\xcc\x03\n" +
+	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x1a\xa7\x04\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
 	"\vword_errors\x18\x03 \x01(\rH\x02R\n" +
 	"wordErrors\x88\x01\x01\x12\x15\n" +
-	"\x03cer\x18\x04 \x01(\x02H\x03R\x03cer\x88\x01\x01\x12*\n" +
-	"\x0ekeyterm_recall\x18\x05 \x01(\x02H\x04R\rkeytermRecall\x88\x01\x01\x12.\n" +
-	"\x10keyterms_uttered\x18\x06 \x01(\rH\x05R\x0fkeytermsUttered\x88\x01\x01\x124\n" +
-	"\x13keyterms_recognized\x18\a \x01(\rH\x06R\x12keytermsRecognized\x88\x01\x01\x12=\n" +
-	"\x18transcription_latency_ms\x18\b \x01(\rH\aR\x16transcriptionLatencyMs\x88\x01\x01B\x06\n" +
+	"\x03cer\x18\x04 \x01(\x02H\x03R\x03cer\x88\x01\x01\x12\x19\n" +
+	"\x05chars\x18\t \x01(\rH\x04R\x05chars\x88\x01\x01\x12$\n" +
+	"\vchar_errors\x18\n" +
+	" \x01(\rH\x05R\n" +
+	"charErrors\x88\x01\x01\x12*\n" +
+	"\x0ekeyterm_recall\x18\x05 \x01(\x02H\x06R\rkeytermRecall\x88\x01\x01\x12.\n" +
+	"\x10keyterms_uttered\x18\x06 \x01(\rH\aR\x0fkeytermsUttered\x88\x01\x01\x124\n" +
+	"\x13keyterms_recognized\x18\a \x01(\rH\bR\x12keytermsRecognized\x88\x01\x01\x12=\n" +
+	"\x18transcription_latency_ms\x18\b \x01(\rH\tR\x16transcriptionLatencyMs\x88\x01\x01B\x06\n" +
 	"\x04_werB\b\n" +
 	"\x06_wordsB\x0e\n" +
 	"\f_word_errorsB\x06\n" +
-	"\x04_cerB\x11\n" +
+	"\x04_cerB\b\n" +
+	"\x06_charsB\x0e\n" +
+	"\f_char_errorsB\x11\n" +
 	"\x0f_keyterm_recallB\x13\n" +
 	"\x11_keyterms_utteredB\x16\n" +
 	"\x14_keyterms_recognizedB\x1b\n" +
@@ -2863,19 +2925,33 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"\b_ttfs_msB\x14\n" +
 	"\x12_tokens_per_secondB\x14\n" +
-	"\x12_conciseness_score\x1a\xc9\x02\n" +
+	"\x12_conciseness_score\x1a\x9e\x04\n" +
 	"\x03TTS\x12\x1c\n" +
 	"\attfa_ms\x18\x01 \x01(\rH\x00R\x06ttfaMs\x88\x01\x01\x12\x1c\n" +
 	"\attfb_ms\x18\x02 \x01(\rH\x01R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
-	"\x03wer\x18\x03 \x01(\x02H\x02R\x03wer\x88\x01\x01\x12+\n" +
-	"\x0fspeech_rate_wpm\x18\x04 \x01(\x02H\x03R\rspeechRateWpm\x88\x01\x01\x120\n" +
-	"\x11naturalness_score\x18\x05 \x01(\x02H\x04R\x10naturalnessScore\x88\x01\x01\x120\n" +
-	"\x11enunciation_score\x18\x06 \x01(\x02H\x05R\x10enunciationScore\x88\x01\x01B\n" +
+	"\x03wer\x18\x03 \x01(\x02H\x02R\x03wer\x88\x01\x01\x12\x19\n" +
+	"\x05words\x18\a \x01(\rH\x03R\x05words\x88\x01\x01\x12$\n" +
+	"\vword_errors\x18\b \x01(\rH\x04R\n" +
+	"wordErrors\x88\x01\x01\x12\x15\n" +
+	"\x03cer\x18\t \x01(\x02H\x05R\x03cer\x88\x01\x01\x12\x19\n" +
+	"\x05chars\x18\n" +
+	" \x01(\rH\x06R\x05chars\x88\x01\x01\x12$\n" +
+	"\vchar_errors\x18\v \x01(\rH\aR\n" +
+	"charErrors\x88\x01\x01\x12+\n" +
+	"\x0fspeech_rate_wpm\x18\x04 \x01(\x02H\bR\rspeechRateWpm\x88\x01\x01\x120\n" +
+	"\x11naturalness_score\x18\x05 \x01(\x02H\tR\x10naturalnessScore\x88\x01\x01\x120\n" +
+	"\x11enunciation_score\x18\x06 \x01(\x02H\n" +
+	"R\x10enunciationScore\x88\x01\x01B\n" +
 	"\n" +
 	"\b_ttfa_msB\n" +
 	"\n" +
 	"\b_ttfb_msB\x06\n" +
-	"\x04_werB\x12\n" +
+	"\x04_werB\b\n" +
+	"\x06_wordsB\x0e\n" +
+	"\f_word_errorsB\x06\n" +
+	"\x04_cerB\b\n" +
+	"\x06_charsB\x0e\n" +
+	"\f_char_errorsB\x12\n" +
 	"\x10_speech_rate_wpmB\x14\n" +
 	"\x12_naturalness_scoreB\x14\n" +
 	"\x12_enunciation_score\x1a\x86\n" +
@@ -2950,7 +3026,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x12_enunciation_scoreB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x12\n" +
-	"\x10_task_completion\x1a\xcb\x04\n" +
+	"\x10_task_completion\x1a\xcf\x04\n" +
 	"\n" +
 	"RunMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2961,10 +3037,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03tts\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
 	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversation\x12\x1d\n" +
 	"\n" +
-	"jobs_total\x18\t \x01(\rR\tjobsTotal\x12\x1f\n" +
-	"\vjobs_failed\x18\n" +
-	" \x01(\rR\n" +
-	"jobsFailed\x120\n" +
+	"jobs_total\x18\t \x01(\rR\tjobsTotal\x12#\n" +
+	"\rjobs_measured\x18\n" +
+	" \x01(\rR\fjobsMeasured\x120\n" +
 	"\x14jobs_simulator_fault\x18\v \x01(\rR\x12jobsSimulatorFaultB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x15\n" +
