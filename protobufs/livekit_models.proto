@@ -292,9 +292,6 @@ message DataTrackInfo {
 
   // ID of the schema used by frames on this track if the track is typed.
   optional DataTrackSchemaId schema = 6;
-
-  // Whether dynacast is enabled for this track.
-  bool is_dynacasted = 7;
 }
 
 // Encoding for frame payloads.
