@@ -169,7 +169,7 @@ var RequiredResponseHeaders = map[string]bool{
 }
 
 // Crucial headers that can't be overridden by the user, and their shorthands
-var FrobiddenSipHeaderNames = map[string]bool{
+var ForbiddenSipHeaderNames = map[string]bool{
 	"accept":           true,
 	"accept-encoding":  true,
 	"accept-language":  true,
@@ -232,7 +232,7 @@ func ValidateHeaderName(name string, restrictNames bool) error {
 	// Convert to lowercase for case-insensitive comparison
 	if restrictNames {
 		lowerName := strings.ToLower(name)
-		if forbidden, exists := FrobiddenSipHeaderNames[lowerName]; exists && forbidden {
+		if forbidden, exists := ForbiddenSipHeaderNames[lowerName]; exists && forbidden {
 			return fmt.Errorf("header name %s not supported", name)
 		}
 	}
