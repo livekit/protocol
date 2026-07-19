@@ -16,7 +16,7 @@ importers:
         specifier: ^7.27.1
         version: 7.29.6
       '@changesets/cli':
-        specifier: ^2.29.4
+        specifier: ^2.29.7
         version: 2.29.7
       '@livekit/changesets-changelog-github':
         specifier: ^0.0.4

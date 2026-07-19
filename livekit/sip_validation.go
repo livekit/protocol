@@ -169,7 +169,7 @@ var RequiredResponseHeaders = map[string]bool{
 }
 
 // Crucial headers that can't be overridden by the user, and their shorthands
-var FrobiddenSipHeaderNames = map[string]bool{
+var ForbiddenSipHeaderNames = map[string]bool{
 	"accept":           true,
 	"accept-encoding":  true,
 	"accept-language":  true,
@@ -209,7 +209,11 @@ var nameAddrHeaders = map[string]bool{
 	"record-route":        true,
 	"reply-to":            true,
 	"p-asserted-identity": true, // RFC 3325 Section 9.1
+	"referred-by":         true, // RFC 3892 Section 3
 }
+
+// Deprecated: has no effect. Use ValidationResult method variants instead.
+func SetSoftFailureReporter(reporter func(err error)) {}
 
 // ValidateHeaderName validates a SIP header name per RFC 3261 Section 25.1
 func ValidateHeaderName(name string, restrictNames bool) error {
@@ -228,7 +232,7 @@ func ValidateHeaderName(name string, restrictNames bool) error {
 	// Convert to lowercase for case-insensitive comparison
 	if restrictNames {
 		lowerName := strings.ToLower(name)
-		if forbidden, exists := FrobiddenSipHeaderNames[lowerName]; exists && forbidden {
+		if forbidden, exists := ForbiddenSipHeaderNames[lowerName]; exists && forbidden {
 			return fmt.Errorf("header name %s not supported", name)
 		}
 	}
@@ -238,29 +242,33 @@ func ValidateHeaderName(name string, restrictNames bool) error {
 
 // ValidateHeaderValue validates a SIP header value per RFC 3261 Section 25.1
 func ValidateHeaderValue(name, value string) error {
+	return ValidateHeaderValueResult(name, value).Error()
+}
+
+// ValidateHeaderValueResult
+func ValidateHeaderValueResult(name, value string) ValidationResult {
 	if value == "" {
-		return nil
+		return ValidationResult{}
 	}
 
 	if len(value) > 1024 {
-		return fmt.Errorf("header %s: value too long (max 1024 characters)", name)
+		return ValidationFailure(fmt.Errorf("header %s: value too long (max 1024 characters)", name))
 	}
 
 	// Basic character validation - printable ASCII. We're stricter than the spec here - no UTF-8 for now
 	if err := headerValuesCharacters.Validate(value); err != nil {
-		return fmt.Errorf("header %s: value: %w", name, err)
+		return ValidationFailure(fmt.Errorf("header %s: value: %w", name, err))
 	}
 
 	// Convert to lowercase for case-insensitive comparison
+	var softErrs []error
 	lowerName := strings.ToLower(name)
-	if _, exists := nameAddrHeaders[lowerName]; exists && false {
-		// TODO: Disabled since all supported headers are forbidden, re-enable when we allow some
+	if _, exists := nameAddrHeaders[lowerName]; exists {
 		if err := validateNameAddrHeader(value); err != nil {
-			return fmt.Errorf("header %s: value: %w", name, err)
+			softErrs = append(softErrs, fmt.Errorf("header %s: value: %w", name, err))
 		}
 	}
-
-	return nil
+	return ValidationResult{nil, softErrs}
 }
 
 // findAngleBrackets efficiently finds angle brackets in a single scan
@@ -315,7 +323,7 @@ func validateNameAddrHeader(value string) error {
 		}
 	} else {
 		// This is a bare URI, and should comply with addr-spec, no special characters
-		if strings.ContainsAny(value, ";,? ") {
+		if strings.ContainsAny(value, ",? ") {
 			return errors.New("bare URI with special characters")
 		}
 	}

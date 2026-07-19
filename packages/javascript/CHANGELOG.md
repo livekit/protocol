@@ -1,5 +1,39 @@
 # @livekit/protocol
 
+## 1.50.0
+
+### Minor Changes
+
+- Add validation method variants that include information about soft errors. - [#1667](https://github.com/livekit/protocol/pull/1667) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- add redaction flag in Job - [#1657](https://github.com/livekit/protocol/pull/1657) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+- Add wait_until_answered to ConnectWhatsAppCallRequest. - [#1653](https://github.com/livekit/protocol/pull/1653) ([@anunaym14](https://github.com/anunaym14))
+
+## 1.49.0
+
+### Minor Changes
+
+- Support cloud agent attributes in CRUD operations - [#1636](https://github.com/livekit/protocol/pull/1636) ([@rektdeckard](https://github.com/rektdeckard))
+
+### Patch Changes
+
+- add job id in MetricsRecordingHeader for chat log re-injection - [#1646](https://github.com/livekit/protocol/pull/1646) ([@chenghao-mou](https://github.com/chenghao-mou))
+
+## 1.48.2
+
+### Patch Changes
+
+- Use camel case log name in `DataBlobKey` - [#1649](https://github.com/livekit/protocol/pull/1649) ([@ladvoc](https://github.com/ladvoc))
+
+## 1.48.1
+
+### Patch Changes
+
+- Data track schema metadata and storage - [#1553](https://github.com/livekit/protocol/pull/1553) ([@ladvoc](https://github.com/ladvoc))
+
 ## 1.48.0
 
 ### Minor Changes

@@ -187,13 +187,14 @@ message RestartAgentResponse {
 }
 
 message DeployAgentRequest {
-    string agent_id              = 1 [(logger.name) = "agentID"];
-    string agent_name            = 2 [deprecated=true];
-    repeated AgentSecret secrets = 3;
-    int32 replicas               = 4 [deprecated=true];
-    int32 max_replicas           = 5 [deprecated=true];
-    string cpu_req               = 6 [deprecated=true];
-    string deployment            = 7;
+    string agent_id                = 1 [(logger.name) = "agentID"];
+    string agent_name              = 2 [deprecated=true];
+    repeated AgentSecret secrets   = 3;
+    int32 replicas                 = 4 [deprecated=true];
+    int32 max_replicas             = 5 [deprecated=true];
+    string cpu_req                 = 6 [deprecated=true];
+    string deployment              = 7;
+    map<string, string> attributes = 8;
 }
 
 message DeployAgentResponse {
@@ -207,9 +208,10 @@ message DeployAgentResponse {
 }
 
 message DeployAgentV2Request {
-  string agent_id              = 1 [(logger.name) = "agentID"];
-  repeated AgentSecret secrets = 2;
-  string deployment           = 3;
+  string agent_id                = 1 [(logger.name) = "agentID"];
+  repeated AgentSecret secrets   = 2;
+  string deployment              = 3;
+  map<string, string> attributes = 4;
 }
 
 message DeployAgentV2Response {

@@ -73,9 +73,23 @@ func NewCreateSIPParticipantRequest(
 	req *livekit.CreateSIPParticipantRequest,
 	trunk *livekit.SIPOutboundTrunkInfo,
 ) (*InternalCreateSIPParticipantRequest, error) {
+	val, result := NewCreateSIPParticipantRequestResult(projectID, callID, fromHostname, wsUrl, token, req, trunk)
+	if !result.OK() {
+		return nil, result.Error()
+	}
+	return val, nil
+}
+
+// NewCreateSIPParticipantRequestResult is a variant of the above that returns a livekit.ValidationResult.
+func NewCreateSIPParticipantRequestResult(
+	projectID, callID, fromHostname, wsUrl, token string,
+	req *livekit.CreateSIPParticipantRequest,
+	trunk *livekit.SIPOutboundTrunkInfo,
+) (*InternalCreateSIPParticipantRequest, livekit.ValidationResult) {
 	req.Upgrade()
-	if err := req.Validate(); err != nil {
-		return nil, err
+	result := req.ValidateResult()
+	if !result.OK() {
+		return nil, result
 	}
 	var (
 		hostname           string
@@ -116,7 +130,7 @@ func NewCreateSIPParticipantRequest(
 	outboundNumber := req.SipNumber
 	if outboundNumber == "" {
 		if trunk == nil || len(trunk.Numbers) == 0 {
-			return nil, psrpc.NewErrorf(psrpc.FailedPrecondition, "no numbers on outbound trunk")
+			return nil, result.WithError(psrpc.NewErrorf(psrpc.FailedPrecondition, "no numbers on outbound trunk"))
 		}
 		outboundNumber = trunk.Numbers[rand.IntN(len(trunk.Numbers))]
 	}
@@ -205,7 +219,7 @@ func NewCreateSIPParticipantRequest(
 		WaitUntilAnswered:     req.WaitUntilAnswered,
 		DisplayName:           req.DisplayName,
 		Destination:           req.Destination,
-	}, nil
+	}, result
 }
 
 // NewTransferSIPParticipantRequest fills InternalTransferSIPParticipantRequest from
