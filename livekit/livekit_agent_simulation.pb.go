@@ -1557,7 +1557,7 @@ type SimulationRun_JobMetrics_LLM struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	TtftMs           *uint32                `protobuf:"varint,1,opt,name=ttft_ms,json=ttftMs,proto3,oneof" json:"ttft_ms,omitempty"`                                // time to first token, mean (per-turn in turns)
 	TtfsMs           *uint32                `protobuf:"varint,2,opt,name=ttfs_ms,json=ttfsMs,proto3,oneof" json:"ttfs_ms,omitempty"`                                // time to first sentence — the smallest speakable unit
-	TokensPerSecond  *float32               `protobuf:"fixed32,3,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"`  // decode rate, mean
+	TokensPerSecond  *float32               `protobuf:"fixed32,3,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"`  // decode rate, mean (per-turn in turns.llm)
 	ConcisenessScore *float32               `protobuf:"fixed32,4,opt,name=conciseness_score,json=concisenessScore,proto3,oneof" json:"conciseness_score,omitempty"` // judged 0-1: brief enough for voice
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -1636,6 +1636,8 @@ type SimulationRun_JobMetrics_TTS struct {
 	Chars            *uint32  `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`
 	CharErrors       *uint32  `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`
 	SpeechRateWpm    *float32 `protobuf:"fixed32,4,opt,name=speech_rate_wpm,json=speechRateWpm,proto3,oneof" json:"speech_rate_wpm,omitempty"`        // speaking rate; conversational English ~110-150
+	HeardWords       *uint32  `protobuf:"varint,12,opt,name=heard_words,json=heardWords,proto3,oneof" json:"heard_words,omitempty"`                   // pooling stats for speech_rate_wpm: raw heard words (not WER tokens)
+	SpeechMs         *uint32  `protobuf:"varint,13,opt,name=speech_ms,json=speechMs,proto3,oneof" json:"speech_ms,omitempty"`                         // agent voiced time, sum of raw VAD segments
 	NaturalnessScore *float32 `protobuf:"fixed32,5,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"` // judged 0-1: prosody / expressiveness
 	EnunciationScore *float32 `protobuf:"fixed32,6,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // judged 0-1: key entities audibly intact
 	unknownFields    protoimpl.UnknownFields
@@ -1735,6 +1737,20 @@ func (x *SimulationRun_JobMetrics_TTS) GetSpeechRateWpm() float32 {
 	return 0
 }
 
+func (x *SimulationRun_JobMetrics_TTS) GetHeardWords() uint32 {
+	if x != nil && x.HeardWords != nil {
+		return *x.HeardWords
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetSpeechMs() uint32 {
+	if x != nil && x.SpeechMs != nil {
+		return *x.SpeechMs
+	}
+	return 0
+}
+
 func (x *SimulationRun_JobMetrics_TTS) GetNaturalnessScore() float32 {
 	if x != nil && x.NaturalnessScore != nil {
 		return *x.NaturalnessScore
@@ -1757,7 +1773,7 @@ type SimulationRun_JobMetrics_Conversation struct {
 	ResponseLatencyP50Ms              *int32                 `protobuf:"varint,2,opt,name=response_latency_p50_ms,json=responseLatencyP50Ms,proto3,oneof" json:"response_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
 	ResponseLatencyP95Ms              *int32                 `protobuf:"varint,3,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
 	ResponseLatencyP99Ms              *int32                 `protobuf:"varint,4,opt,name=response_latency_p99_ms,json=responseLatencyP99Ms,proto3,oneof" json:"response_latency_p99_ms,omitempty"`
-	AgentYieldLatencyMs               *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`     // how long the agent talks after a barge-in, mean
+	AgentYieldLatencyMs               *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`     // how long the agent talks after a barge-in, mean (per-event in turns)
 	EotMispredictionCount             *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended
 	OverlapRatio                      *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
 	OverlapSpeechMs                   *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
@@ -1968,21 +1984,19 @@ type SimulationRun_JobMetrics_Turn struct {
 	Role    agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"` // ASSISTANT — the agent under test, USER — simulator persona.
 	StartMs *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`  // relative to t0; unset if the turn could not be aligned to the audio
 	EndMs   *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`
-	// Agent-turn measurements; a negative response latency is a cut-in (the
-	// agent started before the caller's turn ended).
-	ResponseLatencyMs         *int32   `protobuf:"varint,5,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`
-	TranscriptionDelayMs      *uint32  `protobuf:"varint,6,opt,name=transcription_delay_ms,json=transcriptionDelayMs,proto3,oneof" json:"transcription_delay_ms,omitempty"`
-	LlmTtftMs                 *uint32  `protobuf:"varint,7,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`
-	LlmTtfsMs                 *uint32  `protobuf:"varint,8,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`
-	TtsTtfaMs                 *uint32  `protobuf:"varint,9,opt,name=tts_ttfa_ms,json=ttsTtfaMs,proto3,oneof" json:"tts_ttfa_ms,omitempty"`
-	TtsTtfbMs                 *uint32  `protobuf:"varint,10,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`
-	AgentReportedE2ELatencyMs *uint32  `protobuf:"varint,11,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"`
-	ConcisenessScore          *float32 `protobuf:"fixed32,12,opt,name=conciseness_score,json=concisenessScore,proto3,oneof" json:"conciseness_score,omitempty"`
-	NaturalnessScore          *float32 `protobuf:"fixed32,13,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"`
-	EnunciationScore          *float32 `protobuf:"fixed32,14,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // judged 0-1: this turn's key entities audibly intact
-	Flags                     []string `protobuf:"bytes,15,rep,name=flags,proto3" json:"flags,omitempty"`                                                       // judge failure tags ("verbosity_or_filler", ...)
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	// Agent-turn measurements
+	// a negative response latency is a cut-in (the agent started before the caller's turn ended).
+	ResponseLatencyMs         *int32  `protobuf:"varint,5,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`
+	AgentReportedE2ELatencyMs *uint32 `protobuf:"varint,6,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"`
+	// persona rows: agent audio continuing past this turn's start; set iff the turn barged in
+	AgentYieldLatencyMs *uint32  `protobuf:"varint,7,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`
+	Flags               []string `protobuf:"bytes,8,rep,name=flags,proto3" json:"flags,omitempty"` // judge failure tags ("verbosity_or_filler", ...)
+	// Job groups hold means/pools of these; a field with no per-turn measurement stays unset here.
+	Stt           *SimulationRun_JobMetrics_STT `protobuf:"bytes,9,opt,name=stt,proto3" json:"stt,omitempty"`  // transcription_latency_ms
+	Llm           *SimulationRun_JobMetrics_LLM `protobuf:"bytes,10,opt,name=llm,proto3" json:"llm,omitempty"` // ttft_ms, ttfs_ms, tokens_per_second, conciseness_score
+	Tts           *SimulationRun_JobMetrics_TTS `protobuf:"bytes,11,opt,name=tts,proto3" json:"tts,omitempty"` // ttfa_ms, ttfb_ms, naturalness_score, enunciation_score
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Turn) Reset() {
@@ -2050,41 +2064,6 @@ func (x *SimulationRun_JobMetrics_Turn) GetResponseLatencyMs() int32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetTranscriptionDelayMs() uint32 {
-	if x != nil && x.TranscriptionDelayMs != nil {
-		return *x.TranscriptionDelayMs
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetLlmTtftMs() uint32 {
-	if x != nil && x.LlmTtftMs != nil {
-		return *x.LlmTtftMs
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetLlmTtfsMs() uint32 {
-	if x != nil && x.LlmTtfsMs != nil {
-		return *x.LlmTtfsMs
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetTtsTtfaMs() uint32 {
-	if x != nil && x.TtsTtfaMs != nil {
-		return *x.TtsTtfaMs
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetTtsTtfbMs() uint32 {
-	if x != nil && x.TtsTtfbMs != nil {
-		return *x.TtsTtfbMs
-	}
-	return 0
-}
-
 func (x *SimulationRun_JobMetrics_Turn) GetAgentReportedE2ELatencyMs() uint32 {
 	if x != nil && x.AgentReportedE2ELatencyMs != nil {
 		return *x.AgentReportedE2ELatencyMs
@@ -2092,23 +2071,9 @@ func (x *SimulationRun_JobMetrics_Turn) GetAgentReportedE2ELatencyMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetConcisenessScore() float32 {
-	if x != nil && x.ConcisenessScore != nil {
-		return *x.ConcisenessScore
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetNaturalnessScore() float32 {
-	if x != nil && x.NaturalnessScore != nil {
-		return *x.NaturalnessScore
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Turn) GetEnunciationScore() float32 {
-	if x != nil && x.EnunciationScore != nil {
-		return *x.EnunciationScore
+func (x *SimulationRun_JobMetrics_Turn) GetAgentYieldLatencyMs() uint32 {
+	if x != nil && x.AgentYieldLatencyMs != nil {
+		return *x.AgentYieldLatencyMs
 	}
 	return 0
 }
@@ -2116,6 +2081,27 @@ func (x *SimulationRun_JobMetrics_Turn) GetEnunciationScore() float32 {
 func (x *SimulationRun_JobMetrics_Turn) GetFlags() []string {
 	if x != nil {
 		return x.Flags
+	}
+	return nil
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetStt() *SimulationRun_JobMetrics_STT {
+	if x != nil {
+		return x.Stt
+	}
+	return nil
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetLlm() *SimulationRun_JobMetrics_LLM {
+	if x != nil {
+		return x.Llm
+	}
+	return nil
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetTts() *SimulationRun_JobMetrics_TTS {
+	if x != nil {
+		return x.Tts
 	}
 	return nil
 }
@@ -2823,7 +2809,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x91?\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xf5=\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2873,7 +2859,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xc9\"\n" +
+	"\x1a\xad!\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2925,7 +2911,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"\b_ttfs_msB\x14\n" +
 	"\x12_tokens_per_secondB\x14\n" +
-	"\x12_conciseness_score\x1a\x9e\x04\n" +
+	"\x12_conciseness_score\x1a\x84\x05\n" +
 	"\x03TTS\x12\x1c\n" +
 	"\attfa_ms\x18\x01 \x01(\rH\x00R\x06ttfaMs\x88\x01\x01\x12\x1c\n" +
 	"\attfb_ms\x18\x02 \x01(\rH\x01R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
@@ -2938,10 +2924,13 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	" \x01(\rH\x06R\x05chars\x88\x01\x01\x12$\n" +
 	"\vchar_errors\x18\v \x01(\rH\aR\n" +
 	"charErrors\x88\x01\x01\x12+\n" +
-	"\x0fspeech_rate_wpm\x18\x04 \x01(\x02H\bR\rspeechRateWpm\x88\x01\x01\x120\n" +
-	"\x11naturalness_score\x18\x05 \x01(\x02H\tR\x10naturalnessScore\x88\x01\x01\x120\n" +
-	"\x11enunciation_score\x18\x06 \x01(\x02H\n" +
-	"R\x10enunciationScore\x88\x01\x01B\n" +
+	"\x0fspeech_rate_wpm\x18\x04 \x01(\x02H\bR\rspeechRateWpm\x88\x01\x01\x12$\n" +
+	"\vheard_words\x18\f \x01(\rH\tR\n" +
+	"heardWords\x88\x01\x01\x12 \n" +
+	"\tspeech_ms\x18\r \x01(\rH\n" +
+	"R\bspeechMs\x88\x01\x01\x120\n" +
+	"\x11naturalness_score\x18\x05 \x01(\x02H\vR\x10naturalnessScore\x88\x01\x01\x120\n" +
+	"\x11enunciation_score\x18\x06 \x01(\x02H\fR\x10enunciationScore\x88\x01\x01B\n" +
 	"\n" +
 	"\b_ttfa_msB\n" +
 	"\n" +
@@ -2952,7 +2941,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x04_cerB\b\n" +
 	"\x06_charsB\x0e\n" +
 	"\f_char_errorsB\x12\n" +
-	"\x10_speech_rate_wpmB\x14\n" +
+	"\x10_speech_rate_wpmB\x0e\n" +
+	"\f_heard_wordsB\f\n" +
+	"\n" +
+	"_speech_msB\x14\n" +
 	"\x12_naturalness_scoreB\x14\n" +
 	"\x12_enunciation_score\x1a\x86\n" +
 	"\n" +
@@ -2993,37 +2985,25 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11early_termination\x18\x01 \x01(\bH\x00R\x10earlyTermination\x88\x01\x01\x12.\n" +
 	"\x10late_termination\x18\x02 \x01(\bH\x01R\x0flateTermination\x88\x01\x01B\x14\n" +
 	"\x12_early_terminationB\x13\n" +
-	"\x11_late_termination\x1a\xeb\x06\n" +
+	"\x11_late_termination\x1a\xe9\x04\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x1e\n" +
 	"\bstart_ms\x18\x03 \x01(\rH\x00R\astartMs\x88\x01\x01\x12\x1a\n" +
 	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x123\n" +
-	"\x13response_latency_ms\x18\x05 \x01(\x05H\x02R\x11responseLatencyMs\x88\x01\x01\x129\n" +
-	"\x16transcription_delay_ms\x18\x06 \x01(\rH\x03R\x14transcriptionDelayMs\x88\x01\x01\x12#\n" +
-	"\vllm_ttft_ms\x18\a \x01(\rH\x04R\tllmTtftMs\x88\x01\x01\x12#\n" +
-	"\vllm_ttfs_ms\x18\b \x01(\rH\x05R\tllmTtfsMs\x88\x01\x01\x12#\n" +
-	"\vtts_ttfa_ms\x18\t \x01(\rH\x06R\tttsTtfaMs\x88\x01\x01\x12#\n" +
-	"\vtts_ttfb_ms\x18\n" +
-	" \x01(\rH\aR\tttsTtfbMs\x88\x01\x01\x12E\n" +
-	"\x1dagent_reported_e2e_latency_ms\x18\v \x01(\rH\bR\x19agentReportedE2eLatencyMs\x88\x01\x01\x120\n" +
-	"\x11conciseness_score\x18\f \x01(\x02H\tR\x10concisenessScore\x88\x01\x01\x120\n" +
-	"\x11naturalness_score\x18\r \x01(\x02H\n" +
-	"R\x10naturalnessScore\x88\x01\x01\x120\n" +
-	"\x11enunciation_score\x18\x0e \x01(\x02H\vR\x10enunciationScore\x88\x01\x01\x12\x14\n" +
-	"\x05flags\x18\x0f \x03(\tR\x05flagsB\v\n" +
+	"\x13response_latency_ms\x18\x05 \x01(\x05H\x02R\x11responseLatencyMs\x88\x01\x01\x12E\n" +
+	"\x1dagent_reported_e2e_latency_ms\x18\x06 \x01(\rH\x03R\x19agentReportedE2eLatencyMs\x88\x01\x01\x128\n" +
+	"\x16agent_yield_latency_ms\x18\a \x01(\rH\x04R\x13agentYieldLatencyMs\x88\x01\x01\x12\x14\n" +
+	"\x05flags\x18\b \x03(\tR\x05flags\x127\n" +
+	"\x03stt\x18\t \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
+	"\x03llm\x18\n" +
+	" \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
+	"\x03tts\x18\v \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03ttsB\v\n" +
 	"\t_start_msB\t\n" +
 	"\a_end_msB\x16\n" +
-	"\x14_response_latency_msB\x19\n" +
-	"\x17_transcription_delay_msB\x0e\n" +
-	"\f_llm_ttft_msB\x0e\n" +
-	"\f_llm_ttfs_msB\x0e\n" +
-	"\f_tts_ttfa_msB\x0e\n" +
-	"\f_tts_ttfb_msB \n" +
-	"\x1e_agent_reported_e2e_latency_msB\x14\n" +
-	"\x12_conciseness_scoreB\x14\n" +
-	"\x12_naturalness_scoreB\x14\n" +
-	"\x12_enunciation_scoreB\x11\n" +
+	"\x14_response_latency_msB \n" +
+	"\x1e_agent_reported_e2e_latency_msB\x19\n" +
+	"\x17_agent_yield_latency_msB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x12\n" +
 	"\x10_task_completion\x1a\xcf\x04\n" +
@@ -3236,32 +3216,35 @@ var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	22, // 29: livekit.SimulationRun.RunMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
 	23, // 30: livekit.SimulationRun.RunMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
 	42, // 31: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
-	6,  // 32: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
-	0,  // 33: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
-	43, // 34: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	4,  // 35: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
-	1,  // 36: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
-	44, // 37: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
-	4,  // 38: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
-	44, // 39: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
-	5,  // 40: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
-	26, // 41: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
-	28, // 42: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
-	30, // 43: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
-	32, // 44: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
-	34, // 45: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
-	38, // 46: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
-	27, // 47: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
-	29, // 48: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
-	31, // 49: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
-	33, // 50: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
-	35, // 51: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
-	39, // 52: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
-	47, // [47:53] is the sub-list for method output_type
-	41, // [41:47] is the sub-list for method input_type
-	41, // [41:41] is the sub-list for extension type_name
-	41, // [41:41] is the sub-list for extension extendee
-	0,  // [0:41] is the sub-list for field type_name
+	20, // 32: livekit.SimulationRun.JobMetrics.Turn.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
+	21, // 33: livekit.SimulationRun.JobMetrics.Turn.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
+	22, // 34: livekit.SimulationRun.JobMetrics.Turn.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
+	6,  // 35: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
+	0,  // 36: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
+	43, // 37: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	4,  // 38: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
+	1,  // 39: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
+	44, // 40: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
+	4,  // 41: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
+	44, // 42: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
+	5,  // 43: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
+	26, // 44: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
+	28, // 45: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
+	30, // 46: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
+	32, // 47: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
+	34, // 48: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
+	38, // 49: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
+	27, // 50: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
+	29, // 51: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
+	31, // 52: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
+	33, // 53: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
+	35, // 54: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
+	39, // 55: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
+	50, // [50:56] is the sub-list for method output_type
+	44, // [44:50] is the sub-list for method input_type
+	44, // [44:44] is the sub-list for extension type_name
+	44, // [44:44] is the sub-list for extension extendee
+	0,  // [0:44] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }
