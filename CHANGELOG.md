@@ -1,5 +1,13 @@
 # github.com/livekit/protocol
 
+## 1.50.1
+
+### Patch Changes
+
+- Fix recursive call to CreateSIPInboundTrunkRequest.ValidateResult. - [#1669](https://github.com/livekit/protocol/pull/1669) ([@alexfish8](https://github.com/alexfish8))
+
+- agent simulation JobMetrics: add TTS.cer, add STT/TTS words/chars counts, replace `jobs_failed` with `jobs_measured` - [#1670](https://github.com/livekit/protocol/pull/1670) ([@Bobronium](https://github.com/Bobronium))
+
 ## 1.50.0
 
 ### Minor Changes
