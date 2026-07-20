@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.50.2
+
+### Patch Changes
+
+- Export the agent simulation protos (Scenario, SimulationDispatch, SimulationMode, SimulationRun, ...) from the JS package root - [#1674](https://github.com/livekit/protocol/pull/1674) ([@u9g](https://github.com/u9g))
+
 ## 1.50.1
 
 ### Patch Changes
