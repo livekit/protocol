@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.50.1
+
+### Patch Changes
+
+- Fix recursive call to CreateSIPInboundTrunkRequest.ValidateResult. - [#1669](https://github.com/livekit/protocol/pull/1669) ([@alexfish8](https://github.com/alexfish8))
+
 ## 1.50.0
 
 ### Minor Changes
