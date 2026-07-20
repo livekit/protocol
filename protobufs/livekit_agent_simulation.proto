@@ -111,6 +111,8 @@ message SimulationRun {
       optional uint32 words = 2;                    // pooling stats: run WER = sum errors / sum words
       optional uint32 word_errors = 3;
       optional float cer = 4;                       // character error rate, pooled
+      optional uint32 chars = 9;
+      optional uint32 char_errors = 10;
       optional float keyterm_recall = 5;            // recall of uttered key entities (names, IDs, amounts)
       optional uint32 keyterms_uttered = 6;
       optional uint32 keyterms_recognized = 7;
@@ -131,7 +133,12 @@ message SimulationRun {
       // it is kept below for disambiguation.
       optional uint32 ttfa_ms = 1;
       optional uint32 ttfb_ms = 2;             // provider byte-level TTFB, agent-reported
-      optional float wer = 3;                  // intelligibility: intended text vs a transcription of the output audio
+      optional float wer = 3;                  // word error rate, pooled: word_errors / words
+      optional uint32 words = 7;
+      optional uint32 word_errors = 8;
+      optional float cer = 9;                  // character error rate, pooled
+      optional uint32 chars = 10;
+      optional uint32 char_errors = 11;
       optional float speech_rate_wpm = 4;      // speaking rate; conversational English ~110-150
       optional float naturalness_score = 5;    // judged 0-1: prosody / expressiveness
       optional float enunciation_score = 6;    // judged 0-1: key entities audibly intact
@@ -198,7 +205,7 @@ message SimulationRun {
     JobMetrics.Conversation conversation = 7;
 
     uint32 jobs_total = 9;
-    uint32 jobs_failed = 10;           // infra failures, excluded from aggregates
+    uint32 jobs_measured = 10;         // composites cover jobs_measured - jobs_simulator_fault
     uint32 jobs_simulator_fault = 11;  // spoiled by the simulator: flagged, not scored
   }
 
