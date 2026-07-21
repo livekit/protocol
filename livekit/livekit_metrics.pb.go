@@ -456,16 +456,18 @@ func (x *EventMetric) GetRid() uint32 {
 }
 
 type MetricsRecordingHeader struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RoomId        string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
-	Duration      uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"` // milliseconds
-	StartTime     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	RoomTags      map[string]string      `protobuf:"bytes,5,rep,name=room_tags,json=roomTags,proto3" json:"room_tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	RoomName      string                 `protobuf:"bytes,6,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
-	RoomStartTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=room_start_time,json=roomStartTime,proto3" json:"room_start_time,omitempty"`
-	JobId         string                 `protobuf:"bytes,8,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	RoomId           string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	Duration         uint64                 `protobuf:"varint,3,opt,name=duration,proto3" json:"duration,omitempty"` // milliseconds
+	StartTime        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	RoomTags         map[string]string      `protobuf:"bytes,5,rep,name=room_tags,json=roomTags,proto3" json:"room_tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	RoomName         string                 `protobuf:"bytes,6,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	RoomStartTime    *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=room_start_time,json=roomStartTime,proto3" json:"room_start_time,omitempty"`
+	JobId            string                 `protobuf:"bytes,8,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Simulated        bool                   `protobuf:"varint,9,opt,name=simulated,proto3" json:"simulated,omitempty"`                                        // session is a simulation; the collector skips PII redaction for it unless redaction_enabled is set
+	RedactionEnabled bool                   `protobuf:"varint,10,opt,name=redaction_enabled,json=redactionEnabled,proto3" json:"redaction_enabled,omitempty"` // force PII redaction on for this session (only ever enables, never disables)
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *MetricsRecordingHeader) Reset() {
@@ -547,6 +549,20 @@ func (x *MetricsRecordingHeader) GetJobId() string {
 	return ""
 }
 
+func (x *MetricsRecordingHeader) GetSimulated() bool {
+	if x != nil {
+		return x.Simulated
+	}
+	return false
+}
+
+func (x *MetricsRecordingHeader) GetRedactionEnabled() bool {
+	if x != nil {
+		return x.RedactionEnabled
+	}
+	return false
+}
+
 var File_livekit_metrics_proto protoreflect.FileDescriptor
 
 const file_livekit_metrics_proto_rawDesc = "" +
@@ -580,7 +596,7 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\bmetadata\x18\b \x01(\tR\bmetadata\x12\x10\n" +
 	"\x03rid\x18\t \x01(\rR\x03ridB\x13\n" +
 	"\x11_end_timestamp_msB\x1b\n" +
-	"\x19_normalized_end_timestamp\"\x94\x03\n" +
+	"\x19_normalized_end_timestamp\"\xe5\x03\n" +
 	"\x16MetricsRecordingHeader\x12\"\n" +
 	"\aroom_id\x18\x01 \x01(\tB\t\xbaP\x06roomIDR\x06roomId\x12\x1a\n" +
 	"\bduration\x18\x03 \x01(\x04R\bduration\x129\n" +
@@ -589,10 +605,13 @@ const file_livekit_metrics_proto_rawDesc = "" +
 	"\troom_tags\x18\x05 \x03(\v2-.livekit.MetricsRecordingHeader.RoomTagsEntryR\broomTags\x12\x1b\n" +
 	"\troom_name\x18\x06 \x01(\tR\broomName\x12B\n" +
 	"\x0froom_start_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\rroomStartTime\x12\x15\n" +
-	"\x06job_id\x18\b \x01(\tR\x05jobId\x1a;\n" +
+	"\x06job_id\x18\b \x01(\tR\x05jobId\x12\x1c\n" +
+	"\tsimulated\x18\t \x01(\bR\tsimulated\x12+\n" +
+	"\x11redaction_enabled\x18\n" +
+	" \x01(\bR\x10redactionEnabled\x1a;\n" +
 	"\rRoomTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*\x81\a\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x02\x10\x03*\x81\a\n" +
 	"\vMetricLabel\x12\x13\n" +
 	"\x0fAGENTS_LLM_TTFT\x10\x00\x12\x13\n" +
 	"\x0fAGENTS_STT_TTFT\x10\x01\x12\x13\n" +
