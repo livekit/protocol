@@ -346,6 +346,38 @@ func TestURLNotifierFilter(t *testing.T) {
 			webhookCheckInterval,
 		)
 	})
+
+	t.Run("room metadata changed", func(t *testing.T) {
+		urlNotifier := NewURLNotifier(URLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			FilterParams: FilterParams{
+				IncludeEvents: []string{EventRoomMetadataChanged},
+			},
+			Config: URLNotifierConfig{
+				QueueSize: 20,
+			},
+		})
+		defer urlNotifier.Stop(false)
+
+		numCalled := atomic.Int32{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			numCalled.Inc()
+		}
+
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomMetadataChanged})
+		_ = urlNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
+		require.Eventually(
+			t,
+			func() bool {
+				return numCalled.Load() == 1
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
 }
 
 func newTestNotifier() *URLNotifier {

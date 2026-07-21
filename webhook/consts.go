@@ -27,6 +27,7 @@ const authHeader = "Authorization"
 const (
 	EventRoomStarted                  = "room_started"
 	EventRoomFinished                 = "room_finished"
+	EventRoomMetadataChanged          = "room_metadata_changed"
 	EventParticipantJoined            = "participant_joined"
 	EventParticipantLeft              = "participant_left"
 	EventParticipantConnectionAborted = "participant_connection_aborted"
