@@ -93,6 +93,7 @@ func Proto() error {
 		"rpc/whip_signal.proto",
 		"rpc/sip.proto",
 	}
+	allProtoFiles := append(append(append(twirpProtoFiles, protoFiles...), grpcProtoFiles...), psrpcProtoFiles...)
 
 	// mapped proto directory:
 	//    ./protobufs/roomrpc/<name>rpc
@@ -107,7 +108,10 @@ func Proto() error {
 	if err := os.MkdirAll(target, 0755); err != nil {
 		return err
 	}
-
+	javaTarget := "generated/java"
+	if err := os.MkdirAll(javaTarget, 0755); err != nil {
+		return err
+	}
 	protoc, err := getToolPath("protoc")
 	if err != nil {
 		return err
@@ -238,7 +242,18 @@ func Proto() error {
 	if err = cmd.Run(); err != nil {
 		return err
 	}
+	fmt.Println("generating Java protobuf")
+	javaArgs := append([]string{
+		"--java_out=" + javaTarget,  
+		"-I=./protobufs",            
+		"-I" + psrpcDir + "/protoc-gen-psrpc/options",  
+	}, allProtoFiles...)  
 
+	cmd = exec.Command(protoc, javaArgs...)
+	mageutil.ConnectStd(cmd)
+	if err = cmd.Run(); err != nil {
+		return fmt.Errorf("生成 Java 代码失败: %v", err)
+	}
 	return nil
 }
 
