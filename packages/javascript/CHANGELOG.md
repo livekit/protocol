@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.50.4
+
+### Patch Changes
+
+- feat: add simulation/redaction fields to MetricsRecordingHeader - [#1679](https://github.com/livekit/protocol/pull/1679) ([@chenghao-mou](https://github.com/chenghao-mou))
+
 ## 1.50.3
 
 ## 1.50.2
