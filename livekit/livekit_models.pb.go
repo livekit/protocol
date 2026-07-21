@@ -999,7 +999,8 @@ const (
 	ParticipantInfo_FORWARDED          ParticipantInfo_KindDetail = 1
 	ParticipantInfo_CONNECTOR_WHATSAPP ParticipantInfo_KindDetail = 2
 	ParticipantInfo_CONNECTOR_TWILIO   ParticipantInfo_KindDetail = 3
-	ParticipantInfo_BRIDGE_RTSP        ParticipantInfo_KindDetail = 4 // NEXT_ID: 5
+	ParticipantInfo_BRIDGE_RTSP        ParticipantInfo_KindDetail = 4
+	ParticipantInfo_SIMULATION         ParticipantInfo_KindDetail = 5 // NEXT_ID: 6
 )
 
 // Enum value maps for ParticipantInfo_KindDetail.
@@ -1010,6 +1011,7 @@ var (
 		2: "CONNECTOR_WHATSAPP",
 		3: "CONNECTOR_TWILIO",
 		4: "BRIDGE_RTSP",
+		5: "SIMULATION",
 	}
 	ParticipantInfo_KindDetail_value = map[string]int32{
 		"CLOUD_AGENT":        0,
@@ -1017,6 +1019,7 @@ var (
 		"CONNECTOR_WHATSAPP": 2,
 		"CONNECTOR_TWILIO":   3,
 		"BRIDGE_RTSP":        4,
+		"SIMULATION":         5,
 	}
 )
 
@@ -6848,7 +6851,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	" \x01(\bR\x11canUpdateMetadata\x12\x18\n" +
 	"\x05agent\x18\v \x01(\bB\x02\x18\x01R\x05agent\x122\n" +
 	"\x15can_subscribe_metrics\x18\f \x01(\bR\x13canSubscribeMetrics\x127\n" +
-	"\x18can_manage_agent_session\x18\r \x01(\bR\x15canManageAgentSession\"\xf3\t\n" +
+	"\x18can_manage_agent_session\x18\r \x01(\bR\x15canManageAgentSession\"\x83\n" +
+	"\n" +
 	"\x0fParticipantInfo\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -6895,14 +6899,16 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x05AGENT\x10\x04\x12\r\n" +
 	"\tCONNECTOR\x10\a\x12\n" +
 	"\n" +
-	"\x06BRIDGE\x10\b\"k\n" +
+	"\x06BRIDGE\x10\b\"{\n" +
 	"\n" +
 	"KindDetail\x12\x0f\n" +
 	"\vCLOUD_AGENT\x10\x00\x12\r\n" +
 	"\tFORWARDED\x10\x01\x12\x16\n" +
 	"\x12CONNECTOR_WHATSAPP\x10\x02\x12\x14\n" +
 	"\x10CONNECTOR_TWILIO\x10\x03\x12\x0f\n" +
-	"\vBRIDGE_RTSP\x10\x04\"3\n" +
+	"\vBRIDGE_RTSP\x10\x04\x12\x0e\n" +
+	"\n" +
+	"SIMULATION\x10\x05\"3\n" +
 	"\n" +
 	"Encryption\"%\n" +
 	"\x04Type\x12\b\n" +

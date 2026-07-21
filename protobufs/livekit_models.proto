@@ -166,7 +166,8 @@ message ParticipantInfo {
     CONNECTOR_WHATSAPP = 2;
     CONNECTOR_TWILIO = 3;
     BRIDGE_RTSP = 4;
-    // NEXT_ID: 5
+    SIMULATION = 5;
+    // NEXT_ID: 6
   }
   string sid = 1;
   string identity = 2;

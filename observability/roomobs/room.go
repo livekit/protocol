@@ -145,21 +145,32 @@ const (
 	SimulationRoomFeature
 )
 
-func RoomFeatureFromParticipantKind(k livekit.ParticipantInfo_Kind) RoomFeature {
+// RoomFeatureFromParticipantKind derives the room-session features implied by a
+// participant's kind and any kind details. Features are additive: a single
+// participant can contribute multiple bits (e.g. an AGENT participant flagged
+// with the SIMULATION kind detail yields both AgentRoomFeature and
+// SimulationRoomFeature).
+func RoomFeatureFromParticipantKind(k livekit.ParticipantInfo_Kind, details ...livekit.ParticipantInfo_KindDetail) RoomFeature {
+	var f RoomFeature
 	switch k {
 	case livekit.ParticipantInfo_INGRESS:
-		return IngressRoomFeature
+		f = IngressRoomFeature
 	case livekit.ParticipantInfo_EGRESS:
-		return EgressRoomFeature
+		f = EgressRoomFeature
 	case livekit.ParticipantInfo_SIP:
-		return SIPRoomFeature
+		f = SIPRoomFeature
 	case livekit.ParticipantInfo_AGENT:
-		return AgentRoomFeature
+		f = AgentRoomFeature
 	case livekit.ParticipantInfo_CONNECTOR:
-		return ConnectorRoomFeature
-	default:
-		return 0
+		f = ConnectorRoomFeature
 	}
+	for _, d := range details {
+		switch d {
+		case livekit.ParticipantInfo_SIMULATION:
+			f |= SimulationRoomFeature
+		}
+	}
+	return f
 }
 
 func ParticipantKindCode(k livekit.ParticipantInfo_Kind) int32 {
