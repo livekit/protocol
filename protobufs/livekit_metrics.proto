@@ -90,6 +90,7 @@ message EventMetric {
 }
 
 message MetricsRecordingHeader {
+  reserved 2; // was observability field, removed in #1294
   string room_id = 1 [(logger.name) = "roomID"];
   uint64 duration = 3; // milliseconds
   google.protobuf.Timestamp start_time = 4;
@@ -97,4 +98,6 @@ message MetricsRecordingHeader {
   string room_name = 6;
   google.protobuf.Timestamp room_start_time = 7;
   string job_id = 8;
+  bool simulation = 9;  // session is a simulation; the collector skips PII redaction for it unless redaction is set
+  bool redaction = 10;  // force PII redaction on for this session (only ever enables, never disables)
 }
