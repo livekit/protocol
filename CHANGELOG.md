@@ -1,5 +1,11 @@
 # github.com/livekit/protocol
 
+## 1.50.3
+
+### Patch Changes
+
+- agent simulation: homogenizes Turn/Job/Run LLM/TTS/STT/Conversation metrics shapes - [#1673](https://github.com/livekit/protocol/pull/1673) ([@Bobronium](https://github.com/Bobronium))
+
 ## 1.50.2
 
 ## 1.50.1
