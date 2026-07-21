@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_9V68R3G = true
+const Version_J1BFFVO = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -109,6 +109,15 @@ type modelReporter interface {
 	ReportInferenceTotalTokens(v uint64)
 	ReportInferenceCacheCreateTokens(v uint64)
 	ReportInferenceCacheReadTokens(v uint64)
+	ReportRealtimeDurationSeconds(v uint32)
+	ReportRealtimeInputTextTokens(v uint64)
+	ReportRealtimeInputAudioTokens(v uint64)
+	ReportRealtimeInputImageTokens(v uint64)
+	ReportRealtimeInputVideoTokens(v uint64)
+	ReportRealtimeOutputTextTokens(v uint64)
+	ReportRealtimeOutputAudioTokens(v uint64)
+	ReportRealtimeCachedTextTokens(v uint64)
+	ReportRealtimeCachedAudioTokens(v uint64)
 	ReportSttDuration(v uint32)
 	ReportTtsChars(v uint32)
 	ReportBargeInRequests(v uint64)
