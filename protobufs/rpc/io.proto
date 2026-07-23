@@ -71,11 +71,11 @@ message UpdateMetricsRequest {
   float max_cpu_usage = 4;
 }
 
-// Query an ingress info from an ingress ID or stream key
 message CreateIngress2Response {
   livekit.IngressInfo info = 1;
 }
 
+// Query an ingress info from an ingress ID or stream key
 message GetIngressInfoRequest {
   string ingress_id = 1 [(logger.name) = "ingressID"];
   string stream_key = 2;
