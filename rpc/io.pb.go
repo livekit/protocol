@@ -247,7 +247,6 @@ func (x *UpdateMetricsRequest) GetMaxCpuUsage() float32 {
 	return 0
 }
 
-// Query an ingress info from an ingress ID or stream key
 type CreateIngress2Response struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Info          *livekit.IngressInfo   `protobuf:"bytes,1,opt,name=info,proto3" json:"info,omitempty"`
@@ -292,6 +291,7 @@ func (x *CreateIngress2Response) GetInfo() *livekit.IngressInfo {
 	return nil
 }
 
+// Query an ingress info from an ingress ID or stream key
 type GetIngressInfoRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	IngressId     string                 `protobuf:"bytes,1,opt,name=ingress_id,json=ingressId,proto3" json:"ingress_id,omitempty"`
