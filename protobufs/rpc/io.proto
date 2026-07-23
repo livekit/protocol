@@ -37,6 +37,9 @@ service IOInfo {
 
   // ingress
   rpc CreateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);
+  // CreateIngress2 creates the ingress and returns the stored record .
+  // It will return existed record directly if the id is already there. 
+  rpc CreateIngress2(livekit.IngressInfo) returns (CreateIngress2Response);
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
 
@@ -69,6 +72,10 @@ message UpdateMetricsRequest {
 }
 
 // Query an ingress info from an ingress ID or stream key
+message CreateIngress2Response {
+  livekit.IngressInfo info = 1;
+}
+
 message GetIngressInfoRequest {
   string ingress_id = 1 [(logger.name) = "ingressID"];
   string stream_key = 2;
