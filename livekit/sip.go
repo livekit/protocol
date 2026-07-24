@@ -346,7 +346,7 @@ func (vr ValidationResult) WithError(err error) ValidationResult {
 // returns the result's associated error, if any.
 func (vr ValidationResult) LogSoftErrors(l logger.Logger) error {
 	for _, err := range vr.softErrs {
-		l.Warnw("soft validation failure: %w", err)
+		l.Warnw("soft validation failure", err)
 	}
 	return vr.err
 }
@@ -354,7 +354,7 @@ func (vr ValidationResult) LogSoftErrors(l logger.Logger) error {
 // LogUnlikelySoftErrors is a variant of LogSoftErrors.
 func (vr ValidationResult) LogUnlikelySoftErrors(l logger.UnlikelyLogger) error {
 	for _, err := range vr.softErrs {
-		l.Warnw("soft validation failure: %w", err)
+		l.Warnw("soft validation failure", err)
 	}
 	return vr.err
 }
