@@ -321,9 +321,12 @@ func (r *ResourceURLNotifier) Process(
 	}
 
 	sendStart := time.Now()
-	err := r.send(event, params)
+	res, err := r.send(event, params)
 	sendDuration := time.Since(sendStart)
 	fields = append(fields, "sendDuration", sendDuration)
+	if res != nil {
+		fields = append(fields, "status", res.Status, "statusCode", res.StatusCode)
+	}
 	if err != nil {
 		params.Logger.Warnw("failed to send webhook", err, fields...)
 		IncDispatchFailure()
@@ -349,10 +352,10 @@ func (r *ResourceURLNotifier) Process(
 	}
 }
 
-func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *ResourceURLNotifierParams) error {
+func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *ResourceURLNotifierParams) (*http.Response, error) {
 	encoded, err := protojson.Marshal(event)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// sign payload
 	sum := sha256.Sum256(encoded)
@@ -366,22 +369,22 @@ func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *Resource
 		SetSha256(b64)
 	token, err := at.ToJWT()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	req, err := retryablehttp.NewRequest("POST", params.URL, bytes.NewReader(encoded))
 	if err != nil {
 		// ignore and continue
-		return err
+		return nil, err
 	}
 	req.Header.Set(authHeader, token)
 	// use a custom mime type to ensure signature is checked prior to parsing
 	req.Header.Set("content-type", "application/webhook+json")
 	res, err := r.client.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	_ = res.Body.Close()
-	return nil
+	return res, nil
 }
 
 func (r *ResourceURLNotifier) sweeper() {
