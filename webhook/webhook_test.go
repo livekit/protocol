@@ -187,8 +187,9 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		}
 		defer urlNotifier.Stop(false)
 
-		err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
+		res, err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
 		require.Error(t, err)
+		require.Nil(t, res)
 	})
 
 	t.Run("times out before connection", func(t *testing.T) {
@@ -208,8 +209,9 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		defer urlNotifier.Stop(false)
 
 		startedAt := time.Now()
-		err = urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
+		res, err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
 		require.Error(t, err)
+		require.Nil(t, res)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
 }
@@ -666,8 +668,9 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		}
 		defer resourceURLNotifier.Stop(false)
 
-		err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
+		res, err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
 		require.Error(t, err)
+		require.Nil(t, res)
 	})
 
 	t.Run("times out before connection", func(t *testing.T) {
@@ -694,8 +697,9 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		defer resourceURLNotifier.Stop(false)
 
 		startedAt := time.Now()
-		err = resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
+		res, err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
 		require.Error(t, err)
+		require.Nil(t, res)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
 }
