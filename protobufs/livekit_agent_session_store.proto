@@ -26,26 +26,21 @@ option ruby_package = "LiveKit::Proto";
 // livekit_agent_session_db.proto). project_id is taken from the authenticated
 // principal (access key) on every call, never a request field.
 service AgentSessionStore {
-  // CreateSession allocates a new session database.
   rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
-
-  // GetSession returns session metadata.
   rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
-
-  // ListSessions pages through the caller's sessions.
   rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
 
-  // DeleteSession removes a session and all its stored data.
+  // Deletes the stored data too, not just the metadata row.
   rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
 
-  // Dump exports a consistent full SQLite database file for the session and
-  // returns a time-limited download URL (object-storage pre-authenticated
-  // request). Runs off the serving path; never blocks the session's writes.
+  // Exports a consistent full SQLite database file and returns a time-limited
+  // download URL (object-storage pre-authenticated request). Runs off the
+  // serving path; never blocks the session's writes.
   rpc Dump(DumpSessionRequest) returns (DumpSessionResponse);
 }
 
 message CreateSessionRequest {
-  string region = 1;           // data region the session is stored in
+  string region = 1;
   string user_attributes = 2;  // opaque JSON metadata for the caller
   int64 ttl_seconds = 3;       // per-session TTL, clamped to a hard max; never extended
 }

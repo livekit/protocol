@@ -32,21 +32,18 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 // livekit_agent_session_db.proto). project_id is taken from the authenticated
 // principal (access key) on every call, never a request field.
 type AgentSessionStore interface {
-	// CreateSession allocates a new session database.
 	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
 
-	// GetSession returns session metadata.
 	GetSession(context.Context, *GetSessionRequest) (*GetSessionResponse, error)
 
-	// ListSessions pages through the caller's sessions.
 	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsResponse, error)
 
-	// DeleteSession removes a session and all its stored data.
+	// Deletes the stored data too, not just the metadata row.
 	DeleteSession(context.Context, *DeleteSessionRequest) (*DeleteSessionResponse, error)
 
-	// Dump exports a consistent full SQLite database file for the session and
-	// returns a time-limited download URL (object-storage pre-authenticated
-	// request). Runs off the serving path; never blocks the session's writes.
+	// Exports a consistent full SQLite database file and returns a time-limited
+	// download URL (object-storage pre-authenticated request). Runs off the
+	// serving path; never blocks the session's writes.
 	Dump(context.Context, *DumpSessionRequest) (*DumpSessionResponse, error)
 }
 

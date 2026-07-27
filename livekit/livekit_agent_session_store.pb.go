@@ -37,7 +37,7 @@ const (
 
 type CreateSessionRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	Region         string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`                                       // data region the session is stored in
+	Region         string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,2,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"` // opaque JSON metadata for the caller
 	TtlSeconds     int64                  `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`            // per-session TTL, clamped to a hard max; never extended
 	unknownFields  protoimpl.UnknownFields
