@@ -45,6 +45,7 @@ func Proto() error {
 	twirpProtoFiles := []string{
 		"cloud_replay.proto",
 		"livekit_agent_dispatch.proto",
+		"livekit_agent_session_store.proto",
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
 		"livekit_room.proto",
@@ -66,6 +67,7 @@ func Proto() error {
 
 	protoFiles := []string{
 		"livekit_agent.proto",
+		"livekit_agent_session_db.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",

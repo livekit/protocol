@@ -1,0 +1,145 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+// Data plane for AgentSessionStore session databases: a SQL(+openCypher)
+// protocol carried over a WebSocket. One binary-protobuf message per WS
+// frame; requests and responses correlate by request_id (monotonic per
+// connection, chosen by the client). One WebSocket = one session connection.
+//
+// Flow control: query results stream as SessionRowBatch frames paced by
+// per-request credits (SessionCredit) the client advertises; the server
+// never sends more un-consumed batches than granted, so any result size
+// streams with bounded memory at every hop.
+
+message SessionStoreRequest {
+  uint32 request_id = 1;
+  oneof message {
+    SessionHello hello = 2;           // must be first on the socket
+    SessionStatement exec = 3;        // no result rows; answers SessionExecResult
+    SessionStatement query = 4;       // answers SessionColumns + SessionRowBatch* + SessionDone
+    SessionBatch batch = 5;           // atomic multi-statement exec
+    SessionBegin begin = 6;           // interactive transaction (server enforces idle/duration timeouts)
+    SessionCommit commit = 7;
+    SessionRollback rollback = 8;
+    SessionCancel cancel = 9;         // stop a running query's stream/cursor
+    SessionCredit credit = 10;        // grant more RowBatch credits for request_id
+    SessionPing ping = 11;
+  }
+}
+
+message SessionStoreResponse {
+  uint32 request_id = 1;
+  oneof message {
+    SessionHelloOk hello_ok = 2;
+    SessionColumns columns = 3;
+    SessionRowBatch row_batch = 4;
+    SessionExecResult exec_result = 5;
+    SessionDone done = 6;
+    SessionStoreError error = 7;
+    SessionPong pong = 8;
+  }
+}
+
+// SessionQueryLang selects the query language of a statement; both execute
+// against the same session database.
+enum SessionQueryLang {
+  SESSION_QUERY_LANG_SQL = 0;
+  SESSION_QUERY_LANG_CYPHER = 1;
+}
+
+// SessionValue mirrors SQLite's five storage classes exactly.
+message SessionValue {
+  oneof value {
+    bool null_value = 1;   // always true when set
+    int64 int_value = 2;
+    double double_value = 3;
+    string text_value = 4;
+    bytes blob_value = 5;
+  }
+}
+
+message SessionStatement {
+  string sql = 1;                     // statement text in the selected lang
+  repeated SessionValue params = 2;   // positional bind parameters
+  SessionQueryLang lang = 3;
+}
+
+message SessionBatch {
+  repeated SessionStatement statements = 1;  // applied atomically, in order
+}
+
+message SessionBegin {}
+message SessionCommit {}
+message SessionRollback {}
+message SessionCancel {}
+
+message SessionCredit {
+  uint32 batches = 1;                 // additional RowBatch frames the client can absorb
+}
+
+message SessionPing {
+  int64 timestamp = 1;
+}
+
+message SessionPong {
+  int64 last_ping_timestamp = 1;
+  int64 timestamp = 2;
+}
+
+message SessionHello {
+  string token = 1;                   // access token; authorization is checked here
+  string session_id = 2;
+}
+
+message SessionHelloOk {
+  int64 tip = 1;                      // latest durable commit sequence
+  uint32 ping_interval_ms = 2;        // server-advertised keepalive cadence
+  uint32 ping_timeout_ms = 3;
+}
+
+message SessionColumns {
+  repeated string names = 1;
+}
+
+message SessionRow {
+  repeated SessionValue values = 1;
+}
+
+message SessionRowBatch {
+  repeated SessionRow rows = 1;
+}
+
+message SessionExecResult {
+  int64 rows_affected = 1;
+  int64 last_insert_id = 2;
+  int64 tip = 3;                      // durable commit sequence after this exec
+}
+
+message SessionDone {
+  int64 tip = 1;                      // snapshot the query ran at
+  uint64 total_rows = 2;
+}
+
+message SessionStoreError {
+  string code = 1;                    // stable machine-readable code
+  string message = 2;
+}
