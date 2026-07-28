@@ -130,6 +130,24 @@ var (
 		PayloadType: 108,
 	}
 
+	H264ProfileLevelId4d001fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=4d001f",
+		},
+		PayloadType: 39,
+	}
+
+	H264ProfileLevelId4d001fPacketizationMode1CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=4d001f",
+		},
+		PayloadType: 106,
+	}
+
 	H264HighProfileFmtp            = "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=640032"
 	H264HighProfileCodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
