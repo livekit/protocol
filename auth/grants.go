@@ -581,10 +581,14 @@ type AgentGrant struct {
 	Admin bool `json:"admin,omitempty"`
 	// SimulationAdmin grants access to manage simulations and scenarios for evaluating agents.
 	SimulationAdmin bool `json:"simulationAdmin,omitempty"`
-	// SessionAdmin grants access to the agent session store: creating, reading,
-	// querying, exporting and deleting a project's session databases. It gates
-	// both the management API and the data-plane connection.
-	SessionAdmin bool `json:"sessionAdmin,omitempty"`
+	// SessionStoreAdmin grants access to the agent session store: creating,
+	// reading, querying, exporting and deleting a project's session databases. It
+	// gates both the management API and the data-plane connection.
+	//
+	// Named for the store rather than "session" because an agent session is
+	// already a running conversation elsewhere in this package's vocabulary (see
+	// agent/livekit_agent_session.proto), which this has nothing to do with.
+	SessionStoreAdmin bool `json:"sessionStoreAdmin,omitempty"`
 }
 
 func (s *AgentGrant) Clone() *AgentGrant {
@@ -604,7 +608,7 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 	e.AddBool("Admin", s.Admin)
 	e.AddBool("SimulationAdmin", s.SimulationAdmin)
-	e.AddBool("SessionAdmin", s.SessionAdmin)
+	e.AddBool("SessionStoreAdmin", s.SessionStoreAdmin)
 	return nil
 }
 
