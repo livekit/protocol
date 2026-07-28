@@ -25,7 +25,7 @@ option ruby_package = "LiveKit::Proto";
 // frame; requests and responses correlate by request_id (monotonic per
 // connection, chosen by the client). One WebSocket = one session connection.
 //
-// Flow control: query results stream as SessionRowBatch frames paced by
+// Flow control: query results stream as SessionColumnBatch frames paced by
 // per-request credits (SessionCredit) the client advertises; the server
 // never sends more un-consumed batches than granted, so any result size
 // streams with bounded memory at every hop.
@@ -35,13 +35,13 @@ message SessionStoreRequest {
   oneof message {
     SessionHello hello = 2;           // must be first on the socket
     SessionStatement exec = 3;        // no result rows; answers SessionExecResult
-    SessionStatement query = 4;       // answers SessionColumns + SessionRowBatch* + SessionDone
+    SessionStatement query = 4;       // answers SessionColumns + SessionColumnBatch* + SessionDone
     SessionBatch batch = 5;           // atomic multi-statement exec
     SessionBegin begin = 6;           // interactive transaction (server enforces idle/duration timeouts)
     SessionCommit commit = 7;
     SessionRollback rollback = 8;
     SessionCancel cancel = 9;         // stop a running query's stream/cursor
-    SessionCredit credit = 10;        // grant more RowBatch credits for request_id
+    SessionCredit credit = 10;        // grant more batch credits for request_id
     SessionPing ping = 11;
   }
 }
@@ -51,7 +51,7 @@ message SessionStoreResponse {
   oneof message {
     SessionHelloOk hello_ok = 2;
     SessionColumns columns = 3;
-    SessionRowBatch row_batch = 4;
+    SessionColumnBatch column_batch = 4;
     SessionExecResult exec_result = 5;
     SessionDone done = 6;
     SessionStoreError error = 7;
@@ -93,7 +93,7 @@ message SessionRollback {}
 message SessionCancel {}
 
 message SessionCredit {
-  uint32 batches = 1;                 // additional RowBatch frames the client can absorb
+  uint32 batches = 1;                 // additional batch frames the client can absorb
 }
 
 message SessionPing {
@@ -120,12 +120,40 @@ message SessionColumns {
   repeated string names = 1;
 }
 
-message SessionRow {
-  repeated SessionValue values = 1;
+// SessionValueType tags one value's storage class within a SessionColumn.
+enum SessionValueType {
+  SESSION_VALUE_TYPE_NULL = 0;
+  SESSION_VALUE_TYPE_INT = 1;
+  SESSION_VALUE_TYPE_DOUBLE = 2;
+  SESSION_VALUE_TYPE_TEXT = 3;
+  SESSION_VALUE_TYPE_BLOB = 4;
 }
 
-message SessionRowBatch {
-  repeated SessionRow rows = 1;
+// SessionColumn carries one column of a batch, column-oriented so a result set
+// costs a handful of allocations per batch rather than two per cell (a message
+// plus a oneof wrapper), and so scalar runs land in pointer-free arrays the
+// garbage collector never scans.
+//
+// SQLite types values individually rather than by column, so `types` tags every
+// value and each typed array holds only the values of its own class, in row
+// order. Reading a column means walking `types` and taking the next entry from
+// the matching array; NULLs occupy a tag and nothing else.
+message SessionColumn {
+  bytes types = 1;                 // one SessionValueType per row, one byte each
+  repeated sint64 ints = 2;        // zigzag, so negative values stay small
+  repeated double doubles = 3;
+  // Text and blob values are concatenated with an exclusive end offset each,
+  // rather than `repeated string`, so a decoder can hand out subslices of one
+  // buffer instead of copying every value.
+  bytes text_data = 4;
+  repeated uint32 text_ends = 5;
+  bytes blob_data = 6;
+  repeated uint32 blob_ends = 7;
+}
+
+message SessionColumnBatch {
+  repeated SessionColumn columns = 1;  // one per column of SessionColumns
+  uint32 rows = 2;
 }
 
 message SessionExecResult {

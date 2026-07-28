@@ -69,8 +69,23 @@ message ListSessionsRequest {
 }
 
 message ListSessionsResponse {
-  repeated GetSessionResponse sessions = 1;
+  repeated SessionSummary sessions = 1;
   string next_page_token = 2;  // empty when exhausted
+}
+
+// SessionSummary is what listing returns: a session's immutable facts.
+//
+// tip is deliberately absent. It advances on every commit, so it cannot be
+// carried in the listing index without putting a write on the commit path, which
+// would mean listing reads every session's metadata row forever. It would also
+// be stale the moment it was returned, since anything acting on it has to
+// re-read. GetSession returns it for a single session.
+message SessionSummary {
+  string session_id = 1;
+  string region = 2;
+  string user_attributes = 3;
+  int64 created_at_unix = 4;
+  int64 expires_at_unix = 5;
 }
 
 message DeleteSessionRequest {
