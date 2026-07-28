@@ -20,11 +20,9 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-// AgentSessionStore is the MANAGEMENT plane for per-session SQLite databases:
-// lifecycle and export only. All querying goes through the data plane (a
-// WebSocket speaking SessionStoreRequest/SessionStoreResponse, defined in
-// livekit_agent_session_db.proto). project_id is taken from the authenticated
-// principal (access key) on every call, never a request field.
+// AgentSessionStore manages per-session SQLite databases: lifecycle and export.
+// Querying goes through the data plane in livekit_agent_session_db.proto. The
+// project comes from the access token, never from a request field.
 service AgentSessionStore {
   rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
   rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
@@ -33,9 +31,7 @@ service AgentSessionStore {
   // Deletes the stored data too, not just the metadata row.
   rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
 
-  // Exports a consistent full SQLite database file and returns a time-limited
-  // download URL (object-storage pre-authenticated request). Runs off the
-  // serving path; never blocks the session's writes.
+  // Exports a consistent SQLite file, returning a time-limited download URL.
   rpc Dump(DumpSessionRequest) returns (DumpSessionResponse);
 }
 
@@ -73,13 +69,8 @@ message ListSessionsResponse {
   string next_page_token = 2;  // empty when exhausted
 }
 
-// SessionSummary is what listing returns: a session's immutable facts.
-//
-// tip is deliberately absent. It advances on every commit, so it cannot be
-// carried in the listing index without putting a write on the commit path, which
-// would mean listing reads every session's metadata row forever. It would also
-// be stale the moment it was returned, since anything acting on it has to
-// re-read. GetSession returns it for a single session.
+// SessionSummary is a session's immutable fields. No tip: it changes on every
+// commit, so call GetSession for it.
 message SessionSummary {
   string session_id = 1;
   string region = 2;

@@ -26,11 +26,9 @@ const _ = twirp.TwirpPackageMinVersion_8_1_0
 // AgentSessionStore Interface
 // ===========================
 
-// AgentSessionStore is the MANAGEMENT plane for per-session SQLite databases:
-// lifecycle and export only. All querying goes through the data plane (a
-// WebSocket speaking SessionStoreRequest/SessionStoreResponse, defined in
-// livekit_agent_session_db.proto). project_id is taken from the authenticated
-// principal (access key) on every call, never a request field.
+// AgentSessionStore manages per-session SQLite databases: lifecycle and export.
+// Querying goes through the data plane in livekit_agent_session_db.proto. The
+// project comes from the access token, never from a request field.
 type AgentSessionStore interface {
 	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
 
@@ -41,9 +39,7 @@ type AgentSessionStore interface {
 	// Deletes the stored data too, not just the metadata row.
 	DeleteSession(context.Context, *DeleteSessionRequest) (*DeleteSessionResponse, error)
 
-	// Exports a consistent full SQLite database file and returns a time-limited
-	// download URL (object-storage pre-authenticated request). Runs off the
-	// serving path; never blocks the session's writes.
+	// Exports a consistent SQLite file, returning a time-limited download URL.
 	Dump(context.Context, *DumpSessionRequest) (*DumpSessionResponse, error)
 }
 
