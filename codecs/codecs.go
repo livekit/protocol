@@ -17,10 +17,11 @@ package codecs
 import (
 	"strings"
 
+	"github.com/pion/webrtc/v4"
+
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
-	"github.com/pion/webrtc/v4"
 )
 
 var (
@@ -93,6 +94,24 @@ var (
 		PayloadType: 100,
 	}
 
+	H264ProfileLevelId42001fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42001f",
+		},
+		PayloadType: 104,
+	}
+
+	H264ProfileLevelId42001fPacketizationMode1CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f",
+		},
+		PayloadType: 102,
+	}
+
 	H264ProfileLevelId42e01fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
 			MimeType:    mime.MimeTypeH264.String(),
@@ -143,6 +162,8 @@ var (
 		VP9ProfileId1CodecParameters,
 		H264ProfileLevelId42e01fPacketizationMode0CodecParameters,
 		H264ProfileLevelId42e01fPacketizationMode1CodecParameters,
+		H264ProfileLevelId42001fPacketizationMode0CodecParameters,
+		H264ProfileLevelId42001fPacketizationMode1CodecParameters,
 		H264HighProfileCodecParameters,
 		AV1CodecParameters,
 		H265CodecParameters,
