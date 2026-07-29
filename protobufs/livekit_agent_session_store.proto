@@ -38,12 +38,12 @@ service AgentSessionStore {
 message CreateSessionRequest {
   string region = 1;
   string user_attributes = 2;  // opaque JSON metadata for the caller
-  int64 ttl_seconds = 3;       // per-session TTL, clamped to a hard max; never extended
+  int64 ttl_seconds = 3;       // unset: never expires. Otherwise clamped to the server cap, and never extended
 }
 
 message CreateSessionResponse {
   string session_id = 1;       // "SESS_..."
-  int64 expires_at_unix = 2;
+  int64 expires_at_unix = 2;   // 0: never expires
 }
 
 message GetSessionRequest {
@@ -55,7 +55,7 @@ message GetSessionResponse {
   string region = 2;
   string user_attributes = 3;
   int64 created_at_unix = 4;
-  int64 expires_at_unix = 5;
+  int64 expires_at_unix = 5;   // 0: never expires
   int64 tip = 6;               // latest durable commit sequence
 }
 
@@ -76,7 +76,7 @@ message SessionSummary {
   string region = 2;
   string user_attributes = 3;
   int64 created_at_unix = 4;
-  int64 expires_at_unix = 5;
+  int64 expires_at_unix = 5;   // 0: never expires
 }
 
 message DeleteSessionRequest {

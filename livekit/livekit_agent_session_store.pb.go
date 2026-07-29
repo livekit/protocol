@@ -39,7 +39,7 @@ type CreateSessionRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Region         string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,2,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"` // opaque JSON metadata for the caller
-	TtlSeconds     int64                  `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`            // per-session TTL, clamped to a hard max; never extended
+	TtlSeconds     int64                  `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`            // unset: never expires. Otherwise clamped to the server cap, and never extended
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -97,8 +97,8 @@ func (x *CreateSessionRequest) GetTtlSeconds() int64 {
 
 type CreateSessionResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // "SESS_..."
-	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`                // "SESS_..."
+	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // 0: never expires
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -197,8 +197,8 @@ type GetSessionResponse struct {
 	Region         string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,3,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"`
 	CreatedAtUnix  int64                  `protobuf:"varint,4,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
-	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
-	Tip            int64                  `protobuf:"varint,6,opt,name=tip,proto3" json:"tip,omitempty"` // latest durable commit sequence
+	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // 0: never expires
+	Tip            int64                  `protobuf:"varint,6,opt,name=tip,proto3" json:"tip,omitempty"`                                            // latest durable commit sequence
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -387,7 +387,7 @@ type SessionSummary struct {
 	Region         string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,3,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"`
 	CreatedAtUnix  int64                  `protobuf:"varint,4,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
-	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
+	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // 0: never expires
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
