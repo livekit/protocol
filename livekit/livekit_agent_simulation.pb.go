@@ -1048,8 +1048,13 @@ type SimulationRun_RunMetrics struct {
 	JobsTotal          uint32                                 `protobuf:"varint,9,opt,name=jobs_total,json=jobsTotal,proto3" json:"jobs_total,omitempty"`
 	JobsMeasured       uint32                                 `protobuf:"varint,10,opt,name=jobs_measured,json=jobsMeasured,proto3" json:"jobs_measured,omitempty"`                     // composites cover jobs_measured - jobs_simulator_fault
 	JobsSimulatorFault uint32                                 `protobuf:"varint,11,opt,name=jobs_simulator_fault,json=jobsSimulatorFault,proto3" json:"jobs_simulator_fault,omitempty"` // spoiled by the simulator: flagged, not scored
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Number of distinct issues in this run's SimulationRunSummary
+	// (len(SimulationRunSummary.issues)), denormalized at summarize time so a
+	// listing can show the count without shipping summary_zstd. Absent on runs
+	// that have not been summarized; 0 means the summary found no issues.
+	IssuesCount   *uint32 `protobuf:"varint,12,opt,name=issues_count,json=issuesCount,proto3,oneof" json:"issues_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_RunMetrics) Reset() {
@@ -1148,6 +1153,13 @@ func (x *SimulationRun_RunMetrics) GetJobsMeasured() uint32 {
 func (x *SimulationRun_RunMetrics) GetJobsSimulatorFault() uint32 {
 	if x != nil {
 		return x.JobsSimulatorFault
+	}
+	return 0
+}
+
+func (x *SimulationRun_RunMetrics) GetIssuesCount() uint32 {
+	if x != nil && x.IssuesCount != nil {
+		return *x.IssuesCount
 	}
 	return 0
 }
@@ -2787,7 +2799,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xf5<\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xae=\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2979,7 +2991,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\a_end_msB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x12\n" +
-	"\x10_task_completion\x1a\xcf\x04\n" +
+	"\x10_task_completion\x1a\x88\x05\n" +
 	"\n" +
 	"RunMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2993,10 +3005,12 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"jobs_total\x18\t \x01(\rR\tjobsTotal\x12#\n" +
 	"\rjobs_measured\x18\n" +
 	" \x01(\rR\fjobsMeasured\x120\n" +
-	"\x14jobs_simulator_fault\x18\v \x01(\rR\x12jobsSimulatorFaultB\x11\n" +
+	"\x14jobs_simulator_fault\x18\v \x01(\rR\x12jobsSimulatorFault\x12&\n" +
+	"\fissues_count\x18\f \x01(\rH\x03R\vissuesCount\x88\x01\x01B\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x15\n" +
-	"\x13_scenario_pass_rate\x1a\xf5\x03\n" +
+	"\x13_scenario_pass_rateB\x0f\n" +
+	"\r_issues_count\x1a\xf5\x03\n" +
 	"\x06Create\x1a\xdc\x02\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +

@@ -200,6 +200,12 @@ message SimulationRun {
     uint32 jobs_total = 9;
     uint32 jobs_measured = 10;         // composites cover jobs_measured - jobs_simulator_fault
     uint32 jobs_simulator_fault = 11;  // spoiled by the simulator: flagged, not scored
+
+    // Number of distinct issues in this run's SimulationRunSummary
+    // (len(SimulationRunSummary.issues)), denormalized at summarize time so a
+    // listing can show the count without shipping summary_zstd. Absent on runs
+    // that have not been summarized; 0 means the summary found no issues.
+    optional uint32 issues_count = 12;
   }
 
   message Create {
