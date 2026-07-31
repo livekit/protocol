@@ -282,8 +282,8 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParam
 		return err
 	}
 	r.Header.Set(authHeader, token)
-	// use a custom mime type to ensure signature is checked prior to parsing
-	r.Header.Set("content-type", "application/webhook+json")
+	r.Header.Set(contentTypeHeader, ContentType)
+	r.Header.Set(userAgentHeader, UserAgent)
 	res, err := n.client.Do(r)
 	if err != nil {
 		return err

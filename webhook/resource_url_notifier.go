@@ -374,8 +374,8 @@ func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *Resource
 		return err
 	}
 	req.Header.Set(authHeader, token)
-	// use a custom mime type to ensure signature is checked prior to parsing
-	req.Header.Set("content-type", "application/webhook+json")
+	req.Header.Set(contentTypeHeader, ContentType)
+	req.Header.Set(userAgentHeader, UserAgent)
 	res, err := r.client.Do(req)
 	if err != nil {
 		return err

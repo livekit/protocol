@@ -74,6 +74,7 @@ func TestWebHook(t *testing.T) {
 
 			require.EqualValues(t, event, decodedEvent)
 			require.Equal(t, expectedUrl, r.URL.String())
+			require.Equal(t, UserAgent, r.UserAgent())
 		}
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		wg.Wait()
@@ -395,6 +396,7 @@ func TestResourceWebHook(t *testing.T) {
 			require.NoError(t, err)
 
 			require.EqualValues(t, event, decodedEvent)
+			require.Equal(t, UserAgent, r.UserAgent())
 		}
 		require.NoError(t, resourceURLNotifier.QueueNotify(context.Background(), event))
 		wg.Wait()
