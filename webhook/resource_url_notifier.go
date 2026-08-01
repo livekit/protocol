@@ -117,6 +117,9 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 	if params.Config.MaxDepth == 0 {
 		params.Config.MaxDepth = DefaultResourceURLNotifierConfig.MaxDepth
 	}
+	if params.UserAgent == "" {
+		params.UserAgent = DefaultUserAgent
+	}
 
 	rhc := retryablehttp.NewClient()
 	if params.RetryWaitMin > 0 {
@@ -375,7 +378,7 @@ func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *Resource
 	}
 	req.Header.Set(authHeader, token)
 	req.Header.Set(contentTypeHeader, ContentType)
-	req.Header.Set(userAgentHeader, UserAgent)
+	req.Header.Set(userAgentHeader, params.UserAgent)
 	res, err := r.client.Do(req)
 	if err != nil {
 		return err

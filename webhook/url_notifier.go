@@ -79,6 +79,9 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	if params.Logger == nil {
 		params.Logger = logger.GetLogger()
 	}
+	if params.UserAgent == "" {
+		params.UserAgent = DefaultUserAgent
+	}
 
 	rhc := retryablehttp.NewClient()
 	if params.RetryWaitMin > 0 {
@@ -283,7 +286,7 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParam
 	}
 	r.Header.Set(authHeader, token)
 	r.Header.Set(contentTypeHeader, ContentType)
-	r.Header.Set(userAgentHeader, UserAgent)
+	r.Header.Set(userAgentHeader, params.UserAgent)
 	res, err := n.client.Do(r)
 	if err != nil {
 		return err

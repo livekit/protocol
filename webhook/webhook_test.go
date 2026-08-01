@@ -74,7 +74,7 @@ func TestWebHook(t *testing.T) {
 
 			require.EqualValues(t, event, decodedEvent)
 			require.Equal(t, expectedUrl, r.URL.String())
-			require.Equal(t, UserAgent, r.UserAgent())
+			require.Equal(t, DefaultUserAgent, r.UserAgent())
 		}
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		wg.Wait()
@@ -84,6 +84,35 @@ func TestWebHook(t *testing.T) {
 		require.NoError(t, notifier.QueueNotify(context.Background(), event, WithExtraWebhooks([]*livekit.WebhookConfig{&livekit.WebhookConfig{Url: "http://localhost:8765/wh"}})))
 		wg.Wait()
 
+	})
+
+	t.Run("overridden user agent", func(t *testing.T) {
+		notifier := NewURLNotifier(URLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			Config: URLNotifierConfig{
+				QueueSize: 20,
+			},
+			HTTPClientParams: HTTPClientParams{
+				UserAgent: "LiveKitCloud",
+			},
+		})
+		defer notifier.Stop(false)
+
+		ua := atomic.String{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			ua.Store(r.UserAgent())
+		}
+		require.NoError(t, notifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted}))
+		require.Eventually(
+			t,
+			func() bool {
+				return ua.Load() == "LiveKitCloud"
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
 	})
 }
 
@@ -396,12 +425,41 @@ func TestResourceWebHook(t *testing.T) {
 			require.NoError(t, err)
 
 			require.EqualValues(t, event, decodedEvent)
-			require.Equal(t, UserAgent, r.UserAgent())
+			require.Equal(t, DefaultUserAgent, r.UserAgent())
 		}
 		require.NoError(t, resourceURLNotifier.QueueNotify(context.Background(), event))
 		wg.Wait()
 	})
 
+	t.Run("overridden user agent", func(t *testing.T) {
+		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
+			HTTPClientParams: HTTPClientParams{
+				UserAgent: "LiveKitCloud",
+			},
+		})
+		defer resourceURLNotifier.Stop(false)
+
+		ua := atomic.String{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			ua.Store(r.UserAgent())
+		}
+		require.NoError(t, resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted}))
+		require.Eventually(
+			t,
+			func() bool {
+				return ua.Load() == "LiveKitCloud"
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
 }
 
 func TestResourceURLNotifierDropped(t *testing.T) {

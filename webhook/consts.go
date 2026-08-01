@@ -28,12 +28,11 @@ const (
 	userAgentHeader   = "User-Agent"
 )
 
-// use a custom mime type to ensure signature is checked prior to parsing
-const ContentType = "application/webhook+json"
-
-// receivers pin WAF rules to this, so it must stay stable across releases and
-// identical for cloud and self-hosted
-const UserAgent = "LiveKitWebhooks"
+const (
+	// use a custom mime type to ensure signature is checked prior to parsing
+	ContentType      = "application/webhook+json"
+	DefaultUserAgent = "LiveKit"
+)
 
 const (
 	EventRoomStarted                  = "room_started"
