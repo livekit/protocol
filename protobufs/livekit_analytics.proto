@@ -307,4 +307,5 @@ message WebhookInfo {
   int32 service_error_code = 20;
   string service_error = 21;
   string send_error = 22;
+  int32 http_status_code = 23; // HTTP response status code for the delivery attempt (0 if no response).
 }

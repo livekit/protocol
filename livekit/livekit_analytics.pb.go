@@ -2053,6 +2053,7 @@ type WebhookInfo struct {
 	ServiceErrorCode    int32                  `protobuf:"varint,20,opt,name=service_error_code,json=serviceErrorCode,proto3" json:"service_error_code,omitempty"`
 	ServiceError        string                 `protobuf:"bytes,21,opt,name=service_error,json=serviceError,proto3" json:"service_error,omitempty"`
 	SendError           string                 `protobuf:"bytes,22,opt,name=send_error,json=sendError,proto3" json:"send_error,omitempty"`
+	HttpStatusCode      int32                  `protobuf:"varint,23,opt,name=http_status_code,json=httpStatusCode,proto3" json:"http_status_code,omitempty"` // HTTP response status code for the delivery attempt (0 if no response).
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
 }
@@ -2239,6 +2240,13 @@ func (x *WebhookInfo) GetSendError() string {
 		return x.SendError
 	}
 	return ""
+}
+
+func (x *WebhookInfo) GetHttpStatusCode() int32 {
+	if x != nil {
+		return x.HttpStatusCode
+	}
+	return 0
 }
 
 var File_livekit_analytics_proto protoreflect.FileDescriptor
@@ -2435,7 +2443,7 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\n" +
 	"started_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12\x1f\n" +
 	"\vduration_ns\x18\x0f \x01(\x03R\n" +
-	"durationNs\"\x8c\a\n" +
+	"durationNs\"\xb6\a\n" +
 	"\vWebhookInfo\x12%\n" +
 	"\bevent_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\aeventIDR\aeventId\x12\x14\n" +
@@ -2467,7 +2475,8 @@ const file_livekit_analytics_proto_rawDesc = "" +
 	"\x12service_error_code\x18\x14 \x01(\x05R\x10serviceErrorCode\x12#\n" +
 	"\rservice_error\x18\x15 \x01(\tR\fserviceError\x12\x1d\n" +
 	"\n" +
-	"send_error\x18\x16 \x01(\tR\tsendError**\n" +
+	"send_error\x18\x16 \x01(\tR\tsendError\x12(\n" +
+	"\x10http_status_code\x18\x17 \x01(\x05R\x0ehttpStatusCode**\n" +
 	"\n" +
 	"StreamType\x12\f\n" +
 	"\bUPSTREAM\x10\x00\x12\x0e\n" +
