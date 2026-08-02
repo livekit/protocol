@@ -1438,19 +1438,22 @@ func (x *SimulationRun_Job_Usage) GetAudioTurnsCount() int32 {
 
 // The agent's perception of the caller. Audio only.
 type SimulationRun_JobMetrics_STT struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	Wer                    *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                                      // needs the RemoteSession; word error rate, pooled: word_errors / words
-	Words                  *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                                                                   // needs the RemoteSession; pooling stats: run WER = sum errors / sum words
-	WordErrors             *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`                                       // needs the RemoteSession
-	Cer                    *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                                                      // needs the RemoteSession; character error rate, pooled
-	Chars                  *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                                                   // needs the RemoteSession
-	CharErrors             *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                                      // needs the RemoteSession
-	KeytermRecall          *float32               `protobuf:"fixed32,5,opt,name=keyterm_recall,json=keytermRecall,proto3,oneof" json:"keyterm_recall,omitempty"`                             // needs the RemoteSession; recall of uttered key entities (names, IDs, amounts)
-	KeytermsUttered        *uint32                `protobuf:"varint,6,opt,name=keyterms_uttered,json=keytermsUttered,proto3,oneof" json:"keyterms_uttered,omitempty"`                        // needs the RemoteSession
-	KeytermsRecognized     *uint32                `protobuf:"varint,7,opt,name=keyterms_recognized,json=keytermsRecognized,proto3,oneof" json:"keyterms_recognized,omitempty"`               // needs the RemoteSession
-	TranscriptionLatencyMs *uint32                `protobuf:"varint,8,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay, mean
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state                      protoimpl.MessageState `protogen:"open.v1"`
+	Wer                        *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                                                   // needs the RemoteSession; word error rate, pooled: word_errors / words
+	Words                      *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                                                                                // needs the RemoteSession; pooling stats: run WER = sum errors / sum words
+	WordErrors                 *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`                                                    // needs the RemoteSession
+	Cer                        *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                                                                   // needs the RemoteSession; character error rate, pooled
+	Chars                      *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                                                                // needs the RemoteSession
+	CharErrors                 *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                                                   // needs the RemoteSession
+	KeytermRecall              *float32               `protobuf:"fixed32,5,opt,name=keyterm_recall,json=keytermRecall,proto3,oneof" json:"keyterm_recall,omitempty"`                                          // needs the RemoteSession; pooled: acquired_recognized / acquired_uttered
+	KeytermRecognition         *float32               `protobuf:"fixed32,11,opt,name=keyterm_recognition,json=keytermRecognition,proto3,oneof" json:"keyterm_recognition,omitempty"`                          // needs the RemoteSession; pooled: recognized / uttered
+	KeytermsUttered            *uint32                `protobuf:"varint,6,opt,name=keyterms_uttered,json=keytermsUttered,proto3,oneof" json:"keyterms_uttered,omitempty"`                                     // needs the RemoteSession; every saying of a key entity
+	KeytermsRecognized         *uint32                `protobuf:"varint,7,opt,name=keyterms_recognized,json=keytermsRecognized,proto3,oneof" json:"keyterms_recognized,omitempty"`                            // needs the RemoteSession; of those, heard right
+	KeytermsAcquiredUttered    *uint32                `protobuf:"varint,12,opt,name=keyterms_acquired_uttered,json=keytermsAcquiredUttered,proto3,oneof" json:"keyterms_acquired_uttered,omitempty"`          // needs the RemoteSession; sayings after acquiring
+	KeytermsAcquiredRecognized *uint32                `protobuf:"varint,13,opt,name=keyterms_acquired_recognized,json=keytermsAcquiredRecognized,proto3,oneof" json:"keyterms_acquired_recognized,omitempty"` // needs the RemoteSession; of those, still heard right
+	TranscriptionLatencyMs     *uint32                `protobuf:"varint,8,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"`              // needs the RemoteSession; agent-reported STT/endpointing delay, mean
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_STT) Reset() {
@@ -1532,6 +1535,13 @@ func (x *SimulationRun_JobMetrics_STT) GetKeytermRecall() float32 {
 	return 0
 }
 
+func (x *SimulationRun_JobMetrics_STT) GetKeytermRecognition() float32 {
+	if x != nil && x.KeytermRecognition != nil {
+		return *x.KeytermRecognition
+	}
+	return 0
+}
+
 func (x *SimulationRun_JobMetrics_STT) GetKeytermsUttered() uint32 {
 	if x != nil && x.KeytermsUttered != nil {
 		return *x.KeytermsUttered
@@ -1542,6 +1552,20 @@ func (x *SimulationRun_JobMetrics_STT) GetKeytermsUttered() uint32 {
 func (x *SimulationRun_JobMetrics_STT) GetKeytermsRecognized() uint32 {
 	if x != nil && x.KeytermsRecognized != nil {
 		return *x.KeytermsRecognized
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetKeytermsAcquiredUttered() uint32 {
+	if x != nil && x.KeytermsAcquiredUttered != nil {
+		return *x.KeytermsAcquiredUttered
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetKeytermsAcquiredRecognized() uint32 {
+	if x != nil && x.KeytermsAcquiredRecognized != nil {
+		return *x.KeytermsAcquiredRecognized
 	}
 	return 0
 }
@@ -2787,7 +2811,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xf5<\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x8a?\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2837,7 +2861,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xad \n" +
+	"\x1a\xc2\"\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2854,7 +2878,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"judgeModel\x12*\n" +
 	"\x11audio_judge_model\x18\v \x01(\tR\x0faudioJudgeModel\x12,\n" +
 	"\x12has_remote_session\x18\f \x01(\bR\x10hasRemoteSession\x12*\n" +
-	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x1a\xa7\x04\n" +
+	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x1a\xbc\x06\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
@@ -2865,19 +2889,26 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vchar_errors\x18\n" +
 	" \x01(\rH\x05R\n" +
 	"charErrors\x88\x01\x01\x12*\n" +
-	"\x0ekeyterm_recall\x18\x05 \x01(\x02H\x06R\rkeytermRecall\x88\x01\x01\x12.\n" +
-	"\x10keyterms_uttered\x18\x06 \x01(\rH\aR\x0fkeytermsUttered\x88\x01\x01\x124\n" +
-	"\x13keyterms_recognized\x18\a \x01(\rH\bR\x12keytermsRecognized\x88\x01\x01\x12=\n" +
-	"\x18transcription_latency_ms\x18\b \x01(\rH\tR\x16transcriptionLatencyMs\x88\x01\x01B\x06\n" +
+	"\x0ekeyterm_recall\x18\x05 \x01(\x02H\x06R\rkeytermRecall\x88\x01\x01\x124\n" +
+	"\x13keyterm_recognition\x18\v \x01(\x02H\aR\x12keytermRecognition\x88\x01\x01\x12.\n" +
+	"\x10keyterms_uttered\x18\x06 \x01(\rH\bR\x0fkeytermsUttered\x88\x01\x01\x124\n" +
+	"\x13keyterms_recognized\x18\a \x01(\rH\tR\x12keytermsRecognized\x88\x01\x01\x12?\n" +
+	"\x19keyterms_acquired_uttered\x18\f \x01(\rH\n" +
+	"R\x17keytermsAcquiredUttered\x88\x01\x01\x12E\n" +
+	"\x1ckeyterms_acquired_recognized\x18\r \x01(\rH\vR\x1akeytermsAcquiredRecognized\x88\x01\x01\x12=\n" +
+	"\x18transcription_latency_ms\x18\b \x01(\rH\fR\x16transcriptionLatencyMs\x88\x01\x01B\x06\n" +
 	"\x04_werB\b\n" +
 	"\x06_wordsB\x0e\n" +
 	"\f_word_errorsB\x06\n" +
 	"\x04_cerB\b\n" +
 	"\x06_charsB\x0e\n" +
 	"\f_char_errorsB\x11\n" +
-	"\x0f_keyterm_recallB\x13\n" +
+	"\x0f_keyterm_recallB\x16\n" +
+	"\x14_keyterm_recognitionB\x13\n" +
 	"\x11_keyterms_utteredB\x16\n" +
-	"\x14_keyterms_recognizedB\x1b\n" +
+	"\x14_keyterms_recognizedB\x1c\n" +
+	"\x1a_keyterms_acquired_utteredB\x1f\n" +
+	"\x1d_keyterms_acquired_recognizedB\x1b\n" +
 	"\x19_transcription_latency_ms\x1a\xe8\x01\n" +
 	"\x03LLM\x12\x1c\n" +
 	"\attft_ms\x18\x01 \x01(\rH\x00R\x06ttftMs\x88\x01\x01\x12\x1c\n" +

@@ -113,9 +113,12 @@ message SimulationRun {
       optional float cer = 4;                       // needs the RemoteSession; character error rate, pooled
       optional uint32 chars = 9;                    // needs the RemoteSession
       optional uint32 char_errors = 10;             // needs the RemoteSession
-      optional float keyterm_recall = 5;            // needs the RemoteSession; recall of uttered key entities (names, IDs, amounts)
-      optional uint32 keyterms_uttered = 6;         // needs the RemoteSession
-      optional uint32 keyterms_recognized = 7;      // needs the RemoteSession
+      optional float keyterm_recall = 5;                 // needs the RemoteSession; pooled: acquired_recognized / acquired_uttered
+      optional float keyterm_recognition = 11;           // needs the RemoteSession; pooled: recognized / uttered
+      optional uint32 keyterms_uttered = 6;              // needs the RemoteSession; every saying of a key entity
+      optional uint32 keyterms_recognized = 7;           // needs the RemoteSession; of those, heard right
+      optional uint32 keyterms_acquired_uttered = 12;    // needs the RemoteSession; sayings after acquiring
+      optional uint32 keyterms_acquired_recognized = 13; // needs the RemoteSession; of those, still heard right
       optional uint32 transcription_latency_ms = 8; // needs the RemoteSession; agent-reported STT/endpointing delay, mean
     }
 
