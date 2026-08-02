@@ -7,3 +7,5 @@ minimumReleaseAgeExclude:
   - "@livekit/*"
   # Renovate security update: @babel/core@7.29.6
   - "@babel/core@7.29.6"
+  # Renovate security update: js-yaml@3.15.0
+  - js-yaml@3.15.0
