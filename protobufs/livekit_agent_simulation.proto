@@ -187,12 +187,12 @@ message SimulationRun {
       optional uint32 end_ms = 4;       // audio only
 
       // Job groups hold means/pools of these; a field with no per-turn measurement stays unset here.
-      STT stt = 5;                      // transcription_latency_ms
-      LLM llm = 6;                      // ttft_ms, ttfs_ms, tokens_per_second
-      TTS tts = 7;                      // ttfa_ms, ttfb_ms, naturalness_score, enunciation_score
-      Conversation conversation = 8;    // response_latency_ms, agent_yield_latency_ms, agent_reported_e2e_latency_ms, 0/1 counts
+      STT stt = 5;
+      LLM llm = 6;
+      TTS tts = 7;
+      Conversation conversation = 8;
 
-      optional float conciseness = 9;   // judged {0, 0.5, 1}
+      optional float conciseness = 9;
     }
   }
 
