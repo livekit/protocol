@@ -219,9 +219,8 @@ message SimulationRun {
     JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
 
-    uint32 jobs_total = 9;
-    uint32 jobs_measured = 10;         // composites cover jobs_measured - jobs_simulator_fault
-    uint32 jobs_simulator_fault = 11;  // spoiled by the simulator: flagged, not scored
+    reserved 9, 10, 11;  // was jobs_total, jobs_measured, jobs_simulator_fault
+    reserved "jobs_total", "jobs_measured", "jobs_simulator_fault";
   }
 
   message Create {
