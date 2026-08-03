@@ -110,9 +110,7 @@ message SimulationRun {
     optional bool information_loss = 16;
     optional bool redundant_statements = 17;
     optional bool poor_question_quality = 18;
-    // Derived from the flags by fixed formula (0 flags = 1.0, 1 = 0.5, 2+ = 0.0);
-    // the flags reach experience_score only through this, never directly.
-    optional float conversation_progression = 19;
+    optional float conversation_progression = 19;  // 0-1, derived from the flags above
 
     // The agent's perception of the caller. Audio only.
     message STT {
@@ -124,13 +122,12 @@ message SimulationRun {
       optional uint32 char_errors = 10;             // needs the RemoteSession
       optional uint32 transcription_latency_ms = 8; // needs the RemoteSession; agent-reported STT/endpointing delay, mean
 
-      // Key entities (names, IDs, amounts) LLM-extracted from the authored dialog,
-      // scored by occurrence survival over the WER alignment. Needs the text judge.
-      optional float entity_recognition = 11;  // recognized / uttered; feeds accuracy_score
-      optional uint32 entities_uttered = 12;   // pooling stats
+      // Key entities (names, IDs, amounts) the caller said. Needs the text judge.
+      optional float entity_recognition = 11;  // recognized / uttered
+      optional uint32 entities_uttered = 12;
       optional uint32 entities_recognized = 13;
 
-      reserved 5, 6, 7;  // was keyterm_recall, keyterms_uttered, keyterms_recognized (methodology replaced by entity_*)
+      reserved 5, 6, 7;  // was keyterm_recall, keyterms_uttered, keyterms_recognized
       reserved "keyterm_recall", "keyterms_uttered", "keyterms_recognized";
     }
 
@@ -139,7 +136,7 @@ message SimulationRun {
       optional uint32 ttfs_ms = 2;            // needs the RemoteSession; time to first sentence (the smallest speakable unit)
       optional float tokens_per_second = 3;   // needs the RemoteSession; decode rate, mean (per-turn in turns.llm)
 
-      reserved 4;  // was conciseness_score; conciseness is a dialog judgment, moved to JobMetrics/Turn
+      reserved 4;  // was conciseness_score, now on JobMetrics/Turn
       reserved "conciseness_score";
     }
 
@@ -156,13 +153,12 @@ message SimulationRun {
       optional float naturalness_score = 5;    // needs the audio judge; judged 0-1: prosody / expressiveness
       optional float enunciation_score = 6;    // needs the audio judge; judged 0-1: key entities audibly intact
 
-      // Did the simulator hear the agent's key entities intact? Same
-      // methodology as STT.entity_*, opposite direction. Needs the text judge.
-      optional float entity_recognition = 14;
-      optional uint32 entities_uttered = 15;   // pooling stats
+      // Key entities the agent said, as the caller heard them. Needs the text judge.
+      optional float entity_recognition = 14;  // recognized / uttered
+      optional uint32 entities_uttered = 15;
       optional uint32 entities_recognized = 16;
 
-      reserved 4, 12, 13;  // was speech_rate_wpm + its pooling stats (heard_words, speech_ms); real speaking rate needs a prosody model
+      reserved 4, 12, 13;  // was speech_rate_wpm, heard_words, speech_ms
       reserved "speech_rate_wpm", "heard_words", "speech_ms";
     }
 
@@ -173,10 +169,10 @@ message SimulationRun {
       optional int32 response_latency_p95_ms = 3;
       optional int32 response_latency_p99_ms = 4;
       optional int32 response_latency_ms = 16;           // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
-      optional uint32 response_latency_samples = 17;     // clean handoffs behind the percentiles; cut-ins are excluded and counted below
+      optional uint32 response_latency_samples = 17;     // samples behind the percentiles
       optional uint32 agent_yield_latency_ms = 5;        // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
-      optional uint32 eot_misprediction_count = 6;       // agent cut in >= 200ms before the caller's turn ended; 0/1 per turn
-      optional float overlap_ratio = 7;                  // competitive overlap (backchannels excluded) / voiced union
+      optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended; 0/1 per turn
+      optional float overlap_ratio = 7;                  // overlapping speech / total speech
       optional uint32 overlap_speech_ms = 8;             // pooling stats for overlap_ratio
       optional uint32 total_speech_ms = 9;
       optional uint32 awkward_silence_count = 11;        // gaps past the natural-pause threshold; 0/1 per turn
@@ -184,7 +180,7 @@ message SimulationRun {
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
       optional uint32 agent_reported_e2e_latency_ms = 15; // needs the RemoteSession; the agent's own claim, mean
 
-      reserved 10, 14;  // was silence_total_ms (derivable from turn edges), false_interruption_unrecovered_count (recovery no longer tracked)
+      reserved 10, 14;  // was silence_total_ms, false_interruption_unrecovered_count
       reserved "silence_total_ms", "false_interruption_unrecovered_count";
     }
 
@@ -209,7 +205,7 @@ message SimulationRun {
       TTS tts = 7;                      // ttfa_ms, ttfb_ms, naturalness_score, enunciation_score
       Conversation conversation = 8;    // response_latency_ms, agent_yield_latency_ms, agent_reported_e2e_latency_ms, 0/1 counts
 
-      optional float conciseness = 9;   // judged {0, 0.5, 1}: this reply was brief enough for voice
+      optional float conciseness = 9;   // judged {0, 0.5, 1}
     }
   }
 
