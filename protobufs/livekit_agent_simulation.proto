@@ -169,7 +169,6 @@ message SimulationRun {
       optional int32 response_latency_p95_ms = 3;
       optional int32 response_latency_p99_ms = 4;
       optional int32 response_latency_ms = 16;           // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
-      optional uint32 response_latency_samples = 17;     // samples behind the percentiles
       optional uint32 agent_yield_latency_ms = 5;        // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
       optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended; 0/1 per turn
       optional float overlap_ratio = 7;                  // overlapping speech / total speech
