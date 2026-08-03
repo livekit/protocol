@@ -1945,23 +1945,23 @@ func (x *SimulationRun_JobMetrics_Simulator) GetLateTermination() bool {
 // over these; anything not measured for a turn stays unset.
 type SimulationRun_JobMetrics_Turn struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
-	Index             uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                                                             // 1-based, conversation order
-	Role              agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                                   // ASSISTANT = the agent under test, USER = simulator persona
-	StartMs           *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                                    // audio only; relative to t0; unset if the turn could not be aligned to the audio
-	EndMs             *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                                          // audio only
-	SttDelayMs        *uint32                `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`                         // needs the RemoteSession; simulator turns
-	LlmTtftMs         *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`                            // needs the RemoteSession
-	LlmTtfsMs         *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`                            // needs the RemoteSession
-	LlmTps            *float32               `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                                      // needs the RemoteSession
-	TtsTtfbMs         *uint32                `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`                            // needs the RemoteSession
-	E2ELatencyMs      *uint32                `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`                  // needs the RemoteSession; the agent's own claim
-	HeardE2ELatencyMs *int32                 `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"` // floor-transfer offset, cut-in if negative
-	TimeToYieldMs     *uint32                `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`             // agent audio continuing past a barge-in
-	TurnTakingScore   *float32               `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`        // 0-1
-	Conciseness       *float32               `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`                                         // needs the text judge
-	EotMisprediction  *bool                  `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`        // agent started before the caller's turn ended
-	AwkwardSilence    *bool                  `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`              // gap past the natural-pause threshold
-	Unanswered        *bool                  `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`                                            // the caller spoke, the agent never responded
+	Index             uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                                            // 1-based, conversation order
+	Role              agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                  // ASSISTANT = the agent under test, USER = simulator persona
+	StartMs           *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                   // audio only; relative to t0; unset if the turn could not be aligned to the audio
+	EndMs             *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                         // audio only
+	SttDelayMs        *uint32                `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`        // needs the RemoteSession
+	LlmTtftMs         *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`           // needs the RemoteSession
+	LlmTtfsMs         *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`           // needs the RemoteSession
+	LlmTps            *float32               `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                     // needs the RemoteSession
+	TtsTtfbMs         *uint32                `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`           // needs the RemoteSession
+	E2ELatencyMs      *uint32                `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"` // needs the RemoteSession
+	HeardE2ELatencyMs *int32                 `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"`
+	TimeToYieldMs     *uint32                `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`
+	TurnTakingScore   *float32               `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`
+	Conciseness       *float32               `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // needs the text judge
+	EotMisprediction  *bool                  `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
+	AwkwardSilence    *bool                  `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
+	Unanswered        *bool                  `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
