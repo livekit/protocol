@@ -97,7 +97,6 @@ message SimulationRun {
     repeated Turn turns = 9;
 
     string judge_model = 10;            // text judge for judged scores; "" if none ran
-    string audio_judge_model = 11;      // audio (LALM) judge; "" if none ran
     bool has_remote_session = 12;       // false = waveform-only capture (e.g. SIP)
     google.protobuf.Timestamp t0 = 13;  // audio only; call start (first speech edge); turn times relative to it
 
@@ -134,7 +133,6 @@ message SimulationRun {
 
     // The agent's voice. Audio only.
     message TTS {
-      optional uint32 ttfa_ms = 1;             // needs the RemoteSession
       optional uint32 ttfb_ms = 2;             // needs the RemoteSession; provider byte-level TTFB
       optional float wer = 3;                  // needs the RemoteSession; word_errors / words
       optional uint32 words = 7;               // needs the RemoteSession
@@ -142,8 +140,6 @@ message SimulationRun {
       optional float cer = 9;                  // needs the RemoteSession; char_errors / chars
       optional uint32 chars = 10;              // needs the RemoteSession
       optional uint32 char_errors = 11;        // needs the RemoteSession
-      optional float naturalness_score = 5;    // needs the audio judge; 0-1, prosody / expressiveness
-      optional float enunciation_score = 6;    // needs the audio judge; 0-1, key entities audibly intact
 
       // Key entities the agent said, as the caller heard them. Needs the text judge.
       optional float entity_recognition = 14;  // recognized / uttered
@@ -183,7 +179,7 @@ message SimulationRun {
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 
-      optional uint32 transcription_delay_ms = 5;  // needs the RemoteSession; simulator turns
+      optional uint32 transcription_latency_ms = 5;  // needs the RemoteSession; simulator turns
       optional uint32 llm_ttft_ms = 6;             // needs the RemoteSession
       optional uint32 llm_ttfs_ms = 7;             // needs the RemoteSession
       optional float tokens_per_second = 8;        // needs the RemoteSession
