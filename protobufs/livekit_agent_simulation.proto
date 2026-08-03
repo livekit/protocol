@@ -91,7 +91,6 @@ message SimulationRun {
     LLM llm = 5;
     TTS tts = 6;
     Conversation conversation = 7;
-    Simulator simulator = 8;
 
     // One entry per turn, both speakers.
     repeated Turn turns = 9;
@@ -162,13 +161,6 @@ message SimulationRun {
       optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
       optional uint32 e2e_latency_ms = 15;               // needs the RemoteSession; the agent's own claim
-    }
-
-    // Was the call spoiled by the simulator, not the agent? Diagnostic only,
-    // never folded into the scores.
-    message Simulator {
-      optional bool early_termination = 1;  // simulator ended a still-progressing call
-      optional bool late_termination = 2;   // simulator dragged on after the goal was met
     }
 
     // Rows exist for text and audio. The groups above hold the means and pools
