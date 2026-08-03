@@ -912,12 +912,12 @@ type SimulationRun_JobMetrics struct {
 	HasRemoteSession bool                             `protobuf:"varint,12,opt,name=has_remote_session,json=hasRemoteSession,proto3" json:"has_remote_session,omitempty"` // false = waveform-only capture (e.g. SIP)
 	T0               *timestamppb.Timestamp           `protobuf:"bytes,13,opt,name=t0,proto3" json:"t0,omitempty"`                                                        // audio only; call start (first speech edge); turn times relative to it
 	// Judged over the authored dialog (text and audio); needs the text judge.
-	Conciseness *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1} per agent turn: brief enough for voice; job = mean
-	// Whole-call issue flags (true = issue; absent = not judged), each first-class:
-	UnnecessaryToolCalls *bool `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"` // tool churn the dialog did not require
-	InformationLoss      *bool `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`                  // agent dropped or forgot stated facts
-	RedundantStatements  *bool `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`      // agent repeated itself without cause
-	PoorQuestionQuality  *bool `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`    // vague, stacked, or already-answered questions
+	Conciseness *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1} per agent turn; job = mean
+	// Whole-call issue flags; true = present, absent = not judged.
+	UnnecessaryToolCalls *bool `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"`
+	InformationLoss      *bool `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`
+	RedundantStatements  *bool `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`
+	PoorQuestionQuality  *bool `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`
 	// Derived from the flags by fixed formula (0 flags = 1.0, 1 = 0.5, 2+ = 0.0);
 	// the flags reach experience_score only through this, never directly.
 	ConversationProgression *float32 `protobuf:"fixed32,19,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"`
@@ -1090,21 +1090,19 @@ func (x *SimulationRun_JobMetrics) GetConversationProgression() float32 {
 
 // Aggregates over this run's jobs. Reuses the JobMetrics group shapes.
 type SimulationRun_RunMetrics struct {
-	state                   protoimpl.MessageState                 `protogen:"open.v1"`
-	AccuracyScore           *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"` // mean over scored jobs
-	ExperienceScore         *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
-	ScenarioPassRate        *float32                               `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"` // share of jobs whose scenario verdict passed
-	Stt                     *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
-	Llm                     *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
-	Tts                     *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
-	Conversation            *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	JobsTotal               uint32                                 `protobuf:"varint,9,opt,name=jobs_total,json=jobsTotal,proto3" json:"jobs_total,omitempty"`
-	JobsMeasured            uint32                                 `protobuf:"varint,10,opt,name=jobs_measured,json=jobsMeasured,proto3" json:"jobs_measured,omitempty"`                                         // composites cover jobs_measured - jobs_simulator_fault
-	JobsSimulatorFault      uint32                                 `protobuf:"varint,11,opt,name=jobs_simulator_fault,json=jobsSimulatorFault,proto3" json:"jobs_simulator_fault,omitempty"`                     // spoiled by the simulator: flagged, not scored
-	Conciseness             *float32                               `protobuf:"fixed32,12,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`                                                        // mean over judged jobs
-	ConversationProgression *float32                               `protobuf:"fixed32,13,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"` // mean over judged jobs
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	state              protoimpl.MessageState                 `protogen:"open.v1"`
+	AccuracyScore      *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"` // mean over scored jobs
+	ExperienceScore    *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
+	ScenarioPassRate   *float32                               `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"` // share of jobs whose scenario verdict passed
+	Stt                *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm                *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts                *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation       *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	JobsTotal          uint32                                 `protobuf:"varint,9,opt,name=jobs_total,json=jobsTotal,proto3" json:"jobs_total,omitempty"`
+	JobsMeasured       uint32                                 `protobuf:"varint,10,opt,name=jobs_measured,json=jobsMeasured,proto3" json:"jobs_measured,omitempty"`                     // composites cover jobs_measured - jobs_simulator_fault
+	JobsSimulatorFault uint32                                 `protobuf:"varint,11,opt,name=jobs_simulator_fault,json=jobsSimulatorFault,proto3" json:"jobs_simulator_fault,omitempty"` // spoiled by the simulator: flagged, not scored
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *SimulationRun_RunMetrics) Reset() {
@@ -1203,20 +1201,6 @@ func (x *SimulationRun_RunMetrics) GetJobsMeasured() uint32 {
 func (x *SimulationRun_RunMetrics) GetJobsSimulatorFault() uint32 {
 	if x != nil {
 		return x.JobsSimulatorFault
-	}
-	return 0
-}
-
-func (x *SimulationRun_RunMetrics) GetConciseness() float32 {
-	if x != nil && x.Conciseness != nil {
-		return *x.Conciseness
-	}
-	return 0
-}
-
-func (x *SimulationRun_RunMetrics) GetConversationProgression() float32 {
-	if x != nil && x.ConversationProgression != nil {
-		return *x.ConversationProgression
 	}
 	return 0
 }
@@ -2852,7 +2836,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xf1B\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xddA\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3052,7 +3036,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11_information_lossB\x17\n" +
 	"\x15_redundant_statementsB\x18\n" +
 	"\x16_poor_question_qualityB\x1b\n" +
-	"\x19_conversation_progression\x1a\xe3\x05\n" +
+	"\x19_conversation_progression\x1a\xcf\x04\n" +
 	"\n" +
 	"RunMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -3066,14 +3050,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"jobs_total\x18\t \x01(\rR\tjobsTotal\x12#\n" +
 	"\rjobs_measured\x18\n" +
 	" \x01(\rR\fjobsMeasured\x120\n" +
-	"\x14jobs_simulator_fault\x18\v \x01(\rR\x12jobsSimulatorFault\x12%\n" +
-	"\vconciseness\x18\f \x01(\x02H\x03R\vconciseness\x88\x01\x01\x12>\n" +
-	"\x18conversation_progression\x18\r \x01(\x02H\x04R\x17conversationProgression\x88\x01\x01B\x11\n" +
+	"\x14jobs_simulator_fault\x18\v \x01(\rR\x12jobsSimulatorFaultB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x15\n" +
-	"\x13_scenario_pass_rateB\x0e\n" +
-	"\f_concisenessB\x1b\n" +
-	"\x19_conversation_progression\x1a\xf5\x03\n" +
+	"\x13_scenario_pass_rate\x1a\xf5\x03\n" +
 	"\x06Create\x1a\xdc\x02\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
