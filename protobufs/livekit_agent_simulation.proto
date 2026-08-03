@@ -179,21 +179,21 @@ message SimulationRun {
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 
-      optional uint32 stt_delay_ms = 5;             // needs the RemoteSession; simulator turns
-      optional uint32 llm_ttft_ms = 6;             // needs the RemoteSession
-      optional uint32 llm_ttfs_ms = 7;             // needs the RemoteSession
-      optional float llm_tps = 8;                  // needs the RemoteSession
-      optional uint32 tts_ttfb_ms = 9;             // needs the RemoteSession
-      optional uint32 e2e_latency_ms = 10;         // needs the RemoteSession; the agent's own claim
+      optional uint32 stt_delay_ms = 5;    // needs the RemoteSession
+      optional uint32 llm_ttft_ms = 6;     // needs the RemoteSession
+      optional uint32 llm_ttfs_ms = 7;     // needs the RemoteSession
+      optional float llm_tps = 8;          // needs the RemoteSession
+      optional uint32 tts_ttfb_ms = 9;     // needs the RemoteSession
+      optional uint32 e2e_latency_ms = 10; // needs the RemoteSession
 
-      optional int32 heard_e2e_latency_ms = 11;    // floor-transfer offset, cut-in if negative
-      optional uint32 time_to_yield_ms = 12;       // agent audio continuing past a barge-in
-      optional float turn_taking_score = 13;       // 0-1
-      optional float conciseness = 14;             // needs the text judge
+      optional int32 heard_e2e_latency_ms = 11;
+      optional uint32 time_to_yield_ms = 12;
+      optional float turn_taking_score = 13;
+      optional float conciseness = 14;     // needs the text judge
 
-      optional bool eot_misprediction = 15;        // agent started before the caller's turn ended
-      optional bool awkward_silence = 16;          // gap past the natural-pause threshold
-      optional bool unanswered = 17;               // the caller spoke, the agent never responded
+      optional bool eot_misprediction = 15;
+      optional bool awkward_silence = 16;
+      optional bool unanswered = 17;
     }
   }
 
