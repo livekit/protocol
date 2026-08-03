@@ -180,8 +180,6 @@ var (
 		VP9ProfileId1CodecParameters,
 		H264ProfileLevelId42e01fPacketizationMode0CodecParameters,
 		H264ProfileLevelId42e01fPacketizationMode1CodecParameters,
-		H264ProfileLevelId42001fPacketizationMode0CodecParameters,
-		H264ProfileLevelId42001fPacketizationMode1CodecParameters,
 		H264HighProfileCodecParameters,
 		AV1CodecParameters,
 		H265CodecParameters,
