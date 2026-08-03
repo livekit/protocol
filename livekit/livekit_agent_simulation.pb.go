@@ -910,13 +910,11 @@ type SimulationRun_JobMetrics struct {
 	// Judged over the authored dialog (text and audio); needs the text judge.
 	Conciseness *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1} per agent turn; job = mean
 	// Whole-call issue flags; true = present, absent = not judged.
-	UnnecessaryToolCalls *bool `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"`
-	InformationLoss      *bool `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`
-	RedundantStatements  *bool `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`
-	PoorQuestionQuality  *bool `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`
-	// Derived from the flags by fixed formula (0 flags = 1.0, 1 = 0.5, 2+ = 0.0);
-	// the flags reach experience_score only through this, never directly.
-	ConversationProgression *float32 `protobuf:"fixed32,19,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"`
+	UnnecessaryToolCalls    *bool    `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"`
+	InformationLoss         *bool    `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`
+	RedundantStatements     *bool    `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`
+	PoorQuestionQuality     *bool    `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`
+	ConversationProgression *float32 `protobuf:"fixed32,19,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"` // 0-1, derived from the flags above
 	unknownFields           protoimpl.UnknownFields
 	sizeCache               protoimpl.SizeCache
 }
@@ -1495,10 +1493,9 @@ type SimulationRun_JobMetrics_STT struct {
 	Chars                  *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                                                   // needs the RemoteSession
 	CharErrors             *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                                      // needs the RemoteSession
 	TranscriptionLatencyMs *uint32                `protobuf:"varint,8,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay, mean
-	// Key entities (names, IDs, amounts) LLM-extracted from the authored dialog,
-	// scored by occurrence survival over the WER alignment. Needs the text judge.
-	EntityRecognition  *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered; feeds accuracy_score
-	EntitiesUttered    *uint32  `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`        // pooling stats
+	// Key entities (names, IDs, amounts) the caller said. Needs the text judge.
+	EntityRecognition  *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
+	EntitiesUttered    *uint32  `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
 	EntitiesRecognized *uint32  `protobuf:"varint,13,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
@@ -1677,10 +1674,9 @@ type SimulationRun_JobMetrics_TTS struct {
 	CharErrors       *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                   // needs the RemoteSession
 	NaturalnessScore *float32               `protobuf:"fixed32,5,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"` // needs the audio judge; judged 0-1: prosody / expressiveness
 	EnunciationScore *float32               `protobuf:"fixed32,6,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // needs the audio judge; judged 0-1: key entities audibly intact
-	// Did the simulator hear the agent's key entities intact? Same
-	// methodology as STT.entity_*, opposite direction. Needs the text judge.
-	EntityRecognition  *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"`
-	EntitiesUttered    *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"` // pooling stats
+	// Key entities the agent said, as the caller heard them. Needs the text judge.
+	EntityRecognition  *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
+	EntitiesUttered    *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
 	EntitiesRecognized *uint32  `protobuf:"varint,16,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
@@ -1815,10 +1811,10 @@ type SimulationRun_JobMetrics_Conversation struct {
 	ResponseLatencyP95Ms      *int32                 `protobuf:"varint,3,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
 	ResponseLatencyP99Ms      *int32                 `protobuf:"varint,4,opt,name=response_latency_p99_ms,json=responseLatencyP99Ms,proto3,oneof" json:"response_latency_p99_ms,omitempty"`
 	ResponseLatencyMs         *int32                 `protobuf:"varint,16,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`                // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
-	ResponseLatencySamples    *uint32                `protobuf:"varint,17,opt,name=response_latency_samples,json=responseLatencySamples,proto3,oneof" json:"response_latency_samples,omitempty"` // clean handoffs behind the percentiles; cut-ins are excluded and counted below
+	ResponseLatencySamples    *uint32                `protobuf:"varint,17,opt,name=response_latency_samples,json=responseLatencySamples,proto3,oneof" json:"response_latency_samples,omitempty"` // samples behind the percentiles
 	AgentYieldLatencyMs       *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`         // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
-	EotMispredictionCount     *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"`     // agent cut in >= 200ms before the caller's turn ended; 0/1 per turn
-	OverlapRatio              *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                                 // competitive overlap (backchannels excluded) / voiced union
+	EotMispredictionCount     *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"`     // agent started before the caller's turn ended; 0/1 per turn
+	OverlapRatio              *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                                 // overlapping speech / total speech
 	OverlapSpeechMs           *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                       // pooling stats for overlap_ratio
 	TotalSpeechMs             *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
 	AwkwardSilenceCount       *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`                       // gaps past the natural-pause threshold; 0/1 per turn
@@ -2031,7 +2027,7 @@ type SimulationRun_JobMetrics_Turn struct {
 	Llm           *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,6,opt,name=llm,proto3" json:"llm,omitempty"`                         // ttft_ms, ttfs_ms, tokens_per_second
 	Tts           *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,7,opt,name=tts,proto3" json:"tts,omitempty"`                         // ttfa_ms, ttfb_ms, naturalness_score, enunciation_score
 	Conversation  *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,8,opt,name=conversation,proto3" json:"conversation,omitempty"`       // response_latency_ms, agent_yield_latency_ms, agent_reported_e2e_latency_ms, 0/1 counts
-	Conciseness   *float32                               `protobuf:"fixed32,9,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1}: this reply was brief enough for voice
+	Conciseness   *float32                               `protobuf:"fixed32,9,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1}
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
