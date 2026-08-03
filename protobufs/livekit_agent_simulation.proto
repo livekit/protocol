@@ -107,12 +107,12 @@ message SimulationRun {
     google.protobuf.Timestamp t0 = 13;  // audio only; call start (first speech edge); turn times relative to it
 
     // Judged over the authored dialog (text and audio); needs the text judge.
-    optional float conciseness = 14;               // judged {0, 0.5, 1} per agent turn: brief enough for voice; job = mean
-    // Whole-call issue flags (true = issue; absent = not judged), each first-class:
-    optional bool unnecessary_tool_calls = 15;     // tool churn the dialog did not require
-    optional bool information_loss = 16;           // agent dropped or forgot stated facts
-    optional bool redundant_statements = 17;       // agent repeated itself without cause
-    optional bool poor_question_quality = 18;      // vague, stacked, or already-answered questions
+    optional float conciseness = 14;  // judged {0, 0.5, 1} per agent turn; job = mean
+    // Whole-call issue flags; true = present, absent = not judged.
+    optional bool unnecessary_tool_calls = 15;
+    optional bool information_loss = 16;
+    optional bool redundant_statements = 17;
+    optional bool poor_question_quality = 18;
     // Derived from the flags by fixed formula (0 flags = 1.0, 1 = 0.5, 2+ = 0.0);
     // the flags reach experience_score only through this, never directly.
     optional float conversation_progression = 19;
@@ -230,9 +230,6 @@ message SimulationRun {
     uint32 jobs_total = 9;
     uint32 jobs_measured = 10;         // composites cover jobs_measured - jobs_simulator_fault
     uint32 jobs_simulator_fault = 11;  // spoiled by the simulator: flagged, not scored
-
-    optional float conciseness = 12;               // mean over judged jobs
-    optional float conversation_progression = 13;  // mean over judged jobs
   }
 
   message Create {
