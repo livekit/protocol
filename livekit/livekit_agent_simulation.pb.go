@@ -891,11 +891,7 @@ func (x *SimulationRun_Job) GetMetrics() *SimulationRun_JobMetrics {
 type SimulationRun_JobMetrics struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Headline scores, 0-1, computed by the worker as weighted means over the
-	// members that ran (a missing member renormalizes the rest):
-	//
-	//	accuracy   = task_completion x3 + (1 - stt.wer) + stt.entity_recognition
-	//	experience = conversation.turn_taking_score x2 + conciseness + conversation_progression
-	//	           + (1 - conversation.false_interruption_count / agent turns, penalty-only)
+	// members that ran (a missing member renormalizes the rest).
 	AccuracyScore   *float32 `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"`       // absent when the simulator spoiled the call
 	ExperienceScore *float32 `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"` // absent when the simulator spoiled the call
 	// The accuracy anchor: the scenario verdict as 1/0, or the fraction of the declared target state the call reached.
