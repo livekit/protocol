@@ -122,6 +122,12 @@ message SimulationRun {
       optional float entity_recognition = 11;  // recognized / uttered
       optional uint32 entities_uttered = 12;
       optional uint32 entities_recognized = 13;
+      // Retention: an entity is acquired at the first saying heard right, and
+      // these count only the sayings after that, so recall separates keeping an
+      // entity from ever getting it.
+      optional float entity_recall = 14;  // acquired_recognized / acquired_uttered
+      optional uint32 entities_acquired_uttered = 15;
+      optional uint32 entities_acquired_recognized = 16;
     }
 
     message LLM {
@@ -144,6 +150,9 @@ message SimulationRun {
       optional float entity_recognition = 14;  // recognized / uttered
       optional uint32 entities_uttered = 15;
       optional uint32 entities_recognized = 16;
+      optional float entity_recall = 17;  // acquired_recognized / acquired_uttered
+      optional uint32 entities_acquired_uttered = 18;
+      optional uint32 entities_acquired_recognized = 19;
     }
 
     // Audio only.
