@@ -201,6 +201,19 @@ message SimulationRun {
     }
   }
 
+  // Aggregates over this run's jobs, so a run summary does not have to pull
+  // every job and turn. Reuses the JobMetrics group shapes.
+  message RunMetrics {
+    optional float accuracy_score = 1;     // mean over scored jobs
+    optional float experience_score = 2;
+    optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
+
+    JobMetrics.STT stt = 4;
+    JobMetrics.LLM llm = 5;
+    JobMetrics.TTS tts = 6;
+    JobMetrics.Conversation conversation = 7;
+  }
+
   message Create {
     message Request {
       reserved 3;  // was agent_description (input never consumed; description is derived from source)
@@ -289,6 +302,8 @@ message SimulationRun {
   int32 concurrency = 17;
   // Conversation mode for every job in this run; unspecified = TEXT.
   SimulationMode mode = 18;
+  // Run-level aggregates over this run's jobs.
+  RunMetrics metrics = 19;
   // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
   // Compressed by default so the blob ships as-is on every hop.
   bytes summary_zstd = 20;
