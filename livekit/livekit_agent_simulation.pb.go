@@ -902,7 +902,6 @@ type SimulationRun_JobMetrics struct {
 	// One entry per turn, both speakers.
 	Turns            []*SimulationRun_JobMetrics_Turn `protobuf:"bytes,9,rep,name=turns,proto3" json:"turns,omitempty"`
 	JudgeModel       string                           `protobuf:"bytes,10,opt,name=judge_model,json=judgeModel,proto3" json:"judge_model,omitempty"`                      // text judge for judged scores; "" if none ran
-	AudioJudgeModel  string                           `protobuf:"bytes,11,opt,name=audio_judge_model,json=audioJudgeModel,proto3" json:"audio_judge_model,omitempty"`     // audio (LALM) judge; "" if none ran
 	HasRemoteSession bool                             `protobuf:"varint,12,opt,name=has_remote_session,json=hasRemoteSession,proto3" json:"has_remote_session,omitempty"` // false = waveform-only capture (e.g. SIP)
 	T0               *timestamppb.Timestamp           `protobuf:"bytes,13,opt,name=t0,proto3" json:"t0,omitempty"`                                                        // audio only; call start (first speech edge); turn times relative to it
 	// Judged over the authored dialog (text and audio); needs the text judge.
@@ -1013,13 +1012,6 @@ func (x *SimulationRun_JobMetrics) GetTurns() []*SimulationRun_JobMetrics_Turn {
 func (x *SimulationRun_JobMetrics) GetJudgeModel() string {
 	if x != nil {
 		return x.JudgeModel
-	}
-	return ""
-}
-
-func (x *SimulationRun_JobMetrics) GetAudioJudgeModel() string {
-	if x != nil {
-		return x.AudioJudgeModel
 	}
 	return ""
 }
@@ -1638,17 +1630,14 @@ func (x *SimulationRun_JobMetrics_LLM) GetTokensPerSecond() float32 {
 
 // The agent's voice. Audio only.
 type SimulationRun_JobMetrics_TTS struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	TtfaMs           *uint32                `protobuf:"varint,1,opt,name=ttfa_ms,json=ttfaMs,proto3,oneof" json:"ttfa_ms,omitempty"`                                // needs the RemoteSession
-	TtfbMs           *uint32                `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`                                // needs the RemoteSession; provider byte-level TTFB
-	Wer              *float32               `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                   // needs the RemoteSession; word_errors / words
-	Words            *uint32                `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`                                                // needs the RemoteSession
-	WordErrors       *uint32                `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`                    // needs the RemoteSession
-	Cer              *float32               `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                                   // needs the RemoteSession; char_errors / chars
-	Chars            *uint32                `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                               // needs the RemoteSession
-	CharErrors       *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                   // needs the RemoteSession
-	NaturalnessScore *float32               `protobuf:"fixed32,5,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"` // needs the audio judge; 0-1, prosody / expressiveness
-	EnunciationScore *float32               `protobuf:"fixed32,6,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // needs the audio judge; 0-1, key entities audibly intact
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	TtfbMs     *uint32                `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`              // needs the RemoteSession; provider byte-level TTFB
+	Wer        *float32               `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                 // needs the RemoteSession; word_errors / words
+	Words      *uint32                `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`                              // needs the RemoteSession
+	WordErrors *uint32                `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`  // needs the RemoteSession
+	Cer        *float32               `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                 // needs the RemoteSession; char_errors / chars
+	Chars      *uint32                `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                             // needs the RemoteSession
+	CharErrors *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"` // needs the RemoteSession
 	// Key entities the agent said, as the caller heard them. Needs the text judge.
 	EntityRecognition  *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
 	EntitiesUttered    *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
@@ -1685,13 +1674,6 @@ func (x *SimulationRun_JobMetrics_TTS) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SimulationRun_JobMetrics_TTS.ProtoReflect.Descriptor instead.
 func (*SimulationRun_JobMetrics_TTS) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1, 2}
-}
-
-func (x *SimulationRun_JobMetrics_TTS) GetTtfaMs() uint32 {
-	if x != nil && x.TtfaMs != nil {
-		return *x.TtfaMs
-	}
-	return 0
 }
 
 func (x *SimulationRun_JobMetrics_TTS) GetTtfbMs() uint32 {
@@ -1739,20 +1721,6 @@ func (x *SimulationRun_JobMetrics_TTS) GetChars() uint32 {
 func (x *SimulationRun_JobMetrics_TTS) GetCharErrors() uint32 {
 	if x != nil && x.CharErrors != nil {
 		return *x.CharErrors
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_TTS) GetNaturalnessScore() float32 {
-	if x != nil && x.NaturalnessScore != nil {
-		return *x.NaturalnessScore
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_TTS) GetEnunciationScore() float32 {
-	if x != nil && x.EnunciationScore != nil {
-		return *x.EnunciationScore
 	}
 	return 0
 }
@@ -1981,7 +1949,7 @@ type SimulationRun_JobMetrics_Turn struct {
 	Role                      agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                                                             // ASSISTANT = the agent under test, USER = simulator persona
 	StartMs                   *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                                                              // audio only; relative to t0; unset if the turn could not be aligned to the audio
 	EndMs                     *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                                                                    // audio only
-	TranscriptionDelayMs      *uint32                `protobuf:"varint,5,opt,name=transcription_delay_ms,json=transcriptionDelayMs,proto3,oneof" json:"transcription_delay_ms,omitempty"`                     // needs the RemoteSession; simulator turns
+	TranscriptionLatencyMs    *uint32                `protobuf:"varint,5,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"`               // needs the RemoteSession; simulator turns
 	LlmTtftMs                 *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`                                                      // needs the RemoteSession
 	LlmTtfsMs                 *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`                                                      // needs the RemoteSession
 	TokensPerSecond           *float32               `protobuf:"fixed32,8,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"`                                   // needs the RemoteSession
@@ -2056,9 +2024,9 @@ func (x *SimulationRun_JobMetrics_Turn) GetEndMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetTranscriptionDelayMs() uint32 {
-	if x != nil && x.TranscriptionDelayMs != nil {
-		return *x.TranscriptionDelayMs
+func (x *SimulationRun_JobMetrics_Turn) GetTranscriptionLatencyMs() uint32 {
+	if x != nil && x.TranscriptionLatencyMs != nil {
+		return *x.TranscriptionLatencyMs
 	}
 	return 0
 }
@@ -2850,7 +2818,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xaaB\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xca@\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2900,7 +2868,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xd8&\n" +
+	"\x1a\xf8$\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2914,8 +2882,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05turns\x18\t \x03(\v2&.livekit.SimulationRun.JobMetrics.TurnR\x05turns\x12\x1f\n" +
 	"\vjudge_model\x18\n" +
 	" \x01(\tR\n" +
-	"judgeModel\x12*\n" +
-	"\x11audio_judge_model\x18\v \x01(\tR\x0faudioJudgeModel\x12,\n" +
+	"judgeModel\x12,\n" +
 	"\x12has_remote_session\x18\f \x01(\bR\x10hasRemoteSession\x12*\n" +
 	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x12%\n" +
 	"\vconciseness\x18\x0e \x01(\x02H\x03R\vconciseness\x88\x01\x01\x129\n" +
@@ -2956,27 +2923,21 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\b_ttft_msB\n" +
 	"\n" +
 	"\b_ttfs_msB\x14\n" +
-	"\x12_tokens_per_second\x1a\xbb\x05\n" +
+	"\x12_tokens_per_second\x1a\x81\x04\n" +
 	"\x03TTS\x12\x1c\n" +
-	"\attfa_ms\x18\x01 \x01(\rH\x00R\x06ttfaMs\x88\x01\x01\x12\x1c\n" +
-	"\attfb_ms\x18\x02 \x01(\rH\x01R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
-	"\x03wer\x18\x03 \x01(\x02H\x02R\x03wer\x88\x01\x01\x12\x19\n" +
-	"\x05words\x18\a \x01(\rH\x03R\x05words\x88\x01\x01\x12$\n" +
-	"\vword_errors\x18\b \x01(\rH\x04R\n" +
+	"\attfb_ms\x18\x02 \x01(\rH\x00R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
+	"\x03wer\x18\x03 \x01(\x02H\x01R\x03wer\x88\x01\x01\x12\x19\n" +
+	"\x05words\x18\a \x01(\rH\x02R\x05words\x88\x01\x01\x12$\n" +
+	"\vword_errors\x18\b \x01(\rH\x03R\n" +
 	"wordErrors\x88\x01\x01\x12\x15\n" +
-	"\x03cer\x18\t \x01(\x02H\x05R\x03cer\x88\x01\x01\x12\x19\n" +
+	"\x03cer\x18\t \x01(\x02H\x04R\x03cer\x88\x01\x01\x12\x19\n" +
 	"\x05chars\x18\n" +
-	" \x01(\rH\x06R\x05chars\x88\x01\x01\x12$\n" +
-	"\vchar_errors\x18\v \x01(\rH\aR\n" +
-	"charErrors\x88\x01\x01\x120\n" +
-	"\x11naturalness_score\x18\x05 \x01(\x02H\bR\x10naturalnessScore\x88\x01\x01\x120\n" +
-	"\x11enunciation_score\x18\x06 \x01(\x02H\tR\x10enunciationScore\x88\x01\x01\x122\n" +
-	"\x12entity_recognition\x18\x0e \x01(\x02H\n" +
-	"R\x11entityRecognition\x88\x01\x01\x12.\n" +
-	"\x10entities_uttered\x18\x0f \x01(\rH\vR\x0fentitiesUttered\x88\x01\x01\x124\n" +
-	"\x13entities_recognized\x18\x10 \x01(\rH\fR\x12entitiesRecognized\x88\x01\x01B\n" +
-	"\n" +
-	"\b_ttfa_msB\n" +
+	" \x01(\rH\x05R\x05chars\x88\x01\x01\x12$\n" +
+	"\vchar_errors\x18\v \x01(\rH\x06R\n" +
+	"charErrors\x88\x01\x01\x122\n" +
+	"\x12entity_recognition\x18\x0e \x01(\x02H\aR\x11entityRecognition\x88\x01\x01\x12.\n" +
+	"\x10entities_uttered\x18\x0f \x01(\rH\bR\x0fentitiesUttered\x88\x01\x01\x124\n" +
+	"\x13entities_recognized\x18\x10 \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01B\n" +
 	"\n" +
 	"\b_ttfb_msB\x06\n" +
 	"\x04_werB\b\n" +
@@ -2984,9 +2945,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_word_errorsB\x06\n" +
 	"\x04_cerB\b\n" +
 	"\x06_charsB\x0e\n" +
-	"\f_char_errorsB\x14\n" +
-	"\x12_naturalness_scoreB\x14\n" +
-	"\x12_enunciation_scoreB\x15\n" +
+	"\f_char_errorsB\x15\n" +
 	"\x13_entity_recognitionB\x13\n" +
 	"\x11_entities_utteredB\x16\n" +
 	"\x14_entities_recognized\x1a\xac\b\n" +
@@ -3022,13 +2981,13 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11early_termination\x18\x01 \x01(\bH\x00R\x10earlyTermination\x88\x01\x01\x12.\n" +
 	"\x10late_termination\x18\x02 \x01(\bH\x01R\x0flateTermination\x88\x01\x01B\x14\n" +
 	"\x12_early_terminationB\x13\n" +
-	"\x11_late_termination\x1a\xa0\b\n" +
+	"\x11_late_termination\x1a\xa6\b\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x1e\n" +
 	"\bstart_ms\x18\x03 \x01(\rH\x00R\astartMs\x88\x01\x01\x12\x1a\n" +
-	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x129\n" +
-	"\x16transcription_delay_ms\x18\x05 \x01(\rH\x02R\x14transcriptionDelayMs\x88\x01\x01\x12#\n" +
+	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x12=\n" +
+	"\x18transcription_latency_ms\x18\x05 \x01(\rH\x02R\x16transcriptionLatencyMs\x88\x01\x01\x12#\n" +
 	"\vllm_ttft_ms\x18\x06 \x01(\rH\x03R\tllmTtftMs\x88\x01\x01\x12#\n" +
 	"\vllm_ttfs_ms\x18\a \x01(\rH\x04R\tllmTtfsMs\x88\x01\x01\x12/\n" +
 	"\x11tokens_per_second\x18\b \x01(\x02H\x05R\x0ftokensPerSecond\x88\x01\x01\x12#\n" +
@@ -3046,8 +3005,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"unanswered\x18\x11 \x01(\bH\x0eR\n" +
 	"unanswered\x88\x01\x01B\v\n" +
 	"\t_start_msB\t\n" +
-	"\a_end_msB\x19\n" +
-	"\x17_transcription_delay_msB\x0e\n" +
+	"\a_end_msB\x1b\n" +
+	"\x19_transcription_latency_msB\x0e\n" +
 	"\f_llm_ttft_msB\x0e\n" +
 	"\f_llm_ttfs_msB\x14\n" +
 	"\x12_tokens_per_secondB\x0e\n" +
