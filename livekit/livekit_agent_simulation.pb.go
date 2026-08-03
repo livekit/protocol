@@ -1452,14 +1452,14 @@ func (x *SimulationRun_Job_Usage) GetAudioTurnsCount() int32 {
 
 // The agent's perception of the caller. Audio only.
 type SimulationRun_JobMetrics_STT struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	Wer                    *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                                      // needs the RemoteSession; word_errors / words
-	Words                  *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                                                                   // needs the RemoteSession
-	WordErrors             *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`                                       // needs the RemoteSession
-	Cer                    *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                                                      // needs the RemoteSession; char_errors / chars
-	Chars                  *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                                                   // needs the RemoteSession
-	CharErrors             *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                                      // needs the RemoteSession
-	TranscriptionLatencyMs *uint32                `protobuf:"varint,8,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Wer        *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                  // needs the RemoteSession; word_errors / words
+	Words      *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                               // needs the RemoteSession
+	WordErrors *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`   // needs the RemoteSession
+	Cer        *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                  // needs the RemoteSession; char_errors / chars
+	Chars      *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                               // needs the RemoteSession
+	CharErrors *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`  // needs the RemoteSession
+	SttDelayMs *uint32                `protobuf:"varint,8,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay
 	// Key entities (names, IDs, amounts) the caller said. Needs the text judge.
 	EntityRecognition  *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
 	EntitiesUttered    *uint32  `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
@@ -1540,9 +1540,9 @@ func (x *SimulationRun_JobMetrics_STT) GetCharErrors() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_STT) GetTranscriptionLatencyMs() uint32 {
-	if x != nil && x.TranscriptionLatencyMs != nil {
-		return *x.TranscriptionLatencyMs
+func (x *SimulationRun_JobMetrics_STT) GetSttDelayMs() uint32 {
+	if x != nil && x.SttDelayMs != nil {
+		return *x.SttDelayMs
 	}
 	return 0
 }
@@ -1748,22 +1748,22 @@ func (x *SimulationRun_JobMetrics_TTS) GetEntitiesRecognized() uint32 {
 
 // Audio only.
 type SimulationRun_JobMetrics_Conversation struct {
-	state                     protoimpl.MessageState `protogen:"open.v1"`
-	TurnTakingScore           *float32               `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                 // 0-1
-	ResponseLatencyP50Ms      *int32                 `protobuf:"varint,2,opt,name=response_latency_p50_ms,json=responseLatencyP50Ms,proto3,oneof" json:"response_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
-	ResponseLatencyP95Ms      *int32                 `protobuf:"varint,3,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
-	ResponseLatencyP99Ms      *int32                 `protobuf:"varint,4,opt,name=response_latency_p99_ms,json=responseLatencyP99Ms,proto3,oneof" json:"response_latency_p99_ms,omitempty"`
-	AgentYieldLatencyMs       *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`     // agent audio continuing past a barge-in
-	EotMispredictionCount     *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended
-	OverlapRatio              *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
-	OverlapSpeechMs           *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
-	TotalSpeechMs             *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
-	AwkwardSilenceCount       *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`                       // gaps past the natural-pause threshold
-	UnansweredTurns           *uint32                `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`                                     // the simulated party spoke, the agent never responded
-	FalseInterruptionCount    *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"`              // needs the RemoteSession; agent paused for a non-interruption
-	AgentReportedE2ELatencyMs *uint32                `protobuf:"varint,15,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"` // needs the RemoteSession; the agent's own claim
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	TurnTakingScore        *float32               `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                   // 0-1
+	HeardE2ELatencyP50Ms   *int32                 `protobuf:"varint,2,opt,name=heard_e2e_latency_p50_ms,json=heardE2eLatencyP50Ms,proto3,oneof" json:"heard_e2e_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
+	HeardE2ELatencyP95Ms   *int32                 `protobuf:"varint,3,opt,name=heard_e2e_latency_p95_ms,json=heardE2eLatencyP95Ms,proto3,oneof" json:"heard_e2e_latency_p95_ms,omitempty"`
+	HeardE2ELatencyP99Ms   *int32                 `protobuf:"varint,4,opt,name=heard_e2e_latency_p99_ms,json=heardE2eLatencyP99Ms,proto3,oneof" json:"heard_e2e_latency_p99_ms,omitempty"`
+	TimeToYieldMs          *uint32                `protobuf:"varint,5,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`                       // agent audio continuing past a barge-in
+	EotMispredictionCount  *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended
+	OverlapRatio           *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
+	OverlapSpeechMs        *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
+	TotalSpeechMs          *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
+	AwkwardSilenceCount    *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`          // gaps past the natural-pause threshold
+	UnansweredTurns        *uint32                `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`                        // the simulated party spoke, the agent never responded
+	FalseInterruptionCount *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"` // needs the RemoteSession; agent paused for a non-interruption
+	E2ELatencyMs           *uint32                `protobuf:"varint,15,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`                               // needs the RemoteSession; the agent's own claim
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Conversation) Reset() {
@@ -1803,30 +1803,30 @@ func (x *SimulationRun_JobMetrics_Conversation) GetTurnTakingScore() float32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP50Ms() int32 {
-	if x != nil && x.ResponseLatencyP50Ms != nil {
-		return *x.ResponseLatencyP50Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetHeardE2ELatencyP50Ms() int32 {
+	if x != nil && x.HeardE2ELatencyP50Ms != nil {
+		return *x.HeardE2ELatencyP50Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP95Ms() int32 {
-	if x != nil && x.ResponseLatencyP95Ms != nil {
-		return *x.ResponseLatencyP95Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetHeardE2ELatencyP95Ms() int32 {
+	if x != nil && x.HeardE2ELatencyP95Ms != nil {
+		return *x.HeardE2ELatencyP95Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP99Ms() int32 {
-	if x != nil && x.ResponseLatencyP99Ms != nil {
-		return *x.ResponseLatencyP99Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetHeardE2ELatencyP99Ms() int32 {
+	if x != nil && x.HeardE2ELatencyP99Ms != nil {
+		return *x.HeardE2ELatencyP99Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetAgentYieldLatencyMs() uint32 {
-	if x != nil && x.AgentYieldLatencyMs != nil {
-		return *x.AgentYieldLatencyMs
+func (x *SimulationRun_JobMetrics_Conversation) GetTimeToYieldMs() uint32 {
+	if x != nil && x.TimeToYieldMs != nil {
+		return *x.TimeToYieldMs
 	}
 	return 0
 }
@@ -1880,9 +1880,9 @@ func (x *SimulationRun_JobMetrics_Conversation) GetFalseInterruptionCount() uint
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetAgentReportedE2ELatencyMs() uint32 {
-	if x != nil && x.AgentReportedE2ELatencyMs != nil {
-		return *x.AgentReportedE2ELatencyMs
+func (x *SimulationRun_JobMetrics_Conversation) GetE2ELatencyMs() uint32 {
+	if x != nil && x.E2ELatencyMs != nil {
+		return *x.E2ELatencyMs
 	}
 	return 0
 }
@@ -1944,26 +1944,26 @@ func (x *SimulationRun_JobMetrics_Simulator) GetLateTermination() bool {
 // Rows exist for text and audio. The groups above hold the means and pools
 // over these; anything not measured for a turn stays unset.
 type SimulationRun_JobMetrics_Turn struct {
-	state                     protoimpl.MessageState `protogen:"open.v1"`
-	Index                     uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                                                                                       // 1-based, conversation order
-	Role                      agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                                                             // ASSISTANT = the agent under test, USER = simulator persona
-	StartMs                   *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                                                              // audio only; relative to t0; unset if the turn could not be aligned to the audio
-	EndMs                     *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                                                                    // audio only
-	TranscriptionLatencyMs    *uint32                `protobuf:"varint,5,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"`               // needs the RemoteSession; simulator turns
-	LlmTtftMs                 *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`                                                      // needs the RemoteSession
-	LlmTtfsMs                 *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`                                                      // needs the RemoteSession
-	TokensPerSecond           *float32               `protobuf:"fixed32,8,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"`                                   // needs the RemoteSession
-	TtsTtfbMs                 *uint32                `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`                                                      // needs the RemoteSession
-	AgentReportedE2ELatencyMs *uint32                `protobuf:"varint,10,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"` // needs the RemoteSession
-	ResponseLatencyMs         *int32                 `protobuf:"varint,11,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`                             // floor-transfer offset, cut-in if negative
-	AgentYieldLatencyMs       *uint32                `protobuf:"varint,12,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`                     // agent audio continuing past a barge-in
-	TurnTakingScore           *float32               `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                                  // 0-1
-	Conciseness               *float32               `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`                                                                   // needs the text judge
-	EotMisprediction          *bool                  `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`                                  // agent started before the caller's turn ended
-	AwkwardSilence            *bool                  `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`                                        // gap past the natural-pause threshold
-	Unanswered                *bool                  `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`                                                                      // the caller spoke, the agent never responded
-	unknownFields             protoimpl.UnknownFields
-	sizeCache                 protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Index             uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                                                             // 1-based, conversation order
+	Role              agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                                   // ASSISTANT = the agent under test, USER = simulator persona
+	StartMs           *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                                    // audio only; relative to t0; unset if the turn could not be aligned to the audio
+	EndMs             *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                                          // audio only
+	SttDelayMs        *uint32                `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`                         // needs the RemoteSession; simulator turns
+	LlmTtftMs         *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`                            // needs the RemoteSession
+	LlmTtfsMs         *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`                            // needs the RemoteSession
+	LlmTps            *float32               `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                                      // needs the RemoteSession
+	TtsTtfbMs         *uint32                `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`                            // needs the RemoteSession
+	E2ELatencyMs      *uint32                `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`                  // needs the RemoteSession; the agent's own claim
+	HeardE2ELatencyMs *int32                 `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"` // floor-transfer offset, cut-in if negative
+	TimeToYieldMs     *uint32                `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`             // agent audio continuing past a barge-in
+	TurnTakingScore   *float32               `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`        // 0-1
+	Conciseness       *float32               `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`                                         // needs the text judge
+	EotMisprediction  *bool                  `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`        // agent started before the caller's turn ended
+	AwkwardSilence    *bool                  `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`              // gap past the natural-pause threshold
+	Unanswered        *bool                  `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`                                            // the caller spoke, the agent never responded
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Turn) Reset() {
@@ -2024,9 +2024,9 @@ func (x *SimulationRun_JobMetrics_Turn) GetEndMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetTranscriptionLatencyMs() uint32 {
-	if x != nil && x.TranscriptionLatencyMs != nil {
-		return *x.TranscriptionLatencyMs
+func (x *SimulationRun_JobMetrics_Turn) GetSttDelayMs() uint32 {
+	if x != nil && x.SttDelayMs != nil {
+		return *x.SttDelayMs
 	}
 	return 0
 }
@@ -2045,9 +2045,9 @@ func (x *SimulationRun_JobMetrics_Turn) GetLlmTtfsMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetTokensPerSecond() float32 {
-	if x != nil && x.TokensPerSecond != nil {
-		return *x.TokensPerSecond
+func (x *SimulationRun_JobMetrics_Turn) GetLlmTps() float32 {
+	if x != nil && x.LlmTps != nil {
+		return *x.LlmTps
 	}
 	return 0
 }
@@ -2059,23 +2059,23 @@ func (x *SimulationRun_JobMetrics_Turn) GetTtsTtfbMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetAgentReportedE2ELatencyMs() uint32 {
-	if x != nil && x.AgentReportedE2ELatencyMs != nil {
-		return *x.AgentReportedE2ELatencyMs
+func (x *SimulationRun_JobMetrics_Turn) GetE2ELatencyMs() uint32 {
+	if x != nil && x.E2ELatencyMs != nil {
+		return *x.E2ELatencyMs
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetResponseLatencyMs() int32 {
-	if x != nil && x.ResponseLatencyMs != nil {
-		return *x.ResponseLatencyMs
+func (x *SimulationRun_JobMetrics_Turn) GetHeardE2ELatencyMs() int32 {
+	if x != nil && x.HeardE2ELatencyMs != nil {
+		return *x.HeardE2ELatencyMs
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetAgentYieldLatencyMs() uint32 {
-	if x != nil && x.AgentYieldLatencyMs != nil {
-		return *x.AgentYieldLatencyMs
+func (x *SimulationRun_JobMetrics_Turn) GetTimeToYieldMs() uint32 {
+	if x != nil && x.TimeToYieldMs != nil {
+		return *x.TimeToYieldMs
 	}
 	return 0
 }
@@ -2818,7 +2818,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xca@\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xf3>\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2868,7 +2868,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xf8$\n" +
+	"\x1a\xa1#\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2890,7 +2890,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10information_loss\x18\x10 \x01(\bH\x05R\x0finformationLoss\x88\x01\x01\x126\n" +
 	"\x14redundant_statements\x18\x11 \x01(\bH\x06R\x13redundantStatements\x88\x01\x01\x127\n" +
 	"\x15poor_question_quality\x18\x12 \x01(\bH\aR\x13poorQuestionQuality\x88\x01\x01\x12>\n" +
-	"\x18conversation_progression\x18\x13 \x01(\x02H\bR\x17conversationProgression\x88\x01\x01\x1a\xb3\x04\n" +
+	"\x18conversation_progression\x18\x13 \x01(\x02H\bR\x17conversationProgression\x88\x01\x01\x1a\x8f\x04\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
@@ -2900,8 +2900,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05chars\x18\t \x01(\rH\x04R\x05chars\x88\x01\x01\x12$\n" +
 	"\vchar_errors\x18\n" +
 	" \x01(\rH\x05R\n" +
-	"charErrors\x88\x01\x01\x12=\n" +
-	"\x18transcription_latency_ms\x18\b \x01(\rH\x06R\x16transcriptionLatencyMs\x88\x01\x01\x122\n" +
+	"charErrors\x88\x01\x01\x12%\n" +
+	"\fstt_delay_ms\x18\b \x01(\rH\x06R\n" +
+	"sttDelayMs\x88\x01\x01\x122\n" +
 	"\x12entity_recognition\x18\v \x01(\x02H\aR\x11entityRecognition\x88\x01\x01\x12.\n" +
 	"\x10entities_uttered\x18\f \x01(\rH\bR\x0fentitiesUttered\x88\x01\x01\x124\n" +
 	"\x13entities_recognized\x18\r \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01B\x06\n" +
@@ -2910,8 +2911,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_word_errorsB\x06\n" +
 	"\x04_cerB\b\n" +
 	"\x06_charsB\x0e\n" +
-	"\f_char_errorsB\x1b\n" +
-	"\x19_transcription_latency_msB\x15\n" +
+	"\f_char_errorsB\x0f\n" +
+	"\r_stt_delay_msB\x15\n" +
 	"\x13_entity_recognitionB\x13\n" +
 	"\x11_entities_utteredB\x16\n" +
 	"\x14_entities_recognized\x1a\xa0\x01\n" +
@@ -2948,13 +2949,13 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_char_errorsB\x15\n" +
 	"\x13_entity_recognitionB\x13\n" +
 	"\x11_entities_utteredB\x16\n" +
-	"\x14_entities_recognized\x1a\xac\b\n" +
+	"\x14_entities_recognized\x1a\xf5\a\n" +
 	"\fConversation\x12/\n" +
-	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14responseLatencyP50Ms\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p95_ms\x18\x03 \x01(\x05H\x02R\x14responseLatencyP95Ms\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p99_ms\x18\x04 \x01(\x05H\x03R\x14responseLatencyP99Ms\x88\x01\x01\x128\n" +
-	"\x16agent_yield_latency_ms\x18\x05 \x01(\rH\x04R\x13agentYieldLatencyMs\x88\x01\x01\x12;\n" +
+	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12;\n" +
+	"\x18heard_e2e_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14heardE2eLatencyP50Ms\x88\x01\x01\x12;\n" +
+	"\x18heard_e2e_latency_p95_ms\x18\x03 \x01(\x05H\x02R\x14heardE2eLatencyP95Ms\x88\x01\x01\x12;\n" +
+	"\x18heard_e2e_latency_p99_ms\x18\x04 \x01(\x05H\x03R\x14heardE2eLatencyP99Ms\x88\x01\x01\x12,\n" +
+	"\x10time_to_yield_ms\x18\x05 \x01(\rH\x04R\rtimeToYieldMs\x88\x01\x01\x12;\n" +
 	"\x17eot_misprediction_count\x18\x06 \x01(\rH\x05R\x15eotMispredictionCount\x88\x01\x01\x12(\n" +
 	"\roverlap_ratio\x18\a \x01(\x02H\x06R\foverlapRatio\x88\x01\x01\x12/\n" +
 	"\x11overlap_speech_ms\x18\b \x01(\rH\aR\x0foverlapSpeechMs\x88\x01\x01\x12+\n" +
@@ -2962,40 +2963,41 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x15awkward_silence_count\x18\v \x01(\rH\tR\x13awkwardSilenceCount\x88\x01\x01\x12.\n" +
 	"\x10unanswered_turns\x18\f \x01(\rH\n" +
 	"R\x0funansweredTurns\x88\x01\x01\x12=\n" +
-	"\x18false_interruption_count\x18\r \x01(\rH\vR\x16falseInterruptionCount\x88\x01\x01\x12E\n" +
-	"\x1dagent_reported_e2e_latency_ms\x18\x0f \x01(\rH\fR\x19agentReportedE2eLatencyMs\x88\x01\x01B\x14\n" +
-	"\x12_turn_taking_scoreB\x1a\n" +
-	"\x18_response_latency_p50_msB\x1a\n" +
-	"\x18_response_latency_p95_msB\x1a\n" +
-	"\x18_response_latency_p99_msB\x19\n" +
-	"\x17_agent_yield_latency_msB\x1a\n" +
+	"\x18false_interruption_count\x18\r \x01(\rH\vR\x16falseInterruptionCount\x88\x01\x01\x12)\n" +
+	"\x0ee2e_latency_ms\x18\x0f \x01(\rH\fR\fe2eLatencyMs\x88\x01\x01B\x14\n" +
+	"\x12_turn_taking_scoreB\x1b\n" +
+	"\x19_heard_e2e_latency_p50_msB\x1b\n" +
+	"\x19_heard_e2e_latency_p95_msB\x1b\n" +
+	"\x19_heard_e2e_latency_p99_msB\x13\n" +
+	"\x11_time_to_yield_msB\x1a\n" +
 	"\x18_eot_misprediction_countB\x10\n" +
 	"\x0e_overlap_ratioB\x14\n" +
 	"\x12_overlap_speech_msB\x12\n" +
 	"\x10_total_speech_msB\x18\n" +
 	"\x16_awkward_silence_countB\x13\n" +
 	"\x11_unanswered_turnsB\x1b\n" +
-	"\x19_false_interruption_countB \n" +
-	"\x1e_agent_reported_e2e_latency_ms\x1a\x98\x01\n" +
+	"\x19_false_interruption_countB\x11\n" +
+	"\x0f_e2e_latency_ms\x1a\x98\x01\n" +
 	"\tSimulator\x120\n" +
 	"\x11early_termination\x18\x01 \x01(\bH\x00R\x10earlyTermination\x88\x01\x01\x12.\n" +
 	"\x10late_termination\x18\x02 \x01(\bH\x01R\x0flateTermination\x88\x01\x01B\x14\n" +
 	"\x12_early_terminationB\x13\n" +
-	"\x11_late_termination\x1a\xa6\b\n" +
+	"\x11_late_termination\x1a\xaa\a\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x1e\n" +
 	"\bstart_ms\x18\x03 \x01(\rH\x00R\astartMs\x88\x01\x01\x12\x1a\n" +
-	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x12=\n" +
-	"\x18transcription_latency_ms\x18\x05 \x01(\rH\x02R\x16transcriptionLatencyMs\x88\x01\x01\x12#\n" +
+	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x12%\n" +
+	"\fstt_delay_ms\x18\x05 \x01(\rH\x02R\n" +
+	"sttDelayMs\x88\x01\x01\x12#\n" +
 	"\vllm_ttft_ms\x18\x06 \x01(\rH\x03R\tllmTtftMs\x88\x01\x01\x12#\n" +
-	"\vllm_ttfs_ms\x18\a \x01(\rH\x04R\tllmTtfsMs\x88\x01\x01\x12/\n" +
-	"\x11tokens_per_second\x18\b \x01(\x02H\x05R\x0ftokensPerSecond\x88\x01\x01\x12#\n" +
-	"\vtts_ttfb_ms\x18\t \x01(\rH\x06R\tttsTtfbMs\x88\x01\x01\x12E\n" +
-	"\x1dagent_reported_e2e_latency_ms\x18\n" +
-	" \x01(\rH\aR\x19agentReportedE2eLatencyMs\x88\x01\x01\x123\n" +
-	"\x13response_latency_ms\x18\v \x01(\x05H\bR\x11responseLatencyMs\x88\x01\x01\x128\n" +
-	"\x16agent_yield_latency_ms\x18\f \x01(\rH\tR\x13agentYieldLatencyMs\x88\x01\x01\x12/\n" +
+	"\vllm_ttfs_ms\x18\a \x01(\rH\x04R\tllmTtfsMs\x88\x01\x01\x12\x1c\n" +
+	"\allm_tps\x18\b \x01(\x02H\x05R\x06llmTps\x88\x01\x01\x12#\n" +
+	"\vtts_ttfb_ms\x18\t \x01(\rH\x06R\tttsTtfbMs\x88\x01\x01\x12)\n" +
+	"\x0ee2e_latency_ms\x18\n" +
+	" \x01(\rH\aR\fe2eLatencyMs\x88\x01\x01\x124\n" +
+	"\x14heard_e2e_latency_ms\x18\v \x01(\x05H\bR\x11heardE2eLatencyMs\x88\x01\x01\x12,\n" +
+	"\x10time_to_yield_ms\x18\f \x01(\rH\tR\rtimeToYieldMs\x88\x01\x01\x12/\n" +
 	"\x11turn_taking_score\x18\r \x01(\x02H\n" +
 	"R\x0fturnTakingScore\x88\x01\x01\x12%\n" +
 	"\vconciseness\x18\x0e \x01(\x02H\vR\vconciseness\x88\x01\x01\x120\n" +
@@ -3005,15 +3007,16 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"unanswered\x18\x11 \x01(\bH\x0eR\n" +
 	"unanswered\x88\x01\x01B\v\n" +
 	"\t_start_msB\t\n" +
-	"\a_end_msB\x1b\n" +
-	"\x19_transcription_latency_msB\x0e\n" +
+	"\a_end_msB\x0f\n" +
+	"\r_stt_delay_msB\x0e\n" +
 	"\f_llm_ttft_msB\x0e\n" +
-	"\f_llm_ttfs_msB\x14\n" +
-	"\x12_tokens_per_secondB\x0e\n" +
-	"\f_tts_ttfb_msB \n" +
-	"\x1e_agent_reported_e2e_latency_msB\x16\n" +
-	"\x14_response_latency_msB\x19\n" +
-	"\x17_agent_yield_latency_msB\x14\n" +
+	"\f_llm_ttfs_msB\n" +
+	"\n" +
+	"\b_llm_tpsB\x0e\n" +
+	"\f_tts_ttfb_msB\x11\n" +
+	"\x0f_e2e_latency_msB\x17\n" +
+	"\x15_heard_e2e_latency_msB\x13\n" +
+	"\x11_time_to_yield_msB\x14\n" +
 	"\x12_turn_taking_scoreB\x0e\n" +
 	"\f_concisenessB\x14\n" +
 	"\x12_eot_mispredictionB\x12\n" +
