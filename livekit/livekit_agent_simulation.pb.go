@@ -1810,12 +1810,11 @@ type SimulationRun_JobMetrics_Conversation struct {
 	ResponseLatencyP50Ms      *int32                 `protobuf:"varint,2,opt,name=response_latency_p50_ms,json=responseLatencyP50Ms,proto3,oneof" json:"response_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
 	ResponseLatencyP95Ms      *int32                 `protobuf:"varint,3,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
 	ResponseLatencyP99Ms      *int32                 `protobuf:"varint,4,opt,name=response_latency_p99_ms,json=responseLatencyP99Ms,proto3,oneof" json:"response_latency_p99_ms,omitempty"`
-	ResponseLatencyMs         *int32                 `protobuf:"varint,16,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`                // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
-	ResponseLatencySamples    *uint32                `protobuf:"varint,17,opt,name=response_latency_samples,json=responseLatencySamples,proto3,oneof" json:"response_latency_samples,omitempty"` // samples behind the percentiles
-	AgentYieldLatencyMs       *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`         // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
-	EotMispredictionCount     *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"`     // agent started before the caller's turn ended; 0/1 per turn
-	OverlapRatio              *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                                 // overlapping speech / total speech
-	OverlapSpeechMs           *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                       // pooling stats for overlap_ratio
+	ResponseLatencyMs         *int32                 `protobuf:"varint,16,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`            // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
+	AgentYieldLatencyMs       *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`     // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
+	EotMispredictionCount     *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended; 0/1 per turn
+	OverlapRatio              *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
+	OverlapSpeechMs           *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
 	TotalSpeechMs             *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
 	AwkwardSilenceCount       *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`                       // gaps past the natural-pause threshold; 0/1 per turn
 	UnansweredTurns           *uint32                `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`                                     // the simulated party spoke, the agent never responded; 0/1 per turn
@@ -1886,13 +1885,6 @@ func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP99Ms() int32 
 func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyMs() int32 {
 	if x != nil && x.ResponseLatencyMs != nil {
 		return *x.ResponseLatencyMs
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencySamples() uint32 {
-	if x != nil && x.ResponseLatencySamples != nil {
-		return *x.ResponseLatencySamples
 	}
 	return 0
 }
@@ -2828,7 +2820,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xddA\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x81A\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2878,7 +2870,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\x95%\n" +
+	"\x1a\xb9$\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2967,31 +2959,28 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x12_enunciation_scoreB\x15\n" +
 	"\x13_entity_recognitionB\x13\n" +
 	"\x11_entities_utteredB\x16\n" +
-	"\x14_entities_recognizedJ\x04\b\x04\x10\x05J\x04\b\f\x10\rJ\x04\b\r\x10\x0eR\x0fspeech_rate_wpmR\vheard_wordsR\tspeech_ms\x1a\x99\n" +
-	"\n" +
+	"\x14_entities_recognizedJ\x04\b\x04\x10\x05J\x04\b\f\x10\rJ\x04\b\r\x10\x0eR\x0fspeech_rate_wpmR\vheard_wordsR\tspeech_ms\x1a\xbd\t\n" +
 	"\fConversation\x12/\n" +
 	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12:\n" +
 	"\x17response_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14responseLatencyP50Ms\x88\x01\x01\x12:\n" +
 	"\x17response_latency_p95_ms\x18\x03 \x01(\x05H\x02R\x14responseLatencyP95Ms\x88\x01\x01\x12:\n" +
 	"\x17response_latency_p99_ms\x18\x04 \x01(\x05H\x03R\x14responseLatencyP99Ms\x88\x01\x01\x123\n" +
-	"\x13response_latency_ms\x18\x10 \x01(\x05H\x04R\x11responseLatencyMs\x88\x01\x01\x12=\n" +
-	"\x18response_latency_samples\x18\x11 \x01(\rH\x05R\x16responseLatencySamples\x88\x01\x01\x128\n" +
-	"\x16agent_yield_latency_ms\x18\x05 \x01(\rH\x06R\x13agentYieldLatencyMs\x88\x01\x01\x12;\n" +
-	"\x17eot_misprediction_count\x18\x06 \x01(\rH\aR\x15eotMispredictionCount\x88\x01\x01\x12(\n" +
-	"\roverlap_ratio\x18\a \x01(\x02H\bR\foverlapRatio\x88\x01\x01\x12/\n" +
-	"\x11overlap_speech_ms\x18\b \x01(\rH\tR\x0foverlapSpeechMs\x88\x01\x01\x12+\n" +
-	"\x0ftotal_speech_ms\x18\t \x01(\rH\n" +
-	"R\rtotalSpeechMs\x88\x01\x01\x127\n" +
-	"\x15awkward_silence_count\x18\v \x01(\rH\vR\x13awkwardSilenceCount\x88\x01\x01\x12.\n" +
-	"\x10unanswered_turns\x18\f \x01(\rH\fR\x0funansweredTurns\x88\x01\x01\x12=\n" +
-	"\x18false_interruption_count\x18\r \x01(\rH\rR\x16falseInterruptionCount\x88\x01\x01\x12E\n" +
-	"\x1dagent_reported_e2e_latency_ms\x18\x0f \x01(\rH\x0eR\x19agentReportedE2eLatencyMs\x88\x01\x01B\x14\n" +
+	"\x13response_latency_ms\x18\x10 \x01(\x05H\x04R\x11responseLatencyMs\x88\x01\x01\x128\n" +
+	"\x16agent_yield_latency_ms\x18\x05 \x01(\rH\x05R\x13agentYieldLatencyMs\x88\x01\x01\x12;\n" +
+	"\x17eot_misprediction_count\x18\x06 \x01(\rH\x06R\x15eotMispredictionCount\x88\x01\x01\x12(\n" +
+	"\roverlap_ratio\x18\a \x01(\x02H\aR\foverlapRatio\x88\x01\x01\x12/\n" +
+	"\x11overlap_speech_ms\x18\b \x01(\rH\bR\x0foverlapSpeechMs\x88\x01\x01\x12+\n" +
+	"\x0ftotal_speech_ms\x18\t \x01(\rH\tR\rtotalSpeechMs\x88\x01\x01\x127\n" +
+	"\x15awkward_silence_count\x18\v \x01(\rH\n" +
+	"R\x13awkwardSilenceCount\x88\x01\x01\x12.\n" +
+	"\x10unanswered_turns\x18\f \x01(\rH\vR\x0funansweredTurns\x88\x01\x01\x12=\n" +
+	"\x18false_interruption_count\x18\r \x01(\rH\fR\x16falseInterruptionCount\x88\x01\x01\x12E\n" +
+	"\x1dagent_reported_e2e_latency_ms\x18\x0f \x01(\rH\rR\x19agentReportedE2eLatencyMs\x88\x01\x01B\x14\n" +
 	"\x12_turn_taking_scoreB\x1a\n" +
 	"\x18_response_latency_p50_msB\x1a\n" +
 	"\x18_response_latency_p95_msB\x1a\n" +
 	"\x18_response_latency_p99_msB\x16\n" +
-	"\x14_response_latency_msB\x1b\n" +
-	"\x19_response_latency_samplesB\x19\n" +
+	"\x14_response_latency_msB\x19\n" +
 	"\x17_agent_yield_latency_msB\x1a\n" +
 	"\x18_eot_misprediction_countB\x10\n" +
 	"\x0e_overlap_ratioB\x14\n" +
