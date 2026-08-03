@@ -83,10 +83,7 @@ message SimulationRun {
 
   message JobMetrics {
     // Headline scores, 0-1, computed by the worker as weighted means over the
-    // members that ran (a missing member renormalizes the rest):
-    //   accuracy   = task_completion x3 + (1 - stt.wer) + stt.entity_recognition
-    //   experience = conversation.turn_taking_score x2 + conciseness + conversation_progression
-    //              + (1 - conversation.false_interruption_count / agent turns, penalty-only)
+    // members that ran (a missing member renormalizes the rest).
     optional float accuracy_score = 1;    // absent when the simulator spoiled the call
     optional float experience_score = 2;  // absent when the simulator spoiled the call
     // The accuracy anchor: the scenario verdict as 1/0, or the fraction of the declared target state the call reached.
