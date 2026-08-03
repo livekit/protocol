@@ -82,12 +82,10 @@ message SimulationRun {
   }
 
   message JobMetrics {
-    // Headline scores, 0-1, computed by the worker as weighted means over the
-    // members that ran (a missing member renormalizes the rest).
-    optional float accuracy_score = 1;    // absent when the simulator spoiled the call
-    optional float experience_score = 2;  // absent when the simulator spoiled the call
-    // The accuracy anchor: the scenario verdict as 1/0, or the fraction of the declared target state the call reached.
-    optional float task_completion = 3;   // absent when the simulator spoiled the call
+    // Headline scores, 0-1. All absent when the simulator spoiled the call.
+    optional float accuracy_score = 1;
+    optional float experience_score = 2;
+    optional float task_completion = 3;  // the scenario verdict as 1/0
 
     STT stt = 4;
     LLM llm = 5;
@@ -95,7 +93,7 @@ message SimulationRun {
     Conversation conversation = 7;
     Simulator simulator = 8;
 
-    // Conversation timeline: one entry per transcript turn, both speakers.
+    // One entry per turn, both speakers.
     repeated Turn turns = 9;
 
     string judge_model = 10;            // text judge for judged scores; "" if none ran
@@ -114,13 +112,13 @@ message SimulationRun {
 
     // The agent's perception of the caller. Audio only.
     message STT {
-      optional float wer = 1;                       // needs the RemoteSession; word error rate, pooled: word_errors / words
-      optional uint32 words = 2;                    // needs the RemoteSession; pooling stats: run WER = sum errors / sum words
+      optional float wer = 1;                       // needs the RemoteSession; word_errors / words
+      optional uint32 words = 2;                    // needs the RemoteSession
       optional uint32 word_errors = 3;              // needs the RemoteSession
-      optional float cer = 4;                       // needs the RemoteSession; character error rate, pooled
+      optional float cer = 4;                       // needs the RemoteSession; char_errors / chars
       optional uint32 chars = 9;                    // needs the RemoteSession
       optional uint32 char_errors = 10;             // needs the RemoteSession
-      optional uint32 transcription_latency_ms = 8; // needs the RemoteSession; agent-reported STT/endpointing delay, mean
+      optional uint32 transcription_latency_ms = 8; // needs the RemoteSession; agent-reported STT/endpointing delay
 
       // Key entities (names, IDs, amounts) the caller said. Needs the text judge.
       optional float entity_recognition = 11;  // recognized / uttered
@@ -129,23 +127,23 @@ message SimulationRun {
     }
 
     message LLM {
-      optional uint32 ttft_ms = 1;            // needs the RemoteSession; time to first token, mean (per-turn in turns)
-      optional uint32 ttfs_ms = 2;            // needs the RemoteSession; time to first sentence (the smallest speakable unit)
-      optional float tokens_per_second = 3;   // needs the RemoteSession; decode rate, mean (per-turn in turns.llm)
+      optional uint32 ttft_ms = 1;            // needs the RemoteSession; time to first token
+      optional uint32 ttfs_ms = 2;            // needs the RemoteSession; time to first sentence, the smallest speakable unit
+      optional float tokens_per_second = 3;   // needs the RemoteSession
     }
 
-    // The agent's voice. audio only.
+    // The agent's voice. Audio only.
     message TTS {
       optional uint32 ttfa_ms = 1;             // needs the RemoteSession
       optional uint32 ttfb_ms = 2;             // needs the RemoteSession; provider byte-level TTFB
-      optional float wer = 3;                  // needs the RemoteSession; word error rate, pooled: word_errors / words
+      optional float wer = 3;                  // needs the RemoteSession; word_errors / words
       optional uint32 words = 7;               // needs the RemoteSession
       optional uint32 word_errors = 8;         // needs the RemoteSession
-      optional float cer = 9;                  // needs the RemoteSession; character error rate, pooled
+      optional float cer = 9;                  // needs the RemoteSession; char_errors / chars
       optional uint32 chars = 10;              // needs the RemoteSession
       optional uint32 char_errors = 11;        // needs the RemoteSession
-      optional float naturalness_score = 5;    // needs the audio judge; judged 0-1: prosody / expressiveness
-      optional float enunciation_score = 6;    // needs the audio judge; judged 0-1: key entities audibly intact
+      optional float naturalness_score = 5;    // needs the audio judge; 0-1, prosody / expressiveness
+      optional float enunciation_score = 6;    // needs the audio judge; 0-1, key entities audibly intact
 
       // Key entities the agent said, as the caller heard them. Needs the text judge.
       optional float entity_recognition = 14;  // recognized / uttered
@@ -155,38 +153,38 @@ message SimulationRun {
 
     // Audio only.
     message Conversation {
-      optional float turn_taking_score = 1;              // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
+      optional float turn_taking_score = 1;              // 0-1
       optional int32 response_latency_p50_ms = 2;        // floor-transfer offset; a gap is > 0, an overlap < 0
       optional int32 response_latency_p95_ms = 3;
       optional int32 response_latency_p99_ms = 4;
-      optional int32 response_latency_ms = 16;           // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
-      optional uint32 agent_yield_latency_ms = 5;        // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
-      optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended; 0/1 per turn
+      optional int32 response_latency_ms = 16;           // one turn's floor-transfer offset, cut-in if negative
+      optional uint32 agent_yield_latency_ms = 5;        // agent audio continuing past a barge-in
+      optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended
       optional float overlap_ratio = 7;                  // overlapping speech / total speech
       optional uint32 overlap_speech_ms = 8;             // pooling stats for overlap_ratio
       optional uint32 total_speech_ms = 9;
-      optional uint32 awkward_silence_count = 11;        // gaps past the natural-pause threshold; 0/1 per turn
-      optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded; 0/1 per turn
+      optional uint32 awkward_silence_count = 11;        // gaps past the natural-pause threshold
+      optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
-      optional uint32 agent_reported_e2e_latency_ms = 15; // needs the RemoteSession; the agent's own claim, mean
+      optional uint32 agent_reported_e2e_latency_ms = 15; // needs the RemoteSession; the agent's own claim
     }
 
-    // Was the call spoiled by the simulator, not the agent? Diagnostic only —
-    // never folded into the scores; run aggregation excludes flagged calls
-    // from the two headline scores.
+    // Was the call spoiled by the simulator, not the agent? Diagnostic only,
+    // never folded into the scores.
     message Simulator {
       optional bool early_termination = 1;  // simulator ended a still-progressing call
       optional bool late_termination = 2;   // simulator dragged on after the goal was met
     }
 
-    // Rows exist for text and audio;
+    // Rows exist for text and audio.
     message Turn {
       uint32 index = 1;                 // 1-based, conversation order
-      livekit.agent.ChatRole role = 2;  // ASSISTANT — the agent under test, USER — simulator persona.
+      livekit.agent.ChatRole role = 2;  // ASSISTANT = the agent under test, USER = simulator persona
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 
-      // Job groups hold means/pools of these; a field with no per-turn measurement stays unset here.
+      // Job groups hold the means/pools of these; counts here are 0/1. A field
+      // with no per-turn measurement stays unset.
       STT stt = 5;
       LLM llm = 6;
       TTS tts = 7;
