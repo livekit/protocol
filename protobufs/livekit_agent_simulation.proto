@@ -126,18 +126,12 @@ message SimulationRun {
       optional float entity_recognition = 11;  // recognized / uttered
       optional uint32 entities_uttered = 12;
       optional uint32 entities_recognized = 13;
-
-      reserved 5, 6, 7;  // was keyterm_recall, keyterms_uttered, keyterms_recognized
-      reserved "keyterm_recall", "keyterms_uttered", "keyterms_recognized";
     }
 
     message LLM {
       optional uint32 ttft_ms = 1;            // needs the RemoteSession; time to first token, mean (per-turn in turns)
       optional uint32 ttfs_ms = 2;            // needs the RemoteSession; time to first sentence (the smallest speakable unit)
       optional float tokens_per_second = 3;   // needs the RemoteSession; decode rate, mean (per-turn in turns.llm)
-
-      reserved 4;  // was conciseness_score, now on JobMetrics/Turn
-      reserved "conciseness_score";
     }
 
     // The agent's voice. audio only.
@@ -157,9 +151,6 @@ message SimulationRun {
       optional float entity_recognition = 14;  // recognized / uttered
       optional uint32 entities_uttered = 15;
       optional uint32 entities_recognized = 16;
-
-      reserved 4, 12, 13;  // was speech_rate_wpm, heard_words, speech_ms
-      reserved "speech_rate_wpm", "heard_words", "speech_ms";
     }
 
     // Audio only.
@@ -178,9 +169,6 @@ message SimulationRun {
       optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded; 0/1 per turn
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
       optional uint32 agent_reported_e2e_latency_ms = 15; // needs the RemoteSession; the agent's own claim, mean
-
-      reserved 10, 14;  // was silence_total_ms, false_interruption_unrecovered_count
-      reserved "silence_total_ms", "false_interruption_unrecovered_count";
     }
 
     // Was the call spoiled by the simulator, not the agent? Diagnostic only —
@@ -218,9 +206,6 @@ message SimulationRun {
     JobMetrics.LLM llm = 5;
     JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
-
-    reserved 9, 10, 11;  // was jobs_total, jobs_measured, jobs_simulator_fault
-    reserved "jobs_total", "jobs_measured", "jobs_simulator_fault";
   }
 
   message Create {
