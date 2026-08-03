@@ -117,7 +117,7 @@ message SimulationRun {
       optional float cer = 4;                       // needs the RemoteSession; char_errors / chars
       optional uint32 chars = 9;                    // needs the RemoteSession
       optional uint32 char_errors = 10;             // needs the RemoteSession
-      optional uint32 transcription_latency_ms = 8; // needs the RemoteSession; agent-reported STT/endpointing delay
+      optional uint32 stt_delay_ms = 8;             // needs the RemoteSession; agent-reported STT/endpointing delay
 
       // Key entities (names, IDs, amounts) the caller said. Needs the text judge.
       optional float entity_recognition = 11;  // recognized / uttered
@@ -150,10 +150,10 @@ message SimulationRun {
     // Audio only.
     message Conversation {
       optional float turn_taking_score = 1;              // 0-1
-      optional int32 response_latency_p50_ms = 2;        // floor-transfer offset; a gap is > 0, an overlap < 0
-      optional int32 response_latency_p95_ms = 3;
-      optional int32 response_latency_p99_ms = 4;
-      optional uint32 agent_yield_latency_ms = 5;        // agent audio continuing past a barge-in
+      optional int32 heard_e2e_latency_p50_ms = 2;       // floor-transfer offset; a gap is > 0, an overlap < 0
+      optional int32 heard_e2e_latency_p95_ms = 3;
+      optional int32 heard_e2e_latency_p99_ms = 4;
+      optional uint32 time_to_yield_ms = 5;              // agent audio continuing past a barge-in
       optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended
       optional float overlap_ratio = 7;                  // overlapping speech / total speech
       optional uint32 overlap_speech_ms = 8;             // pooling stats for overlap_ratio
@@ -161,7 +161,7 @@ message SimulationRun {
       optional uint32 awkward_silence_count = 11;        // gaps past the natural-pause threshold
       optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
-      optional uint32 agent_reported_e2e_latency_ms = 15; // needs the RemoteSession; the agent's own claim
+      optional uint32 e2e_latency_ms = 15;               // needs the RemoteSession; the agent's own claim
     }
 
     // Was the call spoiled by the simulator, not the agent? Diagnostic only,
@@ -179,15 +179,15 @@ message SimulationRun {
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 
-      optional uint32 transcription_latency_ms = 5;  // needs the RemoteSession; simulator turns
+      optional uint32 stt_delay_ms = 5;             // needs the RemoteSession; simulator turns
       optional uint32 llm_ttft_ms = 6;             // needs the RemoteSession
       optional uint32 llm_ttfs_ms = 7;             // needs the RemoteSession
-      optional float tokens_per_second = 8;        // needs the RemoteSession
+      optional float llm_tps = 8;                  // needs the RemoteSession
       optional uint32 tts_ttfb_ms = 9;             // needs the RemoteSession
-      optional uint32 agent_reported_e2e_latency_ms = 10;  // needs the RemoteSession
+      optional uint32 e2e_latency_ms = 10;         // needs the RemoteSession; the agent's own claim
 
-      optional int32 response_latency_ms = 11;     // floor-transfer offset, cut-in if negative
-      optional uint32 agent_yield_latency_ms = 12; // agent audio continuing past a barge-in
+      optional int32 heard_e2e_latency_ms = 11;    // floor-transfer offset, cut-in if negative
+      optional uint32 time_to_yield_ms = 12;       // agent audio continuing past a barge-in
       optional float turn_taking_score = 13;       // 0-1
       optional float conciseness = 14;             // needs the text judge
 
