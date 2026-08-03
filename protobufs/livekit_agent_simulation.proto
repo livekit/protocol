@@ -157,7 +157,6 @@ message SimulationRun {
       optional int32 response_latency_p50_ms = 2;        // floor-transfer offset; a gap is > 0, an overlap < 0
       optional int32 response_latency_p95_ms = 3;
       optional int32 response_latency_p99_ms = 4;
-      optional int32 response_latency_ms = 16;           // one turn's floor-transfer offset, cut-in if negative
       optional uint32 agent_yield_latency_ms = 5;        // agent audio continuing past a barge-in
       optional uint32 eot_misprediction_count = 6;       // agent started before the caller's turn ended
       optional float overlap_ratio = 7;                  // overlapping speech / total speech
@@ -176,34 +175,30 @@ message SimulationRun {
       optional bool late_termination = 2;   // simulator dragged on after the goal was met
     }
 
-    // Rows exist for text and audio.
+    // Rows exist for text and audio. The groups above hold the means and pools
+    // over these; anything not measured for a turn stays unset.
     message Turn {
       uint32 index = 1;                 // 1-based, conversation order
       livekit.agent.ChatRole role = 2;  // ASSISTANT = the agent under test, USER = simulator persona
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 
-      // Job groups hold the means/pools of these; counts here are 0/1. A field
-      // with no per-turn measurement stays unset.
-      STT stt = 5;
-      LLM llm = 6;
-      TTS tts = 7;
-      Conversation conversation = 8;
+      optional uint32 transcription_delay_ms = 5;  // needs the RemoteSession; simulator turns
+      optional uint32 llm_ttft_ms = 6;             // needs the RemoteSession
+      optional uint32 llm_ttfs_ms = 7;             // needs the RemoteSession
+      optional float tokens_per_second = 8;        // needs the RemoteSession
+      optional uint32 tts_ttfb_ms = 9;             // needs the RemoteSession
+      optional uint32 agent_reported_e2e_latency_ms = 10;  // needs the RemoteSession
 
-      optional float conciseness = 9;
+      optional int32 response_latency_ms = 11;     // floor-transfer offset, cut-in if negative
+      optional uint32 agent_yield_latency_ms = 12; // agent audio continuing past a barge-in
+      optional float turn_taking_score = 13;       // 0-1
+      optional float conciseness = 14;             // needs the text judge
+
+      optional bool eot_misprediction = 15;        // agent started before the caller's turn ended
+      optional bool awkward_silence = 16;          // gap past the natural-pause threshold
+      optional bool unanswered = 17;               // the caller spoke, the agent never responded
     }
-  }
-
-  // Aggregates over this run's jobs. Reuses the JobMetrics group shapes.
-  message RunMetrics {
-    optional float accuracy_score = 1;     // mean over scored jobs
-    optional float experience_score = 2;
-    optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
-
-    JobMetrics.STT stt = 4;
-    JobMetrics.LLM llm = 5;
-    JobMetrics.TTS tts = 6;
-    JobMetrics.Conversation conversation = 7;
   }
 
   message Create {
@@ -294,9 +289,6 @@ message SimulationRun {
   int32 concurrency = 17;
   // Conversation mode for every job in this run; unspecified = TEXT.
   SimulationMode mode = 18;
-  // Run-level metric aggregates.
-  RunMetrics metrics = 19;
-
   // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
   // Compressed by default so the blob ships as-is on every hop.
   bytes summary_zstd = 20;
