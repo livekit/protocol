@@ -1991,11 +1991,11 @@ type SimulationRun_JobMetrics_Turn struct {
 	StartMs *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`  // audio only; relative to t0; unset if the turn could not be aligned to the audio
 	EndMs   *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`        // audio only
 	// Job groups hold means/pools of these; a field with no per-turn measurement stays unset here.
-	Stt           *SimulationRun_JobMetrics_STT          `protobuf:"bytes,5,opt,name=stt,proto3" json:"stt,omitempty"`                         // transcription_latency_ms
-	Llm           *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,6,opt,name=llm,proto3" json:"llm,omitempty"`                         // ttft_ms, ttfs_ms, tokens_per_second
-	Tts           *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,7,opt,name=tts,proto3" json:"tts,omitempty"`                         // ttfa_ms, ttfb_ms, naturalness_score, enunciation_score
-	Conversation  *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,8,opt,name=conversation,proto3" json:"conversation,omitempty"`       // response_latency_ms, agent_yield_latency_ms, agent_reported_e2e_latency_ms, 0/1 counts
-	Conciseness   *float32                               `protobuf:"fixed32,9,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1}
+	Stt           *SimulationRun_JobMetrics_STT          `protobuf:"bytes,5,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm           *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,6,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts           *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,7,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation  *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,8,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	Conciseness   *float32                               `protobuf:"fixed32,9,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
