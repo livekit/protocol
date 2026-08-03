@@ -1456,8 +1456,14 @@ type SimulationRun_JobMetrics_STT struct {
 	EntityRecognition  *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
 	EntitiesUttered    *uint32  `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
 	EntitiesRecognized *uint32  `protobuf:"varint,13,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// Retention: an entity is acquired at the first saying heard right, and
+	// these count only the sayings after that, so recall separates keeping an
+	// entity from ever getting it.
+	EntityRecall               *float32 `protobuf:"fixed32,14,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"` // acquired_recognized / acquired_uttered
+	EntitiesAcquiredUttered    *uint32  `protobuf:"varint,15,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
+	EntitiesAcquiredRecognized *uint32  `protobuf:"varint,16,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_STT) Reset() {
@@ -1560,6 +1566,27 @@ func (x *SimulationRun_JobMetrics_STT) GetEntitiesRecognized() uint32 {
 	return 0
 }
 
+func (x *SimulationRun_JobMetrics_STT) GetEntityRecall() float32 {
+	if x != nil && x.EntityRecall != nil {
+		return *x.EntityRecall
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetEntitiesAcquiredUttered() uint32 {
+	if x != nil && x.EntitiesAcquiredUttered != nil {
+		return *x.EntitiesAcquiredUttered
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetEntitiesAcquiredRecognized() uint32 {
+	if x != nil && x.EntitiesAcquiredRecognized != nil {
+		return *x.EntitiesAcquiredRecognized
+	}
+	return 0
+}
+
 type SimulationRun_JobMetrics_LLM struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	TtftMs          *uint32                `protobuf:"varint,1,opt,name=ttft_ms,json=ttftMs,proto3,oneof" json:"ttft_ms,omitempty"`                               // needs the RemoteSession; time to first token
@@ -1631,11 +1658,14 @@ type SimulationRun_JobMetrics_TTS struct {
 	Chars      *uint32                `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                             // needs the RemoteSession
 	CharErrors *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"` // needs the RemoteSession
 	// Key entities the agent said, as the caller heard them. Needs the text judge.
-	EntityRecognition  *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
-	EntitiesUttered    *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
-	EntitiesRecognized *uint32  `protobuf:"varint,16,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	EntityRecognition          *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
+	EntitiesUttered            *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
+	EntitiesRecognized         *uint32  `protobuf:"varint,16,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
+	EntityRecall               *float32 `protobuf:"fixed32,17,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"` // acquired_recognized / acquired_uttered
+	EntitiesAcquiredUttered    *uint32  `protobuf:"varint,18,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
+	EntitiesAcquiredRecognized *uint32  `protobuf:"varint,19,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_TTS) Reset() {
@@ -1734,6 +1764,27 @@ func (x *SimulationRun_JobMetrics_TTS) GetEntitiesUttered() uint32 {
 func (x *SimulationRun_JobMetrics_TTS) GetEntitiesRecognized() uint32 {
 	if x != nil && x.EntitiesRecognized != nil {
 		return *x.EntitiesRecognized
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetEntityRecall() float32 {
+	if x != nil && x.EntityRecall != nil {
+		return *x.EntityRecall
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetEntitiesAcquiredUttered() uint32 {
+	if x != nil && x.EntitiesAcquiredUttered != nil {
+		return *x.EntitiesAcquiredUttered
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetEntitiesAcquiredRecognized() uint32 {
+	if x != nil && x.EntitiesAcquiredRecognized != nil {
+		return *x.EntitiesAcquiredRecognized
 	}
 	return 0
 }
@@ -2756,7 +2807,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x8d=\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x93A\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2806,7 +2857,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xbb!\n" +
+	"\x1a\xc1%\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2827,7 +2878,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10information_loss\x18\x10 \x01(\bH\x05R\x0finformationLoss\x88\x01\x01\x126\n" +
 	"\x14redundant_statements\x18\x11 \x01(\bH\x06R\x13redundantStatements\x88\x01\x01\x127\n" +
 	"\x15poor_question_quality\x18\x12 \x01(\bH\aR\x13poorQuestionQuality\x88\x01\x01\x12>\n" +
-	"\x18conversation_progression\x18\x13 \x01(\x02H\bR\x17conversationProgression\x88\x01\x01\x1a\x8f\x04\n" +
+	"\x18conversation_progression\x18\x13 \x01(\x02H\bR\x17conversationProgression\x88\x01\x01\x1a\x92\x06\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
@@ -2842,7 +2893,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"sttDelayMs\x88\x01\x01\x122\n" +
 	"\x12entity_recognition\x18\v \x01(\x02H\aR\x11entityRecognition\x88\x01\x01\x12.\n" +
 	"\x10entities_uttered\x18\f \x01(\rH\bR\x0fentitiesUttered\x88\x01\x01\x124\n" +
-	"\x13entities_recognized\x18\r \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01B\x06\n" +
+	"\x13entities_recognized\x18\r \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01\x12(\n" +
+	"\rentity_recall\x18\x0e \x01(\x02H\n" +
+	"R\fentityRecall\x88\x01\x01\x12?\n" +
+	"\x19entities_acquired_uttered\x18\x0f \x01(\rH\vR\x17entitiesAcquiredUttered\x88\x01\x01\x12E\n" +
+	"\x1centities_acquired_recognized\x18\x10 \x01(\rH\fR\x1aentitiesAcquiredRecognized\x88\x01\x01B\x06\n" +
 	"\x04_werB\b\n" +
 	"\x06_wordsB\x0e\n" +
 	"\f_word_errorsB\x06\n" +
@@ -2852,7 +2907,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\r_stt_delay_msB\x15\n" +
 	"\x13_entity_recognitionB\x13\n" +
 	"\x11_entities_utteredB\x16\n" +
-	"\x14_entities_recognized\x1a\xa0\x01\n" +
+	"\x14_entities_recognizedB\x10\n" +
+	"\x0e_entity_recallB\x1c\n" +
+	"\x1a_entities_acquired_utteredB\x1f\n" +
+	"\x1d_entities_acquired_recognized\x1a\xa0\x01\n" +
 	"\x03LLM\x12\x1c\n" +
 	"\attft_ms\x18\x01 \x01(\rH\x00R\x06ttftMs\x88\x01\x01\x12\x1c\n" +
 	"\attfs_ms\x18\x02 \x01(\rH\x01R\x06ttfsMs\x88\x01\x01\x12/\n" +
@@ -2861,7 +2919,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\b_ttft_msB\n" +
 	"\n" +
 	"\b_ttfs_msB\x14\n" +
-	"\x12_tokens_per_second\x1a\x81\x04\n" +
+	"\x12_tokens_per_second\x1a\x84\x06\n" +
 	"\x03TTS\x12\x1c\n" +
 	"\attfb_ms\x18\x02 \x01(\rH\x00R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
 	"\x03wer\x18\x03 \x01(\x02H\x01R\x03wer\x88\x01\x01\x12\x19\n" +
@@ -2875,7 +2933,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"charErrors\x88\x01\x01\x122\n" +
 	"\x12entity_recognition\x18\x0e \x01(\x02H\aR\x11entityRecognition\x88\x01\x01\x12.\n" +
 	"\x10entities_uttered\x18\x0f \x01(\rH\bR\x0fentitiesUttered\x88\x01\x01\x124\n" +
-	"\x13entities_recognized\x18\x10 \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01B\n" +
+	"\x13entities_recognized\x18\x10 \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01\x12(\n" +
+	"\rentity_recall\x18\x11 \x01(\x02H\n" +
+	"R\fentityRecall\x88\x01\x01\x12?\n" +
+	"\x19entities_acquired_uttered\x18\x12 \x01(\rH\vR\x17entitiesAcquiredUttered\x88\x01\x01\x12E\n" +
+	"\x1centities_acquired_recognized\x18\x13 \x01(\rH\fR\x1aentitiesAcquiredRecognized\x88\x01\x01B\n" +
 	"\n" +
 	"\b_ttfb_msB\x06\n" +
 	"\x04_werB\b\n" +
@@ -2886,7 +2948,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_char_errorsB\x15\n" +
 	"\x13_entity_recognitionB\x13\n" +
 	"\x11_entities_utteredB\x16\n" +
-	"\x14_entities_recognized\x1a\xf5\a\n" +
+	"\x14_entities_recognizedB\x10\n" +
+	"\x0e_entity_recallB\x1c\n" +
+	"\x1a_entities_acquired_utteredB\x1f\n" +
+	"\x1d_entities_acquired_recognized\x1a\xf5\a\n" +
 	"\fConversation\x12/\n" +
 	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12;\n" +
 	"\x18heard_e2e_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14heardE2eLatencyP50Ms\x88\x01\x01\x12;\n" +
