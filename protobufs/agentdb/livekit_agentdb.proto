@@ -14,44 +14,44 @@
 
 syntax = "proto3";
 
-package livekit;
+package livekit.agentdb;
 
-option go_package = "github.com/livekit/protocol/livekit";
+option go_package = "github.com/livekit/protocol/livekit/agentdb";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-// AgentSessionStore manages per-session SQLite databases: lifecycle and export.
-// Querying goes through the data plane in livekit_agent_session_db.proto. The
-// project comes from the access token, never from a request field.
-service AgentSessionStore {
-  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
-  rpc GetSession(GetSessionRequest) returns (GetSessionResponse);
-  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+// AgentDB hands out SQLite databases: lifecycle and export. Querying goes
+// through the data plane in livekit_agentdb_data.proto. The project comes from
+// the access token, never from a request field.
+service AgentDB {
+  rpc CreateDatabase(CreateDatabaseRequest) returns (CreateDatabaseResponse);
+  rpc GetDatabase(GetDatabaseRequest) returns (GetDatabaseResponse);
+  rpc ListDatabases(ListDatabasesRequest) returns (ListDatabasesResponse);
 
   // Deletes the stored data too, not just the metadata row.
-  rpc DeleteSession(DeleteSessionRequest) returns (DeleteSessionResponse);
+  rpc DeleteDatabase(DeleteDatabaseRequest) returns (DeleteDatabaseResponse);
 
   // Exports a consistent SQLite file, returning a time-limited download URL.
-  rpc Dump(DumpSessionRequest) returns (DumpSessionResponse);
+  rpc Dump(DumpDatabaseRequest) returns (DumpDatabaseResponse);
 }
 
-message CreateSessionRequest {
+message CreateDatabaseRequest {
   string region = 1;
   string user_attributes = 2;  // opaque JSON metadata for the caller
   int64 ttl_seconds = 3;       // unset: never expires. Otherwise clamped to the server cap, and never extended
 }
 
-message CreateSessionResponse {
-  string session_id = 1;       // "SESS_..."
+message CreateDatabaseResponse {
+  string database_id = 1;      // "DB_..."
   int64 expires_at_unix = 2;   // 0: never expires
 }
 
-message GetSessionRequest {
-  string session_id = 1;
+message GetDatabaseRequest {
+  string database_id = 1;
 }
 
-message GetSessionResponse {
-  string session_id = 1;
+message GetDatabaseResponse {
+  string database_id = 1;
   string region = 2;
   string user_attributes = 3;
   int64 created_at_unix = 4;
@@ -59,37 +59,37 @@ message GetSessionResponse {
   int64 tip = 6;               // latest durable commit sequence
 }
 
-message ListSessionsRequest {
+message ListDatabasesRequest {
   int32 page_size = 1;         // server-clamped
   string page_token = 2;       // opaque cursor from a previous response
 }
 
-message ListSessionsResponse {
-  repeated SessionSummary sessions = 1;
+message ListDatabasesResponse {
+  repeated DatabaseSummary databases = 1;
   string next_page_token = 2;  // empty when exhausted
 }
 
-// SessionSummary is a session's immutable fields. No tip: it changes on every
-// commit, so call GetSession for it.
-message SessionSummary {
-  string session_id = 1;
+// DatabaseSummary is a database's immutable fields. No tip: it changes on every
+// commit, so call GetDatabase for it.
+message DatabaseSummary {
+  string database_id = 1;
   string region = 2;
   string user_attributes = 3;
   int64 created_at_unix = 4;
   int64 expires_at_unix = 5;   // 0: never expires
 }
 
-message DeleteSessionRequest {
-  string session_id = 1;
+message DeleteDatabaseRequest {
+  string database_id = 1;
 }
 
-message DeleteSessionResponse {}
+message DeleteDatabaseResponse {}
 
-message DumpSessionRequest {
-  string session_id = 1;
+message DumpDatabaseRequest {
+  string database_id = 1;
 }
 
-message DumpSessionResponse {
+message DumpDatabaseResponse {
   string download_url = 1;     // pre-authenticated object-storage URL
   int64 expires_at_unix = 2;   // URL expiry
   int64 tip = 3;               // commit sequence the dump is consistent at
