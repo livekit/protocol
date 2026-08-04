@@ -15,13 +15,13 @@
 package rpc
 
 import (
+	"maps"
 	"slices"
 	sync "sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/atomic"
-	"golang.org/x/exp/maps"
 
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
@@ -78,7 +78,7 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 	}
 
 	metricsBase.curryLabels = o.curryLabels
-	curryLabelNames := maps.Keys(o.curryLabels)
+	curryLabelNames := slices.Collect(maps.Keys(o.curryLabels))
 	slices.Sort(curryLabelNames)
 
 	labels := slices.Concat(curryLabelNames, []string{"role", "kind", "service", "method"})
