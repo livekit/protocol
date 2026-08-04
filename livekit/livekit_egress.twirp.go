@@ -3019,7 +3019,7 @@ func (s *egressServer) serveStartTrackEgressProtobuf(ctx context.Context, resp h
 }
 
 func (s *egressServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor3, 0
+	return twirpFileDescriptor2, 0
 }
 
 func (s *egressServer) ProtocGenTwirpVersion() string {
@@ -3033,7 +3033,7 @@ func (s *egressServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "Egress")
 }
 
-var twirpFileDescriptor3 = []byte{
+var twirpFileDescriptor2 = []byte{
 	// 4257 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x3b, 0x4b, 0x70, 0x1c, 0x59,
 	0x52, 0xaa, 0xea, 0x7f, 0xf6, 0xaf, 0xf4, 0x24, 0x6b, 0xda, 0xf2, 0x7a, 0xec, 0x6d, 0xef, 0x8c,
