@@ -169,13 +169,29 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 	return stuck
 }
 
+// HolderStrength describes how a stuck lock is held.
+type HolderStrength int32
+
+const (
+	HolderExclusive HolderStrength = iota // Mutex, RWMutex write lock, Synchronized
+	HolderShared                          // RWMutex read locks
+)
+
+func (s HolderStrength) String() string {
+	if s == HolderShared {
+		return "shared"
+	}
+	return "exclusive"
+}
+
 type StuckLock struct {
-	stack        []uintptr
-	ts           uint32
-	waiting      int32
-	held         int32
-	gids         []int64
-	holderStacks []string
+	stack          []uintptr
+	ts             uint32
+	waiting        int32
+	held           int32
+	holderStrength HolderStrength
+	gids           []int64
+	holderStacks   []string
 }
 
 func (d *StuckLock) FirstLockedAtStack() string {
@@ -218,6 +234,12 @@ func (d *StuckLock) NumGoroutineWaiting() int {
 // RWMutex (compare with NumGoroutineHeld to detect overflow).
 func (d *StuckLock) HolderGoroutineIDs() []int64 {
 	return d.gids
+}
+
+// HolderStrength reports whether the lock is held exclusively or shared by
+// readers.
+func (d *StuckLock) HolderStrength() HolderStrength {
+	return d.holderStrength
 }
 
 // HolderStacks returns the holder goroutines' stacks as resolved by
@@ -288,29 +310,23 @@ type lockTracker struct {
 }
 
 func (t *lockTracker) trackWait() {
-	if t != nil {
-		atomic.AddInt32(&t.waiting, 1)
-	}
+	atomic.AddInt32(&t.waiting, 1)
 }
 
 func (t *lockTracker) trackLock() {
-	if t != nil {
-		atomic.AddInt32(&t.waiting, -1)
-		t.gid = goid.Get()
-		atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
+	atomic.AddInt32(&t.waiting, -1)
+	t.gid = goid.Get()
+	atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
 
-		if atomic.LoadUint32(&enableLockTrackerStackTrace) == 1 {
-			n := runtime.Callers(2, t.stack[:lockTrackerMaxStackDepth])
-			t.stack = t.stack[:n]
-		}
+	if atomic.LoadUint32(&enableLockTrackerStackTrace) == 1 {
+		n := runtime.Callers(2, t.stack[:lockTrackerMaxStackDepth])
+		t.stack = t.stack[:n]
 	}
 }
 
 func (t *lockTracker) trackUnlock() {
-	if t != nil {
-		t.gid = 0
-		atomic.StoreUint32(&t.ts, math.MaxUint32)
-	}
+	t.gid = 0
+	atomic.StoreUint32(&t.ts, math.MaxUint32)
 }
 
 func newLockTracker() *lockTracker {
@@ -333,6 +349,18 @@ func sync_runtime_doSpin()
 
 // trackerInitSentinel marks a tracker pointer field as mid-initialization.
 var trackerInitSentinel = unsafe.Pointer(new(int))
+
+// loadTracker returns the tracker if its initialization completed, else nil.
+// Unlock paths use it instead of lazyInitTracker: a lock being unlocked was
+// necessarily locked first, so the tracker either exists or tracking was
+// disabled at Lock time.
+func loadTracker[T any](p **T) *T {
+	t := atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(p)))
+	if t == trackerInitSentinel {
+		return nil
+	}
+	return (*T)(t)
+}
 
 func lazyInitTracker[T any](p **T, construct func() *T) *T {
 	if !lockTrackerEnabled {
@@ -365,13 +393,16 @@ type Mutex struct {
 
 func (m *Mutex) Lock() {
 	t := lazyInitTracker(&m.t, newLockTracker)
-	t.trackWait()
+	if t != nil {
+		t.trackWait()
+		defer t.trackLock()
+	}
 	m.Mutex.Lock()
-	t.trackLock()
 }
 
 func (m *Mutex) Unlock() {
-	t := lazyInitTracker(&m.t, newLockTracker)
-	t.trackUnlock()
+	if t := loadTracker(&m.t); t != nil {
+		t.trackUnlock()
+	}
 	m.Mutex.Unlock()
 }

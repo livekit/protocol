@@ -45,19 +45,7 @@ type rwLockTracker struct {
 	rgids     [lockTrackerMaxReadHolders]int64
 }
 
-// base returns the embedded exclusive tracker, tolerating nil like the
-// lockTracker methods do.
-func (t *rwLockTracker) base() *lockTracker {
-	if t == nil {
-		return nil
-	}
-	return &t.lockTracker
-}
-
 func (t *rwLockTracker) trackRLock() {
-	if t == nil {
-		return
-	}
 	atomic.AddInt32(&t.waiting, -1)
 
 	gid := goid.Get()
@@ -83,9 +71,6 @@ func (t *rwLockTracker) trackRLock() {
 }
 
 func (t *rwLockTracker) trackRUnlock() {
-	if t == nil {
-		return
-	}
 	gid := goid.Get()
 	removed := false
 	for i := range t.rgids {
@@ -137,10 +122,12 @@ func scanRWTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 			waiting := atomic.LoadInt32(&t.waiting)
 			if ts <= minTS && waiting > 0 {
 				var gids []int64
+				strength := HolderShared
 				held := atomic.LoadInt32(&t.rheld)
 				if gid := t.gid; gid != 0 {
 					gids = append(gids, gid)
 					held++
+					strength = HolderExclusive
 				}
 				for i := range t.rgids {
 					if gid := atomic.LoadInt64(&t.rgids[i]); gid != 0 {
@@ -148,11 +135,12 @@ func scanRWTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 					}
 				}
 				stuck = append(stuck, &StuckLock{
-					stack:   slices.Clone(t.stack),
-					ts:      ts,
-					waiting: waiting,
-					held:    held,
-					gids:    gids,
+					stack:          slices.Clone(t.stack),
+					ts:             ts,
+					waiting:        waiting,
+					held:           held,
+					holderStrength: strength,
+					gids:           gids,
 				})
 			}
 		}
@@ -167,26 +155,32 @@ type RWMutex struct {
 
 func (m *RWMutex) Lock() {
 	t := lazyInitTracker(&m.t, newRWLockTracker)
-	t.base().trackWait()
+	if t != nil {
+		t.trackWait()
+		defer t.trackLock()
+	}
 	m.RWMutex.Lock()
-	t.base().trackLock()
 }
 
 func (m *RWMutex) Unlock() {
-	t := lazyInitTracker(&m.t, newRWLockTracker)
-	t.base().trackUnlock()
+	if t := loadTracker(&m.t); t != nil {
+		t.trackUnlock()
+	}
 	m.RWMutex.Unlock()
 }
 
 func (m *RWMutex) RLock() {
 	t := lazyInitTracker(&m.t, newRWLockTracker)
-	t.base().trackWait()
+	if t != nil {
+		t.trackWait()
+		defer t.trackRLock()
+	}
 	m.RWMutex.RLock()
-	t.trackRLock()
 }
 
 func (m *RWMutex) RUnlock() {
-	t := lazyInitTracker(&m.t, newRWLockTracker)
-	t.trackRUnlock()
+	if t := loadTracker(&m.t); t != nil {
+		t.trackRUnlock()
+	}
 	m.RWMutex.RUnlock()
 }

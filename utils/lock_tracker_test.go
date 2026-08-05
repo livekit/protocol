@@ -128,6 +128,7 @@ func TestHolderStacks(t *testing.T) {
 	locks := utils.ScanTrackedLocks(time.Millisecond)
 	require.NotNil(t, locks)
 	require.Len(t, locks[0].HolderGoroutineIDs(), 2)
+	require.Equal(t, utils.HolderShared, locks[0].HolderStrength())
 	require.Equal(t, "", locks[0].HolderStacks())
 
 	utils.PopulateHolderStacks(locks)
@@ -175,6 +176,7 @@ func TestHolderCrossGoroutineUnlock(t *testing.T) {
 	require.NotNil(t, locks)
 	// the cross-goroutine unlock must not leak the original locker's slot
 	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+	require.Equal(t, utils.HolderExclusive, locks[0].HolderStrength())
 	utils.PopulateHolderStacks(locks)
 	require.Contains(t, locks[0].HolderStacks(), "parkHoldingLock(")
 
