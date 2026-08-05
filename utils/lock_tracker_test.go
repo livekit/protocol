@@ -458,6 +458,29 @@ func BenchmarkLockTracker(b *testing.B) {
 	})
 }
 
+func BenchmarkLockTrackerParallel(b *testing.B) {
+	b.Run("wrapped rwmutex rlock", func(b *testing.B) {
+		var m utils.RWMutex
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				m.RLock()
+				noop()
+				m.RUnlock()
+			}
+		})
+	})
+	b.Run("native rwmutex rlock", func(b *testing.B) {
+		var m sync.RWMutex
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				m.RLock()
+				noop()
+				m.RUnlock()
+			}
+		})
+	})
+}
+
 func BenchmarkGetBlocked(b *testing.B) {
 	for n := 100; n <= 1000000; n *= 100 {
 		n := n
