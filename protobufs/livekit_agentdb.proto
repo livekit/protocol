@@ -30,7 +30,7 @@ service AgentDBService {
   // Deletes the stored data, not just the metadata.
   rpc DeleteDatabase(AgentDB.DeleteRequest) returns (AgentDB.DeleteResponse);
   // Exports a consistent SQLite file as a time-limited download URL.
-  rpc Dump(AgentDB.DumpRequest) returns (AgentDB.DumpResponse);
+  rpc DumpDatabase(AgentDB.DumpRequest) returns (AgentDB.DumpResponse);
 }
 
 // Nested so that names like Value and Ping need not be unique across the
@@ -128,7 +128,7 @@ message AgentDB {
     }
 
     enum QueryLang {
-      QUERY_LANG_SQL = 0;
+      SQL = 0;
       reserved 1;
     }
 
@@ -187,11 +187,11 @@ message AgentDB {
     }
 
     enum ValueType {
-      VALUE_TYPE_NULL = 0;
-      VALUE_TYPE_INT = 1;
-      VALUE_TYPE_DOUBLE = 2;
-      VALUE_TYPE_TEXT = 3;
-      VALUE_TYPE_BLOB = 4;
+      NULL = 0;
+      INT = 1;
+      DOUBLE = 2;
+      TEXT = 3;
+      BLOB = 4;
     }
 
     // Values are typed per row, as SQLite types them, so a column may mix

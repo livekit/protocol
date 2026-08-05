@@ -38,16 +38,16 @@ const (
 type AgentDB_Wire_QueryLang int32
 
 const (
-	AgentDB_Wire_QUERY_LANG_SQL AgentDB_Wire_QueryLang = 0
+	AgentDB_Wire_SQL AgentDB_Wire_QueryLang = 0
 )
 
 // Enum value maps for AgentDB_Wire_QueryLang.
 var (
 	AgentDB_Wire_QueryLang_name = map[int32]string{
-		0: "QUERY_LANG_SQL",
+		0: "SQL",
 	}
 	AgentDB_Wire_QueryLang_value = map[string]int32{
-		"QUERY_LANG_SQL": 0,
+		"SQL": 0,
 	}
 )
 
@@ -81,28 +81,28 @@ func (AgentDB_Wire_QueryLang) EnumDescriptor() ([]byte, []int) {
 type AgentDB_Wire_ValueType int32
 
 const (
-	AgentDB_Wire_VALUE_TYPE_NULL   AgentDB_Wire_ValueType = 0
-	AgentDB_Wire_VALUE_TYPE_INT    AgentDB_Wire_ValueType = 1
-	AgentDB_Wire_VALUE_TYPE_DOUBLE AgentDB_Wire_ValueType = 2
-	AgentDB_Wire_VALUE_TYPE_TEXT   AgentDB_Wire_ValueType = 3
-	AgentDB_Wire_VALUE_TYPE_BLOB   AgentDB_Wire_ValueType = 4
+	AgentDB_Wire_NULL   AgentDB_Wire_ValueType = 0
+	AgentDB_Wire_INT    AgentDB_Wire_ValueType = 1
+	AgentDB_Wire_DOUBLE AgentDB_Wire_ValueType = 2
+	AgentDB_Wire_TEXT   AgentDB_Wire_ValueType = 3
+	AgentDB_Wire_BLOB   AgentDB_Wire_ValueType = 4
 )
 
 // Enum value maps for AgentDB_Wire_ValueType.
 var (
 	AgentDB_Wire_ValueType_name = map[int32]string{
-		0: "VALUE_TYPE_NULL",
-		1: "VALUE_TYPE_INT",
-		2: "VALUE_TYPE_DOUBLE",
-		3: "VALUE_TYPE_TEXT",
-		4: "VALUE_TYPE_BLOB",
+		0: "NULL",
+		1: "INT",
+		2: "DOUBLE",
+		3: "TEXT",
+		4: "BLOB",
 	}
 	AgentDB_Wire_ValueType_value = map[string]int32{
-		"VALUE_TYPE_NULL":   0,
-		"VALUE_TYPE_INT":    1,
-		"VALUE_TYPE_DOUBLE": 2,
-		"VALUE_TYPE_TEXT":   3,
-		"VALUE_TYPE_BLOB":   4,
+		"NULL":   0,
+		"INT":    1,
+		"DOUBLE": 2,
+		"TEXT":   3,
+		"BLOB":   4,
 	}
 )
 
@@ -1369,7 +1369,7 @@ func (x *AgentDB_Wire_Statement) GetLang() AgentDB_Wire_QueryLang {
 	if x != nil {
 		return x.Lang
 	}
-	return AgentDB_Wire_QUERY_LANG_SQL
+	return AgentDB_Wire_SQL
 }
 
 type AgentDB_Wire_Batch struct {
@@ -2173,7 +2173,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\"\x95\x1b\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\"\xd3\x1a\n" +
 	"\aAgentDB\x1aH\n" +
 	"\rCreateRequest\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x1f\n" +
@@ -2223,7 +2223,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x12\x1d\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\x03R\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\x8f\x14\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xcd\x13\n" +
 	"\x04Wire\x1a\xe0\x04\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2314,21 +2314,22 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"total_rows\x18\x02 \x01(\x04R\ttotalRows\x1a5\n" +
 	"\x05Error\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"%\n" +
-	"\tQueryLang\x12\x12\n" +
-	"\x0eQUERY_LANG_SQL\x10\x00\"\x04\b\x01\x10\x01\"u\n" +
-	"\tValueType\x12\x13\n" +
-	"\x0fVALUE_TYPE_NULL\x10\x00\x12\x12\n" +
-	"\x0eVALUE_TYPE_INT\x10\x01\x12\x15\n" +
-	"\x11VALUE_TYPE_DOUBLE\x10\x02\x12\x13\n" +
-	"\x0fVALUE_TYPE_TEXT\x10\x03\x12\x13\n" +
-	"\x0fVALUE_TYPE_BLOB\x10\x042\x93\x03\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x1a\n" +
+	"\tQueryLang\x12\a\n" +
+	"\x03SQL\x10\x00\"\x04\b\x01\x10\x01\">\n" +
+	"\tValueType\x12\b\n" +
+	"\x04NULL\x10\x00\x12\a\n" +
+	"\x03INT\x10\x01\x12\n" +
+	"\n" +
+	"\x06DOUBLE\x10\x02\x12\b\n" +
+	"\x04TEXT\x10\x03\x12\b\n" +
+	"\x04BLOB\x10\x042\x9b\x03\n" +
 	"\x0eAgentDBService\x12Q\n" +
 	"\x0eCreateDatabase\x12\x1e.livekit.AgentDB.CreateRequest\x1a\x1f.livekit.AgentDB.CreateResponse\x12H\n" +
 	"\vGetDatabase\x12\x1b.livekit.AgentDB.GetRequest\x1a\x1c.livekit.AgentDB.GetResponse\x12L\n" +
 	"\rListDatabases\x12\x1c.livekit.AgentDB.ListRequest\x1a\x1d.livekit.AgentDB.ListResponse\x12Q\n" +
-	"\x0eDeleteDatabase\x12\x1e.livekit.AgentDB.DeleteRequest\x1a\x1f.livekit.AgentDB.DeleteResponse\x12C\n" +
-	"\x04Dump\x12\x1c.livekit.AgentDB.DumpRequest\x1a\x1d.livekit.AgentDB.DumpResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x0eDeleteDatabase\x12\x1e.livekit.AgentDB.DeleteRequest\x1a\x1f.livekit.AgentDB.DeleteResponse\x12K\n" +
+	"\fDumpDatabase\x12\x1c.livekit.AgentDB.DumpRequest\x1a\x1d.livekit.AgentDB.DumpResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agentdb_proto_rawDescOnce sync.Once
@@ -2408,12 +2409,12 @@ var file_livekit_agentdb_proto_depIdxs = []int32{
 	5,  // 23: livekit.AgentDBService.GetDatabase:input_type -> livekit.AgentDB.GetRequest
 	7,  // 24: livekit.AgentDBService.ListDatabases:input_type -> livekit.AgentDB.ListRequest
 	10, // 25: livekit.AgentDBService.DeleteDatabase:input_type -> livekit.AgentDB.DeleteRequest
-	12, // 26: livekit.AgentDBService.Dump:input_type -> livekit.AgentDB.DumpRequest
+	12, // 26: livekit.AgentDBService.DumpDatabase:input_type -> livekit.AgentDB.DumpRequest
 	4,  // 27: livekit.AgentDBService.CreateDatabase:output_type -> livekit.AgentDB.CreateResponse
 	6,  // 28: livekit.AgentDBService.GetDatabase:output_type -> livekit.AgentDB.GetResponse
 	8,  // 29: livekit.AgentDBService.ListDatabases:output_type -> livekit.AgentDB.ListResponse
 	11, // 30: livekit.AgentDBService.DeleteDatabase:output_type -> livekit.AgentDB.DeleteResponse
-	13, // 31: livekit.AgentDBService.Dump:output_type -> livekit.AgentDB.DumpResponse
+	13, // 31: livekit.AgentDBService.DumpDatabase:output_type -> livekit.AgentDB.DumpResponse
 	27, // [27:32] is the sub-list for method output_type
 	22, // [22:27] is the sub-list for method input_type
 	22, // [22:22] is the sub-list for extension type_name
