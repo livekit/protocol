@@ -175,7 +175,7 @@ type AgentDB_CreateRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Region         string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,2,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"` // opaque JSON metadata for the caller
-	// Unset: never expires, and expires_at_unix is then 0 everywhere.
+	// Unset: never expires, and expires_at is then 0 everywhere.
 	// Otherwise clamped to the server cap, and never extended.
 	TtlSeconds    int64 `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -236,7 +236,7 @@ func (x *AgentDB_CreateRequest) GetTtlSeconds() int64 {
 type AgentDB_CreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..."
-	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -278,9 +278,9 @@ func (x *AgentDB_CreateResponse) GetDatabaseId() string {
 	return ""
 }
 
-func (x *AgentDB_CreateResponse) GetExpiresAtUnix() int64 {
+func (x *AgentDB_CreateResponse) GetExpiresAt() int64 {
 	if x != nil {
-		return x.ExpiresAtUnix
+		return x.ExpiresAt
 	}
 	return 0
 }
@@ -334,8 +334,8 @@ type AgentDB_GetResponse struct {
 	DatabaseId     string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	Region         string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,3,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"`
-	CreatedAtUnix  int64                  `protobuf:"varint,4,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
-	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
+	CreatedAt      int64                  `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	ExpiresAt      int64                  `protobuf:"varint,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	Tip            int64                  `protobuf:"varint,6,opt,name=tip,proto3" json:"tip,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -392,16 +392,16 @@ func (x *AgentDB_GetResponse) GetUserAttributes() string {
 	return ""
 }
 
-func (x *AgentDB_GetResponse) GetCreatedAtUnix() int64 {
+func (x *AgentDB_GetResponse) GetCreatedAt() int64 {
 	if x != nil {
-		return x.CreatedAtUnix
+		return x.CreatedAt
 	}
 	return 0
 }
 
-func (x *AgentDB_GetResponse) GetExpiresAtUnix() int64 {
+func (x *AgentDB_GetResponse) GetExpiresAt() int64 {
 	if x != nil {
-		return x.ExpiresAtUnix
+		return x.ExpiresAt
 	}
 	return 0
 }
@@ -517,15 +517,14 @@ func (x *AgentDB_ListResponse) GetNextPageToken() string {
 	return ""
 }
 
-// Immutable fields only, so a listing needs no per-database read. No tip: it
-// moves on every commit.
+// Immutable fields only. No tip: it moves on every commit.
 type AgentDB_Summary struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	DatabaseId     string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	Region         string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,3,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"`
-	CreatedAtUnix  int64                  `protobuf:"varint,4,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
-	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
+	CreatedAt      int64                  `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	ExpiresAt      int64                  `protobuf:"varint,5,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -581,16 +580,16 @@ func (x *AgentDB_Summary) GetUserAttributes() string {
 	return ""
 }
 
-func (x *AgentDB_Summary) GetCreatedAtUnix() int64 {
+func (x *AgentDB_Summary) GetCreatedAt() int64 {
 	if x != nil {
-		return x.CreatedAtUnix
+		return x.CreatedAt
 	}
 	return 0
 }
 
-func (x *AgentDB_Summary) GetExpiresAtUnix() int64 {
+func (x *AgentDB_Summary) GetExpiresAt() int64 {
 	if x != nil {
-		return x.ExpiresAtUnix
+		return x.ExpiresAt
 	}
 	return 0
 }
@@ -721,9 +720,9 @@ func (x *AgentDB_DumpRequest) GetDatabaseId() string {
 
 type AgentDB_DumpResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	DownloadUrl   string                 `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"`          // pre-authenticated object-storage URL
-	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // of the URL, not the database
-	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                                            // what the dump is consistent at
+	DownloadUrl   string                 `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"` // pre-authenticated object-storage URL
+	ExpiresAt     int64                  `protobuf:"varint,2,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`      // of the URL, not the database
+	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                                   // what the dump is consistent at
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -765,9 +764,9 @@ func (x *AgentDB_DumpResponse) GetDownloadUrl() string {
 	return ""
 }
 
-func (x *AgentDB_DumpResponse) GetExpiresAtUnix() int64 {
+func (x *AgentDB_DumpResponse) GetExpiresAt() int64 {
 	if x != nil {
-		return x.ExpiresAtUnix
+		return x.ExpiresAt
 	}
 	return 0
 }
@@ -1631,7 +1630,7 @@ func (x *AgentDB_Wire_Credit) GetBatches() uint32 {
 
 type AgentDB_Wire_Ping struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Timestamp     int64                  `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	TimestampMs   int64                  `protobuf:"varint,1,opt,name=timestamp_ms,json=timestampMs,proto3" json:"timestamp_ms,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1666,19 +1665,19 @@ func (*AgentDB_Wire_Ping) Descriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 11, 10}
 }
 
-func (x *AgentDB_Wire_Ping) GetTimestamp() int64 {
+func (x *AgentDB_Wire_Ping) GetTimestampMs() int64 {
 	if x != nil {
-		return x.Timestamp
+		return x.TimestampMs
 	}
 	return 0
 }
 
 type AgentDB_Wire_Pong struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	LastPingTimestamp int64                  `protobuf:"varint,1,opt,name=last_ping_timestamp,json=lastPingTimestamp,proto3" json:"last_ping_timestamp,omitempty"`
-	Timestamp         int64                  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	LastPingTimestampMs int64                  `protobuf:"varint,1,opt,name=last_ping_timestamp_ms,json=lastPingTimestampMs,proto3" json:"last_ping_timestamp_ms,omitempty"`
+	TimestampMs         int64                  `protobuf:"varint,2,opt,name=timestamp_ms,json=timestampMs,proto3" json:"timestamp_ms,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *AgentDB_Wire_Pong) Reset() {
@@ -1711,16 +1710,16 @@ func (*AgentDB_Wire_Pong) Descriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 11, 11}
 }
 
-func (x *AgentDB_Wire_Pong) GetLastPingTimestamp() int64 {
+func (x *AgentDB_Wire_Pong) GetLastPingTimestampMs() int64 {
 	if x != nil {
-		return x.LastPingTimestamp
+		return x.LastPingTimestampMs
 	}
 	return 0
 }
 
-func (x *AgentDB_Wire_Pong) GetTimestamp() int64 {
+func (x *AgentDB_Wire_Pong) GetTimestampMs() int64 {
 	if x != nil {
-		return x.Timestamp
+		return x.TimestampMs
 	}
 	return 0
 }
@@ -2198,28 +2197,31 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\"\xb7\x1c\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\"\x90\x1c\n" +
 	"\aAgentDB\x1aq\n" +
 	"\rCreateRequest\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12'\n" +
 	"\x0fuser_attributes\x18\x02 \x01(\tR\x0euserAttributes\x12\x1f\n" +
 	"\vttl_seconds\x18\x03 \x01(\x03R\n" +
-	"ttlSeconds\x1aY\n" +
+	"ttlSeconds\x1aP\n" +
 	"\x0eCreateResponse\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
-	"databaseId\x12&\n" +
-	"\x0fexpires_at_unix\x18\x02 \x01(\x03R\rexpiresAtUnix\x1a-\n" +
+	"databaseId\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x02 \x01(\x03R\texpiresAt\x1a-\n" +
 	"\n" +
 	"GetRequest\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
-	"databaseId\x1a\xd1\x01\n" +
+	"databaseId\x1a\xbf\x01\n" +
 	"\vGetResponse\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
 	"databaseId\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12'\n" +
-	"\x0fuser_attributes\x18\x03 \x01(\tR\x0euserAttributes\x12&\n" +
-	"\x0fcreated_at_unix\x18\x04 \x01(\x03R\rcreatedAtUnix\x12&\n" +
-	"\x0fexpires_at_unix\x18\x05 \x01(\x03R\rexpiresAtUnix\x12\x10\n" +
+	"\x0fuser_attributes\x18\x03 \x01(\tR\x0euserAttributes\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x04 \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x05 \x01(\x03R\texpiresAt\x12\x10\n" +
 	"\x03tip\x18\x06 \x01(\x03R\x03tip\x1aI\n" +
 	"\vListRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
@@ -2227,25 +2229,28 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x1an\n" +
 	"\fListResponse\x126\n" +
 	"\tdatabases\x18\x01 \x03(\v2\x18.livekit.AgentDB.SummaryR\tdatabases\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\xbb\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\xa9\x01\n" +
 	"\aSummary\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
 	"databaseId\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12'\n" +
-	"\x0fuser_attributes\x18\x03 \x01(\tR\x0euserAttributes\x12&\n" +
-	"\x0fcreated_at_unix\x18\x04 \x01(\x03R\rcreatedAtUnix\x12&\n" +
-	"\x0fexpires_at_unix\x18\x05 \x01(\x03R\rexpiresAtUnix\x1a0\n" +
+	"\x0fuser_attributes\x18\x03 \x01(\tR\x0euserAttributes\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x04 \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x05 \x01(\x03R\texpiresAt\x1a0\n" +
 	"\rDeleteRequest\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
 	"databaseId\x1a\x10\n" +
 	"\x0eDeleteResponse\x1a.\n" +
 	"\vDumpRequest\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
-	"databaseId\x1ak\n" +
+	"databaseId\x1ab\n" +
 	"\fDumpResponse\x12!\n" +
-	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x12&\n" +
-	"\x0fexpires_at_unix\x18\x02 \x01(\x03R\rexpiresAtUnix\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\x80\x14\n" +
+	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x02 \x01(\x03R\texpiresAt\x12\x10\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\x8f\x14\n" +
 	"\x04Wire\x1a\xe0\x04\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2298,12 +2303,12 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\bRollback\x1a\b\n" +
 	"\x06Cancel\x1a\"\n" +
 	"\x06Credit\x12\x18\n" +
-	"\abatches\x18\x01 \x01(\rR\abatches\x1a$\n" +
-	"\x04Ping\x12\x1c\n" +
-	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x1aT\n" +
-	"\x04Pong\x12.\n" +
-	"\x13last_ping_timestamp\x18\x01 \x01(\x03R\x11lastPingTimestamp\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\x03R\ttimestamp\x1a>\n" +
+	"\abatches\x18\x01 \x01(\rR\abatches\x1a)\n" +
+	"\x04Ping\x12!\n" +
+	"\ftimestamp_ms\x18\x01 \x01(\x03R\vtimestampMs\x1a^\n" +
+	"\x04Pong\x123\n" +
+	"\x16last_ping_timestamp_ms\x18\x01 \x01(\x03R\x13lastPingTimestampMs\x12!\n" +
+	"\ftimestamp_ms\x18\x02 \x01(\x03R\vtimestampMs\x1a>\n" +
 	"\x05Hello\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1f\n" +
 	"\vdatabase_id\x18\x02 \x01(\tR\n" +

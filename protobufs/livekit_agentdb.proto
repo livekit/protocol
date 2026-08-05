@@ -39,14 +39,14 @@ message AgentDB {
   message CreateRequest {
     string region = 1;
     string user_attributes = 2;  // opaque JSON metadata for the caller
-    // Unset: never expires, and expires_at_unix is then 0 everywhere.
+    // Unset: never expires, and expires_at is then 0 everywhere.
     // Otherwise clamped to the server cap, and never extended.
     int64 ttl_seconds = 3;
   }
 
   message CreateResponse {
     string database_id = 1;      // "DB_..."
-    int64 expires_at_unix = 2;
+    int64 expires_at = 2;
   }
 
   message GetRequest {
@@ -57,8 +57,8 @@ message AgentDB {
     string database_id = 1;
     string region = 2;
     string user_attributes = 3;
-    int64 created_at_unix = 4;
-    int64 expires_at_unix = 5;
+    int64 created_at = 4;
+    int64 expires_at = 5;
     int64 tip = 6;
   }
 
@@ -72,14 +72,13 @@ message AgentDB {
     string next_page_token = 2;  // empty when exhausted
   }
 
-  // Immutable fields only, so a listing needs no per-database read. No tip: it
-  // moves on every commit.
+  // Immutable fields only. No tip: it moves on every commit.
   message Summary {
     string database_id = 1;
     string region = 2;
     string user_attributes = 3;
-    int64 created_at_unix = 4;
-    int64 expires_at_unix = 5;
+    int64 created_at = 4;
+    int64 expires_at = 5;
   }
 
   message DeleteRequest {
@@ -94,7 +93,7 @@ message AgentDB {
 
   message DumpResponse {
     string download_url = 1;     // pre-authenticated object-storage URL
-    int64 expires_at_unix = 2;   // of the URL, not the database
+    int64 expires_at = 2;   // of the URL, not the database
     int64 tip = 3;               // what the dump is consistent at
   }
 
@@ -167,12 +166,12 @@ message AgentDB {
     }
 
     message Ping {
-      int64 timestamp = 1;
+      int64 timestamp_ms = 1;
     }
 
     message Pong {
-      int64 last_ping_timestamp = 1;
-      int64 timestamp = 2;
+      int64 last_ping_timestamp_ms = 1;
+      int64 timestamp_ms = 2;
     }
 
     message Hello {
