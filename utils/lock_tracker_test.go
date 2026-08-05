@@ -17,6 +17,7 @@ package utils_test
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -96,23 +97,26 @@ func parkHoldingLock(release chan struct{}) {
 	<-release
 }
 
-func TestHolderStack(t *testing.T) {
+func TestHolderStacks(t *testing.T) {
 	t.Cleanup(cleanupTest)
 	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
 
-	m := &utils.Mutex{}
+	m := &utils.RWMutex{}
 	release := make(chan struct{})
-	held := make(chan struct{})
 	done := make(chan struct{})
 
-	go func() {
-		m.Lock()
-		close(held)
-		parkHoldingLock(release)
-		m.Unlock()
-	}()
+	var held sync.WaitGroup
+	held.Add(2)
+	for range 2 {
+		go func() {
+			m.RLock()
+			held.Done()
+			parkHoldingLock(release)
+			m.RUnlock()
+		}()
+	}
 
-	<-held
+	held.Wait()
 	go func() {
 		m.Lock()
 		noop()
@@ -123,12 +127,14 @@ func TestHolderStack(t *testing.T) {
 	time.Sleep(100 * time.Millisecond)
 	locks := utils.ScanTrackedLocks(time.Millisecond)
 	require.NotNil(t, locks)
-	require.NotZero(t, locks[0].HolderGoroutineID())
-	require.Equal(t, "", locks[0].HolderStack())
+	require.Len(t, locks[0].HolderGoroutineIDs(), 2)
+	require.Equal(t, "", locks[0].HolderStacks())
 
 	utils.PopulateHolderStacks(locks)
-	require.Contains(t, locks[0].HolderStack(), "parkHoldingLock")
-	require.Contains(t, locks[0].HolderStack(), fmt.Sprintf("goroutine %d ", locks[0].HolderGoroutineID()))
+	for _, gid := range locks[0].HolderGoroutineIDs() {
+		require.Contains(t, locks[0].HolderStacks(), fmt.Sprintf("goroutine %d ", gid))
+	}
+	require.Equal(t, 2, strings.Count(locks[0].HolderStacks(), "parkHoldingLock("))
 
 	close(release)
 	<-done

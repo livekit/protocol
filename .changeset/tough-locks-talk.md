@@ -2,4 +2,4 @@
 "github.com/livekit/protocol": patch
 ---
 
-Track the holder goroutine of stuck locks and resolve its current stack
+Track holder goroutines of stuck locks (all RWMutex readers up to 8) and resolve their current stacks

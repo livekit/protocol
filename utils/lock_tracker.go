@@ -28,7 +28,10 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-const lockTrackerMaxStackDepth = 16
+const (
+	lockTrackerMaxStackDepth = 16
+	lockTrackerMaxHolders    = 8
+)
 
 var lockTrackerEnabled = false
 var enableLockTrackerOnce sync.Once
@@ -112,12 +115,18 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 			ts := atomic.LoadUint32(&t.ts)
 			waiting := atomic.LoadInt32(&t.waiting)
 			if ts <= minTS && waiting > 0 {
+				var gids []int64
+				for i := range t.gids {
+					if gid := atomic.LoadInt64(&t.gids[i]); gid != 0 {
+						gids = append(gids, gid)
+					}
+				}
 				stuck = append(stuck, &StuckLock{
 					stack:   slices.Clone(t.stack),
 					ts:      ts,
 					waiting: waiting,
 					held:    atomic.LoadInt32(&t.held),
-					gid:     atomic.LoadInt64(&t.gid),
+					gids:    gids,
 				})
 			}
 		}
@@ -126,12 +135,12 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 }
 
 type StuckLock struct {
-	stack       []uintptr
-	ts          uint32
-	waiting     int32
-	held        int32
-	gid         int64
-	holderStack string
+	stack        []uintptr
+	ts           uint32
+	waiting      int32
+	held         int32
+	gids         []int64
+	holderStacks []string
 }
 
 func (d *StuckLock) FirstLockedAtStack() string {
@@ -169,26 +178,26 @@ func (d *StuckLock) NumGoroutineWaiting() int {
 	return int(d.waiting)
 }
 
-// HolderGoroutineID returns the id of the goroutine that took the lock while
-// it was free. For RWMutex this is the first reader or the writer.
-func (d *StuckLock) HolderGoroutineID() int64 {
-	return d.gid
+// HolderGoroutineIDs returns the ids of the goroutines holding the lock, up
+// to lockTrackerMaxHolders concurrent RWMutex readers.
+func (d *StuckLock) HolderGoroutineIDs() []int64 {
+	return d.gids
 }
 
-// HolderStack returns the holder goroutine's stack as resolved by
-// PopulateHolderStacks, or "" if it has not been resolved.
-func (d *StuckLock) HolderStack() string {
-	return d.holderStack
+// HolderStacks returns the holder goroutines' stacks as resolved by
+// PopulateHolderStacks, or "" if not resolved.
+func (d *StuckLock) HolderStacks() string {
+	return strings.Join(d.holderStacks, "\n\n")
 }
 
 // PopulateHolderStacks resolves the current stack of each stuck lock's holder
-// goroutine from a single snapshot of all goroutine stacks. The snapshot stops
-// the world; call it once per detection, not per lock.
+// goroutines from a single snapshot of all goroutine stacks. The snapshot
+// stops the world; call it once per detection, not per lock.
 func PopulateHolderStacks(stuck []*StuckLock) {
 	byGID := make(map[int64][]*StuckLock, len(stuck))
 	for _, d := range stuck {
-		if d.gid != 0 {
-			byGID[d.gid] = append(byGID[d.gid], d)
+		for _, gid := range d.gids {
+			byGID[gid] = append(byGID[gid], d)
 		}
 	}
 	if len(byGID) == 0 {
@@ -208,7 +217,7 @@ func PopulateHolderStacks(stuck []*StuckLock) {
 	for _, g := range strings.Split(string(buf), "\n\n") {
 		if gid, ok := parseGoroutineHeader(g); ok {
 			for _, d := range byGID[gid] {
-				d.holderStack = g
+				d.holderStacks = append(d.holderStacks, g)
 			}
 		}
 	}
@@ -235,7 +244,7 @@ type lockTracker struct {
 	ts      uint32
 	waiting int32
 	held    int32
-	gid     int64
+	gids    [lockTrackerMaxHolders]int64
 	ref     int
 }
 
@@ -248,9 +257,16 @@ func (t *lockTracker) trackWait() {
 func (t *lockTracker) trackLock() {
 	if t != nil {
 		atomic.AddInt32(&t.waiting, -1)
+
+		gid := goid.Get()
+		for i := range t.gids {
+			if atomic.CompareAndSwapInt64(&t.gids[i], 0, gid) {
+				break
+			}
+		}
+
 		if atomic.AddInt32(&t.held, 1) == 1 {
 			atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
-			atomic.StoreInt64(&t.gid, goid.Get())
 
 			if atomic.LoadUint32(&enableLockTrackerStackTrace) == 1 {
 				n := runtime.Callers(2, t.stack[:lockTrackerMaxStackDepth])
@@ -262,8 +278,20 @@ func (t *lockTracker) trackLock() {
 
 func (t *lockTracker) trackUnlock() {
 	if t != nil {
+		gid := goid.Get()
+		for i := range t.gids {
+			if atomic.CompareAndSwapInt64(&t.gids[i], gid, 0) {
+				break
+			}
+		}
+
 		if atomic.AddInt32(&t.held, -1) == 0 {
 			atomic.StoreUint32(&t.ts, math.MaxUint32)
+			// reclaim slots leaked by goroutines that unlock a mutex locked
+			// elsewhere; may briefly drop a concurrent new holder's slot
+			for i := range t.gids {
+				atomic.StoreInt64(&t.gids[i], 0)
+			}
 		}
 	}
 }
