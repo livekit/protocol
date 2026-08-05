@@ -517,6 +517,7 @@ message SyncState {
   repeated string track_sids_disabled = 6;
   repeated DataChannelReceiveState datachannel_receive_states = 7;
   repeated PublishDataTrackResponse publish_data_tracks = 8;
+  UpdateDataSubscription data_subscription = 9;
 }
 
 message DataChannelReceiveState {
