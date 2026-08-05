@@ -19,10 +19,8 @@ import (
 	"runtime"
 	"sync"
 	"sync/atomic"
-	"unsafe"
 
 	"github.com/petermattis/goid"
-	"golang.org/x/exp/slices"
 )
 
 const lockTrackerMaxReadHolders = 8
@@ -97,55 +95,16 @@ func (t *rwLockTracker) trackRUnlock() {
 	}
 }
 
+// newRWLockTracker allocates a tracker without side effects; lazyInitTracker
+// registers whichever allocation wins publication.
 func newRWLockTracker() *rwLockTracker {
-	t := &rwLockTracker{
+	return &rwLockTracker{
 		lockTracker: lockTracker{
 			stack: make([]uintptr, lockTrackerMaxStackDepth),
 			ts:    math.MaxUint32,
+			rw:    true,
 		},
 	}
-	t.ref = rwRefs.add(unsafe.Pointer(t))
-	runtime.SetFinalizer(t, func(t *rwLockTracker) {
-		rwRefs.remove(t.ref)
-	})
-	return t
-}
-
-//go:norace
-//go:nosplit
-func scanRWTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
-	var stuck []*StuckLock
-	for _, ref := range refs {
-		if ref != 0 {
-			t := (*rwLockTracker)(unsafe.Pointer(ref))
-			ts := atomic.LoadUint32(&t.ts)
-			waiting := atomic.LoadInt32(&t.waiting)
-			if ts <= minTS && waiting > 0 {
-				var gids []int64
-				strength := HolderShared
-				held := atomic.LoadInt32(&t.rheld)
-				if gid := t.gid; gid != 0 {
-					gids = append(gids, gid)
-					held++
-					strength = HolderExclusive
-				}
-				for i := range t.rgids {
-					if gid := atomic.LoadInt64(&t.rgids[i]); gid != 0 {
-						gids = append(gids, gid)
-					}
-				}
-				stuck = append(stuck, &StuckLock{
-					stack:          slices.Clone(t.stack),
-					ts:             ts,
-					waiting:        waiting,
-					held:           held,
-					holderStrength: strength,
-					gids:           gids,
-				})
-			}
-		}
-	}
-	return stuck
 }
 
 type RWMutex struct {

@@ -60,15 +60,15 @@ func updateLowResTime() {
 }
 
 // weakRefList is a registry of tracker pointers held as uintptrs so they
-// don't keep their owners alive; finalizers clear the slots. All lists share
-// weakRefLock.
+// don't keep their owners alive; finalizers clear the slots.
 type weakRefList struct {
 	refs []uintptr
 	free []int
+	next int
 }
 
 var weakRefLock sync.Mutex
-var mutexRefs, rwRefs weakRefList
+var weakRefs weakRefList
 
 func (l *weakRefList) add(p unsafe.Pointer) int {
 	weakRefLock.Lock()
@@ -94,10 +94,24 @@ func (l *weakRefList) count() int {
 	return len(l.refs) - len(l.free)
 }
 
+// window returns the next n-element window of refs, wrapping to the start
+// when the end is reached.
+func (l *weakRefList) window(n int) []uintptr {
+	min := l.next
+	max := min + n
+	if len(l.refs) <= max {
+		max = len(l.refs)
+		l.next = 0
+	} else {
+		l.next = max
+	}
+	return l.refs[min:max]
+}
+
 func NumMutexes() int {
 	weakRefLock.Lock()
 	defer weakRefLock.Unlock()
-	return mutexRefs.count() + rwRefs.count()
+	return weakRefs.count()
 }
 
 // ScanTrackedLocks check all lock trackers
@@ -106,11 +120,8 @@ func ScanTrackedLocks(threshold time.Duration) []*StuckLock {
 
 	weakRefLock.Lock()
 	defer weakRefLock.Unlock()
-	return append(scanTrackedLocks(mutexRefs.refs, minTS), scanRWTrackedLocks(rwRefs.refs, minTS)...)
+	return scanTrackedLocks(weakRefs.refs, minTS)
 }
-
-var nextScanMin int
-var nextScanMinRW int
 
 // ScanTrackedLocksI check lock trackers incrementally n at a time
 func ScanTrackedLocksI(threshold time.Duration, n int) []*StuckLock {
@@ -122,22 +133,7 @@ func ScanTrackedLocksI(threshold time.Duration, n int) []*StuckLock {
 	weakRefLock.Lock()
 	defer weakRefLock.Unlock()
 
-	stuck := scanTrackedLocks(window(mutexRefs.refs, &nextScanMin, n), minTS)
-	return append(stuck, scanRWTrackedLocks(window(rwRefs.refs, &nextScanMinRW, n), minTS)...)
-}
-
-// window returns the next n-element window of refs, advancing next and
-// wrapping to the start when the end is reached.
-func window(refs []uintptr, next *int, n int) []uintptr {
-	min := *next
-	max := min + n
-	if len(refs) <= max {
-		max = len(refs)
-		*next = 0
-	} else {
-		*next = max
-	}
-	return refs[min:max]
+	return scanTrackedLocks(weakRefs.window(n), minTS)
 }
 
 //go:norace
@@ -150,23 +146,37 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 			ts := atomic.LoadUint32(&t.ts)
 			waiting := atomic.LoadInt32(&t.waiting)
 			if ts <= minTS && waiting > 0 {
-				var gids []int64
-				var held int32
-				if gid := t.gid; gid != 0 {
-					gids = []int64{gid}
-					held = 1
-				}
-				stuck = append(stuck, &StuckLock{
-					stack:   slices.Clone(t.stack),
-					ts:      ts,
-					waiting: waiting,
-					held:    held,
-					gids:    gids,
-				})
+				stuck = append(stuck, t.toStuckLock(ts, waiting))
 			}
 		}
 	}
 	return stuck
+}
+
+//go:norace
+func (t *lockTracker) toStuckLock(ts uint32, waiting int32) *StuckLock {
+	d := &StuckLock{
+		stack:   slices.Clone(t.stack),
+		ts:      ts,
+		waiting: waiting,
+	}
+	if gid := t.gid; gid != 0 {
+		d.gids = append(d.gids, gid)
+		d.held = 1
+	}
+	if t.rw {
+		r := (*rwLockTracker)(unsafe.Pointer(t))
+		d.held += atomic.LoadInt32(&r.rheld)
+		if len(d.gids) == 0 && d.held > 0 {
+			d.holderStrength = HolderShared
+		}
+		for i := range r.rgids {
+			if gid := atomic.LoadInt64(&r.rgids[i]); gid != 0 {
+				d.gids = append(d.gids, gid)
+			}
+		}
+	}
+	return d
 }
 
 // HolderStrength describes how a stuck lock is held.
@@ -301,12 +311,14 @@ func parseGoroutineHeader(g string) (int64, bool) {
 // the lock is held, so the single holder's bookkeeping needs no atomics;
 // only the waiter count, maintained outside the lock, does. The scanner
 // reads holder state without the lock and tolerates racy reads (go:norace).
+// rw marks trackers that are really rwLockTrackers, which extend this with
+// read-holder slots.
 type lockTracker struct {
 	stack   []uintptr
 	ts      uint32
 	waiting int32
 	gid     int64
-	ref     int
+	rw      bool
 }
 
 func (t *lockTracker) trackWait() {
@@ -329,61 +341,44 @@ func (t *lockTracker) trackUnlock() {
 	atomic.StoreUint32(&t.ts, math.MaxUint32)
 }
 
+// newLockTracker allocates a tracker without side effects; lazyInitTracker
+// registers whichever allocation wins publication.
 func newLockTracker() *lockTracker {
-	t := &lockTracker{
+	return &lockTracker{
 		stack: make([]uintptr, lockTrackerMaxStackDepth),
 		ts:    math.MaxUint32,
 	}
-	t.ref = mutexRefs.add(unsafe.Pointer(t))
-	runtime.SetFinalizer(t, func(t *lockTracker) {
-		mutexRefs.remove(t.ref)
-	})
-	return t
 }
 
-//go:linkname sync_runtime_canSpin sync.runtime_canSpin
-func sync_runtime_canSpin(int) bool
-
-//go:linkname sync_runtime_doSpin sync.runtime_doSpin
-func sync_runtime_doSpin()
-
-// trackerInitSentinel marks a tracker pointer field as mid-initialization.
-var trackerInitSentinel = unsafe.Pointer(new(int))
-
-// loadTracker returns the tracker if its initialization completed, else nil.
-// Unlock paths use it instead of lazyInitTracker: a lock being unlocked was
-// necessarily locked first, so the tracker either exists or tracking was
-// disabled at Lock time.
+// loadTracker returns the tracker, or nil if there is none. Unlock paths use
+// it instead of lazyInitTracker: a lock being unlocked was necessarily
+// locked first, so the tracker either exists or tracking was disabled at
+// Lock time.
 func loadTracker[T any](p **T) *T {
-	t := atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(p)))
-	if t == trackerInitSentinel {
-		return nil
-	}
-	return (*T)(t)
+	return (*T)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(p))))
 }
 
+// lazyInitTracker returns the field's tracker, constructing and registering
+// it on first use. construct must be free of side effects: racing
+// initializers may each allocate, but only the publishing CAS winner
+// registers its tracker; losers' allocations are left to the GC.
 func lazyInitTracker[T any](p **T, construct func() *T) *T {
 	if !lockTrackerEnabled {
 		return nil
 	}
 	up := (*unsafe.Pointer)(unsafe.Pointer(p))
-	iter := 0
-	for {
-		if t := atomic.LoadPointer(up); t == nil {
-			if atomic.CompareAndSwapPointer(up, nil, trackerInitSentinel) {
-				atomic.StorePointer(up, unsafe.Pointer(construct()))
-			}
-		} else if t == trackerInitSentinel {
-			if sync_runtime_canSpin(iter) {
-				sync_runtime_doSpin()
-				iter++
-			} else {
-				runtime.Gosched()
-			}
-		} else {
-			return (*T)(t)
-		}
+	if t := atomic.LoadPointer(up); t != nil {
+		return (*T)(t)
 	}
+	t := construct()
+	if !atomic.CompareAndSwapPointer(up, nil, unsafe.Pointer(t)) {
+		return (*T)(atomic.LoadPointer(up))
+	}
+	ref := weakRefs.add(unsafe.Pointer(t))
+	runtime.SetFinalizer(t, func(*T) {
+		weakRefs.remove(ref)
+	})
+	return t
 }
 
 type Mutex struct {
