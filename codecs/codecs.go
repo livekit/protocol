@@ -17,10 +17,11 @@ package codecs
 import (
 	"strings"
 
+	"github.com/pion/webrtc/v4"
+
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
-	"github.com/pion/webrtc/v4"
 )
 
 var (
@@ -93,6 +94,24 @@ var (
 		PayloadType: 100,
 	}
 
+	H264ProfileLevelId42001fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=42001f",
+		},
+		PayloadType: 104,
+	}
+
+	H264ProfileLevelId42001fPacketizationMode1CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42001f",
+		},
+		PayloadType: 102,
+	}
+
 	H264ProfileLevelId42e01fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
 			MimeType:    mime.MimeTypeH264.String(),
@@ -109,6 +128,24 @@ var (
 			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=42e01f",
 		},
 		PayloadType: 108,
+	}
+
+	H264ProfileLevelId4d001fPacketizationMode0CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=0;profile-level-id=4d001f",
+		},
+		PayloadType: 39,
+	}
+
+	H264ProfileLevelId4d001fPacketizationMode1CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeH264.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=4d001f",
+		},
+		PayloadType: 106,
 	}
 
 	H264HighProfileFmtp            = "level-asymmetry-allowed=1;packetization-mode=1;profile-level-id=640032"

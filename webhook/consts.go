@@ -22,7 +22,17 @@ var (
 	ErrInvalidChecksum = errors.New("could not verify authenticity of message")
 )
 
-const authHeader = "Authorization"
+const (
+	authHeader        = "Authorization"
+	contentTypeHeader = "content-type"
+	userAgentHeader   = "User-Agent"
+)
+
+const (
+	// use a custom mime type to ensure signature is checked prior to parsing
+	ContentType      = "application/webhook+json"
+	DefaultUserAgent = "LiveKit"
+)
 
 const (
 	EventRoomStarted                  = "room_started"

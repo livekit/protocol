@@ -117,6 +117,9 @@ func NewResourceURLNotifier(params ResourceURLNotifierParams) *ResourceURLNotifi
 	if params.Config.MaxDepth == 0 {
 		params.Config.MaxDepth = DefaultResourceURLNotifierConfig.MaxDepth
 	}
+	if params.UserAgent == "" {
+		params.UserAgent = DefaultUserAgent
+	}
 
 	rhc := retryablehttp.NewClient()
 	if params.RetryWaitMin > 0 {
@@ -377,8 +380,8 @@ func (r *ResourceURLNotifier) send(event *livekit.WebhookEvent, params *Resource
 		return nil, err
 	}
 	req.Header.Set(authHeader, token)
-	// use a custom mime type to ensure signature is checked prior to parsing
-	req.Header.Set("content-type", "application/webhook+json")
+	req.Header.Set(contentTypeHeader, ContentType)
+	req.Header.Set(userAgentHeader, params.UserAgent)
 	res, err := r.client.Do(req)
 	if err != nil {
 		return nil, err

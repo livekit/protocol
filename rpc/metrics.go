@@ -15,13 +15,13 @@
 package rpc
 
 import (
-	"sort"
+	"maps"
+	"slices"
 	sync "sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/atomic"
-	"golang.org/x/exp/maps"
 
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
@@ -78,12 +78,13 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 	}
 
 	metricsBase.curryLabels = o.curryLabels
-	curryLabelNames := maps.Keys(o.curryLabels)
-	sort.Strings(curryLabelNames)
+	curryLabelNames := slices.Collect(maps.Keys(o.curryLabels))
+	slices.Sort(curryLabelNames)
 
-	labels := append(curryLabelNames, "role", "kind", "service", "method")
-	streamLabels := append(curryLabelNames, "role", "service", "method")
-	bytesLabels := append(labels, "direction")
+	labels := slices.Concat(curryLabelNames, []string{"role", "kind", "service", "method"})
+	streamLabels := slices.Concat(curryLabelNames, []string{"role", "service", "method"})
+	errorLabels := slices.Concat(labels, []string{"error_code"})
+	bytesLabels := slices.Concat(labels, []string{"direction"})
 
 	metricsBase.requestTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   livekitNamespace,
@@ -116,7 +117,7 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 		Subsystem:   "psrpc",
 		Name:        "error_total",
 		ConstLabels: constLabels,
-	}, labels)
+	}, errorLabels)
 	metricsBase.bytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
@@ -159,6 +160,13 @@ func CurryMetricLabels(labels prometheus.Labels) {
 	})
 }
 
+func errorCodeLabel(err error) string {
+	if code, ok := psrpc.GetErrorCode(err); ok && code != psrpc.OK {
+		return string(code)
+	}
+	return string(psrpc.Unknown)
+}
+
 var _ middleware.MetricsObserver = PSRPCMetricsObserver{}
 
 type PSRPCMetricsObserver struct{}
@@ -169,7 +177,7 @@ func (o PSRPCMetricsObserver) OnUnaryRequest(role middleware.MetricRole, info ps
 	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(txBytes))
 
 	if err != nil {
-		m.errorTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, errorCodeLabel(err)).Inc()
 	} else {
 		m.requestTime.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
@@ -181,7 +189,8 @@ func (o PSRPCMetricsObserver) OnMultiRequest(role middleware.MetricRole, info ps
 	m.bytesTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method, "tx").Add(float64(txBytes))
 
 	if responseCount == 0 {
-		m.errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Inc()
+		// psrpc's MetricsObserver doesn't surface an error for multi requests
+		m.errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method, string(psrpc.Unknown)).Inc()
 	} else {
 		m.requestTime.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
@@ -192,7 +201,7 @@ func (o PSRPCMetricsObserver) OnStreamSend(role middleware.MetricRole, info psrp
 	m.bytesTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, "tx").Add(float64(bytes))
 
 	if err != nil {
-		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, errorCodeLabel(err)).Inc()
 	} else {
 		m.streamSendTime.WithLabelValues(role.String(), info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
@@ -203,7 +212,7 @@ func (o PSRPCMetricsObserver) OnStreamRecv(role middleware.MetricRole, info psrp
 	m.bytesTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, "rx").Add(float64(bytes))
 
 	if err != nil {
-		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, errorCodeLabel(err)).Inc()
 	} else {
 		m.streamReceiveTotal.WithLabelValues(role.String(), info.Service, info.Method).Inc()
 	}

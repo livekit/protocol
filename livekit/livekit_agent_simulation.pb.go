@@ -311,7 +311,7 @@ type SimulationRun struct {
 	Concurrency int32 `protobuf:"varint,17,opt,name=concurrency,proto3" json:"concurrency,omitempty"`
 	// Conversation mode for every job in this run; unspecified = TEXT.
 	Mode SimulationMode `protobuf:"varint,18,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
-	// Run-level metric aggregates.
+	// Run-level aggregates over this run's jobs.
 	Metrics *SimulationRun_RunMetrics `protobuf:"bytes,19,opt,name=metrics,proto3" json:"metrics,omitempty"`
 	// zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
 	// Compressed by default so the blob ships as-is on every hop.
@@ -890,28 +890,29 @@ func (x *SimulationRun_Job) GetMetrics() *SimulationRun_JobMetrics {
 
 type SimulationRun_JobMetrics struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Headline scores, 0-1, computed by the worker as weighted means over the
-	// members that ran (a missing member renormalizes the rest):
-	//
-	//	accuracy   = task_completion x3 + stt.keyterm_recall + (1 - stt.wer) + tts.enunciation_score
-	//	experience = conversation.turn_taking_score x2 + tts.naturalness_score + llm.conciseness_score
-	AccuracyScore   *float32 `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"`       // absent when the simulator spoiled the call
-	ExperienceScore *float32 `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"` // absent when the simulator spoiled the call
-	// The accuracy anchor: the scenario verdict as 1/0, or the fraction of the declared target state the call reached.
-	TaskCompletion *float32                               `protobuf:"fixed32,3,opt,name=task_completion,json=taskCompletion,proto3,oneof" json:"task_completion,omitempty"` // absent when the simulator spoiled the call
-	Stt            *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
-	Llm            *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
-	Tts            *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
-	Conversation   *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	Simulator      *SimulationRun_JobMetrics_Simulator    `protobuf:"bytes,8,opt,name=simulator,proto3" json:"simulator,omitempty"`
-	// Conversation timeline: one entry per transcript turn, both speakers.
+	// Headline scores, 0-1. All absent when the simulator spoiled the call.
+	AccuracyScore   *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"`
+	ExperienceScore *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
+	TaskCompletion  *float32                               `protobuf:"fixed32,3,opt,name=task_completion,json=taskCompletion,proto3,oneof" json:"task_completion,omitempty"` // the scenario verdict as 1/0
+	Stt             *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm             *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts             *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation    *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	// One entry per turn, both speakers.
 	Turns            []*SimulationRun_JobMetrics_Turn `protobuf:"bytes,9,rep,name=turns,proto3" json:"turns,omitempty"`
 	JudgeModel       string                           `protobuf:"bytes,10,opt,name=judge_model,json=judgeModel,proto3" json:"judge_model,omitempty"`                      // text judge for judged scores; "" if none ran
-	AudioJudgeModel  string                           `protobuf:"bytes,11,opt,name=audio_judge_model,json=audioJudgeModel,proto3" json:"audio_judge_model,omitempty"`     // audio (LALM) judge; "" if none ran
 	HasRemoteSession bool                             `protobuf:"varint,12,opt,name=has_remote_session,json=hasRemoteSession,proto3" json:"has_remote_session,omitempty"` // false = waveform-only capture (e.g. SIP)
 	T0               *timestamppb.Timestamp           `protobuf:"bytes,13,opt,name=t0,proto3" json:"t0,omitempty"`                                                        // audio only; call start (first speech edge); turn times relative to it
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Judged over the authored dialog (text and audio); needs the text judge.
+	Conciseness *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // judged {0, 0.5, 1} per agent turn; job = mean
+	// Whole-call issue flags; true = present, absent = not judged.
+	UnnecessaryToolCalls    *bool    `protobuf:"varint,15,opt,name=unnecessary_tool_calls,json=unnecessaryToolCalls,proto3,oneof" json:"unnecessary_tool_calls,omitempty"`
+	InformationLoss         *bool    `protobuf:"varint,16,opt,name=information_loss,json=informationLoss,proto3,oneof" json:"information_loss,omitempty"`
+	RedundantStatements     *bool    `protobuf:"varint,17,opt,name=redundant_statements,json=redundantStatements,proto3,oneof" json:"redundant_statements,omitempty"`
+	PoorQuestionQuality     *bool    `protobuf:"varint,18,opt,name=poor_question_quality,json=poorQuestionQuality,proto3,oneof" json:"poor_question_quality,omitempty"`
+	ConversationProgression *float32 `protobuf:"fixed32,19,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"` // 0-1, derived from the flags above
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics) Reset() {
@@ -993,13 +994,6 @@ func (x *SimulationRun_JobMetrics) GetConversation() *SimulationRun_JobMetrics_C
 	return nil
 }
 
-func (x *SimulationRun_JobMetrics) GetSimulator() *SimulationRun_JobMetrics_Simulator {
-	if x != nil {
-		return x.Simulator
-	}
-	return nil
-}
-
 func (x *SimulationRun_JobMetrics) GetTurns() []*SimulationRun_JobMetrics_Turn {
 	if x != nil {
 		return x.Turns
@@ -1010,13 +1004,6 @@ func (x *SimulationRun_JobMetrics) GetTurns() []*SimulationRun_JobMetrics_Turn {
 func (x *SimulationRun_JobMetrics) GetJudgeModel() string {
 	if x != nil {
 		return x.JudgeModel
-	}
-	return ""
-}
-
-func (x *SimulationRun_JobMetrics) GetAudioJudgeModel() string {
-	if x != nil {
-		return x.AudioJudgeModel
 	}
 	return ""
 }
@@ -1035,21 +1022,61 @@ func (x *SimulationRun_JobMetrics) GetT0() *timestamppb.Timestamp {
 	return nil
 }
 
-// Aggregates over this run's jobs. Reuses the JobMetrics group shapes.
+func (x *SimulationRun_JobMetrics) GetConciseness() float32 {
+	if x != nil && x.Conciseness != nil {
+		return *x.Conciseness
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics) GetUnnecessaryToolCalls() bool {
+	if x != nil && x.UnnecessaryToolCalls != nil {
+		return *x.UnnecessaryToolCalls
+	}
+	return false
+}
+
+func (x *SimulationRun_JobMetrics) GetInformationLoss() bool {
+	if x != nil && x.InformationLoss != nil {
+		return *x.InformationLoss
+	}
+	return false
+}
+
+func (x *SimulationRun_JobMetrics) GetRedundantStatements() bool {
+	if x != nil && x.RedundantStatements != nil {
+		return *x.RedundantStatements
+	}
+	return false
+}
+
+func (x *SimulationRun_JobMetrics) GetPoorQuestionQuality() bool {
+	if x != nil && x.PoorQuestionQuality != nil {
+		return *x.PoorQuestionQuality
+	}
+	return false
+}
+
+func (x *SimulationRun_JobMetrics) GetConversationProgression() float32 {
+	if x != nil && x.ConversationProgression != nil {
+		return *x.ConversationProgression
+	}
+	return 0
+}
+
+// Aggregates over this run's jobs, so a run summary does not have to pull
+// every job and turn. Reuses the JobMetrics group shapes.
 type SimulationRun_RunMetrics struct {
-	state              protoimpl.MessageState                 `protogen:"open.v1"`
-	AccuracyScore      *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"` // mean over scored jobs
-	ExperienceScore    *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
-	ScenarioPassRate   *float32                               `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"` // share of jobs whose scenario verdict passed
-	Stt                *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
-	Llm                *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
-	Tts                *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
-	Conversation       *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	JobsTotal          uint32                                 `protobuf:"varint,9,opt,name=jobs_total,json=jobsTotal,proto3" json:"jobs_total,omitempty"`
-	JobsMeasured       uint32                                 `protobuf:"varint,10,opt,name=jobs_measured,json=jobsMeasured,proto3" json:"jobs_measured,omitempty"`                     // composites cover jobs_measured - jobs_simulator_fault
-	JobsSimulatorFault uint32                                 `protobuf:"varint,11,opt,name=jobs_simulator_fault,json=jobsSimulatorFault,proto3" json:"jobs_simulator_fault,omitempty"` // spoiled by the simulator: flagged, not scored
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	state            protoimpl.MessageState                 `protogen:"open.v1"`
+	AccuracyScore    *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"` // mean over scored jobs
+	ExperienceScore  *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
+	ScenarioPassRate *float32                               `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"` // share of jobs whose scenario verdict passed
+	Stt              *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm              *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts              *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation     *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *SimulationRun_RunMetrics) Reset() {
@@ -1129,27 +1156,6 @@ func (x *SimulationRun_RunMetrics) GetConversation() *SimulationRun_JobMetrics_C
 		return x.Conversation
 	}
 	return nil
-}
-
-func (x *SimulationRun_RunMetrics) GetJobsTotal() uint32 {
-	if x != nil {
-		return x.JobsTotal
-	}
-	return 0
-}
-
-func (x *SimulationRun_RunMetrics) GetJobsMeasured() uint32 {
-	if x != nil {
-		return x.JobsMeasured
-	}
-	return 0
-}
-
-func (x *SimulationRun_RunMetrics) GetJobsSimulatorFault() uint32 {
-	if x != nil {
-		return x.JobsSimulatorFault
-	}
-	return 0
 }
 
 type SimulationRun_Create struct {
@@ -1438,19 +1444,26 @@ func (x *SimulationRun_Job_Usage) GetAudioTurnsCount() int32 {
 
 // The agent's perception of the caller. Audio only.
 type SimulationRun_JobMetrics_STT struct {
-	state                  protoimpl.MessageState `protogen:"open.v1"`
-	Wer                    *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                                      // needs the RemoteSession; word error rate, pooled: word_errors / words
-	Words                  *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                                                                   // needs the RemoteSession; pooling stats: run WER = sum errors / sum words
-	WordErrors             *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`                                       // needs the RemoteSession
-	Cer                    *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                                                      // needs the RemoteSession; character error rate, pooled
-	Chars                  *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                                                   // needs the RemoteSession
-	CharErrors             *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                                      // needs the RemoteSession
-	KeytermRecall          *float32               `protobuf:"fixed32,5,opt,name=keyterm_recall,json=keytermRecall,proto3,oneof" json:"keyterm_recall,omitempty"`                             // needs the RemoteSession; recall of uttered key entities (names, IDs, amounts)
-	KeytermsUttered        *uint32                `protobuf:"varint,6,opt,name=keyterms_uttered,json=keytermsUttered,proto3,oneof" json:"keyterms_uttered,omitempty"`                        // needs the RemoteSession
-	KeytermsRecognized     *uint32                `protobuf:"varint,7,opt,name=keyterms_recognized,json=keytermsRecognized,proto3,oneof" json:"keyterms_recognized,omitempty"`               // needs the RemoteSession
-	TranscriptionLatencyMs *uint32                `protobuf:"varint,8,opt,name=transcription_latency_ms,json=transcriptionLatencyMs,proto3,oneof" json:"transcription_latency_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay, mean
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	Wer        *float32               `protobuf:"fixed32,1,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                  // needs the RemoteSession; word_errors / words
+	Words      *uint32                `protobuf:"varint,2,opt,name=words,proto3,oneof" json:"words,omitempty"`                               // needs the RemoteSession
+	WordErrors *uint32                `protobuf:"varint,3,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`   // needs the RemoteSession
+	Cer        *float32               `protobuf:"fixed32,4,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                  // needs the RemoteSession; char_errors / chars
+	Chars      *uint32                `protobuf:"varint,9,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                               // needs the RemoteSession
+	CharErrors *uint32                `protobuf:"varint,10,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`  // needs the RemoteSession
+	SttDelayMs *uint32                `protobuf:"varint,8,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"` // needs the RemoteSession; agent-reported STT/endpointing delay
+	// Key entities (names, IDs, amounts) the caller said. Needs the text judge.
+	EntityRecognition  *float32 `protobuf:"fixed32,11,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
+	EntitiesUttered    *uint32  `protobuf:"varint,12,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
+	EntitiesRecognized *uint32  `protobuf:"varint,13,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
+	// Retention: an entity is acquired at the first saying heard right, and
+	// these count only the sayings after that, so recall separates keeping an
+	// entity from ever getting it.
+	EntityRecall               *float32 `protobuf:"fixed32,14,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"` // acquired_recognized / acquired_uttered
+	EntitiesAcquiredUttered    *uint32  `protobuf:"varint,15,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
+	EntitiesAcquiredRecognized *uint32  `protobuf:"varint,16,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_STT) Reset() {
@@ -1525,42 +1538,62 @@ func (x *SimulationRun_JobMetrics_STT) GetCharErrors() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_STT) GetKeytermRecall() float32 {
-	if x != nil && x.KeytermRecall != nil {
-		return *x.KeytermRecall
+func (x *SimulationRun_JobMetrics_STT) GetSttDelayMs() uint32 {
+	if x != nil && x.SttDelayMs != nil {
+		return *x.SttDelayMs
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_STT) GetKeytermsUttered() uint32 {
-	if x != nil && x.KeytermsUttered != nil {
-		return *x.KeytermsUttered
+func (x *SimulationRun_JobMetrics_STT) GetEntityRecognition() float32 {
+	if x != nil && x.EntityRecognition != nil {
+		return *x.EntityRecognition
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_STT) GetKeytermsRecognized() uint32 {
-	if x != nil && x.KeytermsRecognized != nil {
-		return *x.KeytermsRecognized
+func (x *SimulationRun_JobMetrics_STT) GetEntitiesUttered() uint32 {
+	if x != nil && x.EntitiesUttered != nil {
+		return *x.EntitiesUttered
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_STT) GetTranscriptionLatencyMs() uint32 {
-	if x != nil && x.TranscriptionLatencyMs != nil {
-		return *x.TranscriptionLatencyMs
+func (x *SimulationRun_JobMetrics_STT) GetEntitiesRecognized() uint32 {
+	if x != nil && x.EntitiesRecognized != nil {
+		return *x.EntitiesRecognized
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetEntityRecall() float32 {
+	if x != nil && x.EntityRecall != nil {
+		return *x.EntityRecall
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetEntitiesAcquiredUttered() uint32 {
+	if x != nil && x.EntitiesAcquiredUttered != nil {
+		return *x.EntitiesAcquiredUttered
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_STT) GetEntitiesAcquiredRecognized() uint32 {
+	if x != nil && x.EntitiesAcquiredRecognized != nil {
+		return *x.EntitiesAcquiredRecognized
 	}
 	return 0
 }
 
 type SimulationRun_JobMetrics_LLM struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	TtftMs           *uint32                `protobuf:"varint,1,opt,name=ttft_ms,json=ttftMs,proto3,oneof" json:"ttft_ms,omitempty"`                                // needs the RemoteSession; time to first token, mean (per-turn in turns)
-	TtfsMs           *uint32                `protobuf:"varint,2,opt,name=ttfs_ms,json=ttfsMs,proto3,oneof" json:"ttfs_ms,omitempty"`                                // needs the RemoteSession; time to first sentence (the smallest speakable unit)
-	TokensPerSecond  *float32               `protobuf:"fixed32,3,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"`  // needs the RemoteSession; decode rate, mean (per-turn in turns.llm)
-	ConcisenessScore *float32               `protobuf:"fixed32,4,opt,name=conciseness_score,json=concisenessScore,proto3,oneof" json:"conciseness_score,omitempty"` // audio only; needs the audio judge; judged 0-1: brief enough for voice
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	TtftMs          *uint32                `protobuf:"varint,1,opt,name=ttft_ms,json=ttftMs,proto3,oneof" json:"ttft_ms,omitempty"`                               // needs the RemoteSession; time to first token
+	TtfsMs          *uint32                `protobuf:"varint,2,opt,name=ttfs_ms,json=ttfsMs,proto3,oneof" json:"ttfs_ms,omitempty"`                               // needs the RemoteSession; time to first sentence, the smallest speakable unit
+	TokensPerSecond *float32               `protobuf:"fixed32,3,opt,name=tokens_per_second,json=tokensPerSecond,proto3,oneof" json:"tokens_per_second,omitempty"` // needs the RemoteSession
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_LLM) Reset() {
@@ -1614,31 +1647,25 @@ func (x *SimulationRun_JobMetrics_LLM) GetTokensPerSecond() float32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_LLM) GetConcisenessScore() float32 {
-	if x != nil && x.ConcisenessScore != nil {
-		return *x.ConcisenessScore
-	}
-	return 0
-}
-
-// The agent's voice. audio only.
+// The agent's voice. Audio only.
 type SimulationRun_JobMetrics_TTS struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	TtfaMs           *uint32                `protobuf:"varint,1,opt,name=ttfa_ms,json=ttfaMs,proto3,oneof" json:"ttfa_ms,omitempty"`                                // needs the RemoteSession
-	TtfbMs           *uint32                `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`                                // needs the RemoteSession; provider byte-level TTFB
-	Wer              *float32               `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                                   // needs the RemoteSession; word error rate, pooled: word_errors / words
-	Words            *uint32                `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`                                                // needs the RemoteSession
-	WordErrors       *uint32                `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`                    // needs the RemoteSession
-	Cer              *float32               `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                                   // needs the RemoteSession; character error rate, pooled
-	Chars            *uint32                `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                                               // needs the RemoteSession
-	CharErrors       *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"`                   // needs the RemoteSession
-	SpeechRateWpm    *float32               `protobuf:"fixed32,4,opt,name=speech_rate_wpm,json=speechRateWpm,proto3,oneof" json:"speech_rate_wpm,omitempty"`        // speaking rate; conversational English ~110-150
-	HeardWords       *uint32                `protobuf:"varint,12,opt,name=heard_words,json=heardWords,proto3,oneof" json:"heard_words,omitempty"`                   // pooling stats for speech_rate_wpm: raw heard words (not WER tokens)
-	SpeechMs         *uint32                `protobuf:"varint,13,opt,name=speech_ms,json=speechMs,proto3,oneof" json:"speech_ms,omitempty"`                         // agent voiced time, sum of raw VAD segments
-	NaturalnessScore *float32               `protobuf:"fixed32,5,opt,name=naturalness_score,json=naturalnessScore,proto3,oneof" json:"naturalness_score,omitempty"` // needs the audio judge; judged 0-1: prosody / expressiveness
-	EnunciationScore *float32               `protobuf:"fixed32,6,opt,name=enunciation_score,json=enunciationScore,proto3,oneof" json:"enunciation_score,omitempty"` // needs the audio judge; judged 0-1: key entities audibly intact
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	TtfbMs     *uint32                `protobuf:"varint,2,opt,name=ttfb_ms,json=ttfbMs,proto3,oneof" json:"ttfb_ms,omitempty"`              // needs the RemoteSession; provider byte-level TTFB
+	Wer        *float32               `protobuf:"fixed32,3,opt,name=wer,proto3,oneof" json:"wer,omitempty"`                                 // needs the RemoteSession; word_errors / words
+	Words      *uint32                `protobuf:"varint,7,opt,name=words,proto3,oneof" json:"words,omitempty"`                              // needs the RemoteSession
+	WordErrors *uint32                `protobuf:"varint,8,opt,name=word_errors,json=wordErrors,proto3,oneof" json:"word_errors,omitempty"`  // needs the RemoteSession
+	Cer        *float32               `protobuf:"fixed32,9,opt,name=cer,proto3,oneof" json:"cer,omitempty"`                                 // needs the RemoteSession; char_errors / chars
+	Chars      *uint32                `protobuf:"varint,10,opt,name=chars,proto3,oneof" json:"chars,omitempty"`                             // needs the RemoteSession
+	CharErrors *uint32                `protobuf:"varint,11,opt,name=char_errors,json=charErrors,proto3,oneof" json:"char_errors,omitempty"` // needs the RemoteSession
+	// Key entities the agent said, as the caller heard them. Needs the text judge.
+	EntityRecognition          *float32 `protobuf:"fixed32,14,opt,name=entity_recognition,json=entityRecognition,proto3,oneof" json:"entity_recognition,omitempty"` // recognized / uttered
+	EntitiesUttered            *uint32  `protobuf:"varint,15,opt,name=entities_uttered,json=entitiesUttered,proto3,oneof" json:"entities_uttered,omitempty"`
+	EntitiesRecognized         *uint32  `protobuf:"varint,16,opt,name=entities_recognized,json=entitiesRecognized,proto3,oneof" json:"entities_recognized,omitempty"`
+	EntityRecall               *float32 `protobuf:"fixed32,17,opt,name=entity_recall,json=entityRecall,proto3,oneof" json:"entity_recall,omitempty"` // acquired_recognized / acquired_uttered
+	EntitiesAcquiredUttered    *uint32  `protobuf:"varint,18,opt,name=entities_acquired_uttered,json=entitiesAcquiredUttered,proto3,oneof" json:"entities_acquired_uttered,omitempty"`
+	EntitiesAcquiredRecognized *uint32  `protobuf:"varint,19,opt,name=entities_acquired_recognized,json=entitiesAcquiredRecognized,proto3,oneof" json:"entities_acquired_recognized,omitempty"`
+	unknownFields              protoimpl.UnknownFields
+	sizeCache                  protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_TTS) Reset() {
@@ -1669,13 +1696,6 @@ func (x *SimulationRun_JobMetrics_TTS) ProtoReflect() protoreflect.Message {
 // Deprecated: Use SimulationRun_JobMetrics_TTS.ProtoReflect.Descriptor instead.
 func (*SimulationRun_JobMetrics_TTS) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1, 2}
-}
-
-func (x *SimulationRun_JobMetrics_TTS) GetTtfaMs() uint32 {
-	if x != nil && x.TtfaMs != nil {
-		return *x.TtfaMs
-	}
-	return 0
 }
 
 func (x *SimulationRun_JobMetrics_TTS) GetTtfbMs() uint32 {
@@ -1727,62 +1747,66 @@ func (x *SimulationRun_JobMetrics_TTS) GetCharErrors() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_TTS) GetSpeechRateWpm() float32 {
-	if x != nil && x.SpeechRateWpm != nil {
-		return *x.SpeechRateWpm
+func (x *SimulationRun_JobMetrics_TTS) GetEntityRecognition() float32 {
+	if x != nil && x.EntityRecognition != nil {
+		return *x.EntityRecognition
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_TTS) GetHeardWords() uint32 {
-	if x != nil && x.HeardWords != nil {
-		return *x.HeardWords
+func (x *SimulationRun_JobMetrics_TTS) GetEntitiesUttered() uint32 {
+	if x != nil && x.EntitiesUttered != nil {
+		return *x.EntitiesUttered
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_TTS) GetSpeechMs() uint32 {
-	if x != nil && x.SpeechMs != nil {
-		return *x.SpeechMs
+func (x *SimulationRun_JobMetrics_TTS) GetEntitiesRecognized() uint32 {
+	if x != nil && x.EntitiesRecognized != nil {
+		return *x.EntitiesRecognized
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_TTS) GetNaturalnessScore() float32 {
-	if x != nil && x.NaturalnessScore != nil {
-		return *x.NaturalnessScore
+func (x *SimulationRun_JobMetrics_TTS) GetEntityRecall() float32 {
+	if x != nil && x.EntityRecall != nil {
+		return *x.EntityRecall
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_TTS) GetEnunciationScore() float32 {
-	if x != nil && x.EnunciationScore != nil {
-		return *x.EnunciationScore
+func (x *SimulationRun_JobMetrics_TTS) GetEntitiesAcquiredUttered() uint32 {
+	if x != nil && x.EntitiesAcquiredUttered != nil {
+		return *x.EntitiesAcquiredUttered
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_TTS) GetEntitiesAcquiredRecognized() uint32 {
+	if x != nil && x.EntitiesAcquiredRecognized != nil {
+		return *x.EntitiesAcquiredRecognized
 	}
 	return 0
 }
 
 // Audio only.
 type SimulationRun_JobMetrics_Conversation struct {
-	state                             protoimpl.MessageState `protogen:"open.v1"`
-	TurnTakingScore                   *float32               `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                 // 0-1: latency curve + cut-in/barge-in/missed-turn penalties
-	ResponseLatencyP50Ms              *int32                 `protobuf:"varint,2,opt,name=response_latency_p50_ms,json=responseLatencyP50Ms,proto3,oneof" json:"response_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
-	ResponseLatencyP95Ms              *int32                 `protobuf:"varint,3,opt,name=response_latency_p95_ms,json=responseLatencyP95Ms,proto3,oneof" json:"response_latency_p95_ms,omitempty"`
-	ResponseLatencyP99Ms              *int32                 `protobuf:"varint,4,opt,name=response_latency_p99_ms,json=responseLatencyP99Ms,proto3,oneof" json:"response_latency_p99_ms,omitempty"`
-	ResponseLatencyMs                 *int32                 `protobuf:"varint,16,opt,name=response_latency_ms,json=responseLatencyMs,proto3,oneof" json:"response_latency_ms,omitempty"`            // one turn's floor-transfer offset, cut-in if negative; job/run serve the percentiles
-	AgentYieldLatencyMs               *uint32                `protobuf:"varint,5,opt,name=agent_yield_latency_ms,json=agentYieldLatencyMs,proto3,oneof" json:"agent_yield_latency_ms,omitempty"`     // agent audio continuing past a barge-in — per turn: on the barging persona row (presence = barge-in); job: mean
-	EotMispredictionCount             *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended; 0/1 per turn
-	OverlapRatio                      *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
-	OverlapSpeechMs                   *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
-	TotalSpeechMs                     *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
-	SilenceTotalMs                    *uint32                `protobuf:"varint,10,opt,name=silence_total_ms,json=silenceTotalMs,proto3,oneof" json:"silence_total_ms,omitempty"`                                                            // dead air within the conversation
-	AwkwardSilenceCount               *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`                                             // gaps past the natural-pause threshold; 0/1 per turn
-	UnansweredPersonaTurns            *uint32                `protobuf:"varint,12,opt,name=unanswered_persona_turns,json=unansweredPersonaTurns,proto3,oneof" json:"unanswered_persona_turns,omitempty"`                                    // the simulated party spoke, the agent never responded; 0/1 per turn
-	FalseInterruptionCount            *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"`                                    // needs the RemoteSession; agent paused for a non-interruption
-	FalseInterruptionUnrecoveredCount *uint32                `protobuf:"varint,14,opt,name=false_interruption_unrecovered_count,json=falseInterruptionUnrecoveredCount,proto3,oneof" json:"false_interruption_unrecovered_count,omitempty"` // needs the RemoteSession; of those, never resumed
-	AgentReportedE2ELatencyMs         *uint32                `protobuf:"varint,15,opt,name=agent_reported_e2e_latency_ms,json=agentReportedE2eLatencyMs,proto3,oneof" json:"agent_reported_e2e_latency_ms,omitempty"`                       // needs the RemoteSession; the agent's own claim, mean
-	unknownFields                     protoimpl.UnknownFields
-	sizeCache                         protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	TurnTakingScore        *float32               `protobuf:"fixed32,1,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`                   // 0-1
+	HeardE2ELatencyP50Ms   *int32                 `protobuf:"varint,2,opt,name=heard_e2e_latency_p50_ms,json=heardE2eLatencyP50Ms,proto3,oneof" json:"heard_e2e_latency_p50_ms,omitempty"` // floor-transfer offset; a gap is > 0, an overlap < 0
+	HeardE2ELatencyP95Ms   *int32                 `protobuf:"varint,3,opt,name=heard_e2e_latency_p95_ms,json=heardE2eLatencyP95Ms,proto3,oneof" json:"heard_e2e_latency_p95_ms,omitempty"`
+	HeardE2ELatencyP99Ms   *int32                 `protobuf:"varint,4,opt,name=heard_e2e_latency_p99_ms,json=heardE2eLatencyP99Ms,proto3,oneof" json:"heard_e2e_latency_p99_ms,omitempty"`
+	TimeToYieldMs          *uint32                `protobuf:"varint,5,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`                       // agent audio continuing past a barge-in
+	EotMispredictionCount  *uint32                `protobuf:"varint,6,opt,name=eot_misprediction_count,json=eotMispredictionCount,proto3,oneof" json:"eot_misprediction_count,omitempty"` // agent started before the caller's turn ended
+	OverlapRatio           *float32               `protobuf:"fixed32,7,opt,name=overlap_ratio,json=overlapRatio,proto3,oneof" json:"overlap_ratio,omitempty"`                             // overlapping speech / total speech
+	OverlapSpeechMs        *uint32                `protobuf:"varint,8,opt,name=overlap_speech_ms,json=overlapSpeechMs,proto3,oneof" json:"overlap_speech_ms,omitempty"`                   // pooling stats for overlap_ratio
+	TotalSpeechMs          *uint32                `protobuf:"varint,9,opt,name=total_speech_ms,json=totalSpeechMs,proto3,oneof" json:"total_speech_ms,omitempty"`
+	AwkwardSilenceCount    *uint32                `protobuf:"varint,11,opt,name=awkward_silence_count,json=awkwardSilenceCount,proto3,oneof" json:"awkward_silence_count,omitempty"`          // gaps past the natural-pause threshold
+	UnansweredTurns        *uint32                `protobuf:"varint,12,opt,name=unanswered_turns,json=unansweredTurns,proto3,oneof" json:"unanswered_turns,omitempty"`                        // the simulated party spoke, the agent never responded
+	FalseInterruptionCount *uint32                `protobuf:"varint,13,opt,name=false_interruption_count,json=falseInterruptionCount,proto3,oneof" json:"false_interruption_count,omitempty"` // needs the RemoteSession; agent paused for a non-interruption
+	E2ELatencyMs           *uint32                `protobuf:"varint,15,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"`                               // needs the RemoteSession; the agent's own claim
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Conversation) Reset() {
@@ -1822,37 +1846,30 @@ func (x *SimulationRun_JobMetrics_Conversation) GetTurnTakingScore() float32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP50Ms() int32 {
-	if x != nil && x.ResponseLatencyP50Ms != nil {
-		return *x.ResponseLatencyP50Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetHeardE2ELatencyP50Ms() int32 {
+	if x != nil && x.HeardE2ELatencyP50Ms != nil {
+		return *x.HeardE2ELatencyP50Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP95Ms() int32 {
-	if x != nil && x.ResponseLatencyP95Ms != nil {
-		return *x.ResponseLatencyP95Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetHeardE2ELatencyP95Ms() int32 {
+	if x != nil && x.HeardE2ELatencyP95Ms != nil {
+		return *x.HeardE2ELatencyP95Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyP99Ms() int32 {
-	if x != nil && x.ResponseLatencyP99Ms != nil {
-		return *x.ResponseLatencyP99Ms
+func (x *SimulationRun_JobMetrics_Conversation) GetHeardE2ELatencyP99Ms() int32 {
+	if x != nil && x.HeardE2ELatencyP99Ms != nil {
+		return *x.HeardE2ELatencyP99Ms
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetResponseLatencyMs() int32 {
-	if x != nil && x.ResponseLatencyMs != nil {
-		return *x.ResponseLatencyMs
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics_Conversation) GetAgentYieldLatencyMs() uint32 {
-	if x != nil && x.AgentYieldLatencyMs != nil {
-		return *x.AgentYieldLatencyMs
+func (x *SimulationRun_JobMetrics_Conversation) GetTimeToYieldMs() uint32 {
+	if x != nil && x.TimeToYieldMs != nil {
+		return *x.TimeToYieldMs
 	}
 	return 0
 }
@@ -1885,13 +1902,6 @@ func (x *SimulationRun_JobMetrics_Conversation) GetTotalSpeechMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetSilenceTotalMs() uint32 {
-	if x != nil && x.SilenceTotalMs != nil {
-		return *x.SilenceTotalMs
-	}
-	return 0
-}
-
 func (x *SimulationRun_JobMetrics_Conversation) GetAwkwardSilenceCount() uint32 {
 	if x != nil && x.AwkwardSilenceCount != nil {
 		return *x.AwkwardSilenceCount
@@ -1899,9 +1909,9 @@ func (x *SimulationRun_JobMetrics_Conversation) GetAwkwardSilenceCount() uint32 
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetUnansweredPersonaTurns() uint32 {
-	if x != nil && x.UnansweredPersonaTurns != nil {
-		return *x.UnansweredPersonaTurns
+func (x *SimulationRun_JobMetrics_Conversation) GetUnansweredTurns() uint32 {
+	if x != nil && x.UnansweredTurns != nil {
+		return *x.UnansweredTurns
 	}
 	return 0
 }
@@ -1913,94 +1923,41 @@ func (x *SimulationRun_JobMetrics_Conversation) GetFalseInterruptionCount() uint
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetFalseInterruptionUnrecoveredCount() uint32 {
-	if x != nil && x.FalseInterruptionUnrecoveredCount != nil {
-		return *x.FalseInterruptionUnrecoveredCount
+func (x *SimulationRun_JobMetrics_Conversation) GetE2ELatencyMs() uint32 {
+	if x != nil && x.E2ELatencyMs != nil {
+		return *x.E2ELatencyMs
 	}
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Conversation) GetAgentReportedE2ELatencyMs() uint32 {
-	if x != nil && x.AgentReportedE2ELatencyMs != nil {
-		return *x.AgentReportedE2ELatencyMs
-	}
-	return 0
-}
-
-// Was the call spoiled by the simulator, not the agent? Diagnostic only —
-// never folded into the scores; run aggregation excludes flagged calls
-// from the two headline scores.
-type SimulationRun_JobMetrics_Simulator struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	EarlyTermination *bool                  `protobuf:"varint,1,opt,name=early_termination,json=earlyTermination,proto3,oneof" json:"early_termination,omitempty"` // simulator ended a still-progressing call
-	LateTermination  *bool                  `protobuf:"varint,2,opt,name=late_termination,json=lateTermination,proto3,oneof" json:"late_termination,omitempty"`    // simulator dragged on after the goal was met
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *SimulationRun_JobMetrics_Simulator) Reset() {
-	*x = SimulationRun_JobMetrics_Simulator{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SimulationRun_JobMetrics_Simulator) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SimulationRun_JobMetrics_Simulator) ProtoMessage() {}
-
-func (x *SimulationRun_JobMetrics_Simulator) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SimulationRun_JobMetrics_Simulator.ProtoReflect.Descriptor instead.
-func (*SimulationRun_JobMetrics_Simulator) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1, 4}
-}
-
-func (x *SimulationRun_JobMetrics_Simulator) GetEarlyTermination() bool {
-	if x != nil && x.EarlyTermination != nil {
-		return *x.EarlyTermination
-	}
-	return false
-}
-
-func (x *SimulationRun_JobMetrics_Simulator) GetLateTermination() bool {
-	if x != nil && x.LateTermination != nil {
-		return *x.LateTermination
-	}
-	return false
-}
-
-// Rows exist for text and audio;
+// Rows exist for text and audio. The groups above hold the means and pools
+// over these; anything not measured for a turn stays unset.
 type SimulationRun_JobMetrics_Turn struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	Index   uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                           // 1-based, conversation order
-	Role    agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"` // ASSISTANT — the agent under test, USER — simulator persona.
-	StartMs *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`  // audio only; relative to t0; unset if the turn could not be aligned to the audio
-	EndMs   *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`        // audio only
-	// Job groups hold means/pools of these; a field with no per-turn measurement stays unset here.
-	Stt           *SimulationRun_JobMetrics_STT          `protobuf:"bytes,5,opt,name=stt,proto3" json:"stt,omitempty"`                   // transcription_latency_ms
-	Llm           *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,6,opt,name=llm,proto3" json:"llm,omitempty"`                   // ttft_ms, ttfs_ms, tokens_per_second, conciseness_score
-	Tts           *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,7,opt,name=tts,proto3" json:"tts,omitempty"`                   // ttfa_ms, ttfb_ms, naturalness_score, enunciation_score
-	Conversation  *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,8,opt,name=conversation,proto3" json:"conversation,omitempty"` // response_latency_ms, agent_yield_latency_ms, agent_reported_e2e_latency_ms, 0/1 counts
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Index             uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                                            // 1-based, conversation order
+	Role              agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                  // ASSISTANT = the agent under test, USER = simulator persona
+	StartMs           *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                   // audio only; relative to t0; unset if the turn could not be aligned to the audio
+	EndMs             *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                         // audio only
+	SttDelayMs        *uint32                `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`        // needs the RemoteSession
+	LlmTtftMs         *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`           // needs the RemoteSession
+	LlmTtfsMs         *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`           // needs the RemoteSession
+	LlmTps            *float32               `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                     // needs the RemoteSession
+	TtsTtfbMs         *uint32                `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`           // needs the RemoteSession
+	E2ELatencyMs      *uint32                `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"` // needs the RemoteSession
+	HeardE2ELatencyMs *int32                 `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"`
+	TimeToYieldMs     *uint32                `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`
+	TurnTakingScore   *float32               `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`
+	Conciseness       *float32               `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // needs the text judge
+	EotMisprediction  *bool                  `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
+	AwkwardSilence    *bool                  `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
+	Unanswered        *bool                  `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *SimulationRun_JobMetrics_Turn) Reset() {
 	*x = SimulationRun_JobMetrics_Turn{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[22]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2012,7 +1969,7 @@ func (x *SimulationRun_JobMetrics_Turn) String() string {
 func (*SimulationRun_JobMetrics_Turn) ProtoMessage() {}
 
 func (x *SimulationRun_JobMetrics_Turn) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[22]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2025,7 +1982,7 @@ func (x *SimulationRun_JobMetrics_Turn) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SimulationRun_JobMetrics_Turn.ProtoReflect.Descriptor instead.
 func (*SimulationRun_JobMetrics_Turn) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1, 5}
+	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1, 4}
 }
 
 func (x *SimulationRun_JobMetrics_Turn) GetIndex() uint32 {
@@ -2056,32 +2013,95 @@ func (x *SimulationRun_JobMetrics_Turn) GetEndMs() uint32 {
 	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetStt() *SimulationRun_JobMetrics_STT {
-	if x != nil {
-		return x.Stt
+func (x *SimulationRun_JobMetrics_Turn) GetSttDelayMs() uint32 {
+	if x != nil && x.SttDelayMs != nil {
+		return *x.SttDelayMs
 	}
-	return nil
+	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetLlm() *SimulationRun_JobMetrics_LLM {
-	if x != nil {
-		return x.Llm
+func (x *SimulationRun_JobMetrics_Turn) GetLlmTtftMs() uint32 {
+	if x != nil && x.LlmTtftMs != nil {
+		return *x.LlmTtftMs
 	}
-	return nil
+	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetTts() *SimulationRun_JobMetrics_TTS {
-	if x != nil {
-		return x.Tts
+func (x *SimulationRun_JobMetrics_Turn) GetLlmTtfsMs() uint32 {
+	if x != nil && x.LlmTtfsMs != nil {
+		return *x.LlmTtfsMs
 	}
-	return nil
+	return 0
 }
 
-func (x *SimulationRun_JobMetrics_Turn) GetConversation() *SimulationRun_JobMetrics_Conversation {
-	if x != nil {
-		return x.Conversation
+func (x *SimulationRun_JobMetrics_Turn) GetLlmTps() float32 {
+	if x != nil && x.LlmTps != nil {
+		return *x.LlmTps
 	}
-	return nil
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetTtsTtfbMs() uint32 {
+	if x != nil && x.TtsTtfbMs != nil {
+		return *x.TtsTtfbMs
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetE2ELatencyMs() uint32 {
+	if x != nil && x.E2ELatencyMs != nil {
+		return *x.E2ELatencyMs
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetHeardE2ELatencyMs() int32 {
+	if x != nil && x.HeardE2ELatencyMs != nil {
+		return *x.HeardE2ELatencyMs
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetTimeToYieldMs() uint32 {
+	if x != nil && x.TimeToYieldMs != nil {
+		return *x.TimeToYieldMs
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetTurnTakingScore() float32 {
+	if x != nil && x.TurnTakingScore != nil {
+		return *x.TurnTakingScore
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetConciseness() float32 {
+	if x != nil && x.Conciseness != nil {
+		return *x.Conciseness
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetEotMisprediction() bool {
+	if x != nil && x.EotMisprediction != nil {
+		return *x.EotMisprediction
+	}
+	return false
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetAwkwardSilence() bool {
+	if x != nil && x.AwkwardSilence != nil {
+		return *x.AwkwardSilence
+	}
+	return false
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetUnanswered() bool {
+	if x != nil && x.Unanswered != nil {
+		return *x.Unanswered
+	}
+	return false
 }
 
 type SimulationRun_Create_Request struct {
@@ -2104,7 +2124,7 @@ type SimulationRun_Create_Request struct {
 
 func (x *SimulationRun_Create_Request) Reset() {
 	*x = SimulationRun_Create_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[23]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2116,7 +2136,7 @@ func (x *SimulationRun_Create_Request) String() string {
 func (*SimulationRun_Create_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Create_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[23]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2191,7 +2211,7 @@ type SimulationRun_Create_Response struct {
 
 func (x *SimulationRun_Create_Response) Reset() {
 	*x = SimulationRun_Create_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[24]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2203,7 +2223,7 @@ func (x *SimulationRun_Create_Response) String() string {
 func (*SimulationRun_Create_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Create_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[24]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2244,7 +2264,7 @@ type SimulationRun_ConfirmSourceUpload_Request struct {
 
 func (x *SimulationRun_ConfirmSourceUpload_Request) Reset() {
 	*x = SimulationRun_ConfirmSourceUpload_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[25]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2256,7 +2276,7 @@ func (x *SimulationRun_ConfirmSourceUpload_Request) String() string {
 func (*SimulationRun_ConfirmSourceUpload_Request) ProtoMessage() {}
 
 func (x *SimulationRun_ConfirmSourceUpload_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[25]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2301,7 +2321,7 @@ type SimulationRun_ConfirmSourceUpload_Response struct {
 
 func (x *SimulationRun_ConfirmSourceUpload_Response) Reset() {
 	*x = SimulationRun_ConfirmSourceUpload_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[26]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2313,7 +2333,7 @@ func (x *SimulationRun_ConfirmSourceUpload_Response) String() string {
 func (*SimulationRun_ConfirmSourceUpload_Response) ProtoMessage() {}
 
 func (x *SimulationRun_ConfirmSourceUpload_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[26]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2339,7 +2359,7 @@ type SimulationRun_Get_Request struct {
 
 func (x *SimulationRun_Get_Request) Reset() {
 	*x = SimulationRun_Get_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2351,7 +2371,7 @@ func (x *SimulationRun_Get_Request) String() string {
 func (*SimulationRun_Get_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Get_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2390,7 +2410,7 @@ type SimulationRun_Get_Response struct {
 
 func (x *SimulationRun_Get_Response) Reset() {
 	*x = SimulationRun_Get_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2402,7 +2422,7 @@ func (x *SimulationRun_Get_Response) String() string {
 func (*SimulationRun_Get_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Get_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2436,7 +2456,7 @@ type SimulationRun_List_Request struct {
 
 func (x *SimulationRun_List_Request) Reset() {
 	*x = SimulationRun_List_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2448,7 +2468,7 @@ func (x *SimulationRun_List_Request) String() string {
 func (*SimulationRun_List_Request) ProtoMessage() {}
 
 func (x *SimulationRun_List_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2495,7 +2515,7 @@ type SimulationRun_List_Response struct {
 
 func (x *SimulationRun_List_Response) Reset() {
 	*x = SimulationRun_List_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2507,7 +2527,7 @@ func (x *SimulationRun_List_Response) String() string {
 func (*SimulationRun_List_Response) ProtoMessage() {}
 
 func (x *SimulationRun_List_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2547,7 +2567,7 @@ type SimulationRun_Cancel_Request struct {
 
 func (x *SimulationRun_Cancel_Request) Reset() {
 	*x = SimulationRun_Cancel_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2559,7 +2579,7 @@ func (x *SimulationRun_Cancel_Request) String() string {
 func (*SimulationRun_Cancel_Request) ProtoMessage() {}
 
 func (x *SimulationRun_Cancel_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2597,7 +2617,7 @@ type SimulationRun_Cancel_Response struct {
 
 func (x *SimulationRun_Cancel_Response) Reset() {
 	*x = SimulationRun_Cancel_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2609,7 +2629,7 @@ func (x *SimulationRun_Cancel_Response) String() string {
 func (*SimulationRun_Cancel_Response) ProtoMessage() {}
 
 func (x *SimulationRun_Cancel_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2633,7 +2653,7 @@ type Scenario_CreateFromSession struct {
 
 func (x *Scenario_CreateFromSession) Reset() {
 	*x = Scenario_CreateFromSession{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[33]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2645,7 +2665,7 @@ func (x *Scenario_CreateFromSession) String() string {
 func (*Scenario_CreateFromSession) ProtoMessage() {}
 
 func (x *Scenario_CreateFromSession) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[33]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2672,7 +2692,7 @@ type Scenario_CreateFromSession_Request struct {
 
 func (x *Scenario_CreateFromSession_Request) Reset() {
 	*x = Scenario_CreateFromSession_Request{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2684,7 +2704,7 @@ func (x *Scenario_CreateFromSession_Request) String() string {
 func (*Scenario_CreateFromSession_Request) ProtoMessage() {}
 
 func (x *Scenario_CreateFromSession_Request) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2730,7 +2750,7 @@ type Scenario_CreateFromSession_Response struct {
 
 func (x *Scenario_CreateFromSession_Response) Reset() {
 	*x = Scenario_CreateFromSession_Response{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[36]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2742,7 +2762,7 @@ func (x *Scenario_CreateFromSession_Response) String() string {
 func (*Scenario_CreateFromSession_Response) ProtoMessage() {}
 
 func (x *Scenario_CreateFromSession_Response) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[36]
+	mi := &file_livekit_agent_simulation_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2787,7 +2807,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xf5<\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x93A\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -2837,7 +2857,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xad \n" +
+	"\x1a\xc1%\n" +
 	"\n" +
 	"JobMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2846,15 +2866,19 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03stt\x18\x04 \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
 	"\x03llm\x18\x05 \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
 	"\x03tts\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
-	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversation\x12I\n" +
-	"\tsimulator\x18\b \x01(\v2+.livekit.SimulationRun.JobMetrics.SimulatorR\tsimulator\x12<\n" +
+	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversation\x12<\n" +
 	"\x05turns\x18\t \x03(\v2&.livekit.SimulationRun.JobMetrics.TurnR\x05turns\x12\x1f\n" +
 	"\vjudge_model\x18\n" +
 	" \x01(\tR\n" +
-	"judgeModel\x12*\n" +
-	"\x11audio_judge_model\x18\v \x01(\tR\x0faudioJudgeModel\x12,\n" +
+	"judgeModel\x12,\n" +
 	"\x12has_remote_session\x18\f \x01(\bR\x10hasRemoteSession\x12*\n" +
-	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x1a\xa7\x04\n" +
+	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x12%\n" +
+	"\vconciseness\x18\x0e \x01(\x02H\x03R\vconciseness\x88\x01\x01\x129\n" +
+	"\x16unnecessary_tool_calls\x18\x0f \x01(\bH\x04R\x14unnecessaryToolCalls\x88\x01\x01\x12.\n" +
+	"\x10information_loss\x18\x10 \x01(\bH\x05R\x0finformationLoss\x88\x01\x01\x126\n" +
+	"\x14redundant_statements\x18\x11 \x01(\bH\x06R\x13redundantStatements\x88\x01\x01\x127\n" +
+	"\x15poor_question_quality\x18\x12 \x01(\bH\aR\x13poorQuestionQuality\x88\x01\x01\x12>\n" +
+	"\x18conversation_progression\x18\x13 \x01(\x02H\bR\x17conversationProgression\x88\x01\x01\x1a\x92\x06\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
@@ -2864,53 +2888,56 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05chars\x18\t \x01(\rH\x04R\x05chars\x88\x01\x01\x12$\n" +
 	"\vchar_errors\x18\n" +
 	" \x01(\rH\x05R\n" +
-	"charErrors\x88\x01\x01\x12*\n" +
-	"\x0ekeyterm_recall\x18\x05 \x01(\x02H\x06R\rkeytermRecall\x88\x01\x01\x12.\n" +
-	"\x10keyterms_uttered\x18\x06 \x01(\rH\aR\x0fkeytermsUttered\x88\x01\x01\x124\n" +
-	"\x13keyterms_recognized\x18\a \x01(\rH\bR\x12keytermsRecognized\x88\x01\x01\x12=\n" +
-	"\x18transcription_latency_ms\x18\b \x01(\rH\tR\x16transcriptionLatencyMs\x88\x01\x01B\x06\n" +
+	"charErrors\x88\x01\x01\x12%\n" +
+	"\fstt_delay_ms\x18\b \x01(\rH\x06R\n" +
+	"sttDelayMs\x88\x01\x01\x122\n" +
+	"\x12entity_recognition\x18\v \x01(\x02H\aR\x11entityRecognition\x88\x01\x01\x12.\n" +
+	"\x10entities_uttered\x18\f \x01(\rH\bR\x0fentitiesUttered\x88\x01\x01\x124\n" +
+	"\x13entities_recognized\x18\r \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01\x12(\n" +
+	"\rentity_recall\x18\x0e \x01(\x02H\n" +
+	"R\fentityRecall\x88\x01\x01\x12?\n" +
+	"\x19entities_acquired_uttered\x18\x0f \x01(\rH\vR\x17entitiesAcquiredUttered\x88\x01\x01\x12E\n" +
+	"\x1centities_acquired_recognized\x18\x10 \x01(\rH\fR\x1aentitiesAcquiredRecognized\x88\x01\x01B\x06\n" +
 	"\x04_werB\b\n" +
 	"\x06_wordsB\x0e\n" +
 	"\f_word_errorsB\x06\n" +
 	"\x04_cerB\b\n" +
 	"\x06_charsB\x0e\n" +
-	"\f_char_errorsB\x11\n" +
-	"\x0f_keyterm_recallB\x13\n" +
-	"\x11_keyterms_utteredB\x16\n" +
-	"\x14_keyterms_recognizedB\x1b\n" +
-	"\x19_transcription_latency_ms\x1a\xe8\x01\n" +
+	"\f_char_errorsB\x0f\n" +
+	"\r_stt_delay_msB\x15\n" +
+	"\x13_entity_recognitionB\x13\n" +
+	"\x11_entities_utteredB\x16\n" +
+	"\x14_entities_recognizedB\x10\n" +
+	"\x0e_entity_recallB\x1c\n" +
+	"\x1a_entities_acquired_utteredB\x1f\n" +
+	"\x1d_entities_acquired_recognized\x1a\xa0\x01\n" +
 	"\x03LLM\x12\x1c\n" +
 	"\attft_ms\x18\x01 \x01(\rH\x00R\x06ttftMs\x88\x01\x01\x12\x1c\n" +
 	"\attfs_ms\x18\x02 \x01(\rH\x01R\x06ttfsMs\x88\x01\x01\x12/\n" +
-	"\x11tokens_per_second\x18\x03 \x01(\x02H\x02R\x0ftokensPerSecond\x88\x01\x01\x120\n" +
-	"\x11conciseness_score\x18\x04 \x01(\x02H\x03R\x10concisenessScore\x88\x01\x01B\n" +
+	"\x11tokens_per_second\x18\x03 \x01(\x02H\x02R\x0ftokensPerSecond\x88\x01\x01B\n" +
 	"\n" +
 	"\b_ttft_msB\n" +
 	"\n" +
 	"\b_ttfs_msB\x14\n" +
-	"\x12_tokens_per_secondB\x14\n" +
-	"\x12_conciseness_score\x1a\x84\x05\n" +
+	"\x12_tokens_per_second\x1a\x84\x06\n" +
 	"\x03TTS\x12\x1c\n" +
-	"\attfa_ms\x18\x01 \x01(\rH\x00R\x06ttfaMs\x88\x01\x01\x12\x1c\n" +
-	"\attfb_ms\x18\x02 \x01(\rH\x01R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
-	"\x03wer\x18\x03 \x01(\x02H\x02R\x03wer\x88\x01\x01\x12\x19\n" +
-	"\x05words\x18\a \x01(\rH\x03R\x05words\x88\x01\x01\x12$\n" +
-	"\vword_errors\x18\b \x01(\rH\x04R\n" +
+	"\attfb_ms\x18\x02 \x01(\rH\x00R\x06ttfbMs\x88\x01\x01\x12\x15\n" +
+	"\x03wer\x18\x03 \x01(\x02H\x01R\x03wer\x88\x01\x01\x12\x19\n" +
+	"\x05words\x18\a \x01(\rH\x02R\x05words\x88\x01\x01\x12$\n" +
+	"\vword_errors\x18\b \x01(\rH\x03R\n" +
 	"wordErrors\x88\x01\x01\x12\x15\n" +
-	"\x03cer\x18\t \x01(\x02H\x05R\x03cer\x88\x01\x01\x12\x19\n" +
+	"\x03cer\x18\t \x01(\x02H\x04R\x03cer\x88\x01\x01\x12\x19\n" +
 	"\x05chars\x18\n" +
-	" \x01(\rH\x06R\x05chars\x88\x01\x01\x12$\n" +
-	"\vchar_errors\x18\v \x01(\rH\aR\n" +
-	"charErrors\x88\x01\x01\x12+\n" +
-	"\x0fspeech_rate_wpm\x18\x04 \x01(\x02H\bR\rspeechRateWpm\x88\x01\x01\x12$\n" +
-	"\vheard_words\x18\f \x01(\rH\tR\n" +
-	"heardWords\x88\x01\x01\x12 \n" +
-	"\tspeech_ms\x18\r \x01(\rH\n" +
-	"R\bspeechMs\x88\x01\x01\x120\n" +
-	"\x11naturalness_score\x18\x05 \x01(\x02H\vR\x10naturalnessScore\x88\x01\x01\x120\n" +
-	"\x11enunciation_score\x18\x06 \x01(\x02H\fR\x10enunciationScore\x88\x01\x01B\n" +
-	"\n" +
-	"\b_ttfa_msB\n" +
+	" \x01(\rH\x05R\x05chars\x88\x01\x01\x12$\n" +
+	"\vchar_errors\x18\v \x01(\rH\x06R\n" +
+	"charErrors\x88\x01\x01\x122\n" +
+	"\x12entity_recognition\x18\x0e \x01(\x02H\aR\x11entityRecognition\x88\x01\x01\x12.\n" +
+	"\x10entities_uttered\x18\x0f \x01(\rH\bR\x0fentitiesUttered\x88\x01\x01\x124\n" +
+	"\x13entities_recognized\x18\x10 \x01(\rH\tR\x12entitiesRecognized\x88\x01\x01\x12(\n" +
+	"\rentity_recall\x18\x11 \x01(\x02H\n" +
+	"R\fentityRecall\x88\x01\x01\x12?\n" +
+	"\x19entities_acquired_uttered\x18\x12 \x01(\rH\vR\x17entitiesAcquiredUttered\x88\x01\x01\x12E\n" +
+	"\x1centities_acquired_recognized\x18\x13 \x01(\rH\fR\x1aentitiesAcquiredRecognized\x88\x01\x01B\n" +
 	"\n" +
 	"\b_ttfb_msB\x06\n" +
 	"\x04_werB\b\n" +
@@ -2918,68 +2945,89 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_word_errorsB\x06\n" +
 	"\x04_cerB\b\n" +
 	"\x06_charsB\x0e\n" +
-	"\f_char_errorsB\x12\n" +
-	"\x10_speech_rate_wpmB\x0e\n" +
-	"\f_heard_wordsB\f\n" +
-	"\n" +
-	"_speech_msB\x14\n" +
-	"\x12_naturalness_scoreB\x14\n" +
-	"\x12_enunciation_score\x1a\xd3\n" +
-	"\n" +
+	"\f_char_errorsB\x15\n" +
+	"\x13_entity_recognitionB\x13\n" +
+	"\x11_entities_utteredB\x16\n" +
+	"\x14_entities_recognizedB\x10\n" +
+	"\x0e_entity_recallB\x1c\n" +
+	"\x1a_entities_acquired_utteredB\x1f\n" +
+	"\x1d_entities_acquired_recognized\x1a\xf5\a\n" +
 	"\fConversation\x12/\n" +
-	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14responseLatencyP50Ms\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p95_ms\x18\x03 \x01(\x05H\x02R\x14responseLatencyP95Ms\x88\x01\x01\x12:\n" +
-	"\x17response_latency_p99_ms\x18\x04 \x01(\x05H\x03R\x14responseLatencyP99Ms\x88\x01\x01\x123\n" +
-	"\x13response_latency_ms\x18\x10 \x01(\x05H\x04R\x11responseLatencyMs\x88\x01\x01\x128\n" +
-	"\x16agent_yield_latency_ms\x18\x05 \x01(\rH\x05R\x13agentYieldLatencyMs\x88\x01\x01\x12;\n" +
-	"\x17eot_misprediction_count\x18\x06 \x01(\rH\x06R\x15eotMispredictionCount\x88\x01\x01\x12(\n" +
-	"\roverlap_ratio\x18\a \x01(\x02H\aR\foverlapRatio\x88\x01\x01\x12/\n" +
-	"\x11overlap_speech_ms\x18\b \x01(\rH\bR\x0foverlapSpeechMs\x88\x01\x01\x12+\n" +
-	"\x0ftotal_speech_ms\x18\t \x01(\rH\tR\rtotalSpeechMs\x88\x01\x01\x12-\n" +
-	"\x10silence_total_ms\x18\n" +
-	" \x01(\rH\n" +
-	"R\x0esilenceTotalMs\x88\x01\x01\x127\n" +
-	"\x15awkward_silence_count\x18\v \x01(\rH\vR\x13awkwardSilenceCount\x88\x01\x01\x12=\n" +
-	"\x18unanswered_persona_turns\x18\f \x01(\rH\fR\x16unansweredPersonaTurns\x88\x01\x01\x12=\n" +
-	"\x18false_interruption_count\x18\r \x01(\rH\rR\x16falseInterruptionCount\x88\x01\x01\x12T\n" +
-	"$false_interruption_unrecovered_count\x18\x0e \x01(\rH\x0eR!falseInterruptionUnrecoveredCount\x88\x01\x01\x12E\n" +
-	"\x1dagent_reported_e2e_latency_ms\x18\x0f \x01(\rH\x0fR\x19agentReportedE2eLatencyMs\x88\x01\x01B\x14\n" +
-	"\x12_turn_taking_scoreB\x1a\n" +
-	"\x18_response_latency_p50_msB\x1a\n" +
-	"\x18_response_latency_p95_msB\x1a\n" +
-	"\x18_response_latency_p99_msB\x16\n" +
-	"\x14_response_latency_msB\x19\n" +
-	"\x17_agent_yield_latency_msB\x1a\n" +
+	"\x11turn_taking_score\x18\x01 \x01(\x02H\x00R\x0fturnTakingScore\x88\x01\x01\x12;\n" +
+	"\x18heard_e2e_latency_p50_ms\x18\x02 \x01(\x05H\x01R\x14heardE2eLatencyP50Ms\x88\x01\x01\x12;\n" +
+	"\x18heard_e2e_latency_p95_ms\x18\x03 \x01(\x05H\x02R\x14heardE2eLatencyP95Ms\x88\x01\x01\x12;\n" +
+	"\x18heard_e2e_latency_p99_ms\x18\x04 \x01(\x05H\x03R\x14heardE2eLatencyP99Ms\x88\x01\x01\x12,\n" +
+	"\x10time_to_yield_ms\x18\x05 \x01(\rH\x04R\rtimeToYieldMs\x88\x01\x01\x12;\n" +
+	"\x17eot_misprediction_count\x18\x06 \x01(\rH\x05R\x15eotMispredictionCount\x88\x01\x01\x12(\n" +
+	"\roverlap_ratio\x18\a \x01(\x02H\x06R\foverlapRatio\x88\x01\x01\x12/\n" +
+	"\x11overlap_speech_ms\x18\b \x01(\rH\aR\x0foverlapSpeechMs\x88\x01\x01\x12+\n" +
+	"\x0ftotal_speech_ms\x18\t \x01(\rH\bR\rtotalSpeechMs\x88\x01\x01\x127\n" +
+	"\x15awkward_silence_count\x18\v \x01(\rH\tR\x13awkwardSilenceCount\x88\x01\x01\x12.\n" +
+	"\x10unanswered_turns\x18\f \x01(\rH\n" +
+	"R\x0funansweredTurns\x88\x01\x01\x12=\n" +
+	"\x18false_interruption_count\x18\r \x01(\rH\vR\x16falseInterruptionCount\x88\x01\x01\x12)\n" +
+	"\x0ee2e_latency_ms\x18\x0f \x01(\rH\fR\fe2eLatencyMs\x88\x01\x01B\x14\n" +
+	"\x12_turn_taking_scoreB\x1b\n" +
+	"\x19_heard_e2e_latency_p50_msB\x1b\n" +
+	"\x19_heard_e2e_latency_p95_msB\x1b\n" +
+	"\x19_heard_e2e_latency_p99_msB\x13\n" +
+	"\x11_time_to_yield_msB\x1a\n" +
 	"\x18_eot_misprediction_countB\x10\n" +
 	"\x0e_overlap_ratioB\x14\n" +
 	"\x12_overlap_speech_msB\x12\n" +
-	"\x10_total_speech_msB\x13\n" +
-	"\x11_silence_total_msB\x18\n" +
-	"\x16_awkward_silence_countB\x1b\n" +
-	"\x19_unanswered_persona_turnsB\x1b\n" +
-	"\x19_false_interruption_countB'\n" +
-	"%_false_interruption_unrecovered_countB \n" +
-	"\x1e_agent_reported_e2e_latency_ms\x1a\x98\x01\n" +
-	"\tSimulator\x120\n" +
-	"\x11early_termination\x18\x01 \x01(\bH\x00R\x10earlyTermination\x88\x01\x01\x12.\n" +
-	"\x10late_termination\x18\x02 \x01(\bH\x01R\x0flateTermination\x88\x01\x01B\x14\n" +
-	"\x12_early_terminationB\x13\n" +
-	"\x11_late_termination\x1a\x9c\x03\n" +
+	"\x10_total_speech_msB\x18\n" +
+	"\x16_awkward_silence_countB\x13\n" +
+	"\x11_unanswered_turnsB\x1b\n" +
+	"\x19_false_interruption_countB\x11\n" +
+	"\x0f_e2e_latency_ms\x1a\xaa\a\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
 	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x1e\n" +
 	"\bstart_ms\x18\x03 \x01(\rH\x00R\astartMs\x88\x01\x01\x12\x1a\n" +
-	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x127\n" +
-	"\x03stt\x18\x05 \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
-	"\x03llm\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
-	"\x03tts\x18\a \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
-	"\fconversation\x18\b \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversationB\v\n" +
+	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x12%\n" +
+	"\fstt_delay_ms\x18\x05 \x01(\rH\x02R\n" +
+	"sttDelayMs\x88\x01\x01\x12#\n" +
+	"\vllm_ttft_ms\x18\x06 \x01(\rH\x03R\tllmTtftMs\x88\x01\x01\x12#\n" +
+	"\vllm_ttfs_ms\x18\a \x01(\rH\x04R\tllmTtfsMs\x88\x01\x01\x12\x1c\n" +
+	"\allm_tps\x18\b \x01(\x02H\x05R\x06llmTps\x88\x01\x01\x12#\n" +
+	"\vtts_ttfb_ms\x18\t \x01(\rH\x06R\tttsTtfbMs\x88\x01\x01\x12)\n" +
+	"\x0ee2e_latency_ms\x18\n" +
+	" \x01(\rH\aR\fe2eLatencyMs\x88\x01\x01\x124\n" +
+	"\x14heard_e2e_latency_ms\x18\v \x01(\x05H\bR\x11heardE2eLatencyMs\x88\x01\x01\x12,\n" +
+	"\x10time_to_yield_ms\x18\f \x01(\rH\tR\rtimeToYieldMs\x88\x01\x01\x12/\n" +
+	"\x11turn_taking_score\x18\r \x01(\x02H\n" +
+	"R\x0fturnTakingScore\x88\x01\x01\x12%\n" +
+	"\vconciseness\x18\x0e \x01(\x02H\vR\vconciseness\x88\x01\x01\x120\n" +
+	"\x11eot_misprediction\x18\x0f \x01(\bH\fR\x10eotMisprediction\x88\x01\x01\x12,\n" +
+	"\x0fawkward_silence\x18\x10 \x01(\bH\rR\x0eawkwardSilence\x88\x01\x01\x12#\n" +
+	"\n" +
+	"unanswered\x18\x11 \x01(\bH\x0eR\n" +
+	"unanswered\x88\x01\x01B\v\n" +
 	"\t_start_msB\t\n" +
-	"\a_end_msB\x11\n" +
+	"\a_end_msB\x0f\n" +
+	"\r_stt_delay_msB\x0e\n" +
+	"\f_llm_ttft_msB\x0e\n" +
+	"\f_llm_ttfs_msB\n" +
+	"\n" +
+	"\b_llm_tpsB\x0e\n" +
+	"\f_tts_ttfb_msB\x11\n" +
+	"\x0f_e2e_latency_msB\x17\n" +
+	"\x15_heard_e2e_latency_msB\x13\n" +
+	"\x11_time_to_yield_msB\x14\n" +
+	"\x12_turn_taking_scoreB\x0e\n" +
+	"\f_concisenessB\x14\n" +
+	"\x12_eot_mispredictionB\x12\n" +
+	"\x10_awkward_silenceB\r\n" +
+	"\v_unansweredB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x12\n" +
-	"\x10_task_completion\x1a\xcf\x04\n" +
+	"\x10_task_completionB\x0e\n" +
+	"\f_concisenessB\x19\n" +
+	"\x17_unnecessary_tool_callsB\x13\n" +
+	"\x11_information_lossB\x17\n" +
+	"\x15_redundant_statementsB\x18\n" +
+	"\x16_poor_question_qualityB\x1b\n" +
+	"\x19_conversation_progression\x1a\xd9\x03\n" +
 	"\n" +
 	"RunMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -2988,12 +3036,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03stt\x18\x04 \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
 	"\x03llm\x18\x05 \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
 	"\x03tts\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
-	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversation\x12\x1d\n" +
-	"\n" +
-	"jobs_total\x18\t \x01(\rR\tjobsTotal\x12#\n" +
-	"\rjobs_measured\x18\n" +
-	" \x01(\rR\fjobsMeasured\x120\n" +
-	"\x14jobs_simulator_fault\x18\v \x01(\rR\x12jobsSimulatorFaultB\x11\n" +
+	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversationB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x15\n" +
 	"\x13_scenario_pass_rate\x1a\xf5\x03\n" +
@@ -3108,7 +3151,7 @@ func file_livekit_agent_simulation_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_simulation_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 37)
+var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
 var file_livekit_agent_simulation_proto_goTypes = []any{
 	(SimulationMode)(0),                                // 0: livekit.SimulationMode
 	(SimulationRun_Status)(0),                          // 1: livekit.SimulationRun.Status
@@ -3134,91 +3177,85 @@ var file_livekit_agent_simulation_proto_goTypes = []any{
 	(*SimulationRun_JobMetrics_LLM)(nil),               // 21: livekit.SimulationRun.JobMetrics.LLM
 	(*SimulationRun_JobMetrics_TTS)(nil),               // 22: livekit.SimulationRun.JobMetrics.TTS
 	(*SimulationRun_JobMetrics_Conversation)(nil),      // 23: livekit.SimulationRun.JobMetrics.Conversation
-	(*SimulationRun_JobMetrics_Simulator)(nil),         // 24: livekit.SimulationRun.JobMetrics.Simulator
-	(*SimulationRun_JobMetrics_Turn)(nil),              // 25: livekit.SimulationRun.JobMetrics.Turn
-	(*SimulationRun_Create_Request)(nil),               // 26: livekit.SimulationRun.Create.Request
-	(*SimulationRun_Create_Response)(nil),              // 27: livekit.SimulationRun.Create.Response
-	(*SimulationRun_ConfirmSourceUpload_Request)(nil),  // 28: livekit.SimulationRun.ConfirmSourceUpload.Request
-	(*SimulationRun_ConfirmSourceUpload_Response)(nil), // 29: livekit.SimulationRun.ConfirmSourceUpload.Response
-	(*SimulationRun_Get_Request)(nil),                  // 30: livekit.SimulationRun.Get.Request
-	(*SimulationRun_Get_Response)(nil),                 // 31: livekit.SimulationRun.Get.Response
-	(*SimulationRun_List_Request)(nil),                 // 32: livekit.SimulationRun.List.Request
-	(*SimulationRun_List_Response)(nil),                // 33: livekit.SimulationRun.List.Response
-	(*SimulationRun_Cancel_Request)(nil),               // 34: livekit.SimulationRun.Cancel.Request
-	(*SimulationRun_Cancel_Response)(nil),              // 35: livekit.SimulationRun.Cancel.Response
-	(*Scenario_CreateFromSession)(nil),                 // 36: livekit.Scenario.CreateFromSession
-	nil,                                                // 37: livekit.Scenario.TagsEntry
-	(*Scenario_CreateFromSession_Request)(nil),         // 38: livekit.Scenario.CreateFromSession.Request
-	(*Scenario_CreateFromSession_Response)(nil),        // 39: livekit.Scenario.CreateFromSession.Response
-	(*timestamppb.Timestamp)(nil),                      // 40: google.protobuf.Timestamp
-	(*agent.ChatContext)(nil),                          // 41: livekit.agent.ChatContext
-	(agent.ChatRole)(0),                                // 42: livekit.agent.ChatRole
-	(*PresignedPostRequest)(nil),                       // 43: livekit.PresignedPostRequest
-	(*TokenPagination)(nil),                            // 44: livekit.TokenPagination
+	(*SimulationRun_JobMetrics_Turn)(nil),              // 24: livekit.SimulationRun.JobMetrics.Turn
+	(*SimulationRun_Create_Request)(nil),               // 25: livekit.SimulationRun.Create.Request
+	(*SimulationRun_Create_Response)(nil),              // 26: livekit.SimulationRun.Create.Response
+	(*SimulationRun_ConfirmSourceUpload_Request)(nil),  // 27: livekit.SimulationRun.ConfirmSourceUpload.Request
+	(*SimulationRun_ConfirmSourceUpload_Response)(nil), // 28: livekit.SimulationRun.ConfirmSourceUpload.Response
+	(*SimulationRun_Get_Request)(nil),                  // 29: livekit.SimulationRun.Get.Request
+	(*SimulationRun_Get_Response)(nil),                 // 30: livekit.SimulationRun.Get.Response
+	(*SimulationRun_List_Request)(nil),                 // 31: livekit.SimulationRun.List.Request
+	(*SimulationRun_List_Response)(nil),                // 32: livekit.SimulationRun.List.Response
+	(*SimulationRun_Cancel_Request)(nil),               // 33: livekit.SimulationRun.Cancel.Request
+	(*SimulationRun_Cancel_Response)(nil),              // 34: livekit.SimulationRun.Cancel.Response
+	(*Scenario_CreateFromSession)(nil),                 // 35: livekit.Scenario.CreateFromSession
+	nil,                                                // 36: livekit.Scenario.TagsEntry
+	(*Scenario_CreateFromSession_Request)(nil),         // 37: livekit.Scenario.CreateFromSession.Request
+	(*Scenario_CreateFromSession_Response)(nil),        // 38: livekit.Scenario.CreateFromSession.Response
+	(*timestamppb.Timestamp)(nil),                      // 39: google.protobuf.Timestamp
+	(*agent.ChatContext)(nil),                          // 40: livekit.agent.ChatContext
+	(agent.ChatRole)(0),                                // 41: livekit.agent.ChatRole
+	(*PresignedPostRequest)(nil),                       // 42: livekit.PresignedPostRequest
+	(*TokenPagination)(nil),                            // 43: livekit.TokenPagination
 }
 var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	9,  // 0: livekit.SimulationRunSummary.issues:type_name -> livekit.SimulationRunSummary.Issue
 	8,  // 1: livekit.SimulationRunSummary.chat_history:type_name -> livekit.SimulationRunSummary.ChatHistoryEntry
 	1,  // 2: livekit.SimulationRun.status:type_name -> livekit.SimulationRun.Status
-	40, // 3: livekit.SimulationRun.created_at:type_name -> google.protobuf.Timestamp
+	39, // 3: livekit.SimulationRun.created_at:type_name -> google.protobuf.Timestamp
 	10, // 4: livekit.SimulationRun.jobs:type_name -> livekit.SimulationRun.Job
 	6,  // 5: livekit.SimulationRun.scenario_group:type_name -> livekit.ScenarioGroup
-	40, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
+	39, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
 	18, // 7: livekit.SimulationRun.usage:type_name -> livekit.SimulationRun.Usage
 	0,  // 8: livekit.SimulationRun.mode:type_name -> livekit.SimulationMode
 	12, // 9: livekit.SimulationRun.metrics:type_name -> livekit.SimulationRun.RunMetrics
-	37, // 10: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
+	36, // 10: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
 	5,  // 11: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
 	5,  // 12: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
 	0,  // 13: livekit.SimulationDispatch.mode:type_name -> livekit.SimulationMode
-	41, // 14: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
+	40, // 14: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
 	2,  // 15: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
-	40, // 16: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
-	40, // 17: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
+	39, // 16: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
+	39, // 17: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
 	19, // 18: livekit.SimulationRun.Job.usage:type_name -> livekit.SimulationRun.Job.Usage
 	11, // 19: livekit.SimulationRun.Job.metrics:type_name -> livekit.SimulationRun.JobMetrics
 	20, // 20: livekit.SimulationRun.JobMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
 	21, // 21: livekit.SimulationRun.JobMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
 	22, // 22: livekit.SimulationRun.JobMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
 	23, // 23: livekit.SimulationRun.JobMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
-	24, // 24: livekit.SimulationRun.JobMetrics.simulator:type_name -> livekit.SimulationRun.JobMetrics.Simulator
-	25, // 25: livekit.SimulationRun.JobMetrics.turns:type_name -> livekit.SimulationRun.JobMetrics.Turn
-	40, // 26: livekit.SimulationRun.JobMetrics.t0:type_name -> google.protobuf.Timestamp
-	20, // 27: livekit.SimulationRun.RunMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
-	21, // 28: livekit.SimulationRun.RunMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
-	22, // 29: livekit.SimulationRun.RunMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
-	23, // 30: livekit.SimulationRun.RunMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
-	42, // 31: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
-	20, // 32: livekit.SimulationRun.JobMetrics.Turn.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
-	21, // 33: livekit.SimulationRun.JobMetrics.Turn.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
-	22, // 34: livekit.SimulationRun.JobMetrics.Turn.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
-	23, // 35: livekit.SimulationRun.JobMetrics.Turn.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
-	6,  // 36: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
-	0,  // 37: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
-	43, // 38: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	4,  // 39: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
-	1,  // 40: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
-	44, // 41: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
-	4,  // 42: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
-	44, // 43: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
-	5,  // 44: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
-	26, // 45: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
-	28, // 46: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
-	30, // 47: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
-	32, // 48: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
-	34, // 49: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
-	38, // 50: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
-	27, // 51: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
-	29, // 52: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
-	31, // 53: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
-	33, // 54: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
-	35, // 55: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
-	39, // 56: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
-	51, // [51:57] is the sub-list for method output_type
-	45, // [45:51] is the sub-list for method input_type
-	45, // [45:45] is the sub-list for extension type_name
-	45, // [45:45] is the sub-list for extension extendee
-	0,  // [0:45] is the sub-list for field type_name
+	24, // 24: livekit.SimulationRun.JobMetrics.turns:type_name -> livekit.SimulationRun.JobMetrics.Turn
+	39, // 25: livekit.SimulationRun.JobMetrics.t0:type_name -> google.protobuf.Timestamp
+	20, // 26: livekit.SimulationRun.RunMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
+	21, // 27: livekit.SimulationRun.RunMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
+	22, // 28: livekit.SimulationRun.RunMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
+	23, // 29: livekit.SimulationRun.RunMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
+	41, // 30: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
+	6,  // 31: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
+	0,  // 32: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
+	42, // 33: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	4,  // 34: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
+	1,  // 35: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
+	43, // 36: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
+	4,  // 37: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
+	43, // 38: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
+	5,  // 39: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
+	25, // 40: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
+	27, // 41: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
+	29, // 42: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
+	31, // 43: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
+	33, // 44: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
+	37, // 45: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
+	26, // 46: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
+	28, // 47: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
+	30, // 48: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
+	32, // 49: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
+	34, // 50: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
+	38, // 51: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
+	46, // [46:52] is the sub-list for method output_type
+	40, // [40:46] is the sub-list for method input_type
+	40, // [40:40] is the sub-list for extension type_name
+	40, // [40:40] is the sub-list for extension extendee
+	0,  // [0:40] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }
@@ -3236,15 +3273,14 @@ func file_livekit_agent_simulation_proto_init() {
 	file_livekit_agent_simulation_proto_msgTypes[20].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[21].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[22].OneofWrappers = []any{}
-	file_livekit_agent_simulation_proto_msgTypes[23].OneofWrappers = []any{}
-	file_livekit_agent_simulation_proto_msgTypes[29].OneofWrappers = []any{}
+	file_livekit_agent_simulation_proto_msgTypes[28].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_simulation_proto_rawDesc), len(file_livekit_agent_simulation_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   37,
+			NumMessages:   36,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
