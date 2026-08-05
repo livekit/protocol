@@ -115,6 +115,7 @@ func TestHolderStack(t *testing.T) {
 	<-held
 	go func() {
 		m.Lock()
+		noop()
 		m.Unlock()
 		close(done)
 	}()
