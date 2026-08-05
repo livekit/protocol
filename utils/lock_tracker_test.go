@@ -140,6 +140,115 @@ func TestHolderStacks(t *testing.T) {
 	<-done
 }
 
+func TestHolderCrossGoroutineUnlock(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	m := &utils.Mutex{}
+	locked := make(chan struct{})
+	go func() {
+		m.Lock()
+		close(locked)
+	}()
+	<-locked
+	m.Unlock() // legal: different goroutine than the locker
+
+	release := make(chan struct{})
+	held := make(chan struct{})
+	done := make(chan struct{})
+	go func() {
+		m.Lock()
+		close(held)
+		parkHoldingLock(release)
+		m.Unlock()
+	}()
+	<-held
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	// the cross-goroutine unlock must not leak the original locker's slot
+	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+	utils.PopulateHolderStacks(locks)
+	require.Contains(t, locks[0].HolderStacks(), "parkHoldingLock(")
+
+	close(release)
+	<-done
+}
+
+func TestHolderOverflow(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	const readers = 10 // more than the 8 holder slots
+
+	m := &utils.RWMutex{}
+	release := make(chan struct{})
+	done := make(chan struct{})
+
+	var held, finished sync.WaitGroup
+	held.Add(readers)
+	finished.Add(readers)
+	for range readers {
+		go func() {
+			m.RLock()
+			held.Done()
+			parkHoldingLock(release)
+			m.RUnlock()
+			finished.Done()
+		}()
+	}
+
+	held.Wait()
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.Len(t, locks[0].HolderGoroutineIDs(), 8)
+	require.Equal(t, readers, locks[0].NumGoroutineHeld())
+
+	close(release)
+	finished.Wait()
+	<-done
+
+	// slot and overflow accounting must drain fully for the next episode
+	release2 := make(chan struct{})
+	held2 := make(chan struct{})
+	done2 := make(chan struct{})
+	go func() {
+		m.RLock()
+		close(held2)
+		parkHoldingLock(release2)
+		m.RUnlock()
+	}()
+	<-held2
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done2)
+	}()
+	time.Sleep(100 * time.Millisecond)
+	locks = utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+
+	close(release2)
+	<-done2
+}
+
 func TestMutexFinalizer(t *testing.T) {
 	cleanupTest()
 	require.Equal(t, 0, utils.NumMutexes())

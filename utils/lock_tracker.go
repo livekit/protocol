@@ -179,7 +179,9 @@ func (d *StuckLock) NumGoroutineWaiting() int {
 }
 
 // HolderGoroutineIDs returns the ids of the goroutines holding the lock, up
-// to lockTrackerMaxHolders concurrent RWMutex readers.
+// to lockTrackerMaxHolders concurrent RWMutex readers; compare with
+// NumGoroutineHeld to detect overflow. A lock unlocked from a goroutine other
+// than its locker may transiently misattribute one entry.
 func (d *StuckLock) HolderGoroutineIDs() []int64 {
 	return d.gids
 }
@@ -240,12 +242,13 @@ func parseGoroutineHeader(g string) (int64, bool) {
 }
 
 type lockTracker struct {
-	stack   []uintptr
-	ts      uint32
-	waiting int32
-	held    int32
-	gids    [lockTrackerMaxHolders]int64
-	ref     int
+	stack    []uintptr
+	ts       uint32
+	waiting  int32
+	held     int32
+	overflow int32
+	gids     [lockTrackerMaxHolders]int64
+	ref      int
 }
 
 func (t *lockTracker) trackWait() {
@@ -254,15 +257,27 @@ func (t *lockTracker) trackWait() {
 	}
 }
 
+// Holder accounting: trackLock records the holder's gid in a free slot, or
+// increments overflow when all slots are taken. trackUnlock removes exactly
+// one entry: the caller's own gid if present, else an overflow credit, else
+// an arbitrary slot — Go permits unlocking from a goroutine other than the
+// locker, so like go-deadlock we keep the count consistent at the price of a
+// possibly misattributed entry in that rare case. Invariant: occupied slots
+// plus overflow equals the number of current holders.
 func (t *lockTracker) trackLock() {
 	if t != nil {
 		atomic.AddInt32(&t.waiting, -1)
 
 		gid := goid.Get()
+		claimed := false
 		for i := range t.gids {
 			if atomic.CompareAndSwapInt64(&t.gids[i], 0, gid) {
+				claimed = true
 				break
 			}
+		}
+		if !claimed {
+			atomic.AddInt32(&t.overflow, 1)
 		}
 
 		if atomic.AddInt32(&t.held, 1) == 1 {
@@ -279,19 +294,28 @@ func (t *lockTracker) trackLock() {
 func (t *lockTracker) trackUnlock() {
 	if t != nil {
 		gid := goid.Get()
+		removed := false
 		for i := range t.gids {
 			if atomic.CompareAndSwapInt64(&t.gids[i], gid, 0) {
+				removed = true
 				break
+			}
+		}
+		for !removed {
+			if o := atomic.LoadInt32(&t.overflow); o > 0 {
+				removed = atomic.CompareAndSwapInt32(&t.overflow, o, o-1)
+				continue
+			}
+			removed = true
+			for i := range t.gids {
+				if g := atomic.LoadInt64(&t.gids[i]); g != 0 && atomic.CompareAndSwapInt64(&t.gids[i], g, 0) {
+					break
+				}
 			}
 		}
 
 		if atomic.AddInt32(&t.held, -1) == 0 {
 			atomic.StoreUint32(&t.ts, math.MaxUint32)
-			// reclaim slots leaked by goroutines that unlock a mutex locked
-			// elsewhere; may briefly drop a concurrent new holder's slot
-			for i := range t.gids {
-				atomic.StoreInt64(&t.gids[i], 0)
-			}
 		}
 	}
 }
