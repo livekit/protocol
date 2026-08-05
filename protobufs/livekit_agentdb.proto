@@ -38,10 +38,9 @@ service AgentDBService {
 message AgentDB {
   message CreateRequest {
     string region = 1;
-    string user_attributes = 2;  // opaque JSON metadata for the caller
     // Unset: never expires, and expires_at is then 0 everywhere.
     // Otherwise clamped to the server cap, and never extended.
-    int64 ttl_seconds = 3;
+    int64 ttl_seconds = 2;
   }
 
   message CreateResponse {
@@ -56,10 +55,9 @@ message AgentDB {
   message GetResponse {
     string database_id = 1;
     string region = 2;
-    string user_attributes = 3;
-    int64 created_at = 4;
-    int64 expires_at = 5;
-    int64 tip = 6;
+    int64 created_at = 3;
+    int64 expires_at = 4;
+    int64 tip = 5;
   }
 
   message ListRequest {
@@ -76,9 +74,8 @@ message AgentDB {
   message Summary {
     string database_id = 1;
     string region = 2;
-    string user_attributes = 3;
-    int64 created_at = 4;
-    int64 expires_at = 5;
+    int64 created_at = 3;
+    int64 expires_at = 4;
   }
 
   message DeleteRequest {
