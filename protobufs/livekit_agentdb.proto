@@ -25,7 +25,7 @@ option ruby_package = "LiveKit::Proto";
 // run over the data plane below. The project comes from the access token.
 service AgentDBService {
   rpc CreateDatabase(AgentDB.CreateRequest) returns (AgentDB.CreateResponse);
-  rpc GetDatabase(AgentDB.GetRequest) returns (AgentDB.Database);
+  rpc GetDatabase(AgentDB.GetRequest) returns (AgentDB.AgentDatabase);
   rpc ListDatabases(AgentDB.ListRequest) returns (AgentDB.ListResponse);
   // Deletes the stored data, not just the metadata.
   rpc DeleteDatabase(AgentDB.DeleteRequest) returns (AgentDB.DeleteResponse);
@@ -58,12 +58,12 @@ message AgentDB {
   }
 
   message ListResponse {
-    repeated Database databases = 1;
+    repeated AgentDatabase databases = 1;
     string next_page_token = 2;  // empty when exhausted
   }
 
   // One database, as get and list both report it.
-  message Database {
+  message AgentDatabase {
     string database_id = 1;
     string region = 2;
     int64 created_at = 3;

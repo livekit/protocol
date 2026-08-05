@@ -374,9 +374,9 @@ func (x *AgentDB_ListRequest) GetPageToken() string {
 }
 
 type AgentDB_ListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Databases     []*AgentDB_Database    `protobuf:"bytes,1,rep,name=databases,proto3" json:"databases,omitempty"`
-	NextPageToken string                 `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // empty when exhausted
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Databases     []*AgentDB_AgentDatabase `protobuf:"bytes,1,rep,name=databases,proto3" json:"databases,omitempty"`
+	NextPageToken string                   `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"` // empty when exhausted
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -411,7 +411,7 @@ func (*AgentDB_ListResponse) Descriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 4}
 }
 
-func (x *AgentDB_ListResponse) GetDatabases() []*AgentDB_Database {
+func (x *AgentDB_ListResponse) GetDatabases() []*AgentDB_AgentDatabase {
 	if x != nil {
 		return x.Databases
 	}
@@ -426,7 +426,7 @@ func (x *AgentDB_ListResponse) GetNextPageToken() string {
 }
 
 // One database, as get and list both report it.
-type AgentDB_Database struct {
+type AgentDB_AgentDatabase struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	Region        string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
@@ -437,20 +437,20 @@ type AgentDB_Database struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AgentDB_Database) Reset() {
-	*x = AgentDB_Database{}
+func (x *AgentDB_AgentDatabase) Reset() {
+	*x = AgentDB_AgentDatabase{}
 	mi := &file_livekit_agentdb_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AgentDB_Database) String() string {
+func (x *AgentDB_AgentDatabase) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AgentDB_Database) ProtoMessage() {}
+func (*AgentDB_AgentDatabase) ProtoMessage() {}
 
-func (x *AgentDB_Database) ProtoReflect() protoreflect.Message {
+func (x *AgentDB_AgentDatabase) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agentdb_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -462,40 +462,40 @@ func (x *AgentDB_Database) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AgentDB_Database.ProtoReflect.Descriptor instead.
-func (*AgentDB_Database) Descriptor() ([]byte, []int) {
+// Deprecated: Use AgentDB_AgentDatabase.ProtoReflect.Descriptor instead.
+func (*AgentDB_AgentDatabase) Descriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 5}
 }
 
-func (x *AgentDB_Database) GetDatabaseId() string {
+func (x *AgentDB_AgentDatabase) GetDatabaseId() string {
 	if x != nil {
 		return x.DatabaseId
 	}
 	return ""
 }
 
-func (x *AgentDB_Database) GetRegion() string {
+func (x *AgentDB_AgentDatabase) GetRegion() string {
 	if x != nil {
 		return x.Region
 	}
 	return ""
 }
 
-func (x *AgentDB_Database) GetCreatedAt() int64 {
+func (x *AgentDB_AgentDatabase) GetCreatedAt() int64 {
 	if x != nil {
 		return x.CreatedAt
 	}
 	return 0
 }
 
-func (x *AgentDB_Database) GetExpiresAt() int64 {
+func (x *AgentDB_AgentDatabase) GetExpiresAt() int64 {
 	if x != nil {
 		return x.ExpiresAt
 	}
 	return 0
 }
 
-func (x *AgentDB_Database) GetTip() int64 {
+func (x *AgentDB_AgentDatabase) GetTip() int64 {
 	if x != nil {
 		return x.Tip
 	}
@@ -2105,7 +2105,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\"\xce\x19\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\"\xd8\x19\n" +
 	"\aAgentDB\x1aH\n" +
 	"\rCreateRequest\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x1f\n" +
@@ -2123,11 +2123,11 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\vListRequest\x12\x1b\n" +
 	"\tpage_size\x18\x01 \x01(\x05R\bpageSize\x12\x1d\n" +
 	"\n" +
-	"page_token\x18\x02 \x01(\tR\tpageToken\x1ao\n" +
-	"\fListResponse\x127\n" +
-	"\tdatabases\x18\x01 \x03(\v2\x19.livekit.AgentDB.DatabaseR\tdatabases\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\x93\x01\n" +
-	"\bDatabase\x12\x1f\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x1at\n" +
+	"\fListResponse\x12<\n" +
+	"\tdatabases\x18\x01 \x03(\v2\x1e.livekit.AgentDB.AgentDatabaseR\tdatabases\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\x98\x01\n" +
+	"\rAgentDatabase\x12\x1f\n" +
 	"\vdatabase_id\x18\x01 \x01(\tR\n" +
 	"databaseId\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12\x1d\n" +
@@ -2247,10 +2247,10 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
 	"\x06DOUBLE\x10\x02\x12\b\n" +
 	"\x04TEXT\x10\x03\x12\b\n" +
-	"\x04BLOB\x10\x042\x98\x03\n" +
+	"\x04BLOB\x10\x042\x9d\x03\n" +
 	"\x0eAgentDBService\x12Q\n" +
-	"\x0eCreateDatabase\x12\x1e.livekit.AgentDB.CreateRequest\x1a\x1f.livekit.AgentDB.CreateResponse\x12E\n" +
-	"\vGetDatabase\x12\x1b.livekit.AgentDB.GetRequest\x1a\x19.livekit.AgentDB.Database\x12L\n" +
+	"\x0eCreateDatabase\x12\x1e.livekit.AgentDB.CreateRequest\x1a\x1f.livekit.AgentDB.CreateResponse\x12J\n" +
+	"\vGetDatabase\x12\x1b.livekit.AgentDB.GetRequest\x1a\x1e.livekit.AgentDB.AgentDatabase\x12L\n" +
 	"\rListDatabases\x12\x1c.livekit.AgentDB.ListRequest\x1a\x1d.livekit.AgentDB.ListResponse\x12Q\n" +
 	"\x0eDeleteDatabase\x12\x1e.livekit.AgentDB.DeleteRequest\x1a\x1f.livekit.AgentDB.DeleteResponse\x12K\n" +
 	"\fDumpDatabase\x12\x1c.livekit.AgentDB.DumpRequest\x1a\x1d.livekit.AgentDB.DumpResponseBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
@@ -2278,7 +2278,7 @@ var file_livekit_agentdb_proto_goTypes = []any{
 	(*AgentDB_GetRequest)(nil),         // 5: livekit.AgentDB.GetRequest
 	(*AgentDB_ListRequest)(nil),        // 6: livekit.AgentDB.ListRequest
 	(*AgentDB_ListResponse)(nil),       // 7: livekit.AgentDB.ListResponse
-	(*AgentDB_Database)(nil),           // 8: livekit.AgentDB.Database
+	(*AgentDB_AgentDatabase)(nil),      // 8: livekit.AgentDB.AgentDatabase
 	(*AgentDB_DeleteRequest)(nil),      // 9: livekit.AgentDB.DeleteRequest
 	(*AgentDB_DeleteResponse)(nil),     // 10: livekit.AgentDB.DeleteResponse
 	(*AgentDB_DumpRequest)(nil),        // 11: livekit.AgentDB.DumpRequest
@@ -2306,7 +2306,7 @@ var file_livekit_agentdb_proto_goTypes = []any{
 	(*AgentDB_Wire_Error)(nil),         // 33: livekit.AgentDB.Wire.Error
 }
 var file_livekit_agentdb_proto_depIdxs = []int32{
-	8,  // 0: livekit.AgentDB.ListResponse.databases:type_name -> livekit.AgentDB.Database
+	8,  // 0: livekit.AgentDB.ListResponse.databases:type_name -> livekit.AgentDB.AgentDatabase
 	26, // 1: livekit.AgentDB.Wire.ClientMessage.hello:type_name -> livekit.AgentDB.Wire.Hello
 	17, // 2: livekit.AgentDB.Wire.ClientMessage.exec:type_name -> livekit.AgentDB.Wire.Statement
 	17, // 3: livekit.AgentDB.Wire.ClientMessage.query:type_name -> livekit.AgentDB.Wire.Statement
@@ -2334,7 +2334,7 @@ var file_livekit_agentdb_proto_depIdxs = []int32{
 	9,  // 25: livekit.AgentDBService.DeleteDatabase:input_type -> livekit.AgentDB.DeleteRequest
 	11, // 26: livekit.AgentDBService.DumpDatabase:input_type -> livekit.AgentDB.DumpRequest
 	4,  // 27: livekit.AgentDBService.CreateDatabase:output_type -> livekit.AgentDB.CreateResponse
-	8,  // 28: livekit.AgentDBService.GetDatabase:output_type -> livekit.AgentDB.Database
+	8,  // 28: livekit.AgentDBService.GetDatabase:output_type -> livekit.AgentDB.AgentDatabase
 	7,  // 29: livekit.AgentDBService.ListDatabases:output_type -> livekit.AgentDB.ListResponse
 	10, // 30: livekit.AgentDBService.DeleteDatabase:output_type -> livekit.AgentDB.DeleteResponse
 	12, // 31: livekit.AgentDBService.DumpDatabase:output_type -> livekit.AgentDB.DumpResponse
