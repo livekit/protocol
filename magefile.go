@@ -45,6 +45,7 @@ func Proto() error {
 	twirpProtoFiles := []string{
 		"cloud_replay.proto",
 		"livekit_agent_dispatch.proto",
+		"livekit_agentdb.proto",
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
 		"livekit_room.proto",
@@ -163,28 +164,6 @@ func Proto() error {
 			"-I=./protobufs",
 		}
 		args = append(args, agentProtoFiles...)
-		cmd := exec.Command(protoc, args...)
-		connectStd(cmd)
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-	}
-
-	// Own go_package, so its own invocation: protoc-gen-twirp refuses to mix
-	// packages in one run.
-	fmt.Println("generating protobuf (livekit/agentdb)")
-	{
-		args := []string{
-			"--go_out", target,
-			"--twirp_out", target,
-			"--go_opt=paths=source_relative",
-			"--twirp_opt=paths=source_relative",
-			"--plugin=go=" + protocGoPath,
-			"--plugin=twirp=" + twirpPath,
-			"-I=./protobufs",
-			"agentdb/livekit_agentdb.proto",
-			"agentdb/livekit_agentdb_data.proto",
-		}
 		cmd := exec.Command(protoc, args...)
 		connectStd(cmd)
 		if err := cmd.Run(); err != nil {
