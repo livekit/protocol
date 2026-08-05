@@ -24,6 +24,7 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/petermattis/goid"
 	"golang.org/x/exp/slices"
 )
 
@@ -116,6 +117,7 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 					ts:      ts,
 					waiting: waiting,
 					held:    atomic.LoadInt32(&t.held),
+					gid:     atomic.LoadInt64(&t.gid),
 				})
 			}
 		}
@@ -124,10 +126,12 @@ func scanTrackedLocks(refs []uintptr, minTS uint32) []*StuckLock {
 }
 
 type StuckLock struct {
-	stack   []uintptr
-	ts      uint32
-	waiting int32
-	held    int32
+	stack       []uintptr
+	ts          uint32
+	waiting     int32
+	held        int32
+	gid         int64
+	holderStack string
 }
 
 func (d *StuckLock) FirstLockedAtStack() string {
@@ -165,11 +169,73 @@ func (d *StuckLock) NumGoroutineWaiting() int {
 	return int(d.waiting)
 }
 
+// HolderGoroutineID returns the id of the goroutine that took the lock while
+// it was free. For RWMutex this is the first reader or the writer.
+func (d *StuckLock) HolderGoroutineID() int64 {
+	return d.gid
+}
+
+// HolderStack returns the holder goroutine's stack as resolved by
+// PopulateHolderStacks, or "" if it has not been resolved.
+func (d *StuckLock) HolderStack() string {
+	return d.holderStack
+}
+
+// PopulateHolderStacks resolves the current stack of each stuck lock's holder
+// goroutine from a single snapshot of all goroutine stacks. The snapshot stops
+// the world; call it once per detection, not per lock.
+func PopulateHolderStacks(stuck []*StuckLock) {
+	byGID := make(map[int64][]*StuckLock, len(stuck))
+	for _, d := range stuck {
+		if d.gid != 0 {
+			byGID[d.gid] = append(byGID[d.gid], d)
+		}
+	}
+	if len(byGID) == 0 {
+		return
+	}
+
+	buf := make([]byte, 1<<20)
+	for {
+		n := runtime.Stack(buf, true)
+		if n < len(buf) || len(buf) >= 1<<26 {
+			buf = buf[:n]
+			break
+		}
+		buf = make([]byte, len(buf)*2)
+	}
+
+	for _, g := range strings.Split(string(buf), "\n\n") {
+		if gid, ok := parseGoroutineHeader(g); ok {
+			for _, d := range byGID[gid] {
+				d.holderStack = g
+			}
+		}
+	}
+}
+
+// parseGoroutineHeader extracts the goroutine id from a stack block formatted
+// like "goroutine 123 [chan receive]:\n..."
+func parseGoroutineHeader(g string) (int64, bool) {
+	const prefix = "goroutine "
+	if !strings.HasPrefix(g, prefix) {
+		return 0, false
+	}
+	rest := g[len(prefix):]
+	sp := strings.IndexByte(rest, ' ')
+	if sp <= 0 {
+		return 0, false
+	}
+	gid, err := strconv.ParseInt(rest[:sp], 10, 64)
+	return gid, err == nil
+}
+
 type lockTracker struct {
 	stack   []uintptr
 	ts      uint32
 	waiting int32
 	held    int32
+	gid     int64
 	ref     int
 }
 
@@ -184,6 +250,7 @@ func (t *lockTracker) trackLock() {
 		atomic.AddInt32(&t.waiting, -1)
 		if atomic.AddInt32(&t.held, 1) == 1 {
 			atomic.StoreUint32(&t.ts, atomic.LoadUint32(&lowResTime))
+			atomic.StoreInt64(&t.gid, goid.Get())
 
 			if atomic.LoadUint32(&enableLockTrackerStackTrace) == 1 {
 				n := runtime.Callers(2, t.stack[:lockTrackerMaxStackDepth])

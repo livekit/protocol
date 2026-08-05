@@ -20,6 +20,7 @@ require (
 	github.com/mackerelio/go-osstat v0.2.8
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
 	github.com/nyaruka/phonenumbers v1.8.1
+	github.com/petermattis/goid v0.0.0-20260725062400-500c67a39b75
 	github.com/pion/logging v0.2.4
 	github.com/pion/sdp/v3 v3.0.19
 	github.com/pion/webrtc/v4 v4.2.17

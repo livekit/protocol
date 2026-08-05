@@ -92,6 +92,47 @@ func TestFirstLockStackTrace(t *testing.T) {
 	m.Unlock()
 }
 
+func parkHoldingLock(release chan struct{}) {
+	<-release
+}
+
+func TestHolderStack(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	m := &utils.Mutex{}
+	release := make(chan struct{})
+	held := make(chan struct{})
+	done := make(chan struct{})
+
+	go func() {
+		m.Lock()
+		close(held)
+		parkHoldingLock(release)
+		m.Unlock()
+	}()
+
+	<-held
+	go func() {
+		m.Lock()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.NotZero(t, locks[0].HolderGoroutineID())
+	require.Equal(t, "", locks[0].HolderStack())
+
+	utils.PopulateHolderStacks(locks)
+	require.Contains(t, locks[0].HolderStack(), "parkHoldingLock")
+	require.Contains(t, locks[0].HolderStack(), fmt.Sprintf("goroutine %d ", locks[0].HolderGoroutineID()))
+
+	close(release)
+	<-done
+}
+
 func TestMutexFinalizer(t *testing.T) {
 	cleanupTest()
 	require.Equal(t, 0, utils.NumMutexes())
