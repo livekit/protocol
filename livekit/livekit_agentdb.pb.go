@@ -35,24 +35,19 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// QueryLang selects the query language of a statement; both execute
-// against the same database.
 type AgentDB_QueryLang int32
 
 const (
-	AgentDB_QUERY_LANG_SQL    AgentDB_QueryLang = 0
-	AgentDB_QUERY_LANG_CYPHER AgentDB_QueryLang = 1
+	AgentDB_QUERY_LANG_SQL AgentDB_QueryLang = 0
 )
 
 // Enum value maps for AgentDB_QueryLang.
 var (
 	AgentDB_QueryLang_name = map[int32]string{
 		0: "QUERY_LANG_SQL",
-		1: "QUERY_LANG_CYPHER",
 	}
 	AgentDB_QueryLang_value = map[string]int32{
-		"QUERY_LANG_SQL":    0,
-		"QUERY_LANG_CYPHER": 1,
+		"QUERY_LANG_SQL": 0,
 	}
 )
 
@@ -83,7 +78,6 @@ func (AgentDB_QueryLang) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 0}
 }
 
-// ValueType tags one value's storage class within a Column.
 type AgentDB_ValueType int32
 
 const (
@@ -139,9 +133,8 @@ func (AgentDB_ValueType) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agentdb_proto_rawDescGZIP(), []int{0, 1}
 }
 
-// AgentDB nests every message this service and its data plane use, so names
-// like Value and Ping do not have to be unique across the whole livekit
-// package (the DataStream container does the same).
+// Nested so that names like Value and Ping need not be unique across the
+// livekit package. `tip` throughout is the latest durable commit sequence.
 type AgentDB struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -182,9 +175,11 @@ type AgentDB_CreateRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Region         string                 `protobuf:"bytes,1,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,2,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"` // opaque JSON metadata for the caller
-	TtlSeconds     int64                  `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`            // unset: never expires. Otherwise clamped to the server cap, and never extended
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Unset: never expires, and expires_at_unix is then 0 everywhere.
+	// Otherwise clamped to the server cap, and never extended.
+	TtlSeconds    int64 `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AgentDB_CreateRequest) Reset() {
@@ -240,8 +235,8 @@ func (x *AgentDB_CreateRequest) GetTtlSeconds() int64 {
 
 type AgentDB_CreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`             // "DB_..."
-	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // 0: never expires
+	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"` // "DB_..."
+	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -340,8 +335,8 @@ type AgentDB_GetResponse struct {
 	Region         string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,3,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"`
 	CreatedAtUnix  int64                  `protobuf:"varint,4,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
-	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // 0: never expires
-	Tip            int64                  `protobuf:"varint,6,opt,name=tip,proto3" json:"tip,omitempty"`                                            // latest durable commit sequence
+	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
+	Tip            int64                  `protobuf:"varint,6,opt,name=tip,proto3" json:"tip,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -420,8 +415,8 @@ func (x *AgentDB_GetResponse) GetTip() int64 {
 
 type AgentDB_ListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`   // server-clamped
-	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"` // opaque cursor from a previous response
+	PageSize      int32                  `protobuf:"varint,1,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // server-clamped
+	PageToken     string                 `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -522,15 +517,15 @@ func (x *AgentDB_ListResponse) GetNextPageToken() string {
 	return ""
 }
 
-// Summary is a database's immutable fields. No tip: it changes on every
-// commit, so call GetDatabase for it.
+// Immutable fields only, so a listing needs no per-database read. No tip: it
+// moves on every commit.
 type AgentDB_Summary struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	DatabaseId     string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	Region         string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	UserAttributes string                 `protobuf:"bytes,3,opt,name=user_attributes,json=userAttributes,proto3" json:"user_attributes,omitempty"`
 	CreatedAtUnix  int64                  `protobuf:"varint,4,opt,name=created_at_unix,json=createdAtUnix,proto3" json:"created_at_unix,omitempty"`
-	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // 0: never expires
+	ExpiresAtUnix  int64                  `protobuf:"varint,5,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -727,8 +722,8 @@ func (x *AgentDB_DumpRequest) GetDatabaseId() string {
 type AgentDB_DumpResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	DownloadUrl   string                 `protobuf:"bytes,1,opt,name=download_url,json=downloadUrl,proto3" json:"download_url,omitempty"`          // pre-authenticated object-storage URL
-	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // URL expiry
-	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                                            // commit sequence the dump is consistent at
+	ExpiresAtUnix int64                  `protobuf:"varint,2,opt,name=expires_at_unix,json=expiresAtUnix,proto3" json:"expires_at_unix,omitempty"` // of the URL, not the database
+	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`                                            // what the dump is consistent at
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -947,7 +942,7 @@ type AgentDB_ClientMessage_Hello struct {
 }
 
 type AgentDB_ClientMessage_Exec struct {
-	Exec *AgentDB_Statement `protobuf:"bytes,3,opt,name=exec,proto3,oneof"` // no result rows; answers ExecResult
+	Exec *AgentDB_Statement `protobuf:"bytes,3,opt,name=exec,proto3,oneof"` // answers ExecResult
 }
 
 type AgentDB_ClientMessage_Query struct {
@@ -955,11 +950,11 @@ type AgentDB_ClientMessage_Query struct {
 }
 
 type AgentDB_ClientMessage_Batch struct {
-	Batch *AgentDB_Batch `protobuf:"bytes,5,opt,name=batch,proto3,oneof"` // atomic multi-statement exec
+	Batch *AgentDB_Batch `protobuf:"bytes,5,opt,name=batch,proto3,oneof"`
 }
 
 type AgentDB_ClientMessage_Begin struct {
-	Begin *AgentDB_Begin `protobuf:"bytes,6,opt,name=begin,proto3,oneof"` // interactive transaction (server enforces idle/duration timeouts)
+	Begin *AgentDB_Begin `protobuf:"bytes,6,opt,name=begin,proto3,oneof"`
 }
 
 type AgentDB_ClientMessage_Commit struct {
@@ -971,11 +966,11 @@ type AgentDB_ClientMessage_Rollback struct {
 }
 
 type AgentDB_ClientMessage_Cancel struct {
-	Cancel *AgentDB_Cancel `protobuf:"bytes,9,opt,name=cancel,proto3,oneof"` // stop a running query's stream/cursor
+	Cancel *AgentDB_Cancel `protobuf:"bytes,9,opt,name=cancel,proto3,oneof"`
 }
 
 type AgentDB_ClientMessage_Credit struct {
-	Credit *AgentDB_Credit `protobuf:"bytes,10,opt,name=credit,proto3,oneof"` // grant more batch credits for request_id
+	Credit *AgentDB_Credit `protobuf:"bytes,10,opt,name=credit,proto3,oneof"`
 }
 
 type AgentDB_ClientMessage_Ping struct {
@@ -1172,7 +1167,7 @@ func (*AgentDB_ServerMessage_Error) isAgentDB_ServerMessage_Message() {}
 
 func (*AgentDB_ServerMessage_Pong) isAgentDB_ServerMessage_Message() {}
 
-// Value mirrors SQLite's five storage classes exactly.
+// SQLite's five storage classes.
 type AgentDB_Value struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Value:
@@ -1305,8 +1300,8 @@ func (*AgentDB_Value_BlobValue) isAgentDB_Value_Value() {}
 
 type AgentDB_Statement struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sql           string                 `protobuf:"bytes,1,opt,name=sql,proto3" json:"sql,omitempty"`       // statement text in the selected lang
-	Params        []*AgentDB_Value       `protobuf:"bytes,2,rep,name=params,proto3" json:"params,omitempty"` // positional bind parameters
+	Sql           string                 `protobuf:"bytes,1,opt,name=sql,proto3" json:"sql,omitempty"`
+	Params        []*AgentDB_Value       `protobuf:"bytes,2,rep,name=params,proto3" json:"params,omitempty"` // positional
 	Lang          AgentDB_QueryLang      `protobuf:"varint,3,opt,name=lang,proto3,enum=livekit.AgentDB_QueryLang" json:"lang,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1553,7 +1548,7 @@ func (*AgentDB_Cancel) Descriptor() ([]byte, []int) {
 
 type AgentDB_Credit struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Batches       uint32                 `protobuf:"varint,1,opt,name=batches,proto3" json:"batches,omitempty"` // additional batch frames the client can absorb
+	Batches       uint32                 `protobuf:"varint,1,opt,name=batches,proto3" json:"batches,omitempty"` // additional batches the client can absorb
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1693,7 +1688,7 @@ func (x *AgentDB_Pong) GetTimestamp() int64 {
 
 type AgentDB_Hello struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` // access token; authorization is checked here
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	DatabaseId    string                 `protobuf:"bytes,2,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1745,8 +1740,8 @@ func (x *AgentDB_Hello) GetDatabaseId() string {
 
 type AgentDB_HelloOk struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	Tip            int64                  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"`                                               // latest durable commit sequence
-	PingIntervalMs uint32                 `protobuf:"varint,2,opt,name=ping_interval_ms,json=pingIntervalMs,proto3" json:"ping_interval_ms,omitempty"` // server-advertised keepalive cadence
+	Tip            int64                  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"`
+	PingIntervalMs uint32                 `protobuf:"varint,2,opt,name=ping_interval_ms,json=pingIntervalMs,proto3" json:"ping_interval_ms,omitempty"`
 	PingTimeoutMs  uint32                 `protobuf:"varint,3,opt,name=ping_timeout_ms,json=pingTimeoutMs,proto3" json:"ping_timeout_ms,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -1847,20 +1842,20 @@ func (x *AgentDB_Columns) GetNames() []string {
 	return nil
 }
 
-// Column is one column of a batch. Values are typed individually, as
-// SQLite types them, so a column may mix classes: walk `types` and take the next
-// entry from the matching array. A NULL occupies a tag only.
+// Values are typed per row, as SQLite types them, so a column may mix
+// classes: walk `types` and take the next entry from the matching array. Text
+// and blobs are concatenated with one exclusive end offset each, so value i
+// is data[ends[i-1]:ends[i]] with 0 implied before the first. A NULL occupies
+// a tag only.
 type AgentDB_Column struct {
-	state   protoimpl.MessageState `protogen:"open.v1"`
-	Types   []byte                 `protobuf:"bytes,1,opt,name=types,proto3" json:"types,omitempty"` // one ValueType per row
-	Ints    []int64                `protobuf:"zigzag64,2,rep,packed,name=ints,proto3" json:"ints,omitempty"`
-	Doubles []float64              `protobuf:"fixed64,3,rep,packed,name=doubles,proto3" json:"doubles,omitempty"`
-	// Values concatenated, one exclusive end offset each: value i is
-	// data[ends[i-1]:ends[i]], with 0 implied before the first.
-	TextData      []byte   `protobuf:"bytes,4,opt,name=text_data,json=textData,proto3" json:"text_data,omitempty"`
-	TextEnds      []uint32 `protobuf:"varint,5,rep,packed,name=text_ends,json=textEnds,proto3" json:"text_ends,omitempty"`
-	BlobData      []byte   `protobuf:"bytes,6,opt,name=blob_data,json=blobData,proto3" json:"blob_data,omitempty"`
-	BlobEnds      []uint32 `protobuf:"varint,7,rep,packed,name=blob_ends,json=blobEnds,proto3" json:"blob_ends,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Types         []byte                 `protobuf:"bytes,1,opt,name=types,proto3" json:"types,omitempty"` // one ValueType per row
+	Ints          []int64                `protobuf:"zigzag64,2,rep,packed,name=ints,proto3" json:"ints,omitempty"`
+	Doubles       []float64              `protobuf:"fixed64,3,rep,packed,name=doubles,proto3" json:"doubles,omitempty"`
+	TextData      []byte                 `protobuf:"bytes,4,opt,name=text_data,json=textData,proto3" json:"text_data,omitempty"`
+	TextEnds      []uint32               `protobuf:"varint,5,rep,packed,name=text_ends,json=textEnds,proto3" json:"text_ends,omitempty"`
+	BlobData      []byte                 `protobuf:"bytes,6,opt,name=blob_data,json=blobData,proto3" json:"blob_data,omitempty"`
+	BlobEnds      []uint32               `protobuf:"varint,7,rep,packed,name=blob_ends,json=blobEnds,proto3" json:"blob_ends,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1946,7 +1941,7 @@ func (x *AgentDB_Column) GetBlobEnds() []uint32 {
 
 type AgentDB_ColumnBatch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Columns       []*AgentDB_Column      `protobuf:"bytes,1,rep,name=columns,proto3" json:"columns,omitempty"` // one per column of Columns
+	Columns       []*AgentDB_Column      `protobuf:"bytes,1,rep,name=columns,proto3" json:"columns,omitempty"` // one per name in Columns
 	Rows          uint32                 `protobuf:"varint,2,opt,name=rows,proto3" json:"rows,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2000,7 +1995,7 @@ type AgentDB_ExecResult struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RowsAffected  int64                  `protobuf:"varint,1,opt,name=rows_affected,json=rowsAffected,proto3" json:"rows_affected,omitempty"`
 	LastInsertId  int64                  `protobuf:"varint,2,opt,name=last_insert_id,json=lastInsertId,proto3" json:"last_insert_id,omitempty"`
-	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"` // durable commit sequence after this exec
+	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2058,7 +2053,7 @@ func (x *AgentDB_ExecResult) GetTip() int64 {
 
 type AgentDB_Done struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Tip           int64                  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"` // snapshot the query ran at
+	Tip           int64                  `protobuf:"varint,1,opt,name=tip,proto3" json:"tip,omitempty"` // the snapshot the query ran at
 	TotalRows     uint64                 `protobuf:"varint,2,opt,name=total_rows,json=totalRows,proto3" json:"total_rows,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2110,7 +2105,7 @@ func (x *AgentDB_Done) GetTotalRows() uint64 {
 
 type AgentDB_Error struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // stable machine-readable code
+	Code          string                 `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"` // stable, machine-readable
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2164,7 +2159,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\"\xd5\x1b\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\"\xc4\x1b\n" +
 	"\aAgentDB\x1aq\n" +
 	"\rCreateRequest\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12'\n" +
@@ -2301,10 +2296,9 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"total_rows\x18\x02 \x01(\x04R\ttotalRows\x1a5\n" +
 	"\x05Error\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"6\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"%\n" +
 	"\tQueryLang\x12\x12\n" +
-	"\x0eQUERY_LANG_SQL\x10\x00\x12\x15\n" +
-	"\x11QUERY_LANG_CYPHER\x10\x01\"u\n" +
+	"\x0eQUERY_LANG_SQL\x10\x00\"\x04\b\x01\x10\x01\"u\n" +
 	"\tValueType\x12\x13\n" +
 	"\x0fVALUE_TYPE_NULL\x10\x00\x12\x12\n" +
 	"\x0eVALUE_TYPE_INT\x10\x01\x12\x15\n" +
