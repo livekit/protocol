@@ -325,6 +325,22 @@ message Scenario {
     }
   }
 
+  message NoiseEvent {
+    string condition = 1; // natural language condition
+    string audio = 2; // car_honk, child_crying, ...
+  }
+
+  message Environment {
+    string background_noise = 1;
+    repeated NoiseEvent noise_events = 2;
+    repeated string audio_degradations = 3; // audio_loss, low_bitrate, muffled_voice, far_speaker, echo
+  }
+
+  message Options {
+    // The simulator backchannels the agent under test.
+    bool backchannel = 1;
+  }
+
   string label = 1;
   string instructions = 2;
   string agent_expectations = 3;
@@ -333,6 +349,8 @@ message Scenario {
   // Arbitrary JSON-encoded object, surfaced to the agent under test as
   // SimulationContext userdata (e.g. inputs and benchmark target state).
   string userdata = 5;
+  Environment environment = 6;
+  Options options = 7;
 }
 
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
