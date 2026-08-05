@@ -122,22 +122,22 @@ func ScanTrackedLocksI(threshold time.Duration, n int) []*StuckLock {
 	weakRefLock.Lock()
 	defer weakRefLock.Unlock()
 
-	window := func(size int, next *int) (int, int) {
-		min := *next
-		max := min + n
-		if size <= max {
-			max = size
-			*next = 0
-		} else {
-			*next = max
-		}
-		return min, max
-	}
+	stuck := scanTrackedLocks(window(mutexRefs.refs, &nextScanMin, n), minTS)
+	return append(stuck, scanRWTrackedLocks(window(rwRefs.refs, &nextScanMinRW, n), minTS)...)
+}
 
-	min, max := window(len(mutexRefs.refs), &nextScanMin)
-	stuck := scanTrackedLocks(mutexRefs.refs[min:max], minTS)
-	min, max = window(len(rwRefs.refs), &nextScanMinRW)
-	return append(stuck, scanRWTrackedLocks(rwRefs.refs[min:max], minTS)...)
+// window returns the next n-element window of refs, advancing next and
+// wrapping to the start when the end is reached.
+func window(refs []uintptr, next *int, n int) []uintptr {
+	min := *next
+	max := min + n
+	if len(refs) <= max {
+		max = len(refs)
+		*next = 0
+	} else {
+		*next = max
+	}
+	return refs[min:max]
 }
 
 //go:norace
