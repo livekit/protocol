@@ -1,0 +1,226 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+syntax = "proto3";
+
+package livekit;
+
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+// AgentDBService is the lifecycle and export API for SQLite databases; queries
+// run over the data plane below. The project comes from the access token.
+service AgentDBService {
+  rpc CreateDatabase(AgentDB.CreateRequest) returns (AgentDB.CreateResponse);
+  rpc GetDatabase(AgentDB.GetRequest) returns (AgentDB.AgentDatabase);
+  rpc ListDatabases(AgentDB.ListRequest) returns (AgentDB.ListResponse);
+  // Deletes the stored data, not just the metadata.
+  rpc DeleteDatabase(AgentDB.DeleteRequest) returns (AgentDB.DeleteResponse);
+  // Exports a consistent SQLite file as a time-limited download URL.
+  rpc DumpDatabase(AgentDB.DumpRequest) returns (AgentDB.DumpResponse);
+}
+
+// Nested so that names like Value and Ping need not be unique across the
+// livekit package. `tip` throughout is the latest durable commit sequence.
+message AgentDB {
+  message CreateRequest {
+    string region = 1;
+    // Unset: never expires, and expires_at is then 0 everywhere.
+    // Otherwise clamped to the server cap, and never extended.
+    int64 ttl_seconds = 2;
+  }
+
+  message CreateResponse {
+    string database_id = 1;      // "DB_..."
+    int64 expires_at = 2;
+  }
+
+  message GetRequest {
+    string database_id = 1;
+  }
+
+  message ListRequest {
+    int32 page_size = 1;         // server-clamped
+    string page_token = 2;
+  }
+
+  message ListResponse {
+    repeated AgentDatabase databases = 1;
+    string next_page_token = 2;  // empty when exhausted
+  }
+
+  // One database, as get and list both report it.
+  message AgentDatabase {
+    string database_id = 1;
+    string region = 2;
+    int64 created_at = 3;
+    int64 expires_at = 4;
+    int64 tip = 5;
+  }
+
+  message DeleteRequest {
+    string database_id = 1;
+  }
+
+  message DeleteResponse {}
+
+  message DumpRequest {
+    string database_id = 1;
+  }
+
+  message DumpResponse {
+    string download_url = 1;     // pre-authenticated object-storage URL
+    int64 expires_at = 2;   // of the URL, not the database
+    int64 tip = 3;               // what the dump is consistent at
+  }
+
+  // Data plane: one WebSocket per database, one message per frame, correlated
+  // by a client-chosen request_id. Result batches are paced by Credit, so the
+  // server never sends more un-consumed batches than granted.
+  message Wire {
+    message ClientMessage {
+      uint32 request_id = 1;
+      oneof message {
+        Hello hello = 2;           // must be first on the socket
+        Statement exec = 3;        // answers ExecResult
+        Statement query = 4;       // answers Columns + ColumnBatch* + Done
+        Batch batch = 5;
+        Begin begin = 6;
+        Commit commit = 7;
+        Rollback rollback = 8;
+        Cancel cancel = 9;
+        Credit credit = 10;
+        Ping ping = 11;
+      }
+    }
+
+    message ServerMessage {
+      uint32 request_id = 1;
+      oneof message {
+        HelloOk hello_ok = 2;
+        Columns columns = 3;
+        ColumnBatch column_batch = 4;
+        ExecResult exec_result = 5;
+        Done done = 6;
+        Error error = 7;
+        Pong pong = 8;
+      }
+    }
+
+    enum QueryLang {
+      SQL = 0;
+      reserved 1;
+    }
+
+    // SQLite's five storage classes.
+    message Value {
+      oneof value {
+        bool null_value = 1;   // always true when set
+        int64 int_value = 2;
+        double double_value = 3;
+        string text_value = 4;
+        bytes blob_value = 5;
+      }
+    }
+
+    message Statement {
+      string sql = 1;
+      repeated Value params = 2;   // positional
+      QueryLang lang = 3;
+    }
+
+    message Batch {
+      repeated Statement statements = 1;  // applied atomically, in order
+    }
+
+    message Begin {}
+    message Commit {}
+    message Rollback {}
+    message Cancel {}
+
+    message Credit {
+      uint32 batches = 1;          // additional batches the client can absorb
+    }
+
+    message Ping {
+      int64 timestamp_ms = 1;
+    }
+
+    message Pong {
+      int64 last_ping_timestamp_ms = 1;
+      int64 timestamp_ms = 2;
+    }
+
+    message Hello {
+      string token = 1;
+      string database_id = 2;
+    }
+
+    message HelloOk {
+      int64 tip = 1;
+      uint32 ping_interval_ms = 2;
+      uint32 ping_timeout_ms = 3;
+    }
+
+    message Columns {
+      repeated string names = 1;
+    }
+
+    enum ValueType {
+      NULL = 0;
+      INT = 1;
+      DOUBLE = 2;
+      TEXT = 3;
+      BLOB = 4;
+    }
+
+    // Values are typed per row, as SQLite types them, so a column may mix
+    // classes: walk `types` and take the next entry from the matching array. Text
+    // and blobs are concatenated with one exclusive end offset each, so value i
+    // is data[ends[i-1]:ends[i]] with 0 implied before the first. A NULL occupies
+    // a tag only.
+    message Column {
+      bytes types = 1;             // one ValueType per row
+      repeated sint64 ints = 2;
+      repeated double doubles = 3;
+      bytes text_data = 4;
+      repeated uint32 text_ends = 5;
+      bytes blob_data = 6;
+      repeated uint32 blob_ends = 7;
+    }
+
+    message ColumnBatch {
+      repeated Column columns = 1; // one per name in Columns
+      uint32 rows = 2;
+    }
+
+    message ExecResult {
+      int64 rows_affected = 1;
+      int64 last_insert_id = 2;
+      int64 tip = 3;
+    }
+
+    message Done {
+      int64 tip = 1;               // the snapshot the query ran at
+      uint64 total_rows = 2;
+    }
+
+    message Error {
+      string code = 1;             // stable, machine-readable
+      string message = 2;
+    }
+  }
+}
