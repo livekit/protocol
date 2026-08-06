@@ -130,6 +130,15 @@ enum ToolReplyStatus {
   TR_SKIPPED = 3;
 }
 
+enum SessionCloseReason {
+  SC_UNKNOWN = 0;
+  SC_ERROR = 1;
+  SC_JOB_SHUTDOWN = 2;
+  SC_PARTICIPANT_DISCONNECTED = 3;
+  SC_USER_INITIATED = 4;
+  SC_TASK_COMPLETED = 5;
+}
+
 enum AmdCategory {
   AMD_UNKNOWN = 0;
   AMD_HUMAN = 1;
@@ -310,6 +319,15 @@ message AgentSessionEvent {
     bool resumed = 1;
   }
 
+  // The session has ended and answers no further input. Emitted for every close,
+  // including one the agent initiates itself (hanging up after a farewell), which
+  // a driver otherwise cannot tell apart from the agent falling silent.
+  message SessionClosed {
+    SessionCloseReason reason = 1;
+    // Set when the session closed because of an error.
+    optional string error = 2;
+  }
+
   google.protobuf.Timestamp created_at = 1;
   oneof event {
     AgentStateChanged agent_state_changed = 10;
@@ -326,6 +344,7 @@ message AgentSessionEvent {
     DebugMessage debug_message = 21;
     ToolExecutionUpdated tool_execution_updated = 22;
     AgentFalseInterruption agent_false_interruption = 23;
+    SessionClosed session_closed = 24;
   }
 }
 
