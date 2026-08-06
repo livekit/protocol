@@ -23,7 +23,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/protocol/logger"
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
 )
@@ -41,7 +40,6 @@ type psrpcMetrics struct {
 	bytesTotal         *prometheus.CounterVec
 	requestsReceived   *prometheus.CounterVec
 	requestsExpired    *prometheus.CounterVec
-	claimTotal         *prometheus.CounterVec
 	claimWaitTime      prometheus.ObserverVec
 }
 
@@ -145,12 +143,6 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 		Name:        "requests_expired_total",
 		ConstLabels: constLabels,
 	}, lifecycleLabels)
-	metricsBase.claimTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace:   livekitNamespace,
-		Subsystem:   "psrpc",
-		Name:        "claim_total",
-		ConstLabels: constLabels,
-	}, claimLabels)
 	metricsBase.claimWaitTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
@@ -171,7 +163,6 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 	prometheus.MustRegister(metricsBase.bytesTotal)
 	prometheus.MustRegister(metricsBase.requestsReceived)
 	prometheus.MustRegister(metricsBase.requestsExpired)
-	prometheus.MustRegister(metricsBase.claimTotal)
 	prometheus.MustRegister(metricsBase.claimWaitTime)
 
 	CurryMetricLabels(o.curryLabels)
@@ -199,7 +190,6 @@ func CurryMetricLabels(labels prometheus.Labels) {
 		bytesTotal:         metricsBase.bytesTotal.MustCurryWith(metricsBase.curryLabels),
 		requestsReceived:   metricsBase.requestsReceived.MustCurryWith(metricsBase.curryLabels),
 		requestsExpired:    metricsBase.requestsExpired.MustCurryWith(metricsBase.curryLabels),
-		claimTotal:         metricsBase.claimTotal.MustCurryWith(metricsBase.curryLabels),
 		claimWaitTime:      metricsBase.claimWaitTime.MustCurryWith(metricsBase.curryLabels),
 	})
 }
@@ -303,20 +293,8 @@ func (o PSRPCMetricsObserver) OnRequestReceived(info psrpc.RPCInfo) {
 
 func (o PSRPCMetricsObserver) OnRequestExpired(info psrpc.RPCInfo, lateBy time.Duration) {
 	metrics.Load().requestsExpired.WithLabelValues(info.Service, info.Method).Inc()
-	logger.Warnw("psrpc request dropped: expired before dispatch", nil,
-		"service", info.Service, "method", info.Method, "lateBy", lateBy)
 }
 
 func (o PSRPCMetricsObserver) OnClaim(info psrpc.RPCInfo, outcome psrpc.ClaimOutcome, wait time.Duration) {
-	m := metrics.Load()
-	m.claimTotal.WithLabelValues(info.Service, info.Method, outcome.String()).Inc()
-	m.claimWaitTime.WithLabelValues(info.Service, info.Method, outcome.String()).Observe(float64(wait.Milliseconds()))
-
-	if outcome == psrpc.ClaimTimedOut {
-		// The caller stopped waiting for a bid before ours was accepted. It has
-		// already returned ErrNoResponse upstream, so without this line the
-		// request leaves no record on either side.
-		logger.Warnw("psrpc claim timed out before the caller granted it", nil,
-			"service", info.Service, "method", info.Method, "waited", wait)
-	}
+	metrics.Load().claimWaitTime.WithLabelValues(info.Service, info.Method, outcome.String()).Observe(float64(wait.Milliseconds()))
 }

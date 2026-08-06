@@ -43,8 +43,6 @@ func TestRequestObserverMetrics(t *testing.T) {
 	got := gatherPSRPCSeries(t, "LifecycleSvc")
 	require.Equal(t, 1.0, got["livekit_psrpc_requests_received_total"])
 	require.Equal(t, 1.0, got["livekit_psrpc_requests_expired_total"])
-	require.Equal(t, 1.0, got["livekit_psrpc_claim_total|granted"])
-	require.Equal(t, 1.0, got["livekit_psrpc_claim_total|timed_out"])
 	require.Equal(t, 1.0, got["livekit_psrpc_claim_wait_time_ms|granted"])
 	require.Equal(t, 1.0, got["livekit_psrpc_claim_wait_time_ms|timed_out"])
 }
