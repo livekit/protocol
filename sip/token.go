@@ -31,7 +31,6 @@ type SIPTokenParams struct {
 	ParticipantAttributes map[string]string
 	RoomPreset            string
 	RoomConfig            *livekit.RoomConfiguration
-	RoomAdmin             bool
 }
 
 func BuildSIPToken(params SIPTokenParams) (string, error) {
@@ -39,7 +38,6 @@ func BuildSIPToken(params SIPTokenParams) (string, error) {
 	at := auth.NewAccessToken(params.APIKey, params.APISecret).
 		SetVideoGrant(&auth.VideoGrant{
 			RoomJoin:             true,
-			RoomAdmin:            params.RoomAdmin,
 			Room:                 params.RoomName,
 			CanSubscribe:         &t,
 			CanPublish:           &t,
