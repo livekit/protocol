@@ -1,5 +1,13 @@
 # @livekit/protocol
 
+## 1.50.5
+
+### Patch Changes
+
+- Remove extraneous format specifier from log string. - [#1682](https://github.com/livekit/protocol/pull/1682) ([@alexfish8](https://github.com/alexfish8))
+
+- Add data track subscription to sync state - [#1703](https://github.com/livekit/protocol/pull/1703) ([@boks1971](https://github.com/boks1971))
+
 ## 1.50.4
 
 ### Patch Changes

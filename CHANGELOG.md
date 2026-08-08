@@ -1,5 +1,17 @@
 # github.com/livekit/protocol
 
+## 1.50.5
+
+### Patch Changes
+
+- Add an `error_code` label to the `livekit_psrpc_error_total` metric. - [#1699](https://github.com/livekit/protocol/pull/1699) ([@paulwe](https://github.com/paulwe))
+
+- Add realtime (speech-to-speech) reporter methods to gatewayobs, regenerated from cloud-observability schema/gateway.yaml realtime billing columns (#502). - [#1663](https://github.com/livekit/protocol/pull/1663) ([@russellmartin-livekit](https://github.com/russellmartin-livekit))
+
+- Remove extraneous format specifier from log string. - [#1682](https://github.com/livekit/protocol/pull/1682) ([@alexfish8](https://github.com/alexfish8))
+
+- Add data track subscription to sync state - [#1703](https://github.com/livekit/protocol/pull/1703) ([@boks1971](https://github.com/boks1971))
+
 ## 1.50.4
 
 ### Patch Changes
