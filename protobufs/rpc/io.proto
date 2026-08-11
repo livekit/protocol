@@ -36,10 +36,7 @@ service IOInfo {
   rpc UpdateMetrics(UpdateMetricsRequest) returns (google.protobuf.Empty);
 
   // ingress
-  rpc CreateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);
-  // CreateIngress2 creates the ingress and returns the stored record .
-  // It will return existed record directly if the id is already there. 
-  rpc CreateIngress2(livekit.IngressInfo) returns (CreateIngress2Response);
+  rpc CreateIngress(livekit.IngressInfo) returns (CreateIngressResponse);
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
 
@@ -71,7 +68,7 @@ message UpdateMetricsRequest {
   float max_cpu_usage = 4;
 }
 
-message CreateIngress2Response {
+message CreateIngressResponse {
   livekit.IngressInfo info = 1;
 }
 
