@@ -166,12 +166,13 @@ func (t *lockTracker) toStuckLock(ts uint32, waiting int32) *StuckLock {
 	}
 	if t.rw {
 		r := (*rwLockTracker)(unsafe.Pointer(t))
-		d.held += atomic.LoadInt32(&r.rheld)
+		d.held += r.rheld.Load()
 		if len(d.gids) == 0 && d.held > 0 {
 			d.holderStrength = HolderShared
 		}
 		for i := range r.rgids {
-			if gid := atomic.LoadInt64(&r.rgids[i]); gid != 0 {
+			// dedupe: a recursive RLock occupies multiple slots with one gid
+			if gid := r.rgids[i].Load(); gid != 0 && !slices.Contains(d.gids, gid) {
 				d.gids = append(d.gids, gid)
 			}
 		}
@@ -183,7 +184,7 @@ func (t *lockTracker) toStuckLock(ts uint32, waiting int32) *StuckLock {
 type HolderStrength int32
 
 const (
-	HolderExclusive HolderStrength = iota // Mutex, RWMutex write lock, Synchronized
+	HolderExclusive HolderStrength = iota // Mutex, RWMutex write lock
 	HolderShared                          // RWMutex read locks
 )
 
@@ -272,7 +273,10 @@ func PopulateHolderStacks(stuck []*StuckLock) {
 		return
 	}
 
-	buf := make([]byte, 1<<20)
+	// size for the live goroutine count up front: each doubling pass repeats
+	// the stop-the-world snapshot, worst exactly when diagnosing a
+	// goroutine-heavy stuck process
+	buf := make([]byte, min(max(1<<20, runtime.NumGoroutine()*4096), 1<<26))
 	for {
 		n := runtime.Stack(buf, true)
 		if n < len(buf) || len(buf) >= 1<<26 {

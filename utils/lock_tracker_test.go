@@ -251,6 +251,44 @@ func TestHolderOverflow(t *testing.T) {
 	<-done2
 }
 
+func TestRecursiveRLockDedupe(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	m := &utils.RWMutex{}
+	release := make(chan struct{})
+	held := make(chan struct{})
+	done := make(chan struct{})
+	go func() {
+		m.RLock()
+		m.RLock()
+		close(held)
+		parkHoldingLock(release)
+		m.RUnlock()
+		m.RUnlock()
+	}()
+	<-held
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	// recursive RLock occupies two slots but is one holder
+	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+	require.Equal(t, 2, locks[0].NumGoroutineHeld())
+
+	utils.PopulateHolderStacks(locks)
+	require.Equal(t, 1, strings.Count(locks[0].HolderStacks(), "parkHoldingLock("))
+
+	close(release)
+	<-done
+}
+
 func TestMutexFinalizer(t *testing.T) {
 	cleanupTest()
 	require.Equal(t, 0, utils.NumMutexes())
