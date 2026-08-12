@@ -17,6 +17,7 @@ package utils_test
 import (
 	"fmt"
 	"runtime"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -90,6 +91,202 @@ func TestFirstLockStackTrace(t *testing.T) {
 	require.NotEqual(t, "", locks[0].FirstLockedAtStack())
 
 	m.Unlock()
+}
+
+func parkHoldingLock(release chan struct{}) {
+	<-release
+}
+
+func TestHolderStacks(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	m := &utils.RWMutex{}
+	release := make(chan struct{})
+	done := make(chan struct{})
+
+	var held sync.WaitGroup
+	held.Add(2)
+	for range 2 {
+		go func() {
+			m.RLock()
+			held.Done()
+			parkHoldingLock(release)
+			m.RUnlock()
+		}()
+	}
+
+	held.Wait()
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.Len(t, locks[0].HolderGoroutineIDs(), 2)
+	require.Equal(t, utils.HolderShared, locks[0].HolderStrength())
+	require.Equal(t, "", locks[0].HolderStacks())
+
+	utils.PopulateHolderStacks(locks)
+	for _, gid := range locks[0].HolderGoroutineIDs() {
+		require.Contains(t, locks[0].HolderStacks(), fmt.Sprintf("goroutine %d ", gid))
+	}
+	require.Equal(t, 2, strings.Count(locks[0].HolderStacks(), "parkHoldingLock("))
+
+	close(release)
+	<-done
+}
+
+func TestHolderCrossGoroutineUnlock(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	m := &utils.Mutex{}
+	locked := make(chan struct{})
+	go func() {
+		m.Lock()
+		close(locked)
+	}()
+	<-locked
+	m.Unlock() // legal: different goroutine than the locker
+
+	release := make(chan struct{})
+	held := make(chan struct{})
+	done := make(chan struct{})
+	go func() {
+		m.Lock()
+		close(held)
+		parkHoldingLock(release)
+		m.Unlock()
+	}()
+	<-held
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	// the cross-goroutine unlock must not leak the original locker's slot
+	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+	require.Equal(t, utils.HolderExclusive, locks[0].HolderStrength())
+	utils.PopulateHolderStacks(locks)
+	require.Contains(t, locks[0].HolderStacks(), "parkHoldingLock(")
+
+	close(release)
+	<-done
+}
+
+func TestHolderOverflow(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	const readers = 10 // more than the 8 holder slots
+
+	m := &utils.RWMutex{}
+	release := make(chan struct{})
+	done := make(chan struct{})
+
+	var held, finished sync.WaitGroup
+	held.Add(readers)
+	finished.Add(readers)
+	for range readers {
+		go func() {
+			m.RLock()
+			held.Done()
+			parkHoldingLock(release)
+			m.RUnlock()
+			finished.Done()
+		}()
+	}
+
+	held.Wait()
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.Len(t, locks[0].HolderGoroutineIDs(), 8)
+	require.Equal(t, readers, locks[0].NumGoroutineHeld())
+
+	close(release)
+	finished.Wait()
+	<-done
+
+	// slot and overflow accounting must drain fully for the next episode
+	release2 := make(chan struct{})
+	held2 := make(chan struct{})
+	done2 := make(chan struct{})
+	go func() {
+		m.RLock()
+		close(held2)
+		parkHoldingLock(release2)
+		m.RUnlock()
+	}()
+	<-held2
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done2)
+	}()
+	time.Sleep(100 * time.Millisecond)
+	locks = utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+
+	close(release2)
+	<-done2
+}
+
+func TestRecursiveRLockDedupe(t *testing.T) {
+	t.Cleanup(cleanupTest)
+	require.Nil(t, utils.ScanTrackedLocks(time.Millisecond))
+
+	m := &utils.RWMutex{}
+	release := make(chan struct{})
+	held := make(chan struct{})
+	done := make(chan struct{})
+	go func() {
+		m.RLock()
+		m.RLock()
+		close(held)
+		parkHoldingLock(release)
+		m.RUnlock()
+		m.RUnlock()
+	}()
+	<-held
+	go func() {
+		m.Lock()
+		noop()
+		m.Unlock()
+		close(done)
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	locks := utils.ScanTrackedLocks(time.Millisecond)
+	require.NotNil(t, locks)
+	// recursive RLock occupies two slots but is one holder
+	require.Len(t, locks[0].HolderGoroutineIDs(), 1)
+	require.Equal(t, 2, locks[0].NumGoroutineHeld())
+
+	utils.PopulateHolderStacks(locks)
+	require.Equal(t, 1, strings.Count(locks[0].HolderStacks(), "parkHoldingLock("))
+
+	close(release)
+	<-done
 }
 
 func TestMutexFinalizer(t *testing.T) {
@@ -298,6 +495,29 @@ func BenchmarkLockTracker(b *testing.B) {
 			noop()
 			m.Unlock()
 		}
+	})
+}
+
+func BenchmarkLockTrackerParallel(b *testing.B) {
+	b.Run("wrapped rwmutex rlock", func(b *testing.B) {
+		var m utils.RWMutex
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				m.RLock()
+				noop()
+				m.RUnlock()
+			}
+		})
+	})
+	b.Run("native rwmutex rlock", func(b *testing.B) {
+		var m sync.RWMutex
+		b.RunParallel(func(pb *testing.PB) {
+			for pb.Next() {
+				m.RLock()
+				noop()
+				m.RUnlock()
+			}
+		})
 	})
 }
 
