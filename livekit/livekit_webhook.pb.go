@@ -39,7 +39,7 @@ type WebhookEvent struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// one of room_started, room_finished, participant_joined, participant_left, participant_connection_aborted,
 	// track_published, track_unpublished, egress_started, egress_updated, egress_ended,
-	// ingress_started, ingress_ended
+	// ingress_started, ingress_ended, agent_job_started, agent_job_ended
 	Event string `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 	Room  *Room  `protobuf:"bytes,2,opt,name=room,proto3" json:"room,omitempty"`
 	// set when event is participant_* or track_*
@@ -50,6 +50,8 @@ type WebhookEvent struct {
 	IngressInfo *IngressInfo `protobuf:"bytes,10,opt,name=ingress_info,json=ingressInfo,proto3" json:"ingress_info,omitempty"`
 	// set when event is track_*
 	Track *TrackInfo `protobuf:"bytes,8,opt,name=track,proto3" json:"track,omitempty"`
+	// set when event is agent_job_*
+	Job *Job `protobuf:"bytes,12,opt,name=job,proto3" json:"job,omitempty"`
 	// unique event uuid
 	Id string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
 	// timestamp in seconds
@@ -132,6 +134,13 @@ func (x *WebhookEvent) GetTrack() *TrackInfo {
 	return nil
 }
 
+func (x *WebhookEvent) GetJob() *Job {
+	if x != nil {
+		return x.Job
+	}
+	return nil
+}
+
 func (x *WebhookEvent) GetId() string {
 	if x != nil {
 		return x.Id
@@ -158,7 +167,7 @@ var File_livekit_webhook_proto protoreflect.FileDescriptor
 
 const file_livekit_webhook_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_webhook.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\"\xf0\x02\n" +
+	"\x15livekit_webhook.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x13livekit_agent.proto\"\x90\x03\n" +
 	"\fWebhookEvent\x12\x14\n" +
 	"\x05event\x18\x01 \x01(\tR\x05event\x12!\n" +
 	"\x04room\x18\x02 \x01(\v2\r.livekit.RoomR\x04room\x12:\n" +
@@ -167,7 +176,8 @@ const file_livekit_webhook_proto_rawDesc = "" +
 	"egressInfo\x127\n" +
 	"\fingress_info\x18\n" +
 	" \x01(\v2\x14.livekit.IngressInfoR\vingressInfo\x12(\n" +
-	"\x05track\x18\b \x01(\v2\x12.livekit.TrackInfoR\x05track\x12\x0e\n" +
+	"\x05track\x18\b \x01(\v2\x12.livekit.TrackInfoR\x05track\x12\x1e\n" +
+	"\x03job\x18\f \x01(\v2\f.livekit.JobR\x03job\x12\x0e\n" +
 	"\x02id\x18\x06 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\a \x01(\x03R\tcreatedAt\x12#\n" +
@@ -194,6 +204,7 @@ var file_livekit_webhook_proto_goTypes = []any{
 	(*EgressInfo)(nil),      // 3: livekit.EgressInfo
 	(*IngressInfo)(nil),     // 4: livekit.IngressInfo
 	(*TrackInfo)(nil),       // 5: livekit.TrackInfo
+	(*Job)(nil),             // 6: livekit.Job
 }
 var file_livekit_webhook_proto_depIdxs = []int32{
 	1, // 0: livekit.WebhookEvent.room:type_name -> livekit.Room
@@ -201,11 +212,12 @@ var file_livekit_webhook_proto_depIdxs = []int32{
 	3, // 2: livekit.WebhookEvent.egress_info:type_name -> livekit.EgressInfo
 	4, // 3: livekit.WebhookEvent.ingress_info:type_name -> livekit.IngressInfo
 	5, // 4: livekit.WebhookEvent.track:type_name -> livekit.TrackInfo
-	5, // [5:5] is the sub-list for method output_type
-	5, // [5:5] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	6, // 5: livekit.WebhookEvent.job:type_name -> livekit.Job
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_livekit_webhook_proto_init() }
@@ -216,6 +228,7 @@ func file_livekit_webhook_proto_init() {
 	file_livekit_models_proto_init()
 	file_livekit_egress_proto_init()
 	file_livekit_ingress_proto_init()
+	file_livekit_agent_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
