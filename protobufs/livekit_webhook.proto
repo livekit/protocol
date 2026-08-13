@@ -22,11 +22,12 @@ option ruby_package = "LiveKit::Proto";
 import "livekit_models.proto";
 import "livekit_egress.proto";
 import "livekit_ingress.proto";
+import "livekit_agent.proto";
 
 message WebhookEvent {
   // one of room_started, room_finished, participant_joined, participant_left, participant_connection_aborted,
   // track_published, track_unpublished, egress_started, egress_updated, egress_ended,
-  // ingress_started, ingress_ended
+  // ingress_started, ingress_ended, agent_job_started, agent_job_ended
   string event = 1;
 
   Room room = 2;
@@ -43,6 +44,9 @@ message WebhookEvent {
   // set when event is track_*
   TrackInfo track = 8;
 
+  // set when event is agent_job_*
+  Job job = 12;
+
   // unique event uuid
   string id = 6;
 
@@ -51,5 +55,5 @@ message WebhookEvent {
 
   int32 num_dropped = 11 [deprecated=true];
 
-  // NEXT_ID: 12
+  // NEXT_ID: 13
 }
