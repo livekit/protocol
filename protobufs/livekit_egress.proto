@@ -28,7 +28,6 @@ service Egress {
   rpc StartEgress(StartEgressRequest) returns (EgressInfo);
 
   // Update url/template or stream outputs
-  // rpc UpdateEgress(UpdateEgressRequest) returns (EgressInfo);
   rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
@@ -61,6 +60,9 @@ message StartEgressRequest {
   oneof encoding {
     EncodingOptionsPreset preset = 5;
     EncodingOptions advanced = 6;
+
+    // Remux a single explicitly-identified track without decoding or re-encoding
+    bool passthrough = 10;
   }
 
   // At least one required
@@ -347,14 +349,6 @@ message ListEgressResponse {
   // next field id: 3
 }
 
-message UpdateEgressRequest {
-  string egress_id = 1 [(logger.name) = "egressID"];
-  string url = 2;
-  string layout = 3;
-  repeated string add_stream_urls = 4;
-  repeated string remove_stream_urls = 5;
-}
-
 message StopEgressRequest {
   string egress_id = 1 [(logger.name) = "egressID"];
 }
@@ -506,6 +500,9 @@ message ExportReplayRequest {
   oneof encoding {
     EncodingOptionsPreset preset = 7;
     EncodingOptions advanced = 8;
+
+    // Remux a single explicitly-identified track without decoding or re-encoding
+    bool passthrough = 12;
   }
 
   repeated Output outputs = 9;
