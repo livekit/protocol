@@ -115,7 +115,7 @@ func TestRedactStreamOutput(t *testing.T) {
 
 	RedactStreamKeys(so)
 	require.Equal(t, "rtmps://foo.bar.com/app/{sec...key}", so.Urls[0])
-	require.Equal(t, "mux://{8e0...dae}", so.Urls[1])
+	require.Equal(t, "mux://{8e0...2ae}", so.Urls[1])
 	require.Equal(t, "twitch://{liv...nop}", so.Urls[2])
 	require.Equal(t, "srt://foo.bar.com:9999", so.Urls[3])
 }
