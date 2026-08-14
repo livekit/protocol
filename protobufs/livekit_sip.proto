@@ -752,11 +752,22 @@ message CreateSIPParticipantRequest {
   SIPOutboundConfig trunk = 20;
 
   SIPRequestDest sip_request_uri = 24; // INVITE <uri>
+  // Currently not usable with CreateSIPParticipant: sip_call_to is required, and
+  // the two cannot be combined. Use to_user_override to change the To header user.
   SIPNamedDest   sip_to_header   = 25; // To:   "Name" <uri>
   SIPNamedDest   sip_from_header = 26; // From: "Name" <uri>
 
   // What number should be dialed via SIP
   string sip_call_to = 2;
+
+  // Replaces the user part of the To header, leaving its host, port and transport
+  // as they would otherwise be. The request URI is not affected, so the call is
+  // still placed to sip_call_to. Empty means no override.
+  //
+  // Use this when the callee expects a To header that differs from the number
+  // being dialed. Setting "To" in the headers map instead produces an INVITE with
+  // two To headers and is rejected.
+  string to_user_override = 27;
 
   // Optional SIP From number to use. If empty, trunk number is used.
   string sip_number = 15;
@@ -834,7 +845,7 @@ message CreateSIPParticipantRequest {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional Destination destination = 22;
-  // NEXT ID: 27
+  // NEXT ID: 28
 }
 
 message SIPParticipantInfo {

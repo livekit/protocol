@@ -188,6 +188,8 @@ var ForbiddenSipHeaderNames = map[string]bool{
 	"record-route":     true,
 	"refer-to":         true, // rfc3515
 	"reply-to":         true,
+	"to":               true, // Set the user part with CreateSIPParticipantRequest.to_user_override
+	"via":              true, // Multiple Via are legal, but a caller's own breaks response routing
 	"k":                true, // Supported
 	"l":                true, // Content-Length
 	"m":                true, // Contact

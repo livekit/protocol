@@ -330,12 +330,23 @@ func TestSIPValidate(t *testing.T) {
 			{
 				name: "participant_validates_embedded_media_ok",
 				req: &CreateSIPParticipantRequest{
-					SipTrunkId: "trunk",
-					SipCallTo:  "+1000",
-					RoomName:   "room",
+					SipTrunkId:     "trunk",
+					SipCallTo:      "+1000",
+					RoomName:       "room",
+					ToUserOverride: "+2000",
 					// Sanity
 				},
 				exp: true,
+			},
+			{
+				name: "participant_to_user_override_is_not_a_uri",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId:     "trunk",
+					SipCallTo:      "+1000",
+					RoomName:       "room",
+					ToUserOverride: "sip:+2000@example.com",
+				},
+				exp: false,
 			},
 			{
 				name: "participant_validates_embedded_media_timeout_over_max",

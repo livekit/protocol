@@ -51,6 +51,9 @@ message InternalCreateSIPParticipantRequest {
   livekit.SIPNamedDest   sip_from_header = 36; // From: "Name" <uri>
   livekit.SIPNamedDest   sip_to_header   = 37; // To:   "Name" <uri>
 
+  // Replaces the user part of the To header. Does not affect the request URI.
+  string to_user_override = 39;
+
   // IP or hostname that SIP INVITE is sent too
   string address = 2;
   // Hostname for the 'From' SIP address in INVITE
@@ -152,7 +155,7 @@ message InternalCreateSIPParticipantRequest {
 
   SIPCallObservability observability = 38;
 
-  // NEXT ID: 39
+  // NEXT ID: 40
 }
 
 message InternalCreateSIPParticipantResponse {

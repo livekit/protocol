@@ -918,6 +918,14 @@ func (p *CreateSIPParticipantRequest) ValidateResult() ValidationResult {
 	} else if strings.Contains(p.SipCallTo, "@") {
 		return ValidationFailure(errors.New("SipCallTo should be a phone number or SIP user, not a full SIP URI"))
 	}
+	if p.ToUserOverride != "" {
+		if strings.Contains(p.ToUserOverride, "@") {
+			return ValidationFailure(errors.New("ToUserOverride should be a phone number or SIP user, not a full SIP URI"))
+		}
+		if err := tokenCharacters.Validate(p.ToUserOverride); err != nil {
+			return ValidationFailure(fmt.Errorf("ToUserOverride contains invalid characters: %w", err))
+		}
+	}
 	if p.RoomName == "" {
 		return ValidationFailure(errors.New("missing room name"))
 	}
