@@ -182,5 +182,9 @@ message InternalTransferSIPParticipantRequest {
 
   // Project-level feature flags from ProjectSettings.FeatureFlags
   map<string, string> feature_flags = 6;
+
+  string room_name = 7;
+  string participant_identity = 8;
+
 }
 
