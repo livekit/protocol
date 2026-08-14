@@ -1174,7 +1174,7 @@ type RoomConfiguration struct {
 	EmptyTimeout uint32 `protobuf:"varint,2,opt,name=empty_timeout,json=emptyTimeout,proto3" json:"empty_timeout,omitempty"`
 	// number of seconds to keep the room open after everyone leaves
 	DepartureTimeout uint32 `protobuf:"varint,3,opt,name=departure_timeout,json=departureTimeout,proto3" json:"departure_timeout,omitempty"`
-	// limit number of participants that can be in a room, excluding Egress and Ingress participants
+	// limit number of participants that can be in a room, excluding Egress and Agent participants
 	MaxParticipants uint32 `protobuf:"varint,4,opt,name=max_participants,json=maxParticipants,proto3" json:"max_participants,omitempty"`
 	// metadata of room
 	Metadata string `protobuf:"bytes,11,opt,name=metadata,proto3" json:"metadata,omitempty"`
