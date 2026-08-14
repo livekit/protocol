@@ -35,7 +35,7 @@ func RedactUpload(req UploadRequest) {
 		s3.AccessKey = utils.Redact(s3.AccessKey, "{access_key}")
 		s3.Secret = utils.Redact(s3.Secret, "{secret}")
 		s3.AssumeRoleExternalId = utils.Redact(s3.AssumeRoleExternalId, "{external_id}")
-		s3.SessionToken = utils.Redact(s3.AssumeRoleExternalId, "{session_token}")
+		s3.SessionToken = utils.Redact(s3.SessionToken, "{session_token}")
 		return
 	}
 
@@ -90,6 +90,11 @@ func RedactEncodedOutputs(out EncodedOutput) {
 func RedactDirectOutputs(out DirectOutput) {
 	if f := out.GetFile(); f != nil {
 		RedactUpload(f)
+	}
+	if track, ok := out.(*livekit.TrackEgressRequest); ok {
+		if ws, ok := track.Output.(*livekit.TrackEgressRequest_WebsocketUrl); ok {
+			ws.WebsocketUrl = utils.RedactUrlQueryValues(ws.WebsocketUrl)
+		}
 	}
 }
 
