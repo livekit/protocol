@@ -71,6 +71,20 @@ func TestRedactUpload(t *testing.T) {
 	require.Equal(t, "{external_id}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.AssumeRoleExternalId)
 	require.Equal(t, "{session_token}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.SessionToken)
 
+	sessionTokenOnly := &livekit.EncodedFileOutput{
+		Output: &livekit.EncodedFileOutput_S3{
+			S3: &livekit.S3Upload{
+				AccessKey:    "ACCESS_KEY",
+				Secret:       "LONG_SECRET_STRING",
+				SessionToken: "SESSION_TOKEN",
+			},
+		},
+	}
+	cl = proto.Clone(sessionTokenOnly)
+	RedactUpload(cl.(UploadRequest))
+
+	require.Equal(t, "{session_token}", cl.(*livekit.EncodedFileOutput).Output.(*livekit.EncodedFileOutput_S3).S3.SessionToken)
+
 	cl = proto.Clone(image)
 	RedactUpload(cl.(UploadRequest))
 
@@ -93,11 +107,17 @@ func TestRedactStreamOutput(t *testing.T) {
 	so := &livekit.StreamOutput{
 		Urls: []string{
 			"rtmps://foo.bar.com/app/secret_stream_key",
+			"mux://8e0b1b9c-50a2-d893-ec0a-102056d112ae",
+			"twitch://live_12345678_abcdefghijklmnop",
+			"srt://foo.bar.com:9999",
 		},
 	}
 
 	RedactStreamKeys(so)
 	require.Equal(t, "rtmps://foo.bar.com/app/{sec...key}", so.Urls[0])
+	require.Equal(t, "mux://{8e0...dae}", so.Urls[1])
+	require.Equal(t, "twitch://{liv...nop}", so.Urls[2])
+	require.Equal(t, "srt://foo.bar.com:9999", so.Urls[3])
 }
 
 func TestRedactEncodedOutputs(t *testing.T) {
@@ -154,4 +174,15 @@ func TestRedactDirectOutput(t *testing.T) {
 	RedactDirectOutputs(track)
 	require.Equal(t, "{access_key}", track.Output.(*livekit.TrackEgressRequest_File).File.Output.(*livekit.DirectFileOutput_S3).S3.AccessKey)
 	require.Equal(t, "{secret}", track.Output.(*livekit.TrackEgressRequest_File).File.Output.(*livekit.DirectFileOutput_S3).S3.Secret)
+
+	websocket := &livekit.TrackEgressRequest{
+		Output: &livekit.TrackEgressRequest_WebsocketUrl{
+			WebsocketUrl: "wss://foo.bar.com/audio?callId=12145&token=7df13dab0d4437602d6f7056b97e72b9",
+		},
+	}
+
+	RedactDirectOutputs(websocket)
+	require.Equal(t,
+		"wss://foo.bar.com/audio?callId={1...5}&token={7df...2b9}",
+		websocket.Output.(*livekit.TrackEgressRequest_WebsocketUrl).WebsocketUrl)
 }
