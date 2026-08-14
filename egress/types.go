@@ -64,7 +64,11 @@ type EgressRequest interface {
 	GetWeb() *livekit.WebSource
 	GetOutputs() []*livekit.Output
 	GetStorage() *livekit.StorageConfig
+	GetPassthrough() bool
 }
+
+var _ EgressRequest = (*livekit.StartEgressRequest)(nil)
+var _ EgressRequest = (*livekit.ExportReplayRequest)(nil)
 
 type UploadRequest interface {
 	GetS3() *livekit.S3Upload

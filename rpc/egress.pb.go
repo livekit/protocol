@@ -482,9 +482,8 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"durationMs2\xb2\x01\n" +
 	"\x0eEgressInternal\x12E\n" +
 	"\vStartEgress\x12\x17.rpc.StartEgressRequest\x1a\x13.livekit.EgressInfo\"\b\xb2\x89\x01\x04\x10\x010\x01\x12Y\n" +
-	"\x10ListActiveEgress\x12\x1c.rpc.ListActiveEgressRequest\x1a\x1d.rpc.ListActiveEgressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xec\x01\n" +
-	"\rEgressHandler\x12I\n" +
-	"\fUpdateEgress\x12\x1c.livekit.UpdateEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12E\n" +
+	"\x10ListActiveEgress\x12\x1c.rpc.ListActiveEgressRequest\x1a\x1d.rpc.ListActiveEgressResponse\"\b\xb2\x89\x01\x04\x10\x01(\x012\xa1\x01\n" +
+	"\rEgressHandler\x12E\n" +
 	"\n" +
 	"StopEgress\x12\x1a.livekit.StopEgressRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x01\x12I\n" +
 	"\fUpdateStream\x12\x1c.livekit.UpdateStreamRequest\x1a\x13.livekit.EgressInfo\"\x06\xb2\x89\x01\x02\x10\x012\\\n" +
@@ -518,10 +517,9 @@ var file_rpc_egress_proto_goTypes = []any{
 	(*livekit.ParticipantEgressRequest)(nil),    // 9: livekit.ParticipantEgressRequest
 	(*livekit.TrackCompositeEgressRequest)(nil), // 10: livekit.TrackCompositeEgressRequest
 	(*livekit.TrackEgressRequest)(nil),          // 11: livekit.TrackEgressRequest
-	(*livekit.UpdateEgressRequest)(nil),         // 12: livekit.UpdateEgressRequest
-	(*livekit.StopEgressRequest)(nil),           // 13: livekit.StopEgressRequest
-	(*livekit.UpdateStreamRequest)(nil),         // 14: livekit.UpdateStreamRequest
-	(*livekit.EgressInfo)(nil),                  // 15: livekit.EgressInfo
+	(*livekit.StopEgressRequest)(nil),           // 12: livekit.StopEgressRequest
+	(*livekit.UpdateStreamRequest)(nil),         // 13: livekit.UpdateStreamRequest
+	(*livekit.EgressInfo)(nil),                  // 14: livekit.EgressInfo
 }
 var file_rpc_egress_proto_depIdxs = []int32{
 	5,  // 0: rpc.StartEgressRequest.egress:type_name -> livekit.StartEgressRequest
@@ -533,18 +531,16 @@ var file_rpc_egress_proto_depIdxs = []int32{
 	11, // 6: rpc.StartEgressRequest.track:type_name -> livekit.TrackEgressRequest
 	0,  // 7: rpc.EgressInternal.StartEgress:input_type -> rpc.StartEgressRequest
 	1,  // 8: rpc.EgressInternal.ListActiveEgress:input_type -> rpc.ListActiveEgressRequest
-	12, // 9: rpc.EgressHandler.UpdateEgress:input_type -> livekit.UpdateEgressRequest
-	13, // 10: rpc.EgressHandler.StopEgress:input_type -> livekit.StopEgressRequest
-	14, // 11: rpc.EgressHandler.UpdateStream:input_type -> livekit.UpdateStreamRequest
-	3,  // 12: rpc.ReplayExport.EgressReady:input_type -> rpc.EgressReadyRequest
-	15, // 13: rpc.EgressInternal.StartEgress:output_type -> livekit.EgressInfo
-	2,  // 14: rpc.EgressInternal.ListActiveEgress:output_type -> rpc.ListActiveEgressResponse
-	15, // 15: rpc.EgressHandler.UpdateEgress:output_type -> livekit.EgressInfo
-	15, // 16: rpc.EgressHandler.StopEgress:output_type -> livekit.EgressInfo
-	15, // 17: rpc.EgressHandler.UpdateStream:output_type -> livekit.EgressInfo
-	4,  // 18: rpc.ReplayExport.EgressReady:output_type -> rpc.EgressReadyResponse
-	13, // [13:19] is the sub-list for method output_type
-	7,  // [7:13] is the sub-list for method input_type
+	12, // 9: rpc.EgressHandler.StopEgress:input_type -> livekit.StopEgressRequest
+	13, // 10: rpc.EgressHandler.UpdateStream:input_type -> livekit.UpdateStreamRequest
+	3,  // 11: rpc.ReplayExport.EgressReady:input_type -> rpc.EgressReadyRequest
+	14, // 12: rpc.EgressInternal.StartEgress:output_type -> livekit.EgressInfo
+	2,  // 13: rpc.EgressInternal.ListActiveEgress:output_type -> rpc.ListActiveEgressResponse
+	14, // 14: rpc.EgressHandler.StopEgress:output_type -> livekit.EgressInfo
+	14, // 15: rpc.EgressHandler.UpdateStream:output_type -> livekit.EgressInfo
+	4,  // 16: rpc.ReplayExport.EgressReady:output_type -> rpc.EgressReadyResponse
+	12, // [12:17] is the sub-list for method output_type
+	7,  // [7:12] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
