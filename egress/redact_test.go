@@ -110,6 +110,7 @@ func TestRedactStreamOutput(t *testing.T) {
 			"mux://8e0b1b9c-50a2-d893-ec0a-102056d112ae",
 			"twitch://live_12345678_abcdefghijklmnop",
 			"srt://foo.bar.com:9999",
+			"srt://foo.bar.com:9999?streamid=124939da-5244&passphrase=WnxknzJTUbwYl9SpdqAudX",
 		},
 	}
 
@@ -118,6 +119,7 @@ func TestRedactStreamOutput(t *testing.T) {
 	require.Equal(t, "mux://{8e0...2ae}", so.Urls[1])
 	require.Equal(t, "twitch://{liv...nop}", so.Urls[2])
 	require.Equal(t, "srt://foo.bar.com:9999", so.Urls[3])
+	require.Equal(t, "srt://foo.bar.com:9999?streamid={...}&passphrase={...}", so.Urls[4])
 }
 
 func TestRedactEncodedOutputs(t *testing.T) {
@@ -183,6 +185,6 @@ func TestRedactDirectOutput(t *testing.T) {
 
 	RedactDirectOutputs(websocket)
 	require.Equal(t,
-		"wss://foo.bar.com/audio?callId={1...5}&token={7df...2b9}",
+		"wss://foo.bar.com/audio?callId={...}&token={...}",
 		websocket.Output.(*livekit.TrackEgressRequest_WebsocketUrl).WebsocketUrl)
 }

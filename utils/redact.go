@@ -33,6 +33,9 @@ func RedactStreamKey(url string) (string, bool) {
 
 	match := rtmpRegexp.FindStringSubmatch(url)
 	if len(match) != 6 {
+		if redacted := RedactUrlQueryValues(url); redacted != url {
+			return redacted, true
+		}
 		return url, false
 	}
 
@@ -40,7 +43,7 @@ func RedactStreamKey(url string) (string, bool) {
 	return strings.Join(match[1:], ""), true
 }
 
-// RedactUrlQueryValues redacts every query parameter value in rawUrl, keeping parameter names intact.
+// RedactUrlQueryValues fully redacts every query parameter value in rawUrl, keeping parameter names intact.
 func RedactUrlQueryValues(rawUrl string) string {
 	base, query, found := strings.Cut(rawUrl, "?")
 	if !found || query == "" {
@@ -50,7 +53,7 @@ func RedactUrlQueryValues(rawUrl string) string {
 	params := strings.Split(query, "&")
 	for i, p := range params {
 		if k, v, ok := strings.Cut(p, "="); ok && v != "" {
-			params[i] = k + "=" + RedactIdentifier(v)
+			params[i] = k + "={...}"
 		}
 	}
 	return base + "?" + strings.Join(params, "&")
