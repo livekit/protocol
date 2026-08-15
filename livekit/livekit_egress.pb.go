@@ -96,6 +96,7 @@ const (
 	EncodingOptionsPreset_PORTRAIT_H264_720P_60  EncodingOptionsPreset = 5 //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
 	EncodingOptionsPreset_PORTRAIT_H264_1080P_30 EncodingOptionsPreset = 6 // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
 	EncodingOptionsPreset_PORTRAIT_H264_1080P_60 EncodingOptionsPreset = 7 // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
+	EncodingOptionsPreset_PASSTHROUGH            EncodingOptionsPreset = 8 // Skip transcoding. Valid only when specifying a single track with MediaSource
 )
 
 // Enum value maps for EncodingOptionsPreset.
@@ -109,6 +110,7 @@ var (
 		5: "PORTRAIT_H264_720P_60",
 		6: "PORTRAIT_H264_1080P_30",
 		7: "PORTRAIT_H264_1080P_60",
+		8: "PASSTHROUGH",
 	}
 	EncodingOptionsPreset_value = map[string]int32{
 		"H264_720P_30":           0,
@@ -119,6 +121,7 @@ var (
 		"PORTRAIT_H264_720P_60":  5,
 		"PORTRAIT_H264_1080P_30": 6,
 		"PORTRAIT_H264_1080P_60": 7,
+		"PASSTHROUGH":            8,
 	}
 )
 
@@ -614,7 +617,6 @@ type StartEgressRequest struct {
 	//
 	//	*StartEgressRequest_Preset
 	//	*StartEgressRequest_Advanced
-	//	*StartEgressRequest_Passthrough
 	Encoding isStartEgressRequest_Encoding `protobuf_oneof:"encoding"`
 	// At least one required
 	Outputs []*Output `protobuf:"bytes,7,rep,name=outputs,proto3" json:"outputs,omitempty"`
@@ -722,15 +724,6 @@ func (x *StartEgressRequest) GetAdvanced() *EncodingOptions {
 	return nil
 }
 
-func (x *StartEgressRequest) GetPassthrough() bool {
-	if x != nil {
-		if x, ok := x.Encoding.(*StartEgressRequest_Passthrough); ok {
-			return x.Passthrough
-		}
-	}
-	return false
-}
-
 func (x *StartEgressRequest) GetOutputs() []*Output {
 	if x != nil {
 		return x.Outputs
@@ -786,16 +779,9 @@ type StartEgressRequest_Advanced struct {
 	Advanced *EncodingOptions `protobuf:"bytes,6,opt,name=advanced,proto3,oneof"`
 }
 
-type StartEgressRequest_Passthrough struct {
-	// Remux a single explicitly-identified track without decoding or re-encoding
-	Passthrough bool `protobuf:"varint,10,opt,name=passthrough,proto3,oneof"`
-}
-
 func (*StartEgressRequest_Preset) isStartEgressRequest_Encoding() {}
 
 func (*StartEgressRequest_Advanced) isStartEgressRequest_Encoding() {}
-
-func (*StartEgressRequest_Passthrough) isStartEgressRequest_Encoding() {}
 
 // Room composite recording via layout template.
 // Service generates token, constructs recorder URL, awaits start signal.
@@ -3750,7 +3736,6 @@ type ExportReplayRequest struct {
 	//
 	//	*ExportReplayRequest_Preset
 	//	*ExportReplayRequest_Advanced
-	//	*ExportReplayRequest_Passthrough
 	Encoding      isExportReplayRequest_Encoding `protobuf_oneof:"encoding"`
 	Outputs       []*Output                      `protobuf:"bytes,9,rep,name=outputs,proto3" json:"outputs,omitempty"`
 	Storage       *StorageConfig                 `protobuf:"bytes,10,opt,name=storage,proto3" json:"storage,omitempty"`
@@ -3869,15 +3854,6 @@ func (x *ExportReplayRequest) GetAdvanced() *EncodingOptions {
 	return nil
 }
 
-func (x *ExportReplayRequest) GetPassthrough() bool {
-	if x != nil {
-		if x, ok := x.Encoding.(*ExportReplayRequest_Passthrough); ok {
-			return x.Passthrough
-		}
-	}
-	return false
-}
-
 func (x *ExportReplayRequest) GetOutputs() []*Output {
 	if x != nil {
 		return x.Outputs
@@ -3933,16 +3909,9 @@ type ExportReplayRequest_Advanced struct {
 	Advanced *EncodingOptions `protobuf:"bytes,8,opt,name=advanced,proto3,oneof"`
 }
 
-type ExportReplayRequest_Passthrough struct {
-	// Remux a single explicitly-identified track without decoding or re-encoding
-	Passthrough bool `protobuf:"varint,12,opt,name=passthrough,proto3,oneof"`
-}
-
 func (*ExportReplayRequest_Preset) isExportReplayRequest_Encoding() {}
 
 func (*ExportReplayRequest_Advanced) isExportReplayRequest_Encoding() {}
-
-func (*ExportReplayRequest_Passthrough) isExportReplayRequest_Encoding() {}
 
 type RoomCompositeEgressRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -5298,16 +5267,14 @@ var File_livekit_egress_proto protoreflect.FileDescriptor
 
 const file_livekit_egress_proto_rawDesc = "" +
 	"\n" +
-	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xfb\x03\n" +
+	"\x14livekit_egress.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14logger/options.proto\"\xd7\x03\n" +
 	"\x12StartEgressRequest\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x125\n" +
 	"\btemplate\x18\x02 \x01(\v2\x17.livekit.TemplateSourceH\x00R\btemplate\x12&\n" +
 	"\x03web\x18\x03 \x01(\v2\x12.livekit.WebSourceH\x00R\x03web\x12,\n" +
 	"\x05media\x18\x04 \x01(\v2\x14.livekit.MediaSourceH\x00R\x05media\x128\n" +
 	"\x06preset\x18\x05 \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
-	"\badvanced\x18\x06 \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12\"\n" +
-	"\vpassthrough\x18\n" +
-	" \x01(\bH\x01R\vpassthrough\x12)\n" +
+	"\badvanced\x18\x06 \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12)\n" +
 	"\aoutputs\x18\a \x03(\v2\x0f.livekit.OutputR\aoutputs\x120\n" +
 	"\astorage\x18\b \x01(\v2\x16.livekit.StorageConfigR\astorage\x122\n" +
 	"\bwebhooks\x18\t \x03(\v2\x16.livekit.WebhookConfigR\bwebhooksB\b\n" +
@@ -5571,7 +5538,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x03gcp\x18\x03 \x01(\v2\x12.livekit.GCPUploadH\x00R\x03gcp\x120\n" +
 	"\x05azure\x18\x04 \x01(\v2\x18.livekit.AzureBlobUploadH\x00R\x05azure\x12/\n" +
 	"\x06aliOSS\x18\x06 \x01(\v2\x15.livekit.AliOSSUploadH\x00R\x06aliOSSB\b\n" +
-	"\x06output\"\xd5\x04\n" +
+	"\x06output\"\xb1\x04\n" +
 	"\x13ExportReplayRequest\x12(\n" +
 	"\treplay_id\x18\x01 \x01(\tB\v\xbaP\breplayIDR\breplayId\x12&\n" +
 	"\x0fstart_offset_ms\x18\x02 \x01(\x03R\rstartOffsetMs\x12\"\n" +
@@ -5580,8 +5547,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x03web\x18\x05 \x01(\v2\x12.livekit.WebSourceH\x00R\x03web\x12,\n" +
 	"\x05media\x18\x06 \x01(\v2\x14.livekit.MediaSourceH\x00R\x05media\x128\n" +
 	"\x06preset\x18\a \x01(\x0e2\x1e.livekit.EncodingOptionsPresetH\x01R\x06preset\x126\n" +
-	"\badvanced\x18\b \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12\"\n" +
-	"\vpassthrough\x18\f \x01(\bH\x01R\vpassthrough\x12)\n" +
+	"\badvanced\x18\b \x01(\v2\x18.livekit.EncodingOptionsH\x01R\badvanced\x12)\n" +
 	"\aoutputs\x18\t \x03(\v2\x0f.livekit.OutputR\aoutputs\x120\n" +
 	"\astorage\x18\n" +
 	" \x01(\v2\x16.livekit.StorageConfigR\astorage\x122\n" +
@@ -5697,7 +5663,7 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\fAudioChannel\x12\x16\n" +
 	"\x12AUDIO_CHANNEL_BOTH\x10\x00\x12\x16\n" +
 	"\x12AUDIO_CHANNEL_LEFT\x10\x01\x12\x17\n" +
-	"\x13AUDIO_CHANNEL_RIGHT\x10\x02*\xcf\x01\n" +
+	"\x13AUDIO_CHANNEL_RIGHT\x10\x02*\xe0\x01\n" +
 	"\x15EncodingOptionsPreset\x12\x10\n" +
 	"\fH264_720P_30\x10\x00\x12\x10\n" +
 	"\fH264_720P_60\x10\x01\x12\x11\n" +
@@ -5706,7 +5672,8 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x15PORTRAIT_H264_720P_30\x10\x04\x12\x19\n" +
 	"\x15PORTRAIT_H264_720P_60\x10\x05\x12\x1a\n" +
 	"\x16PORTRAIT_H264_1080P_30\x10\x06\x12\x1a\n" +
-	"\x16PORTRAIT_H264_1080P_60\x10\a*B\n" +
+	"\x16PORTRAIT_H264_1080P_60\x10\a\x12\x0f\n" +
+	"\vPASSTHROUGH\x10\b*B\n" +
 	"\x0fEncodedFileType\x12\x14\n" +
 	"\x10DEFAULT_FILETYPE\x10\x00\x12\a\n" +
 	"\x03MP4\x10\x01\x12\a\n" +
@@ -6000,7 +5967,6 @@ func file_livekit_egress_proto_init() {
 		(*StartEgressRequest_Media)(nil),
 		(*StartEgressRequest_Preset)(nil),
 		(*StartEgressRequest_Advanced)(nil),
-		(*StartEgressRequest_Passthrough)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[3].OneofWrappers = []any{
 		(*MediaSource_VideoTrackId)(nil),
@@ -6067,7 +6033,6 @@ func file_livekit_egress_proto_init() {
 		(*ExportReplayRequest_Media)(nil),
 		(*ExportReplayRequest_Preset)(nil),
 		(*ExportReplayRequest_Advanced)(nil),
-		(*ExportReplayRequest_Passthrough)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[32].OneofWrappers = []any{
 		(*RoomCompositeEgressRequest_File)(nil),
