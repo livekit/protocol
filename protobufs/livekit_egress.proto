@@ -60,9 +60,6 @@ message StartEgressRequest {
   oneof encoding {
     EncodingOptionsPreset preset = 5;
     EncodingOptions advanced = 6;
-
-    // Remux a single explicitly-identified track without decoding or re-encoding
-    bool passthrough = 10;
   }
 
   // At least one required
@@ -162,6 +159,7 @@ enum EncodingOptionsPreset {
   PORTRAIT_H264_720P_60 = 5;   //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
   PORTRAIT_H264_1080P_30 = 6;  // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
   PORTRAIT_H264_1080P_60 = 7;  // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
+  PASSTHROUGH = 8;             // Skip transcoding. Valid only when specifying a single track with MediaSource
 }
 
 message EncodingOptions {
@@ -500,9 +498,6 @@ message ExportReplayRequest {
   oneof encoding {
     EncodingOptionsPreset preset = 7;
     EncodingOptions advanced = 8;
-
-    // Remux a single explicitly-identified track without decoding or re-encoding
-    bool passthrough = 12;
   }
 
   repeated Output outputs = 9;
