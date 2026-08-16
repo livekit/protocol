@@ -9,8 +9,9 @@ import (
 
 	"github.com/dennwc/iters"
 	"github.com/stretchr/testify/require"
+	"go.yaml.in/yaml/v3"
 	proto "google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v3"
+	gopkgyaml "gopkg.in/yaml.v3"
 )
 
 func TestUnmarshallRoomConfiguration(t *testing.T) {
@@ -42,6 +43,51 @@ a:
 	require.Equal(t, "ag", re.Agents[1].AgentName)
 	require.Equal(t, "mm", re.Agents[1].Metadata)
 
+}
+
+// TestUnmarshallRoomConfigurationBothYAMLPackages guards the func-based UnmarshalYAML
+// signature on RoomConfiguration/RoomEgress/RoomAgent.
+//
+// Callers decode protocol types with either gopkg.in/yaml.v3 or go.yaml.in/yaml/v3.
+// A UnmarshalYAML(*yaml.Node) method is only recognized by the package that owns the
+// Node type; the other package silently falls back to reflective struct decoding,
+// which leaves proto fields such as min_playout_delay at their zero value rather than
+// returning an error. Both decoders must therefore keep producing a populated message.
+func TestUnmarshallRoomConfigurationBothYAMLPackages(t *testing.T) {
+	y := `
+name: room_name
+egress:
+  room:
+    room_name: egress_room
+agents:
+  - agent_name: ag
+    metadata: mm
+min_playout_delay: 42
+`
+
+	check := func(t *testing.T, rc *RoomConfiguration) {
+		t.Helper()
+		require.Equal(t, "room_name", rc.Name)
+		// zero here means the custom unmarshaller was skipped
+		require.Equal(t, uint32(42), rc.MinPlayoutDelay)
+		require.NotNil(t, rc.Egress)
+		require.Equal(t, "egress_room", rc.Egress.Room.RoomName)
+		require.Equal(t, 1, len(rc.Agents))
+		require.Equal(t, "ag", rc.Agents[0].AgentName)
+		require.Equal(t, "mm", rc.Agents[0].Metadata)
+	}
+
+	t.Run("go.yaml.in/yaml/v3", func(t *testing.T) {
+		var rc RoomConfiguration
+		require.NoError(t, yaml.Unmarshal([]byte(y), &rc))
+		check(t, &rc)
+	})
+
+	t.Run("gopkg.in/yaml.v3", func(t *testing.T) {
+		var rc RoomConfiguration
+		require.NoError(t, gopkgyaml.Unmarshal([]byte(y), &rc))
+		check(t, &rc)
+	})
 }
 
 func TestMarshallRoomConfiguration(t *testing.T) {

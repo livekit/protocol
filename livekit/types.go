@@ -27,8 +27,8 @@ import (
 	"buf.build/go/protoyaml"
 	"github.com/dennwc/iters"
 	"go.opentelemetry.io/otel/attribute"
+	"go.yaml.in/yaml/v3"
 	proto "google.golang.org/protobuf/proto"
-	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -139,46 +139,51 @@ type Guid interface {
 
 type GuidBlock [9]byte
 
-func (r *RoomConfiguration) UnmarshalYAML(value *yaml.Node) error {
-	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
-	str, err := yaml.Marshal(value)
-	if err != nil {
-		return err
-	}
-
-	return protoyaml.Unmarshal(str, r)
+func (r *RoomConfiguration) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	return unmarshalProto(unmarshal, r)
 }
 
 func (r *RoomConfiguration) MarshalYAML() (interface{}, error) {
 	return marshalProto(r)
 }
 
-func (r *RoomEgress) UnmarshalYAML(value *yaml.Node) error {
-	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
-	str, err := yaml.Marshal(value)
-	if err != nil {
-		return err
-	}
-
-	return protoyaml.Unmarshal(str, r)
+func (r *RoomEgress) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	return unmarshalProto(unmarshal, r)
 }
 
 func (r *RoomEgress) MarshalYAML() (interface{}, error) {
 	return marshalProto(r)
 }
 
-func (r *RoomAgent) UnmarshalYAML(value *yaml.Node) error {
-	// Marshall the Node back to yaml to pass it to the protobuf specific unmarshaller
-	str, err := yaml.Marshal(value)
-	if err != nil {
-		return err
-	}
-
-	return protoyaml.Unmarshal(str, r)
+func (r *RoomAgent) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	return unmarshalProto(unmarshal, r)
 }
 
 func (r *RoomAgent) MarshalYAML() (interface{}, error) {
 	return marshalProto(r)
+}
+
+// unmarshalProto decodes a yaml value into a protobuf message using the protobuf
+// specific unmarshaller.
+//
+// The func-based unmarshal signature is deliberate: unlike UnmarshalYAML(*yaml.Node),
+// it names no types from any yaml package, so decoders from both gopkg.in/yaml.v3 and
+// go.yaml.in/yaml/v3 recognize it. Taking a *yaml.Node would bind these types to
+// whichever package protocol imports, and callers using the other one would silently
+// fall back to reflective struct decoding.
+func unmarshalProto(unmarshal func(interface{}) error, o proto.Message) error {
+	var v interface{}
+	if err := unmarshal(&v); err != nil {
+		return err
+	}
+
+	// Marshall the value back to yaml to pass it to the protobuf specific unmarshaller
+	str, err := yaml.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	return protoyaml.Unmarshal(str, o)
 }
 
 func marshalProto(o proto.Message) (map[string]interface{}, error) {
