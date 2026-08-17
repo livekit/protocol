@@ -3841,8 +3841,9 @@ type CreateSIPParticipantRequest struct {
 	// still placed to sip_call_to. Empty means no override.
 	//
 	// Use this when the callee expects a To header that differs from the number
-	// being dialed. Setting "To" in the headers map is not a substitute: it adds a
-	// second To header rather than replacing ours, which makes the INVITE malformed.
+	// being dialed. Setting "To" in the headers map is not a valid alternative:
+	// it adds a second To header rather than replacing the existing one, which
+	// makes the INVITE malformed.
 	ToUserOverride string `protobuf:"bytes,27,opt,name=to_user_override,json=toUserOverride,proto3" json:"to_user_override,omitempty"`
 	// Optional SIP From number to use. If empty, trunk number is used.
 	SipNumber string `protobuf:"bytes,15,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
