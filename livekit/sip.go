@@ -370,6 +370,13 @@ func validateHeaders(headers map[string]string) ValidationResult {
 		if err := ValidateHeaderName(headerName, true); err != nil {
 			return ret.WithError(fmt.Errorf("invalid header name: %w", err))
 		}
+		if hint, ok := deprecatedSipHeaderNames[strings.ToLower(headerName)]; ok {
+			// Warn regardless of whether the value parses, so logs show every caller
+			// setting the header and not just the malformed ones.
+			ret = ret.Combine(ValidationResult{nil, []error{
+				fmt.Errorf("header %s is not supported and will be rejected in a future release%s", headerName, hint),
+			}})
+		}
 		result := ValidateHeaderValueResult(headerName, headerValue)
 		if !result.OK() {
 			return ret.WithError(fmt.Errorf("invalid header value for %s: %w", headerName, result.Error()))

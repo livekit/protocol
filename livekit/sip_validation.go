@@ -188,8 +188,6 @@ var ForbiddenSipHeaderNames = map[string]bool{
 	"record-route":     true,
 	"refer-to":         true, // rfc3515
 	"reply-to":         true,
-	"to":               true, // Set the user part with CreateSIPParticipantRequest.to_user_override
-	"via":              true, // Multiple Via are legal, but a caller's own breaks response routing
 	"k":                true, // Supported
 	"l":                true, // Content-Length
 	"m":                true, // Contact
@@ -198,6 +196,12 @@ var ForbiddenSipHeaderNames = map[string]bool{
 	"t":                true, // To
 	"u":                true, // Allow-Events; rfc3903
 	"v":                true, // Via
+}
+
+// Headers that will soon be forbidden
+var deprecatedSipHeaderNames = map[string]string{
+	"to":  "; use CreateSIPParticipantRequest.to_user_override instead",
+	"via": "",
 }
 
 // Headers that must comply with name-addr specification per RFC 3261 Section 20.10
