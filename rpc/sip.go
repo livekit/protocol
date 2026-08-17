@@ -191,6 +191,7 @@ func NewCreateSIPParticipantRequestResult(
 		SipRequestUri:         req.SipRequestUri,
 		SipFromHeader:         req.SipFromHeader,
 		SipToHeader:           req.SipToHeader,
+		ToUserOverride:        req.ToUserOverride,
 		Address:               hostname,
 		Hostname:              fromHostname,
 		Transport:             transport,

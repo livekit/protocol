@@ -370,6 +370,13 @@ func validateHeaders(headers map[string]string) ValidationResult {
 		if err := ValidateHeaderName(headerName, true); err != nil {
 			return ret.WithError(fmt.Errorf("invalid header name: %w", err))
 		}
+		if hint, ok := deprecatedSipHeaderNames[strings.ToLower(headerName)]; ok {
+			// Warn regardless of whether the value parses, so logs show every caller
+			// setting the header and not just the malformed ones.
+			ret = ret.Combine(ValidationResult{nil, []error{
+				fmt.Errorf("header %s is not supported and will be rejected in a future release%s", headerName, hint),
+			}})
+		}
 		result := ValidateHeaderValueResult(headerName, headerValue)
 		if !result.OK() {
 			return ret.WithError(fmt.Errorf("invalid header value for %s: %w", headerName, result.Error()))
@@ -917,6 +924,14 @@ func (p *CreateSIPParticipantRequest) ValidateResult() ValidationResult {
 		return ValidationFailure(errors.New("missing sip callee number"))
 	} else if strings.Contains(p.SipCallTo, "@") {
 		return ValidationFailure(errors.New("SipCallTo should be a phone number or SIP user, not a full SIP URI"))
+	}
+	if p.ToUserOverride != "" {
+		if strings.Contains(p.ToUserOverride, "@") {
+			return ValidationFailure(errors.New("ToUserOverride should be a phone number or SIP user, not a full SIP URI"))
+		}
+		if err := tokenCharacters.Validate(p.ToUserOverride); err != nil {
+			return ValidationFailure(fmt.Errorf("ToUserOverride contains invalid characters: %w", err))
+		}
 	}
 	if p.RoomName == "" {
 		return ValidationFailure(errors.New("missing room name"))

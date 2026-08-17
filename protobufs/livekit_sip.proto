@@ -16,10 +16,6 @@ syntax = "proto3";
 
 package livekit;
 
-option go_package = "github.com/livekit/protocol/livekit";
-option csharp_namespace = "LiveKit.Proto";
-option ruby_package = "LiveKit::Proto";
-
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
@@ -27,6 +23,10 @@ import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_room.proto";
 import "logger/options.proto";
+
+option csharp_namespace = "LiveKit.Proto";
+option go_package = "github.com/livekit/protocol/livekit";
+option ruby_package = "LiveKit::Proto";
 
 /*
    LiveKit's SIP API is built with 3 high level primitives
@@ -53,11 +53,12 @@ import "logger/options.proto";
    calls must be initiated with `CreateSIPParticipant`.
 */
 
-
 service SIP {
   // rpc CreateSIPTrunk(CreateSIPTrunkRequest) returns (SIPTrunkInfo) { option deprecated = true; }; DELETED
 
-  rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) { option deprecated = true; };
+  rpc ListSIPTrunk(ListSIPTrunkRequest) returns (ListSIPTrunkResponse) {
+    option deprecated = true;
+  }
 
   rpc CreateSIPInboundTrunk(CreateSIPInboundTrunkRequest) returns (SIPInboundTrunkInfo);
   rpc CreateSIPOutboundTrunk(CreateSIPOutboundTrunkRequest) returns (SIPOutboundTrunkInfo);
@@ -79,88 +80,88 @@ service SIP {
 }
 
 enum SIPStatusCode {
-    SIP_STATUS_UNKNOWN = 0;
+  SIP_STATUS_UNKNOWN = 0;
 
-    SIP_STATUS_TRYING = 100;
-    SIP_STATUS_RINGING = 180;
-    SIP_STATUS_CALL_IS_FORWARDED = 181;
-    SIP_STATUS_QUEUED = 182;
-    SIP_STATUS_SESSION_PROGRESS = 183;
-    SIP_STATUS_EARLY_DIALOG_TERMINATED = 199;
+  SIP_STATUS_TRYING = 100;
+  SIP_STATUS_RINGING = 180;
+  SIP_STATUS_CALL_IS_FORWARDED = 181;
+  SIP_STATUS_QUEUED = 182;
+  SIP_STATUS_SESSION_PROGRESS = 183;
+  SIP_STATUS_EARLY_DIALOG_TERMINATED = 199;
 
-    SIP_STATUS_OK = 200;
-    SIP_STATUS_ACCEPTED = 202;
-    SIP_STATUS_NO_NOTIFICATION = 204;
+  SIP_STATUS_OK = 200;
+  SIP_STATUS_ACCEPTED = 202;
+  SIP_STATUS_NO_NOTIFICATION = 204;
 
-    SIP_STATUS_MULTIPLE_CHOICES = 300;
-    SIP_STATUS_MOVED_PERMANENTLY = 301;
-    SIP_STATUS_MOVED_TEMPORARILY = 302;
-    SIP_STATUS_USE_PROXY = 305;
-    SIP_STATUS_ALTERNATIVE_SERVICE = 380;
+  SIP_STATUS_MULTIPLE_CHOICES = 300;
+  SIP_STATUS_MOVED_PERMANENTLY = 301;
+  SIP_STATUS_MOVED_TEMPORARILY = 302;
+  SIP_STATUS_USE_PROXY = 305;
+  SIP_STATUS_ALTERNATIVE_SERVICE = 380;
 
-    SIP_STATUS_BAD_REQUEST = 400;
-    SIP_STATUS_UNAUTHORIZED = 401;
-    SIP_STATUS_PAYMENT_REQUIRED = 402;
-    SIP_STATUS_FORBIDDEN = 403;
-    SIP_STATUS_NOTFOUND = 404;
-    SIP_STATUS_METHOD_NOT_ALLOWED = 405;
-    SIP_STATUS_NOT_ACCEPTABLE = 406;
-    SIP_STATUS_PROXY_AUTH_REQUIRED = 407;
-    SIP_STATUS_REQUEST_TIMEOUT = 408;
-    SIP_STATUS_CONFLICT = 409;
-    SIP_STATUS_GONE = 410;
-    SIP_STATUS_LENGTH_REQUIRED = 411;
-    SIP_STATUS_CONDITIONAL_REQUEST_FAILED = 412;
-    SIP_STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
-    SIP_STATUS_REQUEST_URI_TOO_LONG = 414;
-    SIP_STATUS_UNSUPPORTED_MEDIA_TYPE = 415;
-    SIP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
-    SIP_STATUS_UNKNOWN_RESOURCE_PRIORITY = 417;
-    SIP_STATUS_BAD_EXTENSION = 420;
-    SIP_STATUS_EXTENSION_REQUIRED = 421;
-    SIP_STATUS_SESSION_INTERVAL_TOO_SMALL = 422;
-    SIP_STATUS_INTERVAL_TOO_BRIEF = 423;
-    SIP_STATUS_BAD_LOCATION_INFORMATION = 424;
-    SIP_STATUS_BAD_ALERT_MESSAGE = 425;
-    SIP_STATUS_USE_IDENTITY_HEADER = 428;
-    SIP_STATUS_PROVIDE_REFERRER_IDENTITY = 429;
-    SIP_STATUS_FLOW_FAILED = 430;
-    SIP_STATUS_ANONYMITY_DISALLOWED = 433;
-    SIP_STATUS_BAD_IDENTITY_INFO = 436;
-    SIP_STATUS_UNSUPPORTED_CERTIFICATE = 437;
-    SIP_STATUS_INVALID_IDENTITY_HEADER = 438;
-    SIP_STATUS_FIRST_HOP_LACKS_OUTBOUND_SUPPORT = 439;
-    SIP_STATUS_MAX_BREADTH_EXCEEDED = 440;
-    SIP_STATUS_BAD_INFO_PACKAGE = 469;
-    SIP_STATUS_CONSENT_NEEDED = 470;
-    SIP_STATUS_TEMPORARILY_UNAVAILABLE = 480;
-    SIP_STATUS_CALL_TRANSACTION_DOES_NOT_EXISTS = 481;
-    SIP_STATUS_LOOP_DETECTED = 482;
-    SIP_STATUS_TOO_MANY_HOPS = 483;
-    SIP_STATUS_ADDRESS_INCOMPLETE = 484;
-    SIP_STATUS_AMBIGUOUS = 485;
-    SIP_STATUS_BUSY_HERE = 486;
-    SIP_STATUS_REQUEST_TERMINATED = 487;
-    SIP_STATUS_NOT_ACCEPTABLE_HERE = 488;
-    SIP_STATUS_BAD_EVENT = 489;
-    SIP_STATUS_REQUEST_PENDING = 491;
-    SIP_STATUS_UNDECIPHERABLE = 493;
-    SIP_STATUS_SECURITY_AGREEMENT_REQUIRED = 494;
+  SIP_STATUS_BAD_REQUEST = 400;
+  SIP_STATUS_UNAUTHORIZED = 401;
+  SIP_STATUS_PAYMENT_REQUIRED = 402;
+  SIP_STATUS_FORBIDDEN = 403;
+  SIP_STATUS_NOTFOUND = 404;
+  SIP_STATUS_METHOD_NOT_ALLOWED = 405;
+  SIP_STATUS_NOT_ACCEPTABLE = 406;
+  SIP_STATUS_PROXY_AUTH_REQUIRED = 407;
+  SIP_STATUS_REQUEST_TIMEOUT = 408;
+  SIP_STATUS_CONFLICT = 409;
+  SIP_STATUS_GONE = 410;
+  SIP_STATUS_LENGTH_REQUIRED = 411;
+  SIP_STATUS_CONDITIONAL_REQUEST_FAILED = 412;
+  SIP_STATUS_REQUEST_ENTITY_TOO_LARGE = 413;
+  SIP_STATUS_REQUEST_URI_TOO_LONG = 414;
+  SIP_STATUS_UNSUPPORTED_MEDIA_TYPE = 415;
+  SIP_STATUS_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+  SIP_STATUS_UNKNOWN_RESOURCE_PRIORITY = 417;
+  SIP_STATUS_BAD_EXTENSION = 420;
+  SIP_STATUS_EXTENSION_REQUIRED = 421;
+  SIP_STATUS_SESSION_INTERVAL_TOO_SMALL = 422;
+  SIP_STATUS_INTERVAL_TOO_BRIEF = 423;
+  SIP_STATUS_BAD_LOCATION_INFORMATION = 424;
+  SIP_STATUS_BAD_ALERT_MESSAGE = 425;
+  SIP_STATUS_USE_IDENTITY_HEADER = 428;
+  SIP_STATUS_PROVIDE_REFERRER_IDENTITY = 429;
+  SIP_STATUS_FLOW_FAILED = 430;
+  SIP_STATUS_ANONYMITY_DISALLOWED = 433;
+  SIP_STATUS_BAD_IDENTITY_INFO = 436;
+  SIP_STATUS_UNSUPPORTED_CERTIFICATE = 437;
+  SIP_STATUS_INVALID_IDENTITY_HEADER = 438;
+  SIP_STATUS_FIRST_HOP_LACKS_OUTBOUND_SUPPORT = 439;
+  SIP_STATUS_MAX_BREADTH_EXCEEDED = 440;
+  SIP_STATUS_BAD_INFO_PACKAGE = 469;
+  SIP_STATUS_CONSENT_NEEDED = 470;
+  SIP_STATUS_TEMPORARILY_UNAVAILABLE = 480;
+  SIP_STATUS_CALL_TRANSACTION_DOES_NOT_EXISTS = 481;
+  SIP_STATUS_LOOP_DETECTED = 482;
+  SIP_STATUS_TOO_MANY_HOPS = 483;
+  SIP_STATUS_ADDRESS_INCOMPLETE = 484;
+  SIP_STATUS_AMBIGUOUS = 485;
+  SIP_STATUS_BUSY_HERE = 486;
+  SIP_STATUS_REQUEST_TERMINATED = 487;
+  SIP_STATUS_NOT_ACCEPTABLE_HERE = 488;
+  SIP_STATUS_BAD_EVENT = 489;
+  SIP_STATUS_REQUEST_PENDING = 491;
+  SIP_STATUS_UNDECIPHERABLE = 493;
+  SIP_STATUS_SECURITY_AGREEMENT_REQUIRED = 494;
 
-    SIP_STATUS_INTERNAL_SERVER_ERROR = 500;
-    SIP_STATUS_NOT_IMPLEMENTED = 501;
-    SIP_STATUS_BAD_GATEWAY = 502;
-    SIP_STATUS_SERVICE_UNAVAILABLE = 503;
-    SIP_STATUS_GATEWAY_TIMEOUT = 504;
-    SIP_STATUS_VERSION_NOT_SUPPORTED = 505;
-    SIP_STATUS_MESSAGE_TOO_LARGE = 513;
+  SIP_STATUS_INTERNAL_SERVER_ERROR = 500;
+  SIP_STATUS_NOT_IMPLEMENTED = 501;
+  SIP_STATUS_BAD_GATEWAY = 502;
+  SIP_STATUS_SERVICE_UNAVAILABLE = 503;
+  SIP_STATUS_GATEWAY_TIMEOUT = 504;
+  SIP_STATUS_VERSION_NOT_SUPPORTED = 505;
+  SIP_STATUS_MESSAGE_TOO_LARGE = 513;
 
-    SIP_STATUS_GLOBAL_BUSY_EVERYWHERE = 600;
-    SIP_STATUS_GLOBAL_DECLINE = 603;
-    SIP_STATUS_GLOBAL_DOES_NOT_EXIST_ANYWHERE = 604;
-    SIP_STATUS_GLOBAL_NOT_ACCEPTABLE = 606;
-    SIP_STATUS_GLOBAL_UNWANTED = 607;
-    SIP_STATUS_GLOBAL_REJECTED = 608;
+  SIP_STATUS_GLOBAL_BUSY_EVERYWHERE = 600;
+  SIP_STATUS_GLOBAL_DECLINE = 603;
+  SIP_STATUS_GLOBAL_DOES_NOT_EXIST_ANYWHERE = 604;
+  SIP_STATUS_GLOBAL_NOT_ACCEPTABLE = 606;
+  SIP_STATUS_GLOBAL_UNWANTED = 607;
+  SIP_STATUS_GLOBAL_REJECTED = 608;
 }
 
 // SIPStatus is returned as an error detail in CreateSIPParticipant.
@@ -181,7 +182,7 @@ message CreateSIPTrunkRequest {
   // Number used to make outbound calls
   string outbound_number = 3;
 
-  repeated string inbound_numbers_regex = 4 [deprecated=true];
+  repeated string inbound_numbers_regex = 4 [deprecated = true];
 
   // Accepted `To` values. This Trunk will only accept a call made to
   // these numbers. This allows you to have distinct Trunks for different phone
@@ -212,8 +213,8 @@ enum SIPTransport {
 }
 
 enum SIPHeaderOptions {
-  SIP_NO_HEADERS = 0;  // do not map any headers, except ones mapped explicitly
-  SIP_X_HEADERS = 1;   // map all X-* headers to sip.h.x-* attributes
+  SIP_NO_HEADERS = 0; // do not map any headers, except ones mapped explicitly
+  SIP_X_HEADERS = 1; // map all X-* headers to sip.h.x-* attributes
   SIP_ALL_HEADERS = 2; // map all headers to sip.h.* attributes
 }
 
@@ -247,8 +248,8 @@ message ProviderInfo {
 
 enum ProviderType {
   PROVIDER_TYPE_UNKNOWN = 0;
-  PROVIDER_TYPE_INTERNAL = 1;  // Internally implemented
-  PROVIDER_TYPE_EXTERNAL = 2;  // Vendor provided
+  PROVIDER_TYPE_INTERNAL = 1; // Internally implemented
+  PROVIDER_TYPE_EXTERNAL = 2; // Vendor provided
 }
 
 message SIPTrunkInfo {
@@ -276,7 +277,7 @@ message SIPTrunkInfo {
   // Transport used for inbound and outbound calls.
   SIPTransport transport = 13;
 
-  repeated string inbound_numbers_regex = 5 [deprecated=true];
+  repeated string inbound_numbers_regex = 5 [deprecated = true];
 
   // Accepted `To` values. This Trunk will only accept a call made to
   // these numbers. This allows you to have distinct Trunks for different phone
@@ -366,7 +367,7 @@ message SIPInboundTrunkInfo {
   google.protobuf.Duration max_call_duration = 12;
 
   bool krisp_enabled = 13;
-  SIPMediaEncryption media_encryption = 16 [deprecated=true];
+  SIPMediaEncryption media_encryption = 16 [deprecated = true];
   SIPMediaConfig media = 20;
 
   google.protobuf.Timestamp created_at = 17;
@@ -387,7 +388,7 @@ message SIPInboundTrunkUpdate {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  optional SIPMediaEncryption media_encryption = 8 [deprecated=true];
+  optional SIPMediaEncryption media_encryption = 8 [deprecated = true];
   SIPMediaConfig media = 10;
 
   // NEXT ID: 11
@@ -454,7 +455,7 @@ message SIPOutboundTrunkInfo {
   // lowercase header names should be used, for example: sip.h.x-custom-header.
   SIPHeaderOptions include_headers = 12;
 
-  SIPMediaEncryption media_encryption = 13 [deprecated=true];
+  SIPMediaEncryption media_encryption = 13 [deprecated = true];
   SIPMediaConfig media = 18;
 
   // Optional custom hostname for the 'From' SIP header in outbound INVITEs.
@@ -480,7 +481,7 @@ message SIPOutboundTrunkUpdate {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  optional SIPMediaEncryption media_encryption = 8 [deprecated=true];
+  optional SIPMediaEncryption media_encryption = 8 [deprecated = true];
   SIPMediaConfig media = 11;
   optional string from_host = 10;
 
@@ -593,41 +594,41 @@ message SIPDispatchRule {
 message CreateSIPDispatchRuleRequest {
   SIPDispatchRuleInfo dispatch_rule = 10; // Rule ID is ignored
 
-  SIPDispatchRule rule = 1 [deprecated=true];
+  SIPDispatchRule rule = 1 [deprecated = true];
 
   // What trunks are accepted for this dispatch rule
   // If empty all trunks will match this dispatch rule
-  repeated string trunk_ids = 2 [deprecated=true];
+  repeated string trunk_ids = 2 [deprecated = true];
 
   // By default the From value (Phone number) is used for participant name/identity and added to attributes.
   // If true, a random value for identity will be used and numbers will be omitted from attributes.
-  bool hide_phone_number = 3 [deprecated=true];
+  bool hide_phone_number = 3 [deprecated = true];
 
   // Dispatch Rule will only accept a call made to these numbers (if set).
-  repeated string inbound_numbers = 6 [deprecated=true];
+  repeated string inbound_numbers = 6 [deprecated = true];
 
   // Optional human-readable name for the Dispatch Rule.
-  string name = 4 [deprecated=true];
+  string name = 4 [deprecated = true];
   // User-defined metadata for the Dispatch Rule.
   // Participants created by this rule will inherit this metadata.
   string metadata = 5 [
-    deprecated=true,
+    deprecated = true,
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   // User-defined attributes for the Dispatch Rule.
   // Participants created by this rule will inherit these attributes.
   map<string, string> attributes = 7 [
-    deprecated=true,
+    deprecated = true,
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
 
   // Cloud-only, config preset to use
-  string room_preset = 8 [deprecated=true];
+  string room_preset = 8 [deprecated = true];
 
   // RoomConfiguration to use if the participant initiates the room
-  RoomConfiguration room_config = 9 [deprecated=true];
+  RoomConfiguration room_config = 9 [deprecated = true];
 
   // NEXT ID: 11
 }
@@ -674,7 +675,7 @@ message SIPDispatchRuleInfo {
 
   SIPMediaConfig media = 16;
   bool krisp_enabled = 11;
-  SIPMediaEncryption media_encryption = 12 [deprecated=true];
+  SIPMediaEncryption media_encryption = 12 [deprecated = true];
 
   google.protobuf.Timestamp created_at = 14;
   google.protobuf.Timestamp updated_at = 15;
@@ -694,7 +695,7 @@ message SIPDispatchRuleUpdate {
     (logger.sensitivity) = SENSITIVITY_PII,
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
-  optional SIPMediaEncryption media_encryption = 6 [deprecated=true];
+  optional SIPMediaEncryption media_encryption = 6 [deprecated = true];
   SIPMediaConfig media = 7;
 }
 
@@ -752,11 +753,23 @@ message CreateSIPParticipantRequest {
   SIPOutboundConfig trunk = 20;
 
   SIPRequestDest sip_request_uri = 24; // INVITE <uri>
-  SIPNamedDest   sip_to_header   = 25; // To:   "Name" <uri>
-  SIPNamedDest   sip_from_header = 26; // From: "Name" <uri>
+  // Currently not usable with CreateSIPParticipant: sip_call_to is required, and
+  // the two cannot be combined. Use to_user_override to change the To header user.
+  SIPNamedDest sip_to_header = 25; // To:   "Name" <uri>
+  SIPNamedDest sip_from_header = 26; // From: "Name" <uri>
 
   // What number should be dialed via SIP
   string sip_call_to = 2;
+
+  // Replaces the user part of the To header, leaving its host, port and transport
+  // as they would otherwise be. The request URI is not affected, so the call is
+  // still placed to sip_call_to. Empty means no override.
+  //
+  // Use this when the callee expects a To header that differs from the number
+  // being dialed. Setting "To" in the headers map is not a valid alternative:
+  // it adds a second To header rather than replacing the existing one, which
+  // makes the INVITE malformed.
+  string to_user_override = 27;
 
   // Optional SIP From number to use. If empty, trunk number is used.
   string sip_number = 15;
@@ -834,7 +847,7 @@ message CreateSIPParticipantRequest {
     (logger.redact_format) = "<redacted ({{ .Size }} bytes)>"
   ];
   optional Destination destination = 22;
-  // NEXT ID: 27
+  // NEXT ID: 28
 }
 
 message SIPParticipantInfo {
@@ -862,7 +875,6 @@ message TransferSIPParticipantRequest {
   google.protobuf.Duration ringing_timeout = 6;
 }
 
-
 message SIPCallInfo {
   string call_id = 1 [(logger.name) = "callID"];
   string trunk_id = 2 [(logger.name) = "trunkID"];
@@ -877,9 +889,9 @@ message SIPCallInfo {
   ];
   SIPUri from_uri = 6;
   SIPUri to_uri = 7;
-  int64 created_at = 9 [ deprecated = true ];
-  int64 started_at = 10 [ deprecated = true ];
-  int64 ended_at = 11 [ deprecated = true ];
+  int64 created_at = 9 [deprecated = true];
+  int64 started_at = 10 [deprecated = true];
+  int64 ended_at = 11 [deprecated = true];
   repeated SIPFeature enabled_features = 14;
   SIPCallDirection call_direction = 15;
   SIPCallStatus call_status = 8;

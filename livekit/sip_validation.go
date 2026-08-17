@@ -198,6 +198,12 @@ var ForbiddenSipHeaderNames = map[string]bool{
 	"v":                true, // Via
 }
 
+// Headers that will soon be forbidden
+var deprecatedSipHeaderNames = map[string]string{
+	"to":  "; use CreateSIPParticipantRequest.to_user_override instead",
+	"via": "",
+}
+
 // Headers that must comply with name-addr specification per RFC 3261 Section 20.10
 // name-addr = [display-name] <addr-spec>
 // addr-spec = SIP-URI / SIPS-URI / absoluteURI

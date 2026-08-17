@@ -3830,10 +3830,21 @@ type CreateSIPParticipantRequest struct {
 	SipTrunkId    string             `protobuf:"bytes,1,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
 	Trunk         *SIPOutboundConfig `protobuf:"bytes,20,opt,name=trunk,proto3" json:"trunk,omitempty"`
 	SipRequestUri *SIPRequestDest    `protobuf:"bytes,24,opt,name=sip_request_uri,json=sipRequestUri,proto3" json:"sip_request_uri,omitempty"` // INVITE <uri>
-	SipToHeader   *SIPNamedDest      `protobuf:"bytes,25,opt,name=sip_to_header,json=sipToHeader,proto3" json:"sip_to_header,omitempty"`       // To:   "Name" <uri>
-	SipFromHeader *SIPNamedDest      `protobuf:"bytes,26,opt,name=sip_from_header,json=sipFromHeader,proto3" json:"sip_from_header,omitempty"` // From: "Name" <uri>
+	// Currently not usable with CreateSIPParticipant: sip_call_to is required, and
+	// the two cannot be combined. Use to_user_override to change the To header user.
+	SipToHeader   *SIPNamedDest `protobuf:"bytes,25,opt,name=sip_to_header,json=sipToHeader,proto3" json:"sip_to_header,omitempty"`       // To:   "Name" <uri>
+	SipFromHeader *SIPNamedDest `protobuf:"bytes,26,opt,name=sip_from_header,json=sipFromHeader,proto3" json:"sip_from_header,omitempty"` // From: "Name" <uri>
 	// What number should be dialed via SIP
 	SipCallTo string `protobuf:"bytes,2,opt,name=sip_call_to,json=sipCallTo,proto3" json:"sip_call_to,omitempty"`
+	// Replaces the user part of the To header, leaving its host, port and transport
+	// as they would otherwise be. The request URI is not affected, so the call is
+	// still placed to sip_call_to. Empty means no override.
+	//
+	// Use this when the callee expects a To header that differs from the number
+	// being dialed. Setting "To" in the headers map is not a valid alternative:
+	// it adds a second To header rather than replacing the existing one, which
+	// makes the INVITE malformed.
+	ToUserOverride string `protobuf:"bytes,27,opt,name=to_user_override,json=toUserOverride,proto3" json:"to_user_override,omitempty"`
 	// Optional SIP From number to use. If empty, trunk number is used.
 	SipNumber string `protobuf:"bytes,15,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
 	// What LiveKit room should this participant be connected too
@@ -3884,7 +3895,7 @@ type CreateSIPParticipantRequest struct {
 	// 2) Empty string: Do not send a display name, which will result in a CNAM lookup downstream.
 	// 3) Non-empty: Use the specified value as the display name.
 	DisplayName   *string      `protobuf:"bytes,21,opt,name=display_name,json=displayName,proto3,oneof" json:"display_name,omitempty"`
-	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"` // NEXT ID: 27
+	Destination   *Destination `protobuf:"bytes,22,opt,name=destination,proto3,oneof" json:"destination,omitempty"` // NEXT ID: 28
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -3957,6 +3968,13 @@ func (x *CreateSIPParticipantRequest) GetSipFromHeader() *SIPNamedDest {
 func (x *CreateSIPParticipantRequest) GetSipCallTo() string {
 	if x != nil {
 		return x.SipCallTo
+	}
+	return ""
+}
+
+func (x *CreateSIPParticipantRequest) GetToUserOverride() string {
+	if x != nil {
+		return x.ToUserOverride
 	}
 	return ""
 }
@@ -5263,7 +5281,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1aF\n" +
 	"\x18AttributesToHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xe5\r\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x8f\x0e\n" +
 	"\x1bCreateSIPParticipantRequest\x12/\n" +
 	"\fsip_trunk_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"sipTrunkIDR\n" +
@@ -5272,7 +5290,8 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0fsip_request_uri\x18\x18 \x01(\v2\x17.livekit.SIPRequestDestR\rsipRequestUri\x129\n" +
 	"\rsip_to_header\x18\x19 \x01(\v2\x15.livekit.SIPNamedDestR\vsipToHeader\x12=\n" +
 	"\x0fsip_from_header\x18\x1a \x01(\v2\x15.livekit.SIPNamedDestR\rsipFromHeader\x12\x1e\n" +
-	"\vsip_call_to\x18\x02 \x01(\tR\tsipCallTo\x12\x1d\n" +
+	"\vsip_call_to\x18\x02 \x01(\tR\tsipCallTo\x12(\n" +
+	"\x10to_user_override\x18\x1b \x01(\tR\x0etoUserOverride\x12\x1d\n" +
 	"\n" +
 	"sip_number\x18\x0f \x01(\tR\tsipNumber\x12\x1b\n" +
 	"\troom_name\x18\x03 \x01(\tR\broomName\x121\n" +

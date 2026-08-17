@@ -49,6 +49,8 @@ type InternalCreateSIPParticipantRequest struct {
 	SipRequestUri *livekit.SIPRequestDest `protobuf:"bytes,35,opt,name=sip_request_uri,json=sipRequestUri,proto3" json:"sip_request_uri,omitempty"` // INVITE <uri>
 	SipFromHeader *livekit.SIPNamedDest   `protobuf:"bytes,36,opt,name=sip_from_header,json=sipFromHeader,proto3" json:"sip_from_header,omitempty"` // From: "Name" <uri>
 	SipToHeader   *livekit.SIPNamedDest   `protobuf:"bytes,37,opt,name=sip_to_header,json=sipToHeader,proto3" json:"sip_to_header,omitempty"`       // To:   "Name" <uri>
+	// Replaces the user part of the To header. Does not affect the request URI.
+	ToUserOverride string `protobuf:"bytes,39,opt,name=to_user_override,json=toUserOverride,proto3" json:"to_user_override,omitempty"`
 	// IP or hostname that SIP INVITE is sent too
 	Address string `protobuf:"bytes,2,opt,name=address,proto3" json:"address,omitempty"`
 	// Hostname for the 'From' SIP address in INVITE
@@ -183,6 +185,13 @@ func (x *InternalCreateSIPParticipantRequest) GetSipToHeader() *livekit.SIPNamed
 		return x.SipToHeader
 	}
 	return nil
+}
+
+func (x *InternalCreateSIPParticipantRequest) GetToUserOverride() string {
+	if x != nil {
+		return x.ToUserOverride
+	}
+	return ""
 }
 
 func (x *InternalCreateSIPParticipantRequest) GetAddress() string {
@@ -555,7 +564,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\x1a\frpc/io.proto\"\x95\x15\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\x1a\frpc/io.proto\"\xbf\x15\n" +
 	"#InternalCreateSIPParticipantRequest\x12+\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12,\n" +
@@ -565,7 +574,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"sipTrunkId\x12?\n" +
 	"\x0fsip_request_uri\x18# \x01(\v2\x17.livekit.SIPRequestDestR\rsipRequestUri\x12=\n" +
 	"\x0fsip_from_header\x18$ \x01(\v2\x15.livekit.SIPNamedDestR\rsipFromHeader\x129\n" +
-	"\rsip_to_header\x18% \x01(\v2\x15.livekit.SIPNamedDestR\vsipToHeader\x12\x18\n" +
+	"\rsip_to_header\x18% \x01(\v2\x15.livekit.SIPNamedDestR\vsipToHeader\x12(\n" +
+	"\x10to_user_override\x18' \x01(\tR\x0etoUserOverride\x12\x18\n" +
 	"\aaddress\x18\x02 \x01(\tR\aaddress\x12\x1a\n" +
 	"\bhostname\x18\x14 \x01(\tR\bhostname\x12/\n" +
 	"\x13destination_country\x18\x1e \x01(\tR\x12destinationCountry\x123\n" +
