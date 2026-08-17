@@ -9,3 +9,5 @@ minimumReleaseAgeExclude:
   - "@babel/core@7.29.6"
   # Renovate security update: js-yaml@3.15.1
   - js-yaml@3.15.1
+  # Renovate security update: brace-expansion@5.0.9
+  - brace-expansion@5.0.9
