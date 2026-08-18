@@ -17,6 +17,7 @@ syntax = "proto3";
 package livekit;
 
 import "agent/livekit_agent_session.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_cloud_agent.proto";
 import "livekit_models.proto";
@@ -261,10 +262,40 @@ message SimulationRun {
       string project_id = 1;
       optional Status status = 2;
       optional TokenPagination page_token = 3;
+      // Half-open window [from, to) on created_at, the leading key of this
+      // list's keyset. Unset bounds mean no window, so existing callers keep
+      // their unbounded scan; the histogram's selected range sets both.
+      optional google.protobuf.Timestamp from = 4;
+      optional google.protobuf.Timestamp to = 5;
     }
     message Response {
       repeated SimulationRun runs = 1;
       TokenPagination next_page_token = 2;
+    }
+  }
+
+  // Counts of the runs `List` would return over the same window, bucketed by
+  // created_at instead of paginated.
+  message Counts {
+    message Request {
+      string project_id = 1;
+      // Both bounds required: a bucketed scan of a project's whole history is
+      // never what a caller wants.
+      google.protobuf.Timestamp from = 2;
+      google.protobuf.Timestamp to = 3;
+    }
+    message Response {
+      // Buckets holding at least one run, ascending by bucket_start. Empty
+      // buckets are omitted; each run lands in exactly one bucket, so the
+      // counts sum to the number of runs in the window.
+      repeated Bucket buckets = 1;
+      // The bucket width the server chose from the window, so the client
+      // zero-fills the omitted buckets on the grid the counts were built on.
+      google.protobuf.Duration interval = 2;
+    }
+    message Bucket {
+      google.protobuf.Timestamp bucket_start = 1;
+      uint64 count = 2;
     }
   }
 
@@ -364,6 +395,7 @@ service AgentSimulation {
   rpc ConfirmSimulationSourceUpload(SimulationRun.ConfirmSourceUpload.Request) returns (SimulationRun.ConfirmSourceUpload.Response);
   rpc GetSimulationRun(SimulationRun.Get.Request) returns (SimulationRun.Get.Response);
   rpc ListSimulationRuns(SimulationRun.List.Request) returns (SimulationRun.List.Response);
+  rpc CountSimulationRuns(SimulationRun.Counts.Request) returns (SimulationRun.Counts.Response);
   rpc CancelSimulationRun(SimulationRun.Cancel.Request) returns (SimulationRun.Cancel.Response);
 
   rpc CreateScenarioFromSession(Scenario.CreateFromSession.Request) returns (Scenario.CreateFromSession.Response);
