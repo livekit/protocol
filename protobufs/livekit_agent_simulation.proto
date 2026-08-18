@@ -230,6 +230,11 @@ message SimulationRun {
 
       // Conversation mode for every job in this run; unspecified = TEXT.
       SimulationMode mode = 9;
+
+      // Impairments applied to the simulated user's audio; AUDIO mode only.
+      bool background_noise = 10;
+      bool low_quality_microphone = 11;
+      bool packet_loss = 12;
     }
     message Response {
       string simulation_run_id = 1;

@@ -2117,9 +2117,13 @@ type SimulationRun_Create_Request struct {
 	// project's concurrency quota; 0/unset uses the server default.
 	Concurrency *int32 `protobuf:"varint,8,opt,name=concurrency,proto3,oneof" json:"concurrency,omitempty"`
 	// Conversation mode for every job in this run; unspecified = TEXT.
-	Mode          SimulationMode `protobuf:"varint,9,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Mode SimulationMode `protobuf:"varint,9,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
+	// Impairments applied to the simulated user's audio; AUDIO mode only.
+	BackgroundNoise      bool `protobuf:"varint,10,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"`
+	LowQualityMicrophone bool `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
+	PacketLoss           bool `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Create_Request) Reset() {
@@ -2199,6 +2203,27 @@ func (x *SimulationRun_Create_Request) GetMode() SimulationMode {
 		return x.Mode
 	}
 	return SimulationMode_SIMULATION_MODE_UNSPECIFIED
+}
+
+func (x *SimulationRun_Create_Request) GetBackgroundNoise() bool {
+	if x != nil {
+		return x.BackgroundNoise
+	}
+	return false
+}
+
+func (x *SimulationRun_Create_Request) GetLowQualityMicrophone() bool {
+	if x != nil {
+		return x.LowQualityMicrophone
+	}
+	return false
+}
+
+func (x *SimulationRun_Create_Request) GetPacketLoss() bool {
+	if x != nil {
+		return x.PacketLoss
+	}
+	return false
 }
 
 type SimulationRun_Create_Response struct {
@@ -2807,7 +2832,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x93A\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x95B\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3039,8 +3064,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversationB\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x15\n" +
-	"\x13_scenario_pass_rate\x1a\xf5\x03\n" +
-	"\x06Create\x1a\xdc\x02\n" +
+	"\x13_scenario_pass_rate\x1a\xf7\x04\n" +
+	"\x06Create\x1a\xde\x03\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3050,7 +3075,12 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x06region\x18\x06 \x01(\tR\x06region\x12B\n" +
 	"\x0escenario_group\x18\a \x01(\v2\x16.livekit.ScenarioGroupH\x00R\rscenarioGroup\x88\x01\x01\x12%\n" +
 	"\vconcurrency\x18\b \x01(\x05H\x01R\vconcurrency\x88\x01\x01\x12+\n" +
-	"\x04mode\x18\t \x01(\x0e2\x17.livekit.SimulationModeR\x04modeB\x11\n" +
+	"\x04mode\x18\t \x01(\x0e2\x17.livekit.SimulationModeR\x04mode\x12)\n" +
+	"\x10background_noise\x18\n" +
+	" \x01(\bR\x0fbackgroundNoise\x124\n" +
+	"\x16low_quality_microphone\x18\v \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
+	"\vpacket_loss\x18\f \x01(\bR\n" +
+	"packetLossB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
 	"\bResponse\x12*\n" +
