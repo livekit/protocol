@@ -155,6 +155,13 @@ func (c *Observer[T]) load(path string) (conf *T, err error) {
 			return nil, fmt.Errorf("cannot parse config: file empty")
 		}
 
+		// T is owned by the caller, so this decodes struct trees full of types
+		// from other repos. Any custom UnmarshalYAML(*yaml.Node) in that tree is
+		// only honored if its Node comes from the same yaml package used here;
+		// otherwise the decoder silently ignores it and decodes reflectively.
+		// Types crossing a repo boundary should therefore use the func-based
+		// unmarshal signature, which belongs to no yaml package. See
+		// TestObserverHonorsCustomUnmarshallers before changing this import.
 		if err := yaml.Unmarshal(b, conf); err != nil {
 			return nil, fmt.Errorf("cannot parse config: %v", err)
 		}
