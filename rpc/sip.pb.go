@@ -483,9 +483,11 @@ type InternalTransferSIPParticipantRequest struct {
 	// Max time for the transfer destination to answer the call.
 	RingingTimeout *durationpb.Duration `protobuf:"bytes,5,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
 	// Project-level feature flags from ProjectSettings.FeatureFlags
-	FeatureFlags  map[string]string `protobuf:"bytes,6,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	FeatureFlags        map[string]string `protobuf:"bytes,6,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	RoomName            string            `protobuf:"bytes,7,opt,name=room_name,json=roomName,proto3" json:"room_name,omitempty"`
+	ParticipantIdentity string            `protobuf:"bytes,8,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *InternalTransferSIPParticipantRequest) Reset() {
@@ -560,6 +562,20 @@ func (x *InternalTransferSIPParticipantRequest) GetFeatureFlags() map[string]str
 	return nil
 }
 
+func (x *InternalTransferSIPParticipantRequest) GetRoomName() string {
+	if x != nil {
+		return x.RoomName
+	}
+	return ""
+}
+
+func (x *InternalTransferSIPParticipantRequest) GetParticipantIdentity() string {
+	if x != nil {
+		return x.ParticipantIdentity
+	}
+	return ""
+}
+
 var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
@@ -627,7 +643,7 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"$InternalCreateSIPParticipantResponse\x127\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12,\n" +
-	"\vsip_call_id\x18\x03 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\"\xb8\x04\n" +
+	"\vsip_call_id\x18\x03 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\"\x88\x05\n" +
 	"%InternalTransferSIPParticipantRequest\x12,\n" +
 	"\vsip_call_id\x18\x01 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\x12\x1f\n" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
@@ -635,7 +651,9 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12w\n" +
 	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12B\n" +
 	"\x0fringing_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12a\n" +
-	"\rfeature_flags\x18\x06 \x03(\v2<.rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntryR\ffeatureFlags\x1a:\n" +
+	"\rfeature_flags\x18\x06 \x03(\v2<.rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntryR\ffeatureFlags\x12\x1b\n" +
+	"\troom_name\x18\a \x01(\tR\broomName\x121\n" +
+	"\x14participant_identity\x18\b \x01(\tR\x13participantIdentity\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a?\n" +
