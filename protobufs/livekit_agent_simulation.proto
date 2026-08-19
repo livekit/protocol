@@ -267,6 +267,9 @@ message SimulationRun {
       // their unbounded scan; the histogram's selected range sets both.
       optional google.protobuf.Timestamp from = 4;
       optional google.protobuf.Timestamp to = 5;
+      // Exact agent name. Unset means every agent — including the runs whose
+      // name is empty, which a bare string could not tell from no filter.
+      optional string agent_name = 6;
     }
     message Response {
       repeated SimulationRun runs = 1;
@@ -286,6 +289,7 @@ message SimulationRun {
       // Applied as `List` applies it: a filter the rows honour and the bars
       // above them drop would make the histogram an answer about a wider set.
       optional Status status = 4;
+      optional string agent_name = 5;
     }
     message Response {
       // Buckets holding at least one run, ascending by bucket_start. Empty
