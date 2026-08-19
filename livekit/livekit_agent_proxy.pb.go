@@ -39,7 +39,7 @@ const (
 // One multiplexed frame, carried as a single websocket binary message.
 type AgentHttpFrame struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The stream this frame belongs to; the edge opens them all and takes odd ids.
+	// The stream this frame belongs to; the controller opens them all and takes odd ids.
 	//
 	// 0 is the connection itself rather than a stream on it, which only credit uses: every
 	// stream draws from a window the whole wire shares, and that window is refilled here.
@@ -209,10 +209,10 @@ type AgentHttpRegistration struct {
 	// workers. Not the id RegisterWorkerResponse gives: a wire is dialled before then.
 	WorkerId string `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 	// The first path segment of a request: "get_order" takes /get_order and all below it.
-	// The edge compares that one segment and forwards the path untouched, so the worker's
-	// own router answers 404 and 405 itself.
+	// The controller compares that one segment and forwards the path untouched, so the
+	// worker's own router answers 404 and 405 itself.
 	Endpoints []string `protobuf:"bytes,2,rep,name=endpoints,proto3" json:"endpoints,omitempty"`
-	// Requests the edge may have in flight against this worker at once. 0 means no limit.
+	// Requests the controller may have in flight against this worker. 0 means no limit.
 	MaxConcurrentRequests uint32 `protobuf:"varint,3,opt,name=max_concurrent_requests,json=maxConcurrentRequests,proto3" json:"max_concurrent_requests,omitempty"`
 	unknownFields         protoimpl.UnknownFields
 	sizeCache             protoimpl.SizeCache
@@ -269,11 +269,11 @@ func (x *AgentHttpRegistration) GetMaxConcurrentRequests() uint32 {
 	return 0
 }
 
-// What the edge knows about a request that the bytes themselves do not carry.
+// What the controller knows about a request that the bytes themselves do not carry.
 type AgentHttpOpen struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	RequestId string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	// client address as the edge saw it, before any X-Forwarded-For it injects
+	// client address as the controller saw it, before any X-Forwarded-For it injects
 	PeerAddr      string            `protobuf:"bytes,2,opt,name=peer_addr,json=peerAddr,proto3" json:"peer_addr,omitempty"`
 	Attributes    map[string]string `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
