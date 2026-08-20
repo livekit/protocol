@@ -18,7 +18,6 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 import "options.proto";
 import "livekit_sip.proto";
@@ -29,7 +28,7 @@ service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
     option (psrpc.options).topics = true;
   };
-  rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (google.protobuf.Empty) {
+  rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (livekit.TransferSIPParticipantResponse) {
     option (psrpc.options) = {
       topics: true
       topic_params: {

@@ -18,7 +18,6 @@ package livekit;
 
 import "google/protobuf/any.proto";
 import "google/protobuf/duration.proto";
-import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_models.proto";
 import "livekit_room.proto";
@@ -76,7 +75,7 @@ service SIP {
   rpc DeleteSIPDispatchRule(DeleteSIPDispatchRuleRequest) returns (SIPDispatchRuleInfo);
 
   rpc CreateSIPParticipant(CreateSIPParticipantRequest) returns (SIPParticipantInfo);
-  rpc TransferSIPParticipant(TransferSIPParticipantRequest) returns (google.protobuf.Empty);
+  rpc TransferSIPParticipant(TransferSIPParticipantRequest) returns (TransferSIPParticipantResponse);
 }
 
 enum SIPStatusCode {
@@ -875,6 +874,17 @@ message TransferSIPParticipantRequest {
   google.protobuf.Duration ringing_timeout = 6;
 }
 
+message TransferSIPParticipantResponse {
+  string transfer_id = 1 [(logger.name) = "transferID"];
+  SIPTransferStatus status = 2;
+  SIPTransferReason reason = 3;
+
+  // Set when the outcome was reported by a SIP response.
+  SIPStatus sip_status = 4;
+
+  // NEXT ID: 5
+}
+
 message SIPCallInfo {
   string call_id = 1 [(logger.name) = "callID"];
   string trunk_id = 2 [(logger.name) = "trunkID"];
@@ -920,8 +930,9 @@ message SIPTransferInfo {
   SIPTransferStatus transfer_status = 6;
   string error = 7;
   SIPStatus transfer_status_code = 8;
+  SIPTransferReason reason = 9;
 
-  // NEXT ID: 7
+  // NEXT ID: 10
 }
 
 message SIPUri {
@@ -959,6 +970,16 @@ enum SIPTransferStatus {
   STS_TRANSFER_ONGOING = 0;
   STS_TRANSFER_FAILED = 1;
   STS_TRANSFER_SUCCESSFUL = 2;
+}
+
+enum SIPTransferReason {
+  STR_UNSPECIFIED = 0; // No reason reported
+  STR_COMPLETED = 1; // The transferee answered and the transfer completed
+  STR_CALL_ENDED = 2; // The call ended before the transfer completed: remote BYE, room deleted or local hangup
+  STR_REJECTED = 3; // The transferee, or its provider, rejected the transfer
+  STR_RINGING_TIMEOUT = 4; // The transferee did not answer in time
+  STR_SUBSCRIPTION_TERMINATED = 5; // The provider stopped reporting the transfer status without a final response
+  STR_CANCELED = 6; // Canceled through the API
 }
 
 enum SIPFeature {
