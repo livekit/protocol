@@ -14,10 +14,13 @@ func ValidateDeployment(deployment string) error {
 	for i := 0; i < len(deployment); i++ {
 		c := deployment[i]
 		switch {
+		case c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z', c >= '0' && c <= '9', c == '-', c == '.':
 		case c == '_':
 			return fmt.Errorf("deployment contains reserved character %q", c)
-		case c <= ' ' || c == 0x7f:
-			return fmt.Errorf("deployment contains whitespace or control byte at position %d", i)
+		default:
+			// deployments appear as a single URL path segment (/agents/{deployment}/...),
+			// so only alphanumerics, '-' and '.' are accepted
+			return fmt.Errorf("deployment contains invalid character %q at position %d", c, i)
 		}
 	}
 	return nil
