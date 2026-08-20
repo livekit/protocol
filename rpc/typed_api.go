@@ -17,6 +17,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/livekit/psrpc"
@@ -97,12 +98,34 @@ func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
 	return p.Bus, psrpc.WithClientOptions(p.Options()...)
 }
 
+var serverSkipClaim atomic.Pointer[func() bool]
+
+// SetServerSkipClaim gates the claim handshake for every server built through
+// WithServerObservability, which is the only seam every server constructor
+// shares -- several take no config to read the setting from. Process-wide
+// because the claim is a transport policy, not a per-service one. Consulted per
+// request, so this may be called before or after the servers exist, and the
+// setting stays revocable at runtime.
+func SetServerSkipClaim(enabled func() bool) {
+	serverSkipClaim.Store(&enabled)
+}
+
+func serverSkipClaimEnabled() bool {
+	if enabled := serverSkipClaim.Load(); enabled != nil {
+		return (*enabled)()
+	}
+	return false
+}
+
 func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
 	return psrpc.WithServerOptions(
 		middleware.WithServerMetrics(PSRPCMetricsObserver{}),
 		psrpc.WithServerObserver(PSRPCMetricsObserver{}),
 		WithServerLogger(logger),
 		otelpsrpc.ServerOptions(otelpsrpc.Config{}),
+		// Rides along here rather than in WithDefaultServerOptions so it also
+		// reaches the servers that only take a logger.
+		psrpc.WithServerSkipClaim(serverSkipClaimEnabled),
 	)
 }
 
