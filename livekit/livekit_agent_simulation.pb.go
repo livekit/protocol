@@ -2492,8 +2492,11 @@ type SimulationRun_List_Request struct {
 	// Half-open window [from, to) on created_at, the leading key of this
 	// list's keyset. Unset bounds mean no window, so existing callers keep
 	// their unbounded scan; the histogram's selected range sets both.
-	From          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=from,proto3,oneof" json:"from,omitempty"`
-	To            *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=to,proto3,oneof" json:"to,omitempty"`
+	From *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=from,proto3,oneof" json:"from,omitempty"`
+	To   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=to,proto3,oneof" json:"to,omitempty"`
+	// Exact agent name. Unset means every agent — including the runs whose
+	// name is empty, which a bare string could not tell from no filter.
+	AgentName     *string `protobuf:"bytes,6,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2563,6 +2566,13 @@ func (x *SimulationRun_List_Request) GetTo() *timestamppb.Timestamp {
 	return nil
 }
 
+func (x *SimulationRun_List_Request) GetAgentName() string {
+	if x != nil && x.AgentName != nil {
+		return *x.AgentName
+	}
+	return ""
+}
+
 type SimulationRun_List_Response struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Runs          []*SimulationRun       `protobuf:"bytes,1,rep,name=runs,proto3" json:"runs,omitempty"`
@@ -2625,6 +2635,7 @@ type SimulationRun_Counts_Request struct {
 	// Applied as `List` applies it: a filter the rows honour and the bars
 	// above them drop would make the histogram an answer about a wider set.
 	Status        *SimulationRun_Status `protobuf:"varint,4,opt,name=status,proto3,enum=livekit.SimulationRun_Status,oneof" json:"status,omitempty"`
+	AgentName     *string               `protobuf:"bytes,5,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2685,6 +2696,13 @@ func (x *SimulationRun_Counts_Request) GetStatus() SimulationRun_Status {
 		return *x.Status
 	}
 	return SimulationRun_STATUS_PENDING_UPLOAD
+}
+
+func (x *SimulationRun_Counts_Request) GetAgentName() string {
+	if x != nil && x.AgentName != nil {
+		return *x.AgentName
+	}
+	return ""
 }
 
 type SimulationRun_Counts_Response struct {
@@ -3046,7 +3064,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xc5E\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xabF\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3309,8 +3327,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12*\n" +
 	"\x11simulation_run_id\x18\x02 \x01(\tR\x0fsimulationRunId\x1a4\n" +
 	"\bResponse\x12(\n" +
-	"\x03run\x18\x01 \x01(\v2\x16.livekit.SimulationRunR\x03run\x1a\xb5\x03\n" +
-	"\x04List\x1a\xb2\x02\n" +
+	"\x03run\x18\x01 \x01(\v2\x16.livekit.SimulationRunR\x03run\x1a\xe8\x03\n" +
+	"\x04List\x1a\xe5\x02\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12:\n" +
@@ -3318,22 +3336,28 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"page_token\x18\x03 \x01(\v2\x18.livekit.TokenPaginationH\x01R\tpageToken\x88\x01\x01\x123\n" +
 	"\x04from\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampH\x02R\x04from\x88\x01\x01\x12/\n" +
-	"\x02to\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\x02to\x88\x01\x01B\t\n" +
+	"\x02to\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\x02to\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"agent_name\x18\x06 \x01(\tH\x04R\tagentName\x88\x01\x01B\t\n" +
 	"\a_statusB\r\n" +
 	"\v_page_tokenB\a\n" +
 	"\x05_fromB\x05\n" +
-	"\x03_to\x1ax\n" +
+	"\x03_toB\r\n" +
+	"\v_agent_name\x1ax\n" +
 	"\bResponse\x12*\n" +
 	"\x04runs\x18\x01 \x03(\v2\x16.livekit.SimulationRunR\x04runs\x12@\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x1a\xb9\x03\n" +
-	"\x06Counts\x1a\xcb\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x1a\xec\x03\n" +
+	"\x06Counts\x1a\xfe\x01\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12.\n" +
 	"\x04from\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\x04from\x12*\n" +
 	"\x02to\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x02to\x12:\n" +
-	"\x06status\x18\x04 \x01(\x0e2\x1d.livekit.SimulationRun.StatusH\x00R\x06status\x88\x01\x01B\t\n" +
-	"\a_status\x1a\x81\x01\n" +
+	"\x06status\x18\x04 \x01(\x0e2\x1d.livekit.SimulationRun.StatusH\x00R\x06status\x88\x01\x01\x12\"\n" +
+	"\n" +
+	"agent_name\x18\x05 \x01(\tH\x01R\tagentName\x88\x01\x01B\t\n" +
+	"\a_statusB\r\n" +
+	"\v_agent_name\x1a\x81\x01\n" +
 	"\bResponse\x12>\n" +
 	"\abuckets\x18\x01 \x03(\v2$.livekit.SimulationRun.Counts.BucketR\abuckets\x125\n" +
 	"\binterval\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\binterval\x1a]\n" +
