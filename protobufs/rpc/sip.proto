@@ -18,7 +18,6 @@ package rpc;
 
 option go_package = "github.com/livekit/protocol/rpc";
 
-import "google/protobuf/empty.proto";
 import "google/protobuf/duration.proto";
 import "options.proto";
 import "livekit_sip.proto";
@@ -29,7 +28,7 @@ service SIPInternal {
   rpc CreateSIPParticipant(InternalCreateSIPParticipantRequest) returns (InternalCreateSIPParticipantResponse) {
     option (psrpc.options).topics = true;
   };
-  rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (google.protobuf.Empty) {
+  rpc TransferSIPParticipant(InternalTransferSIPParticipantRequest) returns (InternalTransferSIPParticipantResponse) {
     option (psrpc.options) = {
       topics: true
       topic_params: {
@@ -184,3 +183,11 @@ message InternalTransferSIPParticipantRequest {
   map<string, string> feature_flags = 6;
 }
 
+message InternalTransferSIPParticipantResponse {
+  string transfer_id = 1 [(logger.name) = "transferID"];
+  livekit.SIPTransferStatus status = 2;
+  livekit.SIPTransferReason reason = 3;
+
+  // Set when the outcome was reported by a SIP response.
+  livekit.SIPStatus sip_status = 4;
+}
