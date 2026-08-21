@@ -6,6 +6,7 @@ import (
 	reflect "reflect"
 	"runtime"
 	"slices"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -75,4 +76,20 @@ func TestPropagateRequestTimeout(t *testing.T) {
 	var ro psrpc.RequestOpts
 	WithPropagateRequestTimeout(ctx)(&ro)
 	require.InEpsilon(t, 42*time.Second, ro.Timeout, 0.01)
+}
+
+func TestServerSkipClaim(t *testing.T) {
+	t.Cleanup(func() { serverSkipClaim.Store(nil) })
+
+	require.False(t, serverSkipClaimEnabled(), "unset must mean claim")
+
+	var on atomic.Bool
+	SetServerSkipClaim(on.Load)
+	require.False(t, serverSkipClaimEnabled())
+
+	on.Store(true)
+	require.True(t, serverSkipClaimEnabled(), "must be read per call, not captured")
+
+	on.Store(false)
+	require.False(t, serverSkipClaimEnabled(), "must stay revocable")
 }
