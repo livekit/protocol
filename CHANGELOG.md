@@ -1,5 +1,33 @@
 # github.com/livekit/protocol
 
+## 1.51.0
+
+### Minor Changes
+
+- egress v2: add `passthrough` to the `encoding` oneof on `StartEgressRequest` and `ExportReplayRequest`; remove the unused `EgressHandler.UpdateEgress` RPC and the `livekit.UpdateEgressRequest` message - [#1716](https://github.com/livekit/protocol/pull/1716) ([@frostbyte73](https://github.com/frostbyte73))
+
+- `TransferSIPParticipant` now returns `TransferSIPParticipantResponse` instead of `google.protobuf.Empty`, carrying the transfer id, status, a new `SIPTransferReason` and the SIP status when the outcome came from a SIP response. `SIPTransferInfo` gains the same `reason`. This changes the generated method signature: a transfer that reports a non-successful status without an error means the transfer did not complete. - [#1730](https://github.com/livekit/protocol/pull/1730) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Moved egress passthrough option to an encoding preset. - [#1718](https://github.com/livekit/protocol/pull/1718) ([@frostbyte73](https://github.com/frostbyte73))
+
+### Patch Changes
+
+- Add `agent_job_started` / `agent_job_ended` webhook events and a `job` field on `WebhookEvent` - [#1711](https://github.com/livekit/protocol/pull/1711) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add an `error_code` label to the `livekit_psrpc_error_total` metric. - [#1699](https://github.com/livekit/protocol/pull/1699) ([@paulwe](https://github.com/paulwe))
+
+- Add realtime (speech-to-speech) reporter methods to gatewayobs, regenerated from cloud-observability schema/gateway.yaml realtime billing columns (#502). - [#1663](https://github.com/livekit/protocol/pull/1663) ([@russellmartin-livekit](https://github.com/russellmartin-livekit))
+
+- Add `to_user_override` to `CreateSIPParticipantRequest` to override the user part of the `To` header, and warn when `To`/`Via` are set in the SIP headers map. - [#1717](https://github.com/livekit/protocol/pull/1717) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Remove extraneous format specifier from log string. - [#1682](https://github.com/livekit/protocol/pull/1682) ([@alexfish8](https://github.com/alexfish8))
+
+- Move the config observer into utils/configutil and drop the stuttering Config prefix. utils.ConfigObserver, utils.ConfigBuilder, utils.ConfigDefaulter and utils.NewConfigObserver remain as aliases. - [#1712](https://github.com/livekit/protocol/pull/1712) ([@paulwe](https://github.com/paulwe))
+
+- Track holder goroutines of stuck locks (all RWMutex readers up to 8) and resolve their current stacks - [#1701](https://github.com/livekit/protocol/pull/1701) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add data track subscription to sync state - [#1703](https://github.com/livekit/protocol/pull/1703) ([@boks1971](https://github.com/boks1971))
+
 ## 1.50.4
 
 ### Patch Changes
