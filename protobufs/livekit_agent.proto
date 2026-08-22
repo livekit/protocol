@@ -78,6 +78,10 @@ message ServerMessage {
     JobAssignment assignment = 3;
     JobTermination termination = 5;
     WorkerPong pong = 4;
+
+    // the server is draining this control connection: re-register elsewhere,
+    // in-flight agent HTTP streams run to completion
+    AgentHttp.GoAway go_away = 6;
   }
 }
 
@@ -115,20 +119,31 @@ message WorkerPong {
 }
 
 message RegisterWorkerRequest {
+  reserved 2, 4; // worker_id, name (retired)
   JobType type = 1;
   string agent_name = 8;
-  // string worker_id = 2;
   string version = 3;
-  // string name = 4 [deprecated = true];
   uint32 ping_interval = 5;
   optional string namespace = 6;
   ParticipantPermission allowed_permissions = 7;
   string deployment = 9;
+
+  // HTTP endpoints this worker serves through the data plane, in route order.
+  // Empty means the worker exposes no endpoints and needs no data connections.
+  repeated AgentHttp.AgentEndpoint endpoints = 10;
+  // random per process; a re-registration with a new instance_id supersedes the
+  // previous epoch and closes its remaining connections
+  string instance_id = 11 [(logger.name) = "instanceID"];
+  // highest data-plane protocol version the worker supports; 0 = unsupported
+  uint32 endpoint_protocol = 12;
 }
 
 message RegisterWorkerResponse {
+  reserved 2;
   string worker_id = 1 [(logger.name) = "workerID"];
   ServerInfo server_info = 3;
+  // present iff the registration carried endpoints and the server supports the data plane
+  AgentHttp.AgentEndpointSettings endpoint_settings = 4;
 }
 
 message MigrateJobRequest {
@@ -168,10 +183,16 @@ message UpdateJobStatus {
 }
 
 message UpdateWorkerStatus {
+  reserved 2; // metadata (retired)
   optional WorkerStatus status = 1;
-  // optional string metadata = 2 [deprecated=true];
   float load = 3;
   uint32 job_count = 4;
+
+  // worker wants no new streams; existing streams run to completion
+  bool draining = 5;
+  // monotonic per registration; status updates may interleave across connections
+  // and a stale report must not regress newer state
+  uint64 seq = 6;
 }
 
 message JobAssignment {
@@ -182,4 +203,134 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1 [(logger.name) = "jobID"];
+}
+
+// ----- agent HTTP endpoints data plane -----
+//
+// AgentHttp namespaces the data plane: workers expose HTTP endpoints served at
+// /agents/{deployment}/{path} without binding any local listener. The worker
+// dials a fixed pool of websocket wires; the server opens multiplexed streams
+// over them and each stream carries one opaque HTTP/1.1 exchange, bridged into
+// the worker's application in-process. Wires speak AgentHttp.Frame exclusively
+// (one frame per websocket binary message); the control connection (the
+// existing /agent registration socket) carries the manifest, load and drain
+// state, never frames. Frame envelope adapted from livekit/protocol#1725.
+message AgentHttp {
+  enum AgentEndpointKind {
+    AEK_HTTP = 0;
+    // reserved for future text-mode endpoints
+    AEK_TEXT = 1;
+  }
+
+  message AgentEndpoint {
+    // starlette-style path template rooted at '/': {name} (one segment, default),
+    // {name:int}, {name:float}, {name:uuid} (constrained single segments),
+    // {name:path} (multi-segment). Custom converters are rejected.
+    string path = 1;
+    // uppercase, exactly as the application routes them (FastAPI does not imply
+    // HEAD from GET)
+    repeated string methods = 2;
+    AgentEndpointKind kind = 3;
+    // reachable without a project token
+    bool public = 4;
+  }
+
+  // registration-level settings negotiated on the control connection, returned
+  // in RegisterWorkerResponse. Wire-level parameters (credit windows, frame
+  // size, stream caps) are set per wire by the node adopting it, in
+  // AttachDataConnectionResponse.
+  message AgentEndpointSettings {
+    // negotiated data-plane protocol version
+    uint32 protocol = 1;
+    // one token per registration, bound to (worker_id, instance_id); reused for
+    // all wires and across redials, expires with the epoch
+    string attach_token = 2;
+    // fixed wire pool size the worker must dial
+    uint32 data_connection_count = 3;
+  }
+
+  // first frame on a wire (stream_id 0), sent by the worker after the upgrade.
+  // Wires may land on any node behind a load balancer, so they self-identify;
+  // the adopting node validates against the registration wherever it lives.
+  message AttachDataConnection {
+    string worker_id = 1 [(logger.name) = "workerID"];
+    string instance_id = 2 [(logger.name) = "instanceID"];
+    string attach_token = 3;
+  }
+
+  // the adopting node's answer (stream_id 0); its wire parameters govern this
+  // wire only
+  message AttachDataConnectionResponse {
+    // empty means attached; otherwise the reason the attach was rejected and the
+    // wire will be closed
+    string error = 1;
+    // per-stream credit window in bytes
+    uint32 credit_window = 2;
+    // shared connection-level window in bytes, refilled by credit on stream 0
+    uint32 connection_window = 3;
+    // max Frame.data payload bytes per frame
+    uint32 max_frame_size = 4;
+    // hard cap on open streams on this wire (active + parked)
+    uint32 max_streams_per_conn = 5;
+  }
+
+  enum HttpStreamResetCode {
+    HSR_INTERNAL = 0;
+    HSR_CANCEL = 1;
+    // the worker refused the stream before dispatching it to the application;
+    // the request was never applied and is safe to retry elsewhere
+    HSR_REFUSED = 2;
+    HSR_PROTOCOL = 3;
+  }
+
+  // opens a stream carrying what the bytes themselves do not say
+  message HttpStreamOpen {
+    string request_id = 1 [(logger.name) = "requestID"];
+    // remote address of the end client, informational
+    string client_addr = 2;
+    // reserved for forward-compatible request metadata
+    map<string, string> attributes = 3;
+  }
+
+  // half-close: the sender is done writing but keeps reading
+  message HttpStreamEof {
+  }
+
+  message HttpStreamReset {
+    HttpStreamResetCode code = 1;
+    string error = 2;
+  }
+
+  // One multiplexed frame, carried as a single websocket binary message.
+  // Receivers MUST ignore frames for unknown stream ids: a reset can cross in
+  // flight with data already queued behind it, and ids are never reused within
+  // a wire.
+  message Frame {
+    // the stream this frame addresses. 0 is the wire itself: the attach
+    // handshake rides it, and credit on it refills the shared connection
+    // window. The node opens streams and takes odd ids; even ids are reserved
+    // for worker-opened streams.
+    uint32 stream_id = 1 [(logger.name) = "streamID"];
+
+    oneof message {
+      AttachDataConnection attach = 2;
+      AttachDataConnectionResponse attach_response = 3;
+      HttpStreamOpen open = 4;
+      // opaque HTTP/1.1 bytes: bare so the hot path costs one parse and no
+      // nested message
+      bytes data = 5;
+      HttpStreamEof eof = 6;
+      HttpStreamReset reset = 7;
+      // the sender may put this many more bytes in flight (stream 0: on the
+      // whole wire; otherwise: on this stream). Replenished on consumption,
+      // not receipt.
+      uint32 credit = 8;
+    }
+  }
+
+  // the server is draining: the worker should re-register elsewhere; existing
+  // streams run to completion
+  message GoAway {
+    string reason = 1;
+  }
 }
