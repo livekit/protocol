@@ -188,18 +188,18 @@ type AgentHttp_AgentEndpointKind int32
 const (
 	AgentHttp_AEK_HTTP AgentHttp_AgentEndpointKind = 0
 	// reserved for future text-mode endpoints
-	AgentHttp_AEK_TEXT AgentHttp_AgentEndpointKind = 2
+	AgentHttp_AEK_TEXT AgentHttp_AgentEndpointKind = 1
 )
 
 // Enum value maps for AgentHttp_AgentEndpointKind.
 var (
 	AgentHttp_AgentEndpointKind_name = map[int32]string{
 		0: "AEK_HTTP",
-		2: "AEK_TEXT",
+		1: "AEK_TEXT",
 	}
 	AgentHttp_AgentEndpointKind_value = map[string]int32{
 		"AEK_HTTP": 0,
-		"AEK_TEXT": 2,
+		"AEK_TEXT": 1,
 	}
 )
 
@@ -2475,7 +2475,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"1\n" +
 	"\x0eJobTermination\x12\x1f\n" +
-	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xf7\f\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xf1\f\n" +
 	"\tAgentHttp\x1a\x8f\x01\n" +
 	"\rAgentEndpoint\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x18\n" +
@@ -2524,10 +2524,10 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x06credit\x18\b \x01(\rH\x00R\x06creditB\t\n" +
 	"\amessage\x1a \n" +
 	"\x06GoAway\x12\x16\n" +
-	"\x06reason\x18\x01 \x01(\tR\x06reason\"5\n" +
+	"\x06reason\x18\x01 \x01(\tR\x06reason\"/\n" +
 	"\x11AgentEndpointKind\x12\f\n" +
 	"\bAEK_HTTP\x10\x00\x12\f\n" +
-	"\bAEK_TEXT\x10\x02\"\x04\b\x01\x10\x01\"Z\n" +
+	"\bAEK_TEXT\x10\x01\"Z\n" +
 	"\x13HttpStreamResetCode\x12\x10\n" +
 	"\fHSR_INTERNAL\x10\x00\x12\x0e\n" +
 	"\n" +

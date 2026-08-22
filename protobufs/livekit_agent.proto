@@ -218,9 +218,8 @@ message JobTermination {
 message AgentHttp {
   enum AgentEndpointKind {
     AEK_HTTP = 0;
-    reserved 1; // client WebSocket routes are not supported
     // reserved for future text-mode endpoints
-    AEK_TEXT = 2;
+    AEK_TEXT = 1;
   }
 
   message AgentEndpoint {
