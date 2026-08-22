@@ -32,38 +32,27 @@ import (
 	"github.com/livekit/protocol/utils/must"
 )
 
-// Proto returns a zapcore.ObjectMarshaler that redacts every field whose
-// (logger.sensitivity) is at or above SENSITIVITY_PII. Use in routine
-// application and debug logs.
+// Proto returns a zapcore.ObjectMarshaler that records each field annotated
+// with a (logger.sensitivity) under that sensitivity, and redacts it when the
+// sink cannot record that level. SECRET is never recordable.
 func Proto(val proto.Message) zapcore.ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
-	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_UNSPECIFIED}
-}
-
-// UnredactedProto returns a zapcore.ObjectMarshaler that exposes PII-tier
-// fields while still redacting SECRET-tier fields (credentials, tokens, API
-// keys). Use only in observability events where operator context legitimately
-// requires user-identifying data.
-func UnredactedProto(val proto.Message) zapcore.ObjectMarshaler {
-	if val == nil {
-		return nil
-	}
-	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_PII}
+	return protoMarshaller{m: val.ProtoReflect()}
 }
 
 // ProtoWithLimit behaves like Proto, but when the message's wire size exceeds
 // maxBytes it logs a compact summary instead of the full contents: message
-// type, wire size, and top-level scalar fields (redacted per sensitivity,
-// long strings truncated), with repeated/map fields reduced to counts and
-// nested messages dropped. Use for messages of unbounded size, such as RPC
-// payloads.
+// type, wire size, and top-level scalar fields (tagged or redacted per
+// sensitivity, long strings truncated), with repeated/map fields reduced to
+// counts and nested messages dropped. Use for messages of unbounded size, such
+// as RPC payloads.
 func ProtoWithLimit(val proto.Message, maxBytes int) zapcore.ObjectMarshaler {
 	if val == nil {
 		return nil
 	}
-	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_UNSPECIFIED, maxSize: maxBytes}
+	return protoMarshaller{m: val.ProtoReflect(), maxSize: maxBytes}
 }
 
 var _ zapcore.ObjectMarshaler = protoMarshaller{}
@@ -71,8 +60,7 @@ var _ zapcore.ObjectMarshaler = protoMapMarshaller{}
 var _ zapcore.ArrayMarshaler = protoListMarshaller{}
 
 type protoMarshaller struct {
-	m        protoreflect.Message
-	maxLevel logger.Sensitivity
+	m protoreflect.Message
 	// maxSize is the wire size in bytes above which the message is logged as
 	// a summary instead of its full contents. 0 means no limit.
 	maxSize int
@@ -102,21 +90,32 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 			continue
 		}
 
-		if fieldSensitivity(f) > p.maxLevel {
-			e.AddString(k, marshalRedacted(f, v))
-			continue
+		// Never assign to e: sibling fields must not inherit this field's
+		// level. enc records this field, and everything nested under it, at
+		// the level the field declares.
+		enc := e
+		if level := fieldSensitivity(f); level > SensitivityNone {
+			se := ObjectEncoderFor(e, level)
+			if se == nil {
+				e.AddString(k, marshalRedacted(f, v))
+				continue
+			}
+			enc = se
 		}
 
+		// Sensitivity is not re-checked for map values or list elements: proto
+		// cannot annotate them independently of the containing field, so the
+		// check above is complete.
 		if f.IsMap() {
 			if m := v.Map(); m.IsValid() {
-				e.AddObject(k, protoMapMarshaller{f: f, m: m, maxLevel: p.maxLevel})
+				enc.AddObject(k, protoMapMarshaller{f: f, m: m})
 			}
 		} else if f.IsList() {
 			if m := v.List(); m.IsValid() {
-				e.AddArray(k, protoListMarshaller{f: f, m: m, maxLevel: p.maxLevel})
+				enc.AddArray(k, protoListMarshaller{f: f, m: m})
 			}
 		} else {
-			marshalProtoField(k, f, v, e, p.maxLevel)
+			marshalProtoField(k, f, v, enc)
 		}
 	}
 	return nil
@@ -140,18 +139,35 @@ func (p protoMarshaller) marshalSummary(e zapcore.ObjectEncoder, size int) error
 		if proto.HasExtension(f.Options(), logger.E_Name) {
 			k = proto.GetExtension(f.Options(), logger.E_Name).(string)
 		}
+		// These disclose no field contents, so they precede the sensitivity
+		// decision and stay untagged. Moving the decision above them would
+		// replace a count with a redaction.
 		switch {
 		case f.IsMap():
 			e.AddInt(k+"Count", v.Map().Len())
+			continue
 		case f.IsList():
 			e.AddInt(k+"Count", v.List().Len())
+			continue
 		case f.Kind() == protoreflect.MessageKind, f.Kind() == protoreflect.GroupKind:
-		case fieldSensitivity(f) > p.maxLevel:
-			e.AddString(k, marshalRedacted(f, v))
-		case f.Kind() == protoreflect.StringKind:
-			e.AddString(k, marshalTruncatedString(v.String()))
-		default:
-			marshalProtoField(k, f, v, e, p.maxLevel)
+			continue
+		}
+
+		enc := e
+		if level := fieldSensitivity(f); level > SensitivityNone {
+			se := ObjectEncoderFor(e, level)
+			if se == nil {
+				e.AddString(k, marshalRedacted(f, v))
+				continue
+			}
+			enc = se
+		}
+
+		// Summaries stay bounded even for values the sink may record.
+		if f.Kind() == protoreflect.StringKind {
+			enc.AddString(k, marshalTruncatedString(v.String()))
+		} else {
+			marshalProtoField(k, f, v, enc)
 		}
 	}
 	return nil
@@ -165,9 +181,8 @@ func marshalTruncatedString(s string) string {
 }
 
 type protoMapMarshaller struct {
-	f        protoreflect.FieldDescriptor
-	m        protoreflect.Map
-	maxLevel logger.Sensitivity
+	f protoreflect.FieldDescriptor
+	m protoreflect.Map
 }
 
 func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
@@ -183,16 +198,15 @@ func (p protoMapMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		case protoreflect.StringKind:
 			k = ki.String()
 		}
-		marshalProtoField(k, p.f.MapValue(), vi, e, p.maxLevel)
+		marshalProtoField(k, p.f.MapValue(), vi, e)
 		return true
 	})
 	return nil
 }
 
 type protoListMarshaller struct {
-	f        protoreflect.FieldDescriptor
-	m        protoreflect.List
-	maxLevel logger.Sensitivity
+	f protoreflect.FieldDescriptor
+	m protoreflect.List
 }
 
 func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
@@ -214,13 +228,13 @@ func (p protoListMarshaller) MarshalLogArray(e zapcore.ArrayEncoder) error {
 		case protoreflect.BytesKind:
 			e.AppendString(marshalProtoBytes(v.Bytes()))
 		case protoreflect.MessageKind:
-			e.AppendObject(protoMarshaller{m: v.Message(), maxLevel: p.maxLevel})
+			e.AppendObject(protoMarshaller{m: v.Message()})
 		}
 	}
 	return nil
 }
 
-func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder, maxLevel logger.Sensitivity) {
+func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.Value, e zapcore.ObjectEncoder) {
 	switch f.Kind() {
 	case protoreflect.BoolKind:
 		e.AddBool(k, v.Bool())
@@ -237,7 +251,7 @@ func marshalProtoField(k string, f protoreflect.FieldDescriptor, v protoreflect.
 	case protoreflect.BytesKind:
 		e.AddString(k, marshalProtoBytes(v.Bytes()))
 	case protoreflect.MessageKind:
-		e.AddObject(k, protoMarshaller{m: v.Message(), maxLevel: maxLevel})
+		e.AddObject(k, protoMarshaller{m: v.Message()})
 	}
 }
 
