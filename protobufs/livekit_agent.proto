@@ -218,9 +218,7 @@ message JobTermination {
 message AgentHttp {
   enum AgentEndpointKind {
     AEK_HTTP = 0;
-    // a client-initiated WebSocket route; the stream carries the upgrade exchange
-    // and then raw bidirectional bytes
-    AEK_WEBSOCKET = 1;
+    reserved 1; // client WebSocket routes are not supported
     // reserved for future text-mode endpoints
     AEK_TEXT = 2;
   }
@@ -231,7 +229,7 @@ message AgentHttp {
     // {name:path} (multi-segment). Custom converters are rejected.
     string path = 1;
     // uppercase, exactly as the application routes them (FastAPI does not imply
-    // HEAD from GET); empty for AEK_WEBSOCKET
+    // HEAD from GET)
     repeated string methods = 2;
     AgentEndpointKind kind = 3;
     // reachable without a project token
