@@ -25,31 +25,27 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
+      # Pinned exactly, not floated: protoc stamps its version into every generated
+      # file, so a release bump rewrites the committed output. Moving this is a
+      # deliberate edit whose header churn is reviewable on its own.
       - name: Install Protoc
         uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0
         with:
-          version: "35.x"
+          version: "35.1"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
-          go-version: ">=1.26"
+          go-version-file: "go.mod"
 
-      - name: Go mod tidy
-        run: go mod tidy
+      - name: Download Go modules
+        run: go mod download
 
-      - name: Install generators
-        uses: magefile/mage-action@a662bd8c29d8106879588cfff83b2faf6e6f59db # v4.0.0
-        with:
-          version: latest
-          install-only: true
-
-      - name: Bootstrap
-        run: mage bootstrap
-
+      # The protoc plugins and mage itself come from the tool directives in go.mod, so
+      # generation runs the versions pinned there instead of whatever is latest today.
       - name: Generate Protobuf
-        run: mage proto
+        run: go tool mage proto
 
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
