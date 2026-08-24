@@ -180,3 +180,25 @@ func ParticipantKindCode(k livekit.ParticipantInfo_Kind) int32 {
 func ParticipantKindDetailsCodes(d []livekit.ParticipantInfo_KindDetail) []int32 {
 	return *(*[]int32)(unsafe.Pointer(&d))
 }
+
+func GetFeatureNameFromFeature(info *livekit.FeatureUsageInfo) string {
+	if info == nil {
+		return ""
+	}
+	switch info.GetFeature() {
+	case livekit.FeatureUsageInfo_KRISP_NOISE_CANCELLATION:
+		return "krisp_noise_cancellation"
+	case livekit.FeatureUsageInfo_KRISP_BACKGROUND_VOICE_CANCELLATION:
+		return "krisp_background_voice_cancellation"
+	case livekit.FeatureUsageInfo_AIC_AUDIO_ENHANCEMENT:
+		// if the feature is aic_audio_enhancement, we need to return the id of the feature
+		for k, v := range info.GetFeatureInfo() {
+			return fmt.Sprintf("%s_%s", k, v)
+		}
+		return "aic_audio_enhancement"
+	case livekit.FeatureUsageInfo_KRISP_VIVA:
+		return "krisp_viva"
+	default:
+		return "unknown"
+	}
+}
