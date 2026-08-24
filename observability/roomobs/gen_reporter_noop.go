@@ -50,6 +50,8 @@ func NewNoopProjectReporter() ProjectReporter {
 func (r *noopProjectReporter) RegisterFunc(f func(ts time.Time, tx ProjectTx) bool) {}
 func (r *noopProjectReporter) Tx(f func(ProjectTx))                                 {}
 func (r *noopProjectReporter) TxAt(ts time.Time, f func(ProjectTx))                 {}
+func (r *noopProjectReporter) ReportFeatureName(v string)                           {}
+func (r *noopProjectReporter) ReportFeatureDuration(v uint64)                       {}
 func (r *noopProjectReporter) WithRoom(name string) RoomReporter {
 	return &noopRoomReporter{}
 }
@@ -58,6 +60,9 @@ func (r *noopProjectReporter) WithDeferredRoom() (RoomReporter, KeyResolver) {
 }
 
 type noopProjectTx struct{}
+
+func (t *noopProjectTx) ReportFeatureName(v string)     {}
+func (t *noopProjectTx) ReportFeatureDuration(v uint64) {}
 
 type noopRoomReporter struct{}
 
