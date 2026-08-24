@@ -100,12 +100,8 @@ func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
 
 var serverSkipClaim atomic.Pointer[func() bool]
 
-// SetServerSkipClaim gates the claim handshake for every server built through
-// WithServerObservability, which is the only seam every server constructor
-// shares -- several take no config to read the setting from. Process-wide
-// because the claim is a transport policy, not a per-service one. Consulted per
-// request, so this may be called before or after the servers exist, and the
-// setting stays revocable at runtime.
+// SetServerSkipClaim gates the claim skip for every server built through
+// WithServerObservability. Process-wide; read per request, so revocable at runtime.
 func SetServerSkipClaim(enabled func() bool) {
 	serverSkipClaim.Store(&enabled)
 }
@@ -123,8 +119,7 @@ func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
 		psrpc.WithServerObserver(PSRPCMetricsObserver{}),
 		WithServerLogger(logger),
 		otelpsrpc.ServerOptions(otelpsrpc.Config{}),
-		// Rides along here rather than in WithDefaultServerOptions so it also
-		// reaches the servers that only take a logger.
+		// here rather than WithDefaultServerOptions so logger-only servers get it too
 		psrpc.WithServerSkipClaim(serverSkipClaimEnabled),
 	)
 }
