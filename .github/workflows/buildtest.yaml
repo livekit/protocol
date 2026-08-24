@@ -81,6 +81,9 @@ jobs:
   # `from` cost python-sdks a red mypy gate days later, on an unrelated PR.
   proto-lint:
     runs-on: ubuntu-latest
+    # setup-protoc uses the token only to raise its release-download rate limit.
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
