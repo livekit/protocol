@@ -26,18 +26,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/go/bin
-            ~/.cache
-          key: livekit-protocol
 
       - name: Set up Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: "go.mod"
+          # setup-go's own cache restores on an exact key only, so any go.sum
+          # change is a full cold build. Restored below instead.
+          cache: false
+
+      # The run_id suffix never pre-exists, so a push always writes a fresh
+      # entry rather than one frozen at the go.sum that first created it.
+      - name: Restore Go caches
+        id: go-cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: go-${{ runner.os }}-${{ hashFiles('go.sum') }}-${{ github.run_id }}
+          restore-keys: |
+            go-${{ runner.os }}-${{ hashFiles('go.sum') }}-
+            go-${{ runner.os }}-
 
       - name: Set up gotestfmt
         run: go install github.com/gotesttools/gotestfmt/v2/cmd/gotestfmt@9eae5abc81d6d08f73268741ef4a8b97f29b60d8 # v2.4.1
@@ -54,3 +64,14 @@ jobs:
         run: |
           set -euo pipefail
           MallocNanoZone=0 go test -race -json -v ./... 2>&1 | gotestfmt
+
+      # Only main writes. Pull requests read main's entry, which keeps ~1 GB
+      # per PR run out of the repo's 10 GB cache budget.
+      - name: Save Go caches
+        if: github.event_name == 'push'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.cache/go-build
+            ~/go/pkg/mod
+          key: ${{ steps.go-cache.outputs.cache-primary-key }}
