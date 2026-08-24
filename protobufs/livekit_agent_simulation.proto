@@ -267,11 +267,11 @@ message SimulationRun {
       string project_id = 1;
       optional Status status = 2;
       optional TokenPagination page_token = 3;
-      // Half-open window [from, to) on created_at, the leading key of this
-      // list's keyset. Unset bounds mean no window, so existing callers keep
-      // their unbounded scan; the histogram's selected range sets both.
-      optional google.protobuf.Timestamp from = 4;
-      optional google.protobuf.Timestamp to = 5;
+      // Half-open window [start_time, end_time) on created_at, the leading key
+      // of this list's keyset. Unset bounds mean no window, so existing callers
+      // keep their unbounded scan; the histogram's selected range sets both.
+      optional google.protobuf.Timestamp start_time = 4;
+      optional google.protobuf.Timestamp end_time = 5;
       // Exact agent name. Unset means every agent — including the runs whose
       // name is empty, which a bare string could not tell from no filter.
       optional string agent_name = 6;
@@ -289,8 +289,8 @@ message SimulationRun {
       string project_id = 1;
       // Both bounds required: a bucketed scan of a project's whole history is
       // never what a caller wants.
-      google.protobuf.Timestamp from = 2;
-      google.protobuf.Timestamp to = 3;
+      google.protobuf.Timestamp start_time = 2;
+      google.protobuf.Timestamp end_time = 3;
       // Applied as `List` applies it: a filter the rows honour and the bars
       // above them drop would make the histogram an answer about a wider set.
       optional Status status = 4;
