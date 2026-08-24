@@ -3,6 +3,7 @@ package roomobs
 import (
 	"fmt"
 	"strings"
+	"time"
 	"unsafe"
 
 	"github.com/livekit/protocol/livekit"
@@ -181,6 +182,9 @@ func ParticipantKindDetailsCodes(d []livekit.ParticipantInfo_KindDetail) []int32
 	return *(*[]int32)(unsafe.Pointer(&d))
 }
 
+// GetFeatureNameFromFeature returns the canonical name used to identify a
+// feature usage in the feature_usages rollup. It returns "" when info is nil or
+// the feature is not recognized, so callers can skip reporting.
 func GetFeatureNameFromFeature(info *livekit.FeatureUsageInfo) string {
 	if info == nil {
 		return ""
@@ -190,15 +194,31 @@ func GetFeatureNameFromFeature(info *livekit.FeatureUsageInfo) string {
 		return "krisp_noise_cancellation"
 	case livekit.FeatureUsageInfo_KRISP_BACKGROUND_VOICE_CANCELLATION:
 		return "krisp_background_voice_cancellation"
+	case livekit.FeatureUsageInfo_KRISP_VIVA:
+		return "krisp_viva"
 	case livekit.FeatureUsageInfo_AIC_AUDIO_ENHANCEMENT:
-		// if the feature is aic_audio_enhancement, we need to return the id of the feature
+		// AIC enhancement is keyed by the specific feature metadata (<key>_<value>).
 		for k, v := range info.GetFeatureInfo() {
 			return fmt.Sprintf("%s_%s", k, v)
 		}
 		return "aic_audio_enhancement"
-	case livekit.FeatureUsageInfo_KRISP_VIVA:
-		return "krisp_viva"
 	default:
-		return "unknown"
+		return ""
 	}
+}
+
+// GetFeatureDurationFromFeature returns the total active duration of a feature
+// usage, summed across its (non-negative) time ranges.
+func GetFeatureDurationFromFeature(info *livekit.FeatureUsageInfo) time.Duration {
+	if info == nil {
+		return 0
+	}
+	var d time.Duration
+	for _, tr := range info.GetTimeRanges() {
+		start, end := tr.GetStartedAt().AsTime(), tr.GetEndedAt().AsTime()
+		if end.After(start) {
+			d += end.Sub(start)
+		}
+	}
+	return d
 }
