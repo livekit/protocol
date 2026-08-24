@@ -98,16 +98,16 @@ func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
 	return p.Bus, psrpc.WithClientOptions(p.Options()...)
 }
 
-var serverSkipClaim atomic.Pointer[func() bool]
+var psrpcServerSkipClaim atomic.Pointer[func() bool]
 
-// SetServerSkipClaim gates the claim skip for every server built through
+// SetPSRPCServerSkipClaim gates the claim skip for every server built through
 // WithServerObservability. Process-wide; read per request, so revocable at runtime.
-func SetServerSkipClaim(enabled func() bool) {
-	serverSkipClaim.Store(&enabled)
+func SetPSRPCServerSkipClaim(enabled func() bool) {
+	psrpcServerSkipClaim.Store(&enabled)
 }
 
-func serverSkipClaimEnabled() bool {
-	if enabled := serverSkipClaim.Load(); enabled != nil {
+func psrpcServerSkipClaimEnabled() bool {
+	if enabled := psrpcServerSkipClaim.Load(); enabled != nil {
 		return (*enabled)()
 	}
 	return false
@@ -120,7 +120,7 @@ func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
 		WithServerLogger(logger),
 		otelpsrpc.ServerOptions(otelpsrpc.Config{}),
 		// here rather than WithDefaultServerOptions so logger-only servers get it too
-		psrpc.WithServerSkipClaim(serverSkipClaimEnabled),
+		psrpc.WithServerSkipClaim(psrpcServerSkipClaimEnabled),
 	)
 }
 

@@ -79,17 +79,17 @@ func TestPropagateRequestTimeout(t *testing.T) {
 }
 
 func TestServerSkipClaim(t *testing.T) {
-	t.Cleanup(func() { serverSkipClaim.Store(nil) })
+	t.Cleanup(func() { psrpcServerSkipClaim.Store(nil) })
 
-	require.False(t, serverSkipClaimEnabled(), "unset must mean claim")
+	require.False(t, psrpcServerSkipClaimEnabled(), "unset must mean claim")
 
 	var on atomic.Bool
-	SetServerSkipClaim(on.Load)
-	require.False(t, serverSkipClaimEnabled())
+	SetPSRPCServerSkipClaim(on.Load)
+	require.False(t, psrpcServerSkipClaimEnabled())
 
 	on.Store(true)
-	require.True(t, serverSkipClaimEnabled(), "must be read per call, not captured")
+	require.True(t, psrpcServerSkipClaimEnabled(), "must be read per call, not captured")
 
 	on.Store(false)
-	require.False(t, serverSkipClaimEnabled(), "must stay revocable")
+	require.False(t, psrpcServerSkipClaimEnabled(), "must stay revocable")
 }
