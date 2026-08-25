@@ -210,6 +210,10 @@ message SimulationRun {
     JobMetrics.LLM llm = 5;
     JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
+
+    // Means over the jobs that report them.
+    optional float conciseness = 8;
+    optional float conversation_progression = 9;
   }
 
   message Create {
