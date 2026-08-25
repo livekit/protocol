@@ -19,6 +19,9 @@ on:
   push:
     branches-ignore: [main]
 
+permissions:
+  contents: write # Required to commit the regenerated output
+
 jobs:
   generate:
     runs-on: ubuntu-latest
