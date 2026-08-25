@@ -1076,8 +1076,11 @@ type SimulationRun_RunMetrics struct {
 	Llm              *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
 	Tts              *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
 	Conversation     *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Means over the jobs that report them.
+	Conciseness             *float32 `protobuf:"fixed32,8,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"`
+	ConversationProgression *float32 `protobuf:"fixed32,9,opt,name=conversation_progression,json=conversationProgression,proto3,oneof" json:"conversation_progression,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *SimulationRun_RunMetrics) Reset() {
@@ -1157,6 +1160,20 @@ func (x *SimulationRun_RunMetrics) GetConversation() *SimulationRun_JobMetrics_C
 		return x.Conversation
 	}
 	return nil
+}
+
+func (x *SimulationRun_RunMetrics) GetConciseness() float32 {
+	if x != nil && x.Conciseness != nil {
+		return *x.Conciseness
+	}
+	return 0
+}
+
+func (x *SimulationRun_RunMetrics) GetConversationProgression() float32 {
+	if x != nil && x.ConversationProgression != nil {
+		return *x.ConversationProgression
+	}
+	return 0
 }
 
 type SimulationRun_Create struct {
@@ -3089,7 +3106,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xe5G\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xf9H\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3309,7 +3326,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11_information_lossB\x17\n" +
 	"\x15_redundant_statementsB\x18\n" +
 	"\x16_poor_question_qualityB\x1b\n" +
-	"\x19_conversation_progression\x1a\xd9\x03\n" +
+	"\x19_conversation_progression\x1a\xed\x04\n" +
 	"\n" +
 	"RunMetrics\x12*\n" +
 	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
@@ -3318,10 +3335,14 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03stt\x18\x04 \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
 	"\x03llm\x18\x05 \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
 	"\x03tts\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
-	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversationB\x11\n" +
+	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversation\x12%\n" +
+	"\vconciseness\x18\b \x01(\x02H\x03R\vconciseness\x88\x01\x01\x12>\n" +
+	"\x18conversation_progression\x18\t \x01(\x02H\x04R\x17conversationProgression\x88\x01\x01B\x11\n" +
 	"\x0f_accuracy_scoreB\x13\n" +
 	"\x11_experience_scoreB\x15\n" +
-	"\x13_scenario_pass_rate\x1a\xf7\x04\n" +
+	"\x13_scenario_pass_rateB\x0e\n" +
+	"\f_concisenessB\x1b\n" +
+	"\x19_conversation_progression\x1a\xf7\x04\n" +
 	"\x06Create\x1a\xde\x03\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
