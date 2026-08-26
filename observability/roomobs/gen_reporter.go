@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_HCR54L8 = true
+const Version_5CO3ESG = true
 
 type KeyResolver interface {
 	Resolve(string)
@@ -19,6 +19,8 @@ type Reporter interface {
 }
 
 type projectReporter interface {
+	ReportFeatureName(v string)
+	ReportFeatureDuration(v uint64)
 }
 
 type ProjectTx interface {
