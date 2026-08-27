@@ -173,6 +173,7 @@ func (r *noopModelReporter) ReportRealtimeOutputTextTokens(v uint64)            
 func (r *noopModelReporter) ReportRealtimeOutputAudioTokens(v uint64)             {}
 func (r *noopModelReporter) ReportRealtimeCachedTextTokens(v uint64)              {}
 func (r *noopModelReporter) ReportRealtimeCachedAudioTokens(v uint64)             {}
+func (r *noopModelReporter) ReportRealtimeCachedImageTokens(v uint64)             {}
 func (r *noopModelReporter) ReportRealtimeTextInputMessages(v uint64)             {}
 func (r *noopModelReporter) ReportSttDuration(v uint32)                           {}
 func (r *noopModelReporter) ReportTtsChars(v uint32)                              {}
@@ -203,6 +204,7 @@ func (t *noopModelTx) ReportRealtimeOutputTextTokens(v uint64)              {}
 func (t *noopModelTx) ReportRealtimeOutputAudioTokens(v uint64)             {}
 func (t *noopModelTx) ReportRealtimeCachedTextTokens(v uint64)              {}
 func (t *noopModelTx) ReportRealtimeCachedAudioTokens(v uint64)             {}
+func (t *noopModelTx) ReportRealtimeCachedImageTokens(v uint64)             {}
 func (t *noopModelTx) ReportRealtimeTextInputMessages(v uint64)             {}
 func (t *noopModelTx) ReportSttDuration(v uint32)                           {}
 func (t *noopModelTx) ReportTtsChars(v uint32)                              {}
