@@ -11,6 +11,7 @@ func BuildAgentToken(
 	apiKey, secret, roomName, participantIdentity, participantName, participantMetadata string,
 	participantAttributes map[string]string,
 	permissions *livekit.ParticipantPermission,
+	kindDetails ...livekit.ParticipantInfo_KindDetail,
 ) (string, error) {
 	grant := &auth.VideoGrant{
 		RoomJoin:             true,
@@ -29,6 +30,7 @@ func BuildAgentToken(
 		SetIdentity(participantIdentity).
 		SetName(participantName).
 		SetKind(livekit.ParticipantInfo_AGENT).
+		SetKindDetail(kindDetails...).
 		SetValidFor(1 * time.Hour).
 		SetMetadata(participantMetadata).
 		SetAttributes(participantAttributes)
