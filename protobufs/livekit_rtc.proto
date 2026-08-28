@@ -264,6 +264,19 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
+  // when set, every signal message after this JoinResponse is wrapped in
+  // WrappedSignalRequest/WrappedSignalResponse, in both directions.
+  //
+  // The server sets this only if the client advertised
+  // ClientInfo.CAP_COMPRESSION_DEFLATE_RAW. Unset (the default) means the client MUST
+  // keep sending bare SignalRequests, so an old server and a new client, or the
+  // reverse, keep working unchanged.
+  //
+  // This JoinResponse itself is NOT wrapped: it is what establishes the agreement, so
+  // it has to be readable by a client that does not yet know the answer. That leaves
+  // the join roster uncompressed -- the one place this scheme does not help. See
+  // ReconnectResponse.signal_compression for the resume path.
+  bool signal_compression = 16;
 }
 
 message ReconnectResponse {
@@ -273,6 +286,14 @@ message ReconnectResponse {
 
   // last sequence number of reliable message received before resuming
   uint32 last_message_seq = 4;
+
+  // Same contract as JoinResponse.signal_compression: when set, every signal message
+  // after this ReconnectResponse is wrapped, in both directions, and this message
+  // itself is not.
+  //
+  // Renegotiated per resume rather than inherited, because a resume may land on a
+  // different node than the one that answered the original join.
+  bool signal_compression = 5;
 }
 
 message TrackPublishedResponse {
@@ -665,6 +686,43 @@ message WrappedJoinRequest {
 
   Compression compression = 1;
   bytes join_request = 2;  // marshalled JoinRequest + potentially compressed
+}
+
+// How a wrapped signal payload was compressed.
+//
+// DEFLATE_RAW is preferred over GZIP for per-message compression: it omits gzip's
+// ~18 bytes of header and trailer, which is material when the median signal message
+// is a few hundred bytes. GZIP is offered for implementations that already have a
+// gzip codec wired up (WrappedJoinRequest uses it) and want to reuse it.
+//
+// Values are prefixed, unlike the older bare-valued enums in this file: top-level
+// enum values share the package namespace, and a bare `NONE` would collide with the
+// one already declared in livekit_sip.proto.
+enum SignalCompression {
+  SIGNAL_COMPRESSION_NONE = 0;
+  SIGNAL_COMPRESSION_GZIP = 1;
+  SIGNAL_COMPRESSION_DEFLATE_RAW = 2;
+}
+
+// Envelope for a compressed SignalRequest, mirroring WrappedJoinRequest.
+//
+// Used in place of a bare SignalRequest on the signalling WebSocket once both
+// sides have agreed to compress -- see JoinResponse.signal_compression.
+//
+// Senders SHOULD leave small payloads uncompressed (NONE): below roughly 200 bytes
+// the compressed form is usually larger, and the CPU is wasted either way. Senders
+// MUST fall back to NONE if compression fails or does not shrink the payload; a
+// compression problem must never become a connection failure. Receivers MUST honour
+// whatever `compression` says regardless of size.
+message WrappedSignalRequest {
+  SignalCompression compression = 1;
+  bytes signal_request = 2;  // marshalled SignalRequest + potentially compressed
+}
+
+// Envelope for a compressed SignalResponse. See WrappedSignalRequest.
+message WrappedSignalResponse {
+  SignalCompression compression = 1;
+  bytes signal_response = 2;  // marshalled SignalResponse + potentially compressed
 }
 
 message MediaSectionsRequirement {
