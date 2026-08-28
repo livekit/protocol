@@ -690,18 +690,27 @@ message WrappedJoinRequest {
 
 // How a wrapped signal payload was compressed.
 //
-// DEFLATE_RAW is preferred over GZIP for per-message compression: it omits gzip's
-// ~18 bytes of header and trailer, which is material when the median signal message
-// is a few hundred bytes. GZIP is offered for implementations that already have a
-// gzip codec wired up (WrappedJoinRequest uses it) and want to reuse it.
+// A holder for the enum rather than a top-level enum, so that both directions can
+// share one type while keeping bare value names: enum values follow C++ scoping and
+// are siblings of their type, so a top-level `NONE` would collide with the one
+// already declared in livekit_sip.proto. Nesting scopes them to this message.
 //
-// Values are prefixed, unlike the older bare-valued enums in this file: top-level
-// enum values share the package namespace, and a bare `NONE` would collide with the
-// one already declared in livekit_sip.proto.
-enum SignalCompression {
-  SIGNAL_COMPRESSION_NONE = 0;
-  SIGNAL_COMPRESSION_GZIP = 1;
-  SIGNAL_COMPRESSION_DEFLATE_RAW = 2;
+// One shared type, rather than an enum nested in each envelope, because
+// compress/decompress is naturally generic over direction -- the SFU's own
+// implementation already threads a single compression type through both the request
+// and response paths.
+message SignalCompression {
+  enum Type {
+    NONE = 0;
+    // Numbered to match WrappedJoinRequest.Compression rather than to rank the
+    // options: two enums in one file where GZIP has different numbers is a trap for
+    // anyone mapping between them by hand.
+    GZIP = 1;
+    // Preferred for per-message compression: raw deflate omits gzip's ~18 bytes of
+    // header and trailer, which is material when the median signal message is a few
+    // hundred bytes.
+    DEFLATE_RAW = 2;
+  }
 }
 
 // Envelope for a compressed SignalRequest, mirroring WrappedJoinRequest.
@@ -715,13 +724,13 @@ enum SignalCompression {
 // compression problem must never become a connection failure. Receivers MUST honour
 // whatever `compression` says regardless of size.
 message WrappedSignalRequest {
-  SignalCompression compression = 1;
+  SignalCompression.Type compression = 1;
   bytes signal_request = 2;  // marshalled SignalRequest + potentially compressed
 }
 
 // Envelope for a compressed SignalResponse. See WrappedSignalRequest.
 message WrappedSignalResponse {
-  SignalCompression compression = 1;
+  SignalCompression.Type compression = 1;
   bytes signal_response = 2;  // marshalled SignalResponse + potentially compressed
 }
 
