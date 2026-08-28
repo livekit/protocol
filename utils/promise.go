@@ -14,14 +14,13 @@ func init() {
 type Promise[T any] struct {
 	mu     sync.Mutex
 	done   chan struct{}
+	thens  []func(T, error)
 	Result T
 	Err    error
 }
 
 func NewPromise[T any]() *Promise[T] {
-	return &Promise[T]{
-		done: make(chan struct{}),
-	}
+	return &Promise[T]{}
 }
 
 func GoPromise[T any](f func() (T, error)) *Promise[T] {
@@ -40,9 +39,9 @@ func NewResolvedPromise[T any](result T, err error) *Promise[T] {
 
 func (p *Promise[T]) Resolve(result T, err error) {
 	p.mu.Lock()
-	defer p.mu.Unlock()
 
 	if p.done == closedPromiseChan {
+		p.mu.Unlock()
 		return
 	}
 
@@ -53,6 +52,31 @@ func (p *Promise[T]) Resolve(result T, err error) {
 		close(p.done)
 	}
 	p.done = closedPromiseChan
+
+	thens := p.thens
+	p.thens = nil
+	p.mu.Unlock()
+
+	// invoked unlocked so a callback can re-enter the promise
+	for _, f := range thens {
+		f(result, err)
+	}
+}
+
+// Then registers f to run when p resolves, on the goroutine that calls Resolve. If p is
+// already resolved, f runs inline on the calling goroutine.
+func (p *Promise[T]) Then(f func(T, error)) {
+	p.mu.Lock()
+
+	if p.done == closedPromiseChan {
+		result, err := p.Result, p.Err
+		p.mu.Unlock()
+		f(result, err)
+		return
+	}
+
+	p.thens = append(p.thens, f)
+	p.mu.Unlock()
 }
 
 func (p *Promise[T]) Done() <-chan struct{} {
