@@ -2086,9 +2086,21 @@ type JoinResponse struct {
 	SifTrailer           []byte   `protobuf:"bytes,13,opt,name=sif_trailer,json=sifTrailer,proto3" json:"sif_trailer,omitempty"`
 	EnabledPublishCodecs []*Codec `protobuf:"bytes,14,rep,name=enabled_publish_codecs,json=enabledPublishCodecs,proto3" json:"enabled_publish_codecs,omitempty"`
 	// when set, client should attempt to establish publish peer connection when joining room to speed up publishing
-	FastPublish   bool `protobuf:"varint,15,opt,name=fast_publish,json=fastPublish,proto3" json:"fast_publish,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	FastPublish bool `protobuf:"varint,15,opt,name=fast_publish,json=fastPublish,proto3" json:"fast_publish,omitempty"`
+	// when set, this server understands SignalRequest.compressed and the client MAY
+	// use it. Unset means the client MUST NOT: an older server parses the unknown
+	// field into its unknown-field set, leaves the oneof unset, and drops the message
+	// without an error -- so sending compressed to a server that cannot read it loses
+	// signalling silently rather than failing cleanly.
+	//
+	// Only the client-to-server direction needs announcing. The server learns what the
+	// client can decode from ClientInfo.CAP_COMPRESSION_DEFLATE_RAW in the connect URL,
+	// which it has before it replies. Note this is not the circular arrangement of an
+	// earlier revision: this flag gates what the client SENDS, never how it parses, so
+	// the JoinResponse carrying it can itself be compressed.
+	AcceptsCompressedSignal bool `protobuf:"varint,16,opt,name=accepts_compressed_signal,json=acceptsCompressedSignal,proto3" json:"accepts_compressed_signal,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *JoinResponse) Reset() {
@@ -2226,6 +2238,13 @@ func (x *JoinResponse) GetFastPublish() bool {
 	return false
 }
 
+func (x *JoinResponse) GetAcceptsCompressedSignal() bool {
+	if x != nil {
+		return x.AcceptsCompressedSignal
+	}
+	return false
+}
+
 type ReconnectResponse struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	IceServers          []*ICEServer           `protobuf:"bytes,1,rep,name=ice_servers,json=iceServers,proto3" json:"ice_servers,omitempty"`
@@ -2233,8 +2252,14 @@ type ReconnectResponse struct {
 	ServerInfo          *ServerInfo            `protobuf:"bytes,3,opt,name=server_info,json=serverInfo,proto3" json:"server_info,omitempty"`
 	// last sequence number of reliable message received before resuming
 	LastMessageSeq uint32 `protobuf:"varint,4,opt,name=last_message_seq,json=lastMessageSeq,proto3" json:"last_message_seq,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Same meaning as JoinResponse.accepts_compressed_signal, repeated because a resume
+	// may land on a different node than answered the original join, and because the
+	// largest client-to-server message of all -- SyncState, carrying two session
+	// descriptions plus the subscription and publish lists -- is sent immediately after
+	// this response.
+	AcceptsCompressedSignal bool `protobuf:"varint,5,opt,name=accepts_compressed_signal,json=acceptsCompressedSignal,proto3" json:"accepts_compressed_signal,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *ReconnectResponse) Reset() {
@@ -2293,6 +2318,13 @@ func (x *ReconnectResponse) GetLastMessageSeq() uint32 {
 		return x.LastMessageSeq
 	}
 	return 0
+}
+
+func (x *ReconnectResponse) GetAcceptsCompressedSignal() bool {
+	if x != nil {
+		return x.AcceptsCompressedSignal
+	}
+	return false
 }
 
 type TrackPublishedResponse struct {
@@ -5309,9 +5341,17 @@ func (*SignalCompression) Descriptor() ([]byte, []int) {
 // was left uncompressed.
 //
 // Senders MUST NOT nest -- the payload is always an ordinary SignalRequest, never
-// another CompressedSignalRequest -- and MUST send this arm only when the peer has
-// advertised ClientInfo.CAP_COMPRESSION_DEFLATE_RAW, since an older peer would parse
-// it as an unknown field and silently drop the message.
+// another CompressedSignalRequest -- and MUST NOT use this arm unless the peer has
+// said it can decode one. An older peer parses the unknown field into its
+// unknown-field set, leaves the oneof unset, and drops the message without an error,
+// so guessing wrong loses signalling silently rather than failing cleanly.
+//
+// Each direction learns that separately, and neither needs a handshake:
+//   - server -> client: gated by ClientInfo.CAP_COMPRESSION_DEFLATE_RAW, which the
+//     server has from the connect URL before it sends anything.
+//   - client -> server: gated by JoinResponse.accepts_compressed_signal (or
+//     ReconnectResponse.accepts_compressed_signal), which the client has before it
+//     sends anything of consequence.
 //
 // Senders SHOULD leave payloads below roughly 200 bytes uncompressed, sending the
 // ordinary arm instead: below that the compressed form is usually larger and the CPU
@@ -5732,7 +5772,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x05final\x18\x03 \x01(\bR\x05final\":\n" +
 	"\x10MuteTrackRequest\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x14\n" +
-	"\x05muted\x18\x02 \x01(\bR\x05muted\"\xe8\x05\n" +
+	"\x05muted\x18\x02 \x01(\bR\x05muted\"\xa4\x06\n" +
 	"\fJoinResponse\x12!\n" +
 	"\x04room\x18\x01 \x01(\v2\r.livekit.RoomR\x04room\x12:\n" +
 	"\vparticipant\x18\x02 \x01(\v2\x18.livekit.ParticipantInfoR\vparticipant\x12G\n" +
@@ -5752,14 +5792,16 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\vsif_trailer\x18\r \x01(\fR\n" +
 	"sifTrailer\x12D\n" +
 	"\x16enabled_publish_codecs\x18\x0e \x03(\v2\x0e.livekit.CodecR\x14enabledPublishCodecs\x12!\n" +
-	"\ffast_publish\x18\x0f \x01(\bR\vfastPublish\"\xf9\x01\n" +
+	"\ffast_publish\x18\x0f \x01(\bR\vfastPublish\x12:\n" +
+	"\x19accepts_compressed_signal\x18\x10 \x01(\bR\x17acceptsCompressedSignal\"\xb5\x02\n" +
 	"\x11ReconnectResponse\x123\n" +
 	"\vice_servers\x18\x01 \x03(\v2\x12.livekit.ICEServerR\n" +
 	"iceServers\x12O\n" +
 	"\x14client_configuration\x18\x02 \x01(\v2\x1c.livekit.ClientConfigurationR\x13clientConfiguration\x124\n" +
 	"\vserver_info\x18\x03 \x01(\v2\x13.livekit.ServerInfoR\n" +
 	"serverInfo\x12(\n" +
-	"\x10last_message_seq\x18\x04 \x01(\rR\x0elastMessageSeq\"T\n" +
+	"\x10last_message_seq\x18\x04 \x01(\rR\x0elastMessageSeq\x12:\n" +
+	"\x19accepts_compressed_signal\x18\x05 \x01(\bR\x17acceptsCompressedSignal\"T\n" +
 	"\x16TrackPublishedResponse\x12\x10\n" +
 	"\x03cid\x18\x01 \x01(\tR\x03cid\x12(\n" +
 	"\x05track\x18\x02 \x01(\v2\x12.livekit.TrackInfoR\x05track\"7\n" +
