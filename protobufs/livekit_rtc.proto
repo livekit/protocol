@@ -268,6 +268,18 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
+  // when set, this server understands SignalRequest.compressed and the client MAY
+  // use it. Unset means the client MUST NOT: an older server parses the unknown
+  // field into its unknown-field set, leaves the oneof unset, and drops the message
+  // without an error -- so sending compressed to a server that cannot read it loses
+  // signalling silently rather than failing cleanly.
+  //
+  // Only the client-to-server direction needs announcing. The server learns what the
+  // client can decode from ClientInfo.CAP_COMPRESSION_DEFLATE_RAW in the connect URL,
+  // which it has before it replies. Note this is not the circular arrangement of an
+  // earlier revision: this flag gates what the client SENDS, never how it parses, so
+  // the JoinResponse carrying it can itself be compressed.
+  bool accepts_compressed_signal = 16;
 }
 
 message ReconnectResponse {
@@ -277,6 +289,13 @@ message ReconnectResponse {
 
   // last sequence number of reliable message received before resuming
   uint32 last_message_seq = 4;
+
+  // Same meaning as JoinResponse.accepts_compressed_signal, repeated because a resume
+  // may land on a different node than answered the original join, and because the
+  // largest client-to-server message of all -- SyncState, carrying two session
+  // descriptions plus the subscription and publish lists -- is sent immediately after
+  // this response.
+  bool accepts_compressed_signal = 5;
 }
 
 message TrackPublishedResponse {
@@ -714,9 +733,17 @@ message SignalCompression {
 // was left uncompressed.
 //
 // Senders MUST NOT nest -- the payload is always an ordinary SignalRequest, never
-// another CompressedSignalRequest -- and MUST send this arm only when the peer has
-// advertised ClientInfo.CAP_COMPRESSION_DEFLATE_RAW, since an older peer would parse
-// it as an unknown field and silently drop the message.
+// another CompressedSignalRequest -- and MUST NOT use this arm unless the peer has
+// said it can decode one. An older peer parses the unknown field into its
+// unknown-field set, leaves the oneof unset, and drops the message without an error,
+// so guessing wrong loses signalling silently rather than failing cleanly.
+//
+// Each direction learns that separately, and neither needs a handshake:
+//   - server -> client: gated by ClientInfo.CAP_COMPRESSION_DEFLATE_RAW, which the
+//     server has from the connect URL before it sends anything.
+//   - client -> server: gated by JoinResponse.accepts_compressed_signal (or
+//     ReconnectResponse.accepts_compressed_signal), which the client has before it
+//     sends anything of consequence.
 //
 // Senders SHOULD leave payloads below roughly 200 bytes uncompressed, sending the
 // ordinary arm instead: below that the compressed form is usually larger and the CPU
