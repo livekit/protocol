@@ -21,6 +21,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read # Lint and test only read the checkout
+
 jobs:
   test:
     runs-on: ubuntu-latest
