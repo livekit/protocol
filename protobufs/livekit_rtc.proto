@@ -133,6 +133,9 @@ message SignalResponse {
     StoreDataBlobResponse store_data_blob_response = 30;
     // Sent in response to `GetDataBlobRequest`.
     GetDataBlobResponse get_data_blob_response = 31;
+    // Always the FIRST message on a connection that will use signal compression.
+    // See SignalCompressionAck.
+    SignalCompressionAck compression_ack = 32;
   }
 }
 
@@ -264,19 +267,6 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
-  // when set, every signal message after this JoinResponse is wrapped in
-  // WrappedSignalRequest/WrappedSignalResponse, in both directions.
-  //
-  // The server sets this only if the client advertised
-  // ClientInfo.CAP_COMPRESSION_DEFLATE_RAW. Unset (the default) means the client MUST
-  // keep sending bare SignalRequests, so an old server and a new client, or the
-  // reverse, keep working unchanged.
-  //
-  // This JoinResponse itself is NOT wrapped: it is what establishes the agreement, so
-  // it has to be readable by a client that does not yet know the answer. That leaves
-  // the join roster uncompressed -- the one place this scheme does not help. See
-  // ReconnectResponse.signal_compression for the resume path.
-  bool signal_compression = 16;
 }
 
 message ReconnectResponse {
@@ -286,14 +276,6 @@ message ReconnectResponse {
 
   // last sequence number of reliable message received before resuming
   uint32 last_message_seq = 4;
-
-  // Same contract as JoinResponse.signal_compression: when set, every signal message
-  // after this ReconnectResponse is wrapped, in both directions, and this message
-  // itself is not.
-  //
-  // Renegotiated per resume rather than inherited, because a resume may land on a
-  // different node than the one that answered the original join.
-  bool signal_compression = 5;
 }
 
 message TrackPublishedResponse {
@@ -713,10 +695,35 @@ message SignalCompression {
   }
 }
 
+// Turns on signal compression for the rest of the connection, in both directions.
+//
+// Sent as the FIRST signal message, unwrapped, before the JoinResponse or
+// ReconnectResponse. Everything after it is wrapped in
+// WrappedSignalRequest/WrappedSignalResponse -- including that JoinResponse, which
+// on a large room is the single biggest message on the wire.
+//
+// Sent only when the client advertised ClientInfo.CAP_COMPRESSION_DEFLATE_RAW. A
+// server that does not implement compression, or a client that did not ask for it,
+// simply never exchanges this message and the connection stays as it is today.
+//
+// Being its own message, rather than a flag on JoinResponse, is what lets the
+// JoinResponse itself be compressed: a flag would have to be read before the client
+// could know how to parse the message carrying it. Here both possibilities for the
+// first frame are a plain SignalResponse, so the client parses one type and switches
+// on which arm it got -- `compression_ack` means compress from here on, anything else
+// means an older server and the connection continues uncompressed. No sniffing, and
+// no extra round trip: the server writes this and the JoinResponse back to back.
+message SignalCompressionAck {
+  // The algorithm to use. Senders may still emit NONE per message -- see
+  // WrappedSignalRequest on the size threshold -- but must not use an algorithm
+  // other than this one.
+  SignalCompression.Type compression = 1;
+}
+
 // Envelope for a compressed SignalRequest, mirroring WrappedJoinRequest.
 //
 // Used in place of a bare SignalRequest on the signalling WebSocket once both
-// sides have agreed to compress -- see JoinResponse.signal_compression.
+// sides have agreed to compress -- see SignalCompressionAck.
 //
 // Senders SHOULD leave small payloads uncompressed (NONE): below roughly 200 bytes
 // the compressed form is usually larger, and the CPU is wasted either way. Senders
