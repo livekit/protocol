@@ -48,8 +48,8 @@ func (b *Deferrer) buffer(core zapcore.Core, ent zapcore.Entry, fields []zapcore
 }
 
 func (b *Deferrer) flush() {
-	fields := b.fields.Load()
-	if fields == nil {
+	pfields := b.fields.Load()
+	if pfields == nil {
 		return
 	}
 
@@ -58,7 +58,7 @@ func (b *Deferrer) flush() {
 	b.writes = nil
 	b.mu.Unlock()
 
-	fields := slices.Clone(*b.fields.Load())
+	fields := slices.Clone(*pfields)
 	n := len(fields)
 
 	for _, w := range writes {
