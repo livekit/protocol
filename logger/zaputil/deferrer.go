@@ -48,6 +48,11 @@ func (b *Deferrer) buffer(core zapcore.Core, ent zapcore.Entry, fields []zapcore
 }
 
 func (b *Deferrer) flush() {
+	fields := b.fields.Load()
+	if fields == nil {
+		return
+	}
+
 	b.mu.Lock()
 	writes := b.writes
 	b.writes = nil
