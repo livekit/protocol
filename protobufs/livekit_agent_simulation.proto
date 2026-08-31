@@ -216,6 +216,17 @@ message SimulationRun {
     optional float conversation_progression = 9;
   }
 
+  // The pipeline this run came from. Set by the client from its CI
+  // environment; absent for runs not started by a pipeline.
+  message CI {
+    string provider = 1;  // e.g. "github_actions"
+    string commit_sha = 2;
+    string ref = 3;  // branch or tag
+    string pull_request = 4;
+    string run_url = 5;  // link back to the CI job
+    string actor = 6;
+  }
+
   message Create {
     message Request {
       reserved 3;  // was agent_description (input never consumed; description is derived from source)
@@ -240,6 +251,7 @@ message SimulationRun {
       bool background_noise = 10;
       bool low_quality_microphone = 11;
       bool packet_loss = 12;
+      optional CI ci = 13;
     }
     message Response {
       string simulation_run_id = 1;
@@ -359,6 +371,8 @@ message SimulationRun {
   // landed — absent and 0 differ ("never summarized" vs "no issues") — and
   // List responses carry it without the summary blob itself.
   optional int32 issue_count = 21;
+  // The pipeline this run came from; unset when it did not come from one.
+  optional CI ci = 22;
 
   message Usage {
     int32 text_turns_count = 1;
