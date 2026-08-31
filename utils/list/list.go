@@ -32,9 +32,19 @@ type Hooked[T any] interface {
 	hookAccessor[T]
 }
 
+// List is an intrusive doubly-linked list. Mutations involving a node the list
+// does not own are no-ops, as in container/list. A node linked into a DIFFERENT
+// list is indistinguishable from a member without a per-node list pointer and
+// remains the caller's contract.
 type List[T any, P Hooked[T]] struct {
 	head P
 	tail P
+}
+
+// linked reports whether it is a member of this list. A zeroed hook is
+// ambiguous between "not linked" and "sole element"; the head check settles it.
+func (l *List[T, P]) linked(it P, h *Hook[T]) bool {
+	return h.prev != nil || h.next != nil || l.head == it
 }
 
 func (l *List[T, P]) Empty() bool {
@@ -58,10 +68,16 @@ func (l *List[T, P]) PushBack(it P) {
 }
 
 func (l *List[T, P]) InsertBefore(it, mark P) {
+	if !l.linked(mark, mark.getListHook()) {
+		return
+	}
 	l.insert(it, mark.getListHook().prev, mark)
 }
 
 func (l *List[T, P]) InsertAfter(it, mark P) {
+	if !l.linked(mark, mark.getListHook()) {
+		return
+	}
 	l.insert(it, mark, mark.getListHook().next)
 }
 
@@ -70,6 +86,9 @@ func (l *List[T, P]) MoveToFront(it P) {
 		return
 	}
 	h := it.getListHook()
+	if !l.linked(it, h) {
+		return
+	}
 	l.unlink(h)
 	l.link(it, h, nil, l.head)
 }
@@ -79,19 +98,29 @@ func (l *List[T, P]) MoveToBack(it P) {
 		return
 	}
 	h := it.getListHook()
+	if !l.linked(it, h) {
+		return
+	}
 	l.unlink(h)
 	l.link(it, h, l.tail, nil)
 }
 
 func (l *List[T, P]) Remove(it P) {
 	h := it.getListHook()
+	if !l.linked(it, h) {
+		return
+	}
 	l.unlink(h)
 	h.next = nil
 	h.prev = nil
 }
 
 func (l *List[T, P]) insert(it, prev, next P) {
-	l.link(it, it.getListHook(), prev, next)
+	h := it.getListHook()
+	if l.linked(it, h) {
+		return
+	}
+	l.link(it, h, prev, next)
 }
 
 func (l *List[T, P]) link(it P, h *Hook[T], prev, next P) {
@@ -110,6 +139,8 @@ func (l *List[T, P]) link(it P, h *Hook[T], prev, next P) {
 	}
 }
 
+// unlink requires a linked h: nil prev/next mean head/tail here, so a zeroed
+// hook would clear both.
 func (l *List[T, P]) unlink(h *Hook[T]) {
 	if h.prev != nil {
 		P(h.prev).getListHook().next = h.next
