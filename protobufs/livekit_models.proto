@@ -735,6 +735,21 @@ enum DisconnectReason {
   AGENT_ERROR = 16;
 }
 
+// why a room ended, reported on room-ended telemetry
+enum RoomEndReason {
+  ROOM_END_UNKNOWN = 0;
+  // RoomService.DeleteRoom was called
+  ROOM_END_API_DELETE = 1;
+  // the room sat empty past its empty or departure timeout
+  ROOM_END_IDLE_TIMEOUT = 2;
+  // the server instance is shutting down
+  ROOM_END_SERVER_SHUTDOWN = 3;
+  // the room was restarted or replaced elsewhere
+  ROOM_END_SUPERSEDED = 4;
+  // the room failed to finish opening
+  ROOM_END_OPEN_FAILED = 5;
+}
+
 message RTPDrift {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
