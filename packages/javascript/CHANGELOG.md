@@ -1,5 +1,33 @@
 # @livekit/protocol
 
+## 1.51.0
+
+### Minor Changes
+
+- egress v2: add `passthrough` to the `encoding` oneof on `StartEgressRequest` and `ExportReplayRequest`; remove the unused `EgressHandler.UpdateEgress` RPC and the `livekit.UpdateEgressRequest` message - [#1716](https://github.com/livekit/protocol/pull/1716) ([@frostbyte73](https://github.com/frostbyte73))
+
+- add `RoomEndReason` enum and report it on room-ended telemetry: `AnalyticsEvent.room_end_reason` and `WebhookEvent.room_end_reason` now say why a room ended (`ROOM_END_API_DELETE`, `ROOM_END_IDLE_TIMEOUT`, `ROOM_END_SERVER_SHUTDOWN`, `ROOM_END_SUPERSEDED`, `ROOM_END_OPEN_FAILED`), so room-end volume can be broken down by cause the way participant disconnects already are - [#1748](https://github.com/livekit/protocol/pull/1748) ([@paulwe](https://github.com/paulwe))
+
+- `TransferSIPParticipant` now returns `TransferSIPParticipantResponse` instead of `google.protobuf.Empty`, carrying the transfer id, status, a new `SIPTransferReason` and the SIP status when the outcome came from a SIP response. `SIPTransferInfo` gains the same `reason`. This changes the generated method signature: a transfer that reports a non-successful status without an error means the transfer did not complete. - [#1730](https://github.com/livekit/protocol/pull/1730) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Moved egress passthrough option to an encoding preset. - [#1718](https://github.com/livekit/protocol/pull/1718) ([@frostbyte73](https://github.com/frostbyte73))
+
+### Patch Changes
+
+- Add `agent_job_started` / `agent_job_ended` webhook events and a `job` field on `WebhookEvent` - [#1711](https://github.com/livekit/protocol/pull/1711) ([@erikhortsch](https://github.com/erikhortsch))
+
+- agent simulation: add `conciseness` and `conversation_progression` to `SimulationRun.RunMetrics` - [#1742](https://github.com/livekit/protocol/pull/1742) ([@u9g](https://github.com/u9g))
+
+- Add `background_noise`, `low_quality_microphone`, and `packet_loss` to `SimulationRun.Create.Request`, so an audio simulation run can impair the simulated user's audio. - [#1723](https://github.com/livekit/protocol/pull/1723) ([@u9g](https://github.com/u9g))
+
+- Add `to_user_override` to `CreateSIPParticipantRequest` to override the user part of the `To` header, and warn when `To`/`Via` are set in the SIP headers map. - [#1717](https://github.com/livekit/protocol/pull/1717) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Remove extraneous format specifier from log string. - [#1682](https://github.com/livekit/protocol/pull/1682) ([@alexfish8](https://github.com/alexfish8))
+
+- Move the config observer into utils/configutil and drop the stuttering Config prefix. utils.ConfigObserver, utils.ConfigBuilder, utils.ConfigDefaulter and utils.NewConfigObserver remain as aliases. - [#1712](https://github.com/livekit/protocol/pull/1712) ([@paulwe](https://github.com/paulwe))
+
+- Add data track subscription to sync state - [#1703](https://github.com/livekit/protocol/pull/1703) ([@boks1971](https://github.com/boks1971))
+
 ## 1.50.4
 
 ### Patch Changes
