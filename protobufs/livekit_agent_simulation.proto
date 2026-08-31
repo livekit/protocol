@@ -75,6 +75,9 @@ message SimulationRun {
     Usage usage = 13;
     // Quality metrics for this job's call. Unset when the job produced none.
     JobMetrics metrics = 14;
+    // Scenario userdata this job ran with: arbitrary JSON-encoded object,
+    // as in Scenario.userdata. Empty when the scenario carried none.
+    string userdata = 15;
 
     message Usage {
       int32 text_turns_count = 1;
