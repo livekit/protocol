@@ -68,17 +68,19 @@ func (l *List[T, P]) PushBack(it P) {
 }
 
 func (l *List[T, P]) InsertBefore(it, mark P) {
-	if !l.linked(mark, mark.getListHook()) {
+	mh := mark.getListHook()
+	if !l.linked(mark, mh) {
 		return
 	}
-	l.insert(it, mark.getListHook().prev, mark)
+	l.insert(it, mh.prev, mark)
 }
 
 func (l *List[T, P]) InsertAfter(it, mark P) {
-	if !l.linked(mark, mark.getListHook()) {
+	mh := mark.getListHook()
+	if !l.linked(mark, mh) {
 		return
 	}
-	l.insert(it, mark, mark.getListHook().next)
+	l.insert(it, mark, mh.next)
 }
 
 func (l *List[T, P]) MoveToFront(it P) {
