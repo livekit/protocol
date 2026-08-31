@@ -763,7 +763,10 @@ type SimulationRun_Job struct {
 	RoomId            string                   `protobuf:"bytes,12,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
 	Usage             *SimulationRun_Job_Usage `protobuf:"bytes,13,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Quality metrics for this job's call. Unset when the job produced none.
-	Metrics       *SimulationRun_JobMetrics `protobuf:"bytes,14,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	Metrics *SimulationRun_JobMetrics `protobuf:"bytes,14,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	// Scenario userdata this job ran with: arbitrary JSON-encoded object,
+	// as in Scenario.userdata. Empty when the scenario carried none.
+	Userdata      string `protobuf:"bytes,15,opt,name=userdata,proto3" json:"userdata,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -887,6 +890,13 @@ func (x *SimulationRun_Job) GetMetrics() *SimulationRun_JobMetrics {
 		return x.Metrics
 	}
 	return nil
+}
+
+func (x *SimulationRun_Job) GetUserdata() string {
+	if x != nil {
+		return x.Userdata
+	}
+	return ""
 }
 
 type SimulationRun_JobMetrics struct {
@@ -3106,7 +3116,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xf9H\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x95I\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3130,7 +3140,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vconcurrency\x18\x11 \x01(\x05R\vconcurrency\x12+\n" +
 	"\x04mode\x18\x12 \x01(\x0e2\x17.livekit.SimulationModeR\x04mode\x12;\n" +
 	"\ametrics\x18\x13 \x01(\v2!.livekit.SimulationRun.RunMetricsR\ametrics\x12!\n" +
-	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x1a\xd6\x05\n" +
+	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x1a\xf2\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3146,7 +3156,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\bended_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12\x17\n" +
 	"\aroom_id\x18\f \x01(\tR\x06roomId\x126\n" +
 	"\x05usage\x18\r \x01(\v2 .livekit.SimulationRun.Job.UsageR\x05usage\x12;\n" +
-	"\ametrics\x18\x0e \x01(\v2!.livekit.SimulationRun.JobMetricsR\ametrics\x1a]\n" +
+	"\ametrics\x18\x0e \x01(\v2!.livekit.SimulationRun.JobMetricsR\ametrics\x12\x1a\n" +
+	"\buserdata\x18\x0f \x01(\tR\buserdata\x1a]\n" +
 	"\x05Usage\x12(\n" +
 	"\x10text_turns_count\x18\x01 \x01(\x05R\x0etextTurnsCount\x12*\n" +
 	"\x11audio_turns_count\x18\x02 \x01(\x05R\x0faudioTurnsCount\"o\n" +
