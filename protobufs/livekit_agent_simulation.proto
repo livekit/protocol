@@ -38,6 +38,9 @@ message SimulationRunSummary {
     string description = 1;
     string suggestion = 2;
     string label = 3;
+    // Jobs whose calls evidence this issue, so a reader scopes to them without
+    // parsing the citations out of the prose.
+    repeated string job_ids = 4;
   }
 }
 
@@ -108,6 +111,28 @@ message SimulationRun {
     optional bool redundant_statements = 17;
     optional bool poor_question_quality = 18;
     optional float conversation_progression = 19;  // 0-1, derived from the flags above
+    // The judge's evidence for each flag above, citing the transcript; ""
+    // when that flag was not judged.
+    string unnecessary_tool_calls_evidence = 20;
+    string information_loss_evidence = 21;
+    string redundant_statements_evidence = 22;
+    string poor_question_quality_evidence = 23;
+
+    // Metrics attempted for this call but not measured, so an absent field
+    // reads as failed-with-a-reason rather than never-tried.
+    repeated UnmeasuredMetric unmeasured = 24;
+
+    message UnmeasuredMetric {
+      string metric = 1;  // proto path within JobMetrics, e.g. "stt.entity_recognition"
+      string reason = 2;
+    }
+
+    // One judged entity for an ear; the ear's entity counts pool over these.
+    message EntityOutcome {
+      string entity = 1;    // verbatim, as extracted
+      bool uttered = 2;     // found in the speaker's authored text
+      bool recognized = 3;  // heard right at least once
+    }
 
     // The agent's perception of the caller. Audio only.
     message STT {
@@ -129,6 +154,7 @@ message SimulationRun {
       optional float entity_recall = 14;  // acquired_recognized / acquired_uttered
       optional uint32 entities_acquired_uttered = 15;
       optional uint32 entities_acquired_recognized = 16;
+      repeated EntityOutcome entity_outcomes = 17;
     }
 
     message LLM {
@@ -154,6 +180,7 @@ message SimulationRun {
       optional float entity_recall = 17;  // acquired_recognized / acquired_uttered
       optional uint32 entities_acquired_uttered = 18;
       optional uint32 entities_acquired_recognized = 19;
+      repeated EntityOutcome entity_outcomes = 20;
     }
 
     // Audio only.
@@ -196,6 +223,11 @@ message SimulationRun {
       optional bool eot_misprediction = 15;
       optional bool awkward_silence = 16;
       optional bool unanswered = 17;
+
+      // The conciseness judge's read of this turn; both empty unless
+      // conciseness is set.
+      string conciseness_rationale = 18;
+      repeated string conciseness_failure_modes = 19;
     }
   }
 
