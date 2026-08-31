@@ -230,60 +230,6 @@ func (AgentHttp_AgentEndpointKind) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 0}
 }
 
-type AgentHttp_HttpStreamResetCode int32
-
-const (
-	AgentHttp_HSR_INTERNAL AgentHttp_HttpStreamResetCode = 0
-	AgentHttp_HSR_CANCEL   AgentHttp_HttpStreamResetCode = 1
-	// the worker refused the stream before dispatching it to the application;
-	// the request was never applied and is safe to retry elsewhere
-	AgentHttp_HSR_REFUSED  AgentHttp_HttpStreamResetCode = 2
-	AgentHttp_HSR_PROTOCOL AgentHttp_HttpStreamResetCode = 3
-)
-
-// Enum value maps for AgentHttp_HttpStreamResetCode.
-var (
-	AgentHttp_HttpStreamResetCode_name = map[int32]string{
-		0: "HSR_INTERNAL",
-		1: "HSR_CANCEL",
-		2: "HSR_REFUSED",
-		3: "HSR_PROTOCOL",
-	}
-	AgentHttp_HttpStreamResetCode_value = map[string]int32{
-		"HSR_INTERNAL": 0,
-		"HSR_CANCEL":   1,
-		"HSR_REFUSED":  2,
-		"HSR_PROTOCOL": 3,
-	}
-)
-
-func (x AgentHttp_HttpStreamResetCode) Enum() *AgentHttp_HttpStreamResetCode {
-	p := new(AgentHttp_HttpStreamResetCode)
-	*p = x
-	return p
-}
-
-func (x AgentHttp_HttpStreamResetCode) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AgentHttp_HttpStreamResetCode) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agent_proto_enumTypes[4].Descriptor()
-}
-
-func (AgentHttp_HttpStreamResetCode) Type() protoreflect.EnumType {
-	return &file_livekit_agent_proto_enumTypes[4]
-}
-
-func (x AgentHttp_HttpStreamResetCode) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AgentHttp_HttpStreamResetCode.Descriptor instead.
-func (AgentHttp_HttpStreamResetCode) EnumDescriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 1}
-}
-
 type Job struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1629,13 +1575,15 @@ func (x *JobTermination) GetJobId() string {
 // ----- agent HTTP endpoints data plane -----
 //
 // AgentHttp namespaces the data plane: workers expose HTTP endpoints served at
-// /agents/{deployment}/{path} without binding any local listener. The worker
-// dials a fixed pool of websocket wires; the server opens multiplexed streams
-// over them and each stream carries one opaque HTTP/1.1 exchange, bridged into
-// the worker's application in-process. Wires speak AgentHttp.Frame exclusively
-// (one frame per websocket binary message); the control connection (the
-// existing /agent registration socket) carries the manifest, load and drain
-// state, never frames. Frame envelope adapted from livekit/protocol#1725.
+// /agents/{agent_name}/{deployment}/{path} without binding any local listener.
+// The worker opens ONE WebTransport (QUIC) session to /agent that carries both
+// its control stream (the same WorkerMessage/ServerMessage exchange as the
+// WebSocket control connection, length-delimited) and every HTTP exchange: the
+// node opens one bidirectional QUIC stream per request, writes the opaque
+// HTTP/1.1 request bytes, and reads the opaque response back, bridged into the
+// worker's application in-process. QUIC provides the multiplexing, per-stream
+// flow control, and half-close (stream FIN) / abort (RESET_STREAM), so there is
+// no capsule framing, no credit accounting, and no attach handshake.
 type AgentHttp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1747,20 +1695,14 @@ func (x *AgentHttp_AgentEndpoint) GetPublic() bool {
 }
 
 // registration-level settings negotiated on the control connection, returned
-// in RegisterWorkerResponse. Wire-level parameters (credit windows, frame
-// size, stream caps) are set per wire by the node adopting it, in
-// AttachDataConnectionResponse.
+// in RegisterWorkerResponse when the worker declares endpoints and the server
+// supports the data plane.
 type AgentHttp_AgentEndpointSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// negotiated data-plane protocol version
-	Protocol uint32 `protobuf:"varint,1,opt,name=protocol,proto3" json:"protocol,omitempty"`
-	// one token per registration, bound to (worker_id, instance_id); reused for
-	// all wires and across redials, expires with the epoch
-	AttachToken string `protobuf:"bytes,2,opt,name=attach_token,json=attachToken,proto3" json:"attach_token,omitempty"`
-	// fixed wire pool size the worker must dial
-	DataConnectionCount uint32 `protobuf:"varint,3,opt,name=data_connection_count,json=dataConnectionCount,proto3" json:"data_connection_count,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	Protocol      uint32 `protobuf:"varint,1,opt,name=protocol,proto3" json:"protocol,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *AgentHttp_AgentEndpointSettings) Reset() {
@@ -1800,504 +1742,8 @@ func (x *AgentHttp_AgentEndpointSettings) GetProtocol() uint32 {
 	return 0
 }
 
-func (x *AgentHttp_AgentEndpointSettings) GetAttachToken() string {
-	if x != nil {
-		return x.AttachToken
-	}
-	return ""
-}
-
-func (x *AgentHttp_AgentEndpointSettings) GetDataConnectionCount() uint32 {
-	if x != nil {
-		return x.DataConnectionCount
-	}
-	return 0
-}
-
-// first frame on a wire (stream_id 0), sent by the worker after the upgrade.
-// Wires may land on any node behind a load balancer, so they self-identify;
-// the adopting node validates against the registration wherever it lives.
-type AgentHttp_AttachDataConnection struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	WorkerId      string                 `protobuf:"bytes,1,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
-	InstanceId    string                 `protobuf:"bytes,2,opt,name=instance_id,json=instanceId,proto3" json:"instance_id,omitempty"`
-	AttachToken   string                 `protobuf:"bytes,3,opt,name=attach_token,json=attachToken,proto3" json:"attach_token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentHttp_AttachDataConnection) Reset() {
-	*x = AgentHttp_AttachDataConnection{}
-	mi := &file_livekit_agent_proto_msgTypes[21]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentHttp_AttachDataConnection) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentHttp_AttachDataConnection) ProtoMessage() {}
-
-func (x *AgentHttp_AttachDataConnection) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[21]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentHttp_AttachDataConnection.ProtoReflect.Descriptor instead.
-func (*AgentHttp_AttachDataConnection) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 2}
-}
-
-func (x *AgentHttp_AttachDataConnection) GetWorkerId() string {
-	if x != nil {
-		return x.WorkerId
-	}
-	return ""
-}
-
-func (x *AgentHttp_AttachDataConnection) GetInstanceId() string {
-	if x != nil {
-		return x.InstanceId
-	}
-	return ""
-}
-
-func (x *AgentHttp_AttachDataConnection) GetAttachToken() string {
-	if x != nil {
-		return x.AttachToken
-	}
-	return ""
-}
-
-// the adopting node's answer (stream_id 0); its wire parameters govern this
-// wire only
-type AgentHttp_AttachDataConnectionResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// empty means attached; otherwise the reason the attach was rejected and the
-	// wire will be closed
-	Error string `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
-	// per-stream credit window in bytes
-	CreditWindow uint32 `protobuf:"varint,2,opt,name=credit_window,json=creditWindow,proto3" json:"credit_window,omitempty"`
-	// shared connection-level window in bytes, refilled by credit on stream 0
-	ConnectionWindow uint32 `protobuf:"varint,3,opt,name=connection_window,json=connectionWindow,proto3" json:"connection_window,omitempty"`
-	// max Frame.data payload bytes per frame
-	MaxFrameSize uint32 `protobuf:"varint,4,opt,name=max_frame_size,json=maxFrameSize,proto3" json:"max_frame_size,omitempty"`
-	// hard cap on open streams on this wire (active + parked)
-	MaxStreamsPerConn uint32 `protobuf:"varint,5,opt,name=max_streams_per_conn,json=maxStreamsPerConn,proto3" json:"max_streams_per_conn,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) Reset() {
-	*x = AgentHttp_AttachDataConnectionResponse{}
-	mi := &file_livekit_agent_proto_msgTypes[22]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentHttp_AttachDataConnectionResponse) ProtoMessage() {}
-
-func (x *AgentHttp_AttachDataConnectionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[22]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentHttp_AttachDataConnectionResponse.ProtoReflect.Descriptor instead.
-func (*AgentHttp_AttachDataConnectionResponse) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 3}
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) GetCreditWindow() uint32 {
-	if x != nil {
-		return x.CreditWindow
-	}
-	return 0
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) GetConnectionWindow() uint32 {
-	if x != nil {
-		return x.ConnectionWindow
-	}
-	return 0
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) GetMaxFrameSize() uint32 {
-	if x != nil {
-		return x.MaxFrameSize
-	}
-	return 0
-}
-
-func (x *AgentHttp_AttachDataConnectionResponse) GetMaxStreamsPerConn() uint32 {
-	if x != nil {
-		return x.MaxStreamsPerConn
-	}
-	return 0
-}
-
-// opens a stream carrying what the bytes themselves do not say
-type AgentHttp_HttpStreamOpen struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	RequestId string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	// remote address of the end client, informational
-	ClientAddr string `protobuf:"bytes,2,opt,name=client_addr,json=clientAddr,proto3" json:"client_addr,omitempty"`
-	// reserved for forward-compatible request metadata
-	Attributes    map[string]string `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentHttp_HttpStreamOpen) Reset() {
-	*x = AgentHttp_HttpStreamOpen{}
-	mi := &file_livekit_agent_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentHttp_HttpStreamOpen) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentHttp_HttpStreamOpen) ProtoMessage() {}
-
-func (x *AgentHttp_HttpStreamOpen) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentHttp_HttpStreamOpen.ProtoReflect.Descriptor instead.
-func (*AgentHttp_HttpStreamOpen) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 4}
-}
-
-func (x *AgentHttp_HttpStreamOpen) GetRequestId() string {
-	if x != nil {
-		return x.RequestId
-	}
-	return ""
-}
-
-func (x *AgentHttp_HttpStreamOpen) GetClientAddr() string {
-	if x != nil {
-		return x.ClientAddr
-	}
-	return ""
-}
-
-func (x *AgentHttp_HttpStreamOpen) GetAttributes() map[string]string {
-	if x != nil {
-		return x.Attributes
-	}
-	return nil
-}
-
-// half-close: the sender is done writing but keeps reading
-type AgentHttp_HttpStreamEof struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentHttp_HttpStreamEof) Reset() {
-	*x = AgentHttp_HttpStreamEof{}
-	mi := &file_livekit_agent_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentHttp_HttpStreamEof) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentHttp_HttpStreamEof) ProtoMessage() {}
-
-func (x *AgentHttp_HttpStreamEof) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[24]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentHttp_HttpStreamEof.ProtoReflect.Descriptor instead.
-func (*AgentHttp_HttpStreamEof) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 5}
-}
-
-type AgentHttp_HttpStreamReset struct {
-	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Code          AgentHttp_HttpStreamResetCode `protobuf:"varint,1,opt,name=code,proto3,enum=livekit.AgentHttp_HttpStreamResetCode" json:"code,omitempty"`
-	Error         string                        `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentHttp_HttpStreamReset) Reset() {
-	*x = AgentHttp_HttpStreamReset{}
-	mi := &file_livekit_agent_proto_msgTypes[25]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentHttp_HttpStreamReset) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentHttp_HttpStreamReset) ProtoMessage() {}
-
-func (x *AgentHttp_HttpStreamReset) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[25]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentHttp_HttpStreamReset.ProtoReflect.Descriptor instead.
-func (*AgentHttp_HttpStreamReset) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 6}
-}
-
-func (x *AgentHttp_HttpStreamReset) GetCode() AgentHttp_HttpStreamResetCode {
-	if x != nil {
-		return x.Code
-	}
-	return AgentHttp_HSR_INTERNAL
-}
-
-func (x *AgentHttp_HttpStreamReset) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-// One multiplexed frame, carried as a single websocket binary message.
-// Receivers MUST ignore frames for unknown stream ids: a reset can cross in
-// flight with data already queued behind it, and ids are never reused within
-// a wire.
-type AgentHttp_Frame struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// the stream this frame addresses. 0 is the wire itself: the attach
-	// handshake rides it, and credit on it refills the shared connection
-	// window. The node opens streams and takes odd ids; even ids are reserved
-	// for worker-opened streams.
-	StreamId uint32 `protobuf:"varint,1,opt,name=stream_id,json=streamId,proto3" json:"stream_id,omitempty"`
-	// Types that are valid to be assigned to Message:
-	//
-	//	*AgentHttp_Frame_Attach
-	//	*AgentHttp_Frame_AttachResponse
-	//	*AgentHttp_Frame_Open
-	//	*AgentHttp_Frame_Data
-	//	*AgentHttp_Frame_Eof
-	//	*AgentHttp_Frame_Reset_
-	//	*AgentHttp_Frame_Credit
-	Message       isAgentHttp_Frame_Message `protobuf_oneof:"message"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentHttp_Frame) Reset() {
-	*x = AgentHttp_Frame{}
-	mi := &file_livekit_agent_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentHttp_Frame) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentHttp_Frame) ProtoMessage() {}
-
-func (x *AgentHttp_Frame) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentHttp_Frame.ProtoReflect.Descriptor instead.
-func (*AgentHttp_Frame) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 7}
-}
-
-func (x *AgentHttp_Frame) GetStreamId() uint32 {
-	if x != nil {
-		return x.StreamId
-	}
-	return 0
-}
-
-func (x *AgentHttp_Frame) GetMessage() isAgentHttp_Frame_Message {
-	if x != nil {
-		return x.Message
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetAttach() *AgentHttp_AttachDataConnection {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_Attach); ok {
-			return x.Attach
-		}
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetAttachResponse() *AgentHttp_AttachDataConnectionResponse {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_AttachResponse); ok {
-			return x.AttachResponse
-		}
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetOpen() *AgentHttp_HttpStreamOpen {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_Open); ok {
-			return x.Open
-		}
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetData() []byte {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_Data); ok {
-			return x.Data
-		}
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetEof() *AgentHttp_HttpStreamEof {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_Eof); ok {
-			return x.Eof
-		}
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetReset_() *AgentHttp_HttpStreamReset {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_Reset_); ok {
-			return x.Reset_
-		}
-	}
-	return nil
-}
-
-func (x *AgentHttp_Frame) GetCredit() uint32 {
-	if x != nil {
-		if x, ok := x.Message.(*AgentHttp_Frame_Credit); ok {
-			return x.Credit
-		}
-	}
-	return 0
-}
-
-type isAgentHttp_Frame_Message interface {
-	isAgentHttp_Frame_Message()
-}
-
-type AgentHttp_Frame_Attach struct {
-	Attach *AgentHttp_AttachDataConnection `protobuf:"bytes,2,opt,name=attach,proto3,oneof"`
-}
-
-type AgentHttp_Frame_AttachResponse struct {
-	AttachResponse *AgentHttp_AttachDataConnectionResponse `protobuf:"bytes,3,opt,name=attach_response,json=attachResponse,proto3,oneof"`
-}
-
-type AgentHttp_Frame_Open struct {
-	Open *AgentHttp_HttpStreamOpen `protobuf:"bytes,4,opt,name=open,proto3,oneof"`
-}
-
-type AgentHttp_Frame_Data struct {
-	// opaque HTTP/1.1 bytes: bare so the hot path costs one parse and no
-	// nested message
-	Data []byte `protobuf:"bytes,5,opt,name=data,proto3,oneof"`
-}
-
-type AgentHttp_Frame_Eof struct {
-	Eof *AgentHttp_HttpStreamEof `protobuf:"bytes,6,opt,name=eof,proto3,oneof"`
-}
-
-type AgentHttp_Frame_Reset_ struct {
-	Reset_ *AgentHttp_HttpStreamReset `protobuf:"bytes,7,opt,name=reset,proto3,oneof"`
-}
-
-type AgentHttp_Frame_Credit struct {
-	// the sender may put this many more bytes in flight (stream 0: on the
-	// whole wire; otherwise: on this stream). Replenished on consumption,
-	// not receipt.
-	Credit uint32 `protobuf:"varint,8,opt,name=credit,proto3,oneof"`
-}
-
-func (*AgentHttp_Frame_Attach) isAgentHttp_Frame_Message() {}
-
-func (*AgentHttp_Frame_AttachResponse) isAgentHttp_Frame_Message() {}
-
-func (*AgentHttp_Frame_Open) isAgentHttp_Frame_Message() {}
-
-func (*AgentHttp_Frame_Data) isAgentHttp_Frame_Message() {}
-
-func (*AgentHttp_Frame_Eof) isAgentHttp_Frame_Message() {}
-
-func (*AgentHttp_Frame_Reset_) isAgentHttp_Frame_Message() {}
-
-func (*AgentHttp_Frame_Credit) isAgentHttp_Frame_Message() {}
-
-// the server is draining: the worker should re-register elsewhere; existing
-// streams run to completion
+// the server is draining: the worker should re-register elsewhere; in-flight
+// HTTP exchanges run to completion
 type AgentHttp_GoAway struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Reason        string                 `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
@@ -2307,7 +1753,7 @@ type AgentHttp_GoAway struct {
 
 func (x *AgentHttp_GoAway) Reset() {
 	*x = AgentHttp_GoAway{}
-	mi := &file_livekit_agent_proto_msgTypes[27]
+	mi := &file_livekit_agent_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2319,7 +1765,7 @@ func (x *AgentHttp_GoAway) String() string {
 func (*AgentHttp_GoAway) ProtoMessage() {}
 
 func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[27]
+	mi := &file_livekit_agent_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2332,7 +1778,7 @@ func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_GoAway.ProtoReflect.Descriptor instead.
 func (*AgentHttp_GoAway) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 8}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 2}
 }
 
 func (x *AgentHttp_GoAway) GetReason() string {
@@ -2475,65 +1921,20 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"1\n" +
 	"\x0eJobTermination\x12\x1f\n" +
-	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xf1\f\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xa5\x02\n" +
 	"\tAgentHttp\x1a\x8f\x01\n" +
 	"\rAgentEndpoint\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x18\n" +
 	"\amethods\x18\x02 \x03(\tR\amethods\x128\n" +
 	"\x04kind\x18\x03 \x01(\x0e2$.livekit.AgentHttp.AgentEndpointKindR\x04kind\x12\x16\n" +
-	"\x06public\x18\x04 \x01(\bR\x06public\x1a\x8a\x01\n" +
+	"\x06public\x18\x04 \x01(\bR\x06public\x1a3\n" +
 	"\x15AgentEndpointSettings\x12\x1a\n" +
-	"\bprotocol\x18\x01 \x01(\rR\bprotocol\x12!\n" +
-	"\fattach_token\x18\x02 \x01(\tR\vattachToken\x122\n" +
-	"\x15data_connection_count\x18\x03 \x01(\rR\x13dataConnectionCount\x1a\x93\x01\n" +
-	"\x14AttachDataConnection\x12(\n" +
-	"\tworker_id\x18\x01 \x01(\tB\v\xbaP\bworkerIDR\bworkerId\x12.\n" +
-	"\vinstance_id\x18\x02 \x01(\tB\r\xbaP\n" +
-	"instanceIDR\n" +
-	"instanceId\x12!\n" +
-	"\fattach_token\x18\x03 \x01(\tR\vattachToken\x1a\xdd\x01\n" +
-	"\x1cAttachDataConnectionResponse\x12\x14\n" +
-	"\x05error\x18\x01 \x01(\tR\x05error\x12#\n" +
-	"\rcredit_window\x18\x02 \x01(\rR\fcreditWindow\x12+\n" +
-	"\x11connection_window\x18\x03 \x01(\rR\x10connectionWindow\x12$\n" +
-	"\x0emax_frame_size\x18\x04 \x01(\rR\fmaxFrameSize\x12/\n" +
-	"\x14max_streams_per_conn\x18\x05 \x01(\rR\x11maxStreamsPerConn\x1a\xf0\x01\n" +
-	"\x0eHttpStreamOpen\x12+\n" +
-	"\n" +
-	"request_id\x18\x01 \x01(\tB\f\xbaP\trequestIDR\trequestId\x12\x1f\n" +
-	"\vclient_addr\x18\x02 \x01(\tR\n" +
-	"clientAddr\x12Q\n" +
-	"\n" +
-	"attributes\x18\x03 \x03(\v21.livekit.AgentHttp.HttpStreamOpen.AttributesEntryR\n" +
-	"attributes\x1a=\n" +
-	"\x0fAttributesEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a\x0f\n" +
-	"\rHttpStreamEof\x1ac\n" +
-	"\x0fHttpStreamReset\x12:\n" +
-	"\x04code\x18\x01 \x01(\x0e2&.livekit.AgentHttp.HttpStreamResetCodeR\x04code\x12\x14\n" +
-	"\x05error\x18\x02 \x01(\tR\x05error\x1a\xb6\x03\n" +
-	"\x05Frame\x12(\n" +
-	"\tstream_id\x18\x01 \x01(\rB\v\xbaP\bstreamIDR\bstreamId\x12A\n" +
-	"\x06attach\x18\x02 \x01(\v2'.livekit.AgentHttp.AttachDataConnectionH\x00R\x06attach\x12Z\n" +
-	"\x0fattach_response\x18\x03 \x01(\v2/.livekit.AgentHttp.AttachDataConnectionResponseH\x00R\x0eattachResponse\x127\n" +
-	"\x04open\x18\x04 \x01(\v2!.livekit.AgentHttp.HttpStreamOpenH\x00R\x04open\x12\x14\n" +
-	"\x04data\x18\x05 \x01(\fH\x00R\x04data\x124\n" +
-	"\x03eof\x18\x06 \x01(\v2 .livekit.AgentHttp.HttpStreamEofH\x00R\x03eof\x12:\n" +
-	"\x05reset\x18\a \x01(\v2\".livekit.AgentHttp.HttpStreamResetH\x00R\x05reset\x12\x18\n" +
-	"\x06credit\x18\b \x01(\rH\x00R\x06creditB\t\n" +
-	"\amessage\x1a \n" +
+	"\bprotocol\x18\x01 \x01(\rR\bprotocol\x1a \n" +
 	"\x06GoAway\x12\x16\n" +
 	"\x06reason\x18\x01 \x01(\tR\x06reason\"/\n" +
 	"\x11AgentEndpointKind\x12\f\n" +
 	"\bAEK_HTTP\x10\x00\x12\f\n" +
-	"\bAEK_TEXT\x10\x01\"Z\n" +
-	"\x13HttpStreamResetCode\x12\x10\n" +
-	"\fHSR_INTERNAL\x10\x00\x12\x0e\n" +
-	"\n" +
-	"HSR_CANCEL\x10\x01\x12\x0f\n" +
-	"\vHSR_REFUSED\x10\x02\x12\x10\n" +
-	"\fHSR_PROTOCOL\x10\x03*<\n" +
+	"\bAEK_TEXT\x10\x01*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
 	"\fJT_PUBLISHER\x10\x01\x12\x12\n" +
@@ -2562,94 +1963,79 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 	return file_livekit_agent_proto_rawDescData
 }
 
-var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
+var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_livekit_agent_proto_goTypes = []any{
-	(JobType)(0),                                   // 0: livekit.JobType
-	(WorkerStatus)(0),                              // 1: livekit.WorkerStatus
-	(JobStatus)(0),                                 // 2: livekit.JobStatus
-	(AgentHttp_AgentEndpointKind)(0),               // 3: livekit.AgentHttp.AgentEndpointKind
-	(AgentHttp_HttpStreamResetCode)(0),             // 4: livekit.AgentHttp.HttpStreamResetCode
-	(*Job)(nil),                                    // 5: livekit.Job
-	(*JobState)(nil),                               // 6: livekit.JobState
-	(*WorkerMessage)(nil),                          // 7: livekit.WorkerMessage
-	(*ServerMessage)(nil),                          // 8: livekit.ServerMessage
-	(*SimulateJobRequest)(nil),                     // 9: livekit.SimulateJobRequest
-	(*WorkerPing)(nil),                             // 10: livekit.WorkerPing
-	(*WorkerPong)(nil),                             // 11: livekit.WorkerPong
-	(*RegisterWorkerRequest)(nil),                  // 12: livekit.RegisterWorkerRequest
-	(*RegisterWorkerResponse)(nil),                 // 13: livekit.RegisterWorkerResponse
-	(*MigrateJobRequest)(nil),                      // 14: livekit.MigrateJobRequest
-	(*AvailabilityRequest)(nil),                    // 15: livekit.AvailabilityRequest
-	(*AvailabilityResponse)(nil),                   // 16: livekit.AvailabilityResponse
-	(*UpdateJobStatus)(nil),                        // 17: livekit.UpdateJobStatus
-	(*UpdateWorkerStatus)(nil),                     // 18: livekit.UpdateWorkerStatus
-	(*JobAssignment)(nil),                          // 19: livekit.JobAssignment
-	(*JobTermination)(nil),                         // 20: livekit.JobTermination
-	(*AgentHttp)(nil),                              // 21: livekit.AgentHttp
-	nil,                                            // 22: livekit.Job.AttributesEntry
-	nil,                                            // 23: livekit.AvailabilityResponse.ParticipantAttributesEntry
-	(*AgentHttp_AgentEndpoint)(nil),                // 24: livekit.AgentHttp.AgentEndpoint
-	(*AgentHttp_AgentEndpointSettings)(nil),        // 25: livekit.AgentHttp.AgentEndpointSettings
-	(*AgentHttp_AttachDataConnection)(nil),         // 26: livekit.AgentHttp.AttachDataConnection
-	(*AgentHttp_AttachDataConnectionResponse)(nil), // 27: livekit.AgentHttp.AttachDataConnectionResponse
-	(*AgentHttp_HttpStreamOpen)(nil),               // 28: livekit.AgentHttp.HttpStreamOpen
-	(*AgentHttp_HttpStreamEof)(nil),                // 29: livekit.AgentHttp.HttpStreamEof
-	(*AgentHttp_HttpStreamReset)(nil),              // 30: livekit.AgentHttp.HttpStreamReset
-	(*AgentHttp_Frame)(nil),                        // 31: livekit.AgentHttp.Frame
-	(*AgentHttp_GoAway)(nil),                       // 32: livekit.AgentHttp.GoAway
-	nil,                                            // 33: livekit.AgentHttp.HttpStreamOpen.AttributesEntry
-	(*Room)(nil),                                   // 34: livekit.Room
-	(*ParticipantInfo)(nil),                        // 35: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),                  // 36: livekit.ParticipantPermission
-	(*ServerInfo)(nil),                             // 37: livekit.ServerInfo
+	(JobType)(0),                            // 0: livekit.JobType
+	(WorkerStatus)(0),                       // 1: livekit.WorkerStatus
+	(JobStatus)(0),                          // 2: livekit.JobStatus
+	(AgentHttp_AgentEndpointKind)(0),        // 3: livekit.AgentHttp.AgentEndpointKind
+	(*Job)(nil),                             // 4: livekit.Job
+	(*JobState)(nil),                        // 5: livekit.JobState
+	(*WorkerMessage)(nil),                   // 6: livekit.WorkerMessage
+	(*ServerMessage)(nil),                   // 7: livekit.ServerMessage
+	(*SimulateJobRequest)(nil),              // 8: livekit.SimulateJobRequest
+	(*WorkerPing)(nil),                      // 9: livekit.WorkerPing
+	(*WorkerPong)(nil),                      // 10: livekit.WorkerPong
+	(*RegisterWorkerRequest)(nil),           // 11: livekit.RegisterWorkerRequest
+	(*RegisterWorkerResponse)(nil),          // 12: livekit.RegisterWorkerResponse
+	(*MigrateJobRequest)(nil),               // 13: livekit.MigrateJobRequest
+	(*AvailabilityRequest)(nil),             // 14: livekit.AvailabilityRequest
+	(*AvailabilityResponse)(nil),            // 15: livekit.AvailabilityResponse
+	(*UpdateJobStatus)(nil),                 // 16: livekit.UpdateJobStatus
+	(*UpdateWorkerStatus)(nil),              // 17: livekit.UpdateWorkerStatus
+	(*JobAssignment)(nil),                   // 18: livekit.JobAssignment
+	(*JobTermination)(nil),                  // 19: livekit.JobTermination
+	(*AgentHttp)(nil),                       // 20: livekit.AgentHttp
+	nil,                                     // 21: livekit.Job.AttributesEntry
+	nil,                                     // 22: livekit.AvailabilityResponse.ParticipantAttributesEntry
+	(*AgentHttp_AgentEndpoint)(nil),         // 23: livekit.AgentHttp.AgentEndpoint
+	(*AgentHttp_AgentEndpointSettings)(nil), // 24: livekit.AgentHttp.AgentEndpointSettings
+	(*AgentHttp_GoAway)(nil),                // 25: livekit.AgentHttp.GoAway
+	(*Room)(nil),                            // 26: livekit.Room
+	(*ParticipantInfo)(nil),                 // 27: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),           // 28: livekit.ParticipantPermission
+	(*ServerInfo)(nil),                      // 29: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	34, // 1: livekit.Job.room:type_name -> livekit.Room
-	35, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
-	6,  // 3: livekit.Job.state:type_name -> livekit.JobState
-	22, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
+	26, // 1: livekit.Job.room:type_name -> livekit.Room
+	27, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	5,  // 3: livekit.Job.state:type_name -> livekit.JobState
+	21, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
 	2,  // 5: livekit.JobState.status:type_name -> livekit.JobStatus
-	12, // 6: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
-	16, // 7: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
-	18, // 8: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
-	17, // 9: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
-	10, // 10: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
-	9,  // 11: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
-	14, // 12: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
-	13, // 13: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
-	15, // 14: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
-	19, // 15: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
-	20, // 16: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
-	11, // 17: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	32, // 18: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
+	11, // 6: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
+	15, // 7: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
+	17, // 8: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
+	16, // 9: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
+	9,  // 10: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
+	8,  // 11: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
+	13, // 12: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
+	12, // 13: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
+	14, // 14: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
+	18, // 15: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
+	19, // 16: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
+	10, // 17: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
+	25, // 18: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
 	0,  // 19: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	34, // 20: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	35, // 21: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	26, // 20: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	27, // 21: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
 	0,  // 22: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	36, // 23: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
-	24, // 24: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
-	37, // 25: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
-	25, // 26: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
-	5,  // 27: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	23, // 28: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	28, // 23: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	23, // 24: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
+	29, // 25: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	24, // 26: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
+	4,  // 27: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	22, // 28: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
 	2,  // 29: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
 	1,  // 30: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	5,  // 31: livekit.JobAssignment.job:type_name -> livekit.Job
+	4,  // 31: livekit.JobAssignment.job:type_name -> livekit.Job
 	3,  // 32: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	33, // 33: livekit.AgentHttp.HttpStreamOpen.attributes:type_name -> livekit.AgentHttp.HttpStreamOpen.AttributesEntry
-	4,  // 34: livekit.AgentHttp.HttpStreamReset.code:type_name -> livekit.AgentHttp.HttpStreamResetCode
-	26, // 35: livekit.AgentHttp.Frame.attach:type_name -> livekit.AgentHttp.AttachDataConnection
-	27, // 36: livekit.AgentHttp.Frame.attach_response:type_name -> livekit.AgentHttp.AttachDataConnectionResponse
-	28, // 37: livekit.AgentHttp.Frame.open:type_name -> livekit.AgentHttp.HttpStreamOpen
-	29, // 38: livekit.AgentHttp.Frame.eof:type_name -> livekit.AgentHttp.HttpStreamEof
-	30, // 39: livekit.AgentHttp.Frame.reset:type_name -> livekit.AgentHttp.HttpStreamReset
-	40, // [40:40] is the sub-list for method output_type
-	40, // [40:40] is the sub-list for method input_type
-	40, // [40:40] is the sub-list for extension type_name
-	40, // [40:40] is the sub-list for extension extendee
-	0,  // [0:40] is the sub-list for field type_name
+	33, // [33:33] is the sub-list for method output_type
+	33, // [33:33] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -2679,22 +2065,13 @@ func file_livekit_agent_proto_init() {
 	file_livekit_agent_proto_msgTypes[7].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[13].OneofWrappers = []any{}
 	file_livekit_agent_proto_msgTypes[14].OneofWrappers = []any{}
-	file_livekit_agent_proto_msgTypes[26].OneofWrappers = []any{
-		(*AgentHttp_Frame_Attach)(nil),
-		(*AgentHttp_Frame_AttachResponse)(nil),
-		(*AgentHttp_Frame_Open)(nil),
-		(*AgentHttp_Frame_Data)(nil),
-		(*AgentHttp_Frame_Eof)(nil),
-		(*AgentHttp_Frame_Reset_)(nil),
-		(*AgentHttp_Frame_Credit)(nil),
-	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
-			NumEnums:      5,
-			NumMessages:   29,
+			NumEnums:      4,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
