@@ -21,11 +21,11 @@ import (
 )
 
 var (
-	errHeaderSizeInsufficient    = errors.New("data track packet header size insufficient")
-	errBufferSizeInsufficient    = errors.New("data track packet buffer size insufficient")
-	errExtensionSizeInsufficient = errors.New("data track packet extension size insufficient")
-	errExtensionNotFound         = errors.New("data track packet extension not found")
-	errExtensionSizeTooBig       = errors.New("extension size is too big")
+	ErrHeaderSizeInsufficient    = errors.New("data track packet header size insufficient")
+	ErrBufferSizeInsufficient    = errors.New("data track packet buffer size insufficient")
+	ErrExtensionSizeInsufficient = errors.New("data track packet extension size insufficient")
+	ErrExtensionNotFound         = errors.New("data track packet extension not found")
+	ErrExtensionSizeTooBig       = errors.New("extension size is too big")
 )
 
 const (
@@ -111,7 +111,7 @@ type Header struct {
 
 func (h *Header) Unmarshal(buf []byte) (int, error) {
 	if len(buf) < headerLength {
-		return 0, fmt.Errorf("%w: %d < %d", errHeaderSizeInsufficient, len(buf), headerLength)
+		return 0, fmt.Errorf("%w: %d < %d", ErrHeaderSizeInsufficient, len(buf), headerLength)
 	}
 
 	hdrSize := headerLength
@@ -127,7 +127,7 @@ func (h *Header) Unmarshal(buf []byte) (int, error) {
 
 	if h.HasExtensions {
 		if len(buf) < extensionsSizeOffset+extensionsSizeLength {
-			return 0, fmt.Errorf("%w: %d < %d", errHeaderSizeInsufficient, len(buf), extensionsSizeOffset+extensionsSizeLength)
+			return 0, fmt.Errorf("%w: %d < %d", ErrHeaderSizeInsufficient, len(buf), extensionsSizeOffset+extensionsSizeLength)
 		}
 		extensionsSize := (int(binary.BigEndian.Uint16(buf[extensionsSizeOffset:extensionsSizeOffset+extensionsSizeLength]))+1)*4 - extensionsSizeLength
 		hdrSize += extensionsSizeLength
@@ -138,20 +138,20 @@ func (h *Header) Unmarshal(buf []byte) (int, error) {
 		for remainingSize != 0 {
 			// read extension header
 			if len(buf[idx:]) < extensionIDLength || remainingSize < extensionIDLength {
-				return 0, fmt.Errorf("%w: %d/%d < %d", errExtensionSizeInsufficient, remainingSize, len(buf[idx:]), extensionIDLength)
+				return 0, fmt.Errorf("%w: %d/%d < %d", ErrExtensionSizeInsufficient, remainingSize, len(buf[idx:]), extensionIDLength)
 			}
 			id := buf[idx]
 			if id == 0 {
 				// end of extensions, padding has started
 				if len(buf[idx:]) < remainingSize {
-					return 0, fmt.Errorf("%w: %d/%d < %d", errExtensionSizeInsufficient, remainingSize, len(buf[idx:]), remainingSize)
+					return 0, fmt.Errorf("%w: %d/%d < %d", ErrExtensionSizeInsufficient, remainingSize, len(buf[idx:]), remainingSize)
 				}
 				hdrSize += remainingSize
 				break
 			}
 
 			if len(buf[idx+1:]) < extensionSizeLength || remainingSize < extensionSizeLength {
-				return 0, fmt.Errorf("%w: %d/%d < %d", errExtensionSizeInsufficient, remainingSize, len(buf[idx:]), extensionSizeLength)
+				return 0, fmt.Errorf("%w: %d/%d < %d", ErrExtensionSizeInsufficient, remainingSize, len(buf[idx:]), extensionSizeLength)
 			}
 			size := int(buf[idx+1])
 
@@ -161,7 +161,7 @@ func (h *Header) Unmarshal(buf []byte) (int, error) {
 
 			// read extension data
 			if len(buf[idx:]) < size || remainingSize < size {
-				return 0, fmt.Errorf("%w: %d/%d < %d", errExtensionSizeInsufficient, remainingSize, len(buf[idx:]), size)
+				return 0, fmt.Errorf("%w: %d/%d < %d", ErrExtensionSizeInsufficient, remainingSize, len(buf[idx:]), size)
 			}
 			h.Extensions = append(h.Extensions, Extension{id: id, data: buf[idx : idx+size]})
 
@@ -189,7 +189,7 @@ func (h *Header) MarshalSize() int {
 
 func (h *Header) MarshalTo(buf []byte) (int, error) {
 	if len(buf) < headerLength {
-		return 0, fmt.Errorf("%w: %d < %d", errHeaderSizeInsufficient, len(buf), headerLength)
+		return 0, fmt.Errorf("%w: %d < %d", ErrHeaderSizeInsufficient, len(buf), headerLength)
 	}
 
 	hdrSize := headerLength
@@ -219,7 +219,7 @@ func (h *Header) MarshalTo(buf []byte) (int, error) {
 		for _, ext := range h.Extensions {
 			buf[idx] = ext.id
 			if len(ext.data) > 255 {
-				return 0, fmt.Errorf("%w: %d > 255", errExtensionSizeTooBig, len(ext.data))
+				return 0, fmt.Errorf("%w: %d > 255", ErrExtensionSizeTooBig, len(ext.data))
 			}
 			buf[idx+extensionIDLength] = byte(len(ext.data))
 			copy(buf[idx+extensionIDLength+extensionSizeLength:], ext.data)
@@ -262,7 +262,7 @@ func (h *Header) GetExtension(id uint8) (Extension, error) {
 			return ext, nil
 		}
 	}
-	return Extension{}, fmt.Errorf("%w, id: %d", errExtensionNotFound, id)
+	return Extension{}, fmt.Errorf("%w, id: %d", ErrExtensionNotFound, id)
 }
 
 // ----------------------------------------------------
@@ -278,7 +278,7 @@ func (p *Packet) Unmarshal(buf []byte) error {
 		return err
 	}
 	if hdrSize > len(buf) {
-		return fmt.Errorf("%w: %d < %d", errBufferSizeInsufficient, len(buf), hdrSize)
+		return fmt.Errorf("%w: %d < %d", ErrBufferSizeInsufficient, len(buf), hdrSize)
 	}
 
 	p.Payload = buf[hdrSize:]
@@ -297,7 +297,7 @@ func (p *Packet) Marshal() ([]byte, error) {
 func (p *Packet) MarshalTo(buf []byte) error {
 	size := p.Header.MarshalSize() + len(p.Payload)
 	if len(buf) < size {
-		return fmt.Errorf("%w: %d < %d", errBufferSizeInsufficient, len(buf), size)
+		return fmt.Errorf("%w: %d < %d", ErrBufferSizeInsufficient, len(buf), size)
 	}
 
 	hdrSize, err := p.Header.MarshalTo(buf)
