@@ -108,6 +108,27 @@ message SimulationRun {
     optional bool redundant_statements = 17;
     optional bool poor_question_quality = 18;
     optional float conversation_progression = 19;  // 0-1, derived from the flags above
+    // The judge's evidence behind each flag set above.
+    repeated Finding progression_findings = 20;
+
+    // One key entity as said, with every saying the listener got wrong.
+    message Entity {
+      string term = 1;  // as the judge extracted it
+      uint32 uttered = 2;
+      uint32 recognized = 3;
+      repeated Miss misses = 4;
+
+      message Miss {
+        uint32 turn = 1;      // Turn.index of the saying
+        string heard_as = 2;  // what the listener wrote there; "" when it was dropped
+      }
+    }
+
+    // One flagged progression dimension and the judge's evidence for it.
+    message Finding {
+      string dimension = 1;  // the flag's field name, e.g. "information_loss"
+      string evidence = 2;
+    }
 
     // The agent's perception of the caller. Audio only.
     message STT {
@@ -129,6 +150,8 @@ message SimulationRun {
       optional float entity_recall = 14;  // acquired_recognized / acquired_uttered
       optional uint32 entities_acquired_uttered = 15;
       optional uint32 entities_acquired_recognized = 16;
+      // Per entity, so a rate below 1 names what was misheard.
+      repeated Entity entities = 17;
     }
 
     message LLM {
@@ -154,6 +177,7 @@ message SimulationRun {
       optional float entity_recall = 17;  // acquired_recognized / acquired_uttered
       optional uint32 entities_acquired_uttered = 18;
       optional uint32 entities_acquired_recognized = 19;
+      repeated Entity entities = 20;
     }
 
     // Audio only.
@@ -196,6 +220,10 @@ message SimulationRun {
       optional bool eot_misprediction = 15;
       optional bool awkward_silence = 16;
       optional bool unanswered = 17;
+
+      // Audio only; this turn's words as the other side heard them.
+      optional uint32 words = 18;        // needs the RemoteSession
+      optional uint32 word_errors = 19;  // needs the RemoteSession
     }
   }
 
