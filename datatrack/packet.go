@@ -67,6 +67,18 @@ type Extension struct {
 	data []byte
 }
 
+func NewExtension(id uint8, data []byte) Extension {
+	return Extension{id: id, data: data}
+}
+
+func (e Extension) ID() uint8 {
+	return e.id
+}
+
+func (e Extension) Data() []byte {
+	return e.data
+}
+
 type Header struct {
 	Version        uint8
 	IsStartOfFrame bool
