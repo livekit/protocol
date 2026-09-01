@@ -2539,8 +2539,8 @@ type SimulationRun_List_Request struct {
 	// Exact agent name. Unset means every agent — including the runs whose
 	// name is empty, which a bare string could not tell from no filter.
 	AgentName *string `protobuf:"bytes,6,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"`
-	// Unset means every mode. `SimulationRun.mode` reads unspecified as TEXT,
-	// so a TEXT filter matches runs stored with either value.
+	// Absent applies no mode filter. TEXT matches runs stored as TEXT or
+	// UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
 	Mode          *SimulationMode `protobuf:"varint,7,opt,name=mode,proto3,enum=livekit.SimulationMode,oneof" json:"mode,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

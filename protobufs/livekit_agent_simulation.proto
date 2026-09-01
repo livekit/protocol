@@ -279,8 +279,8 @@ message SimulationRun {
       // Exact agent name. Unset means every agent — including the runs whose
       // name is empty, which a bare string could not tell from no filter.
       optional string agent_name = 6;
-      // Unset means every mode. `SimulationRun.mode` reads unspecified as TEXT,
-      // so a TEXT filter matches runs stored with either value.
+      // Absent applies no mode filter. TEXT matches runs stored as TEXT or
+      // UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
       optional SimulationMode mode = 7;
     }
     message Response {
