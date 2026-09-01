@@ -279,6 +279,9 @@ message SimulationRun {
       // Exact agent name. Unset means every agent — including the runs whose
       // name is empty, which a bare string could not tell from no filter.
       optional string agent_name = 6;
+      // Unset means every mode. `SimulationRun.mode` reads unspecified as TEXT,
+      // so a TEXT filter matches runs stored with either value.
+      optional SimulationMode mode = 7;
     }
     message Response {
       repeated SimulationRun runs = 1;
@@ -299,6 +302,7 @@ message SimulationRun {
       // above them drop would make the histogram an answer about a wider set.
       optional Status status = 4;
       optional string agent_name = 5;
+      optional SimulationMode mode = 6;
     }
     message Response {
       // Buckets holding at least one run, ascending by bucket_start. Empty
