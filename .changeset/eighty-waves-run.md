@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add data track subscription to sync state
+Move data track packet serialization from livekit package

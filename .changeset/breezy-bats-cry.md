@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Remove extraneous format specifier from log string.
+Add fuzz test for data track packet deserialization
