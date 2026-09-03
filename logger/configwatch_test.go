@@ -26,7 +26,7 @@ func TestApplyConfigFile(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "logging.yaml")
 		writeFile(t, path, "level: debug\n")
 
-		applied, ok := applyConfigFile(conf, path, nil)
+		applied, ok := applyConfigFile(conf, conf.snapshot(), path, nil)
 		require.True(t, ok)
 		require.NotEmpty(t, applied)
 		require.True(t, zapLoggerCore(l).Enabled(zapcore.DebugLevel),
@@ -49,7 +49,7 @@ func TestApplyConfigFile(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "logging.yaml")
 		writeFile(t, path, "level: warn\n")
 
-		_, ok := applyConfigFile(conf, path, nil)
+		_, ok := applyConfigFile(conf, conf.snapshot(), path, nil)
 		require.True(t, ok)
 		require.Equal(t, "warn", conf.Level)
 		require.True(t, conf.JSON)
@@ -66,7 +66,7 @@ func TestApplyConfigFile(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "logging.yaml")
 		writeFile(t, path, "component_levels:\n  psrpc: debug\n")
 
-		_, ok := applyConfigFile(conf, path, nil)
+		_, ok := applyConfigFile(conf, conf.snapshot(), path, nil)
 		require.True(t, ok)
 		require.Equal(t, "error", conf.ComponentLevels["pion"])
 		require.Equal(t, "debug", conf.ComponentLevels["psrpc"])
@@ -78,9 +78,9 @@ func TestApplyConfigFile(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "logging.yaml")
 		writeFile(t, path, "level: debug\n")
 
-		applied, ok := applyConfigFile(conf, path, nil)
+		applied, ok := applyConfigFile(conf, conf.snapshot(), path, nil)
 		require.True(t, ok)
-		_, ok = applyConfigFile(conf, path, applied)
+		_, ok = applyConfigFile(conf, conf.snapshot(), path, applied)
 		require.False(t, ok)
 	})
 
@@ -92,7 +92,7 @@ func TestApplyConfigFile(t *testing.T) {
 		path := filepath.Join(t.TempDir(), "logging.yaml")
 		writeFile(t, path, "level: [not, a, string\n")
 
-		_, ok := applyConfigFile(conf, path, nil)
+		_, ok := applyConfigFile(conf, conf.snapshot(), path, nil)
 		require.False(t, ok)
 		require.Equal(t, "info", conf.Level)
 		require.False(t, zapLoggerCore(l).Enabled(zapcore.DebugLevel))
@@ -100,7 +100,7 @@ func TestApplyConfigFile(t *testing.T) {
 
 	t.Run("a missing file is tolerated", func(t *testing.T) {
 		conf := &Config{Level: "info"}
-		_, ok := applyConfigFile(conf, filepath.Join(t.TempDir(), "absent.yaml"), nil)
+		_, ok := applyConfigFile(conf, conf.snapshot(), filepath.Join(t.TempDir(), "absent.yaml"), nil)
 		require.False(t, ok)
 		require.Equal(t, "info", conf.Level)
 	})
@@ -150,11 +150,36 @@ func TestApplyConfigFileWhileResolvingComponents(t *testing.T) {
 	var last []byte
 	for i, level := range []string{"debug", "warn", "info", "error"} {
 		writeFile(t, path, "level: "+level+"\n")
-		applied, ok := applyConfigFile(conf, path, last)
+		applied, ok := applyConfigFile(conf, conf.snapshot(), path, last)
 		require.True(t, ok, "iteration %d", i)
 		last = applied
 	}
 	<-done
 	require.Equal(t, "error", conf.Level)
 	require.Equal(t, "error", conf.ComponentLevels["pion"])
+}
+
+// The reset path the chart documents: emptying the file must put the startup levels back, not
+// leave the last override in force. Applying each file over a baseline rather than over the
+// config currently in force is what makes this hold.
+func TestEmptyFileRestoresStartupConfig(t *testing.T) {
+	conf := &Config{Level: "info", ComponentLevels: map[string]string{"pion": "error"}}
+	l, err := NewZapLogger(conf)
+	require.NoError(t, err)
+	baseline := conf.snapshot()
+
+	path := filepath.Join(t.TempDir(), "logging.yaml")
+	writeFile(t, path, "level: debug\ncomponent_levels:\n  psrpc: debug\n")
+	applied, ok := applyConfigFile(conf, baseline, path, nil)
+	require.True(t, ok)
+	require.Equal(t, "debug", conf.Level)
+	require.True(t, zapLoggerCore(l).Enabled(zapcore.DebugLevel))
+
+	writeFile(t, path, "{}\n")
+	_, ok = applyConfigFile(conf, baseline, path, applied)
+	require.True(t, ok)
+	require.Equal(t, "info", conf.Level)
+	require.Equal(t, map[string]string{"pion": "error"}, conf.ComponentLevels,
+		"a component the file no longer names must stop applying")
+	require.False(t, zapLoggerCore(l).Enabled(zapcore.DebugLevel))
 }
