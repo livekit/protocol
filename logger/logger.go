@@ -150,11 +150,12 @@ type sharedConfig struct {
 func newSharedConfig(conf *Config) *sharedConfig {
 	sc := &sharedConfig{
 		level:           zap.NewAtomicLevelAt(ParseZapLevel(conf.Level)),
-		config:          conf,
+		config:          conf.snapshot(),
 		componentLevels: make(map[string]zap.AtomicLevel),
 	}
 	conf.AddUpdateObserver(sc.onConfigUpdate)
 	_ = sc.onConfigUpdate(conf)
+	startConfigWatchFromEnv(conf)
 	return sc
 }
 
@@ -164,7 +165,11 @@ func (c *sharedConfig) onConfigUpdate(conf *Config) error {
 
 	// we have to update alla existing component levels
 	c.mu.Lock()
-	c.config = conf
+	// Snapshot, not the caller's live Config: Update writes that object's fields under its own
+	// lock, while ComponentLevel reads them under c.mu. Holding a private copy keeps the two
+	// mutexes from guarding the same memory now that Update is actually reachable (the file
+	// watcher calls it; before that nothing ever did).
+	c.config = conf.snapshot()
 	for component, atomicLevel := range c.componentLevels {
 		effectiveLevel := c.level.Level()
 		parts := strings.Split(component, ".")

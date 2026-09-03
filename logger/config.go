@@ -67,6 +67,30 @@ func (c *Config) Update(o *Config) error {
 	return nil
 }
 
+// snapshot copies the data fields so a file can be unmarshalled over the config in force.
+// Update assigns every field, so decoding a partial file into a zero Config would silently reset
+// the rest — including ComponentLevels, which is where livekit-server puts pion_level.
+func (c *Config) snapshot() *Config {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	componentLevels := make(map[string]string, len(c.ComponentLevels))
+	for component, level := range c.ComponentLevels {
+		componentLevels[component] = level
+	}
+	return &Config{
+		JSON:               c.JSON,
+		Level:              c.Level,
+		Sample:             c.Sample,
+		ComponentLevels:    componentLevels,
+		SampleInitial:      c.SampleInitial,
+		SampleInterval:     c.SampleInterval,
+		ItemSampleSeconds:  c.ItemSampleSeconds,
+		ItemSampleInitial:  c.ItemSampleInitial,
+		ItemSampleInterval: c.ItemSampleInterval,
+	}
+}
+
 func (c *Config) AddUpdateObserver(cb ConfigObserver) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
