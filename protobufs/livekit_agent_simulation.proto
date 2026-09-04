@@ -75,6 +75,10 @@ message SimulationRun {
     Usage usage = 13;
     // Quality metrics for this job's call. Unset when the job produced none.
     JobMetrics metrics = 14;
+    // The deployed cloud agent version that served this job, as self-reported
+    // by the agent participant's `lk.agent.version` attribute. Unset when the
+    // agent did not report one.
+    optional string agent_version = 15;
 
     message Usage {
       int32 text_turns_count = 1;
@@ -373,6 +377,12 @@ message SimulationRun {
   optional int32 issue_count = 21;
   // The pipeline this run came from; unset when it did not come from one.
   optional CI ci = 22;
+  // The deployed cloud agent version (the deploy tag shown by
+  // `lk agent versions`) that served this run, as self-reported by the agent
+  // participant's `lk.agent.version` attribute. Set only when every job in the
+  // run reports the same version; unset when jobs disagree (a run that
+  // straddles a deploy) or the agent did not report one.
+  optional string agent_version = 23;
 
   message Usage {
     int32 text_turns_count = 1;
