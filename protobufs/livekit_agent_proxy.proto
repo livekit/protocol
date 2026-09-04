@@ -1,0 +1,80 @@
+// Copyright 2023 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package livekit;
+option go_package = "github.com/livekit/protocol/livekit";
+option csharp_namespace = "LiveKit.Proto";
+option ruby_package = "LiveKit::Proto";
+
+import "logger/options.proto";
+
+// Reaching a worker's HTTP endpoints from LiveKit Cloud.
+//
+// A worker cannot accept inbound connections, so it dials a pool of websockets to the
+// cloud controller, which multiplexes requests over them. A stream carries opaque HTTP
+// bytes both ways, so streaming, SSE and websocket upgrades work without HTTP parsing.
+
+// One multiplexed frame, carried as a single websocket binary message.
+message AgentHttpFrame {
+  // The stream this frame belongs to; the controller opens them all and takes odd ids.
+  //
+  // 0 is the connection itself rather than a stream on it, which only credit uses: every
+  // stream draws from a window the whole wire shares, and that window is refilled here.
+  uint32 stream_id = 1;
+
+  oneof message {
+    AgentHttpRegistration registration = 2;
+    AgentHttpOpen open = 3;
+    // bare bytes, so a frame costs one copy and not a nested parse
+    bytes data = 4;
+    // half-close: nothing more this way, the other direction keeps going
+    AgentHttpEof eof = 5;
+    // the stream is over and whatever was in flight is lost
+    AgentHttpReset reset = 6;
+    // the sender may put this many more bytes in flight
+    uint32 credit = 7;
+  };
+}
+
+// Who the worker is and what it serves. The first frame of every wire.
+//
+// Registration lands on whichever node the load balancer picked, which is not the node
+// the wires land on, so it cannot carry this.
+message AgentHttpRegistration {
+  // Identifies the worker process, so it must be stable for its life and unique between
+  // workers. Not the id RegisterWorkerResponse gives: a wire is dialled before then.
+  string worker_id = 1 [(logger.name) = "workerID"];
+
+  // The first path segment of a request: "get_order" takes /get_order and all below it.
+  // The controller compares that one segment and forwards the path untouched, so the
+  // worker's own router answers 404 and 405 itself.
+  repeated string endpoints = 2;
+
+  // Requests the controller may have in flight against this worker. 0 means no limit.
+  uint32 max_concurrent_requests = 3;
+}
+
+// What the controller knows about a request that the bytes themselves do not carry.
+message AgentHttpOpen {
+  string request_id = 1 [(logger.name) = "requestID"];
+  // client address as the controller saw it, before any X-Forwarded-For it injects
+  string peer_addr = 2;
+  map<string, string> attributes = 3;
+}
+
+message AgentHttpEof {}
+
+message AgentHttpReset {}
