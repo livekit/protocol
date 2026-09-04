@@ -355,6 +355,10 @@ message SimulationRun {
   // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
   // Compressed by default so the blob ships as-is on every hop.
   bytes summary_zstd = 20;
+  // How many issues the stored summary flagged. Present only once a summary
+  // landed — absent and 0 differ ("never summarized" vs "no issues") — and
+  // List responses carry it without the summary blob itself.
+  optional int32 issue_count = 21;
 
   message Usage {
     int32 text_turns_count = 1;

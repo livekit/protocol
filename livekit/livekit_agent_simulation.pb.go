@@ -316,7 +316,11 @@ type SimulationRun struct {
 	Metrics *SimulationRun_RunMetrics `protobuf:"bytes,19,opt,name=metrics,proto3" json:"metrics,omitempty"`
 	// zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
 	// Compressed by default so the blob ships as-is on every hop.
-	SummaryZstd   []byte `protobuf:"bytes,20,opt,name=summary_zstd,json=summaryZstd,proto3" json:"summary_zstd,omitempty"`
+	SummaryZstd []byte `protobuf:"bytes,20,opt,name=summary_zstd,json=summaryZstd,proto3" json:"summary_zstd,omitempty"`
+	// How many issues the stored summary flagged. Present only once a summary
+	// landed — absent and 0 differ ("never summarized" vs "no issues") — and
+	// List responses carry it without the summary blob itself.
+	IssueCount    *int32 `protobuf:"varint,21,opt,name=issue_count,json=issueCount,proto3,oneof" json:"issue_count,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -482,6 +486,13 @@ func (x *SimulationRun) GetSummaryZstd() []byte {
 		return x.SummaryZstd
 	}
 	return nil
+}
+
+func (x *SimulationRun) GetIssueCount() int32 {
+	if x != nil && x.IssueCount != nil {
+		return *x.IssueCount
+	}
+	return 0
 }
 
 // A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
@@ -3124,7 +3135,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xefI\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xa5J\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3148,7 +3159,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vconcurrency\x18\x11 \x01(\x05R\vconcurrency\x12+\n" +
 	"\x04mode\x18\x12 \x01(\x0e2\x17.livekit.SimulationModeR\x04mode\x12;\n" +
 	"\ametrics\x18\x13 \x01(\v2!.livekit.SimulationRun.RunMetricsR\ametrics\x12!\n" +
-	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x1a\xd6\x05\n" +
+	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x12$\n" +
+	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
+	"issueCount\x88\x01\x01\x1a\xd6\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3456,7 +3469,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x12STATUS_SUMMARIZING\x10\x03\x12\x14\n" +
 	"\x10STATUS_COMPLETED\x10\x04\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x05\x12\x14\n" +
-	"\x10STATUS_CANCELLED\x10\x06J\x04\b\b\x10\tR\asummary\"\xa5\x03\n" +
+	"\x10STATUS_CANCELLED\x10\x06B\x0e\n" +
+	"\f_issue_countJ\x04\b\b\x10\tR\asummary\"\xa5\x03\n" +
 	"\bScenario\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\"\n" +
 	"\finstructions\x18\x02 \x01(\tR\finstructions\x12-\n" +
@@ -3639,6 +3653,7 @@ func file_livekit_agent_simulation_proto_init() {
 	}
 	file_livekit_cloud_agent_proto_init()
 	file_livekit_models_proto_init()
+	file_livekit_agent_simulation_proto_msgTypes[1].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[8].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[9].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[18].OneofWrappers = []any{}
