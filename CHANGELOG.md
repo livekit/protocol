@@ -1,5 +1,23 @@
 # github.com/livekit/protocol
 
+## 1.51.1
+
+### Patch Changes
+
+- Add fuzz test for data track packet deserialization - [#1759](https://github.com/livekit/protocol/pull/1759) ([@ladvoc](https://github.com/ladvoc))
+
+- Move data track packet serialization from livekit package - [#1757](https://github.com/livekit/protocol/pull/1757) ([@ladvoc](https://github.com/ladvoc))
+
+- Change GRPC code mapping for SIP 480/486 - [#1766](https://github.com/livekit/protocol/pull/1766) ([@ChelseaBradbury](https://github.com/ChelseaBradbury))
+
+- Add psrpc bus compression settings to PSRPCConfig - [#1771](https://github.com/livekit/protocol/pull/1771) ([@paulwe](https://github.com/paulwe))
+
+- sdp: harden SDPFragment.Unmarshal against out-of-range accesses - [#1767](https://github.com/livekit/protocol/pull/1767) ([@boks1971](https://github.com/boks1971))
+
+- Add `SimulationRun.CI` — the provider, commit, ref, pull request, run URL, and actor of the pipeline that started a run — to `SimulationRun.Create.Request` and to `SimulationRun`, so the dashboard can link a run back to the CI job that produced it. - [#1758](https://github.com/livekit/protocol/pull/1758) ([@u9g](https://github.com/u9g))
+
+- sip: fix panic in EvaluateDispatchRule on an empty From user part - [#1768](https://github.com/livekit/protocol/pull/1768) ([@hechen-eng](https://github.com/hechen-eng))
+
 ## 1.51.0
 
 ### Minor Changes
