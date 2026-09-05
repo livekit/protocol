@@ -16,7 +16,7 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.2.0
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731
-	github.com/livekit/psrpc v0.7.5
+	github.com/livekit/psrpc v0.7.6
 	github.com/mackerelio/go-osstat v0.2.8
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
 	github.com/nyaruka/phonenumbers v1.8.1

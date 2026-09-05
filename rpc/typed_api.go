@@ -31,10 +31,22 @@ import (
 )
 
 type PSRPCConfig struct {
-	MaxAttempts int           `yaml:"max_attempts,omitempty"`
-	Timeout     time.Duration `yaml:"timeout,omitempty"`
-	Backoff     time.Duration `yaml:"backoff,omitempty"`
-	BufferSize  int           `yaml:"buffer_size,omitempty"`
+	MaxAttempts int               `yaml:"max_attempts,omitempty"`
+	Timeout     time.Duration     `yaml:"timeout,omitempty"`
+	Backoff     time.Duration     `yaml:"backoff,omitempty"`
+	BufferSize  int               `yaml:"buffer_size,omitempty"`
+	Compression CompressionConfig `yaml:"compression,omitempty"`
+}
+
+// Quality zero disables compression. Only MaxDecompressedSize affects reading.
+type CompressionConfig struct {
+	Quality             int `yaml:"quality,omitempty"`
+	Threshold           int `yaml:"threshold,omitempty"`
+	MaxDecompressedSize int `yaml:"max_decompressed_size,omitempty"`
+}
+
+var DefaultCompressionConfig = CompressionConfig{
+	Threshold: psrpc.DefaultCompressionThreshold,
 }
 
 var DefaultPSRPCConfig = PSRPCConfig{
@@ -42,6 +54,17 @@ var DefaultPSRPCConfig = PSRPCConfig{
 	Timeout:     3 * time.Second,
 	Backoff:     2 * time.Second,
 	BufferSize:  1000,
+	Compression: DefaultCompressionConfig,
+}
+
+func (c PSRPCConfig) BusOptions() []psrpc.BusOption {
+	return []psrpc.BusOption{
+		psrpc.WithBusCompression(psrpc.CompressionOpts{
+			Quality:             c.Compression.Quality,
+			Threshold:           c.Compression.Threshold,
+			MaxDecompressedSize: c.Compression.MaxDecompressedSize,
+		}),
+	}
 }
 
 type ClientParams struct {
