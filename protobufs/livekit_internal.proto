@@ -214,6 +214,9 @@ message RoomInternal {
   bool replay_enabled = 6;
   bool export_room = 7;
   map<string, string> tags = 8;
+  // room-scoped webhooks, resolved from CreateRoomRequest/RoomConfiguration at
+  // room creation. Not exposed on the public Room proto: entries carry signing keys.
+  repeated WebhookConfig webhooks = 9;
 }
 
 enum ICECandidateType {
