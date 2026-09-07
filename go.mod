@@ -14,7 +14,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jxskiss/base62 v1.1.0
-	github.com/lithammer/shortuuid/v4 v4.2.0
+	github.com/lithammer/shortuuid/v4 v4.3.0
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731
 	github.com/livekit/psrpc v0.7.6
 	github.com/mackerelio/go-osstat v0.2.8
