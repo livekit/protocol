@@ -81,6 +81,21 @@ message CreateAgentV2Response {
   repeated string server_regions = 3;
 }
 
+message PromoteAgentRequest {
+  string agent_id = 1 [(logger.name) = "agentID"];
+  string src_deployment = 2;
+  string dst_deployment = 3;
+}
+
+message PromoteAgentResponse {
+  bool success = 1;
+  string message = 2;
+  string agent_id = 3 [(logger.name) = "agentID"];
+  string src_deployment = 4;
+  string dst_deployment = 5;
+  string version_tag = 6;
+}
+
 message PresignedPostRequest {
   string url = 1;
   map<string, string> values = 2;
@@ -105,6 +120,7 @@ message AgentDeployment {
     string version = 16;
     string agent_name = 17;
     bool deployment_enabled = 18;
+    google.protobuf.Timestamp last_scraped_at = 19;
 }
 
 message AgentInfo {
@@ -171,13 +187,14 @@ message RestartAgentResponse {
 }
 
 message DeployAgentRequest {
-    string agent_id              = 1 [(logger.name) = "agentID"];
-    string agent_name            = 2 [deprecated=true];
-    repeated AgentSecret secrets = 3;
-    int32 replicas               = 4 [deprecated=true];
-    int32 max_replicas           = 5 [deprecated=true];
-    string cpu_req               = 6 [deprecated=true];
-    string deployment            = 7;
+    string agent_id                = 1 [(logger.name) = "agentID"];
+    string agent_name              = 2 [deprecated=true];
+    repeated AgentSecret secrets   = 3;
+    int32 replicas                 = 4 [deprecated=true];
+    int32 max_replicas             = 5 [deprecated=true];
+    string cpu_req                 = 6 [deprecated=true];
+    string deployment              = 7;
+    map<string, string> attributes = 8;
 }
 
 message DeployAgentResponse {
@@ -191,9 +208,10 @@ message DeployAgentResponse {
 }
 
 message DeployAgentV2Request {
-  string agent_id              = 1 [(logger.name) = "agentID"];
-  repeated AgentSecret secrets = 2;
-  string deployment           = 3;
+  string agent_id                = 1 [(logger.name) = "agentID"];
+  repeated AgentSecret secrets   = 2;
+  string deployment              = 3;
+  map<string, string> attributes = 4;
 }
 
 message DeployAgentV2Response {
@@ -338,6 +356,7 @@ message GetPrivateLinkStatusResponse {
 service CloudAgent {
     rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse) {}
     rpc CreateAgentV2(CreateAgentV2Request) returns (CreateAgentV2Response) {}
+    rpc PromoteAgent(PromoteAgentRequest) returns (PromoteAgentResponse) {}
     rpc ListAgents(ListAgentsRequest) returns (ListAgentsResponse) {}
     rpc ListAgentVersions(ListAgentVersionsRequest) returns (ListAgentVersionsResponse) {}
     rpc ListAgentSecrets(ListAgentSecretsRequest) returns (ListAgentSecretsResponse) {}

@@ -79,6 +79,9 @@ func NewURLNotifier(params URLNotifierParams) *URLNotifier {
 	if params.Logger == nil {
 		params.Logger = logger.GetLogger()
 	}
+	if params.UserAgent == "" {
+		params.UserAgent = DefaultUserAgent
+	}
 
 	rhc := retryablehttp.NewClient()
 	if params.RetryWaitMin > 0 {
@@ -196,9 +199,12 @@ func (n *URLNotifier) QueueNotify(ctx context.Context, event *livekit.WebhookEve
 		fields = append(fields, "queueDuration", queueDuration)
 
 		sendStart := time.Now()
-		err := n.send(event, &params)
+		res, err := n.send(event, &params)
 		sendDuration := time.Since(sendStart)
 		fields = append(fields, "sendDuration", sendDuration)
+		if res != nil {
+			fields = append(fields, "status", res.Status, "statusCode", res.StatusCode)
+		}
 		if err != nil {
 			params.Logger.Warnw("failed to send webhook", err, fields...)
 			n.dropped.Add(event.NumDropped + 1)
@@ -258,12 +264,12 @@ func (n *URLNotifier) Stop(force bool) {
 	}
 }
 
-func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParams) error {
+func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParams) (*http.Response, error) {
 	// set dropped count
 	event.NumDropped = n.dropped.Swap(0)
 	encoded, err := protojson.Marshal(event)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// sign payload
 	sum := sha256.Sum256(encoded)
@@ -274,20 +280,20 @@ func (n *URLNotifier) send(event *livekit.WebhookEvent, params *URLNotifierParam
 		SetSha256(b64)
 	token, err := at.ToJWT()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	r, err := retryablehttp.NewRequest("POST", params.URL, bytes.NewReader(encoded))
 	if err != nil {
 		// ignore and continue
-		return err
+		return nil, err
 	}
 	r.Header.Set(authHeader, token)
-	// use a custom mime type to ensure signature is checked prior to parsing
-	r.Header.Set("content-type", "application/webhook+json")
+	r.Header.Set(contentTypeHeader, ContentType)
+	r.Header.Set(userAgentHeader, params.UserAgent)
 	res, err := n.client.Do(r)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	_ = res.Body.Close()
-	return nil
+	return res, nil
 }

@@ -100,6 +100,7 @@ func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
 func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
 	return psrpc.WithServerOptions(
 		middleware.WithServerMetrics(PSRPCMetricsObserver{}),
+		psrpc.WithServerObserver(PSRPCMetricsObserver{}),
 		WithServerLogger(logger),
 		otelpsrpc.ServerOptions(otelpsrpc.Config{}),
 	)

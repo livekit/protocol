@@ -77,6 +77,11 @@ func (v *APIKeyTokenVerifier) Verify(key interface{}) (*jwt.RegisteredClaims, *C
 		jwt.WithValidMethods(allowedSigningMethods),
 		jwt.WithIssuer(v.apiKey),
 		jwt.WithLeeway(tokenLeeway),
+		// Without this, a token carrying no exp claim passes validation and
+		// never expires. First-party SDKs always set exp, but any hand-rolled
+		// or third-party minter that forgets it silently mints a permanent
+		// credential.
+		jwt.WithExpirationRequired(),
 	)
 	if err != nil {
 		return nil, nil, err

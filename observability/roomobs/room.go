@@ -129,11 +129,12 @@ func TrackSourceFromProto(p livekit.TrackSource) TrackSource {
 
 type RoomFeature uint16
 
-func (f RoomFeature) HasIngress() bool   { return f&IngressRoomFeature != 0 }
-func (f RoomFeature) HasEgress() bool    { return f&EgressRoomFeature != 0 }
-func (f RoomFeature) HasSIP() bool       { return f&SIPRoomFeature != 0 }
-func (f RoomFeature) HasAgent() bool     { return f&AgentRoomFeature != 0 }
-func (f RoomFeature) HasConnector() bool { return f&ConnectorRoomFeature != 0 }
+func (f RoomFeature) HasIngress() bool    { return f&IngressRoomFeature != 0 }
+func (f RoomFeature) HasEgress() bool     { return f&EgressRoomFeature != 0 }
+func (f RoomFeature) HasSIP() bool        { return f&SIPRoomFeature != 0 }
+func (f RoomFeature) HasAgent() bool      { return f&AgentRoomFeature != 0 }
+func (f RoomFeature) HasConnector() bool  { return f&ConnectorRoomFeature != 0 }
+func (f RoomFeature) HasSimulation() bool { return f&SimulationRoomFeature != 0 }
 
 const (
 	IngressRoomFeature RoomFeature = 1 << iota
@@ -141,23 +142,35 @@ const (
 	SIPRoomFeature
 	AgentRoomFeature
 	ConnectorRoomFeature
+	SimulationRoomFeature
 )
 
-func RoomFeatureFromParticipantKind(k livekit.ParticipantInfo_Kind) RoomFeature {
+// RoomFeatureFromParticipantKind derives the room-session features implied by a
+// participant's kind and any kind details. Features are additive: a single
+// participant can contribute multiple bits (e.g. an AGENT participant flagged
+// with the SIMULATION kind detail yields both AgentRoomFeature and
+// SimulationRoomFeature).
+func RoomFeatureFromParticipantKind(k livekit.ParticipantInfo_Kind, details ...livekit.ParticipantInfo_KindDetail) RoomFeature {
+	var f RoomFeature
 	switch k {
 	case livekit.ParticipantInfo_INGRESS:
-		return IngressRoomFeature
+		f = IngressRoomFeature
 	case livekit.ParticipantInfo_EGRESS:
-		return EgressRoomFeature
+		f = EgressRoomFeature
 	case livekit.ParticipantInfo_SIP:
-		return SIPRoomFeature
+		f = SIPRoomFeature
 	case livekit.ParticipantInfo_AGENT:
-		return AgentRoomFeature
+		f = AgentRoomFeature
 	case livekit.ParticipantInfo_CONNECTOR:
-		return ConnectorRoomFeature
-	default:
-		return 0
+		f = ConnectorRoomFeature
 	}
+	for _, d := range details {
+		switch d {
+		case livekit.ParticipantInfo_SIMULATION:
+			f |= SimulationRoomFeature
+		}
+	}
+	return f
 }
 
 func ParticipantKindCode(k livekit.ParticipantInfo_Kind) int32 {

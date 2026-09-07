@@ -36,7 +36,7 @@ service IOInfo {
   rpc UpdateMetrics(UpdateMetricsRequest) returns (google.protobuf.Empty);
 
   // ingress
-  rpc CreateIngress(livekit.IngressInfo) returns (google.protobuf.Empty);
+  rpc CreateIngress(livekit.IngressInfo) returns (CreateIngressResponse);
   rpc GetIngressInfo(GetIngressInfoRequest) returns (GetIngressInfoResponse);
   rpc UpdateIngressState(UpdateIngressStateRequest) returns (google.protobuf.Empty);
 
@@ -66,6 +66,10 @@ message UpdateMetricsRequest {
   livekit.EgressInfo info = 1;
   float avg_cpu_usage = 3;
   float max_cpu_usage = 4;
+}
+
+message CreateIngressResponse {
+  livekit.IngressInfo info = 1;
 }
 
 // Query an ingress info from an ingress ID or stream key

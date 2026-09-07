@@ -15,13 +15,13 @@
 package rpc
 
 import (
-	"sort"
+	"maps"
+	"slices"
 	sync "sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/atomic"
-	"golang.org/x/exp/maps"
 
 	"github.com/livekit/psrpc"
 	"github.com/livekit/psrpc/pkg/middleware"
@@ -38,6 +38,9 @@ type psrpcMetrics struct {
 	streamCurrent      *prometheus.GaugeVec
 	errorTotal         *prometheus.CounterVec
 	bytesTotal         *prometheus.CounterVec
+	requestsReceived   *prometheus.CounterVec
+	requestsExpired    *prometheus.CounterVec
+	claimWaitTime      prometheus.ObserverVec
 }
 
 var (
@@ -78,12 +81,16 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 	}
 
 	metricsBase.curryLabels = o.curryLabels
-	curryLabelNames := maps.Keys(o.curryLabels)
-	sort.Strings(curryLabelNames)
+	curryLabelNames := slices.Collect(maps.Keys(o.curryLabels))
+	slices.Sort(curryLabelNames)
 
-	labels := append(curryLabelNames, "role", "kind", "service", "method")
-	streamLabels := append(curryLabelNames, "role", "service", "method")
-	bytesLabels := append(labels, "direction")
+	labels := slices.Concat(curryLabelNames, []string{"role", "kind", "service", "method"})
+	streamLabels := slices.Concat(curryLabelNames, []string{"role", "service", "method"})
+	errorLabels := slices.Concat(labels, []string{"error_code"})
+	bytesLabels := slices.Concat(labels, []string{"direction"})
+	// Lifecycle metrics are server-side only, so they carry no role label.
+	lifecycleLabels := slices.Concat(curryLabelNames, []string{"service", "method"})
+	claimLabels := slices.Concat(lifecycleLabels, []string{"outcome"})
 
 	metricsBase.requestTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace:   livekitNamespace,
@@ -116,13 +123,35 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 		Subsystem:   "psrpc",
 		Name:        "error_total",
 		ConstLabels: constLabels,
-	}, labels)
+	}, errorLabels)
 	metricsBase.bytesTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "psrpc",
 		Name:        "bytes_total",
 		ConstLabels: constLabels,
 	}, bytesLabels)
+
+	metricsBase.requestsReceived = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace:   livekitNamespace,
+		Subsystem:   "psrpc",
+		Name:        "requests_received_total",
+		ConstLabels: constLabels,
+	}, lifecycleLabels)
+	metricsBase.requestsExpired = prometheus.NewCounterVec(prometheus.CounterOpts{
+		Namespace:   livekitNamespace,
+		Subsystem:   "psrpc",
+		Name:        "requests_expired_total",
+		ConstLabels: constLabels,
+	}, lifecycleLabels)
+	metricsBase.claimWaitTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+		Namespace:   livekitNamespace,
+		Subsystem:   "psrpc",
+		Name:        "claim_wait_time_ms",
+		ConstLabels: constLabels,
+		// A granted claim settles in single-digit ms; a timed-out one runs to
+		// the caller's selection timeout, 1s by default.
+		Buckets: []float64{1, 5, 10, 25, 50, 100, 250, 500, 1000, 3000},
+	}, claimLabels)
 
 	metricsBase.mu.Unlock()
 
@@ -132,6 +161,9 @@ func InitPSRPCStats(constLabels prometheus.Labels, opts ...PSRPCMetricsOption) {
 	prometheus.MustRegister(metricsBase.streamCurrent)
 	prometheus.MustRegister(metricsBase.errorTotal)
 	prometheus.MustRegister(metricsBase.bytesTotal)
+	prometheus.MustRegister(metricsBase.requestsReceived)
+	prometheus.MustRegister(metricsBase.requestsExpired)
+	prometheus.MustRegister(metricsBase.claimWaitTime)
 
 	CurryMetricLabels(o.curryLabels)
 }
@@ -156,10 +188,23 @@ func CurryMetricLabels(labels prometheus.Labels) {
 		streamCurrent:      metricsBase.streamCurrent.MustCurryWith(metricsBase.curryLabels),
 		errorTotal:         metricsBase.errorTotal.MustCurryWith(metricsBase.curryLabels),
 		bytesTotal:         metricsBase.bytesTotal.MustCurryWith(metricsBase.curryLabels),
+		requestsReceived:   metricsBase.requestsReceived.MustCurryWith(metricsBase.curryLabels),
+		requestsExpired:    metricsBase.requestsExpired.MustCurryWith(metricsBase.curryLabels),
+		claimWaitTime:      metricsBase.claimWaitTime.MustCurryWith(metricsBase.curryLabels),
 	})
 }
 
-var _ middleware.MetricsObserver = PSRPCMetricsObserver{}
+func errorCodeLabel(err error) string {
+	if code, ok := psrpc.GetErrorCode(err); ok && code != psrpc.OK {
+		return string(code)
+	}
+	return string(psrpc.Unknown)
+}
+
+var (
+	_ middleware.MetricsObserver = PSRPCMetricsObserver{}
+	_ psrpc.RequestObserver      = PSRPCMetricsObserver{}
+)
 
 type PSRPCMetricsObserver struct{}
 
@@ -169,7 +214,7 @@ func (o PSRPCMetricsObserver) OnUnaryRequest(role middleware.MetricRole, info ps
 	m.bytesTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, "tx").Add(float64(txBytes))
 
 	if err != nil {
-		m.errorTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "rpc", info.Service, info.Method, errorCodeLabel(err)).Inc()
 	} else {
 		m.requestTime.WithLabelValues(role.String(), "rpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
@@ -181,7 +226,8 @@ func (o PSRPCMetricsObserver) OnMultiRequest(role middleware.MetricRole, info ps
 	m.bytesTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method, "tx").Add(float64(txBytes))
 
 	if responseCount == 0 {
-		m.errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Inc()
+		// psrpc's MetricsObserver doesn't surface an error for multi requests
+		m.errorTotal.WithLabelValues(role.String(), "multirpc", info.Service, info.Method, string(psrpc.Unknown)).Inc()
 	} else {
 		m.requestTime.WithLabelValues(role.String(), "multirpc", info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
@@ -192,7 +238,7 @@ func (o PSRPCMetricsObserver) OnStreamSend(role middleware.MetricRole, info psrp
 	m.bytesTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, "tx").Add(float64(bytes))
 
 	if err != nil {
-		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, errorCodeLabel(err)).Inc()
 	} else {
 		m.streamSendTime.WithLabelValues(role.String(), info.Service, info.Method).Observe(float64(duration.Milliseconds()))
 	}
@@ -203,7 +249,7 @@ func (o PSRPCMetricsObserver) OnStreamRecv(role middleware.MetricRole, info psrp
 	m.bytesTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, "rx").Add(float64(bytes))
 
 	if err != nil {
-		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method).Inc()
+		m.errorTotal.WithLabelValues(role.String(), "stream", info.Service, info.Method, errorCodeLabel(err)).Inc()
 	} else {
 		m.streamReceiveTotal.WithLabelValues(role.String(), info.Service, info.Method).Inc()
 	}
@@ -234,4 +280,21 @@ func (o UnimplementedMetricsObserver) OnStreamRecv(role middleware.MetricRole, r
 func (o UnimplementedMetricsObserver) OnStreamOpen(role middleware.MetricRole, rpcInfo psrpc.RPCInfo) {
 }
 func (o UnimplementedMetricsObserver) OnStreamClose(role middleware.MetricRole, rpcInfo psrpc.RPCInfo) {
+}
+
+// OnRequestReceived, OnRequestExpired and OnClaim report server-side lifecycle
+// events that the interceptor chain cannot see, because in each case the
+// handler is never invoked. Installed by psrpc.WithServerObserver, which is
+// separate from middleware.WithServerMetrics.
+
+func (o PSRPCMetricsObserver) OnRequestReceived(info psrpc.RPCInfo) {
+	metrics.Load().requestsReceived.WithLabelValues(info.Service, info.Method).Inc()
+}
+
+func (o PSRPCMetricsObserver) OnRequestExpired(info psrpc.RPCInfo, lateBy time.Duration) {
+	metrics.Load().requestsExpired.WithLabelValues(info.Service, info.Method).Inc()
+}
+
+func (o PSRPCMetricsObserver) OnClaim(info psrpc.RPCInfo, outcome psrpc.ClaimOutcome, wait time.Duration) {
+	metrics.Load().claimWaitTime.WithLabelValues(info.Service, info.Method, outcome.String()).Observe(float64(wait.Milliseconds()))
 }

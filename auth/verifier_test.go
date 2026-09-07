@@ -49,6 +49,26 @@ func TestVerifier(t *testing.T) {
 		require.Error(t, err)
 	})
 
+	t.Run("token without exp is rejected", func(t *testing.T) {
+		// hand-rolled JWT with no exp claim (the Go SDK always sets one, so
+		// build it directly to model a third-party minter forgetting exp)
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"iss": apiKey,
+			"nbf": jwt.NewNumericDate(time.Now().Add(-time.Minute)),
+			"video": map[string]interface{}{
+				"roomCreate": true,
+			},
+		})
+		authToken, err := token.SignedString([]byte(secret))
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(authToken)
+		require.NoError(t, err)
+
+		_, _, err = v.Verify(secret)
+		require.Error(t, err)
+	})
+
 	t.Run("unexpired token is verified", func(t *testing.T) {
 		claim := auth.VideoGrant{RoomCreate: true}
 		at := auth.NewAccessToken(apiKey, secret).

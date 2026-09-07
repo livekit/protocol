@@ -16,6 +16,7 @@ package rpc
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/puzpuzpuz/xsync/v4"
@@ -24,6 +25,28 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/psrpc"
 )
+
+// clientLocalError reports whether an RPC error surfaced on the client without
+// the server handler having produced (and logged) it: transport, timeout,
+// selection, and response-decoding failures. Errors returned by the server
+// handler are logged server-side with full request/response detail, so
+// clients only need to log them at debug.
+func clientLocalError(err error) bool {
+	var pe psrpc.Error
+	if !errors.As(err, &pe) {
+		return true
+	}
+	switch pe.Code() {
+	case psrpc.Canceled, psrpc.DeadlineExceeded, psrpc.Unavailable, psrpc.MalformedResponse:
+		return true
+	}
+	return false
+}
+
+// maxPayloadLogSize is the wire size in bytes above which RPC payloads are
+// logged as a summary. Encoded JSON can be several times larger than the wire
+// size; this keeps log lines within collector line limits.
+const maxPayloadLogSize = 32 << 10
 
 type loggerCache struct {
 	m *xsync.Map[string, logger.Logger]
@@ -62,10 +85,12 @@ func newClientRPCLoggerInterceptor(l logger.Logger) psrpc.ClientRPCInterceptor {
 		return func(ctx context.Context, req proto.Message, opts ...psrpc.RequestOption) (res proto.Message, err error) {
 			start := time.Now()
 			defer func() {
-				if err != nil {
-					l.Warnw("client error", err, "topic", rpcInfo.Topic, "request", logger.Proto(req), "response", logger.Proto(res), "duration", time.Since(start))
+				if err != nil && clientLocalError(err) {
+					l.Warnw("client error", err, "topic", rpcInfo.Topic, "request", logger.ProtoWithLimit(req, maxPayloadLogSize), "response", logger.ProtoWithLimit(res, maxPayloadLogSize), "duration", time.Since(start))
+				} else if err != nil {
+					l.Debugw("client error", "error", err, "topic", rpcInfo.Topic, "request", logger.ProtoWithLimit(req, maxPayloadLogSize), "duration", time.Since(start))
 				} else {
-					l.Debugw("client response", "topic", rpcInfo.Topic, "request", logger.Proto(req), "response", logger.Proto(res), "duration", time.Since(start))
+					l.Debugw("client response", "topic", rpcInfo.Topic, "request", logger.ProtoWithLimit(req, maxPayloadLogSize), "response", logger.ProtoWithLimit(res, maxPayloadLogSize), "duration", time.Since(start))
 				}
 			}()
 			return next(ctx, req, opts...)
@@ -80,9 +105,9 @@ func newServerRPCLoggerInterceptor(l logger.Logger) psrpc.ServerRPCInterceptor {
 		start := time.Now()
 		defer func() {
 			if err != nil {
-				l.Warnw("server error", err, "topic", rpcInfo.Topic, "request", logger.Proto(req), "response", logger.Proto(res), "duration", time.Since(start))
+				l.Warnw("server error", err, "topic", rpcInfo.Topic, "request", logger.ProtoWithLimit(req, maxPayloadLogSize), "response", logger.ProtoWithLimit(res, maxPayloadLogSize), "duration", time.Since(start))
 			} else {
-				l.Debugw("server response", "topic", rpcInfo.Topic, "request", logger.Proto(req), "response", logger.Proto(res), "duration", time.Since(start))
+				l.Debugw("server response", "topic", rpcInfo.Topic, "request", logger.ProtoWithLimit(req, maxPayloadLogSize), "response", logger.ProtoWithLimit(res, maxPayloadLogSize), "duration", time.Since(start))
 			}
 		}()
 		return handler(ctx, req)
@@ -107,7 +132,7 @@ type streamLoggerInterceptor struct {
 }
 
 func (s *streamLoggerInterceptor) Recv(msg proto.Message) (err error) {
-	s.logger.Debugw("received message", "message", logger.Proto(msg))
+	s.logger.Debugw("received message", "message", logger.ProtoWithLimit(msg, maxPayloadLogSize))
 	return s.StreamHandler.Recv(msg)
 }
 
@@ -115,9 +140,9 @@ func (s *streamLoggerInterceptor) Send(msg proto.Message, opts ...psrpc.StreamOp
 	start := time.Now()
 	defer func() {
 		if err != nil {
-			s.logger.Warnw("failed to send message", err, "message", logger.Proto(msg), "duration", time.Since(start))
+			s.logger.Warnw("failed to send message", err, "message", logger.ProtoWithLimit(msg, maxPayloadLogSize), "duration", time.Since(start))
 		} else {
-			s.logger.Debugw("sent message", "message", logger.Proto(msg), "duration", time.Since(start))
+			s.logger.Debugw("sent message", "message", logger.ProtoWithLimit(msg, maxPayloadLogSize), "duration", time.Since(start))
 		}
 	}()
 	return s.StreamHandler.Send(msg, opts...)
@@ -145,26 +170,34 @@ type multiRPCLoggerInterceptor struct {
 	start         time.Time
 	responseCount int
 	errorCount    int
+	lastErr       error
 }
 
 func (r *multiRPCLoggerInterceptor) Send(ctx context.Context, req proto.Message, opts ...psrpc.RequestOption) error {
 	r.start = time.Now()
-	r.logger.Debugw("multirpc opened", "request", logger.Proto(req))
+	r.logger.Debugw("multirpc opened", "request", logger.ProtoWithLimit(req, maxPayloadLogSize))
 	return r.ClientMultiRPCHandler.Send(ctx, req, opts...)
 }
 
 func (r *multiRPCLoggerInterceptor) Recv(msg proto.Message, err error) {
 	if err != nil {
-		r.logger.Warnw("received error", err)
+		// individual errors are summarized in Close to avoid one warn line
+		// per responding node on fan-out RPCs
+		r.logger.Debugw("received error", "error", err)
 		r.errorCount++
+		r.lastErr = err
 	} else {
-		r.logger.Debugw("received response", "response", logger.Proto(msg))
+		r.logger.Debugw("received response", "response", logger.ProtoWithLimit(msg, maxPayloadLogSize))
 		r.responseCount++
 	}
 	r.ClientMultiRPCHandler.Recv(msg, err)
 }
 
 func (r *multiRPCLoggerInterceptor) Close() {
-	r.logger.Debugw("multirpc closed", "responseCount", r.responseCount, "errorCount", r.errorCount)
+	if r.errorCount > 0 {
+		r.logger.Warnw("multirpc closed with errors", r.lastErr, "responseCount", r.responseCount, "errorCount", r.errorCount, "duration", time.Since(r.start))
+	} else {
+		r.logger.Debugw("multirpc closed", "responseCount", r.responseCount, "errorCount", r.errorCount)
+	}
 	r.ClientMultiRPCHandler.Close()
 }

@@ -74,6 +74,7 @@ func TestWebHook(t *testing.T) {
 
 			require.EqualValues(t, event, decodedEvent)
 			require.Equal(t, expectedUrl, r.URL.String())
+			require.Equal(t, DefaultUserAgent, r.UserAgent())
 		}
 		require.NoError(t, notifier.QueueNotify(context.Background(), event))
 		wg.Wait()
@@ -83,6 +84,35 @@ func TestWebHook(t *testing.T) {
 		require.NoError(t, notifier.QueueNotify(context.Background(), event, WithExtraWebhooks([]*livekit.WebhookConfig{&livekit.WebhookConfig{Url: "http://localhost:8765/wh"}})))
 		wg.Wait()
 
+	})
+
+	t.Run("overridden user agent", func(t *testing.T) {
+		notifier := NewURLNotifier(URLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			Config: URLNotifierConfig{
+				QueueSize: 20,
+			},
+			HTTPClientParams: HTTPClientParams{
+				UserAgent: "LiveKitCloud",
+			},
+		})
+		defer notifier.Stop(false)
+
+		ua := atomic.String{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			ua.Store(r.UserAgent())
+		}
+		require.NoError(t, notifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted}))
+		require.Eventually(
+			t,
+			func() bool {
+				return ua.Load() == "LiveKitCloud"
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
 	})
 }
 
@@ -187,8 +217,9 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		}
 		defer urlNotifier.Stop(false)
 
-		err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
+		res, err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
 		require.Error(t, err)
+		require.Nil(t, res)
 	})
 
 	t.Run("times out before connection", func(t *testing.T) {
@@ -208,8 +239,9 @@ func TestURLNotifierLifecycle(t *testing.T) {
 		defer urlNotifier.Stop(false)
 
 		startedAt := time.Now()
-		err = urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
+		res, err := urlNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &urlNotifier.params)
 		require.Error(t, err)
+		require.Nil(t, res)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
 }
@@ -395,11 +427,41 @@ func TestResourceWebHook(t *testing.T) {
 			require.NoError(t, err)
 
 			require.EqualValues(t, event, decodedEvent)
+			require.Equal(t, DefaultUserAgent, r.UserAgent())
 		}
 		require.NoError(t, resourceURLNotifier.QueueNotify(context.Background(), event))
 		wg.Wait()
 	})
 
+	t.Run("overridden user agent", func(t *testing.T) {
+		resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{
+			URL:       testUrl,
+			APIKey:    testAPIKey,
+			APISecret: testAPISecret,
+			Config: ResourceURLNotifierConfig{
+				MaxAge:   200 * time.Millisecond,
+				MaxDepth: 50,
+			},
+			HTTPClientParams: HTTPClientParams{
+				UserAgent: "LiveKitCloud",
+			},
+		})
+		defer resourceURLNotifier.Stop(false)
+
+		ua := atomic.String{}
+		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			ua.Store(r.UserAgent())
+		}
+		require.NoError(t, resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted}))
+		require.Eventually(
+			t,
+			func() bool {
+				return ua.Load() == "LiveKitCloud"
+			},
+			5*time.Second,
+			webhookCheckInterval,
+		)
+	})
 }
 
 func TestResourceURLNotifierDropped(t *testing.T) {
@@ -666,8 +728,9 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		}
 		defer resourceURLNotifier.Stop(false)
 
-		err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
+		res, err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
 		require.Error(t, err)
+		require.Nil(t, res)
 	})
 
 	t.Run("times out before connection", func(t *testing.T) {
@@ -694,8 +757,9 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 		defer resourceURLNotifier.Stop(false)
 
 		startedAt := time.Now()
-		err = resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
+		res, err := resourceURLNotifier.send(&livekit.WebhookEvent{Event: EventRoomStarted}, &params)
 		require.Error(t, err)
+		require.Nil(t, res)
 		require.Less(t, time.Since(startedAt).Seconds(), float64(2))
 	})
 }

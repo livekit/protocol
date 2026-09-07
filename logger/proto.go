@@ -53,6 +53,19 @@ func UnredactedProto(val proto.Message) zapcore.ObjectMarshaler {
 	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_PII}
 }
 
+// ProtoWithLimit behaves like Proto, but when the message's wire size exceeds
+// maxBytes it logs a compact summary instead of the full contents: message
+// type, wire size, and top-level scalar fields (redacted per sensitivity,
+// long strings truncated), with repeated/map fields reduced to counts and
+// nested messages dropped. Use for messages of unbounded size, such as RPC
+// payloads.
+func ProtoWithLimit(val proto.Message, maxBytes int) zapcore.ObjectMarshaler {
+	if val == nil {
+		return nil
+	}
+	return protoMarshaller{m: val.ProtoReflect(), maxLevel: logger.Sensitivity_SENSITIVITY_UNSPECIFIED, maxSize: maxBytes}
+}
+
 var _ zapcore.ObjectMarshaler = protoMarshaller{}
 var _ zapcore.ObjectMarshaler = protoMapMarshaller{}
 var _ zapcore.ArrayMarshaler = protoListMarshaller{}
@@ -60,11 +73,20 @@ var _ zapcore.ArrayMarshaler = protoListMarshaller{}
 type protoMarshaller struct {
 	m        protoreflect.Message
 	maxLevel logger.Sensitivity
+	// maxSize is the wire size in bytes above which the message is logged as
+	// a summary instead of its full contents. 0 means no limit.
+	maxSize int
 }
 
 func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	if !p.m.IsValid() {
 		return nil
+	}
+
+	if p.maxSize > 0 {
+		if size := proto.Size(p.m.Interface()); size > p.maxSize {
+			return p.marshalSummary(e, size)
+		}
 	}
 
 	fields := p.m.Descriptor().Fields()
@@ -98,6 +120,48 @@ func (p protoMarshaller) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		}
 	}
 	return nil
+}
+
+// marshalSummary keeps top-level scalar fields, which do not meaningfully
+// contribute to message size, and reduces lists, maps, and long strings to
+// counts and sizes.
+func (p protoMarshaller) marshalSummary(e zapcore.ObjectEncoder, size int) error {
+	e.AddString("truncatedProto", string(p.m.Descriptor().FullName()))
+	e.AddInt("protoBytes", size)
+
+	fields := p.m.Descriptor().Fields()
+	for i := 0; i < fields.Len(); i++ {
+		f := fields.Get(i)
+		v := p.m.Get(f)
+		if protoFieldIsZero(f, v) {
+			continue
+		}
+		k := f.JSONName()
+		if proto.HasExtension(f.Options(), logger.E_Name) {
+			k = proto.GetExtension(f.Options(), logger.E_Name).(string)
+		}
+		switch {
+		case f.IsMap():
+			e.AddInt(k+"Count", v.Map().Len())
+		case f.IsList():
+			e.AddInt(k+"Count", v.List().Len())
+		case f.Kind() == protoreflect.MessageKind, f.Kind() == protoreflect.GroupKind:
+		case fieldSensitivity(f) > p.maxLevel:
+			e.AddString(k, marshalRedacted(f, v))
+		case f.Kind() == protoreflect.StringKind:
+			e.AddString(k, marshalTruncatedString(v.String()))
+		default:
+			marshalProtoField(k, f, v, e, p.maxLevel)
+		}
+	}
+	return nil
+}
+
+func marshalTruncatedString(s string) string {
+	if len(s) <= 256 {
+		return s
+	}
+	return fmt.Sprintf("%s... (%d bytes)", s[:256], len(s))
 }
 
 type protoMapMarshaller struct {

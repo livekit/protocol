@@ -30,6 +30,12 @@ func (f *filter) SetFilter(params FilterParams) {
 	f.params = params
 }
 
+// IsAllowed reports whether event passes the include/exclude filter. IncludeEvents
+// takes precedence over ExcludeEvents; if neither is set, the event is allowed.
+func (p FilterParams) IsAllowed(event string) bool {
+	return newFilter(p).IsAllowed(event)
+}
+
 // IncludeEvents and ExcludeEvents are mutually exclusive; only one will be checked
 // if neither are set, the event will be allowed
 func (f *filter) IsAllowed(event string) bool {

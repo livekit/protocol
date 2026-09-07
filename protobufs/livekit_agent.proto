@@ -35,6 +35,7 @@ message Job {
   bool enable_recording = 10;
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
+  bool enable_redaction = 13;
 }
 
 message JobState {

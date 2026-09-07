@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package configutil
 
 import (
 	"os"
@@ -22,8 +22,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/require"
-
-	"github.com/livekit/protocol/utils/configutil"
 )
 
 const testConfig0 = `foo: a`
@@ -56,14 +54,14 @@ func TestConfigObserver(t *testing.T) {
 	_, err = f.WriteString(testConfig0)
 	require.NoError(t, err)
 
-	obs, conf, err := NewConfigObserver(f.Name(), testConfigBuilder{})
+	obs, conf, err := NewObserver(f.Name(), testConfigBuilder{})
 	require.NoError(t, err)
 	t.Cleanup(obs.Close)
 
 	require.Equal(t, "a", conf.Foo)
 	require.Equal(t, "c", conf.Bar)
 
-	atomicFoo := configutil.NewAtomicValue(obs, func(c *TestConfig) string {
+	atomicFoo := NewAtomicValue(obs, func(c *TestConfig) string {
 		return c.Foo
 	})
 

@@ -20,52 +20,54 @@ import (
 	"go.uber.org/atomic"
 )
 
-type ConfigObserver[T any] interface {
+type Observable[T any] interface {
 	Observe(cb func(*T)) func()
 	Load() *T
 }
 
-func NewAtomicBool[C any](config ConfigObserver[C], accessor func(*C) bool) *atomic.Bool {
+type ConfigObserver[T any] = Observable[T]
+
+func NewAtomicBool[C any](config Observable[C], accessor func(*C) bool) *atomic.Bool {
 	return newAtomic(atomic.NewBool, config, accessor)
 }
 
-func NewAtomicDuration[C any](config ConfigObserver[C], accessor func(*C) time.Duration) *atomic.Duration {
+func NewAtomicDuration[C any](config Observable[C], accessor func(*C) time.Duration) *atomic.Duration {
 	return newAtomic(atomic.NewDuration, config, accessor)
 }
 
-func NewAtomicFloat32[C any](config ConfigObserver[C], accessor func(*C) float32) *atomic.Float32 {
+func NewAtomicFloat32[C any](config Observable[C], accessor func(*C) float32) *atomic.Float32 {
 	return newAtomic(atomic.NewFloat32, config, accessor)
 }
 
-func NewAtomicFloat64[C any](config ConfigObserver[C], accessor func(*C) float64) *atomic.Float64 {
+func NewAtomicFloat64[C any](config Observable[C], accessor func(*C) float64) *atomic.Float64 {
 	return newAtomic(atomic.NewFloat64, config, accessor)
 }
 
-func NewAtomicInt32[C any](config ConfigObserver[C], accessor func(*C) int32) *atomic.Int32 {
+func NewAtomicInt32[C any](config Observable[C], accessor func(*C) int32) *atomic.Int32 {
 	return newAtomic(atomic.NewInt32, config, accessor)
 }
 
-func NewAtomicInt64[C any](config ConfigObserver[C], accessor func(*C) int64) *atomic.Int64 {
+func NewAtomicInt64[C any](config Observable[C], accessor func(*C) int64) *atomic.Int64 {
 	return newAtomic(atomic.NewInt64, config, accessor)
 }
 
-func NewAtomicString[C any](config ConfigObserver[C], accessor func(*C) string) *atomic.String {
+func NewAtomicString[C any](config Observable[C], accessor func(*C) string) *atomic.String {
 	return newAtomic(atomic.NewString, config, accessor)
 }
 
-func NewAtomicTime[C any](config ConfigObserver[C], accessor func(*C) time.Time) *atomic.Time {
+func NewAtomicTime[C any](config Observable[C], accessor func(*C) time.Time) *atomic.Time {
 	return newAtomic(atomic.NewTime, config, accessor)
 }
 
-func NewAtomicUint32[C any](config ConfigObserver[C], accessor func(*C) uint32) *atomic.Uint32 {
+func NewAtomicUint32[C any](config Observable[C], accessor func(*C) uint32) *atomic.Uint32 {
 	return newAtomic(atomic.NewUint32, config, accessor)
 }
 
-func NewAtomicUint64[C any](config ConfigObserver[C], accessor func(*C) uint64) *atomic.Uint64 {
+func NewAtomicUint64[C any](config Observable[C], accessor func(*C) uint64) *atomic.Uint64 {
 	return newAtomic(atomic.NewUint64, config, accessor)
 }
 
-func NewAtomicPointer[T, C any](config ConfigObserver[C], accessor func(*C) *T) *atomic.Pointer[T] {
+func NewAtomicPointer[T, C any](config Observable[C], accessor func(*C) *T) *atomic.Pointer[T] {
 	return newAtomic(atomic.NewPointer[T], config, accessor)
 }
 
@@ -85,11 +87,11 @@ func (a *AtomicValue[T]) Load() T {
 	return a.v.Load().(T)
 }
 
-func NewAtomicValue[T, C any](config ConfigObserver[C], accessor func(*C) T) *AtomicValue[T] {
+func NewAtomicValue[T, C any](config Observable[C], accessor func(*C) T) *AtomicValue[T] {
 	return newAtomic(newAtomicValue[T], config, accessor)
 }
 
-func newAtomic[T, C any, A interface{ Store(T) }](ctor func(T) A, config ConfigObserver[C], accessor func(*C) T) A {
+func newAtomic[T, C any, A interface{ Store(T) }](ctor func(T) A, config Observable[C], accessor func(*C) T) A {
 	var zero T
 	v := ctor(zero)
 	config.Observe(func(cc *C) { v.Store(accessor(cc)) })

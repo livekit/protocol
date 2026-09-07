@@ -61,7 +61,7 @@ service RoomService {
   rpc SendData(SendDataRequest) returns (SendDataResponse);
 
   // Update room metadata, will cause updates to be broadcasted to everyone in the room, Requires `roomAdmin`
-  rpc UpdateRoomMetadata (UpdateRoomMetadataRequest) returns (Room);
+  rpc UpdateRoomMetadata(UpdateRoomMetadataRequest) returns (Room);
 
   // Cloud-only
   // Forward a connected participant's track(s) to another room. Requires `roomAdmin` and `destinationRoom`. The forwarding will
@@ -124,7 +124,6 @@ message RoomEgress {
 message RoomAgent {
   repeated RoomAgentDispatch dispatches = 1;
 }
-
 
 message ListRoomsRequest {
   // when set, will only return rooms with name match
@@ -222,7 +221,7 @@ message SendDataRequest {
   bytes data = 2;
   DataPacket.Kind kind = 3;
   // mark deprecated
-  repeated string destination_sids = 4 [deprecated=true];
+  repeated string destination_sids = 4 [deprecated = true];
   // when set, only forward to these identities
   repeated string destination_identities = 6;
   optional string topic = 5;
@@ -246,12 +245,12 @@ message UpdateRoomMetadataRequest {
 }
 
 message RoomConfiguration {
-  string name = 1; // Used as ID, must be unique
+  string name = 1;  // Used as ID, must be unique
   // number of seconds to keep the room open if no one joins
   uint32 empty_timeout = 2;
   // number of seconds to keep the room open after everyone leaves
   uint32 departure_timeout = 3;
-  // limit number of participants that can be in a room, excluding Egress and Ingress participants
+  // limit number of participants that can be in a room, excluding Egress and Agent participants
   uint32 max_participants = 4;
   // metadata of room
   string metadata = 11 [

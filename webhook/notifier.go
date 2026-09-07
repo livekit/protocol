@@ -186,6 +186,9 @@ type HTTPClientParams struct {
 	MaxRetries    int
 	ClientTimeout time.Duration
 	ForceIPv4     bool
+	// receivers pin WAF rules to this, so it must stay stable across releases
+	// defaults to DefaultUserAgent
+	UserAgent string
 }
 
 type FilterParams struct {

@@ -6,6 +6,7 @@ export * as AgentText from "./gen/agent/livekit_agent_text_pb.js";
 export * as AgentDev from "./gen/agent/livekit_agent_dev_pb.js";
 export * from "./gen/livekit_agent_dispatch_pb.js";
 export * from "./gen/livekit_agent_pb.js";
+export * from "./gen/livekit_agent_simulation_pb.js";
 export * from "./gen/livekit_analytics_pb.js";
 export * from "./gen/livekit_connector_pb.js";
 export * from "./gen/livekit_connector_twilio_pb.js";

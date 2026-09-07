@@ -78,6 +78,24 @@ func TestGetRequestType(t *testing.T) {
 			expected: "track",
 		},
 		{
+			name: "Egress",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{},
+				},
+			},
+			expected: "egress",
+		},
+		{
+			name: "Replay",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Replay{
+					Replay: &livekit.ExportReplayRequest{},
+				},
+			},
+			expected: "replay",
+		},
+		{
 			name:     "Undefined",
 			info:     &livekit.EgressInfo{},
 			expected: "", // Undefined is an empty string
@@ -88,6 +106,65 @@ func TestGetRequestType(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := GetRequestType(tt.info)
 			require.Equal(t, tt.expected, string(result))
+		})
+	}
+}
+
+func TestGetSourceTypeV2(t *testing.T) {
+	tests := []struct {
+		name     string
+		info     *livekit.EgressInfo
+		expected string
+	}{
+		{
+			name: "EgressTemplate",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Template{Template: &livekit.TemplateSource{}},
+					},
+				},
+			},
+			expected: "template",
+		},
+		{
+			name: "EgressMedia",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Media{Media: &livekit.MediaSource{}},
+					},
+				},
+			},
+			expected: "media",
+		},
+		{
+			name: "EgressWeb",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Web{Web: &livekit.WebSource{}},
+					},
+				},
+			},
+			expected: "web",
+		},
+		{
+			name: "ReplayTemplate",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Replay{
+					Replay: &livekit.ExportReplayRequest{
+						Source: &livekit.ExportReplayRequest_Template{Template: &livekit.TemplateSource{}},
+					},
+				},
+			},
+			expected: "template",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			require.Equal(t, tt.expected, string(GetSourceType(tt.info)))
 		})
 	}
 }
@@ -194,6 +271,27 @@ func TestGetRequest(t *testing.T) {
 				Request: &livekit.EgressInfo_Track{
 					Track: &livekit.TrackEgressRequest{
 						RoomName: "test-room",
+					},
+				},
+			},
+		},
+		{
+			name: "Egress",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						RoomName: "test-room",
+						Source:   &livekit.StartEgressRequest_Template{Template: &livekit.TemplateSource{Layout: "speaker"}},
+					},
+				},
+			},
+		},
+		{
+			name: "Replay",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Replay{
+					Replay: &livekit.ExportReplayRequest{
+						ReplayId: "test-replay",
 					},
 				},
 			},
