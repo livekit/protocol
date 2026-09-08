@@ -27,11 +27,12 @@ const (
 type PhoneNumberStatus int32
 
 const (
-	PhoneNumberStatus_PHONE_NUMBER_STATUS_UNSPECIFIED PhoneNumberStatus = 0 // Default value
-	PhoneNumberStatus_PHONE_NUMBER_STATUS_ACTIVE      PhoneNumberStatus = 1 // Number is active and ready for use
-	PhoneNumberStatus_PHONE_NUMBER_STATUS_PENDING     PhoneNumberStatus = 2 // Number is being provisioned
-	PhoneNumberStatus_PHONE_NUMBER_STATUS_RELEASED    PhoneNumberStatus = 3 // Number has been released
-	PhoneNumberStatus_PHONE_NUMBER_STATUS_OFFLINE     PhoneNumberStatus = 4 // Number is offline (not associated with any dispatch rule)
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_UNSPECIFIED   PhoneNumberStatus = 0 // Default value
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_ACTIVE        PhoneNumberStatus = 1 // Number is active and ready for use
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_PENDING       PhoneNumberStatus = 2 // Number is being provisioned
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_RELEASED      PhoneNumberStatus = 3 // Number has been released
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_OFFLINE       PhoneNumberStatus = 4 // Number is offline (not associated with any dispatch rule, unavailable for outbound)
+	PhoneNumberStatus_PHONE_NUMBER_STATUS_OUTBOUND_ONLY PhoneNumberStatus = 5 // Number is available for outbound only (not associated with any dispatch rule)
 )
 
 // Enum value maps for PhoneNumberStatus.
@@ -42,13 +43,15 @@ var (
 		2: "PHONE_NUMBER_STATUS_PENDING",
 		3: "PHONE_NUMBER_STATUS_RELEASED",
 		4: "PHONE_NUMBER_STATUS_OFFLINE",
+		5: "PHONE_NUMBER_STATUS_OUTBOUND_ONLY",
 	}
 	PhoneNumberStatus_value = map[string]int32{
-		"PHONE_NUMBER_STATUS_UNSPECIFIED": 0,
-		"PHONE_NUMBER_STATUS_ACTIVE":      1,
-		"PHONE_NUMBER_STATUS_PENDING":     2,
-		"PHONE_NUMBER_STATUS_RELEASED":    3,
-		"PHONE_NUMBER_STATUS_OFFLINE":     4,
+		"PHONE_NUMBER_STATUS_UNSPECIFIED":   0,
+		"PHONE_NUMBER_STATUS_ACTIVE":        1,
+		"PHONE_NUMBER_STATUS_PENDING":       2,
+		"PHONE_NUMBER_STATUS_RELEASED":      3,
+		"PHONE_NUMBER_STATUS_OFFLINE":       4,
+		"PHONE_NUMBER_STATUS_OUTBOUND_ONLY": 5,
 	}
 )
 
@@ -1053,13 +1056,14 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\vreleased_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"releasedAt\x12G\n" +
 	"\x14sip_dispatch_rule_id\x18\x0f \x01(\tB\x16\xbaP\x11sipDispatchRuleID\x18\x01R\x11sipDispatchRuleId\x121\n" +
-	"\x15sip_dispatch_rule_ids\x18\x10 \x03(\tR\x12sipDispatchRuleIds*\xbc\x01\n" +
+	"\x15sip_dispatch_rule_ids\x18\x10 \x03(\tR\x12sipDispatchRuleIds*\xe3\x01\n" +
 	"\x11PhoneNumberStatus\x12#\n" +
 	"\x1fPHONE_NUMBER_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aPHONE_NUMBER_STATUS_ACTIVE\x10\x01\x12\x1f\n" +
 	"\x1bPHONE_NUMBER_STATUS_PENDING\x10\x02\x12 \n" +
 	"\x1cPHONE_NUMBER_STATUS_RELEASED\x10\x03\x12\x1f\n" +
-	"\x1bPHONE_NUMBER_STATUS_OFFLINE\x10\x04*\x8c\x01\n" +
+	"\x1bPHONE_NUMBER_STATUS_OFFLINE\x10\x04\x12%\n" +
+	"!PHONE_NUMBER_STATUS_OUTBOUND_ONLY\x10\x05*\x8c\x01\n" +
 	"\x0fPhoneNumberType\x12\x1d\n" +
 	"\x19PHONE_NUMBER_TYPE_UNKNOWN\x10\x00\x12\x1c\n" +
 	"\x18PHONE_NUMBER_TYPE_MOBILE\x10\x01\x12\x1b\n" +

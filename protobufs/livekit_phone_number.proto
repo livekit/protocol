@@ -13,11 +13,12 @@ import "logger/options.proto";
 
 // Phone number status enumeration
 enum PhoneNumberStatus {
-  PHONE_NUMBER_STATUS_UNSPECIFIED = 0;  // Default value
-  PHONE_NUMBER_STATUS_ACTIVE = 1;       // Number is active and ready for use
-  PHONE_NUMBER_STATUS_PENDING = 2;      // Number is being provisioned
-  PHONE_NUMBER_STATUS_RELEASED = 3;     // Number has been released
-  PHONE_NUMBER_STATUS_OFFLINE = 4;      // Number is offline (not associated with any dispatch rule)
+  PHONE_NUMBER_STATUS_UNSPECIFIED = 0;    // Default value
+  PHONE_NUMBER_STATUS_ACTIVE = 1;         // Number is active and ready for use
+  PHONE_NUMBER_STATUS_PENDING = 2;        // Number is being provisioned
+  PHONE_NUMBER_STATUS_RELEASED = 3;       // Number has been released
+  PHONE_NUMBER_STATUS_OFFLINE = 4;        // Number is offline (not associated with any dispatch rule, unavailable for outbound)
+  PHONE_NUMBER_STATUS_OUTBOUND_ONLY = 5;  // Number is available for outbound only (not associated with any dispatch rule)
 }
 
 // Phone number type enumeration
