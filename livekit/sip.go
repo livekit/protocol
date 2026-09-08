@@ -68,7 +68,6 @@ func SIPStatusFrom(err error) *SIPStatus {
 	if !ok {
 		return nil
 	}
-	var nested *SIPStatus
 	for _, d := range st.Details() {
 		switch e := d.(type) {
 		case *SIPStatus:
@@ -76,11 +75,11 @@ func SIPStatusFrom(err error) *SIPStatus {
 		case *SIPTransferError:
 			// A failed transfer reports its SIP status inside its own details.
 			if e.SipStatus != nil {
-				nested = e.SipStatus
+				return e.SipStatus
 			}
 		}
 	}
-	return nested
+	return nil
 }
 
 func (p *SIPStatus) Error() string {
