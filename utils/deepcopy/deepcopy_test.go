@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package deepcopy
 
 import (
 	"testing"
@@ -31,7 +31,7 @@ type copyTestType struct {
 	vunexported    bool //nolint:unused // tests deep copy of unexported fields
 }
 
-func TestDeepCopy(t *testing.T) {
+func TestCopy(t *testing.T) {
 	v := &copyTestType{
 		Vbool:  true,
 		Varray: [3]int{0, 1, 2},
@@ -42,5 +42,5 @@ func TestDeepCopy(t *testing.T) {
 		},
 	}
 
-	require.EqualValues(t, v, DeepCopy(v))
+	require.EqualValues(t, v, Copy(v))
 }

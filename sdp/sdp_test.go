@@ -184,3 +184,57 @@ func TestSDPFragment(t *testing.T) {
 	expectedMarshalledSDPFragment3 := "a=group:BUNDLE 0 1\r\na=ice-options:trickle ice2\r\nm=video 9 UDP/TLS/RTP/SAVPF 96\r\na=mid:0\r\na=ice-ufrag:ysXw\r\na=ice-pwd:vw5LmwG4y/e6dPP/zAP9Gp5k\r\na=candidate:1387637174 1 udp 2122260223 192.0.2.1 61764 typ host generation 0 ufrag EsAw network-id 1\r\na=candidate:3471623853 1 udp 2122194687 198.51.100.2 61765 typ host generation 0 ufrag EsAw network-id 2\r\na=candidate:473322822 1 tcp 1518280447 192.0.2.1 9 typ host tcptype active generation 0 ufrag EsAw network-id 1\r\na=candidate:2154773085 1 tcp 1518214911 198.51.100.2 9 typ host tcptype active generation 0 ufrag EsAw network-id 2\r\na=candidate:393455558 0 tcp 1518283007 [2401:4900:633c:959f:2037:680c:7c40:b3db] 9 typ host tcptype active\r\n"
 	require.Equal(t, expectedMarshalledSDPFragment3, marshalledSDPFragment3)
 }
+
+func TestSDPFragmentUnmarshalMalformed(t *testing.T) {
+	// malformed fragments should error out, not panic
+	malformed := []string{
+		"",
+		"m",
+		"a",
+		"m\r\n",
+		"a\r\n",
+		"m=",
+		"a=",
+		"mx=audio 9 UDP/TLS/RTP/SAVPF 111",
+		"m=audio 9 UDP/TLS/RTP/SAVPF 111\r\na",
+		"m=audio 9 UDP/TLS/RTP/SAVPF 111\r\nax\r\n",
+		"m=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\nm=video 9 UDP/TLS/RTP/SAVPF 96\r\n",
+		"a=ice-lite\r\na=ice-ufrag:ysXw\r\n",
+	}
+	for _, frag := range malformed {
+		sdpFragment := &SDPFragment{}
+		require.Error(t, sdpFragment.Unmarshal(frag), "fragment: %q", frag)
+	}
+}
+
+func FuzzSDPFragmentUnmarshal(f *testing.F) {
+	f.Add("a=group:BUNDLE 0\r\na=ice-lite\r\na=ice-options:trickle ice2\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\na=ice-ufrag:ysXw\r\na=ice-pwd:vw5LmwG4y/e6dPP/zAP9Gp5k\r\na=candidate:1387637174 1 udp 2122260223 192.0.2.1 61764 typ host\r\na=end-of-candidates\r\n")
+	f.Add("m=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\n")
+	f.Add("m")
+	f.Add("a")
+	f.Add("a=")
+	f.Add("m=\na")
+
+	f.Fuzz(func(t *testing.T, frag string) {
+		sdpFragment := &SDPFragment{}
+		if err := sdpFragment.Unmarshal(frag); err != nil {
+			return
+		}
+
+		// accessors and marshalling of anything that parsed should be safe too
+		sdpFragment.Mid()
+		sdpFragment.Candidates()
+		sdpFragment.ExtractICECredential()
+		marshalled, err := sdpFragment.Marshal()
+		if err != nil {
+			t.Fatalf("marshal of parsed fragment %q failed: %v", frag, err)
+		}
+
+		// marshalling a parsed fragment should produce something that parses back the same
+		reparsed := &SDPFragment{}
+		if err := reparsed.Unmarshal(marshalled); err != nil {
+			t.Fatalf("re-unmarshal of %q (from %q) failed: %v", marshalled, frag, err)
+		}
+		require.Equal(t, sdpFragment, reparsed, "fragment: %q", frag)
+	})
+}

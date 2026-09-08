@@ -16,7 +16,7 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.2.0
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731
-	github.com/livekit/psrpc v0.7.5
+	github.com/livekit/psrpc v0.7.6
 	github.com/mackerelio/go-osstat v0.2.8
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
 	github.com/nyaruka/phonenumbers v1.8.1
@@ -45,7 +45,7 @@ require (
 	golang.org/x/sys v0.47.0
 	golang.org/x/text v0.40.0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260526163538-3dc84a4a5aaa
-	google.golang.org/grpc v1.83.0
+	google.golang.org/grpc v1.83.1
 	google.golang.org/protobuf v1.36.12
 	gopkg.in/yaml.v3 v3.0.1
 )

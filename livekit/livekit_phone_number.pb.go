@@ -594,6 +594,7 @@ type UpdatePhoneNumberRequest struct {
 	Id                *string                `protobuf:"bytes,1,opt,name=id,proto3,oneof" json:"id,omitempty"`                                                            // Use phone number ID for direct lookup
 	PhoneNumber       *string                `protobuf:"bytes,2,opt,name=phone_number,json=phoneNumber,proto3,oneof" json:"phone_number,omitempty"`                       // Use phone number string for lookup
 	SipDispatchRuleId *string                `protobuf:"bytes,3,opt,name=sip_dispatch_rule_id,json=sipDispatchRuleId,proto3,oneof" json:"sip_dispatch_rule_id,omitempty"` // SIP dispatch rule ID to assign to the phone number
+	Name              *string                `protobuf:"bytes,4,opt,name=name,proto3,oneof" json:"name,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -645,6 +646,13 @@ func (x *UpdatePhoneNumberRequest) GetPhoneNumber() string {
 func (x *UpdatePhoneNumberRequest) GetSipDispatchRuleId() string {
 	if x != nil && x.SipDispatchRuleId != nil {
 		return *x.SipDispatchRuleId
+	}
+	return ""
+}
+
+func (x *UpdatePhoneNumberRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
 	}
 	return ""
 }
@@ -788,6 +796,7 @@ func (*ReleasePhoneNumbersResponse) Descriptor() ([]byte, []int) {
 type PhoneNumber struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
 	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                                 // Unique identifier
+	Name         string                 `protobuf:"bytes,17,opt,name=name,proto3" json:"name,omitempty"`                                                            // Human-readable name/label for the phone number
 	E164Format   string                 `protobuf:"bytes,2,opt,name=e164_format,json=e164Format,proto3" json:"e164_format,omitempty"`                               // Phone number in E.164 format (e.g., "+14155552671")
 	CountryCode  string                 `protobuf:"bytes,3,opt,name=country_code,json=countryCode,proto3" json:"country_code,omitempty"`                            // Country code (e.g., "US")
 	AreaCode     string                 `protobuf:"bytes,4,opt,name=area_code,json=areaCode,proto3" json:"area_code,omitempty"`                                     // Area code (e.g., "415")
@@ -841,6 +850,13 @@ func (*PhoneNumber) Descriptor() ([]byte, []int) {
 func (x *PhoneNumber) GetId() string {
 	if x != nil {
 		return x.Id
+	}
+	return ""
+}
+
+func (x *PhoneNumber) GetName() string {
+	if x != nil {
+		return x.Name
 	}
 	return ""
 }
@@ -996,22 +1012,25 @@ const file_livekit_phone_number_proto_rawDesc = "" +
 	"\x03_idB\x0f\n" +
 	"\r_phone_number\"Q\n" +
 	"\x16GetPhoneNumberResponse\x127\n" +
-	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"\xd4\x01\n" +
+	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"\xf6\x01\n" +
 	"\x18UpdatePhoneNumberRequest\x12\x13\n" +
 	"\x02id\x18\x01 \x01(\tH\x00R\x02id\x88\x01\x01\x12&\n" +
 	"\fphone_number\x18\x02 \x01(\tH\x01R\vphoneNumber\x88\x01\x01\x12J\n" +
-	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDH\x02R\x11sipDispatchRuleId\x88\x01\x01B\x05\n" +
+	"\x14sip_dispatch_rule_id\x18\x03 \x01(\tB\x14\xbaP\x11sipDispatchRuleIDH\x02R\x11sipDispatchRuleId\x88\x01\x01\x12\x17\n" +
+	"\x04name\x18\x04 \x01(\tH\x03R\x04name\x88\x01\x01B\x05\n" +
 	"\x03_idB\x0f\n" +
 	"\r_phone_numberB\x17\n" +
-	"\x15_sip_dispatch_rule_id\"T\n" +
+	"\x15_sip_dispatch_rule_idB\a\n" +
+	"\x05_name\"T\n" +
 	"\x19UpdatePhoneNumberResponse\x127\n" +
 	"\fphone_number\x18\x01 \x01(\v2\x14.livekit.PhoneNumberR\vphoneNumber\"S\n" +
 	"\x1aReleasePhoneNumbersRequest\x12\x10\n" +
 	"\x03ids\x18\x01 \x03(\tR\x03ids\x12#\n" +
 	"\rphone_numbers\x18\x02 \x03(\tR\fphoneNumbers\"\x1d\n" +
-	"\x1bReleasePhoneNumbersResponse\"\xd0\x05\n" +
+	"\x1bReleasePhoneNumbersResponse\"\xe4\x05\n" +
 	"\vPhoneNumber\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x11 \x01(\tR\x04name\x12\x1f\n" +
 	"\ve164_format\x18\x02 \x01(\tR\n" +
 	"e164Format\x12!\n" +
 	"\fcountry_code\x18\x03 \x01(\tR\vcountryCode\x12\x1b\n" +
