@@ -874,7 +874,13 @@ message TransferSIPParticipantRequest {
   google.protobuf.Duration ringing_timeout = 6;
 }
 
+// Deprecated: every transfer outcome other than STR_COMPLETED is reported as an
+// error carrying SIPTransferError. This message only still reports
+// STR_CALL_ENDED, which is temporarily returned as a success, and will carry
+// nothing once that becomes an error too.
 message TransferSIPParticipantResponse {
+  option deprecated = true;
+
   string transfer_id = 1 [(logger.name) = "transferID"];
   SIPTransferStatus status = 2;
   SIPTransferReason reason = 3;
@@ -883,6 +889,17 @@ message TransferSIPParticipantResponse {
   SIPStatus sip_status = 4;
 
   // NEXT ID: 5
+}
+
+// Details of a failed SIP transfer, attached to the error.
+message SIPTransferError {
+  string transfer_id = 1 [(logger.name) = "transferID"];
+  SIPTransferReason reason = 2;
+
+  // Set when the outcome was reported by a SIP response.
+  SIPStatus sip_status = 3;
+
+  // NEXT ID: 4
 }
 
 message SIPCallInfo {

@@ -559,6 +559,13 @@ func (x *InternalTransferSIPParticipantRequest) GetFeatureFlags() map[string]str
 	return nil
 }
 
+// Being deprecated: every transfer outcome other than STR_COMPLETED is reported
+// as an error carrying livekit.SIPTransferError. This message only still
+// reports STR_CALL_ENDED, which is temporarily returned as a success, and will
+// carry nothing once that becomes an error too. Do not add fields here.
+//
+// Not marked deprecated in proto: cloud names this type in non-generated code
+// and lints with staticcheck SA1019 enabled, unlike sip and livekit.
 type InternalTransferSIPParticipantResponse struct {
 	state      protoimpl.MessageState    `protogen:"open.v1"`
 	TransferId string                    `protobuf:"bytes,1,opt,name=transfer_id,json=transferId,proto3" json:"transfer_id,omitempty"`

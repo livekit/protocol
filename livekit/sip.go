@@ -26,7 +26,41 @@ const MaxSIPMediaTimeout = 10 * time.Minute
 var (
 	_ xtwirp.ErrorMeta = (*SIPStatus)(nil)
 	_ error            = (*SIPStatus)(nil)
+
+	_ xtwirp.ErrorMeta = (*SIPTransferError)(nil)
 )
+
+// SIPTransferErrorFrom unwraps an error and returns the associated SIP transfer
+// details, if any. A rejected transfer also carries a SIPStatus, see SIPStatusFrom.
+func SIPTransferErrorFrom(err error) *SIPTransferError {
+	st, ok := status.FromError(err)
+	if !ok {
+		return nil
+	}
+	for _, d := range st.Details() {
+		if e, ok := d.(*SIPTransferError); ok {
+			return e
+		}
+	}
+	return nil
+}
+
+func (p *SIPTransferError) TwirpErrorMeta() map[string]string {
+	m := map[string]string{
+		"sip_transfer_reason": p.Reason.String(),
+	}
+	if p.TransferId != "" {
+		m["sip_transfer_id"] = p.TransferId
+	}
+	// Report the SIP status under the same keys a dialing failure uses, so a
+	// client reads one set of keys regardless of which call failed.
+	if p.SipStatus != nil {
+		for k, v := range p.SipStatus.TwirpErrorMeta() {
+			m[k] = v
+		}
+	}
+	return m
+}
 
 // SIPStatusFrom unwraps an error and returns associated SIP call status, if any.
 func SIPStatusFrom(err error) *SIPStatus {
@@ -34,16 +68,19 @@ func SIPStatusFrom(err error) *SIPStatus {
 	if !ok {
 		return nil
 	}
+	var nested *SIPStatus
 	for _, d := range st.Details() {
-		if e, ok := d.(*SIPStatus); ok {
+		switch e := d.(type) {
+		case *SIPStatus:
 			return e
+		case *SIPTransferError:
+			// A failed transfer reports its SIP status inside its own details.
+			if e.SipStatus != nil {
+				nested = e.SipStatus
+			}
 		}
 	}
-	return nil
-}
-
-func (p SIPStatusCode) ShortName() string {
-	return strings.TrimPrefix(p.String(), "SIP_STATUS_")
+	return nested
 }
 
 func (p *SIPStatus) Error() string {
@@ -51,6 +88,48 @@ func (p *SIPStatus) Error() string {
 		return fmt.Sprintf("sip status: %d: %s", p.Code, p.Status)
 	}
 	return fmt.Sprintf("sip status: %d (%s)", p.Code, p.Code.ShortName())
+}
+
+func (p *SIPStatus) GRPCStatus() *status.Status {
+	code, ok := sipCodeToGRPCCode[p.Code]
+	if !ok {
+		code = codes.Unknown // 1xx and 2xx codes should never emit an error, something is wrong.
+		if p.Code < 200 {
+			code = codes.Unknown // 1xx are not final responses, something is wrong.
+		} else if p.Code < 300 {
+			return status.New(codes.OK, "OK") // Preserving previous behavior
+		} else if p.Code < 500 {
+			code = codes.InvalidArgument
+		} else if p.Code < 600 {
+			code = codes.FailedPrecondition // 5xx from remote server, per guideline (c) in gRPC docs
+		} else if p.Code < 700 {
+			code = codes.InvalidArgument // Same as 4xx ,but authoritative
+		}
+	}
+	msg := p.Status
+	if msg == "" {
+		msg = p.Code.ShortName()
+	}
+	st := status.New(code, fmt.Sprintf("sip status %d: %s", p.Code, msg))
+	if st2, err := st.WithDetails(p); err == nil {
+		return st2
+	}
+	return st
+}
+
+func (p *SIPStatus) TwirpErrorMeta() map[string]string {
+	status := p.Status
+	if status == "" {
+		status = p.Code.String()
+	}
+	return map[string]string{
+		"sip_status_code": strconv.Itoa(int(p.Code)),
+		"sip_status":      status,
+	}
+}
+
+func (p SIPStatusCode) ShortName() string {
+	return strings.TrimPrefix(p.String(), "SIP_STATUS_")
 }
 
 // Maps SIP response codes received from remote SIP servers to GRPC error codes.
@@ -128,44 +207,6 @@ var sipCodeToGRPCCode = map[SIPStatusCode]codes.Code{
 	SIPStatusCode_SIP_STATUS_GLOBAL_NOT_ACCEPTABLE:          codes.InvalidArgument,
 	SIPStatusCode_SIP_STATUS_GLOBAL_UNWANTED:                codes.PermissionDenied,
 	SIPStatusCode_SIP_STATUS_GLOBAL_REJECTED:                codes.PermissionDenied,
-}
-
-func (p *SIPStatus) GRPCStatus() *status.Status {
-	code, ok := sipCodeToGRPCCode[p.Code]
-	if !ok {
-		code = codes.Unknown // 1xx and 2xx codes should never emit an error, something is wrong.
-		if p.Code < 200 {
-			code = codes.Unknown // 1xx are not final responses, something is wrong.
-		} else if p.Code < 300 {
-			return status.New(codes.OK, "OK") // Preserving previous behavior
-		} else if p.Code < 500 {
-			code = codes.InvalidArgument
-		} else if p.Code < 600 {
-			code = codes.FailedPrecondition // 5xx from remote server, per guideline (c) in gRPC docs
-		} else if p.Code < 700 {
-			code = codes.InvalidArgument // Same as 4xx ,but authoritative
-		}
-	}
-	msg := p.Status
-	if msg == "" {
-		msg = p.Code.ShortName()
-	}
-	st := status.New(code, fmt.Sprintf("sip status %d: %s", p.Code, msg))
-	if st2, err := st.WithDetails(p); err == nil {
-		return st2
-	}
-	return st
-}
-
-func (p *SIPStatus) TwirpErrorMeta() map[string]string {
-	status := p.Status
-	if status == "" {
-		status = p.Code.String()
-	}
-	return map[string]string{
-		"sip_status_code": strconv.Itoa(int(p.Code)),
-		"sip_status":      status,
-	}
 }
 
 // Name returns a lower-case short name for the transport.

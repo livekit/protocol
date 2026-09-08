@@ -14,6 +14,8 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/utils/prototest"
+	"github.com/livekit/protocol/utils/xtwirp"
+	"github.com/livekit/psrpc"
 )
 
 func TestSIPTrunkAs(t *testing.T) {
@@ -1538,4 +1540,39 @@ func TestValidateHeaders(t *testing.T) {
 			require.Equal(t, len(testCase.expected.SoftErrors()), len(result.SoftErrors()), "soft error slice lengths differ; got soft errors: %v", result.SoftErrors())
 		})
 	}
+}
+
+func TestSIPTransferErrorFrom(t *testing.T) {
+	sipStatus := &SIPStatus{
+		Code:   SIPStatusCode_SIP_STATUS_BUSY_HERE,
+		Status: "Busy Here",
+	}
+	transferErr := &SIPTransferError{
+		TransferId: "STR_test",
+		Reason:     SIPTransferReason_STR_REJECTED,
+		SipStatus:  sipStatus,
+	}
+	// One detail carries the whole outcome, SIP status included.
+	err := psrpc.NewError(psrpc.UpstreamClientError, errors.New("call transfer failed"), transferErr)
+
+	require.True(t, proto.Equal(transferErr, SIPTransferErrorFrom(err)))
+	// SIPStatusFrom still finds the status nested inside it.
+	require.True(t, proto.Equal(sipStatus, SIPStatusFrom(err)))
+
+	// The same round trip the API boundary performs: psrpc error -> twirp error
+	// with the details in metadata -> status with the details back.
+	twerr := xtwirp.ToError(err)
+	require.Equal(t, "STR_REJECTED", twerr.Meta("sip_transfer_reason"))
+	require.Equal(t, "STR_test", twerr.Meta("sip_transfer_id"))
+	require.Equal(t, "486", twerr.Meta("sip_status_code"))
+
+	st, ok := xtwirp.StatusFromError(twerr)
+	require.True(t, ok)
+	require.True(t, proto.Equal(transferErr, SIPTransferErrorFrom(st.Err())))
+	require.True(t, proto.Equal(sipStatus, SIPStatusFrom(st.Err())))
+}
+
+func TestSIPTransferErrorFromNotFound(t *testing.T) {
+	require.Nil(t, SIPTransferErrorFrom(errors.New("plain")))
+	require.Nil(t, SIPTransferErrorFrom(psrpc.NewErrorf(psrpc.Internal, "no details")))
 }

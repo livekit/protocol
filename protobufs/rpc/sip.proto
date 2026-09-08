@@ -183,6 +183,13 @@ message InternalTransferSIPParticipantRequest {
   map<string, string> feature_flags = 6;
 }
 
+// Being deprecated: every transfer outcome other than STR_COMPLETED is reported
+// as an error carrying livekit.SIPTransferError. This message only still
+// reports STR_CALL_ENDED, which is temporarily returned as a success, and will
+// carry nothing once that becomes an error too. Do not add fields here.
+//
+// Not marked deprecated in proto: cloud names this type in non-generated code
+// and lints with staticcheck SA1019 enabled, unlike sip and livekit.
 message InternalTransferSIPParticipantResponse {
   string transfer_id = 1 [(logger.name) = "transferID"];
   livekit.SIPTransferStatus status = 2;
