@@ -402,12 +402,17 @@ message Scenario {
   // Arbitrary JSON-encoded object, surfaced to the agent under test as
   // SimulationContext userdata (e.g. inputs and benchmark target state).
   string userdata = 5;
+  // Stable across edits to label, instructions, or expectations, so runs of
+  // the same scenario can be correlated over time.
+  string id = 6;
 }
 
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
 message ScenarioGroup {
   string name = 1;
   repeated Scenario scenarios = 2;
+  // Stable identity of the scenarios file, independent of its name.
+  string id = 3;
 }
 
 // How the simulated user interacts with the agent under test.
