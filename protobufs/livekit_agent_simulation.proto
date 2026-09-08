@@ -252,6 +252,12 @@ message SimulationRun {
       bool low_quality_microphone = 11;
       bool packet_loss = 12;
       optional CI ci = 13;
+
+      // Agent deployment to dispatch. Empty/unset = production, matching
+      // CreateAgentDispatchRequest.deployment. The Cloud simulation service
+      // must copy this onto AgentDispatch so a shared agent name can pin
+      // staging/dev instead of the production default.
+      string deployment = 14;
     }
     message Response {
       string simulation_run_id = 1;
@@ -373,6 +379,8 @@ message SimulationRun {
   optional int32 issue_count = 21;
   // The pipeline this run came from; unset when it did not come from one.
   optional CI ci = 22;
+  // Agent deployment this run targeted. Empty/unset = production.
+  string deployment = 23;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -426,6 +434,9 @@ message SimulationDispatch {
   string job_id = 2;
   Scenario scenario = 3;
   SimulationMode mode = 4;
+  // Agent deployment the Cloud simulation service must pass to AgentDispatch.
+  // Empty/unset = production. Room metadata alone does not select the worker.
+  string deployment = 5;
 }
 
 service AgentSimulation {
