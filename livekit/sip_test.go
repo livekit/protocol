@@ -1576,3 +1576,32 @@ func TestSIPTransferErrorFromNotFound(t *testing.T) {
 	require.Nil(t, SIPTransferErrorFrom(errors.New("plain")))
 	require.Nil(t, SIPTransferErrorFrom(psrpc.NewErrorf(psrpc.Internal, "no details")))
 }
+
+func TestSIPTransferErrorAsError(t *testing.T) {
+	sipStatus := &SIPStatus{Code: SIPStatusCode_SIP_STATUS_BUSY_HERE, Status: "Busy Here"}
+	rejected := &SIPTransferError{
+		TransferId: "STR_test",
+		Reason:     SIPTransferReason_STR_REJECTED,
+		SipStatus:  sipStatus,
+	}
+	timedOut := &SIPTransferError{
+		TransferId: "STR_test",
+		Reason:     SIPTransferReason_STR_RINGING_TIMEOUT,
+	}
+
+	require.EqualError(t, rejected, "sip transfer failed: STR_REJECTED: sip status: 486: Busy Here")
+	require.EqualError(t, timedOut, "sip transfer failed: STR_RINGING_TIMEOUT")
+
+	// Unwrap exposes the SIP status to the errors package.
+	require.Equal(t, sipStatus, errors.Unwrap(rejected))
+	require.NoError(t, errors.Unwrap(timedOut))
+
+	// GRPCStatus takes the code from the SIP status and keeps the reason.
+	st := rejected.GRPCStatus()
+	require.Equal(t, sipStatus.GRPCStatus().Code(), st.Code())
+	require.True(t, proto.Equal(rejected, SIPTransferErrorFrom(st.Err())))
+
+	st2 := timedOut.GRPCStatus()
+	require.Equal(t, codes.Unknown, st2.Code())
+	require.True(t, proto.Equal(timedOut, SIPTransferErrorFrom(st2.Err())))
+}

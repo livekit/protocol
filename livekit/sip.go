@@ -28,11 +28,16 @@ var (
 	_ error            = (*SIPStatus)(nil)
 
 	_ xtwirp.ErrorMeta = (*SIPTransferError)(nil)
+	_ error            = (*SIPTransferError)(nil)
 )
 
 // SIPTransferErrorFrom unwraps an error and returns the associated SIP transfer
 // details, if any. A rejected transfer also carries a SIPStatus, see SIPStatusFrom.
 func SIPTransferErrorFrom(err error) *SIPTransferError {
+	// Local error tree is cheaper than the protobuf roundtrip below, so check this first.
+	if e, ok := errors.AsType[*SIPTransferError](err); ok {
+		return e
+	}
 	st, ok := status.FromError(err)
 	if !ok {
 		return nil
@@ -43,6 +48,39 @@ func SIPTransferErrorFrom(err error) *SIPTransferError {
 		}
 	}
 	return nil
+}
+
+func (p *SIPTransferError) Error() string {
+	if p.SipStatus != nil {
+		return fmt.Sprintf("sip transfer failed: %s: %s", p.Reason, p.SipStatus.Error())
+	}
+	return fmt.Sprintf("sip transfer failed: %s", p.Reason)
+}
+
+// Unwrap returns the SIP status the transfer was rejected with, if one was
+// reported, so errors.As and errors.AsType reach it through the transfer error.
+func (p *SIPTransferError) Unwrap() error {
+	if p.SipStatus == nil {
+		return nil
+	}
+	return p.SipStatus
+}
+
+// GRPCStatus takes the code from the SIP status when the transfer was rejected
+// with one. The other reasons have no SIP response to map, and the code for
+// those is set by the caller that builds the error, so they report Unknown here.
+func (p *SIPTransferError) GRPCStatus() *status.Status {
+	code := codes.Unknown
+	if p.SipStatus != nil {
+		// Only extracting the code here and rebuilding the status below
+		// to avoid dropping the transfer reason in the details.
+		code = p.SipStatus.GRPCStatus().Code()
+	}
+	st := status.New(code, p.Error())
+	if st2, err := st.WithDetails(p); err == nil {
+		return st2
+	}
+	return st
 }
 
 func (p *SIPTransferError) TwirpErrorMeta() map[string]string {
@@ -64,6 +102,10 @@ func (p *SIPTransferError) TwirpErrorMeta() map[string]string {
 
 // SIPStatusFrom unwraps an error and returns associated SIP call status, if any.
 func SIPStatusFrom(err error) *SIPStatus {
+	// Local error tree is cheaper than the protobuf roundtrip below, so check this first.
+	if e, ok := errors.AsType[*SIPStatus](err); ok {
+		return e
+	}
 	st, ok := status.FromError(err)
 	if !ok {
 		return nil
