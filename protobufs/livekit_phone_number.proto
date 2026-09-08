@@ -112,6 +112,7 @@ message UpdatePhoneNumberRequest {
   optional string id = 1;                   // Use phone number ID for direct lookup
   optional string phone_number = 2;         // Use phone number string for lookup
   optional string sip_dispatch_rule_id = 3 [(logger.name) = "sipDispatchRuleID"]; // SIP dispatch rule ID to assign to the phone number
+  optional string name = 4;
 }
 
 // UpdatePhoneNumberResponse - Response containing the updated phone number
@@ -133,6 +134,7 @@ message ReleasePhoneNumbersResponse {
 // PhoneNumber - Unified phone number type for inventory and purchased numbers
 message PhoneNumber {
   string id = 1;                              // Unique identifier
+  string name = 17;                           // Human-readable name/label for the phone number
   string e164_format = 2;                     // Phone number in E.164 format (e.g., "+14155552671")
   string country_code = 3;                    // Country code (e.g., "US")
   string area_code = 4;                       // Area code (e.g., "415")
