@@ -515,7 +515,10 @@ type Scenario struct {
 	Tags map[string]string `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Arbitrary JSON-encoded object, surfaced to the agent under test as
 	// SimulationContext userdata (e.g. inputs and benchmark target state).
-	Userdata      string `protobuf:"bytes,5,opt,name=userdata,proto3" json:"userdata,omitempty"`
+	Userdata string `protobuf:"bytes,5,opt,name=userdata,proto3" json:"userdata,omitempty"`
+	// SCN_-prefixed guid. Stable across edits to label, instructions, or
+	// expectations, so runs of the same scenario can be correlated over time.
+	Id            string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -585,11 +588,21 @@ func (x *Scenario) GetUserdata() string {
 	return ""
 }
 
+func (x *Scenario) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
 type ScenarioGroup struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Scenarios     []*Scenario            `protobuf:"bytes,2,rep,name=scenarios,proto3" json:"scenarios,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	Name      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Scenarios []*Scenario            `protobuf:"bytes,2,rep,name=scenarios,proto3" json:"scenarios,omitempty"`
+	// SCNG_-prefixed guid. Stable identity of the scenarios file, independent
+	// of its name.
+	Id            string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -636,6 +649,13 @@ func (x *ScenarioGroup) GetScenarios() []*Scenario {
 		return x.Scenarios
 	}
 	return nil
+}
+
+func (x *ScenarioGroup) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
 }
 
 // Carried (protojson-encoded) in the simulation room's metadata so the agent
@@ -3585,13 +3605,14 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rSTATUS_FAILED\x10\x05\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x06B\x0e\n" +
 	"\f_issue_countB\x05\n" +
-	"\x03_ciJ\x04\b\b\x10\tR\asummary\"\xa5\x03\n" +
+	"\x03_ciJ\x04\b\b\x10\tR\asummary\"\xb5\x03\n" +
 	"\bScenario\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\"\n" +
 	"\finstructions\x18\x02 \x01(\tR\finstructions\x12-\n" +
 	"\x12agent_expectations\x18\x03 \x01(\tR\x11agentExpectations\x12/\n" +
 	"\x04tags\x18\x04 \x03(\v2\x1b.livekit.Scenario.TagsEntryR\x04tags\x12\x1a\n" +
-	"\buserdata\x18\x05 \x01(\tR\buserdata\x1a\xa9\x01\n" +
+	"\buserdata\x18\x05 \x01(\tR\buserdata\x12\x0e\n" +
+	"\x02id\x18\x06 \x01(\tR\x02id\x1a\xa9\x01\n" +
 	"\x11CreateFromSession\x1aY\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
@@ -3602,10 +3623,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\bscenario\x18\x01 \x01(\v2\x11.livekit.ScenarioR\bscenario\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"d\n" +
 	"\rScenarioGroup\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12/\n" +
-	"\tscenarios\x18\x02 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"\xb3\x01\n" +
+	"\tscenarios\x18\x02 \x03(\v2\x11.livekit.ScenarioR\tscenarios\x12\x0e\n" +
+	"\x02id\x18\x03 \x01(\tR\x02id\"\xb3\x01\n" +
 	"\x12SimulationDispatch\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12\x15\n" +
 	"\x06job_id\x18\x02 \x01(\tR\x05jobId\x12-\n" +

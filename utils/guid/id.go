@@ -70,6 +70,8 @@ const (
 	AgentGatewayPrefix                 = "GW_"
 	CarrierPrefix                      = "CR_"
 	PhoneNumberPrefix                  = "PN_"
+	ScenarioPrefix                     = "SCN_"
+	ScenarioGroupPrefix                = "SCNG_"
 )
 
 const (
