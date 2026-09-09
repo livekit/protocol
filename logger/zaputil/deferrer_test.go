@@ -15,6 +15,7 @@
 package zaputil
 
 import (
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -130,4 +131,32 @@ func TestDeferredLogger(t *testing.T) {
 		require.Equal(t, "car", log.A)
 		require.Equal(t, "dog", log.B)
 	})
+
+	t.Run("each destination applies its own level", func(t *testing.T) {
+		debug := countingCore(zapcore.DebugLevel)
+		warn := countingCore(zapcore.WarnLevel)
+		d := &Deferrer{}
+		s := zap.New(NewDeferredValueCore(zapcore.NewTee(debug, warn), d)).Sugar()
+
+		s.Infow("test")
+		d.Resolve("a", "foo")
+		require.Equal(t, 1, debug.WriteCount())
+		require.Equal(t, 0, warn.WriteCount())
+
+		s.Infow("test")
+		require.Equal(t, 2, debug.WriteCount())
+		require.Equal(t, 0, warn.WriteCount())
+
+		s.Warnw("test")
+		require.Equal(t, 3, debug.WriteCount())
+		require.Equal(t, 1, warn.WriteCount())
+	})
+}
+
+func countingCore(enab zapcore.LevelEnabler) *testCore {
+	return &testCore{Core: zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+		zapcore.AddSync(io.Discard),
+		enab,
+	)}
 }
