@@ -40,45 +40,23 @@ func valueFields(kvs ...any) []zapcore.Field {
 	return fields
 }
 
-type Encoder[T any] interface {
-	WithValues(kvs ...any) T
-	Core(out *WriteEnabler) zapcore.Core
+type Encoder struct {
+	enc zapcore.Encoder
 }
 
-type DevelopmentEncoder struct {
-	console zapcore.Encoder
+func NewDevelopmentEncoder() Encoder {
+	return Encoder{zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())}
 }
 
-func NewDevelopmentEncoder() DevelopmentEncoder {
-	return DevelopmentEncoder{
-		console: zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
-	}
+func NewProductionEncoder() Encoder {
+	return Encoder{zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())}
 }
 
-func (e DevelopmentEncoder) WithValues(kvs ...any) DevelopmentEncoder {
-	e.console = encoderWithValues(e.console, kvs...)
+func (e Encoder) WithValues(kvs ...any) Encoder {
+	e.enc = encoderWithValues(e.enc, kvs...)
 	return e
 }
 
-func (e DevelopmentEncoder) Core(out *WriteEnabler) zapcore.Core {
-	return zapcore.NewCore(e.console, out, out)
-}
-
-type ProductionEncoder struct {
-	json zapcore.Encoder
-}
-
-func NewProductionEncoder() ProductionEncoder {
-	return ProductionEncoder{
-		json: zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-	}
-}
-
-func (e ProductionEncoder) WithValues(kvs ...any) ProductionEncoder {
-	e.json = encoderWithValues(e.json, kvs...)
-	return e
-}
-
-func (e ProductionEncoder) Core(out *WriteEnabler) zapcore.Core {
-	return zapcore.NewCore(e.json, out, out)
+func (e Encoder) Core(out *WriteEnabler) zapcore.Core {
+	return zapcore.NewCore(e.enc, out, out)
 }
