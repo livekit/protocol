@@ -874,13 +874,10 @@ message TransferSIPParticipantRequest {
   google.protobuf.Duration ringing_timeout = 6;
 }
 
-// Deprecated: every transfer outcome other than STR_COMPLETED is reported as an
-// error carrying SIPTransferError. This message only still reports
-// STR_CALL_ENDED, which is temporarily returned as a success, and will carry
-// nothing once that becomes an error too.
+// Added in https://github.com/livekit/protocol/pull/1730. Not needed after all:
+// will be rolled back to an empty message once STR_CALL_ENDED is reported as an
+// error like every other failed transfer.
 message TransferSIPParticipantResponse {
-  option deprecated = true;
-
   string transfer_id = 1 [(logger.name) = "transferID"];
   SIPTransferStatus status = 2;
   SIPTransferReason reason = 3;
