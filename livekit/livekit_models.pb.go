@@ -1475,6 +1475,7 @@ const (
 	ClientInfo_NODE         ClientInfo_SDK = 12
 	ClientInfo_UNREAL       ClientInfo_SDK = 13
 	ClientInfo_ESP32        ClientInfo_SDK = 14
+	ClientInfo_DOTNET       ClientInfo_SDK = 15
 )
 
 // Enum value maps for ClientInfo_SDK.
@@ -1495,6 +1496,7 @@ var (
 		12: "NODE",
 		13: "UNREAL",
 		14: "ESP32",
+		15: "DOTNET",
 	}
 	ClientInfo_SDK_value = map[string]int32{
 		"UNKNOWN":      0,
@@ -1512,6 +1514,7 @@ var (
 		"NODE":         12,
 		"UNREAL":       13,
 		"ESP32":        14,
+		"DOTNET":       15,
 	}
 )
 
@@ -7215,7 +7218,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x0eagent_protocol\x18\a \x01(\x05R\ragentProtocol\"\"\n" +
 	"\aEdition\x12\f\n" +
 	"\bStandard\x10\x00\x12\t\n" +
-	"\x05Cloud\x10\x01\"\xcf\x05\n" +
+	"\x05Cloud\x10\x01\"\xdb\x05\n" +
 	"\n" +
 	"ClientInfo\x12)\n" +
 	"\x03sdk\x18\x01 \x01(\x0e2\x17.livekit.ClientInfo.SDKR\x03sdk\x12\x18\n" +
@@ -7233,7 +7236,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"other_sdks\x18\v \x01(\tR\totherSdks\x12'\n" +
 	"\x0fclient_protocol\x18\f \x01(\x05R\x0eclientProtocol\x12B\n" +
-	"\fcapabilities\x18\r \x03(\x0e2\x1e.livekit.ClientInfo.CapabilityR\fcapabilities\"\xb3\x01\n" +
+	"\fcapabilities\x18\r \x03(\x0e2\x1e.livekit.ClientInfo.CapabilityR\fcapabilities\"\xbf\x01\n" +
 	"\x03SDK\x12\v\n" +
 	"\aUNKNOWN\x10\x00\x12\x06\n" +
 	"\x02JS\x10\x01\x12\t\n" +
@@ -7252,7 +7255,9 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x04NODE\x10\f\x12\n" +
 	"\n" +
 	"\x06UNREAL\x10\r\x12\t\n" +
-	"\x05ESP32\x10\x0e\"U\n" +
+	"\x05ESP32\x10\x0e\x12\n" +
+	"\n" +
+	"\x06DOTNET\x10\x0f\"U\n" +
 	"\n" +
 	"Capability\x12\x0e\n" +
 	"\n" +
