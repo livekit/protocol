@@ -227,9 +227,6 @@ type ZapComponentLeveler interface {
 	ComponentLevel(component string) zapcore.LevelEnabler
 }
 
-// ZapComponentMinLeveler resolves a per-component minimum level for a logger,
-// on top of the levels configured globally. It returns nil for components it
-// has no opinion on.
 type ZapComponentMinLeveler interface {
 	ComponentMinLevel(component string) zapcore.LevelEnabler
 }
@@ -239,10 +236,6 @@ type ZapLogger interface {
 	ToZap() *zap.SugaredLogger
 	ComponentLeveler() ZapComponentLeveler
 	WithMinLevel(lvl zapcore.LevelEnabler) Logger
-	// WithComponentMinLeveler lowers the level per component, for this logger
-	// and its descendants. Unlike WithMinLevel it is reported by
-	// ComponentLeveler, so it also opens up subsystems that do their own level
-	// gating.
 	WithComponentMinLeveler(ml ZapComponentMinLeveler) Logger
 }
 
@@ -255,6 +248,7 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 	sampler             *zaputil.Sampler
 	minLevel            zapcore.LevelEnabler
 	componentMinLeveler ZapComponentMinLeveler
+	enablers            *enablerCache
 }
 
 // componentMinLevel returns the min leveler's opinion on component, or nil.
@@ -263,6 +257,55 @@ func (l *zapLogger[T]) componentMinLevel(component string) zapcore.LevelEnabler 
 		return nil
 	}
 	return l.componentMinLeveler.ComponentMinLevel(component)
+}
+
+type enablerCache struct {
+	mu     sync.Mutex
+	writes map[string]*zaputil.WriteEnabler
+	levels map[string]zapcore.LevelEnabler
+}
+
+func newEnablerCache(ml ZapComponentMinLeveler) *enablerCache {
+	if ml == nil {
+		return nil
+	}
+	return &enablerCache{}
+}
+
+func (c *enablerCache) write(component string, build func() *zaputil.WriteEnabler) *zaputil.WriteEnabler {
+	if c == nil {
+		return build()
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if enab, ok := c.writes[component]; ok {
+		return enab
+	}
+	enab := build()
+	if c.writes == nil {
+		c.writes = map[string]*zaputil.WriteEnabler{}
+	}
+	c.writes[component] = enab
+	return enab
+}
+
+func (c *enablerCache) level(component string, build func() zapcore.LevelEnabler) zapcore.LevelEnabler {
+	if c == nil {
+		return build()
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if enab, ok := c.levels[component]; ok {
+		return enab
+	}
+	enab := build()
+	if c.levels == nil {
+		c.levels = map[string]zapcore.LevelEnabler{}
+	}
+	c.levels[component] = enab
+	return enab
 }
 
 func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
@@ -319,15 +362,15 @@ func newZapLogger[T zaputil.Encoder[T]](zap *zap.SugaredLogger, zc *zapConfig, e
 
 func (l *zapLogger[T]) makeZap() *zap.SugaredLogger {
 	var console *zaputil.WriteEnabler
-	// writeEnablers is shared by every logger built from this config, so it can
-	// only cache enablers that depend on nothing but the component.
 	if componentMinLevel := l.componentMinLevel(l.component); componentMinLevel == nil && l.minLevel == nil {
 		console, _ = l.writeEnablers.LoadOrCompute(l.component, func() (*zaputil.WriteEnabler, bool) {
 			return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component)), false
 		})
 	} else {
-		enab := zaputil.NewOrLevelEnabler(l.minLevel, l.sc.ComponentLevel(l.component), componentMinLevel)
-		console = zaputil.NewWriteEnabler(os.Stderr, enab)
+		console = l.enablers.write(l.component, func() *zaputil.WriteEnabler {
+			enab := zaputil.NewOrLevelEnabler(l.minLevel, l.sc.ComponentLevel(l.component), componentMinLevel)
+			return zaputil.NewWriteEnabler(os.Stderr, enab)
+		})
 	}
 
 	c := l.enc.Core(console, l.tap)
@@ -354,12 +397,10 @@ func (l zapLoggerComponentLeveler[T]) ComponentLevel(component string) zapcore.L
 		component = l.zl.component + "." + component
 	}
 
-	// Note this reports the logger's component min leveler but not its min
-	// level: see ZapLogger.WithMinLevel. levelEnablers is shared by every
-	// logger built from this config, so a min leveler's opinion, which is
-	// particular to one logger, must not be cached in it.
 	if override := l.zl.componentMinLevel(component); override != nil {
-		return zaputil.OrLevelEnabler{l.zl.sc.ComponentLevel(component), l.zl.tap, override}
+		return l.zl.enablers.level(component, func() zapcore.LevelEnabler {
+			return zaputil.NewOrLevelEnabler(l.zl.sc.ComponentLevel(component), l.zl.tap, override)
+		})
 	}
 
 	enab, _ := l.zl.levelEnablers.LoadOrCompute(component, func() (*zaputil.OrLevelEnabler, bool) {
@@ -379,6 +420,7 @@ func (l *zapLogger[T]) Debugw(msg string, keysAndValues ...any) {
 func (l *zapLogger[T]) WithComponentMinLeveler(ml ZapComponentMinLeveler) Logger {
 	dup := *l
 	dup.componentMinLeveler = ml
+	dup.enablers = newEnablerCache(ml)
 	dup.zap = dup.makeZap()
 	return &dup
 }
@@ -386,6 +428,7 @@ func (l *zapLogger[T]) WithComponentMinLeveler(ml ZapComponentMinLeveler) Logger
 func (l *zapLogger[T]) WithMinLevel(lvl zapcore.LevelEnabler) Logger {
 	dup := *l
 	dup.minLevel = lvl
+	dup.enablers = newEnablerCache(dup.componentMinLeveler)
 	dup.zap = dup.makeZap()
 	return &dup
 }
