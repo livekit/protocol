@@ -322,7 +322,9 @@ type SimulationRun struct {
 	// List responses carry it without the summary blob itself.
 	IssueCount *int32 `protobuf:"varint,21,opt,name=issue_count,json=issueCount,proto3,oneof" json:"issue_count,omitempty"`
 	// The pipeline this run came from; unset when it did not come from one.
-	Ci            *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
+	Ci *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
+	// Agent deployment this run targeted. Empty/unset = production.
+	Deployment    string `protobuf:"bytes,23,opt,name=deployment,proto3" json:"deployment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -504,6 +506,13 @@ func (x *SimulationRun) GetCi() *SimulationRun_CI {
 	return nil
 }
 
+func (x *SimulationRun) GetDeployment() string {
+	if x != nil {
+		return x.Deployment
+	}
+	return ""
+}
+
 // A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
 // are no longer stored server-side; the yaml file is the source of truth.
 type Scenario struct {
@@ -646,8 +655,11 @@ type SimulationDispatch struct {
 	JobId           string                 `protobuf:"bytes,2,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	Scenario        *Scenario              `protobuf:"bytes,3,opt,name=scenario,proto3" json:"scenario,omitempty"`
 	Mode            SimulationMode         `protobuf:"varint,4,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	// Agent deployment the Cloud simulation service must pass to AgentDispatch.
+	// Empty/unset = production. Room metadata alone does not select the worker.
+	Deployment    string `protobuf:"bytes,5,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationDispatch) Reset() {
@@ -706,6 +718,13 @@ func (x *SimulationDispatch) GetMode() SimulationMode {
 		return x.Mode
 	}
 	return SimulationMode_SIMULATION_MODE_UNSPECIFIED
+}
+
+func (x *SimulationDispatch) GetDeployment() string {
+	if x != nil {
+		return x.Deployment
+	}
+	return ""
 }
 
 type SimulationRunSummary_Issue struct {
@@ -2285,8 +2304,13 @@ type SimulationRun_Create_Request struct {
 	LowQualityMicrophone bool              `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
 	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
 	Ci                   *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Agent deployment to dispatch. Empty/unset = production, matching
+	// CreateAgentDispatchRequest.deployment. The Cloud simulation service
+	// must copy this onto AgentDispatch so a shared agent name can pin
+	// staging/dev instead of the production default.
+	Deployment    string `protobuf:"bytes,14,opt,name=deployment,proto3" json:"deployment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Create_Request) Reset() {
@@ -2394,6 +2418,13 @@ func (x *SimulationRun_Create_Request) GetCi() *SimulationRun_CI {
 		return x.Ci
 	}
 	return nil
+}
+
+func (x *SimulationRun_Create_Request) GetDeployment() string {
+	if x != nil {
+		return x.Deployment
+	}
+	return ""
 }
 
 type SimulationRun_Create_Response struct {
@@ -3238,7 +3269,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb9L\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xf9L\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3265,7 +3296,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x12$\n" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
-	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x1a\xd6\x05\n" +
+	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x17 \x01(\tR\n" +
+	"deployment\x1a\xd6\x05\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3485,8 +3519,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03ref\x18\x03 \x01(\tR\x03ref\x12!\n" +
 	"\fpull_request\x18\x04 \x01(\tR\vpullRequest\x12\x17\n" +
 	"\arun_url\x18\x05 \x01(\tR\x06runUrl\x12\x14\n" +
-	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xae\x05\n" +
-	"\x06Create\x1a\x95\x04\n" +
+	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xce\x05\n" +
+	"\x06Create\x1a\xb5\x04\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3502,7 +3536,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x16low_quality_microphone\x18\v \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
-	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01B\x11\n" +
+	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x0e \x01(\tR\n" +
+	"deploymentB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
@@ -3605,12 +3642,15 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"T\n" +
 	"\rScenarioGroup\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12/\n" +
-	"\tscenarios\x18\x02 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"\xb3\x01\n" +
+	"\tscenarios\x18\x02 \x03(\v2\x11.livekit.ScenarioR\tscenarios\"\xd3\x01\n" +
 	"\x12SimulationDispatch\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12\x15\n" +
 	"\x06job_id\x18\x02 \x01(\tR\x05jobId\x12-\n" +
 	"\bscenario\x18\x03 \x01(\v2\x11.livekit.ScenarioR\bscenario\x12+\n" +
-	"\x04mode\x18\x04 \x01(\x0e2\x17.livekit.SimulationModeR\x04mode*f\n" +
+	"\x04mode\x18\x04 \x01(\x0e2\x17.livekit.SimulationModeR\x04mode\x12\x1e\n" +
+	"\n" +
+	"deployment\x18\x05 \x01(\tR\n" +
+	"deployment*f\n" +
 	"\x0eSimulationMode\x12\x1f\n" +
 	"\x1bSIMULATION_MODE_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14SIMULATION_MODE_TEXT\x10\x01\x12\x19\n" +
