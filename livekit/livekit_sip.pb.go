@@ -4336,12 +4336,9 @@ func (x *TransferSIPParticipantRequest) GetRingingTimeout() *durationpb.Duration
 	return nil
 }
 
-// Deprecated: every transfer outcome other than STR_COMPLETED is reported as an
-// error carrying SIPTransferError. This message only still reports
-// STR_CALL_ENDED, which is temporarily returned as a success, and will carry
-// nothing once that becomes an error too.
-//
-// Deprecated: Marked as deprecated in livekit_sip.proto.
+// Added in https://github.com/livekit/protocol/pull/1730. Not needed after all:
+// will be rolled back to an empty message once STR_CALL_ENDED is reported as an
+// error like every other failed transfer.
 type TransferSIPParticipantResponse struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	TransferId string                 `protobuf:"bytes,1,opt,name=transfer_id,json=transferId,proto3" json:"transfer_id,omitempty"`
@@ -5542,7 +5539,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x0fringing_timeout\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xef\x01\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xeb\x01\n" +
 	"\x1eTransferSIPParticipantResponse\x12.\n" +
 	"\vtransfer_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"transferIDR\n" +
@@ -5550,7 +5547,7 @@ const file_livekit_sip_proto_rawDesc = "" +
 	"\x06status\x18\x02 \x01(\x0e2\x1a.livekit.SIPTransferStatusR\x06status\x122\n" +
 	"\x06reason\x18\x03 \x01(\x0e2\x1a.livekit.SIPTransferReasonR\x06reason\x121\n" +
 	"\n" +
-	"sip_status\x18\x04 \x01(\v2\x12.livekit.SIPStatusR\tsipStatus:\x02\x18\x01\"\xa9\x01\n" +
+	"sip_status\x18\x04 \x01(\v2\x12.livekit.SIPStatusR\tsipStatus\"\xa9\x01\n" +
 	"\x10SIPTransferError\x12.\n" +
 	"\vtransfer_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"transferIDR\n" +
