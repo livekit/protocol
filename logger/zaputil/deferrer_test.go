@@ -51,9 +51,8 @@ func TestDeferredLogger(t *testing.T) {
 
 	t.Run("resolved values can be overwritten", func(t *testing.T) {
 		ws := &testutil.BufferedWriteSyncer{}
-		we := NewWriteEnabler(ws, zapcore.DebugLevel)
 		enc := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
-		c := NewEncoderCore(enc, we)
+		c := zapcore.NewCore(enc, ws, zapcore.DebugLevel)
 		d := &Deferrer{}
 		dc := NewDeferredValueCore(c, d)
 		s := zap.New(dc).Sugar()
@@ -78,9 +77,8 @@ func TestDeferredLogger(t *testing.T) {
 
 	t.Run("resolved values merge with previous resolutions", func(t *testing.T) {
 		ws := &testutil.BufferedWriteSyncer{}
-		we := NewWriteEnabler(ws, zapcore.DebugLevel)
 		enc := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
-		c := NewEncoderCore(enc, we)
+		c := zapcore.NewCore(enc, ws, zapcore.DebugLevel)
 		d := &Deferrer{}
 		dc := NewDeferredValueCore(c, d)
 		s := zap.New(dc).Sugar()
@@ -100,9 +98,8 @@ func TestDeferredLogger(t *testing.T) {
 
 	t.Run("re-resolve", func(t *testing.T) {
 		ws := &testutil.BufferedWriteSyncer{}
-		we := NewWriteEnabler(ws, zapcore.DebugLevel)
 		enc := zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
-		c := NewEncoderCore(enc, we)
+		c := zapcore.NewCore(enc, ws, zapcore.DebugLevel)
 		d := &Deferrer{}
 		dc := NewDeferredValueCore(c, d)
 		s := zap.New(dc).Sugar()

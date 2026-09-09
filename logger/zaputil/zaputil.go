@@ -61,7 +61,7 @@ func (e DevelopmentEncoder) WithValues(kvs ...any) DevelopmentEncoder {
 }
 
 func (e DevelopmentEncoder) Core(out *WriteEnabler) zapcore.Core {
-	return NewEncoderCore(e.console, out)
+	return zapcore.NewCore(e.console, out, out)
 }
 
 type ProductionEncoder struct {
@@ -80,5 +80,5 @@ func (e ProductionEncoder) WithValues(kvs ...any) ProductionEncoder {
 }
 
 func (e ProductionEncoder) Core(out *WriteEnabler) zapcore.Core {
-	return NewEncoderCore(e.json, out)
+	return zapcore.NewCore(e.json, out, out)
 }
