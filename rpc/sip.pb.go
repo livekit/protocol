@@ -559,6 +559,9 @@ func (x *InternalTransferSIPParticipantRequest) GetFeatureFlags() map[string]str
 	return nil
 }
 
+// Added in https://github.com/livekit/protocol/pull/1730. Not needed after all:
+// will be rolled back to an empty message once STR_CALL_ENDED is reported as an
+// error like every other failed transfer.
 type InternalTransferSIPParticipantResponse struct {
 	state      protoimpl.MessageState    `protogen:"open.v1"`
 	TransferId string                    `protobuf:"bytes,1,opt,name=transfer_id,json=transferId,proto3" json:"transfer_id,omitempty"`

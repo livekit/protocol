@@ -183,6 +183,9 @@ message InternalTransferSIPParticipantRequest {
   map<string, string> feature_flags = 6;
 }
 
+// Added in https://github.com/livekit/protocol/pull/1730. Not needed after all:
+// will be rolled back to an empty message once STR_CALL_ENDED is reported as an
+// error like every other failed transfer.
 message InternalTransferSIPParticipantResponse {
   string transfer_id = 1 [(logger.name) = "transferID"];
   livekit.SIPTransferStatus status = 2;
