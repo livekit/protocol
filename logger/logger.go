@@ -211,15 +211,16 @@ type zapConfig struct {
 	conf          *Config
 	sc            *sharedConfig
 	writeEnablers *xsync.Map[string, *zaputil.WriteEnabler]
-	levelEnablers *xsync.Map[string, *zaputil.OrLevelEnabler]
-	tap           *zaputil.WriteEnabler
+	tee           zaputil.Tee
 }
 
 type ZapLoggerOption func(*zapConfig)
 
-func WithTap(tap *zaputil.WriteEnabler) ZapLoggerOption {
+// The tee does its own encoding, but shares the console's level: it cannot
+// widen what the logger emits.
+func WithTee(tee zaputil.Tee) ZapLoggerOption {
 	return func(zc *zapConfig) {
-		zc.tap = tap
+		zc.tee = tee
 	}
 }
 
@@ -242,6 +243,7 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 	deferred  []*zaputil.Deferrer
 	sampler   *zaputil.Sampler
 	minLevel  zapcore.LevelEnabler
+	tee       zaputil.Tee
 }
 
 func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
@@ -254,8 +256,6 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 		conf:          conf,
 		sc:            newSharedConfig(conf),
 		writeEnablers: xsync.NewMap[string, *zaputil.WriteEnabler](),
-		levelEnablers: xsync.NewMap[string, *zaputil.OrLevelEnabler](),
-		tap:           zaputil.NewDiscardWriteEnabler(),
 	}
 	for _, opt := range opts {
 		opt(zc)
@@ -291,6 +291,7 @@ func newZapLogger[T zaputil.Encoder[T]](zap *zap.SugaredLogger, zc *zapConfig, e
 		zapConfig: zc,
 		enc:       enc,
 		sampler:   sampler,
+		tee:       zc.tee,
 	}
 	l.zap = l.makeZap()
 	return l
@@ -307,7 +308,10 @@ func (l *zapLogger[T]) makeZap() *zap.SugaredLogger {
 		console = zaputil.NewWriteEnabler(os.Stderr, enab)
 	}
 
-	c := l.enc.Core(console, l.tap)
+	c := l.enc.Core(console)
+	if tee := l.tee.Core(console); tee != nil {
+		c = zapcore.NewTee(c, tee)
+	}
 	for i := range l.deferred {
 		c = zaputil.NewDeferredValueCore(c, l.deferred[i])
 	}
@@ -331,10 +335,7 @@ func (l zapLoggerComponentLeveler[T]) ComponentLevel(component string) zapcore.L
 		component = l.zl.component + "." + component
 	}
 
-	enab, _ := l.zl.levelEnablers.LoadOrCompute(component, func() (*zaputil.OrLevelEnabler, bool) {
-		return &zaputil.OrLevelEnabler{l.zl.sc.ComponentLevel(component), l.zl.tap}, false
-	})
-	return enab
+	return l.zl.sc.ComponentLevel(component)
 }
 
 func (l *zapLogger[T]) ComponentLeveler() ZapComponentLeveler {
@@ -373,6 +374,7 @@ func (l *zapLogger[T]) Errorw(msg string, err error, keysAndValues ...any) {
 func (l *zapLogger[T]) WithValues(keysAndValues ...any) Logger {
 	dup := *l
 	dup.enc = dup.enc.WithValues(keysAndValues...)
+	dup.tee = dup.tee.WithValues(keysAndValues...)
 	dup.zap = dup.makeZap()
 	return &dup
 }

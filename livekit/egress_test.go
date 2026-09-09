@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/logger/testutil"
@@ -32,7 +31,7 @@ type TestEgressLogOutput struct {
 
 func TestLoggerProto(t *testing.T) {
 	ws := &testutil.BufferedWriteSyncer{}
-	l, err := logger.NewZapLogger(&logger.Config{}, logger.WithTap(zaputil.NewWriteEnabler(ws, zapcore.DebugLevel)))
+	l, err := logger.NewZapLogger(&logger.Config{Level: "debug"}, logger.WithTee(zaputil.NewTee(testutil.NewJSONCoreFactory(ws))))
 	require.NoError(t, err)
 
 	s3 := &S3Upload{

@@ -28,15 +28,6 @@ func NewWriteEnabler(ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) *WriteEn
 	return &WriteEnabler{ws, enab}
 }
 
-type discardWriteSyncer struct{}
-
-func (discardWriteSyncer) Write(p []byte) (int, error) { return len(p), nil }
-func (discardWriteSyncer) Sync() error                 { return nil }
-
-func NewDiscardWriteEnabler() *WriteEnabler {
-	return NewWriteEnabler(discardWriteSyncer{}, zapcore.FatalLevel)
-}
-
 func NewEncoderCore(enc zapcore.Encoder, out ...*WriteEnabler) zapcore.Core {
 	return &encoderCore{
 		enc: enc,
