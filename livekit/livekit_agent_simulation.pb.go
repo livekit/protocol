@@ -516,8 +516,8 @@ type Scenario struct {
 	// Arbitrary JSON-encoded object, surfaced to the agent under test as
 	// SimulationContext userdata (e.g. inputs and benchmark target state).
 	Userdata string `protobuf:"bytes,5,opt,name=userdata,proto3" json:"userdata,omitempty"`
-	// Stable across edits to label, instructions, or expectations, so runs of
-	// the same scenario can be correlated over time.
+	// SCN_-prefixed guid. Stable across edits to label, instructions, or
+	// expectations, so runs of the same scenario can be correlated over time.
 	Id            string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -600,7 +600,8 @@ type ScenarioGroup struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	Name      string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Scenarios []*Scenario            `protobuf:"bytes,2,rep,name=scenarios,proto3" json:"scenarios,omitempty"`
-	// Stable identity of the scenarios file, independent of its name.
+	// SCNG_-prefixed guid. Stable identity of the scenarios file, independent
+	// of its name.
 	Id            string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
