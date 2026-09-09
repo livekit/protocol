@@ -639,6 +639,7 @@ message ClientInfo {
     NODE = 12;
     UNREAL = 13;
     ESP32 = 14;
+    DOTNET = 15;
   }
 
   // Optional capabilities advertised by the client at connect time. The SFU
