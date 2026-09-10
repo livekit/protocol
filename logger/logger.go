@@ -18,14 +18,11 @@ import (
 	"log/slog"
 	"os"
 	"slices"
-	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/logr/funcr"
-	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -88,7 +85,12 @@ func ParseZapLevel(level string) zapcore.Level {
 	return lvl
 }
 
-type DeferredFieldResolver = zaputil.DeferredFieldResolver
+type (
+	ComponentLeveler       = zaputil.ComponentLeveler
+	ComponentLevelResolver = zaputil.ComponentLevelResolver
+	DeferredFieldResolver  = zaputil.DeferredFieldResolver
+	FixedComponentLevel    = zaputil.FixedComponentLevel
+)
 
 type Logger interface {
 	Debugw(msg string, keysAndValues ...any)
@@ -140,86 +142,18 @@ func (l UnlikelyLogger) WithValues(keysAndValues ...any) UnlikelyLogger {
 	return UnlikelyLogger{l.logger, slices.Concat(l.keysAndValues, keysAndValues)}
 }
 
-type sharedConfig struct {
-	level           zap.AtomicLevel
-	mu              sync.Mutex
-	componentLevels map[string]zap.AtomicLevel
-	config          *Config
-}
-
-func newSharedConfig(conf *Config) *sharedConfig {
-	sc := &sharedConfig{
-		level:           zap.NewAtomicLevelAt(ParseZapLevel(conf.Level)),
-		config:          conf,
-		componentLevels: make(map[string]zap.AtomicLevel),
-	}
-	conf.AddUpdateObserver(sc.onConfigUpdate)
-	_ = sc.onConfigUpdate(conf)
-	return sc
-}
-
-func (c *sharedConfig) onConfigUpdate(conf *Config) error {
-	// update log levels
-	c.level.SetLevel(ParseZapLevel(conf.Level))
-
-	// we have to update alla existing component levels
-	c.mu.Lock()
-	c.config = conf
-	for component, atomicLevel := range c.componentLevels {
-		effectiveLevel := c.level.Level()
-		parts := strings.Split(component, ".")
-	confSearch:
-		for len(parts) > 0 {
-			search := strings.Join(parts, ".")
-			if compLevel, ok := conf.ComponentLevels[search]; ok {
-				effectiveLevel = ParseZapLevel(compLevel)
-				break confSearch
-			}
-			parts = parts[:len(parts)-1]
-		}
-		atomicLevel.SetLevel(effectiveLevel)
-	}
-	c.mu.Unlock()
-	return nil
-}
-
-// ensure we have an atomic level in the map representing the full component path
-// this makes it possible to update the log level after the fact
-func (c *sharedConfig) ComponentLevel(component string) zap.AtomicLevel {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if compLevel, ok := c.componentLevels[component]; ok {
-		return compLevel
-	}
-
-	// search up the hierarchy to find the first level that is set
-	atomicLevel := zap.NewAtomicLevelAt(c.level.Level())
-	c.componentLevels[component] = atomicLevel
-	parts := strings.Split(component, ".")
-	for len(parts) > 0 {
-		search := strings.Join(parts, ".")
-		if compLevel, ok := c.config.ComponentLevels[search]; ok {
-			atomicLevel.SetLevel(ParseZapLevel(compLevel))
-			return atomicLevel
-		}
-		parts = parts[:len(parts)-1]
-	}
-	return atomicLevel
-}
-
 type zapConfig struct {
-	conf          *Config
-	sc            *sharedConfig
-	writeEnablers *xsync.Map[string, *zaputil.WriteEnabler]
-	levelEnablers *xsync.Map[string, *zaputil.OrLevelEnabler]
-	tap           *zaputil.WriteEnabler
+	conf *Config
+	root *ComponentLeveler
+	tee  zaputil.Tee
 }
 
 type ZapLoggerOption func(*zapConfig)
 
-func WithTap(tap *zaputil.WriteEnabler) ZapLoggerOption {
+// The tee does its own encoding, and shares the console's resolved level.
+func WithTee(tee zaputil.Tee) ZapLoggerOption {
 	return func(zc *zapConfig) {
-		zc.tap = tap
+		zc.tee = tee
 	}
 }
 
@@ -230,18 +164,24 @@ type ZapComponentLeveler interface {
 type ZapLogger interface {
 	Logger
 	ToZap() *zap.SugaredLogger
+	// ComponentLeveler names components relative to this logger, unlike Leveler, which
+	// takes paths from the root.
 	ComponentLeveler() ZapComponentLeveler
-	WithMinLevel(lvl zapcore.LevelEnabler) Logger
+	Leveler() *ComponentLeveler
+	// lv supplies the write syncer as well as the level, so it must be derived from this
+	// logger's Leveler or output goes wherever its root points.
+	WithComponentLeveler(lv *ComponentLeveler) Logger
 }
 
-type zapLogger[T zaputil.Encoder[T]] struct {
+type zapLogger struct {
 	zap *zap.SugaredLogger
 	*zapConfig
-	enc       T
+	enc       zaputil.Encoder
 	component string
 	deferred  []*zaputil.Deferrer
 	sampler   *zaputil.Sampler
-	minLevel  zapcore.LevelEnabler
+	leveler   *ComponentLeveler
+	tee       zaputil.Tee
 }
 
 func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
@@ -251,12 +191,13 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 	zap := log.WithOptions(zap.AddCallerSkip(1)).Sugar()
 
 	zc := &zapConfig{
-		conf:          conf,
-		sc:            newSharedConfig(conf),
-		writeEnablers: xsync.NewMap[string, *zaputil.WriteEnabler](),
-		levelEnablers: xsync.NewMap[string, *zaputil.OrLevelEnabler](),
-		tap:           zaputil.NewDiscardWriteEnabler(),
+		conf: conf,
+		root: zaputil.NewRootComponentLeveler(os.Stderr, conf),
 	}
+	conf.AddUpdateObserver(func(*Config) error {
+		zc.root.Refresh()
+		return nil
+	})
 	for _, opt := range opts {
 		opt(zc)
 	}
@@ -276,38 +217,34 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 
 	if conf.JSON {
 		return newZapLogger(zap, zc, zaputil.NewProductionEncoder(), sampler), nil
-	} else {
-		return newZapLogger(zap, zc, zaputil.NewDevelopmentEncoder(), sampler), nil
 	}
+	return newZapLogger(zap, zc, zaputil.NewDevelopmentEncoder(), sampler), nil
 }
 
 func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
 	return FromZapLogger(nil, conf, opts...)
 }
 
-func newZapLogger[T zaputil.Encoder[T]](zap *zap.SugaredLogger, zc *zapConfig, enc T, sampler *zaputil.Sampler) ZapLogger {
-	l := &zapLogger[T]{
+func newZapLogger(zap *zap.SugaredLogger, zc *zapConfig, enc zaputil.Encoder, sampler *zaputil.Sampler) ZapLogger {
+	l := &zapLogger{
 		zap:       zap,
 		zapConfig: zc,
 		enc:       enc,
 		sampler:   sampler,
+		leveler:   zc.root,
+		tee:       zc.tee,
 	}
 	l.zap = l.makeZap()
 	return l
 }
 
-func (l *zapLogger[T]) makeZap() *zap.SugaredLogger {
-	var console *zaputil.WriteEnabler
-	if l.minLevel == nil {
-		console, _ = l.writeEnablers.LoadOrCompute(l.component, func() (*zaputil.WriteEnabler, bool) {
-			return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component)), false
-		})
-	} else {
-		enab := zaputil.OrLevelEnabler{l.minLevel, l.sc.ComponentLevel(l.component)}
-		console = zaputil.NewWriteEnabler(os.Stderr, enab)
-	}
+func (l *zapLogger) makeZap() *zap.SugaredLogger {
+	console := l.leveler.WriteEnabler(l.component)
 
-	c := l.enc.Core(console, l.tap)
+	c := l.enc.Core(console)
+	if tee := l.tee.Core(console); tee != nil {
+		c = zapcore.NewTee(c, tee)
+	}
 	for i := range l.deferred {
 		c = zaputil.NewDeferredValueCore(c, l.deferred[i])
 	}
@@ -318,76 +255,81 @@ func (l *zapLogger[T]) makeZap() *zap.SugaredLogger {
 	return l.zap.WithOptions(zap.WrapCore(func(zapcore.Core) zapcore.Core { return c }))
 }
 
-func (l *zapLogger[T]) ToZap() *zap.SugaredLogger {
+func (l *zapLogger) ToZap() *zap.SugaredLogger {
 	return l.zap.WithOptions(zap.AddCallerSkip(-1))
 }
 
-type zapLoggerComponentLeveler[T zaputil.Encoder[T]] struct {
-	zl *zapLogger[T]
+type zapLoggerComponentLeveler struct {
+	zl *zapLogger
 }
 
-func (l zapLoggerComponentLeveler[T]) ComponentLevel(component string) zapcore.LevelEnabler {
+func (l zapLoggerComponentLeveler) ComponentLevel(component string) zapcore.LevelEnabler {
 	if l.zl.component != "" {
 		component = l.zl.component + "." + component
 	}
 
-	enab, _ := l.zl.levelEnablers.LoadOrCompute(component, func() (*zaputil.OrLevelEnabler, bool) {
-		return &zaputil.OrLevelEnabler{l.zl.sc.ComponentLevel(component), l.zl.tap}, false
-	})
-	return enab
+	return l.zl.leveler.ComponentLevel(component)
 }
 
-func (l *zapLogger[T]) ComponentLeveler() ZapComponentLeveler {
-	return zapLoggerComponentLeveler[T]{l}
+func (l *zapLogger) ComponentLeveler() ZapComponentLeveler {
+	return zapLoggerComponentLeveler{l}
 }
 
-func (l *zapLogger[T]) Debugw(msg string, keysAndValues ...any) {
+func (l *zapLogger) Debugw(msg string, keysAndValues ...any) {
 	l.zap.Debugw(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) WithMinLevel(lvl zapcore.LevelEnabler) Logger {
+func (l *zapLogger) Leveler() *ComponentLeveler {
+	return l.leveler
+}
+
+func (l *zapLogger) WithComponentLeveler(lv *ComponentLeveler) Logger {
+	if lv == nil {
+		return l
+	}
 	dup := *l
-	dup.minLevel = lvl
+	dup.leveler = lv
 	dup.zap = dup.makeZap()
 	return &dup
 }
 
-func (l *zapLogger[T]) Infow(msg string, keysAndValues ...any) {
+func (l *zapLogger) Infow(msg string, keysAndValues ...any) {
 	l.zap.Infow(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) Warnw(msg string, err error, keysAndValues ...any) {
+func (l *zapLogger) Warnw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
 	l.zap.Warnw(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) Errorw(msg string, err error, keysAndValues ...any) {
+func (l *zapLogger) Errorw(msg string, err error, keysAndValues ...any) {
 	if err != nil {
 		keysAndValues = append(keysAndValues, "error", err)
 	}
 	l.zap.Errorw(msg, keysAndValues...)
 }
 
-func (l *zapLogger[T]) WithValues(keysAndValues ...any) Logger {
+func (l *zapLogger) WithValues(keysAndValues ...any) Logger {
 	dup := *l
 	dup.enc = dup.enc.WithValues(keysAndValues...)
+	dup.tee = dup.tee.WithValues(keysAndValues...)
 	dup.zap = dup.makeZap()
 	return &dup
 }
 
-func (l *zapLogger[T]) WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger {
+func (l *zapLogger) WithUnlikelyValues(keysAndValues ...any) UnlikelyLogger {
 	return UnlikelyLogger{l, keysAndValues}
 }
 
-func (l *zapLogger[T]) WithName(name string) Logger {
+func (l *zapLogger) WithName(name string) Logger {
 	dup := *l
 	dup.zap = dup.zap.Named(name)
 	return &dup
 }
 
-func (l *zapLogger[T]) WithComponent(component string) Logger {
+func (l *zapLogger) WithComponent(component string) Logger {
 	dup := *l
 	dup.zap = dup.zap.Named(component)
 	if dup.component == "" {
@@ -399,13 +341,13 @@ func (l *zapLogger[T]) WithComponent(component string) Logger {
 	return &dup
 }
 
-func (l *zapLogger[T]) WithCallDepth(depth int) Logger {
+func (l *zapLogger) WithCallDepth(depth int) Logger {
 	dup := *l
 	dup.zap = dup.zap.WithOptions(zap.AddCallerSkip(depth))
 	return &dup
 }
 
-func (l *zapLogger[T]) WithItemSampler() Logger {
+func (l *zapLogger) WithItemSampler() Logger {
 	if l.conf.ItemSampleSeconds == 0 {
 		return l
 	}
@@ -419,14 +361,14 @@ func (l *zapLogger[T]) WithItemSampler() Logger {
 	return &dup
 }
 
-func (l *zapLogger[T]) WithoutSampler() Logger {
+func (l *zapLogger) WithoutSampler() Logger {
 	dup := *l
 	dup.sampler = nil
 	dup.zap = dup.makeZap()
 	return &dup
 }
 
-func (l *zapLogger[T]) WithDeferredValues() (Logger, DeferredFieldResolver) {
+func (l *zapLogger) WithDeferredValues() (Logger, DeferredFieldResolver) {
 	dup := *l
 	def := &zaputil.Deferrer{}
 	dup.deferred = append(dup.deferred[0:len(dup.deferred):len(dup.deferred)], def)

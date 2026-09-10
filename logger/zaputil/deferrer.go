@@ -62,18 +62,22 @@ func (b *Deferrer) flush() {
 	n := len(fields)
 
 	for _, w := range writes {
-		fields = append(fields[:n], w.fields...)
-		w.core.Write(w.ent, fields)
+		if ce := w.core.Check(w.ent, nil); ce != nil {
+			ce.Write(append(fields[:n], w.fields...)...)
+		}
 	}
 }
 
-func (b *Deferrer) write(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) error {
+func (b *Deferrer) write(core zapcore.Core, ent zapcore.Entry, fields []zapcore.Field) {
 	for {
 		if dfs := b.fields.Load(); dfs != nil {
-			return core.Write(ent, slices.Concat(fields, *dfs))
+			if ce := core.Check(ent, nil); ce != nil {
+				ce.Write(slices.Concat(fields, *dfs)...)
+			}
+			return
 		}
 		if b.buffer(core, ent, fields) {
-			return nil
+			return
 		}
 	}
 }
@@ -158,5 +162,6 @@ func (c *deferredValueCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *
 }
 
 func (c *deferredValueCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
-	return c.def.write(c.Core, ent, fields)
+	c.def.write(c.Core, ent, fields)
+	return nil
 }
