@@ -232,9 +232,17 @@ message SimulationRun {
       reserved 3;  // was agent_description (input never consumed; description is derived from source)
       reserved "agent_description";
       string project_id = 1;
+      // The agent under test, as named in the project's livekit.toml. This is
+      // the run's identity: runs list/counts filter on it and the dashboard
+      // groups by it, so it must be the same across every run of that agent.
       string agent_name = 2;
       int32 num_simulations = 4;
       string region = 6;
+      // The explicit-dispatch name the simulator dispatches jobs to. Set when
+      // the worker serving this run registers under a throwaway name (the CLI
+      // spawning the agent locally must not collide with the deployed agent's
+      // name). Unset dispatches to agent_name.
+      optional string dispatch_agent_name = 14;
 
       // When set, run these scenarios (loaded from a scenarios.yaml).
       // When unset, generate num_simulations scenarios from the uploaded agent source.
@@ -349,6 +357,8 @@ message SimulationRun {
   // was: SimulationRunSummary summary (replaced by summary_zstd)
   reserved 8;
   reserved "summary";
+  // The agent under test (see Create.Request.agent_name), not the name jobs
+  // were dispatched to.
   string agent_name = 9;
   ScenarioGroup scenario_group = 10;
   google.protobuf.Timestamp ended_at = 11;
