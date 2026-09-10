@@ -1,5 +1,37 @@
 # @livekit/protocol
 
+## 1.52.0
+
+### Patch Changes
+
+- Add `AgentGrant.DispatchAdmin` - [#1744](https://github.com/livekit/protocol/pull/1744) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add fuzz test for data track packet deserialization - [#1759](https://github.com/livekit/protocol/pull/1759) ([@ladvoc](https://github.com/ladvoc))
+
+- Add a dotnet field to the ClientInfo to track community dotnet sdk usage - [#1789](https://github.com/livekit/protocol/pull/1789) ([@MaxHeimbrock](https://github.com/MaxHeimbrock))
+
+- Move data track packet serialization from livekit package - [#1757](https://github.com/livekit/protocol/pull/1757) ([@ladvoc](https://github.com/ladvoc))
+
+- Replace logger.WithTap with logger.WithTee, which duplicates every log entry to a caller-supplied zaputil.Tee. The tee's core is built from the level each derived logger resolves, so the copy follows component levels rather than carrying a level of its own. - [#1790](https://github.com/livekit/protocol/pull/1790) ([@paulwe](https://github.com/paulwe))
+
+  Replace ZapLogger.WithMinLevel with WithComponentLeveler, which attaches a zaputil.ComponentLeveler to a branch of the logger tree. A leveler owns the per-component level and write-enabler cache for one configuration source and can only widen its parent, so a caller can resolve levels per (tenant, component) without rebuilding loggers on a config change. ZapLogger.Leveler exposes the leveler a branch resolves through, for use as the parent of a derived one.
+
+- Change GRPC code mapping for SIP 480/486 - [#1766](https://github.com/livekit/protocol/pull/1766) ([@ChelseaBradbury](https://github.com/ChelseaBradbury))
+
+- Add psrpc bus compression settings to PSRPCConfig - [#1771](https://github.com/livekit/protocol/pull/1771) ([@paulwe](https://github.com/paulwe))
+
+- sdp: harden SDPFragment.Unmarshal against out-of-range accesses - [#1767](https://github.com/livekit/protocol/pull/1767) ([@boks1971](https://github.com/boks1971))
+
+- Add `SimulationRun.CI` — the provider, commit, ref, pull request, run URL, and actor of the pipeline that started a run — to `SimulationRun.Create.Request` and to `SimulationRun`, so the dashboard can link a run back to the CI job that produced it. - [#1758](https://github.com/livekit/protocol/pull/1758) ([@u9g](https://github.com/u9g))
+
+- Add name field to the phone numbers. - [#1781](https://github.com/livekit/protocol/pull/1781) ([@dennwc](https://github.com/dennwc))
+
+- Add separate inbound and outbound statuses for phone numbers. - [#1784](https://github.com/livekit/protocol/pull/1784) ([@dennwc](https://github.com/dennwc))
+
+- Report SIP transfer failures with a SIPTransferError detail on the error - [#1782](https://github.com/livekit/protocol/pull/1782) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- sip: fix panic in EvaluateDispatchRule on an empty From user part - [#1768](https://github.com/livekit/protocol/pull/1768) ([@hechen-eng](https://github.com/hechen-eng))
+
 ## 1.51.0
 
 ### Minor Changes
