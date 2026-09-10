@@ -78,6 +78,10 @@ message ServerMessage {
     JobAssignment assignment = 3;
     JobTermination termination = 5;
     WorkerPong pong = 4;
+
+    // the server is draining this control connection: re-register elsewhere,
+    // in-flight agent HTTP streams run to completion
+    AgentHttp.GoAway go_away = 6;
   }
 }
 
@@ -115,20 +119,31 @@ message WorkerPong {
 }
 
 message RegisterWorkerRequest {
+  reserved 2, 4; // worker_id, name (retired)
   JobType type = 1;
   string agent_name = 8;
-  // string worker_id = 2;
   string version = 3;
-  // string name = 4 [deprecated = true];
   uint32 ping_interval = 5;
   optional string namespace = 6;
   ParticipantPermission allowed_permissions = 7;
   string deployment = 9;
+
+  // HTTP endpoints this worker serves through the data plane, in route order.
+  // Empty means the worker exposes no endpoints and needs no data connections.
+  repeated AgentHttp.AgentEndpoint endpoints = 10;
+  // random per process; a re-registration with a new instance_id supersedes the
+  // previous epoch and closes its remaining connections
+  string instance_id = 11 [(logger.name) = "instanceID"];
+  // highest data-plane protocol version the worker supports; 0 = unsupported
+  uint32 endpoint_protocol = 12;
 }
 
 message RegisterWorkerResponse {
+  reserved 2;
   string worker_id = 1 [(logger.name) = "workerID"];
   ServerInfo server_info = 3;
+  // present iff the registration carried endpoints and the server supports the data plane
+  AgentHttp.AgentEndpointSettings endpoint_settings = 4;
 }
 
 message MigrateJobRequest {
@@ -168,10 +183,16 @@ message UpdateJobStatus {
 }
 
 message UpdateWorkerStatus {
+  reserved 2; // metadata (retired)
   optional WorkerStatus status = 1;
-  // optional string metadata = 2 [deprecated=true];
   float load = 3;
   uint32 job_count = 4;
+
+  // worker wants no new streams; existing streams run to completion
+  bool draining = 5;
+  // monotonic per registration; status updates may interleave across connections
+  // and a stale report must not regress newer state
+  uint64 seq = 6;
 }
 
 message JobAssignment {
@@ -182,4 +203,51 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1 [(logger.name) = "jobID"];
+}
+
+// ----- agent HTTP endpoints data plane -----
+//
+// AgentHttp namespaces the data plane: workers expose HTTP endpoints served at
+// /agents/{agent_name}/{deployment}/{path} without binding any local listener.
+// The worker opens ONE WebTransport (QUIC) session to /agent that carries both
+// its control stream (the same WorkerMessage/ServerMessage exchange as the
+// WebSocket control connection, length-delimited) and every HTTP exchange: the
+// node opens one bidirectional QUIC stream per request, writes the opaque
+// HTTP/1.1 request bytes, and reads the opaque response back, bridged into the
+// worker's application in-process. QUIC provides the multiplexing, per-stream
+// flow control, and half-close (stream FIN) / abort (RESET_STREAM), so there is
+// no capsule framing, no credit accounting, and no attach handshake.
+message AgentHttp {
+  enum AgentEndpointKind {
+    AEK_HTTP = 0;
+    // reserved for future text-mode endpoints
+    AEK_TEXT = 1;
+  }
+
+  message AgentEndpoint {
+    // starlette-style path template rooted at '/': {name} (one segment, default),
+    // {name:int}, {name:float}, {name:uuid} (constrained single segments),
+    // {name:path} (multi-segment). Custom converters are rejected.
+    string path = 1;
+    // uppercase, exactly as the application routes them (FastAPI does not imply
+    // HEAD from GET)
+    repeated string methods = 2;
+    AgentEndpointKind kind = 3;
+    // reachable without a project token
+    bool public = 4;
+  }
+
+  // registration-level settings negotiated on the control connection, returned
+  // in RegisterWorkerResponse when the worker declares endpoints and the server
+  // supports the data plane.
+  message AgentEndpointSettings {
+    // negotiated data-plane protocol version
+    uint32 protocol = 1;
+  }
+
+  // the server is draining: the worker should re-register elsewhere; in-flight
+  // HTTP exchanges run to completion
+  message GoAway {
+    string reason = 1;
+  }
 }
