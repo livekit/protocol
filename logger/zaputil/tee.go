@@ -20,9 +20,9 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// Tee duplicates every entry a derived logger writes. newCore must gate on the
-// enabler it is handed rather than a level of its own: that enabler is the one
-// the derived logger resolved.
+// Tee duplicates every entry a derived logger writes. The enabler handed to
+// newCore is the level that logger resolved, and is what the built core must
+// gate on.
 type Tee struct {
 	newCore func(enab zapcore.LevelEnabler) zapcore.Core
 	fields  []zapcore.Field

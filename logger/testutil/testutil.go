@@ -30,8 +30,8 @@ func NewJSONCore(ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core
 	return zapcore.NewCore(zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()), ws, enab)
 }
 
-// These helpers stop short of building a zaputil.Tee: zaputil's own tests
-// import this package, so depending on it here would cycle.
+// zaputil's own tests import this package, so it must not import zaputil;
+// callers build the Tee themselves.
 type CoreFactory = func(enab zapcore.LevelEnabler) zapcore.Core
 
 func NewJSONCoreFactory(ws zapcore.WriteSyncer) CoreFactory {

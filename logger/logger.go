@@ -150,8 +150,7 @@ type zapConfig struct {
 
 type ZapLoggerOption func(*zapConfig)
 
-// The tee does its own encoding, but shares the console's level: it cannot
-// widen what the logger emits.
+// The tee does its own encoding, and shares the console's resolved level.
 func WithTee(tee zaputil.Tee) ZapLoggerOption {
 	return func(zc *zapConfig) {
 		zc.tee = tee
