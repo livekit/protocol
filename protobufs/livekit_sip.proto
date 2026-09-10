@@ -874,6 +874,9 @@ message TransferSIPParticipantRequest {
   google.protobuf.Duration ringing_timeout = 6;
 }
 
+// Added in https://github.com/livekit/protocol/pull/1730. Not needed after all:
+// will be rolled back to an empty message once STR_CALL_ENDED is reported as an
+// error like every other failed transfer.
 message TransferSIPParticipantResponse {
   string transfer_id = 1 [(logger.name) = "transferID"];
   SIPTransferStatus status = 2;
@@ -883,6 +886,17 @@ message TransferSIPParticipantResponse {
   SIPStatus sip_status = 4;
 
   // NEXT ID: 5
+}
+
+// Details of a failed SIP transfer, attached to the error.
+message SIPTransferError {
+  string transfer_id = 1 [(logger.name) = "transferID"];
+  SIPTransferReason reason = 2;
+
+  // Set when the outcome was reported by a SIP response.
+  SIPStatus sip_status = 3;
+
+  // NEXT ID: 4
 }
 
 message SIPCallInfo {
