@@ -25,6 +25,13 @@ func jsonTee(ws zapcore.WriteSyncer) ZapLoggerOption {
 	return WithTee(zaputil.NewTee(testutil.NewJSONCoreFactory(ws)))
 }
 
+type componentLevels map[string]zapcore.Level
+
+func (c componentLevels) ResolveComponentLevel(component string) (zapcore.Level, bool) {
+	lvl, ok := c[component]
+	return lvl, ok
+}
+
 func observerTee() (ZapLoggerOption, *observer.ObservedLogs) {
 	f, logs := testutil.NewObserverCoreFactory()
 	return WithTee(zaputil.NewTee(f)), logs
@@ -120,6 +127,73 @@ func TestLoggerComponent(t *testing.T) {
 		require.False(t, lvl.Enabled(zapcore.DebugLevel))
 		require.True(t, lvl.Enabled(zapcore.InfoLevel))
 	})
+
+	t.Run("branch leveler widens only the components it names", func(t *testing.T) {
+		l := must.Get(NewZapLogger(&Config{Level: "info"}))
+		lv := zaputil.NewComponentLeveler(l.Leveler(), componentLevels{"rtc.room": zapcore.DebugLevel})
+		branch := l.WithComponentLeveler(lv)
+
+		require.True(t, zapLoggerCore(branch.WithComponent("rtc").WithComponent("room")).Enabled(zapcore.DebugLevel))
+		require.False(t, zapLoggerCore(branch.WithComponent("rtc")).Enabled(zapcore.DebugLevel))
+		require.True(t, zapLoggerCore(branch.WithComponent("rtc")).Enabled(zapcore.InfoLevel))
+	})
+
+	t.Run("branch leveler cannot quiet its parent", func(t *testing.T) {
+		l := must.Get(NewZapLogger(&Config{Level: "debug"}))
+		lv := zaputil.NewComponentLeveler(l.Leveler(), componentLevels{"sub": zapcore.ErrorLevel})
+
+		require.True(t, zapLoggerCore(l.WithComponentLeveler(lv).WithComponent("sub")).Enabled(zapcore.DebugLevel))
+	})
+
+	t.Run("sibling branch levelers are independent", func(t *testing.T) {
+		l := must.Get(NewZapLogger(&Config{Level: "info"}))
+		a := zaputil.NewComponentLeveler(l.Leveler(), componentLevels{"sub": zapcore.DebugLevel})
+		b := zaputil.NewComponentLeveler(l.Leveler(), componentLevels{})
+
+		require.True(t, zapLoggerCore(l.WithComponentLeveler(a).WithComponent("sub")).Enabled(zapcore.DebugLevel))
+		require.False(t, zapLoggerCore(l.WithComponentLeveler(b).WithComponent("sub")).Enabled(zapcore.DebugLevel))
+	})
+
+	t.Run("nil branch leveler is a no-op", func(t *testing.T) {
+		l := must.Get(NewZapLogger(&Config{Level: "info"}))
+		require.Same(t, Logger(l), l.WithComponentLeveler(nil))
+	})
+
+	t.Run("write enablers are memoized per component", func(t *testing.T) {
+		lv := must.Get(NewZapLogger(&Config{Level: "info"})).Leveler()
+
+		require.Same(t, lv.WriteEnabler("sub"), lv.WriteEnabler("sub"))
+		require.NotSame(t, lv.WriteEnabler("sub"), lv.WriteEnabler("other"))
+	})
+
+	t.Run("branch leveler follows global updates", func(t *testing.T) {
+		conf := &Config{Level: "info"}
+		l := must.Get(NewZapLogger(conf))
+		lv := zaputil.NewComponentLeveler(l.Leveler(), componentLevels{"other": zapcore.DebugLevel})
+
+		core := zapLoggerCore(l.WithComponentLeveler(lv).WithComponent("sub"))
+		require.False(t, core.Enabled(zapcore.DebugLevel))
+
+		require.NoError(t, conf.Update(&Config{Level: "debug"}))
+		require.True(t, core.Enabled(zapcore.DebugLevel))
+	})
+
+	t.Run("branch leveler refresh reaches existing loggers", func(t *testing.T) {
+		l := must.Get(NewZapLogger(&Config{Level: "info"}))
+		levels := componentLevels{}
+		lv := zaputil.NewComponentLeveler(l.Leveler(), levels)
+
+		core := zapLoggerCore(l.WithComponentLeveler(lv).WithComponent("sub"))
+		require.False(t, core.Enabled(zapcore.DebugLevel))
+
+		levels["sub"] = zapcore.DebugLevel
+		lv.Refresh()
+		require.True(t, core.Enabled(zapcore.DebugLevel))
+
+		delete(levels, "sub")
+		lv.Refresh()
+		require.False(t, core.Enabled(zapcore.DebugLevel))
+	})
 }
 
 func TestLoggerTee(t *testing.T) {
@@ -167,13 +241,14 @@ func TestLoggerTee(t *testing.T) {
 		require.Equal(t, "x", entries[0].Message)
 	})
 
-	t.Run("follows the min level floor", func(t *testing.T) {
+	t.Run("follows the branch leveler", func(t *testing.T) {
 		silenceStderr(t)
 		tee, logs := observerTee()
 		l := must.Get(NewZapLogger(&Config{Level: "info"}, tee))
+		lv := zaputil.NewComponentLeveler(l.Leveler(), FixedComponentLevel(zapcore.DebugLevel))
 
 		l.Debugw("dropped")
-		l.WithMinLevel(zapcore.DebugLevel).Debugw("kept")
+		l.WithComponentLeveler(lv).Debugw("kept")
 
 		entries := logs.All()
 		require.Len(t, entries, 1)

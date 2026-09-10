@@ -18,14 +18,11 @@ import (
 	"log/slog"
 	"os"
 	"slices"
-	"strings"
-	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/logr/funcr"
-	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -88,7 +85,12 @@ func ParseZapLevel(level string) zapcore.Level {
 	return lvl
 }
 
-type DeferredFieldResolver = zaputil.DeferredFieldResolver
+type (
+	ComponentLeveler       = zaputil.ComponentLeveler
+	ComponentLevelResolver = zaputil.ComponentLevelResolver
+	DeferredFieldResolver  = zaputil.DeferredFieldResolver
+	FixedComponentLevel    = zaputil.FixedComponentLevel
+)
 
 type Logger interface {
 	Debugw(msg string, keysAndValues ...any)
@@ -140,78 +142,10 @@ func (l UnlikelyLogger) WithValues(keysAndValues ...any) UnlikelyLogger {
 	return UnlikelyLogger{l.logger, slices.Concat(l.keysAndValues, keysAndValues)}
 }
 
-type sharedConfig struct {
-	level           zap.AtomicLevel
-	mu              sync.Mutex
-	componentLevels map[string]zap.AtomicLevel
-	config          *Config
-}
-
-func newSharedConfig(conf *Config) *sharedConfig {
-	sc := &sharedConfig{
-		level:           zap.NewAtomicLevelAt(ParseZapLevel(conf.Level)),
-		config:          conf,
-		componentLevels: make(map[string]zap.AtomicLevel),
-	}
-	conf.AddUpdateObserver(sc.onConfigUpdate)
-	_ = sc.onConfigUpdate(conf)
-	return sc
-}
-
-func (c *sharedConfig) onConfigUpdate(conf *Config) error {
-	// update log levels
-	c.level.SetLevel(ParseZapLevel(conf.Level))
-
-	// we have to update alla existing component levels
-	c.mu.Lock()
-	c.config = conf
-	for component, atomicLevel := range c.componentLevels {
-		effectiveLevel := c.level.Level()
-		parts := strings.Split(component, ".")
-	confSearch:
-		for len(parts) > 0 {
-			search := strings.Join(parts, ".")
-			if compLevel, ok := conf.ComponentLevels[search]; ok {
-				effectiveLevel = ParseZapLevel(compLevel)
-				break confSearch
-			}
-			parts = parts[:len(parts)-1]
-		}
-		atomicLevel.SetLevel(effectiveLevel)
-	}
-	c.mu.Unlock()
-	return nil
-}
-
-// ensure we have an atomic level in the map representing the full component path
-// this makes it possible to update the log level after the fact
-func (c *sharedConfig) ComponentLevel(component string) zap.AtomicLevel {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if compLevel, ok := c.componentLevels[component]; ok {
-		return compLevel
-	}
-
-	// search up the hierarchy to find the first level that is set
-	atomicLevel := zap.NewAtomicLevelAt(c.level.Level())
-	c.componentLevels[component] = atomicLevel
-	parts := strings.Split(component, ".")
-	for len(parts) > 0 {
-		search := strings.Join(parts, ".")
-		if compLevel, ok := c.config.ComponentLevels[search]; ok {
-			atomicLevel.SetLevel(ParseZapLevel(compLevel))
-			return atomicLevel
-		}
-		parts = parts[:len(parts)-1]
-	}
-	return atomicLevel
-}
-
 type zapConfig struct {
-	conf          *Config
-	sc            *sharedConfig
-	writeEnablers *xsync.Map[string, *zaputil.WriteEnabler]
-	tee           zaputil.Tee
+	conf *Config
+	root *ComponentLeveler
+	tee  zaputil.Tee
 }
 
 type ZapLoggerOption func(*zapConfig)
@@ -231,8 +165,13 @@ type ZapComponentLeveler interface {
 type ZapLogger interface {
 	Logger
 	ToZap() *zap.SugaredLogger
+	// ComponentLeveler names components relative to this logger, unlike Leveler, which
+	// takes paths from the root.
 	ComponentLeveler() ZapComponentLeveler
-	WithMinLevel(lvl zapcore.LevelEnabler) Logger
+	Leveler() *ComponentLeveler
+	// lv supplies the write syncer as well as the level, so it must be derived from this
+	// logger's Leveler or output goes wherever its root points.
+	WithComponentLeveler(lv *ComponentLeveler) Logger
 }
 
 type zapLogger struct {
@@ -242,7 +181,7 @@ type zapLogger struct {
 	component string
 	deferred  []*zaputil.Deferrer
 	sampler   *zaputil.Sampler
-	minLevel  zapcore.LevelEnabler
+	leveler   *ComponentLeveler
 	tee       zaputil.Tee
 }
 
@@ -253,10 +192,13 @@ func FromZapLogger(log *zap.Logger, conf *Config, opts ...ZapLoggerOption) (ZapL
 	zap := log.WithOptions(zap.AddCallerSkip(1)).Sugar()
 
 	zc := &zapConfig{
-		conf:          conf,
-		sc:            newSharedConfig(conf),
-		writeEnablers: xsync.NewMap[string, *zaputil.WriteEnabler](),
+		conf: conf,
+		root: zaputil.NewRootComponentLeveler(os.Stderr, conf),
 	}
+	conf.AddUpdateObserver(func(*Config) error {
+		zc.root.Refresh()
+		return nil
+	})
 	for _, opt := range opts {
 		opt(zc)
 	}
@@ -290,6 +232,7 @@ func newZapLogger(zap *zap.SugaredLogger, zc *zapConfig, enc zaputil.Encoder, sa
 		zapConfig: zc,
 		enc:       enc,
 		sampler:   sampler,
+		leveler:   zc.root,
 		tee:       zc.tee,
 	}
 	l.zap = l.makeZap()
@@ -297,15 +240,7 @@ func newZapLogger(zap *zap.SugaredLogger, zc *zapConfig, enc zaputil.Encoder, sa
 }
 
 func (l *zapLogger) makeZap() *zap.SugaredLogger {
-	var console *zaputil.WriteEnabler
-	if l.minLevel == nil {
-		console, _ = l.writeEnablers.LoadOrCompute(l.component, func() (*zaputil.WriteEnabler, bool) {
-			return zaputil.NewWriteEnabler(os.Stderr, l.sc.ComponentLevel(l.component)), false
-		})
-	} else {
-		enab := zaputil.OrLevelEnabler{l.minLevel, l.sc.ComponentLevel(l.component)}
-		console = zaputil.NewWriteEnabler(os.Stderr, enab)
-	}
+	console := l.leveler.WriteEnabler(l.component)
 
 	c := l.enc.Core(console)
 	if tee := l.tee.Core(console); tee != nil {
@@ -334,7 +269,7 @@ func (l zapLoggerComponentLeveler) ComponentLevel(component string) zapcore.Leve
 		component = l.zl.component + "." + component
 	}
 
-	return l.zl.sc.ComponentLevel(component)
+	return l.zl.leveler.ComponentLevel(component)
 }
 
 func (l *zapLogger) ComponentLeveler() ZapComponentLeveler {
@@ -345,9 +280,16 @@ func (l *zapLogger) Debugw(msg string, keysAndValues ...any) {
 	l.zap.Debugw(msg, keysAndValues...)
 }
 
-func (l *zapLogger) WithMinLevel(lvl zapcore.LevelEnabler) Logger {
+func (l *zapLogger) Leveler() *ComponentLeveler {
+	return l.leveler
+}
+
+func (l *zapLogger) WithComponentLeveler(lv *ComponentLeveler) Logger {
+	if lv == nil {
+		return l
+	}
 	dup := *l
-	dup.minLevel = lvl
+	dup.leveler = lv
 	dup.zap = dup.makeZap()
 	return &dup
 }

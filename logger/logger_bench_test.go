@@ -37,6 +37,44 @@ func withDiscardTee() []ZapLoggerOption {
 	return []ZapLoggerOption{WithTee(zaputil.NewTee(testutil.NewJSONCoreFactory(zapcore.AddSync(io.Discard))))}
 }
 
+func BenchmarkLoggerWithComponent(b *testing.B) {
+	for _, c := range derivationBenchCases() {
+		b.Run(c.label, func(b *testing.B) {
+			root := c.logger(b)
+			branch := root.WithComponentLeveler(zaputil.NewComponentLeveler(root.Leveler(), FixedComponentLevel(zapcore.DebugLevel)))
+
+			// One repeated component, so this measures the cache rather than resolution.
+			b.Run("root", func(b *testing.B) {
+				b.ReportAllocs()
+				for range b.N {
+					benchSink = root.WithComponent("rtc")
+				}
+			})
+
+			b.Run("branch leveler", func(b *testing.B) {
+				b.ReportAllocs()
+				for range b.N {
+					benchSink = branch.WithComponent("rtc")
+				}
+			})
+		})
+	}
+}
+
+func BenchmarkLoggerWithComponentLeveler(b *testing.B) {
+	for _, c := range derivationBenchCases() {
+		b.Run(c.label, func(b *testing.B) {
+			root := c.logger(b)
+			lv := zaputil.NewComponentLeveler(root.Leveler(), FixedComponentLevel(zapcore.DebugLevel))
+
+			b.ReportAllocs()
+			for range b.N {
+				benchSink = root.WithComponentLeveler(lv)
+			}
+		})
+	}
+}
+
 func BenchmarkLoggerWithValues(b *testing.B) {
 	for _, c := range derivationBenchCases() {
 		b.Run(c.label, func(b *testing.B) {

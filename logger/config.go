@@ -14,7 +14,12 @@
 
 package logger
 
-import "sync"
+import (
+	"strings"
+	"sync"
+
+	"go.uber.org/zap/zapcore"
+)
 
 type Config struct {
 	JSON  bool   `yaml:"json,omitempty"`
@@ -71,4 +76,19 @@ func (c *Config) AddUpdateObserver(cb ConfigObserver) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.onUpdatedCallbacks = append(c.onUpdatedCallbacks, cb)
+}
+
+// ResolveComponentLevel always resolves: an unconfigured component takes Level.
+func (c *Config) ResolveComponentLevel(component string) (zapcore.Level, bool) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	parts := strings.Split(component, ".")
+	for len(parts) > 0 {
+		if lvl, ok := c.ComponentLevels[strings.Join(parts, ".")]; ok {
+			return ParseZapLevel(lvl), true
+		}
+		parts = parts[:len(parts)-1]
+	}
+	return ParseZapLevel(c.Level), true
 }
