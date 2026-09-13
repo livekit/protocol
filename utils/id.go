@@ -53,6 +53,8 @@ const (
 	CloudAgentPrivateLinkClusterPrefix = guid.CloudAgentPrivateLinkClusterPrefix
 	CloudAgentPrivateLinkGatewayPrefix = guid.CloudAgentPrivateLinkGatewayPrefix
 	CloudAgentPrivateLinkSecretPrefix  = guid.CloudAgentPrivateLinkSecretPrefix
+	ScenarioPrefix                     = guid.ScenarioPrefix
+	ScenarioGroupPrefix                = guid.ScenarioGroupPrefix
 )
 
 func NewGuid(prefix string) string {

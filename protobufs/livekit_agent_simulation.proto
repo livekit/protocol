@@ -17,6 +17,7 @@ syntax = "proto3";
 package livekit;
 
 import "agent/livekit_agent_session.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "livekit_cloud_agent.proto";
 import "livekit_models.proto";
@@ -209,6 +210,21 @@ message SimulationRun {
     JobMetrics.LLM llm = 5;
     JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
+
+    // Means over the jobs that report them.
+    optional float conciseness = 8;
+    optional float conversation_progression = 9;
+  }
+
+  // The pipeline this run came from. Set by the client from its CI
+  // environment; absent for runs not started by a pipeline.
+  message CI {
+    string provider = 1;  // e.g. "github_actions"
+    string commit_sha = 2;
+    string ref = 3;  // branch or tag
+    string pull_request = 4;
+    string run_url = 5;  // link back to the CI job
+    string actor = 6;
   }
 
   message Create {
@@ -230,6 +246,12 @@ message SimulationRun {
 
       // Conversation mode for every job in this run; unspecified = TEXT.
       SimulationMode mode = 9;
+
+      // Impairments applied to the simulated user's audio; AUDIO mode only.
+      bool background_noise = 10;
+      bool low_quality_microphone = 11;
+      bool packet_loss = 12;
+      optional CI ci = 13;
     }
     message Response {
       string simulation_run_id = 1;
@@ -261,10 +283,51 @@ message SimulationRun {
       string project_id = 1;
       optional Status status = 2;
       optional TokenPagination page_token = 3;
+      // Half-open window [start_time, end_time) on created_at, the leading key
+      // of this list's keyset. Unset bounds mean no window, so existing callers
+      // keep their unbounded scan; the histogram's selected range sets both.
+      optional google.protobuf.Timestamp start_time = 4;
+      optional google.protobuf.Timestamp end_time = 5;
+      // Exact agent name. Unset means every agent — including the runs whose
+      // name is empty, which a bare string could not tell from no filter.
+      optional string agent_name = 6;
+      // Absent applies no mode filter. TEXT matches runs stored as TEXT or
+      // UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
+      optional SimulationMode mode = 7;
     }
     message Response {
       repeated SimulationRun runs = 1;
       TokenPagination next_page_token = 2;
+    }
+  }
+
+  // Counts of the runs `List` would return over the same window, bucketed by
+  // created_at instead of paginated.
+  message Counts {
+    message Request {
+      string project_id = 1;
+      // Both bounds required: a bucketed scan of a project's whole history is
+      // never what a caller wants.
+      google.protobuf.Timestamp start_time = 2;
+      google.protobuf.Timestamp end_time = 3;
+      // Applied as `List` applies it: a filter the rows honour and the bars
+      // above them drop would make the histogram an answer about a wider set.
+      optional Status status = 4;
+      optional string agent_name = 5;
+      optional SimulationMode mode = 6;
+    }
+    message Response {
+      // Buckets holding at least one run, ascending by bucket_start. Empty
+      // buckets are omitted; each run lands in exactly one bucket, so the
+      // counts sum to the number of runs in the window.
+      repeated Bucket buckets = 1;
+      // The bucket width the server chose from the window, so the client
+      // zero-fills the omitted buckets on the grid the counts were built on.
+      google.protobuf.Duration interval = 2;
+    }
+    message Bucket {
+      google.protobuf.Timestamp bucket_start = 1;
+      uint64 count = 2;
     }
   }
 
@@ -304,6 +367,12 @@ message SimulationRun {
   // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
   // Compressed by default so the blob ships as-is on every hop.
   bytes summary_zstd = 20;
+  // How many issues the stored summary flagged. Present only once a summary
+  // landed — absent and 0 differ ("never summarized" vs "no issues") — and
+  // List responses carry it without the summary blob itself.
+  optional int32 issue_count = 21;
+  // The pipeline this run came from; unset when it did not come from one.
+  optional CI ci = 22;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -333,12 +402,18 @@ message Scenario {
   // Arbitrary JSON-encoded object, surfaced to the agent under test as
   // SimulationContext userdata (e.g. inputs and benchmark target state).
   string userdata = 5;
+  // SCN_-prefixed guid. Stable across edits to label, instructions, or
+  // expectations, so runs of the same scenario can be correlated over time.
+  string id = 6;
 }
 
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
 message ScenarioGroup {
   string name = 1;
   repeated Scenario scenarios = 2;
+  // SCNG_-prefixed guid. Stable identity of the scenarios file, independent
+  // of its name.
+  string id = 3;
 }
 
 // How the simulated user interacts with the agent under test.
@@ -364,6 +439,7 @@ service AgentSimulation {
   rpc ConfirmSimulationSourceUpload(SimulationRun.ConfirmSourceUpload.Request) returns (SimulationRun.ConfirmSourceUpload.Response);
   rpc GetSimulationRun(SimulationRun.Get.Request) returns (SimulationRun.Get.Response);
   rpc ListSimulationRuns(SimulationRun.List.Request) returns (SimulationRun.List.Response);
+  rpc CountSimulationRuns(SimulationRun.Counts.Request) returns (SimulationRun.Counts.Response);
   rpc CancelSimulationRun(SimulationRun.Cancel.Request) returns (SimulationRun.Cancel.Response);
 
   rpc CreateScenarioFromSession(Scenario.CreateFromSession.Request) returns (Scenario.CreateFromSession.Response);

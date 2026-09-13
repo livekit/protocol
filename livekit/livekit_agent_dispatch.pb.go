@@ -556,32 +556,32 @@ var File_livekit_agent_dispatch_proto protoreflect.FileDescriptor
 
 const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"\n" +
-	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xeb\x02\n" +
+	"\x1clivekit_agent_dispatch.proto\x12\alivekit\x1a\x13livekit_agent.proto\x1a\x14logger/options.proto\"\xad\x03\n" +
 	"\x1aCreateAgentDispatchRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x12\n" +
-	"\x04room\x18\x02 \x01(\tR\x04room\x12\x1f\n" +
-	"\bmetadata\x18\x03 \x01(\tB\x03\xc0P\x01R\bmetadata\x12@\n" +
+	"\x04room\x18\x02 \x01(\tR\x04room\x12@\n" +
+	"\bmetadata\x18\x03 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12@\n" +
 	"\x0erestart_policy\x18\x04 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\x05 \x01(\tR\n" +
-	"deployment\x12X\n" +
+	"deployment\x12y\n" +
 	"\n" +
-	"attributes\x18\x06 \x03(\v23.livekit.CreateAgentDispatchRequest.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x18\x06 \x03(\v23.livekit.CreateAgentDispatchRequest.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xc5\x02\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x87\x03\n" +
 	"\x11RoomAgentDispatch\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x1f\n" +
-	"\bmetadata\x18\x02 \x01(\tB\x03\xc0P\x01R\bmetadata\x12@\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12@\n" +
+	"\bmetadata\x18\x02 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12@\n" +
 	"\x0erestart_policy\x18\x03 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\x04 \x01(\tR\n" +
-	"deployment\x12O\n" +
+	"deployment\x12p\n" +
 	"\n" +
-	"attributes\x18\x05 \x03(\v2*.livekit.RoomAgentDispatch.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x18\x05 \x03(\v2*.livekit.RoomAgentDispatch.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
@@ -597,20 +597,20 @@ const file_livekit_agent_dispatch_proto_rawDesc = "" +
 	"dispatchId\x12\x12\n" +
 	"\x04room\x18\x02 \x01(\tR\x04room\"^\n" +
 	"\x19ListAgentDispatchResponse\x12A\n" +
-	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\x94\x03\n" +
+	"\x10agent_dispatches\x18\x01 \x03(\v2\x16.livekit.AgentDispatchR\x0fagentDispatches\"\xd6\x03\n" +
 	"\rAgentDispatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x12\n" +
-	"\x04room\x18\x03 \x01(\tR\x04room\x12\x1f\n" +
-	"\bmetadata\x18\x04 \x01(\tB\x03\xc0P\x01R\bmetadata\x121\n" +
+	"\x04room\x18\x03 \x01(\tR\x04room\x12@\n" +
+	"\bmetadata\x18\x04 \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x121\n" +
 	"\x05state\x18\x05 \x01(\v2\x1b.livekit.AgentDispatchStateR\x05state\x12@\n" +
 	"\x0erestart_policy\x18\x06 \x01(\x0e2\x19.livekit.JobRestartPolicyR\rrestartPolicy\x12\x1e\n" +
 	"\n" +
 	"deployment\x18\a \x01(\tR\n" +
-	"deployment\x12K\n" +
+	"deployment\x12l\n" +
 	"\n" +
-	"attributes\x18\b \x03(\v2&.livekit.AgentDispatch.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x18\b \x03(\v2&.livekit.AgentDispatch.AttributesEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\n" +
 	"attributes\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

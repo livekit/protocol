@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add data track subscription to sync state
+Add `AgentGrant.DispatchAdmin`

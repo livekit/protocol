@@ -1,42 +1,23 @@
 package utils
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/livekit/protocol/utils/promise"
 )
 
-func TestPromise(t *testing.T) {
-	t.Run("zero value is usable", func(t *testing.T) {
-		var p Promise[bool]
+// A defined type here would compile but break every caller that mixes the two
+// spellings, which no test of behaviour would catch.
+var _ *Promise[int] = (*promise.Promise[int])(nil)
 
-		require.False(t, p.Resolved())
-		done := p.Done()
-		select {
-		case <-done:
-			require.FailNow(t, "unresolved done channel should block")
-		default:
-		}
+func TestPromiseAlias(t *testing.T) {
+	p := NewPromise[int]()
+	promise.Await(t.Context(), promise.NewResolved(0, nil))
+	p.Resolve(7, nil)
 
-		p.Resolve(true, nil)
-
-		require.True(t, p.Resolved())
-		select {
-		case <-done:
-		default:
-			require.FailNow(t, "resolved done channel should not block")
-		}
-
-		require.True(t, p.Result)
-	})
-
-	t.Run("promise cannot be resolved twice", func(t *testing.T) {
-		p := NewPromise[bool]()
-		p.Resolve(false, errors.New("fail"))
-		p.Resolve(true, nil)
-
-		require.False(t, p.Result)
-		require.Error(t, p.Err)
-	})
+	result, err := AwaitPromise(t.Context(), p)
+	require.NoError(t, err)
+	require.Equal(t, 7, result)
 }

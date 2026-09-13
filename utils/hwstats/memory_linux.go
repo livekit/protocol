@@ -26,16 +26,19 @@ import (
 	"github.com/livekit/protocol/logger"
 )
 
-const (
-	memUsagePathV1      = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
-	memLimitPathV1      = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
-	memStatPathV1       = "/sys/fs/cgroup/memory/memory.stat"
-	totalInactiveFileV1 = "total_inactive_file"
+var (
+	memUsagePathV1 = "/sys/fs/cgroup/memory/memory.usage_in_bytes"
+	memLimitPathV1 = "/sys/fs/cgroup/memory/memory.limit_in_bytes"
+	memStatPathV1  = "/sys/fs/cgroup/memory/memory.stat"
 
 	memCurrentPathV2 = "/sys/fs/cgroup/memory.current"
 	memMaxPathV2     = "/sys/fs/cgroup/memory.max"
 	memStatPathV2    = "/sys/fs/cgroup/memory.stat"
-	inactiveFileV2   = "inactive_file"
+)
+
+const (
+	totalInactiveFileV1 = "total_inactive_file"
+	inactiveFileV2      = "inactive_file"
 )
 
 type memInfoGetter interface {
@@ -114,12 +117,12 @@ func (cg *memInfoGetterV1) getMemory() (uint64, uint64, error) {
 
 	// fallback if limit from cgroup is more than physical available memory
 	// when limit is not set explicitly, it could be very high
-	usage1, total1, err := cg.osStat.getMemory()
+	_, total1, err := cg.osStat.getMemory()
 	if err != nil {
 		return 0, 0, err
 	}
 	if total > total1 {
-		return usage1, total1, nil
+		return usage, total1, nil
 	}
 
 	return usage, total, nil
@@ -150,7 +153,7 @@ func (cg *memInfoGetterV2) getMemory() (uint64, uint64, error) {
 	total, err := readValueFromFile(memMaxPathV2)
 	if err != nil {
 		// when memory limit not set, it has the string "max"
-		usage, total, err = cg.osStat.getMemory()
+		_, total, err = cg.osStat.getMemory()
 		if err != nil {
 			return 0, 0, err
 		}

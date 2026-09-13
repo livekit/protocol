@@ -639,6 +639,7 @@ message ClientInfo {
     NODE = 12;
     UNREAL = 13;
     ESP32 = 14;
+    DOTNET = 15;
   }
 
   // Optional capabilities advertised by the client at connect time. The SFU
@@ -733,6 +734,21 @@ enum DisconnectReason {
   MEDIA_FAILURE = 15;
   // agent encountered an error
   AGENT_ERROR = 16;
+}
+
+// why a room ended, reported on room-ended telemetry
+enum RoomEndReason {
+  ROOM_END_UNKNOWN = 0;
+  // RoomService.DeleteRoom was called
+  ROOM_END_API_DELETE = 1;
+  // the room sat empty past its empty or departure timeout
+  ROOM_END_IDLE_TIMEOUT = 2;
+  // the server instance is shutting down
+  ROOM_END_SERVER_SHUTDOWN = 3;
+  // the room was restarted or replaced elsewhere
+  ROOM_END_SUPERSEDED = 4;
+  // the room failed to finish opening
+  ROOM_END_OPEN_FAILED = 5;
 }
 
 message RTPDrift {

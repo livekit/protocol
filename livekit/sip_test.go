@@ -14,6 +14,8 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/livekit/protocol/utils/prototest"
+	"github.com/livekit/protocol/utils/xtwirp"
+	"github.com/livekit/psrpc"
 )
 
 func TestSIPTrunkAs(t *testing.T) {
@@ -330,12 +332,38 @@ func TestSIPValidate(t *testing.T) {
 			{
 				name: "participant_validates_embedded_media_ok",
 				req: &CreateSIPParticipantRequest{
-					SipTrunkId: "trunk",
-					SipCallTo:  "+1000",
-					RoomName:   "room",
+					SipTrunkId:     "trunk",
+					SipCallTo:      "+1000",
+					RoomName:       "room",
+					ToUserOverride: "+2000",
 					// Sanity
 				},
 				exp: true,
+			},
+			{
+				// Accepted for now, but warns so we can tell who sets it before
+				// rejecting. Value is well-formed, so only the deprecation warns.
+				name: "participant_deprecated_to_header_warns",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId: "trunk",
+					SipCallTo:  "+1000",
+					RoomName:   "room",
+					Headers: map[string]string{
+						"To": "<sip:+2000@example.com>",
+					},
+				},
+				exp:          true,
+				wantSoftErrs: true,
+			},
+			{
+				name: "participant_to_user_override_is_not_a_uri",
+				req: &CreateSIPParticipantRequest{
+					SipTrunkId:     "trunk",
+					SipCallTo:      "+1000",
+					RoomName:       "room",
+					ToUserOverride: "sip:+2000@example.com",
+				},
+				exp: false,
 			},
 			{
 				name: "participant_validates_embedded_media_timeout_over_max",
@@ -1044,7 +1072,7 @@ func TestGRPCStatus(t *testing.T) {
 	e := &SIPStatus{Code: SIPStatusCode_SIP_STATUS_BUSY_HERE}
 	st, ok := status.FromError(e)
 	require.True(t, ok)
-	require.Equal(t, codes.ResourceExhausted, st.Code())
+	require.Equal(t, codes.FailedPrecondition, st.Code())
 	require.Equal(t, "sip status 486: BUSY_HERE", st.Message())
 	details := st.Details()
 	require.Len(t, details, 1)
@@ -1512,4 +1540,68 @@ func TestValidateHeaders(t *testing.T) {
 			require.Equal(t, len(testCase.expected.SoftErrors()), len(result.SoftErrors()), "soft error slice lengths differ; got soft errors: %v", result.SoftErrors())
 		})
 	}
+}
+
+func TestSIPTransferErrorFrom(t *testing.T) {
+	sipStatus := &SIPStatus{
+		Code:   SIPStatusCode_SIP_STATUS_BUSY_HERE,
+		Status: "Busy Here",
+	}
+	transferErr := &SIPTransferError{
+		TransferId: "STR_test",
+		Reason:     SIPTransferReason_STR_REJECTED,
+		SipStatus:  sipStatus,
+	}
+	// One detail carries the whole outcome, SIP status included.
+	err := psrpc.NewError(psrpc.UpstreamClientError, errors.New("call transfer failed"), transferErr)
+
+	require.True(t, proto.Equal(transferErr, SIPTransferErrorFrom(err)))
+	// SIPStatusFrom still finds the status nested inside it.
+	require.True(t, proto.Equal(sipStatus, SIPStatusFrom(err)))
+
+	// The same round trip the API boundary performs: psrpc error -> twirp error
+	// with the details in metadata -> status with the details back.
+	twerr := xtwirp.ToError(err)
+	require.Equal(t, "STR_REJECTED", twerr.Meta("sip_transfer_reason"))
+	require.Equal(t, "STR_test", twerr.Meta("sip_transfer_id"))
+	require.Equal(t, "486", twerr.Meta("sip_status_code"))
+
+	st, ok := xtwirp.StatusFromError(twerr)
+	require.True(t, ok)
+	require.True(t, proto.Equal(transferErr, SIPTransferErrorFrom(st.Err())))
+	require.True(t, proto.Equal(sipStatus, SIPStatusFrom(st.Err())))
+}
+
+func TestSIPTransferErrorFromNotFound(t *testing.T) {
+	require.Nil(t, SIPTransferErrorFrom(errors.New("plain")))
+	require.Nil(t, SIPTransferErrorFrom(psrpc.NewErrorf(psrpc.Internal, "no details")))
+}
+
+func TestSIPTransferErrorAsError(t *testing.T) {
+	sipStatus := &SIPStatus{Code: SIPStatusCode_SIP_STATUS_BUSY_HERE, Status: "Busy Here"}
+	rejected := &SIPTransferError{
+		TransferId: "STR_test",
+		Reason:     SIPTransferReason_STR_REJECTED,
+		SipStatus:  sipStatus,
+	}
+	timedOut := &SIPTransferError{
+		TransferId: "STR_test",
+		Reason:     SIPTransferReason_STR_RINGING_TIMEOUT,
+	}
+
+	require.EqualError(t, rejected, "sip transfer failed: STR_REJECTED: sip status: 486: Busy Here")
+	require.EqualError(t, timedOut, "sip transfer failed: STR_RINGING_TIMEOUT")
+
+	// Unwrap exposes the SIP status to the errors package.
+	require.Equal(t, sipStatus, errors.Unwrap(rejected))
+	require.NoError(t, errors.Unwrap(timedOut))
+
+	// GRPCStatus takes the code from the SIP status and keeps the reason.
+	st := rejected.GRPCStatus()
+	require.Equal(t, sipStatus.GRPCStatus().Code(), st.Code())
+	require.True(t, proto.Equal(rejected, SIPTransferErrorFrom(st.Err())))
+
+	st2 := timedOut.GRPCStatus()
+	require.Equal(t, codes.Unknown, st2.Code())
+	require.True(t, proto.Equal(timedOut, SIPTransferErrorFrom(st2.Err())))
 }

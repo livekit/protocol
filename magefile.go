@@ -24,6 +24,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"github.com/livekit/mageutil"
 	"github.com/livekit/protocol/psrpc"
@@ -31,6 +32,20 @@ import (
 
 var Default = Proto
 
+// install the protoc plugins system-wide, for developers who want them on their PATH
+//
+// This is purely a developer convenience and is not required to generate anything: no
+// build, release or CI step invokes it, and none should. `mage proto` resolves each
+// plugin through the tool directives in go.mod (see goToolPath) and passes protoc an
+// explicit path, so it works on a clean checkout and ignores whatever these installs put
+// in GOPATH/bin.
+//
+// That separation is why @latest is safe here. These binaries are for ad-hoc use outside
+// generation — inspecting a descriptor, compiling a scratch .proto — and are not inputs
+// to any committed file. Two things keep them out of the committed output: the tool
+// directives above, and the Generate workflow, which regenerates and commits the
+// generated tree on every push to a non-main branch, so what lands on main always comes
+// from the pinned versions regardless of what a contributor had installed locally.
 func Bootstrap() error {
 	return mageutil.Run(context.Background(),
 		"go install github.com/twitchtv/twirp/protoc-gen-twirp@latest",
@@ -113,15 +128,15 @@ func Proto() error {
 	if err != nil {
 		return err
 	}
-	protocGoPath, err := getToolPath("protoc-gen-go")
+	protocGoPath, err := goToolPath("protoc-gen-go")
 	if err != nil {
 		return err
 	}
-	twirpPath, err := getToolPath("protoc-gen-twirp")
+	twirpPath, err := goToolPath("protoc-gen-twirp")
 	if err != nil {
 		return err
 	}
-	protocGrpcGoPath, err := getToolPath("protoc-gen-go-grpc")
+	protocGrpcGoPath, err := goToolPath("protoc-gen-go-grpc")
 	if err != nil {
 		return err
 	}
@@ -132,8 +147,8 @@ func Proto() error {
 		"--twirp_out", target,
 		"--go_opt=paths=source_relative",
 		"--twirp_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
-		"--plugin=twirp=" + twirpPath,
+		"--plugin=protoc-gen-go=" + protocGoPath,
+		"--plugin=protoc-gen-twirp=" + twirpPath,
 		"-I=./protobufs",
 	}, twirpProtoFiles...)
 	cmd := exec.Command(protoc, args...)
@@ -146,7 +161,7 @@ func Proto() error {
 	args = append([]string{
 		"--go_out", target,
 		"--go_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
+		"--plugin=protoc-gen-go=" + protocGoPath,
 		"-I=./protobufs",
 	}, protoFiles...)
 	cmd = exec.Command(protoc, args...)
@@ -160,7 +175,7 @@ func Proto() error {
 		args := []string{
 			"--go_out", target,
 			"--go_opt=paths=source_relative",
-			"--plugin=go=" + protocGoPath,
+			"--plugin=protoc-gen-go=" + protocGoPath,
 			"-I=./protobufs",
 		}
 		args = append(args, agentProtoFiles...)
@@ -181,7 +196,7 @@ func Proto() error {
 		args := []string{
 			"--go_out", target,
 			"--go_opt=paths=source_relative",
-			"--plugin=go=" + protocGoPath,
+			"--plugin=protoc-gen-go=" + protocGoPath,
 			"-I=./protobufs",
 		}
 		for _, protoFile := range protoFiles {
@@ -200,8 +215,8 @@ func Proto() error {
 		"--go-grpc_out", ".",
 		"--go_opt=paths=source_relative",
 		"--go-grpc_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
-		"--plugin=go-grpc=" + protocGrpcGoPath,
+		"--plugin=protoc-gen-go=" + protocGoPath,
+		"--plugin=protoc-gen-go-grpc=" + protocGrpcGoPath,
 		"-I=./protobufs",
 	}, grpcProtoFiles...)
 	cmd = exec.Command(protoc, args...)
@@ -216,7 +231,7 @@ func Proto() error {
 	if err != nil {
 		return err
 	}
-	psrpcPath, err := mageutil.GetToolPath("protoc-gen-psrpc")
+	psrpcPath, err := goToolPath("protoc-gen-psrpc")
 	if err != nil {
 		return err
 	}
@@ -229,8 +244,8 @@ func Proto() error {
 		"--psrpc_out", ".",
 		"--go_opt=paths=source_relative",
 		"--psrpc_opt=paths=source_relative",
-		"--plugin=go=" + protocGoPath,
-		"--plugin=psrpc=" + psrpcPath,
+		"--plugin=protoc-gen-go=" + protocGoPath,
+		"--plugin=protoc-gen-psrpc=" + psrpcPath,
 		"-I" + psrpcDir + "/protoc-gen-psrpc/options",
 		"-I=./protobufs",
 	}, psrpcProtoFiles...)
@@ -252,6 +267,22 @@ func Test() error {
 
 // helpers
 
+// goToolPath builds a protoc plugin from the tool directives in go.mod and returns its
+// path, so generation uses the pinned version rather than whatever happens to be on PATH.
+func goToolPath(name string) (string, error) {
+	out, err := exec.Command("go", "tool", "-n", name).Output()
+	if err != nil {
+		return "", fmt.Errorf("resolving tool %s: %w", name, err)
+	}
+	path := strings.TrimSpace(string(out))
+	if path == "" {
+		return "", fmt.Errorf("resolving tool %s: no path returned", name)
+	}
+	return path, nil
+}
+
+// getToolPath locates a binary that is not a Go tool, i.e. protoc itself, which CI
+// installs with arduino/setup-protoc.
 func getToolPath(name string) (string, error) {
 	if p, err := exec.LookPath(name); err == nil {
 		return p, nil

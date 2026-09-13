@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Remove extraneous format specifier from log string.
+Report SIP transfer failures with a SIPTransferError detail on the error

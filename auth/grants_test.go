@@ -120,7 +120,8 @@ func TestGrants(t *testing.T) {
 
 	t.Run("clone with Agent", func(t *testing.T) {
 		agent := &AgentGrant{
-			Admin: true,
+			Admin:         true,
+			DispatchAdmin: true,
 		}
 		grants := &ClaimGrants{
 			Identity: "identity",

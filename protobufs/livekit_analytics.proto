@@ -184,8 +184,9 @@ message AnalyticsEvent {
   ReportInfo report = 33;
   APICallInfo api_call = 34;
   WebhookInfo webhook = 35;
+  RoomEndReason room_end_reason = 37;
 
-  // NEXT_ID: 37
+  // NEXT_ID: 38
 }
 
 message AnalyticsEvents {

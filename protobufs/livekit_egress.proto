@@ -28,7 +28,6 @@ service Egress {
   rpc StartEgress(StartEgressRequest) returns (EgressInfo);
 
   // Update url/template or stream outputs
-  // rpc UpdateEgress(UpdateEgressRequest) returns (EgressInfo);
   rpc UpdateLayout(UpdateLayoutRequest) returns (EgressInfo);
   rpc UpdateStream(UpdateStreamRequest) returns (EgressInfo);
 
@@ -160,6 +159,7 @@ enum EncodingOptionsPreset {
   PORTRAIT_H264_720P_60 = 5;   //  720x1280, 60fps, 4500kbps, H.264_MAIN / OPUS
   PORTRAIT_H264_1080P_30 = 6;  // 1080x1920, 30fps, 4500kbps, H.264_MAIN / OPUS
   PORTRAIT_H264_1080P_60 = 7;  // 1080x1920, 60fps, 6000kbps, H.264_MAIN / OPUS
+  PASSTHROUGH = 8;             // Skip transcoding. Valid only when specifying a single track with MediaSource
 }
 
 message EncodingOptions {
@@ -345,14 +345,6 @@ message ListEgressResponse {
   repeated EgressInfo items = 1;
   TokenPagination next_page_token = 2;
   // next field id: 3
-}
-
-message UpdateEgressRequest {
-  string egress_id = 1 [(logger.name) = "egressID"];
-  string url = 2;
-  string layout = 3;
-  repeated string add_stream_urls = 4;
-  repeated string remove_stream_urls = 5;
 }
 
 message StopEgressRequest {

@@ -29,48 +29,34 @@ func encoderWithValues(enc zapcore.Encoder, kvs ...any) zapcore.Encoder {
 	return clone
 }
 
-type Encoder[T any] interface {
-	WithValues(kvs ...any) T
-	Core(console, json *WriteEnabler) zapcore.Core
-}
-
-type DevelopmentEncoder struct {
-	console zapcore.Encoder
-	json    zapcore.Encoder
-}
-
-func NewDevelopmentEncoder() DevelopmentEncoder {
-	return DevelopmentEncoder{
-		console: zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig()),
-		json:    zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
+// Field selection must match encoderWithValues, which cannot share this loop without allocating.
+func valueFields(kvs ...any) []zapcore.Field {
+	fields := make([]zapcore.Field, 0, len(kvs)/2)
+	for i := 1; i < len(kvs); i += 2 {
+		if key, ok := kvs[i-1].(string); ok {
+			fields = append(fields, zap.Any(key, kvs[i]))
+		}
 	}
+	return fields
 }
 
-func (e DevelopmentEncoder) WithValues(kvs ...any) DevelopmentEncoder {
-	e.console = encoderWithValues(e.console, kvs...)
-	e.json = encoderWithValues(e.json, kvs...)
+type Encoder struct {
+	enc zapcore.Encoder
+}
+
+func NewDevelopmentEncoder() Encoder {
+	return Encoder{zapcore.NewConsoleEncoder(zap.NewDevelopmentEncoderConfig())}
+}
+
+func NewProductionEncoder() Encoder {
+	return Encoder{zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())}
+}
+
+func (e Encoder) WithValues(kvs ...any) Encoder {
+	e.enc = encoderWithValues(e.enc, kvs...)
 	return e
 }
 
-func (e DevelopmentEncoder) Core(console, json *WriteEnabler) zapcore.Core {
-	return zapcore.NewTee(NewEncoderCore(e.console, console), NewEncoderCore(e.json, json))
-}
-
-type ProductionEncoder struct {
-	json zapcore.Encoder
-}
-
-func NewProductionEncoder() ProductionEncoder {
-	return ProductionEncoder{
-		json: zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()),
-	}
-}
-
-func (e ProductionEncoder) WithValues(kvs ...any) ProductionEncoder {
-	e.json = encoderWithValues(e.json, kvs...)
-	return e
-}
-
-func (e ProductionEncoder) Core(console, json *WriteEnabler) zapcore.Core {
-	return NewEncoderCore(e.json, console, json)
+func (e Encoder) Core(out *WriteEnabler) zapcore.Core {
+	return zapcore.NewCore(e.enc, out, out)
 }

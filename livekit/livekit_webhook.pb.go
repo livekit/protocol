@@ -57,7 +57,9 @@ type WebhookEvent struct {
 	// timestamp in seconds
 	CreatedAt int64 `protobuf:"varint,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_webhook.proto.
-	NumDropped    int32 `protobuf:"varint,11,opt,name=num_dropped,json=numDropped,proto3" json:"num_dropped,omitempty"`
+	NumDropped int32 `protobuf:"varint,11,opt,name=num_dropped,json=numDropped,proto3" json:"num_dropped,omitempty"`
+	// set when event is room_finished
+	RoomEndReason RoomEndReason `protobuf:"varint,13,opt,name=room_end_reason,json=roomEndReason,proto3,enum=livekit.RoomEndReason" json:"room_end_reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -163,11 +165,18 @@ func (x *WebhookEvent) GetNumDropped() int32 {
 	return 0
 }
 
+func (x *WebhookEvent) GetRoomEndReason() RoomEndReason {
+	if x != nil {
+		return x.RoomEndReason
+	}
+	return RoomEndReason_ROOM_END_UNKNOWN
+}
+
 var File_livekit_webhook_proto protoreflect.FileDescriptor
 
 const file_livekit_webhook_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_webhook.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x13livekit_agent.proto\"\x90\x03\n" +
+	"\x15livekit_webhook.proto\x12\alivekit\x1a\x14livekit_models.proto\x1a\x14livekit_egress.proto\x1a\x15livekit_ingress.proto\x1a\x13livekit_agent.proto\"\xd0\x03\n" +
 	"\fWebhookEvent\x12\x14\n" +
 	"\x05event\x18\x01 \x01(\tR\x05event\x12!\n" +
 	"\x04room\x18\x02 \x01(\v2\r.livekit.RoomR\x04room\x12:\n" +
@@ -182,7 +191,8 @@ const file_livekit_webhook_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\x03R\tcreatedAt\x12#\n" +
 	"\vnum_dropped\x18\v \x01(\x05B\x02\x18\x01R\n" +
-	"numDroppedBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"numDropped\x12>\n" +
+	"\x0froom_end_reason\x18\r \x01(\x0e2\x16.livekit.RoomEndReasonR\rroomEndReasonBFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_webhook_proto_rawDescOnce sync.Once
@@ -205,6 +215,7 @@ var file_livekit_webhook_proto_goTypes = []any{
 	(*IngressInfo)(nil),     // 4: livekit.IngressInfo
 	(*TrackInfo)(nil),       // 5: livekit.TrackInfo
 	(*Job)(nil),             // 6: livekit.Job
+	(RoomEndReason)(0),      // 7: livekit.RoomEndReason
 }
 var file_livekit_webhook_proto_depIdxs = []int32{
 	1, // 0: livekit.WebhookEvent.room:type_name -> livekit.Room
@@ -213,11 +224,12 @@ var file_livekit_webhook_proto_depIdxs = []int32{
 	4, // 3: livekit.WebhookEvent.ingress_info:type_name -> livekit.IngressInfo
 	5, // 4: livekit.WebhookEvent.track:type_name -> livekit.TrackInfo
 	6, // 5: livekit.WebhookEvent.job:type_name -> livekit.Job
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	7, // 6: livekit.WebhookEvent.room_end_reason:type_name -> livekit.RoomEndReason
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_livekit_webhook_proto_init() }

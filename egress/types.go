@@ -66,6 +66,9 @@ type EgressRequest interface {
 	GetStorage() *livekit.StorageConfig
 }
 
+var _ EgressRequest = (*livekit.StartEgressRequest)(nil)
+var _ EgressRequest = (*livekit.ExportReplayRequest)(nil)
+
 type UploadRequest interface {
 	GetS3() *livekit.S3Upload
 	GetGcp() *livekit.GCPUpload
