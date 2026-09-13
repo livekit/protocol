@@ -37,6 +37,13 @@ type Defaulter[T any] interface {
 	InitDefaults(*T) error
 }
 
+// Validator runs after InitDefaults on every load. A config that fails
+// validation is never stored or emitted, so on reload the previous config
+// stays in effect.
+type Validator[T any] interface {
+	Validate(*T) error
+}
+
 type Observer[T any] struct {
 	builder   Builder[T]
 	watcher   *fsnotify.Watcher
@@ -164,7 +171,15 @@ func (c *Observer[T]) load(path string) (conf *T, err error) {
 	}
 
 	if d, ok := c.builder.(Defaulter[T]); ok {
-		d.InitDefaults(conf)
+		if err := d.InitDefaults(conf); err != nil {
+			return nil, fmt.Errorf("cannot apply config defaults: %w", err)
+		}
+	}
+
+	if v, ok := c.builder.(Validator[T]); ok {
+		if err := v.Validate(conf); err != nil {
+			return nil, fmt.Errorf("invalid config: %w", err)
+		}
 	}
 
 	c.conf.Store(conf)
