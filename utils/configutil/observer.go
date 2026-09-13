@@ -84,6 +84,7 @@ func (c *Observer[T]) Close() {
 }
 
 func (c *Observer[T]) EmitConfigUpdate(conf *T) {
+	c.conf.Store(conf)
 	c.observers.Emit(conf)
 }
 

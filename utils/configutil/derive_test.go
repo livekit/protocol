@@ -19,9 +19,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.uber.org/atomic"
-
-	"github.com/livekit/protocol/utils/events"
 )
 
 // *Observer is the observable Derive exists to narrow, so hold it to the
@@ -45,28 +42,8 @@ type deriveInnerConfig struct {
 	Name string
 }
 
-type stubObservable[T any] struct {
-	conf      atomic.Pointer[T]
-	observers *events.ObserverList[*T]
-}
-
-func newStubObservable[T any](conf *T) *stubObservable[T] {
-	s := &stubObservable[T]{observers: events.NewObserverList[*T](events.WithBlocking())}
-	s.conf.Store(conf)
-	return s
-}
-
-func (s *stubObservable[T]) Observe(cb func(*T)) func() { return s.observers.On(cb) }
-
-func (s *stubObservable[T]) Load() *T { return s.conf.Load() }
-
-func (s *stubObservable[T]) emit(conf *T) {
-	s.conf.Store(conf)
-	s.observers.Emit(conf)
-}
-
 func TestDerive(t *testing.T) {
-	src := newStubObservable(&deriveAppConfig{
+	src := NewStaticObserver(&deriveAppConfig{
 		Sweeper: deriveSweeperConfig{Period: time.Second},
 	})
 	sweeper := Derive(src, func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
@@ -78,26 +55,26 @@ func TestDerive(t *testing.T) {
 		observed = append(observed, c.Period)
 	})
 
-	src.emit(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 2 * time.Second}})
+	src.EmitConfigUpdate(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 2 * time.Second}})
 	require.Equal(t, 2*time.Second, sweeper.Load().Period)
 	require.Equal(t, []time.Duration{2 * time.Second}, observed)
 
 	unsubscribe()
-	src.emit(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 3 * time.Second}})
+	src.EmitConfigUpdate(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 3 * time.Second}})
 	require.Equal(t, 3*time.Second, sweeper.Load().Period)
 	require.Equal(t, []time.Duration{2 * time.Second}, observed, "unsubscribed callback still fired")
 }
 
 func TestDeriveLoadIdentity(t *testing.T) {
 	conf := &deriveAppConfig{Sweeper: deriveSweeperConfig{Period: time.Second}}
-	sweeper := Derive(newStubObservable(conf), func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
+	sweeper := Derive(NewStaticObserver(conf), func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
 
 	require.Same(t, &conf.Sweeper, sweeper.Load())
 	require.Same(t, sweeper.Load(), sweeper.Load())
 }
 
 func TestDeriveChained(t *testing.T) {
-	src := newStubObservable(&deriveAppConfig{
+	src := NewStaticObserver(&deriveAppConfig{
 		Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "a"}},
 	})
 	nested := Derive(src, func(c *deriveAppConfig) *deriveNestedConfig { return &c.Nested })
@@ -108,13 +85,13 @@ func TestDeriveChained(t *testing.T) {
 	done := make(chan string, 1)
 	inner.Observe(func(c *deriveInnerConfig) { done <- c.Name })
 
-	src.emit(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "b"}}})
+	src.EmitConfigUpdate(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "b"}}})
 	require.Equal(t, "b", <-done)
 	require.Equal(t, "b", inner.Load().Name)
 }
 
 func TestDeriveFeedsAtomic(t *testing.T) {
-	src := newStubObservable(&deriveAppConfig{
+	src := NewStaticObserver(&deriveAppConfig{
 		Sweeper: deriveSweeperConfig{Period: time.Second},
 	})
 	sweeper := Derive(src, func(c *deriveAppConfig) *deriveSweeperConfig { return &c.Sweeper })
@@ -122,6 +99,6 @@ func TestDeriveFeedsAtomic(t *testing.T) {
 
 	require.Equal(t, time.Second, period.Load())
 
-	src.emit(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 2 * time.Second}})
+	src.EmitConfigUpdate(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 2 * time.Second}})
 	require.Equal(t, 2*time.Second, period.Load())
 }
