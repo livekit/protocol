@@ -212,11 +212,41 @@ message JobTermination {
 // The worker opens ONE WebTransport (QUIC) session to /agent that carries both
 // its control stream (the same WorkerMessage/ServerMessage exchange as the
 // WebSocket control connection, length-delimited) and every HTTP exchange: the
-// node opens one bidirectional QUIC stream per request, writes the opaque
-// HTTP/1.1 request bytes, and reads the opaque response back, bridged into the
-// worker's application in-process. QUIC provides the multiplexing, per-stream
-// flow control, and half-close (stream FIN) / abort (RESET_STREAM), so there is
-// no capsule framing, no credit accounting, and no attach handshake.
+// node opens one bidirectional QUIC stream per request. QUIC provides the
+// multiplexing and per-stream flow control, so there is no credit accounting
+// and no attach handshake.
+//
+// Each exchange stream is:
+//
+//   [len:u32be][StreamPreamble]   the only LiveKit framing
+//   [ ... opaque bytes ... ]      one HTTP/1.1 exchange, to FIN or RESET_STREAM
+//
+// After the preamble the stream is byte-transparent: the node writes a
+// canonical HTTP/1.1 request and the worker replies with an HTTP/1.1 response,
+// each parsed by whatever HTTP implementation the side already has. A WebSocket
+// upgrade is therefore an ordinary request whose response is a 101, after which
+// the stream is a byte pipe. The protocol evolves by version negotiation at
+// registration, so the preamble carries no version of its own.
+//
+// Bodies use ordinary HTTP/1.1 framing, Content-Length or chunked, and are
+// unbounded: a body may be many gigabytes and must be streamed. Request and
+// response size limits are policy for the layer above.
+//
+// How one direction ends:
+//
+//   success             end of message per the body's own framing, then FIN.
+//   failed mid-body     chunked trailer fields x-lk-completion and x-lk-error,
+//                       in band, so the outcome cannot race the bytes it
+//                       describes.
+//   failed before any   RESET_STREAM carrying an HttpStreamResetCode, sound
+//   bytes               only here, where nothing is in flight.
+//
+// FIN before the body's own framing says it is complete is truncation, and a
+// receiver must surface it as such.
+//
+// The x-lk- header prefix is reserved for this signalling in both directions.
+// A node strips it from client-supplied request headers, so a client cannot
+// forge one, and strips it from responses, so it never reaches the end client.
 message AgentHttp {
   enum AgentEndpointKind {
     AEK_HTTP = 0;
@@ -241,8 +271,59 @@ message AgentHttp {
   // in RegisterWorkerResponse when the worker declares endpoints and the server
   // supports the data plane.
   message AgentEndpointSettings {
-    // negotiated data-plane protocol version
+    reserved 2, 3; // attach_token, data_connection_count (retired with the wire pool)
+    // the negotiated data-plane protocol version; the worker speaks exactly this
+    // or closes the session
     uint32 protocol = 1;
+  }
+
+  // the first thing on every exchange stream, node -> worker. It carries only
+  // what the worker cannot derive from the HTTP bytes that follow and what it
+  // must not infer from client-supplied headers - identity above all.
+  message StreamPreamble {
+    // what the bytes after this preamble are. A field rather than a framing
+    // tag, so a new stream semantic costs no new mechanism.
+    AgentEndpointKind kind = 1;
+    string request_id = 2 [(logger.name) = "requestID"];
+    // the caller presented a valid project token. When false the request
+    // reached a route declared public and no identity is available; identity
+    // must never be inferred from a header, which is why this lives here and
+    // nowhere else.
+    bool authenticated = 3;
+    // the manifest template that matched, e.g. "/items/{id}"
+    string route = 4;
+    // relative, because node and worker clocks are not synchronized. 0 imposes
+    // no deadline.
+    uint32 timeout_ms = 5;
+    // end client address, host only
+    string client_addr = 6 [(logger.sensitivity) = SENSITIVITY_PII];
+    // "http" or "https" as the end client saw it; not derivable worker-side
+    string scheme = 7;
+    // NEXT_ID: 8
+  }
+
+  // why a stream was reset before any HTTP bytes flowed. This travels as the
+  // QUIC RESET_STREAM / STOP_SENDING error code, so it is a number with no room
+  // for detail: the reason string is logged by the side that reset and joined
+  // to this by request_id. An outcome after bytes have flowed travels in
+  // trailers instead, where it cannot race them.
+  enum HttpStreamResetCode {
+    // no information. The ordinary cancel code, sent whenever a stream is torn
+    // down without a specific outcome, so it must stay the zero value and must
+    // not imply that anything was or was not applied.
+    HSR_ABORT = 0;
+    // the worker aborted before any application code observed the request, so
+    // nothing was applied and the exchange is safe to retry. Requires that the
+    // application was never entered; a 404 it returned is an ordinary response.
+    HSR_REFUSED = 1;
+    // the application was entered and then failed before producing a response
+    // head; side effects may already have happened, so this is not safe to
+    // retry.
+    HSR_INTERNAL = 2;
+    // the deadline elapsed before a response head was produced
+    HSR_TIMEOUT = 3;
+    // the peer's bytes were not valid HTTP/1.1
+    HSR_PROTOCOL = 4;
   }
 
   // the server is draining: the worker should re-register elsewhere; in-flight

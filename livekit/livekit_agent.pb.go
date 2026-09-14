@@ -230,6 +230,77 @@ func (AgentHttp_AgentEndpointKind) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 0}
 }
 
+// why a stream was reset before any HTTP bytes flowed. This travels as the
+// QUIC RESET_STREAM / STOP_SENDING error code, so it is a number with no room
+// for detail: the reason string is logged by the side that reset and joined
+// to this by request_id. An outcome after bytes have flowed travels in
+// trailers instead, where it cannot race them.
+type AgentHttp_HttpStreamResetCode int32
+
+const (
+	// no information. The ordinary cancel code, sent whenever a stream is torn
+	// down without a specific outcome, so it must stay the zero value and must
+	// not imply that anything was or was not applied.
+	AgentHttp_HSR_ABORT AgentHttp_HttpStreamResetCode = 0
+	// the worker aborted before any application code observed the request, so
+	// nothing was applied and the exchange is safe to retry. Requires that the
+	// application was never entered; a 404 it returned is an ordinary response.
+	AgentHttp_HSR_REFUSED AgentHttp_HttpStreamResetCode = 1
+	// the application was entered and then failed before producing a response
+	// head; side effects may already have happened, so this is not safe to
+	// retry.
+	AgentHttp_HSR_INTERNAL AgentHttp_HttpStreamResetCode = 2
+	// the deadline elapsed before a response head was produced
+	AgentHttp_HSR_TIMEOUT AgentHttp_HttpStreamResetCode = 3
+	// the peer's bytes were not valid HTTP/1.1
+	AgentHttp_HSR_PROTOCOL AgentHttp_HttpStreamResetCode = 4
+)
+
+// Enum value maps for AgentHttp_HttpStreamResetCode.
+var (
+	AgentHttp_HttpStreamResetCode_name = map[int32]string{
+		0: "HSR_ABORT",
+		1: "HSR_REFUSED",
+		2: "HSR_INTERNAL",
+		3: "HSR_TIMEOUT",
+		4: "HSR_PROTOCOL",
+	}
+	AgentHttp_HttpStreamResetCode_value = map[string]int32{
+		"HSR_ABORT":    0,
+		"HSR_REFUSED":  1,
+		"HSR_INTERNAL": 2,
+		"HSR_TIMEOUT":  3,
+		"HSR_PROTOCOL": 4,
+	}
+)
+
+func (x AgentHttp_HttpStreamResetCode) Enum() *AgentHttp_HttpStreamResetCode {
+	p := new(AgentHttp_HttpStreamResetCode)
+	*p = x
+	return p
+}
+
+func (x AgentHttp_HttpStreamResetCode) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AgentHttp_HttpStreamResetCode) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_agent_proto_enumTypes[4].Descriptor()
+}
+
+func (AgentHttp_HttpStreamResetCode) Type() protoreflect.EnumType {
+	return &file_livekit_agent_proto_enumTypes[4]
+}
+
+func (x AgentHttp_HttpStreamResetCode) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AgentHttp_HttpStreamResetCode.Descriptor instead.
+func (AgentHttp_HttpStreamResetCode) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 1}
+}
+
 type Job struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1579,11 +1650,41 @@ func (x *JobTermination) GetJobId() string {
 // The worker opens ONE WebTransport (QUIC) session to /agent that carries both
 // its control stream (the same WorkerMessage/ServerMessage exchange as the
 // WebSocket control connection, length-delimited) and every HTTP exchange: the
-// node opens one bidirectional QUIC stream per request, writes the opaque
-// HTTP/1.1 request bytes, and reads the opaque response back, bridged into the
-// worker's application in-process. QUIC provides the multiplexing, per-stream
-// flow control, and half-close (stream FIN) / abort (RESET_STREAM), so there is
-// no capsule framing, no credit accounting, and no attach handshake.
+// node opens one bidirectional QUIC stream per request. QUIC provides the
+// multiplexing and per-stream flow control, so there is no credit accounting
+// and no attach handshake.
+//
+// Each exchange stream is:
+//
+//	[len:u32be][StreamPreamble]   the only LiveKit framing
+//	[ ... opaque bytes ... ]      one HTTP/1.1 exchange, to FIN or RESET_STREAM
+//
+// After the preamble the stream is byte-transparent: the node writes a
+// canonical HTTP/1.1 request and the worker replies with an HTTP/1.1 response,
+// each parsed by whatever HTTP implementation the side already has. A WebSocket
+// upgrade is therefore an ordinary request whose response is a 101, after which
+// the stream is a byte pipe. The protocol evolves by version negotiation at
+// registration, so the preamble carries no version of its own.
+//
+// Bodies use ordinary HTTP/1.1 framing, Content-Length or chunked, and are
+// unbounded: a body may be many gigabytes and must be streamed. Request and
+// response size limits are policy for the layer above.
+//
+// How one direction ends:
+//
+//	success             end of message per the body's own framing, then FIN.
+//	failed mid-body     chunked trailer fields x-lk-completion and x-lk-error,
+//	                    in band, so the outcome cannot race the bytes it
+//	                    describes.
+//	failed before any   RESET_STREAM carrying an HttpStreamResetCode, sound
+//	bytes               only here, where nothing is in flight.
+//
+// FIN before the body's own framing says it is complete is truncation, and a
+// receiver must surface it as such.
+//
+// The x-lk- header prefix is reserved for this signalling in both directions.
+// A node strips it from client-supplied request headers, so a client cannot
+// forge one, and strips it from responses, so it never reaches the end client.
 type AgentHttp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1699,7 +1800,8 @@ func (x *AgentHttp_AgentEndpoint) GetPublic() bool {
 // supports the data plane.
 type AgentHttp_AgentEndpointSettings struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// negotiated data-plane protocol version
+	// the negotiated data-plane protocol version; the worker speaks exactly this
+	// or closes the session
 	Protocol      uint32 `protobuf:"varint,1,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1742,6 +1844,112 @@ func (x *AgentHttp_AgentEndpointSettings) GetProtocol() uint32 {
 	return 0
 }
 
+// the first thing on every exchange stream, node -> worker. It carries only
+// what the worker cannot derive from the HTTP bytes that follow and what it
+// must not infer from client-supplied headers - identity above all.
+type AgentHttp_StreamPreamble struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// what the bytes after this preamble are. A field rather than a framing
+	// tag, so a new stream semantic costs no new mechanism.
+	Kind      AgentHttp_AgentEndpointKind `protobuf:"varint,1,opt,name=kind,proto3,enum=livekit.AgentHttp_AgentEndpointKind" json:"kind,omitempty"`
+	RequestId string                      `protobuf:"bytes,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// the caller presented a valid project token. When false the request
+	// reached a route declared public and no identity is available; identity
+	// must never be inferred from a header, which is why this lives here and
+	// nowhere else.
+	Authenticated bool `protobuf:"varint,3,opt,name=authenticated,proto3" json:"authenticated,omitempty"`
+	// the manifest template that matched, e.g. "/items/{id}"
+	Route string `protobuf:"bytes,4,opt,name=route,proto3" json:"route,omitempty"`
+	// relative, because node and worker clocks are not synchronized. 0 imposes
+	// no deadline.
+	TimeoutMs uint32 `protobuf:"varint,5,opt,name=timeout_ms,json=timeoutMs,proto3" json:"timeout_ms,omitempty"`
+	// end client address, host only
+	ClientAddr string `protobuf:"bytes,6,opt,name=client_addr,json=clientAddr,proto3" json:"client_addr,omitempty"`
+	// "http" or "https" as the end client saw it; not derivable worker-side
+	Scheme        string `protobuf:"bytes,7,opt,name=scheme,proto3" json:"scheme,omitempty"` // NEXT_ID: 8
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentHttp_StreamPreamble) Reset() {
+	*x = AgentHttp_StreamPreamble{}
+	mi := &file_livekit_agent_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentHttp_StreamPreamble) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentHttp_StreamPreamble) ProtoMessage() {}
+
+func (x *AgentHttp_StreamPreamble) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentHttp_StreamPreamble.ProtoReflect.Descriptor instead.
+func (*AgentHttp_StreamPreamble) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 2}
+}
+
+func (x *AgentHttp_StreamPreamble) GetKind() AgentHttp_AgentEndpointKind {
+	if x != nil {
+		return x.Kind
+	}
+	return AgentHttp_AEK_HTTP
+}
+
+func (x *AgentHttp_StreamPreamble) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *AgentHttp_StreamPreamble) GetAuthenticated() bool {
+	if x != nil {
+		return x.Authenticated
+	}
+	return false
+}
+
+func (x *AgentHttp_StreamPreamble) GetRoute() string {
+	if x != nil {
+		return x.Route
+	}
+	return ""
+}
+
+func (x *AgentHttp_StreamPreamble) GetTimeoutMs() uint32 {
+	if x != nil {
+		return x.TimeoutMs
+	}
+	return 0
+}
+
+func (x *AgentHttp_StreamPreamble) GetClientAddr() string {
+	if x != nil {
+		return x.ClientAddr
+	}
+	return ""
+}
+
+func (x *AgentHttp_StreamPreamble) GetScheme() string {
+	if x != nil {
+		return x.Scheme
+	}
+	return ""
+}
+
 // the server is draining: the worker should re-register elsewhere; in-flight
 // HTTP exchanges run to completion
 type AgentHttp_GoAway struct {
@@ -1753,7 +1961,7 @@ type AgentHttp_GoAway struct {
 
 func (x *AgentHttp_GoAway) Reset() {
 	*x = AgentHttp_GoAway{}
-	mi := &file_livekit_agent_proto_msgTypes[21]
+	mi := &file_livekit_agent_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1765,7 +1973,7 @@ func (x *AgentHttp_GoAway) String() string {
 func (*AgentHttp_GoAway) ProtoMessage() {}
 
 func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[21]
+	mi := &file_livekit_agent_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1778,7 +1986,7 @@ func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_GoAway.ProtoReflect.Descriptor instead.
 func (*AgentHttp_GoAway) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 2}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{16, 3}
 }
 
 func (x *AgentHttp_GoAway) GetReason() string {
@@ -1921,20 +2129,37 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"1\n" +
 	"\x0eJobTermination\x12\x1f\n" +
-	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xa5\x02\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xb0\x05\n" +
 	"\tAgentHttp\x1a\x8f\x01\n" +
 	"\rAgentEndpoint\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x18\n" +
 	"\amethods\x18\x02 \x03(\tR\amethods\x128\n" +
 	"\x04kind\x18\x03 \x01(\x0e2$.livekit.AgentHttp.AgentEndpointKindR\x04kind\x12\x16\n" +
-	"\x06public\x18\x04 \x01(\bR\x06public\x1a3\n" +
+	"\x06public\x18\x04 \x01(\bR\x06public\x1a?\n" +
 	"\x15AgentEndpointSettings\x12\x1a\n" +
-	"\bprotocol\x18\x01 \x01(\rR\bprotocol\x1a \n" +
+	"\bprotocol\x18\x01 \x01(\rR\bprotocolJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04\x1a\x90\x02\n" +
+	"\x0eStreamPreamble\x128\n" +
+	"\x04kind\x18\x01 \x01(\x0e2$.livekit.AgentHttp.AgentEndpointKindR\x04kind\x12+\n" +
+	"\n" +
+	"request_id\x18\x02 \x01(\tB\f\xbaP\trequestIDR\trequestId\x12$\n" +
+	"\rauthenticated\x18\x03 \x01(\bR\rauthenticated\x12\x14\n" +
+	"\x05route\x18\x04 \x01(\tR\x05route\x12\x1d\n" +
+	"\n" +
+	"timeout_ms\x18\x05 \x01(\rR\ttimeoutMs\x12$\n" +
+	"\vclient_addr\x18\x06 \x01(\tB\x03\xc0P\x01R\n" +
+	"clientAddr\x12\x16\n" +
+	"\x06scheme\x18\a \x01(\tR\x06scheme\x1a \n" +
 	"\x06GoAway\x12\x16\n" +
 	"\x06reason\x18\x01 \x01(\tR\x06reason\"/\n" +
 	"\x11AgentEndpointKind\x12\f\n" +
 	"\bAEK_HTTP\x10\x00\x12\f\n" +
-	"\bAEK_TEXT\x10\x01*<\n" +
+	"\bAEK_TEXT\x10\x01\"j\n" +
+	"\x13HttpStreamResetCode\x12\r\n" +
+	"\tHSR_ABORT\x10\x00\x12\x0f\n" +
+	"\vHSR_REFUSED\x10\x01\x12\x10\n" +
+	"\fHSR_INTERNAL\x10\x02\x12\x0f\n" +
+	"\vHSR_TIMEOUT\x10\x03\x12\x10\n" +
+	"\fHSR_PROTOCOL\x10\x04*<\n" +
 	"\aJobType\x12\v\n" +
 	"\aJT_ROOM\x10\x00\x12\x10\n" +
 	"\fJT_PUBLISHER\x10\x01\x12\x12\n" +
@@ -1963,79 +2188,82 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 	return file_livekit_agent_proto_rawDescData
 }
 
-var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_livekit_agent_proto_goTypes = []any{
 	(JobType)(0),                            // 0: livekit.JobType
 	(WorkerStatus)(0),                       // 1: livekit.WorkerStatus
 	(JobStatus)(0),                          // 2: livekit.JobStatus
 	(AgentHttp_AgentEndpointKind)(0),        // 3: livekit.AgentHttp.AgentEndpointKind
-	(*Job)(nil),                             // 4: livekit.Job
-	(*JobState)(nil),                        // 5: livekit.JobState
-	(*WorkerMessage)(nil),                   // 6: livekit.WorkerMessage
-	(*ServerMessage)(nil),                   // 7: livekit.ServerMessage
-	(*SimulateJobRequest)(nil),              // 8: livekit.SimulateJobRequest
-	(*WorkerPing)(nil),                      // 9: livekit.WorkerPing
-	(*WorkerPong)(nil),                      // 10: livekit.WorkerPong
-	(*RegisterWorkerRequest)(nil),           // 11: livekit.RegisterWorkerRequest
-	(*RegisterWorkerResponse)(nil),          // 12: livekit.RegisterWorkerResponse
-	(*MigrateJobRequest)(nil),               // 13: livekit.MigrateJobRequest
-	(*AvailabilityRequest)(nil),             // 14: livekit.AvailabilityRequest
-	(*AvailabilityResponse)(nil),            // 15: livekit.AvailabilityResponse
-	(*UpdateJobStatus)(nil),                 // 16: livekit.UpdateJobStatus
-	(*UpdateWorkerStatus)(nil),              // 17: livekit.UpdateWorkerStatus
-	(*JobAssignment)(nil),                   // 18: livekit.JobAssignment
-	(*JobTermination)(nil),                  // 19: livekit.JobTermination
-	(*AgentHttp)(nil),                       // 20: livekit.AgentHttp
-	nil,                                     // 21: livekit.Job.AttributesEntry
-	nil,                                     // 22: livekit.AvailabilityResponse.ParticipantAttributesEntry
-	(*AgentHttp_AgentEndpoint)(nil),         // 23: livekit.AgentHttp.AgentEndpoint
-	(*AgentHttp_AgentEndpointSettings)(nil), // 24: livekit.AgentHttp.AgentEndpointSettings
-	(*AgentHttp_GoAway)(nil),                // 25: livekit.AgentHttp.GoAway
-	(*Room)(nil),                            // 26: livekit.Room
-	(*ParticipantInfo)(nil),                 // 27: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),           // 28: livekit.ParticipantPermission
-	(*ServerInfo)(nil),                      // 29: livekit.ServerInfo
+	(AgentHttp_HttpStreamResetCode)(0),      // 4: livekit.AgentHttp.HttpStreamResetCode
+	(*Job)(nil),                             // 5: livekit.Job
+	(*JobState)(nil),                        // 6: livekit.JobState
+	(*WorkerMessage)(nil),                   // 7: livekit.WorkerMessage
+	(*ServerMessage)(nil),                   // 8: livekit.ServerMessage
+	(*SimulateJobRequest)(nil),              // 9: livekit.SimulateJobRequest
+	(*WorkerPing)(nil),                      // 10: livekit.WorkerPing
+	(*WorkerPong)(nil),                      // 11: livekit.WorkerPong
+	(*RegisterWorkerRequest)(nil),           // 12: livekit.RegisterWorkerRequest
+	(*RegisterWorkerResponse)(nil),          // 13: livekit.RegisterWorkerResponse
+	(*MigrateJobRequest)(nil),               // 14: livekit.MigrateJobRequest
+	(*AvailabilityRequest)(nil),             // 15: livekit.AvailabilityRequest
+	(*AvailabilityResponse)(nil),            // 16: livekit.AvailabilityResponse
+	(*UpdateJobStatus)(nil),                 // 17: livekit.UpdateJobStatus
+	(*UpdateWorkerStatus)(nil),              // 18: livekit.UpdateWorkerStatus
+	(*JobAssignment)(nil),                   // 19: livekit.JobAssignment
+	(*JobTermination)(nil),                  // 20: livekit.JobTermination
+	(*AgentHttp)(nil),                       // 21: livekit.AgentHttp
+	nil,                                     // 22: livekit.Job.AttributesEntry
+	nil,                                     // 23: livekit.AvailabilityResponse.ParticipantAttributesEntry
+	(*AgentHttp_AgentEndpoint)(nil),         // 24: livekit.AgentHttp.AgentEndpoint
+	(*AgentHttp_AgentEndpointSettings)(nil), // 25: livekit.AgentHttp.AgentEndpointSettings
+	(*AgentHttp_StreamPreamble)(nil),        // 26: livekit.AgentHttp.StreamPreamble
+	(*AgentHttp_GoAway)(nil),                // 27: livekit.AgentHttp.GoAway
+	(*Room)(nil),                            // 28: livekit.Room
+	(*ParticipantInfo)(nil),                 // 29: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),           // 30: livekit.ParticipantPermission
+	(*ServerInfo)(nil),                      // 31: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	26, // 1: livekit.Job.room:type_name -> livekit.Room
-	27, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
-	5,  // 3: livekit.Job.state:type_name -> livekit.JobState
-	21, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
+	28, // 1: livekit.Job.room:type_name -> livekit.Room
+	29, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	6,  // 3: livekit.Job.state:type_name -> livekit.JobState
+	22, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
 	2,  // 5: livekit.JobState.status:type_name -> livekit.JobStatus
-	11, // 6: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
-	15, // 7: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
-	17, // 8: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
-	16, // 9: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
-	9,  // 10: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
-	8,  // 11: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
-	13, // 12: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
-	12, // 13: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
-	14, // 14: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
-	18, // 15: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
-	19, // 16: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
-	10, // 17: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	25, // 18: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
+	12, // 6: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
+	16, // 7: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
+	18, // 8: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
+	17, // 9: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
+	10, // 10: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
+	9,  // 11: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
+	14, // 12: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
+	13, // 13: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
+	15, // 14: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
+	19, // 15: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
+	20, // 16: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
+	11, // 17: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
+	27, // 18: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
 	0,  // 19: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	26, // 20: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	27, // 21: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	28, // 20: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	29, // 21: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
 	0,  // 22: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	28, // 23: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
-	23, // 24: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
-	29, // 25: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
-	24, // 26: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
-	4,  // 27: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	22, // 28: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	30, // 23: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	24, // 24: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
+	31, // 25: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	25, // 26: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
+	5,  // 27: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	23, // 28: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
 	2,  // 29: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
 	1,  // 30: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	4,  // 31: livekit.JobAssignment.job:type_name -> livekit.Job
+	5,  // 31: livekit.JobAssignment.job:type_name -> livekit.Job
 	3,  // 32: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	33, // [33:33] is the sub-list for method output_type
-	33, // [33:33] is the sub-list for method input_type
-	33, // [33:33] is the sub-list for extension type_name
-	33, // [33:33] is the sub-list for extension extendee
-	0,  // [0:33] is the sub-list for field type_name
+	3,  // 33: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	34, // [34:34] is the sub-list for method output_type
+	34, // [34:34] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -2070,8 +2298,8 @@ func file_livekit_agent_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
-			NumEnums:      4,
-			NumMessages:   22,
+			NumEnums:      5,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
