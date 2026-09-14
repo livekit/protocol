@@ -75,6 +75,12 @@ message SimulationRun {
     Usage usage = 13;
     // Quality metrics for this job's call. Unset when the job produced none.
     JobMetrics metrics = 14;
+    // The Scenario.id this job ran; empty for generated runs. Every attempt
+    // of one scenario shares it, so a run's jobs group back into scenarios.
+    string scenario_id = 15;
+    // 1-based attempt of that scenario within the run; always 1 when the run's
+    // repeats is 1.
+    int32 attempt = 16;
 
     message Usage {
       int32 text_turns_count = 1;
@@ -254,6 +260,9 @@ message SimulationRun {
       bool low_quality_microphone = 11;
       bool packet_loss = 12;
       optional CI ci = 13;
+      // Attempts per scenario; 0/unset = 1. Requires scenario_group. The run
+      // holds scenarios × repeats jobs, subject to the usual job cap.
+      int32 repeats = 14;
     }
     message Response {
       string simulation_run_id = 1;
@@ -375,6 +384,8 @@ message SimulationRun {
   optional int32 issue_count = 21;
   // The pipeline this run came from; unset when it did not come from one.
   optional CI ci = 22;
+  // Attempts per scenario; 1 when not repeated.
+  int32 repeats = 23;
 
   message Usage {
     int32 text_turns_count = 1;
