@@ -35,6 +35,7 @@ func TestGrants(t *testing.T) {
 		require.Same(t, grants.Agent, clone.Agent)
 		require.Same(t, grants.Inference, clone.Inference)
 		require.Same(t, grants.SIP, clone.SIP)
+		require.Same(t, grants.AgentEndpoint, clone.AgentEndpoint)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
 	})
@@ -61,6 +62,9 @@ func TestGrants(t *testing.T) {
 		// require Inference
 		require.Same(t, grants.Inference, clone.Inference)
 		require.True(t, reflect.DeepEqual(grants.Inference, clone.Inference))
+		// require AgentEndpoint
+		require.Same(t, grants.AgentEndpoint, clone.AgentEndpoint)
+		require.True(t, reflect.DeepEqual(grants.AgentEndpoint, clone.AgentEndpoint))
 	})
 
 	t.Run("clone with video", func(t *testing.T) {
@@ -474,4 +478,49 @@ func TestRoomConfiguration_CheckCredentials(t *testing.T) {
 		}
 		require.NoError(t, config.CheckCredentials())
 	})
+}
+
+func TestAgentEndpointGrantAllows(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name       string
+		grant      *AgentEndpointGrant
+		agentName  string
+		deployment string
+		want       bool
+	}{
+		{"nil grant", nil, "a", "prod", false},
+		{"call unset with scope", &AgentEndpointGrant{AgentName: "a", Deployment: "prod"}, "a", "prod", false},
+		{"wildcard", &AgentEndpointGrant{Call: true}, "a", "prod", true},
+		{"agent match", &AgentEndpointGrant{Call: true, AgentName: "a"}, "a", "prod", true},
+		{"agent mismatch", &AgentEndpointGrant{Call: true, AgentName: "a"}, "b", "prod", false},
+		{"deployment match", &AgentEndpointGrant{Call: true, Deployment: "prod"}, "a", "prod", true},
+		{"deployment mismatch", &AgentEndpointGrant{Call: true, Deployment: "prod"}, "a", "staging", false},
+		{"both match", &AgentEndpointGrant{Call: true, AgentName: "a", Deployment: "prod"}, "a", "prod", true},
+		{"both set, deployment differs", &AgentEndpointGrant{Call: true, AgentName: "a", Deployment: "prod"}, "a", "staging", false},
+		{"agent case differs", &AgentEndpointGrant{Call: true, AgentName: "Agent"}, "agent", "prod", false},
+		{"deployment case differs", &AgentEndpointGrant{Call: true, Deployment: "Prod"}, "a", "prod", false},
+		{"empty deployment is wildcard", &AgentEndpointGrant{Call: true}, "a", "production", true},
+		{"default pinned by literal", &AgentEndpointGrant{Call: true, Deployment: "default"}, "a", "default", true},
+		{"default pin rejects others", &AgentEndpointGrant{Call: true, Deployment: "default"}, "a", "prod", false},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			require.Equal(t, c.want, c.grant.Allows(c.agentName, c.deployment))
+		})
+	}
+}
+
+func TestAgentEndpointGrantCloneIndependent(t *testing.T) {
+	t.Parallel()
+
+	grants := &ClaimGrants{AgentEndpoint: &AgentEndpointGrant{Call: true, AgentName: "a", Deployment: "prod"}}
+	clone := grants.Clone()
+	require.NotSame(t, grants.AgentEndpoint, clone.AgentEndpoint)
+
+	clone.AgentEndpoint.Call = false
+	clone.AgentEndpoint.AgentName = "b"
+	require.True(t, grants.AgentEndpoint.Call)
+	require.Equal(t, "a", grants.AgentEndpoint.AgentName)
 }
