@@ -285,11 +285,9 @@ message AgentHttp {
     // tag, so a new stream semantic costs no new mechanism.
     AgentEndpointKind kind = 1;
     string request_id = 2 [(logger.name) = "requestID"];
-    // the caller presented a valid project token. When false the request
-    // reached a route declared public and no identity is available; identity
-    // must never be inferred from a header, which is why this lives here and
-    // nowhere else.
-    bool authenticated = 3;
+    // the caller holds agent-endpoint call permission for this agent and
+    // deployment. Always true on a non-public route.
+    bool authorized = 3;
     // the manifest template that matched, e.g. "/items/{id}"
     string route = 4;
     // relative, because node and worker clocks are not synchronized. 0 imposes
