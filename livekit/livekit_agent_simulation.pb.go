@@ -323,8 +323,8 @@ type SimulationRun struct {
 	IssueCount *int32 `protobuf:"varint,21,opt,name=issue_count,json=issueCount,proto3,oneof" json:"issue_count,omitempty"`
 	// The pipeline this run came from; unset when it did not come from one.
 	Ci *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	// Attempts per scenario; 1 when not repeated.
-	Repeats       int32 `protobuf:"varint,23,opt,name=repeats,proto3" json:"repeats,omitempty"`
+	// Samples per scenario; 1 when run once.
+	Samples       int32 `protobuf:"varint,23,opt,name=samples,proto3" json:"samples,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -506,9 +506,9 @@ func (x *SimulationRun) GetCi() *SimulationRun_CI {
 	return nil
 }
 
-func (x *SimulationRun) GetRepeats() int32 {
+func (x *SimulationRun) GetSamples() int32 {
 	if x != nil {
-		return x.Repeats
+		return x.Samples
 	}
 	return 0
 }
@@ -817,7 +817,7 @@ type SimulationRun_Job struct {
 	// of one scenario shares it, so a run's jobs group back into scenarios.
 	ScenarioId string `protobuf:"bytes,15,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	// 1-based attempt of that scenario within the run; always 1 when the run's
-	// repeats is 1.
+	// samples is 1.
 	Attempt       int32 `protobuf:"varint,16,opt,name=attempt,proto3" json:"attempt,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2318,8 +2318,8 @@ type SimulationRun_Create_Request struct {
 	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
 	Ci                   *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
 	// Attempts per scenario; 0/unset = 1. Requires scenario_group. The run
-	// holds scenarios × repeats jobs, subject to the usual job cap.
-	Repeats       int32 `protobuf:"varint,14,opt,name=repeats,proto3" json:"repeats,omitempty"`
+	// holds scenarios × samples jobs, subject to the usual job cap.
+	Samples       int32 `protobuf:"varint,14,opt,name=samples,proto3" json:"samples,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2431,9 +2431,9 @@ func (x *SimulationRun_Create_Request) GetCi() *SimulationRun_CI {
 	return nil
 }
 
-func (x *SimulationRun_Create_Request) GetRepeats() int32 {
+func (x *SimulationRun_Create_Request) GetSamples() int32 {
 	if x != nil {
-		return x.Repeats
+		return x.Samples
 	}
 	return 0
 }
@@ -3308,7 +3308,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
 	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12\x18\n" +
-	"\arepeats\x18\x17 \x01(\x05R\arepeats\x1a\x91\x06\n" +
+	"\asamples\x18\x17 \x01(\x05R\asamples\x1a\x91\x06\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3546,7 +3546,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
 	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12\x18\n" +
-	"\arepeats\x18\x0e \x01(\x05R\arepeatsB\x11\n" +
+	"\asamples\x18\x0e \x01(\x05R\asamplesB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
