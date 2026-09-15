@@ -930,15 +930,13 @@ func (x *SimulationRun_Job) GetMetrics() *SimulationRun_JobMetrics {
 }
 
 type SimulationRun_JobMetrics struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Headline scores, 0-1. All absent when the simulator spoiled the call.
-	AccuracyScore   *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"`
-	ExperienceScore *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
-	TaskCompletion  *float32                               `protobuf:"fixed32,3,opt,name=task_completion,json=taskCompletion,proto3,oneof" json:"task_completion,omitempty"` // the scenario verdict as 1/0
-	Stt             *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
-	Llm             *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
-	Tts             *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
-	Conversation    *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
+	state          protoimpl.MessageState                 `protogen:"open.v1"`
+	TaskCompletion *float32                               `protobuf:"fixed32,3,opt,name=task_completion,json=taskCompletion,proto3,oneof" json:"task_completion,omitempty"` // the scenario verdict as 1/0
+	OverallScore   *float32                               `protobuf:"fixed32,20,opt,name=overall_score,json=overallScore,proto3,oneof" json:"overall_score,omitempty"`      // weighted mean of the judged and heard scores
+	Stt            *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
+	Llm            *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
+	Tts            *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
+	Conversation   *SimulationRun_JobMetrics_Conversation `protobuf:"bytes,7,opt,name=conversation,proto3" json:"conversation,omitempty"`
 	// One entry per turn, both speakers.
 	Turns            []*SimulationRun_JobMetrics_Turn `protobuf:"bytes,9,rep,name=turns,proto3" json:"turns,omitempty"`
 	JudgeModel       string                           `protobuf:"bytes,10,opt,name=judge_model,json=judgeModel,proto3" json:"judge_model,omitempty"`                      // text judge for judged scores; "" if none ran
@@ -986,23 +984,16 @@ func (*SimulationRun_JobMetrics) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 1}
 }
 
-func (x *SimulationRun_JobMetrics) GetAccuracyScore() float32 {
-	if x != nil && x.AccuracyScore != nil {
-		return *x.AccuracyScore
-	}
-	return 0
-}
-
-func (x *SimulationRun_JobMetrics) GetExperienceScore() float32 {
-	if x != nil && x.ExperienceScore != nil {
-		return *x.ExperienceScore
-	}
-	return 0
-}
-
 func (x *SimulationRun_JobMetrics) GetTaskCompletion() float32 {
 	if x != nil && x.TaskCompletion != nil {
 		return *x.TaskCompletion
+	}
+	return 0
+}
+
+func (x *SimulationRun_JobMetrics) GetOverallScore() float32 {
+	if x != nil && x.OverallScore != nil {
+		return *x.OverallScore
 	}
 	return 0
 }
@@ -1109,9 +1100,8 @@ func (x *SimulationRun_JobMetrics) GetConversationProgression() float32 {
 // every job and turn. Reuses the JobMetrics group shapes.
 type SimulationRun_RunMetrics struct {
 	state            protoimpl.MessageState                 `protogen:"open.v1"`
-	AccuracyScore    *float32                               `protobuf:"fixed32,1,opt,name=accuracy_score,json=accuracyScore,proto3,oneof" json:"accuracy_score,omitempty"` // mean over scored jobs
-	ExperienceScore  *float32                               `protobuf:"fixed32,2,opt,name=experience_score,json=experienceScore,proto3,oneof" json:"experience_score,omitempty"`
 	ScenarioPassRate *float32                               `protobuf:"fixed32,3,opt,name=scenario_pass_rate,json=scenarioPassRate,proto3,oneof" json:"scenario_pass_rate,omitempty"` // share of jobs whose scenario verdict passed
+	OverallScore     *float32                               `protobuf:"fixed32,10,opt,name=overall_score,json=overallScore,proto3,oneof" json:"overall_score,omitempty"`              // mean over scored jobs
 	Stt              *SimulationRun_JobMetrics_STT          `protobuf:"bytes,4,opt,name=stt,proto3" json:"stt,omitempty"`
 	Llm              *SimulationRun_JobMetrics_LLM          `protobuf:"bytes,5,opt,name=llm,proto3" json:"llm,omitempty"`
 	Tts              *SimulationRun_JobMetrics_TTS          `protobuf:"bytes,6,opt,name=tts,proto3" json:"tts,omitempty"`
@@ -1153,23 +1143,16 @@ func (*SimulationRun_RunMetrics) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 2}
 }
 
-func (x *SimulationRun_RunMetrics) GetAccuracyScore() float32 {
-	if x != nil && x.AccuracyScore != nil {
-		return *x.AccuracyScore
-	}
-	return 0
-}
-
-func (x *SimulationRun_RunMetrics) GetExperienceScore() float32 {
-	if x != nil && x.ExperienceScore != nil {
-		return *x.ExperienceScore
-	}
-	return 0
-}
-
 func (x *SimulationRun_RunMetrics) GetScenarioPassRate() float32 {
 	if x != nil && x.ScenarioPassRate != nil {
 		return *x.ScenarioPassRate
+	}
+	return 0
+}
+
+func (x *SimulationRun_RunMetrics) GetOverallScore() float32 {
+	if x != nil && x.OverallScore != nil {
+		return *x.OverallScore
 	}
 	return 0
 }
@@ -3258,7 +3241,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb9L\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x85L\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3311,12 +3294,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x10STATUS_COMPLETED\x10\x02\x12\x11\n" +
 	"\rSTATUS_FAILED\x10\x03\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x04J\x04\b\t\x10\n" +
-	"\x1a\xc1%\n" +
+	"\x1a\xa7%\n" +
 	"\n" +
-	"JobMetrics\x12*\n" +
-	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
-	"\x10experience_score\x18\x02 \x01(\x02H\x01R\x0fexperienceScore\x88\x01\x01\x12,\n" +
-	"\x0ftask_completion\x18\x03 \x01(\x02H\x02R\x0etaskCompletion\x88\x01\x01\x127\n" +
+	"JobMetrics\x12,\n" +
+	"\x0ftask_completion\x18\x03 \x01(\x02H\x00R\x0etaskCompletion\x88\x01\x01\x12(\n" +
+	"\roverall_score\x18\x14 \x01(\x02H\x01R\foverallScore\x88\x01\x01\x127\n" +
 	"\x03stt\x18\x04 \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
 	"\x03llm\x18\x05 \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
 	"\x03tts\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
@@ -3327,12 +3309,12 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"judgeModel\x12,\n" +
 	"\x12has_remote_session\x18\f \x01(\bR\x10hasRemoteSession\x12*\n" +
 	"\x02t0\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\x02t0\x12%\n" +
-	"\vconciseness\x18\x0e \x01(\x02H\x03R\vconciseness\x88\x01\x01\x129\n" +
-	"\x16unnecessary_tool_calls\x18\x0f \x01(\bH\x04R\x14unnecessaryToolCalls\x88\x01\x01\x12.\n" +
-	"\x10information_loss\x18\x10 \x01(\bH\x05R\x0finformationLoss\x88\x01\x01\x126\n" +
-	"\x14redundant_statements\x18\x11 \x01(\bH\x06R\x13redundantStatements\x88\x01\x01\x127\n" +
-	"\x15poor_question_quality\x18\x12 \x01(\bH\aR\x13poorQuestionQuality\x88\x01\x01\x12>\n" +
-	"\x18conversation_progression\x18\x13 \x01(\x02H\bR\x17conversationProgression\x88\x01\x01\x1a\x92\x06\n" +
+	"\vconciseness\x18\x0e \x01(\x02H\x02R\vconciseness\x88\x01\x01\x129\n" +
+	"\x16unnecessary_tool_calls\x18\x0f \x01(\bH\x03R\x14unnecessaryToolCalls\x88\x01\x01\x12.\n" +
+	"\x10information_loss\x18\x10 \x01(\bH\x04R\x0finformationLoss\x88\x01\x01\x126\n" +
+	"\x14redundant_statements\x18\x11 \x01(\bH\x05R\x13redundantStatements\x88\x01\x01\x127\n" +
+	"\x15poor_question_quality\x18\x12 \x01(\bH\x06R\x13poorQuestionQuality\x88\x01\x01\x12>\n" +
+	"\x18conversation_progression\x18\x13 \x01(\x02H\aR\x17conversationProgression\x88\x01\x01\x1a\x92\x06\n" +
 	"\x03STT\x12\x15\n" +
 	"\x03wer\x18\x01 \x01(\x02H\x00R\x03wer\x88\x01\x01\x12\x19\n" +
 	"\x05words\x18\x02 \x01(\rH\x01R\x05words\x88\x01\x01\x12$\n" +
@@ -3472,32 +3454,30 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\f_concisenessB\x14\n" +
 	"\x12_eot_mispredictionB\x12\n" +
 	"\x10_awkward_silenceB\r\n" +
-	"\v_unansweredB\x11\n" +
-	"\x0f_accuracy_scoreB\x13\n" +
-	"\x11_experience_scoreB\x12\n" +
-	"\x10_task_completionB\x0e\n" +
+	"\v_unansweredB\x12\n" +
+	"\x10_task_completionB\x10\n" +
+	"\x0e_overall_scoreB\x0e\n" +
 	"\f_concisenessB\x19\n" +
 	"\x17_unnecessary_tool_callsB\x13\n" +
 	"\x11_information_lossB\x17\n" +
 	"\x15_redundant_statementsB\x18\n" +
 	"\x16_poor_question_qualityB\x1b\n" +
-	"\x19_conversation_progression\x1a\xed\x04\n" +
+	"\x19_conversation_progressionJ\x04\b\x01\x10\x02J\x04\b\x02\x10\x03R\x0eaccuracy_scoreR\x10experience_score\x1a\xd3\x04\n" +
 	"\n" +
-	"RunMetrics\x12*\n" +
-	"\x0eaccuracy_score\x18\x01 \x01(\x02H\x00R\raccuracyScore\x88\x01\x01\x12.\n" +
-	"\x10experience_score\x18\x02 \x01(\x02H\x01R\x0fexperienceScore\x88\x01\x01\x121\n" +
-	"\x12scenario_pass_rate\x18\x03 \x01(\x02H\x02R\x10scenarioPassRate\x88\x01\x01\x127\n" +
+	"RunMetrics\x121\n" +
+	"\x12scenario_pass_rate\x18\x03 \x01(\x02H\x00R\x10scenarioPassRate\x88\x01\x01\x12(\n" +
+	"\roverall_score\x18\n" +
+	" \x01(\x02H\x01R\foverallScore\x88\x01\x01\x127\n" +
 	"\x03stt\x18\x04 \x01(\v2%.livekit.SimulationRun.JobMetrics.STTR\x03stt\x127\n" +
 	"\x03llm\x18\x05 \x01(\v2%.livekit.SimulationRun.JobMetrics.LLMR\x03llm\x127\n" +
 	"\x03tts\x18\x06 \x01(\v2%.livekit.SimulationRun.JobMetrics.TTSR\x03tts\x12R\n" +
 	"\fconversation\x18\a \x01(\v2..livekit.SimulationRun.JobMetrics.ConversationR\fconversation\x12%\n" +
-	"\vconciseness\x18\b \x01(\x02H\x03R\vconciseness\x88\x01\x01\x12>\n" +
-	"\x18conversation_progression\x18\t \x01(\x02H\x04R\x17conversationProgression\x88\x01\x01B\x11\n" +
-	"\x0f_accuracy_scoreB\x13\n" +
-	"\x11_experience_scoreB\x15\n" +
-	"\x13_scenario_pass_rateB\x0e\n" +
+	"\vconciseness\x18\b \x01(\x02H\x02R\vconciseness\x88\x01\x01\x12>\n" +
+	"\x18conversation_progression\x18\t \x01(\x02H\x03R\x17conversationProgression\x88\x01\x01B\x15\n" +
+	"\x13_scenario_pass_rateB\x10\n" +
+	"\x0e_overall_scoreB\x0e\n" +
 	"\f_concisenessB\x1b\n" +
-	"\x19_conversation_progression\x1a\xa3\x01\n" +
+	"\x19_conversation_progressionJ\x04\b\x01\x10\x02J\x04\b\x02\x10\x03R\x0eaccuracy_scoreR\x10experience_score\x1a\xa3\x01\n" +
 	"\x02CI\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x1d\n" +
 	"\n" +

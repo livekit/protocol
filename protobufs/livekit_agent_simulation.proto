@@ -84,9 +84,10 @@ message SimulationRun {
 
   message JobMetrics {
     // Headline scores, 0-1. All absent when the simulator spoiled the call.
-    optional float accuracy_score = 1;
-    optional float experience_score = 2;
+    reserved 1, 2;  // was accuracy_score, experience_score (merged into overall_score)
+    reserved "accuracy_score", "experience_score";
     optional float task_completion = 3;  // the scenario verdict as 1/0
+    optional float overall_score = 20;   // weighted mean of the judged and heard scores
 
     STT stt = 4;
     LLM llm = 5;
@@ -202,9 +203,10 @@ message SimulationRun {
   // Aggregates over this run's jobs, so a run summary does not have to pull
   // every job and turn. Reuses the JobMetrics group shapes.
   message RunMetrics {
-    optional float accuracy_score = 1;     // mean over scored jobs
-    optional float experience_score = 2;
+    reserved 1, 2;  // was accuracy_score, experience_score (merged into overall_score)
+    reserved "accuracy_score", "experience_score";
     optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
+    optional float overall_score = 10;     // mean over scored jobs
 
     JobMetrics.STT stt = 4;
     JobMetrics.LLM llm = 5;
