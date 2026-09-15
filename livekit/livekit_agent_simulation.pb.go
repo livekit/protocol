@@ -322,7 +322,9 @@ type SimulationRun struct {
 	// List responses carry it without the summary blob itself.
 	IssueCount *int32 `protobuf:"varint,21,opt,name=issue_count,json=issueCount,proto3,oneof" json:"issue_count,omitempty"`
 	// The pipeline this run came from; unset when it did not come from one.
-	Ci            *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
+	Ci *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
+	// Samples per scenario; 1 when run once.
+	Samples       int32 `protobuf:"varint,23,opt,name=samples,proto3" json:"samples,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -502,6 +504,13 @@ func (x *SimulationRun) GetCi() *SimulationRun_CI {
 		return x.Ci
 	}
 	return nil
+}
+
+func (x *SimulationRun) GetSamples() int32 {
+	if x != nil {
+		return x.Samples
+	}
+	return 0
 }
 
 // A single scenario, mirroring one entry in a scenarios.yaml file. Scenarios
@@ -803,7 +812,13 @@ type SimulationRun_Job struct {
 	RoomId            string                   `protobuf:"bytes,12,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
 	Usage             *SimulationRun_Job_Usage `protobuf:"bytes,13,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Quality metrics for this job's call. Unset when the job produced none.
-	Metrics       *SimulationRun_JobMetrics `protobuf:"bytes,14,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	Metrics *SimulationRun_JobMetrics `protobuf:"bytes,14,opt,name=metrics,proto3" json:"metrics,omitempty"`
+	// The Scenario.id this job ran; empty for generated runs. Every sample
+	// of one scenario shares it, so a run's jobs group back into scenarios.
+	ScenarioId string `protobuf:"bytes,15,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
+	// 1-based sample of that scenario within the run; always 1 when the run's
+	// samples is 1.
+	Sample        int32 `protobuf:"varint,16,opt,name=sample,proto3" json:"sample,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -927,6 +942,20 @@ func (x *SimulationRun_Job) GetMetrics() *SimulationRun_JobMetrics {
 		return x.Metrics
 	}
 	return nil
+}
+
+func (x *SimulationRun_Job) GetScenarioId() string {
+	if x != nil {
+		return x.ScenarioId
+	}
+	return ""
+}
+
+func (x *SimulationRun_Job) GetSample() int32 {
+	if x != nil {
+		return x.Sample
+	}
+	return 0
 }
 
 type SimulationRun_JobMetrics struct {
@@ -2288,8 +2317,11 @@ type SimulationRun_Create_Request struct {
 	LowQualityMicrophone bool              `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
 	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
 	Ci                   *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	// Samples per scenario; 0/unset = 1. Requires scenario_group. The run
+	// holds scenarios × samples jobs, subject to the usual job cap.
+	Samples       int32 `protobuf:"varint,14,opt,name=samples,proto3" json:"samples,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Create_Request) Reset() {
@@ -2397,6 +2429,13 @@ func (x *SimulationRun_Create_Request) GetCi() *SimulationRun_CI {
 		return x.Ci
 	}
 	return nil
+}
+
+func (x *SimulationRun_Create_Request) GetSamples() int32 {
+	if x != nil {
+		return x.Samples
+	}
+	return 0
 }
 
 type SimulationRun_Create_Response struct {
@@ -3241,7 +3280,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x85L\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xf2L\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3268,7 +3307,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x12$\n" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
-	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x1a\xd6\x05\n" +
+	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12\x18\n" +
+	"\asamples\x18\x17 \x01(\x05R\asamples\x1a\x8f\x06\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3284,7 +3324,10 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\bended_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\aendedAt\x12\x17\n" +
 	"\aroom_id\x18\f \x01(\tR\x06roomId\x126\n" +
 	"\x05usage\x18\r \x01(\v2 .livekit.SimulationRun.Job.UsageR\x05usage\x12;\n" +
-	"\ametrics\x18\x0e \x01(\v2!.livekit.SimulationRun.JobMetricsR\ametrics\x1a]\n" +
+	"\ametrics\x18\x0e \x01(\v2!.livekit.SimulationRun.JobMetricsR\ametrics\x12\x1f\n" +
+	"\vscenario_id\x18\x0f \x01(\tR\n" +
+	"scenarioId\x12\x16\n" +
+	"\x06sample\x18\x10 \x01(\x05R\x06sample\x1a]\n" +
 	"\x05Usage\x12(\n" +
 	"\x10text_turns_count\x18\x01 \x01(\x05R\x0etextTurnsCount\x12*\n" +
 	"\x11audio_turns_count\x18\x02 \x01(\x05R\x0faudioTurnsCount\"o\n" +
@@ -3485,8 +3528,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03ref\x18\x03 \x01(\tR\x03ref\x12!\n" +
 	"\fpull_request\x18\x04 \x01(\tR\vpullRequest\x12\x17\n" +
 	"\arun_url\x18\x05 \x01(\tR\x06runUrl\x12\x14\n" +
-	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xae\x05\n" +
-	"\x06Create\x1a\x95\x04\n" +
+	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xc8\x05\n" +
+	"\x06Create\x1a\xaf\x04\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3502,7 +3545,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x16low_quality_microphone\x18\v \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
-	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01B\x11\n" +
+	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12\x18\n" +
+	"\asamples\x18\x0e \x01(\x05R\asamplesB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
