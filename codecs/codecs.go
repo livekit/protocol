@@ -174,20 +174,11 @@ var (
 		PayloadType: 116,
 	}
 
-	// FlexFEC03Fmtp is the flexfec-03 "repair-window" fmtp value matching
-	// libwebrtc and pion's fixed advertised value (10 s in microseconds).
-	// A different value prevents those publishers from negotiating FlexFEC.
-	FlexFEC03Fmtp = "repair-window=10000000"
-
-	// FlexFEC03CodecParameters is the flexfec-03 codec registered/offered when
-	// FlexFEC is enabled for a direction. Payload type 115 is reserved
-	// alongside the codec and RTX payload types. Mirrors pion's
-	// ConfigureFlexFEC03 codec minus its generator interceptor.
 	FlexFEC03CodecParameters = webrtc.RTPCodecParameters{
 		RTPCodecCapability: webrtc.RTPCodecCapability{
 			MimeType:    mime.MimeTypeFlexFEC03.String(),
 			ClockRate:   90000,
-			SDPFmtpLine: FlexFEC03Fmtp,
+			SDPFmtpLine: "repair-window=10000000",
 			RTCPFeedback: []webrtc.RTCPFeedback{
 				{Type: webrtc.TypeRTCPFBTransportCC},
 			},
