@@ -263,6 +263,11 @@ message SimulationRun {
       // Samples per scenario; 0/unset = 1. Requires scenario_group. The run
       // holds scenarios × samples jobs, subject to the usual job cap.
       int32 samples = 14;
+      // The share of a scenario's samples that must pass for that scenario to
+      // pass, 0-1; 0/unset requires every sample. A scenario needs
+      // round(rate × samples) of them. The run fails if any scenario fails;
+      // pass@k and pass^k report over scenarios and neither gates.
+      double min_sample_pass_rate = 15;
     }
     message Response {
       string simulation_run_id = 1;
@@ -386,6 +391,9 @@ message SimulationRun {
   optional CI ci = 22;
   // Samples per scenario; 1 when run once.
   int32 samples = 23;
+  // The share of a scenario's samples that had to pass for that scenario to
+  // pass; 0 when the run required every sample.
+  double min_sample_pass_rate = 24;
 
   message Usage {
     int32 text_turns_count = 1;
