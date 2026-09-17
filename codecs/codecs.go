@@ -174,6 +174,27 @@ var (
 		PayloadType: 116,
 	}
 
+	// FlexFEC03Fmtp is the flexfec-03 "repair-window" fmtp value matching
+	// libwebrtc and pion's fixed advertised value (10 s in microseconds).
+	// A different value prevents those publishers from negotiating FlexFEC.
+	FlexFEC03Fmtp = "repair-window=10000000"
+
+	// FlexFEC03CodecParameters is the flexfec-03 codec registered/offered when
+	// FlexFEC is enabled for a direction. Payload type 115 is reserved
+	// alongside the codec and RTX payload types. Mirrors pion's
+	// ConfigureFlexFEC03 codec minus its generator interceptor.
+	FlexFEC03CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeFlexFEC03.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: FlexFEC03Fmtp,
+			RTCPFeedback: []webrtc.RTCPFeedback{
+				{Type: webrtc.TypeRTCPFBTransportCC},
+			},
+		},
+		PayloadType: 115,
+	}
+
 	VideoCodecsParameters = []webrtc.RTPCodecParameters{
 		VP8CodecParameters,
 		VP9ProfileId0CodecParameters,
@@ -245,6 +266,8 @@ func ToWebrtcCodecParameters(codec *livekit.Codec) webrtc.RTPCodecParameters {
 		}
 	case mime.MimeTypeH265:
 		params = H265CodecParameters
+	case mime.MimeTypeFlexFEC03:
+		params = FlexFEC03CodecParameters
 	default:
 		return webrtc.RTPCodecParameters{}
 	}
