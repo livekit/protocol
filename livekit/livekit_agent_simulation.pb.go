@@ -327,9 +327,9 @@ type SimulationRun struct {
 	Samples int32 `protobuf:"varint,23,opt,name=samples,proto3" json:"samples,omitempty"`
 	// The share of a scenario's samples that had to pass for that scenario to
 	// pass; 0 when the run required every sample.
-	MinSamplePassRate float64 `protobuf:"fixed64,24,opt,name=min_sample_pass_rate,json=minSamplePassRate,proto3" json:"min_sample_pass_rate,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	PassRate      float64 `protobuf:"fixed64,24,opt,name=pass_rate,json=passRate,proto3" json:"pass_rate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun) Reset() {
@@ -516,9 +516,9 @@ func (x *SimulationRun) GetSamples() int32 {
 	return 0
 }
 
-func (x *SimulationRun) GetMinSamplePassRate() float64 {
+func (x *SimulationRun) GetPassRate() float64 {
 	if x != nil {
-		return x.MinSamplePassRate
+		return x.PassRate
 	}
 	return 0
 }
@@ -2334,9 +2334,9 @@ type SimulationRun_Create_Request struct {
 	// pass, 0-1; 0/unset requires every sample. A scenario needs
 	// round(rate × samples) of them. The run fails if any scenario fails;
 	// pass@k and pass^k report over scenarios and neither gates.
-	MinSamplePassRate float64 `protobuf:"fixed64,15,opt,name=min_sample_pass_rate,json=minSamplePassRate,proto3" json:"min_sample_pass_rate,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	PassRate      float64 `protobuf:"fixed64,15,opt,name=pass_rate,json=passRate,proto3" json:"pass_rate,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Create_Request) Reset() {
@@ -2453,9 +2453,9 @@ func (x *SimulationRun_Create_Request) GetSamples() int32 {
 	return 0
 }
 
-func (x *SimulationRun_Create_Request) GetMinSamplePassRate() float64 {
+func (x *SimulationRun_Create_Request) GetPassRate() float64 {
 	if x != nil {
-		return x.MinSamplePassRate
+		return x.PassRate
 	}
 	return 0
 }
@@ -3302,7 +3302,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xd4M\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xacM\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3330,8 +3330,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
 	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12\x18\n" +
-	"\asamples\x18\x17 \x01(\x05R\asamples\x12/\n" +
-	"\x14min_sample_pass_rate\x18\x18 \x01(\x01R\x11minSamplePassRate\x1a\x8f\x06\n" +
+	"\asamples\x18\x17 \x01(\x05R\asamples\x12\x1b\n" +
+	"\tpass_rate\x18\x18 \x01(\x01R\bpassRate\x1a\x8f\x06\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3551,8 +3551,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03ref\x18\x03 \x01(\tR\x03ref\x12!\n" +
 	"\fpull_request\x18\x04 \x01(\tR\vpullRequest\x12\x17\n" +
 	"\arun_url\x18\x05 \x01(\tR\x06runUrl\x12\x14\n" +
-	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xf9\x05\n" +
-	"\x06Create\x1a\xe0\x04\n" +
+	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xe5\x05\n" +
+	"\x06Create\x1a\xcc\x04\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3569,8 +3569,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
 	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12\x18\n" +
-	"\asamples\x18\x0e \x01(\x05R\asamples\x12/\n" +
-	"\x14min_sample_pass_rate\x18\x0f \x01(\x01R\x11minSamplePassRateB\x11\n" +
+	"\asamples\x18\x0e \x01(\x05R\asamples\x12\x1b\n" +
+	"\tpass_rate\x18\x0f \x01(\x01R\bpassRateB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
