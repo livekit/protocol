@@ -8,8 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// This package is itself the thing it checks for: it must stay usable from a
-// guarded package's test without being a dependency anyone reasons about.
+// A guarded package's test imports this one, so it must be a leaf itself.
 func TestPackageIsALeaf(t *testing.T) {
 	Assert(t)
 }
@@ -24,13 +23,13 @@ func TestRejectsAPackageThatReachesFurther(t *testing.T) {
 
 	msg := err.Error()
 	assert.Contains(t, msg, "github.com/livekit/protocol/utils/configutil",
-		"the failure must name the package that broke its promise")
+		"the failure must name the package")
 	assert.Contains(t, msg, "fsnotify", "and what it reached")
-	assert.Contains(t, msg, "doc comment", "and where the rule it broke is written")
+	assert.Contains(t, msg, "doc comment", "and where the rule is written")
 }
 
-// Allowing a path subtracts it from the report, and allowing everything the
-// package reaches makes it pass.
+// Allowing a path subtracts it from the report; allowing everything a package
+// reaches makes it pass.
 func TestAllowListSubtracts(t *testing.T) {
 	bare := check("../configutil", nil)
 	require.Error(t, bare)
@@ -46,8 +45,7 @@ func TestAllowListSubtracts(t *testing.T) {
 		"allowing everything it reaches is what makes a non-leaf pass")
 }
 
-// A path in the allow list that the package does not import is not an error: an
-// allow list outliving the import it was written for is untidy, not unsafe.
+// An allow list may name a path the package does not import.
 func TestAllowingSomethingUnusedIsNotAnError(t *testing.T) {
 	require.NoError(t, check("../must", []string{"github.com/nothing/here"}))
 }
@@ -71,8 +69,8 @@ func TestIsStdlib(t *testing.T) {
 	}
 }
 
-// reachedPackages pulls the offending import paths back out of a failure, so a
-// test can assert on the set rather than on the prose around it.
+// reachedPackages pulls the offending import paths out of a failure, so a test
+// can assert on the set and not the prose around it.
 func reachedPackages(t *testing.T, err error) []string {
 	t.Helper()
 	var out []string
