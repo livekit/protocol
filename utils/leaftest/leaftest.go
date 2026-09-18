@@ -61,8 +61,8 @@ func check(dir string, allowed []string) error {
 		return nil
 	}
 	return fmt.Errorf("leaftest: %s must import only the standard library%s, but its dependency "+
-		"closure reaches %d package(s):\n\t%s\n\nSee the rule in that package's doc comment. "+
-		"If the new dependency is intended, add it to the allow list this test passes.",
+		"closure reaches %d package(s):\n\t%s\n\nsee the rule in that package's doc comment; "+
+		"if the new dependency is intended, add it to the allow list this test passes",
 		self[0], andAllowed(allowed), len(external), strings.Join(external, "\n\t"))
 }
 
