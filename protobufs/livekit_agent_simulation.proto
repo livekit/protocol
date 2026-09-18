@@ -267,7 +267,7 @@ message SimulationRun {
       // pass, 0-1; 0/unset requires every sample. A scenario needs
       // round(rate × samples) of them. The run fails if any scenario fails;
       // pass@k and pass^k report over scenarios and neither gates.
-      double min_sample_pass_rate = 15;
+      double pass_rate = 15;
     }
     message Response {
       string simulation_run_id = 1;
@@ -393,7 +393,7 @@ message SimulationRun {
   int32 samples = 23;
   // The share of a scenario's samples that had to pass for that scenario to
   // pass; 0 when the run required every sample.
-  double min_sample_pass_rate = 24;
+  double pass_rate = 24;
 
   message Usage {
     int32 text_turns_count = 1;
