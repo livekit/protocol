@@ -2327,11 +2327,11 @@ type SimulationRun_Create_Request struct {
 	LowQualityMicrophone bool              `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
 	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
 	Ci                   *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	// Samples per scenario; 0/unset = 1. Requires scenario_group. The run
+	// Samples per scenario; 0 = 1. Requires scenario_group. The run
 	// holds scenarios × samples jobs, subject to the usual job cap.
 	Samples int32 `protobuf:"varint,14,opt,name=samples,proto3" json:"samples,omitempty"`
 	// The share of a scenario's samples that must pass for that scenario to
-	// pass, 0-1; 0/unset requires every sample. A scenario needs
+	// pass, 0-1; 0 requires every sample. A scenario needs
 	// round(rate × samples) of them. The run fails if any scenario fails;
 	// pass@k and pass^k report over scenarios and neither gates.
 	PassRate      float64 `protobuf:"fixed64,15,opt,name=pass_rate,json=passRate,proto3" json:"pass_rate,omitempty"`
