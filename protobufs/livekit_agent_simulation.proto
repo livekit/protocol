@@ -235,6 +235,18 @@ message SimulationRun {
     string actor = 6;
   }
 
+  // Runs each scenario more than once, so a flaky sample is distinguishable
+  // from a broken scenario. Both fields are required when it is present.
+  message Sampling {
+    // Samples per scenario, > 1. The run holds scenarios × samples jobs,
+    // subject to the usual job cap.
+    int32 samples = 1;
+    // The share of a scenario's samples that must pass for that scenario to
+    // pass, 0-1. A scenario needs round(rate × samples) of them, so 1
+    // requires every sample and 0.67 of 3 requires 2.
+    double pass_rate = 2;
+  }
+
   message Create {
     message Request {
       reserved 3;  // was agent_description (input never consumed; description is derived from source)
@@ -260,15 +272,10 @@ message SimulationRun {
       bool low_quality_microphone = 11;
       bool packet_loss = 12;
       optional CI ci = 13;
-      // Samples per scenario. Requires scenario_group. Absent runs each
-      // scenario once. The run holds scenarios × samples jobs, subject to
-      // the usual job cap.
-      optional int32 samples = 14;
-      // The share of a scenario's samples that must pass for that scenario to
-      // pass, 0-1 exclusive of 0. A scenario needs round(rate × samples) of
-      // them; absent requires every sample. The run fails if any scenario
-      // fails; pass@k and pass^k report over scenarios and neither gates.
-      optional double pass_rate = 15;
+      // Absent runs each scenario once and requires it to pass. Requires
+      // scenario_group. The run fails if any scenario fails; pass@k and
+      // pass^k report over scenarios and neither gates.
+      optional Sampling sampling = 14;
     }
     message Response {
       string simulation_run_id = 1;
@@ -390,11 +397,8 @@ message SimulationRun {
   optional int32 issue_count = 21;
   // The pipeline this run came from; unset when it did not come from one.
   optional CI ci = 22;
-  // Samples per scenario; 1 when run once.
-  int32 samples = 23;
-  // The share of a scenario's samples that had to pass for that scenario to
-  // pass; absent when the run required every sample.
-  optional double pass_rate = 24;
+  // Absent when the run ran each scenario once and required it to pass.
+  optional Sampling sampling = 23;
 
   message Usage {
     int32 text_turns_count = 1;
