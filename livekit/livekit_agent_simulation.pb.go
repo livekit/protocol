@@ -326,8 +326,8 @@ type SimulationRun struct {
 	// Samples per scenario; 1 when run once.
 	Samples int32 `protobuf:"varint,23,opt,name=samples,proto3" json:"samples,omitempty"`
 	// The share of a scenario's samples that had to pass for that scenario to
-	// pass; 0 when the run required every sample.
-	PassRate      float64 `protobuf:"fixed64,24,opt,name=pass_rate,json=passRate,proto3" json:"pass_rate,omitempty"`
+	// pass; absent when the run required every sample.
+	PassRate      *float64 `protobuf:"fixed64,24,opt,name=pass_rate,json=passRate,proto3,oneof" json:"pass_rate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -517,8 +517,8 @@ func (x *SimulationRun) GetSamples() int32 {
 }
 
 func (x *SimulationRun) GetPassRate() float64 {
-	if x != nil {
-		return x.PassRate
+	if x != nil && x.PassRate != nil {
+		return *x.PassRate
 	}
 	return 0
 }
@@ -2327,14 +2327,15 @@ type SimulationRun_Create_Request struct {
 	LowQualityMicrophone bool              `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
 	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
 	Ci                   *SimulationRun_CI `protobuf:"bytes,13,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
-	// Samples per scenario; 0 = 1. Requires scenario_group. The run
-	// holds scenarios × samples jobs, subject to the usual job cap.
-	Samples int32 `protobuf:"varint,14,opt,name=samples,proto3" json:"samples,omitempty"`
+	// Samples per scenario. Requires scenario_group. Absent runs each
+	// scenario once. The run holds scenarios × samples jobs, subject to
+	// the usual job cap.
+	Samples *int32 `protobuf:"varint,14,opt,name=samples,proto3,oneof" json:"samples,omitempty"`
 	// The share of a scenario's samples that must pass for that scenario to
-	// pass, 0-1; 0 requires every sample. A scenario needs
-	// round(rate × samples) of them. The run fails if any scenario fails;
-	// pass@k and pass^k report over scenarios and neither gates.
-	PassRate      float64 `protobuf:"fixed64,15,opt,name=pass_rate,json=passRate,proto3" json:"pass_rate,omitempty"`
+	// pass, 0-1 exclusive of 0. A scenario needs round(rate × samples) of
+	// them; absent requires every sample. The run fails if any scenario
+	// fails; pass@k and pass^k report over scenarios and neither gates.
+	PassRate      *float64 `protobuf:"fixed64,15,opt,name=pass_rate,json=passRate,proto3,oneof" json:"pass_rate,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2447,15 +2448,15 @@ func (x *SimulationRun_Create_Request) GetCi() *SimulationRun_CI {
 }
 
 func (x *SimulationRun_Create_Request) GetSamples() int32 {
-	if x != nil {
-		return x.Samples
+	if x != nil && x.Samples != nil {
+		return *x.Samples
 	}
 	return 0
 }
 
 func (x *SimulationRun_Create_Request) GetPassRate() float64 {
-	if x != nil {
-		return x.PassRate
+	if x != nil && x.PassRate != nil {
+		return *x.PassRate
 	}
 	return 0
 }
@@ -3302,7 +3303,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xacM\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xe3M\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3330,8 +3331,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
 	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12\x18\n" +
-	"\asamples\x18\x17 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x18 \x01(\x01R\bpassRate\x1a\x8f\x06\n" +
+	"\asamples\x18\x17 \x01(\x05R\asamples\x12 \n" +
+	"\tpass_rate\x18\x18 \x01(\x01H\x02R\bpassRate\x88\x01\x01\x1a\x8f\x06\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3551,8 +3552,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03ref\x18\x03 \x01(\tR\x03ref\x12!\n" +
 	"\fpull_request\x18\x04 \x01(\tR\vpullRequest\x12\x17\n" +
 	"\arun_url\x18\x05 \x01(\tR\x06runUrl\x12\x14\n" +
-	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\xe5\x05\n" +
-	"\x06Create\x1a\xcc\x04\n" +
+	"\x05actor\x18\x06 \x01(\tR\x05actor\x1a\x89\x06\n" +
+	"\x06Create\x1a\xf0\x04\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3568,12 +3569,16 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x16low_quality_microphone\x18\v \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
-	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12\x18\n" +
-	"\asamples\x18\x0e \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x0f \x01(\x01R\bpassRateB\x11\n" +
+	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12\x1d\n" +
+	"\asamples\x18\x0e \x01(\x05H\x03R\asamples\x88\x01\x01\x12 \n" +
+	"\tpass_rate\x18\x0f \x01(\x01H\x04R\bpassRate\x88\x01\x01B\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
-	"\x03_ciJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
+	"\x03_ciB\n" +
+	"\n" +
+	"\b_samplesB\f\n" +
+	"\n" +
+	"_pass_rateJ\x04\b\x03\x10\x04R\x11agent_description\x1a\x8b\x01\n" +
 	"\bResponse\x12*\n" +
 	"\x11simulation_run_id\x18\x01 \x01(\tR\x0fsimulationRunId\x12S\n" +
 	"\x16presigned_post_request\x18\x02 \x01(\v2\x1d.livekit.PresignedPostRequestR\x14presignedPostRequest\x1a\xa0\x01\n" +
@@ -3653,7 +3658,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rSTATUS_FAILED\x10\x05\x12\x14\n" +
 	"\x10STATUS_CANCELLED\x10\x06B\x0e\n" +
 	"\f_issue_countB\x05\n" +
-	"\x03_ciJ\x04\b\b\x10\tR\asummary\"\xb5\x03\n" +
+	"\x03_ciB\f\n" +
+	"\n" +
+	"_pass_rateJ\x04\b\b\x10\tR\asummary\"\xb5\x03\n" +
 	"\bScenario\x12\x14\n" +
 	"\x05label\x18\x01 \x01(\tR\x05label\x12\"\n" +
 	"\finstructions\x18\x02 \x01(\tR\finstructions\x12-\n" +
