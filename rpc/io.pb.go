@@ -97,22 +97,28 @@ func (SIPDispatchResult) EnumDescriptor() ([]byte, []int) {
 type SIPTrunkAuthenticationError int32
 
 const (
-	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_NONE           SIPTrunkAuthenticationError = 0
-	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED SIPTrunkAuthenticationError = 1
-	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND SIPTrunkAuthenticationError = 2
+	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_NONE              SIPTrunkAuthenticationError = 0
+	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED    SIPTrunkAuthenticationError = 1
+	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND    SIPTrunkAuthenticationError = 2
+	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_ROUTE_NOT_ALLOWED SIPTrunkAuthenticationError = 3
+	SIPTrunkAuthenticationError_SIP_TRUNK_AUTH_ERROR_OTHER             SIPTrunkAuthenticationError = 255
 )
 
 // Enum value maps for SIPTrunkAuthenticationError.
 var (
 	SIPTrunkAuthenticationError_name = map[int32]string{
-		0: "SIP_TRUNK_AUTH_ERROR_NONE",
-		1: "SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED",
-		2: "SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND",
+		0:   "SIP_TRUNK_AUTH_ERROR_NONE",
+		1:   "SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED",
+		2:   "SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND",
+		3:   "SIP_TRUNK_AUTH_ERROR_ROUTE_NOT_ALLOWED",
+		255: "SIP_TRUNK_AUTH_ERROR_OTHER",
 	}
 	SIPTrunkAuthenticationError_value = map[string]int32{
-		"SIP_TRUNK_AUTH_ERROR_NONE":           0,
-		"SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED": 1,
-		"SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND": 2,
+		"SIP_TRUNK_AUTH_ERROR_NONE":              0,
+		"SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED":    1,
+		"SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND":    2,
+		"SIP_TRUNK_AUTH_ERROR_ROUTE_NOT_ALLOWED": 3,
+		"SIP_TRUNK_AUTH_ERROR_OTHER":             255,
 	}
 )
 
@@ -1583,11 +1589,13 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\vREQUEST_PIN\x10\x02\x12\n" +
 	"\n" +
 	"\x06REJECT\x10\x03\x12\b\n" +
-	"\x04DROP\x10\x04*\x8e\x01\n" +
+	"\x04DROP\x10\x04*\xdb\x01\n" +
 	"\x1bSIPTrunkAuthenticationError\x12\x1d\n" +
 	"\x19SIP_TRUNK_AUTH_ERROR_NONE\x10\x00\x12'\n" +
 	"#SIP_TRUNK_AUTH_ERROR_QUOTA_EXCEEDED\x10\x01\x12'\n" +
-	"#SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND\x10\x022\x91\a\n" +
+	"#SIP_TRUNK_AUTH_ERROR_NO_TRUNK_FOUND\x10\x02\x12*\n" +
+	"&SIP_TRUNK_AUTH_ERROR_ROUTE_NOT_ALLOWED\x10\x03\x12\x1f\n" +
+	"\x1aSIP_TRUNK_AUTH_ERROR_OTHER\x10\xff\x012\x91\a\n" +
 	"\x06IOInfo\x12;\n" +
 	"\fCreateEgress\x12\x13.livekit.EgressInfo\x1a\x16.google.protobuf.Empty\x12;\n" +
 	"\fUpdateEgress\x12\x13.livekit.EgressInfo\x1a\x16.google.protobuf.Empty\x127\n" +
