@@ -16,7 +16,7 @@ require (
 	github.com/jxskiss/base62 v1.1.0
 	github.com/lithammer/shortuuid/v4 v4.3.0
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731
-	github.com/livekit/psrpc v0.7.7
+	github.com/livekit/psrpc v0.8.0
 	github.com/mackerelio/go-osstat v0.2.8
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
 	github.com/nyaruka/phonenumbers v1.8.1
@@ -67,9 +67,6 @@ require (
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/magefile/mage v1.17.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/nats-io/nats.go v1.52.0 // indirect
-	github.com/nats-io/nkeys v0.4.16 // indirect
-	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pion/datachannel v1.6.2 // indirect
 	github.com/pion/dtls/v3 v3.1.5 // indirect
 	github.com/pion/ice/v4 v4.4.0 // indirect
