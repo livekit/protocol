@@ -82,6 +82,13 @@ func (v *APIKeyTokenVerifier) Verify(key interface{}) (*jwt.RegisteredClaims, *C
 		// or third-party minter that forgets it silently mints a permanent
 		// credential.
 		jwt.WithExpirationRequired(),
+		// Without this, iat is never validated. First-party SDKs always set
+		// nbf (see AccessToken.ToJWT), which the parser already validates by
+		// default when present, but a token that omits nbf entirely verifies
+		// immediately regardless of how far in the future it claims to have
+		// been issued unless iat is checked too. (A token omitting both iat
+		// and nbf is unaffected by this check either way.)
+		jwt.WithIssuedAt(),
 	)
 	if err != nil {
 		return nil, nil, err
