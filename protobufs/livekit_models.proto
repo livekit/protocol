@@ -828,7 +828,16 @@ message RTPStats {
   RTPDrift ntp_report_drift = 45;
   RTPDrift rebased_report_drift = 46;
   RTPDrift received_report_drift = 47;
-  // NEXT_ID: 48
+
+  // FlexFEC repair packets received by the stream's decoder.
+  uint32 fec_packets_received = 48;
+  // RTP payload bytes in received FlexFEC repair packets.
+  uint64 fec_bytes_received = 49;
+  // FlexFEC repair packets rejected as unusable by the decoder.
+  uint32 fec_packets_discarded = 50;
+  // Media packets reconstructed by FlexFEC.
+  uint32 packets_recovered = 51;
+  // NEXT_ID: 52
 }
 
 message RTCPSenderReportState {
