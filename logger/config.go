@@ -83,12 +83,14 @@ func (c *Config) ResolveComponentLevel(component string) (zapcore.Level, bool) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	parts := strings.Split(component, ".")
-	for len(parts) > 0 {
-		if lvl, ok := c.ComponentLevels[strings.Join(parts, ".")]; ok {
+	for {
+		if lvl, ok := c.ComponentLevels[component]; ok {
 			return ParseZapLevel(lvl), true
 		}
-		parts = parts[:len(parts)-1]
+		i := strings.LastIndexByte(component, '.')
+		if i < 0 {
+			return ParseZapLevel(c.Level), true
+		}
+		component = component[:i]
 	}
-	return ParseZapLevel(c.Level), true
 }
