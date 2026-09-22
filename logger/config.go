@@ -15,6 +15,7 @@
 package logger
 
 import (
+	"maps"
 	"strings"
 	"sync"
 
@@ -49,6 +50,42 @@ type Config struct {
 }
 
 type ConfigObserver func(*Config) error
+
+// configYAML mirrors Config's yaml-visible fields so MarshalYAML can snapshot them
+// under the lock; Config itself cannot be copied out. TestConfigYAMLFields guards drift.
+type configYAML struct {
+	JSON   bool   `yaml:"json,omitempty"`
+	Level  string `yaml:"level,omitempty"`
+	Sample bool   `yaml:"sample,omitempty"`
+
+	ComponentLevels map[string]string `yaml:"component_levels,omitempty"`
+
+	SampleInitial  int `yaml:"sample_initial,omitempty"`
+	SampleInterval int `yaml:"sample_interval,omitempty"`
+
+	ItemSampleSeconds  int `yaml:"item_sample_seconds,omitempty"`
+	ItemSampleInitial  int `yaml:"item_sample_initial,omitempty"`
+	ItemSampleInterval int `yaml:"item_sample_interval,omitempty"`
+}
+
+// The encoder reads the returned value after the lock is released, so the map is cloned
+// rather than shared with a config that Update may replace.
+func (c *Config) MarshalYAML() (any, error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	return configYAML{
+		JSON:               c.JSON,
+		Level:              c.Level,
+		Sample:             c.Sample,
+		ComponentLevels:    maps.Clone(c.ComponentLevels),
+		SampleInitial:      c.SampleInitial,
+		SampleInterval:     c.SampleInterval,
+		ItemSampleSeconds:  c.ItemSampleSeconds,
+		ItemSampleInitial:  c.ItemSampleInitial,
+		ItemSampleInterval: c.ItemSampleInterval,
+	}, nil
+}
 
 func (c *Config) Update(o *Config) error {
 	c.lock.Lock()
