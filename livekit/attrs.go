@@ -24,6 +24,8 @@ const (
 	AttrSIPCallStatus = AttrSIPPrefix + "callStatus"
 	// AttrSIPHeaderPrefix is a prefix for automatically mapped SIP header attributes.
 	AttrSIPHeaderPrefix = AttrSIPPrefix + "h."
+	// AttrSIPInviteTime attribute contains the time the inbound INVITE was received, in Unix milliseconds.
+	AttrSIPInviteTime = "lk.sip.inviteTime"
 
 	// AttrIngressPrefix is shared for all Ingress attributes
 	AttrIngressPrefix = "ingress."
