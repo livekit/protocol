@@ -23,6 +23,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/go-logr/logr/funcr"
+	"github.com/livekit/psrpc"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -59,6 +60,9 @@ func SetLogger(l Logger, name string) {
 	defaultLogger = l.WithName(name)
 	// pkg wrapper needs to drop two levels of depth
 	pkgLogger = l.WithCallDepth(1).WithName(name)
+	// psrpc reports its own bus failures (a dropped Redis subscription, a failed publish) only
+	// through its own package logger, which discards until one is set.
+	psrpc.SetLogger(logr.FromSlogHandler(ToSlogHandler(defaultLogger.WithComponent("psrpc"))))
 }
 
 func Debugw(msg string, keysAndValues ...any) {

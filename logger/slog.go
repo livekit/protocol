@@ -32,7 +32,7 @@ func ToSlogHandler(log Logger) slog.Handler {
 	switch log := log.(type) {
 	case ZapLogger:
 		zlog := log.ToZap().Desugar()
-		return zapslog.NewHandler(zlog.Core())
+		return zapslog.NewHandler(zlog.Core(), zapslog.WithName(zlog.Name()))
 	case LogRLogger:
 		return logr.ToSlogHandler(log.toLogr())
 	}
