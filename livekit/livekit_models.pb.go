@@ -5454,16 +5454,12 @@ type RTPStats struct {
 	NtpReportDrift       *RTPDrift              `protobuf:"bytes,45,opt,name=ntp_report_drift,json=ntpReportDrift,proto3" json:"ntp_report_drift,omitempty"`
 	RebasedReportDrift   *RTPDrift              `protobuf:"bytes,46,opt,name=rebased_report_drift,json=rebasedReportDrift,proto3" json:"rebased_report_drift,omitempty"`
 	ReceivedReportDrift  *RTPDrift              `protobuf:"bytes,47,opt,name=received_report_drift,json=receivedReportDrift,proto3" json:"received_report_drift,omitempty"`
-	// FlexFEC repair packets received by the stream's decoder.
-	FecPackets uint32 `protobuf:"varint,48,opt,name=fec_packets,json=fecPackets,proto3" json:"fec_packets,omitempty"`
-	// RTP payload bytes in received FlexFEC repair packets.
-	FecBytes uint64 `protobuf:"varint,49,opt,name=fec_bytes,json=fecBytes,proto3" json:"fec_bytes,omitempty"`
-	// FlexFEC repair packets rejected as unusable by the decoder.
-	FecPacketsDiscarded uint32 `protobuf:"varint,50,opt,name=fec_packets_discarded,json=fecPacketsDiscarded,proto3" json:"fec_packets_discarded,omitempty"`
-	// Media packets reconstructed by FlexFEC.
-	FecPacketsRecovered uint32 `protobuf:"varint,51,opt,name=fec_packets_recovered,json=fecPacketsRecovered,proto3" json:"fec_packets_recovered,omitempty"` // NEXT_ID: 52
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	FecPackets           uint32                 `protobuf:"varint,48,opt,name=fec_packets,json=fecPackets,proto3" json:"fec_packets,omitempty"`
+	FecBytes             uint64                 `protobuf:"varint,49,opt,name=fec_bytes,json=fecBytes,proto3" json:"fec_bytes,omitempty"`
+	FecPacketsDiscarded  uint32                 `protobuf:"varint,50,opt,name=fec_packets_discarded,json=fecPacketsDiscarded,proto3" json:"fec_packets_discarded,omitempty"`
+	FecPacketsRecovered  uint32                 `protobuf:"varint,51,opt,name=fec_packets_recovered,json=fecPacketsRecovered,proto3" json:"fec_packets_recovered,omitempty"` // NEXT_ID: 52
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *RTPStats) Reset() {
