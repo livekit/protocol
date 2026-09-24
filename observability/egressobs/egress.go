@@ -191,7 +191,15 @@ func GetAudioOnly(info *livekit.EgressInfo) bool {
 		return req.RoomComposite.AudioOnly
 	case *livekit.EgressInfo_Web:
 		return req.Web.AudioOnly
+	case *livekit.EgressInfo_Egress:
+		return getAudioOnlyV2(req.Egress)
+	case *livekit.EgressInfo_Replay:
+		return getAudioOnlyV2(req.Replay)
 	default:
 		return false
 	}
+}
+
+func getAudioOnlyV2(r egress.EgressRequest) bool {
+	return r.GetTemplate().GetAudioOnly() || r.GetWeb().GetAudioOnly()
 }
