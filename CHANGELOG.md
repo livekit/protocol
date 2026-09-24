@@ -1,5 +1,29 @@
 # github.com/livekit/protocol
 
+## 1.52.1
+
+### Patch Changes
+
+- Add `configutil.Derive` for narrowing an observable config onto a subtree - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+- Add `configutil.NewStaticObserver`, which builds an `Observer` over an already-built config with no file to watch, for stubbing observable config in tests. `EmitConfigUpdate` now also stores the config it emits, so `Load` reflects an update pushed by hand. - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+- Add `configutil.Validator`, an optional builder hook run on every config load after `InitDefaults`. A config that fails validation, or whose `InitDefaults` returns an error, now fails `NewObserver`; on reload the failure is logged and the previous config stays in effect. - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+- `egressobs.GetAudioOnly` reports v2 `StartEgress` and replay export requests as audio-only when their Template or Web source sets `audio_only`. - [#1816](https://github.com/livekit/protocol/pull/1816) ([@milos-lk](https://github.com/milos-lk))
+
+- Add FlexFEC stats to RTPStats - [#1818](https://github.com/livekit/protocol/pull/1818) ([@chenosaurus](https://github.com/chenosaurus))
+
+- `logger.Config` implements `yaml.Marshaler`, so marshaling a `*Config` snapshots it under the same lock `Update` takes instead of reading fields alongside a concurrent update. - [#1813](https://github.com/livekit/protocol/pull/1813) ([@paulwe](https://github.com/paulwe))
+
+- Update psrpc to v0.8.0 - [#1808](https://github.com/livekit/protocol/pull/1808) ([@paulwe](https://github.com/paulwe))
+
+- agent_simulation: repeat scenarios within a run for pass@k / pass^k, and decide a scenario's verdict from a `Sampling.pass_rate` - [#1799](https://github.com/livekit/protocol/pull/1799) ([@u9g](https://github.com/u9g))
+
+- Add `lk.sip.inviteTime` SIP participant attribute and agents `sip_invite_latency` reporter - [#1815](https://github.com/livekit/protocol/pull/1815) ([@paulwe](https://github.com/paulwe))
+
+- Add `utils/leaftest`, which asserts that a package imports nothing beyond the standard library and an explicit allow list. `leaftest.Assert(t)` names the package from the working directory, so a guarded package's test carries no import path to keep in sync. Test-only imports are not counted. - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
 ## 1.52.0
 
 ### Minor Changes
