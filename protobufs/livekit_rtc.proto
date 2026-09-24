@@ -67,6 +67,8 @@ message SignalRequest {
     StoreDataBlobRequest store_data_blob_request = 22;
     // Retrieve a stored data blob.
     GetDataBlobRequest get_data_blob_request = 23;
+    // A compressed SignalRequest. See CompressedSignalRequest.
+    CompressedSignalRequest compressed = 24;
   }
 }
 
@@ -133,6 +135,8 @@ message SignalResponse {
     StoreDataBlobResponse store_data_blob_response = 30;
     // Sent in response to `GetDataBlobRequest`.
     GetDataBlobResponse get_data_blob_response = 31;
+    // A compressed SignalResponse. See CompressedSignalResponse.
+    CompressedSignalResponse compressed = 32;
   }
 }
 
@@ -264,6 +268,18 @@ message JoinResponse {
   repeated Codec enabled_publish_codecs = 14;
   // when set, client should attempt to establish publish peer connection when joining room to speed up publishing
   bool fast_publish = 15;
+  // when set, this server understands SignalRequest.compressed and the client MAY
+  // use it. Unset means the client MUST NOT: an older server parses the unknown
+  // field into its unknown-field set, leaves the oneof unset, and drops the message
+  // without an error -- so sending compressed to a server that cannot read it loses
+  // signalling silently rather than failing cleanly.
+  //
+  // Only the client-to-server direction needs announcing. The server learns what the
+  // client can decode from ClientInfo.CAP_COMPRESSION_DEFLATE_RAW in the connect URL,
+  // which it has before it replies. Note this is not the circular arrangement of an
+  // earlier revision: this flag gates what the client SENDS, never how it parses, so
+  // the JoinResponse carrying it can itself be compressed.
+  bool accepts_compressed_signal = 16;
 }
 
 message ReconnectResponse {
@@ -273,6 +289,13 @@ message ReconnectResponse {
 
   // last sequence number of reliable message received before resuming
   uint32 last_message_seq = 4;
+
+  // Same meaning as JoinResponse.accepts_compressed_signal, repeated because a resume
+  // may land on a different node than answered the original join, and because the
+  // largest client-to-server message of all -- SyncState, carrying two session
+  // descriptions plus the subscription and publish lists -- is sent immediately after
+  // this response.
+  bool accepts_compressed_signal = 5;
 }
 
 message TrackPublishedResponse {
@@ -665,6 +688,77 @@ message WrappedJoinRequest {
 
   Compression compression = 1;
   bytes join_request = 2;  // marshalled JoinRequest + potentially compressed
+}
+
+// How a wrapped signal payload was compressed.
+//
+// A holder for the enum rather than a top-level enum, so that both directions can
+// share one type while keeping bare value names: enum values follow C++ scoping and
+// are siblings of their type, so a top-level `NONE` would collide with the one
+// already declared in livekit_sip.proto. Nesting scopes them to this message.
+//
+// One shared type, rather than an enum nested in each message, because
+// compress/decompress is naturally generic over direction -- the SFU's own
+// implementation already threads a single compression type through both the request
+// and response paths.
+message SignalCompression {
+  enum Type {
+    // Not used by CompressedSignalRequest/Response: an uncompressed message is sent
+    // as its ordinary oneof arm, not as a compressed one claiming NONE. Present
+    // because proto3 enums must have a zero value.
+    NONE = 0;
+    // Numbered to match WrappedJoinRequest.Compression rather than to rank the
+    // options: two enums in one file where GZIP has different numbers is a trap for
+    // anyone mapping between them by hand.
+    GZIP = 1;
+    // Preferred for per-message compression: raw deflate omits gzip's ~18 bytes of
+    // header and trailer, which is material when the median signal message is a few
+    // hundred bytes.
+    DEFLATE_RAW = 2;
+  }
+}
+
+// A SignalRequest that has been compressed, carried as an arm of SignalRequest's own
+// oneof: `signal_request` holds a marshalled SignalRequest, compressed with
+// `compression`. Receivers decompress and parse the result as a SignalRequest.
+//
+// Being an arm of the oneof, rather than an envelope around it, is what makes this
+// need no negotiation handshake. The receiver always parses a SignalRequest; the
+// oneof tag itself says whether the payload is compressed. Nothing has to be agreed
+// before the first message, so the very first message can be compressed -- which
+// matters most for JoinResponse, the largest message on the wire in a big room.
+//
+// It also costs nothing when compression does not pay: a message under the threshold
+// is simply sent as its ordinary arm, rather than as an envelope announcing that it
+// was left uncompressed.
+//
+// Senders MUST NOT nest -- the payload is always an ordinary SignalRequest, never
+// another CompressedSignalRequest -- and MUST NOT use this arm unless the peer has
+// said it can decode one. An older peer parses the unknown field into its
+// unknown-field set, leaves the oneof unset, and drops the message without an error,
+// so guessing wrong loses signalling silently rather than failing cleanly.
+//
+// Each direction learns that separately, and neither needs a handshake:
+//   - server -> client: gated by ClientInfo.CAP_COMPRESSION_DEFLATE_RAW, which the
+//     server has from the connect URL before it sends anything.
+//   - client -> server: gated by JoinResponse.accepts_compressed_signal (or
+//     ReconnectResponse.accepts_compressed_signal), which the client has before it
+//     sends anything of consequence.
+//
+// Senders SHOULD leave payloads below roughly 200 bytes uncompressed, sending the
+// ordinary arm instead: below that the compressed form is usually larger and the CPU
+// is wasted either way. Senders MUST fall back to the ordinary arm if compression
+// fails or does not shrink the payload; a compression problem must never become a
+// connection failure.
+message CompressedSignalRequest {
+  SignalCompression.Type compression = 1;
+  bytes signal_request = 2;  // marshalled SignalRequest, compressed
+}
+
+// A compressed SignalResponse. See CompressedSignalRequest.
+message CompressedSignalResponse {
+  SignalCompression.Type compression = 1;
+  bytes signal_response = 2;  // marshalled SignalResponse, compressed
 }
 
 message MediaSectionsRequirement {
