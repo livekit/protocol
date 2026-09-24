@@ -31,23 +31,23 @@ func TestAggregateRTPStatsFEC(t *testing.T) {
 		{
 			StartTime:           timestamppb.New(start),
 			EndTime:             timestamppb.New(end),
-			FecPacketsReceived:  3,
-			FecBytesReceived:    900,
+			FecPackets:          3,
+			FecBytes:            900,
 			FecPacketsDiscarded: 1,
-			PacketsRecovered:    2,
+			FecPacketsRecovered: 2,
 		},
 		{
 			StartTime:           timestamppb.New(start),
 			EndTime:             timestamppb.New(end),
-			FecPacketsReceived:  4,
-			FecBytesReceived:    1200,
+			FecPackets:          4,
+			FecBytes:            1200,
 			FecPacketsDiscarded: 2,
-			PacketsRecovered:    3,
+			FecPacketsRecovered: 3,
 		},
 	}, 8)
 
-	require.EqualValues(t, 7, stats.FecPacketsReceived)
-	require.EqualValues(t, 2100, stats.FecBytesReceived)
+	require.EqualValues(t, 7, stats.FecPackets)
+	require.EqualValues(t, 2100, stats.FecBytes)
 	require.EqualValues(t, 3, stats.FecPacketsDiscarded)
-	require.EqualValues(t, 5, stats.PacketsRecovered)
+	require.EqualValues(t, 5, stats.FecPacketsRecovered)
 }

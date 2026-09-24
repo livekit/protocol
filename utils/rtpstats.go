@@ -39,10 +39,10 @@ func AggregateRTPStats(statsList []*livekit.RTPStats, gapHistogramSize int) *liv
 	packetsPadding := uint32(0)
 	bytesPadding := uint64(0)
 	headerBytesPadding := uint64(0)
-	fecPacketsReceived := uint32(0)
-	fecBytesReceived := uint64(0)
+	fecPackets := uint32(0)
+	fecBytes := uint64(0)
 	fecPacketsDiscarded := uint32(0)
-	packetsRecovered := uint32(0)
+	fecPacketsRecovered := uint32(0)
 	packetsOutOfOrder := uint32(0)
 	frames := uint32(0)
 	keyFrames := uint32(0)
@@ -86,10 +86,10 @@ func AggregateRTPStats(statsList []*livekit.RTPStats, gapHistogramSize int) *liv
 		bytesPadding += stats.BytesPadding
 		headerBytesPadding += stats.HeaderBytesPadding
 
-		fecPacketsReceived += stats.FecPacketsReceived
-		fecBytesReceived += stats.FecBytesReceived
+		fecPackets += stats.FecPackets
+		fecBytes += stats.FecBytes
 		fecPacketsDiscarded += stats.FecPacketsDiscarded
-		packetsRecovered += stats.PacketsRecovered
+		fecPacketsRecovered += stats.FecPacketsRecovered
 
 		packetsOutOfOrder += stats.PacketsOutOfOrder
 
@@ -175,10 +175,10 @@ func AggregateRTPStats(statsList []*livekit.RTPStats, gapHistogramSize int) *liv
 		BytesPadding:         bytesPadding,
 		HeaderBytesPadding:   headerBytesPadding,
 		BitratePadding:       bitratePadding,
-		FecPacketsReceived:   fecPacketsReceived,
-		FecBytesReceived:     fecBytesReceived,
+		FecPackets:           fecPackets,
+		FecBytes:             fecBytes,
 		FecPacketsDiscarded:  fecPacketsDiscarded,
-		PacketsRecovered:     packetsRecovered,
+		FecPacketsRecovered:  fecPacketsRecovered,
 		PacketsOutOfOrder:    packetsOutOfOrder,
 		Frames:               frames,
 		FrameRate:            frameRate,

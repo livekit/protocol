@@ -5453,9 +5453,17 @@ type RTPStats struct {
 	PacketDrift          *RTPDrift              `protobuf:"bytes,44,opt,name=packet_drift,json=packetDrift,proto3" json:"packet_drift,omitempty"`
 	NtpReportDrift       *RTPDrift              `protobuf:"bytes,45,opt,name=ntp_report_drift,json=ntpReportDrift,proto3" json:"ntp_report_drift,omitempty"`
 	RebasedReportDrift   *RTPDrift              `protobuf:"bytes,46,opt,name=rebased_report_drift,json=rebasedReportDrift,proto3" json:"rebased_report_drift,omitempty"`
-	ReceivedReportDrift  *RTPDrift              `protobuf:"bytes,47,opt,name=received_report_drift,json=receivedReportDrift,proto3" json:"received_report_drift,omitempty"` // NEXT_ID: 48
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	ReceivedReportDrift  *RTPDrift              `protobuf:"bytes,47,opt,name=received_report_drift,json=receivedReportDrift,proto3" json:"received_report_drift,omitempty"`
+	// FlexFEC repair packets received by the stream's decoder.
+	FecPackets uint32 `protobuf:"varint,48,opt,name=fec_packets,json=fecPackets,proto3" json:"fec_packets,omitempty"`
+	// RTP payload bytes in received FlexFEC repair packets.
+	FecBytes uint64 `protobuf:"varint,49,opt,name=fec_bytes,json=fecBytes,proto3" json:"fec_bytes,omitempty"`
+	// FlexFEC repair packets rejected as unusable by the decoder.
+	FecPacketsDiscarded uint32 `protobuf:"varint,50,opt,name=fec_packets_discarded,json=fecPacketsDiscarded,proto3" json:"fec_packets_discarded,omitempty"`
+	// Media packets reconstructed by FlexFEC.
+	FecPacketsRecovered uint32 `protobuf:"varint,51,opt,name=fec_packets_recovered,json=fecPacketsRecovered,proto3" json:"fec_packets_recovered,omitempty"` // NEXT_ID: 52
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *RTPStats) Reset() {
@@ -5801,6 +5809,34 @@ func (x *RTPStats) GetReceivedReportDrift() *RTPDrift {
 		return x.ReceivedReportDrift
 	}
 	return nil
+}
+
+func (x *RTPStats) GetFecPackets() uint32 {
+	if x != nil {
+		return x.FecPackets
+	}
+	return 0
+}
+
+func (x *RTPStats) GetFecBytes() uint64 {
+	if x != nil {
+		return x.FecBytes
+	}
+	return 0
+}
+
+func (x *RTPStats) GetFecPacketsDiscarded() uint32 {
+	if x != nil {
+		return x.FecPacketsDiscarded
+	}
+	return 0
+}
+
+func (x *RTPStats) GetFecPacketsRecovered() uint32 {
+	if x != nil {
+		return x.FecPacketsRecovered
+	}
+	return 0
 }
 
 type RTCPSenderReportState struct {
@@ -7287,7 +7323,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\rdrift_samples\x18\a \x01(\x03R\fdriftSamples\x12\x19\n" +
 	"\bdrift_ms\x18\b \x01(\x01R\adriftMs\x12\x1d\n" +
 	"\n" +
-	"clock_rate\x18\t \x01(\x01R\tclockRate\"\xc4\x0f\n" +
+	"clock_rate\x18\t \x01(\x01R\tclockRate\"\xea\x10\n" +
 	"\bRTPStats\x129\n" +
 	"\n" +
 	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -7341,7 +7377,12 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fpacket_drift\x18, \x01(\v2\x11.livekit.RTPDriftR\vpacketDrift\x12;\n" +
 	"\x10ntp_report_drift\x18- \x01(\v2\x11.livekit.RTPDriftR\x0entpReportDrift\x12C\n" +
 	"\x14rebased_report_drift\x18. \x01(\v2\x11.livekit.RTPDriftR\x12rebasedReportDrift\x12E\n" +
-	"\x15received_report_drift\x18/ \x01(\v2\x11.livekit.RTPDriftR\x13receivedReportDrift\x1a?\n" +
+	"\x15received_report_drift\x18/ \x01(\v2\x11.livekit.RTPDriftR\x13receivedReportDrift\x12\x1f\n" +
+	"\vfec_packets\x180 \x01(\rR\n" +
+	"fecPackets\x12\x1b\n" +
+	"\tfec_bytes\x181 \x01(\x04R\bfecBytes\x122\n" +
+	"\x15fec_packets_discarded\x182 \x01(\rR\x13fecPacketsDiscarded\x122\n" +
+	"\x15fec_packets_recovered\x183 \x01(\rR\x13fecPacketsRecovered\x1a?\n" +
 	"\x11GapHistogramEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\rR\x05value:\x028\x01\"\xf0\x01\n" +
