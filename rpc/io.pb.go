@@ -21,15 +21,16 @@
 package rpc
 
 import (
+	reflect "reflect"
+	sync "sync"
+	unsafe "unsafe"
+
 	livekit "github.com/livekit/protocol/livekit"
 	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
-	unsafe "unsafe"
 )
 
 const (
@@ -927,7 +928,7 @@ type EvaluateSIPDispatchRulesResponse struct {
 	EnabledFeatures []livekit.SIPFeature     `protobuf:"varint,15,rep,packed,name=enabled_features,json=enabledFeatures,proto3,enum=livekit.SIPFeature" json:"enabled_features,omitempty"`
 	// Max time for the caller to wait for track subscription.
 	RingingTimeout *durationpb.Duration `protobuf:"bytes,16,opt,name=ringing_timeout,json=ringingTimeout,proto3" json:"ringing_timeout,omitempty"`
-	// SIP status sent when ringing_timeout elapses. Unset means 486 Busy Here.
+	// SIP status sent when ringing_timeout elapses. Unset means using system default.
 	RingingTimeoutStatus *livekit.SIPStatus `protobuf:"bytes,25,opt,name=ringing_timeout_status,json=ringingTimeoutStatus,proto3" json:"ringing_timeout_status,omitempty"`
 	// Max call duration.
 	MaxCallDuration *durationpb.Duration `protobuf:"bytes,17,opt,name=max_call_duration,json=maxCallDuration,proto3" json:"max_call_duration,omitempty"`
