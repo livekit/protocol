@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add ringing_timeout_status to SIPInboundTrunkInfo
+Add ringing_timeout_status to SIPInboundTrunkInfo & EvaluateSIPDispatchRulesResponse
