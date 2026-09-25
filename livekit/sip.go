@@ -614,6 +614,9 @@ func (p *SIPInboundTrunkInfo) ValidateResult() ValidationResult {
 	if err := p.Media.Validate(); err != nil {
 		return ValidationFailure(err)
 	}
+	if c := p.RingingTimeoutStatus; c != SIPStatusCode_SIP_STATUS_UNKNOWN && (c < 400 || c > 699) {
+		return ValidationFailure(psrpc.NewErrorf(psrpc.InvalidArgument, "ringing timeout status must be 4xx-6xx, got %d", c))
+	}
 
 	result := validateHeaders(p.Headers)
 	if !result.OK() {

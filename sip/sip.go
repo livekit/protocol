@@ -972,6 +972,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		resp.AttributesToHeaders = trunk.AttributesToHeaders
 		resp.IncludeHeaders = trunk.IncludeHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
+		resp.RingingTimeoutStatus = trunk.RingingTimeoutStatus
 		resp.MaxCallDuration = trunk.MaxCallDuration
 
 		krispEnabled = krispEnabled || trunk.KrispEnabled

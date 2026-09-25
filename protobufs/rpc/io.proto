@@ -248,6 +248,8 @@ message EvaluateSIPDispatchRulesResponse {
 
   // Max time for the caller to wait for track subscription.
   google.protobuf.Duration ringing_timeout = 16;
+  // SIP status code if ringing_timeout elapses. Unset means using system default.
+  livekit.SIPStatusCode ringing_timeout_status = 25;
   // Max call duration.
   google.protobuf.Duration max_call_duration = 17;
 
@@ -262,7 +264,7 @@ message EvaluateSIPDispatchRulesResponse {
 
   map<string, string> feature_flags = 23;
 
-  // NEXT ID: 25
+  // NEXT ID: 26
 }
 
 message SIPCallObservability {
