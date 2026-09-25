@@ -362,9 +362,8 @@ message SIPInboundTrunkInfo {
 
   // Max time for the caller to wait for track subscription.
   google.protobuf.Duration ringing_timeout = 11;
-  // SIP status sent to the caller when ringing_timeout elapses. Defaults to 486 Busy Here.
-  // Code must be in the 4xx-6xx range; empty status text uses the standard reason phrase.
-  SIPStatus ringing_timeout_status = 21;
+  // SIP status code if ringing_timeout elapses. Unset means using system default.
+  SIPStatusCode ringing_timeout_status = 21;
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
 

@@ -137,7 +137,7 @@ func TestSIPValidate(t *testing.T) {
 				name: "inbound ringing timeout status",
 				req: &SIPInboundTrunkInfo{
 					Numbers:              []string{"+1111"},
-					RingingTimeoutStatus: &SIPStatus{Code: SIPStatusCode_SIP_STATUS_TEMPORARILY_UNAVAILABLE},
+					RingingTimeoutStatus: SIPStatusCode_SIP_STATUS_TEMPORARILY_UNAVAILABLE,
 				},
 				exp: true,
 			},
@@ -145,15 +145,15 @@ func TestSIPValidate(t *testing.T) {
 				name: "inbound ringing timeout status 2xx",
 				req: &SIPInboundTrunkInfo{
 					Numbers:              []string{"+1111"},
-					RingingTimeoutStatus: &SIPStatus{Code: SIPStatusCode_SIP_STATUS_OK},
+					RingingTimeoutStatus: SIPStatusCode_SIP_STATUS_OK,
 				},
 				exp: false,
 			},
 			{
-				name: "inbound ringing timeout status unset code",
+				name: "inbound ringing timeout status out of range",
 				req: &SIPInboundTrunkInfo{
 					Numbers:              []string{"+1111"},
-					RingingTimeoutStatus: &SIPStatus{Status: "Nope"},
+					RingingTimeoutStatus: SIPStatusCode(700),
 				},
 				exp: false,
 			},
