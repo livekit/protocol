@@ -93,3 +93,22 @@ func TestGetOutputType(t *testing.T) {
 	require.Equal(t, OutputTypeMultiple, ot)
 
 }
+
+func TestGetTypesRoomTracks(t *testing.T) {
+	req := &livekit.StartEgressRequest{
+		Source: &livekit.StartEgressRequest_RoomTracks{
+			RoomTracks: &livekit.RoomTracksSource{},
+		},
+		Outputs: []*livekit.Output{
+			{
+				Config: &livekit.Output_File{
+					File: &livekit.FileOutput{FileType: livekit.EncodedFileType_MCAP},
+				},
+			},
+		},
+	}
+
+	sourceType, outputType := GetTypes(&livekit.EgressInfo_Egress{Egress: req})
+	require.Equal(t, EgressTypeRoomTracks, sourceType)
+	require.Equal(t, OutputTypeFile, outputType)
+}

@@ -54,6 +54,7 @@ message StartEgressRequest {
     TemplateSource template = 2;
     WebSource web = 3;
     MediaSource media = 4;
+    RoomTracksSource room_tracks = 10;
   }
 
   // Optional — default H264_720P_30
@@ -89,6 +90,13 @@ message WebSource {
   bool audio_only = 2;
   bool video_only = 3;
   bool await_start_signal = 4;
+}
+
+// Capture every published audio and video track in a room as an independent
+// channel. Currently supported only with a single MCAP file output.
+message RoomTracksSource {
+  bool audio_only = 1;
+  bool video_only = 2;
 }
 
 // Capture tracks directly from a room via SDK.
@@ -207,6 +215,7 @@ enum EncodedFileType {
   MP4 = 1;
   OGG = 2;
   MP3 = 3;
+  MCAP = 4;
 }
 
 message StreamOutput {
