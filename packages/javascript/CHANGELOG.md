@@ -1,5 +1,11 @@
 # @livekit/protocol
 
+## 1.52.2
+
+### Patch Changes
+
+- Add ringing_timeout_status to SIPInboundTrunkInfo & EvaluateSIPDispatchRulesResponse - [#1819](https://github.com/livekit/protocol/pull/1819) ([@alexlivekit](https://github.com/alexlivekit))
+
 ## 1.52.1
 
 ### Patch Changes
