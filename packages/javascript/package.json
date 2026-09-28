@@ -31,13 +31,13 @@
   "author": "LiveKit",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@bufbuild/protoc-gen-es": "^1.10.0",
+    "@bufbuild/protoc-gen-es": "^2.0.0",
     "genversion": "^3.2.0",
-    "typescript": "5.9.3",
+    "typescript": "7.0.2",
     "unbuild": "^3.6.1"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^1.10.0"
+    "@bufbuild/protobuf": "^2.0.0"
   },
   "repository": {
     "url": "https://github.com/livekit/protocol"
