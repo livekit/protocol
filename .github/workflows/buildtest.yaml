@@ -78,3 +78,56 @@ jobs:
             ~/.cache/go-build
             ~/go/pkg/mod
           key: ${{ steps.go-cache.outputs.cache-primary-key }}
+
+  # A field name that is a keyword in a target language cannot be addressed by
+  # name in that language. protoc's Python stub generator silently degrades:
+  # `from` cost python-sdks a red mypy gate days later, on an unrelated PR.
+  proto-lint:
+    runs-on: ubuntu-latest
+    # setup-protoc uses the token only to raise its release-download rate limit.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@c65c819552d16ad3c9b72d9dfd5ba5237b9c906b # v3.0.0
+        with:
+          version: "35.x"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install api-linter
+        run: go install github.com/googleapis/api-linter/cmd/api-linter@v1.72.0
+
+      # Run from protobufs/: api-linter resolves the files it lints against the
+      # working directory, and uses -I only for their imports.
+      - name: Check for reserved words in field names
+        run: |
+          set -euo pipefail
+          go mod download github.com/livekit/psrpc
+          psrpc=$(go list -m -f '{{.Dir}}' github.com/livekit/psrpc)
+          test -d "$psrpc/protoc-gen-psrpc/options"
+          psrpc="$psrpc/protoc-gen-psrpc/options"
+          cd protobufs
+          api-linter --config ../.api-linter.yaml --set-exit-status \
+            -I . -I "$psrpc" \
+            $(find . -name '*.proto' | sed 's|^\./||')
+
+      # The reserved-word rule matches a list; this asks the generator. A stub
+      # falls back to an untyped **kwargs whenever protoc cannot emit a keyword
+      # argument for a field, whatever the reason.
+      - name: Check the Python stubs name every field
+        run: |
+          set -euo pipefail
+          out=$(mktemp -d)
+          protoc -I=protobufs --pyi_out="$out" \
+            protobufs/livekit_*.proto protobufs/agent/*.proto protobufs/logger/*.proto
+          if grep -rn '\*\*kwargs' "$out"; then
+            echo "::error::a field name above is unaddressable in Python; rename it" >&2
+            exit 1
+          fi
