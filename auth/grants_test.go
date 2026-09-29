@@ -348,6 +348,49 @@ func TestRoomConfiguration_CheckCredentials(t *testing.T) {
 		require.NoError(t, config.CheckCredentials())
 	})
 
+	t.Run("room image output with S3 secret fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					ImageOutputs: []*livekit.ImageOutput{
+						{
+							CaptureInterval: 5,
+							Output: &livekit.ImageOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "secret",
+									Bucket:    "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
+	t.Run("deprecated room file output with S3 secret fails", func(t *testing.T) {
+		config := &RoomConfiguration{
+			Egress: &livekit.RoomEgress{
+				Room: &livekit.RoomCompositeEgressRequest{
+					Output: &livekit.RoomCompositeEgressRequest_File{
+						File: &livekit.EncodedFileOutput{
+							Output: &livekit.EncodedFileOutput_S3{
+								S3: &livekit.S3Upload{
+									AccessKey: "access",
+									Secret:    "secret",
+									Bucket:    "bucket",
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		require.ErrorIs(t, config.CheckCredentials(), ErrSensitiveCredentials)
+	})
+
 	t.Run("room stream outputs always fail", func(t *testing.T) {
 		config := &RoomConfiguration{
 			Egress: &livekit.RoomEgress{
