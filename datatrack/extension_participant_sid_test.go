@@ -35,7 +35,7 @@ func TestExtensionParticipantSid(t *testing.T) {
 		id:   uint8(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID),
 		data: []byte{'t', 'e', 's', 't'},
 	}
-	ext, err := extParticipantSid.Marshal()
+	ext, err := extParticipantSid.Marshal(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID)
 	require.NoError(t, err)
 	require.Equal(t, expectedExt, ext)
 
