@@ -374,7 +374,8 @@ message DataTrackSchemaId {
 
 enum DataTrackExtensionID {
   DTEI_INVALID = 0;
-  DTEI_PARTICIPANT_SID = 1;
+  DTEI_PARTICIPANT_SID_LOW = 1;
+  DTEI_PARTICIPANT_SID = 255;
 }
 
 message DataTrackExtensionParticipantSid {
