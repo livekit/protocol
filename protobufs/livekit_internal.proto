@@ -125,7 +125,7 @@ message NodeStats {
 
   // forward metrics
   uint32 forward_latency = 48;
-  uint32 forward_jitter = 49;
+  uint32 forward_jitter = 49 [deprecated = true];
 
   repeated NodeStatsRate rates = 50;
 
