@@ -125,7 +125,7 @@ func AggregateRTPStats(statsList []*livekit.RTPStats, gapHistogramSize int) *liv
 		}
 
 		firs += stats.Firs
-		if lastFir.IsZero() || lastPli.Before(stats.LastFir.AsTime()) {
+		if lastFir.IsZero() || lastFir.Before(stats.LastFir.AsTime()) {
 			lastFir = stats.LastFir.AsTime()
 		}
 

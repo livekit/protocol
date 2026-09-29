@@ -51,3 +51,24 @@ func TestAggregateRTPStatsFEC(t *testing.T) {
 	require.EqualValues(t, 3, stats.FecPacketsDiscarded)
 	require.EqualValues(t, 5, stats.FecPacketsRecovered)
 }
+
+func TestAggregateRTPStatsLastFir(t *testing.T) {
+	start := time.Now()
+	end := start.Add(time.Second)
+	stats := AggregateRTPStats([]*livekit.RTPStats{
+		{
+			StartTime: timestamppb.New(start),
+			EndTime:   timestamppb.New(end),
+			LastPli:   timestamppb.New(time.Unix(10, 0)),
+			LastFir:   timestamppb.New(time.Unix(100, 0)),
+		},
+		{
+			StartTime: timestamppb.New(start),
+			EndTime:   timestamppb.New(end),
+			LastPli:   timestamppb.New(time.Unix(10, 0)),
+			LastFir:   timestamppb.New(time.Unix(50, 0)),
+		},
+	}, 8)
+
+	require.Equal(t, int64(100), stats.LastFir.AsTime().Unix())
+}
