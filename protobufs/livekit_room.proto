@@ -112,7 +112,11 @@ message CreateRoomRequest {
   // Define agents that should be dispatched to this room
   repeated RoomAgentDispatch agents = 14;
 
-  // NEXT-ID: 16
+  // Optional additional webhook config, scoped to this room. Egress and ingress
+  // events are never delivered to these; use the egress request webhooks for those.
+  repeated WebhookConfig webhooks = 16;
+
+  // NEXT-ID: 17
 }
 
 message RoomEgress {
@@ -272,7 +276,10 @@ message RoomConfiguration {
   // Tags to attach to the room
   map<string, string> tags = 12;
 
-  // NEXT_ID: 13
+  // Optional additional webhook config, scoped to rooms created with this preset
+  repeated WebhookConfig webhooks = 13;
+
+  // NEXT_ID: 14
 }
 
 message ForwardParticipantRequest {
