@@ -69,6 +69,31 @@ func TestVerifier(t *testing.T) {
 		require.Error(t, err)
 	})
 
+	t.Run("token issued in the future without nbf is rejected", func(t *testing.T) {
+		// hand-rolled JWT with iat 2h in the future and no nbf claim. The Go
+		// SDK always sets nbf (see AccessToken.ToJWT), so build this directly
+		// to model a third-party minter that omits it: without nbf, and
+		// without WithIssuedAt() on the parser, nothing stops a token from
+		// verifying immediately no matter how far in the future it claims to
+		// have been issued.
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+			"iss": apiKey,
+			"iat": jwt.NewNumericDate(time.Now().Add(2 * time.Hour)),
+			"exp": jwt.NewNumericDate(time.Now().Add(3 * time.Hour)),
+			"video": map[string]interface{}{
+				"roomCreate": true,
+			},
+		})
+		authToken, err := token.SignedString([]byte(secret))
+		require.NoError(t, err)
+
+		v, err := auth.ParseAPIToken(authToken)
+		require.NoError(t, err)
+
+		_, _, err = v.Verify(secret)
+		require.Error(t, err)
+	})
+
 	t.Run("unexpired token is verified", func(t *testing.T) {
 		claim := auth.VideoGrant{RoomCreate: true}
 		at := auth.NewAccessToken(apiKey, secret).
