@@ -78,6 +78,10 @@ message ServerMessage {
     JobAssignment assignment = 3;
     JobTermination termination = 5;
     WorkerPong pong = 4;
+
+    // the server is draining this control connection: re-register elsewhere,
+    // in-flight agent HTTP streams run to completion
+    AgentHttp.GoAway go_away = 6;
   }
 }
 
@@ -115,20 +119,31 @@ message WorkerPong {
 }
 
 message RegisterWorkerRequest {
+  reserved 2, 4; // worker_id, name (retired)
   JobType type = 1;
   string agent_name = 8;
-  // string worker_id = 2;
   string version = 3;
-  // string name = 4 [deprecated = true];
   uint32 ping_interval = 5;
   optional string namespace = 6;
   ParticipantPermission allowed_permissions = 7;
   string deployment = 9;
+
+  // HTTP endpoints this worker serves through the data plane, in route order.
+  // Empty means the worker exposes no endpoints and needs no data connections.
+  repeated AgentHttp.AgentEndpoint endpoints = 10;
+  // random per process; a re-registration with a new instance_id supersedes the
+  // previous epoch and closes its remaining connections
+  string instance_id = 11 [(logger.name) = "instanceID"];
+  // highest data-plane protocol version the worker supports; 0 = unsupported
+  uint32 endpoint_protocol = 12;
 }
 
 message RegisterWorkerResponse {
+  reserved 2;
   string worker_id = 1 [(logger.name) = "workerID"];
   ServerInfo server_info = 3;
+  // present iff the registration carried endpoints and the server supports the data plane
+  AgentHttp.AgentEndpointSettings endpoint_settings = 4;
 }
 
 message MigrateJobRequest {
@@ -168,10 +183,16 @@ message UpdateJobStatus {
 }
 
 message UpdateWorkerStatus {
+  reserved 2; // metadata (retired)
   optional WorkerStatus status = 1;
-  // optional string metadata = 2 [deprecated=true];
   float load = 3;
   uint32 job_count = 4;
+
+  // worker wants no new streams; existing streams run to completion
+  bool draining = 5;
+  // monotonic per registration; status updates may interleave across connections
+  // and a stale report must not regress newer state
+  uint64 seq = 6;
 }
 
 message JobAssignment {
@@ -182,4 +203,130 @@ message JobAssignment {
 
 message JobTermination {
   string job_id = 1 [(logger.name) = "jobID"];
+}
+
+// ----- agent HTTP endpoints data plane -----
+//
+// AgentHttp namespaces the data plane: workers expose HTTP endpoints served at
+// /agents/{agent_name}/{deployment}/{path} without binding any local listener.
+// The worker opens ONE WebTransport (QUIC) session to /agent that carries both
+// its control stream (the same WorkerMessage/ServerMessage exchange as the
+// WebSocket control connection, length-delimited) and every HTTP exchange: the
+// node opens one bidirectional QUIC stream per request. QUIC provides the
+// multiplexing and per-stream flow control, so there is no credit accounting
+// and no attach handshake.
+//
+// Each exchange stream is:
+//
+//   [len:u32be][StreamPreamble]   the only LiveKit framing
+//   [ ... opaque bytes ... ]      one HTTP/1.1 exchange, to FIN or RESET_STREAM
+//
+// After the preamble the stream is byte-transparent: the node writes a
+// canonical HTTP/1.1 request and the worker replies with an HTTP/1.1 response,
+// each parsed by whatever HTTP implementation the side already has. A WebSocket
+// upgrade is therefore an ordinary request whose response is a 101, after which
+// the stream is a byte pipe. The protocol evolves by version negotiation at
+// registration, so the preamble carries no version of its own.
+//
+// Bodies use ordinary HTTP/1.1 framing, Content-Length or chunked, and are
+// unbounded: a body may be many gigabytes and must be streamed. Request and
+// response size limits are policy for the layer above.
+//
+// How one direction ends:
+//
+//   success             end of message per the body's own framing, then FIN.
+//   failed mid-body     chunked trailer fields x-lk-completion and x-lk-error,
+//                       in band, so the outcome cannot race the bytes it
+//                       describes.
+//   failed before any   RESET_STREAM carrying an HttpStreamResetCode, sound
+//   bytes               only here, where nothing is in flight.
+//
+// FIN before the body's own framing says it is complete is truncation, and a
+// receiver must surface it as such.
+//
+// The x-lk- header prefix is reserved for this signalling in both directions.
+// A node strips it from client-supplied request headers, so a client cannot
+// forge one, and strips it from responses, so it never reaches the end client.
+message AgentHttp {
+  enum AgentEndpointKind {
+    AEK_HTTP = 0;
+    // reserved for future text-mode endpoints
+    AEK_TEXT = 1;
+  }
+
+  message AgentEndpoint {
+    // starlette-style path template rooted at '/': {name} (one segment, default),
+    // {name:int}, {name:float}, {name:uuid} (constrained single segments),
+    // {name:path} (multi-segment). Custom converters are rejected.
+    string path = 1;
+    // uppercase, exactly as the application routes them (FastAPI does not imply
+    // HEAD from GET)
+    repeated string methods = 2;
+    AgentEndpointKind kind = 3;
+    // reachable without a project token
+    bool public = 4;
+  }
+
+  // registration-level settings negotiated on the control connection, returned
+  // in RegisterWorkerResponse when the worker declares endpoints and the server
+  // supports the data plane.
+  message AgentEndpointSettings {
+    reserved 2, 3; // attach_token, data_connection_count (retired with the wire pool)
+    // the negotiated data-plane protocol version; the worker speaks exactly this
+    // or closes the session
+    uint32 protocol = 1;
+  }
+
+  // the first thing on every exchange stream, node -> worker. It carries only
+  // what the worker cannot derive from the HTTP bytes that follow and what it
+  // must not infer from client-supplied headers - identity above all.
+  message StreamPreamble {
+    // what the bytes after this preamble are. A field rather than a framing
+    // tag, so a new stream semantic costs no new mechanism.
+    AgentEndpointKind kind = 1;
+    string request_id = 2 [(logger.name) = "requestID"];
+    // the caller holds agent-endpoint call permission for this agent and
+    // deployment. Always true on a non-public route.
+    bool authorized = 3;
+    // the manifest template that matched, e.g. "/items/{id}"
+    string route = 4;
+    // relative, because node and worker clocks are not synchronized. 0 imposes
+    // no deadline.
+    uint32 timeout_ms = 5;
+    // end client address, host only
+    string client_addr = 6 [(logger.sensitivity) = SENSITIVITY_PII];
+    // "http" or "https" as the end client saw it; not derivable worker-side
+    string scheme = 7;
+    // NEXT_ID: 8
+  }
+
+  // why a stream was reset before any HTTP bytes flowed. This travels as the
+  // QUIC RESET_STREAM / STOP_SENDING error code, so it is a number with no room
+  // for detail: the reason string is logged by the side that reset and joined
+  // to this by request_id. An outcome after bytes have flowed travels in
+  // trailers instead, where it cannot race them.
+  enum HttpStreamResetCode {
+    // no information. The ordinary cancel code, sent whenever a stream is torn
+    // down without a specific outcome, so it must stay the zero value and must
+    // not imply that anything was or was not applied.
+    HSR_ABORT = 0;
+    // the worker aborted before any application code observed the request, so
+    // nothing was applied and the exchange is safe to retry. Requires that the
+    // application was never entered; a 404 it returned is an ordinary response.
+    HSR_REFUSED = 1;
+    // the application was entered and then failed before producing a response
+    // head; side effects may already have happened, so this is not safe to
+    // retry.
+    HSR_INTERNAL = 2;
+    // the deadline elapsed before a response head was produced
+    HSR_TIMEOUT = 3;
+    // the peer's bytes were not valid HTTP/1.1
+    HSR_PROTOCOL = 4;
+  }
+
+  // the server is draining: the worker should re-register elsewhere; in-flight
+  // HTTP exchanges run to completion
+  message GoAway {
+    string reason = 1;
+  }
 }

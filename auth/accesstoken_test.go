@@ -223,3 +223,33 @@ func TestAccessToken(t *testing.T) {
 func apiKeypair() (string, string) {
 	return guid.New(utils.APIKeyPrefix), utils.RandomSecret()
 }
+
+func TestAgentEndpointGrantRoundTrip(t *testing.T) {
+	t.Parallel()
+
+	apiKey, secret := apiKeypair()
+	grant := &AgentEndpointGrant{Call: true, AgentName: "my-agent", Deployment: "prod"}
+	raw, err := NewAccessToken(apiKey, secret).
+		SetAgentEndpointGrant(grant).
+		SetValidFor(time.Minute).
+		ToJWT()
+	require.NoError(t, err)
+
+	// the claim key is camelCase
+	require.Contains(t, decodeClaims(t, raw), `"agentEndpoint"`)
+
+	v, err := ParseAPIToken(raw)
+	require.NoError(t, err)
+	_, decoded, err := v.Verify(secret)
+	require.NoError(t, err)
+	require.Equal(t, grant, decoded.AgentEndpoint)
+}
+
+func decodeClaims(t *testing.T, raw string) string {
+	t.Helper()
+	parts := strings.Split(raw, ".")
+	require.Len(t, parts, 3)
+	body, err := base64.RawURLEncoding.DecodeString(parts[1])
+	require.NoError(t, err)
+	return string(body)
+}
