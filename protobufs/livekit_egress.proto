@@ -227,7 +227,8 @@ message SegmentedFileOutput {
   string filename_prefix = 2;                // (optional)
   string playlist_name = 3;                  // (optional)
   string live_playlist_name = 11;            // (optional, disabled if not provided). Path of a live playlist
-  uint32 segment_duration = 4;               // in seconds (optional)
+  uint32 segment_duration = 4 [deprecated = true];  // in seconds (optional, deprecated in favor of segment_duration_seconds)
+  double segment_duration_seconds = 12;      // in seconds (optional)
   SegmentedFileSuffix filename_suffix = 10;  // (optional, default INDEX)
   bool disable_manifest = 8;                 // disable upload of manifest file (default false)
 

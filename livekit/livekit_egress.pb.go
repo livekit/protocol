@@ -1738,13 +1738,15 @@ func (x *StreamOutput) GetUrls() []string {
 // Used to generate HLS segments or other kind of segmented output
 type SegmentedFileOutput struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Protocol         SegmentedFileProtocol  `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.SegmentedFileProtocol" json:"protocol,omitempty"`                                  // (optional)
-	FilenamePrefix   string                 `protobuf:"bytes,2,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`                                    // (optional)
-	PlaylistName     string                 `protobuf:"bytes,3,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`                                          // (optional)
-	LivePlaylistName string                 `protobuf:"bytes,11,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"`                           // (optional, disabled if not provided). Path of a live playlist
-	SegmentDuration  uint32                 `protobuf:"varint,4,opt,name=segment_duration,json=segmentDuration,proto3" json:"segment_duration,omitempty"`                                // in seconds (optional)
-	FilenameSuffix   SegmentedFileSuffix    `protobuf:"varint,10,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.SegmentedFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
-	DisableManifest  bool                   `protobuf:"varint,8,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                                // disable upload of manifest file (default false)
+	Protocol         SegmentedFileProtocol  `protobuf:"varint,1,opt,name=protocol,proto3,enum=livekit.SegmentedFileProtocol" json:"protocol,omitempty"`        // (optional)
+	FilenamePrefix   string                 `protobuf:"bytes,2,opt,name=filename_prefix,json=filenamePrefix,proto3" json:"filename_prefix,omitempty"`          // (optional)
+	PlaylistName     string                 `protobuf:"bytes,3,opt,name=playlist_name,json=playlistName,proto3" json:"playlist_name,omitempty"`                // (optional)
+	LivePlaylistName string                 `protobuf:"bytes,11,opt,name=live_playlist_name,json=livePlaylistName,proto3" json:"live_playlist_name,omitempty"` // (optional, disabled if not provided). Path of a live playlist
+	// Deprecated: Marked as deprecated in livekit_egress.proto.
+	SegmentDuration        uint32              `protobuf:"varint,4,opt,name=segment_duration,json=segmentDuration,proto3" json:"segment_duration,omitempty"`                                // in seconds (optional, deprecated in favor of segment_duration_seconds)
+	SegmentDurationSeconds float64             `protobuf:"fixed64,12,opt,name=segment_duration_seconds,json=segmentDurationSeconds,proto3" json:"segment_duration_seconds,omitempty"`       // in seconds (optional)
+	FilenameSuffix         SegmentedFileSuffix `protobuf:"varint,10,opt,name=filename_suffix,json=filenameSuffix,proto3,enum=livekit.SegmentedFileSuffix" json:"filename_suffix,omitempty"` // (optional, default INDEX)
+	DisableManifest        bool                `protobuf:"varint,8,opt,name=disable_manifest,json=disableManifest,proto3" json:"disable_manifest,omitempty"`                                // disable upload of manifest file (default false)
 	// TODO: deprecate
 	//
 	// Types that are valid to be assigned to Output:
@@ -1816,9 +1818,17 @@ func (x *SegmentedFileOutput) GetLivePlaylistName() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in livekit_egress.proto.
 func (x *SegmentedFileOutput) GetSegmentDuration() uint32 {
 	if x != nil {
 		return x.SegmentDuration
+	}
+	return 0
+}
+
+func (x *SegmentedFileOutput) GetSegmentDurationSeconds() float64 {
+	if x != nil {
+		return x.SegmentDurationSeconds
 	}
 	return 0
 }
@@ -5355,13 +5365,14 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x10disable_manifest\x18\x03 \x01(\bR\x0fdisableManifest\"W\n" +
 	"\fStreamOutput\x123\n" +
 	"\bprotocol\x18\x01 \x01(\x0e2\x17.livekit.StreamProtocolR\bprotocol\x12\x12\n" +
-	"\x04urls\x18\x02 \x03(\tR\x04urls\"\xa4\x04\n" +
+	"\x04urls\x18\x02 \x03(\tR\x04urls\"\xe2\x04\n" +
 	"\x13SegmentedFileOutput\x12:\n" +
 	"\bprotocol\x18\x01 \x01(\x0e2\x1e.livekit.SegmentedFileProtocolR\bprotocol\x12'\n" +
 	"\x0ffilename_prefix\x18\x02 \x01(\tR\x0efilenamePrefix\x12#\n" +
 	"\rplaylist_name\x18\x03 \x01(\tR\fplaylistName\x12,\n" +
-	"\x12live_playlist_name\x18\v \x01(\tR\x10livePlaylistName\x12)\n" +
-	"\x10segment_duration\x18\x04 \x01(\rR\x0fsegmentDuration\x12E\n" +
+	"\x12live_playlist_name\x18\v \x01(\tR\x10livePlaylistName\x12-\n" +
+	"\x10segment_duration\x18\x04 \x01(\rB\x02\x18\x01R\x0fsegmentDuration\x128\n" +
+	"\x18segment_duration_seconds\x18\f \x01(\x01R\x16segmentDurationSeconds\x12E\n" +
 	"\x0ffilename_suffix\x18\n" +
 	" \x01(\x0e2\x1c.livekit.SegmentedFileSuffixR\x0efilenameSuffix\x12)\n" +
 	"\x10disable_manifest\x18\b \x01(\bR\x0fdisableManifest\x12#\n" +
