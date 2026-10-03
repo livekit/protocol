@@ -20,7 +20,6 @@ import (
 	"time"
 
 	"github.com/livekit/protocol/datatrack"
-	"github.com/livekit/protocol/livekit"
 )
 
 func GenerateRawDataPackets(handle uint16, seqNum uint16, frameNum uint16, numFrames int, frameSize int, frameDuration time.Duration) [][]byte {
@@ -59,7 +58,7 @@ func GenerateRawDataPackets(handle uint16, seqNum uint16, frameNum uint16, numFr
 				Payload: payload,
 			}
 			if extParticipantSid, err := datatrack.NewExtensionParticipantSid("test_participant"); err == nil {
-				if ext, err := extParticipantSid.Marshal(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID); err == nil {
+				if ext, err := extParticipantSid.Marshal(); err == nil {
 					packet.AddExtension(ext)
 				}
 			}

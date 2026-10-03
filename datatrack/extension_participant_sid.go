@@ -36,11 +36,11 @@ func (e *ExtensionParticipantSid) ParticipantID() livekit.ParticipantID {
 	return e.participantID
 }
 
-func (e *ExtensionParticipantSid) Marshal(extID livekit.DataTrackExtensionID) (Extension, error) {
+func (e *ExtensionParticipantSid) Marshal() (Extension, error) {
 	data := make([]byte, len(e.participantID))
 	copy(data, e.participantID)
 	return Extension{
-		id:   uint8(extID),
+		id:   uint8(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID),
 		data: data,
 	}, nil
 }

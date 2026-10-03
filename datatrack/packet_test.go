@@ -73,7 +73,7 @@ func TestPacket(t *testing.T) {
 			Payload: payload,
 		}
 		if extParticipantSid, err := NewExtensionParticipantSid("test_participant"); err == nil {
-			if ext, err := extParticipantSid.Marshal(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID); err == nil {
+			if ext, err := extParticipantSid.Marshal(); err == nil {
 				packet.AddExtension(ext)
 			}
 		}
@@ -120,7 +120,7 @@ func TestPacket(t *testing.T) {
 			Payload: payload,
 		}
 		if extParticipantSid, err := NewExtensionParticipantSid("participant"); err == nil {
-			if ext, err := extParticipantSid.Marshal(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID); err == nil {
+			if ext, err := extParticipantSid.Marshal(); err == nil {
 				packet.AddExtension(ext)
 			}
 		}
@@ -166,7 +166,7 @@ func TestPacket(t *testing.T) {
 			Payload: payload,
 		}
 		if extParticipantSid, err := NewExtensionParticipantSid("participant"); err == nil {
-			if ext, err := extParticipantSid.Marshal(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID); err == nil {
+			if ext, err := extParticipantSid.Marshal(); err == nil {
 				packet.AddExtension(ext)
 			}
 		}
@@ -183,7 +183,7 @@ func TestPacket(t *testing.T) {
 
 		// replace existing extension ID and ensure that marshalled packet is updated
 		if extParticipantSid, err := NewExtensionParticipantSid("test_participant"); err == nil {
-			if ext, err := extParticipantSid.Marshal(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID); err == nil {
+			if ext, err := extParticipantSid.Marshal(); err == nil {
 				packet.AddExtension(ext)
 			}
 		}
