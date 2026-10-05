@@ -898,6 +898,43 @@ func TestResourceURLNotifierFilter(t *testing.T) {
 	})
 }
 
+func TestResourceURLNotifierQueueNotifyError(t *testing.T) {
+	resourceURLNotifier := NewResourceURLNotifier(ResourceURLNotifierParams{URL: testUrl})
+
+	// a failed call must not keep the notifier locked
+	errs := make(chan error, 4)
+	go func() {
+		defer close(errs)
+		for range 2 {
+			errs <- resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
+		}
+		resourceURLNotifier.SetKeys(testAPIKey, testAPISecret)
+		for range 2 {
+			errs <- resourceURLNotifier.QueueNotify(
+				context.Background(),
+				&livekit.WebhookEvent{Event: EventRoomStarted},
+				WithExtraWebhooks([]*livekit.WebhookConfig{{Url: testUrl}, {Url: testUrl}}),
+			)
+		}
+	}()
+
+	for i := range 4 {
+		select {
+		case err := <-errs:
+			if i < 2 {
+				require.ErrorIs(t, err, errNoKey)
+			} else {
+				require.Error(t, err)
+			}
+		case <-time.After(5 * time.Second):
+			t.Fatalf("QueueNotify blocked after %d failed calls", i)
+		}
+	}
+
+	// not deferred, Stop would block on a notifier that is still locked
+	resourceURLNotifier.Stop(true)
+}
+
 func newTestResourceNotifier(timeout time.Duration, maxAge time.Duration, maxDepth int) *ResourceURLNotifier {
 	return NewResourceURLNotifier(ResourceURLNotifierParams{
 		URL:       testUrl,
