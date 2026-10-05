@@ -203,6 +203,71 @@ func TestGetAudioOnly(t *testing.T) {
 			audioOnly: true,
 		},
 		{
+			name: "v2 Template audio only",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Template{
+							Template: &livekit.TemplateSource{AudioOnly: true},
+						},
+					},
+				},
+			},
+			audioOnly: true,
+		},
+		{
+			name: "v2 Template not audio only",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Template{
+							Template: &livekit.TemplateSource{Layout: "grid"},
+						},
+					},
+				},
+			},
+			audioOnly: false,
+		},
+		{
+			name: "v2 Web audio only",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Web{
+							Web: &livekit.WebSource{AudioOnly: true},
+						},
+					},
+				},
+			},
+			audioOnly: true,
+		},
+		{
+			name: "v2 Media returns false",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Media{
+							Media: &livekit.MediaSource{},
+						},
+					},
+				},
+			},
+			audioOnly: false,
+		},
+		{
+			name: "Replay Template audio only",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Replay{
+					Replay: &livekit.ExportReplayRequest{
+						Source: &livekit.ExportReplayRequest_Template{
+							Template: &livekit.TemplateSource{AudioOnly: true},
+						},
+					},
+				},
+			},
+			audioOnly: true,
+		},
+		{
 			name: "Track request returns false",
 			info: &livekit.EgressInfo{
 				Request: &livekit.EgressInfo_Track{

@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add `AgentGrant.DispatchAdmin`
+Fix ResourceURLNotifier.QueueNotify keeping its lock after an error

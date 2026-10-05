@@ -213,6 +213,8 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 	r.mu.Lock()
 	// copy the parameters
 	params := r.params
+	r.mu.Unlock()
+
 	if len(p.ExtraWebhooks) > 1 {
 		return fmt.Errorf("more than 1 extra webhook url unexpected")
 	}
@@ -231,6 +233,7 @@ func (r *ResourceURLNotifier) QueueNotify(ctx context.Context, event *livekit.We
 		return errNoKey
 	}
 
+	r.mu.Lock()
 	rqi := r.resourceQueues[key]
 	if rqi == nil || !r.resourceQueueTimeoutQueue.Reset(rqi.tqi) {
 		rq := newResourceQueue(resourceQueueParams{

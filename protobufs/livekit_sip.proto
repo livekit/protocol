@@ -362,6 +362,8 @@ message SIPInboundTrunkInfo {
 
   // Max time for the caller to wait for track subscription.
   google.protobuf.Duration ringing_timeout = 11;
+  // SIP status code if ringing_timeout elapses. Unset means using system default.
+  SIPStatusCode ringing_timeout_status = 21;
   // Max call duration.
   google.protobuf.Duration max_call_duration = 12;
 
@@ -372,7 +374,7 @@ message SIPInboundTrunkInfo {
   google.protobuf.Timestamp created_at = 17;
   google.protobuf.Timestamp updated_at = 18;
 
-  // NEXT ID: 21
+  // NEXT ID: 22
 }
 
 message SIPInboundTrunkUpdate {

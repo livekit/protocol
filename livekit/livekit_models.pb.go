@@ -351,19 +351,22 @@ func (TrackSource) EnumDescriptor() ([]byte, []int) {
 type DataTrackExtensionID int32
 
 const (
-	DataTrackExtensionID_DTEI_INVALID         DataTrackExtensionID = 0
-	DataTrackExtensionID_DTEI_PARTICIPANT_SID DataTrackExtensionID = 1
+	DataTrackExtensionID_DTEI_INVALID             DataTrackExtensionID = 0
+	DataTrackExtensionID_DTEI_PARTICIPANT_SID_LOW DataTrackExtensionID = 1
+	DataTrackExtensionID_DTEI_PARTICIPANT_SID     DataTrackExtensionID = 255
 )
 
 // Enum value maps for DataTrackExtensionID.
 var (
 	DataTrackExtensionID_name = map[int32]string{
-		0: "DTEI_INVALID",
-		1: "DTEI_PARTICIPANT_SID",
+		0:   "DTEI_INVALID",
+		1:   "DTEI_PARTICIPANT_SID_LOW",
+		255: "DTEI_PARTICIPANT_SID",
 	}
 	DataTrackExtensionID_value = map[string]int32{
-		"DTEI_INVALID":         0,
-		"DTEI_PARTICIPANT_SID": 1,
+		"DTEI_INVALID":             0,
+		"DTEI_PARTICIPANT_SID_LOW": 1,
+		"DTEI_PARTICIPANT_SID":     255,
 	}
 )
 
@@ -5453,7 +5456,11 @@ type RTPStats struct {
 	PacketDrift          *RTPDrift              `protobuf:"bytes,44,opt,name=packet_drift,json=packetDrift,proto3" json:"packet_drift,omitempty"`
 	NtpReportDrift       *RTPDrift              `protobuf:"bytes,45,opt,name=ntp_report_drift,json=ntpReportDrift,proto3" json:"ntp_report_drift,omitempty"`
 	RebasedReportDrift   *RTPDrift              `protobuf:"bytes,46,opt,name=rebased_report_drift,json=rebasedReportDrift,proto3" json:"rebased_report_drift,omitempty"`
-	ReceivedReportDrift  *RTPDrift              `protobuf:"bytes,47,opt,name=received_report_drift,json=receivedReportDrift,proto3" json:"received_report_drift,omitempty"` // NEXT_ID: 48
+	ReceivedReportDrift  *RTPDrift              `protobuf:"bytes,47,opt,name=received_report_drift,json=receivedReportDrift,proto3" json:"received_report_drift,omitempty"`
+	FecPackets           uint32                 `protobuf:"varint,48,opt,name=fec_packets,json=fecPackets,proto3" json:"fec_packets,omitempty"`
+	FecBytes             uint64                 `protobuf:"varint,49,opt,name=fec_bytes,json=fecBytes,proto3" json:"fec_bytes,omitempty"`
+	FecPacketsDiscarded  uint32                 `protobuf:"varint,50,opt,name=fec_packets_discarded,json=fecPacketsDiscarded,proto3" json:"fec_packets_discarded,omitempty"`
+	FecPacketsRecovered  uint32                 `protobuf:"varint,51,opt,name=fec_packets_recovered,json=fecPacketsRecovered,proto3" json:"fec_packets_recovered,omitempty"` // NEXT_ID: 52
 	unknownFields        protoimpl.UnknownFields
 	sizeCache            protoimpl.SizeCache
 }
@@ -5801,6 +5808,34 @@ func (x *RTPStats) GetReceivedReportDrift() *RTPDrift {
 		return x.ReceivedReportDrift
 	}
 	return nil
+}
+
+func (x *RTPStats) GetFecPackets() uint32 {
+	if x != nil {
+		return x.FecPackets
+	}
+	return 0
+}
+
+func (x *RTPStats) GetFecBytes() uint64 {
+	if x != nil {
+		return x.FecBytes
+	}
+	return 0
+}
+
+func (x *RTPStats) GetFecPacketsDiscarded() uint32 {
+	if x != nil {
+		return x.FecPacketsDiscarded
+	}
+	return 0
+}
+
+func (x *RTPStats) GetFecPacketsRecovered() uint32 {
+	if x != nil {
+		return x.FecPacketsRecovered
+	}
+	return 0
 }
 
 type RTCPSenderReportState struct {
@@ -7287,7 +7322,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\rdrift_samples\x18\a \x01(\x03R\fdriftSamples\x12\x19\n" +
 	"\bdrift_ms\x18\b \x01(\x01R\adriftMs\x12\x1d\n" +
 	"\n" +
-	"clock_rate\x18\t \x01(\x01R\tclockRate\"\xc4\x0f\n" +
+	"clock_rate\x18\t \x01(\x01R\tclockRate\"\xea\x10\n" +
 	"\bRTPStats\x129\n" +
 	"\n" +
 	"start_time\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tstartTime\x125\n" +
@@ -7341,7 +7376,12 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\fpacket_drift\x18, \x01(\v2\x11.livekit.RTPDriftR\vpacketDrift\x12;\n" +
 	"\x10ntp_report_drift\x18- \x01(\v2\x11.livekit.RTPDriftR\x0entpReportDrift\x12C\n" +
 	"\x14rebased_report_drift\x18. \x01(\v2\x11.livekit.RTPDriftR\x12rebasedReportDrift\x12E\n" +
-	"\x15received_report_drift\x18/ \x01(\v2\x11.livekit.RTPDriftR\x13receivedReportDrift\x1a?\n" +
+	"\x15received_report_drift\x18/ \x01(\v2\x11.livekit.RTPDriftR\x13receivedReportDrift\x12\x1f\n" +
+	"\vfec_packets\x180 \x01(\rR\n" +
+	"fecPackets\x12\x1b\n" +
+	"\tfec_bytes\x181 \x01(\x04R\bfecBytes\x122\n" +
+	"\x15fec_packets_discarded\x182 \x01(\rR\x13fecPacketsDiscarded\x122\n" +
+	"\x15fec_packets_recovered\x183 \x01(\rR\x13fecPacketsRecovered\x1a?\n" +
 	"\x11GapHistogramEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\x05R\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\rR\x05value:\x028\x01\"\xf0\x01\n" +
@@ -7499,10 +7539,11 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"MICROPHONE\x10\x02\x12\x10\n" +
 	"\fSCREEN_SHARE\x10\x03\x12\x16\n" +
-	"\x12SCREEN_SHARE_AUDIO\x10\x04*B\n" +
+	"\x12SCREEN_SHARE_AUDIO\x10\x04*a\n" +
 	"\x14DataTrackExtensionID\x12\x10\n" +
-	"\fDTEI_INVALID\x10\x00\x12\x18\n" +
-	"\x14DTEI_PARTICIPANT_SID\x10\x01*6\n" +
+	"\fDTEI_INVALID\x10\x00\x12\x1c\n" +
+	"\x18DTEI_PARTICIPANT_SID_LOW\x10\x01\x12\x19\n" +
+	"\x14DTEI_PARTICIPANT_SID\x10\xff\x01*6\n" +
 	"\fVideoQuality\x12\a\n" +
 	"\x03LOW\x10\x00\x12\n" +
 	"\n" +

@@ -71,7 +71,7 @@ func WithDetailsFrom(dst twirp.Error, src error) twirp.Error {
 		return dst
 	}
 	if dst.Code() == twirp.Unknown {
-		dst = twirp.NewError(ErrorCodeFromGRPC(st.Code()), dst.Error())
+		dst = twirp.NewError(ErrorCodeFromGRPC(st.Code()), dst.Msg())
 	}
 	return WithDetailsFromStatus(dst, st)
 }

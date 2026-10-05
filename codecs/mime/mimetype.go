@@ -44,6 +44,7 @@ const (
 	MimeTypeCodecRTX
 	MimeTypeCodecFlexFEC
 	MimeTypeCodecULPFEC
+	MimeTypeCodecFlexFEC03
 )
 
 func (m MimeTypeCodec) String() string {
@@ -76,6 +77,8 @@ func (m MimeTypeCodec) String() string {
 		return "flexfec"
 	case MimeTypeCodecULPFEC:
 		return "ulpfec"
+	case MimeTypeCodecFlexFEC03:
+		return "flexfec-03"
 	}
 
 	return "MimeTypeCodecUnknown"
@@ -111,6 +114,8 @@ func (m MimeTypeCodec) ToMimeType() MimeType {
 		return MimeTypeFlexFEC
 	case MimeTypeCodecULPFEC:
 		return MimeTypeULPFEC
+	case MimeTypeCodecFlexFEC03:
+		return MimeTypeFlexFEC03
 	}
 
 	return MimeTypeUnknown
@@ -144,6 +149,8 @@ func NormalizeMimeTypeCodec(codec string) MimeTypeCodec {
 		return MimeTypeCodecFlexFEC
 	case strings.EqualFold(codec, "ulpfec"):
 		return MimeTypeCodecULPFEC
+	case strings.EqualFold(codec, "flexfec-03"):
+		return MimeTypeCodecFlexFEC03
 	}
 
 	return MimeTypeCodecUnknown
@@ -195,6 +202,7 @@ const (
 	MimeTypeRTX
 	MimeTypeFlexFEC
 	MimeTypeULPFEC
+	MimeTypeFlexFEC03
 )
 
 func (m MimeType) String() string {
@@ -227,6 +235,8 @@ func (m MimeType) String() string {
 		return webrtc.MimeTypeFlexFEC
 	case MimeTypeULPFEC:
 		return "video/ulpfec"
+	case MimeTypeFlexFEC03:
+		return webrtc.MimeTypeFlexFEC03
 	}
 
 	return "MimeTypeUnknown"
@@ -262,6 +272,8 @@ func (m MimeType) ReporterType() roomobs.MimeType {
 		return roomobs.MimeTypeVideoFlexfec
 	case MimeTypeULPFEC:
 		return roomobs.MimeTypeVideoUlpfec
+	case MimeTypeFlexFEC03:
+		return roomobs.MimeTypeVideoFlexfec03
 	}
 
 	return roomobs.MimeTypeUndefined
@@ -295,6 +307,8 @@ func NormalizeMimeType(mime string) MimeType {
 		return MimeTypeFlexFEC
 	case strings.EqualFold(mime, "video/ulpfec"):
 		return MimeTypeULPFEC
+	case strings.EqualFold(mime, webrtc.MimeTypeFlexFEC03):
+		return MimeTypeFlexFEC03
 	}
 
 	return MimeTypeUnknown
@@ -362,4 +376,8 @@ func IsMimeTypeStringVP9(mime string) bool {
 
 func IsMimeTypeStringH264(mime string) bool {
 	return NormalizeMimeType(mime) == MimeTypeH264
+}
+
+func IsMimeTypeStringFlexFEC03(mime string) bool {
+	return NormalizeMimeType(mime) == MimeTypeFlexFEC03
 }
