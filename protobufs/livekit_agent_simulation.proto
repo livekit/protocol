@@ -38,6 +38,13 @@ message SimulationRunSummary {
     string description = 1;
     string suggestion = 2;
     string label = 3;
+    // Stable across the project's runs: every run that reports the same
+    // defect carries the same id. Empty for runs summarized before issues
+    // were tracked.
+    string id = 4;
+    // How many of the project's runs had reported this issue when this run
+    // was summarized, this run included.
+    int32 run_count = 5;
   }
 }
 
