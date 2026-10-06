@@ -330,7 +330,35 @@ message AgentHttp {
     // Empty when the node resolved none; the worker then resolves it from the
     // body itself.
     string session_id = 8 [(logger.name) = "sessionID"];
-    // NEXT_ID: 9
+    // the agent session grant the caller's token carried, set by the node from
+    // the verified token's agentSession claim. Absent when the token carried
+    // none or the route was reached without a LiveKit token. The token itself
+    // never reaches the worker; the worker trusts this field the way it trusts
+    // authorized, and enforces it (agent name, subject, session ids, flags)
+    // against the session the request addresses.
+    AgentSessionGrant session_grant = 9;
+    // NEXT_ID: 10
+  }
+
+  // the verified agentSession claim of a LiveKit token, mirroring
+  // auth.AgentSessionGrant. It scopes the holder to the sessions of one agent,
+  // selected by subject or by id, with per-action flags.
+  message AgentSessionGrant {
+    // required: sessions, keys and subjects are scoped per agent
+    string agent_name = 1 [(logger.name) = "agentName"];
+    // the subject whose sessions the holder may see and create
+    string sub = 2;
+    // restricts the grant to these sessions instead. One of sub and
+    // session_ids is required; a grant with neither covers no session.
+    repeated string session_ids = 3 [(logger.name) = "sessionIDs"];
+    bool list = 4;
+    // a first message may create a session, with sub as its subject
+    bool create = 5;
+    // message/send, message/stream and tasks/cancel
+    bool send = 6;
+    // get, chat_history and background_tasks
+    bool read = 7;
+    bool delete = 8;
   }
 
   // why a stream was reset before any HTTP bytes flowed. This travels as the

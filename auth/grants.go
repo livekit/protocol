@@ -781,6 +781,25 @@ func (s *AgentSessionGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	return nil
 }
 
+// ToProto is the grant as the node forwards it to the worker in
+// AgentHttp.StreamPreamble.session_grant. nil maps to nil, so an absent claim
+// leaves the preamble field unset.
+func (s *AgentSessionGrant) ToProto() *livekit.AgentHttp_AgentSessionGrant {
+	if s == nil {
+		return nil
+	}
+	return &livekit.AgentHttp_AgentSessionGrant{
+		AgentName:  s.AgentName,
+		Sub:        s.Sub,
+		SessionIds: append([]string{}, s.SessionIDs...),
+		List:       s.List,
+		Create:     s.Create,
+		Send:       s.Send,
+		Read:       s.Read,
+		Delete:     s.Delete,
+	}
+}
+
 // ------------------------------------------------------------------
 
 func sourceToString(source livekit.TrackSource) string {

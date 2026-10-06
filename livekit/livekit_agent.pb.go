@@ -2014,7 +2014,14 @@ type AgentHttp_StreamPreamble struct {
 	// node from the request's id or key, or created for a first message.
 	// Empty when the node resolved none; the worker then resolves it from the
 	// body itself.
-	SessionId     string `protobuf:"bytes,8,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // NEXT_ID: 9
+	SessionId string `protobuf:"bytes,8,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	// the agent session grant the caller's token carried, set by the node from
+	// the verified token's agentSession claim. Absent when the token carried
+	// none or the route was reached without a LiveKit token. The token itself
+	// never reaches the worker; the worker trusts this field the way it trusts
+	// authorized, and enforces it (agent name, subject, session ids, flags)
+	// against the session the request addresses.
+	SessionGrant  *AgentHttp_AgentSessionGrant `protobuf:"bytes,9,opt,name=session_grant,json=sessionGrant,proto3" json:"session_grant,omitempty"` // NEXT_ID: 10
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2105,6 +2112,123 @@ func (x *AgentHttp_StreamPreamble) GetSessionId() string {
 	return ""
 }
 
+func (x *AgentHttp_StreamPreamble) GetSessionGrant() *AgentHttp_AgentSessionGrant {
+	if x != nil {
+		return x.SessionGrant
+	}
+	return nil
+}
+
+// the verified agentSession claim of a LiveKit token, mirroring
+// auth.AgentSessionGrant. It scopes the holder to the sessions of one agent,
+// selected by subject or by id, with per-action flags.
+type AgentHttp_AgentSessionGrant struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// required: sessions, keys and subjects are scoped per agent
+	AgentName string `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	// the subject whose sessions the holder may see and create
+	Sub string `protobuf:"bytes,2,opt,name=sub,proto3" json:"sub,omitempty"`
+	// restricts the grant to these sessions instead. One of sub and
+	// session_ids is required; a grant with neither covers no session.
+	SessionIds []string `protobuf:"bytes,3,rep,name=session_ids,json=sessionIds,proto3" json:"session_ids,omitempty"`
+	List       bool     `protobuf:"varint,4,opt,name=list,proto3" json:"list,omitempty"`
+	// a first message may create a session, with sub as its subject
+	Create bool `protobuf:"varint,5,opt,name=create,proto3" json:"create,omitempty"`
+	// message/send, message/stream and tasks/cancel
+	Send bool `protobuf:"varint,6,opt,name=send,proto3" json:"send,omitempty"`
+	// get, chat_history and background_tasks
+	Read          bool `protobuf:"varint,7,opt,name=read,proto3" json:"read,omitempty"`
+	Delete        bool `protobuf:"varint,8,opt,name=delete,proto3" json:"delete,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentHttp_AgentSessionGrant) Reset() {
+	*x = AgentHttp_AgentSessionGrant{}
+	mi := &file_livekit_agent_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentHttp_AgentSessionGrant) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentHttp_AgentSessionGrant) ProtoMessage() {}
+
+func (x *AgentHttp_AgentSessionGrant) ProtoReflect() protoreflect.Message {
+	mi := &file_livekit_agent_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentHttp_AgentSessionGrant.ProtoReflect.Descriptor instead.
+func (*AgentHttp_AgentSessionGrant) Descriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{17, 3}
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetAgentName() string {
+	if x != nil {
+		return x.AgentName
+	}
+	return ""
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetSub() string {
+	if x != nil {
+		return x.Sub
+	}
+	return ""
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetSessionIds() []string {
+	if x != nil {
+		return x.SessionIds
+	}
+	return nil
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetList() bool {
+	if x != nil {
+		return x.List
+	}
+	return false
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetCreate() bool {
+	if x != nil {
+		return x.Create
+	}
+	return false
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetSend() bool {
+	if x != nil {
+		return x.Send
+	}
+	return false
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetRead() bool {
+	if x != nil {
+		return x.Read
+	}
+	return false
+}
+
+func (x *AgentHttp_AgentSessionGrant) GetDelete() bool {
+	if x != nil {
+		return x.Delete
+	}
+	return false
+}
+
 // the server is draining: the worker should re-register elsewhere; in-flight
 // HTTP exchanges run to completion
 type AgentHttp_GoAway struct {
@@ -2116,7 +2240,7 @@ type AgentHttp_GoAway struct {
 
 func (x *AgentHttp_GoAway) Reset() {
 	*x = AgentHttp_GoAway{}
-	mi := &file_livekit_agent_proto_msgTypes[23]
+	mi := &file_livekit_agent_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2128,7 +2252,7 @@ func (x *AgentHttp_GoAway) String() string {
 func (*AgentHttp_GoAway) ProtoMessage() {}
 
 func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_proto_msgTypes[23]
+	mi := &file_livekit_agent_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2141,7 +2265,7 @@ func (x *AgentHttp_GoAway) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentHttp_GoAway.ProtoReflect.Descriptor instead.
 func (*AgentHttp_GoAway) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_proto_rawDescGZIP(), []int{17, 3}
+	return file_livekit_agent_proto_rawDescGZIP(), []int{17, 4}
 }
 
 func (x *AgentHttp_GoAway) GetReason() string {
@@ -2292,7 +2416,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"1\n" +
 	"\x0eJobTermination\x12\x1f\n" +
-	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xd7\x05\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\x93\b\n" +
 	"\tAgentHttp\x1a\x8f\x01\n" +
 	"\rAgentEndpoint\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x18\n" +
@@ -2300,7 +2424,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x04kind\x18\x03 \x01(\x0e2$.livekit.AgentHttp.AgentEndpointKindR\x04kind\x12\x16\n" +
 	"\x06public\x18\x04 \x01(\bR\x06public\x1a?\n" +
 	"\x15AgentEndpointSettings\x12\x1a\n" +
-	"\bprotocol\x18\x01 \x01(\rR\bprotocolJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04\x1a\xb7\x02\n" +
+	"\bprotocol\x18\x01 \x01(\rR\bprotocolJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04\x1a\x82\x03\n" +
 	"\x0eStreamPreamble\x128\n" +
 	"\x04kind\x18\x01 \x01(\x0e2$.livekit.AgentHttp.AgentEndpointKindR\x04kind\x12+\n" +
 	"\n" +
@@ -2315,7 +2439,20 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"clientAddr\x12\x16\n" +
 	"\x06scheme\x18\a \x01(\tR\x06scheme\x12+\n" +
 	"\n" +
-	"session_id\x18\b \x01(\tB\f\xbaP\tsessionIDR\tsessionId\x1a \n" +
+	"session_id\x18\b \x01(\tB\f\xbaP\tsessionIDR\tsessionId\x12I\n" +
+	"\rsession_grant\x18\t \x01(\v2$.livekit.AgentHttp.AgentSessionGrantR\fsessionGrant\x1a\xee\x01\n" +
+	"\x11AgentSessionGrant\x12+\n" +
+	"\n" +
+	"agent_name\x18\x01 \x01(\tB\f\xbaP\tagentNameR\tagentName\x12\x10\n" +
+	"\x03sub\x18\x02 \x01(\tR\x03sub\x12.\n" +
+	"\vsession_ids\x18\x03 \x03(\tB\r\xbaP\n" +
+	"sessionIDsR\n" +
+	"sessionIds\x12\x12\n" +
+	"\x04list\x18\x04 \x01(\bR\x04list\x12\x16\n" +
+	"\x06create\x18\x05 \x01(\bR\x06create\x12\x12\n" +
+	"\x04send\x18\x06 \x01(\bR\x04send\x12\x12\n" +
+	"\x04read\x18\a \x01(\bR\x04read\x12\x16\n" +
+	"\x06delete\x18\b \x01(\bR\x06delete\x1a \n" +
 	"\x06GoAway\x12\x16\n" +
 	"\x06reason\x18\x01 \x01(\tR\x06reason\"/\n" +
 	"\x11AgentEndpointKind\x12\f\n" +
@@ -2359,7 +2496,7 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
 var file_livekit_agent_proto_goTypes = []any{
 	(JobType)(0),                            // 0: livekit.JobType
 	(WorkerStatus)(0),                       // 1: livekit.WorkerStatus
@@ -2390,16 +2527,17 @@ var file_livekit_agent_proto_goTypes = []any{
 	(*AgentHttp_AgentEndpoint)(nil),         // 26: livekit.AgentHttp.AgentEndpoint
 	(*AgentHttp_AgentEndpointSettings)(nil), // 27: livekit.AgentHttp.AgentEndpointSettings
 	(*AgentHttp_StreamPreamble)(nil),        // 28: livekit.AgentHttp.StreamPreamble
-	(*AgentHttp_GoAway)(nil),                // 29: livekit.AgentHttp.GoAway
-	(*Room)(nil),                            // 30: livekit.Room
-	(*ParticipantInfo)(nil),                 // 31: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),           // 32: livekit.ParticipantPermission
-	(*ServerInfo)(nil),                      // 33: livekit.ServerInfo
+	(*AgentHttp_AgentSessionGrant)(nil),     // 29: livekit.AgentHttp.AgentSessionGrant
+	(*AgentHttp_GoAway)(nil),                // 30: livekit.AgentHttp.GoAway
+	(*Room)(nil),                            // 31: livekit.Room
+	(*ParticipantInfo)(nil),                 // 32: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),           // 33: livekit.ParticipantPermission
+	(*ServerInfo)(nil),                      // 34: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	30, // 1: livekit.Job.room:type_name -> livekit.Room
-	31, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	31, // 1: livekit.Job.room:type_name -> livekit.Room
+	32, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
 	7,  // 3: livekit.Job.state:type_name -> livekit.JobState
 	24, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
 	2,  // 5: livekit.JobState.status:type_name -> livekit.JobStatus
@@ -2416,14 +2554,14 @@ var file_livekit_agent_proto_depIdxs = []int32{
 	21, // 16: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
 	22, // 17: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
 	12, // 18: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	29, // 19: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
+	30, // 19: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
 	0,  // 20: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	30, // 21: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	31, // 22: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	31, // 21: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	32, // 22: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
 	0,  // 23: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	32, // 24: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	33, // 24: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
 	26, // 25: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
-	33, // 26: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	34, // 26: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
 	27, // 27: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
 	6,  // 28: livekit.AvailabilityRequest.job:type_name -> livekit.Job
 	25, // 29: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
@@ -2433,11 +2571,12 @@ var file_livekit_agent_proto_depIdxs = []int32{
 	6,  // 33: livekit.JobAssignment.job:type_name -> livekit.Job
 	4,  // 34: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
 	4,  // 35: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	36, // [36:36] is the sub-list for method output_type
-	36, // [36:36] is the sub-list for method input_type
-	36, // [36:36] is the sub-list for extension type_name
-	36, // [36:36] is the sub-list for extension extendee
-	0,  // [0:36] is the sub-list for field type_name
+	29, // 36: livekit.AgentHttp.StreamPreamble.session_grant:type_name -> livekit.AgentHttp.AgentSessionGrant
+	37, // [37:37] is the sub-list for method output_type
+	37, // [37:37] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -2474,7 +2613,7 @@ func file_livekit_agent_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   24,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
