@@ -36,6 +36,9 @@ message Job {
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
   bool enable_redaction = 13;
+  // the agent session ("AT_...") this job's conversation belongs to, created
+  // by dispatch before the job is assigned. Empty when dispatch created none.
+  string session_id = 14 [(logger.name) = "sessionID"];
 }
 
 message JobState {
@@ -65,6 +68,8 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
+    // worker reports that it holds, or has released, an agent session
+    UpdateSessionStatus update_session = 8;
   };
 }
 
@@ -182,6 +187,29 @@ message UpdateJobStatus {
   string error = 3;
 }
 
+enum SessionStatus {
+  // the worker opened the session: the server binds (agent, session_id) to
+  // this worker and routes the session's requests to it
+  SS_ACTIVE = 0;
+  // the worker evicted the session with no run in flight, no background task
+  // running and everything persisted: the server unbinds, and the next
+  // request picks a worker afresh. Final for this worker: it never reopens
+  // a released session.
+  SS_RELEASED = 1;
+}
+
+// The worker tells the server which agent sessions it holds, so requests for
+// a session reach the worker that has it loaded. There is no reply: the
+// server applies updates per worker in seq order, and a control stream that
+// drops before a release arrives drops every binding of the worker anyway.
+message UpdateSessionStatus {
+  string session_id = 1 [(logger.name) = "sessionID"];
+  SessionStatus status = 2;
+  // monotonic per worker across its connections. Updates may arrive out of
+  // order; a late SS_ACTIVE never resurrects an SS_RELEASED binding.
+  uint64 seq = 3;
+}
+
 message UpdateWorkerStatus {
   reserved 2; // metadata (retired)
   optional WorkerStatus status = 1;
@@ -297,7 +325,12 @@ message AgentHttp {
     string client_addr = 6 [(logger.sensitivity) = SENSITIVITY_PII];
     // "http" or "https" as the end client saw it; not derivable worker-side
     string scheme = 7;
-    // NEXT_ID: 8
+    // the agent session ("AT_...") this request belongs to, resolved by the
+    // node from the request's id or key, or created for a first message.
+    // Empty when the node resolved none; the worker then resolves it from the
+    // body itself.
+    string session_id = 8 [(logger.name) = "sessionID"];
+    // NEXT_ID: 9
   }
 
   // why a stream was reset before any HTTP bytes flowed. This travels as the
