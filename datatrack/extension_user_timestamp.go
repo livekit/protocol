@@ -23,8 +23,6 @@ const (
 	ExtensionUserTimestampID uint8 = 2
 )
 
-// ExtensionUserTimestamp carries an application-defined 64-bit timestamp set by the
-// publisher, typically the capture time of the frame.
 type ExtensionUserTimestamp struct {
 	timestamp uint64
 }
@@ -46,8 +44,6 @@ func (e *ExtensionUserTimestamp) Marshal() (Extension, error) {
 	}, nil
 }
 
-// Unmarshal reads the extension. Data beyond the known length is ignored so that a
-// future version of the extension remains readable.
 func (e *ExtensionUserTimestamp) Unmarshal(ext Extension) error {
 	if ext.id != ExtensionUserTimestampID {
 		return ErrExtensionInvalidID

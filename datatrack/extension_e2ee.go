@@ -15,7 +15,6 @@
 package datatrack
 
 const (
-	// ExtensionE2EEIVLength is the length of the AES-GCM initialization vector carried by ExtensionE2EE.
 	ExtensionE2EEIVLength = 12
 
 	// TODO: once the collision is fully resolved (see #1825), the source of truth for
@@ -24,9 +23,6 @@ const (
 	ExtensionE2EEID uint8 = 1
 )
 
-// ExtensionE2EE marks a packet whose payload is end-to-end encrypted and carries what the
-// receiver needs to decrypt it: the index of the key in the publisher's key ring and the
-// AES-GCM initialization vector.
 type ExtensionE2EE struct {
 	keyIndex uint8
 	iv       [ExtensionE2EEIVLength]byte
@@ -54,8 +50,6 @@ func (e *ExtensionE2EE) Marshal() (Extension, error) {
 	}, nil
 }
 
-// Unmarshal reads the extension. Data beyond the known length is ignored so that a
-// future version of the extension remains readable.
 func (e *ExtensionE2EE) Unmarshal(ext Extension) error {
 	if ext.id != ExtensionE2EEID {
 		return ErrExtensionInvalidID
