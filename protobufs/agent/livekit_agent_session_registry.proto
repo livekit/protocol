@@ -60,6 +60,10 @@ service AgentSessionRegistry {
   // Creates the session's database if it has none and records it on the
   // session. Idempotent: a second call returns the same database_id.
   rpc EnsureStateDatabase(SessionRegistry.EnsureRequest) returns (SessionRegistry.Session);
+  // Sets redirect_to on a fresh session after its items were copied into the
+  // found one. Reserved to the project credential. Refused with
+  // failed_precondition when the row already redirects elsewhere.
+  rpc RedirectSession(SessionRegistry.RedirectRequest) returns (SessionRegistry.Session);
 }
 
 // Nested so that names like Session and CreateRequest need not be unique
@@ -159,6 +163,12 @@ message SessionRegistry {
 
   message EnsureRequest {
     string session_id = 1 [(logger.name) = "sessionID"];
+  }
+
+  message RedirectRequest {
+    string session_id = 1 [(logger.name) = "sessionID"];
+    // The session the items were copied into.
+    string redirect_to = 2 [(logger.name) = "redirectTo"];
   }
 
   // One session, as every read reports it. Keys are never returned, by any

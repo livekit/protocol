@@ -878,6 +878,59 @@ func (x *SessionRegistry_EnsureRequest) GetSessionId() string {
 	return ""
 }
 
+type SessionRegistry_RedirectRequest struct {
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	SessionId string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	// The session the items were copied into.
+	RedirectTo    string `protobuf:"bytes,2,opt,name=redirect_to,json=redirectTo,proto3" json:"redirect_to,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SessionRegistry_RedirectRequest) Reset() {
+	*x = SessionRegistry_RedirectRequest{}
+	mi := &file_agent_livekit_agent_session_registry_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SessionRegistry_RedirectRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SessionRegistry_RedirectRequest) ProtoMessage() {}
+
+func (x *SessionRegistry_RedirectRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_agent_livekit_agent_session_registry_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SessionRegistry_RedirectRequest.ProtoReflect.Descriptor instead.
+func (*SessionRegistry_RedirectRequest) Descriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_session_registry_proto_rawDescGZIP(), []int{0, 14}
+}
+
+func (x *SessionRegistry_RedirectRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *SessionRegistry_RedirectRequest) GetRedirectTo() string {
+	if x != nil {
+		return x.RedirectTo
+	}
+	return ""
+}
+
 // One session, as every read reports it. Keys are never returned, by any
 // call and with any token: only their count is.
 type SessionRegistry_Session struct {
@@ -906,7 +959,7 @@ type SessionRegistry_Session struct {
 
 func (x *SessionRegistry_Session) Reset() {
 	*x = SessionRegistry_Session{}
-	mi := &file_agent_livekit_agent_session_registry_proto_msgTypes[15]
+	mi := &file_agent_livekit_agent_session_registry_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -918,7 +971,7 @@ func (x *SessionRegistry_Session) String() string {
 func (*SessionRegistry_Session) ProtoMessage() {}
 
 func (x *SessionRegistry_Session) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_session_registry_proto_msgTypes[15]
+	mi := &file_agent_livekit_agent_session_registry_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -931,7 +984,7 @@ func (x *SessionRegistry_Session) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionRegistry_Session.ProtoReflect.Descriptor instead.
 func (*SessionRegistry_Session) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_session_registry_proto_rawDescGZIP(), []int{0, 14}
+	return file_agent_livekit_agent_session_registry_proto_rawDescGZIP(), []int{0, 15}
 }
 
 func (x *SessionRegistry_Session) GetSessionId() string {
@@ -1022,7 +1075,7 @@ var File_agent_livekit_agent_session_registry_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_session_registry_proto_rawDesc = "" +
 	"\n" +
-	"*agent/livekit_agent_session_registry.proto\x12\rlivekit.agent\x1a\x14logger/options.proto\"\x81\x11\n" +
+	"*agent/livekit_agent_session_registry.proto\x12\rlivekit.agent\x1a\x14logger/options.proto\"\xf1\x11\n" +
 	"\x0fSessionRegistry\x1a@\n" +
 	"\bAgentKey\x12\x1d\n" +
 	"\n" +
@@ -1093,7 +1146,13 @@ const file_agent_livekit_agent_session_registry_proto_rawDesc = "" +
 	"\x0eDeleteResponse\x1a<\n" +
 	"\rEnsureRequest\x12+\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tB\f\xbaP\tsessionIDR\tsessionId\x1a\x88\x04\n" +
+	"session_id\x18\x01 \x01(\tB\f\xbaP\tsessionIDR\tsessionId\x1an\n" +
+	"\x0fRedirectRequest\x12+\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tB\f\xbaP\tsessionIDR\tsessionId\x12.\n" +
+	"\vredirect_to\x18\x02 \x01(\tB\r\xbaP\n" +
+	"redirectToR\n" +
+	"redirectTo\x1a\x88\x04\n" +
 	"\aSession\x12+\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tB\f\xbaP\tsessionIDR\tsessionId\x12\x1d\n" +
@@ -1119,7 +1178,7 @@ const file_agent_livekit_agent_session_registry_proto_rawDesc = "" +
 	"redirectTo\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xcf\a\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012\xba\b\n" +
 	"\x14AgentSessionRegistry\x12l\n" +
 	"\rCreateSession\x12,.livekit.agent.SessionRegistry.CreateRequest\x1a-.livekit.agent.SessionRegistry.CreateResponse\x12_\n" +
 	"\n" +
@@ -1130,7 +1189,8 @@ const file_agent_livekit_agent_session_registry_proto_rawDesc = "" +
 	"\rAddSessionKey\x12,.livekit.agent.SessionRegistry.AddKeyRequest\x1a&.livekit.agent.SessionRegistry.Session\x12k\n" +
 	"\x10RemoveSessionKey\x12/.livekit.agent.SessionRegistry.RemoveKeyRequest\x1a&.livekit.agent.SessionRegistry.Session\x12l\n" +
 	"\rDeleteSession\x12,.livekit.agent.SessionRegistry.DeleteRequest\x1a-.livekit.agent.SessionRegistry.DeleteResponse\x12k\n" +
-	"\x13EnsureStateDatabase\x12,.livekit.agent.SessionRegistry.EnsureRequest\x1a&.livekit.agent.SessionRegistry.SessionB+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
+	"\x13EnsureStateDatabase\x12,.livekit.agent.SessionRegistry.EnsureRequest\x1a&.livekit.agent.SessionRegistry.Session\x12i\n" +
+	"\x0fRedirectSession\x12..livekit.agent.SessionRegistry.RedirectRequest\x1a&.livekit.agent.SessionRegistry.SessionB+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
 
 var (
 	file_agent_livekit_agent_session_registry_proto_rawDescOnce sync.Once
@@ -1144,7 +1204,7 @@ func file_agent_livekit_agent_session_registry_proto_rawDescGZIP() []byte {
 	return file_agent_livekit_agent_session_registry_proto_rawDescData
 }
 
-var file_agent_livekit_agent_session_registry_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_agent_livekit_agent_session_registry_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_agent_livekit_agent_session_registry_proto_goTypes = []any{
 	(*SessionRegistry)(nil),                  // 0: livekit.agent.SessionRegistry
 	(*SessionRegistry_AgentKey)(nil),         // 1: livekit.agent.SessionRegistry.AgentKey
@@ -1161,18 +1221,19 @@ var file_agent_livekit_agent_session_registry_proto_goTypes = []any{
 	(*SessionRegistry_DeleteRequest)(nil),    // 12: livekit.agent.SessionRegistry.DeleteRequest
 	(*SessionRegistry_DeleteResponse)(nil),   // 13: livekit.agent.SessionRegistry.DeleteResponse
 	(*SessionRegistry_EnsureRequest)(nil),    // 14: livekit.agent.SessionRegistry.EnsureRequest
-	(*SessionRegistry_Session)(nil),          // 15: livekit.agent.SessionRegistry.Session
-	nil,                                      // 16: livekit.agent.SessionRegistry.CreateRequest.AttributesEntry
-	nil,                                      // 17: livekit.agent.SessionRegistry.UpdateRequest.AttributesEntry
-	nil,                                      // 18: livekit.agent.SessionRegistry.Session.AttributesEntry
+	(*SessionRegistry_RedirectRequest)(nil),  // 15: livekit.agent.SessionRegistry.RedirectRequest
+	(*SessionRegistry_Session)(nil),          // 16: livekit.agent.SessionRegistry.Session
+	nil,                                      // 17: livekit.agent.SessionRegistry.CreateRequest.AttributesEntry
+	nil,                                      // 18: livekit.agent.SessionRegistry.UpdateRequest.AttributesEntry
+	nil,                                      // 19: livekit.agent.SessionRegistry.Session.AttributesEntry
 }
 var file_agent_livekit_agent_session_registry_proto_depIdxs = []int32{
-	16, // 0: livekit.agent.SessionRegistry.CreateRequest.attributes:type_name -> livekit.agent.SessionRegistry.CreateRequest.AttributesEntry
-	15, // 1: livekit.agent.SessionRegistry.CreateResponse.session:type_name -> livekit.agent.SessionRegistry.Session
+	17, // 0: livekit.agent.SessionRegistry.CreateRequest.attributes:type_name -> livekit.agent.SessionRegistry.CreateRequest.AttributesEntry
+	16, // 1: livekit.agent.SessionRegistry.CreateResponse.session:type_name -> livekit.agent.SessionRegistry.Session
 	1,  // 2: livekit.agent.SessionRegistry.GetRequest.by_key:type_name -> livekit.agent.SessionRegistry.AgentKey
-	15, // 3: livekit.agent.SessionRegistry.ListResponse.sessions:type_name -> livekit.agent.SessionRegistry.Session
-	17, // 4: livekit.agent.SessionRegistry.UpdateRequest.attributes:type_name -> livekit.agent.SessionRegistry.UpdateRequest.AttributesEntry
-	18, // 5: livekit.agent.SessionRegistry.Session.attributes:type_name -> livekit.agent.SessionRegistry.Session.AttributesEntry
+	16, // 3: livekit.agent.SessionRegistry.ListResponse.sessions:type_name -> livekit.agent.SessionRegistry.Session
+	18, // 4: livekit.agent.SessionRegistry.UpdateRequest.attributes:type_name -> livekit.agent.SessionRegistry.UpdateRequest.AttributesEntry
+	19, // 5: livekit.agent.SessionRegistry.Session.attributes:type_name -> livekit.agent.SessionRegistry.Session.AttributesEntry
 	2,  // 6: livekit.agent.AgentSessionRegistry.CreateSession:input_type -> livekit.agent.SessionRegistry.CreateRequest
 	4,  // 7: livekit.agent.AgentSessionRegistry.GetSession:input_type -> livekit.agent.SessionRegistry.GetRequest
 	5,  // 8: livekit.agent.AgentSessionRegistry.ListSessions:input_type -> livekit.agent.SessionRegistry.ListRequest
@@ -1182,17 +1243,19 @@ var file_agent_livekit_agent_session_registry_proto_depIdxs = []int32{
 	11, // 12: livekit.agent.AgentSessionRegistry.RemoveSessionKey:input_type -> livekit.agent.SessionRegistry.RemoveKeyRequest
 	12, // 13: livekit.agent.AgentSessionRegistry.DeleteSession:input_type -> livekit.agent.SessionRegistry.DeleteRequest
 	14, // 14: livekit.agent.AgentSessionRegistry.EnsureStateDatabase:input_type -> livekit.agent.SessionRegistry.EnsureRequest
-	3,  // 15: livekit.agent.AgentSessionRegistry.CreateSession:output_type -> livekit.agent.SessionRegistry.CreateResponse
-	15, // 16: livekit.agent.AgentSessionRegistry.GetSession:output_type -> livekit.agent.SessionRegistry.Session
-	6,  // 17: livekit.agent.AgentSessionRegistry.ListSessions:output_type -> livekit.agent.SessionRegistry.ListResponse
-	15, // 18: livekit.agent.AgentSessionRegistry.UpdateSession:output_type -> livekit.agent.SessionRegistry.Session
-	9,  // 19: livekit.agent.AgentSessionRegistry.TouchSession:output_type -> livekit.agent.SessionRegistry.TouchResponse
-	15, // 20: livekit.agent.AgentSessionRegistry.AddSessionKey:output_type -> livekit.agent.SessionRegistry.Session
-	15, // 21: livekit.agent.AgentSessionRegistry.RemoveSessionKey:output_type -> livekit.agent.SessionRegistry.Session
-	13, // 22: livekit.agent.AgentSessionRegistry.DeleteSession:output_type -> livekit.agent.SessionRegistry.DeleteResponse
-	15, // 23: livekit.agent.AgentSessionRegistry.EnsureStateDatabase:output_type -> livekit.agent.SessionRegistry.Session
-	15, // [15:24] is the sub-list for method output_type
-	6,  // [6:15] is the sub-list for method input_type
+	15, // 15: livekit.agent.AgentSessionRegistry.RedirectSession:input_type -> livekit.agent.SessionRegistry.RedirectRequest
+	3,  // 16: livekit.agent.AgentSessionRegistry.CreateSession:output_type -> livekit.agent.SessionRegistry.CreateResponse
+	16, // 17: livekit.agent.AgentSessionRegistry.GetSession:output_type -> livekit.agent.SessionRegistry.Session
+	6,  // 18: livekit.agent.AgentSessionRegistry.ListSessions:output_type -> livekit.agent.SessionRegistry.ListResponse
+	16, // 19: livekit.agent.AgentSessionRegistry.UpdateSession:output_type -> livekit.agent.SessionRegistry.Session
+	9,  // 20: livekit.agent.AgentSessionRegistry.TouchSession:output_type -> livekit.agent.SessionRegistry.TouchResponse
+	16, // 21: livekit.agent.AgentSessionRegistry.AddSessionKey:output_type -> livekit.agent.SessionRegistry.Session
+	16, // 22: livekit.agent.AgentSessionRegistry.RemoveSessionKey:output_type -> livekit.agent.SessionRegistry.Session
+	13, // 23: livekit.agent.AgentSessionRegistry.DeleteSession:output_type -> livekit.agent.SessionRegistry.DeleteResponse
+	16, // 24: livekit.agent.AgentSessionRegistry.EnsureStateDatabase:output_type -> livekit.agent.SessionRegistry.Session
+	16, // 25: livekit.agent.AgentSessionRegistry.RedirectSession:output_type -> livekit.agent.SessionRegistry.Session
+	16, // [16:26] is the sub-list for method output_type
+	6,  // [6:16] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name
 	6,  // [6:6] is the sub-list for extension extendee
 	0,  // [0:6] is the sub-list for field type_name
@@ -1214,7 +1277,7 @@ func file_agent_livekit_agent_session_registry_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_session_registry_proto_rawDesc), len(file_agent_livekit_agent_session_registry_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   19,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
