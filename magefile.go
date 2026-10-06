@@ -72,6 +72,7 @@ func Proto() error {
 		"livekit_connector_twilio.proto",
 		"livekit_agent_simulation.proto",
 		"livekit_agent_worker.proto",
+		"agent/livekit_agent_session_registry.proto",
 	}
 
 	agentProtoFiles := []string{
