@@ -431,6 +431,16 @@ message Scenario {
   // SCN_-prefixed guid. Stable across edits to label, instructions, or
   // expectations, so runs of the same scenario can be correlated over time.
   string id = 6;
+
+  // BCP-47 tags for the simulated user. Empty fields are inferred from
+  // instructions; an empty listen follows speak.
+  message Language {
+    // The language the simulated user speaks.
+    string speak = 1;
+    // The language the simulated user listens for from the agent under test.
+    string listen = 2;
+  }
+  Language language = 7;
 }
 
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
