@@ -169,6 +169,7 @@ type ClaimGrants struct {
 	Inference     *InferenceGrant     `json:"inference,omitempty"`
 	Observability *ObservabilityGrant `json:"observability,omitempty"`
 	AgentEndpoint *AgentEndpointGrant `json:"agentEndpoint,omitempty"`
+	AgentSession  *AgentSessionGrant  `json:"agentSession,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -216,6 +217,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Inference = c.Inference.Clone()
 	clone.Observability = c.Observability.Clone()
 	clone.AgentEndpoint = c.AgentEndpoint.Clone()
+	clone.AgentSession = c.AgentSession.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -239,6 +241,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Inference", c.Inference)
 	e.AddObject("Observability", c.Observability)
 	e.AddObject("AgentEndpoint", c.AgentEndpoint)
+	e.AddObject("AgentSession", c.AgentSession)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -707,6 +710,74 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddBool("Call", s.Call)
 	e.AddString("AgentName", s.AgentName)
 	e.AddString("Deployment", s.Deployment)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+// AgentSessionGrant scopes a token to agent sessions: the durable
+// conversations of one agent, selected by subject or by id. It is minted by
+// the application's backend the way a room token is, so the subject rides in
+// the signature and a request body never names it. The JWT sub claim stays the
+// participant identity; the session subject is Sub.
+type AgentSessionGrant struct {
+	// AgentName is required: sessions, keys and subjects are scoped per agent.
+	AgentName string `json:"agentName"`
+	// Sub is the subject whose sessions the holder may see and create.
+	Sub string `json:"sub,omitempty"`
+	// SessionIDs restricts the grant to these sessions instead. One of Sub and
+	// SessionIDs is required; a grant with neither covers no session.
+	SessionIDs []string `json:"sessionIds,omitempty"`
+	List       bool     `json:"list,omitempty"`
+	// Create lets a first message create a session, with Sub as its subject.
+	Create bool `json:"create,omitempty"`
+	// Send grants message/send, message/stream and tasks/cancel.
+	Send bool `json:"send,omitempty"`
+	// Read grants get, chat_history and background_tasks.
+	Read   bool `json:"read,omitempty"`
+	Delete bool `json:"delete,omitempty"`
+}
+
+// Covers reports whether a session is in the grant's scope: it was created by
+// the grant's agent, and either its subject equals the grant's Sub or its id is
+// listed in SessionIDs. The action flags are checked by the caller. Matching
+// is exact and case-sensitive; an empty Sub or session id never matches.
+func (s *AgentSessionGrant) Covers(agentName, sub, sessionID string) bool {
+	if s == nil || s.AgentName == "" || s.AgentName != agentName {
+		return false
+	}
+	if s.Sub != "" && s.Sub == sub {
+		return true
+	}
+	return sessionID != "" && slices.Contains(s.SessionIDs, sessionID)
+}
+
+func (s *AgentSessionGrant) Clone() *AgentSessionGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+	if len(s.SessionIDs) > 0 {
+		clone.SessionIDs = append([]string{}, s.SessionIDs...)
+	}
+
+	return &clone
+}
+
+func (s *AgentSessionGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddString("AgentName", s.AgentName)
+	e.AddString("Sub", s.Sub)
+	zap.Strings("SessionIDs", s.SessionIDs).AddTo(e)
+	e.AddBool("List", s.List)
+	e.AddBool("Create", s.Create)
+	e.AddBool("Send", s.Send)
+	e.AddBool("Read", s.Read)
+	e.AddBool("Delete", s.Delete)
 	return nil
 }
 
