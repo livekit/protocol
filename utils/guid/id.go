@@ -72,6 +72,8 @@ const (
 	PhoneNumberPrefix                  = "PN_"
 	ScenarioPrefix                     = "SCN_"
 	ScenarioGroupPrefix                = "SCNG_"
+	AgentSessionPrefix                 = "AT_"
+	AgentStreamPrefix                  = "AST_" // ST_ is SIPTrunkPrefix
 )
 
 const (
