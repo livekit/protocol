@@ -896,7 +896,7 @@ type AgentDB_Wire_ClientMessage_Query struct {
 }
 
 type AgentDB_Wire_ClientMessage_Batch struct {
-	Batch *AgentDB_Wire_Batch `protobuf:"bytes,5,opt,name=batch,proto3,oneof"`
+	Batch *AgentDB_Wire_Batch `protobuf:"bytes,5,opt,name=batch,proto3,oneof"` // answers one result per statement, then Done
 }
 
 type AgentDB_Wire_ClientMessage_Begin struct {
@@ -1304,9 +1304,15 @@ func (x *AgentDB_Wire_Statement) GetLang() AgentDB_Wire_QueryLang {
 	return AgentDB_Wire_SQL
 }
 
+// Applied atomically, in order, and answered with one result per
+// statement, in order: Columns then ColumnBatch frames for a statement
+// that returns rows, one ExecResult for one that does not, each tagged
+// with the statement's 0-based index, then a single Done for the whole
+// batch. A statement that returns no rows still sends its Columns. Credit
+// paces the ColumnBatch frames of the batch as a whole.
 type AgentDB_Wire_Batch struct {
 	state         protoimpl.MessageState    `protogen:"open.v1"`
-	Statements    []*AgentDB_Wire_Statement `protobuf:"bytes,1,rep,name=statements,proto3" json:"statements,omitempty"` // applied atomically, in order
+	Statements    []*AgentDB_Wire_Statement `protobuf:"bytes,1,rep,name=statements,proto3" json:"statements,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1747,6 +1753,7 @@ func (x *AgentDB_Wire_HelloOk) GetPingTimeoutMs() uint32 {
 type AgentDB_Wire_Columns struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Names         []string               `protobuf:"bytes,1,rep,name=names,proto3" json:"names,omitempty"`
+	Statement     uint32                 `protobuf:"varint,2,opt,name=statement,proto3" json:"statement,omitempty"` // index within a Batch; 0 and unused for a Query
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1786,6 +1793,13 @@ func (x *AgentDB_Wire_Columns) GetNames() []string {
 		return x.Names
 	}
 	return nil
+}
+
+func (x *AgentDB_Wire_Columns) GetStatement() uint32 {
+	if x != nil {
+		return x.Statement
+	}
+	return 0
 }
 
 // Values are typed per row, as SQLite types them, so a column may mix
@@ -1889,6 +1903,7 @@ type AgentDB_Wire_ColumnBatch struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Columns       []*AgentDB_Wire_Column `protobuf:"bytes,1,rep,name=columns,proto3" json:"columns,omitempty"` // one per name in Columns
 	Rows          uint32                 `protobuf:"varint,2,opt,name=rows,proto3" json:"rows,omitempty"`
+	Statement     uint32                 `protobuf:"varint,3,opt,name=statement,proto3" json:"statement,omitempty"` // index within a Batch; 0 and unused for a Query
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1937,11 +1952,19 @@ func (x *AgentDB_Wire_ColumnBatch) GetRows() uint32 {
 	return 0
 }
 
+func (x *AgentDB_Wire_ColumnBatch) GetStatement() uint32 {
+	if x != nil {
+		return x.Statement
+	}
+	return 0
+}
+
 type AgentDB_Wire_ExecResult struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RowsAffected  int64                  `protobuf:"varint,1,opt,name=rows_affected,json=rowsAffected,proto3" json:"rows_affected,omitempty"`
 	LastInsertId  int64                  `protobuf:"varint,2,opt,name=last_insert_id,json=lastInsertId,proto3" json:"last_insert_id,omitempty"`
 	Tip           int64                  `protobuf:"varint,3,opt,name=tip,proto3" json:"tip,omitempty"`
+	Statement     uint32                 `protobuf:"varint,4,opt,name=statement,proto3" json:"statement,omitempty"` // index within a Batch; 0 and unused for an Exec
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1993,6 +2016,13 @@ func (x *AgentDB_Wire_ExecResult) GetLastInsertId() int64 {
 func (x *AgentDB_Wire_ExecResult) GetTip() int64 {
 	if x != nil {
 		return x.Tip
+	}
+	return 0
+}
+
+func (x *AgentDB_Wire_ExecResult) GetStatement() uint32 {
+	if x != nil {
+		return x.Statement
 	}
 	return 0
 }
@@ -2105,7 +2135,7 @@ var File_livekit_agentdb_proto protoreflect.FileDescriptor
 
 const file_livekit_agentdb_proto_rawDesc = "" +
 	"\n" +
-	"\x15livekit_agentdb.proto\x12\alivekit\"\xd8\x19\n" +
+	"\x15livekit_agentdb.proto\x12\alivekit\"\xb3\x1a\n" +
 	"\aAgentDB\x1aH\n" +
 	"\rCreateRequest\x12\x16\n" +
 	"\x06region\x18\x01 \x01(\tR\x06region\x12\x1f\n" +
@@ -2147,7 +2177,7 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\fdownload_url\x18\x01 \x01(\tR\vdownloadUrl\x12\x1d\n" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\x03R\texpiresAt\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xcd\x13\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a\xa8\x14\n" +
 	"\x04Wire\x1a\xe0\x04\n" +
 	"\rClientMessage\x12\x1d\n" +
 	"\n" +
@@ -2213,9 +2243,10 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\aHelloOk\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12(\n" +
 	"\x10ping_interval_ms\x18\x02 \x01(\rR\x0epingIntervalMs\x12&\n" +
-	"\x0fping_timeout_ms\x18\x03 \x01(\rR\rpingTimeoutMs\x1a\x1f\n" +
+	"\x0fping_timeout_ms\x18\x03 \x01(\rR\rpingTimeoutMs\x1a=\n" +
 	"\aColumns\x12\x14\n" +
-	"\x05names\x18\x01 \x03(\tR\x05names\x1a\xc0\x01\n" +
+	"\x05names\x18\x01 \x03(\tR\x05names\x12\x1c\n" +
+	"\tstatement\x18\x02 \x01(\rR\tstatement\x1a\xc0\x01\n" +
 	"\x06Column\x12\x14\n" +
 	"\x05types\x18\x01 \x01(\fR\x05types\x12\x12\n" +
 	"\x04ints\x18\x02 \x03(\x12R\x04ints\x12\x18\n" +
@@ -2223,15 +2254,17 @@ const file_livekit_agentdb_proto_rawDesc = "" +
 	"\ttext_data\x18\x04 \x01(\fR\btextData\x12\x1b\n" +
 	"\ttext_ends\x18\x05 \x03(\rR\btextEnds\x12\x1b\n" +
 	"\tblob_data\x18\x06 \x01(\fR\bblobData\x12\x1b\n" +
-	"\tblob_ends\x18\a \x03(\rR\bblobEnds\x1aY\n" +
+	"\tblob_ends\x18\a \x03(\rR\bblobEnds\x1aw\n" +
 	"\vColumnBatch\x126\n" +
 	"\acolumns\x18\x01 \x03(\v2\x1c.livekit.AgentDB.Wire.ColumnR\acolumns\x12\x12\n" +
-	"\x04rows\x18\x02 \x01(\rR\x04rows\x1ai\n" +
+	"\x04rows\x18\x02 \x01(\rR\x04rows\x12\x1c\n" +
+	"\tstatement\x18\x03 \x01(\rR\tstatement\x1a\x87\x01\n" +
 	"\n" +
 	"ExecResult\x12#\n" +
 	"\rrows_affected\x18\x01 \x01(\x03R\frowsAffected\x12$\n" +
 	"\x0elast_insert_id\x18\x02 \x01(\x03R\flastInsertId\x12\x10\n" +
-	"\x03tip\x18\x03 \x01(\x03R\x03tip\x1a7\n" +
+	"\x03tip\x18\x03 \x01(\x03R\x03tip\x12\x1c\n" +
+	"\tstatement\x18\x04 \x01(\rR\tstatement\x1a7\n" +
 	"\x04Done\x12\x10\n" +
 	"\x03tip\x18\x01 \x01(\x03R\x03tip\x12\x1d\n" +
 	"\n" +
