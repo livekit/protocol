@@ -14,7 +14,7 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id; keys (such as a phone
-// number) find it again, at most one thread per key and agent. Holds a scope,
+// number) find it again, at most one thread per key in a project. Holds a scope,
 // attributes, an idle TTL and the AgentDB database with its state. Served by
 // cloud-protocol's AgentThreads.
 
@@ -80,65 +80,12 @@ func (*AgentThread) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0}
 }
 
-type AgentThread_AgentKey struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Key           string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AgentThread_AgentKey) Reset() {
-	*x = AgentThread_AgentKey{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentThread_AgentKey) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentThread_AgentKey) ProtoMessage() {}
-
-func (x *AgentThread_AgentKey) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentThread_AgentKey.ProtoReflect.Descriptor instead.
-func (*AgentThread_AgentKey) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 0}
-}
-
-func (x *AgentThread_AgentKey) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
-	}
-	return ""
-}
-
-func (x *AgentThread_AgentKey) GetKey() string {
-	if x != nil {
-		return x.Key
-	}
-	return ""
-}
-
 type AgentThread_CreateRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	// When set, create is get-or-create on (agent_name, key).
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// When set, create is get-or-create on key.
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// Groups threads, e.g. by user: an application-defined value, typically the
-	// user's identity. An AgentThreadGrant is scoped by it, across agents.
+	// user's identity. An AgentThreadGrant is scoped by it.
 	Scope      string            `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"`
 	Attributes map[string]string `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Unset takes the server default.
@@ -149,7 +96,7 @@ type AgentThread_CreateRequest struct {
 
 func (x *AgentThread_CreateRequest) Reset() {
 	*x = AgentThread_CreateRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[2]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -161,7 +108,7 @@ func (x *AgentThread_CreateRequest) String() string {
 func (*AgentThread_CreateRequest) ProtoMessage() {}
 
 func (x *AgentThread_CreateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[2]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -174,14 +121,7 @@ func (x *AgentThread_CreateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_CreateRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_CreateRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 1}
-}
-
-func (x *AgentThread_CreateRequest) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
-	}
-	return ""
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 0}
 }
 
 func (x *AgentThread_CreateRequest) GetKey() string {
@@ -223,7 +163,7 @@ type AgentThread_CreateResponse struct {
 
 func (x *AgentThread_CreateResponse) Reset() {
 	*x = AgentThread_CreateResponse{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[3]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -235,7 +175,7 @@ func (x *AgentThread_CreateResponse) String() string {
 func (*AgentThread_CreateResponse) ProtoMessage() {}
 
 func (x *AgentThread_CreateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[3]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -248,7 +188,7 @@ func (x *AgentThread_CreateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_CreateResponse.ProtoReflect.Descriptor instead.
 func (*AgentThread_CreateResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 2}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 1}
 }
 
 func (x *AgentThread_CreateResponse) GetThread() *AgentThread_Thread {
@@ -270,7 +210,7 @@ type AgentThread_GetRequest struct {
 	// Types that are valid to be assigned to Lookup:
 	//
 	//	*AgentThread_GetRequest_ThreadId
-	//	*AgentThread_GetRequest_ByKey
+	//	*AgentThread_GetRequest_Key
 	Lookup        isAgentThread_GetRequest_Lookup `protobuf_oneof:"lookup"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -278,7 +218,7 @@ type AgentThread_GetRequest struct {
 
 func (x *AgentThread_GetRequest) Reset() {
 	*x = AgentThread_GetRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[4]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -290,7 +230,7 @@ func (x *AgentThread_GetRequest) String() string {
 func (*AgentThread_GetRequest) ProtoMessage() {}
 
 func (x *AgentThread_GetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[4]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -303,7 +243,7 @@ func (x *AgentThread_GetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_GetRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_GetRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 3}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 2}
 }
 
 func (x *AgentThread_GetRequest) GetLookup() isAgentThread_GetRequest_Lookup {
@@ -322,13 +262,13 @@ func (x *AgentThread_GetRequest) GetThreadId() string {
 	return ""
 }
 
-func (x *AgentThread_GetRequest) GetByKey() *AgentThread_AgentKey {
+func (x *AgentThread_GetRequest) GetKey() string {
 	if x != nil {
-		if x, ok := x.Lookup.(*AgentThread_GetRequest_ByKey); ok {
-			return x.ByKey
+		if x, ok := x.Lookup.(*AgentThread_GetRequest_Key); ok {
+			return x.Key
 		}
 	}
-	return nil
+	return ""
 }
 
 type isAgentThread_GetRequest_Lookup interface {
@@ -339,19 +279,18 @@ type AgentThread_GetRequest_ThreadId struct {
 	ThreadId string `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3,oneof"`
 }
 
-type AgentThread_GetRequest_ByKey struct {
-	ByKey *AgentThread_AgentKey `protobuf:"bytes,2,opt,name=by_key,json=byKey,proto3,oneof"`
+type AgentThread_GetRequest_Key struct {
+	Key string `protobuf:"bytes,2,opt,name=key,proto3,oneof"`
 }
 
 func (*AgentThread_GetRequest_ThreadId) isAgentThread_GetRequest_Lookup() {}
 
-func (*AgentThread_GetRequest_ByKey) isAgentThread_GetRequest_Lookup() {}
+func (*AgentThread_GetRequest_Key) isAgentThread_GetRequest_Lookup() {}
 
-// The threads of one scope under one agent, newest first.
+// The threads of one scope, newest first.
 type AgentThread_ListRequest struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Scope     string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Scope string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
 	// Cursor from the previous ListResponse; empty for the first page.
 	Before        string `protobuf:"bytes,3,opt,name=before,proto3" json:"before,omitempty"`
 	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -361,7 +300,7 @@ type AgentThread_ListRequest struct {
 
 func (x *AgentThread_ListRequest) Reset() {
 	*x = AgentThread_ListRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[5]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -373,7 +312,7 @@ func (x *AgentThread_ListRequest) String() string {
 func (*AgentThread_ListRequest) ProtoMessage() {}
 
 func (x *AgentThread_ListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[5]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -386,14 +325,7 @@ func (x *AgentThread_ListRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_ListRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_ListRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 4}
-}
-
-func (x *AgentThread_ListRequest) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
-	}
-	return ""
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 3}
 }
 
 func (x *AgentThread_ListRequest) GetScope() string {
@@ -428,7 +360,7 @@ type AgentThread_ListResponse struct {
 
 func (x *AgentThread_ListResponse) Reset() {
 	*x = AgentThread_ListResponse{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[6]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -440,7 +372,7 @@ func (x *AgentThread_ListResponse) String() string {
 func (*AgentThread_ListResponse) ProtoMessage() {}
 
 func (x *AgentThread_ListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[6]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -453,7 +385,7 @@ func (x *AgentThread_ListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_ListResponse.ProtoReflect.Descriptor instead.
 func (*AgentThread_ListResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 5}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 4}
 }
 
 func (x *AgentThread_ListResponse) GetThreads() []*AgentThread_Thread {
@@ -482,7 +414,7 @@ type AgentThread_UpdateRequest struct {
 
 func (x *AgentThread_UpdateRequest) Reset() {
 	*x = AgentThread_UpdateRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[7]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -494,7 +426,7 @@ func (x *AgentThread_UpdateRequest) String() string {
 func (*AgentThread_UpdateRequest) ProtoMessage() {}
 
 func (x *AgentThread_UpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[7]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -507,7 +439,7 @@ func (x *AgentThread_UpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_UpdateRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_UpdateRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 6}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 5}
 }
 
 func (x *AgentThread_UpdateRequest) GetThreadId() string {
@@ -540,7 +472,7 @@ type AgentThread_TouchRequest struct {
 
 func (x *AgentThread_TouchRequest) Reset() {
 	*x = AgentThread_TouchRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[8]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -552,7 +484,7 @@ func (x *AgentThread_TouchRequest) String() string {
 func (*AgentThread_TouchRequest) ProtoMessage() {}
 
 func (x *AgentThread_TouchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[8]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -565,7 +497,7 @@ func (x *AgentThread_TouchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_TouchRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_TouchRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 7}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 6}
 }
 
 func (x *AgentThread_TouchRequest) GetThreadId() string {
@@ -584,7 +516,7 @@ type AgentThread_TouchResponse struct {
 
 func (x *AgentThread_TouchResponse) Reset() {
 	*x = AgentThread_TouchResponse{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[9]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -596,7 +528,7 @@ func (x *AgentThread_TouchResponse) String() string {
 func (*AgentThread_TouchResponse) ProtoMessage() {}
 
 func (x *AgentThread_TouchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[9]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -609,7 +541,7 @@ func (x *AgentThread_TouchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_TouchResponse.ProtoReflect.Descriptor instead.
 func (*AgentThread_TouchResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 8}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 7}
 }
 
 func (x *AgentThread_TouchResponse) GetExpiresAt() *timestamppb.Timestamp {
@@ -625,7 +557,7 @@ type AgentThread_AddKeyRequest struct {
 	Key      string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// Unset keeps the key for the life of the thread.
 	Ttl *durationpb.Duration `protobuf:"bytes,3,opt,name=ttl,proto3" json:"ttl,omitempty"`
-	// Move the key here when another thread of the same agent holds it.
+	// Move the key here when another thread holds it.
 	Replace       bool `protobuf:"varint,4,opt,name=replace,proto3" json:"replace,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -633,7 +565,7 @@ type AgentThread_AddKeyRequest struct {
 
 func (x *AgentThread_AddKeyRequest) Reset() {
 	*x = AgentThread_AddKeyRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[10]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -645,7 +577,7 @@ func (x *AgentThread_AddKeyRequest) String() string {
 func (*AgentThread_AddKeyRequest) ProtoMessage() {}
 
 func (x *AgentThread_AddKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[10]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -658,7 +590,7 @@ func (x *AgentThread_AddKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_AddKeyRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_AddKeyRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 9}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 8}
 }
 
 func (x *AgentThread_AddKeyRequest) GetThreadId() string {
@@ -699,7 +631,7 @@ type AgentThread_RemoveKeyRequest struct {
 
 func (x *AgentThread_RemoveKeyRequest) Reset() {
 	*x = AgentThread_RemoveKeyRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[11]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -711,7 +643,7 @@ func (x *AgentThread_RemoveKeyRequest) String() string {
 func (*AgentThread_RemoveKeyRequest) ProtoMessage() {}
 
 func (x *AgentThread_RemoveKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[11]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -724,7 +656,7 @@ func (x *AgentThread_RemoveKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_RemoveKeyRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_RemoveKeyRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 10}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 9}
 }
 
 func (x *AgentThread_RemoveKeyRequest) GetThreadId() string {
@@ -750,7 +682,7 @@ type AgentThread_DeleteRequest struct {
 
 func (x *AgentThread_DeleteRequest) Reset() {
 	*x = AgentThread_DeleteRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[12]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -762,7 +694,7 @@ func (x *AgentThread_DeleteRequest) String() string {
 func (*AgentThread_DeleteRequest) ProtoMessage() {}
 
 func (x *AgentThread_DeleteRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[12]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -775,7 +707,7 @@ func (x *AgentThread_DeleteRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_DeleteRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_DeleteRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 11}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 10}
 }
 
 func (x *AgentThread_DeleteRequest) GetThreadId() string {
@@ -793,7 +725,7 @@ type AgentThread_DeleteResponse struct {
 
 func (x *AgentThread_DeleteResponse) Reset() {
 	*x = AgentThread_DeleteResponse{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[13]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -805,7 +737,7 @@ func (x *AgentThread_DeleteResponse) String() string {
 func (*AgentThread_DeleteResponse) ProtoMessage() {}
 
 func (x *AgentThread_DeleteResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[13]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -818,7 +750,7 @@ func (x *AgentThread_DeleteResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_DeleteResponse.ProtoReflect.Descriptor instead.
 func (*AgentThread_DeleteResponse) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 12}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 11}
 }
 
 // Creates the thread's database if it has none. Idempotent.
@@ -831,7 +763,7 @@ type AgentThread_CreateThreadDatabaseRequest struct {
 
 func (x *AgentThread_CreateThreadDatabaseRequest) Reset() {
 	*x = AgentThread_CreateThreadDatabaseRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[14]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -843,7 +775,7 @@ func (x *AgentThread_CreateThreadDatabaseRequest) String() string {
 func (*AgentThread_CreateThreadDatabaseRequest) ProtoMessage() {}
 
 func (x *AgentThread_CreateThreadDatabaseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[14]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -856,7 +788,7 @@ func (x *AgentThread_CreateThreadDatabaseRequest) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use AgentThread_CreateThreadDatabaseRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_CreateThreadDatabaseRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 13}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 12}
 }
 
 func (x *AgentThread_CreateThreadDatabaseRequest) GetThreadId() string {
@@ -878,7 +810,7 @@ type AgentThread_MergeThreadRequest struct {
 
 func (x *AgentThread_MergeThreadRequest) Reset() {
 	*x = AgentThread_MergeThreadRequest{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[15]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -890,7 +822,7 @@ func (x *AgentThread_MergeThreadRequest) String() string {
 func (*AgentThread_MergeThreadRequest) ProtoMessage() {}
 
 func (x *AgentThread_MergeThreadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[15]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -903,7 +835,7 @@ func (x *AgentThread_MergeThreadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_MergeThreadRequest.ProtoReflect.Descriptor instead.
 func (*AgentThread_MergeThreadRequest) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 14}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 13}
 }
 
 func (x *AgentThread_MergeThreadRequest) GetThreadId() string {
@@ -921,9 +853,8 @@ func (x *AgentThread_MergeThreadRequest) GetInto() string {
 }
 
 type AgentThread_Thread struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	ThreadId  string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	AgentName string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	// Keys themselves are never returned.
 	KeyCount   uint32                 `protobuf:"varint,3,opt,name=key_count,json=keyCount,proto3" json:"key_count,omitempty"`
 	Scope      string                 `protobuf:"bytes,4,opt,name=scope,proto3" json:"scope,omitempty"`
@@ -945,7 +876,7 @@ type AgentThread_Thread struct {
 
 func (x *AgentThread_Thread) Reset() {
 	*x = AgentThread_Thread{}
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[16]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -957,7 +888,7 @@ func (x *AgentThread_Thread) String() string {
 func (*AgentThread_Thread) ProtoMessage() {}
 
 func (x *AgentThread_Thread) ProtoReflect() protoreflect.Message {
-	mi := &file_agent_livekit_agent_thread_proto_msgTypes[16]
+	mi := &file_agent_livekit_agent_thread_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -970,19 +901,12 @@ func (x *AgentThread_Thread) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentThread_Thread.ProtoReflect.Descriptor instead.
 func (*AgentThread_Thread) Descriptor() ([]byte, []int) {
-	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 15}
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 14}
 }
 
 func (x *AgentThread_Thread) GetThreadId() string {
 	if x != nil {
 		return x.ThreadId
-	}
-	return ""
-}
-
-func (x *AgentThread_Thread) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
 	}
 	return ""
 }
@@ -1054,15 +978,9 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xf5\x11\n" +
-	"\vAgentThread\x1a;\n" +
-	"\bAgentKey\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\tR\x03key\x1a\xaf\x02\n" +
-	"\rCreateRequest\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xc2\x10\n" +
+	"\vAgentThread\x1a\x96\x02\n" +
+	"\rCreateRequest\x12\x10\n" +
 	"\x03key\x18\x02 \x01(\tR\x03key\x12\x19\n" +
 	"\x05scope\x18\x03 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
 	"\n" +
@@ -1071,21 +989,19 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\bidle_ttl\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1ae\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x01\x10\x02\x1ae\n" +
 	"\x0eCreateResponse\x129\n" +
 	"\x06thread\x18\x01 \x01(\v2!.livekit.agent.AgentThread.ThreadR\x06thread\x12\x18\n" +
-	"\acreated\x18\x02 \x01(\bR\acreated\x1a\x80\x01\n" +
+	"\acreated\x18\x02 \x01(\bR\acreated\x1aV\n" +
 	"\n" +
 	"GetRequest\x12*\n" +
-	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDH\x00R\bthreadId\x12<\n" +
-	"\x06by_key\x18\x02 \x01(\v2#.livekit.agent.AgentThread.AgentKeyH\x00R\x05byKeyB\b\n" +
-	"\x06lookup\x1au\n" +
-	"\vListRequest\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
+	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDH\x00R\bthreadId\x12\x12\n" +
+	"\x03key\x18\x02 \x01(\tH\x00R\x03keyB\b\n" +
+	"\x06lookup\x1a\\\n" +
+	"\vListRequest\x12\x19\n" +
 	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x16\n" +
 	"\x06before\x18\x03 \x01(\tR\x06before\x12\x14\n" +
-	"\x05limit\x18\x04 \x01(\x05R\x05limit\x1ac\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limitJ\x04\b\x01\x10\x02\x1ac\n" +
 	"\fListResponse\x12;\n" +
 	"\athreads\x18\x01 \x03(\v2!.livekit.agent.AgentThread.ThreadR\athreads\x12\x16\n" +
 	"\x06before\x18\x02 \x01(\tR\x06before\x1a\x8d\x02\n" +
@@ -1118,11 +1034,9 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1aR\n" +
 	"\x12MergeThreadRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x12\n" +
-	"\x04into\x18\x02 \x01(\tR\x04into\x1a\xcb\x04\n" +
+	"\x04into\x18\x02 \x01(\tR\x04into\x1a\xb2\x04\n" +
 	"\x06Thread\x12(\n" +
-	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1b\n" +
+	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x1b\n" +
 	"\tkey_count\x18\x03 \x01(\rR\bkeyCount\x12\x19\n" +
 	"\x05scope\x18\x04 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
 	"\n" +
@@ -1142,7 +1056,7 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"mergedInto\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x02\x10\x03B+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
 
 var (
 	file_agent_livekit_agent_thread_proto_rawDescOnce sync.Once
@@ -1156,51 +1070,49 @@ func file_agent_livekit_agent_thread_proto_rawDescGZIP() []byte {
 	return file_agent_livekit_agent_thread_proto_rawDescData
 }
 
-var file_agent_livekit_agent_thread_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_agent_livekit_agent_thread_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_agent_livekit_agent_thread_proto_goTypes = []any{
 	(*AgentThread)(nil),                             // 0: livekit.agent.AgentThread
-	(*AgentThread_AgentKey)(nil),                    // 1: livekit.agent.AgentThread.AgentKey
-	(*AgentThread_CreateRequest)(nil),               // 2: livekit.agent.AgentThread.CreateRequest
-	(*AgentThread_CreateResponse)(nil),              // 3: livekit.agent.AgentThread.CreateResponse
-	(*AgentThread_GetRequest)(nil),                  // 4: livekit.agent.AgentThread.GetRequest
-	(*AgentThread_ListRequest)(nil),                 // 5: livekit.agent.AgentThread.ListRequest
-	(*AgentThread_ListResponse)(nil),                // 6: livekit.agent.AgentThread.ListResponse
-	(*AgentThread_UpdateRequest)(nil),               // 7: livekit.agent.AgentThread.UpdateRequest
-	(*AgentThread_TouchRequest)(nil),                // 8: livekit.agent.AgentThread.TouchRequest
-	(*AgentThread_TouchResponse)(nil),               // 9: livekit.agent.AgentThread.TouchResponse
-	(*AgentThread_AddKeyRequest)(nil),               // 10: livekit.agent.AgentThread.AddKeyRequest
-	(*AgentThread_RemoveKeyRequest)(nil),            // 11: livekit.agent.AgentThread.RemoveKeyRequest
-	(*AgentThread_DeleteRequest)(nil),               // 12: livekit.agent.AgentThread.DeleteRequest
-	(*AgentThread_DeleteResponse)(nil),              // 13: livekit.agent.AgentThread.DeleteResponse
-	(*AgentThread_CreateThreadDatabaseRequest)(nil), // 14: livekit.agent.AgentThread.CreateThreadDatabaseRequest
-	(*AgentThread_MergeThreadRequest)(nil),          // 15: livekit.agent.AgentThread.MergeThreadRequest
-	(*AgentThread_Thread)(nil),                      // 16: livekit.agent.AgentThread.Thread
-	nil,                                             // 17: livekit.agent.AgentThread.CreateRequest.AttributesEntry
-	nil,                                             // 18: livekit.agent.AgentThread.UpdateRequest.AttributesEntry
-	nil,                                             // 19: livekit.agent.AgentThread.Thread.AttributesEntry
-	(*durationpb.Duration)(nil),                     // 20: google.protobuf.Duration
-	(*timestamppb.Timestamp)(nil),                   // 21: google.protobuf.Timestamp
+	(*AgentThread_CreateRequest)(nil),               // 1: livekit.agent.AgentThread.CreateRequest
+	(*AgentThread_CreateResponse)(nil),              // 2: livekit.agent.AgentThread.CreateResponse
+	(*AgentThread_GetRequest)(nil),                  // 3: livekit.agent.AgentThread.GetRequest
+	(*AgentThread_ListRequest)(nil),                 // 4: livekit.agent.AgentThread.ListRequest
+	(*AgentThread_ListResponse)(nil),                // 5: livekit.agent.AgentThread.ListResponse
+	(*AgentThread_UpdateRequest)(nil),               // 6: livekit.agent.AgentThread.UpdateRequest
+	(*AgentThread_TouchRequest)(nil),                // 7: livekit.agent.AgentThread.TouchRequest
+	(*AgentThread_TouchResponse)(nil),               // 8: livekit.agent.AgentThread.TouchResponse
+	(*AgentThread_AddKeyRequest)(nil),               // 9: livekit.agent.AgentThread.AddKeyRequest
+	(*AgentThread_RemoveKeyRequest)(nil),            // 10: livekit.agent.AgentThread.RemoveKeyRequest
+	(*AgentThread_DeleteRequest)(nil),               // 11: livekit.agent.AgentThread.DeleteRequest
+	(*AgentThread_DeleteResponse)(nil),              // 12: livekit.agent.AgentThread.DeleteResponse
+	(*AgentThread_CreateThreadDatabaseRequest)(nil), // 13: livekit.agent.AgentThread.CreateThreadDatabaseRequest
+	(*AgentThread_MergeThreadRequest)(nil),          // 14: livekit.agent.AgentThread.MergeThreadRequest
+	(*AgentThread_Thread)(nil),                      // 15: livekit.agent.AgentThread.Thread
+	nil,                                             // 16: livekit.agent.AgentThread.CreateRequest.AttributesEntry
+	nil,                                             // 17: livekit.agent.AgentThread.UpdateRequest.AttributesEntry
+	nil,                                             // 18: livekit.agent.AgentThread.Thread.AttributesEntry
+	(*durationpb.Duration)(nil),                     // 19: google.protobuf.Duration
+	(*timestamppb.Timestamp)(nil),                   // 20: google.protobuf.Timestamp
 }
 var file_agent_livekit_agent_thread_proto_depIdxs = []int32{
-	17, // 0: livekit.agent.AgentThread.CreateRequest.attributes:type_name -> livekit.agent.AgentThread.CreateRequest.AttributesEntry
-	20, // 1: livekit.agent.AgentThread.CreateRequest.idle_ttl:type_name -> google.protobuf.Duration
-	16, // 2: livekit.agent.AgentThread.CreateResponse.thread:type_name -> livekit.agent.AgentThread.Thread
-	1,  // 3: livekit.agent.AgentThread.GetRequest.by_key:type_name -> livekit.agent.AgentThread.AgentKey
-	16, // 4: livekit.agent.AgentThread.ListResponse.threads:type_name -> livekit.agent.AgentThread.Thread
-	18, // 5: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
-	20, // 6: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
-	21, // 7: livekit.agent.AgentThread.TouchResponse.expires_at:type_name -> google.protobuf.Timestamp
-	20, // 8: livekit.agent.AgentThread.AddKeyRequest.ttl:type_name -> google.protobuf.Duration
-	19, // 9: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
-	21, // 10: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
-	21, // 11: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
-	21, // 12: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
-	20, // 13: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
-	14, // [14:14] is the sub-list for method output_type
-	14, // [14:14] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	16, // 0: livekit.agent.AgentThread.CreateRequest.attributes:type_name -> livekit.agent.AgentThread.CreateRequest.AttributesEntry
+	19, // 1: livekit.agent.AgentThread.CreateRequest.idle_ttl:type_name -> google.protobuf.Duration
+	15, // 2: livekit.agent.AgentThread.CreateResponse.thread:type_name -> livekit.agent.AgentThread.Thread
+	15, // 3: livekit.agent.AgentThread.ListResponse.threads:type_name -> livekit.agent.AgentThread.Thread
+	17, // 4: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
+	19, // 5: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
+	20, // 6: livekit.agent.AgentThread.TouchResponse.expires_at:type_name -> google.protobuf.Timestamp
+	19, // 7: livekit.agent.AgentThread.AddKeyRequest.ttl:type_name -> google.protobuf.Duration
+	18, // 8: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
+	20, // 9: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
+	20, // 10: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
+	20, // 11: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
+	19, // 12: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
+	13, // [13:13] is the sub-list for method output_type
+	13, // [13:13] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_thread_proto_init() }
@@ -1208,9 +1120,9 @@ func file_agent_livekit_agent_thread_proto_init() {
 	if File_agent_livekit_agent_thread_proto != nil {
 		return
 	}
-	file_agent_livekit_agent_thread_proto_msgTypes[4].OneofWrappers = []any{
+	file_agent_livekit_agent_thread_proto_msgTypes[3].OneofWrappers = []any{
 		(*AgentThread_GetRequest_ThreadId)(nil),
-		(*AgentThread_GetRequest_ByKey)(nil),
+		(*AgentThread_GetRequest_Key)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -1218,7 +1130,7 @@ func file_agent_livekit_agent_thread_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_thread_proto_rawDesc), len(file_agent_livekit_agent_thread_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
