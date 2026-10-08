@@ -72,7 +72,7 @@ message AgentThread {
 
   message UpdateRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // Merged; an empty value deletes the entry.
+    // Added to the existing attributes; an empty value deletes the entry.
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.Duration idle_ttl = 3;
     // Every update counts as activity and pushes expires_at out by idle_ttl.
@@ -83,13 +83,6 @@ message AgentThread {
   }
 
   message DeleteResponse {}
-
-  // Marks thread_id as merged into another thread, after its items were copied
-  // there.
-  message MergeThreadRequest {
-    string thread_id = 1 [(logger.name) = "threadID"];
-    string into = 2;
-  }
 
   message Thread {
     string thread_id = 1 [(logger.name) = "threadID"];
@@ -106,8 +99,6 @@ message AgentThread {
     google.protobuf.Duration idle_ttl = 9;
     // The thread's database ("DB_..."), created with the thread.
     string database_id = 10;
-    // Set when merged into another thread; calls on it then fail with
-    // FailedPrecondition.
-    string merged_into = 11;
+    reserved 11;
   }
 }
