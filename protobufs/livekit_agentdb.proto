@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// AgentDB gives each agent its own SQLite databases. A database lives in its
+// project's data region, on object storage with a replicated hot tier for
+// recent commits, and has one writer at a time. Queries and transactions run
+// over the WebSocket data plane (AgentDB.Wire); creating, listing, deleting and
+// exporting databases go through cloud-protocol's AgentDB gRPC service.
 
 syntax = "proto3";
 
@@ -20,9 +25,6 @@ package livekit;
 option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
-
-// Lifecycle and export of SQLite databases; queries run over the data plane
-// below. The service is cloud-protocol's AgentDB.
 
 // Nested so that names like Value and Ping need not be unique across the
 // livekit package. `tip` throughout is the latest durable commit sequence.

@@ -12,6 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// An AgentThread is the durable conversation an agent has with a person,
+// continuing across channels (voice, SMS, chat, email) and over time. It is
+// named by an "AT_" id and optionally by keys an application attaches to find
+// it again, such as a phone number; a key resolves to at most one thread per
+// agent. A thread carries a subject, attributes, an idle TTL and the AgentDB
+// database that holds its state. Its service is cloud-protocol's AgentThreads.
+
 syntax = "proto3";
 
 package livekit.agent;
@@ -20,9 +27,6 @@ option go_package = "github.com/livekit/protocol/livekit/agent";
 
 import "logger/options.proto";
 
-// A thread is the durable conversation an agent has with a person across
-// channels. It is named by its "AT_" id and optionally by keys an application
-// attaches to find it again; a key resolves to at most one thread per agent.
 // Times are unix seconds.
 message AgentThread {
   message AgentKey {
