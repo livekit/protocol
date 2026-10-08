@@ -14,7 +14,7 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id; keys (such as a phone
-// number) find it again, at most one thread per key and agent. Holds a scope,
+// number) find it again, at most one thread per key in a project. Holds a scope,
 // attributes, an idle TTL and the AgentDB database with its state. Served by
 // cloud-protocol's AgentThreads.
 
@@ -29,17 +29,12 @@ import "google/protobuf/timestamp.proto";
 import "logger/options.proto";
 
 message AgentThread {
-  message AgentKey {
-    string agent_name = 1;
-    string key = 2;
-  }
-
   message CreateRequest {
-    string agent_name = 1;
-    // When set, create is get-or-create on (agent_name, key).
+    reserved 1;
+    // When set, create is get-or-create on key.
     string key = 2;
     // Groups threads, e.g. by user: an application-defined value, typically the
-    // user's identity. An AgentThreadGrant is scoped by it, across agents.
+    // user's identity. An AgentThreadGrant is scoped by it.
     string scope = 3 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
     // Unset takes the server default.
@@ -55,13 +50,13 @@ message AgentThread {
   message GetRequest {
     oneof lookup {
       string thread_id = 1 [(logger.name) = "threadID"];
-      AgentKey by_key = 2;
+      string key = 2;
     }
   }
 
-  // The threads of one scope under one agent, newest first.
+  // The threads of one scope, newest first.
   message ListRequest {
-    string agent_name = 1;
+    reserved 1;
     string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     // Cursor from the previous ListResponse; empty for the first page.
     string before = 3;
@@ -94,7 +89,7 @@ message AgentThread {
     string key = 2;
     // Unset keeps the key for the life of the thread.
     google.protobuf.Duration ttl = 3;
-    // Move the key here when another thread of the same agent holds it.
+    // Move the key here when another thread holds it.
     bool replace = 4;
   }
 
@@ -123,7 +118,7 @@ message AgentThread {
 
   message Thread {
     string thread_id = 1 [(logger.name) = "threadID"];
-    string agent_name = 2;
+    reserved 2;
     // Keys themselves are never returned.
     uint32 key_count = 3;
     string scope = 4 [(logger.sensitivity) = SENSITIVITY_PII];
