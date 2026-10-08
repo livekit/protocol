@@ -24,9 +24,10 @@ package livekit.agent;
 
 option go_package = "github.com/livekit/protocol/livekit/agent";
 
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 import "logger/options.proto";
 
-// Times are unix seconds.
 message AgentThread {
   message AgentKey {
     string agent_name = 1;
@@ -37,11 +38,12 @@ message AgentThread {
     string agent_name = 1;
     // When set, create is get-or-create on (agent_name, key).
     string key = 2;
-    // The subject the thread belongs to, as scoped by an AgentThreadGrant.
-    string sub = 3 [(logger.sensitivity) = SENSITIVITY_PII];
+    // Groups threads, e.g. by user: an application-defined value, typically the
+    // user's identity. An AgentThreadGrant is scoped by it.
+    string subject = 3 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
-    // 0 takes the server default.
-    int64 idle_ttl_seconds = 5;
+    // Unset takes the server default.
+    google.protobuf.Duration idle_ttl = 5;
   }
 
   message CreateResponse {
@@ -60,7 +62,7 @@ message AgentThread {
   // The threads of one subject under one agent, newest first.
   message ListRequest {
     string agent_name = 1;
-    string sub = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    string subject = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     // Cursor from the previous ListResponse; empty for the first page.
     string before = 3;
     int32 limit = 4;
@@ -76,7 +78,7 @@ message AgentThread {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Merged; an empty value deletes the entry.
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
-    optional int64 idle_ttl_seconds = 3;
+    google.protobuf.Duration idle_ttl = 3;
   }
 
   message TouchRequest {
@@ -84,14 +86,14 @@ message AgentThread {
   }
 
   message TouchResponse {
-    int64 expires_at = 1;
+    google.protobuf.Timestamp expires_at = 1;
   }
 
   message AddKeyRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     string key = 2;
-    // 0 keeps the key for the life of the thread.
-    int64 ttl_seconds = 3;
+    // Unset keeps the key for the life of the thread.
+    google.protobuf.Duration ttl = 3;
     // Move the key here when another thread of the same agent holds it.
     bool replace = 4;
   }
@@ -108,14 +110,15 @@ message AgentThread {
   message DeleteResponse {}
 
   // Creates the thread's database if it has none. Idempotent.
-  message EnsureStateDatabaseRequest {
+  message CreateThreadDatabaseRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
   }
 
-  // Marks a thread as merged into redirect_to.
-  message RedirectRequest {
+  // Marks thread_id as merged into another thread, after its items were copied
+  // there.
+  message MergeThreadRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    string redirect_to = 2 [(logger.name) = "redirectTo"];
+    string into = 2;
   }
 
   message Thread {
@@ -123,16 +126,18 @@ message AgentThread {
     string agent_name = 2;
     // Keys themselves are never returned.
     uint32 key_count = 3;
-    string sub = 4 [(logger.sensitivity) = SENSITIVITY_PII];
+    string subject = 4 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 5 [(logger.sensitivity) = SENSITIVITY_PII];
-    int64 created_at = 6;
-    int64 last_active = 7;
-    int64 expires_at = 8;
-    int64 idle_ttl_seconds = 9;
-    // "DB_..."; empty until the first write or EnsureStateDatabase.
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp last_active = 7;
+    // last_active + idle_ttl; every touch or send pushes it out. The thread is
+    // deleted once it passes.
+    google.protobuf.Timestamp expires_at = 8;
+    google.protobuf.Duration idle_ttl = 9;
+    // "DB_..."; empty until the first write or CreateThreadDatabase.
     string database_id = 10;
     // Set when merged into another thread; calls on it then fail with
     // FailedPrecondition.
-    string redirect_to = 11;
+    string merged_into = 11;
   }
 }

@@ -2111,7 +2111,7 @@ func (x *AgentHttp_StreamPreamble) GetThreadGrant() *AgentHttp_AgentThreadGrant 
 type AgentHttp_AgentThreadGrant struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Sub       string                 `protobuf:"bytes,2,opt,name=sub,proto3" json:"sub,omitempty"`
+	Subject   string                 `protobuf:"bytes,2,opt,name=subject,proto3" json:"subject,omitempty"`
 	ThreadIds []string               `protobuf:"bytes,3,rep,name=thread_ids,json=threadIds,proto3" json:"thread_ids,omitempty"`
 	List      bool                   `protobuf:"varint,4,opt,name=list,proto3" json:"list,omitempty"`
 	Create    bool                   `protobuf:"varint,5,opt,name=create,proto3" json:"create,omitempty"`
@@ -2161,9 +2161,9 @@ func (x *AgentHttp_AgentThreadGrant) GetAgentName() string {
 	return ""
 }
 
-func (x *AgentHttp_AgentThreadGrant) GetSub() string {
+func (x *AgentHttp_AgentThreadGrant) GetSubject() string {
 	if x != nil {
-		return x.Sub
+		return x.Subject
 	}
 	return ""
 }
@@ -2402,7 +2402,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x05token\x18\x03 \x01(\tR\x05tokenB\x06\n" +
 	"\x04_url\"1\n" +
 	"\x0eJobTermination\x12\x1f\n" +
-	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xa7\b\n" +
+	"\x06job_id\x18\x01 \x01(\tB\b\xbaP\x05jobIDR\x05jobId\"\xaf\b\n" +
 	"\tAgentHttp\x1a\x8f\x01\n" +
 	"\rAgentEndpoint\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x18\n" +
@@ -2425,11 +2425,11 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"clientAddr\x12\x16\n" +
 	"\x06scheme\x18\a \x01(\tR\x06scheme\x12(\n" +
 	"\tthread_id\x18\b \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12F\n" +
-	"\fthread_grant\x18\t \x01(\v2#.livekit.AgentHttp.AgentThreadGrantR\vthreadGrant\x1a\x88\x02\n" +
+	"\fthread_grant\x18\t \x01(\v2#.livekit.AgentHttp.AgentThreadGrantR\vthreadGrant\x1a\x90\x02\n" +
 	"\x10AgentThreadGrant\x12+\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tB\f\xbaP\tagentNameR\tagentName\x12\x10\n" +
-	"\x03sub\x18\x02 \x01(\tR\x03sub\x12+\n" +
+	"agent_name\x18\x01 \x01(\tB\f\xbaP\tagentNameR\tagentName\x12\x18\n" +
+	"\asubject\x18\x02 \x01(\tR\asubject\x12+\n" +
 	"\n" +
 	"thread_ids\x18\x03 \x03(\tB\f\xbaP\tthreadIDsR\tthreadIds\x12\x12\n" +
 	"\x04list\x18\x04 \x01(\bR\x04list\x12\x16\n" +

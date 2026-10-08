@@ -720,7 +720,7 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // endpoints the holder may call; empty allows all of them.
 type AgentThreadGrant struct {
 	AgentName string   `json:"agentName"`
-	Sub       string   `json:"sub,omitempty"`
+	Subject   string   `json:"subject,omitempty"`
 	ThreadIDs []string `json:"threadIds,omitempty"`
 	Endpoints []string `json:"endpoints,omitempty"`
 	List      bool     `json:"list,omitempty"`
@@ -731,12 +731,12 @@ type AgentThreadGrant struct {
 }
 
 // Covers reports whether a thread of agentName is in scope, by subject or by
-// id. An empty Sub or thread id never matches; the caller checks the flags.
-func (s *AgentThreadGrant) Covers(agentName, sub, threadID string) bool {
+// id. An empty Subject or thread id never matches; the caller checks the flags.
+func (s *AgentThreadGrant) Covers(agentName, subject, threadID string) bool {
 	if s == nil || s.AgentName == "" || s.AgentName != agentName {
 		return false
 	}
-	if s.Sub != "" && s.Sub == sub {
+	if s.Subject != "" && s.Subject == subject {
 		return true
 	}
 	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
@@ -775,7 +775,7 @@ func (s *AgentThreadGrant) ToProto() *livekit.AgentHttp_AgentThreadGrant {
 	}
 	return &livekit.AgentHttp_AgentThreadGrant{
 		AgentName: s.AgentName,
-		Sub:       s.Sub,
+		Subject:   s.Subject,
 		ThreadIds: append([]string{}, s.ThreadIDs...),
 		Endpoints: append([]string{}, s.Endpoints...),
 		List:      s.List,
@@ -792,7 +792,7 @@ func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddString("AgentName", s.AgentName)
-	e.AddString("Sub", s.Sub)
+	e.AddString("Subject", s.Subject)
 	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
 	zap.Strings("Endpoints", s.Endpoints).AddTo(e)
 	e.AddBool("List", s.List)
