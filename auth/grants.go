@@ -24,6 +24,7 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/livekit/protocol/livekit"
+	"github.com/livekit/protocol/livekit/agent"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/protojson"
@@ -728,16 +729,41 @@ type AgentThreadGrant struct {
 	Delete    bool     `json:"delete,omitempty"`
 }
 
-// Allows reports whether a thread is in the grant, by scope or by id. An empty
-// Scope or thread id never matches; the caller checks the flags.
-func (s *AgentThreadGrant) Allows(scope, threadID string) bool {
-	if s == nil {
+// CanCreate reports whether the holder may create threads. They are created in
+// the grant's scope, so a grant without one cannot create.
+func (s *AgentThreadGrant) CanCreate() bool {
+	return s != nil && s.Create && s.Scope != ""
+}
+
+// CanList reports whether the holder may list the threads of scope.
+func (s *AgentThreadGrant) CanList(scope string) bool {
+	return s != nil && s.List && s.Scope != "" && s.Scope == scope
+}
+
+// CanRead reports whether the holder may read thread.
+func (s *AgentThreadGrant) CanRead(thread *agent.AgentThread_Thread) bool {
+	return s != nil && s.Read && s.includes(thread)
+}
+
+// CanWrite reports whether the holder may send to thread.
+func (s *AgentThreadGrant) CanWrite(thread *agent.AgentThread_Thread) bool {
+	return s != nil && s.Write && s.includes(thread)
+}
+
+// CanDelete reports whether the holder may delete thread.
+func (s *AgentThreadGrant) CanDelete(thread *agent.AgentThread_Thread) bool {
+	return s != nil && s.Delete && s.includes(thread)
+}
+
+// includes reports whether thread is in the grant, by scope or by id.
+func (s *AgentThreadGrant) includes(thread *agent.AgentThread_Thread) bool {
+	if thread == nil {
 		return false
 	}
-	if s.Scope != "" && s.Scope == scope {
+	if s.Scope != "" && s.Scope == thread.Scope {
 		return true
 	}
-	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
+	return thread.ThreadId != "" && slices.Contains(s.ThreadIDs, thread.ThreadId)
 }
 
 func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
