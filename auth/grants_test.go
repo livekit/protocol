@@ -567,6 +567,17 @@ func TestAgentThreadGrantCovers(t *testing.T) {
 	}
 }
 
+func TestAgentThreadGrantAllowsEndpoint(t *testing.T) {
+	t.Parallel()
+
+	all := &AgentThreadGrant{AgentName: "a"}
+	chat := &AgentThreadGrant{AgentName: "a", Endpoints: []string{"chat"}}
+	require.True(t, all.AllowsEndpoint("voice"))
+	require.True(t, chat.AllowsEndpoint("chat"))
+	require.False(t, chat.AllowsEndpoint("voice"))
+	require.False(t, (*AgentThreadGrant)(nil).AllowsEndpoint("chat"))
+}
+
 func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	t.Parallel()
 

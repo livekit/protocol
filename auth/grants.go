@@ -716,11 +716,13 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 // ------------------------------------------------------------------
 
 // AgentThreadGrant scopes a token to one agent's threads, selected by subject
-// or by id, with per-action flags.
+// or by id, with per-action flags. Endpoints limits which of the agent's
+// endpoints the holder may call; empty allows all of them.
 type AgentThreadGrant struct {
 	AgentName string   `json:"agentName"`
 	Sub       string   `json:"sub,omitempty"`
 	ThreadIDs []string `json:"threadIds,omitempty"`
+	Endpoints []string `json:"endpoints,omitempty"`
 	List      bool     `json:"list,omitempty"`
 	Create    bool     `json:"create,omitempty"`
 	Send      bool     `json:"send,omitempty"`
@@ -740,6 +742,15 @@ func (s *AgentThreadGrant) Covers(agentName, sub, threadID string) bool {
 	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
 }
 
+// AllowsEndpoint reports whether the holder may call endpoint of the grant's
+// agent.
+func (s *AgentThreadGrant) AllowsEndpoint(endpoint string) bool {
+	if s == nil {
+		return false
+	}
+	return len(s.Endpoints) == 0 || slices.Contains(s.Endpoints, endpoint)
+}
+
 func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
 	if s == nil {
 		return nil
@@ -748,6 +759,9 @@ func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
 	clone := *s
 	if len(s.ThreadIDs) > 0 {
 		clone.ThreadIDs = append([]string{}, s.ThreadIDs...)
+	}
+	if len(s.Endpoints) > 0 {
+		clone.Endpoints = append([]string{}, s.Endpoints...)
 	}
 
 	return &clone
@@ -761,6 +775,7 @@ func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddString("AgentName", s.AgentName)
 	e.AddString("Sub", s.Sub)
 	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
+	zap.Strings("Endpoints", s.Endpoints).AddTo(e)
 	e.AddBool("List", s.List)
 	e.AddBool("Create", s.Create)
 	e.AddBool("Send", s.Send)
