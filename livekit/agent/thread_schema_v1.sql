@@ -34,8 +34,7 @@ CREATE TABLE tasks (
   seq            INTEGER NOT NULL,
   name           TEXT,            -- the AgentTask class
   message_id     TEXT,            -- the A2A messageId that created it, for idempotency
-  attempts       INTEGER NOT NULL DEFAULT 0,  -- pickups, a second one means the worker was lost
-  status         TEXT NOT NULL,   -- A2A TaskState
+  status         TEXT NOT NULL,   -- A2A TaskState, working when a new run finds it means its worker was lost
   status_message JSONB,           -- A2A Message
   updated_at     INTEGER NOT NULL,
   data           JSONB NOT NULL,  -- A2A Task fields: history, artifacts, metadata
