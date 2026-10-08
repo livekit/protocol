@@ -324,7 +324,7 @@ type SimulationRun struct {
 	// The pipeline this run came from; unset when it did not come from one.
 	Ci *SimulationRun_CI `protobuf:"bytes,22,opt,name=ci,proto3,oneof" json:"ci,omitempty"`
 	// Absent when the run ran each scenario once and required it to pass.
-	Sampling      *SimulationRun_Sampling `protobuf:"bytes,23,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
+	Sampling      *SimulationRun_SamplingOptions `protobuf:"bytes,23,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -506,7 +506,7 @@ func (x *SimulationRun) GetCi() *SimulationRun_CI {
 	return nil
 }
 
-func (x *SimulationRun) GetSampling() *SimulationRun_Sampling {
+func (x *SimulationRun) GetSampling() *SimulationRun_SamplingOptions {
 	if x != nil {
 		return x.Sampling
 	}
@@ -1316,7 +1316,7 @@ func (x *SimulationRun_CI) GetActor() string {
 
 // Runs each scenario more than once, so a flaky sample is distinguishable
 // from a broken scenario. Both fields are required when it is present.
-type SimulationRun_Sampling struct {
+type SimulationRun_SamplingOptions struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Samples per scenario, > 1. The run holds scenarios × samples jobs,
 	// subject to the usual job cap.
@@ -1329,20 +1329,20 @@ type SimulationRun_Sampling struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SimulationRun_Sampling) Reset() {
-	*x = SimulationRun_Sampling{}
+func (x *SimulationRun_SamplingOptions) Reset() {
+	*x = SimulationRun_SamplingOptions{}
 	mi := &file_livekit_agent_simulation_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SimulationRun_Sampling) String() string {
+func (x *SimulationRun_SamplingOptions) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SimulationRun_Sampling) ProtoMessage() {}
+func (*SimulationRun_SamplingOptions) ProtoMessage() {}
 
-func (x *SimulationRun_Sampling) ProtoReflect() protoreflect.Message {
+func (x *SimulationRun_SamplingOptions) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_simulation_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1354,19 +1354,19 @@ func (x *SimulationRun_Sampling) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SimulationRun_Sampling.ProtoReflect.Descriptor instead.
-func (*SimulationRun_Sampling) Descriptor() ([]byte, []int) {
+// Deprecated: Use SimulationRun_SamplingOptions.ProtoReflect.Descriptor instead.
+func (*SimulationRun_SamplingOptions) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 4}
 }
 
-func (x *SimulationRun_Sampling) GetSamples() int32 {
+func (x *SimulationRun_SamplingOptions) GetSamples() int32 {
 	if x != nil {
 		return x.Samples
 	}
 	return 0
 }
 
-func (x *SimulationRun_Sampling) GetPassRate() float64 {
+func (x *SimulationRun_SamplingOptions) GetPassRate() float64 {
 	if x != nil {
 		return x.PassRate
 	}
@@ -2379,7 +2379,7 @@ type SimulationRun_Create_Request struct {
 	// Absent runs each scenario once and requires it to pass. Requires
 	// scenario_group. The run fails if any scenario fails; pass@k and
 	// pass^k report over scenarios and neither gates.
-	Sampling      *SimulationRun_Sampling `protobuf:"bytes,14,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
+	Sampling      *SimulationRun_SamplingOptions `protobuf:"bytes,14,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2491,7 +2491,7 @@ func (x *SimulationRun_Create_Request) GetCi() *SimulationRun_CI {
 	return nil
 }
 
-func (x *SimulationRun_Create_Request) GetSampling() *SimulationRun_Sampling {
+func (x *SimulationRun_Create_Request) GetSampling() *SimulationRun_SamplingOptions {
 	if x != nil {
 		return x.Sampling
 	}
@@ -3340,7 +3340,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x9fN\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xb4N\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3367,8 +3367,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\fsummary_zstd\x18\x14 \x01(\fR\vsummaryZstd\x12$\n" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
-	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12@\n" +
-	"\bsampling\x18\x17 \x01(\v2\x1f.livekit.SimulationRun.SamplingH\x02R\bsampling\x88\x01\x01\x1a\x8f\x06\n" +
+	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12G\n" +
+	"\bsampling\x18\x17 \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x02R\bsampling\x88\x01\x01\x1a\x8f\x06\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3588,11 +3588,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x03ref\x18\x03 \x01(\tR\x03ref\x12!\n" +
 	"\fpull_request\x18\x04 \x01(\tR\vpullRequest\x12\x17\n" +
 	"\arun_url\x18\x05 \x01(\tR\x06runUrl\x12\x14\n" +
-	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aA\n" +
-	"\bSampling\x12\x18\n" +
+	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
+	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xfd\x05\n" +
-	"\x06Create\x1a\xe4\x04\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x84\x06\n" +
+	"\x06Create\x1a\xeb\x04\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3608,8 +3608,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x16low_quality_microphone\x18\v \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
-	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12@\n" +
-	"\bsampling\x18\x0e \x01(\v2\x1f.livekit.SimulationRun.SamplingH\x03R\bsampling\x88\x01\x01B\x11\n" +
+	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12G\n" +
+	"\bsampling\x18\x0e \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x03R\bsampling\x88\x01\x01B\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
@@ -3764,7 +3764,7 @@ var file_livekit_agent_simulation_proto_goTypes = []any{
 	(*SimulationRun_JobMetrics)(nil),                   // 11: livekit.SimulationRun.JobMetrics
 	(*SimulationRun_RunMetrics)(nil),                   // 12: livekit.SimulationRun.RunMetrics
 	(*SimulationRun_CI)(nil),                           // 13: livekit.SimulationRun.CI
-	(*SimulationRun_Sampling)(nil),                     // 14: livekit.SimulationRun.Sampling
+	(*SimulationRun_SamplingOptions)(nil),              // 14: livekit.SimulationRun.SamplingOptions
 	(*SimulationRun_Create)(nil),                       // 15: livekit.SimulationRun.Create
 	(*SimulationRun_ConfirmSourceUpload)(nil),          // 16: livekit.SimulationRun.ConfirmSourceUpload
 	(*SimulationRun_Get)(nil),                          // 17: livekit.SimulationRun.Get
@@ -3814,7 +3814,7 @@ var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	0,  // 8: livekit.SimulationRun.mode:type_name -> livekit.SimulationMode
 	12, // 9: livekit.SimulationRun.metrics:type_name -> livekit.SimulationRun.RunMetrics
 	13, // 10: livekit.SimulationRun.ci:type_name -> livekit.SimulationRun.CI
-	14, // 11: livekit.SimulationRun.sampling:type_name -> livekit.SimulationRun.Sampling
+	14, // 11: livekit.SimulationRun.sampling:type_name -> livekit.SimulationRun.SamplingOptions
 	42, // 12: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
 	5,  // 13: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
 	5,  // 14: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
@@ -3839,7 +3839,7 @@ var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	6,  // 33: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
 	0,  // 34: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
 	13, // 35: livekit.SimulationRun.Create.Request.ci:type_name -> livekit.SimulationRun.CI
-	14, // 36: livekit.SimulationRun.Create.Request.sampling:type_name -> livekit.SimulationRun.Sampling
+	14, // 36: livekit.SimulationRun.Create.Request.sampling:type_name -> livekit.SimulationRun.SamplingOptions
 	48, // 37: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
 	4,  // 38: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
 	1,  // 39: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status

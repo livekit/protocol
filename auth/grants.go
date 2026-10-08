@@ -168,6 +168,7 @@ type ClaimGrants struct {
 	Agent         *AgentGrant         `json:"agent,omitempty"`
 	Inference     *InferenceGrant     `json:"inference,omitempty"`
 	Observability *ObservabilityGrant `json:"observability,omitempty"`
+	AgentEndpoint *AgentEndpointGrant `json:"agentEndpoint,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -214,6 +215,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Agent = c.Agent.Clone()
 	clone.Inference = c.Inference.Clone()
 	clone.Observability = c.Observability.Clone()
+	clone.AgentEndpoint = c.AgentEndpoint.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -236,6 +238,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Agent", c.Agent)
 	e.AddObject("Inference", c.Inference)
 	e.AddObject("Observability", c.Observability)
+	e.AddObject("AgentEndpoint", c.AgentEndpoint)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -445,14 +448,14 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 	return &livekit.ParticipantPermission{
-		CanPublish:          v.GetCanPublish(),
-		CanPublishData:      v.GetCanPublishData(),
-		CanSubscribe:        v.GetCanSubscribe(),
-		CanPublishSources:   v.GetCanPublishSources(),
-		CanUpdateMetadata:   v.GetCanUpdateOwnMetadata(),
-		Hidden:              v.Hidden,
-		Recorder:            v.Recorder,
-		Agent:               v.Agent,
+		CanPublish:            v.GetCanPublish(),
+		CanPublishData:        v.GetCanPublishData(),
+		CanSubscribe:          v.GetCanSubscribe(),
+		CanPublishSources:     v.GetCanPublishSources(),
+		CanUpdateMetadata:     v.GetCanUpdateOwnMetadata(),
+		Hidden:                v.Hidden,
+		Recorder:              v.Recorder,
+		Agent:                 v.Agent,
 		CanSubscribeMetrics:   v.GetCanSubscribeMetrics(),
 		CanManageAgentSession: v.GetCanManageAgentSession(),
 	}
@@ -658,6 +661,52 @@ func (s *ObservabilityGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddBool("Write", s.Write)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+type AgentEndpointGrant struct {
+	// Call grants to invoke an agent's non-public HTTP endpoints.
+	Call bool `json:"call,omitempty"`
+	// AgentName restricts the grant to one agent; empty grants every agent in the project.
+	AgentName string `json:"agentName,omitempty"`
+	// Deployment restricts the grant to one deployment; empty grants every
+	// deployment. A worker registered without one is addressed as "default".
+	Deployment string `json:"deployment,omitempty"`
+}
+
+// Allows reports whether the grant authorizes calling non-public endpoints of
+// (agentName, deployment). Matching is exact and case-sensitive; an empty scope
+// field matches any value.
+func (s *AgentEndpointGrant) Allows(agentName, deployment string) bool {
+	if s == nil || !s.Call {
+		return false
+	}
+	if s.AgentName != "" && s.AgentName != agentName {
+		return false
+	}
+	return s.Deployment == "" || s.Deployment == deployment
+}
+
+func (s *AgentEndpointGrant) Clone() *AgentEndpointGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+
+	return &clone
+}
+
+func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Call", s.Call)
+	e.AddString("AgentName", s.AgentName)
+	e.AddString("Deployment", s.Deployment)
 	return nil
 }
 
