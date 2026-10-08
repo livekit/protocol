@@ -71,23 +71,23 @@ message AgentThread {
 
   message DeleteResponse {}
 
-  // The conversation, oldest first.
-  message HistoryRequest {
+  // The thread's chat items, oldest first.
+  message GetItemsRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // One agent's history; empty for every agent's.
+    // One agent's items; empty for every agent's.
     string agent = 2;
-    // Cursor from the previous HistoryResponse; empty for the first page.
+    // Cursor from the previous GetItemsResponse; empty for the first page.
     string after = 3;
     int32 limit = 4;
   }
 
-  message HistoryResponse {
+  message GetItemsResponse {
     repeated Item items = 1;
     // Empty at the end.
     string after = 2;
   }
 
-  // One chat item of an agent's history. Stored as the JSON of
+  // One chat item of an agent. Stored as the JSON of
   // ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
   message Item {
     string agent = 1;
@@ -124,16 +124,16 @@ message AgentTask {
   }
 
   // A thread's tasks, oldest first.
-  message ListRequest {
+  message GetTasksRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Unset for every status.
     optional Status status = 2;
-    // Cursor from the previous ListResponse; empty for the first page.
+    // Cursor from the previous GetTasksResponse; empty for the first page.
     string after = 3;
     int32 limit = 4;
   }
 
-  message ListResponse {
+  message GetTasksResponse {
     repeated Task tasks = 1;
     // Empty at the end.
     string after = 2;

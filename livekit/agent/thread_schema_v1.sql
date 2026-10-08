@@ -1,7 +1,7 @@
 -- Tables inside a thread's database. The agents framework creates and writes
 -- them (lk-agents-storage, statements/sql.rs). The platform reads items and
--- tasks (agent-db's threads service: AgentThreads.GetThreadHistory and
--- ListThreadTasks). An agent is a registered agent taking part in the thread,
+-- tasks (agent-db's threads service: AgentThreads.GetThreadItems and
+-- GetThreadTasks). An agent is a registered agent taking part in the thread,
 -- across every channel. Two agents in one thread, through a delegation, write
 -- separate rows.
 
@@ -11,7 +11,7 @@ CREATE TABLE schema_version (
 );
 
 -- One chat item per row, in each agent's order. Used by: the framework, as
--- the model's history, and GetThreadHistory.
+-- the model's history, and GetThreadItems.
 CREATE TABLE items (
   id         TEXT PRIMARY KEY,
   agent      TEXT NOT NULL,
@@ -26,7 +26,7 @@ CREATE UNIQUE INDEX items_agent_message ON items (agent, message_id) WHERE messa
 -- AgentTask (name set). Used by: the framework's A2A methods (message/send,
 -- message/stream, tasks/get, tasks/list, tasks/cancel), which rebuild the A2A
 -- Task as id = task_id, contextId = the thread id, status = (status,
--- status_message, updated_at), plus the fields of data. And ListThreadTasks,
+-- status_message, updated_at), plus the fields of data. And GetThreadTasks,
 -- for the rows with a name.
 CREATE TABLE tasks (
   task_id        TEXT PRIMARY KEY,
