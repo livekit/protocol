@@ -36,7 +36,7 @@ func TestGrants(t *testing.T) {
 		require.Same(t, grants.Inference, clone.Inference)
 		require.Same(t, grants.SIP, clone.SIP)
 		require.Same(t, grants.AgentEndpoint, clone.AgentEndpoint)
-		require.Same(t, grants.AgentSession, clone.AgentSession)
+		require.Same(t, grants.AgentThread, clone.AgentThread)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
 	})
@@ -66,9 +66,9 @@ func TestGrants(t *testing.T) {
 		// require AgentEndpoint
 		require.Same(t, grants.AgentEndpoint, clone.AgentEndpoint)
 		require.True(t, reflect.DeepEqual(grants.AgentEndpoint, clone.AgentEndpoint))
-		// require AgentSession
-		require.Same(t, grants.AgentSession, clone.AgentSession)
-		require.True(t, reflect.DeepEqual(grants.AgentSession, clone.AgentSession))
+		// require AgentThread
+		require.Same(t, grants.AgentThread, clone.AgentThread)
+		require.True(t, reflect.DeepEqual(grants.AgentThread, clone.AgentThread))
 	})
 
 	t.Run("clone with video", func(t *testing.T) {
@@ -529,27 +529,27 @@ func TestAgentEndpointGrantCloneIndependent(t *testing.T) {
 	require.Equal(t, "a", grants.AgentEndpoint.AgentName)
 }
 
-func TestAgentSessionGrantCovers(t *testing.T) {
+func TestAgentThreadGrantCovers(t *testing.T) {
 	t.Parallel()
 
-	bySub := &AgentSessionGrant{AgentName: "a", Sub: "u1"}
-	byID := &AgentSessionGrant{AgentName: "a", SessionIDs: []string{"AT_1", "AT_2"}}
-	both := &AgentSessionGrant{AgentName: "a", Sub: "u1", SessionIDs: []string{"AT_1"}}
+	bySub := &AgentThreadGrant{AgentName: "a", Sub: "u1"}
+	byID := &AgentThreadGrant{AgentName: "a", ThreadIDs: []string{"AT_1", "AT_2"}}
+	both := &AgentThreadGrant{AgentName: "a", Sub: "u1", ThreadIDs: []string{"AT_1"}}
 
 	cases := []struct {
 		name      string
-		grant     *AgentSessionGrant
+		grant     *AgentThreadGrant
 		agentName string
 		sub       string
-		sessionID string
+		threadID  string
 		want      bool
 	}{
 		{"nil grant", nil, "a", "u1", "AT_1", false},
-		{"no agent", &AgentSessionGrant{Sub: "u1"}, "", "u1", "AT_1", false},
-		{"neither sub nor ids", &AgentSessionGrant{AgentName: "a"}, "a", "", "AT_1", false},
+		{"no agent", &AgentThreadGrant{Sub: "u1"}, "", "u1", "AT_1", false},
+		{"neither sub nor ids", &AgentThreadGrant{AgentName: "a"}, "a", "", "AT_1", false},
 		{"sub match", bySub, "a", "u1", "AT_9", true},
 		{"sub mismatch", bySub, "a", "u2", "AT_9", false},
-		{"sub empty on session", bySub, "a", "", "AT_9", false},
+		{"sub empty on thread", bySub, "a", "", "AT_9", false},
 		{"agent mismatch", bySub, "b", "u1", "AT_9", false},
 		{"agent case differs", bySub, "A", "u1", "AT_9", false},
 		{"id listed", byID, "a", "u2", "AT_2", true},
@@ -562,22 +562,22 @@ func TestAgentSessionGrantCovers(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			require.Equal(t, c.want, c.grant.Covers(c.agentName, c.sub, c.sessionID))
+			require.Equal(t, c.want, c.grant.Covers(c.agentName, c.sub, c.threadID))
 		})
 	}
 }
 
-func TestAgentSessionGrantCloneIndependent(t *testing.T) {
+func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	t.Parallel()
 
-	grants := &ClaimGrants{AgentSession: &AgentSessionGrant{AgentName: "a", Sub: "u1", SessionIDs: []string{"AT_1"}, Send: true}}
+	grants := &ClaimGrants{AgentThread: &AgentThreadGrant{AgentName: "a", Sub: "u1", ThreadIDs: []string{"AT_1"}, Send: true}}
 	clone := grants.Clone()
-	require.NotSame(t, grants.AgentSession, clone.AgentSession)
-	require.True(t, reflect.DeepEqual(grants.AgentSession, clone.AgentSession))
+	require.NotSame(t, grants.AgentThread, clone.AgentThread)
+	require.True(t, reflect.DeepEqual(grants.AgentThread, clone.AgentThread))
 
-	clone.AgentSession.Send = false
-	clone.AgentSession.SessionIDs[0] = "AT_2"
-	clone.AgentSession.SessionIDs = append(clone.AgentSession.SessionIDs, "AT_3")
-	require.True(t, grants.AgentSession.Send)
-	require.Equal(t, []string{"AT_1"}, grants.AgentSession.SessionIDs)
+	clone.AgentThread.Send = false
+	clone.AgentThread.ThreadIDs[0] = "AT_2"
+	clone.AgentThread.ThreadIDs = append(clone.AgentThread.ThreadIDs, "AT_3")
+	require.True(t, grants.AgentThread.Send)
+	require.Equal(t, []string{"AT_1"}, grants.AgentThread.ThreadIDs)
 }

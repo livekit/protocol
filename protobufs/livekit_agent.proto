@@ -36,9 +36,9 @@ message Job {
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
   bool enable_redaction = 13;
-  // the agent session ("AT_...") this job's conversation belongs to, created
+  // the agent thread ("AT_...") this job's conversation belongs to, created
   // by dispatch before the job is assigned. Empty when dispatch created none.
-  string session_id = 14 [(logger.name) = "sessionID"];
+  string thread_id = 14 [(logger.name) = "threadID"];
 }
 
 message JobState {
@@ -68,8 +68,8 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
-    // worker reports that it holds, or has released, an agent session
-    UpdateSessionStatus update_session = 8;
+    // worker reports that it holds, or has released, an agent thread
+    UpdateThreadStatus update_thread = 8;
   };
 }
 
@@ -187,26 +187,26 @@ message UpdateJobStatus {
   string error = 3;
 }
 
-enum SessionStatus {
-  // the worker opened the session: the server binds (agent, session_id) to
-  // this worker and routes the session's requests to it
-  SS_ACTIVE = 0;
-  // the worker evicted the session with no run in flight, no background task
+enum ThreadStatus {
+  // the worker opened the thread: the server binds (agent, thread_id) to
+  // this worker and routes the thread's requests to it
+  TS_ACTIVE = 0;
+  // the worker evicted the thread with no run in flight, no background task
   // running and everything persisted: the server unbinds, and the next
   // request picks a worker afresh. Final for this worker: it never reopens
-  // a released session.
-  SS_RELEASED = 1;
+  // a released thread.
+  TS_RELEASED = 1;
 }
 
-// The worker tells the server which agent sessions it holds, so requests for
-// a session reach the worker that has it loaded. There is no reply: the
+// The worker tells the server which agent threads it holds, so requests for
+// a thread reach the worker that has it loaded. There is no reply: the
 // server applies updates per worker in seq order, and a control stream that
 // drops before a release arrives drops every binding of the worker anyway.
-message UpdateSessionStatus {
-  string session_id = 1 [(logger.name) = "sessionID"];
-  SessionStatus status = 2;
+message UpdateThreadStatus {
+  string thread_id = 1 [(logger.name) = "threadID"];
+  ThreadStatus status = 2;
   // monotonic per worker across its connections. Updates may arrive out of
-  // order; a late SS_ACTIVE never resurrects an SS_RELEASED binding.
+  // order; a late TS_ACTIVE never resurrects a TS_RELEASED binding.
   uint64 seq = 3;
 }
 
@@ -325,34 +325,34 @@ message AgentHttp {
     string client_addr = 6 [(logger.sensitivity) = SENSITIVITY_PII];
     // "http" or "https" as the end client saw it; not derivable worker-side
     string scheme = 7;
-    // the agent session ("AT_...") this request belongs to, resolved by the
+    // the agent thread ("AT_...") this request belongs to, resolved by the
     // node from the request's id or key, or created for a first message.
     // Empty when the node resolved none; the worker then resolves it from the
     // body itself.
-    string session_id = 8 [(logger.name) = "sessionID"];
-    // the agent session grant the caller's token carried, set by the node from
-    // the verified token's agentSession claim. Absent when the token carried
+    string thread_id = 8 [(logger.name) = "threadID"];
+    // the agent thread grant the caller's token carried, set by the node from
+    // the verified token's agentThread claim. Absent when the token carried
     // none or the route was reached without a LiveKit token. The token itself
     // never reaches the worker; the worker trusts this field the way it trusts
-    // authorized, and enforces it (agent name, subject, session ids, flags)
-    // against the session the request addresses.
-    AgentSessionGrant session_grant = 9;
+    // authorized, and enforces it (agent name, subject, thread ids, flags)
+    // against the thread the request addresses.
+    AgentThreadGrant thread_grant = 9;
     // NEXT_ID: 10
   }
 
-  // the verified agentSession claim of a LiveKit token, mirroring
-  // auth.AgentSessionGrant. It scopes the holder to the sessions of one agent,
+  // the verified agentThread claim of a LiveKit token, mirroring
+  // auth.AgentThreadGrant. It scopes the holder to the threads of one agent,
   // selected by subject or by id, with per-action flags.
-  message AgentSessionGrant {
-    // required: sessions, keys and subjects are scoped per agent
+  message AgentThreadGrant {
+    // required: threads, keys and subjects are scoped per agent
     string agent_name = 1 [(logger.name) = "agentName"];
-    // the subject whose sessions the holder may see and create
+    // the subject whose threads the holder may see and create
     string sub = 2;
-    // restricts the grant to these sessions instead. One of sub and
-    // session_ids is required; a grant with neither covers no session.
-    repeated string session_ids = 3 [(logger.name) = "sessionIDs"];
+    // restricts the grant to these threads instead. One of sub and
+    // thread_ids is required; a grant with neither covers no thread.
+    repeated string thread_ids = 3 [(logger.name) = "threadIDs"];
     bool list = 4;
-    // a first message may create a session, with sub as its subject
+    // a first message may create a thread, with sub as its subject
     bool create = 5;
     // message/send, message/stream and tasks/cancel
     bool send = 6;

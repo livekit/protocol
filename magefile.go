@@ -60,7 +60,6 @@ func Proto() error {
 	twirpProtoFiles := []string{
 		"cloud_replay.proto",
 		"livekit_agent_dispatch.proto",
-		"livekit_agentdb.proto",
 		"livekit_egress.proto",
 		"livekit_ingress.proto",
 		"livekit_room.proto",
@@ -78,16 +77,12 @@ func Proto() error {
 		"agent/livekit_agent_session.proto",
 		"agent/livekit_agent_dev.proto",
 		"agent/livekit_agent_inference.proto",
-	}
-	// protoc-gen-twirp requires every file of one invocation to share a
-	// go_package, so services in livekit/agent are generated apart from the
-	// ones in livekit.
-	agentTwirpProtoFiles := []string{
-		"agent/livekit_agent_session_registry.proto",
+		"agent/livekit_agent_thread.proto",
 	}
 
 	protoFiles := []string{
 		"livekit_agent.proto",
+		"livekit_agentdb.proto",
 		"livekit_analytics.proto",
 		"livekit_internal.proto",
 		"livekit_models.proto",
@@ -185,25 +180,6 @@ func Proto() error {
 			"-I=./protobufs",
 		}
 		args = append(args, agentProtoFiles...)
-		cmd := exec.Command(protoc, args...)
-		connectStd(cmd)
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-	}
-
-	fmt.Println("generating twirp protobuf (livekit/agent)")
-	{
-		args := []string{
-			"--go_out", target,
-			"--twirp_out", target,
-			"--go_opt=paths=source_relative",
-			"--twirp_opt=paths=source_relative",
-			"--plugin=protoc-gen-go=" + protocGoPath,
-			"--plugin=protoc-gen-twirp=" + twirpPath,
-			"-I=./protobufs",
-		}
-		args = append(args, agentTwirpProtoFiles...)
 		cmd := exec.Command(protoc, args...)
 		connectStd(cmd)
 		if err := cmd.Run(); err != nil {

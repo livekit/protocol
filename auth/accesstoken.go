@@ -114,8 +114,8 @@ func (t *AccessToken) SetAgentEndpointGrant(grant *AgentEndpointGrant) *AccessTo
 	return t
 }
 
-func (t *AccessToken) SetAgentSessionGrant(grant *AgentSessionGrant) *AccessToken {
-	t.grant.AgentSession = grant
+func (t *AccessToken) SetAgentThreadGrant(grant *AgentThreadGrant) *AccessToken {
+	t.grant.AgentThread = grant
 	return t
 }
 

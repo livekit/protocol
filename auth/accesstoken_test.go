@@ -245,28 +245,28 @@ func TestAgentEndpointGrantRoundTrip(t *testing.T) {
 	require.Equal(t, grant, decoded.AgentEndpoint)
 }
 
-func TestAgentSessionGrantRoundTrip(t *testing.T) {
+func TestAgentThreadGrantRoundTrip(t *testing.T) {
 	t.Parallel()
 
 	apiKey, secret := apiKeypair()
-	grant := &AgentSessionGrant{AgentName: "my-agent", Sub: "user-1", SessionIDs: []string{"AT_1"}, Read: true, Send: true}
+	grant := &AgentThreadGrant{AgentName: "my-agent", Sub: "user-1", ThreadIDs: []string{"AT_1"}, Read: true, Send: true}
 	raw, err := NewAccessToken(apiKey, secret).
-		SetAgentSessionGrant(grant).
+		SetAgentThreadGrant(grant).
 		SetValidFor(time.Minute).
 		ToJWT()
 	require.NoError(t, err)
 
 	// the claim keys are camelCase
 	claims := decodeClaims(t, raw)
-	require.Contains(t, claims, `"agentSession"`)
+	require.Contains(t, claims, `"agentThread"`)
 	require.Contains(t, claims, `"agentName"`)
-	require.Contains(t, claims, `"sessionIds"`)
+	require.Contains(t, claims, `"threadIds"`)
 
 	v, err := ParseAPIToken(raw)
 	require.NoError(t, err)
 	_, decoded, err := v.Verify(secret)
 	require.NoError(t, err)
-	require.Equal(t, grant, decoded.AgentSession)
+	require.Equal(t, grant, decoded.AgentThread)
 }
 
 func decodeClaims(t *testing.T, raw string) string {

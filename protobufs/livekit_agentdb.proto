@@ -21,23 +21,19 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
-// AgentDBService is the lifecycle and export API for SQLite databases; queries
-// run over the data plane below. The project comes from the access token.
-service AgentDBService {
-  rpc CreateDatabase(AgentDB.CreateRequest) returns (AgentDB.CreateResponse);
-  rpc GetDatabase(AgentDB.GetRequest) returns (AgentDB.AgentDatabase);
-  rpc ListDatabases(AgentDB.ListRequest) returns (AgentDB.ListResponse);
-  // Deletes the stored data, not just the metadata.
-  rpc DeleteDatabase(AgentDB.DeleteRequest) returns (AgentDB.DeleteResponse);
-  // Exports a consistent SQLite file as a time-limited download URL.
-  rpc DumpDatabase(AgentDB.DumpRequest) returns (AgentDB.DumpResponse);
-}
+// AgentDB messages: the lifecycle and export of SQLite databases, whose queries
+// run over the data plane below. The project comes from the access token, and a
+// database lives in the project's data region. The service over the lifecycle
+// messages is internal gRPC (cloud-protocol AgentDB); the public API is
+// public-api-server's DatabaseService.
 
 // Nested so that names like Value and Ping need not be unique across the
 // livekit package. `tip` throughout is the latest durable commit sequence.
 message AgentDB {
   message CreateRequest {
-    string region = 1;
+    // The project's data region decides where a database lives.
+    reserved 1;
+    reserved "region";
     // Unset: never expires, and expires_at is then 0 everywhere.
     // Otherwise clamped to the server cap, and never extended.
     int64 ttl_seconds = 2;
@@ -65,6 +61,7 @@ message AgentDB {
   // One database, as get and list both report it.
   message AgentDatabase {
     string database_id = 1;
+    // The data region the database lives in, the project's at creation.
     string region = 2;
     int64 created_at = 3;
     int64 expires_at = 4;
