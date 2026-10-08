@@ -13,10 +13,10 @@
 // limitations under the License.
 
 // AgentThread: the durable conversation between an agent and a person, across
-// channels and over time. Identified by an "AT_" id; keys (such as a phone
-// number) find it again, at most one thread per key in a project. Holds a scope,
-// attributes, an idle TTL and the AgentDB database with its state. Served by
-// cloud-protocol's AgentThreads.
+// channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
+// an idle TTL and the AgentDB database created with it. An internal key (a
+// LiveKit phone number) can find it again. Served by cloud-protocol's
+// AgentThreads.
 
 syntax = "proto3";
 
