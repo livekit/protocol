@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// AgentDB gives each agent its own SQLite databases. A database lives in its
-// project's data region, on object storage with a replicated hot tier for
-// recent commits, and has one writer at a time. Queries and transactions run
-// over the WebSocket data plane (AgentDB.Wire); creating, listing, deleting and
-// exporting databases go through cloud-protocol's AgentDB gRPC service.
+// AgentDB: per-agent SQLite databases. Each lives in its project's data region
+// on object storage, with one writer at a time. Queries run over the WebSocket
+// data plane (AgentDB.Wire); lifecycle is cloud-protocol's AgentDB service.
 
 syntax = "proto3";
 
