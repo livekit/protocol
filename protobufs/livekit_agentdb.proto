@@ -31,12 +31,9 @@ import "google/protobuf/timestamp.proto";
 // livekit package. `tip` throughout is the latest durable commit sequence.
 message AgentDB {
   message CreateRequest {
-    // A database lives in its project's data region.
-    reserved 1;
-    reserved "region";
     // Unset: never expires, and expires_at is then unset everywhere.
     // Otherwise clamped to the server cap, and never extended.
-    google.protobuf.Duration ttl = 2;
+    google.protobuf.Duration ttl = 1;
   }
 
   message CreateResponse {

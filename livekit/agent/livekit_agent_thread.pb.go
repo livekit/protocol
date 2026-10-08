@@ -84,13 +84,13 @@ type AgentThread_CreateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Internal: when set, create is get-or-create on key (e.g. a LiveKit phone
 	// number). Not exposed by the public API.
-	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	// Groups threads, e.g. by user: an application-defined value, typically the
 	// user's identity. An AgentThreadGrant is scoped by it.
-	Scope      string            `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"`
-	Attributes map[string]string `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Scope      string            `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
+	Attributes map[string]string `protobuf:"bytes,3,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Unset takes the server default.
-	IdleTtl       *durationpb.Duration `protobuf:"bytes,5,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
+	IdleTtl       *durationpb.Duration `protobuf:"bytes,4,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -291,10 +291,10 @@ func (*AgentThread_GetRequest_Key) isAgentThread_GetRequest_Lookup() {}
 // The threads of one scope, newest first.
 type AgentThread_ListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Scope string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
+	Scope string                 `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
 	// Cursor from the previous ListResponse; empty for the first page.
-	Before        string `protobuf:"bytes,3,opt,name=before,proto3" json:"before,omitempty"`
-	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	Before        string `protobuf:"bytes,2,opt,name=before,proto3" json:"before,omitempty"`
+	Limit         int32  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -548,17 +548,17 @@ type AgentThread_Thread struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	// Internal: the key the thread was created with, if any.
-	Key        string                 `protobuf:"bytes,3,opt,name=key,proto3" json:"key,omitempty"`
-	Scope      string                 `protobuf:"bytes,4,opt,name=scope,proto3" json:"scope,omitempty"`
-	Attributes map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	LastActive *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
+	Key        string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	Scope      string                 `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"`
+	Attributes map[string]string      `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	LastActive *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
 	// last_active + idle_ttl; every update pushes it out. The thread and its
 	// database are deleted once it passes.
-	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	IdleTtl   *durationpb.Duration   `protobuf:"bytes,9,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
+	ExpiresAt *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	IdleTtl   *durationpb.Duration   `protobuf:"bytes,8,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
 	// The thread's database ("DB_..."), created with the thread.
-	DatabaseId    string `protobuf:"bytes,10,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
+	DatabaseId    string `protobuf:"bytes,9,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -660,18 +660,18 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x94\f\n" +
-	"\vAgentThread\x1a\x96\x02\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xfc\v\n" +
+	"\vAgentThread\x1a\x90\x02\n" +
 	"\rCreateRequest\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\tR\x03key\x12\x19\n" +
-	"\x05scope\x18\x03 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x19\n" +
+	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
 	"\n" +
-	"attributes\x18\x04 \x03(\v28.livekit.agent.AgentThread.CreateRequest.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x18\x03 \x03(\v28.livekit.agent.AgentThread.CreateRequest.AttributesEntryB\x03\xc0P\x01R\n" +
 	"attributes\x124\n" +
-	"\bidle_ttl\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x1a=\n" +
+	"\bidle_ttl\x18\x04 \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x01\x10\x02\x1ae\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1ae\n" +
 	"\x0eCreateResponse\x129\n" +
 	"\x06thread\x18\x01 \x01(\v2!.livekit.agent.AgentThread.ThreadR\x06thread\x12\x18\n" +
 	"\acreated\x18\x02 \x01(\bR\acreated\x1aV\n" +
@@ -679,11 +679,11 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"GetRequest\x12*\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDH\x00R\bthreadId\x12\x12\n" +
 	"\x03key\x18\x02 \x01(\tH\x00R\x03keyB\b\n" +
-	"\x06lookup\x1a\\\n" +
+	"\x06lookup\x1aV\n" +
 	"\vListRequest\x12\x19\n" +
-	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x16\n" +
-	"\x06before\x18\x03 \x01(\tR\x06before\x12\x14\n" +
-	"\x05limit\x18\x04 \x01(\x05R\x05limitJ\x04\b\x01\x10\x02\x1ac\n" +
+	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x16\n" +
+	"\x06before\x18\x02 \x01(\tR\x06before\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x1ac\n" +
 	"\fListResponse\x12;\n" +
 	"\athreads\x18\x01 \x03(\v2!.livekit.agent.AgentThread.ThreadR\athreads\x12\x16\n" +
 	"\x06before\x18\x02 \x01(\tR\x06before\x1a\x8d\x02\n" +
@@ -698,27 +698,26 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
 	"\rDeleteRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a\x10\n" +
-	"\x0eDeleteResponse\x1a\x8c\x04\n" +
+	"\x0eDeleteResponse\x1a\x80\x04\n" +
 	"\x06Thread\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x10\n" +
-	"\x03key\x18\x03 \x01(\tR\x03key\x12\x19\n" +
-	"\x05scope\x18\x04 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x12\x19\n" +
+	"\x05scope\x18\x03 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
 	"\n" +
-	"attributes\x18\x05 \x03(\v21.livekit.agent.AgentThread.Thread.AttributesEntryB\x03\xc0P\x01R\n" +
+	"attributes\x18\x04 \x03(\v21.livekit.agent.AgentThread.Thread.AttributesEntryB\x03\xc0P\x01R\n" +
 	"attributes\x129\n" +
 	"\n" +
-	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12;\n" +
-	"\vlast_active\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12;\n" +
+	"\vlast_active\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"lastActive\x129\n" +
 	"\n" +
-	"expires_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
-	"\bidle_ttl\x18\t \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x12\x1f\n" +
-	"\vdatabase_id\x18\n" +
-	" \x01(\tR\n" +
+	"expires_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\x124\n" +
+	"\bidle_ttl\x18\b \x01(\v2\x19.google.protobuf.DurationR\aidleTtl\x12\x1f\n" +
+	"\vdatabase_id\x18\t \x01(\tR\n" +
 	"databaseId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01J\x04\b\x02\x10\x03J\x04\b\v\x10\fB+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
 
 var (
 	file_agent_livekit_agent_thread_proto_rawDescOnce sync.Once

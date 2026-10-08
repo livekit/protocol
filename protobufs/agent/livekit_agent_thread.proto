@@ -30,16 +30,15 @@ import "logger/options.proto";
 
 message AgentThread {
   message CreateRequest {
-    reserved 1;
     // Internal: when set, create is get-or-create on key (e.g. a LiveKit phone
     // number). Not exposed by the public API.
-    string key = 2;
+    string key = 1;
     // Groups threads, e.g. by user: an application-defined value, typically the
     // user's identity. An AgentThreadGrant is scoped by it.
-    string scope = 3 [(logger.sensitivity) = SENSITIVITY_PII];
-    map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
+    string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    map<string, string> attributes = 3 [(logger.sensitivity) = SENSITIVITY_PII];
     // Unset takes the server default.
-    google.protobuf.Duration idle_ttl = 5;
+    google.protobuf.Duration idle_ttl = 4;
   }
 
   message CreateResponse {
@@ -57,11 +56,10 @@ message AgentThread {
 
   // The threads of one scope, newest first.
   message ListRequest {
-    reserved 1;
-    string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
     // Cursor from the previous ListResponse; empty for the first page.
-    string before = 3;
-    int32 limit = 4;
+    string before = 2;
+    int32 limit = 3;
   }
 
   message ListResponse {
@@ -86,19 +84,17 @@ message AgentThread {
 
   message Thread {
     string thread_id = 1 [(logger.name) = "threadID"];
-    reserved 2;
     // Internal: the key the thread was created with, if any.
-    string key = 3;
-    string scope = 4 [(logger.sensitivity) = SENSITIVITY_PII];
-    map<string, string> attributes = 5 [(logger.sensitivity) = SENSITIVITY_PII];
-    google.protobuf.Timestamp created_at = 6;
-    google.protobuf.Timestamp last_active = 7;
+    string key = 2;
+    string scope = 3 [(logger.sensitivity) = SENSITIVITY_PII];
+    map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp last_active = 6;
     // last_active + idle_ttl; every update pushes it out. The thread and its
     // database are deleted once it passes.
-    google.protobuf.Timestamp expires_at = 8;
-    google.protobuf.Duration idle_ttl = 9;
+    google.protobuf.Timestamp expires_at = 7;
+    google.protobuf.Duration idle_ttl = 8;
     // The thread's database ("DB_..."), created with the thread.
-    string database_id = 10;
-    reserved 11;
+    string database_id = 9;
   }
 }
