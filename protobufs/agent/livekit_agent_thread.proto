@@ -14,7 +14,7 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id; keys (such as a phone
-// number) find it again, at most one thread per key and agent. Holds a subject,
+// number) find it again, at most one thread per key and agent. Holds a scope,
 // attributes, an idle TTL and the AgentDB database with its state. Served by
 // cloud-protocol's AgentThreads.
 
@@ -39,8 +39,8 @@ message AgentThread {
     // When set, create is get-or-create on (agent_name, key).
     string key = 2;
     // Groups threads, e.g. by user: an application-defined value, typically the
-    // user's identity. An AgentThreadGrant is scoped by it.
-    string subject = 3 [(logger.sensitivity) = SENSITIVITY_PII];
+    // user's identity. An AgentThreadGrant is scoped by it, across agents.
+    string scope = 3 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
     // Unset takes the server default.
     google.protobuf.Duration idle_ttl = 5;
@@ -59,10 +59,10 @@ message AgentThread {
     }
   }
 
-  // The threads of one subject under one agent, newest first.
+  // The threads of one scope under one agent, newest first.
   message ListRequest {
     string agent_name = 1;
-    string subject = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     // Cursor from the previous ListResponse; empty for the first page.
     string before = 3;
     int32 limit = 4;
@@ -126,7 +126,7 @@ message AgentThread {
     string agent_name = 2;
     // Keys themselves are never returned.
     uint32 key_count = 3;
-    string subject = 4 [(logger.sensitivity) = SENSITIVITY_PII];
+    string scope = 4 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 5 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.Timestamp created_at = 6;
     google.protobuf.Timestamp last_active = 7;

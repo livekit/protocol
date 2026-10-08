@@ -532,63 +532,42 @@ func TestAgentEndpointGrantCloneIndependent(t *testing.T) {
 func TestAgentThreadGrantCovers(t *testing.T) {
 	t.Parallel()
 
-	bySubject := &AgentThreadGrant{AgentName: "a", Subject: "u1"}
-	byID := &AgentThreadGrant{AgentName: "a", ThreadIDs: []string{"AT_1", "AT_2"}}
-	both := &AgentThreadGrant{AgentName: "a", Subject: "u1", ThreadIDs: []string{"AT_1"}}
-
+	byScope := &AgentThreadGrant{Scope: "u1"}
+	byID := &AgentThreadGrant{ThreadIDs: []string{"AT_1", "AT_2"}}
 	cases := []struct {
-		name      string
-		grant     *AgentThreadGrant
-		agentName string
-		subject   string
-		threadID  string
-		want      bool
+		name     string
+		grant    *AgentThreadGrant
+		scope    string
+		threadID string
+		want     bool
 	}{
-		{"nil grant", nil, "a", "u1", "AT_1", false},
-		{"no agent", &AgentThreadGrant{Subject: "u1"}, "", "u1", "AT_1", false},
-		{"neither subject nor ids", &AgentThreadGrant{AgentName: "a"}, "a", "", "AT_1", false},
-		{"subject match", bySubject, "a", "u1", "AT_9", true},
-		{"subject mismatch", bySubject, "a", "u2", "AT_9", false},
-		{"subject empty on thread", bySubject, "a", "", "AT_9", false},
-		{"agent mismatch", bySubject, "b", "u1", "AT_9", false},
-		{"agent case differs", bySubject, "A", "u1", "AT_9", false},
-		{"id listed", byID, "a", "u2", "AT_2", true},
-		{"id not listed", byID, "a", "u2", "AT_3", false},
-		{"id empty", byID, "a", "u2", "", false},
-		{"id listed, agent mismatch", byID, "b", "u2", "AT_2", false},
-		{"both: subject", both, "a", "u1", "AT_9", true},
-		{"both: id", both, "a", "u2", "AT_1", true},
-		{"both: neither", both, "a", "u2", "AT_9", false},
+		{"nil grant", nil, "u1", "AT_1", false},
+		{"neither scope nor ids", &AgentThreadGrant{}, "", "AT_1", false},
+		{"scope match", byScope, "u1", "AT_9", true},
+		{"scope mismatch", byScope, "u2", "AT_9", false},
+		{"scope empty on thread", byScope, "", "AT_9", false},
+		{"id match", byID, "", "AT_2", true},
+		{"id mismatch", byID, "", "AT_3", false},
+		{"empty id", byID, "", "", false},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			require.Equal(t, c.want, c.grant.Covers(c.agentName, c.subject, c.threadID))
+			require.Equal(t, c.want, c.grant.Covers(c.scope, c.threadID))
 		})
 	}
-}
-
-func TestAgentThreadGrantAllowsEndpoint(t *testing.T) {
-	t.Parallel()
-
-	all := &AgentThreadGrant{AgentName: "a"}
-	chat := &AgentThreadGrant{AgentName: "a", Endpoints: []string{"chat"}}
-	require.True(t, all.AllowsEndpoint("voice"))
-	require.True(t, chat.AllowsEndpoint("chat"))
-	require.False(t, chat.AllowsEndpoint("voice"))
-	require.False(t, (*AgentThreadGrant)(nil).AllowsEndpoint("chat"))
 }
 
 func TestAgentThreadGrantCloneIndependent(t *testing.T) {
 	t.Parallel()
 
-	grants := &ClaimGrants{AgentThread: &AgentThreadGrant{AgentName: "a", Subject: "u1", ThreadIDs: []string{"AT_1"}, Send: true}}
+	grants := &ClaimGrants{AgentThread: &AgentThreadGrant{Scope: "u1", ThreadIDs: []string{"AT_1"}, Write: true}}
 	clone := grants.Clone()
 	require.NotSame(t, grants.AgentThread, clone.AgentThread)
 	require.True(t, reflect.DeepEqual(grants.AgentThread, clone.AgentThread))
 
-	clone.AgentThread.Send = false
+	clone.AgentThread.Write = false
 	clone.AgentThread.ThreadIDs[0] = "AT_2"
 	clone.AgentThread.ThreadIDs = append(clone.AgentThread.ThreadIDs, "AT_3")
-	require.True(t, grants.AgentThread.Send)
+	require.True(t, grants.AgentThread.Write)
 	require.Equal(t, []string{"AT_1"}, grants.AgentThread.ThreadIDs)
 }

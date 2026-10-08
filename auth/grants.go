@@ -715,40 +715,29 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 // ------------------------------------------------------------------
 
-// AgentThreadGrant scopes a token to one agent's threads, selected by subject
-// or by id, with per-action flags. Endpoints limits which of the agent's
-// endpoints the holder may call; empty allows all of them.
+// AgentThreadGrant gives a token access to threads: those whose scope equals
+// Scope, or those listed in ThreadIDs, across the project's agents. It grants
+// thread data only; which endpoints a token may call is agentEndpoint's.
 type AgentThreadGrant struct {
-	AgentName string   `json:"agentName"`
-	Subject   string   `json:"subject,omitempty"`
+	Scope     string   `json:"scope,omitempty"`
 	ThreadIDs []string `json:"threadIds,omitempty"`
-	Endpoints []string `json:"endpoints,omitempty"`
 	List      bool     `json:"list,omitempty"`
 	Create    bool     `json:"create,omitempty"`
-	Send      bool     `json:"send,omitempty"`
+	Write     bool     `json:"write,omitempty"`
 	Read      bool     `json:"read,omitempty"`
 	Delete    bool     `json:"delete,omitempty"`
 }
 
-// Covers reports whether a thread of agentName is in scope, by subject or by
-// id. An empty Subject or thread id never matches; the caller checks the flags.
-func (s *AgentThreadGrant) Covers(agentName, subject, threadID string) bool {
-	if s == nil || s.AgentName == "" || s.AgentName != agentName {
-		return false
-	}
-	if s.Subject != "" && s.Subject == subject {
-		return true
-	}
-	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
-}
-
-// AllowsEndpoint reports whether the holder may call endpoint of the grant's
-// agent.
-func (s *AgentThreadGrant) AllowsEndpoint(endpoint string) bool {
+// Covers reports whether a thread is in the grant, by scope or by id. An empty
+// Scope or thread id never matches; the caller checks the flags.
+func (s *AgentThreadGrant) Covers(scope, threadID string) bool {
 	if s == nil {
 		return false
 	}
-	return len(s.Endpoints) == 0 || slices.Contains(s.Endpoints, endpoint)
+	if s.Scope != "" && s.Scope == scope {
+		return true
+	}
+	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
 }
 
 func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
@@ -760,9 +749,6 @@ func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
 	if len(s.ThreadIDs) > 0 {
 		clone.ThreadIDs = append([]string{}, s.ThreadIDs...)
 	}
-	if len(s.Endpoints) > 0 {
-		clone.Endpoints = append([]string{}, s.Endpoints...)
-	}
 
 	return &clone
 }
@@ -772,13 +758,11 @@ func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		return nil
 	}
 
-	e.AddString("AgentName", s.AgentName)
-	e.AddString("Subject", s.Subject)
+	e.AddString("Scope", s.Scope)
 	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
-	zap.Strings("Endpoints", s.Endpoints).AddTo(e)
 	e.AddBool("List", s.List)
 	e.AddBool("Create", s.Create)
-	e.AddBool("Send", s.Send)
+	e.AddBool("Write", s.Write)
 	e.AddBool("Read", s.Read)
 	e.AddBool("Delete", s.Delete)
 	return nil
