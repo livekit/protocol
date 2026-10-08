@@ -26,6 +26,8 @@ var (
 	ErrExtensionSizeInsufficient = errors.New("data track packet extension size insufficient")
 	ErrExtensionNotFound         = errors.New("data track packet extension not found")
 	ErrExtensionSizeTooBig       = errors.New("extension size is too big")
+	ErrExtensionInvalidID        = errors.New("invalid extension ID")
+	ErrExtensionDataTooShort     = errors.New("extension data too short")
 )
 
 const (
