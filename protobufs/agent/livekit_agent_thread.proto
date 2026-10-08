@@ -15,7 +15,7 @@
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
 // an idle TTL and the AgentDB database created with it. An internal key (a
-// LiveKit phone number) can find it again. Served by cloud-protocol's
+// LiveKit phone number) finds it again through create. Served by cloud-protocol's
 // AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
 // by the agents framework, which writes it, and the platform, which reads it.
 
@@ -50,10 +50,7 @@ message AgentThread {
   }
 
   message GetRequest {
-    oneof lookup {
-      string thread_id = 1 [(logger.name) = "threadID"];
-      string key = 2;
-    }
+    string thread_id = 1 [(logger.name) = "threadID"];
   }
 
   // The threads of one scope, newest first.
