@@ -760,13 +760,11 @@ func (s *AgentThreadGrant) ToProto() *livekit.AgentHttp_AgentThreadGrant {
 		return nil
 	}
 	return &livekit.AgentHttp_AgentThreadGrant{
-		AgentName: s.AgentName,
-		Subject:   s.Subject,
+		Scope:     s.Scope,
 		ThreadIds: append([]string{}, s.ThreadIDs...),
-		Endpoints: append([]string{}, s.Endpoints...),
 		List:      s.List,
 		Create:    s.Create,
-		Send:      s.Send,
+		Write:     s.Write,
 		Read:      s.Read,
 		Delete:    s.Delete,
 	}

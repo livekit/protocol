@@ -327,19 +327,17 @@ message AgentHttp {
     // NEXT_ID: 10
   }
 
-  // auth.AgentThreadGrant on the wire: one agent's threads, by subject or by
-  // id, with per-action flags
+  // auth.AgentThreadGrant on the wire: threads by scope or by id, with
+  // per-action flags
   message AgentThreadGrant {
-    string agent_name = 1 [(logger.name) = "agentName"];
-    string subject = 2;
+    reserved 1, 9;
+    string scope = 2;
     repeated string thread_ids = 3 [(logger.name) = "threadIDs"];
     bool list = 4;
     bool create = 5;
-    bool send = 6;
+    bool write = 6;
     bool read = 7;
     bool delete = 8;
-    // endpoints of the agent the holder may call; empty is all
-    repeated string endpoints = 9;
   }
 
   // why a stream was reset before any HTTP bytes flowed. This travels as the
