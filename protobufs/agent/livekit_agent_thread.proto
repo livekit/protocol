@@ -31,7 +31,8 @@ import "logger/options.proto";
 message AgentThread {
   message CreateRequest {
     reserved 1;
-    // When set, create is get-or-create on key.
+    // Internal: when set, create is get-or-create on key (e.g. a LiveKit phone
+    // number). Not exposed by the public API.
     string key = 2;
     // Groups threads, e.g. by user: an application-defined value, typically the
     // user's identity. An AgentThreadGrant is scoped by it.
@@ -74,28 +75,7 @@ message AgentThread {
     // Merged; an empty value deletes the entry.
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.Duration idle_ttl = 3;
-  }
-
-  message TouchRequest {
-    string thread_id = 1 [(logger.name) = "threadID"];
-  }
-
-  message TouchResponse {
-    google.protobuf.Timestamp expires_at = 1;
-  }
-
-  message AddKeyRequest {
-    string thread_id = 1 [(logger.name) = "threadID"];
-    string key = 2;
-    // Unset keeps the key for the life of the thread.
-    google.protobuf.Duration ttl = 3;
-    // Move the key here when another thread holds it.
-    bool replace = 4;
-  }
-
-  message RemoveKeyRequest {
-    string thread_id = 1 [(logger.name) = "threadID"];
-    string key = 2;
+    // Every update counts as activity and pushes expires_at out by idle_ttl.
   }
 
   message DeleteRequest {
@@ -103,11 +83,6 @@ message AgentThread {
   }
 
   message DeleteResponse {}
-
-  // Creates the thread's database if it has none. Idempotent.
-  message CreateThreadDatabaseRequest {
-    string thread_id = 1 [(logger.name) = "threadID"];
-  }
 
   // Marks thread_id as merged into another thread, after its items were copied
   // there.
@@ -119,17 +94,17 @@ message AgentThread {
   message Thread {
     string thread_id = 1 [(logger.name) = "threadID"];
     reserved 2;
-    // Keys themselves are never returned.
-    uint32 key_count = 3;
+    // Internal: the key the thread was created with, if any.
+    string key = 3;
     string scope = 4 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 5 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.Timestamp created_at = 6;
     google.protobuf.Timestamp last_active = 7;
-    // last_active + idle_ttl; every touch or send pushes it out. The thread is
-    // deleted once it passes.
+    // last_active + idle_ttl; every update pushes it out. The thread and its
+    // database are deleted once it passes.
     google.protobuf.Timestamp expires_at = 8;
     google.protobuf.Duration idle_ttl = 9;
-    // "DB_..."; empty until the first write or CreateThreadDatabase.
+    // The thread's database ("DB_..."), created with the thread.
     string database_id = 10;
     // Set when merged into another thread; calls on it then fail with
     // FailedPrecondition.
