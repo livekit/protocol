@@ -17,8 +17,7 @@
 // an idle TTL and the AgentDB database created with it. An internal key (a
 // LiveKit phone number) can find it again. Served by cloud-protocol's
 // AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
-// by the agents framework, which writes it, and the platform, which reads and
-// merges it.
+// by the agents framework, which writes it, and the platform, which reads it.
 
 syntax = "proto3";
 
@@ -76,7 +75,7 @@ message AgentThread {
 
   message UpdateRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // Merged; an empty value deletes the entry.
+    // Added to the existing attributes; an empty value deletes the entry.
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.Duration idle_ttl = 3;
     // Every update counts as activity and pushes expires_at out by idle_ttl.
@@ -87,13 +86,6 @@ message AgentThread {
   }
 
   message DeleteResponse {}
-
-  // Copies every agent's history and tasks of thread_id into another thread,
-  // as agents named "<agent>@<thread_id>", then marks thread_id merged.
-  message MergeThreadRequest {
-    string thread_id = 1 [(logger.name) = "threadID"];
-    string into = 2;
-  }
 
   // The conversation, oldest first.
   message HistoryRequest {
@@ -164,8 +156,6 @@ message AgentThread {
     google.protobuf.Duration idle_ttl = 9;
     // The thread's database ("DB_..."), created with the thread.
     string database_id = 10;
-    // Set when merged into another thread; calls on it then fail with
-    // FailedPrecondition.
-    string merged_into = 11;
+    reserved 11;
   }
 }
