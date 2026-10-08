@@ -20,74 +20,30 @@ option go_package = "github.com/livekit/protocol/livekit/agent";
 
 import "logger/options.proto";
 
-// AgentThread messages: the durable conversation an agent has with a person
-// across channels and over time. A thread is named by its "AT_" id and
-// optionally by keys, opaque strings an application attaches ("phone:+1...") to
-// find it again; a key resolves to at most one thread per agent. The project
-// comes from the access token, and the thread's database lives in the project's
-// data region.
-//
-// The service over these messages is internal gRPC (cloud-protocol
-// AgentThreads); the public API is public-api-server's ThreadService. Errors are
-// gRPC codes:
-//   AlreadyExists       a key attached to another thread, without replace
-//   InvalidArgument     a key, sub or attribute over its size limit
-//   FailedPrecondition  the thread was redirected; the caller re-reads at
-//                       Thread.redirect_to
-//   PermissionDenied    a thread, subject or agent outside the token's
-//                       AgentThreadGrant
-//   NotFound            otherwise
-//
-// Calls:
-//   Create   a keyed create is get-or-create: if the key already names a
-//            thread of this agent, that thread is returned with created = false
-//            and nothing else in the request is applied. Without a key a new
-//            thread is always created.
-//   Get      by id, or by (agent_name, key). The lookup by key is reserved to the
-//            project credential; an AgentThreadGrant may only read by id.
-//   List     the threads of one subject under one agent, newest first.
-//   Update   attributes and idle TTL. Not available to an AgentThreadGrant:
-//            attributes are written by the agent's tools or the application's
-//            backend.
-//   Touch    marks the thread active now and pushes expires_at out by its idle
-//            TTL.
-//   AddKey   a key already attached to another thread of the same agent is
-//            AlreadyExists unless replace is set, which moves it.
-//   Delete   deletes the thread, its keys and its database.
-//   EnsureStateDatabase  creates the thread's database if it has none and
-//            records it on the thread. Idempotent.
-//   Redirect sets redirect_to on a fresh thread after its items were copied into
-//            the found one. Reserved to the project credential. Refused with
-//            FailedPrecondition when the row already redirects elsewhere.
-//
-// Nested so that names like Thread and CreateRequest need not be unique across
-// the livekit.agent package. Times throughout are int64 unix seconds.
+// A thread is the durable conversation an agent has with a person across
+// channels. It is named by its "AT_" id and optionally by keys an application
+// attaches to find it again; a key resolves to at most one thread per agent.
+// Times are unix seconds.
 message AgentThread {
-  // One key under one agent. Keys are scoped per agent: the same string under
-  // two agents names two threads.
   message AgentKey {
     string agent_name = 1;
-    string key = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    string key = 2;
   }
 
   message CreateRequest {
     string agent_name = 1;
-    // Optional. When set the call is get-or-create on (agent_name, key). At
-    // most 256 bytes.
-    string key = 2 [(logger.sensitivity) = SENSITIVITY_PII];
-    // Optional. The subject the thread belongs to, the value List selects on
-    // and an AgentThreadGrant is scoped by. At most 256 bytes.
+    // When set, create is get-or-create on (agent_name, key).
+    string key = 2;
+    // The subject the thread belongs to, as scoped by an AgentThreadGrant.
     string sub = 3 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
-    // 0 takes the server default. The thread expires this long after its last
-    // activity.
+    // 0 takes the server default.
     int64 idle_ttl_seconds = 5;
   }
 
   message CreateResponse {
     Thread thread = 1;
-    // False when a key in the request already named a thread, which is the one
-    // returned.
+    // False when the key already named a thread, which is returned as is.
     bool created = 2;
   }
 
@@ -98,26 +54,24 @@ message AgentThread {
     }
   }
 
+  // The threads of one subject under one agent, newest first.
   message ListRequest {
     string agent_name = 1;
     string sub = 2 [(logger.sensitivity) = SENSITIVITY_PII];
-    // Optional. The cursor from the previous page's ListResponse.before; opaque
-    // to the client. Empty starts from the newest thread.
+    // Cursor from the previous ListResponse; empty for the first page.
     string before = 3;
-    // Server-clamped.
     int32 limit = 4;
   }
 
   message ListResponse {
     repeated Thread threads = 1;
-    // The cursor for the next page; empty at the end.
+    // Empty at the end.
     string before = 2;
   }
 
   message UpdateRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // Merged into the thread's attributes: a key with an empty value deletes the
-    // entry, keys not present are left alone.
+    // Merged; an empty value deletes the entry.
     map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     optional int64 idle_ttl_seconds = 3;
   }
@@ -132,10 +86,8 @@ message AgentThread {
 
   message AddKeyRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // At most 256 bytes.
-    string key = 2 [(logger.sensitivity) = SENSITIVITY_PII];
-    // Optional. The key is dropped this long after it is attached; 0 keeps it
-    // for the life of the thread.
+    string key = 2;
+    // 0 keeps the key for the life of the thread.
     int64 ttl_seconds = 3;
     // Move the key here when another thread of the same agent holds it.
     bool replace = 4;
@@ -143,7 +95,7 @@ message AgentThread {
 
   message RemoveKeyRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    string key = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    string key = 2;
   }
 
   message DeleteRequest {
@@ -152,22 +104,21 @@ message AgentThread {
 
   message DeleteResponse {}
 
+  // Creates the thread's database if it has none. Idempotent.
   message EnsureStateDatabaseRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
   }
 
+  // Marks a thread as merged into redirect_to.
   message RedirectRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // The thread the items were copied into.
     string redirect_to = 2 [(logger.name) = "redirectTo"];
   }
 
-  // One thread, as every read reports it. Keys are never returned, by any call
-  // and with any token: only their count is.
   message Thread {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // The agent that created the thread.
     string agent_name = 2;
+    // Keys themselves are never returned.
     uint32 key_count = 3;
     string sub = 4 [(logger.sensitivity) = SENSITIVITY_PII];
     map<string, string> attributes = 5 [(logger.sensitivity) = SENSITIVITY_PII];
@@ -175,12 +126,10 @@ message AgentThread {
     int64 last_active = 7;
     int64 expires_at = 8;
     int64 idle_ttl_seconds = 9;
-    // The thread's database on agent-db, "DB_..."; empty until the first write
-    // or EnsureStateDatabase.
+    // "DB_..."; empty until the first write or EnsureStateDatabase.
     string database_id = 10;
-    // Set when this thread was merged into another. Threads report the redirect
-    // and never follow it: calls on a redirected thread fail with
-    // FailedPrecondition and the caller re-reads at this id.
+    // Set when merged into another thread; calls on it then fail with
+    // FailedPrecondition.
     string redirect_to = 11;
   }
 }

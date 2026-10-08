@@ -36,50 +36,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// AgentThread messages: the durable conversation an agent has with a person
-// across channels and over time. A thread is named by its "AT_" id and
-// optionally by keys, opaque strings an application attaches ("phone:+1...") to
-// find it again; a key resolves to at most one thread per agent. The project
-// comes from the access token, and the thread's database lives in the project's
-// data region.
-//
-// The service over these messages is internal gRPC (cloud-protocol
-// AgentThreads); the public API is public-api-server's ThreadService. Errors are
-// gRPC codes:
-//
-//	AlreadyExists       a key attached to another thread, without replace
-//	InvalidArgument     a key, sub or attribute over its size limit
-//	FailedPrecondition  the thread was redirected; the caller re-reads at
-//	                    Thread.redirect_to
-//	PermissionDenied    a thread, subject or agent outside the token's
-//	                    AgentThreadGrant
-//	NotFound            otherwise
-//
-// Calls:
-//
-//	Create   a keyed create is get-or-create: if the key already names a
-//	         thread of this agent, that thread is returned with created = false
-//	         and nothing else in the request is applied. Without a key a new
-//	         thread is always created.
-//	Get      by id, or by (agent_name, key). The lookup by key is reserved to the
-//	         project credential; an AgentThreadGrant may only read by id.
-//	List     the threads of one subject under one agent, newest first.
-//	Update   attributes and idle TTL. Not available to an AgentThreadGrant:
-//	         attributes are written by the agent's tools or the application's
-//	         backend.
-//	Touch    marks the thread active now and pushes expires_at out by its idle
-//	         TTL.
-//	AddKey   a key already attached to another thread of the same agent is
-//	         AlreadyExists unless replace is set, which moves it.
-//	Delete   deletes the thread, its keys and its database.
-//	EnsureStateDatabase  creates the thread's database if it has none and
-//	         records it on the thread. Idempotent.
-//	Redirect sets redirect_to on a fresh thread after its items were copied into
-//	         the found one. Reserved to the project credential. Refused with
-//	         FailedPrecondition when the row already redirects elsewhere.
-//
-// Nested so that names like Thread and CreateRequest need not be unique across
-// the livekit.agent package. Times throughout are int64 unix seconds.
+// A thread is the durable conversation an agent has with a person across
+// channels. It is named by its "AT_" id and optionally by keys an application
+// attaches to find it again; a key resolves to at most one thread per agent.
+// Times are unix seconds.
 type AgentThread struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -116,8 +76,6 @@ func (*AgentThread) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0}
 }
 
-// One key under one agent. Keys are scoped per agent: the same string under
-// two agents names two threads.
 type AgentThread_AgentKey struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	AgentName     string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
@@ -173,15 +131,12 @@ func (x *AgentThread_AgentKey) GetKey() string {
 type AgentThread_CreateRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	// Optional. When set the call is get-or-create on (agent_name, key). At
-	// most 256 bytes.
+	// When set, create is get-or-create on (agent_name, key).
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	// Optional. The subject the thread belongs to, the value List selects on
-	// and an AgentThreadGrant is scoped by. At most 256 bytes.
+	// The subject the thread belongs to, as scoped by an AgentThreadGrant.
 	Sub        string            `protobuf:"bytes,3,opt,name=sub,proto3" json:"sub,omitempty"`
 	Attributes map[string]string `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	// 0 takes the server default. The thread expires this long after its last
-	// activity.
+	// 0 takes the server default.
 	IdleTtlSeconds int64 `protobuf:"varint,5,opt,name=idle_ttl_seconds,json=idleTtlSeconds,proto3" json:"idle_ttl_seconds,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -255,8 +210,7 @@ func (x *AgentThread_CreateRequest) GetIdleTtlSeconds() int64 {
 type AgentThread_CreateResponse struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	Thread *AgentThread_Thread    `protobuf:"bytes,1,opt,name=thread,proto3" json:"thread,omitempty"`
-	// False when a key in the request already named a thread, which is the one
-	// returned.
+	// False when the key already named a thread, which is returned as is.
 	Created       bool `protobuf:"varint,2,opt,name=created,proto3" json:"created,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -388,15 +342,14 @@ func (*AgentThread_GetRequest_ThreadId) isAgentThread_GetRequest_Lookup() {}
 
 func (*AgentThread_GetRequest_ByKey) isAgentThread_GetRequest_Lookup() {}
 
+// The threads of one subject under one agent, newest first.
 type AgentThread_ListRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	Sub       string                 `protobuf:"bytes,2,opt,name=sub,proto3" json:"sub,omitempty"`
-	// Optional. The cursor from the previous page's ListResponse.before; opaque
-	// to the client. Empty starts from the newest thread.
-	Before string `protobuf:"bytes,3,opt,name=before,proto3" json:"before,omitempty"`
-	// Server-clamped.
-	Limit         int32 `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Cursor from the previous ListResponse; empty for the first page.
+	Before        string `protobuf:"bytes,3,opt,name=before,proto3" json:"before,omitempty"`
+	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -462,7 +415,7 @@ func (x *AgentThread_ListRequest) GetLimit() int32 {
 type AgentThread_ListResponse struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Threads []*AgentThread_Thread  `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
-	// The cursor for the next page; empty at the end.
+	// Empty at the end.
 	Before        string `protobuf:"bytes,2,opt,name=before,proto3" json:"before,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -515,8 +468,7 @@ func (x *AgentThread_ListResponse) GetBefore() string {
 type AgentThread_UpdateRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// Merged into the thread's attributes: a key with an empty value deletes the
-	// entry, keys not present are left alone.
+	// Merged; an empty value deletes the entry.
 	Attributes     map[string]string `protobuf:"bytes,2,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	IdleTtlSeconds *int64            `protobuf:"varint,3,opt,name=idle_ttl_seconds,json=idleTtlSeconds,proto3,oneof" json:"idle_ttl_seconds,omitempty"`
 	unknownFields  protoimpl.UnknownFields
@@ -665,10 +617,8 @@ func (x *AgentThread_TouchResponse) GetExpiresAt() int64 {
 type AgentThread_AddKeyRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// At most 256 bytes.
-	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	// Optional. The key is dropped this long after it is attached; 0 keeps it
-	// for the life of the thread.
+	Key      string                 `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
+	// 0 keeps the key for the life of the thread.
 	TtlSeconds int64 `protobuf:"varint,3,opt,name=ttl_seconds,json=ttlSeconds,proto3" json:"ttl_seconds,omitempty"`
 	// Move the key here when another thread of the same agent holds it.
 	Replace       bool `protobuf:"varint,4,opt,name=replace,proto3" json:"replace,omitempty"`
@@ -866,6 +816,7 @@ func (*AgentThread_DeleteResponse) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 12}
 }
 
+// Creates the thread's database if it has none. Idempotent.
 type AgentThread_EnsureStateDatabaseRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId      string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
@@ -910,11 +861,11 @@ func (x *AgentThread_EnsureStateDatabaseRequest) GetThreadId() string {
 	return ""
 }
 
+// Marks a thread as merged into redirect_to.
 type AgentThread_RedirectRequest struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// The thread the items were copied into.
-	RedirectTo    string `protobuf:"bytes,2,opt,name=redirect_to,json=redirectTo,proto3" json:"redirect_to,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ThreadId      string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
+	RedirectTo    string                 `protobuf:"bytes,2,opt,name=redirect_to,json=redirectTo,proto3" json:"redirect_to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -963,13 +914,11 @@ func (x *AgentThread_RedirectRequest) GetRedirectTo() string {
 	return ""
 }
 
-// One thread, as every read reports it. Keys are never returned, by any call
-// and with any token: only their count is.
 type AgentThread_Thread struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
-	// The agent that created the thread.
-	AgentName      string            `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ThreadId  string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
+	AgentName string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	// Keys themselves are never returned.
 	KeyCount       uint32            `protobuf:"varint,3,opt,name=key_count,json=keyCount,proto3" json:"key_count,omitempty"`
 	Sub            string            `protobuf:"bytes,4,opt,name=sub,proto3" json:"sub,omitempty"`
 	Attributes     map[string]string `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -977,12 +926,10 @@ type AgentThread_Thread struct {
 	LastActive     int64             `protobuf:"varint,7,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
 	ExpiresAt      int64             `protobuf:"varint,8,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	IdleTtlSeconds int64             `protobuf:"varint,9,opt,name=idle_ttl_seconds,json=idleTtlSeconds,proto3" json:"idle_ttl_seconds,omitempty"`
-	// The thread's database on agent-db, "DB_..."; empty until the first write
-	// or EnsureStateDatabase.
+	// "DB_..."; empty until the first write or EnsureStateDatabase.
 	DatabaseId string `protobuf:"bytes,10,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
-	// Set when this thread was merged into another. Threads report the redirect
-	// and never follow it: calls on a redirected thread fail with
-	// FailedPrecondition and the caller re-reads at this id.
+	// Set when merged into another thread; calls on it then fail with
+	// FailedPrecondition.
 	RedirectTo    string `protobuf:"bytes,11,opt,name=redirect_to,json=redirectTo,proto3" json:"redirect_to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1099,16 +1046,16 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x14logger/options.proto\"\x8f\x11\n" +
-	"\vAgentThread\x1a@\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x14logger/options.proto\"\xfb\x10\n" +
+	"\vAgentThread\x1a;\n" +
 	"\bAgentKey\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x15\n" +
-	"\x03key\x18\x02 \x01(\tB\x03\xc0P\x01R\x03key\x1a\xa4\x02\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x1a\x9f\x02\n" +
 	"\rCreateRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x15\n" +
-	"\x03key\x18\x02 \x01(\tB\x03\xc0P\x01R\x03key\x12\x15\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x12\x15\n" +
 	"\x03sub\x18\x03 \x01(\tB\x03\xc0P\x01R\x03sub\x12]\n" +
 	"\n" +
 	"attributes\x18\x04 \x03(\v28.livekit.agent.AgentThread.CreateRequest.AttributesEntryB\x03\xc0P\x01R\n" +
@@ -1148,16 +1095,16 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a.\n" +
 	"\rTouchResponse\x12\x1d\n" +
 	"\n" +
-	"expires_at\x18\x01 \x01(\x03R\texpiresAt\x1a\x8b\x01\n" +
+	"expires_at\x18\x01 \x01(\x03R\texpiresAt\x1a\x86\x01\n" +
 	"\rAddKeyRequest\x12(\n" +
-	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x15\n" +
-	"\x03key\x18\x02 \x01(\tB\x03\xc0P\x01R\x03key\x12\x1f\n" +
+	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x10\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x12\x1f\n" +
 	"\vttl_seconds\x18\x03 \x01(\x03R\n" +
 	"ttlSeconds\x12\x18\n" +
-	"\areplace\x18\x04 \x01(\bR\areplace\x1aS\n" +
+	"\areplace\x18\x04 \x01(\bR\areplace\x1aN\n" +
 	"\x10RemoveKeyRequest\x12(\n" +
-	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x15\n" +
-	"\x03key\x18\x02 \x01(\tB\x03\xc0P\x01R\x03key\x1a9\n" +
+	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x10\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x1a9\n" +
 	"\rDeleteRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a\x10\n" +
 	"\x0eDeleteResponse\x1aF\n" +

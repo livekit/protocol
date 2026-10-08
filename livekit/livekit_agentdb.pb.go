@@ -419,13 +419,12 @@ func (x *AgentDB_ListResponse) GetNextPageToken() string {
 
 // One database, as get and list both report it.
 type AgentDB_AgentDatabase struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	DatabaseId string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
-	// The data region the database lives in, the project's at creation.
-	Region        string `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
-	CreatedAt     int64  `protobuf:"varint,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	ExpiresAt     int64  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	Tip           int64  `protobuf:"varint,5,opt,name=tip,proto3" json:"tip,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DatabaseId    string                 `protobuf:"bytes,1,opt,name=database_id,json=databaseId,proto3" json:"database_id,omitempty"`
+	Region        string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	Tip           int64                  `protobuf:"varint,5,opt,name=tip,proto3" json:"tip,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

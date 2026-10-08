@@ -715,33 +715,21 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 // ------------------------------------------------------------------
 
-// AgentThreadGrant scopes a token to agent threads: the durable
-// conversations of one agent, selected by subject or by id. It is minted by
-// the application's backend the way a room token is, so the subject rides in
-// the signature and a request body never names it. The JWT sub claim stays the
-// participant identity; the thread subject is Sub.
+// AgentThreadGrant scopes a token to one agent's threads, selected by subject
+// or by id, with per-action flags.
 type AgentThreadGrant struct {
-	// AgentName is required: threads, keys and subjects are scoped per agent.
-	AgentName string `json:"agentName"`
-	// Sub is the subject whose threads the holder may see and create.
-	Sub string `json:"sub,omitempty"`
-	// ThreadIDs restricts the grant to these threads instead. One of Sub and
-	// ThreadIDs is required; a grant with neither covers no thread.
+	AgentName string   `json:"agentName"`
+	Sub       string   `json:"sub,omitempty"`
 	ThreadIDs []string `json:"threadIds,omitempty"`
 	List      bool     `json:"list,omitempty"`
-	// Create lets a first message create a thread, with Sub as its subject.
-	Create bool `json:"create,omitempty"`
-	// Send grants message/send, message/stream and tasks/cancel.
-	Send bool `json:"send,omitempty"`
-	// Read grants get, chat_history and background_tasks.
-	Read   bool `json:"read,omitempty"`
-	Delete bool `json:"delete,omitempty"`
+	Create    bool     `json:"create,omitempty"`
+	Send      bool     `json:"send,omitempty"`
+	Read      bool     `json:"read,omitempty"`
+	Delete    bool     `json:"delete,omitempty"`
 }
 
-// Covers reports whether a thread is in the grant's scope: it was created by
-// the grant's agent, and either its subject equals the grant's Sub or its id is
-// listed in ThreadIDs. The action flags are checked by the caller. Matching
-// is exact and case-sensitive; an empty Sub or thread id never matches.
+// Covers reports whether a thread of agentName is in scope, by subject or by
+// id. An empty Sub or thread id never matches; the caller checks the flags.
 func (s *AgentThreadGrant) Covers(agentName, sub, threadID string) bool {
 	if s == nil || s.AgentName == "" || s.AgentName != agentName {
 		return false
