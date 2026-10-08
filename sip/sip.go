@@ -447,22 +447,23 @@ func parseIPMask(mask string) (netip.Prefix, bool) {
 	return pref, true
 }
 
-func matchAddrMasks(addr string, host string, masks []string) bool {
+// matchAddrMasks reports whether the call's source address is inside one of the masks. Only the
+// transport address is consulted: a From host is written by the caller, so matching a mask against it
+// would let any INVITE satisfy the allowlist by claiming the right host. A hostname entry therefore
+// matches nothing, and a list made only of hostnames admits no call.
+func matchAddrMasks(addr string, masks []string) bool {
 	ip, err := netip.ParseAddr(addr)
 	if err != nil {
 		return true
 	}
+	// A dual-stack listener reports IPv4 peers as ::ffff:a.b.c.d; the masks are written as IPv4.
+	ip = ip.Unmap()
 	masks = filterInvalidAddrMasks(masks)
 	if len(masks) == 0 {
 		return true
 	}
 	for _, mask := range masks {
-		if pref, ok := parseIPMask(mask); ok {
-			// IP masks must only match the source IP, never the (spoofable) From host.
-			if pref.Contains(ip) {
-				return true
-			}
-		} else if mask == host {
+		if pref, ok := parseIPMask(mask); ok && pref.Contains(ip) {
 			return true
 		}
 	}
@@ -492,7 +493,7 @@ func (opt *matchTrunkOpts) matchAddresses(call *rpc.SIPCall, masks []string) boo
 	if opt.StrictAddresses {
 		return matchAddrMasksStrict(call.SourceIp, masks)
 	}
-	return matchAddrMasks(call.SourceIp, call.From.Host, masks)
+	return matchAddrMasks(call.SourceIp, masks)
 }
 
 func matchNumbers(num string, allowed []string) bool {
