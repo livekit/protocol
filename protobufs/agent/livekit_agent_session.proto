@@ -130,15 +130,6 @@ enum ToolReplyStatus {
   TR_SKIPPED = 3;
 }
 
-// How a run ended. A run is one input to one result, tools included, on
-// any channel: a text message, a voice turn, a background task.
-enum RunOutcome {
-  RO_COMPLETED = 0;
-  RO_FAILED = 1;
-  // the run yielded to a newer message or was cancelled by the caller
-  RO_CANCELLED = 2;
-}
-
 enum AmdCategory {
   AMD_UNKNOWN = 0;
   AMD_HUMAN = 1;
@@ -319,31 +310,6 @@ message AgentSessionEvent {
     bool resumed = 1;
   }
 
-  // Written by the framework when a run begins, before any application code
-  // runs. A RunStarted with no matching RunEnded is an interrupted run.
-  message RunStarted {
-    string run_id = 1 [(logger.name) = "runID"];
-    // the A2A task the run serves; also the id of its answer stream
-    string task_id = 2 [(logger.name) = "taskID"];
-    // the durable stream ("AST_...") the run's answer is appended to
-    string stream_id = 3 [(logger.name) = "streamID"];
-    // the registered agent whose lane the run writes
-    string lane = 4;
-    // the channel the input arrived on: "sms", "whatsapp", "email", "a2a",
-    // "voice"; empty when the ingress tagged none
-    string channel = 5;
-  }
-
-  // Written by the framework when a run commits or fails.
-  message RunEnded {
-    string run_id = 1 [(logger.name) = "runID"];
-    RunOutcome outcome = 2;
-    // the word from the shared reason list for a failed or cancelled run:
-    // "worker-lost", "lease-timeout", "session-not-found",
-    // "storage-unavailable", "timeout"; empty when completed
-    string reason = 3;
-  }
-
   google.protobuf.Timestamp created_at = 1;
   oneof event {
     AgentStateChanged agent_state_changed = 10;
@@ -360,8 +326,6 @@ message AgentSessionEvent {
     DebugMessage debug_message = 21;
     ToolExecutionUpdated tool_execution_updated = 22;
     AgentFalseInterruption agent_false_interruption = 23;
-    RunStarted run_started = 24;
-    RunEnded run_ended = 25;
   }
 }
 
