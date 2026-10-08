@@ -169,6 +169,7 @@ type ClaimGrants struct {
 	Inference     *InferenceGrant     `json:"inference,omitempty"`
 	Observability *ObservabilityGrant `json:"observability,omitempty"`
 	AgentEndpoint *AgentEndpointGrant `json:"agentEndpoint,omitempty"`
+	AgentThread   *AgentThreadGrant   `json:"agentThread,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -216,6 +217,7 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Inference = c.Inference.Clone()
 	clone.Observability = c.Observability.Clone()
 	clone.AgentEndpoint = c.AgentEndpoint.Clone()
+	clone.AgentThread = c.AgentThread.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -239,6 +241,7 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Inference", c.Inference)
 	e.AddObject("Observability", c.Observability)
 	e.AddObject("AgentEndpoint", c.AgentEndpoint)
+	e.AddObject("AgentThread", c.AgentThread)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -707,6 +710,74 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddBool("Call", s.Call)
 	e.AddString("AgentName", s.AgentName)
 	e.AddString("Deployment", s.Deployment)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+// AgentThreadGrant scopes a token to agent threads: the durable
+// conversations of one agent, selected by subject or by id. It is minted by
+// the application's backend the way a room token is, so the subject rides in
+// the signature and a request body never names it. The JWT sub claim stays the
+// participant identity; the thread subject is Sub.
+type AgentThreadGrant struct {
+	// AgentName is required: threads, keys and subjects are scoped per agent.
+	AgentName string `json:"agentName"`
+	// Sub is the subject whose threads the holder may see and create.
+	Sub string `json:"sub,omitempty"`
+	// ThreadIDs restricts the grant to these threads instead. One of Sub and
+	// ThreadIDs is required; a grant with neither covers no thread.
+	ThreadIDs []string `json:"threadIds,omitempty"`
+	List      bool     `json:"list,omitempty"`
+	// Create lets a first message create a thread, with Sub as its subject.
+	Create bool `json:"create,omitempty"`
+	// Send grants message/send, message/stream and tasks/cancel.
+	Send bool `json:"send,omitempty"`
+	// Read grants get, chat_history and background_tasks.
+	Read   bool `json:"read,omitempty"`
+	Delete bool `json:"delete,omitempty"`
+}
+
+// Covers reports whether a thread is in the grant's scope: it was created by
+// the grant's agent, and either its subject equals the grant's Sub or its id is
+// listed in ThreadIDs. The action flags are checked by the caller. Matching
+// is exact and case-sensitive; an empty Sub or thread id never matches.
+func (s *AgentThreadGrant) Covers(agentName, sub, threadID string) bool {
+	if s == nil || s.AgentName == "" || s.AgentName != agentName {
+		return false
+	}
+	if s.Sub != "" && s.Sub == sub {
+		return true
+	}
+	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
+}
+
+func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+	if len(s.ThreadIDs) > 0 {
+		clone.ThreadIDs = append([]string{}, s.ThreadIDs...)
+	}
+
+	return &clone
+}
+
+func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddString("AgentName", s.AgentName)
+	e.AddString("Sub", s.Sub)
+	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
+	e.AddBool("List", s.List)
+	e.AddBool("Create", s.Create)
+	e.AddBool("Send", s.Send)
+	e.AddBool("Read", s.Read)
+	e.AddBool("Delete", s.Delete)
 	return nil
 }
 
