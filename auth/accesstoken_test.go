@@ -249,7 +249,7 @@ func TestAgentThreadGrantRoundTrip(t *testing.T) {
 	t.Parallel()
 
 	apiKey, secret := apiKeypair()
-	grant := &AgentThreadGrant{AgentName: "my-agent", Sub: "user-1", ThreadIDs: []string{"AT_1"}, Read: true, Send: true}
+	grant := &AgentThreadGrant{AgentName: "my-agent", Subject: "user-1", ThreadIDs: []string{"AT_1"}, Read: true, Send: true}
 	raw, err := NewAccessToken(apiKey, secret).
 		SetAgentThreadGrant(grant).
 		SetValidFor(time.Minute).
