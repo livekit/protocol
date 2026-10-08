@@ -36,6 +36,8 @@ message Job {
   string deployment = 11;
   map<string, string> attributes = 12 [(logger.sensitivity) = SENSITIVITY_PII];
   bool enable_redaction = 13;
+  // the thread ("AT_...") this job continues; empty when dispatch made none
+  string thread_id = 14 [(logger.name) = "threadID"];
 }
 
 message JobState {
@@ -65,6 +67,8 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
+    // the worker holds or released a thread
+    UpdateThreadStatus update_thread = 8;
   };
 }
 
@@ -182,6 +186,23 @@ message UpdateJobStatus {
   string error = 3;
 }
 
+enum ThreadStatus {
+  // the server routes the thread's requests to this worker
+  TS_ACTIVE = 0;
+  // the worker evicted the thread with everything persisted; final for this worker
+  TS_RELEASED = 1;
+}
+
+// Which threads a worker holds, so a thread's requests reach the worker that
+// has it loaded. Applied per worker in seq order; a dropped control stream
+// releases every binding of the worker.
+message UpdateThreadStatus {
+  string thread_id = 1 [(logger.name) = "threadID"];
+  ThreadStatus status = 2;
+  // monotonic per worker; a late TS_ACTIVE never revives a TS_RELEASED binding
+  uint64 seq = 3;
+}
+
 message UpdateWorkerStatus {
   reserved 2; // metadata (retired)
   optional WorkerStatus status = 1;
@@ -297,7 +318,28 @@ message AgentHttp {
     string client_addr = 6 [(logger.sensitivity) = SENSITIVITY_PII];
     // "http" or "https" as the end client saw it; not derivable worker-side
     string scheme = 7;
-    // NEXT_ID: 8
+    // the thread ("AT_...") the node resolved for this request; empty when
+    // none, and the worker resolves it from the body
+    string thread_id = 8 [(logger.name) = "threadID"];
+    // the verified agentThread claim of the caller's token, which never
+    // reaches the worker; the worker enforces it on the addressed thread
+    AgentThreadGrant thread_grant = 9;
+    // NEXT_ID: 10
+  }
+
+  // auth.AgentThreadGrant on the wire: one agent's threads, by subject or by
+  // id, with per-action flags
+  message AgentThreadGrant {
+    string agent_name = 1 [(logger.name) = "agentName"];
+    string sub = 2;
+    repeated string thread_ids = 3 [(logger.name) = "threadIDs"];
+    bool list = 4;
+    bool create = 5;
+    bool send = 6;
+    bool read = 7;
+    bool delete = 8;
+    // endpoints of the agent the holder may call; empty is all
+    repeated string endpoints = 9;
   }
 
   // why a stream was reset before any HTTP bytes flowed. This travels as the

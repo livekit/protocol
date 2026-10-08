@@ -767,6 +767,25 @@ func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
 	return &clone
 }
 
+// ToProto is the grant as the node forwards it to the worker in
+// AgentHttp.StreamPreamble.thread_grant; nil stays nil.
+func (s *AgentThreadGrant) ToProto() *livekit.AgentHttp_AgentThreadGrant {
+	if s == nil {
+		return nil
+	}
+	return &livekit.AgentHttp_AgentThreadGrant{
+		AgentName: s.AgentName,
+		Sub:       s.Sub,
+		ThreadIds: append([]string{}, s.ThreadIDs...),
+		Endpoints: append([]string{}, s.Endpoints...),
+		List:      s.List,
+		Create:    s.Create,
+		Send:      s.Send,
+		Read:      s.Read,
+		Delete:    s.Delete,
+	}
+}
+
 func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	if s == nil {
 		return nil
