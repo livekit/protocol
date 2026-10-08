@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/livekit/agent"
 )
 
 func TestGrants(t *testing.T) {
@@ -533,29 +532,24 @@ func TestAgentEndpointGrantCloneIndependent(t *testing.T) {
 func TestAgentThreadGrantChecks(t *testing.T) {
 	t.Parallel()
 
-	mine := &agent.AgentThread_Thread{ThreadId: "AT_1", Scope: "u1"}
-	shared := &agent.AgentThread_Thread{ThreadId: "AT_2", Scope: "u2"}
-	other := &agent.AgentThread_Thread{ThreadId: "AT_3", Scope: "u2"}
-	unscoped := &agent.AgentThread_Thread{ThreadId: "AT_4"}
-
-	g := &AgentThreadGrant{Scope: "u1", ThreadIDs: []string{"AT_2"}, List: true, Create: true, Read: true}
-	require.True(t, g.CanRead(mine))
-	require.True(t, g.CanRead(shared))
-	require.False(t, g.CanRead(other))
-	require.False(t, g.CanRead(unscoped))
-	require.False(t, g.CanWrite(mine))
-	require.False(t, g.CanDelete(mine))
+	// Scope covers list and create only; read, write and delete need the id.
+	g := &AgentThreadGrant{Scope: "u1", ThreadIDs: []string{"AT_1"}, List: true, Create: true, Read: true}
+	require.True(t, g.CanRead("AT_1"))
+	require.False(t, g.CanRead("AT_2"))
+	require.False(t, g.CanRead(""))
+	require.False(t, g.CanWrite("AT_1"))
+	require.False(t, g.CanDelete("AT_1"))
 	require.True(t, g.CanList("u1"))
 	require.False(t, g.CanList("u2"))
 	require.False(t, g.CanList(""))
 	require.True(t, g.CanCreate())
 
 	idsOnly := &AgentThreadGrant{ThreadIDs: []string{"AT_4"}, Create: true, Write: true}
-	require.True(t, idsOnly.CanWrite(unscoped))
+	require.True(t, idsOnly.CanWrite("AT_4"))
 	require.False(t, idsOnly.CanCreate())
 
 	var none *AgentThreadGrant
-	require.False(t, none.CanRead(mine))
+	require.False(t, none.CanRead("AT_1"))
 	require.False(t, none.CanCreate())
 }
 
