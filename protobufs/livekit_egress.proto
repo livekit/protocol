@@ -54,7 +54,6 @@ message StartEgressRequest {
     TemplateSource template = 2;
     WebSource web = 3;
     MediaSource media = 4;
-    RoomTracksSource room_tracks = 10;
   }
 
   // Optional — default H264_720P_30
@@ -92,13 +91,6 @@ message WebSource {
   bool await_start_signal = 4;
 }
 
-// Capture every published audio and video track in a room as an independent
-// channel. Currently supported only with a single MCAP file output.
-message RoomTracksSource {
-  bool audio_only = 1;
-  bool video_only = 2;
-}
-
 // Capture tracks directly from a room via SDK.
 // Unifies deprecated Participant, TrackComposite, and Track egress.
 message MediaSource {
@@ -108,6 +100,22 @@ message MediaSource {
   }
   AudioConfig audio = 3;
   // TODO: DataConfig data = 4;
+  // Capture every published track of the selected kinds independently.
+  // Mutually exclusive with the video and audio selectors above. Currently
+  // supported only for live egress with a single MCAP file output.
+  RoomTracksSelection room_tracks = 5;
+}
+
+message RoomTracksSelection {
+  // At least one kind is required. DATA can be added here later without
+  // changing the semantics of existing AUDIO/VIDEO requests.
+  repeated RoomTrackKind kinds = 1;
+}
+
+enum RoomTrackKind {
+  ROOM_TRACK_KIND_UNSPECIFIED = 0;
+  ROOM_TRACK_KIND_AUDIO = 1;
+  ROOM_TRACK_KIND_VIDEO = 2;
 }
 
 // --- Video Configuration ---
