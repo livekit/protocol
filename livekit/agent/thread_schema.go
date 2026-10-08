@@ -21,7 +21,7 @@ import _ "embed"
 const ThreadSchemaVersion = 1
 
 // ThreadSchemaV1 creates version 1 of the conversation schema, one statement
-// per ";".
+// per ";" (comments hold none).
 //
 //go:embed thread_schema_v1.sql
 var ThreadSchemaV1 string
