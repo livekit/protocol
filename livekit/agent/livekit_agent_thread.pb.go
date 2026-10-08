@@ -725,19 +725,16 @@ func (x *AgentThread_HistoryResponse) GetAfter() string {
 	return ""
 }
 
-// One chat item, as the agents framework stores it (items in
-// thread_schema_v1.sql).
+// One chat item of an agent's history. Stored as the JSON of
+// ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
 type AgentThread_Item struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	Id    string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Agent string                 `protobuf:"bytes,2,opt,name=agent,proto3" json:"agent,omitempty"`
+	Agent string                 `protobuf:"bytes,1,opt,name=agent,proto3" json:"agent,omitempty"`
 	// Position in the agent's history.
-	Seq int64 `protobuf:"varint,3,opt,name=seq,proto3" json:"seq,omitempty"`
-	// "message", "function_call", "function_call_output" or "agent_handoff".
-	Type string `protobuf:"bytes,4,opt,name=type,proto3" json:"type,omitempty"`
+	Seq int64 `protobuf:"varint,2,opt,name=seq,proto3" json:"seq,omitempty"`
 	// The A2A message the item came from.
-	MessageId     string           `protobuf:"bytes,5,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
-	Payload       *structpb.Struct `protobuf:"bytes,6,opt,name=payload,proto3" json:"payload,omitempty"`
+	MessageId     string                `protobuf:"bytes,3,opt,name=message_id,json=messageId,proto3" json:"message_id,omitempty"`
+	Item          *ChatContext_ChatItem `protobuf:"bytes,4,opt,name=item,proto3" json:"item,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -772,13 +769,6 @@ func (*AgentThread_Item) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 11}
 }
 
-func (x *AgentThread_Item) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
 func (x *AgentThread_Item) GetAgent() string {
 	if x != nil {
 		return x.Agent
@@ -793,13 +783,6 @@ func (x *AgentThread_Item) GetSeq() int64 {
 	return 0
 }
 
-func (x *AgentThread_Item) GetType() string {
-	if x != nil {
-		return x.Type
-	}
-	return ""
-}
-
 func (x *AgentThread_Item) GetMessageId() string {
 	if x != nil {
 		return x.MessageId
@@ -807,9 +790,9 @@ func (x *AgentThread_Item) GetMessageId() string {
 	return ""
 }
 
-func (x *AgentThread_Item) GetPayload() *structpb.Struct {
+func (x *AgentThread_Item) GetItem() *ChatContext_ChatItem {
 	if x != nil {
-		return x.Payload
+		return x.Item
 	}
 	return nil
 }
@@ -941,10 +924,10 @@ type AgentThread_Task struct {
 	Agent  string                 `protobuf:"bytes,2,opt,name=agent,proto3" json:"agent,omitempty"`
 	// "submitted", "working", "input-required", "completed", "failed",
 	// "canceled" or "rejected".
-	Status        string              `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	StatusMessage *structpb.Struct    `protobuf:"bytes,4,opt,name=status_message,json=statusMessage,proto3" json:"status_message,omitempty"`
-	History       *structpb.ListValue `protobuf:"bytes,5,opt,name=history,proto3" json:"history,omitempty"`
-	Artifacts     *structpb.ListValue `protobuf:"bytes,6,opt,name=artifacts,proto3" json:"artifacts,omitempty"`
+	Status        string                  `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	StatusMessage *structpb.Struct        `protobuf:"bytes,4,opt,name=status_message,json=statusMessage,proto3" json:"status_message,omitempty"`
+	History       []*ChatContext_ChatItem `protobuf:"bytes,5,rep,name=history,proto3" json:"history,omitempty"`
+	Artifacts     *structpb.ListValue     `protobuf:"bytes,6,opt,name=artifacts,proto3" json:"artifacts,omitempty"`
 	// The task that submitted this one, if any.
 	Parent        string                 `protobuf:"bytes,7,opt,name=parent,proto3" json:"parent,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -1010,7 +993,7 @@ func (x *AgentThread_Task) GetStatusMessage() *structpb.Struct {
 	return nil
 }
 
-func (x *AgentThread_Task) GetHistory() *structpb.ListValue {
+func (x *AgentThread_Task) GetHistory() []*ChatContext_ChatItem {
 	if x != nil {
 		return x.History
 	}
@@ -1164,7 +1147,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xd1\x14\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xbc\x14\n" +
 	"\vAgentThread\x1a\x96\x02\n" +
 	"\rCreateRequest\x12\x10\n" +
 	"\x03key\x18\x02 \x01(\tR\x03key\x12\x19\n" +
@@ -1213,15 +1196,13 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x1a^\n" +
 	"\x0fHistoryResponse\x125\n" +
 	"\x05items\x18\x01 \x03(\v2\x1f.livekit.agent.AgentThread.ItemR\x05items\x12\x14\n" +
-	"\x05after\x18\x02 \x01(\tR\x05after\x1a\xa9\x01\n" +
-	"\x04Item\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x10\n" +
-	"\x03seq\x18\x03 \x01(\x03R\x03seq\x12\x12\n" +
-	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1d\n" +
+	"\x05after\x18\x02 \x01(\tR\x05after\x1a\x8b\x01\n" +
+	"\x04Item\x12\x14\n" +
+	"\x05agent\x18\x01 \x01(\tR\x05agent\x12\x10\n" +
+	"\x03seq\x18\x02 \x01(\x03R\x03seq\x12\x1d\n" +
 	"\n" +
-	"message_id\x18\x05 \x01(\tR\tmessageId\x126\n" +
-	"\apayload\x18\x06 \x01(\v2\x17.google.protobuf.StructB\x03\xc0P\x01R\apayload\x1a~\n" +
+	"message_id\x18\x03 \x01(\tR\tmessageId\x12<\n" +
+	"\x04item\x18\x04 \x01(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\x04item\x1a~\n" +
 	"\x10ListTasksRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x14\n" +
 	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x14\n" +
@@ -1229,13 +1210,13 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x1a`\n" +
 	"\x11ListTasksResponse\x125\n" +
 	"\x05tasks\x18\x01 \x03(\v2\x1f.livekit.agent.AgentThread.TaskR\x05tasks\x12\x14\n" +
-	"\x05after\x18\x02 \x01(\tR\x05after\x1a\xdf\x02\n" +
+	"\x05after\x18\x02 \x01(\tR\x05after\x1a\xe8\x02\n" +
 	"\x04Task\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12\x14\n" +
 	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x16\n" +
 	"\x06status\x18\x03 \x01(\tR\x06status\x12C\n" +
-	"\x0estatus_message\x18\x04 \x01(\v2\x17.google.protobuf.StructB\x03\xc0P\x01R\rstatusMessage\x129\n" +
-	"\ahistory\x18\x05 \x01(\v2\x1a.google.protobuf.ListValueB\x03\xc0P\x01R\ahistory\x12=\n" +
+	"\x0estatus_message\x18\x04 \x01(\v2\x17.google.protobuf.StructB\x03\xc0P\x01R\rstatusMessage\x12B\n" +
+	"\ahistory\x18\x05 \x03(\v2#.livekit.agent.ChatContext.ChatItemB\x03\xc0P\x01R\ahistory\x12=\n" +
 	"\tartifacts\x18\x06 \x01(\v2\x1a.google.protobuf.ListValueB\x03\xc0P\x01R\tartifacts\x12\x16\n" +
 	"\x06parent\x18\a \x01(\tR\x06parent\x129\n" +
 	"\n" +
@@ -1298,9 +1279,10 @@ var file_agent_livekit_agent_thread_proto_goTypes = []any{
 	nil,                                    // 18: livekit.agent.AgentThread.UpdateRequest.AttributesEntry
 	nil,                                    // 19: livekit.agent.AgentThread.Thread.AttributesEntry
 	(*durationpb.Duration)(nil),            // 20: google.protobuf.Duration
-	(*structpb.Struct)(nil),                // 21: google.protobuf.Struct
-	(*structpb.ListValue)(nil),             // 22: google.protobuf.ListValue
-	(*timestamppb.Timestamp)(nil),          // 23: google.protobuf.Timestamp
+	(*ChatContext_ChatItem)(nil),           // 21: livekit.agent.ChatContext.ChatItem
+	(*structpb.Struct)(nil),                // 22: google.protobuf.Struct
+	(*structpb.ListValue)(nil),             // 23: google.protobuf.ListValue
+	(*timestamppb.Timestamp)(nil),          // 24: google.protobuf.Timestamp
 }
 var file_agent_livekit_agent_thread_proto_depIdxs = []int32{
 	17, // 0: livekit.agent.AgentThread.CreateRequest.attributes:type_name -> livekit.agent.AgentThread.CreateRequest.AttributesEntry
@@ -1310,16 +1292,16 @@ var file_agent_livekit_agent_thread_proto_depIdxs = []int32{
 	18, // 4: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
 	20, // 5: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
 	12, // 6: livekit.agent.AgentThread.HistoryResponse.items:type_name -> livekit.agent.AgentThread.Item
-	21, // 7: livekit.agent.AgentThread.Item.payload:type_name -> google.protobuf.Struct
+	21, // 7: livekit.agent.AgentThread.Item.item:type_name -> livekit.agent.ChatContext.ChatItem
 	15, // 8: livekit.agent.AgentThread.ListTasksResponse.tasks:type_name -> livekit.agent.AgentThread.Task
-	21, // 9: livekit.agent.AgentThread.Task.status_message:type_name -> google.protobuf.Struct
-	22, // 10: livekit.agent.AgentThread.Task.history:type_name -> google.protobuf.ListValue
-	22, // 11: livekit.agent.AgentThread.Task.artifacts:type_name -> google.protobuf.ListValue
-	23, // 12: livekit.agent.AgentThread.Task.updated_at:type_name -> google.protobuf.Timestamp
+	22, // 9: livekit.agent.AgentThread.Task.status_message:type_name -> google.protobuf.Struct
+	21, // 10: livekit.agent.AgentThread.Task.history:type_name -> livekit.agent.ChatContext.ChatItem
+	23, // 11: livekit.agent.AgentThread.Task.artifacts:type_name -> google.protobuf.ListValue
+	24, // 12: livekit.agent.AgentThread.Task.updated_at:type_name -> google.protobuf.Timestamp
 	19, // 13: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
-	23, // 14: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
-	23, // 15: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
-	23, // 16: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
+	24, // 14: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
+	24, // 15: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
+	24, // 16: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
 	20, // 17: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
 	18, // [18:18] is the sub-list for method output_type
 	18, // [18:18] is the sub-list for method input_type
@@ -1333,6 +1315,7 @@ func file_agent_livekit_agent_thread_proto_init() {
 	if File_agent_livekit_agent_thread_proto != nil {
 		return
 	}
+	file_agent_livekit_agent_session_proto_init()
 	file_agent_livekit_agent_thread_proto_msgTypes[3].OneofWrappers = []any{
 		(*AgentThread_GetRequest_ThreadId)(nil),
 		(*AgentThread_GetRequest_Key)(nil),

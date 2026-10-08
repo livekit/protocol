@@ -29,6 +29,7 @@ option go_package = "github.com/livekit/protocol/livekit/agent";
 import "google/protobuf/duration.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
+import "agent/livekit_agent_session.proto";
 import "logger/options.proto";
 
 message AgentThread {
@@ -110,18 +111,15 @@ message AgentThread {
     string after = 2;
   }
 
-  // One chat item, as the agents framework stores it (items in
-  // thread_schema_v1.sql).
+  // One chat item of an agent's history. Stored as the JSON of
+  // ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
   message Item {
-    string id = 1;
-    string agent = 2;
+    string agent = 1;
     // Position in the agent's history.
-    int64 seq = 3;
-    // "message", "function_call", "function_call_output" or "agent_handoff".
-    string type = 4;
+    int64 seq = 2;
     // The A2A message the item came from.
-    string message_id = 5;
-    google.protobuf.Struct payload = 6 [(logger.sensitivity) = SENSITIVITY_PII];
+    string message_id = 3;
+    ChatContext.ChatItem item = 4 [(logger.sensitivity) = SENSITIVITY_PII];
   }
 
   // The thread's A2A tasks, oldest first.
@@ -144,7 +142,7 @@ message AgentThread {
     // "canceled" or "rejected".
     string status = 3;
     google.protobuf.Struct status_message = 4 [(logger.sensitivity) = SENSITIVITY_PII];
-    google.protobuf.ListValue history = 5 [(logger.sensitivity) = SENSITIVITY_PII];
+    repeated ChatContext.ChatItem history = 5 [(logger.sensitivity) = SENSITIVITY_PII];
     google.protobuf.ListValue artifacts = 6 [(logger.sensitivity) = SENSITIVITY_PII];
     // The task that submitted this one, if any.
     string parent = 7;

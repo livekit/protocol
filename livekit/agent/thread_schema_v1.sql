@@ -1,8 +1,9 @@
 -- The conversation inside a thread's database, version 1. The agents framework
 -- creates it on a thread's first write; the platform reads items and tasks and
--- merges threads. schema_version, items, tasks and lanes.lane are shared: a
--- change to them is additive and ships as a new version file. Other tables and
--- lane columns belong to the framework.
+-- merges threads. items.payload and tasks.history hold
+-- livekit.agent.ChatContext.ChatItem as protobuf JSON. schema_version, items,
+-- tasks and lanes.lane are shared: a change to them is additive and ships as a
+-- new version file. Other tables and lane columns belong to the framework.
 CREATE TABLE schema_version (version INTEGER NOT NULL, applied_at INTEGER NOT NULL);
 CREATE TABLE items  (lane TEXT NOT NULL, id TEXT PRIMARY KEY, seq INTEGER NOT NULL, type TEXT NOT NULL,
                      message_id TEXT, payload JSONB NOT NULL);
