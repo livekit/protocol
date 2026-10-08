@@ -16,8 +16,8 @@
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
 // an idle TTL and the AgentDB database created with it. An internal key (a
 // LiveKit phone number) can find it again. Served by cloud-protocol's
-// AgentThreads. The agents framework writes the conversation into the
-// database; the platform reads its history and tasks back.
+// AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
+// by the agents framework, which writes it, and the platform, which reads it.
 
 syntax = "proto3";
 
@@ -100,8 +100,8 @@ message AgentThread {
     string after = 2;
   }
 
-  // One chat item of an agent's history, stored by the framework as
-  // ChatContext.ChatItem protobuf JSON.
+  // One chat item of an agent's history. Stored as the JSON of
+  // ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
   message Item {
     string agent = 1;
     // Position in the agent's history.
