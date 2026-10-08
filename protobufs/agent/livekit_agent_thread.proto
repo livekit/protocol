@@ -26,7 +26,6 @@ package livekit.agent;
 option go_package = "github.com/livekit/protocol/livekit/agent";
 
 import "google/protobuf/duration.proto";
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "agent/livekit_agent_session.proto";
 import "logger/options.proto";
@@ -129,28 +128,24 @@ message AgentThread {
   }
 }
 
-// AgentTask: a task an agent runs within a thread, the AgentTask class an agent
-// tool submitted.
+// AgentTask: background work an agent runs within a thread, such as a booking
+// that takes minutes.
 message AgentTask {
   enum Status {
-    SUBMITTED = 0;
-    WORKING = 1;
-    INPUT_REQUIRED = 2;
-    COMPLETED = 3;
-    FAILED = 4;
-    CANCELED = 5;
+    RUNNING = 0;
+    COMPLETED = 1;
+    FAILED = 2;
+    CANCELED = 3;
   }
 
   // A thread's tasks, oldest first.
   message ListRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // One agent's tasks; empty for every agent's.
-    string agent = 2;
-    // Only tasks in this status; unset for every status.
-    optional Status status = 3;
+    // Unset for every status.
+    optional Status status = 2;
     // Cursor from the previous ListResponse; empty for the first page.
-    string after = 4;
-    int32 limit = 5;
+    string after = 3;
+    int32 limit = 4;
   }
 
   message ListResponse {
@@ -164,15 +159,9 @@ message AgentTask {
     string thread_id = 2 [(logger.name) = "threadID"];
     // The agent running it.
     string agent = 3;
-    // The AgentTask class.
+    // The task's name, as the agent defines it.
     string name = 4;
-    // Its constructor arguments.
-    google.protobuf.Struct arguments = 5 [(logger.sensitivity) = SENSITIVITY_PII];
-    Status status = 6;
-    // The task's own conversation.
-    repeated ChatContext.ChatItem history = 7 [(logger.sensitivity) = SENSITIVITY_PII];
-    // The task that submitted this one, if any.
-    string parent = 8;
-    google.protobuf.Timestamp updated_at = 9;
+    Status status = 5;
+    google.protobuf.Timestamp updated_at = 6;
   }
 }
