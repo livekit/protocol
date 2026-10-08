@@ -93,7 +93,7 @@ message AgentDB {
         Hello hello = 2;           // must be first on the socket
         Statement exec = 3;        // answers ExecResult
         Statement query = 4;       // answers Columns + ColumnBatch* + Done
-        Batch batch = 5;           // answers one result per statement, then Done
+        Batch batch = 5;
         Begin begin = 6;
         Commit commit = 7;
         Rollback rollback = 8;
@@ -138,14 +138,8 @@ message AgentDB {
       QueryLang lang = 3;
     }
 
-    // Applied atomically, in order, and answered with one result per
-    // statement, in order: Columns then ColumnBatch frames for a statement
-    // that returns rows, one ExecResult for one that does not, each tagged
-    // with the statement's 0-based index, then a single Done for the whole
-    // batch. A statement that returns no rows still sends its Columns. Credit
-    // paces the ColumnBatch frames of the batch as a whole.
     message Batch {
-      repeated Statement statements = 1;
+      repeated Statement statements = 1;  // applied atomically, in order
     }
 
     message Begin {}
@@ -179,7 +173,6 @@ message AgentDB {
 
     message Columns {
       repeated string names = 1;
-      uint32 statement = 2;        // index within a Batch; 0 and unused for a Query
     }
 
     enum ValueType {
@@ -208,14 +201,12 @@ message AgentDB {
     message ColumnBatch {
       repeated Column columns = 1; // one per name in Columns
       uint32 rows = 2;
-      uint32 statement = 3;        // index within a Batch; 0 and unused for a Query
     }
 
     message ExecResult {
       int64 rows_affected = 1;
       int64 last_insert_id = 2;
       int64 tip = 3;
-      uint32 statement = 4;        // index within a Batch; 0 and unused for an Exec
     }
 
     message Done {
