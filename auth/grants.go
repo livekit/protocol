@@ -24,7 +24,6 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/protocol/livekit/agent"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/protojson"
@@ -716,9 +715,10 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 // ------------------------------------------------------------------
 
-// AgentThreadGrant gives a token access to threads: those whose scope equals
-// Scope, or those listed in ThreadIDs, across the project's agents. It grants
-// thread data only; which endpoints a token may call is agentEndpoint's.
+// AgentThreadGrant gives a token access to threads, across the project's
+// agents: list and create within Scope, and read, write and delete the threads
+// in ThreadIDs. It grants thread data only; which endpoints a token may call is
+// agentEndpoint's.
 type AgentThreadGrant struct {
 	Scope     string   `json:"scope,omitempty"`
 	ThreadIDs []string `json:"threadIds,omitempty"`
@@ -740,30 +740,23 @@ func (s *AgentThreadGrant) CanList(scope string) bool {
 	return s != nil && s.List && s.Scope != "" && s.Scope == scope
 }
 
-// CanRead reports whether the holder may read thread.
-func (s *AgentThreadGrant) CanRead(thread *agent.AgentThread_Thread) bool {
-	return s != nil && s.Read && s.includes(thread)
+// CanRead reports whether the holder may read threadID.
+func (s *AgentThreadGrant) CanRead(threadID string) bool {
+	return s != nil && s.Read && s.includes(threadID)
 }
 
-// CanWrite reports whether the holder may send to thread.
-func (s *AgentThreadGrant) CanWrite(thread *agent.AgentThread_Thread) bool {
-	return s != nil && s.Write && s.includes(thread)
+// CanWrite reports whether the holder may send to threadID.
+func (s *AgentThreadGrant) CanWrite(threadID string) bool {
+	return s != nil && s.Write && s.includes(threadID)
 }
 
-// CanDelete reports whether the holder may delete thread.
-func (s *AgentThreadGrant) CanDelete(thread *agent.AgentThread_Thread) bool {
-	return s != nil && s.Delete && s.includes(thread)
+// CanDelete reports whether the holder may delete threadID.
+func (s *AgentThreadGrant) CanDelete(threadID string) bool {
+	return s != nil && s.Delete && s.includes(threadID)
 }
 
-// includes reports whether thread is in the grant, by scope or by id.
-func (s *AgentThreadGrant) includes(thread *agent.AgentThread_Thread) bool {
-	if thread == nil {
-		return false
-	}
-	if s.Scope != "" && s.Scope == thread.Scope {
-		return true
-	}
-	return thread.ThreadId != "" && slices.Contains(s.ThreadIDs, thread.ThreadId)
+func (s *AgentThreadGrant) includes(threadID string) bool {
+	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
 }
 
 func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
