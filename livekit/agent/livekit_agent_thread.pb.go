@@ -14,7 +14,7 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id; keys (such as a phone
-// number) find it again, at most one thread per key and agent. Holds a subject,
+// number) find it again, at most one thread per key and agent. Holds a scope,
 // attributes, an idle TTL and the AgentDB database with its state. Served by
 // cloud-protocol's AgentThreads.
 
@@ -138,8 +138,8 @@ type AgentThread_CreateRequest struct {
 	// When set, create is get-or-create on (agent_name, key).
 	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	// Groups threads, e.g. by user: an application-defined value, typically the
-	// user's identity. An AgentThreadGrant is scoped by it.
-	Subject    string            `protobuf:"bytes,3,opt,name=subject,proto3" json:"subject,omitempty"`
+	// user's identity. An AgentThreadGrant is scoped by it, across agents.
+	Scope      string            `protobuf:"bytes,3,opt,name=scope,proto3" json:"scope,omitempty"`
 	Attributes map[string]string `protobuf:"bytes,4,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Unset takes the server default.
 	IdleTtl       *durationpb.Duration `protobuf:"bytes,5,opt,name=idle_ttl,json=idleTtl,proto3" json:"idle_ttl,omitempty"`
@@ -191,9 +191,9 @@ func (x *AgentThread_CreateRequest) GetKey() string {
 	return ""
 }
 
-func (x *AgentThread_CreateRequest) GetSubject() string {
+func (x *AgentThread_CreateRequest) GetScope() string {
 	if x != nil {
-		return x.Subject
+		return x.Scope
 	}
 	return ""
 }
@@ -347,11 +347,11 @@ func (*AgentThread_GetRequest_ThreadId) isAgentThread_GetRequest_Lookup() {}
 
 func (*AgentThread_GetRequest_ByKey) isAgentThread_GetRequest_Lookup() {}
 
-// The threads of one subject under one agent, newest first.
+// The threads of one scope under one agent, newest first.
 type AgentThread_ListRequest struct {
 	state     protoimpl.MessageState `protogen:"open.v1"`
 	AgentName string                 `protobuf:"bytes,1,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	Subject   string                 `protobuf:"bytes,2,opt,name=subject,proto3" json:"subject,omitempty"`
+	Scope     string                 `protobuf:"bytes,2,opt,name=scope,proto3" json:"scope,omitempty"`
 	// Cursor from the previous ListResponse; empty for the first page.
 	Before        string `protobuf:"bytes,3,opt,name=before,proto3" json:"before,omitempty"`
 	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -396,9 +396,9 @@ func (x *AgentThread_ListRequest) GetAgentName() string {
 	return ""
 }
 
-func (x *AgentThread_ListRequest) GetSubject() string {
+func (x *AgentThread_ListRequest) GetScope() string {
 	if x != nil {
-		return x.Subject
+		return x.Scope
 	}
 	return ""
 }
@@ -926,7 +926,7 @@ type AgentThread_Thread struct {
 	AgentName string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
 	// Keys themselves are never returned.
 	KeyCount   uint32                 `protobuf:"varint,3,opt,name=key_count,json=keyCount,proto3" json:"key_count,omitempty"`
-	Subject    string                 `protobuf:"bytes,4,opt,name=subject,proto3" json:"subject,omitempty"`
+	Scope      string                 `protobuf:"bytes,4,opt,name=scope,proto3" json:"scope,omitempty"`
 	Attributes map[string]string      `protobuf:"bytes,5,rep,name=attributes,proto3" json:"attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	CreatedAt  *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	LastActive *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=last_active,json=lastActive,proto3" json:"last_active,omitempty"`
@@ -994,9 +994,9 @@ func (x *AgentThread_Thread) GetKeyCount() uint32 {
 	return 0
 }
 
-func (x *AgentThread_Thread) GetSubject() string {
+func (x *AgentThread_Thread) GetScope() string {
 	if x != nil {
-		return x.Subject
+		return x.Scope
 	}
 	return ""
 }
@@ -1054,17 +1054,17 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\x81\x12\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x14logger/options.proto\"\xf5\x11\n" +
 	"\vAgentThread\x1a;\n" +
 	"\bAgentKey\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\tR\x03key\x1a\xb3\x02\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x1a\xaf\x02\n" +
 	"\rCreateRequest\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x10\n" +
-	"\x03key\x18\x02 \x01(\tR\x03key\x12\x1d\n" +
-	"\asubject\x18\x03 \x01(\tB\x03\xc0P\x01R\asubject\x12]\n" +
+	"\x03key\x18\x02 \x01(\tR\x03key\x12\x19\n" +
+	"\x05scope\x18\x03 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
 	"\n" +
 	"attributes\x18\x04 \x03(\v28.livekit.agent.AgentThread.CreateRequest.AttributesEntryB\x03\xc0P\x01R\n" +
 	"attributes\x124\n" +
@@ -1079,11 +1079,11 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"GetRequest\x12*\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDH\x00R\bthreadId\x12<\n" +
 	"\x06by_key\x18\x02 \x01(\v2#.livekit.agent.AgentThread.AgentKeyH\x00R\x05byKeyB\b\n" +
-	"\x06lookup\x1ay\n" +
+	"\x06lookup\x1au\n" +
 	"\vListRequest\x12\x1d\n" +
 	"\n" +
-	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x1d\n" +
-	"\asubject\x18\x02 \x01(\tB\x03\xc0P\x01R\asubject\x12\x16\n" +
+	"agent_name\x18\x01 \x01(\tR\tagentName\x12\x19\n" +
+	"\x05scope\x18\x02 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x16\n" +
 	"\x06before\x18\x03 \x01(\tR\x06before\x12\x14\n" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x1ac\n" +
 	"\fListResponse\x12;\n" +
@@ -1118,13 +1118,13 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1aR\n" +
 	"\x12MergeThreadRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x12\n" +
-	"\x04into\x18\x02 \x01(\tR\x04into\x1a\xcf\x04\n" +
+	"\x04into\x18\x02 \x01(\tR\x04into\x1a\xcb\x04\n" +
 	"\x06Thread\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1b\n" +
-	"\tkey_count\x18\x03 \x01(\rR\bkeyCount\x12\x1d\n" +
-	"\asubject\x18\x04 \x01(\tB\x03\xc0P\x01R\asubject\x12V\n" +
+	"\tkey_count\x18\x03 \x01(\rR\bkeyCount\x12\x19\n" +
+	"\x05scope\x18\x04 \x01(\tB\x03\xc0P\x01R\x05scope\x12V\n" +
 	"\n" +
 	"attributes\x18\x05 \x03(\v21.livekit.agent.AgentThread.Thread.AttributesEntryB\x03\xc0P\x01R\n" +
 	"attributes\x129\n" +
