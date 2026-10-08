@@ -67,8 +67,6 @@ message WorkerMessage {
     WorkerPing ping = 5;
     SimulateJobRequest simulate_job = 6;
     MigrateJobRequest migrate_job = 7;
-    // the worker holds or released a thread
-    UpdateThreadStatus update_thread = 8;
   };
 }
 
@@ -184,23 +182,6 @@ message UpdateJobStatus {
 
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
-}
-
-enum ThreadStatus {
-  // the server routes the thread's requests to this worker
-  TS_ACTIVE = 0;
-  // the worker evicted the thread with everything persisted; final for this worker
-  TS_RELEASED = 1;
-}
-
-// Which threads a worker holds, so a thread's requests reach the worker that
-// has it loaded. Applied per worker in seq order; a dropped control stream
-// releases every binding of the worker.
-message UpdateThreadStatus {
-  string thread_id = 1 [(logger.name) = "threadID"];
-  ThreadStatus status = 2;
-  // monotonic per worker; a late TS_ACTIVE never revives a TS_RELEASED binding
-  uint64 seq = 3;
 }
 
 message UpdateWorkerStatus {
