@@ -16,7 +16,9 @@
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
 // an idle TTL and the AgentDB database created with it. An internal key (a
 // LiveKit phone number) can find it again. Served by cloud-protocol's
-// AgentThreads.
+// AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
+// by the agents framework, which writes it, and the platform, which reads and
+// merges it.
 
 syntax = "proto3";
 
@@ -25,6 +27,7 @@ package livekit.agent;
 option go_package = "github.com/livekit/protocol/livekit/agent";
 
 import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "logger/options.proto";
 
@@ -84,11 +87,68 @@ message AgentThread {
 
   message DeleteResponse {}
 
-  // Marks thread_id as merged into another thread, after its items were copied
-  // there.
+  // Copies every agent's history and tasks of thread_id into another thread,
+  // as agents named "<agent>@<thread_id>", then marks thread_id merged.
   message MergeThreadRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     string into = 2;
+  }
+
+  // The conversation, oldest first.
+  message HistoryRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+    // One agent's history; empty for every agent's.
+    string agent = 2;
+    // Cursor from the previous HistoryResponse; empty for the first page.
+    string after = 3;
+    int32 limit = 4;
+  }
+
+  message HistoryResponse {
+    repeated Item items = 1;
+    // Empty at the end.
+    string after = 2;
+  }
+
+  // One chat item, as the agents framework stores it (items in
+  // thread_schema_v1.sql).
+  message Item {
+    string id = 1;
+    string agent = 2;
+    // Position in the agent's history.
+    int64 seq = 3;
+    // "message", "function_call", "function_call_output" or "agent_handoff".
+    string type = 4;
+    // The A2A message the item came from.
+    string message_id = 5;
+    google.protobuf.Struct payload = 6 [(logger.sensitivity) = SENSITIVITY_PII];
+  }
+
+  // The thread's A2A tasks, oldest first.
+  message ListTasksRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+    string agent = 2;
+    string after = 3;
+    int32 limit = 4;
+  }
+
+  message ListTasksResponse {
+    repeated Task tasks = 1;
+    string after = 2;
+  }
+
+  message Task {
+    string task_id = 1;
+    string agent = 2;
+    // "submitted", "working", "input-required", "completed", "failed",
+    // "canceled" or "rejected".
+    string status = 3;
+    google.protobuf.Struct status_message = 4 [(logger.sensitivity) = SENSITIVITY_PII];
+    google.protobuf.ListValue history = 5 [(logger.sensitivity) = SENSITIVITY_PII];
+    google.protobuf.ListValue artifacts = 6 [(logger.sensitivity) = SENSITIVITY_PII];
+    // The task that submitted this one, if any.
+    string parent = 7;
+    google.protobuf.Timestamp updated_at = 8;
   }
 
   message Thread {
