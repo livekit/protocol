@@ -1,21 +1,12 @@
--- Conversation schema, version 1: the tables inside a thread's database.
---
--- The agents framework creates them on a thread's first write. The platform
--- reads items and tasks. Shared tables change only by adding a new version
--- file. Private tables belong to the framework.
---
--- items.payload and tasks.history hold livekit.agent.ChatContext.ChatItem as
--- protobuf JSON.
-
-
--- Shared ---------------------------------------------------------------------
+-- Tables inside a thread's database, created by the agents framework. The
+-- platform reads items and tasks. items.payload and tasks.history hold
+-- livekit.agent.ChatContext.ChatItem as protobuf JSON.
 
 CREATE TABLE schema_version (
   version    INTEGER NOT NULL,
   applied_at INTEGER NOT NULL
 );
 
--- One chat item per row, in each lane's order.
 CREATE TABLE items (
   lane       TEXT NOT NULL,
   id         TEXT PRIMARY KEY,
@@ -27,7 +18,6 @@ CREATE TABLE items (
 CREATE INDEX items_lane_seq ON items (lane, seq);
 CREATE UNIQUE INDEX items_lane_message ON items (lane, message_id) WHERE message_id IS NOT NULL;
 
--- A2A tasks.
 CREATE TABLE tasks (
   task_id        TEXT PRIMARY KEY,
   lane           TEXT NOT NULL,
@@ -50,7 +40,7 @@ CREATE TABLE tasks (
 CREATE INDEX tasks_lane_status_due ON tasks (lane, status, due_at);
 CREATE UNIQUE INDEX tasks_lane_message ON tasks (lane, message_id) WHERE message_id IS NOT NULL;
 
--- One row per agent that wrote to the thread. Only lane is shared.
+-- One row per agent.
 CREATE TABLE lanes (
   lane         TEXT PRIMARY KEY,
   version      INTEGER NOT NULL,
@@ -63,10 +53,8 @@ CREATE TABLE lanes (
   drained_seq  INTEGER NOT NULL DEFAULT 0
 );
 
+-- The tables below are private to the framework.
 
--- Private --------------------------------------------------------------------
-
--- Run journal.
 CREATE TABLE events (
   seq     INTEGER PRIMARY KEY,
   ts_ms   INTEGER NOT NULL,
@@ -78,7 +66,6 @@ CREATE TABLE events (
 );
 CREATE INDEX events_lane_seq ON events (lane, seq);
 
--- Messages waiting for a busy lane.
 CREATE TABLE inbox (
   seq         INTEGER PRIMARY KEY,
   lane        TEXT NOT NULL,
