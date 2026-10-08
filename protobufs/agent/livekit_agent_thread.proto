@@ -14,9 +14,8 @@
 
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
-// an idle TTL and the AgentDB database created with it. An internal key (a
-// LiveKit phone number) finds it again through create. Served by cloud-protocol's
-// AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
+// an idle TTL and the AgentDB database created with it. Served by
+// cloud-protocol's AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
 // by the agents framework, which writes it, and the platform, which reads it.
 
 syntax = "proto3";
@@ -32,21 +31,12 @@ import "logger/options.proto";
 
 message AgentThread {
   message CreateRequest {
-    // Internal: when set, create is get-or-create on key (e.g. a LiveKit phone
-    // number). Not exposed by the public API.
-    string key = 1;
     // Groups threads, e.g. by user: an application-defined value, typically the
     // user's identity. An AgentThreadGrant is scoped by it.
-    string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
-    map<string, string> attributes = 3 [(logger.sensitivity) = SENSITIVITY_PII];
+    string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
+    map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
     // Unset takes the server default.
-    google.protobuf.Duration idle_ttl = 4;
-  }
-
-  message CreateResponse {
-    Thread thread = 1;
-    // False when the key already named a thread, which is returned as is.
-    bool created = 2;
+    google.protobuf.Duration idle_ttl = 3;
   }
 
   message GetRequest {
@@ -110,18 +100,16 @@ message AgentThread {
 
   message Thread {
     string thread_id = 1 [(logger.name) = "threadID"];
-    // Internal: the key the thread was created with, if any.
-    string key = 2;
-    string scope = 3 [(logger.sensitivity) = SENSITIVITY_PII];
-    map<string, string> attributes = 4 [(logger.sensitivity) = SENSITIVITY_PII];
-    google.protobuf.Timestamp created_at = 5;
-    google.protobuf.Timestamp last_active = 6;
+    string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    map<string, string> attributes = 3 [(logger.sensitivity) = SENSITIVITY_PII];
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp last_active = 5;
     // last_active + idle_ttl; every update pushes it out. The thread and its
     // database are deleted once it passes.
-    google.protobuf.Timestamp expires_at = 7;
-    google.protobuf.Duration idle_ttl = 8;
+    google.protobuf.Timestamp expires_at = 6;
+    google.protobuf.Duration idle_ttl = 7;
     // The thread's database ("DB_..."), created with the thread.
-    string database_id = 9;
+    string database_id = 8;
   }
 }
 
