@@ -24,8 +24,8 @@ CREATE UNIQUE INDEX items_lane_message ON items (lane, message_id) WHERE message
 -- AgentTask (name set). Used by: the framework's A2A methods (message/send,
 -- message/stream, tasks/get, tasks/list, tasks/cancel), which rebuild the A2A
 -- Task as id = task_id, contextId = the thread id, status = (status,
--- status_message, updated_at), plus the fields of data. And ListThreadTasks, for the
--- rows with a name.
+-- status_message, updated_at), plus the fields of data. And ListThreadTasks,
+-- for the rows with a name.
 CREATE TABLE tasks (
   task_id        TEXT PRIMARY KEY,
   lane           TEXT NOT NULL,   -- the agent
@@ -37,7 +37,7 @@ CREATE TABLE tasks (
   status_message JSONB,           -- A2A Message
   updated_at     INTEGER NOT NULL,
   data           JSONB NOT NULL,  -- A2A Task fields: history, artifacts, metadata
-  state          JSONB            -- the AgentTask's arguments and pending question, for the framework to resume it
+  state          JSONB            -- AgentTask arguments and pending question, to resume it
 );
 CREATE INDEX tasks_lane_status ON tasks (lane, status);
 CREATE UNIQUE INDEX tasks_lane_message ON tasks (lane, message_id) WHERE message_id IS NOT NULL;
