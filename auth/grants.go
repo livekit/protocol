@@ -728,9 +728,9 @@ type AgentThreadGrant struct {
 	Delete    bool     `json:"delete,omitempty"`
 }
 
-// Covers reports whether a thread is in the grant, by scope or by id. An empty
+// Allows reports whether a thread is in the grant, by scope or by id. An empty
 // Scope or thread id never matches; the caller checks the flags.
-func (s *AgentThreadGrant) Covers(scope, threadID string) bool {
+func (s *AgentThreadGrant) Allows(scope, threadID string) bool {
 	if s == nil {
 		return false
 	}

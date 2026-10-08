@@ -529,7 +529,7 @@ func TestAgentEndpointGrantCloneIndependent(t *testing.T) {
 	require.Equal(t, "a", grants.AgentEndpoint.AgentName)
 }
 
-func TestAgentThreadGrantCovers(t *testing.T) {
+func TestAgentThreadGrantAllows(t *testing.T) {
 	t.Parallel()
 
 	byScope := &AgentThreadGrant{Scope: "u1"}
@@ -552,7 +552,7 @@ func TestAgentThreadGrantCovers(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			require.Equal(t, c.want, c.grant.Covers(c.scope, c.threadID))
+			require.Equal(t, c.want, c.grant.Allows(c.scope, c.threadID))
 		})
 	}
 }
