@@ -542,15 +542,28 @@ func TestAgentThreadGrantChecks(t *testing.T) {
 	require.True(t, g.CanList("u1"))
 	require.False(t, g.CanList("u2"))
 	require.False(t, g.CanList(""))
-	require.True(t, g.CanCreate())
+	require.True(t, g.CanCreate("u1"))
+	require.False(t, g.CanCreate("u2"))
+	require.False(t, g.CanUpdate())
 
 	idsOnly := &AgentThreadGrant{ThreadIDs: []string{"AT_4"}, Create: true, Write: true}
 	require.True(t, idsOnly.CanWrite("AT_4"))
-	require.False(t, idsOnly.CanCreate())
+	require.False(t, idsOnly.CanCreate(""))
+
+	// All covers every thread and scope, still gated by the action flags.
+	all := &AgentThreadGrant{All: true, Read: true, List: true}
+	require.True(t, all.CanRead("AT_9"))
+	require.True(t, all.CanList("any"))
+	require.False(t, all.CanRead(""))
+	require.False(t, all.CanDelete("AT_9"))
+	require.False(t, all.CanCreate("any"))
+	require.False(t, all.CanUpdate())
+	require.True(t, (&AgentThreadGrant{All: true, Write: true}).CanUpdate())
 
 	var none *AgentThreadGrant
 	require.False(t, none.CanRead("AT_1"))
-	require.False(t, none.CanCreate())
+	require.False(t, none.CanCreate("u1"))
+	require.False(t, none.CanUpdate())
 }
 
 func TestAgentThreadGrantCloneIndependent(t *testing.T) {

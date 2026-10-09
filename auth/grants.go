@@ -717,9 +717,11 @@ func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 
 // AgentThreadGrant gives a token access to threads, across the project's
 // agents: list and create within Scope, and read, write and delete the threads
-// in ThreadIDs. It grants thread data only; which endpoints a token may call is
-// agentEndpoint's.
+// in ThreadIDs. All extends it to every thread and scope of the project; the
+// action flags still apply. It grants thread data only; which endpoints a token
+// may call is agentEndpoint's.
 type AgentThreadGrant struct {
+	All       bool     `json:"all,omitempty"`
 	Scope     string   `json:"scope,omitempty"`
 	ThreadIDs []string `json:"threadIds,omitempty"`
 	List      bool     `json:"list,omitempty"`
@@ -729,15 +731,21 @@ type AgentThreadGrant struct {
 	Delete    bool     `json:"delete,omitempty"`
 }
 
-// CanCreate reports whether the holder may create threads. They are created in
-// the grant's scope, so a grant without one cannot create.
-func (s *AgentThreadGrant) CanCreate() bool {
-	return s != nil && s.Create && s.Scope != ""
+// CanCreate reports whether the holder may create threads in scope. A scoped
+// grant creates only in its own scope.
+func (s *AgentThreadGrant) CanCreate(scope string) bool {
+	return s != nil && s.Create && s.inScope(scope)
 }
 
 // CanList reports whether the holder may list the threads of scope.
 func (s *AgentThreadGrant) CanList(scope string) bool {
-	return s != nil && s.List && s.Scope != "" && s.Scope == scope
+	return s != nil && s.List && s.inScope(scope)
+}
+
+// CanUpdate reports whether the holder may change any thread's attributes and
+// idle TTL, which only a project-wide grant may.
+func (s *AgentThreadGrant) CanUpdate() bool {
+	return s != nil && s.All && s.Write
 }
 
 // CanRead reports whether the holder may read threadID.
@@ -755,8 +763,12 @@ func (s *AgentThreadGrant) CanDelete(threadID string) bool {
 	return s != nil && s.Delete && s.includes(threadID)
 }
 
+func (s *AgentThreadGrant) inScope(scope string) bool {
+	return s.All || (s.Scope != "" && s.Scope == scope)
+}
+
 func (s *AgentThreadGrant) includes(threadID string) bool {
-	return threadID != "" && slices.Contains(s.ThreadIDs, threadID)
+	return threadID != "" && (s.All || slices.Contains(s.ThreadIDs, threadID))
 }
 
 func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
@@ -777,6 +789,7 @@ func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 		return nil
 	}
 
+	e.AddBool("All", s.All)
 	e.AddString("Scope", s.Scope)
 	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
 	e.AddBool("List", s.List)
