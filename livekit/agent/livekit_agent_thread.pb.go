@@ -44,7 +44,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Zero is never a task's status, so every status appears in JSON.
+// A task is never UNSPECIFIED.
 type AgentTask_Status int32
 
 const (

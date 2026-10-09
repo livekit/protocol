@@ -116,7 +116,7 @@ message AgentThread {
 // AgentTask: background work an agent runs within a thread, such as a booking
 // that takes minutes.
 message AgentTask {
-  // Zero is never a task's status, so every status appears in JSON.
+  // A task is never UNSPECIFIED.
   enum Status {
     UNSPECIFIED = 0;
     RUNNING = 1;
