@@ -15,6 +15,7 @@
 package datatrack
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/livekit/protocol/livekit"
@@ -210,6 +211,64 @@ func TestPacket(t *testing.T) {
 		var extParticipantSid ExtensionParticipantSid
 		require.NoError(t, extParticipantSid.Unmarshal(ext))
 		require.Equal(t, livekit.ParticipantID("test_participant"), extParticipantSid.ParticipantID())
+	})
+
+	t.Run("with client extensions", func(t *testing.T) {
+		// mirrors the serialization test vector of the Rust client (livekit-datatrack)
+		payload := bytes.Repeat([]byte{0xfa}, 1024)
+		packet := &Packet{
+			Header: Header{
+				Version:        0,
+				IsStartOfFrame: false,
+				IsFinalOfFrame: true,
+				Handle:         0x8811,
+				SequenceNumber: 0x4422,
+				FrameNumber:    0x4411,
+				Timestamp:      0x44221188,
+			},
+			Payload: payload,
+		}
+		var iv [ExtensionE2EEIVLength]byte
+		for i := range iv {
+			iv[i] = 0x3c
+		}
+		ext, err := NewExtensionE2EE(0xfa, iv).Marshal()
+		require.NoError(t, err)
+		packet.AddExtension(ext)
+		ext, err = NewExtensionUserTimestamp(0x4411221111118811).Marshal()
+		require.NoError(t, err)
+		packet.AddExtension(ext)
+
+		rawPacket, err := packet.Marshal()
+		require.NoError(t, err)
+		require.Len(t, rawPacket, 1064)
+
+		expectedHeader := []byte{
+			0x0c, 0x00, 0x88, 0x11, 0x44, 0x22, 0x44, 0x11, // version 0, final, extensions; handle; sequence; frame
+			0x44, 0x22, 0x11, 0x88, 0x00, 0x06, // timestamp; extension words
+			0x01, 0x0d, 0xfa, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, 0x3c, // E2EE
+			0x02, 0x08, 0x44, 0x11, 0x22, 0x11, 0x11, 0x11, 0x88, 0x11, // user timestamp
+			0x00, // padding
+		}
+		require.Equal(t, expectedHeader, rawPacket[:len(expectedHeader)])
+		require.Equal(t, payload, rawPacket[len(expectedHeader):])
+
+		var unmarshaled Packet
+		require.NoError(t, unmarshaled.Unmarshal(rawPacket))
+		require.Equal(t, packet, &unmarshaled)
+
+		ext, err = unmarshaled.GetExtension(ExtensionE2EEID)
+		require.NoError(t, err)
+		var extE2EE ExtensionE2EE
+		require.NoError(t, extE2EE.Unmarshal(ext))
+		require.Equal(t, uint8(0xfa), extE2EE.KeyIndex())
+		require.Equal(t, iv, extE2EE.IV())
+
+		ext, err = unmarshaled.GetExtension(ExtensionUserTimestampID)
+		require.NoError(t, err)
+		var extUserTimestamp ExtensionUserTimestamp
+		require.NoError(t, extUserTimestamp.Unmarshal(ext))
+		require.Equal(t, uint64(0x4411221111118811), extUserTimestamp.Timestamp())
 	})
 
 	t.Run("bad packet", func(t *testing.T) {

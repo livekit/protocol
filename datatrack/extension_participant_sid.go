@@ -47,11 +47,11 @@ func (e *ExtensionParticipantSid) Marshal() (Extension, error) {
 
 func (e *ExtensionParticipantSid) Unmarshal(ext Extension) error {
 	if ext.id != uint8(livekit.DataTrackExtensionID_DTEI_PARTICIPANT_SID) {
-		return errors.New("invalid extension ID")
+		return ErrExtensionInvalidID
 	}
 
 	if len(ext.data) == 0 {
-		return errors.New("empty extension data")
+		return ErrExtensionDataTooShort
 	}
 
 	e.participantID = livekit.ParticipantID(ext.data)
