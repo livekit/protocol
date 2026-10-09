@@ -103,12 +103,25 @@ message MediaSource {
   // TODO: DataConfig data = 4;
 }
 
-// Preserve every matching room track as an independent MCAP channel. An empty
-// track_names list captures every track. Names are exact-match allowlist entries;
-// if multiple participants publish the same name, every matching track is captured.
-// Currently audio and video tracks are supported. Data tracks can be added without
-// changing the selection model.
+// Preserve selected room data as independent output channels. With no modality
+// selectors, every supported track is captured. When any modality selector is
+// present, only the selected modalities are captured. Empty selector lists mean
+// "all"; non-empty lists are exact-match allowlists.
 message DataSource {
+  reserved 1;
+  reserved "track_names";
+
+  ParticipantSelection participants = 2;
+  TrackSelection video_tracks = 3;
+  TrackSelection audio_tracks = 4;
+  TrackSelection data_tracks = 5;
+}
+
+message ParticipantSelection {
+  repeated string identities = 1;
+}
+
+message TrackSelection {
   repeated string track_names = 1;
 }
 

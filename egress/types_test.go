@@ -97,7 +97,9 @@ func TestGetOutputType(t *testing.T) {
 func TestGetTypesData(t *testing.T) {
 	req := &livekit.StartEgressRequest{
 		Source: &livekit.StartEgressRequest_Data{
-			Data: &livekit.DataSource{TrackNames: []string{"camera"}},
+			Data: &livekit.DataSource{
+				VideoTracks: &livekit.TrackSelection{TrackNames: []string{"camera"}},
+			},
 		},
 		Outputs: []*livekit.Output{
 			{
