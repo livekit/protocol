@@ -1,6 +1,9 @@
 package sip
 
 import (
+	"slices"
+	"strings"
+
 	"github.com/livekit/protocol/livekit"
 	"github.com/nyaruka/phonenumbers"
 )
@@ -54,4 +57,70 @@ func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 	default:
 		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_UNKNOWN
 	}
+}
+
+var emergencyNumbers = []string{"911", "1911"}
+
+// IsEmergencyNumber reports whether a dialed number reaches the 911 emergency
+// service. It accepts the bare number and the +1 or 1 prefixed forms.
+func IsEmergencyNumber(number string) bool {
+	digits := strings.Map(func(r rune) rune {
+		if strings.ContainsRune("+ -()", r) {
+			return -1
+		}
+		return r
+	}, number)
+	return slices.Contains(emergencyNumbers, digits)
+}
+
+// URIUser returns the user part of a sip, sips or tel URI, with the display
+// name, angle brackets, host and parameters removed. A URI with no user part
+// and anything that is not a URI returns an empty string.
+func URIUser(uri string) string {
+	uri = skipQuotedDisplayName(uri)
+	if i := strings.Index(uri, "<"); i >= 0 {
+		uri = uri[i+1:]
+		if j := strings.Index(uri, ">"); j >= 0 {
+			uri = uri[:j]
+		}
+	}
+	colon := strings.Index(uri, ":")
+	if colon < 0 {
+		return ""
+	}
+	scheme, rest := strings.ToLower(uri[:colon]), uri[colon+1:]
+	var user string
+	switch scheme {
+	case "sip", "sips":
+		at := strings.Index(rest, "@")
+		if at < 0 {
+			return ""
+		}
+		user = rest[:at]
+	case "tel":
+		user = rest
+	default:
+		return ""
+	}
+	if i := strings.IndexAny(user, ";?"); i >= 0 {
+		user = user[:i]
+	}
+	return user
+}
+
+// skipQuotedDisplayName returns the part of a name-addr after a leading quoted
+// display name, so that a "<" inside the quotes is not taken as the URI start.
+func skipQuotedDisplayName(s string) string {
+	if !strings.HasPrefix(s, "\"") {
+		return s
+	}
+	for i := 1; i < len(s); i++ {
+		switch s[i] {
+		case '\\':
+			i++
+		case '"':
+			return s[i+1:]
+		}
+	}
+	return s
 }
