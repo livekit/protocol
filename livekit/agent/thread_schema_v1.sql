@@ -17,7 +17,7 @@ CREATE TABLE schema_version (
 -- One chat item per row.
 CREATE TABLE items (
   pos        INTEGER PRIMARY KEY AUTOINCREMENT,  -- [platform] insertion order, never reused: the page token's sort key
-  id         TEXT NOT NULL UNIQUE,               -- [framework] the item's id, its upsert key
+  id         TEXT NOT NULL UNIQUE,               -- [framework] the item's id, its upsert key (ON CONFLICT DO UPDATE: a REPLACE would move pos)
   lane       TEXT NOT NULL,                      -- [platform, framework]
   seq        INTEGER NOT NULL,                   -- [platform, framework] position in the lane
   message_id TEXT,                               -- [platform, framework] the A2A messageId it came from, for idempotency

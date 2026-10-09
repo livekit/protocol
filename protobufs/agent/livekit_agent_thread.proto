@@ -86,8 +86,8 @@ message AgentThread {
     // next_page_token of the previous GetItemsResponse; empty for the first page.
     string page_token = 3;
     int32 limit = 4;
-    // Unset or ASC is oldest first. DESC starts from the latest item and the
-    // cursor walks back through older ones.
+    // Unset or ASC is oldest first. DESC starts from the latest item and each
+    // next_page_token walks back through older ones.
     SortOrder sort_order = 5;
   }
 
