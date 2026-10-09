@@ -198,7 +198,7 @@ message UpdateWorkerStatus {
 message JobAssignment {
   Job job = 1;
   optional string url = 2;
-  string token = 3;
+  string token = 3 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
 
 message JobTermination {

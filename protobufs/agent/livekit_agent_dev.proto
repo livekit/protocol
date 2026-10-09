@@ -4,6 +4,8 @@ package livekit.agent;
 
 option go_package = "github.com/livekit/protocol/livekit/agent";
 
+import "logger/options.proto";
+
 // AgentDevMessage is used for IPC between the CLI and agent processes
 // during dev-mode hot reload.
 message AgentDevMessage {
@@ -32,7 +34,7 @@ message RunningAgentJobInfo {
   string accept_identity = 3;
   string accept_metadata = 4;
   string url = 5;
-  string token = 6;
+  string token = 6 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string worker_id = 7;
   bool mock_job = 8;
 }

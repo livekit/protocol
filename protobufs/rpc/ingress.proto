@@ -66,14 +66,14 @@ message ListActiveIngressResponse {
 
 message DeleteWHIPResourceRequest {
   string resource_id = 1 [(logger.name) = "resourceID"];
-  string stream_key = 2;
+  string stream_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
 
 message ICERestartWHIPResourceRequest {
   string resource_id = 1 [(logger.name) = "resourceID"];
-  string stream_key = 2;
+  string stream_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string user_fragment = 3;
-  string password = 4;
+  string password = 4 [(logger.sensitivity) = SENSITIVITY_SECRET];
   repeated string candidates = 5;
   string raw_trickle_ice_sdpfrag = 6;
   string if_match = 7;
@@ -93,7 +93,7 @@ message WHIPRTCConnectionNotifyRequest {
 
 message StartIngressRequest {
   livekit.IngressInfo info = 1;
-  string token = 2;
+  string token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   string ws_url = 3;
   map<string, string> logging_fields = 4;
   map<string, string> feature_flags = 5;

@@ -21,6 +21,8 @@ option go_package = "github.com/livekit/protocol/livekit";
 option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
+import "logger/options.proto";
+
 // AgentDBService is the lifecycle and export API for SQLite databases; queries
 // run over the data plane below. The project comes from the access token.
 service AgentDBService {
@@ -165,7 +167,7 @@ message AgentDB {
     }
 
     message Hello {
-      string token = 1;
+      string token = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
       string database_id = 2;
     }
 
