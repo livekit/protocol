@@ -6917,7 +6917,7 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x03set\x18\x01 \x03(\tR\x03set\x12\x10\n" +
 	"\x03add\x18\x02 \x03(\tR\x03add\x12\x16\n" +
 	"\x06remove\x18\x03 \x03(\tR\x06remove\x12\x14\n" +
-	"\x05clear\x18\x04 \x01(\bR\x05clear\"\xc4\x04\n" +
+	"\x05clear\x18\x04 \x01(\bR\x05clear\"\xc9\x04\n" +
 	"\x04Room\x12\x10\n" +
 	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12#\n" +
@@ -6925,8 +6925,8 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\x11departure_timeout\x18\x0e \x01(\rR\x10departureTimeout\x12)\n" +
 	"\x10max_participants\x18\x04 \x01(\rR\x0fmaxParticipants\x12#\n" +
 	"\rcreation_time\x18\x05 \x01(\x03R\fcreationTime\x12(\n" +
-	"\x10creation_time_ms\x18\x0f \x01(\x03R\x0ecreationTimeMs\x12#\n" +
-	"\rturn_password\x18\x06 \x01(\tR\fturnPassword\x125\n" +
+	"\x10creation_time_ms\x18\x0f \x01(\x03R\x0ecreationTimeMs\x12(\n" +
+	"\rturn_password\x18\x06 \x01(\tB\x03\xc0P\x02R\fturnPassword\x125\n" +
 	"\x0eenabled_codecs\x18\a \x03(\v2\x0e.livekit.CodecR\renabledCodecs\x12@\n" +
 	"\bmetadata\x18\b \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\bmetadata\x12)\n" +
 	"\x10num_participants\x18\t \x01(\rR\x0fnumParticipants\x12%\n" +

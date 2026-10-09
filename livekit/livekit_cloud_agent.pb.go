@@ -3279,10 +3279,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"AgentEvent\x12+\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x17.livekit.AgentEventTypeR\x04type\x12\x14\n" +
 	"\x05count\x18\x02 \x01(\x05R\x05count\x128\n" +
-	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\xfd\x01\n" +
+	"\ttimestamp\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\ttimestamp\"\x82\x02\n" +
 	"\vAgentSecret\x12\x12\n" +
-	"\x04name\x18\x01 \x01(\tR\x04name\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\fR\x05value\x129\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x19\n" +
+	"\x05value\x18\x02 \x01(\fB\x03\xc0P\x02R\x05value\x129\n" +
 	"\n" +
 	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
@@ -3329,10 +3329,10 @@ const file_livekit_cloud_agent_proto_rawDesc = "" +
 	"\x0esrc_deployment\x18\x04 \x01(\tR\rsrcDeployment\x12%\n" +
 	"\x0edst_deployment\x18\x05 \x01(\tR\rdstDeployment\x12\x1f\n" +
 	"\vversion_tag\x18\x06 \x01(\tR\n" +
-	"versionTag\"\xa6\x01\n" +
+	"versionTag\"\xab\x01\n" +
 	"\x14PresignedPostRequest\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url\x12A\n" +
-	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryR\x06values\x1a9\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12F\n" +
+	"\x06values\x18\x02 \x03(\v2).livekit.PresignedPostRequest.ValuesEntryB\x03\xc0P\x02R\x06values\x1a9\n" +
 	"\vValuesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x86\x05\n" +
