@@ -140,10 +140,15 @@ message AgentTask {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Unset for every status.
     optional Status status = 2;
+    // next_page_token of the previous GetTasksResponse; empty for the first page.
+    string page_token = 3;
+    int32 limit = 4;
   }
 
   message GetTasksResponse {
     repeated Task tasks = 1;
+    // Empty when exhausted.
+    string next_page_token = 2;
   }
 
   message Task {
