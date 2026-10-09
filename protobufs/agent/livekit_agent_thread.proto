@@ -116,11 +116,13 @@ message AgentThread {
 // AgentTask: background work an agent runs within a thread, such as a booking
 // that takes minutes.
 message AgentTask {
+  // Zero is never a task's status, so every status appears in JSON.
   enum Status {
-    RUNNING = 0;
-    COMPLETED = 1;
-    FAILED = 2;
-    CANCELED = 3;
+    UNSPECIFIED = 0;
+    RUNNING = 1;
+    COMPLETED = 2;
+    FAILED = 3;
+    CANCELED = 4;
   }
 
   // A thread's tasks, oldest first.

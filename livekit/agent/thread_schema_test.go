@@ -20,7 +20,7 @@ import "testing"
 // it would silently match nothing.
 func TestEveryTaskStatusHasStates(t *testing.T) {
 	for value := range AgentTask_Status_name {
-		if len(TaskStates(AgentTask_Status(value))) == 0 {
+		if value != 0 && len(TaskStates(AgentTask_Status(value))) == 0 {
 			t.Errorf("%s has no tasks.status value", AgentTask_Status(value))
 		}
 	}
