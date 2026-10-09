@@ -31,16 +31,17 @@ CREATE UNIQUE INDEX items_lane_message ON items (lane, message_id) WHERE message
 -- AgentTask (name set). The A2A Task is id = task_id, contextId = the thread
 -- id, status = (status, status_message, updated_at), plus the fields of data.
 CREATE TABLE tasks (
-  task_id        TEXT PRIMARY KEY,  -- [platform, a2a, framework]
-  lane           TEXT NOT NULL,     -- [framework]
-  seq            INTEGER NOT NULL,  -- [framework] submission order in the lane
-  name           TEXT,              -- [platform, framework] the AgentTask class
-  message_id     TEXT,              -- [framework] the A2A messageId that created it, for idempotency
-  status         TEXT NOT NULL,     -- [platform, a2a, framework] A2A TaskState (agent.TaskStatus maps it), working when a new run finds it means its worker was lost
-  status_message JSONB,             -- [a2a] A2A Message
-  updated_at     INTEGER NOT NULL,  -- [platform, a2a, framework]
-  data           JSONB NOT NULL,    -- [a2a] A2A Task fields: history, artifacts, metadata
-  internal       JSONB              -- [framework] AgentTask arguments and pending question, to resume it
+  pos            INTEGER PRIMARY KEY AUTOINCREMENT,  -- [platform] insertion order, never reused: the page token's sort key
+  task_id        TEXT NOT NULL UNIQUE,               -- [platform, a2a, framework] its upsert key (ON CONFLICT DO UPDATE: a REPLACE would move pos)
+  lane           TEXT NOT NULL,                      -- [framework]
+  seq            INTEGER NOT NULL,                   -- [framework] submission order in the lane
+  name           TEXT,                               -- [platform, framework] the AgentTask class
+  message_id     TEXT,                               -- [framework] the A2A messageId that created it, for idempotency
+  status         TEXT NOT NULL,                      -- [platform, a2a, framework] A2A TaskState (agent.TaskStatus maps it), working when a new run finds it means its worker was lost
+  status_message JSONB,                              -- [a2a] A2A Message
+  updated_at     INTEGER NOT NULL,                   -- [platform, a2a, framework]
+  data           JSONB NOT NULL,                     -- [a2a] A2A Task fields: history, artifacts, metadata
+  internal       JSONB                               -- [framework] AgentTask arguments and pending question, to resume it
 );
 CREATE INDEX tasks_lane_seq ON tasks (lane, seq);
 CREATE INDEX tasks_lane_status ON tasks (lane, status, seq);
