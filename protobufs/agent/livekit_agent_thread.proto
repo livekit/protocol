@@ -79,6 +79,9 @@ message AgentThread {
     // Cursor from the previous GetItemsResponse; empty for the first page.
     string after = 3;
     int32 limit = 4;
+    // Newest first, so the first page is the latest items and the cursor walks
+    // back through older ones. Unset is oldest first.
+    bool newest_first = 5;
   }
 
   message GetItemsResponse {
