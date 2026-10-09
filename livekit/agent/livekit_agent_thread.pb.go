@@ -335,8 +335,8 @@ func (x *AgentThread_GetRequest) GetThreadId() string {
 type AgentThread_ListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Scope string                 `protobuf:"bytes,1,opt,name=scope,proto3" json:"scope,omitempty"`
-	// Cursor from the previous ListResponse; empty for the first page.
-	Before        string `protobuf:"bytes,2,opt,name=before,proto3" json:"before,omitempty"`
+	// next_page_token of the previous ListResponse; empty for the first page.
+	PageToken     string `protobuf:"bytes,2,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Limit         int32  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -379,9 +379,9 @@ func (x *AgentThread_ListRequest) GetScope() string {
 	return ""
 }
 
-func (x *AgentThread_ListRequest) GetBefore() string {
+func (x *AgentThread_ListRequest) GetPageToken() string {
 	if x != nil {
-		return x.Before
+		return x.PageToken
 	}
 	return ""
 }
@@ -396,8 +396,8 @@ func (x *AgentThread_ListRequest) GetLimit() int32 {
 type AgentThread_ListResponse struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Threads []*AgentThread_Thread  `protobuf:"bytes,1,rep,name=threads,proto3" json:"threads,omitempty"`
-	// Empty at the end.
-	Before        string `protobuf:"bytes,2,opt,name=before,proto3" json:"before,omitempty"`
+	// Empty when exhausted.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -439,9 +439,9 @@ func (x *AgentThread_ListResponse) GetThreads() []*AgentThread_Thread {
 	return nil
 }
 
-func (x *AgentThread_ListResponse) GetBefore() string {
+func (x *AgentThread_ListResponse) GetNextPageToken() string {
 	if x != nil {
-		return x.Before
+		return x.NextPageToken
 	}
 	return ""
 }
@@ -593,9 +593,9 @@ type AgentThread_GetItemsRequest struct {
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	// One agent's items; empty for every agent's.
 	Agent string `protobuf:"bytes,2,opt,name=agent,proto3" json:"agent,omitempty"`
-	// Cursor from the previous GetItemsResponse; empty for the first page.
-	After string `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
-	Limit int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	// next_page_token of the previous GetItemsResponse; empty for the first page.
+	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	Limit     int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Unset or ASC is oldest first. DESC starts from the latest item and the
 	// cursor walks back through older ones.
 	SortOrder     AgentThread_SortOrder `protobuf:"varint,5,opt,name=sort_order,json=sortOrder,proto3,enum=livekit.agent.AgentThread_SortOrder" json:"sort_order,omitempty"`
@@ -647,9 +647,9 @@ func (x *AgentThread_GetItemsRequest) GetAgent() string {
 	return ""
 }
 
-func (x *AgentThread_GetItemsRequest) GetAfter() string {
+func (x *AgentThread_GetItemsRequest) GetPageToken() string {
 	if x != nil {
-		return x.After
+		return x.PageToken
 	}
 	return ""
 }
@@ -671,8 +671,8 @@ func (x *AgentThread_GetItemsRequest) GetSortOrder() AgentThread_SortOrder {
 type AgentThread_GetItemsResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	Items []*AgentThread_Item    `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-	// Empty at the end.
-	After         string `protobuf:"bytes,2,opt,name=after,proto3" json:"after,omitempty"`
+	// Empty when exhausted.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -714,9 +714,9 @@ func (x *AgentThread_GetItemsResponse) GetItems() []*AgentThread_Item {
 	return nil
 }
 
-func (x *AgentThread_GetItemsResponse) GetAfter() string {
+func (x *AgentThread_GetItemsResponse) GetNextPageToken() string {
 	if x != nil {
-		return x.After
+		return x.NextPageToken
 	}
 	return ""
 }
@@ -1075,7 +1075,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xd7\x0e\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\x89\x0f\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1088,14 +1088,15 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a6\n" +
 	"\n" +
 	"GetRequest\x12(\n" +
-	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1aV\n" +
+	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a]\n" +
 	"\vListRequest\x12\x19\n" +
-	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x16\n" +
-	"\x06before\x18\x02 \x01(\tR\x06before\x12\x14\n" +
-	"\x05limit\x18\x03 \x01(\x05R\x05limit\x1ac\n" +
+	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x1as\n" +
 	"\fListResponse\x12;\n" +
-	"\athreads\x18\x01 \x03(\v2!.livekit.agent.AgentThread.ThreadR\athreads\x12\x16\n" +
-	"\x06before\x18\x02 \x01(\tR\x06before\x1a\x8d\x02\n" +
+	"\athreads\x18\x01 \x03(\v2!.livekit.agent.AgentThread.ThreadR\athreads\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\x8d\x02\n" +
 	"\rUpdateRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12]\n" +
 	"\n" +
@@ -1107,17 +1108,18 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
 	"\rDeleteRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a\x10\n" +
-	"\x0eDeleteResponse\x1a\xc2\x01\n" +
+	"\x0eDeleteResponse\x1a\xcb\x01\n" +
 	"\x0fGetItemsRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x14\n" +
-	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x14\n" +
-	"\x05after\x18\x03 \x01(\tR\x05after\x12\x14\n" +
+	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\x12\x14\n" +
 	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12C\n" +
 	"\n" +
-	"sort_order\x18\x05 \x01(\x0e2$.livekit.agent.AgentThread.SortOrderR\tsortOrder\x1a_\n" +
+	"sort_order\x18\x05 \x01(\x0e2$.livekit.agent.AgentThread.SortOrderR\tsortOrder\x1aq\n" +
 	"\x10GetItemsResponse\x125\n" +
-	"\x05items\x18\x01 \x03(\v2\x1f.livekit.agent.AgentThread.ItemR\x05items\x12\x14\n" +
-	"\x05after\x18\x02 \x01(\tR\x05after\x1a\x8b\x01\n" +
+	"\x05items\x18\x01 \x03(\v2\x1f.livekit.agent.AgentThread.ItemR\x05items\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\x8b\x01\n" +
 	"\x04Item\x12\x14\n" +
 	"\x05agent\x18\x01 \x01(\tR\x05agent\x12\x10\n" +
 	"\x03seq\x18\x02 \x01(\x03R\x03seq\x12\x1d\n" +
