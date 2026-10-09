@@ -44,6 +44,56 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Direction of a listing. Each request documents what unset means.
+type AgentThread_SortOrder int32
+
+const (
+	AgentThread_SORT_ORDER_UNSPECIFIED AgentThread_SortOrder = 0
+	AgentThread_SORT_ORDER_ASC         AgentThread_SortOrder = 1
+	AgentThread_SORT_ORDER_DESC        AgentThread_SortOrder = 2
+)
+
+// Enum value maps for AgentThread_SortOrder.
+var (
+	AgentThread_SortOrder_name = map[int32]string{
+		0: "SORT_ORDER_UNSPECIFIED",
+		1: "SORT_ORDER_ASC",
+		2: "SORT_ORDER_DESC",
+	}
+	AgentThread_SortOrder_value = map[string]int32{
+		"SORT_ORDER_UNSPECIFIED": 0,
+		"SORT_ORDER_ASC":         1,
+		"SORT_ORDER_DESC":        2,
+	}
+)
+
+func (x AgentThread_SortOrder) Enum() *AgentThread_SortOrder {
+	p := new(AgentThread_SortOrder)
+	*p = x
+	return p
+}
+
+func (x AgentThread_SortOrder) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AgentThread_SortOrder) Descriptor() protoreflect.EnumDescriptor {
+	return file_agent_livekit_agent_thread_proto_enumTypes[0].Descriptor()
+}
+
+func (AgentThread_SortOrder) Type() protoreflect.EnumType {
+	return &file_agent_livekit_agent_thread_proto_enumTypes[0]
+}
+
+func (x AgentThread_SortOrder) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AgentThread_SortOrder.Descriptor instead.
+func (AgentThread_SortOrder) EnumDescriptor() ([]byte, []int) {
+	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // A task is never UNSPECIFIED.
 type AgentTask_Status int32
 
@@ -84,11 +134,11 @@ func (x AgentTask_Status) String() string {
 }
 
 func (AgentTask_Status) Descriptor() protoreflect.EnumDescriptor {
-	return file_agent_livekit_agent_thread_proto_enumTypes[0].Descriptor()
+	return file_agent_livekit_agent_thread_proto_enumTypes[1].Descriptor()
 }
 
 func (AgentTask_Status) Type() protoreflect.EnumType {
-	return &file_agent_livekit_agent_thread_proto_enumTypes[0]
+	return &file_agent_livekit_agent_thread_proto_enumTypes[1]
 }
 
 func (x AgentTask_Status) Number() protoreflect.EnumNumber {
@@ -537,7 +587,7 @@ func (*AgentThread_DeleteResponse) Descriptor() ([]byte, []int) {
 	return file_agent_livekit_agent_thread_proto_rawDescGZIP(), []int{0, 6}
 }
 
-// The thread's chat items, oldest first.
+// The thread's chat items, oldest first unless sort_order says otherwise.
 type AgentThread_GetItemsRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
@@ -546,9 +596,9 @@ type AgentThread_GetItemsRequest struct {
 	// Cursor from the previous GetItemsResponse; empty for the first page.
 	After string `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
 	Limit int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
-	// Newest first, so the first page is the latest items and the cursor walks
-	// back through older ones. Unset is oldest first.
-	NewestFirst   bool `protobuf:"varint,5,opt,name=newest_first,json=newestFirst,proto3" json:"newest_first,omitempty"`
+	// Unset or ASC is oldest first. DESC starts from the latest item and the
+	// cursor walks back through older ones.
+	SortOrder     AgentThread_SortOrder `protobuf:"varint,5,opt,name=sort_order,json=sortOrder,proto3,enum=livekit.agent.AgentThread_SortOrder" json:"sort_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -611,11 +661,11 @@ func (x *AgentThread_GetItemsRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *AgentThread_GetItemsRequest) GetNewestFirst() bool {
+func (x *AgentThread_GetItemsRequest) GetSortOrder() AgentThread_SortOrder {
 	if x != nil {
-		return x.NewestFirst
+		return x.SortOrder
 	}
-	return false
+	return AgentThread_SORT_ORDER_UNSPECIFIED
 }
 
 type AgentThread_GetItemsResponse struct {
@@ -1025,7 +1075,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xe3\r\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xd7\x0e\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1057,13 +1107,14 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
 	"\rDeleteRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a\x10\n" +
-	"\x0eDeleteResponse\x1a\xa0\x01\n" +
+	"\x0eDeleteResponse\x1a\xc2\x01\n" +
 	"\x0fGetItemsRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x14\n" +
 	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x14\n" +
 	"\x05after\x18\x03 \x01(\tR\x05after\x12\x14\n" +
-	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12!\n" +
-	"\fnewest_first\x18\x05 \x01(\bR\vnewestFirst\x1a_\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12C\n" +
+	"\n" +
+	"sort_order\x18\x05 \x01(\x0e2$.livekit.agent.AgentThread.SortOrderR\tsortOrder\x1a_\n" +
 	"\x10GetItemsResponse\x125\n" +
 	"\x05items\x18\x01 \x03(\v2\x1f.livekit.agent.AgentThread.ItemR\x05items\x12\x14\n" +
 	"\x05after\x18\x02 \x01(\tR\x05after\x1a\x8b\x01\n" +
@@ -1090,7 +1141,11 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"databaseId\x1a=\n" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x80\x04\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"P\n" +
+	"\tSortOrder\x12\x1a\n" +
+	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
+	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
+	"\x0fSORT_ORDER_DESC\x10\x02\"\x80\x04\n" +
 	"\tAgentTask\x1a\x84\x01\n" +
 	"\x0fGetTasksRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12<\n" +
@@ -1125,55 +1180,57 @@ func file_agent_livekit_agent_thread_proto_rawDescGZIP() []byte {
 	return file_agent_livekit_agent_thread_proto_rawDescData
 }
 
-var file_agent_livekit_agent_thread_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_agent_livekit_agent_thread_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_agent_livekit_agent_thread_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_agent_livekit_agent_thread_proto_goTypes = []any{
-	(AgentTask_Status)(0),                // 0: livekit.agent.AgentTask.Status
-	(*AgentThread)(nil),                  // 1: livekit.agent.AgentThread
-	(*AgentTask)(nil),                    // 2: livekit.agent.AgentTask
-	(*AgentThread_CreateRequest)(nil),    // 3: livekit.agent.AgentThread.CreateRequest
-	(*AgentThread_GetRequest)(nil),       // 4: livekit.agent.AgentThread.GetRequest
-	(*AgentThread_ListRequest)(nil),      // 5: livekit.agent.AgentThread.ListRequest
-	(*AgentThread_ListResponse)(nil),     // 6: livekit.agent.AgentThread.ListResponse
-	(*AgentThread_UpdateRequest)(nil),    // 7: livekit.agent.AgentThread.UpdateRequest
-	(*AgentThread_DeleteRequest)(nil),    // 8: livekit.agent.AgentThread.DeleteRequest
-	(*AgentThread_DeleteResponse)(nil),   // 9: livekit.agent.AgentThread.DeleteResponse
-	(*AgentThread_GetItemsRequest)(nil),  // 10: livekit.agent.AgentThread.GetItemsRequest
-	(*AgentThread_GetItemsResponse)(nil), // 11: livekit.agent.AgentThread.GetItemsResponse
-	(*AgentThread_Item)(nil),             // 12: livekit.agent.AgentThread.Item
-	(*AgentThread_Thread)(nil),           // 13: livekit.agent.AgentThread.Thread
-	nil,                                  // 14: livekit.agent.AgentThread.CreateRequest.AttributesEntry
-	nil,                                  // 15: livekit.agent.AgentThread.UpdateRequest.AttributesEntry
-	nil,                                  // 16: livekit.agent.AgentThread.Thread.AttributesEntry
-	(*AgentTask_GetTasksRequest)(nil),    // 17: livekit.agent.AgentTask.GetTasksRequest
-	(*AgentTask_GetTasksResponse)(nil),   // 18: livekit.agent.AgentTask.GetTasksResponse
-	(*AgentTask_Task)(nil),               // 19: livekit.agent.AgentTask.Task
-	(*durationpb.Duration)(nil),          // 20: google.protobuf.Duration
-	(*ChatContext_ChatItem)(nil),         // 21: livekit.agent.ChatContext.ChatItem
-	(*timestamppb.Timestamp)(nil),        // 22: google.protobuf.Timestamp
+	(AgentThread_SortOrder)(0),           // 0: livekit.agent.AgentThread.SortOrder
+	(AgentTask_Status)(0),                // 1: livekit.agent.AgentTask.Status
+	(*AgentThread)(nil),                  // 2: livekit.agent.AgentThread
+	(*AgentTask)(nil),                    // 3: livekit.agent.AgentTask
+	(*AgentThread_CreateRequest)(nil),    // 4: livekit.agent.AgentThread.CreateRequest
+	(*AgentThread_GetRequest)(nil),       // 5: livekit.agent.AgentThread.GetRequest
+	(*AgentThread_ListRequest)(nil),      // 6: livekit.agent.AgentThread.ListRequest
+	(*AgentThread_ListResponse)(nil),     // 7: livekit.agent.AgentThread.ListResponse
+	(*AgentThread_UpdateRequest)(nil),    // 8: livekit.agent.AgentThread.UpdateRequest
+	(*AgentThread_DeleteRequest)(nil),    // 9: livekit.agent.AgentThread.DeleteRequest
+	(*AgentThread_DeleteResponse)(nil),   // 10: livekit.agent.AgentThread.DeleteResponse
+	(*AgentThread_GetItemsRequest)(nil),  // 11: livekit.agent.AgentThread.GetItemsRequest
+	(*AgentThread_GetItemsResponse)(nil), // 12: livekit.agent.AgentThread.GetItemsResponse
+	(*AgentThread_Item)(nil),             // 13: livekit.agent.AgentThread.Item
+	(*AgentThread_Thread)(nil),           // 14: livekit.agent.AgentThread.Thread
+	nil,                                  // 15: livekit.agent.AgentThread.CreateRequest.AttributesEntry
+	nil,                                  // 16: livekit.agent.AgentThread.UpdateRequest.AttributesEntry
+	nil,                                  // 17: livekit.agent.AgentThread.Thread.AttributesEntry
+	(*AgentTask_GetTasksRequest)(nil),    // 18: livekit.agent.AgentTask.GetTasksRequest
+	(*AgentTask_GetTasksResponse)(nil),   // 19: livekit.agent.AgentTask.GetTasksResponse
+	(*AgentTask_Task)(nil),               // 20: livekit.agent.AgentTask.Task
+	(*durationpb.Duration)(nil),          // 21: google.protobuf.Duration
+	(*ChatContext_ChatItem)(nil),         // 22: livekit.agent.ChatContext.ChatItem
+	(*timestamppb.Timestamp)(nil),        // 23: google.protobuf.Timestamp
 }
 var file_agent_livekit_agent_thread_proto_depIdxs = []int32{
-	14, // 0: livekit.agent.AgentThread.CreateRequest.attributes:type_name -> livekit.agent.AgentThread.CreateRequest.AttributesEntry
-	20, // 1: livekit.agent.AgentThread.CreateRequest.idle_ttl:type_name -> google.protobuf.Duration
-	13, // 2: livekit.agent.AgentThread.ListResponse.threads:type_name -> livekit.agent.AgentThread.Thread
-	15, // 3: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
-	20, // 4: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
-	12, // 5: livekit.agent.AgentThread.GetItemsResponse.items:type_name -> livekit.agent.AgentThread.Item
-	21, // 6: livekit.agent.AgentThread.Item.item:type_name -> livekit.agent.ChatContext.ChatItem
-	16, // 7: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
-	22, // 8: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
-	22, // 9: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
-	22, // 10: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
-	20, // 11: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
-	0,  // 12: livekit.agent.AgentTask.GetTasksRequest.status:type_name -> livekit.agent.AgentTask.Status
-	19, // 13: livekit.agent.AgentTask.GetTasksResponse.tasks:type_name -> livekit.agent.AgentTask.Task
-	0,  // 14: livekit.agent.AgentTask.Task.status:type_name -> livekit.agent.AgentTask.Status
-	22, // 15: livekit.agent.AgentTask.Task.updated_at:type_name -> google.protobuf.Timestamp
-	16, // [16:16] is the sub-list for method output_type
-	16, // [16:16] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	15, // 0: livekit.agent.AgentThread.CreateRequest.attributes:type_name -> livekit.agent.AgentThread.CreateRequest.AttributesEntry
+	21, // 1: livekit.agent.AgentThread.CreateRequest.idle_ttl:type_name -> google.protobuf.Duration
+	14, // 2: livekit.agent.AgentThread.ListResponse.threads:type_name -> livekit.agent.AgentThread.Thread
+	16, // 3: livekit.agent.AgentThread.UpdateRequest.attributes:type_name -> livekit.agent.AgentThread.UpdateRequest.AttributesEntry
+	21, // 4: livekit.agent.AgentThread.UpdateRequest.idle_ttl:type_name -> google.protobuf.Duration
+	0,  // 5: livekit.agent.AgentThread.GetItemsRequest.sort_order:type_name -> livekit.agent.AgentThread.SortOrder
+	13, // 6: livekit.agent.AgentThread.GetItemsResponse.items:type_name -> livekit.agent.AgentThread.Item
+	22, // 7: livekit.agent.AgentThread.Item.item:type_name -> livekit.agent.ChatContext.ChatItem
+	17, // 8: livekit.agent.AgentThread.Thread.attributes:type_name -> livekit.agent.AgentThread.Thread.AttributesEntry
+	23, // 9: livekit.agent.AgentThread.Thread.created_at:type_name -> google.protobuf.Timestamp
+	23, // 10: livekit.agent.AgentThread.Thread.last_active:type_name -> google.protobuf.Timestamp
+	23, // 11: livekit.agent.AgentThread.Thread.expires_at:type_name -> google.protobuf.Timestamp
+	21, // 12: livekit.agent.AgentThread.Thread.idle_ttl:type_name -> google.protobuf.Duration
+	1,  // 13: livekit.agent.AgentTask.GetTasksRequest.status:type_name -> livekit.agent.AgentTask.Status
+	20, // 14: livekit.agent.AgentTask.GetTasksResponse.tasks:type_name -> livekit.agent.AgentTask.Task
+	1,  // 15: livekit.agent.AgentTask.Task.status:type_name -> livekit.agent.AgentTask.Status
+	23, // 16: livekit.agent.AgentTask.Task.updated_at:type_name -> google.protobuf.Timestamp
+	17, // [17:17] is the sub-list for method output_type
+	17, // [17:17] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_thread_proto_init() }
@@ -1188,7 +1245,7 @@ func file_agent_livekit_agent_thread_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agent_livekit_agent_thread_proto_rawDesc), len(file_agent_livekit_agent_thread_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   0,
