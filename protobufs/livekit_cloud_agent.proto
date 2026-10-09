@@ -43,7 +43,7 @@ message AgentEvent {
 
 message AgentSecret {
     string name = 1;
-    bytes value = 2;
+    bytes value = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
     google.protobuf.Timestamp created_at = 3;
     google.protobuf.Timestamp updated_at = 4;
     AgentSecretKind kind = 5;
@@ -98,7 +98,7 @@ message PromoteAgentResponse {
 
 message PresignedPostRequest {
   string url = 1;
-  map<string, string> values = 2;
+  map<string, string> values = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
 
 message AgentDeployment {

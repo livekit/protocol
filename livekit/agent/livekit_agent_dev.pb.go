@@ -7,6 +7,7 @@
 package agent
 
 import (
+	_ "github.com/livekit/protocol/livekit/logger"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -358,7 +359,7 @@ var File_agent_livekit_agent_dev_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_dev_proto_rawDesc = "" +
 	"\n" +
-	"\x1dagent/livekit_agent_dev.proto\x12\rlivekit.agent\"\xa9\x02\n" +
+	"\x1dagent/livekit_agent_dev.proto\x12\rlivekit.agent\x1a\x14logger/options.proto\"\xa9\x02\n" +
 	"\x0fAgentDevMessage\x12d\n" +
 	"\x18get_running_jobs_request\x18\x01 \x01(\v2).livekit.agent.GetRunningAgentJobsRequestH\x00R\x15getRunningJobsRequest\x12g\n" +
 	"\x19get_running_jobs_response\x18\x02 \x01(\v2*.livekit.agent.GetRunningAgentJobsResponseH\x00R\x16getRunningJobsResponse\x12<\n" +
@@ -372,15 +373,15 @@ const file_agent_livekit_agent_dev_proto_rawDesc = "" +
 	"\x03url\x18\x02 \x01(\tR\x03url\"\x1c\n" +
 	"\x1aGetRunningAgentJobsRequest\"U\n" +
 	"\x1bGetRunningAgentJobsResponse\x126\n" +
-	"\x04jobs\x18\x01 \x03(\v2\".livekit.agent.RunningAgentJobInfoR\x04jobs\"\xfa\x01\n" +
+	"\x04jobs\x18\x01 \x03(\v2\".livekit.agent.RunningAgentJobInfoR\x04jobs\"\xff\x01\n" +
 	"\x13RunningAgentJobInfo\x12\x10\n" +
 	"\x03job\x18\x01 \x01(\fR\x03job\x12\x1f\n" +
 	"\vaccept_name\x18\x02 \x01(\tR\n" +
 	"acceptName\x12'\n" +
 	"\x0faccept_identity\x18\x03 \x01(\tR\x0eacceptIdentity\x12'\n" +
 	"\x0faccept_metadata\x18\x04 \x01(\tR\x0eacceptMetadata\x12\x10\n" +
-	"\x03url\x18\x05 \x01(\tR\x03url\x12\x14\n" +
-	"\x05token\x18\x06 \x01(\tR\x05token\x12\x1b\n" +
+	"\x03url\x18\x05 \x01(\tR\x03url\x12\x19\n" +
+	"\x05token\x18\x06 \x01(\tB\x03\xc0P\x02R\x05token\x12\x1b\n" +
 	"\tworker_id\x18\a \x01(\tR\bworkerId\x12\x19\n" +
 	"\bmock_job\x18\b \x01(\bR\amockJobB+Z)github.com/livekit/protocol/livekit/agentb\x06proto3"
 

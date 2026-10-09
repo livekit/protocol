@@ -20,6 +20,7 @@ option csharp_namespace = "LiveKit.Proto";
 option ruby_package = "LiveKit::Proto";
 
 import "livekit_room.proto";
+import "logger/options.proto";
 
 message TokenSourceRequest {
   // The name of the room being requested when generating credentials
@@ -45,5 +46,5 @@ message TokenSourceRequest {
 
 message TokenSourceResponse {
   string server_url = 1;
-  string participant_token = 2;
+  string participant_token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
 }
