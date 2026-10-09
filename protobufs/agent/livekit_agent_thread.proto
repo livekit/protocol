@@ -30,6 +30,13 @@ import "agent/livekit_agent_session.proto";
 import "logger/options.proto";
 
 message AgentThread {
+  // Direction of a listing. Each request documents what unset means.
+  enum SortOrder {
+    SORT_ORDER_UNSPECIFIED = 0;
+    SORT_ORDER_ASC = 1;
+    SORT_ORDER_DESC = 2;
+  }
+
   message CreateRequest {
     // Groups threads, e.g. by user: an application-defined value, typically the
     // user's identity. An AgentThreadGrant is scoped by it.
@@ -71,7 +78,7 @@ message AgentThread {
 
   message DeleteResponse {}
 
-  // The thread's chat items, oldest first.
+  // The thread's chat items, oldest first unless sort_order says otherwise.
   message GetItemsRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     // One agent's items; empty for every agent's.
@@ -79,9 +86,9 @@ message AgentThread {
     // Cursor from the previous GetItemsResponse; empty for the first page.
     string after = 3;
     int32 limit = 4;
-    // Newest first, so the first page is the latest items and the cursor walks
-    // back through older ones. Unset is oldest first.
-    bool newest_first = 5;
+    // Unset or ASC is oldest first. DESC starts from the latest item and the
+    // cursor walks back through older ones.
+    SortOrder sort_order = 5;
   }
 
   message GetItemsResponse {
