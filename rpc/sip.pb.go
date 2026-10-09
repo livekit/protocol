@@ -110,6 +110,8 @@ type InternalCreateSIPParticipantRequest struct {
 	// Project-level feature flags from ProjectSettings.FeatureFlags
 	FeatureFlags  map[string]string     `protobuf:"bytes,33,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Observability *SIPCallObservability `protobuf:"bytes,38,opt,name=observability,proto3" json:"observability,omitempty"`
+	// Set when the call is placed from a LiveKit phone number.
+	ProviderInfo  *livekit.ProviderInfo `protobuf:"bytes,40,opt,name=provider_info,json=providerInfo,proto3" json:"provider_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -411,6 +413,13 @@ func (x *InternalCreateSIPParticipantRequest) GetObservability() *SIPCallObserva
 	return nil
 }
 
+func (x *InternalCreateSIPParticipantRequest) GetProviderInfo() *livekit.ProviderInfo {
+	if x != nil {
+		return x.ProviderInfo
+	}
+	return nil
+}
+
 type InternalCreateSIPParticipantResponse struct {
 	state               protoimpl.MessageState `protogen:"open.v1"`
 	ParticipantId       string                 `protobuf:"bytes,1,opt,name=participant_id,json=participantId,proto3" json:"participant_id,omitempty"`
@@ -635,7 +644,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\x1a\frpc/io.proto\"\xbf\x15\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\x1a\frpc/io.proto\"\xfb\x15\n" +
 	"#InternalCreateSIPParticipantRequest\x12+\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12,\n" +
@@ -678,7 +687,8 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\fdisplay_name\x18\x1f \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01H\x00R\vdisplayName\x88\x01\x01\x126\n" +
 	"\vdestination\x18  \x01(\v2\x14.livekit.DestinationR\vdestination\x12_\n" +
 	"\rfeature_flags\x18! \x03(\v2:.rpc.InternalCreateSIPParticipantRequest.FeatureFlagsEntryR\ffeatureFlags\x12?\n" +
-	"\robservability\x18& \x01(\v2\x19.rpc.SIPCallObservabilityR\robservability\x1aH\n" +
+	"\robservability\x18& \x01(\v2\x19.rpc.SIPCallObservabilityR\robservability\x12:\n" +
+	"\rprovider_info\x18( \x01(\v2\x15.livekit.ProviderInfoR\fproviderInfo\x1aH\n" +
 	"\x1aParticipantAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a:\n" +
@@ -760,9 +770,10 @@ var file_rpc_sip_proto_goTypes = []any{
 	(*livekit.SIPMediaConfig)(nil),  // 18: livekit.SIPMediaConfig
 	(*livekit.Destination)(nil),     // 19: livekit.Destination
 	(*SIPCallObservability)(nil),    // 20: rpc.SIPCallObservability
-	(livekit.SIPTransferStatus)(0),  // 21: livekit.SIPTransferStatus
-	(livekit.SIPTransferReason)(0),  // 22: livekit.SIPTransferReason
-	(*livekit.SIPStatus)(nil),       // 23: livekit.SIPStatus
+	(*livekit.ProviderInfo)(nil),    // 21: livekit.ProviderInfo
+	(livekit.SIPTransferStatus)(0),  // 22: livekit.SIPTransferStatus
+	(livekit.SIPTransferReason)(0),  // 23: livekit.SIPTransferReason
+	(*livekit.SIPStatus)(nil),       // 24: livekit.SIPStatus
 }
 var file_rpc_sip_proto_depIdxs = []int32{
 	11, // 0: rpc.InternalCreateSIPParticipantRequest.sip_request_uri:type_name -> livekit.SIPRequestDest
@@ -782,21 +793,22 @@ var file_rpc_sip_proto_depIdxs = []int32{
 	19, // 14: rpc.InternalCreateSIPParticipantRequest.destination:type_name -> livekit.Destination
 	8,  // 15: rpc.InternalCreateSIPParticipantRequest.feature_flags:type_name -> rpc.InternalCreateSIPParticipantRequest.FeatureFlagsEntry
 	20, // 16: rpc.InternalCreateSIPParticipantRequest.observability:type_name -> rpc.SIPCallObservability
-	9,  // 17: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
-	16, // 18: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
-	10, // 19: rpc.InternalTransferSIPParticipantRequest.feature_flags:type_name -> rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntry
-	21, // 20: rpc.InternalTransferSIPParticipantResponse.status:type_name -> livekit.SIPTransferStatus
-	22, // 21: rpc.InternalTransferSIPParticipantResponse.reason:type_name -> livekit.SIPTransferReason
-	23, // 22: rpc.InternalTransferSIPParticipantResponse.sip_status:type_name -> livekit.SIPStatus
-	0,  // 23: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
-	2,  // 24: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
-	1,  // 25: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
-	3,  // 26: rpc.SIPInternal.TransferSIPParticipant:output_type -> rpc.InternalTransferSIPParticipantResponse
-	25, // [25:27] is the sub-list for method output_type
-	23, // [23:25] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	21, // 17: rpc.InternalCreateSIPParticipantRequest.provider_info:type_name -> livekit.ProviderInfo
+	9,  // 18: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
+	16, // 19: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	10, // 20: rpc.InternalTransferSIPParticipantRequest.feature_flags:type_name -> rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntry
+	22, // 21: rpc.InternalTransferSIPParticipantResponse.status:type_name -> livekit.SIPTransferStatus
+	23, // 22: rpc.InternalTransferSIPParticipantResponse.reason:type_name -> livekit.SIPTransferReason
+	24, // 23: rpc.InternalTransferSIPParticipantResponse.sip_status:type_name -> livekit.SIPStatus
+	0,  // 24: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
+	2,  // 25: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
+	1,  // 26: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
+	3,  // 27: rpc.SIPInternal.TransferSIPParticipant:output_type -> rpc.InternalTransferSIPParticipantResponse
+	26, // [26:28] is the sub-list for method output_type
+	24, // [24:26] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_rpc_sip_proto_init() }
