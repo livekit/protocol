@@ -544,8 +544,11 @@ type AgentThread_GetItemsRequest struct {
 	// One agent's items; empty for every agent's.
 	Agent string `protobuf:"bytes,2,opt,name=agent,proto3" json:"agent,omitempty"`
 	// Cursor from the previous GetItemsResponse; empty for the first page.
-	After         string `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
-	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	After string `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
+	Limit int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
+	// Newest first, so the first page is the latest items and the cursor walks
+	// back through older ones. Unset is oldest first.
+	NewestFirst   bool `protobuf:"varint,5,opt,name=newest_first,json=newestFirst,proto3" json:"newest_first,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -606,6 +609,13 @@ func (x *AgentThread_GetItemsRequest) GetLimit() int32 {
 		return x.Limit
 	}
 	return 0
+}
+
+func (x *AgentThread_GetItemsRequest) GetNewestFirst() bool {
+	if x != nil {
+		return x.NewestFirst
+	}
+	return false
 }
 
 type AgentThread_GetItemsResponse struct {
@@ -1015,7 +1025,7 @@ var File_agent_livekit_agent_thread_proto protoreflect.FileDescriptor
 
 const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\n" +
-	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xbf\r\n" +
+	" agent/livekit_agent_thread.proto\x12\rlivekit.agent\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a!agent/livekit_agent_session.proto\x1a\x14logger/options.proto\"\xe3\r\n" +
 	"\vAgentThread\x1a\xfe\x01\n" +
 	"\rCreateRequest\x12\x19\n" +
 	"\x05scope\x18\x01 \x01(\tB\x03\xc0P\x01R\x05scope\x12]\n" +
@@ -1047,12 +1057,13 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
 	"\rDeleteRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x1a\x10\n" +
-	"\x0eDeleteResponse\x1a}\n" +
+	"\x0eDeleteResponse\x1a\xa0\x01\n" +
 	"\x0fGetItemsRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x14\n" +
 	"\x05agent\x18\x02 \x01(\tR\x05agent\x12\x14\n" +
 	"\x05after\x18\x03 \x01(\tR\x05after\x12\x14\n" +
-	"\x05limit\x18\x04 \x01(\x05R\x05limit\x1a_\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limit\x12!\n" +
+	"\fnewest_first\x18\x05 \x01(\bR\vnewestFirst\x1a_\n" +
 	"\x10GetItemsResponse\x125\n" +
 	"\x05items\x18\x01 \x03(\v2\x1f.livekit.agent.AgentThread.ItemR\x05items\x12\x14\n" +
 	"\x05after\x18\x02 \x01(\tR\x05after\x1a\x8b\x01\n" +
