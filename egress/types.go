@@ -17,10 +17,10 @@ package egress
 import "github.com/livekit/protocol/livekit"
 
 const (
-	EgressTypeTemplate    = "template"
-	EgressTypeWeb         = "web"
-	EgressTypeMedia       = "media"
-	EgressTypeMediaTracks = "media_tracks"
+	EgressTypeTemplate = "template"
+	EgressTypeWeb      = "web"
+	EgressTypeMedia    = "media"
+	EgressTypeData     = "data"
 
 	EgressTypeRoomComposite  = "room_composite"
 	EgressTypeParticipant    = "participant"
@@ -105,8 +105,8 @@ func GetTypes(request any) (string, string) {
 }
 
 func getSourceTypeV2(req EgressRequest) string {
-	if req.GetMedia() != nil && req.GetMedia().GetRoomTracks() != nil {
-		return EgressTypeMediaTracks
+	if dataReq, ok := req.(interface{ GetData() *livekit.DataSource }); ok && dataReq.GetData() != nil {
+		return EgressTypeData
 	} else if req.GetMedia() != nil {
 		return EgressTypeMedia
 	} else if req.GetTemplate() != nil {

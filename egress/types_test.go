@@ -94,17 +94,10 @@ func TestGetOutputType(t *testing.T) {
 
 }
 
-func TestGetTypesMediaTracks(t *testing.T) {
+func TestGetTypesData(t *testing.T) {
 	req := &livekit.StartEgressRequest{
-		Source: &livekit.StartEgressRequest_Media{
-			Media: &livekit.MediaSource{
-				RoomTracks: &livekit.RoomTracksSelection{
-					Kinds: []livekit.RoomTrackKind{
-						livekit.RoomTrackKind_ROOM_TRACK_KIND_AUDIO,
-						livekit.RoomTrackKind_ROOM_TRACK_KIND_VIDEO,
-					},
-				},
-			},
+		Source: &livekit.StartEgressRequest_Data{
+			Data: &livekit.DataSource{TrackNames: []string{"camera"}},
 		},
 		Outputs: []*livekit.Output{
 			{
@@ -116,6 +109,6 @@ func TestGetTypesMediaTracks(t *testing.T) {
 	}
 
 	sourceType, outputType := GetTypes(&livekit.EgressInfo_Egress{Egress: req})
-	require.Equal(t, EgressTypeMediaTracks, sourceType)
+	require.Equal(t, EgressTypeData, sourceType)
 	require.Equal(t, OutputTypeFile, outputType)
 }

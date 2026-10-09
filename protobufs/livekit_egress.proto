@@ -54,6 +54,7 @@ message StartEgressRequest {
     TemplateSource template = 2;
     WebSource web = 3;
     MediaSource media = 4;
+    DataSource data = 10;
   }
 
   // Optional — default H264_720P_30
@@ -100,22 +101,15 @@ message MediaSource {
   }
   AudioConfig audio = 3;
   // TODO: DataConfig data = 4;
-  // Capture every published track of the selected kinds independently.
-  // Mutually exclusive with the video and audio selectors above. Currently
-  // supported only for live egress with a single MCAP file output.
-  RoomTracksSelection room_tracks = 5;
 }
 
-message RoomTracksSelection {
-  // At least one kind is required. DATA can be added here later without
-  // changing the semantics of existing AUDIO/VIDEO requests.
-  repeated RoomTrackKind kinds = 1;
-}
-
-enum RoomTrackKind {
-  ROOM_TRACK_KIND_UNSPECIFIED = 0;
-  ROOM_TRACK_KIND_AUDIO = 1;
-  ROOM_TRACK_KIND_VIDEO = 2;
+// Preserve every matching room track as an independent MCAP channel. An empty
+// track_names list captures every track. Names are exact-match allowlist entries;
+// if multiple participants publish the same name, every matching track is captured.
+// Currently audio and video tracks are supported. Data tracks can be added without
+// changing the selection model.
+message DataSource {
+  repeated string track_names = 1;
 }
 
 // --- Video Configuration ---
