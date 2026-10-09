@@ -25,3 +25,33 @@ const ThreadSchemaVersion = 1
 //
 //go:embed thread_schema_v1.sql
 var ThreadSchemaV1 string
+
+// taskStatuses maps the values of tasks.status (A2A task states) to
+// AgentTask.Status: a task not yet finished is running, a rejected one failed.
+var taskStatuses = map[string]AgentTask_Status{
+	"submitted":      AgentTask_RUNNING,
+	"working":        AgentTask_RUNNING,
+	"input-required": AgentTask_RUNNING,
+	"completed":      AgentTask_COMPLETED,
+	"failed":         AgentTask_FAILED,
+	"rejected":       AgentTask_FAILED,
+	"canceled":       AgentTask_CANCELED,
+}
+
+// TaskStatus is the AgentTask.Status of a tasks.status value.
+func TaskStatus(state string) (AgentTask_Status, bool) {
+	status, ok := taskStatuses[state]
+	return status, ok
+}
+
+// TaskStates are the tasks.status values of an AgentTask.Status.
+func TaskStates(status AgentTask_Status) []string {
+	var states []string
+	for state, s := range taskStatuses {
+		if s == status {
+			states = append(states, state)
+		}
+	}
+	return states
+}
+

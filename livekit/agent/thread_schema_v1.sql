@@ -34,7 +34,7 @@ CREATE TABLE tasks (
   seq            INTEGER NOT NULL,  -- [framework] submission order in the lane
   name           TEXT,              -- [platform, framework] the AgentTask class
   message_id     TEXT,              -- [framework] the A2A messageId that created it, for idempotency
-  status         TEXT NOT NULL,     -- [platform, a2a, framework] A2A TaskState, working when a new run finds it means its worker was lost
+  status         TEXT NOT NULL,     -- [platform, a2a, framework] A2A TaskState (agent.TaskStatus maps it), working when a new run finds it means its worker was lost
   status_message JSONB,             -- [a2a] A2A Message
   updated_at     INTEGER NOT NULL,  -- [platform, a2a, framework]
   data           JSONB NOT NULL,    -- [a2a] A2A Task fields: history, artifacts, metadata
