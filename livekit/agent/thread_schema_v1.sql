@@ -16,13 +16,15 @@ CREATE TABLE schema_version (
 
 -- One chat item per row.
 CREATE TABLE items (
-  id         TEXT PRIMARY KEY,  -- [framework] the item's id, its upsert key
-  lane       TEXT NOT NULL,     -- [platform, framework]
-  seq        INTEGER NOT NULL,  -- [platform, framework] position in the lane
-  message_id TEXT,              -- [platform, framework] the A2A messageId it came from, for idempotency
-  payload    JSONB NOT NULL     -- [platform, framework] livekit.agent.ChatContext.ChatItem as protobuf JSON
+  pos        INTEGER PRIMARY KEY AUTOINCREMENT,  -- [platform] insertion order, never reused: the page token's sort key
+  id         TEXT NOT NULL UNIQUE,               -- [framework] the item's id, its upsert key
+  lane       TEXT NOT NULL,                      -- [platform, framework]
+  seq        INTEGER NOT NULL,                   -- [platform, framework] position in the lane
+  message_id TEXT,                               -- [platform, framework] the A2A messageId it came from, for idempotency
+  payload    JSONB NOT NULL                      -- [platform, framework] livekit.agent.ChatContext.ChatItem as protobuf JSON
 );
 CREATE INDEX items_lane_seq ON items (lane, seq);
+CREATE INDEX items_lane_pos ON items (lane, pos);
 CREATE UNIQUE INDEX items_lane_message ON items (lane, message_id) WHERE message_id IS NOT NULL;
 
 -- One A2A task per row: the task of an incoming message, or a background
