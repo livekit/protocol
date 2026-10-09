@@ -1,0 +1,147 @@
+// Copyright 2026 LiveKit, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// AgentThread: the durable conversation between an agent and a person, across
+// channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
+// an idle TTL and the AgentDB database created with it. Served by
+// cloud-protocol's AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
+// by the agents framework, which writes it, and the platform, which reads it.
+
+syntax = "proto3";
+
+package livekit.agent;
+
+option go_package = "github.com/livekit/protocol/livekit/agent";
+
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "agent/livekit_agent_session.proto";
+import "logger/options.proto";
+
+message AgentThread {
+  message CreateRequest {
+    // Groups threads, e.g. by user: an application-defined value, typically the
+    // user's identity. An AgentThreadGrant is scoped by it.
+    string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
+    map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    // Unset takes the server default.
+    google.protobuf.Duration idle_ttl = 3;
+  }
+
+  message GetRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+  }
+
+  // The threads of one scope, newest first.
+  message ListRequest {
+    string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
+    // Cursor from the previous ListResponse; empty for the first page.
+    string before = 2;
+    int32 limit = 3;
+  }
+
+  message ListResponse {
+    repeated Thread threads = 1;
+    // Empty at the end.
+    string before = 2;
+  }
+
+  message UpdateRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+    // Added to the existing attributes; an empty value deletes the entry.
+    map<string, string> attributes = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    google.protobuf.Duration idle_ttl = 3;
+    // Every update counts as activity and pushes expires_at out by idle_ttl.
+  }
+
+  message DeleteRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+  }
+
+  message DeleteResponse {}
+
+  // The thread's chat items, oldest first.
+  message GetItemsRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+    // One agent's items; empty for every agent's.
+    string agent = 2;
+    // Cursor from the previous GetItemsResponse; empty for the first page.
+    string after = 3;
+    int32 limit = 4;
+  }
+
+  message GetItemsResponse {
+    repeated Item items = 1;
+    // Empty at the end.
+    string after = 2;
+  }
+
+  // One chat item of an agent. Stored as the JSON of
+  // ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
+  message Item {
+    string agent = 1;
+    // Position in the agent's history.
+    int64 seq = 2;
+    // The A2A message the item came from.
+    string message_id = 3;
+    ChatContext.ChatItem item = 4 [(logger.sensitivity) = SENSITIVITY_PII];
+  }
+
+  message Thread {
+    string thread_id = 1 [(logger.name) = "threadID"];
+    string scope = 2 [(logger.sensitivity) = SENSITIVITY_PII];
+    map<string, string> attributes = 3 [(logger.sensitivity) = SENSITIVITY_PII];
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp last_active = 5;
+    // last_active + idle_ttl; every update pushes it out. The thread and its
+    // database are deleted once it passes.
+    google.protobuf.Timestamp expires_at = 6;
+    google.protobuf.Duration idle_ttl = 7;
+    // The thread's database ("DB_..."), created with the thread.
+    string database_id = 8;
+  }
+}
+
+// AgentTask: background work an agent runs within a thread, such as a booking
+// that takes minutes.
+message AgentTask {
+  // A task is never UNSPECIFIED.
+  enum Status {
+    UNSPECIFIED = 0;
+    RUNNING = 1;
+    COMPLETED = 2;
+    FAILED = 3;
+    CANCELED = 4;
+  }
+
+  // A thread's tasks, oldest first.
+  message GetTasksRequest {
+    string thread_id = 1 [(logger.name) = "threadID"];
+    // Unset for every status.
+    optional Status status = 2;
+  }
+
+  message GetTasksResponse {
+    repeated Task tasks = 1;
+  }
+
+  message Task {
+    string task_id = 1;
+    string thread_id = 2 [(logger.name) = "threadID"];
+    // The task's name, as the agent defines it.
+    string name = 3;
+    Status status = 4;
+    google.protobuf.Timestamp updated_at = 5;
+  }
+}

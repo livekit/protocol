@@ -36,6 +36,7 @@ func TestGrants(t *testing.T) {
 		require.Same(t, grants.Inference, clone.Inference)
 		require.Same(t, grants.SIP, clone.SIP)
 		require.Same(t, grants.AgentEndpoint, clone.AgentEndpoint)
+		require.Same(t, grants.AgentThread, clone.AgentThread)
 		require.True(t, reflect.DeepEqual(grants, clone))
 		require.True(t, reflect.DeepEqual(grants.Video, clone.Video))
 	})
@@ -65,6 +66,9 @@ func TestGrants(t *testing.T) {
 		// require AgentEndpoint
 		require.Same(t, grants.AgentEndpoint, clone.AgentEndpoint)
 		require.True(t, reflect.DeepEqual(grants.AgentEndpoint, clone.AgentEndpoint))
+		// require AgentThread
+		require.Same(t, grants.AgentThread, clone.AgentThread)
+		require.True(t, reflect.DeepEqual(grants.AgentThread, clone.AgentThread))
 	})
 
 	t.Run("clone with video", func(t *testing.T) {
@@ -523,4 +527,56 @@ func TestAgentEndpointGrantCloneIndependent(t *testing.T) {
 	clone.AgentEndpoint.AgentName = "b"
 	require.True(t, grants.AgentEndpoint.Call)
 	require.Equal(t, "a", grants.AgentEndpoint.AgentName)
+}
+
+func TestAgentThreadGrantChecks(t *testing.T) {
+	t.Parallel()
+
+	// Scope covers list and create only; read, write and delete need the id.
+	g := &AgentThreadGrant{Scope: "u1", ThreadIDs: []string{"AT_1"}, List: true, Create: true, Read: true}
+	require.True(t, g.CanRead("AT_1"))
+	require.False(t, g.CanRead("AT_2"))
+	require.False(t, g.CanRead(""))
+	require.False(t, g.CanWrite("AT_1"))
+	require.False(t, g.CanDelete("AT_1"))
+	require.True(t, g.CanList("u1"))
+	require.False(t, g.CanList("u2"))
+	require.False(t, g.CanList(""))
+	require.True(t, g.CanCreate("u1"))
+	require.False(t, g.CanCreate("u2"))
+	require.False(t, g.CanUpdate())
+
+	idsOnly := &AgentThreadGrant{ThreadIDs: []string{"AT_4"}, Create: true, Write: true}
+	require.True(t, idsOnly.CanWrite("AT_4"))
+	require.False(t, idsOnly.CanCreate(""))
+
+	// All covers every thread and scope, still gated by the action flags.
+	all := &AgentThreadGrant{All: true, Read: true, List: true}
+	require.True(t, all.CanRead("AT_9"))
+	require.True(t, all.CanList("any"))
+	require.False(t, all.CanRead(""))
+	require.False(t, all.CanDelete("AT_9"))
+	require.False(t, all.CanCreate("any"))
+	require.False(t, all.CanUpdate())
+	require.True(t, (&AgentThreadGrant{All: true, Write: true}).CanUpdate())
+
+	var none *AgentThreadGrant
+	require.False(t, none.CanRead("AT_1"))
+	require.False(t, none.CanCreate("u1"))
+	require.False(t, none.CanUpdate())
+}
+
+func TestAgentThreadGrantCloneIndependent(t *testing.T) {
+	t.Parallel()
+
+	grants := &ClaimGrants{AgentThread: &AgentThreadGrant{Scope: "u1", ThreadIDs: []string{"AT_1"}, Write: true}}
+	clone := grants.Clone()
+	require.NotSame(t, grants.AgentThread, clone.AgentThread)
+	require.True(t, reflect.DeepEqual(grants.AgentThread, clone.AgentThread))
+
+	clone.AgentThread.Write = false
+	clone.AgentThread.ThreadIDs[0] = "AT_2"
+	clone.AgentThread.ThreadIDs = append(clone.AgentThread.ThreadIDs, "AT_3")
+	require.True(t, grants.AgentThread.Write)
+	require.Equal(t, []string{"AT_1"}, grants.AgentThread.ThreadIDs)
 }
