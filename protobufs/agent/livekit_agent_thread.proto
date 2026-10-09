@@ -53,15 +53,15 @@ message AgentThread {
   // The threads of one scope, newest first.
   message ListRequest {
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
-    // Cursor from the previous ListResponse; empty for the first page.
-    string before = 2;
+    // next_page_token of the previous ListResponse; empty for the first page.
+    string page_token = 2;
     int32 limit = 3;
   }
 
   message ListResponse {
     repeated Thread threads = 1;
-    // Empty at the end.
-    string before = 2;
+    // Empty when exhausted.
+    string next_page_token = 2;
   }
 
   message UpdateRequest {
@@ -83,8 +83,8 @@ message AgentThread {
     string thread_id = 1 [(logger.name) = "threadID"];
     // One agent's items; empty for every agent's.
     string agent = 2;
-    // Cursor from the previous GetItemsResponse; empty for the first page.
-    string after = 3;
+    // next_page_token of the previous GetItemsResponse; empty for the first page.
+    string page_token = 3;
     int32 limit = 4;
     // Unset or ASC is oldest first. DESC starts from the latest item and the
     // cursor walks back through older ones.
@@ -93,8 +93,8 @@ message AgentThread {
 
   message GetItemsResponse {
     repeated Item items = 1;
-    // Empty at the end.
-    string after = 2;
+    // Empty when exhausted.
+    string next_page_token = 2;
   }
 
   // One chat item of an agent. Stored as the JSON of
