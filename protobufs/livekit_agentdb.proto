@@ -70,14 +70,14 @@ message AgentDB {
 
   message DeleteResponse {}
 
-  message DumpRequest {
+  message ExportRequest {
     string database_id = 1;
   }
 
-  message DumpResponse {
+  message ExportResponse {
     string download_url = 1;     // pre-authenticated object-storage URL
     google.protobuf.Timestamp expires_at = 2;  // of the URL, not the database
-    int64 tip = 3;               // what the dump is consistent at
+    int64 tip = 3;               // what the export is consistent at
   }
 
   // Data plane: one WebSocket per database, one message per frame, correlated
