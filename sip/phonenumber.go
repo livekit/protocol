@@ -74,23 +74,28 @@ func IsEmergencyNumber(number string) bool {
 // name, angle brackets, host and parameters removed. A URI with no user part
 // and anything that is not a URI returns an empty string.
 func URIUser(uri string) string {
+	uri = skipQuotedDisplayName(uri)
 	if i := strings.Index(uri, "<"); i >= 0 {
 		uri = uri[i+1:]
 		if j := strings.Index(uri, ">"); j >= 0 {
 			uri = uri[:j]
 		}
 	}
+	colon := strings.Index(uri, ":")
+	if colon < 0 {
+		return ""
+	}
+	scheme, rest := strings.ToLower(uri[:colon]), uri[colon+1:]
 	var user string
-	switch {
-	case strings.HasPrefix(uri, "sip:"), strings.HasPrefix(uri, "sips:"):
-		uri = uri[strings.Index(uri, ":")+1:]
-		at := strings.Index(uri, "@")
+	switch scheme {
+	case "sip", "sips":
+		at := strings.Index(rest, "@")
 		if at < 0 {
 			return ""
 		}
-		user = uri[:at]
-	case strings.HasPrefix(uri, "tel:"):
-		user = uri[len("tel:"):]
+		user = rest[:at]
+	case "tel":
+		user = rest
 	default:
 		return ""
 	}
@@ -98,4 +103,21 @@ func URIUser(uri string) string {
 		user = user[:i]
 	}
 	return user
+}
+
+// skipQuotedDisplayName returns the part of a name-addr after a leading quoted
+// display name, so that a "<" inside the quotes is not taken as the URI start.
+func skipQuotedDisplayName(s string) string {
+	if !strings.HasPrefix(s, "\"") {
+		return s
+	}
+	for i := 1; i < len(s); i++ {
+		switch s[i] {
+		case '\\':
+			i++
+		case '"':
+			return s[i+1:]
+		}
+	}
+	return s
 }

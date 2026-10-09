@@ -154,7 +154,7 @@ message InternalCreateSIPParticipantRequest {
 
   SIPCallObservability observability = 38;
 
-  // Set when the call is placed from a LiveKit phone number.
+  // Provider of the caller number, when the call does not use a customer trunk.
   livekit.ProviderInfo provider_info = 40;
 
   // NEXT ID: 41

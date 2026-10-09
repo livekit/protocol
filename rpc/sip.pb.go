@@ -110,7 +110,7 @@ type InternalCreateSIPParticipantRequest struct {
 	// Project-level feature flags from ProjectSettings.FeatureFlags
 	FeatureFlags  map[string]string     `protobuf:"bytes,33,rep,name=feature_flags,json=featureFlags,proto3" json:"feature_flags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Observability *SIPCallObservability `protobuf:"bytes,38,opt,name=observability,proto3" json:"observability,omitempty"`
-	// Set when the call is placed from a LiveKit phone number.
+	// Provider of the caller number, when the call does not use a customer trunk.
 	ProviderInfo  *livekit.ProviderInfo `protobuf:"bytes,40,opt,name=provider_info,json=providerInfo,proto3" json:"provider_info,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
