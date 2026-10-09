@@ -596,8 +596,8 @@ type AgentThread_GetItemsRequest struct {
 	// next_page_token of the previous GetItemsResponse; empty for the first page.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
 	Limit     int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
-	// Unset or ASC is oldest first. DESC starts from the latest item and the
-	// cursor walks back through older ones.
+	// Unset or ASC is oldest first. DESC starts from the latest item and each
+	// next_page_token walks back through older ones.
 	SortOrder     AgentThread_SortOrder `protobuf:"varint,5,opt,name=sort_order,json=sortOrder,proto3,enum=livekit.agent.AgentThread_SortOrder" json:"sort_order,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
