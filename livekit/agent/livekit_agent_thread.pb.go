@@ -901,7 +901,10 @@ type AgentTask_GetTasksRequest struct {
 	state    protoimpl.MessageState `protogen:"open.v1"`
 	ThreadId string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"`
 	// Unset for every status.
-	Status        *AgentTask_Status `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.agent.AgentTask_Status,oneof" json:"status,omitempty"`
+	Status *AgentTask_Status `protobuf:"varint,2,opt,name=status,proto3,enum=livekit.agent.AgentTask_Status,oneof" json:"status,omitempty"`
+	// next_page_token of the previous GetTasksResponse; empty for the first page.
+	PageToken     string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	Limit         int32  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -950,9 +953,25 @@ func (x *AgentTask_GetTasksRequest) GetStatus() AgentTask_Status {
 	return AgentTask_UNSPECIFIED
 }
 
+func (x *AgentTask_GetTasksRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+func (x *AgentTask_GetTasksRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
 type AgentTask_GetTasksResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Tasks         []*AgentTask_Task      `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Tasks []*AgentTask_Task      `protobuf:"bytes,1,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	// Empty when exhausted.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -992,6 +1011,13 @@ func (x *AgentTask_GetTasksResponse) GetTasks() []*AgentTask_Task {
 		return x.Tasks
 	}
 	return nil
+}
+
+func (x *AgentTask_GetTasksResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
 }
 
 type AgentTask_Task struct {
@@ -1147,14 +1173,18 @@ const file_agent_livekit_agent_thread_proto_rawDesc = "" +
 	"\tSortOrder\x12\x1a\n" +
 	"\x16SORT_ORDER_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0eSORT_ORDER_ASC\x10\x01\x12\x13\n" +
-	"\x0fSORT_ORDER_DESC\x10\x02\"\x80\x04\n" +
-	"\tAgentTask\x1a\x84\x01\n" +
+	"\x0fSORT_ORDER_DESC\x10\x02\"\xdd\x04\n" +
+	"\tAgentTask\x1a\xb9\x01\n" +
 	"\x0fGetTasksRequest\x12(\n" +
 	"\tthread_id\x18\x01 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12<\n" +
-	"\x06status\x18\x02 \x01(\x0e2\x1f.livekit.agent.AgentTask.StatusH\x00R\x06status\x88\x01\x01B\t\n" +
-	"\a_status\x1aG\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x1f.livekit.agent.AgentTask.StatusH\x00R\x06status\x88\x01\x01\x12\x1d\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tR\tpageToken\x12\x14\n" +
+	"\x05limit\x18\x04 \x01(\x05R\x05limitB\t\n" +
+	"\a_status\x1ao\n" +
 	"\x10GetTasksResponse\x123\n" +
-	"\x05tasks\x18\x01 \x03(\v2\x1d.livekit.agent.AgentTask.TaskR\x05tasks\x1a\xd1\x01\n" +
+	"\x05tasks\x18\x01 \x03(\v2\x1d.livekit.agent.AgentTask.TaskR\x05tasks\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\x1a\xd1\x01\n" +
 	"\x04Task\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12(\n" +
 	"\tthread_id\x18\x02 \x01(\tB\v\xbaP\bthreadIDR\bthreadId\x12\x12\n" +
