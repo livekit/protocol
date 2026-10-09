@@ -1,6 +1,7 @@
 package sip
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/livekit/protocol/livekit"
@@ -58,6 +59,8 @@ func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 	}
 }
 
+var emergencyNumbers = []string{"911", "1911"}
+
 // IsEmergencyNumber reports whether a dialed number reaches the 911 emergency
 // service. It accepts the bare number and the +1 or 1 prefixed forms.
 func IsEmergencyNumber(number string) bool {
@@ -67,7 +70,7 @@ func IsEmergencyNumber(number string) bool {
 		}
 		return r
 	}, number)
-	return digits == "911" || digits == "1911"
+	return slices.Contains(emergencyNumbers, digits)
 }
 
 // URIUser returns the user part of a sip, sips or tel URI, with the display
