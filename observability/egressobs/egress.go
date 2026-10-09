@@ -201,5 +201,6 @@ func GetAudioOnly(info *livekit.EgressInfo) bool {
 }
 
 func getAudioOnlyV2(r egress.EgressRequest) bool {
-	return r.GetTemplate().GetAudioOnly() || r.GetWeb().GetAudioOnly()
+	return r.GetTemplate().GetAudioOnly() || r.GetWeb().GetAudioOnly() ||
+		(r.GetMedia() != nil && r.GetMedia().GetVideo() == nil)
 }
