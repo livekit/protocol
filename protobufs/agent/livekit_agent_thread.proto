@@ -128,25 +128,18 @@ message AgentTask {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Unset for every status.
     optional Status status = 2;
-    // Cursor from the previous GetTasksResponse; empty for the first page.
-    string after = 3;
-    int32 limit = 4;
   }
 
   message GetTasksResponse {
     repeated Task tasks = 1;
-    // Empty at the end.
-    string after = 2;
   }
 
   message Task {
     string task_id = 1;
     string thread_id = 2 [(logger.name) = "threadID"];
-    // The agent running it.
-    string agent = 3;
     // The task's name, as the agent defines it.
-    string name = 4;
-    Status status = 5;
-    google.protobuf.Timestamp updated_at = 6;
+    string name = 3;
+    Status status = 4;
+    google.protobuf.Timestamp updated_at = 5;
   }
 }

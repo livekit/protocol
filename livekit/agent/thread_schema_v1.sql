@@ -30,7 +30,7 @@ CREATE UNIQUE INDEX items_lane_message ON items (lane, message_id) WHERE message
 -- id, status = (status, status_message, updated_at), plus the fields of data.
 CREATE TABLE tasks (
   task_id        TEXT PRIMARY KEY,  -- [platform, a2a, framework]
-  lane           TEXT NOT NULL,     -- [platform, framework]
+  lane           TEXT NOT NULL,     -- [framework]
   seq            INTEGER NOT NULL,  -- [framework] submission order in the lane
   name           TEXT,              -- [platform, framework] the AgentTask class
   message_id     TEXT,              -- [framework] the A2A messageId that created it, for idempotency
