@@ -137,6 +137,9 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 			DB:            conf.DB,
 			TLSConfig:     tlsConfig,
 			MaxRedirects:  conf.GetMaxRedirects(),
+			DialTimeout:   time.Duration(conf.DialTimeout) * time.Millisecond,
+			ReadTimeout:   time.Duration(conf.ReadTimeout) * time.Millisecond,
+			WriteTimeout:  time.Duration(conf.WriteTimeout) * time.Millisecond,
 			PoolTimeout:   conf.PoolTimeout,
 			PoolSize:      conf.PoolSize,
 			IsClusterMode: true,
@@ -144,13 +147,16 @@ func GetRedisClient(conf *RedisConfig) (redis.UniversalClient, error) {
 	} else {
 		logger.Infow("connecting to redis", "simple", true, "addr", conf.Address)
 		rcOptions = &redis.UniversalOptions{
-			Addrs:       []string{conf.Address},
-			Username:    conf.Username,
-			Password:    conf.Password,
-			DB:          conf.DB,
-			TLSConfig:   tlsConfig,
-			PoolTimeout: conf.PoolTimeout,
-			PoolSize:    conf.PoolSize,
+			Addrs:        []string{conf.Address},
+			Username:     conf.Username,
+			Password:     conf.Password,
+			DB:           conf.DB,
+			TLSConfig:    tlsConfig,
+			DialTimeout:  time.Duration(conf.DialTimeout) * time.Millisecond,
+			ReadTimeout:  time.Duration(conf.ReadTimeout) * time.Millisecond,
+			WriteTimeout: time.Duration(conf.WriteTimeout) * time.Millisecond,
+			PoolTimeout:  conf.PoolTimeout,
+			PoolSize:     conf.PoolSize,
 		}
 	}
 	rc = redis.NewUniversalClient(rcOptions)
