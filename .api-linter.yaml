@@ -1,0 +1,35 @@
+# Only AIP-140's reserved-word check is enabled. api-linter's default rule set
+# encodes Google's whole API style guide, which these protos do not follow — it
+# reports hundreds of problems per file. This one rule is about generated code
+# being usable at all: a field whose name is a keyword in Java, JavaScript or
+# Python 3 cannot be addressed by name in that language.
+- included_paths: ["**"]
+  disabled_rules: ["core"]
+  enabled_rules: ["core::0140::reserved-words"]
+
+# Fields that predate the check. Suppressed here rather than with the in-proto
+# `(-- api-linter: ... --)` comment, which protoc copies into the generated code
+# of every language.
+#
+#   livekit_rtc.proto      TrickleRequest.final
+#   livekit_models.proto   TranscriptionSegment.final
+#     On the wire since 2021; renaming breaks every SDK. `final` is reserved in
+#     Java alone, where the generator mangles it.
+#
+#   agent/livekit_agent_session.proto   FunctionCall.arguments
+#     Not a keyword in Python, and JavaScript restricts `arguments` only inside
+#     a strict-mode function body, not as a property name.
+#
+#   rpc/io.proto   SIPCall.from
+#     Names the SIP From header it carries. rpc/ is generated for Go only, so
+#     the Python keyword never reaches a stub — renaming is a prerequisite if
+#     that ever changes.
+#
+# The Python side of these files stays covered: the stub check in CI runs the
+# generator itself, and no suppression reaches it.
+- included_paths:
+    - "livekit_rtc.proto"
+    - "livekit_models.proto"
+    - "agent/livekit_agent_session.proto"
+    - "rpc/io.proto"
+  disabled_rules: ["core::0140::reserved-words"]
