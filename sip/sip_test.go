@@ -205,13 +205,44 @@ var trunkCases = []struct {
 		exp: -1,
 	},
 	{
-		name: "inbound with host mask",
+		name: "inbound with host mask is not matched by the From host",
 		trunks: []*livekit.SIPTrunkInfo{
 			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
 				"10.10.10.0/24",
 				"sip.example.com",
 			}},
 		},
+		exp: -1,
+	},
+	{
+		name: "inbound with address mask is not matched by a From host naming that address",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"192.76.120.10",
+			}},
+		},
+		host: "192.76.120.10",
+		exp:  -1,
+	},
+	{
+		name: "inbound with address mask is matched by an IPv4-mapped source address",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"192.76.120.10",
+			}},
+		},
+		src: "::ffff:192.76.120.10",
+		exp: 0,
+	},
+	{
+		name: "inbound with host mask is matched by the source address",
+		trunks: []*livekit.SIPTrunkInfo{
+			{SipTrunkId: "bbb", OutboundNumber: sipNumber2, InboundAddresses: []string{
+				"10.10.10.0/24",
+				"sip.example.com",
+			}},
+		},
+		src: "10.10.10.7",
 		exp: 0,
 	},
 	{
@@ -1192,7 +1223,6 @@ func TestMatchMasks(t *testing.T) {
 	cases := []struct {
 		name  string
 		addr  string
-		host  string
 		masks []string
 		exp   bool
 	}{
@@ -1235,18 +1265,32 @@ func TestMatchMasks(t *testing.T) {
 			exp: false,
 		},
 		{
-			name: "hostname",
-			addr: "192.168.0.10",
-			host: "sip.example.com",
+			name: "address mask is not the From host",
+			addr: "1.1.1.1",
 			masks: []string{
-				"sip.example.com",
+				"192.76.120.10",
+			},
+			exp: false,
+		},
+		{
+			name: "mapped address",
+			addr: "::ffff:192.168.0.10",
+			masks: []string{
+				"192.168.0.0/24",
 			},
 			exp: true,
 		},
 		{
+			name: "hostname matches nothing",
+			addr: "192.168.0.10",
+			masks: []string{
+				"sip.example.com",
+			},
+			exp: false,
+		},
+		{
 			name: "invalid hostname",
 			addr: "192.168.0.10",
-			host: "sip.example.com",
 			masks: []string{
 				"some.domain",
 			},
@@ -1271,20 +1315,19 @@ func TestMatchMasks(t *testing.T) {
 			exp: false,
 		},
 		{
-			name: "domain name",
+			name: "domain name beside a wrong range",
 			addr: "192.168.0.10",
-			host: "sip.example.com",
 			masks: []string{
 				"some.domain",
 				"192.168.1.0/24",
 				"sip.example.com",
 			},
-			exp: true,
+			exp: false,
 		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got := matchAddrMasks(c.addr, c.host, c.masks)
+			got := matchAddrMasks(c.addr, c.masks)
 			require.Equal(t, c.exp, got)
 		})
 	}
