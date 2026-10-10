@@ -238,3 +238,22 @@ func FuzzSDPFragmentUnmarshal(f *testing.F) {
 		require.Equal(t, sdpFragment, reparsed, "fragment: %q", frag)
 	})
 }
+
+func TestSDPFragmentEndOfCandidates(t *testing.T) {
+	fragment := "a=group:BUNDLE 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\na=ice-ufrag:ysXw\r\na=ice-pwd:vw5LmwG4y/e6dPP/zAP9Gp5k\r\na=candidate:1387637174 1 udp 2122260223 192.0.2.1 61764 typ host\r\na=end-of-candidates\r\n"
+
+	sdpFragment := &SDPFragment{}
+	require.NoError(t, sdpFragment.Unmarshal(fragment))
+
+	marshalled, err := sdpFragment.Marshal()
+	require.NoError(t, err)
+	require.Equal(t, fragment, marshalled)
+
+	offer := "v=0\r\no=- 4648475892259889561 3 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\na=group:BUNDLE 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nc=IN IP4 0.0.0.0\r\na=ice-ufrag:1hhfzwf0ijpzm\r\na=ice-pwd:jm5puo2ab1op3vs59ca53bdk7s\r\na=setup:passive\r\na=mid:0\r\na=sendonly\r\na=rtcp-mux\r\na=rtpmap:111 opus/48000/2\r\n"
+	parsed, err := (&webrtc.SessionDescription{Type: webrtc.SDPTypeOffer, SDP: offer}).Unmarshal()
+	require.NoError(t, err)
+	require.NoError(t, sdpFragment.PatchICECredentialAndCandidatesIntoSDP(parsed))
+
+	_, found := parsed.MediaDescriptions[0].Attribute(pionsdp.AttrKeyEndOfCandidates)
+	require.True(t, found)
+}
