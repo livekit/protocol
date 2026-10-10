@@ -2126,7 +2126,7 @@ const file_agent_livekit_agent_inference_proto_rawDesc = "" +
 	"\x12_client_created_at*F\n" +
 	"\rAudioEncoding\x12\x1c\n" +
 	"\x18AUDIO_ENCODING_PCM_S16LE\x10\x00\x12\x17\n" +
-	"\x13AUDIO_ENCODING_OPUS\x10\x01BNH\x01Z)github.com/livekit/protocol/livekit/agent\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x13AUDIO_ENCODING_OPUS\x10\x01B>H\x01Z)github.com/livekit/protocol/livekit/agent\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_agent_livekit_agent_inference_proto_rawDescOnce sync.Once

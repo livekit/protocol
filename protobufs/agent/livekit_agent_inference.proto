@@ -20,7 +20,6 @@ import "agent/livekit_agent_session.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-option csharp_namespace = "LiveKit.Proto";
 option go_package = "github.com/livekit/protocol/livekit/agent";
 option optimize_for = SPEED;
 option ruby_package = "LiveKit::Proto";
