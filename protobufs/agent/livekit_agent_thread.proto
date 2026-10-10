@@ -30,6 +30,13 @@ import "agent/livekit_agent_session.proto";
 import "logger/options.proto";
 
 message AgentThread {
+  // Direction of a listing. Each request documents what unset means.
+  enum SortOrder {
+    SORT_ORDER_UNSPECIFIED = 0;
+    SORT_ORDER_ASC = 1;
+    SORT_ORDER_DESC = 2;
+  }
+
   message CreateRequest {
     // Groups threads, e.g. by user: an application-defined value, typically the
     // user's identity. An AgentThreadGrant is scoped by it.
@@ -46,15 +53,15 @@ message AgentThread {
   // The threads of one scope, newest first.
   message ListRequest {
     string scope = 1 [(logger.sensitivity) = SENSITIVITY_PII];
-    // Cursor from the previous ListResponse; empty for the first page.
-    string before = 2;
+    // next_page_token of the previous ListResponse; empty for the first page.
+    string page_token = 2;
     int32 limit = 3;
   }
 
   message ListResponse {
     repeated Thread threads = 1;
-    // Empty at the end.
-    string before = 2;
+    // Empty when exhausted.
+    string next_page_token = 2;
   }
 
   message UpdateRequest {
@@ -71,20 +78,23 @@ message AgentThread {
 
   message DeleteResponse {}
 
-  // The thread's chat items, oldest first.
+  // The thread's chat items, oldest first unless sort_order says otherwise.
   message GetItemsRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     // One agent's items; empty for every agent's.
     string agent = 2;
-    // Cursor from the previous GetItemsResponse; empty for the first page.
-    string after = 3;
+    // next_page_token of the previous GetItemsResponse; empty for the first page.
+    string page_token = 3;
     int32 limit = 4;
+    // Unset or ASC is oldest first. DESC starts from the latest item and each
+    // next_page_token walks back through older ones.
+    SortOrder sort_order = 5;
   }
 
   message GetItemsResponse {
     repeated Item items = 1;
-    // Empty at the end.
-    string after = 2;
+    // Empty when exhausted.
+    string next_page_token = 2;
   }
 
   // One chat item of an agent. Stored as the JSON of
@@ -130,10 +140,15 @@ message AgentTask {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Unset for every status.
     optional Status status = 2;
+    // next_page_token of the previous GetTasksResponse; empty for the first page.
+    string page_token = 3;
+    int32 limit = 4;
   }
 
   message GetTasksResponse {
     repeated Task tasks = 1;
+    // Empty when exhausted.
+    string next_page_token = 2;
   }
 
   message Task {
