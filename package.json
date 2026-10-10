@@ -16,7 +16,7 @@
     "overrides": {
       "minimatch": "10.2.6",
       "js-yaml": "3.15.2",
-      "brace-expansion": "5.0.9",
+      "brace-expansion": "5.0.12",
       "picomatch": "4.0.7",
       "defu": "6.1.7"
     },
