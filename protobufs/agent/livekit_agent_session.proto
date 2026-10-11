@@ -62,7 +62,10 @@ message FunctionCall {
   string arguments = 3;
   string name = 4;
   google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Struct extra = 6;
+  // Framework metadata recorded on the call, kept with the history. A delegating call records
+  // where the request went: lk.delegation.task_id, lk.delegation.endpoint,
+  // lk.delegation.transport and lk.delegation.profile.
+  map<string, string> extra = 6;
 }
 
 message FunctionCallOutput {
