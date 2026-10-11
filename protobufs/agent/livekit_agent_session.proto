@@ -62,6 +62,7 @@ message FunctionCall {
   string arguments = 3;
   string name = 4;
   google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Struct extra = 6;
 }
 
 message FunctionCallOutput {
