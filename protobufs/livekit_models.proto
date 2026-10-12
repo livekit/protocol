@@ -858,6 +858,14 @@ message RTPForwarderState {
     VP8MungerState vp8_munger = 7;
   }
   repeated RTCPSenderReportState sender_report_state = 8;
+  DependencyDescriptorForwarderState dependency_descriptor_forwarder = 9;
+}
+
+// State of a forwarder that writes the dependency descriptor for the subscriber, so
+// its frame numbers continue on a migrated subscriber.
+message DependencyDescriptorForwarderState {
+  // highest extended frame number sent to the subscriber
+  uint64 ext_last_frame_number = 1;
 }
 
 message RTPMungerState {

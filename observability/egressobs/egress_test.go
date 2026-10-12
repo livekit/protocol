@@ -242,12 +242,67 @@ func TestGetAudioOnly(t *testing.T) {
 			audioOnly: true,
 		},
 		{
-			name: "v2 Media returns false",
+			name: "v2 Media audio routes only",
 			info: &livekit.EgressInfo{
 				Request: &livekit.EgressInfo_Egress{
 					Egress: &livekit.StartEgressRequest{
 						Source: &livekit.StartEgressRequest_Media{
-							Media: &livekit.MediaSource{},
+							Media: &livekit.MediaSource{
+								Audio: &livekit.AudioConfig{
+									Routes: []*livekit.AudioRoute{{
+										Match:   &livekit.AudioRoute_ParticipantIdentity{ParticipantIdentity: "caller"},
+										Channel: livekit.AudioChannel_AUDIO_CHANNEL_LEFT,
+									}},
+								},
+							},
+						},
+					},
+				},
+			},
+			audioOnly: true,
+		},
+		{
+			name: "v2 Media capture all audio",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Media{
+							Media: &livekit.MediaSource{
+								Audio: &livekit.AudioConfig{CaptureAll: true},
+							},
+						},
+					},
+				},
+			},
+			audioOnly: true,
+		},
+		{
+			name: "v2 Media video track",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Media{
+							Media: &livekit.MediaSource{
+								Video: &livekit.MediaSource_VideoTrackId{VideoTrackId: "TR_video"},
+								Audio: &livekit.AudioConfig{CaptureAll: true},
+							},
+						},
+					},
+				},
+			},
+			audioOnly: false,
+		},
+		{
+			name: "v2 Media participant video",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Egress{
+					Egress: &livekit.StartEgressRequest{
+						Source: &livekit.StartEgressRequest_Media{
+							Media: &livekit.MediaSource{
+								Video: &livekit.MediaSource_ParticipantVideo{
+									ParticipantVideo: &livekit.ParticipantVideo{Identity: "speaker"},
+								},
+							},
 						},
 					},
 				},
@@ -261,6 +316,21 @@ func TestGetAudioOnly(t *testing.T) {
 					Replay: &livekit.ExportReplayRequest{
 						Source: &livekit.ExportReplayRequest_Template{
 							Template: &livekit.TemplateSource{AudioOnly: true},
+						},
+					},
+				},
+			},
+			audioOnly: true,
+		},
+		{
+			name: "Replay Media audio only",
+			info: &livekit.EgressInfo{
+				Request: &livekit.EgressInfo_Replay{
+					Replay: &livekit.ExportReplayRequest{
+						Source: &livekit.ExportReplayRequest_Media{
+							Media: &livekit.MediaSource{
+								Audio: &livekit.AudioConfig{CaptureAll: true},
+							},
 						},
 					},
 				},
