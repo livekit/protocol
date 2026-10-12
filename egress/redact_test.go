@@ -188,3 +188,29 @@ func TestRedactDirectOutput(t *testing.T) {
 		"wss://foo.bar.com/audio?callId={...}&token={...}",
 		websocket.Output.(*livekit.TrackEgressRequest_WebsocketUrl).WebsocketUrl)
 }
+
+func TestRedactWebhooks(t *testing.T) {
+	webhooks := func() []*livekit.WebhookConfig {
+		return []*livekit.WebhookConfig{{Url: "https://foo.bar.com/webhook", SigningKey: "SIGNING_KEY"}}
+	}
+	requireRedacted := func(webhooks []*livekit.WebhookConfig) {
+		require.Equal(t, "https://foo.bar.com/webhook", webhooks[0].Url)
+		require.Equal(t, "{signing_key}", webhooks[0].SigningKey)
+	}
+
+	roomComposite := &livekit.RoomCompositeEgressRequest{Webhooks: webhooks()}
+	RedactEncodedOutputs(roomComposite)
+	requireRedacted(roomComposite.Webhooks)
+
+	track := &livekit.TrackEgressRequest{Webhooks: webhooks()}
+	RedactDirectOutputs(track)
+	requireRedacted(track.Webhooks)
+
+	start := &livekit.StartEgressRequest{Webhooks: webhooks()}
+	RedactStartEgressRequest(start)
+	requireRedacted(start.Webhooks)
+
+	replay := &livekit.ExportReplayRequest{Webhooks: webhooks()}
+	RedactStartEgressRequest(replay)
+	requireRedacted(replay.Webhooks)
+}

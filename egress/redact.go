@@ -21,6 +21,7 @@ import (
 
 // RedactStartEgressRequest redacts secrets from a V2 StartEgressRequest.
 func RedactStartEgressRequest(req EgressRequest) {
+	redactRequestWebhooks(req)
 	RedactUpload(req.GetStorage())
 	for _, output := range req.GetOutputs() {
 		RedactUpload(output.Storage)
@@ -67,6 +68,7 @@ func RedactAutoEncodedOutput(out AutoEncodedOutput) {
 }
 
 func RedactEncodedOutputs(out EncodedOutput) {
+	redactRequestWebhooks(out)
 	RedactAutoEncodedOutput(out)
 
 	if streams := out.GetStreamOutputs(); len(streams) == 1 {
@@ -88,6 +90,7 @@ func RedactEncodedOutputs(out EncodedOutput) {
 }
 
 func RedactDirectOutputs(out DirectOutput) {
+	redactRequestWebhooks(out)
 	if f := out.GetFile(); f != nil {
 		RedactUpload(f)
 	}
@@ -103,5 +106,17 @@ func RedactStreamKeys(stream *livekit.StreamOutput) {
 		if redacted, ok := utils.RedactStreamKey(url); ok {
 			stream.Urls[i] = redacted
 		}
+	}
+}
+
+func RedactWebhooks(webhooks []*livekit.WebhookConfig) {
+	for _, webhook := range webhooks {
+		webhook.SigningKey = utils.Redact(webhook.SigningKey, "{signing_key}")
+	}
+}
+
+func redactRequestWebhooks(req any) {
+	if r, ok := req.(interface{ GetWebhooks() []*livekit.WebhookConfig }); ok {
+		RedactWebhooks(r.GetWebhooks())
 	}
 }

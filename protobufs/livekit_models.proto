@@ -989,7 +989,7 @@ message FilterParams {
 
 message WebhookConfig {
   string url = 1;
-  string signing_key = 2;
+  string signing_key = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   FilterParams filter_params = 3;
 }
 

@@ -7493,10 +7493,10 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\vDEFLATE_RAW\x10\x01\"\\\n" +
 	"\fFilterParams\x12%\n" +
 	"\x0einclude_events\x18\x01 \x03(\tR\rincludeEvents\x12%\n" +
-	"\x0eexclude_events\x18\x02 \x03(\tR\rexcludeEvents\"~\n" +
+	"\x0eexclude_events\x18\x02 \x03(\tR\rexcludeEvents\"\x83\x01\n" +
 	"\rWebhookConfig\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url\x12\x1f\n" +
-	"\vsigning_key\x18\x02 \x01(\tR\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12$\n" +
+	"\vsigning_key\x18\x02 \x01(\tB\x03\xc0P\x02R\n" +
 	"signingKey\x12:\n" +
 	"\rfilter_params\x18\x03 \x01(\v2\x15.livekit.FilterParamsR\ffilterParams\"F\n" +
 	"\x14SubscribedAudioCodec\x12\x14\n" +
