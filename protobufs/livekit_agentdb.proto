@@ -26,6 +26,7 @@ option ruby_package = "LiveKit::Proto";
 
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "logger/options.proto";
 
 // Nested so that names like Value and Ping need not be unique across the
 // livekit package. `tip` throughout is the latest durable commit sequence.
@@ -164,7 +165,7 @@ message AgentDB {
     }
 
     message Hello {
-      string token = 1;
+      string token = 1 [(logger.sensitivity) = SENSITIVITY_SECRET];
       string database_id = 2;
     }
 

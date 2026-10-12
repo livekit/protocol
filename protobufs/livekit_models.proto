@@ -49,7 +49,7 @@ message Room {
   uint32 max_participants = 4;
   int64 creation_time = 5;
   int64 creation_time_ms = 15;
-  string turn_password = 6;
+  string turn_password = 6 [(logger.sensitivity) = SENSITIVITY_SECRET];
   repeated Codec enabled_codecs = 7;
   string metadata = 8 [
     (logger.sensitivity) = SENSITIVITY_PII,

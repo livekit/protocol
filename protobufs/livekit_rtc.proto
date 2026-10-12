@@ -102,7 +102,7 @@ message SignalResponse {
     // when subscription permission changed
     SubscriptionPermissionUpdate subscription_permission_update = 15;
     // update the token the client was using, to prevent an active client from using an expired token
-    string refresh_token = 16;
+    string refresh_token = 16 [(logger.sensitivity) = SENSITIVITY_SECRET];
     // server initiated track unpublish
     TrackUnpublishedResponse track_unpublished = 17;
     // respond to ping
@@ -497,7 +497,7 @@ message RoomMovedResponse {
   // information about the new room
   Room room = 1;
   // new reconnect token that can be used to reconnect to the new room
-  string token = 2;
+  string token = 2 [(logger.sensitivity) = SENSITIVITY_SECRET];
   ParticipantInfo participant = 3;
   repeated ParticipantInfo other_participants = 4;
 }

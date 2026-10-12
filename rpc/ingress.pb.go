@@ -574,21 +574,21 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\x19ListActiveIngressResponse\x12#\n" +
 	"\vingress_ids\x18\x01 \x03(\tB\x02\x18\x01R\n" +
 	"ingressIds\x12>\n" +
-	"\x10ingress_sessions\x18\x02 \x03(\v2\x13.rpc.IngressSessionR\x0fingressSessions\"j\n" +
+	"\x10ingress_sessions\x18\x02 \x03(\v2\x13.rpc.IngressSessionR\x0fingressSessions\"o\n" +
 	"\x19DeleteWHIPResourceRequest\x12.\n" +
 	"\vresource_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"resourceIDR\n" +
-	"resourceId\x12\x1d\n" +
+	"resourceId\x12\"\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xa1\x02\n" +
+	"stream_key\x18\x02 \x01(\tB\x03\xc0P\x02R\tstreamKey\"\xab\x02\n" +
 	"\x1dICERestartWHIPResourceRequest\x12.\n" +
 	"\vresource_id\x18\x01 \x01(\tB\r\xbaP\n" +
 	"resourceIDR\n" +
-	"resourceId\x12\x1d\n" +
+	"resourceId\x12\"\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\x12#\n" +
-	"\ruser_fragment\x18\x03 \x01(\tR\fuserFragment\x12\x1a\n" +
-	"\bpassword\x18\x04 \x01(\tR\bpassword\x12\x1e\n" +
+	"stream_key\x18\x02 \x01(\tB\x03\xc0P\x02R\tstreamKey\x12#\n" +
+	"\ruser_fragment\x18\x03 \x01(\tR\fuserFragment\x12\x1f\n" +
+	"\bpassword\x18\x04 \x01(\tB\x03\xc0P\x02R\bpassword\x12\x1e\n" +
 	"\n" +
 	"candidates\x18\x05 \x03(\tR\n" +
 	"candidates\x125\n" +
@@ -601,10 +601,10 @@ const file_rpc_ingress_proto_rawDesc = "" +
 	"\x0eparticipant_id\x18\x01 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x12\x16\n" +
 	"\x06closed\x18\x02 \x01(\bR\x06closed\x12.\n" +
 	"\x05video\x18\x03 \x01(\v2\x18.livekit.InputVideoStateR\x05video\x12.\n" +
-	"\x05audio\x18\x04 \x01(\v2\x18.livekit.InputAudioStateR\x05audio\"\x94\x03\n" +
+	"\x05audio\x18\x04 \x01(\v2\x18.livekit.InputAudioStateR\x05audio\"\x99\x03\n" +
 	"\x13StartIngressRequest\x12(\n" +
-	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\x12\x15\n" +
+	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x19\n" +
+	"\x05token\x18\x02 \x01(\tB\x03\xc0P\x02R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x03 \x01(\tR\x05wsUrl\x12R\n" +
 	"\x0elogging_fields\x18\x04 \x03(\v2+.rpc.StartIngressRequest.LoggingFieldsEntryR\rloggingFields\x12O\n" +
 	"\rfeature_flags\x18\x05 \x03(\v2*.rpc.StartIngressRequest.FeatureFlagsEntryR\ffeatureFlags\x1a@\n" +
