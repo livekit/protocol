@@ -431,8 +431,8 @@ message Scenario {
   // SCN_-prefixed guid. Stable across edits to label, instructions, or
   // expectations, so runs of the same scenario can be correlated over time.
   string id = 6;
-  // The ScenarioGroup step the call starts at. The simulator then plays the far
-  // end of an outbound call by walking the steps. Set this or instructions,
+  // The ScenarioGroup node the call starts at. The simulator then plays the far
+  // end of an outbound call by walking the nodes. Set this or instructions,
   // not both.
   string start = 7;
   // Hard cap on a call that has start. Unset is 300s.
@@ -446,16 +446,19 @@ message ScenarioGroup {
   // SCNG_-prefixed guid. Stable identity of the scenarios file, independent
   // of its name.
   string id = 3;
-  // Named steps shared by every scenario in the group. A scenario's start
-  // names one of them. Steps can also name built-ins: livekit/hangup,
+  // Named nodes shared by every scenario in the group. A scenario's start
+  // names one of them. Nodes can also name built-ins: livekit/hangup,
   // livekit/voicemail, and livekit/unavailable. The livekit/ prefix is reserved.
-  map<string, SimulatorStep> steps = 4;
+  map<string, SimulatorNode> nodes = 4;
 }
 
-// One step of the far end of a simulated outbound call: a machine line, a
-// person, a voicemail box, or silence. Steps name each other in then, routes,
-// timeout, max_visits, and voicemail.next.
-message SimulatorStep {
+// One node of the far end of a simulated outbound call: a machine line, a
+// person, or silence. Nodes name each other in then, routes, timeout, and
+// max_visits. A voicemail box is the built-in livekit/voicemail: a beep, then
+// the agent is recorded in silence, then the call ends or a menu offers to send
+// or re-record the message. Each run picks the box's details, such as whether
+// it beeps, how long it waits for silence, and which of the two follows.
+message SimulatorNode {
   enum Speaker {
     // A person: the scenario's voice.
     PERSON = 0;
@@ -481,46 +484,26 @@ message SimulatorStep {
     string to = 2;
   }
 
-  // livekit/voicemail with these parameters: a beep, then the agent is recorded
-  // in silence.
-  message Voicemail {
-    // The next step. Unset is livekit/hangup.
-    string next = 1;
-    // Silence after the agent stops speaking that ends the recording. Unset is 30s.
-    google.protobuf.Duration silence_timeout = 2;
-    // Cap on the recording. Unset is 120s.
-    google.protobuf.Duration max_duration = 3;
-    // DTMF key that ends the recording; empty for none. Unset is "#".
-    optional string end_key = 4;
-    // Unset is true.
-    optional bool beep = 5;
-    // Gap between the previous step and the beep. Unset is 0.5s.
-    google.protobuf.Duration beep_delay = 6;
-  }
-
-  // Spoken word for word when the step starts.
+  // Spoken word for word when the node starts.
   string say = 1;
-  // LLM roleplay for every turn after say. Only these steps react to the
+  // LLM roleplay for every turn after say. Only these nodes react to the
   // agent's speech.
   string instructions = 2;
-  // Makes this step a voicemail box. Cannot be combined with say,
-  // instructions, then, routes, or timeout.
-  Voicemail voicemail = 3;
-  // The next step: when say ends, or, with timeout, when the agent's reply
+  // The next node: when say ends, or, with timeout, when the agent's reply
   // ends. Then timeout is the path for no reply.
-  string then = 4;
-  // Checked in order; the first match wins. A step whose routes each match
+  string then = 3;
+  // Checked in order; the first match wins. A node whose routes each match
   // one key matches every key at once. Otherwise keys collect until #, which
   // ends the entry. Keys pressed during say count, and a match cuts say off.
-  repeated Route routes = 5;
-  // Starts when say ends. On a machine step only a route cancels it; on a
-  // person step the agent's speech restarts it.
-  Timeout timeout = 6;
-  // A retry cap for steps that repeat, such as a menu.
-  MaxVisits max_visits = 7;
-  Speaker speaker = 8;
-  // What the agent should do during this step, for the judge.
-  string expectation = 9;
+  repeated Route routes = 4;
+  // Starts when say ends. On a machine node only a route cancels it; on a
+  // person node the agent's speech restarts it.
+  Timeout timeout = 5;
+  // A retry cap for nodes that repeat, such as a menu.
+  MaxVisits max_visits = 6;
+  Speaker speaker = 7;
+  // What the agent should do during this node, for the judge.
+  string expectation = 8;
 }
 
 // How the simulated user interacts with the agent under test.
