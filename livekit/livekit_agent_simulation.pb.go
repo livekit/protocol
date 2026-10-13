@@ -206,51 +206,51 @@ func (SimulationRun_Job_Status) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{1, 0, 0}
 }
 
-type SimulatorStep_Speaker int32
+type SimulatorNode_Speaker int32
 
 const (
 	// A person: the scenario's voice.
-	SimulatorStep_PERSON SimulatorStep_Speaker = 0
+	SimulatorNode_PERSON SimulatorNode_Speaker = 0
 	// A machine: a fixed voice, different from every person's.
-	SimulatorStep_MACHINE SimulatorStep_Speaker = 1
+	SimulatorNode_MACHINE SimulatorNode_Speaker = 1
 )
 
-// Enum value maps for SimulatorStep_Speaker.
+// Enum value maps for SimulatorNode_Speaker.
 var (
-	SimulatorStep_Speaker_name = map[int32]string{
+	SimulatorNode_Speaker_name = map[int32]string{
 		0: "PERSON",
 		1: "MACHINE",
 	}
-	SimulatorStep_Speaker_value = map[string]int32{
+	SimulatorNode_Speaker_value = map[string]int32{
 		"PERSON":  0,
 		"MACHINE": 1,
 	}
 )
 
-func (x SimulatorStep_Speaker) Enum() *SimulatorStep_Speaker {
-	p := new(SimulatorStep_Speaker)
+func (x SimulatorNode_Speaker) Enum() *SimulatorNode_Speaker {
+	p := new(SimulatorNode_Speaker)
 	*p = x
 	return p
 }
 
-func (x SimulatorStep_Speaker) String() string {
+func (x SimulatorNode_Speaker) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (SimulatorStep_Speaker) Descriptor() protoreflect.EnumDescriptor {
+func (SimulatorNode_Speaker) Descriptor() protoreflect.EnumDescriptor {
 	return file_livekit_agent_simulation_proto_enumTypes[3].Descriptor()
 }
 
-func (SimulatorStep_Speaker) Type() protoreflect.EnumType {
+func (SimulatorNode_Speaker) Type() protoreflect.EnumType {
 	return &file_livekit_agent_simulation_proto_enumTypes[3]
 }
 
-func (x SimulatorStep_Speaker) Number() protoreflect.EnumNumber {
+func (x SimulatorNode_Speaker) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use SimulatorStep_Speaker.Descriptor instead.
-func (SimulatorStep_Speaker) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use SimulatorNode_Speaker.Descriptor instead.
+func (SimulatorNode_Speaker) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4, 0}
 }
 
@@ -576,8 +576,8 @@ type Scenario struct {
 	// SCN_-prefixed guid. Stable across edits to label, instructions, or
 	// expectations, so runs of the same scenario can be correlated over time.
 	Id string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
-	// The ScenarioGroup step the call starts at. The simulator then plays the far
-	// end of an outbound call by walking the steps. Set this or instructions,
+	// The ScenarioGroup node the call starts at. The simulator then plays the far
+	// end of an outbound call by walking the nodes. Set this or instructions,
 	// not both.
 	Start string `protobuf:"bytes,7,opt,name=start,proto3" json:"start,omitempty"`
 	// Hard cap on a call that has start. Unset is 300s.
@@ -680,10 +680,10 @@ type ScenarioGroup struct {
 	// SCNG_-prefixed guid. Stable identity of the scenarios file, independent
 	// of its name.
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	// Named steps shared by every scenario in the group. A scenario's start
-	// names one of them. Steps can also name built-ins: livekit/hangup,
+	// Named nodes shared by every scenario in the group. A scenario's start
+	// names one of them. Nodes can also name built-ins: livekit/hangup,
 	// livekit/voicemail, and livekit/unavailable. The livekit/ prefix is reserved.
-	Steps         map[string]*SimulatorStep `protobuf:"bytes,4,rep,name=steps,proto3" json:"steps,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Nodes         map[string]*SimulatorNode `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -739,59 +739,59 @@ func (x *ScenarioGroup) GetId() string {
 	return ""
 }
 
-func (x *ScenarioGroup) GetSteps() map[string]*SimulatorStep {
+func (x *ScenarioGroup) GetNodes() map[string]*SimulatorNode {
 	if x != nil {
-		return x.Steps
+		return x.Nodes
 	}
 	return nil
 }
 
-// One step of the far end of a simulated outbound call: a machine line, a
-// person, a voicemail box, or silence. Steps name each other in then, routes,
-// timeout, max_visits, and voicemail.next.
-type SimulatorStep struct {
+// One node of the far end of a simulated outbound call: a machine line, a
+// person, or silence. Nodes name each other in then, routes, timeout, and
+// max_visits. A voicemail box is the built-in livekit/voicemail: a beep, then
+// the agent is recorded in silence, then the call ends or a menu offers to send
+// or re-record the message. Each run picks the box's details, such as whether
+// it beeps, how long it waits for silence, and which of the two follows.
+type SimulatorNode struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Spoken word for word when the step starts.
+	// Spoken word for word when the node starts.
 	Say string `protobuf:"bytes,1,opt,name=say,proto3" json:"say,omitempty"`
-	// LLM roleplay for every turn after say. Only these steps react to the
+	// LLM roleplay for every turn after say. Only these nodes react to the
 	// agent's speech.
 	Instructions string `protobuf:"bytes,2,opt,name=instructions,proto3" json:"instructions,omitempty"`
-	// Makes this step a voicemail box. Cannot be combined with say,
-	// instructions, then, routes, or timeout.
-	Voicemail *SimulatorStep_Voicemail `protobuf:"bytes,3,opt,name=voicemail,proto3" json:"voicemail,omitempty"`
-	// The next step: when say ends, or, with timeout, when the agent's reply
+	// The next node: when say ends, or, with timeout, when the agent's reply
 	// ends. Then timeout is the path for no reply.
-	Then string `protobuf:"bytes,4,opt,name=then,proto3" json:"then,omitempty"`
-	// Checked in order; the first match wins. A step whose routes each match
+	Then string `protobuf:"bytes,3,opt,name=then,proto3" json:"then,omitempty"`
+	// Checked in order; the first match wins. A node whose routes each match
 	// one key matches every key at once. Otherwise keys collect until #, which
 	// ends the entry. Keys pressed during say count, and a match cuts say off.
-	Routes []*SimulatorStep_Route `protobuf:"bytes,5,rep,name=routes,proto3" json:"routes,omitempty"`
-	// Starts when say ends. On a machine step only a route cancels it; on a
-	// person step the agent's speech restarts it.
-	Timeout *SimulatorStep_Timeout `protobuf:"bytes,6,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	// A retry cap for steps that repeat, such as a menu.
-	MaxVisits *SimulatorStep_MaxVisits `protobuf:"bytes,7,opt,name=max_visits,json=maxVisits,proto3" json:"max_visits,omitempty"`
-	Speaker   SimulatorStep_Speaker    `protobuf:"varint,8,opt,name=speaker,proto3,enum=livekit.SimulatorStep_Speaker" json:"speaker,omitempty"`
-	// What the agent should do during this step, for the judge.
-	Expectation   string `protobuf:"bytes,9,opt,name=expectation,proto3" json:"expectation,omitempty"`
+	Routes []*SimulatorNode_Route `protobuf:"bytes,4,rep,name=routes,proto3" json:"routes,omitempty"`
+	// Starts when say ends. On a machine node only a route cancels it; on a
+	// person node the agent's speech restarts it.
+	Timeout *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// A retry cap for nodes that repeat, such as a menu.
+	MaxVisits *SimulatorNode_MaxVisits `protobuf:"bytes,6,opt,name=max_visits,json=maxVisits,proto3" json:"max_visits,omitempty"`
+	Speaker   SimulatorNode_Speaker    `protobuf:"varint,7,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
+	// What the agent should do during this node, for the judge.
+	Expectation   string `protobuf:"bytes,8,opt,name=expectation,proto3" json:"expectation,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SimulatorStep) Reset() {
-	*x = SimulatorStep{}
+func (x *SimulatorNode) Reset() {
+	*x = SimulatorNode{}
 	mi := &file_livekit_agent_simulation_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SimulatorStep) String() string {
+func (x *SimulatorNode) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SimulatorStep) ProtoMessage() {}
+func (*SimulatorNode) ProtoMessage() {}
 
-func (x *SimulatorStep) ProtoReflect() protoreflect.Message {
+func (x *SimulatorNode) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_simulation_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -803,68 +803,61 @@ func (x *SimulatorStep) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SimulatorStep.ProtoReflect.Descriptor instead.
-func (*SimulatorStep) Descriptor() ([]byte, []int) {
+// Deprecated: Use SimulatorNode.ProtoReflect.Descriptor instead.
+func (*SimulatorNode) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *SimulatorStep) GetSay() string {
+func (x *SimulatorNode) GetSay() string {
 	if x != nil {
 		return x.Say
 	}
 	return ""
 }
 
-func (x *SimulatorStep) GetInstructions() string {
+func (x *SimulatorNode) GetInstructions() string {
 	if x != nil {
 		return x.Instructions
 	}
 	return ""
 }
 
-func (x *SimulatorStep) GetVoicemail() *SimulatorStep_Voicemail {
-	if x != nil {
-		return x.Voicemail
-	}
-	return nil
-}
-
-func (x *SimulatorStep) GetThen() string {
+func (x *SimulatorNode) GetThen() string {
 	if x != nil {
 		return x.Then
 	}
 	return ""
 }
 
-func (x *SimulatorStep) GetRoutes() []*SimulatorStep_Route {
+func (x *SimulatorNode) GetRoutes() []*SimulatorNode_Route {
 	if x != nil {
 		return x.Routes
 	}
 	return nil
 }
 
-func (x *SimulatorStep) GetTimeout() *SimulatorStep_Timeout {
+func (x *SimulatorNode) GetTimeout() *SimulatorNode_Timeout {
 	if x != nil {
 		return x.Timeout
 	}
 	return nil
 }
 
-func (x *SimulatorStep) GetMaxVisits() *SimulatorStep_MaxVisits {
+func (x *SimulatorNode) GetMaxVisits() *SimulatorNode_MaxVisits {
 	if x != nil {
 		return x.MaxVisits
 	}
 	return nil
 }
 
-func (x *SimulatorStep) GetSpeaker() SimulatorStep_Speaker {
+func (x *SimulatorNode) GetSpeaker() SimulatorNode_Speaker {
 	if x != nil {
 		return x.Speaker
 	}
-	return SimulatorStep_PERSON
+	return SimulatorNode_PERSON
 }
 
-func (x *SimulatorStep) GetExpectation() string {
+func (x *SimulatorNode) GetExpectation() string {
 	if x != nil {
 		return x.Expectation
 	}
@@ -3523,7 +3516,7 @@ func (x *Scenario_CreateFromSession_Response) GetScenario() *Scenario {
 	return nil
 }
 
-type SimulatorStep_Route struct {
+type SimulatorNode_Route struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Only DTMF characters (0-9, *, #): a literal. Anything else: a regex that
 	// must match the whole entry.
@@ -3533,20 +3526,20 @@ type SimulatorStep_Route struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SimulatorStep_Route) Reset() {
-	*x = SimulatorStep_Route{}
+func (x *SimulatorNode_Route) Reset() {
+	*x = SimulatorNode_Route{}
 	mi := &file_livekit_agent_simulation_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SimulatorStep_Route) String() string {
+func (x *SimulatorNode_Route) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SimulatorStep_Route) ProtoMessage() {}
+func (*SimulatorNode_Route) ProtoMessage() {}
 
-func (x *SimulatorStep_Route) ProtoReflect() protoreflect.Message {
+func (x *SimulatorNode_Route) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_simulation_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3558,26 +3551,26 @@ func (x *SimulatorStep_Route) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SimulatorStep_Route.ProtoReflect.Descriptor instead.
-func (*SimulatorStep_Route) Descriptor() ([]byte, []int) {
+// Deprecated: Use SimulatorNode_Route.ProtoReflect.Descriptor instead.
+func (*SimulatorNode_Route) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4, 0}
 }
 
-func (x *SimulatorStep_Route) GetMatch() string {
+func (x *SimulatorNode_Route) GetMatch() string {
 	if x != nil {
 		return x.Match
 	}
 	return ""
 }
 
-func (x *SimulatorStep_Route) GetTo() string {
+func (x *SimulatorNode_Route) GetTo() string {
 	if x != nil {
 		return x.To
 	}
 	return ""
 }
 
-type SimulatorStep_Timeout struct {
+type SimulatorNode_Timeout struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	After         *durationpb.Duration   `protobuf:"bytes,1,opt,name=after,proto3" json:"after,omitempty"`
 	To            string                 `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
@@ -3585,20 +3578,20 @@ type SimulatorStep_Timeout struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SimulatorStep_Timeout) Reset() {
-	*x = SimulatorStep_Timeout{}
+func (x *SimulatorNode_Timeout) Reset() {
+	*x = SimulatorNode_Timeout{}
 	mi := &file_livekit_agent_simulation_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SimulatorStep_Timeout) String() string {
+func (x *SimulatorNode_Timeout) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SimulatorStep_Timeout) ProtoMessage() {}
+func (*SimulatorNode_Timeout) ProtoMessage() {}
 
-func (x *SimulatorStep_Timeout) ProtoReflect() protoreflect.Message {
+func (x *SimulatorNode_Timeout) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_simulation_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3610,26 +3603,26 @@ func (x *SimulatorStep_Timeout) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SimulatorStep_Timeout.ProtoReflect.Descriptor instead.
-func (*SimulatorStep_Timeout) Descriptor() ([]byte, []int) {
+// Deprecated: Use SimulatorNode_Timeout.ProtoReflect.Descriptor instead.
+func (*SimulatorNode_Timeout) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4, 1}
 }
 
-func (x *SimulatorStep_Timeout) GetAfter() *durationpb.Duration {
+func (x *SimulatorNode_Timeout) GetAfter() *durationpb.Duration {
 	if x != nil {
 		return x.After
 	}
 	return nil
 }
 
-func (x *SimulatorStep_Timeout) GetTo() string {
+func (x *SimulatorNode_Timeout) GetTo() string {
 	if x != nil {
 		return x.To
 	}
 	return ""
 }
 
-type SimulatorStep_MaxVisits struct {
+type SimulatorNode_MaxVisits struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// At least 1. The visit after the last allowed one goes to `to` instead.
 	Count         int32  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
@@ -3638,20 +3631,20 @@ type SimulatorStep_MaxVisits struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SimulatorStep_MaxVisits) Reset() {
-	*x = SimulatorStep_MaxVisits{}
+func (x *SimulatorNode_MaxVisits) Reset() {
+	*x = SimulatorNode_MaxVisits{}
 	mi := &file_livekit_agent_simulation_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SimulatorStep_MaxVisits) String() string {
+func (x *SimulatorNode_MaxVisits) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SimulatorStep_MaxVisits) ProtoMessage() {}
+func (*SimulatorNode_MaxVisits) ProtoMessage() {}
 
-func (x *SimulatorStep_MaxVisits) ProtoReflect() protoreflect.Message {
+func (x *SimulatorNode_MaxVisits) ProtoReflect() protoreflect.Message {
 	mi := &file_livekit_agent_simulation_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3663,115 +3656,23 @@ func (x *SimulatorStep_MaxVisits) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SimulatorStep_MaxVisits.ProtoReflect.Descriptor instead.
-func (*SimulatorStep_MaxVisits) Descriptor() ([]byte, []int) {
+// Deprecated: Use SimulatorNode_MaxVisits.ProtoReflect.Descriptor instead.
+func (*SimulatorNode_MaxVisits) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4, 2}
 }
 
-func (x *SimulatorStep_MaxVisits) GetCount() int32 {
+func (x *SimulatorNode_MaxVisits) GetCount() int32 {
 	if x != nil {
 		return x.Count
 	}
 	return 0
 }
 
-func (x *SimulatorStep_MaxVisits) GetTo() string {
+func (x *SimulatorNode_MaxVisits) GetTo() string {
 	if x != nil {
 		return x.To
 	}
 	return ""
-}
-
-// livekit/voicemail with these parameters: a beep, then the agent is recorded
-// in silence.
-type SimulatorStep_Voicemail struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The next step. Unset is livekit/hangup.
-	Next string `protobuf:"bytes,1,opt,name=next,proto3" json:"next,omitempty"`
-	// Silence after the agent stops speaking that ends the recording. Unset is 30s.
-	SilenceTimeout *durationpb.Duration `protobuf:"bytes,2,opt,name=silence_timeout,json=silenceTimeout,proto3" json:"silence_timeout,omitempty"`
-	// Cap on the recording. Unset is 120s.
-	MaxDuration *durationpb.Duration `protobuf:"bytes,3,opt,name=max_duration,json=maxDuration,proto3" json:"max_duration,omitempty"`
-	// DTMF key that ends the recording; empty for none. Unset is "#".
-	EndKey *string `protobuf:"bytes,4,opt,name=end_key,json=endKey,proto3,oneof" json:"end_key,omitempty"`
-	// Unset is true.
-	Beep *bool `protobuf:"varint,5,opt,name=beep,proto3,oneof" json:"beep,omitempty"`
-	// Gap between the previous step and the beep. Unset is 0.5s.
-	BeepDelay     *durationpb.Duration `protobuf:"bytes,6,opt,name=beep_delay,json=beepDelay,proto3" json:"beep_delay,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *SimulatorStep_Voicemail) Reset() {
-	*x = SimulatorStep_Voicemail{}
-	mi := &file_livekit_agent_simulation_proto_msgTypes[47]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *SimulatorStep_Voicemail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SimulatorStep_Voicemail) ProtoMessage() {}
-
-func (x *SimulatorStep_Voicemail) ProtoReflect() protoreflect.Message {
-	mi := &file_livekit_agent_simulation_proto_msgTypes[47]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use SimulatorStep_Voicemail.ProtoReflect.Descriptor instead.
-func (*SimulatorStep_Voicemail) Descriptor() ([]byte, []int) {
-	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4, 3}
-}
-
-func (x *SimulatorStep_Voicemail) GetNext() string {
-	if x != nil {
-		return x.Next
-	}
-	return ""
-}
-
-func (x *SimulatorStep_Voicemail) GetSilenceTimeout() *durationpb.Duration {
-	if x != nil {
-		return x.SilenceTimeout
-	}
-	return nil
-}
-
-func (x *SimulatorStep_Voicemail) GetMaxDuration() *durationpb.Duration {
-	if x != nil {
-		return x.MaxDuration
-	}
-	return nil
-}
-
-func (x *SimulatorStep_Voicemail) GetEndKey() string {
-	if x != nil && x.EndKey != nil {
-		return *x.EndKey
-	}
-	return ""
-}
-
-func (x *SimulatorStep_Voicemail) GetBeep() bool {
-	if x != nil && x.Beep != nil {
-		return *x.Beep
-	}
-	return false
-}
-
-func (x *SimulatorStep_Voicemail) GetBeepDelay() *durationpb.Duration {
-	if x != nil {
-		return x.BeepDelay
-	}
-	return nil
 }
 
 var File_livekit_agent_simulation_proto protoreflect.FileDescriptor
@@ -4175,22 +4076,21 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12/\n" +
 	"\tscenarios\x18\x02 \x03(\v2\x11.livekit.ScenarioR\tscenarios\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\tR\x02id\x127\n" +
-	"\x05steps\x18\x04 \x03(\v2!.livekit.ScenarioGroup.StepsEntryR\x05steps\x1aP\n" +
+	"\x05nodes\x18\x04 \x03(\v2!.livekit.ScenarioGroup.NodesEntryR\x05nodes\x1aP\n" +
 	"\n" +
-	"StepsEntry\x12\x10\n" +
+	"NodesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
-	"\x05value\x18\x02 \x01(\v2\x16.livekit.SimulatorStepR\x05value:\x028\x01\"\xa2\a\n" +
-	"\rSimulatorStep\x12\x10\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.livekit.SimulatorNodeR\x05value:\x028\x01\"\xb8\x04\n" +
+	"\rSimulatorNode\x12\x10\n" +
 	"\x03say\x18\x01 \x01(\tR\x03say\x12\"\n" +
-	"\finstructions\x18\x02 \x01(\tR\finstructions\x12>\n" +
-	"\tvoicemail\x18\x03 \x01(\v2 .livekit.SimulatorStep.VoicemailR\tvoicemail\x12\x12\n" +
-	"\x04then\x18\x04 \x01(\tR\x04then\x124\n" +
-	"\x06routes\x18\x05 \x03(\v2\x1c.livekit.SimulatorStep.RouteR\x06routes\x128\n" +
-	"\atimeout\x18\x06 \x01(\v2\x1e.livekit.SimulatorStep.TimeoutR\atimeout\x12?\n" +
+	"\finstructions\x18\x02 \x01(\tR\finstructions\x12\x12\n" +
+	"\x04then\x18\x03 \x01(\tR\x04then\x124\n" +
+	"\x06routes\x18\x04 \x03(\v2\x1c.livekit.SimulatorNode.RouteR\x06routes\x128\n" +
+	"\atimeout\x18\x05 \x01(\v2\x1e.livekit.SimulatorNode.TimeoutR\atimeout\x12?\n" +
 	"\n" +
-	"max_visits\x18\a \x01(\v2 .livekit.SimulatorStep.MaxVisitsR\tmaxVisits\x128\n" +
-	"\aspeaker\x18\b \x01(\x0e2\x1e.livekit.SimulatorStep.SpeakerR\aspeaker\x12 \n" +
-	"\vexpectation\x18\t \x01(\tR\vexpectation\x1a-\n" +
+	"max_visits\x18\x06 \x01(\v2 .livekit.SimulatorNode.MaxVisitsR\tmaxVisits\x128\n" +
+	"\aspeaker\x18\a \x01(\x0e2\x1e.livekit.SimulatorNode.SpeakerR\aspeaker\x12 \n" +
+	"\vexpectation\x18\b \x01(\tR\vexpectation\x1a-\n" +
 	"\x05Route\x12\x14\n" +
 	"\x05match\x18\x01 \x01(\tR\x05match\x12\x0e\n" +
 	"\x02to\x18\x02 \x01(\tR\x02to\x1aJ\n" +
@@ -4199,18 +4099,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x02to\x18\x02 \x01(\tR\x02to\x1a1\n" +
 	"\tMaxVisits\x12\x14\n" +
 	"\x05count\x18\x01 \x01(\x05R\x05count\x12\x0e\n" +
-	"\x02to\x18\x02 \x01(\tR\x02to\x1a\xa7\x02\n" +
-	"\tVoicemail\x12\x12\n" +
-	"\x04next\x18\x01 \x01(\tR\x04next\x12B\n" +
-	"\x0fsilence_timeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x0esilenceTimeout\x12<\n" +
-	"\fmax_duration\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\vmaxDuration\x12\x1c\n" +
-	"\aend_key\x18\x04 \x01(\tH\x00R\x06endKey\x88\x01\x01\x12\x17\n" +
-	"\x04beep\x18\x05 \x01(\bH\x01R\x04beep\x88\x01\x01\x128\n" +
-	"\n" +
-	"beep_delay\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\tbeepDelayB\n" +
-	"\n" +
-	"\b_end_keyB\a\n" +
-	"\x05_beep\"\"\n" +
+	"\x02to\x18\x02 \x01(\tR\x02to\"\"\n" +
 	"\aSpeaker\x12\n" +
 	"\n" +
 	"\x06PERSON\x10\x00\x12\v\n" +
@@ -4246,17 +4135,17 @@ func file_livekit_agent_simulation_proto_rawDescGZIP() []byte {
 }
 
 var file_livekit_agent_simulation_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 48)
+var file_livekit_agent_simulation_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
 var file_livekit_agent_simulation_proto_goTypes = []any{
 	(SimulationMode)(0),                                // 0: livekit.SimulationMode
 	(SimulationRun_Status)(0),                          // 1: livekit.SimulationRun.Status
 	(SimulationRun_Job_Status)(0),                      // 2: livekit.SimulationRun.Job.Status
-	(SimulatorStep_Speaker)(0),                         // 3: livekit.SimulatorStep.Speaker
+	(SimulatorNode_Speaker)(0),                         // 3: livekit.SimulatorNode.Speaker
 	(*SimulationRunSummary)(nil),                       // 4: livekit.SimulationRunSummary
 	(*SimulationRun)(nil),                              // 5: livekit.SimulationRun
 	(*Scenario)(nil),                                   // 6: livekit.Scenario
 	(*ScenarioGroup)(nil),                              // 7: livekit.ScenarioGroup
-	(*SimulatorStep)(nil),                              // 8: livekit.SimulatorStep
+	(*SimulatorNode)(nil),                              // 8: livekit.SimulatorNode
 	(*SimulationDispatch)(nil),                         // 9: livekit.SimulationDispatch
 	nil,                                                // 10: livekit.SimulationRunSummary.ChatHistoryEntry
 	(*SimulationRunSummary_Issue)(nil),                 // 11: livekit.SimulationRunSummary.Issue
@@ -4295,104 +4184,99 @@ var file_livekit_agent_simulation_proto_goTypes = []any{
 	nil,                                                // 44: livekit.Scenario.TagsEntry
 	(*Scenario_CreateFromSession_Request)(nil),         // 45: livekit.Scenario.CreateFromSession.Request
 	(*Scenario_CreateFromSession_Response)(nil),        // 46: livekit.Scenario.CreateFromSession.Response
-	nil,                             // 47: livekit.ScenarioGroup.StepsEntry
-	(*SimulatorStep_Route)(nil),     // 48: livekit.SimulatorStep.Route
-	(*SimulatorStep_Timeout)(nil),   // 49: livekit.SimulatorStep.Timeout
-	(*SimulatorStep_MaxVisits)(nil), // 50: livekit.SimulatorStep.MaxVisits
-	(*SimulatorStep_Voicemail)(nil), // 51: livekit.SimulatorStep.Voicemail
-	(*timestamppb.Timestamp)(nil),   // 52: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),     // 53: google.protobuf.Duration
-	(*agent.ChatContext)(nil),       // 54: livekit.agent.ChatContext
-	(agent.ChatRole)(0),             // 55: livekit.agent.ChatRole
-	(*PresignedPostRequest)(nil),    // 56: livekit.PresignedPostRequest
-	(*TokenPagination)(nil),         // 57: livekit.TokenPagination
+	nil,                             // 47: livekit.ScenarioGroup.NodesEntry
+	(*SimulatorNode_Route)(nil),     // 48: livekit.SimulatorNode.Route
+	(*SimulatorNode_Timeout)(nil),   // 49: livekit.SimulatorNode.Timeout
+	(*SimulatorNode_MaxVisits)(nil), // 50: livekit.SimulatorNode.MaxVisits
+	(*timestamppb.Timestamp)(nil),   // 51: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),     // 52: google.protobuf.Duration
+	(*agent.ChatContext)(nil),       // 53: livekit.agent.ChatContext
+	(agent.ChatRole)(0),             // 54: livekit.agent.ChatRole
+	(*PresignedPostRequest)(nil),    // 55: livekit.PresignedPostRequest
+	(*TokenPagination)(nil),         // 56: livekit.TokenPagination
 }
 var file_livekit_agent_simulation_proto_depIdxs = []int32{
 	11, // 0: livekit.SimulationRunSummary.issues:type_name -> livekit.SimulationRunSummary.Issue
 	10, // 1: livekit.SimulationRunSummary.chat_history:type_name -> livekit.SimulationRunSummary.ChatHistoryEntry
 	1,  // 2: livekit.SimulationRun.status:type_name -> livekit.SimulationRun.Status
-	52, // 3: livekit.SimulationRun.created_at:type_name -> google.protobuf.Timestamp
+	51, // 3: livekit.SimulationRun.created_at:type_name -> google.protobuf.Timestamp
 	12, // 4: livekit.SimulationRun.jobs:type_name -> livekit.SimulationRun.Job
 	7,  // 5: livekit.SimulationRun.scenario_group:type_name -> livekit.ScenarioGroup
-	52, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
+	51, // 6: livekit.SimulationRun.ended_at:type_name -> google.protobuf.Timestamp
 	23, // 7: livekit.SimulationRun.usage:type_name -> livekit.SimulationRun.Usage
 	0,  // 8: livekit.SimulationRun.mode:type_name -> livekit.SimulationMode
 	14, // 9: livekit.SimulationRun.metrics:type_name -> livekit.SimulationRun.RunMetrics
 	15, // 10: livekit.SimulationRun.ci:type_name -> livekit.SimulationRun.CI
 	16, // 11: livekit.SimulationRun.sampling:type_name -> livekit.SimulationRun.SamplingOptions
 	44, // 12: livekit.Scenario.tags:type_name -> livekit.Scenario.TagsEntry
-	53, // 13: livekit.Scenario.max_duration:type_name -> google.protobuf.Duration
+	52, // 13: livekit.Scenario.max_duration:type_name -> google.protobuf.Duration
 	6,  // 14: livekit.ScenarioGroup.scenarios:type_name -> livekit.Scenario
-	47, // 15: livekit.ScenarioGroup.steps:type_name -> livekit.ScenarioGroup.StepsEntry
-	51, // 16: livekit.SimulatorStep.voicemail:type_name -> livekit.SimulatorStep.Voicemail
-	48, // 17: livekit.SimulatorStep.routes:type_name -> livekit.SimulatorStep.Route
-	49, // 18: livekit.SimulatorStep.timeout:type_name -> livekit.SimulatorStep.Timeout
-	50, // 19: livekit.SimulatorStep.max_visits:type_name -> livekit.SimulatorStep.MaxVisits
-	3,  // 20: livekit.SimulatorStep.speaker:type_name -> livekit.SimulatorStep.Speaker
-	6,  // 21: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
-	0,  // 22: livekit.SimulationDispatch.mode:type_name -> livekit.SimulationMode
-	54, // 23: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
-	2,  // 24: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
-	52, // 25: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
-	52, // 26: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
-	24, // 27: livekit.SimulationRun.Job.usage:type_name -> livekit.SimulationRun.Job.Usage
-	13, // 28: livekit.SimulationRun.Job.metrics:type_name -> livekit.SimulationRun.JobMetrics
-	25, // 29: livekit.SimulationRun.JobMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
-	26, // 30: livekit.SimulationRun.JobMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
-	27, // 31: livekit.SimulationRun.JobMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
-	28, // 32: livekit.SimulationRun.JobMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
-	29, // 33: livekit.SimulationRun.JobMetrics.turns:type_name -> livekit.SimulationRun.JobMetrics.Turn
-	52, // 34: livekit.SimulationRun.JobMetrics.t0:type_name -> google.protobuf.Timestamp
-	25, // 35: livekit.SimulationRun.RunMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
-	26, // 36: livekit.SimulationRun.RunMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
-	27, // 37: livekit.SimulationRun.RunMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
-	28, // 38: livekit.SimulationRun.RunMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
-	55, // 39: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
-	7,  // 40: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
-	0,  // 41: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
-	15, // 42: livekit.SimulationRun.Create.Request.ci:type_name -> livekit.SimulationRun.CI
-	16, // 43: livekit.SimulationRun.Create.Request.sampling:type_name -> livekit.SimulationRun.SamplingOptions
-	56, // 44: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
-	5,  // 45: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
-	1,  // 46: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
-	57, // 47: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
-	52, // 48: livekit.SimulationRun.List.Request.start_time:type_name -> google.protobuf.Timestamp
-	52, // 49: livekit.SimulationRun.List.Request.end_time:type_name -> google.protobuf.Timestamp
-	0,  // 50: livekit.SimulationRun.List.Request.mode:type_name -> livekit.SimulationMode
-	5,  // 51: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
-	57, // 52: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
-	52, // 53: livekit.SimulationRun.Counts.Request.start_time:type_name -> google.protobuf.Timestamp
-	52, // 54: livekit.SimulationRun.Counts.Request.end_time:type_name -> google.protobuf.Timestamp
-	1,  // 55: livekit.SimulationRun.Counts.Request.status:type_name -> livekit.SimulationRun.Status
-	0,  // 56: livekit.SimulationRun.Counts.Request.mode:type_name -> livekit.SimulationMode
-	40, // 57: livekit.SimulationRun.Counts.Response.buckets:type_name -> livekit.SimulationRun.Counts.Bucket
-	53, // 58: livekit.SimulationRun.Counts.Response.interval:type_name -> google.protobuf.Duration
-	52, // 59: livekit.SimulationRun.Counts.Bucket.bucket_start:type_name -> google.protobuf.Timestamp
-	6,  // 60: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
-	8,  // 61: livekit.ScenarioGroup.StepsEntry.value:type_name -> livekit.SimulatorStep
-	53, // 62: livekit.SimulatorStep.Timeout.after:type_name -> google.protobuf.Duration
-	53, // 63: livekit.SimulatorStep.Voicemail.silence_timeout:type_name -> google.protobuf.Duration
-	53, // 64: livekit.SimulatorStep.Voicemail.max_duration:type_name -> google.protobuf.Duration
-	53, // 65: livekit.SimulatorStep.Voicemail.beep_delay:type_name -> google.protobuf.Duration
-	30, // 66: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
-	32, // 67: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
-	34, // 68: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
-	36, // 69: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
-	38, // 70: livekit.AgentSimulation.CountSimulationRuns:input_type -> livekit.SimulationRun.Counts.Request
-	41, // 71: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
-	45, // 72: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
-	31, // 73: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
-	33, // 74: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
-	35, // 75: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
-	37, // 76: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
-	39, // 77: livekit.AgentSimulation.CountSimulationRuns:output_type -> livekit.SimulationRun.Counts.Response
-	42, // 78: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
-	46, // 79: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
-	73, // [73:80] is the sub-list for method output_type
-	66, // [66:73] is the sub-list for method input_type
-	66, // [66:66] is the sub-list for extension type_name
-	66, // [66:66] is the sub-list for extension extendee
-	0,  // [0:66] is the sub-list for field type_name
+	47, // 15: livekit.ScenarioGroup.nodes:type_name -> livekit.ScenarioGroup.NodesEntry
+	48, // 16: livekit.SimulatorNode.routes:type_name -> livekit.SimulatorNode.Route
+	49, // 17: livekit.SimulatorNode.timeout:type_name -> livekit.SimulatorNode.Timeout
+	50, // 18: livekit.SimulatorNode.max_visits:type_name -> livekit.SimulatorNode.MaxVisits
+	3,  // 19: livekit.SimulatorNode.speaker:type_name -> livekit.SimulatorNode.Speaker
+	6,  // 20: livekit.SimulationDispatch.scenario:type_name -> livekit.Scenario
+	0,  // 21: livekit.SimulationDispatch.mode:type_name -> livekit.SimulationMode
+	53, // 22: livekit.SimulationRunSummary.ChatHistoryEntry.value:type_name -> livekit.agent.ChatContext
+	2,  // 23: livekit.SimulationRun.Job.status:type_name -> livekit.SimulationRun.Job.Status
+	51, // 24: livekit.SimulationRun.Job.started_at:type_name -> google.protobuf.Timestamp
+	51, // 25: livekit.SimulationRun.Job.ended_at:type_name -> google.protobuf.Timestamp
+	24, // 26: livekit.SimulationRun.Job.usage:type_name -> livekit.SimulationRun.Job.Usage
+	13, // 27: livekit.SimulationRun.Job.metrics:type_name -> livekit.SimulationRun.JobMetrics
+	25, // 28: livekit.SimulationRun.JobMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
+	26, // 29: livekit.SimulationRun.JobMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
+	27, // 30: livekit.SimulationRun.JobMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
+	28, // 31: livekit.SimulationRun.JobMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
+	29, // 32: livekit.SimulationRun.JobMetrics.turns:type_name -> livekit.SimulationRun.JobMetrics.Turn
+	51, // 33: livekit.SimulationRun.JobMetrics.t0:type_name -> google.protobuf.Timestamp
+	25, // 34: livekit.SimulationRun.RunMetrics.stt:type_name -> livekit.SimulationRun.JobMetrics.STT
+	26, // 35: livekit.SimulationRun.RunMetrics.llm:type_name -> livekit.SimulationRun.JobMetrics.LLM
+	27, // 36: livekit.SimulationRun.RunMetrics.tts:type_name -> livekit.SimulationRun.JobMetrics.TTS
+	28, // 37: livekit.SimulationRun.RunMetrics.conversation:type_name -> livekit.SimulationRun.JobMetrics.Conversation
+	54, // 38: livekit.SimulationRun.JobMetrics.Turn.role:type_name -> livekit.agent.ChatRole
+	7,  // 39: livekit.SimulationRun.Create.Request.scenario_group:type_name -> livekit.ScenarioGroup
+	0,  // 40: livekit.SimulationRun.Create.Request.mode:type_name -> livekit.SimulationMode
+	15, // 41: livekit.SimulationRun.Create.Request.ci:type_name -> livekit.SimulationRun.CI
+	16, // 42: livekit.SimulationRun.Create.Request.sampling:type_name -> livekit.SimulationRun.SamplingOptions
+	55, // 43: livekit.SimulationRun.Create.Response.presigned_post_request:type_name -> livekit.PresignedPostRequest
+	5,  // 44: livekit.SimulationRun.Get.Response.run:type_name -> livekit.SimulationRun
+	1,  // 45: livekit.SimulationRun.List.Request.status:type_name -> livekit.SimulationRun.Status
+	56, // 46: livekit.SimulationRun.List.Request.page_token:type_name -> livekit.TokenPagination
+	51, // 47: livekit.SimulationRun.List.Request.start_time:type_name -> google.protobuf.Timestamp
+	51, // 48: livekit.SimulationRun.List.Request.end_time:type_name -> google.protobuf.Timestamp
+	0,  // 49: livekit.SimulationRun.List.Request.mode:type_name -> livekit.SimulationMode
+	5,  // 50: livekit.SimulationRun.List.Response.runs:type_name -> livekit.SimulationRun
+	56, // 51: livekit.SimulationRun.List.Response.next_page_token:type_name -> livekit.TokenPagination
+	51, // 52: livekit.SimulationRun.Counts.Request.start_time:type_name -> google.protobuf.Timestamp
+	51, // 53: livekit.SimulationRun.Counts.Request.end_time:type_name -> google.protobuf.Timestamp
+	1,  // 54: livekit.SimulationRun.Counts.Request.status:type_name -> livekit.SimulationRun.Status
+	0,  // 55: livekit.SimulationRun.Counts.Request.mode:type_name -> livekit.SimulationMode
+	40, // 56: livekit.SimulationRun.Counts.Response.buckets:type_name -> livekit.SimulationRun.Counts.Bucket
+	52, // 57: livekit.SimulationRun.Counts.Response.interval:type_name -> google.protobuf.Duration
+	51, // 58: livekit.SimulationRun.Counts.Bucket.bucket_start:type_name -> google.protobuf.Timestamp
+	6,  // 59: livekit.Scenario.CreateFromSession.Response.scenario:type_name -> livekit.Scenario
+	8,  // 60: livekit.ScenarioGroup.NodesEntry.value:type_name -> livekit.SimulatorNode
+	52, // 61: livekit.SimulatorNode.Timeout.after:type_name -> google.protobuf.Duration
+	30, // 62: livekit.AgentSimulation.CreateSimulationRun:input_type -> livekit.SimulationRun.Create.Request
+	32, // 63: livekit.AgentSimulation.ConfirmSimulationSourceUpload:input_type -> livekit.SimulationRun.ConfirmSourceUpload.Request
+	34, // 64: livekit.AgentSimulation.GetSimulationRun:input_type -> livekit.SimulationRun.Get.Request
+	36, // 65: livekit.AgentSimulation.ListSimulationRuns:input_type -> livekit.SimulationRun.List.Request
+	38, // 66: livekit.AgentSimulation.CountSimulationRuns:input_type -> livekit.SimulationRun.Counts.Request
+	41, // 67: livekit.AgentSimulation.CancelSimulationRun:input_type -> livekit.SimulationRun.Cancel.Request
+	45, // 68: livekit.AgentSimulation.CreateScenarioFromSession:input_type -> livekit.Scenario.CreateFromSession.Request
+	31, // 69: livekit.AgentSimulation.CreateSimulationRun:output_type -> livekit.SimulationRun.Create.Response
+	33, // 70: livekit.AgentSimulation.ConfirmSimulationSourceUpload:output_type -> livekit.SimulationRun.ConfirmSourceUpload.Response
+	35, // 71: livekit.AgentSimulation.GetSimulationRun:output_type -> livekit.SimulationRun.Get.Response
+	37, // 72: livekit.AgentSimulation.ListSimulationRuns:output_type -> livekit.SimulationRun.List.Response
+	39, // 73: livekit.AgentSimulation.CountSimulationRuns:output_type -> livekit.SimulationRun.Counts.Response
+	42, // 74: livekit.AgentSimulation.CancelSimulationRun:output_type -> livekit.SimulationRun.Cancel.Response
+	46, // 75: livekit.AgentSimulation.CreateScenarioFromSession:output_type -> livekit.Scenario.CreateFromSession.Response
+	69, // [69:76] is the sub-list for method output_type
+	62, // [62:69] is the sub-list for method input_type
+	62, // [62:62] is the sub-list for extension type_name
+	62, // [62:62] is the sub-list for extension extendee
+	0,  // [0:62] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_simulation_proto_init() }
@@ -4413,14 +4297,13 @@ func file_livekit_agent_simulation_proto_init() {
 	file_livekit_agent_simulation_proto_msgTypes[26].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[32].OneofWrappers = []any{}
 	file_livekit_agent_simulation_proto_msgTypes[34].OneofWrappers = []any{}
-	file_livekit_agent_simulation_proto_msgTypes[47].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_simulation_proto_rawDesc), len(file_livekit_agent_simulation_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   48,
+			NumMessages:   47,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
