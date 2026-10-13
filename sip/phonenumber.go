@@ -1,7 +1,6 @@
 package sip
 
 import (
-	"slices"
 	"strings"
 
 	"github.com/livekit/protocol/livekit"
@@ -59,18 +58,32 @@ func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 	}
 }
 
-var emergencyNumbers = []string{"911", "1911"}
+// IsEmergencyNumber reports whether a dialed number reaches an emergency
+// service. The from number, in international format, is the number whose
+// carrier dials the target. Its region decides which short codes count.
+// A number in international format is also checked against the emergency
+// numbers of its own country, so "+1911" matches from any number.
+func IsEmergencyNumber(number, from string) bool {
+	if phonenumbers.IsEmergencyNumber(number, numberRegion(from)) {
+		return true
+	}
+	if !strings.HasPrefix(strings.TrimSpace(number), "+") {
+		return false
+	}
+	num, err := phonenumbers.Parse(number, "")
+	if err != nil {
+		return false
+	}
+	own := phonenumbers.GetRegionCodeForCountryCode(int(num.GetCountryCode()))
+	return phonenumbers.IsEmergencyNumber(phonenumbers.GetNationalSignificantNumber(num), own)
+}
 
-// IsEmergencyNumber reports whether a dialed number reaches the 911 emergency
-// service. It accepts the bare number and the +1 or 1 prefixed forms.
-func IsEmergencyNumber(number string) bool {
-	digits := strings.Map(func(r rune) rune {
-		if strings.ContainsRune("+ -()", r) {
-			return -1
-		}
-		return r
-	}, number)
-	return slices.Contains(emergencyNumbers, digits)
+func numberRegion(number string) string {
+	num, err := phonenumbers.Parse(number, "")
+	if err != nil {
+		return ""
+	}
+	return phonenumbers.GetRegionCodeForNumber(num)
 }
 
 // URIUser returns the user part of a sip, sips or tel URI, with the display

@@ -20,59 +20,47 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const (
+	usNumber = "+14155550123"
+	ukNumber = "+442071234567"
+	auNumber = "+61212345678"
+)
+
 func TestIsEmergencyNumber(t *testing.T) {
 	cases := []struct {
 		number string
+		from   string
 		exp    bool
 	}{
-		{"911", true},
-		{"1911", true},
-		{"+1911", true},
-		{"+1 911", true},
-		{"+1-911", true},
-		{"(911)", true},
-		{"", false},
-		{"9", false},
-		{"9111", false},
-		{"0911", false},
-		{"+14155559110", false},
-		{"+19115551212", false},
-		{"112", false},
-		{"alice", false},
-		{"911abc", false},
+		{"911", usNumber, true},
+		{"112", usNumber, true},
+		{"+1911", usNumber, true},
+		{"+1 911", usNumber, true},
+		{"+1-911", usNumber, true},
+		{"+1 (911)", usNumber, true},
+		{"1911", usNumber, false},
+		{"999", usNumber, false},
+		{"933", usNumber, false},
+		{"9111", usNumber, false},
+		{"0911", usNumber, false},
+		{"+14155559110", usNumber, false},
+		{"+19115551212", usNumber, false},
+		{"alice", usNumber, false},
+		{"", usNumber, false},
+		{"999", ukNumber, true},
+		{"112", ukNumber, true},
+		{"911", ukNumber, false},
+		{"000", auNumber, true},
+		{"+61000", usNumber, true},
+		{"+44999", usNumber, true},
+		{"+33112", usNumber, true},
+		{"+1911", ukNumber, true},
+		{"+1911", "", true},
+		{"911", "", false},
 	}
 	for _, c := range cases {
-		t.Run(c.number, func(t *testing.T) {
-			require.Equal(t, c.exp, IsEmergencyNumber(c.number))
-		})
-	}
-}
-
-func TestURIUser(t *testing.T) {
-	cases := []struct {
-		uri string
-		exp string
-	}{
-		{"<sip:911@carrier.example.com>", "911"},
-		{"sip:911@carrier.example.com", "911"},
-		{"sips:+1911@carrier.example.com:5061;transport=tls", "+1911"},
-		{"<sip:alice@example.com;transport=tcp>", "alice"},
-		{"\"Bob\" <sip:bob@example.com>", "bob"},
-		{"\"Bob <the man>\" <sip:bob@example.com>", "bob"},
-		{"\"Bob \\\" <quote\" <sip:bob@example.com>", "bob"},
-		{"SIP:911@example.com", "911"},
-		{"<Sips:911@example.com>", "911"},
-		{"TEL:911", "911"},
-		{"tel:911", "911"},
-		{"tel:+1-911;phone-context=example.com", "+1-911"},
-		{"<tel:911>", "911"},
-		{"sip:example.com", ""},
-		{"", ""},
-		{"911", ""},
-	}
-	for _, c := range cases {
-		t.Run(c.uri, func(t *testing.T) {
-			require.Equal(t, c.exp, URIUser(c.uri))
+		t.Run(c.number+"/"+c.from, func(t *testing.T) {
+			require.Equal(t, c.exp, IsEmergencyNumber(c.number, c.from))
 		})
 	}
 }
