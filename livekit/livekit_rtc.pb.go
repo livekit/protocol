@@ -5359,7 +5359,7 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x18update_data_subscription\x18\x15 \x01(\v2\x1f.livekit.UpdateDataSubscriptionH\x00R\x16updateDataSubscription\x12V\n" +
 	"\x17store_data_blob_request\x18\x16 \x01(\v2\x1d.livekit.StoreDataBlobRequestH\x00R\x14storeDataBlobRequest\x12P\n" +
 	"\x15get_data_blob_request\x18\x17 \x01(\v2\x1b.livekit.GetDataBlobRequestH\x00R\x12getDataBlobRequestB\t\n" +
-	"\amessage\"\x89\x11\n" +
+	"\amessage\"\x8e\x11\n" +
 	"\x0eSignalResponse\x12+\n" +
 	"\x04join\x18\x01 \x01(\v2\x15.livekit.JoinResponseH\x00R\x04join\x125\n" +
 	"\x06answer\x18\x02 \x01(\v2\x1b.livekit.SessionDescriptionH\x00R\x06answer\x123\n" +
@@ -5376,8 +5376,8 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x12connection_quality\x18\f \x01(\v2 .livekit.ConnectionQualityUpdateH\x00R\x11connectionQuality\x12L\n" +
 	"\x13stream_state_update\x18\r \x01(\v2\x1a.livekit.StreamStateUpdateH\x00R\x11streamStateUpdate\x12^\n" +
 	"\x19subscribed_quality_update\x18\x0e \x01(\v2 .livekit.SubscribedQualityUpdateH\x00R\x17subscribedQualityUpdate\x12m\n" +
-	"\x1esubscription_permission_update\x18\x0f \x01(\v2%.livekit.SubscriptionPermissionUpdateH\x00R\x1csubscriptionPermissionUpdate\x12%\n" +
-	"\rrefresh_token\x18\x10 \x01(\tH\x00R\frefreshToken\x12P\n" +
+	"\x1esubscription_permission_update\x18\x0f \x01(\v2%.livekit.SubscriptionPermissionUpdateH\x00R\x1csubscriptionPermissionUpdate\x12*\n" +
+	"\rrefresh_token\x18\x10 \x01(\tB\x03\xc0P\x02H\x00R\frefreshToken\x12P\n" +
 	"\x11track_unpublished\x18\x11 \x01(\v2!.livekit.TrackUnpublishedResponseH\x00R\x10trackUnpublished\x12\x14\n" +
 	"\x04pong\x18\x12 \x01(\x03H\x00R\x04pong\x12:\n" +
 	"\treconnect\x18\x13 \x01(\v2\x1a.livekit.ReconnectResponseH\x00R\treconnect\x12,\n" +
@@ -5619,10 +5619,10 @@ const file_livekit_rtc_proto_rawDesc = "" +
 	"\x1cSubscriptionPermissionUpdate\x12'\n" +
 	"\x0fparticipant_sid\x18\x01 \x01(\tR\x0eparticipantSid\x12\x1b\n" +
 	"\ttrack_sid\x18\x02 \x01(\tR\btrackSid\x12\x18\n" +
-	"\aallowed\x18\x03 \x01(\bR\aallowed\"\xd1\x01\n" +
+	"\aallowed\x18\x03 \x01(\bR\aallowed\"\xd6\x01\n" +
 	"\x11RoomMovedResponse\x12!\n" +
-	"\x04room\x18\x01 \x01(\v2\r.livekit.RoomR\x04room\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\x12:\n" +
+	"\x04room\x18\x01 \x01(\v2\r.livekit.RoomR\x04room\x12\x19\n" +
+	"\x05token\x18\x02 \x01(\tB\x03\xc0P\x02R\x05token\x12:\n" +
 	"\vparticipant\x18\x03 \x01(\v2\x18.livekit.ParticipantInfoR\vparticipant\x12G\n" +
 	"\x12other_participants\x18\x04 \x03(\v2\x18.livekit.ParticipantInfoR\x11otherParticipants\"\xec\x04\n" +
 	"\tSyncState\x123\n" +

@@ -4152,7 +4152,7 @@ func (s *roomServiceServer) servePerformRpcProtobuf(ctx context.Context, resp ht
 }
 
 func (s *roomServiceServer) ServiceDescriptor() ([]byte, int) {
-	return twirpFileDescriptor5, 0
+	return twirpFileDescriptor4, 0
 }
 
 func (s *roomServiceServer) ProtocGenTwirpVersion() string {
@@ -4166,7 +4166,7 @@ func (s *roomServiceServer) PathPrefix() string {
 	return baseServicePath(s.pathPrefix, "livekit", "RoomService")
 }
 
-var twirpFileDescriptor5 = []byte{
+var twirpFileDescriptor4 = []byte{
 	// 1612 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0x5b, 0x6f, 0x13, 0xd7,
 	0x16, 0x3e, 0x4e, 0x6c, 0xc7, 0x5e, 0xce, 0xcd, 0x3b, 0x01, 0x26, 0x13, 0x2e, 0x66, 0xc2, 0x39,

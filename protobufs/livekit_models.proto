@@ -49,7 +49,7 @@ message Room {
   uint32 max_participants = 4;
   int64 creation_time = 5;
   int64 creation_time_ms = 15;
-  string turn_password = 6;
+  string turn_password = 6 [(logger.sensitivity) = SENSITIVITY_SECRET];
   repeated Codec enabled_codecs = 7;
   string metadata = 8 [
     (logger.sensitivity) = SENSITIVITY_PII,
@@ -858,6 +858,14 @@ message RTPForwarderState {
     VP8MungerState vp8_munger = 7;
   }
   repeated RTCPSenderReportState sender_report_state = 8;
+  DependencyDescriptorForwarderState dependency_descriptor_forwarder = 9;
+}
+
+// State of a forwarder that writes the dependency descriptor for the subscriber, so
+// its frame numbers continue on a migrated subscriber.
+message DependencyDescriptorForwarderState {
+  // highest extended frame number sent to the subscriber
+  uint64 ext_last_frame_number = 1;
 }
 
 message RTPMungerState {
