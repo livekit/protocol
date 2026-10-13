@@ -94,10 +94,10 @@ func TestGetOutputType(t *testing.T) {
 
 }
 
-func TestGetTypesData(t *testing.T) {
+func TestGetTypesRobotics(t *testing.T) {
 	req := &livekit.StartEgressRequest{
-		Source: &livekit.StartEgressRequest_Data{
-			Data: &livekit.DataSource{
+		Source: &livekit.StartEgressRequest_Robotics{
+			Robotics: &livekit.RoboticsSource{
 				VideoTracks: &livekit.TrackSelection{TrackNames: []string{"camera"}},
 			},
 		},
@@ -111,6 +111,6 @@ func TestGetTypesData(t *testing.T) {
 	}
 
 	sourceType, outputType := GetTypes(&livekit.EgressInfo_Egress{Egress: req})
-	require.Equal(t, EgressTypeData, sourceType)
+	require.Equal(t, EgressTypeRobotics, sourceType)
 	require.Equal(t, OutputTypeFile, outputType)
 }

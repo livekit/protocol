@@ -54,7 +54,7 @@ message StartEgressRequest {
     TemplateSource template = 2;
     WebSource web = 3;
     MediaSource media = 4;
-    DataSource data = 10;
+    RoboticsSource robotics = 10;
   }
 
   // Optional — default H264_720P_30
@@ -107,7 +107,7 @@ message MediaSource {
 // selectors, every supported track is captured. When any modality selector is
 // present, only the selected modalities are captured. Empty selector lists mean
 // "all"; non-empty lists are exact-match allowlists.
-message DataSource {
+message RoboticsSource {
   reserved 1;
   reserved "track_names";
 

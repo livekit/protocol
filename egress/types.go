@@ -20,7 +20,7 @@ const (
 	EgressTypeTemplate = "template"
 	EgressTypeWeb      = "web"
 	EgressTypeMedia    = "media"
-	EgressTypeData     = "data"
+	EgressTypeRobotics = "robotics"
 
 	EgressTypeRoomComposite  = "room_composite"
 	EgressTypeParticipant    = "participant"
@@ -105,8 +105,10 @@ func GetTypes(request any) (string, string) {
 }
 
 func getSourceTypeV2(req EgressRequest) string {
-	if dataReq, ok := req.(interface{ GetData() *livekit.DataSource }); ok && dataReq.GetData() != nil {
-		return EgressTypeData
+	if roboticsReq, ok := req.(interface {
+		GetRobotics() *livekit.RoboticsSource
+	}); ok && roboticsReq.GetRobotics() != nil {
+		return EgressTypeRobotics
 	} else if req.GetMedia() != nil {
 		return EgressTypeMedia
 	} else if req.GetTemplate() != nil {
