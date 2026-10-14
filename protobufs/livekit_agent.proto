@@ -47,6 +47,8 @@ message JobState {
   string participant_identity = 6;
   string worker_id = 7 [(logger.name) = "workerID"];
   string agent_id = 8 [(logger.name) = "agentID"];
+  // why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
+  JobStateReason reason = 9;
 }
 
 // from Worker to Server
@@ -101,6 +103,18 @@ enum JobStatus {
   JS_RUNNING = 1;
   JS_SUCCESS = 2;
   JS_FAILED = 3;
+  // the job ended before it was assigned to an agent
+  JS_CANCELLED = 4;
+}
+
+enum JobStateReason {
+  JSR_UNSPECIFIED = 0;
+  // no agent was available to accept the job
+  JSR_NO_CAPACITY = 1;
+  // the room closed before an agent was assigned
+  JSR_ROOM_CLOSED = 2;
+  // the dispatch was deleted before an agent was assigned
+  JSR_DISPATCH_DELETED = 3;
 }
 
 message SimulateJobRequest {
