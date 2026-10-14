@@ -58,32 +58,19 @@ func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 	}
 }
 
-// IsEmergencyNumber reports whether a dialed number reaches an emergency
-// service. The from number, in international format, is the number whose
-// carrier dials the target. Its region decides which short codes count.
-// A number in international format is also checked against the emergency
-// numbers of its own country, so "+1911" matches from any number.
-func IsEmergencyNumber(number, from string) bool {
-	if phonenumbers.IsEmergencyNumber(number, numberRegion(from)) {
-		return true
+// IsEmergencyNumber reports whether a dialed number is an emergency number in
+// any country, regardless of where the caller is from. A real short code
+// colliding with another country's emergency number is unlikely, so the
+// extra matches are accepted for the sake of simplicity. However, a known
+// collision is Barbados which has 211, 311, and 511 as emergency numbers,
+// which are also used in the US for non-emergency services.
+func IsEmergencyNumber(number string) bool {
+	for region := range phonenumbers.GetSupportedRegions() {
+		if phonenumbers.IsEmergencyNumber(number, region) {
+			return true
+		}
 	}
-	if !strings.HasPrefix(strings.TrimSpace(number), "+") {
-		return false
-	}
-	num, err := phonenumbers.Parse(number, "")
-	if err != nil {
-		return false
-	}
-	own := phonenumbers.GetRegionCodeForCountryCode(int(num.GetCountryCode()))
-	return phonenumbers.IsEmergencyNumber(phonenumbers.GetNationalSignificantNumber(num), own)
-}
-
-func numberRegion(number string) string {
-	num, err := phonenumbers.Parse(number, "")
-	if err != nil {
-		return ""
-	}
-	return phonenumbers.GetRegionCodeForNumber(num)
+	return false
 }
 
 // URIUser returns the user part of a sip, sips or tel URI, with the display

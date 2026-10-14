@@ -20,47 +20,31 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const (
-	usNumber = "+14155550123"
-	ukNumber = "+442071234567"
-	auNumber = "+61212345678"
-)
-
 func TestIsEmergencyNumber(t *testing.T) {
 	cases := []struct {
 		number string
-		from   string
 		exp    bool
 	}{
-		{"911", usNumber, true},
-		{"112", usNumber, true},
-		{"+1911", usNumber, true},
-		{"+1 911", usNumber, true},
-		{"+1-911", usNumber, true},
-		{"+1 (911)", usNumber, true},
-		{"1911", usNumber, false},
-		{"999", usNumber, false},
-		{"933", usNumber, false},
-		{"9111", usNumber, false},
-		{"0911", usNumber, false},
-		{"+14155559110", usNumber, false},
-		{"+19115551212", usNumber, false},
-		{"alice", usNumber, false},
-		{"", usNumber, false},
-		{"999", ukNumber, true},
-		{"112", ukNumber, true},
-		{"911", ukNumber, false},
-		{"000", auNumber, true},
-		{"+61000", usNumber, true},
-		{"+44999", usNumber, true},
-		{"+33112", usNumber, true},
-		{"+1911", ukNumber, true},
-		{"+1911", "", true},
-		{"911", "", false},
+		{"911", true},
+		{"112", true},
+		{"999", true},
+		{"000", true},
+		{"9-1-1", true},
+		{"(911)", true},
+		{"+1911", false},
+		{"+1 911", false},
+		{"1911", false},
+		{"411", false},
+		{"9111", false},
+		{"0911", false},
+		{"+14155559110", false},
+		{"+19115551212", false},
+		{"alice", false},
+		{"", false},
 	}
 	for _, c := range cases {
-		t.Run(c.number+"/"+c.from, func(t *testing.T) {
-			require.Equal(t, c.exp, IsEmergencyNumber(c.number, c.from))
+		t.Run(c.number, func(t *testing.T) {
+			require.Equal(t, c.exp, IsEmergencyNumber(c.number))
 		})
 	}
 }
