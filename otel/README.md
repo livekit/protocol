@@ -189,3 +189,19 @@ Known limits:
 - App-defined attributes (custom events, `Scope::set_attribute`) are reported as unknown keys.
 - `lk.sdk.*` is not reported when missing: resource attributes are only compared, not required.
 - Units are annotations; live-check checks names, types and enum values, never magnitudes.
+
+### In SDK integration tests
+
+Every SDK's telemetry e2e test already writes its session to a local collector with a file
+exporter. That capture is live-check input as is, so each SDK can validate what it actually
+sends against this registry, in CI, with no new harness:
+
+```
+otel/live-check.sh <sdk-capture>.jsonl                 # names, types, enums, severities, checkpoints, outcomes
+otel/live-check.sh <sdk-capture>.jsonl . --fail-on none  # report only
+```
+
+Rollout: run report-only until the six identity/PII renames land in a core, then fail the
+test on violations. One registry version checks all producers the same way, so a platform
+cannot drift from the shared keys without its own CI noticing. It checks the vocabulary, not
+transport, cadence or storage.
