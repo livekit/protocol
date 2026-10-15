@@ -59,6 +59,10 @@ jobs:
       - name: Live-check the smoke sample
         run: otel/tests/live-check.sh
 
+      - name: Schema-version rule rejects comment-only changes and downgrades
+        run: otel/tests/schema-bump-test.sh
+
+      # The same script as locally: a changed otel/model needs a strictly higher schema_url version.
       - name: Schema version bumped when the model changed
         if: github.event_name == 'pull_request'
         env:
