@@ -374,7 +374,8 @@ message DataTrackSchemaId {
 
 enum DataTrackExtensionID {
   DTEI_INVALID = 0;
-  DTEI_PARTICIPANT_SID_LOW = 1;
+  DTEI_E2EE = 1;
+  DTEI_USER_TIMESTAMP = 2;
   DTEI_PARTICIPANT_SID = 255;
 }
 
