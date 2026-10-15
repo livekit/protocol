@@ -17,7 +17,7 @@ Agents-owned keys are not registered yet.
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
 | `model/client/groups.yaml` | Attribute sets on every client resource / record (used by live-check) |
-| `policies/` | LiveKit rules; any finding fails `check.sh` |
+| `policies/` | LiveKit rules, per file (`livekit.rego`) and on the resolved registry (`resolved.rego`); any finding fails `check.sh` |
 | `advice/` | Non-failing advice, printed by `check.sh` |
 | `templates/registry/{rust,typescript,markdown}/` | Codegen templates |
 | `gen/` | Generated outputs, committed: `rust/semconv.rs`, `ts/semconv.ts`, `docs/semconv.md` |
@@ -108,8 +108,10 @@ npx -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semcon
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*` |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
-| `livekit_seconds`, `livekit_unit`, `livekit_metric_unit` | yes | seconds, unless `unit_exception` |
-| `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions |
+| `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
+| `livekit_metric_unit` | yes | metric units are not `ms` (resolved: v1, `definition/2` and `extends`) |
+| `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so inherited ones count) |
+| `livekit_ref_override` | yes | a `ref` to an `lk.*` key may not override its `annotations` (owner, sensitivity, unit) |
 | `livekit_client_namespace` | no (advice) | client-owned keys under `lk.client.*` |
 
 Weaver itself rejects duplicate keys, unknown fields and unresolved references.

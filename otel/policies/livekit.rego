@@ -1,7 +1,7 @@
 package before_resolution
 
-# LiveKit registry rules (violations), run by otel/check.sh. Each finding id is
-# documented in otel/README.md; otel/tests/negatives has one failing fixture per violation.
+# LiveKit rules per definition file (violations), run by otel/check.sh. Each finding id is
+# documented in otel/README.md; otel/tests/negatives has a failing fixture for each.
 
 import rego.v1
 
@@ -19,8 +19,6 @@ canonical_identity := {
 	"lk.track.sid": "lk.track_sid",
 	"lk.job.id": "lk.job_id",
 }
-
-high_cardinality := {"lk.room_sid", "lk.participant_id", "lk.track_sid", "lk.job_id", "lk.client.connect_id"}
 
 owners := {"shared", "client", "agents", "cloud"}
 
@@ -98,16 +96,4 @@ deny contains finding("livekit_unit", sprintf("%s: duration-like attribute must 
 	not ms_exception(attr)
 }
 
-deny contains finding("livekit_metric_unit", sprintf("%s: metric unit must be s, not ms", [group.metric_name])) if {
-	some group in input.groups
-	group.type == "metric"
-	group.unit == "ms"
-}
-
-deny contains finding("livekit_cardinality", sprintf("%s: %s is high-cardinality, not a default metric dimension", [group.metric_name, a.ref])) if {
-	some group in input.groups
-	group.type == "metric"
-	some a in group.attributes
-	high_cardinality[a.ref]
-	lk(group, "cardinality_exception") != true # Agents' job-scoped exception sets true
-}
+# Metric rules (units, cardinality) and ref overrides live in otel/policies/resolved.rego.
