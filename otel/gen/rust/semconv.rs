@@ -2,9 +2,9 @@
 //! LiveKit telemetry semantic conventions.
 
 /// Telemetry schema version; set as `schema_url` on every OTLP scope.
-pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.1.0";
+pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.2.0";
 
-/// 1-based connect attempt; 1 is the user-initiated connect.
+/// 1-based connect attempt.
 pub const LK_CONNECT_ATTEMPT: &str = "lk.connect.attempt";
 
 /// Whether the app is in front of the user.
@@ -14,7 +14,7 @@ pub const LK_DEVICE_APP_STATE: &str = "lk.device.app_state";
 pub mod lk_device_app_state {
     /// In front of the user.
     pub const FOREGROUND: &str = "foreground";
-    /// In the background; forces a flush.
+    /// In the background.
     pub const BACKGROUND: &str = "background";
 }
 
@@ -23,16 +23,16 @@ pub const LK_DEVICE_AUDIO_INTERRUPTION: &str = "lk.device.audio.interruption";
 
 /// Values of [`LK_DEVICE_AUDIO_INTERRUPTION`].
 pub mod lk_device_audio_interruption {
-    /// Interruption began.
+    /// Interruption began (another app or a call took the audio session).
     pub const BEGAN: &str = "began";
     /// Interruption ended.
     pub const ENDED: &str = "ended";
 }
 
-/// Comma-separated active outputs, each one of speaker, receiver, wired_headset, bluetooth, car_audio, air_play, hdmi, usb, other.
+/// The active outputs, comma-separated.
 pub const LK_DEVICE_AUDIO_ROUTE_OUTPUTS: &str = "lk.device.audio_route.outputs";
 
-/// Why the audio route changed (AVAudioSession route change reasons).
+/// Why the audio route changed.
 pub const LK_DEVICE_AUDIO_ROUTE_REASON: &str = "lk.device.audio_route.reason";
 
 /// Values of [`LK_DEVICE_AUDIO_ROUTE_REASON`].
@@ -74,7 +74,7 @@ pub mod lk_device_capture_device {
     pub const SCREEN_SHARE: &str = "screen_share";
 }
 
-/// Why capture failed (the getUserMedia failure taxonomy).
+/// Why capture failed, in the getUserMedia failure taxonomy.
 pub const LK_DEVICE_CAPTURE_REASON: &str = "lk.device.capture.reason";
 
 /// Values of [`LK_DEVICE_CAPTURE_REASON`].
@@ -118,56 +118,56 @@ pub const LK_DEVICE_THERMAL_STATE: &str = "lk.device.thermal.state";
 
 /// Values of [`LK_DEVICE_THERMAL_STATE`].
 pub mod lk_device_thermal_state {
-    /// No thermal pressure.
+    /// Within normal limits.
     pub const NOMINAL: &str = "nominal";
     /// Slightly elevated.
     pub const FAIR: &str = "fair";
-    /// High; the core doubles its cadence.
+    /// High; the system reduces performance.
     pub const SERIOUS: &str = "serious";
-    /// Critical; the core quadruples its cadence.
+    /// Critical; the device needs to cool down.
     pub const CRITICAL: &str = "critical";
 }
 
-/// Why the session ended (the protocol's DisconnectReason, plus the client giving up).
+/// Why the session ended.
 pub const LK_DISCONNECT_REASON: &str = "lk.disconnect.reason";
 
 /// Values of [`LK_DISCONNECT_REASON`].
 pub mod lk_disconnect_reason {
-    /// The client hung up.
+    /// The client hung up (CLIENT_INITIATED).
     pub const CLIENT_INITIATED: &str = "client_initiated";
-    /// Another participant joined with the same identity.
+    /// Another participant joined with the same identity (DUPLICATE_IDENTITY).
     pub const DUPLICATE_IDENTITY: &str = "duplicate_identity";
-    /// The server shut down.
+    /// The server instance shut down (SERVER_SHUTDOWN).
     pub const SERVER_SHUTDOWN: &str = "server_shutdown";
-    /// The participant was removed.
+    /// RoomService.RemoveParticipant was called (PARTICIPANT_REMOVED).
     pub const PARTICIPANT_REMOVED: &str = "participant_removed";
-    /// The room was deleted.
+    /// RoomService.DeleteRoom was called (ROOM_DELETED).
     pub const ROOM_DELETED: &str = "room_deleted";
-    /// Client and server state diverged.
+    /// The server did not know the session the client tried to resume (STATE_MISMATCH).
     pub const STATE_MISMATCH: &str = "state_mismatch";
-    /// The join failed.
+    /// The client could not connect fully (JOIN_FAILURE).
     pub const JOIN_FAILURE: &str = "join_failure";
-    /// The session migrated.
+    /// The server asked the participant to migrate (MIGRATION, Cloud only).
     pub const MIGRATION: &str = "migration";
-    /// The signaling connection closed.
+    /// The signal WebSocket closed unexpectedly (SIGNAL_CLOSE).
     pub const SIGNAL_CLOSE: &str = "signal_close";
-    /// The room closed.
+    /// The room closed after its participants left (ROOM_CLOSED).
     pub const ROOM_CLOSED: &str = "room_closed";
-    /// SIP callee unavailable.
+    /// The SIP callee did not answer in time (USER_UNAVAILABLE).
     pub const USER_UNAVAILABLE: &str = "user_unavailable";
-    /// SIP callee rejected the call.
+    /// The SIP callee rejected the call (USER_REJECTED).
     pub const USER_REJECTED: &str = "user_rejected";
-    /// SIP trunk failure.
+    /// SIP protocol failure (SIP_TRUNK_FAILURE).
     pub const SIP_TRUNK_FAILURE: &str = "sip_trunk_failure";
-    /// The connection timed out.
+    /// The server timed out the session (CONNECTION_TIMEOUT).
     pub const CONNECTION_TIMEOUT: &str = "connection_timeout";
-    /// Media failed.
+    /// Media failed or timed out (MEDIA_FAILURE).
     pub const MEDIA_FAILURE: &str = "media_failure";
-    /// The agent failed.
+    /// The agent failed (AGENT_ERROR).
     pub const AGENT_ERROR: &str = "agent_error";
-    /// The reconnect policy ran out of attempts.
+    /// The client ran out of reconnect attempts (client only).
     pub const RECONNECT_FAILED: &str = "reconnect_failed";
-    /// Unknown reason.
+    /// UNKNOWN_REASON or a number the client does not know.
     pub const UNKNOWN: &str = "unknown";
 }
 
@@ -184,26 +184,26 @@ pub const LK_LOG_SOURCE: &str = "lk.log.source";
 pub mod lk_log_source {
     /// The platform SDK.
     pub const SDK: &str = "sdk";
-    /// The Rust core.
+    /// The Rust core, copied by the log forwarder with JWT-shaped substrings masked as `<jwt>`.
     pub const FFI: &str = "ffi";
     /// WebRTC.
     pub const WEBRTC: &str = "webrtc";
 }
 
-/// How the attempt ended. Always present on a span; rollups read this, never the span status.
+/// How the attempt ended. Rollups read this, never the span status.
 pub const LK_OUTCOME: &str = "lk.outcome";
 
 /// Values of [`LK_OUTCOME`].
 pub mod lk_outcome {
-    /// Succeeded.
+    /// Succeeded; span status Unset.
     pub const OK: &str = "ok";
-    /// Failed; `error.type` names why.
+    /// Failed; span status Error, with `error.type` when the failure has a type.
     pub const ERROR: &str = "error";
-    /// Cancelled by the caller or a newer attempt.
+    /// Cancelled by the caller or superseded; span status Unset.
     pub const CANCELLED: &str = "cancelled";
 }
 
-/// Server-assigned participant SID (`PA_...`).
+/// Server-assigned SID of the local participant (`PA_...`).
 pub const LK_PARTICIPANT_ID: &str = "lk.participant_id";
 
 /// Customer-supplied identity of the local participant. PII: redacted by the collector.
@@ -226,45 +226,45 @@ pub const LK_RECONNECT_MODE: &str = "lk.reconnect.mode";
 
 /// Values of [`LK_RECONNECT_MODE`].
 pub mod lk_reconnect_mode {
-    /// ICE restart / resume.
+    /// Resume the session (ICE restart).
     pub const QUICK: &str = "quick";
-    /// Full reconnect.
+    /// Reconnect from scratch.
     pub const FULL: &str = "full";
 }
 
-/// What triggered the reconnect cycle (the protocol's ReconnectReason, plus client-only reasons).
+/// What triggered the reconnect cycle.
 pub const LK_RECONNECT_REASON: &str = "lk.reconnect.reason";
 
 /// Values of [`LK_RECONNECT_REASON`].
 pub mod lk_reconnect_reason {
-    /// The signaling socket closed.
+    /// The signaling socket closed (RR_SIGNAL_DISCONNECTED).
     pub const SIGNAL_DISCONNECTED: &str = "signal_disconnected";
-    /// The publisher peer connection failed.
+    /// The publisher peer connection failed (RR_PUBLISHER_FAILED).
     pub const PUBLISHER_FAILED: &str = "publisher_failed";
-    /// The subscriber peer connection failed.
+    /// The subscriber peer connection failed (RR_SUBSCRIBER_FAILED).
     pub const SUBSCRIBER_FAILED: &str = "subscriber_failed";
-    /// A peer connection failed; the platform did not say which.
+    /// A peer connection failed and the platform did not say which (client only).
     pub const TRANSPORT_FAILED: &str = "transport_failed";
-    /// The server asked for a candidate switch.
+    /// The server asked for a candidate switch (RR_SWITCH_CANDIDATE).
     pub const SWITCH_CANDIDATE: &str = "switch_candidate";
-    /// The device moved to another network.
+    /// The device moved to another network (client only).
     pub const NETWORK_CHANGED: &str = "network_changed";
-    /// A test or debug menu asked for it.
+    /// A test or a debug menu asked for it (client only).
     pub const DEBUG: &str = "debug";
-    /// Unknown reason.
+    /// RR_UNKNOWN or a number the client does not know.
     pub const UNKNOWN: &str = "unknown";
 }
 
 /// Server-assigned room session SID (`RM_...`).
 pub const LK_ROOM_SID: &str = "lk.room_sid";
 
-/// Average audio level in the window, 0-1, audio. Unit: `1`.
+/// Average audio level in the window, 0-1, inbound audio. Unit: `1`.
 pub const LK_RTC_AUDIO_LEVEL_AVG: &str = "lk.rtc.audio_level.avg";
 
-/// Maximum audio level in the window, 0-1, audio. Unit: `1`.
+/// Maximum audio level in the window, 0-1, inbound audio. Unit: `1`.
 pub const LK_RTC_AUDIO_LEVEL_MAX: &str = "lk.rtc.audio_level.max";
 
-/// Minimum audio level in the window, 0-1, audio. Unit: `1`.
+/// Minimum audio level in the window, 0-1, inbound audio. Unit: `1`.
 pub const LK_RTC_AUDIO_LEVEL_MIN: &str = "lk.rtc.audio_level.min";
 
 /// Bytes sent or received (cumulative). Unit: `By`.
@@ -306,13 +306,13 @@ pub const LK_RTC_JITTER_BUFFER_DELAY_MS: &str = "lk.rtc.jitter_buffer_delay_ms";
 /// Samples or frames emitted by the jitter buffer, inbound (cumulative). Unit: `{sample}`.
 pub const LK_RTC_JITTER_BUFFER_EMITTED_COUNT: &str = "lk.rtc.jitter_buffer_emitted_count";
 
-/// Average jitter in the window. Unit: `ms`.
+/// Average jitter in the window, inbound. Unit: `ms`.
 pub const LK_RTC_JITTER_MS_AVG: &str = "lk.rtc.jitter_ms.avg";
 
-/// Maximum jitter in the window. Unit: `ms`.
+/// Maximum jitter in the window, inbound. Unit: `ms`.
 pub const LK_RTC_JITTER_MS_MAX: &str = "lk.rtc.jitter_ms.max";
 
-/// Minimum jitter in the window. Unit: `ms`.
+/// Minimum jitter in the window, inbound. Unit: `ms`.
 pub const LK_RTC_JITTER_MS_MIN: &str = "lk.rtc.jitter_ms.min";
 
 /// Packets sent or received (cumulative). Unit: `{packet}`.
@@ -342,10 +342,10 @@ pub const LK_RTC_RTT_MS_AVG: &str = "lk.rtc.rtt_ms.avg";
 /// Maximum round-trip time in the window. Unit: `ms`.
 pub const LK_RTC_RTT_MS_MAX: &str = "lk.rtc.rtt_ms.max";
 
-/// Minimum round-trip time in the window (remote-inbound for outbound, candidate pair for inbound). Unit: `ms`.
+/// Minimum round-trip time in the window. Unit: `ms`.
 pub const LK_RTC_RTT_MS_MIN: &str = "lk.rtc.rtt_ms.min";
 
-/// Stats readings in the window. Unit: `{reading}`.
+/// Stats readings folded into the window. Unit: `{reading}`.
 pub const LK_RTC_SAMPLES: &str = "lk.rtc.samples";
 
 /// Concealed samples that were silent, inbound audio (cumulative). Unit: `{sample}`.
@@ -360,10 +360,19 @@ pub const LK_SDK_NAME: &str = "lk.sdk.name";
 /// LiveKit SDK version.
 pub const LK_SDK_VERSION: &str = "lk.sdk.version";
 
-/// Batches waiting in the cache now (a gauge). Unit: `{batch}`.
+/// Batches waiting in the cache now. Unit: `{batch}`.
 pub const LK_TELEMETRY_CACHE_BATCHES: &str = "lk.telemetry.cache.batches";
 
-/// Batches the disk refused, kept in memory. Unit: `{batch}`.
+/// Sent batches the cache could not delete; never sent twice from the same launch. Unit: `{batch}`.
+pub const LK_TELEMETRY_CACHE_DELETE_ERRORS: &str = "lk.telemetry.cache.delete_errors";
+
+/// Times the cache could not be listed, so nothing was reconciled or sent. Unit: `{attempt}`.
+pub const LK_TELEMETRY_CACHE_LIST_ERRORS: &str = "lk.telemetry.cache.list_errors";
+
+/// Cached batches that could not be read right now, kept for the next pass. Unit: `{batch}`.
+pub const LK_TELEMETRY_CACHE_READ_ERRORS: &str = "lk.telemetry.cache.read_errors";
+
+/// Batches the disk refused, kept in memory instead. Unit: `{batch}`.
 pub const LK_TELEMETRY_CACHE_WRITE_ERRORS: &str = "lk.telemetry.cache.write_errors";
 
 /// Records no cache, not even memory, could take. Unit: `{record}`.
@@ -375,10 +384,10 @@ pub const LK_TELEMETRY_DROPPED_CACHE_FULL: &str = "lk.telemetry.dropped.cache_fu
 /// Records in cached batches that failed their CRC. Unit: `{record}`.
 pub const LK_TELEMETRY_DROPPED_CORRUPT: &str = "lk.telemetry.dropped.corrupt";
 
-/// Records in batches past the 24 h age limit. Unit: `{record}`.
+/// Records in batches past the cache's age limit. Unit: `{record}`.
 pub const LK_TELEMETRY_DROPPED_EXPIRED: &str = "lk.telemetry.dropped.expired";
 
-/// Custom events or attributes over the limits (rejected). Unit: `{record}`.
+/// Custom events, attributes or SDK strings over the limits, rejected. Unit: `{record}`.
 pub const LK_TELEMETRY_DROPPED_INVALID: &str = "lk.telemetry.dropped.invalid";
 
 /// Single records larger than the collector accepts (413). Unit: `{record}`.
@@ -390,13 +399,16 @@ pub const LK_TELEMETRY_DROPPED_QUEUE_FULL: &str = "lk.telemetry.dropped.queue_fu
 /// Discrete events dropped by the flood guard. Unit: `{record}`.
 pub const LK_TELEMETRY_DROPPED_RATE_LIMITED: &str = "lk.telemetry.dropped.rate_limited";
 
-/// Records the collector rejected (final 4xx/5xx, partial success). Unit: `{record}`.
+/// Records the collector rejected (final 4xx/5xx, OTLP partial success). Unit: `{record}`.
 pub const LK_TELEMETRY_DROPPED_REJECTED: &str = "lk.telemetry.dropped.rejected";
 
 /// Records evicted from the cache during a server-directed pause. Unit: `{record}`.
 pub const LK_TELEMETRY_DROPPED_THROTTLED: &str = "lk.telemetry.dropped.throttled";
 
-/// Soft upload holds that reached the 60 s cap. Unit: `{hold}`.
+/// Log lines from a Room-shaped logging context with no telemetry scope behind it, dropped. Unit: `{record}`.
+pub const LK_TELEMETRY_DROPPED_UNATTRIBUTED: &str = "lk.telemetry.dropped.unattributed";
+
+/// Soft upload holds that reached their cap. Unit: `{hold}`.
 pub const LK_TELEMETRY_HOLDS_CAPPED: &str = "lk.telemetry.holds.capped";
 
 /// Compressed bytes the collector accepted. Unit: `By`.
@@ -419,9 +431,9 @@ pub const LK_TRACK_DIRECTION: &str = "lk.track.direction";
 
 /// Values of [`LK_TRACK_DIRECTION`].
 pub mod lk_track_direction {
-    /// Received media.
+    /// Received media (inbound-rtp).
     pub const INBOUND: &str = "inbound";
-    /// Sent media.
+    /// Sent media (outbound-rtp).
     pub const OUTBOUND: &str = "outbound";
 }
 
@@ -436,20 +448,20 @@ pub mod lk_track_kind {
     pub const VIDEO: &str = "video";
 }
 
-/// Source of the track (the protocol's TrackSource, snake_case).
+/// Source of the track.
 pub const LK_TRACK_SOURCE: &str = "lk.track.source";
 
 /// Values of [`LK_TRACK_SOURCE`].
 pub mod lk_track_source {
-    /// Camera.
+    /// Camera (TrackSource CAMERA).
     pub const CAMERA: &str = "camera";
-    /// Microphone.
+    /// Microphone (TrackSource MICROPHONE).
     pub const MICROPHONE: &str = "microphone";
-    /// Screen share video.
+    /// Screen share video (TrackSource SCREEN_SHARE).
     pub const SCREEN_SHARE: &str = "screen_share";
-    /// Screen share audio.
+    /// Screen share audio (TrackSource SCREEN_SHARE_AUDIO).
     pub const SCREEN_SHARE_AUDIO: &str = "screen_share_audio";
-    /// Unknown source.
+    /// Unknown source (TrackSource UNKNOWN).
     pub const UNKNOWN: &str = "unknown";
 }
 
@@ -460,31 +472,31 @@ pub const LK_TRACK_SID: &str = "lk.track_sid";
 pub mod event {
     /// Namespace of app-defined events. The core emits `custom.<name>` with the app's own attributes.
     pub const CUSTOM: &str = "custom";
-    /// App moved to the foreground or background (and its initial value).
+    /// The app moved to the foreground or background.
     pub const LK_DEVICE_APP_STATE_CHANGED: &str = "lk.device.app_state.changed";
-    /// Audio session interruption began or ended.
+    /// An audio session interruption began or ended.
     pub const LK_DEVICE_AUDIO_INTERRUPTION: &str = "lk.device.audio.interruption";
-    /// Audio route changed.
+    /// The audio route changed.
     pub const LK_DEVICE_AUDIO_ROUTE_CHANGED: &str = "lk.device.audio_route.changed";
-    /// Charging changed, or the level crossed 20 % or 10 % unplugged. Never per percent.
+    /// Charging changed, or the level crossed 20 % or 10 % unplugged.
     pub const LK_DEVICE_BATTERY_CHANGED: &str = "lk.device.battery.changed";
-    /// A capture device failed. Severity WARN.
+    /// A capture device failed.
     pub const LK_DEVICE_CAPTURE_FAILED: &str = "lk.device.capture.failed";
-    /// Low Power Mode changed (and its initial value).
+    /// Low Power Mode changed.
     pub const LK_DEVICE_LOW_POWER_CHANGED: &str = "lk.device.low_power.changed";
-    /// Memory pressure changed (and its initial value).
+    /// Memory pressure changed.
     pub const LK_DEVICE_MEMORY_CHANGED: &str = "lk.device.memory.changed";
-    /// Network path changed (and its initial value).
+    /// The network path changed.
     pub const LK_DEVICE_NETWORK_CHANGED: &str = "lk.device.network.changed";
-    /// Thermal state changed (and its initial value).
+    /// Thermal state changed.
     pub const LK_DEVICE_THERMAL_CHANGED: &str = "lk.device.thermal.changed";
-    /// Pipeline smoke test. Never emitted in production paths.
+    /// Pipeline smoke test.
     pub const LK_PING: &str = "lk.ping";
-    /// The Room left connected for good (never on a reconnect). INFO when the client hung up, WARN otherwise.
+    /// The Room left connected for good.
     pub const LK_ROOM_DISCONNECTED: &str = "lk.room.disconnected";
     /// One RTC stats window for one track and direction.
     pub const LK_RTC_STATS_SAMPLE: &str = "lk.rtc.stats.sample";
-    /// Self-telemetry, appended to the next upload after a loss, failure, refusal, capped hold or disk error, and once at shutdown.
+    /// Self-telemetry; counts since the previous report.
     pub const LK_TELEMETRY_REPORT: &str = "lk.telemetry.report";
 }
 
@@ -496,6 +508,6 @@ pub mod span {
     pub const LK_PUBLISH: &str = "lk.publish";
     /// One reconnect cycle. Kind: client.
     pub const LK_RECONNECT: &str = "lk.reconnect";
-    /// One subscription, from the intent to subscribe to the first media (or timed_out after 30 s). Kind: internal.
+    /// One subscription, from the intent to subscribe to the first media. Kind: internal.
     pub const LK_SUBSCRIBE: &str = "lk.subscribe";
 }
