@@ -124,6 +124,33 @@ message SimulationRun {
     optional bool poor_question_quality = 18;
     optional float conversation_progression = 19;  // 0-1, derived from the flags above
 
+    // How the call ended. A failing end also sets the job's error.
+    EndReason end_reason = 21;
+    // The simulated caller's language, as a language tag: what it spoke or wrote.
+    string caller_language = 22;
+    // Audio only: the language the caller transcribed the agent in; "" means
+    // caller_language.
+    string caller_listen_language = 23;
+    // Audio only: what the caller's audio went through before the agent heard
+    // it. Absent for a clean call.
+    Impairments impairments = 24;
+
+    enum EndReason {
+      END_REASON_UNSPECIFIED = 0;
+      END_REASON_SCENARIO_COMPLETED = 1;  // the caller finished the scenario
+      END_REASON_AGENT_ENDED = 2;         // the agent under test ended the call
+      END_REASON_INACTIVITY = 3;          // the agent under test went silent
+      END_REASON_TURN_LIMIT = 4;          // the caller ran out of turns
+      END_REASON_EMPTY_RESPONSE = 5;      // the agent under test kept replying with nothing
+      END_REASON_AGENT_ERROR = 6;         // the agent under test failed mid-call
+    }
+
+    message Impairments {
+      string background_noise = 1;  // the ambience played under the caller, e.g. "cafe"; "" = none
+      bool low_quality_microphone = 2;
+      bool packet_loss = 3;
+    }
+
     // The agent's perception of the caller. Audio only.
     message STT {
       optional float wer = 1;                       // needs the RemoteSession; word_errors / words
@@ -186,6 +213,7 @@ message SimulationRun {
       optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
       optional uint32 e2e_latency_ms = 15;               // needs the RemoteSession; the agent's own claim
+      optional uint32 backchannel_count = 16;            // the caller's acknowledgements over the agent's speech
     }
 
     // Rows exist for text and audio. The groups above hold the means and pools
