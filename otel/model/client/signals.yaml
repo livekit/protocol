@@ -151,6 +151,7 @@ groups:
     name: lk.rtc.stats.sample
     stability: development
     brief: One RTC stats window for one track and direction.
+    note: Only the track, kind, direction, window and sample count are always present; counters and gauges a platform or direction lacks are omitted.
     attributes:
       - ref: lk.track_sid
         requirement_level: required
@@ -165,9 +166,9 @@ groups:
       - ref: lk.rtc.samples
         requirement_level: required
       - ref: lk.rtc.bytes
-        requirement_level: required
+        requirement_level: {conditionally_required: When the stats report it.}
       - ref: lk.rtc.packets
-        requirement_level: required
+        requirement_level: {conditionally_required: When the stats report it.}
       - ref: lk.rtc.packets_lost
         requirement_level: {conditionally_required: Inbound.}
       - ref: lk.rtc.freeze_count
@@ -205,11 +206,11 @@ groups:
       - ref: lk.rtc.jitter_ms.avg
         requirement_level: {conditionally_required: Inbound.}
       - ref: lk.rtc.rtt_ms.min
-        requirement_level: recommended
+        requirement_level: {conditionally_required: When the window has readings.}
       - ref: lk.rtc.rtt_ms.max
-        requirement_level: recommended
+        requirement_level: {conditionally_required: When the window has readings.}
       - ref: lk.rtc.rtt_ms.avg
-        requirement_level: recommended
+        requirement_level: {conditionally_required: When the window has readings.}
       - ref: lk.rtc.fps.min
         requirement_level: {conditionally_required: Video.}
       - ref: lk.rtc.fps.max

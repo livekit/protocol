@@ -206,14 +206,14 @@ The Room left connected for good (never on a reconnect). INFO when the client hu
 
 ### `lk.rtc.stats.sample`
 
-One RTC stats window for one track and direction.
+One RTC stats window for one track and direction. Only the track, kind, direction, window and sample count are always present; counters and gauges a platform or direction lacks are omitted.
 
 | Attribute | Requirement |
 | --- | --- |
 | `lk.rtc.audio_level.avg` | conditionally_required: Audio. |
 | `lk.rtc.audio_level.max` | conditionally_required: Audio. |
 | `lk.rtc.audio_level.min` | conditionally_required: Audio. |
-| `lk.rtc.bytes` | required |
+| `lk.rtc.bytes` | conditionally_required: When the stats report it. |
 | `lk.rtc.codec` | conditionally_required: When known. |
 | `lk.rtc.concealed_samples` | conditionally_required: Inbound audio. |
 | `lk.rtc.concealment_events` | conditionally_required: Inbound audio. |
@@ -229,16 +229,16 @@ One RTC stats window for one track and direction.
 | `lk.rtc.jitter_ms.avg` | conditionally_required: Inbound. |
 | `lk.rtc.jitter_ms.max` | conditionally_required: Inbound. |
 | `lk.rtc.jitter_ms.min` | conditionally_required: Inbound. |
-| `lk.rtc.packets` | required |
+| `lk.rtc.packets` | conditionally_required: When the stats report it. |
 | `lk.rtc.packets_lost` | conditionally_required: Inbound. |
 | `lk.rtc.pause_count` | conditionally_required: Inbound video. |
 | `lk.rtc.pauses_duration_ms` | conditionally_required: Inbound video. |
 | `lk.rtc.quality_limitation.bandwidth_ms` | conditionally_required: Outbound video. |
 | `lk.rtc.quality_limitation.cpu_ms` | conditionally_required: Outbound video. |
 | `lk.rtc.quality_limitation.other_ms` | conditionally_required: Outbound video. |
-| `lk.rtc.rtt_ms.avg` | recommended |
-| `lk.rtc.rtt_ms.max` | recommended |
-| `lk.rtc.rtt_ms.min` | recommended |
+| `lk.rtc.rtt_ms.avg` | conditionally_required: When the window has readings. |
+| `lk.rtc.rtt_ms.max` | conditionally_required: When the window has readings. |
+| `lk.rtc.rtt_ms.min` | conditionally_required: When the window has readings. |
 | `lk.rtc.samples` | required |
 | `lk.rtc.silent_concealed_samples` | conditionally_required: Inbound audio. |
 | `lk.rtc.window_ms` | required |
