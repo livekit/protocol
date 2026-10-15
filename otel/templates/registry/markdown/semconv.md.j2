@@ -65,8 +65,9 @@ keeps everything else. Log bodies and metrics are never redacted, so PII must no
 PII keys: {% for a in ctx.attributes | selectattr("annotations.livekit.sensitivity", "eq", "pii") %}`{{ a.key }}`{% if not loop.last %}, {% endif %}{% endfor %}.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
-OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds,
-converted from the seconds the W3C stats report:
+OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds. The
+window length (`lk.rtc.window_ms`) is measured by the producer; the others are converted from the
+seconds the W3C stats report:
 {% for a in ctx.attributes | selectattr("annotations.livekit.unit_exception") %}`{{ a.key }}`{% if not loop.last %}, {% endif %}{% endfor %}.
 
 **Keys the SDK owns.** Apps must not set these, on their own events or as session attributes,

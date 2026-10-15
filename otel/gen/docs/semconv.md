@@ -39,8 +39,9 @@ keeps everything else. Log bodies and metrics are never redacted, so PII must no
 PII keys: `lk.pii.participant_identity`, `lk.pii.remote_participant_identity`, `lk.pii.room_name`.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
-OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds,
-converted from the seconds the W3C stats report:
+OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds. The
+window length (`lk.rtc.window_ms`) is measured by the producer; the others are converted from the
+seconds the W3C stats report:
 `lk.rtc.freezes_duration_ms`, `lk.rtc.interruptions_duration_ms`, `lk.rtc.jitter_buffer_delay_ms`, `lk.rtc.jitter_ms.avg`, `lk.rtc.jitter_ms.max`, `lk.rtc.jitter_ms.min`, `lk.rtc.pauses_duration_ms`, `lk.rtc.quality_limitation.bandwidth_ms`, `lk.rtc.quality_limitation.cpu_ms`, `lk.rtc.quality_limitation.other_ms`, `lk.rtc.rtt_ms.avg`, `lk.rtc.rtt_ms.max`, `lk.rtc.rtt_ms.min`, `lk.rtc.window_ms`.
 
 **Keys the SDK owns.** Apps must not set these, on their own events or as session attributes,

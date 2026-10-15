@@ -64,7 +64,7 @@ nothing validates it.
    | `owner` | `shared`, `client`, `agents`, `cloud` | required |
    | `sensitivity` | `none`, `pii`, `secret` (protocol `logger.Sensitivity`) | required; `pii` iff the key has a `pii` segment; `secret` is never emitted |
    | `unit` | UCUM, e.g. `s`, `By`, `{packet}` | durations are seconds |
-   | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys, converted from the W3C stats' seconds) |
+   | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
    | `bindings` | map of producer/store → name | informational |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
 
