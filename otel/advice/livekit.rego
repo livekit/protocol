@@ -19,9 +19,9 @@ lk_attrs contains object.union(attr, {"id": attr.key}) if {
 	not attr.deprecated
 }
 
-# The Notion conventions put client-owned attributes under lk.client.*. The client core ships
-# its current names until that decision is made; this lists what the rule would move.
-deny contains {"id": "livekit_client_namespace", "level": "improvement", "message": sprintf("%s: client-owned; the Notion convention would move it under lk.client.*", [attr.id])} if {
+# The namespace convention puts client-owned attributes under lk.client.*. The registry keeps the
+# client's names, so this rule is advice: it lists the client-owned keys outside lk.client.*.
+deny contains {"id": "livekit_client_namespace", "level": "improvement", "message": sprintf("%s: client-owned key outside lk.client.*", [attr.id])} if {
 	some attr in lk_attrs
 	object.get(attr, ["annotations", "livekit", "owner"], null) == "client"
 	not startswith(attr.id, "lk.client.")

@@ -80,8 +80,7 @@ groups:
         brief: Battery charge in percent, 0-100.
         note: >
           Only where the level is known (iOS, Android; not desktops or tvOS); never from the JS
-          port. SPEC.md specifies OTel `hw.battery.charge` (ratio 0-1) instead; the code ships this
-          key. Open decision.
+          port. An integer percentage, not a 0-1 ratio.
         examples: [42]
         annotations:
           livekit: {owner: client, sensitivity: none, unit: "%"}
@@ -89,7 +88,7 @@ groups:
         type: boolean
         stability: development
         brief: The device is charging.
-        note: SPEC.md specifies OTel `hw.battery.state` instead; the code ships this key. Open decision.
+        note: Sent together with `lk.device.battery.level`.
         examples: [false]
         annotations:
           livekit: {owner: client, sensitivity: none}
@@ -482,8 +481,7 @@ groups:
         note: >
           Exactly once on every LiveKit span, written by the core from how the span ended; an
           attribute of this name set any other way is dropped. Status follows it: `Error` for
-          `error`, `Unset` for `ok` and `cancelled`. The Notion conventions name
-          `lk.client.connection.result` (success, failure, cancelled) for connects only. Open decision.
+          `error`, `Unset` for `ok` and `cancelled`.
         type:
           members:
             - {id: ok, value: ok, brief: Succeeded; span status Unset., stability: development}
@@ -790,8 +788,8 @@ groups:
     brief: The browser the JS SDK runs in. Resource attributes, JS port only.
     note: >
       Set only when the JS SDK runs in a browser, not when a host SDK (React Native, a wrapper)
-      supplies its own identity. Not OTel keys: OTel 1.44.0 names this `user_agent.name` /
-      `user_agent.version`, and owns the `browser.*` namespace. Open decision.
+      supplies its own identity. LiveKit-defined keys: OTel 1.44.0 defines no `browser.name` or
+      `browser.version`.
     attributes:
       - id: browser.name
         type: string

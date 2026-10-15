@@ -30,7 +30,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 
 The generated docs, [`gen/docs/semconv.md`](gen/docs/semconv.md), are the human-readable spec:
 naming rules, the Resource, the attributes on every record, each event and span with its
-requirement table, enum values, bindings, and the open naming decisions.
+requirement table, enum values and bindings.
 
 ## Ownership
 
@@ -172,7 +172,7 @@ On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 
 | `lk.track.sid` | `lk.track_sid` | same, ×12 each, plus `required_attribute_not_present: lk.track_sid` ×10 |
 | `lk.room.name` | `lk.pii.room_name` | `missing_attribute`, `unexpected_attribute`, `livekit_pii_unmarked` ×10 each |
 | `lk.participant.identity` | `lk.pii.participant_identity` | same, ×10 each |
-| `lk.participant.remote_identity` | `lk.pii.remote_participant_identity` (name TBD) | same, ×2 each, plus `recommended_attribute_not_present` ×2 |
+| `lk.participant.remote_identity` | `lk.pii.remote_participant_identity` | same, ×2 each, plus `recommended_attribute_not_present` ×2 |
 
 With those six keys renamed in the same capture, live-check reports nothing and exits 0.
 `tests/live-sample.json` is part of that capture, anonymized.

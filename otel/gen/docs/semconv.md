@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.2.0`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.2.1`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -13,8 +13,7 @@ batching, retries, storage) is not part of the conventions.
 
 Contents: [Conventions](#conventions) · [Resource](#resource) · [Every record](#every-record) ·
 [Plain log records](#plain-log-records) · [Events](#events) · [Spans](#spans) ·
-[Attribute reference](#attribute-reference) · [Enum values](#enum-values) ·
-[Bindings](#bindings) · [Open decisions](#open-decisions)
+[Attribute reference](#attribute-reference) · [Enum values](#enum-values) · [Bindings](#bindings)
 
 ## Conventions
 
@@ -82,8 +81,8 @@ Resource attributes of the client pipeline, one Resource per process. Set once p
 | `browser.name` | string | Conditionally required: The JS SDK running in a browser. | Browser name. Resource attribute, JS port only. |
 | `browser.version` | string | Conditionally required: The JS SDK running in a browser. | Browser version. Resource attribute, JS port only. |
 | `device.model.identifier` | string | Recommended | The model identifier for the device. Set by the platform SDK where it knows the model; the JS port only when a host SDK supplies it. |
-| `lk.sdk.name` | string | Recommended | LiveKit SDK name. Resource attribute. A low-cardinality metric dimension. Not sent by the client core yet (it sends `service.name = livekit-client-<sdk>`); the vocabulary is open. |
-| `lk.sdk.version` | string | Recommended | LiveKit SDK version. Resource attribute. A low-cardinality metric dimension. Not sent by the client core yet. |
+| `lk.sdk.name` | string | Recommended | LiveKit SDK name. Resource attribute. A low-cardinality metric dimension. Matches the `<sdk>` part of `service.name = livekit-client-<sdk>`. |
+| `lk.sdk.version` | string | Recommended | LiveKit SDK version. Resource attribute. A low-cardinality metric dimension. |
 | `os.name` | string | Recommended | Human readable operating system name. Set by the platform SDK; the JS port only when a host SDK supplies it. |
 | `os.version` | string | Recommended | The version string of the operating system as defined in [Version Attributes](https://github.com/open-telemetry/semantic-conventions/blob/v1.44.0/docs/resource/README.md#version-attributes). Set by the platform SDK; the JS port only when a host SDK supplies it. |
 
@@ -94,10 +93,10 @@ Attributes the core stamps on every log record and span of a session. One sessio
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `session.id` | string | Required | A unique ID to identify a session. The session's trace id (32 hex characters), also on the process's own records. |
-| `lk.participant_id` | string | Conditionally required: Once the client has joined the room. | Server-assigned SID of the local participant (`PA_...`). On every record and span of a session once the client has joined. High cardinality, never a default metric dimension. The client core sends `lk.participant.sid` until the shared rename lands. |
-| `lk.pii.participant_identity` | string | Conditionally required: Once the client has joined the room. | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. The client core sends `lk.participant.identity` until the shared rename lands. |
-| `lk.pii.room_name` | string | Conditionally required: Once the client has joined the room. | Customer-supplied room name. On every record and span of a session once the client has joined. The client core sends `lk.room.name` until the shared rename lands, which the collector cannot redact. |
-| `lk.room_sid` | string | Conditionally required: Once the client has joined the room. | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. The client core sends `lk.room.sid` until the shared rename lands. |
+| `lk.participant_id` | string | Conditionally required: Once the client has joined the room. | Server-assigned SID of the local participant (`PA_...`). On every record and span of a session once the client has joined. High cardinality, never a default metric dimension. |
+| `lk.pii.participant_identity` | string | Conditionally required: Once the client has joined the room. | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. |
+| `lk.pii.room_name` | string | Conditionally required: Once the client has joined the room. | Customer-supplied room name. On every record and span of a session once the client has joined. |
+| `lk.room_sid` | string | Conditionally required: Once the client has joined the room. | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. |
 | `otel.event.name` | string | Conditionally required: On event records; duplicates the record's `event_name`. | Identifies the class / type of event. For backends that do not surface the OTLP `event_name` field yet. |
 
 ## Plain log records
@@ -164,8 +163,8 @@ Charging changed, or the level crossed 20 % or 10 % unplugged. Never per percent
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.device.battery.charging` | boolean | Required | The device is charging. SPEC.md specifies OTel `hw.battery.state` instead; the code ships this key. Open decision. |
-| `lk.device.battery.level` | int, `%` | Required | Battery charge in percent, 0-100. Only where the level is known (iOS, Android; not desktops or tvOS); never from the JS port. SPEC.md specifies OTel `hw.battery.charge` (ratio 0-1) instead; the code ships this key. Open decision. |
+| `lk.device.battery.charging` | boolean | Required | The device is charging. Sent together with `lk.device.battery.level`. |
+| `lk.device.battery.level` | int, `%` | Required | Battery charge in percent, 0-100. Only where the level is known (iOS, Android; not desktops or tvOS); never from the JS port. An integer percentage, not a 0-1 ratio. |
 
 ### `lk.device.capture.failed`
 
@@ -260,7 +259,7 @@ One RTC stats window for one track and direction. One per track and direction pe
 | `lk.rtc.window_ms` | int, `ms` | Required | Actual length of the stats window. From the window's start to its close, on the core's clock (the JS port uses wall-clock time). |
 | `lk.track.direction` | enum | Required | Whether the stats describe sent or received media. On RTC stats windows only. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
-| `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. The client core sends `lk.track.sid` until the shared rename lands. |
+| `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 | `lk.rtc.audio_level.avg` | double, `1` | Conditionally required: Inbound audio. | Average audio level in the window, 0-1, inbound audio. Inbound `audioLevel`, averaged over `lk.rtc.samples` readings. |
 | `lk.rtc.audio_level.max` | double, `1` | Conditionally required: Inbound audio. | Maximum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. |
 | `lk.rtc.audio_level.min` | double, `1` | Conditionally required: Inbound audio. | Minimum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. |
@@ -333,7 +332,7 @@ Kind `client`. One connect attempt. Dashboards compute connect phases only from 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.connect.attempt` | int | Required | 1-based connect attempt. 1 for the user-initiated connect; a platform that retries sets the next number on the next `lk.connect` span. |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. The Notion conventions name `lk.client.connection.result` (success, failure, cancelled) for connects only. Open decision. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes, platform-defined: Swift sends `LiveKitError.<numeric code>`, `CancellationError` or the Swift error type. Dashboards group by it per `service.name`. Written only by the core, at most once. |
 
 | Checkpoint | Requirement | Meaning |
@@ -357,11 +356,11 @@ Kind `internal`. One track publish. A child of the ambient span when there is on
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. The Notion conventions name `lk.client.connection.result` (success, failure, cancelled) for connects only. Open decision. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track.source` | enum | Required | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Written only by the core, at most once. |
-| `lk.track_sid` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. The client core sends `lk.track.sid` until the shared rename lands. |
+| `lk.track_sid` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
 No checkpoints.
 
@@ -369,11 +368,11 @@ Limits: 128 attributes, 128 span events per span.
 
 ### `lk.reconnect`
 
-Kind `client`. One reconnect cycle. `cancelled` when `disconnect()` or a newer reconnect wins. Each attempt is a checkpoint named `attempt <n> <mode>`: a dynamic name (the Notion conventions keep dynamic data out of names; open decision), mirrored by `lk.reconnect.attempts` and `lk.reconnect.mode`.
+Kind `client`. One reconnect cycle. `cancelled` when `disconnect()` or a newer reconnect wins. Each attempt is a checkpoint named `attempt <n> <mode>`, mirrored by `lk.reconnect.attempts` and `lk.reconnect.mode`.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. The Notion conventions name `lk.client.connection.result` (success, failure, cancelled) for connects only. Open decision. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.reconnect.reason` | enum | Required | What triggered the reconnect cycle. The protocol's `ReconnectReason` (`RR_*`), plus reasons only a client knows. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Written only by the core, at most once. |
 | `lk.reconnect.attempts` | int | Conditionally required: After the first attempt. | Reconnect attempts made in the cycle. Equals `<n>` of the last `attempt <n> <mode>` checkpoint. |
@@ -391,12 +390,12 @@ Kind `internal`. One subscription, from the intent to subscribe to the first med
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. The Notion conventions name `lk.client.connection.result` (success, failure, cancelled) for connects only. Open decision. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track.source` | enum | Required | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |
-| `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. The client core sends `lk.track.sid` until the shared rename lands. |
+| `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. `timed_out` when no media came within 30 s. |
-| `lk.pii.remote_participant_identity` | string | Recommended | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). Name TBD, needs sign-off; the Notion conventions name no key for it. The client core sends `lk.participant.remote_identity` until then. |
+| `lk.pii.remote_participant_identity` | string | Recommended | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). On subscribe spans: the identity of the participant publishing the track. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
@@ -652,8 +651,8 @@ attribute sets, events and spans that reference the key.
 
 ## Bindings
 
-The physical name of a concept in other producers and stores. Carried for reference, to be
-confirmed by each owner; nothing validates it.
+The physical name of a concept in other producers and stores. Carried for reference; nothing
+validates it.
 
 | Key | Producer or store | Name there |
 | --- | --- | --- |
@@ -665,41 +664,4 @@ confirmed by each owner; nothing validates it.
 | `lk.track.source` | agents_otlp | `lk.track_source` |
 
 `agents_otlp` lists Agents' span key first, then its Resource and metric-point key.
-`collector_column: room_id` is materialized from the attributes `room_id` and `roomID` only, so no
-client key fills it today.
-
-## Open decisions
-
-Naming questions this registry records without resolving them. Current names stay until each is
-decided.
-
-1. **`lk.pii.remote_participant_identity`** is a proposed name for the remote participant's
-   identity on subscribe spans; the Notion conventions name no key for it.
-2. **`lk.room_sid` and the collector's `room_id` column.** The rename alone leaves the client's
-   `room_id` column empty: either clients also send `room_id`, or ingest falls back to
-   `lk.room_sid`.
-3. **`lk.client.*` / `client.*` namespaces.** The Notion conventions put client-owned attributes
-   under `lk.client.*` and client event names under `client.*`; no client key or event does yet.
-4. **RTC units.** The `lk.rtc.*` `_ms` keys keep milliseconds through a documented exception; the
-   Notion conventions ask for seconds.
-5. **Battery.** Clients send `lk.device.battery.level` (percent) and `lk.device.battery.charging`;
-   SPEC.md specifies OTel `hw.battery.charge` (0-1) and `hw.battery.state`.
-6. **`lk.outcome`** (`ok`, `error`, `cancelled`, on every span) vs the Notion
-   `lk.client.connection.result` (`success`, `failure`, `cancelled`, on connects).
-7. **`lk.connect.attempt`** vs the Notion `lk.client.connect_attempt`, plus the missing
-   `lk.client.connect_id`.
-8. **`attempt <n> <mode>`** puts dynamic data in a checkpoint name.
-9. **`session.id`** is the client's session key; the Notion conventions want no separate client
-   session id.
-10. **`otel.event.name`** duplicates `event_name` on every client event.
-11. **`network.connection.type`** gets `vpn`, `bluetooth` and `other` from clients, which are not
-    OTel members.
-12. **Track source vocabulary:** clients send `lk.track.source = microphone`, Agents
-    `lk.track_source = SOURCE_MICROPHONE`.
-13. **`lk.sdk.name` values** are not fixed, and no client sends `lk.sdk.*` yet.
-14. **`custom`** is registered as an event name because the registry has no wildcard events; the
-    events on the wire are `custom.<name>`.
-15. **Schema URL.** `https://livekit.io/schemas/telemetry/...` does not resolve yet.
-16. **`browser.name` / `browser.version`** (JS port) are not OTel keys and sit in OTel's
-    `browser.*` namespace; OTel names them `user_agent.name` / `user_agent.version`.
-17. **Event bodies.** The Rust core sends display lines, the JS port the event name.
+`collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.

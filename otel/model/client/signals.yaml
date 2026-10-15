@@ -372,8 +372,7 @@ groups:
     brief: One reconnect cycle.
     note: >
       `cancelled` when `disconnect()` or a newer reconnect wins. Each attempt is a checkpoint
-      named `attempt <n> <mode>`: a dynamic name (the Notion conventions keep dynamic data out of
-      names; open decision), mirrored by `lk.reconnect.attempts` and `lk.reconnect.mode`.
+      named `attempt <n> <mode>`, mirrored by `lk.reconnect.attempts` and `lk.reconnect.mode`.
     annotations:
       livekit:
         checkpoints: []

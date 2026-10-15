@@ -16,8 +16,7 @@ groups:
         brief: Server-assigned room session SID (`RM_...`).
         note: >
           On every record and span of a session once the client has joined; absent before join.
-          High cardinality, never a default metric dimension. The client core sends `lk.room.sid`
-          until the shared rename lands.
+          High cardinality, never a default metric dimension.
         examples: ["RM_5Fq8xQ2ZbXwN"]
         annotations:
           livekit:
@@ -28,15 +27,14 @@ groups:
             bindings:
               agents_otlp: [lk.room_sid, room_id] # spans | resource + metric points
               collector_column: room_id # materialized from attribute room_id|roomID only
-              roomobs: room_session.id # TBC by Observability
+              roomobs: room_session.id
       - id: lk.participant_id
         type: string
         stability: development
         brief: Server-assigned SID of the local participant (`PA_...`).
         note: >
           On every record and span of a session once the client has joined. High cardinality,
-          never a default metric dimension. The client core sends `lk.participant.sid` until the
-          shared rename lands.
+          never a default metric dimension.
         examples: ["PA_9kLm2NpQ4rTs"]
         annotations:
           livekit: {owner: shared, sensitivity: none, authority: cloud}
@@ -46,8 +44,7 @@ groups:
         brief: Server-assigned track SID (`TR_...`).
         note: >
           On publish and subscribe spans and RTC stats windows. A publish learns it only on
-          success. High cardinality, never a default metric dimension. The client core sends
-          `lk.track.sid` until the shared rename lands.
+          success. High cardinality, never a default metric dimension.
         examples: ["TR_AMkTyV3Zx8Qp"]
         annotations:
           livekit: {owner: shared, sensitivity: none, authority: cloud}
@@ -84,8 +81,7 @@ groups:
         stability: development
         brief: Customer-supplied room name.
         note: >
-          On every record and span of a session once the client has joined. The client core sends
-          `lk.room.name` until the shared rename lands, which the collector cannot redact.
+          On every record and span of a session once the client has joined.
         examples: ["my-room"]
         annotations:
           livekit: {owner: shared, sensitivity: pii}
@@ -94,8 +90,7 @@ groups:
         stability: development
         brief: Customer-supplied identity of the local participant.
         note: >
-          On every record and span of a session once the client has joined. The client core sends
-          `lk.participant.identity` until the shared rename lands.
+          On every record and span of a session once the client has joined.
         examples: ["identity-0"]
         annotations:
           livekit: {owner: shared, sensitivity: pii}
@@ -104,8 +99,7 @@ groups:
         stability: development
         brief: Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe).
         note: >
-          Name TBD, needs sign-off; the Notion conventions name no key for it. The client core sends
-          `lk.participant.remote_identity` until then.
+          On subscribe spans: the identity of the participant publishing the track.
         examples: ["identity-1"]
         annotations:
           livekit: {owner: shared, sensitivity: pii}
@@ -123,8 +117,8 @@ groups:
         stability: development
         brief: LiveKit SDK name.
         note: >
-          Resource attribute. A low-cardinality metric dimension. Not sent by the client core yet
-          (it sends `service.name = livekit-client-<sdk>`); the vocabulary is open.
+          Resource attribute. A low-cardinality metric dimension. Matches the `<sdk>` part of
+          `service.name = livekit-client-<sdk>`.
         examples: ["swift", "android", "flutter", "react-native", "unity", "rust", "js"]
         annotations:
           livekit: {owner: shared, sensitivity: none}
@@ -132,7 +126,7 @@ groups:
         type: string
         stability: development
         brief: LiveKit SDK version.
-        note: Resource attribute. A low-cardinality metric dimension. Not sent by the client core yet.
+        note: Resource attribute. A low-cardinality metric dimension.
         examples: ["2.17.0"]
         annotations:
           livekit: {owner: shared, sensitivity: none}

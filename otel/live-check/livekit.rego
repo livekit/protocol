@@ -20,7 +20,7 @@ canonical_identity := {
 canonical_pii := {
 	"lk.room.name": "lk.pii.room_name",
 	"lk.participant.identity": "lk.pii.participant_identity",
-	"lk.participant.remote_identity": "lk.pii.remote_participant_identity", # name TBD
+	"lk.participant.remote_identity": "lk.pii.remote_participant_identity",
 }
 
 lk_advice(type, ctx, msg) := {
