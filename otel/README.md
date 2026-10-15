@@ -21,7 +21,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
 | `model/client/groups.yaml` | Attribute sets on every client resource / record (used by live-check) |
-| `policies/` | LiveKit rules, per file (`livekit.rego`) and on the resolved registry (`resolved.rego`); any finding fails `check.sh` |
+| `policies/` | LiveKit rules (`lib.rego`), applied per file (`livekit.rego`, default mode) and to the resolved registry (`resolved.rego`, default and `--v2`); any finding fails `check.sh` and `generate.sh` |
 | `advice/` | Non-failing advice, printed by `check.sh` |
 | `templates/registry/{rust,typescript,markdown}/` | Codegen templates |
 | `gen/` | Generated outputs, committed: `rust/semconv.rs`, `ts/semconv.ts`, `docs/semconv.md` |
@@ -116,8 +116,8 @@ prints 34 warnings: 33 about upstream's own files, and one because `client/group
 not-yet-stable `definition/2` format.
 
 ```sh
-otel/check.sh                          # registry + LiveKit policies, then advice
-otel/tests/negatives.sh                # each negative fixture fails with its named finding
+otel/check.sh                          # registry + LiveKit policies, default and --v2, then advice
+otel/tests/negatives.sh                # each negative fixture fails with its named finding, both modes
 otel/generate.sh && git status otel/gen   # regenerate; no diff expected
 otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged
 otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc and tsc
@@ -136,12 +136,14 @@ npx -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semcon
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*` |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
-| `livekit_metric_unit` | yes | metric units are not `ms` (resolved: v1, `definition/2` and `extends`) |
-| `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so inherited ones count) |
+| `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
+| `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
 | `livekit_ref_override` | yes | a `ref` to an `lk.*` key may not override its `annotations` (owner, sensitivity, unit) |
 | `livekit_client_namespace` | no (advice) | client-owned keys under `lk.client.*` |
 
-Weaver itself rejects duplicate keys, unknown fields and unresolved references.
+Weaver itself rejects duplicate keys, unknown fields and unresolved references. Every rule runs in
+weaver's default mode and with `--v2`: weaver skips per-file (`before_resolution`) policies with
+`--v2`, so `resolved.rego` applies the same rules (from `lib.rego`) to the resolved registry there.
 
 ## Live-check
 

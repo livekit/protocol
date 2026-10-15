@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Checks otel/model against OTel semconv v1.44.0 and the LiveKit policies (fails on any
-# violation), then prints the non-failing advice from otel/advice.
+# Checks otel/model against OTel semconv v1.44.0 and the LiveKit policies, in weaver's default
+# mode and with --v2 (fails on any violation), then prints the non-failing advice from otel/advice.
 # usage: otel/check.sh [extra `weaver registry check` args, e.g. --diagnostic-format gh_workflow_command]
 set -euo pipefail
 cd "$(dirname "$0")"
 W=${WEAVER:-weaver}
 
 "$W" registry check -r model -p policies "$@"
+# With --v2 (the mode generate.sh uses) weaver skips before_resolution policies; the resolved
+# policies cover that mode, so it is checked on its own.
+"$W" registry check --v2 -r model -p policies "$@"
 
 # weaver exits 1 whenever a policy has findings, whatever their level, so the advice pass reads
 # its JSON diagnostics instead and fails only on something that is not advice.
