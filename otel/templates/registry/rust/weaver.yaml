@@ -1,0 +1,5 @@
+templates:
+  - template: semconv.rs.j2
+    filter: '{schema_url, attributes: [.registry.attributes[] | select(.key | startswith("lk."))] | sort_by(.key), events: .registry.events | sort_by(.name), spans: .registry.spans | sort_by(.type), metrics: .registry.metrics | sort_by(.name), groups: .registry.attribute_groups | sort_by(.id)}'
+    application_mode: single
+    file_name: semconv.rs
