@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # The smoke sample (a real client capture, anonymized, canonical names) must pass with no
-# findings, and so must a sparse RTC window and a JS network event without its flags. The same
-# smoke sample with the client's current identity/PII keys, an unregistered lk.* span, unlisted
-# checkpoints (one empty), outcomes that disagree with the span status (Error for ok, Ok for ok)
-# and events at the wrong severity (by text, and by number) must be flagged.
+# findings, and so must a sparse RTC window, a JS network event without its flags and a record
+# without severity text. The same smoke sample with the client's current identity/PII keys, an
+# unregistered lk.* span, unlisted checkpoints (one empty), outcomes that disagree with the span
+# status (Error for ok, Ok for ok) and events at the wrong severity (by text, and by number) must
+# be flagged.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
@@ -22,6 +23,14 @@ js=$(./live-check.sh tests/live-js-network.json "$tmp/js")
 echo "$js"
 [[ $js == *'"advice_level_counts": {}'* ]] || { echo "FAIL  JS network sample has findings" >&2; exit 1; }
 
+# severity_text is optional in OTLP: a record with only a valid severity number passes, whether
+# it comes as weaver samples or as OTLP/JSON lines.
+for sample in tests/live-no-severity-text.json tests/live-no-severity-text.jsonl; do
+  out=$(./live-check.sh "$sample" "$tmp/$(basename "$sample")")
+  echo "$out"
+  [[ $out == *'"advice_level_counts": {}'* ]] || { echo "FAIL  $sample has findings" >&2; exit 1; }
+done
+
 sed -e 's/"lk\.room_sid"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.name"/g' \
   -e 's/"name": "lk\.publish"/"name": "lk.bogus"/' \
   -e '/"name": "lk\.connect"/s/"name": "ws_open"/"name": "ws_opened"/' \
@@ -39,4 +48,4 @@ for want in "livekit_flat_identity lk.room.sid" "livekit_pii_unmarked lk.room.na
   id=${want% *} key=${want#* }
   grep -q -E -- "${id}: .*${key//./\\.}" <<<"$legacy" || { echo "FAIL  not flagged: $id on $key" >&2; exit 1; }
 done
-echo "PASS  live-check: smoke, sparse and JS samples clean, every planted violation flagged"
+echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, every planted violation flagged"

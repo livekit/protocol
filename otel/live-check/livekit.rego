@@ -92,8 +92,10 @@ deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "seve
 deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "severity_text": log.severity_text}, sprintf("event '%s' is sent at %v; otel/model allows %v", [log.event_name, log.severity_text, declared("severity")])) if {
 	log := input.sample.log
 	declared("severity") != null
-	object.get(log, "severity_text", "") != ""
-	not log.severity_text in declared("severity")
+	text := object.get(log, "severity_text", null) # optional in OTLP; omitted arrives as null
+	is_string(text)
+	text != ""
+	not text in declared("severity")
 }
 
 # The span status lk.outcome implies: Error for `error`, Unset for `ok` and `cancelled`.
