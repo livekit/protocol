@@ -89,9 +89,13 @@ deny contains finding("livekit_seconds", sprintf("%s: LiveKit durations are seco
 	not ms_exception(attr)
 }
 
-deny contains finding("livekit_unit", sprintf("%s: duration-like attribute must declare annotations.livekit.unit: s", [attr.id])) if {
+# A duration word ending the key, optionally followed by `_ms` and one aggregation segment:
+# lk.client.rtt, lk.rtc.freezes_duration_ms, lk.client.rtt.avg, lk.rtc.rtt_ms.max.
+duration_like := `(^|[._])(duration|latency|delay|rtt|jitter)(_ms)?([._](min|max|avg|mean|median|sum|total|last|p[0-9]+))?$`
+
+deny contains finding("livekit_unit", sprintf("%s: duration-like attribute must declare annotations.livekit.unit: s (or unit: ms with a unit_exception)", [attr.id])) if {
 	some attr in lk_attrs
-	regex.match(`(duration|latency|delay|rtt|jitter)$`, attr.id)
+	regex.match(duration_like, attr.id)
 	lk(attr, "unit") != "s"
 	not ms_exception(attr)
 }
