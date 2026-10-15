@@ -315,13 +315,13 @@ groups:
     type: event
     name: custom
     stability: development
-    brief: Namespace of app-defined events. The core emits `custom.<name>` with the app's own attributes.
+    brief: Namespace of app-defined events, named `custom.<name>` and carrying the app's own attributes.
     note: >
       The `custom.` prefix keeps app events from colliding with or spoofing `lk.*` events. An app's
       attributes, on its events and on the session (correlation attributes such as `app.call_id`),
-      may not use the reserved keys, and stay within the limits; anything else is rejected, never
-      truncated, and counted in `lk.telemetry.dropped.invalid`. An event's own attributes override
-      the session's.
+      must not use the reserved keys and must stay within the limits; a producer must reject an
+      attribute that breaks either rule, never truncate it, and count it in
+      `lk.telemetry.dropped.invalid`. An event's own attributes override the session's.
     annotations:
       livekit:
         severity: [INFO]
@@ -363,7 +363,7 @@ groups:
         note: >
           A type name, never a message, at most 128 bytes, platform-defined: Swift sends
           `LiveKitError.<numeric code>`, `CancellationError` or the Swift error type. Dashboards
-          group by it per `service.name`. Written only by the core, at most once.
+          group by it per `service.name`. Set only by the SDK, at most once.
         examples: ["LiveKitError.12", "signal_close"]
 
   - id: span.lk.reconnect
@@ -390,7 +390,7 @@ groups:
         requirement_level: required
       - ref: error.type
         requirement_level: {conditionally_required: Only when `lk.outcome` is `error` and the failure has a type.}
-        note: A type name, never a message, at most 128 bytes. Written only by the core, at most once.
+        note: A type name, never a message, at most 128 bytes. Set only by the SDK, at most once.
         examples: ["reconnect_failed"]
 
   - id: span.lk.publish
@@ -416,7 +416,7 @@ groups:
         requirement_level: required
       - ref: error.type
         requirement_level: {conditionally_required: Only when `lk.outcome` is `error` and the failure has a type.}
-        note: A type name, never a message, at most 128 bytes. Written only by the core, at most once.
+        note: A type name, never a message, at most 128 bytes. Set only by the SDK, at most once.
         examples: ["LiveKitError.12"]
 
   - id: span.lk.subscribe

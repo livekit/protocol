@@ -39,18 +39,20 @@ keeps everything else. Log bodies and metrics are never redacted, so PII must no
 PII keys: `lk.pii.participant_identity`, `lk.pii.remote_participant_identity`, `lk.pii.room_name`.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
-OTLP time. One documented exception: RTC stats keep the W3C webrtc-stats milliseconds, in keys
-ending in `_ms`:
+OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds,
+converted from the seconds the W3C stats report:
 `lk.rtc.freezes_duration_ms`, `lk.rtc.interruptions_duration_ms`, `lk.rtc.jitter_buffer_delay_ms`, `lk.rtc.jitter_ms.avg`, `lk.rtc.jitter_ms.max`, `lk.rtc.jitter_ms.min`, `lk.rtc.pauses_duration_ms`, `lk.rtc.quality_limitation.bandwidth_ms`, `lk.rtc.quality_limitation.cpu_ms`, `lk.rtc.quality_limitation.other_ms`, `lk.rtc.rtt_ms.avg`, `lk.rtc.rtt_ms.max`, `lk.rtc.rtt_ms.min`, `lk.rtc.window_ms`.
 
-**Keys the SDK owns.** Apps never set these, on their own events or as session attributes:
+**Keys the SDK owns.** Apps must not set these, on their own events or as session attributes,
+and a producer must reject such an attribute:
 prefixes `lk.`, `otel.`, `code.` and keys
 `session.id`, `error.type`.
 
 **App events.** An app's events are named `custom.<name>` (see [`custom`](#custom)), so they never
-collide with or spoof LiveKit events, and stay within these limits:
+collide with or spoof LiveKit events, and must stay within these limits:
 attributes per event 64, attributes per session 64, key bytes 128, name bytes 128, string value bytes 1024.
-Anything over a limit is rejected, never truncated, and counted in `lk.telemetry.dropped.invalid`.
+A producer must reject anything over a limit, never truncate it, and count it in
+`lk.telemetry.dropped.invalid`.
 
 **Records.** An event is an OTLP log record with `event_name`; its severity and body are listed
 with it. The JS port sends every event's name as its body. A record's timestamp and attributes are
@@ -61,11 +63,12 @@ taken when it is captured. Every record and span of a room session carries the
 verbs, never ids. Span status is `Unset` on success and on cancellation, `Error` on failure.
 `lk.outcome` (`ok`, `error`, `cancelled`) is on every span exactly once, and rollups read it, never
 the status. `error.type` is a type name, never a message, at most 128 bytes, present only when the
-span failed with a type. The core writes both; a span attribute of either name set any other way is
-dropped. Checkpoints are span events without attributes, named from a fixed list per span. Past a
-span's limits, later checkpoints are dropped and counted in OTLP `dropped_events_count`; app
-correlation attributes are dropped first, then the span's own tail, counted in
-`dropped_attributes_count`; the session's attributes, `lk.outcome` and `error.type` always ship.
+span failed with a type. Only the SDK sets either; a producer must drop a span attribute of either
+name set any other way. Checkpoints are span events without attributes, named from a fixed list
+per span. A producer must hold each span to its limits: later checkpoints are dropped and counted
+in OTLP `dropped_events_count`; past the attribute limit, app correlation attributes go first, then
+the span's own tail, counted in `dropped_attributes_count`; the session's attributes, `lk.outcome`
+and `error.type` always ship.
 
 ## Resource
 
@@ -88,7 +91,7 @@ Resource attributes of the client pipeline, one Resource per process. Set once p
 
 ## Every record
 
-Attributes the core stamps on every log record and span of a session. One session is one Room connection lifetime, across reconnects, and one trace. A record's attributes and timestamp are taken when it is captured, the session's included, so a record captured before a disconnect keeps its room. Records outside a room (device state, pre-room errors, self-telemetry) belong to the process's own session and carry only `session.id`. Keys the SDK owns (`lk.*`, `otel.*`, `code.*`, `session.id`, `error.type`) are never set by an app; an app's correlation attributes (e.g. `app.call_id`, `enduser.id`) ride along, within the `custom` event's limits.
+Attributes on every log record and span of a session. One session is one Room connection lifetime, across reconnects, and one trace. A record's attributes and timestamp are taken when it is captured, the session's included, so a record captured before a disconnect keeps its room. Records outside a room (device state, pre-room errors, self-telemetry) belong to the process's own session and carry only `session.id`. Keys the SDK owns (`lk.*`, `otel.*`, `code.*`, `session.id`, `error.type`) must never be set by an app; an app's correlation attributes (e.g. `app.call_id`, `enduser.id`) ride along, within the `custom` event's limits.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
@@ -101,7 +104,7 @@ Attributes the core stamps on every log record and span of a session. One sessio
 
 ## Plain log records
 
-Attributes of a plain log record (no event name). The body is the log message. Only WARN and ERROR records are sent; WebRTC lines only at ERROR, and the telemetry module's own lines never. In records the core copies from Rust (`lk.log.source = ffi`), JWT-shaped substrings are masked as `<jwt>`.
+Attributes of a plain log record (no event name). The body is the log message. Only WARN and ERROR records are sent; WebRTC lines only at ERROR, and the telemetry module's own lines never. In records copied from the Rust core (`lk.log.source = ffi`), JWT-shaped substrings must be masked as `<jwt>`.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
@@ -115,7 +118,7 @@ Attributes of a plain log record (no event name). The body is the log message. O
 
 ### `custom`
 
-Namespace of app-defined events. The core emits `custom.<name>` with the app's own attributes. The `custom.` prefix keeps app events from colliding with or spoofing `lk.*` events. An app's attributes, on its events and on the session (correlation attributes such as `app.call_id`), may not use the reserved keys, and stay within the limits; anything else is rejected, never truncated, and counted in `lk.telemetry.dropped.invalid`. An event's own attributes override the session's.
+Namespace of app-defined events, named `custom.<name>` and carrying the app's own attributes. The `custom.` prefix keeps app events from colliding with or spoofing `lk.*` events. An app's attributes, on its events and on the session (correlation attributes such as `app.call_id`), must not use the reserved keys and must stay within the limits; a producer must reject an attribute that breaks either rule, never truncate it, and count it in `lk.telemetry.dropped.invalid`. An event's own attributes override the session's.
 
 - Severity: `INFO`
 - Body: The event name (`custom.<name>`).
@@ -255,19 +258,19 @@ One RTC stats window for one track and direction. One per track and direction pe
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.rtc.samples` | int, `{reading}` | Required | Stats readings folded into the window. Denominator for the gauges' averages. |
-| `lk.rtc.window_ms` | int, `ms` | Required | Actual length of the stats window. From the window's start to its close, on the core's clock (the JS port uses wall-clock time). |
+| `lk.rtc.samples` | int, `{reading}` | Required | Stats readings folded into the window. A gauge's `.avg` divides by the readings that reported that gauge, which can be fewer. |
+| `lk.rtc.window_ms` | int, `ms` | Required | Actual length of the stats window. From the window's start to its close, on a monotonic clock. |
 | `lk.track.direction` | enum | Required | Whether the stats describe sent or received media. On RTC stats windows only. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
-| `lk.rtc.audio_level.avg` | double, `1` | Conditionally required: Inbound audio. | Average audio level in the window, 0-1, inbound audio. Inbound `audioLevel`, averaged over `lk.rtc.samples` readings. |
+| `lk.rtc.audio_level.avg` | double, `1` | Conditionally required: Inbound audio. | Average audio level in the window, 0-1, inbound audio. Inbound `audioLevel`, averaged over the window's readings that report it. |
 | `lk.rtc.audio_level.max` | double, `1` | Conditionally required: Inbound audio. | Maximum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. |
 | `lk.rtc.audio_level.min` | double, `1` | Conditionally required: Inbound audio. | Minimum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. |
 | `lk.rtc.bytes` | int, `By` | Conditionally required: When the stats report it. | Bytes sent or received (cumulative). Outbound `bytesSent`, inbound `bytesReceived`. |
 | `lk.rtc.codec` | string | Conditionally required: When known. | Codec mimeType, when known. The `codec` stats entry the RTP stream's `codecId` names. |
 | `lk.rtc.concealed_samples` | int, `{sample}` | Conditionally required: Inbound audio. | Concealed audio samples, inbound audio (cumulative). Inbound `concealedSamples`. |
 | `lk.rtc.concealment_events` | int, `{event}` | Conditionally required: Inbound audio. | Concealment events, inbound audio (cumulative). Inbound `concealmentEvents`. |
-| `lk.rtc.fps.avg` | double, `{frame}/s` | Conditionally required: Video. | Average frame rate in the window, video. `framesPerSecond`, either direction, averaged over `lk.rtc.samples` readings. |
+| `lk.rtc.fps.avg` | double, `{frame}/s` | Conditionally required: Video. | Average frame rate in the window, video. `framesPerSecond`, either direction, averaged over the window's readings that report it. |
 | `lk.rtc.fps.max` | double, `{frame}/s` | Conditionally required: Video. | Maximum frame rate in the window, video. `framesPerSecond`, either direction. |
 | `lk.rtc.fps.min` | double, `{frame}/s` | Conditionally required: Video. | Minimum frame rate in the window, video. `framesPerSecond`, either direction. |
 | `lk.rtc.freeze_count` | int, `{freeze}` | Conditionally required: Inbound video. | Video freezes, inbound video (cumulative). Inbound `freezeCount`. |
@@ -276,7 +279,7 @@ One RTC stats window for one track and direction. One per track and direction pe
 | `lk.rtc.interruptions_duration_ms` | int, `ms` | Conditionally required: Inbound audio. | Total interruption time, inbound audio (cumulative). Inbound `totalInterruptionDuration`. |
 | `lk.rtc.jitter_buffer_delay_ms` | int, `ms` | Conditionally required: Inbound. | Jitter buffer delay, inbound (cumulative). Inbound `jitterBufferDelay`. Average delay = jitter_buffer_delay_ms / jitter_buffer_emitted_count. |
 | `lk.rtc.jitter_buffer_emitted_count` | int, `{sample}` | Conditionally required: Inbound. | Samples or frames emitted by the jitter buffer, inbound (cumulative). Inbound `jitterBufferEmittedCount`. |
-| `lk.rtc.jitter_ms.avg` | double, `ms` | Conditionally required: Inbound. | Average jitter in the window, inbound. Inbound `jitter` (seconds × 1000), averaged over `lk.rtc.samples` readings. |
+| `lk.rtc.jitter_ms.avg` | double, `ms` | Conditionally required: Inbound. | Average jitter in the window, inbound. Inbound `jitter` (seconds × 1000), averaged over the window's readings that report it. |
 | `lk.rtc.jitter_ms.max` | double, `ms` | Conditionally required: Inbound. | Maximum jitter in the window, inbound. Inbound `jitter` (seconds × 1000). |
 | `lk.rtc.jitter_ms.min` | double, `ms` | Conditionally required: Inbound. | Minimum jitter in the window, inbound. Inbound `jitter` (seconds × 1000). |
 | `lk.rtc.packets` | int, `{packet}` | Conditionally required: When the stats report it. | Packets sent or received (cumulative). Outbound `packetsSent`, inbound `packetsReceived`. |
@@ -286,7 +289,7 @@ One RTC stats window for one track and direction. One per track and direction pe
 | `lk.rtc.quality_limitation.bandwidth_ms` | int, `ms` | Conditionally required: Outbound video. | Time the encoder was limited by bandwidth, outbound video (cumulative). Outbound `qualityLimitationDurations.bandwidth`. |
 | `lk.rtc.quality_limitation.cpu_ms` | int, `ms` | Conditionally required: Outbound video. | Time the encoder was limited by CPU, outbound video (cumulative). Outbound `qualityLimitationDurations.cpu`. |
 | `lk.rtc.quality_limitation.other_ms` | int, `ms` | Conditionally required: Outbound video. | Time the encoder was limited for other reasons, outbound video (cumulative). Outbound `qualityLimitationDurations.other`. |
-| `lk.rtc.rtt_ms.avg` | double, `ms` | Conditionally required: When the window has readings. | Average round-trip time in the window. Same sources as `lk.rtc.rtt_ms.min`, averaged over `lk.rtc.samples` readings. |
+| `lk.rtc.rtt_ms.avg` | double, `ms` | Conditionally required: When the window has readings. | Average round-trip time in the window. Same sources as `lk.rtc.rtt_ms.min`, averaged over the window's readings that report it. |
 | `lk.rtc.rtt_ms.max` | double, `ms` | Conditionally required: When the window has readings. | Maximum round-trip time in the window. Same sources as `lk.rtc.rtt_ms.min`. |
 | `lk.rtc.rtt_ms.min` | double, `ms` | Conditionally required: When the window has readings. | Minimum round-trip time in the window. Outbound: the `remote-inbound-rtp` entry's `roundTripTime`; inbound: the nominated candidate pair's `currentRoundTripTime` (seconds × 1000). |
 | `lk.rtc.silent_concealed_samples` | int, `{sample}` | Conditionally required: Inbound audio. | Concealed samples that were silent, inbound audio (cumulative). Inbound `silentConcealedSamples`. |
@@ -332,8 +335,8 @@ Kind `client`. One connect attempt. Dashboards compute connect phases only from 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.connect.attempt` | int | Required | 1-based connect attempt. 1 for the user-initiated connect; a platform that retries sets the next number on the next `lk.connect` span. |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
-| `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes, platform-defined: Swift sends `LiveKitError.<numeric code>`, `CancellationError` or the Swift error type. Dashboards group by it per `service.name`. Written only by the core, at most once. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
+| `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes, platform-defined: Swift sends `LiveKitError.<numeric code>`, `CancellationError` or the Swift error type. Dashboards group by it per `service.name`. Set only by the SDK, at most once. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
@@ -356,10 +359,10 @@ Kind `internal`. One track publish. A child of the ambient span when there is on
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track.source` | enum | Required | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |
-| `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Written only by the core, at most once. |
+| `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Set only by the SDK, at most once. |
 | `lk.track_sid` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
 No checkpoints.
@@ -372,9 +375,9 @@ Kind `client`. One reconnect cycle. `cancelled` when `disconnect()` or a newer r
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.reconnect.reason` | enum | Required | What triggered the reconnect cycle. The protocol's `ReconnectReason` (`RR_*`), plus reasons only a client knows. |
-| `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Written only by the core, at most once. |
+| `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Set only by the SDK, at most once. |
 | `lk.reconnect.attempts` | int | Conditionally required: After the first attempt. | Reconnect attempts made in the cycle. Equals `<n>` of the last `attempt <n> <mode>` checkpoint. |
 | `lk.reconnect.mode` | enum | Conditionally required: After the first attempt. | Mode of the last reconnect attempt. Updated with each `attempt <n> <mode>` checkpoint; matches the last one. |
 
@@ -390,7 +393,7 @@ Kind `internal`. One subscription, from the intent to subscribe to the first med
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, written by the core from how the span ended; an attribute of this name set any other way is dropped. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
+| `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track.source` | enum | Required | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |
 | `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
@@ -406,101 +409,101 @@ Limits: 128 attributes, 128 span events per span.
 
 ## Attribute reference
 
-Every key this registry defines; the OTel keys used above are defined by OTel. "Used on" names the
-attribute sets, events and spans that reference the key.
+Every key this registry defines, with its meaning; the OTel keys used above are defined by OTel.
+"Used on" names the attribute sets, events and spans that reference the key.
 
-| Key | Type | Owner | Sensitivity | Examples | Used on |
-| --- | --- | --- | --- | --- | --- |
-| `browser.name` | string | client | none | `Chrome`, `Safari`, `Firefox` | resource |
-| `browser.version` | string | client | none | `124.0` | resource |
-| `lk.connect.attempt` | int | client | none | `1` | `lk.connect` |
-| `lk.device.app_state` | enum | client | none |  | `lk.device.app_state.changed` |
-| `lk.device.audio.interruption` | enum | client | none |  | `lk.device.audio.interruption` |
-| `lk.device.audio_route.outputs` | string | client | none | `bluetooth`, `speaker,usb` | `lk.device.audio_route.changed` |
-| `lk.device.audio_route.reason` | enum | client | none |  | `lk.device.audio_route.changed` |
-| `lk.device.battery.charging` | boolean | client | none | `false` | `lk.device.battery.changed` |
-| `lk.device.battery.level` | int, `%` | client | none | `42` | `lk.device.battery.changed` |
-| `lk.device.capture.device` | enum | client | none |  | `lk.device.capture.failed` |
-| `lk.device.capture.reason` | enum | client | none |  | `lk.device.capture.failed` |
-| `lk.device.low_power.enabled` | boolean | client | none | `true` | `lk.device.low_power.changed` |
-| `lk.device.memory.pressure` | enum | client | none |  | `lk.device.memory.changed` |
-| `lk.device.network.constrained` | boolean | client | none | `false` | `lk.device.network.changed` |
-| `lk.device.network.expensive` | boolean | client | none | `false` | `lk.device.network.changed` |
-| `lk.device.thermal.state` | enum | client | none |  | `lk.device.thermal.changed` |
-| `lk.disconnect.reason` | enum | client | none |  | `lk.room.disconnected` |
-| `lk.job_id` | string | shared | none | `AJ_kVbMBWtnVHvT` | |
-| `lk.log.logger` | string | client | none | `Room`, `livekit::rtc_engine` | log |
-| `lk.log.source` | enum | client | none |  | log |
-| `lk.outcome` | enum | client | none |  | `lk.connect` `lk.publish` `lk.reconnect` `lk.subscribe` |
-| `lk.participant_id` | string | shared | none | `PA_9kLm2NpQ4rTs` | record |
-| `lk.pii.participant_identity` | string | shared | pii | `identity-0` | record |
-| `lk.pii.remote_participant_identity` | string | shared | pii | `identity-1` | `lk.subscribe` |
-| `lk.pii.room_name` | string | shared | pii | `my-room` | record |
-| `lk.ping.seq` | int | client | none | `1` | `lk.ping` |
-| `lk.reconnect.attempts` | int | client | none | `2` | `lk.reconnect` |
-| `lk.reconnect.mode` | enum | client | none |  | `lk.reconnect` |
-| `lk.reconnect.reason` | enum | client | none |  | `lk.reconnect` |
-| `lk.room_sid` | string | shared | none | `RM_5Fq8xQ2ZbXwN` | record |
-| `lk.rtc.audio_level.avg` | double, `1` | client | none | `0.05` | `lk.rtc.stats.sample` |
-| `lk.rtc.audio_level.max` | double, `1` | client | none | `0.3` | `lk.rtc.stats.sample` |
-| `lk.rtc.audio_level.min` | double, `1` | client | none | `0.0` | `lk.rtc.stats.sample` |
-| `lk.rtc.bytes` | int, `By` | client | none | `1048576` | `lk.rtc.stats.sample` |
-| `lk.rtc.codec` | string | client | none | `audio/opus`, `video/VP8` | `lk.rtc.stats.sample` |
-| `lk.rtc.concealed_samples` | int, `{sample}` | client | none | `480` | `lk.rtc.stats.sample` |
-| `lk.rtc.concealment_events` | int, `{event}` | client | none | `1` | `lk.rtc.stats.sample` |
-| `lk.rtc.fps.avg` | double, `{frame}/s` | client | none | `29.7` | `lk.rtc.stats.sample` |
-| `lk.rtc.fps.max` | double, `{frame}/s` | client | none | `30.0` | `lk.rtc.stats.sample` |
-| `lk.rtc.fps.min` | double, `{frame}/s` | client | none | `24.0` | `lk.rtc.stats.sample` |
-| `lk.rtc.freeze_count` | int, `{freeze}` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.freezes_duration_ms` | int, `ms` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.interruption_count` | int, `{interruption}` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.interruptions_duration_ms` | int, `ms` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.jitter_buffer_delay_ms` | int, `ms` | client | none | `1200` | `lk.rtc.stats.sample` |
-| `lk.rtc.jitter_buffer_emitted_count` | int, `{sample}` | client | none | `48000` | `lk.rtc.stats.sample` |
-| `lk.rtc.jitter_ms.avg` | double, `ms` | client | none | `1.8` | `lk.rtc.stats.sample` |
-| `lk.rtc.jitter_ms.max` | double, `ms` | client | none | `4.2` | `lk.rtc.stats.sample` |
-| `lk.rtc.jitter_ms.min` | double, `ms` | client | none | `0.5` | `lk.rtc.stats.sample` |
-| `lk.rtc.packets` | int, `{packet}` | client | none | `3000` | `lk.rtc.stats.sample` |
-| `lk.rtc.packets_lost` | int, `{packet}` | client | none | `3` | `lk.rtc.stats.sample` |
-| `lk.rtc.pause_count` | int, `{pause}` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.pauses_duration_ms` | int, `ms` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.quality_limitation.bandwidth_ms` | int, `ms` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.quality_limitation.cpu_ms` | int, `ms` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.quality_limitation.other_ms` | int, `ms` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.rtt_ms.avg` | double, `ms` | client | none | `25.5` | `lk.rtc.stats.sample` |
-| `lk.rtc.rtt_ms.max` | double, `ms` | client | none | `80.0` | `lk.rtc.stats.sample` |
-| `lk.rtc.rtt_ms.min` | double, `ms` | client | none | `12.0` | `lk.rtc.stats.sample` |
-| `lk.rtc.samples` | int, `{reading}` | client | none | `2` | `lk.rtc.stats.sample` |
-| `lk.rtc.silent_concealed_samples` | int, `{sample}` | client | none | `0` | `lk.rtc.stats.sample` |
-| `lk.rtc.window_ms` | int, `ms` | client | none | `60000` | `lk.rtc.stats.sample` |
-| `lk.sdk.name` | string | shared | none | `swift`, `android`, `flutter`, `react-native`, `unity`, `rust`, `js` | resource |
-| `lk.sdk.version` | string | shared | none | `2.17.0` | resource |
-| `lk.telemetry.cache.batches` | int, `{batch}` | client | none | `0` | `lk.telemetry.report` |
-| `lk.telemetry.cache.delete_errors` | int, `{batch}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.cache.list_errors` | int, `{attempt}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.cache.read_errors` | int, `{batch}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.cache.write_errors` | int, `{batch}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.cache_error` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.cache_full` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.corrupt` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.expired` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.invalid` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.oversized` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.queue_full` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.rate_limited` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.rejected` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.throttled` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.dropped.unattributed` | int, `{record}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.holds.capped` | int, `{hold}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.uploads.bytes` | int, `By` | client | none | `20480` | `lk.telemetry.report` |
-| `lk.telemetry.uploads.failed` | int, `{attempt}` | client | none | `0` | `lk.telemetry.report` |
-| `lk.telemetry.uploads.sent` | int, `{batch}` | client | none | `4` | `lk.telemetry.report` |
-| `lk.telemetry.uploads.timeouts` | int, `{attempt}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.telemetry.uploads.unauthorized` | int, `{attempt}` | client | none | `1` | `lk.telemetry.report` |
-| `lk.track.direction` | enum | client | none |  | `lk.rtc.stats.sample` |
-| `lk.track.kind` | enum | client | none |  | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
-| `lk.track.source` | enum | client | none |  | `lk.publish` `lk.subscribe` |
-| `lk.track_sid` | string | shared | none | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
+| Key | Type | Owner | Sensitivity | Description | Examples | Used on |
+| --- | --- | --- | --- | --- | --- | --- |
+| `browser.name` | string | client | none | Browser name. Resource attribute, JS port only. | `Chrome`, `Safari`, `Firefox` | resource |
+| `browser.version` | string | client | none | Browser version. Resource attribute, JS port only. | `124.0` | resource |
+| `lk.connect.attempt` | int | client | none | 1-based connect attempt. 1 for the user-initiated connect; a platform that retries sets the next number on the next `lk.connect` span. | `1` | `lk.connect` |
+| `lk.device.app_state` | enum | client | none | Whether the app is in front of the user. All platforms; the web maps page visibility. |  | `lk.device.app_state.changed` |
+| `lk.device.audio.interruption` | enum | client | none | Phase of an audio session interruption. iOS audio session interruptions; Android audio focus loss and gain. |  | `lk.device.audio.interruption` |
+| `lk.device.audio_route.outputs` | string | client | none | The active outputs, comma-separated. Each item is one of speaker, receiver, wired_headset, bluetooth, car_audio, air_play, hdmi, usb, other. A string, not an array: the vocabulary is closed but the list is joined. | `bluetooth`, `speaker,usb` | `lk.device.audio_route.changed` |
+| `lk.device.audio_route.reason` | enum | client | none | Why the audio route changed. AVAudioSession route change reasons on iOS; Android maps its audio device callbacks; `unknown` where the platform gives none. |  | `lk.device.audio_route.changed` |
+| `lk.device.battery.charging` | boolean | client | none | The device is charging. Sent together with `lk.device.battery.level`. | `false` | `lk.device.battery.changed` |
+| `lk.device.battery.level` | int, `%` | client | none | Battery charge in percent, 0-100. Only where the level is known (iOS, Android; not desktops or tvOS); never from the JS port. An integer percentage, not a 0-1 ratio. | `42` | `lk.device.battery.changed` |
+| `lk.device.capture.device` | enum | client | none | Capture device that failed. All platforms. |  | `lk.device.capture.failed` |
+| `lk.device.capture.reason` | enum | client | none | Why capture failed, in the getUserMedia failure taxonomy. iOS: authorization status and capture interruptions; Android: permission checks and camera callbacks; web: DOMException names. |  | `lk.device.capture.failed` |
+| `lk.device.low_power.enabled` | boolean | client | none | Low Power Mode / Battery Saver is on. Absent where the platform has no source. iOS, macOS and Android; optional elsewhere. | `true` | `lk.device.low_power.changed` |
+| `lk.device.memory.pressure` | enum | client | none | Memory pressure as the OS reports it. Apple `DispatchSource` memory-pressure levels; Android `onTrimMemory`: RUNNING_LOW and BACKGROUND map to `warning`, RUNNING_CRITICAL and COMPLETE to `critical`. iOS, macOS and Android; optional elsewhere. |  | `lk.device.memory.changed` |
+| `lk.device.network.constrained` | boolean | client | none | The user asked for less traffic (Low Data Mode, Data Saver). Apple `NWPath.isConstrained`, Android Data Saver; on the web `navigator.connection.saveData`, only where the Network Information API exists. | `false` | `lk.device.network.changed` |
+| `lk.device.network.expensive` | boolean | client | none | The network is metered (cellular, personal hotspot). Apple `NWPath.isExpensive`, Android metered networks; on the web only where the Network Information API exists. | `false` | `lk.device.network.changed` |
+| `lk.device.thermal.state` | enum | client | none | Thermal pressure as the OS reports it. Apple `ProcessInfo.thermalState`, Android `PowerManager` thermal status, web Compute Pressure API, all mapped to this vocabulary. The platform's `unknown` (no thermal source) is no reading and is never emitted. iOS, macOS and Android; optional elsewhere. |  | `lk.device.thermal.changed` |
+| `lk.disconnect.reason` | enum | client | none | Why the session ended. The protocol's `DisconnectReason`, plus the client giving up (`reconnect_failed`). |  | `lk.room.disconnected` |
+| `lk.job_id` | string | shared | none | Agent job ID (`AJ_...`). Sent by Agents, not by clients. High cardinality; Agents' job-scoped metrics are the one sanctioned metric-dimension exception. | `AJ_kVbMBWtnVHvT` | |
+| `lk.log.logger` | string | client | none | Logger, type, module or file that wrote the line. Free text from the platform's logger. | `Room`, `livekit::rtc_engine` | log |
+| `lk.log.source` | enum | client | none | Which layer wrote the log line. Only WARN and ERROR records are sent; WebRTC lines only at ERROR. |  | log |
+| `lk.outcome` | enum | client | none | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |  | `lk.connect` `lk.publish` `lk.reconnect` `lk.subscribe` |
+| `lk.participant_id` | string | shared | none | Server-assigned SID of the local participant (`PA_...`). On every record and span of a session once the client has joined. High cardinality, never a default metric dimension. | `PA_9kLm2NpQ4rTs` | record |
+| `lk.pii.participant_identity` | string | shared | pii | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. | `identity-0` | record |
+| `lk.pii.remote_participant_identity` | string | shared | pii | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). On subscribe spans: the identity of the participant publishing the track. | `identity-1` | `lk.subscribe` |
+| `lk.pii.room_name` | string | shared | pii | Customer-supplied room name. On every record and span of a session once the client has joined. | `my-room` | record |
+| `lk.ping.seq` | int | client | none | Monotonically increasing sequence number per pipeline. Optional; on `lk.ping` only. | `1` | `lk.ping` |
+| `lk.reconnect.attempts` | int | client | none | Reconnect attempts made in the cycle. Equals `<n>` of the last `attempt <n> <mode>` checkpoint. | `2` | `lk.reconnect` |
+| `lk.reconnect.mode` | enum | client | none | Mode of the last reconnect attempt. Updated with each `attempt <n> <mode>` checkpoint; matches the last one. |  | `lk.reconnect` |
+| `lk.reconnect.reason` | enum | client | none | What triggered the reconnect cycle. The protocol's `ReconnectReason` (`RR_*`), plus reasons only a client knows. |  | `lk.reconnect` |
+| `lk.room_sid` | string | shared | none | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. | `RM_5Fq8xQ2ZbXwN` | record |
+| `lk.rtc.audio_level.avg` | double, `1` | client | none | Average audio level in the window, 0-1, inbound audio. Inbound `audioLevel`, averaged over the window's readings that report it. | `0.05` | `lk.rtc.stats.sample` |
+| `lk.rtc.audio_level.max` | double, `1` | client | none | Maximum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. | `0.3` | `lk.rtc.stats.sample` |
+| `lk.rtc.audio_level.min` | double, `1` | client | none | Minimum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. | `0.0` | `lk.rtc.stats.sample` |
+| `lk.rtc.bytes` | int, `By` | client | none | Bytes sent or received (cumulative). Outbound `bytesSent`, inbound `bytesReceived`. | `1048576` | `lk.rtc.stats.sample` |
+| `lk.rtc.codec` | string | client | none | Codec mimeType, when known. The `codec` stats entry the RTP stream's `codecId` names. | `audio/opus`, `video/VP8` | `lk.rtc.stats.sample` |
+| `lk.rtc.concealed_samples` | int, `{sample}` | client | none | Concealed audio samples, inbound audio (cumulative). Inbound `concealedSamples`. | `480` | `lk.rtc.stats.sample` |
+| `lk.rtc.concealment_events` | int, `{event}` | client | none | Concealment events, inbound audio (cumulative). Inbound `concealmentEvents`. | `1` | `lk.rtc.stats.sample` |
+| `lk.rtc.fps.avg` | double, `{frame}/s` | client | none | Average frame rate in the window, video. `framesPerSecond`, either direction, averaged over the window's readings that report it. | `29.7` | `lk.rtc.stats.sample` |
+| `lk.rtc.fps.max` | double, `{frame}/s` | client | none | Maximum frame rate in the window, video. `framesPerSecond`, either direction. | `30.0` | `lk.rtc.stats.sample` |
+| `lk.rtc.fps.min` | double, `{frame}/s` | client | none | Minimum frame rate in the window, video. `framesPerSecond`, either direction. | `24.0` | `lk.rtc.stats.sample` |
+| `lk.rtc.freeze_count` | int, `{freeze}` | client | none | Video freezes, inbound video (cumulative). Inbound `freezeCount`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.freezes_duration_ms` | int, `ms` | client | none | Total freeze time, inbound video (cumulative). Inbound `totalFreezesDuration`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.interruption_count` | int, `{interruption}` | client | none | Audio interruptions, inbound audio (cumulative). Inbound `interruptionCount`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.interruptions_duration_ms` | int, `ms` | client | none | Total interruption time, inbound audio (cumulative). Inbound `totalInterruptionDuration`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.jitter_buffer_delay_ms` | int, `ms` | client | none | Jitter buffer delay, inbound (cumulative). Inbound `jitterBufferDelay`. Average delay = jitter_buffer_delay_ms / jitter_buffer_emitted_count. | `1200` | `lk.rtc.stats.sample` |
+| `lk.rtc.jitter_buffer_emitted_count` | int, `{sample}` | client | none | Samples or frames emitted by the jitter buffer, inbound (cumulative). Inbound `jitterBufferEmittedCount`. | `48000` | `lk.rtc.stats.sample` |
+| `lk.rtc.jitter_ms.avg` | double, `ms` | client | none | Average jitter in the window, inbound. Inbound `jitter` (seconds × 1000), averaged over the window's readings that report it. | `1.8` | `lk.rtc.stats.sample` |
+| `lk.rtc.jitter_ms.max` | double, `ms` | client | none | Maximum jitter in the window, inbound. Inbound `jitter` (seconds × 1000). | `4.2` | `lk.rtc.stats.sample` |
+| `lk.rtc.jitter_ms.min` | double, `ms` | client | none | Minimum jitter in the window, inbound. Inbound `jitter` (seconds × 1000). | `0.5` | `lk.rtc.stats.sample` |
+| `lk.rtc.packets` | int, `{packet}` | client | none | Packets sent or received (cumulative). Outbound `packetsSent`, inbound `packetsReceived`. | `3000` | `lk.rtc.stats.sample` |
+| `lk.rtc.packets_lost` | int, `{packet}` | client | none | Packets lost, inbound (cumulative). Inbound `packetsLost`. Loss ratio = packets_lost / (packets + packets_lost). | `3` | `lk.rtc.stats.sample` |
+| `lk.rtc.pause_count` | int, `{pause}` | client | none | Video pauses, inbound video (cumulative). Inbound `pauseCount`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.pauses_duration_ms` | int, `ms` | client | none | Total pause time, inbound video (cumulative). Inbound `totalPausesDuration`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.quality_limitation.bandwidth_ms` | int, `ms` | client | none | Time the encoder was limited by bandwidth, outbound video (cumulative). Outbound `qualityLimitationDurations.bandwidth`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.quality_limitation.cpu_ms` | int, `ms` | client | none | Time the encoder was limited by CPU, outbound video (cumulative). Outbound `qualityLimitationDurations.cpu`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.quality_limitation.other_ms` | int, `ms` | client | none | Time the encoder was limited for other reasons, outbound video (cumulative). Outbound `qualityLimitationDurations.other`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.rtt_ms.avg` | double, `ms` | client | none | Average round-trip time in the window. Same sources as `lk.rtc.rtt_ms.min`, averaged over the window's readings that report it. | `25.5` | `lk.rtc.stats.sample` |
+| `lk.rtc.rtt_ms.max` | double, `ms` | client | none | Maximum round-trip time in the window. Same sources as `lk.rtc.rtt_ms.min`. | `80.0` | `lk.rtc.stats.sample` |
+| `lk.rtc.rtt_ms.min` | double, `ms` | client | none | Minimum round-trip time in the window. Outbound: the `remote-inbound-rtp` entry's `roundTripTime`; inbound: the nominated candidate pair's `currentRoundTripTime` (seconds × 1000). | `12.0` | `lk.rtc.stats.sample` |
+| `lk.rtc.samples` | int, `{reading}` | client | none | Stats readings folded into the window. A gauge's `.avg` divides by the readings that reported that gauge, which can be fewer. | `2` | `lk.rtc.stats.sample` |
+| `lk.rtc.silent_concealed_samples` | int, `{sample}` | client | none | Concealed samples that were silent, inbound audio (cumulative). Inbound `silentConcealedSamples`. | `0` | `lk.rtc.stats.sample` |
+| `lk.rtc.window_ms` | int, `ms` | client | none | Actual length of the stats window. From the window's start to its close, on a monotonic clock. | `60000` | `lk.rtc.stats.sample` |
+| `lk.sdk.name` | string | shared | none | LiveKit SDK name. Resource attribute. A low-cardinality metric dimension. Matches the `<sdk>` part of `service.name = livekit-client-<sdk>`. | `swift`, `android`, `flutter`, `react-native`, `unity`, `rust`, `js` | resource |
+| `lk.sdk.version` | string | shared | none | LiveKit SDK version. Resource attribute. A low-cardinality metric dimension. | `2.17.0` | resource |
+| `lk.telemetry.cache.batches` | int, `{batch}` | client | none | Batches waiting in the cache now. A gauge, not a count since the previous report. Always present on a report. | `0` | `lk.telemetry.report` |
+| `lk.telemetry.cache.delete_errors` | int, `{batch}` | client | none | Sent batches the cache could not delete; never sent twice from the same launch. Only when non-zero. JS port only. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.cache.list_errors` | int, `{attempt}` | client | none | Times the cache could not be listed, so nothing was reconciled or sent. Only when non-zero. JS port only. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.cache.read_errors` | int, `{batch}` | client | none | Cached batches that could not be read right now, kept for the next pass. Only when non-zero. JS port only. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.cache.write_errors` | int, `{batch}` | client | none | Batches the disk refused, kept in memory instead. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.cache_error` | int, `{record}` | client | none | Records no cache, not even memory, could take. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.cache_full` | int, `{record}` | client | none | Records evicted by the cache's size or file-count bound. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.corrupt` | int, `{record}` | client | none | Records in cached batches that failed their CRC. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.expired` | int, `{record}` | client | none | Records in batches past the cache's age limit. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.invalid` | int, `{record}` | client | none | Custom events, attributes or SDK strings over the limits, rejected. Only when non-zero. Over-limit values are rejected, never truncated (a truncated id collides). | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.oversized` | int, `{record}` | client | none | Single records larger than the collector accepts (413). Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.queue_full` | int, `{record}` | client | none | Records evicted from the in-memory queue. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.rate_limited` | int, `{record}` | client | none | Discrete events dropped by the flood guard. Only when non-zero. RTC stats windows and reports are exempt from the guard. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.rejected` | int, `{record}` | client | none | Records the collector rejected (final 4xx/5xx, OTLP partial success). Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.throttled` | int, `{record}` | client | none | Records evicted from the cache during a server-directed pause. Only when non-zero. Rust core only; the JS port never sends it. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.dropped.unattributed` | int, `{record}` | client | none | Log lines from a Room-shaped logging context with no telemetry scope behind it, dropped. Only when non-zero. JS port only. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.holds.capped` | int, `{hold}` | client | none | Soft upload holds that reached their cap. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.uploads.bytes` | int, `By` | client | none | Compressed bytes the collector accepted. What telemetry cost the uplink. Always present on a report, even when 0. | `20480` | `lk.telemetry.report` |
+| `lk.telemetry.uploads.failed` | int, `{attempt}` | client | none | Upload attempts that failed transiently (no answer, 429, 5xx). Always present on a report, even when 0. | `0` | `lk.telemetry.report` |
+| `lk.telemetry.uploads.sent` | int, `{batch}` | client | none | Batches the collector accepted. Always present on a report, even when 0. | `4` | `lk.telemetry.report` |
+| `lk.telemetry.uploads.timeouts` | int, `{attempt}` | client | none | Upload attempts that hit the export timeout. Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.telemetry.uploads.unauthorized` | int, `{attempt}` | client | none | 401/403 answers (tokens the collector refused). Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.track.direction` | enum | client | none | Whether the stats describe sent or received media. On RTC stats windows only. |  | `lk.rtc.stats.sample` |
+| `lk.track.kind` | enum | client | none | Media kind of the track. On publish and subscribe spans and RTC stats windows. |  | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
+| `lk.track.source` | enum | client | none | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |  | `lk.publish` `lk.subscribe` |
+| `lk.track_sid` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
 
 ## Enum values
 

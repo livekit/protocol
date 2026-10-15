@@ -56,15 +56,15 @@ attribute_groups:
   - id: livekit.client.record
     visibility: public
     stability: development
-    brief: Attributes the core stamps on every log record and span of a session.
+    brief: Attributes on every log record and span of a session.
     note: >
       One session is one Room connection lifetime, across reconnects, and one trace. A record's
       attributes and timestamp are taken when it is captured, the session's included, so a record
       captured before a disconnect keeps its room. Records outside a room (device state, pre-room
       errors, self-telemetry) belong to the process's own session and carry only `session.id`.
-      Keys the SDK owns (`lk.*`, `otel.*`, `code.*`, `session.id`, `error.type`) are never set by an
-      app; an app's correlation attributes (e.g. `app.call_id`, `enduser.id`) ride along, within the
-      `custom` event's limits.
+      Keys the SDK owns (`lk.*`, `otel.*`, `code.*`, `session.id`, `error.type`) must never be set
+      by an app; an app's correlation attributes (e.g. `app.call_id`, `enduser.id`) ride along,
+      within the `custom` event's limits.
     attributes:
       - ref: session.id
         requirement_level: required
@@ -89,8 +89,8 @@ attribute_groups:
     brief: Attributes of a plain log record (no event name).
     note: >
       The body is the log message. Only WARN and ERROR records are sent; WebRTC lines only at
-      ERROR, and the telemetry module's own lines never. In records the core copies from Rust
-      (`lk.log.source = ffi`), JWT-shaped substrings are masked as `<jwt>`.
+      ERROR, and the telemetry module's own lines never. In records copied from the Rust core
+      (`lk.log.source = ffi`), JWT-shaped substrings must be masked as `<jwt>`.
     attributes:
       - ref: lk.log.source
         requirement_level: required

@@ -413,7 +413,7 @@ export const LK_TRACK_SOURCE_VALUE_UNKNOWN = "unknown" as const;
 /** Server-assigned track SID (`TR_...`). */
 export const ATTR_LK_TRACK_SID = "lk.track_sid" as const;
 
-/** Namespace of app-defined events. The core emits `custom.<name>` with the app's own attributes. */
+/** Namespace of app-defined events, named `custom.<name>` and carrying the app's own attributes. */
 export const EVENT_CUSTOM = "custom" as const;
 /** The app moved to the foreground or background. */
 export const EVENT_LK_DEVICE_APP_STATE_CHANGED = "lk.device.app_state.changed" as const;

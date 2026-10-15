@@ -65,18 +65,20 @@ keeps everything else. Log bodies and metrics are never redacted, so PII must no
 PII keys: {% for a in ctx.attributes | selectattr("annotations.livekit.sensitivity", "eq", "pii") %}`{{ a.key }}`{% if not loop.last %}, {% endif %}{% endfor %}.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
-OTLP time. One documented exception: RTC stats keep the W3C webrtc-stats milliseconds, in keys
-ending in `_ms`:
+OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds,
+converted from the seconds the W3C stats report:
 {% for a in ctx.attributes | selectattr("annotations.livekit.unit_exception") %}`{{ a.key }}`{% if not loop.last %}, {% endif %}{% endfor %}.
 
-**Keys the SDK owns.** Apps never set these, on their own events or as session attributes:
+**Keys the SDK owns.** Apps must not set these, on their own events or as session attributes,
+and a producer must reject such an attribute:
 prefixes {% for p in custom.annotations.livekit.reserved.prefixes %}`{{ p }}`{% if not loop.last %}, {% endif %}{% endfor %} and keys
 {% for k in custom.annotations.livekit.reserved.keys %}`{{ k }}`{% if not loop.last %}, {% endif %}{% endfor %}.
 
 **App events.** An app's events are named `custom.<name>` (see [`custom`](#custom)), so they never
-collide with or spoof LiveKit events, and stay within these limits:
+collide with or spoof LiveKit events, and must stay within these limits:
 {% for k, v in custom.annotations.livekit.limits | items %}{{ k | replace("_", " ") }} {{ v }}{% if not loop.last %}, {% endif %}{% endfor %}.
-Anything over a limit is rejected, never truncated, and counted in `lk.telemetry.dropped.invalid`.
+A producer must reject anything over a limit, never truncate it, and count it in
+`lk.telemetry.dropped.invalid`.
 
 **Records.** An event is an OTLP log record with `event_name`; its severity and body are listed
 with it. The JS port sends every event's name as its body. A record's timestamp and attributes are
@@ -87,11 +89,12 @@ taken when it is captured. Every record and span of a room session carries the
 verbs, never ids. Span status is `Unset` on success and on cancellation, `Error` on failure.
 `lk.outcome` (`ok`, `error`, `cancelled`) is on every span exactly once, and rollups read it, never
 the status. `error.type` is a type name, never a message, at most 128 bytes, present only when the
-span failed with a type. The core writes both; a span attribute of either name set any other way is
-dropped. Checkpoints are span events without attributes, named from a fixed list per span. Past a
-span's limits, later checkpoints are dropped and counted in OTLP `dropped_events_count`; app
-correlation attributes are dropped first, then the span's own tail, counted in
-`dropped_attributes_count`; the session's attributes, `lk.outcome` and `error.type` always ship.
+span failed with a type. Only the SDK sets either; a producer must drop a span attribute of either
+name set any other way. Checkpoints are span events without attributes, named from a fixed list
+per span. A producer must hold each span to its limits: later checkpoints are dropped and counted
+in OTLP `dropped_events_count`; past the attribute limit, app correlation attributes go first, then
+the span's own tail, counted in `dropped_attributes_count`; the session's attributes, `lk.outcome`
+and `error.type` always ship.
 
 ## Resource
 
@@ -135,12 +138,12 @@ Limits: {% for k, v in lk.limits | items %}{{ v }} {{ k | replace("_", " ") }}{%
 {% endfor %}
 ## Attribute reference
 
-Every key this registry defines; the OTel keys used above are defined by OTel. "Used on" names the
-attribute sets, events and spans that reference the key.
+Every key this registry defines, with its meaning; the OTel keys used above are defined by OTel.
+"Used on" names the attribute sets, events and spans that reference the key.
 
-| Key | Type | Owner | Sensitivity | Examples | Used on |
-| --- | --- | --- | --- | --- | --- |
-{% for a in ctx.attributes %}| `{{ a.key }}` | {{ ty(a) }} | {{ a.annotations.livekit.owner }} | {{ a.annotations.livekit.sensitivity }} | {% for x in a.examples or [] %}`{{ cell(x | string) }}`{% if not loop.last %}, {% endif %}{% endfor %} | {% for g in ctx.groups %}{% if a.key in (g.attributes | map(attribute="key") | list) %}{{ g.id | replace("livekit.client.", "") }} {% endif %}{% endfor %}{% for e in ctx.events %}{% if a.key in ((e.attributes or []) | map(attribute="key") | list) %}`{{ e.name }}` {% endif %}{% endfor %}{% for s in ctx.spans %}{% if a.key in (s.attributes | map(attribute="key") | list) %}`{{ s.type }}` {% endif %}{% endfor %}|
+| Key | Type | Owner | Sensitivity | Description | Examples | Used on |
+| --- | --- | --- | --- | --- | --- | --- |
+{% for a in ctx.attributes %}| `{{ a.key }}` | {{ ty(a) }} | {{ a.annotations.livekit.owner }} | {{ a.annotations.livekit.sensitivity }} | {{ desc(a) }} | {% for x in a.examples or [] %}`{{ cell(x | string) }}`{% if not loop.last %}, {% endif %}{% endfor %} | {% for g in ctx.groups %}{% if a.key in (g.attributes | map(attribute="key") | list) %}{{ g.id | replace("livekit.client.", "") }} {% endif %}{% endfor %}{% for e in ctx.events %}{% if a.key in ((e.attributes or []) | map(attribute="key") | list) %}`{{ e.name }}` {% endif %}{% endfor %}{% for s in ctx.spans %}{% if a.key in (s.attributes | map(attribute="key") | list) %}`{{ s.type }}` {% endif %}{% endfor %}|
 {% endfor %}
 ## Enum values
 {% for a in ctx.attributes %}{% if a.type is mapping %}

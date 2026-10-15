@@ -476,7 +476,7 @@ pub const LK_TRACK_SID: &str = "lk.track_sid";
 
 /// Event names (OTLP `LogRecord.event_name`).
 pub mod event {
-    /// Namespace of app-defined events. The core emits `custom.<name>` with the app's own attributes.
+    /// Namespace of app-defined events, named `custom.<name>` and carrying the app's own attributes.
     pub const CUSTOM: &str = "custom";
     /// The app moved to the foreground or background.
     pub const LK_DEVICE_APP_STATE_CHANGED: &str = "lk.device.app_state.changed";

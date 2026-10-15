@@ -1,14 +1,15 @@
 # Client-owned attributes, under the names the client cores emit today (rust-sdks
 # livekit-telemetry SPEC.md, and the JS port in client-sdk-js). The Client team approves changes
-# here alone, unless one touches a shared concept (otel/model/shared). Durations and RTT/jitter in
-# RTC stats stay in ms, the W3C webrtc-stats unit, through an explicit `unit_exception`.
+# here alone, unless one touches a shared concept (otel/model/shared). The RTC stats durations,
+# RTT and jitter are milliseconds, converted from the W3C stats' seconds, through an explicit
+# `unit_exception`.
 groups:
   - id: registry.lk.device
     type: attribute_group
     display_name: LiveKit client device state
-    brief: Device conditions the host SDK observes and the core reports on change.
+    brief: Device conditions the platform observes, reported on change.
     note: >
-      The platform SDK reads the OS; the core turns changes into `lk.device.*` events. A platform
+      The platform SDK reads the OS; its changes become `lk.device.*` events. A platform
       without a source for a reading sends no event for it rather than a guess.
     attributes:
       - id: lk.device.thermal.state
@@ -205,11 +206,12 @@ groups:
     display_name: LiveKit client RTC stats
     brief: >
       One `lk.rtc.stats.sample` window per track and direction. Counters are cumulative (the last
-      W3C webrtc-stats reading, monotonic); gauges are min/max/avg over the window.
+      W3C webrtc-stats reading, monotonic); gauges are min/max/avg over the window's readings that
+      report them.
     note: >
-      Simulcast layers of one track are folded into one monotonic series before windowing. W3C
-      durations in seconds become integer milliseconds (truncated); RTT and jitter become double
-      milliseconds. A field the platform or direction lacks is omitted, never sent as 0.
+      Simulcast layers of one track are folded into one monotonic series before windowing. The
+      W3C stats report durations, RTT and jitter in seconds; these keys carry them as integer
+      milliseconds (durations) and double milliseconds (RTT, jitter). A field the platform or direction lacks is omitted, never sent as 0.
     attributes:
       - id: lk.rtc.codec
         type: string
@@ -223,15 +225,15 @@ groups:
         type: int
         stability: development
         brief: Actual length of the stats window.
-        note: From the window's start to its close, on the core's clock (the JS port uses wall-clock time).
+        note: From the window's start to its close, on a monotonic clock.
         examples: [60000]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.samples
         type: int
         stability: development
         brief: Stats readings folded into the window.
-        note: Denominator for the gauges' averages.
+        note: A gauge's `.avg` divides by the readings that reported that gauge, which can be fewer.
         examples: [2]
         annotations:
           livekit: {owner: client, sensitivity: none, unit: "{reading}"}
@@ -274,7 +276,7 @@ groups:
         note: Inbound `totalFreezesDuration`.
         examples: [0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.pause_count
         type: int
         stability: development
@@ -290,7 +292,7 @@ groups:
         note: Inbound `totalPausesDuration`.
         examples: [0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.concealed_samples
         type: int
         stability: development
@@ -330,7 +332,7 @@ groups:
         note: Inbound `totalInterruptionDuration`.
         examples: [0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.jitter_buffer_delay_ms
         type: int
         stability: development
@@ -338,7 +340,7 @@ groups:
         note: Inbound `jitterBufferDelay`. Average delay = jitter_buffer_delay_ms / jitter_buffer_emitted_count.
         examples: [1200]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.jitter_buffer_emitted_count
         type: int
         stability: development
@@ -354,7 +356,7 @@ groups:
         note: Outbound `qualityLimitationDurations.bandwidth`.
         examples: [0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.quality_limitation.cpu_ms
         type: int
         stability: development
@@ -362,7 +364,7 @@ groups:
         note: Outbound `qualityLimitationDurations.cpu`.
         examples: [0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.quality_limitation.other_ms
         type: int
         stability: development
@@ -370,7 +372,7 @@ groups:
         note: Outbound `qualityLimitationDurations.other`.
         examples: [0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.jitter_ms.min
         type: double
         stability: development
@@ -378,7 +380,7 @@ groups:
         note: Inbound `jitter` (seconds × 1000).
         examples: [0.5]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.jitter_ms.max
         type: double
         stability: development
@@ -386,15 +388,15 @@ groups:
         note: Inbound `jitter` (seconds × 1000).
         examples: [4.2]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.jitter_ms.avg
         type: double
         stability: development
         brief: Average jitter in the window, inbound.
-        note: Inbound `jitter` (seconds × 1000), averaged over `lk.rtc.samples` readings.
+        note: Inbound `jitter` (seconds × 1000), averaged over the window's readings that report it.
         examples: [1.8]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.rtt_ms.min
         type: double
         stability: development
@@ -404,7 +406,7 @@ groups:
           candidate pair's `currentRoundTripTime` (seconds × 1000).
         examples: [12.0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.rtt_ms.max
         type: double
         stability: development
@@ -412,15 +414,15 @@ groups:
         note: Same sources as `lk.rtc.rtt_ms.min`.
         examples: [80.0]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.rtt_ms.avg
         type: double
         stability: development
         brief: Average round-trip time in the window.
-        note: Same sources as `lk.rtc.rtt_ms.min`, averaged over `lk.rtc.samples` readings.
+        note: Same sources as `lk.rtc.rtt_ms.min`, averaged over the window's readings that report it.
         examples: [25.5]
         annotations:
-          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keys report milliseconds}
       - id: lk.rtc.fps.min
         type: double
         stability: development
@@ -441,7 +443,7 @@ groups:
         type: double
         stability: development
         brief: Average frame rate in the window, video.
-        note: "`framesPerSecond`, either direction, averaged over `lk.rtc.samples` readings."
+        note: "`framesPerSecond`, either direction, averaged over the window's readings that report it."
         examples: [29.7]
         annotations:
           livekit: {owner: client, sensitivity: none, unit: "{frame}/s"}
@@ -465,7 +467,7 @@ groups:
         type: double
         stability: development
         brief: Average audio level in the window, 0-1, inbound audio.
-        note: Inbound `audioLevel`, averaged over `lk.rtc.samples` readings.
+        note: Inbound `audioLevel`, averaged over the window's readings that report it.
         examples: [0.05]
         annotations:
           livekit: {owner: client, sensitivity: none, unit: "1"}
@@ -473,14 +475,14 @@ groups:
   - id: registry.lk.span
     type: attribute_group
     display_name: LiveKit client span details
-    brief: Attributes on the core's spans.
+    brief: Attributes on the LiveKit client spans.
     attributes:
       - id: lk.outcome
         stability: development
         brief: How the attempt ended. Rollups read this, never the span status.
         note: >
-          Exactly once on every LiveKit span, written by the core from how the span ended; an
-          attribute of this name set any other way is dropped. Status follows it: `Error` for
+          Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer
+          must drop an attribute of this name set any other way. Status follows it: `Error` for
           `error`, `Unset` for `ok` and `cancelled`.
         type:
           members:
