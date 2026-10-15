@@ -1,0 +1,69 @@
+# Attribute sets the client core puts on every resource / record. They exist so live-check
+# matchers (otel/live-check/weaver.toml) can compare those samples with something, which needs
+# public v2 attribute groups, hence this file's format. Reference attributes only here: define
+# keys in the v1 files, where otel/policies sees them.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.client.resource
+    visibility: public
+    stability: development
+    brief: Resource attributes of the client pipeline (one per process).
+    attributes:
+      - ref: service.name
+        requirement_level: required
+        examples: ["livekit-client-swift"]
+      - ref: service.version
+        requirement_level: required
+      - ref: os.name
+        requirement_level: recommended
+      - ref: os.version
+        requirement_level: recommended
+      - ref: device.model.identifier
+        requirement_level: recommended
+      - ref: telemetry.sdk.name
+        requirement_level: required
+        examples: ["livekit-telemetry"]
+      - ref: telemetry.sdk.language
+        requirement_level: required
+      - ref: telemetry.sdk.version
+        requirement_level: required
+      - ref: lk.sdk.name
+        requirement_level: recommended
+      - ref: lk.sdk.version
+        requirement_level: recommended
+
+  - id: livekit.client.record
+    visibility: public
+    stability: development
+    brief: Attributes the core stamps on every record and span of a session.
+    attributes:
+      - ref: session.id
+        requirement_level: required
+        note: The session's trace id, also on records outside a room.
+      - ref: otel.event.name
+        requirement_level: recommended
+        note: Duplicates the log record's `event_name` for backends that do not surface it.
+      - ref: lk.room_sid
+        requirement_level: recommended
+      - ref: lk.pii.room_name
+        requirement_level: recommended
+      - ref: lk.participant_id
+        requirement_level: recommended
+      - ref: lk.pii.participant_identity
+        requirement_level: recommended
+
+  - id: livekit.client.log
+    visibility: public
+    stability: development
+    brief: Attributes of a plain log record (no event name).
+    attributes:
+      - ref: lk.log.source
+        requirement_level: required
+      - ref: lk.log.logger
+        requirement_level: required
+      - ref: code.function.name
+        requirement_level: recommended
+      - ref: code.file.path
+        requirement_level: recommended
+      - ref: code.line.number
+        requirement_level: recommended

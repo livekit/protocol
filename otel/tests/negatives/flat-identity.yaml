@@ -1,0 +1,11 @@
+# expect: livekit_flat_identity
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.room.sid
+        type: string
+        stability: development
+        brief: Dotted shared identity.
+        annotations: {livekit: {owner: shared, sensitivity: none}}

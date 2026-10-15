@@ -1,0 +1,312 @@
+# Client signals, under the names the client core emits today (rust-sdks livekit-telemetry
+# SPEC.md). Events are OTLP log records with `event_name`; spans are one attempt each.
+groups:
+  # --- Log events -------------------------------------------------------------------------
+  - id: event.lk.ping
+    type: event
+    name: lk.ping
+    stability: development
+    brief: Pipeline smoke test. Never emitted in production paths.
+    attributes:
+      - ref: lk.ping.seq
+        requirement_level: recommended
+
+  - id: event.lk.telemetry.report
+    type: event
+    name: lk.telemetry.report
+    stability: development
+    brief: Self-telemetry, appended to the next upload after a loss, failure, refusal, capped hold or disk error, and once at shutdown.
+    attributes:
+      - ref: lk.telemetry.uploads.sent
+        requirement_level: required
+      - ref: lk.telemetry.uploads.bytes
+        requirement_level: required
+      - ref: lk.telemetry.uploads.failed
+        requirement_level: required
+      - ref: lk.telemetry.cache.batches
+        requirement_level: required
+      - ref: lk.telemetry.uploads.timeouts
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.uploads.unauthorized
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.holds.capped
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.cache.write_errors
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.queue_full
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.cache_error
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.cache_full
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.expired
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.corrupt
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.invalid
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.rejected
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.oversized
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.throttled
+        requirement_level: {conditionally_required: When non-zero.}
+      - ref: lk.telemetry.dropped.rate_limited
+        requirement_level: {conditionally_required: When non-zero.}
+
+  - id: event.lk.device.thermal.changed
+    type: event
+    name: lk.device.thermal.changed
+    stability: development
+    brief: Thermal state changed (and its initial value).
+    attributes:
+      - ref: lk.device.thermal.state
+        requirement_level: required
+
+  - id: event.lk.device.low_power.changed
+    type: event
+    name: lk.device.low_power.changed
+    stability: development
+    brief: Low Power Mode changed (and its initial value).
+    attributes:
+      - ref: lk.device.low_power.enabled
+        requirement_level: required
+
+  - id: event.lk.device.app_state.changed
+    type: event
+    name: lk.device.app_state.changed
+    stability: development
+    brief: App moved to the foreground or background (and its initial value).
+    attributes:
+      - ref: lk.device.app_state
+        requirement_level: required
+
+  - id: event.lk.device.memory.changed
+    type: event
+    name: lk.device.memory.changed
+    stability: development
+    brief: Memory pressure changed (and its initial value).
+    attributes:
+      - ref: lk.device.memory.pressure
+        requirement_level: required
+
+  - id: event.lk.device.network.changed
+    type: event
+    name: lk.device.network.changed
+    stability: development
+    brief: Network path changed (and its initial value).
+    attributes:
+      - ref: network.connection.type
+        requirement_level: required
+        note: The client also sends `vpn`, `bluetooth` and `other`, which are not upstream members.
+      - ref: lk.device.network.expensive
+        requirement_level: required
+      - ref: lk.device.network.constrained
+        requirement_level: required
+
+  - id: event.lk.device.battery.changed
+    type: event
+    name: lk.device.battery.changed
+    stability: development
+    brief: Charging changed, or the level crossed 20 % or 10 % unplugged. Never per percent.
+    attributes:
+      - ref: lk.device.battery.level
+        requirement_level: required
+      - ref: lk.device.battery.charging
+        requirement_level: required
+
+  - id: event.lk.device.audio_route.changed
+    type: event
+    name: lk.device.audio_route.changed
+    stability: development
+    brief: Audio route changed.
+    attributes:
+      - ref: lk.device.audio_route.outputs
+        requirement_level: required
+      - ref: lk.device.audio_route.reason
+        requirement_level: required
+
+  - id: event.lk.device.audio.interruption
+    type: event
+    name: lk.device.audio.interruption
+    stability: development
+    brief: Audio session interruption began or ended.
+    attributes:
+      - ref: lk.device.audio.interruption
+        requirement_level: required
+
+  - id: event.lk.device.capture.failed
+    type: event
+    name: lk.device.capture.failed
+    stability: development
+    brief: A capture device failed. Severity WARN.
+    attributes:
+      - ref: lk.device.capture.device
+        requirement_level: required
+      - ref: lk.device.capture.reason
+        requirement_level: required
+
+  - id: event.lk.rtc.stats.sample
+    type: event
+    name: lk.rtc.stats.sample
+    stability: development
+    brief: One RTC stats window for one track and direction.
+    attributes:
+      - ref: lk.track_sid
+        requirement_level: required
+      - ref: lk.track.kind
+        requirement_level: required
+      - ref: lk.track.direction
+        requirement_level: required
+      - ref: lk.rtc.codec
+        requirement_level: {conditionally_required: When known.}
+      - ref: lk.rtc.window_ms
+        requirement_level: required
+      - ref: lk.rtc.samples
+        requirement_level: required
+      - ref: lk.rtc.bytes
+        requirement_level: required
+      - ref: lk.rtc.packets
+        requirement_level: required
+      - ref: lk.rtc.packets_lost
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.freeze_count
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.freezes_duration_ms
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.pause_count
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.pauses_duration_ms
+        requirement_level: {conditionally_required: Inbound video.}
+      - ref: lk.rtc.concealed_samples
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.silent_concealed_samples
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.concealment_events
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.interruption_count
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.interruptions_duration_ms
+        requirement_level: {conditionally_required: Inbound audio.}
+      - ref: lk.rtc.jitter_buffer_delay_ms
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.jitter_buffer_emitted_count
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.quality_limitation.bandwidth_ms
+        requirement_level: {conditionally_required: Outbound video.}
+      - ref: lk.rtc.quality_limitation.cpu_ms
+        requirement_level: {conditionally_required: Outbound video.}
+      - ref: lk.rtc.quality_limitation.other_ms
+        requirement_level: {conditionally_required: Outbound video.}
+      - ref: lk.rtc.jitter_ms.min
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.jitter_ms.max
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.jitter_ms.avg
+        requirement_level: {conditionally_required: Inbound.}
+      - ref: lk.rtc.rtt_ms.min
+        requirement_level: recommended
+      - ref: lk.rtc.rtt_ms.max
+        requirement_level: recommended
+      - ref: lk.rtc.rtt_ms.avg
+        requirement_level: recommended
+      - ref: lk.rtc.fps.min
+        requirement_level: {conditionally_required: Video.}
+      - ref: lk.rtc.fps.max
+        requirement_level: {conditionally_required: Video.}
+      - ref: lk.rtc.fps.avg
+        requirement_level: {conditionally_required: Video.}
+      - ref: lk.rtc.audio_level.min
+        requirement_level: {conditionally_required: Audio.}
+      - ref: lk.rtc.audio_level.max
+        requirement_level: {conditionally_required: Audio.}
+      - ref: lk.rtc.audio_level.avg
+        requirement_level: {conditionally_required: Audio.}
+
+  - id: event.lk.room.disconnected
+    type: event
+    name: lk.room.disconnected
+    stability: development
+    brief: The Room left connected for good (never on a reconnect). INFO when the client hung up, WARN otherwise.
+    attributes:
+      - ref: lk.disconnect.reason
+        requirement_level: required
+
+  - id: event.custom
+    type: event
+    name: custom
+    stability: development
+    brief: Namespace of app-defined events. The core emits `custom.<name>` with the app's own attributes.
+    note: App attribute keys may not use `lk.*`, `otel.*` or `session.id`.
+
+  # --- Spans: one attempt at an operation; checkpoints are span events ---------------------
+  - id: span.lk.connect
+    type: span
+    span_kind: client
+    stability: development
+    brief: One connect attempt.
+    note: >
+      Checkpoints, in order: ws_open, signal, join_recv, pc_created (required on every platform),
+      then engine, pc_connected, offer_sent, answer_sent, room_connected (best effort).
+    attributes:
+      - ref: lk.connect.attempt
+        requirement_level: required
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: When `lk.outcome` is `error`.}
+
+  - id: span.lk.reconnect
+    type: span
+    span_kind: client
+    stability: development
+    brief: One reconnect cycle.
+    note: Checkpoints are named `attempt <n> <mode>`, one per attempt (dynamic; open decision).
+    attributes:
+      - ref: lk.reconnect.reason
+        requirement_level: required
+      - ref: lk.reconnect.mode
+        requirement_level: {conditionally_required: After the first attempt.}
+      - ref: lk.reconnect.attempts
+        requirement_level: {conditionally_required: After the first attempt.}
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: When `lk.outcome` is `error`.}
+
+  - id: span.lk.publish
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One track publish.
+    attributes:
+      - ref: lk.track.kind
+        requirement_level: required
+      - ref: lk.track.source
+        requirement_level: required
+      - ref: lk.track_sid
+        requirement_level: {conditionally_required: On success.}
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: When `lk.outcome` is `error`.}
+
+  - id: span.lk.subscribe
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One subscription, from the intent to subscribe to the first media (or timed_out after 30 s).
+    note: "Checkpoints: subscribed, first_media."
+    attributes:
+      - ref: lk.track_sid
+        requirement_level: required
+      - ref: lk.track.kind
+        requirement_level: required
+      - ref: lk.track.source
+        requirement_level: required
+      - ref: lk.pii.remote_participant_identity
+        requirement_level: recommended
+      - ref: lk.outcome
+        requirement_level: required
+      - ref: error.type
+        requirement_level: {conditionally_required: When `lk.outcome` is `error`.}

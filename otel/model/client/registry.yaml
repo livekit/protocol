@@ -1,0 +1,654 @@
+# Client-owned attributes, under the names the client core emits today (rust-sdks
+# livekit-telemetry SPEC.md). The Client team approves changes here alone, unless one touches
+# a shared concept (otel/model/shared). Durations and RTT/jitter in RTC stats stay in ms, the
+# W3C webrtc-stats unit, through an explicit `unit_exception`.
+groups:
+  - id: registry.lk.device
+    type: attribute_group
+    display_name: LiveKit client device state
+    brief: Device conditions the host SDK observes and the core reports on change.
+    attributes:
+      - id: lk.device.thermal.state
+        stability: development
+        brief: Thermal pressure as the OS reports it.
+        note: The platform's `unknown` is no reading and is never emitted.
+        type:
+          members:
+            - {id: nominal, value: nominal, brief: No thermal pressure., stability: development}
+            - {id: fair, value: fair, brief: Slightly elevated., stability: development}
+            - {id: serious, value: serious, brief: High; the core doubles its cadence., stability: development}
+            - {id: critical, value: critical, brief: Critical; the core quadruples its cadence., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.low_power.enabled
+        type: boolean
+        stability: development
+        brief: Low Power Mode / Battery Saver is on.
+        examples: [true]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.app_state
+        stability: development
+        brief: Whether the app is in front of the user.
+        type:
+          members:
+            - {id: foreground, value: foreground, brief: In front of the user., stability: development}
+            - {id: background, value: background, brief: In the background; forces a flush., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.memory.pressure
+        stability: development
+        brief: Memory pressure as the OS reports it.
+        note: "Android `onTrimMemory`: RUNNING_LOW/BACKGROUND map to `warning`, RUNNING_CRITICAL/COMPLETE to `critical`."
+        type:
+          members:
+            - {id: normal, value: normal, brief: No pressure., stability: development}
+            - {id: warning, value: warning, brief: Low memory., stability: development}
+            - {id: critical, value: critical, brief: Critically low memory., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.network.expensive
+        type: boolean
+        stability: development
+        brief: The network is metered (cellular, personal hotspot).
+        examples: [false]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.network.constrained
+        type: boolean
+        stability: development
+        brief: The user asked for less traffic (Low Data Mode, Data Saver).
+        examples: [false]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.battery.level
+        type: int
+        stability: development
+        brief: Battery charge in percent, 0-100.
+        note: SPEC.md specifies OTel `hw.battery.charge` (ratio 0-1) instead; the code ships this key. Open decision.
+        examples: [42]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "%"}
+      - id: lk.device.battery.charging
+        type: boolean
+        stability: development
+        brief: The device is charging.
+        note: SPEC.md specifies OTel `hw.battery.state` instead; the code ships this key. Open decision.
+        examples: [false]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.audio_route.reason
+        stability: development
+        brief: Why the audio route changed (AVAudioSession route change reasons).
+        type:
+          members:
+            - {id: new_device, value: new_device, brief: A new output became available., stability: development}
+            - {id: old_device_unavailable, value: old_device_unavailable, brief: The previous output went away., stability: development}
+            - {id: category_change, value: category_change, brief: The audio session category changed., stability: development}
+            - {id: override, value: override, brief: The route was overridden., stability: development}
+            - {id: wake_from_sleep, value: wake_from_sleep, brief: The device woke from sleep., stability: development}
+            - {id: no_suitable_route, value: no_suitable_route, brief: No route fits the category., stability: development}
+            - {id: route_configuration_change, value: route_configuration_change, brief: The route's configuration changed., stability: development}
+            - {id: unknown, value: unknown, brief: The platform gave no reason., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.audio_route.outputs
+        type: string
+        stability: development
+        brief: >
+          Comma-separated active outputs, each one of speaker, receiver, wired_headset, bluetooth,
+          car_audio, air_play, hdmi, usb, other.
+        examples: ["bluetooth", "speaker,usb"]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.audio.interruption
+        stability: development
+        brief: Phase of an audio session interruption.
+        type:
+          members:
+            - {id: began, value: began, brief: Interruption began., stability: development}
+            - {id: ended, value: ended, brief: Interruption ended., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.capture.device
+        stability: development
+        brief: Capture device that failed.
+        type:
+          members:
+            - {id: camera, value: camera, brief: Camera., stability: development}
+            - {id: microphone, value: microphone, brief: Microphone., stability: development}
+            - {id: screen_share, value: screen_share, brief: Screen capture., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.device.capture.reason
+        stability: development
+        brief: Why capture failed (the getUserMedia failure taxonomy).
+        type:
+          members:
+            - {id: permission_denied, value: permission_denied, brief: The user or OS denied access., stability: development}
+            - {id: not_found, value: not_found, brief: No such device., stability: development}
+            - {id: in_use, value: in_use, brief: Another app holds the device., stability: development}
+            - {id: disconnected, value: disconnected, brief: The device went away., stability: development}
+            - {id: other, value: other, brief: Anything else., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+
+  - id: registry.lk.track
+    type: attribute_group
+    display_name: LiveKit client track details
+    brief: Track details on publish/subscribe spans and RTC stats. The track SID is shared (`lk.track_sid`).
+    attributes:
+      - id: lk.track.kind
+        stability: development
+        brief: Media kind of the track.
+        type:
+          members:
+            - {id: audio, value: audio, brief: Audio., stability: development}
+            - {id: video, value: video, brief: Video., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.track.source
+        stability: development
+        brief: Source of the track (the protocol's TrackSource, snake_case).
+        type:
+          members:
+            - {id: camera, value: camera, brief: Camera., stability: development}
+            - {id: microphone, value: microphone, brief: Microphone., stability: development}
+            - {id: screen_share, value: screen_share, brief: Screen share video., stability: development}
+            - {id: screen_share_audio, value: screen_share_audio, brief: Screen share audio., stability: development}
+            - {id: unknown, value: unknown, brief: Unknown source., stability: development}
+        annotations:
+          livekit:
+            owner: client
+            sensitivity: none
+            bindings:
+              agents_otlp: lk.track_source # values are the FFI enum names, e.g. SOURCE_MICROPHONE
+      - id: lk.track.direction
+        stability: development
+        brief: Whether the stats describe sent or received media.
+        type:
+          members:
+            - {id: inbound, value: inbound, brief: Received media., stability: development}
+            - {id: outbound, value: outbound, brief: Sent media., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+
+  - id: registry.lk.rtc
+    type: attribute_group
+    display_name: LiveKit client RTC stats
+    brief: >
+      One `lk.rtc.stats.sample` window per track and direction. Counters are cumulative (the last
+      W3C webrtc-stats reading, monotonic); gauges are min/max/avg over the window.
+    attributes:
+      - id: lk.rtc.codec
+        type: string
+        stability: development
+        brief: Codec mimeType, when known.
+        examples: ["audio/opus", "video/VP8"]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.rtc.window_ms
+        type: int
+        stability: development
+        brief: Actual length of the stats window.
+        examples: [60000]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.samples
+        type: int
+        stability: development
+        brief: Stats readings in the window.
+        examples: [2]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{reading}"}
+      - id: lk.rtc.bytes
+        type: int
+        stability: development
+        brief: Bytes sent or received (cumulative).
+        examples: [1048576]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: By}
+      - id: lk.rtc.packets
+        type: int
+        stability: development
+        brief: Packets sent or received (cumulative).
+        examples: [3000]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{packet}"}
+      - id: lk.rtc.packets_lost
+        type: int
+        stability: development
+        brief: Packets lost, inbound (cumulative).
+        examples: [3]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{packet}"}
+      - id: lk.rtc.freeze_count
+        type: int
+        stability: development
+        brief: Video freezes, inbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{freeze}"}
+      - id: lk.rtc.freezes_duration_ms
+        type: int
+        stability: development
+        brief: Total freeze time, inbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.pause_count
+        type: int
+        stability: development
+        brief: Video pauses, inbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{pause}"}
+      - id: lk.rtc.pauses_duration_ms
+        type: int
+        stability: development
+        brief: Total pause time, inbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.concealed_samples
+        type: int
+        stability: development
+        brief: Concealed audio samples, inbound audio (cumulative).
+        examples: [480]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{sample}"}
+      - id: lk.rtc.silent_concealed_samples
+        type: int
+        stability: development
+        brief: Concealed samples that were silent, inbound audio (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{sample}"}
+      - id: lk.rtc.concealment_events
+        type: int
+        stability: development
+        brief: Concealment events, inbound audio (cumulative).
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{event}"}
+      - id: lk.rtc.interruption_count
+        type: int
+        stability: development
+        brief: Audio interruptions, inbound audio (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{interruption}"}
+      - id: lk.rtc.interruptions_duration_ms
+        type: int
+        stability: development
+        brief: Total interruption time, inbound audio (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.jitter_buffer_delay_ms
+        type: int
+        stability: development
+        brief: Jitter buffer delay, inbound (cumulative).
+        examples: [1200]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.jitter_buffer_emitted_count
+        type: int
+        stability: development
+        brief: Samples or frames emitted by the jitter buffer, inbound (cumulative).
+        examples: [48000]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{sample}"}
+      - id: lk.rtc.quality_limitation.bandwidth_ms
+        type: int
+        stability: development
+        brief: Time the encoder was limited by bandwidth, outbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.quality_limitation.cpu_ms
+        type: int
+        stability: development
+        brief: Time the encoder was limited by CPU, outbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.quality_limitation.other_ms
+        type: int
+        stability: development
+        brief: Time the encoder was limited for other reasons, outbound video (cumulative).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.jitter_ms.min
+        type: double
+        stability: development
+        brief: Minimum jitter in the window.
+        examples: [0.5]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.jitter_ms.max
+        type: double
+        stability: development
+        brief: Maximum jitter in the window.
+        examples: [4.2]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.jitter_ms.avg
+        type: double
+        stability: development
+        brief: Average jitter in the window.
+        examples: [1.8]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.rtt_ms.min
+        type: double
+        stability: development
+        brief: Minimum round-trip time in the window (remote-inbound for outbound, candidate pair for inbound).
+        examples: [12.0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.rtt_ms.max
+        type: double
+        stability: development
+        brief: Maximum round-trip time in the window.
+        examples: [80.0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.rtt_ms.avg
+        type: double
+        stability: development
+        brief: Average round-trip time in the window.
+        examples: [25.5]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: ms, unit_exception: RTC stats keep webrtc-stats milliseconds}
+      - id: lk.rtc.fps.min
+        type: double
+        stability: development
+        brief: Minimum frame rate in the window, video.
+        examples: [24.0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{frame}/s"}
+      - id: lk.rtc.fps.max
+        type: double
+        stability: development
+        brief: Maximum frame rate in the window, video.
+        examples: [30.0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{frame}/s"}
+      - id: lk.rtc.fps.avg
+        type: double
+        stability: development
+        brief: Average frame rate in the window, video.
+        examples: [29.7]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{frame}/s"}
+      - id: lk.rtc.audio_level.min
+        type: double
+        stability: development
+        brief: Minimum audio level in the window, 0-1, audio.
+        examples: [0.0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "1"}
+      - id: lk.rtc.audio_level.max
+        type: double
+        stability: development
+        brief: Maximum audio level in the window, 0-1, audio.
+        examples: [0.3]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "1"}
+      - id: lk.rtc.audio_level.avg
+        type: double
+        stability: development
+        brief: Average audio level in the window, 0-1, audio.
+        examples: [0.05]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "1"}
+
+  - id: registry.lk.span
+    type: attribute_group
+    display_name: LiveKit client span details
+    brief: Attributes on the core's spans.
+    attributes:
+      - id: lk.outcome
+        stability: development
+        brief: How the attempt ended. Always present on a span; rollups read this, never the span status.
+        note: The Notion conventions name `lk.client.connection.result` (success|failure|cancelled) for connects only. Open decision.
+        type:
+          members:
+            - {id: ok, value: ok, brief: Succeeded., stability: development}
+            - {id: error, value: error, brief: Failed; `error.type` names why., stability: development}
+            - {id: cancelled, value: cancelled, brief: Cancelled by the caller or a newer attempt., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.connect.attempt
+        type: int
+        stability: development
+        brief: 1-based connect attempt; 1 is the user-initiated connect.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.reconnect.reason
+        stability: development
+        brief: What triggered the reconnect cycle (the protocol's ReconnectReason, plus client-only reasons).
+        type:
+          members:
+            - {id: signal_disconnected, value: signal_disconnected, brief: The signaling socket closed., stability: development}
+            - {id: publisher_failed, value: publisher_failed, brief: The publisher peer connection failed., stability: development}
+            - {id: subscriber_failed, value: subscriber_failed, brief: The subscriber peer connection failed., stability: development}
+            - {id: transport_failed, value: transport_failed, brief: A peer connection failed; the platform did not say which., stability: development}
+            - {id: switch_candidate, value: switch_candidate, brief: The server asked for a candidate switch., stability: development}
+            - {id: network_changed, value: network_changed, brief: The device moved to another network., stability: development}
+            - {id: debug, value: debug, brief: A test or debug menu asked for it., stability: development}
+            - {id: unknown, value: unknown, brief: Unknown reason., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.reconnect.mode
+        stability: development
+        brief: Mode of the last reconnect attempt.
+        type:
+          members:
+            - {id: quick, value: quick, brief: ICE restart / resume., stability: development}
+            - {id: full, value: full, brief: Full reconnect., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.reconnect.attempts
+        type: int
+        stability: development
+        brief: Reconnect attempts made in the cycle.
+        examples: [2]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+
+  - id: registry.lk.session
+    type: attribute_group
+    display_name: LiveKit client session
+    brief: Session lifecycle attributes.
+    attributes:
+      - id: lk.disconnect.reason
+        stability: development
+        brief: Why the session ended (the protocol's DisconnectReason, plus the client giving up).
+        type:
+          members:
+            - {id: client_initiated, value: client_initiated, brief: The client hung up., stability: development}
+            - {id: duplicate_identity, value: duplicate_identity, brief: Another participant joined with the same identity., stability: development}
+            - {id: server_shutdown, value: server_shutdown, brief: The server shut down., stability: development}
+            - {id: participant_removed, value: participant_removed, brief: The participant was removed., stability: development}
+            - {id: room_deleted, value: room_deleted, brief: The room was deleted., stability: development}
+            - {id: state_mismatch, value: state_mismatch, brief: Client and server state diverged., stability: development}
+            - {id: join_failure, value: join_failure, brief: The join failed., stability: development}
+            - {id: migration, value: migration, brief: The session migrated., stability: development}
+            - {id: signal_close, value: signal_close, brief: The signaling connection closed., stability: development}
+            - {id: room_closed, value: room_closed, brief: The room closed., stability: development}
+            - {id: user_unavailable, value: user_unavailable, brief: SIP callee unavailable., stability: development}
+            - {id: user_rejected, value: user_rejected, brief: SIP callee rejected the call., stability: development}
+            - {id: sip_trunk_failure, value: sip_trunk_failure, brief: SIP trunk failure., stability: development}
+            - {id: connection_timeout, value: connection_timeout, brief: The connection timed out., stability: development}
+            - {id: media_failure, value: media_failure, brief: Media failed., stability: development}
+            - {id: agent_error, value: agent_error, brief: The agent failed., stability: development}
+            - {id: reconnect_failed, value: reconnect_failed, brief: The reconnect policy ran out of attempts., stability: development}
+            - {id: unknown, value: unknown, brief: Unknown reason., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+
+  - id: registry.lk.log
+    type: attribute_group
+    display_name: LiveKit client log records
+    brief: Attributes on plain log records (no event name).
+    attributes:
+      - id: lk.log.source
+        stability: development
+        brief: Which layer wrote the log line.
+        type:
+          members:
+            - {id: sdk, value: sdk, brief: The platform SDK., stability: development}
+            - {id: ffi, value: ffi, brief: The Rust core., stability: development}
+            - {id: webrtc, value: webrtc, brief: WebRTC., stability: development}
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.log.logger
+        type: string
+        stability: development
+        brief: Logger, type, module or file that wrote the line.
+        examples: ["Room", "livekit::rtc_engine"]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+
+  - id: registry.lk.telemetry
+    type: attribute_group
+    display_name: LiveKit client self-telemetry
+    brief: Counters on `lk.telemetry.report`, counted since the previous report.
+    attributes:
+      - id: lk.ping.seq
+        type: int
+        stability: development
+        brief: Monotonically increasing sequence number per pipeline.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none}
+      - id: lk.telemetry.uploads.sent
+        type: int
+        stability: development
+        brief: Batches the collector accepted.
+        examples: [4]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{batch}"}
+      - id: lk.telemetry.uploads.bytes
+        type: int
+        stability: development
+        brief: Compressed bytes the collector accepted.
+        examples: [20480]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: By}
+      - id: lk.telemetry.uploads.failed
+        type: int
+        stability: development
+        brief: Upload attempts that failed transiently (no answer, 429, 5xx).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{attempt}"}
+      - id: lk.telemetry.uploads.timeouts
+        type: int
+        stability: development
+        brief: Upload attempts that hit the export timeout.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{attempt}"}
+      - id: lk.telemetry.uploads.unauthorized
+        type: int
+        stability: development
+        brief: 401/403 answers (tokens the collector refused).
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{attempt}"}
+      - id: lk.telemetry.holds.capped
+        type: int
+        stability: development
+        brief: Soft upload holds that reached the 60 s cap.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{hold}"}
+      - id: lk.telemetry.cache.batches
+        type: int
+        stability: development
+        brief: Batches waiting in the cache now (a gauge).
+        examples: [0]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{batch}"}
+      - id: lk.telemetry.cache.write_errors
+        type: int
+        stability: development
+        brief: Batches the disk refused, kept in memory.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{batch}"}
+      - id: lk.telemetry.dropped.queue_full
+        type: int
+        stability: development
+        brief: Records evicted from the in-memory queue.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.cache_error
+        type: int
+        stability: development
+        brief: Records no cache, not even memory, could take.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.cache_full
+        type: int
+        stability: development
+        brief: Records evicted by the cache's size or file-count bound.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.expired
+        type: int
+        stability: development
+        brief: Records in batches past the 24 h age limit.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.corrupt
+        type: int
+        stability: development
+        brief: Records in cached batches that failed their CRC.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.invalid
+        type: int
+        stability: development
+        brief: Custom events or attributes over the limits (rejected).
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.rejected
+        type: int
+        stability: development
+        brief: Records the collector rejected (final 4xx/5xx, partial success).
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.oversized
+        type: int
+        stability: development
+        brief: Single records larger than the collector accepts (413).
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.throttled
+        type: int
+        stability: development
+        brief: Records evicted from the cache during a server-directed pause.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}
+      - id: lk.telemetry.dropped.rate_limited
+        type: int
+        stability: development
+        brief: Discrete events dropped by the flood guard.
+        examples: [1]
+        annotations:
+          livekit: {owner: client, sensitivity: none, unit: "{record}"}

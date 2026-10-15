@@ -1,0 +1,108 @@
+# Shared vocabulary: a change here needs Client + Agents + Observability review.
+# Upstream OTel keys (service.*, os.*, device.*, network.*, error.type, session.id, code.*)
+# are referenced with `ref:` where used, never redefined here.
+groups:
+  - id: registry.lk.identity
+    type: attribute_group
+    display_name: LiveKit shared identity
+    brief: Cross-producer identity keys. Flat `lk.<entity>_<field>`, never `lk.<entity>.sid`.
+    attributes:
+      - id: lk.room_sid
+        type: string
+        stability: development
+        brief: Server-assigned room session SID (`RM_...`).
+        note: Omit before join. High cardinality, never a default metric dimension.
+        examples: ["RM_5Fq8xQ2ZbXwN"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            authority: cloud
+            # Physical name per producer/store. Weaver carries these; nothing validates them.
+            bindings:
+              agents_otlp: [lk.room_sid, room_id] # spans | resource + metric points
+              collector_column: room_id # materialized from attribute room_id|roomID only
+              roomobs: room_session.id # TBC by Observability
+      - id: lk.participant_id
+        type: string
+        stability: development
+        brief: Server-assigned participant SID (`PA_...`).
+        note: High cardinality, never a default metric dimension.
+        examples: ["PA_9kLm2NpQ4rTs"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none, authority: cloud}
+      - id: lk.track_sid
+        type: string
+        stability: development
+        brief: Server-assigned track SID (`TR_...`).
+        note: High cardinality, never a default metric dimension.
+        examples: ["TR_AMkTyV3Zx8Qp"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none, authority: cloud}
+      - id: lk.job_id
+        type: string
+        stability: development
+        brief: Agent job ID (`AJ_...`).
+        note: High cardinality; Agents' job-scoped metrics are the one exception.
+        examples: ["AJ_kVbMBWtnVHvT"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            authority: cloud
+            bindings:
+              agents_otlp: [lk.job_id, job_id] # spans | resource + metric points
+              collector_column: none # only agents_rollup has job_id, fed outside OTLP
+
+  - id: registry.lk.pii
+    type: attribute_group
+    display_name: LiveKit PII
+    brief: >
+      Customer-supplied values. The `pii` key segment is the collector's redaction contract
+      (agents-private pii-redaction/redact `(^|\.)pii(\.|$)`): a key without it is never redacted.
+    attributes:
+      - id: lk.pii.room_name
+        type: string
+        stability: development
+        brief: Customer-supplied room name.
+        examples: ["my-room"]
+        annotations:
+          livekit: {owner: shared, sensitivity: pii}
+      - id: lk.pii.participant_identity
+        type: string
+        stability: development
+        brief: Customer-supplied identity of the local participant.
+        examples: ["identity-0"]
+        annotations:
+          livekit: {owner: shared, sensitivity: pii}
+      - id: lk.pii.remote_participant_identity
+        type: string
+        stability: development
+        brief: Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe).
+        note: Name TBD, needs sign-off; the Notion conventions name no key for it.
+        examples: ["identity-1"]
+        annotations:
+          livekit: {owner: shared, sensitivity: pii}
+
+  - id: registry.lk.sdk
+    type: attribute_group
+    display_name: LiveKit SDK identity
+    brief: Which LiveKit SDK produced the telemetry. Resource attributes, next to OTel `service.*`.
+    note: >
+      `service.name` names the producer (`livekit-client-swift`); `telemetry.sdk.*` stays reserved
+      for the OTel-level library (`livekit-telemetry`).
+    attributes:
+      - id: lk.sdk.name
+        type: string
+        stability: development
+        brief: LiveKit SDK name.
+        examples: ["swift", "android", "flutter", "react-native", "unity", "rust", "js"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none}
+      - id: lk.sdk.version
+        type: string
+        stability: development
+        brief: LiveKit SDK version.
+        examples: ["2.17.0"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none}
