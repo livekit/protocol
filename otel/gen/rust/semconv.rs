@@ -2,7 +2,7 @@
 //! LiveKit telemetry semantic conventions.
 
 /// Telemetry schema version; set as `schema_url` on every OTLP scope.
-pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.2.1";
+pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.3.0";
 
 /// Browser name.
 pub const BROWSER_NAME: &str = "browser.name";

@@ -99,8 +99,8 @@ column. It is versioned independently of the protocol package.
 Every PR that changes `model/` bumps it: CI fails unless the version at the end of `schema_url`
 (MAJOR.MINOR.PATCH) is strictly higher than the base branch's (`tests/schema-bump.sh`; a comment
 or quotes on an unchanged URL, or a downgrade, do not count). While the
-registry is `0.x`, bump the minor version for added, renamed or removed keys, events or spans, and
-the patch version for documentation-only changes. To rename a key that has shipped, keep the old
+registry is `0.x`, bump the minor version for added, renamed or removed keys, events or spans and
+for changed types or requirement levels, and the patch version for documentation-only changes. To rename a key that has shipped, keep the old
 key with `deprecated: {reason: renamed, renamed_to: <new key>}` instead of deleting it;
 `weaver registry diff` and live-check both report the rename.
 

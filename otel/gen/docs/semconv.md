@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.2.1`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.3.0`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -202,16 +202,16 @@ Memory pressure changed. Sent once with the initial reading, then on each change
 
 ### `lk.device.network.changed`
 
-The network path changed. Sent once with the initial state, then when any of its attributes changes. iOS, macOS and Android; on the web, Chromium only.
+The network path changed. Sent once with the initial state, then when any of its attributes changes. All platforms. A platform that cannot read the connection's details (a browser without the Network Information API) sends only `network.connection.type`, as `unknown` or `unavailable`.
 
 - Severity: `INFO`
 - Body: Display line, e.g. `network: cell, expensive` (Rust core); the event name (JS port).
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.device.network.constrained` | boolean | Required | The user asked for less traffic (Low Data Mode, Data Saver). Apple `NWPath.isConstrained`, Android Data Saver, web `navigator.connection.saveData`. |
-| `lk.device.network.expensive` | boolean | Required | The network is metered (cellular, personal hotspot). Apple `NWPath.isExpensive`, Android metered networks; web Chromium only. |
 | `network.connection.type` | enum | Required | The internet connection type. Clients also send `vpn`, `bluetooth` and `other`, which are not OTel members; `unknown` when the platform cannot tell, `unavailable` when offline. |
+| `lk.device.network.constrained` | boolean | Conditionally required: When the platform reports it. | The user asked for less traffic (Low Data Mode, Data Saver). Apple `NWPath.isConstrained`, Android Data Saver; on the web `navigator.connection.saveData`, only where the Network Information API exists. |
+| `lk.device.network.expensive` | boolean | Conditionally required: When the platform reports it. | The network is metered (cellular, personal hotspot). Apple `NWPath.isExpensive`, Android metered networks; on the web only where the Network Information API exists. |
 
 ### `lk.device.thermal.changed`
 

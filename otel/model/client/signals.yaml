@@ -142,8 +142,9 @@ groups:
     stability: development
     brief: The network path changed.
     note: >
-      Sent once with the initial state, then when any of its attributes changes. iOS, macOS and
-      Android; on the web, Chromium only.
+      Sent once with the initial state, then when any of its attributes changes. All platforms. A
+      platform that cannot read the connection's details (a browser without the Network
+      Information API) sends only `network.connection.type`, as `unknown` or `unavailable`.
     annotations:
       livekit: {severity: [INFO], body: "Display line, e.g. `network: cell, expensive` (Rust core); the event name (JS port)."}
     attributes:
@@ -154,9 +155,9 @@ groups:
           when the platform cannot tell, `unavailable` when offline.
         examples: ["wifi", "cell"]
       - ref: lk.device.network.expensive
-        requirement_level: required
+        requirement_level: {conditionally_required: When the platform reports it.}
       - ref: lk.device.network.constrained
-        requirement_level: required
+        requirement_level: {conditionally_required: When the platform reports it.}
 
   - id: event.lk.device.battery.changed
     type: event

@@ -62,7 +62,7 @@ groups:
         type: boolean
         stability: development
         brief: The network is metered (cellular, personal hotspot).
-        note: Apple `NWPath.isExpensive`, Android metered networks; web Chromium only.
+        note: Apple `NWPath.isExpensive`, Android metered networks; on the web only where the Network Information API exists.
         examples: [false]
         annotations:
           livekit: {owner: client, sensitivity: none}
@@ -70,7 +70,7 @@ groups:
         type: boolean
         stability: development
         brief: The user asked for less traffic (Low Data Mode, Data Saver).
-        note: Apple `NWPath.isConstrained`, Android Data Saver, web `navigator.connection.saveData`.
+        note: Apple `NWPath.isConstrained`, Android Data Saver; on the web `navigator.connection.saveData`, only where the Network Information API exists.
         examples: [false]
         annotations:
           livekit: {owner: client, sensitivity: none}
