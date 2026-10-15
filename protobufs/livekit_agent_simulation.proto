@@ -81,10 +81,18 @@ message SimulationRun {
     // 1-based sample of that scenario within the run; always 1 when the run's
     // samples is 1.
     int32 sample = 16;
+    // Set on a failed job whose cause is known; error stays the detail.
+    FailureReason failure_reason = 19;
 
     message Usage {
       int32 text_turns_count = 1;
       int32 audio_turns_count = 2;
+    }
+
+    enum FailureReason {
+      FAILURE_REASON_UNSPECIFIED = 0;
+      // The agent under test never joined the simulation's room.
+      FAILURE_REASON_AGENT_JOIN_TIMEOUT = 1;
     }
   }
 
