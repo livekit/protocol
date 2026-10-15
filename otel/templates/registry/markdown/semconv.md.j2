@@ -16,7 +16,7 @@ Schema: `{{ ctx.schema_url }}`. Upstream OTel keys (OTel semconv v1.44.0) are re
 
 | Key | Type | Owner | Sensitivity | Unit | Description |
 | --- | --- | --- | --- | --- | --- |
-{% for a in ctx.attributes %}| `{{ a.key }}` | {% if a.type is mapping %}enum: {% for m in a.type.members %}`{{ m.value }}`{% if not loop.last %}, {% endif %}{% endfor %}{% else %}{{ a.type }}{% endif %} | {{ a.annotations.livekit.owner }} | {{ a.annotations.livekit.sensitivity }} | {% if a.annotations.livekit.unit %}`{{ a.annotations.livekit.unit }}`{% if a.annotations.livekit.unit_exception %} (exception: {{ a.annotations.livekit.unit_exception }}){% endif %}{% endif %} | {{ a.brief | trim | replace("\n", " ") | replace("|", "\\|") }}{% if a.note %} {{ a.note | trim | replace("\n", " ") | replace("|", "\\|") }}{% endif %} |
+{% for a in ctx.attributes %}| `{{ a.key }}` | {% if a.type is mapping %}enum: {% for m in a.type.members %}`{{ m.value | replace("\r", " ") | replace("\n", " ") | replace("|", "\\|") }}`{% if not loop.last %}, {% endif %}{% endfor %}{% else %}{{ a.type }}{% endif %} | {{ a.annotations.livekit.owner }} | {{ a.annotations.livekit.sensitivity }} | {% if a.annotations.livekit.unit %}`{{ a.annotations.livekit.unit }}`{% if a.annotations.livekit.unit_exception %} (exception: {{ a.annotations.livekit.unit_exception }}){% endif %}{% endif %} | {{ a.brief | trim | replace("\n", " ") | replace("|", "\\|") }}{% if a.note %} {{ a.note | trim | replace("\n", " ") | replace("|", "\\|") }}{% endif %} |
 {% endfor %}
 ## Bindings
 

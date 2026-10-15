@@ -22,7 +22,7 @@ Agents-owned keys are not registered yet.
 | `templates/registry/{rust,typescript,markdown}/` | Codegen templates |
 | `gen/` | Generated outputs, committed: `rust/semconv.rs`, `ts/semconv.ts`, `docs/semconv.md` |
 | `live-check/` | Live-check config, advice rules and the OTLP/JSON converter |
-| `tests/` | Policy negatives, live-check smoke sample, schema-version rule |
+| `tests/` | Policy negatives, live-check samples, codegen escaping, schema-version rule |
 
 The generated docs, [`gen/docs/semconv.md`](gen/docs/semconv.md), list every key with its type,
 owner, sensitivity and unit.
@@ -96,7 +96,8 @@ not-yet-stable `definition/2` format.
 otel/check.sh                          # registry + LiveKit policies, then advice
 otel/tests/negatives.sh                # each negative fixture fails with its named finding
 otel/generate.sh && git status otel/gen   # regenerate; no diff expected
-otel/tests/live-check.sh               # smoke sample clean, legacy keys flagged
+otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged
+otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc and tsc
 otel/tests/schema-bump.sh origin/main  # schema_url version strictly higher if model/ changed
 otel/tests/schema-bump-test.sh         # that rule, against comment-only changes and downgrades
 

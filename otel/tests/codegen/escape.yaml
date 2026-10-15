@@ -1,0 +1,18 @@
+# A value and docs no generated literal or comment may break. tests/codegen.sh round-trips the
+# value through rustc and tsc+node; keep it in sync with `want` there.
+groups:
+  - id: registry.lk.codegen_test
+    type: attribute_group
+    brief: Codegen fixture.
+    attributes:
+      - id: lk.test.escape
+        stability: development
+        brief: Docs that end a block comment */ and say "quoted" \ things.
+        type:
+          members:
+            - id: tricky
+              value: "a \"quoted\" back\\slash, 'single', </tag> & */ tab\tnew\nline"
+              brief: "Member docs with */ and a\nsecond line."
+              stability: development
+        annotations:
+          livekit: {owner: client, sensitivity: none}

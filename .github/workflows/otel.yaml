@@ -56,6 +56,9 @@ jobs:
           rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir "$RUNNER_TEMP"
           npx --yes -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
 
+      - name: Codegen escapes literals (round-trip through rustc and tsc)
+        run: otel/tests/codegen.sh
+
       - name: Live-check the smoke sample
         run: otel/tests/live-check.sh
 
