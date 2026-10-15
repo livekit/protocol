@@ -57,28 +57,53 @@ declared(field) := object.get(input, ["registry_group", "annotations", "livekit"
 
 span_attr(key) := [a.value | some a in input.sample.span.attributes; a.name == key]
 
-# A span event must be one of the span's checkpoints or match its checkpoint pattern.
+# A span event must be one of the span's checkpoints, or match a pattern the span declares.
+matches_declared_pattern(name) if {
+	pattern := object.get(input, ["registry_group", "annotations", "livekit", "checkpoint_pattern", "pattern"], null)
+	is_string(pattern)
+	regex.match(pattern, name)
+}
+
 deny contains lk_advice("livekit_checkpoint", {"span_name": span.name, "checkpoint": name}, sprintf("span '%s' has checkpoint '%s', which otel/model does not list for it", [span.name, name])) if {
 	span := input.sample.span
 	declared("checkpoints") != null
 	some event in span.span_events
 	name := event.name
 	not name in {c.name | some c in declared("checkpoints")}
-	not regex.match(object.get(input, ["registry_group", "annotations", "livekit", "checkpoint_pattern", "pattern"], "^$"), name)
+	not matches_declared_pattern(name)
+}
+
+# OTLP severity numbers per severity text (logs data model: INFO 9-12, WARN 13-16, ERROR 17-20).
+severity_range := {"INFO": [9, 12], "WARN": [13, 16], "ERROR": [17, 20]}
+
+number_declared(n) if {
+	some text in declared("severity")
+	severity_range[text][0] <= n
+	n <= severity_range[text][1]
+}
+
+# The number decides; a text, when present, must agree with the declaration too.
+deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "severity_number": log.severity_number}, sprintf("event '%s' is sent at severity number %v; otel/model allows %v", [log.event_name, log.severity_number, declared("severity")])) if {
+	log := input.sample.log
+	declared("severity") != null
+	not number_declared(object.get(log, "severity_number", 0))
 }
 
 deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "severity_text": log.severity_text}, sprintf("event '%s' is sent at %v; otel/model allows %v", [log.event_name, log.severity_text, declared("severity")])) if {
 	log := input.sample.log
 	declared("severity") != null
+	object.get(log, "severity_text", "") != ""
 	not log.severity_text in declared("severity")
 }
 
-# Status follows lk.outcome (Error only for `error`), and error.type comes only with `error`.
-deny contains lk_advice("livekit_span_outcome", {"span_name": span.name, "outcome": outcome, "status": span.status.code}, sprintf("span '%s': lk.outcome=%s but status=%s", [span.name, outcome, span.status.code])) if {
+# The span status lk.outcome implies: Error for `error`, Unset for `ok` and `cancelled`.
+status_for := {"ok": "unset", "cancelled": "unset", "error": "error"}
+
+deny contains lk_advice("livekit_span_outcome", {"span_name": span.name, "outcome": outcome, "status": span.status.code}, sprintf("span '%s': lk.outcome=%s requires status %s, got %s", [span.name, outcome, status_for[outcome], span.status.code])) if {
 	span := input.sample.span
 	startswith(span.name, "lk.")
 	some outcome in span_attr("lk.outcome")
-	(outcome == "error") != (span.status.code == "error")
+	span.status.code != status_for[outcome]
 }
 
 deny contains lk_advice("livekit_span_outcome", {"span_name": span.name, "outcome": outcome}, sprintf("span '%s': error.type without lk.outcome=error (lk.outcome=%s)", [span.name, outcome])) if {
