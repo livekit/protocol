@@ -51,3 +51,40 @@ deny contains lk_advice("livekit_unknown_span", {"span_name": name}, sprintf("sp
 	startswith(name, "lk.")
 	object.get(input, "registry_group", null) == null # always present, null when unmatched
 }
+
+# What otel/model/client/signals.yaml declares in annotations.livekit, checked on matched samples.
+declared(field) := object.get(input, ["registry_group", "annotations", "livekit", field], null)
+
+span_attr(key) := [a.value | some a in input.sample.span.attributes; a.name == key]
+
+# A span event must be one of the span's checkpoints or match its checkpoint pattern.
+deny contains lk_advice("livekit_checkpoint", {"span_name": span.name, "checkpoint": name}, sprintf("span '%s' has checkpoint '%s', which otel/model does not list for it", [span.name, name])) if {
+	span := input.sample.span
+	declared("checkpoints") != null
+	some event in span.span_events
+	name := event.name
+	not name in {c.name | some c in declared("checkpoints")}
+	not regex.match(object.get(input, ["registry_group", "annotations", "livekit", "checkpoint_pattern", "pattern"], "^$"), name)
+}
+
+deny contains lk_advice("livekit_severity", {"event_name": log.event_name, "severity_text": log.severity_text}, sprintf("event '%s' is sent at %v; otel/model allows %v", [log.event_name, log.severity_text, declared("severity")])) if {
+	log := input.sample.log
+	declared("severity") != null
+	not log.severity_text in declared("severity")
+}
+
+# Status follows lk.outcome (Error only for `error`), and error.type comes only with `error`.
+deny contains lk_advice("livekit_span_outcome", {"span_name": span.name, "outcome": outcome, "status": span.status.code}, sprintf("span '%s': lk.outcome=%s but status=%s", [span.name, outcome, span.status.code])) if {
+	span := input.sample.span
+	startswith(span.name, "lk.")
+	some outcome in span_attr("lk.outcome")
+	(outcome == "error") != (span.status.code == "error")
+}
+
+deny contains lk_advice("livekit_span_outcome", {"span_name": span.name, "outcome": outcome}, sprintf("span '%s': error.type without lk.outcome=error (lk.outcome=%s)", [span.name, outcome])) if {
+	span := input.sample.span
+	startswith(span.name, "lk.")
+	count(span_attr("error.type")) > 0
+	some outcome in span_attr("lk.outcome")
+	outcome != "error"
+}

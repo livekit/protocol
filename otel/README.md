@@ -68,7 +68,8 @@ nothing validates it.
    | `bindings` | map of producer/store → name | informational |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
 
-   Events and spans carry their own `annotations.livekit`, rendered in the docs:
+   Events and spans carry their own `annotations.livekit`, rendered in the docs; live-check
+   enforces `severity`, `checkpoints` and `checkpoint_pattern`:
 
    | Annotation | On | Meaning |
    |---|---|---|
@@ -156,7 +157,10 @@ record against `model/client/groups.yaml`. It drops two kinds of finding: `not_s
 is `development`) and absent `conditionally_required` attributes (their conditions are prose).
 `live-check/livekit.rego` adds `livekit_flat_identity` and `livekit_pii_unmarked`, each naming
 the key to send instead, and `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
-alone reports nothing for an unmatched span that has no attributes).
+alone reports nothing for an unmatched span that has no attributes). From the event and span
+annotations it adds `livekit_severity` (an event at a severity it is not declared with),
+`livekit_checkpoint` (a span event the span does not list) and `livekit_span_outcome` (span status
+disagreeing with `lk.outcome`, or `error.type` without `lk.outcome = error`).
 
 On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 spans, 22 logs,
 349 attributes), every finding is one of the expected shared identity / PII renames:
@@ -179,8 +183,7 @@ Known limits:
   `Span::detached` name) passes without a check; with no attributes it gets no finding at all.
   A registered span also needs its matcher in `live-check/weaver.toml`, or it is reported as
   `livekit_unknown_span`.
-- Span event names (connect checkpoints, `attempt <n> <mode>`) are not checked; weaver compares
-  span events only by attributes.
+- Checkpoint order is not checked, only names.
 - App-defined attributes (custom events, `Scope::set_attribute`) are reported as unknown keys.
 - `lk.sdk.*` is not reported when missing: resource attributes are only compared, not required.
 - Units are annotations; live-check checks names, types and enum values, never magnitudes.
