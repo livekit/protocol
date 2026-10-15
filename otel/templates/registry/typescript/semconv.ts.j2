@@ -21,6 +21,9 @@ export const EVENT_{{ e.name | screaming_snake_case }} = {{ e.name | tojson }} a
 {% endfor %}
 {% for s in ctx.spans %}/** {{ line(s.brief) }} Kind: {{ s.kind }}. */
 export const SPAN_{{ s.type | screaming_snake_case }} = {{ s.type | tojson }} as const;
+{% endfor %}
+{% for c in ctx.checkpoints %}/** Checkpoint (span event): {{ line(c.brief) }} */
+export const CHECKPOINT_{{ c.name | screaming_snake_case }} = {{ c.name | tojson }} as const;
 {% endfor %}{% for m in ctx.metrics %}
 /** {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit) }}`. */
 export const METRIC_{{ m.name | screaming_snake_case }} = {{ m.name | tojson }} as const;

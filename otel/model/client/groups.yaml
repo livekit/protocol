@@ -98,10 +98,13 @@ attribute_groups:
         requirement_level: required
       - ref: code.function.name
         requirement_level: recommended
+        note: The function that logged the line, as the platform names it.
         examples: ["connect(url:token:)"]
       - ref: code.file.path
         requirement_level: recommended
+        note: The source file that logged the line.
         examples: ["Sources/LiveKit/Core/Room.swift"]
       - ref: code.line.number
         requirement_level: recommended
+        note: The line in `code.file.path`.
         examples: [42]

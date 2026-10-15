@@ -36,6 +36,13 @@ pub mod span {
 {% for s in ctx.spans %}    /// {{ line(s.brief) }} Kind: {{ s.kind }}.
     pub const {{ s.type | screaming_snake_case }}: &str = {{ lit(s.type) }};
 {% endfor %}}
+
+/// Checkpoint names: span events of the spans above. `lk.reconnect` names its attempts
+/// `attempt <n> <mode>` instead.
+pub mod checkpoint {
+{% for c in ctx.checkpoints %}    /// {{ line(c.brief) }}
+    pub const {{ c.name | screaming_snake_case }}: &str = {{ lit(c.name) }};
+{% endfor %}}
 {% if ctx.metrics %}
 /// Metric names.
 pub mod metric {

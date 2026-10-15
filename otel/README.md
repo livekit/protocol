@@ -7,8 +7,12 @@ upstream keys (`service.*`, `os.*`, `device.*`, `network.connection.type`, `erro
 `session.id`, `code.*`) are referenced with `ref:`, never redefined.
 
 Status: prototype, `development` stability. It registers the shared identity, PII and SDK keys,
-and what the client core (rust-sdks `livekit-telemetry`) emits today, under its current names.
-Agents-owned keys are not registered yet.
+and what the client cores (rust-sdks `livekit-telemetry` and the JS port) emit today, under their
+current names. Agents-owned keys are not registered yet.
+
+The registry is the spec of these conventions: names, types, units, requirement levels, meaning,
+event severity and body, span kind, checkpoints and outcome rules. Transport, cadence, upload
+policy, storage and the app API are not conventions and live with each SDK.
 
 | Path | What |
 |---|---|
@@ -24,8 +28,9 @@ Agents-owned keys are not registered yet.
 | `live-check/` | Live-check config, advice rules and the OTLP/JSON converter |
 | `tests/` | Policy negatives, live-check samples, codegen escaping, schema-version rule |
 
-The generated docs, [`gen/docs/semconv.md`](gen/docs/semconv.md), list every key with its type,
-owner, sensitivity and unit.
+The generated docs, [`gen/docs/semconv.md`](gen/docs/semconv.md), are the human-readable spec:
+naming rules, the Resource, the attributes on every record, each event and span with its
+requirement table, enum values, bindings, and the open naming decisions.
 
 ## Ownership
 
@@ -62,6 +67,20 @@ nothing validates it.
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (RTC stats keep webrtc-stats milliseconds) |
    | `bindings` | map of producer/store → name | informational |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
+
+   Events and spans carry their own `annotations.livekit`, rendered in the docs:
+
+   | Annotation | On | Meaning |
+   |---|---|---|
+   | `severity` | event | OTLP severity texts the event is sent with, e.g. `[INFO]` |
+   | `body` | event | What the log body carries |
+   | `reserved`, `limits` | `custom` event | Keys and prefixes apps may not use; size caps on app events and attributes |
+   | `checkpoints` | span | Span events in order, each `{name, requirement: required\|best_effort, brief}` |
+   | `checkpoint_pattern` | span | A dynamic checkpoint name: `{name, pattern, brief}` |
+   | `limits` | span | Checkpoints and attributes per span; the rest is counted in OTLP `dropped_*_count` |
+
+   Give every key, event and span a `brief` and a `note`, and every non-enum key `examples`; a
+   `ref` to an OTel key gets a short `note` saying how LiveKit uses it.
 
    Naming: shared identity keys are flat (`lk.room_sid`, never `lk.room.sid`). Customer-supplied
    values go under `lk.pii.*`: the collector deletes keys with a `pii` segment when redaction is

@@ -4,6 +4,12 @@
 /// Telemetry schema version; set as `schema_url` on every OTLP scope.
 pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.2.0";
 
+/// Browser name.
+pub const BROWSER_NAME: &str = "browser.name";
+
+/// Browser version.
+pub const BROWSER_VERSION: &str = "browser.version";
+
 /// 1-based connect attempt.
 pub const LK_CONNECT_ATTEMPT: &str = "lk.connect.attempt";
 
@@ -510,4 +516,33 @@ pub mod span {
     pub const LK_RECONNECT: &str = "lk.reconnect";
     /// One subscription, from the intent to subscribe to the first media. Kind: internal.
     pub const LK_SUBSCRIBE: &str = "lk.subscribe";
+}
+
+/// Checkpoint names: span events of the spans above. `lk.reconnect` names its attempts
+/// `attempt <n> <mode>` instead.
+pub mod checkpoint {
+    /// The subscriber's SDP answer went out.
+    pub const ANSWER_SENT: &str = "answer_sent";
+    /// A peer connection was created before the join response (JS port only).
+    pub const EARLY_PC_CREATED: &str = "early_pc_created";
+    /// The RTC engine is ready (Swift stamps it with pc_connected).
+    pub const ENGINE: &str = "engine";
+    /// The first inbound stats reading with bytes; the span ends ok here.
+    pub const FIRST_MEDIA: &str = "first_media";
+    /// The join response arrived.
+    pub const JOIN_RECV: &str = "join_recv";
+    /// The publisher's SDP offer went out.
+    pub const OFFER_SENT: &str = "offer_sent";
+    /// The primary peer connection connected.
+    pub const PC_CONNECTED: &str = "pc_connected";
+    /// The peer connections exist (stamped once the join is adopted).
+    pub const PC_CREATED: &str = "pc_created";
+    /// The Room reached the connected state.
+    pub const ROOM_CONNECTED: &str = "room_connected";
+    /// Signaling is up (stamped with ws_open on the web and with join_recv on Swift).
+    pub const SIGNAL: &str = "signal";
+    /// The platform reported the remote track subscribed.
+    pub const SUBSCRIBED: &str = "subscribed";
+    /// The signaling WebSocket opened.
+    pub const WS_OPEN: &str = "ws_open";
 }

@@ -3,6 +3,12 @@
 /** Telemetry schema version; set as `schemaUrl` on every OTLP scope. */
 export const SCHEMA_URL = "https://livekit.io/schemas/telemetry/0.2.0" as const;
 
+/** Browser name. */
+export const ATTR_BROWSER_NAME = "browser.name" as const;
+
+/** Browser version. */
+export const ATTR_BROWSER_VERSION = "browser.version" as const;
+
 /** 1-based connect attempt. */
 export const ATTR_LK_CONNECT_ATTEMPT = "lk.connect.attempt" as const;
 
@@ -444,3 +450,28 @@ export const SPAN_LK_PUBLISH = "lk.publish" as const;
 export const SPAN_LK_RECONNECT = "lk.reconnect" as const;
 /** One subscription, from the intent to subscribe to the first media. Kind: internal. */
 export const SPAN_LK_SUBSCRIBE = "lk.subscribe" as const;
+
+/** Checkpoint (span event): The subscriber's SDP answer went out. */
+export const CHECKPOINT_ANSWER_SENT = "answer_sent" as const;
+/** Checkpoint (span event): A peer connection was created before the join response (JS port only). */
+export const CHECKPOINT_EARLY_PC_CREATED = "early_pc_created" as const;
+/** Checkpoint (span event): The RTC engine is ready (Swift stamps it with pc_connected). */
+export const CHECKPOINT_ENGINE = "engine" as const;
+/** Checkpoint (span event): The first inbound stats reading with bytes; the span ends ok here. */
+export const CHECKPOINT_FIRST_MEDIA = "first_media" as const;
+/** Checkpoint (span event): The join response arrived. */
+export const CHECKPOINT_JOIN_RECV = "join_recv" as const;
+/** Checkpoint (span event): The publisher's SDP offer went out. */
+export const CHECKPOINT_OFFER_SENT = "offer_sent" as const;
+/** Checkpoint (span event): The primary peer connection connected. */
+export const CHECKPOINT_PC_CONNECTED = "pc_connected" as const;
+/** Checkpoint (span event): The peer connections exist (stamped once the join is adopted). */
+export const CHECKPOINT_PC_CREATED = "pc_created" as const;
+/** Checkpoint (span event): The Room reached the connected state. */
+export const CHECKPOINT_ROOM_CONNECTED = "room_connected" as const;
+/** Checkpoint (span event): Signaling is up (stamped with ws_open on the web and with join_recv on Swift). */
+export const CHECKPOINT_SIGNAL = "signal" as const;
+/** Checkpoint (span event): The platform reported the remote track subscribed. */
+export const CHECKPOINT_SUBSCRIBED = "subscribed" as const;
+/** Checkpoint (span event): The signaling WebSocket opened. */
+export const CHECKPOINT_WS_OPEN = "ws_open" as const;
