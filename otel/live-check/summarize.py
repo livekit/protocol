@@ -15,7 +15,7 @@ def walk(x):
             t = f'{adv["level"]:<11} {adv["id"]}'
             by_type[t] += 1
             ctx = adv.get("context") or {}
-            keys[t][ctx.get("attribute_key") or ctx.get("event_name") or adv.get("signal_name") or "-"] += 1
+            keys[t][ctx.get("attribute_key") or ctx.get("event_name") or ctx.get("span_name") or adv.get("signal_name") or "-"] += 1
         for v in x.values(): walk(v)
     elif isinstance(x, list):
         for v in x: walk(v)

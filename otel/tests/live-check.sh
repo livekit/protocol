@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The smoke sample (a real client capture, anonymized, canonical names) must pass with no
 # findings, and so must a sparse RTC window; the same smoke sample with the client's current
-# identity/PII keys must be flagged.
+# identity/PII keys and an unregistered lk.* span must be flagged.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
@@ -16,10 +16,10 @@ echo "$sparse"
 [[ $sparse == *'"advice_level_counts": {}'* ]] || { echo "FAIL  sparse RTC sample has findings" >&2; exit 1; }
 
 sed -e 's/"lk\.room_sid"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.name"/g' \
-  tests/live-sample.json > "$tmp/legacy.json"
+  -e 's/"name": "lk\.publish"/"name": "lk.bogus"/' tests/live-sample.json > "$tmp/legacy.json"
 legacy=$(./live-check.sh "$tmp/legacy.json" "$tmp/legacy" --fail-on none)
 echo "$legacy"
-for want in "livekit_flat_identity: lk.room.sid" "livekit_pii_unmarked: lk.room.name"; do
+for want in "livekit_flat_identity: lk.room.sid" "livekit_pii_unmarked: lk.room.name" "livekit_unknown_span: lk.bogus"; do
   [[ $legacy == *"$want"* ]] || { echo "FAIL  legacy keys not flagged: $want" >&2; exit 1; }
 done
-echo "PASS  live-check: smoke and sparse samples clean, legacy keys flagged"
+echo "PASS  live-check: smoke and sparse samples clean, legacy keys and unknown span flagged"

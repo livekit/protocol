@@ -86,6 +86,9 @@ key with `deprecated: {reason: renamed, renamed_to: <new key>}` instead of delet
 
 ## Running the checks locally
 
+CI (`.github/workflows/otel.yaml`) runs the same scripts on pull requests and pushes to `main`
+that touch `otel/**` or the workflow file itself, and on manual dispatch.
+
 Install weaver 0.28.0, the version CI pins, from its
 [release](https://github.com/open-telemetry/weaver/releases/tag/v0.28.0) (`weaver-installer.sh`),
 or put the binary anywhere and point `WEAVER` at it. Every run clones OTel semconv v1.44.0 and
@@ -133,7 +136,8 @@ JSON file. `live-check/weaver.toml` matches spans by name and checks the resourc
 record against `model/client/groups.yaml`. It drops two kinds of finding: `not_stable` (every key
 is `development`) and absent `conditionally_required` attributes (their conditions are prose).
 `live-check/livekit.rego` adds `livekit_flat_identity` and `livekit_pii_unmarked`, each naming
-the key to send instead.
+the key to send instead, and `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
+alone reports nothing for an unmatched span that has no attributes).
 
 On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 spans, 22 logs,
 349 attributes), every finding is one of the expected shared identity / PII renames:
@@ -152,6 +156,10 @@ With those six keys renamed in the same capture, live-check reports nothing and 
 
 Known limits:
 
+- Span names are checked only in the `lk.*` namespace. A span outside it (an app's own
+  `Span::detached` name) passes without a check; with no attributes it gets no finding at all.
+  A registered span also needs its matcher in `live-check/weaver.toml`, or it is reported as
+  `livekit_unknown_span`.
 - Span event names (connect checkpoints, `attempt <n> <mode>`) are not checked; weaver compares
   span events only by attributes.
 - App-defined attributes (custom events, `Scope::set_attribute`) are reported as unknown keys.

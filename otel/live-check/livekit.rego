@@ -43,3 +43,11 @@ deny contains lk_advice("livekit_flat_identity", {"attribute_key": key, "expecte
 	key := input.sample.attribute.name
 	want := canonical_identity[key]
 }
+
+# Spans have no name-based match of their own (otel/live-check/weaver.toml matches the registered
+# ones), so weaver says nothing about an lk.* span it cannot place. Like an unknown event, flag it.
+deny contains lk_advice("livekit_unknown_span", {"span_name": name}, sprintf("span '%s' is in the LiveKit namespace but not registered in otel/model", [name])) if {
+	name := input.sample.span.name
+	startswith(name, "lk.")
+	object.get(input, "registry_group", null) == null # always present, null when unmatched
+}
