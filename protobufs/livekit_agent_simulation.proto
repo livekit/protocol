@@ -321,7 +321,10 @@ message SimulationRun {
       // SCNG_ id of the scenario group. Runs created before the id was stored
       // have none, so they never match.
       optional string scenario_group_id = 8;
-      // Populates each run's `jobs`, which the list otherwise leaves empty.
+      // Populates each run's `jobs` with their outcomes only: id, status,
+      // label, error, scenario_id and sample. Everything else on a job, and the
+      // scenarios' content in `scenario_group`, stays empty; `Get` returns
+      // whole jobs. Without it the list leaves `jobs` empty.
       bool include_jobs = 9;
     }
     message Response {

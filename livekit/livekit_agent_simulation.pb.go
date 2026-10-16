@@ -2761,7 +2761,10 @@ type SimulationRun_List_Request struct {
 	// SCNG_ id of the scenario group. Runs created before the id was stored
 	// have none, so they never match.
 	ScenarioGroupId *string `protobuf:"bytes,8,opt,name=scenario_group_id,json=scenarioGroupId,proto3,oneof" json:"scenario_group_id,omitempty"`
-	// Populates each run's `jobs`, which the list otherwise leaves empty.
+	// Populates each run's `jobs` with their outcomes only: id, status,
+	// label, error, scenario_id and sample. Everything else on a job, and the
+	// scenarios' content in `scenario_group`, stays empty; `Get` returns
+	// whole jobs. Without it the list leaves `jobs` empty.
 	IncludeJobs   bool `protobuf:"varint,9,opt,name=include_jobs,json=includeJobs,proto3" json:"include_jobs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
