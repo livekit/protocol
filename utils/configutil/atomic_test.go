@@ -16,6 +16,12 @@ func (c *testConfig) Observe(cb func(*testConfig)) func() {
 	return c.On(cb)
 }
 
+func (c *testConfig) ObserveCurrent(cb func(*testConfig)) func() {
+	stop := c.On(cb)
+	cb(c)
+	return stop
+}
+
 func (c *testConfig) Load() *testConfig {
 	return c
 }
@@ -37,11 +43,4 @@ func TestAtomicAfterEmit(t *testing.T) {
 
 	obs.EmitConfigUpdate(&TestConfig{Foo: "c"})
 	require.Equal(t, "c", foo.Load())
-}
-
-func TestObserveCurrentFallback(t *testing.T) {
-	config := &testConfig{}
-	var seen []*testConfig
-	ObserveCurrent(config, func(c *testConfig) { seen = append(seen, c) })
-	require.Equal(t, []*testConfig{config}, seen)
 }

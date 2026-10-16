@@ -112,7 +112,7 @@ func TestDeriveObserveCurrent(t *testing.T) {
 	inner := Derive(nested, func(c *deriveNestedConfig) *deriveInnerConfig { return &c.Inner })
 
 	var seen []string
-	stop := ObserveCurrent(inner, func(c *deriveInnerConfig) { seen = append(seen, c.Name) })
+	stop := inner.ObserveCurrent(func(c *deriveInnerConfig) { seen = append(seen, c.Name) })
 	require.Equal(t, []string{"b"}, seen)
 
 	src.EmitConfigUpdate(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "c"}}})

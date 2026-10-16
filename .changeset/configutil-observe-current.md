@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-`configutil.ObserveCurrent` replays the current config to late subscribers, ordered against reloads; `NewAtomic*` and `Derive` use it
+`configutil.Observable` gains `ObserveCurrent`, which replays the current config to late subscribers ordered against reloads; `NewAtomic*` use it. Implementations outside this package must add the method

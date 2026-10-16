@@ -41,7 +41,7 @@ func (d derived[Src, Dst]) Observe(cb func(*Dst)) func() {
 }
 
 func (d derived[Src, Dst]) ObserveCurrent(cb func(*Dst)) func() {
-	return ObserveCurrent(d.src, func(c *Src) { cb(d.project(c)) })
+	return d.src.ObserveCurrent(func(c *Src) { cb(d.project(c)) })
 }
 
 func (d derived[Src, Dst]) Load() *Dst {
