@@ -47,6 +47,7 @@ const (
 	EventEgressEnded                  = "egress_ended"
 	EventIngressStarted               = "ingress_started"
 	EventIngressEnded                 = "ingress_ended"
+	EventAgentJobPending              = "agent_job_pending"
 	EventAgentJobStarted              = "agent_job_started"
 	EventAgentJobEnded                = "agent_job_ended"
 )
