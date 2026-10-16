@@ -102,3 +102,23 @@ func TestDeriveFeedsAtomic(t *testing.T) {
 	src.EmitConfigUpdate(&deriveAppConfig{Sweeper: deriveSweeperConfig{Period: 2 * time.Second}})
 	require.Equal(t, 2*time.Second, period.Load())
 }
+
+func TestDeriveObserveCurrent(t *testing.T) {
+	src := NewStaticObserver(&deriveAppConfig{
+		Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "a"}},
+	})
+	src.EmitConfigUpdate(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "b"}}})
+	nested := Derive(src, func(c *deriveAppConfig) *deriveNestedConfig { return &c.Nested })
+	inner := Derive(nested, func(c *deriveNestedConfig) *deriveInnerConfig { return &c.Inner })
+
+	var seen []string
+	stop := ObserveCurrent(inner, func(c *deriveInnerConfig) { seen = append(seen, c.Name) })
+	require.Equal(t, []string{"b"}, seen)
+
+	src.EmitConfigUpdate(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "c"}}})
+	require.Equal(t, []string{"b", "c"}, seen)
+
+	stop()
+	src.EmitConfigUpdate(&deriveAppConfig{Nested: deriveNestedConfig{Inner: deriveInnerConfig{Name: "d"}}})
+	require.Equal(t, []string{"b", "c"}, seen)
+}

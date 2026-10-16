@@ -94,7 +94,17 @@ func NewAtomicValue[T, C any](config Observable[C], accessor func(*C) T) *Atomic
 func newAtomic[T, C any, A interface{ Store(T) }](ctor func(T) A, config Observable[C], accessor func(*C) T) A {
 	var zero T
 	v := ctor(zero)
-	config.Observe(func(cc *C) { v.Store(accessor(cc)) })
-	v.Store(accessor(config.Load()))
+	ObserveCurrent(config, func(cc *C) { v.Store(accessor(cc)) })
 	return v
+}
+
+// ObserveCurrent calls cb with o's current value and then on every change.
+func ObserveCurrent[T any](o Observable[T], cb func(*T)) func() {
+	if oc, ok := o.(interface{ ObserveCurrent(func(*T)) func() }); ok {
+		return oc.ObserveCurrent(cb)
+	}
+	// Unordered: a racing emit can be overwritten by this older Load.
+	stop := o.Observe(cb)
+	cb(o.Load())
+	return stop
 }
