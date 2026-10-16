@@ -2757,7 +2757,12 @@ type SimulationRun_List_Request struct {
 	AgentName *string `protobuf:"bytes,6,opt,name=agent_name,json=agentName,proto3,oneof" json:"agent_name,omitempty"`
 	// Absent applies no mode filter. TEXT matches runs stored as TEXT or
 	// UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
-	Mode          *SimulationMode `protobuf:"varint,7,opt,name=mode,proto3,enum=livekit.SimulationMode,oneof" json:"mode,omitempty"`
+	Mode *SimulationMode `protobuf:"varint,7,opt,name=mode,proto3,enum=livekit.SimulationMode,oneof" json:"mode,omitempty"`
+	// SCNG_ id of the scenario group. Runs created before the id was stored
+	// have none, so they never match.
+	ScenarioGroupId *string `protobuf:"bytes,8,opt,name=scenario_group_id,json=scenarioGroupId,proto3,oneof" json:"scenario_group_id,omitempty"`
+	// Populates each run's `jobs`, which the list otherwise leaves empty.
+	IncludeJobs   bool `protobuf:"varint,9,opt,name=include_jobs,json=includeJobs,proto3" json:"include_jobs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2839,6 +2844,20 @@ func (x *SimulationRun_List_Request) GetMode() SimulationMode {
 		return *x.Mode
 	}
 	return SimulationMode_SIMULATION_MODE_UNSPECIFIED
+}
+
+func (x *SimulationRun_List_Request) GetScenarioGroupId() string {
+	if x != nil && x.ScenarioGroupId != nil {
+		return *x.ScenarioGroupId
+	}
+	return ""
+}
+
+func (x *SimulationRun_List_Request) GetIncludeJobs() bool {
+	if x != nil {
+		return x.IncludeJobs
+	}
+	return false
 }
 
 type SimulationRun_List_Response struct {
@@ -3340,7 +3359,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb4N\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x9eO\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3631,8 +3650,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12*\n" +
 	"\x11simulation_run_id\x18\x02 \x01(\tR\x0fsimulationRunId\x1a4\n" +
 	"\bResponse\x12(\n" +
-	"\x03run\x18\x01 \x01(\v2\x16.livekit.SimulationRunR\x03run\x1a\xc5\x04\n" +
-	"\x04List\x1a\xc2\x03\n" +
+	"\x03run\x18\x01 \x01(\v2\x16.livekit.SimulationRunR\x03run\x1a\xaf\x05\n" +
+	"\x04List\x1a\xac\x04\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12:\n" +
@@ -3644,13 +3663,16 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\bend_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampH\x03R\aendTime\x88\x01\x01\x12\"\n" +
 	"\n" +
 	"agent_name\x18\x06 \x01(\tH\x04R\tagentName\x88\x01\x01\x120\n" +
-	"\x04mode\x18\a \x01(\x0e2\x17.livekit.SimulationModeH\x05R\x04mode\x88\x01\x01B\t\n" +
+	"\x04mode\x18\a \x01(\x0e2\x17.livekit.SimulationModeH\x05R\x04mode\x88\x01\x01\x12/\n" +
+	"\x11scenario_group_id\x18\b \x01(\tH\x06R\x0fscenarioGroupId\x88\x01\x01\x12!\n" +
+	"\finclude_jobs\x18\t \x01(\bR\vincludeJobsB\t\n" +
 	"\a_statusB\r\n" +
 	"\v_page_tokenB\r\n" +
 	"\v_start_timeB\v\n" +
 	"\t_end_timeB\r\n" +
 	"\v_agent_nameB\a\n" +
-	"\x05_mode\x1ax\n" +
+	"\x05_modeB\x14\n" +
+	"\x12_scenario_group_id\x1ax\n" +
 	"\bResponse\x12*\n" +
 	"\x04runs\x18\x01 \x03(\v2\x16.livekit.SimulationRunR\x04runs\x12@\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\v2\x18.livekit.TokenPaginationR\rnextPageToken\x1a\xbd\x04\n" +

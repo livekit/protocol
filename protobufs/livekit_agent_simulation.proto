@@ -318,6 +318,11 @@ message SimulationRun {
       // Absent applies no mode filter. TEXT matches runs stored as TEXT or
       // UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
       optional SimulationMode mode = 7;
+      // SCNG_ id of the scenario group. Runs created before the id was stored
+      // have none, so they never match.
+      optional string scenario_group_id = 8;
+      // Populates each run's `jobs`, which the list otherwise leaves empty.
+      bool include_jobs = 9;
     }
     message Response {
       repeated SimulationRun runs = 1;
