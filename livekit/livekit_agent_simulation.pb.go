@@ -818,9 +818,16 @@ type SimulationRun_Job struct {
 	ScenarioId string `protobuf:"bytes,15,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	// 1-based sample of that scenario within the run; always 1 when the run's
 	// samples is 1.
-	Sample        int32 `protobuf:"varint,16,opt,name=sample,proto3" json:"sample,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Sample int32 `protobuf:"varint,16,opt,name=sample,proto3" json:"sample,omitempty"`
+	// Verdicts of this job's scenario in up to 10 earlier finished runs of the
+	// same agent, newest first. Runs where the scenario only hit
+	// infrastructure failures are skipped. Empty when scenario_id is empty.
+	PriorPassed []bool `protobuf:"varint,17,rep,packed,name=prior_passed,json=priorPassed,proto3" json:"prior_passed,omitempty"`
+	// At least 7 of the 10 most recent prior_passed are false; never true with
+	// fewer than 10.
+	HistoricallyRed bool `protobuf:"varint,18,opt,name=historically_red,json=historicallyRed,proto3" json:"historically_red,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *SimulationRun_Job) Reset() {
@@ -956,6 +963,20 @@ func (x *SimulationRun_Job) GetSample() int32 {
 		return x.Sample
 	}
 	return 0
+}
+
+func (x *SimulationRun_Job) GetPriorPassed() []bool {
+	if x != nil {
+		return x.PriorPassed
+	}
+	return nil
+}
+
+func (x *SimulationRun_Job) GetHistoricallyRed() bool {
+	if x != nil {
+		return x.HistoricallyRed
+	}
+	return false
 }
 
 type SimulationRun_JobMetrics struct {
@@ -3340,7 +3361,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb4N\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x82O\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3368,7 +3389,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vissue_count\x18\x15 \x01(\x05H\x00R\n" +
 	"issueCount\x88\x01\x01\x12.\n" +
 	"\x02ci\x18\x16 \x01(\v2\x19.livekit.SimulationRun.CIH\x01R\x02ci\x88\x01\x01\x12G\n" +
-	"\bsampling\x18\x17 \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x02R\bsampling\x88\x01\x01\x1a\x8f\x06\n" +
+	"\bsampling\x18\x17 \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x02R\bsampling\x88\x01\x01\x1a\xdd\x06\n" +
 	"\x03Job\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x129\n" +
 	"\x06status\x18\x02 \x01(\x0e2!.livekit.SimulationRun.Job.StatusR\x06status\x12\"\n" +
@@ -3387,7 +3408,9 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\ametrics\x18\x0e \x01(\v2!.livekit.SimulationRun.JobMetricsR\ametrics\x12\x1f\n" +
 	"\vscenario_id\x18\x0f \x01(\tR\n" +
 	"scenarioId\x12\x16\n" +
-	"\x06sample\x18\x10 \x01(\x05R\x06sample\x1a]\n" +
+	"\x06sample\x18\x10 \x01(\x05R\x06sample\x12!\n" +
+	"\fprior_passed\x18\x11 \x03(\bR\vpriorPassed\x12)\n" +
+	"\x10historically_red\x18\x12 \x01(\bR\x0fhistoricallyRed\x1a]\n" +
 	"\x05Usage\x12(\n" +
 	"\x10text_turns_count\x18\x01 \x01(\x05R\x0etextTurnsCount\x12*\n" +
 	"\x11audio_turns_count\x18\x02 \x01(\x05R\x0faudioTurnsCount\"o\n" +
