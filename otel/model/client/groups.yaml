@@ -1,0 +1,110 @@
+# Attribute sets the client cores put on every resource / record. They exist so live-check
+# matchers (otel/live-check/weaver.toml) can compare those samples with something, which needs
+# public v2 attribute groups, hence this file's format. Reference attributes only here: define
+# keys in the v1 files, where otel/policies sees them.
+file_format: definition/2
+attribute_groups:
+  - id: livekit.client.resource
+    visibility: public
+    stability: development
+    brief: Resource attributes of the client pipeline, one Resource per process.
+    note: >
+      Set once per pipeline. Session-specific keys (`lk.room_sid`, `lk.participant_id`,
+      `lk.track_sid`) never go here; they stay on records and spans.
+    attributes:
+      - ref: service.name
+        requirement_level: required
+        note: "`livekit-client-<sdk>`: swift, android, flutter, react-native, unity, rust, js; `livekit-client` when the platform names none. Set by the platform SDK."
+        examples: ["livekit-client-swift", "livekit-client-js"]
+      - ref: service.version
+        requirement_level: required
+        note: The LiveKit client SDK's version. Set by the platform SDK.
+        examples: ["2.17.0"]
+      - ref: os.name
+        requirement_level: recommended
+        note: Set by the platform SDK; the JS port only when a host SDK supplies it.
+        examples: ["iOS", "macOS", "Android"]
+      - ref: os.version
+        requirement_level: recommended
+        note: Set by the platform SDK; the JS port only when a host SDK supplies it.
+        examples: ["18.5"]
+      - ref: device.model.identifier
+        requirement_level: recommended
+        note: Set by the platform SDK where it knows the model; the JS port only when a host SDK supplies it.
+        examples: ["iPhone16,1", "Mac16,8"]
+      - ref: telemetry.sdk.name
+        requirement_level: required
+        note: The telemetry library, `livekit-telemetry`, in every client.
+        examples: ["livekit-telemetry"]
+      - ref: telemetry.sdk.language
+        requirement_level: required
+        note: "`rust` from the Rust core (every native SDK), `webjs` from the JS port."
+        examples: ["rust", "webjs"]
+      - ref: telemetry.sdk.version
+        requirement_level: required
+        note: The telemetry library's version (the JS port sends `0.1.0`).
+        examples: ["0.1.0"]
+      - ref: lk.sdk.name
+        requirement_level: recommended
+      - ref: lk.sdk.version
+        requirement_level: recommended
+      - ref: browser.name
+        requirement_level: {conditionally_required: The JS SDK running in a browser.}
+      - ref: browser.version
+        requirement_level: {conditionally_required: The JS SDK running in a browser.}
+
+  - id: livekit.client.record
+    visibility: public
+    stability: development
+    brief: Attributes on every log record and span of a session.
+    note: >
+      One session is one Room connection lifetime, across reconnects, and one trace. A record's
+      attributes and timestamp are taken when it is captured, the session's included, so a record
+      captured before a disconnect keeps its room. Records outside a room (device state, pre-room
+      errors, self-telemetry) belong to the process's own session and carry only `session.id`.
+      Keys the SDK owns (`lk.*`, `otel.*`, `code.*`, `session.id`, `error.type`) must never be set
+      by an app; an app's correlation attributes (e.g. `app.call_id`, `enduser.id`) ride along,
+      within the `custom` event's limits.
+    attributes:
+      - ref: session.id
+        requirement_level: required
+        note: The session's trace id (32 hex characters), also on the process's own records.
+        examples: ["4bf92f3577b34da6a3ce929d0e0e4736"]
+      - ref: otel.event.name
+        requirement_level: {conditionally_required: On event records; duplicates the record's `event_name`.}
+        note: For backends that do not surface the OTLP `event_name` field yet.
+        examples: ["lk.rtc.stats.sample"]
+      - ref: lk.room_sid
+        requirement_level: {conditionally_required: Once the client has joined the room.}
+      - ref: lk.pii.room_name
+        requirement_level: {conditionally_required: Once the client has joined the room.}
+      - ref: lk.participant_id
+        requirement_level: {conditionally_required: Once the client has joined the room.}
+      - ref: lk.pii.participant_identity
+        requirement_level: {conditionally_required: Once the client has joined the room.}
+
+  - id: livekit.client.log
+    visibility: public
+    stability: development
+    brief: Attributes of a plain log record (no event name).
+    note: >
+      The body is the log message. Only WARN and ERROR records are sent; WebRTC lines only at
+      ERROR, and the telemetry module's own lines never. In records copied from the Rust core
+      (`lk.log.source = ffi`), JWT-shaped substrings must be masked as `<jwt>`.
+    attributes:
+      - ref: lk.log.source
+        requirement_level: required
+      - ref: lk.log.logger
+        requirement_level: required
+      - ref: code.function.name
+        requirement_level: recommended
+        note: The function that logged the line, as the platform names it.
+        examples: ["connect(url:token:)"]
+      - ref: code.file.path
+        requirement_level: recommended
+        note: The source file that logged the line.
+        examples: ["Sources/LiveKit/Core/Room.swift"]
+      - ref: code.line.number
+        requirement_level: recommended
+        note: The line in `code.file.path`.
+        examples: [42]

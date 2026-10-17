@@ -1,0 +1,5 @@
+templates:
+  - template: semconv.rs.j2
+    filter: '{schema_url, attributes: .registry.attributes | sort_by(.key), events: .registry.events | sort_by(.name), spans: .registry.spans | sort_by(.type), checkpoints: [.registry.spans[] | (.annotations.livekit.checkpoints // [])[]] | unique_by(.name), metrics: .registry.metrics | sort_by(.name)}'
+    application_mode: single
+    file_name: semconv.rs

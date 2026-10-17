@@ -1,0 +1,73 @@
+# Copyright 2026 LiveKit, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Telemetry conventions
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["otel/**", ".github/workflows/otel.yaml"]
+  pull_request:
+    branches: [main]
+    paths: ["otel/**", ".github/workflows/otel.yaml"]
+
+permissions:
+  contents: read # Checks only read the checkout
+
+jobs:
+  weaver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # the schema-version rule diffs against the base branch
+
+      - name: Set up weaver
+        uses: open-telemetry/weaver/.github/actions/setup-weaver@51a5bf95bdbb2e20fb6e16638e6bbe7dde911e93 # v0.28.0
+        with:
+          version: "0.28.0"
+
+      - name: Check the registry
+        run: otel/check.sh
+
+      - name: Policy negatives fail with their named finding
+        run: otel/tests/negatives.sh
+
+      - name: Generated outputs are current
+        run: |
+          otel/generate.sh
+          git add --intent-to-add otel/gen
+          git diff --exit-code -- otel/gen
+
+      - name: Generated outputs compile
+        run: |
+          rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir "$RUNNER_TEMP"
+          npx --yes -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
+
+      - name: Codegen escapes literals (round-trip through rustc and tsc)
+        run: otel/tests/codegen.sh
+
+      - name: Live-check the smoke sample
+        run: otel/tests/live-check.sh
+
+      - name: Schema-version rule rejects comment-only changes and downgrades
+        run: otel/tests/schema-bump-test.sh
+
+      # The same script as locally: a changed otel/model needs a strictly higher schema_url version.
+      - name: Schema version bumped when the model changed
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: otel/tests/schema-bump.sh "origin/$BASE_REF"

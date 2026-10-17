@@ -1,0 +1,11 @@
+# expect: livekit_seconds
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.client.setup_ms
+        type: int
+        stability: development
+        brief: Milliseconds without a unit_exception.
+        annotations: {livekit: {owner: client, sensitivity: none, unit: ms}}

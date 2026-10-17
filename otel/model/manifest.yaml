@@ -1,0 +1,10 @@
+file_format: definition_manifest/2.0
+# The registry version IS the telemetry schema version: producers stamp this URL on
+# OTLP ScopeSpans/ScopeLogs/ScopeMetrics.schema_url (generated as SCHEMA_URL).
+# Bump it in the same PR as any change under otel/model (see otel/README.md).
+schema_url: https://livekit.io/schemas/telemetry/0.3.0
+stability: development
+description: LiveKit telemetry semantic conventions (shared identity, PII, SDK identity, client-owned signals).
+dependencies:
+  - schema_url: https://opentelemetry.io/schemas/1.44.0
+    registry_path: https://github.com/open-telemetry/semantic-conventions.git@v1.44.0[model]

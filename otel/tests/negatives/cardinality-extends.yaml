@@ -1,0 +1,16 @@
+# expect: livekit_cardinality
+groups:
+  - id: attributes.lk.negative
+    type: attribute_group
+    brief: Attributes a metric inherits.
+    attributes:
+      - ref: lk.room_sid
+        requirement_level: required
+  - id: metric.client.negative.count
+    type: metric
+    metric_name: client.negative.count
+    instrument: counter
+    unit: "{event}"
+    stability: development
+    brief: A metric inheriting a high-cardinality dimension through extends.
+    extends: attributes.lk.negative

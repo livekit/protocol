@@ -1,0 +1,11 @@
+# expect: is declared multiple times
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.room_sid
+        type: int
+        stability: development
+        brief: Defined twice.
+        annotations: {livekit: {owner: shared, sensitivity: none}}
