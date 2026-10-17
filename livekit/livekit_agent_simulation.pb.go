@@ -2379,7 +2379,14 @@ type SimulationRun_Create_Request struct {
 	// Absent runs each scenario once and requires it to pass. Requires
 	// scenario_group. The run fails if any scenario fails; pass@k and
 	// pass^k report over scenarios and neither gates.
-	Sampling      *SimulationRun_SamplingOptions `protobuf:"bytes,14,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
+	Sampling *SimulationRun_SamplingOptions `protobuf:"bytes,14,opt,name=sampling,proto3,oneof" json:"sampling,omitempty"`
+	// When set, every job dials this number over SIP instead of dispatching
+	// agent_name, as CreateSIPParticipantRequest would. AUDIO mode only.
+	SipCallTo string `protobuf:"bytes,15,opt,name=sip_call_to,json=sipCallTo,proto3" json:"sip_call_to,omitempty"`
+	// Outbound trunk to dial through. Empty dials from sip_number, which must
+	// then be a LiveKit phone number the project owns.
+	SipTrunkId    string `protobuf:"bytes,16,opt,name=sip_trunk_id,json=sipTrunkId,proto3" json:"sip_trunk_id,omitempty"`
+	SipNumber     string `protobuf:"bytes,17,opt,name=sip_number,json=sipNumber,proto3" json:"sip_number,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2496,6 +2503,27 @@ func (x *SimulationRun_Create_Request) GetSampling() *SimulationRun_SamplingOpti
 		return x.Sampling
 	}
 	return nil
+}
+
+func (x *SimulationRun_Create_Request) GetSipCallTo() string {
+	if x != nil {
+		return x.SipCallTo
+	}
+	return ""
+}
+
+func (x *SimulationRun_Create_Request) GetSipTrunkId() string {
+	if x != nil {
+		return x.SipTrunkId
+	}
+	return ""
+}
+
+func (x *SimulationRun_Create_Request) GetSipNumber() string {
+	if x != nil {
+		return x.SipNumber
+	}
+	return ""
 }
 
 type SimulationRun_Create_Response struct {
@@ -3340,7 +3368,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb4N\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x95O\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3591,8 +3619,8 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x84\x06\n" +
-	"\x06Create\x1a\xeb\x04\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xe5\x06\n" +
+	"\x06Create\x1a\xcc\x05\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
@@ -3609,7 +3637,12 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
 	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12G\n" +
-	"\bsampling\x18\x0e \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x03R\bsampling\x88\x01\x01B\x11\n" +
+	"\bsampling\x18\x0e \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x03R\bsampling\x88\x01\x01\x12\x1e\n" +
+	"\vsip_call_to\x18\x0f \x01(\tR\tsipCallTo\x12 \n" +
+	"\fsip_trunk_id\x18\x10 \x01(\tR\n" +
+	"sipTrunkId\x12\x1d\n" +
+	"\n" +
+	"sip_number\x18\x11 \x01(\tR\tsipNumberB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
