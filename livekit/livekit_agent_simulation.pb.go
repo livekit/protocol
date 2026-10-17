@@ -299,13 +299,15 @@ type SimulationRun struct {
 	Error            string                 `protobuf:"bytes,5,opt,name=error,proto3" json:"error,omitempty"`
 	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	Jobs             []*SimulationRun_Job   `protobuf:"bytes,7,rep,name=jobs,proto3" json:"jobs,omitempty"`
-	AgentName        string                 `protobuf:"bytes,9,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	ScenarioGroup    *ScenarioGroup         `protobuf:"bytes,10,opt,name=scenario_group,json=scenarioGroup,proto3" json:"scenario_group,omitempty"`
-	EndedAt          *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
-	JobCount         int32                  `protobuf:"varint,12,opt,name=job_count,json=jobCount,proto3" json:"job_count,omitempty"`
-	PassedCount      int32                  `protobuf:"varint,13,opt,name=passed_count,json=passedCount,proto3" json:"passed_count,omitempty"`
-	FailedCount      int32                  `protobuf:"varint,14,opt,name=failed_count,json=failedCount,proto3" json:"failed_count,omitempty"`
-	NumSimulations   int32                  `protobuf:"varint,15,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
+	// The agent under test (see Create.Request.agent_name), not the name jobs
+	// were dispatched to.
+	AgentName      string                 `protobuf:"bytes,9,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	ScenarioGroup  *ScenarioGroup         `protobuf:"bytes,10,opt,name=scenario_group,json=scenarioGroup,proto3" json:"scenario_group,omitempty"`
+	EndedAt        *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=ended_at,json=endedAt,proto3" json:"ended_at,omitempty"`
+	JobCount       int32                  `protobuf:"varint,12,opt,name=job_count,json=jobCount,proto3" json:"job_count,omitempty"`
+	PassedCount    int32                  `protobuf:"varint,13,opt,name=passed_count,json=passedCount,proto3" json:"passed_count,omitempty"`
+	FailedCount    int32                  `protobuf:"varint,14,opt,name=failed_count,json=failedCount,proto3" json:"failed_count,omitempty"`
+	NumSimulations int32                  `protobuf:"varint,15,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
 	// Aggregate usage across all jobs in this run (sum of Job.usage).
 	Usage *SimulationRun_Usage `protobuf:"bytes,16,opt,name=usage,proto3" json:"usage,omitempty"`
 	// Maximum simulate jobs running in parallel for this run (0 = server default).
@@ -2358,11 +2360,19 @@ func (x *SimulationRun_JobMetrics_Turn) GetUnanswered() bool {
 }
 
 type SimulationRun_Create_Request struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	ProjectId      string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	AgentName      string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
-	NumSimulations int32                  `protobuf:"varint,4,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
-	Region         string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
+	state     protoimpl.MessageState `protogen:"open.v1"`
+	ProjectId string                 `protobuf:"bytes,1,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	// The agent under test, as named in the project's livekit.toml. This is
+	// the run's identity: runs list/counts filter on it and the dashboard
+	// groups by it, so it must be the same across every run of that agent.
+	AgentName      string `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`
+	NumSimulations int32  `protobuf:"varint,4,opt,name=num_simulations,json=numSimulations,proto3" json:"num_simulations,omitempty"`
+	Region         string `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
+	// The explicit-dispatch name the simulator dispatches jobs to. Set when
+	// the worker serving this run registers under a throwaway name (the CLI
+	// spawning the agent locally must not collide with the deployed agent's
+	// name). Unset dispatches to agent_name.
+	DispatchAgentName *string `protobuf:"bytes,15,opt,name=dispatch_agent_name,json=dispatchAgentName,proto3,oneof" json:"dispatch_agent_name,omitempty"`
 	// When set, run these scenarios (loaded from a scenarios.yaml).
 	// When unset, generate num_simulations scenarios from the uploaded agent source.
 	ScenarioGroup *ScenarioGroup `protobuf:"bytes,7,opt,name=scenario_group,json=scenarioGroup,proto3,oneof" json:"scenario_group,omitempty"`
@@ -2438,6 +2448,13 @@ func (x *SimulationRun_Create_Request) GetNumSimulations() int32 {
 func (x *SimulationRun_Create_Request) GetRegion() string {
 	if x != nil {
 		return x.Region
+	}
+	return ""
+}
+
+func (x *SimulationRun_Create_Request) GetDispatchAgentName() string {
+	if x != nil && x.DispatchAgentName != nil {
+		return *x.DispatchAgentName
 	}
 	return ""
 }
@@ -3340,7 +3357,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\xb4N\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\x81O\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3591,25 +3608,27 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x05actor\x18\x06 \x01(\tR\x05actor\x1aH\n" +
 	"\x0fSamplingOptions\x12\x18\n" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x1b\n" +
-	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\x84\x06\n" +
-	"\x06Create\x1a\xeb\x04\n" +
+	"\tpass_rate\x18\x02 \x01(\x01R\bpassRate\x1a\xd1\x06\n" +
+	"\x06Create\x1a\xb8\x05\n" +
 	"\aRequest\x12\x1d\n" +
 	"\n" +
 	"project_id\x18\x01 \x01(\tR\tprojectId\x12\x1d\n" +
 	"\n" +
 	"agent_name\x18\x02 \x01(\tR\tagentName\x12'\n" +
 	"\x0fnum_simulations\x18\x04 \x01(\x05R\x0enumSimulations\x12\x16\n" +
-	"\x06region\x18\x06 \x01(\tR\x06region\x12B\n" +
-	"\x0escenario_group\x18\a \x01(\v2\x16.livekit.ScenarioGroupH\x00R\rscenarioGroup\x88\x01\x01\x12%\n" +
-	"\vconcurrency\x18\b \x01(\x05H\x01R\vconcurrency\x88\x01\x01\x12+\n" +
+	"\x06region\x18\x06 \x01(\tR\x06region\x123\n" +
+	"\x13dispatch_agent_name\x18\x0f \x01(\tH\x00R\x11dispatchAgentName\x88\x01\x01\x12B\n" +
+	"\x0escenario_group\x18\a \x01(\v2\x16.livekit.ScenarioGroupH\x01R\rscenarioGroup\x88\x01\x01\x12%\n" +
+	"\vconcurrency\x18\b \x01(\x05H\x02R\vconcurrency\x88\x01\x01\x12+\n" +
 	"\x04mode\x18\t \x01(\x0e2\x17.livekit.SimulationModeR\x04mode\x12)\n" +
 	"\x10background_noise\x18\n" +
 	" \x01(\bR\x0fbackgroundNoise\x124\n" +
 	"\x16low_quality_microphone\x18\v \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
 	"\vpacket_loss\x18\f \x01(\bR\n" +
 	"packetLoss\x12.\n" +
-	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x02R\x02ci\x88\x01\x01\x12G\n" +
-	"\bsampling\x18\x0e \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x03R\bsampling\x88\x01\x01B\x11\n" +
+	"\x02ci\x18\r \x01(\v2\x19.livekit.SimulationRun.CIH\x03R\x02ci\x88\x01\x01\x12G\n" +
+	"\bsampling\x18\x0e \x01(\v2&.livekit.SimulationRun.SamplingOptionsH\x04R\bsampling\x88\x01\x01B\x16\n" +
+	"\x14_dispatch_agent_nameB\x11\n" +
 	"\x0f_scenario_groupB\x0e\n" +
 	"\f_concurrencyB\x05\n" +
 	"\x03_ciB\v\n" +
