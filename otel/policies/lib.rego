@@ -22,6 +22,13 @@ canonical_identity := {
 	"lk.job.id": "lk.job_id",
 }
 
+# Client spellings of shared keys whose Agents spelling and value set won (otel/model/shared).
+# Keep in sync with otel/live-check/livekit.rego.
+renamed_shared := {
+	"lk.track.source": "lk.track_source",
+	"lk.disconnect.reason": "lk.disconnect_reason",
+}
+
 high_cardinality := {"lk.room_sid", "lk.participant_id", "lk.track_sid", "lk.job_id", "lk.client.connect_id"}
 
 owners := {"shared", "client", "agents", "cloud"}
@@ -45,7 +52,7 @@ ms_exception(attr) if {
 }
 
 # Every violation of one LiveKit attribute definition, its key in `id`.
-attr_findings(attr) := ((((((owner(attr) | sensitivity(attr)) | secret(attr)) | pii_marker(attr)) | pii_heuristic(attr)) | flat_identity(attr)) | seconds(attr)) | unit(attr)
+attr_findings(attr) := (((((((owner(attr) | sensitivity(attr)) | secret(attr)) | pii_marker(attr)) | pii_heuristic(attr)) | flat_identity(attr)) | shared_rename(attr)) | seconds(attr)) | unit(attr)
 
 owner(attr) := {finding("livekit_owner", sprintf("%s: annotations.livekit.owner must be one of %v", [attr.id, owners])) |
 	not owners[lk(attr, "owner")]
@@ -84,6 +91,10 @@ heuristic_exception(attr) if {
 	pii_heuristic_allowlist[attr.id]
 	is_string(lk(attr, "pii_heuristic_exception"))
 	lk(attr, "pii_heuristic_exception") != ""
+}
+
+shared_rename(attr) := {finding("livekit_shared_rename", sprintf("%s: the shared key is %s (the Agents spelling); do not define the client spelling", [attr.id, renamed_shared[attr.id]])) |
+	renamed_shared[attr.id]
 }
 
 flat_identity(attr) := {finding("livekit_flat_identity", sprintf("%s: shared identity keys are flat, use %s", [attr.id, canonical_identity[attr.id]])) |

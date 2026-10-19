@@ -33,6 +33,8 @@ groups:
         requirement_level: recommended
       - ref: lk.pii.room_name
         requirement_level: recommended
+      - ref: lk.agent_name
+        requirement_level: recommended
       - ref: lk.job.worker_id
         requirement_level: recommended
       - ref: lk.job.agent_id
@@ -119,6 +121,7 @@ groups:
           - {name: participant_linked, requirement: best_effort, brief: "The session linked to its participant."}
           - {name: agent_state_changed, requirement: best_effort, brief: "The agent state changed (`lk.old_state` -> `lk.new_state`)."}
           - {name: user_state_changed, requirement: best_effort, brief: "The user state changed (`lk.old_state` -> `lk.new_state`)."}
+          - {name: participant_disconnected, requirement: best_effort, brief: "The linked participant left the room, with `lk.disconnect_reason`."}
           - {name: event_loop_blocked, requirement: best_effort, brief: "A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name."}
           - {name: exception, requirement: best_effort, brief: "The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once."}
     attributes:
@@ -129,6 +132,11 @@ groups:
         note: Agents sends the SID of the participant it is linked to, not of the agent itself.
       - ref: lk.participant_kind
         requirement_level: recommended
+      - ref: lk.agent_name
+        requirement_level: recommended
+      - ref: lk.disconnect_reason
+        requirement_level: opt_in
+        note: Sent on the `participant_disconnected` checkpoint, not on the span.
       - ref: lk.pii.sip.phoneNumber
         requirement_level: opt_in
       - ref: lk.blocking.count
@@ -191,12 +199,15 @@ groups:
     annotations:
       livekit:
         checkpoints:
-          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed."}
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_sid` and `lk.track_source`."}
           - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
           - {name: pre_connect_audio, requirement: best_effort, brief: "Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`."}
     attributes:
       - ref: lk.track_sid
         requirement_level: recommended
+      - ref: lk.track_source
+        requirement_level: recommended
+        note: Sent on the `track_subscribed` checkpoint, not on the span.
       - ref: lk.first_frame_delay
         requirement_level: recommended
   - id: span.wait_for_video_track
@@ -207,11 +218,14 @@ groups:
     annotations:
       livekit:
         checkpoints:
-          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed."}
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_sid` and `lk.track_source`."}
           - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
     attributes:
       - ref: lk.track_sid
         requirement_level: recommended
+      - ref: lk.track_source
+        requirement_level: recommended
+        note: Sent on the `track_subscribed` checkpoint, not on the span.
       - ref: lk.first_frame_delay
         requirement_level: recommended
   - id: span.publish_audio_output

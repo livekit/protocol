@@ -17,6 +17,12 @@ canonical_identity := {
 	"lk.job.id": "lk.job_id",
 }
 
+# Client spellings of shared keys whose Agents spelling and value set won (otel/model/shared).
+renamed_shared := {
+	"lk.track.source": "lk.track_source",
+	"lk.disconnect.reason": "lk.disconnect_reason",
+}
+
 canonical_pii := {
 	"lk.room.name": "lk.pii.room_name",
 	"lk.participant.identity": "lk.pii.participant_identity",
@@ -37,6 +43,11 @@ deny contains lk_advice("livekit_pii_unmarked", {"attribute_key": key, "expected
 	regex.match(pii_looking, key)
 	not regex.match(pii_segment, key)
 	hint := object.get({k: sprintf("; send '%s'", [v]) | some k, v in canonical_pii}, key, "")
+}
+
+deny contains lk_advice("livekit_shared_rename", {"attribute_key": key, "expected": want}, sprintf("'%s' is the client spelling of the shared key; send '%s' with its protobuf enum name as the value", [key, want])) if {
+	key := input.sample.attribute.name
+	want := renamed_shared[key]
 }
 
 deny contains lk_advice("livekit_flat_identity", {"attribute_key": key, "expected": want}, sprintf("'%s' must be emitted as '%s'", [key, want])) if {

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # The smoke sample (a real client capture, anonymized, canonical names) must pass with no
-# findings, and so must a sparse RTC window, a JS network event without its flags and a record
-# without severity text. The same smoke sample with the client's current identity/PII keys, an
-# unregistered lk.* span, unlisted checkpoints (one empty), outcomes that disagree with the span
-# status (Error for ok, Ok for ok) and events at the wrong severity (by text, and by number) must
-# be flagged.
+# findings, and so must a sparse RTC window, a JS network event without its flags, the shared keys
+# as Agents sends them, and a record without severity text. The same smoke sample with the
+# client's current identity/PII keys and spellings of shared keys, an unregistered lk.* span,
+# unlisted checkpoints (one empty), outcomes that disagree with the span status (Error for ok, Ok
+# for ok) and events at the wrong severity (by text, and by number) must be flagged.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
@@ -23,6 +23,11 @@ js=$(./live-check.sh tests/live-js-network.json "$tmp/js")
 echo "$js"
 [[ $js == *'"advice_level_counts": {}'* ]] || { echo "FAIL  JS network sample has findings" >&2; exit 1; }
 
+# What Agents sends for the shared keys, as bare attributes (Agents spans have no matchers).
+agents=$(./live-check.sh tests/live-agents.json "$tmp/agents" --search-all-attributes)
+echo "$agents"
+[[ $agents == *'"advice_level_counts": {}'* ]] || { echo "FAIL  Agents shared-key sample has findings" >&2; exit 1; }
+
 # severity_text is optional in OTLP: a record with only a valid severity number passes, whether
 # it comes as weaver samples or as OTLP/JSON lines.
 for sample in tests/live-no-severity-text.json tests/live-no-severity-text.jsonl; do
@@ -39,13 +44,16 @@ sed -e 's/"lk\.room_sid"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.na
   -e '/"name": "lk\.subscribe"/s/"span_events": \[/"span_events": [{"name": "", "attributes": []}, /' \
   -e '/"name": "lk\.subscribe"/s/"status": {"code": "unset"/"status": {"code": "ok"/' \
   -e '/"event_name": "lk\.rtc\.stats\.sample"/s/"severity_number": 9/"severity_number": 17/' \
+  -e 's/"name": "lk\.track_source", "value": "SOURCE_CAMERA"/"name": "lk.track.source", "value": "camera"/g' \
+  -e 's/"name": "lk\.disconnect_reason", "value": "CLIENT_INITIATED"/"name": "lk.disconnect.reason", "value": "client_initiated"/' \
   tests/live-sample.json > "$tmp/legacy.json"
 legacy=$(./live-check.sh "$tmp/legacy.json" "$tmp/legacy" --fail-on none)
 echo "$legacy"
 for want in "livekit_flat_identity lk.room.sid" "livekit_pii_unmarked lk.room.name" "livekit_unknown_span lk.bogus" \
   "livekit_checkpoint lk.connect" "livekit_span_outcome lk.connect" "livekit_severity lk.device.network.changed" \
-  "livekit_checkpoint lk.subscribe" "livekit_span_outcome lk.subscribe" "livekit_severity lk.rtc.stats.sample"; do
+  "livekit_checkpoint lk.subscribe" "livekit_span_outcome lk.subscribe" "livekit_severity lk.rtc.stats.sample" \
+  "livekit_shared_rename lk.track.source" "livekit_shared_rename lk.disconnect.reason"; do
   id=${want% *} key=${want#* }
   grep -q -E -- "${id}: .*${key//./\\.}" <<<"$legacy" || { echo "FAIL  not flagged: $id on $key" >&2; exit 1; }
 done
-echo "PASS  live-check: smoke, sparse, JS and no-severity-text samples clean, every planted violation flagged"
+echo "PASS  live-check: smoke, sparse, JS, Agents and no-severity-text samples clean, every planted violation flagged"

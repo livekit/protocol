@@ -159,7 +159,7 @@ groups:
   - id: registry.lk.track
     type: attribute_group
     display_name: LiveKit client track details
-    brief: Track details on publish/subscribe spans and RTC stats. The track SID is shared (`lk.track_sid`).
+    brief: Track details on publish/subscribe spans and RTC stats. The track SID and source are shared (`lk.track_sid`, `lk.track_source`).
     attributes:
       - id: lk.track.kind
         stability: development
@@ -171,25 +171,6 @@ groups:
             - {id: video, value: video, brief: Video., stability: development}
         annotations:
           livekit: {owner: client, sensitivity: none}
-      - id: lk.track.source
-        stability: development
-        brief: Source of the track.
-        note: >
-          The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead
-          (`lk.track_source = SOURCE_MICROPHONE`).
-        type:
-          members:
-            - {id: camera, value: camera, brief: Camera (TrackSource CAMERA)., stability: development}
-            - {id: microphone, value: microphone, brief: Microphone (TrackSource MICROPHONE)., stability: development}
-            - {id: screen_share, value: screen_share, brief: Screen share video (TrackSource SCREEN_SHARE)., stability: development}
-            - {id: screen_share_audio, value: screen_share_audio, brief: Screen share audio (TrackSource SCREEN_SHARE_AUDIO)., stability: development}
-            - {id: unknown, value: unknown, brief: Unknown source (TrackSource UNKNOWN)., stability: development}
-        annotations:
-          livekit:
-            owner: client
-            sensitivity: none
-            bindings:
-              agents_otlp: lk.track_source # values are the FFI enum names, e.g. SOURCE_MICROPHONE
       - id: lk.track.direction
         stability: development
         brief: Whether the stats describe sent or received media.
@@ -531,38 +512,6 @@ groups:
         brief: Reconnect attempts made in the cycle.
         note: Equals `<n>` of the last `attempt <n> <mode>` checkpoint.
         examples: [2]
-        annotations:
-          livekit: {owner: client, sensitivity: none}
-
-  - id: registry.lk.session
-    type: attribute_group
-    display_name: LiveKit client session
-    brief: Session lifecycle attributes.
-    attributes:
-      - id: lk.disconnect.reason
-        stability: development
-        brief: Why the session ended.
-        note: The protocol's `DisconnectReason`, plus the client giving up (`reconnect_failed`).
-        type:
-          members:
-            - {id: client_initiated, value: client_initiated, brief: The client hung up (CLIENT_INITIATED)., stability: development}
-            - {id: duplicate_identity, value: duplicate_identity, brief: Another participant joined with the same identity (DUPLICATE_IDENTITY)., stability: development}
-            - {id: server_shutdown, value: server_shutdown, brief: The server instance shut down (SERVER_SHUTDOWN)., stability: development}
-            - {id: participant_removed, value: participant_removed, brief: RoomService.RemoveParticipant was called (PARTICIPANT_REMOVED)., stability: development}
-            - {id: room_deleted, value: room_deleted, brief: RoomService.DeleteRoom was called (ROOM_DELETED)., stability: development}
-            - {id: state_mismatch, value: state_mismatch, brief: The server did not know the session the client tried to resume (STATE_MISMATCH)., stability: development}
-            - {id: join_failure, value: join_failure, brief: The client could not connect fully (JOIN_FAILURE)., stability: development}
-            - {id: migration, value: migration, brief: "The server asked the participant to migrate (MIGRATION, Cloud only).", stability: development}
-            - {id: signal_close, value: signal_close, brief: The signal WebSocket closed unexpectedly (SIGNAL_CLOSE)., stability: development}
-            - {id: room_closed, value: room_closed, brief: The room closed after its participants left (ROOM_CLOSED)., stability: development}
-            - {id: user_unavailable, value: user_unavailable, brief: The SIP callee did not answer in time (USER_UNAVAILABLE)., stability: development}
-            - {id: user_rejected, value: user_rejected, brief: The SIP callee rejected the call (USER_REJECTED)., stability: development}
-            - {id: sip_trunk_failure, value: sip_trunk_failure, brief: SIP protocol failure (SIP_TRUNK_FAILURE)., stability: development}
-            - {id: connection_timeout, value: connection_timeout, brief: The server timed out the session (CONNECTION_TIMEOUT)., stability: development}
-            - {id: media_failure, value: media_failure, brief: Media failed or timed out (MEDIA_FAILURE)., stability: development}
-            - {id: agent_error, value: agent_error, brief: The agent failed (AGENT_ERROR)., stability: development}
-            - {id: reconnect_failed, value: reconnect_failed, brief: The client ran out of reconnect attempts (client only)., stability: development}
-            - {id: unknown, value: unknown, brief: UNKNOWN_REASON or a number the client does not know., stability: development}
         annotations:
           livekit: {owner: client, sensitivity: none}
 

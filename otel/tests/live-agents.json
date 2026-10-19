@@ -1,0 +1,13 @@
+[
+ {"attribute": {"name": "lk.job_id", "value": "AJ_kVbMBWtnVHvT"}},
+ {"attribute": {"name": "lk.room_sid", "value": "RM_5Fq8xQ2ZbXwN"}},
+ {"attribute": {"name": "lk.pii.room_name", "value": "my-room"}},
+ {"attribute": {"name": "lk.participant_id", "value": "PA_9kLm2NpQ4rTs"}},
+ {"attribute": {"name": "lk.pii.participant_identity", "value": "identity-1"}},
+ {"attribute": {"name": "lk.track_sid", "value": "TR_AMkTyV3Zx8Qp"}},
+ {"attribute": {"name": "lk.agent_name", "value": "my-agent"}},
+ {"attribute": {"name": "lk.track_source", "value": "SOURCE_MICROPHONE"}},
+ {"attribute": {"name": "lk.track_source", "value": "SOURCE_CAMERA"}},
+ {"attribute": {"name": "lk.disconnect_reason", "value": "CLIENT_INITIATED"}},
+ {"attribute": {"name": "lk.disconnect_reason", "value": "UNKNOWN_REASON"}}
+]

@@ -304,11 +304,11 @@ groups:
     name: lk.room.disconnected
     stability: development
     brief: The Room left connected for good.
-    note: Once per session, never on a reconnect. INFO when the client hung up (`client_initiated`), WARN otherwise.
+    note: Once per session, never on a reconnect. INFO when the client hung up (`CLIENT_INITIATED`), WARN otherwise.
     annotations:
       livekit: {severity: [INFO, WARN], body: "Display line, e.g. `disconnected: client_initiated` (Rust core); the event name (JS port)."}
     attributes:
-      - ref: lk.disconnect.reason
+      - ref: lk.disconnect_reason
         requirement_level: required
 
   - id: event.custom
@@ -408,7 +408,7 @@ groups:
     attributes:
       - ref: lk.track.kind
         requirement_level: required
-      - ref: lk.track.source
+      - ref: lk.track_source
         requirement_level: required
       - ref: lk.track_sid
         requirement_level: {conditionally_required: On success; the server assigns it.}
@@ -441,7 +441,7 @@ groups:
         requirement_level: required
       - ref: lk.track.kind
         requirement_level: required
-      - ref: lk.track.source
+      - ref: lk.track_source
         requirement_level: required
       - ref: lk.pii.remote_participant_identity
         requirement_level: recommended

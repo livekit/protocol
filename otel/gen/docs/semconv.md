@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.5.0`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.6.0`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -32,6 +32,11 @@ owner is in the [attribute reference](#attribute-reference).
 `lk.job_id`, `lk.participant_id`, `lk.room_sid`, `lk.track_sid`.
 They are record and span attributes, never Resource attributes, omitted until the server has
 assigned them, and never default metric dimensions (high cardinality).
+
+**One name per concept.** Where a client and Agents named the same concept differently, the
+Agents spelling and value set is the shared key: a flat key, and protobuf enum names as values
+(`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The other
+spelling is never registered.
 
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
@@ -276,14 +281,14 @@ Pipeline smoke test. Never emitted in production paths. Not sent by the JS port.
 
 ### `lk.room.disconnected`
 
-The Room left connected for good. Once per session, never on a reconnect. INFO when the client hung up (`client_initiated`), WARN otherwise.
+The Room left connected for good. Once per session, never on a reconnect. INFO when the client hung up (`CLIENT_INITIATED`), WARN otherwise.
 
 - Severity: `INFO` or `WARN`
 - Body: Display line, e.g. `disconnected: client_initiated` (Rust core); the event name (JS port).
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.disconnect.reason` | enum | Required | Why the session ended. The protocol's `DisconnectReason`, plus the client giving up (`reconnect_failed`). |
+| `lk.disconnect_reason` | enum | Required | Why a participant left the room, as the protobuf `DisconnectReason` enum name. On the client `lk.room.disconnected` event (the local participant) and on the Agents `participant_disconnected` checkpoint (the linked participant). `RECONNECT_FAILED` is the one value outside the protobuf enum: a client that ran out of reconnect attempts sends it. |
 
 ### `lk.rtc.stats.sample`
 
@@ -370,6 +375,7 @@ Kind `internal`. The agent session, parent of every turn.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
+| `lk.agent_name` | string | Recommended | Name of the agent a job was dispatched to. On the Agents Resource and the `job_entrypoint` and `agent_session` spans, set when the job has an agent name (explicit dispatch). A client that reports the agent it talks to uses this key. The participant attribute `lk.agent.name` carries the same name on the room; it is not a telemetry key. |
 | `lk.participant_id` | string | Recommended | Server-assigned SID of the local participant (`PA_...`). Agents sends the SID of the participant it is linked to, not of the agent itself. |
 | `lk.participant_kind` | string | Recommended | Kind of the linked participant (protocol `ParticipantInfo.Kind`). |
 | `lk.pii.participant_identity` | string | Recommended | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. |
@@ -379,6 +385,7 @@ Kind `internal`. The agent session, parent of every turn.
 | `lk.blocking.count` | int | Opt-in | Blocks in the session. |
 | `lk.blocking.max_duration` | double, `s` | Opt-in | Seconds of the longest block in the session. |
 | `lk.blocking.total_duration` | double, `s` | Opt-in | Seconds blocked in total over the session. |
+| `lk.disconnect_reason` | enum | Opt-in | Why a participant left the room, as the protobuf `DisconnectReason` enum name. Sent on the `participant_disconnected` checkpoint, not on the span. |
 | `lk.fail` | boolean | Opt-in | The session report is tagged failed. See `lk.success`. |
 | `lk.pii.sip.phoneNumber` | string | Opt-in | Phone number of a SIP participant. Camel case as the SIP participant attribute it is copied from; registered as emitted. |
 | `lk.success` | boolean | Opt-in | The session report is tagged successful. A tag name in the session report (`observability.py` / `report.rs`); the outcome is derived from which of `lk.success` and `lk.fail` is present. |
@@ -388,6 +395,7 @@ Kind `internal`. The agent session, parent of every turn.
 | `participant_linked` | Best effort | The session linked to its participant. |
 | `agent_state_changed` | Best effort | The agent state changed (`lk.old_state` -> `lk.new_state`). |
 | `user_state_changed` | Best effort | The user state changed (`lk.old_state` -> `lk.new_state`). |
+| `participant_disconnected` | Best effort | The linked participant left the room, with `lk.disconnect_reason`. |
 | `event_loop_blocked` | Best effort | A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name. |
 | `exception` | Best effort | The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once. |
 
@@ -555,6 +563,7 @@ Kind `internal`. The job's entrypoint, root of a job's trace.
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.job_id` | string | Required | Agent job ID (`AJ_...`). Sent by Agents, not by clients. High cardinality; Agents' job-scoped metrics are the one sanctioned metric-dimension exception. |
+| `lk.agent_name` | string | Recommended | Name of the agent a job was dispatched to. On the Agents Resource and the `job_entrypoint` and `agent_session` spans, set when the job has an agent name (explicit dispatch). A client that reports the agent it talks to uses this key. The participant attribute `lk.agent.name` carries the same name on the room; it is not a telemetry key. |
 | `lk.job.accept_latency` | double, `s` | Recommended | Seconds from the job request to its acceptance. |
 | `lk.job.agent_id` | string | Recommended | Agent id of the job. |
 | `lk.job.assignment_latency` | double, `s` | Recommended | Seconds from acceptance to the job assignment. |
@@ -660,7 +669,7 @@ Kind `internal`. One track publish. A child of the ambient span when there is on
 | --- | --- | --- | --- |
 | `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
-| `lk.track.source` | enum | Required | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |
+| `lk.track_source` | enum | Required | Source of the track, as the protobuf `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside SCREENSHARE). |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Set only by the SDK, at most once. |
 | `lk.track_sid` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
@@ -694,8 +703,8 @@ Kind `internal`. One subscription, from the intent to subscribe to the first med
 | --- | --- | --- | --- |
 | `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
-| `lk.track.source` | enum | Required | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |
 | `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_source` | enum | Required | Source of the track, as the protobuf `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside SCREENSHARE). |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. `timed_out` when no media came within 30 s. |
 | `lk.pii.remote_participant_identity` | string | Recommended | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). On subscribe spans: the identity of the participant publishing the track. |
 
@@ -1236,10 +1245,11 @@ Kind `internal`. Waiting for the participant's audio track.
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
 | `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_source` | enum | Recommended | Source of the track, as the protobuf `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `track_subscribed` | Best effort | The track was subscribed. |
+| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_sid` and `lk.track_source`. |
 | `first_frame` | Best effort | The first frame arrived. |
 | `pre_connect_audio` | Best effort | Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`. |
 
@@ -1265,10 +1275,11 @@ Kind `internal`. Waiting for the participant's video track.
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
 | `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_source` | enum | Recommended | Source of the track, as the protobuf `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `track_subscribed` | Best effort | The track was subscribed. |
+| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_sid` and `lk.track_source`. |
 | `first_frame` | Best effort | The first frame arrived. |
 
 No limits declared.
@@ -1292,6 +1303,7 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `gen_ai.usage.reasoning_tokens` | int | agents | none | LangFuse spelling of reasoning tokens. | `12` | |
 | `langfuse.observation.completion_start_time` | string | agents | none | LangFuse's completion start time (ISO 8601), set next to `gen_ai.response.time_to_first_chunk`. | `2026-10-19T12:00:00.000Z` | |
 | `lk.agent_label` | string | agents | none | Label of the agent running the activity. | `Assistant` | `drain_agent_activity` `llm_node` `on_enter` `on_exit` `pause_agent_activity` `resume_agent_activity` `start_agent_activity` `tts_node` `update_agent` |
+| `lk.agent_name` | string | shared | none | Name of the agent a job was dispatched to. On the Agents Resource and the `job_entrypoint` and `agent_session` spans, set when the job has an agent name (explicit dispatch). A client that reports the agent it talks to uses this key. The participant attribute `lk.agent.name` carries the same name on the room; it is not a telemetry key. | `my-agent` | `agent_session` `job_entrypoint` |
 | `lk.amd.category` | string | agents | none | AMD classification. | `human`, `machine` | `amd` |
 | `lk.amd.delay` | double, `s` | agents | none | Seconds from the call start to the AMD decision. | `3.0` | `amd` |
 | `lk.amd.reason` | string | agents | none | Why the AMD classifier decided. | `greeting_length` | `amd` |
@@ -1328,7 +1340,7 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.device.network.constrained` | boolean | client | none | The user asked for less traffic (Low Data Mode, Data Saver). Apple `NWPath.isConstrained`, Android Data Saver; on the web `navigator.connection.saveData`, only where the Network Information API exists. | `false` | `lk.device.network.changed` |
 | `lk.device.network.expensive` | boolean | client | none | The network is metered (cellular, personal hotspot). Apple `NWPath.isExpensive`, Android metered networks; on the web only where the Network Information API exists. | `false` | `lk.device.network.changed` |
 | `lk.device.thermal.state` | enum | client | none | Thermal pressure as the OS reports it. Apple `ProcessInfo.thermalState`, Android `PowerManager` thermal status, web Compute Pressure API, all mapped to this vocabulary. The platform's `unknown` (no thermal source) is no reading and is never emitted. iOS, macOS and Android; optional elsewhere. |  | `lk.device.thermal.changed` |
-| `lk.disconnect.reason` | enum | client | none | Why the session ended. The protocol's `DisconnectReason`, plus the client giving up (`reconnect_failed`). |  | `lk.room.disconnected` |
+| `lk.disconnect_reason` | enum | shared | none | Why a participant left the room, as the protobuf `DisconnectReason` enum name. On the client `lk.room.disconnected` event (the local participant) and on the Agents `participant_disconnected` checkpoint (the linked participant). `RECONNECT_FAILED` is the one value outside the protobuf enum: a client that ran out of reconnect attempts sends it. |  | `lk.room.disconnected` `agent_session` |
 | `lk.dispatch_id` | string | agents | none | Agent dispatch id. | `AD_abc123` | `job_entrypoint` |
 | `lk.e2e_latency` | double, `s` | agents | none | Seconds from the end of the user's speech to the agent's first audio. | `1.1` | `agent_turn` |
 | `lk.end_of_turn_delay` | double, `s` | agents | none | Seconds from the end of speech to the turn decision. | `0.7` | `agent_turn` `user_turn` |
@@ -1512,8 +1524,8 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.tool_sets` | string[] | agents | none | Tool set names offered. | `["mcp:docs"]` | `llm_node` `setup_toolsets` |
 | `lk.track.direction` | enum | client | none | Whether the stats describe sent or received media. On RTC stats windows only. |  | `lk.rtc.stats.sample` |
 | `lk.track.kind` | enum | client | none | Media kind of the track. On publish and subscribe spans and RTC stats windows. |  | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
-| `lk.track.source` | enum | client | none | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |  | `lk.publish` `lk.subscribe` |
 | `lk.track_sid` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` `publish_audio_output` `wait_for_audio_track` `wait_for_video_track` |
+| `lk.track_source` | enum | shared | none | Source of the track, as the protobuf `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside SCREENSHARE). |  | `lk.publish` `lk.subscribe` `wait_for_audio_track` `wait_for_video_track` |
 | `lk.transcript_confidence` | double | agents | none | Confidence of the final transcript. | `0.98` | `user_turn` |
 | `lk.transcription_delay` | double, `s` | agents | none | Seconds from the end of speech to the final transcript. | `0.4` | `agent_turn` `user_turn` |
 | `lk.tts.bytes` | int, `By` | agents | none | Audio bytes the TTS driver collected (Node binding). | `230400` | `tts_stream` `tts_synthesize` |
@@ -1589,28 +1601,28 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `serious` | High; the system reduces performance. |
 | `critical` | Critical; the device needs to cool down. |
 
-### `lk.disconnect.reason`
+### `lk.disconnect_reason`
 
 | Value | Meaning |
 | --- | --- |
-| `client_initiated` | The client hung up (CLIENT_INITIATED). |
-| `duplicate_identity` | Another participant joined with the same identity (DUPLICATE_IDENTITY). |
-| `server_shutdown` | The server instance shut down (SERVER_SHUTDOWN). |
-| `participant_removed` | RoomService.RemoveParticipant was called (PARTICIPANT_REMOVED). |
-| `room_deleted` | RoomService.DeleteRoom was called (ROOM_DELETED). |
-| `state_mismatch` | The server did not know the session the client tried to resume (STATE_MISMATCH). |
-| `join_failure` | The client could not connect fully (JOIN_FAILURE). |
-| `migration` | The server asked the participant to migrate (MIGRATION, Cloud only). |
-| `signal_close` | The signal WebSocket closed unexpectedly (SIGNAL_CLOSE). |
-| `room_closed` | The room closed after its participants left (ROOM_CLOSED). |
-| `user_unavailable` | The SIP callee did not answer in time (USER_UNAVAILABLE). |
-| `user_rejected` | The SIP callee rejected the call (USER_REJECTED). |
-| `sip_trunk_failure` | SIP protocol failure (SIP_TRUNK_FAILURE). |
-| `connection_timeout` | The server timed out the session (CONNECTION_TIMEOUT). |
-| `media_failure` | Media failed or timed out (MEDIA_FAILURE). |
-| `agent_error` | The agent failed (AGENT_ERROR). |
-| `reconnect_failed` | The client ran out of reconnect attempts (client only). |
-| `unknown` | UNKNOWN_REASON or a number the client does not know. |
+| `UNKNOWN_REASON` | No reason given, or a number the producer does not know. |
+| `CLIENT_INITIATED` | The participant hung up. |
+| `DUPLICATE_IDENTITY` | Another participant joined with the same identity. |
+| `SERVER_SHUTDOWN` | The server instance shut down. |
+| `PARTICIPANT_REMOVED` | RoomService.RemoveParticipant was called. |
+| `ROOM_DELETED` | RoomService.DeleteRoom was called. |
+| `STATE_MISMATCH` | The server did not know the session the client tried to resume. |
+| `JOIN_FAILURE` | The client could not connect fully. |
+| `MIGRATION` | The server asked the participant to migrate (Cloud only). |
+| `SIGNAL_CLOSE` | The signal WebSocket closed unexpectedly. |
+| `ROOM_CLOSED` | The room closed after its participants left. |
+| `USER_UNAVAILABLE` | The SIP callee did not answer in time. |
+| `USER_REJECTED` | The SIP callee rejected the call. |
+| `SIP_TRUNK_FAILURE` | SIP protocol failure. |
+| `CONNECTION_TIMEOUT` | The server timed out the session. |
+| `MEDIA_FAILURE` | Media failed or timed out. |
+| `AGENT_ERROR` | The agent failed. |
+| `RECONNECT_FAILED` | The client ran out of reconnect attempts (client only, not a protobuf value). |
 
 ### `lk.eou.outcome`
 
@@ -1679,15 +1691,15 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `audio` | Audio. |
 | `video` | Video. |
 
-### `lk.track.source`
+### `lk.track_source`
 
 | Value | Meaning |
 | --- | --- |
-| `camera` | Camera (TrackSource CAMERA). |
-| `microphone` | Microphone (TrackSource MICROPHONE). |
-| `screen_share` | Screen share video (TrackSource SCREEN_SHARE). |
-| `screen_share_audio` | Screen share audio (TrackSource SCREEN_SHARE_AUDIO). |
-| `unknown` | Unknown source (TrackSource UNKNOWN). |
+| `SOURCE_UNKNOWN` | Unknown source. |
+| `SOURCE_CAMERA` | Camera. |
+| `SOURCE_MICROPHONE` | Microphone. |
+| `SOURCE_SCREENSHARE` | Screen share video. |
+| `SOURCE_SCREENSHARE_AUDIO` | Screen share audio. |
 
 ## Bindings
 
@@ -1696,12 +1708,14 @@ validates it.
 
 | Key | Producer or store | Name there |
 | --- | --- | --- |
+| `lk.agent_name` | agents_participant_attribute | `lk.agent.name` |
+| `lk.agent_name` | agents_session_report | `agent_name` |
 | `lk.job_id` | agents_otlp | `lk.job_id`, `job_id` |
 | `lk.job_id` | collector_column | `none` |
 | `lk.room_sid` | agents_otlp | `lk.room_sid`, `room_id` |
 | `lk.room_sid` | collector_column | `room_id` |
 | `lk.room_sid` | roomobs | `room_session.id` |
-| `lk.track.source` | agents_otlp | `lk.track_source` |
 
 `agents_otlp` lists Agents' span key first, then its Resource and metric-point key.
+`agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.

@@ -1,0 +1,12 @@
+# expect: livekit_shared_rename
+groups:
+  - id: registry.lk.negative
+    type: attribute_group
+    brief: Negative fixture.
+    attributes:
+      - id: lk.track.source
+        type: string
+        stability: development
+        brief: The client spelling of the shared key lk.track_source, defined again.
+        examples: ["camera"]
+        annotations: {livekit: {owner: client, sensitivity: none}}

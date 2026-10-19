@@ -20,7 +20,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 | Path | What |
 |---|---|
 | `model/manifest.yaml` | Registry version (`schema_url`) and the pinned OTel dependency |
-| `model/shared/registry.yaml` | Shared keys: identity (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`) |
+| `model/shared/registry.yaml` | Shared keys: identity (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
 | `model/client/groups.yaml` | Attribute sets on every client resource / record (used by live-check) |
@@ -46,9 +46,14 @@ Every LiveKit key carries `annotations.livekit.owner`:
 - **`client`** (`model/client/`): the Client team approves alone, unless the change touches or
   duplicates a shared concept.
 - **`agents`** (`model/agents/`): the Agents team approves alone, unless the change touches or
-  duplicates a shared concept. Registered as emitted; the three keys that collide with a client
-  spelling (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) are deliberately left
-  out until the two teams pick one, and stay literals in the Agents shims.
+  duplicates a shared concept. Registered as emitted.
+
+Where a client and Agents named the same concept differently, the Agents spelling and value set
+is the shared key, and the client is the side that changes: `lk.track_source` and
+`lk.disconnect_reason` take the protobuf enum names as values (`SOURCE_MICROPHONE`,
+`CLIENT_INITIATED`), and `lk.agent_name` is the key a client uses for the agent. The client's
+current spellings are rename targets, like the six identity/PII keys: they are not registered, a
+policy rejects defining them, and live-check names the shared key to send instead.
 - `cloud` is a valid owner for when that team registers its keys, in its own directory.
 
 The Notion conventions put client-owned attributes under `lk.client.*`. The client core does not do
@@ -149,6 +154,7 @@ never here, so a producer names them from one place. TypeScript does not yet.
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
+| `livekit_shared_rename` | yes | no `lk.track.source`, `lk.disconnect.reason` (the client spellings of shared keys) |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
@@ -171,15 +177,16 @@ It takes OTLP/JSON lines from an otelcol `file` exporter (the SDK e2e setup), or
 JSON file. `live-check/weaver.toml` matches spans by name and checks the resource and every
 record against `model/client/groups.yaml`. It drops two kinds of finding: `not_stable` (every key
 is `development`) and absent `conditionally_required` attributes (their conditions are prose).
-`live-check/livekit.rego` adds `livekit_flat_identity` and `livekit_pii_unmarked`, each naming
-the key to send instead, and `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
+`live-check/livekit.rego` adds `livekit_flat_identity`, `livekit_pii_unmarked` and
+`livekit_shared_rename`, each naming the key to send instead, and `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
 alone reports nothing for an unmatched span that has no attributes). From the event and span
 annotations it adds `livekit_severity` (an event at a severity it is not declared with),
 `livekit_checkpoint` (a span event the span does not list) and `livekit_span_outcome` (span status
 disagreeing with `lk.outcome`, or `error.type` without `lk.outcome = error`).
 
 On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 spans, 22 logs,
-349 attributes), every finding is one of the expected shared identity / PII renames:
+349 attributes), every finding is one of the eight expected renames to shared keys (136
+violations, 62 improvements):
 
 | Emitted today | Registered key | Findings |
 |---|---|---|
@@ -189,8 +196,12 @@ On the reference session (Swift 2.17.0 with the core at rust-sdks `a9ec8d52`: 6 
 | `lk.room.name` | `lk.pii.room_name` | `missing_attribute`, `unexpected_attribute`, `livekit_pii_unmarked` ×10 each |
 | `lk.participant.identity` | `lk.pii.participant_identity` | same, ×10 each |
 | `lk.participant.remote_identity` | `lk.pii.remote_participant_identity` | same, ×2 each, plus `recommended_attribute_not_present` ×2 |
+| `lk.track.source` = `camera`, `microphone` | `lk.track_source` = `SOURCE_CAMERA`, `SOURCE_MICROPHONE` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename`, `required_attribute_not_present: lk.track_source` ×4 each |
+| `lk.disconnect.reason` = `client_initiated` | `lk.disconnect_reason` = `CLIENT_INITIATED` | same, ×2 each |
 
-With those six keys renamed in the same capture, live-check reports nothing and exits 0.
+With those eight keys renamed (and the two values mapped) in the same capture, live-check reports
+nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and
+`tests/live-agents.json` holds the shared keys as Agents sends them; both must pass.
 `tests/live-sample.json` is part of that capture, anonymized.
 
 Known limits:
@@ -215,7 +226,7 @@ otel/live-check.sh <sdk-capture>.jsonl                 # names, types, enums, se
 otel/live-check.sh <sdk-capture>.jsonl . --fail-on none  # report only
 ```
 
-Rollout: run report-only until the six identity/PII renames land in a core, then fail the
+Rollout: run report-only until the eight renames to shared keys land in a core, then fail the
 test on violations. One registry version checks all producers the same way, so a platform
 cannot drift from the shared keys without its own CI noticing. It checks the vocabulary, not
 transport, cadence or storage.
