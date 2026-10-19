@@ -532,6 +532,7 @@ message DataChannelInfo {
 }
 
 enum NegotiatedDataChannelID {
+  NDCI_INVALID = 0;
   NDCI_RELIABLE = 100;
   NDCI_LOSSY = 101;
   NDCI_DATA_TRACK = 102;
