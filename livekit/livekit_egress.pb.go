@@ -260,7 +260,8 @@ type SegmentedFileProtocol int32
 
 const (
 	SegmentedFileProtocol_DEFAULT_SEGMENTED_FILE_PROTOCOL SegmentedFileProtocol = 0
-	SegmentedFileProtocol_HLS_PROTOCOL                    SegmentedFileProtocol = 1
+	SegmentedFileProtocol_HLS_PROTOCOL                    SegmentedFileProtocol = 1 // MPEG-TS segments
+	SegmentedFileProtocol_HLS_FMP4_PROTOCOL               SegmentedFileProtocol = 2 // fragmented MP4 segments
 )
 
 // Enum value maps for SegmentedFileProtocol.
@@ -268,10 +269,12 @@ var (
 	SegmentedFileProtocol_name = map[int32]string{
 		0: "DEFAULT_SEGMENTED_FILE_PROTOCOL",
 		1: "HLS_PROTOCOL",
+		2: "HLS_FMP4_PROTOCOL",
 	}
 	SegmentedFileProtocol_value = map[string]int32{
 		"DEFAULT_SEGMENTED_FILE_PROTOCOL": 0,
 		"HLS_PROTOCOL":                    1,
+		"HLS_FMP4_PROTOCOL":               2,
 	}
 )
 
@@ -5683,10 +5686,11 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\x10DEFAULT_PROTOCOL\x10\x00\x12\b\n" +
 	"\x04RTMP\x10\x01\x12\a\n" +
 	"\x03SRT\x10\x02\x12\r\n" +
-	"\tWEBSOCKET\x10\x03*N\n" +
+	"\tWEBSOCKET\x10\x03*e\n" +
 	"\x15SegmentedFileProtocol\x12#\n" +
 	"\x1fDEFAULT_SEGMENTED_FILE_PROTOCOL\x10\x00\x12\x10\n" +
-	"\fHLS_PROTOCOL\x10\x01*/\n" +
+	"\fHLS_PROTOCOL\x10\x01\x12\x15\n" +
+	"\x11HLS_FMP4_PROTOCOL\x10\x02*/\n" +
 	"\x13SegmentedFileSuffix\x12\t\n" +
 	"\x05INDEX\x10\x00\x12\r\n" +
 	"\tTIMESTAMP\x10\x01*f\n" +

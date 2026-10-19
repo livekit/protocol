@@ -242,7 +242,8 @@ message SegmentedFileOutput {
 
 enum SegmentedFileProtocol {
   DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
-  HLS_PROTOCOL = 1;
+  HLS_PROTOCOL = 1;        // MPEG-TS segments
+  HLS_FMP4_PROTOCOL = 2;   // fragmented MP4 segments
 }
 
 enum SegmentedFileSuffix {
