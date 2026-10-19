@@ -1,5 +1,49 @@
 # github.com/livekit/protocol
 
+## 1.53.0
+
+### Minor Changes
+
+- Agent threads, the durable conversation an agent has with a person across channels (`agent/livekit_agent_thread.proto`): `AgentThread` (the thread, its items as `ChatContext.ChatItem`) and `AgentTask` (background work an agent runs in it); the conversation tables in `livekit/agent/thread_schema_v1.sql`; `auth.AgentThreadGrant` under the `agentThread` claim (list and create by scope, read, write and delete by thread id, or every thread of the project with `all`); the `AT_` (thread) and `AST_` (agent stream) id prefixes in `utils/guid`. - [#1841](https://github.com/livekit/protocol/pull/1841) ([@theomonnom](https://github.com/theomonnom))
+
+  The agent-db and thread services are internal gRPC in cloud-protocol, so `AgentDBService` and its Twirp code are removed; the public API is public-api-server. A database lives in its project's data region: `AgentDB.CreateRequest.region` is removed, `DumpRequest`/`DumpResponse` are now `ExportRequest`/`ExportResponse`, and AgentDB times are `google.protobuf.Timestamp` / `Duration`. A batch answers one result per statement, tagged with its 0-based `statement` index on `Columns`, `ColumnBatch` and `ExecResult`.
+
+### Patch Changes
+
+- Add `AgentEndpointGrant`, scoping calls to an agent's non-public HTTP endpoints - [#1728](https://github.com/livekit/protocol/pull/1728) ([@theomonnom](https://github.com/theomonnom))
+
+- `configutil.Observable` gains `ObserveCurrent`, which replays the current config to late subscribers ordered against reloads; `NewAtomic*` use it. Implementations outside this package must add the method - [#1869](https://github.com/livekit/protocol/pull/1869) ([@paulwe](https://github.com/paulwe))
+
+- Report full CPU load in hwstats.GetCPULoad when idle is 0 - [#1835](https://github.com/livekit/protocol/pull/1835) ([@boks1971](https://github.com/boks1971))
+
+- Add data track packet client extensions - [#1834](https://github.com/livekit/protocol/pull/1834) ([@ladvoc](https://github.com/ladvoc))
+
+- `egressobs.GetAudioOnly` reports `true` for v2 egress and replay requests with a `MediaSource` that has no video selector - [#1848](https://github.com/livekit/protocol/pull/1848) ([@milos-lk](https://github.com/milos-lk))
+
+- `egressobs.GetAudioOnly` reports `true` for TrackComposite egress requests without a video track - [#1859](https://github.com/livekit/protocol/pull/1859) ([@erikhortsch](https://github.com/erikhortsch))
+
+- `RTPForwarderState.dependency_descriptor_forwarder` (`DependencyDescriptorForwarderState`) carries the last dependency descriptor frame number a forwarder sent, so a migrated subscriber's frame numbers continue. - [#1855](https://github.com/livekit/protocol/pull/1855) ([@boks1971](https://github.com/boks1971))
+
+- `FunctionCall.extra` (`map<string, string>`, like `ChatMessage.extra`): a function call's extra metadata, such as a delegation's task id and endpoint, survives the threads service. - [#1853](https://github.com/livekit/protocol/pull/1853) ([@theomonnom](https://github.com/theomonnom))
+
+- Add fixed IDs for negotiated data channels - [#1871](https://github.com/livekit/protocol/pull/1871) ([@cnderrauber](https://github.com/cnderrauber))
+
+- Keep loggers derived from medialogutils.OverrideLogger wrapped, so they still demote errors to warnings and report the right caller - [#1842](https://github.com/livekit/protocol/pull/1842) ([@anunaym14](https://github.com/anunaym14))
+
+- Data track extension ID collision: intermediate step. - [#1825](https://github.com/livekit/protocol/pull/1825) ([@boks1971](https://github.com/boks1971))
+
+- Add ringing_timeout_status to SIPInboundTrunkInfo & EvaluateSIPDispatchRulesResponse - [#1819](https://github.com/livekit/protocol/pull/1819) ([@alexlivekit](https://github.com/alexlivekit))
+
+- agent_simulation: rename `SimulationRun.Sampling` to `SimulationRun.SamplingOptions`. Wire-compatible; the `sampling` fields keep their names and numbers. - [#1832](https://github.com/livekit/protocol/pull/1832) ([@u9g](https://github.com/u9g))
+
+- Add sip.IsEmergencyNumber and provider_info on InternalCreateSIPParticipantRequest - [#1850](https://github.com/livekit/protocol/pull/1850) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Add `ParseSIPNameAddr`, which validates a name-addr value and returns its user part, replacing `sip.URIUser` - [#1864](https://github.com/livekit/protocol/pull/1864) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- `AgentThread.GetItemsRequest.sort_order` (`AgentThread.SortOrder`): `DESC` lists a thread's items from the latest back, so a chat view can load its last page first and page up through older items. Thread listings page like the other lists: `page_token`, `limit` and `next_page_token` (strings: `livekit.agent` cannot use `TokenPagination`) replace `before`/`after`, and `GetTasks` pages too. In `thread_schema_v1.sql`, `items` and `tasks` gain `pos INTEGER PRIMARY KEY AUTOINCREMENT` (insertion order, never reused, so a page token never skips a row), `items` an index on `(lane, pos)`; `id` and `task_id` stay the upsert keys as `TEXT NOT NULL UNIQUE`. - [#1851](https://github.com/livekit/protocol/pull/1851) ([@theomonnom](https://github.com/theomonnom))
+
+- Fix ResourceURLNotifier.QueueNotify keeping its lock after an error - [#1831](https://github.com/livekit/protocol/pull/1831) ([@boks1971](https://github.com/boks1971))
+
 ## 1.52.1
 
 ### Patch Changes
