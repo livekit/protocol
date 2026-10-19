@@ -46,3 +46,36 @@ func (l *OverrideLogger) Warnw(msg string, err error, keysAndValues ...interface
 func (l *OverrideLogger) Errorw(msg string, err error, keysAndValues ...interface{}) {
 	l.Logger.Warnw(msg, err, keysAndValues...)
 }
+
+func (l *OverrideLogger) WithValues(keysAndValues ...interface{}) logger.Logger {
+	return &OverrideLogger{Logger: l.Logger.WithValues(keysAndValues...)}
+}
+
+func (l *OverrideLogger) WithUnlikelyValues(keysAndValues ...interface{}) logger.UnlikelyLogger {
+	return logger.NewUnlikelyLogger(l, keysAndValues...)
+}
+
+func (l *OverrideLogger) WithName(name string) logger.Logger {
+	return &OverrideLogger{Logger: l.Logger.WithName(name)}
+}
+
+func (l *OverrideLogger) WithComponent(component string) logger.Logger {
+	return &OverrideLogger{Logger: l.Logger.WithComponent(component)}
+}
+
+func (l *OverrideLogger) WithCallDepth(depth int) logger.Logger {
+	return &OverrideLogger{Logger: l.Logger.WithCallDepth(depth)}
+}
+
+func (l *OverrideLogger) WithItemSampler() logger.Logger {
+	return &OverrideLogger{Logger: l.Logger.WithItemSampler()}
+}
+
+func (l *OverrideLogger) WithoutSampler() logger.Logger {
+	return &OverrideLogger{Logger: l.Logger.WithoutSampler()}
+}
+
+func (l *OverrideLogger) WithDeferredValues() (logger.Logger, logger.DeferredFieldResolver) {
+	child, resolver := l.Logger.WithDeferredValues()
+	return &OverrideLogger{Logger: child}, resolver
+}

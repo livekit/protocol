@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"hash/crc32"
 	"os"
+	"sync"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/prometheus/client_golang/prometheus"
@@ -48,7 +49,9 @@ type Observer[T any] struct {
 	builder   Builder[T]
 	watcher   *fsnotify.Watcher
 	observers *events.ObserverList[*T]
-	conf      atomic.Pointer[T]
+	// mu serializes store+emit with ObserveCurrent's register+replay.
+	mu   sync.Mutex
+	conf atomic.Pointer[T]
 }
 
 func NewObserver[T any](path string, builder Builder[T]) (*Observer[T], *T, error) {
@@ -61,6 +64,7 @@ func NewObserver[T any](path string, builder Builder[T]) (*Observer[T], *T, erro
 	if err != nil {
 		return nil, nil, err
 	}
+	c.conf.Store(conf)
 
 	if path != "" {
 		c.watcher, err = fsnotify.NewWatcher()
@@ -84,15 +88,34 @@ func (c *Observer[T]) Close() {
 }
 
 func (c *Observer[T]) EmitConfigUpdate(conf *T) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.conf.Store(conf)
 	c.observers.Emit(conf)
 }
 
+// Observe delivers only configs emitted after it returns.
 func (c *Observer[T]) Observe(cb func(*T)) func() {
 	if c == nil {
 		return func() {}
 	}
 	return c.observers.On(cb)
+}
+
+// ObserveCurrent calls cb with the current config before returning, then on
+// every later emit; cb never sees a config older than one it already received.
+//
+// Callbacks run under the observer's lock: they must not call Observe,
+// ObserveCurrent, EmitConfigUpdate or a stop func.
+func (c *Observer[T]) ObserveCurrent(cb func(*T)) func() {
+	if c == nil {
+		return func() {}
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	stop := c.observers.On(cb)
+	cb(c.conf.Load())
+	return stop
 }
 
 func (c *Observer[T]) Load() *T {
@@ -182,8 +205,6 @@ func (c *Observer[T]) load(path string) (conf *T, err error) {
 			return nil, fmt.Errorf("invalid config: %w", err)
 		}
 	}
-
-	c.conf.Store(conf)
 
 	if hasHash {
 		setConfigHash(path, hash)

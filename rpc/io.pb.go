@@ -1443,15 +1443,15 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\ravg_cpu_usage\x18\x03 \x01(\x02R\vavgCpuUsage\x12\"\n" +
 	"\rmax_cpu_usage\x18\x04 \x01(\x02R\vmaxCpuUsage\"A\n" +
 	"\x15CreateIngressResponse\x12(\n" +
-	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\"c\n" +
+	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\"h\n" +
 	"\x15GetIngressInfoRequest\x12+\n" +
 	"\n" +
-	"ingress_id\x18\x01 \x01(\tB\f\xbaP\tingressIDR\tingressId\x12\x1d\n" +
+	"ingress_id\x18\x01 \x01(\tB\f\xbaP\tingressIDR\tingressId\x12\"\n" +
 	"\n" +
-	"stream_key\x18\x02 \x01(\tR\tstreamKey\"\xca\x03\n" +
+	"stream_key\x18\x02 \x01(\tB\x03\xc0P\x02R\tstreamKey\"\xcf\x03\n" +
 	"\x16GetIngressInfoResponse\x12(\n" +
-	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x14\n" +
-	"\x05token\x18\x02 \x01(\tR\x05token\x12\x15\n" +
+	"\x04info\x18\x01 \x01(\v2\x14.livekit.IngressInfoR\x04info\x12\x19\n" +
+	"\x05token\x18\x02 \x01(\tB\x03\xc0P\x02R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\x03 \x01(\tR\x05wsUrl\x12+\n" +
 	"\n" +
 	"project_id\x18\x06 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12U\n" +
@@ -1494,7 +1494,7 @@ const file_rpc_io_proto_rawDesc = "" +
 	" \x01(\v2\x19.rpc.SIPCallObservabilityR\robservability\x1a?\n" +
 	"\x11FeatureFlagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa8\x05\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xad\x05\n" +
 	"\x1fEvaluateSIPDispatchRulesRequest\x12.\n" +
 	"\vsip_call_id\x18\b \x01(\tB\x0e\xbaP\tsipCallID\x18\x01R\tsipCallId\x12C\n" +
 	"\x12sip_participant_id\x18\x01 \x01(\tB\x15\xbaP\x10sipParticipantID\x18\x01R\x10sipParticipantId\x12/\n" +
@@ -1506,8 +1506,8 @@ const file_rpc_io_proto_rawDesc = "" +
 	"\fcalling_host\x18\v \x01(\tB\x02\x18\x01R\vcallingHost\x12'\n" +
 	"\rcalled_number\x18\x03 \x01(\tB\x02\x18\x01R\fcalledNumber\x12#\n" +
 	"\vsrc_address\x18\x04 \x01(\tB\x02\x18\x01R\n" +
-	"srcAddress\x12\x10\n" +
-	"\x03pin\x18\x05 \x01(\tR\x03pin\x12\x15\n" +
+	"srcAddress\x12\x15\n" +
+	"\x03pin\x18\x05 \x01(\tB\x03\xc0P\x02R\x03pin\x12\x15\n" +
 	"\x06no_pin\x18\x06 \x01(\bR\x05noPin\x12#\n" +
 	"\vcalled_host\x18\a \x01(\tB\x02\x18\x01R\n" +
 	"calledHost\x12\x8a\x01\n" +

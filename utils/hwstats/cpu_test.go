@@ -16,7 +16,9 @@ package hwstats
 
 import (
 	"testing"
+	"time"
 
+	"github.com/frostbyte73/core"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,6 +28,37 @@ func TestGetCPUIdle(t *testing.T) {
 
 	idle := st.GetCPUIdle()
 	require.GreaterOrEqual(t, idle, 0.0)
+}
+
+type fakeCPUMonitor struct {
+	idle float64
+	n    float64
+}
+
+func (f *fakeCPUMonitor) getCPUIdle() (float64, error) { return f.idle, nil }
+func (f *fakeCPUMonitor) numCPU() float64              { return f.n }
+
+func TestGetCPULoad(t *testing.T) {
+	platform := &fakeCPUMonitor{n: 8}
+	st := &CPUStats{platform: platform, warningThrottle: core.NewThrottle(time.Minute)}
+
+	// no sample yet
+	require.Zero(t, st.GetCPULoad())
+
+	for _, c := range []struct {
+		idle float64
+		load float64
+	}{
+		{idle: 8, load: 0},
+		{idle: 4, load: 0.5},
+		{idle: 0.01, load: 0.99875},
+		// a saturated node has its idle clamped to 0
+		{idle: 0, load: 1},
+	} {
+		platform.idle = c.idle
+		st.sampleCPUIdle()
+		require.InDelta(t, c.load, st.GetCPULoad(), 1e-9, "idle %v", c.idle)
+	}
 }
 
 func TestAggregateMemoryStats(t *testing.T) {
