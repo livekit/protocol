@@ -104,4 +104,9 @@ func RedactStreamKeys(stream *livekit.StreamOutput) {
 			stream.Urls[i] = redacted
 		}
 	}
+	for _, d := range stream.Destinations {
+		if redacted, ok := utils.RedactStreamKey(d.Url); ok {
+			d.Url = redacted
+		}
+	}
 }
