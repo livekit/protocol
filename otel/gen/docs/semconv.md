@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.6.0`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.6.1`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -13,7 +13,8 @@ batching, retries, storage) is not part of the conventions.
 
 Contents: [Conventions](#conventions) · [Resource](#resource) · [Every record](#every-record) ·
 [Plain log records](#plain-log-records) · [Events](#events) · [Spans](#spans) ·
-[Attribute reference](#attribute-reference) · [Enum values](#enum-values) · [Bindings](#bindings)
+[Attribute reference](#attribute-reference) · [Enum values](#enum-values) · [Bindings](#bindings) ·
+[Old spellings](#old-spellings)
 
 ## Conventions
 
@@ -34,9 +35,10 @@ They are record and span attributes, never Resource attributes, omitted until th
 assigned them, and never default metric dimensions (high cardinality).
 
 **One name per concept.** Where a client and Agents named the same concept differently, the
-Agents spelling and value set is the shared key: a flat key, and protobuf enum names as values
-(`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The other
-spelling is never registered.
+Agents spelling and value set is the shared key: a flat key, and the enum names Agents sends as
+values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The
+other spelling is never registered, deprecated or not. The shared key records it in
+`renamed_from`, listed under [Old spellings](#old-spellings).
 
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
@@ -669,7 +671,7 @@ Kind `internal`. One track publish. A child of the ambient span when there is on
 | --- | --- | --- | --- |
 | `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
-| `lk.track_source` | enum | Required | Source of the track, as the protobuf `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside SCREENSHARE). |
+| `lk.track_source` | enum | Required | Source of the track, as the Agents RTC FFI `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their track source to these names explicitly. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Set only by the SDK, at most once. |
 | `lk.track_sid` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
@@ -704,7 +706,7 @@ Kind `internal`. One subscription, from the intent to subscribe to the first med
 | `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
-| `lk.track_source` | enum | Required | Source of the track, as the protobuf `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside SCREENSHARE). |
+| `lk.track_source` | enum | Required | Source of the track, as the Agents RTC FFI `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their track source to these names explicitly. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. `timed_out` when no media came within 30 s. |
 | `lk.pii.remote_participant_identity` | string | Recommended | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). On subscribe spans: the identity of the participant publishing the track. |
 
@@ -1245,7 +1247,7 @@ Kind `internal`. Waiting for the participant's audio track.
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
 | `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
-| `lk.track_source` | enum | Recommended | Source of the track, as the protobuf `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
+| `lk.track_source` | enum | Recommended | Source of the track, as the Agents RTC FFI `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
@@ -1275,7 +1277,7 @@ Kind `internal`. Waiting for the participant's video track.
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
 | `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
-| `lk.track_source` | enum | Recommended | Source of the track, as the protobuf `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
+| `lk.track_source` | enum | Recommended | Source of the track, as the Agents RTC FFI `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
@@ -1525,7 +1527,7 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.track.direction` | enum | client | none | Whether the stats describe sent or received media. On RTC stats windows only. |  | `lk.rtc.stats.sample` |
 | `lk.track.kind` | enum | client | none | Media kind of the track. On publish and subscribe spans and RTC stats windows. |  | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
 | `lk.track_sid` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` `publish_audio_output` `wait_for_audio_track` `wait_for_video_track` |
-| `lk.track_source` | enum | shared | none | Source of the track, as the protobuf `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside SCREENSHARE). |  | `lk.publish` `lk.subscribe` `wait_for_audio_track` `wait_for_video_track` |
+| `lk.track_source` | enum | shared | none | Source of the track, as the Agents RTC FFI `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their track source to these names explicitly. |  | `lk.publish` `lk.subscribe` `wait_for_audio_track` `wait_for_video_track` |
 | `lk.transcript_confidence` | double | agents | none | Confidence of the final transcript. | `0.98` | `user_turn` |
 | `lk.transcription_delay` | double, `s` | agents | none | Seconds from the end of speech to the final transcript. | `0.4` | `agent_turn` `user_turn` |
 | `lk.tts.bytes` | int, `By` | agents | none | Audio bytes the TTS driver collected (Node binding). | `230400` | `tts_stream` `tts_synthesize` |
@@ -1719,3 +1721,41 @@ validates it.
 `agents_otlp` lists Agents' span key first, then its Resource and metric-point key.
 `agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.
+
+## Old spellings
+
+Keys and values that producers sent before this registry, and the key and value to send instead.
+Each row comes from `renamed_from` on the shared key. Live-check reports an old spelling as
+`livekit_shared_rename` and names the replacement.
+
+| Old key | Old value | Key to send | Value to send |
+| --- | --- | --- | --- |
+| `lk.disconnect.reason` | `agent_error` | `lk.disconnect_reason` | `AGENT_ERROR` |
+| `lk.disconnect.reason` | `client_initiated` | `lk.disconnect_reason` | `CLIENT_INITIATED` |
+| `lk.disconnect.reason` | `connection_timeout` | `lk.disconnect_reason` | `CONNECTION_TIMEOUT` |
+| `lk.disconnect.reason` | `duplicate_identity` | `lk.disconnect_reason` | `DUPLICATE_IDENTITY` |
+| `lk.disconnect.reason` | `join_failure` | `lk.disconnect_reason` | `JOIN_FAILURE` |
+| `lk.disconnect.reason` | `media_failure` | `lk.disconnect_reason` | `MEDIA_FAILURE` |
+| `lk.disconnect.reason` | `migration` | `lk.disconnect_reason` | `MIGRATION` |
+| `lk.disconnect.reason` | `participant_removed` | `lk.disconnect_reason` | `PARTICIPANT_REMOVED` |
+| `lk.disconnect.reason` | `reconnect_failed` | `lk.disconnect_reason` | `RECONNECT_FAILED` |
+| `lk.disconnect.reason` | `room_closed` | `lk.disconnect_reason` | `ROOM_CLOSED` |
+| `lk.disconnect.reason` | `room_deleted` | `lk.disconnect_reason` | `ROOM_DELETED` |
+| `lk.disconnect.reason` | `server_shutdown` | `lk.disconnect_reason` | `SERVER_SHUTDOWN` |
+| `lk.disconnect.reason` | `signal_close` | `lk.disconnect_reason` | `SIGNAL_CLOSE` |
+| `lk.disconnect.reason` | `sip_trunk_failure` | `lk.disconnect_reason` | `SIP_TRUNK_FAILURE` |
+| `lk.disconnect.reason` | `state_mismatch` | `lk.disconnect_reason` | `STATE_MISMATCH` |
+| `lk.disconnect.reason` | `unknown` | `lk.disconnect_reason` | `UNKNOWN_REASON` |
+| `lk.disconnect.reason` | `user_rejected` | `lk.disconnect_reason` | `USER_REJECTED` |
+| `lk.disconnect.reason` | `user_unavailable` | `lk.disconnect_reason` | `USER_UNAVAILABLE` |
+| `lk.participant.sid` | any | `lk.participant_id` | unchanged |
+| `lk.participant.identity` | any | `lk.pii.participant_identity` | unchanged |
+| `lk.participant.remote_identity` | any | `lk.pii.remote_participant_identity` | unchanged |
+| `lk.room.name` | any | `lk.pii.room_name` | unchanged |
+| `lk.room.sid` | any | `lk.room_sid` | unchanged |
+| `lk.track.sid` | any | `lk.track_sid` | unchanged |
+| `lk.track.source` | `camera` | `lk.track_source` | `SOURCE_CAMERA` |
+| `lk.track.source` | `microphone` | `lk.track_source` | `SOURCE_MICROPHONE` |
+| `lk.track.source` | `screen_share` | `lk.track_source` | `SOURCE_SCREENSHARE` |
+| `lk.track.source` | `screen_share_audio` | `lk.track_source` | `SOURCE_SCREENSHARE_AUDIO` |
+| `lk.track.source` | `unknown` | `lk.track_source` | `SOURCE_UNKNOWN` |

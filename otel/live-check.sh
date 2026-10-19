@@ -18,7 +18,8 @@ fi
 
 status=0
 "$W" registry live-check --config "$here/live-check/weaver.toml" -r "$here/model" --v2 \
-  --advice-policies "$here/live-check" --input-source "$samples" --input-format json \
+  --advice-policies "$here/live-check" --advice-preprocessor "$here/live-check/renames.jq" \
+  --input-source "$samples" --input-format json \
   --format json -o "$out" "${@:3}" > "$out/weaver.log" 2>&1 || status=$?
 python3 -I "$here/live-check/summarize.py" "$out/live_check.json"
 echo "report: $out/live_check.json"

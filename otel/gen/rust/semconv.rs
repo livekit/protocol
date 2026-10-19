@@ -2,7 +2,7 @@
 //! LiveKit telemetry semantic conventions.
 
 /// Telemetry schema version; set as `schema_url` on every OTLP scope.
-pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.6.0";
+pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.6.1";
 
 /// Browser name.
 pub const BROWSER_NAME: &str = "browser.name";
@@ -914,7 +914,7 @@ pub mod lk_track_kind {
 /// Server-assigned track SID (`TR_...`).
 pub const LK_TRACK_SID: &str = "lk.track_sid";
 
-/// Source of the track, as the protobuf `TrackSource` enum name.
+/// Source of the track, as the Agents RTC FFI `TrackSource` enum name.
 pub const LK_TRACK_SOURCE: &str = "lk.track_source";
 
 /// Values of [`LK_TRACK_SOURCE`].

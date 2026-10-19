@@ -2,7 +2,7 @@
 """LiveKit telemetry semantic conventions."""
 
 #: Telemetry schema version; set as `schema_url` on every OTLP scope.
-SCHEMA_URL = "https://livekit.io/schemas/telemetry/0.6.0"
+SCHEMA_URL = "https://livekit.io/schemas/telemetry/0.6.1"
 
 #: Browser name.
 BROWSER_NAME = "browser.name"
@@ -850,7 +850,7 @@ LK_TRACK_KIND_VIDEO = "video"
 #: Server-assigned track SID (`TR_...`).
 LK_TRACK_SID = "lk.track_sid"
 
-#: Source of the track, as the protobuf `TrackSource` enum name.
+#: Source of the track, as the Agents RTC FFI `TrackSource` enum name.
 LK_TRACK_SOURCE = "lk.track_source"
 #: Unknown source.
 LK_TRACK_SOURCE_SOURCE_UNKNOWN = "SOURCE_UNKNOWN"

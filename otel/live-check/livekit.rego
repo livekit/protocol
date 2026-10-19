@@ -1,7 +1,7 @@
 package live_check_advice
 
-# Same contract as otel/policies/livekit.rego, applied to emitted telemetry. Each finding names
-# the registered key a producer should send instead.
+# Same contract as otel/policies/livekit.rego, applied to emitted telemetry. A finding on an old
+# spelling names the registered key, and value, a producer must send instead.
 
 import rego.v1
 
@@ -9,25 +9,9 @@ pii_segment := `(^|\.)pii(\.|$)`
 
 pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[._]name)`
 
-canonical_identity := {
-	"lk.room.sid": "lk.room_sid",
-	"lk.participant.sid": "lk.participant_id",
-	"lk.participant_sid": "lk.participant_id",
-	"lk.track.sid": "lk.track_sid",
-	"lk.job.id": "lk.job_id",
-}
-
-# Client spellings of shared keys whose Agents spelling and value set won (otel/model/shared).
-renamed_shared := {
-	"lk.track.source": "lk.track_source",
-	"lk.disconnect.reason": "lk.disconnect_reason",
-}
-
-canonical_pii := {
-	"lk.room.name": "lk.pii.room_name",
-	"lk.participant.identity": "lk.pii.participant_identity",
-	"lk.participant.remote_identity": "lk.pii.remote_participant_identity",
-}
+# The renames recorded in otel/model (`renamed_from` on each shared key), keyed by the old
+# spelling: `data.renames[old] = {key, values}`. Built by live-check/renames.jq.
+renames := object.get(data, "renames", {})
 
 lk_advice(type, ctx, msg) := {
 	"type": "advice",
@@ -37,22 +21,33 @@ lk_advice(type, ctx, msg) := {
 	"message": msg,
 }
 
-deny contains lk_advice("livekit_pii_unmarked", {"attribute_key": key, "expected": object.get(canonical_pii, key, null)}, sprintf("'%s' looks like PII but has no `pii` key segment, so the collector will not redact it%s", [key, hint])) if {
+# A PII-looking key that is not an old spelling (those get livekit_shared_rename).
+deny contains lk_advice("livekit_pii_unmarked", {"attribute_key": key}, sprintf("'%s' looks like PII but has no `pii` key segment, so the collector will not redact it", [key])) if {
 	key := input.sample.attribute.name
 	startswith(key, "lk.")
 	regex.match(pii_looking, key)
 	not regex.match(pii_segment, key)
-	hint := object.get({k: sprintf("; send '%s'", [v]) | some k, v in canonical_pii}, key, "")
+	not renames[key]
 }
 
-deny contains lk_advice("livekit_shared_rename", {"attribute_key": key, "expected": want}, sprintf("'%s' is the client spelling of the shared key; send '%s' with its protobuf enum name as the value", [key, want])) if {
+# An old spelling: the model names the key to send and, for an enum, the value.
+deny contains lk_advice("livekit_shared_rename", {"attribute_key": key, "expected": to.key, "expected_value": value}, sprintf("'%s' is renamed: send '%s'%s", [key, to.key, hint])) if {
 	key := input.sample.attribute.name
-	want := renamed_shared[key]
+	to := renames[key]
+	value := object.get(to.values, input.sample.attribute.value, null)
+	hint := rename_value_hint(to, value)
 }
 
-deny contains lk_advice("livekit_flat_identity", {"attribute_key": key, "expected": want}, sprintf("'%s' must be emitted as '%s'", [key, want])) if {
-	key := input.sample.attribute.name
-	want := canonical_identity[key]
+rename_value_hint(to, value) := "" if count(to.values) == 0
+
+rename_value_hint(to, value) := sprintf(" = '%s'", [value]) if {
+	count(to.values) > 0
+	value != null
+}
+
+rename_value_hint(to, value) := sprintf(" (no value mapped for '%v')", [input.sample.attribute.value]) if {
+	count(to.values) > 0
+	value == null
 }
 
 # Spans have no name-based match of their own (otel/live-check/weaver.toml matches the registered

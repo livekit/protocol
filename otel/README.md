@@ -50,10 +50,16 @@ Every LiveKit key carries `annotations.livekit.owner`:
 
 Where a client and Agents named the same concept differently, the Agents spelling and value set
 is the shared key, and the client is the side that changes: `lk.track_source` and
-`lk.disconnect_reason` take the protobuf enum names as values (`SOURCE_MICROPHONE`,
-`CLIENT_INITIATED`), and `lk.agent_name` is the key a client uses for the agent. The client's
-current spellings are rename targets, like the six identity/PII keys: they are not registered, a
-policy rejects defining them, and live-check names the shared key to send instead.
+`lk.disconnect_reason` take the enum names Agents sends as values (`SOURCE_MICROPHONE`,
+`CLIENT_INITIATED`), and `lk.agent_name` is the key a client uses for the agent. The track
+source names are the Agents RTC FFI `TrackSource` names, not the signal protocol's (`CAMERA`,
+`SCREEN_SHARE`), so clients map them explicitly.
+
+All eight client renames (the six identity/PII keys, `lk.track.source` and
+`lk.disconnect.reason`) are recorded the same way: `renamed_from` on the shared key names the old
+spelling and, for an enum, maps each old value to a member. The old spellings are never
+registered, deprecated or not. A policy rejects defining one, and live-check reads the map to
+name the key and value to send.
 - `cloud` is a valid owner for when that team registers its keys, in its own directory.
 
 The Notion conventions put client-owned attributes under `lk.client.*`. The client core does not do
@@ -80,6 +86,7 @@ nothing validates it.
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
    | `bindings` | map of producer/store → name | informational |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
+   | `renamed_from` | `{key, values}`, on a shared key | the spelling it replaces, and for an enum a map of old value → member; the old key stays unregistered |
    | `pii_heuristic_exception` | a reason | documents a shipped key the PII heuristic would flag; it only takes effect for a key listed in `pii_heuristic_allowlist` in `policies/lib.rego` (today `lk.rpc.caller_identity`, `lk.rpc.destination_identity`), so a new key cannot opt out by annotating itself. The collector still does not redact them |
 
    Events and spans carry their own `annotations.livekit`, rendered in the docs; live-check
@@ -154,7 +161,8 @@ never here, so a producer names them from one place. TypeScript does not yet.
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
-| `livekit_shared_rename` | yes | no `lk.track.source`, `lk.disconnect.reason` (the client spellings of shared keys) |
+| `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` is defined, deprecated or not (resolved, both modes) |
+| `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
@@ -177,8 +185,10 @@ It takes OTLP/JSON lines from an otelcol `file` exporter (the SDK e2e setup), or
 JSON file. `live-check/weaver.toml` matches spans by name and checks the resource and every
 record against `model/client/groups.yaml`. It drops two kinds of finding: `not_stable` (every key
 is `development`) and absent `conditionally_required` attributes (their conditions are prose).
-`live-check/livekit.rego` adds `livekit_flat_identity`, `livekit_pii_unmarked` and
-`livekit_shared_rename`, each naming the key to send instead, and `livekit_unknown_span` for an `lk.*` span no matcher places (weaver
+`live-check/livekit.rego` adds `livekit_shared_rename` for an old spelling. `live-check/renames.jq`
+builds its map from the model's `renamed_from`, so each finding names the key to send and, for an
+enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, and
+`livekit_unknown_span` for an `lk.*` span no matcher places (weaver
 alone reports nothing for an unmatched span that has no attributes). From the event and span
 annotations it adds `livekit_severity` (an event at a severity it is not declared with),
 `livekit_checkpoint` (a span event the span does not list) and `livekit_span_outcome` (span status
@@ -190,10 +200,10 @@ violations, 62 improvements):
 
 | Emitted today | Registered key | Findings |
 |---|---|---|
-| `lk.room.sid` | `lk.room_sid` | `missing_attribute`, `unexpected_attribute`, `livekit_flat_identity` ×10 each |
+| `lk.room.sid` | `lk.room_sid` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.sid` | `lk.participant_id` | same, ×10 each |
 | `lk.track.sid` | `lk.track_sid` | same, ×12 each, plus `required_attribute_not_present: lk.track_sid` ×10 |
-| `lk.room.name` | `lk.pii.room_name` | `missing_attribute`, `unexpected_attribute`, `livekit_pii_unmarked` ×10 each |
+| `lk.room.name` | `lk.pii.room_name` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.identity` | `lk.pii.participant_identity` | same, ×10 each |
 | `lk.participant.remote_identity` | `lk.pii.remote_participant_identity` | same, ×2 each, plus `recommended_attribute_not_present` ×2 |
 | `lk.track.source` = `camera`, `microphone` | `lk.track_source` = `SOURCE_CAMERA`, `SOURCE_MICROPHONE` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename`, `required_attribute_not_present: lk.track_source` ×4 each |
@@ -202,7 +212,6 @@ violations, 62 improvements):
 With those eight keys renamed (and the two values mapped) in the same capture, live-check reports
 nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and
 `tests/live-agents.json` holds the shared keys as Agents sends them; both must pass.
-`tests/live-sample.json` is part of that capture, anonymized.
 
 Known limits:
 

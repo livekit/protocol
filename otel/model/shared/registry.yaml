@@ -23,6 +23,7 @@ groups:
             owner: shared
             sensitivity: none
             authority: cloud
+            renamed_from: {key: lk.room.sid}
             # Physical name per producer/store. Weaver carries these; nothing validates them.
             bindings:
               agents_otlp: [lk.room_sid, room_id] # spans | resource + metric points
@@ -37,7 +38,7 @@ groups:
           never a default metric dimension.
         examples: ["PA_9kLm2NpQ4rTs"]
         annotations:
-          livekit: {owner: shared, sensitivity: none, authority: cloud}
+          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.participant.sid}}
       - id: lk.track_sid
         type: string
         stability: development
@@ -47,7 +48,7 @@ groups:
           success. High cardinality, never a default metric dimension.
         examples: ["TR_AMkTyV3Zx8Qp"]
         annotations:
-          livekit: {owner: shared, sensitivity: none, authority: cloud}
+          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.track.sid}}
       - id: lk.job_id
         type: string
         stability: development
@@ -84,7 +85,7 @@ groups:
           On every record and span of a session once the client has joined.
         examples: ["my-room"]
         annotations:
-          livekit: {owner: shared, sensitivity: pii}
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.room.name}}
       - id: lk.pii.participant_identity
         type: string
         stability: development
@@ -93,7 +94,7 @@ groups:
           On every record and span of a session once the client has joined.
         examples: ["identity-0"]
         annotations:
-          livekit: {owner: shared, sensitivity: pii}
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.participant.identity}}
       - id: lk.pii.remote_participant_identity
         type: string
         stability: development
@@ -102,7 +103,7 @@ groups:
           On subscribe spans: the identity of the participant publishing the track.
         examples: ["identity-1"]
         annotations:
-          livekit: {owner: shared, sensitivity: pii}
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.participant.remote_identity}}
 
   - id: registry.lk.sdk
     type: attribute_group
@@ -137,15 +138,16 @@ groups:
     brief: Concepts clients and Agents both send, under the Agents spelling and value set.
     note: >
       Where a client and Agents named the same concept differently, the Agents key and values are
-      the shared ones: a flat `lk.<entity>_<field>` key, and protobuf enum names as values.
+      the shared ones: a flat `lk.<entity>_<field>` key, and the enum names Agents sends as values.
     attributes:
       - id: lk.track_source
         stability: development
-        brief: Source of the track, as the protobuf `TrackSource` enum name.
+        brief: Source of the track, as the Agents RTC FFI `TrackSource` enum name.
         note: >
           On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint.
-          The value is the enum name exactly, e.g. `SOURCE_SCREENSHARE` (no underscore inside
-          SCREENSHARE).
+          The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal
+          protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their
+          track source to these names explicitly.
         type:
           members:
             - {id: source_unknown, value: SOURCE_UNKNOWN, brief: Unknown source., stability: development}
@@ -154,7 +156,12 @@ groups:
             - {id: source_screenshare, value: SOURCE_SCREENSHARE, brief: Screen share video., stability: development}
             - {id: source_screenshare_audio, value: SOURCE_SCREENSHARE_AUDIO, brief: Screen share audio., stability: development}
         annotations:
-          livekit: {owner: shared, sensitivity: none}
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from:
+              key: lk.track.source
+              values: {camera: SOURCE_CAMERA, microphone: SOURCE_MICROPHONE, screen_share: SOURCE_SCREENSHARE, screen_share_audio: SOURCE_SCREENSHARE_AUDIO, unknown: SOURCE_UNKNOWN}
       - id: lk.disconnect_reason
         stability: development
         brief: Why a participant left the room, as the protobuf `DisconnectReason` enum name.
@@ -183,7 +190,30 @@ groups:
             - {id: agent_error, value: AGENT_ERROR, brief: The agent failed., stability: development}
             - {id: reconnect_failed, value: RECONNECT_FAILED, brief: "The client ran out of reconnect attempts (client only, not a protobuf value).", stability: development}
         annotations:
-          livekit: {owner: shared, sensitivity: none}
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from:
+              key: lk.disconnect.reason
+              values:
+                client_initiated: CLIENT_INITIATED
+                duplicate_identity: DUPLICATE_IDENTITY
+                server_shutdown: SERVER_SHUTDOWN
+                participant_removed: PARTICIPANT_REMOVED
+                room_deleted: ROOM_DELETED
+                state_mismatch: STATE_MISMATCH
+                join_failure: JOIN_FAILURE
+                migration: MIGRATION
+                signal_close: SIGNAL_CLOSE
+                room_closed: ROOM_CLOSED
+                user_unavailable: USER_UNAVAILABLE
+                user_rejected: USER_REJECTED
+                sip_trunk_failure: SIP_TRUNK_FAILURE
+                connection_timeout: CONNECTION_TIMEOUT
+                media_failure: MEDIA_FAILURE
+                agent_error: AGENT_ERROR
+                unknown: UNKNOWN_REASON
+                reconnect_failed: RECONNECT_FAILED
       - id: lk.agent_name
         type: string
         stability: development

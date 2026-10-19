@@ -46,14 +46,20 @@ sed -e 's/"lk\.room_sid"/"lk.room.sid"/g' -e 's/"lk\.pii\.room_name"/"lk.room.na
   -e '/"event_name": "lk\.rtc\.stats\.sample"/s/"severity_number": 9/"severity_number": 17/' \
   -e 's/"name": "lk\.track_source", "value": "SOURCE_CAMERA"/"name": "lk.track.source", "value": "camera"/g' \
   -e 's/"name": "lk\.disconnect_reason", "value": "CLIENT_INITIATED"/"name": "lk.disconnect.reason", "value": "client_initiated"/' \
+  -e '/"name": "lk\.connect"/s/"name": "lk\.pii\.participant_identity"/"name": "lk.caller_identity"/' \
   tests/live-sample.json > "$tmp/legacy.json"
 legacy=$(./live-check.sh "$tmp/legacy.json" "$tmp/legacy" --fail-on none)
 echo "$legacy"
-for want in "livekit_flat_identity lk.room.sid" "livekit_pii_unmarked lk.room.name" "livekit_unknown_span lk.bogus" \
+for want in "livekit_shared_rename lk.room.sid" "livekit_shared_rename lk.room.name" "livekit_unknown_span lk.bogus" \
   "livekit_checkpoint lk.connect" "livekit_span_outcome lk.connect" "livekit_severity lk.device.network.changed" \
   "livekit_checkpoint lk.subscribe" "livekit_span_outcome lk.subscribe" "livekit_severity lk.rtc.stats.sample" \
-  "livekit_shared_rename lk.track.source" "livekit_shared_rename lk.disconnect.reason"; do
+  "livekit_shared_rename lk.track.source" "livekit_shared_rename lk.disconnect.reason" \
+  "livekit_pii_unmarked lk.caller_identity"; do
   id=${want% *} key=${want#* }
   grep -q -E -- "${id}: .*${key//./\\.}" <<<"$legacy" || { echo "FAIL  not flagged: $id on $key" >&2; exit 1; }
+done
+# The key and value to send come from renamed_from in the model.
+for want in "send 'lk.room_sid'" "send 'lk.track_source' = 'SOURCE_CAMERA'" "send 'lk.disconnect_reason' = 'CLIENT_INITIATED'"; do
+  grep -q -F -- "$want" "$tmp/legacy/live_check.json" || { echo "FAIL  no finding says: $want" >&2; exit 1; }
 done
 echo "PASS  live-check: smoke, sparse, JS, Agents and no-severity-text samples clean, every planted violation flagged"

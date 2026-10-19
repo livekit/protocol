@@ -15,6 +15,38 @@ deny contains f if {
 	some f in data.livekit.lib.attr_findings(object.union(attr, {"id": attr.key}))
 }
 
+# Renames recorded in the model: each shared key's `renamed_from` names the old spelling and, for
+# an enum, maps the old values to its members. Read from every attribute, either representation.
+attributes contains {"key": a.name, "attr": a} if {
+	some g in object.get(input, "groups", [])
+	some a in g.attributes
+}
+
+attributes contains {"key": a.key, "attr": a} if {
+	some a in object.get(input, ["registry", "attributes"], [])
+}
+
+renamed_to[old] := a.key if {
+	some a in attributes
+	old := data.livekit.lib.lk(a.attr, "renamed_from").key
+}
+
+# An old spelling stays unregistered, deprecated or not: the rename lives on the shared key.
+deny contains data.livekit.lib.finding("livekit_shared_rename", msg) if {
+	some a in attributes
+	new := renamed_to[a.key]
+	msg := sprintf("%s: renamed to %s (renamed_from on %s); the old spelling may not be defined, deprecated or not", [a.key, new, new])
+}
+
+# A mapped value must be a member of the shared key's enum.
+deny contains data.livekit.lib.finding("livekit_rename_value", msg) if {
+	some a in attributes
+	some old_value, new_value in object.get(a.attr, ["annotations", "livekit", "renamed_from", "values"], {})
+	members := {m.value | some m in object.get(a.attr, ["type", "members"], [])}
+	not new_value in members
+	msg := sprintf("%s: renamed_from maps %s to %s, which is not a member", [a.key, old_value, new_value])
+}
+
 # Every resolved metric, either representation: name, unit, dimension keys, exception, origin.
 metrics contains {"name": g.metric_name, "unit": unit, "keys": keys, "exception": exception, "where": where} if {
 	some g in object.get(input, "groups", [])

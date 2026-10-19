@@ -39,7 +39,8 @@ batching, retries, storage) is not part of the conventions.
 
 Contents: [Conventions](#conventions) · [Resource](#resource) · [Every record](#every-record) ·
 [Plain log records](#plain-log-records) · [Events](#events) · [Spans](#spans) ·
-[Attribute reference](#attribute-reference) · [Enum values](#enum-values) · [Bindings](#bindings)
+[Attribute reference](#attribute-reference) · [Enum values](#enum-values) · [Bindings](#bindings) ·
+[Old spellings](#old-spellings)
 
 ## Conventions
 
@@ -60,9 +61,10 @@ They are record and span attributes, never Resource attributes, omitted until th
 assigned them, and never default metric dimensions (high cardinality).
 
 **One name per concept.** Where a client and Agents named the same concept differently, the
-Agents spelling and value set is the shared key: a flat key, and protobuf enum names as values
-(`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The other
-spelling is never registered.
+Agents spelling and value set is the shared key: a flat key, and the enum names Agents sends as
+values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The
+other spelling is never registered, deprecated or not. The shared key records it in
+`renamed_from`, listed under [Old spellings](#old-spellings).
 
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
@@ -171,3 +173,15 @@ validates it.
 `agents_otlp` lists Agents' span key first, then its Resource and metric-point key.
 `agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.
+
+## Old spellings
+
+Keys and values that producers sent before this registry, and the key and value to send instead.
+Each row comes from `renamed_from` on the shared key. Live-check reports an old spelling as
+`livekit_shared_rename` and names the replacement.
+
+| Old key | Old value | Key to send | Value to send |
+| --- | --- | --- | --- |
+{% for a in ctx.attributes %}{% set from = a.annotations.livekit.renamed_from %}{% if from %}{% if from["values"] %}{% for old, new in from["values"] | items %}| `{{ from.key }}` | `{{ old }}` | `{{ a.key }}` | `{{ new }}` |
+{% endfor %}{% else %}| `{{ from.key }}` | any | `{{ a.key }}` | unchanged |
+{% endif %}{% endif %}{% endfor %}
