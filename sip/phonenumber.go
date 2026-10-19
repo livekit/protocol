@@ -55,3 +55,18 @@ func DetermineNumberType(phoneNumber string) livekit.PhoneNumberType {
 		return livekit.PhoneNumberType_PHONE_NUMBER_TYPE_UNKNOWN
 	}
 }
+
+// IsEmergencyNumber reports whether a dialed number is an emergency number in
+// any country, regardless of where the caller is from. A real short code
+// colliding with another country's emergency number is unlikely, so the
+// extra matches are accepted for the sake of simplicity. However, a known
+// collision is Barbados which has 211, 311, and 511 as emergency numbers,
+// which are also used in the US for non-emergency services.
+func IsEmergencyNumber(number string) bool {
+	for region := range phonenumbers.GetSupportedRegions() {
+		if phonenumbers.IsEmergencyNumber(number, region) {
+			return true
+		}
+	}
+	return false
+}

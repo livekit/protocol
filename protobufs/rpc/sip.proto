@@ -154,7 +154,10 @@ message InternalCreateSIPParticipantRequest {
 
   SIPCallObservability observability = 38;
 
-  // NEXT ID: 40
+  // Provider of the caller number, when the call does not use a customer trunk.
+  livekit.ProviderInfo provider_info = 40;
+
+  // NEXT ID: 41
 }
 
 message InternalCreateSIPParticipantResponse {

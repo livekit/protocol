@@ -22,6 +22,9 @@ import (
 
 type Observable[T any] interface {
 	Observe(cb func(*T)) func()
+	// ObserveCurrent calls cb with the current value before returning, then on
+	// every change; cb never sees a value older than one it already received.
+	ObserveCurrent(cb func(*T)) func()
 	Load() *T
 }
 
@@ -94,7 +97,6 @@ func NewAtomicValue[T, C any](config Observable[C], accessor func(*C) T) *Atomic
 func newAtomic[T, C any, A interface{ Store(T) }](ctor func(T) A, config Observable[C], accessor func(*C) T) A {
 	var zero T
 	v := ctor(zero)
-	config.Observe(func(cc *C) { v.Store(accessor(cc)) })
-	v.Store(accessor(config.Load()))
+	config.ObserveCurrent(func(cc *C) { v.Store(accessor(cc)) })
 	return v
 }
