@@ -221,6 +221,10 @@ message SimulationRun {
     message Turn {
       uint32 index = 1;                 // 1-based, conversation order
       livekit.agent.ChatRole role = 2;  // ASSISTANT = the agent under test, USER = simulator persona
+      // The words the judges read for this turn: the speaker's own, or as the
+      // other side heard them when those are unknown (the agent's, without a
+      // RemoteSession).
+      string text = 18;
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 

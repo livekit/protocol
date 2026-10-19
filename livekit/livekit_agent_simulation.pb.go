@@ -2410,24 +2410,28 @@ func (x *SimulationRun_JobMetrics_Conversation) GetBackchannelCount() uint32 {
 // Rows exist for text and audio. The groups above hold the means and pools
 // over these; anything not measured for a turn stays unset.
 type SimulationRun_JobMetrics_Turn struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Index             uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                                            // 1-based, conversation order
-	Role              agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"`                  // ASSISTANT = the agent under test, USER = simulator persona
-	StartMs           *uint32                `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                   // audio only; relative to t0; unset if the turn could not be aligned to the audio
-	EndMs             *uint32                `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                         // audio only
-	SttDelayMs        *uint32                `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`        // needs the RemoteSession
-	LlmTtftMs         *uint32                `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`           // needs the RemoteSession
-	LlmTtfsMs         *uint32                `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`           // needs the RemoteSession
-	LlmTps            *float32               `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                     // needs the RemoteSession
-	TtsTtfbMs         *uint32                `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`           // needs the RemoteSession
-	E2ELatencyMs      *uint32                `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"` // needs the RemoteSession
-	HeardE2ELatencyMs *int32                 `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"`
-	TimeToYieldMs     *uint32                `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`
-	TurnTakingScore   *float32               `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`
-	Conciseness       *float32               `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // needs the text judge
-	EotMisprediction  *bool                  `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
-	AwkwardSilence    *bool                  `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
-	Unanswered        *bool                  `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Index uint32                 `protobuf:"varint,1,opt,name=index,proto3" json:"index,omitempty"`                           // 1-based, conversation order
+	Role  agent.ChatRole         `protobuf:"varint,2,opt,name=role,proto3,enum=livekit.agent.ChatRole" json:"role,omitempty"` // ASSISTANT = the agent under test, USER = simulator persona
+	// The words the judges read for this turn: the speaker's own, or as the
+	// other side heard them when those are unknown (the agent's, without a
+	// RemoteSession).
+	Text              string   `protobuf:"bytes,18,opt,name=text,proto3" json:"text,omitempty"`
+	StartMs           *uint32  `protobuf:"varint,3,opt,name=start_ms,json=startMs,proto3,oneof" json:"start_ms,omitempty"`                   // audio only; relative to t0; unset if the turn could not be aligned to the audio
+	EndMs             *uint32  `protobuf:"varint,4,opt,name=end_ms,json=endMs,proto3,oneof" json:"end_ms,omitempty"`                         // audio only
+	SttDelayMs        *uint32  `protobuf:"varint,5,opt,name=stt_delay_ms,json=sttDelayMs,proto3,oneof" json:"stt_delay_ms,omitempty"`        // needs the RemoteSession
+	LlmTtftMs         *uint32  `protobuf:"varint,6,opt,name=llm_ttft_ms,json=llmTtftMs,proto3,oneof" json:"llm_ttft_ms,omitempty"`           // needs the RemoteSession
+	LlmTtfsMs         *uint32  `protobuf:"varint,7,opt,name=llm_ttfs_ms,json=llmTtfsMs,proto3,oneof" json:"llm_ttfs_ms,omitempty"`           // needs the RemoteSession
+	LlmTps            *float32 `protobuf:"fixed32,8,opt,name=llm_tps,json=llmTps,proto3,oneof" json:"llm_tps,omitempty"`                     // needs the RemoteSession
+	TtsTtfbMs         *uint32  `protobuf:"varint,9,opt,name=tts_ttfb_ms,json=ttsTtfbMs,proto3,oneof" json:"tts_ttfb_ms,omitempty"`           // needs the RemoteSession
+	E2ELatencyMs      *uint32  `protobuf:"varint,10,opt,name=e2e_latency_ms,json=e2eLatencyMs,proto3,oneof" json:"e2e_latency_ms,omitempty"` // needs the RemoteSession
+	HeardE2ELatencyMs *int32   `protobuf:"varint,11,opt,name=heard_e2e_latency_ms,json=heardE2eLatencyMs,proto3,oneof" json:"heard_e2e_latency_ms,omitempty"`
+	TimeToYieldMs     *uint32  `protobuf:"varint,12,opt,name=time_to_yield_ms,json=timeToYieldMs,proto3,oneof" json:"time_to_yield_ms,omitempty"`
+	TurnTakingScore   *float32 `protobuf:"fixed32,13,opt,name=turn_taking_score,json=turnTakingScore,proto3,oneof" json:"turn_taking_score,omitempty"`
+	Conciseness       *float32 `protobuf:"fixed32,14,opt,name=conciseness,proto3,oneof" json:"conciseness,omitempty"` // needs the text judge
+	EotMisprediction  *bool    `protobuf:"varint,15,opt,name=eot_misprediction,json=eotMisprediction,proto3,oneof" json:"eot_misprediction,omitempty"`
+	AwkwardSilence    *bool    `protobuf:"varint,16,opt,name=awkward_silence,json=awkwardSilence,proto3,oneof" json:"awkward_silence,omitempty"`
+	Unanswered        *bool    `protobuf:"varint,17,opt,name=unanswered,proto3,oneof" json:"unanswered,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -2474,6 +2478,13 @@ func (x *SimulationRun_JobMetrics_Turn) GetRole() agent.ChatRole {
 		return x.Role
 	}
 	return agent.ChatRole(0)
+}
+
+func (x *SimulationRun_JobMetrics_Turn) GetText() string {
+	if x != nil {
+		return x.Text
+	}
+	return ""
 }
 
 func (x *SimulationRun_JobMetrics_Turn) GetStartMs() uint32 {
@@ -3564,7 +3575,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"suggestion\x18\x02 \x01(\tR\n" +
 	"suggestion\x12\x14\n" +
-	"\x05label\x18\x03 \x01(\tR\x05label\"\x8dU\n" +
+	"\x05label\x18\x03 \x01(\tR\x05label\"\xa1U\n" +
 	"\rSimulationRun\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
@@ -3625,7 +3636,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\rFailureReason\x12\x1e\n" +
 	"\x1aFAILURE_REASON_UNSPECIFIED\x10\x00\x12%\n" +
 	"!FAILURE_REASON_AGENT_JOIN_TIMEOUT\x10\x01J\x04\b\t\x10\n" +
-	"\x1a\xd7*\n" +
+	"\x1a\xeb*\n" +
 	"\n" +
 	"JobMetrics\x12,\n" +
 	"\x0ftask_completion\x18\x03 \x01(\x02H\x00R\x0etaskCompletion\x88\x01\x01\x12(\n" +
@@ -3758,10 +3769,11 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\x11_unanswered_turnsB\x1b\n" +
 	"\x19_false_interruption_countB\x11\n" +
 	"\x0f_e2e_latency_msB\x14\n" +
-	"\x12_backchannel_count\x1a\xaa\a\n" +
+	"\x12_backchannel_count\x1a\xbe\a\n" +
 	"\x04Turn\x12\x14\n" +
 	"\x05index\x18\x01 \x01(\rR\x05index\x12+\n" +
-	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x1e\n" +
+	"\x04role\x18\x02 \x01(\x0e2\x17.livekit.agent.ChatRoleR\x04role\x12\x12\n" +
+	"\x04text\x18\x12 \x01(\tR\x04text\x12\x1e\n" +
 	"\bstart_ms\x18\x03 \x01(\rH\x00R\astartMs\x88\x01\x01\x12\x1a\n" +
 	"\x06end_ms\x18\x04 \x01(\rH\x01R\x05endMs\x88\x01\x01\x12%\n" +
 	"\fstt_delay_ms\x18\x05 \x01(\rH\x02R\n" +
