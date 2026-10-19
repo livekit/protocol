@@ -1,5 +1,5 @@
 templates:
   - template: semconv.rs.j2
-    filter: '{schema_url, attributes: .registry.attributes | sort_by(.key), events: .registry.events | sort_by(.name), spans: .registry.spans | sort_by(.type), checkpoints: [.registry.spans[] | (.annotations.livekit.checkpoints // [])[]] | unique_by(.name), metrics: .registry.metrics | sort_by(.name)}'
+    filter: '(.registry.attributes | map(.key)) as $local | {schema_url, attributes: .registry.attributes | sort_by(.key), upstream: ([.registry.spans[], .registry.events[], .registry.metrics[], .registry.attribute_groups[] | (.attributes // [])[] | select(.key as $k | $local | index($k) | not)] | unique_by(.key)), events: .registry.events | sort_by(.name), spans: .registry.spans | sort_by(.type), checkpoints: [.registry.spans[] | (.annotations.livekit.checkpoints // [])[]] | unique_by(.name), metrics: .registry.metrics | sort_by(.name)}'
     application_mode: single
     file_name: semconv.rs

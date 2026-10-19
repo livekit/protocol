@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 W=${WEAVER:-weaver}
 tmp=$(mktemp -d) && trap 'rm -rf "$tmp"' EXIT
-for target in rust:rust typescript:ts markdown:docs; do
+for target in rust:rust typescript:ts python:python markdown:docs; do
   "$W" registry generate --v2 -r model -p policies -t templates "${target%%:*}" "$tmp/${target#*:}"
 done
 cp -R "$tmp"/. gen/

@@ -123,7 +123,7 @@ and `error.type` always ship.
 {% if e.attributes %}
 {{ attr_table(e.attributes) }}{% endif %}{% endfor %}
 ## Spans
-{% for s in ctx.spans %}{% set lk = s.annotations.livekit %}
+{% for s in ctx.spans %}{% set lk = (s.annotations.livekit if s.annotations and s.annotations.livekit else {}) %}
 ### `{{ s.type }}`
 
 Kind `{{ s.kind }}`. {{ s.brief | trim }}{% if s.note %} {{ s.note | trim }}{% endif %}
@@ -135,7 +135,7 @@ Kind `{{ s.kind }}`. {{ s.brief | trim }}{% if s.note %} {{ s.note | trim }}{% e
 {% endfor %}{% if lk.checkpoint_pattern %}| `{{ lk.checkpoint_pattern.name }}` | One per attempt | {{ cell(lk.checkpoint_pattern.brief) }} Matches `{{ cell(lk.checkpoint_pattern.pattern) }}`. |
 {% endif %}{% else %}No checkpoints.
 {% endif %}
-Limits: {% for k, v in lk.limits | items %}{{ v }} {{ k | replace("_", " ") }}{% if not loop.last %}, {% endif %}{% endfor %} per span.
+{% if lk.limits %}Limits: {% for k, v in lk.limits | items %}{{ v }} {{ k | replace("_", " ") }}{% if not loop.last %}, {% endif %}{% endfor %} per span.{% else %}No limits declared.{% endif %}
 {% endfor %}
 ## Attribute reference
 
