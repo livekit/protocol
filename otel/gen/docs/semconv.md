@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.3.0`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.4.0`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -36,7 +36,7 @@ assigned them, and never default metric dimensions (high cardinality).
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
 keeps everything else. Log bodies and metrics are never redacted, so PII must not go there.
-PII keys: `lk.pii.participant_identity`, `lk.pii.remote_participant_identity`, `lk.pii.room_name`.
+PII keys: `lk.pii.amd.transcript`, `lk.pii.arguments`, `lk.pii.chat_ctx`, `lk.pii.dtmf_inputs`, `lk.pii.error`, `lk.pii.event`, `lk.pii.function_tool.arguments`, `lk.pii.function_tool.output`, `lk.pii.input_text`, `lk.pii.instructions`, `lk.pii.keyterms`, `lk.pii.output`, `lk.pii.participant_identity`, `lk.pii.progress_message`, `lk.pii.raw_arguments`, `lk.pii.remote_participant_identity`, `lk.pii.repaired`, `lk.pii.response.function_calls`, `lk.pii.response.text`, `lk.pii.room_name`, `lk.pii.rpc.payload`, `lk.pii.rpc.response`, `lk.pii.sip.phoneNumber`, `lk.pii.text`, `lk.pii.transcript`, `lk.pii.user_input`, `lk.pii.user_transcript`.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
 OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds. The
@@ -123,6 +123,41 @@ Namespace of app-defined events, named `custom.<name>` and carrying the app's ow
 
 - Severity: `INFO`
 - Body: The event name (`custom.<name>`).
+
+### `gen_ai.assistant.message`
+
+OTel GenAI assistant message (also a function call), a span event on `llm_node`. Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+
+- Severity: 
+- Body: Not a log record: a span event whose `content` attribute carries the message.
+
+### `gen_ai.choice`
+
+OTel GenAI choice, a span event on `llm_node`. Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+
+- Severity: 
+- Body: Not a log record: a span event whose `content` attribute carries the message.
+
+### `gen_ai.system.message`
+
+OTel GenAI system (or developer) message, a span event on `llm_node`. Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+
+- Severity: 
+- Body: Not a log record: a span event whose `content` attribute carries the message.
+
+### `gen_ai.tool.message`
+
+OTel GenAI tool message (a function call output), a span event on `llm_node`. Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+
+- Severity: 
+- Body: Not a log record: a span event whose `content` attribute carries the message.
+
+### `gen_ai.user.message`
+
+OTel GenAI user message, a span event on `llm_node`. Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+
+- Severity: 
+- Body: Not a log record: a span event whose `content` attribute carries the message.
 
 ### `lk.device.app_state.changed`
 
@@ -329,6 +364,246 @@ Self-telemetry; counts since the previous report. Sent after a loss, failure, re
 
 ## Spans
 
+### `agent_session`
+
+Kind `internal`. The agent session, parent of every turn.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.participant_id` | string | Recommended | Server-assigned SID of the local participant (`PA_...`). Agents sends the SID of the participant it is linked to, not of the agent itself. |
+| `lk.participant_kind` | string | Recommended | Kind of the linked participant (protocol `ParticipantInfo.Kind`). |
+| `lk.pii.participant_identity` | string | Recommended | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. |
+| `exception.message` | string | Opt-in | The exception message. Replaced by a fixed marker when redaction is on; `error.type` keeps the class. |
+| `exception.stacktrace` | string | Opt-in | A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG. Dropped when redaction is on. |
+| `exception.type` | string | Opt-in | The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it. On the span's exception events, as the OTel SDK records them. |
+| `lk.blocking.count` | int | Opt-in | Blocks in the session. |
+| `lk.blocking.max_duration` | double, `s` | Opt-in | Seconds of the longest block in the session. |
+| `lk.blocking.total_duration` | double, `s` | Opt-in | Seconds blocked in total over the session. |
+| `lk.fail` | boolean | Opt-in | The session report is tagged failed. See `lk.success`. |
+| `lk.pii.sip.phoneNumber` | string | Opt-in | Phone number of a SIP participant. Camel case as the SIP participant attribute it is copied from; registered as emitted. |
+| `lk.success` | boolean | Opt-in | The session report is tagged successful. A tag name in the session report (`observability.py` / `report.rs`); the outcome is derived from which of `lk.success` and `lk.fail` is present. |
+
+No checkpoints.
+
+No limits declared.
+
+### `agent_speaking`
+
+Kind `internal`. The agent's audio playing out.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.interruption.source` | string | Conditionally required: When interrupted. | What triggered the interruption. |
+| `lk.playout.position` | double, `s` | Conditionally required: When interrupted. | Seconds of the agent's speech played out when it was interrupted. |
+| `lk.interrupted` | boolean | Recommended | The speech was interrupted. |
+| `lk.speech_id` | string | Recommended | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+
+No checkpoints.
+
+No limits declared.
+
+### `agent_turn`
+
+Kind `internal`. One agent turn (generation), parent of the LLM and TTS nodes.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.e2e_latency` | double, `s` | Recommended | Seconds from the end of the user's speech to the agent's first audio. |
+| `lk.generation_count` | int | Recommended | Generations in the turn. |
+| `lk.generation_id` | string | Recommended | Id of the agent turn (generation). |
+| `lk.interrupted` | boolean | Recommended | The speech was interrupted. |
+| `lk.speech.queue_wait` | double, `s` | Recommended | Seconds a speech handle waited in the queue before generation was authorized. |
+| `lk.speech_id` | string | Recommended | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+| `lk.end_of_turn_delay` | double, `s` | Opt-in | Seconds from the end of speech to the turn decision. |
+| `lk.llm_metrics` | string | Opt-in | LLM metrics of the turn, serialized. |
+| `lk.on_user_turn_completed_delay` | double, `s` | Opt-in | Seconds the `on_user_turn_completed` hook took. |
+| `lk.parent_generation_id` | string | Opt-in | Generation this one continues (a tool-call follow-up). |
+| `lk.pii.instructions` | string | Opt-in | Agent instructions in force. |
+| `lk.pii.user_input` | string | Opt-in | The user's transcript for the turn. |
+| `lk.provider_request_ids` | string[] | Opt-in | Provider request ids a span covers, for joining against provider logs. |
+| `lk.realtime_model_metrics` | string | Opt-in | Realtime model metrics of the turn, serialized. |
+| `lk.transcription_delay` | double, `s` | Opt-in | Seconds from the end of speech to the final transcript. |
+| `lk.tts_metrics` | string | Opt-in | TTS metrics of the turn, serialized. |
+
+No checkpoints.
+
+No limits declared.
+
+### `amd`
+
+Kind `internal`. Answering-machine detection on an outbound call.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.amd.category` | string | Required | AMD classification. |
+| `lk.amd.delay` | double, `s` | Recommended | Seconds from the call start to the AMD decision. |
+| `lk.amd.reason` | string | Recommended | Why the AMD classifier decided. |
+| `lk.amd.speech_duration` | double, `s` | Recommended | Seconds of speech the AMD classifier heard. |
+| `lk.pii.amd.transcript` | string | Opt-in | Transcript the AMD classifier used. |
+
+No checkpoints.
+
+No limits declared.
+
+### `drain_agent_activity`
+
+Kind `internal`. Draining an agent activity before it ends.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+
+No checkpoints.
+
+No limits declared.
+
+### `eou_detection`
+
+Kind `internal`. One end-of-utterance inference.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.eou.detection_delay` | double, `s` | Recommended | Seconds the detector inference took. |
+| `lk.eou.from_cache` | boolean | Recommended | The detector answer came from the cache. |
+| `lk.eou.language` | string | Recommended | Language the detector ran for. |
+| `lk.eou.probability` | double | Recommended | End-of-utterance probability. |
+| `lk.eou.unlikely_threshold` | double | Recommended | Threshold under which the turn is unlikely to be over. |
+| `lk.pii.user_transcript` | string | Opt-in | Transcript the detector scored. |
+
+No checkpoints.
+
+No limits declared.
+
+### `eou_wait`
+
+Kind `internal`. The endpointing wait, from the user's last speech to the turn decision.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.eou.outcome` | enum | Required | How the endpointing wait ended. |
+| `lk.eou.endpointing_delay` | double, `s` | Recommended | Seconds of endpointing delay applied. |
+| `lk.eou.not_committed_count` | int | Recommended | Turn decisions the wait rejected before it ended. |
+| `lk.eou.rearm_count` | int | Recommended | Times the endpointing wait restarted on a later trigger. |
+| `lk.eou.wait_duration` | double, `s` | Recommended | Seconds from the end of the user's speech to the turn decision. |
+
+No checkpoints.
+
+No limits declared.
+
+### `event_loop_blocked`
+
+Kind `internal`. A synchronous block on the agent event loop.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.blocking.duration` | double, `s` | Required | Seconds the loop was blocked. |
+| `lk.blocking.cpu_time` | double, `s` | Recommended | CPU seconds the loop thread consumed during the block. |
+| `lk.blocking.gc_time` | double, `s` | Recommended | Seconds of garbage collection on the loop thread during the block. |
+| `lk.blocking.severity` | string | Recommended | Severity bucket of the block. |
+| `lk.blocking.stack` | string | Recommended | Loop-thread stack sampled while blocked (source locations only). |
+| `lk.blocking.suppressed` | int | Recommended | Reports dropped by rate limiting since the previous emitted span. |
+| `lk.blocking.task` | string | Recommended | Name of the task that was running. |
+| `lk.blocking.threshold` | double, `s` | Recommended | Seconds above which a block is reported. |
+| `lk.blocking.import` | string | Opt-in | Module a lazy import was loading when sampled. |
+
+No checkpoints.
+
+No limits declared.
+
+### `function_tool`
+
+Kind `internal`. One function tool execution, the OTel GenAI execute-tool span.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.function_tool.name` | string | Required | Tool name. |
+| `error.type` | enum | Conditionally required: On failure. | Describes a class of error the operation ended with. The `error.type` SHOULD be predictable, and SHOULD have low cardinality.  When `error.type` is set to a type (e.g., an exception type), its canonical class name identifying the type within the artifact SHOULD be used.  If the recorded error type is a wrapper that is not meaningful for failure classification, instrumentation MAY use the type of the inner error instead. For example, in Go, errors created with `fmt.Errorf` using `%w` MAY be unwrapped when the wrapper type does not help classify the failure.  Instrumentations SHOULD document the list of errors they report.  The cardinality of `error.type` within one instrumentation library SHOULD be low. Telemetry consumers that aggregate data from multiple instrumentation libraries and applications should be prepared for `error.type` to have high cardinality at query time when no additional filters are applied.  If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.  If a specific domain defines its own set of error identifiers (such as HTTP or RPC status codes), it's RECOMMENDED to:  - Use a domain-specific attribute - Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not. |
+| `gen_ai.operation.name` | enum | Recommended | The name of the operation being performed. If one of the predefined values applies, but specific system uses a different name it's RECOMMENDED to document it in the semantic conventions for specific GenAI system and use system-specific name in the instrumentation. If a different name is not documented, instrumentation libraries SHOULD use applicable predefined value. |
+| `gen_ai.tool.call.id` | string | Recommended | The tool call identifier supplied by the model or provider. This attribute SHOULD be set to the identifier received from the model or provider if and only if one was supplied. |
+| `gen_ai.tool.name` | string | Recommended | Name of the tool utilized by the agent. |
+| `gen_ai.tool.type` | string | Recommended | Type of the tool utilized by the agent. Extension: A tool executed on the agent-side to directly call external APIs, bridging the gap between the agent and real-world systems.   Agent-side operations involve actions that are performed by the agent on the server or within the agent's controlled environment. Function: A tool executed on the client-side, where the agent generates parameters for a predefined function, and the client executes the logic.   Client-side operations are actions taken on the user's end or within the client application. Datastore: A tool used by the agent to access and query structured or unstructured external data for retrieval-augmented tasks or knowledge updates. |
+| `lk.function_tool.id` | string | Recommended | Tool call id. |
+| `lk.function_tool.is_error` | boolean | Recommended | The tool returned an error. |
+| `gen_ai.tool.call.arguments` | any | Opt-in | Parameters passed to the tool call. > [!WARNING] > This attribute may contain sensitive information.  It's expected to be an object - in case a serialized string is available to the instrumentation, the instrumentation SHOULD do the best effort to deserialize it to an object. |
+| `gen_ai.tool.call.result` | any | Opt-in | The result returned by the tool call (if any and if execution was successful). > [!WARNING] > This attribute may contain sensitive information.  It's expected to be an object - in case a serialized string is available to the instrumentation, the instrumentation SHOULD do the best effort to deserialize it to an object. |
+| `gen_ai.tool.description` | string | Opt-in | The tool description. > [!WARNING] > This attribute may contain sensitive information. |
+| `lk.pii.function_tool.arguments` | string | Opt-in | Tool call arguments. |
+| `lk.pii.function_tool.output` | string | Opt-in | Tool output. |
+
+No checkpoints.
+
+No limits declared.
+
+### `job_entrypoint`
+
+Kind `internal`. The job's entrypoint, root of a job's trace.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.job_id` | string | Required | Agent job ID (`AJ_...`). Sent by Agents, not by clients. High cardinality; Agents' job-scoped metrics are the one sanctioned metric-dimension exception. |
+| `lk.job.accept_latency` | double, `s` | Recommended | Seconds from the job request to its acceptance. |
+| `lk.job.agent_id` | string | Recommended | Agent id of the job. |
+| `lk.job.assignment_latency` | double, `s` | Recommended | Seconds from acceptance to the job assignment. |
+| `lk.job.dispatch_latency` | double, `s` | Recommended | Seconds from the dispatch request to the entrypoint running. |
+| `lk.job.entrypoint_latency` | double, `s` | Recommended | Seconds from launch to the entrypoint running. |
+| `lk.job.launch_latency` | double, `s` | Recommended | Seconds from assignment to the job process launch. |
+| `lk.job.worker_id` | string | Recommended | Worker id the job runs on. |
+| `lk.pii.room_name` | string | Recommended | Customer-supplied room name. On every record and span of a session once the client has joined. |
+| `lk.room_sid` | string | Recommended | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. |
+| `lk.cloud_agent_id` | string | Opt-in | LiveKit Cloud agent id. |
+| `lk.deployment_id` | string | Opt-in | LiveKit Cloud deployment id. |
+| `lk.dispatch_id` | string | Opt-in | Agent dispatch id. |
+| `lk.redaction.enabled` | boolean | Opt-in | PII redaction was requested for the session. Telemetry metadata key; the producer's own `pii` filter reads it from the span attributes. |
+| `lk.simulation.enabled` | boolean | Opt-in | The session is a simulation. Telemetry metadata key set by the job context; a span attribute on the session trace. |
+| `lk.simulation.job_id` | string | Opt-in | Simulation run job (one scenario) behind the session. |
+| `lk.simulation.run_id` | string | Opt-in | Simulation run the session belongs to. |
+
+No checkpoints.
+
+No limits declared.
+
+### `job_shutdown`
+
+Kind `internal`. The job shutting down.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.shutdown.reason` | string | Recommended | Why the job shut down. |
+| `lk.shutdown.user_initiated` | boolean | Recommended | The shutdown was requested by user code. |
+
+No checkpoints.
+
+No limits declared.
+
+### `judge_evaluation`
+
+Kind `internal`. One LLM-judge evaluation of the session.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `gen_ai.evaluation.name` | string | Recommended | The name of the evaluation metric used for the GenAI response. |
+| `gen_ai.evaluation.score.label` | string | Recommended | Human readable label for evaluation. This attribute provides a human-readable interpretation of the evaluation score produced by an evaluator. For example, a score value of 1 could mean "relevant" in one evaluation system and "not relevant" in another, depending on the scoring range and evaluator. The label SHOULD have low cardinality. Possible values depend on the evaluation metric and evaluator used; implementations SHOULD document the possible values. |
+| `gen_ai.evaluation.explanation` | string | Opt-in | A free-form explanation for the assigned score provided by the evaluator. |
+
+No checkpoints.
+
+No limits declared.
+
+### `keyterm_detection`
+
+Kind `internal`. A keyterm update to the STT.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.keyterms.added` | int | Recommended | Keyterms added by the update. |
+| `lk.keyterms.count` | int | Recommended | Number of keyterms configured. |
+| `lk.keyterms.removed` | int | Recommended | Keyterms removed by the update. |
+| `lk.pii.keyterms` | string | Opt-in | The keyterms themselves (customer vocabulary). |
+
+No checkpoints.
+
+No limits declared.
+
 ### `lk.connect`
 
 Kind `client`. One connect attempt. Dashboards compute connect phases only from the required checkpoints, which every platform sends in this order; best-effort ones refine a platform's own view and may be missing or ordered differently.
@@ -408,6 +683,563 @@ Kind `internal`. One subscription, from the intent to subscribe to the first med
 
 Limits: 128 attributes, 128 span events per span.
 
+### `llm_fallback_adapter`
+
+Kind `internal`. The LLM fallback adapter choosing an instance.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.fallback.index` | int | Recommended | Index of the fallback instance that served the request. |
+| `lk.fallback.label` | string | Recommended | Label of the fallback instance that served the request. |
+| `lk.fallback.recovery` | boolean | Recommended | The request was a recovery probe of a failed instance. |
+
+No checkpoints.
+
+No limits declared.
+
+### `llm_node`
+
+Kind `internal`. The agent's LLM node for one generation. Carries the OTel GenAI request identity when a custom node does its own inference and no `llm_request` span exists. Its span events are the OTel GenAI message events (see the `event.gen_ai.*` groups below).
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+| `lk.function_tools` | string[] | Recommended | Function tool names offered. |
+| `lk.provider_tools` | string[] | Recommended | Provider-side tool names offered. |
+| `lk.response.ttft` | double, `s` | Recommended | Seconds to the first LLM token. |
+| `lk.speech_id` | string | Recommended | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+| `lk.tool_sets` | string[] | Recommended | Tool set names offered. |
+| `gen_ai.memory.query.text` | string | Opt-in | The search query used to retrieve memories. Instrumentations SHOULD NOT capture this attribute by default. Capture SHOULD be gated by an explicit user opt-in, for example `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT`.  > [!Warning] > This attribute may contain sensitive information. |
+| `gen_ai.memory.records` | any | Opt-in | The memory records stored or retrieved in a memory operation. Instrumentations SHOULD NOT capture this attribute by default. Capture SHOULD be gated by an explicit user opt-in, for example `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT`.  > [!Warning] > This attribute may contain sensitive information including user/PII data. |
+| `gen_ai.prompt.variable` | template[string] | Opt-in | The variables supplied to the prompt template, the `<key>` being the variable name, the value being the variable value. Prompt templates are parameterized with variables that are filled in at runtime. This attribute records the variable values passed to the template. The attribute name defines the variable name, and the attribute value is the variable value serialized as a string.  Examples:  - A variable `user_name` with value `Alice` SHOULD be recorded as   the `gen_ai.prompt.variable.user_name` attribute with value `"Alice"`. - A variable `language` with value `French` SHOULD be recorded as   the `gen_ai.prompt.variable.language` attribute with value `"French"`.  > [!Warning] > This attribute may contain sensitive information. |
+| `gen_ai.provider.name` | enum | Opt-in | The Generative AI provider as identified by the client or server instrumentation. Semantic conventions for individual GenAI operations SHOULD clarify which kinds of providers (e.g. inference, embeddings, retrieval, memory, hosted agent providers) apply when it is not clear from context.  The attribute SHOULD be set based on the instrumentation's best knowledge and may differ from the actual upstream provider. For example, a client SDK may be configured against a proxy or hosting platform that transparently relays requests to a different provider.  The `gen_ai.provider.name` attribute acts as a discriminator that identifies the GenAI telemetry format flavor specific to that provider within GenAI semantic conventions. It SHOULD be set consistently with provider-specific attributes and signals. For example, GenAI spans, metrics, and events related to AWS Bedrock should have the `gen_ai.provider.name` set to `aws.bedrock` and include applicable `aws.bedrock.*` attributes and are not expected to include `openai.*` attributes. |
+| `gen_ai.request.model` | string | Opt-in | The name of the GenAI model a request is being made to. |
+| `gen_ai.retrieval.documents` | any | Opt-in | The documents retrieved. Each document object SHOULD contain the following properties when available: `id` (string): A unique identifier for the document, `score` (double): The relevance score of the document |
+| `gen_ai.retrieval.query.text` | string | Opt-in | The query text used for retrieval. > [!Warning] > This attribute may contain sensitive information. |
+| `gen_ai.workflow.name` | string | Opt-in | Human-readable name of the GenAI workflow provided by the application. The workflow name is usually a static, application-unique identifier defined in a framework-specific way.  For example, it can be the name of the first chain in LangChain, the name of the crew in CrewAI, or the entry point agent in ADK or OpenAI Agents when no explicit workflow name is provided.  This attribute MUST have low cardinality. It is NOT RECOMMENDED to use instrumentation-time constants or names of types representing the workflow, such as "StateGraph". When no meaningful, low-cardinality workflow name is available for a given framework, this attribute MUST NOT be captured by default.  Semantic conventions for individual Generative AI frameworks SHOULD document what `gen_ai.workflow.name` means in the context of that framework. |
+| `lk.input.base_span_id` | string | Opt-in | Span whose input record this one continues. |
+| `lk.input.delta` | boolean | Opt-in | The span's input record is a delta over its base span. |
+| `lk.input.dropped_from_base` | int | Opt-in | Items of the base record not carried into this one. |
+| `lk.pii.chat_ctx` | string | Opt-in | Serialized chat context sent to the LLM. |
+| `lk.pii.response.function_calls` | string | Opt-in | Function calls the LLM produced, serialized. |
+| `lk.pii.response.text` | string | Opt-in | Text the LLM produced. |
+
+No checkpoints.
+
+No limits declared.
+
+### `llm_request`
+
+Kind `client`. One LLM inference request, the OTel GenAI inference span.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `gen_ai.operation.name` | enum | Required | The name of the operation being performed. If one of the predefined values applies, but specific system uses a different name it's RECOMMENDED to document it in the semantic conventions for specific GenAI system and use system-specific name in the instrumentation. If a different name is not documented, instrumentation libraries SHOULD use applicable predefined value. |
+| `error.type` | enum | Conditionally required: On failure. | Describes a class of error the operation ended with. The `error.type` SHOULD be predictable, and SHOULD have low cardinality.  When `error.type` is set to a type (e.g., an exception type), its canonical class name identifying the type within the artifact SHOULD be used.  If the recorded error type is a wrapper that is not meaningful for failure classification, instrumentation MAY use the type of the inner error instead. For example, in Go, errors created with `fmt.Errorf` using `%w` MAY be unwrapped when the wrapper type does not help classify the failure.  Instrumentations SHOULD document the list of errors they report.  The cardinality of `error.type` within one instrumentation library SHOULD be low. Telemetry consumers that aggregate data from multiple instrumentation libraries and applications should be prepared for `error.type` to have high cardinality at query time when no additional filters are applied.  If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.  If a specific domain defines its own set of error identifiers (such as HTTP or RPC status codes), it's RECOMMENDED to:  - Use a domain-specific attribute - Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not. |
+| `gen_ai.agent.name` | string | Recommended | Human-readable name of the GenAI agent provided by the application. |
+| `gen_ai.conversation.id` | string | Recommended | The unique identifier for a conversation (session, thread), used to store and correlate messages within this conversation. Instrumentations SHOULD populate conversation id when they have an identifier for the conversation readily available for a given operation, for example:  - when the client framework being instrumented manages conversation history (see [LlamaIndex chat store](https://docs.llamaindex.ai/en/stable/module_guides/storing/chat_stores/), [LangChain `session_id`](https://reference.langchain.com/python/langchain-core/runnables/history/RunnableWithMessageHistory), and [Google ADK sessions](https://adk.dev/sessions/session)) - when instrumenting GenAI client libraries that maintain a conversation on the backend (see [AWS Bedrock agent sessions](https://docs.aws.amazon.com/bedrock/latest/userguide/agents-session-state.html), [OpenAI Assistant threads](https://platform.openai.com/docs/api-reference/threads))  When no identifier for the conversation is available, instrumentations SHOULD NOT populate conversation id. For example, a new UUID, a trace identifier, or a hash of request content SHOULD NOT be used as a fallback value.  Application developers that manage conversation history MAY add conversation id to GenAI and other spans or logs using custom span or log record processors or hooks provided by instrumentation libraries. |
+| `gen_ai.output.type` | enum | Recommended | Represents the content type requested by the client. This attribute SHOULD be used when the client requests output of a specific type. The model may return zero or more outputs of this type. This attribute specifies the output modality and not the actual output format. For example, if an image is requested, the actual output could be a URL pointing to an image file. Additional output format details may be recorded in the future in the `gen_ai.output.{type}.*` attributes. |
+| `gen_ai.provider.name` | enum | Recommended | The Generative AI provider as identified by the client or server instrumentation. Semantic conventions for individual GenAI operations SHOULD clarify which kinds of providers (e.g. inference, embeddings, retrieval, memory, hosted agent providers) apply when it is not clear from context.  The attribute SHOULD be set based on the instrumentation's best knowledge and may differ from the actual upstream provider. For example, a client SDK may be configured against a proxy or hosting platform that transparently relays requests to a different provider.  The `gen_ai.provider.name` attribute acts as a discriminator that identifies the GenAI telemetry format flavor specific to that provider within GenAI semantic conventions. It SHOULD be set consistently with provider-specific attributes and signals. For example, GenAI spans, metrics, and events related to AWS Bedrock should have the `gen_ai.provider.name` set to `aws.bedrock` and include applicable `aws.bedrock.*` attributes and are not expected to include `openai.*` attributes. |
+| `gen_ai.request.model` | string | Recommended | The name of the GenAI model a request is being made to. |
+| `gen_ai.request.stream` | boolean | Recommended | Indicates whether the GenAI request was made in streaming mode. |
+| `gen_ai.response.finish_reasons` | string[] | Recommended | Array of reasons the model stopped generating tokens, corresponding to each generation received. Values correspond to generations in the same order as the returned choices/candidates.  Each position SHOULD contain the finish reason for the corresponding choice/candidate. If a finish reason was expected but not received, for example because generation failed, was cancelled, or a stream ended before the final event, instrumentations SHOULD report `error` for that position instead of omitting it.  `error` indicates that the generation ended abnormally, whether reported by the provider or inferred by the instrumentation. |
+| `gen_ai.response.id` | string | Recommended | The unique identifier for the completion. |
+| `gen_ai.response.model` | string | Recommended | The name of the model that generated the response. |
+| `gen_ai.response.time_to_first_chunk` | double | Recommended | Time to first chunk in a streaming response, measured from request issuance, in seconds. The value is measured from when the client issues the generation request to when the first chunk is received in the response stream. |
+| `gen_ai.usage.input_tokens` | int | Recommended | The number of tokens used in the GenAI input (prompt). This value SHOULD include all types of input tokens, including cached tokens. Instrumentations SHOULD make a best effort to populate this value, using a total provided by the provider when available or, depending on the provider API, by summing different token types parsed from the provider output.  When the provider reports both billed token counts and model-consumed token counts (for example, Cohere exposes both `usage.billed_units` and `usage.tokens`), instrumentations SHOULD report the billed count so the value matches the units the customer is charged for.  Detailed usage attributes are subsets of total and aggregate counts. For example, if a request has 100 text tokens (40 cached) and 200 image tokens: - `gen_ai.usage.input_tokens`: 300 - `gen_ai.usage.cache_read.input_tokens`: 40 - `gen_ai.usage.text.input_tokens`: 100 - `gen_ai.usage.text.cache_read.input_tokens`: 40 - `gen_ai.usage.image.input_tokens`: 200 |
+| `gen_ai.usage.output_tokens` | int | Recommended | The number of tokens used in the GenAI response (completion). When the provider reports both billed token counts and model-consumed token counts (for example, Cohere exposes both `usage.billed_units` and `usage.tokens`), instrumentations SHOULD report the billed count so the value matches the units the customer is charged for. |
+| `lk.retry_count` | int | Recommended | Retries before the operation succeeded or gave up. |
+| `gen_ai.input.messages` | any | Opt-in | The chat history provided to the model as an input. Messages MUST be provided in the order they were sent to the model. Instrumentations MAY provide a way for users to filter or truncate input messages.  > [!Warning] > This attribute is likely to contain sensitive information including user/PII data.  See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes) section for more details. |
+| `gen_ai.output.messages` | any | Opt-in | Messages returned by the model where each message represents a specific model response (choice, candidate). Each message represents a single output choice/candidate generated by the model. Each message corresponds to exactly one generation (choice/candidate) and vice versa - one choice cannot be split across multiple messages or one message cannot contain parts from multiple choices.  Instrumentations MAY provide a way for users to filter or truncate output messages. `gen_ai.response.finish_reasons` remains aligned with the generations returned by the provider, not with a filtered or truncated `gen_ai.output.messages` value.  When an operation ends in an error, this attribute SHOULD only be set when the operation produced output, including partial streamed output. Instrumentation SHOULD NOT synthesize output content for a failed operation.  > [!Warning] > This attribute is likely to contain sensitive information including user/PII data.  See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes) section for more details. |
+| `gen_ai.system_instructions` | any | Opt-in | The system message or instructions provided to the GenAI model separately from the chat history. This attribute SHOULD be used when the corresponding provider or API allows to provide system instructions or messages separately from the chat history.  Instructions that are part of the chat history SHOULD be recorded in `gen_ai.input.messages` attribute instead.  Instrumentations MAY provide a way for users to filter or truncate system instructions.  > [!Warning] > This attribute may contain sensitive information.  See [Recording content on attributes](/docs/gen-ai/gen-ai-spans.md#recording-content-on-attributes) section for more details. |
+| `gen_ai.tool.definitions` | any | Opt-in | The list of tool definitions available to the GenAI agent or model. > [!WARNING] > This attribute may contain sensitive information.  Since this attribute could be large, it's NOT RECOMMENDED to populate non-required properties by default. Instrumentations MAY provide a way to enable populating optional properties. |
+| `gen_ai.usage.audio.cache_read.input_tokens` | int | Opt-in | The number of audio input tokens served from a provider-managed cache. The value SHOULD be included in `gen_ai.usage.cache_read.input_tokens` and in `gen_ai.usage.audio.input_tokens`. |
+| `gen_ai.usage.audio.input_tokens` | int | Opt-in | The number of audio input tokens. The value SHOULD be included in `gen_ai.usage.input_tokens`. |
+| `gen_ai.usage.audio.output_tokens` | int | Opt-in | The number of audio output tokens. The value SHOULD be included in `gen_ai.usage.output_tokens`. |
+| `gen_ai.usage.cache_read.input_tokens` | int | Opt-in | The number of input tokens served from a provider-managed cache. The value SHOULD be included in `gen_ai.usage.input_tokens`. |
+| `gen_ai.usage.cache_write.input_tokens` | int | Opt-in | The number of input tokens written to a provider-managed cache. The value SHOULD be included in `gen_ai.usage.input_tokens`. |
+| `gen_ai.usage.image.cache_read.input_tokens` | int | Opt-in | The number of image input tokens served from a provider-managed cache. The value SHOULD be included in `gen_ai.usage.cache_read.input_tokens` and in `gen_ai.usage.image.input_tokens`. |
+| `gen_ai.usage.image.input_tokens` | int | Opt-in | The number of image input tokens. The value SHOULD be included in `gen_ai.usage.input_tokens`. |
+| `gen_ai.usage.reasoning.output_tokens` | int | Opt-in | The number of output tokens used for reasoning (e.g. chain-of-thought, extended thinking). The value SHOULD be included in `gen_ai.usage.output_tokens`. |
+| `gen_ai.usage.text.cache_read.input_tokens` | int | Opt-in | The number of text input tokens served from a provider-managed cache. The value SHOULD be included in `gen_ai.usage.cache_read.input_tokens` and in `gen_ai.usage.text.input_tokens`. |
+| `gen_ai.usage.text.input_tokens` | int | Opt-in | The number of text input tokens. The value SHOULD be included in `gen_ai.usage.input_tokens`. |
+| `gen_ai.usage.text.output_tokens` | int | Opt-in | The number of text output tokens. The value SHOULD be included in `gen_ai.usage.output_tokens`. |
+| `lk.fallback.index` | int | Opt-in | Index of the fallback instance that served the request. |
+| `lk.fallback.label` | string | Opt-in | Label of the fallback instance that served the request. |
+| `lk.fallback.recovery` | boolean | Opt-in | The request was a recovery probe of a failed instance. |
+| `lk.input.base_span_id` | string | Opt-in | Span whose input record this one continues. |
+| `lk.input.delta` | boolean | Opt-in | The span's input record is a delta over its base span. |
+| `lk.input.dropped_from_base` | int | Opt-in | Items of the base record not carried into this one. |
+| `lk.provider_request_ids` | string[] | Opt-in | Provider request ids a span covers, for joining against provider logs. |
+
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `gen_ai.client.inference.operation.details` | Best effort | OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced |
+
+No limits declared.
+
+### `llm_request_run`
+
+Kind `internal`. The LLM request's stream being consumed.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `metrics`
+
+Kind `internal`. A plugin-task metric noted through the Node binding, stamped with its resolved frame.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.frame.resolution` | enum | Required | How the inbound frame of a plugin-task metric was resolved (Node binding). |
+| `lk.metric` | string | Required | Metric type noted from a plugin task (Node binding `metrics` span). |
+| `lk.speech_id` | string | Conditionally required: When the frame resolves to a speech. | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+
+No checkpoints.
+
+No limits declared.
+
+### `on_enter`
+
+Kind `internal`. The agent's `on_enter` hook.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+
+No checkpoints.
+
+No limits declared.
+
+### `on_exit`
+
+Kind `internal`. The agent's `on_exit` hook.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+
+No checkpoints.
+
+No limits declared.
+
+### `on_session_end`
+
+Kind `internal`. The session-end hook.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `on_user_turn_completed`
+
+Kind `internal`. The `on_user_turn_completed` hook.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.on_user_turn_completed_delay` | double, `s` | Recommended | Seconds the `on_user_turn_completed` hook took. |
+
+No checkpoints.
+
+No limits declared.
+
+### `pause_agent_activity`
+
+Kind `internal`. Pausing an agent activity.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+
+No checkpoints.
+
+No limits declared.
+
+### `publish_audio_output`
+
+Kind `internal`. Publishing the agent's audio track.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.pre_connect_audio.duration` | double, `s` | Opt-in | Seconds of pre-connect audio replayed. |
+
+No checkpoints.
+
+No limits declared.
+
+### `realtime_inference`
+
+Kind `client`. One realtime-model generation.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `gen_ai.provider.name` | enum | Recommended | The Generative AI provider as identified by the client or server instrumentation. Semantic conventions for individual GenAI operations SHOULD clarify which kinds of providers (e.g. inference, embeddings, retrieval, memory, hosted agent providers) apply when it is not clear from context.  The attribute SHOULD be set based on the instrumentation's best knowledge and may differ from the actual upstream provider. For example, a client SDK may be configured against a proxy or hosting platform that transparently relays requests to a different provider.  The `gen_ai.provider.name` attribute acts as a discriminator that identifies the GenAI telemetry format flavor specific to that provider within GenAI semantic conventions. It SHOULD be set consistently with provider-specific attributes and signals. For example, GenAI spans, metrics, and events related to AWS Bedrock should have the `gen_ai.provider.name` set to `aws.bedrock` and include applicable `aws.bedrock.*` attributes and are not expected to include `openai.*` attributes. |
+| `gen_ai.request.model` | string | Recommended | The name of the GenAI model a request is being made to. |
+| `lk.speech_id` | string | Recommended | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+
+No checkpoints.
+
+No limits declared.
+
+### `realtime_metrics`
+
+Kind `internal`. Realtime-model metrics attached to a turn.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.realtime_model_metrics` | string | Recommended | Realtime model metrics of the turn, serialized. |
+| `lk.speech_id` | string | Recommended | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+
+No checkpoints.
+
+No limits declared.
+
+### `resume_agent_activity`
+
+Kind `internal`. Resuming an agent activity.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+
+No checkpoints.
+
+No limits declared.
+
+### `room_connect`
+
+Kind `client`. Connecting the job to its room.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.connection_state` | string | Recommended | Room connection state. |
+| `lk.room.auto_subscribe` | boolean | Recommended | The room was joined with auto-subscribe. |
+| `lk.room.e2ee` | boolean | Recommended | End-to-end encryption is on. |
+| `lk.room.remote_participant_count` | int | Recommended | Remote participants when the agent connected. |
+
+No checkpoints.
+
+No limits declared.
+
+### `room_disconnect`
+
+Kind `client`. Disconnecting from the room.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `rpc_call`
+
+Kind `client`. An outgoing RPC.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `rpc.method` | string | Required | The fully-qualified logical name of the method from the RPC interface perspective. The LiveKit RPC method name. |
+| `lk.rpc.error_code` | int | Conditionally required: On failure. | RPC error code. |
+| `lk.rpc.destination_identity` | string | Recommended | Identity the RPC is sent to. |
+| `lk.rpc.payload_size` | int, `By` | Recommended | RPC request payload size in bytes. |
+| `lk.rpc.request_id` | string | Recommended | RPC request id. |
+| `lk.rpc.response_size` | int, `By` | Recommended | RPC response size in bytes. |
+| `lk.rpc.response_timeout` | double, `s` | Recommended | RPC response timeout in seconds. |
+| `lk.pii.rpc.payload` | string | Opt-in | RPC request payload. |
+| `lk.pii.rpc.response` | string | Opt-in | RPC response payload. |
+
+No checkpoints.
+
+No limits declared.
+
+### `rpc_handler`
+
+Kind `server`. An incoming RPC handled by the agent.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `rpc.method` | string | Required | The fully-qualified logical name of the method from the RPC interface perspective. The LiveKit RPC method name. |
+| `lk.rpc.error_code` | int | Conditionally required: On failure. | RPC error code. |
+| `lk.rpc.caller_identity` | string | Recommended | Identity of the RPC caller. A participant identity outside `lk.pii.*`, as Agents 2.0 ships it; the registry records it rather than renaming it. |
+| `lk.rpc.handler_registered` | boolean | Recommended | A handler was registered for the method. |
+| `lk.rpc.payload_size` | int, `By` | Recommended | RPC request payload size in bytes. |
+| `lk.rpc.request_id` | string | Recommended | RPC request id. |
+| `lk.rpc.response_size` | int, `By` | Recommended | RPC response size in bytes. |
+| `lk.rpc.response_timeout` | double, `s` | Recommended | RPC response timeout in seconds. |
+| `lk.pii.rpc.payload` | string | Opt-in | RPC request payload. |
+| `lk.pii.rpc.response` | string | Opt-in | RPC response payload. |
+
+No checkpoints.
+
+No limits declared.
+
+### `session_close`
+
+Kind `internal`. Closing the session.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.close.drain` | boolean | Recommended | The close drained pending speech first. |
+| `lk.close_reason` | string | Recommended | Why the session closed. |
+
+No checkpoints.
+
+No limits declared.
+
+### `session_end_upload`
+
+Kind `internal`. Uploading the session report.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `session_start`
+
+Kind `internal`. Starting the session (room I/O, first activity).
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `setup_toolsets`
+
+Kind `internal`. Initializing the agent's tool sets.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.tool_sets` | string[] | Recommended | Tool set names offered. |
+
+No checkpoints.
+
+No limits declared.
+
+### `shutdown_callback`
+
+Kind `internal`. One shutdown callback.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.callback.name` | string | Required | Name of the shutdown callback. |
+
+No checkpoints.
+
+No limits declared.
+
+### `start_agent_activity`
+
+Kind `internal`. Starting an agent activity.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_fallback_adapter`
+
+Kind `internal`. The TTS fallback adapter choosing an instance.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.fallback.index` | int | Recommended | Index of the fallback instance that served the request. |
+| `lk.fallback.label` | string | Recommended | Label of the fallback instance that served the request. |
+| `lk.fallback.recovery` | boolean | Recommended | The request was a recovery probe of a failed instance. |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_node`
+
+Kind `internal`. The agent's TTS node for one generation.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+| `lk.response.ttfb` | double, `s` | Recommended | Seconds to the first TTS audio byte. |
+| `lk.speech_id` | string | Recommended | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. |
+| `lk.tts.label` | string | Recommended | Label of the TTS instance. |
+| `lk.tts.streaming` | boolean | Recommended | The TTS instance streams (duplex path). |
+| `lk.pii.input_text` | string | Opt-in | Text sent to the TTS. |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_request`
+
+Kind `client`. One TTS request.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `error.type` | enum | Conditionally required: On failure. | Describes a class of error the operation ended with. The `error.type` SHOULD be predictable, and SHOULD have low cardinality.  When `error.type` is set to a type (e.g., an exception type), its canonical class name identifying the type within the artifact SHOULD be used.  If the recorded error type is a wrapper that is not meaningful for failure classification, instrumentation MAY use the type of the inner error instead. For example, in Go, errors created with `fmt.Errorf` using `%w` MAY be unwrapped when the wrapper type does not help classify the failure.  Instrumentations SHOULD document the list of errors they report.  The cardinality of `error.type` within one instrumentation library SHOULD be low. Telemetry consumers that aggregate data from multiple instrumentation libraries and applications should be prepared for `error.type` to have high cardinality at query time when no additional filters are applied.  If the operation has completed successfully, instrumentations SHOULD NOT set `error.type`.  If a specific domain defines its own set of error identifiers (such as HTTP or RPC status codes), it's RECOMMENDED to:  - Use a domain-specific attribute - Set `error.type` to capture all errors, regardless of whether they are defined within the domain-specific set or not. |
+| `lk.retry_count` | int | Recommended | Retries before the operation succeeded or gave up. |
+| `lk.tts.label` | string | Recommended | Label of the TTS instance. |
+| `gen_ai.provider.name` | enum | Opt-in | The Generative AI provider as identified by the client or server instrumentation. Semantic conventions for individual GenAI operations SHOULD clarify which kinds of providers (e.g. inference, embeddings, retrieval, memory, hosted agent providers) apply when it is not clear from context.  The attribute SHOULD be set based on the instrumentation's best knowledge and may differ from the actual upstream provider. For example, a client SDK may be configured against a proxy or hosting platform that transparently relays requests to a different provider.  The `gen_ai.provider.name` attribute acts as a discriminator that identifies the GenAI telemetry format flavor specific to that provider within GenAI semantic conventions. It SHOULD be set consistently with provider-specific attributes and signals. For example, GenAI spans, metrics, and events related to AWS Bedrock should have the `gen_ai.provider.name` set to `aws.bedrock` and include applicable `aws.bedrock.*` attributes and are not expected to include `openai.*` attributes. |
+| `gen_ai.request.model` | string | Opt-in | The name of the GenAI model a request is being made to. |
+| `lk.provider_request_ids` | string[] | Opt-in | Provider request ids a span covers, for joining against provider logs. |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_request_run`
+
+Kind `internal`. The TTS request's stream being consumed.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_stream`
+
+Kind `internal`. The Node binding driving `Tts::stream` (the duplex path).
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.tts.label` | string | Required | Label of the TTS instance. |
+| `lk.error.retryable` | boolean | Conditionally required: On failure. | The provider error is retryable (Node binding). |
+| `lk.tts.bytes` | int, `By` | Conditionally required: On success. | Audio bytes the TTS driver collected (Node binding). |
+| `lk.tts.frames` | int | Conditionally required: On success. | Audio frames the TTS driver collected (Node binding). |
+| `lk.tts.no_duplex_path` | boolean | Conditionally required: When the instance has no duplex path. | The TTS reported no duplex path, so the stream adapter was selected (Node binding; not a failure). |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_stream_adapter`
+
+Kind `internal`. The sentence-splitting adapter over a non-streaming TTS.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.tts.label` | string | Recommended | Label of the TTS instance. |
+
+No checkpoints.
+
+No limits declared.
+
+### `tts_synthesize`
+
+Kind `internal`. The Node binding driving `Tts::synthesize` (the simplex path).
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.tts.label` | string | Required | Label of the TTS instance. |
+| `lk.tts.streaming` | boolean | Required | The TTS instance streams (duplex path). |
+| `lk.error.retryable` | boolean | Conditionally required: On failure. | The provider error is retryable (Node binding). |
+| `lk.tts.bytes` | int, `By` | Conditionally required: On success. | Audio bytes the TTS driver collected (Node binding). |
+| `lk.tts.frames` | int | Conditionally required: On success. | Audio frames the TTS driver collected (Node binding). |
+
+No checkpoints.
+
+No limits declared.
+
+### `update_agent`
+
+Kind `internal`. Replacing the session's agent.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.agent_label` | string | Recommended | Label of the agent running the activity. |
+| `lk.previous_agent_label` | string | Recommended | Label of the agent handed off from. |
+
+No checkpoints.
+
+No limits declared.
+
+### `user_speaking`
+
+Kind `internal`. The user speaking (VAD).
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+
+No checkpoints.
+
+No limits declared.
+
+### `user_turn`
+
+Kind `internal`. One user turn, from speech to the turn decision.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.end_of_turn_delay` | double, `s` | Recommended | Seconds from the end of speech to the turn decision. |
+| `lk.eou.resume_count` | int | Recommended | Endpointing waits the user cut short by speaking again. |
+| `lk.eou.source` | string | Recommended | What decided the end of the turn. |
+| `lk.is_interruption` | boolean | Recommended | The user turn was classified as an interruption. |
+| `lk.stt.events` | string | Recommended | JSON list of transcript events on the user turn, in arrival order (received_at, type, transcript_length). |
+| `lk.transcript_confidence` | double | Recommended | Confidence of the final transcript. |
+| `lk.transcription_delay` | double, `s` | Recommended | Seconds from the end of speech to the final transcript. |
+| `lk.interruption.detection_delay` | double, `s` | Opt-in | Seconds from the user's speech to the interruption decision. |
+| `lk.interruption.prediction_duration` | double, `s` | Opt-in | Seconds the interruption prediction took. |
+| `lk.interruption.probability` | double | Opt-in | Interruption probability. |
+| `lk.interruption.total_duration` | double, `s` | Opt-in | Seconds of the interruption from detection to resolution. |
+| `lk.pii.user_transcript` | string | Opt-in | Transcript the detector scored. |
+
+No checkpoints.
+
+No limits declared.
+
+### `wait_for_audio_track`
+
+Kind `internal`. Waiting for the participant's audio track.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
+| `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+
+No checkpoints.
+
+No limits declared.
+
+### `wait_for_participant`
+
+Kind `internal`. Waiting for the participant to link to.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.room_io.participant_filter` | string | Recommended | How room I/O picked its participant. |
+
+No checkpoints.
+
+No limits declared.
+
+### `wait_for_video_track`
+
+Kind `internal`. Waiting for the participant's video track.
+
+| Attribute | Type | Requirement | Description |
+| --- | --- | --- | --- |
+| `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
+| `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+
+No checkpoints.
+
+No limits declared.
+
 ## Attribute reference
 
 Every key this registry defines, with its meaning; the OTel keys used above are defined by OTel.
@@ -417,7 +1249,39 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | --- | --- | --- | --- | --- | --- | --- |
 | `browser.name` | string | client | none | Browser name. Resource attribute, JS port only. | `Chrome`, `Safari`, `Firefox` | resource |
 | `browser.version` | string | client | none | Browser version. Resource attribute, JS port only. | `124.0` | resource |
+| `connection_reused` | string | agents | none | Whether a pooled connection was reused, as the string `true`/`false`. | `true` | |
+| `gen_ai.token.type` | string | agents | none | Token type (`input` or `output`); deprecated upstream, a dimension of `gen_ai.client.token.usage`. | `input`, `output` | |
+| `gen_ai.usage.input_audio_tokens` | int | agents | none | LangFuse spelling of audio input tokens. | `800` | |
+| `gen_ai.usage.input_cached_tokens` | int | agents | none | LangFuse spelling of cached input tokens. | `64` | |
+| `gen_ai.usage.input_text_tokens` | int | agents | none | LangFuse spelling of text input tokens. | `120` | |
+| `gen_ai.usage.output_audio_tokens` | int | agents | none | LangFuse spelling of audio output tokens. | `300` | |
+| `gen_ai.usage.output_text_tokens` | int | agents | none | LangFuse spelling of text output tokens. | `40` | |
+| `gen_ai.usage.reasoning_tokens` | int | agents | none | LangFuse spelling of reasoning tokens. | `12` | |
+| `langfuse.observation.completion_start_time` | string | agents | none | LangFuse's completion start time (ISO 8601), set next to `gen_ai.response.time_to_first_chunk`. | `2026-10-19T12:00:00.000Z` | |
+| `lk.agent_label` | string | agents | none | Label of the agent running the activity. | `Assistant` | `drain_agent_activity` `llm_node` `on_enter` `on_exit` `pause_agent_activity` `resume_agent_activity` `start_agent_activity` `tts_node` `update_agent` |
+| `lk.amd.category` | string | agents | none | AMD classification. | `human`, `machine` | `amd` |
+| `lk.amd.delay` | double, `s` | agents | none | Seconds from the call start to the AMD decision. | `3.0` | `amd` |
+| `lk.amd.reason` | string | agents | none | Why the AMD classifier decided. | `greeting_length` | `amd` |
+| `lk.amd.speech_duration` | double, `s` | agents | none | Seconds of speech the AMD classifier heard. | `2.1` | `amd` |
+| `lk.blocking.count` | int | agents | none | Blocks in the session. | `2` | `agent_session` |
+| `lk.blocking.cpu_time` | double, `s` | agents | none | CPU seconds the loop thread consumed during the block. | `0.25` | `event_loop_blocked` |
+| `lk.blocking.duration` | double, `s` | agents | none | Seconds the loop was blocked. | `0.3` | `event_loop_blocked` |
+| `lk.blocking.gc_time` | double, `s` | agents | none | Seconds of garbage collection on the loop thread during the block. | `0.02` | `event_loop_blocked` |
+| `lk.blocking.import` | string | agents | none | Module a lazy import was loading when sampled. | `numpy` | `event_loop_blocked` |
+| `lk.blocking.max_duration` | double, `s` | agents | none | Seconds of the longest block in the session. | `0.4` | `agent_session` |
+| `lk.blocking.severity` | string | agents | none | Severity bucket of the block. | `warning` | `event_loop_blocked` |
+| `lk.blocking.stack` | string | agents | none | Loop-thread stack sampled while blocked (source locations only). | `agent.py:42` | `event_loop_blocked` |
+| `lk.blocking.suppressed` | int | agents | none | Reports dropped by rate limiting since the previous emitted span. | `0` | `event_loop_blocked` |
+| `lk.blocking.task` | string | agents | none | Name of the task that was running. | `Task-12` | `event_loop_blocked` |
+| `lk.blocking.threshold` | double, `s` | agents | none | Seconds above which a block is reported. | `0.1` | `event_loop_blocked` |
+| `lk.blocking.total_duration` | double, `s` | agents | none | Seconds blocked in total over the session. | `0.6` | `agent_session` |
+| `lk.callback.name` | string | agents | none | Name of the shutdown callback. | `flush_transcript` | `shutdown_callback` |
+| `lk.close.drain` | boolean | agents | none | The close drained pending speech first. | `true` | `session_close` |
+| `lk.close_reason` | string | agents | none | Why the session closed. | `user_initiated` | `session_close` |
+| `lk.cloud_agent_id` | string | agents | none | LiveKit Cloud agent id. | `CA_abc123` | `job_entrypoint` |
 | `lk.connect.attempt` | int | client | none | 1-based connect attempt. 1 for the user-initiated connect; a platform that retries sets the next number on the next `lk.connect` span. | `1` | `lk.connect` |
+| `lk.connection_state` | string | agents | none | Room connection state. | `connected` | `room_connect` |
+| `lk.deployment_id` | string | agents | none | LiveKit Cloud deployment id. | `DP_abc123` | `job_entrypoint` |
 | `lk.device.app_state` | enum | client | none | Whether the app is in front of the user. All platforms; the web maps page visibility. |  | `lk.device.app_state.changed` |
 | `lk.device.audio.interruption` | enum | client | none | Phase of an audio session interruption. iOS audio session interruptions; Android audio focus loss and gain. |  | `lk.device.audio.interruption` |
 | `lk.device.audio_route.outputs` | string | client | none | The active outputs, comma-separated. Each item is one of speaker, receiver, wired_headset, bluetooth, car_audio, air_play, hdmi, usb, other. A string, not an array: the vocabulary is closed but the list is joined. | `bluetooth`, `speaker,usb` | `lk.device.audio_route.changed` |
@@ -432,19 +1296,120 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.device.network.expensive` | boolean | client | none | The network is metered (cellular, personal hotspot). Apple `NWPath.isExpensive`, Android metered networks; on the web only where the Network Information API exists. | `false` | `lk.device.network.changed` |
 | `lk.device.thermal.state` | enum | client | none | Thermal pressure as the OS reports it. Apple `ProcessInfo.thermalState`, Android `PowerManager` thermal status, web Compute Pressure API, all mapped to this vocabulary. The platform's `unknown` (no thermal source) is no reading and is never emitted. iOS, macOS and Android; optional elsewhere. |  | `lk.device.thermal.changed` |
 | `lk.disconnect.reason` | enum | client | none | Why the session ended. The protocol's `DisconnectReason`, plus the client giving up (`reconnect_failed`). |  | `lk.room.disconnected` |
-| `lk.job_id` | string | shared | none | Agent job ID (`AJ_...`). Sent by Agents, not by clients. High cardinality; Agents' job-scoped metrics are the one sanctioned metric-dimension exception. | `AJ_kVbMBWtnVHvT` | |
+| `lk.dispatch_id` | string | agents | none | Agent dispatch id. | `AD_abc123` | `job_entrypoint` |
+| `lk.e2e_latency` | double, `s` | agents | none | Seconds from the end of the user's speech to the agent's first audio. | `1.1` | `agent_turn` |
+| `lk.end_of_turn_delay` | double, `s` | agents | none | Seconds from the end of speech to the turn decision. | `0.7` | `agent_turn` `user_turn` |
+| `lk.eou.detection_delay` | double, `s` | agents | none | Seconds the detector inference took. | `0.08` | `eou_detection` |
+| `lk.eou.endpointing_delay` | double, `s` | agents | none | Seconds of endpointing delay applied. | `0.5` | `eou_wait` |
+| `lk.eou.from_cache` | boolean | agents | none | The detector answer came from the cache. | `false` | `eou_detection` |
+| `lk.eou.language` | string | agents | none | Language the detector ran for. | `en` | `eou_detection` |
+| `lk.eou.not_committed_count` | int | agents | none | Turn decisions the wait rejected before it ended. | `0` | `eou_wait` |
+| `lk.eou.outcome` | enum | agents | none | How the endpointing wait ended. |  | `eou_wait` |
+| `lk.eou.probability` | double | agents | none | End-of-utterance probability. | `0.93` | `eou_detection` |
+| `lk.eou.rearm_count` | int | agents | none | Times the endpointing wait restarted on a later trigger. | `0` | `eou_wait` |
+| `lk.eou.resume_count` | int | agents | none | Endpointing waits the user cut short by speaking again. | `1` | `user_turn` |
+| `lk.eou.source` | string | agents | none | What decided the end of the turn. | `turn_detector`, `vad` | `user_turn` |
+| `lk.eou.unlikely_threshold` | double | agents | none | Threshold under which the turn is unlikely to be over. | `0.15` | `eou_detection` |
+| `lk.eou.wait_duration` | double, `s` | agents | none | Seconds from the end of the user's speech to the turn decision. | `0.6` | `eou_wait` |
+| `lk.error.retryable` | boolean | agents | none | The provider error is retryable (Node binding). | `true` | `tts_stream` `tts_synthesize` |
+| `lk.fail` | boolean | agents | none | The session report is tagged failed. See `lk.success`. | `true` | `agent_session` |
+| `lk.fallback.index` | int | agents | none | Index of the fallback instance that served the request. | `1` | `llm_fallback_adapter` `llm_request` `tts_fallback_adapter` |
+| `lk.fallback.label` | string | agents | none | Label of the fallback instance that served the request. | `openai.LLM` | `llm_fallback_adapter` `llm_request` `tts_fallback_adapter` |
+| `lk.fallback.recovery` | boolean | agents | none | The request was a recovery probe of a failed instance. | `false` | `llm_fallback_adapter` `llm_request` `tts_fallback_adapter` |
+| `lk.first_frame_delay` | double, `s` | agents | none | Seconds from waiting for a track to its first frame. | `0.25` | `wait_for_audio_track` `wait_for_video_track` |
+| `lk.frame.resolution` | enum | agents | none | How the inbound frame of a plugin-task metric was resolved (Node binding). |  | `metrics` |
+| `lk.function_tool.id` | string | agents | none | Tool call id. | `call_7` | `function_tool` |
+| `lk.function_tool.is_error` | boolean | agents | none | The tool returned an error. | `false` | `function_tool` |
+| `lk.function_tool.name` | string | agents | none | Tool name. | `lookup_weather` | `function_tool` |
+| `lk.function_tools` | string[] | agents | none | Function tool names offered. | `["lookup_weather"]` | `llm_node` |
+| `lk.generation_count` | int | agents | none | Generations in the turn. | `1` | `agent_turn` |
+| `lk.generation_id` | string | agents | none | Id of the agent turn (generation). | `gen_abc123` | `agent_turn` |
+| `lk.input.base_span_id` | string | agents | none | Span whose input record this one continues. | `7f3c2a1b9e8d4c5f` | `llm_node` `llm_request` |
+| `lk.input.delta` | boolean | agents | none | The span's input record is a delta over its base span. | `true` | `llm_node` `llm_request` |
+| `lk.input.dropped_from_base` | int | agents | none | Items of the base record not carried into this one. | `0` | `llm_node` `llm_request` |
+| `lk.interrupted` | boolean | agents | none | The speech was interrupted. | `true` | `agent_speaking` `agent_turn` |
+| `lk.interruption.detection_delay` | double, `s` | agents | none | Seconds from the user's speech to the interruption decision. | `0.2` | `user_turn` |
+| `lk.interruption.prediction_duration` | double, `s` | agents | none | Seconds the interruption prediction took. | `0.05` | `user_turn` |
+| `lk.interruption.probability` | double | agents | none | Interruption probability. | `0.8` | `user_turn` |
+| `lk.interruption.source` | string | agents | none | What triggered the interruption. | `vad`, `manual` | `agent_speaking` |
+| `lk.interruption.total_duration` | double, `s` | agents | none | Seconds of the interruption from detection to resolution. | `0.5` | `user_turn` |
+| `lk.is_interruption` | boolean | agents | none | The user turn was classified as an interruption. | `true` | `user_turn` |
+| `lk.job.accept_latency` | double, `s` | agents | none | Seconds from the job request to its acceptance. | `0.012` | `job_entrypoint` |
+| `lk.job.agent_id` | string | agents | none | Agent id of the job. | `AG_abc123` | `job_entrypoint` |
+| `lk.job.assignment_latency` | double, `s` | agents | none | Seconds from acceptance to the job assignment. | `0.3` | `job_entrypoint` |
+| `lk.job.dispatch_latency` | double, `s` | agents | none | Seconds from the dispatch request to the entrypoint running. | `0.9` | `job_entrypoint` |
+| `lk.job.entrypoint_latency` | double, `s` | agents | none | Seconds from launch to the entrypoint running. | `0.1` | `job_entrypoint` |
+| `lk.job.launch_latency` | double, `s` | agents | none | Seconds from assignment to the job process launch. | `0.5` | `job_entrypoint` |
+| `lk.job.worker_id` | string | agents | none | Worker id the job runs on. | `AW_abc123` | `job_entrypoint` |
+| `lk.job_id` | string | shared | none | Agent job ID (`AJ_...`). Sent by Agents, not by clients. High cardinality; Agents' job-scoped metrics are the one sanctioned metric-dimension exception. | `AJ_kVbMBWtnVHvT` | `job_entrypoint` |
+| `lk.keyterms.added` | int | agents | none | Keyterms added by the update. | `3` | `keyterm_detection` |
+| `lk.keyterms.count` | int | agents | none | Number of keyterms configured. | `12` | `keyterm_detection` |
+| `lk.keyterms.removed` | int | agents | none | Keyterms removed by the update. | `1` | `keyterm_detection` |
+| `lk.llm_metrics` | string | agents | none | LLM metrics of the turn, serialized. | `{}` | `agent_turn` |
 | `lk.log.logger` | string | client | none | Logger, type, module or file that wrote the line. Free text from the platform's logger. | `Room`, `livekit::rtc_engine` | log |
 | `lk.log.source` | enum | client | none | Which layer wrote the log line. Only WARN and ERROR records are sent; WebRTC lines only at ERROR. |  | log |
+| `lk.metric` | string | agents | none | Metric type noted from a plugin task (Node binding `metrics` span). | `tts_metrics` | `metrics` |
+| `lk.new_state` | string | agents | none | State after a transition. | `speaking` | |
+| `lk.old_state` | string | agents | none | State before a transition. | `listening` | |
+| `lk.on_user_turn_completed_delay` | double, `s` | agents | none | Seconds the `on_user_turn_completed` hook took. | `0.01` | `agent_turn` `on_user_turn_completed` |
 | `lk.outcome` | enum | client | none | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |  | `lk.connect` `lk.publish` `lk.reconnect` `lk.subscribe` |
-| `lk.participant_id` | string | shared | none | Server-assigned SID of the local participant (`PA_...`). On every record and span of a session once the client has joined. High cardinality, never a default metric dimension. | `PA_9kLm2NpQ4rTs` | record |
-| `lk.pii.participant_identity` | string | shared | pii | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. | `identity-0` | record |
+| `lk.parent_generation_id` | string | agents | none | Generation this one continues (a tool-call follow-up). | `gen_abc122` | `agent_turn` |
+| `lk.participant_id` | string | shared | none | Server-assigned SID of the local participant (`PA_...`). On every record and span of a session once the client has joined. High cardinality, never a default metric dimension. | `PA_9kLm2NpQ4rTs` | record `agent_session` |
+| `lk.participant_kind` | string | agents | none | Kind of the linked participant (protocol `ParticipantInfo.Kind`). | `standard`, `sip` | `agent_session` |
+| `lk.pii.amd.transcript` | string | agents | pii | Transcript the AMD classifier used. | `hello?` | `amd` |
+| `lk.pii.arguments` | string | agents | pii | Tool-call arguments on a log record. | `{}` | |
+| `lk.pii.chat_ctx` | string | agents | pii | Serialized chat context sent to the LLM. | `[]` | `llm_node` |
+| `lk.pii.dtmf_inputs` | string | agents | pii | DTMF digits received. | `1234` | |
+| `lk.pii.error` | string | agents | pii | Error text that may quote user content. | `expected ','` | |
+| `lk.pii.event` | string | agents | pii | Raw provider event on a debug log record. | `{}` | |
+| `lk.pii.function_tool.arguments` | string | agents | pii | Tool call arguments. | `{"city":"Paris"}` | `function_tool` |
+| `lk.pii.function_tool.output` | string | agents | pii | Tool output. | `sunny` | `function_tool` |
+| `lk.pii.input_text` | string | agents | pii | Text sent to the TTS. | `Hello` | `tts_node` |
+| `lk.pii.instructions` | string | agents | pii | Agent instructions in force. | `You are a helpful assistant.` | `agent_turn` |
+| `lk.pii.keyterms` | string | agents | pii | The keyterms themselves (customer vocabulary). | `LiveKit, WebRTC` | `keyterm_detection` |
+| `lk.pii.output` | string | agents | pii | Tool-call output on a log record. | `ok` | |
+| `lk.pii.participant_identity` | string | shared | pii | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. | `identity-0` | record `agent_session` |
+| `lk.pii.progress_message` | string | agents | pii | MCP tool progress message. | `fetching` | |
+| `lk.pii.raw_arguments` | string | agents | pii | Malformed tool-call arguments as received. | `{'x':1}` | |
 | `lk.pii.remote_participant_identity` | string | shared | pii | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). On subscribe spans: the identity of the participant publishing the track. | `identity-1` | `lk.subscribe` |
-| `lk.pii.room_name` | string | shared | pii | Customer-supplied room name. On every record and span of a session once the client has joined. | `my-room` | record |
+| `lk.pii.repaired` | string | agents | pii | Tool-call arguments after repair. | `{"x":1}` | |
+| `lk.pii.response.function_calls` | string | agents | pii | Function calls the LLM produced, serialized. | `[]` | `llm_node` |
+| `lk.pii.response.text` | string | agents | pii | Text the LLM produced. | `Sure.` | `llm_node` |
+| `lk.pii.room_name` | string | shared | pii | Customer-supplied room name. On every record and span of a session once the client has joined. | `my-room` | record `job_entrypoint` |
+| `lk.pii.rpc.payload` | string | agents | pii | RPC request payload. | `{"q":1}` | `rpc_call` `rpc_handler` |
+| `lk.pii.rpc.response` | string | agents | pii | RPC response payload. | `ok` | `rpc_call` `rpc_handler` |
+| `lk.pii.sip.phoneNumber` | string | agents | pii | Phone number of a SIP participant. Camel case as the SIP participant attribute it is copied from; registered as emitted. | `+15550100` | `agent_session` |
+| `lk.pii.text` | string | agents | pii | Message text on a log record. | `hello` | |
+| `lk.pii.transcript` | string | agents | pii | Transcript text on a log record. | `hello` | |
+| `lk.pii.user_input` | string | agents | pii | The user's transcript for the turn. | `book a table` | `agent_turn` |
+| `lk.pii.user_transcript` | string | agents | pii | Transcript the detector scored. | `book a table` | `eou_detection` `user_turn` |
 | `lk.ping.seq` | int | client | none | Monotonically increasing sequence number per pipeline. Optional; on `lk.ping` only. | `1` | `lk.ping` |
+| `lk.playout.position` | double, `s` | agents | none | Seconds of the agent's speech played out when it was interrupted. | `1.2` | `agent_speaking` |
+| `lk.pre_connect_audio.duration` | double, `s` | agents | none | Seconds of pre-connect audio replayed. | `1.5` | `publish_audio_output` |
+| `lk.previous_agent_label` | string | agents | none | Label of the agent handed off from. | `Greeter` | `update_agent` |
+| `lk.provider_request_ids` | string[] | agents | none | Provider request ids a span covers, for joining against provider logs. | `["req_abc123"]` | `agent_turn` `llm_request` `tts_request` |
+| `lk.provider_tools` | string[] | agents | none | Provider-side tool names offered. | `["web_search"]` | `llm_node` |
+| `lk.realtime_model_metrics` | string | agents | none | Realtime model metrics of the turn, serialized. | `{}` | `agent_turn` `realtime_metrics` |
 | `lk.reconnect.attempts` | int | client | none | Reconnect attempts made in the cycle. Equals `<n>` of the last `attempt <n> <mode>` checkpoint. | `2` | `lk.reconnect` |
 | `lk.reconnect.mode` | enum | client | none | Mode of the last reconnect attempt. Updated with each `attempt <n> <mode>` checkpoint; matches the last one. |  | `lk.reconnect` |
 | `lk.reconnect.reason` | enum | client | none | What triggered the reconnect cycle. The protocol's `ReconnectReason` (`RR_*`), plus reasons only a client knows. |  | `lk.reconnect` |
-| `lk.room_sid` | string | shared | none | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. | `RM_5Fq8xQ2ZbXwN` | record |
+| `lk.redaction.enabled` | boolean | agents | none | PII redaction was requested for the session. Telemetry metadata key; the producer's own `pii` filter reads it from the span attributes. | `true` | `job_entrypoint` |
+| `lk.response.ttfb` | double, `s` | agents | none | Seconds to the first TTS audio byte. | `0.3` | `tts_node` |
+| `lk.response.ttft` | double, `s` | agents | none | Seconds to the first LLM token. | `0.42` | `llm_node` |
+| `lk.retry_count` | int | agents | none | Retries before the operation succeeded or gave up. | `0`, `2` | `llm_request` `tts_request` |
+| `lk.room.auto_subscribe` | boolean | agents | none | The room was joined with auto-subscribe. | `true` | `room_connect` |
+| `lk.room.e2ee` | boolean | agents | none | End-to-end encryption is on. | `false` | `room_connect` |
+| `lk.room.remote_participant_count` | int | agents | none | Remote participants when the agent connected. | `1` | `room_connect` |
+| `lk.room_io.participant_filter` | string | agents | none | How room I/O picked its participant. | `identity`, `kind` | `wait_for_participant` |
+| `lk.room_sid` | string | shared | none | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. | `RM_5Fq8xQ2ZbXwN` | record `job_entrypoint` |
+| `lk.rpc.caller_identity` | string | agents | none | Identity of the RPC caller. A participant identity outside `lk.pii.*`, as Agents 2.0 ships it; the registry records it rather than renaming it. | `identity-0` | `rpc_handler` |
+| `lk.rpc.destination_identity` | string | agents | none | Identity the RPC is sent to. | `identity-1` | `rpc_call` |
+| `lk.rpc.error_code` | int | agents | none | RPC error code. | `1400` | `rpc_call` `rpc_handler` |
+| `lk.rpc.handler_registered` | boolean | agents | none | A handler was registered for the method. | `true` | `rpc_handler` |
+| `lk.rpc.payload_size` | int, `By` | agents | none | RPC request payload size in bytes. | `42` | `rpc_call` `rpc_handler` |
+| `lk.rpc.request_id` | string | agents | none | RPC request id. | `rpc_abc123` | `rpc_call` `rpc_handler` |
+| `lk.rpc.response_size` | int, `By` | agents | none | RPC response size in bytes. | `2` | `rpc_call` `rpc_handler` |
+| `lk.rpc.response_timeout` | double, `s` | agents | none | RPC response timeout in seconds. | `10.0` | `rpc_call` `rpc_handler` |
 | `lk.rtc.audio_level.avg` | double, `1` | client | none | Average audio level in the window, 0-1, inbound audio. Inbound `audioLevel`, averaged over the window's readings that report it. | `0.05` | `lk.rtc.stats.sample` |
 | `lk.rtc.audio_level.max` | double, `1` | client | none | Maximum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. | `0.3` | `lk.rtc.stats.sample` |
 | `lk.rtc.audio_level.min` | double, `1` | client | none | Minimum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. | `0.0` | `lk.rtc.stats.sample` |
@@ -479,6 +1444,15 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.rtc.window_ms` | int, `ms` | client | none | Actual length of the stats window. From the window's start to its close, on a monotonic clock. | `60000` | `lk.rtc.stats.sample` |
 | `lk.sdk.name` | string | shared | none | LiveKit SDK name. Resource attribute. A low-cardinality metric dimension. Matches the `<sdk>` part of `service.name = livekit-client-<sdk>`. | `swift`, `android`, `flutter`, `react-native`, `unity`, `rust`, `js` | resource |
 | `lk.sdk.version` | string | shared | none | LiveKit SDK version. Resource attribute. A low-cardinality metric dimension. | `2.17.0` | resource |
+| `lk.shutdown.reason` | string | agents | none | Why the job shut down. | `room_disconnected` | `job_shutdown` |
+| `lk.shutdown.user_initiated` | boolean | agents | none | The shutdown was requested by user code. | `false` | `job_shutdown` |
+| `lk.simulation.enabled` | boolean | agents | none | The session is a simulation. Telemetry metadata key set by the job context; a span attribute on the session trace. | `true` | `job_entrypoint` |
+| `lk.simulation.job_id` | string | agents | none | Simulation run job (one scenario) behind the session. | `srj_abc123` | `job_entrypoint` |
+| `lk.simulation.run_id` | string | agents | none | Simulation run the session belongs to. | `run_abc123` | `job_entrypoint` |
+| `lk.speech.queue_wait` | double, `s` | agents | none | Seconds a speech handle waited in the queue before generation was authorized. | `0.05` | `agent_turn` |
+| `lk.speech_id` | string | agents | none | Id of the speech handle a span belongs to. The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model. | `speech_3f2a9c` | `agent_speaking` `agent_turn` `llm_node` `metrics` `realtime_inference` `realtime_metrics` `tts_node` |
+| `lk.stt.events` | string | agents | none | JSON list of transcript events on the user turn, in arrival order (received_at, type, transcript_length). | `[]` | `user_turn` |
+| `lk.success` | boolean | agents | none | The session report is tagged successful. A tag name in the session report (`observability.py` / `report.rs`); the outcome is derived from which of `lk.success` and `lk.fail` is present. | `true` | `agent_session` |
 | `lk.telemetry.cache.batches` | int, `{batch}` | client | none | Batches waiting in the cache now. A gauge, not a count since the previous report. Always present on a report. | `0` | `lk.telemetry.report` |
 | `lk.telemetry.cache.delete_errors` | int, `{batch}` | client | none | Sent batches the cache could not delete; never sent twice from the same launch. Only when non-zero. JS port only. | `1` | `lk.telemetry.report` |
 | `lk.telemetry.cache.list_errors` | int, `{attempt}` | client | none | Times the cache could not be listed, so nothing was reconciled or sent. Only when non-zero. JS port only. | `1` | `lk.telemetry.report` |
@@ -501,10 +1475,21 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.telemetry.uploads.sent` | int, `{batch}` | client | none | Batches the collector accepted. Always present on a report, even when 0. | `4` | `lk.telemetry.report` |
 | `lk.telemetry.uploads.timeouts` | int, `{attempt}` | client | none | Upload attempts that hit the export timeout. Only when non-zero. | `1` | `lk.telemetry.report` |
 | `lk.telemetry.uploads.unauthorized` | int, `{attempt}` | client | none | 401/403 answers (tokens the collector refused). Only when non-zero. | `1` | `lk.telemetry.report` |
+| `lk.tool_sets` | string[] | agents | none | Tool set names offered. | `["mcp:docs"]` | `llm_node` `setup_toolsets` |
 | `lk.track.direction` | enum | client | none | Whether the stats describe sent or received media. On RTC stats windows only. |  | `lk.rtc.stats.sample` |
 | `lk.track.kind` | enum | client | none | Media kind of the track. On publish and subscribe spans and RTC stats windows. |  | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
 | `lk.track.source` | enum | client | none | Source of the track. The protocol's `TrackSource` in snake_case. Agents sends the FFI enum names instead (`lk.track_source = SOURCE_MICROPHONE`). |  | `lk.publish` `lk.subscribe` |
-| `lk.track_sid` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
+| `lk.track_sid` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` `publish_audio_output` `wait_for_audio_track` `wait_for_video_track` |
+| `lk.transcript_confidence` | double | agents | none | Confidence of the final transcript. | `0.98` | `user_turn` |
+| `lk.transcription_delay` | double, `s` | agents | none | Seconds from the end of speech to the final transcript. | `0.4` | `agent_turn` `user_turn` |
+| `lk.tts.bytes` | int, `By` | agents | none | Audio bytes the TTS driver collected (Node binding). | `230400` | `tts_stream` `tts_synthesize` |
+| `lk.tts.frames` | int | agents | none | Audio frames the TTS driver collected (Node binding). | `120` | `tts_stream` `tts_synthesize` |
+| `lk.tts.label` | string | agents | none | Label of the TTS instance. | `cartesia.TTS` | `tts_node` `tts_request` `tts_stream` `tts_stream_adapter` `tts_synthesize` |
+| `lk.tts.no_duplex_path` | boolean | agents | none | The TTS reported no duplex path, so the stream adapter was selected (Node binding; not a failure). | `true` | `tts_stream` |
+| `lk.tts.streaming` | boolean | agents | none | The TTS instance streams (duplex path). | `true` | `tts_node` `tts_synthesize` |
+| `lk.tts_metrics` | string | agents | none | TTS metrics of the turn, serialized. | `{}` | `agent_turn` |
+| `model_name` | string | agents | none | Model name the plugin reported. | `gpt-4o-mini` | |
+| `model_provider` | string | agents | none | Provider the plugin reported. | `openai` | |
 
 ## Enum values
 
@@ -592,6 +1577,23 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `agent_error` | The agent failed (AGENT_ERROR). |
 | `reconnect_failed` | The client ran out of reconnect attempts (client only). |
 | `unknown` | UNKNOWN_REASON or a number the client does not know. |
+
+### `lk.eou.outcome`
+
+| Value | Meaning |
+| --- | --- |
+| `committed` | The turn was committed. |
+| `user_resumed` | The user spoke again. |
+| `dropped` | The turn was dropped. |
+
+### `lk.frame.resolution`
+
+| Value | Meaning |
+| --- | --- |
+| `root` | The root frame. |
+| `live` | A live speech frame. |
+| `stale` | A frame whose speech already ended. |
+| `unknown` | Not a frame the slab knows. |
 
 ### `lk.log.source`
 

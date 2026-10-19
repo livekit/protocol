@@ -2,7 +2,7 @@
 //! LiveKit telemetry semantic conventions.
 
 /// Telemetry schema version; set as `schema_url` on every OTLP scope.
-pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.3.0";
+pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.4.0";
 
 /// Browser name.
 pub const BROWSER_NAME: &str = "browser.name";
@@ -10,8 +10,104 @@ pub const BROWSER_NAME: &str = "browser.name";
 /// Browser version.
 pub const BROWSER_VERSION: &str = "browser.version";
 
+/// Whether a pooled connection was reused, as the string `true`/`false`.
+pub const CONNECTION_REUSED: &str = "connection_reused";
+
+/// Token type (`input` or `output`); deprecated upstream, a dimension of `gen_ai.client.token.usage`.
+pub const GEN_AI_TOKEN_TYPE: &str = "gen_ai.token.type";
+
+/// LangFuse spelling of audio input tokens.
+pub const GEN_AI_USAGE_INPUT_AUDIO_TOKENS: &str = "gen_ai.usage.input_audio_tokens";
+
+/// LangFuse spelling of cached input tokens.
+pub const GEN_AI_USAGE_INPUT_CACHED_TOKENS: &str = "gen_ai.usage.input_cached_tokens";
+
+/// LangFuse spelling of text input tokens.
+pub const GEN_AI_USAGE_INPUT_TEXT_TOKENS: &str = "gen_ai.usage.input_text_tokens";
+
+/// LangFuse spelling of audio output tokens.
+pub const GEN_AI_USAGE_OUTPUT_AUDIO_TOKENS: &str = "gen_ai.usage.output_audio_tokens";
+
+/// LangFuse spelling of text output tokens.
+pub const GEN_AI_USAGE_OUTPUT_TEXT_TOKENS: &str = "gen_ai.usage.output_text_tokens";
+
+/// LangFuse spelling of reasoning tokens.
+pub const GEN_AI_USAGE_REASONING_TOKENS: &str = "gen_ai.usage.reasoning_tokens";
+
+/// LangFuse's completion start time (ISO 8601), set next to `gen_ai.response.time_to_first_chunk`.
+pub const LANGFUSE_OBSERVATION_COMPLETION_START_TIME: &str = "langfuse.observation.completion_start_time";
+
+/// Label of the agent running the activity.
+pub const LK_AGENT_LABEL: &str = "lk.agent_label";
+
+/// AMD classification.
+pub const LK_AMD_CATEGORY: &str = "lk.amd.category";
+
+/// Seconds from the call start to the AMD decision. Unit: `s`.
+pub const LK_AMD_DELAY: &str = "lk.amd.delay";
+
+/// Why the AMD classifier decided.
+pub const LK_AMD_REASON: &str = "lk.amd.reason";
+
+/// Seconds of speech the AMD classifier heard. Unit: `s`.
+pub const LK_AMD_SPEECH_DURATION: &str = "lk.amd.speech_duration";
+
+/// Blocks in the session.
+pub const LK_BLOCKING_COUNT: &str = "lk.blocking.count";
+
+/// CPU seconds the loop thread consumed during the block. Unit: `s`.
+pub const LK_BLOCKING_CPU_TIME: &str = "lk.blocking.cpu_time";
+
+/// Seconds the loop was blocked. Unit: `s`.
+pub const LK_BLOCKING_DURATION: &str = "lk.blocking.duration";
+
+/// Seconds of garbage collection on the loop thread during the block. Unit: `s`.
+pub const LK_BLOCKING_GC_TIME: &str = "lk.blocking.gc_time";
+
+/// Module a lazy import was loading when sampled.
+pub const LK_BLOCKING_IMPORT: &str = "lk.blocking.import";
+
+/// Seconds of the longest block in the session. Unit: `s`.
+pub const LK_BLOCKING_MAX_DURATION: &str = "lk.blocking.max_duration";
+
+/// Severity bucket of the block.
+pub const LK_BLOCKING_SEVERITY: &str = "lk.blocking.severity";
+
+/// Loop-thread stack sampled while blocked (source locations only).
+pub const LK_BLOCKING_STACK: &str = "lk.blocking.stack";
+
+/// Reports dropped by rate limiting since the previous emitted span.
+pub const LK_BLOCKING_SUPPRESSED: &str = "lk.blocking.suppressed";
+
+/// Name of the task that was running.
+pub const LK_BLOCKING_TASK: &str = "lk.blocking.task";
+
+/// Seconds above which a block is reported. Unit: `s`.
+pub const LK_BLOCKING_THRESHOLD: &str = "lk.blocking.threshold";
+
+/// Seconds blocked in total over the session. Unit: `s`.
+pub const LK_BLOCKING_TOTAL_DURATION: &str = "lk.blocking.total_duration";
+
+/// Name of the shutdown callback.
+pub const LK_CALLBACK_NAME: &str = "lk.callback.name";
+
+/// The close drained pending speech first.
+pub const LK_CLOSE_DRAIN: &str = "lk.close.drain";
+
+/// Why the session closed.
+pub const LK_CLOSE_REASON: &str = "lk.close_reason";
+
+/// LiveKit Cloud agent id.
+pub const LK_CLOUD_AGENT_ID: &str = "lk.cloud_agent_id";
+
 /// 1-based connect attempt.
 pub const LK_CONNECT_ATTEMPT: &str = "lk.connect.attempt";
+
+/// Room connection state.
+pub const LK_CONNECTION_STATE: &str = "lk.connection_state";
+
+/// LiveKit Cloud deployment id.
+pub const LK_DEPLOYMENT_ID: &str = "lk.deployment_id";
 
 /// Whether the app is in front of the user.
 pub const LK_DEVICE_APP_STATE: &str = "lk.device.app_state";
@@ -177,8 +273,177 @@ pub mod lk_disconnect_reason {
     pub const UNKNOWN: &str = "unknown";
 }
 
+/// Agent dispatch id.
+pub const LK_DISPATCH_ID: &str = "lk.dispatch_id";
+
+/// Seconds from the end of the user's speech to the agent's first audio. Unit: `s`.
+pub const LK_E2E_LATENCY: &str = "lk.e2e_latency";
+
+/// Seconds from the end of speech to the turn decision. Unit: `s`.
+pub const LK_END_OF_TURN_DELAY: &str = "lk.end_of_turn_delay";
+
+/// Seconds the detector inference took. Unit: `s`.
+pub const LK_EOU_DETECTION_DELAY: &str = "lk.eou.detection_delay";
+
+/// Seconds of endpointing delay applied. Unit: `s`.
+pub const LK_EOU_ENDPOINTING_DELAY: &str = "lk.eou.endpointing_delay";
+
+/// The detector answer came from the cache.
+pub const LK_EOU_FROM_CACHE: &str = "lk.eou.from_cache";
+
+/// Language the detector ran for.
+pub const LK_EOU_LANGUAGE: &str = "lk.eou.language";
+
+/// Turn decisions the wait rejected before it ended.
+pub const LK_EOU_NOT_COMMITTED_COUNT: &str = "lk.eou.not_committed_count";
+
+/// How the endpointing wait ended.
+pub const LK_EOU_OUTCOME: &str = "lk.eou.outcome";
+
+/// Values of [`LK_EOU_OUTCOME`].
+pub mod lk_eou_outcome {
+    /// The turn was committed.
+    pub const COMMITTED: &str = "committed";
+    /// The user spoke again.
+    pub const USER_RESUMED: &str = "user_resumed";
+    /// The turn was dropped.
+    pub const DROPPED: &str = "dropped";
+}
+
+/// End-of-utterance probability.
+pub const LK_EOU_PROBABILITY: &str = "lk.eou.probability";
+
+/// Times the endpointing wait restarted on a later trigger.
+pub const LK_EOU_REARM_COUNT: &str = "lk.eou.rearm_count";
+
+/// Endpointing waits the user cut short by speaking again.
+pub const LK_EOU_RESUME_COUNT: &str = "lk.eou.resume_count";
+
+/// What decided the end of the turn.
+pub const LK_EOU_SOURCE: &str = "lk.eou.source";
+
+/// Threshold under which the turn is unlikely to be over.
+pub const LK_EOU_UNLIKELY_THRESHOLD: &str = "lk.eou.unlikely_threshold";
+
+/// Seconds from the end of the user's speech to the turn decision. Unit: `s`.
+pub const LK_EOU_WAIT_DURATION: &str = "lk.eou.wait_duration";
+
+/// The provider error is retryable (Node binding).
+pub const LK_ERROR_RETRYABLE: &str = "lk.error.retryable";
+
+/// The session report is tagged failed.
+pub const LK_FAIL: &str = "lk.fail";
+
+/// Index of the fallback instance that served the request.
+pub const LK_FALLBACK_INDEX: &str = "lk.fallback.index";
+
+/// Label of the fallback instance that served the request.
+pub const LK_FALLBACK_LABEL: &str = "lk.fallback.label";
+
+/// The request was a recovery probe of a failed instance.
+pub const LK_FALLBACK_RECOVERY: &str = "lk.fallback.recovery";
+
+/// Seconds from waiting for a track to its first frame. Unit: `s`.
+pub const LK_FIRST_FRAME_DELAY: &str = "lk.first_frame_delay";
+
+/// How the inbound frame of a plugin-task metric was resolved (Node binding).
+pub const LK_FRAME_RESOLUTION: &str = "lk.frame.resolution";
+
+/// Values of [`LK_FRAME_RESOLUTION`].
+pub mod lk_frame_resolution {
+    /// The root frame.
+    pub const ROOT: &str = "root";
+    /// A live speech frame.
+    pub const LIVE: &str = "live";
+    /// A frame whose speech already ended.
+    pub const STALE: &str = "stale";
+    /// Not a frame the slab knows.
+    pub const UNKNOWN: &str = "unknown";
+}
+
+/// Tool call id.
+pub const LK_FUNCTION_TOOL_ID: &str = "lk.function_tool.id";
+
+/// The tool returned an error.
+pub const LK_FUNCTION_TOOL_IS_ERROR: &str = "lk.function_tool.is_error";
+
+/// Tool name.
+pub const LK_FUNCTION_TOOL_NAME: &str = "lk.function_tool.name";
+
+/// Function tool names offered.
+pub const LK_FUNCTION_TOOLS: &str = "lk.function_tools";
+
+/// Generations in the turn.
+pub const LK_GENERATION_COUNT: &str = "lk.generation_count";
+
+/// Id of the agent turn (generation).
+pub const LK_GENERATION_ID: &str = "lk.generation_id";
+
+/// Span whose input record this one continues.
+pub const LK_INPUT_BASE_SPAN_ID: &str = "lk.input.base_span_id";
+
+/// The span's input record is a delta over its base span.
+pub const LK_INPUT_DELTA: &str = "lk.input.delta";
+
+/// Items of the base record not carried into this one.
+pub const LK_INPUT_DROPPED_FROM_BASE: &str = "lk.input.dropped_from_base";
+
+/// The speech was interrupted.
+pub const LK_INTERRUPTED: &str = "lk.interrupted";
+
+/// Seconds from the user's speech to the interruption decision. Unit: `s`.
+pub const LK_INTERRUPTION_DETECTION_DELAY: &str = "lk.interruption.detection_delay";
+
+/// Seconds the interruption prediction took. Unit: `s`.
+pub const LK_INTERRUPTION_PREDICTION_DURATION: &str = "lk.interruption.prediction_duration";
+
+/// Interruption probability.
+pub const LK_INTERRUPTION_PROBABILITY: &str = "lk.interruption.probability";
+
+/// What triggered the interruption.
+pub const LK_INTERRUPTION_SOURCE: &str = "lk.interruption.source";
+
+/// Seconds of the interruption from detection to resolution. Unit: `s`.
+pub const LK_INTERRUPTION_TOTAL_DURATION: &str = "lk.interruption.total_duration";
+
+/// The user turn was classified as an interruption.
+pub const LK_IS_INTERRUPTION: &str = "lk.is_interruption";
+
+/// Seconds from the job request to its acceptance. Unit: `s`.
+pub const LK_JOB_ACCEPT_LATENCY: &str = "lk.job.accept_latency";
+
+/// Agent id of the job.
+pub const LK_JOB_AGENT_ID: &str = "lk.job.agent_id";
+
+/// Seconds from acceptance to the job assignment. Unit: `s`.
+pub const LK_JOB_ASSIGNMENT_LATENCY: &str = "lk.job.assignment_latency";
+
+/// Seconds from the dispatch request to the entrypoint running. Unit: `s`.
+pub const LK_JOB_DISPATCH_LATENCY: &str = "lk.job.dispatch_latency";
+
+/// Seconds from launch to the entrypoint running. Unit: `s`.
+pub const LK_JOB_ENTRYPOINT_LATENCY: &str = "lk.job.entrypoint_latency";
+
+/// Seconds from assignment to the job process launch. Unit: `s`.
+pub const LK_JOB_LAUNCH_LATENCY: &str = "lk.job.launch_latency";
+
+/// Worker id the job runs on.
+pub const LK_JOB_WORKER_ID: &str = "lk.job.worker_id";
+
 /// Agent job ID (`AJ_...`).
 pub const LK_JOB_ID: &str = "lk.job_id";
+
+/// Keyterms added by the update.
+pub const LK_KEYTERMS_ADDED: &str = "lk.keyterms.added";
+
+/// Number of keyterms configured.
+pub const LK_KEYTERMS_COUNT: &str = "lk.keyterms.count";
+
+/// Keyterms removed by the update.
+pub const LK_KEYTERMS_REMOVED: &str = "lk.keyterms.removed";
+
+/// LLM metrics of the turn, serialized.
+pub const LK_LLM_METRICS: &str = "lk.llm_metrics";
 
 /// Logger, type, module or file that wrote the line.
 pub const LK_LOG_LOGGER: &str = "lk.log.logger";
@@ -196,6 +461,18 @@ pub mod lk_log_source {
     pub const WEBRTC: &str = "webrtc";
 }
 
+/// Metric type noted from a plugin task (Node binding `metrics` span).
+pub const LK_METRIC: &str = "lk.metric";
+
+/// State after a transition.
+pub const LK_NEW_STATE: &str = "lk.new_state";
+
+/// State before a transition.
+pub const LK_OLD_STATE: &str = "lk.old_state";
+
+/// Seconds the `on_user_turn_completed` hook took. Unit: `s`.
+pub const LK_ON_USER_TURN_COMPLETED_DELAY: &str = "lk.on_user_turn_completed_delay";
+
 /// How the attempt ended. Rollups read this, never the span status.
 pub const LK_OUTCOME: &str = "lk.outcome";
 
@@ -209,20 +486,116 @@ pub mod lk_outcome {
     pub const CANCELLED: &str = "cancelled";
 }
 
+/// Generation this one continues (a tool-call follow-up).
+pub const LK_PARENT_GENERATION_ID: &str = "lk.parent_generation_id";
+
 /// Server-assigned SID of the local participant (`PA_...`).
 pub const LK_PARTICIPANT_ID: &str = "lk.participant_id";
+
+/// Kind of the linked participant (protocol `ParticipantInfo.Kind`).
+pub const LK_PARTICIPANT_KIND: &str = "lk.participant_kind";
+
+/// Transcript the AMD classifier used. PII: redacted by the collector.
+pub const LK_PII_AMD_TRANSCRIPT: &str = "lk.pii.amd.transcript";
+
+/// Tool-call arguments on a log record. PII: redacted by the collector.
+pub const LK_PII_ARGUMENTS: &str = "lk.pii.arguments";
+
+/// Serialized chat context sent to the LLM. PII: redacted by the collector.
+pub const LK_PII_CHAT_CTX: &str = "lk.pii.chat_ctx";
+
+/// DTMF digits received. PII: redacted by the collector.
+pub const LK_PII_DTMF_INPUTS: &str = "lk.pii.dtmf_inputs";
+
+/// Error text that may quote user content. PII: redacted by the collector.
+pub const LK_PII_ERROR: &str = "lk.pii.error";
+
+/// Raw provider event on a debug log record. PII: redacted by the collector.
+pub const LK_PII_EVENT: &str = "lk.pii.event";
+
+/// Tool call arguments. PII: redacted by the collector.
+pub const LK_PII_FUNCTION_TOOL_ARGUMENTS: &str = "lk.pii.function_tool.arguments";
+
+/// Tool output. PII: redacted by the collector.
+pub const LK_PII_FUNCTION_TOOL_OUTPUT: &str = "lk.pii.function_tool.output";
+
+/// Text sent to the TTS. PII: redacted by the collector.
+pub const LK_PII_INPUT_TEXT: &str = "lk.pii.input_text";
+
+/// Agent instructions in force. PII: redacted by the collector.
+pub const LK_PII_INSTRUCTIONS: &str = "lk.pii.instructions";
+
+/// The keyterms themselves (customer vocabulary). PII: redacted by the collector.
+pub const LK_PII_KEYTERMS: &str = "lk.pii.keyterms";
+
+/// Tool-call output on a log record. PII: redacted by the collector.
+pub const LK_PII_OUTPUT: &str = "lk.pii.output";
 
 /// Customer-supplied identity of the local participant. PII: redacted by the collector.
 pub const LK_PII_PARTICIPANT_IDENTITY: &str = "lk.pii.participant_identity";
 
+/// MCP tool progress message. PII: redacted by the collector.
+pub const LK_PII_PROGRESS_MESSAGE: &str = "lk.pii.progress_message";
+
+/// Malformed tool-call arguments as received. PII: redacted by the collector.
+pub const LK_PII_RAW_ARGUMENTS: &str = "lk.pii.raw_arguments";
+
 /// Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). PII: redacted by the collector.
 pub const LK_PII_REMOTE_PARTICIPANT_IDENTITY: &str = "lk.pii.remote_participant_identity";
+
+/// Tool-call arguments after repair. PII: redacted by the collector.
+pub const LK_PII_REPAIRED: &str = "lk.pii.repaired";
+
+/// Function calls the LLM produced, serialized. PII: redacted by the collector.
+pub const LK_PII_RESPONSE_FUNCTION_CALLS: &str = "lk.pii.response.function_calls";
+
+/// Text the LLM produced. PII: redacted by the collector.
+pub const LK_PII_RESPONSE_TEXT: &str = "lk.pii.response.text";
 
 /// Customer-supplied room name. PII: redacted by the collector.
 pub const LK_PII_ROOM_NAME: &str = "lk.pii.room_name";
 
+/// RPC request payload. PII: redacted by the collector.
+pub const LK_PII_RPC_PAYLOAD: &str = "lk.pii.rpc.payload";
+
+/// RPC response payload. PII: redacted by the collector.
+pub const LK_PII_RPC_RESPONSE: &str = "lk.pii.rpc.response";
+
+/// Phone number of a SIP participant. PII: redacted by the collector.
+pub const LK_PII_SIP_PHONE_NUMBER: &str = "lk.pii.sip.phoneNumber";
+
+/// Message text on a log record. PII: redacted by the collector.
+pub const LK_PII_TEXT: &str = "lk.pii.text";
+
+/// Transcript text on a log record. PII: redacted by the collector.
+pub const LK_PII_TRANSCRIPT: &str = "lk.pii.transcript";
+
+/// The user's transcript for the turn. PII: redacted by the collector.
+pub const LK_PII_USER_INPUT: &str = "lk.pii.user_input";
+
+/// Transcript the detector scored. PII: redacted by the collector.
+pub const LK_PII_USER_TRANSCRIPT: &str = "lk.pii.user_transcript";
+
 /// Monotonically increasing sequence number per pipeline.
 pub const LK_PING_SEQ: &str = "lk.ping.seq";
+
+/// Seconds of the agent's speech played out when it was interrupted. Unit: `s`.
+pub const LK_PLAYOUT_POSITION: &str = "lk.playout.position";
+
+/// Seconds of pre-connect audio replayed. Unit: `s`.
+pub const LK_PRE_CONNECT_AUDIO_DURATION: &str = "lk.pre_connect_audio.duration";
+
+/// Label of the agent handed off from.
+pub const LK_PREVIOUS_AGENT_LABEL: &str = "lk.previous_agent_label";
+
+/// Provider request ids a span covers, for joining against provider logs.
+pub const LK_PROVIDER_REQUEST_IDS: &str = "lk.provider_request_ids";
+
+/// Provider-side tool names offered.
+pub const LK_PROVIDER_TOOLS: &str = "lk.provider_tools";
+
+/// Realtime model metrics of the turn, serialized.
+pub const LK_REALTIME_MODEL_METRICS: &str = "lk.realtime_model_metrics";
 
 /// Reconnect attempts made in the cycle.
 pub const LK_RECONNECT_ATTEMPTS: &str = "lk.reconnect.attempts";
@@ -261,8 +634,56 @@ pub mod lk_reconnect_reason {
     pub const UNKNOWN: &str = "unknown";
 }
 
+/// PII redaction was requested for the session.
+pub const LK_REDACTION_ENABLED: &str = "lk.redaction.enabled";
+
+/// Seconds to the first TTS audio byte. Unit: `s`.
+pub const LK_RESPONSE_TTFB: &str = "lk.response.ttfb";
+
+/// Seconds to the first LLM token. Unit: `s`.
+pub const LK_RESPONSE_TTFT: &str = "lk.response.ttft";
+
+/// Retries before the operation succeeded or gave up.
+pub const LK_RETRY_COUNT: &str = "lk.retry_count";
+
+/// The room was joined with auto-subscribe.
+pub const LK_ROOM_AUTO_SUBSCRIBE: &str = "lk.room.auto_subscribe";
+
+/// End-to-end encryption is on.
+pub const LK_ROOM_E2EE: &str = "lk.room.e2ee";
+
+/// Remote participants when the agent connected.
+pub const LK_ROOM_REMOTE_PARTICIPANT_COUNT: &str = "lk.room.remote_participant_count";
+
+/// How room I/O picked its participant.
+pub const LK_ROOM_IO_PARTICIPANT_FILTER: &str = "lk.room_io.participant_filter";
+
 /// Server-assigned room session SID (`RM_...`).
 pub const LK_ROOM_SID: &str = "lk.room_sid";
+
+/// Identity of the RPC caller.
+pub const LK_RPC_CALLER_IDENTITY: &str = "lk.rpc.caller_identity";
+
+/// Identity the RPC is sent to.
+pub const LK_RPC_DESTINATION_IDENTITY: &str = "lk.rpc.destination_identity";
+
+/// RPC error code.
+pub const LK_RPC_ERROR_CODE: &str = "lk.rpc.error_code";
+
+/// A handler was registered for the method.
+pub const LK_RPC_HANDLER_REGISTERED: &str = "lk.rpc.handler_registered";
+
+/// RPC request payload size in bytes. Unit: `By`.
+pub const LK_RPC_PAYLOAD_SIZE: &str = "lk.rpc.payload_size";
+
+/// RPC request id.
+pub const LK_RPC_REQUEST_ID: &str = "lk.rpc.request_id";
+
+/// RPC response size in bytes. Unit: `By`.
+pub const LK_RPC_RESPONSE_SIZE: &str = "lk.rpc.response_size";
+
+/// RPC response timeout in seconds. Unit: `s`.
+pub const LK_RPC_RESPONSE_TIMEOUT: &str = "lk.rpc.response_timeout";
 
 /// Average audio level in the window, 0-1, inbound audio. Unit: `1`.
 pub const LK_RTC_AUDIO_LEVEL_AVG: &str = "lk.rtc.audio_level.avg";
@@ -366,6 +787,33 @@ pub const LK_SDK_NAME: &str = "lk.sdk.name";
 /// LiveKit SDK version.
 pub const LK_SDK_VERSION: &str = "lk.sdk.version";
 
+/// Why the job shut down.
+pub const LK_SHUTDOWN_REASON: &str = "lk.shutdown.reason";
+
+/// The shutdown was requested by user code.
+pub const LK_SHUTDOWN_USER_INITIATED: &str = "lk.shutdown.user_initiated";
+
+/// The session is a simulation.
+pub const LK_SIMULATION_ENABLED: &str = "lk.simulation.enabled";
+
+/// Simulation run job (one scenario) behind the session.
+pub const LK_SIMULATION_JOB_ID: &str = "lk.simulation.job_id";
+
+/// Simulation run the session belongs to.
+pub const LK_SIMULATION_RUN_ID: &str = "lk.simulation.run_id";
+
+/// Seconds a speech handle waited in the queue before generation was authorized. Unit: `s`.
+pub const LK_SPEECH_QUEUE_WAIT: &str = "lk.speech.queue_wait";
+
+/// Id of the speech handle a span belongs to.
+pub const LK_SPEECH_ID: &str = "lk.speech_id";
+
+/// JSON list of transcript events on the user turn, in arrival order (received_at, type, transcript_length).
+pub const LK_STT_EVENTS: &str = "lk.stt.events";
+
+/// The session report is tagged successful.
+pub const LK_SUCCESS: &str = "lk.success";
+
 /// Batches waiting in the cache now. Unit: `{batch}`.
 pub const LK_TELEMETRY_CACHE_BATCHES: &str = "lk.telemetry.cache.batches";
 
@@ -432,6 +880,9 @@ pub const LK_TELEMETRY_UPLOADS_TIMEOUTS: &str = "lk.telemetry.uploads.timeouts";
 /// 401/403 answers (tokens the collector refused). Unit: `{attempt}`.
 pub const LK_TELEMETRY_UPLOADS_UNAUTHORIZED: &str = "lk.telemetry.uploads.unauthorized";
 
+/// Tool set names offered.
+pub const LK_TOOL_SETS: &str = "lk.tool_sets";
+
 /// Whether the stats describe sent or received media.
 pub const LK_TRACK_DIRECTION: &str = "lk.track.direction";
 
@@ -474,10 +925,316 @@ pub mod lk_track_source {
 /// Server-assigned track SID (`TR_...`).
 pub const LK_TRACK_SID: &str = "lk.track_sid";
 
+/// Confidence of the final transcript.
+pub const LK_TRANSCRIPT_CONFIDENCE: &str = "lk.transcript_confidence";
+
+/// Seconds from the end of speech to the final transcript. Unit: `s`.
+pub const LK_TRANSCRIPTION_DELAY: &str = "lk.transcription_delay";
+
+/// Audio bytes the TTS driver collected (Node binding). Unit: `By`.
+pub const LK_TTS_BYTES: &str = "lk.tts.bytes";
+
+/// Audio frames the TTS driver collected (Node binding).
+pub const LK_TTS_FRAMES: &str = "lk.tts.frames";
+
+/// Label of the TTS instance.
+pub const LK_TTS_LABEL: &str = "lk.tts.label";
+
+/// The TTS reported no duplex path, so the stream adapter was selected (Node binding; not a failure).
+pub const LK_TTS_NO_DUPLEX_PATH: &str = "lk.tts.no_duplex_path";
+
+/// The TTS instance streams (duplex path).
+pub const LK_TTS_STREAMING: &str = "lk.tts.streaming";
+
+/// TTS metrics of the turn, serialized.
+pub const LK_TTS_METRICS: &str = "lk.tts_metrics";
+
+/// Model name the plugin reported.
+pub const MODEL_NAME: &str = "model_name";
+
+/// Provider the plugin reported.
+pub const MODEL_PROVIDER: &str = "model_provider";
+
+/// Upstream OTel keys that LiveKit signals reference (defined by the registry's dependencies,
+/// never here), so a producer can name them from one place.
+pub mod upstream {
+    /// The source code filename that identifies the code unit as uniquely as possible (preferably an absolute file path). This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+    pub const CODE_FILE_PATH: &str = "code.file.path";
+    /// The method or function fully-qualified name without arguments. The value should fit the natural representation of the language runtime, which is also likely the same used within `code.stacktrace` attribute value. This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Function'. This constraint is imposed to prevent redundancy and maintain data integrity.
+    pub const CODE_FUNCTION_NAME: &str = "code.function.name";
+    /// The line number in `code.file.path` best representing the operation. It SHOULD point within the code unit named in `code.function.name`. This attribute MUST NOT be used on the Profile signal since the data is already captured in 'message Line'. This constraint is imposed to prevent redundancy and maintain data integrity.
+    pub const CODE_LINE_NUMBER: &str = "code.line.number";
+    /// The model identifier for the device
+    pub const DEVICE_MODEL_IDENTIFIER: &str = "device.model.identifier";
+    /// Describes a class of error the operation ended with.
+    pub const ERROR_TYPE: &str = "error.type";
+
+    /// Values of [`ERROR_TYPE`].
+    pub mod error_type {
+        /// A fallback error value to be used when the instrumentation doesn't define a custom value.
+        pub const OTHER: &str = "_OTHER";
+    }
+    /// The exception message.
+    pub const EXCEPTION_MESSAGE: &str = "exception.message";
+    /// A stacktrace as a string in the natural representation for the language runtime. The representation is to be determined and documented by each language SIG.
+    pub const EXCEPTION_STACKTRACE: &str = "exception.stacktrace";
+    /// The type of the exception (its fully-qualified class name, if applicable). The dynamic type of the exception should be preferred over the static type in languages that support it.
+    pub const EXCEPTION_TYPE: &str = "exception.type";
+    /// Human-readable name of the GenAI agent provided by the application.
+    pub const GEN_AI_AGENT_NAME: &str = "gen_ai.agent.name";
+    /// The unique identifier for a conversation (session, thread), used to store and correlate messages within this conversation.
+    pub const GEN_AI_CONVERSATION_ID: &str = "gen_ai.conversation.id";
+    /// A free-form explanation for the assigned score provided by the evaluator.
+    pub const GEN_AI_EVALUATION_EXPLANATION: &str = "gen_ai.evaluation.explanation";
+    /// The name of the evaluation metric used for the GenAI response.
+    pub const GEN_AI_EVALUATION_NAME: &str = "gen_ai.evaluation.name";
+    /// Human readable label for evaluation.
+    pub const GEN_AI_EVALUATION_SCORE_LABEL: &str = "gen_ai.evaluation.score.label";
+    /// The chat history provided to the model as an input.
+    pub const GEN_AI_INPUT_MESSAGES: &str = "gen_ai.input.messages";
+    /// The search query used to retrieve memories.
+    pub const GEN_AI_MEMORY_QUERY_TEXT: &str = "gen_ai.memory.query.text";
+    /// The memory records stored or retrieved in a memory operation.
+    pub const GEN_AI_MEMORY_RECORDS: &str = "gen_ai.memory.records";
+    /// The name of the operation being performed.
+    pub const GEN_AI_OPERATION_NAME: &str = "gen_ai.operation.name";
+
+    /// Values of [`GEN_AI_OPERATION_NAME`].
+    pub mod gen_ai_operation_name {
+        /// Chat completion operation such as [OpenAI Chat API](https://platform.openai.com/docs/api-reference/chat)
+        pub const CHAT: &str = "chat";
+        /// Multimodal content generation operation such as [Gemini Generate Content](https://ai.google.dev/api/generate-content)
+        pub const GENERATE_CONTENT: &str = "generate_content";
+        /// Text completions operation such as [OpenAI Completions API (Legacy)](https://platform.openai.com/docs/api-reference/completions)
+        pub const TEXT_COMPLETION: &str = "text_completion";
+        /// Embeddings operation such as [OpenAI Create embeddings API](https://platform.openai.com/docs/api-reference/embeddings/create)
+        pub const EMBEDDINGS: &str = "embeddings";
+        /// Retrieval operation such as [OpenAI Search Vector Store API](https://platform.openai.com/docs/api-reference/vector-stores/search)
+        pub const RETRIEVAL: &str = "retrieval";
+        /// Fetch a previously generated model response by its identifier, without performing inference, such as [OpenAI Get a model response](https://platform.openai.com/docs/api-reference/responses/get)
+        pub const FETCH_RESPONSE: &str = "fetch_response";
+        /// Create GenAI agent
+        pub const CREATE_AGENT: &str = "create_agent";
+        /// Invoke GenAI agent
+        pub const INVOKE_AGENT: &str = "invoke_agent";
+        /// Execute a tool
+        pub const EXECUTE_TOOL: &str = "execute_tool";
+        /// Invoke GenAI workflow
+        pub const INVOKE_WORKFLOW: &str = "invoke_workflow";
+        /// Agent planning or task decomposition phase
+        pub const PLAN: &str = "plan";
+        /// Search/query memories from a memory store
+        pub const SEARCH_MEMORY: &str = "search_memory";
+        /// Create new memory records
+        pub const CREATE_MEMORY: &str = "create_memory";
+        /// Update existing memory records
+        pub const UPDATE_MEMORY: &str = "update_memory";
+        /// Create or update memory records without the caller choosing which
+        pub const UPSERT_MEMORY: &str = "upsert_memory";
+        /// Delete memory records
+        pub const DELETE_MEMORY: &str = "delete_memory";
+        /// Create or initialize a memory store
+        pub const CREATE_MEMORY_STORE: &str = "create_memory_store";
+        /// Delete or deprovision a memory store
+        pub const DELETE_MEMORY_STORE: &str = "delete_memory_store";
+    }
+    /// Messages returned by the model where each message represents a specific model response (choice, candidate).
+    pub const GEN_AI_OUTPUT_MESSAGES: &str = "gen_ai.output.messages";
+    /// Represents the content type requested by the client.
+    pub const GEN_AI_OUTPUT_TYPE: &str = "gen_ai.output.type";
+
+    /// Values of [`GEN_AI_OUTPUT_TYPE`].
+    pub mod gen_ai_output_type {
+        /// Plain text
+        pub const TEXT: &str = "text";
+        /// JSON object with known or unknown schema
+        pub const JSON: &str = "json";
+        /// Image
+        pub const IMAGE: &str = "image";
+        /// Speech
+        pub const SPEECH: &str = "speech";
+    }
+    /// The variables supplied to the prompt template, the `<key>` being the variable name, the value being the variable value.
+    pub const GEN_AI_PROMPT_VARIABLE: &str = "gen_ai.prompt.variable";
+    /// The Generative AI provider as identified by the client or server instrumentation.
+    pub const GEN_AI_PROVIDER_NAME: &str = "gen_ai.provider.name";
+
+    /// Values of [`GEN_AI_PROVIDER_NAME`].
+    pub mod gen_ai_provider_name {
+        /// [OpenAI](https://openai.com/)
+        pub const OPENAI: &str = "openai";
+        /// Any Google generative AI endpoint
+        pub const GCP_GEN_AI: &str = "gcp.gen_ai";
+        /// [Vertex AI](https://cloud.google.com/vertex-ai)
+        pub const GCP_VERTEX_AI: &str = "gcp.vertex_ai";
+        /// [Gemini](https://cloud.google.com/products/gemini)
+        pub const GCP_GEMINI: &str = "gcp.gemini";
+        /// [Anthropic](https://www.anthropic.com/)
+        pub const ANTHROPIC: &str = "anthropic";
+        /// [Cohere](https://cohere.com/)
+        pub const COHERE: &str = "cohere";
+        /// Azure AI Inference
+        pub const AZURE_AI_INFERENCE: &str = "azure.ai.inference";
+        /// [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/overview)
+        pub const AZURE_AI_OPENAI: &str = "azure.ai.openai";
+        /// [IBM Watsonx AI](https://www.ibm.com/products/watsonx-ai)
+        pub const IBM_WATSONX_AI: &str = "ibm.watsonx.ai";
+        /// [AWS Bedrock](https://aws.amazon.com/bedrock)
+        pub const AWS_BEDROCK: &str = "aws.bedrock";
+        /// [Perplexity](https://www.perplexity.ai/)
+        pub const PERPLEXITY: &str = "perplexity";
+        /// [xAI](https://x.ai/)
+        pub const X_AI: &str = "x_ai";
+        /// [DeepSeek](https://www.deepseek.com/)
+        pub const DEEPSEEK: &str = "deepseek";
+        /// [Groq](https://groq.com/)
+        pub const GROQ: &str = "groq";
+        /// [Mistral](https://mistral.ai/)
+        pub const MISTRAL: &str = "mistral";
+        /// [Moonshot AI](https://www.moonshot.ai/)
+        pub const MOONSHOT_AI: &str = "moonshot_ai";
+    }
+    /// The name of the GenAI model a request is being made to.
+    pub const GEN_AI_REQUEST_MODEL: &str = "gen_ai.request.model";
+    /// Indicates whether the GenAI request was made in streaming mode.
+    pub const GEN_AI_REQUEST_STREAM: &str = "gen_ai.request.stream";
+    /// Array of reasons the model stopped generating tokens, corresponding to each generation received.
+    pub const GEN_AI_RESPONSE_FINISH_REASONS: &str = "gen_ai.response.finish_reasons";
+    /// The unique identifier for the completion.
+    pub const GEN_AI_RESPONSE_ID: &str = "gen_ai.response.id";
+    /// The name of the model that generated the response.
+    pub const GEN_AI_RESPONSE_MODEL: &str = "gen_ai.response.model";
+    /// Time to first chunk in a streaming response, measured from request issuance, in seconds. The value is measured from when the client issues the generation request to when the first chunk is received in the response stream.
+    pub const GEN_AI_RESPONSE_TIME_TO_FIRST_CHUNK: &str = "gen_ai.response.time_to_first_chunk";
+    /// The documents retrieved.
+    pub const GEN_AI_RETRIEVAL_DOCUMENTS: &str = "gen_ai.retrieval.documents";
+    /// The query text used for retrieval.
+    pub const GEN_AI_RETRIEVAL_QUERY_TEXT: &str = "gen_ai.retrieval.query.text";
+    /// The system message or instructions provided to the GenAI model separately from the chat history.
+    pub const GEN_AI_SYSTEM_INSTRUCTIONS: &str = "gen_ai.system_instructions";
+    /// Parameters passed to the tool call.
+    pub const GEN_AI_TOOL_CALL_ARGUMENTS: &str = "gen_ai.tool.call.arguments";
+    /// The tool call identifier supplied by the model or provider.
+    pub const GEN_AI_TOOL_CALL_ID: &str = "gen_ai.tool.call.id";
+    /// The result returned by the tool call (if any and if execution was successful).
+    pub const GEN_AI_TOOL_CALL_RESULT: &str = "gen_ai.tool.call.result";
+    /// The list of tool definitions available to the GenAI agent or model.
+    pub const GEN_AI_TOOL_DEFINITIONS: &str = "gen_ai.tool.definitions";
+    /// The tool description.
+    pub const GEN_AI_TOOL_DESCRIPTION: &str = "gen_ai.tool.description";
+    /// Name of the tool utilized by the agent.
+    pub const GEN_AI_TOOL_NAME: &str = "gen_ai.tool.name";
+    /// Type of the tool utilized by the agent
+    pub const GEN_AI_TOOL_TYPE: &str = "gen_ai.tool.type";
+    /// The number of audio input tokens served from a provider-managed cache.
+    pub const GEN_AI_USAGE_AUDIO_CACHE_READ_INPUT_TOKENS: &str = "gen_ai.usage.audio.cache_read.input_tokens";
+    /// The number of audio input tokens.
+    pub const GEN_AI_USAGE_AUDIO_INPUT_TOKENS: &str = "gen_ai.usage.audio.input_tokens";
+    /// The number of audio output tokens.
+    pub const GEN_AI_USAGE_AUDIO_OUTPUT_TOKENS: &str = "gen_ai.usage.audio.output_tokens";
+    /// The number of input tokens served from a provider-managed cache.
+    pub const GEN_AI_USAGE_CACHE_READ_INPUT_TOKENS: &str = "gen_ai.usage.cache_read.input_tokens";
+    /// The number of input tokens written to a provider-managed cache.
+    pub const GEN_AI_USAGE_CACHE_WRITE_INPUT_TOKENS: &str = "gen_ai.usage.cache_write.input_tokens";
+    /// The number of image input tokens served from a provider-managed cache.
+    pub const GEN_AI_USAGE_IMAGE_CACHE_READ_INPUT_TOKENS: &str = "gen_ai.usage.image.cache_read.input_tokens";
+    /// The number of image input tokens.
+    pub const GEN_AI_USAGE_IMAGE_INPUT_TOKENS: &str = "gen_ai.usage.image.input_tokens";
+    /// The number of tokens used in the GenAI input (prompt).
+    pub const GEN_AI_USAGE_INPUT_TOKENS: &str = "gen_ai.usage.input_tokens";
+    /// The number of tokens used in the GenAI response (completion).
+    pub const GEN_AI_USAGE_OUTPUT_TOKENS: &str = "gen_ai.usage.output_tokens";
+    /// The number of output tokens used for reasoning (e.g. chain-of-thought, extended thinking).
+    pub const GEN_AI_USAGE_REASONING_OUTPUT_TOKENS: &str = "gen_ai.usage.reasoning.output_tokens";
+    /// The number of text input tokens served from a provider-managed cache.
+    pub const GEN_AI_USAGE_TEXT_CACHE_READ_INPUT_TOKENS: &str = "gen_ai.usage.text.cache_read.input_tokens";
+    /// The number of text input tokens.
+    pub const GEN_AI_USAGE_TEXT_INPUT_TOKENS: &str = "gen_ai.usage.text.input_tokens";
+    /// The number of text output tokens.
+    pub const GEN_AI_USAGE_TEXT_OUTPUT_TOKENS: &str = "gen_ai.usage.text.output_tokens";
+    /// Human-readable name of the GenAI workflow provided by the application.
+    pub const GEN_AI_WORKFLOW_NAME: &str = "gen_ai.workflow.name";
+    /// The internet connection type.
+    pub const NETWORK_CONNECTION_TYPE: &str = "network.connection.type";
+
+    /// Values of [`NETWORK_CONNECTION_TYPE`].
+    pub mod network_connection_type {
+        /// Wi-Fi
+        pub const WIFI: &str = "wifi";
+        /// `wired`.
+        pub const WIRED: &str = "wired";
+        /// `cell`.
+        pub const CELL: &str = "cell";
+        /// `unavailable`.
+        pub const UNAVAILABLE: &str = "unavailable";
+        /// `unknown`.
+        pub const UNKNOWN: &str = "unknown";
+    }
+    /// Human readable operating system name.
+    pub const OS_NAME: &str = "os.name";
+    /// The version string of the operating system as defined in [Version Attributes](/docs/resource/README.md#version-attributes).
+    pub const OS_VERSION: &str = "os.version";
+    /// Identifies the class / type of event.
+    pub const OTEL_EVENT_NAME: &str = "otel.event.name";
+    /// The fully-qualified logical name of the method from the RPC interface perspective.
+    pub const RPC_METHOD: &str = "rpc.method";
+    /// Logical name of the service.
+    pub const SERVICE_NAME: &str = "service.name";
+    /// The version string of the service component. The format is not defined by these conventions.
+    pub const SERVICE_VERSION: &str = "service.version";
+    /// A unique ID to identify a session.
+    pub const SESSION_ID: &str = "session.id";
+    /// The language of the telemetry SDK.
+    pub const TELEMETRY_SDK_LANGUAGE: &str = "telemetry.sdk.language";
+
+    /// Values of [`TELEMETRY_SDK_LANGUAGE`].
+    pub mod telemetry_sdk_language {
+        /// [C++](https://opentelemetry.io/docs/languages/cpp/)
+        pub const CPP: &str = "cpp";
+        /// [.NET](https://opentelemetry.io/docs/languages/dotnet/)
+        pub const DOTNET: &str = "dotnet";
+        /// [Erlang/Elixir](https://opentelemetry.io/docs/languages/erlang/)
+        pub const ERLANG: &str = "erlang";
+        /// [Go](https://opentelemetry.io/docs/languages/go/)
+        pub const GO: &str = "go";
+        /// [Java](https://opentelemetry.io/docs/languages/java/)
+        pub const JAVA: &str = "java";
+        /// [Kotlin](https://opentelemetry.io/docs/languages/kotlin/)
+        pub const KOTLIN: &str = "kotlin";
+        /// [Node.js](https://opentelemetry.io/docs/languages/js/)
+        pub const NODEJS: &str = "nodejs";
+        /// [PHP](https://opentelemetry.io/docs/languages/php/)
+        pub const PHP: &str = "php";
+        /// [Python](https://opentelemetry.io/docs/languages/python/)
+        pub const PYTHON: &str = "python";
+        /// [Ruby](https://opentelemetry.io/docs/languages/ruby/)
+        pub const RUBY: &str = "ruby";
+        /// [Rust](https://opentelemetry.io/docs/languages/rust/)
+        pub const RUST: &str = "rust";
+        /// [Swift](https://opentelemetry.io/docs/languages/swift/)
+        pub const SWIFT: &str = "swift";
+        /// [Browser](https://opentelemetry.io/docs/languages/js/)
+        pub const WEBJS: &str = "webjs";
+    }
+    /// The name of the telemetry SDK as defined above.
+    pub const TELEMETRY_SDK_NAME: &str = "telemetry.sdk.name";
+    /// The version string of the telemetry SDK.
+    pub const TELEMETRY_SDK_VERSION: &str = "telemetry.sdk.version";
+}
 /// Event names (OTLP `LogRecord.event_name`).
 pub mod event {
     /// Namespace of app-defined events, named `custom.<name>` and carrying the app's own attributes.
     pub const CUSTOM: &str = "custom";
+    /// OTel GenAI assistant message (also a function call), a span event on `llm_node`.
+    pub const GEN_AI_ASSISTANT_MESSAGE: &str = "gen_ai.assistant.message";
+    /// OTel GenAI choice, a span event on `llm_node`.
+    pub const GEN_AI_CHOICE: &str = "gen_ai.choice";
+    /// OTel GenAI system (or developer) message, a span event on `llm_node`.
+    pub const GEN_AI_SYSTEM_MESSAGE: &str = "gen_ai.system.message";
+    /// OTel GenAI tool message (a function call output), a span event on `llm_node`.
+    pub const GEN_AI_TOOL_MESSAGE: &str = "gen_ai.tool.message";
+    /// OTel GenAI user message, a span event on `llm_node`.
+    pub const GEN_AI_USER_MESSAGE: &str = "gen_ai.user.message";
     /// The app moved to the foreground or background.
     pub const LK_DEVICE_APP_STATE_CHANGED: &str = "lk.device.app_state.changed";
     /// An audio session interruption began or ended.
@@ -508,6 +1265,32 @@ pub mod event {
 
 /// Span names.
 pub mod span {
+    /// The agent session, parent of every turn. Kind: internal.
+    pub const AGENT_SESSION: &str = "agent_session";
+    /// The agent's audio playing out. Kind: internal.
+    pub const AGENT_SPEAKING: &str = "agent_speaking";
+    /// One agent turn (generation), parent of the LLM and TTS nodes. Kind: internal.
+    pub const AGENT_TURN: &str = "agent_turn";
+    /// Answering-machine detection on an outbound call. Kind: internal.
+    pub const AMD: &str = "amd";
+    /// Draining an agent activity before it ends. Kind: internal.
+    pub const DRAIN_AGENT_ACTIVITY: &str = "drain_agent_activity";
+    /// One end-of-utterance inference. Kind: internal.
+    pub const EOU_DETECTION: &str = "eou_detection";
+    /// The endpointing wait, from the user's last speech to the turn decision. Kind: internal.
+    pub const EOU_WAIT: &str = "eou_wait";
+    /// A synchronous block on the agent event loop. Kind: internal.
+    pub const EVENT_LOOP_BLOCKED: &str = "event_loop_blocked";
+    /// One function tool execution, the OTel GenAI execute-tool span. Kind: internal.
+    pub const FUNCTION_TOOL: &str = "function_tool";
+    /// The job's entrypoint, root of a job's trace. Kind: internal.
+    pub const JOB_ENTRYPOINT: &str = "job_entrypoint";
+    /// The job shutting down. Kind: internal.
+    pub const JOB_SHUTDOWN: &str = "job_shutdown";
+    /// One LLM-judge evaluation of the session. Kind: internal.
+    pub const JUDGE_EVALUATION: &str = "judge_evaluation";
+    /// A keyterm update to the STT. Kind: internal.
+    pub const KEYTERM_DETECTION: &str = "keyterm_detection";
     /// One connect attempt. Kind: client.
     pub const LK_CONNECT: &str = "lk.connect";
     /// One track publish. Kind: internal.
@@ -516,6 +1299,80 @@ pub mod span {
     pub const LK_RECONNECT: &str = "lk.reconnect";
     /// One subscription, from the intent to subscribe to the first media. Kind: internal.
     pub const LK_SUBSCRIBE: &str = "lk.subscribe";
+    /// The LLM fallback adapter choosing an instance. Kind: internal.
+    pub const LLM_FALLBACK_ADAPTER: &str = "llm_fallback_adapter";
+    /// The agent's LLM node for one generation. Kind: internal.
+    pub const LLM_NODE: &str = "llm_node";
+    /// One LLM inference request, the OTel GenAI inference span. Kind: client.
+    pub const LLM_REQUEST: &str = "llm_request";
+    /// The LLM request's stream being consumed. Kind: internal.
+    pub const LLM_REQUEST_RUN: &str = "llm_request_run";
+    /// A plugin-task metric noted through the Node binding, stamped with its resolved frame. Kind: internal.
+    pub const METRICS: &str = "metrics";
+    /// The agent's `on_enter` hook. Kind: internal.
+    pub const ON_ENTER: &str = "on_enter";
+    /// The agent's `on_exit` hook. Kind: internal.
+    pub const ON_EXIT: &str = "on_exit";
+    /// The session-end hook. Kind: internal.
+    pub const ON_SESSION_END: &str = "on_session_end";
+    /// The `on_user_turn_completed` hook. Kind: internal.
+    pub const ON_USER_TURN_COMPLETED: &str = "on_user_turn_completed";
+    /// Pausing an agent activity. Kind: internal.
+    pub const PAUSE_AGENT_ACTIVITY: &str = "pause_agent_activity";
+    /// Publishing the agent's audio track. Kind: internal.
+    pub const PUBLISH_AUDIO_OUTPUT: &str = "publish_audio_output";
+    /// One realtime-model generation. Kind: client.
+    pub const REALTIME_INFERENCE: &str = "realtime_inference";
+    /// Realtime-model metrics attached to a turn. Kind: internal.
+    pub const REALTIME_METRICS: &str = "realtime_metrics";
+    /// Resuming an agent activity. Kind: internal.
+    pub const RESUME_AGENT_ACTIVITY: &str = "resume_agent_activity";
+    /// Connecting the job to its room. Kind: client.
+    pub const ROOM_CONNECT: &str = "room_connect";
+    /// Disconnecting from the room. Kind: client.
+    pub const ROOM_DISCONNECT: &str = "room_disconnect";
+    /// An outgoing RPC. Kind: client.
+    pub const RPC_CALL: &str = "rpc_call";
+    /// An incoming RPC handled by the agent. Kind: server.
+    pub const RPC_HANDLER: &str = "rpc_handler";
+    /// Closing the session. Kind: internal.
+    pub const SESSION_CLOSE: &str = "session_close";
+    /// Uploading the session report. Kind: internal.
+    pub const SESSION_END_UPLOAD: &str = "session_end_upload";
+    /// Starting the session (room I/O, first activity). Kind: internal.
+    pub const SESSION_START: &str = "session_start";
+    /// Initializing the agent's tool sets. Kind: internal.
+    pub const SETUP_TOOLSETS: &str = "setup_toolsets";
+    /// One shutdown callback. Kind: internal.
+    pub const SHUTDOWN_CALLBACK: &str = "shutdown_callback";
+    /// Starting an agent activity. Kind: internal.
+    pub const START_AGENT_ACTIVITY: &str = "start_agent_activity";
+    /// The TTS fallback adapter choosing an instance. Kind: internal.
+    pub const TTS_FALLBACK_ADAPTER: &str = "tts_fallback_adapter";
+    /// The agent's TTS node for one generation. Kind: internal.
+    pub const TTS_NODE: &str = "tts_node";
+    /// One TTS request. Kind: client.
+    pub const TTS_REQUEST: &str = "tts_request";
+    /// The TTS request's stream being consumed. Kind: internal.
+    pub const TTS_REQUEST_RUN: &str = "tts_request_run";
+    /// The Node binding driving `Tts::stream` (the duplex path). Kind: internal.
+    pub const TTS_STREAM: &str = "tts_stream";
+    /// The sentence-splitting adapter over a non-streaming TTS. Kind: internal.
+    pub const TTS_STREAM_ADAPTER: &str = "tts_stream_adapter";
+    /// The Node binding driving `Tts::synthesize` (the simplex path). Kind: internal.
+    pub const TTS_SYNTHESIZE: &str = "tts_synthesize";
+    /// Replacing the session's agent. Kind: internal.
+    pub const UPDATE_AGENT: &str = "update_agent";
+    /// The user speaking (VAD). Kind: internal.
+    pub const USER_SPEAKING: &str = "user_speaking";
+    /// One user turn, from speech to the turn decision. Kind: internal.
+    pub const USER_TURN: &str = "user_turn";
+    /// Waiting for the participant's audio track. Kind: internal.
+    pub const WAIT_FOR_AUDIO_TRACK: &str = "wait_for_audio_track";
+    /// Waiting for the participant to link to. Kind: internal.
+    pub const WAIT_FOR_PARTICIPANT: &str = "wait_for_participant";
+    /// Waiting for the participant's video track. Kind: internal.
+    pub const WAIT_FOR_VIDEO_TRACK: &str = "wait_for_video_track";
 }
 
 /// Checkpoint names: span events of the spans above. `lk.reconnect` names its attempts
@@ -529,6 +1386,8 @@ pub mod checkpoint {
     pub const ENGINE: &str = "engine";
     /// The first inbound stats reading with bytes; the span ends ok here.
     pub const FIRST_MEDIA: &str = "first_media";
+    /// OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced
+    pub const GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS: &str = "gen_ai.client.inference.operation.details";
     /// The join response arrived.
     pub const JOIN_RECV: &str = "join_recv";
     /// The publisher's SDP offer went out.
@@ -545,4 +1404,52 @@ pub mod checkpoint {
     pub const SUBSCRIBED: &str = "subscribed";
     /// The signaling WebSocket opened.
     pub const WS_OPEN: &str = "ws_open";
+}
+
+/// Metric names.
+pub mod metric {
+    /// Time to the first chunk of a streaming GenAI response (deprecated upstream; declared as emitted). Instrument: histogram, unit: `s`.
+    pub const GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK: &str = "gen_ai.client.operation.time_to_first_chunk";
+    /// Input and output tokens used by the GenAI operation (deprecated upstream; declared as emitted). Instrument: histogram, unit: `{token}`.
+    pub const GEN_AI_CLIENT_TOKEN_USAGE: &str = "gen_ai.client.token.usage";
+    /// Seconds to acquire a provider connection. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_CONNECTION_ACQUIRE_TIME: &str = "lk.agents.connection.acquire_time";
+    /// Duration of synchronous blocks detected on an agent event loop. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_EVENT_LOOP_BLOCKED_DURATION: &str = "lk.agents.event_loop.blocked_duration";
+    /// End-to-end latency of a turn. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_TURN_E2E_LATENCY: &str = "lk.agents.turn.e2e_latency";
+    /// Delay from the end of speech to the turn decision. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_TURN_END_OF_TURN_DELAY: &str = "lk.agents.turn.end_of_turn_delay";
+    /// Time to the first LLM token. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_TURN_LLM_TTFT: &str = "lk.agents.turn.llm_ttft";
+    /// Duration of the `on_user_turn_completed` hook. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_TURN_ON_USER_TURN_COMPLETED_DELAY: &str = "lk.agents.turn.on_user_turn_completed_delay";
+    /// Delay from the end of speech to the final transcript. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_TURN_TRANSCRIPTION_DELAY: &str = "lk.agents.turn.transcription_delay";
+    /// Time to the first TTS byte. Instrument: histogram, unit: `s`.
+    pub const LK_AGENTS_TURN_TTS_TTFB: &str = "lk.agents.turn.tts_ttfb";
+    /// Interruption-detector requests. Instrument: counter, unit: `{request}`.
+    pub const LK_AGENTS_USAGE_INTERRUPTION_NUM_REQUESTS: &str = "lk.agents.usage.interruption_num_requests";
+    /// Realtime-model audio input tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_INPUT_AUDIO_TOKENS: &str = "lk.agents.usage.llm_input_audio_tokens";
+    /// LLM cached input tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_INPUT_CACHED_TOKENS: &str = "lk.agents.usage.llm_input_cached_tokens";
+    /// Realtime-model text input tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_INPUT_TEXT_TOKENS: &str = "lk.agents.usage.llm_input_text_tokens";
+    /// LLM input tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_INPUT_TOKENS: &str = "lk.agents.usage.llm_input_tokens";
+    /// Realtime-model audio output tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_OUTPUT_AUDIO_TOKENS: &str = "lk.agents.usage.llm_output_audio_tokens";
+    /// Realtime-model text output tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_OUTPUT_TEXT_TOKENS: &str = "lk.agents.usage.llm_output_text_tokens";
+    /// LLM output tokens. Instrument: counter, unit: `{token}`.
+    pub const LK_AGENTS_USAGE_LLM_OUTPUT_TOKENS: &str = "lk.agents.usage.llm_output_tokens";
+    /// Realtime-model session seconds. Instrument: counter, unit: `s`.
+    pub const LK_AGENTS_USAGE_LLM_SESSION_DURATION: &str = "lk.agents.usage.llm_session_duration";
+    /// Seconds of audio transcribed. Instrument: counter, unit: `s`.
+    pub const LK_AGENTS_USAGE_STT_AUDIO_DURATION: &str = "lk.agents.usage.stt_audio_duration";
+    /// Seconds of audio synthesized. Instrument: counter, unit: `s`.
+    pub const LK_AGENTS_USAGE_TTS_AUDIO_DURATION: &str = "lk.agents.usage.tts_audio_duration";
+    /// Characters synthesized. Instrument: counter, unit: `{character}`.
+    pub const LK_AGENTS_USAGE_TTS_CHARACTERS: &str = "lk.agents.usage.tts_characters";
 }
