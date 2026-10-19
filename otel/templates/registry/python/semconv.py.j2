@@ -44,6 +44,8 @@ SPAN_{{ s.type | screaming_snake_case }} = {{ lit(s.type) }}
 CHECKPOINT_{{ c.name | screaming_snake_case }} = {{ lit(c.name) }}
 {% endfor %}{% if ctx.metrics %}
 # Metric names.
-{% for m in ctx.metrics %}#: {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit) }}`.
+{% for m in ctx.metrics %}#: {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit or "") }}`.
 METRIC_{{ m.name | screaming_snake_case }} = {{ lit(m.name) }}
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_{{ m.name | screaming_snake_case }}_UNIT = {{ lit(m.unit or "") }}
 {% endfor %}{% endif %}

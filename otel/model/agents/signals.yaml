@@ -15,6 +15,17 @@ groups:
     span_kind: internal
     stability: development
     brief: The job's entrypoint, root of a job's trace.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: job_received, requirement: best_effort, brief: "The worker received the job request."}
+          - {name: job_accepted, requirement: best_effort, brief: "The worker accepted the job."}
+          - {name: job_assigned, requirement: best_effort, brief: "The server assigned the job."}
+          - {name: process_assigned, requirement: best_effort, brief: "A job process was launched for it."}
+          - {name: entrypoint_started, requirement: best_effort, brief: "The entrypoint started running."}
+          - {name: job_started_on_server, requirement: best_effort, brief: "The server-side job start time, as the worker learned it."}
+          - {name: entrypoint_cancelled, requirement: best_effort, brief: "The entrypoint was cancelled."}
+          - {name: entrypoint_returned, requirement: best_effort, brief: "The entrypoint returned."}
     attributes:
       - ref: lk.job_id
         requirement_level: required
@@ -102,6 +113,14 @@ groups:
     span_kind: internal
     stability: development
     brief: The agent session, parent of every turn.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: participant_linked, requirement: best_effort, brief: "The session linked to its participant."}
+          - {name: agent_state_changed, requirement: best_effort, brief: "The agent state changed (`lk.old_state` -> `lk.new_state`)."}
+          - {name: user_state_changed, requirement: best_effort, brief: "The user state changed (`lk.old_state` -> `lk.new_state`)."}
+          - {name: event_loop_blocked, requirement: best_effort, brief: "A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name."}
+          - {name: exception, requirement: best_effort, brief: "The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once."}
     attributes:
       - ref: lk.pii.participant_identity
         requirement_level: recommended
@@ -169,6 +188,12 @@ groups:
     span_kind: internal
     stability: development
     brief: Waiting for the participant's audio track.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed."}
+          - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
+          - {name: pre_connect_audio, requirement: best_effort, brief: "Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`."}
     attributes:
       - ref: lk.track_sid
         requirement_level: recommended
@@ -179,6 +204,11 @@ groups:
     span_kind: internal
     stability: development
     brief: Waiting for the participant's video track.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed."}
+          - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
     attributes:
       - ref: lk.track_sid
         requirement_level: recommended
@@ -371,6 +401,9 @@ groups:
     attributes:
       - ref: lk.pii.user_transcript
         requirement_level: opt_in
+      - ref: lk.pii.interim_transcript
+        requirement_level: opt_in
+        note: On the interim-transcript log records of the turn, not on the span.
       - ref: lk.stt.events
         requirement_level: recommended
       - ref: lk.transcript_confidence
@@ -398,6 +431,10 @@ groups:
     span_kind: internal
     stability: development
     brief: One end-of-utterance inference.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: superseded, requirement: best_effort, brief: "A newer detection superseded this one."}
     attributes:
       - ref: lk.eou.probability
         requirement_level: recommended
@@ -416,6 +453,11 @@ groups:
     span_kind: internal
     stability: development
     brief: The endpointing wait, from the user's last speech to the turn decision.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: rearmed, requirement: best_effort, brief: "A later trigger re-armed the wait."}
+          - {name: user_resumed, requirement: best_effort, brief: "The user spoke again during the wait."}
     attributes:
       - ref: lk.eou.outcome
         requirement_level: required
@@ -432,6 +474,10 @@ groups:
     span_kind: internal
     stability: development
     brief: The `on_user_turn_completed` hook.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: stop_response, requirement: best_effort, brief: "The hook stopped the response."}
     attributes:
       - ref: lk.on_user_turn_completed_delay
         requirement_level: recommended
@@ -440,6 +486,11 @@ groups:
     span_kind: internal
     stability: development
     brief: One agent turn (generation), parent of the LLM and TTS nodes.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: generation, requirement: best_effort, brief: "One generation started (the generation attributes)."}
+          - {name: preemptive_generation_discarded, requirement: best_effort, brief: "A preemptive generation was discarded in favour of this one (`lk.speech_id` of the discarded handle)."}
     attributes:
       - ref: lk.speech_id
         requirement_level: recommended
@@ -815,24 +866,27 @@ groups:
         requirement_level: {conditionally_required: On failure.}
 
   # --- Metrics (`otel_metrics.py`, `metrics/otel.rs`) --------------------------------------
+  # Units are exactly what the producer ships: the nine counters Python creates without a unit
+  # are declared with `unit: ""` (the OTel SDK default), not with the `{token}` / `{character}`
+  # / `{request}` annotations they arguably deserve; changing that is a wire change.
   - {id: metric.lk.agents.turn.e2e_latency, type: metric, metric_name: lk.agents.turn.e2e_latency, instrument: histogram, unit: s, stability: development, brief: "End-to-end latency of a turn.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.turn.llm_ttft, type: metric, metric_name: lk.agents.turn.llm_ttft, instrument: histogram, unit: s, stability: development, brief: "Time to the first LLM token.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.turn.tts_ttfb, type: metric, metric_name: lk.agents.turn.tts_ttfb, instrument: histogram, unit: s, stability: development, brief: "Time to the first TTS byte.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.turn.transcription_delay, type: metric, metric_name: lk.agents.turn.transcription_delay, instrument: histogram, unit: s, stability: development, brief: "Delay from the end of speech to the final transcript.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.turn.end_of_turn_delay, type: metric, metric_name: lk.agents.turn.end_of_turn_delay, instrument: histogram, unit: s, stability: development, brief: "Delay from the end of speech to the turn decision.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.turn.on_user_turn_completed_delay, type: metric, metric_name: lk.agents.turn.on_user_turn_completed_delay, instrument: histogram, unit: s, stability: development, brief: "Duration of the `on_user_turn_completed` hook.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_input_tokens, type: metric, metric_name: lk.agents.usage.llm_input_tokens, instrument: counter, unit: "{token}", stability: development, brief: "LLM input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_input_cached_tokens, type: metric, metric_name: lk.agents.usage.llm_input_cached_tokens, instrument: counter, unit: "{token}", stability: development, brief: "LLM cached input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_output_tokens, type: metric, metric_name: lk.agents.usage.llm_output_tokens, instrument: counter, unit: "{token}", stability: development, brief: "LLM output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_input_audio_tokens, type: metric, metric_name: lk.agents.usage.llm_input_audio_tokens, instrument: counter, unit: "{token}", stability: development, brief: "Realtime-model audio input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_input_text_tokens, type: metric, metric_name: lk.agents.usage.llm_input_text_tokens, instrument: counter, unit: "{token}", stability: development, brief: "Realtime-model text input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_output_audio_tokens, type: metric, metric_name: lk.agents.usage.llm_output_audio_tokens, instrument: counter, unit: "{token}", stability: development, brief: "Realtime-model audio output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.llm_output_text_tokens, type: metric, metric_name: lk.agents.usage.llm_output_text_tokens, instrument: counter, unit: "{token}", stability: development, brief: "Realtime-model text output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_tokens, type: metric, metric_name: lk.agents.usage.llm_input_tokens, instrument: counter, unit: "", stability: development, brief: "LLM input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_cached_tokens, type: metric, metric_name: lk.agents.usage.llm_input_cached_tokens, instrument: counter, unit: "", stability: development, brief: "LLM cached input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_output_tokens, type: metric, metric_name: lk.agents.usage.llm_output_tokens, instrument: counter, unit: "", stability: development, brief: "LLM output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_audio_tokens, type: metric, metric_name: lk.agents.usage.llm_input_audio_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model audio input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_text_tokens, type: metric, metric_name: lk.agents.usage.llm_input_text_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model text input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_output_audio_tokens, type: metric, metric_name: lk.agents.usage.llm_output_audio_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model audio output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_output_text_tokens, type: metric, metric_name: lk.agents.usage.llm_output_text_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model text output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.usage.llm_session_duration, type: metric, metric_name: lk.agents.usage.llm_session_duration, instrument: counter, unit: s, stability: development, brief: "Realtime-model session seconds.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.tts_characters, type: metric, metric_name: lk.agents.usage.tts_characters, instrument: counter, unit: "{character}", stability: development, brief: "Characters synthesized.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.tts_characters, type: metric, metric_name: lk.agents.usage.tts_characters, instrument: counter, unit: "", stability: development, brief: "Characters synthesized.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.usage.tts_audio_duration, type: metric, metric_name: lk.agents.usage.tts_audio_duration, instrument: counter, unit: s, stability: development, brief: "Seconds of audio synthesized.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.usage.stt_audio_duration, type: metric, metric_name: lk.agents.usage.stt_audio_duration, instrument: counter, unit: s, stability: development, brief: "Seconds of audio transcribed.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
-  - {id: metric.lk.agents.usage.interruption_num_requests, type: metric, metric_name: lk.agents.usage.interruption_num_requests, instrument: counter, unit: "{request}", stability: development, brief: "Interruption-detector requests.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.interruption_num_requests, type: metric, metric_name: lk.agents.usage.interruption_num_requests, instrument: counter, unit: "", stability: development, brief: "Interruption-detector requests.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
   - {id: metric.lk.agents.connection.acquire_time, type: metric, metric_name: lk.agents.connection.acquire_time, instrument: histogram, unit: s, stability: development, brief: "Seconds to acquire a provider connection.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}, {ref: connection_reused, requirement_level: required}]}
   - {id: metric.lk.agents.event_loop.blocked_duration, type: metric, metric_name: lk.agents.event_loop.blocked_duration, instrument: histogram, unit: s, stability: development, brief: "Duration of synchronous blocks detected on an agent event loop."}
 

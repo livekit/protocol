@@ -2,7 +2,7 @@
 """LiveKit telemetry semantic conventions."""
 
 #: Telemetry schema version; set as `schema_url` on every OTLP scope.
-SCHEMA_URL = "https://livekit.io/schemas/telemetry/0.4.0"
+SCHEMA_URL = "https://livekit.io/schemas/telemetry/0.5.0"
 
 #: Browser name.
 BROWSER_NAME = "browser.name"
@@ -476,6 +476,9 @@ LK_PII_INPUT_TEXT = "lk.pii.input_text"
 
 #: Agent instructions in force. PII: redacted by the collector.
 LK_PII_INSTRUCTIONS = "lk.pii.instructions"
+
+#: An interim (non-final) transcript, on a log record. PII: redacted by the collector.
+LK_PII_INTERIM_TRANSCRIPT = "lk.pii.interim_transcript"
 
 #: The keyterms themselves (customer vocabulary). PII: redacted by the collector.
 LK_PII_KEYTERMS = "lk.pii.keyterms"
@@ -1343,75 +1346,163 @@ SPAN_WAIT_FOR_VIDEO_TRACK = "wait_for_video_track"
 
 # Checkpoint names: span events of the spans above. `lk.reconnect` names its attempts
 # `attempt <n> <mode>` instead.
+#: The agent state changed (`lk.old_state` -> `lk.new_state`).
+CHECKPOINT_AGENT_STATE_CHANGED = "agent_state_changed"
 #: The subscriber's SDP answer went out.
 CHECKPOINT_ANSWER_SENT = "answer_sent"
 #: A peer connection was created before the join response (JS port only).
 CHECKPOINT_EARLY_PC_CREATED = "early_pc_created"
 #: The RTC engine is ready (Swift stamps it with pc_connected).
 CHECKPOINT_ENGINE = "engine"
+#: The entrypoint was cancelled.
+CHECKPOINT_ENTRYPOINT_CANCELLED = "entrypoint_cancelled"
+#: The entrypoint returned.
+CHECKPOINT_ENTRYPOINT_RETURNED = "entrypoint_returned"
+#: The entrypoint started running.
+CHECKPOINT_ENTRYPOINT_STARTED = "entrypoint_started"
+#: A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name.
+CHECKPOINT_EVENT_LOOP_BLOCKED = "event_loop_blocked"
+#: The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once.
+CHECKPOINT_EXCEPTION = "exception"
+#: The first frame arrived.
+CHECKPOINT_FIRST_FRAME = "first_frame"
 #: The first inbound stats reading with bytes; the span ends ok here.
 CHECKPOINT_FIRST_MEDIA = "first_media"
 #: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced
 CHECKPOINT_GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS = "gen_ai.client.inference.operation.details"
+#: One generation started (the generation attributes).
+CHECKPOINT_GENERATION = "generation"
+#: The worker accepted the job.
+CHECKPOINT_JOB_ACCEPTED = "job_accepted"
+#: The server assigned the job.
+CHECKPOINT_JOB_ASSIGNED = "job_assigned"
+#: The worker received the job request.
+CHECKPOINT_JOB_RECEIVED = "job_received"
+#: The server-side job start time, as the worker learned it.
+CHECKPOINT_JOB_STARTED_ON_SERVER = "job_started_on_server"
 #: The join response arrived.
 CHECKPOINT_JOIN_RECV = "join_recv"
 #: The publisher's SDP offer went out.
 CHECKPOINT_OFFER_SENT = "offer_sent"
+#: The session linked to its participant.
+CHECKPOINT_PARTICIPANT_LINKED = "participant_linked"
 #: The primary peer connection connected.
 CHECKPOINT_PC_CONNECTED = "pc_connected"
 #: The peer connections exist (stamped once the join is adopted).
 CHECKPOINT_PC_CREATED = "pc_created"
+#: Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`.
+CHECKPOINT_PRE_CONNECT_AUDIO = "pre_connect_audio"
+#: A preemptive generation was discarded in favour of this one (`lk.speech_id` of the discarded handle).
+CHECKPOINT_PREEMPTIVE_GENERATION_DISCARDED = "preemptive_generation_discarded"
+#: A job process was launched for it.
+CHECKPOINT_PROCESS_ASSIGNED = "process_assigned"
+#: A later trigger re-armed the wait.
+CHECKPOINT_REARMED = "rearmed"
 #: The Room reached the connected state.
 CHECKPOINT_ROOM_CONNECTED = "room_connected"
 #: Signaling is up (stamped with ws_open on the web and with join_recv on Swift).
 CHECKPOINT_SIGNAL = "signal"
+#: The hook stopped the response.
+CHECKPOINT_STOP_RESPONSE = "stop_response"
 #: The platform reported the remote track subscribed.
 CHECKPOINT_SUBSCRIBED = "subscribed"
+#: A newer detection superseded this one.
+CHECKPOINT_SUPERSEDED = "superseded"
+#: The track was subscribed.
+CHECKPOINT_TRACK_SUBSCRIBED = "track_subscribed"
+#: The user spoke again during the wait.
+CHECKPOINT_USER_RESUMED = "user_resumed"
+#: The user state changed (`lk.old_state` -> `lk.new_state`).
+CHECKPOINT_USER_STATE_CHANGED = "user_state_changed"
 #: The signaling WebSocket opened.
 CHECKPOINT_WS_OPEN = "ws_open"
 
 # Metric names.
 #: Time to the first chunk of a streaming GenAI response (deprecated upstream; declared as emitted). Instrument: histogram, unit: `s`.
 METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK = "gen_ai.client.operation.time_to_first_chunk"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK_UNIT = "s"
 #: Input and output tokens used by the GenAI operation (deprecated upstream; declared as emitted). Instrument: histogram, unit: `{token}`.
 METRIC_GEN_AI_CLIENT_TOKEN_USAGE = "gen_ai.client.token.usage"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_GEN_AI_CLIENT_TOKEN_USAGE_UNIT = "{token}"
 #: Seconds to acquire a provider connection. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_CONNECTION_ACQUIRE_TIME = "lk.agents.connection.acquire_time"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_CONNECTION_ACQUIRE_TIME_UNIT = "s"
 #: Duration of synchronous blocks detected on an agent event loop. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_EVENT_LOOP_BLOCKED_DURATION = "lk.agents.event_loop.blocked_duration"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_EVENT_LOOP_BLOCKED_DURATION_UNIT = "s"
 #: End-to-end latency of a turn. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_TURN_E2E_LATENCY = "lk.agents.turn.e2e_latency"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_TURN_E2E_LATENCY_UNIT = "s"
 #: Delay from the end of speech to the turn decision. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_TURN_END_OF_TURN_DELAY = "lk.agents.turn.end_of_turn_delay"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_TURN_END_OF_TURN_DELAY_UNIT = "s"
 #: Time to the first LLM token. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_TURN_LLM_TTFT = "lk.agents.turn.llm_ttft"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_TURN_LLM_TTFT_UNIT = "s"
 #: Duration of the `on_user_turn_completed` hook. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_TURN_ON_USER_TURN_COMPLETED_DELAY = "lk.agents.turn.on_user_turn_completed_delay"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_TURN_ON_USER_TURN_COMPLETED_DELAY_UNIT = "s"
 #: Delay from the end of speech to the final transcript. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_TURN_TRANSCRIPTION_DELAY = "lk.agents.turn.transcription_delay"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_TURN_TRANSCRIPTION_DELAY_UNIT = "s"
 #: Time to the first TTS byte. Instrument: histogram, unit: `s`.
 METRIC_LK_AGENTS_TURN_TTS_TTFB = "lk.agents.turn.tts_ttfb"
-#: Interruption-detector requests. Instrument: counter, unit: `{request}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_TURN_TTS_TTFB_UNIT = "s"
+#: Interruption-detector requests. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_INTERRUPTION_NUM_REQUESTS = "lk.agents.usage.interruption_num_requests"
-#: Realtime-model audio input tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_INTERRUPTION_NUM_REQUESTS_UNIT = ""
+#: Realtime-model audio input tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_INPUT_AUDIO_TOKENS = "lk.agents.usage.llm_input_audio_tokens"
-#: LLM cached input tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_INPUT_AUDIO_TOKENS_UNIT = ""
+#: LLM cached input tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_INPUT_CACHED_TOKENS = "lk.agents.usage.llm_input_cached_tokens"
-#: Realtime-model text input tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_INPUT_CACHED_TOKENS_UNIT = ""
+#: Realtime-model text input tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_INPUT_TEXT_TOKENS = "lk.agents.usage.llm_input_text_tokens"
-#: LLM input tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_INPUT_TEXT_TOKENS_UNIT = ""
+#: LLM input tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_INPUT_TOKENS = "lk.agents.usage.llm_input_tokens"
-#: Realtime-model audio output tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_INPUT_TOKENS_UNIT = ""
+#: Realtime-model audio output tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_OUTPUT_AUDIO_TOKENS = "lk.agents.usage.llm_output_audio_tokens"
-#: Realtime-model text output tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_OUTPUT_AUDIO_TOKENS_UNIT = ""
+#: Realtime-model text output tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_OUTPUT_TEXT_TOKENS = "lk.agents.usage.llm_output_text_tokens"
-#: LLM output tokens. Instrument: counter, unit: `{token}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_OUTPUT_TEXT_TOKENS_UNIT = ""
+#: LLM output tokens. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_LLM_OUTPUT_TOKENS = "lk.agents.usage.llm_output_tokens"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_OUTPUT_TOKENS_UNIT = ""
 #: Realtime-model session seconds. Instrument: counter, unit: `s`.
 METRIC_LK_AGENTS_USAGE_LLM_SESSION_DURATION = "lk.agents.usage.llm_session_duration"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_LLM_SESSION_DURATION_UNIT = "s"
 #: Seconds of audio transcribed. Instrument: counter, unit: `s`.
 METRIC_LK_AGENTS_USAGE_STT_AUDIO_DURATION = "lk.agents.usage.stt_audio_duration"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_STT_AUDIO_DURATION_UNIT = "s"
 #: Seconds of audio synthesized. Instrument: counter, unit: `s`.
 METRIC_LK_AGENTS_USAGE_TTS_AUDIO_DURATION = "lk.agents.usage.tts_audio_duration"
-#: Characters synthesized. Instrument: counter, unit: `{character}`.
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_TTS_AUDIO_DURATION_UNIT = "s"
+#: Characters synthesized. Instrument: counter, unit: ``.
 METRIC_LK_AGENTS_USAGE_TTS_CHARACTERS = "lk.agents.usage.tts_characters"
+#: Unit of the instrument above, exactly as the producer creates it (empty = none).
+METRIC_LK_AGENTS_USAGE_TTS_CHARACTERS_UNIT = ""

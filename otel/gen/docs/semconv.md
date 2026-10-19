@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.4.0`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.5.0`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -36,7 +36,7 @@ assigned them, and never default metric dimensions (high cardinality).
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
 keeps everything else. Log bodies and metrics are never redacted, so PII must not go there.
-PII keys: `lk.pii.amd.transcript`, `lk.pii.arguments`, `lk.pii.chat_ctx`, `lk.pii.dtmf_inputs`, `lk.pii.error`, `lk.pii.event`, `lk.pii.function_tool.arguments`, `lk.pii.function_tool.output`, `lk.pii.input_text`, `lk.pii.instructions`, `lk.pii.keyterms`, `lk.pii.output`, `lk.pii.participant_identity`, `lk.pii.progress_message`, `lk.pii.raw_arguments`, `lk.pii.remote_participant_identity`, `lk.pii.repaired`, `lk.pii.response.function_calls`, `lk.pii.response.text`, `lk.pii.room_name`, `lk.pii.rpc.payload`, `lk.pii.rpc.response`, `lk.pii.sip.phoneNumber`, `lk.pii.text`, `lk.pii.transcript`, `lk.pii.user_input`, `lk.pii.user_transcript`.
+PII keys: `lk.pii.amd.transcript`, `lk.pii.arguments`, `lk.pii.chat_ctx`, `lk.pii.dtmf_inputs`, `lk.pii.error`, `lk.pii.event`, `lk.pii.function_tool.arguments`, `lk.pii.function_tool.output`, `lk.pii.input_text`, `lk.pii.instructions`, `lk.pii.interim_transcript`, `lk.pii.keyterms`, `lk.pii.output`, `lk.pii.participant_identity`, `lk.pii.progress_message`, `lk.pii.raw_arguments`, `lk.pii.remote_participant_identity`, `lk.pii.repaired`, `lk.pii.response.function_calls`, `lk.pii.response.text`, `lk.pii.room_name`, `lk.pii.rpc.payload`, `lk.pii.rpc.response`, `lk.pii.sip.phoneNumber`, `lk.pii.text`, `lk.pii.transcript`, `lk.pii.user_input`, `lk.pii.user_transcript`.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
 OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds. The
@@ -383,7 +383,13 @@ Kind `internal`. The agent session, parent of every turn.
 | `lk.pii.sip.phoneNumber` | string | Opt-in | Phone number of a SIP participant. Camel case as the SIP participant attribute it is copied from; registered as emitted. |
 | `lk.success` | boolean | Opt-in | The session report is tagged successful. A tag name in the session report (`observability.py` / `report.rs`); the outcome is derived from which of `lk.success` and `lk.fail` is present. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `participant_linked` | Best effort | The session linked to its participant. |
+| `agent_state_changed` | Best effort | The agent state changed (`lk.old_state` -> `lk.new_state`). |
+| `user_state_changed` | Best effort | The user state changed (`lk.old_state` -> `lk.new_state`). |
+| `event_loop_blocked` | Best effort | A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name. |
+| `exception` | Best effort | The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once. |
 
 No limits declared.
 
@@ -425,7 +431,10 @@ Kind `internal`. One agent turn (generation), parent of the LLM and TTS nodes.
 | `lk.transcription_delay` | double, `s` | Opt-in | Seconds from the end of speech to the final transcript. |
 | `lk.tts_metrics` | string | Opt-in | TTS metrics of the turn, serialized. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `generation` | Best effort | One generation started (the generation attributes). |
+| `preemptive_generation_discarded` | Best effort | A preemptive generation was discarded in favour of this one (`lk.speech_id` of the discarded handle). |
 
 No limits declared.
 
@@ -470,7 +479,9 @@ Kind `internal`. One end-of-utterance inference.
 | `lk.eou.unlikely_threshold` | double | Recommended | Threshold under which the turn is unlikely to be over. |
 | `lk.pii.user_transcript` | string | Opt-in | Transcript the detector scored. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `superseded` | Best effort | A newer detection superseded this one. |
 
 No limits declared.
 
@@ -486,7 +497,10 @@ Kind `internal`. The endpointing wait, from the user's last speech to the turn d
 | `lk.eou.rearm_count` | int | Recommended | Times the endpointing wait restarted on a later trigger. |
 | `lk.eou.wait_duration` | double, `s` | Recommended | Seconds from the end of the user's speech to the turn decision. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `rearmed` | Best effort | A later trigger re-armed the wait. |
+| `user_resumed` | Best effort | The user spoke again during the wait. |
 
 No limits declared.
 
@@ -558,7 +572,16 @@ Kind `internal`. The job's entrypoint, root of a job's trace.
 | `lk.simulation.job_id` | string | Opt-in | Simulation run job (one scenario) behind the session. |
 | `lk.simulation.run_id` | string | Opt-in | Simulation run the session belongs to. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `job_received` | Best effort | The worker received the job request. |
+| `job_accepted` | Best effort | The worker accepted the job. |
+| `job_assigned` | Best effort | The server assigned the job. |
+| `process_assigned` | Best effort | A job process was launched for it. |
+| `entrypoint_started` | Best effort | The entrypoint started running. |
+| `job_started_on_server` | Best effort | The server-side job start time, as the worker learned it. |
+| `entrypoint_cancelled` | Best effort | The entrypoint was cancelled. |
+| `entrypoint_returned` | Best effort | The entrypoint returned. |
 
 No limits declared.
 
@@ -846,7 +869,9 @@ Kind `internal`. The `on_user_turn_completed` hook.
 | --- | --- | --- | --- |
 | `lk.on_user_turn_completed_delay` | double, `s` | Recommended | Seconds the `on_user_turn_completed` hook took. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `stop_response` | Best effort | The hook stopped the response. |
 
 No limits declared.
 
@@ -1196,6 +1221,7 @@ Kind `internal`. One user turn, from speech to the turn decision.
 | `lk.interruption.prediction_duration` | double, `s` | Opt-in | Seconds the interruption prediction took. |
 | `lk.interruption.probability` | double | Opt-in | Interruption probability. |
 | `lk.interruption.total_duration` | double, `s` | Opt-in | Seconds of the interruption from detection to resolution. |
+| `lk.pii.interim_transcript` | string | Opt-in | An interim (non-final) transcript, on a log record. On the interim-transcript log records of the turn, not on the span. |
 | `lk.pii.user_transcript` | string | Opt-in | Transcript the detector scored. |
 
 No checkpoints.
@@ -1211,7 +1237,11 @@ Kind `internal`. Waiting for the participant's audio track.
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
 | `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `track_subscribed` | Best effort | The track was subscribed. |
+| `first_frame` | Best effort | The first frame arrived. |
+| `pre_connect_audio` | Best effort | Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`. |
 
 No limits declared.
 
@@ -1236,7 +1266,10 @@ Kind `internal`. Waiting for the participant's video track.
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
 | `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
-No checkpoints.
+| Checkpoint | Requirement | Meaning |
+| --- | --- | --- |
+| `track_subscribed` | Best effort | The track was subscribed. |
+| `first_frame` | Best effort | The first frame arrived. |
 
 No limits declared.
 
@@ -1366,6 +1399,7 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.pii.function_tool.output` | string | agents | pii | Tool output. | `sunny` | `function_tool` |
 | `lk.pii.input_text` | string | agents | pii | Text sent to the TTS. | `Hello` | `tts_node` |
 | `lk.pii.instructions` | string | agents | pii | Agent instructions in force. | `You are a helpful assistant.` | `agent_turn` |
+| `lk.pii.interim_transcript` | string | agents | pii | An interim (non-final) transcript, on a log record. | `book a` | `user_turn` |
 | `lk.pii.keyterms` | string | agents | pii | The keyterms themselves (customer vocabulary). | `LiveKit, WebRTC` | `keyterm_detection` |
 | `lk.pii.output` | string | agents | pii | Tool-call output on a log record. | `ok` | |
 | `lk.pii.participant_identity` | string | shared | pii | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. | `identity-0` | record `agent_session` |

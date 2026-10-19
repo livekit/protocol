@@ -145,6 +145,7 @@ groups:
       - {id: lk.eou.endpointing_delay, type: double, stability: development, brief: "Seconds of endpointing delay applied.", examples: [0.5], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
       - {id: lk.eou.language, type: string, stability: development, brief: "Language the detector ran for.", examples: ["en"], annotations: {livekit: {owner: agents, sensitivity: none}}}
       - {id: lk.pii.user_transcript, type: string, stability: development, brief: "Transcript the detector scored.", examples: ["book a table"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.interim_transcript, type: string, stability: development, brief: "An interim (non-final) transcript, on a log record.", examples: ["book a"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
       - {id: lk.stt.events, type: string, stability: development, brief: "JSON list of transcript events on the user turn, in arrival order (received_at, type, transcript_length).", examples: ["[]"], annotations: {livekit: {owner: agents, sensitivity: none}}}
       - {id: lk.transcript_confidence, type: double, stability: development, brief: "Confidence of the final transcript.", examples: [0.98], annotations: {livekit: {owner: agents, sensitivity: none}}}
       - {id: lk.transcription_delay, type: double, stability: development, brief: "Seconds from the end of speech to the final transcript.", examples: [0.4], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}

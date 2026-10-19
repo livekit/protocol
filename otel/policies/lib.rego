@@ -70,10 +70,18 @@ pii_heuristic(attr) := {finding("livekit_pii_heuristic", sprintf("%s looks like 
 	not heuristic_exception(attr)
 }
 
-# A shipped key the heuristic would flag, registered as emitted with the reason it is not renamed
-# (Agents' lk.rpc.caller_identity). The collector still does not redact it: this documents, it
-# does not excuse.
+# The shipped keys the heuristic would flag, registered as emitted. Only a key listed HERE may
+# carry `annotations.livekit.pii_heuristic_exception` (the annotation documents it at the key;
+# this map is the gate), so a new identity/email/phone key cannot opt out of the rule by
+# annotating itself. The collector still does not redact these: this documents, it does not
+# excuse. Adding a key means editing this file, in review.
+pii_heuristic_allowlist := {
+	"lk.rpc.caller_identity": "Agents 2.0 ships the RPC caller identity unmarked; renaming it to lk.pii.rpc.caller_identity is a producer change",
+	"lk.rpc.destination_identity": "Agents 2.0 ships the RPC destination identity unmarked; same as lk.rpc.caller_identity",
+}
+
 heuristic_exception(attr) if {
+	pii_heuristic_allowlist[attr.id]
 	is_string(lk(attr, "pii_heuristic_exception"))
 	lk(attr, "pii_heuristic_exception") != ""
 }

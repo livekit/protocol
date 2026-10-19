@@ -2,7 +2,7 @@
 //! LiveKit telemetry semantic conventions.
 
 /// Telemetry schema version; set as `schema_url` on every OTLP scope.
-pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.4.0";
+pub const SCHEMA_URL: &str = "https://livekit.io/schemas/telemetry/0.5.0";
 
 /// Browser name.
 pub const BROWSER_NAME: &str = "browser.name";
@@ -524,6 +524,9 @@ pub const LK_PII_INPUT_TEXT: &str = "lk.pii.input_text";
 
 /// Agent instructions in force. PII: redacted by the collector.
 pub const LK_PII_INSTRUCTIONS: &str = "lk.pii.instructions";
+
+/// An interim (non-final) transcript, on a log record. PII: redacted by the collector.
+pub const LK_PII_INTERIM_TRANSCRIPT: &str = "lk.pii.interim_transcript";
 
 /// The keyterms themselves (customer vocabulary). PII: redacted by the collector.
 pub const LK_PII_KEYTERMS: &str = "lk.pii.keyterms";
@@ -1378,30 +1381,74 @@ pub mod span {
 /// Checkpoint names: span events of the spans above. `lk.reconnect` names its attempts
 /// `attempt <n> <mode>` instead.
 pub mod checkpoint {
+    /// The agent state changed (`lk.old_state` -> `lk.new_state`).
+    pub const AGENT_STATE_CHANGED: &str = "agent_state_changed";
     /// The subscriber's SDP answer went out.
     pub const ANSWER_SENT: &str = "answer_sent";
     /// A peer connection was created before the join response (JS port only).
     pub const EARLY_PC_CREATED: &str = "early_pc_created";
     /// The RTC engine is ready (Swift stamps it with pc_connected).
     pub const ENGINE: &str = "engine";
+    /// The entrypoint was cancelled.
+    pub const ENTRYPOINT_CANCELLED: &str = "entrypoint_cancelled";
+    /// The entrypoint returned.
+    pub const ENTRYPOINT_RETURNED: &str = "entrypoint_returned";
+    /// The entrypoint started running.
+    pub const ENTRYPOINT_STARTED: &str = "entrypoint_started";
+    /// A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name.
+    pub const EVENT_LOOP_BLOCKED: &str = "event_loop_blocked";
+    /// The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once.
+    pub const EXCEPTION: &str = "exception";
+    /// The first frame arrived.
+    pub const FIRST_FRAME: &str = "first_frame";
     /// The first inbound stats reading with bytes; the span ends ok here.
     pub const FIRST_MEDIA: &str = "first_media";
     /// OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced
     pub const GEN_AI_CLIENT_INFERENCE_OPERATION_DETAILS: &str = "gen_ai.client.inference.operation.details";
+    /// One generation started (the generation attributes).
+    pub const GENERATION: &str = "generation";
+    /// The worker accepted the job.
+    pub const JOB_ACCEPTED: &str = "job_accepted";
+    /// The server assigned the job.
+    pub const JOB_ASSIGNED: &str = "job_assigned";
+    /// The worker received the job request.
+    pub const JOB_RECEIVED: &str = "job_received";
+    /// The server-side job start time, as the worker learned it.
+    pub const JOB_STARTED_ON_SERVER: &str = "job_started_on_server";
     /// The join response arrived.
     pub const JOIN_RECV: &str = "join_recv";
     /// The publisher's SDP offer went out.
     pub const OFFER_SENT: &str = "offer_sent";
+    /// The session linked to its participant.
+    pub const PARTICIPANT_LINKED: &str = "participant_linked";
     /// The primary peer connection connected.
     pub const PC_CONNECTED: &str = "pc_connected";
     /// The peer connections exist (stamped once the join is adopted).
     pub const PC_CREATED: &str = "pc_created";
+    /// Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`.
+    pub const PRE_CONNECT_AUDIO: &str = "pre_connect_audio";
+    /// A preemptive generation was discarded in favour of this one (`lk.speech_id` of the discarded handle).
+    pub const PREEMPTIVE_GENERATION_DISCARDED: &str = "preemptive_generation_discarded";
+    /// A job process was launched for it.
+    pub const PROCESS_ASSIGNED: &str = "process_assigned";
+    /// A later trigger re-armed the wait.
+    pub const REARMED: &str = "rearmed";
     /// The Room reached the connected state.
     pub const ROOM_CONNECTED: &str = "room_connected";
     /// Signaling is up (stamped with ws_open on the web and with join_recv on Swift).
     pub const SIGNAL: &str = "signal";
+    /// The hook stopped the response.
+    pub const STOP_RESPONSE: &str = "stop_response";
     /// The platform reported the remote track subscribed.
     pub const SUBSCRIBED: &str = "subscribed";
+    /// A newer detection superseded this one.
+    pub const SUPERSEDED: &str = "superseded";
+    /// The track was subscribed.
+    pub const TRACK_SUBSCRIBED: &str = "track_subscribed";
+    /// The user spoke again during the wait.
+    pub const USER_RESUMED: &str = "user_resumed";
+    /// The user state changed (`lk.old_state` -> `lk.new_state`).
+    pub const USER_STATE_CHANGED: &str = "user_state_changed";
     /// The signaling WebSocket opened.
     pub const WS_OPEN: &str = "ws_open";
 }
@@ -1410,46 +1457,90 @@ pub mod checkpoint {
 pub mod metric {
     /// Time to the first chunk of a streaming GenAI response (deprecated upstream; declared as emitted). Instrument: histogram, unit: `s`.
     pub const GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK: &str = "gen_ai.client.operation.time_to_first_chunk";
+    /// Unit of [`GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK`], exactly as the producer creates the instrument (empty = none).
+    pub const GEN_AI_CLIENT_OPERATION_TIME_TO_FIRST_CHUNK_UNIT: &str = "s";
     /// Input and output tokens used by the GenAI operation (deprecated upstream; declared as emitted). Instrument: histogram, unit: `{token}`.
     pub const GEN_AI_CLIENT_TOKEN_USAGE: &str = "gen_ai.client.token.usage";
+    /// Unit of [`GEN_AI_CLIENT_TOKEN_USAGE`], exactly as the producer creates the instrument (empty = none).
+    pub const GEN_AI_CLIENT_TOKEN_USAGE_UNIT: &str = "{token}";
     /// Seconds to acquire a provider connection. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_CONNECTION_ACQUIRE_TIME: &str = "lk.agents.connection.acquire_time";
+    /// Unit of [`LK_AGENTS_CONNECTION_ACQUIRE_TIME`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_CONNECTION_ACQUIRE_TIME_UNIT: &str = "s";
     /// Duration of synchronous blocks detected on an agent event loop. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_EVENT_LOOP_BLOCKED_DURATION: &str = "lk.agents.event_loop.blocked_duration";
+    /// Unit of [`LK_AGENTS_EVENT_LOOP_BLOCKED_DURATION`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_EVENT_LOOP_BLOCKED_DURATION_UNIT: &str = "s";
     /// End-to-end latency of a turn. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_TURN_E2E_LATENCY: &str = "lk.agents.turn.e2e_latency";
+    /// Unit of [`LK_AGENTS_TURN_E2E_LATENCY`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_TURN_E2E_LATENCY_UNIT: &str = "s";
     /// Delay from the end of speech to the turn decision. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_TURN_END_OF_TURN_DELAY: &str = "lk.agents.turn.end_of_turn_delay";
+    /// Unit of [`LK_AGENTS_TURN_END_OF_TURN_DELAY`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_TURN_END_OF_TURN_DELAY_UNIT: &str = "s";
     /// Time to the first LLM token. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_TURN_LLM_TTFT: &str = "lk.agents.turn.llm_ttft";
+    /// Unit of [`LK_AGENTS_TURN_LLM_TTFT`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_TURN_LLM_TTFT_UNIT: &str = "s";
     /// Duration of the `on_user_turn_completed` hook. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_TURN_ON_USER_TURN_COMPLETED_DELAY: &str = "lk.agents.turn.on_user_turn_completed_delay";
+    /// Unit of [`LK_AGENTS_TURN_ON_USER_TURN_COMPLETED_DELAY`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_TURN_ON_USER_TURN_COMPLETED_DELAY_UNIT: &str = "s";
     /// Delay from the end of speech to the final transcript. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_TURN_TRANSCRIPTION_DELAY: &str = "lk.agents.turn.transcription_delay";
+    /// Unit of [`LK_AGENTS_TURN_TRANSCRIPTION_DELAY`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_TURN_TRANSCRIPTION_DELAY_UNIT: &str = "s";
     /// Time to the first TTS byte. Instrument: histogram, unit: `s`.
     pub const LK_AGENTS_TURN_TTS_TTFB: &str = "lk.agents.turn.tts_ttfb";
-    /// Interruption-detector requests. Instrument: counter, unit: `{request}`.
+    /// Unit of [`LK_AGENTS_TURN_TTS_TTFB`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_TURN_TTS_TTFB_UNIT: &str = "s";
+    /// Interruption-detector requests. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_INTERRUPTION_NUM_REQUESTS: &str = "lk.agents.usage.interruption_num_requests";
-    /// Realtime-model audio input tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_INTERRUPTION_NUM_REQUESTS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_INTERRUPTION_NUM_REQUESTS_UNIT: &str = "";
+    /// Realtime-model audio input tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_INPUT_AUDIO_TOKENS: &str = "lk.agents.usage.llm_input_audio_tokens";
-    /// LLM cached input tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_LLM_INPUT_AUDIO_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_INPUT_AUDIO_TOKENS_UNIT: &str = "";
+    /// LLM cached input tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_INPUT_CACHED_TOKENS: &str = "lk.agents.usage.llm_input_cached_tokens";
-    /// Realtime-model text input tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_LLM_INPUT_CACHED_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_INPUT_CACHED_TOKENS_UNIT: &str = "";
+    /// Realtime-model text input tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_INPUT_TEXT_TOKENS: &str = "lk.agents.usage.llm_input_text_tokens";
-    /// LLM input tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_LLM_INPUT_TEXT_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_INPUT_TEXT_TOKENS_UNIT: &str = "";
+    /// LLM input tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_INPUT_TOKENS: &str = "lk.agents.usage.llm_input_tokens";
-    /// Realtime-model audio output tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_LLM_INPUT_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_INPUT_TOKENS_UNIT: &str = "";
+    /// Realtime-model audio output tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_OUTPUT_AUDIO_TOKENS: &str = "lk.agents.usage.llm_output_audio_tokens";
-    /// Realtime-model text output tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_LLM_OUTPUT_AUDIO_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_OUTPUT_AUDIO_TOKENS_UNIT: &str = "";
+    /// Realtime-model text output tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_OUTPUT_TEXT_TOKENS: &str = "lk.agents.usage.llm_output_text_tokens";
-    /// LLM output tokens. Instrument: counter, unit: `{token}`.
+    /// Unit of [`LK_AGENTS_USAGE_LLM_OUTPUT_TEXT_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_OUTPUT_TEXT_TOKENS_UNIT: &str = "";
+    /// LLM output tokens. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_LLM_OUTPUT_TOKENS: &str = "lk.agents.usage.llm_output_tokens";
+    /// Unit of [`LK_AGENTS_USAGE_LLM_OUTPUT_TOKENS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_OUTPUT_TOKENS_UNIT: &str = "";
     /// Realtime-model session seconds. Instrument: counter, unit: `s`.
     pub const LK_AGENTS_USAGE_LLM_SESSION_DURATION: &str = "lk.agents.usage.llm_session_duration";
+    /// Unit of [`LK_AGENTS_USAGE_LLM_SESSION_DURATION`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_LLM_SESSION_DURATION_UNIT: &str = "s";
     /// Seconds of audio transcribed. Instrument: counter, unit: `s`.
     pub const LK_AGENTS_USAGE_STT_AUDIO_DURATION: &str = "lk.agents.usage.stt_audio_duration";
+    /// Unit of [`LK_AGENTS_USAGE_STT_AUDIO_DURATION`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_STT_AUDIO_DURATION_UNIT: &str = "s";
     /// Seconds of audio synthesized. Instrument: counter, unit: `s`.
     pub const LK_AGENTS_USAGE_TTS_AUDIO_DURATION: &str = "lk.agents.usage.tts_audio_duration";
-    /// Characters synthesized. Instrument: counter, unit: `{character}`.
+    /// Unit of [`LK_AGENTS_USAGE_TTS_AUDIO_DURATION`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_TTS_AUDIO_DURATION_UNIT: &str = "s";
+    /// Characters synthesized. Instrument: counter, unit: ``.
     pub const LK_AGENTS_USAGE_TTS_CHARACTERS: &str = "lk.agents.usage.tts_characters";
+    /// Unit of [`LK_AGENTS_USAGE_TTS_CHARACTERS`], exactly as the producer creates the instrument (empty = none).
+    pub const LK_AGENTS_USAGE_TTS_CHARACTERS_UNIT: &str = "";
 }

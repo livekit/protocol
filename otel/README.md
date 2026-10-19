@@ -75,7 +75,7 @@ nothing validates it.
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
    | `bindings` | map of producer/store → name | informational |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
-   | `pii_heuristic_exception` | a reason | a shipped key the PII heuristic would flag (`lk.rpc.caller_identity`); documents it, the collector still does not redact it |
+   | `pii_heuristic_exception` | a reason | documents a shipped key the PII heuristic would flag; it only takes effect for a key listed in `pii_heuristic_allowlist` in `policies/lib.rego` (today `lk.rpc.caller_identity`, `lk.rpc.destination_identity`), so a new key cannot opt out by annotating itself. The collector still does not redact them |
 
    Events and spans carry their own `annotations.livekit`, rendered in the docs; live-check
    enforces `severity`, `checkpoints` and `checkpoint_pattern`:
@@ -147,7 +147,7 @@ never here, so a producer names them from one place. TypeScript does not yet.
 | `livekit_owner`, `livekit_sensitivity` | yes | annotations present and valid |
 | `livekit_secret` | yes | `secret` is never emitted |
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment |
-| `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless `pii_heuristic_exception` gives a reason |
+| `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |

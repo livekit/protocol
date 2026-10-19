@@ -55,7 +55,9 @@ pub mod checkpoint {
 {% if ctx.metrics %}
 /// Metric names.
 pub mod metric {
-{% for m in ctx.metrics %}    /// {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit) }}`.
+{% for m in ctx.metrics %}    /// {{ line(m.brief) }} Instrument: {{ m.instrument }}, unit: `{{ line(m.unit or "") }}`.
     pub const {{ m.name | screaming_snake_case }}: &str = {{ lit(m.name) }};
+    /// Unit of [`{{ m.name | screaming_snake_case }}`], exactly as the producer creates the instrument (empty = none).
+    pub const {{ m.name | screaming_snake_case }}_UNIT: &str = {{ lit(m.unit or "") }};
 {% endfor %}}
 {% endif %}
