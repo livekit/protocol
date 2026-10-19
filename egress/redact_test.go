@@ -112,6 +112,11 @@ func TestRedactStreamOutput(t *testing.T) {
 			"srt://foo.bar.com:9999",
 			"srt://foo.bar.com:9999?streamid=124939da-5244&passphrase=WnxknzJTUbwYl9SpdqAudX",
 		},
+		Destinations: []*livekit.StreamDestination{
+			{Id: "a", Url: "rtmps://foo.bar.com/app/secret_stream_key"},
+			{Id: "b", Url: "srt://foo.bar.com:9999?streamid=124939da-5244&passphrase=WnxknzJTUbwYl9SpdqAudX"},
+			{Id: "c", Url: "srt://foo.bar.com:9999"},
+		},
 	}
 
 	RedactStreamKeys(so)
@@ -120,6 +125,13 @@ func TestRedactStreamOutput(t *testing.T) {
 	require.Equal(t, "twitch://{liv...nop}", so.Urls[2])
 	require.Equal(t, "srt://foo.bar.com:9999", so.Urls[3])
 	require.Equal(t, "srt://foo.bar.com:9999?streamid={...}&passphrase={...}", so.Urls[4])
+
+	require.Equal(t, "rtmps://foo.bar.com/app/{sec...key}", so.Destinations[0].Url)
+	require.Equal(t, "srt://foo.bar.com:9999?streamid={...}&passphrase={...}", so.Destinations[1].Url)
+	require.Equal(t, "srt://foo.bar.com:9999", so.Destinations[2].Url)
+	require.Equal(t, "a", so.Destinations[0].Id)
+	require.Equal(t, "b", so.Destinations[1].Id)
+	require.Equal(t, "c", so.Destinations[2].Id)
 }
 
 func TestRedactEncodedOutputs(t *testing.T) {

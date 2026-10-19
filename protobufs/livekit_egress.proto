@@ -210,8 +210,14 @@ enum EncodedFileType {
 }
 
 message StreamOutput {
-  StreamProtocol protocol = 1;  // required
-  repeated string urls = 2;     // required
+  StreamProtocol protocol = 1;                  // required
+  repeated string urls = 2;                     // urls or destinations required
+  repeated StreamDestination destinations = 3;  // urls or destinations required
+}
+
+message StreamDestination {
+  string id = 1;   // required
+  string url = 2;  // required
 }
 
 enum StreamProtocol {
@@ -431,6 +437,7 @@ message StreamInfo {
   string error = 6;
   int64 last_retry_at = 7;
   uint32 retries = 8;
+  string id = 9;  // StreamDestination.id this stream was started from; empty for plain urls
 }
 
 message FileInfo {
@@ -635,6 +642,7 @@ message UpdateStreamRequest {
   string egress_id = 1 [(logger.name) = "egressID"];
   repeated string add_output_urls = 2;
   repeated string remove_output_urls = 3;
+  repeated StreamDestination add_destinations = 4;
 }
 
 message StreamInfoList {
