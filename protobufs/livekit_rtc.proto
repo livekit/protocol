@@ -531,6 +531,12 @@ message DataChannelInfo {
   SignalTarget target = 3;
 }
 
+enum NegotiatedDataChannelID {
+  NDCI_RELIABLE = 100;
+  NDCI_LOSSY = 101;
+  NDCI_DATA_TRACK = 102;
+}
+
 enum CandidateProtocol {
   UDP = 0;
   TCP = 1;
