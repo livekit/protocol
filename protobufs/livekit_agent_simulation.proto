@@ -423,7 +423,7 @@ message Scenario {
   string label = 1;
   string instructions = 2;
   string agent_expectations = 3;
-  // Set as participant attributes on the simulation participant's access token.
+  // Surfaced to the agent under test as SimulationContext scenario tags.
   map<string, string> tags = 4;
   // Arbitrary JSON-encoded object, surfaced to the agent under test as
   // SimulationContext userdata (e.g. inputs and benchmark target state).
@@ -451,8 +451,9 @@ enum SimulationMode {
   SIMULATION_MODE_AUDIO = 2;
 }
 
-// Carried (protojson-encoded) in the simulation room's metadata so the agent
-// under test can read the scenario + run identity synchronously at connect.
+// Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
+// on the agent dispatch, so the agent under test can read the scenario + run
+// identity synchronously at job start.
 message SimulationDispatch {
   string simulation_run_id = 1;
   string job_id = 2;
