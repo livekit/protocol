@@ -410,7 +410,7 @@ message SimulationRun {
   repeated ScenarioOutcome scenario_outcomes = 24;
 
   message ScenarioOutcome {
-    // Empty for a job without a scenario id, which gets an entry of its own.
+    // Jobs without a scenario id have no outcome.
     string scenario_id = 1;
     string label = 2;
     // Every sample of the scenario in this run, finished or not.
