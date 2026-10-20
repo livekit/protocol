@@ -31,8 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0 # the schema-version rule diffs against the base branch
 
       - name: Set up weaver
         uses: open-telemetry/weaver/.github/actions/setup-weaver@51a5bf95bdbb2e20fb6e16638e6bbe7dde911e93 # v0.28.0
@@ -61,13 +59,3 @@ jobs:
 
       - name: Live-check the smoke sample
         run: otel/tests/live-check.sh
-
-      - name: Schema-version rule rejects comment-only changes and downgrades
-        run: otel/tests/schema-bump-test.sh
-
-      # The same script as locally: a changed otel/model needs a strictly higher schema_url version.
-      - name: Schema version bumped when the model changed
-        if: github.event_name == 'pull_request'
-        env:
-          BASE_REF: ${{ github.base_ref }}
-        run: otel/tests/schema-bump.sh "origin/$BASE_REF"

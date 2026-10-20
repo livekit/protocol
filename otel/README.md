@@ -19,7 +19,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 
 | Path | What |
 |---|---|
-| `model/manifest.yaml` | Registry version (`schema_url`) and the pinned OTel dependency |
+| `model/manifest.yaml` | The pinned OTel dependencies, and a placeholder `schema_url` (see [Versioning](#versioning)) |
 | `model/shared/registry.yaml` | Shared keys: identity (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
@@ -32,7 +32,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 | `templates/registry/{rust,typescript,python,markdown}/` | Codegen templates |
 | `gen/` | Generated outputs, committed: `rust/semconv.rs`, `ts/semconv.ts`, `python/semconv.py`, `docs/semconv.md` |
 | `live-check/` | Live-check config, advice rules and the OTLP/JSON converter |
-| `tests/` | Policy negatives, live-check samples, codegen escaping, schema-version rule |
+| `tests/` | Policy negatives, live-check samples, codegen escaping |
 
 The generated docs, [`gen/docs/semconv.md`](gen/docs/semconv.md), are the human-readable spec:
 naming rules, the Resource, the attributes on every record, each event and span with its
@@ -117,21 +117,14 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    on, and keeps everything else.
 4. Reference it from the events or spans that carry it, with a `requirement_level`.
 5. Run `otel/check.sh`, then `otel/generate.sh`, and commit `gen/` with the change.
-6. Bump the schema version (below).
 
-## Bumping the schema version
+## Versioning
 
-`schema_url` in `model/manifest.yaml` is the telemetry schema version. Producers set it as the
-OTLP scope `schema_url` (generated as `SCHEMA_URL`), which the collector already stores as a
-column. It is versioned independently of the protocol package.
-
-Every PR that changes `model/` bumps it: CI fails unless the version at the end of `schema_url`
-(MAJOR.MINOR.PATCH) is strictly higher than the base branch's (`tests/schema-bump.sh`; a comment
-or quotes on an unchanged URL, or a downgrade, do not count). While the
-registry is `0.x`, bump the minor version for added, renamed or removed keys, events or spans and
-for changed types or requirement levels, and the patch version for documentation-only changes. To rename a key that has shipped, keep the old
-key with `deprecated: {reason: renamed, renamed_to: <new key>}` instead of deleting it;
-`weaver registry diff` and live-check both report the rename.
+The registry is unversioned until a producer needs to emit `schema_url`. No producer sets it
+today, so `model/manifest.yaml` carries the fixed placeholder
+`https://livekit.io/schemas/telemetry/0.0.0` that Weaver requires. When a producer needs it, the
+plan is to stamp the protocol release version into the manifest in the release step, as OTel
+semantic-conventions does.
 
 ## Running the checks locally
 
@@ -151,8 +144,6 @@ otel/tests/negatives.sh                # each negative fixture fails with its na
 otel/generate.sh && git status otel/gen   # regenerate; no diff expected
 otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged
 otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc, tsc and python3
-otel/tests/schema-bump.sh origin/main  # schema_url version strictly higher if model/ changed
-otel/tests/schema-bump-test.sh         # that rule, against comment-only changes and downgrades
 
 rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir /tmp
 npx -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts

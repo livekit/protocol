@@ -29,9 +29,6 @@ pub mod {{ a.key | snake_case }} {
 //!
 //! In a `log` key-value list, write a constant in parentheses, `(LK_PII_ERROR) = value`: `log`
 //! stringifies a bare identifier, so `LK_PII_ERROR = value` sends the key `LK_PII_ERROR`.
-
-/// Telemetry schema version; set as `schema_url` on every OTLP scope.
-pub const SCHEMA_URL: &str = {{ lit(ctx.schema_url) }};
 {% for a in ctx.attributes %}
 {{ attr(a) }}{% endfor %}
 /// Upstream OTel keys that LiveKit signals reference (defined by the registry's dependencies,
