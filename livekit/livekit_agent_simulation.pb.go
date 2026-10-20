@@ -1603,7 +1603,7 @@ func (*SimulationRun_Cancel) Descriptor() ([]byte, []int) {
 
 type SimulationRun_ScenarioOutcome struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Empty for a job without a scenario id, which gets an entry of its own.
+	// Jobs without a scenario id have no outcome.
 	ScenarioId string `protobuf:"bytes,1,opt,name=scenario_id,json=scenarioId,proto3" json:"scenario_id,omitempty"`
 	Label      string `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
 	// Every sample of the scenario in this run, finished or not.
