@@ -116,7 +116,8 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    values go under `lk.pii.*`: the collector deletes keys with a `pii` segment when redaction is
    on, and keeps everything else.
 4. Reference it from the events or spans that carry it, with a `requirement_level`.
-5. Run `otel/check.sh`, then `otel/generate.sh`, and commit `gen/` with the change.
+5. Run `otel/check.sh`, then `go tool mage otel` (it runs `otel/generate.sh`), and commit `gen/`
+   with the change.
 
 ## Versioning
 
@@ -132,6 +133,14 @@ semantic-conventions does.
 CI (`.github/workflows/otel.yaml`) runs the same scripts on pull requests and pushes to `main`
 that touch `otel/**` or the workflow file itself, and on manual dispatch.
 
+`go tool mage otel` regenerates `otel/gen`, next to `go tool mage proto` for the protobufs. Only a
+change under `otel/` needs Weaver: `mage proto` and the JS generation do not. As for the
+protobufs, the Generate workflow (`.github/workflows/generate.yaml`) regenerates `otel/gen` on
+every push to a branch other than `main` and commits any change. That commit is pushed with the
+workflow token, so it does not run the checks by itself (GitHub can ask a maintainer to approve
+that run), the same as for the regenerated protobuf code. After a regeneration commit, push
+again to run the checks.
+
 Install weaver 0.28.0, the version CI pins, from its
 [release](https://github.com/open-telemetry/weaver/releases/tag/v0.28.0) (`weaver-installer.sh`),
 or put the binary anywhere and point `WEAVER` at it. Every run clones OTel semconv v1.44.0 and
@@ -142,7 +151,7 @@ for each LiveKit file in the not-yet-stable `definition/2` format (`client/group
 ```sh
 otel/check.sh                          # registry + LiveKit policies, default and --v2, then advice
 otel/tests/negatives.sh                # each negative fixture fails with its named finding, both modes
-otel/generate.sh && git status otel/gen   # regenerate; no diff expected
+go tool mage otel && git status otel/gen  # regenerate (runs otel/generate.sh); no diff expected
 otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged
 otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc, tsc and python3
 
