@@ -30,6 +30,7 @@ var (
 	pionIgnoredPrefixes = map[string]*prefixSet{
 		"ice": {
 			"pingAllCandidates called with no candidate pairs",
+			"Failed to ping without candidate pairs",
 			"failed to send packet: io: read/write on closed pipe",
 			"Ignoring remote candidate with tcpType active",
 			"discard message from",
