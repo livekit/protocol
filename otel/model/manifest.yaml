@@ -1,7 +1,7 @@
 file_format: definition_manifest/2.0
-# A placeholder: Weaver requires a schema_url with a version segment. Producers do not emit it,
-# and it does not change when the model changes (see otel/README.md, Versioning).
-schema_url: https://livekit.io/schemas/telemetry/0.0.0
+# Points at this registry. Weaver requires a schema_url and reads its last path segment (`otel`)
+# as the version. Producers do not emit it, and it resolves once this directory is on main.
+schema_url: https://github.com/livekit/protocol/tree/main/otel
 stability: development
 description: LiveKit telemetry semantic conventions (shared identity, PII, SDK identity, client-owned and agents-owned signals).
 dependencies:

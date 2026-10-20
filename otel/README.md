@@ -19,7 +19,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 
 | Path | What |
 |---|---|
-| `model/manifest.yaml` | The pinned OTel dependencies, and a placeholder `schema_url` (see [Versioning](#versioning)) |
+| `model/manifest.yaml` | The pinned OTel dependencies, and a `schema_url` that points at this registry (see [Versioning](#versioning)) |
 | `model/shared/registry.yaml` | Shared keys: identity (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
@@ -120,10 +120,11 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
 
 ## Versioning
 
-The registry is unversioned until a producer needs to emit `schema_url`. No producer sets it
-today, so `model/manifest.yaml` carries the fixed placeholder
-`https://livekit.io/schemas/telemetry/0.0.0` that Weaver requires. When a producer needs it, the
-plan is to stamp the protocol release version into the manifest in the release step, as OTel
+The registry is unversioned until a producer needs to emit `schema_url`. Weaver requires one, so
+`model/manifest.yaml` sets `https://github.com/livekit/protocol/tree/main/otel`, which points at
+this registry. Weaver reads its last path segment, `otel`, as the version. No producer emits it,
+and the link resolves once this directory is on main. When a producer needs a version, the plan
+is to stamp the protocol release version into the manifest in the release step, as OTel
 semantic-conventions does.
 
 ## Running the checks locally
