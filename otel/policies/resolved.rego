@@ -111,3 +111,38 @@ deny contains data.livekit.lib.finding("livekit_ref_override", msg) if {
 	signal := object.get(s, "id", object.get(s, "name", object.get(s, "type", "?")))
 	msg := override_msg(a.key, signal, object.get(s, ["provenance", "path"], signal))
 }
+
+# Shipped values, either representation: default mode keeps every group's resolved attributes,
+# definitions included; --v2 keeps a ref's copy in the signal or attribute group that holds it,
+# and the definitions in `registry.attributes`.
+shipped contains {"key": a.name, "attr": a} if {
+	some g in object.get(input, "groups", [])
+	some a in g.attributes
+	data.livekit.lib.lk(a, "shipped_values") != null
+}
+
+shipped contains {"key": a.key, "attr": a} if {
+	some s in v2_signals
+	some a in object.get(s, "attributes", [])
+	data.livekit.lib.lk(a, "shipped_values") != null
+}
+
+shipped contains {"key": a.key, "attr": a} if {
+	some a in object.get(input, ["registry", "attributes"], [])
+	data.livekit.lib.lk(a, "shipped_values") != null
+}
+
+deny contains data.livekit.lib.finding("livekit_shipped_value", msg) if {
+	some s in shipped
+	some msg in data.livekit.lib.shipped_value_problems(s.key, s.attr)
+}
+
+# One shipped_values list per key across the whole registry: codegen merges every ref's list into
+# one module, so two lists could generate one constant twice. Copies of the same list (a key's
+# definition in each signal, a group used twice) count once.
+deny contains data.livekit.lib.finding("livekit_shipped_value", msg) if {
+	some key in {s.key | some s in shipped}
+	lists := {data.livekit.lib.lk(s.attr, "shipped_values") | some s in shipped; s.key == key}
+	count(lists) > 1
+	msg := sprintf("%s: %d refs carry different shipped_values lists; keep one list for the key", [key, count(lists)])
+}

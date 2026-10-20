@@ -66,6 +66,25 @@ values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_IN
 other spelling is never registered, deprecated or not. The shared key records it in
 `renamed_from`, listed under [Old spellings](#old-spellings).
 
+**Upstream metrics.** Agents creates three GenAI metrics that the GenAI registry defines. The
+registry imports `gen_ai.invoke_agent.duration` and `gen_ai.execute_tool.duration`, and the
+generated code lists them in its upstream section. Weaver cannot import
+`gen_ai.client.operation.duration`, because semconv 1.44.0 keeps an excluded, deprecated copy, so
+the registry declares it as emitted.
+
+**Values beyond upstream.** A ref to an upstream key can list `shipped_values`: values a LiveKit
+producer sends that the upstream definition does not list. The generated code gives each one a
+constant next to the upstream values, and a policy rejects a value that upstream already lists.
+
+| Key | Value | Meaning |
+| --- | --- | --- |
+{% for g in ctx.groups %}{% for a in g.attributes %}{% if a.annotations and a.annotations.livekit and a.annotations.livekit.shipped_values %}{% for v in a.annotations.livekit.shipped_values %}| `{{ a.key }}` | `{{ cell(v.value) }}` | {{ cell(v.brief) }} |
+{% endfor %}{% endif %}{% endfor %}{% endfor %}
+**Session report.** Agents' session report sends plain log records whose keys predate this
+registry, registered as emitted: three in the upstream `session.*` namespace, and seven without a
+namespace. A map-valued key carries an OTLP map, and its fields are payload, not attribute keys.
+`chat.item` carries conversation content: with redaction on, the collector drops the whole record.
+
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
 keeps everything else. Log bodies and metrics are never redacted, so PII must not go there.

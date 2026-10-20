@@ -949,5 +949,10 @@ groups:
     note: Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
     annotations:
       livekit: {severity: [], body: "Not a log record: a span event whose `content` attribute carries the message."}
+  # gen_ai.client.operation.duration is current in the GenAI registry, but weaver 0.28.0 refuses to
+  # import it: semconv v1.44.0 keeps a deprecated copy marked `dependency_resolution: exclude`, and
+  # an import that matches an excluded metric is an error. Declared here as emitted, with the GenAI
+  # registry's instrument and unit, until weaver can import it (groups.yaml imports the other two).
+  - {id: metric.gen_ai.client.operation.duration, type: metric, metric_name: gen_ai.client.operation.duration, instrument: histogram, unit: s, stability: development, brief: "GenAI operation duration, as the GenAI registry defines it (declared here because weaver cannot import it).", attributes: [{ref: gen_ai.operation.name, requirement_level: required}, {ref: gen_ai.provider.name, requirement_level: recommended}, {ref: gen_ai.request.model, requirement_level: recommended}]}
   - {id: metric.gen_ai.client.token.usage, type: metric, metric_name: gen_ai.client.token.usage, instrument: histogram, unit: "{token}", stability: development, brief: "Input and output tokens used by the GenAI operation (deprecated upstream; declared as emitted).", attributes: [{ref: gen_ai.token.type, requirement_level: required}, {ref: gen_ai.operation.name, requirement_level: required}, {ref: gen_ai.provider.name, requirement_level: recommended}, {ref: gen_ai.request.model, requirement_level: recommended}]}
   - {id: metric.gen_ai.client.operation.time_to_first_chunk, type: metric, metric_name: gen_ai.client.operation.time_to_first_chunk, instrument: histogram, unit: s, stability: development, brief: "Time to the first chunk of a streaming GenAI response (deprecated upstream; declared as emitted).", attributes: [{ref: gen_ai.operation.name, requirement_level: required}, {ref: gen_ai.provider.name, requirement_level: recommended}, {ref: gen_ai.request.model, requirement_level: recommended}]}

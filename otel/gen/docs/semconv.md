@@ -2,7 +2,7 @@
 # LiveKit telemetry semantic conventions
 
 The attribute keys, events and spans LiveKit producers send over OTLP, and what they mean.
-Schema `https://livekit.io/schemas/telemetry/0.6.1`, stability `development`. Built on
+Schema `https://livekit.io/schemas/telemetry/0.7.0`, stability `development`. Built on
 [OpenTelemetry semantic conventions v1.44.0](https://github.com/open-telemetry/semantic-conventions/tree/v1.44.0):
 OTel keys are used as OTel defines them and are not redefined here.
 
@@ -40,10 +40,35 @@ values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_IN
 other spelling is never registered, deprecated or not. The shared key records it in
 `renamed_from`, listed under [Old spellings](#old-spellings).
 
+**Upstream metrics.** Agents creates three GenAI metrics that the GenAI registry defines. The
+registry imports `gen_ai.invoke_agent.duration` and `gen_ai.execute_tool.duration`, and the
+generated code lists them in its upstream section. Weaver cannot import
+`gen_ai.client.operation.duration`, because semconv 1.44.0 keeps an excluded, deprecated copy, so
+the registry declares it as emitted.
+
+**Values beyond upstream.** A ref to an upstream key can list `shipped_values`: values a LiveKit
+producer sends that the upstream definition does not list. The generated code gives each one a
+constant next to the upstream values, and a policy rejects a value that upstream already lists.
+
+| Key | Value | Meaning |
+| --- | --- | --- |
+| `gen_ai.provider.name` | `mistral_ai` | Mistral, as Agents sends it. The upstream member is `mistral`. |
+| `gen_ai.response.finish_reasons` | `stop` | The generation finished normally. |
+| `gen_ai.response.finish_reasons` | `length` | The output reached the token limit. |
+| `gen_ai.response.finish_reasons` | `content_filter` | A content filter stopped the output. |
+| `gen_ai.response.finish_reasons` | `tool_call` | The generation ended with a tool call. |
+| `gen_ai.response.finish_reasons` | `compaction` | Declared in Agents' `GenAIFinishReason`. No Agents code path sends it today. |
+| `gen_ai.response.finish_reasons` | `error` | The generation ended abnormally. The upstream note names this value. |
+
+**Session report.** Agents' session report sends plain log records whose keys predate this
+registry, registered as emitted: three in the upstream `session.*` namespace, and seven without a
+namespace. A map-valued key carries an OTLP map, and its fields are payload, not attribute keys.
+`chat.item` carries conversation content: with redaction on, the collector drops the whole record.
+
 **PII.** Customer-supplied values go under `lk.pii.*`. The `pii` key segment is the collector's
 redaction contract: with redaction on, it deletes every attribute whose key has a `pii` segment and
 keeps everything else. Log bodies and metrics are never redacted, so PII must not go there.
-PII keys: `lk.pii.amd.transcript`, `lk.pii.arguments`, `lk.pii.chat_ctx`, `lk.pii.dtmf_inputs`, `lk.pii.error`, `lk.pii.event`, `lk.pii.function_tool.arguments`, `lk.pii.function_tool.output`, `lk.pii.input_text`, `lk.pii.instructions`, `lk.pii.interim_transcript`, `lk.pii.keyterms`, `lk.pii.output`, `lk.pii.participant_identity`, `lk.pii.progress_message`, `lk.pii.raw_arguments`, `lk.pii.remote_participant_identity`, `lk.pii.repaired`, `lk.pii.response.function_calls`, `lk.pii.response.text`, `lk.pii.room_name`, `lk.pii.rpc.payload`, `lk.pii.rpc.response`, `lk.pii.sip.phoneNumber`, `lk.pii.text`, `lk.pii.transcript`, `lk.pii.user_input`, `lk.pii.user_transcript`.
+PII keys: `chat.item`, `lk.pii.amd.transcript`, `lk.pii.arguments`, `lk.pii.chat_ctx`, `lk.pii.dtmf_inputs`, `lk.pii.error`, `lk.pii.event`, `lk.pii.function_tool.arguments`, `lk.pii.function_tool.output`, `lk.pii.input_text`, `lk.pii.instructions`, `lk.pii.interim_transcript`, `lk.pii.keyterms`, `lk.pii.output`, `lk.pii.participant_identity`, `lk.pii.progress_message`, `lk.pii.raw_arguments`, `lk.pii.remote_participant_identity`, `lk.pii.repaired`, `lk.pii.response.function_calls`, `lk.pii.response.text`, `lk.pii.room_name`, `lk.pii.rpc.payload`, `lk.pii.rpc.response`, `lk.pii.sip.phoneNumber`, `lk.pii.text`, `lk.pii.transcript`, `lk.pii.user_input`, `lk.pii.user_transcript`.
 
 **Units.** Durations are seconds (OTel), on a monotonic clock; timestamps are the record's own
 OTLP time. One documented exception: the RTC stats keys ending in `_ms` carry milliseconds. The
@@ -1293,9 +1318,12 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 
 | Key | Type | Owner | Sensitivity | Description | Examples | Used on |
 | --- | --- | --- | --- | --- | --- | --- |
+| `agent_name` | string | agents | none | The agent's name. | `support-agent` | |
 | `browser.name` | string | client | none | Browser name. Resource attribute, JS port only. | `Chrome`, `Safari`, `Firefox` | resource |
 | `browser.version` | string | client | none | Browser version. Resource attribute, JS port only. | `124.0` | resource |
+| `chat.item` | any | agents | pii | One chat history item, as a map. Carries conversation content. With redaction on, the collector drops the whole `chat.item` record. | `{"type": "message", "role": "user"}` | |
 | `connection_reused` | string | agents | none | Whether a pooled connection was reused, as the string `true`/`false`. | `true` | |
+| `evaluation` | any | agents | none | One evaluation result, as a map of string fields. | `{"name": "task_completion", "verdict": "pass"}` | |
 | `gen_ai.token.type` | string | agents | none | Token type (`input` or `output`); deprecated upstream, a dimension of `gen_ai.client.token.usage`. | `input`, `output` | |
 | `gen_ai.usage.input_audio_tokens` | int | agents | none | LangFuse spelling of audio input tokens. | `800` | |
 | `gen_ai.usage.input_cached_tokens` | int | agents | none | LangFuse spelling of cached input tokens. | `64` | |
@@ -1538,6 +1566,13 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.tts_metrics` | string | agents | none | TTS metrics of the turn, serialized. | `{}` | `agent_turn` |
 | `model_name` | string | agents | none | Model name the plugin reported. | `gpt-4o-mini` | |
 | `model_provider` | string | agents | none | Provider the plugin reported. | `openai` | |
+| `outcome` | any | agents | none | The session outcome, as a map with the field `outcome` (`success` or `fail`) and an optional `reason`. `reason` is a field of this map, not an attribute key. | `{"outcome": "fail", "reason": "user hung up"}` | |
+| `sdk_version` | string | agents | none | The Agents SDK version. | `2.0.0` | |
+| `session.options` | any | agents | none | The session's options, as a map of option name to value. In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it. | `{"allow_interruptions": true}` | |
+| `session.report_timestamp` | double | agents | none | When the report was made, in Unix seconds. In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it. | `1760870400.5` | |
+| `session.tags` | string[] | agents | none | The session's tags, sorted. Absent when the session has none. In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it. | `["support", "escalated"]` | |
+| `tag` | any | agents | none | One tag with metadata, as a map with the fields `name` and `metadata`. | `{"name": "escalated", "metadata": {}}` | |
+| `usage` | any | agents | none | Model usage, as a list of maps, one per model. Absent when there was none. | `[{"model": "gpt-4o", "input_tokens": 120}]` | |
 
 ## Enum values
 

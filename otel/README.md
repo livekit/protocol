@@ -24,8 +24,9 @@ policy, storage and the app API are not conventions and live with each SDK.
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
 | `model/client/groups.yaml` | Attribute sets on every client resource / record (used by live-check) |
-| `model/agents/registry.yaml` | Agents-owned attributes (`lk.speech_id`, `lk.eou.*`, `lk.rpc.*`, `lk.blocking.*`, …), the `lk.agents.*` metric dimensions, and the `gen_ai.*`/LangFuse keys no upstream registry defines |
-| `model/agents/signals.yaml` | Agents spans (50, unprefixed as shipped), the 20 `lk.agents.*` metrics, and the GenAI span events and metrics deprecated upstream |
+| `model/agents/registry.yaml` | Agents-owned attributes (`lk.speech_id`, `lk.eou.*`, `lk.rpc.*`, `lk.blocking.*`, …), the `lk.agents.*` metric dimensions, the `gen_ai.*`/LangFuse keys no upstream registry defines, and the session-report keys |
+| `model/agents/signals.yaml` | Agents spans (50, unprefixed as shipped), the 20 `lk.agents.*` metrics, and the GenAI span events and metrics that are deprecated upstream or cannot be imported |
+| `model/agents/groups.yaml` | GenAI metrics imported from the GenAI registry, and the values Agents sends for upstream keys that the upstream definitions do not list |
 | `policies/` | LiveKit rules (`lib.rego`), applied per file (`livekit.rego`, default mode) and to the resolved registry (`resolved.rego`, default and `--v2`); any finding fails `check.sh` and `generate.sh` |
 | `advice/` | Non-failing advice, printed by `check.sh` |
 | `templates/registry/{rust,typescript,python,markdown}/` | Codegen templates |
@@ -69,6 +70,13 @@ fails on it.
 How a concept is named in other producers or stores (Agents' `room_id`, the collector's `room_id`
 column, roomobs) is recorded in `annotations.livekit.bindings`. Weaver carries it into the docs;
 nothing validates it.
+
+Agents' session report sends plain log records whose keys predate this registry. They are
+registered as emitted, owner `agents`: `session.options`, `session.report_timestamp` and
+`session.tags` sit in the upstream `session.*` namespace and carry
+`annotations.livekit.upstream_namespace: session`, and `agent_name`, `sdk_version`, `usage`,
+`chat.item`, `evaluation`, `tag` and `outcome` have no namespace. A map-valued key carries an OTLP
+map, and its fields (such as `reason` in `outcome`) are payload, not attribute keys.
 
 ## Adding a key
 
@@ -133,8 +141,9 @@ that touch `otel/**` or the workflow file itself, and on manual dispatch.
 Install weaver 0.28.0, the version CI pins, from its
 [release](https://github.com/open-telemetry/weaver/releases/tag/v0.28.0) (`weaver-installer.sh`),
 or put the binary anywhere and point `WEAVER` at it. Every run clones OTel semconv v1.44.0 and
-prints 34 warnings: 33 about upstream's own files, and one because `client/groups.yaml` uses the
-not-yet-stable `definition/2` format.
+the GenAI registry. It prints about 90 warnings: almost all about upstream's own files, and one
+for each LiveKit file in the not-yet-stable `definition/2` format (`client/groups.yaml`,
+`agents/groups.yaml`).
 
 ```sh
 otel/check.sh                          # registry + LiveKit policies, default and --v2, then advice
@@ -152,7 +161,28 @@ python3 -I -m py_compile otel/gen/python/semconv.py
 
 The generated Rust and Python also carry an `upstream` section: every OTel key a LiveKit signal
 references (`error.type`, `gen_ai.request.model`, `rpc.method`, …), defined by a dependency and
-never here, so a producer names them from one place. TypeScript does not yet.
+never here, so a producer names them from one place. TypeScript does not yet. Three mechanisms
+add to it:
+
+- Imported metrics. `model/agents/groups.yaml` imports `gen_ai.invoke_agent.duration` and
+  `gen_ai.execute_tool.duration` from the GenAI registry, and the upstream section lists them with
+  their units. Weaver 0.28.0 refuses to import `gen_ai.client.operation.duration`, because semconv
+  v1.44.0 keeps a deprecated copy excluded from dependency resolution. `model/agents/signals.yaml`
+  declares that metric as emitted instead.
+- Values beyond upstream. A ref to an upstream key can list `annotations.livekit.shipped_values`:
+  values a producer sends that the upstream definition does not list, for example
+  `gen_ai.provider.name = mistral_ai`. Each value gets a constant next to the upstream values
+  (`GEN_AI_PROVIDER_NAME_MISTRAL_AI`). Two rules keep those constants unique.
+  A shipped `id` must be lowercase snake_case (`^[a-z][a-z0-9_]*$`), so its uppercase form is
+  exactly the constant name, and it must differ from every upstream member id read the same way
+  (`aws.bedrock` as `aws_bedrock`).
+  At most one shipped_values list exists per upstream key in the whole registry, because codegen
+  merges every ref's list into one set of constants.
+  `livekit_shipped_value` enforces both in both modes. The CI compile of the generated Rust is
+  the backstop for any collision the policy misses: a repeated constant does not compile (E0428).
+- Rust `log` keys. In a `log` key-value list, wrap a generated constant in parentheses:
+  `log::warn!(target: "livekit.agents", (semconv::LK_PII_ERROR) = error; "...")`. A bare
+  identifier also compiles, but `log` sends the identifier's name (`LK_PII_ERROR`) as the key.
 
 | Finding | Fails | Rule |
 |---|---|---|
@@ -167,6 +197,7 @@ never here, so a producer names them from one place. TypeScript does not yet.
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
 | `livekit_ref_override` | yes | a `ref` to an `lk.*` key may not override its `annotations` (owner, sensitivity, unit) |
+| `livekit_shipped_value` | yes | a `shipped_values` list is on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
 | `livekit_client_namespace` | no (advice) | client-owned keys under `lk.client.*` |
 
 Weaver itself rejects duplicate keys, unknown fields and unresolved references. Every rule runs in

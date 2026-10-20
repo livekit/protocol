@@ -109,3 +109,67 @@ cardinality(name, where, keys, exception) := {finding("livekit_cardinality", spr
 }
 
 lk_all(obj) := object.get(obj, ["annotations", "livekit"], null)
+
+# `annotations.livekit.shipped_values` on a ref: values a producer sends for an upstream key that
+# the upstream definition does not list. Every problem with one ref's list, as messages.
+shipped_value_problems(key, attr) := ((((lk_key_shipped(key) | unshippable(key, attr)) | malformed_shipped(key, attr)) | upstream_shipped(key, attr)) | upstream_id_shipped(key, attr)) | repeated_id_shipped(key, attr)
+
+lk_key_shipped(key) := {sprintf("%s: shipped_values are for upstream keys; list a LiveKit key's values as enum members", [key]) |
+	startswith(key, "lk.")
+}
+
+# A string, string[] or string enum key: the only types a list of string values fits. An enum
+# with any non-string member (rpc.grpc.status_code is an int enum) does not.
+shippable_type(t) if t == "string"
+
+shippable_type(t) if t == "string[]"
+
+shippable_type(t) if {
+	is_object(t)
+	count(t.members) > 0
+	every m in t.members {
+		is_string(m.value)
+	}
+}
+
+unshippable(key, attr) := {sprintf("%s: shipped_values need a string, string[] or string enum key, not %v", [key, attr.type]) |
+	not shippable_type(attr.type)
+}
+
+# A lowercase snake_case id, so upper(id) is exactly the constant name the templates generate.
+shipped_entry_ok(v) if {
+	is_string(v.id)
+	regex.match(`^[a-z][a-z0-9_]*$`, v.id)
+	is_string(v.value)
+	v.value != ""
+	is_string(v.brief)
+}
+
+malformed_shipped(key, attr) := {sprintf("%s: every shipped value needs a lowercase snake_case id (^[a-z][a-z0-9_]*$), a non-empty value and a brief, not %v", [key, v]) |
+	some v in lk(attr, "shipped_values")
+	not shipped_entry_ok(v)
+}
+
+upstream_shipped(key, attr) := {sprintf("%s: shipped value %v is already an upstream value; use the upstream constant", [key, v.value]) |
+	some v in lk(attr, "shipped_values")
+	some m in object.get(attr, ["type", "members"], [])
+	v.value == m.value
+}
+
+# A shipped id equal to an upstream member id read as lowercase snake_case (`aws.bedrock` as
+# `aws_bedrock`): both would generate the same constant. Upstream ids that need more case
+# conversion than this are left to the CI compile of the generated code.
+upstream_id_shipped(key, attr) := {sprintf("%s: shipped value id %v generates the same constant as upstream member %v", [key, v.id, m.id]) |
+	some v in lk(attr, "shipped_values")
+	some m in object.get(attr, ["type", "members"], [])
+	v.id == regex.replace(lower(m.id), `[^a-z0-9]`, "_")
+}
+
+# Two shipped entries with the same id.
+repeated_id_shipped(key, attr) := {sprintf("%s: two shipped values have the id %v", [key, a.id]) |
+	values := lk(attr, "shipped_values")
+	some i, a in values
+	some j, b in values
+	i < j
+	a.id == b.id
+}

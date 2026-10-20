@@ -249,3 +249,25 @@ groups:
       - {id: gen_ai.usage.output_audio_tokens, type: int, stability: development, brief: "LangFuse spelling of audio output tokens.", examples: [300], annotations: {livekit: {owner: agents, sensitivity: none}}}
       - {id: gen_ai.usage.reasoning_tokens, type: int, stability: development, brief: "LangFuse spelling of reasoning tokens.", examples: [12], annotations: {livekit: {owner: agents, sensitivity: none}}}
       - {id: langfuse.observation.completion_start_time, type: string, stability: development, brief: "LangFuse's completion start time (ISO 8601), set next to `gen_ai.response.time_to_first_chunk`.", examples: ["2026-10-19T12:00:00.000Z"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.agents.session_report
+    type: attribute_group
+    display_name: Agents session report
+    brief: Attributes of the session-report log records Agents sends on the `chat_history` and `evaluations` loggers.
+    note: >
+      Plain log records with no event name, one per report part, with the body `session report`,
+      `chat item`, `evaluation`, `tag` or `outcome`. The keys are registered as emitted: three sit
+      in the upstream `session.*` namespace (`annotations.livekit.upstream_namespace`), the others
+      have no namespace. A map-valued key carries an OTLP AnyValue map; its fields are payload, not
+      attribute keys.
+    attributes:
+      - {id: session.options, type: any, stability: development, brief: "The session's options, as a map of option name to value.", note: "In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it.", examples: ["{\"allow_interruptions\": true}"], annotations: {livekit: {owner: agents, sensitivity: none, upstream_namespace: session}}}
+      - {id: session.report_timestamp, type: double, stability: development, brief: "When the report was made, in Unix seconds.", note: "In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it.", examples: [1760870400.5], annotations: {livekit: {owner: agents, sensitivity: none, upstream_namespace: session}}}
+      - {id: session.tags, type: "string[]", stability: development, brief: "The session's tags, sorted. Absent when the session has none.", note: "In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it.", examples: [["support", "escalated"]], annotations: {livekit: {owner: agents, sensitivity: none, upstream_namespace: session}}}
+      - {id: agent_name, type: string, stability: development, brief: "The agent's name.", examples: ["support-agent"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: sdk_version, type: string, stability: development, brief: "The Agents SDK version.", examples: ["2.0.0"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: usage, type: any, stability: development, brief: "Model usage, as a list of maps, one per model. Absent when there was none.", examples: ["[{\"model\": \"gpt-4o\", \"input_tokens\": 120}]"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: chat.item, type: any, stability: development, brief: "One chat history item, as a map. Carries conversation content.", note: "With redaction on, the collector drops the whole `chat.item` record.", examples: ["{\"type\": \"message\", \"role\": \"user\"}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: evaluation, type: any, stability: development, brief: "One evaluation result, as a map of string fields.", examples: ["{\"name\": \"task_completion\", \"verdict\": \"pass\"}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: tag, type: any, stability: development, brief: "One tag with metadata, as a map with the fields `name` and `metadata`.", examples: ["{\"name\": \"escalated\", \"metadata\": {}}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: outcome, type: any, stability: development, brief: "The session outcome, as a map with the field `outcome` (`success` or `fail`) and an optional `reason`.", note: "`reason` is a field of this map, not an attribute key.", examples: ["{\"outcome\": \"fail\", \"reason\": \"user hung up\"}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
