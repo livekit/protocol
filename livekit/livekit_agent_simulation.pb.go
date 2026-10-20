@@ -520,7 +520,7 @@ type Scenario struct {
 	Label             string                 `protobuf:"bytes,1,opt,name=label,proto3" json:"label,omitempty"`
 	Instructions      string                 `protobuf:"bytes,2,opt,name=instructions,proto3" json:"instructions,omitempty"`
 	AgentExpectations string                 `protobuf:"bytes,3,opt,name=agent_expectations,json=agentExpectations,proto3" json:"agent_expectations,omitempty"`
-	// Set as participant attributes on the simulation participant's access token.
+	// Surfaced to the agent under test as SimulationContext scenario tags.
 	Tags map[string]string `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Arbitrary JSON-encoded object, surfaced to the agent under test as
 	// SimulationContext userdata (e.g. inputs and benchmark target state).
@@ -667,8 +667,9 @@ func (x *ScenarioGroup) GetId() string {
 	return ""
 }
 
-// Carried (protojson-encoded) in the simulation room's metadata so the agent
-// under test can read the scenario + run identity synchronously at connect.
+// Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
+// on the agent dispatch, so the agent under test can read the scenario + run
+// identity synchronously at job start.
 type SimulationDispatch struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	SimulationRunId string                 `protobuf:"bytes,1,opt,name=simulation_run_id,json=simulationRunId,proto3" json:"simulation_run_id,omitempty"`
