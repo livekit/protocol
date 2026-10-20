@@ -197,6 +197,8 @@ const (
 	JobStateReason_JSR_ROOM_CLOSED JobStateReason = 2
 	// the dispatch was deleted before an agent was assigned
 	JobStateReason_JSR_DISPATCH_DELETED JobStateReason = 3
+	// the job failed and is being dispatched again
+	JobStateReason_JSR_RETRYING JobStateReason = 4
 )
 
 // Enum value maps for JobStateReason.
@@ -206,12 +208,14 @@ var (
 		1: "JSR_NO_CAPACITY",
 		2: "JSR_ROOM_CLOSED",
 		3: "JSR_DISPATCH_DELETED",
+		4: "JSR_RETRYING",
 	}
 	JobStateReason_value = map[string]int32{
 		"JSR_UNSPECIFIED":      0,
 		"JSR_NO_CAPACITY":      1,
 		"JSR_ROOM_CLOSED":      2,
 		"JSR_DISPATCH_DELETED": 3,
+		"JSR_RETRYING":         4,
 	}
 )
 
@@ -2244,12 +2248,13 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\n" +
 	"JS_SUCCESS\x10\x02\x12\r\n" +
 	"\tJS_FAILED\x10\x03\x12\x10\n" +
-	"\fJS_CANCELLED\x10\x04*i\n" +
+	"\fJS_CANCELLED\x10\x04*{\n" +
 	"\x0eJobStateReason\x12\x13\n" +
 	"\x0fJSR_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fJSR_NO_CAPACITY\x10\x01\x12\x13\n" +
 	"\x0fJSR_ROOM_CLOSED\x10\x02\x12\x18\n" +
-	"\x14JSR_DISPATCH_DELETED\x10\x03BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\x14JSR_DISPATCH_DELETED\x10\x03\x12\x10\n" +
+	"\fJSR_RETRYING\x10\x04BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agent_proto_rawDescOnce sync.Once
