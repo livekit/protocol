@@ -115,6 +115,8 @@ enum JobStateReason {
   JSR_ROOM_CLOSED = 2;
   // the dispatch was deleted before an agent was assigned
   JSR_DISPATCH_DELETED = 3;
+  // the job failed and is being dispatched again
+  JSR_RETRYING = 4;
 }
 
 message SimulateJobRequest {
