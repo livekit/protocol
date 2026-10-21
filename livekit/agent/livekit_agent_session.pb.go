@@ -3198,19 +3198,14 @@ type AgentSessionEvent_AmdPrediction struct {
 	Delay          *durationpb.Duration   `protobuf:"bytes,5,opt,name=delay,proto3" json:"delay,omitempty"`
 	TurnId         uint32                 `protobuf:"varint,6,opt,name=turn_id,json=turnId,proto3" json:"turn_id,omitempty"`
 	// The stage after this prediction. Never AMD_WAIT.
-	Stage        AmdCategory `protobuf:"varint,7,opt,name=stage,proto3,enum=livekit.agent.AmdCategory" json:"stage,omitempty"`
-	StateChanged bool        `protobuf:"varint,8,opt,name=state_changed,json=stateChanged,proto3" json:"state_changed,omitempty"`
+	Stage AmdCategory `protobuf:"varint,7,opt,name=stage,proto3,enum=livekit.agent.AmdCategory" json:"stage,omitempty"`
 	// Whether this prediction left the recommended transitions to correct an
 	// earlier stage.
-	CorrectsStage bool `protobuf:"varint,9,opt,name=corrects_stage,json=correctsStage,proto3" json:"corrects_stage,omitempty"`
-	// AMD_UNKNOWN when there is none.
-	PrevTurnCategory  AmdCategory `protobuf:"varint,10,opt,name=prev_turn_category,json=prevTurnCategory,proto3,enum=livekit.agent.AmdCategory" json:"prev_turn_category,omitempty"`
-	PrevStageCategory AmdCategory `protobuf:"varint,11,opt,name=prev_stage_category,json=prevStageCategory,proto3,enum=livekit.agent.AmdCategory" json:"prev_stage_category,omitempty"`
+	CorrectsStage bool `protobuf:"varint,8,opt,name=corrects_stage,json=correctsStage,proto3" json:"corrects_stage,omitempty"`
 	// Unset when the turn ran no inference.
-	InferenceDuration      *durationpb.Duration `protobuf:"bytes,12,opt,name=inference_duration,json=inferenceDuration,proto3" json:"inference_duration,omitempty"`
-	VoicemailMessagePlayed bool                 `protobuf:"varint,13,opt,name=voicemail_message_played,json=voicemailMessagePlayed,proto3" json:"voicemail_message_played,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	InferenceDuration *durationpb.Duration `protobuf:"bytes,9,opt,name=inference_duration,json=inferenceDuration,proto3" json:"inference_duration,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *AgentSessionEvent_AmdPrediction) Reset() {
@@ -3292,32 +3287,11 @@ func (x *AgentSessionEvent_AmdPrediction) GetStage() AmdCategory {
 	return AmdCategory_AMD_UNKNOWN
 }
 
-func (x *AgentSessionEvent_AmdPrediction) GetStateChanged() bool {
-	if x != nil {
-		return x.StateChanged
-	}
-	return false
-}
-
 func (x *AgentSessionEvent_AmdPrediction) GetCorrectsStage() bool {
 	if x != nil {
 		return x.CorrectsStage
 	}
 	return false
-}
-
-func (x *AgentSessionEvent_AmdPrediction) GetPrevTurnCategory() AmdCategory {
-	if x != nil {
-		return x.PrevTurnCategory
-	}
-	return AmdCategory_AMD_UNKNOWN
-}
-
-func (x *AgentSessionEvent_AmdPrediction) GetPrevStageCategory() AmdCategory {
-	if x != nil {
-		return x.PrevStageCategory
-	}
-	return AmdCategory_AMD_UNKNOWN
 }
 
 func (x *AgentSessionEvent_AmdPrediction) GetInferenceDuration() *durationpb.Duration {
@@ -3327,25 +3301,16 @@ func (x *AgentSessionEvent_AmdPrediction) GetInferenceDuration() *durationpb.Dur
 	return nil
 }
 
-func (x *AgentSessionEvent_AmdPrediction) GetVoicemailMessagePlayed() bool {
-	if x != nil {
-		return x.VoicemailMessagePlayed
-	}
-	return false
-}
-
 // Once per AMD run.
 type AgentSessionEvent_AmdCompleted struct {
 	state                  protoimpl.MessageState `protogen:"open.v1"`
 	Category               AmdCategory            `protobuf:"varint,1,opt,name=category,proto3,enum=livekit.agent.AmdCategory" json:"category,omitempty"`
 	Reason                 string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
-	TurnId                 uint32                 `protobuf:"varint,3,opt,name=turn_id,json=turnId,proto3" json:"turn_id,omitempty"`
-	Transcript             string                 `protobuf:"bytes,4,opt,name=transcript,proto3" json:"transcript,omitempty"`
-	PrevTurnCategory       AmdCategory            `protobuf:"varint,5,opt,name=prev_turn_category,json=prevTurnCategory,proto3,enum=livekit.agent.AmdCategory" json:"prev_turn_category,omitempty"`
-	PrevStageCategory      AmdCategory            `protobuf:"varint,6,opt,name=prev_stage_category,json=prevStageCategory,proto3,enum=livekit.agent.AmdCategory" json:"prev_stage_category,omitempty"`
-	VoicemailMessagePlayed bool                   `protobuf:"varint,7,opt,name=voicemail_message_played,json=voicemailMessagePlayed,proto3" json:"voicemail_message_played,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	VoicemailMessagePlayed bool                   `protobuf:"varint,3,opt,name=voicemail_message_played,json=voicemailMessagePlayed,proto3" json:"voicemail_message_played,omitempty"`
+	// Unset when the run ended before any prediction.
+	LastPrediction *AgentSessionEvent_AmdPrediction `protobuf:"bytes,4,opt,name=last_prediction,json=lastPrediction,proto3" json:"last_prediction,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *AgentSessionEvent_AmdCompleted) Reset() {
@@ -3392,39 +3357,18 @@ func (x *AgentSessionEvent_AmdCompleted) GetReason() string {
 	return ""
 }
 
-func (x *AgentSessionEvent_AmdCompleted) GetTurnId() uint32 {
-	if x != nil {
-		return x.TurnId
-	}
-	return 0
-}
-
-func (x *AgentSessionEvent_AmdCompleted) GetTranscript() string {
-	if x != nil {
-		return x.Transcript
-	}
-	return ""
-}
-
-func (x *AgentSessionEvent_AmdCompleted) GetPrevTurnCategory() AmdCategory {
-	if x != nil {
-		return x.PrevTurnCategory
-	}
-	return AmdCategory_AMD_UNKNOWN
-}
-
-func (x *AgentSessionEvent_AmdCompleted) GetPrevStageCategory() AmdCategory {
-	if x != nil {
-		return x.PrevStageCategory
-	}
-	return AmdCategory_AMD_UNKNOWN
-}
-
 func (x *AgentSessionEvent_AmdCompleted) GetVoicemailMessagePlayed() bool {
 	if x != nil {
 		return x.VoicemailMessagePlayed
 	}
 	return false
+}
+
+func (x *AgentSessionEvent_AmdCompleted) GetLastPrediction() *AgentSessionEvent_AmdPrediction {
+	if x != nil {
+		return x.LastPrediction
+	}
+	return nil
 }
 
 type AgentSessionEvent_EotPrediction struct {
@@ -5384,7 +5328,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\vmodel_usage\x18\x01 \x03(\v2\x19.livekit.agent.ModelUsageR\n" +
 	"modelUsage\"A\n" +
 	"\fDebugMessage\x121\n" +
-	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xbe&\n" +
+	"\apayload\x18\x01 \x01(\v2\x17.google.protobuf.StructR\apayload\"\xd3#\n" +
 	"\x11AgentSessionEvent\x129\n" +
 	"\n" +
 	"created_at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12d\n" +
@@ -5432,7 +5376,7 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\x0fdetection_delay\x18\x03 \x01(\x01R\x0edetectionDelay\x12;\n" +
 	"\vdetected_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"detectedAtB\x15\n" +
-	"\x13_overlap_started_at\x1a\xa5\x05\n" +
+	"\x13_overlap_started_at\x1a\xb0\x03\n" +
 	"\rAmdPrediction\x12B\n" +
 	"\x0fspeech_duration\x18\x01 \x01(\v2\x19.google.protobuf.DurationR\x0espeechDuration\x126\n" +
 	"\bcategory\x18\x02 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\bcategory\x12\x16\n" +
@@ -5442,24 +5386,14 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"transcript\x12/\n" +
 	"\x05delay\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x05delay\x12\x17\n" +
 	"\aturn_id\x18\x06 \x01(\rR\x06turnId\x120\n" +
-	"\x05stage\x18\a \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x05stage\x12#\n" +
-	"\rstate_changed\x18\b \x01(\bR\fstateChanged\x12%\n" +
-	"\x0ecorrects_stage\x18\t \x01(\bR\rcorrectsStage\x12H\n" +
-	"\x12prev_turn_category\x18\n" +
-	" \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x10prevTurnCategory\x12J\n" +
-	"\x13prev_stage_category\x18\v \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x11prevStageCategory\x12H\n" +
-	"\x12inference_duration\x18\f \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\x128\n" +
-	"\x18voicemail_message_played\x18\r \x01(\bR\x16voicemailMessagePlayed\x1a\xe7\x02\n" +
+	"\x05stage\x18\a \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x05stage\x12%\n" +
+	"\x0ecorrects_stage\x18\b \x01(\bR\rcorrectsStage\x12H\n" +
+	"\x12inference_duration\x18\t \x01(\v2\x19.google.protobuf.DurationR\x11inferenceDuration\x1a\xf1\x01\n" +
 	"\fAmdCompleted\x126\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\bcategory\x12\x16\n" +
-	"\x06reason\x18\x02 \x01(\tR\x06reason\x12\x17\n" +
-	"\aturn_id\x18\x03 \x01(\rR\x06turnId\x12\x1e\n" +
-	"\n" +
-	"transcript\x18\x04 \x01(\tR\n" +
-	"transcript\x12H\n" +
-	"\x12prev_turn_category\x18\x05 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x10prevTurnCategory\x12J\n" +
-	"\x13prev_stage_category\x18\x06 \x01(\x0e2\x1a.livekit.agent.AmdCategoryR\x11prevStageCategory\x128\n" +
-	"\x18voicemail_message_played\x18\a \x01(\bR\x16voicemailMessagePlayed\x1a\xca\x01\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\x128\n" +
+	"\x18voicemail_message_played\x18\x03 \x01(\bR\x16voicemailMessagePlayed\x12W\n" +
+	"\x0flast_prediction\x18\x04 \x01(\v2..livekit.agent.AgentSessionEvent.AmdPredictionR\x0elastPrediction\x1a\xca\x01\n" +
 	"\rEotPrediction\x12 \n" +
 	"\vprobability\x18\x01 \x01(\x02R\vprobability\x12\x1c\n" +
 	"\tthreshold\x18\x02 \x01(\x02R\tthreshold\x12H\n" +
@@ -5837,41 +5771,38 @@ var file_agent_livekit_agent_session_proto_depIdxs = []int32{
 	5,   // 80: livekit.agent.AgentSessionEvent.AmdPrediction.category:type_name -> livekit.agent.AmdCategory
 	79,  // 81: livekit.agent.AgentSessionEvent.AmdPrediction.delay:type_name -> google.protobuf.Duration
 	5,   // 82: livekit.agent.AgentSessionEvent.AmdPrediction.stage:type_name -> livekit.agent.AmdCategory
-	5,   // 83: livekit.agent.AgentSessionEvent.AmdPrediction.prev_turn_category:type_name -> livekit.agent.AmdCategory
-	5,   // 84: livekit.agent.AgentSessionEvent.AmdPrediction.prev_stage_category:type_name -> livekit.agent.AmdCategory
-	79,  // 85: livekit.agent.AgentSessionEvent.AmdPrediction.inference_duration:type_name -> google.protobuf.Duration
-	5,   // 86: livekit.agent.AgentSessionEvent.AmdCompleted.category:type_name -> livekit.agent.AmdCategory
-	5,   // 87: livekit.agent.AgentSessionEvent.AmdCompleted.prev_turn_category:type_name -> livekit.agent.AmdCategory
-	5,   // 88: livekit.agent.AgentSessionEvent.AmdCompleted.prev_stage_category:type_name -> livekit.agent.AmdCategory
-	79,  // 89: livekit.agent.AgentSessionEvent.EotPrediction.inference_duration:type_name -> google.protobuf.Duration
-	79,  // 90: livekit.agent.AgentSessionEvent.EotPrediction.delay:type_name -> google.protobuf.Duration
-	20,  // 91: livekit.agent.AgentSessionEvent.SessionUsageUpdated.usage:type_name -> livekit.agent.AgentSessionUsage
-	44,  // 92: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.started:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Started
-	45,  // 93: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.call_updated:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.CallUpdated
-	47,  // 94: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.reply_updated:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated
-	46,  // 95: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.ended:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Ended
-	9,   // 96: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Started.function_call:type_name -> livekit.agent.FunctionCall
-	3,   // 97: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Ended.status:type_name -> livekit.agent.ToolCallStatus
-	4,   // 98: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated.status:type_name -> livekit.agent.ToolReplyStatus
-	58,  // 99: livekit.agent.SessionRequest.UpdateIO.input:type_name -> livekit.agent.SessionRequest.UpdateIO.Input
-	59,  // 100: livekit.agent.SessionRequest.UpdateIO.output:type_name -> livekit.agent.SessionRequest.UpdateIO.Output
-	29,  // 101: livekit.agent.SessionResponse.GetChatHistoryResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
-	29,  // 102: livekit.agent.SessionResponse.GetAgentInfoResponse.chat_ctx:type_name -> livekit.agent.ChatContext.ChatItem
-	29,  // 103: livekit.agent.SessionResponse.RunInputResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
-	1,   // 104: livekit.agent.SessionResponse.GetSessionStateResponse.agent_state:type_name -> livekit.agent.AgentState
-	2,   // 105: livekit.agent.SessionResponse.GetSessionStateResponse.user_state:type_name -> livekit.agent.UserState
-	70,  // 106: livekit.agent.SessionResponse.GetSessionStateResponse.options:type_name -> livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
-	77,  // 107: livekit.agent.SessionResponse.GetSessionStateResponse.created_at:type_name -> google.protobuf.Timestamp
-	78,  // 108: livekit.agent.SessionResponse.GetRTCStatsResponse.publisher_stats:type_name -> google.protobuf.Struct
-	78,  // 109: livekit.agent.SessionResponse.GetRTCStatsResponse.subscriber_stats:type_name -> google.protobuf.Struct
-	20,  // 110: livekit.agent.SessionResponse.GetSessionUsageResponse.usage:type_name -> livekit.agent.AgentSessionUsage
-	77,  // 111: livekit.agent.SessionResponse.GetSessionUsageResponse.created_at:type_name -> google.protobuf.Timestamp
-	71,  // 112: livekit.agent.SessionResponse.FinalizeSimulationResponse.user_verdict:type_name -> livekit.agent.SessionResponse.FinalizeSimulationResponse.SimulationVerdict
-	113, // [113:113] is the sub-list for method output_type
-	113, // [113:113] is the sub-list for method input_type
-	113, // [113:113] is the sub-list for extension type_name
-	113, // [113:113] is the sub-list for extension extendee
-	0,   // [0:113] is the sub-list for field type_name
+	79,  // 83: livekit.agent.AgentSessionEvent.AmdPrediction.inference_duration:type_name -> google.protobuf.Duration
+	5,   // 84: livekit.agent.AgentSessionEvent.AmdCompleted.category:type_name -> livekit.agent.AmdCategory
+	38,  // 85: livekit.agent.AgentSessionEvent.AmdCompleted.last_prediction:type_name -> livekit.agent.AgentSessionEvent.AmdPrediction
+	79,  // 86: livekit.agent.AgentSessionEvent.EotPrediction.inference_duration:type_name -> google.protobuf.Duration
+	79,  // 87: livekit.agent.AgentSessionEvent.EotPrediction.delay:type_name -> google.protobuf.Duration
+	20,  // 88: livekit.agent.AgentSessionEvent.SessionUsageUpdated.usage:type_name -> livekit.agent.AgentSessionUsage
+	44,  // 89: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.started:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Started
+	45,  // 90: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.call_updated:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.CallUpdated
+	47,  // 91: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.reply_updated:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated
+	46,  // 92: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.ended:type_name -> livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Ended
+	9,   // 93: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Started.function_call:type_name -> livekit.agent.FunctionCall
+	3,   // 94: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.Ended.status:type_name -> livekit.agent.ToolCallStatus
+	4,   // 95: livekit.agent.AgentSessionEvent.ToolExecutionUpdated.ReplyUpdated.status:type_name -> livekit.agent.ToolReplyStatus
+	58,  // 96: livekit.agent.SessionRequest.UpdateIO.input:type_name -> livekit.agent.SessionRequest.UpdateIO.Input
+	59,  // 97: livekit.agent.SessionRequest.UpdateIO.output:type_name -> livekit.agent.SessionRequest.UpdateIO.Output
+	29,  // 98: livekit.agent.SessionResponse.GetChatHistoryResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
+	29,  // 99: livekit.agent.SessionResponse.GetAgentInfoResponse.chat_ctx:type_name -> livekit.agent.ChatContext.ChatItem
+	29,  // 100: livekit.agent.SessionResponse.RunInputResponse.items:type_name -> livekit.agent.ChatContext.ChatItem
+	1,   // 101: livekit.agent.SessionResponse.GetSessionStateResponse.agent_state:type_name -> livekit.agent.AgentState
+	2,   // 102: livekit.agent.SessionResponse.GetSessionStateResponse.user_state:type_name -> livekit.agent.UserState
+	70,  // 103: livekit.agent.SessionResponse.GetSessionStateResponse.options:type_name -> livekit.agent.SessionResponse.GetSessionStateResponse.OptionsEntry
+	77,  // 104: livekit.agent.SessionResponse.GetSessionStateResponse.created_at:type_name -> google.protobuf.Timestamp
+	78,  // 105: livekit.agent.SessionResponse.GetRTCStatsResponse.publisher_stats:type_name -> google.protobuf.Struct
+	78,  // 106: livekit.agent.SessionResponse.GetRTCStatsResponse.subscriber_stats:type_name -> google.protobuf.Struct
+	20,  // 107: livekit.agent.SessionResponse.GetSessionUsageResponse.usage:type_name -> livekit.agent.AgentSessionUsage
+	77,  // 108: livekit.agent.SessionResponse.GetSessionUsageResponse.created_at:type_name -> google.protobuf.Timestamp
+	71,  // 109: livekit.agent.SessionResponse.FinalizeSimulationResponse.user_verdict:type_name -> livekit.agent.SessionResponse.FinalizeSimulationResponse.SimulationVerdict
+	110, // [110:110] is the sub-list for method output_type
+	110, // [110:110] is the sub-list for method input_type
+	110, // [110:110] is the sub-list for extension type_name
+	110, // [110:110] is the sub-list for extension extendee
+	0,   // [0:110] is the sub-list for field type_name
 }
 
 func init() { file_agent_livekit_agent_session_proto_init() }

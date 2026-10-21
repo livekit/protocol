@@ -262,27 +262,20 @@ message AgentSessionEvent {
     uint32 turn_id = 6;
     // The stage after this prediction. Never AMD_WAIT.
     AmdCategory stage = 7;
-    bool state_changed = 8;
     // Whether this prediction left the recommended transitions to correct an
     // earlier stage.
-    bool corrects_stage = 9;
-    // AMD_UNKNOWN when there is none.
-    AmdCategory prev_turn_category = 10;
-    AmdCategory prev_stage_category = 11;
+    bool corrects_stage = 8;
     // Unset when the turn ran no inference.
-    google.protobuf.Duration inference_duration = 12;
-    bool voicemail_message_played = 13;
+    google.protobuf.Duration inference_duration = 9;
   }
 
   // Once per AMD run.
   message AmdCompleted {
     AmdCategory category = 1;
     string reason = 2;
-    uint32 turn_id = 3;
-    string transcript = 4;
-    AmdCategory prev_turn_category = 5;
-    AmdCategory prev_stage_category = 6;
-    bool voicemail_message_played = 7;
+    bool voicemail_message_played = 3;
+    // Unset when the run ended before any prediction.
+    AmdPrediction last_prediction = 4;
   }
 
   message EotPrediction {
