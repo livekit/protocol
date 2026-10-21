@@ -1,0 +1,14 @@
+livekit/agent/livekit_agent_session.pb.go
+  h_a827ab16c3c189 3201-3202
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "93980a51301376d3842cf56b3707f398f44d3bc4",
+  "prompts": {},
+  "humans": {
+    "h_a827ab16c3c189": {
+      "author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
