@@ -60,8 +60,9 @@ jobs:
         run: |
           rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir "$RUNNER_TEMP"
           npx --yes -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
+          python3 -I -W error otel/gen/python/semconv.py
 
-      - name: Codegen escapes literals (round-trip through rustc and tsc)
+      - name: Codegen escapes literals (round-trip through rustc, tsc and python3)
         run: otel/tests/codegen.sh
 
       - name: Live-check the smoke sample

@@ -158,7 +158,7 @@ otel/tests/codegen.sh                  # a value with quotes, backslashes, newli
 
 rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir /tmp
 npx -p typescript@5.9.3 tsc --strict --noEmit --target es2020 otel/gen/ts/semconv.ts
-python3 -I -m py_compile otel/gen/python/semconv.py
+python3 -I -W error otel/gen/python/semconv.py
 ```
 
 The generated Rust and Python also carry an `upstream` section: every OTel key a LiveKit signal
