@@ -27,11 +27,11 @@ const (
 )
 
 const (
-	DataChannelRpcMaxRoundTripLatency    = 2000 * time.Millisecond
+	DataChannelRpcMaxRoundTripLatency    = 7000 * time.Millisecond
 	DataChannelRpcMaxMessageBytes        = 256
 	DataChannelRpcMaxDataBytes           = 15360 // 15KiB
 	DataChannelRpcMaxPayloadBytes        = 15360 // 15KiB
-	DataChannelRpcDefaultResponseTimeout = 10000 * time.Millisecond
+	DataChannelRpcDefaultResponseTimeout = 15000 * time.Millisecond
 )
 
 var dataChannelRpcErrorMessages = map[DataChannelRpcErrorCode]string{
