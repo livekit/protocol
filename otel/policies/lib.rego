@@ -59,9 +59,19 @@ secret(attr) := {finding("livekit_secret", sprintf("%s: SECRET values are never 
 	lk(attr, "sensitivity") == "secret"
 }
 
+# PII keys the collector matches by exact name instead of a `pii` segment, so they keep their
+# shipped names: pii-redaction/redact/otellogs.go:19 drops every record that carries chat.item.
+pii_by_name := {"chat.item"}
+
+redacted(key) := true if regex.match(pii_segment, key)
+
+else := true if pii_by_name[key]
+
+else := false
+
 pii_marker(attr) := {finding("livekit_pii_marker", sprintf("%s: sensitivity=%v, but the collector redacts by key, so a `pii` key segment must be present iff sensitivity=pii", [attr.id, lk(attr, "sensitivity")])) |
 	sensitivities[lk(attr, "sensitivity")]
-	(lk(attr, "sensitivity") == "pii") != regex.match(pii_segment, attr.id)
+	(lk(attr, "sensitivity") == "pii") != redacted(attr.id)
 }
 
 pii_heuristic(attr) := {finding("livekit_pii_heuristic", sprintf("%s looks like PII; name it lk.pii.* so the collector redacts it", [attr.id])) |

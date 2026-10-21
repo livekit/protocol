@@ -10,7 +10,6 @@ import rego.v1
 # --v2 skips the per-file pass, so the attribute rules run here on the resolved definitions.
 deny contains f if {
 	some attr in object.get(input, ["registry", "attributes"], [])
-	startswith(attr.key, "lk.")
 	not attr.deprecated
 	some f in data.livekit.lib.attr_findings(object.union(attr, {"id": attr.key}))
 }
@@ -81,11 +80,19 @@ deny contains f if {
 # a key, e.g. as non-PII, while the collector keeps redacting by key name.
 override_msg(key, signal, where) := sprintf("%s in %s (%s): a ref may not override the annotations of a LiveKit key", [key, signal, where])
 
+# Default mode: keys defined in otel/model. A definition's copy has no lineage entry and a ref's
+# copy has one, so membership comes from the definition, whatever the ref does to its annotations.
+defined contains a.name if {
+	some g in object.get(input, "groups", [])
+	some a in g.attributes
+	not g.lineage.attributes[a.name]
+}
+
 # Default mode: the lineage records which fields a ref overrode.
 deny contains data.livekit.lib.finding("livekit_ref_override", msg) if {
 	some group in object.get(input, "groups", [])
 	some key, lineage in object.get(group, ["lineage", "attributes"], {})
-	startswith(key, "lk.")
+	defined[key]
 	"annotations" in object.get(lineage, "locally_overridden_fields", [])
 	msg := override_msg(key, group.id, object.get(group, ["lineage", "provenance", "path"], group.id))
 }
@@ -106,7 +113,7 @@ v2_signals contains s if {
 deny contains data.livekit.lib.finding("livekit_ref_override", msg) if {
 	some s in v2_signals
 	some a in object.get(s, "attributes", [])
-	startswith(a.key, "lk.")
+	definitions[a.key]
 	data.livekit.lib.lk_all(a) != object.get(definitions, a.key, null)
 	signal := object.get(s, "id", object.get(s, "name", object.get(s, "type", "?")))
 	msg := override_msg(a.key, signal, object.get(s, ["provenance", "path"], signal))

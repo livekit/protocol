@@ -64,8 +64,8 @@ name the key and value to send.
 - `cloud` is a valid owner for when that team registers its keys, in its own directory.
 
 The Notion conventions put client-owned attributes under `lk.client.*`. The client core does not do
-that yet, so that rule is advice: `check.sh` lists every client key it would move, and never
-fails on it.
+that yet, so that rule is advice: `check.sh` lists every client key it would move, `browser.*`
+included, and never fails on it.
 
 How a concept is named in other producers or stores (Agents' `room_id`, the collector's `room_id`
 column, roomobs) is recorded in `annotations.livekit.bindings`. Weaver carries it into the docs;
@@ -89,7 +89,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    | Annotation | Values | Rule |
    |---|---|---|
    | `owner` | `shared`, `client`, `agents`, `cloud` | required |
-   | `sensitivity` | `none`, `pii`, `secret` (protocol `logger.Sensitivity`) | required; `pii` iff the key has a `pii` segment; `secret` is never emitted |
+   | `sensitivity` | `none`, `pii`, `secret` (protocol `logger.Sensitivity`) | required; `pii` iff the key has a `pii` segment, or is `chat.item`, which the collector drops by name; `secret` is never emitted |
    | `unit` | UCUM, e.g. `s`, `By`, `{packet}` | durations are seconds |
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
    | `bindings` | map of producer/store → name | informational |
@@ -190,7 +190,7 @@ add to it:
 |---|---|---|
 | `livekit_owner`, `livekit_sensitivity` | yes | annotations present and valid |
 | `livekit_secret` | yes | `secret` is never emitted |
-| `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment |
+| `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment, except `chat.item`, which the collector drops by name (`pii_by_name` in `lib.rego`) |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
 | `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
 | `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` is defined, deprecated or not (resolved, both modes) |
@@ -198,10 +198,11 @@ add to it:
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
 | `livekit_metric_unit` | yes | metric units are not `ms` (resolved, so `definition/2` metrics and refinements count) |
 | `livekit_cardinality` | yes | high-cardinality IDs are not metric dimensions (resolved, so `extends` and refinements count) |
-| `livekit_ref_override` | yes | a `ref` to an `lk.*` key may not override its `annotations` (owner, sensitivity, unit) |
+| `livekit_ref_override` | yes | a `ref` to a key defined in `otel/model` may not override its `annotations` (owner, sensitivity, unit) |
 | `livekit_shipped_value` | yes | a `shipped_values` list is on a non-`lk.*` key of type string, string[] or an enum whose values are all strings; every entry has a lowercase snake_case id, a value and a brief; no value repeats an upstream value; no id repeats another entry or an upstream member id (lowercased, non-alphanumerics as `_`); and each key has at most one distinct list in the whole registry. Refs and definitions, resolved, both modes |
 | `livekit_client_namespace` | no (advice) | client-owned keys under `lk.client.*` |
 
+The attribute rules cover every key defined in `otel/model`, `lk.*` or not.
 Weaver itself rejects duplicate keys, unknown fields and unresolved references. Every rule runs in
 weaver's default mode and with `--v2`: weaver skips per-file (`before_resolution`) policies with
 `--v2`, so `resolved.rego` applies the same rules (from `lib.rego`) to the resolved registry there.

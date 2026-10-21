@@ -5,17 +5,16 @@ package before_resolution
 
 import rego.v1
 
-# LiveKit attribute definitions, from v1 `groups:` files and definition/2 files alike.
+# Attribute definitions, lk.* or not, from v1 `groups:` files and definition/2 files alike.
 lk_attrs contains attr if {
 	some group in input.groups
 	some attr in group.attributes
-	startswith(attr.id, "lk.")
+	is_string(attr.id) # a definition, not a ref
 	not attr.deprecated
 }
 
 lk_attrs contains object.union(attr, {"id": attr.key}) if {
 	some attr in input.attributes
-	startswith(attr.key, "lk.")
 	not attr.deprecated
 }
 
