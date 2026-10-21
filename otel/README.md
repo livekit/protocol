@@ -152,7 +152,7 @@ for each LiveKit file in the not-yet-stable `definition/2` format (`client/group
 otel/check.sh                          # registry + LiveKit policies, default and --v2, then advice
 otel/tests/negatives.sh                # each negative fixture fails with its named finding, both modes
 go tool mage otel && git status otel/gen  # regenerate (runs otel/generate.sh); no diff expected
-otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged
+otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged, wrapper exit status
 otel/tests/generate.sh                 # generate.sh replaces gen/ whole, and keeps it when a target fails
 otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc, tsc and python3
 
