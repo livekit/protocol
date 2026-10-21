@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-AMD v2 in agent session events (`livekit_agent_session.proto`): `AmdCategory` adds `AMD_MACHINE_SCREENING` and `AMD_WAIT`, `AmdPrediction` adds the turn, stage, and previous categories, and a new `AmdCompleted` event reports the final result once per AMD run.
+AMD v2 in agent session events (`livekit_agent_session.proto`): `AmdCategory` adds `AMD_MACHINE_SCREENING` and `AMD_WAIT`, `AmdPrediction` adds the turn ID, the stage, whether it corrects the stage, and the inference time, and a new `AmdCompleted` event reports the final result and the last prediction once per AMD run.
