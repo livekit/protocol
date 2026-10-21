@@ -141,6 +141,9 @@ enum AmdCategory {
   AMD_MACHINE_VM = 3;
   AMD_MACHINE_UNAVAILABLE = 4;
   AMD_UNCERTAIN = 5;
+  AMD_MACHINE_SCREENING = 6;
+  // A prediction only: the turn's reply is held, and the stage does not change.
+  AMD_WAIT = 7;
 }
 
 message LLMModelUsage {
@@ -256,6 +259,31 @@ message AgentSessionEvent {
     string reason = 3;
     string transcript = 4;
     google.protobuf.Duration delay = 5;
+    uint32 turn_id = 6;
+    // The stage after this prediction. Never AMD_WAIT.
+    AmdCategory stage = 7;
+    // Whether this prediction started a new stage.
+    bool state_changed = 8;
+    // Whether this prediction left the recommended transitions to correct an
+    // earlier stage.
+    bool corrects_stage = 9;
+    // AMD_UNKNOWN when there is none.
+    AmdCategory prev_turn_category = 10;
+    AmdCategory prev_stage_category = 11;
+    // Unset when the turn ran no inference.
+    google.protobuf.Duration inference_duration = 12;
+    bool voicemail_message_played = 13;
+  }
+
+  // Once per AMD run.
+  message AmdCompleted {
+    AmdCategory category = 1;
+    string reason = 2;
+    uint32 turn_id = 3;
+    string transcript = 4;
+    AmdCategory prev_turn_category = 5;
+    AmdCategory prev_stage_category = 6;
+    bool voicemail_message_played = 7;
   }
 
   message EotPrediction {
@@ -330,6 +358,7 @@ message AgentSessionEvent {
     DebugMessage debug_message = 21;
     ToolExecutionUpdated tool_execution_updated = 22;
     AgentFalseInterruption agent_false_interruption = 23;
+    AmdCompleted amd_completed = 24;
   }
 }
 
