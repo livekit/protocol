@@ -3198,9 +3198,8 @@ type AgentSessionEvent_AmdPrediction struct {
 	Delay          *durationpb.Duration   `protobuf:"bytes,5,opt,name=delay,proto3" json:"delay,omitempty"`
 	TurnId         uint32                 `protobuf:"varint,6,opt,name=turn_id,json=turnId,proto3" json:"turn_id,omitempty"`
 	// The stage after this prediction. Never AMD_WAIT.
-	Stage AmdCategory `protobuf:"varint,7,opt,name=stage,proto3,enum=livekit.agent.AmdCategory" json:"stage,omitempty"`
-	// Whether this prediction started a new stage.
-	StateChanged bool `protobuf:"varint,8,opt,name=state_changed,json=stateChanged,proto3" json:"state_changed,omitempty"`
+	Stage        AmdCategory `protobuf:"varint,7,opt,name=stage,proto3,enum=livekit.agent.AmdCategory" json:"stage,omitempty"`
+	StateChanged bool        `protobuf:"varint,8,opt,name=state_changed,json=stateChanged,proto3" json:"state_changed,omitempty"`
 	// Whether this prediction left the recommended transitions to correct an
 	// earlier stage.
 	CorrectsStage bool `protobuf:"varint,9,opt,name=corrects_stage,json=correctsStage,proto3" json:"corrects_stage,omitempty"`

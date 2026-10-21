@@ -262,7 +262,6 @@ message AgentSessionEvent {
     uint32 turn_id = 6;
     // The stage after this prediction. Never AMD_WAIT.
     AmdCategory stage = 7;
-    // Whether this prediction started a new stage.
     bool state_changed = 8;
     // Whether this prediction left the recommended transitions to correct an
     // earlier stage.
