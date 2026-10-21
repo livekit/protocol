@@ -432,11 +432,9 @@ message Scenario {
   // expectations, so runs of the same scenario can be correlated over time.
   string id = 6;
   // The ScenarioGroup node the call starts at. The simulator then plays the far
-  // end of an outbound call by walking the nodes. Set this or instructions,
-  // not both.
+  // end of an outbound call by walking the nodes, and ends the call after 300
+  // seconds. Set this or instructions, not both.
   string start = 7;
-  // Hard cap on a call that has start. Unset is 300s.
-  google.protobuf.Duration max_duration = 8;
 }
 
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
