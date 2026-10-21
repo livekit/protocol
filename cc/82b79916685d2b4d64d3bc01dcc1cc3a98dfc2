@@ -1,0 +1,25 @@
+.changeset/simulator-flow-schema.md
+  s_aaf78334cb7322::t_c53f7aaf1dee7c 6
+livekit/livekit_agent_simulation.pb.go
+  s_aaf78334cb7322::t_d22ef17fd03a89 580-582,3985,3993,4116-4120,4136-4201
+livekit/livekit_agent_simulation.twirp.go
+  s_aaf78334cb7322::t_41ac539b312566 2194-2460
+protobufs/livekit_agent_simulation.proto
+  s_aaf78334cb7322::t_3c071e816d963a 435-436
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cc82b79916685d2b4d64d3bc01dcc1cc3a98dfc2",
+  "prompts": {},
+  "sessions": {
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
