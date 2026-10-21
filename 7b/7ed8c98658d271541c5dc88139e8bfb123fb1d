@@ -1,0 +1,16 @@
+livekit/livekit_agent_simulation.pb.go
+  h_a827ab16c3c189 767-768,4008,4015
+livekit/livekit_agent_simulation.twirp.go
+  h_a827ab16c3c189 2194,2199-2200,2222,2265,2364,2393,2403,2413,2422,2431,2436-2460
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7b7ed8c98658d271541c5dc88139e8bfb123fb1d",
+  "prompts": {},
+  "humans": {
+    "h_a827ab16c3c189": {
+      "author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
