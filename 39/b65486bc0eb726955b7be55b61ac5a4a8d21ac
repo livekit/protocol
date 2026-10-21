@@ -1,0 +1,19 @@
+protobufs/livekit_agent_simulation.proto
+  s_aaf78334cb7322::t_79ee101985fd4d 481,483-485,493-495
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "39b65486bc0eb726955b7be55b61ac5a4a8d21ac",
+  "prompts": {},
+  "sessions": {
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
