@@ -318,6 +318,12 @@ message SimulationRun {
       // Absent applies no mode filter. TEXT matches runs stored as TEXT or
       // UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
       optional SimulationMode mode = 7;
+      // SCNG_ id of the scenario group. Runs created before the id was stored
+      // have none, so they never match.
+      optional string scenario_group_id = 8;
+      // Populates each run's `scenario_outcomes`. `jobs` stays empty either
+      // way; `Get` returns them.
+      bool include_scenario_outcomes = 9;
     }
     message Response {
       repeated SimulationRun runs = 1;
@@ -399,6 +405,23 @@ message SimulationRun {
   optional CI ci = 22;
   // Absent when the run ran each scenario once and required it to pass.
   optional SamplingOptions sampling = 23;
+  // One per scenario, tallied over its samples. Set only by `List` with
+  // `include_scenario_outcomes`.
+  repeated ScenarioOutcome scenario_outcomes = 24;
+
+  message ScenarioOutcome {
+    // Jobs without a scenario id have no outcome.
+    string scenario_id = 1;
+    string label = 2;
+    // Every sample of the scenario in this run, finished or not.
+    int32 samples = 3;
+    int32 passed = 4;
+    int32 failed = 5;
+    // Why the first failed sample failed; empty when none failed.
+    string failure_reason = 6;
+    // The sample to open: the first failed one, else the first.
+    string job_id = 7;
+  }
 
   message Usage {
     int32 text_turns_count = 1;
