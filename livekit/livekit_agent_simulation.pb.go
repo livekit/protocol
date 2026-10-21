@@ -753,6 +753,8 @@ type SimulatorNode struct {
 	// agent's reply ends, if the agent starts one before timeout.after;
 	// otherwise timeout.to.
 	Then string `protobuf:"bytes,3,opt,name=then,proto3" json:"then,omitempty"`
+	// Named routes, not on: YAML 1.1 parsers, such as PyYAML, read an unquoted
+	// `on` key as true.
 	// Checked in order; the first match wins. A node whose routes each match
 	// one key matches every key at once. Otherwise keys collect until #, which
 	// ends the entry. Keys pressed during say count, and a match cuts say off.
