@@ -577,8 +577,8 @@ type Scenario struct {
 	// expectations, so runs of the same scenario can be correlated over time.
 	Id string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
 	// The ScenarioGroup node the call starts at. The simulator then plays the far
-	// end of an outbound call by walking the nodes, and ends the call after 300
-	// seconds. Set this or instructions, not both.
+	// end of an outbound call by walking the nodes. Set this or instructions,
+	// not both.
 	Start         string `protobuf:"bytes,7,opt,name=start,proto3" json:"start,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -3556,9 +3556,10 @@ func (x *SimulatorNode_Route) GetTo() string {
 }
 
 type SimulatorNode_Timeout struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	After         *durationpb.Duration   `protobuf:"bytes,1,opt,name=after,proto3" json:"after,omitempty"`
-	To            string                 `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// At most 20 seconds.
+	After         *durationpb.Duration `protobuf:"bytes,1,opt,name=after,proto3" json:"after,omitempty"`
+	To            string               `protobuf:"bytes,2,opt,name=to,proto3" json:"to,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
