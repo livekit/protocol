@@ -1,13 +1,21 @@
 package logger
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"os"
 	"runtime"
 	"strings"
+	"sync/atomic"
 	"testing"
+	"time"
 
+	"github.com/livekit/psrpc/pkg/bus/redisbus"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap/zapcore"
 	"go.uber.org/zap/zaptest/observer"
@@ -409,4 +417,51 @@ func TestLoggerCallDepth(t *testing.T) {
 			require.True(t, strings.HasSuffix(caller, log.Caller), `caller mismatch expected suffix match on "%s" got "%s"`, caller, log.Caller)
 		})
 	}
+}
+
+// chanWriteSyncer hands each write to the test, so a line logged from another goroutine is read
+// without racing on a shared buffer.
+type chanWriteSyncer chan []byte
+
+func (c chanWriteSyncer) Write(p []byte) (int, error) {
+	c <- bytes.Clone(p)
+	return len(p), nil
+}
+
+func (chanWriteSyncer) Sync() error { return nil }
+
+func TestSetLoggerRoutesPsrpcBusErrors(t *testing.T) {
+	t.Cleanup(func() {
+		defaultLogger = LogRLogger(discardLogger)
+		pkgLogger = LogRLogger(discardLogger)
+	})
+
+	lines := make(chanWriteSyncer, 1)
+	SetLogger(must.Get(NewZapLogger(&Config{}, jsonTee(lines))), "TEST")
+
+	dialErr := errors.New("redis is unreachable")
+	var dials atomic.Int32
+	rc := redis.NewClient(&redis.Options{
+		Dialer: func(context.Context, string, string) (net.Conn, error) {
+			if dials.Add(1) == 1 {
+				return nil, dialErr
+			}
+			// Park every reconnect after the first failure, so the bus logs once and then stays
+			// quiet instead of retrying into later tests.
+			select {}
+		},
+	})
+	redisbus.New(rc)
+
+	var line map[string]any
+	select {
+	case b := <-lines:
+		require.NoError(t, json.Unmarshal(b, &line))
+	case <-time.After(5 * time.Second):
+		t.Fatal("the psrpc bus error never reached the configured logger")
+	}
+	require.Equal(t, "error", line["level"])
+	require.Equal(t, "redis receive message failed", line["msg"])
+	require.Equal(t, "TEST.psrpc", line["logger"])
+	require.Contains(t, fmt.Sprint(line), dialErr.Error())
 }
