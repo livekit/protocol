@@ -97,9 +97,11 @@ message MediaSource {
   oneof video {
     string video_track_id = 1 [(logger.name) = "videoTrackID"];
     ParticipantVideo participant_video = 2;
+    // Multiple independent video tracks; requires an MCAP file output
+    VideoConfig videos = 5;
   }
   AudioConfig audio = 3;
-  // TODO: DataConfig data = 4;
+  DataConfig data = 4;
 }
 
 // --- Video Configuration ---
@@ -107,6 +109,20 @@ message MediaSource {
 message ParticipantVideo {
   string identity = 1;
   bool prefer_screen_share = 2;
+}
+
+message VideoConfig {
+  bool capture_all = 1;
+  repeated VideoSelector selectors = 2;
+}
+
+message VideoSelector {
+  oneof match {
+    string track_id = 1 [(logger.name) = "trackID"];
+    string participant_identity = 2;
+    string track_name = 3;
+  }
+  bool exclude = 4; // Drop matching tracks, overriding capture_all and other matches
 }
 
 // --- Audio Configuration ---
@@ -123,9 +139,11 @@ message AudioRoute {
     string track_id = 1 [(logger.name) = "trackID"];
     string participant_identity = 2;
     ParticipantInfo.Kind participant_kind = 3;
+    string track_name = 5;
   }
 
   AudioChannel channel = 4;
+  bool exclude = 6; // Drop matching tracks, overriding capture_all and other routes
 }
 
 enum AudioChannel {
@@ -145,7 +163,9 @@ message DataSelector {
   oneof match {
     string track_id = 1 [(logger.name) = "trackID"];
     string participant_identity = 2;
+    string track_name = 3;
   }
+  bool exclude = 4; // Drop matching tracks, overriding capture_all and other matches
 }
 
 // --- Encoding ---
@@ -207,6 +227,7 @@ enum EncodedFileType {
   MP4 = 1;
   OGG = 2;
   MP3 = 3;
+  MCAP = 4;  // One channel per captured track
 }
 
 message StreamOutput {
