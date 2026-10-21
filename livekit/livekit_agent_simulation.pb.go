@@ -764,10 +764,8 @@ type SimulatorNode struct {
 	// Starts when say ends. With then, the agent starting a reply cancels it.
 	// Without then, on a machine node only a route cancels it; on a person node
 	// the agent's speech restarts it.
-	Timeout *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Speaker SimulatorNode_Speaker  `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
-	// What the agent should do during this node, for the judge.
-	Expectation   string `protobuf:"bytes,7,opt,name=expectation,proto3" json:"expectation,omitempty"`
+	Timeout       *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Speaker       SimulatorNode_Speaker  `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -842,13 +840,6 @@ func (x *SimulatorNode) GetSpeaker() SimulatorNode_Speaker {
 		return x.Speaker
 	}
 	return SimulatorNode_PERSON
-}
-
-func (x *SimulatorNode) GetExpectation() string {
-	if x != nil {
-		return x.Expectation
-	}
-	return ""
 }
 
 // Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
@@ -4014,15 +4005,14 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\n" +
 	"NodesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
-	"\x05value\x18\x02 \x01(\v2\x16.livekit.SimulatorNodeR\x05value:\x028\x01\"\xc4\x03\n" +
+	"\x05value\x18\x02 \x01(\v2\x16.livekit.SimulatorNodeR\x05value:\x028\x01\"\xa2\x03\n" +
 	"\rSimulatorNode\x12\x10\n" +
 	"\x03say\x18\x01 \x01(\tR\x03say\x12\"\n" +
 	"\finstructions\x18\x02 \x01(\tR\finstructions\x12\x12\n" +
 	"\x04then\x18\x03 \x01(\tR\x04then\x124\n" +
 	"\x06routes\x18\x04 \x03(\v2\x1c.livekit.SimulatorNode.RouteR\x06routes\x128\n" +
 	"\atimeout\x18\x05 \x01(\v2\x1e.livekit.SimulatorNode.TimeoutR\atimeout\x128\n" +
-	"\aspeaker\x18\x06 \x01(\x0e2\x1e.livekit.SimulatorNode.SpeakerR\aspeaker\x12 \n" +
-	"\vexpectation\x18\a \x01(\tR\vexpectation\x1a-\n" +
+	"\aspeaker\x18\x06 \x01(\x0e2\x1e.livekit.SimulatorNode.SpeakerR\aspeaker\x1a-\n" +
 	"\x05Route\x12\x14\n" +
 	"\x05match\x18\x01 \x01(\tR\x05match\x12\x0e\n" +
 	"\x02to\x18\x02 \x01(\tR\x02to\x1aJ\n" +

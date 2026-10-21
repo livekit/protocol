@@ -498,8 +498,6 @@ message SimulatorNode {
   // the agent's speech restarts it.
   Timeout timeout = 5;
   Speaker speaker = 6;
-  // What the agent should do during this node, for the judge.
-  string expectation = 7;
 }
 
 // How the simulated user interacts with the agent under test.
