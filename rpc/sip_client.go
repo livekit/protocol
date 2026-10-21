@@ -14,7 +14,17 @@
 
 package rpc
 
-import "github.com/livekit/psrpc"
+import (
+	"time"
+
+	"github.com/livekit/psrpc"
+)
+
+// sipClaimTimeout is how long a SIP request waits for a SIP instance to claim it. psrpc's 1s
+// default is too short for a claim published from a SIP pod whose Redis connections went cold
+// while it sat idle. The window only bounds the wait for an unclaimed request; nothing is sent
+// again, so a longer one cannot place a call twice.
+const sipClaimTimeout = 3 * time.Second
 
 type SIPClient interface {
 	SIPInternalClient
@@ -32,7 +42,8 @@ func NewSIPClientWithParams(params ClientParams) (SIPClient, error) {
 	if params.Bus == nil {
 		return nil, nil
 	}
-	opts := params.Options()
+	// First, so a caller's own selection timeout still wins.
+	opts := append([]psrpc.ClientOption{psrpc.WithClientSelectTimeout(sipClaimTimeout)}, params.Options()...)
 
 	internalClient, err := NewSIPInternalClient(params.Bus, opts...)
 	if err != nil {
