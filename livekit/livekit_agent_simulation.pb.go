@@ -747,11 +747,11 @@ type SimulatorNode struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Spoken word for word when the node starts.
 	Say string `protobuf:"bytes,1,opt,name=say,proto3" json:"say,omitempty"`
-	// LLM roleplay for every turn after say. Only these nodes react to the
-	// agent's speech.
+	// LLM roleplay for every turn after say. Only these nodes answer the agent.
 	Instructions string `protobuf:"bytes,2,opt,name=instructions,proto3" json:"instructions,omitempty"`
-	// The next node: when say ends, or, with timeout, when the agent's reply
-	// ends. Then timeout is the path for no reply.
+	// The next node. Without timeout: when say ends. With timeout: when the
+	// agent's reply ends, if the agent starts one before timeout.after;
+	// otherwise timeout.to.
 	Then string `protobuf:"bytes,3,opt,name=then,proto3" json:"then,omitempty"`
 	// Checked in order; the first match wins. A node whose routes each match
 	// one key matches every key at once. Otherwise keys collect until #, which
@@ -759,8 +759,9 @@ type SimulatorNode struct {
 	// A node with routes, such as a menu, plays at most three times; the next
 	// visit ends the call.
 	Routes []*SimulatorNode_Route `protobuf:"bytes,4,rep,name=routes,proto3" json:"routes,omitempty"`
-	// Starts when say ends. On a machine node only a route cancels it; on a
-	// person node the agent's speech restarts it.
+	// Starts when say ends. With then, the agent starting a reply cancels it.
+	// Without then, on a machine node only a route cancels it; on a person node
+	// the agent's speech restarts it.
 	Timeout *SimulatorNode_Timeout `protobuf:"bytes,5,opt,name=timeout,proto3" json:"timeout,omitempty"`
 	Speaker SimulatorNode_Speaker  `protobuf:"varint,6,opt,name=speaker,proto3,enum=livekit.SimulatorNode_Speaker" json:"speaker,omitempty"`
 	// What the agent should do during this node, for the judge.
