@@ -1,0 +1,23 @@
+livekit/livekit_agent_simulation.pb.go
+  s_aaf78334cb7322::t_6433d95f71b21d 750-754,768-769,774,776,4023,4029-4031,4073,4122-4130,4136,4139,4146,4151-4212,4239
+livekit/livekit_agent_simulation.twirp.go
+  s_aaf78334cb7322::t_5c97007fc8b4d9 2194-2461
+protobufs/livekit_agent_simulation.proto
+  s_aaf78334cb7322::t_ea0f07efdb23d5 456-460,492-493,498,500
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d83a11babc389f84c10f3521a65045df823ad667",
+  "prompts": {},
+  "sessions": {
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
