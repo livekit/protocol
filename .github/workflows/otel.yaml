@@ -46,12 +46,15 @@ jobs:
       # The Generate workflow regenerates otel/gen on every push to a branch and commits any
       # change, as it does for the protobuf code. That commit is pushed with the workflow
       # token and does not run these checks by itself (GitHub can ask a maintainer to approve
-      # that run); push again to run them. This check fails a commit whose otel/gen is stale.
+      # that run); push again to run them. This check fails a commit whose otel/gen is stale,
+      # also when a fresh run deletes an output: `git add --all` stages the deletion, and the
+      # diff compares the index with the commit.
       - name: Generated outputs are current
         run: |
+          otel/tests/generate.sh
           otel/generate.sh
-          git add --intent-to-add otel/gen
-          git diff --exit-code -- otel/gen
+          git add --all otel/gen
+          git diff --cached --exit-code -- otel/gen
 
       - name: Generated outputs compile
         run: |

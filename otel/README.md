@@ -153,6 +153,7 @@ otel/check.sh                          # registry + LiveKit policies, default an
 otel/tests/negatives.sh                # each negative fixture fails with its named finding, both modes
 go tool mage otel && git status otel/gen  # regenerate (runs otel/generate.sh); no diff expected
 otel/tests/live-check.sh               # smoke and sparse samples clean, legacy keys flagged
+otel/tests/generate.sh                 # generate.sh replaces gen/ whole, and keeps it when a target fails
 otel/tests/codegen.sh                  # a value with quotes, backslashes, newlines round-trips through rustc, tsc and python3
 
 rustc --edition 2021 --crate-type lib -D warnings -D missing_docs otel/gen/rust/semconv.rs --out-dir /tmp
