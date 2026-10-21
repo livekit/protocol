@@ -363,6 +363,18 @@ message SimulationRun {
     message Response {}
   }
 
+  // A report that a simulated scenario is not trustworthy, sent to LiveKit
+  // staff for triage. Nothing is stored.
+  message ReportIssue {
+    message Request {
+      string project_id = 1;
+      string simulation_run_id = 2;
+      string simulation_job_id = 3;
+      string description = 4;
+    }
+    message Response {}
+  }
+
   string id = 1;
   string project_id = 2;
   Status status = 3;
@@ -468,6 +480,7 @@ service AgentSimulation {
   rpc ListSimulationRuns(SimulationRun.List.Request) returns (SimulationRun.List.Response);
   rpc CountSimulationRuns(SimulationRun.Counts.Request) returns (SimulationRun.Counts.Response);
   rpc CancelSimulationRun(SimulationRun.Cancel.Request) returns (SimulationRun.Cancel.Response);
+  rpc ReportSimulationIssue(SimulationRun.ReportIssue.Request) returns (SimulationRun.ReportIssue.Response);
 
   rpc CreateScenarioFromSession(Scenario.CreateFromSession.Request) returns (Scenario.CreateFromSession.Response);
 }
