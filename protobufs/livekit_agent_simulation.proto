@@ -302,6 +302,7 @@ message SimulationRun {
       SimulationMode mode = 9;
 
       // Impairments applied to the simulated user's audio; AUDIO mode only.
+      // TODO(u9g): migrate these to SimulationImpairments.
       bool background_noise = 10;
       bool low_quality_microphone = 11;
       bool packet_loss = 12;

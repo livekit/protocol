@@ -2608,6 +2608,7 @@ type SimulationRun_Create_Request struct {
 	// Conversation mode for every job in this run; unspecified = TEXT.
 	Mode SimulationMode `protobuf:"varint,9,opt,name=mode,proto3,enum=livekit.SimulationMode" json:"mode,omitempty"`
 	// Impairments applied to the simulated user's audio; AUDIO mode only.
+	// TODO(u9g): migrate these to SimulationImpairments.
 	BackgroundNoise      bool              `protobuf:"varint,10,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"`
 	LowQualityMicrophone bool              `protobuf:"varint,11,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
 	PacketLoss           bool              `protobuf:"varint,12,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
