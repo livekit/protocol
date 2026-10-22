@@ -22,6 +22,11 @@ const (
 	//
 	// SIP participant is ready when it reaches "active" status.
 	AttrSIPCallStatus = AttrSIPPrefix + "callStatus"
+	// AttrSIPCallStatusCode attribute contains the SIP response code the call ended on,
+	// as a decimal string (e.g. "486"). Set only when a SIP response decided the outcome.
+	AttrSIPCallStatusCode = AttrSIPPrefix + "callStatusCode"
+	// AttrSIPCallStatusText attribute contains the reason phrase of that response (e.g. "Busy Here").
+	AttrSIPCallStatusText = AttrSIPPrefix + "callStatusText"
 	// AttrSIPHeaderPrefix is a prefix for automatically mapped SIP header attributes.
 	AttrSIPHeaderPrefix = AttrSIPPrefix + "h."
 	// AttrSIPInviteTime attribute contains the time the inbound INVITE was received, in Unix milliseconds.
