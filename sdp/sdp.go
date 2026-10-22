@@ -154,13 +154,13 @@ func ExtractStreamID(media *sdp.MediaDescription) (string, bool) {
 }
 
 func GetIP(sdp *sdp.SessionDescription) string {
-	if sdp.ConnectionInformation != nil && sdp.ConnectionInformation.NetworkType == "IN" {
-		return sdp.ConnectionInformation.Address.Address
+	if ci := sdp.ConnectionInformation; ci != nil && ci.NetworkType == "IN" && ci.Address != nil {
+		return ci.Address.Address
 	}
 
 	for _, media := range sdp.MediaDescriptions {
-		if media.ConnectionInformation != nil && media.ConnectionInformation.NetworkType == "IN" {
-			return media.ConnectionInformation.Address.Address
+		if ci := media.ConnectionInformation; ci != nil && ci.NetworkType == "IN" && ci.Address != nil {
+			return ci.Address.Address
 		}
 	}
 	return ""
@@ -417,6 +417,10 @@ func (s *SDPFragment) Unmarshal(frag string) error {
 		}
 
 		if line[0] == 'm' {
+			if len(line) < 3 || line[1] != '=' {
+				return errors.New("invalid media section")
+			}
+
 			if s.media != nil {
 				return errors.New("too many media sections")
 			}
@@ -431,7 +435,7 @@ func (s *SDPFragment) Unmarshal(frag string) error {
 			continue
 		}
 
-		if line[1] != '=' {
+		if len(line) < 2 || line[1] != '=' {
 			return errors.New("invalid attribute")
 		}
 
@@ -572,7 +576,7 @@ func (s *SDPFragment) ExtractICECredential() (string, string, error) {
 		}
 	}
 
-	if s.media != nil {
+	if s.media != nil && s.media.ice != nil {
 		if s.media.ice.ufrag != "" {
 			ufrags = append(ufrags, s.media.ice.ufrag)
 		}
@@ -670,31 +674,37 @@ func (s *SDPFragment) PatchICECredentialAndCandidatesIntoSDP(parsed *sdp.Session
 
 	if s.media != nil {
 		for _, md := range parsed.MediaDescriptions {
-			for idx, a := range md.Attributes {
-				switch a.Key {
-				case "ice-ufrag":
-					if s.media.ice.ufrag != "" {
-						md.Attributes[idx] = sdp.Attribute{
-							Key:   "ice-ufrag",
-							Value: s.media.ice.ufrag,
+			if s.media.ice != nil {
+				for idx, a := range md.Attributes {
+					switch a.Key {
+					case "ice-ufrag":
+						if s.media.ice.ufrag != "" {
+							md.Attributes[idx] = sdp.Attribute{
+								Key:   "ice-ufrag",
+								Value: s.media.ice.ufrag,
+							}
 						}
-					}
-				case "ice-pwd":
-					if s.media.ice.pwd != "" {
-						md.Attributes[idx] = sdp.Attribute{
-							Key:   "ice-pwd",
-							Value: s.media.ice.pwd,
+					case "ice-pwd":
+						if s.media.ice.pwd != "" {
+							md.Attributes[idx] = sdp.Attribute{
+								Key:   "ice-pwd",
+								Value: s.media.ice.pwd,
+							}
 						}
 					}
 				}
 			}
 
 			// clean out existing candidates and patch in new ones
-			for idx, a := range md.Attributes {
+			retained := md.Attributes[:0]
+			for _, a := range md.Attributes {
 				if a.IsICECandidate() || a.Key == sdp.AttrKeyEndOfCandidates {
-					md.Attributes = append(md.Attributes[:idx], md.Attributes[idx+1:]...)
+					continue
 				}
+
+				retained = append(retained, a)
 			}
+			md.Attributes = retained
 
 			for _, ic := range s.media.candidates {
 				md.Attributes = append(

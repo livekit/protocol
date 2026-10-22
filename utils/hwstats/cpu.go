@@ -64,6 +64,8 @@ type platformCPUMonitor interface {
 
 type CPUStats struct {
 	idleCPUs atomic.Float64
+	// set by the first sample, the load reads as 0 until then
+	sampled  atomic.Bool
 	platform platformCPUMonitor
 
 	idleCallback    func(idle float64)
@@ -176,13 +178,17 @@ func (c *CPUStats) NumCPU() float64 {
 }
 
 func (c *CPUStats) GetCPULoad() float64 {
-	var cpuLoad float64
-	cpuIdle := c.GetCPUIdle()
 	nCPU := c.NumCPU()
-	if nCPU > 0 && cpuIdle > 0 {
-		cpuLoad = 1 - (cpuIdle / c.NumCPU())
+	if nCPU <= 0 || !c.sampled.Load() {
+		return 0
 	}
-	return cpuLoad
+	// idle 0 is a saturated node, not a missing sample
+	return min(1, max(0, 1-c.GetCPUIdle()/nCPU))
+}
+
+func (c *CPUStats) storeIdle(idle float64) {
+	c.idleCPUs.Store(idle)
+	c.sampled.Store(true)
 }
 
 func (c *CPUStats) Stop() {
@@ -198,23 +204,27 @@ func (c *CPUStats) monitorCPULoad() {
 		case <-c.closeChan:
 			return
 		case <-ticker.C:
-			idle, err := c.platform.getCPUIdle()
-			if err != nil {
-				logger.Errorw("failed retrieving CPU idle", err)
-				continue
-			}
-
-			c.idleCPUs.Store(idle)
-			idleRatio := idle / c.platform.numCPU()
-
-			if idleRatio < 0.1 {
-				c.warningThrottle(func() { logger.Infow("high cpu load", "load", 1-idleRatio) })
-			}
-
-			if c.idleCallback != nil {
-				c.idleCallback(idle)
-			}
+			c.sampleCPUIdle()
 		}
+	}
+}
+
+func (c *CPUStats) sampleCPUIdle() {
+	idle, err := c.platform.getCPUIdle()
+	if err != nil {
+		logger.Errorw("failed retrieving CPU idle", err)
+		return
+	}
+
+	c.storeIdle(idle)
+	idleRatio := idle / c.platform.numCPU()
+
+	if idleRatio < 0.1 {
+		c.warningThrottle(func() { logger.Infow("high cpu load", "load", 1-idleRatio) })
+	}
+
+	if c.idleCallback != nil {
+		c.idleCallback(idle)
 	}
 }
 
@@ -304,7 +314,7 @@ func (c *CPUStats) monitorProcesses() {
 				stats.CpuIdle -= cpu
 			}
 
-			c.idleCPUs.Store(stats.CpuIdle)
+			c.storeIdle(stats.CpuIdle)
 
 			if c.procCallback != nil {
 				c.procCallback(stats)

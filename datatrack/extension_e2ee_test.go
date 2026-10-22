@@ -1,4 +1,4 @@
-// Copyright 2024 LiveKit, Inc.
+// Copyright 2026 LiveKit, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,35 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package utils
+package datatrack
 
 import (
 	"testing"
-	"unsafe"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-type copyTestType struct {
-	Vbool          bool
-	Varray         [3]int
-	Vslice         []int
-	Vmap           map[int]int
-	Vpointer       *copyTestType
-	VunsafePointer unsafe.Pointer
-	vunexported    bool //nolint:unused // tests deep copy of unexported fields
-}
+func TestExtensionE2EE(t *testing.T) {
+	iv := [ExtensionE2EEIVLength]byte{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+	extE2EE := NewExtensionE2EE(0xfa, iv)
 
-func TestDeepCopy(t *testing.T) {
-	v := &copyTestType{
-		Vbool:  true,
-		Varray: [3]int{0, 1, 2},
-		Vslice: []int{0, 1, 2},
-		Vmap:   map[int]int{0: 0, 1: 1, 2: 2},
-		Vpointer: &copyTestType{
-			Vbool: true,
-		},
+	expectedExt := Extension{
+		id:   ExtensionE2EEID,
+		data: []byte{0xfa, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 	}
+	ext, err := extE2EE.Marshal()
+	require.NoError(t, err)
+	require.Equal(t, expectedExt, ext)
 
-	require.EqualValues(t, v, DeepCopy(v))
+	var unmarshaled ExtensionE2EE
+	err = unmarshaled.Unmarshal(ext)
+	require.NoError(t, err)
+	assert.Equal(t, uint8(0xfa), unmarshaled.KeyIndex())
+	assert.Equal(t, iv, unmarshaled.IV())
 }

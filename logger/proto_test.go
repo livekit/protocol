@@ -58,30 +58,7 @@ func TestProtoRedactsPIIAndSecret(t *testing.T) {
 	require.Equal(t, "<redacted>", fields["assumeRoleExternalID"])
 }
 
-func TestUnredactedProtoShowsPIIRedactsSecret(t *testing.T) {
-	msg := &livekit.S3Upload{
-		AccessKey:            "AKIAEXAMPLE",
-		Secret:               "supersecretvalue",
-		SessionToken:         "tokenvalue",
-		AssumeRoleArn:        "arn:aws:iam::123456789012:role/MyRole",
-		AssumeRoleExternalId: "external-id-1",
-		Region:               "us-east-1",
-	}
-	fields := marshalFields(t, logger.UnredactedProto(msg))
-
-	require.Equal(t, "us-east-1", fields["region"])
-
-	// PII is exposed.
-	require.Equal(t, "arn:aws:iam::123456789012:role/MyRole", fields["assumeRoleArn"])
-
-	// SECRETs remain redacted.
-	require.Equal(t, "<redacted>", fields["accessKey"])
-	require.Equal(t, "<redacted>", fields["secret"])
-	require.Equal(t, "<redacted>", fields["sessionToken"])
-	require.Equal(t, "<redacted>", fields["assumeRoleExternalID"])
-}
-
-func TestProtoRedactFormatPreservedAtPIITier(t *testing.T) {
+func TestProtoRedactFormatUsedForPII(t *testing.T) {
 	// ParticipantInfo.metadata is PII with a size-showing redact_format.
 	msg := &livekit.ParticipantInfo{
 		Identity: "user-123",
@@ -94,10 +71,6 @@ func TestProtoRedactFormatPreservedAtPIITier(t *testing.T) {
 	require.Equal(t, "<redacted>", got["name"])
 	require.Contains(t, got["metadata"].(string), "<redacted (")
 	require.Contains(t, got["metadata"].(string), "bytes)>")
-
-	gotUnredacted := marshalFields(t, logger.UnredactedProto(msg))
-	require.Equal(t, "Alice", gotUnredacted["name"])
-	require.Equal(t, `{"plan":"pro"}`, gotUnredacted["metadata"])
 }
 
 func TestProtoNestedListPIIRedacted(t *testing.T) {
@@ -110,22 +83,14 @@ func TestProtoNestedListPIIRedacted(t *testing.T) {
 		},
 	}
 
-	gotRedacted := marshalFields(t, logger.Proto(msg))
-	tracks := gotRedacted["tracks"].([]any)
+	got := marshalFields(t, logger.Proto(msg))
+	tracks := got["tracks"].([]any)
 	require.Len(t, tracks, 2)
 	for _, raw := range tracks {
 		track := raw.(map[string]any)
 		require.NotEmpty(t, track["sid"])
 		require.Equal(t, "<redacted>", track["name"])
 	}
-
-	gotUnredacted := marshalFields(t, logger.UnredactedProto(msg))
-	tracksU := gotUnredacted["tracks"].([]any)
-	names := make([]string, 0, 2)
-	for _, raw := range tracksU {
-		names = append(names, raw.(map[string]any)["name"].(string))
-	}
-	require.ElementsMatch(t, []string{"Microphone", "Camera"}, names)
 }
 
 func TestProtoNestedSecretAlwaysRedacted(t *testing.T) {
@@ -135,19 +100,11 @@ func TestProtoNestedSecretAlwaysRedacted(t *testing.T) {
 	}
 	wrap := &livekit.JoinResponse{IceServers: servers}
 
-	for _, name := range []string{"Proto", "UnredactedProto"} {
-		var m zapcore.ObjectMarshaler
-		if name == "Proto" {
-			m = logger.Proto(wrap)
-		} else {
-			m = logger.UnredactedProto(wrap)
-		}
-		fields := marshalFields(t, m)
-		iceServers := fields["iceServers"].([]any)
-		require.Len(t, iceServers, 1)
-		entry := iceServers[0].(map[string]any)
-		require.Equal(t, "<redacted>", entry["credential"], "credential must be redacted by %s", name)
-	}
+	fields := marshalFields(t, logger.Proto(wrap))
+	iceServers := fields["iceServers"].([]any)
+	require.Len(t, iceServers, 1)
+	entry := iceServers[0].(map[string]any)
+	require.Equal(t, "<redacted>", entry["credential"])
 }
 
 func TestProtoWithLimitUnderLimit(t *testing.T) {
@@ -233,7 +190,6 @@ func TestProtoWithLimitNilSafe(t *testing.T) {
 
 func TestProtoNilSafe(t *testing.T) {
 	require.Nil(t, logger.Proto(nil))
-	require.Nil(t, logger.UnredactedProto(nil))
 
 	// Typed-nil pointer is not interface-nil; the returned marshaller is
 	// non-nil but emits no fields.

@@ -351,8 +351,10 @@ func (x *ListActiveEgressResponse) GetEgressIds() []string {
 }
 
 type EgressReadyRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	EgressId      string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	EgressId string                 `protobuf:"bytes,1,opt,name=egress_id,json=egressId,proto3" json:"egress_id,omitempty"`
+	// set when the egress is exporting from object storage rather than joining a room
+	SkipPlayback  bool `protobuf:"varint,2,opt,name=skip_playback,json=skipPlayback,proto3" json:"skip_playback,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -392,6 +394,13 @@ func (x *EgressReadyRequest) GetEgressId() string {
 		return x.EgressId
 	}
 	return ""
+}
+
+func (x *EgressReadyRequest) GetSkipPlayback() bool {
+	if x != nil {
+		return x.SkipPlayback
+	}
+	return false
 }
 
 type EgressReadyResponse struct {
@@ -473,9 +482,10 @@ const file_rpc_egress_proto_rawDesc = "" +
 	"\x17ListActiveEgressRequest\"9\n" +
 	"\x18ListActiveEgressResponse\x12\x1d\n" +
 	"\n" +
-	"egress_ids\x18\x01 \x03(\tR\tegressIds\">\n" +
+	"egress_ids\x18\x01 \x03(\tR\tegressIds\"c\n" +
 	"\x12EgressReadyRequest\x12(\n" +
-	"\tegress_id\x18\x01 \x01(\tB\v\xbaP\begressIDR\begressId\"Q\n" +
+	"\tegress_id\x18\x01 \x01(\tB\v\xbaP\begressIDR\begressId\x12#\n" +
+	"\rskip_playback\x18\x02 \x01(\bR\fskipPlayback\"Q\n" +
 	"\x13EgressReadyResponse\x12\x19\n" +
 	"\bstart_at\x18\x01 \x01(\x03R\astartAt\x12\x1f\n" +
 	"\vduration_ms\x18\x02 \x01(\x03R\n" +

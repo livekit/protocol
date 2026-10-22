@@ -17,6 +17,7 @@ package rpc
 import (
 	"context"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"github.com/livekit/psrpc"
@@ -30,10 +31,22 @@ import (
 )
 
 type PSRPCConfig struct {
-	MaxAttempts int           `yaml:"max_attempts,omitempty"`
-	Timeout     time.Duration `yaml:"timeout,omitempty"`
-	Backoff     time.Duration `yaml:"backoff,omitempty"`
-	BufferSize  int           `yaml:"buffer_size,omitempty"`
+	MaxAttempts int               `yaml:"max_attempts,omitempty"`
+	Timeout     time.Duration     `yaml:"timeout,omitempty"`
+	Backoff     time.Duration     `yaml:"backoff,omitempty"`
+	BufferSize  int               `yaml:"buffer_size,omitempty"`
+	Compression CompressionConfig `yaml:"compression,omitempty"`
+}
+
+// Quality zero disables compression. Only MaxDecompressedSize affects reading.
+type CompressionConfig struct {
+	Quality             int `yaml:"quality,omitempty"`
+	Threshold           int `yaml:"threshold,omitempty"`
+	MaxDecompressedSize int `yaml:"max_decompressed_size,omitempty"`
+}
+
+var DefaultCompressionConfig = CompressionConfig{
+	Threshold: psrpc.DefaultCompressionThreshold,
 }
 
 var DefaultPSRPCConfig = PSRPCConfig{
@@ -41,6 +54,17 @@ var DefaultPSRPCConfig = PSRPCConfig{
 	Timeout:     3 * time.Second,
 	Backoff:     2 * time.Second,
 	BufferSize:  1000,
+	Compression: DefaultCompressionConfig,
+}
+
+func (c PSRPCConfig) BusOptions() []psrpc.BusOption {
+	return []psrpc.BusOption{
+		psrpc.WithBusCompression(psrpc.CompressionOpts{
+			Quality:             c.Compression.Quality,
+			Threshold:           c.Compression.Threshold,
+			MaxDecompressedSize: c.Compression.MaxDecompressedSize,
+		}),
+	}
 }
 
 type ClientParams struct {
@@ -97,12 +121,29 @@ func (p *ClientParams) Args() (psrpc.MessageBus, psrpc.ClientOption) {
 	return p.Bus, psrpc.WithClientOptions(p.Options()...)
 }
 
+var psrpcServerSkipClaim atomic.Pointer[func() bool]
+
+// SetPSRPCServerSkipClaim gates the claim skip for every server built through
+// WithServerObservability. Process-wide; read per request, so revocable at runtime.
+func SetPSRPCServerSkipClaim(enabled func() bool) {
+	psrpcServerSkipClaim.Store(&enabled)
+}
+
+func psrpcServerSkipClaimEnabled() bool {
+	if enabled := psrpcServerSkipClaim.Load(); enabled != nil {
+		return (*enabled)()
+	}
+	return false
+}
+
 func WithServerObservability(logger logger.Logger) psrpc.ServerOption {
 	return psrpc.WithServerOptions(
 		middleware.WithServerMetrics(PSRPCMetricsObserver{}),
 		psrpc.WithServerObserver(PSRPCMetricsObserver{}),
 		WithServerLogger(logger),
 		otelpsrpc.ServerOptions(otelpsrpc.Config{}),
+		// here rather than WithDefaultServerOptions so logger-only servers get it too
+		psrpc.WithServerSkipClaim(psrpcServerSkipClaimEnabled),
 	)
 }
 

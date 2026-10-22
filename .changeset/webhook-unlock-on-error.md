@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add data track subscription to sync state
+Fix ResourceURLNotifier.QueueNotify keeping its lock after an error

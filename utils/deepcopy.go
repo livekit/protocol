@@ -14,61 +14,6 @@
 
 package utils
 
-import (
-	"reflect"
-)
+import "github.com/livekit/protocol/utils/deepcopy"
 
-func DeepCopy[T any](v T) T {
-	return deepCopy(reflect.ValueOf(v)).Interface().(T)
-}
-
-func deepCopy(v reflect.Value) reflect.Value {
-	switch v.Type().Kind() {
-	case reflect.Array:
-		c := reflect.New(v.Type()).Elem()
-		for i := range v.Len() {
-			c.Index(i).Set(deepCopy(v.Index(i)))
-		}
-		return c
-
-	case reflect.Map:
-		if v.IsNil() {
-			return v
-		}
-		c := reflect.MakeMap(v.Type())
-		for mr := v.MapRange(); mr.Next(); {
-			c.SetMapIndex(deepCopy(mr.Key()), deepCopy(mr.Value()))
-		}
-		return c
-
-	case reflect.Pointer:
-		if v.IsNil() {
-			return v
-		}
-		c := reflect.New(v.Type().Elem())
-		c.Elem().Set(deepCopy(v.Elem()))
-		return c
-
-	case reflect.Slice:
-		if v.IsNil() {
-			return v
-		}
-		c := reflect.MakeSlice(v.Type(), v.Len(), v.Cap())
-		for i := range v.Len() {
-			c.Index(i).Set(deepCopy(v.Index(i)))
-		}
-		return c
-
-	case reflect.Struct:
-		c := reflect.New(v.Type()).Elem()
-		for i := range v.NumField() {
-			if c.Field(i).CanSet() {
-				c.Field(i).Set(deepCopy(v.Field(i)))
-			}
-		}
-		return c
-
-	default: // Bool, Chan, Complex128, Complex64, Float32, Float64, Func, Int, Int16, Int32, Int64, Int8, Interface, String, Uint, Uint16, Uint32, Uint64, Uint8, Uintptr, UnsafePointer
-		return v
-	}
-}
+func DeepCopy[T any](v T) T { return deepcopy.Copy(v) }

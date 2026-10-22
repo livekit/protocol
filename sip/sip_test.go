@@ -851,6 +851,30 @@ func TestEvaluateDispatchRule(t *testing.T) {
 		}
 		require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
 	})
+	t.Run("HidePhoneNumber", func(t *testing.T) {
+		// Masking slices the From user part, which may be empty.
+		d := &livekit.SIPDispatchRuleInfo{
+			SipDispatchRuleId: "rule",
+			Rule:              newDirectDispatch("room", ""),
+			HidePhoneNumber:   true,
+		}
+		for _, c := range []struct{ from, exp string }{
+			{"", ""},
+			{"1", "1"},
+			{"1234", "4"},
+			{"12345", "2345"},
+			{caller, "4567"},
+		} {
+			r := &rpc.EvaluateSIPDispatchRulesRequest{
+				SipCallId:     "call-id",
+				CallingNumber: c.from,
+				CalledNumber:  callee,
+			}
+			res, err := EvaluateDispatchRule(projectID, tr, d, r)
+			require.NoError(t, err, "from %q", c.from)
+			require.Equal(t, "Phone "+c.exp, res.ParticipantName, "from %q", c.from)
+		}
+	})
 	t.Run("Individual", func(t *testing.T) {
 		t.Run("minimal", func(t *testing.T) {
 			testDR := livekit.SIPDispatchRuleInfo{

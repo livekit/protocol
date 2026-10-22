@@ -75,6 +75,12 @@ message SimulationRun {
     Usage usage = 13;
     // Quality metrics for this job's call. Unset when the job produced none.
     JobMetrics metrics = 14;
+    // The Scenario.id this job ran; empty for generated runs. Every sample
+    // of one scenario shares it, so a run's jobs group back into scenarios.
+    string scenario_id = 15;
+    // 1-based sample of that scenario within the run; always 1 when the run's
+    // samples is 1.
+    int32 sample = 16;
 
     message Usage {
       int32 text_turns_count = 1;
@@ -84,9 +90,10 @@ message SimulationRun {
 
   message JobMetrics {
     // Headline scores, 0-1. All absent when the simulator spoiled the call.
-    optional float accuracy_score = 1;
-    optional float experience_score = 2;
+    reserved 1, 2;  // was accuracy_score, experience_score (merged into overall_score)
+    reserved "accuracy_score", "experience_score";
     optional float task_completion = 3;  // the scenario verdict as 1/0
+    optional float overall_score = 20;   // weighted mean of the judged and heard scores
 
     STT stt = 4;
     LLM llm = 5;
@@ -202,14 +209,42 @@ message SimulationRun {
   // Aggregates over this run's jobs, so a run summary does not have to pull
   // every job and turn. Reuses the JobMetrics group shapes.
   message RunMetrics {
-    optional float accuracy_score = 1;     // mean over scored jobs
-    optional float experience_score = 2;
+    reserved 1, 2;  // was accuracy_score, experience_score (merged into overall_score)
+    reserved "accuracy_score", "experience_score";
     optional float scenario_pass_rate = 3; // share of jobs whose scenario verdict passed
+    optional float overall_score = 10;     // mean over scored jobs
 
     JobMetrics.STT stt = 4;
     JobMetrics.LLM llm = 5;
     JobMetrics.TTS tts = 6;
     JobMetrics.Conversation conversation = 7;
+
+    // Means over the jobs that report them.
+    optional float conciseness = 8;
+    optional float conversation_progression = 9;
+  }
+
+  // The pipeline this run came from. Set by the client from its CI
+  // environment; absent for runs not started by a pipeline.
+  message CI {
+    string provider = 1;  // e.g. "github_actions"
+    string commit_sha = 2;
+    string ref = 3;  // branch or tag
+    string pull_request = 4;
+    string run_url = 5;  // link back to the CI job
+    string actor = 6;
+  }
+
+  // Runs each scenario more than once, so a flaky sample is distinguishable
+  // from a broken scenario. Both fields are required when it is present.
+  message SamplingOptions {
+    // Samples per scenario, > 1. The run holds scenarios × samples jobs,
+    // subject to the usual job cap.
+    int32 samples = 1;
+    // The share of a scenario's samples that must pass for that scenario to
+    // pass, 0-1. A scenario needs round(rate × samples) of them, so 1
+    // requires every sample and 0.67 of 3 requires 2.
+    double pass_rate = 2;
   }
 
   message Create {
@@ -231,6 +266,16 @@ message SimulationRun {
 
       // Conversation mode for every job in this run; unspecified = TEXT.
       SimulationMode mode = 9;
+
+      // Impairments applied to the simulated user's audio; AUDIO mode only.
+      bool background_noise = 10;
+      bool low_quality_microphone = 11;
+      bool packet_loss = 12;
+      optional CI ci = 13;
+      // Absent runs each scenario once and requires it to pass. Requires
+      // scenario_group. The run fails if any scenario fails; pass@k and
+      // pass^k report over scenarios and neither gates.
+      optional SamplingOptions sampling = 14;
     }
     message Response {
       string simulation_run_id = 1;
@@ -262,14 +307,17 @@ message SimulationRun {
       string project_id = 1;
       optional Status status = 2;
       optional TokenPagination page_token = 3;
-      // Half-open window [from, to) on created_at, the leading key of this
-      // list's keyset. Unset bounds mean no window, so existing callers keep
-      // their unbounded scan; the histogram's selected range sets both.
-      optional google.protobuf.Timestamp from = 4;
-      optional google.protobuf.Timestamp to = 5;
+      // Half-open window [start_time, end_time) on created_at, the leading key
+      // of this list's keyset. Unset bounds mean no window, so existing callers
+      // keep their unbounded scan; the histogram's selected range sets both.
+      optional google.protobuf.Timestamp start_time = 4;
+      optional google.protobuf.Timestamp end_time = 5;
       // Exact agent name. Unset means every agent — including the runs whose
       // name is empty, which a bare string could not tell from no filter.
       optional string agent_name = 6;
+      // Absent applies no mode filter. TEXT matches runs stored as TEXT or
+      // UNSPECIFIED, which `SimulationRun.mode` defines as the same mode.
+      optional SimulationMode mode = 7;
     }
     message Response {
       repeated SimulationRun runs = 1;
@@ -284,12 +332,13 @@ message SimulationRun {
       string project_id = 1;
       // Both bounds required: a bucketed scan of a project's whole history is
       // never what a caller wants.
-      google.protobuf.Timestamp from = 2;
-      google.protobuf.Timestamp to = 3;
+      google.protobuf.Timestamp start_time = 2;
+      google.protobuf.Timestamp end_time = 3;
       // Applied as `List` applies it: a filter the rows honour and the bars
       // above them drop would make the histogram an answer about a wider set.
       optional Status status = 4;
       optional string agent_name = 5;
+      optional SimulationMode mode = 6;
     }
     message Response {
       // Buckets holding at least one run, ascending by bucket_start. Empty
@@ -342,6 +391,14 @@ message SimulationRun {
   // zstd-compressed SimulationRunSummary: decompress, then proto.Unmarshal.
   // Compressed by default so the blob ships as-is on every hop.
   bytes summary_zstd = 20;
+  // How many issues the stored summary flagged. Present only once a summary
+  // landed — absent and 0 differ ("never summarized" vs "no issues") — and
+  // List responses carry it without the summary blob itself.
+  optional int32 issue_count = 21;
+  // The pipeline this run came from; unset when it did not come from one.
+  optional CI ci = 22;
+  // Absent when the run ran each scenario once and required it to pass.
+  optional SamplingOptions sampling = 23;
 
   message Usage {
     int32 text_turns_count = 1;
@@ -371,12 +428,18 @@ message Scenario {
   // Arbitrary JSON-encoded object, surfaced to the agent under test as
   // SimulationContext userdata (e.g. inputs and benchmark target state).
   string userdata = 5;
+  // SCN_-prefixed guid. Stable across edits to label, instructions, or
+  // expectations, so runs of the same scenario can be correlated over time.
+  string id = 6;
 }
 
 // A named group of scenarios, mirroring a whole scenarios.yaml file.
 message ScenarioGroup {
   string name = 1;
   repeated Scenario scenarios = 2;
+  // SCNG_-prefixed guid. Stable identity of the scenarios file, independent
+  // of its name.
+  string id = 3;
 }
 
 // How the simulated user interacts with the agent under test.

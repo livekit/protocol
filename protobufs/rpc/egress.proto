@@ -92,6 +92,9 @@ message ListActiveEgressResponse {
 
 message EgressReadyRequest {
   string egress_id = 1 [(logger.name) = "egressID"];
+
+  // set when the egress is exporting from object storage rather than joining a room
+  bool skip_playback = 2;
 }
 
 message EgressReadyResponse {

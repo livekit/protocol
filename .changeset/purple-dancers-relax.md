@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Remove extraneous format specifier from log string.
+Data track extension ID collision: intermediate step.

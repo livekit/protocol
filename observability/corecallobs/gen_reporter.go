@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const Version_OETGPV0 = true
+const Version_FOSFDP8 = true
 
 type KeyResolver interface {
 	Resolve(string)

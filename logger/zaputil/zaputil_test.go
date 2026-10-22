@@ -51,6 +51,15 @@ func (c *testCore) With(fields []zapcore.Field) zapcore.Core {
 	}
 }
 
+// Check must register c, not the embedded core, or Write never runs
+func (c *testCore) Check(ent zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	c.init()
+	if c.Enabled(ent.Level) {
+		return ce.AddCore(ent, c)
+	}
+	return ce
+}
+
 func (c *testCore) Write(entry zapcore.Entry, fields []zapcore.Field) error {
 	c.init()
 	c.writeCount.Inc()

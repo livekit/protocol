@@ -14,7 +14,13 @@
 
 package logger
 
-import "sync"
+import (
+	"maps"
+	"strings"
+	"sync"
+
+	"go.uber.org/zap/zapcore"
+)
 
 type Config struct {
 	JSON  bool   `yaml:"json,omitempty"`
@@ -45,6 +51,42 @@ type Config struct {
 
 type ConfigObserver func(*Config) error
 
+// configYAML mirrors Config's yaml-visible fields so MarshalYAML can snapshot them
+// under the lock; Config itself cannot be copied out. TestConfigYAMLFields guards drift.
+type configYAML struct {
+	JSON   bool   `yaml:"json,omitempty"`
+	Level  string `yaml:"level,omitempty"`
+	Sample bool   `yaml:"sample,omitempty"`
+
+	ComponentLevels map[string]string `yaml:"component_levels,omitempty"`
+
+	SampleInitial  int `yaml:"sample_initial,omitempty"`
+	SampleInterval int `yaml:"sample_interval,omitempty"`
+
+	ItemSampleSeconds  int `yaml:"item_sample_seconds,omitempty"`
+	ItemSampleInitial  int `yaml:"item_sample_initial,omitempty"`
+	ItemSampleInterval int `yaml:"item_sample_interval,omitempty"`
+}
+
+// The encoder reads the returned value after the lock is released, so the map is cloned
+// rather than shared with a config that Update may replace.
+func (c *Config) MarshalYAML() (any, error) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	return configYAML{
+		JSON:               c.JSON,
+		Level:              c.Level,
+		Sample:             c.Sample,
+		ComponentLevels:    maps.Clone(c.ComponentLevels),
+		SampleInitial:      c.SampleInitial,
+		SampleInterval:     c.SampleInterval,
+		ItemSampleSeconds:  c.ItemSampleSeconds,
+		ItemSampleInitial:  c.ItemSampleInitial,
+		ItemSampleInterval: c.ItemSampleInterval,
+	}, nil
+}
+
 func (c *Config) Update(o *Config) error {
 	c.lock.Lock()
 	c.JSON = o.JSON
@@ -71,4 +113,21 @@ func (c *Config) AddUpdateObserver(cb ConfigObserver) {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.onUpdatedCallbacks = append(c.onUpdatedCallbacks, cb)
+}
+
+// ResolveComponentLevel always resolves: an unconfigured component takes Level.
+func (c *Config) ResolveComponentLevel(component string) (zapcore.Level, bool) {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	for {
+		if lvl, ok := c.ComponentLevels[component]; ok {
+			return ParseZapLevel(lvl), true
+		}
+		i := strings.LastIndexByte(component, '.')
+		if i < 0 {
+			return ParseZapLevel(c.Level), true
+		}
+		component = component[:i]
+	}
 }

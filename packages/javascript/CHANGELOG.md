@@ -1,5 +1,95 @@
 # @livekit/protocol
 
+## 1.52.1
+
+### Patch Changes
+
+- Add `configutil.Derive` for narrowing an observable config onto a subtree - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+- Add `configutil.NewStaticObserver`, which builds an `Observer` over an already-built config with no file to watch, for stubbing observable config in tests. `EmitConfigUpdate` now also stores the config it emits, so `Load` reflects an update pushed by hand. - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+- Add `configutil.Validator`, an optional builder hook run on every config load after `InitDefaults`. A config that fails validation, or whose `InitDefaults` returns an error, now fails `NewObserver`; on reload the failure is logged and the previous config stays in effect. - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+- Add FlexFEC stats to RTPStats - [#1818](https://github.com/livekit/protocol/pull/1818) ([@chenosaurus](https://github.com/chenosaurus))
+
+- `logger.Config` implements `yaml.Marshaler`, so marshaling a `*Config` snapshots it under the same lock `Update` takes instead of reading fields alongside a concurrent update. - [#1813](https://github.com/livekit/protocol/pull/1813) ([@paulwe](https://github.com/paulwe))
+
+- Update psrpc to v0.8.0 - [#1808](https://github.com/livekit/protocol/pull/1808) ([@paulwe](https://github.com/paulwe))
+
+- agent_simulation: repeat scenarios within a run for pass@k / pass^k, and decide a scenario's verdict from a `Sampling.pass_rate` - [#1799](https://github.com/livekit/protocol/pull/1799) ([@u9g](https://github.com/u9g))
+
+- Add `lk.sip.inviteTime` SIP participant attribute and agents `sip_invite_latency` reporter - [#1815](https://github.com/livekit/protocol/pull/1815) ([@paulwe](https://github.com/paulwe))
+
+- Add `utils/leaftest`, which asserts that a package imports nothing beyond the standard library and an explicit allow list. `leaftest.Assert(t)` names the package from the working directory, so a guarded package's test carries no import path to keep in sync. Test-only imports are not counted. - [#1795](https://github.com/livekit/protocol/pull/1795) ([@paulwe](https://github.com/paulwe))
+
+## 1.52.0
+
+### Minor Changes
+
+- Add new SIPAuthentication error codes. - [#1798](https://github.com/livekit/protocol/pull/1798) ([@alexfish8](https://github.com/alexfish8))
+
+### Patch Changes
+
+- Add `AgentGrant.DispatchAdmin` - [#1744](https://github.com/livekit/protocol/pull/1744) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add fuzz test for data track packet deserialization - [#1759](https://github.com/livekit/protocol/pull/1759) ([@ladvoc](https://github.com/ladvoc))
+
+- Add a dotnet field to the ClientInfo to track community dotnet sdk usage - [#1789](https://github.com/livekit/protocol/pull/1789) ([@MaxHeimbrock](https://github.com/MaxHeimbrock))
+
+- Move data track packet serialization from livekit package - [#1757](https://github.com/livekit/protocol/pull/1757) ([@ladvoc](https://github.com/ladvoc))
+
+- Add flexfec-03 codec parameters and mime type helpers - [#1805](https://github.com/livekit/protocol/pull/1805) ([@chenosaurus](https://github.com/chenosaurus))
+
+- Replace logger.WithTap with logger.WithTee, which duplicates every log entry to a caller-supplied zaputil.Tee. The tee's core is built from the level each derived logger resolves, so the copy follows component levels rather than carrying a level of its own. - [#1790](https://github.com/livekit/protocol/pull/1790) ([@paulwe](https://github.com/paulwe))
+
+  Replace ZapLogger.WithMinLevel with WithComponentLeveler, which attaches a zaputil.ComponentLeveler to a branch of the logger tree. A leveler owns the per-component level and write-enabler cache for one configuration source and can only widen its parent, so a caller can resolve levels per (tenant, component) without rebuilding loggers on a config change. ZapLogger.Leveler exposes the leveler a branch resolves through, for use as the parent of a derived one.
+
+- Change GRPC code mapping for SIP 480/486 - [#1766](https://github.com/livekit/protocol/pull/1766) ([@ChelseaBradbury](https://github.com/ChelseaBradbury))
+
+- Add psrpc bus compression settings to PSRPCConfig - [#1771](https://github.com/livekit/protocol/pull/1771) ([@paulwe](https://github.com/paulwe))
+
+- sdp: harden SDPFragment.Unmarshal against out-of-range accesses - [#1767](https://github.com/livekit/protocol/pull/1767) ([@boks1971](https://github.com/boks1971))
+
+- agent simulation: merge `accuracy_score` and `experience_score` into a single `overall_score` on `SimulationRun.JobMetrics` and `SimulationRun.RunMetrics`; the old field numbers and names are reserved. - [#1800](https://github.com/livekit/protocol/pull/1800) ([@u9g](https://github.com/u9g))
+
+- Add `SimulationRun.CI` — the provider, commit, ref, pull request, run URL, and actor of the pipeline that started a run — to `SimulationRun.Create.Request` and to `SimulationRun`, so the dashboard can link a run back to the CI job that produced it. - [#1758](https://github.com/livekit/protocol/pull/1758) ([@u9g](https://github.com/u9g))
+
+- Add name field to the phone numbers. - [#1781](https://github.com/livekit/protocol/pull/1781) ([@dennwc](https://github.com/dennwc))
+
+- Add separate inbound and outbound statuses for phone numbers. - [#1784](https://github.com/livekit/protocol/pull/1784) ([@dennwc](https://github.com/dennwc))
+
+- Report SIP transfer failures with a SIPTransferError detail on the error - [#1782](https://github.com/livekit/protocol/pull/1782) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- sip: fix panic in EvaluateDispatchRule on an empty From user part - [#1768](https://github.com/livekit/protocol/pull/1768) ([@hechen-eng](https://github.com/hechen-eng))
+
+## 1.51.0
+
+### Minor Changes
+
+- egress v2: add `passthrough` to the `encoding` oneof on `StartEgressRequest` and `ExportReplayRequest`; remove the unused `EgressHandler.UpdateEgress` RPC and the `livekit.UpdateEgressRequest` message - [#1716](https://github.com/livekit/protocol/pull/1716) ([@frostbyte73](https://github.com/frostbyte73))
+
+- add `RoomEndReason` enum and report it on room-ended telemetry: `AnalyticsEvent.room_end_reason` and `WebhookEvent.room_end_reason` now say why a room ended (`ROOM_END_API_DELETE`, `ROOM_END_IDLE_TIMEOUT`, `ROOM_END_SERVER_SHUTDOWN`, `ROOM_END_SUPERSEDED`, `ROOM_END_OPEN_FAILED`), so room-end volume can be broken down by cause the way participant disconnects already are - [#1748](https://github.com/livekit/protocol/pull/1748) ([@paulwe](https://github.com/paulwe))
+
+- `TransferSIPParticipant` now returns `TransferSIPParticipantResponse` instead of `google.protobuf.Empty`, carrying the transfer id, status, a new `SIPTransferReason` and the SIP status when the outcome came from a SIP response. `SIPTransferInfo` gains the same `reason`. This changes the generated method signature: a transfer that reports a non-successful status without an error means the transfer did not complete. - [#1730](https://github.com/livekit/protocol/pull/1730) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Moved egress passthrough option to an encoding preset. - [#1718](https://github.com/livekit/protocol/pull/1718) ([@frostbyte73](https://github.com/frostbyte73))
+
+### Patch Changes
+
+- Add `agent_job_started` / `agent_job_ended` webhook events and a `job` field on `WebhookEvent` - [#1711](https://github.com/livekit/protocol/pull/1711) ([@erikhortsch](https://github.com/erikhortsch))
+
+- agent simulation: add `conciseness` and `conversation_progression` to `SimulationRun.RunMetrics` - [#1742](https://github.com/livekit/protocol/pull/1742) ([@u9g](https://github.com/u9g))
+
+- Add `background_noise`, `low_quality_microphone`, and `packet_loss` to `SimulationRun.Create.Request`, so an audio simulation run can impair the simulated user's audio. - [#1723](https://github.com/livekit/protocol/pull/1723) ([@u9g](https://github.com/u9g))
+
+- Add `to_user_override` to `CreateSIPParticipantRequest` to override the user part of the `To` header, and warn when `To`/`Via` are set in the SIP headers map. - [#1717](https://github.com/livekit/protocol/pull/1717) ([@genseric-ghiro](https://github.com/genseric-ghiro))
+
+- Remove extraneous format specifier from log string. - [#1682](https://github.com/livekit/protocol/pull/1682) ([@alexfish8](https://github.com/alexfish8))
+
+- Move the config observer into utils/configutil and drop the stuttering Config prefix. utils.ConfigObserver, utils.ConfigBuilder, utils.ConfigDefaulter and utils.NewConfigObserver remain as aliases. - [#1712](https://github.com/livekit/protocol/pull/1712) ([@paulwe](https://github.com/paulwe))
+
+- Add data track subscription to sync state - [#1703](https://github.com/livekit/protocol/pull/1703) ([@boks1971](https://github.com/boks1971))
+
 ## 1.50.4
 
 ### Patch Changes

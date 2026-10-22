@@ -70,6 +70,10 @@ const (
 	AgentGatewayPrefix                 = "GW_"
 	CarrierPrefix                      = "CR_"
 	PhoneNumberPrefix                  = "PN_"
+	ScenarioPrefix                     = "SCN_"
+	ScenarioGroupPrefix                = "SCNG_"
+	AgentThreadPrefix                  = "AT_"
+	AgentStreamPrefix                  = "AST_" // ST_ is SIPTrunkPrefix
 )
 
 const (

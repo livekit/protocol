@@ -168,6 +168,8 @@ type ClaimGrants struct {
 	Agent         *AgentGrant         `json:"agent,omitempty"`
 	Inference     *InferenceGrant     `json:"inference,omitempty"`
 	Observability *ObservabilityGrant `json:"observability,omitempty"`
+	AgentEndpoint *AgentEndpointGrant `json:"agentEndpoint,omitempty"`
+	AgentThread   *AgentThreadGrant   `json:"agentThread,omitempty"`
 	// Room configuration to use if this participant initiates the room
 	RoomConfig *RoomConfiguration `json:"roomConfig,omitempty"`
 	// Cloud-only, config preset to use
@@ -214,6 +216,8 @@ func (c *ClaimGrants) Clone() *ClaimGrants {
 	clone.Agent = c.Agent.Clone()
 	clone.Inference = c.Inference.Clone()
 	clone.Observability = c.Observability.Clone()
+	clone.AgentEndpoint = c.AgentEndpoint.Clone()
+	clone.AgentThread = c.AgentThread.Clone()
 	clone.Attributes = maps.Clone(c.Attributes)
 	clone.RoomConfig = c.RoomConfig.Clone()
 	if len(c.KindDetails) > 0 {
@@ -236,6 +240,8 @@ func (c *ClaimGrants) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddObject("Agent", c.Agent)
 	e.AddObject("Inference", c.Inference)
 	e.AddObject("Observability", c.Observability)
+	e.AddObject("AgentEndpoint", c.AgentEndpoint)
+	e.AddObject("AgentThread", c.AgentThread)
 	e.AddObject("RoomConfig", logger.Proto((*livekit.RoomConfiguration)(c.RoomConfig)))
 	e.AddString("RoomPreset", c.RoomPreset)
 	return nil
@@ -445,14 +451,14 @@ func (v *VideoGrant) UpdateFromPermission(permission *livekit.ParticipantPermiss
 
 func (v *VideoGrant) ToPermission() *livekit.ParticipantPermission {
 	return &livekit.ParticipantPermission{
-		CanPublish:          v.GetCanPublish(),
-		CanPublishData:      v.GetCanPublishData(),
-		CanSubscribe:        v.GetCanSubscribe(),
-		CanPublishSources:   v.GetCanPublishSources(),
-		CanUpdateMetadata:   v.GetCanUpdateOwnMetadata(),
-		Hidden:              v.Hidden,
-		Recorder:            v.Recorder,
-		Agent:               v.Agent,
+		CanPublish:            v.GetCanPublish(),
+		CanPublishData:        v.GetCanPublishData(),
+		CanSubscribe:          v.GetCanSubscribe(),
+		CanPublishSources:     v.GetCanPublishSources(),
+		CanUpdateMetadata:     v.GetCanUpdateOwnMetadata(),
+		Hidden:                v.Hidden,
+		Recorder:              v.Recorder,
+		Agent:                 v.Agent,
 		CanSubscribeMetrics:   v.GetCanSubscribeMetrics(),
 		CanManageAgentSession: v.GetCanManageAgentSession(),
 	}
@@ -583,6 +589,8 @@ type AgentGrant struct {
 	SimulationAdmin bool `json:"simulationAdmin,omitempty"`
 	// DatabaseAdmin grants access to a project's agent databases (AgentDB).
 	DatabaseAdmin bool `json:"databaseAdmin,omitempty"`
+	// DispatchAdmin grants access to manage a project's agent dispatch queue.
+	DispatchAdmin bool `json:"dispatchAdmin,omitempty"`
 }
 
 func (s *AgentGrant) Clone() *AgentGrant {
@@ -603,6 +611,7 @@ func (s *AgentGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	e.AddBool("Admin", s.Admin)
 	e.AddBool("SimulationAdmin", s.SimulationAdmin)
 	e.AddBool("DatabaseAdmin", s.DatabaseAdmin)
+	e.AddBool("DispatchAdmin", s.DispatchAdmin)
 	return nil
 }
 
@@ -655,6 +664,139 @@ func (s *ObservabilityGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
 	}
 
 	e.AddBool("Write", s.Write)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+type AgentEndpointGrant struct {
+	// Call grants to invoke an agent's non-public HTTP endpoints.
+	Call bool `json:"call,omitempty"`
+	// AgentName restricts the grant to one agent; empty grants every agent in the project.
+	AgentName string `json:"agentName,omitempty"`
+	// Deployment restricts the grant to one deployment; empty grants every
+	// deployment. A worker registered without one is addressed as "default".
+	Deployment string `json:"deployment,omitempty"`
+}
+
+// Allows reports whether the grant authorizes calling non-public endpoints of
+// (agentName, deployment). Matching is exact and case-sensitive; an empty scope
+// field matches any value.
+func (s *AgentEndpointGrant) Allows(agentName, deployment string) bool {
+	if s == nil || !s.Call {
+		return false
+	}
+	if s.AgentName != "" && s.AgentName != agentName {
+		return false
+	}
+	return s.Deployment == "" || s.Deployment == deployment
+}
+
+func (s *AgentEndpointGrant) Clone() *AgentEndpointGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+
+	return &clone
+}
+
+func (s *AgentEndpointGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("Call", s.Call)
+	e.AddString("AgentName", s.AgentName)
+	e.AddString("Deployment", s.Deployment)
+	return nil
+}
+
+// ------------------------------------------------------------------
+
+// AgentThreadGrant gives a token access to threads, across the project's
+// agents: list and create within Scope, and read, write and delete the threads
+// in ThreadIDs. All extends it to every thread and scope of the project; the
+// action flags still apply. It grants thread data only; which endpoints a token
+// may call is agentEndpoint's.
+type AgentThreadGrant struct {
+	All       bool     `json:"all,omitempty"`
+	Scope     string   `json:"scope,omitempty"`
+	ThreadIDs []string `json:"threadIds,omitempty"`
+	List      bool     `json:"list,omitempty"`
+	Create    bool     `json:"create,omitempty"`
+	Write     bool     `json:"write,omitempty"`
+	Read      bool     `json:"read,omitempty"`
+	Delete    bool     `json:"delete,omitempty"`
+}
+
+// CanCreate reports whether the holder may create threads in scope. A scoped
+// grant creates only in its own scope.
+func (s *AgentThreadGrant) CanCreate(scope string) bool {
+	return s != nil && s.Create && s.inScope(scope)
+}
+
+// CanList reports whether the holder may list the threads of scope.
+func (s *AgentThreadGrant) CanList(scope string) bool {
+	return s != nil && s.List && s.inScope(scope)
+}
+
+// CanUpdate reports whether the holder may change any thread's attributes and
+// idle TTL, which only a project-wide grant may.
+func (s *AgentThreadGrant) CanUpdate() bool {
+	return s != nil && s.All && s.Write
+}
+
+// CanRead reports whether the holder may read threadID.
+func (s *AgentThreadGrant) CanRead(threadID string) bool {
+	return s != nil && s.Read && s.includes(threadID)
+}
+
+// CanWrite reports whether the holder may send to threadID.
+func (s *AgentThreadGrant) CanWrite(threadID string) bool {
+	return s != nil && s.Write && s.includes(threadID)
+}
+
+// CanDelete reports whether the holder may delete threadID.
+func (s *AgentThreadGrant) CanDelete(threadID string) bool {
+	return s != nil && s.Delete && s.includes(threadID)
+}
+
+func (s *AgentThreadGrant) inScope(scope string) bool {
+	return s.All || (s.Scope != "" && s.Scope == scope)
+}
+
+func (s *AgentThreadGrant) includes(threadID string) bool {
+	return threadID != "" && (s.All || slices.Contains(s.ThreadIDs, threadID))
+}
+
+func (s *AgentThreadGrant) Clone() *AgentThreadGrant {
+	if s == nil {
+		return nil
+	}
+
+	clone := *s
+	if len(s.ThreadIDs) > 0 {
+		clone.ThreadIDs = append([]string{}, s.ThreadIDs...)
+	}
+
+	return &clone
+}
+
+func (s *AgentThreadGrant) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	if s == nil {
+		return nil
+	}
+
+	e.AddBool("All", s.All)
+	e.AddString("Scope", s.Scope)
+	zap.Strings("ThreadIDs", s.ThreadIDs).AddTo(e)
+	e.AddBool("List", s.List)
+	e.AddBool("Create", s.Create)
+	e.AddBool("Write", s.Write)
+	e.AddBool("Read", s.Read)
+	e.AddBool("Delete", s.Delete)
 	return nil
 }
 

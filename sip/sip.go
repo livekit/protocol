@@ -884,7 +884,8 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		// TODO: Maybe keep regional code, but mask all but 4 last digits?
 		n := 4
 		if len(from) <= 4 {
-			n = 1
+			// User part comes from the INVITE and may be empty.
+			n = min(1, len(from))
 		}
 		from = from[len(from)-n:]
 		fromName = "Phone " + from
@@ -971,6 +972,7 @@ func EvaluateDispatchRule(projectID string, trunk *livekit.SIPInboundTrunkInfo, 
 		resp.AttributesToHeaders = trunk.AttributesToHeaders
 		resp.IncludeHeaders = trunk.IncludeHeaders
 		resp.RingingTimeout = trunk.RingingTimeout
+		resp.RingingTimeoutStatus = trunk.RingingTimeoutStatus
 		resp.MaxCallDuration = trunk.MaxCallDuration
 
 		krispEnabled = krispEnabled || trunk.KrispEnabled

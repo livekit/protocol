@@ -174,6 +174,18 @@ var (
 		PayloadType: 116,
 	}
 
+	FlexFEC03CodecParameters = webrtc.RTPCodecParameters{
+		RTPCodecCapability: webrtc.RTPCodecCapability{
+			MimeType:    mime.MimeTypeFlexFEC03.String(),
+			ClockRate:   90000,
+			SDPFmtpLine: "repair-window=10000000",
+			RTCPFeedback: []webrtc.RTCPFeedback{
+				{Type: webrtc.TypeRTCPFBTransportCC},
+			},
+		},
+		PayloadType: 115,
+	}
+
 	VideoCodecsParameters = []webrtc.RTPCodecParameters{
 		VP8CodecParameters,
 		VP9ProfileId0CodecParameters,
@@ -245,6 +257,8 @@ func ToWebrtcCodecParameters(codec *livekit.Codec) webrtc.RTPCodecParameters {
 		}
 	case mime.MimeTypeH265:
 		params = H265CodecParameters
+	case mime.MimeTypeFlexFEC03:
+		params = FlexFEC03CodecParameters
 	default:
 		return webrtc.RTPCodecParameters{}
 	}

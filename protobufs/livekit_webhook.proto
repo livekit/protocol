@@ -55,5 +55,8 @@ message WebhookEvent {
 
   int32 num_dropped = 11 [deprecated=true];
 
-  // NEXT_ID: 13
+  // set when event is room_finished
+  RoomEndReason room_end_reason = 13;
+
+  // NEXT_ID: 14
 }
