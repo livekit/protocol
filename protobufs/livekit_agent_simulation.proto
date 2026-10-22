@@ -487,7 +487,7 @@ enum SimulationMode {
 
 // What the simulated caller's audio went through before the agent heard it.
 message SimulationImpairments {
-  string background_noise = 1;  // the ambience played under the caller, e.g. "cafe"; "" = none
+  bool background_noise = 1;
   bool low_quality_microphone = 2;
   bool packet_loss = 3;
 }

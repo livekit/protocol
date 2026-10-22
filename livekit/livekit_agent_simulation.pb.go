@@ -778,7 +778,7 @@ func (x *ScenarioGroup) GetId() string {
 // What the simulated caller's audio went through before the agent heard it.
 type SimulationImpairments struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
-	BackgroundNoise      string                 `protobuf:"bytes,1,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"` // the ambience played under the caller, e.g. "cafe"; "" = none
+	BackgroundNoise      bool                   `protobuf:"varint,1,opt,name=background_noise,json=backgroundNoise,proto3" json:"background_noise,omitempty"`
 	LowQualityMicrophone bool                   `protobuf:"varint,2,opt,name=low_quality_microphone,json=lowQualityMicrophone,proto3" json:"low_quality_microphone,omitempty"`
 	PacketLoss           bool                   `protobuf:"varint,3,opt,name=packet_loss,json=packetLoss,proto3" json:"packet_loss,omitempty"`
 	unknownFields        protoimpl.UnknownFields
@@ -815,11 +815,11 @@ func (*SimulationImpairments) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_simulation_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *SimulationImpairments) GetBackgroundNoise() string {
+func (x *SimulationImpairments) GetBackgroundNoise() bool {
 	if x != nil {
 		return x.BackgroundNoise
 	}
-	return ""
+	return false
 }
 
 func (x *SimulationImpairments) GetLowQualityMicrophone() bool {
@@ -3974,7 +3974,7 @@ const file_livekit_agent_simulation_proto_rawDesc = "" +
 	"\tscenarios\x18\x02 \x03(\v2\x11.livekit.ScenarioR\tscenarios\x12\x0e\n" +
 	"\x02id\x18\x03 \x01(\tR\x02id\"\x99\x01\n" +
 	"\x15SimulationImpairments\x12)\n" +
-	"\x10background_noise\x18\x01 \x01(\tR\x0fbackgroundNoise\x124\n" +
+	"\x10background_noise\x18\x01 \x01(\bR\x0fbackgroundNoise\x124\n" +
 	"\x16low_quality_microphone\x18\x02 \x01(\bR\x14lowQualityMicrophone\x12\x1f\n" +
 	"\vpacket_loss\x18\x03 \x01(\bR\n" +
 	"packetLoss\"\xb3\x01\n" +
