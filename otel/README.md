@@ -62,6 +62,8 @@ spelling and, for an enum, maps each old value to a member. The old spellings ar
 registered, deprecated or not. A policy rejects defining one, and live-check reads the map to
 name the key and value to send.
 - `cloud` is a valid owner for when that team registers its keys, in its own directory.
+- `telephony` is the telephony-devs team, which owns SIP. It is a valid owner for when that team
+  registers its keys, in its own directory.
 
 The Notion conventions put client-owned attributes under `lk.client.*`. The client core does not do
 that yet, so that rule is advice: `check.sh` lists every client key it would move, `browser.*`
@@ -69,7 +71,8 @@ included, and never fails on it.
 
 How a concept is named in other producers or stores (Agents' `room_id`, the collector's `room_id`
 column, roomobs) is recorded in `annotations.livekit.bindings`. Weaver carries it into the docs;
-nothing validates it.
+nothing validates it. `event_logs` is the Go project logger store that cloud services such as
+cloud-sip and cloud realtime write to, not OTLP.
 
 Agents' session report sends plain log records whose keys predate this registry. They are
 registered as emitted, owner `agents`: `session.options`, `session.report_timestamp` and
@@ -88,7 +91,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
 
    | Annotation | Values | Rule |
    |---|---|---|
-   | `owner` | `shared`, `client`, `agents`, `cloud` | required |
+   | `owner` | `shared`, `client`, `agents`, `cloud`, `telephony` | required |
    | `sensitivity` | `none`, `pii`, `secret` (protocol `logger.Sensitivity`) | required; `pii` iff the key has a `pii` segment, or is `chat.item`, which the collector drops by name; `secret` is never emitted |
    | `unit` | UCUM, e.g. `s`, `By`, `{packet}` | durations are seconds |
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |

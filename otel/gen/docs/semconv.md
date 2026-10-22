@@ -1749,8 +1749,10 @@ validates it.
 | `lk.agent_name` | agents_session_report | `agent_name` |
 | `lk.job_id` | agents_otlp | `lk.job_id`, `job_id` |
 | `lk.job_id` | collector_column | `none` |
+| `lk.participant_id` | event_logs | `participantID` |
 | `lk.room_sid` | agents_otlp | `lk.room_sid`, `room_id` |
 | `lk.room_sid` | collector_column | `room_id` |
+| `lk.room_sid` | event_logs | `roomID` |
 | `lk.room_sid` | roomobs | `room_session.id` |
 
 `agents_otlp` lists Agents' span key first, then its Resource and metric-point key.

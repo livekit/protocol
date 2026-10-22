@@ -24,7 +24,7 @@ canonical_identity := {
 
 high_cardinality := {"lk.room_sid", "lk.participant_id", "lk.track_sid", "lk.job_id", "lk.client.connect_id"}
 
-owners := {"shared", "client", "agents", "cloud"}
+owners := {"shared", "client", "agents", "cloud", "telephony"}
 
 # Mirrors protocol protobufs/logger/options.proto Sensitivity (UNSPECIFIED/PII/SECRET).
 sensitivities := {"none", "pii", "secret"}

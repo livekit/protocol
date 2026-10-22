@@ -28,6 +28,7 @@ groups:
             bindings:
               agents_otlp: [lk.room_sid, room_id] # spans | resource + metric points
               collector_column: room_id # materialized from attribute room_id|roomID only
+              event_logs: roomID # Go project logger (cloud-sip, cloud realtime), not OTLP
               roomobs: room_session.id
       - id: lk.participant_id
         type: string
@@ -38,7 +39,7 @@ groups:
           never a default metric dimension.
         examples: ["PA_9kLm2NpQ4rTs"]
         annotations:
-          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.participant.sid}}
+          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.participant.sid}, bindings: {event_logs: participantID}}
       - id: lk.track_sid
         type: string
         stability: development
