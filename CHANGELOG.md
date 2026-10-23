@@ -1,5 +1,21 @@
 # github.com/livekit/protocol
 
+## 1.53.1
+
+### Patch Changes
+
+- Add `agent_job_pending` webhook event, `JS_CANCELLED` job status, and `JobState.reason` (including `JSR_RETRYING`) - [#1860](https://github.com/livekit/protocol/pull/1860) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add `livekit.agent.CloseReason`, the agent session close reasons, for agent evals. - [#1887](https://github.com/livekit/protocol/pull/1887) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- Add session_summary to MetricsRecordingHeader, for agent evals. - [#1884](https://github.com/livekit/protocol/pull/1884) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- `SimulationRun.JobMetrics`: how the call ended (`end_reason`), the simulated caller's languages (`caller_language`, `caller_listen_language`), the audio impairments applied to it (`impairments`), and `conversation.backchannel_count`. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.Job.failure_reason`: a machine-readable cause for a failed simulation job, such as the agent never joining the room. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.JobMetrics.Turn.text`: the words of each turn as the simulation's judges read them. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
 ## 1.53.0
 
 ### Minor Changes
