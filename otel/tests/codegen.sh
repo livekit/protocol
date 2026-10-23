@@ -20,7 +20,7 @@ rustc --edition 2021 -D warnings "$tmp/main.rs" -o "$tmp/main"
 [[ $("$tmp/main"; printf .) == "$want." ]] || { echo "FAIL  Rust literal does not round-trip" >&2; exit 1; }
 
 npx --yes -p typescript@5.9.3 tsc --strict --target es2020 --module commonjs --outDir "$tmp/js" "$tmp/typescript/semconv.ts"
-got=$(node -e 'process.stdout.write(require(process.argv[1]).LK_TEST_ESCAPE_VALUE_TRICKY)' "$tmp/js/semconv.js"; printf .)
+got=$(node -e 'process.stdout.write(require(process.argv[1]).LkTestEscape.TRICKY)' "$tmp/js/semconv.js"; printf .)
 [[ $got == "$want." ]] || { echo "FAIL  TypeScript literal does not round-trip" >&2; exit 1; }
 got=$(python3 -I -c 'import sys, importlib.util; s = importlib.util.spec_from_file_location("semconv", sys.argv[1]); m = importlib.util.module_from_spec(s); s.loader.exec_module(m); sys.stdout.write(m.LK_TEST_ESCAPE_TRICKY)' "$tmp/python/semconv.py"; printf .)
 [[ $got == "$want." ]] || { echo "FAIL  Python literal does not round-trip" >&2; exit 1; }
