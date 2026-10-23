@@ -442,12 +442,19 @@ func (s *SDPFragment) Unmarshal(frag string) error {
 		line = line[2:]
 		delimIndex := strings.Index(line, ":")
 		if delimIndex < 0 {
-			if line == sdp.AttrKeyICELite {
+			switch line {
+			case sdp.AttrKeyICELite:
 				lite := true
 				if s.media != nil {
 					s.media.ice.lite = &lite
 				} else {
 					s.ice.lite = &lite
+				}
+
+			case sdp.AttrKeyEndOfCandidates:
+				endOfCandidates := true
+				if s.media != nil {
+					s.media.endOfCandidates = &endOfCandidates
 				}
 			}
 			continue
@@ -489,11 +496,6 @@ func (s *SDPFragment) Unmarshal(frag string) error {
 				s.media.candidates = append(s.media.candidates, value)
 			}
 
-		case sdp.AttrKeyEndOfCandidates:
-			endOfCandidates := true
-			if s.media != nil {
-				s.media.endOfCandidates = &endOfCandidates
-			}
 		}
 	}
 
