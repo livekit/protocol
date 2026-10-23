@@ -37,10 +37,9 @@ CREATE TABLE tasks (
   seq            INTEGER NOT NULL,                   -- [framework] submission order in the lane
   name           TEXT,                               -- [platform, framework] the AgentTask class
   message_id     TEXT,                               -- [framework] the A2A messageId that created it, for idempotency
-  status         TEXT NOT NULL,                      -- [platform, a2a, framework] the A2A v1 TaskState name, TASK_STATE_WORKING etc. (agent.TaskStatus maps it); working when a new run finds it means its worker was lost
-  status_message JSONB,                              -- [a2a] A2A v1 Message, as protobuf JSON
+  status         TEXT NOT NULL,                      -- [platform, a2a, framework] the framework's task state: submitted, working, input-required, completed, failed, canceled or rejected (agent.TaskStatus maps it); working when a new run finds it means its worker was lost
   updated_at     INTEGER NOT NULL,                   -- [platform, a2a, framework] unix milliseconds
-  data           JSONB NOT NULL,                     -- [a2a] A2A v1 Task fields as protobuf JSON: history, artifacts, metadata
+  data           JSONB NOT NULL,                     -- [a2a] the A2A v1 Task fields as protobuf JSON: history, artifacts, metadata, statusMessage
   ask            JSONB                               -- [framework] the question a task waiting on the person asked, and the call that takes the answer
 );
 CREATE INDEX tasks_lane_seq ON tasks (lane, seq);
