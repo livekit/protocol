@@ -16,26 +16,28 @@ package agent
 
 import _ "embed"
 
-// ThreadSchemaVersion is the newest conversation schema a thread's database
-// can hold.
-const ThreadSchemaVersion = 1
+// ThreadSchemaVersion is the conversation schema a thread's database holds.
+// Version 2 stores A2A v1: task states by their v1 names, messages and tasks
+// as v1 protobuf JSON, and tasks.updated_at in milliseconds.
+const ThreadSchemaVersion = 2
 
-// ThreadSchemaV1 creates version 1 of the conversation schema, one statement
-// per ";" (comments hold none).
+// ThreadSchema creates the conversation schema, one statement per ";"
+// (comments hold none).
 //
-//go:embed thread_schema_v1.sql
-var ThreadSchemaV1 string
+//go:embed thread_schema.sql
+var ThreadSchema string
 
-// taskStatuses maps the values of tasks.status (A2A task states) to
+// taskStatuses maps the values of tasks.status (A2A v1 task state names) to
 // AgentTask.Status: a task not yet finished is running, a rejected one failed.
 var taskStatuses = map[string]AgentTask_Status{
-	"submitted":      AgentTask_RUNNING,
-	"working":        AgentTask_RUNNING,
-	"input-required": AgentTask_RUNNING,
-	"completed":      AgentTask_COMPLETED,
-	"failed":         AgentTask_FAILED,
-	"rejected":       AgentTask_FAILED,
-	"canceled":       AgentTask_CANCELED,
+	"TASK_STATE_SUBMITTED":      AgentTask_RUNNING,
+	"TASK_STATE_WORKING":        AgentTask_RUNNING,
+	"TASK_STATE_INPUT_REQUIRED": AgentTask_RUNNING,
+	"TASK_STATE_AUTH_REQUIRED":  AgentTask_RUNNING,
+	"TASK_STATE_COMPLETED":      AgentTask_COMPLETED,
+	"TASK_STATE_FAILED":         AgentTask_FAILED,
+	"TASK_STATE_REJECTED":       AgentTask_FAILED,
+	"TASK_STATE_CANCELED":       AgentTask_CANCELED,
 }
 
 // TaskStatus is the AgentTask.Status of a tasks.status value.

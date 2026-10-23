@@ -15,7 +15,7 @@
 // AgentThread: the durable conversation between an agent and a person, across
 // channels and over time. Identified by an "AT_" id. Holds a scope, attributes,
 // an idle TTL and the AgentDB database created with it. Served by
-// cloud-protocol's AgentThreads. The conversation inside follows thread_schema_v1.sql, shared
+// cloud-protocol's AgentThreads. The conversation inside follows thread_schema.sql, shared
 // by the agents framework, which writes it, and the platform, which reads it.
 
 syntax = "proto3";
@@ -98,7 +98,7 @@ message AgentThread {
   }
 
   // One chat item of an agent. Stored as the JSON of
-  // ChatContext.ChatItem (items.payload in thread_schema_v1.sql).
+  // ChatContext.ChatItem (items.payload in thread_schema.sql).
   message Item {
     string agent = 1;
     // Position in the agent's history.

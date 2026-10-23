@@ -1,5 +1,5 @@
--- Tables inside a thread's database. The agents framework creates and writes
--- them (lk-agents-storage, statements/sql.rs). A lane is one registered
+-- Tables inside a thread's database, version 2. The agents framework creates
+-- and writes them (lk-agents-storage, schema.rs). A lane is one registered
 -- agent's part of the thread, named after the agent, across every channel. Two
 -- agents in one thread, through a delegation, are two lanes.
 --
@@ -37,11 +37,11 @@ CREATE TABLE tasks (
   seq            INTEGER NOT NULL,                   -- [framework] submission order in the lane
   name           TEXT,                               -- [platform, framework] the AgentTask class
   message_id     TEXT,                               -- [framework] the A2A messageId that created it, for idempotency
-  status         TEXT NOT NULL,                      -- [platform, a2a, framework] A2A TaskState (agent.TaskStatus maps it), working when a new run finds it means its worker was lost
-  status_message JSONB,                              -- [a2a] A2A Message
-  updated_at     INTEGER NOT NULL,                   -- [platform, a2a, framework]
-  data           JSONB NOT NULL,                     -- [a2a] A2A Task fields: history, artifacts, metadata
-  internal       JSONB                               -- [framework] AgentTask arguments and pending question, to resume it
+  status         TEXT NOT NULL,                      -- [platform, a2a, framework] the A2A v1 TaskState name, TASK_STATE_WORKING etc. (agent.TaskStatus maps it); working when a new run finds it means its worker was lost
+  status_message JSONB,                              -- [a2a] A2A v1 Message, as protobuf JSON
+  updated_at     INTEGER NOT NULL,                   -- [platform, a2a, framework] unix milliseconds
+  data           JSONB NOT NULL,                     -- [a2a] A2A v1 Task fields as protobuf JSON: history, artifacts, metadata
+  ask            JSONB                               -- [framework] the question a task waiting on the person asked, and the call that takes the answer
 );
 CREATE INDEX tasks_lane_seq ON tasks (lane, seq);
 CREATE INDEX tasks_lane_status ON tasks (lane, status, seq);
@@ -81,7 +81,7 @@ CREATE TABLE inbox (
   lane        TEXT NOT NULL,        -- [framework]
   task_id     TEXT NOT NULL,        -- [framework]
   message_id  TEXT NOT NULL,        -- [framework] the A2A messageId, for idempotency
-  message     JSONB NOT NULL,       -- [framework] the A2A message
+  message     JSONB NOT NULL,       -- [framework] the A2A v1 Message, as protobuf JSON
   received_at INTEGER NOT NULL      -- [framework]
 );
 CREATE INDEX inbox_lane_id ON inbox (lane, id);
