@@ -259,6 +259,13 @@ func Proto() error {
 	return nil
 }
 
+// regenerate the telemetry conventions in otel/gen (needs weaver, see otel/README.md)
+func Otel() error {
+	cmd := exec.Command("otel/generate.sh")
+	connectStd(cmd)
+	return cmd.Run()
+}
+
 // run tests
 func Test() error {
 	cmd := exec.Command("go", "test", "-race", "./...")

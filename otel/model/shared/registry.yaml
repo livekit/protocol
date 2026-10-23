@@ -1,0 +1,234 @@
+# Shared vocabulary: a change here needs Client + Agents + Observability review.
+# Upstream OTel keys (service.*, os.*, device.*, network.*, error.type, session.id, code.*)
+# are referenced with `ref:` where used, never redefined here.
+groups:
+  - id: registry.lk.identity
+    type: attribute_group
+    display_name: LiveKit shared identity
+    brief: Cross-producer identity keys. Flat `lk.<entity>_<field>`, never `lk.<entity>.sid`.
+    note: >
+      Record and span attributes, never Resource attributes: a Resource lives for the process,
+      these for one session. Omitted until the server has assigned them, never sent empty.
+    attributes:
+      - id: lk.room_sid
+        type: string
+        stability: development
+        brief: Server-assigned room session SID (`RM_...`).
+        note: >
+          On every record and span of a session once the client has joined; absent before join.
+          High cardinality, never a default metric dimension.
+        examples: ["RM_5Fq8xQ2ZbXwN"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            authority: cloud
+            renamed_from: {key: lk.room.sid}
+            # Physical name per producer/store. Weaver carries these; nothing validates them.
+            bindings:
+              agents_otlp: [lk.room_sid, room_id] # spans | resource + metric points
+              collector_column: room_id # materialized from attribute room_id|roomID only
+              event_logs: roomID # Go project logger (cloud-sip, cloud realtime), not OTLP
+              roomobs: room_session.id
+      - id: lk.participant_id
+        type: string
+        stability: development
+        brief: Server-assigned SID of the local participant (`PA_...`).
+        note: >
+          On every record and span of a session once the client has joined. High cardinality,
+          never a default metric dimension.
+        examples: ["PA_9kLm2NpQ4rTs"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.participant.sid}, bindings: {event_logs: participantID}}
+      - id: lk.track_sid
+        type: string
+        stability: development
+        brief: Server-assigned track SID (`TR_...`).
+        note: >
+          On publish and subscribe spans and RTC stats windows. A publish learns it only on
+          success. High cardinality, never a default metric dimension.
+        examples: ["TR_AMkTyV3Zx8Qp"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none, authority: cloud, renamed_from: {key: lk.track.sid}}
+      - id: lk.job_id
+        type: string
+        stability: development
+        brief: Agent job ID (`AJ_...`).
+        note: >
+          Sent by Agents, not by clients. High cardinality; Agents' job-scoped metrics are the one
+          sanctioned metric-dimension exception.
+        examples: ["AJ_kVbMBWtnVHvT"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            authority: cloud
+            bindings:
+              agents_otlp: [lk.job_id, job_id] # spans | resource + metric points
+              collector_column: none # only agents_rollup has job_id, fed outside OTLP
+
+  - id: registry.lk.pii
+    type: attribute_group
+    display_name: LiveKit PII
+    brief: >
+      Customer-supplied values. The `pii` key segment is the collector's redaction contract
+      (agents-private pii-redaction/redact `(^|\.)pii(\.|$)`): a key without it is never redacted.
+    note: >
+      When redaction is on, the collector deletes every attribute whose key has a `pii` segment, at
+      resource, scope, record, event and link level; it never masks or hashes. Log bodies and
+      metrics are never redacted, so PII must not go there.
+    attributes:
+      - id: lk.pii.room_name
+        type: string
+        stability: development
+        brief: Customer-supplied room name.
+        note: >
+          On every record and span of a session once the client has joined.
+        examples: ["my-room"]
+        annotations:
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.room.name}}
+      - id: lk.pii.participant_identity
+        type: string
+        stability: development
+        brief: Customer-supplied identity of the local participant.
+        note: >
+          On every record and span of a session once the client has joined.
+        examples: ["identity-0"]
+        annotations:
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.participant.identity}}
+      - id: lk.pii.remote_participant_identity
+        type: string
+        stability: development
+        brief: Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe).
+        note: >
+          On subscribe spans: the identity of the participant publishing the track.
+        examples: ["identity-1"]
+        annotations:
+          livekit: {owner: shared, sensitivity: pii, renamed_from: {key: lk.participant.remote_identity}}
+
+  - id: registry.lk.sdk
+    type: attribute_group
+    display_name: LiveKit SDK identity
+    brief: Which LiveKit SDK produced the telemetry. Resource attributes, next to OTel `service.*`.
+    note: >
+      `service.name` names the producer (`livekit-client-swift`); `telemetry.sdk.*` stays reserved
+      for the OTel-level library (`livekit-telemetry`).
+    attributes:
+      - id: lk.sdk.name
+        type: string
+        stability: development
+        brief: LiveKit SDK name.
+        note: >
+          Resource attribute. A low-cardinality metric dimension. Matches the `<sdk>` part of
+          `service.name = livekit-client-<sdk>`.
+        examples: ["swift", "android", "flutter", "react-native", "unity", "rust", "js"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none}
+      - id: lk.sdk.version
+        type: string
+        stability: development
+        brief: LiveKit SDK version.
+        note: Resource attribute. A low-cardinality metric dimension.
+        examples: ["2.17.0"]
+        annotations:
+          livekit: {owner: shared, sensitivity: none}
+
+  - id: registry.lk.shared
+    type: attribute_group
+    display_name: LiveKit shared details
+    brief: Concepts clients and Agents both send, under the Agents spelling and value set.
+    note: >
+      Where a client and Agents named the same concept differently, the Agents key and values are
+      the shared ones: a flat `lk.<entity>_<field>` key, and the enum names Agents sends as values.
+    attributes:
+      - id: lk.track_source
+        stability: development
+        brief: Source of the track, as the Agents RTC FFI `TrackSource` enum name.
+        note: >
+          On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint.
+          The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal
+          protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their
+          track source to these names explicitly.
+        type:
+          members:
+            - {id: source_unknown, value: SOURCE_UNKNOWN, brief: Unknown source., stability: development}
+            - {id: source_camera, value: SOURCE_CAMERA, brief: Camera., stability: development}
+            - {id: source_microphone, value: SOURCE_MICROPHONE, brief: Microphone., stability: development}
+            - {id: source_screenshare, value: SOURCE_SCREENSHARE, brief: Screen share video., stability: development}
+            - {id: source_screenshare_audio, value: SOURCE_SCREENSHARE_AUDIO, brief: Screen share audio., stability: development}
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from:
+              key: lk.track.source
+              values: {camera: SOURCE_CAMERA, microphone: SOURCE_MICROPHONE, screen_share: SOURCE_SCREENSHARE, screen_share_audio: SOURCE_SCREENSHARE_AUDIO, unknown: SOURCE_UNKNOWN}
+      - id: lk.disconnect_reason
+        stability: development
+        brief: Why a participant left the room, as the protobuf `DisconnectReason` enum name.
+        note: >
+          On the client `lk.room.disconnected` event (the local participant) and on the Agents
+          `participant_disconnected` checkpoint (the linked participant). `RECONNECT_FAILED` is the
+          one value outside the protobuf enum: a client that ran out of reconnect attempts sends it.
+        type:
+          members:
+            - {id: unknown_reason, value: UNKNOWN_REASON, brief: "No reason given, or a number the producer does not know.", stability: development}
+            - {id: client_initiated, value: CLIENT_INITIATED, brief: The participant hung up., stability: development}
+            - {id: duplicate_identity, value: DUPLICATE_IDENTITY, brief: Another participant joined with the same identity., stability: development}
+            - {id: server_shutdown, value: SERVER_SHUTDOWN, brief: The server instance shut down., stability: development}
+            - {id: participant_removed, value: PARTICIPANT_REMOVED, brief: RoomService.RemoveParticipant was called., stability: development}
+            - {id: room_deleted, value: ROOM_DELETED, brief: RoomService.DeleteRoom was called., stability: development}
+            - {id: state_mismatch, value: STATE_MISMATCH, brief: The server did not know the session the client tried to resume., stability: development}
+            - {id: join_failure, value: JOIN_FAILURE, brief: The client could not connect fully., stability: development}
+            - {id: migration, value: MIGRATION, brief: "The server asked the participant to migrate (Cloud only).", stability: development}
+            - {id: signal_close, value: SIGNAL_CLOSE, brief: The signal WebSocket closed unexpectedly., stability: development}
+            - {id: room_closed, value: ROOM_CLOSED, brief: The room closed after its participants left., stability: development}
+            - {id: user_unavailable, value: USER_UNAVAILABLE, brief: The SIP callee did not answer in time., stability: development}
+            - {id: user_rejected, value: USER_REJECTED, brief: The SIP callee rejected the call., stability: development}
+            - {id: sip_trunk_failure, value: SIP_TRUNK_FAILURE, brief: SIP protocol failure., stability: development}
+            - {id: connection_timeout, value: CONNECTION_TIMEOUT, brief: The server timed out the session., stability: development}
+            - {id: media_failure, value: MEDIA_FAILURE, brief: Media failed or timed out., stability: development}
+            - {id: agent_error, value: AGENT_ERROR, brief: The agent failed., stability: development}
+            - {id: reconnect_failed, value: RECONNECT_FAILED, brief: "The client ran out of reconnect attempts (client only, not a protobuf value).", stability: development}
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            renamed_from:
+              key: lk.disconnect.reason
+              values:
+                client_initiated: CLIENT_INITIATED
+                duplicate_identity: DUPLICATE_IDENTITY
+                server_shutdown: SERVER_SHUTDOWN
+                participant_removed: PARTICIPANT_REMOVED
+                room_deleted: ROOM_DELETED
+                state_mismatch: STATE_MISMATCH
+                join_failure: JOIN_FAILURE
+                migration: MIGRATION
+                signal_close: SIGNAL_CLOSE
+                room_closed: ROOM_CLOSED
+                user_unavailable: USER_UNAVAILABLE
+                user_rejected: USER_REJECTED
+                sip_trunk_failure: SIP_TRUNK_FAILURE
+                connection_timeout: CONNECTION_TIMEOUT
+                media_failure: MEDIA_FAILURE
+                agent_error: AGENT_ERROR
+                unknown: UNKNOWN_REASON
+                reconnect_failed: RECONNECT_FAILED
+      - id: lk.agent_name
+        type: string
+        stability: development
+        brief: Name of the agent a job was dispatched to.
+        note: >
+          On the Agents Resource and the `job_entrypoint` and `agent_session` spans, set when the job
+          has an agent name (explicit dispatch). A client that reports the agent it talks to uses
+          this key. The participant attribute `lk.agent.name` carries the same name on the room; it
+          is not a telemetry key.
+        examples: ["my-agent"]
+        annotations:
+          livekit:
+            owner: shared
+            sensitivity: none
+            bindings:
+              agents_participant_attribute: lk.agent.name # room participant attribute, not an OTLP key
+              agents_session_report: agent_name # bare key on the session report log

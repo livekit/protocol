@@ -1,0 +1,17 @@
+# expect: livekit_shipped_value
+# A shipped_values list on a standalone definition: --v2 must check definitions, not only refs.
+groups:
+  - id: registry.review
+    type: attribute_group
+    brief: review
+    attributes:
+      - id: lk.review
+        type: string
+        stability: development
+        brief: review
+        examples: ["fake"]
+        annotations:
+          livekit:
+            owner: agents
+            sensitivity: none
+            shipped_values: [{id: fake, value: fake, brief: fake}]
