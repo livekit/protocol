@@ -142,7 +142,7 @@ enum CloseReason {
   CR_JOB_SHUTDOWN = 2;
   CR_PARTICIPANT_DISCONNECTED = 3;
   CR_USER_INITIATED = 4;
-  CR_TASK_COMPLETED = 5;
+  CR_COMPLETED = 5;
 }
 
 enum AmdCategory {
