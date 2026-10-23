@@ -295,7 +295,7 @@ const (
 	CloseReason_CR_JOB_SHUTDOWN             CloseReason = 2
 	CloseReason_CR_PARTICIPANT_DISCONNECTED CloseReason = 3
 	CloseReason_CR_USER_INITIATED           CloseReason = 4
-	CloseReason_CR_TASK_COMPLETED           CloseReason = 5
+	CloseReason_CR_COMPLETED                CloseReason = 5
 )
 
 // Enum value maps for CloseReason.
@@ -306,7 +306,7 @@ var (
 		2: "CR_JOB_SHUTDOWN",
 		3: "CR_PARTICIPANT_DISCONNECTED",
 		4: "CR_USER_INITIATED",
-		5: "CR_TASK_COMPLETED",
+		5: "CR_COMPLETED",
 	}
 	CloseReason_value = map[string]int32{
 		"CR_UNKNOWN":                  0,
@@ -314,7 +314,7 @@ var (
 		"CR_JOB_SHUTDOWN":             2,
 		"CR_PARTICIPANT_DISCONNECTED": 3,
 		"CR_USER_INITIATED":           4,
-		"CR_TASK_COMPLETED":           5,
+		"CR_COMPLETED":                5,
 	}
 )
 
@@ -5501,15 +5501,15 @@ const file_agent_livekit_agent_session_proto_rawDesc = "" +
 	"\fTR_COMPLETED\x10\x01\x12\x12\n" +
 	"\x0eTR_INTERRUPTED\x10\x02\x12\x0e\n" +
 	"\n" +
-	"TR_SKIPPED\x10\x03*\x8f\x01\n" +
+	"TR_SKIPPED\x10\x03*\x8a\x01\n" +
 	"\vCloseReason\x12\x0e\n" +
 	"\n" +
 	"CR_UNKNOWN\x10\x00\x12\f\n" +
 	"\bCR_ERROR\x10\x01\x12\x13\n" +
 	"\x0fCR_JOB_SHUTDOWN\x10\x02\x12\x1f\n" +
 	"\x1bCR_PARTICIPANT_DISCONNECTED\x10\x03\x12\x15\n" +
-	"\x11CR_USER_INITIATED\x10\x04\x12\x15\n" +
-	"\x11CR_TASK_COMPLETED\x10\x05*\x86\x01\n" +
+	"\x11CR_USER_INITIATED\x10\x04\x12\x10\n" +
+	"\fCR_COMPLETED\x10\x05*\x86\x01\n" +
 	"\vAmdCategory\x12\x0f\n" +
 	"\vAMD_UNKNOWN\x10\x00\x12\r\n" +
 	"\tAMD_HUMAN\x10\x01\x12\x13\n" +
