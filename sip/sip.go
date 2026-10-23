@@ -443,17 +443,23 @@ func matchAddrMask(ip netip.Addr, mask string) bool {
 	return pref.Contains(ip)
 }
 
-func matchAddrMasks(addr string, host string, masks []string) bool {
+// matchAddrMasks reports whether the call's source address is inside one of the masks. Only the
+// transport address is consulted: a From host is written by the caller, so matching a mask against it
+// would let any INVITE satisfy the allowlist by claiming the right host. A hostname entry therefore
+// matches nothing, and a list made only of hostnames admits no call.
+func matchAddrMasks(addr string, masks []string) bool {
 	ip, err := netip.ParseAddr(addr)
 	if err != nil {
 		return true
 	}
+	// A dual-stack listener reports IPv4 peers as ::ffff:a.b.c.d; the masks are written as IPv4.
+	ip = ip.Unmap()
 	masks = filterInvalidAddrMasks(masks)
 	if len(masks) == 0 {
 		return true
 	}
 	for _, mask := range masks {
-		if mask == host || matchAddrMask(ip, mask) {
+		if matchAddrMask(ip, mask) {
 			return true
 		}
 	}
@@ -543,7 +549,7 @@ func MatchTrunkDetailed(it iters.Iter[*livekit.SIPInboundTrunkInfo], call *rpc.S
 				continue
 			}
 		}
-		if !matchAddrMasks(call.SourceIp, call.From.Host, tr.AllowedAddresses) {
+		if !matchAddrMasks(call.SourceIp, tr.AllowedAddresses) {
 			if !opt.Filtered(tr, TrunkFilteredSourceAddressDisallowed) {
 				continue
 			}
