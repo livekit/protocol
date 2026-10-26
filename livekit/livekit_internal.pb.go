@@ -377,10 +377,12 @@ type NodeStats struct {
 	// forward metrics
 	ForwardLatency uint32 `protobuf:"varint,48,opt,name=forward_latency,json=forwardLatency,proto3" json:"forward_latency,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	ForwardJitter uint32           `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
-	Rates         []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ForwardJitter uint32 `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
+	// p90 time from arrival to dequeue, in ns, for packets that found their forwarder idle
+	ForwardSchedulingDelay uint32           `protobuf:"varint,57,opt,name=forward_scheduling_delay,json=forwardSchedulingDelay,proto3" json:"forward_scheduling_delay,omitempty"`
+	Rates                  []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *NodeStats) Reset() {
@@ -814,6 +816,13 @@ func (x *NodeStats) GetForwardLatency() uint32 {
 func (x *NodeStats) GetForwardJitter() uint32 {
 	if x != nil {
 		return x.ForwardJitter
+	}
+	return 0
+}
+
+func (x *NodeStats) GetForwardSchedulingDelay() uint32 {
+	if x != nil {
+		return x.ForwardSchedulingDelay
 	}
 	return 0
 }
@@ -1488,7 +1497,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xb3\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\xed\x16\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1554,7 +1563,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x18participant_rtc_canceled\x185 \x01(\x04R\x16participantRtcCanceled\x124\n" +
 	"\x16participant_rtc_active\x186 \x01(\x04R\x14participantRtcActive\x12'\n" +
 	"\x0fforward_latency\x180 \x01(\rR\x0eforwardLatency\x12)\n" +
-	"\x0eforward_jitter\x181 \x01(\rB\x02\x18\x01R\rforwardJitter\x12,\n" +
+	"\x0eforward_jitter\x181 \x01(\rB\x02\x18\x01R\rforwardJitter\x128\n" +
+	"\x18forward_scheduling_delay\x189 \x01(\rR\x16forwardSchedulingDelay\x12,\n" +
 	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\xb1\n" +
 	"\n" +
 	"\rNodeStatsRate\x12\x1d\n" +
