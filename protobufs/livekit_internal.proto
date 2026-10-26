@@ -126,8 +126,8 @@ message NodeStats {
   // forward metrics
   uint32 forward_latency = 48;
   uint32 forward_jitter = 49 [deprecated = true];
-  // p90 time from arrival to dequeue, in ns, for packets that found their forwarder idle
-  uint32 forward_scheduling_delay = 57;
+  // mean forwarding work per subscriber, in ns: (end of fan-out - dequeue) / subscribers written
+  uint32 forward_processing_per_subscriber = 57;
 
   repeated NodeStatsRate rates = 50;
 
