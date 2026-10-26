@@ -246,6 +246,14 @@ func ValidateHeaderName(name string, restrictNames bool) error {
 	return nil
 }
 
+// EncryptedHeaderValuePrefix marks a header value that was encrypted.
+const EncryptedHeaderValuePrefix = "lkenc:"
+
+const (
+	maxHeaderValueLen          = 1024
+	maxEncryptedHeaderValueLen = 8192
+)
+
 // ValidateHeaderValue validates a SIP header value per RFC 3261 Section 25.1
 func ValidateHeaderValue(name, value string) error {
 	return ValidateHeaderValueResult(name, value).Error()
@@ -257,8 +265,12 @@ func ValidateHeaderValueResult(name, value string) ValidationResult {
 		return ValidationResult{}
 	}
 
-	if len(value) > 1024 {
-		return ValidationFailure(fmt.Errorf("header %s: value too long (max 1024 characters)", name))
+	maxLen := maxHeaderValueLen
+	if strings.HasPrefix(value, EncryptedHeaderValuePrefix) {
+		maxLen = maxEncryptedHeaderValueLen
+	}
+	if len(value) > maxLen {
+		return ValidationFailure(fmt.Errorf("header %s: value too long (max %d characters)", name, maxLen))
 	}
 
 	// Basic character validation - printable ASCII. We're stricter than the spec here - no UTF-8 for now

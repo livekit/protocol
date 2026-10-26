@@ -100,6 +100,7 @@ var ValidHeaderValues = []string{
 	"Header with unicode 世界",               // Unicode
 	"Header with unicode émojis 🎉",         // Unicode with emojis
 	strings.Repeat("a", 1024),              // max length
+	EncryptedHeaderValuePrefix + strings.Repeat("a", 8192-len(EncryptedHeaderValuePrefix)), // encrypted max length
 }
 
 // Note: These restrictions are NOT in RFC 3261 but are applied for security/performance
@@ -111,6 +112,7 @@ var InvalidHeaderValues = []string{
 	"Header with\x1Funit separator", // control character
 	"Header with\x7Fdelete",         // delete character
 	strings.Repeat("a", 1025),       // too long
+	EncryptedHeaderValuePrefix + strings.Repeat("a", 8193-len(EncryptedHeaderValuePrefix)), // encrypted too long
 }
 
 // testCaseName truncates a test case name to maxLen and adds dots with total size
