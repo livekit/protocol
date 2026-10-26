@@ -126,10 +126,12 @@ message NodeStats {
   // forward metrics
   uint32 forward_latency = 48;
   uint32 forward_jitter = 49 [deprecated = true];
+  // p90 time from arrival to dequeue, in ns, for packets that found their forwarder idle
+  uint32 forward_scheduling_delay = 57;
 
   repeated NodeStatsRate rates = 50;
 
-  // NEXT ID: 57
+  // NEXT ID: 58
 }
 
 // rates of different node stats (per second)
