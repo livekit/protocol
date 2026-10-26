@@ -237,6 +237,22 @@ message SimulationRun {
       optional bool eot_misprediction = 15;
       optional bool awkward_silence = 16;
       optional bool unanswered = 17;
+
+      // Audio only; needs the text judge. One per saying of a key entity in
+      // this turn, in order, as the other side heard it. Matched over the whole
+      // call's transcript, so a saying spanning turns sits on its first, and
+      // which of an entity's repeated sayings was heard is the alignment's
+      // best guess.
+      repeated Entity entities = 19;
+      // the agent's chat item id for the first message this turn holds, as its
+      // stored transcript carries it; "" without a RemoteSession
+      string item_id = 20;
+
+      message Entity {
+        string said = 1;      // the entity as the speaker said it
+        string heard = 2;     // the listener's normalized words where it landed; "" if dropped
+        bool recognized = 3;  // heard with no word errors
+      }
     }
   }
 
