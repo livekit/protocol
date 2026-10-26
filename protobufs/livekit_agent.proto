@@ -165,6 +165,9 @@ message RegisterWorkerResponse {
 message MigrateJobRequest {
   // string job_id = 1 [deprecated = true];
   repeated string job_ids = 2;
+  // the jobs in job_ids as they were assigned, with state.participant_identity
+  // set to the identity the worker accepted them with
+  repeated Job jobs = 3;
 }
 
 message AvailabilityRequest {
