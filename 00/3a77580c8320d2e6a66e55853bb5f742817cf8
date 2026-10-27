@@ -1,0 +1,87 @@
+.changeset/forward-processing-per-subscriber.md
+  s_aaf78334cb7322::t_6c10f8a3a121e9 2,6
+.changeset/sdp-codec-helpers.md
+  s_aaf78334cb7322::t_a2dc90492178ab 3,6
+.changeset/sim-sip-call-to.md
+  s_aaf78334cb7322::t_c3da52be864f2a 2-3,6
+.changeset/sip-dialtone-preset.md
+  s_aaf78334cb7322::t_f7b052306232f8 1-6
+CHANGELOG.md
+  s_aaf78334cb7322::t_1c79a91308c36c 3-22
+go.mod
+  s_aaf78334cb7322::t_681c082576cd47 12
+go.sum
+  s_aaf78334cb7322::t_839e4d03a9eb85 49-50
+livekit/agent/livekit_agent_session.pb.go
+  s_aaf78334cb7322::t_8406f146fda703 288-347,390,394,403,5504-5512,5533,5541-5615,5618-5619,5621-5685,5690-5706,5709-5713,5716-5722,5825
+livekit/livekit_agent.pb.go
+  s_aaf78334cb7322::t_068df4625c8ae4 1277-1280,1322-1328,2178,2180-2181,2348-2360
+livekit/livekit_agent_simulation.pb.go
+  s_aaf78334cb7322::t_14f199ce58e8b6 209-316,349,353,953-1013,1029,1041,1054,1096,1108,1166-1168,1175,1187,1308-1314,1336-1347,1352,1364,1492-1519,1539,1551,1639,1651,1726,1738,1776,1788,1812,1824,1848,1860,1884,1896,1922,1934,1958,1970,1996,2008,2048,2060,2116,2128,2246,2258,2318,2330,2453,2460,2472,2579-2585,2589-2610,2617,2629,2659-2665,2786,2794-2801,2808,2820,2920-2940,2951,2963,3004,3016,3061,3073,3099,3111,3150,3162,3207,3219,3294,3306,3354,3366,3439,3451,3491,3503,3543,3555,3593,3605,3629,3641,3668,3680,3726,3738,3773,3785,3826,3838,3890,3918,3937-3938,3947-3951,3971-3976,4049,4064-4065,4078-4079,4082-4083,4119-4127,4161-4162,4179-4184,4314-4319,4350-4351,4356-4411,4414-4415,4417-4421,4423-4432,4434,4436-4495,4507,4513-4515,4521-4522
+livekit/livekit_agent_simulation.twirp.go
+  s_aaf78334cb7322::t_c28961c54952bc 2194-2484
+livekit/livekit_internal.pb.go
+  s_aaf78334cb7322::t_512e9a8cd12650 380-385,823-829,1136-1139,1328-1334,1500,1566-1567,1606,1633-1634
+livekit/livekit_metrics.pb.go
+  s_aaf78334cb7322::t_f5a09ea3bd3a9d 469-474,570-576,610,622-623
+livekit/livekit_sip.pb.go
+  s_aaf78334cb7322::t_a79889599ae56a 460-522,556,560,569,611,615,624,660,664,673,721,725,734,767,771,780,816,820,829,865,869,3995,3999,4001-4002,4033,4174,4182-4188,4340-4342,4344-4345,4405,4413-4419,5581,5600-5602,5627,5632-5634,5814-5822,5884,5891-5968,5972,5974-5976,5978-5983,5985,5987,5989-5994,5996-5999,6001-6003,6006-6008,6010,6012-6033,6035-6039,6041-6043,6045-6120,6165
+livekit/livekit_sip.twirp.go
+  s_aaf78334cb7322::t_92fa2230ff319d 4705-5084
+livekit/sip.go
+  s_aaf78334cb7322::t_9b1b49dab98ccd 1328-1343
+package.json
+  s_aaf78334cb7322::t_906f63dbc58667 4
+packages/javascript/CHANGELOG.md
+  s_aaf78334cb7322::t_9f6c3eb1ca7908 3-24
+packages/javascript/package.json
+  s_aaf78334cb7322::t_a914c4ff19c5ae 3
+protobufs/agent/livekit_agent_session.proto
+  s_aaf78334cb7322::t_de5d3176b9ee81 137-147
+protobufs/livekit_agent.proto
+  s_aaf78334cb7322::t_3e89dd5dec5918 168-170
+protobufs/livekit_agent_simulation.proto
+  s_aaf78334cb7322::t_d2be748cad0c9a 84-85,91-96,127-147,210,218-221,305,314-321,555-561
+protobufs/livekit_internal.proto
+  s_aaf78334cb7322::t_9ca4edf65d0db7 129-130,134,205-206,208
+protobufs/livekit_metrics.proto
+  s_aaf78334cb7322::t_5c62fdb60e36f9 103-106
+protobufs/livekit_sip.proto
+  s_aaf78334cb7322::t_8fe96100cdac7d 226-237,817,819-821,865,880-883
+protobufs/rpc/sip.proto
+  s_aaf78334cb7322::t_e502fd58199e34 106-107,109,162,175-176,178
+rpc/sip.go
+  s_aaf78334cb7322::t_7c256fbf825ea9 210-211,233,237-238,246-253
+rpc/sip.pb.go
+  s_aaf78334cb7322::t_82e42fe812a628 77-80,82-84,314,322-328,499-501,503-504,559,567-573,671,699-701,736,740-742,792-803,811-840
+rpc/sip.psrpc.go
+  s_a76e625a99c445::t_46d1abf10cb593 165-258
+rpc/sip_test.go
+  s_aaf78334cb7322::t_d6a69af0d45320 73,113,159-220
+sdp/sdp.go
+  s_aaf78334cb7322::t_70e37e0988f07a 229-255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "003a77580c8320d2e6a66e55853bb5f742817cf8",
+  "prompts": {},
+  "sessions": {
+    "s_a76e625a99c445": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c9702b8a-b660-4f34-bd32-230591d391a0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    },
+    "s_aaf78334cb7322": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2193486-0057-4a50-bb24-44082ff248d9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Chenghao Mou <chenghao.mou@livekit.io>"
+    }
+  }
+}
