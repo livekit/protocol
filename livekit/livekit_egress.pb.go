@@ -1155,9 +1155,9 @@ type VideoSelector struct {
 	//
 	//	*VideoSelector_TrackId
 	//	*VideoSelector_ParticipantIdentity
-	//	*VideoSelector_TrackName
 	Match         isVideoSelector_Match `protobuf_oneof:"match"`
-	Exclude       bool                  `protobuf:"varint,4,opt,name=exclude,proto3" json:"exclude,omitempty"` // Drop matching tracks, overriding capture_all and other matches
+	TrackName     string                `protobuf:"bytes,3,opt,name=track_name,json=trackName,proto3" json:"track_name,omitempty"` // Narrows the match to tracks with this name; alone, matches it from any participant
+	Exclude       bool                  `protobuf:"varint,4,opt,name=exclude,proto3" json:"exclude,omitempty"`                     // Drop matching tracks, overriding capture_all and other matches
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1219,9 +1219,7 @@ func (x *VideoSelector) GetParticipantIdentity() string {
 
 func (x *VideoSelector) GetTrackName() string {
 	if x != nil {
-		if x, ok := x.Match.(*VideoSelector_TrackName); ok {
-			return x.TrackName
-		}
+		return x.TrackName
 	}
 	return ""
 }
@@ -1245,15 +1243,9 @@ type VideoSelector_ParticipantIdentity struct {
 	ParticipantIdentity string `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3,oneof"`
 }
 
-type VideoSelector_TrackName struct {
-	TrackName string `protobuf:"bytes,3,opt,name=track_name,json=trackName,proto3,oneof"`
-}
-
 func (*VideoSelector_TrackId) isVideoSelector_Match() {}
 
 func (*VideoSelector_ParticipantIdentity) isVideoSelector_Match() {}
-
-func (*VideoSelector_TrackName) isVideoSelector_Match() {}
 
 // Unified audio selection and channel routing.
 // Each route specifies both which audio to capture and which channel to output to.
@@ -1316,10 +1308,10 @@ type AudioRoute struct {
 	//	*AudioRoute_TrackId
 	//	*AudioRoute_ParticipantIdentity
 	//	*AudioRoute_ParticipantKind
-	//	*AudioRoute_TrackName
 	Match         isAudioRoute_Match `protobuf_oneof:"match"`
+	TrackName     string             `protobuf:"bytes,5,opt,name=track_name,json=trackName,proto3" json:"track_name,omitempty"` // Narrows the match to tracks with this name; alone, matches it from any participant
+	Exclude       bool               `protobuf:"varint,6,opt,name=exclude,proto3" json:"exclude,omitempty"`                     // Drop matching tracks, overriding capture_all and other routes
 	Channel       AudioChannel       `protobuf:"varint,4,opt,name=channel,proto3,enum=livekit.AudioChannel" json:"channel,omitempty"`
-	Exclude       bool               `protobuf:"varint,6,opt,name=exclude,proto3" json:"exclude,omitempty"` // Drop matching tracks, overriding capture_all and other routes
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1390,18 +1382,9 @@ func (x *AudioRoute) GetParticipantKind() ParticipantInfo_Kind {
 
 func (x *AudioRoute) GetTrackName() string {
 	if x != nil {
-		if x, ok := x.Match.(*AudioRoute_TrackName); ok {
-			return x.TrackName
-		}
+		return x.TrackName
 	}
 	return ""
-}
-
-func (x *AudioRoute) GetChannel() AudioChannel {
-	if x != nil {
-		return x.Channel
-	}
-	return AudioChannel_AUDIO_CHANNEL_BOTH
 }
 
 func (x *AudioRoute) GetExclude() bool {
@@ -1409,6 +1392,13 @@ func (x *AudioRoute) GetExclude() bool {
 		return x.Exclude
 	}
 	return false
+}
+
+func (x *AudioRoute) GetChannel() AudioChannel {
+	if x != nil {
+		return x.Channel
+	}
+	return AudioChannel_AUDIO_CHANNEL_BOTH
 }
 
 type isAudioRoute_Match interface {
@@ -1427,17 +1417,11 @@ type AudioRoute_ParticipantKind struct {
 	ParticipantKind ParticipantInfo_Kind `protobuf:"varint,3,opt,name=participant_kind,json=participantKind,proto3,enum=livekit.ParticipantInfo_Kind,oneof"`
 }
 
-type AudioRoute_TrackName struct {
-	TrackName string `protobuf:"bytes,5,opt,name=track_name,json=trackName,proto3,oneof"`
-}
-
 func (*AudioRoute_TrackId) isAudioRoute_Match() {}
 
 func (*AudioRoute_ParticipantIdentity) isAudioRoute_Match() {}
 
 func (*AudioRoute_ParticipantKind) isAudioRoute_Match() {}
-
-func (*AudioRoute_TrackName) isAudioRoute_Match() {}
 
 type DataConfig struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1497,9 +1481,9 @@ type DataSelector struct {
 	//
 	//	*DataSelector_TrackId
 	//	*DataSelector_ParticipantIdentity
-	//	*DataSelector_TrackName
 	Match         isDataSelector_Match `protobuf_oneof:"match"`
-	Exclude       bool                 `protobuf:"varint,4,opt,name=exclude,proto3" json:"exclude,omitempty"` // Drop matching tracks, overriding capture_all and other matches
+	TrackName     string               `protobuf:"bytes,3,opt,name=track_name,json=trackName,proto3" json:"track_name,omitempty"` // Narrows the match to tracks with this name; alone, matches it from any participant
+	Exclude       bool                 `protobuf:"varint,4,opt,name=exclude,proto3" json:"exclude,omitempty"`                     // Drop matching tracks, overriding capture_all and other matches
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1561,9 +1545,7 @@ func (x *DataSelector) GetParticipantIdentity() string {
 
 func (x *DataSelector) GetTrackName() string {
 	if x != nil {
-		if x, ok := x.Match.(*DataSelector_TrackName); ok {
-			return x.TrackName
-		}
+		return x.TrackName
 	}
 	return ""
 }
@@ -1587,15 +1569,9 @@ type DataSelector_ParticipantIdentity struct {
 	ParticipantIdentity string `protobuf:"bytes,2,opt,name=participant_identity,json=participantIdentity,proto3,oneof"`
 }
 
-type DataSelector_TrackName struct {
-	TrackName string `protobuf:"bytes,3,opt,name=track_name,json=trackName,proto3,oneof"`
-}
-
 func (*DataSelector_TrackId) isDataSelector_Match() {}
 
 func (*DataSelector_ParticipantIdentity) isDataSelector_Match() {}
-
-func (*DataSelector_TrackName) isDataSelector_Match() {}
 
 type EncodingOptions struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
@@ -5621,41 +5597,41 @@ const file_livekit_egress_proto_rawDesc = "" +
 	"\vVideoConfig\x12\x1f\n" +
 	"\vcapture_all\x18\x01 \x01(\bR\n" +
 	"captureAll\x124\n" +
-	"\tselectors\x18\x02 \x03(\v2\x16.livekit.VideoSelectorR\tselectors\"\xb1\x01\n" +
+	"\tselectors\x18\x02 \x03(\v2\x16.livekit.VideoSelectorR\tselectors\"\xaf\x01\n" +
 	"\rVideoSelector\x12'\n" +
 	"\btrack_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\atrackIDH\x00R\atrackId\x123\n" +
-	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12\x1f\n" +
+	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12\x1d\n" +
 	"\n" +
-	"track_name\x18\x03 \x01(\tH\x00R\ttrackName\x12\x18\n" +
+	"track_name\x18\x03 \x01(\tR\ttrackName\x12\x18\n" +
 	"\aexclude\x18\x04 \x01(\bR\aexcludeB\a\n" +
 	"\x05match\"[\n" +
 	"\vAudioConfig\x12\x1f\n" +
 	"\vcapture_all\x18\x01 \x01(\bR\n" +
 	"captureAll\x12+\n" +
-	"\x06routes\x18\x02 \x03(\v2\x13.livekit.AudioRouteR\x06routes\"\xab\x02\n" +
+	"\x06routes\x18\x02 \x03(\v2\x13.livekit.AudioRouteR\x06routes\"\xa9\x02\n" +
 	"\n" +
 	"AudioRoute\x12'\n" +
 	"\btrack_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\atrackIDH\x00R\atrackId\x123\n" +
 	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12J\n" +
-	"\x10participant_kind\x18\x03 \x01(\x0e2\x1d.livekit.ParticipantInfo.KindH\x00R\x0fparticipantKind\x12\x1f\n" +
+	"\x10participant_kind\x18\x03 \x01(\x0e2\x1d.livekit.ParticipantInfo.KindH\x00R\x0fparticipantKind\x12\x1d\n" +
 	"\n" +
-	"track_name\x18\x05 \x01(\tH\x00R\ttrackName\x12/\n" +
-	"\achannel\x18\x04 \x01(\x0e2\x15.livekit.AudioChannelR\achannel\x12\x18\n" +
-	"\aexclude\x18\x06 \x01(\bR\aexcludeB\a\n" +
+	"track_name\x18\x05 \x01(\tR\ttrackName\x12\x18\n" +
+	"\aexclude\x18\x06 \x01(\bR\aexclude\x12/\n" +
+	"\achannel\x18\x04 \x01(\x0e2\x15.livekit.AudioChannelR\achannelB\a\n" +
 	"\x05match\"b\n" +
 	"\n" +
 	"DataConfig\x12\x1f\n" +
 	"\vcapture_all\x18\x01 \x01(\bR\n" +
 	"captureAll\x123\n" +
-	"\tselectors\x18\x02 \x03(\v2\x15.livekit.DataSelectorR\tselectors\"\xb0\x01\n" +
+	"\tselectors\x18\x02 \x03(\v2\x15.livekit.DataSelectorR\tselectors\"\xae\x01\n" +
 	"\fDataSelector\x12'\n" +
 	"\btrack_id\x18\x01 \x01(\tB\n" +
 	"\xbaP\atrackIDH\x00R\atrackId\x123\n" +
-	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12\x1f\n" +
+	"\x14participant_identity\x18\x02 \x01(\tH\x00R\x13participantIdentity\x12\x1d\n" +
 	"\n" +
-	"track_name\x18\x03 \x01(\tH\x00R\ttrackName\x12\x18\n" +
+	"track_name\x18\x03 \x01(\tR\ttrackName\x12\x18\n" +
 	"\aexclude\x18\x04 \x01(\bR\aexcludeB\a\n" +
 	"\x05match\"\xd2\x03\n" +
 	"\x0fEncodingOptions\x12\x14\n" +
@@ -6325,18 +6301,15 @@ func file_livekit_egress_proto_init() {
 	file_livekit_egress_proto_msgTypes[6].OneofWrappers = []any{
 		(*VideoSelector_TrackId)(nil),
 		(*VideoSelector_ParticipantIdentity)(nil),
-		(*VideoSelector_TrackName)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[8].OneofWrappers = []any{
 		(*AudioRoute_TrackId)(nil),
 		(*AudioRoute_ParticipantIdentity)(nil),
 		(*AudioRoute_ParticipantKind)(nil),
-		(*AudioRoute_TrackName)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[10].OneofWrappers = []any{
 		(*DataSelector_TrackId)(nil),
 		(*DataSelector_ParticipantIdentity)(nil),
-		(*DataSelector_TrackName)(nil),
 	}
 	file_livekit_egress_proto_msgTypes[12].OneofWrappers = []any{
 		(*Output_File)(nil),

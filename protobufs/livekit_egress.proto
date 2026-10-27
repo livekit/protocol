@@ -120,8 +120,8 @@ message VideoSelector {
   oneof match {
     string track_id = 1 [(logger.name) = "trackID"];
     string participant_identity = 2;
-    string track_name = 3;
   }
+  string track_name = 3; // Narrows the match to tracks with this name; alone, matches it from any participant
   bool exclude = 4; // Drop matching tracks, overriding capture_all and other matches
 }
 
@@ -139,11 +139,10 @@ message AudioRoute {
     string track_id = 1 [(logger.name) = "trackID"];
     string participant_identity = 2;
     ParticipantInfo.Kind participant_kind = 3;
-    string track_name = 5;
   }
-
-  AudioChannel channel = 4;
+  string track_name = 5; // Narrows the match to tracks with this name; alone, matches it from any participant
   bool exclude = 6; // Drop matching tracks, overriding capture_all and other routes
+  AudioChannel channel = 4;
 }
 
 enum AudioChannel {
@@ -163,8 +162,8 @@ message DataSelector {
   oneof match {
     string track_id = 1 [(logger.name) = "trackID"];
     string participant_identity = 2;
-    string track_name = 3;
   }
+  string track_name = 3; // Narrows the match to tracks with this name; alone, matches it from any participant
   bool exclude = 4; // Drop matching tracks, overriding capture_all and other matches
 }
 
