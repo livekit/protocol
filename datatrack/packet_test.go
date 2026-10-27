@@ -257,14 +257,14 @@ func TestPacket(t *testing.T) {
 		require.NoError(t, unmarshaled.Unmarshal(rawPacket))
 		require.Equal(t, packet, &unmarshaled)
 
-		ext, err = unmarshaled.GetExtension(ExtensionE2EEID)
+		ext, err = unmarshaled.GetExtension(uint8(livekit.DataTrackExtensionID_DTEI_E2EE))
 		require.NoError(t, err)
 		var extE2EE ExtensionE2EE
 		require.NoError(t, extE2EE.Unmarshal(ext))
 		require.Equal(t, uint8(0xfa), extE2EE.KeyIndex())
 		require.Equal(t, iv, extE2EE.IV())
 
-		ext, err = unmarshaled.GetExtension(ExtensionUserTimestampID)
+		ext, err = unmarshaled.GetExtension(uint8(livekit.DataTrackExtensionID_DTEI_USER_TIMESTAMP))
 		require.NoError(t, err)
 		var extUserTimestamp ExtensionUserTimestamp
 		require.NoError(t, extUserTimestamp.Unmarshal(ext))

@@ -351,22 +351,25 @@ func (TrackSource) EnumDescriptor() ([]byte, []int) {
 type DataTrackExtensionID int32
 
 const (
-	DataTrackExtensionID_DTEI_INVALID             DataTrackExtensionID = 0
-	DataTrackExtensionID_DTEI_PARTICIPANT_SID_LOW DataTrackExtensionID = 1
-	DataTrackExtensionID_DTEI_PARTICIPANT_SID     DataTrackExtensionID = 255
+	DataTrackExtensionID_DTEI_INVALID         DataTrackExtensionID = 0
+	DataTrackExtensionID_DTEI_E2EE            DataTrackExtensionID = 1
+	DataTrackExtensionID_DTEI_USER_TIMESTAMP  DataTrackExtensionID = 2
+	DataTrackExtensionID_DTEI_PARTICIPANT_SID DataTrackExtensionID = 255
 )
 
 // Enum value maps for DataTrackExtensionID.
 var (
 	DataTrackExtensionID_name = map[int32]string{
 		0:   "DTEI_INVALID",
-		1:   "DTEI_PARTICIPANT_SID_LOW",
+		1:   "DTEI_E2EE",
+		2:   "DTEI_USER_TIMESTAMP",
 		255: "DTEI_PARTICIPANT_SID",
 	}
 	DataTrackExtensionID_value = map[string]int32{
-		"DTEI_INVALID":             0,
-		"DTEI_PARTICIPANT_SID_LOW": 1,
-		"DTEI_PARTICIPANT_SID":     255,
+		"DTEI_INVALID":         0,
+		"DTEI_E2EE":            1,
+		"DTEI_USER_TIMESTAMP":  2,
+		"DTEI_PARTICIPANT_SID": 255,
 	}
 )
 
@@ -7597,10 +7600,11 @@ const file_livekit_models_proto_rawDesc = "" +
 	"\n" +
 	"MICROPHONE\x10\x02\x12\x10\n" +
 	"\fSCREEN_SHARE\x10\x03\x12\x16\n" +
-	"\x12SCREEN_SHARE_AUDIO\x10\x04*a\n" +
+	"\x12SCREEN_SHARE_AUDIO\x10\x04*k\n" +
 	"\x14DataTrackExtensionID\x12\x10\n" +
-	"\fDTEI_INVALID\x10\x00\x12\x1c\n" +
-	"\x18DTEI_PARTICIPANT_SID_LOW\x10\x01\x12\x19\n" +
+	"\fDTEI_INVALID\x10\x00\x12\r\n" +
+	"\tDTEI_E2EE\x10\x01\x12\x17\n" +
+	"\x13DTEI_USER_TIMESTAMP\x10\x02\x12\x19\n" +
 	"\x14DTEI_PARTICIPANT_SID\x10\xff\x01*6\n" +
 	"\fVideoQuality\x12\a\n" +
 	"\x03LOW\x10\x00\x12\n" +

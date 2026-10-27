@@ -17,6 +17,7 @@ package datatrack
 import (
 	"testing"
 
+	"github.com/livekit/protocol/livekit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -26,7 +27,7 @@ func TestExtensionE2EE(t *testing.T) {
 	extE2EE := NewExtensionE2EE(0xfa, iv)
 
 	expectedExt := Extension{
-		id:   ExtensionE2EEID,
+		id:   uint8(livekit.DataTrackExtensionID_DTEI_E2EE),
 		data: []byte{0xfa, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11},
 	}
 	ext, err := extE2EE.Marshal()

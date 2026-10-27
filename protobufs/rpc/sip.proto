@@ -103,8 +103,10 @@ message InternalCreateSIPParticipantRequest {
   // Character 'w' can be used to add a 0.5 sec delay.
   string dtmf = 11;
 
+  // Deprecated: set for older sip services, which only read this field. Read dialtone after Upgrade() instead.
+  bool play_dialtone = 12 [deprecated = true];
   // Optionally play dialtone in the room as an audible indicator for existing participants
-  bool play_dialtone = 12;
+  livekit.SIPDialtone dialtone = 41;
 
   map<string, string> headers = 21 [
     (logger.sensitivity) = SENSITIVITY_PII,
@@ -154,7 +156,10 @@ message InternalCreateSIPParticipantRequest {
 
   SIPCallObservability observability = 38;
 
-  // NEXT ID: 40
+  // Provider of the caller number, when the call does not use a customer trunk.
+  livekit.ProviderInfo provider_info = 40;
+
+  // NEXT ID: 42
 }
 
 message InternalCreateSIPParticipantResponse {
@@ -167,8 +172,10 @@ message InternalTransferSIPParticipantRequest {
   string sip_call_id = 1 [(logger.name) = "sipCallID"];
   string transfer_to = 2;
 
+  // Deprecated: set for older sip services, which only read this field. Read dialtone after Upgrade() instead.
+  bool play_dialtone = 3 [deprecated = true];
   // Optionally play dialtone to the SIP participant as an audible indicator of being transferred
-  bool play_dialtone = 3;
+  livekit.SIPDialtone dialtone = 7;
 
   // Add the following headers to the REFER SIP request.
   map<string, string> headers = 4 [

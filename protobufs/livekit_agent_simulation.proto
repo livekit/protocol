@@ -81,10 +81,18 @@ message SimulationRun {
     // 1-based sample of that scenario within the run; always 1 when the run's
     // samples is 1.
     int32 sample = 16;
+    // Set on a failed job whose cause is known; error stays the detail.
+    FailureReason failure_reason = 19;
 
     message Usage {
       int32 text_turns_count = 1;
       int32 audio_turns_count = 2;
+    }
+
+    enum FailureReason {
+      FAILURE_REASON_UNSPECIFIED = 0;
+      // The agent under test never joined the simulation's room.
+      FAILURE_REASON_AGENT_JOIN_TIMEOUT = 1;
     }
   }
 
@@ -115,6 +123,27 @@ message SimulationRun {
     optional bool redundant_statements = 17;
     optional bool poor_question_quality = 18;
     optional float conversation_progression = 19;  // 0-1, derived from the flags above
+
+    // How the call ended. A failing end also sets the job's error.
+    EndReason end_reason = 21;
+    // The simulated caller's language, as a language tag: what it spoke or wrote.
+    string caller_language = 22;
+    // Audio only: the language the caller transcribed the agent in; "" means
+    // caller_language.
+    string caller_listen_language = 23;
+    // Audio only: what the caller's audio went through before the agent heard
+    // it. Absent for a clean call.
+    SimulationImpairments impairments = 24;
+
+    enum EndReason {
+      END_REASON_UNSPECIFIED = 0;
+      END_REASON_SCENARIO_COMPLETED = 1;  // the caller finished the scenario
+      END_REASON_AGENT_ENDED = 2;         // the agent under test ended the call
+      END_REASON_INACTIVITY = 3;          // the agent under test went silent
+      END_REASON_TURN_LIMIT = 4;          // the caller ran out of turns
+      END_REASON_EMPTY_RESPONSE = 5;      // the agent under test kept replying with nothing
+      END_REASON_AGENT_ERROR = 6;         // the agent under test failed mid-call
+    }
 
     // The agent's perception of the caller. Audio only.
     message STT {
@@ -178,6 +207,7 @@ message SimulationRun {
       optional uint32 unanswered_turns = 12;             // the simulated party spoke, the agent never responded
       optional uint32 false_interruption_count = 13;     // needs the RemoteSession; agent paused for a non-interruption
       optional uint32 e2e_latency_ms = 15;               // needs the RemoteSession; the agent's own claim
+      optional uint32 backchannel_count = 16;            // the caller's acknowledgements over the agent's speech
     }
 
     // Rows exist for text and audio. The groups above hold the means and pools
@@ -185,6 +215,10 @@ message SimulationRun {
     message Turn {
       uint32 index = 1;                 // 1-based, conversation order
       livekit.agent.ChatRole role = 2;  // ASSISTANT = the agent under test, USER = simulator persona
+      // The words the judges read for this turn: the speaker's own, or as the
+      // other side heard them when those are unknown (the agent's, without a
+      // RemoteSession).
+      string text = 18;
       optional uint32 start_ms = 3;     // audio only; relative to t0; unset if the turn could not be aligned to the audio
       optional uint32 end_ms = 4;       // audio only
 
@@ -268,6 +302,7 @@ message SimulationRun {
       SimulationMode mode = 9;
 
       // Impairments applied to the simulated user's audio; AUDIO mode only.
+      // TODO(u9g): migrate these to SimulationImpairments.
       bool background_noise = 10;
       bool low_quality_microphone = 11;
       bool packet_loss = 12;
@@ -276,6 +311,14 @@ message SimulationRun {
       // scenario_group. The run fails if any scenario fails; pass@k and
       // pass^k report over scenarios and neither gates.
       optional SamplingOptions sampling = 14;
+
+      // When set, every job dials this number over SIP instead of dispatching
+      // agent_name, as CreateSIPParticipantRequest would. AUDIO mode only.
+      string sip_call_to = 15;
+      // Outbound trunk to dial through. Empty dials from sip_number, which must
+      // then be a LiveKit phone number the project owns.
+      string sip_trunk_id = 16;
+      string sip_number = 17;
     }
     message Response {
       string simulation_run_id = 1;
@@ -423,7 +466,7 @@ message Scenario {
   string label = 1;
   string instructions = 2;
   string agent_expectations = 3;
-  // Set as participant attributes on the simulation participant's access token.
+  // Surfaced to the agent under test as SimulationContext scenario tags.
   map<string, string> tags = 4;
   // Arbitrary JSON-encoded object, surfaced to the agent under test as
   // SimulationContext userdata (e.g. inputs and benchmark target state).
@@ -451,8 +494,16 @@ enum SimulationMode {
   SIMULATION_MODE_AUDIO = 2;
 }
 
-// Carried (protojson-encoded) in the simulation room's metadata so the agent
-// under test can read the scenario + run identity synchronously at connect.
+// What the simulated caller's audio went through before the agent heard it.
+message SimulationImpairments {
+  bool background_noise = 1;
+  bool low_quality_microphone = 2;
+  bool packet_loss = 3;
+}
+
+// Carried (protojson-encoded) in the Job's lk.simulator.dispatch attribute, set
+// on the agent dispatch, so the agent under test can read the scenario + run
+// identity synchronously at job start.
 message SimulationDispatch {
   string simulation_run_id = 1;
   string job_id = 2;

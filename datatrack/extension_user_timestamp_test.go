@@ -17,6 +17,7 @@ package datatrack
 import (
 	"testing"
 
+	"github.com/livekit/protocol/livekit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -25,7 +26,7 @@ func TestExtensionUserTimestamp(t *testing.T) {
 	extUserTimestamp := NewExtensionUserTimestamp(0x4411221111118811)
 
 	expectedExt := Extension{
-		id:   ExtensionUserTimestampID,
+		id:   uint8(livekit.DataTrackExtensionID_DTEI_USER_TIMESTAMP),
 		data: []byte{0x44, 0x11, 0x22, 0x11, 0x11, 0x11, 0x88, 0x11},
 	}
 	ext, err := extUserTimestamp.Marshal()

@@ -54,7 +54,6 @@ message StartEgressRequest {
     TemplateSource template = 2;
     WebSource web = 3;
     MediaSource media = 4;
-    RoboticsSource robotics = 10;
   }
 
   // Optional — default H264_720P_30
@@ -101,28 +100,6 @@ message MediaSource {
   }
   AudioConfig audio = 3;
   // TODO: DataConfig data = 4;
-}
-
-// Preserve selected room data as independent output channels. With no modality
-// selectors, every supported track is captured. When any modality selector is
-// present, only the selected modalities are captured. Empty selector lists mean
-// "all"; non-empty lists are exact-match allowlists.
-message RoboticsSource {
-  reserved 1;
-  reserved "track_names";
-
-  ParticipantSelection participants = 2;
-  TrackSelection video_tracks = 3;
-  TrackSelection audio_tracks = 4;
-  TrackSelection data_tracks = 5;
-}
-
-message ParticipantSelection {
-  repeated string identities = 1;
-}
-
-message TrackSelection {
-  repeated string track_names = 1;
 }
 
 // --- Video Configuration ---
@@ -230,12 +207,17 @@ enum EncodedFileType {
   MP4 = 1;
   OGG = 2;
   MP3 = 3;
-  MCAP = 4;
 }
 
 message StreamOutput {
-  StreamProtocol protocol = 1;  // required
-  repeated string urls = 2;     // required
+  StreamProtocol protocol = 1;                  // required
+  repeated string urls = 2;                     // urls or destinations required
+  repeated StreamDestination destinations = 3;  // urls or destinations required
+}
+
+message StreamDestination {
+  string id = 1;   // required
+  string url = 2;  // required
 }
 
 enum StreamProtocol {
@@ -266,7 +248,8 @@ message SegmentedFileOutput {
 
 enum SegmentedFileProtocol {
   DEFAULT_SEGMENTED_FILE_PROTOCOL = 0;
-  HLS_PROTOCOL = 1;
+  HLS_PROTOCOL = 1;        // MPEG-TS segments
+  HLS_FMP4_PROTOCOL = 2;   // fragmented MP4 segments
 }
 
 enum SegmentedFileSuffix {
@@ -454,6 +437,7 @@ message StreamInfo {
   string error = 6;
   int64 last_retry_at = 7;
   uint32 retries = 8;
+  string id = 9;  // StreamDestination.id this stream was started from; empty for plain urls
 }
 
 message FileInfo {
@@ -658,6 +642,7 @@ message UpdateStreamRequest {
   string egress_id = 1 [(logger.name) = "egressID"];
   repeated string add_output_urls = 2;
   repeated string remove_output_urls = 3;
+  repeated StreamDestination add_destinations = 4;
 }
 
 message StreamInfoList {

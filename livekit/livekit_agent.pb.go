@@ -138,6 +138,8 @@ const (
 	JobStatus_JS_RUNNING JobStatus = 1
 	JobStatus_JS_SUCCESS JobStatus = 2
 	JobStatus_JS_FAILED  JobStatus = 3
+	// the job ended before it was assigned to an agent
+	JobStatus_JS_CANCELLED JobStatus = 4
 )
 
 // Enum value maps for JobStatus.
@@ -147,12 +149,14 @@ var (
 		1: "JS_RUNNING",
 		2: "JS_SUCCESS",
 		3: "JS_FAILED",
+		4: "JS_CANCELLED",
 	}
 	JobStatus_value = map[string]int32{
-		"JS_PENDING": 0,
-		"JS_RUNNING": 1,
-		"JS_SUCCESS": 2,
-		"JS_FAILED":  3,
+		"JS_PENDING":   0,
+		"JS_RUNNING":   1,
+		"JS_SUCCESS":   2,
+		"JS_FAILED":    3,
+		"JS_CANCELLED": 4,
 	}
 )
 
@@ -181,6 +185,65 @@ func (x JobStatus) Number() protoreflect.EnumNumber {
 // Deprecated: Use JobStatus.Descriptor instead.
 func (JobStatus) EnumDescriptor() ([]byte, []int) {
 	return file_livekit_agent_proto_rawDescGZIP(), []int{2}
+}
+
+type JobStateReason int32
+
+const (
+	JobStateReason_JSR_UNSPECIFIED JobStateReason = 0
+	// no agent was available to accept the job
+	JobStateReason_JSR_NO_CAPACITY JobStateReason = 1
+	// the room closed before an agent was assigned
+	JobStateReason_JSR_ROOM_CLOSED JobStateReason = 2
+	// the dispatch was deleted before an agent was assigned
+	JobStateReason_JSR_DISPATCH_DELETED JobStateReason = 3
+	// the job failed and is being dispatched again
+	JobStateReason_JSR_RETRYING JobStateReason = 4
+)
+
+// Enum value maps for JobStateReason.
+var (
+	JobStateReason_name = map[int32]string{
+		0: "JSR_UNSPECIFIED",
+		1: "JSR_NO_CAPACITY",
+		2: "JSR_ROOM_CLOSED",
+		3: "JSR_DISPATCH_DELETED",
+		4: "JSR_RETRYING",
+	}
+	JobStateReason_value = map[string]int32{
+		"JSR_UNSPECIFIED":      0,
+		"JSR_NO_CAPACITY":      1,
+		"JSR_ROOM_CLOSED":      2,
+		"JSR_DISPATCH_DELETED": 3,
+		"JSR_RETRYING":         4,
+	}
+)
+
+func (x JobStateReason) Enum() *JobStateReason {
+	p := new(JobStateReason)
+	*p = x
+	return p
+}
+
+func (x JobStateReason) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (JobStateReason) Descriptor() protoreflect.EnumDescriptor {
+	return file_livekit_agent_proto_enumTypes[3].Descriptor()
+}
+
+func (JobStateReason) Type() protoreflect.EnumType {
+	return &file_livekit_agent_proto_enumTypes[3]
+}
+
+func (x JobStateReason) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use JobStateReason.Descriptor instead.
+func (JobStateReason) EnumDescriptor() ([]byte, []int) {
+	return file_livekit_agent_proto_rawDescGZIP(), []int{3}
 }
 
 type AgentHttp_AgentEndpointKind int32
@@ -214,11 +277,11 @@ func (x AgentHttp_AgentEndpointKind) String() string {
 }
 
 func (AgentHttp_AgentEndpointKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agent_proto_enumTypes[3].Descriptor()
+	return file_livekit_agent_proto_enumTypes[4].Descriptor()
 }
 
 func (AgentHttp_AgentEndpointKind) Type() protoreflect.EnumType {
-	return &file_livekit_agent_proto_enumTypes[3]
+	return &file_livekit_agent_proto_enumTypes[4]
 }
 
 func (x AgentHttp_AgentEndpointKind) Number() protoreflect.EnumNumber {
@@ -285,11 +348,11 @@ func (x AgentHttp_HttpStreamResetCode) String() string {
 }
 
 func (AgentHttp_HttpStreamResetCode) Descriptor() protoreflect.EnumDescriptor {
-	return file_livekit_agent_proto_enumTypes[4].Descriptor()
+	return file_livekit_agent_proto_enumTypes[5].Descriptor()
 }
 
 func (AgentHttp_HttpStreamResetCode) Type() protoreflect.EnumType {
-	return &file_livekit_agent_proto_enumTypes[4]
+	return &file_livekit_agent_proto_enumTypes[5]
 }
 
 func (x AgentHttp_HttpStreamResetCode) Number() protoreflect.EnumNumber {
@@ -453,8 +516,10 @@ type JobState struct {
 	ParticipantIdentity string                 `protobuf:"bytes,6,opt,name=participant_identity,json=participantIdentity,proto3" json:"participant_identity,omitempty"`
 	WorkerId            string                 `protobuf:"bytes,7,opt,name=worker_id,json=workerId,proto3" json:"worker_id,omitempty"`
 	AgentId             string                 `protobuf:"bytes,8,opt,name=agent_id,json=agentId,proto3" json:"agent_id,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	// why the job has no agent, for JS_PENDING and JS_CANCELLED jobs
+	Reason        JobStateReason `protobuf:"varint,9,opt,name=reason,proto3,enum=livekit.JobStateReason" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *JobState) Reset() {
@@ -541,6 +606,13 @@ func (x *JobState) GetAgentId() string {
 		return x.AgentId
 	}
 	return ""
+}
+
+func (x *JobState) GetReason() JobStateReason {
+	if x != nil {
+		return x.Reason
+	}
+	return JobStateReason_JSR_UNSPECIFIED
 }
 
 // from Worker to Server
@@ -1202,7 +1274,10 @@ func (x *RegisterWorkerResponse) GetEndpointSettings() *AgentHttp_AgentEndpointS
 type MigrateJobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// string job_id = 1 [deprecated = true];
-	JobIds        []string `protobuf:"bytes,2,rep,name=job_ids,json=jobIds,proto3" json:"job_ids,omitempty"`
+	JobIds []string `protobuf:"bytes,2,rep,name=job_ids,json=jobIds,proto3" json:"job_ids,omitempty"`
+	// the jobs in job_ids as they were assigned, with state.participant_identity
+	// set to the identity the worker accepted them with
+	Jobs          []*Job `protobuf:"bytes,3,rep,name=jobs,proto3" json:"jobs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1240,6 +1315,13 @@ func (*MigrateJobRequest) Descriptor() ([]byte, []int) {
 func (x *MigrateJobRequest) GetJobIds() []string {
 	if x != nil {
 		return x.JobIds
+	}
+	return nil
+}
+
+func (x *MigrateJobRequest) GetJobs() []*Job {
+	if x != nil {
+		return x.Jobs
 	}
 	return nil
 }
@@ -2024,7 +2106,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x0fAttributesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\x0e\n" +
-	"\f_participant\"\xa9\x02\n" +
+	"\f_participant\"\xda\x02\n" +
 	"\bJobState\x12*\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -2036,7 +2118,8 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x14participant_identity\x18\x06 \x01(\tR\x13participantIdentity\x12(\n" +
 	"\tworker_id\x18\a \x01(\tB\v\xbaP\bworkerIDR\bworkerId\x12%\n" +
 	"\bagent_id\x18\b \x01(\tB\n" +
-	"\xbaP\aagentIDR\aagentId\"\xc8\x03\n" +
+	"\xbaP\aagentIDR\aagentId\x12/\n" +
+	"\x06reason\x18\t \x01(\x0e2\x17.livekit.JobStateReasonR\x06reason\"\xc8\x03\n" +
 	"\rWorkerMessage\x12<\n" +
 	"\bregister\x18\x01 \x01(\v2\x1e.livekit.RegisterWorkerRequestH\x00R\bregister\x12C\n" +
 	"\favailability\x18\x02 \x01(\v2\x1d.livekit.AvailabilityResponseH\x00R\favailability\x12B\n" +
@@ -2092,9 +2175,10 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\tworker_id\x18\x01 \x01(\tB\v\xbaP\bworkerIDR\bworkerId\x124\n" +
 	"\vserver_info\x18\x03 \x01(\v2\x13.livekit.ServerInfoR\n" +
 	"serverInfo\x12U\n" +
-	"\x11endpoint_settings\x18\x04 \x01(\v2(.livekit.AgentHttp.AgentEndpointSettingsR\x10endpointSettingsJ\x04\b\x02\x10\x03\",\n" +
+	"\x11endpoint_settings\x18\x04 \x01(\v2(.livekit.AgentHttp.AgentEndpointSettingsR\x10endpointSettingsJ\x04\b\x02\x10\x03\"N\n" +
 	"\x11MigrateJobRequest\x12\x17\n" +
-	"\ajob_ids\x18\x02 \x03(\tR\x06jobIds\"Q\n" +
+	"\ajob_ids\x18\x02 \x03(\tR\x06jobIds\x12 \n" +
+	"\x04jobs\x18\x03 \x03(\v2\f.livekit.JobR\x04jobs\"Q\n" +
 	"\x13AvailabilityRequest\x12\x1e\n" +
 	"\x03job\x18\x01 \x01(\v2\f.livekit.JobR\x03job\x12\x1a\n" +
 	"\bresuming\x18\x02 \x01(\bR\bresuming\"\xe8\x03\n" +
@@ -2166,7 +2250,7 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x0eJT_PARTICIPANT\x10\x02*-\n" +
 	"\fWorkerStatus\x12\x10\n" +
 	"\fWS_AVAILABLE\x10\x00\x12\v\n" +
-	"\aWS_FULL\x10\x01*J\n" +
+	"\aWS_FULL\x10\x01*\\\n" +
 	"\tJobStatus\x12\x0e\n" +
 	"\n" +
 	"JS_PENDING\x10\x00\x12\x0e\n" +
@@ -2174,7 +2258,14 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"JS_RUNNING\x10\x01\x12\x0e\n" +
 	"\n" +
 	"JS_SUCCESS\x10\x02\x12\r\n" +
-	"\tJS_FAILED\x10\x03BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
+	"\tJS_FAILED\x10\x03\x12\x10\n" +
+	"\fJS_CANCELLED\x10\x04*{\n" +
+	"\x0eJobStateReason\x12\x13\n" +
+	"\x0fJSR_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fJSR_NO_CAPACITY\x10\x01\x12\x13\n" +
+	"\x0fJSR_ROOM_CLOSED\x10\x02\x12\x18\n" +
+	"\x14JSR_DISPATCH_DELETED\x10\x03\x12\x10\n" +
+	"\fJSR_RETRYING\x10\x04BFZ#github.com/livekit/protocol/livekit\xaa\x02\rLiveKit.Proto\xea\x02\x0eLiveKit::Protob\x06proto3"
 
 var (
 	file_livekit_agent_proto_rawDescOnce sync.Once
@@ -2188,82 +2279,85 @@ func file_livekit_agent_proto_rawDescGZIP() []byte {
 	return file_livekit_agent_proto_rawDescData
 }
 
-var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
+var file_livekit_agent_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_livekit_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_livekit_agent_proto_goTypes = []any{
 	(JobType)(0),                            // 0: livekit.JobType
 	(WorkerStatus)(0),                       // 1: livekit.WorkerStatus
 	(JobStatus)(0),                          // 2: livekit.JobStatus
-	(AgentHttp_AgentEndpointKind)(0),        // 3: livekit.AgentHttp.AgentEndpointKind
-	(AgentHttp_HttpStreamResetCode)(0),      // 4: livekit.AgentHttp.HttpStreamResetCode
-	(*Job)(nil),                             // 5: livekit.Job
-	(*JobState)(nil),                        // 6: livekit.JobState
-	(*WorkerMessage)(nil),                   // 7: livekit.WorkerMessage
-	(*ServerMessage)(nil),                   // 8: livekit.ServerMessage
-	(*SimulateJobRequest)(nil),              // 9: livekit.SimulateJobRequest
-	(*WorkerPing)(nil),                      // 10: livekit.WorkerPing
-	(*WorkerPong)(nil),                      // 11: livekit.WorkerPong
-	(*RegisterWorkerRequest)(nil),           // 12: livekit.RegisterWorkerRequest
-	(*RegisterWorkerResponse)(nil),          // 13: livekit.RegisterWorkerResponse
-	(*MigrateJobRequest)(nil),               // 14: livekit.MigrateJobRequest
-	(*AvailabilityRequest)(nil),             // 15: livekit.AvailabilityRequest
-	(*AvailabilityResponse)(nil),            // 16: livekit.AvailabilityResponse
-	(*UpdateJobStatus)(nil),                 // 17: livekit.UpdateJobStatus
-	(*UpdateWorkerStatus)(nil),              // 18: livekit.UpdateWorkerStatus
-	(*JobAssignment)(nil),                   // 19: livekit.JobAssignment
-	(*JobTermination)(nil),                  // 20: livekit.JobTermination
-	(*AgentHttp)(nil),                       // 21: livekit.AgentHttp
-	nil,                                     // 22: livekit.Job.AttributesEntry
-	nil,                                     // 23: livekit.AvailabilityResponse.ParticipantAttributesEntry
-	(*AgentHttp_AgentEndpoint)(nil),         // 24: livekit.AgentHttp.AgentEndpoint
-	(*AgentHttp_AgentEndpointSettings)(nil), // 25: livekit.AgentHttp.AgentEndpointSettings
-	(*AgentHttp_StreamPreamble)(nil),        // 26: livekit.AgentHttp.StreamPreamble
-	(*AgentHttp_GoAway)(nil),                // 27: livekit.AgentHttp.GoAway
-	(*Room)(nil),                            // 28: livekit.Room
-	(*ParticipantInfo)(nil),                 // 29: livekit.ParticipantInfo
-	(*ParticipantPermission)(nil),           // 30: livekit.ParticipantPermission
-	(*ServerInfo)(nil),                      // 31: livekit.ServerInfo
+	(JobStateReason)(0),                     // 3: livekit.JobStateReason
+	(AgentHttp_AgentEndpointKind)(0),        // 4: livekit.AgentHttp.AgentEndpointKind
+	(AgentHttp_HttpStreamResetCode)(0),      // 5: livekit.AgentHttp.HttpStreamResetCode
+	(*Job)(nil),                             // 6: livekit.Job
+	(*JobState)(nil),                        // 7: livekit.JobState
+	(*WorkerMessage)(nil),                   // 8: livekit.WorkerMessage
+	(*ServerMessage)(nil),                   // 9: livekit.ServerMessage
+	(*SimulateJobRequest)(nil),              // 10: livekit.SimulateJobRequest
+	(*WorkerPing)(nil),                      // 11: livekit.WorkerPing
+	(*WorkerPong)(nil),                      // 12: livekit.WorkerPong
+	(*RegisterWorkerRequest)(nil),           // 13: livekit.RegisterWorkerRequest
+	(*RegisterWorkerResponse)(nil),          // 14: livekit.RegisterWorkerResponse
+	(*MigrateJobRequest)(nil),               // 15: livekit.MigrateJobRequest
+	(*AvailabilityRequest)(nil),             // 16: livekit.AvailabilityRequest
+	(*AvailabilityResponse)(nil),            // 17: livekit.AvailabilityResponse
+	(*UpdateJobStatus)(nil),                 // 18: livekit.UpdateJobStatus
+	(*UpdateWorkerStatus)(nil),              // 19: livekit.UpdateWorkerStatus
+	(*JobAssignment)(nil),                   // 20: livekit.JobAssignment
+	(*JobTermination)(nil),                  // 21: livekit.JobTermination
+	(*AgentHttp)(nil),                       // 22: livekit.AgentHttp
+	nil,                                     // 23: livekit.Job.AttributesEntry
+	nil,                                     // 24: livekit.AvailabilityResponse.ParticipantAttributesEntry
+	(*AgentHttp_AgentEndpoint)(nil),         // 25: livekit.AgentHttp.AgentEndpoint
+	(*AgentHttp_AgentEndpointSettings)(nil), // 26: livekit.AgentHttp.AgentEndpointSettings
+	(*AgentHttp_StreamPreamble)(nil),        // 27: livekit.AgentHttp.StreamPreamble
+	(*AgentHttp_GoAway)(nil),                // 28: livekit.AgentHttp.GoAway
+	(*Room)(nil),                            // 29: livekit.Room
+	(*ParticipantInfo)(nil),                 // 30: livekit.ParticipantInfo
+	(*ParticipantPermission)(nil),           // 31: livekit.ParticipantPermission
+	(*ServerInfo)(nil),                      // 32: livekit.ServerInfo
 }
 var file_livekit_agent_proto_depIdxs = []int32{
 	0,  // 0: livekit.Job.type:type_name -> livekit.JobType
-	28, // 1: livekit.Job.room:type_name -> livekit.Room
-	29, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
-	6,  // 3: livekit.Job.state:type_name -> livekit.JobState
-	22, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
+	29, // 1: livekit.Job.room:type_name -> livekit.Room
+	30, // 2: livekit.Job.participant:type_name -> livekit.ParticipantInfo
+	7,  // 3: livekit.Job.state:type_name -> livekit.JobState
+	23, // 4: livekit.Job.attributes:type_name -> livekit.Job.AttributesEntry
 	2,  // 5: livekit.JobState.status:type_name -> livekit.JobStatus
-	12, // 6: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
-	16, // 7: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
-	18, // 8: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
-	17, // 9: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
-	10, // 10: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
-	9,  // 11: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
-	14, // 12: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
-	13, // 13: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
-	15, // 14: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
-	19, // 15: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
-	20, // 16: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
-	11, // 17: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
-	27, // 18: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
-	0,  // 19: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
-	28, // 20: livekit.SimulateJobRequest.room:type_name -> livekit.Room
-	29, // 21: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
-	0,  // 22: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
-	30, // 23: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
-	24, // 24: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
-	31, // 25: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
-	25, // 26: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
-	5,  // 27: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	23, // 28: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
-	2,  // 29: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
-	1,  // 30: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	5,  // 31: livekit.JobAssignment.job:type_name -> livekit.Job
-	3,  // 32: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	3,  // 33: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	34, // [34:34] is the sub-list for method output_type
-	34, // [34:34] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	3,  // 6: livekit.JobState.reason:type_name -> livekit.JobStateReason
+	13, // 7: livekit.WorkerMessage.register:type_name -> livekit.RegisterWorkerRequest
+	17, // 8: livekit.WorkerMessage.availability:type_name -> livekit.AvailabilityResponse
+	19, // 9: livekit.WorkerMessage.update_worker:type_name -> livekit.UpdateWorkerStatus
+	18, // 10: livekit.WorkerMessage.update_job:type_name -> livekit.UpdateJobStatus
+	11, // 11: livekit.WorkerMessage.ping:type_name -> livekit.WorkerPing
+	10, // 12: livekit.WorkerMessage.simulate_job:type_name -> livekit.SimulateJobRequest
+	15, // 13: livekit.WorkerMessage.migrate_job:type_name -> livekit.MigrateJobRequest
+	14, // 14: livekit.ServerMessage.register:type_name -> livekit.RegisterWorkerResponse
+	16, // 15: livekit.ServerMessage.availability:type_name -> livekit.AvailabilityRequest
+	20, // 16: livekit.ServerMessage.assignment:type_name -> livekit.JobAssignment
+	21, // 17: livekit.ServerMessage.termination:type_name -> livekit.JobTermination
+	12, // 18: livekit.ServerMessage.pong:type_name -> livekit.WorkerPong
+	28, // 19: livekit.ServerMessage.go_away:type_name -> livekit.AgentHttp.GoAway
+	0,  // 20: livekit.SimulateJobRequest.type:type_name -> livekit.JobType
+	29, // 21: livekit.SimulateJobRequest.room:type_name -> livekit.Room
+	30, // 22: livekit.SimulateJobRequest.participant:type_name -> livekit.ParticipantInfo
+	0,  // 23: livekit.RegisterWorkerRequest.type:type_name -> livekit.JobType
+	31, // 24: livekit.RegisterWorkerRequest.allowed_permissions:type_name -> livekit.ParticipantPermission
+	25, // 25: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
+	32, // 26: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
+	26, // 27: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
+	6,  // 28: livekit.MigrateJobRequest.jobs:type_name -> livekit.Job
+	6,  // 29: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	24, // 30: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	2,  // 31: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
+	1,  // 32: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
+	6,  // 33: livekit.JobAssignment.job:type_name -> livekit.Job
+	4,  // 34: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	4,  // 35: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	36, // [36:36] is the sub-list for method output_type
+	36, // [36:36] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }
@@ -2298,7 +2392,7 @@ func file_livekit_agent_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_livekit_agent_proto_rawDesc), len(file_livekit_agent_proto_rawDesc)),
-			NumEnums:      5,
+			NumEnums:      6,
 			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   0,
