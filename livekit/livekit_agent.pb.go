@@ -1274,7 +1274,10 @@ func (x *RegisterWorkerResponse) GetEndpointSettings() *AgentHttp_AgentEndpointS
 type MigrateJobRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// string job_id = 1 [deprecated = true];
-	JobIds        []string `protobuf:"bytes,2,rep,name=job_ids,json=jobIds,proto3" json:"job_ids,omitempty"`
+	JobIds []string `protobuf:"bytes,2,rep,name=job_ids,json=jobIds,proto3" json:"job_ids,omitempty"`
+	// the jobs in job_ids as they were assigned, with state.participant_identity
+	// set to the identity the worker accepted them with
+	Jobs          []*Job `protobuf:"bytes,3,rep,name=jobs,proto3" json:"jobs,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1312,6 +1315,13 @@ func (*MigrateJobRequest) Descriptor() ([]byte, []int) {
 func (x *MigrateJobRequest) GetJobIds() []string {
 	if x != nil {
 		return x.JobIds
+	}
+	return nil
+}
+
+func (x *MigrateJobRequest) GetJobs() []*Job {
+	if x != nil {
+		return x.Jobs
 	}
 	return nil
 }
@@ -2165,9 +2175,10 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\tworker_id\x18\x01 \x01(\tB\v\xbaP\bworkerIDR\bworkerId\x124\n" +
 	"\vserver_info\x18\x03 \x01(\v2\x13.livekit.ServerInfoR\n" +
 	"serverInfo\x12U\n" +
-	"\x11endpoint_settings\x18\x04 \x01(\v2(.livekit.AgentHttp.AgentEndpointSettingsR\x10endpointSettingsJ\x04\b\x02\x10\x03\",\n" +
+	"\x11endpoint_settings\x18\x04 \x01(\v2(.livekit.AgentHttp.AgentEndpointSettingsR\x10endpointSettingsJ\x04\b\x02\x10\x03\"N\n" +
 	"\x11MigrateJobRequest\x12\x17\n" +
-	"\ajob_ids\x18\x02 \x03(\tR\x06jobIds\"Q\n" +
+	"\ajob_ids\x18\x02 \x03(\tR\x06jobIds\x12 \n" +
+	"\x04jobs\x18\x03 \x03(\v2\f.livekit.JobR\x04jobs\"Q\n" +
 	"\x13AvailabilityRequest\x12\x1e\n" +
 	"\x03job\x18\x01 \x01(\v2\f.livekit.JobR\x03job\x12\x1a\n" +
 	"\bresuming\x18\x02 \x01(\bR\bresuming\"\xe8\x03\n" +
@@ -2334,18 +2345,19 @@ var file_livekit_agent_proto_depIdxs = []int32{
 	25, // 25: livekit.RegisterWorkerRequest.endpoints:type_name -> livekit.AgentHttp.AgentEndpoint
 	32, // 26: livekit.RegisterWorkerResponse.server_info:type_name -> livekit.ServerInfo
 	26, // 27: livekit.RegisterWorkerResponse.endpoint_settings:type_name -> livekit.AgentHttp.AgentEndpointSettings
-	6,  // 28: livekit.AvailabilityRequest.job:type_name -> livekit.Job
-	24, // 29: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
-	2,  // 30: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
-	1,  // 31: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
-	6,  // 32: livekit.JobAssignment.job:type_name -> livekit.Job
-	4,  // 33: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	4,  // 34: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
-	35, // [35:35] is the sub-list for method output_type
-	35, // [35:35] is the sub-list for method input_type
-	35, // [35:35] is the sub-list for extension type_name
-	35, // [35:35] is the sub-list for extension extendee
-	0,  // [0:35] is the sub-list for field type_name
+	6,  // 28: livekit.MigrateJobRequest.jobs:type_name -> livekit.Job
+	6,  // 29: livekit.AvailabilityRequest.job:type_name -> livekit.Job
+	24, // 30: livekit.AvailabilityResponse.participant_attributes:type_name -> livekit.AvailabilityResponse.ParticipantAttributesEntry
+	2,  // 31: livekit.UpdateJobStatus.status:type_name -> livekit.JobStatus
+	1,  // 32: livekit.UpdateWorkerStatus.status:type_name -> livekit.WorkerStatus
+	6,  // 33: livekit.JobAssignment.job:type_name -> livekit.Job
+	4,  // 34: livekit.AgentHttp.AgentEndpoint.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	4,  // 35: livekit.AgentHttp.StreamPreamble.kind:type_name -> livekit.AgentHttp.AgentEndpointKind
+	36, // [36:36] is the sub-list for method output_type
+	36, // [36:36] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_livekit_agent_proto_init() }

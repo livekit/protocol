@@ -226,6 +226,33 @@ func CodecsFromMediaDescription(m *sdp.MediaDescription) (out []sdp.Codec, err e
 	return out, nil
 }
 
+func CodecsFromSessionDescription(parsed *sdp.SessionDescription, mediaType string) ([]sdp.Codec, error) {
+	var out []sdp.Codec
+	for _, m := range parsed.MediaDescriptions {
+		if m.MediaName.Media != mediaType {
+			continue
+		}
+		codecs, err := CodecsFromMediaDescription(m)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, codecs...)
+	}
+	return out, nil
+}
+
+// Keys are lowercased (RFC 6838 §4.3). Params without a value, like "0-16", map to "".
+func ParseFmtp(fmtp string) map[string]string {
+	params := make(map[string]string)
+	for _, param := range strings.Split(fmtp, ";") {
+		key, value, _ := strings.Cut(param, "=")
+		if key = strings.ToLower(strings.TrimSpace(key)); key != "" {
+			params[key] = strings.TrimSpace(value)
+		}
+	}
+	return params
+}
+
 func GetBundleMid(parsed *sdp.SessionDescription) (string, bool) {
 	if groupAttribute, found := parsed.Attribute(sdp.AttrKeyGroup); found {
 		bundleIDs := strings.Split(groupAttribute, " ")

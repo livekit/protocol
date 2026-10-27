@@ -70,6 +70,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		WsUrl:                 "url",
 		Dtmf:                  "1234#",
 		PlayDialtone:          true,
+		Dialtone:              livekit.SIPDialtone_SIP_DIALTONE_ETSI,
 		ParticipantAttributes: expAttrs1,
 		Headers: map[string]string{
 			"X-A": "A",
@@ -109,6 +110,7 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 		WsUrl:               "url",
 		Dtmf:                "1234#",
 		PlayDialtone:        true,
+		Dialtone:            livekit.SIPDialtone_SIP_DIALTONE_ETSI,
 		ParticipantIdentity: "sip_+3333",
 		ParticipantAttributes: map[string]string{
 			"extra":                "1",
@@ -152,6 +154,68 @@ func TestNewCreateSIPParticipantRequest(t *testing.T) {
 	res, err = NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, nil)
 	require.NoError(t, err)
 	require.True(t, proto.Equal(exp, res), "%v\nvs\n%v", exp, res)
+}
+
+func TestSIPDialtone(t *testing.T) {
+	const (
+		disabled = livekit.SIPDialtone_SIP_DIALTONE_DISABLED
+		etsi     = livekit.SIPDialtone_SIP_DIALTONE_ETSI
+		us       = livekit.SIPDialtone_SIP_DIALTONE_US
+	)
+	cases := []struct {
+		name   string
+		tone   livekit.SIPDialtone
+		legacy bool
+		exp    livekit.SIPDialtone
+	}{
+		{"unset", disabled, false, disabled},
+		{"legacy", disabled, true, etsi},
+		{"preset", us, false, us},
+		{"preset wins over legacy", us, true, us},
+	}
+	for _, c := range cases {
+		t.Run("create "+c.name, func(t *testing.T) {
+			r := &livekit.CreateSIPParticipantRequest{
+				SipTrunkId:   "trunk",
+				SipCallTo:    "+3333",
+				RoomName:     "room",
+				PlayDialtone: c.legacy,
+				Dialtone:     c.tone,
+			}
+			tr := &livekit.SIPOutboundTrunkInfo{SipTrunkId: "trunk", Address: "sip.example.com", Numbers: []string{"+1111"}}
+			res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+			require.NoError(t, err)
+			require.Equal(t, c.exp, res.Dialtone)
+			require.Equal(t, c.exp != disabled, res.PlayDialtone)
+		})
+		t.Run("transfer "+c.name, func(t *testing.T) {
+			r := &livekit.TransferSIPParticipantRequest{
+				TransferTo:   "tel:+3333",
+				PlayDialtone: c.legacy,
+				Dialtone:     c.tone,
+			}
+			res, err := NewTransferSIPParticipantRequest("call-id", r)
+			require.NoError(t, err)
+			require.Equal(t, c.exp, res.Dialtone)
+			require.Equal(t, c.exp != disabled, res.PlayDialtone)
+		})
+	}
+	t.Run("create play_ringtone", func(t *testing.T) {
+		r := &livekit.CreateSIPParticipantRequest{SipTrunkId: "trunk", SipCallTo: "+3333", RoomName: "room", PlayRingtone: true}
+		tr := &livekit.SIPOutboundTrunkInfo{SipTrunkId: "trunk", Address: "sip.example.com", Numbers: []string{"+1111"}}
+		res, err := NewCreateSIPParticipantRequest("p_123", "call-id", "xyz.sip.livekit.cloud", "url", "token", r, tr)
+		require.NoError(t, err)
+		require.Equal(t, etsi, res.Dialtone)
+	})
+	t.Run("internal from older server", func(t *testing.T) {
+		create := &InternalCreateSIPParticipantRequest{PlayDialtone: true}
+		create.Upgrade()
+		require.Equal(t, etsi, create.Dialtone)
+
+		transfer := &InternalTransferSIPParticipantRequest{PlayDialtone: true}
+		transfer.Upgrade()
+		require.Equal(t, etsi, transfer.Dialtone)
+	})
 }
 
 func TestNewCreateSIPParticipantRequestMediaConfig(t *testing.T) {
