@@ -143,6 +143,7 @@ message SimulationRun {
       END_REASON_TURN_LIMIT = 4;          // the caller ran out of turns
       END_REASON_EMPTY_RESPONSE = 5;      // the agent under test kept replying with nothing
       END_REASON_AGENT_ERROR = 6;         // the agent under test failed mid-call
+      END_REASON_SIMULATOR_HUNG_UP = 7;   // the simulator flow hung up
     }
 
     // The agent's perception of the caller. Audio only.
