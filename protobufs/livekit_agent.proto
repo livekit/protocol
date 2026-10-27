@@ -199,6 +199,22 @@ message UpdateJobStatus {
 
   // metadata shown on the dashboard, useful for debugging
   string error = 3;
+
+  // set once the agent has connected to the room
+  JobJoinTiming join_timing = 4;
+}
+
+// worker-side stages from the availability request to the agent transport connected,
+// measured on the worker host's monotonic clock. Durations, because worker and server
+// clocks are not synchronized.
+message JobJoinTiming {
+  uint32 accept_ms = 1;      // availability request received to request handler accepted
+  uint32 assignment_ms = 2;  // accepted to the job assignment arrived
+  uint32 launch_ms = 3;      // assignment to a job process handed the job
+  bool launch_warm = 4;      // an idle warmed process took the job; false means one was spawned
+  uint32 entrypoint_ms = 5;  // process handed the job to entrypoint started
+  uint32 pre_connect_ms = 6; // entrypoint started to the room connect call
+  uint32 connect_ms = 7;     // room connect call to the primary transport connected
 }
 
 message UpdateWorkerStatus {
