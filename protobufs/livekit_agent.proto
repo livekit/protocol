@@ -204,17 +204,20 @@ message UpdateJobStatus {
   JobJoinTiming join_timing = 4;
 }
 
-// worker-side stages from the availability request to the agent transport connected,
-// measured on the worker host's monotonic clock. Durations, because worker and server
-// clocks are not synchronized.
+// Instants of one agent join on the worker host's monotonic clock, in microseconds. The
+// clock origin is arbitrary, so only differences between these values carry meaning on
+// their own. The worker and its job processes share this clock.
 message JobJoinTiming {
-  uint32 accept_ms = 1;      // availability request received to request handler accepted
-  uint32 assignment_ms = 2;  // accepted to the job assignment arrived
-  uint32 launch_ms = 3;      // assignment to a job process handed the job
-  bool launch_warm = 4;      // an idle warmed process took the job; false means one was spawned
-  uint32 entrypoint_ms = 5;  // process handed the job to entrypoint started
-  uint32 pre_connect_ms = 6; // entrypoint started to the room connect call
-  uint32 connect_ms = 7;     // room connect call to the primary transport connected
+  int64 offer_received_us = 1;       // availability request received
+  int64 accepted_us = 2;             // request handler accepted the job
+  int64 assignment_received_us = 3;  // job assignment received
+  int64 launched_us = 4;             // a job process was handed the job
+  bool launch_warm = 5;              // an idle process took the job; false means one was spawned
+  int64 prewarm_started_us = 6;      // the agent's prewarm function, in the process that took the job
+  int64 prewarm_ended_us = 7;
+  int64 entrypoint_started_us = 8;   // the agent's entrypoint started
+  int64 connect_called_us = 9;       // the agent called room connect
+  int64 connected_us = 10;           // the agent's primary transport connected
 }
 
 message UpdateWorkerStatus {

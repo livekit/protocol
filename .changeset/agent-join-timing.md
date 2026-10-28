@@ -3,4 +3,4 @@
 "@livekit/protocol": patch
 ---
 
-Add `UpdateJobStatus.join_timing`, the time each step of an agent join took on the worker
+Add `UpdateJobStatus.join_timing`, the instants of an agent join on the worker's monotonic clock
