@@ -135,6 +135,8 @@ message SignalResponse {
     StoreDataBlobResponse store_data_blob_response = 30;
     // Sent in response to `GetDataBlobRequest`.
     GetDataBlobResponse get_data_blob_response = 31;
+
+    // NEXT-ID: 33
   }
 }
 
