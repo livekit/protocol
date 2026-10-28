@@ -123,23 +123,14 @@ message AgentThread {
   }
 }
 
-// AgentTask: background work an agent runs within a thread, such as a booking
-// that takes minutes.
+// AgentTask: a framework task in a thread, including an incoming message's task.
+// The application may label it with an optional name.
 message AgentTask {
-  // A task is never UNSPECIFIED.
-  enum Status {
-    UNSPECIFIED = 0;
-    RUNNING = 1;
-    COMPLETED = 2;
-    FAILED = 3;
-    CANCELED = 4;
-  }
-
   // A thread's tasks, oldest first.
   message GetTasksRequest {
     string thread_id = 1 [(logger.name) = "threadID"];
     // Unset for every status.
-    optional Status status = 2;
+    optional string status = 2;
     // next_page_token of the previous GetTasksResponse; empty for the first page.
     string page_token = 3;
     int32 limit = 4;
@@ -155,8 +146,10 @@ message AgentTask {
     string task_id = 1;
     string thread_id = 2 [(logger.name) = "threadID"];
     // The task's name, as the agent defines it.
-    string name = 3;
-    Status status = 4;
+    optional string name = 3;
+    // The framework's A2A state: submitted, working, input-required, completed, failed,
+    // canceled or rejected.
+    string status = 4;
     google.protobuf.Timestamp updated_at = 5;
   }
 }

@@ -16,12 +16,14 @@ package agent
 
 import "testing"
 
-// Every AgentTask.Status must be reachable from a stored state, or a filter on
-// it would silently match nothing.
-func TestEveryTaskStatusHasStates(t *testing.T) {
-	for value := range AgentTask_Status_name {
-		if value != 0 && len(TaskStates(AgentTask_Status(value))) == 0 {
-			t.Errorf("%s has no tasks.status value", AgentTask_Status(value))
+func TestTaskFiltersKeepNonterminalAndRejectedStatesSeparate(t *testing.T) {
+	for _, state := range []string{"submitted", "working", "input-required", "rejected", "failed"} {
+		got := TaskStates(state)
+		if len(got) != 1 || got[0] != state {
+			t.Errorf("filter %q expands to %v", state, got)
 		}
+	}
+	if got := TaskStates("unknown"); len(got) != 0 {
+		t.Fatalf("unknown state accepted: %v", got)
 	}
 }
