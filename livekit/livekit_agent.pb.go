@@ -1551,20 +1551,23 @@ func (x *UpdateJobStatus) GetJoinTiming() *JobJoinTiming {
 	return nil
 }
 
-// worker-side stages from the availability request to the agent transport connected,
-// measured on the worker host's monotonic clock. Durations, because worker and server
-// clocks are not synchronized.
+// Instants of one agent join on the worker host's monotonic clock, in microseconds. The
+// clock origin is arbitrary, so only differences between these values carry meaning on
+// their own. The worker and its job processes share this clock.
 type JobJoinTiming struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AcceptMs      uint32                 `protobuf:"varint,1,opt,name=accept_ms,json=acceptMs,proto3" json:"accept_ms,omitempty"`               // availability request received to request handler accepted
-	AssignmentMs  uint32                 `protobuf:"varint,2,opt,name=assignment_ms,json=assignmentMs,proto3" json:"assignment_ms,omitempty"`   // accepted to the job assignment arrived
-	LaunchMs      uint32                 `protobuf:"varint,3,opt,name=launch_ms,json=launchMs,proto3" json:"launch_ms,omitempty"`               // assignment to a job process handed the job
-	LaunchWarm    bool                   `protobuf:"varint,4,opt,name=launch_warm,json=launchWarm,proto3" json:"launch_warm,omitempty"`         // an idle warmed process took the job; false means one was spawned
-	EntrypointMs  uint32                 `protobuf:"varint,5,opt,name=entrypoint_ms,json=entrypointMs,proto3" json:"entrypoint_ms,omitempty"`   // process handed the job to entrypoint started
-	PreConnectMs  uint32                 `protobuf:"varint,6,opt,name=pre_connect_ms,json=preConnectMs,proto3" json:"pre_connect_ms,omitempty"` // entrypoint started to the room connect call
-	ConnectMs     uint32                 `protobuf:"varint,7,opt,name=connect_ms,json=connectMs,proto3" json:"connect_ms,omitempty"`            // room connect call to the primary transport connected
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	OfferReceivedUs      int64                  `protobuf:"varint,1,opt,name=offer_received_us,json=offerReceivedUs,proto3" json:"offer_received_us,omitempty"`                // availability request received
+	AcceptedUs           int64                  `protobuf:"varint,2,opt,name=accepted_us,json=acceptedUs,proto3" json:"accepted_us,omitempty"`                                 // request handler accepted the job
+	AssignmentReceivedUs int64                  `protobuf:"varint,3,opt,name=assignment_received_us,json=assignmentReceivedUs,proto3" json:"assignment_received_us,omitempty"` // job assignment received
+	LaunchedUs           int64                  `protobuf:"varint,4,opt,name=launched_us,json=launchedUs,proto3" json:"launched_us,omitempty"`                                 // a job process was handed the job
+	LaunchWarm           bool                   `protobuf:"varint,5,opt,name=launch_warm,json=launchWarm,proto3" json:"launch_warm,omitempty"`                                 // an idle process took the job; false means one was spawned
+	PrewarmStartedUs     int64                  `protobuf:"varint,6,opt,name=prewarm_started_us,json=prewarmStartedUs,proto3" json:"prewarm_started_us,omitempty"`             // the agent's prewarm function, in the process that took the job
+	PrewarmEndedUs       int64                  `protobuf:"varint,7,opt,name=prewarm_ended_us,json=prewarmEndedUs,proto3" json:"prewarm_ended_us,omitempty"`
+	EntrypointStartedUs  int64                  `protobuf:"varint,8,opt,name=entrypoint_started_us,json=entrypointStartedUs,proto3" json:"entrypoint_started_us,omitempty"` // the agent's entrypoint started
+	ConnectCalledUs      int64                  `protobuf:"varint,9,opt,name=connect_called_us,json=connectCalledUs,proto3" json:"connect_called_us,omitempty"`             // the agent called room connect
+	ConnectedUs          int64                  `protobuf:"varint,10,opt,name=connected_us,json=connectedUs,proto3" json:"connected_us,omitempty"`                          // the agent's primary transport connected
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *JobJoinTiming) Reset() {
@@ -1597,23 +1600,30 @@ func (*JobJoinTiming) Descriptor() ([]byte, []int) {
 	return file_livekit_agent_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *JobJoinTiming) GetAcceptMs() uint32 {
+func (x *JobJoinTiming) GetOfferReceivedUs() int64 {
 	if x != nil {
-		return x.AcceptMs
+		return x.OfferReceivedUs
 	}
 	return 0
 }
 
-func (x *JobJoinTiming) GetAssignmentMs() uint32 {
+func (x *JobJoinTiming) GetAcceptedUs() int64 {
 	if x != nil {
-		return x.AssignmentMs
+		return x.AcceptedUs
 	}
 	return 0
 }
 
-func (x *JobJoinTiming) GetLaunchMs() uint32 {
+func (x *JobJoinTiming) GetAssignmentReceivedUs() int64 {
 	if x != nil {
-		return x.LaunchMs
+		return x.AssignmentReceivedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetLaunchedUs() int64 {
+	if x != nil {
+		return x.LaunchedUs
 	}
 	return 0
 }
@@ -1625,23 +1635,37 @@ func (x *JobJoinTiming) GetLaunchWarm() bool {
 	return false
 }
 
-func (x *JobJoinTiming) GetEntrypointMs() uint32 {
+func (x *JobJoinTiming) GetPrewarmStartedUs() int64 {
 	if x != nil {
-		return x.EntrypointMs
+		return x.PrewarmStartedUs
 	}
 	return 0
 }
 
-func (x *JobJoinTiming) GetPreConnectMs() uint32 {
+func (x *JobJoinTiming) GetPrewarmEndedUs() int64 {
 	if x != nil {
-		return x.PreConnectMs
+		return x.PrewarmEndedUs
 	}
 	return 0
 }
 
-func (x *JobJoinTiming) GetConnectMs() uint32 {
+func (x *JobJoinTiming) GetEntrypointStartedUs() int64 {
 	if x != nil {
-		return x.ConnectMs
+		return x.EntrypointStartedUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetConnectCalledUs() int64 {
+	if x != nil {
+		return x.ConnectCalledUs
+	}
+	return 0
+}
+
+func (x *JobJoinTiming) GetConnectedUs() int64 {
+	if x != nil {
+		return x.ConnectedUs
 	}
 	return 0
 }
@@ -2303,17 +2327,22 @@ const file_livekit_agent_proto_rawDesc = "" +
 	"\x06status\x18\x02 \x01(\x0e2\x12.livekit.JobStatusR\x06status\x12\x14\n" +
 	"\x05error\x18\x03 \x01(\tR\x05error\x127\n" +
 	"\vjoin_timing\x18\x04 \x01(\v2\x16.livekit.JobJoinTimingR\n" +
-	"joinTiming\"\xf9\x01\n" +
-	"\rJobJoinTiming\x12\x1b\n" +
-	"\taccept_ms\x18\x01 \x01(\rR\bacceptMs\x12#\n" +
-	"\rassignment_ms\x18\x02 \x01(\rR\fassignmentMs\x12\x1b\n" +
-	"\tlaunch_ms\x18\x03 \x01(\rR\blaunchMs\x12\x1f\n" +
-	"\vlaunch_warm\x18\x04 \x01(\bR\n" +
-	"launchWarm\x12#\n" +
-	"\rentrypoint_ms\x18\x05 \x01(\rR\fentrypointMs\x12$\n" +
-	"\x0epre_connect_ms\x18\x06 \x01(\rR\fpreConnectMs\x12\x1d\n" +
-	"\n" +
-	"connect_ms\x18\a \x01(\rR\tconnectMs\"\xb8\x01\n" +
+	"joinTiming\"\xaf\x03\n" +
+	"\rJobJoinTiming\x12*\n" +
+	"\x11offer_received_us\x18\x01 \x01(\x03R\x0fofferReceivedUs\x12\x1f\n" +
+	"\vaccepted_us\x18\x02 \x01(\x03R\n" +
+	"acceptedUs\x124\n" +
+	"\x16assignment_received_us\x18\x03 \x01(\x03R\x14assignmentReceivedUs\x12\x1f\n" +
+	"\vlaunched_us\x18\x04 \x01(\x03R\n" +
+	"launchedUs\x12\x1f\n" +
+	"\vlaunch_warm\x18\x05 \x01(\bR\n" +
+	"launchWarm\x12,\n" +
+	"\x12prewarm_started_us\x18\x06 \x01(\x03R\x10prewarmStartedUs\x12(\n" +
+	"\x10prewarm_ended_us\x18\a \x01(\x03R\x0eprewarmEndedUs\x122\n" +
+	"\x15entrypoint_started_us\x18\b \x01(\x03R\x13entrypointStartedUs\x12*\n" +
+	"\x11connect_called_us\x18\t \x01(\x03R\x0fconnectCalledUs\x12!\n" +
+	"\fconnected_us\x18\n" +
+	" \x01(\x03R\vconnectedUs\"\xb8\x01\n" +
 	"\x12UpdateWorkerStatus\x122\n" +
 	"\x06status\x18\x01 \x01(\x0e2\x15.livekit.WorkerStatusH\x00R\x06status\x88\x01\x01\x12\x12\n" +
 	"\x04load\x18\x03 \x01(\x02R\x04load\x12\x1b\n" +
