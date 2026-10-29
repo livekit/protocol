@@ -67,6 +67,7 @@ type CPUStats struct {
 	// set by the first sample, the load reads as 0 until then
 	sampled  atomic.Bool
 	platform platformCPUMonitor
+	hostCPU  bool
 
 	idleCallback    func(idle float64)
 	procCallback    func(*ProcStats)
@@ -163,6 +164,7 @@ func NewCPUStats(idleUpdateCallback func(idle float64), opts ...CPUStatsOption) 
 
 	c := &CPUStats{
 		platform:        p,
+		hostCPU:         o.hostCPU,
 		warningThrottle: core.NewThrottle(time.Minute),
 		idleCallback:    idleUpdateCallback,
 		closeChan:       make(chan struct{}),
@@ -196,8 +198,11 @@ func (c *CPUStats) GetCPUIdle() float64 {
 }
 
 func (c *CPUStats) NumCPU() float64 {
-	if n := EffectiveCPURequest(); n > 0 {
-		return n
+	// idle from the host monitor is in host CPUs, a container CPU request does not apply
+	if !c.hostCPU {
+		if n := EffectiveCPURequest(); n > 0 {
+			return n
+		}
 	}
 	return c.platform.numCPU()
 }
