@@ -130,8 +130,33 @@ func aggregateMemoryStats(entries []procEntry, selfPID, pageSize int) (memoryTot
 	return
 }
 
-func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
-	p, err := newPlatformCPUMonitor()
+type CPUStatsOption func(*cpuStatsOptions)
+
+type cpuStatsOptions struct {
+	hostCPU bool
+}
+
+// WithHostCPU measures CPU for the whole host from /proc/stat instead of the container cgroup,
+// for a process that owns its node, so softirq and other processes on the node count as load.
+func WithHostCPU() CPUStatsOption {
+	return func(o *cpuStatsOptions) {
+		o.hostCPU = true
+	}
+}
+
+func NewCPUStats(idleUpdateCallback func(idle float64), opts ...CPUStatsOption) (*CPUStats, error) {
+	var o cpuStatsOptions
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	var p platformCPUMonitor
+	var err error
+	if o.hostCPU {
+		p, err = newOSStatCPUMonitor()
+	} else {
+		p, err = newPlatformCPUMonitor()
+	}
 	if err != nil {
 		return nil, err
 	}
