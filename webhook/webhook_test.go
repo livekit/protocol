@@ -668,17 +668,28 @@ func TestResourceURLNotifierLifecycle(t *testing.T) {
 	})
 
 	t.Run("stop allowing to drain", func(t *testing.T) {
-		resourceURLNotifier := newTestResourceNotifier(time.Minute, 200*time.Millisecond, 50)
+		resourceURLNotifier := newTestResourceNotifier(time.Minute, time.Minute, 50)
 		numCalled := atomic.Int32{}
 		s.handler = func(w http.ResponseWriter, r *http.Request) {
+			time.Sleep(10 * time.Millisecond)
 			numCalled.Inc()
 		}
-		for i := 0; i < 10; i++ {
+		// half the events in one resource queue, half spread over others
+		for i := 0; i < 5; i++ {
 			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted})
 			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished})
 		}
+		for i := 0; i < 5; i++ {
+			room := &livekit.Room{Name: fmt.Sprintf("room%d", i)}
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomStarted, Room: room})
+			_ = resourceURLNotifier.QueueNotify(context.Background(), &livekit.WebhookEvent{Event: EventRoomFinished, Room: room})
+		}
+		resourceURLNotifier.mu.RLock()
+		require.Equal(t, 6, len(resourceURLNotifier.resourceQueues))
+		resourceURLNotifier.mu.RUnlock()
+		// returns once the queued events in every resource queue have been sent
 		resourceURLNotifier.Stop(false)
-		require.Eventually(t, func() bool { return numCalled.Load() == 20 }, 5*time.Second, webhookCheckInterval)
+		require.Equal(t, int32(20), numCalled.Load())
 	})
 
 	t.Run("force stop", func(t *testing.T) {
