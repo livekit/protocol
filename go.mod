@@ -18,7 +18,7 @@ require (
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731
 	github.com/livekit/psrpc v0.8.2
 	github.com/mackerelio/go-osstat v0.2.8
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
+	github.com/maxbrunsfeld/counterfeiter/v6 v6.14.0
 	github.com/nyaruka/phonenumbers v1.8.1
 	github.com/petermattis/goid v0.0.0-20260918085751-abfca077860b
 	github.com/pion/logging v0.2.4
