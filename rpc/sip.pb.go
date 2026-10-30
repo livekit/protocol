@@ -74,10 +74,14 @@ type InternalCreateSIPParticipantRequest struct {
 	// Optionally send following DTMF digits (extension codes) when making a call.
 	// Character 'w' can be used to add a 0.5 sec delay.
 	Dtmf string `protobuf:"bytes,11,opt,name=dtmf,proto3" json:"dtmf,omitempty"`
+	// Deprecated: set for older sip services, which only read this field. Read dialtone after Upgrade() instead.
+	//
+	// Deprecated: Marked as deprecated in rpc/sip.proto.
+	PlayDialtone bool `protobuf:"varint,12,opt,name=play_dialtone,json=playDialtone,proto3" json:"play_dialtone,omitempty"`
 	// Optionally play dialtone in the room as an audible indicator for existing participants
-	PlayDialtone        bool              `protobuf:"varint,12,opt,name=play_dialtone,json=playDialtone,proto3" json:"play_dialtone,omitempty"`
-	Headers             map[string]string `protobuf:"bytes,21,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	HeadersToAttributes map[string]string `protobuf:"bytes,22,rep,name=headers_to_attributes,json=headersToAttributes,proto3" json:"headers_to_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Dialtone            livekit.SIPDialtone `protobuf:"varint,41,opt,name=dialtone,proto3,enum=livekit.SIPDialtone" json:"dialtone,omitempty"`
+	Headers             map[string]string   `protobuf:"bytes,21,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	HeadersToAttributes map[string]string   `protobuf:"bytes,22,rep,name=headers_to_attributes,json=headersToAttributes,proto3" json:"headers_to_attributes,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Map LiveKit attributes to SIP X-* headers when sending BYE or REFER requests.
 	// Keys are the names of attributes and values are the names of X-* headers they will be mapped to.
 	AttributesToHeaders map[string]string `protobuf:"bytes,26,rep,name=attributes_to_headers,json=attributesToHeaders,proto3" json:"attributes_to_headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -307,11 +311,19 @@ func (x *InternalCreateSIPParticipantRequest) GetDtmf() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in rpc/sip.proto.
 func (x *InternalCreateSIPParticipantRequest) GetPlayDialtone() bool {
 	if x != nil {
 		return x.PlayDialtone
 	}
 	return false
+}
+
+func (x *InternalCreateSIPParticipantRequest) GetDialtone() livekit.SIPDialtone {
+	if x != nil {
+		return x.Dialtone
+	}
+	return livekit.SIPDialtone(0)
 }
 
 func (x *InternalCreateSIPParticipantRequest) GetHeaders() map[string]string {
@@ -484,8 +496,12 @@ type InternalTransferSIPParticipantRequest struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	SipCallId  string                 `protobuf:"bytes,1,opt,name=sip_call_id,json=sipCallId,proto3" json:"sip_call_id,omitempty"`
 	TransferTo string                 `protobuf:"bytes,2,opt,name=transfer_to,json=transferTo,proto3" json:"transfer_to,omitempty"`
-	// Optionally play dialtone to the SIP participant as an audible indicator of being transferred
+	// Deprecated: set for older sip services, which only read this field. Read dialtone after Upgrade() instead.
+	//
+	// Deprecated: Marked as deprecated in rpc/sip.proto.
 	PlayDialtone bool `protobuf:"varint,3,opt,name=play_dialtone,json=playDialtone,proto3" json:"play_dialtone,omitempty"`
+	// Optionally play dialtone to the SIP participant as an audible indicator of being transferred
+	Dialtone livekit.SIPDialtone `protobuf:"varint,7,opt,name=dialtone,proto3,enum=livekit.SIPDialtone" json:"dialtone,omitempty"`
 	// Add the following headers to the REFER SIP request.
 	Headers map[string]string `protobuf:"bytes,4,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Max time for the transfer destination to answer the call.
@@ -540,11 +556,19 @@ func (x *InternalTransferSIPParticipantRequest) GetTransferTo() string {
 	return ""
 }
 
+// Deprecated: Marked as deprecated in rpc/sip.proto.
 func (x *InternalTransferSIPParticipantRequest) GetPlayDialtone() bool {
 	if x != nil {
 		return x.PlayDialtone
 	}
 	return false
+}
+
+func (x *InternalTransferSIPParticipantRequest) GetDialtone() livekit.SIPDialtone {
+	if x != nil {
+		return x.Dialtone
+	}
+	return livekit.SIPDialtone(0)
 }
 
 func (x *InternalTransferSIPParticipantRequest) GetHeaders() map[string]string {
@@ -644,7 +668,7 @@ var File_rpc_sip_proto protoreflect.FileDescriptor
 
 const file_rpc_sip_proto_rawDesc = "" +
 	"\n" +
-	"\rrpc/sip.proto\x12\x03rpc\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\x1a\frpc/io.proto\"\xfb\x15\n" +
+	"\rrpc/sip.proto\x12\x03rpc\x1a\x1egoogle/protobuf/duration.proto\x1a\roptions.proto\x1a\x11livekit_sip.proto\x1a\x14logger/options.proto\x1a\frpc/io.proto\"\xb1\x16\n" +
 	"#InternalCreateSIPParticipantRequest\x12+\n" +
 	"\n" +
 	"project_id\x18\x12 \x01(\tB\f\xbaP\tprojectIDR\tprojectId\x12,\n" +
@@ -672,8 +696,9 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"\x05token\x18\t \x01(\tB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x02R\x05token\x12\x15\n" +
 	"\x06ws_url\x18\n" +
 	" \x01(\tR\x05wsUrl\x12\x12\n" +
-	"\x04dtmf\x18\v \x01(\tR\x04dtmf\x12#\n" +
-	"\rplay_dialtone\x18\f \x01(\bR\fplayDialtone\x12u\n" +
+	"\x04dtmf\x18\v \x01(\tR\x04dtmf\x12'\n" +
+	"\rplay_dialtone\x18\f \x01(\bB\x02\x18\x01R\fplayDialtone\x120\n" +
+	"\bdialtone\x18) \x01(\x0e2\x14.livekit.SIPDialtoneR\bdialtone\x12u\n" +
 	"\aheaders\x18\x15 \x03(\v25.rpc.InternalCreateSIPParticipantRequest.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12u\n" +
 	"\x15headers_to_attributes\x18\x16 \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.HeadersToAttributesEntryR\x13headersToAttributes\x12u\n" +
 	"\x15attributes_to_headers\x18\x1a \x03(\v2A.rpc.InternalCreateSIPParticipantRequest.AttributesToHeadersEntryR\x13attributesToHeaders\x12B\n" +
@@ -708,12 +733,13 @@ const file_rpc_sip_proto_rawDesc = "" +
 	"$InternalCreateSIPParticipantResponse\x127\n" +
 	"\x0eparticipant_id\x18\x01 \x01(\tB\x10\xbaP\rparticipantIDR\rparticipantId\x121\n" +
 	"\x14participant_identity\x18\x02 \x01(\tR\x13participantIdentity\x12,\n" +
-	"\vsip_call_id\x18\x03 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\"\xb8\x04\n" +
+	"\vsip_call_id\x18\x03 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\"\xee\x04\n" +
 	"%InternalTransferSIPParticipantRequest\x12,\n" +
 	"\vsip_call_id\x18\x01 \x01(\tB\f\xbaP\tsipCallIDR\tsipCallId\x12\x1f\n" +
 	"\vtransfer_to\x18\x02 \x01(\tR\n" +
-	"transferTo\x12#\n" +
-	"\rplay_dialtone\x18\x03 \x01(\bR\fplayDialtone\x12w\n" +
+	"transferTo\x12'\n" +
+	"\rplay_dialtone\x18\x03 \x01(\bB\x02\x18\x01R\fplayDialtone\x120\n" +
+	"\bdialtone\x18\a \x01(\x0e2\x14.livekit.SIPDialtoneR\bdialtone\x12w\n" +
 	"\aheaders\x18\x04 \x03(\v27.rpc.InternalTransferSIPParticipantRequest.HeadersEntryB$\xb2P\x1e<redacted ({{ .Size }} bytes)>\xc0P\x01R\aheaders\x12B\n" +
 	"\x0fringing_timeout\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\x0eringingTimeout\x12a\n" +
 	"\rfeature_flags\x18\x06 \x03(\v2<.rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntryR\ffeatureFlags\x1a:\n" +
@@ -763,17 +789,18 @@ var file_rpc_sip_proto_goTypes = []any{
 	(*livekit.SIPRequestDest)(nil),  // 11: livekit.SIPRequestDest
 	(*livekit.SIPNamedDest)(nil),    // 12: livekit.SIPNamedDest
 	(livekit.SIPTransport)(0),       // 13: livekit.SIPTransport
-	(livekit.SIPHeaderOptions)(0),   // 14: livekit.SIPHeaderOptions
-	(livekit.SIPFeature)(0),         // 15: livekit.SIPFeature
-	(*durationpb.Duration)(nil),     // 16: google.protobuf.Duration
-	(livekit.SIPMediaEncryption)(0), // 17: livekit.SIPMediaEncryption
-	(*livekit.SIPMediaConfig)(nil),  // 18: livekit.SIPMediaConfig
-	(*livekit.Destination)(nil),     // 19: livekit.Destination
-	(*SIPCallObservability)(nil),    // 20: rpc.SIPCallObservability
-	(*livekit.ProviderInfo)(nil),    // 21: livekit.ProviderInfo
-	(livekit.SIPTransferStatus)(0),  // 22: livekit.SIPTransferStatus
-	(livekit.SIPTransferReason)(0),  // 23: livekit.SIPTransferReason
-	(*livekit.SIPStatus)(nil),       // 24: livekit.SIPStatus
+	(livekit.SIPDialtone)(0),        // 14: livekit.SIPDialtone
+	(livekit.SIPHeaderOptions)(0),   // 15: livekit.SIPHeaderOptions
+	(livekit.SIPFeature)(0),         // 16: livekit.SIPFeature
+	(*durationpb.Duration)(nil),     // 17: google.protobuf.Duration
+	(livekit.SIPMediaEncryption)(0), // 18: livekit.SIPMediaEncryption
+	(*livekit.SIPMediaConfig)(nil),  // 19: livekit.SIPMediaConfig
+	(*livekit.Destination)(nil),     // 20: livekit.Destination
+	(*SIPCallObservability)(nil),    // 21: rpc.SIPCallObservability
+	(*livekit.ProviderInfo)(nil),    // 22: livekit.ProviderInfo
+	(livekit.SIPTransferStatus)(0),  // 23: livekit.SIPTransferStatus
+	(livekit.SIPTransferReason)(0),  // 24: livekit.SIPTransferReason
+	(*livekit.SIPStatus)(nil),       // 25: livekit.SIPStatus
 }
 var file_rpc_sip_proto_depIdxs = []int32{
 	11, // 0: rpc.InternalCreateSIPParticipantRequest.sip_request_uri:type_name -> livekit.SIPRequestDest
@@ -781,34 +808,36 @@ var file_rpc_sip_proto_depIdxs = []int32{
 	12, // 2: rpc.InternalCreateSIPParticipantRequest.sip_to_header:type_name -> livekit.SIPNamedDest
 	13, // 3: rpc.InternalCreateSIPParticipantRequest.transport:type_name -> livekit.SIPTransport
 	4,  // 4: rpc.InternalCreateSIPParticipantRequest.participant_attributes:type_name -> rpc.InternalCreateSIPParticipantRequest.ParticipantAttributesEntry
-	5,  // 5: rpc.InternalCreateSIPParticipantRequest.headers:type_name -> rpc.InternalCreateSIPParticipantRequest.HeadersEntry
-	6,  // 6: rpc.InternalCreateSIPParticipantRequest.headers_to_attributes:type_name -> rpc.InternalCreateSIPParticipantRequest.HeadersToAttributesEntry
-	7,  // 7: rpc.InternalCreateSIPParticipantRequest.attributes_to_headers:type_name -> rpc.InternalCreateSIPParticipantRequest.AttributesToHeadersEntry
-	14, // 8: rpc.InternalCreateSIPParticipantRequest.include_headers:type_name -> livekit.SIPHeaderOptions
-	15, // 9: rpc.InternalCreateSIPParticipantRequest.enabled_features:type_name -> livekit.SIPFeature
-	16, // 10: rpc.InternalCreateSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
-	16, // 11: rpc.InternalCreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
-	17, // 12: rpc.InternalCreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
-	18, // 13: rpc.InternalCreateSIPParticipantRequest.media:type_name -> livekit.SIPMediaConfig
-	19, // 14: rpc.InternalCreateSIPParticipantRequest.destination:type_name -> livekit.Destination
-	8,  // 15: rpc.InternalCreateSIPParticipantRequest.feature_flags:type_name -> rpc.InternalCreateSIPParticipantRequest.FeatureFlagsEntry
-	20, // 16: rpc.InternalCreateSIPParticipantRequest.observability:type_name -> rpc.SIPCallObservability
-	21, // 17: rpc.InternalCreateSIPParticipantRequest.provider_info:type_name -> livekit.ProviderInfo
-	9,  // 18: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
-	16, // 19: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
-	10, // 20: rpc.InternalTransferSIPParticipantRequest.feature_flags:type_name -> rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntry
-	22, // 21: rpc.InternalTransferSIPParticipantResponse.status:type_name -> livekit.SIPTransferStatus
-	23, // 22: rpc.InternalTransferSIPParticipantResponse.reason:type_name -> livekit.SIPTransferReason
-	24, // 23: rpc.InternalTransferSIPParticipantResponse.sip_status:type_name -> livekit.SIPStatus
-	0,  // 24: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
-	2,  // 25: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
-	1,  // 26: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
-	3,  // 27: rpc.SIPInternal.TransferSIPParticipant:output_type -> rpc.InternalTransferSIPParticipantResponse
-	26, // [26:28] is the sub-list for method output_type
-	24, // [24:26] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	14, // 5: rpc.InternalCreateSIPParticipantRequest.dialtone:type_name -> livekit.SIPDialtone
+	5,  // 6: rpc.InternalCreateSIPParticipantRequest.headers:type_name -> rpc.InternalCreateSIPParticipantRequest.HeadersEntry
+	6,  // 7: rpc.InternalCreateSIPParticipantRequest.headers_to_attributes:type_name -> rpc.InternalCreateSIPParticipantRequest.HeadersToAttributesEntry
+	7,  // 8: rpc.InternalCreateSIPParticipantRequest.attributes_to_headers:type_name -> rpc.InternalCreateSIPParticipantRequest.AttributesToHeadersEntry
+	15, // 9: rpc.InternalCreateSIPParticipantRequest.include_headers:type_name -> livekit.SIPHeaderOptions
+	16, // 10: rpc.InternalCreateSIPParticipantRequest.enabled_features:type_name -> livekit.SIPFeature
+	17, // 11: rpc.InternalCreateSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	17, // 12: rpc.InternalCreateSIPParticipantRequest.max_call_duration:type_name -> google.protobuf.Duration
+	18, // 13: rpc.InternalCreateSIPParticipantRequest.media_encryption:type_name -> livekit.SIPMediaEncryption
+	19, // 14: rpc.InternalCreateSIPParticipantRequest.media:type_name -> livekit.SIPMediaConfig
+	20, // 15: rpc.InternalCreateSIPParticipantRequest.destination:type_name -> livekit.Destination
+	8,  // 16: rpc.InternalCreateSIPParticipantRequest.feature_flags:type_name -> rpc.InternalCreateSIPParticipantRequest.FeatureFlagsEntry
+	21, // 17: rpc.InternalCreateSIPParticipantRequest.observability:type_name -> rpc.SIPCallObservability
+	22, // 18: rpc.InternalCreateSIPParticipantRequest.provider_info:type_name -> livekit.ProviderInfo
+	14, // 19: rpc.InternalTransferSIPParticipantRequest.dialtone:type_name -> livekit.SIPDialtone
+	9,  // 20: rpc.InternalTransferSIPParticipantRequest.headers:type_name -> rpc.InternalTransferSIPParticipantRequest.HeadersEntry
+	17, // 21: rpc.InternalTransferSIPParticipantRequest.ringing_timeout:type_name -> google.protobuf.Duration
+	10, // 22: rpc.InternalTransferSIPParticipantRequest.feature_flags:type_name -> rpc.InternalTransferSIPParticipantRequest.FeatureFlagsEntry
+	23, // 23: rpc.InternalTransferSIPParticipantResponse.status:type_name -> livekit.SIPTransferStatus
+	24, // 24: rpc.InternalTransferSIPParticipantResponse.reason:type_name -> livekit.SIPTransferReason
+	25, // 25: rpc.InternalTransferSIPParticipantResponse.sip_status:type_name -> livekit.SIPStatus
+	0,  // 26: rpc.SIPInternal.CreateSIPParticipant:input_type -> rpc.InternalCreateSIPParticipantRequest
+	2,  // 27: rpc.SIPInternal.TransferSIPParticipant:input_type -> rpc.InternalTransferSIPParticipantRequest
+	1,  // 28: rpc.SIPInternal.CreateSIPParticipant:output_type -> rpc.InternalCreateSIPParticipantResponse
+	3,  // 29: rpc.SIPInternal.TransferSIPParticipant:output_type -> rpc.InternalTransferSIPParticipantResponse
+	28, // [28:30] is the sub-list for method output_type
+	26, // [26:28] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_rpc_sip_proto_init() }

@@ -377,10 +377,12 @@ type NodeStats struct {
 	// forward metrics
 	ForwardLatency uint32 `protobuf:"varint,48,opt,name=forward_latency,json=forwardLatency,proto3" json:"forward_latency,omitempty"`
 	// Deprecated: Marked as deprecated in livekit_internal.proto.
-	ForwardJitter uint32           `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
-	Rates         []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	ForwardJitter uint32 `protobuf:"varint,49,opt,name=forward_jitter,json=forwardJitter,proto3" json:"forward_jitter,omitempty"`
+	// mean forwarding work per write to a subscriber, in ns: (end of fan-out - dequeue) / writes
+	ForwardProcessingPerWrite uint32           `protobuf:"varint,57,opt,name=forward_processing_per_write,json=forwardProcessingPerWrite,proto3" json:"forward_processing_per_write,omitempty"`
+	Rates                     []*NodeStatsRate `protobuf:"bytes,50,rep,name=rates,proto3" json:"rates,omitempty"`
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *NodeStats) Reset() {
@@ -818,6 +820,13 @@ func (x *NodeStats) GetForwardJitter() uint32 {
 	return 0
 }
 
+func (x *NodeStats) GetForwardProcessingPerWrite() uint32 {
+	if x != nil {
+		return x.ForwardProcessingPerWrite
+	}
+	return 0
+}
+
 func (x *NodeStats) GetRates() []*NodeStatsRate {
 	if x != nil {
 		return x.Rates
@@ -1124,8 +1133,10 @@ type StartSession struct {
 	SyncState               *SyncState          `protobuf:"bytes,23,opt,name=sync_state,json=syncState,proto3" json:"sync_state,omitempty"`
 	UseSinglePeerConnection bool                `protobuf:"varint,24,opt,name=use_single_peer_connection,json=useSinglePeerConnection,proto3" json:"use_single_peer_connection,omitempty"`
 	TokenExpiresAt          int64               `protobuf:"varint,26,opt,name=token_expires_at,json=tokenExpiresAt,proto3" json:"token_expires_at,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// API key that issued the join token, for correlating sessions with the key
+	ApiKey        string `protobuf:"bytes,27,opt,name=api_key,json=apiKey,proto3" json:"api_key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *StartSession) Reset() {
@@ -1314,6 +1325,13 @@ func (x *StartSession) GetTokenExpiresAt() int64 {
 	return 0
 }
 
+func (x *StartSession) GetApiKey() string {
+	if x != nil {
+		return x.ApiKey
+	}
+	return ""
+}
+
 // room info that should not be returned to clients
 type RoomInternal struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
@@ -1479,7 +1497,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x05stats\x18\x04 \x01(\v2\x12.livekit.NodeStatsR\x05stats\x12%\n" +
 	"\x04type\x18\x05 \x01(\x0e2\x11.livekit.NodeTypeR\x04type\x12(\n" +
 	"\x05state\x18\x06 \x01(\x0e2\x12.livekit.NodeStateR\x05state\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\"\xb3\x16\n" +
+	"\x06region\x18\a \x01(\tR\x06region\"\xf4\x16\n" +
 	"\tNodeStats\x12\x1d\n" +
 	"\n" +
 	"started_at\x18\x01 \x01(\x03R\tstartedAt\x12\x1d\n" +
@@ -1545,7 +1563,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\x18participant_rtc_canceled\x185 \x01(\x04R\x16participantRtcCanceled\x124\n" +
 	"\x16participant_rtc_active\x186 \x01(\x04R\x14participantRtcActive\x12'\n" +
 	"\x0fforward_latency\x180 \x01(\rR\x0eforwardLatency\x12)\n" +
-	"\x0eforward_jitter\x181 \x01(\rB\x02\x18\x01R\rforwardJitter\x12,\n" +
+	"\x0eforward_jitter\x181 \x01(\rB\x02\x18\x01R\rforwardJitter\x12?\n" +
+	"\x1cforward_processing_per_write\x189 \x01(\rR\x19forwardProcessingPerWrite\x12,\n" +
 	"\x05rates\x182 \x03(\v2\x16.livekit.NodeStatsRateR\x05rates\"\xb1\n" +
 	"\n" +
 	"\rNodeStatsRate\x12\x1d\n" +
@@ -1584,7 +1603,7 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"memoryLoad\x12\x1f\n" +
 	"\vmemory_used\x18\x16 \x01(\x02R\n" +
 	"memoryUsed\x12!\n" +
-	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xca\b\n" +
+	"\fmemory_total\x18\x17 \x01(\x02R\vmemoryTotal\"\xe3\b\n" +
 	"\fStartSession\x12\x1b\n" +
 	"\troom_name\x18\x01 \x01(\tR\broomName\x12\x1a\n" +
 	"\bidentity\x18\x02 \x01(\tR\bidentity\x124\n" +
@@ -1611,7 +1630,8 @@ const file_livekit_internal_proto_rawDesc = "" +
 	"\n" +
 	"sync_state\x18\x17 \x01(\v2\x12.livekit.SyncStateR\tsyncState\x12;\n" +
 	"\x1ause_single_peer_connection\x18\x18 \x01(\bR\x17useSinglePeerConnection\x12(\n" +
-	"\x10token_expires_at\x18\x1a \x01(\x03R\x0etokenExpiresAtB\x1c\n" +
+	"\x10token_expires_at\x18\x1a \x01(\x03R\x0etokenExpiresAt\x12\x17\n" +
+	"\aapi_key\x18\x1b \x01(\tR\x06apiKeyB\x1c\n" +
 	"\x1a_auto_subscribe_data_trackB\x19\n" +
 	"\x17_subscriber_allow_pause\"\xf6\x03\n" +
 	"\fRoomInternal\x12;\n" +

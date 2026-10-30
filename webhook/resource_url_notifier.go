@@ -287,6 +287,12 @@ func (r *ResourceURLNotifier) Stop(force bool) {
 	for _, rq := range resourceQueues {
 		rq.Stop(force)
 	}
+	if !force {
+		// wait for the queued events to be sent, as URLNotifier does when draining
+		for _, rq := range resourceQueues {
+			<-rq.Done()
+		}
+	}
 }
 
 // poster interface

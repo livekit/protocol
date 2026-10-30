@@ -1325,6 +1325,22 @@ func (p *CreateSIPParticipantRequest) Upgrade() {
 		return
 	}
 	p.Media = p.Media.UpgradeWith(p.MediaEncryption)
+	p.Dialtone = UpgradeSIPDialtone(p.Dialtone, p.PlayRingtone || p.PlayDialtone)
+}
+
+func (p *TransferSIPParticipantRequest) Upgrade() {
+	if p == nil {
+		return
+	}
+	p.Dialtone = UpgradeSIPDialtone(p.Dialtone, p.PlayDialtone)
+}
+
+// UpgradeSIPDialtone maps the deprecated play_dialtone flag to SIP_DIALTONE_ETSI when dialtone is unset.
+func UpgradeSIPDialtone(tone SIPDialtone, playDialtone bool) SIPDialtone {
+	if tone == SIPDialtone_SIP_DIALTONE_DISABLED && playDialtone {
+		return SIPDialtone_SIP_DIALTONE_ETSI
+	}
+	return tone
 }
 
 func (p *SIPMediaEncryption) Deref() SIPMediaEncryption {

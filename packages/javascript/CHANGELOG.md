@@ -1,5 +1,27 @@
 # @livekit/protocol
 
+## 1.53.1
+
+### Patch Changes
+
+- Add `agent_job_pending` webhook event, `JS_CANCELLED` job status, and `JobState.reason` (including `JSR_RETRYING`) - [#1860](https://github.com/livekit/protocol/pull/1860) ([@erikhortsch](https://github.com/erikhortsch))
+
+- Add `MigrateJobRequest.jobs`, the jobs a reconnecting agent worker still runs, as they were assigned - [#1893](https://github.com/livekit/protocol/pull/1893) ([@davidzhao](https://github.com/davidzhao))
+
+- Add `livekit.agent.CloseReason`, the agent session close reasons, for agent evals. - [#1887](https://github.com/livekit/protocol/pull/1887) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- Add `NodeStats.forward_scheduling_delay`, the p90 time from arrival to dequeue for packets that found their forwarder idle - [#1891](https://github.com/livekit/protocol/pull/1891) ([@boks1971](https://github.com/boks1971))
+
+- Add session_summary to MetricsRecordingHeader, for agent evals. - [#1884](https://github.com/livekit/protocol/pull/1884) ([@jmcclanahan](https://github.com/jmcclanahan))
+
+- `SimulationRun.JobMetrics`: how the call ended (`end_reason`), the simulated caller's languages (`caller_language`, `caller_listen_language`), the audio impairments applied to it (`impairments`), and `conversation.backchannel_count`. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.Job.failure_reason`: a machine-readable cause for a failed simulation job, such as the agent never joining the room. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `SimulationRun.JobMetrics.Turn.text`: the words of each turn as the simulation's judges read them. - [#1867](https://github.com/livekit/protocol/pull/1867) ([@u9g](https://github.com/u9g))
+
+- `StreamDestination` (`id`, `url`) on `StreamOutput.destinations` and `UpdateStreamRequest.add_destinations`, echoed as `StreamInfo.id`, so a client can tell its streams apart; `RedactStreamKeys` redacts destination URLs - [#1873](https://github.com/livekit/protocol/pull/1873) ([@frostbyte73](https://github.com/frostbyte73))
+
 ## 1.53.0
 
 ### Minor Changes
