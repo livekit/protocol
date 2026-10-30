@@ -64,7 +64,9 @@ assigned them, and never default metric dimensions (high cardinality).
 Agents spelling and value set is the shared key: a flat key, and the enum names Agents sends as
 values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The
 other spelling is never registered, deprecated or not. The shared key records it in
-`renamed_from`, listed under [Old spellings](#old-spellings).
+`renamed_from`, listed under [Old spellings](#old-spellings). The room and track IDs are the
+exception: `lk.room_id` and `lk.track_id` match `lk.participant_id`, and Agents spans keep their
+own names for them, listed under [Bindings](#bindings).
 
 **Upstream metrics.** Agents creates three GenAI metrics that the GenAI registry defines. The
 registry imports `gen_ai.invoke_agent.duration` and `gen_ai.execute_tool.duration`, and the
@@ -189,7 +191,9 @@ validates it.
 | --- | --- | --- |
 {% for a in ctx.attributes %}{% if a.annotations.livekit.bindings %}{% for k, v in a.annotations.livekit.bindings | items %}| `{{ a.key }}` | {{ k }} | {% if v is string %}`{{ v }}`{% else %}{% for x in v %}`{{ x }}`{% if not loop.last %}, {% endif %}{% endfor %}{% endif %} |
 {% endfor %}{% endif %}{% endfor %}
-`agents_otlp` lists Agents' span key first, then its Resource and metric-point key.
+`agents_otlp` is Agents' span key, then its Resource and metric-point key when there is one. A
+span key that differs from the registered key is a binding, never a key: live-check reports it as
+`livekit_agents_binding`, an improvement that names the key.
 `agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.
 

@@ -228,7 +228,7 @@ groups:
         severity: [INFO]
         body: "Display summary, e.g. `video inbound: 33 kbps, loss 0.0%, rtt 0 ms, 10 fps` (Rust core); the event name (JS port)."
     attributes:
-      - ref: lk.track_sid
+      - ref: lk.track_id
         requirement_level: required
       - ref: lk.track.kind
         requirement_level: required
@@ -410,7 +410,7 @@ groups:
         requirement_level: required
       - ref: lk.track_source
         requirement_level: required
-      - ref: lk.track_sid
+      - ref: lk.track_id
         requirement_level: {conditionally_required: On success; the server assigns it.}
       - ref: lk.outcome
         requirement_level: required
@@ -437,7 +437,7 @@ groups:
           - {name: first_media, requirement: required, brief: The first inbound stats reading with bytes; the span ends ok here.}
         limits: {span_events: 128, attributes: 128}
     attributes:
-      - ref: lk.track_sid
+      - ref: lk.track_id
         requirement_level: required
       - ref: lk.track.kind
         requirement_level: required

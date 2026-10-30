@@ -14,15 +14,18 @@ pii_segment := `(^|\.)pii(\.|$)`
 # ponytail: keyword heuristic, misses PII with innocent names; reviewers still own it.
 pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[._]name)`
 
+# The `_sid` spellings are Agents' span bindings of the room and track keys, never keys.
 canonical_identity := {
-	"lk.room.sid": "lk.room_sid",
+	"lk.room.sid": "lk.room_id",
+	"lk.room_sid": "lk.room_id",
 	"lk.participant.sid": "lk.participant_id",
 	"lk.participant_sid": "lk.participant_id",
-	"lk.track.sid": "lk.track_sid",
+	"lk.track.sid": "lk.track_id",
+	"lk.track_sid": "lk.track_id",
 	"lk.job.id": "lk.job_id",
 }
 
-high_cardinality := {"lk.room_sid", "lk.participant_id", "lk.track_sid", "lk.job_id", "lk.client.connect_id"}
+high_cardinality := {"lk.room_id", "lk.participant_id", "lk.track_id", "lk.job_id", "lk.client.connect_id"}
 
 owners := {"shared", "client", "agents", "cloud", "telephony"}
 

@@ -13,10 +13,16 @@ pii_looking := `(identity|email|phone|ip_address|user_agent|(room|participant)[.
 # spelling: `data.renames[old] = {key, values}`. Built by live-check/renames.jq.
 renames := object.get(data, "renames", {})
 
-lk_advice(type, ctx, msg) := {
+# The span keys Agents sends for a shared key under another name (`bindings.agents_otlp` in
+# otel/model), keyed by that name: `data.bindings[name] = key`. Also built by renames.jq.
+bindings := object.get(data, "bindings", {})
+
+lk_advice(type, ctx, msg) := lk_finding("violation", type, ctx, msg)
+
+lk_finding(level, type, ctx, msg) := {
 	"type": "advice",
 	"advice_type": type,
-	"advice_level": "violation",
+	"advice_level": level,
 	"advice_context": ctx,
 	"message": msg,
 }
@@ -36,6 +42,13 @@ deny contains lk_advice("livekit_shared_rename", {"attribute_key": key, "expecte
 	to := renames[key]
 	value := object.get(to.values, input.sample.attribute.value, null)
 	hint := rename_value_hint(to, value)
+}
+
+# An Agents span binding is not a registered key. weaver.toml drops weaver's missing_attribute for
+# it; this names the key instead, as an improvement, since Agents sends it by design.
+deny contains lk_finding("improvement", "livekit_agents_binding", {"attribute_key": key, "expected": to}, sprintf("'%s' is how Agents spans send '%s' (bindings.agents_otlp)", [key, to])) if {
+	key := input.sample.attribute.name
+	to := bindings[key]
 }
 
 rename_value_hint(to, value) := "" if count(to.values) == 0

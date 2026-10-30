@@ -5,7 +5,8 @@ package before_resolution
 
 import rego.v1
 
-# Attribute definitions in this file, lk.* or not (refs and deprecated keys are exempt).
+# Attribute definitions in this file, lk.* or not. Refs and deprecated keys are exempt, but
+# resolved.rego still applies the flat-identity rule to deprecated keys.
 lk_attrs contains attr if {
 	some group in input.groups
 	some attr in group.attributes

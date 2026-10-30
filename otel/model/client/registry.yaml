@@ -159,7 +159,7 @@ groups:
   - id: registry.lk.track
     type: attribute_group
     display_name: LiveKit client track details
-    brief: Track details on publish/subscribe spans and RTC stats. The track SID and source are shared (`lk.track_sid`, `lk.track_source`).
+    brief: Track details on publish/subscribe spans and RTC stats. The track SID and source are shared (`lk.track_id`, `lk.track_source`).
     attributes:
       - id: lk.track.kind
         stability: development

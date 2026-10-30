@@ -20,7 +20,7 @@ policy, storage and the app API are not conventions and live with each SDK.
 | Path | What |
 |---|---|
 | `model/manifest.yaml` | The pinned OTel dependencies, and a `schema_url` that points at this registry (see [Versioning](#versioning)) |
-| `model/shared/registry.yaml` | Shared keys: identity (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
+| `model/shared/registry.yaml` | Shared keys: identity (`lk.room_id`, `lk.participant_id`, `lk.track_id`, `lk.job_id`), PII (`lk.pii.*`), SDK identity (`lk.sdk.*`), and the concepts clients and Agents both send (`lk.track_source`, `lk.disconnect_reason`, `lk.agent_name`) |
 | `model/client/registry.yaml` | Client-owned attributes (`lk.device.*`, `lk.rtc.*`, `lk.track.*`, `lk.log.*`, `lk.telemetry.*`, …) |
 | `model/client/signals.yaml` | Client log events and spans |
 | `model/client/groups.yaml` | Attribute sets on every client resource / record (used by live-check) |
@@ -54,7 +54,9 @@ is the shared key, and the client is the side that changes: `lk.track_source` an
 `lk.disconnect_reason` take the enum names Agents sends as values (`SOURCE_MICROPHONE`,
 `CLIENT_INITIATED`), and `lk.agent_name` is the key a client uses for the agent. The track
 source names are the Agents RTC FFI `TrackSource` names, not the signal protocol's (`CAMERA`,
-`SCREEN_SHARE`), so clients map them explicitly.
+`SCREEN_SHARE`), so clients map them explicitly. The room and track IDs are the exception:
+`lk.room_id` and `lk.track_id` match `lk.participant_id` and the collector's `room_id` column,
+and Agents spans keep sending `lk.room_sid` and `lk.track_sid`, recorded as bindings.
 
 All eight client renames (the six identity/PII keys, `lk.track.source` and
 `lk.disconnect.reason`) are recorded the same way: `renamed_from` on the shared key names the old
@@ -72,7 +74,10 @@ included, and never fails on it.
 How a concept is named in other producers or stores (Agents' `room_id`, the collector's `room_id`
 column, roomobs) is recorded in `annotations.livekit.bindings`. Weaver carries it into the docs;
 nothing validates it. `event_logs` is the Go project logger store that cloud services such as
-cloud-sip and cloud realtime write to, not OTLP.
+cloud-sip and cloud realtime write to, not OTLP. Agents spans send `lk.room_id` and `lk.track_id`
+as `lk.room_sid` and `lk.track_sid` (the first `agents_otlp` entry). Those names are bindings, not
+keys: `livekit_flat_identity` rejects defining one, deprecated or not, and live-check reports one
+as an improvement that names the key (see [Live-check](#live-check)).
 
 Agents' session report sends plain log records whose keys predate this registry. They are
 registered as emitted, owner `agents`: `session.options`, `session.report_timestamp` and
@@ -95,7 +100,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    | `sensitivity` | `none`, `pii`, `secret` (protocol `logger.Sensitivity`) | required; `pii` iff the key has a `pii` segment, or is `chat.item`, which the collector drops by name; `secret` is never emitted |
    | `unit` | UCUM, e.g. `s`, `By`, `{packet}` | durations are seconds |
    | `unit_exception` | a reason | allows a `*_ms` key with `unit: ms` (the RTC stats keys: `lk.rtc.window_ms` as measured, the others converted from the W3C stats' seconds) |
-   | `bindings` | map of producer/store → name | informational |
+   | `bindings` | map of producer/store → name | informational; live-check reads the Agents span name from `agents_otlp` |
    | `cardinality_exception` | `true`, on a metric | allows a high-cardinality ID as a metric dimension |
    | `renamed_from` | `{key, values}`, on a shared key | the spelling it replaces, and for an enum a map of old value → member; the old key stays unregistered |
    | `pii_heuristic_exception` | a reason | documents a shipped key the PII heuristic would flag; it only takes effect for a key listed in `pii_heuristic_allowlist` in `policies/lib.rego` (today `lk.rpc.caller_identity`, `lk.rpc.destination_identity`), so a new key cannot opt out by annotating itself. The collector still does not redact them |
@@ -115,7 +120,7 @@ map, and its fields (such as `reason` in `outcome`) are payload, not attribute k
    Give every key, event and span a `brief` and a `note`, and every non-enum key `examples`; a
    `ref` to an OTel key gets a short `note` saying how LiveKit uses it.
 
-   Naming: shared identity keys are flat (`lk.room_sid`, never `lk.room.sid`). Customer-supplied
+   Naming: shared identity keys are flat (`lk.room_id`, never `lk.room.sid`). Customer-supplied
    values go under `lk.pii.*`: the collector deletes keys with a `pii` segment when redaction is
    on, and keeps everything else.
 4. Reference it from the events or spans that carry it, with a `requirement_level`.
@@ -195,7 +200,7 @@ add to it:
 | `livekit_secret` | yes | `secret` is never emitted |
 | `livekit_pii_marker` | yes | `sensitivity: pii` iff a `pii` key segment, except `chat.item`, which the collector drops by name (`pii_by_name` in `lib.rego`) |
 | `livekit_pii_heuristic` | yes | identity, email, phone, room/participant name outside `lk.pii.*`, unless the key is on the policy's `pii_heuristic_allowlist` and carries a `pii_heuristic_exception` reason |
-| `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id` |
+| `livekit_flat_identity` | yes | no `lk.room.sid`, `lk.participant.sid`, `lk.track.sid`, `lk.job.id`, and no `_sid` spelling (`lk.room_sid`, `lk.participant_sid`, `lk.track_sid`), deprecated or not (deprecated keys: resolved, both modes); `lk.room_sid` and `lk.track_sid` are Agents' span bindings |
 | `livekit_shared_rename` | yes | no old spelling named in a `renamed_from` is defined, deprecated or not (resolved, both modes) |
 | `livekit_rename_value` | yes | every value a `renamed_from` maps to is a member of the shared key's enum |
 | `livekit_seconds`, `livekit_unit` | yes | seconds, unless `unit_exception` |
@@ -220,8 +225,16 @@ otel/live-check.sh session.jsonl [out-dir] [--fail-on none]
 
 It takes OTLP/JSON lines from an otelcol `file` exporter (the SDK e2e setup), or a weaver samples
 JSON file. `live-check/weaver.toml` matches spans by name and checks the resource and every
-record against `model/client/groups.yaml`. It drops two kinds of finding: `not_stable` (every key
-is `development`) and absent `conditionally_required` attributes (their conditions are prose).
+record against `model/client/groups.yaml`. It drops three kinds of finding: `not_stable` (every
+key is `development`), absent `conditionally_required` attributes (their conditions are prose), and
+`missing_attribute` for `lk.room_sid` and `lk.track_sid`, the names Agents spans send for
+`lk.room_id` and `lk.track_id`. For those two, `live-check/livekit.rego` reports
+`livekit_agents_binding` instead, an improvement that names the key; `live-check/renames.jq` reads
+them from the model's `bindings.agents_otlp`, and the `weaver.toml` filter lists the same two.
+Both go by the attribute name alone, not by producer or span: a client record that sends
+`lk.room_sid` in place of `lk.room_id` gets only improvements (`livekit_agents_binding` and
+`unexpected_attribute`), since an absent `lk.room_id` is conditionally required;
+`lk.track_sid` in place of a required `lk.track_id` still fails as `required_attribute_not_present`.
 `live-check/livekit.rego` adds `livekit_shared_rename` for an old spelling. `live-check/renames.jq`
 builds its map from the model's `renamed_from`, so each finding names the key to send and, for an
 enum, the value. It also adds `livekit_pii_unmarked` for any other PII-looking key, and
@@ -237,9 +250,9 @@ violations, 62 improvements):
 
 | Emitted today | Registered key | Findings |
 |---|---|---|
-| `lk.room.sid` | `lk.room_sid` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
+| `lk.room.sid` | `lk.room_id` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.sid` | `lk.participant_id` | same, ×10 each |
-| `lk.track.sid` | `lk.track_sid` | same, ×12 each, plus `required_attribute_not_present: lk.track_sid` ×10 |
+| `lk.track.sid` | `lk.track_id` | same, ×12 each, plus `required_attribute_not_present: lk.track_id` ×10 |
 | `lk.room.name` | `lk.pii.room_name` | `missing_attribute`, `unexpected_attribute`, `livekit_shared_rename` ×10 each |
 | `lk.participant.identity` | `lk.pii.participant_identity` | same, ×10 each |
 | `lk.participant.remote_identity` | `lk.pii.remote_participant_identity` | same, ×2 each, plus `recommended_attribute_not_present` ×2 |
@@ -247,8 +260,9 @@ violations, 62 improvements):
 | `lk.disconnect.reason` = `client_initiated` | `lk.disconnect_reason` = `CLIENT_INITIATED` | same, ×2 each |
 
 With those eight keys renamed (and the two values mapped) in the same capture, live-check reports
-nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and
-`tests/live-agents.json` holds the shared keys as Agents sends them; both must pass.
+nothing and exits 0. `tests/live-sample.json` is part of that capture, anonymized, and must pass.
+`tests/live-agents.json` holds the shared keys as Agents sends them and must report nothing but
+its two `livekit_agents_binding` improvements.
 
 Known limits:
 

@@ -4,7 +4,7 @@ groups:
     type: attribute_group
     brief: Attributes a metric inherits.
     attributes:
-      - ref: lk.room_sid
+      - ref: lk.room_id
         requirement_level: required
   - id: metric.client.negative.count
     type: metric

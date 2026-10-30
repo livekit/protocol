@@ -610,11 +610,11 @@ export const ATTR_LK_ROOM_E2EE = "lk.room.e2ee" as const;
 /** Remote participants when the agent connected. */
 export const ATTR_LK_ROOM_REMOTE_PARTICIPANT_COUNT = "lk.room.remote_participant_count" as const;
 
+/** Server-assigned room session SID (`RM_...`). */
+export const ATTR_LK_ROOM_ID = "lk.room_id" as const;
+
 /** How room I/O picked its participant. */
 export const ATTR_LK_ROOM_IO_PARTICIPANT_FILTER = "lk.room_io.participant_filter" as const;
-
-/** Server-assigned room session SID (`RM_...`). */
-export const ATTR_LK_ROOM_SID = "lk.room_sid" as const;
 
 /** Identity of the RPC caller. */
 export const ATTR_LK_RPC_CALLER_IDENTITY = "lk.rpc.caller_identity" as const;
@@ -853,7 +853,7 @@ export const LK_TRACK_KIND_VALUE_AUDIO = "audio" as const;
 export const LK_TRACK_KIND_VALUE_VIDEO = "video" as const;
 
 /** Server-assigned track SID (`TR_...`). */
-export const ATTR_LK_TRACK_SID = "lk.track_sid" as const;
+export const ATTR_LK_TRACK_ID = "lk.track_id" as const;
 
 /** Source of the track, as the Agents RTC FFI `TrackSource` enum name. */
 export const ATTR_LK_TRACK_SOURCE = "lk.track_source" as const;
@@ -1131,7 +1131,7 @@ export const CHECKPOINT_STOP_RESPONSE = "stop_response" as const;
 export const CHECKPOINT_SUBSCRIBED = "subscribed" as const;
 /** Checkpoint (span event): A newer detection superseded this one. */
 export const CHECKPOINT_SUPERSEDED = "superseded" as const;
-/** Checkpoint (span event): The track was subscribed, with `lk.track_sid` and `lk.track_source`. */
+/** Checkpoint (span event): The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`. */
 export const CHECKPOINT_TRACK_SUBSCRIBED = "track_subscribed" as const;
 /** Checkpoint (span event): The user spoke again during the wait. */
 export const CHECKPOINT_USER_RESUMED = "user_resumed" as const;

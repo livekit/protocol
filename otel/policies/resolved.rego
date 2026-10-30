@@ -37,6 +37,15 @@ deny contains data.livekit.lib.finding("livekit_shared_rename", msg) if {
 	msg := sprintf("%s: renamed to %s (renamed_from on %s); the old spelling may not be defined, deprecated or not", [a.key, new, new])
 }
 
+# The attribute rules skip deprecated keys, but a spelling the flat-identity rule forbids (a dotted
+# one, or an Agents `_sid` binding) may not be defined, deprecated or not. Either representation;
+# the per-file pass and the --v2 rule above already check every key that is not deprecated.
+deny contains f if {
+	some a in attributes
+	a.attr.deprecated
+	some f in data.livekit.lib.flat_identity({"id": a.key})
+}
+
 # A mapped value must be a member of the shared key's enum.
 deny contains data.livekit.lib.finding("livekit_rename_value", msg) if {
 	some a in attributes

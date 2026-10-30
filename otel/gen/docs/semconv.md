@@ -30,7 +30,7 @@ owner is in the [attribute reference](#attribute-reference).
 
 **Flat shared identity.** Shared identity keys are flat, `lk.<entity>_<field>`, never
 `lk.<entity>.sid`:
-`lk.job_id`, `lk.participant_id`, `lk.room_sid`, `lk.track_sid`.
+`lk.job_id`, `lk.participant_id`, `lk.room_id`, `lk.track_id`.
 They are record and span attributes, never Resource attributes, omitted until the server has
 assigned them, and never default metric dimensions (high cardinality).
 
@@ -38,7 +38,9 @@ assigned them, and never default metric dimensions (high cardinality).
 Agents spelling and value set is the shared key: a flat key, and the enum names Agents sends as
 values (`lk.track_source = SOURCE_MICROPHONE`, `lk.disconnect_reason = CLIENT_INITIATED`). The
 other spelling is never registered, deprecated or not. The shared key records it in
-`renamed_from`, listed under [Old spellings](#old-spellings).
+`renamed_from`, listed under [Old spellings](#old-spellings). The room and track IDs are the
+exception: `lk.room_id` and `lk.track_id` match `lk.participant_id`, and Agents spans keep their
+own names for them, listed under [Bindings](#bindings).
 
 **Upstream metrics.** Agents creates three GenAI metrics that the GenAI registry defines. The
 registry imports `gen_ai.invoke_agent.duration` and `gen_ai.execute_tool.duration`, and the
@@ -105,7 +107,7 @@ and `error.type` always ship.
 
 ## Resource
 
-Resource attributes of the client pipeline, one Resource per process. Set once per pipeline. Session-specific keys (`lk.room_sid`, `lk.participant_id`, `lk.track_sid`) never go here; they stay on records and spans.
+Resource attributes of the client pipeline, one Resource per process. Set once per pipeline. Session-specific keys (`lk.room_id`, `lk.participant_id`, `lk.track_id`) never go here; they stay on records and spans.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
@@ -132,7 +134,7 @@ Attributes on every log record and span of a session. One session is one Room co
 | `lk.participant_id` | string | Conditionally required: Once the client has joined the room. | Server-assigned SID of the local participant (`PA_...`). On every record and span of a session once the client has joined. High cardinality, never a default metric dimension. |
 | `lk.pii.participant_identity` | string | Conditionally required: Once the client has joined the room. | Customer-supplied identity of the local participant. On every record and span of a session once the client has joined. |
 | `lk.pii.room_name` | string | Conditionally required: Once the client has joined the room. | Customer-supplied room name. On every record and span of a session once the client has joined. |
-| `lk.room_sid` | string | Conditionally required: Once the client has joined the room. | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. |
+| `lk.room_id` | string | Conditionally required: Once the client has joined the room. | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. |
 | `otel.event.name` | string | Conditionally required: On event records; duplicates the record's `event_name`. | Identifies the class / type of event. For backends that do not surface the OTLP `event_name` field yet. |
 
 ## Plain log records
@@ -330,7 +332,7 @@ One RTC stats window for one track and direction. One per track and direction pe
 | `lk.rtc.window_ms` | int, `ms` | Required | Actual length of the stats window. From the window's start to its close, on a monotonic clock. |
 | `lk.track.direction` | enum | Required | Whether the stats describe sent or received media. On RTC stats windows only. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
-| `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_id` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 | `lk.rtc.audio_level.avg` | double, `1` | Conditionally required: Inbound audio. | Average audio level in the window, 0-1, inbound audio. Inbound `audioLevel`, averaged over the window's readings that report it. |
 | `lk.rtc.audio_level.max` | double, `1` | Conditionally required: Inbound audio. | Maximum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. |
 | `lk.rtc.audio_level.min` | double, `1` | Conditionally required: Inbound audio. | Minimum audio level in the window, 0-1, inbound audio. Inbound `audioLevel`. |
@@ -599,7 +601,7 @@ Kind `internal`. The job's entrypoint, root of a job's trace.
 | `lk.job.launch_latency` | double, `s` | Recommended | Seconds from assignment to the job process launch. |
 | `lk.job.worker_id` | string | Recommended | Worker id the job runs on. |
 | `lk.pii.room_name` | string | Recommended | Customer-supplied room name. On every record and span of a session once the client has joined. |
-| `lk.room_sid` | string | Recommended | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. |
+| `lk.room_id` | string | Recommended | Server-assigned room session SID (`RM_...`). Agents sends it as `lk.room_sid` (`bindings.agents_otlp`). |
 | `lk.cloud_agent_id` | string | Opt-in | LiveKit Cloud agent id. |
 | `lk.deployment_id` | string | Opt-in | LiveKit Cloud deployment id. |
 | `lk.dispatch_id` | string | Opt-in | Agent dispatch id. |
@@ -698,7 +700,7 @@ Kind `internal`. One track publish. A child of the ambient span when there is on
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
 | `lk.track_source` | enum | Required | Source of the track, as the Agents RTC FFI `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their track source to these names explicitly. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. Set only by the SDK, at most once. |
-| `lk.track_sid` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_id` | string | Conditionally required: On success; the server assigns it. | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 
 No checkpoints.
 
@@ -730,7 +732,7 @@ Kind `internal`. One subscription, from the intent to subscribe to the first med
 | --- | --- | --- | --- |
 | `lk.outcome` | enum | Required | How the attempt ended. Rollups read this, never the span status. Exactly once on every LiveKit span, set by the SDK from how the span ended; a producer must drop an attribute of this name set any other way. Status follows it: `Error` for `error`, `Unset` for `ok` and `cancelled`. |
 | `lk.track.kind` | enum | Required | Media kind of the track. On publish and subscribe spans and RTC stats windows. |
-| `lk.track_sid` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_id` | string | Required | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
 | `lk.track_source` | enum | Required | Source of the track, as the Agents RTC FFI `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their track source to these names explicitly. |
 | `error.type` | enum | Conditionally required: Only when `lk.outcome` is `error` and the failure has a type. | Describes a class of error the operation ended with. A type name, never a message, at most 128 bytes. `timed_out` when no media came within 30 s. |
 | `lk.pii.remote_participant_identity` | string | Recommended | Customer-supplied identity of the remote participant a record is about (the publisher, on subscribe). On subscribe spans: the identity of the participant publishing the track. |
@@ -929,7 +931,7 @@ Kind `internal`. Publishing the agent's audio track.
 
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
-| `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends it as `lk.track_sid` (`bindings.agents_otlp`). |
 | `lk.pre_connect_audio.duration` | double, `s` | Opt-in | Seconds of pre-connect audio replayed. |
 
 No checkpoints.
@@ -1271,12 +1273,12 @@ Kind `internal`. Waiting for the participant's audio track.
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
-| `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends it as `lk.track_sid` (`bindings.agents_otlp`). |
 | `lk.track_source` | enum | Recommended | Source of the track, as the Agents RTC FFI `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_sid` and `lk.track_source`. |
+| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`. |
 | `first_frame` | Best effort | The first frame arrived. |
 | `pre_connect_audio` | Best effort | Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`. |
 
@@ -1301,12 +1303,12 @@ Kind `internal`. Waiting for the participant's video track.
 | Attribute | Type | Requirement | Description |
 | --- | --- | --- | --- |
 | `lk.first_frame_delay` | double, `s` | Recommended | Seconds from waiting for a track to its first frame. |
-| `lk.track_sid` | string | Recommended | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. |
+| `lk.track_id` | string | Recommended | Server-assigned track SID (`TR_...`). Agents sends it as `lk.track_sid` (`bindings.agents_otlp`). |
 | `lk.track_source` | enum | Recommended | Source of the track, as the Agents RTC FFI `TrackSource` enum name. Sent on the `track_subscribed` checkpoint, not on the span. |
 
 | Checkpoint | Requirement | Meaning |
 | --- | --- | --- |
-| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_sid` and `lk.track_source`. |
+| `track_subscribed` | Best effort | The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`. |
 | `first_frame` | Best effort | The first frame arrived. |
 
 No limits declared.
@@ -1476,8 +1478,8 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.room.auto_subscribe` | boolean | agents | none | The room was joined with auto-subscribe. | `true` | `room_connect` |
 | `lk.room.e2ee` | boolean | agents | none | End-to-end encryption is on. | `false` | `room_connect` |
 | `lk.room.remote_participant_count` | int | agents | none | Remote participants when the agent connected. | `1` | `room_connect` |
+| `lk.room_id` | string | shared | none | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. | `RM_5Fq8xQ2ZbXwN` | record `job_entrypoint` |
 | `lk.room_io.participant_filter` | string | agents | none | How room I/O picked its participant. | `identity`, `kind` | `wait_for_participant` |
-| `lk.room_sid` | string | shared | none | Server-assigned room session SID (`RM_...`). On every record and span of a session once the client has joined; absent before join. High cardinality, never a default metric dimension. | `RM_5Fq8xQ2ZbXwN` | record `job_entrypoint` |
 | `lk.rpc.caller_identity` | string | agents | none | Identity of the RPC caller. A participant identity outside `lk.pii.*`, as Agents 2.0 ships it; the registry records it rather than renaming it. | `identity-0` | `rpc_handler` |
 | `lk.rpc.destination_identity` | string | agents | none | Identity the RPC is sent to. | `identity-1` | `rpc_call` |
 | `lk.rpc.error_code` | int | agents | none | RPC error code. | `1400` | `rpc_call` `rpc_handler` |
@@ -1554,7 +1556,7 @@ Every key this registry defines, with its meaning; the OTel keys used above are 
 | `lk.tool_sets` | string[] | agents | none | Tool set names offered. | `["mcp:docs"]` | `llm_node` `setup_toolsets` |
 | `lk.track.direction` | enum | client | none | Whether the stats describe sent or received media. On RTC stats windows only. |  | `lk.rtc.stats.sample` |
 | `lk.track.kind` | enum | client | none | Media kind of the track. On publish and subscribe spans and RTC stats windows. |  | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` |
-| `lk.track_sid` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` `publish_audio_output` `wait_for_audio_track` `wait_for_video_track` |
+| `lk.track_id` | string | shared | none | Server-assigned track SID (`TR_...`). On publish and subscribe spans and RTC stats windows. A publish learns it only on success. High cardinality, never a default metric dimension. | `TR_AMkTyV3Zx8Qp` | `lk.rtc.stats.sample` `lk.publish` `lk.subscribe` `publish_audio_output` `wait_for_audio_track` `wait_for_video_track` |
 | `lk.track_source` | enum | shared | none | Source of the track, as the Agents RTC FFI `TrackSource` enum name. On client publish and subscribe spans, and on the Agents `track_subscribed` checkpoint. The value is the RTC FFI enum name exactly, e.g. `SOURCE_SCREENSHARE`. The signal protocol's `TrackSource` names differ (`CAMERA`, `SCREEN_SHARE`), so clients map their track source to these names explicitly. |  | `lk.publish` `lk.subscribe` `wait_for_audio_track` `wait_for_video_track` |
 | `lk.transcript_confidence` | double | agents | none | Confidence of the final transcript. | `0.98` | `user_turn` |
 | `lk.transcription_delay` | double, `s` | agents | none | Seconds from the end of speech to the final transcript. | `0.4` | `agent_turn` `user_turn` |
@@ -1750,12 +1752,15 @@ validates it.
 | `lk.job_id` | agents_otlp | `lk.job_id`, `job_id` |
 | `lk.job_id` | collector_column | `none` |
 | `lk.participant_id` | event_logs | `participantID` |
-| `lk.room_sid` | agents_otlp | `lk.room_sid`, `room_id` |
-| `lk.room_sid` | collector_column | `room_id` |
-| `lk.room_sid` | event_logs | `roomID` |
-| `lk.room_sid` | roomobs | `room_session.id` |
+| `lk.room_id` | agents_otlp | `lk.room_sid`, `room_id` |
+| `lk.room_id` | collector_column | `room_id` |
+| `lk.room_id` | event_logs | `roomID` |
+| `lk.room_id` | roomobs | `room_session.id` |
+| `lk.track_id` | agents_otlp | `lk.track_sid` |
 
-`agents_otlp` lists Agents' span key first, then its Resource and metric-point key.
+`agents_otlp` is Agents' span key, then its Resource and metric-point key when there is one. A
+span key that differs from the registered key is a binding, never a key: live-check reports it as
+`livekit_agents_binding`, an improvement that names the key.
 `agents_participant_attribute` is the room participant attribute, which is not an OTLP key.
 `collector_column: room_id` is materialized from the attributes `room_id` and `roomID`.
 
@@ -1789,8 +1794,8 @@ Each row comes from `renamed_from` on the shared key. Live-check reports an old 
 | `lk.participant.identity` | any | `lk.pii.participant_identity` | unchanged |
 | `lk.participant.remote_identity` | any | `lk.pii.remote_participant_identity` | unchanged |
 | `lk.room.name` | any | `lk.pii.room_name` | unchanged |
-| `lk.room.sid` | any | `lk.room_sid` | unchanged |
-| `lk.track.sid` | any | `lk.track_sid` | unchanged |
+| `lk.room.sid` | any | `lk.room_id` | unchanged |
+| `lk.track.sid` | any | `lk.track_id` | unchanged |
 | `lk.track.source` | `camera` | `lk.track_source` | `SOURCE_CAMERA` |
 | `lk.track.source` | `microphone` | `lk.track_source` | `SOURCE_MICROPHONE` |
 | `lk.track.source` | `screen_share` | `lk.track_source` | `SOURCE_SCREENSHARE` |

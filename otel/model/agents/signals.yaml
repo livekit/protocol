@@ -29,8 +29,9 @@ groups:
     attributes:
       - ref: lk.job_id
         requirement_level: required
-      - ref: lk.room_sid
+      - ref: lk.room_id
         requirement_level: recommended
+        note: Agents sends it as `lk.room_sid` (`bindings.agents_otlp`).
       - ref: lk.pii.room_name
         requirement_level: recommended
       - ref: lk.agent_name
@@ -199,12 +200,13 @@ groups:
     annotations:
       livekit:
         checkpoints:
-          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_sid` and `lk.track_source`."}
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`."}
           - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
           - {name: pre_connect_audio, requirement: best_effort, brief: "Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`."}
     attributes:
-      - ref: lk.track_sid
+      - ref: lk.track_id
         requirement_level: recommended
+        note: Agents sends it as `lk.track_sid` (`bindings.agents_otlp`).
       - ref: lk.track_source
         requirement_level: recommended
         note: Sent on the `track_subscribed` checkpoint, not on the span.
@@ -218,11 +220,12 @@ groups:
     annotations:
       livekit:
         checkpoints:
-          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_sid` and `lk.track_source`."}
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`."}
           - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
     attributes:
-      - ref: lk.track_sid
+      - ref: lk.track_id
         requirement_level: recommended
+        note: Agents sends it as `lk.track_sid` (`bindings.agents_otlp`).
       - ref: lk.track_source
         requirement_level: recommended
         note: Sent on the `track_subscribed` checkpoint, not on the span.
@@ -234,8 +237,9 @@ groups:
     stability: development
     brief: Publishing the agent's audio track.
     attributes:
-      - ref: lk.track_sid
+      - ref: lk.track_id
         requirement_level: recommended
+        note: Agents sends it as `lk.track_sid` (`bindings.agents_otlp`).
       - ref: lk.pre_connect_audio.duration
         requirement_level: opt_in
   - id: span.setup_toolsets

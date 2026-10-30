@@ -63,3 +63,10 @@ exclude = ["not_stable"]
 # Conditions are prose (`Inbound video.`); weaver cannot evaluate them, so absence is no finding.
 [[live-check.finding_filters]]
 exclude = ["conditionally_required_attribute_not_present"]
+
+# Agents spans send `lk.room_id` and `lk.track_id` as `lk.room_sid` and `lk.track_sid`
+# (`bindings.agents_otlp` in otel/model). Those are not keys, so weaver would report them missing;
+# livekit.rego reports them as `livekit_agents_binding` instead. List exactly those bindings here.
+[[live-check.finding_filters]]
+exclude = ["missing_attribute"]
+sample_names = ["lk.room_sid", "lk.track_sid"]
