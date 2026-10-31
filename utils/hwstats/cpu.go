@@ -67,6 +67,7 @@ type CPUStats struct {
 	// set by the first sample, the load reads as 0 until then
 	sampled  atomic.Bool
 	platform platformCPUMonitor
+	hostCPU  bool
 
 	idleCallback    func(idle float64)
 	procCallback    func(*ProcStats)
@@ -130,14 +131,40 @@ func aggregateMemoryStats(entries []procEntry, selfPID, pageSize int) (memoryTot
 	return
 }
 
-func NewCPUStats(idleUpdateCallback func(idle float64)) (*CPUStats, error) {
-	p, err := newPlatformCPUMonitor()
+type CPUStatsOption func(*cpuStatsOptions)
+
+type cpuStatsOptions struct {
+	hostCPU bool
+}
+
+// WithHostCPU measures CPU for the whole host from /proc/stat instead of the container cgroup,
+// for a process that owns its node, so softirq and other processes on the node count as load.
+func WithHostCPU() CPUStatsOption {
+	return func(o *cpuStatsOptions) {
+		o.hostCPU = true
+	}
+}
+
+func NewCPUStats(idleUpdateCallback func(idle float64), opts ...CPUStatsOption) (*CPUStats, error) {
+	var o cpuStatsOptions
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	var p platformCPUMonitor
+	var err error
+	if o.hostCPU {
+		p, err = newOSStatCPUMonitor()
+	} else {
+		p, err = newPlatformCPUMonitor()
+	}
 	if err != nil {
 		return nil, err
 	}
 
 	c := &CPUStats{
 		platform:        p,
+		hostCPU:         o.hostCPU,
 		warningThrottle: core.NewThrottle(time.Minute),
 		idleCallback:    idleUpdateCallback,
 		closeChan:       make(chan struct{}),
@@ -171,8 +198,11 @@ func (c *CPUStats) GetCPUIdle() float64 {
 }
 
 func (c *CPUStats) NumCPU() float64 {
-	if n := EffectiveCPURequest(); n > 0 {
-		return n
+	// idle from the host monitor is in host CPUs, a container CPU request does not apply
+	if !c.hostCPU {
+		if n := EffectiveCPURequest(); n > 0 {
+			return n
+		}
 	}
 	return c.platform.numCPU()
 }
