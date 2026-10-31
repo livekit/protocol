@@ -213,11 +213,9 @@ message JobJoinTiming {
   int64 assignment_received_us = 3;  // job assignment received
   int64 launched_us = 4;             // a job process was handed the job
   bool launch_warm = 5;              // an idle process took the job; false means one was spawned
-  int64 prewarm_started_us = 6;      // the agent's prewarm function, in the process that took the job
-  int64 prewarm_ended_us = 7;
-  int64 entrypoint_started_us = 8;   // the agent's entrypoint started
-  int64 connect_called_us = 9;       // the agent called room connect
-  int64 connected_us = 10;           // the agent's primary transport connected
+  int64 entrypoint_started_us = 6;   // the agent's entrypoint started
+  int64 connect_called_us = 7;       // the agent called room connect
+  int64 connected_us = 8;            // the agent's primary transport connected
 }
 
 message UpdateWorkerStatus {
