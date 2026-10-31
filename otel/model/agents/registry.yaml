@@ -1,0 +1,275 @@
+# Agents-owned attributes, under the names LiveKit Agents 2.0 emits today (livekit-agents
+# `telemetry/trace_types.py`, `types.py`, `otel_metrics.py`, `observability.py`, and the Rust
+# core `lk-agents-abi`, `lk-agents-node`). Registered as emitted: no key is renamed here, and
+# where a current name trips a LiveKit rule the exception is annotated and reasoned, so the
+# registry documents the vocabulary rather than fixing it. Shared identity keys (`lk.room_id`,
+# `lk.participant_id`, `lk.job_id`, `lk.track_id`, `lk.pii.room_name`,
+# `lk.pii.participant_identity`) live in otel/model/shared and are referenced, never redefined;
+# Agents spans send the room and track keys as `lk.room_sid` and `lk.track_sid`, recorded as
+# their `bindings`.
+# Upstream keys (`gen_ai.*`, `error.type`, `exception.*`, `rpc.method`) are referenced from the
+# spans in signals.yaml. Types follow the Python producer; the Node binding's deviations are
+# noted on the key.
+groups:
+  - id: registry.lk.agents.job
+    type: attribute_group
+    display_name: LiveKit Agents job and session identity
+    brief: Which worker, job, agent and participant a span is about.
+    attributes:
+      - {id: lk.speech_id, type: string, stability: development, brief: "Id of the speech handle a span belongs to.", note: "The Python producer sends the speech handle id as a string. The Node binding stamps it on its `metrics` span as a number (the frame's speech slot), which this registry does not model.", examples: ["speech_3f2a9c"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.agent_label, type: string, stability: development, brief: "Label of the agent running the activity.", examples: ["Assistant"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.previous_agent_label, type: string, stability: development, brief: "Label of the agent handed off from.", examples: ["Greeter"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.retry_count, type: int, stability: development, brief: "Retries before the operation succeeded or gave up.", examples: [0, 2], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.provider_request_ids, type: "string[]", stability: development, brief: "Provider request ids a span covers, for joining against provider logs.", examples: [["req_abc123"]], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.participant_kind, type: string, stability: development, brief: "Kind of the linked participant (protocol `ParticipantInfo.Kind`).", examples: ["standard", "sip"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.cloud_agent_id, type: string, stability: development, brief: "LiveKit Cloud agent id.", examples: ["CA_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.deployment_id, type: string, stability: development, brief: "LiveKit Cloud deployment id.", examples: ["DP_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.dispatch_id, type: string, stability: development, brief: "Agent dispatch id.", examples: ["AD_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.job.worker_id, type: string, stability: development, brief: "Worker id the job runs on.", examples: ["AW_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.job.agent_id, type: string, stability: development, brief: "Agent id of the job.", examples: ["AG_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.sip.phoneNumber, type: string, stability: development, brief: "Phone number of a SIP participant.", note: "Camel case as the SIP participant attribute it is copied from; registered as emitted.", examples: ["+15550100"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.job.accept_latency, type: double, stability: development, brief: "Seconds from the job request to its acceptance.", examples: [0.012], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.job.assignment_latency, type: double, stability: development, brief: "Seconds from acceptance to the job assignment.", examples: [0.3], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.job.launch_latency, type: double, stability: development, brief: "Seconds from assignment to the job process launch.", examples: [0.5], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.job.entrypoint_latency, type: double, stability: development, brief: "Seconds from launch to the entrypoint running.", examples: [0.1], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.job.dispatch_latency, type: double, stability: development, brief: "Seconds from the dispatch request to the entrypoint running.", examples: [0.9], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.simulation.enabled, type: boolean, stability: development, brief: "The session is a simulation.", note: "Telemetry metadata key set by the job context; a span attribute on the session trace.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.simulation.run_id, type: string, stability: development, brief: "Simulation run the session belongs to.", examples: ["run_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.simulation.job_id, type: string, stability: development, brief: "Simulation run job (one scenario) behind the session.", examples: ["srj_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.redaction.enabled, type: boolean, stability: development, brief: "PII redaction was requested for the session.", note: "Telemetry metadata key; the producer's own `pii` filter reads it from the span attributes.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.success, type: boolean, stability: development, brief: "The session report is tagged successful.", note: "A tag name in the session report (`observability.py` / `report.rs`); the outcome is derived from which of `lk.success` and `lk.fail` is present.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.fail, type: boolean, stability: development, brief: "The session report is tagged failed.", note: "See `lk.success`.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.lk.agents.room
+    type: attribute_group
+    display_name: LiveKit Agents room I/O
+    brief: Room connection, tracks and RPC as the agent sees them.
+    attributes:
+      - {id: lk.keyterms.count, type: int, stability: development, brief: "Number of keyterms configured.", examples: [12], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.keyterms.added, type: int, stability: development, brief: "Keyterms added by the update.", examples: [3], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.keyterms.removed, type: int, stability: development, brief: "Keyterms removed by the update.", examples: [1], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.keyterms, type: string, stability: development, brief: "The keyterms themselves (customer vocabulary).", examples: ["LiveKit, WebRTC"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.room.auto_subscribe, type: boolean, stability: development, brief: "The room was joined with auto-subscribe.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.room.e2ee, type: boolean, stability: development, brief: "End-to-end encryption is on.", examples: [false], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.room.remote_participant_count, type: int, stability: development, brief: "Remote participants when the agent connected.", examples: [1], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.room_io.participant_filter, type: string, stability: development, brief: "How room I/O picked its participant.", examples: ["identity", "kind"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.first_frame_delay, type: double, stability: development, brief: "Seconds from waiting for a track to its first frame.", examples: [0.25], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.pre_connect_audio.duration, type: double, stability: development, brief: "Seconds of pre-connect audio replayed.", examples: [1.5], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.connection_state, type: string, stability: development, brief: "Room connection state.", examples: ["connected"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.old_state, type: string, stability: development, brief: "State before a transition.", examples: ["listening"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.new_state, type: string, stability: development, brief: "State after a transition.", examples: ["speaking"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.rpc.request_id, type: string, stability: development, brief: "RPC request id.", examples: ["rpc_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.rpc.caller_identity, type: string, stability: development, brief: "Identity of the RPC caller.", note: "A participant identity outside `lk.pii.*`, as Agents 2.0 ships it; the registry records it rather than renaming it.", examples: ["identity-0"], annotations: {livekit: {owner: agents, sensitivity: none, pii_heuristic_exception: "Shipped unmarked in Agents 2.0; renaming to lk.pii.rpc.caller_identity is a producer change, not a registry one."}}}
+      - {id: lk.rpc.destination_identity, type: string, stability: development, brief: "Identity the RPC is sent to.", examples: ["identity-1"], annotations: {livekit: {owner: agents, sensitivity: none, pii_heuristic_exception: "Shipped unmarked in Agents 2.0; see lk.rpc.caller_identity."}}}
+      - {id: lk.pii.rpc.payload, type: string, stability: development, brief: "RPC request payload.", examples: ["{\"q\":1}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.rpc.payload_size, type: int, stability: development, brief: "RPC request payload size in bytes.", examples: [42], annotations: {livekit: {owner: agents, sensitivity: none, unit: By}}}
+      - {id: lk.pii.rpc.response, type: string, stability: development, brief: "RPC response payload.", examples: ["ok"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.rpc.response_size, type: int, stability: development, brief: "RPC response size in bytes.", examples: [2], annotations: {livekit: {owner: agents, sensitivity: none, unit: By}}}
+      - {id: lk.rpc.response_timeout, type: double, stability: development, brief: "RPC response timeout in seconds.", examples: [10.0], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.rpc.error_code, type: int, stability: development, brief: "RPC error code.", examples: [1400], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.rpc.handler_registered, type: boolean, stability: development, brief: "A handler was registered for the method.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.lk.agents.lifecycle
+    type: attribute_group
+    display_name: LiveKit Agents lifecycle
+    brief: Session close, job shutdown and callbacks.
+    attributes:
+      - {id: lk.close_reason, type: string, stability: development, brief: "Why the session closed.", examples: ["user_initiated"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.close.drain, type: boolean, stability: development, brief: "The close drained pending speech first.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.shutdown.reason, type: string, stability: development, brief: "Why the job shut down.", examples: ["room_disconnected"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.shutdown.user_initiated, type: boolean, stability: development, brief: "The shutdown was requested by user code.", examples: [false], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.callback.name, type: string, stability: development, brief: "Name of the shutdown callback.", examples: ["flush_transcript"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.lk.agents.turn
+    type: attribute_group
+    display_name: LiveKit Agents turns and generation
+    brief: User and agent turns, the LLM node and tool calls.
+    attributes:
+      - {id: lk.generation_id, type: string, stability: development, brief: "Id of the agent turn (generation).", examples: ["gen_abc123"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.parent_generation_id, type: string, stability: development, brief: "Generation this one continues (a tool-call follow-up).", examples: ["gen_abc122"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.generation_count, type: int, stability: development, brief: "Generations in the turn.", examples: [1], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.user_input, type: string, stability: development, brief: "The user's transcript for the turn.", examples: ["book a table"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.instructions, type: string, stability: development, brief: "Agent instructions in force.", examples: ["You are a helpful assistant."], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.interrupted, type: boolean, stability: development, brief: "The speech was interrupted.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.chat_ctx, type: string, stability: development, brief: "Serialized chat context sent to the LLM.", examples: ["[]"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.function_tools, type: "string[]", stability: development, brief: "Function tool names offered.", examples: [["lookup_weather"]], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.provider_tools, type: "string[]", stability: development, brief: "Provider-side tool names offered.", examples: [["web_search"]], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.tool_sets, type: "string[]", stability: development, brief: "Tool set names offered.", examples: [["mcp:docs"]], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.response.text, type: string, stability: development, brief: "Text the LLM produced.", examples: ["Sure."], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.response.function_calls, type: string, stability: development, brief: "Function calls the LLM produced, serialized.", examples: ["[]"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.response.ttft, type: double, stability: development, brief: "Seconds to the first LLM token.", examples: [0.42], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.input.delta, type: boolean, stability: development, brief: "The span's input record is a delta over its base span.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.input.base_span_id, type: string, stability: development, brief: "Span whose input record this one continues.", examples: ["7f3c2a1b9e8d4c5f"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.input.dropped_from_base, type: int, stability: development, brief: "Items of the base record not carried into this one.", examples: [0], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.function_tool.id, type: string, stability: development, brief: "Tool call id.", examples: ["call_7"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.function_tool.name, type: string, stability: development, brief: "Tool name.", examples: ["lookup_weather"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.function_tool.arguments, type: string, stability: development, brief: "Tool call arguments.", examples: ["{\"city\":\"Paris\"}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.function_tool.is_error, type: boolean, stability: development, brief: "The tool returned an error.", examples: [false], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.function_tool.output, type: string, stability: development, brief: "Tool output.", examples: ["sunny"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.speech.queue_wait, type: double, stability: development, brief: "Seconds a speech handle waited in the queue before generation was authorized.", examples: [0.05], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.e2e_latency, type: double, stability: development, brief: "Seconds from the end of the user's speech to the agent's first audio.", examples: [1.1], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.llm_metrics, type: string, stability: development, brief: "LLM metrics of the turn, serialized.", examples: ["{}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.tts_metrics, type: string, stability: development, brief: "TTS metrics of the turn, serialized.", examples: ["{}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.realtime_model_metrics, type: string, stability: development, brief: "Realtime model metrics of the turn, serialized.", examples: ["{}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.lk.agents.tts
+    type: attribute_group
+    display_name: LiveKit Agents TTS
+    brief: The TTS node and the Node binding's TTS drivers.
+    attributes:
+      - {id: lk.pii.input_text, type: string, stability: development, brief: "Text sent to the TTS.", examples: ["Hello"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.tts.streaming, type: boolean, stability: development, brief: "The TTS instance streams (duplex path).", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.tts.label, type: string, stability: development, brief: "Label of the TTS instance.", examples: ["cartesia.TTS"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.response.ttfb, type: double, stability: development, brief: "Seconds to the first TTS audio byte.", examples: [0.3], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.tts.no_duplex_path, type: boolean, stability: development, brief: "The TTS reported no duplex path, so the stream adapter was selected (Node binding; not a failure).", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.tts.frames, type: int, stability: development, brief: "Audio frames the TTS driver collected (Node binding).", examples: [120], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.tts.bytes, type: int, stability: development, brief: "Audio bytes the TTS driver collected (Node binding).", examples: [230400], annotations: {livekit: {owner: agents, sensitivity: none, unit: By}}}
+      - {id: lk.error.retryable, type: boolean, stability: development, brief: "The provider error is retryable (Node binding).", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.metric, type: string, stability: development, brief: "Metric type noted from a plugin task (Node binding `metrics` span).", examples: ["tts_metrics"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - id: lk.frame.resolution
+        stability: development
+        brief: How the inbound frame of a plugin-task metric was resolved (Node binding).
+        type:
+          members:
+            - {id: root, value: root, brief: The root frame., stability: development}
+            - {id: live, value: live, brief: A live speech frame., stability: development}
+            - {id: stale, value: stale, brief: A frame whose speech already ended., stability: development}
+            - {id: unknown, value: unknown, brief: Not a frame the slab knows., stability: development}
+        annotations: {livekit: {owner: agents, sensitivity: none}}
+
+  - id: registry.lk.agents.eou
+    type: attribute_group
+    display_name: LiveKit Agents end-of-utterance
+    brief: Turn detection, STT and the endpointing wait.
+    attributes:
+      - {id: lk.eou.probability, type: double, stability: development, brief: "End-of-utterance probability.", examples: [0.93], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.eou.unlikely_threshold, type: double, stability: development, brief: "Threshold under which the turn is unlikely to be over.", examples: [0.15], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.eou.endpointing_delay, type: double, stability: development, brief: "Seconds of endpointing delay applied.", examples: [0.5], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.eou.language, type: string, stability: development, brief: "Language the detector ran for.", examples: ["en"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.pii.user_transcript, type: string, stability: development, brief: "Transcript the detector scored.", examples: ["book a table"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.interim_transcript, type: string, stability: development, brief: "An interim (non-final) transcript, on a log record.", examples: ["book a"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.stt.events, type: string, stability: development, brief: "JSON list of transcript events on the user turn, in arrival order (received_at, type, transcript_length).", examples: ["[]"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.transcript_confidence, type: double, stability: development, brief: "Confidence of the final transcript.", examples: [0.98], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.transcription_delay, type: double, stability: development, brief: "Seconds from the end of speech to the final transcript.", examples: [0.4], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.end_of_turn_delay, type: double, stability: development, brief: "Seconds from the end of speech to the turn decision.", examples: [0.7], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.eou.source, type: string, stability: development, brief: "What decided the end of the turn.", examples: ["turn_detector", "vad"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.eou.detection_delay, type: double, stability: development, brief: "Seconds the detector inference took.", examples: [0.08], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.eou.from_cache, type: boolean, stability: development, brief: "The detector answer came from the cache.", examples: [false], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - id: lk.eou.outcome
+        stability: development
+        brief: How the endpointing wait ended.
+        type:
+          members:
+            - {id: committed, value: committed, brief: The turn was committed., stability: development}
+            - {id: user_resumed, value: user_resumed, brief: The user spoke again., stability: development}
+            - {id: dropped, value: dropped, brief: The turn was dropped., stability: development}
+        annotations: {livekit: {owner: agents, sensitivity: none}}
+      - {id: lk.eou.wait_duration, type: double, stability: development, brief: "Seconds from the end of the user's speech to the turn decision.", examples: [0.6], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.eou.rearm_count, type: int, stability: development, brief: "Times the endpointing wait restarted on a later trigger.", examples: [0], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.eou.not_committed_count, type: int, stability: development, brief: "Turn decisions the wait rejected before it ended.", examples: [0], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.eou.resume_count, type: int, stability: development, brief: "Endpointing waits the user cut short by speaking again.", examples: [1], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.on_user_turn_completed_delay, type: double, stability: development, brief: "Seconds the `on_user_turn_completed` hook took.", examples: [0.01], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+
+  - id: registry.lk.agents.amd
+    type: attribute_group
+    display_name: LiveKit Agents answering-machine detection and interruptions
+    brief: AMD results, interruption detection, fallbacks and playout.
+    attributes:
+      - {id: lk.amd.category, type: string, stability: development, brief: "AMD classification.", examples: ["human", "machine"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.amd.reason, type: string, stability: development, brief: "Why the AMD classifier decided.", examples: ["greeting_length"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.amd.speech_duration, type: double, stability: development, brief: "Seconds of speech the AMD classifier heard.", examples: [2.1], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.amd.delay, type: double, stability: development, brief: "Seconds from the call start to the AMD decision.", examples: [3.0], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.pii.amd.transcript, type: string, stability: development, brief: "Transcript the AMD classifier used.", examples: ["hello?"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.interruption.source, type: string, stability: development, brief: "What triggered the interruption.", examples: ["vad", "manual"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.playout.position, type: double, stability: development, brief: "Seconds of the agent's speech played out when it was interrupted.", examples: [1.2], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.fallback.label, type: string, stability: development, brief: "Label of the fallback instance that served the request.", examples: ["openai.LLM"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.fallback.index, type: int, stability: development, brief: "Index of the fallback instance that served the request.", examples: [1], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.fallback.recovery, type: boolean, stability: development, brief: "The request was a recovery probe of a failed instance.", examples: [false], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.is_interruption, type: boolean, stability: development, brief: "The user turn was classified as an interruption.", examples: [true], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.interruption.probability, type: double, stability: development, brief: "Interruption probability.", examples: [0.8], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.interruption.total_duration, type: double, stability: development, brief: "Seconds of the interruption from detection to resolution.", examples: [0.5], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.interruption.prediction_duration, type: double, stability: development, brief: "Seconds the interruption prediction took.", examples: [0.05], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.interruption.detection_delay, type: double, stability: development, brief: "Seconds from the user's speech to the interruption decision.", examples: [0.2], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+
+  - id: registry.lk.agents.blocking
+    type: attribute_group
+    display_name: LiveKit Agents event-loop blocking
+    brief: Synchronous blocks detected on the agent event loop.
+    attributes:
+      - {id: lk.blocking.duration, type: double, stability: development, brief: "Seconds the loop was blocked.", examples: [0.3], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.blocking.threshold, type: double, stability: development, brief: "Seconds above which a block is reported.", examples: [0.1], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.blocking.severity, type: string, stability: development, brief: "Severity bucket of the block.", examples: ["warning"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.blocking.task, type: string, stability: development, brief: "Name of the task that was running.", examples: ["Task-12"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.blocking.stack, type: string, stability: development, brief: "Loop-thread stack sampled while blocked (source locations only).", examples: ["agent.py:42"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.blocking.gc_time, type: double, stability: development, brief: "Seconds of garbage collection on the loop thread during the block.", examples: [0.02], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.blocking.cpu_time, type: double, stability: development, brief: "CPU seconds the loop thread consumed during the block.", examples: [0.25], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.blocking.import, type: string, stability: development, brief: "Module a lazy import was loading when sampled.", examples: ["numpy"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.blocking.suppressed, type: int, stability: development, brief: "Reports dropped by rate limiting since the previous emitted span.", examples: [0], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.blocking.count, type: int, stability: development, brief: "Blocks in the session.", examples: [2], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: lk.blocking.total_duration, type: double, stability: development, brief: "Seconds blocked in total over the session.", examples: [0.6], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+      - {id: lk.blocking.max_duration, type: double, stability: development, brief: "Seconds of the longest block in the session.", examples: [0.4], annotations: {livekit: {owner: agents, sensitivity: none, unit: s}}}
+
+  - id: registry.lk.agents.logs
+    type: attribute_group
+    display_name: LiveKit Agents log attributes
+    brief: PII keys the producers attach to log records (`extra={...}` / `log::warn!` key-values).
+    attributes:
+      - {id: lk.pii.raw_arguments, type: string, stability: development, brief: "Malformed tool-call arguments as received.", examples: ["{'x':1}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.repaired, type: string, stability: development, brief: "Tool-call arguments after repair.", examples: ["{\"x\":1}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.error, type: string, stability: development, brief: "Error text that may quote user content.", examples: ["expected ','"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.progress_message, type: string, stability: development, brief: "MCP tool progress message.", examples: ["fetching"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.arguments, type: string, stability: development, brief: "Tool-call arguments on a log record.", examples: ["{}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.output, type: string, stability: development, brief: "Tool-call output on a log record.", examples: ["ok"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.transcript, type: string, stability: development, brief: "Transcript text on a log record.", examples: ["hello"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.text, type: string, stability: development, brief: "Message text on a log record.", examples: ["hello"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.event, type: string, stability: development, brief: "Raw provider event on a debug log record.", examples: ["{}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: lk.pii.dtmf_inputs, type: string, stability: development, brief: "DTMF digits received.", examples: ["1234"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+
+  - id: registry.lk.agents.metric_dimensions
+    type: attribute_group
+    display_name: LiveKit Agents metric dimensions
+    brief: The dimensions on the `lk.agents.*` instruments, as `otel_metrics.py` names them.
+    note: Bare keys, outside `lk.*`, as shipped; registered so the metrics can declare them.
+    attributes:
+      - {id: model_name, type: string, stability: development, brief: "Model name the plugin reported.", examples: ["gpt-4o-mini"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: model_provider, type: string, stability: development, brief: "Provider the plugin reported.", examples: ["openai"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: connection_reused, type: string, stability: development, brief: "Whether a pooled connection was reused, as the string `true`/`false`.", examples: ["true"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.gen_ai.agents_local
+    type: attribute_group
+    display_name: GenAI keys Agents sends that no upstream registry defines
+    brief: >
+      `gen_ai.token.type` is deprecated in OTel semconv 1.44.0 (excluded from dependency
+      resolution); the LangFuse spellings are not OTel conventions at all. Declared here as emitted
+      so the generated constants cover them; every other `gen_ai.*` key is referenced upstream.
+    attributes:
+      - {id: gen_ai.token.type, type: string, stability: development, brief: "Token type (`input` or `output`); deprecated upstream, a dimension of `gen_ai.client.token.usage`.", examples: ["input", "output"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: gen_ai.usage.input_text_tokens, type: int, stability: development, brief: "LangFuse spelling of text input tokens.", examples: [120], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: gen_ai.usage.input_audio_tokens, type: int, stability: development, brief: "LangFuse spelling of audio input tokens.", examples: [800], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: gen_ai.usage.input_cached_tokens, type: int, stability: development, brief: "LangFuse spelling of cached input tokens.", examples: [64], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: gen_ai.usage.output_text_tokens, type: int, stability: development, brief: "LangFuse spelling of text output tokens.", examples: [40], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: gen_ai.usage.output_audio_tokens, type: int, stability: development, brief: "LangFuse spelling of audio output tokens.", examples: [300], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: gen_ai.usage.reasoning_tokens, type: int, stability: development, brief: "LangFuse spelling of reasoning tokens.", examples: [12], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: langfuse.observation.completion_start_time, type: string, stability: development, brief: "LangFuse's completion start time (ISO 8601), set next to `gen_ai.response.time_to_first_chunk`.", examples: ["2026-10-19T12:00:00.000Z"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+
+  - id: registry.agents.session_report
+    type: attribute_group
+    display_name: Agents session report
+    brief: Attributes of the session-report log records Agents sends on the `chat_history` and `evaluations` loggers.
+    note: >
+      Plain log records with no event name, one per report part, with the body `session report`,
+      `chat item`, `evaluation`, `tag` or `outcome`. The keys are registered as emitted: three sit
+      in the upstream `session.*` namespace (`annotations.livekit.upstream_namespace`), the others
+      have no namespace. A map-valued key carries an OTLP AnyValue map; its fields are payload, not
+      attribute keys.
+    attributes:
+      - {id: session.options, type: any, stability: development, brief: "The session's options, as a map of option name to value.", note: "In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it.", examples: ["{\"allow_interruptions\": true}"], annotations: {livekit: {owner: agents, sensitivity: none, upstream_namespace: session}}}
+      - {id: session.report_timestamp, type: double, stability: development, brief: "When the report was made, in Unix seconds.", note: "In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it.", examples: [1760870400.5], annotations: {livekit: {owner: agents, sensitivity: none, upstream_namespace: session}}}
+      - {id: session.tags, type: "string[]", stability: development, brief: "The session's tags, sorted. Absent when the session has none.", note: "In the upstream `session.*` namespace, which OTel owns; registered as Agents sends it.", examples: [["support", "escalated"]], annotations: {livekit: {owner: agents, sensitivity: none, upstream_namespace: session}}}
+      - {id: agent_name, type: string, stability: development, brief: "The agent's name.", examples: ["support-agent"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: sdk_version, type: string, stability: development, brief: "The Agents SDK version.", examples: ["2.0.0"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: usage, type: any, stability: development, brief: "Model usage, as a list of maps, one per model. Absent when there was none.", examples: ["[{\"model\": \"gpt-4o\", \"input_tokens\": 120}]"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: chat.item, type: any, stability: development, brief: "One chat history item, as a map. Carries conversation content.", note: "With redaction on, the collector drops the whole `chat.item` record.", examples: ["{\"type\": \"message\", \"role\": \"user\"}"], annotations: {livekit: {owner: agents, sensitivity: pii}}}
+      - {id: evaluation, type: any, stability: development, brief: "One evaluation result, as a map of string fields.", examples: ["{\"name\": \"task_completion\", \"verdict\": \"pass\"}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: tag, type: any, stability: development, brief: "One tag with metadata, as a map with the fields `name` and `metadata`.", examples: ["{\"name\": \"escalated\", \"metadata\": {}}"], annotations: {livekit: {owner: agents, sensitivity: none}}}
+      - {id: outcome, type: any, stability: development, brief: "The session outcome, as a map with the field `outcome` (`success` or `fail`) and an optional `reason`.", note: "`reason` is a field of this map, not an attribute key.", examples: ["{\"outcome\": \"fail\", \"reason\": \"user hung up\"}"], annotations: {livekit: {owner: agents, sensitivity: none}}}

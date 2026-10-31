@@ -1,0 +1,72 @@
+# Live-check config for client captures; otel/live-check.sh passes it with --config.
+# Matchers say what each sample is checked against. Filters drop what is not a finding for a
+# registry that is all `development`.
+
+# Spans carry no name-based match of their own: one matcher per span name.
+[[live-check.matchers]]
+id = "match.lk.connect"
+sample_type = "span"
+when = 'name == "lk.connect"'
+signal = "lk.connect"
+attribute_groups = ["livekit.client.record"]
+
+[[live-check.matchers]]
+id = "match.lk.reconnect"
+sample_type = "span"
+when = 'name == "lk.reconnect"'
+signal = "lk.reconnect"
+attribute_groups = ["livekit.client.record"]
+
+[[live-check.matchers]]
+id = "match.lk.publish"
+sample_type = "span"
+when = 'name == "lk.publish"'
+signal = "lk.publish"
+attribute_groups = ["livekit.client.record"]
+
+[[live-check.matchers]]
+id = "match.lk.subscribe"
+sample_type = "span"
+when = 'name == "lk.subscribe"'
+signal = "lk.subscribe"
+attribute_groups = ["livekit.client.record"]
+
+# App-defined events: the core names them custom.<name>.
+[[live-check.matchers]]
+id = "match.custom"
+sample_type = "log"
+when = 'event_name.startsWith("custom.")'
+signal = "custom"
+
+# Plain log lines, then the session attributes every record carries.
+[[live-check.matchers]]
+id = "match.log.plain"
+sample_type = "log"
+when = 'event_name == ""'
+attribute_groups = ["livekit.client.log"]
+
+[[live-check.matchers]]
+id = "match.log.record"
+sample_type = "log"
+attribute_groups = ["livekit.client.record"]
+
+[[live-check.matchers]]
+id = "match.resource"
+sample_type = "resource"
+when = '"service.name" in attributes && attributes["service.name"].startsWith("livekit-client")'
+attribute_groups = ["livekit.client.resource"]
+
+# Every key here is `development`, ours and the upstream ones we use alike.
+[[live-check.finding_filters]]
+exclude = ["not_stable"]
+
+# Conditions are prose (`Inbound video.`); weaver cannot evaluate them, so absence is no finding.
+[[live-check.finding_filters]]
+exclude = ["conditionally_required_attribute_not_present"]
+
+# Agents spans send `lk.room_id` and `lk.track_id` as `lk.room_sid` and `lk.track_sid`
+# (`bindings.agents_otlp` in otel/model). Those are not keys, so weaver would report them missing;
+# livekit.rego reports them as `livekit_agents_binding` instead. List exactly those bindings here.
+[[live-check.finding_filters]]
+exclude = ["missing_attribute"]
+sample_names = ["lk.room_sid", "lk.track_sid"]

@@ -1,0 +1,962 @@
+# Agents spans and metrics, under the names LiveKit Agents 2.0 emits today (the span list is
+# tests/trace_schema.py's SPAN_PARENTS plus the Rust Node binding's three spans; the metrics are
+# `otel_metrics.py` / `metrics/otel.rs`). Span names carry no `lk.` prefix, as shipped.
+#
+# Attribute tables are a first pass: each span lists the keys its producer sets at the span start
+# or that trace_types.py documents for it, with the upstream OTel keys (`gen_ai.*`, `error.type`,
+# `exception.*`, `rpc.method`) referenced from the dependencies and never redefined. The OTel GenAI
+# span events the LLM node attaches (`gen_ai.*.message`, `gen_ai.choice`, deprecated upstream and
+# excluded from dependency resolution; `gen_ai.client.inference.operation.details`, an event, which
+# weaver cannot `ref`) are referenced by name as checkpoints, the registry's span-event mechanism.
+groups:
+  # --- Job and session ---------------------------------------------------------------------
+  - id: span.job_entrypoint
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The job's entrypoint, root of a job's trace.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: job_received, requirement: best_effort, brief: "The worker received the job request."}
+          - {name: job_accepted, requirement: best_effort, brief: "The worker accepted the job."}
+          - {name: job_assigned, requirement: best_effort, brief: "The server assigned the job."}
+          - {name: process_assigned, requirement: best_effort, brief: "A job process was launched for it."}
+          - {name: entrypoint_started, requirement: best_effort, brief: "The entrypoint started running."}
+          - {name: job_started_on_server, requirement: best_effort, brief: "The server-side job start time, as the worker learned it."}
+          - {name: entrypoint_cancelled, requirement: best_effort, brief: "The entrypoint was cancelled."}
+          - {name: entrypoint_returned, requirement: best_effort, brief: "The entrypoint returned."}
+    attributes:
+      - ref: lk.job_id
+        requirement_level: required
+      - ref: lk.room_id
+        requirement_level: recommended
+        note: Agents sends it as `lk.room_sid` (`bindings.agents_otlp`).
+      - ref: lk.pii.room_name
+        requirement_level: recommended
+      - ref: lk.agent_name
+        requirement_level: recommended
+      - ref: lk.job.worker_id
+        requirement_level: recommended
+      - ref: lk.job.agent_id
+        requirement_level: recommended
+      - ref: lk.cloud_agent_id
+        requirement_level: opt_in
+      - ref: lk.deployment_id
+        requirement_level: opt_in
+      - ref: lk.dispatch_id
+        requirement_level: opt_in
+      - ref: lk.job.accept_latency
+        requirement_level: recommended
+      - ref: lk.job.assignment_latency
+        requirement_level: recommended
+      - ref: lk.job.launch_latency
+        requirement_level: recommended
+      - ref: lk.job.entrypoint_latency
+        requirement_level: recommended
+      - ref: lk.job.dispatch_latency
+        requirement_level: recommended
+      - ref: lk.simulation.enabled
+        requirement_level: opt_in
+      - ref: lk.simulation.run_id
+        requirement_level: opt_in
+      - ref: lk.simulation.job_id
+        requirement_level: opt_in
+      - ref: lk.redaction.enabled
+        requirement_level: opt_in
+  - id: span.job_shutdown
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The job shutting down.
+    attributes:
+      - ref: lk.shutdown.reason
+        requirement_level: recommended
+      - ref: lk.shutdown.user_initiated
+        requirement_level: recommended
+  - id: span.shutdown_callback
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One shutdown callback.
+    attributes:
+      - ref: lk.callback.name
+        requirement_level: required
+  - id: span.on_session_end
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The session-end hook.
+  - id: span.session_end_upload
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Uploading the session report.
+  - id: span.room_connect
+    type: span
+    span_kind: client
+    stability: development
+    brief: Connecting the job to its room.
+    attributes:
+      - ref: lk.room.auto_subscribe
+        requirement_level: recommended
+      - ref: lk.room.e2ee
+        requirement_level: recommended
+      - ref: lk.room.remote_participant_count
+        requirement_level: recommended
+      - ref: lk.connection_state
+        requirement_level: recommended
+  - id: span.room_disconnect
+    type: span
+    span_kind: client
+    stability: development
+    brief: Disconnecting from the room.
+  - id: span.agent_session
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The agent session, parent of every turn.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: participant_linked, requirement: best_effort, brief: "The session linked to its participant."}
+          - {name: agent_state_changed, requirement: best_effort, brief: "The agent state changed (`lk.old_state` -> `lk.new_state`)."}
+          - {name: user_state_changed, requirement: best_effort, brief: "The user state changed (`lk.old_state` -> `lk.new_state`)."}
+          - {name: participant_disconnected, requirement: best_effort, brief: "The linked participant left the room, with `lk.disconnect_reason`."}
+          - {name: event_loop_blocked, requirement: best_effort, brief: "A synchronous block on the event loop, with `lk.blocking.duration`; mirrors the span of the same name."}
+          - {name: exception, requirement: best_effort, brief: "The OTel exception event (`exception.*`), recorded on whichever span the exception was caught on; declared here once."}
+    attributes:
+      - ref: lk.pii.participant_identity
+        requirement_level: recommended
+      - ref: lk.participant_id
+        requirement_level: recommended
+        note: Agents sends the SID of the participant it is linked to, not of the agent itself.
+      - ref: lk.participant_kind
+        requirement_level: recommended
+      - ref: lk.agent_name
+        requirement_level: recommended
+      - ref: lk.disconnect_reason
+        requirement_level: opt_in
+        note: Sent on the `participant_disconnected` checkpoint, not on the span.
+      - ref: lk.pii.sip.phoneNumber
+        requirement_level: opt_in
+      - ref: lk.blocking.count
+        requirement_level: opt_in
+      - ref: lk.blocking.total_duration
+        requirement_level: opt_in
+      - ref: lk.blocking.max_duration
+        requirement_level: opt_in
+      - ref: lk.success
+        requirement_level: opt_in
+      - ref: lk.fail
+        requirement_level: opt_in
+      - ref: exception.type
+        requirement_level: opt_in
+        note: On the span's exception events, as the OTel SDK records them.
+      - ref: exception.message
+        requirement_level: opt_in
+        note: Replaced by a fixed marker when redaction is on; `error.type` keeps the class.
+      - ref: exception.stacktrace
+        requirement_level: opt_in
+        note: Dropped when redaction is on.
+  - id: span.session_start
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Starting the session (room I/O, first activity).
+  - id: span.session_close
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Closing the session.
+    attributes:
+      - ref: lk.close_reason
+        requirement_level: recommended
+      - ref: lk.close.drain
+        requirement_level: recommended
+  - id: span.update_agent
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Replacing the session's agent.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+      - ref: lk.previous_agent_label
+        requirement_level: recommended
+  - id: span.wait_for_participant
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Waiting for the participant to link to.
+    attributes:
+      - ref: lk.room_io.participant_filter
+        requirement_level: recommended
+  - id: span.wait_for_audio_track
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Waiting for the participant's audio track.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`."}
+          - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
+          - {name: pre_connect_audio, requirement: best_effort, brief: "Pre-connect audio was replayed, with `lk.pre_connect_audio.duration`."}
+    attributes:
+      - ref: lk.track_id
+        requirement_level: recommended
+        note: Agents sends it as `lk.track_sid` (`bindings.agents_otlp`).
+      - ref: lk.track_source
+        requirement_level: recommended
+        note: Sent on the `track_subscribed` checkpoint, not on the span.
+      - ref: lk.first_frame_delay
+        requirement_level: recommended
+  - id: span.wait_for_video_track
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Waiting for the participant's video track.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: track_subscribed, requirement: best_effort, brief: "The track was subscribed, with `lk.track_id` (sent as `lk.track_sid`) and `lk.track_source`."}
+          - {name: first_frame, requirement: best_effort, brief: "The first frame arrived."}
+    attributes:
+      - ref: lk.track_id
+        requirement_level: recommended
+        note: Agents sends it as `lk.track_sid` (`bindings.agents_otlp`).
+      - ref: lk.track_source
+        requirement_level: recommended
+        note: Sent on the `track_subscribed` checkpoint, not on the span.
+      - ref: lk.first_frame_delay
+        requirement_level: recommended
+  - id: span.publish_audio_output
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Publishing the agent's audio track.
+    attributes:
+      - ref: lk.track_id
+        requirement_level: recommended
+        note: Agents sends it as `lk.track_sid` (`bindings.agents_otlp`).
+      - ref: lk.pre_connect_audio.duration
+        requirement_level: opt_in
+  - id: span.setup_toolsets
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Initializing the agent's tool sets.
+    attributes:
+      - ref: lk.tool_sets
+        requirement_level: recommended
+  - id: span.rpc_call
+    type: span
+    span_kind: client
+    stability: development
+    brief: An outgoing RPC.
+    attributes:
+      - ref: rpc.method
+        requirement_level: required
+        note: The LiveKit RPC method name.
+      - ref: lk.rpc.request_id
+        requirement_level: recommended
+      - ref: lk.rpc.destination_identity
+        requirement_level: recommended
+      - ref: lk.pii.rpc.payload
+        requirement_level: opt_in
+      - ref: lk.rpc.payload_size
+        requirement_level: recommended
+      - ref: lk.pii.rpc.response
+        requirement_level: opt_in
+      - ref: lk.rpc.response_size
+        requirement_level: recommended
+      - ref: lk.rpc.response_timeout
+        requirement_level: recommended
+      - ref: lk.rpc.error_code
+        requirement_level: {conditionally_required: On failure.}
+  - id: span.rpc_handler
+    type: span
+    span_kind: server
+    stability: development
+    brief: An incoming RPC handled by the agent.
+    attributes:
+      - ref: rpc.method
+        requirement_level: required
+        note: The LiveKit RPC method name.
+      - ref: lk.rpc.request_id
+        requirement_level: recommended
+      - ref: lk.rpc.caller_identity
+        requirement_level: recommended
+      - ref: lk.pii.rpc.payload
+        requirement_level: opt_in
+      - ref: lk.rpc.payload_size
+        requirement_level: recommended
+      - ref: lk.pii.rpc.response
+        requirement_level: opt_in
+      - ref: lk.rpc.response_size
+        requirement_level: recommended
+      - ref: lk.rpc.response_timeout
+        requirement_level: recommended
+      - ref: lk.rpc.handler_registered
+        requirement_level: recommended
+      - ref: lk.rpc.error_code
+        requirement_level: {conditionally_required: On failure.}
+
+  # --- Activity lifecycle ------------------------------------------------------------------
+  - id: span.start_agent_activity
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Starting an agent activity.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+  - id: span.drain_agent_activity
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Draining an agent activity before it ends.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+  - id: span.pause_agent_activity
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Pausing an agent activity.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+  - id: span.resume_agent_activity
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Resuming an agent activity.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+  - id: span.on_enter
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The agent's `on_enter` hook.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+  - id: span.on_exit
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The agent's `on_exit` hook.
+    attributes:
+      - ref: lk.agent_label
+        requirement_level: recommended
+  - id: span.keyterm_detection
+    type: span
+    span_kind: internal
+    stability: development
+    brief: A keyterm update to the STT.
+    attributes:
+      - ref: lk.keyterms.count
+        requirement_level: recommended
+      - ref: lk.keyterms.added
+        requirement_level: recommended
+      - ref: lk.keyterms.removed
+        requirement_level: recommended
+      - ref: lk.pii.keyterms
+        requirement_level: opt_in
+  - id: span.event_loop_blocked
+    type: span
+    span_kind: internal
+    stability: development
+    brief: A synchronous block on the agent event loop.
+    attributes:
+      - ref: lk.blocking.duration
+        requirement_level: required
+      - ref: lk.blocking.threshold
+        requirement_level: recommended
+      - ref: lk.blocking.severity
+        requirement_level: recommended
+      - ref: lk.blocking.task
+        requirement_level: recommended
+      - ref: lk.blocking.stack
+        requirement_level: recommended
+      - ref: lk.blocking.gc_time
+        requirement_level: recommended
+      - ref: lk.blocking.cpu_time
+        requirement_level: recommended
+      - ref: lk.blocking.import
+        requirement_level: opt_in
+      - ref: lk.blocking.suppressed
+        requirement_level: recommended
+
+  # --- Turns -------------------------------------------------------------------------------
+  - id: span.user_speaking
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The user speaking (VAD).
+  - id: span.agent_speaking
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The agent's audio playing out.
+    attributes:
+      - ref: lk.speech_id
+        requirement_level: recommended
+      - ref: lk.interrupted
+        requirement_level: recommended
+      - ref: lk.playout.position
+        requirement_level: {conditionally_required: When interrupted.}
+      - ref: lk.interruption.source
+        requirement_level: {conditionally_required: When interrupted.}
+  - id: span.user_turn
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One user turn, from speech to the turn decision.
+    attributes:
+      - ref: lk.pii.user_transcript
+        requirement_level: opt_in
+      - ref: lk.pii.interim_transcript
+        requirement_level: opt_in
+        note: On the interim-transcript log records of the turn, not on the span.
+      - ref: lk.stt.events
+        requirement_level: recommended
+      - ref: lk.transcript_confidence
+        requirement_level: recommended
+      - ref: lk.transcription_delay
+        requirement_level: recommended
+      - ref: lk.end_of_turn_delay
+        requirement_level: recommended
+      - ref: lk.eou.source
+        requirement_level: recommended
+      - ref: lk.eou.resume_count
+        requirement_level: recommended
+      - ref: lk.is_interruption
+        requirement_level: recommended
+      - ref: lk.interruption.probability
+        requirement_level: opt_in
+      - ref: lk.interruption.total_duration
+        requirement_level: opt_in
+      - ref: lk.interruption.prediction_duration
+        requirement_level: opt_in
+      - ref: lk.interruption.detection_delay
+        requirement_level: opt_in
+  - id: span.eou_detection
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One end-of-utterance inference.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: superseded, requirement: best_effort, brief: "A newer detection superseded this one."}
+    attributes:
+      - ref: lk.eou.probability
+        requirement_level: recommended
+      - ref: lk.eou.unlikely_threshold
+        requirement_level: recommended
+      - ref: lk.eou.language
+        requirement_level: recommended
+      - ref: lk.eou.detection_delay
+        requirement_level: recommended
+      - ref: lk.eou.from_cache
+        requirement_level: recommended
+      - ref: lk.pii.user_transcript
+        requirement_level: opt_in
+  - id: span.eou_wait
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The endpointing wait, from the user's last speech to the turn decision.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: rearmed, requirement: best_effort, brief: "A later trigger re-armed the wait."}
+          - {name: user_resumed, requirement: best_effort, brief: "The user spoke again during the wait."}
+    attributes:
+      - ref: lk.eou.outcome
+        requirement_level: required
+      - ref: lk.eou.wait_duration
+        requirement_level: recommended
+      - ref: lk.eou.endpointing_delay
+        requirement_level: recommended
+      - ref: lk.eou.rearm_count
+        requirement_level: recommended
+      - ref: lk.eou.not_committed_count
+        requirement_level: recommended
+  - id: span.on_user_turn_completed
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The `on_user_turn_completed` hook.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: stop_response, requirement: best_effort, brief: "The hook stopped the response."}
+    attributes:
+      - ref: lk.on_user_turn_completed_delay
+        requirement_level: recommended
+  - id: span.agent_turn
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One agent turn (generation), parent of the LLM and TTS nodes.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: generation, requirement: best_effort, brief: "One generation started (the generation attributes)."}
+          - {name: preemptive_generation_discarded, requirement: best_effort, brief: "A preemptive generation was discarded in favour of this one (`lk.speech_id` of the discarded handle)."}
+    attributes:
+      - ref: lk.speech_id
+        requirement_level: recommended
+      - ref: lk.generation_id
+        requirement_level: recommended
+      - ref: lk.parent_generation_id
+        requirement_level: opt_in
+      - ref: lk.generation_count
+        requirement_level: recommended
+      - ref: lk.pii.user_input
+        requirement_level: opt_in
+      - ref: lk.pii.instructions
+        requirement_level: opt_in
+      - ref: lk.interrupted
+        requirement_level: recommended
+      - ref: lk.speech.queue_wait
+        requirement_level: recommended
+      - ref: lk.e2e_latency
+        requirement_level: recommended
+      - ref: lk.transcription_delay
+        requirement_level: opt_in
+      - ref: lk.end_of_turn_delay
+        requirement_level: opt_in
+      - ref: lk.on_user_turn_completed_delay
+        requirement_level: opt_in
+      - ref: lk.llm_metrics
+        requirement_level: opt_in
+      - ref: lk.tts_metrics
+        requirement_level: opt_in
+      - ref: lk.realtime_model_metrics
+        requirement_level: opt_in
+      - ref: lk.provider_request_ids
+        requirement_level: opt_in
+  - id: span.llm_node
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The agent's LLM node for one generation.
+    note: >
+      Carries the OTel GenAI request identity when a custom node does its own inference and no
+      `llm_request` span exists. Its span events are the OTel GenAI message events (see the
+      `event.gen_ai.*` groups below).
+    attributes:
+      - ref: lk.speech_id
+        requirement_level: recommended
+      - ref: lk.agent_label
+        requirement_level: recommended
+      - ref: lk.pii.chat_ctx
+        requirement_level: opt_in
+      - ref: lk.function_tools
+        requirement_level: recommended
+      - ref: lk.provider_tools
+        requirement_level: recommended
+      - ref: lk.tool_sets
+        requirement_level: recommended
+      - ref: lk.pii.response.text
+        requirement_level: opt_in
+      - ref: lk.pii.response.function_calls
+        requirement_level: opt_in
+      - ref: lk.response.ttft
+        requirement_level: recommended
+      - ref: lk.input.delta
+        requirement_level: opt_in
+      - ref: lk.input.base_span_id
+        requirement_level: opt_in
+      - ref: lk.input.dropped_from_base
+        requirement_level: opt_in
+      - ref: gen_ai.request.model
+        requirement_level: opt_in
+      - ref: gen_ai.provider.name
+        requirement_level: opt_in
+      - ref: gen_ai.retrieval.documents
+        requirement_level: opt_in
+      - ref: gen_ai.retrieval.query.text
+        requirement_level: opt_in
+      - ref: gen_ai.memory.query.text
+        requirement_level: opt_in
+      - ref: gen_ai.memory.records
+        requirement_level: opt_in
+      - ref: gen_ai.workflow.name
+        requirement_level: opt_in
+      - ref: gen_ai.prompt.variable
+        requirement_level: opt_in
+  - id: span.llm_request
+    type: span
+    span_kind: client
+    stability: development
+    brief: One LLM inference request, the OTel GenAI inference span.
+    annotations:
+      livekit:
+        checkpoints:
+          - {name: gen_ai.client.inference.operation.details, requirement: best_effort, brief: OTel GenAI inference details event (the GenAI registry defines it; events cannot be referenced, so it is named here).}
+    attributes:
+      - ref: lk.retry_count
+        requirement_level: recommended
+      - ref: lk.provider_request_ids
+        requirement_level: opt_in
+      - ref: lk.input.delta
+        requirement_level: opt_in
+      - ref: lk.input.base_span_id
+        requirement_level: opt_in
+      - ref: lk.input.dropped_from_base
+        requirement_level: opt_in
+      - ref: lk.fallback.label
+        requirement_level: opt_in
+      - ref: lk.fallback.index
+        requirement_level: opt_in
+      - ref: lk.fallback.recovery
+        requirement_level: opt_in
+      - ref: gen_ai.operation.name
+        requirement_level: required
+      - ref: gen_ai.provider.name
+        requirement_level: recommended
+      - ref: gen_ai.request.model
+        requirement_level: recommended
+      - ref: gen_ai.request.stream
+        requirement_level: recommended
+      - ref: gen_ai.response.id
+        requirement_level: recommended
+      - ref: gen_ai.response.model
+        requirement_level: recommended
+      - ref: gen_ai.response.finish_reasons
+        requirement_level: recommended
+      - ref: gen_ai.response.time_to_first_chunk
+        requirement_level: recommended
+      - ref: gen_ai.usage.input_tokens
+        requirement_level: recommended
+      - ref: gen_ai.usage.output_tokens
+        requirement_level: recommended
+      - ref: gen_ai.usage.cache_read.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.cache_write.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.reasoning.output_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.text.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.text.output_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.text.cache_read.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.audio.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.audio.output_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.audio.cache_read.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.image.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.usage.image.cache_read.input_tokens
+        requirement_level: opt_in
+      - ref: gen_ai.conversation.id
+        requirement_level: recommended
+      - ref: gen_ai.agent.name
+        requirement_level: recommended
+      - ref: gen_ai.system_instructions
+        requirement_level: opt_in
+      - ref: gen_ai.input.messages
+        requirement_level: opt_in
+      - ref: gen_ai.output.messages
+        requirement_level: opt_in
+      - ref: gen_ai.output.type
+        requirement_level: recommended
+      - ref: gen_ai.tool.definitions
+        requirement_level: opt_in
+      - ref: error.type
+        requirement_level: {conditionally_required: On failure.}
+  - id: span.llm_request_run
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The LLM request's stream being consumed.
+  - id: span.llm_fallback_adapter
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The LLM fallback adapter choosing an instance.
+    attributes:
+      - ref: lk.fallback.label
+        requirement_level: recommended
+      - ref: lk.fallback.index
+        requirement_level: recommended
+      - ref: lk.fallback.recovery
+        requirement_level: recommended
+  - id: span.realtime_inference
+    type: span
+    span_kind: client
+    stability: development
+    brief: One realtime-model generation.
+    attributes:
+      - ref: lk.speech_id
+        requirement_level: recommended
+      - ref: gen_ai.request.model
+        requirement_level: recommended
+      - ref: gen_ai.provider.name
+        requirement_level: recommended
+  - id: span.realtime_metrics
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Realtime-model metrics attached to a turn.
+    attributes:
+      - ref: lk.speech_id
+        requirement_level: recommended
+      - ref: lk.realtime_model_metrics
+        requirement_level: recommended
+  - id: span.function_tool
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One function tool execution, the OTel GenAI execute-tool span.
+    attributes:
+      - ref: lk.function_tool.id
+        requirement_level: recommended
+      - ref: lk.function_tool.name
+        requirement_level: required
+      - ref: lk.pii.function_tool.arguments
+        requirement_level: opt_in
+      - ref: lk.function_tool.is_error
+        requirement_level: recommended
+      - ref: lk.pii.function_tool.output
+        requirement_level: opt_in
+      - ref: gen_ai.operation.name
+        requirement_level: recommended
+      - ref: gen_ai.tool.name
+        requirement_level: recommended
+      - ref: gen_ai.tool.call.id
+        requirement_level: recommended
+      - ref: gen_ai.tool.description
+        requirement_level: opt_in
+      - ref: gen_ai.tool.type
+        requirement_level: recommended
+      - ref: gen_ai.tool.call.arguments
+        requirement_level: opt_in
+      - ref: gen_ai.tool.call.result
+        requirement_level: opt_in
+      - ref: error.type
+        requirement_level: {conditionally_required: On failure.}
+  - id: span.tts_node
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The agent's TTS node for one generation.
+    attributes:
+      - ref: lk.speech_id
+        requirement_level: recommended
+      - ref: lk.agent_label
+        requirement_level: recommended
+      - ref: lk.pii.input_text
+        requirement_level: opt_in
+      - ref: lk.tts.streaming
+        requirement_level: recommended
+      - ref: lk.tts.label
+        requirement_level: recommended
+      - ref: lk.response.ttfb
+        requirement_level: recommended
+  - id: span.tts_request
+    type: span
+    span_kind: client
+    stability: development
+    brief: One TTS request.
+    attributes:
+      - ref: lk.retry_count
+        requirement_level: recommended
+      - ref: lk.provider_request_ids
+        requirement_level: opt_in
+      - ref: lk.tts.label
+        requirement_level: recommended
+      - ref: gen_ai.request.model
+        requirement_level: opt_in
+      - ref: gen_ai.provider.name
+        requirement_level: opt_in
+      - ref: error.type
+        requirement_level: {conditionally_required: On failure.}
+  - id: span.tts_request_run
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The TTS request's stream being consumed.
+  - id: span.tts_fallback_adapter
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The TTS fallback adapter choosing an instance.
+    attributes:
+      - ref: lk.fallback.label
+        requirement_level: recommended
+      - ref: lk.fallback.index
+        requirement_level: recommended
+      - ref: lk.fallback.recovery
+        requirement_level: recommended
+  - id: span.tts_stream_adapter
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The sentence-splitting adapter over a non-streaming TTS.
+    attributes:
+      - ref: lk.tts.label
+        requirement_level: recommended
+  - id: span.amd
+    type: span
+    span_kind: internal
+    stability: development
+    brief: Answering-machine detection on an outbound call.
+    attributes:
+      - ref: lk.amd.category
+        requirement_level: required
+      - ref: lk.amd.reason
+        requirement_level: recommended
+      - ref: lk.amd.speech_duration
+        requirement_level: recommended
+      - ref: lk.amd.delay
+        requirement_level: recommended
+      - ref: lk.pii.amd.transcript
+        requirement_level: opt_in
+  - id: span.judge_evaluation
+    type: span
+    span_kind: internal
+    stability: development
+    brief: One LLM-judge evaluation of the session.
+    attributes:
+      - ref: gen_ai.evaluation.name
+        requirement_level: recommended
+      - ref: gen_ai.evaluation.score.label
+        requirement_level: recommended
+      - ref: gen_ai.evaluation.explanation
+        requirement_level: opt_in
+
+  # --- Rust Node binding -------------------------------------------------------------------
+  - id: span.metrics
+    type: span
+    span_kind: internal
+    stability: development
+    brief: A plugin-task metric noted through the Node binding, stamped with its resolved frame.
+    attributes:
+      - ref: lk.metric
+        requirement_level: required
+      - ref: lk.frame.resolution
+        requirement_level: required
+      - ref: lk.speech_id
+        requirement_level: {conditionally_required: When the frame resolves to a speech.}
+  - id: span.tts_synthesize
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The Node binding driving `Tts::synthesize` (the simplex path).
+    attributes:
+      - ref: lk.tts.label
+        requirement_level: required
+      - ref: lk.tts.streaming
+        requirement_level: required
+      - ref: lk.tts.frames
+        requirement_level: {conditionally_required: On success.}
+      - ref: lk.tts.bytes
+        requirement_level: {conditionally_required: On success.}
+      - ref: lk.error.retryable
+        requirement_level: {conditionally_required: On failure.}
+  - id: span.tts_stream
+    type: span
+    span_kind: internal
+    stability: development
+    brief: The Node binding driving `Tts::stream` (the duplex path).
+    attributes:
+      - ref: lk.tts.label
+        requirement_level: required
+      - ref: lk.tts.no_duplex_path
+        requirement_level: {conditionally_required: When the instance has no duplex path.}
+      - ref: lk.tts.frames
+        requirement_level: {conditionally_required: On success.}
+      - ref: lk.tts.bytes
+        requirement_level: {conditionally_required: On success.}
+      - ref: lk.error.retryable
+        requirement_level: {conditionally_required: On failure.}
+
+  # --- Metrics (`otel_metrics.py`, `metrics/otel.rs`) --------------------------------------
+  # Units are exactly what the producer ships: the nine counters Python creates without a unit
+  # are declared with `unit: ""` (the OTel SDK default), not with the `{token}` / `{character}`
+  # / `{request}` annotations they arguably deserve; changing that is a wire change.
+  - {id: metric.lk.agents.turn.e2e_latency, type: metric, metric_name: lk.agents.turn.e2e_latency, instrument: histogram, unit: s, stability: development, brief: "End-to-end latency of a turn.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.turn.llm_ttft, type: metric, metric_name: lk.agents.turn.llm_ttft, instrument: histogram, unit: s, stability: development, brief: "Time to the first LLM token.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.turn.tts_ttfb, type: metric, metric_name: lk.agents.turn.tts_ttfb, instrument: histogram, unit: s, stability: development, brief: "Time to the first TTS byte.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.turn.transcription_delay, type: metric, metric_name: lk.agents.turn.transcription_delay, instrument: histogram, unit: s, stability: development, brief: "Delay from the end of speech to the final transcript.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.turn.end_of_turn_delay, type: metric, metric_name: lk.agents.turn.end_of_turn_delay, instrument: histogram, unit: s, stability: development, brief: "Delay from the end of speech to the turn decision.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.turn.on_user_turn_completed_delay, type: metric, metric_name: lk.agents.turn.on_user_turn_completed_delay, instrument: histogram, unit: s, stability: development, brief: "Duration of the `on_user_turn_completed` hook.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_tokens, type: metric, metric_name: lk.agents.usage.llm_input_tokens, instrument: counter, unit: "", stability: development, brief: "LLM input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_cached_tokens, type: metric, metric_name: lk.agents.usage.llm_input_cached_tokens, instrument: counter, unit: "", stability: development, brief: "LLM cached input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_output_tokens, type: metric, metric_name: lk.agents.usage.llm_output_tokens, instrument: counter, unit: "", stability: development, brief: "LLM output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_audio_tokens, type: metric, metric_name: lk.agents.usage.llm_input_audio_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model audio input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_input_text_tokens, type: metric, metric_name: lk.agents.usage.llm_input_text_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model text input tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_output_audio_tokens, type: metric, metric_name: lk.agents.usage.llm_output_audio_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model audio output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_output_text_tokens, type: metric, metric_name: lk.agents.usage.llm_output_text_tokens, instrument: counter, unit: "", stability: development, brief: "Realtime-model text output tokens.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.llm_session_duration, type: metric, metric_name: lk.agents.usage.llm_session_duration, instrument: counter, unit: s, stability: development, brief: "Realtime-model session seconds.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.tts_characters, type: metric, metric_name: lk.agents.usage.tts_characters, instrument: counter, unit: "", stability: development, brief: "Characters synthesized.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.tts_audio_duration, type: metric, metric_name: lk.agents.usage.tts_audio_duration, instrument: counter, unit: s, stability: development, brief: "Seconds of audio synthesized.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.stt_audio_duration, type: metric, metric_name: lk.agents.usage.stt_audio_duration, instrument: counter, unit: s, stability: development, brief: "Seconds of audio transcribed.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.usage.interruption_num_requests, type: metric, metric_name: lk.agents.usage.interruption_num_requests, instrument: counter, unit: "", stability: development, brief: "Interruption-detector requests.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}]}
+  - {id: metric.lk.agents.connection.acquire_time, type: metric, metric_name: lk.agents.connection.acquire_time, instrument: histogram, unit: s, stability: development, brief: "Seconds to acquire a provider connection.", attributes: [{ref: model_name, requirement_level: recommended}, {ref: model_provider, requirement_level: recommended}, {ref: connection_reused, requirement_level: required}]}
+  - {id: metric.lk.agents.event_loop.blocked_duration, type: metric, metric_name: lk.agents.event_loop.blocked_duration, instrument: histogram, unit: s, stability: development, brief: "Duration of synchronous blocks detected on an agent event loop."}
+
+  # --- GenAI span events and metrics no upstream registry defines today -------------------
+  # The five message events and `gen_ai.client.token.usage` / `...time_to_first_chunk` are
+  # deprecated in OTel semconv 1.44.0 and excluded from dependency resolution; Agents still
+  # names them, so they are declared here as emitted. They are span events on `llm_node` and
+  # the PII filter drops them whole; weaver's only event type is the log event.
+  - id: event.gen_ai.system.message
+    type: event
+    name: gen_ai.system.message
+    stability: development
+    brief: OTel GenAI system (or developer) message, a span event on `llm_node`.
+    note: Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+    annotations:
+      livekit: {severity: [], body: "Not a log record: a span event whose `content` attribute carries the message."}
+  - id: event.gen_ai.user.message
+    type: event
+    name: gen_ai.user.message
+    stability: development
+    brief: OTel GenAI user message, a span event on `llm_node`.
+    note: Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+    annotations:
+      livekit: {severity: [], body: "Not a log record: a span event whose `content` attribute carries the message."}
+  - id: event.gen_ai.assistant.message
+    type: event
+    name: gen_ai.assistant.message
+    stability: development
+    brief: OTel GenAI assistant message (also a function call), a span event on `llm_node`.
+    note: Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+    annotations:
+      livekit: {severity: [], body: "Not a log record: a span event whose `content` attribute carries the message."}
+  - id: event.gen_ai.tool.message
+    type: event
+    name: gen_ai.tool.message
+    stability: development
+    brief: OTel GenAI tool message (a function call output), a span event on `llm_node`.
+    note: Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+    annotations:
+      livekit: {severity: [], body: "Not a log record: a span event whose `content` attribute carries the message."}
+  - id: event.gen_ai.choice
+    type: event
+    name: gen_ai.choice
+    stability: development
+    brief: OTel GenAI choice, a span event on `llm_node`.
+    note: Deprecated upstream (semconv 1.44.0 `gen-ai/deprecated/events-deprecated.yaml`); declared as emitted.
+    annotations:
+      livekit: {severity: [], body: "Not a log record: a span event whose `content` attribute carries the message."}
+  # gen_ai.client.operation.duration is current in the GenAI registry, but weaver 0.28.0 refuses to
+  # import it: semconv v1.44.0 keeps a deprecated copy marked `dependency_resolution: exclude`, and
+  # an import that matches an excluded metric is an error. Declared here as emitted, with the GenAI
+  # registry's instrument and unit, until weaver can import it (groups.yaml imports the other two).
+  - {id: metric.gen_ai.client.operation.duration, type: metric, metric_name: gen_ai.client.operation.duration, instrument: histogram, unit: s, stability: development, brief: "GenAI operation duration, as the GenAI registry defines it (declared here because weaver cannot import it).", attributes: [{ref: gen_ai.operation.name, requirement_level: required}, {ref: gen_ai.provider.name, requirement_level: recommended}, {ref: gen_ai.request.model, requirement_level: recommended}]}
+  - {id: metric.gen_ai.client.token.usage, type: metric, metric_name: gen_ai.client.token.usage, instrument: histogram, unit: "{token}", stability: development, brief: "Input and output tokens used by the GenAI operation (deprecated upstream; declared as emitted).", attributes: [{ref: gen_ai.token.type, requirement_level: required}, {ref: gen_ai.operation.name, requirement_level: required}, {ref: gen_ai.provider.name, requirement_level: recommended}, {ref: gen_ai.request.model, requirement_level: recommended}]}
+  - {id: metric.gen_ai.client.operation.time_to_first_chunk, type: metric, metric_name: gen_ai.client.operation.time_to_first_chunk, instrument: histogram, unit: s, stability: development, brief: "Time to the first chunk of a streaming GenAI response (deprecated upstream; declared as emitted).", attributes: [{ref: gen_ai.operation.name, requirement_level: required}, {ref: gen_ai.provider.name, requirement_level: recommended}, {ref: gen_ai.request.model, requirement_level: recommended}]}

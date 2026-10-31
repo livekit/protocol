@@ -1,0 +1,8 @@
+# expect: livekit_metric_unit
+file_format: definition/2
+metrics:
+  - name: client.negative.duration
+    instrument: histogram
+    unit: ms
+    stability: development
+    brief: A definition/2 metric in milliseconds.

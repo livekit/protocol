@@ -1,0 +1,5 @@
+[
+ {"resource": {"attributes": [{"name": "service.name", "value": "livekit-client-js"}, {"name": "service.version", "value": "2.15.0"}, {"name": "telemetry.sdk.name", "value": "livekit-telemetry"}, {"name": "telemetry.sdk.language", "value": "webjs"}, {"name": "telemetry.sdk.version", "value": "0.1.0"}, {"name": "browser.name", "value": "Firefox"}, {"name": "browser.version", "value": "131.0"}]}},
+ {"log": {"event_name": "lk.device.network.changed", "severity_number": 9, "severity_text": "INFO", "body": "lk.device.network.changed", "attributes": [{"name": "network.connection.type", "value": "unknown"}, {"name": "session.id", "value": "4bf92f3577b34da6a3ce929d0e0e4736"}, {"name": "otel.event.name", "value": "lk.device.network.changed"}]}},
+ {"log": {"event_name": "lk.device.network.changed", "severity_number": 9, "severity_text": "INFO", "body": "lk.device.network.changed", "attributes": [{"name": "network.connection.type", "value": "unavailable"}, {"name": "session.id", "value": "4bf92f3577b34da6a3ce929d0e0e4736"}, {"name": "otel.event.name", "value": "lk.device.network.changed"}]}}
+]
