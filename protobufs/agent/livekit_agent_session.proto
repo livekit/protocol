@@ -320,6 +320,14 @@ message AgentSessionEvent {
     }
   }
 
+  // The agent session closed: the call is over even if the agent is still in the room.
+  // No further session events follow, and session requests are no longer answered;
+  // finalize_simulation may still be.
+  message SessionClosed {
+    CloseReason reason = 1;
+    optional string error = 2;
+  }
+
   message AgentFalseInterruption {
     // Agent paused its own speech for what turned out not to be a real interruption (a backchannel, brief noise, etc.).
     bool resumed = 1;
@@ -341,6 +349,7 @@ message AgentSessionEvent {
     DebugMessage debug_message = 21;
     ToolExecutionUpdated tool_execution_updated = 22;
     AgentFalseInterruption agent_false_interruption = 23;
+    SessionClosed session_closed = 24;
   }
 }
 
